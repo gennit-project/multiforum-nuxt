@@ -70,10 +70,10 @@ const isOnMapPage = computed(() => {
 <template>
   <nav
     class="z-20 h-12 border-b border-b-gray-600 bg-gray-900 pr-4 lg:ml-16"
-    :class="[isOnMapPage ? 'fixed w-full' : '']"
+    :class="[isOnMapPage ? 'fixed w-full lg:w-[calc(100%-5rem)]' : '']"
   >
     <div class="flex items-center justify-between py-1 pr-2 pl-12 lg:pl-2">
-      <div class="flex items-center">
+      <div class="min-w-0 flex items-center overflow-hidden">
         <HamburgerMenuButton
           v-if="!sideNavIsOpenVar"
           data-testid="menu-button"
@@ -81,7 +81,7 @@ const isOnMapPage = computed(() => {
           @click="$emit('toggleDropdown')"
         />
 
-        <div class="ml-2 flex items-center space-x-1 text-sm">
+        <div class="ml-2 flex min-w-0 items-center space-x-1 text-sm">
           <nuxt-link to="/" class="flex items-center gap-1">
             <ClientOnly>
               <span v-if="!lgAndUp">🐝</span>
@@ -103,7 +103,7 @@ const isOnMapPage = computed(() => {
             <span>•</span>
             <nuxt-link
               :to="`/forums/${channelId}`"
-              class="font-mono text-gray-300 hover:text-white"
+              class="max-w-[8rem] truncate font-mono text-gray-300 hover:text-white sm:max-w-[12rem] lg:max-w-[16rem]"
             >
               {{ channelId }}
             </nuxt-link>
@@ -116,23 +116,23 @@ const isOnMapPage = computed(() => {
           </div>
           <div
             v-else-if="routeInfoLabel"
-            class="hidden items-center gap-1 sm:flex"
+            class="hidden items-center gap-1 truncate sm:flex"
           >
             <span>•</span>
             {{ routeInfoLabel }}
           </div>
-          <div v-else class="hidden items-center gap-1 sm:flex">
+          <div v-else class="hidden items-center gap-1 truncate sm:flex">
             {{ getLabel() }}
           </div>
         </div>
       </div>
-      <div class="hidden flex-1 px-4 md:flex">
-        <TopNavSearch />
+      <div class="hidden min-w-0 flex-1 justify-center px-4 md:flex">
+        <div class="w-full max-w-xl min-w-0">
+          <TopNavSearch />
+        </div>
       </div>
-      <div class="flex items-center gap-2">
-        <div
-          class="hidden items-center justify-end space-x-4 sm:flex md:flex-1"
-        >
+      <div class="flex flex-none items-center gap-2">
+        <div class="hidden items-center justify-end space-x-4 sm:flex">
           <nuxt-link
             to="/about"
             class="text-sm font-semibold text-gray-300 hover:text-white"
@@ -160,7 +160,7 @@ const isOnMapPage = computed(() => {
             </span>
           </nuxt-link>
           <ThemeSwitcher />
-          <div v-if="usernameVar" class="hidden lg:block">
+          <div v-if="usernameVar" class="block">
             <div class="flex items-center">
               <div class="relative flex-shrink-0">
                 <UserProfileDropdownMenu

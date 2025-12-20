@@ -99,7 +99,7 @@ const handleSessionExpiredLogin = () => {
           />
 
           <div
-            class="flex w-full flex-grow flex-col bg-white dark:bg-black lg:pl-20"
+            class="flex min-w-0 flex-1 flex-col bg-white dark:bg-black lg:pl-20"
           >
             <slot />
           </div>

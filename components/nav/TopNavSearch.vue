@@ -11,7 +11,13 @@ import {
   setLocalStorageItem,
 } from '@/utils/localStorageUtils';
 
-type SearchType = 'discussions' | 'comments' | 'downloads' | 'forums' | 'events';
+type SearchType =
+  | 'discussions'
+  | 'comments'
+  | 'downloads'
+  | 'forums'
+  | 'eventsOnline'
+  | 'eventsInPerson';
 type ModifiedRange = 'all' | 'last7' | 'last30' | 'thisYear' | 'lastYear';
 
 type RecentSearch = {
@@ -44,7 +50,8 @@ const typeOptions: Array<{ value: SearchType; label: string }> = [
   { value: 'comments', label: 'Comments' },
   { value: 'downloads', label: 'Downloads' },
   { value: 'forums', label: 'Forums' },
-  { value: 'events', label: 'Events' },
+  { value: 'eventsOnline', label: 'Events (Online)' },
+  { value: 'eventsInPerson', label: 'Events (In person)' },
 ];
 
 const modifiedOptions: Array<{ value: ModifiedRange; label: string }> = [
@@ -144,7 +151,8 @@ const executeSearch = (value?: string) => {
     comments: '/comments/search',
     downloads: '/downloads',
     forums: '/forums',
-    events: '/events/list/search',
+    eventsOnline: '/events/list/search',
+    eventsInPerson: '/map/search',
   };
 
   router.push({
@@ -229,6 +237,7 @@ onBeforeUnmount(() => {
         :search-placeholder="'Search ( / )'"
         :small="true"
         :test-id="'top-nav-search-input'"
+        :debounce-ms="0"
         @update-search-input="handleSearchInput"
         @submit="executeSearch"
       />

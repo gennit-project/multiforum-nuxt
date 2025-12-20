@@ -32,6 +32,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  debounceMs: {
+    type: Number,
+    default: 500,
+  },
 });
 
 // Emit event
@@ -59,11 +63,17 @@ const removeQuotationMarks = (input: string) => {
 let timeout: ReturnType<typeof setTimeout> | null = null;
 
 const updateSearchInput = (e: Event) => {
-  if (timeout) clearTimeout(timeout);
-  timeout = setTimeout(() => {
-    const target = e.target as HTMLInputElement;
+  const target = e.target as HTMLInputElement;
+  const emitValue = () =>
     emit('updateSearchInput', removeQuotationMarks(target.value));
-  }, 500);
+
+  if (props.debounceMs <= 0) {
+    emitValue();
+    return;
+  }
+
+  if (timeout) clearTimeout(timeout);
+  timeout = setTimeout(emitValue, props.debounceMs);
 };
 
 const submit = (e: Event) => {

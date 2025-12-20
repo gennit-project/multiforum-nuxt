@@ -449,7 +449,6 @@ const isClientSide = typeof window !== 'undefined';
   <div class="flex flex-col">
     <client-only>
       <div
-        :class="[mdAndUp ? 'fixed top-0' : '']"
         class="h-34 z-10 mt-12 flex w-full items-center justify-center bg-gray-800 text-white"
       >
         <div
@@ -461,7 +460,7 @@ const isClientSide = typeof window !== 'undefined';
               class="flex items-center justify-between px-1 pt-1"
             >
               <div
-                class="text-sm font-semibold tracking-wide text-gray-900 dark:text-gray-100 [font-variant-caps:all-small-caps]"
+                class="font-semibold text-sm tracking-wide text-gray-900 [font-variant-caps:all-small-caps] dark:text-gray-100"
               >
                 In-person events
               </div>
@@ -519,7 +518,9 @@ const isClientSide = typeof window !== 'undefined';
           </div>
         </div>
 
-        <div class="fixed right-0 h-screen w-1/2 bg-gray-300 dark:bg-black">
+        <div
+          class="fixed right-0 h-screen w-1/2 bg-gray-300 dark:bg-black lg:w-[calc(50%-2.5rem)]"
+        >
           <LoadingSpinner v-if="eventLoading" class="mx-auto my-4" />
           <ErrorBanner
             v-else-if="eventError"

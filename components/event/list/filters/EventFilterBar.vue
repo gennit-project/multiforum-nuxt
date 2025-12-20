@@ -296,7 +296,10 @@ const updateShowArchived = (event: Event) => {
 </script>
 
 <template>
-  <div class="mx-4 mt-1 flex-1 flex-col space-y-1 dark:text-white">
+  <div
+    class="mt-1 flex-1 flex-col space-y-1 dark:text-white"
+    :class="[showMap ? 'w-full px-4' : 'mx-4']"
+  >
     <div class="mb-2 flex justify-end">
       <button
         v-if="allowHidingMainFilters"
