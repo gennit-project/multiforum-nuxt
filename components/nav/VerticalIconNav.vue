@@ -38,12 +38,6 @@ type NavigationItem = {
 
 const navigation: NavigationItem[] = [
   {
-    name: 'Calendars',
-    href: '/events/list/search',
-    icon: CalendarIcon,
-    routerName: 'events-list-search',
-  },
-  {
     name: 'Discuss',
     href: '/discussions',
     icon: DiscussionIcon,
@@ -54,6 +48,12 @@ const navigation: NavigationItem[] = [
     href: '/downloads',
     icon: DownloadIcon,
     routerName: 'downloads',
+  },
+  {
+    name: 'Calendars',
+    href: '/events/list/search',
+    icon: CalendarIcon,
+    routerName: 'events-list-search',
   },
   {
     name: 'Forums',
