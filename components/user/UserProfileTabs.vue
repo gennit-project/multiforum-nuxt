@@ -14,13 +14,19 @@ type TabData = {
   count?: number | null;
 };
 
+type UserProfileCounts = User & {
+  DownloadsAggregate?: {
+    count?: number | null;
+  } | null;
+};
+
 const props = defineProps({
   vertical: {
     type: Boolean,
     default: false,
   },
   user: {
-    type: Object as () => User,
+    type: Object as () => UserProfileCounts,
     required: true,
   },
   showCounts: {
@@ -55,6 +61,12 @@ const tabs = computed(() => {
       href: `/u/${usernameInParams.value}/discussions`,
       current: false,
       count: props.user?.DiscussionsAggregate?.count,
+    },
+    {
+      name: 'Downloads',
+      href: `/u/${usernameInParams.value}/downloads`,
+      current: false,
+      count: props.user?.DownloadsAggregate?.count,
     },
     {
       name: 'Events',

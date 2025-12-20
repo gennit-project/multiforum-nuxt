@@ -39,6 +39,8 @@ const defaultUniqueName = computed(() => {
   return props.discussion.DiscussionChannels[0].Channel?.uniqueName;
 });
 
+const isDownload = computed(() => !!props.discussion.hasDownload);
+
 const title = props.discussion.title;
 const relativeTimeText = relativeTime(props.discussion.createdAt);
 const authorUsername = props.discussion.Author
@@ -53,9 +55,8 @@ const tags = (props.discussion.Tags ?? []).map((tag) => tag.text);
     @click="
       () => {
         if (defaultUniqueName) {
-          router.push(
-            `/forums/${defaultUniqueName}/discussions/${discussion.id}`
-          );
+          const basePath = isDownload ? 'downloads' : 'discussions';
+          router.push(`/forums/${defaultUniqueName}/${basePath}/${discussion.id}`);
         }
       }
     "
@@ -85,7 +86,9 @@ const tags = (props.discussion.Tags ?? []).map((tag) => tag.text);
         :key="i"
         class="text-gray-500 underline hover:text-gray-700 dark:text-gray-300 hover:dark:text-gray-200"
         :to="{
-          name: 'forums-forumId-discussions-discussionId',
+          name: isDownload
+            ? 'forums-forumId-downloads-discussionId'
+            : 'forums-forumId-discussions-discussionId',
           params: {
             forumId:
               discussionChannel.Channel?.uniqueName ||
@@ -94,7 +97,7 @@ const tags = (props.discussion.Tags ?? []).map((tag) => tag.text);
           },
         }"
       >
-        View this post in
+        View this {{ isDownload ? 'download' : 'post' }} in
         {{
           `c/${discussionChannel.Channel?.uniqueName || discussionChannel.channelUniqueName}`
         }}

@@ -41,7 +41,12 @@ export const GET_USER = gql`
       CommentsAggregate(where: { NOT: { archived: true } }) {
         count
       }
-      DiscussionsAggregate(where: { NOT: { hasDownload: true } }) {
+      DiscussionsAggregate(
+        where: { OR: [{ hasDownload: false }, { hasDownload: null }] }
+      ) {
+        count
+      }
+      DownloadsAggregate: DiscussionsAggregate(where: { hasDownload: true }) {
         count
       }
       EventsAggregate {
@@ -118,7 +123,10 @@ export const GET_USER_DISCUSSIONS = gql`
     users(where: { username: $username }) {
       username
       profilePicURL
-      Discussions(options: { sort: { createdAt: DESC } }) {
+      Discussions(
+        where: { OR: [{ hasDownload: false }, { hasDownload: null }] }
+        options: { sort: { createdAt: DESC } }
+      ) {
         id
         Author {
           username
@@ -131,6 +139,7 @@ export const GET_USER_DISCUSSIONS = gql`
         createdAt
         updatedAt
         deleted
+        hasDownload
         DiscussionChannels {
           archived
           answered
@@ -145,6 +154,66 @@ export const GET_USER_DISCUSSIONS = gql`
         }
         Tags {
           text
+        }
+      }
+    }
+  }
+`;
+
+export const GET_USER_DOWNLOADS = gql`
+  query getUserDownloads($username: String!) {
+    users(where: { username: $username }) {
+      username
+      profilePicURL
+      Discussions(
+        where: { hasDownload: true }
+        options: { sort: { createdAt: DESC } }
+      ) {
+        id
+        Author {
+          username
+          displayName
+          profilePicURL
+          commentKarma
+          discussionKarma
+          createdAt
+          ServerRoles {
+            showAdminTag
+          }
+        }
+        title
+        body
+        createdAt
+        updatedAt
+        deleted
+        hasDownload
+        hasSensitiveContent
+        DiscussionChannels {
+          archived
+          answered
+          locked
+          Channel {
+            uniqueName
+          }
+          CommentsAggregate {
+            count
+          }
+          weightedVotesCount
+          id
+          discussionId
+          channelUniqueName
+        }
+        Tags {
+          text
+        }
+        Album {
+          id
+          imageOrder
+          Images {
+            id
+            url
+            caption
+          }
         }
       }
     }

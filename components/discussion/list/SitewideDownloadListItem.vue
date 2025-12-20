@@ -33,6 +33,10 @@ const props = defineProps({
     type: Array as () => string[],
     default: () => [],
   },
+  showUploader: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const emit = defineEmits<{
@@ -248,7 +252,10 @@ const handleOpenAlbum = () => {
         </span>
       </div>
 
-      <div class="text-sm text-gray-600 dark:text-gray-300">
+      <div
+        v-if="showUploader"
+        class="text-sm text-gray-600 dark:text-gray-300"
+      >
         Posted {{ relativeCreated }} by
         <UsernameWithTooltip
           v-if="authorUsername"
