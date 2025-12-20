@@ -226,54 +226,56 @@ const revealSensitiveContent = () => {
               class="pt-1 text-xs text-gray-500 no-underline dark:text-gray-300"
             >
               <!-- Use div instead of p to avoid invalid HTML (button inside p) -->
-              <div class="flex items-center whitespace-normal">
+              <div class="whitespace-normal">
                 <!-- Comment count -->
-                <nuxt-link
-                  v-if="discussion && !submittedToMultipleChannels"
-                  :to="getDetailLink()"
-                  class="inline"
-                >
-                  {{ commentCount }}
-                  {{ commentCount === 1 ? 'comment' : 'comments' }}
-                </nuxt-link>
-
-                <MenuButton
-                  v-else-if="discussion"
-                  :items="discussionDetailOptions"
-                  class="inline"
-                >
-                  <span class="inline cursor-pointer">
-                    <i class="fa-regular fa-comment mr-1 h-4 w-4" />
+                <template v-if="discussion && !submittedToMultipleChannels">
+                  <nuxt-link :to="getDetailLink()" class="inline">
                     {{ commentCount }}
-                    {{ commentCount === 1 ? 'comment' : 'comments' }} in
-                    {{ channelCount }}
-                    {{ channelCount === 1 ? 'forum' : 'forums' }}
-                    <ChevronDownIcon
-                      class="ml-1 inline h-4 w-4"
-                      aria-hidden="true"
-                    />
+                    {{ commentCount === 1 ? 'comment' : 'comments' }}
+                  </nuxt-link>
+                </template>
+
+                <template v-else-if="discussion">
+                  <span class="inline-flex">
+                    <MenuButton :items="discussionDetailOptions">
+                      <span class="inline cursor-pointer">
+                        <i class="fa-regular fa-comment mr-1 h-4 w-4" />
+                        {{ commentCount }}
+                        {{ commentCount === 1 ? 'comment' : 'comments' }} in
+                        {{ channelCount }}
+                        {{ channelCount === 1 ? 'forum' : 'forums' }}
+                        <ChevronDownIcon
+                          class="ml-1 inline h-4 w-4"
+                          aria-hidden="true"
+                        />
+                      </span>
+                    </MenuButton>
                   </span>
-                </MenuButton>
+                </template>
 
                 <span class="mx-1 inline">•</span>
-                Posted {{ relative }} by
-                <UsernameWithTooltip
-                  v-if="authorUsername"
-                  :is-admin="authorIsAdmin"
-                  :username="authorUsername"
-                  :src="discussion?.Author?.profilePicURL || ''"
-                  :display-name="discussion?.Author?.displayName || ''"
-                  :comment-karma="discussion?.Author?.commentKarma ?? 0"
-                  :discussion-karma="discussion?.Author?.discussionKarma ?? 0"
-                  :account-created="discussion?.Author?.createdAt"
-                />
-                <AddToDiscussionFavorites
-                  v-if="discussion"
-                  :allow-add-to-list="true"
-                  :discussion-id="discussion.id"
-                  :discussion-title="discussion.title"
-                  size="small"
-                />
+                <span class="inline">Posted {{ relative }} by</span>
+                <div class="inline-flex">
+                  <UsernameWithTooltip
+                    v-if="authorUsername"
+                    :is-admin="authorIsAdmin"
+                    :username="authorUsername"
+                    :src="discussion?.Author?.profilePicURL || ''"
+                    :display-name="discussion?.Author?.displayName || ''"
+                    :comment-karma="discussion?.Author?.commentKarma ?? 0"
+                    :discussion-karma="discussion?.Author?.discussionKarma ?? 0"
+                    :account-created="discussion?.Author?.createdAt"
+                  />
+                </div>
+                <div class="inline-flex">
+                  <AddToDiscussionFavorites
+                    v-if="discussion"
+                    :allow-add-to-list="true"
+                    :discussion-id="discussion.id"
+                    :discussion-title="discussion.title"
+                    size="small"
+                  />
+                </div>
               </div>
             </div>
             <button
