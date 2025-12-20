@@ -74,6 +74,7 @@ const {
   searchInput,
   selectedTags,
   showArchived,
+  hasDownload: false,
   showUnanswered,
   options: {
     limit: DISCUSSION_PAGE_LIMIT,
