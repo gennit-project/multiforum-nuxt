@@ -184,7 +184,7 @@ onGetChannelResult((result) => {
       (loadedChannel.description.length > 160 ? '...' : '')
     : `${forumName} - Community Forum`;
   const baseUrl = import.meta.env.VITE_BASE_URL;
-  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME || 'Multiforum';
   const imageUrl =
     loadedChannel.channelIconURL || loadedChannel.channelBannerURL || '';
 
