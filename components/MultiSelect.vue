@@ -230,11 +230,16 @@ const filteredSections = computed(() => {
 
   // When searching, filter options within each section
   // Keep sections even if they have no matching options (to show empty message)
+  const searchTerm = searchQuery.value.toLowerCase();
   return props.sections.map((section) => ({
     ...section,
-    options: section.options.filter((option) =>
-      option.label.toLowerCase().includes(searchQuery.value.toLowerCase())
-    ),
+    options: section.options.filter((option) => {
+      const optionText =
+        option.value === null || option.value === undefined
+          ? option.label
+          : String(option.value);
+      return optionText.toLowerCase().includes(searchTerm);
+    }),
   }));
 });
 
@@ -244,9 +249,14 @@ const filteredOptions = computed(() => {
     return props.options;
   }
 
-  return props.options.filter((option) =>
-    option.label.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
+  const searchTerm = searchQuery.value.toLowerCase();
+  return props.options.filter((option) => {
+    const optionText =
+      option.value === null || option.value === undefined
+        ? option.label
+        : String(option.value);
+    return optionText.toLowerCase().includes(searchTerm);
+  });
 });
 
 // Get option by value

@@ -30,12 +30,14 @@ const emit = defineEmits(['setSelectedChannels']);
 
 const searchQuery = ref('');
 
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 const { loading: channelsLoading, result: channelsResult } = useQuery(
   GET_CHANNEL_NAMES,
   computed(() => ({
     channelWhere: {
       uniqueName_MATCHES: searchQuery.value
-        ? `(?i).*${searchQuery.value}.*`
+        ? `(?i).*${escapeRegex(searchQuery.value)}.*`
         : '.*',
     },
   })),
@@ -145,7 +147,7 @@ const channelSections = computed<MultiSelectSection[]>(() => {
 
   // All Forums section
   sections.push({
-    title: 'All Forums',
+    title: 'Forums (Top 10)',
     options: channelOptions.value,
   });
 
