@@ -6,6 +6,7 @@ import UserProfileDropdownMenu from '@/components/nav/UserProfileDropdownMenu.vu
 import ThemeSwitcher from '@/components/nav/ThemeSwitcher.vue';
 import CreateAnythingButton from '@/components/nav/CreateAnythingButton.vue';
 import AddToChannelFavorites from '@/components/favorites/AddToChannelFavorites.vue';
+import TopNavSearch from '@/components/nav/TopNavSearch.vue';
 // import LogoIcon from "@/components/icons/LogoIcon.vue"; // Unused for now
 import { useRoute } from 'nuxt/app';
 import LoginButton from './LoginButton.vue';
@@ -124,6 +125,9 @@ const isOnMapPage = computed(() => {
             {{ getLabel() }}
           </div>
         </div>
+      </div>
+      <div class="hidden flex-1 px-4 md:flex">
+        <TopNavSearch />
       </div>
       <div class="flex items-center gap-2">
         <div

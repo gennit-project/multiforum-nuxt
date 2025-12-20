@@ -35,7 +35,7 @@ const props = defineProps({
 });
 
 // Emit event
-const emit = defineEmits(['updateSearchInput']);
+const emit = defineEmits(['updateSearchInput', 'submit']);
 
 // Template refs
 const searchInputRef = ref<HTMLElement | null>(null);
@@ -66,10 +66,30 @@ const updateSearchInput = (e: Event) => {
   }, 500);
 };
 
+const submit = (e: Event) => {
+  const target = e.target as HTMLInputElement;
+  emit('submit', removeQuotationMarks(target.value));
+};
+
 const clear = () => {
   emit('updateSearchInput', '');
   input.value = '';
 };
+
+const focus = () => {
+  if (searchInputRef.value instanceof HTMLElement) {
+    searchInputRef.value.focus();
+  }
+};
+
+const getValue = () => {
+  if (searchInputRef.value instanceof HTMLInputElement) {
+    return searchInputRef.value.value;
+  }
+  return '';
+};
+
+defineExpose({ focus, getValue });
 </script>
 
 <template>
@@ -94,6 +114,7 @@ const clear = () => {
         :placeholder="searchPlaceholder"
         type="text"
         @input="updateSearchInput"
+        @keydown.enter.prevent="submit"
       >
       <div
         v-if="initialValue"

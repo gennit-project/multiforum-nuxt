@@ -21,10 +21,18 @@ const selectedTags = ref<Array<string>>(
     ? [route.query.tag]
     : []
 );
-const searchInput = ref<string>('');
+const searchInput = ref<string>(
+  typeof route.query.searchInput === 'string' ? route.query.searchInput : ''
+);
 
 const setSearchInput = (input: string) => {
   searchInput.value = input;
+  router.replace({
+    query: {
+      ...route.query,
+      searchInput: input || undefined,
+    },
+  });
 };
 
 const setSelectedTags = (tag: string) => {
@@ -47,6 +55,14 @@ const setSelectedTags = (tag: string) => {
 
 // update the selected tags whenever query params change in the URL
 watchEffect(() => {
+  if (typeof route.query.searchInput === 'string') {
+    if (searchInput.value !== route.query.searchInput) {
+      searchInput.value = route.query.searchInput;
+    }
+  } else if (searchInput.value) {
+    searchInput.value = '';
+  }
+
   if (route.query.tag) {
     if (typeof route.query.tag === 'string') {
       selectedTags.value = [route.query.tag];
@@ -208,6 +224,7 @@ const defaultLabels = {
         <div class="mx-auto flex max-w-4xl items-center justify-between py-2">
           <SearchBar
             class="mr-4 w-full align-middle"
+            :initial-value="searchInput"
             :search-placeholder="'Search forums'"
             @update-search-input="setSearchInput"
           />
