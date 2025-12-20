@@ -214,7 +214,7 @@ const handleOpenAlbum = () => {
       </div>
     </div>
 
-    <div class="flex flex-col gap-3 p-3">
+    <div class="flex flex-col gap-2 p-2">
       <div
         class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-300"
       >
@@ -233,11 +233,11 @@ const handleOpenAlbum = () => {
         </nuxt-link>
       </div>
 
-      <div>
+      <div class="space-y-1">
         <nuxt-link
           v-if="primaryChannel"
           :to="defaultLink"
-          class="font-semibold text-lg leading-tight text-gray-900 hover:text-gray-600 dark:text-white"
+          class="text-base font-semibold leading-tight text-gray-900 hover:text-gray-600 dark:text-white"
         >
           <HighlightedSearchTerms
             :text="discussion.title || '[Deleted]'"
@@ -246,16 +246,13 @@ const handleOpenAlbum = () => {
         </nuxt-link>
         <span
           v-if="hasSensitiveContent"
-          class="ml-2 rounded-full border border-orange-600 px-2 text-xs text-orange-600 dark:border-orange-400 dark:text-orange-300"
+          class="ml-2 rounded-full border border-orange-600 px-2 text-[10px] text-orange-600 dark:border-orange-400 dark:text-orange-300"
         >
           Sensitive
         </span>
       </div>
 
-      <div
-        v-if="showUploader"
-        class="text-sm text-gray-600 dark:text-gray-300"
-      >
+      <div v-if="showUploader" class="text-xs text-gray-600 dark:text-gray-300">
         Posted {{ relativeCreated }} by
         <UsernameWithTooltip
           v-if="authorUsername"
@@ -269,17 +266,7 @@ const handleOpenAlbum = () => {
         />
       </div>
 
-      <div class="flex flex-wrap gap-2">
-        <TagComponent
-          v-for="tag in tags"
-          :key="tag"
-          :tag="tag"
-          :active="selectedTags.includes(tag)"
-          @click="$emit('filterByTag', tag)"
-        />
-      </div>
-
-      <div class="text-sm text-gray-600 dark:text-gray-300">
+      <div class="text-xs text-gray-600 dark:text-gray-300">
         <nuxt-link
           v-if="primaryChannel && !submittedToMultipleChannels"
           :to="defaultLink"
@@ -289,11 +276,11 @@ const handleOpenAlbum = () => {
           <span>{{ commentCount }} comments</span>
         </nuxt-link>
         <MenuButton
-          v-else-if="submittedToMultipleChannels"
+        v-else-if="submittedToMultipleChannels"
           :items="discussionDetailOptions"
         >
           <span
-            class="flex cursor-pointer items-center gap-1 rounded-full bg-gray-100 px-3 py-1 dark:bg-gray-800"
+            class="flex cursor-pointer items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-xs dark:bg-gray-800"
           >
             <i class="fa-regular fa-comment text-xs" />
             {{ commentCount }}
