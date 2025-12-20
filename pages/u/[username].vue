@@ -60,7 +60,7 @@ watchEffect(() => {
 
   const userName = user.value.displayName || user.value.username;
   const baseUrl = import.meta.env.VITE_BASE_URL;
-  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME || 'Multiforum';
   const profilePic = user.value.profilePicURL || '';
   const userBio = user.value.bio || `${userName}'s profile`;
 

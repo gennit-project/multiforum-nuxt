@@ -49,7 +49,7 @@ const tags = (props.discussion.Tags ?? []).map((tag) => tag.text);
 
 <template>
   <li
-    class="relative cursor-pointer list-none rounded-lg bg-white p-4 dark:bg-gray-800 dark:text-white"
+    class="relative cursor-pointer list-none rounded-lg bg-gray-100 p-4 dark:bg-gray-800 dark:text-white"
     @click="
       () => {
         if (defaultUniqueName) {

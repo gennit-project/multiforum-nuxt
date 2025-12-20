@@ -357,7 +357,7 @@ const cellCount = computed(() => {
           <option
             v-for="yearNumber in availableYears"
             :key="yearNumber"
-            :value="year"
+            :value="yearNumber"
           >
             {{ yearNumber }}
           </option>
@@ -475,7 +475,7 @@ const cellCount = computed(() => {
     <div
       v-if="selectedDay"
       class="mt-4 rounded-lg border p-4"
-      :class="darkMode ? 'border-green-500' : 'bg-gray-50 border-orange-500'"
+      :class="darkMode ? 'border-green-500' : 'bg-gray-50 border-green-500'"
     >
       <div class="flex gap-3">
         <Calendar
