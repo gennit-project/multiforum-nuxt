@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useRoute } from 'nuxt/app';
-import { useQuery } from '@vue/apollo-composable';
 import { useDisplay } from 'vuetify';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
@@ -9,7 +8,6 @@ import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import BookmarkIcon from '@/components/icons/BookmarkIcon.vue';
 import CreateAnythingButton from '@/components/nav/CreateAnythingButton.vue';
-import UserIcon from '@/components/icons/UserIcon.vue';
 import SettingsIcon from '@/components/icons/SettingsIcon.vue';
 import AdminIcon from '@/components/icons/AdminIcon.vue';
 import LoginIcon from '@/components/icons/LoginIcon.vue';
@@ -17,13 +15,11 @@ import MoreIcon from '@/components/icons/MoreIcon.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';
 import IconTooltip from '@/components/common/IconTooltip.vue';
 import RecentForumsDrawer from './RecentForumsDrawer.vue';
-import { GET_USER } from '@/graphQLData/user/queries';
 import { usernameVar, isAuthenticatedVar } from '@/cache';
 import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from '@/utils/localStorageUtils';
-import SiteSidenavLogout from './SiteSidenavLogout.vue';
 import type { ForumItem } from '@/types/forum';
 
 const DEFAULT_LIMIT = 5;
@@ -86,19 +82,6 @@ const loadRecentForums = () => {
 if (import.meta.client) {
   loadRecentForums();
 }
-
-const { result: getUserResult } = useQuery(
-  GET_USER,
-  {
-    username: usernameVar.value,
-  },
-  {
-    enabled: !!usernameVar.value,
-  }
-);
-
-const user = computed(() => getUserResult.value?.users[0] || null);
-const profilePicURL = computed(() => user.value?.profilePicURL || '');
 
 const route = useRoute();
 const { height } = useDisplay();

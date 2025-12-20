@@ -3,7 +3,6 @@ import { computed } from 'vue';
 import type { PropType } from 'vue';
 import { useRoute } from 'nuxt/app';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
-import TagComponent from '@/components/TagComponent.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
@@ -12,7 +11,6 @@ import { relativeTime } from '@/utils';
 import type {
   Discussion,
   DiscussionChannel,
-  Tag,
 } from '@/__generated__/graphql';
 
 type AlbumPayload = {
@@ -100,10 +98,6 @@ const discussionDetailOptions = computed(() => {
     };
   });
 });
-
-const tags = computed(
-  () => props.discussion?.Tags?.map((tag: Tag) => tag.text) || []
-);
 
 const hasSensitiveContent = computed(
   () => !!props.discussion?.hasSensitiveContent

@@ -127,8 +127,14 @@ const isOnMapPage = computed(() => {
       </div>
       <div class="flex items-center gap-2">
         <div
-          class="hidden items-center justify-end space-x-2 sm:flex md:flex-1"
+          class="hidden items-center justify-end space-x-4 sm:flex md:flex-1"
         >
+          <nuxt-link
+            to="/about"
+            class="text-sm font-semibold text-gray-300 hover:text-white"
+          >
+            About
+          </nuxt-link>
           <LoginButton />
         </div>
         <div class="flex items-center space-x-2 md:mr-2">
