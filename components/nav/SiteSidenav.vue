@@ -104,7 +104,6 @@ const user = computed(() => getUserResult.value?.users[0] || null);
 
 const profilePicURL = computed(() => user.value?.profilePicURL || '');
 
-
 const router = useRouter();
 
 const outside = () => {

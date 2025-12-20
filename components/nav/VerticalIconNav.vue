@@ -4,7 +4,6 @@ import { useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { useDisplay } from 'vuetify';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
-import LocationIcon from '@/components/icons/LocationIcon.vue';
 import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
@@ -39,19 +38,13 @@ type NavigationItem = {
 
 const navigation: NavigationItem[] = [
   {
-    name: 'Search Forum Calendars',
+    name: 'Calendars',
     href: '/events/list/search',
     icon: CalendarIcon,
     routerName: 'events-list-search',
   },
   {
-    name: 'Search In-person Events',
-    href: '/map/search',
-    icon: LocationIcon,
-    routerName: 'map-search',
-  },
-  {
-    name: 'Discussions',
+    name: 'Discuss',
     href: '/discussions',
     icon: DiscussionIcon,
     routerName: 'discussions',
@@ -63,7 +56,7 @@ const navigation: NavigationItem[] = [
     routerName: 'downloads',
   },
   {
-    name: 'All Forums',
+    name: 'Forums',
     href: '/forums',
     icon: ChannelIcon,
     routerName: 'forums',
@@ -226,7 +219,7 @@ const getUserActionClasses = (isActive: boolean) => {
 <template>
   <ClientOnly>
     <div
-      class="fixed left-0 top-0 z-[18] hidden h-full w-16 flex-col items-center border-r border-gray-600 bg-gray-900 lg:flex"
+      class="fixed left-0 top-0 z-[18] hidden h-full w-20 flex-col items-center border-r border-gray-600 bg-gray-900 lg:flex"
       :class="{ 'py-2': isVerticallyShort, 'py-4': !isVerticallyShort }"
     >
       <!-- Create Button -->
@@ -234,7 +227,14 @@ const getUserActionClasses = (isActive: boolean) => {
         text="Create new"
         :class="{ 'mb-2': isVerticallyShort, 'mb-4': !isVerticallyShort }"
       >
-        <CreateAnythingButton icon-only />
+        <div class="flex flex-col items-center">
+          <CreateAnythingButton icon-only />
+          <span
+            class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+          >
+            Create
+          </span>
+        </div>
       </IconTooltip>
 
       <!-- Main Navigation Icons -->
@@ -250,20 +250,27 @@ const getUserActionClasses = (isActive: boolean) => {
           :key="item.name"
           :text="item.name"
         >
-          <NuxtLink
-            :to="
-              item.routerName === 'library'
-                ? item.href
-                : { name: item.routerName }
-            "
-            :class="getIconCircleClasses(isActiveNavItem(item.routerName))"
-          >
-            <component
-              :is="item.icon"
-              class="h-6 w-6 text-gray-300"
-              aria-hidden="true"
-            />
-          </NuxtLink>
+          <div class="flex flex-col items-center">
+            <NuxtLink
+              :to="
+                item.routerName === 'library'
+                  ? item.href
+                  : { name: item.routerName }
+              "
+              :class="getIconCircleClasses(isActiveNavItem(item.routerName))"
+            >
+              <component
+                :is="item.icon"
+                class="h-6 w-6 text-gray-300"
+                aria-hidden="true"
+              />
+            </NuxtLink>
+            <span
+              class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+            >
+              {{ item.name }}
+            </span>
+          </div>
         </IconTooltip>
       </div>
 
@@ -286,21 +293,30 @@ const getUserActionClasses = (isActive: boolean) => {
             :key="forum.uniqueName"
             :text="forum.uniqueName"
           >
-            <NuxtLink
-              :to="{
-                name: 'forums-forumId-discussions',
-                params: { forumId: forum.uniqueName },
-              }"
-              :class="getForumIconClasses(currentForumId === forum.uniqueName)"
-            >
-              <AvatarComponent
-                class="h-8 w-8"
-                :text="forum.uniqueName || ''"
-                :src="forum?.channelIconURL ?? ''"
-                :is-small="true"
-                :is-square="false"
-              />
-            </NuxtLink>
+            <div class="flex flex-col items-center">
+              <NuxtLink
+                :to="{
+                  name: 'forums-forumId-discussions',
+                  params: { forumId: forum.uniqueName },
+                }"
+                :class="
+                  getForumIconClasses(currentForumId === forum.uniqueName)
+                "
+              >
+                <AvatarComponent
+                  class="h-8 w-8"
+                  :text="forum.uniqueName || ''"
+                  :src="forum?.channelIconURL ?? ''"
+                  :is-small="true"
+                  :is-square="false"
+                />
+              </NuxtLink>
+              <span
+                class="mt-0.5 w-12 truncate text-center text-[9px] leading-[10px] text-gray-400"
+              >
+                {{ forum.uniqueName }}
+              </span>
+            </div>
           </IconTooltip>
 
           <!-- More Button -->
@@ -313,7 +329,9 @@ const getUserActionClasses = (isActive: boolean) => {
                 <MoreIcon />
               </div>
             </IconTooltip>
-            <span class="mt-1 text-xs text-gray-400">More</span>
+            <span class="mt-0.5 text-[9px] leading-[10px] text-gray-400"
+              >More</span
+            >
           </div>
         </div>
       </ClientOnly>
@@ -334,74 +352,59 @@ const getUserActionClasses = (isActive: boolean) => {
       >
         <!-- Admin Dashboard (always shown) -->
         <IconTooltip text="Admin Dashboard">
-          <NuxtLink
-            to="/admin/issues"
-            :class="getUserActionClasses(isActiveUserAction('admin-issues'))"
-          >
-            <AdminIcon />
-          </NuxtLink>
+          <div class="flex flex-col items-center">
+            <NuxtLink
+              to="/admin/issues"
+              :class="getUserActionClasses(isActiveUserAction('admin-issues'))"
+            >
+              <AdminIcon />
+            </NuxtLink>
+            <span
+              class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+            >
+              Admin
+            </span>
+          </div>
         </IconTooltip>
 
         <!-- Authentication-dependent actions -->
         <ClientOnly>
           <!-- Profile -->
-          <IconTooltip
-            v-if="isAuthenticatedVar && usernameVar"
-            text="My Profile"
-          >
-            <NuxtLink
-              :to="{
-                name: 'u-username',
-                params: { username: usernameVar },
-              }"
-              :class="getUserActionClasses(isActiveUserAction('u-username'))"
-            >
-              <AvatarComponent
-                v-if="profilePicURL"
-                :text="usernameVar"
-                :src="profilePicURL"
-                :is-small="true"
-                class="h-8 w-8"
-              />
-              <UserIcon v-else />
-            </NuxtLink>
-          </IconTooltip>
 
           <!-- Settings -->
           <IconTooltip
             v-if="isAuthenticatedVar && usernameVar"
             text="Account Settings"
           >
-            <NuxtLink
-              to="/account_settings"
-              :class="
-                getUserActionClasses(isActiveUserAction('account_settings'))
-              "
-            >
-              <SettingsIcon />
-            </NuxtLink>
-          </IconTooltip>
-
-          <!-- Sign Out -->
-          <IconTooltip v-if="isAuthenticatedVar" text="Sign Out">
-            <SiteSidenavLogout
-              :nav-link-classes="getUserActionClasses(false)"
-              :show-icon-only="true"
-            />
-          </IconTooltip>
-
-          <!-- Sign In -->
-          <IconTooltip v-if="!isAuthenticatedVar" text="Log In">
-            <div :class="getUserActionClasses(false)">
-              <LoginIcon />
+            <div class="flex flex-col items-center">
+              <NuxtLink
+                to="/account_settings"
+                :class="
+                  getUserActionClasses(isActiveUserAction('account_settings'))
+                "
+              >
+                <SettingsIcon />
+              </NuxtLink>
+              <span
+                class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+              >
+                Settings
+              </span>
             </div>
           </IconTooltip>
 
           <template #fallback>
             <!-- Fallback: Show login icon as default -->
             <IconTooltip text="Log In">
-              <div :class="getUserActionClasses(false)">
-                <LoginIcon />
+              <div class="flex flex-col items-center">
+                <div :class="getUserActionClasses(false)">
+                  <LoginIcon />
+                </div>
+                <span
+                  class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+                >
+                  Log in
+                </span>
               </div>
             </IconTooltip>
           </template>
@@ -422,12 +425,19 @@ const getUserActionClasses = (isActive: boolean) => {
       >
         <!-- Logo -->
         <IconTooltip text="Topical - Home" class="mb-4">
-          <NuxtLink
-            to="/"
-            class="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-orange-500 transition-colors duration-200 hover:bg-orange-600"
-          >
-            <span class="text-2xl">🐝</span>
-          </NuxtLink>
+          <div class="flex flex-col items-center">
+            <NuxtLink
+              to="/"
+              class="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-orange-500 transition-colors duration-200 hover:bg-orange-600"
+            >
+              <span class="text-2xl">🐝</span>
+            </NuxtLink>
+            <span
+              class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+            >
+              Home
+            </span>
+          </div>
         </IconTooltip>
 
         <!-- Main Navigation Icons -->
@@ -437,20 +447,27 @@ const getUserActionClasses = (isActive: boolean) => {
             :key="item.name"
             :text="item.name"
           >
-            <NuxtLink
-              :to="
-                item.routerName === 'library'
-                  ? item.href
-                  : { name: item.routerName }
-              "
-              :class="getIconCircleClasses(isActiveNavItem(item.routerName))"
-            >
-              <component
-                :is="item.icon"
-                class="h-6 w-6 text-gray-300"
-                aria-hidden="true"
-              />
-            </NuxtLink>
+            <div class="flex flex-col items-center">
+              <NuxtLink
+                :to="
+                  item.routerName === 'library'
+                    ? item.href
+                    : { name: item.routerName }
+                "
+                :class="getIconCircleClasses(isActiveNavItem(item.routerName))"
+              >
+                <component
+                  :is="item.icon"
+                  class="h-6 w-6 text-gray-300"
+                  aria-hidden="true"
+                />
+              </NuxtLink>
+              <span
+                class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+              >
+                {{ item.name }}
+              </span>
+            </div>
           </IconTooltip>
         </div>
 
@@ -464,18 +481,34 @@ const getUserActionClasses = (isActive: boolean) => {
         <div class="mt-auto flex flex-col space-y-2">
           <!-- Admin Dashboard -->
           <IconTooltip text="Admin Dashboard">
-            <NuxtLink
-              to="/admin/issues"
-              :class="getUserActionClasses(isActiveUserAction('admin-issues'))"
-            >
-              <AdminIcon />
-            </NuxtLink>
+            <div class="flex flex-col items-center">
+              <NuxtLink
+                to="/admin/issues"
+                :class="
+                  getUserActionClasses(isActiveUserAction('admin-issues'))
+                "
+              >
+                <AdminIcon />
+              </NuxtLink>
+              <span
+                class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+              >
+                Admin
+              </span>
+            </div>
           </IconTooltip>
 
           <!-- Login fallback -->
           <IconTooltip text="Log In">
-            <div :class="getUserActionClasses(false)">
-              <LoginIcon />
+            <div class="flex flex-col items-center">
+              <div :class="getUserActionClasses(false)">
+                <LoginIcon />
+              </div>
+              <span
+                class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+              >
+                Log in
+              </span>
             </div>
           </IconTooltip>
         </div>

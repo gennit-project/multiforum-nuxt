@@ -27,6 +27,8 @@ const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
+const isSearchListRoute = computed(() => route.path === '/events/list/search');
+
 const filterValues = ref(
   getFilterValuesFromParams({
     route,
@@ -131,6 +133,13 @@ const updateFilters = (params: SearchEventValues) => {
     },
   });
 };
+
+const goToInPersonMap = () => {
+  router.push({
+    path: '/map/search',
+    query: route.query,
+  });
+};
 const filterByTag = (tag: string) => {
   const alreadySelected = filterValues.value.tags?.includes(tag);
 
@@ -162,6 +171,23 @@ const filterByChannel = (channel: string) => {
   <div
     class="flex flex-col justify-center gap-2 rounded-lg bg-white dark:bg-gray-800 lg:px-4"
   >
+    <div
+      v-if="isSearchListRoute"
+      class="flex items-center justify-between px-1 pt-1"
+    >
+      <div
+        class="text-sm font-semibold tracking-wide text-gray-900 dark:text-gray-100 [font-variant-caps:all-small-caps]"
+      >
+        Online events
+      </div>
+      <button
+        class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-300 dark:text-gray-300 dark:hover:bg-gray-700"
+        type="button"
+        @click="goToInPersonMap"
+      >
+        In-person map
+      </button>
+    </div>
     <EventFilterBar
       :show-distance-filters="false"
       :allow-hiding-main-filters="true"

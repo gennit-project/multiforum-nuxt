@@ -57,6 +57,7 @@ const router = useRouter();
 const showOnlineOnly = route.name === 'events-list-search';
 const showInPersonOnly =
   route.name === 'map-search-eventId' || route.name === 'map-search';
+const isMapRoute = computed(() => route.path.startsWith('/map/search'));
 
 const filterValues: Ref<SearchEventValues> = ref(
   getFilterValuesFromParams({
@@ -164,6 +165,13 @@ const updateFilters = (params: SearchEventValues) => {
       ...existingQuery,
       ...cleanedParams,
     },
+  });
+};
+
+const goToOnlineList = () => {
+  router.push({
+    path: '/events/list/search',
+    query: route.query,
   });
 };
 
@@ -447,7 +455,24 @@ const isClientSide = typeof window !== 'undefined';
         <div
           class="z-10 flex w-full justify-center bg-gray-100 dark:bg-gray-900"
         >
-          <div class="mt-2 flex max-w-7xl">
+          <div class="mt-2 flex w-full max-w-7xl flex-col">
+            <div
+              v-if="isMapRoute"
+              class="flex items-center justify-between px-1 pt-1"
+            >
+              <div
+                class="text-sm font-semibold tracking-wide text-gray-900 dark:text-gray-100 [font-variant-caps:all-small-caps]"
+              >
+                In-person events
+              </div>
+              <button
+                class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-300 dark:text-gray-300 dark:hover:bg-gray-700"
+                type="button"
+                @click="goToOnlineList"
+              >
+                Online list
+              </button>
+            </div>
             <EventFilterBar
               :show-map="true"
               :allow-hiding-main-filters="false"
