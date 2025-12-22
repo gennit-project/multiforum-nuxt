@@ -31,13 +31,13 @@ const {
   error: imageError,
 } = useQuery(
   GET_IMAGE_DETAILS,
-  {
+  () => ({
     imageId: imageId.value,
-  },
-  {
+  }),
+  () => ({
     enabled: !!imageId.value,
     fetchPolicy: 'network-only',
-  }
+  })
 );
 
 const image = computed((): Image | null => {

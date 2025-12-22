@@ -138,7 +138,7 @@ const loadMoreImages = async () => {
     <!-- Images grid -->
     <div v-else class="space-y-6">
       <div
-        class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+        class="grid grid-cols-2 gap-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
       >
         <ImageListItem
           v-for="image in images"
