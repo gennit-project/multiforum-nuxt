@@ -16,6 +16,7 @@ type SearchType =
   | 'comments'
   | 'downloads'
   | 'forums'
+  | 'wiki'
   | 'eventsOnline'
   | 'eventsInPerson';
 type ModifiedRange = 'all' | 'last7' | 'last30' | 'thisYear' | 'lastYear';
@@ -50,6 +51,7 @@ const typeOptions: Array<{ value: SearchType; label: string }> = [
   { value: 'comments', label: 'Comments' },
   { value: 'downloads', label: 'Downloads' },
   { value: 'forums', label: 'Forums' },
+  { value: 'wiki', label: 'Wiki' },
   { value: 'eventsOnline', label: 'Events (Online)' },
   { value: 'eventsInPerson', label: 'Events (In person)' },
 ];
@@ -102,6 +104,7 @@ const buildQuery = () => {
   const query: Record<string, string | string[] | undefined> = {
     searchInput: trimmedInput || undefined,
     type: selectedType.value,
+    searchOpen: 'true',
     modified: selectedModified.value === 'all' ? undefined : selectedModified.value,
     channels: selectedForums.value.length ? [...selectedForums.value] : undefined,
   };
@@ -151,6 +154,7 @@ const executeSearch = (value?: string) => {
     comments: '/comments/search',
     downloads: '/downloads',
     forums: '/forums',
+    wiki: '/wiki/search',
     eventsOnline: '/events/list/search',
     eventsInPerson: '/map/search',
   };
@@ -247,7 +251,7 @@ onBeforeUnmount(() => {
       class="absolute left-0 right-0 z-30 mt-2 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900"
     >
       <div class="flex flex-wrap items-center gap-2 p-3">
-        <FilterChip :label="typeLabel">
+        <FilterChip :label="`Type: ${typeLabel}`">
           <template #content>
             <div class="min-w-[220px]">
               <button

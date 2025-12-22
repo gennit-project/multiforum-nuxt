@@ -66,6 +66,17 @@ const channelLabel = computed(() =>
 );
 const tagLabel = computed(() => getTagLabel(filterValues.value.tags || []));
 
+const shouldOpenSearch = () => {
+  const hasSearchOpen = route.query.searchOpen === 'true';
+  const hasSearchInput =
+    typeof route.query.searchInput === 'string' &&
+    route.query.searchInput.trim().length > 0;
+  return hasSearchOpen || hasSearchInput;
+};
+
+const showFilters = ref(false);
+const showSearch = ref(shouldOpenSearch());
+
 // Watch for route query changes to update filter values
 watch(
   () => route.query,
@@ -75,6 +86,9 @@ watch(
         route,
         channelId: channelId.value,
       });
+    }
+    if (shouldOpenSearch()) {
+      showSearch.value = true;
     }
   }
 );
@@ -151,9 +165,6 @@ const updateShowUnanswered = (event: Event) => {
   });
 };
 
-const showFilters = ref(false);
-const showSearch = ref(false);
-
 // Get UI store for expand/collapse functionality
 const uiStore = useUIStore();
 const { expandChannelDiscussions, expandSitewideDiscussions } =
@@ -165,6 +176,11 @@ const toggleShowFilters = () => {
 
 const toggleShowSearch = () => {
   showSearch.value = !showSearch.value;
+  updateFilters({
+    router,
+    route,
+    params: { searchOpen: showSearch.value ? 'true' : undefined },
+  });
 };
 
 const expandAll = () => {

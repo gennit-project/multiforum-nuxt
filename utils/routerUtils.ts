@@ -166,6 +166,7 @@ export type UpdateStateInput = {
   channels?: string[];
   tags?: string[];
   searchInput?: string;
+  searchOpen?: string;
   latitude?: number;
   longitude?: number;
   placeName?: string;

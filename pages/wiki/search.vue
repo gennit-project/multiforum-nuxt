@@ -45,7 +45,7 @@ const channelsLabel = computed(() =>
 
 const pageTitle = computed(() => {
   const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
-  return `Comment search | ${serverName}`;
+  return `Wiki search | ${serverName}`;
 });
 
 useHead({
@@ -69,20 +69,20 @@ const updateSearchInput = (value: string) => {
 <template>
   <NuxtLayout>
     <div class="mx-auto max-w-3xl px-4 py-6 text-gray-900 dark:text-gray-100">
-      <h1 class="text-lg font-semibold">Comment search</h1>
+      <h1 class="text-lg font-semibold">Wiki search</h1>
       <div class="mt-4">
         <SearchBar
           :auto-focus="shouldAutoFocus"
           :initial-value="searchInput"
-          :search-placeholder="'Search comments'"
+          :search-placeholder="'Search wiki'"
           :small="true"
-          :test-id="'comment-search-input'"
+          :test-id="'wiki-search-input'"
           :debounce-ms="0"
           @update-search-input="updateSearchInput"
         />
       </div>
       <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
-        Comment search results are not wired up yet.
+        Wiki search results are not wired up yet.
       </p>
       <div
         class="mt-4 rounded-md border border-gray-200 bg-white p-4 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
