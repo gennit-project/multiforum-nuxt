@@ -277,7 +277,7 @@ onBeforeUnmount(() => {
             </div>
           </template>
         </FilterChip>
-        <FilterChip :label="modifiedLabel">
+        <FilterChip :label="`Date: ${modifiedLabel}`">
           <template #content>
             <div class="min-w-[220px]">
               <button
