@@ -78,7 +78,7 @@ describe('Comment moderation link verification', () => {
       cy.url().then((issueUrl) => {
         // Find link back to original comment context
         cy.get('#original-post-container')
-          .contains('View original comment')
+          .contains('Context')
           .click();
         cy.wait('@graphqlRequest');
 
@@ -99,7 +99,7 @@ describe('Comment moderation link verification', () => {
 
         // Step 9: Follow link back to original context
         cy.get('#original-post-container')
-          .contains('View original comment')
+          .contains('Context')
           .click();
         cy.wait('@graphqlRequest');
 
@@ -197,7 +197,7 @@ describe('Comment moderation link verification', () => {
     cy.url().then((issueUrl) => {
       // Verify we can navigate from issue to original feedback
       cy.get('#original-post-container')
-        .contains('View original feedback')
+        .contains('Context')
         .click();
       cy.wait('@graphqlRequest');
 
