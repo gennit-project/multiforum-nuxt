@@ -7,8 +7,8 @@ import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import BookmarkIcon from '@/components/icons/BookmarkIcon.vue';
+import BookIcon from '@/components/icons/BookIcon.vue';
 import CreateAnythingButton from '@/components/nav/CreateAnythingButton.vue';
-import SettingsIcon from '@/components/icons/SettingsIcon.vue';
 import AdminIcon from '@/components/icons/AdminIcon.vue';
 import LoginIcon from '@/components/icons/LoginIcon.vue';
 import MoreIcon from '@/components/icons/MoreIcon.vue';
@@ -50,6 +50,12 @@ const navigation: NavigationItem[] = [
     href: '/events/list/search',
     icon: CalendarIcon,
     routerName: 'events-list-search',
+  },
+  {
+    name: 'Wikis',
+    href: '/wiki/search',
+    icon: BookIcon,
+    routerName: 'wiki-search',
   },
   {
     name: 'Forums',
@@ -352,30 +358,6 @@ const getUserActionClasses = (isActive: boolean) => {
 
         <!-- Authentication-dependent actions -->
         <ClientOnly>
-          <!-- Profile -->
-
-          <!-- Settings -->
-          <IconTooltip
-            v-if="isAuthenticatedVar && usernameVar"
-            text="Account Settings"
-          >
-            <div class="flex flex-col items-center">
-              <NuxtLink
-                to="/account_settings"
-                :class="
-                  getUserActionClasses(isActiveUserAction('account_settings'))
-                "
-              >
-                <SettingsIcon />
-              </NuxtLink>
-              <span
-                class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
-              >
-                Settings
-              </span>
-            </div>
-          </IconTooltip>
-
           <template #fallback>
             <!-- Fallback: Show login icon as default -->
             <IconTooltip text="Log In">
