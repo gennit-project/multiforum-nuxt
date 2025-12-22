@@ -7,7 +7,11 @@ import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import ErrorBanner from '../ErrorBanner.vue';
 import { useRoute } from 'nuxt/app';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
-import { getFeedbackPermalinkObject } from '@/utils/routerUtils';
+import {
+  getFeedbackPermalinkObject,
+  getPermalinkToDiscussionComment,
+  getPermalinkToEventComment,
+} from '@/utils/routerUtils';
 
 const props = defineProps({
   commentId: {
@@ -58,21 +62,58 @@ onCommentResult(({ data }) => {
 });
 
 const permalinkObject = computed(() => {
-  return getFeedbackPermalinkObject({
-    routeName: route.name as string,
-    forumId: channelId.value,
-    commentId: originalComment.value?.id,
-    // This discussionId parameter is used for permalinks to a feedback on a comment in a discussion.
-    discussionId:
-      originalComment.value?.GivesFeedbackOnComment?.DiscussionChannel
-        ?.discussionId,
-    GivesFeedbackOnComment:
-      originalComment.value?.GivesFeedbackOnComment || undefined,
-    GivesFeedbackOnDiscussion:
-      originalComment.value?.GivesFeedbackOnDiscussion || undefined,
-    GivesFeedbackOnEvent:
-      originalComment.value?.GivesFeedbackOnEvent || undefined,
-  });
+  const comment = originalComment.value;
+  if (!comment?.id) return {};
+
+  // Check if this is a feedback comment (has GivesFeedbackOn* relationships)
+  const isFeedbackComment =
+    comment.GivesFeedbackOnComment ||
+    comment.GivesFeedbackOnDiscussion ||
+    comment.GivesFeedbackOnEvent;
+
+  if (isFeedbackComment) {
+    // Use feedback permalink for feedback comments
+    return getFeedbackPermalinkObject({
+      routeName: route.name as string,
+      forumId: channelId.value,
+      commentId: comment.id,
+      discussionId:
+        comment.GivesFeedbackOnComment?.DiscussionChannel?.discussionId,
+      GivesFeedbackOnComment: comment.GivesFeedbackOnComment || undefined,
+      GivesFeedbackOnDiscussion: comment.GivesFeedbackOnDiscussion || undefined,
+      GivesFeedbackOnEvent: comment.GivesFeedbackOnEvent || undefined,
+    });
+  }
+
+  // For regular comments, check if it's on a discussion or event
+  const discussionChannel = comment.DiscussionChannel;
+  const eventId = comment.Event?.id;
+  const forumId =
+    discussionChannel?.channelUniqueName ||
+    comment.Channel?.uniqueName ||
+    channelId.value;
+
+  if (discussionChannel?.discussionId) {
+    // Comment is on a discussion
+    return getPermalinkToDiscussionComment({
+      forumId,
+      discussionId: discussionChannel.discussionId,
+      commentId: comment.id,
+    });
+  }
+
+  if (eventId) {
+    // Comment is on an event
+    return getPermalinkToEventComment({
+      forumId,
+      eventId,
+      commentId: comment.id,
+    });
+  }
+
+  // Fallback - couldn't determine context
+  console.warn('Could not determine permalink context for comment', comment.id);
+  return {};
 });
 </script>
 
