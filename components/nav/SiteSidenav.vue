@@ -11,11 +11,21 @@ import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import BookmarkIcon from '@/components/icons/BookmarkIcon.vue';
 import XIcon from '@/components/icons/XmarkIcon.vue';
+import SearchIcon from '@/components/icons/SearchIcon.vue';
 import { GET_USER } from '@/graphQLData/user/queries';
 import { usernameVar, isAuthenticatedVar, setSideNavIsOpenVar } from '@/cache';
 import SiteSidenavLogout from './SiteSidenavLogout.vue';
 import { getLocalStorageItem } from '@/utils/localStorageUtils';
 import type { ForumItem } from '@/types/forum';
+
+type SearchType =
+  | 'discussions'
+  | 'comments'
+  | 'downloads'
+  | 'forums'
+  | 'wiki'
+  | 'eventsOnline'
+  | 'eventsInPerson';
 
 const DEFAULT_LIMIT = 5;
 
@@ -121,6 +131,58 @@ const routeAndClose = async (route: RouteLocationAsRelativeGeneric) => {
     console.error('Navigation error:', error);
   }
 };
+
+// Mobile search functionality
+const searchInput = ref('');
+const selectedSearchType = ref<SearchType>('discussions');
+const showSearchTypeDropdown = ref(false);
+
+const searchTypeOptions: Array<{ value: SearchType; label: string }> = [
+  { value: 'discussions', label: 'Discussions' },
+  { value: 'comments', label: 'Comments' },
+  { value: 'downloads', label: 'Downloads' },
+  { value: 'forums', label: 'Forums' },
+  { value: 'wiki', label: 'Wiki' },
+  { value: 'eventsOnline', label: 'Events (Online)' },
+  { value: 'eventsInPerson', label: 'Events (In person)' },
+];
+
+const selectedSearchTypeLabel = computed(() => {
+  const match = searchTypeOptions.find(
+    (option) => option.value === selectedSearchType.value
+  );
+  return match?.label || 'Discussions';
+});
+
+const executeSearch = () => {
+  const trimmedInput = searchInput.value.trim();
+  const query: Record<string, string | undefined> = {
+    searchInput: trimmedInput || undefined,
+    type: selectedSearchType.value,
+    searchOpen: 'true',
+  };
+
+  const routes: Record<SearchType, string> = {
+    discussions: '/discussions',
+    comments: '/comments/search',
+    downloads: '/downloads',
+    forums: '/forums',
+    wiki: '/wiki/search',
+    eventsOnline: '/events/list/search',
+    eventsInPerson: '/map/search',
+  };
+
+  router.push({
+    path: routes[selectedSearchType.value],
+    query,
+  });
+  setSideNavIsOpenVar(false);
+};
+
+const selectSearchType = (type: SearchType) => {
+  selectedSearchType.value = type;
+  showSearchTypeDropdown.value = false;
+};
 </script>
 
 <template>
@@ -146,6 +208,70 @@ const routeAndClose = async (route: RouteLocationAsRelativeGeneric) => {
             </button>
           </div>
         </div>
+
+        <!-- Mobile Search Section -->
+        <div class="mt-4 border-b border-gray-200 px-4 pb-4 dark:border-gray-600">
+          <div class="relative">
+            <div
+              class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-gray-300"
+            >
+              <SearchIcon class="h-4 w-4" />
+            </div>
+            <input
+              v-model="searchInput"
+              type="text"
+              placeholder="Search..."
+              class="h-9 w-full rounded-lg border border-gray-200 bg-white pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
+              @keydown.enter.prevent="executeSearch"
+            >
+          </div>
+          <div class="mt-2 flex items-center gap-2">
+            <div class="relative flex-1">
+              <button
+                type="button"
+                class="flex h-8 w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 text-xs text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                @click="showSearchTypeDropdown = !showSearchTypeDropdown"
+              >
+                <span>{{ selectedSearchTypeLabel }}</span>
+                <i
+                  class="fa-solid fa-chevron-down text-[10px] text-gray-400"
+                  :class="{ 'rotate-180': showSearchTypeDropdown }"
+                />
+              </button>
+              <div
+                v-if="showSearchTypeDropdown"
+                class="absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800"
+              >
+                <button
+                  v-for="option in searchTypeOptions"
+                  :key="option.value"
+                  type="button"
+                  class="flex w-full items-center justify-between px-3 py-2 text-left text-xs hover:bg-gray-100 dark:hover:bg-gray-700"
+                  :class="[
+                    selectedSearchType === option.value
+                      ? 'bg-orange-50 text-orange-900 dark:bg-orange-900/30 dark:text-orange-100'
+                      : 'text-gray-700 dark:text-gray-200',
+                  ]"
+                  @click="selectSearchType(option.value)"
+                >
+                  <span>{{ option.label }}</span>
+                  <i
+                    v-if="selectedSearchType === option.value"
+                    class="fa-solid fa-check text-[10px] text-orange-500"
+                  />
+                </button>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="h-8 rounded-md bg-orange-500 px-4 text-xs font-semibold text-white hover:bg-orange-600"
+              @click="executeSearch"
+            >
+              Search
+            </button>
+          </div>
+        </div>
+
         <nav class="mt-4">
           <ul role="list" class="m-0 p-0">
             <li
