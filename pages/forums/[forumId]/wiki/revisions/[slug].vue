@@ -207,11 +207,11 @@ useHead({
       </div>
 
       <!-- Revisions list -->
-      <div v-else class="space-y-4">
+      <div v-else class="space-y-2">
         <div
           v-for="edit in allEdits"
           :key="edit.id"
-          class="hover:bg-gray-50 cursor-pointer rounded-lg border border-gray-200 p-6 transition-colors dark:border-gray-700 dark:hover:bg-gray-800/50"
+          class="hover:bg-gray-50 cursor-pointer rounded-md border border-gray-200 px-3 py-2 transition-colors dark:border-gray-700 dark:hover:bg-gray-800/50"
           @click="
             () => {
               console.log('Click detected on revision:', edit.id);
@@ -219,23 +219,23 @@ useHead({
             }
           "
         >
-          <div class="flex items-center justify-between">
+          <div class="flex items-start justify-between gap-3">
             <div class="flex-1">
-              <div class="flex items-center space-x-3">
+              <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm">
                 <div class="font-medium text-gray-900 dark:text-gray-100">
                   {{ edit.author }}
                 </div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">
+                <div class="text-gray-500 dark:text-gray-400">
                   {{ timeAgo(new Date(edit.createdAt)) }}
                 </div>
                 <div
                   v-if="edit.isCurrent"
-                  class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-800 dark:text-green-200"
+                  class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-800 dark:text-green-200"
                 >
                   Most recent edit
                 </div>
               </div>
-              <div class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              <div class="mt-0.5 text-xs text-gray-600 dark:text-gray-400">
                 {{
                   new Date(edit.createdAt).toLocaleDateString('en-US', {
                     year: 'numeric',
@@ -247,7 +247,7 @@ useHead({
                 }}
               </div>
             </div>
-            <div class="flex items-center text-gray-400 dark:text-gray-500">
+            <div class="flex items-center text-sm text-gray-400 dark:text-gray-500">
               <i class="fas fa-chevron-right" />
             </div>
           </div>
