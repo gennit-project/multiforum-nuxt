@@ -89,7 +89,7 @@ const getImageAlt = (image: Image) => {
     <!-- Favorite button - top right corner -->
     <div
       v-if="props.showFavoriteButton"
-      class="absolute right-1 top-1 z-10"
+      class="absolute right-2 top-2 z-10 rounded-md bg-black bg-opacity-50 p-1.5 transition-all duration-200 hover:bg-opacity-70"
       @click.stop.prevent
     >
       <AddToImageFavorites
