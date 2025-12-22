@@ -142,7 +142,9 @@ const recordRecentSearch = () => {
 
 const executeSearch = (value?: string) => {
   const nextValue =
-    typeof value === 'string' ? value : searchBarRef.value?.getValue?.();
+    typeof value === 'string'
+      ? value
+      : searchBarRef.value?.getValue?.() ?? searchInput.value;
   if (typeof nextValue === 'string') {
     searchInput.value = nextValue;
   }
@@ -171,7 +173,7 @@ const runRecentSearch = (recent: RecentSearch) => {
   selectedType.value = recent.type;
   selectedModified.value = recent.modified;
   selectedForums.value = [...recent.forums];
-  executeSearch();
+  executeSearch(recent.query);
 };
 
 const focusSearch = () => {
