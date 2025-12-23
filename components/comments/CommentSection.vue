@@ -656,6 +656,7 @@ const lengthOfCommentInProgress = computed(() => {
 <template>
   <div class="pr-2">
     <div>
+      <slot name="pre-header" />
       <div class="align-items flex justify-between">
         <div class="flex w-full items-center justify-between space-x-4">
           <h2 id="comments" class="px-1 text-lg dark:text-white">

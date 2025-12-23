@@ -139,6 +139,8 @@ const createCommentInput = computed((): CommentCreateInput[] => {
 
 const createCommentLoading = ref(false);
 const commentEditorOpen = ref(false);
+const showSavedNotice = ref(false);
+let savedNoticeTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const {
   mutate: createComment,
@@ -276,10 +278,22 @@ const {
   },
 }));
 
-onDone(() => {
-  createFormValues.value = createCommentDefaultValues;
+onDone((result) => {
   createCommentLoading.value = false;
+  if (result?.errors?.length) {
+    return;
+  }
+  createFormValues.value = createCommentDefaultValues;
   commentEditorOpen.value = false;
+  showSavedNotice.value = true;
+  if (savedNoticeTimeout) {
+    clearTimeout(savedNoticeTimeout);
+  }
+  savedNoticeTimeout = setTimeout(() => {
+    showSavedNotice.value = false;
+  }, 2000);
+  // clear input
+  createFormValues.value.text = '';
 });
 
 const handleCreateComment = async () => {
@@ -305,14 +319,26 @@ const handleUpdateComment = (event: string) => {
 </script>
 
 <template>
-  <CreateRootCommentForm
+  <slot
     :create-form-values="createFormValues"
     :create-comment-loading="createCommentLoading"
     :create-comment-error="createCommentError"
     :comment-editor-open="commentEditorOpen"
-    @open-comment-editor="commentEditorOpen = true"
-    @close-comment-editor="commentEditorOpen = false"
-    @handle-create-comment="handleCreateComment"
-    @handle-update-comment="handleUpdateComment"
-  />
+    :show-saved-notice="showSavedNotice"
+    :open-comment-editor="() => (commentEditorOpen = true)"
+    :close-comment-editor="() => (commentEditorOpen = false)"
+    :handle-create-comment="handleCreateComment"
+    :handle-update-comment="handleUpdateComment"
+  >
+    <CreateRootCommentForm
+      :create-form-values="createFormValues"
+      :create-comment-loading="createCommentLoading"
+      :create-comment-error="createCommentError"
+      :comment-editor-open="commentEditorOpen"
+      @open-comment-editor="commentEditorOpen = true"
+      @close-comment-editor="commentEditorOpen = false"
+      @handle-create-comment="handleCreateComment"
+      @handle-update-comment="handleUpdateComment"
+    />
+  </slot>
 </template>

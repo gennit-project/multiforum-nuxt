@@ -424,6 +424,9 @@ const handleSubscriptionToggle = () => {
     @update-create-reply-comment-input="updateCreateReplyCommentInput"
     @load-more="$emit('loadMore')"
   >
+    <template #pre-header>
+      <slot name="pre-header" />
+    </template>
     <template #subscription-button>
       <SubscribeButton
         :is-subscribed="isSubscribed"

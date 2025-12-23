@@ -14,13 +14,16 @@ import type {
 } from '@/__generated__/graphql';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
 import DiscussionHeader from '@/components/discussion/detail/DiscussionHeader.vue';
 import DiscussionCommentsWrapper from '@/components/discussion/detail/DiscussionCommentsWrapper.vue';
 import DiscussionChannelLinks from '@/components/discussion/detail/DiscussionChannelLinks.vue';
 import DiscussionRootCommentFormWrapper from '@/components/discussion/form/DiscussionRootCommentFormWrapper.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import { modProfileNameVar } from '@/cache';
+import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 import { useRoute } from 'nuxt/app';
 import DiscussionBodyEditForm from './DiscussionBodyEditForm.vue';
 import AlbumEditForm from './AlbumEditForm.vue';
@@ -306,36 +309,70 @@ const handleEditAlbum = () => {
       aria-busy="true"
     >
       <div class="space-y-3">
-        <div class="h-7 w-3/4 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-        <div class="h-4 w-1/3 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+        <div
+          class="h-7 w-3/4 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+        />
+        <div
+          class="h-4 w-1/3 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+        />
         <div class="flex gap-2 pt-1">
-          <div class="h-8 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-          <div class="h-8 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+          <div
+            class="h-8 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+          />
+          <div
+            class="h-8 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+          />
         </div>
       </div>
       <div class="space-y-2">
-        <div class="h-4 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-        <div class="h-4 w-11/12 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-        <div class="h-4 w-10/12 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-        <div class="h-4 w-9/12 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+        <div
+          class="h-4 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+        />
+        <div
+          class="h-4 w-11/12 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+        />
+        <div
+          class="h-4 w-10/12 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+        />
+        <div
+          class="h-4 w-9/12 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+        />
       </div>
       <div class="space-y-3 pt-2">
-        <div class="h-5 w-32 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+        <div
+          class="h-5 w-32 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+        />
         <div class="space-y-3">
           <div class="flex gap-3">
-            <div class="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
+            <div
+              class="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700"
+            />
             <div class="flex-1 space-y-2">
-              <div class="h-4 w-1/4 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-              <div class="h-3 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-              <div class="h-3 w-5/6 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+              <div
+                class="h-4 w-1/4 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+              />
+              <div
+                class="h-3 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+              />
+              <div
+                class="h-3 w-5/6 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+              />
             </div>
           </div>
           <div class="flex gap-3">
-            <div class="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
+            <div
+              class="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700"
+            />
             <div class="flex-1 space-y-2">
-              <div class="h-4 w-1/5 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-              <div class="h-3 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-              <div class="h-3 w-4/5 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+              <div
+                class="h-4 w-1/5 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+              />
+              <div
+                class="h-3 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+              />
+              <div
+                class="h-3 w-4/5 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+              />
             </div>
           </div>
         </div>
@@ -431,6 +468,98 @@ const handleEditAlbum = () => {
               :answers="answers"
               @load-more="loadMore"
             >
+              <template #pre-header>
+                <DiscussionRootCommentFormWrapper
+                  v-if="activeDiscussionChannel && !isArchived && !locked"
+                  :key="`inline-${channelId}${discussionId}`"
+                  :discussion-channel="activeDiscussionChannel || undefined"
+                  :mod-name="loggedInUserModName"
+                  :previous-offset="previousOffset"
+                >
+                  <template
+                    #default="{
+                      createFormValues,
+                      createCommentLoading,
+                      createCommentError,
+                      showSavedNotice,
+                      handleCreateComment,
+                      handleUpdateComment,
+                    }"
+                  >
+                    <div class="mb-3 w-full pr-1">
+                      <ErrorBanner
+                        v-if="createCommentError"
+                        :text="createCommentError?.message"
+                      />
+                      <RequireAuth :justify-left="true" :full-width="true">
+                        <template #has-auth>
+                          <form
+                            class="flex w-full items-center gap-3 rounded-lg border border-orange-400 bg-white px-3 py-2 dark:bg-gray-900"
+                            @submit.prevent="handleCreateComment"
+                          >
+                            <textarea
+                              data-testid="discussion-inline-comment"
+                              class="bg-transparent min-h-[44px] flex-1 resize-none text-sm text-gray-900 placeholder-gray-500 outline-none focus:outline-none focus:ring-0 focus-visible:outline-none dark:text-gray-100 dark:placeholder-gray-400"
+                              name="discussionInlineComment"
+                              :rows="1"
+                              placeholder="Join the discussion..."
+                              :value="createFormValues.text"
+                              :maxlength="MAX_CHARS_IN_COMMENT"
+                              @input="
+                                handleUpdateComment(
+                                  ($event.target as HTMLTextAreaElement).value
+                                )
+                              "
+                            />
+                            <button
+                              type="submit"
+                              class="font-semibold flex items-center justify-center rounded-md bg-orange-400 px-4 py-2 text-sm text-black hover:bg-orange-500 focus:outline-none focus:ring-0 focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-orange-200"
+                              :disabled="
+                                createCommentLoading ||
+                                !createFormValues.text.length ||
+                                createFormValues.text.length >
+                                  MAX_CHARS_IN_COMMENT
+                              "
+                            >
+                              <LoadingSpinner
+                                v-if="createCommentLoading"
+                                class="mr-2"
+                              />
+                              {{
+                                createCommentLoading
+                                  ? 'Saving'
+                                  : showSavedNotice
+                                    ? 'Saved!'
+                                    : 'Post'
+                              }}
+                            </button>
+                          </form>
+                        </template>
+                        <template #does-not-have-auth>
+                          <div
+                            class="flex w-full items-center gap-3 rounded-lg border border-orange-400 bg-white px-3 py-2 dark:bg-gray-900"
+                          >
+                            <textarea
+                              class="bg-transparent min-h-[44px] flex-1 resize-none text-sm text-gray-500 placeholder-gray-500 outline-none focus:outline-none focus:ring-0 focus-visible:outline-none dark:text-gray-400 dark:placeholder-gray-500"
+                              name="discussionInlineComment"
+                              :rows="1"
+                              placeholder="Join the discussion..."
+                              disabled
+                            />
+                            <button
+                              type="button"
+                              class="font-semibold rounded-md bg-orange-200 px-4 py-2 text-sm text-black"
+                              disabled
+                            >
+                              Post
+                            </button>
+                          </div>
+                        </template>
+                      </RequireAuth>
+                    </div>
+                  </template>
+                </DiscussionRootCommentFormWrapper>
+              </template>
               <DiscussionRootCommentFormWrapper
                 v-if="activeDiscussionChannel && !isArchived && !locked"
                 :key="`${channelId}${discussionId}`"
