@@ -415,7 +415,7 @@ onMounted(() => {
           <!-- Image container -->
           <div class="flex items-center justify-center">
             <div
-              class="touch-pan-x overflow-hidden rounded dark:text-white"
+              class="relative touch-pan-x overflow-hidden rounded dark:text-white"
               :class="{
                 'w-full min-w-0 max-w-full': expandedView,
                 'max-w-96': !expandedView,
@@ -423,6 +423,37 @@ onMounted(() => {
               @touchstart="handleTouchStart"
               @touchend="handleTouchEnd"
             >
+              <div class="pointer-events-none absolute left-2 top-2 z-10">
+                <span
+                  class="rounded bg-black/60 px-2 py-1 text-xs text-white"
+                >
+                  {{ `${activeIndex + 1} of ${orderedImages.length}` }}
+                </span>
+              </div>
+              <div
+                v-if="orderedImages.length > 1"
+                class="absolute left-2 top-1/2 z-10 -translate-y-1/2"
+              >
+                <button
+                  type="button"
+                  class="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70"
+                  @click.stop="goLeft"
+                >
+                  <LeftArrowIcon class="h-4 w-4" />
+                </button>
+              </div>
+              <div
+                v-if="orderedImages.length > 1"
+                class="absolute right-2 top-1/2 z-10 -translate-y-1/2"
+              >
+                <button
+                  type="button"
+                  class="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70"
+                  @click.stop="goRight"
+                >
+                  <RightArrowIcon class="h-4 w-4" />
+                </button>
+              </div>
               <div
                 v-for="(image, idx) in orderedImages"
                 :key="image?.id || idx"
@@ -515,34 +546,6 @@ onMounted(() => {
                     <span v-else>&nbsp;</span>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Counter and navigation row -->
-          <div class="flex w-full items-center justify-between overflow-x-auto p-2">
-            <span class="text-sm">{{
-              `${activeIndex + 1} of ${orderedImages.length}`
-            }}</span>
-
-            <div class="flex items-center gap-2">
-              <!-- Navigation Buttons -->
-              <div v-if="orderedImages.length > 1" class="flex gap-2">
-                <button
-                  type="button"
-                  class="flex h-8 items-center justify-center px-2 hover:bg-gray-500"
-                  @click="goLeft"
-                >
-                  <LeftArrowIcon class="h-4 w-4" />
-                </button>
-
-                <button
-                  class="flex h-8 items-center justify-center px-2 hover:bg-gray-500"
-                  type="button"
-                  @click="goRight"
-                >
-                  <RightArrowIcon class="h-4 w-4" />
-                </button>
               </div>
             </div>
           </div>
