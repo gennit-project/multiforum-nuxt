@@ -15,6 +15,9 @@ import {
   getSortFromQuery,
   getTimeFrameFromQuery,
 } from '@/components/comments/getSortFromQuery';
+import { useAppTheme } from '@/composables/useTheme';
+
+const { theme } = useAppTheme();
 
 const DISCUSSION_PAGE_LIMIT = 25;
 
@@ -171,12 +174,15 @@ const reachedEndOfResults = computed(() => {
 <template>
   <div class="px-2">
     <slot />
-    <p
+    <div
       v-if="!discussionChannelResult && discussionLoading"
-      class="dark:text-gray-200"
+      class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700"
     >
-      Loading...
-    </p>
+      <div v-for="n in 5" :key="n" class="mb-2 flex flex-col gap-2 py-4">
+        <v-skeleton-loader class="w-3/4" type="text" :theme="theme" />
+        <v-skeleton-loader class="w-1/3" type="text" :theme="theme" />
+      </div>
+    </div>
     <ErrorBanner
       v-else-if="discussionError"
       class="max-w-5xl"

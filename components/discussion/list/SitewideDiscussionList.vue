@@ -17,6 +17,9 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import { config } from '@/config';
+import { useAppTheme } from '@/composables/useTheme';
+
+const { theme } = useAppTheme();
 
 const DISCUSSION_PAGE_LIMIT = 15;
 
@@ -181,7 +184,21 @@ const filterByChannel = (channel: string) => {
         >
           <div class="flex-1 md:px-2">
             <slot />
-            <p v-if="discussionLoading">Loading...</p>
+            <div
+              v-if="
+                discussionLoading && (!discussions || discussions.length === 0)
+              "
+              class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700"
+            >
+              <div
+                v-for="n in 5"
+                :key="n"
+                class="mb-2 flex flex-col gap-2 py-4"
+              >
+                <v-skeleton-loader class="w-3/4" type="text" :theme="theme" />
+                <v-skeleton-loader class="w-1/3" type="text" :theme="theme" />
+              </div>
+            </div>
             <ErrorBanner
               v-else-if="discussionError"
               class="max-w-5xl"
