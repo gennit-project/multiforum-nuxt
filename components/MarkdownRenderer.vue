@@ -285,14 +285,21 @@ const containerStyle = computed(() => {
     }
 
     li {
-      margin: 0.35rem 0 !important;
-      line-height: 1.65 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      line-height: 1.4 !important;
+
+      /* Remove paragraph margins inside list items */
+      p {
+        margin: 0 !important;
+        padding: 0 !important;
+      }
     }
 
     /* Nested list styling with different bullet types */
     ul ul {
       list-style-type: circle !important;
-      margin-top: 0.35rem !important;
+      margin-top: 0.25rem !important;
       margin-bottom: 0 !important;
     }
 
@@ -303,7 +310,7 @@ const containerStyle = computed(() => {
     ol ol,
     ul ol,
     ol ul {
-      margin-top: 0.35rem !important;
+      margin-top: 0.25rem !important;
       margin-bottom: 0 !important;
     }
 
@@ -737,14 +744,21 @@ const containerStyle = computed(() => {
   }
 
   li {
-    margin: 0.35rem 0 !important;
-    line-height: 1.65 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.4 !important;
+
+    /* Remove paragraph margins inside list items */
+    p {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
   }
 
   /* Nested list styling with different bullet types */
   ul ul {
     list-style-type: circle !important;
-    margin-top: 0.35rem !important;
+    margin-top: 0.25rem !important;
     margin-bottom: 0 !important;
   }
 
@@ -755,7 +769,7 @@ const containerStyle = computed(() => {
   ol ol,
   ul ol,
   ol ul {
-    margin-top: 0.35rem !important;
+    margin-top: 0.25rem !important;
     margin-bottom: 0 !important;
   }
 
