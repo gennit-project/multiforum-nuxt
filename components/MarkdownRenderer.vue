@@ -287,7 +287,7 @@ const containerStyle = computed(() => {
     li {
       margin: 0 !important;
       padding: 0 !important;
-      line-height: 1.4 !important;
+      line-height: 1.65 !important;
 
       /* Remove paragraph margins inside list items */
       p {
@@ -746,7 +746,7 @@ const containerStyle = computed(() => {
   li {
     margin: 0 !important;
     padding: 0 !important;
-    line-height: 1.4 !important;
+    line-height: 1.65 !important;
 
     /* Remove paragraph margins inside list items */
     p {
