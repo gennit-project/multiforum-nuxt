@@ -26,6 +26,9 @@ export const GET_USER = gql`
       location
       pronouns
       bio
+      Email {
+        address
+      }
       notifyOnReplyToCommentByDefault
       notifyOnReplyToDiscussionByDefault
       notifyOnReplyToEventByDefault

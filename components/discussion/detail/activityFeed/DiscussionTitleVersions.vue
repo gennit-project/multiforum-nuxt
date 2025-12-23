@@ -4,6 +4,15 @@ import type { PropType } from 'vue';
 import type { Discussion } from '@/__generated__/graphql';
 import { timeAgo } from '@/utils';
 
+interface TitleTransition {
+  id: string;
+  author: string;
+  oldTitle: string;
+  newTitle: string;
+  timestamp: Date;
+  isLatest: boolean;
+}
+
 const props = defineProps({
   discussion: {
     type: Object as PropType<Discussion>,
@@ -14,7 +23,7 @@ const props = defineProps({
 const showOlderEdits = ref(false);
 
 // Process the past title versions
-const titleVersionsWithCurrent = computed(() => {
+const titleVersionsWithCurrent = computed((): TitleTransition[] => {
   if (
     !props.discussion?.PastTitleVersions ||
     props.discussion.PastTitleVersions.length === 0
@@ -27,7 +36,7 @@ const titleVersionsWithCurrent = computed(() => {
 
   // Create an array of title transitions:
   // [current <- past version N <- ... <- past version 1]
-  const transitions = [];
+  const transitions: TitleTransition[] = [];
 
   // Add transitions between past versions (chronological order)
   for (let i = 0; i < pastVersions.length; i++) {
@@ -56,12 +65,13 @@ const showActivityFeed = computed(() => {
 });
 
 // Get visible items - most recent only, or all if expanded
-const visibleItems = computed(() => {
+const visibleItems = computed((): TitleTransition[] => {
   if (showOlderEdits.value || titleVersionsWithCurrent.value.length <= 1) {
     return titleVersionsWithCurrent.value;
   }
   // Show only the most recent (last item in chronological order)
-  return [titleVersionsWithCurrent.value[titleVersionsWithCurrent.value.length - 1]];
+  const lastItem = titleVersionsWithCurrent.value[titleVersionsWithCurrent.value.length - 1];
+  return lastItem ? [lastItem] : [];
 });
 
 // Get hidden items count

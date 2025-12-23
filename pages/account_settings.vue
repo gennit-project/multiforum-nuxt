@@ -67,6 +67,13 @@ const notificationFormValues = ref<NotificationFormValues>(
 const dataLoaded = ref(false);
 const showSavedChangesNotification = ref(false);
 
+const userEmail = computed(() => {
+  if (getUserResult.value && getUserResult.value.users.length > 0) {
+    return getUserResult.value.users[0].Email?.address || null;
+  }
+  return null;
+});
+
 watch(getUserResult, (newVal) => {
   if (newVal && newVal.users.length > 0) {
     const user = newVal.users[0];
@@ -243,7 +250,21 @@ function handleCheckboxUpdate(
             </div>
 
             <div v-if="dataLoaded" class="space-y-6">
-              <h2 class="font-semibold mb-4 text-xl">Preferences</h2>
+              <h2 class="font-semibold mb-4 text-xl">Account</h2>
+
+              <!-- Email Address -->
+              <FormRow section-title="Email Address">
+                <template #content>
+                  <div class="text-sm text-gray-700 dark:text-gray-300">
+                    <span v-if="userEmail">{{ userEmail }}</span>
+                    <span v-else class="text-gray-500 dark:text-gray-400 italic"
+                      >No email address associated</span
+                    >
+                  </div>
+                </template>
+              </FormRow>
+
+              <h2 class="font-semibold mb-4 text-xl pt-6">Preferences</h2>
 
               <!-- Email Notification Preferences -->
               <FormRow section-title="Email Notifications">
