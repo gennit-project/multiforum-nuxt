@@ -2,7 +2,6 @@
 import { ref, nextTick, computed } from 'vue';
 import type { Issue } from '@/__generated__/graphql';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import CreateButton from '@/components/CreateButton.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import TextInput from '@/components/TextInput.vue';
@@ -166,12 +165,13 @@ const formattedDate = computed(() => {
             :text="'Edit'"
             @click="onClickEdit"
           />
-          <CreateButton
+          <nuxt-link
             v-if="!titleEditMode"
-            class="ml-2"
             :to="`/forums/${channelId}/issues/create`"
-            :label="'New Issue'"
-          />
+            class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+          >
+            New Issue
+          </nuxt-link>
           <PrimaryButton
             v-if="titleEditMode"
             :disabled="
@@ -190,7 +190,12 @@ const formattedDate = computed(() => {
           />
         </template>
         <template #does-not-have-auth>
-          <PrimaryButton class="ml-2" :label="'New Issue'" />
+          <nuxt-link
+            to="/login"
+            class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+          >
+            New Issue
+          </nuxt-link>
         </template>
       </RequireAuth>
     </div>
