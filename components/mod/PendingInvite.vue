@@ -23,16 +23,22 @@ const channelId = computed(() => {
 const { result: pendingOwnerInviteResult } = useQuery(
   PENDING_FORUM_OWNER_INVITE_EXISTS,
   {
-    username: usernameVar.value,
-    channelId: channelId.value,
+    username: usernameVar,
+    channelId,
+  },
+  {
+    enabled: computed(() => !!usernameVar.value && !!channelId.value),
   }
 );
 
 const { result: pendingModInviteResult } = useQuery(
   PENDING_FORUM_MOD_INVITE_EXISTS,
   {
-    username: usernameVar.value,
-    channelId: channelId.value,
+    username: usernameVar,
+    channelId,
+  },
+  {
+    enabled: computed(() => !!usernameVar.value && !!channelId.value),
   }
 );
 
