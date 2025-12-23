@@ -149,12 +149,12 @@ const isOnMapPage = computed(() => {
             data-testid="notification-bell"
             to="/notifications"
             sr-only="Notifications"
-            class="font-semibold relative inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none"
+            class="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none"
           >
-            <i class="fas fa-bell" />
+            <i class="fas fa-bell text-lg" />
             <span
               v-if="notificationCountVar > 0"
-              class="font-semibold absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 px-1 text-xs leading-none"
+              class="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-semibold leading-none text-white"
             >
               {{ notificationCountVar }}
             </span>
