@@ -218,7 +218,7 @@ const getUserActionClasses = (isActive: boolean) => {
         <div class="flex flex-col items-center">
           <CreateAnythingButton icon-only />
           <span
-            class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
+            class="w-12 text-center text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
           >
             Create
           </span>
@@ -254,7 +254,7 @@ const getUserActionClasses = (isActive: boolean) => {
               />
             </NuxtLink>
             <span
-              class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
+              class="w-12 text-center text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
             >
               {{ item.name }}
             </span>
@@ -300,7 +300,7 @@ const getUserActionClasses = (isActive: boolean) => {
                 />
               </NuxtLink>
               <span
-                class="mt-0.5 w-12 truncate text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
+                class="w-12 truncate text-center text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
               >
                 {{ forum.uniqueName }}
               </span>
@@ -317,7 +317,7 @@ const getUserActionClasses = (isActive: boolean) => {
                 <MoreIcon />
               </div>
             </IconTooltip>
-            <span class="mt-0.5 text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
+            <span class="text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
               >More</span
             >
           </div>
@@ -348,7 +348,7 @@ const getUserActionClasses = (isActive: boolean) => {
               <AdminIcon />
             </NuxtLink>
             <span
-              class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
+              class="w-12 text-center text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
             >
               Admin
             </span>
@@ -365,7 +365,7 @@ const getUserActionClasses = (isActive: boolean) => {
                   <LoginIcon />
                 </div>
                 <span
-                  class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
+                  class="w-12 text-center text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
                 >
                   Log in
                 </span>
@@ -397,7 +397,7 @@ const getUserActionClasses = (isActive: boolean) => {
               <span class="text-2xl">🐝</span>
             </NuxtLink>
             <span
-              class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
+              class="w-12 text-center text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
             >
               Home
             </span>
@@ -427,7 +427,7 @@ const getUserActionClasses = (isActive: boolean) => {
                 />
               </NuxtLink>
               <span
-                class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
+                class="w-12 text-center text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
               >
                 {{ item.name }}
               </span>
@@ -455,7 +455,7 @@ const getUserActionClasses = (isActive: boolean) => {
                 <AdminIcon />
               </NuxtLink>
               <span
-                class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
+                class="w-12 text-center text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
               >
                 Admin
               </span>
@@ -469,7 +469,7 @@ const getUserActionClasses = (isActive: boolean) => {
                 <LoginIcon />
               </div>
               <span
-                class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
+                class="w-12 text-center text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
               >
                 Log in
               </span>
