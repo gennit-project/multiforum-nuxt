@@ -75,6 +75,13 @@ const mainImageHeight = computed(() => {
   return props.downloadMode ? 500 : 400;
 });
 
+const expandedThumbnailDimensions = computed(() => {
+  if (props.expandedView && !props.downloadMode) {
+    return { width: 180, height: 120 };
+  }
+  return { width: 120, height: 120 };
+});
+
 const orderedImages = computed(() => {
   let albumImages: any[] = [];
 
@@ -396,6 +403,8 @@ onMounted(() => {
               :image="image"
               :is-active="idx === activeIndex"
               :size="120"
+              :width="expandedThumbnailDimensions.width"
+              :height="expandedThumbnailDimensions.height"
               @click="activeIndex = idx"
             />
           </div>

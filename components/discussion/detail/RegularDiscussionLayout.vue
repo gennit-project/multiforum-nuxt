@@ -85,7 +85,7 @@ const hasAlbum = computed(() => {
             :album="discussion?.Album || null"
             :carousel-format="true"
             :expanded-view="true"
-            :download-mode="true"
+            :download-mode="false"
             :discussion-author="discussion.Author?.username || ''"
             :discussion-id="discussionId"
             :stl-files="stlFiles"

@@ -16,6 +16,14 @@ const props = defineProps({
     type: Number,
     default: 80,
   },
+  width: {
+    type: Number,
+    default: null,
+  },
+  height: {
+    type: Number,
+    default: null,
+  },
 });
 
 const emit = defineEmits(['click']);
@@ -28,9 +36,11 @@ const hasStlExtension = (url: string) => {
   return url?.toLowerCase().endsWith('.stl');
 };
 
+const thumbnailWidth = computed(() => props.width ?? props.size);
+const thumbnailHeight = computed(() => props.height ?? props.size);
 const sizeStyle = computed(() => ({
-  width: `${props.size}px`,
-  height: `${props.size}px`,
+  width: `${thumbnailWidth.value}px`,
+  height: `${thumbnailHeight.value}px`,
 }));
 </script>
 
@@ -47,16 +57,16 @@ const sizeStyle = computed(() => ({
     <ModelViewer
       v-if="image && image.url && hasGlbExtension(image.url)"
       :model-url="image.url"
-      :height="`${size}px`"
-      :width="`${size}px`"
+      :height="`${thumbnailHeight}px`"
+      :width="`${thumbnailWidth}px`"
       class="rounded"
       :style="sizeStyle"
     />
     <ClientOnly v-else-if="image && image.url && hasStlExtension(image.url)">
       <StlViewer
         :src="image.url"
-        :width="size"
-        :height="size"
+        :width="thumbnailWidth"
+        :height="thumbnailHeight"
         class="rounded"
         :style="sizeStyle"
       />
