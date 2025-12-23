@@ -159,76 +159,90 @@ const containerStyle = computed(() => {
   .markdown-body {
     word-wrap: break-word;
     overflow-wrap: break-word;
-    max-width: 100%;
+    max-width: 70ch; /* Optimal line length for readability */
     box-sizing: border-box;
+    color: #24292f !important; /* Explicit text color for light mode */
+
+    .dark & {
+      color: #e6edf3 !important; /* Explicit text color for dark mode */
+    }
 
     /* ── font‑size variants ─────────────────────────────── */
     &.font-size-small {
       h1 {
-        font-size: 1.2rem !important;
+        font-size: 1.5rem !important;
+        letter-spacing: -0.02em !important;
       }
       h2 {
-        font-size: 1.1rem !important;
+        font-size: 1.25rem !important;
+        letter-spacing: -0.015em !important;
       }
       h3 {
-        font-size: 1rem !important;
+        font-size: 1.1rem !important;
+        letter-spacing: -0.01em !important;
       }
       h4 {
-        font-size: 0.9rem !important;
+        font-size: 1rem !important;
       }
       h5,
       h6 {
-        font-size: 0.8rem !important;
+        font-size: 0.9rem !important;
       }
       p,
       li {
-        font-size: 0.8rem !important;
+        font-size: 0.9rem !important;
       }
     }
 
     &.font-size-medium {
       h1 {
-        font-size: 1.4rem !important;
+        font-size: 1.875rem !important;
+        letter-spacing: -0.025em !important;
       }
       h2 {
-        font-size: 1.2rem !important;
+        font-size: 1.5rem !important;
+        letter-spacing: -0.02em !important;
       }
       h3 {
-        font-size: 1.1rem !important;
+        font-size: 1.25rem !important;
+        letter-spacing: -0.015em !important;
       }
       h4 {
-        font-size: 1rem !important;
+        font-size: 1.1rem !important;
       }
       h5,
       h6 {
-        font-size: 0.9rem !important;
+        font-size: 1rem !important;
       }
       p,
       li {
-        font-size: 0.9rem !important;
+        font-size: 1rem !important;
       }
     }
 
     &.font-size-large {
       h1 {
-        font-size: 1.6rem !important;
+        font-size: 2.25rem !important;
+        letter-spacing: -0.03em !important;
       }
       h2 {
-        font-size: 1.4rem !important;
+        font-size: 1.75rem !important;
+        letter-spacing: -0.025em !important;
       }
       h3 {
-        font-size: 1.2rem !important;
+        font-size: 1.375rem !important;
+        letter-spacing: -0.02em !important;
       }
       h4 {
-        font-size: 1.1rem !important;
+        font-size: 1.2rem !important;
       }
       h5,
       h6 {
-        font-size: 1rem !important;
+        font-size: 1.1rem !important;
       }
       p,
       li {
-        font-size: 1.1rem !important;
+        font-size: 1.125rem !important;
       }
     }
 
@@ -240,20 +254,25 @@ const containerStyle = computed(() => {
     h5,
     h6 {
       font-weight: 600 !important;
-      margin-top: 1.5rem !important;
-      margin-bottom: 1rem !important;
+      margin-top: 1.75rem !important;
+      margin-bottom: 0.75rem !important;
+      line-height: 1.3 !important;
+
+      &:first-child {
+        margin-top: 0 !important;
+      }
     }
 
     p {
-      margin-bottom: 1rem !important;
-      margin-top: 0.25rem !important;
-      line-height: 1.5 !important;
+      margin-bottom: 1.25rem !important;
+      margin-top: 0 !important;
+      line-height: 1.65 !important;
     }
 
     ul,
     ol {
-      padding-left: 2rem !important;
-      margin-bottom: 1rem !important;
+      padding-left: 1.75rem !important;
+      margin-bottom: 1.25rem !important;
       margin-top: 0 !important;
     }
 
@@ -266,15 +285,25 @@ const containerStyle = computed(() => {
     }
 
     li {
-      margin: 0.25rem 0 !important;
-      line-height: 1.5 !important;
+      margin: 0.35rem 0 !important;
+      line-height: 1.65 !important;
     }
 
-    ul ul,
+    /* Nested list styling with different bullet types */
+    ul ul {
+      list-style-type: circle !important;
+      margin-top: 0.35rem !important;
+      margin-bottom: 0 !important;
+    }
+
+    ul ul ul {
+      list-style-type: square !important;
+    }
+
     ol ol,
     ul ol,
     ol ul {
-      margin-top: 0.25rem !important;
+      margin-top: 0.35rem !important;
       margin-bottom: 0 !important;
     }
 
@@ -583,74 +612,89 @@ const containerStyle = computed(() => {
   word-wrap: break-word;
   overflow-wrap: break-word;
   width: 100%;
+  max-width: 70ch; /* Optimal line length for readability */
+  color: #24292f; /* Explicit text color for light mode */
+
+  .dark & {
+    color: #e6edf3; /* Explicit text color for dark mode */
+  }
 
   /* ── font‑size variants ─────────────────────────────── */
   &.font-size-small {
     h1 {
-      font-size: 1.2rem !important;
+      font-size: 1.5rem !important;
+      letter-spacing: -0.02em !important;
     }
     h2 {
-      font-size: 1.1rem !important;
+      font-size: 1.25rem !important;
+      letter-spacing: -0.015em !important;
     }
     h3 {
-      font-size: 1rem !important;
+      font-size: 1.1rem !important;
+      letter-spacing: -0.01em !important;
     }
     h4 {
-      font-size: 0.9rem !important;
+      font-size: 1rem !important;
     }
     h5,
     h6 {
-      font-size: 0.8rem !important;
+      font-size: 0.9rem !important;
     }
     p,
     li {
-      font-size: 0.8rem !important;
+      font-size: 0.9rem !important;
     }
   }
 
   &.font-size-medium {
     h1 {
-      font-size: 1.4rem !important;
+      font-size: 1.875rem !important;
+      letter-spacing: -0.025em !important;
     }
     h2 {
-      font-size: 1.2rem !important;
+      font-size: 1.5rem !important;
+      letter-spacing: -0.02em !important;
     }
     h3 {
-      font-size: 1.1rem !important;
+      font-size: 1.25rem !important;
+      letter-spacing: -0.015em !important;
     }
     h4 {
-      font-size: 1rem !important;
+      font-size: 1.1rem !important;
     }
     h5,
     h6 {
-      font-size: 0.9rem !important;
+      font-size: 1rem !important;
     }
     p,
     li {
-      font-size: 0.9rem !important;
+      font-size: 1rem !important;
     }
   }
 
   &.font-size-large {
     h1 {
-      font-size: 1.6rem !important;
+      font-size: 2.25rem !important;
+      letter-spacing: -0.03em !important;
     }
     h2 {
-      font-size: 1.4rem !important;
+      font-size: 1.75rem !important;
+      letter-spacing: -0.025em !important;
     }
     h3 {
-      font-size: 1.2rem !important;
+      font-size: 1.375rem !important;
+      letter-spacing: -0.02em !important;
     }
     h4 {
-      font-size: 1.1rem !important;
+      font-size: 1.2rem !important;
     }
     h5,
     h6 {
-      font-size: 1rem !important;
+      font-size: 1.1rem !important;
     }
     p,
     li {
-      font-size: 1.1rem !important;
+      font-size: 1.125rem !important;
     }
   }
 
@@ -662,45 +706,95 @@ const containerStyle = computed(() => {
   h5,
   h6 {
     font-weight: 600 !important;
-    margin-top: 1.5rem !important;
-    margin-bottom: 1rem !important;
+    margin-top: 1.75rem !important;
+    margin-bottom: 0.75rem !important;
+    line-height: 1.3 !important;
+
+    &:first-child {
+      margin-top: 0 !important;
+    }
   }
 
   p {
-    margin-bottom: 1rem !important;
-    margin-top: 0.25rem !important;
+    margin-bottom: 1.25rem !important;
+    margin-top: 0 !important;
+    line-height: 1.65 !important;
   }
 
   ul,
   ol {
+    padding-left: 1.75rem !important;
+    margin-bottom: 1.25rem !important;
+    margin-top: 0 !important;
+  }
+
+  ul {
     list-style-type: disc !important;
-    margin-left: 1rem !important;
-    margin-bottom: 0.5rem !important;
+  }
+
+  ol {
+    list-style-type: decimal !important;
+  }
+
+  li {
+    margin: 0.35rem 0 !important;
+    line-height: 1.65 !important;
+  }
+
+  /* Nested list styling with different bullet types */
+  ul ul {
+    list-style-type: circle !important;
+    margin-top: 0.35rem !important;
+    margin-bottom: 0 !important;
+  }
+
+  ul ul ul {
+    list-style-type: square !important;
+  }
+
+  ol ol,
+  ul ol,
+  ol ul {
+    margin-top: 0.35rem !important;
+    margin-bottom: 0 !important;
   }
 
   pre {
-    border-radius: 5px;
+    border-radius: 6px;
     overflow-x: auto; // keep horizontal scroll for code blocks
-    padding-bottom: 0.25rem !important;
+    padding: 1rem !important;
     max-width: 100%;
     white-space: pre-wrap;
+    margin-bottom: 1.25rem !important;
   }
 
   code {
-    border-radius: 5px;
-    padding-bottom: 0.25rem !important;
+    border-radius: 6px;
+    padding: 0.2em 0.4em !important;
     max-width: 100%;
     overflow-wrap: break-word;
     white-space: pre-wrap;
   }
 
+  pre code {
+    padding: 0 !important;
+  }
+
   a {
-    color: #3182ce !important;
+    color: #0969da !important;
     word-wrap: break-word;
     overflow-wrap: break-word;
     max-width: 100%;
-    word-break: break-all;
-    display: inline-block;
+    word-break: break-word;
+    display: inline;
+
+    &:hover {
+      text-decoration: underline !important;
+    }
+
+    .dark & {
+      color: #58a6ff !important;
+    }
   }
 
   img {
@@ -716,15 +810,25 @@ const containerStyle = computed(() => {
   }
 
   blockquote {
-    border-left: 4px solid #3182ce;
-    padding-left: 16px;
-    margin: 16px 0;
-    font-style: italic;
-    color: #555;
+    padding: 0.6em 1em !important;
+    border-left: 0.25em solid #d0d7de !important;
+    margin: 1.25rem 0 !important;
+    color: #57606a !important;
+    background-color: #f6f8fa !important;
+    border-radius: 0 6px 6px 0 !important;
 
     .dark & {
-      border-left-color: #63b3ed;
-      color: #ccc;
+      border-left-color: #30363d !important;
+      color: #8b949e !important;
+      background-color: #161b22 !important;
+    }
+
+    > :first-child {
+      margin-top: 0 !important;
+    }
+
+    > :last-child {
+      margin-bottom: 0 !important;
     }
   }
 

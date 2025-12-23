@@ -5,7 +5,10 @@ import ChannelHeaderDesktop from '@/components/channel/ChannelHeaderDesktop.vue'
 import DiscussionTitleEditForm from '@/components/discussion/detail/DiscussionTitleEditForm.vue';
 import EventTitleEditForm from '@/components/event/detail/EventTitleEditForm.vue';
 import IssueTitleEditForm from '@/components/mod/IssueTitleEditForm.vue';
-import { GET_CHANNEL, GET_CHANNEL_DOWNLOAD_COUNT } from '@/graphQLData/channel/queries';
+import {
+  GET_CHANNEL,
+  GET_CHANNEL_DOWNLOAD_COUNT,
+} from '@/graphQLData/channel/queries';
 import type { Channel, User } from '@/__generated__/graphql';
 import { computed } from 'vue';
 import ChannelSidebar from '@/components/channel/ChannelSidebar.vue';
@@ -14,7 +17,10 @@ import { useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon';
 import BackLink from '@/components/BackLink.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
-import { getLocalStorageItem, setLocalStorageItem } from '@/utils/localStorageUtils';
+import {
+  getLocalStorageItem,
+  setLocalStorageItem,
+} from '@/utils/localStorageUtils';
 import type { ForumItem } from '@/types/forum';
 
 const route = useRoute();
@@ -109,9 +115,7 @@ const channel = computed(() => {
 });
 
 // Get download count separately since we can't query the same field twice
-const {
-  result: downloadCountResult,
-} = useQuery(
+const { result: downloadCountResult } = useQuery(
   GET_CHANNEL_DOWNLOAD_COUNT,
   {
     uniqueName: channelId,
@@ -124,7 +128,10 @@ const {
 );
 
 const downloadCount = computed(() => {
-  return downloadCountResult.value?.channels?.[0]?.DiscussionChannelsAggregate?.count ?? 0;
+  return (
+    downloadCountResult.value?.channels?.[0]?.DiscussionChannelsAggregate
+      ?.count ?? 0
+  );
 });
 
 const showNotFound = computed(() => {
@@ -279,9 +286,9 @@ definePageMeta({
         >
           <div
             v-if="showDiscussionTitle"
-            class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-600 lg:px-4 2xl:px-0"
+            class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600 2xl:px-0"
           >
-            <div class="max-w-screen-2xl flex-1 pr-1">
+            <div class="max-w-screen-2xl flex-1">
               <DiscussionTitleEditForm>
                 <BackLink
                   :data-testid="'discussion-detail-back-link'"
@@ -292,7 +299,7 @@ definePageMeta({
           </div>
           <div
             v-else-if="showDownloadTitle"
-            class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-600 lg:px-4 2xl:px-0"
+            class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600 2xl:px-0"
           >
             <div class="max-w-screen-2xl flex-1 pr-1">
               <DiscussionTitleEditForm>
@@ -305,7 +312,7 @@ definePageMeta({
           </div>
           <div
             v-else-if="showEventTitle"
-            class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-600 lg:px-4 2xl:px-0"
+            class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600 2xl:px-0"
           >
             <div class="max-w-screen-2xl flex-1 pr-1">
               <EventTitleEditForm>
@@ -318,7 +325,7 @@ definePageMeta({
           </div>
           <div
             v-else-if="showIssueTitle"
-            class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-600 lg:px-4 2xl:px-0"
+            class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600 2xl:px-0"
           >
             <div class="max-w-screen-2xl flex-1 pr-1">
               <IssueTitleEditForm>
@@ -334,7 +341,7 @@ definePageMeta({
             <div
               class="flex flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row"
             >
-              <div class="flex-1 min-w-0 md:px-2">
+              <div class="min-w-0 flex-1 px-4">
                 <ChannelTabs
                   v-if="showChannelTabs"
                   :admin-list="adminList"
