@@ -209,24 +209,6 @@ const handleOpenAlbum = () => {
     </div>
 
     <div class="flex flex-col gap-2 p-2">
-      <div
-        class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-300"
-      >
-        <AvatarComponent
-          v-if="primaryChannel"
-          :is-square="true"
-          :text="primaryChannel.channelUniqueName"
-          class="h-6 w-6"
-        />
-        <nuxt-link
-          v-if="primaryChannel"
-          :to="defaultLink"
-          class="text-orange-700 hover:underline dark:text-orange-300"
-        >
-          {{ primaryChannel.channelUniqueName }}
-        </nuxt-link>
-      </div>
-
       <div class="space-y-1">
         <nuxt-link
           v-if="primaryChannel"
@@ -257,7 +239,13 @@ const handleOpenAlbum = () => {
           :discussion-karma="authorDiscussionKarma"
           :account-created="authorAccountCreated"
           :is-admin="authorIsAdmin"
-        />
+        /><template v-if="primaryChannel">
+          in
+          <nuxt-link
+            :to="defaultLink"
+            class="text-orange-700 hover:underline dark:text-orange-300"
+          >{{ primaryChannel.channelUniqueName }}</nuxt-link>
+        </template>
       </div>
 
       <div class="text-xs text-gray-600 dark:text-gray-300">
