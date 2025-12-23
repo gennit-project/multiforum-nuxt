@@ -133,6 +133,7 @@ const hasAlbum = computed(() => {
               v-if="activeDiscussionChannel"
               :discussion="discussion"
               :discussion-channel="activeDiscussionChannel"
+              :show-emoji-button="false"
               :show-downvote="
                 !loggedInUserIsAuthor &&
                 (activeDiscussionChannel?.Channel?.feedbackEnabled ?? true)

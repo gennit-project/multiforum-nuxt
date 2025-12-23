@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import GenericModal from '@/components/GenericModal.vue';
-import HandThumbDownIcon from '@/components/icons/HandThumbDownIcon.vue';
+import FlagIcon from '@/components/icons/FlagIcon.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import CharCounter from '@/components/CharCounter.vue';
 
@@ -59,7 +59,7 @@ function updateFeedback(text: string) {
     :error="props.error"
   >
     <template #icon>
-      <HandThumbDownIcon
+      <FlagIcon
         class="h-6 w-6 text-yellow-600 opacity-100 dark:text-yellow-400"
         aria-hidden="true"
       />

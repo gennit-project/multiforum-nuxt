@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import VoteButton from '@/components/VoteButton.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import HandThumbDownIcon from '@/components/icons/HandThumbDownIcon.vue';
+import FlagIcon from '@/components/icons/FlagIcon.vue';
 import type { SelectOptionData } from '@/types/GenericFormTypes';
 import { ALLOWED_ICONS } from '@/utils';
 
@@ -28,6 +28,10 @@ const props = defineProps({
     default: false,
   },
   showDownvote: {
+    type: Boolean,
+    default: true,
+  },
+  showUpvote: {
     type: Boolean,
     default: true,
   },
@@ -133,6 +137,7 @@ const clickUp = () => {
     <template #has-auth>
       <div class="flex items-center gap-2 text-sm">
         <VoteButton
+          v-if="showUpvote"
           :active="upvoteActive"
           :count="upvoteCount"
           :is-permalinked="isPermalinked"
@@ -165,9 +170,10 @@ const clickUp = () => {
             :show-count="false"
             :test-id="'downvote-discussion-button'"
           >
-            <div>
-              <HandThumbDownIcon class="h-4 w-4" />
-            </div>
+            <span class="flex items-center gap-1 text-xs font-medium">
+              <FlagIcon class="h-4 w-4" />
+              <span>Feedback</span>
+            </span>
           </VoteButton>
         </MenuButton>
       </div>
@@ -175,6 +181,7 @@ const clickUp = () => {
     <template #does-not-have-auth>
       <div class="flex items-center gap-2 text-sm">
         <VoteButton
+          v-if="showUpvote"
           :active="upvoteActive"
           :count="upvoteCount"
           :is-permalinked="isPermalinked"
@@ -202,9 +209,10 @@ const clickUp = () => {
             :test-id="'downvote-discussion-button'"
             :tooltip-text="'Give semi-anonymous feedback'"
           >
-            <div>
-              <HandThumbDownIcon class="h-4 w-4" />
-            </div>
+            <span class="flex items-center gap-1 text-xs font-medium">
+              <FlagIcon class="h-4 w-4" />
+              <span>Feedback</span>
+            </span>
           </VoteButton>
         </MenuButton>
       </div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import VoteButton from '@/components/VoteButton.vue';
-import HandThumbDownIcon from '../icons/HandThumbDownIcon.vue';
+import FlagIcon from '../icons/FlagIcon.vue';
 import type { SelectOptionData } from '@/types/GenericFormTypes';
 import { ALLOWED_ICONS } from '@/utils';
 
@@ -164,7 +164,7 @@ function viewFeedback() {
         :is-permalinked="isPermalinked"
         :is-marked-as-answer="isMarkedAsAnswer"
       >
-        <HandThumbDownIcon class="h-4 w-4" />
+        <FlagIcon class="h-4 w-4" />
       </VoteButton>
     </MenuButton>
   </div>

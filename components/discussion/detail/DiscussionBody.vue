@@ -2,7 +2,6 @@
 import { ref, computed, onMounted } from 'vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import EmojiButtons from '@/components/comments/EmojiButtons.vue';
-import NewEmojiButton from '@/components/comments/NewEmojiButton.vue';
 import Tag from '../../TagComponent.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import 'md-editor-v3/lib/preview.css';
@@ -206,10 +205,6 @@ const hasEmoiji = computed(() => {
     <slot name="activity-feed-slot" />
     <div class="flex items-center gap-2">
       <slot name="button-slot" />
-      <NewEmojiButton
-        v-if="showEmojiButton && !downloadMode"
-        :discussion-channel-id="discussionChannelId"
-      />
     </div>
   </div>
 </template>

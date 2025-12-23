@@ -115,14 +115,15 @@ const hasAlbum = computed(() => {
       </template>
       <template #button-slot>
         <div class="flex-col items-center">
-          <DiscussionVotes
-            v-if="activeDiscussionChannel"
-            :discussion="discussion"
-            :discussion-channel="activeDiscussionChannel"
-            :show-downvote="
-              !loggedInUserIsAuthor &&
-              (activeDiscussionChannel?.Channel?.feedbackEnabled ?? true)
-            "
+            <DiscussionVotes
+              v-if="activeDiscussionChannel"
+              :discussion="discussion"
+              :discussion-channel="activeDiscussionChannel"
+              :show-emoji-button="true"
+              :show-downvote="
+                !loggedInUserIsAuthor &&
+                (activeDiscussionChannel?.Channel?.feedbackEnabled ?? true)
+              "
             :use-heart-icon="false"
             @handle-click-edit-feedback="emit('handleClickEditFeedback')"
             @handle-click-give-feedback="emit('handleClickGiveFeedback')"

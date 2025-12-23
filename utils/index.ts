@@ -4,7 +4,6 @@ import type { Duration } from 'luxon';
 import { DateTime, Interval } from 'luxon';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
-import HandThumbDownIcon from '@/components/icons/HandThumbDownIcon.vue';
 import EyeIcon from '@/components/icons/EyeIcon.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TrashIcon from '@/components/icons/TrashIcon.vue';
@@ -512,7 +511,7 @@ const ALLOWED_ICONS = {
 const actionIconMap = {
   [ALLOWED_ICONS.COPY_LINK]: LinkIcon,
   [ALLOWED_ICONS.REPORT]: FlagIcon,
-  [ALLOWED_ICONS.GIVE_FEEDBACK]: HandThumbDownIcon,
+  [ALLOWED_ICONS.GIVE_FEEDBACK]: FlagIcon,
   [ALLOWED_ICONS.VIEW_FEEDBACK]: EyeIcon,
   [ALLOWED_ICONS.EDIT]: PencilIcon,
   [ALLOWED_ICONS.DELETE]: TrashIcon,

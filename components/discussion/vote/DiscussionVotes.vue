@@ -8,6 +8,7 @@ import {
   UNDO_UPVOTE_DISCUSSION_CHANNEL,
 } from '@/graphQLData/discussion/mutations';
 import VoteButtons from '@/components/discussion/vote/VoteButtons.vue';
+import NewEmojiButton from '@/components/comments/NewEmojiButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import { usernameVar, modProfileNameVar } from '@/cache';
 
@@ -23,6 +24,10 @@ const props = defineProps({
   showDownvote: {
     type: Boolean,
     default: true,
+  },
+  showEmojiButton: {
+    type: Boolean,
+    default: false,
   },
   useHeartIcon: {
     type: Boolean,
@@ -152,26 +157,53 @@ function handleClickViewFeedback() {
       ''
     "
   />
-  <VoteButtons
-    :downvote-active="loggedInUserDownvoted"
-    :downvote-count="downvoteCount"
-    :has-mod-profile="!!modProfileNameVar"
-    :show-downvote="showDownvote"
-    :upvote-active="loggedInUserUpvoted"
-    :upvote-count="upvoteCount"
-    :upvote-icon="upvoteIcon"
-    :upvote-loading="
-      upvoteDiscussionChannelLoading || undoUpvoteDiscussionChannelLoading
-    "
-    :upvote-tooltip-active="upvoteTooltips.active"
-    :upvote-tooltip-inactive="upvoteTooltips.inactive"
-    :upvote-tooltip-unauthenticated="upvoteTooltips.unauthenticated"
-    @click-up="handleClickUp"
-    @edit-feedback="handleClickEditFeedback"
-    @give-feedback="handleClickGiveFeedback"
-    @undo-feedback="handleClickUndoFeedback"
-    @view-feedback="handleClickViewFeedback"
-  />
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <VoteButtons
+        :downvote-active="loggedInUserDownvoted"
+        :downvote-count="downvoteCount"
+        :has-mod-profile="!!modProfileNameVar"
+        :show-downvote="false"
+        :upvote-active="loggedInUserUpvoted"
+        :upvote-count="upvoteCount"
+        :upvote-icon="upvoteIcon"
+        :upvote-loading="
+          upvoteDiscussionChannelLoading || undoUpvoteDiscussionChannelLoading
+        "
+        :upvote-tooltip-active="upvoteTooltips.active"
+        :upvote-tooltip-inactive="upvoteTooltips.inactive"
+        :upvote-tooltip-unauthenticated="upvoteTooltips.unauthenticated"
+        @click-up="handleClickUp"
+      />
+      <NewEmojiButton
+        v-if="showEmojiButton"
+        :discussion-channel-id="discussionChannelId"
+      />
+    </div>
+    <div class="flex items-center">
+      <VoteButtons
+        v-if="showDownvote"
+        :downvote-active="loggedInUserDownvoted"
+        :downvote-count="downvoteCount"
+        :has-mod-profile="!!modProfileNameVar"
+        :show-downvote="showDownvote"
+        :show-upvote="false"
+        :upvote-active="loggedInUserUpvoted"
+        :upvote-count="upvoteCount"
+        :upvote-icon="upvoteIcon"
+        :upvote-loading="
+          upvoteDiscussionChannelLoading || undoUpvoteDiscussionChannelLoading
+        "
+        :upvote-tooltip-active="upvoteTooltips.active"
+        :upvote-tooltip-inactive="upvoteTooltips.inactive"
+        :upvote-tooltip-unauthenticated="upvoteTooltips.unauthenticated"
+        @edit-feedback="handleClickEditFeedback"
+        @give-feedback="handleClickGiveFeedback"
+        @undo-feedback="handleClickUndoFeedback"
+        @view-feedback="handleClickViewFeedback"
+      />
+    </div>
+  </div>
 </template>
 
 <style>
