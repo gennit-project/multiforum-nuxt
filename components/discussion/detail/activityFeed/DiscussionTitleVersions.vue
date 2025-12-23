@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 import type { Discussion } from '@/__generated__/graphql';
 import { timeAgo } from '@/utils';
@@ -10,6 +10,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+const showOlderEdits = ref(false);
 
 // Process the past title versions
 const titleVersionsWithCurrent = computed(() => {
@@ -52,6 +54,24 @@ const titleVersionsWithCurrent = computed(() => {
 const showActivityFeed = computed(() => {
   return titleVersionsWithCurrent.value.length > 0;
 });
+
+// Get visible items - most recent only, or all if expanded
+const visibleItems = computed(() => {
+  if (showOlderEdits.value || titleVersionsWithCurrent.value.length <= 1) {
+    return titleVersionsWithCurrent.value;
+  }
+  // Show only the most recent (last item in chronological order)
+  return [titleVersionsWithCurrent.value[titleVersionsWithCurrent.value.length - 1]];
+});
+
+// Get hidden items count
+const hiddenCount = computed(() => {
+  return titleVersionsWithCurrent.value.length - 1;
+});
+
+const toggleOlderEdits = () => {
+  showOlderEdits.value = !showOlderEdits.value;
+};
 </script>
 
 <template>
@@ -60,23 +80,50 @@ const showActivityFeed = computed(() => {
       Title Edit History
     </h3>
     <ul role="list" class="flow-root">
-      <li
-        v-for="item in titleVersionsWithCurrent"
-        :key="item.id"
-        class="relative pb-6"
-      >
-        <div class="relative flex items-start space-x-3">
-          <!-- Activity icon -->
-          <div class="relative">
+      <!-- Show older edits button -->
+      <li v-if="hiddenCount > 0 && !showOlderEdits" class="relative pb-4">
+        <div class="relative flex items-center space-x-3">
+          <!-- Vertical line connecting to items below -->
+          <div class="relative flex h-6 w-6 items-center justify-center">
             <span
-              class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-600"
+              class="absolute top-3 h-full w-0.5 bg-gray-200 dark:bg-gray-600"
+              aria-hidden="true"
+            />
+          </div>
+          <button
+            class="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            @click="toggleOlderEdits"
+          >
+            Show {{ hiddenCount }} older edit{{ hiddenCount > 1 ? 's' : '' }}
+          </button>
+        </div>
+      </li>
+
+      <li
+        v-for="(item, index) in visibleItems"
+        :key="item.id"
+        class="relative pb-4"
+      >
+        <div class="relative flex items-center space-x-3">
+          <!-- Activity icon with centered vertical line -->
+          <div class="relative flex h-6 w-6 items-center justify-center">
+            <!-- Vertical line - show above icon if not first visible item -->
+            <span
+              v-if="index > 0 || (showOlderEdits && hiddenCount > 0)"
+              class="absolute bottom-3 h-full w-0.5 bg-gray-200 dark:bg-gray-600"
+              aria-hidden="true"
+            />
+            <!-- Vertical line - show below icon if not last item -->
+            <span
+              v-if="index < visibleItems.length - 1"
+              class="absolute top-3 h-full w-0.5 bg-gray-200 dark:bg-gray-600"
               aria-hidden="true"
             />
             <div
-              class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 ring-8 ring-white dark:bg-gray-700 dark:ring-gray-800"
+              class="relative z-10 flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 ring-4 ring-white dark:bg-gray-700 dark:ring-gray-800"
             >
               <i
-                class="fa-solid fa-pencil text-gray-500 dark:text-gray-300"
+                class="fa-solid fa-pencil text-xs text-gray-500 dark:text-gray-300"
                 aria-hidden="true"
               />
             </div>
@@ -105,6 +152,19 @@ const showActivityFeed = computed(() => {
               </span>
             </div>
           </div>
+        </div>
+      </li>
+
+      <!-- Hide older edits button -->
+      <li v-if="hiddenCount > 0 && showOlderEdits" class="relative">
+        <div class="relative flex items-center space-x-3">
+          <div class="flex h-6 w-6 items-center justify-center" />
+          <button
+            class="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            @click="toggleOlderEdits"
+          >
+            Hide older edits
+          </button>
         </div>
       </li>
     </ul>

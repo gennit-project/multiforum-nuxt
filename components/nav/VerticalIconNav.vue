@@ -15,7 +15,6 @@ import MoreIcon from '@/components/icons/MoreIcon.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';
 import IconTooltip from '@/components/common/IconTooltip.vue';
 import RecentForumsDrawer from './RecentForumsDrawer.vue';
-import { usernameVar, isAuthenticatedVar } from '@/cache';
 import {
   getLocalStorageItem,
   setLocalStorageItem,
