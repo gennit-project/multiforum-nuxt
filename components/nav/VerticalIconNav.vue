@@ -182,15 +182,15 @@ watch(
 
 const getIconCircleClasses = (isActive: boolean) => {
   const baseClasses =
-    'w-12 h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer';
+    'w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer';
   return isActive
-    ? `${baseClasses} ring-1 ring-orange-500 ring-offset-1 ring-offset-gray-900`
+    ? `${baseClasses} ring-1 ring-orange-500 ring-offset-1 ring-offset-white dark:ring-offset-gray-900`
     : baseClasses;
 };
 
 const getForumIconClasses = (isActive: boolean) => {
   const baseClasses =
-    'w-12 h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer overflow-hidden';
+    'w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer overflow-hidden';
   return isActive
     ? `${baseClasses} ring-2 ring-orange-500 ring-offset-0`
     : baseClasses;
@@ -198,9 +198,9 @@ const getForumIconClasses = (isActive: boolean) => {
 
 const getUserActionClasses = (isActive: boolean) => {
   const baseClasses =
-    'rounded-full my-2 bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer';
+    'rounded-full my-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer';
   return isActive
-    ? `${baseClasses} ring-1 ring-orange-500 ring-offset-1 ring-offset-gray-900`
+    ? `${baseClasses} ring-1 ring-orange-500 ring-offset-1 ring-offset-white dark:ring-offset-gray-900`
     : baseClasses;
 };
 </script>
@@ -208,7 +208,7 @@ const getUserActionClasses = (isActive: boolean) => {
 <template>
   <ClientOnly>
     <div
-      class="fixed left-0 top-0 z-[18] hidden h-full w-20 flex-col items-center border-r border-gray-600 bg-gray-900 lg:flex"
+      class="fixed left-0 top-0 z-[18] hidden h-full w-20 flex-col items-center border-r border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-900 lg:flex"
       :class="{ 'py-2': isVerticallyShort, 'py-4': !isVerticallyShort }"
     >
       <!-- Create Button -->
@@ -219,7 +219,7 @@ const getUserActionClasses = (isActive: boolean) => {
         <div class="flex flex-col items-center">
           <CreateAnythingButton icon-only />
           <span
-            class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+            class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
           >
             Create
           </span>
@@ -250,12 +250,12 @@ const getUserActionClasses = (isActive: boolean) => {
             >
               <component
                 :is="item.icon"
-                class="h-6 w-6 text-gray-300"
+                class="h-6 w-6 text-gray-600 dark:text-gray-300"
                 aria-hidden="true"
               />
             </NuxtLink>
             <span
-              class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+              class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
             >
               {{ item.name }}
             </span>
@@ -266,7 +266,7 @@ const getUserActionClasses = (isActive: boolean) => {
       <!-- Divider -->
       <div
         v-if="!isVerticallyShort"
-        class="h-px w-8 bg-gray-600"
+        class="h-px w-8 bg-gray-200 dark:bg-gray-600"
         :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"
       />
 
@@ -301,7 +301,7 @@ const getUserActionClasses = (isActive: boolean) => {
                 />
               </NuxtLink>
               <span
-                class="mt-0.5 w-12 truncate text-center text-[9px] leading-[10px] text-gray-400"
+                class="mt-0.5 w-12 truncate text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
               >
                 {{ forum.uniqueName }}
               </span>
@@ -318,7 +318,7 @@ const getUserActionClasses = (isActive: boolean) => {
                 <MoreIcon />
               </div>
             </IconTooltip>
-            <span class="mt-0.5 text-[9px] leading-[10px] text-gray-400"
+            <span class="mt-0.5 text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
               >More</span
             >
           </div>
@@ -327,7 +327,7 @@ const getUserActionClasses = (isActive: boolean) => {
 
       <!-- Divider -->
       <div
-        class="h-px w-8 bg-gray-600"
+        class="h-px w-8 bg-gray-200 dark:bg-gray-600"
         :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"
       />
 
@@ -349,7 +349,7 @@ const getUserActionClasses = (isActive: boolean) => {
               <AdminIcon />
             </NuxtLink>
             <span
-              class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+              class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
             >
               Admin
             </span>
@@ -366,7 +366,7 @@ const getUserActionClasses = (isActive: boolean) => {
                   <LoginIcon />
                 </div>
                 <span
-                  class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+                  class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
                 >
                   Log in
                 </span>
@@ -386,7 +386,7 @@ const getUserActionClasses = (isActive: boolean) => {
     <template #fallback>
       <!-- Server-side fallback with default classes (no responsive behavior) -->
       <div
-        class="fixed left-0 top-0 z-[18] hidden h-full w-16 flex-col items-center border-r border-gray-600 bg-gray-900 py-4 lg:flex"
+        class="fixed left-0 top-0 z-[18] hidden h-full w-16 flex-col items-center border-r border-gray-200 bg-white py-4 dark:border-gray-600 dark:bg-gray-900 lg:flex"
       >
         <!-- Logo -->
         <IconTooltip text="Topical - Home" class="mb-4">
@@ -398,7 +398,7 @@ const getUserActionClasses = (isActive: boolean) => {
               <span class="text-2xl">🐝</span>
             </NuxtLink>
             <span
-              class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+              class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
             >
               Home
             </span>
@@ -423,12 +423,12 @@ const getUserActionClasses = (isActive: boolean) => {
               >
                 <component
                   :is="item.icon"
-                  class="h-6 w-6 text-gray-300"
+                  class="h-6 w-6 text-gray-600 dark:text-gray-300"
                   aria-hidden="true"
                 />
               </NuxtLink>
               <span
-                class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+                class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
               >
                 {{ item.name }}
               </span>
@@ -437,10 +437,10 @@ const getUserActionClasses = (isActive: boolean) => {
         </div>
 
         <!-- Divider -->
-        <div class="my-4 h-px w-8 bg-gray-600" />
+        <div class="my-4 h-px w-8 bg-gray-200 dark:bg-gray-600" />
 
         <!-- Divider -->
-        <div class="my-4 h-px w-8 bg-gray-600" />
+        <div class="my-4 h-px w-8 bg-gray-200 dark:bg-gray-600" />
 
         <!-- User Actions -->
         <div class="mt-auto flex flex-col space-y-2">
@@ -456,7 +456,7 @@ const getUserActionClasses = (isActive: boolean) => {
                 <AdminIcon />
               </NuxtLink>
               <span
-                class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+                class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
               >
                 Admin
               </span>
@@ -470,7 +470,7 @@ const getUserActionClasses = (isActive: boolean) => {
                 <LoginIcon />
               </div>
               <span
-                class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-400"
+                class="mt-0.5 w-12 text-center text-[9px] leading-[10px] text-gray-500 dark:text-gray-400"
               >
                 Log in
               </span>

@@ -19,7 +19,7 @@ const toggleTheme = () => {
   <client-only>
     <button
       class="border-transparent relative mx-2 inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-none"
-      :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-600'"
+      :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-300'"
       aria-label="Toggle theme"
       role="switch"
       :aria-checked="isDarkMode"
@@ -33,7 +33,7 @@ const toggleTheme = () => {
         :class="[
           isDarkMode
             ? 'translate-x-5 bg-gray-900'
-            : 'translate-x-0 bg-gray-800',
+            : 'translate-x-0 bg-white',
         ]"
       >
         <!-- Sun icon in light mode -->
@@ -46,7 +46,7 @@ const toggleTheme = () => {
           ]"
           aria-hidden="true"
         >
-          <i class="fa-solid fa-sun text-sm text-white" />
+          <i class="fa-solid fa-sun text-sm text-orange-500" />
         </span>
 
         <!-- Moon icon in dark mode -->
@@ -67,7 +67,7 @@ const toggleTheme = () => {
     <!-- SSR Fallback -->
     <template #fallback>
       <button
-        class="border-transparent relative mx-2 inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 bg-gray-700 transition-colors duration-200 ease-in-out focus:outline-none"
+        class="border-transparent relative mx-2 inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 bg-gray-300 transition-colors duration-200 ease-in-out focus:outline-none dark:bg-gray-700"
         aria-label="Toggle theme"
         role="switch"
         data-testid="theme-switcher"
@@ -75,17 +75,17 @@ const toggleTheme = () => {
         <span class="sr-only">Toggle theme</span>
         <!-- Static toggle circle for SSR -->
         <span
-          class="pointer-events-none relative inline-block size-5 translate-x-5 transform rounded-full bg-gray-900 shadow ring-0 transition duration-200 ease-in-out"
+          class="pointer-events-none relative inline-block size-5 translate-x-0 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out dark:translate-x-5 dark:bg-gray-900"
         >
-          <!-- Static dark mode icon for SSR -->
+          <!-- Static light mode icon for SSR -->
           <span
-            class="absolute inset-0 flex size-full items-center justify-center opacity-0 transition-opacity duration-100 ease-out"
+            class="absolute inset-0 flex size-full items-center justify-center opacity-100 transition-opacity duration-200 ease-in dark:opacity-0 dark:duration-100 dark:ease-out"
             aria-hidden="true"
           >
-            <i class="fa-solid fa-sun text-sm text-white" />
+            <i class="fa-solid fa-sun text-sm text-orange-500" />
           </span>
           <span
-            class="absolute inset-0 flex size-full items-center justify-center opacity-100 transition-opacity duration-200 ease-in"
+            class="absolute inset-0 flex size-full items-center justify-center opacity-0 transition-opacity duration-100 ease-out dark:opacity-100 dark:duration-200 dark:ease-in"
             aria-hidden="true"
           >
             <i class="fa-solid fa-moon text-sm text-white" />

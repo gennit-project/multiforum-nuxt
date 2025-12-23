@@ -69,7 +69,7 @@ const isOnMapPage = computed(() => {
 
 <template>
   <nav
-    class="z-20 h-12 border-b border-b-gray-600 bg-gray-900 pr-4 lg:ml-16"
+    class="z-20 h-12 border-b border-b-gray-200 bg-white pr-4 dark:border-b-gray-600 dark:bg-gray-900 lg:ml-16"
     :class="[isOnMapPage ? 'fixed w-full lg:w-[calc(100%-5rem)]' : '']"
   >
     <div class="flex items-center justify-between py-1 pr-2 pl-12 lg:pl-2">
@@ -86,24 +86,24 @@ const isOnMapPage = computed(() => {
             <ClientOnly>
               <span v-if="!lgAndUp">🐝</span>
               <span
-                class="logo-font font-bold text-white"
+                class="logo-font font-bold text-gray-900 dark:text-white"
                 :class="{ 'ml-1': !lgAndUp, 'ml-8': smAndDown }"
                 >Topical</span
               >
               <template #fallback>
-                <span class="logo-font font-bold text-white">Topical</span>
+                <span class="logo-font font-bold text-gray-900 dark:text-white">Topical</span>
               </template>
             </ClientOnly>
           </nuxt-link>
 
           <div
             v-if="shouldShowChannelId"
-            class="hidden items-center gap-1 text-gray-300 sm:flex"
+            class="hidden items-center gap-1 text-gray-600 dark:text-gray-300 sm:flex"
           >
             <span>•</span>
             <nuxt-link
               :to="`/forums/${channelId}`"
-              class="max-w-[8rem] truncate font-mono text-gray-300 hover:text-white sm:max-w-[12rem] lg:max-w-[16rem]"
+              class="max-w-[8rem] truncate font-mono text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white sm:max-w-[12rem] lg:max-w-[16rem]"
             >
               {{ channelId }}
             </nuxt-link>
@@ -116,12 +116,12 @@ const isOnMapPage = computed(() => {
           </div>
           <div
             v-else-if="routeInfoLabel"
-            class="hidden items-center gap-1 truncate sm:flex"
+            class="hidden items-center gap-1 truncate text-gray-600 dark:text-gray-300 sm:flex"
           >
             <span>•</span>
             {{ routeInfoLabel }}
           </div>
-          <div v-else class="hidden items-center gap-1 truncate sm:flex">
+          <div v-else class="hidden items-center gap-1 truncate text-gray-600 dark:text-gray-300 sm:flex">
             {{ getLabel() }}
           </div>
         </div>
@@ -135,7 +135,7 @@ const isOnMapPage = computed(() => {
         <div class="hidden items-center justify-end space-x-4 sm:flex">
           <nuxt-link
             to="/about"
-            class="text-sm font-semibold text-gray-300 hover:text-white"
+            class="text-sm font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
           >
             About
           </nuxt-link>
@@ -143,13 +143,13 @@ const isOnMapPage = computed(() => {
         </div>
         <div class="flex items-center space-x-2 md:mr-2">
           <div class="lg:hidden">
-            <CreateAnythingButton :background-color="'dark'" />
+            <CreateAnythingButton :background-color="'light'" />
           </div>
           <nuxt-link
             data-testid="notification-bell"
             to="/notifications"
             sr-only="Notifications"
-            class="font-semibold relative inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-gray-300 hover:text-white focus:outline-none"
+            class="font-semibold relative inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none"
           >
             <i class="fas fa-bell" />
             <span
