@@ -252,7 +252,7 @@ definePageMeta({
     <PageNotFound v-if="showNotFound" />
     <div
       v-else-if="channel"
-      class="flex flex-col bg-white dark:bg-black dark:text-white md:min-h-screen"
+      class="flex flex-col bg-white dark:bg-black dark:text-white sm:px-0 md:min-h-screen"
     >
       <ChannelHeaderMobile
         v-if="
@@ -286,7 +286,7 @@ definePageMeta({
         >
           <div
             v-if="showDiscussionTitle"
-            class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600 2xl:px-0"
+            class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600"
           >
             <div class="max-w-screen-2xl flex-1">
               <DiscussionTitleEditForm>
@@ -299,7 +299,7 @@ definePageMeta({
           </div>
           <div
             v-else-if="showDownloadTitle"
-            class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600 2xl:px-0"
+            class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600"
           >
             <div class="max-w-screen-2xl flex-1 pr-1">
               <DiscussionTitleEditForm>
@@ -312,7 +312,7 @@ definePageMeta({
           </div>
           <div
             v-else-if="showEventTitle"
-            class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600 2xl:px-0"
+            class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600"
           >
             <div class="max-w-screen-2xl flex-1 pr-1">
               <EventTitleEditForm>
@@ -325,7 +325,7 @@ definePageMeta({
           </div>
           <div
             v-else-if="showIssueTitle"
-            class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600 2xl:px-0"
+            class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600"
           >
             <div class="max-w-screen-2xl flex-1 pr-1">
               <IssueTitleEditForm>
