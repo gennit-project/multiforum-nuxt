@@ -7,6 +7,7 @@ import GithubContributionChart from './GithubContributionChart.vue';
 import ContributionChartSkeleton from './ContributionChartSkeleton.vue';
 import { GET_MOD, GET_MOD_CONTRIBUTIONS } from '@/graphQLData/mod/queries';
 import type { DayData, Activity } from '@/types/contribution';
+import { getModActivityLinks } from '@/utils/modContributionLinks';
 
 type IssueInfo = {
   id?: string;
@@ -170,77 +171,7 @@ const formatDate = (date: string) => {
   });
 };
 
-const buildLinks = (activity: ModActivity) => {
-  const links: Array<{ label: string; to: string }> = [];
-
-  if (activity.Issue?.channelUniqueName && activity.Issue.issueNumber != null) {
-    links.push({
-      label: 'Issue',
-      to: `/forums/${activity.Issue.channelUniqueName}/issues/${activity.Issue.issueNumber}`,
-    });
-  }
-
-  const discussionChannel = activity.RelatedDiscussion?.DiscussionChannels?.[0];
-  if (
-    discussionChannel?.channelUniqueName &&
-    discussionChannel?.discussionId
-  ) {
-    links.push({
-      label: 'Discussion',
-      to: `/forums/${discussionChannel.channelUniqueName}/discussions/${discussionChannel.discussionId}`,
-    });
-  }
-
-  const eventChannel = activity.RelatedEvent?.EventChannels?.[0];
-  if (eventChannel?.channelUniqueName && eventChannel?.eventId) {
-    links.push({
-      label: 'Event',
-      to: `/forums/${eventChannel.channelUniqueName}/events/${eventChannel.eventId}`,
-    });
-  }
-
-  if (
-    activity.RelatedComment?.DiscussionChannel?.channelUniqueName &&
-    activity.RelatedComment?.DiscussionChannel?.discussionId &&
-    activity.RelatedComment?.id
-  ) {
-    links.push({
-      label: 'Comment',
-      to: `/forums/${activity.RelatedComment.DiscussionChannel.channelUniqueName}/discussions/${activity.RelatedComment.DiscussionChannel.discussionId}/comments/${activity.RelatedComment.id}`,
-    });
-  } else if (
-    activity.RelatedComment?.Event?.EventChannels?.[0]?.channelUniqueName &&
-    activity.RelatedComment?.Event?.id &&
-    activity.RelatedComment?.id
-  ) {
-    links.push({
-      label: 'Comment',
-      to: `/forums/${activity.RelatedComment.Event.EventChannels[0].channelUniqueName}/events/${activity.RelatedComment.Event.id}/comments/${activity.RelatedComment.id}`,
-    });
-  } else if (
-    activity.RelatedComment?.Event?.id &&
-    activity.Issue?.channelUniqueName &&
-    activity.RelatedComment?.id
-  ) {
-    links.push({
-      label: 'Comment',
-      to: `/forums/${activity.Issue.channelUniqueName}/events/${activity.RelatedComment.Event.id}/comments/${activity.RelatedComment.id}`,
-    });
-  }
-
-  if (
-    activity.Comment?.id &&
-    activity.Issue?.channelUniqueName &&
-    activity.Issue.issueNumber != null
-  ) {
-    links.push({
-      label: 'Issue Comment',
-      to: `/forums/${activity.Issue.channelUniqueName}/issues/${activity.Issue.issueNumber}/comments/${activity.Comment.id}`,
-    });
-  }
-
-  return links;
-};
+const buildLinks = (activity: ModActivity) => getModActivityLinks(activity);
 </script>
 
 <template>
@@ -319,7 +250,7 @@ const buildLinks = (activity: ModActivity) => {
                   <div class="flex flex-wrap gap-3 text-xs font-medium">
                     <nuxt-link
                       v-for="link in buildLinks(activity)"
-                      :key="link.to"
+                      :key="`${link.label}-${link.to.name}`"
                       :to="link.to"
                       class="underline"
                     >
