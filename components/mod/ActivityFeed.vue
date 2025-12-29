@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
-import type { ModerationAction } from '@/__generated__/graphql';
+import type { Discussion, ModerationAction } from '@/__generated__/graphql';
 import ActivityFeedListItem from './ActivityFeedListItem.vue';
 
 const props = defineProps<{
   feedItems: ModerationAction[];
   originalUserAuthorUsername: string;
   originalModAuthorName: string;
+  relatedDiscussion?: Discussion | null;
 }>();
 
 const reversedFeedItems = computed(() => {
@@ -26,6 +27,7 @@ const reversedFeedItems = computed(() => {
           activityItem.User?.username === originalUserAuthorUsername ||
           activityItem.ModerationProfile?.displayName === originalModAuthorName
         "
+        :related-discussion="relatedDiscussion"
       />
     </ul>
   </div>

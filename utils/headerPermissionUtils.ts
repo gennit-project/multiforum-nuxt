@@ -28,6 +28,7 @@ export const getDiscussionHeaderMenuItems = (params: {
   hasAlbum?: boolean;
   feedbackEnabled?: boolean;
   hasSensitiveContent?: boolean;
+  relatedIssueLink?: MenuItem['value'] | null;
 }): MenuItem[] => {
   const {
     isOwnDiscussion,
@@ -38,8 +39,17 @@ export const getDiscussionHeaderMenuItems = (params: {
     hasAlbum = false,
     feedbackEnabled = true,
     hasSensitiveContent = false,
+    relatedIssueLink = null,
   } = params;
   let menuItems: MenuItem[] = [];
+
+  if (relatedIssueLink) {
+    menuItems.push({
+      label: 'View Issue',
+      value: relatedIssueLink,
+      icon: ALLOWED_ICONS.VIEW_ISSUE,
+    });
+  }
 
   // Only add "View Feedback" if feedback is enabled on the channel
   if (feedbackEnabled) {

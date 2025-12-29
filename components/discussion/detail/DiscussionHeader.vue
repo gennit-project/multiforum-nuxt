@@ -20,6 +20,7 @@ import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavo
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
+import { GET_DISCUSSION_ISSUE } from '@/graphQLData/mod/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
@@ -142,6 +143,36 @@ const { result: getChannelResult } = useQuery(
     enabled: computed(() => !!props.channelId || !!defaultChannel.value),
   }
 );
+
+const { result: getDiscussionIssueResult } = useQuery(
+  GET_DISCUSSION_ISSUE,
+  {
+    discussionChannelId: props.discussionChannelId,
+  },
+  {
+    fetchPolicy: 'cache-first',
+    enabled: computed(() => !!props.discussionChannelId),
+  }
+);
+
+const relatedIssueNumber = computed(() => {
+  return getDiscussionIssueResult.value?.discussionChannels?.[0]?.RelatedIssues?.[0]
+    ?.issueNumber;
+});
+
+const relatedIssueLink = computed(() => {
+  if (!relatedIssueNumber.value || !defaultChannel.value) {
+    return null;
+  }
+
+  return {
+    name: 'forums-forumId-issues-issueNumber',
+    params: {
+      forumId: defaultChannel.value,
+      issueNumber: relatedIssueNumber.value,
+    },
+  };
+});
 
 // Query server config to get default roles
 const { result: getServerResult } = useQuery(
@@ -317,6 +348,7 @@ const menuItems = computed(() => {
     feedbackEnabled:
       getChannelResult.value?.channels[0]?.feedbackEnabled ?? true,
     hasSensitiveContent: !!props.discussion?.hasSensitiveContent,
+    relatedIssueLink: relatedIssueLink.value,
   });
 });
 

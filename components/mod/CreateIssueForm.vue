@@ -111,7 +111,10 @@ const {
       try {
         const existingIssuesByChannel = cache.readQuery({
           query: GET_ISSUES_BY_CHANNEL,
-          variables: { channelUniqueName: selectedChannelId.value },
+          variables: {
+            channelUniqueName: selectedChannelId.value,
+            searchInput: '',
+          },
         });
 
         if (existingIssuesByChannel?.channels?.[0]) {
@@ -123,7 +126,10 @@ const {
 
           cache.writeQuery({
             query: GET_ISSUES_BY_CHANNEL,
-            variables: { channelUniqueName: selectedChannelId.value },
+            variables: {
+              channelUniqueName: selectedChannelId.value,
+              searchInput: '',
+            },
             data: {
               channels: [updatedChannel],
             },

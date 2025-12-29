@@ -1,17 +1,21 @@
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 import type { Issue } from '@/__generated__/graphql';
 import { GET_ISSUES_BY_CHANNEL } from '@/graphQLData/issue/queries';
 import { useQuery } from '@vue/apollo-composable';
-import { useRoute } from 'nuxt/app';
+import { useRoute, useRouter } from 'nuxt/app';
+import { updateFilters } from '@/utils/routerUtils';
+import SearchBar from '@/components/SearchBar.vue';
 import ModIssueListItem from './ModIssueListItem.vue';
 
 export default defineComponent({
   components: {
     ModIssueListItem,
+    SearchBar,
   },
   setup() {
     const route = useRoute();
+    const router = useRouter();
 
     const channelId = computed(() => {
       if (typeof route.params.forumId !== 'string') {
@@ -20,13 +24,21 @@ export default defineComponent({
       return route.params.forumId;
     });
 
+    const searchInput = ref(
+      typeof route.query.searchInput === 'string' ? route.query.searchInput : ''
+    );
+
+    const queryVariables = computed(() => ({
+      channelUniqueName: channelId.value,
+      searchInput: searchInput.value.trim(),
+    }));
+
     const {
       result: getIssuesByChannelResult,
       error: getIssuesByChannelError,
       loading: getIssuesByChannelLoading,
-    } = useQuery(GET_ISSUES_BY_CHANNEL, {
-      channelUniqueName: channelId.value,
-    });
+      refetch: refetchIssuesByChannel,
+    } = useQuery(GET_ISSUES_BY_CHANNEL, queryVariables);
 
     const issues = computed<Issue[]>(() => {
       if (getIssuesByChannelLoading.value || getIssuesByChannelError.value) {
@@ -40,10 +52,31 @@ export default defineComponent({
       return channelData.Issues;
     });
 
+    const updateSearchInput = (value: string) => {
+      updateFilters({
+        router,
+        route,
+        params: { searchInput: value },
+      });
+    };
+
+    watch(
+      () => route.query,
+      () => {
+        searchInput.value =
+          typeof route.query.searchInput === 'string'
+            ? route.query.searchInput
+            : '';
+        refetchIssuesByChannel(queryVariables.value);
+      }
+    );
+
     return {
       channelId,
       issues,
       getIssuesByChannelLoading,
+      searchInput,
+      updateSearchInput,
     };
   },
 });
@@ -51,6 +84,15 @@ export default defineComponent({
 
 <template>
   <div class="border-t border-gray-200 dark:border-gray-800 dark:text-white">
+    <div class="px-4 py-4">
+      <SearchBar
+        :initial-value="searchInput"
+        :search-placeholder="'Search issues'"
+        :test-id="'issue-search-input'"
+        :debounce-ms="500"
+        @update-search-input="updateSearchInput"
+      />
+    </div>
     <div
       v-if="!getIssuesByChannelLoading && issues.length === 0"
       class="px-4 py-6 text-sm text-gray-600 dark:text-gray-300"

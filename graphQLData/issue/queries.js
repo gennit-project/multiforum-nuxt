@@ -163,10 +163,19 @@ export const GET_ISSUES_BY_DISCUSSION = gql`
 `;
 
 export const GET_ISSUES_BY_CHANNEL = gql`
-  query getIssuesByChannel($channelUniqueName: String!) {
+  query getIssuesByChannel($channelUniqueName: String!, $searchInput: String) {
     channels(where: { uniqueName: $channelUniqueName }) {
       uniqueName
-      Issues(where: { isOpen: true }, options: { sort: { createdAt: DESC } }) {
+      Issues(
+        where: {
+          isOpen: true
+          OR: [
+            { title_CONTAINS: $searchInput }
+            { body_CONTAINS: $searchInput }
+          ]
+        }
+        options: { sort: { createdAt: DESC } }
+      ) {
         id
         issueNumber
         title

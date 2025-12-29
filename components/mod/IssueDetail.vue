@@ -15,6 +15,7 @@ import {
   UPDATE_ISSUE,
 } from '@/graphQLData/issue/mutations';
 import { DELETE_DISCUSSION } from '@/graphQLData/discussion/mutations';
+import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { DELETE_EVENT } from '@/graphQLData/event/mutations';
 import { DELETE_COMMENT } from '@/graphQLData/comment/mutations';
 import {
@@ -94,6 +95,26 @@ const activeIssue = computed<Issue | null>(() => {
 });
 
 const activeIssueId = computed(() => activeIssue.value?.id || '');
+const relatedDiscussionId = computed(
+  () => activeIssue.value?.relatedDiscussionId || ''
+);
+
+const { result: relatedDiscussionResult } = useQuery(
+  GET_DISCUSSION,
+  () => ({
+    id: relatedDiscussionId.value,
+    loggedInModName: modProfileNameVar.value,
+    channelUniqueName: channelId.value,
+  }),
+  () => ({
+    fetchPolicy: 'cache-first',
+    enabled: !!relatedDiscussionId.value,
+  })
+);
+
+const relatedDiscussion = computed(() => {
+  return relatedDiscussionResult.value?.discussions?.[0] ?? null;
+});
 
 const isIssueAuthor = computed(() => {
   const author = activeIssue.value?.Author;
@@ -268,7 +289,7 @@ const { mutate: closeIssue, loading: closeIssueLoading } = useMutation(
       // to remove this issue from the list of open issues
       const existingIssuesByChannelData = cache.readQuery({
         query: GET_ISSUES_BY_CHANNEL,
-        variables: { channelUniqueName: channelId.value },
+        variables: { channelUniqueName: channelId.value, searchInput: '' },
       });
 
       if (
@@ -287,7 +308,7 @@ const { mutate: closeIssue, loading: closeIssueLoading } = useMutation(
 
         cache.writeQuery({
           query: GET_ISSUES_BY_CHANNEL,
-          variables: { channelUniqueName: channelId.value },
+          variables: { channelUniqueName: channelId.value, searchInput: '' },
           data: {
             channels: [newIssuesByChannel],
           },
@@ -439,7 +460,7 @@ const { mutate: reopenIssue, loading: reopenIssueLoading } = useMutation(
       // to add this issue to the list of open issues
       const existingIssuesByChannelData = cache.readQuery({
         query: GET_ISSUES_BY_CHANNEL,
-        variables: { channelUniqueName: channelId.value },
+        variables: { channelUniqueName: channelId.value, searchInput: '' },
       });
 
       if (
@@ -456,7 +477,7 @@ const { mutate: reopenIssue, loading: reopenIssueLoading } = useMutation(
 
         cache.writeQuery({
           query: GET_ISSUES_BY_CHANNEL,
-          variables: { channelUniqueName: channelId.value },
+          variables: { channelUniqueName: channelId.value, searchInput: '' },
           data: {
             channels: [newIssuesByChannel],
           },
@@ -1036,6 +1057,7 @@ const handleDeleteComment = async (commentId: string) => {
             :feed-items="activeIssue.ActivityFeed || []"
             :original-user-author-username="originalAuthorUsername"
             :original-mod-author-name="originalModProfileName"
+            :related-discussion="relatedDiscussion"
           />
 
           <ErrorBanner

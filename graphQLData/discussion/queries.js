@@ -244,6 +244,7 @@ export const GET_DISCUSSION = gql`
       id
       title
       body
+      editReason
       createdAt
       updatedAt
       hasDownload
