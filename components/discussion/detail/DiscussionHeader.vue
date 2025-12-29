@@ -20,7 +20,7 @@ import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavo
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
-import { GET_DISCUSSION_ISSUE } from '@/graphQLData/mod/queries';
+import { CHECK_DISCUSSION_ISSUE_EXISTENCE } from '@/graphQLData/issue/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
@@ -145,23 +145,23 @@ const { result: getChannelResult } = useQuery(
 );
 
 const { result: getDiscussionIssueResult } = useQuery(
-  GET_DISCUSSION_ISSUE,
-  {
-    discussionChannelId: props.discussionChannelId,
-  },
+  CHECK_DISCUSSION_ISSUE_EXISTENCE,
+  () => ({
+    discussionId: props.discussion?.id,
+    channelUniqueName: defaultChannel.value,
+  }),
   {
     fetchPolicy: 'cache-first',
-    enabled: computed(() => !!props.discussionChannelId),
+    enabled: computed(() => !!props.discussion?.id && !!defaultChannel.value),
   }
 );
 
 const relatedIssueNumber = computed(() => {
-  return getDiscussionIssueResult.value?.discussionChannels?.[0]?.RelatedIssues?.[0]
-    ?.issueNumber;
+  return getDiscussionIssueResult.value?.issues?.[0]?.issueNumber;
 });
 
 const relatedIssueLink = computed(() => {
-  if (!relatedIssueNumber.value || !defaultChannel.value) {
+  if (relatedIssueNumber.value == null || !defaultChannel.value) {
     return null;
   }
 

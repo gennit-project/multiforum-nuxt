@@ -5,6 +5,7 @@ import { DateTime, Interval } from 'luxon';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
 import EyeIcon from '@/components/icons/EyeIcon.vue';
+import DotCircleIcon from '@/components/icons/DotCircleIcon.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TrashIcon from '@/components/icons/TrashIcon.vue';
 import XmarkIcon from '@/components/icons/XmarkIcon.vue';
@@ -514,7 +515,7 @@ const actionIconMap = {
   [ALLOWED_ICONS.REPORT]: FlagIcon,
   [ALLOWED_ICONS.GIVE_FEEDBACK]: FlagIcon,
   [ALLOWED_ICONS.VIEW_FEEDBACK]: EyeIcon,
-  [ALLOWED_ICONS.VIEW_ISSUE]: EyeIcon,
+  [ALLOWED_ICONS.VIEW_ISSUE]: DotCircleIcon,
   [ALLOWED_ICONS.EDIT]: PencilIcon,
   [ALLOWED_ICONS.DELETE]: TrashIcon,
   [ALLOWED_ICONS.CANCEL]: XmarkIcon,

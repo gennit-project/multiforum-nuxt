@@ -111,6 +111,7 @@ export const CHECK_DISCUSSION_ISSUE_EXISTENCE = gql`
       }
     ) {
       id
+      issueNumber
       flaggedServerRuleViolation
     }
   }
