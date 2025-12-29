@@ -5,6 +5,8 @@ export enum ActionType {
   Comment = 'comment',
   Archive = 'archive',
   Remove = 'remove',
+  Delete = 'delete',
+  Edit = 'edit',
   Reopen = 'reopen',
   Report = 'report',
   Suspension = 'suspension',

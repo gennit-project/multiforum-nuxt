@@ -17,6 +17,8 @@ import UserMinus from '../icons/UserMinus.vue';
 import ArrowPath from '../icons/ArrowPath.vue';
 import FlagIcon from '../icons/FlagIcon.vue';
 import XCircleIcon from '../icons/XCircleIcon.vue';
+import PencilIcon from '../icons/PencilIcon.vue';
+import TrashIcon from '../icons/TrashIcon.vue';
 import { ActionType } from '@/types/Comment';
 import { useMutation } from '@vue/apollo-composable';
 import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
@@ -32,6 +34,8 @@ const actionTypeToIcon = {
   [ActionType.Unsuspend]: UserPlus,
   [ActionType.Archive]: ArchiveBox,
   [ActionType.Unarchive]: ArchiveBoxXMark,
+  [ActionType.Edit]: PencilIcon,
+  [ActionType.Delete]: TrashIcon,
 };
 
 const props = defineProps({

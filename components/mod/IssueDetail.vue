@@ -14,6 +14,9 @@ import {
   ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_USER,
   UPDATE_ISSUE,
 } from '@/graphQLData/issue/mutations';
+import { DELETE_DISCUSSION } from '@/graphQLData/discussion/mutations';
+import { DELETE_EVENT } from '@/graphQLData/event/mutations';
+import { DELETE_COMMENT } from '@/graphQLData/comment/mutations';
 import {
   COUNT_CLOSED_ISSUES,
   COUNT_OPEN_ISSUES,
@@ -604,6 +607,24 @@ const {
   },
 });
 
+const {
+  mutate: deleteDiscussion,
+  loading: deleteDiscussionLoading,
+  error: deleteDiscussionError,
+} = useMutation(DELETE_DISCUSSION);
+
+const {
+  mutate: deleteEvent,
+  loading: deleteEventLoading,
+  error: deleteEventError,
+} = useMutation(DELETE_EVENT);
+
+const {
+  mutate: deleteComment,
+  loading: deleteCommentLoading,
+  error: deleteCommentError,
+} = useMutation(DELETE_COMMENT);
+
 const closeOpenButtonText = computed(() => {
   if (activeIssue.value?.isOpen)
     return createFormValues.value.text ? 'Close with comment' : 'Close issue';
@@ -613,6 +634,7 @@ const closeOpenButtonText = computed(() => {
 // Form values for creating comments
 const createCommentDefaultValues = { text: '', isRootComment: true, depth: 1 };
 const createFormValues = ref(createCommentDefaultValues);
+const deleteReasonError = ref('');
 
 const issue = computed<Issue | null>(
   () => getIssueResult.value?.issues[0] || null
@@ -792,20 +814,109 @@ const toggleCloseOpenIssue = async () => {
   }
 };
 
+const resolveDeleteReason = () => {
+  const trimmedReason = createFormValues.value.text.trim();
+  return trimmedReason || 'No reason provided.';
+};
+
+const requireDeleteReasonIfNotOp = () => {
+  deleteReasonError.value = '';
+  if (isCurrentUserOriginalPoster.value) {
+    return true;
+  }
+  if (!createFormValues.value.text.trim()) {
+    deleteReasonError.value = 'Please provide a reason before deleting.';
+    return false;
+  }
+  return true;
+};
+
 // Handle delete actions from Original Poster Actions
-const handleDeleteDiscussion = (discussionId: string) => {
-  console.log('Delete discussion:', discussionId);
-  // TODO: Implement discussion deletion
+const handleDeleteDiscussion = async (discussionId: string) => {
+  if (!discussionId) return;
+  if (!requireDeleteReasonIfNotOp()) return;
+
+  try {
+    if (modProfileNameVar.value && activeIssue.value) {
+      if (activeIssue.value.isOpen) {
+        await closeIssue();
+      }
+
+      await addIssueActivityFeedItemWithCommentAsMod({
+        issueId: activeIssue.value.id,
+        displayName: modProfileNameVar.value,
+        actionDescription: 'deleted the discussion',
+        actionType: 'delete',
+        commentText: resolveDeleteReason(),
+        channelUniqueName: channelId.value,
+      });
+    }
+
+    await deleteDiscussion({ id: discussionId });
+    createFormValues.value.text = '';
+    deleteReasonError.value = '';
+    await refetchIssue();
+  } catch (error) {
+    console.error('Error deleting discussion:', error);
+  }
 };
 
-const handleDeleteEvent = (eventId: string) => {
-  console.log('Delete event:', eventId);
-  // TODO: Implement event deletion
+const handleDeleteEvent = async (eventId: string) => {
+  if (!eventId) return;
+  if (!requireDeleteReasonIfNotOp()) return;
+
+  try {
+    if (modProfileNameVar.value && activeIssue.value) {
+      if (activeIssue.value.isOpen) {
+        await closeIssue();
+      }
+
+      await addIssueActivityFeedItemWithCommentAsMod({
+        issueId: activeIssue.value.id,
+        displayName: modProfileNameVar.value,
+        actionDescription: 'deleted the event',
+        actionType: 'delete',
+        commentText: resolveDeleteReason(),
+        channelUniqueName: channelId.value,
+      });
+    }
+
+    await deleteEvent({ id: eventId });
+    createFormValues.value.text = '';
+    deleteReasonError.value = '';
+    await refetchIssue();
+  } catch (error) {
+    console.error('Error deleting event:', error);
+  }
 };
 
-const handleDeleteComment = (commentId: string) => {
-  console.log('Delete comment:', commentId);
-  // TODO: Implement comment deletion
+const handleDeleteComment = async (commentId: string) => {
+  if (!commentId) return;
+  if (!requireDeleteReasonIfNotOp()) return;
+
+  try {
+    if (modProfileNameVar.value && activeIssue.value) {
+      if (activeIssue.value.isOpen) {
+        await closeIssue();
+      }
+
+      await addIssueActivityFeedItemWithCommentAsMod({
+        issueId: activeIssue.value.id,
+        displayName: modProfileNameVar.value,
+        actionDescription: 'deleted the comment',
+        actionType: 'delete',
+        commentText: resolveDeleteReason(),
+        channelUniqueName: channelId.value,
+      });
+    }
+
+    await deleteComment({ id: commentId });
+    createFormValues.value.text = '';
+    deleteReasonError.value = '';
+    await refetchIssue();
+  } catch (error) {
+    console.error('Error deleting comment:', error);
+  }
 };
 </script>
 
@@ -935,6 +1046,7 @@ const handleDeleteComment = (commentId: string) => {
             v-if="addIssueActivityFeedItemWithCommentAsUserError"
             :text="addIssueActivityFeedItemWithCommentAsUserError.message"
           />
+          <ErrorBanner v-if="deleteReasonError" :text="deleteReasonError" />
           <ModerationWizard
             v-if="
               issue &&

@@ -49,6 +49,14 @@ export const ISSUE_FIELDS = gql`
         User {
           username
         }
+        Revision {
+          id
+          body
+          createdAt
+          Author {
+            username
+          }
+        }
         Comment {
           id
           text
