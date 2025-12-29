@@ -6,7 +6,7 @@ import SaveButton from '@/components/SaveButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import { ref, computed, watch, type PropType } from 'vue';
 import { timeAgo } from '@/utils';
-import type { ModerationAction } from '@/__generated__/graphql';
+import type { Discussion, ModerationAction } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
 import ArchiveBox from '../icons/ArchiveBox.vue';
 import ArchiveBoxXMark from '../icons/ArchiveBoxXMark.vue';
@@ -23,6 +23,7 @@ import { ActionType } from '@/types/Comment';
 import { useMutation } from '@vue/apollo-composable';
 import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
 import { modProfileNameVar, usernameVar } from '@/cache';
+import RevisionDiffInline from '@/components/mod/RevisionDiffInline.vue';
 
 const actionTypeToIcon = {
   [ActionType.Close]: XCircleIcon,
@@ -46,6 +47,10 @@ const props = defineProps({
   isOriginalPoster: {
     type: Boolean,
     default: false,
+  },
+  relatedDiscussion: {
+    type: Object as PropType<Discussion | null>,
+    default: null,
   },
 });
 const commentIdInParams = useRoute().params.commentId as string;
@@ -82,6 +87,50 @@ watch(
 
 const hasChanges = computed(() => {
   return (editedComment.value || '') !== (props.activityItem.Comment?.text || '');
+});
+
+const hasRevision = computed(() => {
+  return !!props.activityItem.Revision && !!props.relatedDiscussion;
+});
+
+const revisionContent = computed(() => {
+  if (!props.activityItem.Revision || !props.relatedDiscussion) {
+    return null;
+  }
+
+  const actionDescription = (props.activityItem.actionDescription || '').toLowerCase();
+  const isTitleEdit = actionDescription.includes('title');
+  const useTitle = isTitleEdit;
+
+  const newVersion = {
+    id: 'current',
+    title: useTitle ? props.relatedDiscussion.title || '' : undefined,
+    body: useTitle ? undefined : props.relatedDiscussion.body || '',
+    createdAt:
+      props.relatedDiscussion.updatedAt ||
+      props.relatedDiscussion.createdAt ||
+      props.activityItem.Revision.createdAt ||
+      '',
+    Author: props.relatedDiscussion.Author || null,
+    editReason: props.relatedDiscussion.editReason || '',
+  };
+
+  if (useTitle) {
+    return {
+      oldVersion: {
+        id: props.activityItem.Revision.id,
+        title: props.activityItem.Revision.body || '',
+        createdAt: props.activityItem.Revision.createdAt,
+        Author: props.activityItem.Revision.Author || null,
+      },
+      newVersion,
+    };
+  }
+
+  return {
+    oldVersion: props.activityItem.Revision,
+    newVersion,
+  };
 });
 
 const {
@@ -266,6 +315,11 @@ const saveEdit = async () => {
               v-if="updateCommentError"
               class="mt-2"
               :text="updateCommentError.message"
+            />
+            <RevisionDiffInline
+              v-if="hasRevision && revisionContent"
+              :old-version="revisionContent.oldVersion"
+              :new-version="revisionContent.newVersion"
             />
           </div>
         </div>
