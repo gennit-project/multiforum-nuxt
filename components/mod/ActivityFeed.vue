@@ -13,6 +13,21 @@ const props = defineProps<{
 const reversedFeedItems = computed(() => {
   return props.feedItems.slice().reverse();
 });
+
+// For each revision activity item, find what the content was changed TO
+// by looking at the next revision's "old" body (which is this revision's "new" body)
+const getNextRevisionBody = (currentIndex: number): string | null => {
+  const items = reversedFeedItems.value;
+  // Look for the next item (later in time) that has a Revision
+  for (let i = currentIndex + 1; i < items.length; i++) {
+    const item = items[i] as ModerationAction & { Revision?: { body?: string } };
+    if (item.Revision?.body) {
+      return item.Revision.body;
+    }
+  }
+  // No next revision found - this is the most recent edit, use current discussion body
+  return null;
+};
 </script>
 
 <template>
@@ -20,7 +35,7 @@ const reversedFeedItems = computed(() => {
     <NuxtPage />
     <ul role="list">
       <ActivityFeedListItem
-        v-for="activityItem in reversedFeedItems"
+        v-for="(activityItem, index) in reversedFeedItems"
         :key="activityItem.id"
         :activity-item="activityItem"
         :is-original-poster="
@@ -28,6 +43,7 @@ const reversedFeedItems = computed(() => {
           activityItem.ModerationProfile?.displayName === originalModAuthorName
         "
         :related-discussion="relatedDiscussion"
+        :next-revision-body="getNextRevisionBody(index)"
       />
     </ul>
   </div>

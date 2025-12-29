@@ -52,6 +52,10 @@ const props = defineProps({
     type: Object as PropType<Discussion | null>,
     default: null,
   },
+  nextRevisionBody: {
+    type: String as PropType<string | null>,
+    default: null,
+  },
 });
 const commentIdInParams = useRoute().params.commentId as string;
 const isPermalinked =
@@ -102,10 +106,15 @@ const revisionContent = computed(() => {
   const isTitleEdit = actionDescription.includes('title');
   const useTitle = isTitleEdit;
 
+  // Use nextRevisionBody if available (for older edits), otherwise use current discussion body
+  const newBodyContent = props.nextRevisionBody !== null
+    ? props.nextRevisionBody
+    : props.relatedDiscussion.body || '';
+
   const newVersion = {
     id: 'current',
     title: useTitle ? props.relatedDiscussion.title || '' : undefined,
-    body: useTitle ? undefined : props.relatedDiscussion.body || '',
+    body: useTitle ? undefined : newBodyContent,
     createdAt:
       props.relatedDiscussion.updatedAt ||
       props.relatedDiscussion.createdAt ||
