@@ -5,6 +5,7 @@ import { GET_MOD } from '@/graphQLData/mod/queries';
 import ModProfileSidebar from '@/components/mod/ModProfileSidebar.vue';
 import { useRoute } from 'nuxt/app';
 import ModProfileTabs from '../../components/mod/ModProfileTabs.vue';
+import ModContributionChart from '@/components/charts/ModContributionChart.vue';
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
@@ -39,6 +40,9 @@ const mod = computed(() => {
     <div class="w-full max-w-screen-2xl px-2 dark:bg-black">
       <ModProfileSidebar :is-admin="false" />
       <div class="min-w-0 flex-1">
+        <client-only>
+          <ModContributionChart />
+        </client-only>
         <ModProfileTabs
           v-if="mod"
           :show-counts="true"

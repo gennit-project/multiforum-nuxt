@@ -58,6 +58,11 @@ const props = defineProps({
       loading: 'Loading activity data...',
     }),
   },
+  // Whether to show the built-in selected day details
+  showDetails: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 // Emits
@@ -473,7 +478,7 @@ const cellCount = computed(() => {
 
     <!-- Selected day details -->
     <div
-      v-if="selectedDay"
+      v-if="showDetails && selectedDay"
       class="mt-4 rounded-lg border p-4"
       :class="darkMode ? 'border-green-500' : 'bg-gray-50 border-green-500'"
     >

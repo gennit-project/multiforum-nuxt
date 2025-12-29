@@ -192,6 +192,76 @@ export const GET_MOD_ISSUES = gql`
   }
 `;
 
+export const GET_MOD_CONTRIBUTIONS = gql`
+  query getModContributions($displayName: String!, $year: Int) {
+    getModContributions(displayName: $displayName, year: $year) {
+      date
+      count
+      activities {
+        id
+        actionType
+        actionDescription
+        createdAt
+        Issue {
+          id
+          issueNumber
+          channelUniqueName
+          relatedDiscussionId
+          relatedEventId
+          relatedCommentId
+          title
+          isOpen
+        }
+        Comment {
+          id
+          text
+          createdAt
+        }
+        RelatedDiscussion {
+          id
+          title
+          createdAt
+          DiscussionChannels {
+            id
+            discussionId
+            channelUniqueName
+          }
+        }
+        RelatedEvent {
+          id
+          title
+          createdAt
+          EventChannels {
+            id
+            eventId
+            channelUniqueName
+          }
+        }
+        RelatedComment {
+          id
+          text
+          createdAt
+          DiscussionChannel {
+            id
+            discussionId
+            channelUniqueName
+          }
+          Event {
+            id
+            title
+            createdAt
+            EventChannels {
+              id
+              eventId
+              channelUniqueName
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_SUSPENDED_MODS_BY_CHANNEL = gql`
   query getModsByChannel($channelUniqueName: String!) {
     channels(where: { uniqueName: $channelUniqueName }) {
