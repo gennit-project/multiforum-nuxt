@@ -84,6 +84,14 @@ export const ISSUE_FIELDS = gql`
           ParentComment {
             id
           }
+          PastVersions(options: { sort: [{ createdAt: DESC }] }) {
+            id
+            body
+            createdAt
+            Author {
+              username
+            }
+          }
           ...CommentVoteFields
         }
       }
@@ -157,6 +165,28 @@ export const GET_ISSUES_BY_DISCUSSION = gql`
           ... on User {
             username
           }
+        }
+      }
+    }
+  }
+`;
+
+export const CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE = gql`
+  query getDiscussionCommentIssue(
+    $discussionId: ID!
+    $channelUniqueName: String!
+  ) {
+    discussionChannels(
+      where: {
+        discussionId: $discussionId
+        channelUniqueName: $channelUniqueName
+      }
+    ) {
+      id
+      Comments(where: { RelatedIssues_SOME: {} }, options: { limit: 1 }) {
+        id
+        RelatedIssues {
+          issueNumber
         }
       }
     }

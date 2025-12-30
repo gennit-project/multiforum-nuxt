@@ -20,7 +20,10 @@ import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavo
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
-import { CHECK_DISCUSSION_ISSUE_EXISTENCE } from '@/graphQLData/issue/queries';
+import {
+  CHECK_DISCUSSION_ISSUE_EXISTENCE,
+  CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
+} from '@/graphQLData/issue/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
@@ -156,8 +159,29 @@ const { result: getDiscussionIssueResult } = useQuery(
   }
 );
 
+const { result: getDiscussionCommentIssueResult } = useQuery(
+  CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
+  () => ({
+    discussionId: props.discussion?.id,
+    channelUniqueName: defaultChannel.value,
+  }),
+  {
+    fetchPolicy: 'cache-first',
+    enabled: computed(() => !!props.discussion?.id && !!defaultChannel.value),
+  }
+);
+
 const relatedIssueNumber = computed(() => {
-  return getDiscussionIssueResult.value?.issues?.[0]?.issueNumber;
+  const directIssueNumber =
+    getDiscussionIssueResult.value?.issues?.[0]?.issueNumber;
+  if (directIssueNumber != null) {
+    return directIssueNumber;
+  }
+
+  return (
+    getDiscussionCommentIssueResult.value?.discussionChannels?.[0]?.Comments?.[0]
+      ?.RelatedIssues?.[0]?.issueNumber ?? null
+  );
 });
 
 const relatedIssueLink = computed(() => {

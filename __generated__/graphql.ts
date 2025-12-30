@@ -1,4 +1,4 @@
- 
+/* eslint-disable */
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -15524,6 +15524,12 @@ export type CreateInstalledPluginsMutationResponse = {
   installedPlugins: Array<InstalledPlugin>;
 };
 
+export type CreateIssueInfosMutationResponse = {
+  __typename?: 'CreateIssueInfosMutationResponse';
+  info: CreateInfo;
+  issueInfos: Array<IssueInfo>;
+};
+
 export type CreateIssuesMutationResponse = {
   __typename?: 'CreateIssuesMutationResponse';
   info: CreateInfo;
@@ -15548,10 +15554,22 @@ export type CreateMessagesMutationResponse = {
   messages: Array<Message>;
 };
 
+export type CreateModActivitiesMutationResponse = {
+  __typename?: 'CreateModActivitiesMutationResponse';
+  info: CreateInfo;
+  modActivities: Array<ModActivity>;
+};
+
 export type CreateModChannelRolesMutationResponse = {
   __typename?: 'CreateModChannelRolesMutationResponse';
   info: CreateInfo;
   modChannelRoles: Array<ModChannelRole>;
+};
+
+export type CreateModDayDataMutationResponse = {
+  __typename?: 'CreateModDayDataMutationResponse';
+  info: CreateInfo;
+  modDayData: Array<ModDayData>;
 };
 
 export type CreateModServerRolesMutationResponse = {
@@ -15666,6 +15684,12 @@ export type CreateSiteWideDiscussionListFormatsMutationResponse = {
   __typename?: 'CreateSiteWideDiscussionListFormatsMutationResponse';
   info: CreateInfo;
   siteWideDiscussionListFormats: Array<SiteWideDiscussionListFormat>;
+};
+
+export type CreateSiteWideWikiListFormatsMutationResponse = {
+  __typename?: 'CreateSiteWideWikiListFormatsMutationResponse';
+  info: CreateInfo;
+  siteWideWikiListFormats: Array<SiteWideWikiListFormat>;
 };
 
 export type CreateSuspensionsMutationResponse = {
@@ -32850,6 +32874,210 @@ export type IssueEventPayload = {
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
+export type IssueInfo = {
+  __typename?: 'IssueInfo';
+  channelUniqueName?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  isOpen?: Maybe<Scalars['Boolean']['output']>;
+  issueNumber?: Maybe<Scalars['Int']['output']>;
+  relatedCommentId?: Maybe<Scalars['ID']['output']>;
+  relatedDiscussionId?: Maybe<Scalars['ID']['output']>;
+  relatedEventId?: Maybe<Scalars['ID']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+export type IssueInfoAggregateSelection = {
+  __typename?: 'IssueInfoAggregateSelection';
+  channelUniqueName: StringAggregateSelection;
+  count: Scalars['Int']['output'];
+  id: IdAggregateSelection;
+  issueNumber: IntAggregateSelection;
+  relatedCommentId: IdAggregateSelection;
+  relatedDiscussionId: IdAggregateSelection;
+  relatedEventId: IdAggregateSelection;
+  title: StringAggregateSelection;
+};
+
+export type IssueInfoCreateInput = {
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  isOpen?: InputMaybe<Scalars['Boolean']['input']>;
+  issueNumber?: InputMaybe<Scalars['Int']['input']>;
+  relatedCommentId?: InputMaybe<Scalars['ID']['input']>;
+  relatedDiscussionId?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type IssueInfoCreatedEvent = {
+  __typename?: 'IssueInfoCreatedEvent';
+  createdIssueInfo: IssueInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type IssueInfoDeletedEvent = {
+  __typename?: 'IssueInfoDeletedEvent';
+  deletedIssueInfo: IssueInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type IssueInfoEdge = {
+  __typename?: 'IssueInfoEdge';
+  cursor: Scalars['String']['output'];
+  node: IssueInfo;
+};
+
+export type IssueInfoEventPayload = {
+  __typename?: 'IssueInfoEventPayload';
+  channelUniqueName?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  isOpen?: Maybe<Scalars['Boolean']['output']>;
+  issueNumber?: Maybe<Scalars['Int']['output']>;
+  relatedCommentId?: Maybe<Scalars['ID']['output']>;
+  relatedDiscussionId?: Maybe<Scalars['ID']['output']>;
+  relatedEventId?: Maybe<Scalars['ID']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+export type IssueInfoOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more IssueInfoSort objects to sort IssueInfos by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<IssueInfoSort>>;
+};
+
+/** Fields to sort IssueInfos by. The order in which sorts are applied is not guaranteed when specifying many fields in one IssueInfoSort object. */
+export type IssueInfoSort = {
+  channelUniqueName?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  isOpen?: InputMaybe<SortDirection>;
+  issueNumber?: InputMaybe<SortDirection>;
+  relatedCommentId?: InputMaybe<SortDirection>;
+  relatedDiscussionId?: InputMaybe<SortDirection>;
+  relatedEventId?: InputMaybe<SortDirection>;
+  title?: InputMaybe<SortDirection>;
+};
+
+export type IssueInfoSubscriptionWhere = {
+  AND?: InputMaybe<Array<IssueInfoSubscriptionWhere>>;
+  NOT?: InputMaybe<IssueInfoSubscriptionWhere>;
+  OR?: InputMaybe<Array<IssueInfoSubscriptionWhere>>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  isOpen?: InputMaybe<Scalars['Boolean']['input']>;
+  issueNumber?: InputMaybe<Scalars['Int']['input']>;
+  issueNumber_GT?: InputMaybe<Scalars['Int']['input']>;
+  issueNumber_GTE?: InputMaybe<Scalars['Int']['input']>;
+  issueNumber_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  issueNumber_LT?: InputMaybe<Scalars['Int']['input']>;
+  issueNumber_LTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedCommentId?: InputMaybe<Scalars['ID']['input']>;
+  relatedCommentId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  relatedCommentId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedCommentId_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  relatedCommentId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedDiscussionId?: InputMaybe<Scalars['ID']['input']>;
+  relatedDiscussionId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  relatedDiscussionId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedDiscussionId_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  relatedDiscussionId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  relatedEventId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  title_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type IssueInfoUpdateInput = {
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  isOpen?: InputMaybe<Scalars['Boolean']['input']>;
+  issueNumber?: InputMaybe<Scalars['Int']['input']>;
+  issueNumber_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
+  issueNumber_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+  relatedCommentId?: InputMaybe<Scalars['ID']['input']>;
+  relatedDiscussionId?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type IssueInfoUpdatedEvent = {
+  __typename?: 'IssueInfoUpdatedEvent';
+  event: EventType;
+  previousState: IssueInfoEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedIssueInfo: IssueInfoEventPayload;
+};
+
+export type IssueInfoWhere = {
+  AND?: InputMaybe<Array<IssueInfoWhere>>;
+  NOT?: InputMaybe<IssueInfoWhere>;
+  OR?: InputMaybe<Array<IssueInfoWhere>>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  isOpen?: InputMaybe<Scalars['Boolean']['input']>;
+  issueNumber?: InputMaybe<Scalars['Int']['input']>;
+  issueNumber_GT?: InputMaybe<Scalars['Int']['input']>;
+  issueNumber_GTE?: InputMaybe<Scalars['Int']['input']>;
+  issueNumber_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  issueNumber_LT?: InputMaybe<Scalars['Int']['input']>;
+  issueNumber_LTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedCommentId?: InputMaybe<Scalars['ID']['input']>;
+  relatedCommentId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  relatedCommentId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedCommentId_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  relatedCommentId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedDiscussionId?: InputMaybe<Scalars['ID']['input']>;
+  relatedDiscussionId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  relatedDiscussionId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedDiscussionId_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  relatedDiscussionId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  relatedEventId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  title_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type IssueInfosConnection = {
+  __typename?: 'IssueInfosConnection';
+  edges: Array<IssueInfoEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type IssueModerationActionActivityFeedAggregationSelection = {
   __typename?: 'IssueModerationActionActivityFeedAggregationSelection';
   count: Scalars['Int']['output'];
@@ -34170,6 +34398,160 @@ export type MessagesConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
+export type ModActivitiesConnection = {
+  __typename?: 'ModActivitiesConnection';
+  edges: Array<ModActivityEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ModActivity = {
+  __typename?: 'ModActivity';
+  Comment?: Maybe<CommentInfo>;
+  Issue?: Maybe<IssueInfo>;
+  RelatedComment?: Maybe<CommentInfo>;
+  RelatedDiscussion?: Maybe<DiscussionInfo>;
+  RelatedEvent?: Maybe<EventInfo>;
+  actionDescription?: Maybe<Scalars['String']['output']>;
+  actionType?: Maybe<Scalars['String']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['String']['output'];
+};
+
+export type ModActivityAggregateSelection = {
+  __typename?: 'ModActivityAggregateSelection';
+  actionDescription: StringAggregateSelection;
+  actionType: StringAggregateSelection;
+  count: Scalars['Int']['output'];
+  createdAt: DateTimeAggregateSelection;
+  id: StringAggregateSelection;
+};
+
+export type ModActivityCreateInput = {
+  actionDescription?: InputMaybe<Scalars['String']['input']>;
+  actionType?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id: Scalars['String']['input'];
+};
+
+export type ModActivityCreatedEvent = {
+  __typename?: 'ModActivityCreatedEvent';
+  createdModActivity: ModActivityEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ModActivityDeletedEvent = {
+  __typename?: 'ModActivityDeletedEvent';
+  deletedModActivity: ModActivityEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ModActivityEdge = {
+  __typename?: 'ModActivityEdge';
+  cursor: Scalars['String']['output'];
+  node: ModActivity;
+};
+
+export type ModActivityEventPayload = {
+  __typename?: 'ModActivityEventPayload';
+  actionDescription?: Maybe<Scalars['String']['output']>;
+  actionType?: Maybe<Scalars['String']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['String']['output'];
+};
+
+export type ModActivityOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more ModActivitySort objects to sort ModActivities by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<ModActivitySort>>;
+};
+
+/** Fields to sort ModActivities by. The order in which sorts are applied is not guaranteed when specifying many fields in one ModActivitySort object. */
+export type ModActivitySort = {
+  actionDescription?: InputMaybe<SortDirection>;
+  actionType?: InputMaybe<SortDirection>;
+  createdAt?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+};
+
+export type ModActivitySubscriptionWhere = {
+  AND?: InputMaybe<Array<ModActivitySubscriptionWhere>>;
+  NOT?: InputMaybe<ModActivitySubscriptionWhere>;
+  OR?: InputMaybe<Array<ModActivitySubscriptionWhere>>;
+  actionDescription?: InputMaybe<Scalars['String']['input']>;
+  actionDescription_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  actionDescription_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  actionDescription_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  actionDescription_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  actionDescription_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  actionType?: InputMaybe<Scalars['String']['input']>;
+  actionType_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  actionType_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  actionType_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  actionType_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  actionType_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  id_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  id_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ModActivityUpdateInput = {
+  actionDescription?: InputMaybe<Scalars['String']['input']>;
+  actionType?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ModActivityUpdatedEvent = {
+  __typename?: 'ModActivityUpdatedEvent';
+  event: EventType;
+  previousState: ModActivityEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedModActivity: ModActivityEventPayload;
+};
+
+export type ModActivityWhere = {
+  AND?: InputMaybe<Array<ModActivityWhere>>;
+  NOT?: InputMaybe<ModActivityWhere>;
+  OR?: InputMaybe<Array<ModActivityWhere>>;
+  actionDescription?: InputMaybe<Scalars['String']['input']>;
+  actionDescription_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  actionDescription_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  actionDescription_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  actionDescription_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  actionDescription_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  actionType?: InputMaybe<Scalars['String']['input']>;
+  actionType_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  actionType_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  actionType_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  actionType_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  actionType_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  id_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  id_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type ModChannelRole = {
   __typename?: 'ModChannelRole';
   canCloseSupportTickets?: Maybe<Scalars['Boolean']['output']>;
@@ -34407,9 +34789,127 @@ export type ModChannelRolesConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
+export type ModDayData = {
+  __typename?: 'ModDayData';
+  activities: Array<ModActivity>;
+  count: Scalars['Int']['output'];
+  date: Scalars['String']['output'];
+};
+
+export type ModDayDataAggregateSelection = {
+  __typename?: 'ModDayDataAggregateSelection';
+  count: IntAggregateSelection;
+  date: StringAggregateSelection;
+};
+
+export type ModDayDataConnection = {
+  __typename?: 'ModDayDataConnection';
+  edges: Array<ModDayDataEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ModDayDataCreateInput = {
+  count: Scalars['Int']['input'];
+  date: Scalars['String']['input'];
+};
+
+export type ModDayDataCreatedEvent = {
+  __typename?: 'ModDayDataCreatedEvent';
+  createdModDayData: ModDayDataEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ModDayDataDeletedEvent = {
+  __typename?: 'ModDayDataDeletedEvent';
+  deletedModDayData: ModDayDataEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ModDayDataEdge = {
+  __typename?: 'ModDayDataEdge';
+  cursor: Scalars['String']['output'];
+  node: ModDayData;
+};
+
+export type ModDayDataEventPayload = {
+  __typename?: 'ModDayDataEventPayload';
+  count: Scalars['Int']['output'];
+  date: Scalars['String']['output'];
+};
+
+export type ModDayDataOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more ModDayDataSort objects to sort ModDayData by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<ModDayDataSort>>;
+};
+
+/** Fields to sort ModDayData by. The order in which sorts are applied is not guaranteed when specifying many fields in one ModDayDataSort object. */
+export type ModDayDataSort = {
+  count?: InputMaybe<SortDirection>;
+  date?: InputMaybe<SortDirection>;
+};
+
+export type ModDayDataSubscriptionWhere = {
+  AND?: InputMaybe<Array<ModDayDataSubscriptionWhere>>;
+  NOT?: InputMaybe<ModDayDataSubscriptionWhere>;
+  OR?: InputMaybe<Array<ModDayDataSubscriptionWhere>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  date?: InputMaybe<Scalars['String']['input']>;
+  date_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  date_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  date_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  date_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  date_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ModDayDataUpdateInput = {
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
+  count_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+  date?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ModDayDataUpdatedEvent = {
+  __typename?: 'ModDayDataUpdatedEvent';
+  event: EventType;
+  previousState: ModDayDataEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedModDayData: ModDayDataEventPayload;
+};
+
+export type ModDayDataWhere = {
+  AND?: InputMaybe<Array<ModDayDataWhere>>;
+  NOT?: InputMaybe<ModDayDataWhere>;
+  OR?: InputMaybe<Array<ModDayDataWhere>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  date?: InputMaybe<Scalars['String']['input']>;
+  date_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  date_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  date_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  date_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  date_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type ModServerRole = {
   __typename?: 'ModServerRole';
   canCloseSupportTickets?: Maybe<Scalars['Boolean']['output']>;
+  canEditComments?: Maybe<Scalars['Boolean']['output']>;
+  canEditDiscussions?: Maybe<Scalars['Boolean']['output']>;
+  canEditEvents?: Maybe<Scalars['Boolean']['output']>;
   canGiveFeedback?: Maybe<Scalars['Boolean']['output']>;
   canHideComment?: Maybe<Scalars['Boolean']['output']>;
   canHideDiscussion?: Maybe<Scalars['Boolean']['output']>;
@@ -34439,6 +34939,9 @@ export type ModServerRoleConnectWhere = {
 
 export type ModServerRoleCreateInput = {
   canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canEditComments?: InputMaybe<Scalars['Boolean']['input']>;
+  canEditDiscussions?: InputMaybe<Scalars['Boolean']['input']>;
+  canEditEvents?: InputMaybe<Scalars['Boolean']['input']>;
   canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
   canHideComment?: InputMaybe<Scalars['Boolean']['input']>;
   canHideDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
@@ -34474,6 +34977,9 @@ export type ModServerRoleEdge = {
 export type ModServerRoleEventPayload = {
   __typename?: 'ModServerRoleEventPayload';
   canCloseSupportTickets?: Maybe<Scalars['Boolean']['output']>;
+  canEditComments?: Maybe<Scalars['Boolean']['output']>;
+  canEditDiscussions?: Maybe<Scalars['Boolean']['output']>;
+  canEditEvents?: Maybe<Scalars['Boolean']['output']>;
   canGiveFeedback?: Maybe<Scalars['Boolean']['output']>;
   canHideComment?: Maybe<Scalars['Boolean']['output']>;
   canHideDiscussion?: Maybe<Scalars['Boolean']['output']>;
@@ -34488,6 +34994,9 @@ export type ModServerRoleEventPayload = {
 
 export type ModServerRoleOnCreateInput = {
   canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canEditComments?: InputMaybe<Scalars['Boolean']['input']>;
+  canEditDiscussions?: InputMaybe<Scalars['Boolean']['input']>;
+  canEditEvents?: InputMaybe<Scalars['Boolean']['input']>;
   canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
   canHideComment?: InputMaybe<Scalars['Boolean']['input']>;
   canHideDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
@@ -34510,6 +35019,9 @@ export type ModServerRoleOptions = {
 /** Fields to sort ModServerRoles by. The order in which sorts are applied is not guaranteed when specifying many fields in one ModServerRoleSort object. */
 export type ModServerRoleSort = {
   canCloseSupportTickets?: InputMaybe<SortDirection>;
+  canEditComments?: InputMaybe<SortDirection>;
+  canEditDiscussions?: InputMaybe<SortDirection>;
+  canEditEvents?: InputMaybe<SortDirection>;
   canGiveFeedback?: InputMaybe<SortDirection>;
   canHideComment?: InputMaybe<SortDirection>;
   canHideDiscussion?: InputMaybe<SortDirection>;
@@ -34527,6 +35039,9 @@ export type ModServerRoleSubscriptionWhere = {
   NOT?: InputMaybe<ModServerRoleSubscriptionWhere>;
   OR?: InputMaybe<Array<ModServerRoleSubscriptionWhere>>;
   canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canEditComments?: InputMaybe<Scalars['Boolean']['input']>;
+  canEditDiscussions?: InputMaybe<Scalars['Boolean']['input']>;
+  canEditEvents?: InputMaybe<Scalars['Boolean']['input']>;
   canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
   canHideComment?: InputMaybe<Scalars['Boolean']['input']>;
   canHideDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
@@ -34555,6 +35070,9 @@ export type ModServerRoleUniqueWhere = {
 
 export type ModServerRoleUpdateInput = {
   canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canEditComments?: InputMaybe<Scalars['Boolean']['input']>;
+  canEditDiscussions?: InputMaybe<Scalars['Boolean']['input']>;
+  canEditEvents?: InputMaybe<Scalars['Boolean']['input']>;
   canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
   canHideComment?: InputMaybe<Scalars['Boolean']['input']>;
   canHideDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
@@ -34580,6 +35098,9 @@ export type ModServerRoleWhere = {
   NOT?: InputMaybe<ModServerRoleWhere>;
   OR?: InputMaybe<Array<ModServerRoleWhere>>;
   canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canEditComments?: InputMaybe<Scalars['Boolean']['input']>;
+  canEditDiscussions?: InputMaybe<Scalars['Boolean']['input']>;
+  canEditEvents?: InputMaybe<Scalars['Boolean']['input']>;
   canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
   canHideComment?: InputMaybe<Scalars['Boolean']['input']>;
   canHideDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
@@ -34617,6 +35138,9 @@ export type ModerationAction = {
   ModerationProfile?: Maybe<ModerationProfile>;
   ModerationProfileAggregate?: Maybe<ModerationActionModerationProfileModerationProfileAggregationSelection>;
   ModerationProfileConnection: ModerationActionModerationProfileConnection;
+  Revision?: Maybe<TextVersion>;
+  RevisionAggregate?: Maybe<ModerationActionTextVersionRevisionAggregationSelection>;
+  RevisionConnection: ModerationActionRevisionConnection;
   User?: Maybe<User>;
   UserAggregate?: Maybe<ModerationActionUserUserAggregationSelection>;
   UserConnection: ModerationActionUserConnection;
@@ -34668,6 +35192,28 @@ export type ModerationActionModerationProfileConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ModerationActionModerationProfileConnectionSort>>;
   where?: InputMaybe<ModerationActionModerationProfileConnectionWhere>;
+};
+
+
+export type ModerationActionRevisionArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<TextVersionOptions>;
+  where?: InputMaybe<TextVersionWhere>;
+};
+
+
+export type ModerationActionRevisionAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<TextVersionWhere>;
+};
+
+
+export type ModerationActionRevisionConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ModerationActionRevisionConnectionSort>>;
+  where?: InputMaybe<ModerationActionRevisionConnectionWhere>;
 };
 
 
@@ -34880,6 +35426,7 @@ export type ModerationActionCommentUpdateFieldInput = {
 export type ModerationActionConnectInput = {
   Comment?: InputMaybe<ModerationActionCommentConnectFieldInput>;
   ModerationProfile?: InputMaybe<ModerationActionModerationProfileConnectFieldInput>;
+  Revision?: InputMaybe<ModerationActionRevisionConnectFieldInput>;
   User?: InputMaybe<ModerationActionUserConnectFieldInput>;
 };
 
@@ -34896,12 +35443,14 @@ export type ModerationActionConnectedRelationships = {
   __typename?: 'ModerationActionConnectedRelationships';
   Comment?: Maybe<ModerationActionCommentConnectedRelationship>;
   ModerationProfile?: Maybe<ModerationActionModerationProfileConnectedRelationship>;
+  Revision?: Maybe<ModerationActionRevisionConnectedRelationship>;
   User?: Maybe<ModerationActionUserConnectedRelationship>;
 };
 
 export type ModerationActionCreateInput = {
   Comment?: InputMaybe<ModerationActionCommentFieldInput>;
   ModerationProfile?: InputMaybe<ModerationActionModerationProfileFieldInput>;
+  Revision?: InputMaybe<ModerationActionRevisionFieldInput>;
   User?: InputMaybe<ModerationActionUserFieldInput>;
   actionDescription?: InputMaybe<Scalars['String']['input']>;
   actionType?: InputMaybe<Scalars['String']['input']>;
@@ -34917,6 +35466,7 @@ export type ModerationActionCreatedEvent = {
 export type ModerationActionDeleteInput = {
   Comment?: InputMaybe<ModerationActionCommentDeleteFieldInput>;
   ModerationProfile?: InputMaybe<ModerationActionModerationProfileDeleteFieldInput>;
+  Revision?: InputMaybe<ModerationActionRevisionDeleteFieldInput>;
   User?: InputMaybe<ModerationActionUserDeleteFieldInput>;
 };
 
@@ -34930,6 +35480,7 @@ export type ModerationActionDeletedEvent = {
 export type ModerationActionDisconnectInput = {
   Comment?: InputMaybe<ModerationActionCommentDisconnectFieldInput>;
   ModerationProfile?: InputMaybe<ModerationActionModerationProfileDisconnectFieldInput>;
+  Revision?: InputMaybe<ModerationActionRevisionDisconnectFieldInput>;
   User?: InputMaybe<ModerationActionUserDisconnectFieldInput>;
 };
 
@@ -35095,6 +35646,7 @@ export type ModerationActionOptions = {
 export type ModerationActionRelationInput = {
   Comment?: InputMaybe<ModerationActionCommentCreateFieldInput>;
   ModerationProfile?: InputMaybe<ModerationActionModerationProfileCreateFieldInput>;
+  Revision?: InputMaybe<ModerationActionRevisionCreateFieldInput>;
   User?: InputMaybe<ModerationActionUserCreateFieldInput>;
 };
 
@@ -35135,7 +35687,148 @@ export type ModerationActionRelationshipDeletedSubscriptionWhere = {
 export type ModerationActionRelationshipsSubscriptionWhere = {
   Comment?: InputMaybe<ModerationActionCommentRelationshipSubscriptionWhere>;
   ModerationProfile?: InputMaybe<ModerationActionModerationProfileRelationshipSubscriptionWhere>;
+  Revision?: InputMaybe<ModerationActionRevisionRelationshipSubscriptionWhere>;
   User?: InputMaybe<ModerationActionUserRelationshipSubscriptionWhere>;
+};
+
+export type ModerationActionRevisionAggregateInput = {
+  AND?: InputMaybe<Array<ModerationActionRevisionAggregateInput>>;
+  NOT?: InputMaybe<ModerationActionRevisionAggregateInput>;
+  OR?: InputMaybe<Array<ModerationActionRevisionAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ModerationActionRevisionNodeAggregationWhereInput>;
+};
+
+export type ModerationActionRevisionConnectFieldInput = {
+  connect?: InputMaybe<TextVersionConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<TextVersionConnectWhere>;
+};
+
+export type ModerationActionRevisionConnectedRelationship = {
+  __typename?: 'ModerationActionRevisionConnectedRelationship';
+  node: TextVersionEventPayload;
+};
+
+export type ModerationActionRevisionConnection = {
+  __typename?: 'ModerationActionRevisionConnection';
+  edges: Array<ModerationActionRevisionRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ModerationActionRevisionConnectionSort = {
+  node?: InputMaybe<TextVersionSort>;
+};
+
+export type ModerationActionRevisionConnectionWhere = {
+  AND?: InputMaybe<Array<ModerationActionRevisionConnectionWhere>>;
+  NOT?: InputMaybe<ModerationActionRevisionConnectionWhere>;
+  OR?: InputMaybe<Array<ModerationActionRevisionConnectionWhere>>;
+  node?: InputMaybe<TextVersionWhere>;
+};
+
+export type ModerationActionRevisionCreateFieldInput = {
+  node: TextVersionCreateInput;
+};
+
+export type ModerationActionRevisionDeleteFieldInput = {
+  delete?: InputMaybe<TextVersionDeleteInput>;
+  where?: InputMaybe<ModerationActionRevisionConnectionWhere>;
+};
+
+export type ModerationActionRevisionDisconnectFieldInput = {
+  disconnect?: InputMaybe<TextVersionDisconnectInput>;
+  where?: InputMaybe<ModerationActionRevisionConnectionWhere>;
+};
+
+export type ModerationActionRevisionFieldInput = {
+  connect?: InputMaybe<ModerationActionRevisionConnectFieldInput>;
+  create?: InputMaybe<ModerationActionRevisionCreateFieldInput>;
+};
+
+export type ModerationActionRevisionNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ModerationActionRevisionNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ModerationActionRevisionNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ModerationActionRevisionNodeAggregationWhereInput>>;
+  body_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  body_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  editReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  editReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  updatedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type ModerationActionRevisionRelationship = {
+  __typename?: 'ModerationActionRevisionRelationship';
+  cursor: Scalars['String']['output'];
+  node: TextVersion;
+};
+
+export type ModerationActionRevisionRelationshipSubscriptionWhere = {
+  node?: InputMaybe<TextVersionSubscriptionWhere>;
+};
+
+export type ModerationActionRevisionUpdateConnectionInput = {
+  node?: InputMaybe<TextVersionUpdateInput>;
+};
+
+export type ModerationActionRevisionUpdateFieldInput = {
+  connect?: InputMaybe<ModerationActionRevisionConnectFieldInput>;
+  create?: InputMaybe<ModerationActionRevisionCreateFieldInput>;
+  delete?: InputMaybe<ModerationActionRevisionDeleteFieldInput>;
+  disconnect?: InputMaybe<ModerationActionRevisionDisconnectFieldInput>;
+  update?: InputMaybe<ModerationActionRevisionUpdateConnectionInput>;
+  where?: InputMaybe<ModerationActionRevisionConnectionWhere>;
 };
 
 /** Fields to sort ModerationActions by. The order in which sorts are applied is not guaranteed when specifying many fields in one ModerationActionSort object. */
@@ -35175,9 +35868,25 @@ export type ModerationActionSubscriptionWhere = {
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
 };
 
+export type ModerationActionTextVersionRevisionAggregationSelection = {
+  __typename?: 'ModerationActionTextVersionRevisionAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<ModerationActionTextVersionRevisionNodeAggregateSelection>;
+};
+
+export type ModerationActionTextVersionRevisionNodeAggregateSelection = {
+  __typename?: 'ModerationActionTextVersionRevisionNodeAggregateSelection';
+  body: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  editReason: StringAggregateSelection;
+  id: IdAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 export type ModerationActionUpdateInput = {
   Comment?: InputMaybe<ModerationActionCommentUpdateFieldInput>;
   ModerationProfile?: InputMaybe<ModerationActionModerationProfileUpdateFieldInput>;
+  Revision?: InputMaybe<ModerationActionRevisionUpdateFieldInput>;
   User?: InputMaybe<ModerationActionUserUpdateFieldInput>;
   actionDescription?: InputMaybe<Scalars['String']['input']>;
   actionType?: InputMaybe<Scalars['String']['input']>;
@@ -35546,6 +36255,11 @@ export type ModerationActionWhere = {
   ModerationProfile_NOT?: InputMaybe<ModerationProfileWhere>;
   NOT?: InputMaybe<ModerationActionWhere>;
   OR?: InputMaybe<Array<ModerationActionWhere>>;
+  Revision?: InputMaybe<TextVersionWhere>;
+  RevisionAggregate?: InputMaybe<ModerationActionRevisionAggregateInput>;
+  RevisionConnection?: InputMaybe<ModerationActionRevisionConnectionWhere>;
+  RevisionConnection_NOT?: InputMaybe<ModerationActionRevisionConnectionWhere>;
+  Revision_NOT?: InputMaybe<TextVersionWhere>;
   User?: InputMaybe<UserWhere>;
   UserAggregate?: InputMaybe<ModerationActionUserAggregateInput>;
   UserConnection?: InputMaybe<ModerationActionUserConnectionWhere>;
@@ -37531,11 +38245,14 @@ export type Mutation = {
   createImages: CreateImagesMutationResponse;
   createInstalledPlugins: CreateInstalledPluginsMutationResponse;
   createIssue?: Maybe<Issue>;
+  createIssueInfos: CreateIssueInfosMutationResponse;
   createIssues: CreateIssuesMutationResponse;
   createLicenses: CreateLicensesMutationResponse;
   createLinkFlairs: CreateLinkFlairsMutationResponse;
   createMessages: CreateMessagesMutationResponse;
+  createModActivities: CreateModActivitiesMutationResponse;
   createModChannelRoles: CreateModChannelRolesMutationResponse;
+  createModDayData: CreateModDayDataMutationResponse;
   createModServerRoles: CreateModServerRolesMutationResponse;
   createModerationActions: CreateModerationActionsMutationResponse;
   createModerationProfiles: CreateModerationProfilesMutationResponse;
@@ -37556,6 +38273,7 @@ export type Mutation = {
   createSignedStorageURL?: Maybe<SignedUrl>;
   createSignedUrls: CreateSignedUrlsMutationResponse;
   createSiteWideDiscussionListFormats: CreateSiteWideDiscussionListFormatsMutationResponse;
+  createSiteWideWikiListFormats: CreateSiteWideWikiListFormatsMutationResponse;
   createSuspensions: CreateSuspensionsMutationResponse;
   createTags: CreateTagsMutationResponse;
   createTextVersions: CreateTextVersionsMutationResponse;
@@ -37597,11 +38315,14 @@ export type Mutation = {
   deleteGetSortedChannelsResponses: DeleteInfo;
   deleteImages: DeleteInfo;
   deleteInstalledPlugins: DeleteInfo;
+  deleteIssueInfos: DeleteInfo;
   deleteIssues: DeleteInfo;
   deleteLicenses: DeleteInfo;
   deleteLinkFlairs: DeleteInfo;
   deleteMessages: DeleteInfo;
+  deleteModActivities: DeleteInfo;
   deleteModChannelRoles: DeleteInfo;
+  deleteModDayData: DeleteInfo;
   deleteModServerRoles: DeleteInfo;
   deleteModerationActions: DeleteInfo;
   deleteModerationProfiles: DeleteInfo;
@@ -37621,6 +38342,7 @@ export type Mutation = {
   deleteServerSecrets: DeleteInfo;
   deleteSignedUrls: DeleteInfo;
   deleteSiteWideDiscussionListFormats: DeleteInfo;
+  deleteSiteWideWikiListFormats: DeleteInfo;
   deleteSuspensions: DeleteInfo;
   deleteTags: DeleteInfo;
   deleteTextVersions: DeleteInfo;
@@ -37703,11 +38425,14 @@ export type Mutation = {
   updateGetSortedChannelsResponses: UpdateGetSortedChannelsResponsesMutationResponse;
   updateImages: UpdateImagesMutationResponse;
   updateInstalledPlugins: UpdateInstalledPluginsMutationResponse;
+  updateIssueInfos: UpdateIssueInfosMutationResponse;
   updateIssues: UpdateIssuesMutationResponse;
   updateLicenses: UpdateLicensesMutationResponse;
   updateLinkFlairs: UpdateLinkFlairsMutationResponse;
   updateMessages: UpdateMessagesMutationResponse;
+  updateModActivities: UpdateModActivitiesMutationResponse;
   updateModChannelRoles: UpdateModChannelRolesMutationResponse;
+  updateModDayData: UpdateModDayDataMutationResponse;
   updateModServerRoles: UpdateModServerRolesMutationResponse;
   updateModerationActions: UpdateModerationActionsMutationResponse;
   updateModerationProfiles: UpdateModerationProfilesMutationResponse;
@@ -37727,6 +38452,7 @@ export type Mutation = {
   updateServerSecrets: UpdateServerSecretsMutationResponse;
   updateSignedUrls: UpdateSignedUrlsMutationResponse;
   updateSiteWideDiscussionListFormats: UpdateSiteWideDiscussionListFormatsMutationResponse;
+  updateSiteWideWikiListFormats: UpdateSiteWideWikiListFormatsMutationResponse;
   updateSuspensions: UpdateSuspensionsMutationResponse;
   updateTags: UpdateTagsMutationResponse;
   updateTextVersions: UpdateTextVersionsMutationResponse;
@@ -38016,6 +38742,11 @@ export type MutationCreateIssueArgs = {
 };
 
 
+export type MutationCreateIssueInfosArgs = {
+  input: Array<IssueInfoCreateInput>;
+};
+
+
 export type MutationCreateIssuesArgs = {
   input: Array<IssueCreateInput>;
 };
@@ -38036,8 +38767,18 @@ export type MutationCreateMessagesArgs = {
 };
 
 
+export type MutationCreateModActivitiesArgs = {
+  input: Array<ModActivityCreateInput>;
+};
+
+
 export type MutationCreateModChannelRolesArgs = {
   input: Array<ModChannelRoleCreateInput>;
+};
+
+
+export type MutationCreateModDayDataArgs = {
+  input: Array<ModDayDataCreateInput>;
 };
 
 
@@ -38140,6 +38881,11 @@ export type MutationCreateSignedUrlsArgs = {
 
 export type MutationCreateSiteWideDiscussionListFormatsArgs = {
   input: Array<SiteWideDiscussionListFormatCreateInput>;
+};
+
+
+export type MutationCreateSiteWideWikiListFormatsArgs = {
+  input: Array<SiteWideWikiListFormatCreateInput>;
 };
 
 
@@ -38365,6 +39111,11 @@ export type MutationDeleteInstalledPluginsArgs = {
 };
 
 
+export type MutationDeleteIssueInfosArgs = {
+  where?: InputMaybe<IssueInfoWhere>;
+};
+
+
 export type MutationDeleteIssuesArgs = {
   delete?: InputMaybe<IssueDeleteInput>;
   where?: InputMaybe<IssueWhere>;
@@ -38387,8 +39138,18 @@ export type MutationDeleteMessagesArgs = {
 };
 
 
+export type MutationDeleteModActivitiesArgs = {
+  where?: InputMaybe<ModActivityWhere>;
+};
+
+
 export type MutationDeleteModChannelRolesArgs = {
   where?: InputMaybe<ModChannelRoleWhere>;
+};
+
+
+export type MutationDeleteModDayDataArgs = {
+  where?: InputMaybe<ModDayDataWhere>;
 };
 
 
@@ -38491,6 +39252,11 @@ export type MutationDeleteSignedUrlsArgs = {
 
 export type MutationDeleteSiteWideDiscussionListFormatsArgs = {
   where?: InputMaybe<SiteWideDiscussionListFormatWhere>;
+};
+
+
+export type MutationDeleteSiteWideWikiListFormatsArgs = {
+  where?: InputMaybe<SiteWideWikiListFormatWhere>;
 };
 
 
@@ -38998,6 +39764,12 @@ export type MutationUpdateInstalledPluginsArgs = {
 };
 
 
+export type MutationUpdateIssueInfosArgs = {
+  update?: InputMaybe<IssueInfoUpdateInput>;
+  where?: InputMaybe<IssueInfoWhere>;
+};
+
+
 export type MutationUpdateIssuesArgs = {
   update?: InputMaybe<IssueUpdateInput>;
   where?: InputMaybe<IssueWhere>;
@@ -39022,9 +39794,21 @@ export type MutationUpdateMessagesArgs = {
 };
 
 
+export type MutationUpdateModActivitiesArgs = {
+  update?: InputMaybe<ModActivityUpdateInput>;
+  where?: InputMaybe<ModActivityWhere>;
+};
+
+
 export type MutationUpdateModChannelRolesArgs = {
   update?: InputMaybe<ModChannelRoleUpdateInput>;
   where?: InputMaybe<ModChannelRoleWhere>;
+};
+
+
+export type MutationUpdateModDayDataArgs = {
+  update?: InputMaybe<ModDayDataUpdateInput>;
+  where?: InputMaybe<ModDayDataWhere>;
 };
 
 
@@ -39139,6 +39923,12 @@ export type MutationUpdateSignedUrlsArgs = {
 export type MutationUpdateSiteWideDiscussionListFormatsArgs = {
   update?: InputMaybe<SiteWideDiscussionListFormatUpdateInput>;
   where?: InputMaybe<SiteWideDiscussionListFormatWhere>;
+};
+
+
+export type MutationUpdateSiteWideWikiListFormatsArgs = {
+  update?: InputMaybe<SiteWideWikiListFormatUpdateInput>;
+  where?: InputMaybe<SiteWideWikiListFormatWhere>;
 };
 
 
@@ -41971,9 +42761,11 @@ export type Query = {
   getDiscussionsInChannel?: Maybe<DiscussionChannelListFormat>;
   getEventComments?: Maybe<EventCommentsFormat>;
   getInstalledPlugins: Array<InstalledPlugin>;
+  getModContributions: Array<ModDayData>;
   getPluginRunsForDownloadableFile: Array<PluginRun>;
   getServerPluginSecrets: Array<PluginSecretStatus>;
   getSiteWideDiscussionList?: Maybe<SiteWideDiscussionListFormat>;
+  getSiteWideWikiList?: Maybe<SiteWideWikiListFormat>;
   getSortedChannels?: Maybe<GetSortedChannelsResponse>;
   getSortedChannelsResponses: Array<GetSortedChannelsResponse>;
   getSortedChannelsResponsesAggregate: GetSortedChannelsResponseAggregateSelection;
@@ -41988,6 +42780,9 @@ export type Query = {
   isOriginalPosterSuspended?: Maybe<Scalars['Boolean']['output']>;
   issueAuthors: Array<IssueAuthor>;
   issueCommentAuthors: Array<IssueCommentAuthor>;
+  issueInfos: Array<IssueInfo>;
+  issueInfosAggregate: IssueInfoAggregateSelection;
+  issueInfosConnection: IssueInfosConnection;
   issues: Array<Issue>;
   issuesAggregate: IssueAggregateSelection;
   issuesConnection: IssuesConnection;
@@ -42000,9 +42795,15 @@ export type Query = {
   messages: Array<Message>;
   messagesAggregate: MessageAggregateSelection;
   messagesConnection: MessagesConnection;
+  modActivities: Array<ModActivity>;
+  modActivitiesAggregate: ModActivityAggregateSelection;
+  modActivitiesConnection: ModActivitiesConnection;
   modChannelRoles: Array<ModChannelRole>;
   modChannelRolesAggregate: ModChannelRoleAggregateSelection;
   modChannelRolesConnection: ModChannelRolesConnection;
+  modDayData: Array<ModDayData>;
+  modDayDataAggregate: ModDayDataAggregateSelection;
+  modDayDataConnection: ModDayDataConnection;
   modServerRoles: Array<ModServerRole>;
   modServerRolesAggregate: ModServerRoleAggregateSelection;
   modServerRolesConnection: ModServerRolesConnection;
@@ -42063,6 +42864,9 @@ export type Query = {
   siteWideDiscussionListFormats: Array<SiteWideDiscussionListFormat>;
   siteWideDiscussionListFormatsAggregate: SiteWideDiscussionListFormatAggregateSelection;
   siteWideDiscussionListFormatsConnection: SiteWideDiscussionListFormatsConnection;
+  siteWideWikiListFormats: Array<SiteWideWikiListFormat>;
+  siteWideWikiListFormatsAggregate: SiteWideWikiListFormatAggregateSelection;
+  siteWideWikiListFormatsConnection: SiteWideWikiListFormatsConnection;
   suspensions: Array<Suspension>;
   suspensionsAggregate: SuspensionAggregateSelection;
   suspensionsConnection: SuspensionsConnection;
@@ -42729,6 +43533,14 @@ export type QueryGetEventCommentsArgs = {
 };
 
 
+export type QueryGetModContributionsArgs = {
+  displayName: Scalars['String']['input'];
+  endDate?: InputMaybe<Scalars['String']['input']>;
+  startDate?: InputMaybe<Scalars['String']['input']>;
+  year?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QueryGetPluginRunsForDownloadableFileArgs = {
   downloadableFileId: Scalars['ID']['input'];
 };
@@ -42746,6 +43558,13 @@ export type QueryGetSiteWideDiscussionListArgs = {
   selectedChannels?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   selectedTags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   showArchived?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type QueryGetSiteWideWikiListArgs = {
+  options?: InputMaybe<WikiListOptions>;
+  searchInput?: InputMaybe<Scalars['String']['input']>;
+  selectedChannels?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
 
@@ -42840,6 +43659,25 @@ export type QueryIssueCommentAuthorsArgs = {
 };
 
 
+export type QueryIssueInfosArgs = {
+  options?: InputMaybe<IssueInfoOptions>;
+  where?: InputMaybe<IssueInfoWhere>;
+};
+
+
+export type QueryIssueInfosAggregateArgs = {
+  where?: InputMaybe<IssueInfoWhere>;
+};
+
+
+export type QueryIssueInfosConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<IssueInfoSort>>>;
+  where?: InputMaybe<IssueInfoWhere>;
+};
+
+
 export type QueryIssuesArgs = {
   options?: InputMaybe<IssueOptions>;
   where?: InputMaybe<IssueWhere>;
@@ -42916,6 +43754,25 @@ export type QueryMessagesConnectionArgs = {
 };
 
 
+export type QueryModActivitiesArgs = {
+  options?: InputMaybe<ModActivityOptions>;
+  where?: InputMaybe<ModActivityWhere>;
+};
+
+
+export type QueryModActivitiesAggregateArgs = {
+  where?: InputMaybe<ModActivityWhere>;
+};
+
+
+export type QueryModActivitiesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<ModActivitySort>>>;
+  where?: InputMaybe<ModActivityWhere>;
+};
+
+
 export type QueryModChannelRolesArgs = {
   options?: InputMaybe<ModChannelRoleOptions>;
   where?: InputMaybe<ModChannelRoleWhere>;
@@ -42932,6 +43789,25 @@ export type QueryModChannelRolesConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<ModChannelRoleSort>>>;
   where?: InputMaybe<ModChannelRoleWhere>;
+};
+
+
+export type QueryModDayDataArgs = {
+  options?: InputMaybe<ModDayDataOptions>;
+  where?: InputMaybe<ModDayDataWhere>;
+};
+
+
+export type QueryModDayDataAggregateArgs = {
+  where?: InputMaybe<ModDayDataWhere>;
+};
+
+
+export type QueryModDayDataConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<ModDayDataSort>>>;
+  where?: InputMaybe<ModDayDataWhere>;
 };
 
 
@@ -43298,6 +44174,25 @@ export type QuerySiteWideDiscussionListFormatsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<SiteWideDiscussionListFormatSort>>>;
   where?: InputMaybe<SiteWideDiscussionListFormatWhere>;
+};
+
+
+export type QuerySiteWideWikiListFormatsArgs = {
+  options?: InputMaybe<SiteWideWikiListFormatOptions>;
+  where?: InputMaybe<SiteWideWikiListFormatWhere>;
+};
+
+
+export type QuerySiteWideWikiListFormatsAggregateArgs = {
+  where?: InputMaybe<SiteWideWikiListFormatWhere>;
+};
+
+
+export type QuerySiteWideWikiListFormatsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<SiteWideWikiListFormatSort>>>;
+  where?: InputMaybe<SiteWideWikiListFormatWhere>;
 };
 
 
@@ -46674,6 +47569,104 @@ export type SiteWideDiscussionListFormatsConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
+export type SiteWideWikiListFormat = {
+  __typename?: 'SiteWideWikiListFormat';
+  aggregateWikiPageCount: Scalars['Int']['output'];
+  wikiPages: Array<WikiPage>;
+};
+
+export type SiteWideWikiListFormatAggregateSelection = {
+  __typename?: 'SiteWideWikiListFormatAggregateSelection';
+  aggregateWikiPageCount: IntAggregateSelection;
+  count: Scalars['Int']['output'];
+};
+
+export type SiteWideWikiListFormatCreateInput = {
+  aggregateWikiPageCount: Scalars['Int']['input'];
+};
+
+export type SiteWideWikiListFormatCreatedEvent = {
+  __typename?: 'SiteWideWikiListFormatCreatedEvent';
+  createdSiteWideWikiListFormat: SiteWideWikiListFormatEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type SiteWideWikiListFormatDeletedEvent = {
+  __typename?: 'SiteWideWikiListFormatDeletedEvent';
+  deletedSiteWideWikiListFormat: SiteWideWikiListFormatEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type SiteWideWikiListFormatEdge = {
+  __typename?: 'SiteWideWikiListFormatEdge';
+  cursor: Scalars['String']['output'];
+  node: SiteWideWikiListFormat;
+};
+
+export type SiteWideWikiListFormatEventPayload = {
+  __typename?: 'SiteWideWikiListFormatEventPayload';
+  aggregateWikiPageCount: Scalars['Int']['output'];
+};
+
+export type SiteWideWikiListFormatOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more SiteWideWikiListFormatSort objects to sort SiteWideWikiListFormats by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<SiteWideWikiListFormatSort>>;
+};
+
+/** Fields to sort SiteWideWikiListFormats by. The order in which sorts are applied is not guaranteed when specifying many fields in one SiteWideWikiListFormatSort object. */
+export type SiteWideWikiListFormatSort = {
+  aggregateWikiPageCount?: InputMaybe<SortDirection>;
+};
+
+export type SiteWideWikiListFormatSubscriptionWhere = {
+  AND?: InputMaybe<Array<SiteWideWikiListFormatSubscriptionWhere>>;
+  NOT?: InputMaybe<SiteWideWikiListFormatSubscriptionWhere>;
+  OR?: InputMaybe<Array<SiteWideWikiListFormatSubscriptionWhere>>;
+  aggregateWikiPageCount?: InputMaybe<Scalars['Int']['input']>;
+  aggregateWikiPageCount_GT?: InputMaybe<Scalars['Int']['input']>;
+  aggregateWikiPageCount_GTE?: InputMaybe<Scalars['Int']['input']>;
+  aggregateWikiPageCount_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
+  aggregateWikiPageCount_LT?: InputMaybe<Scalars['Int']['input']>;
+  aggregateWikiPageCount_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type SiteWideWikiListFormatUpdateInput = {
+  aggregateWikiPageCount?: InputMaybe<Scalars['Int']['input']>;
+  aggregateWikiPageCount_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
+  aggregateWikiPageCount_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type SiteWideWikiListFormatUpdatedEvent = {
+  __typename?: 'SiteWideWikiListFormatUpdatedEvent';
+  event: EventType;
+  previousState: SiteWideWikiListFormatEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedSiteWideWikiListFormat: SiteWideWikiListFormatEventPayload;
+};
+
+export type SiteWideWikiListFormatWhere = {
+  AND?: InputMaybe<Array<SiteWideWikiListFormatWhere>>;
+  NOT?: InputMaybe<SiteWideWikiListFormatWhere>;
+  OR?: InputMaybe<Array<SiteWideWikiListFormatWhere>>;
+  aggregateWikiPageCount?: InputMaybe<Scalars['Int']['input']>;
+  aggregateWikiPageCount_GT?: InputMaybe<Scalars['Int']['input']>;
+  aggregateWikiPageCount_GTE?: InputMaybe<Scalars['Int']['input']>;
+  aggregateWikiPageCount_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
+  aggregateWikiPageCount_LT?: InputMaybe<Scalars['Int']['input']>;
+  aggregateWikiPageCount_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type SiteWideWikiListFormatsConnection = {
+  __typename?: 'SiteWideWikiListFormatsConnection';
+  edges: Array<SiteWideWikiListFormatEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 /** An enum for sorting in either ascending or descending order. */
 export enum SortDirection {
   /** Sort by field values in ascending order. */
@@ -46834,6 +47827,9 @@ export type Subscription = {
   installedPluginUpdated: InstalledPluginUpdatedEvent;
   issueCreated: IssueCreatedEvent;
   issueDeleted: IssueDeletedEvent;
+  issueInfoCreated: IssueInfoCreatedEvent;
+  issueInfoDeleted: IssueInfoDeletedEvent;
+  issueInfoUpdated: IssueInfoUpdatedEvent;
   issueRelationshipCreated: IssueRelationshipCreatedEvent;
   issueRelationshipDeleted: IssueRelationshipDeletedEvent;
   issueUpdated: IssueUpdatedEvent;
@@ -46848,9 +47844,15 @@ export type Subscription = {
   messageRelationshipCreated: MessageRelationshipCreatedEvent;
   messageRelationshipDeleted: MessageRelationshipDeletedEvent;
   messageUpdated: MessageUpdatedEvent;
+  modActivityCreated: ModActivityCreatedEvent;
+  modActivityDeleted: ModActivityDeletedEvent;
+  modActivityUpdated: ModActivityUpdatedEvent;
   modChannelRoleCreated: ModChannelRoleCreatedEvent;
   modChannelRoleDeleted: ModChannelRoleDeletedEvent;
   modChannelRoleUpdated: ModChannelRoleUpdatedEvent;
+  modDayDataCreated: ModDayDataCreatedEvent;
+  modDayDataDeleted: ModDayDataDeletedEvent;
+  modDayDataUpdated: ModDayDataUpdatedEvent;
   modServerRoleCreated: ModServerRoleCreatedEvent;
   modServerRoleDeleted: ModServerRoleDeletedEvent;
   modServerRoleUpdated: ModServerRoleUpdatedEvent;
@@ -46922,6 +47924,9 @@ export type Subscription = {
   siteWideDiscussionListFormatCreated: SiteWideDiscussionListFormatCreatedEvent;
   siteWideDiscussionListFormatDeleted: SiteWideDiscussionListFormatDeletedEvent;
   siteWideDiscussionListFormatUpdated: SiteWideDiscussionListFormatUpdatedEvent;
+  siteWideWikiListFormatCreated: SiteWideWikiListFormatCreatedEvent;
+  siteWideWikiListFormatDeleted: SiteWideWikiListFormatDeletedEvent;
+  siteWideWikiListFormatUpdated: SiteWideWikiListFormatUpdatedEvent;
   suspensionCreated: SuspensionCreatedEvent;
   suspensionDeleted: SuspensionDeletedEvent;
   suspensionRelationshipCreated: SuspensionRelationshipCreatedEvent;
@@ -47616,6 +48621,21 @@ export type SubscriptionIssueDeletedArgs = {
 };
 
 
+export type SubscriptionIssueInfoCreatedArgs = {
+  where?: InputMaybe<IssueInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionIssueInfoDeletedArgs = {
+  where?: InputMaybe<IssueInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionIssueInfoUpdatedArgs = {
+  where?: InputMaybe<IssueInfoSubscriptionWhere>;
+};
+
+
 export type SubscriptionIssueRelationshipCreatedArgs = {
   where?: InputMaybe<IssueRelationshipCreatedSubscriptionWhere>;
 };
@@ -47686,6 +48706,21 @@ export type SubscriptionMessageUpdatedArgs = {
 };
 
 
+export type SubscriptionModActivityCreatedArgs = {
+  where?: InputMaybe<ModActivitySubscriptionWhere>;
+};
+
+
+export type SubscriptionModActivityDeletedArgs = {
+  where?: InputMaybe<ModActivitySubscriptionWhere>;
+};
+
+
+export type SubscriptionModActivityUpdatedArgs = {
+  where?: InputMaybe<ModActivitySubscriptionWhere>;
+};
+
+
 export type SubscriptionModChannelRoleCreatedArgs = {
   where?: InputMaybe<ModChannelRoleSubscriptionWhere>;
 };
@@ -47698,6 +48733,21 @@ export type SubscriptionModChannelRoleDeletedArgs = {
 
 export type SubscriptionModChannelRoleUpdatedArgs = {
   where?: InputMaybe<ModChannelRoleSubscriptionWhere>;
+};
+
+
+export type SubscriptionModDayDataCreatedArgs = {
+  where?: InputMaybe<ModDayDataSubscriptionWhere>;
+};
+
+
+export type SubscriptionModDayDataDeletedArgs = {
+  where?: InputMaybe<ModDayDataSubscriptionWhere>;
+};
+
+
+export type SubscriptionModDayDataUpdatedArgs = {
+  where?: InputMaybe<ModDayDataSubscriptionWhere>;
 };
 
 
@@ -48038,6 +49088,21 @@ export type SubscriptionSiteWideDiscussionListFormatDeletedArgs = {
 
 export type SubscriptionSiteWideDiscussionListFormatUpdatedArgs = {
   where?: InputMaybe<SiteWideDiscussionListFormatSubscriptionWhere>;
+};
+
+
+export type SubscriptionSiteWideWikiListFormatCreatedArgs = {
+  where?: InputMaybe<SiteWideWikiListFormatSubscriptionWhere>;
+};
+
+
+export type SubscriptionSiteWideWikiListFormatDeletedArgs = {
+  where?: InputMaybe<SiteWideWikiListFormatSubscriptionWhere>;
+};
+
+
+export type SubscriptionSiteWideWikiListFormatUpdatedArgs = {
+  where?: InputMaybe<SiteWideWikiListFormatSubscriptionWhere>;
 };
 
 
@@ -51366,6 +52431,12 @@ export type UpdateInstalledPluginsMutationResponse = {
   installedPlugins: Array<InstalledPlugin>;
 };
 
+export type UpdateIssueInfosMutationResponse = {
+  __typename?: 'UpdateIssueInfosMutationResponse';
+  info: UpdateInfo;
+  issueInfos: Array<IssueInfo>;
+};
+
 export type UpdateIssuesMutationResponse = {
   __typename?: 'UpdateIssuesMutationResponse';
   info: UpdateInfo;
@@ -51390,10 +52461,22 @@ export type UpdateMessagesMutationResponse = {
   messages: Array<Message>;
 };
 
+export type UpdateModActivitiesMutationResponse = {
+  __typename?: 'UpdateModActivitiesMutationResponse';
+  info: UpdateInfo;
+  modActivities: Array<ModActivity>;
+};
+
 export type UpdateModChannelRolesMutationResponse = {
   __typename?: 'UpdateModChannelRolesMutationResponse';
   info: UpdateInfo;
   modChannelRoles: Array<ModChannelRole>;
+};
+
+export type UpdateModDayDataMutationResponse = {
+  __typename?: 'UpdateModDayDataMutationResponse';
+  info: UpdateInfo;
+  modDayData: Array<ModDayData>;
 };
 
 export type UpdateModServerRolesMutationResponse = {
@@ -51508,6 +52591,12 @@ export type UpdateSiteWideDiscussionListFormatsMutationResponse = {
   __typename?: 'UpdateSiteWideDiscussionListFormatsMutationResponse';
   info: UpdateInfo;
   siteWideDiscussionListFormats: Array<SiteWideDiscussionListFormat>;
+};
+
+export type UpdateSiteWideWikiListFormatsMutationResponse = {
+  __typename?: 'UpdateSiteWideWikiListFormatsMutationResponse';
+  info: UpdateInfo;
+  siteWideWikiListFormats: Array<SiteWideWikiListFormat>;
 };
 
 export type UpdateSuspensionsMutationResponse = {
@@ -59652,6 +60741,11 @@ export type ValidationResultsConnection = {
   edges: Array<ValidationResultEdge>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
+};
+
+export type WikiListOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type WikiPage = {

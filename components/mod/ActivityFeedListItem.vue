@@ -56,6 +56,10 @@ const props = defineProps({
     type: String as PropType<string | null>,
     default: null,
   },
+  commentEditIndex: {
+    type: Number as PropType<number | null>,
+    default: null,
+  },
 });
 const commentIdInParams = useRoute().params.commentId as string;
 const isPermalinked =
@@ -139,6 +143,76 @@ const revisionContent = computed(() => {
   return {
     oldVersion: props.activityItem.Revision,
     newVersion,
+  };
+});
+
+// Check if this is a comment edit with revision history
+const hasCommentRevision = computed(() => {
+  const comment = props.activityItem.Comment as
+    | (typeof props.activityItem.Comment & {
+        PastVersions?: Array<{ id: string; body: string; createdAt: string }>;
+      })
+    | undefined;
+  return (
+    props.commentEditIndex !== null &&
+    comment?.PastVersions &&
+    comment.PastVersions.length > props.commentEditIndex
+  );
+});
+
+// Build the comment revision content for the diff
+const commentRevisionContent = computed(() => {
+  if (props.commentEditIndex === null) return null;
+
+  const comment = props.activityItem.Comment as
+    | (typeof props.activityItem.Comment & {
+        PastVersions?: Array<{
+          id: string;
+          body: string;
+          createdAt: string;
+          Author?: { username: string } | null;
+        }>;
+      })
+    | undefined;
+
+  const pastVersions = comment?.PastVersions;
+  if (!pastVersions || pastVersions.length <= props.commentEditIndex) {
+    return null;
+  }
+
+  const editIndex = props.commentEditIndex;
+
+  // Old version is at the edit index in PastVersions
+  const oldVersion = pastVersions[editIndex];
+  if (!oldVersion) return null;
+
+  // New version is either the previous PastVersion (if exists) or the current comment text
+  let newBody: string;
+  let newCreatedAt: string;
+  const newerVersion = editIndex > 0 ? pastVersions[editIndex - 1] : null;
+  if (newerVersion) {
+    // There's a more recent past version - that's what this edit changed TO
+    newBody = newerVersion.body;
+    newCreatedAt = newerVersion.createdAt;
+  } else {
+    // This is the most recent edit - new version is the current comment text
+    newBody = comment?.text || '';
+    newCreatedAt = comment?.updatedAt || comment?.createdAt || '';
+  }
+
+  return {
+    oldVersion: {
+      id: oldVersion.id,
+      body: oldVersion.body,
+      createdAt: oldVersion.createdAt,
+      Author: oldVersion.Author || null,
+    },
+    newVersion: {
+      id: 'current',
+      body: newBody,
+      createdAt: newCreatedAt,
+      Author: null,
+    },
   };
 });
 
@@ -325,10 +399,17 @@ const saveEdit = async () => {
               class="mt-2"
               :text="updateCommentError.message"
             />
+            <!-- Discussion revision diff -->
             <RevisionDiffInline
               v-if="hasRevision && revisionContent"
               :old-version="revisionContent.oldVersion"
               :new-version="revisionContent.newVersion"
+            />
+            <!-- Comment revision diff -->
+            <RevisionDiffInline
+              v-if="hasCommentRevision && commentRevisionContent"
+              :old-version="commentRevisionContent.oldVersion"
+              :new-version="commentRevisionContent.newVersion"
             />
           </div>
         </div>
