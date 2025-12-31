@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, watchEffect } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_MOD } from '@/graphQLData/mod/queries';
 import ModProfileSidebar from '@/components/mod/ModProfileSidebar.vue';
-import { useRoute } from 'nuxt/app';
+import { useHead, useRoute } from 'nuxt/app';
 import ModProfileTabs from '../../components/mod/ModProfileTabs.vue';
 import ModContributionChart from '@/components/charts/ModContributionChart.vue';
 
@@ -32,6 +32,16 @@ const mod = computed(() => {
     return result.value.moderationProfiles[0];
   }
   return null;
+});
+
+// Set page title for mod profile
+watchEffect(() => {
+  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME || 'Multiforum';
+  const displayName = mod.value?.displayName || modProfileName.value;
+
+  useHead({
+    title: displayName ? `${displayName} - Mod Profile | ${serverName}` : 'Mod Profile',
+  });
 });
 </script>
 
