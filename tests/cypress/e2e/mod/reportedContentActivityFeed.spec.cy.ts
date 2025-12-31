@@ -369,6 +369,29 @@ const ISSUE_PAGE_REASON_ERROR = 'Please provide a reason before deleting.';
 describe('Reported content activity feed updates', () => {
   setupTestData();
 
+  const expectDeleteActivity = (input: {
+    activityFeed: any[];
+    actionDescription: string;
+    expectedUser?: string | null;
+    expectedMod?: string | null;
+  }) => {
+    const { activityFeed, actionDescription, expectedUser, expectedMod } = input;
+    const deleteItems = activityFeed.filter(
+      (item: any) => item.actionDescription === actionDescription
+    );
+    expect(deleteItems.length).to.be.greaterThan(0);
+    const matched = deleteItems.some((item: any) => {
+      const hasUser = expectedUser
+        ? item.User?.username === expectedUser
+        : !item.User?.username;
+      const hasMod = expectedMod
+        ? item.ModerationProfile?.displayName === expectedMod
+        : !item.ModerationProfile?.displayName;
+      return hasUser && hasMod;
+    });
+    expect(matched).to.eq(true);
+  };
+
   const createDiscussionAsOp = (title: string, body: string) => {
     return graphqlAsCurrentUser(CREATE_DISCUSSION, {
       input: [
@@ -539,6 +562,12 @@ describe('Reported content activity feed updates', () => {
             expect(issue.ActivityFeed.some((item: any) =>
               item.actionDescription === 'deleted the discussion'
             )).to.eq(true);
+            expectDeleteActivity({
+              activityFeed: issue.ActivityFeed,
+              actionDescription: 'deleted the discussion',
+              expectedUser: OP_USERNAME,
+              expectedMod: null,
+            });
           });
         });
       });
@@ -595,6 +624,12 @@ describe('Reported content activity feed updates', () => {
               expect(
                 deleteItems.some((item: any) => item.Comment?.text === deleteReasonText)
               ).to.eq(true);
+              expectDeleteActivity({
+                activityFeed: issueData.ActivityFeed,
+                actionDescription: 'deleted the discussion',
+                expectedUser: null,
+                expectedMod: MOD_USERNAME,
+              });
             });
           });
         });
@@ -652,6 +687,12 @@ describe('Reported content activity feed updates', () => {
                 expect(issue.ActivityFeed.some((item: any) =>
                   item.actionDescription === 'deleted the comment'
                 )).to.eq(true);
+                expectDeleteActivity({
+                  activityFeed: issue.ActivityFeed,
+                  actionDescription: 'deleted the comment',
+                  expectedUser: OP_USERNAME,
+                  expectedMod: null,
+                });
               });
             });
           });
@@ -720,6 +761,12 @@ describe('Reported content activity feed updates', () => {
                   expect(
                     deleteItems.some((item: any) => item.Comment?.text === deleteReasonText)
                   ).to.eq(true);
+                  expectDeleteActivity({
+                    activityFeed: issueData.ActivityFeed,
+                    actionDescription: 'deleted the comment',
+                    expectedUser: null,
+                    expectedMod: MOD_USERNAME,
+                  });
                 });
               });
             });
@@ -767,6 +814,12 @@ describe('Reported content activity feed updates', () => {
               expect(issue.ActivityFeed.some((item: any) =>
                 item.actionDescription === 'deleted the event'
               )).to.eq(true);
+              expectDeleteActivity({
+                activityFeed: issue.ActivityFeed,
+                actionDescription: 'deleted the event',
+                expectedUser: OP_USERNAME,
+                expectedMod: null,
+              });
             });
           });
         });
@@ -822,6 +875,12 @@ describe('Reported content activity feed updates', () => {
                   expect(
                     deleteItems.some((item: any) => item.Comment?.text === deleteReasonText)
                   ).to.eq(true);
+                  expectDeleteActivity({
+                    activityFeed: issueData.ActivityFeed,
+                    actionDescription: 'deleted the event',
+                    expectedUser: null,
+                    expectedMod: MOD_USERNAME,
+                  });
                 });
               });
             });
