@@ -65,7 +65,9 @@ const modifiedOptions: Array<{ value: ModifiedRange; label: string }> = [
 ];
 
 const typeLabel = computed(() => {
-  const match = typeOptions.find((option) => option.value === selectedType.value);
+  const match = typeOptions.find(
+    (option) => option.value === selectedType.value
+  );
   return match?.label || 'Discussions';
 });
 
@@ -105,8 +107,11 @@ const buildQuery = () => {
     searchInput: trimmedInput || undefined,
     type: selectedType.value,
     searchOpen: 'true',
-    modified: selectedModified.value === 'all' ? undefined : selectedModified.value,
-    channels: selectedForums.value.length ? [...selectedForums.value] : undefined,
+    modified:
+      selectedModified.value === 'all' ? undefined : selectedModified.value,
+    channels: selectedForums.value.length
+      ? [...selectedForums.value]
+      : undefined,
   };
 
   return query;
@@ -144,7 +149,7 @@ const executeSearch = (value?: string) => {
   const nextValue =
     typeof value === 'string'
       ? value
-      : searchBarRef.value?.getValue?.() ?? searchInput.value;
+      : (searchBarRef.value?.getValue?.() ?? searchInput.value);
   if (typeof nextValue === 'string') {
     searchInput.value = nextValue;
   }
@@ -186,9 +191,7 @@ const isTypingTarget = (target: EventTarget | null) => {
   if (!(target instanceof HTMLElement)) return false;
   const tagName = target.tagName.toLowerCase();
   return (
-    tagName === 'input' ||
-    tagName === 'textarea' ||
-    target.isContentEditable
+    tagName === 'input' || tagName === 'textarea' || target.isContentEditable
   );
 };
 
@@ -316,7 +319,7 @@ onBeforeUnmount(() => {
         </FilterChip>
         <button
           type="button"
-          class="ml-auto rounded-md bg-orange-500 px-3 py-2 text-xs font-semibold text-white hover:bg-orange-600"
+          class="ml-auto rounded-md bg-orange-500 px-3 py-1.5 text-sm font-bold text-black hover:bg-orange-600"
           @click="executeSearch"
         >
           Search
@@ -326,7 +329,10 @@ onBeforeUnmount(() => {
         <div class="px-3 py-2 text-xs uppercase tracking-wide text-gray-500">
           Recent searches
         </div>
-        <div v-if="recentSearches.length === 0" class="px-3 pb-3 text-sm text-gray-500">
+        <div
+          v-if="recentSearches.length === 0"
+          class="px-3 pb-3 text-sm text-gray-500"
+        >
           No recent searches yet.
         </div>
         <ul v-else class="max-h-56 overflow-y-auto pb-2">
@@ -340,14 +346,20 @@ onBeforeUnmount(() => {
               {{ recent.query }}
             </div>
             <div class="text-xs text-gray-500">
-              {{ typeOptions.find((o) => o.value === recent.type)?.label || '' }}
-              •
               {{
-                modifiedOptions.find((o) => o.value === recent.modified)?.label ||
-                'All'
+                typeOptions.find((o) => o.value === recent.type)?.label || ''
               }}
               •
-              {{ recent.forums.length ? `Forums (${recent.forums.length})` : 'All forums' }}
+              {{
+                modifiedOptions.find((o) => o.value === recent.modified)
+                  ?.label || 'All'
+              }}
+              •
+              {{
+                recent.forums.length
+                  ? `Forums (${recent.forums.length})`
+                  : 'All forums'
+              }}
             </div>
           </li>
         </ul>
