@@ -720,27 +720,51 @@ const lengthOfCommentInProgress = computed(() => {
         aria-busy="true"
       >
         <div class="flex gap-3">
-          <div class="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
+          <div
+            class="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700"
+          />
           <div class="flex-1 space-y-2">
-            <div class="h-4 w-1/4 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-            <div class="h-3 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-            <div class="h-3 w-5/6 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+            <div
+              class="h-4 w-1/4 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+            />
+            <div
+              class="h-3 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+            />
+            <div
+              class="h-3 w-5/6 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+            />
           </div>
         </div>
         <div class="flex gap-3">
-          <div class="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
+          <div
+            class="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700"
+          />
           <div class="flex-1 space-y-2">
-            <div class="h-4 w-1/3 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-            <div class="h-3 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-            <div class="h-3 w-4/5 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+            <div
+              class="h-4 w-1/3 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+            />
+            <div
+              class="h-3 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+            />
+            <div
+              class="h-3 w-4/5 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+            />
           </div>
         </div>
         <div class="flex gap-3">
-          <div class="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
+          <div
+            class="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700"
+          />
           <div class="flex-1 space-y-2">
-            <div class="h-4 w-1/5 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-            <div class="h-3 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-            <div class="h-3 w-3/4 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+            <div
+              class="h-4 w-1/5 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+            />
+            <div
+              class="h-3 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+            />
+            <div
+              class="h-3 w-3/4 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+            />
           </div>
         </div>
       </div>

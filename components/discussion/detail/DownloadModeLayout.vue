@@ -148,9 +148,9 @@ const hasAlbum = computed(() => {
       </DiscussionBody>
     </div>
     <div class="flex-shrink-0">
-      <DownloadSidebar 
-        v-if="discussion && activeDiscussionChannel" 
-        :discussion="discussion" 
+      <DownloadSidebar
+        v-if="discussion && activeDiscussionChannel"
+        :discussion="discussion"
         :discussion-id="discussionId"
         :channel-unique-name="activeDiscussionChannel.channelUniqueName"
       />

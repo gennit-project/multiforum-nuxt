@@ -114,7 +114,9 @@ describe('Server-level suspension enforcement', () => {
     });
 
     // Try to submit the form
-    cy.get('button').contains(/create|submit/i).click();
+    cy.get('button')
+      .contains(/create|submit/i)
+      .click();
 
     // Should see an error about being suspended or lacking permission
     // The exact message depends on how the frontend handles the error
@@ -172,7 +174,9 @@ describe('Server-level suspension enforcement', () => {
     });
 
     // Submit the form
-    cy.get('button').contains(/create|submit/i).click();
+    cy.get('button')
+      .contains(/create|submit/i)
+      .click();
     waitForGraphQL();
 
     // Should see success or be redirected to the new forum

@@ -21,7 +21,9 @@ const selectedChannels = computed(() => {
     return [channels];
   }
   if (Array.isArray(channels)) {
-    return channels.filter((value): value is string => typeof value === 'string');
+    return channels.filter(
+      (value): value is string => typeof value === 'string'
+    );
   }
   return [];
 });
@@ -69,7 +71,7 @@ const updateSearchInput = (value: string) => {
 <template>
   <NuxtLayout>
     <div class="mx-auto max-w-3xl px-4 py-6 text-gray-900 dark:text-gray-100">
-      <h1 class="text-lg font-semibold">Comment search</h1>
+      <h1 class="font-semibold text-lg">Comment search</h1>
       <div class="mt-4">
         <SearchBar
           :auto-focus="shouldAutoFocus"

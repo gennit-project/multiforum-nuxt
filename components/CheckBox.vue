@@ -34,5 +34,5 @@ export default defineComponent({
     :checked="checked"
     :disabled="disabled"
     @change="handleChange"
-  >
+  />
 </template>

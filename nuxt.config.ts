@@ -252,9 +252,7 @@ export default defineNuxtConfig({
     dsn: process.env.VITE_SENTRY_DSN,
     authToken: process.env.VITE_SENTRY_AUTH_TOKEN,
     environment: process.env.VITE_ENVIRONMENT || 'development',
-    integrations: [
-      'replayIntegration',
-    ],
+    integrations: ['replayIntegration'],
     tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
     replaysSessionSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
     replaysOnErrorSampleRate: 1.0,

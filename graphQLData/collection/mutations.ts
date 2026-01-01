@@ -18,11 +18,7 @@ export const CREATE_COLLECTION = gql`
           visibility: $visibility
           itemOrder: []
           updatedAt: $updatedAt
-          CreatedBy: {
-            connect: {
-              where: { node: { username: $username } }
-            }
-          }
+          CreatedBy: { connect: { where: { node: { username: $username } } } }
         }
       ]
     ) {
@@ -46,11 +42,7 @@ export const ADD_DISCUSSION_TO_COLLECTION = gql`
       where: { id: $collectionId }
       update: {
         itemOrder_PUSH: [$itemId]
-        Discussions: {
-          connect: {
-            where: { node: { id: $itemId } }
-          }
-        }
+        Discussions: { connect: { where: { node: { id: $itemId } } } }
       }
     ) {
       collections {
@@ -69,11 +61,7 @@ export const ADD_COMMENT_TO_COLLECTION = gql`
       where: { id: $collectionId }
       update: {
         itemOrder_PUSH: [$itemId]
-        Comments: {
-          connect: {
-            where: { node: { id: $itemId } }
-          }
-        }
+        Comments: { connect: { where: { node: { id: $itemId } } } }
       }
     ) {
       collections {
@@ -92,11 +80,7 @@ export const ADD_IMAGE_TO_COLLECTION = gql`
       where: { id: $collectionId }
       update: {
         itemOrder_PUSH: [$itemId]
-        Images: {
-          connect: {
-            where: { node: { id: $itemId } }
-          }
-        }
+        Images: { connect: { where: { node: { id: $itemId } } } }
       }
     ) {
       collections {
@@ -114,11 +98,7 @@ export const ADD_CHANNEL_TO_COLLECTION = gql`
     updateCollections(
       where: { id: $collectionId }
       update: {
-        Channels: {
-          connect: {
-            where: { node: { uniqueName: $itemId } }
-          }
-        }
+        Channels: { connect: { where: { node: { uniqueName: $itemId } } } }
       }
     ) {
       collections {
@@ -136,11 +116,7 @@ export const REMOVE_DISCUSSION_FROM_COLLECTION = gql`
     updateCollections(
       where: { id: $collectionId }
       update: {
-        Discussions: {
-          disconnect: {
-            where: { node: { id: $itemId } }
-          }
-        }
+        Discussions: { disconnect: { where: { node: { id: $itemId } } } }
       }
     ) {
       collections {
@@ -157,13 +133,7 @@ export const REMOVE_COMMENT_FROM_COLLECTION = gql`
   mutation RemoveCommentFromCollection($collectionId: ID!, $itemId: ID!) {
     updateCollections(
       where: { id: $collectionId }
-      update: {
-        Comments: {
-          disconnect: {
-            where: { node: { id: $itemId } }
-          }
-        }
-      }
+      update: { Comments: { disconnect: { where: { node: { id: $itemId } } } } }
     ) {
       collections {
         id
@@ -179,13 +149,7 @@ export const REMOVE_IMAGE_FROM_COLLECTION = gql`
   mutation RemoveImageFromCollection($collectionId: ID!, $itemId: ID!) {
     updateCollections(
       where: { id: $collectionId }
-      update: {
-        Images: {
-          disconnect: {
-            where: { node: { id: $itemId } }
-          }
-        }
-      }
+      update: { Images: { disconnect: { where: { node: { id: $itemId } } } } }
     ) {
       collections {
         id
@@ -202,11 +166,7 @@ export const REMOVE_CHANNEL_FROM_COLLECTION = gql`
     updateCollections(
       where: { id: $collectionId }
       update: {
-        Channels: {
-          disconnect: {
-            where: { node: { uniqueName: $itemId } }
-          }
-        }
+        Channels: { disconnect: { where: { node: { uniqueName: $itemId } } } }
       }
     ) {
       collections {
@@ -225,11 +185,7 @@ export const ADD_DOWNLOAD_TO_COLLECTION = gql`
       where: { id: $collectionId }
       update: {
         itemOrder_PUSH: [$itemId]
-        Downloads: {
-          connect: {
-            where: { node: { id: $itemId } }
-          }
-        }
+        Downloads: { connect: { where: { node: { id: $itemId } } } }
       }
     ) {
       collections {
@@ -247,11 +203,7 @@ export const REMOVE_DOWNLOAD_FROM_COLLECTION = gql`
     updateCollections(
       where: { id: $collectionId }
       update: {
-        Downloads: {
-          disconnect: {
-            where: { node: { id: $itemId } }
-          }
-        }
+        Downloads: { disconnect: { where: { node: { id: $itemId } } } }
       }
     ) {
       collections {

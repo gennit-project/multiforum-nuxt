@@ -2,7 +2,10 @@
 import { ref, computed, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import type { Channel } from '@/__generated__/graphql';
-import { GET_CHANNEL_NAMES, GET_USER_FAVORITE_CHANNELS } from '@/graphQLData/channel/queries';
+import {
+  GET_CHANNEL_NAMES,
+  GET_USER_FAVORITE_CHANNELS,
+} from '@/graphQLData/channel/queries';
 import { GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS } from '@/graphQLData/collection/queries';
 import SearchBar from '@/components/SearchBar.vue';
 import type { PropType } from 'vue';
@@ -84,28 +87,37 @@ const expandedCollections = ref<Set<string>>(new Set());
 const channelCollections = computed(() => {
   const collections = collectionsResult.value?.users?.[0]?.Collections || [];
 
-  return collections.map((collection: any) => {
-    const channels = (collection.Channels || []).map((channel: any) => ({
-      uniqueName: channel.uniqueName,
-      displayName: channel.displayName || channel.uniqueName,
-      icon: channel.channelIconURL || '',
-    }));
+  return collections
+    .map((collection: any) => {
+      const channels = (collection.Channels || []).map((channel: any) => ({
+        uniqueName: channel.uniqueName,
+        displayName: channel.displayName || channel.uniqueName,
+        icon: channel.channelIconURL || '',
+      }));
 
-    // Filter by search if there's a search query
-    const filteredChannels = searchInput.value
-      ? channels.filter((channel: ChannelOption) =>
-          channel.uniqueName.toLowerCase().includes(searchInput.value.toLowerCase()) ||
-          channel.displayName.toLowerCase().includes(searchInput.value.toLowerCase())
-        )
-      : channels;
+      // Filter by search if there's a search query
+      const filteredChannels = searchInput.value
+        ? channels.filter(
+            (channel: ChannelOption) =>
+              channel.uniqueName
+                .toLowerCase()
+                .includes(searchInput.value.toLowerCase()) ||
+              channel.displayName
+                .toLowerCase()
+                .includes(searchInput.value.toLowerCase())
+          )
+        : channels;
 
-    return {
-      id: collection.id,
-      name: collection.name,
-      channels: filteredChannels,
-      allChannels: channels, // Keep all channels for selection logic
-    };
-  }).filter((collection: any) => collection.channels.length > 0 || !searchInput.value);
+      return {
+        id: collection.id,
+        name: collection.name,
+        channels: filteredChannels,
+        allChannels: channels, // Keep all channels for selection logic
+      };
+    })
+    .filter(
+      (collection: any) => collection.channels.length > 0 || !searchInput.value
+    );
 });
 
 const toggleCollectionExpansion = (collectionId: string) => {
@@ -118,11 +130,18 @@ const toggleCollectionExpansion = (collectionId: string) => {
   expandedCollections.value = new Set(expandedCollections.value);
 };
 
-const toggleSelectAllCollection = (collection: { id: string; allChannels: ChannelOption[] }) => {
-  const collectionValues = collection.allChannels.map((ch: ChannelOption) => ch.uniqueName);
+const toggleSelectAllCollection = (collection: {
+  id: string;
+  allChannels: ChannelOption[];
+}) => {
+  const collectionValues = collection.allChannels.map(
+    (ch: ChannelOption) => ch.uniqueName
+  );
   const currentSelected = props.selectedChannels || [];
 
-  const shouldDeselect = collectionValues.every((val: string) => currentSelected.includes(val));
+  const shouldDeselect = collectionValues.every((val: string) =>
+    currentSelected.includes(val)
+  );
 
   if (shouldDeselect) {
     collectionValues.forEach((uniqueName: string) => {
@@ -139,10 +158,17 @@ const toggleSelectAllCollection = (collection: { id: string; allChannels: Channe
   }
 };
 
-const isCollectionFullySelected = (collection: { allChannels: ChannelOption[] }) => {
-  const collectionValues = collection.allChannels.map((ch: ChannelOption) => ch.uniqueName);
+const isCollectionFullySelected = (collection: {
+  allChannels: ChannelOption[];
+}) => {
+  const collectionValues = collection.allChannels.map(
+    (ch: ChannelOption) => ch.uniqueName
+  );
   const currentSelected = props.selectedChannels || [];
-  return collectionValues.length > 0 && collectionValues.every((val: string) => currentSelected.includes(val));
+  return (
+    collectionValues.length > 0 &&
+    collectionValues.every((val: string) => currentSelected.includes(val))
+  );
 };
 
 // Get favorite channels
@@ -159,9 +185,14 @@ const favoriteChannels = computed(() => {
 
   // Filter by search if there's a search query
   if (searchInput.value) {
-    return mappedFavorites.filter((channel: ChannelOption) =>
-      channel.uniqueName.toLowerCase().includes(searchInput.value.toLowerCase()) ||
-      channel.displayName.toLowerCase().includes(searchInput.value.toLowerCase())
+    return mappedFavorites.filter(
+      (channel: ChannelOption) =>
+        channel.uniqueName
+          .toLowerCase()
+          .includes(searchInput.value.toLowerCase()) ||
+        channel.displayName
+          .toLowerCase()
+          .includes(searchInput.value.toLowerCase())
     );
   }
 
@@ -223,13 +254,17 @@ const updateSearchResult = (input: string) => {
 };
 
 const toggleSelectAllFavorites = () => {
-  const favoriteValues = favoriteChannels.value.map((ch: ChannelOption) => ch.uniqueName);
+  const favoriteValues = favoriteChannels.value.map(
+    (ch: ChannelOption) => ch.uniqueName
+  );
   // Use props.selectedChannels directly to avoid stale state issues
   const currentSelected = props.selectedChannels || [];
 
   // Check if we're currently in "all selected" state
   // We need to check this BEFORE any toggles happen
-  const shouldDeselect = favoriteValues.every((val: string) => currentSelected.includes(val));
+  const shouldDeselect = favoriteValues.every((val: string) =>
+    currentSelected.includes(val)
+  );
 
   if (shouldDeselect) {
     // Deselect all favorites (only toggle ones that are currently selected)
@@ -249,9 +284,14 @@ const toggleSelectAllFavorites = () => {
 };
 
 const areAllFavoritesSelected = computed(() => {
-  const favoriteValues = favoriteChannels.value.map((ch: ChannelOption) => ch.uniqueName);
+  const favoriteValues = favoriteChannels.value.map(
+    (ch: ChannelOption) => ch.uniqueName
+  );
   const currentSelected = props.selectedChannels || [];
-  return favoriteValues.length > 0 && favoriteValues.every((val: string) => currentSelected.includes(val));
+  return (
+    favoriteValues.length > 0 &&
+    favoriteValues.every((val: string) => currentSelected.includes(val))
+  );
 });
 </script>
 
@@ -288,10 +328,16 @@ const areAllFavoritesSelected = computed(() => {
         >
           Favorite Forums
         </h3>
-        <div v-if="!isAuthenticatedVar" class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">
+        <div
+          v-if="!isAuthenticatedVar"
+          class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400"
+        >
           Can't show favorite forums because you are not logged in.
         </div>
-        <div v-else-if="favoriteChannels.length === 0" class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">
+        <div
+          v-else-if="favoriteChannels.length === 0"
+          class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400"
+        >
           You have no favorite forums.
         </div>
         <template v-else>
@@ -300,7 +346,9 @@ const areAllFavoritesSelected = computed(() => {
             <div
               :class="[
                 'flex cursor-pointer items-center border-b px-4 py-2 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700',
-                areAllFavoritesSelected ? 'bg-orange-50 dark:bg-orange-900/20' : '',
+                areAllFavoritesSelected
+                  ? 'bg-orange-50 dark:bg-orange-900/20'
+                  : '',
               ]"
               @click="toggleSelectAllFavorites"
             >
@@ -311,16 +359,20 @@ const areAllFavoritesSelected = computed(() => {
                   :checked="areAllFavoritesSelected"
                   class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                   @click.stop="toggleSelectAllFavorites"
-                >
+                />
               </div>
 
               <!-- Label -->
-              <span class="flex-1 text-sm font-medium text-gray-900 dark:text-white">
+              <span
+                class="flex-1 text-sm font-medium text-gray-900 dark:text-white"
+              >
                 Select all favorite forums
               </span>
 
               <!-- Count badge -->
-              <span class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300">
+              <span
+                class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300"
+              >
                 {{ favoriteChannels.length }}
               </span>
             </div>
@@ -328,10 +380,19 @@ const areAllFavoritesSelected = computed(() => {
             <!-- Preview list of forums -->
             <div class="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
               <span v-if="favoriteChannels.length <= 3">
-                {{ favoriteChannels.map((ch: ChannelOption) => ch.uniqueName).join(', ') }}
+                {{
+                  favoriteChannels
+                    .map((ch: ChannelOption) => ch.uniqueName)
+                    .join(', ')
+                }}
               </span>
               <span v-else-if="!showAllFavorites">
-                {{ favoriteChannels.slice(0, 3).map((ch: ChannelOption) => ch.uniqueName).join(', ') }}
+                {{
+                  favoriteChannels
+                    .slice(0, 3)
+                    .map((ch: ChannelOption) => ch.uniqueName)
+                    .join(', ')
+                }}
                 <button
                   class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
                   @click.stop="showAllFavorites = true"
@@ -340,7 +401,11 @@ const areAllFavoritesSelected = computed(() => {
                 </button>
               </span>
               <span v-else>
-                {{ favoriteChannels.map((ch: ChannelOption) => ch.uniqueName).join(', ') }}
+                {{
+                  favoriteChannels
+                    .map((ch: ChannelOption) => ch.uniqueName)
+                    .join(', ')
+                }}
                 <button
                   class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
                   @click.stop="showAllFavorites = false"
@@ -363,15 +428,14 @@ const areAllFavoritesSelected = computed(() => {
         >
           Forum Lists From Your Collections
         </h3>
-        <div
-          v-for="collection in channelCollections"
-          :key="collection.id"
-        >
+        <div v-for="collection in channelCollections" :key="collection.id">
           <div
             v-if="collection.channels.length > 0"
             :class="[
               'flex cursor-pointer items-center border-b px-4 py-2 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700',
-              isCollectionFullySelected(collection) ? 'bg-orange-50 dark:bg-orange-900/20' : '',
+              isCollectionFullySelected(collection)
+                ? 'bg-orange-50 dark:bg-orange-900/20'
+                : '',
             ]"
             @click="toggleSelectAllCollection(collection)"
           >
@@ -382,25 +446,51 @@ const areAllFavoritesSelected = computed(() => {
                 :checked="isCollectionFullySelected(collection)"
                 class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                 @click.stop="toggleSelectAllCollection(collection)"
-              >
+              />
             </div>
 
             <!-- Label and forum list inline -->
             <div class="flex-1 text-sm">
-              <span class="font-medium text-gray-900 dark:text-white">{{ collection.name }}</span>
+              <span class="font-medium text-gray-900 dark:text-white">{{
+                collection.name
+              }}</span>
               <span class="ml-1 text-gray-500 dark:text-gray-400">
-                (<span v-if="collection.allChannels.length <= 3">{{ collection.allChannels.map((ch: ChannelOption) => ch.uniqueName).join(', ') }}</span><span v-else-if="!expandedCollections.has(collection.id)">{{ collection.allChannels.slice(0, 3).map((ch: ChannelOption) => ch.uniqueName).join(', ') }}<button
+                (<span v-if="collection.allChannels.length <= 3">{{
+                  collection.allChannels
+                    .map((ch: ChannelOption) => ch.uniqueName)
+                    .join(', ')
+                }}</span
+                ><span v-else-if="!expandedCollections.has(collection.id)"
+                  >{{
+                    collection.allChannels
+                      .slice(0, 3)
+                      .map((ch: ChannelOption) => ch.uniqueName)
+                      .join(', ')
+                  }}<button
                     class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
                     @click.stop="toggleCollectionExpansion(collection.id)"
-                  >show more</button></span><span v-else>{{ collection.allChannels.map((ch: ChannelOption) => ch.uniqueName).join(', ') }}<button
+                  >
+                    show more
+                  </button></span
+                ><span v-else
+                  >{{
+                    collection.allChannels
+                      .map((ch: ChannelOption) => ch.uniqueName)
+                      .join(', ')
+                  }}<button
                     class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
                     @click.stop="toggleCollectionExpansion(collection.id)"
-                  >show less</button></span>)
+                  >
+                    show less
+                  </button></span
+                >)
               </span>
             </div>
 
             <!-- Count badge -->
-            <span class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300">
+            <span
+              class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300"
+            >
               {{ collection.allChannels.length }}
             </span>
           </div>

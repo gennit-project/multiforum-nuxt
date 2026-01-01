@@ -456,10 +456,7 @@ export const CHECK_IMAGE_IN_COLLECTIONS = gql`
     users(where: { username: $username }) {
       username
       Collections(
-        where: {
-          collectionType: $collectionType
-          Images_SOME: { id: $itemId }
-        }
+        where: { collectionType: $collectionType, Images_SOME: { id: $itemId } }
       ) {
         id
         name

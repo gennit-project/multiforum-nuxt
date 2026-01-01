@@ -251,7 +251,7 @@ const handleClose = () => {
                 class="h-full min-h-[200px] overflow-auto rounded border border-red-300 bg-white p-3 dark:border-red-700 dark:bg-gray-800"
               >
                 <!-- eslint-disable-next-line vue/no-v-html -->
-                <div v-html="diffHtml.left"/>
+                <div v-html="diffHtml.left" />
               </div>
             </div>
 
@@ -268,7 +268,7 @@ const handleClose = () => {
                 class="h-full min-h-[200px] overflow-auto rounded border border-green-300 bg-white p-3 dark:border-green-700 dark:bg-gray-800"
               >
                 <!-- eslint-disable-next-line vue/no-v-html -->
-                <div v-html="diffHtml.right"/>
+                <div v-html="diffHtml.right" />
               </div>
             </div>
           </div>

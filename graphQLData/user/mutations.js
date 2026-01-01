@@ -77,15 +77,7 @@ export const ADD_FAVORITE_CHANNEL = gql`
       where: { username: $username }
       update: {
         FavoriteChannels: {
-          connect: [
-            {
-              where: {
-                node: {
-                  uniqueName: $channel
-                }
-              }
-            }
-          ]
+          connect: [{ where: { node: { uniqueName: $channel } } }]
         }
       }
     ) {
@@ -105,15 +97,7 @@ export const REMOVE_FAVORITE_CHANNEL = gql`
       where: { username: $username }
       update: {
         FavoriteChannels: {
-          disconnect: [
-            {
-              where: {
-                node: {
-                  uniqueName: $channel
-                }
-              }
-            }
-          ]
+          disconnect: [{ where: { node: { uniqueName: $channel } } }]
         }
       }
     ) {
@@ -133,15 +117,7 @@ export const ADD_FAVORITE_DISCUSSION = gql`
       where: { username: $username }
       update: {
         FavoriteDiscussions: {
-          connect: [
-            {
-              where: {
-                node: {
-                  id: $discussionId
-                }
-              }
-            }
-          ]
+          connect: [{ where: { node: { id: $discussionId } } }]
         }
       }
     ) {
@@ -162,15 +138,7 @@ export const REMOVE_FAVORITE_DISCUSSION = gql`
       where: { username: $username }
       update: {
         FavoriteDiscussions: {
-          disconnect: [
-            {
-              where: {
-                node: {
-                  id: $discussionId
-                }
-              }
-            }
-          ]
+          disconnect: [{ where: { node: { id: $discussionId } } }]
         }
       }
     ) {
@@ -190,17 +158,7 @@ export const ADD_FAVORITE_COMMENT = gql`
     updateUsers(
       where: { username: $username }
       update: {
-        FavoriteComments: {
-          connect: [
-            {
-              where: {
-                node: {
-                  id: $commentId
-                }
-              }
-            }
-          ]
-        }
+        FavoriteComments: { connect: [{ where: { node: { id: $commentId } } }] }
       }
     ) {
       users {
@@ -219,15 +177,7 @@ export const REMOVE_FAVORITE_COMMENT = gql`
       where: { username: $username }
       update: {
         FavoriteComments: {
-          disconnect: [
-            {
-              where: {
-                node: {
-                  id: $commentId
-                }
-              }
-            }
-          ]
+          disconnect: [{ where: { node: { id: $commentId } } }]
         }
       }
     ) {
@@ -246,17 +196,7 @@ export const ADD_FAVORITE_IMAGE = gql`
     updateUsers(
       where: { username: $username }
       update: {
-        FavoriteImages: {
-          connect: [
-            {
-              where: {
-                node: {
-                  id: $imageId
-                }
-              }
-            }
-          ]
-        }
+        FavoriteImages: { connect: [{ where: { node: { id: $imageId } } }] }
       }
     ) {
       users {
@@ -275,17 +215,7 @@ export const REMOVE_FAVORITE_IMAGE = gql`
     updateUsers(
       where: { username: $username }
       update: {
-        FavoriteImages: {
-          disconnect: [
-            {
-              where: {
-                node: {
-                  id: $imageId
-                }
-              }
-            }
-          ]
-        }
+        FavoriteImages: { disconnect: [{ where: { node: { id: $imageId } } }] }
       }
     ) {
       users {

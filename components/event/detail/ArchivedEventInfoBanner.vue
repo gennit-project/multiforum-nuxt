@@ -19,7 +19,8 @@ const { result: getEventIssueResult } = useQuery(GET_EVENT_ISSUE, {
 });
 
 const issueNumber = computed(() => {
-  return getEventIssueResult.value?.eventChannels[0]?.RelatedIssues[0]?.issueNumber;
+  return getEventIssueResult.value?.eventChannels[0]?.RelatedIssues[0]
+    ?.issueNumber;
 });
 
 const markdownLinkToIssue = computed(() => {

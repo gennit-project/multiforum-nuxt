@@ -25,8 +25,12 @@ const filterValues = ref(
   })
 );
 
-const searchInputComputed = computed(() => filterValues.value.searchInput || '');
-const selectedChannelsComputed = computed(() => filterValues.value.channels || []);
+const searchInputComputed = computed(
+  () => filterValues.value.searchInput || ''
+);
+const selectedChannelsComputed = computed(
+  () => filterValues.value.channels || []
+);
 
 const channelLabel = computed(() =>
   getChannelLabel(filterValues.value.channels || [])
@@ -123,13 +127,13 @@ watch(
   <NuxtLayout>
     <div class="mx-auto max-w-4xl px-4 py-6 text-gray-900 dark:text-gray-100">
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <h1 class="text-lg font-semibold">Wiki search</h1>
+        <h1 class="font-semibold text-lg">Wiki search</h1>
         <div class="text-sm text-gray-500 dark:text-gray-400">
           {{ aggregateWikiPageCount }} results
         </div>
       </div>
       <div class="mt-4 flex flex-wrap items-center gap-2">
-        <div class="flex-1 min-w-[220px]">
+        <div class="min-w-[220px] flex-1">
           <SearchBar
             :auto-focus="shouldAutoFocus"
             :initial-value="searchInputComputed"
@@ -160,11 +164,14 @@ watch(
       </div>
       <div
         v-else-if="wikiError"
-        class="mt-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200"
+        class="bg-red-50 mt-6 rounded-md border border-red-200 p-4 text-sm text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200"
       >
         {{ wikiError.message }}
       </div>
-      <div v-else-if="wikiPages.length === 0" class="mt-6 text-sm text-gray-500">
+      <div
+        v-else-if="wikiPages.length === 0"
+        class="mt-6 text-sm text-gray-500"
+      >
         No wiki pages match your search.
       </div>
       <ul
@@ -179,7 +186,7 @@ watch(
         >
           <div class="flex flex-wrap items-center justify-between gap-2">
             <nuxt-link
-              class="text-base font-semibold text-gray-900 hover:text-orange-600 dark:text-gray-100"
+              class="font-semibold text-base text-gray-900 hover:text-orange-600 dark:text-gray-100"
               :to="`/forums/${wikiPage.channelUniqueName}/wiki/${wikiPage.slug}`"
             >
               <HighlightedSearchTerms

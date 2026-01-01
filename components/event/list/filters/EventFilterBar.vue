@@ -324,7 +324,11 @@ const updateShowArchived = (event: Event) => {
     :class="[showMap ? 'w-full px-4' : 'mx-4']"
   >
     <div
-      v-if="allowHidingMainFilters && !hideFiltersButtonExternally && !showNewEventNextToSearchBar"
+      v-if="
+        allowHidingMainFilters &&
+        !hideFiltersButtonExternally &&
+        !showNewEventNextToSearchBar
+      "
       class="mb-2 flex justify-end"
     >
       <button
@@ -349,9 +353,13 @@ const updateShowArchived = (event: Event) => {
       </RequireAuth>
     </div>
     <hr
-      v-if="allowHidingMainFilters && !hideFiltersButtonExternally && !showNewEventNextToSearchBar"
+      v-if="
+        allowHidingMainFilters &&
+        !hideFiltersButtonExternally &&
+        !showNewEventNextToSearchBar
+      "
       class="mb-2 border border-t-gray-500 dark:border-t-gray-600"
-    >
+    />
     <div
       v-if="showMainFilters"
       class="flex flex-col gap-2 rounded-lg p-2 dark:bg-gray-800"
@@ -539,7 +547,10 @@ const updateShowArchived = (event: Event) => {
               />
             </template>
             <template #does-not-have-auth>
-              <PrimaryButton class="ml-2 whitespace-nowrap" :label="'New Event'" />
+              <PrimaryButton
+                class="ml-2 whitespace-nowrap"
+                :label="'New Event'"
+              />
             </template>
           </RequireAuth>
         </div>

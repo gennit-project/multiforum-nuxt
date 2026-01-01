@@ -21,7 +21,9 @@ export function safeArrayFirst<T>(
   array: T[] | undefined | null,
   fallback: T | null = null
 ): T | null {
-  return Array.isArray(array) && array.length > 0 ? array[0] || fallback : fallback;
+  return Array.isArray(array) && array.length > 0
+    ? array[0] || fallback
+    : fallback;
 }
 
 /**

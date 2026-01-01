@@ -5,10 +5,10 @@ services:
     image: neo4j:5.1.0
     container_name: database
     ports:
-      - "7474:7474"
-      - "7687:7687"
+      - '7474:7474'
+      - '7687:7687'
     environment:
-      - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/neo4j}  # Add default value
+      - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/neo4j} # Add default value
       - NEO4J_PLUGINS=["apoc"]
       - NEO4J_dbms_security_procedures_unrestricted=apoc.*
       - NEO4J_dbms_default__database=neo4j
@@ -23,7 +23,16 @@ services:
       - neo4j-import:/import
       - neo4j-plugins:/plugins
     healthcheck:
-      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "${NEO4J_PASSWORD:-neo4j}", "RETURN 1"]
+      test:
+        [
+          'CMD',
+          'cypher-shell',
+          '-u',
+          'neo4j',
+          '-p',
+          '${NEO4J_PASSWORD:-neo4j}',
+          'RETURN 1',
+        ]
       interval: 15s
       timeout: 10s
       retries: 10
@@ -34,7 +43,7 @@ services:
     image: cluse/multiforum-backend:latest
     container_name: multiforum-backend
     ports:
-      - "4000:4000"
+      - '4000:4000'
     depends_on:
       database:
         condition: service_healthy
@@ -52,7 +61,7 @@ services:
       - SERVER_CONFIG_NAME=${VITE_SERVER_NAME:-Gennit}
       - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4000"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:4000']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -65,7 +74,7 @@ services:
       dockerfile: Dockerfile
     container_name: multiforum-frontend
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       backend:
         condition: service_healthy
@@ -93,15 +102,15 @@ services:
       - VITE_OPEN_GRAPH_API_KEY=${VITE_OPEN_GRAPH_API_KEY}
       - VITE_SERVER_NAME=${VITE_SERVER_NAME:-Gennit}
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
+      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:3000']
       interval: 10s
       timeout: 5s
       retries: 3
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: '10m'
+        max-file: '3'
     networks:
       - multiforum-network
 

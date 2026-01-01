@@ -72,9 +72,10 @@
 }
 
 .animate-pulse {
-  background: linear-gradient(90deg, 
-    theme('colors.gray.200') 25%, 
-    theme('colors.gray.100') 37%, 
+  background: linear-gradient(
+    90deg,
+    theme('colors.gray.200') 25%,
+    theme('colors.gray.100') 37%,
     theme('colors.gray.200') 63%
   );
   background-size: 400px 100%;
@@ -82,9 +83,10 @@
 }
 
 .dark .animate-pulse {
-  background: linear-gradient(90deg, 
-    theme('colors.gray.600') 25%, 
-    theme('colors.gray.500') 37%, 
+  background: linear-gradient(
+    90deg,
+    theme('colors.gray.600') 25%,
+    theme('colors.gray.500') 37%,
     theme('colors.gray.600') 63%
   );
   background-size: 400px 100%;

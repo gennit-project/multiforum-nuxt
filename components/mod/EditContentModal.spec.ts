@@ -73,8 +73,7 @@ vi.mock('@/components/admin/SelectBrokenRules.vue', () => ({
     name: 'SelectBrokenRules',
     props: ['selectedForumRules', 'selectedServerRules'],
     emits: ['toggle-forum-rule', 'toggle-server-rule'],
-    template:
-      '<div class="select-broken-rules"><slot></slot></div>',
+    template: '<div class="select-broken-rules"><slot></slot></div>',
   },
 }));
 

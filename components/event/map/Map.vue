@@ -108,7 +108,6 @@ const clearMarkers = () => {
   };
 };
 
-
 const renderMap = async () => {
   await loader.load();
   clearMarkers();

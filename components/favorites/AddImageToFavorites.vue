@@ -95,7 +95,10 @@ const handleToggleFavorite = async () => {
     console.error('Error toggling favorite:', error);
     // Revert optimistic update on error
     isFavorited.value = !isFavorited.value;
-    toastStore.showToast('Error updating favorites. Please try again.', 'error');
+    toastStore.showToast(
+      'Error updating favorites. Please try again.',
+      'error'
+    );
   } finally {
     isLoading.value = false;
   }

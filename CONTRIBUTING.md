@@ -309,27 +309,22 @@ describe('Discussion CRUD operations', () => {
 ### Common Testing Pitfalls to Avoid
 
 1. **Flaky Tests**
-
    - ❌ Don't use arbitrary timeouts: `cy.wait(3000)`
    - ✅ Do wait for specific network requests or UI elements: `cy.wait('@graphqlRequest')`, `cy.get('.element').should('be.visible')`
 
 2. **Brittle Selectors**
-
    - ❌ Don't use CSS classes that might change: `cy.get('.button-primary')`
    - ✅ Do use data-testid attributes: `cy.get('[data-testid="save-button"]')`
 
 3. **Testing Implementation Details**
-
    - ❌ Don't test internal component state: `expect(wrapper.vm.internalValue).toBe(true)`
    - ✅ Do test observable behavior: `expect(wrapper.text()).toContain('Error message')`
 
 4. **Inefficient Test Setup**
-
    - ❌ Don't reset database for each test
    - ✅ Do use `setupTestData()` to initialize once per file
 
 5. **Missing Network Request Handling**
-
    - ❌ Don't assume requests complete instantly
    - ✅ Do intercept and wait for network requests to complete:
      ```typescript
@@ -339,12 +334,10 @@ describe('Discussion CRUD operations', () => {
      ```
 
 6. **Overly Coupled Tests**
-
    - ❌ Don't create tests that depend on each other's state
    - ✅ Do create independent test cases with clear setup/teardown
 
 7. **Testing Too Much in One Test**
-
    - ❌ Don't write lengthy tests covering multiple behaviors
    - ✅ Do create focused tests with clear assertions:
      ```typescript

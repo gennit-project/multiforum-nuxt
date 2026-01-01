@@ -88,7 +88,8 @@ const { result: eventResult } = useQuery(
 
 const initialTitle = computed(() => {
   if (props.targetType === 'comment') return '';
-  if (props.targetType === 'event') return eventResult.value?.events?.[0]?.title || '';
+  if (props.targetType === 'event')
+    return eventResult.value?.events?.[0]?.title || '';
   return discussionResult.value?.discussions?.[0]?.title || '';
 });
 
@@ -117,10 +118,7 @@ watch(
   }
 );
 
-const toggleSelection = (
-  target: 'forum' | 'server',
-  rule: string
-) => {
+const toggleSelection = (target: 'forum' | 'server', rule: string) => {
   const list =
     target === 'forum' ? selectedForumRules.value : selectedServerRules.value;
   const setter =
@@ -156,20 +154,16 @@ onUpdateCommentError((error) => {
   mutationError.value = error.message || 'Failed to save edits.';
 });
 
-const {
-  mutate: updateDiscussion,
-  loading: updateDiscussionLoading,
-} = useMutation(UPDATE_DISCUSSION);
+const { mutate: updateDiscussion, loading: updateDiscussionLoading } =
+  useMutation(UPDATE_DISCUSSION);
 
-const {
-  mutate: updateEvent,
-  loading: updateEventLoading,
-} = useMutation(UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS);
+const { mutate: updateEvent, loading: updateEventLoading } = useMutation(
+  UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS
+);
 
-const {
-  mutate: addFeedItem,
-  loading: addFeedItemLoading,
-} = useMutation(ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD);
+const { mutate: addFeedItem, loading: addFeedItemLoading } = useMutation(
+  ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD
+);
 
 const isLoading = computed(() => {
   return (
@@ -218,12 +212,17 @@ const saveEdits = async () => {
     mutationError.value = '';
     if (props.targetType === 'comment') {
       const result = await updateComment({
-        updateCommentInput: { text: bodyValue.value, editReason: editReason.value },
+        updateCommentInput: {
+          text: bodyValue.value,
+          editReason: editReason.value,
+        },
         commentWhere: { id: props.commentId },
         errorPolicy: 'all',
       });
       if (result?.errors?.length) {
-        mutationError.value = result.errors.map((error) => error.message).join(' ');
+        mutationError.value = result.errors
+          .map((error) => error.message)
+          .join(' ');
         return;
       }
     } else if (
@@ -240,7 +239,9 @@ const saveEdits = async () => {
         errorPolicy: 'all',
       });
       if (result?.errors?.length) {
-        mutationError.value = result.errors.map((error) => error.message).join(' ');
+        mutationError.value = result.errors
+          .map((error) => error.message)
+          .join(' ');
         return;
       }
     } else if (props.targetType === 'event') {
@@ -256,7 +257,9 @@ const saveEdits = async () => {
         errorPolicy: 'all',
       });
       if (result?.errors?.length) {
-        mutationError.value = result.errors.map((error) => error.message).join(' ');
+        mutationError.value = result.errors
+          .map((error) => error.message)
+          .join(' ');
         return;
       }
     }
@@ -288,7 +291,9 @@ const saveEdits = async () => {
     });
 
     if (feedResult?.errors?.length) {
-      mutationError.value = feedResult.errors.map((error) => error.message).join(' ');
+      mutationError.value = feedResult.errors
+        .map((error) => error.message)
+        .join(' ');
       return;
     }
 
@@ -327,19 +332,23 @@ defineExpose({
     <template #content>
       <div class="space-y-4">
         <div class="space-y-1">
-          <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
+          <p class="font-semibold text-sm text-gray-800 dark:text-gray-100">
             Select broken rules
           </p>
           <SelectBrokenRules
             :selected-forum-rules="selectedForumRules"
             :selected-server-rules="selectedServerRules"
-            @toggle-forum-rule-selection="(rule) => toggleSelection('forum', rule)"
-            @toggle-server-rule-selection="(rule) => toggleSelection('server', rule)"
+            @toggle-forum-rule-selection="
+              (rule) => toggleSelection('forum', rule)
+            "
+            @toggle-server-rule-selection="
+              (rule) => toggleSelection('server', rule)
+            "
           />
         </div>
 
         <div class="space-y-2">
-          <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
+          <p class="font-semibold text-sm text-gray-800 dark:text-gray-100">
             Edit reason
           </p>
           <TextEditor
@@ -352,7 +361,7 @@ defineExpose({
         </div>
 
         <div v-if="targetType !== 'comment'" class="space-y-2">
-          <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
+          <p class="font-semibold text-sm text-gray-800 dark:text-gray-100">
             Title
           </p>
           <TextEditor
@@ -365,7 +374,7 @@ defineExpose({
         </div>
 
         <div class="space-y-2">
-          <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
+          <p class="font-semibold text-sm text-gray-800 dark:text-gray-100">
             {{ targetType === 'event' ? 'Description' : 'Body' }}
           </p>
           <TextEditor
@@ -391,7 +400,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-gray-500"
+            class="font-semibold flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-gray-500"
             :disabled="isLoading"
             @click="saveEdits"
           >

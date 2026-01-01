@@ -282,7 +282,7 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="flex fixed left-0 top-0 z-50 h-full w-full bg-black transition-all duration-300 ease-in-out"
+    class="fixed left-0 top-0 z-50 flex h-full w-full bg-black transition-all duration-300 ease-in-out"
     :class="{
       'flex-col': panelOnSide && isPanelVisible,
       'flex-row': !panelOnSide && isPanelVisible,
@@ -293,7 +293,8 @@ onUnmounted(() => {
       class="relative z-40 flex flex-col overflow-hidden transition-all duration-300 ease-in-out"
       :class="{
         'h-full w-3/4': !panelOnSide && isPanelVisible,
-        'h-full w-full': (!panelOnSide && !isPanelVisible) || (panelOnSide && !isPanelVisible),
+        'h-full w-full':
+          (!panelOnSide && !isPanelVisible) || (panelOnSide && !isPanelVisible),
         'w-full flex-1': panelOnSide && isPanelVisible,
       }"
     >

@@ -59,7 +59,7 @@ const emit = defineEmits<{
       @handle-click-give-feedback="emit('handleClickGiveFeedback')"
       @handle-click-undo-feedback="emit('handleClickUndoFeedback')"
     />
-    
+
     <!-- Regular discussion mode layout -->
     <RegularDiscussionLayout
       v-else

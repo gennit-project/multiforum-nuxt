@@ -83,7 +83,9 @@ const validationErrorMessage = computed(() => {
   return '';
 });
 
-const usernameIsInvalid = computed(() => !isValidUsername(newUsername.value || ''));
+const usernameIsInvalid = computed(
+  () => !isValidUsername(newUsername.value || '')
+);
 
 // Age validation logic
 const calculateAge = (birthDate: string): number => {
@@ -217,7 +219,7 @@ const canSave = computed(() => {
           ]"
           class="block w-full flex-1 rounded border-gray-300 pb-2.5 pt-2.5 dark:bg-gray-800 sm:text-sm"
           @update:model-value="updateUsername"
-        >
+        />
         <div
           v-if="usernameIsTaken || usernameIsInvalid"
           class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"

@@ -516,7 +516,7 @@ const handleEditAlbum = () => {
                             />
                             <button
                               type="submit"
-                              class="font-semibold dark:disabled:bg-orange-950 flex items-center justify-center rounded-md bg-orange-400 px-4 py-2 text-sm text-black hover:bg-orange-500 focus:outline-none focus:ring-0 focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-orange-200 dark:disabled:text-orange-400"
+                              class="font-semibold flex items-center justify-center rounded-md bg-orange-400 px-4 py-2 text-sm text-black hover:bg-orange-500 focus:outline-none focus:ring-0 focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-orange-200 dark:disabled:bg-orange-950 dark:disabled:text-orange-400"
                               :disabled="
                                 createCommentLoading ||
                                 !createFormValues.text.length ||
@@ -551,7 +551,7 @@ const handleEditAlbum = () => {
                             />
                             <button
                               type="button"
-                              class="font-semibold dark:bg-orange-950 rounded-md bg-orange-200 px-4 py-2 text-sm text-black dark:text-orange-400"
+                              class="font-semibold rounded-md bg-orange-200 px-4 py-2 text-sm text-black dark:bg-orange-950 dark:text-orange-400"
                               disabled
                             >
                               Post

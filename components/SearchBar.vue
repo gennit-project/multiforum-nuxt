@@ -126,15 +126,18 @@ defineExpose({ focus, getValue });
         type="text"
         @input="updateSearchInput"
         @keydown.enter.prevent="submit"
-      >
+      />
       <button
         v-if="initialValue"
         type="button"
         aria-label="Clear search"
-        class="absolute inset-y-0 right-12 z-10 flex cursor-pointer items-center border-none bg-transparent"
+        class="bg-transparent absolute inset-y-0 right-12 z-10 flex cursor-pointer items-center border-none"
         @click="clear"
       >
-        <i class="fa-solid fa-xmark h-4 w-4 text-gray-400 dark:text-gray-300" aria-hidden="true" />
+        <i
+          class="fa-solid fa-xmark h-4 w-4 text-gray-400 dark:text-gray-300"
+          aria-hidden="true"
+        />
       </button>
       <slot />
       <label for="search" class="sr-only">Search</label>

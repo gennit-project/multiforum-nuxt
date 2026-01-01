@@ -138,11 +138,15 @@ const toggleSelection = (value: any) => {
 
 const toggleSelectAll = (sectionOptions: MultiSelectOption[]) => {
   const sectionValues = sectionOptions.map((opt) => opt.value);
-  const allSelected = sectionValues.every((val) => selected.value.includes(val));
+  const allSelected = sectionValues.every((val) =>
+    selected.value.includes(val)
+  );
 
   if (allSelected) {
     // Deselect all items from this section
-    selected.value = selected.value.filter((val) => !sectionValues.includes(val));
+    selected.value = selected.value.filter(
+      (val) => !sectionValues.includes(val)
+    );
   } else {
     // Select all items from this section (deduplicate)
     const newSelections = [...new Set([...selected.value, ...sectionValues])];
@@ -153,7 +157,10 @@ const toggleSelectAll = (sectionOptions: MultiSelectOption[]) => {
 
 const isSectionFullySelected = (sectionOptions: MultiSelectOption[]) => {
   const sectionValues = sectionOptions.map((opt) => opt.value);
-  return sectionValues.length > 0 && sectionValues.every((val) => selected.value.includes(val));
+  return (
+    sectionValues.length > 0 &&
+    sectionValues.every((val) => selected.value.includes(val))
+  );
 };
 
 // For collection sections: toggle all channels in a collection
@@ -172,7 +179,9 @@ const toggleCollectionChannels = (channels: string[]) => {
 };
 
 const isCollectionFullySelected = (channels: string[]) => {
-  return channels.length > 0 && channels.every((ch) => selected.value.includes(ch));
+  return (
+    channels.length > 0 && channels.every((ch) => selected.value.includes(ch))
+  );
 };
 
 const toggleCollectionExpansion = (collectionId: string) => {
@@ -296,7 +305,9 @@ const selectedOptions = computed(() => {
         :data-testid="testId"
         :class="[
           'flex w-full cursor-pointer rounded-lg border px-4 text-left dark:border-gray-700 dark:bg-gray-700',
-          showChips ? 'min-h-10 flex-wrap items-center' : 'min-h-12 items-start py-2',
+          showChips
+            ? 'min-h-10 flex-wrap items-center'
+            : 'min-h-12 items-start py-2',
         ]"
         @click="toggleDropdown"
       >
@@ -331,7 +342,7 @@ const selectedOptions = computed(() => {
             :src="selectedOptions[0]?.avatar"
             :alt="selectedOptions[0]?.label"
             class="mr-2 h-6 w-6 flex-shrink-0 rounded-full"
-          >
+          />
           <i
             v-else-if="selectedOptions.length === 1 && selectedOptions[0]?.icon"
             :class="[selectedOptions[0]?.icon, 'mr-2 flex-shrink-0']"
@@ -405,7 +416,7 @@ const selectedOptions = computed(() => {
             @click.stop
             @focus.stop
             @blur.stop
-          >
+          />
         </div>
 
         <!-- Loading state -->
@@ -418,9 +429,14 @@ const selectedOptions = computed(() => {
 
         <!-- Sections view -->
         <div v-else-if="props.sections.length > 0">
-          <div v-for="(section, sectionIndex) in filteredSections" :key="sectionIndex">
+          <div
+            v-for="(section, sectionIndex) in filteredSections"
+            :key="sectionIndex"
+          >
             <!-- Section title -->
-            <div class="bg-gray-50 px-4 py-2 text-xs font-semibold uppercase text-gray-600 dark:bg-gray-900 dark:text-gray-400">
+            <div
+              class="bg-gray-50 font-semibold px-4 py-2 text-xs uppercase text-gray-600 dark:bg-gray-900 dark:text-gray-400"
+            >
               {{ section.title }}
             </div>
 
@@ -442,16 +458,20 @@ const selectedOptions = computed(() => {
                     :checked="isSectionFullySelected(section.options)"
                     class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                     @click.stop="toggleSelectAll(section.options)"
-                  >
+                  />
                 </div>
 
                 <!-- Label -->
-                <span class="flex-1 text-sm font-medium text-gray-900 dark:text-white">
+                <span
+                  class="flex-1 text-sm font-medium text-gray-900 dark:text-white"
+                >
                   {{ section.selectAllLabel }}
                 </span>
 
                 <!-- Count badge -->
-                <span class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300">
+                <span
+                  class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300"
+                >
                   {{ section.options.length }}
                 </span>
               </div>
@@ -459,10 +479,15 @@ const selectedOptions = computed(() => {
               <!-- Preview list of forums -->
               <div class="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
                 <span v-if="section.options.length <= 3">
-                  {{ section.options.map(opt => opt.value).join(', ') }}
+                  {{ section.options.map((opt) => opt.value).join(', ') }}
                 </span>
                 <span v-else-if="!expandedSections.has(sectionIndex)">
-                  {{ section.options.slice(0, 3).map(opt => opt.value).join(', ') }}
+                  {{
+                    section.options
+                      .slice(0, 3)
+                      .map((opt) => opt.value)
+                      .join(', ')
+                  }}
                   <button
                     type="button"
                     class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
@@ -472,7 +497,7 @@ const selectedOptions = computed(() => {
                   </button>
                 </span>
                 <span v-else>
-                  {{ section.options.map(opt => opt.value).join(', ') }}
+                  {{ section.options.map((opt) => opt.value).join(', ') }}
                   <button
                     type="button"
                     class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
@@ -485,53 +510,111 @@ const selectedOptions = computed(() => {
             </div>
 
             <!-- Collection section (renders each collection as a row with inline channel list) -->
-            <div v-if="section.isCollectionSection && section.options.length > 0">
+            <div
+              v-if="section.isCollectionSection && section.options.length > 0"
+            >
               <div
                 v-for="collectionOption in section.options"
                 :key="String(collectionOption.value)"
                 :class="[
                   'flex cursor-pointer items-center border-b px-4 py-2 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700',
-                  isCollectionFullySelected((collectionOption as any).channels || [])
+                  isCollectionFullySelected(
+                    (collectionOption as any).channels || []
+                  )
                     ? 'bg-orange-50 dark:bg-orange-900/20'
                     : '',
                 ]"
-                @click="toggleCollectionChannels((collectionOption as any).channels || [])"
+                @click="
+                  toggleCollectionChannels(
+                    (collectionOption as any).channels || []
+                  )
+                "
               >
                 <!-- Checkbox -->
                 <div class="relative mr-3">
                   <input
                     type="checkbox"
-                    :checked="isCollectionFullySelected((collectionOption as any).channels || [])"
+                    :checked="
+                      isCollectionFullySelected(
+                        (collectionOption as any).channels || []
+                      )
+                    "
                     class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
-                    @click.stop="toggleCollectionChannels((collectionOption as any).channels || [])"
-                  >
+                    @click.stop="
+                      toggleCollectionChannels(
+                        (collectionOption as any).channels || []
+                      )
+                    "
+                  />
                 </div>
 
                 <!-- Collection name and channel preview -->
                 <div class="flex-1 text-sm">
-                  <span class="font-medium text-gray-900 dark:text-white">{{ collectionOption.label }}</span>
+                  <span class="font-medium text-gray-900 dark:text-white">{{
+                    collectionOption.label
+                  }}</span>
                   <span class="ml-1 text-gray-500 dark:text-gray-400">
-                    (<span v-if="((collectionOption as any).channels || []).length <= 3">{{ ((collectionOption as any).channels || []).join(', ') }}</span><span v-else-if="!expandedCollections.has(String(collectionOption.value))">{{ ((collectionOption as any).channels || []).slice(0, 3).join(', ') }}<button
+                    (<span
+                      v-if="
+                        ((collectionOption as any).channels || []).length <= 3
+                      "
+                      >{{
+                        ((collectionOption as any).channels || []).join(', ')
+                      }}</span
+                    ><span
+                      v-else-if="
+                        !expandedCollections.has(String(collectionOption.value))
+                      "
+                      >{{
+                        ((collectionOption as any).channels || [])
+                          .slice(0, 3)
+                          .join(', ')
+                      }}<button
                         type="button"
                         class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-                        @click.stop="toggleCollectionExpansion(String(collectionOption.value))"
-                      >show more</button></span><span v-else>{{ ((collectionOption as any).channels || []).join(', ') }}<button
+                        @click.stop="
+                          toggleCollectionExpansion(
+                            String(collectionOption.value)
+                          )
+                        "
+                      >
+                        show more
+                      </button></span
+                    ><span v-else
+                      >{{ ((collectionOption as any).channels || []).join(', ')
+                      }}<button
                         type="button"
                         class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-                        @click.stop="toggleCollectionExpansion(String(collectionOption.value))"
-                      >show less</button></span>)
+                        @click.stop="
+                          toggleCollectionExpansion(
+                            String(collectionOption.value)
+                          )
+                        "
+                      >
+                        show less
+                      </button></span
+                    >)
                   </span>
                 </div>
 
                 <!-- Count badge -->
-                <span class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300">
+                <span
+                  class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300"
+                >
                   {{ ((collectionOption as any).channels || []).length }}
                 </span>
               </div>
             </div>
 
             <!-- Section options (regular items, not for collections or selectAll sections) -->
-            <div v-if="section.options.length > 0 && !section.selectAllLabel && !section.isCollectionSection" class="py-1">
+            <div
+              v-if="
+                section.options.length > 0 &&
+                !section.selectAllLabel &&
+                !section.isCollectionSection
+              "
+              class="py-1"
+            >
               <div
                 v-for="option in section.options"
                 :key="String(option.value)"
@@ -553,7 +636,7 @@ const selectedOptions = computed(() => {
                     :disabled="option.disabled"
                     class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                     @click.stop
-                  >
+                  />
                 </div>
 
                 <!-- Compact label: uniqueName (displayName) -->
@@ -580,7 +663,11 @@ const selectedOptions = computed(() => {
 
             <!-- Empty section message (only shown when section has no options and no selectAllLabel) -->
             <div
-              v-if="section.options.length === 0 && !section.selectAllLabel && !section.isCollectionSection"
+              v-if="
+                section.options.length === 0 &&
+                !section.selectAllLabel &&
+                !section.isCollectionSection
+              "
               class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"
             >
               {{ section.emptyMessage || 'No items' }}
@@ -611,7 +698,7 @@ const selectedOptions = computed(() => {
                 :disabled="option.disabled"
                 class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                 @click.stop
-              >
+              />
             </div>
 
             <!-- Avatar -->
@@ -620,10 +707,14 @@ const selectedOptions = computed(() => {
               :src="option.avatar"
               :alt="option.label"
               class="mr-3 h-6 w-6 rounded-full"
-            >
+            />
 
             <!-- Icon -->
-            <i v-else-if="option.icon" :class="[option.icon, 'mr-3']" aria-hidden="true" />
+            <i
+              v-else-if="option.icon"
+              :class="[option.icon, 'mr-3']"
+              aria-hidden="true"
+            />
 
             <!-- Label -->
             <span class="flex-1 text-sm text-gray-900 dark:text-white">

@@ -129,16 +129,8 @@ const isDownloadDetailPage = computed(() => {
     >
       <div v-if="getDiscussionLoading" class="flex-1">
         <div class="flex flex-col gap-2 px-1">
-          <v-skeleton-loader
-            class="w-3/4"
-            type="text"
-            :theme="theme"
-          />
-          <v-skeleton-loader
-            class="w-1/3"
-            type="text"
-            :theme="theme"
-          />
+          <v-skeleton-loader class="w-3/4" type="text" :theme="theme" />
+          <v-skeleton-loader class="w-1/3" type="text" :theme="theme" />
         </div>
       </div>
       <!-- Primary button skeleton -->

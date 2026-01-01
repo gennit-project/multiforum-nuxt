@@ -257,14 +257,14 @@ function handleCheckboxUpdate(
                 <template #content>
                   <div class="text-sm text-gray-700 dark:text-gray-300">
                     <span v-if="userEmail">{{ userEmail }}</span>
-                    <span v-else class="text-gray-500 dark:text-gray-400 italic"
+                    <span v-else class="italic text-gray-500 dark:text-gray-400"
                       >No email address associated</span
                     >
                   </div>
                 </template>
               </FormRow>
 
-              <h2 class="font-semibold mb-4 text-xl pt-6">Preferences</h2>
+              <h2 class="font-semibold mb-4 pt-6 text-xl">Preferences</h2>
 
               <!-- Email Notification Preferences -->
               <FormRow section-title="Email Notifications">

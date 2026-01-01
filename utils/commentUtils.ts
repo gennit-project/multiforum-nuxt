@@ -40,7 +40,8 @@ export const getCommentPermalink = (comment: any) => {
       },
     };
   } else if (comment.Event) {
-    const channelUniqueName = comment.Event.EventChannels?.[0]?.channelUniqueName;
+    const channelUniqueName =
+      comment.Event.EventChannels?.[0]?.channelUniqueName;
     return getPermalinkToEventComment({
       forumId: channelUniqueName || '',
       eventId: comment.Event.id,
@@ -81,7 +82,8 @@ export const getCommentContextPermalink = (comment: any) => {
       },
     };
   } else if (comment.Event) {
-    const channelUniqueName = comment.Event.EventChannels?.[0]?.channelUniqueName;
+    const channelUniqueName =
+      comment.Event.EventChannels?.[0]?.channelUniqueName;
     return getPermalinkToEvent({
       forumId: channelUniqueName || '',
       eventId: comment.Event.id,
@@ -109,7 +111,9 @@ export const getCommentContextTitle = (comment: any): string => {
  */
 export const getCommentContextType = (comment: any): string => {
   if (comment.DiscussionChannel) {
-    return comment.DiscussionChannel.Discussion?.hasDownload ? 'Download' : 'Discussion';
+    return comment.DiscussionChannel.Discussion?.hasDownload
+      ? 'Download'
+      : 'Discussion';
   } else if (comment.Channel) {
     return 'Forum';
   } else if (comment.Event) {

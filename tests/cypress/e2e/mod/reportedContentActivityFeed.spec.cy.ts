@@ -34,27 +34,32 @@ const loginAsMod = () => {
   cy.loginAsAdminWithUISync();
 };
 
-const graphqlAsCurrentUser = (query: string, variables: Record<string, any>) => {
+const graphqlAsCurrentUser = (
+  query: string,
+  variables: Record<string, any>
+) => {
   return cy.window().then((win) => {
     const token = win.localStorage.getItem('token');
-    return cy.request({
-      method: 'POST',
-      url: GRAPHQL_URL,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'content-type': 'application/json',
-      },
-      body: {
-        query,
-        variables,
-      },
-      failOnStatusCode: false,
-    }).then((response) => {
-      expect(response.status).to.eq(200);
-      expect(response.body.errors, JSON.stringify(response.body.errors)).to.not
-        .exist;
-      return response;
-    });
+    return cy
+      .request({
+        method: 'POST',
+        url: GRAPHQL_URL,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'content-type': 'application/json',
+        },
+        body: {
+          query,
+          variables,
+        },
+        failOnStatusCode: false,
+      })
+      .then((response) => {
+        expect(response.status).to.eq(200);
+        expect(response.body.errors, JSON.stringify(response.body.errors)).to
+          .not.exist;
+        return response;
+      });
   });
 };
 
@@ -378,7 +383,8 @@ describe('Reported content activity feed updates', () => {
     expectedUser?: string | null;
     expectedMod?: string | null;
   }) => {
-    const { activityFeed, actionDescription, expectedUser, expectedMod } = input;
+    const { activityFeed, actionDescription, expectedUser, expectedMod } =
+      input;
     const deleteItems = activityFeed.filter(
       (item: any) => item.actionDescription === actionDescription
     );
@@ -424,7 +430,9 @@ describe('Reported content activity feed updates', () => {
           channelConnections: [DISCUSSION_CHANNEL],
         },
       ],
-    }).then((response) => response.body.data.createDiscussionWithChannelConnections[0]);
+    }).then(
+      (response) => response.body.data.createDiscussionWithChannelConnections[0]
+    );
   };
 
   const createEventAsOp = (title: string, description: string) => {
@@ -457,7 +465,9 @@ describe('Reported content activity feed updates', () => {
           channelConnections: [EVENT_CHANNEL],
         },
       ],
-    }).then((response) => response.body.data.createEventWithChannelConnections[0]);
+    }).then(
+      (response) => response.body.data.createEventWithChannelConnections[0]
+    );
   };
 
   const createCommentAsOp = (
@@ -555,9 +565,12 @@ describe('Reported content activity feed updates', () => {
             channelUniqueName: DISCUSSION_CHANNEL,
           }).then((response) => {
             const issue = response.body.data.issues[0];
-            expect(issue.ActivityFeed.some((item: any) =>
-              item.actionDescription === 'edited the discussion'
-            )).to.eq(true);
+            expect(
+              issue.ActivityFeed.some(
+                (item: any) =>
+                  item.actionDescription === 'edited the discussion'
+              )
+            ).to.eq(true);
           });
         });
 
@@ -571,9 +584,13 @@ describe('Reported content activity feed updates', () => {
             const issue = response.body.data.issues[0];
             expect(issue.isOpen).to.eq(false);
             expectCloseReasonActivity(issue.ActivityFeed);
-            expect(issue.ActivityFeed.some((item: any) =>
-              item.actionDescription === `deleted the discussion by ${OP_LABEL}`
-            )).to.eq(true);
+            expect(
+              issue.ActivityFeed.some(
+                (item: any) =>
+                  item.actionDescription ===
+                  `deleted the discussion by ${OP_LABEL}`
+              )
+            ).to.eq(true);
             expectDeleteActivity({
               activityFeed: issue.ActivityFeed,
               actionDescription: `deleted the discussion by ${OP_LABEL}`,
@@ -606,9 +623,12 @@ describe('Reported content activity feed updates', () => {
             channelUniqueName: DISCUSSION_CHANNEL,
           }).then((response) => {
             const issueData = response.body.data.issues[0];
-            expect(issueData.ActivityFeed.some((item: any) =>
-              item.actionDescription === 'edited the discussion'
-            )).to.eq(true);
+            expect(
+              issueData.ActivityFeed.some(
+                (item: any) =>
+                  item.actionDescription === 'edited the discussion'
+              )
+            ).to.eq(true);
           });
         });
 
@@ -637,7 +657,9 @@ describe('Reported content activity feed updates', () => {
               );
               expect(deleteItems.length).to.eq(1);
               expect(
-                deleteItems.some((item: any) => item.Comment?.text === deleteReasonText)
+                deleteItems.some(
+                  (item: any) => item.Comment?.text === deleteReasonText
+                )
               ).to.eq(true);
               expectDeleteActivity({
                 activityFeed: issueData.ActivityFeed,
@@ -684,9 +706,12 @@ describe('Reported content activity feed updates', () => {
                 channelUniqueName: DISCUSSION_CHANNEL,
               }).then((issueResponse) => {
                 const issue = issueResponse.body.data.issues[0];
-                expect(issue.ActivityFeed.some((item: any) =>
-                  item.actionDescription === 'edited the comment'
-                )).to.eq(true);
+                expect(
+                  issue.ActivityFeed.some(
+                    (item: any) =>
+                      item.actionDescription === 'edited the comment'
+                  )
+                ).to.eq(true);
               });
             });
 
@@ -700,9 +725,13 @@ describe('Reported content activity feed updates', () => {
                 const issue = issueResponse.body.data.issues[0];
                 expect(issue.isOpen).to.eq(false);
                 expectCloseReasonActivity(issue.ActivityFeed);
-                expect(issue.ActivityFeed.some((item: any) =>
-                  item.actionDescription === `deleted the comment by ${OP_LABEL}`
-                )).to.eq(true);
+                expect(
+                  issue.ActivityFeed.some(
+                    (item: any) =>
+                      item.actionDescription ===
+                      `deleted the comment by ${OP_LABEL}`
+                  )
+                ).to.eq(true);
                 expectDeleteActivity({
                   activityFeed: issue.ActivityFeed,
                   actionDescription: `deleted the comment by ${OP_LABEL}`,
@@ -747,9 +776,12 @@ describe('Reported content activity feed updates', () => {
                 channelUniqueName: DISCUSSION_CHANNEL,
               }).then((issueResponse) => {
                 const issueData = issueResponse.body.data.issues[0];
-                expect(issueData.ActivityFeed.some((item: any) =>
-                  item.actionDescription === 'edited the comment'
-                )).to.eq(true);
+                expect(
+                  issueData.ActivityFeed.some(
+                    (item: any) =>
+                      item.actionDescription === 'edited the comment'
+                  )
+                ).to.eq(true);
               });
             });
 
@@ -778,7 +810,9 @@ describe('Reported content activity feed updates', () => {
                   );
                   expect(deleteItems.length).to.eq(1);
                   expect(
-                    deleteItems.some((item: any) => item.Comment?.text === deleteReasonText)
+                    deleteItems.some(
+                      (item: any) => item.Comment?.text === deleteReasonText
+                    )
                   ).to.eq(true);
                   expectDeleteActivity({
                     activityFeed: issueData.ActivityFeed,
@@ -815,9 +849,11 @@ describe('Reported content activity feed updates', () => {
               channelUniqueName: EVENT_CHANNEL,
             }).then((issueResponse) => {
               const issue = issueResponse.body.data.issues[0];
-              expect(issue.ActivityFeed.some((item: any) =>
-                item.actionDescription === 'edited the event'
-              )).to.eq(true);
+              expect(
+                issue.ActivityFeed.some(
+                  (item: any) => item.actionDescription === 'edited the event'
+                )
+              ).to.eq(true);
             });
           });
 
@@ -831,9 +867,13 @@ describe('Reported content activity feed updates', () => {
               const issue = issueResponse.body.data.issues[0];
               expect(issue.isOpen).to.eq(false);
               expectCloseReasonActivity(issue.ActivityFeed);
-              expect(issue.ActivityFeed.some((item: any) =>
-                item.actionDescription === `deleted the event by ${OP_LABEL}`
-              )).to.eq(true);
+              expect(
+                issue.ActivityFeed.some(
+                  (item: any) =>
+                    item.actionDescription ===
+                    `deleted the event by ${OP_LABEL}`
+                )
+              ).to.eq(true);
               expectDeleteActivity({
                 activityFeed: issue.ActivityFeed,
                 actionDescription: `deleted the event by ${OP_LABEL}`,
@@ -865,9 +905,11 @@ describe('Reported content activity feed updates', () => {
               channelUniqueName: EVENT_CHANNEL,
             }).then((issueResponse) => {
               const issueData = issueResponse.body.data.issues[0];
-              expect(issueData.ActivityFeed.some((item: any) =>
-                item.actionDescription === 'edited the event'
-              )).to.eq(true);
+              expect(
+                issueData.ActivityFeed.some(
+                  (item: any) => item.actionDescription === 'edited the event'
+                )
+              ).to.eq(true);
             });
           });
 
@@ -882,32 +924,34 @@ describe('Reported content activity feed updates', () => {
             graphqlAsCurrentUser(DELETE_EVENT, {
               id: eventId,
             }).then(() => {
-                graphqlAsCurrentUser(GET_ISSUE_FOR_EVENT, {
-                  eventId,
-                  channelUniqueName: EVENT_CHANNEL,
-                }).then((issueResponse) => {
-                  const issueData = issueResponse.body.data.issues[0];
-                  expect(issueData.isOpen).to.eq(false);
-                  expectCloseReasonActivity(issueData.ActivityFeed);
-                  const deleteItems = issueData.ActivityFeed.filter(
-                    (item: any) =>
-                      item.actionDescription ===
-                      `deleted the event by ${OP_LABEL}`
-                  );
-                  expect(deleteItems.length).to.eq(1);
-                  expect(
-                    deleteItems.some((item: any) => item.Comment?.text === deleteReasonText)
-                  ).to.eq(true);
-                  expectDeleteActivity({
-                    activityFeed: issueData.ActivityFeed,
-                    actionDescription: `deleted the event by ${OP_LABEL}`,
-                    expectedUser: null,
-                    expectedMod: MOD_USERNAME,
-                  });
+              graphqlAsCurrentUser(GET_ISSUE_FOR_EVENT, {
+                eventId,
+                channelUniqueName: EVENT_CHANNEL,
+              }).then((issueResponse) => {
+                const issueData = issueResponse.body.data.issues[0];
+                expect(issueData.isOpen).to.eq(false);
+                expectCloseReasonActivity(issueData.ActivityFeed);
+                const deleteItems = issueData.ActivityFeed.filter(
+                  (item: any) =>
+                    item.actionDescription ===
+                    `deleted the event by ${OP_LABEL}`
+                );
+                expect(deleteItems.length).to.eq(1);
+                expect(
+                  deleteItems.some(
+                    (item: any) => item.Comment?.text === deleteReasonText
+                  )
+                ).to.eq(true);
+                expectDeleteActivity({
+                  activityFeed: issueData.ActivityFeed,
+                  actionDescription: `deleted the event by ${OP_LABEL}`,
+                  expectedUser: null,
+                  expectedMod: MOD_USERNAME,
                 });
               });
             });
           });
+        });
       }
     );
   });
@@ -915,40 +959,43 @@ describe('Reported content activity feed updates', () => {
   it('requires a delete reason for non-OP via the issue page UI', () => {
     loginAsOp();
 
-    createDiscussionAsOp(`OP delete UI ${Date.now()}`, 'OP discussion body').then(
-      (discussion) => {
-        const discussionId = discussion.id;
+    createDiscussionAsOp(
+      `OP delete UI ${Date.now()}`,
+      'OP discussion body'
+    ).then((discussion) => {
+      const discussionId = discussion.id;
+
+      loginAsMod();
+      reportDiscussionAsMod(discussionId).then((issue) => {
+        const issueNumber = issue.issueNumber;
 
         loginAsMod();
-        reportDiscussionAsMod(discussionId).then((issue) => {
-          const issueNumber = issue.issueNumber;
+        cy.visit(
+          `${BASE_URL}/forums/${DISCUSSION_CHANNEL}/issues/${issueNumber}`
+        );
 
-          loginAsMod();
-          cy.visit(`${BASE_URL}/forums/${DISCUSSION_CHANNEL}/issues/${issueNumber}`);
+        cy.contains('Delete Discussion').should('be.visible').click();
+        cy.get('button').contains('Delete').click();
 
-          cy.contains('Delete Discussion').should('be.visible').click();
-          cy.get('button').contains('Delete').click();
+        cy.contains(ISSUE_PAGE_REASON_ERROR).should('be.visible');
+        cy.get('button').contains('Delete').click();
+        cy.contains(ISSUE_PAGE_REASON_ERROR).should('be.visible');
 
-          cy.contains(ISSUE_PAGE_REASON_ERROR).should('be.visible');
-          cy.get('button').contains('Delete').click();
-          cy.contains(ISSUE_PAGE_REASON_ERROR).should('be.visible');
+        cy.get("textarea[data-testid='texteditor-textarea']")
+          .first()
+          .type(deleteReasonText);
 
-          cy.get("textarea[data-testid='texteditor-textarea']")
-            .first()
-            .type(deleteReasonText);
+        cy.contains('Delete Discussion').should('be.visible').click();
+        cy.get('button').contains('Delete').click();
 
-          cy.contains('Delete Discussion').should('be.visible').click();
-          cy.get('button').contains('Delete').click();
-
-          graphqlAsCurrentUser(GET_ISSUE_BY_NUMBER, {
-            channelUniqueName: DISCUSSION_CHANNEL,
-            issueNumber,
-          }).then((response) => {
-            const issueData = response.body.data.issues[0];
-            expect(issueData.isOpen).to.eq(false);
-          });
+        graphqlAsCurrentUser(GET_ISSUE_BY_NUMBER, {
+          channelUniqueName: DISCUSSION_CHANNEL,
+          issueNumber,
+        }).then((response) => {
+          const issueData = response.body.data.issues[0];
+          expect(issueData.isOpen).to.eq(false);
         });
-      }
-    );
+      });
+    });
   });
 });

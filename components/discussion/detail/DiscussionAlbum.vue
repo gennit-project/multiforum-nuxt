@@ -316,7 +316,7 @@ onMounted(() => {
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="shadow-sm"
-          >
+          />
           <div
             v-if="editingCaptionIndex === idx"
             class="mt-1 text-center text-xs"
@@ -423,9 +423,7 @@ onMounted(() => {
               @touchend="handleTouchEnd"
             >
               <div class="pointer-events-none absolute left-2 top-2 z-10">
-                <span
-                  class="rounded bg-black/60 px-2 py-1 text-xs text-white"
-                >
+                <span class="rounded bg-black/60 px-2 py-1 text-xs text-white">
                   {{ `${activeIndex + 1} of ${orderedImages.length}` }}
                 </span>
               </div>
@@ -513,7 +511,7 @@ onMounted(() => {
                       maxHeight: `${mainImageHeight}px`,
                       height: expandedView ? `${mainImageHeight}px` : 'auto',
                     }"
-                  >
+                  />
                   <div
                     v-if="editingCaptionIndex === idx && idx === activeIndex"
                     class="mt-1 text-center text-xs"

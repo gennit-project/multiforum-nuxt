@@ -74,7 +74,7 @@ const handleInput = (value: string) => {
         :disabled="disabled"
         type="text"
         @input="handleInput(($event.target as HTMLInputElement).value)"
-      >
+      />
       <textarea
         v-else-if="rows && rows > 1"
         ref="inputRef"

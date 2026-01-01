@@ -87,8 +87,7 @@ const publicCollections = computed(() => {
           }"
           class="border-b-2 px-1 py-2 text-sm font-medium"
           :class="
-            typeof $route.name === 'string' &&
-            $route.name.includes('comments')
+            typeof $route.name === 'string' && $route.name.includes('comments')
               ? 'border-orange-500 text-orange-600 dark:text-orange-400'
               : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
           "
@@ -111,10 +110,7 @@ const publicCollections = computed(() => {
         >
           <!-- Description content -->
           <div v-if="discussion?.body" class="min-w-0 flex-1">
-            <MarkdownPreview
-              :disable-gallery="false"
-              :text="discussion.body"
-            />
+            <MarkdownPreview :disable-gallery="false" :text="discussion.body" />
           </div>
           <div
             v-else
@@ -146,7 +142,7 @@ const publicCollections = computed(() => {
   </div>
 
   <div class="mt-6 px-2">
-    <h3 class="mb-3 text-base font-semibold text-gray-900 dark:text-white">
+    <h3 class="font-semibold mb-3 text-base text-gray-900 dark:text-white">
       Public collections featuring this download
     </h3>
     <div

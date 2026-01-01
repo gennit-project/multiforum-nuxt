@@ -93,8 +93,8 @@ const aggregateDiscussionCount = computed(() => {
     return 0;
   }
   return (
-    discussionResult.value.getSiteWideDiscussionList
-      .aggregateDiscussionCount || 0
+    discussionResult.value.getSiteWideDiscussionList.aggregateDiscussionCount ||
+    0
   );
 });
 
@@ -122,8 +122,7 @@ const loadMore = () => {
         getSiteWideDiscussionList: {
           ...previousResult.getSiteWideDiscussionList,
           aggregateDiscussionCount:
-            fetchMoreResult.getSiteWideDiscussionList
-              .aggregateDiscussionCount,
+            fetchMoreResult.getSiteWideDiscussionList.aggregateDiscussionCount,
           discussions: [
             ...previousResult.getSiteWideDiscussionList.discussions,
             ...fetchMoreResult.getSiteWideDiscussionList.discussions,

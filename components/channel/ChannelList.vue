@@ -44,7 +44,9 @@ function filterByTag(tag: string) {
       There are no results.
     </p>
     <!-- Row-based layout -->
-    <div class="divide-y divide-gray-200 border-t border-gray-200 dark:divide-gray-700 dark:border-gray-700">
+    <div
+      class="divide-y divide-gray-200 border-t border-gray-200 dark:divide-gray-700 dark:border-gray-700"
+    >
       <ChannelListItem
         v-for="channel in channels"
         :key="channel.uniqueName"

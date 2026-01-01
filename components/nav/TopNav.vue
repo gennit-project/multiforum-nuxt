@@ -72,8 +72,8 @@ const isOnMapPage = computed(() => {
     class="z-20 h-14 border-b border-b-gray-200 bg-gray-100 pr-4 dark:border-b-gray-600 dark:bg-gray-900 lg:ml-20"
     :class="[isOnMapPage ? 'fixed w-full lg:w-[calc(100%-5rem)]' : '']"
   >
-    <div class="flex items-center justify-between py-2 pr-2 pl-12 lg:pl-2">
-      <div class="min-w-0 flex items-center overflow-hidden">
+    <div class="flex items-center justify-between py-2 pl-12 pr-2 lg:pl-2">
+      <div class="flex min-w-0 items-center overflow-hidden">
         <HamburgerMenuButton
           v-if="!sideNavIsOpenVar"
           data-testid="menu-button"
@@ -91,7 +91,10 @@ const isOnMapPage = computed(() => {
                 >Topical</span
               >
               <template #fallback>
-                <span class="logo-font text-lg font-bold text-gray-900 dark:text-white">Topical</span>
+                <span
+                  class="logo-font text-lg font-bold text-gray-900 dark:text-white"
+                  >Topical</span
+                >
               </template>
             </ClientOnly>
           </nuxt-link>
@@ -121,13 +124,16 @@ const isOnMapPage = computed(() => {
             <span>•</span>
             {{ routeInfoLabel }}
           </div>
-          <div v-else class="hidden items-center gap-1 truncate text-gray-600 dark:text-gray-300 sm:flex">
+          <div
+            v-else
+            class="hidden items-center gap-1 truncate text-gray-600 dark:text-gray-300 sm:flex"
+          >
             {{ getLabel() }}
           </div>
         </div>
       </div>
       <div class="hidden min-w-0 flex-1 justify-center px-4 md:flex">
-        <div class="w-full max-w-xl min-w-0">
+        <div class="w-full min-w-0 max-w-xl">
           <TopNavSearch />
         </div>
       </div>
@@ -135,7 +141,7 @@ const isOnMapPage = computed(() => {
         <div class="hidden items-center justify-end space-x-4 sm:flex">
           <nuxt-link
             to="/about"
-            class="text-sm font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+            class="font-semibold text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
           >
             About
           </nuxt-link>
@@ -149,12 +155,12 @@ const isOnMapPage = computed(() => {
             data-testid="notification-bell"
             to="/notifications"
             aria-label="Notifications"
-            class="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none"
+            class="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-600 hover:text-gray-900 focus:outline-none dark:text-gray-300 dark:hover:text-white"
           >
             <i class="fas fa-bell text-lg" aria-hidden="true" />
             <span
               v-if="notificationCountVar > 0"
-              class="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-semibold leading-none text-white"
+              class="font-semibold absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-xs leading-none text-white"
             >
               {{ notificationCountVar }}
             </span>

@@ -4,8 +4,14 @@ import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useHead } from 'nuxt/app';
 import { useRoute, useRouter } from 'vue-router';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import { GET_COLLECTION_ITEMS, GET_ALL_USER_COLLECTIONS } from '@/graphQLData/collection/queries';
-import { UPDATE_COLLECTION, DELETE_COLLECTION } from '@/graphQLData/collection/mutations';
+import {
+  GET_COLLECTION_ITEMS,
+  GET_ALL_USER_COLLECTIONS,
+} from '@/graphQLData/collection/queries';
+import {
+  UPDATE_COLLECTION,
+  DELETE_COLLECTION,
+} from '@/graphQLData/collection/mutations';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import TagComponent from '@/components/TagComponent.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
@@ -25,7 +31,12 @@ const DiscussionAlbum = defineAsyncComponent(
 const route = useRoute();
 const collectionId = computed(() => route.params.collectionId as string);
 
-const { result, loading, error, refetch: refetchCollection } = useQuery(
+const {
+  result,
+  loading,
+  error,
+  refetch: refetchCollection,
+} = useQuery(
   GET_COLLECTION_ITEMS,
   () => ({
     collectionId: collectionId.value,
@@ -123,8 +134,16 @@ const showDeleteModal = ref(false);
 const router = useRouter();
 
 // Mutations
-const { mutate: updateCollection, loading: updateLoading, error: updateError } = useMutation(UPDATE_COLLECTION);
-const { mutate: deleteCollection, loading: deleteLoading, error: deleteError } = useMutation(DELETE_COLLECTION);
+const {
+  mutate: updateCollection,
+  loading: updateLoading,
+  error: updateError,
+} = useMutation(UPDATE_COLLECTION);
+const {
+  mutate: deleteCollection,
+  loading: deleteLoading,
+  error: deleteError,
+} = useMutation(DELETE_COLLECTION);
 const visibilityUpdating = ref(false);
 const visibilityError = ref<string | null>(null);
 
@@ -223,7 +242,7 @@ const handleDelete = async () => {
             <!-- Error state -->
             <div
               v-else-if="error"
-              class="rounded-lg bg-red-50 p-4 dark:bg-red-900/20"
+              class="bg-red-50 rounded-lg p-4 dark:bg-red-900/20"
             >
               <p class="text-red-800 dark:text-red-300">
                 Error loading collection: {{ error.message }}
@@ -231,10 +250,7 @@ const handleDelete = async () => {
             </div>
 
             <!-- Collection not found -->
-            <div
-              v-else-if="!collection"
-              class="py-12 text-center"
-            >
+            <div v-else-if="!collection" class="py-12 text-center">
               <h3 class="text-lg font-medium text-gray-900 dark:text-white">
                 Collection not found
               </h3>
@@ -279,7 +295,9 @@ const handleDelete = async () => {
                 <!-- Title and actions -->
                 <div class="flex items-start justify-between">
                   <div class="flex-1">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white md:text-3xl">
+                    <h1
+                      class="text-2xl font-bold text-gray-900 dark:text-white md:text-3xl"
+                    >
                       {{ collection.name }}
                     </h1>
                     <p
@@ -288,48 +306,59 @@ const handleDelete = async () => {
                     >
                       {{ collection.description }}
                     </p>
-                  <div class="mt-2 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                    <span class="capitalize">{{ collection.visibility.toLowerCase() }}</span>
-                    <span>{{ collection.itemCount }} {{ collectionTypeLabel.toLowerCase() }}</span>
-                  </div>
-                  <p
-                    v-if="visibilityError"
-                    class="mt-1 text-sm text-red-600 dark:text-red-400"
-                  >
-                    {{ visibilityError }}
-                  </p>
-                </div>
-
-                <!-- Action buttons -->
-                <div class="ml-4 flex flex-shrink-0 gap-2">
-                  <button
-                    type="button"
-                    class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-70 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                    :disabled="visibilityUpdating || updateLoading"
-                    @click="handleToggleVisibility"
-                  >
-                    <svg
-                      class="h-4 w-4 mr-1.5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                    <div
+                      class="mt-2 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400"
                     >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 4v16m8-8H4"
-                      />
-                    </svg>
-                    {{ collection.visibility === 'PUBLIC' ? 'Make Private' : 'Make Public' }}
-                  </button>
-                  <button
-                    type="button"
-                    class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                    @click="openRenameModal"
-                  >
+                      <span class="capitalize">{{
+                        collection.visibility.toLowerCase()
+                      }}</span>
+                      <span
+                        >{{ collection.itemCount }}
+                        {{ collectionTypeLabel.toLowerCase() }}</span
+                      >
+                    </div>
+                    <p
+                      v-if="visibilityError"
+                      class="mt-1 text-sm text-red-600 dark:text-red-400"
+                    >
+                      {{ visibilityError }}
+                    </p>
+                  </div>
+
+                  <!-- Action buttons -->
+                  <div class="ml-4 flex flex-shrink-0 gap-2">
+                    <button
+                      type="button"
+                      class="hover:bg-gray-50 inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm disabled:cursor-not-allowed disabled:opacity-70 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                      :disabled="visibilityUpdating || updateLoading"
+                      @click="handleToggleVisibility"
+                    >
                       <svg
-                        class="h-4 w-4 mr-1.5"
+                        class="mr-1.5 h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                      {{
+                        collection.visibility === 'PUBLIC'
+                          ? 'Make Private'
+                          : 'Make Public'
+                      }}
+                    </button>
+                    <button
+                      type="button"
+                      class="hover:bg-gray-50 inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                      @click="openRenameModal"
+                    >
+                      <svg
+                        class="mr-1.5 h-4 w-4"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -345,11 +374,11 @@ const handleDelete = async () => {
                     </button>
                     <button
                       type="button"
-                      class="inline-flex items-center rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-600 shadow-sm hover:bg-red-50 dark:border-red-600 dark:bg-gray-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                      class="hover:bg-red-50 inline-flex items-center rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-600 shadow-sm dark:border-red-600 dark:bg-gray-700 dark:text-red-400 dark:hover:bg-red-900/20"
                       @click="showDeleteModal = true"
                     >
                       <svg
-                        class="h-4 w-4 mr-1.5"
+                        class="mr-1.5 h-4 w-4"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -368,10 +397,7 @@ const handleDelete = async () => {
               </div>
 
               <!-- Empty state -->
-              <div
-                v-if="items.length === 0"
-                class="py-12 text-center"
-              >
+              <div v-if="items.length === 0" class="py-12 text-center">
                 <svg
                   class="mx-auto h-12 w-12 text-gray-400"
                   fill="none"
@@ -385,17 +411,23 @@ const handleDelete = async () => {
                     d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
                   />
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                <h3
+                  class="mt-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
                   No items yet
                 </h3>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Start adding {{ collectionTypeLabel.toLowerCase() }} to this collection.
+                  Start adding {{ collectionTypeLabel.toLowerCase() }} to this
+                  collection.
                 </p>
               </div>
 
               <!-- Discussions list -->
               <div
-                v-else-if="collection.collectionType === 'DISCUSSIONS' || collection.collectionType === 'DOWNLOADS'"
+                v-else-if="
+                  collection.collectionType === 'DISCUSSIONS' ||
+                  collection.collectionType === 'DOWNLOADS'
+                "
                 class="space-y-4"
               >
                 <div
@@ -424,7 +456,7 @@ const handleDelete = async () => {
                   <div class="mb-3 flex items-center justify-between">
                     <NuxtLink
                       :to="getDiscussionLink(discussion)"
-                      class="min-w-0 flex-1 text-lg font-semibold text-gray-900 hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
+                      class="font-semibold min-w-0 flex-1 text-lg text-gray-900 hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
                     >
                       {{ discussion.title }}
                     </NuxtLink>
@@ -440,7 +472,9 @@ const handleDelete = async () => {
 
                   <!-- Album -->
                   <div
-                    v-if="discussion.Album && discussion.Album?.Images.length > 0"
+                    v-if="
+                      discussion.Album && discussion.Album?.Images.length > 0
+                    "
                     class="mb-4 max-w-full overflow-x-auto bg-black"
                   >
                     <DiscussionAlbum
@@ -468,11 +502,15 @@ const handleDelete = async () => {
                           :display-name="getAuthorInfo(discussion)!.displayName"
                           :src="getAuthorInfo(discussion)!.profilePicURL"
                           :is-admin="getAuthorInfo(discussion)!.isAdmin"
-                          :comment-karma="getAuthorInfo(discussion)!.commentKarma"
+                          :comment-karma="
+                            getAuthorInfo(discussion)!.commentKarma
+                          "
                           :discussion-karma="
                             getAuthorInfo(discussion)!.discussionKarma
                           "
-                          :account-created="getAuthorInfo(discussion)!.createdAt"
+                          :account-created="
+                            getAuthorInfo(discussion)!.createdAt
+                          "
                         />
                         <span v-else>Deleted</span>
                       </div>
@@ -513,10 +551,14 @@ const handleDelete = async () => {
                       class="mr-3 h-12 w-12"
                     />
                     <div class="min-w-0 flex-1">
-                      <h3 class="truncate font-semibold text-gray-900 dark:text-white">
+                      <h3
+                        class="font-semibold truncate text-gray-900 dark:text-white"
+                      >
                         {{ channel.displayName }}
                       </h3>
-                      <p class="truncate text-sm text-gray-500 dark:text-gray-400">
+                      <p
+                        class="truncate text-sm text-gray-500 dark:text-gray-400"
+                      >
                         /{{ channel.uniqueName }}
                       </p>
                     </div>
@@ -544,7 +586,10 @@ const handleDelete = async () => {
                       :to="`/forums/${comment.DiscussionChannel.channelUniqueName}`"
                       class="font-medium text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
                     >
-                      {{ comment.DiscussionChannel.Channel?.displayName || comment.DiscussionChannel.channelUniqueName }}
+                      {{
+                        comment.DiscussionChannel.Channel?.displayName ||
+                        comment.DiscussionChannel.channelUniqueName
+                      }}
                     </NuxtLink>
                     <span v-if="comment.DiscussionChannel.Discussion">
                       on
@@ -560,7 +605,9 @@ const handleDelete = async () => {
                   <div class="text-sm text-gray-600 dark:text-gray-300">
                     <MarkdownRenderer :text="comment.text" font-size="small" />
                   </div>
-                  <div class="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                  <div
+                    class="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400"
+                  >
                     <div class="flex items-center">
                       <span class="mr-1">by</span>
                       <UsernameWithTooltip
@@ -570,7 +617,9 @@ const handleDelete = async () => {
                         :src="getAuthorInfo(comment)!.profilePicURL"
                         :is-admin="getAuthorInfo(comment)!.isAdmin"
                         :comment-karma="getAuthorInfo(comment)!.commentKarma"
-                        :discussion-karma="getAuthorInfo(comment)!.discussionKarma"
+                        :discussion-karma="
+                          getAuthorInfo(comment)!.discussionKarma
+                        "
                         :account-created="getAuthorInfo(comment)!.createdAt"
                       />
                       <span v-else>Deleted</span>
@@ -582,8 +631,10 @@ const handleDelete = async () => {
                         :to="{
                           name: 'forums-forumId-discussions-discussionId-comments-commentId',
                           params: {
-                            forumId: comment.DiscussionChannel.channelUniqueName,
-                            discussionId: comment.DiscussionChannel.Discussion.id,
+                            forumId:
+                              comment.DiscussionChannel.channelUniqueName,
+                            discussionId:
+                              comment.DiscussionChannel.Discussion.id,
                             commentId: comment.id,
                           },
                         }"
@@ -627,7 +678,7 @@ const handleDelete = async () => {
                       :src="image.url"
                       :alt="image.alt || image.caption || 'Image'"
                       class="h-48 w-full rounded-lg object-cover shadow-sm transition-transform hover:scale-105"
-                    >
+                    />
                   </NuxtLink>
                   <p
                     v-if="image.caption"
@@ -683,7 +734,7 @@ const handleDelete = async () => {
                   type="text"
                   class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm"
                   placeholder="Enter collection name"
-                >
+                />
               </div>
               <div>
                 <label

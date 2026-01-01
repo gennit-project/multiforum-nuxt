@@ -1,6 +1,7 @@
 const dropDataForCypressTests = () => {
-  return cy.authenticatedGraphQL(
-    `
+  return cy
+    .authenticatedGraphQL(
+      `
     mutation dropDataForCypressTests {
         dropDataForCypressTests {
             success
@@ -8,14 +9,15 @@ const dropDataForCypressTests = () => {
         }
     }
     `
-  ).then((response) => {
-    const data = response?.body?.data?.dropDataForCypressTests;
-    if (!data) {
-      throw new Error(
-        `🚨 dropDataForCypressTests failed: ${JSON.stringify(response)}`
-      );
-    }
-  });
+    )
+    .then((response) => {
+      const data = response?.body?.data?.dropDataForCypressTests;
+      if (!data) {
+        throw new Error(
+          `🚨 dropDataForCypressTests failed: ${JSON.stringify(response)}`
+        );
+      }
+    });
 };
 
 export default dropDataForCypressTests;

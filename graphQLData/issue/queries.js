@@ -106,7 +106,10 @@ export const GET_ISSUE = gql`
   ${ISSUE_FIELDS}
   query getIssue($channelUniqueName: String!, $issueNumber: Int!) {
     issues(
-      where: { channelUniqueName: $channelUniqueName, issueNumber: $issueNumber }
+      where: {
+        channelUniqueName: $channelUniqueName
+        issueNumber: $issueNumber
+      }
     ) {
       ...IssueFields
     }

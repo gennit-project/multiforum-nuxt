@@ -174,7 +174,7 @@ const cancelDelete = () => {
                   ]"
                   @click="handleEditPost"
                 >
-                  <i class="fa fa-external-link h-4 w-4" aria-hidden="true"/>
+                  <i class="fa fa-external-link h-4 w-4" aria-hidden="true" />
                   Edit
                   {{
                     contentType === 'discussion'

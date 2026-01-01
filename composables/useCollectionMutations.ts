@@ -32,26 +32,52 @@ type ItemType = 'discussion' | 'comment' | 'image' | 'channel' | 'download';
 export function useCollectionMutations(itemType: ItemType) {
   // Initialize all mutations
   const { mutate: createCollection } = useMutation(CREATE_COLLECTION);
-  const { mutate: addDiscussionToCollection } = useMutation(ADD_DISCUSSION_TO_COLLECTION);
-  const { mutate: addCommentToCollection } = useMutation(ADD_COMMENT_TO_COLLECTION);
+  const { mutate: addDiscussionToCollection } = useMutation(
+    ADD_DISCUSSION_TO_COLLECTION
+  );
+  const { mutate: addCommentToCollection } = useMutation(
+    ADD_COMMENT_TO_COLLECTION
+  );
   const { mutate: addImageToCollection } = useMutation(ADD_IMAGE_TO_COLLECTION);
-  const { mutate: addChannelToCollection } = useMutation(ADD_CHANNEL_TO_COLLECTION);
-  const { mutate: addDownloadToCollection } = useMutation(ADD_DOWNLOAD_TO_COLLECTION);
+  const { mutate: addChannelToCollection } = useMutation(
+    ADD_CHANNEL_TO_COLLECTION
+  );
+  const { mutate: addDownloadToCollection } = useMutation(
+    ADD_DOWNLOAD_TO_COLLECTION
+  );
 
-  const { mutate: removeDiscussionFromCollection } = useMutation(REMOVE_DISCUSSION_FROM_COLLECTION);
-  const { mutate: removeCommentFromCollection } = useMutation(REMOVE_COMMENT_FROM_COLLECTION);
-  const { mutate: removeImageFromCollection } = useMutation(REMOVE_IMAGE_FROM_COLLECTION);
-  const { mutate: removeChannelFromCollection } = useMutation(REMOVE_CHANNEL_FROM_COLLECTION);
-  const { mutate: removeDownloadFromCollection } = useMutation(REMOVE_DOWNLOAD_FROM_COLLECTION);
+  const { mutate: removeDiscussionFromCollection } = useMutation(
+    REMOVE_DISCUSSION_FROM_COLLECTION
+  );
+  const { mutate: removeCommentFromCollection } = useMutation(
+    REMOVE_COMMENT_FROM_COLLECTION
+  );
+  const { mutate: removeImageFromCollection } = useMutation(
+    REMOVE_IMAGE_FROM_COLLECTION
+  );
+  const { mutate: removeChannelFromCollection } = useMutation(
+    REMOVE_CHANNEL_FROM_COLLECTION
+  );
+  const { mutate: removeDownloadFromCollection } = useMutation(
+    REMOVE_DOWNLOAD_FROM_COLLECTION
+  );
 
-  const { mutate: addFavoriteDiscussion } = useMutation(ADD_FAVORITE_DISCUSSION);
-  const { mutate: removeFavoriteDiscussion } = useMutation(REMOVE_FAVORITE_DISCUSSION);
+  const { mutate: addFavoriteDiscussion } = useMutation(
+    ADD_FAVORITE_DISCUSSION
+  );
+  const { mutate: removeFavoriteDiscussion } = useMutation(
+    REMOVE_FAVORITE_DISCUSSION
+  );
   const { mutate: addFavoriteComment } = useMutation(ADD_FAVORITE_COMMENT);
-  const { mutate: removeFavoriteComment } = useMutation(REMOVE_FAVORITE_COMMENT);
+  const { mutate: removeFavoriteComment } = useMutation(
+    REMOVE_FAVORITE_COMMENT
+  );
   const { mutate: addFavoriteImage } = useMutation(ADD_FAVORITE_IMAGE);
   const { mutate: removeFavoriteImage } = useMutation(REMOVE_FAVORITE_IMAGE);
   const { mutate: addFavoriteChannel } = useMutation(ADD_FAVORITE_CHANNEL);
-  const { mutate: removeFavoriteChannel } = useMutation(REMOVE_FAVORITE_CHANNEL);
+  const { mutate: removeFavoriteChannel } = useMutation(
+    REMOVE_FAVORITE_CHANNEL
+  );
 
   /**
    * Get the appropriate add mutation based on item type

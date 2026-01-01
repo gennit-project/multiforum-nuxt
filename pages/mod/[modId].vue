@@ -40,7 +40,9 @@ watchEffect(() => {
   const displayName = mod.value?.displayName || modProfileName.value;
 
   useHead({
-    title: displayName ? `${displayName} - Mod Profile | ${serverName}` : 'Mod Profile',
+    title: displayName
+      ? `${displayName} - Mod Profile | ${serverName}`
+      : 'Mod Profile',
   });
 });
 </script>

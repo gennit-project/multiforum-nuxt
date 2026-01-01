@@ -8,10 +8,7 @@ import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavo
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import { relativeTime } from '@/utils';
-import type {
-  Discussion,
-  DiscussionChannel,
-} from '@/__generated__/graphql';
+import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 
 type AlbumPayload = {
   discussion: Discussion;
@@ -170,7 +167,7 @@ const handleOpenAlbum = () => {
             :src="firstAlbumImage"
             :alt="discussion.title || 'Download preview'"
             class="h-full w-full object-cover"
-          >
+          />
           <div
             v-else
             class="flex h-full w-full items-center justify-center text-center text-sm text-gray-500 dark:text-gray-400"
@@ -215,7 +212,7 @@ const handleOpenAlbum = () => {
         <nuxt-link
           v-if="primaryChannel"
           :to="defaultLink"
-          class="text-base font-semibold leading-tight text-gray-900 hover:text-gray-600 dark:text-white"
+          class="font-semibold text-base leading-tight text-gray-900 hover:text-gray-600 dark:text-white"
         >
           <HighlightedSearchTerms
             :text="discussion.title || '[Deleted]'"
@@ -246,7 +243,8 @@ const handleOpenAlbum = () => {
           <nuxt-link
             :to="defaultLink"
             class="text-orange-700 hover:underline dark:text-orange-300"
-          >{{ primaryChannel.channelUniqueName }}</nuxt-link>
+            >{{ primaryChannel.channelUniqueName }}</nuxt-link
+          >
         </template>
       </div>
 
@@ -260,7 +258,7 @@ const handleOpenAlbum = () => {
           <span>{{ commentCount }} comments</span>
         </nuxt-link>
         <MenuButton
-        v-else-if="submittedToMultipleChannels"
+          v-else-if="submittedToMultipleChannels"
           :items="discussionDetailOptions"
         >
           <span

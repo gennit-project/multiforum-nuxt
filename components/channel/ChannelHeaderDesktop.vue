@@ -30,6 +30,6 @@ defineProps({
       :src="channel?.channelBannerURL"
       :alt="'channel banner'"
       class="max-h-36 w-full object-cover"
-    >
+    />
   </div>
 </template>

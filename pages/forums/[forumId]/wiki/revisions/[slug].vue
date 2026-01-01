@@ -221,7 +221,9 @@ useHead({
         >
           <div class="flex items-start justify-between gap-3">
             <div class="flex-1">
-              <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm">
+              <div
+                class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm"
+              >
                 <div class="font-medium text-gray-900 dark:text-gray-100">
                   {{ edit.author }}
                 </div>
@@ -247,7 +249,9 @@ useHead({
                 }}
               </div>
             </div>
-            <div class="flex items-center text-sm text-gray-400 dark:text-gray-500">
+            <div
+              class="flex items-center text-sm text-gray-400 dark:text-gray-500"
+            >
               <i class="fas fa-chevron-right" />
             </div>
           </div>

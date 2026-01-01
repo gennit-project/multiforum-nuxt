@@ -101,7 +101,7 @@ const shouldShowAuthTabs = computed(() => {
   if (!import.meta.client) {
     return hasAuthHint.value;
   }
-  
+
   // On client-side, show auth tabs if not loading and user is authenticated
   return !isLoadingAuthVar.value && (usernameVar.value || hasAuthHint.value);
 });
@@ -212,7 +212,9 @@ const tabs = computed((): Tab[] => {
     );
 
     // For SSR, use auth hints; for client, use current auth state
-    const currentUsername = !import.meta.client ? usernameHint.value : loggedInUsername.value;
+    const currentUsername = !import.meta.client
+      ? usernameHint.value
+      : loggedInUsername.value;
     const currentModName = !import.meta.client ? '' : modProfileNameVar.value; // Mod name not stored in hints for security
 
     const isAdmin = adminList.includes(currentUsername);
@@ -261,13 +263,21 @@ const tabs = computed((): Tab[] => {
         v-if="mdAndUp"
         aria-label="Tabs"
         :class="
-          vertical ? 'text-md flex flex-col' : 'space-x-2 overflow-x-auto text-sm'
+          vertical
+            ? 'text-md flex flex-col'
+            : 'space-x-2 overflow-x-auto text-sm'
         "
       >
         <TabButton
           v-for="tab in tabs"
           :key="tab.name"
-          :count="tab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : (tab.countProperty ? channel[tab.countProperty]?.count : 0)"
+          :count="
+            tab.countProperty === '__DOWNLOAD_COUNT__'
+              ? downloadCount
+              : tab.countProperty
+                ? channel[tab.countProperty]?.count
+                : 0
+          "
           :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
           :is-active="route.path.includes(tab.routeSuffix)"
           :label="tab.label"
@@ -294,11 +304,17 @@ const tabs = computed((): Tab[] => {
                   v-if="
                     showCounts &&
                     activeTab?.countProperty &&
-                    (activeTab?.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[activeTab?.countProperty]?.count)
+                    (activeTab?.countProperty === '__DOWNLOAD_COUNT__'
+                      ? downloadCount
+                      : channel[activeTab?.countProperty]?.count)
                   "
                   class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
                 >
-                  {{ activeTab?.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[activeTab?.countProperty]?.count }}
+                  {{
+                    activeTab?.countProperty === '__DOWNLOAD_COUNT__'
+                      ? downloadCount
+                      : channel[activeTab?.countProperty]?.count
+                  }}
                 </span>
               </div>
               <i class="fa-solid fa-chevron-down ml-2 h-4 w-4" />
@@ -330,11 +346,17 @@ const tabs = computed((): Tab[] => {
                     v-if="
                       showCounts &&
                       tab.countProperty &&
-                      (tab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[tab.countProperty]?.count)
+                      (tab.countProperty === '__DOWNLOAD_COUNT__'
+                        ? downloadCount
+                        : channel[tab.countProperty]?.count)
                     "
                     class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
                   >
-                    {{ tab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[tab.countProperty]?.count }}
+                    {{
+                      tab.countProperty === '__DOWNLOAD_COUNT__'
+                        ? downloadCount
+                        : channel[tab.countProperty]?.count
+                    }}
                   </span>
                 </nuxt-link>
               </div>
@@ -348,13 +370,21 @@ const tabs = computed((): Tab[] => {
         <nav
           aria-label="Tabs"
           :class="
-            vertical ? 'text-md flex flex-col' : 'space-x-2 overflow-x-auto text-sm'
+            vertical
+              ? 'text-md flex flex-col'
+              : 'space-x-2 overflow-x-auto text-sm'
           "
         >
           <TabButton
             v-for="tab in baseTabs"
             :key="tab.name"
-            :count="tab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : (tab.countProperty ? channel[tab.countProperty]?.count : 0)"
+            :count="
+              tab.countProperty === '__DOWNLOAD_COUNT__'
+                ? downloadCount
+                : tab.countProperty
+                  ? channel[tab.countProperty]?.count
+                  : 0
+            "
             :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
             :is-active="route.path.includes(tab.routeSuffix)"
             :label="tab.label"

@@ -34,9 +34,7 @@ const links = [
         </nuxt-link>
       </span>
     </div>
-    <div
-      class="w-full bg-gray-800 px-8 py-4 text-center text-xs text-white"
-    >
+    <div class="w-full bg-gray-800 px-8 py-4 text-center text-xs text-white">
       If you have feedback or technical problems, please open an issue in the
       <a
         class="ml-1 text-orange-500 underline"

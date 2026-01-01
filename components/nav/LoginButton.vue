@@ -53,7 +53,7 @@ if (import.meta.env.SSR === false) {
     <template #has-auth>
       <button
         data-testid="logout-button"
-        class="mr-2 inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+        class="font-semibold mr-2 inline-flex items-center rounded-full px-3 py-1 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
         @click="handleLogout"
       >
         Log Out
@@ -62,7 +62,7 @@ if (import.meta.env.SSR === false) {
     <template #does-not-have-auth>
       <button
         data-testid="login-button"
-        class="mr-2 inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+        class="font-semibold mr-2 inline-flex items-center rounded-full px-3 py-1 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
       >
         Log In
       </button>

@@ -277,12 +277,10 @@ The application has two separate but related permission systems:
 ### User Permission Levels
 
 1. **Standard Users**:
-
    - Use the DefaultChannelRole for the channel (or DefaultServerRole as fallback)
    - Have permissions like createDiscussion, createComment, upvoteContent, etc.
 
 2. **Channel Admins/Owners**:
-
    - Users in the `Channel.Admins` list
    - Have all user and moderator permissions automatically
 
@@ -293,14 +291,12 @@ The application has two separate but related permission systems:
 ### Moderator Permission Levels
 
 1. **Standard/Normal Moderators**:
-
    - All authenticated users are considered standard moderators by default
    - Not explicitly included in `Channel.Moderators` list, not in `Channel.SuspendedMods`
    - Can perform basic moderation actions (report, give feedback) based on DefaultModRole
    - These permissions are controlled by the DefaultModRole configuration
 
 2. **Elevated Moderators**:
-
    - Explicitly included in the `Channel.Moderators` list
    - Have additional permissions beyond standard moderators
    - Can typically archive content, manage other moderators, etc.
@@ -321,7 +317,6 @@ The application has two separate but related permission systems:
   - Channel owners/admins bypass all permission checks (both user and mod)
   - Suspended status overrides all other status for that permission type
 - **Fallback Chain**:
-
   - Channel-specific roles -> Server default roles -> Deny access
 
 - **User vs. Mod Actions**:
@@ -377,6 +372,7 @@ The application enforces suspensions at both channel and server levels. Suspensi
 #### Suspension-Related E2E Tests
 
 Tests for suspension functionality are located in `tests/cypress/e2e/suspensions/`:
+
 - `suspendedUserPermissions.spec.cy.ts` - Tests that suspended users can't create discussions, comments, or events
 - `serverLevelSuspension.spec.cy.ts` - Tests that suspended users can't create new forums
 

@@ -59,5 +59,5 @@ export default defineComponent({
     ]"
     :src="src"
     :alt="alt"
-  >
+  />
 </template>

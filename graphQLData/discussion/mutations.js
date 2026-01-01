@@ -534,12 +534,12 @@ export const UPDATE_DISCUSSION_CHANNEL_LABELS = gql`
     $labelOptionIds: [ID!]!
   ) {
     updateDiscussionChannels(
-      where: { 
+      where: {
         channelUniqueName: $channelUniqueName
-        discussionId: $discussionId 
+        discussionId: $discussionId
       }
-      update: { 
-        LabelOptions: { 
+      update: {
+        LabelOptions: {
           connect: { where: { node: { id_IN: $labelOptionIds } } }
           disconnect: { where: { node: { NOT: { id_IN: $labelOptionIds } } } }
         }

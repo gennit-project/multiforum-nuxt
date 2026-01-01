@@ -436,22 +436,25 @@ const permalinkObject = computed(() => {
     if (!channelUniqueName && !forumId.value) {
       return {};
     }
-    return getFeedbackPermalinkObject({
-      routeName: route.name as string,
-      forumId: channelUniqueName || (forumId.value as string),
-      discussionId:
-        props.commentData.GivesFeedbackOnDiscussion?.id ||
-        (discussionId as string) ||
-        props.commentData?.DiscussionChannel?.discussionId,
-      eventId:
-        props.commentData.GivesFeedbackOnEvent?.id || (eventId as string),
-      commentId: props.commentData.id,
-      GivesFeedbackOnComment:
-        props.commentData.GivesFeedbackOnComment || undefined,
-      GivesFeedbackOnDiscussion:
-        props.commentData.GivesFeedbackOnDiscussion || undefined,
-      GivesFeedbackOnEvent: props.commentData.GivesFeedbackOnEvent || undefined,
-    }) || {};
+    return (
+      getFeedbackPermalinkObject({
+        routeName: route.name as string,
+        forumId: channelUniqueName || (forumId.value as string),
+        discussionId:
+          props.commentData.GivesFeedbackOnDiscussion?.id ||
+          (discussionId as string) ||
+          props.commentData?.DiscussionChannel?.discussionId,
+        eventId:
+          props.commentData.GivesFeedbackOnEvent?.id || (eventId as string),
+        commentId: props.commentData.id,
+        GivesFeedbackOnComment:
+          props.commentData.GivesFeedbackOnComment || undefined,
+        GivesFeedbackOnDiscussion:
+          props.commentData.GivesFeedbackOnDiscussion || undefined,
+        GivesFeedbackOnEvent:
+          props.commentData.GivesFeedbackOnEvent || undefined,
+      }) || {}
+    );
   }
   // This is the default comment permalink object
   let result = {};
@@ -875,7 +878,7 @@ const label = computed(() => {
         <div
           :class="[
             isHighlighted
-              ? 'dark:bg-orange-950 rounded-md border border-orange-600 bg-orange-100 p-2'
+              ? 'rounded-md border border-orange-600 bg-orange-100 p-2 dark:bg-orange-950'
               : isMarkedAsAnswer
                 ? 'dark:bg-green-950 rounded-md border border-green-600 bg-green-100 p-2'
                 : 'dark:bg-gray-950',

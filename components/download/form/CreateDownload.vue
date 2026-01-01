@@ -3,7 +3,11 @@ import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
-import { CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, UPDATE_DISCUSSION_CHANNEL_LABELS, UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
+import {
+  CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
+  UPDATE_DISCUSSION_CHANNEL_LABELS,
+  UPDATE_DISCUSSION,
+} from '@/graphQLData/discussion/mutations';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
 import type { FilterGroup, FilterOption } from '@/__generated__/graphql';
@@ -86,7 +90,10 @@ onDone(async (response) => {
     }
 
     // Handle labels if they exist
-    if (formValues.value.downloadLabels && Object.keys(formValues.value.downloadLabels).length > 0) {
+    if (
+      formValues.value.downloadLabels &&
+      Object.keys(formValues.value.downloadLabels).length > 0
+    ) {
       console.log('Saving download labels:', formValues.value.downloadLabels);
       await saveDownloadLabels(newDiscussionId);
     }
@@ -132,13 +139,16 @@ const saveDownloadAlbum = async (discussionId: string) => {
       },
     };
 
-    console.log('Album update input:', JSON.stringify(albumUpdateInput, null, 2));
+    console.log(
+      'Album update input:',
+      JSON.stringify(albumUpdateInput, null, 2)
+    );
 
     await updateDiscussion({
       where: { id: discussionId },
       updateDiscussionInput: albumUpdateInput,
     });
-    
+
     console.log('Successfully created album');
   } catch (error) {
     console.error('Error creating album:', error);
@@ -150,27 +160,36 @@ const saveDownloadLabels = async (discussionId: string) => {
   try {
     // Convert downloadLabels to FilterOption IDs
     const labelOptionIds: string[] = [];
-    
+
     // We need the FilterGroups from channel data to map values to IDs
     if (!channelData.value?.FilterGroups) {
       console.warn('No FilterGroups found in channel data');
       return;
     }
 
-    console.log('Converting downloadLabels to FilterOption IDs:', formValues.value.downloadLabels);
+    console.log(
+      'Converting downloadLabels to FilterOption IDs:',
+      formValues.value.downloadLabels
+    );
     console.log('Available FilterGroups:', channelData.value.FilterGroups);
 
-    Object.entries(formValues.value.downloadLabels || {}).forEach(([groupKey, selectedValues]) => {
-      const filterGroup = channelData.value?.FilterGroups?.find((fg: FilterGroup) => fg.key === groupKey);
-      if (filterGroup) {
-        selectedValues.forEach(value => {
-          const option = filterGroup.options?.find((opt: FilterOption) => opt.value === value);
-          if (option?.id) {
-            labelOptionIds.push(option.id);
-          }
-        });
+    Object.entries(formValues.value.downloadLabels || {}).forEach(
+      ([groupKey, selectedValues]) => {
+        const filterGroup = channelData.value?.FilterGroups?.find(
+          (fg: FilterGroup) => fg.key === groupKey
+        );
+        if (filterGroup) {
+          selectedValues.forEach((value) => {
+            const option = filterGroup.options?.find(
+              (opt: FilterOption) => opt.value === value
+            );
+            if (option?.id) {
+              labelOptionIds.push(option.id);
+            }
+          });
+        }
       }
-    });
+    );
 
     console.log('Final labelOptionIds to connect:', labelOptionIds);
 
@@ -195,9 +214,15 @@ const updateFormValues = (
 
 const submitForm = async () => {
   try {
-    console.log('CreateDownload submitForm - formValues.album:', formValues.value.album);
-    console.log('CreateDownload submitForm - album images:', formValues.value.album?.images);
-    
+    console.log(
+      'CreateDownload submitForm - formValues.album:',
+      formValues.value.album
+    );
+    console.log(
+      'CreateDownload submitForm - album images:',
+      formValues.value.album?.images
+    );
+
     const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
       onCreate: {
         node: { text: tag },

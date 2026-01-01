@@ -70,7 +70,8 @@ const visibleItems = computed((): TitleTransition[] => {
     return titleVersionsWithCurrent.value;
   }
   // Show only the most recent (last item in chronological order)
-  const lastItem = titleVersionsWithCurrent.value[titleVersionsWithCurrent.value.length - 1];
+  const lastItem =
+    titleVersionsWithCurrent.value[titleVersionsWithCurrent.value.length - 1];
   return lastItem ? [lastItem] : [];
 });
 

@@ -113,7 +113,10 @@ onUpdateModRoleDone(handleMutationDone);
 const definitions = computed<RoleDefinition[]>(() => {
   if (!props.serverConfig) return [];
   const cfg = props.serverConfig;
-  const allowedTypes = (props.types ?? ['server', 'mod']) as RoleDefinition['type'][];
+  const allowedTypes = (props.types ?? [
+    'server',
+    'mod',
+  ]) as RoleDefinition['type'][];
   return [
     {
       key: 'DefaultServerRole',
@@ -307,8 +310,8 @@ const saveRole = async () => {
     >
       {{
         updateServerRoleError?.message ||
-          updateModRoleError?.message ||
-          'Unable to save changes. Please try again.'
+        updateModRoleError?.message ||
+        'Unable to save changes. Please try again.'
       }}
     </p>
 

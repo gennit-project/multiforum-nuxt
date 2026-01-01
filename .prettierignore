@@ -1,0 +1,14 @@
+node_modules
+.nuxt
+.output
+dist
+coverage
+screenshots
+.vercel
+.vscode
+.DS_Store
+__generated__
+cypress/videos
+cypress/screenshots
+public
+package-lock.json

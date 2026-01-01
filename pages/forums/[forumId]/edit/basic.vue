@@ -247,7 +247,7 @@ const handleImageChange = async (input: FileChangeInput) => {
             class="w-full shadow-sm"
             :src="formValues.channelBannerURL"
             :alt="formValues.uniqueName"
-          >
+          />
           <AddImage
             key="channel-banner-url"
             :field-name="'channelBannerURL'"

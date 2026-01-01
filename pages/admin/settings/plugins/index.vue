@@ -288,7 +288,7 @@ onMounted(() => {
                 placeholder="https://registry.example.com"
                 class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 @keyup.enter="addRegistry"
-              >
+              />
               <button
                 type="button"
                 class="rounded-md bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
@@ -369,9 +369,13 @@ onMounted(() => {
               :key="plugin.id"
               class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-600 dark:bg-gray-800"
             >
-              <div class="flex flex-col space-y-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+              <div
+                class="flex flex-col space-y-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0"
+              >
                 <div class="flex-1">
-                  <h3 class="text-base font-medium text-gray-900 dark:text-white">
+                  <h3
+                    class="text-base font-medium text-gray-900 dark:text-white"
+                  >
                     <NuxtLink
                       :to="`/admin/settings/plugins/${plugin.id}`"
                       class="text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300"
@@ -379,11 +383,15 @@ onMounted(() => {
                       {{ plugin.name }}
                     </NuxtLink>
                   </h3>
-                  <div class="mt-2 flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-300">
+                  <div
+                    class="mt-2 flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-300"
+                  >
                     <div class="flex items-center">
-                      <span class="mr-2 text-xs font-medium text-gray-400">Status:</span>
+                      <span class="mr-2 text-xs font-medium text-gray-400"
+                        >Status:</span
+                      >
                       <span
-                        class="inline-flex rounded-full px-2 text-xs font-semibold leading-5"
+                        class="font-semibold inline-flex rounded-full px-2 text-xs leading-5"
                         :class="{
                           'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200':
                             plugin.status === 'available',
@@ -405,11 +413,15 @@ onMounted(() => {
                       </span>
                     </div>
                     <div v-if="plugin.installedVersion?.version">
-                      <span class="text-xs font-medium text-gray-400">Version:</span>
+                      <span class="text-xs font-medium text-gray-400"
+                        >Version:</span
+                      >
                       {{ plugin.installedVersion.version }}
                     </div>
                     <div>
-                      <span class="text-xs font-medium text-gray-400">Available:</span>
+                      <span class="text-xs font-medium text-gray-400"
+                        >Available:</span
+                      >
                       {{ plugin.availableVersions.length }} versions
                     </div>
                   </div>

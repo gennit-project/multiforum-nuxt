@@ -11,7 +11,10 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import type { IssueCreateInput } from '@/__generated__/graphql';
 import { CREATE_ISSUE } from '@/graphQLData/issue/mutations';
 import { GET_ISSUES_BY_CHANNEL } from '@/graphQLData/issue/queries';
-import { COUNT_OPEN_ISSUES, SERVER_SCOPED_ISSUE_COUNT } from '@/graphQLData/mod/queries';
+import {
+  COUNT_OPEN_ISSUES,
+  SERVER_SCOPED_ISSUE_COUNT,
+} from '@/graphQLData/mod/queries';
 import { modProfileNameVar, usernameVar } from '@/cache';
 
 const props = defineProps({
@@ -58,9 +61,7 @@ const authorInput = computed(() => {
 });
 
 const authorName = computed(() => {
-  if (
-    authorInput.value?.ModerationProfile?.connect?.where?.node?.displayName
-  ) {
+  if (authorInput.value?.ModerationProfile?.connect?.where?.node?.displayName) {
     return authorInput.value.ModerationProfile.connect.where.node.displayName;
   }
   if (authorInput.value?.User?.connect?.where?.node?.username) {
@@ -69,22 +70,25 @@ const authorName = computed(() => {
   return '';
 });
 
-const issueInput = computed<IssueCreateInput>(() => ({
-  title: formValues.value.title.trim(),
-  body: formValues.value.body.trim(),
-  isOpen: true,
-  flaggedServerRuleViolation: false,
-  channelUniqueName: selectedChannelId.value || undefined,
-  Channel: selectedChannelId.value
-    ? {
-        connect: {
-          where: { node: { uniqueName: selectedChannelId.value } },
-        },
-      }
-    : undefined,
-  Author: authorInput.value || undefined,
-  authorName: authorName.value || undefined,
-} as IssueCreateInput));
+const issueInput = computed<IssueCreateInput>(
+  () =>
+    ({
+      title: formValues.value.title.trim(),
+      body: formValues.value.body.trim(),
+      isOpen: true,
+      flaggedServerRuleViolation: false,
+      channelUniqueName: selectedChannelId.value || undefined,
+      Channel: selectedChannelId.value
+        ? {
+            connect: {
+              where: { node: { uniqueName: selectedChannelId.value } },
+            },
+          }
+        : undefined,
+      Author: authorInput.value || undefined,
+      authorName: authorName.value || undefined,
+    }) as IssueCreateInput
+);
 
 const canSubmit = computed(() => {
   return (
@@ -209,7 +213,7 @@ const submit = async () => {
         class="space-y-4 rounded-md border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900"
       >
         <div class="space-y-1">
-          <h1 class="text-2xl font-semibold dark:text-white">New Issue</h1>
+          <h1 class="font-semibold text-2xl dark:text-white">New Issue</h1>
           <p class="text-sm text-gray-600 dark:text-gray-300">
             Share a question or request with the moderators. This issue is not
             tied to a specific post, event, or comment.
@@ -240,10 +244,7 @@ const submit = async () => {
           />
         </div>
 
-        <ErrorBanner
-          v-if="createIssueError"
-          :text="createIssueError.message"
-        />
+        <ErrorBanner v-if="createIssueError" :text="createIssueError.message" />
 
         <div class="flex justify-end gap-2">
           <GenericButton :text="'Cancel'" @click="router.back()" />

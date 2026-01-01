@@ -66,7 +66,9 @@ const needsChanges = computed(() => {
 
 const embeddedCrosspost = computed<Discussion | null>(() => {
   return (
-    props.crosspostedDiscussion || props.discussion?.CrosspostedDiscussion || null
+    props.crosspostedDiscussion ||
+    props.discussion?.CrosspostedDiscussion ||
+    null
   );
 });
 
@@ -179,10 +181,7 @@ onMounted(() => {
                   :discussion="embeddedCrosspost"
                   :show-embed-notice="true"
                 />
-                <p
-                  v-else
-                  class="text-sm text-gray-600 dark:text-gray-300"
-                >
+                <p v-else class="text-sm text-gray-600 dark:text-gray-300">
                   We could not load the crossposted discussion. Publish will not
                   include it unless the link is valid.
                 </p>

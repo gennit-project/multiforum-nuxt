@@ -58,7 +58,9 @@ const mod = computed(() => {
             class="flex break-words text-lg font-bold leading-5 text-gray-600 dark:text-gray-200"
           >
             {{ mod.displayName
-            }}<span v-if="modProfileIsYourself" class="ml-2 text-sm">(You)</span>
+            }}<span v-if="modProfileIsYourself" class="ml-2 text-sm"
+              >(You)</span
+            >
           </h1>
         </div>
       </div>

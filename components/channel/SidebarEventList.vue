@@ -153,7 +153,10 @@ const dateSectionObj = computed(() => {
 </script>
 
 <template>
-  <div v-if="dateObj.happeningNow && dateObj.happeningNow.length > 0" class="flex flex-col">
+  <div
+    v-if="dateObj.happeningNow && dateObj.happeningNow.length > 0"
+    class="flex flex-col"
+  >
     <span
       class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
@@ -190,7 +193,10 @@ const dateSectionObj = computed(() => {
     </div>
   </div>
 
-  <div v-if="dateObj.happeningToday && dateObj.happeningToday.length > 0" class="flex flex-col">
+  <div
+    v-if="dateObj.happeningToday && dateObj.happeningToday.length > 0"
+    class="flex flex-col"
+  >
     <span
       class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
@@ -218,7 +224,10 @@ const dateSectionObj = computed(() => {
     </div>
   </div>
 
-  <div v-if="dateObj.happeningTomorrow && dateObj.happeningTomorrow.length > 0" class="flex flex-col">
+  <div
+    v-if="dateObj.happeningTomorrow && dateObj.happeningTomorrow.length > 0"
+    class="flex flex-col"
+  >
     <span
       class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >

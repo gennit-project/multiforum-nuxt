@@ -100,7 +100,6 @@ This script will:
 After the tests complete:
 
 - **Videos** are saved to:
-
   - `cypress/videos/discussions/`
   - `cypress/videos/events/`
   - `cypress/videos/comments/`
@@ -119,7 +118,6 @@ After the tests complete:
 ## Troubleshooting
 
 1. **Port conflicts**:
-
    - The script automatically checks for port conflicts before starting
    - Required ports: 3000-3002, 4001-4003, 7474-7476, 7687-7689
    - If you have port conflicts, you can:
@@ -128,19 +126,16 @@ After the tests complete:
      - Run with only one test group at a time: `./run-parallel-tests.sh -t events`
 
 2. **Container startup failures**:
-
    - Check the logs for specific errors: `docker-compose -f docker-compose.cypress.yml logs`
    - Ensure all required environment variables are set
    - Verify that Docker has enough resources allocated (memory, CPU)
 
 3. **Test failures**:
-
    - Check the Cypress videos and screenshots for visual evidence of failures
    - Examine the container logs for each service
    - Verify your Auth0 test credentials are correct
 
 4. **Database issues**:
-
    - To reset databases, remove the volumes:
      ```bash
      docker-compose -f docker-compose.cypress.yml down -v

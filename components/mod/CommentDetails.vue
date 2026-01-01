@@ -124,7 +124,7 @@ const permalinkObject = computed(() => {
     <ErrorBanner v-else-if="commentError" :text="commentError.message" />
     <div
       v-else-if="!originalComment"
-      class="rounded-lg border border-gray-300 bg-gray-50 p-4 text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+      class="bg-gray-50 rounded-lg border border-gray-300 p-4 text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
     >
       <p>Can't find the content that was reported. It may have been deleted.</p>
     </div>

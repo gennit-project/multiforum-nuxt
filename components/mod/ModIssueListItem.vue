@@ -80,9 +80,9 @@ const reportCountLabel = computed(() => {
         <div v-else class="dark:text-gray-200">{{ issue.title }}</div>
         <div class="text-xs text-gray-500 dark:text-gray-200">
           {{
-            `Opened on ${formatDate(issue.createdAt)} by ${
-              issueAuthorName(issue)
-            } in ${issue.Channel?.uniqueName || '[Deleted]'}`
+            `Opened on ${formatDate(issue.createdAt)} by ${issueAuthorName(
+              issue
+            )} in ${issue.Channel?.uniqueName || '[Deleted]'}`
           }}
         </div>
       </div>

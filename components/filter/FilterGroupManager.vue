@@ -66,13 +66,13 @@ const convertFilterGroupsToYaml = (filterGroups: FilterGroup[]): string => {
       order: option.order,
     })),
   }));
-  
+
   try {
-    return yaml.dump(cleanGroups, { 
+    return yaml.dump(cleanGroups, {
       indent: 2,
       lineWidth: -1,
       noRefs: true,
-      sortKeys: false 
+      sortKeys: false,
     });
   } catch (error) {
     console.error('Error converting to YAML:', error);
@@ -80,21 +80,30 @@ const convertFilterGroupsToYaml = (filterGroups: FilterGroup[]): string => {
   }
 };
 
-const convertYamlToFilterGroups = (yamlString: string): { success: boolean; filterGroups?: FilterGroup[]; error?: string } => {
+const convertYamlToFilterGroups = (
+  yamlString: string
+): { success: boolean; filterGroups?: FilterGroup[]; error?: string } => {
   try {
     const parsed = yaml.load(yamlString) as YamlFilterGroup[];
-    
+
     if (!Array.isArray(parsed)) {
-      return { success: false, error: 'YAML must contain an array of filter groups' };
+      return {
+        success: false,
+        error: 'YAML must contain an array of filter groups',
+      };
     }
 
     const filterGroups: FilterGroup[] = parsed.map((group, index) => {
       if (!group.key || !group.displayName) {
-        throw new Error(`Group at index ${index} is missing required fields (key, displayName)`);
+        throw new Error(
+          `Group at index ${index} is missing required fields (key, displayName)`
+        );
       }
 
       if (!['INCLUDE', 'EXCLUDE'].includes(group.mode)) {
-        throw new Error(`Group "${group.key}" has invalid mode. Must be INCLUDE or EXCLUDE`);
+        throw new Error(
+          `Group "${group.key}" has invalid mode. Must be INCLUDE or EXCLUDE`
+        );
       }
 
       return {
@@ -126,9 +135,9 @@ const convertYamlToFilterGroups = (yamlString: string): { success: boolean; filt
 
     return { success: true, filterGroups };
   } catch (error) {
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Invalid YAML format' 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Invalid YAML format',
     };
   }
 };
@@ -168,13 +177,19 @@ const addNewGroup = () => {
 
 const removeGroup = (groupId: string) => {
   console.log('Removing group with ID:', groupId);
-  console.log('Current groups:', props.filterGroups.map(g => ({ id: g.id, key: g.key })));
-  
+  console.log(
+    'Current groups:',
+    props.filterGroups.map((g) => ({ id: g.id, key: g.key }))
+  );
+
   const updatedGroups = props.filterGroups.filter(
     (group) => group.id !== groupId
   );
-  
-  console.log('Updated groups after removal:', updatedGroups.map(g => ({ id: g.id, key: g.key })));
+
+  console.log(
+    'Updated groups after removal:',
+    updatedGroups.map((g) => ({ id: g.id, key: g.key }))
+  );
   emit('updateFilterGroups', updatedGroups);
 };
 
@@ -236,7 +251,7 @@ const switchToFormView = () => {
 
 const applyYamlChanges = () => {
   const result = convertYamlToFilterGroups(yamlContent.value);
-  
+
   if (result.success && result.filterGroups) {
     yamlError.value = '';
     emit('updateFilterGroups', result.filterGroups);
@@ -253,11 +268,15 @@ const cancelYamlChanges = () => {
 };
 
 // Watch for changes to filterGroups when in YAML mode to keep YAML in sync
-watch(() => props.filterGroups, (newGroups) => {
-  if (viewMode.value === 'yaml') {
-    yamlContent.value = convertFilterGroupsToYaml(newGroups);
-  }
-}, { deep: true });
+watch(
+  () => props.filterGroups,
+  (newGroups) => {
+    if (viewMode.value === 'yaml') {
+      yamlContent.value = convertFilterGroupsToYaml(newGroups);
+    }
+  },
+  { deep: true }
+);
 </script>
 
 <template>
@@ -269,22 +288,24 @@ watch(() => props.filterGroups, (newGroups) => {
             Download Filters
           </h3>
           <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            Configure filter groups that will appear in the downloads sidebar. Users
-            can filter downloads by selecting options within these groups.
+            Configure filter groups that will appear in the downloads sidebar.
+            Users can filter downloads by selecting options within these groups.
           </p>
         </div>
-        
+
         <!-- View Mode Toggle -->
-        <div 
+        <div
           class="flex rounded-md shadow-sm"
           :class="{ 'pointer-events-none opacity-50': disabled }"
         >
           <button
             type="button"
-            class="relative inline-flex items-center px-4 py-2 text-sm font-medium border focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            :class="viewMode === 'form'
-              ? 'bg-blue-600 text-white border-blue-600'
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600'"
+            class="relative inline-flex items-center border px-4 py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            :class="
+              viewMode === 'form'
+                ? 'border-blue-600 bg-blue-600 text-white'
+                : 'hover:bg-gray-50 border-gray-300 bg-white text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600'
+            "
             :disabled="disabled"
             @click="switchToFormView"
           >
@@ -292,10 +313,12 @@ watch(() => props.filterGroups, (newGroups) => {
           </button>
           <button
             type="button"
-            class="relative -ml-px inline-flex items-center px-4 py-2 text-sm font-medium border focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            :class="viewMode === 'yaml'
-              ? 'bg-blue-600 text-white border-blue-600'
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600'"
+            class="relative -ml-px inline-flex items-center border px-4 py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            :class="
+              viewMode === 'yaml'
+                ? 'border-blue-600 bg-blue-600 text-white'
+                : 'hover:bg-gray-50 border-gray-300 bg-white text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600'
+            "
             :disabled="disabled"
             @click="switchToYamlView"
           >
@@ -312,165 +335,165 @@ watch(() => props.filterGroups, (newGroups) => {
         class="space-y-4"
         :class="{ 'pointer-events-none opacity-50': disabled }"
       >
-      <div class="flex items-center justify-between">
-        <h4 class="text-md font-medium text-gray-900 dark:text-white">
-          Filter Groups
-        </h4>
-        <button
-          v-if="!showNewGroupForm"
-          type="button"
-          class="border-transparent rounded-md border bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          :disabled="disabled"
-          @click="showNewGroupForm = true"
+        <div class="flex items-center justify-between">
+          <h4 class="text-md font-medium text-gray-900 dark:text-white">
+            Filter Groups
+          </h4>
+          <button
+            v-if="!showNewGroupForm"
+            type="button"
+            class="border-transparent rounded-md border bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            :disabled="disabled"
+            @click="showNewGroupForm = true"
+          >
+            Add New Filter Group
+          </button>
+        </div>
+
+        <!-- New Group Form -->
+        <div
+          v-if="showNewGroupForm"
+          class="bg-gray-50 rounded-md border border-gray-300 p-4 dark:border-gray-600 dark:bg-gray-800"
         >
-          Add New Filter Group
-        </button>
-      </div>
+          <h5 class="mb-3 text-sm font-medium text-gray-900 dark:text-white">
+            Add New Filter Group
+          </h5>
 
-      <!-- New Group Form -->
-      <div
-        v-if="showNewGroupForm"
-        class="bg-gray-50 rounded-md border border-gray-300 p-4 dark:border-gray-600 dark:bg-gray-800"
-      >
-        <h5 class="mb-3 text-sm font-medium text-gray-900 dark:text-white">
-          Add New Filter Group
-        </h5>
-
-        <div class="space-y-3">
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Group Type
-            </label>
-            <select
-              v-model="newGroupForm.mode"
-              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-            >
-              <option
-                v-for="option in filterModeOptions"
-                :key="option.value"
-                :value="option.value"
+          <div class="space-y-3">
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
-                {{ option.label }}
-              </option>
-            </select>
-          </div>
+                Group Type
+              </label>
+              <select
+                v-model="newGroupForm.mode"
+                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              >
+                <option
+                  v-for="option in filterModeOptions"
+                  :key="option.value"
+                  :value="option.value"
+                >
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
 
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Computer-Friendly Key
-            </label>
-            <input
-              v-model="newGroupForm.key"
-              type="text"
-              placeholder="e.g. lot_size"
-              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              :class="{
-                'border-red-500':
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Computer-Friendly Key
+              </label>
+              <input
+                v-model="newGroupForm.key"
+                type="text"
+                placeholder="e.g. lot_size"
+                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                :class="{
+                  'border-red-500':
+                    newGroupForm.key &&
+                    (!isValidKey(newGroupForm.key) ||
+                      !isKeyUnique(newGroupForm.key)),
+                }"
+              />
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Only letters, numbers, and underscores allowed. Must be unique.
+              </p>
+              <p
+                v-if="newGroupForm.key && !isValidKey(newGroupForm.key)"
+                class="mt-1 text-xs text-red-500"
+              >
+                Key can only contain letters, numbers, and underscores.
+              </p>
+              <p
+                v-if="
                   newGroupForm.key &&
-                  (!isValidKey(newGroupForm.key) ||
-                    !isKeyUnique(newGroupForm.key)),
-              }"
-            >
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Only letters, numbers, and underscores allowed. Must be unique.
-            </p>
-            <p
-              v-if="newGroupForm.key && !isValidKey(newGroupForm.key)"
-              class="mt-1 text-xs text-red-500"
-            >
-              Key can only contain letters, numbers, and underscores.
-            </p>
-            <p
-              v-if="
-                newGroupForm.key &&
-                isValidKey(newGroupForm.key) &&
-                !isKeyUnique(newGroupForm.key)
-              "
-              class="mt-1 text-xs text-red-500"
-            >
-              This key is already used by another filter group.
-            </p>
-          </div>
+                  isValidKey(newGroupForm.key) &&
+                  !isKeyUnique(newGroupForm.key)
+                "
+                class="mt-1 text-xs text-red-500"
+              >
+                This key is already used by another filter group.
+              </p>
+            </div>
 
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Display Name
-            </label>
-            <input
-              v-model="newGroupForm.displayName"
-              type="text"
-              placeholder="e.g. Lot Size"
-              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-            >
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Human-readable name shown to users.
-            </p>
-          </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Display Name
+              </label>
+              <input
+                v-model="newGroupForm.displayName"
+                type="text"
+                placeholder="e.g. Lot Size"
+                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              />
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Human-readable name shown to users.
+              </p>
+            </div>
 
-          <div class="flex space-x-3">
-            <button
-              type="button"
-              class="border-transparent rounded-md border bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              :disabled="!canAddGroup"
-              @click="addNewGroup"
-            >
-              Add Group
-            </button>
-            <button
-              type="button"
-              class="hover:bg-gray-50 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700"
-              @click="showNewGroupForm = false"
-            >
-              Cancel
-            </button>
+            <div class="flex space-x-3">
+              <button
+                type="button"
+                class="border-transparent rounded-md border bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                :disabled="!canAddGroup"
+                @click="addNewGroup"
+              >
+                Add Group
+              </button>
+              <button
+                type="button"
+                class="hover:bg-gray-50 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700"
+                @click="showNewGroupForm = false"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Existing Filter Groups -->
-    <div v-if="filterGroups.length > 0" class="space-y-4">
-      <h4 class="text-md font-medium text-gray-900 dark:text-white">
-        Existing Filter Groups
-      </h4>
+      <!-- Existing Filter Groups -->
+      <div v-if="filterGroups.length > 0" class="space-y-4">
+        <h4 class="text-md font-medium text-gray-900 dark:text-white">
+          Existing Filter Groups
+        </h4>
 
-      <div
-        v-for="(group, index) in filterGroups"
-        :key="group.id"
-        class="rounded-md border border-gray-300 bg-white p-4 dark:border-gray-600 dark:bg-gray-800"
-        :class="{ 'pointer-events-none opacity-50': disabled }"
-      >
-        <FilterOptionManager
-          :filter-group="group"
-          :group-index="index + 1"
-          :can-move-up="index > 0"
-          :can-move-down="index < filterGroups.length - 1"
-          :disabled="disabled"
-          :existing-keys="
-            filterGroups.map((g) => g.key).filter((k) => k !== group.key)
-          "
-          @update-group="updateGroup"
-          @remove-group="removeGroup"
-          @move-group="moveGroup"
-        />
+        <div
+          v-for="(group, index) in filterGroups"
+          :key="group.id"
+          class="rounded-md border border-gray-300 bg-white p-4 dark:border-gray-600 dark:bg-gray-800"
+          :class="{ 'pointer-events-none opacity-50': disabled }"
+        >
+          <FilterOptionManager
+            :filter-group="group"
+            :group-index="index + 1"
+            :can-move-up="index > 0"
+            :can-move-down="index < filterGroups.length - 1"
+            :disabled="disabled"
+            :existing-keys="
+              filterGroups.map((g) => g.key).filter((k) => k !== group.key)
+            "
+            @update-group="updateGroup"
+            @remove-group="removeGroup"
+            @move-group="moveGroup"
+          />
+        </div>
       </div>
-    </div>
 
-    <!-- Empty State -->
-    <div
-      v-if="filterGroups.length === 0 && !showNewGroupForm"
-      class="py-6 text-center text-gray-500 dark:text-gray-400"
-      :class="{ 'opacity-50': disabled }"
-    >
-      <p>No filter groups configured.</p>
-      <p class="text-sm">Add a filter group above to get started.</p>
-    </div>
+      <!-- Empty State -->
+      <div
+        v-if="filterGroups.length === 0 && !showNewGroupForm"
+        class="py-6 text-center text-gray-500 dark:text-gray-400"
+        :class="{ 'opacity-50': disabled }"
+      >
+        <p>No filter groups configured.</p>
+        <p class="text-sm">Add a filter group above to get started.</p>
+      </div>
 
       <div v-if="disabled" class="bg-gray-50 rounded-md p-4 dark:bg-gray-800">
         <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -494,7 +517,9 @@ watch(() => props.filterGroups, (newGroups) => {
       <!-- YAML Textarea -->
       <div class="space-y-3">
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label
+            class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Filter Groups Configuration
           </label>
           <textarea
@@ -519,7 +544,7 @@ watch(() => props.filterGroups, (newGroups) => {
         </div>
 
         <!-- Error Message -->
-        <div v-if="yamlError" class="rounded-md bg-red-50 p-3 dark:bg-red-900">
+        <div v-if="yamlError" class="bg-red-50 rounded-md p-3 dark:bg-red-900">
           <div class="text-sm text-red-700 dark:text-red-200">
             <strong>YAML Error:</strong> {{ yamlError }}
           </div>
@@ -528,12 +553,19 @@ watch(() => props.filterGroups, (newGroups) => {
         <!-- Help Text -->
         <div class="text-sm text-gray-600 dark:text-gray-400">
           <p><strong>Required fields:</strong></p>
-          <ul class="mt-1 list-disc list-inside space-y-1">
-            <li><code>key</code>: Unique identifier (letters, numbers, underscores only)</li>
+          <ul class="mt-1 list-inside list-disc space-y-1">
+            <li>
+              <code>key</code>: Unique identifier (letters, numbers, underscores
+              only)
+            </li>
             <li><code>displayName</code>: Human-readable name</li>
             <li><code>mode</code>: Either "INCLUDE" or "EXCLUDE"</li>
             <li><code>order</code>: Display order (number)</li>
-            <li><code>options</code>: Array of filter options with <code>value</code>, <code>displayName</code>, and <code>order</code></li>
+            <li>
+              <code>options</code>: Array of filter options with
+              <code>value</code>, <code>displayName</code>, and
+              <code>order</code>
+            </li>
           </ul>
         </div>
 

@@ -77,9 +77,7 @@ describe('Comment moderation link verification', () => {
       // Step 5: Store issue URL
       cy.url().then((issueUrl) => {
         // Find link back to original comment context
-        cy.get('#original-post-container')
-          .contains('Context')
-          .click();
+        cy.get('#original-post-container').contains('Context').click();
         cy.wait('@graphqlRequest');
 
         // Step 6: Verify we returned to the original discussion context
@@ -98,9 +96,7 @@ describe('Comment moderation link verification', () => {
         cy.wait('@graphqlRequest');
 
         // Step 9: Follow link back to original context
-        cy.get('#original-post-container')
-          .contains('Context')
-          .click();
+        cy.get('#original-post-container').contains('Context').click();
         cy.wait('@graphqlRequest');
 
         // Step 10: Verify comment is no longer archived
@@ -196,9 +192,7 @@ describe('Comment moderation link verification', () => {
     // Store issue URL
     cy.url().then((issueUrl) => {
       // Verify we can navigate from issue to original feedback
-      cy.get('#original-post-container')
-        .contains('Context')
-        .click();
+      cy.get('#original-post-container').contains('Context').click();
       cy.wait('@graphqlRequest');
 
       // Verify we're on the feedback permalink page

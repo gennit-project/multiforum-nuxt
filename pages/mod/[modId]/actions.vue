@@ -67,19 +67,30 @@ const buildLinks = (activity: ModActivity) => getModActivityLinks(activity);
     <div v-else-if="loading" class="text-sm text-gray-500 dark:text-gray-400">
       Loading actions...
     </div>
-    <div v-else-if="activities.length === 0" class="text-sm text-gray-500 dark:text-gray-400">
+    <div
+      v-else-if="activities.length === 0"
+      class="text-sm text-gray-500 dark:text-gray-400"
+    >
       No moderation actions yet.
     </div>
     <ul v-else class="divide-y border-t border-gray-200 dark:border-gray-800">
       <li v-for="activity in activities" :key="activity.id" class="px-2 py-4">
         <div class="flex flex-col gap-2">
           <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-            {{ activity.actionDescription || activity.actionType || 'Moderation activity' }}
+            {{
+              activity.actionDescription ||
+              activity.actionType ||
+              'Moderation activity'
+            }}
           </div>
           <div class="text-xs text-gray-500 dark:text-gray-400">
-            {{ activity.createdAt ? timeAgo(new Date(activity.createdAt)) : '' }}
+            {{
+              activity.createdAt ? timeAgo(new Date(activity.createdAt)) : ''
+            }}
           </div>
-          <div class="flex flex-wrap gap-3 text-xs font-medium text-gray-600 dark:text-gray-300">
+          <div
+            class="flex flex-wrap gap-3 text-xs font-medium text-gray-600 dark:text-gray-300"
+          >
             <nuxt-link
               v-for="link in buildLinks(activity)"
               :key="`${link.label}-${link.to.name}`"

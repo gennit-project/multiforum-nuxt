@@ -70,7 +70,9 @@ const loadMore = () => {
 };
 
 const issueCount = computed(() => {
-  return issueResult.value?.moderationProfiles?.[0]?.AuthoredIssues?.length || 0;
+  return (
+    issueResult.value?.moderationProfiles?.[0]?.AuthoredIssues?.length || 0
+  );
 });
 
 const issues = computed(() => {
@@ -105,9 +107,7 @@ const issues = computed(() => {
     <div v-if="issueCount">
       <LoadMore
         class="justify-self-center"
-        :reached-end-of-results="
-          commentsAggregate === issueCount
-        "
+        :reached-end-of-results="commentsAggregate === issueCount"
         @load-more="loadMore"
       />
     </div>

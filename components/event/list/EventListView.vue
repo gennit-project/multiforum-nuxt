@@ -182,7 +182,7 @@ const toggleShowMainFilters = () => {
       class="flex items-center justify-between px-1 pt-1"
     >
       <div
-        class="text-sm font-semibold tracking-wide text-gray-900 dark:text-gray-100 [font-variant-caps:all-small-caps]"
+        class="font-semibold text-sm tracking-wide text-gray-900 [font-variant-caps:all-small-caps] dark:text-gray-100"
       >
         Online events
       </div>
@@ -212,7 +212,9 @@ const toggleShowMainFilters = () => {
       :toggle-show-archived-enabled="true"
       :hide-filters-button-externally="isSearchListRoute"
       :show-new-event-next-to-search-bar="isSearchListRoute"
-      :external-show-main-filters="isSearchListRoute ? showMainFilters : undefined"
+      :external-show-main-filters="
+        isSearchListRoute ? showMainFilters : undefined
+      "
     >
       <TimeShortcuts :is-list-view="true" />
       <OnlineInPersonShortcuts v-if="channelId" />

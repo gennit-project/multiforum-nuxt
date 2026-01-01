@@ -29,10 +29,10 @@ The map system displays events geographically using Google Maps with automatic m
 
 ```typescript
 interface MapProps {
-  events: Event[];           // Array of events to display
-  colorLocked: boolean;      // Prevents marker state changes during interactions
-  previewIsOpen: boolean;    // Indicates if event preview is active
-  useMobileStyles: boolean;  // Toggles between mobile/desktop rendering
+  events: Event[]; // Array of events to display
+  colorLocked: boolean; // Prevents marker state changes during interactions
+  previewIsOpen: boolean; // Indicates if event preview is active
+  useMobileStyles: boolean; // Toggles between mobile/desktop rendering
 }
 ```
 
@@ -67,10 +67,10 @@ interface MarkerMap {
 ```
 
 Events are grouped by location using concatenated coordinates as keys:
+
 ```typescript
-const eventLocationId = 
-  event.location.latitude.toString() + 
-  event.location.longitude.toString();
+const eventLocationId =
+  event.location.latitude.toString() + event.location.longitude.toString();
 ```
 
 ### Event Handling
@@ -83,6 +83,7 @@ The component handles different interaction patterns:
 ### Watchers
 
 The map automatically re-renders when:
+
 - Theme changes (light/dark mode)
 - Mobile/desktop view switches
 
@@ -93,6 +94,7 @@ The map automatically re-renders when:
 Location: `tests/unit/components/event/map/Map.spec.ts`
 
 The tests cover:
+
 1. **MarkerClusterer Initialization** - Verifies clustering is properly set up
 2. **Configuration Validation** - Ensures correct parameters are passed
 3. **Mock Setup** - Comprehensive Google Maps API mocking

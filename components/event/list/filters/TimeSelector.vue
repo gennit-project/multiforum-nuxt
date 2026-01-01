@@ -74,7 +74,7 @@ const hourRangesDataComputed = computed(() => hourRangesData);
             class="mr-1 h-4 w-4 cursor-pointer rounded border-gray-400 text-orange-600 focus:ring-orange-500 dark:bg-gray-300"
             :checked="workingCopyOfSelectedHourRanges[range['12-hour-label']]"
             @input="() => toggleSelectTimeRange(range)"
-          >
+          />
           <span class="ml-2 whitespace-nowrap text-sm font-medium">{{
             range['12-hour-label']
           }}</span>

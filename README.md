@@ -319,7 +319,6 @@ Multiforum uses a hybrid authentication system that combines Auth0 for secure au
 To prevent UI flash and hydration issues, the application uses a two-layer authentication approach:
 
 1. **Auth Hint Cookies (SSR-compatible)**
-
    - Non-sensitive cookies that indicate whether a user is logged in
    - Can be read during Server-Side Rendering (SSR) for immediate auth state
    - Ensures server and client render the same initial state
@@ -333,20 +332,17 @@ To prevent UI flash and hydration issues, the application uses a two-layer authe
 ### How It Works
 
 1. **Login Flow**:
-
    - User authenticates through Auth0
    - Auth hint cookie is set (indicates "logged in" state)
    - Auth token is stored in localStorage
    - User data is fetched and cached
 
 2. **SSR Rendering**:
-
    - Server reads auth hint cookies during SSR
    - Renders appropriate UI state (logged in vs logged out)
    - Client hydrates with matching state, preventing flash
 
 3. **Client-side Operation**:
-
    - App checks for auth tokens in localStorage
    - Makes authenticated GraphQL requests
    - Maintains reactive auth state throughout the session

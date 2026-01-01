@@ -1,7 +1,12 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-type AllowedItemType = 'discussion' | 'comment' | 'image' | 'channel' | 'download';
+type AllowedItemType =
+  | 'discussion'
+  | 'comment'
+  | 'image'
+  | 'channel'
+  | 'download';
 
 export const useAddToListModalStore = defineStore('addToListModal', () => {
   const isOpen = ref(false);

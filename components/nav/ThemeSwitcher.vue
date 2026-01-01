@@ -32,9 +32,7 @@ const toggleTheme = () => {
       <span
         class="pointer-events-none relative inline-block size-5 transform rounded-full shadow ring-0 transition duration-200 ease-in-out"
         :class="[
-          isDarkMode
-            ? 'translate-x-5 bg-gray-900'
-            : 'translate-x-0 bg-white',
+          isDarkMode ? 'translate-x-5 bg-gray-900' : 'translate-x-0 bg-white',
         ]"
       >
         <!-- Sun icon in light mode -->

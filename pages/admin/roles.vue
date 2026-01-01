@@ -44,7 +44,7 @@ const serverConfig = computed(() => {
           </div>
 
           <section class="space-y-4">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+            <h2 class="font-semibold text-xl text-gray-900 dark:text-gray-100">
               Standard User Roles
             </h2>
             <DefaultRolesEditor
@@ -57,7 +57,7 @@ const serverConfig = computed(() => {
           </section>
 
           <section class="space-y-4">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+            <h2 class="font-semibold text-xl text-gray-900 dark:text-gray-100">
               Mod Roles
             </h2>
             <DefaultRolesEditor

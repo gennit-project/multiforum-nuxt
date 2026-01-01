@@ -210,7 +210,9 @@ const selectSearchType = (type: SearchType) => {
         </div>
 
         <!-- Mobile Search Section -->
-        <div class="mt-4 border-b border-gray-200 px-4 pb-4 dark:border-gray-600">
+        <div
+          class="mt-4 border-b border-gray-200 px-4 pb-4 dark:border-gray-600"
+        >
           <div class="relative">
             <div
               class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-gray-300"
@@ -223,13 +225,13 @@ const selectSearchType = (type: SearchType) => {
               placeholder="Search..."
               class="h-9 w-full rounded-lg border border-gray-200 bg-white pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
               @keydown.enter.prevent="executeSearch"
-            >
+            />
           </div>
           <div class="mt-2 flex items-center gap-2">
             <div class="relative flex-1">
               <button
                 type="button"
-                class="flex h-8 w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 text-xs text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                class="hover:bg-gray-50 flex h-8 w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 text-xs text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
                 @click="showSearchTypeDropdown = !showSearchTypeDropdown"
               >
                 <span>{{ selectedSearchTypeLabel }}</span>
@@ -264,7 +266,7 @@ const selectSearchType = (type: SearchType) => {
             </div>
             <button
               type="button"
-              class="h-8 rounded-md bg-orange-500 px-4 text-xs font-semibold text-white hover:bg-orange-600"
+              class="font-semibold h-8 rounded-md bg-orange-500 px-4 text-xs text-white hover:bg-orange-600"
               @click="executeSearch"
             >
               Search

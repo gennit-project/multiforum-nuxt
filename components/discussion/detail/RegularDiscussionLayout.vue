@@ -79,7 +79,9 @@ const hasAlbum = computed(() => {
       :show-emoji-button="true"
     >
       <template #album-slot>
-        <div class="mt-1 w-full min-w-0 overflow-hidden rounded-lg bg-black text-white">
+        <div
+          class="mt-1 w-full min-w-0 overflow-hidden rounded-lg bg-black text-white"
+        >
           <DiscussionAlbum
             v-if="hasAlbum"
             :album="discussion?.Album || null"
@@ -115,15 +117,15 @@ const hasAlbum = computed(() => {
       </template>
       <template #button-slot>
         <div class="flex-col items-center">
-            <DiscussionVotes
-              v-if="activeDiscussionChannel"
-              :discussion="discussion"
-              :discussion-channel="activeDiscussionChannel"
-              :show-emoji-button="true"
-              :show-downvote="
-                !loggedInUserIsAuthor &&
-                (activeDiscussionChannel?.Channel?.feedbackEnabled ?? true)
-              "
+          <DiscussionVotes
+            v-if="activeDiscussionChannel"
+            :discussion="discussion"
+            :discussion-channel="activeDiscussionChannel"
+            :show-emoji-button="true"
+            :show-downvote="
+              !loggedInUserIsAuthor &&
+              (activeDiscussionChannel?.Channel?.feedbackEnabled ?? true)
+            "
             :use-heart-icon="false"
             @handle-click-edit-feedback="emit('handleClickEditFeedback')"
             @handle-click-give-feedback="emit('handleClickGiveFeedback')"

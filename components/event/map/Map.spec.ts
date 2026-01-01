@@ -95,7 +95,7 @@ describe('Map with Clustering', () => {
       },
     } as Event,
     {
-      id: '2', 
+      id: '2',
       title: 'Event 2',
       location: {
         latitude: 33.4256, // Very close to first event
@@ -104,7 +104,7 @@ describe('Map with Clustering', () => {
     } as Event,
     {
       id: '3',
-      title: 'Event 3', 
+      title: 'Event 3',
       location: {
         latitude: 34.0522, // Different location
         longitude: -118.2437,
@@ -114,7 +114,7 @@ describe('Map with Clustering', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Mock DOM elements
     Object.defineProperty(window, 'innerWidth', {
       writable: true,
@@ -142,7 +142,7 @@ describe('Map with Clustering', () => {
 
   it('should initialize MarkerClusterer with events', async () => {
     const { MarkerClusterer } = await import('@googlemaps/markerclusterer');
-    
+
     const wrapper = mount(Map, {
       props: {
         events: mockEvents,
@@ -154,21 +154,23 @@ describe('Map with Clustering', () => {
 
     // Wait for component to mount and async renderMap to complete
     await wrapper.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 0));
-    
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     // Verify MarkerClusterer was called
     expect(MarkerClusterer).toHaveBeenCalled();
-    
+
     // Verify map was created
     expect(global.google.maps.Map).toHaveBeenCalled();
-    
+
     // Verify markers were created for each event + 1 test marker
-    expect(global.google.maps.Marker).toHaveBeenCalledTimes(mockEvents.length + 1);
+    expect(global.google.maps.Marker).toHaveBeenCalledTimes(
+      mockEvents.length + 1
+    );
   });
 
   it('should create MarkerClusterer with correct configuration', async () => {
     const { MarkerClusterer } = await import('@googlemaps/markerclusterer');
-    
+
     const wrapper = mount(Map, {
       props: {
         events: mockEvents,
@@ -180,8 +182,8 @@ describe('Map with Clustering', () => {
 
     // Wait for component to mount and async renderMap to complete
     await wrapper.vm.$nextTick();
-    await new Promise(resolve => setTimeout(resolve, 0));
-    
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     // Verify MarkerClusterer was called with correct parameters
     expect(MarkerClusterer).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -190,7 +192,7 @@ describe('Map with Clustering', () => {
         onClusterClick: expect.any(Function),
       })
     );
-    
+
     // Verify the correct number of markers were passed
     const call = (MarkerClusterer as any).mock.calls[0];
     const config = call[0];

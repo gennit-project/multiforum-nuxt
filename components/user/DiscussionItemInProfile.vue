@@ -56,7 +56,9 @@ const tags = (props.discussion.Tags ?? []).map((tag) => tag.text);
       () => {
         if (defaultUniqueName) {
           const basePath = isDownload ? 'downloads' : 'discussions';
-          router.push(`/forums/${defaultUniqueName}/${basePath}/${discussion.id}`);
+          router.push(
+            `/forums/${defaultUniqueName}/${basePath}/${discussion.id}`
+          );
         }
       }
     "

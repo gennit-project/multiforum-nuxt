@@ -179,8 +179,8 @@ const relatedIssueNumber = computed(() => {
   }
 
   return (
-    getDiscussionCommentIssueResult.value?.discussionChannels?.[0]?.Comments?.[0]
-      ?.RelatedIssues?.[0]?.issueNumber ?? null
+    getDiscussionCommentIssueResult.value?.discussionChannels?.[0]
+      ?.Comments?.[0]?.RelatedIssues?.[0]?.issueNumber ?? null
   );
 });
 
@@ -494,7 +494,7 @@ const warningModalBody = computed(() => {
           @crosspost="handleCrosspost"
         >
           <div
-            class="flex items-center gap-1 rounded px-2 py-1 text-xs font-semibold text-gray-600 hover:text-black dark:text-gray-300 dark:hover:text-white"
+            class="font-semibold flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-600 hover:text-black dark:text-gray-300 dark:hover:text-white"
           >
             <LinkIcon class="h-4 w-4" />
             <span>Share</span>

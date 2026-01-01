@@ -146,9 +146,7 @@ const { result: getPermissionResult } = useQuery(
   {
     enabled: computed(
       () =>
-        !!modProfileNameVar.value &&
-        !!usernameVar.value &&
-        !!channelId.value
+        !!modProfileNameVar.value && !!usernameVar.value && !!channelId.value
     ),
     fetchPolicy: 'cache-first',
   }

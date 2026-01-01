@@ -36,7 +36,7 @@ const handleImageClick = () => {
       class="cursor-pointer"
       :class="{ 'rounded-full': rounded }"
       @click="handleImageClick"
-    >
+    />
     <vue-easy-lightbox
       v-if="visible"
       :visible="visible"

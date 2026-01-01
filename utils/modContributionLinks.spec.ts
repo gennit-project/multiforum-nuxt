@@ -176,9 +176,7 @@ describe('getModActivityLinks', () => {
         id: 'comment-3',
         Event: {
           id: 'event-2',
-          EventChannels: [
-            { channelUniqueName: 'tucson', eventId: 'event-2' },
-          ],
+          EventChannels: [{ channelUniqueName: 'tucson', eventId: 'event-2' }],
         },
       },
     });

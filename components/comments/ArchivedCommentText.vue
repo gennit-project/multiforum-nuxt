@@ -20,7 +20,8 @@ const { result: getCommentIssueResult } = useQuery(GET_COMMENT_ISSUE, {
 });
 
 const issueNumber = computed(() => {
-  return getCommentIssueResult.value?.comments[0]?.RelatedIssues[0]?.issueNumber;
+  return getCommentIssueResult.value?.comments[0]?.RelatedIssues[0]
+    ?.issueNumber;
 });
 
 const markdownLinkToIssue = computed(() => {

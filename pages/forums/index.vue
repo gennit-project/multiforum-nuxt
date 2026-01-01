@@ -3,7 +3,10 @@ import { computed, ref, watchEffect } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import ChannelList from '@/components/channel/ChannelList.vue';
-import { GET_CHANNELS_DISCUSSIONS, GET_CHANNELS_DOWNLOADS } from '@/graphQLData/channel/queries';
+import {
+  GET_CHANNELS_DISCUSSIONS,
+  GET_CHANNELS_DOWNLOADS,
+} from '@/graphQLData/channel/queries';
 import TagIcon from '@/components/icons/TagIcon.vue';
 import FilterChip from '@/components/FilterChip.vue';
 import SearchBar from '@/components/SearchBar.vue';
@@ -97,83 +100,85 @@ const {
 );
 
 // Query for channels with download counts
-const {
-  result: downloadCountsResult,
-  fetchMore: fetchMoreDownloadCounts,
-} = useQuery(
-  GET_CHANNELS_DOWNLOADS,
-  {
-    limit: 25,
-    offset: 0,
-    tags: selectedTags,
-    searchInput: searchInput,
-  },
-  {
-    fetchPolicy: 'cache-first',
-  }
-);
+const { result: downloadCountsResult, fetchMore: fetchMoreDownloadCounts } =
+  useQuery(
+    GET_CHANNELS_DOWNLOADS,
+    {
+      limit: 25,
+      offset: 0,
+      tags: selectedTags,
+      searchInput: searchInput,
+    },
+    {
+      fetchPolicy: 'cache-first',
+    }
+  );
 
 // Create map of channel name -> discussion count from the discussions query
 const discussionCountMap = computed(() => {
   const map = new Map<string, number>();
-  const discussionChannels = channelResult.value?.getSortedChannels?.channels || [];
-  
+  const discussionChannels =
+    channelResult.value?.getSortedChannels?.channels || [];
+
   discussionChannels.forEach((channel: Channel) => {
     if (channel.uniqueName) {
       const discussionCount = channel.DiscussionChannelsAggregate?.count || 0;
       map.set(channel.uniqueName, discussionCount);
     }
   });
-  
+
   return map;
 });
 
-// Create map of channel name -> download count from the downloads query  
+// Create map of channel name -> download count from the downloads query
 const downloadCountMap = computed(() => {
   const map = new Map<string, number>();
-  const downloadChannels = downloadCountsResult.value?.getSortedChannels?.channels || [];
-  
+  const downloadChannels =
+    downloadCountsResult.value?.getSortedChannels?.channels || [];
+
   downloadChannels.forEach((channel: Channel) => {
     if (channel.uniqueName) {
       const downloadCount = channel.DiscussionChannelsAggregate?.count || 0;
       map.set(channel.uniqueName, downloadCount);
     }
   });
-  
+
   return map;
 });
 
 // Merge channels by injecting both counts from the maps
 const mergedChannels = computed(() => {
   const baseChannels = channelResult.value?.getSortedChannels?.channels || [];
-  
+
   return baseChannels.map((channel: Channel) => {
-    const discussionCount = discussionCountMap.value.get(channel.uniqueName) || 0;
+    const discussionCount =
+      discussionCountMap.value.get(channel.uniqueName) || 0;
     const downloadCount = downloadCountMap.value.get(channel.uniqueName) || 0;
-    
+
     // Create new channel object with corrected discussion count and added download count
     return {
       ...channel,
       DiscussionChannelsAggregate: {
         ...channel.DiscussionChannelsAggregate,
-        count: discussionCount
+        count: discussionCount,
       },
-      downloadCount
+      downloadCount,
     };
   });
 });
 
 // Function to load more channels
 const loadMore = () => {
-  const currentOffset = channelResult.value?.getSortedChannels?.channels?.length || 0;
-  
+  const currentOffset =
+    channelResult.value?.getSortedChannels?.channels?.length || 0;
+
   fetchMore({
     variables: {
       offset: currentOffset,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;
-      
+
       return {
         ...previousResult,
         getSortedChannels: {
@@ -194,7 +199,7 @@ const loadMore = () => {
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;
-      
+
       return {
         ...previousResult,
         getSortedChannels: {
@@ -267,8 +272,11 @@ const defaultLabels = {
             @filter-by-tag="setSelectedTags"
             @load-more="loadMore"
           />
-          <div 
-            v-else-if="channelLoading && (!channelResult || !channelResult.getSortedChannels?.channels)" 
+          <div
+            v-else-if="
+              channelLoading &&
+              (!channelResult || !channelResult.getSortedChannels?.channels)
+            "
             class="mx-auto max-w-5xl flex-1"
           >
             <div

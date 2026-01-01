@@ -123,7 +123,7 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
       // Note: We might need to handle updates here if group properties changed
     }));
 
-  // Create new groups (those without IDs)  
+  // Create new groups (those without IDs)
   const filterGroupCreations = formValues.value.downloadFilterGroups
     .filter((group: any) => !group.id) // Only new groups
     .map((group, _index) => ({
@@ -168,9 +168,15 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
     allowedFileTypes: formValues.value.allowedFileTypes,
     Tags: [{ connectOrCreate: tagConnections, disconnect: tagDisconnections }],
     FilterGroups: [
-      ...(filterGroupConnections.length > 0 ? [{ connect: filterGroupConnections }] : []),
-      ...(filterGroupCreations.length > 0 ? [{ create: filterGroupCreations }] : []),
-      ...(filterGroupDisconnections.length > 0 ? [{ disconnect: filterGroupDisconnections }] : []),
+      ...(filterGroupConnections.length > 0
+        ? [{ connect: filterGroupConnections }]
+        : []),
+      ...(filterGroupCreations.length > 0
+        ? [{ create: filterGroupCreations }]
+        : []),
+      ...(filterGroupDisconnections.length > 0
+        ? [{ disconnect: filterGroupDisconnections }]
+        : []),
     ],
     Admins: [
       { connect: [{ where: { node: { username: usernameVar.value } } }] },
@@ -203,9 +209,9 @@ function submit() {
     console.log('Channel update input FilterGroups:', {
       connect: updateInput.FilterGroups?.[0]?.connect?.length || 0,
       create: updateInput.FilterGroups?.[0]?.create?.length || 0,
-      disconnect: updateInput.FilterGroups?.[0]?.disconnect?.length || 0
+      disconnect: updateInput.FilterGroups?.[0]?.disconnect?.length || 0,
     });
-    
+
     updateChannel({
       where: { uniqueName: channelId },
       update: updateInput,
@@ -269,8 +275,8 @@ const hasError = computed(() => {
                   class="mb-8 h-4 w-1/2 rounded bg-gray-200 dark:bg-gray-700"
                 />
                 <div class="space-y-4">
-                  <div class="h-10 rounded bg-gray-200 dark:bg-gray-700"/>
-                  <div class="h-10 rounded bg-gray-200 dark:bg-gray-700"/>
+                  <div class="h-10 rounded bg-gray-200 dark:bg-gray-700" />
+                  <div class="h-10 rounded bg-gray-200 dark:bg-gray-700" />
                 </div>
               </div>
             </div>

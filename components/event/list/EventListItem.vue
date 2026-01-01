@@ -209,7 +209,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
         :src="event.coverImageURL"
         alt="Event cover image"
         class="mb-4 block max-h-48 rounded-lg md:hidden"
-      >
+      />
       <!-- Title and image section for medium+ screens -->
       <div class="hidden md:flex md:items-start md:gap-4">
         <div class="flex-1">
@@ -266,7 +266,10 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
               type="button"
               class="rounded-md bg-gray-100 px-4 py-1 text-xs text-black hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
             >
-              <i class="fa-regular fa-comment mr-2 h-4 w-4" aria-hidden="true" />
+              <i
+                class="fa-regular fa-comment mr-2 h-4 w-4"
+                aria-hidden="true"
+              />
               <span class="text black text-sm dark:text-white">{{
                 `${commentCount}`
               }}</span>
@@ -284,7 +287,10 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
               type="button"
               class="-ml-1 mt-1 flex items-center rounded-md bg-gray-100 px-4 pb-2 pt-2 hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
             >
-              <i class="fa-regular fa-comment mr-2 h-4 w-4" aria-hidden="true" />
+              <i
+                class="fa-regular fa-comment mr-2 h-4 w-4"
+                aria-hidden="true"
+              />
               {{
                 `${commentCount} ${
                   commentCount === 1 ? 'comment' : 'comments'
@@ -302,7 +308,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
             :alt="event.title"
             :src="event.coverImageURL"
             class="h-32 w-32 rounded-lg"
-          >
+          />
         </div>
       </div>
       <!-- Title section for small screens -->

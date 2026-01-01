@@ -641,7 +641,7 @@ const touched = ref(false);
                   alt="Cover Image"
                   :src="formValues.coverImageURL"
                   class="h-auto max-h-64 w-full object-cover"
-                >
+                />
 
                 <!-- Image overlay when loading -->
                 <div

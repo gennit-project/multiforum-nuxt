@@ -319,7 +319,7 @@ const saveEdit = async () => {
     class="mt-4 list-none"
     :class="[
       isPermalinked
-        ? 'dark:bg-orange-950 rounded-lg border border-orange-500 bg-orange-100'
+        ? 'rounded-lg border border-orange-500 bg-orange-100 dark:bg-orange-950'
         : '',
     ]"
   >

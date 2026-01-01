@@ -58,7 +58,10 @@ export const getModActivityLinks = (
     const discussionChannel = getFirst(
       activity.RelatedDiscussion?.DiscussionChannels
     );
-    if (discussionChannel?.channelUniqueName && discussionChannel?.discussionId) {
+    if (
+      discussionChannel?.channelUniqueName &&
+      discussionChannel?.discussionId
+    ) {
       links.push({
         label: 'Feedback',
         to: {
@@ -96,8 +99,10 @@ export const getModActivityLinks = (
         to: {
           name: 'forums-forumId-discussions-commentFeedback-discussionId-commentId-feedbackPermalink-feedbackId',
           params: {
-            forumId: activity.RelatedComment.DiscussionChannel.channelUniqueName,
-            discussionId: activity.RelatedComment.DiscussionChannel.discussionId,
+            forumId:
+              activity.RelatedComment.DiscussionChannel.channelUniqueName,
+            discussionId:
+              activity.RelatedComment.DiscussionChannel.discussionId,
             commentId: activity.RelatedComment.id,
             feedbackId: activity.Comment.id,
           },
@@ -106,10 +111,7 @@ export const getModActivityLinks = (
     }
   }
 
-  if (
-    activity.Issue?.channelUniqueName &&
-    activity.Issue.issueNumber != null
-  ) {
+  if (activity.Issue?.channelUniqueName && activity.Issue.issueNumber != null) {
     links.push({
       label: 'Issue',
       to: {
@@ -169,7 +171,8 @@ export const getModActivityLinks = (
       },
     });
   } else if (
-    getFirst(activity.RelatedComment?.Event?.EventChannels)?.channelUniqueName &&
+    getFirst(activity.RelatedComment?.Event?.EventChannels)
+      ?.channelUniqueName &&
     activity.RelatedComment?.Event?.id &&
     activity.RelatedComment?.id
   ) {

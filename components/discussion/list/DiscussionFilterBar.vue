@@ -325,7 +325,7 @@ const isExpanded = computed(() => {
         </div>
       </div>
     </div>
-    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" >
+    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" />
     <div
       v-if="showSearch"
       class="flex flex-col gap-2 bg-gray-100 py-2 dark:bg-gray-700 dark:text-gray-300"
@@ -376,7 +376,10 @@ const isExpanded = computed(() => {
             : 'Show archived discussions'
         }}
       </div>
-      <div v-if="isForumScoped && !isDownloadPage" class="flex items-center gap-2 pr-2 text-sm">
+      <div
+        v-if="isForumScoped && !isDownloadPage"
+        class="flex items-center gap-2 pr-2 text-sm"
+      >
         <CheckBox
           data-testid="show-unanswered-discussions"
           class="align-middle"

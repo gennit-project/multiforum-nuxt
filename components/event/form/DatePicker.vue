@@ -44,7 +44,7 @@ const baseStyles = computed(() => {
       :value="value"
       style="color-scheme: light dark"
       @input="handleChange"
-    >
+    />
     <!-- Using only the native calendar icon -->
   </div>
 </template>

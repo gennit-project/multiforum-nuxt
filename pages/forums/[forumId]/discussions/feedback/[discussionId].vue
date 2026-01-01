@@ -64,7 +64,8 @@ const discussion = computed(() => {
 });
 
 const stlFiles = computed(() => {
-  const files = (discussion.value?.DownloadableFiles || []) as DownloadableFile[];
+  const files = (discussion.value?.DownloadableFiles ||
+    []) as DownloadableFile[];
   return files.filter(
     (file) =>
       file.fileName?.toLowerCase().endsWith('.stl') ||
@@ -73,8 +74,7 @@ const stlFiles = computed(() => {
 });
 
 const hasAlbum = computed(() => {
-  const hasImages =
-    (discussion.value?.Album?.Images?.length || 0) > 0;
+  const hasImages = (discussion.value?.Album?.Images?.length || 0) > 0;
   return hasImages || stlFiles.value.length > 0;
 });
 

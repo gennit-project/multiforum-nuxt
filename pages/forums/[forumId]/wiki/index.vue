@@ -365,7 +365,10 @@ onGetChannelResult((result) => {
           class="sticky top-0 hidden max-h-screen w-64 flex-shrink-0 overflow-y-auto xl:order-1 xl:flex"
         >
           <!-- On This Page Navigation -->
-          <OnThisPage :markdown-content="wikiHomePage.body" :is-mobile="false" />
+          <OnThisPage
+            :markdown-content="wikiHomePage.body"
+            :is-mobile="false"
+          />
         </div>
 
         <!-- Right sidebar - controls and more pages (desktop only) -->
@@ -377,7 +380,9 @@ onGetChannelResult((result) => {
 
             <!-- Child Pages - shown in right sidebar at xl screens -->
             <div
-              v-if="wikiHomePage.ChildPages && wikiHomePage.ChildPages.length > 0"
+              v-if="
+                wikiHomePage.ChildPages && wikiHomePage.ChildPages.length > 0
+              "
               class="w-full"
             >
               <h3
@@ -420,10 +425,10 @@ onGetChannelResult((result) => {
         v-if="wikiHomePage.ChildPages && wikiHomePage.ChildPages.length > 0"
         class="mt-8 block xl:hidden"
       >
-        <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-600 dark:bg-gray-800">
-          <h3
-            class="mb-4 text-lg font-semibold text-gray-900 dark:text-white"
-          >
+        <div
+          class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-600 dark:bg-gray-800"
+        >
+          <h3 class="font-semibold mb-4 text-lg text-gray-900 dark:text-white">
             More Wiki Pages
           </h3>
           <div class="space-y-3">
@@ -444,9 +449,7 @@ onGetChannelResult((result) => {
               <p class="ml-3 text-xs text-gray-500 dark:text-gray-400">
                 Updated
                 {{
-                  timeAgo(
-                    new Date(childPage.updatedAt || childPage.createdAt)
-                  )
+                  timeAgo(new Date(childPage.updatedAt || childPage.createdAt))
                 }}
               </p>
             </div>

@@ -107,7 +107,9 @@ const allEdits = computed(() => {
       // Skip the most recent past version since we handled it above
       if (index === 0) return;
 
-      const previousVersion: TextVersion = wikiPage.value.PastVersions[index + 1] || {
+      const previousVersion: TextVersion = wikiPage.value.PastVersions[
+        index + 1
+      ] || {
         id: 'initial',
         body: '', // Show diff from empty if this was the first edit
         createdAt: version.createdAt,
@@ -408,7 +410,7 @@ useHead({
                 class="flex h-96 items-center justify-center text-gray-500 dark:text-gray-400"
               >
                 <div class="text-center">
-                  <i class="fas fa-spinner fa-spin mb-2 text-2xl"/>
+                  <i class="fas fa-spinner fa-spin mb-2 text-2xl" />
                   <p>Loading diff viewer...</p>
                 </div>
               </div>

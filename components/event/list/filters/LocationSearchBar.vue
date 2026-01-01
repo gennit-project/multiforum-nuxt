@@ -109,7 +109,7 @@ const emit = defineEmits(['updateLocationInput', 'requestUserLocation']);
         ]"
         :placeholder="searchPlaceholder"
         @input="searchLocations"
-      >
+      />
       <slot />
       <client-only>
         <ul

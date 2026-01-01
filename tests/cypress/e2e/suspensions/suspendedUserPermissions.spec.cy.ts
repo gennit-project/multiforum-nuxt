@@ -1,7 +1,4 @@
-import {
-  CATS_FORUM,
-  CATS_FORUM_EVENTS,
-} from '../constants';
+import { CATS_FORUM, CATS_FORUM_EVENTS } from '../constants';
 import { setupTestData } from '../../support/testSetup';
 import { getAuthUser, loginWithAuthUser, waitForGraphQL } from '../utils';
 
@@ -34,7 +31,8 @@ describe('Suspended user permissions enforcement', () => {
     waitForGraphQL();
 
     // Create a discussion that will trigger suspension
-    const testDiscussionTitle = 'Discussion to trigger suspension ' + Date.now();
+    const testDiscussionTitle =
+      'Discussion to trigger suspension ' + Date.now();
     cy.contains('Create Discussion').click();
     waitForGraphQL();
 
@@ -195,7 +193,9 @@ describe('Suspended user permissions enforcement', () => {
       waitForGraphQL();
 
       cy.get('input[placeholder="Title"]').type(modDiscussion);
-      cy.get('[data-testid="texteditor-textarea"]').type('Mod created discussion.');
+      cy.get('[data-testid="texteditor-textarea"]').type(
+        'Mod created discussion.'
+      );
       cy.get('[data-testid="forum-picker"]').click();
       cy.contains('Cats').click();
       cy.get('button').contains('Create').click();
@@ -261,12 +261,14 @@ describe('Suspended user permissions enforcement', () => {
           cy.get('button').contains('Submit').click();
 
           // Should see an error about being suspended
-          cy.contains(/suspended|permission|cannot/i, { timeout: 10000 }).should(
-            'be.visible'
-          );
+          cy.contains(/suspended|permission|cannot/i, {
+            timeout: 10000,
+          }).should('be.visible');
         } else {
           // Comment form might be hidden for suspended users
-          cy.log('Comment form not visible - user may be blocked from commenting');
+          cy.log(
+            'Comment form not visible - user may be blocked from commenting'
+          );
         }
       });
 
@@ -309,7 +311,9 @@ describe('Suspended user permissions enforcement', () => {
     waitForGraphQL();
 
     cy.get('input[placeholder="Title"]').type(triggerDiscussion);
-    cy.get('[data-testid="texteditor-textarea"]').type('Discussion for event test.');
+    cy.get('[data-testid="texteditor-textarea"]').type(
+      'Discussion for event test.'
+    );
     cy.get('[data-testid="forum-picker"]').click();
     cy.contains('Cats').click();
     cy.get('button').contains('Create').click();
@@ -361,7 +365,9 @@ describe('Suspended user permissions enforcement', () => {
         waitForGraphQL();
 
         // Fill in event form
-        cy.get('input[placeholder="Title"]').type('Blocked event ' + Date.now());
+        cy.get('input[placeholder="Title"]').type(
+          'Blocked event ' + Date.now()
+        );
         cy.get('[data-testid="texteditor-textarea"]').type(
           'This event should not be created.'
         );
@@ -385,7 +391,9 @@ describe('Suspended user permissions enforcement', () => {
           'be.visible'
         );
       } else {
-        cy.log('Create Event button not visible - may be hidden for suspended users');
+        cy.log(
+          'Create Event button not visible - may be hidden for suspended users'
+        );
       }
     });
 
@@ -404,7 +412,9 @@ describe('Suspended user permissions enforcement', () => {
         waitForGraphQL();
 
         cy.contains('Unsuspend User').click();
-        cy.get('textarea[data-testid="report-discussion-input"]').type('Cleanup.');
+        cy.get('textarea[data-testid="report-discussion-input"]').type(
+          'Cleanup.'
+        );
         cy.get('button').contains('Submit').click();
         waitForGraphQL();
       }
@@ -485,8 +495,7 @@ describe('Suspended user permissions enforcement', () => {
     cy.visit(CATS_FORUM);
     waitForGraphQL();
 
-    const afterUnsuspendDiscussion =
-      'Discussion after unsuspend ' + Date.now();
+    const afterUnsuspendDiscussion = 'Discussion after unsuspend ' + Date.now();
     cy.contains('Create Discussion').click();
     waitForGraphQL();
 

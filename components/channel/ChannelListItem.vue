@@ -33,7 +33,9 @@ defineEmits(['filterByTag']);
 </script>
 
 <template>
-  <div class="bg-white px-6 py-4 hover:bg-gray-50 dark:bg-black dark:text-gray-200 dark:hover:bg-gray-900">
+  <div
+    class="hover:bg-gray-50 bg-white px-6 py-4 dark:bg-black dark:text-gray-200 dark:hover:bg-gray-900"
+  >
     <div class="flex items-start gap-4">
       <!-- Avatar -->
       <div class="flex-shrink-0">
@@ -49,7 +51,7 @@ defineEmits(['filterByTag']);
       </div>
 
       <!-- Main content -->
-      <div class="flex-1 min-w-0">
+      <div class="min-w-0 flex-1">
         <!-- Forum name and unique name -->
         <div class="mb-1">
           <nuxt-link
@@ -58,7 +60,7 @@ defineEmits(['filterByTag']);
           >
             <h3
               v-if="channel.displayName"
-              class="text-lg font-semibold text-gray-900 dark:text-gray-100"
+              class="font-semibold text-lg text-gray-900 dark:text-gray-100"
             >
               <HighlightedSearchTerms
                 :text="channel.displayName"
@@ -77,7 +79,7 @@ defineEmits(['filterByTag']);
         <!-- Description -->
         <p
           v-if="channel.description"
-          class="mb-3 text-sm text-gray-600 dark:text-gray-300 line-clamp-2"
+          class="mb-3 line-clamp-2 text-sm text-gray-600 dark:text-gray-300"
         >
           <HighlightedSearchTerms
             :text="channel.description"
@@ -104,16 +106,20 @@ defineEmits(['filterByTag']);
       </div>
 
       <!-- Stats sidebar -->
-      <div class="hidden sm:flex flex-col items-end gap-2 text-sm text-gray-500 dark:text-gray-400">
+      <div
+        class="hidden flex-col items-end gap-2 text-sm text-gray-500 dark:text-gray-400 sm:flex"
+      >
         <nuxt-link
           :to="`/forums/${channel.uniqueName}/discussions`"
           class="flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-200"
         >
           <DiscussionIcon class="h-4 w-4" />
-          <span class="font-medium">{{ channel?.DiscussionChannelsAggregate?.count || 0 }}</span>
+          <span class="font-medium">{{
+            channel?.DiscussionChannelsAggregate?.count || 0
+          }}</span>
           <span class="hidden md:inline">Discussions</span>
         </nuxt-link>
-        
+
         <nuxt-link
           v-if="downloadCount > 0"
           :to="`/forums/${channel.uniqueName}/downloads`"
@@ -123,14 +129,16 @@ defineEmits(['filterByTag']);
           <span class="font-medium">{{ downloadCount }}</span>
           <span class="hidden md:inline">Downloads</span>
         </nuxt-link>
-        
+
         <nuxt-link
           v-if="channel?.EventChannelsAggregate?.count"
           :to="`/forums/${channel.uniqueName}/events`"
           class="flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-200"
         >
           <CalendarIcon class="h-4 w-4" />
-          <span class="font-medium">{{ channel?.EventChannelsAggregate?.count || 0 }}</span>
+          <span class="font-medium">{{
+            channel?.EventChannelsAggregate?.count || 0
+          }}</span>
           <span class="hidden md:inline">Events</span>
         </nuxt-link>
       </div>

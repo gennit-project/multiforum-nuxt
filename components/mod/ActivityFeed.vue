@@ -21,7 +21,9 @@ const getNextRevisionBody = (currentIndex: number): string | null => {
   const items = reversedFeedItems.value;
   // Look for the next item (later in time) that has a Revision
   for (let i = currentIndex + 1; i < items.length; i++) {
-    const item = items[i] as ModerationAction & { Revision?: { body?: string } };
+    const item = items[i] as ModerationAction & {
+      Revision?: { body?: string };
+    };
     if (item.Revision?.body) {
       return item.Revision.body;
     }

@@ -381,4 +381,3 @@ const revealSensitiveContent = () => {
     <ErrorBanner v-if="errorMessage" :text="errorMessage" />
   </li>
 </template>
-

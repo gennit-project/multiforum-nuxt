@@ -139,7 +139,11 @@ const buttonClasses = computed(() => {
               >
                 {{ usePrimaryButton ? 'Create' : '+ Add' }}
               </span>
-              <span v-else aria-hidden="true" class="text-4xl leading-none font-light -mt-0.5">
+              <span
+                v-else
+                aria-hidden="true"
+                class="-mt-0.5 text-4xl font-light leading-none"
+              >
                 +
               </span>
               <span v-if="iconOnly" class="sr-only">Create new</span>
@@ -190,7 +194,11 @@ const buttonClasses = computed(() => {
             <span v-if="!iconOnly" class="flex items-center">
               + {{ usePrimaryButton ? 'Create' : '' }}
             </span>
-            <span v-else aria-hidden="true" class="text-4xl leading-none font-light -mt-0.5">
+            <span
+              v-else
+              aria-hidden="true"
+              class="-mt-0.5 text-4xl font-light leading-none"
+            >
               +
             </span>
             <span v-if="iconOnly" class="sr-only">Create new</span>
@@ -209,9 +217,7 @@ const buttonClasses = computed(() => {
         <span v-if="!iconOnly" class="flex items-center">
           + {{ usePrimaryButton ? 'Create' : '' }}
         </span>
-        <span v-else aria-hidden="true" class="text-2xl leading-none">
-          +
-        </span>
+        <span v-else aria-hidden="true" class="text-2xl leading-none"> + </span>
         <span v-if="iconOnly" class="sr-only">Create new</span>
         <ChevronDownIcon
           v-if="!iconOnly"

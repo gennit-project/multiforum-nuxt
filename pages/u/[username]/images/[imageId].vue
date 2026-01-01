@@ -111,7 +111,11 @@ const resetTranslation = () => {
 
 // Lightbox functions
 const openLightbox = () => {
-  if (image.value?.url && !hasGlbExtension(image.value.url) && !hasStlExtension(image.value.url)) {
+  if (
+    image.value?.url &&
+    !hasGlbExtension(image.value.url) &&
+    !hasStlExtension(image.value.url)
+  ) {
     isLightboxOpen.value = true;
     zoomLevel.value = 1;
     resetTranslation();
@@ -186,7 +190,10 @@ watchEffect(() => {
     useHead({
       title: 'Image Not Found',
       meta: [
-        { name: 'description', content: 'The requested image could not be found.' },
+        {
+          name: 'description',
+          content: 'The requested image could not be found.',
+        },
       ],
     });
     return;
@@ -327,15 +334,19 @@ onUnmounted(() => {
             v-else-if="image.url"
             :src="image.url"
             :alt="image.alt ?? 'Image'"
-            class="h-auto max-w-full rounded-lg shadow-lg cursor-pointer transition-transform hover:scale-105"
+            class="h-auto max-w-full cursor-pointer rounded-lg shadow-lg transition-transform hover:scale-105"
             title="Click to view in lightbox"
             @click="openLightbox"
-          >
+          />
         </div>
 
         <!-- Click hint for regular images -->
         <div
-          v-if="image.url && !hasGlbExtension(image.url) && !hasStlExtension(image.url)"
+          v-if="
+            image.url &&
+            !hasGlbExtension(image.url) &&
+            !hasStlExtension(image.url)
+          "
           class="mt-2 text-center text-sm text-gray-500 dark:text-gray-400"
         >
           💡 Click the image to view in fullscreen with zoom controls
@@ -437,13 +448,15 @@ onUnmounted(() => {
       <!-- Custom lightbox -->
       <div
         v-if="isLightboxOpen"
-        class="fixed left-0 top-0 z-50 h-full w-full bg-black flex items-center justify-center"
+        class="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black"
       >
         <!-- Header controls -->
-        <div class="absolute left-0 top-0 z-50 flex w-full items-center justify-between p-5 text-white">
+        <div
+          class="absolute left-0 top-0 z-50 flex w-full items-center justify-between p-5 text-white"
+        >
           <div class="flex items-center gap-4">
             <button
-              class="bg-transparent cursor-pointer border-0 text-white text-3xl"
+              class="bg-transparent cursor-pointer border-0 text-3xl text-white"
               @click="closeLightbox"
             >
               ×
@@ -454,7 +467,7 @@ onUnmounted(() => {
             <!-- Zoom controls -->
             <div class="flex items-center rounded bg-opacity-10">
               <button
-                class="cursor-pointer text-white transition-colors hover:bg-opacity-20 px-2 py-1"
+                class="cursor-pointer px-2 py-1 text-white transition-colors hover:bg-opacity-20"
                 :class="{ 'cursor-not-allowed opacity-50': zoomLevel <= 1 }"
                 title="Zoom out"
                 :disabled="zoomLevel <= 1"
@@ -462,11 +475,11 @@ onUnmounted(() => {
               >
                 −
               </button>
-              <span class="text-white px-2 text-sm">
+              <span class="px-2 text-sm text-white">
                 {{ Math.round(zoomLevel * 100) }}%
               </span>
               <button
-                class="cursor-pointer text-white transition-colors hover:bg-opacity-20 px-2 py-1"
+                class="cursor-pointer px-2 py-1 text-white transition-colors hover:bg-opacity-20"
                 :class="{ 'cursor-not-allowed opacity-50': zoomLevel >= 3 }"
                 title="Zoom in"
                 :disabled="zoomLevel >= 3"
@@ -476,7 +489,7 @@ onUnmounted(() => {
               </button>
               <button
                 v-if="isZoomed"
-                class="cursor-pointer text-white transition-colors hover:bg-opacity-20 px-2 py-1"
+                class="cursor-pointer px-2 py-1 text-white transition-colors hover:bg-opacity-20"
                 title="Reset zoom"
                 @click="resetZoom"
               >
@@ -487,7 +500,7 @@ onUnmounted(() => {
             <!-- Download button -->
             <button
               type="button"
-              class="flex cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white hover:bg-opacity-20 h-8 w-8"
+              class="flex h-8 w-8 cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white hover:bg-opacity-20"
               @click="() => downloadImage(image?.url || '')"
             >
               <DownloadIcon class="h-6 w-6" />
@@ -496,7 +509,9 @@ onUnmounted(() => {
         </div>
 
         <!-- Image container -->
-        <div class="relative flex h-full w-full items-center justify-center overflow-hidden">
+        <div
+          class="relative flex h-full w-full items-center justify-center overflow-hidden"
+        >
           <ModelViewer
             v-if="image && image.url && hasGlbExtension(image.url)"
             :model-url="image.url"
@@ -537,7 +552,7 @@ onUnmounted(() => {
               cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'auto',
             }"
             @mousedown="startDrag"
-          >
+          />
         </div>
       </div>
     </div>

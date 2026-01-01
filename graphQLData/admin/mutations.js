@@ -35,11 +35,7 @@ export const ALLOW_PLUGIN = gql`
   mutation AllowPlugin($pluginId: ID!, $serverName: String!) {
     updateServerConfigs(
       where: { serverName: $serverName }
-      connect: {
-        AllowedPlugins: {
-          where: { node: { id: $pluginId } }
-        }
-      }
+      connect: { AllowedPlugins: { where: { node: { id: $pluginId } } } }
     ) {
       serverConfigs {
         serverName
@@ -56,11 +52,7 @@ export const DISALLOW_PLUGIN = gql`
   mutation DisallowPlugin($pluginId: ID!, $serverName: String!) {
     updateServerConfigs(
       where: { serverName: $serverName }
-      disconnect: {
-        AllowedPlugins: {
-          where: { node: { id: $pluginId } }
-        }
-      }
+      disconnect: { AllowedPlugins: { where: { node: { id: $pluginId } } } }
     ) {
       serverConfigs {
         serverName
@@ -78,9 +70,7 @@ export const INSTALL_PLUGIN = gql`
     updateServerConfigs(
       where: { serverName: $serverName }
       connect: {
-        InstalledVersions: {
-          where: { node: { id: $pluginVersionId } }
-        }
+        InstalledVersions: { where: { node: { id: $pluginVersionId } } }
       }
     ) {
       serverConfigs {
@@ -105,9 +95,7 @@ export const UNINSTALL_PLUGIN = gql`
     updateServerConfigs(
       where: { serverName: $serverName }
       disconnect: {
-        InstalledVersions: {
-          where: { node: { id: $pluginVersionId } }
-        }
+        InstalledVersions: { where: { node: { id: $pluginVersionId } } }
       }
     ) {
       serverConfigs {
@@ -173,11 +161,7 @@ export const SET_SERVER_PLUGIN_SECRET = gql`
     $key: String!
     $value: String!
   ) {
-    setServerPluginSecret(
-      pluginId: $pluginId
-      key: $key
-      value: $value
-    )
+    setServerPluginSecret(pluginId: $pluginId, key: $key, value: $value)
   }
 `;
 
@@ -191,7 +175,10 @@ export const VALIDATE_SERVER_PLUGIN_SECRET = gql`
 `;
 
 export const UPDATE_MOD_CHANNEL_ROLE = gql`
-  mutation UpdateModChannelRole($name: String!, $input: ModChannelRoleUpdateInput!) {
+  mutation UpdateModChannelRole(
+    $name: String!
+    $input: ModChannelRoleUpdateInput!
+  ) {
     updateModChannelRoles(where: { name: $name }, update: $input) {
       modChannelRoles {
         name
@@ -234,7 +221,10 @@ export const UPDATE_SERVER_ROLE = gql`
 `;
 
 export const UPDATE_MOD_SERVER_ROLE = gql`
-  mutation UpdateModServerRole($name: String!, $input: ModServerRoleUpdateInput!) {
+  mutation UpdateModServerRole(
+    $name: String!
+    $input: ModServerRoleUpdateInput!
+  ) {
     updateModServerRoles(where: { name: $name }, update: $input) {
       modServerRoles {
         name

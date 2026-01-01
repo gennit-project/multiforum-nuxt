@@ -238,7 +238,10 @@ const revealSensitiveContent = () => {
                   <span class="inline-flex">
                     <MenuButton :items="discussionDetailOptions">
                       <span class="inline cursor-pointer">
-                        <i class="fa-regular fa-comment mr-1 h-4 w-4" aria-hidden="true" />
+                        <i
+                          class="fa-regular fa-comment mr-1 h-4 w-4"
+                          aria-hidden="true"
+                        />
                         {{ commentCount }}
                         {{ commentCount === 1 ? 'comment' : 'comments' }} in
                         {{ channelCount }}
@@ -289,11 +292,7 @@ const revealSensitiveContent = () => {
                 class="fa-solid fa-expand mr-1 text-xs"
                 aria-hidden="true"
               />
-              <i
-                v-else
-                class="fa-solid fa-x mr-1 text-xs"
-                aria-hidden="true"
-              />
+              <i v-else class="fa-solid fa-x mr-1 text-xs" aria-hidden="true" />
               {{ isExpanded ? 'Collapse' : 'Expand' }}
             </button>
             <div
@@ -382,4 +381,3 @@ const revealSensitiveContent = () => {
     </div>
   </li>
 </template>
-

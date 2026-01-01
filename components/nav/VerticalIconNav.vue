@@ -310,7 +310,8 @@ const getUserActionClasses = (isActive: boolean) => {
                 <MoreIcon />
               </div>
             </IconTooltip>
-            <span class="text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
+            <span
+              class="text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
               >More</span
             >
           </div>

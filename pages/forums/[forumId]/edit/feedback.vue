@@ -21,7 +21,7 @@ defineEmits(['updateFormValues']);
             feedbackEnabled: ($event.target as HTMLInputElement).checked,
           })
         "
-      >
+      />
       <label
         for="feedback-enabled"
         class="ml-2 block text-sm text-gray-900 dark:text-gray-100"

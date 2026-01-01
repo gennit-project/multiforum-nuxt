@@ -77,7 +77,11 @@ const buttonClasses = computed(() => {
     </template>
     <template #does-not-have-auth>
       <div class="flex items-center gap-1">
-        <button type="button" data-testid="reply-comment-button" :class="[buttonClasses]">
+        <button
+          type="button"
+          data-testid="reply-comment-button"
+          :class="[buttonClasses]"
+        >
           <i class="fa-regular fa-comment h-3 w-3" aria-hidden="true" />
           Reply
         </button>

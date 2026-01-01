@@ -2,10 +2,16 @@
 import { ref, computed } from 'vue';
 import type { PropType } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_CHANNEL_NAMES, GET_USER_FAVORITE_CHANNELS } from '@/graphQLData/channel/queries';
+import {
+  GET_CHANNEL_NAMES,
+  GET_USER_FAVORITE_CHANNELS,
+} from '@/graphQLData/channel/queries';
 import { GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS } from '@/graphQLData/collection/queries';
 import MultiSelect from '@/components/MultiSelect.vue';
-import type { MultiSelectOption, MultiSelectSection } from '@/components/MultiSelect.vue';
+import type {
+  MultiSelectOption,
+  MultiSelectSection,
+} from '@/components/MultiSelect.vue';
 import type { Channel } from '@/__generated__/graphql';
 import { usernameVar, isAuthenticatedVar } from '@/cache';
 
@@ -30,7 +36,8 @@ const emit = defineEmits(['setSelectedChannels']);
 
 const searchQuery = ref('');
 
-const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const escapeRegex = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const { loading: channelsLoading, result: channelsResult } = useQuery(
   GET_CHANNEL_NAMES,
@@ -104,11 +111,13 @@ const channelSections = computed<MultiSelectSection[]>(() => {
   const sections: MultiSelectSection[] = [];
 
   // Favorites section
-  const favoriteChannels = favoritesResult.value?.users?.[0]?.FavoriteChannels || [];
+  const favoriteChannels =
+    favoritesResult.value?.users?.[0]?.FavoriteChannels || [];
 
   let favoritesEmptyMessage = 'You have no favorite forums.';
   if (!isAuthenticatedVar.value) {
-    favoritesEmptyMessage = "Can't show favorite forums because you are not logged in.";
+    favoritesEmptyMessage =
+      "Can't show favorite forums because you are not logged in.";
   }
 
   const favoriteOptions = favoriteChannels.map((channel: any) => ({
@@ -120,23 +129,26 @@ const channelSections = computed<MultiSelectSection[]>(() => {
     title: 'Favorite Forums',
     options: favoriteOptions,
     emptyMessage: favoritesEmptyMessage,
-    selectAllLabel: favoriteOptions.length > 0 ? 'Select all favorite forums' : undefined,
+    selectAllLabel:
+      favoriteOptions.length > 0 ? 'Select all favorite forums' : undefined,
   });
 
   // Channel collections - consolidated under single heading
   const collections = collectionsResult.value?.users?.[0]?.Collections || [];
-  const collectionsWithChannels = collections.filter((collection: any) =>
-    collection.Channels && collection.Channels.length > 0
+  const collectionsWithChannels = collections.filter(
+    (collection: any) => collection.Channels && collection.Channels.length > 0
   );
 
   if (collectionsWithChannels.length > 0) {
     // Create options for each collection (for select all functionality)
-    const collectionOptions = collectionsWithChannels.map((collection: any) => ({
-      value: collection.id,
-      label: collection.name,
-      // Store the channel uniqueNames for select all functionality
-      channels: (collection.Channels || []).map((ch: any) => ch.uniqueName),
-    }));
+    const collectionOptions = collectionsWithChannels.map(
+      (collection: any) => ({
+        value: collection.id,
+        label: collection.name,
+        // Store the channel uniqueNames for select all functionality
+        channels: (collection.Channels || []).map((ch: any) => ch.uniqueName),
+      })
+    );
 
     sections.push({
       title: 'Forum Lists From Your Collections',

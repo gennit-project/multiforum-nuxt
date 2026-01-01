@@ -11,7 +11,7 @@ const getBaseUrlPrefix = (): string => {
   if (!import.meta.client) {
     return 'ssr';
   }
-  
+
   const url = new URL(window.location.href);
   return url.host; // This gives us 'localhost:3000' or 'topical.space' etc.
 };
@@ -36,15 +36,15 @@ export const getLocalStorageItem = <T>(key: string, defaultValue: T): T => {
   if (!import.meta.client) {
     return defaultValue;
   }
-  
+
   try {
     const disambiguatedKey = createDisambiguatedKey(key);
     const item = localStorage.getItem(disambiguatedKey);
-    
+
     if (item === null) {
       return defaultValue;
     }
-    
+
     return JSON.parse(item) as T;
   } catch (error) {
     console.warn(`Error parsing localStorage item for key "${key}":`, error);
@@ -61,7 +61,7 @@ export const setLocalStorageItem = <T>(key: string, value: T): void => {
   if (!import.meta.client) {
     return;
   }
-  
+
   try {
     const disambiguatedKey = createDisambiguatedKey(key);
     localStorage.setItem(disambiguatedKey, JSON.stringify(value));
@@ -78,7 +78,7 @@ export const removeLocalStorageItem = (key: string): void => {
   if (!import.meta.client) {
     return;
   }
-  
+
   const disambiguatedKey = createDisambiguatedKey(key);
   localStorage.removeItem(disambiguatedKey);
 };
@@ -91,11 +91,11 @@ export const clearLocalStorageForCurrentSite = (keyPrefix?: string): void => {
   if (!import.meta.client) {
     return;
   }
-  
+
   const basePrefix = getBaseUrlPrefix();
   const keys = Object.keys(localStorage);
-  
-  keys.forEach(key => {
+
+  keys.forEach((key) => {
     if (key.startsWith(`${basePrefix}:`)) {
       if (!keyPrefix || key.startsWith(`${basePrefix}:${keyPrefix}`)) {
         localStorage.removeItem(key);

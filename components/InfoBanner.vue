@@ -17,7 +17,7 @@ defineProps({
 <template>
   <div
     :data-testid="testId"
-    class="dark:bg-orange-950 rounded-md border-l bg-orange-100 p-4 dark:border-orange-400 dark:text-white"
+    class="rounded-md border-l bg-orange-100 p-4 dark:border-orange-400 dark:bg-orange-950 dark:text-white"
   >
     <div class="flex">
       <div class="shrink-0">

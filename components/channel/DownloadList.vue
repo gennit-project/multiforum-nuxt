@@ -192,7 +192,10 @@ const filterByChannel = (channel: string) => {
 
 // Use backend-filtered results directly
 const filteredDownloads = computed(() => {
-  return downloadChannelResult.value?.getDiscussionsInChannel?.discussionChannels || [];
+  return (
+    downloadChannelResult.value?.getDiscussionsInChannel?.discussionChannels ||
+    []
+  );
 });
 
 const reachedEndOfResults = computed(() => {
@@ -208,7 +211,12 @@ const reachedEndOfResults = computed(() => {
     <slot />
     <!-- Loading skeleton cards -->
     <div
-      v-if="downloadLoading && (!downloadChannelResult || downloadChannelResult?.getDiscussionsInChannel?.discussionChannels?.length === 0)"
+      v-if="
+        downloadLoading &&
+        (!downloadChannelResult ||
+          downloadChannelResult?.getDiscussionsInChannel?.discussionChannels
+            ?.length === 0)
+      "
       class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
     >
       <DownloadSkeletonCard v-for="n in 8" :key="n" />

@@ -28,7 +28,11 @@ const timeOptions: MenuItemType[] = [
 const selectedMonths = ref<number | null>(3);
 
 const selectedLabel = computed(() => {
-  const option = timeOptions.find(opt => parseInt(opt.value) === selectedMonths.value || (opt.value === 'null' && selectedMonths.value === null));
+  const option = timeOptions.find(
+    (opt) =>
+      parseInt(opt.value) === selectedMonths.value ||
+      (opt.value === 'null' && selectedMonths.value === null)
+  );
   return option?.label || 'Last 3 Months';
 });
 
@@ -51,7 +55,9 @@ const dateRange = computed(() => {
     return { startDate, endDate };
   }
 
-  const startDate = DateTime.now().minus({ months: selectedMonths.value }).toISODate();
+  const startDate = DateTime.now()
+    .minus({ months: selectedMonths.value })
+    .toISODate();
   return { startDate, endDate };
 });
 
@@ -100,7 +106,7 @@ const maxYValue = computed(() => {
 
 // Calculate discussion and comment counts for each contributor
 const contributorStats = computed(() => {
-  return contributors.value.map(contributor => {
+  return contributors.value.map((contributor) => {
     let discussionCount = 0;
     let commentCount = 0;
 
@@ -151,21 +157,26 @@ const contributorStats = computed(() => {
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="rounded-lg bg-red-50 p-4 dark:bg-red-900/20">
+    <div v-else-if="error" class="bg-red-50 rounded-lg p-4 dark:bg-red-900/20">
       <p class="text-sm text-red-800 dark:text-red-200">
         Error loading contributors: {{ error.message }}
       </p>
     </div>
 
     <!-- Contributors List -->
-    <div v-else-if="contributors.length > 0" class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div
+      v-else-if="contributors.length > 0"
+      class="grid grid-cols-1 gap-6 lg:grid-cols-2"
+    >
       <div
         v-for="(contributor, index) in contributors"
         :key="contributor.username"
         class="rounded-lg bg-white p-4 shadow dark:bg-gray-800"
       >
         <div class="mb-3 flex items-center gap-2">
-          <div class="flex h-6 w-6 items-center justify-center rounded-full bg-orange-100 text-xs font-semibold text-orange-700 dark:bg-orange-900/40 dark:text-orange-300">
+          <div
+            class="font-semibold flex h-6 w-6 items-center justify-center rounded-full bg-orange-100 text-xs text-orange-700 dark:bg-orange-900/40 dark:text-orange-300"
+          >
             {{ index + 1 }}
           </div>
           <img
@@ -175,25 +186,33 @@ const contributorStats = computed(() => {
             class="h-8 w-8 rounded-full"
           />
           <div class="min-w-0 flex-1">
-            <h3 class="truncate text-sm font-semibold text-gray-900 dark:text-white">
+            <h3
+              class="font-semibold truncate text-sm text-gray-900 dark:text-white"
+            >
               {{ contributor.displayName || contributor.username }}
             </h3>
             <p class="truncate text-xs text-gray-500 dark:text-gray-400">
               @{{ contributor.username }} ·
               <span v-if="contributorStats[index]">
-                {{ contributorStats[index].discussionCount }} discussion{{ contributorStats[index].discussionCount !== 1 ? 's' : '' }},
-                {{ contributorStats[index].commentCount }} comment{{ contributorStats[index].commentCount !== 1 ? 's' : '' }}
+                {{ contributorStats[index].discussionCount }} discussion{{
+                  contributorStats[index].discussionCount !== 1 ? 's' : ''
+                }}, {{ contributorStats[index].commentCount }} comment{{
+                  contributorStats[index].commentCount !== 1 ? 's' : ''
+                }}
               </span>
             </p>
           </div>
         </div>
 
-        <ChannelContributionChart :day-data="contributor.dayData" :max-y-value="maxYValue" />
+        <ChannelContributionChart
+          :day-data="contributor.dayData"
+          :max-y-value="maxYValue"
+        />
       </div>
     </div>
 
     <!-- Empty State -->
-    <div v-else class="rounded-lg bg-gray-50 p-12 text-center dark:bg-gray-800">
+    <div v-else class="bg-gray-50 rounded-lg p-12 text-center dark:bg-gray-800">
       <i class="fa-solid fa-users mb-4 text-4xl text-gray-400"></i>
       <h3 class="mb-2 text-lg font-medium text-gray-900 dark:text-white">
         No results in the selected time period

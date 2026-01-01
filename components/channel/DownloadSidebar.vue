@@ -87,19 +87,23 @@ const { result: labelQueryResult } = useQuery(
 
 // Get label options from query result
 const labelOptions = computed(() => {
-  const discussionChannels = labelQueryResult.value?.discussions?.[0]?.DiscussionChannels;
+  const discussionChannels =
+    labelQueryResult.value?.discussions?.[0]?.DiscussionChannels;
   const discussionChannel = discussionChannels?.[0];
   return discussionChannel?.LabelOptions || [];
 });
 
 // Group labels by their group key for display
 const groupedLabels = computed(() => {
-  const groups: Record<string, Array<{ key: string; value: string; displayName: string }>> = {};
-  
+  const groups: Record<
+    string,
+    Array<{ key: string; value: string; displayName: string }>
+  > = {};
+
   labelOptions.value.forEach((option: any) => {
     const groupKey = option.group?.key;
     const groupDisplayName = option.group?.displayName;
-    
+
     if (groupKey && groupDisplayName) {
       if (!groups[groupKey]) {
         groups[groupKey] = [];
@@ -111,7 +115,7 @@ const groupedLabels = computed(() => {
       });
     }
   });
-  
+
   return groups;
 });
 
@@ -207,7 +211,7 @@ const handleDownload = () => {
       </div>
 
       <!-- Labels Section -->
-      <div 
+      <div
         v-if="Object.keys(groupedLabels).length > 0"
         class="border-t border-gray-200 pt-4 dark:border-gray-700"
       >
@@ -228,7 +232,9 @@ const handleDownload = () => {
               <span class="font-medium text-gray-700 dark:text-gray-300">
                 {{ label.key }}:
               </span>
-              <span class="rounded-full bg-gray-100 px-2 py-1 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+              <span
+                class="rounded-full bg-gray-100 px-2 py-1 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+              >
                 {{ label.displayName }}
               </span>
             </div>

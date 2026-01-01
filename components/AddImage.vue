@@ -74,7 +74,7 @@ const onFileSelected = (event: Event) => {
         :disabled="disabled"
         @change="onFileSelected"
         @click="clearFileInput"
-      >
+      />
     </label>
   </div>
 </template>

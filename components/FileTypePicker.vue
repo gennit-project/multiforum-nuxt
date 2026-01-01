@@ -99,7 +99,7 @@ const removeSelection = (fileType: string) => {
           class="bg-transparent flex-1 border-none text-sm focus:outline-none dark:text-white"
           placeholder="Search file types..."
           readonly
-        >
+        />
       </div>
       <SearchableFileTypeList
         v-if="isDropdownOpen && !disabled"

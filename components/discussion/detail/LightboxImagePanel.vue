@@ -90,7 +90,9 @@ const handleClick = (event: MouseEvent) => {
     </button>
 
     <ModelViewer
-      v-if="currentImage && currentImage.url && hasGlbExtension(currentImage.url)"
+      v-if="
+        currentImage && currentImage.url && hasGlbExtension(currentImage.url)
+      "
       :model-url="currentImage.url"
       height="100%"
       width="100%"
@@ -105,7 +107,9 @@ const handleClick = (event: MouseEvent) => {
       @touchmove="(e: TouchEvent) => emit('touchmove', e)"
     />
     <div
-      v-else-if="currentImage && currentImage.url && hasStlExtension(currentImage.url)"
+      v-else-if="
+        currentImage && currentImage.url && hasStlExtension(currentImage.url)
+      "
       class="flex h-full w-full items-center justify-center"
       :style="{
         transform: `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`,
@@ -138,7 +142,7 @@ const handleClick = (event: MouseEvent) => {
       @touchstart="(e: TouchEvent) => emit('touchstart', e)"
       @touchend="(e: TouchEvent) => emit('touchend', e)"
       @touchmove="(e: TouchEvent) => emit('touchmove', e)"
-    >
+    />
 
     <button
       v-if="showNavigation"

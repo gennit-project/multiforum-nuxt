@@ -15,8 +15,9 @@ const seedDataForCypressTests = (input: SeedDataInput) => {
     serverConfigs,
   } = input;
 
-  return cy.authenticatedGraphQL(
-    `
+  return cy
+    .authenticatedGraphQL(
+      `
     mutation seedDataForCypress(
       $channels: [ChannelCreateInput!]!, 
       $discussions: [DiscussionCreateInputWithChannels!]!, 
@@ -48,27 +49,28 @@ const seedDataForCypressTests = (input: SeedDataInput) => {
       }
   }
     `,
-    {
-      channels,
-      discussions,
-      events,
-      comments,
-      tags,
-      users,
-      channelRoles,
-      modChannelRoles,
-      serverRoles,
-      modServerRoles,
-      serverConfigs,
-    }
-  ).then((response) => {
-    const data = response?.body?.data?.seedDataForCypressTests;
-    if (!data) {
-      throw new Error(
-        `🚨 seedDataForCypressTests failed: ${JSON.stringify(response)}`
-      );
-    }
-  });
+      {
+        channels,
+        discussions,
+        events,
+        comments,
+        tags,
+        users,
+        channelRoles,
+        modChannelRoles,
+        serverRoles,
+        modServerRoles,
+        serverConfigs,
+      }
+    )
+    .then((response) => {
+      const data = response?.body?.data?.seedDataForCypressTests;
+      if (!data) {
+        throw new Error(
+          `🚨 seedDataForCypressTests failed: ${JSON.stringify(response)}`
+        );
+      }
+    });
 };
 
 export default seedDataForCypressTests;
