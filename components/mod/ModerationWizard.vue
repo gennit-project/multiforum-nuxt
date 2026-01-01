@@ -242,7 +242,7 @@ const editButtonDisabled = computed(() => {
 
                 <div
                   v-if="issue.isOpen && !isCurrentUserOriginalPoster"
-                  class="grid grid-cols-1 gap-4 lg:grid-cols-2"
+                  class="flex flex-col gap-4"
                 >
                   <div
                     class="space-y-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900/60"
