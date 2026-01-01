@@ -148,7 +148,7 @@ const isDownloadDetailPage = computed(() => {
       <div v-else ref="discussionDetail" class="flex-1">
         <h2
           v-if="!titleEditMode"
-          class="text-md text-wrap px-1 sm:tracking-tight md:text-2xl lg:text-3xl"
+          class="text-wrap px-1 text-lg sm:tracking-tight md:text-2xl"
         >
           {{
             discussion && discussion.title

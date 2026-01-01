@@ -383,7 +383,10 @@ const handleEditAlbum = () => {
         !discussion && !activeDiscussionChannel && !getDiscussionLoading
       "
     />
-    <div v-else class="w-full space-y-2 py-2">
+    <div
+      v-else
+      class="mx-4 my-4 w-full space-y-2 rounded-lg bg-white py-2 shadow-lg ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-gray-700 sm:mx-6 md:mx-8 lg:mx-10"
+    >
       <div class="w-full space-y-2 overflow-hidden">
         <ErrorBanner
           v-if="getDiscussionError"
