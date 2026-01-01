@@ -83,7 +83,7 @@ const toggleShowOnlyServerRuleViolations = () => {
     route,
     params: {
       showOnlyServerRuleViolations:
-        showOnlyServerRuleViolations.value.toString(),
+        showOnlyServerRuleViolations.value,
     },
   });
 };

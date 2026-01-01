@@ -20,7 +20,7 @@ const downloads = ref<any[]>([]);
 const totalDownloads = ref<number>(0);
 const downloadOffset = ref(0);
 
-const { result, loading, error } = useQuery(
+const { result, loading, error, refetch } = useQuery(
   GET_PUBLIC_COLLECTION_BY_ID,
   {
     collectionId: collectionId,
@@ -67,7 +67,7 @@ const loadMore = async () => {
   loadingMore.value = true;
   downloadOffset.value = downloads.value.length;
   try {
-    await result.refetch?.();
+    await refetch?.();
   } finally {
     loadingMore.value = false;
   }

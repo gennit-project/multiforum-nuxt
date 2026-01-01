@@ -84,7 +84,7 @@ const issueInput = computed<IssueCreateInput>(() => ({
     : undefined,
   Author: authorInput.value || undefined,
   authorName: authorName.value || undefined,
-}));
+} as IssueCreateInput));
 
 const canSubmit = computed(() => {
   return (
@@ -109,7 +109,7 @@ const {
 
     if (selectedChannelId.value) {
       try {
-        const existingIssuesByChannel = cache.readQuery({
+        const existingIssuesByChannel = cache.readQuery<any>({
           query: GET_ISSUES_BY_CHANNEL,
           variables: {
             channelUniqueName: selectedChannelId.value,
@@ -140,7 +140,7 @@ const {
       }
 
       try {
-        const openCount = cache.readQuery({
+        const openCount = cache.readQuery<any>({
           query: COUNT_OPEN_ISSUES,
           variables: { channelUniqueName: selectedChannelId.value },
         });
@@ -158,7 +158,7 @@ const {
     }
 
     try {
-      const serverCount = cache.readQuery({
+      const serverCount = cache.readQuery<any>({
         query: SERVER_SCOPED_ISSUE_COUNT,
       });
       const currentServerCount = serverCount?.issuesAggregate?.count;

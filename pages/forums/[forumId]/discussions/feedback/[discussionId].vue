@@ -12,7 +12,7 @@ import { ADD_FEEDBACK_COMMENT_TO_COMMENT } from '@/graphQLData/comment/mutations
 import { GET_FEEDBACK_ON_COMMENT } from '@/graphQLData/comment/queries';
 import { modProfileNameVar } from '@/cache';
 import { useRoute } from 'nuxt/app';
-import type { Comment } from '__generated__/graphql';
+import type { Comment, DownloadableFile } from '@/__generated__/graphql';
 import CrosspostedDiscussionEmbed from '@/components/discussion/detail/CrosspostedDiscussionEmbed.vue';
 
 const PAGE_LIMIT = 10;
@@ -64,7 +64,7 @@ const discussion = computed(() => {
 });
 
 const stlFiles = computed(() => {
-  const files = discussion.value?.DownloadableFiles || [];
+  const files = (discussion.value?.DownloadableFiles || []) as DownloadableFile[];
   return files.filter(
     (file) =>
       file.fileName?.toLowerCase().endsWith('.stl') ||

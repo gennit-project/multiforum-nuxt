@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useHead } from 'nuxt/app';
 import EventListView from '@/components/event/list/EventListView.vue';
 
 useHead({

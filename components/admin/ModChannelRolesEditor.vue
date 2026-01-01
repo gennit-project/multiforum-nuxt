@@ -129,8 +129,8 @@ const onTogglePermission = async (
     </div>
     <div v-else class="space-y-4">
       <div
-        v-for="role in sortedRoles"
-        :key="role.name"
+        v-for="(role, roleIndex) in sortedRoles"
+        :key="role.name ?? role.channelUniqueName ?? roleIndex"
         class="bg-gray-50 dark:border-slate-800 dark:bg-slate-900 rounded-md border border-gray-200 p-4"
       >
         <div class="flex flex-wrap items-start justify-between gap-3">

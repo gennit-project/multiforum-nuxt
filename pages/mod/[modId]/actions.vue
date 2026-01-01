@@ -3,20 +3,18 @@ import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
 import { GET_MOD_CONTRIBUTIONS } from '@/graphQLData/mod/queries';
-import { getModActivityLinks } from '@/utils/modContributionLinks';
+import {
+  getModActivityLinks,
+  type ModActivityLinkInput,
+} from '@/utils/modContributionLinks';
 import { timeAgo } from '@/utils';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 
-type ModActivity = {
+type ModActivity = ModActivityLinkInput & {
   id?: string;
   actionType?: string | null;
   actionDescription?: string | null;
   createdAt?: string | null;
-  Issue?: unknown;
-  Comment?: unknown;
-  RelatedDiscussion?: unknown;
-  RelatedEvent?: unknown;
-  RelatedComment?: unknown;
 };
 
 type ModDay = {

@@ -165,6 +165,7 @@ export type UpdateStateInput = {
   radius?: number;
   showCanceledEvents?: boolean;
   showOnlyFreeEvents?: boolean;
+  showOnlyServerRuleViolations?: boolean;
   locationFilter?: LocationFilterTypes;
   showArchived?: boolean;
   showUnanswered?: boolean;

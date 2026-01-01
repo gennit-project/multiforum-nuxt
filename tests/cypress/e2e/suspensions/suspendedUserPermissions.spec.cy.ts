@@ -373,7 +373,7 @@ describe('Suspended user permissions enforcement', () => {
         // Set date/time (required fields)
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
-        const dateStr = tomorrow.toISOString().split('T')[0];
+        const dateStr = tomorrow.toISOString().split('T')[0] ?? '';
 
         cy.get('input[type="date"]').first().type(dateStr);
         cy.get('input[type="time"]').first().type('14:00');

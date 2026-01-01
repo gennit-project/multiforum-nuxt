@@ -911,9 +911,7 @@ const label = computed(() => {
                     "
                     class="ml-3"
                     :class="[
-                      props.goToPermalinkOnClick
-                        ? 'cursor-pointer hover:bg-gray-100 hover:text-gray-500 hover:dark:bg-gray-700'
-                        : '',
+                      props.goToPermalinkOnClick ? 'cursor-pointer' : '',
                     ]"
                   >
                     <MarkdownPreview

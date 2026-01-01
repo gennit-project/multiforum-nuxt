@@ -49,12 +49,13 @@ const originalComment = computed(() => {
 
 onCommentResult(({ data }) => {
   if (data?.comments?.length) {
-    const originalAuthorUsername = data.comments[0].Author.username;
+    const author = data.comments[0].Author;
+    const originalAuthorUsername = author?.username;
     if (originalAuthorUsername) {
       emit('fetchedOriginalAuthorUsername', originalAuthorUsername);
     }
 
-    const originalAuthorModProfileName = data.comments[0].Author.modProfileName;
+    const originalAuthorModProfileName = author?.modProfileName;
     if (originalAuthorModProfileName) {
       emit('fetchedOriginalAuthorUsername', originalAuthorModProfileName);
     }

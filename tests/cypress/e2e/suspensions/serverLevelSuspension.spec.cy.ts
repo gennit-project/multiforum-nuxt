@@ -180,6 +180,8 @@ describe('Server-level suspension enforcement', () => {
     cy.contains(/suspended|permission denied/i).should('not.exist');
 
     // Optionally verify the forum was created by checking the URL or success message
-    cy.url().should('include', newForumName).or('include', 'forums');
+    cy.url().should((url) => {
+      expect(url.includes(newForumName) || url.includes('forums')).to.eq(true);
+    });
   });
 });

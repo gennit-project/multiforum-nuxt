@@ -145,7 +145,10 @@ const recordRecentSearch = () => {
   setLocalStorageItem(SEARCH_RECENTS_KEY, recentSearches.value);
 };
 
-const executeSearch = (value?: string) => {
+const executeSearch = (value?: string | Event) => {
+  if (value && typeof value !== 'string') {
+    value = undefined;
+  }
   const nextValue =
     typeof value === 'string'
       ? value

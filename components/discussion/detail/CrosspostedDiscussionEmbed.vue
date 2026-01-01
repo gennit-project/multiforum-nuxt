@@ -43,6 +43,10 @@ const hasAlbum = computed(() => {
     props.discussion?.Album?.Images && props.discussion.Album.Images.length > 0
   );
 });
+
+const bodyPreview = computed(() => {
+  return !!props.discussion?.body;
+});
 </script>
 
 <template>

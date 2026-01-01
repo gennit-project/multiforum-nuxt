@@ -134,6 +134,18 @@ const toggleSelection = (
   }
 };
 
+const updateEditReason = (val: string) => {
+  editReason.value = val;
+};
+
+const updateTitleValue = (val: string) => {
+  titleValue.value = val;
+};
+
+const updateBodyValue = (val: string) => {
+  bodyValue.value = val;
+};
+
 const {
   mutate: updateComment,
   loading: updateCommentLoading,
@@ -205,24 +217,34 @@ const saveEdits = async () => {
     loadingSave.value = true;
     mutationError.value = '';
     if (props.targetType === 'comment') {
-      await updateComment({
+      const result = await updateComment({
         updateCommentInput: { text: bodyValue.value, editReason: editReason.value },
         commentWhere: { id: props.commentId },
+        errorPolicy: 'all',
       });
+      if (result?.errors?.length) {
+        mutationError.value = result.errors.map((error) => error.message).join(' ');
+        return;
+      }
     } else if (
       props.targetType === 'discussion' ||
       props.targetType === 'download'
     ) {
-      await updateDiscussion({
+      const result = await updateDiscussion({
         where: { id: props.discussionId },
         updateDiscussionInput: {
           title: titleValue.value,
           body: bodyValue.value,
           editReason: editReason.value,
         },
+        errorPolicy: 'all',
       });
+      if (result?.errors?.length) {
+        mutationError.value = result.errors.map((error) => error.message).join(' ');
+        return;
+      }
     } else if (props.targetType === 'event') {
-      await updateEvent({
+      const result = await updateEvent({
         updateEventInput: {
           title: titleValue.value,
           description: bodyValue.value,
@@ -231,7 +253,12 @@ const saveEdits = async () => {
         where: { id: props.eventId },
         channelConnections: [],
         channelDisconnections: [],
+        errorPolicy: 'all',
       });
+      if (result?.errors?.length) {
+        mutationError.value = result.errors.map((error) => error.message).join(' ');
+        return;
+      }
     }
 
     const actionSummary = (() => {
@@ -249,7 +276,7 @@ const saveEdits = async () => {
       }
     })();
 
-    await addFeedItem({
+    const feedResult = await addFeedItem({
       issueId: props.issueId,
       actionDescription: `${modProfileNameVar.value} ${actionSummary}`,
       actionType: 'EDIT_CONTENT',
@@ -257,11 +284,20 @@ const saveEdits = async () => {
       commentText: buildActivityComment(),
       channelUniqueName: props.channelUniqueName,
       flaggedServerRuleViolation: true,
+      errorPolicy: 'all',
     });
+
+    if (feedResult?.errors?.length) {
+      mutationError.value = feedResult.errors.map((error) => error.message).join(' ');
+      return;
+    }
 
     emit('saved');
     emit('close');
   } catch (err) {
+    const message =
+      err instanceof Error ? err.message : 'Failed to save edits.';
+    mutationError.value = message;
     console.error('Error saving edits', err);
   } finally {
     loadingSave.value = false;
@@ -311,7 +347,7 @@ defineExpose({
             :placeholder="'Briefly explain the edit for audit/history'"
             :initial-value="editReason"
             :disable-toolbar="true"
-            @update="(val) => (editReason.value = val)"
+            @update="updateEditReason"
           />
         </div>
 
@@ -324,7 +360,7 @@ defineExpose({
             :placeholder="'Update the title...'"
             :initial-value="titleValue"
             :disable-toolbar="true"
-            @update="(val) => (titleValue.value = val)"
+            @update="updateTitleValue"
           />
         </div>
 
@@ -336,7 +372,7 @@ defineExpose({
             :rows="8"
             :placeholder="'Update the content...'"
             :initial-value="bodyValue"
-            @update="(val) => (bodyValue.value = val)"
+            @update="updateBodyValue"
           />
         </div>
 

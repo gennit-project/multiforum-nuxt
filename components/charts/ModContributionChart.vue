@@ -120,7 +120,7 @@ const contributions = computed<ModDayData[]>(() => {
       .map((day) => {
         if (!day) return null;
         const activities = Array.isArray(day.activities)
-          ? day.activities.map((activity) => ({
+          ? day.activities.map((activity: ModActivity) => ({
               ...activity,
               type: activity.actionType || 'moderation',
               description: activity.actionDescription || '',

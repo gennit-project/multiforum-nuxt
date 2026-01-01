@@ -36,7 +36,7 @@ export default defineComponent({
 
     type AlbumData = {
       discussion: Discussion;
-      album: Album;
+      album: Album | null | undefined;
     };
 
     const openAlbumData = ref<AlbumData | null>(null);

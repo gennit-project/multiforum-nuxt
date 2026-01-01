@@ -74,7 +74,10 @@ const isCommentAuthor = computed(() => {
   }
 
   if ('displayName' in author) {
-    return !!modProfileNameVar.value && author.displayName === modProfileNameVar.value;
+    return (
+      !!modProfileNameVar.value &&
+      author.displayName === modProfileNameVar.value
+    );
   }
 
   return false;
@@ -94,7 +97,9 @@ watch(
 );
 
 const hasChanges = computed(() => {
-  return (editedComment.value || '') !== (props.activityItem.Comment?.text || '');
+  return (
+    (editedComment.value || '') !== (props.activityItem.Comment?.text || '')
+  );
 });
 
 const hasRevision = computed(() => {
@@ -112,7 +117,9 @@ const getContentNoun = (description: string) => {
 
 const actionPhrase = computed(() => {
   const actionType = props.activityItem.actionType as ActionType | undefined;
-  const actionDescription = (props.activityItem.actionDescription || '').toLowerCase();
+  const actionDescription = (
+    props.activityItem.actionDescription || ''
+  ).toLowerCase();
   const contentNoun = getContentNoun(actionDescription);
 
   switch (actionType) {
@@ -152,14 +159,17 @@ const revisionContent = computed(() => {
     return null;
   }
 
-  const actionDescription = (props.activityItem.actionDescription || '').toLowerCase();
+  const actionDescription = (
+    props.activityItem.actionDescription || ''
+  ).toLowerCase();
   const isTitleEdit = actionDescription.includes('title');
   const useTitle = isTitleEdit;
 
   // Use nextRevisionBody if available (for older edits), otherwise use current discussion body
-  const newBodyContent = props.nextRevisionBody !== null
-    ? props.nextRevisionBody
-    : props.relatedDiscussion.body || '';
+  const newBodyContent =
+    props.nextRevisionBody !== null
+      ? props.nextRevisionBody
+      : props.relatedDiscussion.body || '';
 
   const newVersion = {
     id: 'current',
@@ -309,7 +319,7 @@ const saveEdit = async () => {
     class="mt-4 list-none"
     :class="[
       isPermalinked
-        ? 'rounded-lg border border-orange-500 bg-orange-100 dark:bg-orange-900'
+        ? 'dark:bg-orange-950 rounded-lg border border-orange-500 bg-orange-100'
         : '',
     ]"
   >

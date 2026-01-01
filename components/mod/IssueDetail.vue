@@ -1007,17 +1007,19 @@ const handleDeleteComment = async (commentId: string) => {
           :active-issue="activeIssue"
           @fetched-original-author-username="originalAuthorUsername = $event"
         />
-        <EventDetail
-          v-if="activeIssue?.relatedEventId"
-          :issue-event-id="activeIssue.relatedEventId"
-          :show-comments="false"
-          :show-menu-buttons="false"
-          :username-on-top="true"
-          :show-add-to-calendar="false"
-          :show-event-in-past-banner="false"
-          :show-title="true"
-          @fetched-original-author-username="originalAuthorUsername = $event"
-        />
+        <ClientOnly>
+          <EventDetail
+            v-if="activeIssue?.relatedEventId"
+            :issue-event-id="activeIssue.relatedEventId"
+            :show-comments="false"
+            :show-menu-buttons="false"
+            :username-on-top="true"
+            :show-add-to-calendar="false"
+            :show-event-in-past-banner="false"
+            :show-title="true"
+            @fetched-original-author-username="originalAuthorUsername = $event"
+          />
+        </ClientOnly>
         <CommentDetails
           v-if="activeIssue?.relatedCommentId"
           :comment-id="activeIssue.relatedCommentId"

@@ -24,7 +24,7 @@ const DISCUSSION_PAGE_LIMIT = 15;
 
 type AlbumData = {
   discussion: Discussion;
-  album: Album;
+  album: Album | null | undefined;
 };
 
 const route = useRoute();

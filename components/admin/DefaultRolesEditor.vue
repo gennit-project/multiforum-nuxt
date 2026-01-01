@@ -23,6 +23,12 @@ interface RoleDefinition {
   node: RoleNode | null | undefined;
 }
 
+type RoleState = {
+  name: string;
+  description: string;
+  values: Record<string, boolean>;
+};
+
 const props = defineProps<{
   serverConfig: Record<string, any> | null;
   title?: string;
@@ -70,12 +76,7 @@ const modPermissionKeys = [
   'canLockChannel',
 ];
 
-const roleState = reactive<
-  Record<
-    string,
-    { name: string; description: string; values: Record<string, boolean> }
-  >
->({});
+const roleState = reactive<Record<string, RoleState>>({});
 const editingRoleKey = ref<string | null>(null);
 const showModal = ref(false);
 
@@ -112,59 +113,66 @@ onUpdateModRoleDone(handleMutationDone);
 const definitions = computed<RoleDefinition[]>(() => {
   if (!props.serverConfig) return [];
   const cfg = props.serverConfig;
-  const allowedTypes = props.types ?? ['server', 'mod'];
+  const allowedTypes = (props.types ?? ['server', 'mod']) as RoleDefinition['type'][];
   return [
     {
       key: 'DefaultServerRole',
       label: 'Default Server Role',
-      type: 'server',
+      type: 'server' as const,
       permissions: serverPermissionKeys,
       node: cfg.DefaultServerRole,
     },
     {
       key: 'DefaultModRole',
       label: 'Default Mod Role',
-      type: 'mod',
+      type: 'mod' as const,
       permissions: modPermissionKeys,
       node: cfg.DefaultModRole,
     },
     {
       key: 'DefaultElevatedModRole',
       label: 'Default Elevated Mod Role',
-      type: 'mod',
+      type: 'mod' as const,
       permissions: modPermissionKeys,
       node: cfg.DefaultElevatedModRole,
     },
     {
       key: 'DefaultSuspendedRole',
       label: 'Default Suspended Role',
-      type: 'server',
+      type: 'server' as const,
       permissions: serverPermissionKeys,
       node: cfg.DefaultSuspendedRole,
     },
     {
       key: 'DefaultSuspendedModRole',
       label: 'Default Suspended Mod Role',
-      type: 'mod',
+      type: 'mod' as const,
       permissions: modPermissionKeys,
       node: cfg.DefaultSuspendedModRole,
     },
   ].filter((def) => !!def.node && allowedTypes.includes(def.type));
 });
 
+const ensureRoleState = (def: RoleDefinition): RoleState => {
+  if (!roleState[def.key]) {
+    roleState[def.key] = {
+      name: def.node?.name || '',
+      description: def.node?.description || '',
+      values: def.permissions.reduce<Record<string, boolean>>((acc, perm) => {
+        acc[perm] = !!def.node?.[perm];
+        return acc;
+      }, {}),
+    };
+  }
+  return roleState[def.key]!;
+};
+
 watch(
   definitions,
   (defs) => {
     defs.forEach((def) => {
       if (!def.node) return;
-      roleState[def.key] = {
-        name: def.node.name || '',
-        description: def.node.description || '',
-        values: def.permissions.reduce<Record<string, boolean>>((acc, perm) => {
-          acc[perm] = !!def.node?.[perm];
-          return acc;
-        }, {}),
-      };
+      ensureRoleState(def);
     });
   },
   { immediate: true }
@@ -190,10 +198,11 @@ const openModal = (key: string) => {
 const resetEditingState = () => {
   const def = editingDefinition.value;
   if (!def?.node) return;
-  roleState[def.key].name = def.node.name || '';
-  roleState[def.key].description = def.node.description || '';
+  const state = ensureRoleState(def);
+  state.name = def.node.name || '';
+  state.description = def.node.description || '';
   def.permissions.forEach((perm) => {
-    roleState[def.key].values[perm] = !!def.node?.[perm];
+    state.values[perm] = !!def.node?.[perm];
   });
 };
 
@@ -206,7 +215,7 @@ const closeModal = () => {
 const saveRole = async () => {
   const def = editingDefinition.value;
   if (!def?.node) return;
-  const state = roleState[def.key];
+  const state = ensureRoleState(def);
   try {
     const input = {
       name: state.name,
@@ -329,7 +338,7 @@ const saveRole = async () => {
               Role name
             </label>
             <input
-              v-model="roleState[editingDefinition.key].name"
+              v-model="roleState[editingDefinition.key]!.name"
               type="text"
               class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
               :disabled="mutationLoading"
@@ -342,7 +351,7 @@ const saveRole = async () => {
               Role description
             </label>
             <textarea
-              v-model="roleState[editingDefinition.key].description"
+              v-model="roleState[editingDefinition.key]!.description"
               rows="3"
               class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
               :disabled="mutationLoading"
@@ -358,7 +367,7 @@ const saveRole = async () => {
                 {{ formatPermissionName(perm) }}
               </span>
               <input
-                v-model="roleState[editingDefinition.key].values[perm]"
+                v-model="roleState[editingDefinition.key]!.values[perm]"
                 type="checkbox"
                 class="h-4 w-4 rounded border border-gray-300 accent-blue-600 dark:border-gray-600 dark:accent-blue-400"
                 :disabled="mutationLoading"

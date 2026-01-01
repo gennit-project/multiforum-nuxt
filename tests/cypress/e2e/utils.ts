@@ -41,7 +41,7 @@ export const deleteAll = () => {
 };
 
 // Helper function to validate the response
-const validateResponse = (response: any, commandName: string) => {
+const validateResponse = (response: any, commandName: string): void => {
   if (
     !response ||
     response.status >= 400 ||
@@ -65,7 +65,7 @@ export const seedAll = () => {
   // The order is important here because some
   // have a dependency on the previous seed data.
 
-  const attemptSeed = (attempt = 1) => {
+  const attemptSeed = (attempt = 1): Cypress.Chainable<any> => {
     return cy
       .seedDataForCypressTests({
         channels,
@@ -80,7 +80,7 @@ export const seedAll = () => {
         modServerRoles,
         serverConfigs,
       })
-      .then((response) => {
+      .then((response: any) => {
         const hasConstraintError = Boolean(
           response?.body?.errors?.some((err: any) =>
             (err?.message || '').includes('Constraint validation failed')
@@ -97,7 +97,8 @@ export const seedAll = () => {
           return attemptSeed(attempt + 1);
         }
 
-        return validateResponse(response, 'seedDataForCypressTests');
+        validateResponse(response, 'seedDataForCypressTests');
+        return undefined;
       });
   };
 
