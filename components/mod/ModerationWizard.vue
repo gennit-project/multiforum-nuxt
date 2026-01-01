@@ -7,11 +7,11 @@ import ArchiveButton from './ArchiveButton.vue';
 import SuspendUserButton from './SuspendUserButton.vue';
 import AdminIcon from '../icons/AdminIcon.vue';
 import ScalesIcon from '../icons/ScalesIcon.vue';
-import XCircleIcon from '../icons/XCircleIcon.vue';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { modProfileNameVar } from '@/cache';
 import PencilIcon from '../icons/PencilIcon.vue';
 import EditContentModal from './EditContentModal.vue';
+import CloseIssueAction from './CloseIssueAction.vue';
 import {
   GET_DISCUSSION_CHANNEL,
   GET_EVENT_CHANNEL,
@@ -325,24 +325,13 @@ const editButtonDisabled = computed(() => {
                       >
                         If no (no violation)
                       </p>
-                      <p class="text-sm text-gray-700 dark:text-gray-300">
-                        Close the issue to log that no moderation action is
-                        needed.
-                      </p>
                     </div>
                     <div class="flex flex-col gap-2">
-                      <button
-                        class="font-semibold flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm text-white transition hover:bg-blue-500"
+                      <CloseIssueAction
+                        v-if="!isArchived"
                         :loading="closeIssueLoading"
-                        @click="$emit('close-issue')"
-                      >
-                        <XCircleIcon />
-                        Close Issue (No Action Needed)
-                      </button>
-                      <p class="text-xs text-gray-500 dark:text-gray-400">
-                        This records that moderators reviewed the content and
-                        found no violation.
-                      </p>
+                        @close-issue="$emit('close-issue')"
+                      />
                       <ArchiveButton
                         v-if="isArchived"
                         :discussion-id="discussionId"
@@ -388,13 +377,26 @@ const editButtonDisabled = computed(() => {
                       >
                         If yes (violation)
                       </p>
+                    </div>
+
+                    <div v-if="isArchived" class="flex flex-col gap-2">
+                      <CloseIssueAction
+                        :loading="closeIssueLoading"
+                        @close-issue="$emit('close-issue')"
+                      />
+                    </div>
+
+                    <div v-if="editActions.length" class="flex flex-col gap-2">
                       <p class="text-sm text-gray-700 dark:text-gray-300">
                         Address the violation by editing the original post or
                         taking stronger action.
                       </p>
-                    </div>
-
-                    <div v-if="editActions.length" class="flex flex-col gap-2">
+                      <p
+                        v-if="isArchived"
+                        class="text-sm text-gray-700 dark:text-gray-300"
+                      >
+                        You can first edit, then unarchive the content.
+                      </p>
                       <button
                         v-for="action in editActions"
                         :key="action.testId"
