@@ -37,22 +37,35 @@ const mod = computed(() => {
 </script>
 
 <template>
-  <div class="rounded-lg pt-6">
-    <div class="mb-4 mt-6 flex flex-col gap-2 p-2">
-      <AvatarComponent
-        :text="mod?.displayName || ''"
-        :is-square="false"
-        :is-medium="true"
-      />
-      <label>Mod Profile</label>
-      <h1
-        v-if="mod?.displayName"
-        class="flex border-gray-700 text-xl font-bold leading-6 text-gray-500 dark:text-gray-200"
+  <div class="rounded-lg pt-2">
+    <div
+      class="mb-3 mt-2 flex flex-col gap-2 p-2 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div class="flex min-w-0 items-center gap-3">
+        <AvatarComponent
+          :text="mod?.displayName || ''"
+          :is-square="false"
+          :is-small="true"
+        />
+        <div class="min-w-0">
+          <p
+            class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+          >
+            Mod Profile
+          </p>
+          <h1
+            v-if="mod?.displayName"
+            class="flex break-words text-lg font-bold leading-5 text-gray-600 dark:text-gray-200"
+          >
+            {{ mod.displayName
+            }}<span v-if="modProfileIsYourself" class="ml-2 text-sm">(You)</span>
+          </h1>
+        </div>
+      </div>
+      <div
+        v-if="mod?.createdAt"
+        class="text-sm text-gray-500 dark:text-gray-400 sm:text-right"
       >
-        {{ mod.displayName
-        }}<span v-if="modProfileIsYourself" class="ml-2">(You)</span>
-      </h1>
-      <div v-if="mod?.createdAt" class="min-w-0 flex-1 sm:block 2xl:hidden">
         {{ `Joined ${relativeTime(mod.createdAt)}` }}
       </div>
     </div>
