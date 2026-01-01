@@ -38,11 +38,11 @@ const props = defineProps({
     default: '',
   },
   selectedTags: {
-    type: Array,
+    type: Array as PropType<string[]>,
     default: () => [],
   },
   selectedChannels: {
-    type: Array,
+    type: Array as PropType<string[]>,
     default: () => [],
   },
   defaultExpanded: {
@@ -104,7 +104,6 @@ const discussionDetailOptions = computed(() => {
     return {
       label: `${commentCount} ${commentCount === 1 ? 'comment' : 'comments'} in ${dc.channelUniqueName}`,
       value: discussionDetailLink,
-      event: '',
     };
   }).sort((a, b) => b.label.localeCompare(a.label));
 });
@@ -172,7 +171,7 @@ const revealSensitiveContent = () => {
 
 <template>
   <li
-    class="list-none px-4 pb-2 pt-2"
+    class="list-none px-4 py-2"
     :class="{
       'bg-gray-100 dark:bg-gray-700': discussionIdInParams === discussionId,
     }"
@@ -182,7 +181,7 @@ const revealSensitiveContent = () => {
         <nuxt-link
           v-if="discussion"
           :to="getDetailLink()"
-          class="-ml-0.5 mb-1 flex items-center gap-2 text-xs dark:text-white"
+          class="mb-1 flex items-center gap-2 text-xs dark:text-white"
         >
           <div class="flex items-center text-orange-700 dark:text-white">
             <AvatarComponent
@@ -239,7 +238,7 @@ const revealSensitiveContent = () => {
                   <span class="inline-flex">
                     <MenuButton :items="discussionDetailOptions">
                       <span class="inline cursor-pointer">
-                        <i class="fa-regular fa-comment mr-1 h-4 w-4" />
+                        <i class="fa-regular fa-comment mr-1 h-4 w-4" aria-hidden="true" />
                         {{ commentCount }}
                         {{ commentCount === 1 ? 'comment' : 'comments' }} in
                         {{ channelCount }}
@@ -279,32 +278,23 @@ const revealSensitiveContent = () => {
               </div>
             </div>
             <button
-              v-if="
-                discussion &&
-                (discussion.body || discussion.Album) &&
-                !isExpanded
-              "
+              v-if="discussion && (discussion.body || discussion.Album)"
+              type="button"
               class="text-xs text-gray-600 hover:underline dark:text-gray-300"
-              @click="isExpanded = true"
+              :aria-expanded="isExpanded"
+              @click="isExpanded = !isExpanded"
             >
               <i
-                class="fa-solid fa-expand text-md mr-1 text-gray-600 hover:underline dark:text-gray-300"
+                v-if="!isExpanded"
+                class="fa-solid fa-expand mr-1 text-xs"
+                aria-hidden="true"
               />
-              Expand
-            </button>
-            <button
-              v-if="
-                discussion &&
-                (discussion.body || discussion.Album) &&
-                isExpanded
-              "
-              class="text-xs text-gray-600 hover:underline dark:text-gray-300"
-              @click="isExpanded = false"
-            >
               <i
-                class="fa-solid fa-x mr-1 text-xs text-gray-600 hover:underline dark:text-gray-300"
+                v-else
+                class="fa-solid fa-x mr-1 text-xs"
+                aria-hidden="true"
               />
-              Collapse
+              {{ isExpanded ? 'Collapse' : 'Expand' }}
             </button>
             <div
               v-if="
@@ -321,7 +311,7 @@ const revealSensitiveContent = () => {
                   !sensitiveContentRevealed &&
                   !userAllowsSensitiveContent
                 "
-                class="mb-2 ml-2 mr-2 rounded border bg-gray-200 p-4 text-center dark:bg-black"
+                class="mx-2 mb-2 rounded border bg-gray-200 p-4 text-center dark:bg-black"
               >
                 <p class="mb-3 text-sm text-gray-600 dark:text-gray-300">
                   This content has been marked as potentially sensitive.
@@ -355,14 +345,13 @@ const revealSensitiveContent = () => {
                   :word-limit="50"
                   :disable-gallery="false"
                   :image-max-height="'200px'"
-                  class="ml-2 max-w-full break-words pb-2"
+                  class="max-w-full break-words px-2 pb-2"
                 />
                 <div
                   v-if="discussion.Album"
-                  class="my-4 bg-black"
-                  style="width: 100%; max-width: 100%; overflow: hidden"
+                  class="my-4 w-full max-w-full overflow-hidden bg-black"
                 >
-                  <div style="max-width: 384px; margin: 0 auto">
+                  <div class="mx-auto max-w-96">
                     <DiscussionAlbum
                       :album="discussion.Album"
                       :carousel-format="true"
@@ -394,8 +383,3 @@ const revealSensitiveContent = () => {
   </li>
 </template>
 
-<style scoped>
-.highlighted {
-  background-color: #f9f95d;
-}
-</style>

@@ -47,11 +47,11 @@ const props = defineProps({
     default: '',
   },
   selectedTags: {
-    type: Array,
+    type: Array as PropType<string[]>,
     default: () => [],
   },
   selectedChannels: {
-    type: Array,
+    type: Array as PropType<string[]>,
     default: () => [],
   },
   defaultExpanded: {
@@ -245,35 +245,26 @@ const revealSensitiveContent = () => {
                 />
               </div>
 
-              <!-- Expand/Collapse buttons -->
+              <!-- Expand/Collapse button -->
               <div class="mt-1">
                 <button
-                  v-if="
-                    discussion &&
-                    (discussion.body || discussion.Album) &&
-                    !isExpanded
-                  "
+                  v-if="discussion && (discussion.body || discussion.Album)"
+                  type="button"
                   class="text-xs text-gray-600 hover:underline dark:text-gray-300"
-                  @click="isExpanded = true"
+                  :aria-expanded="isExpanded"
+                  @click="isExpanded = !isExpanded"
                 >
                   <i
-                    class="fa-solid fa-expand text-md mr-1 text-gray-600 hover:underline dark:text-gray-300"
+                    v-if="!isExpanded"
+                    class="fa-solid fa-expand mr-1 text-xs"
+                    aria-hidden="true"
                   />
-                  Expand
-                </button>
-                <button
-                  v-if="
-                    discussion &&
-                    (discussion.body || discussion.Album) &&
-                    isExpanded
-                  "
-                  class="text-xs text-gray-600 hover:underline dark:text-gray-300"
-                  @click="isExpanded = false"
-                >
                   <i
-                    class="fa-solid fa-x mr-1 text-xs text-gray-600 hover:underline dark:text-gray-300"
+                    v-else
+                    class="fa-solid fa-x mr-1 text-xs"
+                    aria-hidden="true"
                   />
-                  Collapse
+                  {{ isExpanded ? 'Collapse' : 'Expand' }}
                 </button>
               </div>
             </div>
@@ -323,14 +314,13 @@ const revealSensitiveContent = () => {
               <template v-if="shouldShowContent">
                 <div
                   v-if="discussion.body"
-                  class="my-2 border-l bg-gray-100 px-2 pb-4 pt-2 dark:border-gray-600 dark:bg-black"
+                  class="my-2 border-l bg-gray-100 py-2 pl-4 pr-2 dark:border-gray-600 dark:bg-black"
                 >
                   <MarkdownPreview
                     :text="discussion.body"
                     :disable-gallery="false"
                     :word-limit="50"
                     :image-max-height="'150px'"
-                    class="ml-2"
                   />
                 </div>
                 <div
@@ -379,7 +369,7 @@ const revealSensitiveContent = () => {
                   }"
                   class="flex items-center gap-2 rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700 dark:hover:bg-gray-600"
                 >
-                  <i class="fa-regular fa-comment text-xs" />
+                  <i class="fa-regular fa-comment text-xs" aria-hidden="true" />
                   <span class="text-sm">{{ commentCount }}</span>
                 </nuxt-link>
               </div>
@@ -392,8 +382,3 @@ const revealSensitiveContent = () => {
   </li>
 </template>
 
-<style scoped>
-.highlighted {
-  background-color: #f9f95d;
-}
-</style>
