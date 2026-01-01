@@ -66,18 +66,19 @@ const {
   error: getIssueError,
   loading: getIssueLoading,
   refetch: refetchIssue,
-} = useQuery(GET_ISSUE, () => ({
-  channelUniqueName: channelId.value,
-  issueNumber: issueNumber.value,
-}), () => ({
-  enabled: issueNumber.value !== null,
-}));
+} = useQuery(
+  GET_ISSUE,
+  () => ({
+    channelUniqueName: channelId.value,
+    issueNumber: issueNumber.value,
+  }),
+  () => ({
+    enabled: issueNumber.value !== null,
+  })
+);
 
 // Setup a query to get channel data (we'll use this for refetching after actions)
-const {
-  result: getChannelResult,
-  refetch: refetchChannel,
-} = useQuery(
+const { result: getChannelResult, refetch: refetchChannel } = useQuery(
   GET_CHANNEL,
   () => ({
     uniqueName: channelId.value,
@@ -125,7 +126,10 @@ const isIssueAuthor = computed(() => {
   }
 
   if (author.__typename === 'ModerationProfile') {
-    return !!modProfileNameVar.value && author.displayName === modProfileNameVar.value;
+    return (
+      !!modProfileNameVar.value &&
+      author.displayName === modProfileNameVar.value
+    );
   }
 
   return false;
@@ -334,7 +338,10 @@ const { mutate: closeIssue, loading: closeIssueLoading } = useMutation(
           existingClosedIssuesByChannelData.channels[0];
         const newClosedIssuesByChannel = {
           ...existingClosedIssuesByChannel,
-          Issues: [...(existingClosedIssuesByChannel?.Issues || []), activeIssue.value],
+          Issues: [
+            ...(existingClosedIssuesByChannel?.Issues || []),
+            activeIssue.value,
+          ],
         };
 
         cache.writeQuery({
@@ -498,8 +505,7 @@ const { mutate: addIssueActivityFeedItem } = useMutation(
       const existingIssueData = cache.readQuery({
         query: GET_ISSUE,
         variables: {
-          channelUniqueName:
-            updatedIssue.channelUniqueName || channelId.value,
+          channelUniqueName: updatedIssue.channelUniqueName || channelId.value,
           issueNumber: updatedIssue.issueNumber,
         },
       });
@@ -569,8 +575,7 @@ const {
       cache.writeQuery({
         query: GET_ISSUE,
         variables: {
-          channelUniqueName:
-            updatedIssue.channelUniqueName || channelId.value,
+          channelUniqueName: updatedIssue.channelUniqueName || channelId.value,
           issueNumber: updatedIssue.issueNumber,
         },
         data: {
@@ -616,8 +621,7 @@ const {
       cache.writeQuery({
         query: GET_ISSUE,
         variables: {
-          channelUniqueName:
-            updatedIssue.channelUniqueName || channelId.value,
+          channelUniqueName: updatedIssue.channelUniqueName || channelId.value,
           issueNumber: updatedIssue.issueNumber,
         },
         data: {
@@ -659,9 +663,7 @@ const hasRelatedContent = computed(() => {
 
 const shouldShowIssueDetailsSection = computed(() => {
   return (
-    hasRelatedContent.value ||
-    !!activeIssue.value?.body ||
-    isIssueAuthor.value
+    hasRelatedContent.value || !!activeIssue.value?.body || isIssueAuthor.value
   );
 });
 
@@ -933,7 +935,7 @@ const handleDeleteComment = async (commentId: string) => {
   <PageNotFound v-if="!getIssueLoading && !activeIssue" />
   <div
     v-else
-    class="w-full max-w-screen-2xl space-y-2 rounded-lg py-2 dark:text-white sm:px-2 md:px-4 lg:px-6"
+    class="mx-4 my-4 flex-1 space-y-2 rounded-lg bg-white py-2 shadow-lg ring-1 ring-gray-200 dark:bg-gray-900 dark:text-white dark:ring-gray-700 sm:mx-6 md:mx-8 lg:mx-10"
   >
     <ErrorBanner
       v-if="getIssueError"
@@ -941,24 +943,21 @@ const handleDeleteComment = async (commentId: string) => {
       :text="getIssueError.message"
     />
     <div v-else-if="activeIssue" class="mt-2 flex flex-col gap-2 px-4">
-      <h2
-        v-if="hasRelatedContent"
-        class="text-xl font-bold"
-      >
+      <h2 v-if="hasRelatedContent" class="text-xl font-bold">
         {{
           `Original ${
             activeIssue?.relatedDiscussionId
               ? 'discussion'
               : activeIssue?.relatedEventId
                 ? 'event'
-            : 'comment'
+                : 'comment'
           }`
         }}
       </h2>
       <div
         v-if="shouldShowIssueDetailsSection"
         id="original-post-container"
-        class="rounded-lg border border-gray-200 px-4 py-2 dark:border-gray-600"
+        class="bg-blue-50 rounded-lg border border-l-4 border-blue-200 border-l-blue-400 px-4 py-2 dark:border-gray-600 dark:border-l-blue-500 dark:bg-gray-800"
       >
         <DiscussionDetails
           v-if="activeIssue?.relatedDiscussionId"
@@ -984,7 +983,7 @@ const handleDeleteComment = async (commentId: string) => {
         />
         <div v-if="activeIssue?.body || isIssueAuthor" class="py-2">
           <div class="mb-2 flex items-center justify-between gap-2">
-            <h3 class="text-lg font-semibold">Issue details</h3>
+            <h3 class="font-semibold text-lg">Issue details</h3>
             <div v-if="isIssueAuthor" class="flex items-center gap-2">
               <GenericButton
                 v-if="!isEditingIssueBody"
@@ -992,10 +991,7 @@ const handleDeleteComment = async (commentId: string) => {
                 @click="startIssueBodyEdit"
               />
               <template v-else>
-                <GenericButton
-                  :text="'Cancel'"
-                  @click="cancelIssueBodyEdit"
-                />
+                <GenericButton :text="'Cancel'" @click="cancelIssueBodyEdit" />
                 <SaveButton
                   :label="'Save'"
                   :disabled="
@@ -1041,7 +1037,7 @@ const handleDeleteComment = async (commentId: string) => {
           <ActivityFeed
             v-if="activeIssue"
             :key="activeIssue.id"
-            class="mb-6"
+            class="mb-6 border-l-4 border-l-blue-400 pl-4 dark:border-l-blue-500"
             :feed-items="activeIssue.ActivityFeed || []"
             :original-user-author-username="originalAuthorUsername"
             :original-mod-author-name="originalModProfileName"

@@ -181,25 +181,25 @@ watch(
 
 const getIconCircleClasses = (isActive: boolean) => {
   const baseClasses =
-    'w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer';
+    'w-12 h-12 rounded-full bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center transition-all duration-200 cursor-pointer';
   return isActive
-    ? `${baseClasses} ring-1 ring-orange-500 ring-offset-1 ring-offset-white dark:ring-offset-gray-900`
+    ? `${baseClasses} bg-gray-200 dark:bg-gray-800 ring-1 ring-orange-500 ring-offset-1 ring-offset-gray-100 dark:ring-offset-gray-900 shadow-md`
     : baseClasses;
 };
 
 const getForumIconClasses = (isActive: boolean) => {
   const baseClasses =
-    'w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer overflow-hidden';
+    'w-12 h-12 rounded-full bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center transition-all duration-200 cursor-pointer overflow-hidden';
   return isActive
-    ? `${baseClasses} ring-2 ring-orange-500 ring-offset-0`
+    ? `${baseClasses} bg-gray-200 dark:bg-gray-800 ring-2 ring-orange-500 ring-offset-0 shadow-md`
     : baseClasses;
 };
 
 const getUserActionClasses = (isActive: boolean) => {
   const baseClasses =
-    'rounded-full my-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer';
+    'rounded-full my-2 bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center transition-all duration-200 cursor-pointer';
   return isActive
-    ? `${baseClasses} ring-1 ring-orange-500 ring-offset-1 ring-offset-white dark:ring-offset-gray-900`
+    ? `${baseClasses} bg-gray-200 dark:bg-gray-800 ring-1 ring-orange-500 ring-offset-1 ring-offset-gray-100 dark:ring-offset-gray-900 shadow-md`
     : baseClasses;
 };
 </script>
@@ -207,7 +207,7 @@ const getUserActionClasses = (isActive: boolean) => {
 <template>
   <ClientOnly>
     <div
-      class="fixed left-0 top-0 z-[18] hidden h-full w-20 flex-col items-center border-r border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-900 lg:flex"
+      class="fixed left-0 top-0 z-[18] hidden h-full w-20 flex-col items-center border-r border-gray-200 bg-gray-100 dark:border-gray-600 dark:bg-gray-900 lg:flex"
       :class="{ 'py-2': isVerticallyShort, 'py-4': !isVerticallyShort }"
     >
       <!-- Create Button -->
@@ -249,7 +249,7 @@ const getUserActionClasses = (isActive: boolean) => {
             >
               <component
                 :is="item.icon"
-                class="h-6 w-6 text-gray-600 dark:text-gray-300"
+                class="h-6 w-6 text-gray-500 dark:text-gray-300"
                 aria-hidden="true"
               />
             </NuxtLink>
@@ -385,7 +385,7 @@ const getUserActionClasses = (isActive: boolean) => {
     <template #fallback>
       <!-- Server-side fallback with default classes (no responsive behavior) -->
       <div
-        class="fixed left-0 top-0 z-[18] hidden h-full w-16 flex-col items-center border-r border-gray-200 bg-white py-4 dark:border-gray-600 dark:bg-gray-900 lg:flex"
+        class="fixed left-0 top-0 z-[18] hidden h-full w-16 flex-col items-center border-r border-gray-200 bg-gray-100 py-4 dark:border-gray-600 dark:bg-gray-900 lg:flex"
       >
         <!-- Logo -->
         <IconTooltip text="Topical - Home" class="mb-4">
@@ -422,7 +422,7 @@ const getUserActionClasses = (isActive: boolean) => {
               >
                 <component
                   :is="item.icon"
-                  class="h-6 w-6 text-gray-600 dark:text-gray-300"
+                  class="h-6 w-6 text-gray-500 dark:text-gray-300"
                   aria-hidden="true"
                 />
               </NuxtLink>

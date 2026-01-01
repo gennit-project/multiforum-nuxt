@@ -124,7 +124,7 @@ const formattedDate = computed(() => {
         <slot />
         <h2
           v-if="!titleEditMode"
-          class="text-md text-wrap px-1 sm:tracking-tight md:text-4xl"
+          class="text-wrap px-1 text-lg sm:tracking-tight md:text-2xl"
         >
           {{ issue && issue.title ? issue.title : "Couldn't find the issue" }}
         </h2>

@@ -63,7 +63,7 @@ const closedCount = computed(() => {
   >
     <nav
       v-if="!issueNumber"
-      class="flex items-center justify-between gap-4 py-3 pl-4 pr-4"
+      class="flex items-center justify-between gap-4 py-3 pl-4 pr-4 shadow-sm"
     >
       <div class="flex items-center gap-4">
         <nuxt-link
