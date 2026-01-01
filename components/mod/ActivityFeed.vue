@@ -15,6 +15,15 @@ const reversedFeedItems = computed(() => {
   return props.feedItems.slice().reverse();
 });
 
+const normalizeActionType = (actionType?: string | null) => {
+  return (actionType || '').toLowerCase().trim();
+};
+
+const isEditAction = (actionType?: string | null) => {
+  const normalized = normalizeActionType(actionType);
+  return normalized === ActionType.Edit || normalized === 'edit_content';
+};
+
 // For each revision activity item, find what the content was changed TO
 // by looking at the next revision's "old" body (which is this revision's "new" body)
 const getNextRevisionBody = (currentIndex: number): string | null => {
@@ -42,7 +51,7 @@ const getCommentEditIndex = (currentIndex: number): number | null => {
 
   // Only applies to Edit actions with a Comment that has PastVersions
   if (
-    currentItem.actionType !== ActionType.Edit ||
+    !isEditAction(currentItem.actionType) ||
     !currentItem.Comment?.PastVersions?.length
   ) {
     return null;
@@ -57,7 +66,7 @@ const getCommentEditIndex = (currentIndex: number): number | null => {
     };
     // Count edits on the same comment
     if (
-      item.actionType === 'Edit' &&
+      isEditAction(item.actionType) &&
       item.Comment?.id === currentItem.Comment?.id
     ) {
       editIndex++;

@@ -15,7 +15,10 @@ import { GET_COMMENT } from '@/graphQLData/comment/queries';
 import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
 import { UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
 import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/event/mutations';
-import { ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD } from '@/graphQLData/issue/mutations';
+import {
+  ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD,
+  UPDATE_ISSUE,
+} from '@/graphQLData/issue/mutations';
 import { modProfileNameVar } from '@/cache';
 
 type TargetType = 'comment' | 'discussion' | 'download' | 'event';
@@ -166,11 +169,18 @@ const {
   error: addFeedItemError,
 } = useMutation(ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD);
 
+const {
+  mutate: updateIssue,
+  loading: updateIssueLoading,
+  error: updateIssueError,
+} = useMutation(UPDATE_ISSUE);
+
 const mutationError = computed(() => {
   return (
     updateCommentError.value?.message ||
     updateDiscussionError.value?.message ||
     updateEventError.value?.message ||
+    updateIssueError.value?.message ||
     addFeedItemError.value?.message ||
     ''
   );
@@ -181,6 +191,7 @@ const isLoading = computed(() => {
     updateCommentLoading.value ||
     updateDiscussionLoading.value ||
     updateEventLoading.value ||
+    updateIssueLoading.value ||
     addFeedItemLoading.value
   );
 });
@@ -193,19 +204,19 @@ const hasRequiredRules = computed(() => {
 
 const buildActivityComment = () => {
   const rulesText = [
-    selectedForumRules.value.length
-      ? `Forum rules: ${selectedForumRules.value.join(', ')}`
-      : null,
     selectedServerRules.value.length
       ? `Server rules: ${selectedServerRules.value.join(', ')}`
+      : null,
+    selectedForumRules.value.length
+      ? `Forum rules: ${selectedForumRules.value.join(', ')}`
       : null,
   ]
     .filter(Boolean)
     .join('\n');
 
   const reasonText = editReason.value
-    ? `\nReason: ${editReason.value}`
-    : '\nReason: (not provided)';
+    ? `Reason: ${editReason.value}`
+    : null;
 
   return [rulesText, reasonText].filter(Boolean).join('\n');
 };
@@ -217,11 +228,12 @@ const saveEdits = async () => {
     return;
   }
 
+  const editDetails = buildActivityComment();
   if (props.targetType === 'comment') {
     await updateComment({
       updateCommentInput: {
         text: bodyValue.value,
-        editReason: editReason.value,
+        editReason: editDetails,
       },
       commentWhere: { id: props.commentId },
     });
@@ -235,7 +247,7 @@ const saveEdits = async () => {
       updateDiscussionInput: {
         title: titleValue.value,
         body: bodyValue.value,
-        editReason: editReason.value,
+        editReason: editDetails,
       },
     });
     if (updateDiscussionError.value) return;
@@ -244,7 +256,7 @@ const saveEdits = async () => {
       updateEventInput: {
         title: titleValue.value,
         description: bodyValue.value,
-        editReason: editReason.value,
+        editReason: editDetails,
       },
       where: { id: props.eventId },
       channelConnections: [],
@@ -253,31 +265,26 @@ const saveEdits = async () => {
     if (updateEventError.value) return;
   }
 
-  const actionSummary = (() => {
-    switch (props.targetType) {
-      case 'comment':
-        return 'edited the comment.';
-      case 'discussion':
-        return 'edited the discussion.';
-      case 'download':
-        return 'edited the download.';
-      case 'event':
-        return 'edited the event.';
-      default:
-        return 'edited the content.';
-    }
-  })();
+  if (props.targetType === 'event') {
+    const actionSummary = 'edited the event.';
 
-  await addFeedItem({
-    issueId: props.issueId,
-    actionDescription: `${modProfileNameVar.value} ${actionSummary}`,
-    actionType: 'EDIT_CONTENT',
-    displayName: modProfileNameVar.value || '',
-    commentText: buildActivityComment(),
-    channelUniqueName: props.channelUniqueName,
-    flaggedServerRuleViolation: true,
-  });
-  if (addFeedItemError.value) return;
+    await addFeedItem({
+      issueId: props.issueId,
+      actionDescription: `${modProfileNameVar.value} ${actionSummary}`,
+      actionType: 'EDIT_CONTENT',
+      displayName: modProfileNameVar.value || '',
+      commentText: editDetails,
+      channelUniqueName: props.channelUniqueName,
+      flaggedServerRuleViolation: true,
+    });
+    if (addFeedItemError.value) return;
+  } else {
+    await updateIssue({
+      issueWhere: { id: props.issueId },
+      updateIssueInput: { flaggedServerRuleViolation: true },
+    });
+    if (updateIssueError.value) return;
+  }
 
   emit('saved');
   emit('close');

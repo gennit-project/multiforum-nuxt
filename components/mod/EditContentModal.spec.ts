@@ -1,10 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import EditContentModal from './EditContentModal.vue';
-import { ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD } from '@/graphQLData/issue/mutations';
+import {
+  ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD,
+  UPDATE_ISSUE,
+} from '@/graphQLData/issue/mutations';
 
 const mockMutate = vi.fn(() => Promise.resolve());
 const mockAddFeed = vi.fn(() => Promise.resolve());
+const mockUpdateIssue = vi.fn(() => Promise.resolve());
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(() => ({
@@ -15,6 +19,15 @@ vi.mock('@vue/apollo-composable', () => ({
       return {
         mutate: (...args: any[]) => {
           mockAddFeed(...args);
+          return Promise.resolve();
+        },
+        loading: { value: false },
+      };
+    }
+    if (mutation === UPDATE_ISSUE) {
+      return {
+        mutate: (...args: any[]) => {
+          mockUpdateIssue(...args);
           return Promise.resolve();
         },
         loading: { value: false },
@@ -89,6 +102,7 @@ describe('EditContentModal', () => {
   beforeEach(() => {
     mockMutate.mockClear();
     mockAddFeed.mockClear();
+    mockUpdateIssue.mockClear();
   });
 
   const mountModal = (props = {}) =>
@@ -128,6 +142,7 @@ describe('EditContentModal', () => {
     await flushPromises();
 
     expect(mockMutate).toHaveBeenCalled();
-    expect(mockAddFeed).toHaveBeenCalled();
+    expect(mockUpdateIssue).toHaveBeenCalled();
+    expect(mockAddFeed).not.toHaveBeenCalled();
   });
 });

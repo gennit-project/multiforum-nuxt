@@ -25,7 +25,7 @@ import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
 import { modProfileNameVar, usernameVar } from '@/cache';
 import RevisionDiffInline from '@/components/mod/RevisionDiffInline.vue';
 
-const actionTypeToIcon = {
+const actionTypeToIcon: Record<string, any> = {
   [ActionType.Close]: XCircleIcon,
   [ActionType.Comment]: ChatBubbleBottomCenter,
   [ActionType.Remove]: XmarkIcon,
@@ -36,6 +36,7 @@ const actionTypeToIcon = {
   [ActionType.Archive]: ArchiveBox,
   [ActionType.Unarchive]: ArchiveBoxXMark,
   [ActionType.Edit]: PencilIcon,
+  edit_content: PencilIcon,
   [ActionType.Delete]: TrashIcon,
 };
 
@@ -115,8 +116,20 @@ const getContentNoun = (description: string) => {
   return 'content';
 };
 
+const normalizeActionType = (actionType?: string | null) => {
+  return (actionType || '').toLowerCase().trim();
+};
+
+const normalizedActionType = computed(() => {
+  return normalizeActionType(props.activityItem.actionType);
+});
+
+const isEditAction = computed(() => {
+  return normalizedActionType.value === ActionType.Edit || normalizedActionType.value === 'edit_content';
+});
+
 const actionPhrase = computed(() => {
-  const actionType = props.activityItem.actionType as ActionType | undefined;
+  const actionType = normalizeActionType(props.activityItem.actionType);
   const actionDescription = (
     props.activityItem.actionDescription || ''
   ).toLowerCase();
@@ -128,6 +141,7 @@ const actionPhrase = computed(() => {
     case ActionType.Close:
       return 'the issue was closed by';
     case ActionType.Edit:
+    case 'edit_content':
       return `the ${contentNoun} was edited by`;
     case ActionType.Delete:
       return `the ${contentNoun} was deleted by`;
@@ -216,6 +230,10 @@ const hasCommentRevision = computed(() => {
   );
 });
 
+const showCommentBody = computed(() => {
+  return !isEditAction.value || !hasCommentRevision.value;
+});
+
 // Build the comment revision content for the diff
 const commentRevisionContent = computed(() => {
   if (props.commentEditIndex === null) return null;
@@ -268,6 +286,7 @@ const commentRevisionContent = computed(() => {
       body: newBody,
       createdAt: newCreatedAt,
       Author: null,
+      editReason: comment?.editReason || '',
     },
   };
 });
@@ -336,7 +355,7 @@ const saveEdit = async () => {
               class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-500 ring-8 ring-white dark:text-white dark:ring-gray-800"
             >
               <component
-                :is="actionTypeToIcon[activityItem.actionType as ActionType]"
+                :is="actionTypeToIcon[normalizedActionType]"
                 class="h-5 w-5 text-white"
                 aria-hidden="true"
               />
@@ -417,7 +436,7 @@ const saveEdit = async () => {
 
           <div class="border-l-2 border-gray-200 pl-2 dark:border-gray-500">
             <div
-              v-if="activityItem.Comment"
+              v-if="activityItem.Comment && showCommentBody"
               class="mb-2 flex items-center justify-between gap-2"
             >
               <MarkdownPreview

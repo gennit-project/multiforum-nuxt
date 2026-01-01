@@ -44,6 +44,16 @@ const editReason = computed(() => {
   return newReason || oldReason || '';
 });
 
+const editReasonLabel = computed(() => {
+  if (
+    editReason.value.includes('Server rules:') ||
+    editReason.value.includes('Forum rules:')
+  ) {
+    return 'Edit details:';
+  }
+  return 'Edit reason:';
+});
+
 // Computed property that generates the diff HTML
 const diffHtml = computed(() => {
   const dmp = new DiffMatchPatch.diff_match_patch();
@@ -87,10 +97,10 @@ const diffHtml = computed(() => {
     <!-- Edit reason if provided -->
     <div
       v-if="editReason"
-      class="border-b px-3 py-2 text-xs text-gray-600 dark:border-gray-700 dark:text-gray-400"
+      class="border-b px-3 py-2 text-xs text-gray-600 dark:border-gray-700 dark:text-gray-400 whitespace-pre-line"
     >
       <span class="font-semibold text-gray-700 dark:text-gray-200"
-        >Edit reason:</span
+        >{{ editReasonLabel }}</span
       >
       {{ editReason }}
     </div>

@@ -84,6 +84,7 @@ export const ISSUE_FIELDS = gql`
           ParentComment {
             id
           }
+          editReason
           PastVersions(options: { sort: [{ createdAt: DESC }] }) {
             id
             body
