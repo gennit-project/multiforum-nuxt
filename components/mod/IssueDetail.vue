@@ -23,6 +23,7 @@ import {
   COUNT_OPEN_ISSUES,
 } from '@/graphQLData/mod/queries';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { DateTime } from 'luxon';
 import type { Issue as GeneratedIssue } from '@/__generated__/graphql';
 import ErrorBanner from '@/components/ErrorBanner.vue';
@@ -41,6 +42,7 @@ import ArrowPathIcon from '../icons/ArrowPath.vue';
 import FlagIcon from '../icons/FlagIcon.vue';
 import MarkdownPreview from '../MarkdownPreview.vue';
 import { getAllPermissions } from '@/utils/permissionUtils';
+import { config } from '@/config';
 
 type Issue = GeneratedIssue & { issueNumber: number };
 
@@ -91,6 +93,10 @@ const { result: getChannelResult, refetch: refetchChannel } = useQuery(
   })
 );
 
+const { result: getServerResult } = useQuery(GET_SERVER_CONFIG, {
+  serverName: config.serverName,
+});
+
 const activeIssue = computed<Issue | null>(() => {
   if (getIssueError.value || !getIssueResult.value) return null;
   return getIssueResult.value.issues[0];
@@ -137,11 +143,23 @@ const isIssueAuthor = computed(() => {
 });
 
 const standardModRole = computed(() => {
-  return getChannelResult.value?.channels?.[0]?.DefaultModRole || null;
+  if (getChannelResult.value?.channels?.[0]?.DefaultModRole) {
+    return getChannelResult.value.channels[0].DefaultModRole;
+  }
+  if (getServerResult.value?.serverConfigs?.[0]?.DefaultModRole) {
+    return getServerResult.value.serverConfigs[0].DefaultModRole;
+  }
+  return null;
 });
 
 const elevatedModRole = computed(() => {
-  return getChannelResult.value?.channels?.[0]?.ElevatedModRole || null;
+  if (getChannelResult.value?.channels?.[0]?.ElevatedModRole) {
+    return getChannelResult.value.channels[0].ElevatedModRole;
+  }
+  if (getServerResult.value?.serverConfigs?.[0]?.DefaultElevatedModRole) {
+    return getServerResult.value.serverConfigs[0].DefaultElevatedModRole;
+  }
+  return null;
 });
 
 const permissionData = computed(() => {

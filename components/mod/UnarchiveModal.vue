@@ -143,10 +143,16 @@ const {
 });
 
 unarchiveDiscussionDone(() => {
+  client.refetchQueries({
+    include: [GET_ISSUE],
+  });
   emit('unarchivedSuccessfully');
 });
 
 unarchiveEventDone(() => {
+  client.refetchQueries({
+    include: [GET_ISSUE],
+  });
   emit('unarchivedSuccessfully');
 });
 

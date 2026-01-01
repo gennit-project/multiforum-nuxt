@@ -53,7 +53,7 @@ const tagClasses = computed(() => {
   return [
     props.large ? 'text-md py-1 shadow rounded-full' : '',
     props.titleMode ? 'text-xl py-1.5' : '',
-    !props.large && !props.titleMode ? 'text-xs py-0.5' : '',
+    !props.large && !props.titleMode ? 'text-sm py-0.5' : '',
     props.clearable ? 'pr-1' : 'cursor-pointer pr-2',
     getButtonStyles(),
     'pl-1 font-medium tag rounded flex items-center gap-1',
@@ -70,7 +70,7 @@ function handleTagClick(tag: string, active: boolean) {
 
 function getButtonStyles() {
   if (props.active) {
-    return 'bg-orange-500 text-black hover:bg-orange-600';
+    return 'bg-orange-400 dark:bg-orange-950 text-black dark:text-orange-400  hover:bg-orange-500';
   } else {
     if (props.channelMode) {
       return 'bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-50 dark:hover:bg-gray-600 dark:hover:text-white';
@@ -100,7 +100,7 @@ function getButtonStyles() {
     <XmarkIcon
       v-if="props.clearable"
       data-testid="tag-delete"
-      class="mr-1 h-3 w-3 cursor-pointer"
+      class="mr-1 h-4 w-4 cursor-pointer"
       @click="emits('delete', props.index)"
     />
   </span>

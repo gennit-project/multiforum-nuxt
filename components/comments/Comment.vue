@@ -677,7 +677,9 @@ const commentMenuItems = computed(() => {
     (userPermissions.value.isChannelOwner ||
       userPermissions.value.isElevatedMod ||
       userPermissions.value.canReport ||
-      userPermissions.value.canGiveFeedback);
+      userPermissions.value.canGiveFeedback ||
+      userPermissions.value.canHideComment ||
+      userPermissions.value.canSuspendUser);
 
   // Show mod actions if user has any mod permissions and isn't the comment author
   if (usernameVar.value && canPerformModActions && !isOwnComment) {

@@ -31,6 +31,7 @@ import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
+import { CHECK_EVENT_ISSUE_EXISTENCE } from '@/graphQLData/issue/queries';
 
 const props = defineProps({
   eventData: {
@@ -152,6 +153,36 @@ const { result: getPermissionResult } = useQuery(
     fetchPolicy: 'cache-first',
   }
 );
+
+const { result: getEventIssueResult } = useQuery(
+  CHECK_EVENT_ISSUE_EXISTENCE,
+  () => ({
+    eventId: eventId.value,
+    channelUniqueName: channelId.value,
+  }),
+  {
+    fetchPolicy: 'cache-first',
+    enabled: computed(() => !!eventId.value && !!channelId.value),
+  }
+);
+
+const relatedIssueNumber = computed(() => {
+  return getEventIssueResult.value?.issues?.[0]?.issueNumber ?? null;
+});
+
+const relatedIssueLink = computed(() => {
+  if (relatedIssueNumber.value == null || !channelId.value) {
+    return null;
+  }
+
+  return {
+    name: 'forums-forumId-issues-issueNumber',
+    params: {
+      forumId: channelId.value,
+      issueNumber: relatedIssueNumber.value,
+    },
+  };
+});
 
 // Get permission data from the query result
 const permissionData = computed(() => {
@@ -291,6 +322,7 @@ const menuItems = computed(() => {
     isOnFeedbackPage: route.name === 'EventFeedback',
     feedbackEnabled:
       getChannelResult.value?.channels[0]?.feedbackEnabled ?? true,
+    relatedIssueLink: relatedIssueLink.value,
   });
 });
 

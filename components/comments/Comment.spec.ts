@@ -258,10 +258,23 @@ const SimplifiedCommentComponent = {
     availableModActions(): MenuItem[] {
       const out: MenuItem[] = [];
 
-      if (this.modProfileName) {
+      const canPerformModActions =
+        !this.userPermissions.isSuspendedMod &&
+        (this.userPermissions.isChannelOwner ||
+          this.userPermissions.isElevatedMod ||
+          this.userPermissions.canReport ||
+          this.userPermissions.canGiveFeedback ||
+          this.userPermissions.canHideComment ||
+          this.userPermissions.canSuspendUser);
+
+      if (this.modProfileName && canPerformModActions) {
         // Add default mod actions
-        out.push({ label: 'Report', event: 'clickReport' });
-        out.push({ label: 'Give Feedback', event: 'clickFeedback' });
+        if (this.userPermissions.canReport) {
+          out.push({ label: 'Report', event: 'clickReport' });
+        }
+        if (this.userPermissions.canGiveFeedback) {
+          out.push({ label: 'Give Feedback', event: 'clickFeedback' });
+        }
 
         // Add conditional archive actions
         if (!this.commentData.archived) {
@@ -593,6 +606,41 @@ describe('Comment.vue', () => {
     expect(
       modActions.some((item: MenuItem) => item.label === 'Give Feedback')
     ).toBe(true);
+    expect(modActions.some((item: MenuItem) => item.label === 'Archive')).toBe(
+      true
+    );
+    expect(
+      modActions.some((item: MenuItem) => item.label === 'Archive and Suspend')
+    ).toBe(true);
+  });
+
+  it('shows archive actions when only hide/suspend permissions are granted', () => {
+    vi.mocked(getAllPermissions).mockReturnValue({
+      canReport: false,
+      canGiveFeedback: false,
+      canHideComment: true,
+      canSuspendUser: true,
+      isChannelOwner: false,
+      isElevatedMod: false,
+      isSuspendedMod: false,
+      isSuspendedUser: false,
+    });
+
+    const otherUserComment: CommentData = {
+      ...baseCommentData,
+      CommentAuthor: {
+        ...baseCommentData.CommentAuthor!,
+        username: 'otheruser',
+      },
+    };
+
+    wrapper = mountComment({
+      commentData: otherUserComment,
+      modProfileName: 'mod-profile',
+    });
+
+    const modActions = wrapper.vm.availableModActions;
+
     expect(modActions.some((item: MenuItem) => item.label === 'Archive')).toBe(
       true
     );

@@ -201,6 +201,7 @@ export const getEventHeaderMenuItems = (params: {
   eventId: string;
   isOnFeedbackPage?: boolean;
   feedbackEnabled?: boolean;
+  relatedIssueLink?: MenuItem['value'] | null;
 }): MenuItem[] => {
   const {
     isOwnEvent,
@@ -211,6 +212,7 @@ export const getEventHeaderMenuItems = (params: {
     eventId,
     isOnFeedbackPage = false,
     feedbackEnabled = true,
+    relatedIssueLink = null,
   } = params;
 
   // Debug log to see the permissions before making menu decisions
@@ -225,6 +227,14 @@ export const getEventHeaderMenuItems = (params: {
   });
 
   let menuItems: MenuItem[] = [];
+
+  if (relatedIssueLink) {
+    menuItems.push({
+      label: 'View Issue',
+      value: relatedIssueLink,
+      icon: ALLOWED_ICONS.VIEW_ISSUE,
+    });
+  }
 
   // Base menu items that don't depend on being on the feedback page
   if (!isOnFeedbackPage) {

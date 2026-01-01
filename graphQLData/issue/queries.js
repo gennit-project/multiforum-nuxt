@@ -134,6 +134,7 @@ export const CHECK_EVENT_ISSUE_EXISTENCE = gql`
       where: { relatedEventId: $eventId, channelUniqueName: $channelUniqueName }
     ) {
       id
+      issueNumber
       flaggedServerRuleViolation
     }
   }

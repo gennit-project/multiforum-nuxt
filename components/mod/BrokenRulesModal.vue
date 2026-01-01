@@ -258,10 +258,16 @@ reportCommentDone(() => {
 });
 
 archiveDiscussionDone(() => {
+  client.refetchQueries({
+    include: [GET_ISSUE],
+  });
   emit('reportedAndArchivedSuccessfully');
 });
 
 archiveEventDone(() => {
+  client.refetchQueries({
+    include: [GET_ISSUE],
+  });
   emit('reportedAndArchivedSuccessfully');
 });
 
@@ -273,6 +279,9 @@ archiveCommentDone(() => {
 });
 
 suspendUserDone(() => {
+  client.refetchQueries({
+    include: [GET_ISSUE],
+  });
   emit('suspended-user-successfully');
 });
 
