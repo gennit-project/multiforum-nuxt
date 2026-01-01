@@ -131,9 +131,7 @@ const editActions = computed(() => {
     case 'comment':
       return [{ label: 'Edit Comment', testId: 'edit-comment' }];
     case 'discussion':
-      return [
-        { label: 'Edit title and/or body', testId: 'edit-discussion' },
-      ];
+      return [{ label: 'Edit title and/or body', testId: 'edit-discussion' }];
     case 'download':
       return [
         {
@@ -142,9 +140,7 @@ const editActions = computed(() => {
         },
       ];
     case 'event':
-      return [
-        { label: 'Edit title and/or description', testId: 'edit-event' },
-      ];
+      return [{ label: 'Edit title and/or description', testId: 'edit-event' }];
     default:
       return [];
   }
@@ -259,7 +255,7 @@ const editButtonDisabled = computed(() => {
                       </p>
                     </div>
                     <button
-                      class="flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-blue-600 px-4 py-2 text-white transition hover:bg-orange-500"
+                      class="flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-500"
                       :loading="closeIssueLoading"
                       @click="$emit('close-issue')"
                     >
