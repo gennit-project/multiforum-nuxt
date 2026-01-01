@@ -6,6 +6,7 @@ import GenericModal from '@/components/GenericModal.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import SelectBrokenRules from '@/components/admin/SelectBrokenRules.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
+import ButtonContent from '@/components/ButtonContent.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import type { PropType } from 'vue';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
@@ -44,9 +45,7 @@ const selectedServerRules = ref<string[]>([]);
 const editReason = ref('');
 const titleValue = ref('');
 const bodyValue = ref('');
-const loadingSave = ref(false);
 const validationError = ref('');
-const mutationError = ref('');
 
 // Fetch content per target
 const { result: commentResult } = useQuery(
@@ -113,7 +112,6 @@ watch(
       selectedServerRules.value = [];
       editReason.value = '';
       validationError.value = '';
-      mutationError.value = '';
     }
   }
 );
@@ -147,27 +145,39 @@ const updateBodyValue = (val: string) => {
 const {
   mutate: updateComment,
   loading: updateCommentLoading,
-  onError: onUpdateCommentError,
+  error: updateCommentError,
 } = useMutation(UPDATE_COMMENT);
 
-onUpdateCommentError((error) => {
-  mutationError.value = error.message || 'Failed to save edits.';
+const {
+  mutate: updateDiscussion,
+  loading: updateDiscussionLoading,
+  error: updateDiscussionError,
+} = useMutation(UPDATE_DISCUSSION);
+
+const {
+  mutate: updateEvent,
+  loading: updateEventLoading,
+  error: updateEventError,
+} = useMutation(UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS);
+
+const {
+  mutate: addFeedItem,
+  loading: addFeedItemLoading,
+  error: addFeedItemError,
+} = useMutation(ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD);
+
+const mutationError = computed(() => {
+  return (
+    updateCommentError.value?.message ||
+    updateDiscussionError.value?.message ||
+    updateEventError.value?.message ||
+    addFeedItemError.value?.message ||
+    ''
+  );
 });
-
-const { mutate: updateDiscussion, loading: updateDiscussionLoading } =
-  useMutation(UPDATE_DISCUSSION);
-
-const { mutate: updateEvent, loading: updateEventLoading } = useMutation(
-  UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS
-);
-
-const { mutate: addFeedItem, loading: addFeedItemLoading } = useMutation(
-  ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD
-);
 
 const isLoading = computed(() => {
   return (
-    loadingSave.value ||
     updateCommentLoading.value ||
     updateDiscussionLoading.value ||
     updateEventLoading.value ||
@@ -194,8 +204,8 @@ const buildActivityComment = () => {
     .join('\n');
 
   const reasonText = editReason.value
-    ? `Reason: ${editReason.value}`
-    : 'Reason: (not provided)';
+    ? `\nReason: ${editReason.value}`
+    : '\nReason: (not provided)';
 
   return [rulesText, reasonText].filter(Boolean).join('\n');
 };
@@ -207,106 +217,70 @@ const saveEdits = async () => {
     return;
   }
 
-  try {
-    loadingSave.value = true;
-    mutationError.value = '';
-    if (props.targetType === 'comment') {
-      const result = await updateComment({
-        updateCommentInput: {
-          text: bodyValue.value,
-          editReason: editReason.value,
-        },
-        commentWhere: { id: props.commentId },
-        errorPolicy: 'all',
-      });
-      if (result?.errors?.length) {
-        mutationError.value = result.errors
-          .map((error) => error.message)
-          .join(' ');
-        return;
-      }
-    } else if (
-      props.targetType === 'discussion' ||
-      props.targetType === 'download'
-    ) {
-      const result = await updateDiscussion({
-        where: { id: props.discussionId },
-        updateDiscussionInput: {
-          title: titleValue.value,
-          body: bodyValue.value,
-          editReason: editReason.value,
-        },
-        errorPolicy: 'all',
-      });
-      if (result?.errors?.length) {
-        mutationError.value = result.errors
-          .map((error) => error.message)
-          .join(' ');
-        return;
-      }
-    } else if (props.targetType === 'event') {
-      const result = await updateEvent({
-        updateEventInput: {
-          title: titleValue.value,
-          description: bodyValue.value,
-          editReason: editReason.value,
-        },
-        where: { id: props.eventId },
-        channelConnections: [],
-        channelDisconnections: [],
-        errorPolicy: 'all',
-      });
-      if (result?.errors?.length) {
-        mutationError.value = result.errors
-          .map((error) => error.message)
-          .join(' ');
-        return;
-      }
-    }
-
-    const actionSummary = (() => {
-      switch (props.targetType) {
-        case 'comment':
-          return 'edited the comment.';
-        case 'discussion':
-          return 'edited the discussion.';
-        case 'download':
-          return 'edited the download.';
-        case 'event':
-          return 'edited the event.';
-        default:
-          return 'edited the content.';
-      }
-    })();
-
-    const feedResult = await addFeedItem({
-      issueId: props.issueId,
-      actionDescription: `${modProfileNameVar.value} ${actionSummary}`,
-      actionType: 'EDIT_CONTENT',
-      displayName: modProfileNameVar.value || '',
-      commentText: buildActivityComment(),
-      channelUniqueName: props.channelUniqueName,
-      flaggedServerRuleViolation: true,
-      errorPolicy: 'all',
+  if (props.targetType === 'comment') {
+    await updateComment({
+      updateCommentInput: {
+        text: bodyValue.value,
+        editReason: editReason.value,
+      },
+      commentWhere: { id: props.commentId },
     });
-
-    if (feedResult?.errors?.length) {
-      mutationError.value = feedResult.errors
-        .map((error) => error.message)
-        .join(' ');
-      return;
-    }
-
-    emit('saved');
-    emit('close');
-  } catch (err) {
-    const message =
-      err instanceof Error ? err.message : 'Failed to save edits.';
-    mutationError.value = message;
-    console.error('Error saving edits', err);
-  } finally {
-    loadingSave.value = false;
+    if (updateCommentError.value) return;
+  } else if (
+    props.targetType === 'discussion' ||
+    props.targetType === 'download'
+  ) {
+    await updateDiscussion({
+      where: { id: props.discussionId },
+      updateDiscussionInput: {
+        title: titleValue.value,
+        body: bodyValue.value,
+        editReason: editReason.value,
+      },
+    });
+    if (updateDiscussionError.value) return;
+  } else if (props.targetType === 'event') {
+    await updateEvent({
+      updateEventInput: {
+        title: titleValue.value,
+        description: bodyValue.value,
+        editReason: editReason.value,
+      },
+      where: { id: props.eventId },
+      channelConnections: [],
+      channelDisconnections: [],
+    });
+    if (updateEventError.value) return;
   }
+
+  const actionSummary = (() => {
+    switch (props.targetType) {
+      case 'comment':
+        return 'edited the comment.';
+      case 'discussion':
+        return 'edited the discussion.';
+      case 'download':
+        return 'edited the download.';
+      case 'event':
+        return 'edited the event.';
+      default:
+        return 'edited the content.';
+    }
+  })();
+
+  await addFeedItem({
+    issueId: props.issueId,
+    actionDescription: `${modProfileNameVar.value} ${actionSummary}`,
+    actionType: 'EDIT_CONTENT',
+    displayName: modProfileNameVar.value || '',
+    commentText: buildActivityComment(),
+    channelUniqueName: props.channelUniqueName,
+    flaggedServerRuleViolation: true,
+  });
+  if (addFeedItemError.value) return;
+
+  emit('saved');
+  emit('close');
 };
 
 defineExpose({
@@ -404,8 +378,12 @@ defineExpose({
             :disabled="isLoading"
             @click="saveEdits"
           >
-            <PencilIcon class="h-4 w-4" />
-            Save edits
+            <ButtonContent :loading="isLoading">
+              <span class="inline-flex items-center gap-2">
+                <PencilIcon class="h-4 w-4" />
+                Save edits
+              </span>
+            </ButtonContent>
           </button>
         </div>
       </div>
