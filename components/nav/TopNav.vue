@@ -69,10 +69,10 @@ const isOnMapPage = computed(() => {
 
 <template>
   <nav
-    class="z-20 h-12 border-b border-b-gray-200 bg-gray-100 pr-4 dark:border-b-gray-600 dark:bg-gray-900 lg:ml-20"
+    class="z-20 h-14 border-b border-b-gray-200 bg-gray-100 pr-4 dark:border-b-gray-600 dark:bg-gray-900 lg:ml-20"
     :class="[isOnMapPage ? 'fixed w-full lg:w-[calc(100%-5rem)]' : '']"
   >
-    <div class="flex items-center justify-between py-1 pr-2 pl-12 lg:pl-2">
+    <div class="flex items-center justify-between py-2 pr-2 pl-12 lg:pl-2">
       <div class="min-w-0 flex items-center overflow-hidden">
         <HamburgerMenuButton
           v-if="!sideNavIsOpenVar"
