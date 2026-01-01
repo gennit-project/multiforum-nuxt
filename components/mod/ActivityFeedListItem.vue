@@ -101,6 +101,10 @@ const hasRevision = computed(() => {
   return !!props.activityItem.Revision && !!props.relatedDiscussion;
 });
 
+const isReportAction = computed(
+  () => props.activityItem.actionType === ActionType.Report
+);
+
 const revisionContent = computed(() => {
   if (!props.activityItem.Revision || !props.relatedDiscussion) {
     return null;
@@ -290,59 +294,116 @@ const saveEdit = async () => {
         <div class="min-w-0 flex-1 py-0">
           <div class="text-xs leading-8 text-gray-500 dark:text-gray-300">
             <span class="mr-0.5 flex flex-row items-center gap-1">
-              <!-- Link for ModerationProfile -->
-              <AvatarComponent
-                v-if="activityItem.ModerationProfile?.displayName"
-                :text="activityItem.ModerationProfile?.displayName"
-                :is-small="true"
-              />
-              <nuxt-link
-                v-if="activityItem.ModerationProfile?.displayName"
-                :to="{
-                  name: isOriginalPoster ? 'u-username' : 'mod-modId',
-                  params: {
-                    [isOriginalPoster ? 'username' : 'modId']:
-                      activityItem.ModerationProfile.displayName,
-                  },
-                }"
-                class="flex items-center gap-1 font-medium text-gray-900 hover:underline dark:text-gray-200"
-              >
-                <span class="flex flex-row items-center gap-1">
-                  {{ activityItem.ModerationProfile?.displayName }}
-                  <span
-                    v-if="isOriginalPoster"
-                    class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
-                    >OP</span
+              <template v-if="isReportAction">
+                <span class="font-semibold text-gray-900 dark:text-gray-200"
+                  >Report</span
+                >
+                <span>added by</span>
+                <template v-if="activityItem.ModerationProfile?.displayName">
+                  <AvatarComponent
+                    :text="activityItem.ModerationProfile?.displayName"
+                    :is-small="true"
+                  />
+                  <nuxt-link
+                    :to="{
+                      name: isOriginalPoster ? 'u-username' : 'mod-modId',
+                      params: {
+                        [isOriginalPoster ? 'username' : 'modId']:
+                          activityItem.ModerationProfile.displayName,
+                      },
+                    }"
+                    class="flex items-center gap-1 font-semibold text-gray-900 hover:underline dark:text-gray-200"
                   >
-                </span>
-              </nuxt-link>
+                    <span class="flex flex-row items-center gap-1">
+                      {{ activityItem.ModerationProfile?.displayName }}
+                      <span
+                        v-if="isOriginalPoster"
+                        class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                        >OP</span
+                      >
+                    </span>
+                  </nuxt-link>
+                </template>
+                <template v-else-if="activityItem.User?.username">
+                  <AvatarComponent
+                    :text="activityItem.User.username"
+                    :is-small="true"
+                  />
+                  <nuxt-link
+                    :to="{
+                      name: 'u-username',
+                      params: {
+                        username: activityItem.User.username,
+                      },
+                    }"
+                    class="flex items-center gap-1 font-semibold text-gray-900 hover:underline dark:text-gray-200"
+                  >
+                    <span class="flex items-center gap-1">
+                      {{ activityItem.User.username }}
+                      <span
+                        v-if="isOriginalPoster"
+                        class="rounded-md border border-gray-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                        >OP</span
+                      >
+                    </span>
+                  </nuxt-link>
+                </template>
+              </template>
+              <template v-else>
+                <!-- Link for ModerationProfile -->
+                <AvatarComponent
+                  v-if="activityItem.ModerationProfile?.displayName"
+                  :text="activityItem.ModerationProfile?.displayName"
+                  :is-small="true"
+                />
+                <nuxt-link
+                  v-if="activityItem.ModerationProfile?.displayName"
+                  :to="{
+                    name: isOriginalPoster ? 'u-username' : 'mod-modId',
+                    params: {
+                      [isOriginalPoster ? 'username' : 'modId']:
+                        activityItem.ModerationProfile.displayName,
+                    },
+                  }"
+                  class="flex items-center gap-1 font-medium text-gray-900 hover:underline dark:text-gray-200"
+                >
+                  <span class="flex flex-row items-center gap-1">
+                    {{ activityItem.ModerationProfile?.displayName }}
+                    <span
+                      v-if="isOriginalPoster"
+                      class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                      >OP</span
+                    >
+                  </span>
+                </nuxt-link>
 
-              <!-- Link for User -->
-              <AvatarComponent
-                v-if="activityItem.User?.username"
-                :text="activityItem.User.username"
-                :is-small="true"
-              />
-              <nuxt-link
-                v-if="activityItem.User?.username"
-                :to="{
-                  name: 'u-username',
-                  params: {
-                    username: activityItem.User.username,
-                  },
-                }"
-                class="flex items-center gap-1 font-medium text-gray-900 hover:underline dark:text-gray-200"
-              >
-                <span class="flex items-center gap-1">
-                  {{ activityItem.User.username }}
-                  <span
-                    v-if="isOriginalPoster"
-                    class="rounded-md border border-gray-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
-                    >OP</span
-                  >
-                </span>
-              </nuxt-link>
-              {{ activityItem.actionDescription }}
+                <!-- Link for User -->
+                <AvatarComponent
+                  v-if="activityItem.User?.username"
+                  :text="activityItem.User.username"
+                  :is-small="true"
+                />
+                <nuxt-link
+                  v-if="activityItem.User?.username"
+                  :to="{
+                    name: 'u-username',
+                    params: {
+                      username: activityItem.User.username,
+                    },
+                  }"
+                  class="flex items-center gap-1 font-medium text-gray-900 hover:underline dark:text-gray-200"
+                >
+                  <span class="flex items-center gap-1">
+                    {{ activityItem.User.username }}
+                    <span
+                      v-if="isOriginalPoster"
+                      class="rounded-md border border-gray-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                      >OP</span
+                    >
+                  </span>
+                </nuxt-link>
+                {{ activityItem.actionDescription }}
+              </template>
             </span>
             {{ ' ' }}
 

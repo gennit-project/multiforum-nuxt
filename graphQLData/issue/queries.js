@@ -96,6 +96,9 @@ export const ISSUE_FIELDS = gql`
         }
       }
     }
+    ActivityFeedAggregate(where: { actionType: "report" }) {
+      count
+    }
   }
 `;
 

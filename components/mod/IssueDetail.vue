@@ -38,6 +38,7 @@ import { modProfileNameVar, usernameVar } from '@/cache';
 import { useRoute } from 'nuxt/app';
 import XCircleIcon from '../icons/XCircleIcon.vue';
 import ArrowPathIcon from '../icons/ArrowPath.vue';
+import FlagIcon from '../icons/FlagIcon.vue';
 import MarkdownPreview from '../MarkdownPreview.vue';
 import { getAllPermissions } from '@/utils/permissionUtils';
 
@@ -661,6 +662,16 @@ const hasRelatedContent = computed(() => {
   );
 });
 
+const reportCount = computed(() => {
+  const count = activeIssue.value?.ActivityFeedAggregate?.count;
+  return typeof count === 'number' ? count : null;
+});
+
+const reportCountLabel = computed(() => {
+  if (reportCount.value === null) return '';
+  return `${reportCount.value} ${reportCount.value === 1 ? 'report' : 'reports'}`;
+});
+
 const shouldShowIssueDetailsSection = computed(() => {
   return (
     hasRelatedContent.value || !!activeIssue.value?.body || isIssueAuthor.value
@@ -943,17 +954,31 @@ const handleDeleteComment = async (commentId: string) => {
       :text="getIssueError.message"
     />
     <div v-else-if="activeIssue" class="mt-2 flex flex-col gap-2 px-4">
-      <h2 v-if="hasRelatedContent" class="text-xl font-bold">
-        {{
-          `Original ${
-            activeIssue?.relatedDiscussionId
-              ? 'discussion'
-              : activeIssue?.relatedEventId
-                ? 'event'
-                : 'comment'
-          }`
-        }}
-      </h2>
+      <div v-if="hasRelatedContent" class="flex items-center justify-between">
+        <h2 class="text-xl font-bold">
+          {{
+            `Original ${
+              activeIssue?.relatedDiscussionId
+                ? 'discussion'
+                : activeIssue?.relatedEventId
+                  ? 'event'
+                  : 'comment'
+            }`
+          }}
+        </h2>
+        <div
+          v-if="reportCount !== null"
+          :class="[
+            'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-sm font-medium',
+            reportCount > 0
+              ? 'bg-red-200 text-red-800 dark:bg-red-900/70 dark:text-red-100'
+              : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-100',
+          ]"
+        >
+          <FlagIcon class="h-4 w-4" aria-hidden="true" />
+          {{ reportCountLabel }}
+        </div>
+      </div>
       <div
         v-if="shouldShowIssueDetailsSection"
         id="original-post-container"
