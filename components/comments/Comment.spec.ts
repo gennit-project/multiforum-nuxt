@@ -200,7 +200,12 @@ const SimplifiedCommentComponent = {
   `,
   computed: {
     forumId(): string {
-      return this.commentData?.Channel?.uniqueName || 'test-forum';
+      return (
+        this.commentData?.Channel?.uniqueName ||
+        this.commentData?.DiscussionChannel?.channelUniqueName ||
+        this.commentData?.Event?.EventChannels?.[0]?.channelUniqueName ||
+        'test-forum'
+      );
     },
     showEditCommentForm(): boolean {
       return (
@@ -723,6 +728,22 @@ describe('Comment.vue', () => {
         commentId: 'comment-123',
       },
     });
+  });
+
+  it('uses the event channel unique name for forumId fallback', () => {
+    const eventComment: CommentData = {
+      ...baseCommentData,
+      Channel: undefined,
+      DiscussionChannel: undefined,
+      Event: {
+        id: 'event-123',
+        EventChannels: [{ channelUniqueName: 'cats' }],
+      },
+    };
+
+    wrapper = mountComment({ commentData: eventComment });
+
+    expect(wrapper.vm.forumId).toBe('cats');
   });
 
   it('shows child comments when reply count > 0 and showReplies is true', async () => {

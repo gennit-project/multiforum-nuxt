@@ -108,7 +108,9 @@ export const getDiscussionHeaderMenuItems = (params: {
     (userPermissions.isChannelOwner ||
       userPermissions.isElevatedMod ||
       userPermissions.canReport ||
-      userPermissions.canGiveFeedback);
+      userPermissions.canGiveFeedback ||
+      userPermissions.canHideEvent ||
+      userPermissions.canSuspendUser);
 
   // Show mod actions if user has any mod permissions and isn't the discussion creator
   if (isLoggedIn && canPerformModActions && !isOwnDiscussion) {

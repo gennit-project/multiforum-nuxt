@@ -180,6 +180,12 @@ const forumId = computed(() => {
   if (props.commentData?.Channel?.uniqueName) {
     return props.commentData.Channel.uniqueName;
   }
+  if (props.commentData?.DiscussionChannel?.channelUniqueName) {
+    return props.commentData.DiscussionChannel.channelUniqueName;
+  }
+  if (props.commentData?.Event?.EventChannels?.[0]?.channelUniqueName) {
+    return props.commentData.Event.EventChannels[0].channelUniqueName;
+  }
   if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }

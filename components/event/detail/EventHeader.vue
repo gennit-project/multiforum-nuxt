@@ -88,14 +88,14 @@ const channelId = computed(() => {
 const { result: getChannelResult } = useQuery(
   GET_CHANNEL,
   {
-    uniqueName: props.eventChannelId || channelId.value,
+    uniqueName: channelId.value,
     // Using luxon, round down to the nearest hour
     now: DateTime.local().startOf('hour').toISO(),
   },
   {
     fetchPolicy: 'cache-first',
     nextFetchPolicy: 'cache-first',
-    enabled: computed(() => !!props.eventChannelId || !!channelId.value),
+    enabled: computed(() => !!channelId.value),
   }
 );
 
@@ -141,14 +141,14 @@ const { result: getPermissionResult } = useQuery(
   {
     modDisplayName: modProfileNameVar.value,
     username: usernameVar.value,
-    channelUniqueName: props.eventChannelId || channelId.value || '',
+    channelUniqueName: channelId.value || '',
   },
   {
     enabled: computed(
       () =>
         !!modProfileNameVar.value &&
         !!usernameVar.value &&
-        (!!props.eventChannelId || !!channelId.value)
+        !!channelId.value
     ),
     fetchPolicy: 'cache-first',
   }
