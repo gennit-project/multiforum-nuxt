@@ -99,6 +99,15 @@ const formattedDate = computed(() => {
     year: 'numeric',
   });
 });
+
+const hasReportedContent = computed(
+  () =>
+    !!(
+      issue.value?.relatedDiscussionId ||
+      issue.value?.relatedEventId ||
+      issue.value?.relatedCommentId
+    )
+);
 </script>
 
 <template>
@@ -152,9 +161,14 @@ const formattedDate = computed(() => {
             v-if="issue"
             class="ml-1 mt-1 text-sm text-gray-500 dark:text-gray-400"
           >
-            {{
-              `First reported on ${formattedDate} by ${issue?.Author?.displayName || '[Deleted]'}`
-            }}
+            <span v-if="hasReportedContent" class="mr-2">
+              All reports for this content are collected in this issue.
+            </span>
+            <span>
+              {{
+                `First reported on ${formattedDate} by ${issue?.Author?.displayName || '[Deleted]'}`
+              }}
+            </span>
           </div>
         </div>
       </div>
