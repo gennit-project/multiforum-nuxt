@@ -263,7 +263,7 @@ const editButtonDisabled = computed(() => {
             v-if="issue.isOpen && !isCurrentUserOriginalPoster"
             class="flex items-center gap-2 border-b border-gray-300 pb-2 text-xl font-bold text-blue-500 dark:border-gray-600"
           >
-            <AdminIcon class="h-6 w-6" />
+            <AdminIcon class="h-6 w-6 text-blue-500" />
             Mod Action Needed
           </h1>
           <h1
@@ -291,7 +291,9 @@ const editButtonDisabled = computed(() => {
                   class="bg-blue-50 flex items-start gap-4 rounded-lg border border-blue-200 p-4 shadow-sm dark:border-blue-500/30 dark:bg-blue-500/10"
                 >
                   <div class="flex-shrink-0 pt-1">
-                    <ScalesIcon class="h-8 w-8 text-blue-600 dark:text-blue-300" />
+                    <ScalesIcon
+                      class="h-8 w-8 text-blue-600 dark:text-blue-300"
+                    />
                   </div>
                   <div class="space-y-1">
                     <p
@@ -338,7 +340,8 @@ const editButtonDisabled = computed(() => {
                         Close Issue (No Action Needed)
                       </button>
                       <p class="text-xs text-gray-500 dark:text-gray-400">
-                        This records that moderators reviewed the content and found no violation.
+                        This records that moderators reviewed the content and
+                        found no violation.
                       </p>
                       <ArchiveButton
                         v-if="isArchived"
@@ -417,7 +420,7 @@ const editButtonDisabled = computed(() => {
                     </div>
 
                     <div
-                      class="-mx-4 -mb-4 border-amber-300 bg-amber-50 dark:border-amber-500/50 dark:bg-amber-500/10 space-y-3 rounded-b-lg p-4"
+                      class="border-amber-300 bg-amber-50 dark:border-amber-500/50 dark:bg-amber-500/10 -mx-4 -mb-4 space-y-3 rounded-b-lg p-4"
                     >
                       <p
                         class="font-semibold text-xs uppercase tracking-wide text-gray-700 dark:text-gray-300"
@@ -431,7 +434,9 @@ const editButtonDisabled = computed(() => {
                       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <!-- Actions on Content -->
                         <div class="space-y-2">
-                          <p class="font-medium text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400">
+                          <p
+                            class="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-400"
+                          >
                             Actions on Content
                           </p>
                           <ArchiveButton
@@ -462,7 +467,9 @@ const editButtonDisabled = computed(() => {
                         </div>
                         <!-- Actions on Author -->
                         <div class="space-y-2">
-                          <p class="font-medium text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400">
+                          <p
+                            class="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-400"
+                          >
                             Actions on Author
                           </p>
                           <SuspendUserButton

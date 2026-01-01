@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 import { useRoute } from 'nuxt/app';
-import { useMutation } from '@vue/apollo-composable';
+import { useApolloClient, useMutation } from '@vue/apollo-composable';
 import { DateTime } from 'luxon';
 import GenericModal from '@/components/GenericModal.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
@@ -15,6 +15,7 @@ import {
   ARCHIVE_EVENT,
   ARCHIVE_COMMENT,
 } from '@/graphQLData/issue/mutations';
+import { GET_ISSUE } from '@/graphQLData/issue/queries';
 import { SUSPEND_USER } from '@/graphQLData/mod/mutations';
 import type { Comment } from '@/__generated__/graphql';
 import SelectBrokenRules from '@/components/admin/SelectBrokenRules.vue';
@@ -94,6 +95,8 @@ const emit = defineEmits([
   'suspended-user-successfully',
   'suspended-mod-successfully',
 ]);
+
+const { client } = useApolloClient();
 
 const route = useRoute();
 
@@ -263,6 +266,9 @@ archiveEventDone(() => {
 });
 
 archiveCommentDone(() => {
+  client.refetchQueries({
+    include: [GET_ISSUE],
+  });
   emit('reportedAndArchivedSuccessfully');
 });
 

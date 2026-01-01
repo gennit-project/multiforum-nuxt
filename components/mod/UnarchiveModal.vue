@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRoute } from 'nuxt/app';
-import { useMutation } from '@vue/apollo-composable';
+import { useApolloClient, useMutation } from '@vue/apollo-composable';
 import GenericModal from '@/components/GenericModal.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import ArchiveBoxXMark from '../icons/ArchiveBoxXMark.vue';
@@ -10,6 +10,7 @@ import {
   UNARCHIVE_EVENT,
   UNARCHIVE_COMMENT,
 } from '@/graphQLData/issue/mutations';
+import { GET_ISSUE } from '@/graphQLData/issue/queries';
 
 const props = defineProps({
   open: {
@@ -43,6 +44,8 @@ const props = defineProps({
   },
 });
 const emit = defineEmits(['close', 'unarchivedSuccessfully']);
+
+const { client } = useApolloClient();
 
 const route = useRoute();
 
@@ -148,6 +151,9 @@ unarchiveEventDone(() => {
 });
 
 unarchiveCommentDone(() => {
+  client.refetchQueries({
+    include: [GET_ISSUE],
+  });
   emit('unarchivedSuccessfully');
 });
 
@@ -256,18 +262,6 @@ const close = () => {
         :disable-auto-focus="false"
         :allow-image-upload="false"
         @update="explanation = $event"
-      />
-      <ErrorBanner
-        v-if="
-          unarchiveDiscussionError ||
-          unarchiveEventError ||
-          unarchiveCommentError
-        "
-        :text="
-          unarchiveDiscussionError?.message ||
-          unarchiveEventError?.message ||
-          unarchiveCommentError?.message
-        "
       />
     </template>
   </GenericModal>

@@ -859,9 +859,9 @@ const label = computed(() => {
         <div
           :class="[
             isHighlighted
-              ? 'rounded-md border border-orange-600 bg-orange-100 p-2 dark:bg-orange-900'
+              ? 'dark:bg-orange-950 rounded-md border border-orange-600 bg-orange-100 p-2'
               : isMarkedAsAnswer
-                ? 'rounded-md border border-green-600 bg-green-100 p-2 dark:bg-green-900'
+                ? 'dark:bg-green-950 rounded-md border border-green-600 bg-green-100 p-2'
                 : 'dark:bg-gray-950',
           ]"
           class="flex w-full"
