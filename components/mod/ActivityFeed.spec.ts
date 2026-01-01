@@ -1,6 +1,21 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
+
 import ActivityFeed from './ActivityFeed.vue';
+
+// Mock nuxt/app before importing the component
+vi.mock('nuxt/app', () => ({
+  useRoute: () => ({ params: { forumId: 'test-forum' } }),
+}));
+
+// Mock @vue/apollo-composable
+vi.mock('@vue/apollo-composable', () => ({
+  useMutation: vi.fn(() => ({
+    mutate: vi.fn(),
+    loading: { value: false },
+    error: { value: null },
+  })),
+}));
 
 const ActivityFeedListItemStub = {
   name: 'ActivityFeedListItem',

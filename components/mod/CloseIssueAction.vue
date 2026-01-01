@@ -8,7 +8,7 @@ defineProps({
   },
 });
 
-const emit = defineEmits(['close-issue']);
+defineEmits(['close-issue']);
 </script>
 
 <template>

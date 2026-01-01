@@ -22,6 +22,7 @@ vi.mock('@vue/apollo-composable', () => ({
           return Promise.resolve();
         },
         loading: { value: false },
+        error: { value: null },
       };
     }
     if (mutation === UPDATE_ISSUE) {
@@ -31,6 +32,7 @@ vi.mock('@vue/apollo-composable', () => ({
           return Promise.resolve();
         },
         loading: { value: false },
+        error: { value: null },
       };
     }
     return {
@@ -39,6 +41,7 @@ vi.mock('@vue/apollo-composable', () => ({
         return Promise.resolve();
       },
       loading: { value: false },
+      error: { value: null },
     };
   }),
 }));
@@ -75,9 +78,10 @@ vi.mock('@/components/GenericModal.vue', () => ({
         type: String,
         default: '',
       },
+      showFooter: Boolean,
     },
     template:
-      '<div><slot name="icon"></slot><slot name="title"></slot><slot name="body"></slot><slot></slot></div>',
+      '<div><slot name="icon"></slot><slot name="title"></slot><slot name="content"></slot><slot></slot></div>',
   },
 }));
 

@@ -75,8 +75,8 @@ const embeddedCrosspost = computed<Discussion | null>(() => {
 const showCrosspostSection = computed(() => {
   return Boolean(
     props.formValues?.crosspostId ||
-      embeddedCrosspost.value ||
-      props.crosspostLoading
+    embeddedCrosspost.value ||
+    props.crosspostLoading
   );
 });
 

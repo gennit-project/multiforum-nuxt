@@ -125,7 +125,10 @@ const normalizedActionType = computed(() => {
 });
 
 const isEditAction = computed(() => {
-  return normalizedActionType.value === ActionType.Edit || normalizedActionType.value === 'edit_content';
+  return (
+    normalizedActionType.value === ActionType.Edit ||
+    normalizedActionType.value === 'edit_content'
+  );
 });
 
 const actionPhrase = computed(() => {

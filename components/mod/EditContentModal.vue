@@ -214,9 +214,7 @@ const buildActivityComment = () => {
     .filter(Boolean)
     .join('\n');
 
-  const reasonText = editReason.value
-    ? `Reason: ${editReason.value}`
-    : null;
+  const reasonText = editReason.value ? `Reason: ${editReason.value}` : null;
 
   return [rulesText, reasonText].filter(Boolean).join('\n');
 };

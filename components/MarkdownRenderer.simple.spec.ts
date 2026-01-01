@@ -69,9 +69,8 @@ describe('MarkdownRenderer - Basic Props', () => {
 
   it('should accept a text prop', async () => {
     // Import the mocked component
-    const MarkdownRenderer = await import(
-      '@/components/MarkdownRenderer.vue'
-    ).then((m) => m.default);
+    const MarkdownRenderer =
+      await import('@/components/MarkdownRenderer.vue').then((m) => m.default);
 
     // Test with basic text
     const wrapper = mount(MarkdownRenderer, {
@@ -86,9 +85,8 @@ describe('MarkdownRenderer - Basic Props', () => {
 
   it('should apply different font size classes based on props', async () => {
     // Import the mocked component
-    const MarkdownRenderer = await import(
-      '@/components/MarkdownRenderer.vue'
-    ).then((m) => m.default);
+    const MarkdownRenderer =
+      await import('@/components/MarkdownRenderer.vue').then((m) => m.default);
 
     // Test small font size
     const smallWrapper = mount(MarkdownRenderer, {

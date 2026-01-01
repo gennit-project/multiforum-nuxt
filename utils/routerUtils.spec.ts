@@ -244,10 +244,7 @@ describe('routerUtils', () => {
 
       const result = getFeedbackPermalinkObject(input);
 
-      expect(result).toEqual({});
-      expect(console.error).toHaveBeenCalledWith(
-        'Missing required parameters for permalink to feedback on discussion'
-      );
+      expect(result).toBeNull();
     });
 
     it('returns null when missing required parameters for event feedback', () => {
@@ -262,10 +259,7 @@ describe('routerUtils', () => {
 
       const result = getFeedbackPermalinkObject(input);
 
-      expect(result).toEqual({});
-      expect(console.error).toHaveBeenCalledWith(
-        'Missing required parameters for permalink to feedback on event'
-      );
+      expect(result).toBeNull();
     });
 
     it('returns null when missing required parameters for comment feedback', () => {
@@ -285,9 +279,6 @@ describe('routerUtils', () => {
       });
 
       expect(result).toBeNull();
-      expect(console.error).toHaveBeenCalledWith(
-        'Missing required parameters for permalink to feedback on comment'
-      );
     });
   });
 

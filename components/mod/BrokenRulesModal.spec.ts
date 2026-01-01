@@ -21,6 +21,14 @@ vi.mock('@vue/apollo-composable', () => ({
     error: undefined,
     result: { value: {} },
   })),
+  useApolloClient: vi.fn(() => ({
+    client: {
+      cache: {
+        evict: vi.fn(),
+        gc: vi.fn(),
+      },
+    },
+  })),
 }));
 
 vi.mock('nuxt/app', () => ({
@@ -111,9 +119,10 @@ describe('BrokenRulesModal Component', () => {
   });
 
   const mountComponent = async (props = {}) => {
-    const BrokenRulesModal = await import(
-      '@/components/mod/BrokenRulesModal.vue'
-    ).then((m) => m.default);
+    const BrokenRulesModal =
+      await import('@/components/mod/BrokenRulesModal.vue').then(
+        (m) => m.default
+      );
     return mount(BrokenRulesModal, {
       props: {
         open: true,

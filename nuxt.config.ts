@@ -63,12 +63,10 @@ export default defineNuxtConfig({
               if (import.meta.client) {
                 return import('@apollo/client/core').then(
                   async ({ HttpLink, from }) => {
-                    const { setContext } = await import(
-                      '@apollo/client/link/context'
-                    );
-                    const { onError } = await import(
-                      '@apollo/client/link/error'
-                    );
+                    const { setContext } =
+                      await import('@apollo/client/link/context');
+                    const { onError } =
+                      await import('@apollo/client/link/error');
 
                     /* helper that returns a token or null */
                     const getToken = async (
@@ -96,9 +94,8 @@ export default defineNuxtConfig({
                     });
 
                     /* ---- errorLink: retry once on 401/UNAUTHENTICATED ---- */
-                    const { fromPromise } = await import(
-                      '@apollo/client/link/utils'
-                    );
+                    const { fromPromise } =
+                      await import('@apollo/client/link/utils');
                     const errorLink = onError(
                       ({ graphQLErrors, networkError, forward, operation }) => {
                         const unauth =

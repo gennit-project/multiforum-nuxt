@@ -97,11 +97,11 @@ const diffHtml = computed(() => {
     <!-- Edit reason if provided -->
     <div
       v-if="editReason"
-      class="border-b px-3 py-2 text-xs text-gray-600 dark:border-gray-700 dark:text-gray-400 whitespace-pre-line"
+      class="whitespace-pre-line border-b px-3 py-2 text-xs text-gray-600 dark:border-gray-700 dark:text-gray-400"
     >
-      <span class="font-semibold text-gray-700 dark:text-gray-200"
-        >{{ editReasonLabel }}</span
-      >
+      <span class="font-semibold text-gray-700 dark:text-gray-200">{{
+        editReasonLabel
+      }}</span>
       {{ editReason }}
     </div>
 
