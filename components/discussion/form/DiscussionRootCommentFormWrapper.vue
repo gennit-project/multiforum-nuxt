@@ -17,6 +17,8 @@ import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import { useRoute } from 'nuxt/app';
 import { gql } from '@apollo/client/core';
 
+defineOptions({ inheritAttrs: false });
+
 // Props
 const props = defineProps({
   link: {
@@ -319,26 +321,28 @@ const handleUpdateComment = (event: string) => {
 </script>
 
 <template>
-  <slot
-    :create-form-values="createFormValues"
-    :create-comment-loading="createCommentLoading"
-    :create-comment-error="createCommentError"
-    :comment-editor-open="commentEditorOpen"
-    :show-saved-notice="showSavedNotice"
-    :open-comment-editor="() => (commentEditorOpen = true)"
-    :close-comment-editor="() => (commentEditorOpen = false)"
-    :handle-create-comment="handleCreateComment"
-    :handle-update-comment="handleUpdateComment"
-  >
-    <CreateRootCommentForm
+  <div v-bind="$attrs">
+    <slot
       :create-form-values="createFormValues"
       :create-comment-loading="createCommentLoading"
       :create-comment-error="createCommentError"
       :comment-editor-open="commentEditorOpen"
-      @open-comment-editor="commentEditorOpen = true"
-      @close-comment-editor="commentEditorOpen = false"
-      @handle-create-comment="handleCreateComment"
-      @handle-update-comment="handleUpdateComment"
-    />
-  </slot>
+      :show-saved-notice="showSavedNotice"
+      :open-comment-editor="() => (commentEditorOpen = true)"
+      :close-comment-editor="() => (commentEditorOpen = false)"
+      :handle-create-comment="handleCreateComment"
+      :handle-update-comment="handleUpdateComment"
+    >
+      <CreateRootCommentForm
+        :create-form-values="createFormValues"
+        :create-comment-loading="createCommentLoading"
+        :create-comment-error="createCommentError"
+        :comment-editor-open="commentEditorOpen"
+        @open-comment-editor="commentEditorOpen = true"
+        @close-comment-editor="commentEditorOpen = false"
+        @handle-create-comment="handleCreateComment"
+        @handle-update-comment="handleUpdateComment"
+      />
+    </slot>
+  </div>
 </template>

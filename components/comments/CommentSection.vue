@@ -670,9 +670,7 @@ const lengthOfCommentInProgress = computed(() => {
           :show-top-options="false"
         />
       </div>
-      <div class="my-2">
-        <slot />
-      </div>
+      <div v-if="$slots.default" class="my-2"><slot /></div>
       <PinnedAnswers
         v-if="answers?.length > 0"
         :answers="answers"
