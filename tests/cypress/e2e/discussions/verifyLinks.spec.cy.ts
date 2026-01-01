@@ -1,5 +1,6 @@
 import { CATS_FORUM, DISCUSSION_CREATION_FORM } from '../constants';
 import { setupTestData } from '../../support/testSetup';
+import { loginWithAuthUser, waitForGraphQL } from '../utils';
 
 describe('Discussion moderation link verification', () => {
   // Set up test data once for all tests in this file
@@ -11,23 +12,15 @@ describe('Discussion moderation link verification', () => {
       'Test discussion for link verification ' + Date.now();
 
     // Credentials
-    const username = Cypress.env('auth0_username_1');
-    const password = Cypress.env('auth0_password_1');
-    const modUsername = Cypress.env('auth0_username_2');
-    const modPassword = Cypress.env('auth0_password_2');
-
     // Set up network interception
     cy.intercept('POST', '**/graphql').as('graphqlRequest');
 
     // Login as regular user to create discussion
-    cy.loginWithCreateEventButton({
-      username: username,
-      password: password,
-    });
+    loginWithAuthUser('user1');
 
     // Create a test discussion
     cy.visit(DISCUSSION_CREATION_FORM);
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     cy.get('[data-testid="title-input"]').type(discussionTitle);
     cy.get('[data-testid="body-input"]').type(
@@ -36,7 +29,7 @@ describe('Discussion moderation link verification', () => {
     cy.get('[data-testid="channel-input"]').type('cats{enter}');
     cy.get('[data-testid="forum-picker-cats"]').click();
     cy.get('button').contains('Save').click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Verify discussion was created
     cy.contains(discussionTitle).should('be.visible');
@@ -47,14 +40,11 @@ describe('Discussion moderation link verification', () => {
       cy.get('[data-testid="logout-button"]').click();
       cy.wait(2000);
 
-      cy.loginWithCreateEventButton({
-        username: modUsername,
-        password: modPassword,
-      });
+      loginWithAuthUser('user2');
 
       // Navigate to the discussion
       cy.visit(originalDiscussionUrl);
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Open the action menu
       cy.get('[data-testid="discussion-menu-button"]').click();
@@ -74,7 +64,7 @@ describe('Discussion moderation link verification', () => {
         'Testing discussion link verification'
       );
       cy.get('button').contains('Submit').click();
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Verify archived banner appears with link
       cy.get('[data-testid="archived-discussion-banner"]').should('be.visible');
@@ -86,7 +76,7 @@ describe('Discussion moderation link verification', () => {
       cy.get('[data-testid="archived-discussion-banner"]')
         .contains('View related issue')
         .click();
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Verify we're on the issue page
       cy.contains('Issue Details').should('be.visible');
@@ -95,7 +85,7 @@ describe('Discussion moderation link verification', () => {
       cy.url().then((issueUrl) => {
         // Find link back to original discussion
         cy.get('#original-post-container').contains(discussionTitle).click();
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         // Verify we returned to the original discussion
         cy.url().should('eq', originalDiscussionUrl);
@@ -105,18 +95,18 @@ describe('Discussion moderation link verification', () => {
 
         // Return to issue
         cy.visit(issueUrl);
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         // Unarchive from issue
         cy.contains('Unarchive').click();
         cy.contains('Unarchive Discussion').should('be.visible');
         cy.get('textarea').type('Unarchiving for test cleanup');
         cy.get('button').contains('Unarchive').click();
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         // Navigate back to discussion
         cy.get('#original-post-container').contains(discussionTitle).click();
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         // Verify discussion is no longer archived
         cy.get('[data-testid="archived-discussion-banner"]').should(
@@ -133,23 +123,15 @@ describe('Discussion moderation link verification', () => {
     const feedbackText = 'Test feedback for discussion link verification';
 
     // Credentials
-    const username = Cypress.env('auth0_username_1');
-    const password = Cypress.env('auth0_password_1');
-    const modUsername = Cypress.env('auth0_username_2');
-    const modPassword = Cypress.env('auth0_password_2');
-
     // Set up network interception
     cy.intercept('POST', '**/graphql').as('graphqlRequest');
 
     // Login as regular user to create discussion
-    cy.loginWithCreateEventButton({
-      username: username,
-      password: password,
-    });
+    loginWithAuthUser('user1');
 
     // Create a test discussion
     cy.visit(DISCUSSION_CREATION_FORM);
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     cy.get('[data-testid="title-input"]').type(discussionTitle);
     cy.get('[data-testid="body-input"]').type(
@@ -158,7 +140,7 @@ describe('Discussion moderation link verification', () => {
     cy.get('[data-testid="channel-input"]').type('cats{enter}');
     cy.get('[data-testid="forum-picker-cats"]').click();
     cy.get('button').contains('Save').click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Verify discussion was created
     cy.contains(discussionTitle).should('be.visible');
@@ -169,14 +151,11 @@ describe('Discussion moderation link verification', () => {
       cy.get('[data-testid="logout-button"]').click();
       cy.wait(2000);
 
-      cy.loginWithCreateEventButton({
-        username: modUsername,
-        password: modPassword,
-      });
+      loginWithAuthUser('user2');
 
       // Navigate to the discussion
       cy.visit(originalDiscussionUrl);
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Open the action menu
       cy.get('[data-testid="discussion-menu-button"]').click();
@@ -190,14 +169,14 @@ describe('Discussion moderation link verification', () => {
       cy.contains('Give Feedback').should('be.visible');
       cy.get('[data-testid="report-discussion-input"]').type(feedbackText);
       cy.get('button').contains('Submit').click();
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Verify feedback submitted successfully
       cy.contains('Feedback submitted successfully').should('be.visible');
 
       // Navigate to feedback tab
       cy.get('[data-testid="feedback-tab"]').click();
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Report the feedback
       cy.contains(feedbackText)
@@ -217,15 +196,15 @@ describe('Discussion moderation link verification', () => {
         'Testing discussion feedback link verification'
       );
       cy.get('button').contains('Submit').click();
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Navigate to issues page
       cy.visit(`${CATS_FORUM.replace('discussions', 'issues')}`);
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Find and click on the issue for our feedback
       cy.contains('Feedback on discussion').click();
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Store issue URL
       cy.url().then((issueUrl) => {
@@ -233,14 +212,14 @@ describe('Discussion moderation link verification', () => {
         cy.get('#original-post-container')
           .contains('View original feedback')
           .click();
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         // Verify we're on the feedback permalink page
         cy.contains(feedbackText).should('be.visible');
 
         // Verify we can get back to the original discussion
         cy.contains('View in discussion').click();
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         // Verify we're back at the original discussion
         cy.url().should('include', originalDiscussionUrl.split('?')[0]);
@@ -248,13 +227,13 @@ describe('Discussion moderation link verification', () => {
 
         // Clean up: Go back to issue and archive the feedback
         cy.visit(issueUrl);
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         cy.contains('Archive').click();
         cy.contains('Archive Feedback').should('be.visible');
         cy.get('textarea').type('Archiving for test cleanup');
         cy.get('button').contains('Archive').click();
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         // Verify archive was successful
         cy.contains('Content archived successfully').should('be.visible');

@@ -1,5 +1,6 @@
 import { CATS_FORUM, CHANNEL_CREATION_FORM } from '../constants';
 import { setupTestData } from '../../support/testSetup';
+import { getAuthUser, loginWithAuthUser, waitForGraphQL } from '../utils';
 
 /**
  * E2E tests for server-level suspension enforcement.
@@ -15,26 +16,21 @@ describe('Server-level suspension enforcement', () => {
   // Set up test data once for all tests in this file
   setupTestData();
 
-  const modUsername = Cypress.env('auth0_username_2');
-  const modPassword = Cypress.env('auth0_password_2');
-  const authorUsername = Cypress.env('auth0_username_1');
-  const authorPassword = Cypress.env('auth0_password_1');
+  const { username: modUsername } = getAuthUser('user2');
+  const { username: authorUsername } = getAuthUser('user1');
 
   it('suspended user cannot create a new forum', () => {
     cy.intercept('POST', '**/graphql').as('graphqlRequest');
 
     // Step 1: Login as author and create a discussion that will be used to suspend them
-    cy.loginWithCreateEventButton({
-      username: authorUsername,
-      password: authorPassword,
-    });
+    loginWithAuthUser('user1');
 
     cy.visit(CATS_FORUM);
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     const triggerDiscussion = 'Forum creation suspension test ' + Date.now();
     cy.contains('Create Discussion').click();
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     cy.get('input[placeholder="Title"]').type(triggerDiscussion);
     cy.get('[data-testid="texteditor-textarea"]').type(
@@ -43,24 +39,21 @@ describe('Server-level suspension enforcement', () => {
     cy.get('[data-testid="forum-picker"]').click();
     cy.contains('Cats').click();
     cy.get('button').contains('Create').click();
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     cy.contains(triggerDiscussion).should('be.visible');
 
     cy.visit('/logout');
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     // Step 2: Login as moderator and suspend the author
-    cy.loginWithCreateEventButton({
-      username: modUsername,
-      password: modPassword,
-    });
+    loginWithAuthUser('user2');
 
     cy.visit(CATS_FORUM);
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     cy.contains(triggerDiscussion).click();
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     cy.get('button[data-testid="discussion-menu-button"]').click();
     cy.get(
@@ -79,24 +72,21 @@ describe('Server-level suspension enforcement', () => {
       'Suspension for forum creation test.'
     );
     cy.get('button').contains('Submit').click();
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
+    waitForGraphQL();
 
     cy.contains('Archived the post and suspended the author').should(
       'be.visible'
     );
 
     cy.visit('/logout');
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     // Step 3: Login as suspended author and try to create a forum
-    cy.loginWithCreateEventButton({
-      username: authorUsername,
-      password: authorPassword,
-    });
+    loginWithAuthUser('user1');
 
     cy.visit(CHANNEL_CREATION_FORM);
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     // Fill in forum creation form
     const newForumName = 'testforum' + Date.now();
@@ -134,19 +124,16 @@ describe('Server-level suspension enforcement', () => {
 
     // Step 4: Cleanup - unsuspend the user
     cy.visit('/logout');
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
-    cy.loginWithCreateEventButton({
-      username: modUsername,
-      password: modPassword,
-    });
+    loginWithAuthUser('user2');
 
     cy.visit(`${CATS_FORUM.replace('discussions', 'edit/suspended-users')}`);
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     cy.contains(authorUsername).should('be.visible');
     cy.contains('Related Issue').click();
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     cy.contains('Unsuspend User').click();
     cy.contains('Unsuspend Author').should('be.visible');
@@ -154,7 +141,7 @@ describe('Server-level suspension enforcement', () => {
       'Cleanup after forum creation test.'
     );
     cy.get('button').contains('Submit').click();
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
   });
 
   it('unsuspended user can create a forum', () => {
@@ -163,13 +150,10 @@ describe('Server-level suspension enforcement', () => {
     // This test verifies that after being unsuspended, a user can create forums again
     // We'll use a user who is known to not be suspended
 
-    cy.loginWithCreateEventButton({
-      username: modUsername, // Use mod who shouldn't be suspended
-      password: modPassword,
-    });
+    loginWithAuthUser('user2');
 
     cy.visit(CHANNEL_CREATION_FORM);
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     // Fill in forum creation form with a unique name
     const newForumName = 'testforum' + Date.now();
@@ -189,7 +173,7 @@ describe('Server-level suspension enforcement', () => {
 
     // Submit the form
     cy.get('button').contains(/create|submit/i).click();
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     // Should see success or be redirected to the new forum
     // Check that we don't see a suspension error

@@ -1,5 +1,6 @@
 import { CATS_FORUM_EVENTS, EVENT_CREATION_FORM } from '../constants';
 import { setupTestData } from '../../support/testSetup';
+import { loginWithAuthUser, waitForGraphQL } from '../utils';
 import { DateTime } from 'luxon';
 
 describe('Event moderation link verification', () => {
@@ -21,23 +22,15 @@ describe('Event moderation link verification', () => {
     const eventTitle = 'Test event for link verification ' + Date.now();
 
     // Credentials
-    const username = Cypress.env('auth0_username_1');
-    const password = Cypress.env('auth0_password_1');
-    const modUsername = Cypress.env('auth0_username_2');
-    const modPassword = Cypress.env('auth0_password_2');
-
     // Set up network interception
     cy.intercept('POST', '**/graphql').as('graphqlRequest');
 
     // Login as regular user to create event
-    cy.loginWithCreateEventButton({
-      username: username,
-      password: password,
-    });
+    loginWithAuthUser('user1');
 
     // Create a test event
     cy.visit(EVENT_CREATION_FORM);
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Fill in event form
     cy.get('[data-testid="title-input"]').type(eventTitle);
@@ -66,7 +59,7 @@ describe('Event moderation link verification', () => {
 
     // Save event
     cy.get('button').contains('Save').click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Verify event was created
     cy.contains(eventTitle).should('be.visible');
@@ -77,14 +70,11 @@ describe('Event moderation link verification', () => {
       cy.get('[data-testid="logout-button"]').click();
       cy.wait(2000);
 
-      cy.loginWithCreateEventButton({
-        username: modUsername,
-        password: modPassword,
-      });
+      loginWithAuthUser('user2');
 
       // Navigate to the event
       cy.visit(originalEventUrl);
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Open the action menu
       cy.get('[data-testid="event-menu-button"]').click();
@@ -104,7 +94,7 @@ describe('Event moderation link verification', () => {
         'Testing event link verification'
       );
       cy.get('button').contains('Submit').click();
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Verify archived banner appears with link
       cy.get('[data-testid="archived-event-banner"]').should('be.visible');
@@ -116,7 +106,7 @@ describe('Event moderation link verification', () => {
       cy.get('[data-testid="archived-event-banner"]')
         .contains('View related issue')
         .click();
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Verify we're on the issue page
       cy.contains('Issue Details').should('be.visible');
@@ -125,7 +115,7 @@ describe('Event moderation link verification', () => {
       cy.url().then((issueUrl) => {
         // Find link back to original event
         cy.get('#original-post-container').contains(eventTitle).click();
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         // Verify we returned to the original event
         cy.url().should('eq', originalEventUrl);
@@ -133,18 +123,18 @@ describe('Event moderation link verification', () => {
 
         // Return to issue
         cy.visit(issueUrl);
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         // Unarchive from issue
         cy.contains('Unarchive').click();
         cy.contains('Unarchive Event').should('be.visible');
         cy.get('textarea').type('Unarchiving for test cleanup');
         cy.get('button').contains('Unarchive').click();
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         // Navigate back to event
         cy.get('#original-post-container').contains(eventTitle).click();
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         // Verify event is no longer archived
         cy.get('[data-testid="archived-event-banner"]').should('not.exist');
@@ -168,23 +158,15 @@ describe('Event moderation link verification', () => {
     const feedbackText = 'Test feedback for event link verification';
 
     // Credentials
-    const username = Cypress.env('auth0_username_1');
-    const password = Cypress.env('auth0_password_1');
-    const modUsername = Cypress.env('auth0_username_2');
-    const modPassword = Cypress.env('auth0_password_2');
-
     // Set up network interception
     cy.intercept('POST', '**/graphql').as('graphqlRequest');
 
     // Login as regular user to create event
-    cy.loginWithCreateEventButton({
-      username: username,
-      password: password,
-    });
+    loginWithAuthUser('user1');
 
     // Create a test event
     cy.visit(EVENT_CREATION_FORM);
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Fill in event form
     cy.get('[data-testid="title-input"]').type(eventTitle);
@@ -213,7 +195,7 @@ describe('Event moderation link verification', () => {
 
     // Save event
     cy.get('button').contains('Save').click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Verify event was created
     cy.contains(eventTitle).should('be.visible');
@@ -224,14 +206,11 @@ describe('Event moderation link verification', () => {
       cy.get('[data-testid="logout-button"]').click();
       cy.wait(2000);
 
-      cy.loginWithCreateEventButton({
-        username: modUsername,
-        password: modPassword,
-      });
+      loginWithAuthUser('user2');
 
       // Navigate to the event
       cy.visit(originalEventUrl);
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Open the action menu
       cy.get('[data-testid="event-menu-button"]').click();
@@ -243,14 +222,14 @@ describe('Event moderation link verification', () => {
       cy.contains('Give Feedback').should('be.visible');
       cy.get('[data-testid="report-event-input"]').type(feedbackText);
       cy.get('button').contains('Submit').click();
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Verify feedback submitted successfully
       cy.contains('Feedback submitted successfully').should('be.visible');
 
       // Navigate to feedback tab
       cy.get('[data-testid="feedback-tab"]').click();
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Report the feedback
       cy.contains(feedbackText)
@@ -270,15 +249,15 @@ describe('Event moderation link verification', () => {
         'Testing event feedback link verification'
       );
       cy.get('button').contains('Submit').click();
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Navigate to issues page
       cy.visit(`${CATS_FORUM_EVENTS.replace('events', 'issues')}`);
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Find and click on the issue for our feedback
       cy.contains('Feedback on event').click();
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Store issue URL
       cy.url().then((issueUrl) => {
@@ -286,14 +265,14 @@ describe('Event moderation link verification', () => {
         cy.get('#original-post-container')
           .contains('View original feedback')
           .click();
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         // Verify we're on the feedback permalink page
         cy.contains(feedbackText).should('be.visible');
 
         // Verify we can get back to the original event
         cy.contains('View in event').click();
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         // Verify we're back at the original event
         cy.url().should('include', originalEventUrl.split('?')[0]);
@@ -301,13 +280,13 @@ describe('Event moderation link verification', () => {
 
         // Clean up: Go back to issue and archive the feedback
         cy.visit(issueUrl);
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         cy.contains('Archive').click();
         cy.contains('Archive Feedback').should('be.visible');
         cy.get('textarea').type('Archiving for test cleanup');
         cy.get('button').contains('Archive').click();
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         // Verify archive was successful
         cy.contains('Content archived successfully').should('be.visible');

@@ -1,5 +1,6 @@
 import { CATS_FORUM } from '../constants';
 import { setupTestData } from '../../support/testSetup';
+import { getAuthUser, loginWithAuthUser, waitForGraphQL } from '../utils';
 
 describe('Feedback moderation link verification', () => {
   // Set up test data once for all tests in this file
@@ -12,24 +13,20 @@ describe('Feedback moderation link verification', () => {
       'Test standalone feedback for link verification ' + Date.now();
 
     // Credentials
-    const modUsername = Cypress.env('auth0_username_2');
-    const modPassword = Cypress.env('auth0_password_2');
+    const { username: modUsername } = getAuthUser('user2');
 
     // Set up network interception
     cy.intercept('POST', '**/graphql').as('graphqlRequest');
 
     // Login as moderator
-    cy.loginWithCreateEventButton({
-      username: modUsername,
-      password: modPassword,
-    });
+    loginWithAuthUser('user2');
 
     // Navigate to a discussion
     cy.visit(CATS_FORUM);
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     cy.contains(discussionTitle).click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Open action menu and give feedback
     cy.get('[data-testid="discussion-menu-button"]').click();
@@ -39,14 +36,14 @@ describe('Feedback moderation link verification', () => {
     cy.contains('Give Feedback').should('be.visible');
     cy.get('[data-testid="report-discussion-input"]').type(feedbackText);
     cy.get('button').contains('Submit').click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Verify feedback submitted
     cy.contains('Feedback submitted successfully').should('be.visible');
 
     // Go to feedback tab
     cy.get('[data-testid="feedback-tab"]').click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Store URL of discussion with feedback
     cy.url().then((discussionWithFeedbackUrl) => {
@@ -68,18 +65,18 @@ describe('Feedback moderation link verification', () => {
         'Testing feedback link verification'
       );
       cy.get('button').contains('Submit').click();
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Verify report success
       cy.contains('Content reported successfully').should('be.visible');
 
       // Navigate to issues
       cy.visit(`${CATS_FORUM.replace('discussions', 'issues')}`);
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Find and open issue for feedback
       cy.contains('Feedback on discussion').click();
-      cy.wait('@graphqlRequest');
+      waitForGraphQL();
 
       // Store issue URL
       cy.url().then((issueUrl) => {
@@ -87,7 +84,7 @@ describe('Feedback moderation link verification', () => {
         cy.get('#original-post-container')
           .contains('View original feedback')
           .click();
-        cy.wait('@graphqlRequest');
+        waitForGraphQL();
 
         // Store feedback permalink URL
         cy.url().then((feedbackPermalinkUrl) => {
@@ -96,28 +93,28 @@ describe('Feedback moderation link verification', () => {
 
           // Check link back to discussion
           cy.contains('View in discussion').click();
-          cy.wait('@graphqlRequest');
+          waitForGraphQL();
 
           // Verify we can go from feedback permalink to discussion
           cy.url().should('include', discussionWithFeedbackUrl.split('?')[0]);
 
           // Go back to issue to test archive flow
           cy.visit(issueUrl);
-          cy.wait('@graphqlRequest');
+          waitForGraphQL();
 
           // Archive the feedback
           cy.contains('Archive').click();
           cy.contains('Archive Feedback').should('be.visible');
           cy.get('textarea').type('Archiving feedback for test');
           cy.get('button').contains('Archive').click();
-          cy.wait('@graphqlRequest');
+          waitForGraphQL();
 
           // Verify archive success
           cy.contains('Content archived successfully').should('be.visible');
 
           // Go to permalink to verify archived state
           cy.visit(feedbackPermalinkUrl);
-          cy.wait('@graphqlRequest');
+          waitForGraphQL();
 
           // Verify feedback shows as archived
           cy.contains('This feedback has been archived').should('be.visible');
@@ -125,7 +122,7 @@ describe('Feedback moderation link verification', () => {
 
           // Follow link back to issue
           cy.contains('View related issue').click();
-          cy.wait('@graphqlRequest');
+          waitForGraphQL();
 
           // Verify we're back at issue
           cy.url().should('eq', issueUrl);
@@ -135,11 +132,11 @@ describe('Feedback moderation link verification', () => {
           cy.contains('Unarchive Feedback').should('be.visible');
           cy.get('textarea').type('Unarchiving for test cleanup');
           cy.get('button').contains('Unarchive').click();
-          cy.wait('@graphqlRequest');
+          waitForGraphQL();
 
           // Go back to permalink to verify unarchived state
           cy.visit(feedbackPermalinkUrl);
-          cy.wait('@graphqlRequest');
+          waitForGraphQL();
 
           // Verify feedback no longer shows as archived
           cy.contains('This feedback has been archived').should('not.exist');
@@ -156,50 +153,42 @@ describe('Feedback moderation link verification', () => {
       'Test feedback for suspension verification ' + Date.now();
 
     // Credentials for standard user who will give feedback
-    const username = Cypress.env('auth0_username_1');
-    const password = Cypress.env('auth0_password_1');
+    const { username } = getAuthUser('user1');
     // Credentials for mod who will suspend
-    const modUsername = Cypress.env('auth0_username_2');
-    const modPassword = Cypress.env('auth0_password_2');
+    const { username: modUsername } = getAuthUser('user2');
 
     // Set up network interception
     cy.intercept('POST', '**/graphql').as('graphqlRequest');
 
     // Login as standard user
-    cy.loginWithCreateEventButton({
-      username: username,
-      password: password,
-    });
+    loginWithAuthUser('user1');
 
     // Navigate to a discussion
     cy.visit(CATS_FORUM);
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     cy.contains(discussionTitle).click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Create a comment that we'll give feedback on
     cy.get('[data-testid="comment-input"]').type(
       'Test comment for feedback suspension verification'
     );
     cy.get('[data-testid="submit-comment-button"]').click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Switch to moderator to give and report feedback
     cy.get('[data-testid="logout-button"]').click();
     cy.wait(2000);
 
-    cy.loginWithCreateEventButton({
-      username: modUsername,
-      password: modPassword,
-    });
+    loginWithAuthUser('user2');
 
     // Navigate back to discussion
     cy.visit(CATS_FORUM);
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     cy.contains(discussionTitle).click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Find the comment by username_1 and give feedback
     cy.contains(username)
@@ -213,27 +202,24 @@ describe('Feedback moderation link verification', () => {
     cy.contains('Give Feedback').should('be.visible');
     cy.get('[data-testid="report-comment-input"]').type(feedbackText);
     cy.get('button').contains('Submit').click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Make this user (username_1) give feedback to create content we'll suspend them for
     cy.get('[data-testid="logout-button"]').click();
     cy.wait(2000);
 
-    cy.loginWithCreateEventButton({
-      username: username,
-      password: password,
-    });
+    loginWithAuthUser('user1');
 
     // Navigate back to discussion
     cy.visit(CATS_FORUM);
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     cy.contains(discussionTitle).click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Find feedback and report it back
     cy.get('[data-testid="feedback-tab"]').click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Give feedback on the feedback (this will be the content we suspend for)
     cy.contains(feedbackText)
@@ -247,26 +233,23 @@ describe('Feedback moderation link verification', () => {
     cy.contains('Give Feedback').should('be.visible');
     cy.get('[data-testid="report-input"]').type('Nested feedback for testing');
     cy.get('button').contains('Submit').click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Switch back to moderator
     cy.get('[data-testid="logout-button"]').click();
     cy.wait(2000);
 
-    cy.loginWithCreateEventButton({
-      username: modUsername,
-      password: modPassword,
-    });
+    loginWithAuthUser('user2');
 
     // Navigate back to discussion feedback
     cy.visit(CATS_FORUM);
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     cy.contains(discussionTitle).click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     cy.get('[data-testid="feedback-tab"]').click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Find the nested feedback and report with suspend
     cy.contains('Nested feedback for testing')
@@ -291,11 +274,11 @@ describe('Feedback moderation link verification', () => {
     cy.get('select').select('Two Weeks');
 
     cy.get('button').contains('Submit').click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Navigate to suspended users
     cy.visit(`${CATS_FORUM.replace('discussions', 'edit/suspended-users')}`);
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Verify user was suspended
     cy.contains(username).should('be.visible');
@@ -303,7 +286,7 @@ describe('Feedback moderation link verification', () => {
 
     // Find and click related issue link
     cy.contains('Related Issue').click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // On issue page, unsuspend the user
     cy.contains('Unsuspend User').click();
@@ -314,14 +297,14 @@ describe('Feedback moderation link verification', () => {
       'Unsuspending for test cleanup'
     );
     cy.get('button').contains('Submit').click();
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Verify unsuspend was successful
     cy.contains(/successfully|completed/i).should('be.visible');
 
     // Check suspended users page to verify user was unsuspended
     cy.visit(`${CATS_FORUM.replace('discussions', 'edit/suspended-users')}`);
-    cy.wait('@graphqlRequest');
+    waitForGraphQL();
 
     // Verify user is no longer suspended
     cy.contains(username).should('not.exist');
