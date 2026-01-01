@@ -14,7 +14,7 @@ const emit = defineEmits(['close-issue']);
 <template>
   <div class="flex flex-col gap-2">
     <p class="text-sm text-gray-700 dark:text-gray-300">
-      Close the issue to log that no moderation action is needed.
+      Complete the review and close this issue.
     </p>
     <button
       class="font-semibold flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm text-white transition hover:bg-blue-500"
