@@ -52,7 +52,7 @@
     "@vue/apollo-option": "^4.2.2",
     "@vue/apollo-util": "^4.2.2",
     "@vueform/multiselect": "^2.6.11",
-    "auth0": "^4.20.0",
+    "auth0": "^5.2.0",
     "axios": "^1.11.0",
     "chart.js": "^4.5.1",
     "crypto-js": "^4.2.0",
