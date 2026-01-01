@@ -69,7 +69,7 @@ const isOnMapPage = computed(() => {
 
 <template>
   <nav
-    class="z-20 h-12 border-b border-b-gray-200 bg-gray-100 pr-4 dark:border-b-gray-600 dark:bg-gray-900 lg:ml-16"
+    class="z-20 h-12 border-b border-b-gray-200 bg-gray-100 pr-4 dark:border-b-gray-600 dark:bg-gray-900 lg:ml-20"
     :class="[isOnMapPage ? 'fixed w-full lg:w-[calc(100%-5rem)]' : '']"
   >
     <div class="flex items-center justify-between py-1 pr-2 pl-12 lg:pl-2">
@@ -86,12 +86,12 @@ const isOnMapPage = computed(() => {
             <ClientOnly>
               <span v-if="!lgAndUp">🐝</span>
               <span
-                class="logo-font font-bold text-gray-900 dark:text-white"
+                class="logo-font text-lg font-bold text-gray-900 dark:text-white"
                 :class="{ 'ml-1': !lgAndUp, 'ml-8': smAndDown }"
                 >Topical</span
               >
               <template #fallback>
-                <span class="logo-font font-bold text-gray-900 dark:text-white">Topical</span>
+                <span class="logo-font text-lg font-bold text-gray-900 dark:text-white">Topical</span>
               </template>
             </ClientOnly>
           </nuxt-link>
@@ -103,7 +103,7 @@ const isOnMapPage = computed(() => {
             <span>•</span>
             <nuxt-link
               :to="`/forums/${channelId}`"
-              class="max-w-[8rem] truncate font-mono text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white sm:max-w-[12rem] lg:max-w-[16rem]"
+              class="max-w-[8rem] truncate text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white sm:max-w-[12rem] lg:max-w-[16rem]"
             >
               {{ channelId }}
             </nuxt-link>

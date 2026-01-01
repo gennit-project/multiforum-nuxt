@@ -102,7 +102,7 @@ const handleItemClick = (item: any) => {
 
 const buttonClasses = computed(() => {
   if (createButtonProps.iconOnly) {
-    return 'flex h-12 w-12 items-center justify-center rounded-full bg-orange-500 text-gray-900 font-semibold hover:bg-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2 focus:ring-offset-gray-900';
+    return 'flex h-12 w-12 items-center justify-center rounded-full bg-orange-400 text-gray-900 font-semibold hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:ring-offset-2 focus:ring-offset-gray-900';
   }
 
   const baseClasses =
@@ -139,7 +139,7 @@ const buttonClasses = computed(() => {
               >
                 {{ usePrimaryButton ? 'Create' : '+ Add' }}
               </span>
-              <span v-else aria-hidden="true" class="text-2xl leading-none">
+              <span v-else aria-hidden="true" class="text-4xl leading-none font-light -mt-0.5">
                 +
               </span>
               <span v-if="iconOnly" class="sr-only">Create new</span>
@@ -190,7 +190,7 @@ const buttonClasses = computed(() => {
             <span v-if="!iconOnly" class="flex items-center">
               + {{ usePrimaryButton ? 'Create' : '' }}
             </span>
-            <span v-else aria-hidden="true" class="text-2xl leading-none">
+            <span v-else aria-hidden="true" class="text-4xl leading-none font-light -mt-0.5">
               +
             </span>
             <span v-if="iconOnly" class="sr-only">Create new</span>

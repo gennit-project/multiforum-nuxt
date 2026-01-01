@@ -215,14 +215,7 @@ const getUserActionClasses = (isActive: boolean) => {
         text="Create new"
         :class="{ 'mb-2': isVerticallyShort, 'mb-4': !isVerticallyShort }"
       >
-        <div class="flex flex-col items-center">
-          <CreateAnythingButton icon-only />
-          <span
-            class="w-12 text-center text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
-          >
-            Create
-          </span>
-        </div>
+        <CreateAnythingButton icon-only />
       </IconTooltip>
 
       <!-- Main Navigation Icons -->

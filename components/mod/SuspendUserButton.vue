@@ -57,9 +57,19 @@ const {
   loading: getUserSuspensionLoading,
   error: getUserSuspensionError,
   // refetch: refetchUserSuspension
-} = useQuery(IS_ORIGINAL_POSTER_SUSPENDED, {
-  issueId: props.issue.id,
-});
+} = useQuery(
+  IS_ORIGINAL_POSTER_SUSPENDED,
+  {
+    issueId: props.issue.id,
+  },
+  {
+    enabled:
+      !!props.issue.id &&
+      (!!props.issue.relatedDiscussionId ||
+        !!props.issue.relatedEventId ||
+        !!props.issue.relatedCommentId),
+  }
+);
 const userIsSuspendedFromChannel = computed(() => {
   if (getUserSuspensionLoading.value || getUserSuspensionError.value)
     return false;

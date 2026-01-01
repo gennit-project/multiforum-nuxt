@@ -178,7 +178,9 @@ const { result: getUserSuspensionResult } = useQuery(
     issueId: props.issue.id,
   }),
   () => ({
-    enabled: !!props.issue.id,
+    enabled:
+      !!props.issue.id &&
+      (!!props.commentId || !!props.discussionId || !!props.eventId),
     fetchPolicy: 'cache-first',
   })
 );
