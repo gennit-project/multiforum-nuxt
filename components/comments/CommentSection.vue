@@ -191,6 +191,12 @@ const hasMeaningfulSlotContent = (nodes?: VNode[]): boolean => {
 const hasDefaultSlot = computed(() =>
   hasMeaningfulSlotContent(slots.default?.())
 );
+const hasPreHeaderSlot = computed(() =>
+  hasMeaningfulSlotContent(slots['pre-header']?.())
+);
+const hasSubscriptionSlot = computed(() =>
+  hasMeaningfulSlotContent(slots['subscription-button']?.())
+);
 
 // Moderation related state
 const commentToArchiveId = ref('');
@@ -687,13 +693,17 @@ const lengthOfCommentInProgress = computed(() => {
 <template>
   <div class="pr-2">
     <div>
-      <slot name="pre-header" />
+      <div v-if="hasPreHeaderSlot">
+        <slot name="pre-header" />
+      </div>
       <div class="align-items flex justify-between">
         <div class="flex w-full items-center justify-between space-x-4">
           <h2 id="comments" class="px-1 text-lg dark:text-white">
             {{ `Comments (${aggregateCommentCount})` }}
           </h2>
-          <slot name="subscription-button" />
+          <div v-if="hasSubscriptionSlot" class="flex items-center">
+            <slot name="subscription-button" />
+          </div>
         </div>
         <SortButtons
           v-if="showCommentSortButtons && aggregateCommentCount > 0"
