@@ -1,5 +1,13 @@
 <script lang="ts" setup>
-import { ref, computed, watch, watchEffect } from 'vue';
+import {
+  ref,
+  computed,
+  watch,
+  watchEffect,
+  useSlots,
+  Comment as VueComment,
+  Fragment as VueFragment,
+} from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import Comment from './Comment.vue';
 import LoadMore from '../LoadMore.vue';
@@ -28,7 +36,7 @@ import type {
   CreateReplyInputData,
   DeleteCommentInputData,
 } from '@/types/Comment';
-import type { Ref, PropType } from 'vue';
+import type { Ref, PropType, VNode } from 'vue';
 import { modProfileNameVar } from '@/cache';
 import { useRouter, useRoute } from 'nuxt/app';
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
@@ -160,6 +168,29 @@ const editFormOpenAtCommentID = ref('');
 const showCopiedLinkNotification = ref(false);
 const showMarkedAsBestAnswerNotification = ref(false);
 const showUnmarkedAsBestAnswerNotification = ref(false);
+
+const slots = useSlots();
+const hasMeaningfulSlotContent = (nodes?: VNode[]): boolean => {
+  if (!nodes || nodes.length === 0) return false;
+  return nodes.some((node) => {
+    if (node.type === VueComment) {
+      return false;
+    }
+    if (node.type === VueFragment && Array.isArray(node.children)) {
+      return hasMeaningfulSlotContent(node.children as VNode[]);
+    }
+    if (typeof node.children === 'string') {
+      return node.children.trim().length > 0;
+    }
+    if (Array.isArray(node.children)) {
+      return hasMeaningfulSlotContent(node.children as VNode[]);
+    }
+    return true;
+  });
+};
+const hasDefaultSlot = computed(() =>
+  hasMeaningfulSlotContent(slots.default?.())
+);
 
 // Moderation related state
 const commentToArchiveId = ref('');
@@ -670,7 +701,7 @@ const lengthOfCommentInProgress = computed(() => {
           :show-top-options="false"
         />
       </div>
-      <div v-if="$slots.default" class="my-2"><slot /></div>
+      <div v-if="hasDefaultSlot" class="my-2"><slot /></div>
       <PinnedAnswers
         v-if="answers?.length > 0"
         :answers="answers"

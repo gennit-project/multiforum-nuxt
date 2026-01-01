@@ -20,6 +20,7 @@ import {
 import { useAuthManager } from '@/composables/useAuthManager';
 import { useTestAuthHelpers } from '@/composables/useTestAuthHelpers';
 
+const isDevRuntime = import.meta.env.DEV;
 const isDevelopment = computed(() => config.environment === 'development');
 const route = useRoute();
 const showFooter = !route.name?.toString().includes('map');
@@ -39,7 +40,7 @@ const { isSessionExpired, loginWithRedirect } = useAuthManager();
 
 // Test helpers (only in dev/test environments)
 const shouldExposeTestHelpers =
-  isDevelopment.value ||
+  isDevRuntime ||
   config.environment === 'test' ||
   (typeof window !== 'undefined' && (window as any).Cypress);
 
