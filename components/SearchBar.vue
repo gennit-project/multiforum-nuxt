@@ -117,8 +117,8 @@ defineExpose({ focus, getValue });
         name="search"
         :data-testid="testId"
         :class="[
-          leftSideIsRounded ? 'rounded-l-full' : 'rounded-l-md',
-          rightSideIsRounded ? 'rounded-r-full' : 'rounded-r-md',
+          leftSideIsRounded ? 'rounded-l-md' : '',
+          rightSideIsRounded ? 'rounded-r-md' : '',
           small ? 'h-9' : 'h-10',
         ]"
         class="w-full border border-gray-200 pl-10 pr-12 text-sm leading-5 text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"

@@ -174,7 +174,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
     <div class="flex-shrink-0 pt-2">
       <div class="flex w-16 flex-col items-center">
         <div
-          class="font-semibold text-xs uppercase text-gray-500 dark:text-gray-200"
+          class="font-semibold text-xs uppercase text-gray-500 dark:text-orange-400"
         >
           {{
             new Date(event.startTime).toLocaleString('en-US', {
@@ -297,7 +297,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
           </MenuButton>
         </div>
 
-        <div v-if="event.coverImageURL" class="flex-shrink-0">
+        <div v-if="event.coverImageURL" class="flex-shrink-0 pr-2">
           <img
             :alt="event.title"
             :src="event.coverImageURL"

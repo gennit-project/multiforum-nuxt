@@ -165,6 +165,12 @@ const filterByChannel = (channel: string) => {
   }
   updateFilters({ channels: [channel] });
 };
+
+// Filter visibility state for online events list (controlled externally)
+const showMainFilters = ref(true);
+const toggleShowMainFilters = () => {
+  showMainFilters.value = !showMainFilters.value;
+};
 </script>
 
 <template>
@@ -180,19 +186,33 @@ const filterByChannel = (channel: string) => {
       >
         Online events
       </div>
-      <button
-        class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-300 dark:text-gray-300 dark:hover:bg-gray-700"
-        type="button"
-        @click="goToInPersonMap"
-      >
-        In-person map
-      </button>
+      <div class="flex items-center gap-2">
+        <button
+          class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-300 dark:text-gray-300 dark:hover:bg-gray-700"
+          :class="[showMainFilters ? 'bg-gray-200 dark:bg-gray-700' : '']"
+          data-testid="toggle-main-filters-button"
+          type="button"
+          @click="toggleShowMainFilters"
+        >
+          {{ showMainFilters ? 'Hide filters' : 'Show filters' }}
+        </button>
+        <button
+          class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-300 dark:text-gray-300 dark:hover:bg-gray-700"
+          type="button"
+          @click="goToInPersonMap"
+        >
+          In-person map
+        </button>
+      </div>
     </div>
     <EventFilterBar
       :show-distance-filters="false"
       :allow-hiding-main-filters="true"
       :show-main-filters-by-default="!channelId"
       :toggle-show-archived-enabled="true"
+      :hide-filters-button-externally="isSearchListRoute"
+      :show-new-event-next-to-search-bar="isSearchListRoute"
+      :external-show-main-filters="isSearchListRoute ? showMainFilters : undefined"
     >
       <TimeShortcuts :is-list-view="true" />
       <OnlineInPersonShortcuts v-if="channelId" />

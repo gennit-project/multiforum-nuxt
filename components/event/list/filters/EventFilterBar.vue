@@ -50,6 +50,21 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // When true, hide the "Hide filters" button in EventFilterBar (parent will render it)
+  hideFiltersButtonExternally: {
+    type: Boolean,
+    default: false,
+  },
+  // When true, show "New Event" button next to search bar instead of in header
+  showNewEventNextToSearchBar: {
+    type: Boolean,
+    default: false,
+  },
+  // External control of filter visibility (for when hideFiltersButtonExternally is true)
+  externalShowMainFilters: {
+    type: Boolean,
+    default: undefined,
+  },
 });
 
 // Setup function
@@ -227,10 +242,18 @@ const updateSelectedDistance = (distance: DistanceUnit) => {
   }
 };
 
-const showMainFilters = ref(props.showMainFiltersByDefault);
+const internalShowMainFilters = ref(props.showMainFiltersByDefault);
+
+// Use external control when provided, otherwise use internal state
+const showMainFilters = computed(() => {
+  if (props.externalShowMainFilters !== undefined) {
+    return props.externalShowMainFilters;
+  }
+  return internalShowMainFilters.value;
+});
 
 const toggleShowMainFilters = () => {
-  showMainFilters.value = !showMainFilters.value;
+  internalShowMainFilters.value = !internalShowMainFilters.value;
 };
 
 const toggleSelectedChannel = (channel: string) => {
@@ -300,9 +323,11 @@ const updateShowArchived = (event: Event) => {
     class="mt-1 flex-1 flex-col space-y-1 dark:text-white"
     :class="[showMap ? 'w-full px-4' : 'mx-4']"
   >
-    <div class="mb-2 flex justify-end">
+    <div
+      v-if="allowHidingMainFilters && !hideFiltersButtonExternally && !showNewEventNextToSearchBar"
+      class="mb-2 flex justify-end"
+    >
       <button
-        v-if="allowHidingMainFilters"
         class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-300 dark:text-gray-300 dark:hover:bg-gray-700"
         :class="[showMainFilters ? 'bg-gray-200 dark:bg-gray-700' : '']"
         data-testid="toggle-main-filters-button"
@@ -310,7 +335,7 @@ const updateShowArchived = (event: Event) => {
       >
         {{ showMainFilters ? 'Hide filters' : 'Show filters' }}
       </button>
-      <RequireAuth v-if="allowHidingMainFilters" :full-width="false">
+      <RequireAuth :full-width="false">
         <template #has-auth>
           <PrimaryButton
             class="mx-2"
@@ -324,7 +349,7 @@ const updateShowArchived = (event: Event) => {
       </RequireAuth>
     </div>
     <hr
-      v-if="allowHidingMainFilters"
+      v-if="allowHidingMainFilters && !hideFiltersButtonExternally && !showNewEventNextToSearchBar"
       class="mb-2 border border-t-gray-500 dark:border-t-gray-600"
     >
     <div
@@ -504,32 +529,22 @@ const updateShowArchived = (event: Event) => {
               </Popper>
             </client-only>
           </LocationSearchBar>
-          <div
-            class="flex hidden items-center justify-center space-x-2 md:block"
-          >
-            <FilterChip
-              class="items-center align-middle"
-              data-testid="tag-filter-button"
-              :highlighted="tagLabel !== defaultFilterLabels.tags"
-              :label="tagLabel"
-            >
-              <template #icon>
-                <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
-              </template>
-              <template #content>
-                <div class="relative w-96">
-                  <SearchableTagList
-                    :selected-tags="filterValues.tags"
-                    @toggle-selection="toggleSelectedTag"
-                  />
-                </div>
-              </template>
-            </FilterChip>
-          </div>
+          <!-- New Event button next to search bar (for online list view) -->
+          <RequireAuth v-if="showNewEventNextToSearchBar" :full-width="false">
+            <template #has-auth>
+              <PrimaryButton
+                class="ml-2 whitespace-nowrap"
+                :label="'New Event'"
+                @click="$router.push(createEventLink)"
+              />
+            </template>
+            <template #does-not-have-auth>
+              <PrimaryButton class="ml-2 whitespace-nowrap" :label="'New Event'" />
+            </template>
+          </RequireAuth>
         </div>
-        <div class="mt-4 flex items-center md:hidden">
+        <div v-if="!channelId" class="mt-4 flex items-center md:hidden">
           <FilterChip
-            v-if="!channelId"
             class="items-center align-middle"
             :data-testid="'forum-filter-button'"
             :highlighted="channelLabel !== defaultFilterLabels.channels"
@@ -553,38 +568,41 @@ const updateShowArchived = (event: Event) => {
               </div>
             </template>
           </FilterChip>
-          <FilterChip
-            class="items-center align-middle"
-            data-testid="tag-filter-button"
-            :highlighted="tagLabel !== defaultFilterLabels.tags"
-            :label="tagLabel"
-          >
-            <template #icon>
-              <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
-            </template>
-            <template #content>
-              <div class="relative w-96">
-                <SearchableTagList
-                  :selected-tags="filterValues.tags"
-                  @toggle-selection="toggleSelectedTag"
-                />
-              </div>
-            </template>
-          </FilterChip>
         </div>
       </div>
       <slot />
       <div
         v-if="toggleShowArchivedEnabled"
-        class="flex items-center justify-start gap-2 py-2 dark:text-gray-300"
+        class="flex flex-wrap items-center justify-start gap-4 py-2 dark:text-gray-300"
       >
-        <CheckBox
-          :checked="filterValues.showArchived"
-          class="align-middle"
-          data-testid="show-archived-discussions"
-          @input="updateShowArchived"
-        />
-        Show archived events
+        <div class="flex items-center gap-2">
+          <CheckBox
+            :checked="filterValues.showArchived"
+            class="align-middle"
+            data-testid="show-archived-discussions"
+            @input="updateShowArchived"
+          />
+          Show archived events
+        </div>
+        <!-- Tags dropdown moved here -->
+        <FilterChip
+          class="items-center align-middle"
+          data-testid="tag-filter-button"
+          :highlighted="tagLabel !== defaultFilterLabels.tags"
+          :label="tagLabel"
+        >
+          <template #icon>
+            <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
+          </template>
+          <template #content>
+            <div class="relative w-96">
+              <SearchableTagList
+                :selected-tags="filterValues.tags"
+                @toggle-selection="toggleSelectedTag"
+              />
+            </div>
+          </template>
+        </FilterChip>
       </div>
     </div>
   </div>

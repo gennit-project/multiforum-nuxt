@@ -1,5 +1,9 @@
 <script lang="ts" setup>
 import EventListView from '@/components/event/list/EventListView.vue';
+
+useHead({
+  title: 'Online Events',
+});
 </script>
 
 <template>
