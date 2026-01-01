@@ -122,7 +122,7 @@ const archivedContentType = computed(() => {
   <button
     v-if="isArchived"
     :disabled="disabled"
-    class="flex items-center justify-center gap-2 rounded px-4 py-2 text-white"
+    class="flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-white"
     :class="{
       'cursor-pointer bg-green-600 hover:bg-green-500': !disabled,
       'cursor-not-allowed bg-gray-500': disabled,
@@ -134,7 +134,7 @@ const archivedContentType = computed(() => {
   </button>
   <button
     v-else
-    class="flex items-center justify-center gap-2 rounded px-4 py-2 text-white"
+    class="flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-white"
     :class="{
       'cursor-pointer bg-red-600 hover:bg-red-500': !disabled,
       'cursor-not-allowed bg-gray-500': disabled,

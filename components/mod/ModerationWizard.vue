@@ -5,7 +5,8 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import type { Issue } from '@/__generated__/graphql';
 import ArchiveButton from './ArchiveButton.vue';
 import SuspendUserButton from './SuspendUserButton.vue';
-import EyeIcon from '../icons/EyeIcon.vue';
+import AdminIcon from '../icons/AdminIcon.vue';
+import ScalesIcon from '../icons/ScalesIcon.vue';
 import XCircleIcon from '../icons/XCircleIcon.vue';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { modProfileNameVar } from '@/cache';
@@ -247,7 +248,7 @@ const editButtonDisabled = computed(() => {
           ]"
         >
           <div class="">
-            <EyeIcon class="h-6 w-6 text-white" />
+            <AdminIcon class="h-6 w-6 text-white" />
           </div>
         </div>
         <div
@@ -260,8 +261,9 @@ const editButtonDisabled = computed(() => {
         >
           <h1
             v-if="issue.isOpen && !isCurrentUserOriginalPoster"
-            class="border-b border-gray-300 pb-2 text-xl font-bold text-blue-500 dark:border-gray-600"
+            class="flex items-center gap-2 border-b border-gray-300 pb-2 text-xl font-bold text-blue-500 dark:border-gray-600"
           >
+            <AdminIcon class="h-6 w-6" />
             Mod Action Needed
           </h1>
           <h1
@@ -286,8 +288,11 @@ const editButtonDisabled = computed(() => {
               <div class="mt-4 flex flex-col space-y-4">
                 <div
                   v-if="issue.isOpen && !isCurrentUserOriginalPoster"
-                  class="bg-blue-50 rounded-lg border border-blue-200 p-4 shadow-sm dark:border-blue-500/30 dark:bg-blue-500/10"
+                  class="bg-blue-50 flex items-start gap-4 rounded-lg border border-blue-200 p-4 shadow-sm dark:border-blue-500/30 dark:bg-blue-500/10"
                 >
+                  <div class="flex-shrink-0 pt-1">
+                    <ScalesIcon class="h-8 w-8 text-blue-600 dark:text-blue-300" />
+                  </div>
                   <div class="space-y-1">
                     <p
                       class="font-semibold text-xs uppercase tracking-wide text-blue-700 dark:text-blue-200"
@@ -332,6 +337,9 @@ const editButtonDisabled = computed(() => {
                         <XCircleIcon />
                         Close Issue (No Action Needed)
                       </button>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">
+                        This records that moderators reviewed the content and found no violation.
+                      </p>
                       <ArchiveButton
                         v-if="isArchived"
                         :discussion-id="discussionId"
@@ -409,7 +417,7 @@ const editButtonDisabled = computed(() => {
                     </div>
 
                     <div
-                      class="border-amber-300 bg-amber-50 dark:border-amber-500/50 dark:bg-amber-500/10 space-y-2 rounded-md"
+                      class="-mx-4 -mb-4 border-amber-300 bg-amber-50 dark:border-amber-500/50 dark:bg-amber-500/10 space-y-3 rounded-b-lg p-4"
                     >
                       <p
                         class="font-semibold text-xs uppercase tracking-wide text-gray-700 dark:text-gray-300"
@@ -420,57 +428,69 @@ const editButtonDisabled = computed(() => {
                         Only use these when the post clearly breaks rules and
                         the problem cannot be resolved by editing.
                       </p>
-                      <div class="flex flex-col gap-2">
-                        <ArchiveButton
-                          v-if="!isArchived"
-                          :discussion-id="discussionId"
-                          :event-id="eventId"
-                          :comment-id="commentId"
-                          :context-text="contextText"
-                          :channel-unique-name="channelUniqueName"
-                          :issue="issue"
-                          :disabled="actionsDisabled"
-                          @archived-successfully="
-                            $emit('archived-successfully')
-                          "
-                          @unarchived-successfully="
-                            $emit('unarchived-successfully')
-                          "
-                        />
-                        <button
-                          v-else
-                          type="button"
-                          disabled
-                          class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded bg-gray-400 px-4 py-2 text-white dark:bg-gray-600"
-                          title="Content is already archived. Use the Unarchive button above to restore it."
-                        >
-                          Archive (Already Archived)
-                        </button>
-                        <SuspendUserButton
-                          v-if="!authorIsSuspended"
-                          :issue="issue"
-                          :discussion-title="contextText"
-                          :discussion-id="discussionId"
-                          :event-title="contextText"
-                          :event-id="eventId"
-                          :channel-unique-name="channelUniqueName"
-                          :disabled="actionsDisabled"
-                          @suspended-successfully="
-                            $emit('suspended-user-successfully')
-                          "
-                          @unsuspended-successfully="
-                            $emit('unsuspended-user-successfully')
-                          "
-                        />
-                        <button
-                          v-else
-                          type="button"
-                          disabled
-                          class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded bg-gray-400 px-4 py-2 text-white dark:bg-gray-600"
-                          title="Author is already suspended. Use the Unsuspend Author button above to restore their access."
-                        >
-                          Suspend Author (Already Suspended)
-                        </button>
+                      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <!-- Actions on Content -->
+                        <div class="space-y-2">
+                          <p class="font-medium text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400">
+                            Actions on Content
+                          </p>
+                          <ArchiveButton
+                            v-if="!isArchived"
+                            :discussion-id="discussionId"
+                            :event-id="eventId"
+                            :comment-id="commentId"
+                            :context-text="contextText"
+                            :channel-unique-name="channelUniqueName"
+                            :issue="issue"
+                            :disabled="actionsDisabled"
+                            @archived-successfully="
+                              $emit('archived-successfully')
+                            "
+                            @unarchived-successfully="
+                              $emit('unarchived-successfully')
+                            "
+                          />
+                          <button
+                            v-else
+                            type="button"
+                            disabled
+                            class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded bg-gray-400 px-4 py-2 text-white dark:bg-gray-600"
+                            title="Content is already archived. Use the Unarchive button above to restore it."
+                          >
+                            Archive (Already Archived)
+                          </button>
+                        </div>
+                        <!-- Actions on Author -->
+                        <div class="space-y-2">
+                          <p class="font-medium text-xs uppercase tracking-wide text-gray-600 dark:text-gray-400">
+                            Actions on Author
+                          </p>
+                          <SuspendUserButton
+                            v-if="!authorIsSuspended"
+                            :issue="issue"
+                            :discussion-title="contextText"
+                            :discussion-id="discussionId"
+                            :event-title="contextText"
+                            :event-id="eventId"
+                            :channel-unique-name="channelUniqueName"
+                            :disabled="actionsDisabled"
+                            @suspended-successfully="
+                              $emit('suspended-user-successfully')
+                            "
+                            @unsuspended-successfully="
+                              $emit('unsuspended-user-successfully')
+                            "
+                          />
+                          <button
+                            v-else
+                            type="button"
+                            disabled
+                            class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded bg-gray-400 px-4 py-2 text-white dark:bg-gray-600"
+                            title="Author is already suspended. Use the Unsuspend Author button above to restore their access."
+                          >
+                            Suspend Author (Already Suspended)
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -506,7 +526,7 @@ const editButtonDisabled = computed(() => {
           class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-300 dark:bg-gray-700"
         >
           <div class="">
-            <EyeIcon class="h-6 w-6 text-white" />
+            <AdminIcon class="h-6 w-6 text-white" />
           </div>
         </div>
         <div
