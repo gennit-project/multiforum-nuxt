@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { Issue as GeneratedIssue } from '@/__generated__/graphql';
 import { DateTime } from 'luxon';
+import FlagIcon from '@/components/icons/FlagIcon.vue';
 
 type Issue = GeneratedIssue & { issueNumber: number };
 
-defineProps({
+const props = defineProps({
   issue: {
     type: Object as () => Issue,
     required: true,
@@ -26,6 +28,16 @@ const issueAuthorName = (issue: Issue) => {
 
   return '[Deleted]';
 };
+
+const reportCount = computed(() => {
+  const count = props.issue?.ActivityFeedAggregate?.count;
+  return typeof count === 'number' ? count : null;
+});
+
+const reportCountLabel = computed(() => {
+  if (reportCount.value === null) return '';
+  return `${reportCount.value} ${reportCount.value === 1 ? 'report' : 'reports'}`;
+});
 </script>
 
 <template>
@@ -37,7 +49,7 @@ const issueAuthorName = (issue: Issue) => {
       <i v-else class="fa-solid fa-circle-check mt-1 text-purple-500" />
 
       <div class="flex-col">
-        <span v-if="issue.Channel" class="flex-wrap gap-2">
+        <span v-if="issue.Channel" class="flex flex-wrap items-center gap-2">
           <nuxt-link
             class="hover:underline dark:text-gray-200"
             :to="{
@@ -49,12 +61,19 @@ const issueAuthorName = (issue: Issue) => {
             }"
           >
             {{ issue.title }}
-            <span
-              v-if="issue.flaggedServerRuleViolation"
-              class="rounded-lg bg-gray-200 px-2 py-1 text-xs dark:bg-gray-700 dark:text-white"
-              >Server Rule Violation</span
-            >
           </nuxt-link>
+          <span
+            v-if="issue.flaggedServerRuleViolation"
+            class="rounded-lg bg-gray-200 px-2 py-1 text-xs dark:bg-gray-700 dark:text-white"
+            >Server Rule Violation</span
+          >
+          <span
+            v-if="reportCount !== null && reportCount > 0"
+            class="inline-flex items-center gap-1 rounded-full bg-red-200 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/70 dark:text-red-100"
+          >
+            <FlagIcon class="h-3 w-3" aria-hidden="true" />
+            {{ reportCountLabel }}
+          </span>
         </span>
         <div v-else class="dark:text-gray-200">{{ issue.title }}</div>
         <div class="text-xs text-gray-500 dark:text-gray-200">

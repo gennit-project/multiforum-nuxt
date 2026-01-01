@@ -232,6 +232,9 @@ export const GET_ISSUES_BY_CHANNEL = gql`
           uniqueName
         }
         flaggedServerRuleViolation
+        ActivityFeedAggregate(where: { actionType: "report" }) {
+          count
+        }
       }
     }
   }
@@ -264,6 +267,9 @@ export const GET_CLOSED_ISSUES_BY_CHANNEL = gql`
           uniqueName
         }
         flaggedServerRuleViolation
+        ActivityFeedAggregate(where: { actionType: "report" }) {
+          count
+        }
       }
     }
   }
@@ -366,6 +372,9 @@ export const GET_ISSUES = gql`
           username
         }
       }
+      ActivityFeedAggregate(where: { actionType: "report" }) {
+        count
+      }
     }
   }
 `;
@@ -395,6 +404,9 @@ export const GET_CLOSED_ISSUES = gql`
         ... on User {
           username
         }
+      }
+      ActivityFeedAggregate(where: { actionType: "report" }) {
+        count
       }
     }
   }
