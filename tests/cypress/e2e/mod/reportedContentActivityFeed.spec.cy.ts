@@ -56,8 +56,10 @@ const graphqlAsCurrentUser = (
       })
       .then((response) => {
         expect(response.status).to.eq(200);
-        expect(response.body.errors, JSON.stringify(response.body.errors)).to
-          .not.exist;
+        expect(
+          response.body.errors,
+          JSON.stringify(response.body.errors)
+        ).to.equal(undefined);
         return response;
       });
   });

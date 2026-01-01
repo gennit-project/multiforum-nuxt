@@ -16,7 +16,7 @@ defineProps({
   },
 });
 
-const emit = defineEmits(['updateFormValues']);
+defineEmits(['updateFormValues']);
 </script>
 
 <template>

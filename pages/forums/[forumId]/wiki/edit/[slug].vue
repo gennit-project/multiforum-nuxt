@@ -76,10 +76,6 @@ const formValues = ref({
   slug: '',
 });
 
-const newChannel = computed(() => {
-  return channelResult.value?.channels[0] || {};
-});
-
 // Initialize form with existing wiki data when available
 const dataLoaded = ref(false);
 watch(

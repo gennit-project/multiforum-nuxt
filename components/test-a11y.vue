@@ -1,11 +1,11 @@
 <template>
   <div>
     <!-- Missing alt attribute on image -->
-    <img src="/logo.png" alt="Logo image" />
+    <img src="/logo.png" alt="Logo image" >
 
     <!-- Missing form label -->
     <label for="test-input">Test input</label>
-    <input id="test-input" type="text" />
+    <input id="test-input" type="text" >
 
     <!-- Incorrect ARIA attribute -->
     <div id="missing-id">Label</div>

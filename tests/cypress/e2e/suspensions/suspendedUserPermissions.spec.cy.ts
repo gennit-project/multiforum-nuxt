@@ -17,7 +17,6 @@ describe('Suspended user permissions enforcement', () => {
   setupTestData();
 
   // Users for testing
-  const { username: modUsername } = getAuthUser('user2');
   const { username: authorUsername } = getAuthUser('user1');
 
   it('suspended user cannot create a discussion and receives notification', () => {

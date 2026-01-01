@@ -288,7 +288,7 @@ onMounted(() => {
                 placeholder="https://registry.example.com"
                 class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 @keyup.enter="addRegistry"
-              />
+              >
               <button
                 type="button"
                 class="rounded-md bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"

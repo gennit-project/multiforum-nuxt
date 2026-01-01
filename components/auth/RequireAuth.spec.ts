@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 
 // Mock composables

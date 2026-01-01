@@ -65,38 +65,40 @@ export default defineComponent({
 });
 </script>
 <template>
-  <div class="py-3 dark:text-white">
-    <div v-if="loading">Loading...</div>
-    <div v-else-if="error">Error</div>
-    <div
-      v-else-if="
-        result?.users?.length === 0 ||
-        result.users[0]?.Discussions?.length === 0
-      "
-    >
-      No downloads yet
+  <div>
+    <div class="py-3 dark:text-white">
+      <div v-if="loading">Loading...</div>
+      <div v-else-if="error">Error</div>
+      <div
+        v-else-if="
+          result?.users?.length === 0 ||
+          result.users[0]?.Discussions?.length === 0
+        "
+      >
+        No downloads yet
+      </div>
+      <div v-else-if="result && result.users.length > 0">
+        <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <SitewideDownloadListItem
+            v-for="discussion in result.users[0].Discussions"
+            :key="discussion.id"
+            :discussion="discussion"
+            :search-input="''"
+            :selected-tags="[]"
+            :show-uploader="false"
+            @open-album="handleOpenAlbum"
+          />
+        </ul>
+      </div>
     </div>
-    <div v-else-if="result && result.users.length > 0">
-      <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <SitewideDownloadListItem
-          v-for="discussion in result.users[0].Discussions"
-          :key="discussion.id"
-          :discussion="discussion"
-          :search-input="''"
-          :selected-tags="[]"
-          :show-uploader="false"
-          @open-album="handleOpenAlbum"
-        />
-      </ul>
-    </div>
+    <DiscussionAlbum
+      v-if="isAlbumLightboxOpen && openAlbumData?.album"
+      :album="openAlbumData.album"
+      :discussion-id="openAlbumData.discussion.id"
+      :discussion-author="openAlbumData.discussion.Author?.username || ''"
+      :show-edit-album="false"
+      :start-in-lightbox="true"
+      @close-lightbox="handleCloseAlbum"
+    />
   </div>
-  <DiscussionAlbum
-    v-if="isAlbumLightboxOpen && openAlbumData?.album"
-    :album="openAlbumData.album"
-    :discussion-id="openAlbumData.discussion.id"
-    :discussion-author="openAlbumData.discussion.Author?.username || ''"
-    :show-edit-album="false"
-    :start-in-lightbox="true"
-    @close-lightbox="handleCloseAlbum"
-  />
 </template>

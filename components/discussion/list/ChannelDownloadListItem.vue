@@ -155,7 +155,7 @@ const filteredQuery = computed(() => {
                 :src="firstAlbumImage"
                 :alt="title"
                 class="h-full w-full object-cover"
-              />
+              >
               <div
                 v-else
                 class="flex h-full w-full items-center justify-center text-center text-sm text-gray-500 dark:text-gray-400"

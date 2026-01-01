@@ -108,7 +108,7 @@ function updateSearchResult(input: string) {
           :checked="selected.includes(fileType)"
           class="border border-gray-300 text-orange-600 dark:border-gray-600"
           @change="() => emit('toggleSelection', fileType)"
-        />
+        >
         <div class="flex items-center space-x-2">
           <div class="flex-col">
             <span

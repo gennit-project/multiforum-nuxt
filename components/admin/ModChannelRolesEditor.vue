@@ -177,7 +177,7 @@ const onTogglePermission = async (
                   ($event.target as HTMLInputElement).checked
                 )
               "
-            />
+            >
           </label>
         </div>
       </div>

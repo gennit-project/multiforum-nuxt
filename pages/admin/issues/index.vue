@@ -129,7 +129,7 @@ watch(
           class="mr-2"
           data-testid="show-only-server-rule-violations"
           @change="toggleShowOnlyServerRuleViolations"
-        />
+        >
         <label for="show-only-server-rule-violations" class="mr-2"
           >Show only server rule violations</label
         >

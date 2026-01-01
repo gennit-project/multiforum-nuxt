@@ -337,7 +337,7 @@ onUnmounted(() => {
             class="h-auto max-w-full cursor-pointer rounded-lg shadow-lg transition-transform hover:scale-105"
             title="Click to view in lightbox"
             @click="openLightbox"
-          />
+          >
         </div>
 
         <!-- Click hint for regular images -->
@@ -552,7 +552,7 @@ onUnmounted(() => {
               cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'auto',
             }"
             @mousedown="startDrag"
-          />
+          >
         </div>
       </div>
     </div>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import CheckBox from '@/components/CheckBox.vue';
-import InfoBanner from '@/components/InfoBanner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';

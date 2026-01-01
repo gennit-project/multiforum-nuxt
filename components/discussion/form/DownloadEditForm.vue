@@ -522,7 +522,7 @@ function handleSave() {
                 :accept="acceptAttribute"
                 :disabled="uploadingFile"
                 @change="handleFileUpload"
-              />
+              >
               <label
                 for="downloadable-file-input"
                 class="hover:bg-gray-50 focus:ring-indigo-500 inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
@@ -533,7 +533,7 @@ function handleSave() {
               </label>
               <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                 Maximum file size: {{ MAX_DOWNLOAD_FILE_SIZE_MB }}MB
-                <br />
+                <br >
                 <span v-if="channelData?.allowedFileTypes?.length">
                   Allowed file types:
                   {{ channelData.allowedFileTypes.join(', ') }}
@@ -575,7 +575,7 @@ function handleSave() {
                           readonly
                           class="bg-gray-50 flex-1 cursor-not-allowed rounded border border-gray-200 px-2 py-1 text-sm text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400"
                           type="text"
-                        />
+                        >
                         <button
                           type="button"
                           class="text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
@@ -633,7 +633,7 @@ function handleSave() {
                   :accept="acceptAttribute"
                   :disabled="uploadingFile"
                   @change="handleFileUpload"
-                />
+                >
                 <label
                   for="additional-file-input"
                   class="hover:bg-gray-50 inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"

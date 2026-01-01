@@ -359,7 +359,7 @@ const updateShowArchived = (event: Event) => {
         !showNewEventNextToSearchBar
       "
       class="mb-2 border border-t-gray-500 dark:border-t-gray-600"
-    />
+    >
     <div
       v-if="showMainFilters"
       class="flex flex-col gap-2 rounded-lg p-2 dark:bg-gray-800"

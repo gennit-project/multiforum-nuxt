@@ -143,7 +143,7 @@ const contributorStats = computed(() => {
           @select-period="handlePeriodSelect"
         >
           {{ selectedLabel }}
-          <i class="fa-solid fa-chevron-down ml-1"></i>
+          <i class="fa-solid fa-chevron-down ml-1"/>
         </IconButtonDropdown>
       </div>
     </div>
@@ -151,7 +151,7 @@ const contributorStats = computed(() => {
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-12">
       <div class="text-gray-500 dark:text-gray-400">
-        <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+        <i class="fa-solid fa-spinner fa-spin mr-2"/>
         Loading contributors...
       </div>
     </div>
@@ -184,7 +184,7 @@ const contributorStats = computed(() => {
             :src="contributor.profilePicURL"
             :alt="contributor.displayName || contributor.username"
             class="h-8 w-8 rounded-full"
-          />
+          >
           <div class="min-w-0 flex-1">
             <h3
               class="font-semibold truncate text-sm text-gray-900 dark:text-white"
@@ -213,7 +213,7 @@ const contributorStats = computed(() => {
 
     <!-- Empty State -->
     <div v-else class="bg-gray-50 rounded-lg p-12 text-center dark:bg-gray-800">
-      <i class="fa-solid fa-users mb-4 text-4xl text-gray-400"></i>
+      <i class="fa-solid fa-users mb-4 text-4xl text-gray-400"/>
       <h3 class="mb-2 text-lg font-medium text-gray-900 dark:text-white">
         No results in the selected time period
       </h3>

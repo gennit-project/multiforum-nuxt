@@ -83,7 +83,7 @@ Cypress.Commands.add('loginAsAdminWithUISync', () => {
 
   // Verify that the auth state has been set correctly
   cy.window().should(() => {
-    expect(localStorage.getItem('token')).to.exist;
+    expect(localStorage.getItem('token')).to.not.equal(null);
   });
 });
 

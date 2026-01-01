@@ -126,7 +126,7 @@ defineExpose({ focus, getValue });
         type="text"
         @input="updateSearchInput"
         @keydown.enter.prevent="submit"
-      />
+      >
       <button
         v-if="initialValue"
         type="button"

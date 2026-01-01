@@ -4,11 +4,6 @@
 
 const currentYear = new Date().getFullYear();
 
-// Helper to create a date string
-const createDateString = (year, month, day) => {
-  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-};
-
 // Generate 3 sample weeks of data
 const generateSampleData = () => {
   // Create a starting date (first Sunday of the year or last of previous year)

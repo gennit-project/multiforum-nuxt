@@ -345,7 +345,7 @@ const saveRole = async () => {
               type="text"
               class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
               :disabled="mutationLoading"
-            />
+            >
           </div>
           <div class="space-y-1">
             <label
@@ -374,7 +374,7 @@ const saveRole = async () => {
                 type="checkbox"
                 class="h-4 w-4 rounded border border-gray-300 accent-blue-600 dark:border-gray-600 dark:accent-blue-400"
                 :disabled="mutationLoading"
-              />
+              >
             </label>
           </div>
         </div>

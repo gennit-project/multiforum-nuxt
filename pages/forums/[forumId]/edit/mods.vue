@@ -111,7 +111,7 @@ const {
   onDone: removeForumModDone,
   error: removeForumModError,
 } = useMutation(REMOVE_FORUM_MOD, {
-  update: (cache, { data }) => {
+  update: (cache, { data: _data }) => {
     // update the result of GET_MODS_BY_CHANNEL
     // to remove the removed user
 

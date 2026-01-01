@@ -225,7 +225,7 @@ const selectSearchType = (type: SearchType) => {
               placeholder="Search..."
               class="h-9 w-full rounded-lg border border-gray-200 bg-white pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
               @keydown.enter.prevent="executeSearch"
-            />
+            >
           </div>
           <div class="mt-2 flex items-center gap-2">
             <div class="relative flex-1">

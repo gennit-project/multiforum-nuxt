@@ -397,7 +397,7 @@ watch(
                     (!isValidKey(newGroupForm.key) ||
                       !isKeyUnique(newGroupForm.key)),
                 }"
-              />
+              >
               <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Only letters, numbers, and underscores allowed. Must be unique.
               </p>
@@ -430,7 +430,7 @@ watch(
                 type="text"
                 placeholder="e.g. Lot Size"
                 class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              />
+              >
               <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Human-readable name shown to users.
               </p>

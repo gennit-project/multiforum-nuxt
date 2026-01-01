@@ -678,7 +678,7 @@ const handleDelete = async () => {
                       :src="image.url"
                       :alt="image.alt || image.caption || 'Image'"
                       class="h-48 w-full rounded-lg object-cover shadow-sm transition-transform hover:scale-105"
-                    />
+                    >
                   </NuxtLink>
                   <p
                     v-if="image.caption"
@@ -734,7 +734,7 @@ const handleDelete = async () => {
                   type="text"
                   class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm"
                   placeholder="Enter collection name"
-                />
+                >
               </div>
               <div>
                 <label

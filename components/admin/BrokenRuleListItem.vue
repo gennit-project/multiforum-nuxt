@@ -33,7 +33,7 @@ const toggleExpandDetail = () => {
       :checked="selected.includes(rule.summary)"
       class="mt-1 border border-gray-300 text-orange-600 dark:border-gray-600"
       @change="() => emit('toggleSelection', rule.summary)"
-    />
+    >
     <div class="flex flex-col text-sm">
       <!-- Summary and See More (inline and wrapping) -->
       <div class="flex flex-wrap items-center gap-x-2">

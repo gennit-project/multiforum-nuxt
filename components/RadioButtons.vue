@@ -38,7 +38,7 @@ const emit = defineEmits(['updateSelected']);
               emit('updateSelected', option);
             }
           "
-        />
+        >
         <label
           class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
         >

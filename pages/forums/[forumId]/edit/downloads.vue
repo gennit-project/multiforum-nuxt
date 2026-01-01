@@ -3,7 +3,6 @@ import { computed } from 'vue';
 import CheckBox from '@/components/CheckBox.vue';
 import FileTypePicker from '@/components/FileTypePicker.vue';
 import FilterGroupManager from '@/components/filter/FilterGroupManager.vue';
-import InfoBanner from '@/components/InfoBanner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import type { FilterGroup } from '@/__generated__/graphql';
 import { useQuery } from '@vue/apollo-composable';

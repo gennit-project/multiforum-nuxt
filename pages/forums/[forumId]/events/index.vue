@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import EventListView from '@/components/event/list/EventListView.vue';
-import InfoBanner from '@/components/InfoBanner.vue';
-import ErrorBanner from '@/components/ErrorBanner.vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';

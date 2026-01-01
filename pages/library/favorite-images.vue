@@ -6,7 +6,6 @@ import { useHead } from 'nuxt/app';
 import { usernameVar } from '@/cache';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import ImageListItem from '@/components/image/ImageListItem.vue';
-import { relativeTime } from '@/utils';
 
 useHead({
   title: 'Favorite Images - Library',

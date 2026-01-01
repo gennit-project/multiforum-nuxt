@@ -4,7 +4,6 @@ import { useMutation } from '@vue/apollo-composable';
 import { SEND_BUG_REPORT } from '@/graphQLData/email/mutations';
 import TextEditor from '@/components/TextEditor.vue';
 import TextInput from '@/components/TextInput.vue';
-import PrimaryButton from '@/components/PrimaryButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import NotificationComponent from '@/components/NotificationComponent.vue';
 import FormComponent from '@/components/FormComponent.vue';

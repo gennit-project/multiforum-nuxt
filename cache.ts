@@ -78,10 +78,10 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       merge: true,
       fields: {
         ActivityFeed: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
         AuthoredIssues: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
       },
     },
@@ -90,10 +90,10 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       merge: true,
       fields: {
         Tags: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
         Admins: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
       },
     },
@@ -102,10 +102,10 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       merge: true,
       fields: {
         Tags: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
         DiscussionChannels: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
         Author: {
           merge: true,
@@ -123,10 +123,10 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
           merge: true,
         },
         UpvotedByUsers: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
         FeedbackComments: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
       },
     },
@@ -138,13 +138,13 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       merge: true,
       fields: {
         Tags: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
         EventChannels: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
         Channels: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
         Poster: {
           merge: true,
@@ -155,13 +155,13 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       merge: true,
       fields: {
         UpvotedByUsers: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
         Channel: {
           merge: true,
         },
         Comments: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
       },
     },
@@ -170,28 +170,28 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       merge: true,
       fields: {
         Discussions: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
         Comments: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
         Events: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
         UpvotedComments: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
         UpvotedDiscussions: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
         UpvotedEvents: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
         ModProfiles: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
         ChannelRoles: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_existing = [], incoming) => [...incoming],
         },
       },
     },

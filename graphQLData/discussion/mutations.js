@@ -572,8 +572,8 @@ export const UPDATE_DISCUSSION_CHANNEL_LABELS = gql`
 //     channel: { connect: { where: { node: { uniqueName: "sims4_builds" }}} },
 //     options: {
 //       create: [
-//         { node: { value: "10x20", displayName: "10 × 20", order: 1 }},
-//         { node: { value: "20x30", displayName: "20 × 30", order: 2 }}
+//         { node: { value: "10x20", displayName: "10x20", order: 1 }},
+//         { node: { value: "20x30", displayName: "20x30", order: 2 }}
 //       ]
 //     }
 //   }]) {

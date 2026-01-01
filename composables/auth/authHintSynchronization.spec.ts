@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ref } from 'vue';
+// ref is used by the vitest mocks
 import { useSSRAuth } from '@/composables/useSSRAuth';
 
 // Mock Nuxt's useCookie
@@ -140,7 +140,7 @@ describe('Auth Hint Cookie Synchronization', () => {
       const { setAuthHint, setUsernameHint } = useSSRAuth();
 
       // Simulate GraphQL response with no user data
-      const userData = {
+      const _userData = {
         user: null,
       };
 

@@ -209,7 +209,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
         :src="event.coverImageURL"
         alt="Event cover image"
         class="mb-4 block max-h-48 rounded-lg md:hidden"
-      />
+      >
       <!-- Title and image section for medium+ screens -->
       <div class="hidden md:flex md:items-start md:gap-4">
         <div class="flex-1">
@@ -308,7 +308,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
             :alt="event.title"
             :src="event.coverImageURL"
             class="h-32 w-32 rounded-lg"
-          />
+          >
         </div>
       </div>
       <!-- Title section for small screens -->

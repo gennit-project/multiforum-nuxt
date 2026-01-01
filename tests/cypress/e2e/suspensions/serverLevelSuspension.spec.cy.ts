@@ -16,7 +16,6 @@ describe('Server-level suspension enforcement', () => {
   // Set up test data once for all tests in this file
   setupTestData();
 
-  const { username: modUsername } = getAuthUser('user2');
   const { username: authorUsername } = getAuthUser('user1');
 
   it('suspended user cannot create a new forum', () => {

@@ -27,15 +27,6 @@ const { result, loading, error } = useQuery(
 const favoriteChannels = computed(() => {
   return result.value?.users?.[0]?.FavoriteChannels || [];
 });
-
-const formatCount = (
-  count: number | undefined,
-  singular: string,
-  plural: string
-) => {
-  const value = count || 0;
-  return `${value} ${value === 1 ? singular : plural}`;
-};
 </script>
 
 <template>

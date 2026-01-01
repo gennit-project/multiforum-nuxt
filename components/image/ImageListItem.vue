@@ -70,7 +70,7 @@ const getImageAlt = (image: Image) => {
         :alt="getImageAlt(props.image) ?? 'Image'"
         class="h-full w-full object-cover"
         loading="lazy"
-      />
+      >
 
       <!-- Overlay with sensitive content warning -->
       <div

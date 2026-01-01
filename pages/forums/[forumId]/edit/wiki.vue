@@ -21,7 +21,7 @@ defineEmits(['updateFormValues']);
             wikiEnabled: ($event.target as HTMLInputElement).checked,
           })
         "
-      />
+      >
       <label
         for="wiki-enabled"
         class="ml-2 block text-sm text-gray-900 dark:text-gray-100"

@@ -223,7 +223,7 @@ const getFirstAlbumImage = (download: any) => {
                     :src="getFirstAlbumImage(download)"
                     :alt="download.title"
                     class="h-full w-full object-cover"
-                  />
+                  >
                   <div
                     v-else
                     class="flex h-full w-full items-center justify-center text-gray-400"

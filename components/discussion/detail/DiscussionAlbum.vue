@@ -316,7 +316,7 @@ onMounted(() => {
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="shadow-sm"
-          />
+          >
           <div
             v-if="editingCaptionIndex === idx"
             class="mt-1 text-center text-xs"
@@ -511,7 +511,7 @@ onMounted(() => {
                       maxHeight: `${mainImageHeight}px`,
                       height: expandedView ? `${mainImageHeight}px` : 'auto',
                     }"
-                  />
+                  >
                   <div
                     v-if="editingCaptionIndex === idx && idx === activeIndex"
                     class="mt-1 text-center text-xs"

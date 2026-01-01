@@ -12,9 +12,6 @@ describe('Feedback moderation link verification', () => {
     const feedbackText =
       'Test standalone feedback for link verification ' + Date.now();
 
-    // Credentials
-    const { username: modUsername } = getAuthUser('user2');
-
     // Set up network interception
     cy.intercept('POST', '**/graphql').as('graphqlRequest');
 
@@ -154,8 +151,6 @@ describe('Feedback moderation link verification', () => {
 
     // Credentials for standard user who will give feedback
     const { username } = getAuthUser('user1');
-    // Credentials for mod who will suspend
-    const { username: modUsername } = getAuthUser('user2');
 
     // Set up network interception
     cy.intercept('POST', '**/graphql').as('graphqlRequest');

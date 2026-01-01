@@ -342,7 +342,7 @@ const selectedOptions = computed(() => {
             :src="selectedOptions[0]?.avatar"
             :alt="selectedOptions[0]?.label"
             class="mr-2 h-6 w-6 flex-shrink-0 rounded-full"
-          />
+          >
           <i
             v-else-if="selectedOptions.length === 1 && selectedOptions[0]?.icon"
             :class="[selectedOptions[0]?.icon, 'mr-2 flex-shrink-0']"
@@ -416,7 +416,7 @@ const selectedOptions = computed(() => {
             @click.stop
             @focus.stop
             @blur.stop
-          />
+          >
         </div>
 
         <!-- Loading state -->
@@ -458,7 +458,7 @@ const selectedOptions = computed(() => {
                     :checked="isSectionFullySelected(section.options)"
                     class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                     @click.stop="toggleSelectAll(section.options)"
-                  />
+                  >
                 </div>
 
                 <!-- Label -->
@@ -545,7 +545,7 @@ const selectedOptions = computed(() => {
                         (collectionOption as any).channels || []
                       )
                     "
-                  />
+                  >
                 </div>
 
                 <!-- Collection name and channel preview -->
@@ -636,7 +636,7 @@ const selectedOptions = computed(() => {
                     :disabled="option.disabled"
                     class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                     @click.stop
-                  />
+                  >
                 </div>
 
                 <!-- Compact label: uniqueName (displayName) -->
@@ -698,7 +698,7 @@ const selectedOptions = computed(() => {
                 :disabled="option.disabled"
                 class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                 @click.stop
-              />
+              >
             </div>
 
             <!-- Avatar -->
@@ -707,7 +707,7 @@ const selectedOptions = computed(() => {
               :src="option.avatar"
               :alt="option.label"
               class="mr-3 h-6 w-6 rounded-full"
-            />
+            >
 
             <!-- Icon -->
             <i

@@ -142,7 +142,7 @@ const handleClick = (event: MouseEvent) => {
       @touchstart="(e: TouchEvent) => emit('touchstart', e)"
       @touchend="(e: TouchEvent) => emit('touchend', e)"
       @touchmove="(e: TouchEvent) => emit('touchmove', e)"
-    />
+    >
 
     <button
       v-if="showNavigation"

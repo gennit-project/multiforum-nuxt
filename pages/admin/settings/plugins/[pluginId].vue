@@ -523,7 +523,7 @@ const getSecretStatusText = (status: string) => {
                             (e.target as HTMLInputElement).checked
                           )
                       "
-                    />
+                    >
                     <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
                       {{ isEnabled ? 'Enabled' : 'Disabled' }}
                     </span>
@@ -579,7 +579,7 @@ const getSecretStatusText = (status: string) => {
                       type="password"
                       placeholder="Enter secret value"
                       class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    />
+                    >
                     <div class="flex space-x-2">
                       <button
                         type="button"
