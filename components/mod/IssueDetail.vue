@@ -628,23 +628,11 @@ const {
   },
 });
 
-const {
-  mutate: deleteDiscussion,
-  loading: deleteDiscussionLoading,
-  error: deleteDiscussionError,
-} = useMutation(DELETE_DISCUSSION);
+const { mutate: deleteDiscussion } = useMutation(DELETE_DISCUSSION);
 
-const {
-  mutate: deleteEvent,
-  loading: deleteEventLoading,
-  error: deleteEventError,
-} = useMutation(DELETE_EVENT);
+const { mutate: deleteEvent } = useMutation(DELETE_EVENT);
 
-const {
-  mutate: deleteComment,
-  loading: deleteCommentLoading,
-  error: deleteCommentError,
-} = useMutation(DELETE_COMMENT);
+const { mutate: deleteComment } = useMutation(DELETE_COMMENT);
 
 const closeOpenButtonText = computed(() => {
   if (activeIssue.value?.isOpen)
