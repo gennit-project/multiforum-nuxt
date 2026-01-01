@@ -365,6 +365,9 @@ const GET_ISSUE_BY_NUMBER = `
 `;
 
 const ISSUE_PAGE_REASON_ERROR = 'Please provide a reason before deleting.';
+const ISSUE_CLOSED_REASON =
+  'the issue was closed because the reported content was deleted';
+const OP_LABEL = OP_USERNAME;
 
 describe('Reported content activity feed updates', () => {
   setupTestData();
@@ -390,6 +393,14 @@ describe('Reported content activity feed updates', () => {
       return hasUser && hasMod;
     });
     expect(matched).to.eq(true);
+  };
+
+  const expectCloseReasonActivity = (activityFeed: any[]) => {
+    expect(
+      activityFeed.some(
+        (item: any) => item.actionDescription === ISSUE_CLOSED_REASON
+      )
+    ).to.eq(true);
   };
 
   const createDiscussionAsOp = (title: string, body: string) => {
@@ -559,12 +570,13 @@ describe('Reported content activity feed updates', () => {
           }).then((response) => {
             const issue = response.body.data.issues[0];
             expect(issue.isOpen).to.eq(false);
+            expectCloseReasonActivity(issue.ActivityFeed);
             expect(issue.ActivityFeed.some((item: any) =>
-              item.actionDescription === 'deleted the discussion'
+              item.actionDescription === `deleted the discussion by ${OP_LABEL}`
             )).to.eq(true);
             expectDeleteActivity({
               activityFeed: issue.ActivityFeed,
-              actionDescription: 'deleted the discussion',
+              actionDescription: `deleted the discussion by ${OP_LABEL}`,
               expectedUser: OP_USERNAME,
               expectedMod: null,
             });
@@ -617,8 +629,11 @@ describe('Reported content activity feed updates', () => {
             }).then((response) => {
               const issueData = response.body.data.issues[0];
               expect(issueData.isOpen).to.eq(false);
+              expectCloseReasonActivity(issueData.ActivityFeed);
               const deleteItems = issueData.ActivityFeed.filter(
-                (item: any) => item.actionDescription === 'deleted the discussion'
+                (item: any) =>
+                  item.actionDescription ===
+                  `deleted the discussion by ${OP_LABEL}`
               );
               expect(deleteItems.length).to.eq(1);
               expect(
@@ -626,7 +641,7 @@ describe('Reported content activity feed updates', () => {
               ).to.eq(true);
               expectDeleteActivity({
                 activityFeed: issueData.ActivityFeed,
-                actionDescription: 'deleted the discussion',
+                actionDescription: `deleted the discussion by ${OP_LABEL}`,
                 expectedUser: null,
                 expectedMod: MOD_USERNAME,
               });
@@ -684,12 +699,13 @@ describe('Reported content activity feed updates', () => {
               }).then((issueResponse) => {
                 const issue = issueResponse.body.data.issues[0];
                 expect(issue.isOpen).to.eq(false);
+                expectCloseReasonActivity(issue.ActivityFeed);
                 expect(issue.ActivityFeed.some((item: any) =>
-                  item.actionDescription === 'deleted the comment'
+                  item.actionDescription === `deleted the comment by ${OP_LABEL}`
                 )).to.eq(true);
                 expectDeleteActivity({
                   activityFeed: issue.ActivityFeed,
-                  actionDescription: 'deleted the comment',
+                  actionDescription: `deleted the comment by ${OP_LABEL}`,
                   expectedUser: OP_USERNAME,
                   expectedMod: null,
                 });
@@ -754,8 +770,11 @@ describe('Reported content activity feed updates', () => {
                 }).then((issueResponse) => {
                   const issueData = issueResponse.body.data.issues[0];
                   expect(issueData.isOpen).to.eq(false);
+                  expectCloseReasonActivity(issueData.ActivityFeed);
                   const deleteItems = issueData.ActivityFeed.filter(
-                    (item: any) => item.actionDescription === 'deleted the comment'
+                    (item: any) =>
+                      item.actionDescription ===
+                      `deleted the comment by ${OP_LABEL}`
                   );
                   expect(deleteItems.length).to.eq(1);
                   expect(
@@ -763,7 +782,7 @@ describe('Reported content activity feed updates', () => {
                   ).to.eq(true);
                   expectDeleteActivity({
                     activityFeed: issueData.ActivityFeed,
-                    actionDescription: 'deleted the comment',
+                    actionDescription: `deleted the comment by ${OP_LABEL}`,
                     expectedUser: null,
                     expectedMod: MOD_USERNAME,
                   });
@@ -811,12 +830,13 @@ describe('Reported content activity feed updates', () => {
             }).then((issueResponse) => {
               const issue = issueResponse.body.data.issues[0];
               expect(issue.isOpen).to.eq(false);
+              expectCloseReasonActivity(issue.ActivityFeed);
               expect(issue.ActivityFeed.some((item: any) =>
-                item.actionDescription === 'deleted the event'
+                item.actionDescription === `deleted the event by ${OP_LABEL}`
               )).to.eq(true);
               expectDeleteActivity({
                 activityFeed: issue.ActivityFeed,
-                actionDescription: 'deleted the event',
+                actionDescription: `deleted the event by ${OP_LABEL}`,
                 expectedUser: OP_USERNAME,
                 expectedMod: null,
               });
@@ -868,8 +888,11 @@ describe('Reported content activity feed updates', () => {
                 }).then((issueResponse) => {
                   const issueData = issueResponse.body.data.issues[0];
                   expect(issueData.isOpen).to.eq(false);
+                  expectCloseReasonActivity(issueData.ActivityFeed);
                   const deleteItems = issueData.ActivityFeed.filter(
-                    (item: any) => item.actionDescription === 'deleted the event'
+                    (item: any) =>
+                      item.actionDescription ===
+                      `deleted the event by ${OP_LABEL}`
                   );
                   expect(deleteItems.length).to.eq(1);
                   expect(
@@ -877,7 +900,7 @@ describe('Reported content activity feed updates', () => {
                   ).to.eq(true);
                   expectDeleteActivity({
                     activityFeed: issueData.ActivityFeed,
-                    actionDescription: 'deleted the event',
+                    actionDescription: `deleted the event by ${OP_LABEL}`,
                     expectedUser: null,
                     expectedMod: MOD_USERNAME,
                   });

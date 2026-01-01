@@ -1,5 +1,6 @@
 import { CATS_FORUM_EVENTS, CHANNEL_ISSUES } from '../constants';
 import { setupTestData } from '../../support/testSetup';
+import { loginWithAuthUser, waitForGraphQL } from '../utils';
 
 describe('Archive and unarchive event', () => {
   // Set up test data once for all tests in this file
@@ -9,26 +10,20 @@ describe('Archive and unarchive event', () => {
     const targetEventTitle = 'Test free/virtual event';
     // Use username_2 to ensure we're not the author of the event (created by username_1)
     // Username_2 should be an elevated mod with archive permissions
-    const username = Cypress.env('auth0_username_2');
-    const password = Cypress.env('auth0_password_2');
-
     // Set up network interception for GraphQL requests
     cy.intercept('POST', '**/graphql').as('graphqlRequest');
 
     // Login as the second user who is a moderator
-    cy.loginWithCreateEventButton({
-      username: username,
-      password: password,
-    });
+    loginWithAuthUser('user2');
 
     // Visit the forum's events tab and open the target event
     cy.visit(CATS_FORUM_EVENTS);
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     // Wait for list to be visible and click the event
     cy.get('ul[data-testid="event-list"]').should('be.visible');
     cy.get('span').contains(targetEventTitle).click();
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     // Now interact with elements on the event detail page
     cy.url().should('include', '/events/');
@@ -62,7 +57,7 @@ describe('Archive and unarchive event', () => {
 
     // Submit the archive
     cy.get('button').contains('Submit').click();
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     // Verify the success notification appears
     cy.contains('The event was reported and archived successfully').should(
@@ -77,7 +72,7 @@ describe('Archive and unarchive event', () => {
 
     // Now navigate to the channel's closed issues tab
     cy.visit(`${CHANNEL_ISSUES}/closed`);
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     // Verify that the issue appears in the list of closed issues
     cy.get('[data-testid="issue-list"]')

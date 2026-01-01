@@ -9,6 +9,30 @@ import modServerRoles from '../support/commandFunctions/seedData/rbac/seedModSer
 import serverConfigs from '../support/commandFunctions/seedData/rbac/seedServerConfig';
 import users from '../support/commandFunctions/seedData/seedUsers';
 
+type AuthUserKey = 'user1' | 'user2';
+
+export const getAuthUser = (key: AuthUserKey) => {
+  if (key === 'user1') {
+    return {
+      username: Cypress.env('auth0_username_1'),
+      password: Cypress.env('auth0_password_1'),
+    };
+  }
+  return {
+    username: Cypress.env('auth0_username_2'),
+    password: Cypress.env('auth0_password_2'),
+  };
+};
+
+export const loginWithAuthUser = (key: AuthUserKey) => {
+  const { username, password } = getAuthUser(key);
+  cy.loginWithCreateEventButton({ username, password });
+};
+
+export const waitForGraphQL = (alias = 'graphqlRequest') => {
+  return cy.wait(`@${alias}`).its('response.statusCode').should('eq', 200);
+};
+
 export const deleteAll = () => {
   cy.loginAsAdmin();
   cy.dropDataForCypressTests().then((response) =>

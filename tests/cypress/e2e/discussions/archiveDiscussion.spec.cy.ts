@@ -1,5 +1,6 @@
 import { CATS_FORUM, CHANNEL_ISSUES } from '../constants';
 import { setupTestData } from '../../support/testSetup';
+import { loginWithAuthUser, waitForGraphQL } from '../utils';
 
 describe('Archive and unarchive discussion', () => {
   // Set up test data once for all tests in this file
@@ -9,24 +10,18 @@ describe('Archive and unarchive discussion', () => {
     const targetDiscussionTitle = 'Example topic 1';
     // Use username_2 to ensure we're not the author of the discussion (created by username_1)
     // Username_2 should be an elevated mod with archive permissions
-    const username = Cypress.env('auth0_username_2');
-    const password = Cypress.env('auth0_password_2');
-
     // Set up network interception for GraphQL requests
     cy.intercept('POST', '**/graphql').as('graphqlRequest');
 
     // Login as the second user who is a moderator
-    cy.loginWithCreateEventButton({
-      username: username,
-      password: password,
-    });
+    loginWithAuthUser('user2');
 
     // Visit the forum and open the target discussion
     cy.visit(CATS_FORUM);
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     cy.get('span').contains(targetDiscussionTitle).click();
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     // Open the discussion action menu
     cy.get('button[data-testid="discussion-menu-button"]').click();
@@ -53,7 +48,7 @@ describe('Archive and unarchive discussion', () => {
 
     // Submit the archive
     cy.get('button').contains('Submit').click();
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     // Verify the success notification appears
     cy.contains('The content was reported and archived successfully').should(
@@ -68,7 +63,7 @@ describe('Archive and unarchive discussion', () => {
 
     // Now navigate to the channel's closed issues tab
     cy.visit(`${CHANNEL_ISSUES}/closed`);
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     // Verify that the issue appears in the list of closed issues
     cy.get('[data-testid="issue-list"]')
@@ -77,7 +72,7 @@ describe('Archive and unarchive discussion', () => {
 
     // Visit the forum and open the target discussion
     cy.visit(CATS_FORUM);
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    waitForGraphQL();
 
     // archived discussion is no longer visible in the open discussions
     cy.get('span').contains(targetDiscussionTitle).should('not.exist');
