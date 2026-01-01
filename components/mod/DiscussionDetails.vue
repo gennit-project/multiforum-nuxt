@@ -89,7 +89,13 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
   <div>
     <ErrorBanner v-if="getDiscussionError" :text="getDiscussionError.message" />
     <LoadingSpinner v-else-if="getDiscussionLoading" />
-    <ClientOnly>
+    <div
+      v-else-if="!discussion"
+      class="rounded-lg border border-gray-300 bg-gray-50 p-4 text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+    >
+      <p>Can't find the content that was reported. It may have been deleted.</p>
+    </div>
+    <ClientOnly v-else>
       <div v-if="discussion" class="mt-3 flex w-full flex-col gap-2">
         <nuxt-link
           :to="{

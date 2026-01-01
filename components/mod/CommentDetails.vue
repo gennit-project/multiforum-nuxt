@@ -120,25 +120,33 @@ const permalinkObject = computed(() => {
 <template>
   <div class="flex w-full flex-col space-y-4">
     <LoadingSpinner v-if="commentLoading" />
-    <ErrorBanner v-if="commentError" :text="commentError.message" />
-    <div v-else-if="originalComment" class="flex items-center">
-      <CommentHeader
-        :comment-data="originalComment"
-        :is-highlighted="false"
-        :parent-comment-id="originalComment?.parentCommentId"
-        :show-context-link="true"
-        :show-channel="false"
-      />
-      <nuxt-link :to="permalinkObject" class="text-orange-500 underline">
-        Context
-      </nuxt-link>
+    <ErrorBanner v-else-if="commentError" :text="commentError.message" />
+    <div
+      v-else-if="!originalComment"
+      class="rounded-lg border border-gray-300 bg-gray-50 p-4 text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+    >
+      <p>Can't find the content that was reported. It may have been deleted.</p>
     </div>
-    <div class="ml-2 flex flex-col gap-2 border-l pl-4">
-      <MarkdownPreview
-        class="-ml-2"
-        :text="originalComment?.text || '[Deleted]'"
-        :disable-gallery="true"
-      />
-    </div>
+    <template v-else>
+      <div class="flex items-center">
+        <CommentHeader
+          :comment-data="originalComment"
+          :is-highlighted="false"
+          :parent-comment-id="originalComment?.parentCommentId"
+          :show-context-link="true"
+          :show-channel="false"
+        />
+        <nuxt-link :to="permalinkObject" class="text-orange-500 underline">
+          Context
+        </nuxt-link>
+      </div>
+      <div class="ml-2 flex flex-col gap-2 border-l pl-4">
+        <MarkdownPreview
+          class="-ml-2"
+          :text="originalComment?.text || '[Deleted]'"
+          :disable-gallery="true"
+        />
+      </div>
+    </template>
   </div>
 </template>

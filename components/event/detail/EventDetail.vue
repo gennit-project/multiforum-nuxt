@@ -348,8 +348,11 @@ watchEffect(() => {
             class="px-4 lg:px-10"
             :text="eventError.message"
           />
-          <div v-else-if="!eventLoading && !event">
-            Could not find the event.
+          <div
+            v-else-if="!eventLoading && !event"
+            class="rounded-lg border border-gray-300 bg-gray-50 p-4 text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+          >
+            <p>Can't find the content that was reported. It may have been deleted.</p>
           </div>
 
           <div
