@@ -11,6 +11,12 @@ import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { modProfileNameVar } from '@/cache';
 import PencilIcon from '../icons/PencilIcon.vue';
 import EditContentModal from './EditContentModal.vue';
+import {
+  GET_DISCUSSION_CHANNEL,
+  GET_EVENT_CHANNEL,
+  IS_ORIGINAL_POSTER_SUSPENDED,
+} from '@/graphQLData/mod/queries';
+import { GET_COMMENT_ARCHIVED } from '@/graphQLData/comment/queries';
 
 const props = defineProps({
   issue: {
@@ -115,6 +121,69 @@ const discussionHasDownload = computed(() => {
   return (
     getDiscussionResult.value?.discussions?.[0]?.hasDownload === true || false
   );
+});
+
+// Query to check if content is archived
+const { result: getDiscussionChannelResult } = useQuery(
+  GET_DISCUSSION_CHANNEL,
+  () => ({
+    discussionId: props.discussionId,
+    channelUniqueName: props.channelUniqueName,
+  }),
+  () => ({
+    enabled: !!props.discussionId && !!props.channelUniqueName,
+    fetchPolicy: 'cache-first',
+  })
+);
+
+const { result: getEventChannelResult } = useQuery(
+  GET_EVENT_CHANNEL,
+  () => ({
+    eventId: props.eventId,
+    channelUniqueName: props.channelUniqueName,
+  }),
+  () => ({
+    enabled: !!props.eventId && !!props.channelUniqueName,
+    fetchPolicy: 'cache-first',
+  })
+);
+
+const { result: isCommentArchivedResult } = useQuery(
+  GET_COMMENT_ARCHIVED,
+  () => ({
+    commentId: props.commentId,
+  }),
+  () => ({
+    enabled: !!props.commentId,
+    fetchPolicy: 'cache-first',
+  })
+);
+
+const isArchived = computed(() => {
+  if (props.discussionId) {
+    return getDiscussionChannelResult.value?.discussionChannels?.[0]?.archived;
+  } else if (props.eventId) {
+    return getEventChannelResult.value?.eventChannels?.[0]?.archived;
+  } else if (props.commentId) {
+    return isCommentArchivedResult.value?.comments?.[0]?.archived;
+  }
+  return false;
+});
+
+// Query to check if author is suspended
+const { result: getUserSuspensionResult } = useQuery(
+  IS_ORIGINAL_POSTER_SUSPENDED,
+  () => ({
+    issueId: props.issue.id,
+  }),
+  () => ({
+    enabled: !!props.issue.id,
+    fetchPolicy: 'cache-first',
+  })
+);
+
+const authorIsSuspended = computed(() => {
+  return getUserSuspensionResult.value?.isOriginalPosterSuspended ?? false;
 });
 
 const relatedContentType = computed(() => {
@@ -254,14 +323,46 @@ const editButtonDisabled = computed(() => {
                         needed.
                       </p>
                     </div>
-                    <button
-                      class="flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-500"
-                      :loading="closeIssueLoading"
-                      @click="$emit('close-issue')"
-                    >
-                      <XCircleIcon />
-                      Close Issue (No Action Needed)
-                    </button>
+                    <div class="flex flex-col gap-2">
+                      <button
+                        class="flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-500"
+                        :loading="closeIssueLoading"
+                        @click="$emit('close-issue')"
+                      >
+                        <XCircleIcon />
+                        Close Issue (No Action Needed)
+                      </button>
+                      <ArchiveButton
+                        v-if="isArchived"
+                        :discussion-id="discussionId"
+                        :event-id="eventId"
+                        :comment-id="commentId"
+                        :context-text="contextText"
+                        :channel-unique-name="channelUniqueName"
+                        :issue="issue"
+                        :disabled="actionsDisabled"
+                        @archived-successfully="$emit('archived-successfully')"
+                        @unarchived-successfully="
+                          $emit('unarchived-successfully')
+                        "
+                      />
+                      <SuspendUserButton
+                        v-if="authorIsSuspended"
+                        :issue="issue"
+                        :discussion-title="contextText"
+                        :discussion-id="discussionId"
+                        :event-title="contextText"
+                        :event-id="eventId"
+                        :channel-unique-name="channelUniqueName"
+                        :disabled="actionsDisabled"
+                        @suspended-successfully="
+                          $emit('suspended-user-successfully')
+                        "
+                        @unsuspended-successfully="
+                          $emit('unsuspended-user-successfully')
+                        "
+                      />
+                    </div>
                   </div>
 
                   <div
@@ -321,6 +422,7 @@ const editButtonDisabled = computed(() => {
                       </p>
                       <div class="flex flex-col gap-2">
                         <ArchiveButton
+                          v-if="!isArchived"
                           :discussion-id="discussionId"
                           :event-id="eventId"
                           :comment-id="commentId"
@@ -335,7 +437,17 @@ const editButtonDisabled = computed(() => {
                             $emit('unarchived-successfully')
                           "
                         />
+                        <button
+                          v-else
+                          type="button"
+                          disabled
+                          class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded bg-gray-400 px-4 py-2 text-white dark:bg-gray-600"
+                          title="Content is already archived. Use the Unarchive button above to restore it."
+                        >
+                          Archive (Already Archived)
+                        </button>
                         <SuspendUserButton
+                          v-if="!authorIsSuspended"
                           :issue="issue"
                           :discussion-title="contextText"
                           :discussion-id="discussionId"
@@ -350,6 +462,15 @@ const editButtonDisabled = computed(() => {
                             $emit('unsuspended-user-successfully')
                           "
                         />
+                        <button
+                          v-else
+                          type="button"
+                          disabled
+                          class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded bg-gray-400 px-4 py-2 text-white dark:bg-gray-600"
+                          title="Author is already suspended. Use the Unsuspend Author button above to restore their access."
+                        >
+                          Suspend Author (Already Suspended)
+                        </button>
                       </div>
                     </div>
                   </div>
