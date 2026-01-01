@@ -385,7 +385,7 @@ const handleEditAlbum = () => {
     />
     <div
       v-else
-      class="mx-4 my-4 w-full space-y-2 rounded-lg bg-white py-2 shadow-lg ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-gray-700 sm:mx-6 md:mx-8 lg:mx-10"
+      class="mx-1 my-4 w-full space-y-2 rounded-lg bg-white py-2 shadow-lg ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-gray-700"
     >
       <div class="w-full space-y-2 overflow-hidden">
         <ErrorBanner
@@ -404,7 +404,7 @@ const handleEditAlbum = () => {
         />
         <div v-if="discussion" class="w-full">
           <div class="w-full px-2">
-            <div class="w-full rounded-lg pb-2 dark:border-gray-700">
+            <div class="w-full rounded-lg py-2 dark:border-gray-700 lg:px-4">
               <DiscussionHeader
                 :channel-id="channelId"
                 :compact-mode="compactMode"

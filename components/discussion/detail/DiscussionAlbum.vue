@@ -281,12 +281,12 @@ onMounted(() => {
     <!-- Normal thumbnail grid view -->
     <div
       v-if="!isLightboxOpen && !startInLightbox"
-      class="overflow-x-auto border"
+      class="overflow-hidden rounded-lg bg-black"
     >
       <!-- Grid view -->
       <div
         v-if="!carouselFormat"
-        class="grid grid-cols-3 gap-2 dark:text-white"
+        class="grid grid-cols-3 gap-2 p-2 dark:text-white"
       >
         <div
           v-for="(image, idx) in orderedImages"
@@ -381,11 +381,10 @@ onMounted(() => {
       <!-- Carousel view -->
       <div
         v-else
-        class="w-full min-w-0 rounded-lg border *:border-gray-300 dark:border-gray-700"
+        class="w-full min-w-0 overflow-hidden rounded-lg bg-black"
         :class="{
           'flex flex-col': true,
           'lg:flex-row': expandedView && orderedImages.length > 1,
-          'max-w-full overflow-hidden': !expandedView,
         }"
       >
         <!-- Thumbnails on the left for large screens in expanded view -->
@@ -394,7 +393,7 @@ onMounted(() => {
           class="order-2 lg:order-1 lg:flex-shrink-0"
         >
           <div
-            class="flex w-full max-w-full gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-y-auto lg:overflow-x-visible lg:pb-0 lg:pr-2"
+            class="flex w-full max-w-full gap-2 overflow-x-auto p-2 lg:flex-col lg:overflow-y-auto lg:overflow-x-visible"
             :style="{ maxHeight: `${mainImageHeight}px` }"
           >
             <CarouselThumbnail
@@ -415,7 +414,7 @@ onMounted(() => {
           <!-- Image container -->
           <div class="flex items-center justify-center">
             <div
-              class="relative touch-pan-x overflow-hidden rounded dark:text-white"
+              class="relative touch-pan-x overflow-hidden rounded-lg dark:text-white"
               :class="{
                 'w-full min-w-0 max-w-full': expandedView,
                 'max-w-96': !expandedView,
@@ -553,9 +552,9 @@ onMounted(() => {
           <!-- Thumbnails row for non-expanded view or small screens -->
           <div
             v-if="showThumbnails && !expandedView && orderedImages.length > 1"
-            class="mt-4 w-full min-w-0 overflow-x-auto px-4"
+            class="mt-2 w-full min-w-0 overflow-x-auto"
           >
-            <div class="flex w-full max-w-full gap-2 pb-2">
+            <div class="flex w-full max-w-full gap-2 p-2">
               <CarouselThumbnail
                 v-for="(image, idx) in orderedImages"
                 :key="`thumb-${image?.id || idx}`"

@@ -35,7 +35,7 @@ const links = [
       </span>
     </div>
     <div
-      class="w-full items-center justify-center text-wrap bg-gray-800 p-4 text-xs text-white"
+      class="w-full bg-gray-800 px-8 py-4 text-center text-xs text-white"
     >
       If you have feedback or technical problems, please open an issue in the
       <a

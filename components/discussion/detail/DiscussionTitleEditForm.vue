@@ -123,7 +123,7 @@ const isDownloadDetailPage = computed(() => {
 </script>
 
 <template>
-  <div class="w-full">
+  <div class="w-full pb-2 shadow-sm">
     <div
       class="mb-3 mt-4 flex w-full flex-col md:flex-row md:items-center md:justify-between md:space-x-2"
     >

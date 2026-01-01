@@ -79,7 +79,7 @@ const hasAlbum = computed(() => {
       :show-emoji-button="true"
     >
       <template #album-slot>
-        <div class="mt-1 w-full min-w-0 overflow-hidden bg-black text-white">
+        <div class="mt-1 w-full min-w-0 overflow-hidden rounded-lg bg-black text-white">
           <DiscussionAlbum
             v-if="hasAlbum"
             :album="discussion?.Album || null"

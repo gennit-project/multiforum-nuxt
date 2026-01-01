@@ -935,7 +935,7 @@ const handleDeleteComment = async (commentId: string) => {
   <PageNotFound v-if="!getIssueLoading && !activeIssue" />
   <div
     v-else
-    class="mx-4 my-4 flex-1 space-y-2 rounded-lg bg-white py-2 shadow-lg ring-1 ring-gray-200 dark:bg-gray-900 dark:text-white dark:ring-gray-700 sm:mx-6 md:mx-8 lg:mx-10"
+    class="mx-1 my-4 flex-1 space-y-2 rounded-lg bg-white py-2 shadow-lg ring-1 ring-gray-200 dark:bg-gray-900 dark:text-white dark:ring-gray-700"
   >
     <ErrorBanner
       v-if="getIssueError"
