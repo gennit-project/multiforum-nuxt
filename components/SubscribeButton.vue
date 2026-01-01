@@ -51,11 +51,12 @@ const handleClick = () => {
     <template #has-auth>
       <button
         v-if="!loading"
+        type="button"
         :disabled="disabled"
         :class="buttonClasses"
         @click="handleClick"
       >
-        <i class="fas fa-bell mr-1.5 text-sm" />
+        <i class="fas fa-bell mr-1.5 text-sm" aria-hidden="true" />
         {{ isSubscribed ? 'Unsubscribe' : 'Subscribe' }}
       </button>
       <div v-else class="inline-flex items-center px-3 py-1.5">
@@ -66,8 +67,8 @@ const handleClick = () => {
       </div>
     </template>
     <template #does-not-have-auth>
-      <button :class="unauthenticatedButtonClasses">
-        <i class="fas fa-bell mr-1.5 text-sm" />
+      <button type="button" :class="unauthenticatedButtonClasses">
+        <i class="fas fa-bell mr-1.5 text-sm" aria-hidden="true" />
         Subscribe
       </button>
     </template>

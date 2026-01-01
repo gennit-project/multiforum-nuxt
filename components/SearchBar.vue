@@ -107,6 +107,7 @@ defineExpose({ focus, getValue });
     <div class="relative flex w-full items-center">
       <div
         class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-gray-300"
+        aria-hidden="true"
       >
         <SearchIcon />
       </div>
@@ -126,13 +127,15 @@ defineExpose({ focus, getValue });
         @input="updateSearchInput"
         @keydown.enter.prevent="submit"
       >
-      <div
+      <button
         v-if="initialValue"
-        class="absolute inset-y-0 right-12 z-10 flex cursor-pointer items-center"
+        type="button"
+        aria-label="Clear search"
+        class="absolute inset-y-0 right-12 z-10 flex cursor-pointer items-center border-none bg-transparent"
         @click="clear"
       >
-        <i class="fa-solid fa-xmark h-4 w-4 text-gray-400 dark:text-gray-300" />
-      </div>
+        <i class="fa-solid fa-xmark h-4 w-4 text-gray-400 dark:text-gray-300" aria-hidden="true" />
+      </button>
       <slot />
       <label for="search" class="sr-only">Search</label>
     </div>

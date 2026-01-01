@@ -155,7 +155,7 @@ const filteredQuery = computed(() => {
                 :src="firstAlbumImage"
                 :alt="title"
                 class="h-full w-full object-cover"
-              />
+              >
               <div
                 v-else
                 class="flex h-full w-full items-center justify-center text-center text-sm text-gray-500 dark:text-gray-400"
@@ -188,13 +188,15 @@ const filteredQuery = computed(() => {
                 discussion?.Album?.Images?.length &&
                 discussion.Album.Images.length > 0
               "
+              type="button"
               class="rounded-md bg-black bg-opacity-50 p-2 text-white transition-all duration-200 hover:bg-opacity-70"
               title="View album"
+              aria-label="View album"
               @click.stop="
                 $emit('openAlbum', { discussion, album: discussion?.Album })
               "
             >
-              <ImageIcon class="h-4 w-4" />
+              <ImageIcon class="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -296,7 +298,7 @@ const filteredQuery = computed(() => {
                     query: filteredQuery,
                   }"
                 >
-                  <i class="fa-regular fa-comment text-xs" />
+                  <i class="fa-regular fa-comment text-xs" aria-hidden="true" />
                   <span class="text-sm">{{ commentCount }}</span>
                 </nuxt-link>
               </div>

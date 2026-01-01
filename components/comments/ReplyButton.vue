@@ -62,7 +62,8 @@ const buttonClasses = computed(() => {
   <RequireAuth :full-width="false">
     <template #has-auth>
       <div class="flex items-center gap-1">
-        <div
+        <button
+          type="button"
           data-testid="reply-comment-button"
           :class="[
             buttonClasses,
@@ -70,14 +71,14 @@ const buttonClasses = computed(() => {
           ]"
           @click="emit('toggleShowReplyEditor')"
         >
-          <i class="fa-regular fa-comment h-3 w-3" /> Reply
-        </div>
+          <i class="fa-regular fa-comment h-3 w-3" aria-hidden="true" /> Reply
+        </button>
       </div>
     </template>
     <template #does-not-have-auth>
       <div class="flex items-center gap-1">
-        <button data-testid="reply-comment-button" :class="[buttonClasses]">
-          <i class="fa-regular fa-comment h-3 w-3" />
+        <button type="button" data-testid="reply-comment-button" :class="[buttonClasses]">
+          <i class="fa-regular fa-comment h-3 w-3" aria-hidden="true" />
           Reply
         </button>
       </div>

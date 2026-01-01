@@ -357,15 +357,16 @@ const selectedOptions = computed(() => {
           <button
             v-if="selectedOptions.length > 0"
             type="button"
+            aria-label="Clear selection"
             class="mr-2 transition-colors hover:text-red-500"
             :title="'Clear selection'"
             @click.stop="clearSelection"
           >
-            <i class="fa-solid fa-times"/>
+            <i class="fa-solid fa-times" aria-hidden="true" />
           </button>
 
           <!-- Dropdown arrow -->
-          <div>
+          <div aria-hidden="true">
             <i
               :class="
                 isDropdownOpen
@@ -463,6 +464,7 @@ const selectedOptions = computed(() => {
                 <span v-else-if="!expandedSections.has(sectionIndex)">
                   {{ section.options.slice(0, 3).map(opt => opt.value).join(', ') }}
                   <button
+                    type="button"
                     class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
                     @click.stop="toggleSectionExpansion(sectionIndex)"
                   >
@@ -472,6 +474,7 @@ const selectedOptions = computed(() => {
                 <span v-else>
                   {{ section.options.map(opt => opt.value).join(', ') }}
                   <button
+                    type="button"
                     class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
                     @click.stop="toggleSectionExpansion(sectionIndex)"
                   >
@@ -509,9 +512,11 @@ const selectedOptions = computed(() => {
                   <span class="font-medium text-gray-900 dark:text-white">{{ collectionOption.label }}</span>
                   <span class="ml-1 text-gray-500 dark:text-gray-400">
                     (<span v-if="((collectionOption as any).channels || []).length <= 3">{{ ((collectionOption as any).channels || []).join(', ') }}</span><span v-else-if="!expandedCollections.has(String(collectionOption.value))">{{ ((collectionOption as any).channels || []).slice(0, 3).join(', ') }}<button
+                        type="button"
                         class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
                         @click.stop="toggleCollectionExpansion(String(collectionOption.value))"
                       >show more</button></span><span v-else>{{ ((collectionOption as any).channels || []).join(', ') }}<button
+                        type="button"
                         class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
                         @click.stop="toggleCollectionExpansion(String(collectionOption.value))"
                       >show less</button></span>)
@@ -568,6 +573,7 @@ const selectedOptions = computed(() => {
                 <i
                   v-if="!multiple && selected.includes(option.value)"
                   class="fa-solid fa-check text-orange-600"
+                  aria-hidden="true"
                 />
               </div>
             </div>
@@ -617,7 +623,7 @@ const selectedOptions = computed(() => {
             >
 
             <!-- Icon -->
-            <i v-else-if="option.icon" :class="[option.icon, 'mr-3']"/>
+            <i v-else-if="option.icon" :class="[option.icon, 'mr-3']" aria-hidden="true" />
 
             <!-- Label -->
             <span class="flex-1 text-sm text-gray-900 dark:text-white">
@@ -628,6 +634,7 @@ const selectedOptions = computed(() => {
             <i
               v-if="!multiple && selected.includes(option.value)"
               class="fa-solid fa-check text-orange-600"
+              aria-hidden="true"
             />
           </div>
         </div>

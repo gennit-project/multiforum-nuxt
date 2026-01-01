@@ -18,6 +18,7 @@ const toggleTheme = () => {
 <template>
   <client-only>
     <button
+      type="button"
       class="border-transparent relative mx-2 inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-none"
       :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-300'"
       aria-label="Toggle theme"
@@ -67,6 +68,7 @@ const toggleTheme = () => {
     <!-- SSR Fallback -->
     <template #fallback>
       <button
+        type="button"
         class="border-transparent relative mx-2 inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 bg-gray-300 transition-colors duration-200 ease-in-out focus:outline-none dark:bg-gray-700"
         aria-label="Toggle theme"
         role="switch"

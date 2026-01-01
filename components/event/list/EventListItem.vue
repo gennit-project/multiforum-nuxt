@@ -263,9 +263,10 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
             class="mt-1 flex cursor-pointer items-center justify-start gap-1 text-gray-500 dark:text-gray-100"
           >
             <button
+              type="button"
               class="rounded-md bg-gray-100 px-4 py-1 text-xs text-black hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
             >
-              <i class="fa-regular fa-comment mr-2 h-4 w-4" />
+              <i class="fa-regular fa-comment mr-2 h-4 w-4" aria-hidden="true" />
               <span class="text black text-sm dark:text-white">{{
                 `${commentCount}`
               }}</span>
@@ -280,9 +281,10 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
             :items="eventDetailOptions"
           >
             <button
+              type="button"
               class="-ml-1 mt-1 flex items-center rounded-md bg-gray-100 px-4 pb-2 pt-2 hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
             >
-              <i class="fa-regular fa-comment mr-2 h-4 w-4" />
+              <i class="fa-regular fa-comment mr-2 h-4 w-4" aria-hidden="true" />
               {{
                 `${commentCount} ${
                   commentCount === 1 ? 'comment' : 'comments'

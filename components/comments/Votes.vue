@@ -142,7 +142,7 @@ function viewFeedback() {
       :is-marked-as-answer="isMarkedAsAnswer"
       @vote="clickUpvote"
     >
-      <i class="fa-solid fa-arrow-up mr-1 w-3" />
+      <i class="fa-solid fa-arrow-up mr-1 w-3" aria-hidden="true" />
       <span id="count" class="text-xs">{{ upvoteCount }}</span>
     </VoteButton>
 

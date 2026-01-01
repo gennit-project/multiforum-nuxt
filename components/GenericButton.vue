@@ -25,6 +25,7 @@ export default defineComponent({
 
 <template>
   <button
+    type="button"
     :data-testid="testId"
     :class="{
       'bg-orange-500 text-white hover:bg-gray-800 dark:text-black hover:dark:bg-orange-600':

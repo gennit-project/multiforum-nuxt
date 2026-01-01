@@ -199,11 +199,13 @@ const handleOpenAlbum = () => {
         <!-- Album View Button -->
         <button
           v-if="discussion?.Album?.Images?.length"
+          type="button"
           class="rounded-md bg-black bg-opacity-50 p-2 text-white transition-all duration-200 hover:bg-opacity-70"
           title="View album"
+          aria-label="View album"
           @click.stop="handleOpenAlbum"
         >
-          <ImageIcon class="h-4 w-4" />
+          <ImageIcon class="h-4 w-4" aria-hidden="true" />
         </button>
       </div>
     </div>
@@ -254,7 +256,7 @@ const handleOpenAlbum = () => {
           :to="defaultLink"
           class="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
         >
-          <i class="fa-regular fa-comment text-xs" />
+          <i class="fa-regular fa-comment text-xs" aria-hidden="true" />
           <span>{{ commentCount }} comments</span>
         </nuxt-link>
         <MenuButton
@@ -264,7 +266,7 @@ const handleOpenAlbum = () => {
           <span
             class="flex cursor-pointer items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-xs dark:bg-gray-800"
           >
-            <i class="fa-regular fa-comment text-xs" />
+            <i class="fa-regular fa-comment text-xs" aria-hidden="true" />
             {{ commentCount }}
             {{ commentCount === 1 ? 'comment' : 'comments' }} in
             {{ channelCount }}

@@ -164,6 +164,7 @@ const cancelDelete = () => {
                 <!-- Edit Post Button -->
                 <button
                   v-if="editRoute"
+                  type="button"
                   :disabled="!isCurrentUserOriginalPoster"
                   class="flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-white"
                   :class="[
@@ -196,6 +197,7 @@ const cancelDelete = () => {
 
                 <!-- Delete Post Button -->
                 <button
+                  type="button"
                   :disabled="!isCurrentUserOriginalPoster"
                   class="flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-white"
                   :class="[

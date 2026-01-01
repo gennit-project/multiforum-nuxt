@@ -64,7 +64,7 @@ const onFileSelected = (event: Event) => {
       ]"
       :for="`file-input-${props.fieldName}`"
     >
-      <i class="fa fa-image mr-2" /> {{ props.label }}
+      <i class="fa fa-image mr-2" aria-hidden="true" /> {{ props.label }}
       <input
         :id="`file-input-${props.fieldName}`"
         ref="fileInput"
