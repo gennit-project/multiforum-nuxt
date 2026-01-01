@@ -78,7 +78,11 @@ describe('ActivityFeed', () => {
         actionDescription: 'edited the discussion title',
         createdAt: '2024-01-01T00:00:00.000Z',
         ModerationProfile: { displayName: 'mod-1' },
-        Revision: { id: 'rev-title', body: 'Old title', createdAt: '2024-01-01T00:00:00.000Z' },
+        Revision: {
+          id: 'rev-title',
+          body: 'Old title',
+          createdAt: '2024-01-01T00:00:00.000Z',
+        },
       },
       {
         id: 'body-edit',
@@ -86,7 +90,11 @@ describe('ActivityFeed', () => {
         actionDescription: 'edited the discussion body',
         createdAt: '2024-01-01T00:00:01.000Z',
         ModerationProfile: { displayName: 'mod-1' },
-        Revision: { id: 'rev-body', body: 'Old body', createdAt: '2024-01-01T00:00:01.000Z' },
+        Revision: {
+          id: 'rev-body',
+          body: 'Old body',
+          createdAt: '2024-01-01T00:00:01.000Z',
+        },
       },
     ];
 

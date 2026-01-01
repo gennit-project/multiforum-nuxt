@@ -191,10 +191,17 @@ const usePassiveDescription = computed(() => {
   return !!actionPhrase.value;
 });
 
+type DiscussionRevisionContent = {
+  kind: 'title' | 'body';
+  label: string;
+  oldVersion: any;
+  newVersion: any;
+};
+
 const buildDiscussionRevisionContent = (
   item: ModerationAction,
   nextRevisionBody: string | null
-) => {
+): DiscussionRevisionContent | null => {
   if (!item.Revision || !props.relatedDiscussion) {
     return null;
   }
@@ -247,12 +254,7 @@ const buildDiscussionRevisionContent = (
 };
 
 const discussionRevisionContents = computed(() => {
-  const contents: Array<{
-    kind: 'title' | 'body';
-    label: string;
-    oldVersion: any;
-    newVersion: any;
-  }> = [];
+  const contents: DiscussionRevisionContent[] = [];
 
   const primary = buildDiscussionRevisionContent(
     props.activityItem,
@@ -556,7 +558,7 @@ const saveEdit = async () => {
               >
                 <div
                   v-if="discussionRevisionContents.length > 1"
-                  class="px-1 text-xs font-semibold text-gray-600 dark:text-gray-300"
+                  class="font-semibold px-1 text-xs text-gray-600 dark:text-gray-300"
                 >
                   {{ content.label }}
                 </div>

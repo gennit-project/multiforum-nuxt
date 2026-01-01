@@ -147,9 +147,12 @@ const displayFeedItems = computed(() => {
 
   for (let i = 0; i < items.length; i++) {
     const current = items[i];
+    if (!current) {
+      continue;
+    }
     const next = items[i + 1];
     const canPair =
-      next &&
+      !!next &&
       getActorKey(current) &&
       getActorKey(current) === getActorKey(next) &&
       wasTriggeredTogether(current, next) &&

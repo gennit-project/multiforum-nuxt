@@ -3,9 +3,11 @@
 # Run lint-staged first to fix and check specific files that changed
 npx lint-staged
 
-# Run TypeScript and Prettier checks
+# Run TypeScript checking (same as CI)
 npm run tsc
-npm run prettier:check
 
-# Then run tests after linting is complete
-npm run lint-verify
+# Run unit tests (same as CI)
+npm run test:unit:run
+
+# Run linting (same as CI)
+npm run lint
