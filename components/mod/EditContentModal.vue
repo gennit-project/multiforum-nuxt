@@ -6,6 +6,7 @@ import GenericModal from '@/components/GenericModal.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import SelectBrokenRules from '@/components/admin/SelectBrokenRules.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
 import type { PropType } from 'vue';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { GET_EVENT } from '@/graphQLData/event/queries';
@@ -45,6 +46,7 @@ const titleValue = ref('');
 const bodyValue = ref('');
 const loadingSave = ref(false);
 const validationError = ref('');
+const mutationError = ref('');
 
 // Fetch content per target
 const { result: commentResult } = useQuery(
@@ -110,6 +112,7 @@ watch(
       selectedServerRules.value = [];
       editReason.value = '';
       validationError.value = '';
+      mutationError.value = '';
     }
   }
 );
@@ -131,9 +134,15 @@ const toggleSelection = (
   }
 };
 
-const { mutate: updateComment, loading: updateCommentLoading } = useMutation(
-  UPDATE_COMMENT
-);
+const {
+  mutate: updateComment,
+  loading: updateCommentLoading,
+  onError: onUpdateCommentError,
+} = useMutation(UPDATE_COMMENT);
+
+onUpdateCommentError((error) => {
+  mutationError.value = error.message || 'Failed to save edits.';
+});
 
 const {
   mutate: updateDiscussion,
@@ -194,6 +203,7 @@ const saveEdits = async () => {
 
   try {
     loadingSave.value = true;
+    mutationError.value = '';
     if (props.targetType === 'comment') {
       await updateComment({
         updateCommentInput: { text: bodyValue.value, editReason: editReason.value },
@@ -269,12 +279,16 @@ defineExpose({
 </script>
 
 <template>
-  <GenericModal :open="open" @close="emit('close')">
+  <GenericModal
+    :open="open"
+    :title="'Edit Content'"
+    :show-footer="false"
+    @close="emit('close')"
+  >
     <template #icon>
       <PencilIcon class="h-6 w-6 text-blue-600" />
     </template>
-    <template #title>Edit Content</template>
-    <template #body>
+    <template #content>
       <div class="space-y-4">
         <div class="space-y-1">
           <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
@@ -283,8 +297,8 @@ defineExpose({
           <SelectBrokenRules
             :selected-forum-rules="selectedForumRules"
             :selected-server-rules="selectedServerRules"
-            @toggle-forum-rule="(rule) => toggleSelection('forum', rule)"
-            @toggle-server-rule="(rule) => toggleSelection('server', rule)"
+            @toggle-forum-rule-selection="(rule) => toggleSelection('forum', rule)"
+            @toggle-server-rule-selection="(rule) => toggleSelection('server', rule)"
           />
         </div>
 
@@ -329,6 +343,7 @@ defineExpose({
         <p v-if="validationError" class="text-sm text-red-600">
           {{ validationError }}
         </p>
+        <ErrorBanner v-if="mutationError" :text="mutationError" />
 
         <div class="flex justify-end gap-2 pt-2">
           <button

@@ -332,7 +332,7 @@ const editButtonDisabled = computed(() => {
                     </div>
                     <div class="flex flex-col gap-2">
                       <button
-                        class="flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500"
+                        class="font-semibold flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm text-white transition hover:bg-blue-500"
                         :loading="closeIssueLoading"
                         @click="$emit('close-issue')"
                       >
@@ -404,7 +404,7 @@ const editButtonDisabled = computed(() => {
                         :class="[
                           editButtonDisabled
                             ? 'cursor-not-allowed bg-gray-500'
-                            : 'hover:bg-indigo-500 cursor-pointer bg-orange-500 dark:bg-orange-800 dark:hover:bg-orange-700',
+                            : 'cursor-pointer bg-blue-500 hover:bg-blue-500 dark:bg-blue-600 dark:hover:bg-blue-700',
                         ]"
                         :disabled="editButtonDisabled"
                         :title="
@@ -459,7 +459,7 @@ const editButtonDisabled = computed(() => {
                             v-else
                             type="button"
                             disabled
-                            class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded bg-gray-400 px-4 py-2 text-sm font-semibold text-white dark:bg-gray-600"
+                            class="font-semibold flex w-full cursor-not-allowed items-center justify-center gap-2 rounded bg-gray-400 px-4 py-2 text-sm text-white dark:bg-gray-600"
                             title="Content is already archived. Use the Unarchive button above to restore it."
                           >
                             Archive (Already Archived)
@@ -492,7 +492,7 @@ const editButtonDisabled = computed(() => {
                             v-else
                             type="button"
                             disabled
-                            class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded bg-gray-400 px-4 py-2 text-sm font-semibold text-white dark:bg-gray-600"
+                            class="font-semibold flex w-full cursor-not-allowed items-center justify-center gap-2 rounded bg-gray-400 px-4 py-2 text-sm text-white dark:bg-gray-600"
                             title="Author is already suspended. Use the Unsuspend Author button above to restore their access."
                           >
                             Suspend Author (Already Suspended)

@@ -56,6 +56,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  showFooter: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const emit = defineEmits(['close', 'primaryButtonClick']);
@@ -150,7 +154,10 @@ const primaryButtonClasses = computed(() => {
                   />
                 </div>
                 <!-- Footer Area with fixed height -->
-                <div class="flex-none px-4 py-4 sm:flex sm:flex-row-reverse">
+                <div
+                  v-if="showFooter"
+                  class="flex-none px-4 py-4 sm:flex sm:flex-row-reverse"
+                >
                   <button
                     type="button"
                     :data-testid="`${dataTestid}-primary-button`"
