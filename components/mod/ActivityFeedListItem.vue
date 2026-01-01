@@ -45,6 +45,10 @@ const props = defineProps({
     type: Object as PropType<ModerationAction>,
     required: true,
   },
+  pairedActivityItem: {
+    type: Object as PropType<ModerationAction | null>,
+    default: null,
+  },
   isOriginalPoster: {
     type: Boolean,
     default: false,
@@ -54,6 +58,10 @@ const props = defineProps({
     default: null,
   },
   nextRevisionBody: {
+    type: String as PropType<string | null>,
+    default: null,
+  },
+  pairedNextRevisionBody: {
     type: String as PropType<string | null>,
     default: null,
   },
@@ -103,10 +111,6 @@ const hasChanges = computed(() => {
   );
 });
 
-const hasRevision = computed(() => {
-  return !!props.activityItem.Revision && !!props.relatedDiscussion;
-});
-
 const getContentNoun = (description: string) => {
   if (description.includes('comment')) return 'comment';
   if (description.includes('discussion')) return 'discussion';
@@ -130,6 +134,22 @@ const isEditAction = computed(() => {
     normalizedActionType.value === 'edit_content'
   );
 });
+
+const normalizeActionDescription = (description?: string | null) => {
+  return (description || '').toLowerCase().trim();
+};
+
+const isDiscussionTitleAction = (item: ModerationAction) => {
+  return normalizeActionDescription(item.actionDescription).includes(
+    'discussion title'
+  );
+};
+
+const isDiscussionBodyAction = (item: ModerationAction) => {
+  return normalizeActionDescription(item.actionDescription).includes(
+    'discussion body'
+  );
+};
 
 const actionPhrase = computed(() => {
   const actionType = normalizeActionType(props.activityItem.actionType);
@@ -171,52 +191,95 @@ const usePassiveDescription = computed(() => {
   return !!actionPhrase.value;
 });
 
-const revisionContent = computed(() => {
-  if (!props.activityItem.Revision || !props.relatedDiscussion) {
+const buildDiscussionRevisionContent = (
+  item: ModerationAction,
+  nextRevisionBody: string | null
+) => {
+  if (!item.Revision || !props.relatedDiscussion) {
     return null;
   }
 
-  const actionDescription = (
-    props.activityItem.actionDescription || ''
-  ).toLowerCase();
-  const isTitleEdit = actionDescription.includes('title');
-  const useTitle = isTitleEdit;
+  const isTitleEdit = isDiscussionTitleAction(item);
+  const isBodyEdit = isDiscussionBodyAction(item);
 
-  // Use nextRevisionBody if available (for older edits), otherwise use current discussion body
+  if (!isTitleEdit && !isBodyEdit) {
+    return null;
+  }
+
   const newBodyContent =
-    props.nextRevisionBody !== null
-      ? props.nextRevisionBody
+    nextRevisionBody !== null
+      ? nextRevisionBody
       : props.relatedDiscussion.body || '';
 
   const newVersion = {
     id: 'current',
-    title: useTitle ? props.relatedDiscussion.title || '' : undefined,
-    body: useTitle ? undefined : newBodyContent,
+    title: isTitleEdit ? props.relatedDiscussion.title || '' : undefined,
+    body: isBodyEdit ? newBodyContent : undefined,
     createdAt:
       props.relatedDiscussion.updatedAt ||
       props.relatedDiscussion.createdAt ||
-      props.activityItem.Revision.createdAt ||
+      item.Revision.createdAt ||
       '',
     Author: props.relatedDiscussion.Author || null,
     editReason: props.relatedDiscussion.editReason || '',
   };
 
-  if (useTitle) {
+  if (isTitleEdit) {
     return {
+      kind: 'title',
+      label: 'Title',
       oldVersion: {
-        id: props.activityItem.Revision.id,
-        title: props.activityItem.Revision.body || '',
-        createdAt: props.activityItem.Revision.createdAt,
-        Author: props.activityItem.Revision.Author || null,
+        id: item.Revision.id,
+        title: item.Revision.body || '',
+        createdAt: item.Revision.createdAt,
+        Author: item.Revision.Author || null,
       },
       newVersion,
     };
   }
 
   return {
-    oldVersion: props.activityItem.Revision,
+    kind: 'body',
+    label: 'Body',
+    oldVersion: item.Revision,
     newVersion,
   };
+};
+
+const discussionRevisionContents = computed(() => {
+  const contents: Array<{
+    kind: 'title' | 'body';
+    label: string;
+    oldVersion: any;
+    newVersion: any;
+  }> = [];
+
+  const primary = buildDiscussionRevisionContent(
+    props.activityItem,
+    props.nextRevisionBody
+  );
+  if (primary) {
+    contents.push(primary);
+  }
+
+  if (props.pairedActivityItem) {
+    const paired = buildDiscussionRevisionContent(
+      props.pairedActivityItem,
+      props.pairedNextRevisionBody
+    );
+    if (paired) {
+      contents.push(paired);
+    }
+  }
+
+  if (contents.length > 1) {
+    contents.sort((a, b) => {
+      if (a.kind === b.kind) return 0;
+      return a.kind === 'title' ? -1 : 1;
+    });
+  }
+
+  return contents;
 });
 
 // Check if this is a comment edit with revision history
@@ -485,12 +548,24 @@ const saveEdit = async () => {
               class="mt-2"
               :text="updateCommentError.message"
             />
-            <!-- Discussion revision diff -->
-            <RevisionDiffInline
-              v-if="hasRevision && revisionContent"
-              :old-version="revisionContent.oldVersion"
-              :new-version="revisionContent.newVersion"
-            />
+            <!-- Discussion revision diffs -->
+            <div v-if="discussionRevisionContents.length" class="space-y-2">
+              <div
+                v-for="content in discussionRevisionContents"
+                :key="content.kind"
+              >
+                <div
+                  v-if="discussionRevisionContents.length > 1"
+                  class="px-1 text-xs font-semibold text-gray-600 dark:text-gray-300"
+                >
+                  {{ content.label }}
+                </div>
+                <RevisionDiffInline
+                  :old-version="content.oldVersion"
+                  :new-version="content.newVersion"
+                />
+              </div>
+            </div>
             <!-- Comment revision diff -->
             <RevisionDiffInline
               v-if="hasCommentRevision && commentRevisionContent"

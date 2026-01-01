@@ -24,6 +24,50 @@ const isEditAction = (actionType?: string | null) => {
   return normalized === ActionType.Edit || normalized === 'edit_content';
 };
 
+const normalizeActionDescription = (description?: string | null) => {
+  return (description || '').toLowerCase().trim();
+};
+
+const isDiscussionTitleEdit = (item: ModerationAction) => {
+  return (
+    isEditAction(item.actionType) &&
+    normalizeActionDescription(item.actionDescription).includes(
+      'discussion title'
+    )
+  );
+};
+
+const isDiscussionBodyEdit = (item: ModerationAction) => {
+  return (
+    isEditAction(item.actionType) &&
+    normalizeActionDescription(item.actionDescription).includes(
+      'discussion body'
+    )
+  );
+};
+
+const getActorKey = (item: ModerationAction) => {
+  if (item.ModerationProfile?.displayName) {
+    return `mod:${item.ModerationProfile.displayName}`;
+  }
+  if (item.User?.username) {
+    return `user:${item.User.username}`;
+  }
+  return '';
+};
+
+const wasTriggeredTogether = (
+  first: ModerationAction,
+  second: ModerationAction
+) => {
+  const firstTime = new Date(first.createdAt).getTime();
+  const secondTime = new Date(second.createdAt).getTime();
+  if (!Number.isFinite(firstTime) || !Number.isFinite(secondTime)) {
+    return false;
+  }
+  return Math.abs(firstTime - secondTime) <= 5000;
+};
+
 // For each revision activity item, find what the content was changed TO
 // by looking at the next revision's "old" body (which is this revision's "new" body)
 const getNextRevisionBody = (currentIndex: number): string | null => {
@@ -38,6 +82,22 @@ const getNextRevisionBody = (currentIndex: number): string | null => {
     }
   }
   // No next revision found - this is the most recent edit, use current discussion body
+  return null;
+};
+
+const getNextBodyRevisionForIndex = (currentIndex: number): string | null => {
+  const items = reversedFeedItems.value;
+  for (let i = currentIndex + 1; i < items.length; i++) {
+    const item = items[i] as ModerationAction & {
+      Revision?: { body?: string };
+    };
+    if (!isDiscussionBodyEdit(item)) {
+      continue;
+    }
+    if (item.Revision?.body) {
+      return item.Revision.body;
+    }
+  }
   return null;
 };
 
@@ -74,6 +134,57 @@ const getCommentEditIndex = (currentIndex: number): number | null => {
   }
   return editIndex;
 };
+
+const displayFeedItems = computed(() => {
+  const items = reversedFeedItems.value;
+  const result: Array<{
+    activityItem: ModerationAction;
+    pairedActivityItem: ModerationAction | null;
+    nextRevisionBody: string | null;
+    pairedNextRevisionBody: string | null;
+    commentEditIndex: number | null;
+  }> = [];
+
+  for (let i = 0; i < items.length; i++) {
+    const current = items[i];
+    const next = items[i + 1];
+    const canPair =
+      next &&
+      getActorKey(current) &&
+      getActorKey(current) === getActorKey(next) &&
+      wasTriggeredTogether(current, next) &&
+      ((isDiscussionTitleEdit(current) && isDiscussionBodyEdit(next)) ||
+        (isDiscussionBodyEdit(current) && isDiscussionTitleEdit(next)));
+
+    if (canPair) {
+      result.push({
+        activityItem: current,
+        pairedActivityItem: next,
+        nextRevisionBody: isDiscussionBodyEdit(current)
+          ? getNextBodyRevisionForIndex(i)
+          : getNextRevisionBody(i),
+        pairedNextRevisionBody: isDiscussionBodyEdit(next)
+          ? getNextBodyRevisionForIndex(i + 1)
+          : getNextRevisionBody(i + 1),
+        commentEditIndex: getCommentEditIndex(i),
+      });
+      i++;
+      continue;
+    }
+
+    result.push({
+      activityItem: current,
+      pairedActivityItem: null,
+      nextRevisionBody: isDiscussionBodyEdit(current)
+        ? getNextBodyRevisionForIndex(i)
+        : getNextRevisionBody(i),
+      pairedNextRevisionBody: null,
+      commentEditIndex: getCommentEditIndex(i),
+    });
+  }
+
+  return result;
+});
 </script>
 
 <template>
@@ -81,16 +192,20 @@ const getCommentEditIndex = (currentIndex: number): number | null => {
     <NuxtPage />
     <ul role="list">
       <ActivityFeedListItem
-        v-for="(activityItem, index) in reversedFeedItems"
-        :key="activityItem.id"
-        :activity-item="activityItem"
+        v-for="displayItem in displayFeedItems"
+        :key="displayItem.activityItem.id"
+        :activity-item="displayItem.activityItem"
+        :paired-activity-item="displayItem.pairedActivityItem"
         :is-original-poster="
-          activityItem.User?.username === originalUserAuthorUsername ||
-          activityItem.ModerationProfile?.displayName === originalModAuthorName
+          displayItem.activityItem.User?.username ===
+            originalUserAuthorUsername ||
+          displayItem.activityItem.ModerationProfile?.displayName ===
+            originalModAuthorName
         "
         :related-discussion="relatedDiscussion"
-        :next-revision-body="getNextRevisionBody(index)"
-        :comment-edit-index="getCommentEditIndex(index)"
+        :next-revision-body="displayItem.nextRevisionBody"
+        :paired-next-revision-body="displayItem.pairedNextRevisionBody"
+        :comment-edit-index="displayItem.commentEditIndex"
       />
     </ul>
   </div>

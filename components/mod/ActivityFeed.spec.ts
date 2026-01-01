@@ -19,9 +19,9 @@ vi.mock('@vue/apollo-composable', () => ({
 
 const ActivityFeedListItemStub = {
   name: 'ActivityFeedListItem',
-  props: ['commentEditIndex', 'activityItem'],
+  props: ['commentEditIndex', 'activityItem', 'pairedActivityItem'],
   template:
-    '<div class="activity-item" :data-comment-edit-index="commentEditIndex"></div>',
+    '<div class="activity-item" :data-comment-edit-index="commentEditIndex" :data-has-paired="Boolean(pairedActivityItem)"></div>',
 };
 
 const NuxtPageStub = {
@@ -68,5 +68,44 @@ describe('ActivityFeed', () => {
     expect(items).toHaveLength(2);
     expect(items[0].attributes()['data-comment-edit-index']).toBe('1');
     expect(items[1].attributes()['data-comment-edit-index']).toBe('0');
+  });
+
+  it('pairs discussion title/body edits from the same action', () => {
+    const feedItems = [
+      {
+        id: 'title-edit',
+        actionType: 'edit',
+        actionDescription: 'edited the discussion title',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        ModerationProfile: { displayName: 'mod-1' },
+        Revision: { id: 'rev-title', body: 'Old title', createdAt: '2024-01-01T00:00:00.000Z' },
+      },
+      {
+        id: 'body-edit',
+        actionType: 'edit',
+        actionDescription: 'edited the discussion body',
+        createdAt: '2024-01-01T00:00:01.000Z',
+        ModerationProfile: { displayName: 'mod-1' },
+        Revision: { id: 'rev-body', body: 'Old body', createdAt: '2024-01-01T00:00:01.000Z' },
+      },
+    ];
+
+    const wrapper = mount(ActivityFeed, {
+      props: {
+        feedItems,
+        originalUserAuthorUsername: '',
+        originalModAuthorName: '',
+      },
+      global: {
+        stubs: {
+          ActivityFeedListItem: ActivityFeedListItemStub,
+          NuxtPage: NuxtPageStub,
+        },
+      },
+    });
+
+    const items = wrapper.findAll('.activity-item');
+    expect(items).toHaveLength(1);
+    expect(items[0].attributes()['data-has-paired']).toBe('true');
   });
 });
