@@ -15,6 +15,7 @@
     "lint": "eslint",
     "lint:a11y": "npx eslint \"components/**/*.vue\" --quiet",
     "prepare": "husky install",
+    "prettier:check": "prettier --check .",
     "start": "nuxt start",
     "test": "cypress open",
     "test:unit": "vitest",
