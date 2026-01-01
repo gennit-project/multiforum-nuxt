@@ -70,11 +70,12 @@ const loadMore = () => {
 };
 
 const issueCount = computed(() => {
-  return issueResult.value?.moderationProfiles[0]?.AuthoredIssues?.length || 0;
+  return issueResult.value?.moderationProfiles?.[0]?.AuthoredIssues?.length || 0;
 });
 
 const issues = computed(() => {
-  const result = issueResult.value?.moderationProfiles[0]?.AuthoredIssues || [];
+  const result =
+    issueResult.value?.moderationProfiles?.[0]?.AuthoredIssues || [];
   if ((result.length === 0 && loading.value) || error.value) {
     return [];
   }
@@ -85,9 +86,7 @@ const issues = computed(() => {
 <template>
   <div class="py-3 dark:text-white">
     <ErrorBanner v-if="error" :text="error.message" />
-    <ErrorBanner v-if="getModError">
-      {{ getModError.message }}
-    </ErrorBanner>
+    <ErrorBanner v-if="getModError" :text="getModError.message" />
     <div
       v-else-if="
         issueResult?.moderationProfiles?.length === 0 || issueCount === 0
@@ -107,8 +106,7 @@ const issues = computed(() => {
       <LoadMore
         class="justify-self-center"
         :reached-end-of-results="
-          commentsAggregate ===
-          issueResult?.moderationProfiles[0]?.AuthoredComments?.length
+          commentsAggregate === issueCount
         "
         @load-more="loadMore"
       />

@@ -69,9 +69,6 @@ const tabs = computed(() => {
       :key="tab.name"
       :to="tab.href"
       :label="tab.name"
-      :is-active="
-        route && typeof route.name === 'string' && route.name.includes(tab.name)
-      "
       :count="tab.count || undefined"
       :show-count="showCounts && !!tab.count"
     />

@@ -51,6 +51,7 @@ const reportCountLabel = computed(() => {
       <div class="flex-col">
         <span v-if="issue.Channel" class="flex flex-wrap items-center gap-2">
           <nuxt-link
+            v-if="issue.issueNumber"
             class="hover:underline dark:text-gray-200"
             :to="{
               name: 'forums-forumId-issues-issueNumber',
@@ -62,6 +63,7 @@ const reportCountLabel = computed(() => {
           >
             {{ issue.title }}
           </nuxt-link>
+          <span v-else class="dark:text-gray-200">{{ issue.title }}</span>
           <span
             v-if="issue.flaggedServerRuleViolation"
             class="rounded-lg bg-gray-200 px-2 py-1 text-xs dark:bg-gray-700 dark:text-white"

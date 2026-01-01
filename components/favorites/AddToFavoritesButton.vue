@@ -41,7 +41,11 @@ const emit = defineEmits<{
 const isAnimating = ref(false);
 const showTooltip = ref(false);
 const showPopover = ref(false);
-const tooltipPosition = ref({ top: 0, left: 0, placement: 'below' as 'below' | 'above' });
+const tooltipPosition = ref({
+  top: 0,
+  left: 0,
+  placement: 'below' as 'below' | 'above',
+});
 
 type PopoverPosition = {
   top: number;
@@ -157,7 +161,7 @@ const updateTooltipPosition = async () => {
   const viewportHeight = window.innerHeight;
 
   // Calculate horizontal position (center tooltip under button)
-  let left = buttonRect.left + (buttonRect.width / 2) - (tooltipRect.width / 2);
+  let left = buttonRect.left + buttonRect.width / 2 - tooltipRect.width / 2;
 
   // Check if tooltip would go off the right edge
   if (left + tooltipRect.width > viewportWidth - 10) {
@@ -240,7 +244,7 @@ watch(
 <template>
   <RequireAuth :full-width="false">
     <template #has-auth>
-      <div class="relative inline-block">
+      <div class="align-center relative flex justify-end">
         <button
           ref="buttonRef"
           type="button"
@@ -252,7 +256,7 @@ watch(
               !isFavorited,
             'text-green-500 hover:text-green-600': isFavorited,
             'animate-pulse-once': isAnimating,
-            'opacity-50 cursor-not-allowed': isLoading,
+            'cursor-not-allowed opacity-50': isLoading,
           }"
           @click="handleClick"
           @mouseenter="handleMouseEnter"
@@ -326,7 +330,7 @@ watch(
           ref="buttonRef"
           type="button"
           :aria-label="`Add ${displayName || entityType} to favorites`"
-          class="add-to-favorites-button rounded-full p-1 transition-all duration-200 text-gray-400 hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400 cursor-pointer"
+          class="add-to-favorites-button cursor-pointer rounded-full p-1 text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400"
           @click="handleClick"
           @mouseenter="handleMouseEnter"
           @mouseleave="handleMouseLeave"

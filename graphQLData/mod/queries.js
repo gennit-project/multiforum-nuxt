@@ -95,6 +95,7 @@ export const GET_MOD = gql`
         options: { limit: 25, offset: 0, sort: { createdAt: DESC } }
       ) {
         id
+        issueNumber
         title
         createdAt
         updatedAt
@@ -172,6 +173,7 @@ export const GET_MOD_ISSUES = gql`
         options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
       ) {
         id
+        issueNumber
         title
         createdAt
         updatedAt

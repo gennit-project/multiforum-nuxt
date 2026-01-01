@@ -388,17 +388,23 @@ const replyCount = computed(() => {
 const textCopy = computed(() => props.commentData.text);
 
 const canShowPermalink = computed(() => {
+  const channelUniqueName =
+    props.commentData.Channel?.uniqueName ||
+    props.commentData?.DiscussionChannel?.channelUniqueName;
+  const hasForumContext = !!(channelUniqueName || forumId.value);
+
   return !!(
     props.commentData.DiscussionChannel ||
-    props.commentData.GivesFeedbackOnDiscussion ||
-    props.commentData.GivesFeedbackOnEvent ||
-    props.commentData.GivesFeedbackOnComment ||
     props.commentData.Event ||
     props.commentData.Issue ||
     props.commentData.Channel ||
     (issueNumber && forumId.value && props.commentData.id) || // For issue comments
     (discussionId && forumId.value) || // For discussion comments
-    (eventId && forumId.value) // For event comments
+    (eventId && forumId.value) || // For event comments
+    (hasForumContext &&
+      (props.commentData.GivesFeedbackOnDiscussion ||
+        props.commentData.GivesFeedbackOnEvent ||
+        props.commentData.GivesFeedbackOnComment))
   );
 });
 
@@ -412,7 +418,6 @@ const isFeedbackComment = computed(() => {
 
 const permalinkObject = computed(() => {
   if (!canShowPermalink.value) {
-    console.warn('No permalink object found for comment', props.commentData);
     return {};
   }
 
@@ -428,6 +433,9 @@ const permalinkObject = computed(() => {
   }
 
   if (isFeedbackComment.value) {
+    if (!channelUniqueName && !forumId.value) {
+      return {};
+    }
     return getFeedbackPermalinkObject({
       routeName: route.name as string,
       forumId: channelUniqueName || (forumId.value as string),
@@ -437,13 +445,13 @@ const permalinkObject = computed(() => {
         props.commentData?.DiscussionChannel?.discussionId,
       eventId:
         props.commentData.GivesFeedbackOnEvent?.id || (eventId as string),
-      commentId: props.commentData.GivesFeedbackOnComment?.id,
+      commentId: props.commentData.id,
       GivesFeedbackOnComment:
         props.commentData.GivesFeedbackOnComment || undefined,
       GivesFeedbackOnDiscussion:
         props.commentData.GivesFeedbackOnDiscussion || undefined,
       GivesFeedbackOnEvent: props.commentData.GivesFeedbackOnEvent || undefined,
-    });
+    }) || {};
   }
   // This is the default comment permalink object
   let result = {};
