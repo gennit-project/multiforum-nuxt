@@ -11,6 +11,33 @@ on:
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
+    env:
+      GRAPHQL_URL_FOR_TYPES: ${{ secrets.GRAPHQL_URL_FOR_TYPES }}
+      VITE_GRAPHQL_URL: ${{ secrets.VITE_GRAPHQL_URL }}
+      VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
+      VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
+      VITE_GOOGLE_MAP_ID: ${{ secrets.VITE_GOOGLE_MAP_ID }}
+      VITE_OPEN_CAGE_API_KEY: ${{ secrets.VITE_OPEN_CAGE_API_KEY }}
+      VITE_AUTH0_DOMAIN: ${{ secrets.VITE_AUTH0_DOMAIN }}
+      VITE_OPEN_GRAPH_API_KEY: ${{ secrets.VITE_OPEN_GRAPH_API_KEY }}
+      VITE_LOGOUT_URL: ${{ secrets.VITE_LOGOUT_URL }}
+      VITE_AUTH0_USERNAME: ${{ secrets.VITE_AUTH0_USERNAME }}
+      VITE_AUTH0_PASSWORD: ${{ secrets.VITE_AUTH0_PASSWORD }}
+      VITE_AUTH0_USERNAME_2: ${{ secrets.VITE_AUTH0_USERNAME_2 }}
+      VITE_AUTH0_PASSWORD_2: ${{ secrets.VITE_AUTH0_PASSWORD_2 }}
+      VITE_AUTH0_URL: ${{ secrets.VITE_AUTH0_URL }}
+      VITE_AUTH0_AUDIENCE: ${{ secrets.VITE_AUTH0_AUDIENCE }}
+      VITE_AUTH0_SCOPE: ${{ secrets.VITE_AUTH0_SCOPE }}
+      VITE_AUTH0_CLIENT_ID: ${{ secrets.VITE_AUTH0_CLIENT_ID }}
+      VITE_AUTH0_CLIENT_SECRET: ${{ secrets.VITE_AUTH0_CLIENT_SECRET }}
+      VITE_AUTH0_CALLBACK_URL: ${{ secrets.VITE_AUTH0_CALLBACK_URL }}
+      VITE_GOOGLE_CLOUD_STORAGE_BUCKET: ${{ secrets.VITE_GOOGLE_CLOUD_STORAGE_BUCKET }}
+      VITE_SENTRY_AUTH_TOKEN: ${{ secrets.VITE_SENTRY_AUTH_TOKEN }}
+      VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+      VITE_LIGHTGALLERY_LICENSE_KEY: ${{ secrets.VITE_LIGHTGALLERY_LICENSE_KEY }}
+      NITRO_PRESET: ${{ secrets.NITRO_PRESET }}
+      VITE_SERVER_NAME: ${{ secrets.VITE_SERVER_NAME }}
+      VITE_ENVIRONMENT: ${{ secrets.VITE_ENVIRONMENT }}
 
     steps:
     - name: Checkout code
