@@ -498,7 +498,7 @@ const isClientSide = typeof window !== 'undefined';
             />
             <EventList
               v-else-if="eventResult && eventResult.events"
-              class="mt-48 pt-0"
+              class="mt-4 pt-0"
               :events="eventResult.events"
               :channel-id="channelId"
               :highlighted-event-location-id="highlightedEventLocationId"
@@ -519,7 +519,7 @@ const isClientSide = typeof window !== 'undefined';
         </div>
 
         <div
-          class="fixed right-0 h-screen w-1/2 bg-gray-300 dark:bg-black lg:w-[calc(50%-2.5rem)]"
+          class="fixed top-0 right-0 h-screen w-1/2 bg-gray-300 dark:bg-black lg:w-[calc(50%-2.5rem)]"
         >
           <LoadingSpinner v-if="eventLoading" class="mx-auto my-4" />
           <ErrorBanner
