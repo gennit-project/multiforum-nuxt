@@ -106,6 +106,7 @@ module.exports = {
       },
       orange: {
         // Bright creamsicle orange with improved contrast
+        950: '#2a1409',
         900: '#3b1c0e',
         800: '#4c2712',
         700: '#5e3317',
