@@ -5,6 +5,7 @@ import {
   watch,
   watchEffect,
   useSlots,
+  onMounted,
   Comment as VueComment,
   Fragment as VueFragment,
 } from 'vue';
@@ -170,6 +171,7 @@ const showMarkedAsBestAnswerNotification = ref(false);
 const showUnmarkedAsBestAnswerNotification = ref(false);
 
 const slots = useSlots();
+const isMounted = ref(false);
 const hasMeaningfulSlotContent = (nodes?: VNode[]): boolean => {
   if (!nodes || nodes.length === 0) return false;
   return nodes.some((node) => {
@@ -190,6 +192,9 @@ const hasMeaningfulSlotContent = (nodes?: VNode[]): boolean => {
 };
 const hasDefaultSlot = computed(() =>
   hasMeaningfulSlotContent(slots.default?.())
+);
+const shouldRenderDefaultSlot = computed(
+  () => hasDefaultSlot.value && isMounted.value
 );
 const hasPreHeaderSlot = computed(() =>
   hasMeaningfulSlotContent(slots['pre-header']?.())
@@ -216,6 +221,10 @@ const locked = ref(props.locked);
 const hasLoadedComments = ref(
   (props.comments?.length || 0) > 0 || !props.loading
 );
+
+onMounted(() => {
+  isMounted.value = true;
+});
 
 watch(
   () => props.comments?.length || 0,
@@ -711,7 +720,7 @@ const lengthOfCommentInProgress = computed(() => {
           :show-top-options="false"
         />
       </div>
-      <div v-if="hasDefaultSlot" class="my-2"><slot /></div>
+      <div v-if="shouldRenderDefaultSlot" class="my-2"><slot /></div>
       <PinnedAnswers
         v-if="answers?.length > 0"
         :answers="answers"
