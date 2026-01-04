@@ -21,6 +21,7 @@ import { GET_USER } from '@/graphQLData/user/queries';
 import Notification from '@/components/NotificationComponent.vue';
 import SubscribeButton from '@/components/SubscribeButton.vue';
 import InlineCommentForm from '@/components/discussion/form/InlineCommentForm.vue';
+import DiscussionRootCommentFormWrapper from '@/components/discussion/form/DiscussionRootCommentFormWrapper.vue';
 
 const COMMENT_LIMIT = 50;
 
@@ -451,7 +452,15 @@ const handleSubscriptionToggle = () => {
         />
       </ClientOnly>
     </template>
-    <slot />
+    <template #default>
+      <DiscussionRootCommentFormWrapper
+        v-if="isMounted && discussionChannel && !archived && !locked"
+        class="pr-1"
+        :discussion-channel="discussionChannel"
+        :mod-name="modName"
+        :previous-offset="previousOffset"
+      />
+    </template>
   </CommentSection>
 
   <!-- Notification toasts -->

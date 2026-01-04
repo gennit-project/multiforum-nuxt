@@ -147,7 +147,8 @@ const {
         return;
       }
 
-      cache.writeFragment({
+      // First, make sure the full comment data is written to the cache
+      const commentRef = cache.writeFragment({
         data: newComment,
         fragment: gql`
           fragment NewCommentWithDetails on Comment {
@@ -181,6 +182,7 @@ const {
         `,
       });
 
+      // Read the current query result from the cache
       const commentSectionQueryVariables = {
         discussionId: props.discussionChannel.discussionId,
         channelUniqueName: props.discussionChannel.channelUniqueName,
@@ -197,6 +199,7 @@ const {
       }) as { getCommentSection: any } | null;
 
       if (queryResult?.getCommentSection) {
+        // Update the Comments array within getCommentSection
         cache.writeQuery({
           query: GET_DISCUSSION_COMMENTS,
           variables: commentSectionQueryVariables,
@@ -205,6 +208,31 @@ const {
             getCommentSection: {
               ...queryResult.getCommentSection,
               Comments: [newComment, ...queryResult.getCommentSection.Comments],
+            },
+          },
+        });
+      } else {
+        console.warn(
+          'Could not read query result from cache, falling back to direct modification'
+        );
+
+        // Fallback: try to modify the ROOT_QUERY directly
+        const queryId = cache.identify({
+          __typename: 'Query',
+        });
+
+        cache.modify({
+          id: queryId,
+          fields: {
+            getCommentSection(existingSection = {}, { readField }) {
+              if (!existingSection) return existingSection;
+
+              const existingComments =
+                (readField('Comments', existingSection) as any[]) || [];
+              return {
+                ...existingSection,
+                Comments: [commentRef, ...existingComments],
+              };
             },
           },
         });

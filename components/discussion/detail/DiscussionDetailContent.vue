@@ -25,7 +25,6 @@ import AlbumEditForm from './AlbumEditForm.vue';
 import ArchivedDiscussionInfoBanner from './ArchivedDiscussionInfoBanner.vue';
 import DiscussionLayoutManager from './DiscussionLayoutManager.vue';
 import FeedbackModalManager from './FeedbackModalManager.vue';
-import DiscussionRootCommentFormWrapper from '@/components/discussion/form/DiscussionRootCommentFormWrapper.vue';
 
 const COMMENT_LIMIT = 50;
 
@@ -476,16 +475,7 @@ const handleEditAlbum = () => {
               :reached-end-of-results="reachedEndOfResults"
               :answers="answers"
               @load-more="loadMore"
-            >
-              <DiscussionRootCommentFormWrapper
-                v-if="activeDiscussionChannel && !isArchived && !locked"
-                :key="`${channelId}${discussionId}`"
-                class="pr-1"
-                :discussion-channel="activeDiscussionChannel || undefined"
-                :mod-name="loggedInUserModName"
-                :previous-offset="previousOffset"
-              />
-            </DiscussionCommentsWrapper>
+            />
           </div>
           <DiscussionChannelLinks
             v-if="discussion && (discussion as Discussion).DiscussionChannels"
