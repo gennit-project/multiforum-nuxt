@@ -389,6 +389,43 @@ When testing moderator permissions:
 - Verify that unprivileged users don't see moderation options
 - Test that suspended moderators can't access moderation features
 
+## SSR and Hydration
+
+### Preventing Hydration Mismatches
+
+Hydration errors occur when the server-rendered HTML doesn't match what the client expects to render. Common causes:
+
+1. **`v-if` conditions with async data**: If a condition depends on data that may differ between server and client (e.g., GraphQL query results, auth state), wrap the content in `<ClientOnly>`.
+
+2. **Slot content with client-dependent conditions**: When passing slot content that has `v-if` conditions depending on async data, wrap the content in `<ClientOnly>` **at the source** (where the slot content is defined), not in the child component receiving the slot.
+
+   ```vue
+   <!-- WRONG: ClientOnly in the child component doesn't help -->
+   <!-- components/Child.vue -->
+   <template>
+     <ClientOnly>
+       <slot />
+     </ClientOnly>
+   </template>
+
+   <!-- CORRECT: ClientOnly wraps the content at the source -->
+   <!-- components/Parent.vue -->
+   <template>
+     <Child>
+       <ClientOnly>
+         <MyComponent v-if="asyncData" />
+       </ClientOnly>
+     </Child>
+   </template>
+   ```
+
+3. **Auth-dependent UI**: Components that show different content based on authentication state should use `<ClientOnly>` since auth state is client-side only.
+
+### Key Files with ClientOnly Wrappers
+
+- `components/discussion/detail/DiscussionDetailContent.vue` - Comment form wrappers
+- `components/discussion/detail/DiscussionCommentsWrapper.vue` - Subscribe button
+
 ## Project Structure
 
 - Components in `components/` directory with subdirectories for features

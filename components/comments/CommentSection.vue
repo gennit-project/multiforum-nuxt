@@ -1,14 +1,5 @@
 <script lang="ts" setup>
-import {
-  ref,
-  computed,
-  watch,
-  watchEffect,
-  useSlots,
-  onMounted,
-  Comment as VueComment,
-  Fragment as VueFragment,
-} from 'vue';
+import { ref, computed, watch, watchEffect } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import Comment from './Comment.vue';
 import LoadMore from '../LoadMore.vue';
@@ -37,7 +28,7 @@ import type {
   CreateReplyInputData,
   DeleteCommentInputData,
 } from '@/types/Comment';
-import type { Ref, PropType, VNode } from 'vue';
+import type { Ref, PropType } from 'vue';
 import { modProfileNameVar } from '@/cache';
 import { useRouter, useRoute } from 'nuxt/app';
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
@@ -170,38 +161,6 @@ const showCopiedLinkNotification = ref(false);
 const showMarkedAsBestAnswerNotification = ref(false);
 const showUnmarkedAsBestAnswerNotification = ref(false);
 
-const slots = useSlots();
-const isMounted = ref(false);
-const hasMeaningfulSlotContent = (nodes?: VNode[]): boolean => {
-  if (!nodes || nodes.length === 0) return false;
-  return nodes.some((node) => {
-    if (node.type === VueComment) {
-      return false;
-    }
-    if (node.type === VueFragment && Array.isArray(node.children)) {
-      return hasMeaningfulSlotContent(node.children as VNode[]);
-    }
-    if (typeof node.children === 'string') {
-      return node.children.trim().length > 0;
-    }
-    if (Array.isArray(node.children)) {
-      return hasMeaningfulSlotContent(node.children as VNode[]);
-    }
-    return true;
-  });
-};
-const hasDefaultSlot = computed(() =>
-  hasMeaningfulSlotContent(slots.default?.())
-);
-const shouldRenderDefaultSlot = computed(
-  () => hasDefaultSlot.value && isMounted.value
-);
-const hasPreHeaderSlot = computed(() =>
-  hasMeaningfulSlotContent(slots['pre-header']?.())
-);
-const hasSubscriptionSlot = computed(() =>
-  hasMeaningfulSlotContent(slots['subscription-button']?.())
-);
 
 // Moderation related state
 const commentToArchiveId = ref('');
@@ -221,10 +180,6 @@ const locked = ref(props.locked);
 const hasLoadedComments = ref(
   (props.comments?.length || 0) > 0 || !props.loading
 );
-
-onMounted(() => {
-  isMounted.value = true;
-});
 
 watch(
   () => props.comments?.length || 0,
@@ -702,17 +657,13 @@ const lengthOfCommentInProgress = computed(() => {
 <template>
   <div class="pr-2">
     <div>
-      <div v-if="hasPreHeaderSlot">
-        <slot name="pre-header" />
-      </div>
+      <slot name="pre-header" />
       <div class="align-items flex justify-between">
         <div class="flex w-full items-center justify-between space-x-4">
           <h2 id="comments" class="px-1 text-lg dark:text-white">
             {{ `Comments (${aggregateCommentCount})` }}
           </h2>
-          <div v-if="hasSubscriptionSlot" class="flex items-center">
-            <slot name="subscription-button" />
-          </div>
+          <slot name="subscription-button" />
         </div>
         <SortButtons
           v-if="showCommentSortButtons && aggregateCommentCount > 0"
@@ -720,7 +671,7 @@ const lengthOfCommentInProgress = computed(() => {
           :show-top-options="false"
         />
       </div>
-      <div v-if="shouldRenderDefaultSlot" class="my-2"><slot /></div>
+      <slot />
       <PinnedAnswers
         v-if="answers?.length > 0"
         :answers="answers"

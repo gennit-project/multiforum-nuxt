@@ -6,7 +6,7 @@ import type {
 } from '@/__generated__/graphql';
 import type { ApolloCache } from '@apollo/client/core';
 import type { PropType } from 'vue';
-import { computed, defineProps, ref } from 'vue';
+import { computed, defineProps, ref, onMounted } from 'vue';
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import type { CreateEditCommentFormValues } from '@/types/Comment';
 import CommentSection from '@/components/comments/CommentSection.vue';
@@ -20,6 +20,7 @@ import {
 import { GET_USER } from '@/graphQLData/user/queries';
 import Notification from '@/components/NotificationComponent.vue';
 import SubscribeButton from '@/components/SubscribeButton.vue';
+import InlineCommentForm from '@/components/discussion/form/InlineCommentForm.vue';
 
 const COMMENT_LIMIT = 50;
 
@@ -108,6 +109,14 @@ const createCommentDefaultValues: CreateEditCommentFormValues = {
 const createFormValues = ref<CreateEditCommentFormValues>(
   createCommentDefaultValues
 );
+
+// Track mounted state to prevent hydration mismatches
+// On SSR and initial hydration: isMounted is false, form doesn't render
+// After mount: isMounted becomes true, form can render
+const isMounted = ref(false);
+onMounted(() => {
+  isMounted.value = true;
+});
 
 const channelId = computed(() => {
   if (typeof route.params.forumId === 'string') {
@@ -425,14 +434,22 @@ const handleSubscriptionToggle = () => {
     @load-more="$emit('loadMore')"
   >
     <template #pre-header>
-      <slot name="pre-header" />
+      <div v-if="isMounted && discussionChannel && !archived && !locked">
+        <InlineCommentForm
+          :discussion-channel="discussionChannel"
+          :mod-name="modName"
+          :previous-offset="previousOffset"
+        />
+      </div>
     </template>
     <template #subscription-button>
-      <SubscribeButton
-        :is-subscribed="isSubscribed"
-        :loading="subscriptionLoading"
-        @toggle="handleSubscriptionToggle"
-      />
+      <ClientOnly>
+        <SubscribeButton
+          :is-subscribed="isSubscribed"
+          :loading="subscriptionLoading"
+          @toggle="handleSubscriptionToggle"
+        />
+      </ClientOnly>
     </template>
     <slot />
   </CommentSection>

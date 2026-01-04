@@ -61,14 +61,11 @@ export function useTestAuthHelpers() {
     }
   };
 
-  // Expose immediately
-  exposeToWindow();
-
-  // Re-expose after mount to ensure it's available
+  // Only expose after mount to prevent SSR/hydration issues
   onMounted(() => {
     exposeToWindow();
     if (shouldLog) {
-      console.log('🔧 Test auth helpers re-exposed after mount');
+      console.log('🔧 Test auth helpers exposed after mount');
     }
   });
 
