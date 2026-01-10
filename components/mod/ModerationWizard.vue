@@ -390,7 +390,8 @@ const editButtonDisabled = computed(() => {
 
                     <div v-if="editActions.length" class="flex flex-col gap-2">
                       <p class="text-sm text-gray-700 dark:text-gray-300">
-                        Address the violation by editing the original post or
+                        As an alternative to simply closing the issue, you can
+                        address the violation by editing the original post or
                         taking stronger action.
                       </p>
                       <p

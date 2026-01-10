@@ -3,7 +3,8 @@ import { computed, ref } from 'vue';
 import GenericModal from '@/components/GenericModal.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import UserPlus from '@/components/icons/UserPlus.vue';
-import { useMutation } from '@vue/apollo-composable';
+import { useApolloClient, useMutation } from '@vue/apollo-composable';
+import { GET_ISSUE } from '@/graphQLData/issue/queries';
 import { IS_ORIGINAL_POSTER_SUSPENDED } from '@/graphQLData/mod/queries';
 import { UNSUSPEND_USER } from '@/graphQLData/mod/mutations';
 
@@ -26,6 +27,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'unsuspendedSuccessfully']);
 
 const explanation = ref('No violation');
+const client = useApolloClient().client;
 
 const {
   mutate: unsuspendUser,
@@ -47,6 +49,9 @@ const {
 });
 
 unsuspendDone(() => {
+  client.refetchQueries({
+    include: [GET_ISSUE],
+  });
   emit('unsuspendedSuccessfully');
 });
 
