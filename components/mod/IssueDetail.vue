@@ -730,31 +730,6 @@ watch(
   { immediate: true }
 );
 
-const activityFeedAuthor = computed(() => {
-  const items = activeIssue.value?.ActivityFeed || [];
-  for (const item of items) {
-    const author = getOriginalPoster({ Comment: item?.Comment });
-    if (author.username || author.modProfileName) {
-      return author;
-    }
-  }
-  return null;
-});
-
-watch(
-  () => activityFeedAuthor.value,
-  (author) => {
-    if (!author) return;
-    if (!originalAuthorUsername.value && author.username) {
-      setOriginalAuthorUsername(author.username);
-    }
-    if (!originalModProfileName.value && author.modProfileName) {
-      setOriginalModProfileName(author.modProfileName);
-    }
-  },
-  { immediate: true }
-);
-
 watch(
   () => activeIssue.value,
   (currentIssue) => {
