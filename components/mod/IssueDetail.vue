@@ -43,6 +43,7 @@ import FlagIcon from '../icons/FlagIcon.vue';
 import MarkdownPreview from '../MarkdownPreview.vue';
 import { getAllPermissions } from '@/utils/permissionUtils';
 import { config } from '@/config';
+import { isCurrentUserOriginalPoster as isOriginalPoster } from '@/utils/originalPoster';
 
 type Issue = GeneratedIssue & { issueNumber: number };
 
@@ -702,6 +703,26 @@ const originalAuthorUsername = ref('');
 // Get the mod profile name of the original author, if applicable
 const originalModProfileName = ref('');
 
+const setOriginalAuthorUsername = (username: string) => {
+  if (username) {
+    originalAuthorUsername.value = username;
+  }
+};
+
+const setOriginalModProfileName = (modProfileName: string) => {
+  if (modProfileName) {
+    originalModProfileName.value = modProfileName;
+  }
+};
+
+watch(
+  () => relatedDiscussion.value?.Author?.username,
+  (username) => {
+    setOriginalAuthorUsername(username || '');
+  },
+  { immediate: true }
+);
+
 watch(
   () => activeIssue.value,
   (currentIssue) => {
@@ -711,14 +732,14 @@ watch(
       !originalAuthorUsername.value &&
       currentIssue.Author?.__typename === 'User'
     ) {
-      originalAuthorUsername.value = currentIssue.Author.username || '';
+      setOriginalAuthorUsername(currentIssue.Author.username || '');
     }
 
     if (
       !originalModProfileName.value &&
       currentIssue.Author?.__typename === 'ModerationProfile'
     ) {
-      originalModProfileName.value = currentIssue.Author.displayName || '';
+      setOriginalModProfileName(currentIssue.Author.displayName || '');
     }
   },
   { immediate: true }
@@ -741,7 +762,12 @@ const isOriginalModAuthor = computed(() => {
 
 // Determine if the current user is the original poster (either as user or mod)
 const isCurrentUserOriginalPoster = computed(() => {
-  return isOriginalUserAuthor.value || isOriginalModAuthor.value;
+  return isOriginalPoster({
+    originalAuthorUsername: originalAuthorUsername.value,
+    originalModProfileName: originalModProfileName.value,
+    currentUsername: usernameVar.value,
+    currentModProfileName: modProfileNameVar.value,
+  });
 });
 
 const updateComment = (text: string) => {
@@ -1005,7 +1031,7 @@ const handleDeleteComment = async (commentId: string) => {
         <DiscussionDetails
           v-if="activeIssue?.relatedDiscussionId"
           :active-issue="activeIssue"
-          @fetched-original-author-username="originalAuthorUsername = $event"
+          @fetched-original-author-username="setOriginalAuthorUsername($event)"
         />
         <ClientOnly>
           <EventDetail
@@ -1017,14 +1043,14 @@ const handleDeleteComment = async (commentId: string) => {
             :show-add-to-calendar="false"
             :show-event-in-past-banner="false"
             :show-title="true"
-            @fetched-original-author-username="originalAuthorUsername = $event"
+            @fetched-original-poster-username="setOriginalAuthorUsername($event)"
           />
         </ClientOnly>
         <CommentDetails
           v-if="activeIssue?.relatedCommentId"
           :comment-id="activeIssue.relatedCommentId"
-          @fetched-original-author-username="originalAuthorUsername = $event"
-          @fetched-original-mod-profile-name="originalModProfileName = $event"
+          @fetched-original-author-username="setOriginalAuthorUsername($event)"
+          @fetched-original-mod-profile-name="setOriginalModProfileName($event)"
         />
         <div v-if="activeIssue?.body || isIssueAuthor" class="py-2">
           <div class="mb-2 flex items-center justify-between gap-2">

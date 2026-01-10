@@ -37,6 +37,11 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  actionsDisabled: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
 const emit = defineEmits([
@@ -47,6 +52,16 @@ const emit = defineEmits([
 
 const router = useRouter();
 const showDeleteConfirmModal = ref(false);
+const canUseActions = computed(() => {
+  return props.isCurrentUserOriginalPoster && !props.actionsDisabled;
+});
+
+const disabledMessage = computed(() => {
+  if (props.actionsDisabled) {
+    return 'Original poster actions are disabled on this page.';
+  }
+  return 'Original poster actions are only available to the author of the post.';
+});
 
 // Determine what type of content this is
 const contentType = computed(() => {
@@ -120,7 +135,7 @@ const cancelDelete = () => {
         <div
           class="flex h-10 w-10 items-center justify-center rounded-lg"
           :class="[
-            isCurrentUserOriginalPoster
+            canUseActions
               ? 'bg-blue-600'
               : 'bg-gray-300 dark:bg-gray-700',
           ]"
@@ -132,13 +147,13 @@ const cancelDelete = () => {
         <div
           class="flex-1 flex-col space-y-4 rounded-lg border px-4 py-4"
           :class="[
-            isCurrentUserOriginalPoster
+            canUseActions
               ? 'border-blue-500'
               : 'border-gray-300 dark:border-gray-700',
           ]"
         >
           <h1
-            v-if="isCurrentUserOriginalPoster"
+            v-if="canUseActions"
             class="border-b border-gray-300 pb-2 text-xl font-bold text-blue-500 dark:border-gray-600"
           >
             Original Poster Actions
@@ -149,13 +164,8 @@ const cancelDelete = () => {
           >
             Original Poster Actions
           </h1>
-          <p
-            v-if="!isCurrentUserOriginalPoster"
-            class="text-gray-600 dark:text-gray-400"
-          >
-            {{
-              'Original poster actions are only available to the author of the post.'
-            }}
+          <p v-if="!canUseActions" class="text-gray-600 dark:text-gray-400">
+            {{ disabledMessage }}
           </p>
 
           <RequireAuth :full-width="true">
@@ -165,10 +175,10 @@ const cancelDelete = () => {
                 <button
                   v-if="editRoute"
                   type="button"
-                  :disabled="!isCurrentUserOriginalPoster"
+                  :disabled="!canUseActions"
                   class="flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-white"
                   :class="[
-                    isCurrentUserOriginalPoster
+                    canUseActions
                       ? 'cursor-pointer bg-blue-600 hover:bg-blue-500'
                       : 'cursor-not-allowed bg-gray-400',
                   ]"
@@ -185,7 +195,7 @@ const cancelDelete = () => {
                   }}
                 </button>
                 <p
-                  v-if="editRoute && isCurrentUserOriginalPoster"
+                  v-if="editRoute && canUseActions"
                   class="-mt-2 text-xs text-gray-600 dark:text-gray-400"
                 >
                   {{
@@ -198,10 +208,10 @@ const cancelDelete = () => {
                 <!-- Delete Post Button -->
                 <button
                   type="button"
-                  :disabled="!isCurrentUserOriginalPoster"
+                  :disabled="!canUseActions"
                   class="flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-white"
                   :class="[
-                    isCurrentUserOriginalPoster
+                    canUseActions
                       ? 'cursor-pointer bg-red-600 hover:bg-red-500'
                       : 'cursor-not-allowed bg-gray-400',
                   ]"

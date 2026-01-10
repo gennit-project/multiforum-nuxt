@@ -20,7 +20,10 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['fetchedOriginalAuthorUsername']);
+const emit = defineEmits([
+  'fetchedOriginalAuthorUsername',
+  'fetchedOriginalModProfileName',
+]);
 
 const route = useRoute();
 const channelId = computed(() => {
@@ -49,15 +52,15 @@ const originalComment = computed(() => {
 
 onCommentResult(({ data }) => {
   if (data?.comments?.length) {
-    const author = data.comments[0].Author;
-    const originalAuthorUsername = author?.username;
-    if (originalAuthorUsername) {
-      emit('fetchedOriginalAuthorUsername', originalAuthorUsername);
+    const author = data.comments[0].CommentAuthor;
+    if (!author) return;
+
+    if (author.__typename === 'User' && author.username) {
+      emit('fetchedOriginalAuthorUsername', author.username);
     }
 
-    const originalAuthorModProfileName = author?.modProfileName;
-    if (originalAuthorModProfileName) {
-      emit('fetchedOriginalAuthorUsername', originalAuthorModProfileName);
+    if (author.__typename === 'ModerationProfile' && author.displayName) {
+      emit('fetchedOriginalModProfileName', author.displayName);
     }
   }
 });
