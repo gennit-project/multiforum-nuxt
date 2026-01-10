@@ -12,6 +12,7 @@ import {
   getPermalinkToDiscussionComment,
   getPermalinkToEventComment,
 } from '@/utils/routerUtils';
+import { getOriginalPoster } from '@/utils/originalPoster';
 
 const props = defineProps({
   commentId: {
@@ -52,15 +53,12 @@ const originalComment = computed(() => {
 
 onCommentResult(({ data }) => {
   if (data?.comments?.length) {
-    const author = data.comments[0].CommentAuthor;
-    if (!author) return;
-
-    if (author.__typename === 'User' && author.username) {
+    const author = getOriginalPoster({ Comment: data.comments[0] });
+    if (author.username) {
       emit('fetchedOriginalAuthorUsername', author.username);
     }
-
-    if (author.__typename === 'ModerationProfile' && author.displayName) {
-      emit('fetchedOriginalModProfileName', author.displayName);
+    if (author.modProfileName) {
+      emit('fetchedOriginalModProfileName', author.modProfileName);
     }
   }
 });

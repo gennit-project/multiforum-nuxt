@@ -46,6 +46,7 @@ import { config } from '@/config';
 import {
   isCurrentUserOriginalPoster as isOriginalPoster,
   getIssueActionVisibility,
+  getOriginalPoster,
 } from '@/utils/originalPoster';
 
 type Issue = GeneratedIssue & { issueNumber: number };
@@ -721,7 +722,10 @@ const setOriginalModProfileName = (modProfileName: string) => {
 watch(
   () => relatedDiscussion.value?.Author?.username,
   (username) => {
-    setOriginalAuthorUsername(username || '');
+    const author = getOriginalPoster({ Discussion: relatedDiscussion.value });
+    if (author.username) {
+      setOriginalAuthorUsername(author.username);
+    }
   },
   { immediate: true }
 );
@@ -729,15 +733,9 @@ watch(
 const activityFeedAuthor = computed(() => {
   const items = activeIssue.value?.ActivityFeed || [];
   for (const item of items) {
-    const commentAuthor = item?.Comment?.CommentAuthor;
-    if (commentAuthor?.__typename === 'User' && commentAuthor.username) {
-      return { username: commentAuthor.username, modProfileName: '' };
-    }
-    if (
-      commentAuthor?.__typename === 'ModerationProfile' &&
-      commentAuthor.displayName
-    ) {
-      return { username: '', modProfileName: commentAuthor.displayName };
+    const author = getOriginalPoster({ Comment: item?.Comment });
+    if (author.username || author.modProfileName) {
+      return author;
     }
   }
   return null;

@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   isCurrentUserOriginalPoster,
   getIssueActionVisibility,
+  getOriginalPoster,
 } from '@/utils/originalPoster';
 
 describe('isCurrentUserOriginalPoster', () => {
@@ -65,7 +66,7 @@ describe('isCurrentUserOriginalPoster', () => {
 });
 
 describe('getIssueActionVisibility', () => {
-  it('reported comment: OP only has OP actions enabled', () => {
+  it('OP only has OP actions enabled', () => {
     expect(
       getIssueActionVisibility({
         hasRelatedContent: true,
@@ -77,55 +78,7 @@ describe('getIssueActionVisibility', () => {
     });
   });
 
-  it('reported comment: non-author only has mod actions enabled', () => {
-    expect(
-      getIssueActionVisibility({
-        hasRelatedContent: true,
-        isOriginalPoster: false,
-      })
-    ).toMatchObject({
-      opActionsEnabled: false,
-      modActionsEnabled: true,
-    });
-  });
-
-  it('reported discussion: OP only has OP actions enabled', () => {
-    expect(
-      getIssueActionVisibility({
-        hasRelatedContent: true,
-        isOriginalPoster: true,
-      })
-    ).toMatchObject({
-      opActionsEnabled: true,
-      modActionsEnabled: false,
-    });
-  });
-
-  it('reported discussion: non-author only has mod actions enabled', () => {
-    expect(
-      getIssueActionVisibility({
-        hasRelatedContent: true,
-        isOriginalPoster: false,
-      })
-    ).toMatchObject({
-      opActionsEnabled: false,
-      modActionsEnabled: true,
-    });
-  });
-
-  it('reported event: OP only has OP actions enabled', () => {
-    expect(
-      getIssueActionVisibility({
-        hasRelatedContent: true,
-        isOriginalPoster: true,
-      })
-    ).toMatchObject({
-      opActionsEnabled: true,
-      modActionsEnabled: false,
-    });
-  });
-
-  it('reported event: non-author only has mod actions enabled', () => {
+  it('non-author only has mod actions enabled', () => {
     expect(
       getIssueActionVisibility({
         hasRelatedContent: true,
@@ -147,5 +100,42 @@ describe('getIssueActionVisibility', () => {
       opActionsEnabled: false,
       modActionsEnabled: false,
     });
+  });
+});
+
+describe('original poster lookup', () => {
+  it('reads username from Discussion.Author', () => {
+    expect(
+      getOriginalPoster({ Discussion: { Author: { username: 'discussion-author' } } })
+    ).toEqual({ username: 'discussion-author', modProfileName: '' });
+  });
+
+  it('reads username from Event.Poster', () => {
+    expect(
+      getOriginalPoster({ Event: { Poster: { username: 'event-poster' } } })
+    ).toEqual({ username: 'event-poster', modProfileName: '' });
+  });
+
+  it('reads user from Comment.CommentAuthor', () => {
+    expect(
+      getOriginalPoster({
+        Comment: {
+          CommentAuthor: { __typename: 'User', username: 'comment-author' },
+        },
+      })
+    ).toEqual({ username: 'comment-author', modProfileName: '' });
+  });
+
+  it('reads mod profile from Comment.CommentAuthor', () => {
+    expect(
+      getOriginalPoster({
+        Comment: {
+          CommentAuthor: {
+            __typename: 'ModerationProfile',
+            displayName: 'ModAuthor',
+          },
+        },
+      })
+    ).toEqual({ username: '', modProfileName: 'ModAuthor' });
   });
 });

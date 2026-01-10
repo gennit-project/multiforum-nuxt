@@ -28,6 +28,7 @@ import { useRoute, useHead } from 'nuxt/app';
 import { modProfileNameVar } from '@/cache';
 import AddToCalendarButton from '../AddToCalendarButton.vue';
 import ArchivedEventInfoBanner from './ArchivedEventInfoBanner.vue';
+import { getOriginalPoster } from '@/utils/originalPoster';
 
 const formatDate = (date: string) => {
   return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);
@@ -112,8 +113,10 @@ const {
 
 onEventResult(({ data }) => {
   if (data?.events?.length) {
-    const event = data.events[0];
-    emit('fetchedOriginalPosterUsername', event.Poster?.username || '');
+    const author = getOriginalPoster({ Event: data.events[0] });
+    if (author.username) {
+      emit('fetchedOriginalPosterUsername', author.username);
+    }
   }
 });
 

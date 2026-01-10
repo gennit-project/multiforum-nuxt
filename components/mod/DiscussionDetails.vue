@@ -15,6 +15,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import MarkdownPreview from '../MarkdownPreview.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
+import { getOriginalPoster } from '@/utils/originalPoster';
 
 const props = defineProps<{
   activeIssue: Issue;
@@ -54,8 +55,10 @@ const downloadableFiles = computed(
 
 onGetDiscussionResult(({ data }) => {
   if (data?.discussions?.length) {
-    const originalAuthorUsername = data.discussions[0].Author.username;
-    emit('fetchedOriginalAuthorUsername', originalAuthorUsername);
+    const author = getOriginalPoster({ Discussion: data.discussions[0] });
+    if (author.username) {
+      emit('fetchedOriginalAuthorUsername', author.username);
+    }
   }
 });
 
