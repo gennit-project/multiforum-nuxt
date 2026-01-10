@@ -5,6 +5,11 @@ export type OriginalPosterContext = {
   currentModProfileName?: string | null;
 };
 
+export type IssueActionVisibilityContext = {
+  hasRelatedContent: boolean;
+  isOriginalPoster: boolean;
+};
+
 export const isCurrentUserOriginalPoster = (
   context: OriginalPosterContext
 ): boolean => {
@@ -25,4 +30,32 @@ export const isCurrentUserOriginalPoster = (
     currentModProfileName === originalModProfileName;
 
   return isUserAuthor || isModAuthor;
+};
+
+export const getIssueActionVisibility = (
+  context: IssueActionVisibilityContext
+): {
+  showOpActions: boolean;
+  showModActions: boolean;
+  opActionsEnabled: boolean;
+  modActionsEnabled: boolean;
+} => {
+  if (!context.hasRelatedContent) {
+    return {
+      showOpActions: false,
+      showModActions: false,
+      opActionsEnabled: false,
+      modActionsEnabled: false,
+    };
+  }
+
+  const opActionsEnabled = context.isOriginalPoster;
+  const modActionsEnabled = !context.isOriginalPoster;
+
+  return {
+    showOpActions: true,
+    showModActions: true,
+    opActionsEnabled,
+    modActionsEnabled,
+  };
 };

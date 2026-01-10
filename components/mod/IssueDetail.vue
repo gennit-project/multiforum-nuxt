@@ -43,7 +43,10 @@ import FlagIcon from '../icons/FlagIcon.vue';
 import MarkdownPreview from '../MarkdownPreview.vue';
 import { getAllPermissions } from '@/utils/permissionUtils';
 import { config } from '@/config';
-import { isCurrentUserOriginalPoster as isOriginalPoster } from '@/utils/originalPoster';
+import {
+  isCurrentUserOriginalPoster as isOriginalPoster,
+  getIssueActionVisibility,
+} from '@/utils/originalPoster';
 
 type Issue = GeneratedIssue & { issueNumber: number };
 
@@ -723,6 +726,37 @@ watch(
   { immediate: true }
 );
 
+const activityFeedAuthor = computed(() => {
+  const items = activeIssue.value?.ActivityFeed || [];
+  for (const item of items) {
+    const commentAuthor = item?.Comment?.CommentAuthor;
+    if (commentAuthor?.__typename === 'User' && commentAuthor.username) {
+      return { username: commentAuthor.username, modProfileName: '' };
+    }
+    if (
+      commentAuthor?.__typename === 'ModerationProfile' &&
+      commentAuthor.displayName
+    ) {
+      return { username: '', modProfileName: commentAuthor.displayName };
+    }
+  }
+  return null;
+});
+
+watch(
+  () => activityFeedAuthor.value,
+  (author) => {
+    if (!author) return;
+    if (!originalAuthorUsername.value && author.username) {
+      setOriginalAuthorUsername(author.username);
+    }
+    if (!originalModProfileName.value && author.modProfileName) {
+      setOriginalModProfileName(author.modProfileName);
+    }
+  },
+  { immediate: true }
+);
+
 watch(
   () => activeIssue.value,
   (currentIssue) => {
@@ -767,6 +801,13 @@ const isCurrentUserOriginalPoster = computed(() => {
     originalModProfileName: originalModProfileName.value,
     currentUsername: usernameVar.value,
     currentModProfileName: modProfileNameVar.value,
+  });
+});
+
+const issueActionVisibility = computed(() => {
+  return getIssueActionVisibility({
+    hasRelatedContent: hasRelatedContent.value,
+    isOriginalPoster: isCurrentUserOriginalPoster.value,
   });
 });
 
@@ -1127,9 +1168,7 @@ const handleDeleteComment = async (commentId: string) => {
           <ModerationWizard
             v-if="
               issue &&
-              (activeIssue?.relatedDiscussionId ||
-                activeIssue?.relatedEventId ||
-                activeIssue?.relatedCommentId)
+              issueActionVisibility.showModActions
             "
             :issue="issue"
             :discussion-id="activeIssue?.relatedDiscussionId || ''"
@@ -1137,7 +1176,7 @@ const handleDeleteComment = async (commentId: string) => {
             :comment-id="activeIssue?.relatedCommentId || ''"
             :channel-unique-name="channelId"
             :close-issue-loading="closeIssueLoading"
-            :is-current-user-original-poster="isCurrentUserOriginalPoster"
+            :is-current-user-original-poster="!issueActionVisibility.modActionsEnabled"
             :can-edit-comments="modPermissions.canEditComments"
             :can-edit-discussions="modPermissions.canEditDiscussions"
             :can-edit-events="modPermissions.canEditEvents"
@@ -1153,9 +1192,7 @@ const handleDeleteComment = async (commentId: string) => {
           <OriginalPosterActions
             v-if="
               issue &&
-              (activeIssue?.relatedDiscussionId ||
-                activeIssue?.relatedEventId ||
-                activeIssue?.relatedCommentId)
+              issueActionVisibility.showOpActions
             "
             :issue="issue"
             :discussion-id="activeIssue?.relatedDiscussionId || ''"
@@ -1163,6 +1200,7 @@ const handleDeleteComment = async (commentId: string) => {
             :comment-id="activeIssue?.relatedCommentId || ''"
             :channel-unique-name="channelId"
             :is-current-user-original-poster="isCurrentUserOriginalPoster"
+            :actions-disabled="!issueActionVisibility.opActionsEnabled"
             @delete-discussion="handleDeleteDiscussion"
             @delete-event="handleDeleteEvent"
             @delete-comment="handleDeleteComment"
