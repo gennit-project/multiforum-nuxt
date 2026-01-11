@@ -3,13 +3,23 @@ import { computed, watchEffect } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
 import UserProfileSidebar from '@/components/user/UserProfileSidebar.vue';
-import { useHead, useRoute } from 'nuxt/app';
+import { navigateTo, useHead, useRoute } from 'nuxt/app';
 import UserContributionChart from '@/components/charts/UserContributionChart.vue';
 
 const route = useRoute();
 const username = computed(() => {
   return typeof route.params.username === 'string' ? route.params.username : '';
 });
+const baseProfilePath = computed(() => `/u/${username.value}`);
+const normalizedPath = computed(() => route.path.replace(/\/+$/, ''));
+
+if (
+  normalizedPath.value === baseProfilePath.value &&
+  normalizedPath.value &&
+  username.value
+) {
+  await navigateTo(`${baseProfilePath.value}/comments`);
+}
 
 const {
   result: userResult,
@@ -17,19 +27,31 @@ const {
   error: userError,
 } = useQuery(
   GET_USER,
-  {
+  () => ({
     username: username.value,
-  },
+  }),
   {
-    enabled: !!username.value,
-    fetchPolicy: 'network-only',
+    fetchPolicy: 'cache-first',
   }
 );
 
 const user = computed(() => {
-  if (userLoading.value || userError.value) return null;
+  if (userError.value) return null;
   if (userResult.value && userResult.value.users.length > 0) {
     return userResult.value.users[0];
+  }
+  // Return a placeholder user object while loading so tabs can render
+  if (userLoading.value && username.value) {
+    return {
+      username: username.value,
+      CommentsAggregate: { count: 0 },
+      DiscussionsAggregate: { count: 0 },
+      DownloadsAggregate: { count: 0 },
+      EventsAggregate: { count: 0 },
+      ImagesAggregate: { count: 0 },
+      AdminOfChannelsAggregate: { count: 0 },
+      ModOfChannelsAggregate: { count: 0 },
+    };
   }
   return null;
 });
@@ -124,13 +146,18 @@ watchEffect(() => {
           <client-only>
             <UserContributionChart />
           </client-only>
-          <UserProfileTabs
-            v-if="user"
-            :show-counts="true"
-            :vertical="false"
-            :user="user"
-            class="block border-b border-gray-200 dark:border-gray-600"
-          />
+          <ClientOnly>
+            <UserProfileTabs
+              v-if="user"
+              :show-counts="true"
+              :vertical="false"
+              :user="user"
+              class="block border-b border-gray-200 dark:border-gray-600"
+            />
+            <template #fallback>
+              <div class="h-10 border-b border-gray-200 dark:border-gray-600" />
+            </template>
+          </ClientOnly>
           <NuxtPage />
         </div>
       </div>
