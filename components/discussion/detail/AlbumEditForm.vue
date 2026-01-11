@@ -45,7 +45,8 @@ const discussionIdInParams = computed(() => {
 const props = defineProps({
   discussion: {
     type: Object as PropType<Discussion | null | undefined>,
-    required: true,
+    required: false,
+    default: undefined,
   },
 });
 const emit = defineEmits<{
