@@ -109,7 +109,7 @@ const selectedServerRules = ref<string[]>([]);
 const reportText = ref('');
 
 // Holds the chosen suspension length if props.suspendUserEnabled is true
-const suspensionLength = ref<'' | 'two_weeks' | 'one_month' | 'indefinite'>('');
+const suspensionLength = ref<'' | 'two_weeks' | 'one_month' | 'indefinite'>('two_weeks');
 
 const toggleForumRuleSelection = (rule: string) => {
   if (selectedForumRules.value.includes(rule)) {
@@ -504,7 +504,7 @@ const close = () => {
   selectedForumRules.value = [];
   selectedServerRules.value = [];
   reportText.value = '';
-  suspensionLength.value = '';
+  suspensionLength.value = 'two_weeks';
   emit('close');
 };
 </script>
