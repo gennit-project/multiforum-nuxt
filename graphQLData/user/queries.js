@@ -106,6 +106,9 @@ export const GET_USER_COMMENTS = gql`
         Event {
           id
           title
+          EventChannels {
+            channelUniqueName
+          }
         }
         Channel {
           uniqueName

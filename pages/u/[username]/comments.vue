@@ -121,7 +121,11 @@ const isCommentOnDeletedEvent = (comment: CommentType) => {
         />
         <ArchivedCommentText
           v-if="comment?.archived"
-          :channel-id="comment.Channel?.uniqueName"
+          :channel-id="
+            comment.Channel?.uniqueName ||
+            comment.DiscussionChannel?.channelUniqueName ||
+            comment.DiscussionChannel?.Channel?.uniqueName
+          "
           :comment-id="comment.id"
         />
         <InfoBanner

@@ -917,27 +917,37 @@ const label = computed(() => {
                       props.goToPermalinkOnClick ? 'cursor-pointer' : '',
                     ]"
                   >
-                    <MarkdownPreview
-                      v-if="
-                        !goToPermalinkOnClick ||
-                        !Object.keys(permalinkObject ?? {}).length
-                      "
-                      :key="textCopy || ''"
-                      :text="textCopy || ''"
-                      :word-limit="SHOW_MORE_THRESHOLD"
-                      :disable-gallery="false"
-                    />
-                    <router-link
-                      v-else-if="Object.keys(permalinkObject ?? {}).length"
-                      :to="permalinkObject || {}"
-                    >
+                    <ClientOnly>
                       <MarkdownPreview
+                        v-if="
+                          !goToPermalinkOnClick ||
+                          !Object.keys(permalinkObject ?? {}).length
+                        "
                         :key="textCopy || ''"
                         :text="textCopy || ''"
                         :word-limit="SHOW_MORE_THRESHOLD"
-                        :disable-gallery="true"
+                        :disable-gallery="false"
                       />
-                    </router-link>
+                      <router-link
+                        v-else-if="Object.keys(permalinkObject ?? {}).length"
+                        :to="permalinkObject || {}"
+                      >
+                        <MarkdownPreview
+                          :key="textCopy || ''"
+                          :text="textCopy || ''"
+                          :word-limit="SHOW_MORE_THRESHOLD"
+                          :disable-gallery="true"
+                        />
+                      </router-link>
+                      <template #fallback>
+                        <MarkdownPreview
+                          :key="textCopy || ''"
+                          :text="textCopy || ''"
+                          :word-limit="SHOW_MORE_THRESHOLD"
+                          :disable-gallery="false"
+                        />
+                      </template>
+                    </ClientOnly>
                   </div>
                   <TextEditor
                     v-if="showEditCommentForm"

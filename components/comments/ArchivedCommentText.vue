@@ -7,7 +7,8 @@ import ArchiveBox from '@/components/icons/ArchiveBox.vue';
 const props = defineProps({
   channelId: {
     type: String,
-    required: true,
+    required: false,
+    default: '',
   },
   commentId: {
     type: String,
@@ -25,7 +26,11 @@ const issueNumber = computed(() => {
 });
 
 const markdownLinkToIssue = computed(() => {
-  if (issueNumber.value !== undefined && issueNumber.value !== null) {
+  if (
+    issueNumber.value !== undefined &&
+    issueNumber.value !== null &&
+    props.channelId
+  ) {
     return `[archived](/forums/${props.channelId}/issues/${issueNumber.value})`;
   }
   return null;
