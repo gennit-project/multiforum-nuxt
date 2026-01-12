@@ -60,31 +60,57 @@ const allEdits = computed(() => {
 
   // Add body revisions only
   if (props.discussion?.PastBodyVersions?.length) {
-    // Create current version entry
-    const currentVersion = {
+    // Create current version entry (body content only - author is set per edit)
+    const currentVersionBody = {
       id: 'current',
       body: props.discussion.body ?? undefined,
       createdAt: String(
         props.discussion.updatedAt || props.discussion.createdAt
       ),
-      Author: props.discussion.Author ?? undefined,
     };
 
     // Add past body versions
+    // With the corrected backend model:
+    // - TextVersion.Author = author of the content stored in that TextVersion (the OLD content)
+    // - BodyLastEditedBy = author of the current discussion body (the person who made the most recent edit)
     props.discussion.PastBodyVersions.forEach((version, index) => {
-      const nextVersion =
+      // The author of the OLD content is now correctly stored in version.Author
+      // (This is the author of the content being replaced, set correctly by the backend)
+
+      // The author of the NEW content (who made this edit):
+      // - For the most recent edit (index 0): use BodyLastEditedBy
+      // - For older edits: use the next TextVersion's Author (who wrote that content)
+      const authorOfNewContent =
         index === 0
-          ? currentVersion
+          ? props.discussion.BodyLastEditedBy
+          : props.discussion.PastBodyVersions[index - 1]?.Author;
+
+      // Get the new version's body content
+      const nextVersionBody =
+        index === 0
+          ? currentVersionBody
           : props.discussion.PastBodyVersions[index - 1];
+
+      // Skip if we don't have valid next version data
+      if (!nextVersionBody) {
+        return;
+      }
 
       edits.push({
         id: version.id,
         type: 'body' as const,
-        author: version.Author?.username || '[Deleted]',
+        // Show who made this edit (the author of the new content)
+        author: authorOfNewContent?.username || '[Deleted]',
         createdAt: version.createdAt,
         isCurrent: false,
+        // oldVersion.Author = author of the old content (directly from TextVersion, now correct)
         oldVersion: version,
-        newVersion: nextVersion || currentVersion,
+        newVersion: {
+          id: nextVersionBody.id,
+          body: nextVersionBody.body ?? undefined,
+          Author: authorOfNewContent,
+          createdAt: version.createdAt, // Use edit timestamp for the new version
+        },
       });
     });
   }

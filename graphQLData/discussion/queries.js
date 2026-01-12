@@ -365,6 +365,9 @@ export const GET_DISCUSSION = gql`
         editReason
         createdAt
       }
+      BodyLastEditedBy {
+        username
+      }
       CrosspostedDiscussion {
         ...CrosspostPreviewFields
       }
