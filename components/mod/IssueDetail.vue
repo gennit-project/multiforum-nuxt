@@ -721,7 +721,7 @@ const setOriginalModProfileName = (modProfileName: string) => {
 
 watch(
   () => relatedDiscussion.value?.Author?.username,
-  (username) => {
+  (_username) => {
     const author = getOriginalPoster({ Discussion: relatedDiscussion.value });
     if (author.username) {
       setOriginalAuthorUsername(author.username);
