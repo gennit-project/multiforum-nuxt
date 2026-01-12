@@ -242,7 +242,7 @@ describe('BrokenRulesModal Component', () => {
     expect((wrapper.vm as any).selectedForumRules).toEqual([]);
     expect((wrapper.vm as any).selectedServerRules).toEqual([]);
     expect((wrapper.vm as any).reportText).toBe('');
-    expect((wrapper.vm as any).suspensionLength).toBe('');
+    expect((wrapper.vm as any).suspensionLength).toBe('two_weeks');
   });
 
   it('generates correct formatted comment text', async () => {
