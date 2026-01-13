@@ -77,7 +77,7 @@ The `discussionChannel.created` event provides the channel context needed for ch
 
 **Goal**: Allow channel admins to configure plugins that run when content is submitted to their channel.
 
-### 9.1 Backend: New Event Type
+### 9.1 Backend: New Event Type ✅ COMPLETED
 
 **Event**: `discussionChannel.created`
 
@@ -86,10 +86,10 @@ The `discussionChannel.created` event provides the channel context needed for ch
 - The Discussion has `hasDownload: true`
 - The Channel has `pluginPipelines` configured
 
-**Files to Modify**:
-- [ ] `typeDefs.ts` - Add `pluginPipelines: JSON` to Channel type
-- [ ] `services/pluginRunner.ts` - Handle new event type
-- [ ] Create trigger in discussion submission flow
+**Files Modified**:
+- [x] `typeDefs.ts` - Added `pluginPipelines: JSON` to Channel type
+- [x] `services/pluginRunner.ts` - Added `triggerChannelPluginPipeline()` function
+- [x] `createDiscussionWithChannelConnections.ts` - Triggers channel pipeline on submission
 
 **Schema Changes**:
 ```graphql
@@ -105,7 +105,7 @@ input EventPipelineInput {
 }
 ```
 
-### 9.2 Backend: Channel Pipeline Mutation
+### 9.2 Backend: Channel Pipeline Mutation ✅ COMPLETED
 
 **New Mutation**: `updateChannelPluginPipelines`
 
@@ -120,21 +120,22 @@ type Mutation {
 
 **File**: `customResolvers/mutations/updateChannelPluginPipelines.ts`
 
-**Tasks**:
-- [ ] Create mutation resolver
-- [ ] Validate channel admin permissions
-- [ ] Validate pipeline configuration
-- [ ] Store on Channel node
+**Completed Tasks**:
+- [x] Create mutation resolver
+- [x] Validate channel-specific events (only `discussionChannel.created` allowed)
+- [x] Reuse `validatePipelines` for structure validation
+- [x] Store on Channel node via `pluginPipelines` field
 
-### 9.3 Backend: Pipeline Execution for Channel Events
+### 9.3 Backend: Pipeline Execution for Channel Events ✅ COMPLETED
 
 **File**: `services/pluginRunner.ts`
 
-**Tasks**:
-- [ ] Add `runChannelPipeline` function
-- [ ] Load pipeline config from Channel node
-- [ ] Execute plugins with channel context
-- [ ] Track PluginRun records with channel reference
+**Completed Tasks**:
+- [x] Added `triggerChannelPluginPipeline()` function
+- [x] Added `CHANNEL_EVENTS` set and `isChannelEvent()` helper
+- [x] Load pipeline config from Channel's `pluginPipelines` field
+- [x] Execute plugins with channel context (scope: 'CHANNEL')
+- [x] Track PluginRun records with `scope: 'CHANNEL'` and `channelId`
 
 **Context Passed to Plugins**:
 ```typescript
@@ -149,26 +150,38 @@ interface ChannelPipelineContext {
     id: string;
     fileName: string;
     fileSize: number;
-    mimeType: string;
+    fileUrl: string;
   };
   channel: {
     uniqueName: string;
     displayName: string;
-    // Channel's label taxonomy for auto-labeling
-    availableLabels: Label[];
+    tags: string[];
   };
 }
 ```
 
-### 9.4 Backend: Trigger Channel Pipeline
+### 9.4 Backend: Trigger Channel Pipeline ✅ COMPLETED
 
-**File**: `customResolvers/mutations/createDiscussionChannel.ts` (or equivalent)
+**File**: `customResolvers/mutations/createDiscussionWithChannelConnections.ts`
 
-**Tasks**:
-- [ ] After DiscussionChannel is created, check if Discussion has download
-- [ ] If yes, check if Channel has `pluginPipelines` for `discussionChannel.created`
-- [ ] If yes, trigger channel pipeline execution
-- [ ] Ensure server pipeline completed first (if applicable)
+**Completed Tasks**:
+- [x] After DiscussionChannel is created, check if Discussion has `hasDownload: true`
+- [x] If yes, trigger `triggerChannelPluginPipeline()` with channel context
+- [x] Pipeline errors are logged but don't fail discussion creation
+- [x] Added plugin models to resolver input for pipeline support
+
+### 9.1-9.4 Backend Tests ✅ COMPLETED
+
+**Test Files Created**:
+- `customResolvers/mutations/updateChannelPluginPipelines.test.ts` - 10 tests
+- `services/pluginRunner.test.ts` - Updated with channel event tests (11 tests total)
+
+**Test Coverage**:
+- Channel event validation (valid/invalid events)
+- Structure validation for channel pipelines
+- `isChannelEvent()` helper function
+- `shouldRunStep()` condition logic
+- Pipeline ID generation
 
 ### 9.5 Frontend: Channel Pipeline Configuration Page
 
@@ -390,14 +403,14 @@ type InstalledPlugin {
 
 Based on the use case of video game mod uploads with channel-specific auto-labeling:
 
-| Priority | Phase | Description | Reason |
+| Priority | Phase | Description | Status |
 |----------|-------|-------------|--------|
-| 1 | **Phase 9.1-9.4** | Backend channel pipeline support | Core functionality needed |
-| 2 | **Phase 9.5-9.6** | Frontend channel pipeline config UI | Enables channel admins to configure |
-| 3 | **Phase 9.8** | Auto-labeler plugin enhancement | Implements the auto-labeling feature |
-| 4 | **Phase 9.7** | Channel pipeline view | Shows results to users |
-| 5 | **Phase 5** | Version management | Nice to have |
-| 6 | **Phase 8** | Documentation & E2E tests | Polish |
+| 1 | **Phase 9.1-9.4** | Backend channel pipeline support | ✅ COMPLETED |
+| 2 | **Phase 9.5-9.6** | Frontend channel pipeline config UI | 🔲 Next |
+| 3 | **Phase 9.8** | Auto-labeler plugin enhancement | 🔲 Pending |
+| 4 | **Phase 9.7** | Channel pipeline view | 🔲 Pending |
+| 5 | **Phase 5** | Version management | 🔲 Pending |
+| 6 | **Phase 8** | Documentation & E2E tests | 🔲 Pending |
 
 ---
 
@@ -442,14 +455,19 @@ When auto-labeler plugin returns `appliedLabels`:
 
 ### Backend (gennit-backend)
 
-**To Create**:
-- `customResolvers/mutations/updateChannelPluginPipelines.ts`
-- `customResolvers/queries/getChannelPluginPipelines.ts`
+**Created (Phase 9.1-9.4)**:
+- ✅ `customResolvers/mutations/updateChannelPluginPipelines.ts` - Channel pipeline mutation
+- ✅ `customResolvers/mutations/updateChannelPluginPipelines.test.ts` - 10 tests
+- ✅ `services/pluginRunner.test.ts` - Updated with channel event tests
 
-**To Modify**:
-- `typeDefs.ts` - Add `pluginPipelines` to Channel
-- `services/pluginRunner.ts` - Add channel pipeline execution
-- Discussion submission flow - Trigger channel pipeline
+**Modified (Phase 9.1-9.4)**:
+- ✅ `typeDefs.ts` - Added `pluginPipelines` to Channel type, added mutation
+- ✅ `services/pluginRunner.ts` - Added `triggerChannelPluginPipeline()`, `isChannelEvent()`
+- ✅ `customResolvers/mutations/createDiscussionWithChannelConnections.ts` - Triggers channel pipeline
+- ✅ `customResolvers.ts` - Registered new mutation and added models
+
+**To Create (Phase 9.5+)**:
+- `customResolvers/queries/getChannelPluginPipelines.ts` (optional, can use existing Channel query)
 
 ### Frontend (multiforum-nuxt)
 

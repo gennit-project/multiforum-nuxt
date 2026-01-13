@@ -19,9 +19,14 @@ The Multiforum plugin system allows server administrators to extend platform fun
 
 ### Event-Driven Execution
 
-Plugins execute in response to events:
+Plugins execute in response to events at two scopes:
+
+**Server-Scoped Events** (configured by server admin):
 - `downloadableFile.created` - When a file is uploaded
 - `downloadableFile.updated` - When a file is modified
+
+**Channel-Scoped Events** (configured by channel admin):
+- `discussionChannel.created` - When a discussion with download is submitted to a channel
 
 Plugins run in configurable pipelines with ordering, conditions, and error handling.
 
@@ -55,6 +60,15 @@ Plugins run in configurable pipelines with ordering, conditions, and error handl
 - Execution order tracking
 - Skip reason recording
 - Duration tracking in milliseconds
+- Scope tracking: `SERVER` or `CHANNEL`
+
+### Channel-Scoped Pipeline Support (Phase 9.1-9.4)
+- Channel admins can configure pipelines for `discussionChannel.created` event
+- Pipelines stored in `Channel.pluginPipelines` JSON field
+- Only server-enabled plugins can be used in channel pipelines
+- Automatic trigger when discussion with download is submitted to channel
+- Pipeline errors logged but don't fail discussion creation
+- Plugin context includes channel metadata (uniqueName, displayName, tags)
 
 ### GraphQL API
 
@@ -72,7 +86,8 @@ Plugins run in configurable pipelines with ordering, conditions, and error handl
 - `disableServerPlugin` - Disable plugin
 - `setServerPluginSecret` - Store encrypted secret
 - `validateServerPluginSecret` - Test secret validity
-- `updatePluginPipelines` - Configure pipeline execution order
+- `updatePluginPipelines` - Configure server-level pipeline execution order
+- `updateChannelPluginPipelines` - Configure channel-level pipeline execution order
 
 ---
 
@@ -210,27 +225,45 @@ Plugins run in configurable pipelines with ordering, conditions, and error handl
 
 ## Unit Tests
 
-### Phase 3 - Pipeline View
+### Frontend (multiforum-nuxt)
+
+#### Phase 3 - Pipeline View
 - `composables/usePluginPipeline.spec.ts` - 17 tests
 - `components/plugins/PluginPipeline.spec.ts` - 14 tests
 - `components/plugins/PluginPipelineStage.spec.ts` - 12 tests
 - `components/plugins/PluginLogsModal.spec.ts` - 13 tests
 
-### Phase 4 - Dynamic Forms
+#### Phase 4 - Dynamic Forms
 - `components/plugins/fields/pluginFields.spec.ts` - 27 tests
 
-### Phase 6 - UI Polish
+#### Phase 6 - UI Polish
 - `pages/admin/settings/plugins/index.spec.ts` - 19 tests
 - `pages/admin/settings/plugins/pluginDetail.spec.ts` - 17 tests
 
-### Phase 7 - Pipeline Configuration
-- `components/plugins/pipelineEditor.spec.ts` - 36 tests
+#### Phase 7 - Pipeline Configuration
+- `components/plugins/pipelineEditor.spec.ts` - 72 tests
+
+### Backend (gennit-backend)
+
+#### Phase 7 - Server Pipeline Configuration
+- `customResolvers/mutations/updatePluginPipelines.test.ts` - Pipeline validation tests
+
+#### Phase 9.1-9.4 - Channel Pipeline Support
+- `customResolvers/mutations/updateChannelPluginPipelines.test.ts` - 10 tests
+  - Channel event validation
+  - Server event rejection for channel pipelines
+  - Structure validation
+- `services/pluginRunner.test.ts` - 11 tests
+  - `shouldRunStep()` condition logic
+  - `generatePipelineId()` format and uniqueness
+  - `isSupportedEvent()` server event detection
+  - `isChannelEvent()` channel event detection
 
 ---
 
 ## Configuration Examples
 
-### Pipeline YAML Configuration
+### Server Pipeline YAML Configuration
 
 ```yaml
 pipelines:
@@ -244,6 +277,20 @@ pipelines:
         condition: PREVIOUS_SUCCEEDED
         continueOnError: true
 ```
+
+### Channel Pipeline YAML Configuration
+
+```yaml
+pipelines:
+  - event: discussionChannel.created
+    stopOnFirstFailure: true
+    steps:
+      - plugin: auto-labeler
+        condition: ALWAYS
+        continueOnError: false
+```
+
+Note: Channel pipelines can only use the `discussionChannel.created` event and can only reference plugins that are enabled at the server level.
 
 ### Plugin Manifest UI Schema
 
