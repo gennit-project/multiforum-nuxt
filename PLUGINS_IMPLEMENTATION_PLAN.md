@@ -448,51 +448,48 @@ type InstalledPlugin {
 
 ---
 
-## Phase 6: UI Polish & Bug Fixes
+## Phase 6: UI Polish & Bug Fixes ✅ COMPLETE
 
 **Goal**: Fix remaining issues and improve UX.
 
-### 6.1 Toast Notifications
+### 6.1 Toast Notifications ✅
 
 **File**: `pages/admin/settings/plugins/[pluginId].vue`
 
-**Current State**: Uses `console.log` as placeholder.
-
 **Tasks**:
-- [ ] Import/create toast notification composable
-- [ ] Replace console.log with toast.success()
-- [ ] Replace console.error with toast.error()
-- [ ] Add toast for: install, enable, disable, secret set, secret validated
+- [x] Import/create toast notification composable
+- [x] Replace console.log with toast.success()
+- [x] Replace console.error with toast.error()
+- [x] Add toast for: install, enable, disable, secret set, secret validated
 
-### 6.2 Per-Button Loading States
+### 6.2 Per-Button Loading States ✅
 
 **File**: `pages/admin/settings/plugins/index.vue`
 
-**Problem**: Clicking one "Allow" button causes all buttons to show loading.
-
-**Solution**: Track loading state per plugin ID.
+**Solution**: Track loading state per plugin ID using Sets.
 
 **Tasks**:
-- [ ] Change `loading` from boolean to `Map<string, boolean>` or object
-- [ ] Set loading state for specific plugin ID on click
-- [ ] Clear loading state for that ID when complete
+- [x] Track loading state per plugin using `Set<string>` for allow/disallow
+- [x] Set loading state for specific plugin ID on click
+- [x] Clear loading state for that ID when complete
 
-### 6.3 Disable Enable Switch if Not Installed
+### 6.3 Disable Enable Switch if Not Installed ✅
 
 **File**: `pages/admin/settings/plugins/[pluginId].vue`
 
 **Tasks**:
-- [ ] Check if plugin is installed before showing enable toggle
-- [ ] If not installed, show disabled toggle with tooltip
-- [ ] Or hide toggle entirely and show "Install to enable" message
+- [x] Enable toggle is only shown when plugin is installed (v-if="isInstalled")
+- [x] Section is hidden entirely when not installed
 
-### 6.4 Plugin List Improvements
+### 6.4 Plugin List Improvements ✅
 
 **Tasks**:
-- [ ] Add search/filter for plugins
-- [ ] Add sorting (name, status, recently updated)
-- [ ] Show plugin description in list view
-- [ ] Improve empty state when no plugins available
+- [x] Add search/filter for plugins (by name, description, or ID)
+- [x] Add status filter dropdown (all/available/allowed/installed/enabled)
+- [x] Add sorting (name, status) with direction toggle
+- [x] Show plugin description in list view
+- [x] Improve empty state with getting started instructions
+- [x] Show filtered results count when filtering
 
 ---
 
@@ -620,7 +617,7 @@ Based on dependencies and value delivery:
 | Phase 3: Pipeline View | 15 | High | ✅ Complete |
 | Phase 4: Dynamic Forms | 10 | Medium | Not Started |
 | Phase 5: Version Management | 6 | Low | Not Started |
-| Phase 6: UI Polish | 8 | Low | Not Started |
+| Phase 6: UI Polish | 8 | Low | ✅ Complete |
 | Phase 7: Pipeline Config UI | 5 | Medium | Backend Complete |
 | Phase 8: Docs & Testing | 10 | Medium | Unit Tests Partial ✅ |
 
