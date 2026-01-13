@@ -92,20 +92,6 @@ When a video game mod is uploaded and submitted to a channel:
 
 ---
 
-## Phase 9.9: Unit Tests
-
-**Files to Create**:
-- [ ] `utils/pipelineSchema.spec.ts` - Test channel events
-- [ ] `pages/forums/[forumId]/edit/pipelines.spec.ts`
-
-**Test Cases**:
-- [ ] Channel pipeline configuration validation
-- [ ] Event filtering by scope
-- [ ] Channel admin permission checks
-- [ ] Pipeline execution order (server before channel)
-
----
-
 ## Phase 8: Documentation & E2E Testing
 
 **Goal**: Complete documentation and add E2E test coverage.
@@ -149,8 +135,7 @@ When a video game mod is uploaded and submitted to a channel:
 | Priority | Phase | Description | Status |
 |----------|-------|-------------|--------|
 | 1 | **Phase 9.8** | Auto-labeler plugin (remaining) | 🔄 IN PROGRESS |
-| 2 | **Phase 9.9** | Unit tests for channel pipelines | 🔲 Pending |
-| 3 | **Phase 8** | Documentation & E2E tests | 🔲 Pending |
+| 2 | **Phase 8** | Documentation & E2E tests | 🔲 Pending |
 
 ---
 
@@ -199,10 +184,6 @@ When auto-labeler plugin returns `appliedLabels`:
 - [ ] Apply labels returned by auto-labeler plugin to discussions
 
 ### Frontend (multiforum-nuxt)
-
-**Phase 9.9**:
-- [ ] `utils/pipelineSchema.spec.ts` - Channel event tests
-- [ ] `pages/forums/[forumId]/edit/pipelines.spec.ts` - Channel pipeline page tests
 
 **Phase 8**:
 - [ ] `pages/admin/settings/plugins/docs.vue` - Documentation page

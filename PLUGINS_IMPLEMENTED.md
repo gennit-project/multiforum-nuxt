@@ -279,6 +279,25 @@ Displays both server and channel pipeline results in the download sidebar:
 - Supports 'v' prefix (e.g., "v1.0.0" treated same as "1.0.0")
 - Gracefully handles non-standard version strings
 
+### Channel Pipeline Unit Tests (Phase 9.9)
+
+**New Test Files**:
+- `utils/pipelineSchema.spec.ts` - 36 tests
+- `pages/forums/[forumId]/edit/pipelines.spec.ts` - 12 tests
+
+**Test Coverage**:
+- Pipeline events (server vs channel scope)
+- `getEventsForScope()` filtering
+- `SERVER_PIPELINE_EVENTS` and `CHANNEL_PIPELINE_EVENTS` constants
+- Pipeline conditions (ALWAYS, PREVIOUS_SUCCEEDED, PREVIOUS_FAILED)
+- JSON Schema generation for different scopes
+- Default YAML templates per scope
+- `validatePipelineConfig()` with scope-aware event validation
+- Channel pipeline page loading/error states
+- Available plugins filtering (only enabled server plugins)
+- Scope configuration passed to editor
+- Pipeline execution order documentation
+
 ---
 
 ## Plugins Repository (multiforum-plugins)
@@ -321,6 +340,10 @@ Displays both server and channel pipeline results in the download sidebar:
 
 #### Phase 7 - Pipeline Configuration
 - `components/plugins/pipelineEditor.spec.ts` - 72 tests
+
+#### Phase 9.9 - Channel Pipeline Unit Tests
+- `utils/pipelineSchema.spec.ts` - 36 tests
+- `pages/forums/[forumId]/edit/pipelines.spec.ts` - 12 tests
 
 ### Backend (gennit-backend)
 
