@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import type { PropType } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
+import { useToast } from '@/composables/useToast';
 import {
   REFRESH_PLUGINS,
   ALLOW_PLUGIN,
@@ -18,6 +19,19 @@ import type {
   Plugin,
   PluginVersion,
 } from '@/__generated__/graphql';
+
+// Toast notifications
+const toast = useToast();
+
+// Per-plugin loading states
+const allowingPluginIds = ref<Set<string>>(new Set());
+const disallowingPluginIds = ref<Set<string>>(new Set());
+
+// Search and filter state
+const searchQuery = ref('');
+const statusFilter = ref<'all' | 'available' | 'allowed' | 'installed' | 'enabled'>('all');
+const sortBy = ref<'name' | 'status'>('name');
+const sortDirection = ref<'asc' | 'desc'>('asc');
 
 const props = defineProps({
   editMode: {
@@ -40,6 +54,7 @@ const newRegistry = ref('');
 interface PluginState {
   id: string;
   name: string;
+  description?: string;
   status:
     | 'available'
     | 'allowed'
@@ -59,6 +74,7 @@ interface InstalledPlugin {
   plugin: {
     id: string;
     name: string;
+    description?: string;
   };
   version: string;
   scope: string;
@@ -135,6 +151,7 @@ const pluginStates = computed((): PluginState[] => {
     return {
       id: plugin.id,
       name: plugin.name,
+      description: plugin.description || installedPlugin?.plugin?.description,
       status,
       installedVersion: installedPlugin
         ? {
@@ -148,6 +165,71 @@ const pluginStates = computed((): PluginState[] => {
     };
   });
 });
+
+// Filtered and sorted plugins
+const filteredAndSortedPlugins = computed((): PluginState[] => {
+  let result = [...pluginStates.value];
+
+  // Apply search filter
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim();
+    result = result.filter(
+      (plugin) =>
+        plugin.name.toLowerCase().includes(query) ||
+        plugin.description?.toLowerCase().includes(query) ||
+        plugin.id.toLowerCase().includes(query)
+    );
+  }
+
+  // Apply status filter
+  if (statusFilter.value !== 'all') {
+    result = result.filter((plugin) => {
+      switch (statusFilter.value) {
+        case 'available':
+          return plugin.status === 'available';
+        case 'allowed':
+          return plugin.status === 'allowed';
+        case 'installed':
+          return plugin.status === 'installed_disabled' || plugin.status === 'installed_enabled';
+        case 'enabled':
+          return plugin.status === 'installed_enabled';
+        default:
+          return true;
+      }
+    });
+  }
+
+  // Apply sorting
+  result.sort((a, b) => {
+    let comparison = 0;
+    if (sortBy.value === 'name') {
+      comparison = a.name.localeCompare(b.name);
+    } else if (sortBy.value === 'status') {
+      // Order: enabled > installed > allowed > available
+      const statusOrder: Record<PluginState['status'], number> = {
+        installed_enabled: 0,
+        installed_disabled: 1,
+        installed: 2,
+        allowed: 3,
+        available: 4,
+      };
+      comparison = statusOrder[a.status] - statusOrder[b.status];
+    }
+    return sortDirection.value === 'asc' ? comparison : -comparison;
+  });
+
+  return result;
+});
+
+// Toggle sort direction or change sort field
+const toggleSort = (field: 'name' | 'status') => {
+  if (sortBy.value === field) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortBy.value = field;
+    sortDirection.value = 'asc';
+  }
+};
 
 const {
   mutate: refreshPluginsMutation,
@@ -187,10 +269,8 @@ const removeRegistry = (index: number) => {
 };
 
 // Plugin management mutations
-const { mutate: allowPluginMutation, loading: allowPluginLoading } =
-  useMutation(ALLOW_PLUGIN);
-const { mutate: disallowPluginMutation, loading: disallowPluginLoading } =
-  useMutation(DISALLOW_PLUGIN);
+const { mutate: allowPluginMutation } = useMutation(ALLOW_PLUGIN);
+const { mutate: disallowPluginMutation } = useMutation(DISALLOW_PLUGIN);
 
 const refreshPlugins = async () => {
   try {
@@ -199,12 +279,14 @@ const refreshPlugins = async () => {
     await refetchPluginManagement();
     // Also refetch installed plugins
     await refetchInstalledPlugins();
-  } catch (err) {
-    console.error('Error refreshing plugins:', err);
+    toast.success('Plugins refreshed successfully');
+  } catch (err: any) {
+    toast.error(`Error refreshing plugins: ${err.message}`);
   }
 };
 
 const allowPlugin = async (pluginId: string) => {
+  allowingPluginIds.value.add(pluginId);
   try {
     await allowPluginMutation({
       pluginId,
@@ -213,12 +295,16 @@ const allowPlugin = async (pluginId: string) => {
     // Refetch to update UI
     await refetchPluginManagement();
     await refetchInstalledPlugins();
-  } catch (err) {
-    console.error('Error allowing plugin:', err);
+    toast.success('Plugin allowed successfully');
+  } catch (err: any) {
+    toast.error(`Error allowing plugin: ${err.message}`);
+  } finally {
+    allowingPluginIds.value.delete(pluginId);
   }
 };
 
 const disallowPlugin = async (pluginId: string) => {
+  disallowingPluginIds.value.add(pluginId);
   try {
     await disallowPluginMutation({
       pluginId,
@@ -227,10 +313,17 @@ const disallowPlugin = async (pluginId: string) => {
     // Refetch to update UI
     await refetchPluginManagement();
     await refetchInstalledPlugins();
-  } catch (err) {
-    console.error('Error disallowing plugin:', err);
+    toast.success('Plugin disallowed successfully');
+  } catch (err: any) {
+    toast.error(`Error disallowing plugin: ${err.message}`);
+  } finally {
+    disallowingPluginIds.value.delete(pluginId);
   }
 };
+
+// Helper functions to check loading state for a specific plugin
+const isAllowingPlugin = (pluginId: string) => allowingPluginIds.value.has(pluginId);
+const isDisallowingPlugin = (pluginId: string) => disallowingPluginIds.value.has(pluginId);
 
 // Refresh data when component mounts to catch any changes from detail pages
 onMounted(() => {
@@ -346,6 +439,76 @@ onMounted(() => {
             Manage plugins available on your server.
           </p>
 
+          <!-- Search and Filter Controls -->
+          <div
+            v-if="pluginStates.length > 0"
+            class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <!-- Search Input -->
+            <div class="relative flex-1 sm:max-w-xs">
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search plugins..."
+                class="w-full rounded-md border border-gray-300 py-2 pl-9 pr-3 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              >
+              <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            </div>
+
+            <!-- Filter and Sort Controls -->
+            <div class="flex flex-wrap items-center gap-2">
+              <!-- Status Filter -->
+              <select
+                v-model="statusFilter"
+                class="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              >
+                <option value="all">All Status</option>
+                <option value="available">Available</option>
+                <option value="allowed">Allowed</option>
+                <option value="installed">Installed</option>
+                <option value="enabled">Enabled</option>
+              </select>
+
+              <!-- Sort Buttons -->
+              <div class="flex rounded-md border border-gray-300 dark:border-gray-600">
+                <button
+                  type="button"
+                  class="px-3 py-2 text-sm"
+                  :class="sortBy === 'name' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'"
+                  @click="toggleSort('name')"
+                >
+                  Name
+                  <i
+                    v-if="sortBy === 'name'"
+                    :class="sortDirection === 'asc' ? 'fa-solid fa-arrow-up' : 'fa-solid fa-arrow-down'"
+                    class="ml-1"
+                  />
+                </button>
+                <button
+                  type="button"
+                  class="border-l border-gray-300 px-3 py-2 text-sm dark:border-gray-600"
+                  :class="sortBy === 'status' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'"
+                  @click="toggleSort('status')"
+                >
+                  Status
+                  <i
+                    v-if="sortBy === 'status'"
+                    :class="sortDirection === 'asc' ? 'fa-solid fa-arrow-up' : 'fa-solid fa-arrow-down'"
+                    class="ml-1"
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Results count -->
+          <div
+            v-if="pluginStates.length > 0 && (searchQuery || statusFilter !== 'all')"
+            class="text-sm text-gray-500 dark:text-gray-400"
+          >
+            Showing {{ filteredAndSortedPlugins.length }} of {{ pluginStates.length }} plugins
+          </div>
+
           <!-- Loading State -->
           <div v-if="pluginManagementLoading" class="py-4 text-center">
             <div class="inline-flex items-center">
@@ -362,10 +525,28 @@ onMounted(() => {
             Error loading plugins: {{ pluginManagementError.message }}
           </div>
 
+          <!-- No Results After Filter -->
+          <div
+            v-else-if="pluginStates.length > 0 && filteredAndSortedPlugins.length === 0"
+            class="py-8 text-center"
+          >
+            <div class="text-gray-500 dark:text-gray-400">
+              <i class="fa-solid fa-search mb-2 text-2xl" />
+              <p>No plugins match your search criteria.</p>
+              <button
+                type="button"
+                class="mt-2 text-sm text-orange-600 hover:underline dark:text-orange-400"
+                @click="searchQuery = ''; statusFilter = 'all'"
+              >
+                Clear filters
+              </button>
+            </div>
+          </div>
+
           <!-- Plugin Cards -->
-          <div v-else-if="pluginStates.length > 0" class="space-y-4">
+          <div v-else-if="filteredAndSortedPlugins.length > 0" class="space-y-4">
             <div
-              v-for="plugin in pluginStates"
+              v-for="plugin in filteredAndSortedPlugins"
               :key="plugin.id"
               class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-600 dark:bg-gray-800"
             >
@@ -383,6 +564,13 @@ onMounted(() => {
                       {{ plugin.name }}
                     </NuxtLink>
                   </h3>
+                  <!-- Plugin Description -->
+                  <p
+                    v-if="plugin.description"
+                    class="mt-1 text-sm text-gray-600 dark:text-gray-400"
+                  >
+                    {{ plugin.description }}
+                  </p>
                   <div
                     class="mt-2 flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-300"
                   >
@@ -433,12 +621,12 @@ onMounted(() => {
                   <button
                     v-if="plugin.status === 'available'"
                     type="button"
-                    class="rounded-md bg-orange-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-                    :disabled="allowPluginLoading"
+                    class="rounded-md bg-orange-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50"
+                    :disabled="isAllowingPlugin(plugin.id)"
                     @click="allowPlugin(plugin.id)"
                   >
                     <i
-                      v-if="allowPluginLoading"
+                      v-if="isAllowingPlugin(plugin.id)"
                       class="fa-solid fa-spinner mr-1 animate-spin"
                     />
                     Allow
@@ -454,12 +642,12 @@ onMounted(() => {
                     </NuxtLink>
                     <button
                       type="button"
-                      class="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                      :disabled="disallowPluginLoading"
+                      class="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50"
+                      :disabled="isDisallowingPlugin(plugin.id)"
                       @click="disallowPlugin(plugin.id)"
                     >
                       <i
-                        v-if="disallowPluginLoading"
+                        v-if="isDisallowingPlugin(plugin.id)"
                         class="fa-solid fa-spinner mr-1 animate-spin"
                       />
                       Disallow
@@ -488,10 +676,20 @@ onMounted(() => {
           <!-- No Plugins State -->
           <div v-else class="py-8 text-center">
             <div class="text-gray-500 dark:text-gray-400">
-              <p>No plugins available yet.</p>
+              <i class="fa-solid fa-puzzle-piece mb-3 text-4xl text-gray-300 dark:text-gray-600" />
+              <p class="text-lg font-medium">No plugins available yet</p>
               <p class="mt-2 text-sm">
-                Add a plugin registry and refresh to discover plugins.
+                Add a plugin registry above and click "Refresh Plugins" to discover available plugins.
               </p>
+              <div class="mt-4 text-xs">
+                <p class="font-medium">Getting started:</p>
+                <ol class="mt-2 list-inside list-decimal text-left inline-block">
+                  <li>Add a plugin registry URL in the section above</li>
+                  <li>Click "Refresh Plugins" to fetch available plugins</li>
+                  <li>Allow plugins you want to use on your server</li>
+                  <li>Install and configure each plugin</li>
+                </ol>
+              </div>
             </div>
           </div>
         </div>

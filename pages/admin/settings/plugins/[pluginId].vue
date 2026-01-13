@@ -5,6 +5,7 @@ import { useQuery, useMutation } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
+import { useToast } from '@/composables/useToast';
 import {
   GET_AVAILABLE_PLUGINS,
   GET_INSTALLED_PLUGINS,
@@ -25,16 +26,8 @@ definePageMeta({
 const route = useRoute();
 const pluginId = route.params.pluginId as string;
 
-// Simple success/error handlers (can be replaced with toast system later)
-const success = (message: string) => {
-  console.log('SUCCESS:', message);
-  // TODO: Implement proper toast notifications
-};
-
-const error = (message: string) => {
-  console.error('ERROR:', message);
-  // TODO: Implement proper toast notifications
-};
+// Toast notifications
+const toast = useToast();
 
 // State
 const selectedVersion = ref<string>('');
@@ -112,12 +105,7 @@ const plugin = computed(() => {
 
 const installedPlugin = computed((): InstalledPlugin | null => {
   const installed = installedResult.value?.getInstalledPlugins || [];
-  console.log('Debug - installed plugins:', installed);
-  console.log('Debug - looking for pluginId:', pluginId);
-  const found =
-    installed.find((p: InstalledPlugin) => p.plugin.id === pluginId) || null;
-  console.log('Debug - found installed plugin:', found);
-  return found;
+  return installed.find((p: InstalledPlugin) => p.plugin.id === pluginId) || null;
 });
 
 const secrets = computed((): PluginSecretStatus[] => {
@@ -238,7 +226,7 @@ const handleInstall = async () => {
       version: selectedVersion.value,
     });
 
-    success(
+    toast.success(
       `Plugin ${plugin.value?.name} v${selectedVersion.value} installed successfully`
     );
 
@@ -246,13 +234,12 @@ const handleInstall = async () => {
     await refetchInstalled();
     await refetchSecrets();
   } catch (err: any) {
-    console.error('Installation failed:', err);
     if (err.message.includes('PLUGIN_VERSION_NOT_FOUND')) {
-      error('Plugin version not found in registry');
+      toast.error('Plugin version not found in registry');
     } else if (err.message.includes('INTEGRITY_MISMATCH')) {
-      error('Plugin download failed integrity check');
+      toast.error('Plugin download failed integrity check');
     } else {
-      error(`Installation failed: ${err.message}`);
+      toast.error(`Installation failed: ${err.message}`);
     }
   }
 };
@@ -268,20 +255,19 @@ const handleToggleEnabled = async (enabled: boolean) => {
       settingsJson: installedPlugin.value.settingsJson || {},
     });
 
-    success(
+    toast.success(
       `Plugin ${plugin.value?.name} ${enabled ? 'enabled' : 'disabled'} successfully`
     );
     await refetchInstalled();
   } catch (err: any) {
-    console.error('Enable/disable failed:', err);
     if (err.message.includes('Missing required secrets')) {
-      error('Cannot enable: missing required secrets');
+      toast.error('Cannot enable: missing required secrets');
     } else if (
       err.message.includes('PLUGIN_MISCONFIGURED_REQUIRED_SECRET_MISSING')
     ) {
-      error('Plugin misconfigured: required secrets missing');
+      toast.error('Plugin misconfigured: required secrets missing');
     } else {
-      error(`${enabled ? 'Enable' : 'Disable'} failed: ${err.message}`);
+      toast.error(`${enabled ? 'Enable' : 'Disable'} failed: ${err.message}`);
     }
   }
 };
@@ -294,7 +280,7 @@ const handleSetSecret = async (key: string, value: string) => {
       value,
     });
 
-    success(`Secret "${key}" set successfully`);
+    toast.success(`Secret "${key}" set successfully`);
 
     // Clear the input and hide it
     secretValues.value[key] = '';
@@ -303,8 +289,7 @@ const handleSetSecret = async (key: string, value: string) => {
     // Refetch secrets to update status
     await refetchSecrets();
   } catch (err: any) {
-    console.error('Set secret failed:', err);
-    error(`Failed to set secret "${key}": ${err.message}`);
+    toast.error(`Failed to set secret "${key}": ${err.message}`);
   }
 };
 
@@ -316,18 +301,17 @@ const handleValidateSecret = async (key: string) => {
     });
 
     if (result?.data?.validateServerPluginSecret?.isValid) {
-      success(`Secret "${key}" is valid`);
+      toast.success(`Secret "${key}" is valid`);
     } else {
       const errorMsg =
         result?.data?.validateServerPluginSecret?.error || 'Unknown error';
-      error(`Secret validation failed: ${errorMsg}`);
+      toast.error(`Secret validation failed: ${errorMsg}`);
     }
 
     // Refetch secrets to update status
     await refetchSecrets();
   } catch (err: any) {
-    console.error('Secret validation failed:', err);
-    error(`Secret validation failed: ${err.message}`);
+    toast.error(`Secret validation failed: ${err.message}`);
   }
 };
 
