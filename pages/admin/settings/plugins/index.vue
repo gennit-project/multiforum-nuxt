@@ -435,9 +435,18 @@ onMounted(() => {
     <FormRow section-title="Plugin Management">
       <template #content>
         <div class="my-3 space-y-4">
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            Manage plugins available on your server.
-          </p>
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Manage plugins available on your server.
+            </p>
+            <NuxtLink
+              to="/admin/settings/plugins/pipelines"
+              class="inline-flex items-center rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+            >
+              <i class="fa-solid fa-diagram-project mr-2" />
+              Configure Pipelines
+            </NuxtLink>
+          </div>
 
           <!-- Search and Filter Controls -->
           <div

@@ -245,3 +245,9 @@ export const UPDATE_MOD_SERVER_ROLE = gql`
     }
   }
 `;
+
+export const UPDATE_PLUGIN_PIPELINES = gql`
+  mutation UpdatePluginPipelines($pipelines: [EventPipelineInput!]!) {
+    updatePluginPipelines(pipelines: $pipelines)
+  }
+`;

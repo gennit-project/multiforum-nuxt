@@ -395,3 +395,12 @@ export const GET_PIPELINE_RUNS = gql`
     }
   }
 `;
+
+export const GET_PLUGIN_PIPELINES = gql`
+  query GetPluginPipelines($serverName: String!) {
+    serverConfigs(where: { serverName: $serverName }) {
+      serverName
+      pluginPipelines
+    }
+  }
+`;
