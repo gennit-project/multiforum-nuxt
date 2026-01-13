@@ -193,3 +193,15 @@ export const BECOME_CHANNEL_ADMIN = gql`
     becomeForumAdmin(channelUniqueName: $channelUniqueName)
   }
 `;
+
+export const UPDATE_CHANNEL_PLUGIN_PIPELINES = gql`
+  mutation UpdateChannelPluginPipelines(
+    $channelUniqueName: String!
+    $pipelines: [EventPipelineInput!]!
+  ) {
+    updateChannelPluginPipelines(
+      channelUniqueName: $channelUniqueName
+      pipelines: $pipelines
+    )
+  }
+`;

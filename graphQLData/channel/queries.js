@@ -529,3 +529,16 @@ export const GET_USER_FAVORITE_CHANNELS = gql`
     }
   }
 `;
+
+export const GET_CHANNEL_PLUGIN_PIPELINES = gql`
+  query GetChannelPluginPipelines($channelUniqueName: String!) {
+    channels(where: { uniqueName: $channelUniqueName }) {
+      uniqueName
+      displayName
+      pluginPipelines
+      Admins {
+        username
+      }
+    }
+  }
+`;

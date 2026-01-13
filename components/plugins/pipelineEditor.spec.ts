@@ -167,7 +167,7 @@ describe('validatePipelineConfig', () => {
 
       const result = validatePipelineConfig(config, availablePlugins);
       expect(result.valid).toBe(false);
-      expect(result.errors.some((e) => e.includes('Unknown event'))).toBe(true);
+      expect(result.errors.some((e) => e.includes('Invalid event'))).toBe(true);
     });
 
     it('should reject pipeline without steps', () => {

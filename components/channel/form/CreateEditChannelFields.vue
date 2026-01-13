@@ -103,6 +103,13 @@ const tabs = computed(() => {
     fontAwesome: null,
   });
 
+  baseTabs.push({
+    key: 'pipelines',
+    label: 'Pipelines',
+    icon: null,
+    fontAwesome: 'fa-solid fa-diagram-project',
+  });
+
   baseTabs.push(
     {
       key: 'feedback',

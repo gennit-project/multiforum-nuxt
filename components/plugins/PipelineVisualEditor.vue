@@ -4,11 +4,25 @@ import draggable from 'vuedraggable';
 import type { EventPipeline, PipelineStep, PipelineCondition } from '@/utils/pipelineSchema';
 import { PIPELINE_EVENTS, PIPELINE_CONDITIONS } from '@/utils/pipelineSchema';
 
-const props = defineProps<{
-  pipeline: EventPipeline;
-  availablePlugins: { id: string; name: string }[];
-  errors?: string[];
-}>();
+type EventOption = {
+  value: string;
+  label: string;
+  description: string;
+  scope: 'server' | 'channel';
+};
+
+const props = withDefaults(
+  defineProps<{
+    pipeline: EventPipeline;
+    availablePlugins: { id: string; name: string }[];
+    errors?: string[];
+    events?: EventOption[];
+  }>(),
+  {
+    // Default to all events if none provided
+    events: () => PIPELINE_EVENTS as unknown as EventOption[],
+  }
+);
 
 const emit = defineEmits<{
   'update:pipeline': [pipeline: EventPipeline];
@@ -68,8 +82,13 @@ function addStep() {
 }
 
 const eventLabel = computed(() => {
-  const event = PIPELINE_EVENTS.find((e) => e.value === props.pipeline.event);
+  const event = props.events.find((e) => e.value === props.pipeline.event);
   return event?.label || props.pipeline.event;
+});
+
+const eventDescription = computed(() => {
+  const event = props.events.find((e) => e.value === props.pipeline.event);
+  return event?.description || '';
 });
 </script>
 
@@ -83,7 +102,7 @@ const eventLabel = computed(() => {
             {{ eventLabel }}
           </h3>
           <p class="text-sm text-gray-500 dark:text-gray-400">
-            {{ PIPELINE_EVENTS.find((e) => e.value === pipeline.event)?.description }}
+            {{ eventDescription }}
           </p>
         </div>
         <label class="flex items-center space-x-2">

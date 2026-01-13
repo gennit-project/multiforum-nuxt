@@ -3,14 +3,24 @@ import { ref, computed, watch } from 'vue';
 import * as yaml from 'js-yaml';
 import PipelineYamlEditor from './PipelineYamlEditor.vue';
 import PipelineVisualEditor from './PipelineVisualEditor.vue';
-import type { PipelineConfig, EventPipeline } from '@/utils/pipelineSchema';
-import { DEFAULT_PIPELINE_YAML, validatePipelineConfig, PIPELINE_EVENTS } from '@/utils/pipelineSchema';
+import type { PipelineConfig, EventPipeline, PipelineScope } from '@/utils/pipelineSchema';
+import {
+  getDefaultPipelineYaml,
+  validatePipelineConfig,
+  getEventsForScope,
+} from '@/utils/pipelineSchema';
 
-const props = defineProps<{
-  initialConfig?: PipelineConfig;
-  availablePlugins: { id: string; name: string }[];
-  saving?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    initialConfig?: PipelineConfig;
+    availablePlugins: { id: string; name: string }[];
+    saving?: boolean;
+    scope?: PipelineScope;
+  }>(),
+  {
+    scope: 'server',
+  }
+);
 
 const emit = defineEmits<{
   save: [config: PipelineConfig];
@@ -19,11 +29,14 @@ const emit = defineEmits<{
 type EditorMode = 'yaml' | 'visual';
 
 const mode = ref<EditorMode>('yaml');
-const yamlContent = ref(DEFAULT_PIPELINE_YAML);
+const yamlContent = ref(getDefaultPipelineYaml(props.scope));
 const parsedConfig = ref<PipelineConfig | null>(null);
 const parseError = ref<string | null>(null);
 const validationErrors = ref<string[]>([]);
 const hasUnsavedChanges = ref(false);
+
+// Get events filtered by scope
+const scopedEvents = computed(() => getEventsForScope(props.scope));
 
 // Initialize from prop
 watch(
@@ -54,8 +67,10 @@ const currentPipeline = computed((): EventPipeline => {
   if (parsedConfig.value?.pipelines?.[0]) {
     return parsedConfig.value.pipelines[0];
   }
+  // Use the first event for the current scope as default
+  const defaultEvent = scopedEvents.value[0]?.value || 'downloadableFile.created';
   return {
-    event: 'downloadableFile.created',
+    event: defaultEvent,
     stopOnFirstFailure: false,
     steps: [],
   };
@@ -81,7 +96,7 @@ function validateConfig() {
     return;
   }
 
-  const result = validatePipelineConfig(parsedConfig.value, availablePluginIds.value);
+  const result = validatePipelineConfig(parsedConfig.value, availablePluginIds.value, props.scope);
   validationErrors.value = result.errors;
 }
 
@@ -255,7 +270,7 @@ const canSave = computed(() => {
           </h4>
           <div class="space-y-2">
             <div
-              v-for="event in PIPELINE_EVENTS"
+              v-for="event in scopedEvents"
               :key="event.value"
               class="flex items-start"
             >
@@ -272,6 +287,7 @@ const canSave = computed(() => {
           :pipeline="currentPipeline"
           :available-plugins="availablePlugins"
           :errors="validationErrors"
+          :events="scopedEvents"
           @update:pipeline="handleVisualUpdate"
         />
       </div>
