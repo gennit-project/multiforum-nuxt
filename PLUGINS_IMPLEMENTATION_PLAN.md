@@ -20,13 +20,16 @@ This document outlines the work required to complete the Multiforum plugins feat
 - **[NEW]** `updatePluginPipelines` mutation for pipeline configuration
 - **[FIXED]** `getInstalledPlugins` now returns correct enabled/settingsJson values
 
-**Frontend (multiforum-nuxt) - ~55% Complete**
+**Frontend (multiforum-nuxt) - ~70% Complete**
 - Server-level plugin management UI (list, install, enable/disable)
 - Server-level secret configuration with validation
 - Basic plugin status display
 - **[NEW]** Plugin detail page with metadata display (author, homepage, license, tags)
 - **[NEW]** README markdown rendering on plugin detail page
 - **[NEW]** View Source link to plugin repository
+- **[NEW]** Pipeline/CI-CD view showing plugin execution status
+- **[NEW]** Auto-refreshing pipeline with polling while running
+- **[NEW]** Pipeline logs modal with copy functionality
 
 **Plugins Repository (multiforum-plugins) - Functional**
 - Two working plugins: hello-world (demo), security-attachment-scan (VirusTotal)
@@ -36,10 +39,9 @@ This document outlines the work required to complete the Multiforum plugins feat
 
 ### What's Missing
 
-1. **Pipeline/CI-CD View** - No visibility into plugin execution status (backend ready, frontend needed)
-2. **Dynamic Forms** - No form generation from plugin's `ui.forms` schema
-3. **Plugin Ordering UI** - Backend supports pipelines, but no UI to configure them
-4. **Version Updates** - No UI to update outdated plugins
+1. **Dynamic Forms** - No form generation from plugin's `ui.forms` schema
+2. **Plugin Ordering UI** - Backend supports pipelines, but no UI to configure them
+3. **Version Updates** - No UI to update outdated plugins
 6. **UI Polish** - Per-button loading states, toast notifications
 
 ---
@@ -201,7 +203,7 @@ type PluginRun {
 
 ---
 
-## Phase 3: Pipeline/CI-CD View
+## Phase 3: Pipeline/CI-CD View ✅ COMPLETE
 
 **Goal**: Give maintainers visibility into plugin execution with a pipeline-like UI.
 
@@ -247,7 +249,7 @@ query GetPipelineRuns($targetId: ID!, $targetType: String!) {
 }
 ```
 
-### 3.3 Frontend: Pipeline Component
+### 3.3 Frontend: Pipeline Component ✅ COMPLETE
 
 **New Files**:
 - `components/plugins/PluginPipeline.vue` - Main pipeline display
@@ -266,22 +268,22 @@ query GetPipelineRuns($targetId: ID!, $targetType: String!) {
 - Auto-refreshes while any stage is PENDING or RUNNING
 
 **Tasks**:
-- [ ] Create `PluginPipeline.vue` component
-- [ ] Create `PluginPipelineStage.vue` component
-- [ ] Create `usePluginPipeline` composable with polling
-- [ ] Add GraphQL query `GET_PIPELINE_RUNS`
-- [ ] Style with Tailwind (match CI/CD aesthetic)
+- [x] Create `PluginPipeline.vue` component
+- [x] Create `PluginPipelineStage.vue` component
+- [x] Create `usePluginPipeline` composable with polling
+- [x] Add GraphQL query `GET_PIPELINE_RUNS`
+- [x] Style with Tailwind (match CI/CD aesthetic)
 
-### 3.4 Frontend: Integrate Pipeline into Download Detail
+### 3.4 Frontend: Integrate Pipeline into Download Detail ✅ COMPLETE
 
-**File**: `components/discussion/detail/DownloadDetailContent.vue` (or similar)
+**File**: `components/channel/DownloadSidebar.vue`
 
 **Tasks**:
-- [ ] Add "Plugin Pipeline" section to download detail view
-- [ ] Show pipeline for the download's file
-- [ ] For uploaders: show immediately after upload
-- [ ] For viewers: show scan status (passed/failed)
-- [ ] Add loading state while pipeline is incomplete
+- [x] Add "Plugin Pipeline" section to download detail view
+- [x] Show pipeline for the download's file
+- [x] For uploaders: show immediately after upload
+- [x] For viewers: show scan status (passed/failed)
+- [x] Add loading state while pipeline is incomplete
 
 **UI Mockup**:
 ```
@@ -297,7 +299,7 @@ query GetPipelineRuns($targetId: ID!, $targetType: String!) {
 └──────────────────────────────────────────────────────┘
 ```
 
-### 3.5 Frontend: Pipeline Logs Modal
+### 3.5 Frontend: Pipeline Logs Modal ✅ COMPLETE
 
 **New File**: `components/plugins/PluginLogsModal.vue`
 
@@ -309,10 +311,10 @@ query GetPipelineRuns($targetId: ID!, $targetType: String!) {
 - Filter by log level (info, warn, error)
 
 **Tasks**:
-- [ ] Create modal component
-- [ ] Fetch logs from PluginRun.payload
-- [ ] Format and display logs
-- [ ] Add to pipeline stage (click to expand)
+- [x] Create modal component
+- [x] Fetch logs from PluginRun.payload
+- [x] Format and display logs
+- [x] Add to pipeline stage (click to expand)
 
 ---
 
@@ -593,7 +595,7 @@ Based on dependencies and value delivery:
 
 1. **Phase 1** (Backend Fixes) - ✅ COMPLETE
 2. **Phase 2** (Plugin Details) - ✅ COMPLETE
-3. **Phase 3** (Pipeline View) - High value, backend ready
+3. **Phase 3** (Pipeline View) - ✅ COMPLETE
 4. **Phase 6** (UI Polish) - Quick fixes, improves UX
 5. **Phase 4** (Dynamic Forms) - Enables proper plugin configuration
 6. **Phase 7** (Pipeline Config UI) - Enables full pipeline customization
@@ -608,7 +610,7 @@ Based on dependencies and value delivery:
 |-------|-------|------------|--------|
 | Phase 1: Backend Fixes | 12 | Medium | ✅ Complete |
 | Phase 2: Plugin Details | 8 | Low | ✅ Complete |
-| Phase 3: Pipeline View | 15 | High | Backend Complete |
+| Phase 3: Pipeline View | 15 | High | ✅ Complete |
 | Phase 4: Dynamic Forms | 10 | Medium | Not Started |
 | Phase 5: Version Management | 6 | Low | Not Started |
 | Phase 6: UI Polish | 8 | Low | Not Started |

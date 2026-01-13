@@ -375,3 +375,23 @@ export const GET_PLUGIN_DETAIL = gql`
     }
   }
 `;
+
+export const GET_PIPELINE_RUNS = gql`
+  query GetPipelineRuns($targetId: ID!, $targetType: String!) {
+    getPipelineRuns(targetId: $targetId, targetType: $targetType) {
+      id
+      pipelineId
+      pluginId
+      pluginName
+      version
+      status
+      message
+      durationMs
+      executionOrder
+      skippedReason
+      payload
+      createdAt
+      updatedAt
+    }
+  }
+`;

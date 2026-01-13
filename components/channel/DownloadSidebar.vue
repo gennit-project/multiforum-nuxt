@@ -3,6 +3,7 @@ import type { PropType } from 'vue';
 import type { Discussion } from '@/__generated__/graphql';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import DownloadSuccessPopover from '@/components/download/DownloadSuccessPopover.vue';
+import PluginPipeline from '@/components/plugins/PluginPipeline.vue';
 import { computed, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_DOWNLOAD_LABELS } from '@/graphQLData/discussion/queries';
@@ -248,6 +249,19 @@ const handleDownload = () => {
         class="text-center text-gray-500 dark:text-gray-400"
       >
         No downloadable files available
+      </div>
+
+      <!-- Plugin Pipeline Section -->
+      <div
+        v-if="primaryFile?.id"
+        class="border-t border-gray-200 pt-4 dark:border-gray-700"
+      >
+        <PluginPipeline
+          :target-id="primaryFile.id"
+          target-type="DownloadableFile"
+          title="Scan Status"
+          :collapsible="true"
+        />
       </div>
     </div>
   </div>
