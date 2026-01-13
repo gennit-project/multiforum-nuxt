@@ -298,6 +298,32 @@ Displays both server and channel pipeline results in the download sidebar:
 - Scope configuration passed to editor
 - Pipeline execution order documentation
 
+### Documentation & E2E Tests (Phase 8)
+
+**In-App Documentation Page** (`pages/admin/settings/plugins/docs.vue`):
+- Comprehensive plugin system documentation
+- Table of contents with anchor links
+- Sections covering:
+  - Overview and plugin lifecycle
+  - Setting up a plugin registry (with JSON format examples)
+  - Creating a plugin (tarball structure, manifest format, entry point)
+  - Configuring pipelines (server vs channel, YAML examples)
+  - Troubleshooting common issues
+- Documentation link added to plugin management page
+
+**E2E Tests** (`tests/cypress/e2e/plugins/pluginManagement.spec.cy.ts`):
+- Plugin management page loading and navigation
+- Documentation page content verification
+- Pipeline configuration page access
+- Plugin detail page navigation
+- Update flow indicators
+- Search and filter controls
+- Back navigation links
+
+**Updated Files**:
+- `pages/admin/settings/plugins/index.vue` - Added "Documentation" link
+- `tests/cypress/e2e/constants.ts` - Added plugin-related URL constants
+
 ---
 
 ## Plugins Repository (multiforum-plugins)

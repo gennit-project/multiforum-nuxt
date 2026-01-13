@@ -92,50 +92,11 @@ When a video game mod is uploaded and submitted to a channel:
 
 ---
 
-## Phase 8: Documentation & E2E Testing
-
-**Goal**: Complete documentation and add E2E test coverage.
-
-### 8.1 In-App Documentation
-
-**New File**: `pages/admin/settings/plugins/docs.vue`
-
-**Content**:
-- How to set up a plugin registry
-- Registry JSON format
-- How to create a plugin (link to PLUGIN_REQUIREMENTS.md)
-- Troubleshooting common issues
-- Server vs Channel pipeline configuration
-
-**Tasks**:
-- [ ] Create documentation page
-- [ ] Add link from plugin management page
-- [ ] Include examples and code snippets
-
-### 8.2 E2E Tests
-
-**New File**: `tests/cypress/e2e/plugins/pluginManagement.spec.cy.ts`
-
-**Test Cases**:
-- [ ] View available plugins
-- [ ] Allow a plugin
-- [ ] Install a plugin version
-- [ ] Configure plugin secrets
-- [ ] Enable/disable plugin
-- [ ] View plugin pipeline for a download
-- [ ] Update plugin to newer version
-- [ ] Configure server pipeline
-- [ ] Configure channel pipeline
-- [ ] Verify auto-labeling on channel submission
-
----
-
 ## Implementation Priority
 
 | Priority | Phase | Description | Status |
 |----------|-------|-------------|--------|
 | 1 | **Phase 9.8** | Auto-labeler plugin (remaining) | 🔄 IN PROGRESS |
-| 2 | **Phase 8** | Documentation & E2E tests | 🔲 Pending |
 
 ---
 
@@ -182,12 +143,6 @@ When auto-labeler plugin returns `appliedLabels`:
 
 **Phase 9.8 (remaining)**:
 - [ ] Apply labels returned by auto-labeler plugin to discussions
-
-### Frontend (multiforum-nuxt)
-
-**Phase 8**:
-- [ ] `pages/admin/settings/plugins/docs.vue` - Documentation page
-- [ ] `tests/cypress/e2e/plugins/pluginManagement.spec.cy.ts` - E2E tests
 
 ### Plugins Repository (multiforum-plugins)
 
