@@ -581,12 +581,21 @@ Already implemented in Phase 1:
 - `components/plugins/PluginPipeline.spec.ts` - 14 tests
 - `components/plugins/PluginPipelineStage.spec.ts` - 12 tests
 - `components/plugins/PluginLogsModal.spec.ts` - 13 tests
+- `pages/admin/settings/plugins/index.spec.ts` - 19 tests (Phase 6)
+- `pages/admin/settings/plugins/pluginDetail.spec.ts` - 17 tests (Phase 6)
 
 **Test Cases**:
 - [x] PluginPipeline renders stages correctly
 - [x] usePluginPipeline composable logic (formatDuration, getStatusInfo, computed properties)
 - [x] PluginPipelineStage displays status, duration, messages
 - [x] PluginLogsModal displays execution details
+- [x] Plugin list filtering by name, description, ID (Phase 6)
+- [x] Plugin list status filtering (Phase 6)
+- [x] Plugin list sorting by name and status (Phase 6)
+- [x] Per-button loading states (Phase 6)
+- [x] Toast notification integration (Phase 6)
+- [x] Enable switch visibility logic (Phase 6)
+- [x] Secret status display helpers (Phase 6)
 - [ ] PluginSettingsForm generates fields from schema (Phase 4)
 - [ ] PluginSecretField shows validation status (Phase 4)
 - [ ] Version comparison logic (Phase 5)
@@ -644,6 +653,8 @@ Based on dependencies and value delivery:
 - ✅ `components/plugins/PluginPipeline.spec.ts`
 - ✅ `components/plugins/PluginPipelineStage.spec.ts`
 - ✅ `components/plugins/PluginLogsModal.spec.ts`
+- ✅ `pages/admin/settings/plugins/index.spec.ts` (Phase 6 tests)
+- ✅ `pages/admin/settings/plugins/pluginDetail.spec.ts` (Phase 6 tests)
 
 ### Backend (gennit-backend) - ✅ Complete
 - ✅ Updated `customResolvers/queries/getInstalledPlugins.ts`
