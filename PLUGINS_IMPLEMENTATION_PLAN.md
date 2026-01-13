@@ -577,15 +577,22 @@ Already implemented in Phase 1:
 - [ ] View plugin pipeline for a download
 - [ ] Update plugin to newer version
 
-### 8.3 Unit Tests
+### 8.3 Unit Tests ✅ PARTIALLY COMPLETE
 
-**New Files**: `tests/unit/components/plugins/*.spec.ts`
+**Files Created**:
+- `composables/usePluginPipeline.spec.ts` - 17 tests
+- `components/plugins/PluginPipeline.spec.ts` - 14 tests
+- `components/plugins/PluginPipelineStage.spec.ts` - 12 tests
+- `components/plugins/PluginLogsModal.spec.ts` - 13 tests
 
 **Test Cases**:
-- [ ] PluginPipeline renders stages correctly
-- [ ] PluginSettingsForm generates fields from schema
-- [ ] PluginSecretField shows validation status
-- [ ] Version comparison logic
+- [x] PluginPipeline renders stages correctly
+- [x] usePluginPipeline composable logic (formatDuration, getStatusInfo, computed properties)
+- [x] PluginPipelineStage displays status, duration, messages
+- [x] PluginLogsModal displays execution details
+- [ ] PluginSettingsForm generates fields from schema (Phase 4)
+- [ ] PluginSecretField shows validation status (Phase 4)
+- [ ] Version comparison logic (Phase 5)
 
 ---
 
@@ -615,16 +622,16 @@ Based on dependencies and value delivery:
 | Phase 5: Version Management | 6 | Low | Not Started |
 | Phase 6: UI Polish | 8 | Low | Not Started |
 | Phase 7: Pipeline Config UI | 5 | Medium | Backend Complete |
-| Phase 8: Docs & Testing | 10 | Medium | Not Started |
+| Phase 8: Docs & Testing | 10 | Medium | Unit Tests Partial ✅ |
 
 ---
 
 ## Files to Create
 
 ### Frontend (multiforum-nuxt)
-- `components/plugins/PluginPipeline.vue`
-- `components/plugins/PluginPipelineStage.vue`
-- `components/plugins/PluginLogsModal.vue`
+- ✅ `components/plugins/PluginPipeline.vue`
+- ✅ `components/plugins/PluginPipelineStage.vue`
+- ✅ `components/plugins/PluginLogsModal.vue`
 - `components/plugins/PluginSettingsForm.vue`
 - `components/plugins/PluginPipelineEditor.vue`
 - `components/plugins/fields/PluginTextField.vue`
@@ -632,11 +639,14 @@ Based on dependencies and value delivery:
 - `components/plugins/fields/PluginBooleanField.vue`
 - `components/plugins/fields/PluginSelectField.vue`
 - `components/plugins/fields/PluginSecretField.vue`
-- `composables/usePluginPipeline.ts`
-- `graphQLData/plugins/queries.ts` (or add to admin/queries.js)
+- ✅ `composables/usePluginPipeline.ts`
+- ✅ `graphQLData/admin/queries.js` (GET_PIPELINE_RUNS added)
 - `pages/admin/settings/plugins/docs.vue`
 - `tests/cypress/e2e/plugins/pluginManagement.spec.cy.ts`
-- `tests/unit/components/plugins/*.spec.ts`
+- ✅ `composables/usePluginPipeline.spec.ts`
+- ✅ `components/plugins/PluginPipeline.spec.ts`
+- ✅ `components/plugins/PluginPipelineStage.spec.ts`
+- ✅ `components/plugins/PluginLogsModal.spec.ts`
 
 ### Backend (gennit-backend) - ✅ Complete
 - ✅ Updated `customResolvers/queries/getInstalledPlugins.ts`
