@@ -6,13 +6,19 @@ This document outlines the work required to complete the Multiforum plugins feat
 
 ### What Exists
 
-**Backend (gennit-backend) - ~70% Complete**
+**Backend (gennit-backend) - ~85% Complete**
 - Plugin CRUD operations (install, enable, configure secrets)
 - Plugin registry handling (HTTP and GCS sources)
 - Secret management with AES-256-GCM encryption
 - Plugin execution for `downloadableFile.*` events
 - PluginRun records for execution history
 - Comprehensive documentation (PLUGIN_REQUIREMENTS.md)
+- **[NEW]** GitHub Actions-style pipeline configuration (`pluginPipelines` on ServerConfig)
+- **[NEW]** Pipeline status tracking (pipelineId, executionOrder, skippedReason)
+- **[NEW]** Conditional execution (ALWAYS, PREVIOUS_SUCCEEDED, PREVIOUS_FAILED)
+- **[NEW]** `getPipelineRuns` query for execution history
+- **[NEW]** `updatePluginPipelines` mutation for pipeline configuration
+- **[FIXED]** `getInstalledPlugins` now returns correct enabled/settingsJson values
 
 **Frontend (multiforum-nuxt) - ~40% Complete**
 - Server-level plugin management UI (list, install, enable/disable)
@@ -27,118 +33,108 @@ This document outlines the work required to complete the Multiforum plugins feat
 
 ### What's Missing
 
-1. **Pipeline/CI-CD View** - No visibility into plugin execution status
+1. **Pipeline/CI-CD View** - No visibility into plugin execution status (backend ready, frontend needed)
 2. **Plugin Details** - README, author, homepage not displayed
 3. **Dynamic Forms** - No form generation from plugin's `ui.forms` schema
-4. **Plugin Ordering** - No way to control execution order of multiple plugins
+4. **Plugin Ordering UI** - Backend supports pipelines, but no UI to configure them
 5. **Version Updates** - No UI to update outdated plugins
-6. **Backend Bug** - `getInstalledPlugins` returns hardcoded defaults
-7. **UI Polish** - Per-button loading states, toast notifications
+6. **UI Polish** - Per-button loading states, toast notifications
 
 ---
 
-## Phase 1: Backend Fixes & Foundation
+## Phase 1: Backend Fixes & Foundation ✅ COMPLETE
 
 **Goal**: Fix existing bugs and ensure solid foundation for frontend work.
 
-### 1.1 Fix getInstalledPlugins Query
+### 1.1 Fix getInstalledPlugins Query ✅
 
 **File**: `gennit-backend/customResolvers/queries/getInstalledPlugins.ts`
 
-**Problem**: Returns hardcoded `enabled: false` and `settingsJson: {}` for all plugins because Neo4j OGM doesn't expose relationship properties in selection sets.
+**Problem**: Returned hardcoded `enabled: false` and `settingsJson: {}` for all plugins.
 
-**Solution**: Use raw Cypher query to fetch relationship properties:
+**Solution**: Used Neo4j GraphQL Connection pattern (`InstalledVersionsConnection.edges.edge`) to access relationship properties.
 
-```cypher
-MATCH (sc:ServerConfig)-[r:INSTALLED]->(pv:PluginVersion)-[:BELONGS_TO]->(p:Plugin)
-RETURN p.id as pluginId, p.name as pluginName,
-       pv.version as version, pv.manifest as manifest,
-       r.enabled as enabled, r.settingsJson as settingsJson
-```
+**Completed**:
+- [x] Updated resolver to use Connection pattern
+- [x] Frontend now receives correct enabled/settings values
 
-**Tasks**:
-- [ ] Write raw Cypher query to fetch installation properties
-- [ ] Update resolver to use Cypher instead of OGM
-- [ ] Add unit tests for the resolver
-- [ ] Verify frontend receives correct enabled/settings values
+### 1.2 Add Plugin Pipeline Configuration ✅
 
-### 1.2 Add Plugin Execution Order Support
-
-**Files**:
-- `gennit-backend/typeDefs.ts` - Add order field
-- `gennit-backend/services/pluginRunner.ts` - Sort by order
+**Approach Changed**: Instead of simple `executionOrder` on each plugin installation, implemented GitHub Actions-style pipeline configuration.
 
 **Schema Changes**:
 ```graphql
-# Add to InstallationProperties
-type InstallationProperties @relationshipProperties {
-  enabled: Boolean!
-  settingsJson: JSON
-  executionOrder: Int  # New field - lower numbers run first
+# Pipeline condition for step execution
+enum PipelineCondition {
+  ALWAYS
+  PREVIOUS_SUCCEEDED
+  PREVIOUS_FAILED
 }
 
-# Add mutation
+# Input types for mutation
+input PipelineStepInput {
+  pluginId: String!
+  continueOnError: Boolean
+  condition: PipelineCondition
+}
+
+input EventPipelineInput {
+  event: String!
+  steps: [PipelineStepInput!]!
+  stopOnFirstFailure: Boolean
+}
+
+# ServerConfig now has pipeline configuration
+type ServerConfig {
+  # ... existing fields
+  pluginPipelines: JSON  # Stores array of EventPipelineInput
+}
+
 type Mutation {
-  setPluginExecutionOrder(pluginVersionId: ID!, order: Int!): InstalledPlugin
+  updatePluginPipelines(pipelines: [EventPipelineInput!]!): JSON!
 }
 ```
 
-**Tasks**:
-- [ ] Add `executionOrder` to InstallationProperties in schema
-- [ ] Update pluginRunner to sort plugins by executionOrder before running
-- [ ] Create `setPluginExecutionOrder` mutation
-- [ ] Add migration script to set default order (0) for existing installations
+**Files Created/Modified**:
+- [x] `typeDefs.ts` - Added pipeline types and `pluginPipelines` field
+- [x] `customResolvers/mutations/updatePluginPipelines.ts` - New mutation
+- [x] `services/pluginRunner.ts` - Pipeline execution logic
 
-### 1.3 Add Pipeline Status Tracking
+### 1.3 Add Pipeline Status Tracking ✅
 
-**Files**:
-- `gennit-backend/typeDefs.ts` - Extend PluginRun
+**Files Modified**:
+- `gennit-backend/typeDefs.ts` - Extended PluginRun
 - `gennit-backend/services/pluginRunner.ts` - Track pipeline stages
 
-**Schema Changes**:
+**PluginRun now includes**:
 ```graphql
-enum PluginRunStatus {
-  PENDING
-  RUNNING
-  SUCCESS
-  FAILED
-  SKIPPED
-}
-
 type PluginRun {
   # Existing fields...
-  status: PluginRunStatus!
-  pipelineId: String  # Groups runs for same event
-  order: Int          # Execution order in pipeline
-  skippedReason: String  # If SKIPPED, why
-}
-
-type Query {
-  getPipelineRuns(targetId: ID!, targetType: String!): [PluginRun!]!
+  pluginName: String      # Display name for UI
+  pipelineId: String      # Groups runs for same event trigger
+  executionOrder: Int     # Order within pipeline
+  skippedReason: String   # Why plugin was skipped (if applicable)
 }
 ```
 
-**Tasks**:
-- [ ] Add status enum and pipelineId to PluginRun schema
-- [ ] Generate unique pipelineId when event triggers
-- [ ] Create PENDING records for all plugins before execution starts
-- [ ] Update status to RUNNING → SUCCESS/FAILED as each runs
-- [ ] Add SKIPPED status for plugins that don't run (e.g., previous failed)
-- [ ] Create `getPipelineRuns` query
+**Completed**:
+- [x] Added pipelineId, executionOrder, skippedReason to PluginRun schema
+- [x] Generate unique pipelineId when event triggers
+- [x] Create PENDING records for all plugins before execution starts
+- [x] Update status to RUNNING → SUCCEEDED/FAILED as each runs
+- [x] SKIPPED status for plugins that don't run
+- [x] Created `getPipelineRuns` query
 
-### 1.4 Add Conditional Execution Support
+### 1.4 Add Conditional Execution Support ✅
 
 **File**: `gennit-backend/services/pluginRunner.ts`
 
-**Logic**:
-- If a plugin fails and subsequent plugins depend on it, mark them SKIPPED
-- Track dependencies in manifest (optional future enhancement)
-- For now: simple "stop on first failure" mode as a plugin setting
-
-**Tasks**:
-- [ ] Add `stopPipelineOnFailure` server setting
-- [ ] When enabled, mark remaining plugins as SKIPPED after first failure
-- [ ] Store skippedReason: "Previous plugin failed"
+**Completed**:
+- [x] Pipeline-level `stopOnFirstFailure` option
+- [x] Step-level `continueOnError` option
+- [x] Step conditions: ALWAYS, PREVIOUS_SUCCEEDED, PREVIOUS_FAILED
+- [x] Store skippedReason when plugins are skipped
+- [x] Falls back to running all enabled plugins if no pipeline defined
 
 ---
 
@@ -199,7 +195,7 @@ type Query {
 
 **Goal**: Give maintainers visibility into plugin execution with a pipeline-like UI.
 
-### 3.1 Design Pipeline Data Model
+### 3.1 Design Pipeline Data Model ✅ (Backend Complete)
 
 **Concept**: When a file is uploaded, all enabled plugins form a "pipeline" that runs in order.
 
@@ -212,12 +208,12 @@ Pipeline for "game-mod.zip" upload
 
 **Data Flow**:
 1. File uploaded → triggers `downloadableFile.created` event
-2. Backend creates PluginRun records with status=PENDING for all enabled plugins
-3. Each plugin runs in order, updating status to RUNNING → SUCCESS/FAILED
+2. Backend creates PluginRun records with status=PENDING for all plugins in pipeline
+3. Each plugin runs in order, updating status to RUNNING → SUCCEEDED/FAILED
 4. Frontend polls or subscribes for updates
 5. User sees pipeline progress in real-time
 
-### 3.2 Backend: Pipeline Query
+### 3.2 Backend: Pipeline Query ✅ COMPLETE
 
 **File**: `gennit-backend/customResolvers/queries/getPipelineRuns.ts`
 
@@ -233,19 +229,13 @@ query GetPipelineRuns($targetId: ID!, $targetType: String!) {
     status
     message
     durationMs
-    order
+    executionOrder
     skippedReason
     createdAt
     updatedAt
   }
 }
 ```
-
-**Tasks**:
-- [ ] Create resolver that fetches PluginRun records by targetId
-- [ ] Group by pipelineId (for multiple runs over time)
-- [ ] Sort by order within each pipeline
-- [ ] Include plugin display name from manifest
 
 ### 3.3 Frontend: Pipeline Component
 
@@ -494,40 +484,50 @@ type InstalledPlugin {
 
 ---
 
-## Phase 7: Plugin Ordering UI
+## Phase 7: Plugin Pipeline Configuration UI
 
-**Goal**: Allow admins to control the order plugins run in.
+**Goal**: Allow admins to configure plugin execution pipelines via UI.
 
-### 7.1 Backend: Ordering Mutation
+### 7.1 Backend: Pipeline Mutation ✅ COMPLETE
 
-Already covered in Phase 1.2.
+Already implemented in Phase 1:
+- `updatePluginPipelines` mutation accepts pipeline configuration
+- Supports conditions, stopOnFirstFailure, continueOnError
 
-### 7.2 Frontend: Drag-and-Drop Ordering
+### 7.2 Frontend: Pipeline Configuration UI
 
-**New File**: `components/plugins/PluginOrderList.vue`
+**New File**: `components/plugins/PluginPipelineEditor.vue`
 
 **Features**:
-- Draggable list of enabled plugins
-- Visual feedback during drag
-- Save order on drop
-- Show current order numbers
+- Visual editor for pipeline configuration
+- Drag-and-drop to reorder plugins within a pipeline
+- Add/remove steps
+- Configure conditions per step (ALWAYS, PREVIOUS_SUCCEEDED, PREVIOUS_FAILED)
+- Toggle continueOnError per step
+- Toggle stopOnFirstFailure per pipeline
+- Select which event triggers the pipeline
 
 **Tasks**:
 - [ ] Install drag-and-drop library (vuedraggable or similar)
-- [ ] Create ordering component
-- [ ] Integrate with plugin settings page
-- [ ] Add section header explaining ordering
+- [ ] Create pipeline editor component
+- [ ] Integrate with `updatePluginPipelines` mutation
+- [ ] Add to plugin settings page or separate pipeline config page
+- [ ] Add validation (at least one step, valid plugin IDs)
 
 **UI Mockup**:
 ```
-┌─ Plugin Execution Order ─────────────────────────────┐
-│ Drag to reorder. Plugins run top to bottom.         │
+┌─ Pipeline: downloadableFile.created ─────────────────┐
+│ ☑ Stop on first failure                             │
 │                                                      │
-│  ≡ [1] Security Attachment Scan                      │
-│  ≡ [2] Auto-Labeler                                  │
-│  ≡ [3] Thumbnail Generator                           │
+│  ≡ [1] security-attachment-scan                      │
+│      Condition: ALWAYS  ☐ Continue on error         │
 │                                                      │
-│  [Save Order]                                        │
+│  ≡ [2] auto-labeler                                  │
+│      Condition: PREVIOUS_SUCCEEDED  ☐ Continue on error│
+│                                                      │
+│  [+ Add Step]                                        │
+│                                                      │
+│  [Save Pipeline]                                     │
 └──────────────────────────────────────────────────────┘
 ```
 
@@ -581,29 +581,29 @@ Already covered in Phase 1.2.
 
 Based on dependencies and value delivery:
 
-1. **Phase 1** (Backend Fixes) - Required foundation
-2. **Phase 2** (Plugin Details) - Quick win, improves existing UI
-3. **Phase 6** (UI Polish) - Quick fixes, improves UX
-4. **Phase 3** (Pipeline View) - Major feature, high value
+1. **Phase 1** (Backend Fixes) - ✅ COMPLETE
+2. **Phase 3** (Pipeline View) - High value, backend ready
+3. **Phase 2** (Plugin Details) - Quick win, improves existing UI
+4. **Phase 6** (UI Polish) - Quick fixes, improves UX
 5. **Phase 4** (Dynamic Forms) - Enables proper plugin configuration
-6. **Phase 5** (Version Management) - Nice to have
-7. **Phase 7** (Plugin Ordering) - Advanced feature
+6. **Phase 7** (Pipeline Config UI) - Enables full pipeline customization
+7. **Phase 5** (Version Management) - Nice to have
 8. **Phase 8** (Documentation & Testing) - Ongoing
 
 ---
 
 ## Estimated Scope
 
-| Phase | Tasks | Complexity |
-|-------|-------|------------|
-| Phase 1: Backend Fixes | 12 | Medium |
-| Phase 2: Plugin Details | 8 | Low |
-| Phase 3: Pipeline View | 15 | High |
-| Phase 4: Dynamic Forms | 10 | Medium |
-| Phase 5: Version Management | 6 | Low |
-| Phase 6: UI Polish | 8 | Low |
-| Phase 7: Plugin Ordering | 5 | Medium |
-| Phase 8: Docs & Testing | 10 | Medium |
+| Phase | Tasks | Complexity | Status |
+|-------|-------|------------|--------|
+| Phase 1: Backend Fixes | 12 | Medium | ✅ Complete |
+| Phase 2: Plugin Details | 8 | Low | Not Started |
+| Phase 3: Pipeline View | 15 | High | Backend Complete |
+| Phase 4: Dynamic Forms | 10 | Medium | Not Started |
+| Phase 5: Version Management | 6 | Low | Not Started |
+| Phase 6: UI Polish | 8 | Low | Not Started |
+| Phase 7: Pipeline Config UI | 5 | Medium | Backend Complete |
+| Phase 8: Docs & Testing | 10 | Medium | Not Started |
 
 ---
 
@@ -614,7 +614,7 @@ Based on dependencies and value delivery:
 - `components/plugins/PluginPipelineStage.vue`
 - `components/plugins/PluginLogsModal.vue`
 - `components/plugins/PluginSettingsForm.vue`
-- `components/plugins/PluginOrderList.vue`
+- `components/plugins/PluginPipelineEditor.vue`
 - `components/plugins/fields/PluginTextField.vue`
 - `components/plugins/fields/PluginNumberField.vue`
 - `components/plugins/fields/PluginBooleanField.vue`
@@ -626,12 +626,12 @@ Based on dependencies and value delivery:
 - `tests/cypress/e2e/plugins/pluginManagement.spec.cy.ts`
 - `tests/unit/components/plugins/*.spec.ts`
 
-### Backend (gennit-backend)
-- Update `customResolvers/queries/getInstalledPlugins.ts`
-- Create `customResolvers/queries/getPipelineRuns.ts`
-- Create `customResolvers/mutations/setPluginExecutionOrder.ts`
-- Update `services/pluginRunner.ts`
-- Update `typeDefs.ts`
+### Backend (gennit-backend) - ✅ Complete
+- ✅ Updated `customResolvers/queries/getInstalledPlugins.ts`
+- ✅ Created `customResolvers/queries/getPipelineRuns.ts`
+- ✅ Created `customResolvers/mutations/updatePluginPipelines.ts`
+- ✅ Updated `services/pluginRunner.ts`
+- ✅ Updated `typeDefs.ts`
 
 ---
 
@@ -641,3 +641,4 @@ Based on dependencies and value delivery:
 - The security-attachment-scan plugin already exists and is functional
 - The pipeline view is the highest-value missing feature for maintainer visibility
 - Consider WebSocket/subscription for real-time pipeline updates (future enhancement)
+- Phase 1 used GitHub Actions-style pipelines instead of simple executionOrder for more flexibility
