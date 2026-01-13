@@ -199,11 +199,33 @@ Plugins run in configurable pipelines with ordering, conditions, and error handl
 - Add/remove step buttons
 - Empty state guidance
 
-**Pipeline Configuration Page (`/admin/settings/plugins/pipelines`):**
+**Server Pipeline Configuration Page (`/admin/settings/plugins/pipelines`):**
 - Load current pipeline config from ServerConfig
 - Save validation before submission
 - Info banner explaining pipeline concepts
 - Link from plugin management index page
+
+### Channel Pipeline Configuration UI (Phase 9.5-9.6)
+
+**Channel Pipeline Page (`/forums/[forumId]/edit/pipelines`):**
+- Integrated into forum settings navigation as "Pipelines" tab
+- Reuses `PluginPipelineEditor` with `scope="channel"` prop
+- Shows only channel-relevant events (`discussionChannel.created`)
+- Loads/saves from Channel's `pluginPipelines` field
+- Info banner explaining channel pipeline behavior
+- Warning if no server plugins are enabled
+
+**Schema Updates:**
+- Added `PipelineScope` type ('server' | 'channel')
+- Added `scope` property to `PIPELINE_EVENTS`
+- Added `getEventsForScope()` helper function
+- Added `getDefaultPipelineYaml(scope)` for scope-specific defaults
+- Added `getPipelineJsonSchema(scope)` for Monaco validation
+- Updated `validatePipelineConfig()` to accept scope parameter
+
+**Component Updates:**
+- `PluginPipelineEditor.vue` - Added `scope` prop, uses scoped events/defaults
+- `PipelineVisualEditor.vue` - Added `events` prop for scope-filtered display
 
 ---
 

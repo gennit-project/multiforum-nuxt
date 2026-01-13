@@ -183,31 +183,34 @@ interface ChannelPipelineContext {
 - `shouldRunStep()` condition logic
 - Pipeline ID generation
 
-### 9.5 Frontend: Channel Pipeline Configuration Page
+### 9.5 Frontend: Channel Pipeline Configuration Page ✅ COMPLETED
 
-**New File**: `pages/c/[channelUniqueName]/settings/plugins/pipelines.vue`
+**Created File**: `pages/forums/[forumId]/edit/pipelines.vue`
 
-**Features**:
-- Reuse `PluginPipelineEditor` component from server-level
-- Filter events to show only channel-relevant events
-- Load/save from Channel's `pluginPipelines` field
-- Channel admin permission check
+**Features Implemented**:
+- Reuses `PluginPipelineEditor` component with `scope="channel"` prop
+- Shows only channel-relevant events (`discussionChannel.created`)
+- Loads/saves from Channel's `pluginPipelines` field via GraphQL
+- Integrated into forum settings navigation with "Pipelines" tab
 
-**Tasks**:
-- [ ] Create channel settings page for pipeline configuration
-- [ ] Add navigation from channel settings menu
-- [ ] Adapt `PluginPipelineEditor` for channel context
-- [ ] Add `GET_CHANNEL_PLUGIN_PIPELINES` query
-- [ ] Add `UPDATE_CHANNEL_PLUGIN_PIPELINES` mutation
+**Completed Tasks**:
+- [x] Create channel settings page for pipeline configuration
+- [x] Add navigation from channel settings menu (Pipelines tab)
+- [x] Adapt `PluginPipelineEditor` for channel context (scope prop)
+- [x] Add `GET_CHANNEL_PLUGIN_PIPELINES` query
+- [x] Add `UPDATE_CHANNEL_PLUGIN_PIPELINES` mutation
 
-### 9.6 Frontend: Update Pipeline Schema
+### 9.6 Frontend: Update Pipeline Schema ✅ COMPLETED
 
 **File**: `utils/pipelineSchema.ts`
 
-**Tasks**:
-- [ ] Add `discussionChannel.created` to `PIPELINE_EVENTS`
-- [ ] Update event descriptions for clarity
-- [ ] Add scope indicator to events (server vs channel)
+**Completed Tasks**:
+- [x] Add `discussionChannel.created` to `PIPELINE_EVENTS`
+- [x] Update event descriptions for clarity
+- [x] Add `scope` property to events (server vs channel)
+- [x] Add `PipelineScope` type and helper functions
+- [x] Add `getEventsForScope()`, `getDefaultPipelineYaml()`, `getPipelineJsonSchema()`
+- [x] Update `validatePipelineConfig()` to accept scope parameter
 
 ```typescript
 export const PIPELINE_EVENTS = [
@@ -406,8 +409,8 @@ Based on the use case of video game mod uploads with channel-specific auto-label
 | Priority | Phase | Description | Status |
 |----------|-------|-------------|--------|
 | 1 | **Phase 9.1-9.4** | Backend channel pipeline support | ✅ COMPLETED |
-| 2 | **Phase 9.5-9.6** | Frontend channel pipeline config UI | 🔲 Next |
-| 3 | **Phase 9.8** | Auto-labeler plugin enhancement | 🔲 Pending |
+| 2 | **Phase 9.5-9.6** | Frontend channel pipeline config UI | ✅ COMPLETED |
+| 3 | **Phase 9.8** | Auto-labeler plugin enhancement | 🔲 Next |
 | 4 | **Phase 9.7** | Channel pipeline view | 🔲 Pending |
 | 5 | **Phase 5** | Version management | 🔲 Pending |
 | 6 | **Phase 8** | Documentation & E2E tests | 🔲 Pending |
@@ -471,15 +474,20 @@ When auto-labeler plugin returns `appliedLabels`:
 
 ### Frontend (multiforum-nuxt)
 
-**To Create**:
-- `pages/c/[channelUniqueName]/settings/plugins/pipelines.vue`
-- `graphQLData/channel/queries.js` - Add channel pipeline queries
-- `graphQLData/channel/mutations.js` - Add channel pipeline mutations
+**Created (Phase 9.5-9.6)**:
+- ✅ `pages/forums/[forumId]/edit/pipelines.vue` - Channel pipeline configuration page
 
-**To Modify**:
-- `utils/pipelineSchema.ts` - Add channel events
+**Modified (Phase 9.5-9.6)**:
+- ✅ `utils/pipelineSchema.ts` - Added channel events, scope types, and helpers
+- ✅ `components/plugins/PluginPipelineEditor.vue` - Added scope prop for channel context
+- ✅ `components/plugins/PipelineVisualEditor.vue` - Added events prop for scoped events
+- ✅ `components/channel/form/CreateEditChannelFields.vue` - Added Pipelines tab
+- ✅ `pages/forums/[forumId].vue` - Added pipelines to settings routes
+- ✅ `graphQLData/channel/queries.js` - Added `GET_CHANNEL_PLUGIN_PIPELINES`
+- ✅ `graphQLData/channel/mutations.js` - Added `UPDATE_CHANNEL_PLUGIN_PIPELINES`
+
+**To Create/Modify (Phase 9.7+)**:
 - `components/channel/DownloadSidebar.vue` - Show both pipeline scopes
-- `components/plugins/PluginPipelineEditor.vue` - Support channel context
 
 ### Plugins Repository (multiforum-plugins)
 
