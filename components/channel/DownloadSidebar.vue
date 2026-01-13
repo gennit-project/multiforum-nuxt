@@ -3,7 +3,7 @@ import type { PropType } from 'vue';
 import type { Discussion } from '@/__generated__/graphql';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import DownloadSuccessPopover from '@/components/download/DownloadSuccessPopover.vue';
-import PluginPipeline from '@/components/plugins/PluginPipeline.vue';
+import ScopedPipelineView from '@/components/plugins/ScopedPipelineView.vue';
 import { computed, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_DOWNLOAD_LABELS } from '@/graphQLData/discussion/queries';
@@ -253,13 +253,13 @@ const handleDownload = () => {
 
       <!-- Plugin Pipeline Section -->
       <div
-        v-if="primaryFile?.id"
+        v-if="primaryFile?.id || discussionId"
         class="border-t border-gray-200 pt-4 dark:border-gray-700"
       >
-        <PluginPipeline
-          :target-id="primaryFile.id"
-          target-type="DownloadableFile"
-          title="Scan Status"
+        <ScopedPipelineView
+          :file-id="primaryFile?.id"
+          :discussion-id="discussionId"
+          :channel-name="channelUniqueName"
           :collapsible="true"
         />
       </div>

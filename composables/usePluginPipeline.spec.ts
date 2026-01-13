@@ -22,6 +22,16 @@ vi.mock('@/graphQLData/admin/queries', () => ({
   GET_PIPELINE_RUNS: 'mock-query',
 }));
 
+// Helper to create mock pipeline runs with required fields
+const createMockRun = (overrides: Partial<PipelineRun> & { id: string; pipelineId: string; pluginId: string; pluginName: string; status: PipelineStatus; executionOrder: number }): PipelineRun => ({
+  version: '1.0.0',
+  scope: 'SERVER',
+  eventType: 'downloadableFile.created',
+  createdAt: '2024-01-01T10:00:00Z',
+  updatedAt: '2024-01-01T10:00:01Z',
+  ...overrides,
+});
+
 describe('usePluginPipeline composable', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -150,39 +160,36 @@ describe('usePluginPipeline composable', () => {
     it('should group runs by pipelineId', async () => {
       const { useQuery } = await import('@vue/apollo-composable');
       const mockRuns: PipelineRun[] = [
-        {
+        createMockRun({
           id: '1',
           pipelineId: 'pipeline-1',
           pluginId: 'plugin-a',
           pluginName: 'Plugin A',
-          version: '1.0.0',
           status: 'SUCCEEDED',
           executionOrder: 0,
           createdAt: '2024-01-01T10:00:00Z',
           updatedAt: '2024-01-01T10:00:01Z',
-        },
-        {
+        }),
+        createMockRun({
           id: '2',
           pipelineId: 'pipeline-1',
           pluginId: 'plugin-b',
           pluginName: 'Plugin B',
-          version: '1.0.0',
           status: 'SUCCEEDED',
           executionOrder: 1,
           createdAt: '2024-01-01T10:00:01Z',
           updatedAt: '2024-01-01T10:00:02Z',
-        },
-        {
+        }),
+        createMockRun({
           id: '3',
           pipelineId: 'pipeline-2',
           pluginId: 'plugin-a',
           pluginName: 'Plugin A',
-          version: '1.0.0',
           status: 'RUNNING',
           executionOrder: 0,
           createdAt: '2024-01-01T11:00:00Z',
           updatedAt: '2024-01-01T11:00:00Z',
-        },
+        }),
       ];
 
       vi.mocked(useQuery).mockReturnValue({
@@ -215,28 +222,26 @@ describe('usePluginPipeline composable', () => {
     it('should sort runs by executionOrder within a group', async () => {
       const { useQuery } = await import('@vue/apollo-composable');
       const mockRuns: PipelineRun[] = [
-        {
+        createMockRun({
           id: '2',
           pipelineId: 'pipeline-1',
           pluginId: 'plugin-b',
           pluginName: 'Plugin B',
-          version: '1.0.0',
           status: 'SUCCEEDED',
           executionOrder: 1,
           createdAt: '2024-01-01T10:00:01Z',
           updatedAt: '2024-01-01T10:00:02Z',
-        },
-        {
+        }),
+        createMockRun({
           id: '1',
           pipelineId: 'pipeline-1',
           pluginId: 'plugin-a',
           pluginName: 'Plugin A',
-          version: '1.0.0',
           status: 'SUCCEEDED',
           executionOrder: 0,
           createdAt: '2024-01-01T10:00:00Z',
           updatedAt: '2024-01-01T10:00:01Z',
-        },
+        }),
       ];
 
       vi.mocked(useQuery).mockReturnValue({
@@ -263,28 +268,26 @@ describe('usePluginPipeline composable', () => {
       vi.mocked(useQuery).mockReturnValue({
         result: ref({
           getPipelineRuns: [
-            {
+            createMockRun({
               id: '1',
               pipelineId: 'pipeline-1',
               pluginId: 'plugin-a',
               pluginName: 'Plugin A',
-              version: '1.0.0',
               status: 'SUCCEEDED',
               executionOrder: 0,
               createdAt: '2024-01-01T10:00:00Z',
               updatedAt: '2024-01-01T10:00:01Z',
-            },
-            {
+            }),
+            createMockRun({
               id: '2',
               pipelineId: 'pipeline-1',
               pluginId: 'plugin-b',
               pluginName: 'Plugin B',
-              version: '1.0.0',
               status: 'FAILED',
               executionOrder: 1,
               createdAt: '2024-01-01T10:00:01Z',
               updatedAt: '2024-01-01T10:00:02Z',
-            },
+            }),
           ],
         }),
         loading: ref(false),
@@ -300,6 +303,39 @@ describe('usePluginPipeline composable', () => {
 
       expect(pipelineGroups.value[0]!.status).toBe('FAILED');
       expect(pipelineGroups.value[0]!.isComplete).toBe(true);
+    });
+
+    it('should include scope in pipeline groups', async () => {
+      const { useQuery } = await import('@vue/apollo-composable');
+      const mockRuns: PipelineRun[] = [
+        createMockRun({
+          id: '1',
+          pipelineId: 'pipeline-1',
+          pluginId: 'plugin-a',
+          pluginName: 'Plugin A',
+          status: 'SUCCEEDED',
+          executionOrder: 0,
+          scope: 'CHANNEL',
+          channelId: 'test-channel',
+          eventType: 'discussionChannel.created',
+        }),
+      ];
+
+      vi.mocked(useQuery).mockReturnValue({
+        result: ref({ getPipelineRuns: mockRuns }),
+        loading: ref(false),
+        error: ref(null),
+        refetch: vi.fn(),
+      } as any);
+
+      const { pipelineGroups } = usePluginPipeline(
+        ref('test-id'),
+        ref('Discussion'),
+        { enabled: true }
+      );
+
+      expect(pipelineGroups.value[0]!.scope).toBe('CHANNEL');
+      expect(pipelineGroups.value[0]!.channelId).toBe('test-channel');
     });
   });
 
@@ -327,28 +363,26 @@ describe('usePluginPipeline composable', () => {
       vi.mocked(useQuery).mockReturnValue({
         result: ref({
           getPipelineRuns: [
-            {
+            createMockRun({
               id: '1',
               pipelineId: 'pipeline-old',
               pluginId: 'plugin-a',
               pluginName: 'Plugin A',
-              version: '1.0.0',
               status: 'SUCCEEDED',
               executionOrder: 0,
               createdAt: '2024-01-01T10:00:00Z',
               updatedAt: '2024-01-01T10:00:01Z',
-            },
-            {
+            }),
+            createMockRun({
               id: '2',
               pipelineId: 'pipeline-new',
               pluginId: 'plugin-a',
               pluginName: 'Plugin A',
-              version: '1.0.0',
               status: 'RUNNING',
               executionOrder: 0,
               createdAt: '2024-01-01T12:00:00Z',
               updatedAt: '2024-01-01T12:00:00Z',
-            },
+            }),
           ],
         }),
         loading: ref(false),
@@ -372,17 +406,14 @@ describe('usePluginPipeline composable', () => {
       vi.mocked(useQuery).mockReturnValue({
         result: ref({
           getPipelineRuns: [
-            {
+            createMockRun({
               id: '1',
               pipelineId: 'pipeline-1',
               pluginId: 'plugin-a',
               pluginName: 'Plugin A',
-              version: '1.0.0',
               status: 'SUCCEEDED',
               executionOrder: 0,
-              createdAt: '2024-01-01T10:00:00Z',
-              updatedAt: '2024-01-01T10:00:01Z',
-            },
+            }),
           ],
         }),
         loading: ref(false),
@@ -404,17 +435,14 @@ describe('usePluginPipeline composable', () => {
       vi.mocked(useQuery).mockReturnValue({
         result: ref({
           getPipelineRuns: [
-            {
+            createMockRun({
               id: '1',
               pipelineId: 'pipeline-1',
               pluginId: 'plugin-a',
               pluginName: 'Plugin A',
-              version: '1.0.0',
               status: 'RUNNING',
               executionOrder: 0,
-              createdAt: '2024-01-01T10:00:00Z',
-              updatedAt: '2024-01-01T10:00:00Z',
-            },
+            }),
           ],
         }),
         loading: ref(false),
@@ -436,17 +464,14 @@ describe('usePluginPipeline composable', () => {
       vi.mocked(useQuery).mockReturnValue({
         result: ref({
           getPipelineRuns: [
-            {
+            createMockRun({
               id: '1',
               pipelineId: 'pipeline-1',
               pluginId: 'plugin-a',
               pluginName: 'Plugin A',
-              version: '1.0.0',
               status: 'PENDING',
               executionOrder: 0,
-              createdAt: '2024-01-01T10:00:00Z',
-              updatedAt: '2024-01-01T10:00:00Z',
-            },
+            }),
           ],
         }),
         loading: ref(false),

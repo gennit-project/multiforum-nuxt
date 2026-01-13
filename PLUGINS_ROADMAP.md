@@ -61,241 +61,23 @@ When a video game mod is uploaded and submitted to a channel:
 - Channel-specific validation rules
 - Custom metadata extraction based on channel focus
 
-### Key Difference: Trigger Events
-
-| Event | Scope | When Triggered | Context Available |
-|-------|-------|----------------|-------------------|
-| `downloadableFile.created` | Server | File is uploaded | File metadata, uploader |
-| `downloadableFile.updated` | Server | File is modified | File metadata, uploader |
-| `discussionChannel.created` | Channel | Discussion connected to channel | Discussion, file, channel config |
-
-The `discussionChannel.created` event provides the channel context needed for channel-specific labeling.
-
 ---
 
-## Phase 9: Channel-Scoped Pipeline Configuration
+## Phase 9.8: Auto-Labeler Plugin (Remaining Work)
 
-**Goal**: Allow channel admins to configure plugins that run when content is submitted to their channel.
+**Repository**: `multiforum-plugins` (local: `/gennit/plugins/auto-labeler`)
 
-### 9.1 Backend: New Event Type ✅ COMPLETED
+**Completed**:
+- ✅ Backend passes `filterGroups` in channel context to plugins
+- ✅ Created stubbed auto-labeler plugin that logs available filters
 
-**Event**: `discussionChannel.created`
-
-**Trigger Conditions**:
-- A DiscussionChannel relationship is created
-- The Discussion has `hasDownload: true`
-- The Channel has `pluginPipelines` configured
-
-**Files Modified**:
-- [x] `typeDefs.ts` - Added `pluginPipelines: JSON` to Channel type
-- [x] `services/pluginRunner.ts` - Added `triggerChannelPluginPipeline()` function
-- [x] `createDiscussionWithChannelConnections.ts` - Triggers channel pipeline on submission
-
-**Schema Changes**:
-```graphql
-type Channel {
-  # ... existing fields
-  pluginPipelines: JSON  # Channel-scoped pipeline configuration
-}
-
-input EventPipelineInput {
-  event: String!  # Now supports: downloadableFile.*, discussionChannel.created
-  steps: [PipelineStepInput!]!
-  stopOnFirstFailure: Boolean
-}
-```
-
-### 9.2 Backend: Channel Pipeline Mutation ✅ COMPLETED
-
-**New Mutation**: `updateChannelPluginPipelines`
-
-```graphql
-type Mutation {
-  updateChannelPluginPipelines(
-    channelUniqueName: String!
-    pipelines: [EventPipelineInput!]!
-  ): JSON!
-}
-```
-
-**File**: `customResolvers/mutations/updateChannelPluginPipelines.ts`
-
-**Completed Tasks**:
-- [x] Create mutation resolver
-- [x] Validate channel-specific events (only `discussionChannel.created` allowed)
-- [x] Reuse `validatePipelines` for structure validation
-- [x] Store on Channel node via `pluginPipelines` field
-
-### 9.3 Backend: Pipeline Execution for Channel Events ✅ COMPLETED
-
-**File**: `services/pluginRunner.ts`
-
-**Completed Tasks**:
-- [x] Added `triggerChannelPluginPipeline()` function
-- [x] Added `CHANNEL_EVENTS` set and `isChannelEvent()` helper
-- [x] Load pipeline config from Channel's `pluginPipelines` field
-- [x] Execute plugins with channel context (scope: 'CHANNEL')
-- [x] Track PluginRun records with `scope: 'CHANNEL'` and `channelId`
-
-**Context Passed to Plugins**:
-```typescript
-interface ChannelPipelineContext {
-  event: 'discussionChannel.created';
-  discussion: {
-    id: string;
-    title: string;
-    body: string;
-  };
-  downloadableFile: {
-    id: string;
-    fileName: string;
-    fileSize: number;
-    fileUrl: string;
-  };
-  channel: {
-    uniqueName: string;
-    displayName: string;
-    tags: string[];
-  };
-}
-```
-
-### 9.4 Backend: Trigger Channel Pipeline ✅ COMPLETED
-
-**File**: `customResolvers/mutations/createDiscussionWithChannelConnections.ts`
-
-**Completed Tasks**:
-- [x] After DiscussionChannel is created, check if Discussion has `hasDownload: true`
-- [x] If yes, trigger `triggerChannelPluginPipeline()` with channel context
-- [x] Pipeline errors are logged but don't fail discussion creation
-- [x] Added plugin models to resolver input for pipeline support
-
-### 9.1-9.4 Backend Tests ✅ COMPLETED
-
-**Test Files Created**:
-- `customResolvers/mutations/updateChannelPluginPipelines.test.ts` - 10 tests
-- `services/pluginRunner.test.ts` - Updated with channel event tests (11 tests total)
-
-**Test Coverage**:
-- Channel event validation (valid/invalid events)
-- Structure validation for channel pipelines
-- `isChannelEvent()` helper function
-- `shouldRunStep()` condition logic
-- Pipeline ID generation
-
-### 9.5 Frontend: Channel Pipeline Configuration Page ✅ COMPLETED
-
-**Created File**: `pages/forums/[forumId]/edit/pipelines.vue`
-
-**Features Implemented**:
-- Reuses `PluginPipelineEditor` component with `scope="channel"` prop
-- Shows only channel-relevant events (`discussionChannel.created`)
-- Loads/saves from Channel's `pluginPipelines` field via GraphQL
-- Integrated into forum settings navigation with "Pipelines" tab
-
-**Completed Tasks**:
-- [x] Create channel settings page for pipeline configuration
-- [x] Add navigation from channel settings menu (Pipelines tab)
-- [x] Adapt `PluginPipelineEditor` for channel context (scope prop)
-- [x] Add `GET_CHANNEL_PLUGIN_PIPELINES` query
-- [x] Add `UPDATE_CHANNEL_PLUGIN_PIPELINES` mutation
-
-### 9.6 Frontend: Update Pipeline Schema ✅ COMPLETED
-
-**File**: `utils/pipelineSchema.ts`
-
-**Completed Tasks**:
-- [x] Add `discussionChannel.created` to `PIPELINE_EVENTS`
-- [x] Update event descriptions for clarity
-- [x] Add `scope` property to events (server vs channel)
-- [x] Add `PipelineScope` type and helper functions
-- [x] Add `getEventsForScope()`, `getDefaultPipelineYaml()`, `getPipelineJsonSchema()`
-- [x] Update `validatePipelineConfig()` to accept scope parameter
-
-```typescript
-export const PIPELINE_EVENTS = [
-  // Server-scoped events
-  {
-    value: 'downloadableFile.created',
-    label: 'File Upload',
-    description: 'Triggered when a downloadable file is uploaded',
-    scope: 'server',
-  },
-  {
-    value: 'downloadableFile.updated',
-    label: 'File Updated',
-    description: 'Triggered when a downloadable file is modified',
-    scope: 'server',
-  },
-  // Channel-scoped events
-  {
-    value: 'discussionChannel.created',
-    label: 'Content Submitted to Channel',
-    description: 'Triggered when a discussion with download is submitted to this channel',
-    scope: 'channel',
-  },
-] as const;
-```
-
-### 9.7 Frontend: Channel Pipeline View
-
-**File**: `components/channel/DownloadSidebar.vue` (or similar)
-
-**Tasks**:
-- [ ] Show both server and channel pipeline results
-- [ ] Distinguish between pipeline scopes in UI
-- [ ] Show auto-applied labels from channel pipeline
-
-**UI Mockup**:
-```
-┌─ Plugin Pipelines ───────────────────────────────────────────────┐
-│                                                                   │
-│  Server Pipeline                                                  │
-│  ● Security Scan ──────────────── ✓ Passed (1.2s)                │
-│  ● Thumbnail Generator ────────── ✓ Passed (0.8s)                │
-│                                                                   │
-│  Channel Pipeline (Gaming Mods)                                   │
-│  ● Auto-Labeler ───────────────── ✓ Passed (0.5s)                │
-│    Applied: [unity] [windows] [large-file]                       │
-│                                                                   │
-│  [View Logs]                                                      │
-└───────────────────────────────────────────────────────────────────┘
-```
-
-### 9.8 Auto-Labeler Plugin Enhancement
-
-**Repository**: `multiforum-plugins`
-
-**Tasks**:
-- [ ] Update auto-labeler plugin to accept channel context
-- [ ] Read channel's available labels
+**Remaining Tasks**:
 - [ ] Analyze file metadata to determine applicable labels
 - [ ] Return applied labels in plugin output
 - [ ] Backend applies returned labels to discussion
+- [ ] Publish plugin to registry
 
-**Plugin Input Context**:
-```json
-{
-  "event": "discussionChannel.created",
-  "file": {
-    "fileName": "awesome-mod-v1.2.zip",
-    "fileSize": 2468421632,
-    "mimeType": "application/zip"
-  },
-  "channel": {
-    "availableLabels": [
-      { "name": "unity", "category": "engine" },
-      { "name": "unreal", "category": "engine" },
-      { "name": "windows", "category": "platform" },
-      { "name": "linux", "category": "platform" },
-      { "name": "small-file", "category": "size" },
-      { "name": "large-file", "category": "size" }
-    ]
-  }
-}
-```
-
-**Plugin Output**:
+**Plugin Output** (target format):
 ```json
 {
   "success": true,
@@ -308,11 +90,13 @@ export const PIPELINE_EVENTS = [
 }
 ```
 
-### 9.9 Unit Tests
+---
+
+## Phase 9.9: Unit Tests
 
 **Files to Create**:
 - [ ] `utils/pipelineSchema.spec.ts` - Test channel events
-- [ ] `pages/c/[channelUniqueName]/settings/plugins/pipelines.spec.ts`
+- [ ] `pages/forums/[forumId]/edit/pipelines.spec.ts`
 
 **Test Cases**:
 - [ ] Channel pipeline configuration validation
@@ -404,16 +188,12 @@ type InstalledPlugin {
 
 ## Implementation Priority
 
-Based on the use case of video game mod uploads with channel-specific auto-labeling:
-
 | Priority | Phase | Description | Status |
 |----------|-------|-------------|--------|
-| 1 | **Phase 9.1-9.4** | Backend channel pipeline support | ✅ COMPLETED |
-| 2 | **Phase 9.5-9.6** | Frontend channel pipeline config UI | ✅ COMPLETED |
-| 3 | **Phase 9.8** | Auto-labeler plugin enhancement | 🔲 Next |
-| 4 | **Phase 9.7** | Channel pipeline view | 🔲 Pending |
-| 5 | **Phase 5** | Version management | 🔲 Pending |
-| 6 | **Phase 8** | Documentation & E2E tests | 🔲 Pending |
+| 1 | **Phase 9.8** | Auto-labeler plugin (remaining) | 🔄 IN PROGRESS |
+| 2 | **Phase 9.9** | Unit tests for channel pipelines | 🔲 Pending |
+| 3 | **Phase 5** | Version management | 🔲 Pending |
+| 4 | **Phase 8** | Documentation & E2E tests | 🔲 Pending |
 
 ---
 
@@ -454,42 +234,28 @@ When auto-labeler plugin returns `appliedLabels`:
 
 ---
 
-## Files Summary
+## Files to Create/Modify
 
 ### Backend (gennit-backend)
 
-**Created (Phase 9.1-9.4)**:
-- ✅ `customResolvers/mutations/updateChannelPluginPipelines.ts` - Channel pipeline mutation
-- ✅ `customResolvers/mutations/updateChannelPluginPipelines.test.ts` - 10 tests
-- ✅ `services/pluginRunner.test.ts` - Updated with channel event tests
-
-**Modified (Phase 9.1-9.4)**:
-- ✅ `typeDefs.ts` - Added `pluginPipelines` to Channel type, added mutation
-- ✅ `services/pluginRunner.ts` - Added `triggerChannelPluginPipeline()`, `isChannelEvent()`
-- ✅ `customResolvers/mutations/createDiscussionWithChannelConnections.ts` - Triggers channel pipeline
-- ✅ `customResolvers.ts` - Registered new mutation and added models
-
-**To Create (Phase 9.5+)**:
-- `customResolvers/queries/getChannelPluginPipelines.ts` (optional, can use existing Channel query)
+**Phase 9.8 (remaining)**:
+- [ ] Apply labels returned by auto-labeler plugin to discussions
 
 ### Frontend (multiforum-nuxt)
 
-**Created (Phase 9.5-9.6)**:
-- ✅ `pages/forums/[forumId]/edit/pipelines.vue` - Channel pipeline configuration page
+**Phase 9.9**:
+- [ ] `utils/pipelineSchema.spec.ts` - Channel event tests
+- [ ] `pages/forums/[forumId]/edit/pipelines.spec.ts` - Channel pipeline page tests
 
-**Modified (Phase 9.5-9.6)**:
-- ✅ `utils/pipelineSchema.ts` - Added channel events, scope types, and helpers
-- ✅ `components/plugins/PluginPipelineEditor.vue` - Added scope prop for channel context
-- ✅ `components/plugins/PipelineVisualEditor.vue` - Added events prop for scoped events
-- ✅ `components/channel/form/CreateEditChannelFields.vue` - Added Pipelines tab
-- ✅ `pages/forums/[forumId].vue` - Added pipelines to settings routes
-- ✅ `graphQLData/channel/queries.js` - Added `GET_CHANNEL_PLUGIN_PIPELINES`
-- ✅ `graphQLData/channel/mutations.js` - Added `UPDATE_CHANNEL_PLUGIN_PIPELINES`
+**Phase 5**:
+- [ ] Update `pages/admin/settings/plugins/index.vue` - Version badges
+- [ ] Update `pages/admin/settings/plugins/[pluginId].vue` - Version selector
 
-**To Create/Modify (Phase 9.7+)**:
-- `components/channel/DownloadSidebar.vue` - Show both pipeline scopes
+**Phase 8**:
+- [ ] `pages/admin/settings/plugins/docs.vue` - Documentation page
+- [ ] `tests/cypress/e2e/plugins/pluginManagement.spec.cy.ts` - E2E tests
 
 ### Plugins Repository (multiforum-plugins)
 
-**To Modify**:
-- `auto-labeler/` - Add channel context handling, label application logic
+**Phase 9.8 (remaining)**:
+- [ ] `auto-labeler/` - Implement actual labeling logic based on file metadata

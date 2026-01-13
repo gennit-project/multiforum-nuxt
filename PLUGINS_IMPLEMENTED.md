@@ -62,13 +62,17 @@ Plugins run in configurable pipelines with ordering, conditions, and error handl
 - Duration tracking in milliseconds
 - Scope tracking: `SERVER` or `CHANNEL`
 
-### Channel-Scoped Pipeline Support (Phase 9.1-9.4)
+### Channel-Scoped Pipeline Support (Phase 9.1-9.4, 9.8)
 - Channel admins can configure pipelines for `discussionChannel.created` event
 - Pipelines stored in `Channel.pluginPipelines` JSON field
 - Only server-enabled plugins can be used in channel pipelines
 - Automatic trigger when discussion with download is submitted to channel
 - Pipeline errors logged but don't fail discussion creation
-- Plugin context includes channel metadata (uniqueName, displayName, tags)
+- Plugin context includes channel metadata:
+  - `uniqueName` - Channel's unique identifier
+  - `displayName` - Channel's display name
+  - `tags` - Channel's tags
+  - `filterGroups` - Channel's filter configuration with options (for auto-labeling)
 
 ### GraphQL API
 
@@ -227,6 +231,23 @@ Plugins run in configurable pipelines with ordering, conditions, and error handl
 - `PluginPipelineEditor.vue` - Added `scope` prop, uses scoped events/defaults
 - `PipelineVisualEditor.vue` - Added `events` prop for scope-filtered display
 
+### Channel Pipeline View (Phase 9.7)
+
+**New Component**: `ScopedPipelineView.vue`
+
+Displays both server and channel pipeline results in the download sidebar:
+- Queries server pipelines (file-level) and channel pipelines (discussion-level)
+- Shows pipelines in separate sections with scope indicators
+- Server pipelines show with server icon
+- Channel pipelines show with hashtag icon and channel name
+- Combined status indicator in header
+- Auto-polling while any pipeline is active
+
+**Updated Files:**
+- `composables/usePluginPipeline.ts` - Added `scope`, `channelId`, `eventType` to PipelineRun and PipelineGroup interfaces
+- `graphQLData/admin/queries.js` - Added `scope`, `channelId`, `eventType` to GET_PIPELINE_RUNS query
+- `components/channel/DownloadSidebar.vue` - Uses ScopedPipelineView instead of PluginPipeline
+
 ---
 
 ## Plugins Repository (multiforum-plugins)
@@ -235,6 +256,11 @@ Plugins run in configurable pipelines with ordering, conditions, and error handl
 
 1. **hello-world** - Demo plugin for testing
 2. **security-attachment-scan** - VirusTotal integration for malware scanning
+3. **auto-labeler** - Stub plugin for channel-scoped auto-labeling (Phase 9.8)
+   - Receives `discussionChannel.created` events
+   - Logs available filter groups from channel context
+   - Returns error with filter summary for debugging
+   - Ready for implementation of actual labeling logic
 
 ### CI/CD Pipeline
 - GitHub Actions workflow for building and publishing
@@ -313,6 +339,43 @@ pipelines:
 ```
 
 Note: Channel pipelines can only use the `discussionChannel.created` event and can only reference plugins that are enabled at the server level.
+
+### Channel Plugin Event Payload
+
+When a channel pipeline is triggered, plugins receive this context:
+
+```json
+{
+  "type": "discussionChannel.created",
+  "payload": {
+    "discussionId": "abc123",
+    "discussionTitle": "Awesome Mod v1.2",
+    "discussionBody": "Check out this mod!",
+    "downloadableFileId": "file123",
+    "fileName": "awesome-mod-v1.2.zip",
+    "fileSize": 2468421632,
+    "fileUrl": "https://storage.example.com/...",
+    "channel": {
+      "uniqueName": "gaming-mods",
+      "displayName": "Gaming Mods",
+      "tags": ["gaming", "mods"],
+      "filterGroups": [
+        {
+          "id": "fg1",
+          "key": "platform",
+          "displayName": "Platform",
+          "mode": "SINGLE",
+          "order": 0,
+          "options": [
+            { "id": "opt1", "value": "windows", "displayName": "Windows", "order": 0 },
+            { "id": "opt2", "value": "linux", "displayName": "Linux", "order": 1 }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
 
 ### Plugin Manifest UI Schema
 

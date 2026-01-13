@@ -9,12 +9,17 @@ export type PipelineStatus =
   | 'FAILED'
   | 'SKIPPED';
 
+export type PipelineScope = 'SERVER' | 'CHANNEL';
+
 export interface PipelineRun {
   id: string;
   pipelineId: string;
   pluginId: string;
   pluginName: string;
   version: string;
+  scope: PipelineScope;
+  channelId?: string;
+  eventType: string;
   status: PipelineStatus;
   message?: string;
   durationMs?: number;
@@ -31,6 +36,8 @@ export interface PipelineGroup {
   startedAt: string;
   status: PipelineStatus;
   isComplete: boolean;
+  scope: PipelineScope;
+  channelId?: string;
 }
 
 interface UsePluginPipelineOptions {
@@ -121,6 +128,8 @@ export function usePluginPipeline(
           startedAt: sortedRuns[0]?.createdAt || '',
           status,
           isComplete: allComplete,
+          scope: sortedRuns[0]?.scope || 'SERVER',
+          channelId: sortedRuns[0]?.channelId,
         };
       })
       .sort(

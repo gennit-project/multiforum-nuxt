@@ -384,6 +384,9 @@ export const GET_PIPELINE_RUNS = gql`
       pluginId
       pluginName
       version
+      scope
+      channelId
+      eventType
       status
       message
       durationMs
