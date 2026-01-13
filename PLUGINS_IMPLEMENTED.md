@@ -248,6 +248,37 @@ Displays both server and channel pipeline results in the download sidebar:
 - `graphQLData/admin/queries.js` - Added `scope`, `channelId`, `eventType` to GET_PIPELINE_RUNS query
 - `components/channel/DownloadSidebar.vue` - Uses ScopedPipelineView instead of PluginPipeline
 
+### Plugin Version Management (Phase 5)
+
+**Goal**: Allow server admins to see when plugin updates are available and easily update to newer versions.
+
+**Backend Changes** (`gennit-backend`):
+- Updated `getInstalledPlugins` resolver to fetch plugin registry
+- Added semver-style version comparison logic
+- New fields on `InstalledPlugin` type:
+  - `hasUpdate: Boolean` - True when a newer version exists in registry
+  - `latestVersion: String` - The newest available version
+  - `availableVersions: [String!]` - All versions from registry, sorted newest first
+
+**Frontend - Plugin List Page** (`pages/admin/settings/plugins/index.vue`):
+- "Update Available" badge next to version when `hasUpdate` is true
+- Shows latest available version in the badge
+- "Update" button appears for plugins with available updates
+- Clicking "Update" navigates to detail page with `?update=true` param
+
+**Frontend - Plugin Detail Page** (`pages/admin/settings/plugins/[pluginId].vue`):
+- Prominent "Update Available" banner when newer version exists
+- Shows installed vs latest version comparison
+- "Update to vX.Y.Z" button for one-click updates
+- Version dropdown marks versions as "(Installed)" or "(Latest)"
+- Auto-selects latest version when accessing with `?update=true` query param
+- Number of available registry versions shown in update banner
+
+**Version Comparison Logic**:
+- Handles semver-style versions (major.minor.patch)
+- Supports 'v' prefix (e.g., "v1.0.0" treated same as "1.0.0")
+- Gracefully handles non-standard version strings
+
 ---
 
 ## Plugins Repository (multiforum-plugins)

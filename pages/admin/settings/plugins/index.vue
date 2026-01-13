@@ -68,6 +68,8 @@ interface PluginState {
     settings: any;
   };
   availableVersions: PluginVersion[];
+  hasUpdate?: boolean;
+  latestVersion?: string;
 }
 
 interface InstalledPlugin {
@@ -80,6 +82,9 @@ interface InstalledPlugin {
   scope: string;
   enabled: boolean;
   settingsJson: any;
+  hasUpdate?: boolean;
+  latestVersion?: string;
+  availableVersions?: string[];
 }
 
 // Fetch plugin data
@@ -162,6 +167,8 @@ const pluginStates = computed((): PluginState[] => {
           }
         : undefined,
       availableVersions,
+      hasUpdate: installedPlugin?.hasUpdate ?? false,
+      latestVersion: installedPlugin?.latestVersion,
     };
   });
 });
@@ -609,11 +616,20 @@ onMounted(() => {
                         }}
                       </span>
                     </div>
-                    <div v-if="plugin.installedVersion?.version">
-                      <span class="text-xs font-medium text-gray-400"
-                        >Version:</span
+                    <div v-if="plugin.installedVersion?.version" class="flex items-center gap-2">
+                      <span>
+                        <span class="text-xs font-medium text-gray-400">Version:</span>
+                        {{ plugin.installedVersion.version }}
+                      </span>
+                      <!-- Update Available Badge -->
+                      <span
+                        v-if="plugin.hasUpdate && plugin.latestVersion"
+                        class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                        :title="`Update available: v${plugin.latestVersion}`"
                       >
-                      {{ plugin.installedVersion.version }}
+                        <i class="fa-solid fa-arrow-up mr-1 text-[10px]" />
+                        {{ plugin.latestVersion }}
+                      </span>
                     </div>
                     <div>
                       <span class="text-xs font-medium text-gray-400"
@@ -670,6 +686,14 @@ onMounted(() => {
                       plugin.status === 'installed_disabled'
                     "
                   >
+                    <NuxtLink
+                      v-if="plugin.hasUpdate"
+                      :to="`/admin/settings/plugins/${plugin.id}?update=true`"
+                      class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                    >
+                      <i class="fa-solid fa-arrow-up mr-1" />
+                      Update
+                    </NuxtLink>
                     <NuxtLink
                       :to="`/admin/settings/plugins/${plugin.id}`"
                       class="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"

@@ -269,6 +269,9 @@ export const GET_INSTALLED_PLUGINS = gql`
       settingsJson
       readmeMarkdown
       manifest
+      hasUpdate
+      latestVersion
+      availableVersions
     }
   }
 `;
@@ -348,6 +351,9 @@ export const GET_PLUGIN_MANAGEMENT_DATA = gql`
       settingsJson
       readmeMarkdown
       manifest
+      hasUpdate
+      latestVersion
+      availableVersions
     }
   }
 `;

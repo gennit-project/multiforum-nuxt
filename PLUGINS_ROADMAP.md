@@ -106,48 +106,6 @@ When a video game mod is uploaded and submitted to a channel:
 
 ---
 
-## Phase 5: Plugin Version Management
-
-**Goal**: Allow updating outdated plugins and managing versions.
-
-### 5.1 Backend: Version Comparison
-
-**Tasks**:
-- [ ] Add query to check for newer versions in registry
-- [ ] Compare installed version with available versions
-- [ ] Return update availability status
-
-**Query**:
-```graphql
-type InstalledPlugin {
-  # Existing fields...
-  hasUpdate: Boolean
-  latestVersion: String
-}
-```
-
-### 5.2 Frontend: Update Available Indicator
-
-**File**: `pages/admin/settings/plugins/index.vue`
-
-**Tasks**:
-- [ ] Show "Update Available" badge on outdated plugins
-- [ ] Show current vs latest version
-- [ ] Add "Update" button that opens detail page
-
-### 5.3 Frontend: Update Flow on Detail Page
-
-**File**: `pages/admin/settings/plugins/[pluginId].vue`
-
-**Tasks**:
-- [ ] Show version dropdown with available versions
-- [ ] Highlight currently installed version
-- [ ] Show "Update to vX.Y.Z" button when newer version exists
-- [ ] Confirm before updating (settings may reset)
-- [ ] Show changelog if available in README
-
----
-
 ## Phase 8: Documentation & E2E Testing
 
 **Goal**: Complete documentation and add E2E test coverage.
@@ -192,8 +150,7 @@ type InstalledPlugin {
 |----------|-------|-------------|--------|
 | 1 | **Phase 9.8** | Auto-labeler plugin (remaining) | 🔄 IN PROGRESS |
 | 2 | **Phase 9.9** | Unit tests for channel pipelines | 🔲 Pending |
-| 3 | **Phase 5** | Version management | 🔲 Pending |
-| 4 | **Phase 8** | Documentation & E2E tests | 🔲 Pending |
+| 3 | **Phase 8** | Documentation & E2E tests | 🔲 Pending |
 
 ---
 
@@ -246,10 +203,6 @@ When auto-labeler plugin returns `appliedLabels`:
 **Phase 9.9**:
 - [ ] `utils/pipelineSchema.spec.ts` - Channel event tests
 - [ ] `pages/forums/[forumId]/edit/pipelines.spec.ts` - Channel pipeline page tests
-
-**Phase 5**:
-- [ ] Update `pages/admin/settings/plugins/index.vue` - Version badges
-- [ ] Update `pages/admin/settings/plugins/[pluginId].vue` - Version selector
 
 **Phase 8**:
 - [ ] `pages/admin/settings/plugins/docs.vue` - Documentation page

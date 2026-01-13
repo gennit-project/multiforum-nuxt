@@ -68,6 +68,9 @@ interface InstalledPlugin {
   settingsJson: any;
   readmeMarkdown?: string;
   manifest?: any;
+  hasUpdate?: boolean;
+  latestVersion?: string;
+  availableVersions?: string[];
 }
 
 // Queries
@@ -208,21 +211,37 @@ const hasNewerVersions = computed(() => {
   );
 });
 
+// Version update info from backend
+const hasUpdate = computed(() => installedPlugin.value?.hasUpdate ?? false);
+const latestVersion = computed(() => installedPlugin.value?.latestVersion);
+const registryVersions = computed(() => installedPlugin.value?.availableVersions || []);
+
+// Check for ?update=true query param to auto-select latest version
+const shouldAutoUpdate = computed(() => route.query.update === 'true');
+
 const canInstall = computed(() => {
   return !isSelectedVersionInstalled.value && selectedVersion.value;
 });
 
 // Set default version when plugin loads
 watch(
-  availableVersions,
-  (versions) => {
+  [availableVersions, () => latestVersion.value, () => shouldAutoUpdate.value],
+  ([versions, latest, autoUpdate]) => {
     if (versions.length > 0 && !selectedVersion.value) {
+      // If auto-update is requested and we have a latest version, select it
+      if (autoUpdate && latest) {
+        selectedVersion.value = latest;
+      }
       // If installed, default to installed version, otherwise first available
-      if (installedVersion.value) {
+      else if (installedVersion.value) {
         selectedVersion.value = installedVersion.value;
       } else {
         selectedVersion.value = versions[0].version;
       }
+    }
+    // If auto-update param is set and we have a newer version, switch to it
+    else if (autoUpdate && latest && selectedVersion.value !== latest) {
+      selectedVersion.value = latest;
     }
   },
   { immediate: true }
@@ -562,6 +581,45 @@ const getSecretStatusText = (status: string) => {
             </NuxtLink>
           </div>
 
+          <!-- Update Available Banner -->
+          <div
+            v-if="hasUpdate && latestVersion"
+            class="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20"
+          >
+            <div class="flex items-start">
+              <div class="flex-shrink-0">
+                <i class="fa-solid fa-arrow-circle-up text-xl text-blue-500" />
+              </div>
+              <div class="ml-3 flex-1">
+                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+                  Update Available
+                </h3>
+                <div class="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                  <p>
+                    A newer version is available:
+                    <span class="font-semibold font-mono">v{{ latestVersion }}</span>
+                    (currently installed: v{{ installedVersion }})
+                  </p>
+                  <p v-if="registryVersions.length > 1" class="mt-1 text-xs">
+                    {{ registryVersions.length }} versions available in registry
+                  </p>
+                </div>
+              </div>
+              <div class="ml-4">
+                <button
+                  type="button"
+                  class="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  :disabled="installing"
+                  @click="selectedVersion = latestVersion!; handleInstall()"
+                >
+                  <i v-if="installing" class="fa-solid fa-spinner mr-1 animate-spin" />
+                  <i v-else class="fa-solid fa-arrow-up mr-1" />
+                  Update to v{{ latestVersion }}
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Installation Section -->
           <FormRow section-title="Installation">
             <template #content>
@@ -624,10 +682,7 @@ const getSecretStatusText = (status: string) => {
                         :key="version.version"
                         :value="version.version"
                       >
-                        v{{ version.version }}
-                        <span v-if="version.version === installedVersion">
-                          (Installed)</span
-                        >
+                        v{{ version.version }}{{ version.version === installedVersion ? ' (Installed)' : '' }}{{ version.version === latestVersion && version.version !== installedVersion ? ' (Latest)' : '' }}
                       </option>
                     </select>
 
