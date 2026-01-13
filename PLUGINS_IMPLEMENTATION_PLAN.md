@@ -20,10 +20,13 @@ This document outlines the work required to complete the Multiforum plugins feat
 - **[NEW]** `updatePluginPipelines` mutation for pipeline configuration
 - **[FIXED]** `getInstalledPlugins` now returns correct enabled/settingsJson values
 
-**Frontend (multiforum-nuxt) - ~40% Complete**
+**Frontend (multiforum-nuxt) - ~55% Complete**
 - Server-level plugin management UI (list, install, enable/disable)
 - Server-level secret configuration with validation
 - Basic plugin status display
+- **[NEW]** Plugin detail page with metadata display (author, homepage, license, tags)
+- **[NEW]** README markdown rendering on plugin detail page
+- **[NEW]** View Source link to plugin repository
 
 **Plugins Repository (multiforum-plugins) - Functional**
 - Two working plugins: hello-world (demo), security-attachment-scan (VirusTotal)
@@ -34,10 +37,9 @@ This document outlines the work required to complete the Multiforum plugins feat
 ### What's Missing
 
 1. **Pipeline/CI-CD View** - No visibility into plugin execution status (backend ready, frontend needed)
-2. **Plugin Details** - README, author, homepage not displayed
-3. **Dynamic Forms** - No form generation from plugin's `ui.forms` schema
-4. **Plugin Ordering UI** - Backend supports pipelines, but no UI to configure them
-5. **Version Updates** - No UI to update outdated plugins
+2. **Dynamic Forms** - No form generation from plugin's `ui.forms` schema
+3. **Plugin Ordering UI** - Backend supports pipelines, but no UI to configure them
+4. **Version Updates** - No UI to update outdated plugins
 6. **UI Polish** - Per-button loading states, toast notifications
 
 ---
@@ -138,36 +140,44 @@ type PluginRun {
 
 ---
 
-## Phase 2: Plugin Details & README Display
+## Phase 2: Plugin Details & README Display ✅ COMPLETE
 
 **Goal**: Show plugin information from manifest on detail page.
 
-### 2.1 Backend: Expose Plugin Metadata
+### 2.1 Backend: Expose Plugin Metadata ✅
 
 **Files**:
 - `gennit-backend/customResolvers/queries/` - New or updated queries
 
 **Tasks**:
-- [ ] Ensure `getInstalledPlugins` returns full manifest including:
+- [x] Ensure `getInstalledPlugins` returns full manifest including:
   - `metadata.author` (name and URL)
   - `metadata.homepage`
   - `metadata.license`
   - `metadata.tags`
   - `documentation.readmePath`
-- [ ] Add query to fetch README content by plugin version ID
-- [ ] Consider caching README content in database on install
+- [x] Add query to fetch README content by plugin version ID
+- [x] Consider caching README content in database on install
 
-### 2.2 Frontend: Plugin Detail Page Enhancements
+**Note**: The backend schema already supported all these fields. Frontend queries were updated to request them.
+
+### 2.2 Frontend: Plugin Detail Page Enhancements ✅
 
 **File**: `pages/admin/settings/plugins/[pluginId].vue`
 
 **Tasks**:
-- [ ] Display plugin author with link to author URL
-- [ ] Display homepage link
-- [ ] Display license badge
-- [ ] Display tags as chips
-- [ ] Render README markdown content (use existing markdown renderer)
-- [ ] Add "View Source" link to repository
+- [x] Display plugin author with link to author URL
+- [x] Display homepage link
+- [x] Display license badge
+- [x] Display tags as chips
+- [x] Render README markdown content (use existing markdown renderer)
+- [x] Add "View Source" link to repository
+
+**Queries Updated**:
+- `GET_AVAILABLE_PLUGINS` - Added displayName, description, authorName, authorUrl, homepage, license, tags
+- `GET_INSTALLED_PLUGINS` - Added full plugin metadata, readmeMarkdown, manifest
+- `GET_PLUGIN_MANAGEMENT_DATA` - Added metadata fields
+- `GET_PLUGIN_DETAIL` - New query for full plugin detail with README
 
 **UI Layout**:
 ```
@@ -582,8 +592,8 @@ Already implemented in Phase 1:
 Based on dependencies and value delivery:
 
 1. **Phase 1** (Backend Fixes) - ✅ COMPLETE
-2. **Phase 3** (Pipeline View) - High value, backend ready
-3. **Phase 2** (Plugin Details) - Quick win, improves existing UI
+2. **Phase 2** (Plugin Details) - ✅ COMPLETE
+3. **Phase 3** (Pipeline View) - High value, backend ready
 4. **Phase 6** (UI Polish) - Quick fixes, improves UX
 5. **Phase 4** (Dynamic Forms) - Enables proper plugin configuration
 6. **Phase 7** (Pipeline Config UI) - Enables full pipeline customization
@@ -597,7 +607,7 @@ Based on dependencies and value delivery:
 | Phase | Tasks | Complexity | Status |
 |-------|-------|------------|--------|
 | Phase 1: Backend Fixes | 12 | Medium | ✅ Complete |
-| Phase 2: Plugin Details | 8 | Low | Not Started |
+| Phase 2: Plugin Details | 8 | Low | ✅ Complete |
 | Phase 3: Pipeline View | 15 | High | Backend Complete |
 | Phase 4: Dynamic Forms | 10 | Medium | Not Started |
 | Phase 5: Version Management | 6 | Low | Not Started |

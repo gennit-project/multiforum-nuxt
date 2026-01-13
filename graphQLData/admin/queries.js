@@ -234,6 +234,13 @@ export const GET_AVAILABLE_PLUGINS = gql`
     plugins {
       id
       name
+      displayName
+      description
+      authorName
+      authorUrl
+      homepage
+      license
+      tags
       Versions {
         id
         version
@@ -248,11 +255,20 @@ export const GET_INSTALLED_PLUGINS = gql`
       plugin {
         id
         name
+        displayName
+        description
+        authorName
+        authorUrl
+        homepage
+        license
+        tags
       }
       version
       scope
       enabled
       settingsJson
+      readmeMarkdown
+      manifest
     }
   }
 `;
@@ -273,6 +289,13 @@ export const GET_PLUGIN_MANAGEMENT_DATA = gql`
     plugins {
       id
       name
+      displayName
+      description
+      authorName
+      authorUrl
+      homepage
+      license
+      tags
       Versions {
         id
         version
@@ -286,6 +309,13 @@ export const GET_PLUGIN_MANAGEMENT_DATA = gql`
       AllowedPlugins {
         id
         name
+        displayName
+        description
+        authorName
+        authorUrl
+        homepage
+        license
+        tags
       }
       InstalledVersions {
         id
@@ -295,6 +325,8 @@ export const GET_PLUGIN_MANAGEMENT_DATA = gql`
         Plugin {
           id
           name
+          displayName
+          description
         }
       }
     }
@@ -302,11 +334,44 @@ export const GET_PLUGIN_MANAGEMENT_DATA = gql`
       plugin {
         id
         name
+        displayName
+        description
+        authorName
+        authorUrl
+        homepage
+        license
+        tags
       }
       version
       scope
       enabled
       settingsJson
+      readmeMarkdown
+      manifest
+    }
+  }
+`;
+
+export const GET_PLUGIN_DETAIL = gql`
+  query GetPluginDetail($pluginId: ID!) {
+    plugins(where: { id: $pluginId }) {
+      id
+      name
+      displayName
+      description
+      authorName
+      authorUrl
+      homepage
+      license
+      tags
+      Versions {
+        id
+        version
+        repoUrl
+        entryPath
+        readmeMarkdown
+        manifest
+      }
     }
   }
 `;

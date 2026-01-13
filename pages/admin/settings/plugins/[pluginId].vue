@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import {
   GET_AVAILABLE_PLUGINS,
   GET_INSTALLED_PLUGINS,
@@ -48,15 +49,26 @@ interface PluginSecretStatus {
   validationError?: string;
 }
 
+interface PluginMetadata {
+  id: string;
+  name: string;
+  displayName?: string;
+  description?: string;
+  authorName?: string;
+  authorUrl?: string;
+  homepage?: string;
+  license?: string;
+  tags?: string[];
+}
+
 interface InstalledPlugin {
-  plugin: {
-    id: string;
-    name: string;
-  };
+  plugin: PluginMetadata;
   version: string;
   scope: string;
   enabled: boolean;
   settingsJson: any;
+  readmeMarkdown?: string;
+  manifest?: any;
 }
 
 // Queries
@@ -114,6 +126,49 @@ const secrets = computed((): PluginSecretStatus[] => {
 
 const isInstalled = computed(() => !!installedPlugin.value);
 const isEnabled = computed(() => installedPlugin.value?.enabled ?? false);
+
+// Plugin metadata computed properties
+const pluginDisplayName = computed(() => {
+  return installedPlugin.value?.plugin?.displayName ||
+         plugin.value?.displayName ||
+         plugin.value?.name ||
+         pluginId;
+});
+
+const pluginDescription = computed(() => {
+  return installedPlugin.value?.plugin?.description || plugin.value?.description;
+});
+
+const pluginAuthorName = computed(() => {
+  return installedPlugin.value?.plugin?.authorName || plugin.value?.authorName;
+});
+
+const pluginAuthorUrl = computed(() => {
+  return installedPlugin.value?.plugin?.authorUrl || plugin.value?.authorUrl;
+});
+
+const pluginHomepage = computed(() => {
+  return installedPlugin.value?.plugin?.homepage || plugin.value?.homepage;
+});
+
+const pluginLicense = computed(() => {
+  return installedPlugin.value?.plugin?.license || plugin.value?.license;
+});
+
+const pluginTags = computed(() => {
+  return installedPlugin.value?.plugin?.tags || plugin.value?.tags || [];
+});
+
+const pluginReadme = computed(() => {
+  return installedPlugin.value?.readmeMarkdown;
+});
+
+const pluginRepoUrl = computed(() => {
+  // Get repo URL from the installed version or manifest
+  const versions = plugin.value?.Versions || [];
+  const currentVersion = versions.find((v: any) => v.version === installedVersion.value);
+  return currentVersion?.repoUrl;
+});
 
 const canEnable = computed(() => {
   if (!isInstalled.value) return false;
@@ -334,12 +389,90 @@ const getSecretStatusText = (status: string) => {
         <!-- Plugin Detail -->
         <div v-else class="space-y-6">
           <!-- Header -->
-          <div class="flex items-center justify-between">
-            <div>
-              <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                {{ plugin.name }}
-              </h1>
-              <div class="mt-2 flex space-x-2">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <!-- Plugin Name and Version -->
+              <div class="flex items-center space-x-3">
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                  {{ pluginDisplayName }}
+                </h1>
+                <span
+                  v-if="installedVersion"
+                  class="rounded bg-gray-100 px-2 py-1 font-mono text-sm text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                >
+                  v{{ installedVersion }}
+                </span>
+              </div>
+
+              <!-- Author and License -->
+              <div class="mt-1 flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                <span v-if="pluginAuthorName">
+                  by
+                  <a
+                    v-if="pluginAuthorUrl"
+                    :href="pluginAuthorUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-orange-600 hover:underline dark:text-orange-400"
+                  >
+                    {{ pluginAuthorName }}
+                  </a>
+                  <span v-else>{{ pluginAuthorName }}</span>
+                </span>
+                <span v-if="pluginAuthorName && pluginLicense" class="text-gray-400">•</span>
+                <span
+                  v-if="pluginLicense"
+                  class="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium dark:bg-gray-700"
+                >
+                  {{ pluginLicense }}
+                </span>
+              </div>
+
+              <!-- Description -->
+              <p
+                v-if="pluginDescription"
+                class="mt-2 text-sm text-gray-600 dark:text-gray-400"
+              >
+                {{ pluginDescription }}
+              </p>
+
+              <!-- Links -->
+              <div class="mt-2 flex items-center space-x-4 text-sm">
+                <a
+                  v-if="pluginHomepage"
+                  :href="pluginHomepage"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center text-orange-600 hover:underline dark:text-orange-400"
+                >
+                  <i class="fa-solid fa-home mr-1" />
+                  Homepage
+                </a>
+                <a
+                  v-if="pluginRepoUrl"
+                  :href="pluginRepoUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center text-orange-600 hover:underline dark:text-orange-400"
+                >
+                  <i class="fa-solid fa-code mr-1" />
+                  View Source
+                </a>
+              </div>
+
+              <!-- Tags -->
+              <div v-if="pluginTags.length > 0" class="mt-3 flex flex-wrap gap-2">
+                <span
+                  v-for="tag in pluginTags"
+                  :key="tag"
+                  class="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                >
+                  {{ tag }}
+                </span>
+              </div>
+
+              <!-- Status Badges -->
+              <div class="mt-3 flex space-x-2">
                 <span
                   v-if="isInstalled"
                   class="font-semibold rounded-full bg-green-100 px-2 py-1 text-xs text-green-800 dark:bg-green-800 dark:text-green-200"
@@ -655,6 +788,18 @@ const getSecretStatusText = (status: string) => {
               Loading secrets...
             </div>
           </div>
+
+          <!-- README Section -->
+          <FormRow v-if="pluginReadme" section-title="Documentation">
+            <template #content>
+              <div class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+                <MarkdownRenderer
+                  :text="pluginReadme"
+                  font-size="small"
+                />
+              </div>
+            </template>
+          </FormRow>
         </div>
       </template>
       <template #does-not-have-auth>

@@ -15608,6 +15608,12 @@ export type CreateNotificationsMutationResponse = {
   notifications: Array<Notification>;
 };
 
+export type CreatePipelineStepsMutationResponse = {
+  __typename?: 'CreatePipelineStepsMutationResponse';
+  info: CreateInfo;
+  pipelineSteps: Array<PipelineStep>;
+};
+
 export type CreatePluginRunsMutationResponse = {
   __typename?: 'CreatePluginRunsMutationResponse';
   info: CreateInfo;
@@ -18029,7 +18035,7 @@ export type DiscussionChannelInfo = {
   Channel?: Maybe<ChannelInfo>;
   channelUniqueName?: Maybe<Scalars['String']['output']>;
   discussionId?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
+  id?: Maybe<Scalars['ID']['output']>;
 };
 
 export type DiscussionChannelInfoAggregateSelection = {
@@ -18043,7 +18049,7 @@ export type DiscussionChannelInfoAggregateSelection = {
 export type DiscussionChannelInfoCreateInput = {
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   discussionId?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['ID']['input'];
+  id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type DiscussionChannelInfoCreatedEvent = {
@@ -18070,7 +18076,7 @@ export type DiscussionChannelInfoEventPayload = {
   __typename?: 'DiscussionChannelInfoEventPayload';
   channelUniqueName?: Maybe<Scalars['String']['output']>;
   discussionId?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
+  id?: Maybe<Scalars['ID']['output']>;
 };
 
 export type DiscussionChannelInfoOptions = {
@@ -18106,7 +18112,7 @@ export type DiscussionChannelInfoSubscriptionWhere = {
   id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
 };
 
@@ -18143,7 +18149,7 @@ export type DiscussionChannelInfoWhere = {
   id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
 };
 
@@ -25360,7 +25366,7 @@ export type EventChannelInfo = {
   Channel?: Maybe<ChannelInfo>;
   channelUniqueName?: Maybe<Scalars['String']['output']>;
   eventId?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
+  id?: Maybe<Scalars['ID']['output']>;
 };
 
 export type EventChannelInfoAggregateSelection = {
@@ -25374,7 +25380,7 @@ export type EventChannelInfoAggregateSelection = {
 export type EventChannelInfoCreateInput = {
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   eventId?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['ID']['input'];
+  id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type EventChannelInfoCreatedEvent = {
@@ -25401,7 +25407,7 @@ export type EventChannelInfoEventPayload = {
   __typename?: 'EventChannelInfoEventPayload';
   channelUniqueName?: Maybe<Scalars['String']['output']>;
   eventId?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
+  id?: Maybe<Scalars['ID']['output']>;
 };
 
 export type EventChannelInfoOptions = {
@@ -25437,7 +25443,7 @@ export type EventChannelInfoSubscriptionWhere = {
   id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
 };
 
@@ -25474,7 +25480,7 @@ export type EventChannelInfoWhere = {
   id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
 };
 
@@ -26768,6 +26774,12 @@ export type EventOptions = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   /** Specify one or more EventSort objects to sort Events by. The sorts will be applied in the order in which they are arranged in the array. */
   sort?: InputMaybe<Array<EventSort>>;
+};
+
+export type EventPipelineInput = {
+  event: Scalars['String']['input'];
+  steps: Array<PipelineStepInput>;
+  stopOnFirstFailure?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventPosterAggregateInput = {
@@ -38648,6 +38660,7 @@ export type Mutation = {
   createModerationActions: CreateModerationActionsMutationResponse;
   createModerationProfiles: CreateModerationProfilesMutationResponse;
   createNotifications: CreateNotificationsMutationResponse;
+  createPipelineSteps: CreatePipelineStepsMutationResponse;
   createPluginRuns: CreatePluginRunsMutationResponse;
   createPluginSecretStatuses: CreatePluginSecretStatusesMutationResponse;
   createPluginVersions: CreatePluginVersionsMutationResponse;
@@ -38718,6 +38731,7 @@ export type Mutation = {
   deleteModerationActions: DeleteInfo;
   deleteModerationProfiles: DeleteInfo;
   deleteNotifications: DeleteInfo;
+  deletePipelineSteps: DeleteInfo;
   deletePluginRuns: DeleteInfo;
   deletePluginSecretStatuses: DeleteInfo;
   deletePluginVersions: DeleteInfo;
@@ -38828,6 +38842,8 @@ export type Mutation = {
   updateModerationActions: UpdateModerationActionsMutationResponse;
   updateModerationProfiles: UpdateModerationProfilesMutationResponse;
   updateNotifications: UpdateNotificationsMutationResponse;
+  updatePipelineSteps: UpdatePipelineStepsMutationResponse;
+  updatePluginPipelines: Scalars['JSON']['output'];
   updatePluginRuns: UpdatePluginRunsMutationResponse;
   updatePluginSecretStatuses: UpdatePluginSecretStatusesMutationResponse;
   updatePluginVersions: UpdatePluginVersionsMutationResponse;
@@ -39190,6 +39206,11 @@ export type MutationCreateModerationProfilesArgs = {
 
 export type MutationCreateNotificationsArgs = {
   input: Array<NotificationCreateInput>;
+};
+
+
+export type MutationCreatePipelineStepsArgs = {
+  input: Array<PipelineStepCreateInput>;
 };
 
 
@@ -39563,6 +39584,11 @@ export type MutationDeleteModerationProfilesArgs = {
 
 export type MutationDeleteNotificationsArgs = {
   where?: InputMaybe<NotificationWhere>;
+};
+
+
+export type MutationDeletePipelineStepsArgs = {
+  where?: InputMaybe<PipelineStepWhere>;
 };
 
 
@@ -40227,6 +40253,17 @@ export type MutationUpdateNotificationsArgs = {
 };
 
 
+export type MutationUpdatePipelineStepsArgs = {
+  update?: InputMaybe<PipelineStepUpdateInput>;
+  where?: InputMaybe<PipelineStepWhere>;
+};
+
+
+export type MutationUpdatePluginPipelinesArgs = {
+  pipelines: Array<EventPipelineInput>;
+};
+
+
 export type MutationUpdatePluginRunsArgs = {
   update?: InputMaybe<PluginRunUpdateInput>;
   where?: InputMaybe<PluginRunWhere>;
@@ -40533,6 +40570,129 @@ export type PageInfo = {
   startCursor?: Maybe<Scalars['String']['output']>;
 };
 
+export enum PipelineCondition {
+  Always = 'ALWAYS',
+  PreviousFailed = 'PREVIOUS_FAILED',
+  PreviousSucceeded = 'PREVIOUS_SUCCEEDED'
+}
+
+export type PipelineStep = {
+  __typename?: 'PipelineStep';
+  condition?: Maybe<PipelineCondition>;
+  continueOnError?: Maybe<Scalars['Boolean']['output']>;
+  pluginId: Scalars['String']['output'];
+};
+
+export type PipelineStepAggregateSelection = {
+  __typename?: 'PipelineStepAggregateSelection';
+  count: Scalars['Int']['output'];
+  pluginId: StringAggregateSelection;
+};
+
+export type PipelineStepCreateInput = {
+  condition?: InputMaybe<PipelineCondition>;
+  continueOnError?: InputMaybe<Scalars['Boolean']['input']>;
+  pluginId: Scalars['String']['input'];
+};
+
+export type PipelineStepCreatedEvent = {
+  __typename?: 'PipelineStepCreatedEvent';
+  createdPipelineStep: PipelineStepEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type PipelineStepDeletedEvent = {
+  __typename?: 'PipelineStepDeletedEvent';
+  deletedPipelineStep: PipelineStepEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type PipelineStepEdge = {
+  __typename?: 'PipelineStepEdge';
+  cursor: Scalars['String']['output'];
+  node: PipelineStep;
+};
+
+export type PipelineStepEventPayload = {
+  __typename?: 'PipelineStepEventPayload';
+  condition?: Maybe<PipelineCondition>;
+  continueOnError?: Maybe<Scalars['Boolean']['output']>;
+  pluginId: Scalars['String']['output'];
+};
+
+export type PipelineStepInput = {
+  condition?: InputMaybe<PipelineCondition>;
+  continueOnError?: InputMaybe<Scalars['Boolean']['input']>;
+  pluginId: Scalars['String']['input'];
+};
+
+export type PipelineStepOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more PipelineStepSort objects to sort PipelineSteps by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<PipelineStepSort>>;
+};
+
+/** Fields to sort PipelineSteps by. The order in which sorts are applied is not guaranteed when specifying many fields in one PipelineStepSort object. */
+export type PipelineStepSort = {
+  condition?: InputMaybe<SortDirection>;
+  continueOnError?: InputMaybe<SortDirection>;
+  pluginId?: InputMaybe<SortDirection>;
+};
+
+export type PipelineStepSubscriptionWhere = {
+  AND?: InputMaybe<Array<PipelineStepSubscriptionWhere>>;
+  NOT?: InputMaybe<PipelineStepSubscriptionWhere>;
+  OR?: InputMaybe<Array<PipelineStepSubscriptionWhere>>;
+  condition?: InputMaybe<PipelineCondition>;
+  condition_IN?: InputMaybe<Array<InputMaybe<PipelineCondition>>>;
+  continueOnError?: InputMaybe<Scalars['Boolean']['input']>;
+  pluginId?: InputMaybe<Scalars['String']['input']>;
+  pluginId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  pluginId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pluginId_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  pluginId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  pluginId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PipelineStepUpdateInput = {
+  condition?: InputMaybe<PipelineCondition>;
+  continueOnError?: InputMaybe<Scalars['Boolean']['input']>;
+  pluginId?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PipelineStepUpdatedEvent = {
+  __typename?: 'PipelineStepUpdatedEvent';
+  event: EventType;
+  previousState: PipelineStepEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedPipelineStep: PipelineStepEventPayload;
+};
+
+export type PipelineStepWhere = {
+  AND?: InputMaybe<Array<PipelineStepWhere>>;
+  NOT?: InputMaybe<PipelineStepWhere>;
+  OR?: InputMaybe<Array<PipelineStepWhere>>;
+  condition?: InputMaybe<PipelineCondition>;
+  condition_IN?: InputMaybe<Array<InputMaybe<PipelineCondition>>>;
+  continueOnError?: InputMaybe<Scalars['Boolean']['input']>;
+  pluginId?: InputMaybe<Scalars['String']['input']>;
+  pluginId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  pluginId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pluginId_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  pluginId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  pluginId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PipelineStepsConnection = {
+  __typename?: 'PipelineStepsConnection';
+  edges: Array<PipelineStepEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type Plugin = {
   __typename?: 'Plugin';
   Versions: Array<PluginVersion>;
@@ -40726,11 +40886,15 @@ export type PluginRun = {
   createdAt: Scalars['DateTime']['output'];
   durationMs?: Maybe<Scalars['Int']['output']>;
   eventType: Scalars['String']['output'];
+  executionOrder?: Maybe<Scalars['Int']['output']>;
   id: Scalars['ID']['output'];
   message?: Maybe<Scalars['String']['output']>;
   payload?: Maybe<Scalars['JSON']['output']>;
+  pipelineId?: Maybe<Scalars['String']['output']>;
   pluginId: Scalars['String']['output'];
+  pluginName?: Maybe<Scalars['String']['output']>;
   scope: Scalars['String']['output'];
+  skippedReason?: Maybe<Scalars['String']['output']>;
   status: Scalars['String']['output'];
   targetId?: Maybe<Scalars['String']['output']>;
   targetType?: Maybe<Scalars['String']['output']>;
@@ -40745,10 +40909,14 @@ export type PluginRunAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   durationMs: IntAggregateSelection;
   eventType: StringAggregateSelection;
+  executionOrder: IntAggregateSelection;
   id: IdAggregateSelection;
   message: StringAggregateSelection;
+  pipelineId: StringAggregateSelection;
   pluginId: StringAggregateSelection;
+  pluginName: StringAggregateSelection;
   scope: StringAggregateSelection;
+  skippedReason: StringAggregateSelection;
   status: StringAggregateSelection;
   targetId: StringAggregateSelection;
   targetType: StringAggregateSelection;
@@ -40760,10 +40928,14 @@ export type PluginRunCreateInput = {
   channelId?: InputMaybe<Scalars['String']['input']>;
   durationMs?: InputMaybe<Scalars['Int']['input']>;
   eventType: Scalars['String']['input'];
+  executionOrder?: InputMaybe<Scalars['Int']['input']>;
   message?: InputMaybe<Scalars['String']['input']>;
   payload?: InputMaybe<Scalars['JSON']['input']>;
+  pipelineId?: InputMaybe<Scalars['String']['input']>;
   pluginId: Scalars['String']['input'];
+  pluginName?: InputMaybe<Scalars['String']['input']>;
   scope: Scalars['String']['input'];
+  skippedReason?: InputMaybe<Scalars['String']['input']>;
   status: Scalars['String']['input'];
   targetId?: InputMaybe<Scalars['String']['input']>;
   targetType?: InputMaybe<Scalars['String']['input']>;
@@ -40797,11 +40969,15 @@ export type PluginRunEventPayload = {
   createdAt: Scalars['DateTime']['output'];
   durationMs?: Maybe<Scalars['Int']['output']>;
   eventType: Scalars['String']['output'];
+  executionOrder?: Maybe<Scalars['Int']['output']>;
   id: Scalars['ID']['output'];
   message?: Maybe<Scalars['String']['output']>;
   payload?: Maybe<Scalars['JSON']['output']>;
+  pipelineId?: Maybe<Scalars['String']['output']>;
   pluginId: Scalars['String']['output'];
+  pluginName?: Maybe<Scalars['String']['output']>;
   scope: Scalars['String']['output'];
+  skippedReason?: Maybe<Scalars['String']['output']>;
   status: Scalars['String']['output'];
   targetId?: Maybe<Scalars['String']['output']>;
   targetType?: Maybe<Scalars['String']['output']>;
@@ -40822,11 +40998,15 @@ export type PluginRunSort = {
   createdAt?: InputMaybe<SortDirection>;
   durationMs?: InputMaybe<SortDirection>;
   eventType?: InputMaybe<SortDirection>;
+  executionOrder?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   message?: InputMaybe<SortDirection>;
   payload?: InputMaybe<SortDirection>;
+  pipelineId?: InputMaybe<SortDirection>;
   pluginId?: InputMaybe<SortDirection>;
+  pluginName?: InputMaybe<SortDirection>;
   scope?: InputMaybe<SortDirection>;
+  skippedReason?: InputMaybe<SortDirection>;
   status?: InputMaybe<SortDirection>;
   targetId?: InputMaybe<SortDirection>;
   targetType?: InputMaybe<SortDirection>;
@@ -40862,6 +41042,12 @@ export type PluginRunSubscriptionWhere = {
   eventType_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   eventType_MATCHES?: InputMaybe<Scalars['String']['input']>;
   eventType_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  executionOrder?: InputMaybe<Scalars['Int']['input']>;
+  executionOrder_GT?: InputMaybe<Scalars['Int']['input']>;
+  executionOrder_GTE?: InputMaybe<Scalars['Int']['input']>;
+  executionOrder_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  executionOrder_LT?: InputMaybe<Scalars['Int']['input']>;
+  executionOrder_LTE?: InputMaybe<Scalars['Int']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
@@ -40875,18 +41061,36 @@ export type PluginRunSubscriptionWhere = {
   message_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   payload?: InputMaybe<Scalars['JSON']['input']>;
   payload_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
+  pipelineId?: InputMaybe<Scalars['String']['input']>;
+  pipelineId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  pipelineId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pipelineId_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  pipelineId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  pipelineId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   pluginId?: InputMaybe<Scalars['String']['input']>;
   pluginId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   pluginId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
   pluginId_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   pluginId_MATCHES?: InputMaybe<Scalars['String']['input']>;
   pluginId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pluginName?: InputMaybe<Scalars['String']['input']>;
+  pluginName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  pluginName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pluginName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  pluginName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  pluginName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   scope?: InputMaybe<Scalars['String']['input']>;
   scope_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   scope_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
   scope_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   scope_MATCHES?: InputMaybe<Scalars['String']['input']>;
   scope_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  skippedReason?: InputMaybe<Scalars['String']['input']>;
+  skippedReason_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  skippedReason_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  skippedReason_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  skippedReason_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  skippedReason_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Scalars['String']['input']>;
   status_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   status_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -40926,10 +41130,16 @@ export type PluginRunUpdateInput = {
   durationMs_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   durationMs_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
   eventType?: InputMaybe<Scalars['String']['input']>;
+  executionOrder?: InputMaybe<Scalars['Int']['input']>;
+  executionOrder_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
+  executionOrder_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
   message?: InputMaybe<Scalars['String']['input']>;
   payload?: InputMaybe<Scalars['JSON']['input']>;
+  pipelineId?: InputMaybe<Scalars['String']['input']>;
   pluginId?: InputMaybe<Scalars['String']['input']>;
+  pluginName?: InputMaybe<Scalars['String']['input']>;
   scope?: InputMaybe<Scalars['String']['input']>;
+  skippedReason?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Scalars['String']['input']>;
   targetId?: InputMaybe<Scalars['String']['input']>;
   targetType?: InputMaybe<Scalars['String']['input']>;
@@ -40972,6 +41182,12 @@ export type PluginRunWhere = {
   eventType_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   eventType_MATCHES?: InputMaybe<Scalars['String']['input']>;
   eventType_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  executionOrder?: InputMaybe<Scalars['Int']['input']>;
+  executionOrder_GT?: InputMaybe<Scalars['Int']['input']>;
+  executionOrder_GTE?: InputMaybe<Scalars['Int']['input']>;
+  executionOrder_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  executionOrder_LT?: InputMaybe<Scalars['Int']['input']>;
+  executionOrder_LTE?: InputMaybe<Scalars['Int']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
@@ -40985,18 +41201,36 @@ export type PluginRunWhere = {
   message_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   payload?: InputMaybe<Scalars['JSON']['input']>;
   payload_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
+  pipelineId?: InputMaybe<Scalars['String']['input']>;
+  pipelineId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  pipelineId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pipelineId_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  pipelineId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  pipelineId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   pluginId?: InputMaybe<Scalars['String']['input']>;
   pluginId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   pluginId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
   pluginId_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   pluginId_MATCHES?: InputMaybe<Scalars['String']['input']>;
   pluginId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pluginName?: InputMaybe<Scalars['String']['input']>;
+  pluginName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  pluginName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pluginName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  pluginName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  pluginName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   scope?: InputMaybe<Scalars['String']['input']>;
   scope_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   scope_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
   scope_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   scope_MATCHES?: InputMaybe<Scalars['String']['input']>;
   scope_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  skippedReason?: InputMaybe<Scalars['String']['input']>;
+  skippedReason_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  skippedReason_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  skippedReason_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  skippedReason_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  skippedReason_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Scalars['String']['input']>;
   status_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   status_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -43153,6 +43387,7 @@ export type Query = {
   getEventComments?: Maybe<EventCommentsFormat>;
   getInstalledPlugins: Array<InstalledPlugin>;
   getModContributions: Array<ModDayData>;
+  getPipelineRuns: Array<PluginRun>;
   getPluginRunsForDownloadableFile: Array<PluginRun>;
   getServerPluginSecrets: Array<PluginSecretStatus>;
   getSiteWideDiscussionList?: Maybe<SiteWideDiscussionListFormat>;
@@ -43207,6 +43442,9 @@ export type Query = {
   notifications: Array<Notification>;
   notificationsAggregate: NotificationAggregateSelection;
   notificationsConnection: NotificationsConnection;
+  pipelineSteps: Array<PipelineStep>;
+  pipelineStepsAggregate: PipelineStepAggregateSelection;
+  pipelineStepsConnection: PipelineStepsConnection;
   pluginRuns: Array<PluginRun>;
   pluginRunsAggregate: PluginRunAggregateSelection;
   pluginRunsConnection: PluginRunsConnection;
@@ -43932,6 +44170,12 @@ export type QueryGetModContributionsArgs = {
 };
 
 
+export type QueryGetPipelineRunsArgs = {
+  targetId: Scalars['ID']['input'];
+  targetType: Scalars['String']['input'];
+};
+
+
 export type QueryGetPluginRunsForDownloadableFileArgs = {
   downloadableFileId: Scalars['ID']['input'];
 };
@@ -44275,6 +44519,25 @@ export type QueryNotificationsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<NotificationSort>>>;
   where?: InputMaybe<NotificationWhere>;
+};
+
+
+export type QueryPipelineStepsArgs = {
+  options?: InputMaybe<PipelineStepOptions>;
+  where?: InputMaybe<PipelineStepWhere>;
+};
+
+
+export type QueryPipelineStepsAggregateArgs = {
+  where?: InputMaybe<PipelineStepWhere>;
+};
+
+
+export type QueryPipelineStepsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<PipelineStepSort>>>;
+  where?: InputMaybe<PipelineStepWhere>;
 };
 
 
@@ -45709,6 +45972,7 @@ export type ServerConfig = {
   allowedFileTypes?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   enableDownloads?: Maybe<Scalars['Boolean']['output']>;
   enableEvents?: Maybe<Scalars['Boolean']['output']>;
+  pluginPipelines?: Maybe<Scalars['JSON']['output']>;
   pluginRegistries?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   rules?: Maybe<Scalars['JSON']['output']>;
   serverDescription?: Maybe<Scalars['String']['output']>;
@@ -46113,6 +46377,7 @@ export type ServerConfigCreateInput = {
   allowedFileTypes?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   enableDownloads?: InputMaybe<Scalars['Boolean']['input']>;
   enableEvents?: InputMaybe<Scalars['Boolean']['input']>;
+  pluginPipelines?: InputMaybe<Scalars['JSON']['input']>;
   pluginRegistries?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   rules?: InputMaybe<Scalars['JSON']['input']>;
   serverDescription?: InputMaybe<Scalars['String']['input']>;
@@ -46805,6 +47070,7 @@ export type ServerConfigEventPayload = {
   allowedFileTypes?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   enableDownloads?: Maybe<Scalars['Boolean']['output']>;
   enableEvents?: Maybe<Scalars['Boolean']['output']>;
+  pluginPipelines?: Maybe<Scalars['JSON']['output']>;
   pluginRegistries?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   rules?: Maybe<Scalars['JSON']['output']>;
   serverDescription?: Maybe<Scalars['String']['output']>;
@@ -47177,6 +47443,7 @@ export type ServerConfigServerRoleDefaultSuspendedRoleNodeAggregateSelection = {
 export type ServerConfigSort = {
   enableDownloads?: InputMaybe<SortDirection>;
   enableEvents?: InputMaybe<SortDirection>;
+  pluginPipelines?: InputMaybe<SortDirection>;
   rules?: InputMaybe<SortDirection>;
   serverDescription?: InputMaybe<SortDirection>;
   serverIconURL?: InputMaybe<SortDirection>;
@@ -47191,6 +47458,8 @@ export type ServerConfigSubscriptionWhere = {
   allowedFileTypes_INCLUDES?: InputMaybe<Scalars['String']['input']>;
   enableDownloads?: InputMaybe<Scalars['Boolean']['input']>;
   enableEvents?: InputMaybe<Scalars['Boolean']['input']>;
+  pluginPipelines?: InputMaybe<Scalars['JSON']['input']>;
+  pluginPipelines_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
   pluginRegistries?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   pluginRegistries_INCLUDES?: InputMaybe<Scalars['String']['input']>;
   rules?: InputMaybe<Scalars['JSON']['input']>;
@@ -47228,6 +47497,7 @@ export type ServerConfigUpdateInput = {
   allowedFileTypes_PUSH?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   enableDownloads?: InputMaybe<Scalars['Boolean']['input']>;
   enableEvents?: InputMaybe<Scalars['Boolean']['input']>;
+  pluginPipelines?: InputMaybe<Scalars['JSON']['input']>;
   pluginRegistries?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   pluginRegistries_POP?: InputMaybe<Scalars['Int']['input']>;
   pluginRegistries_PUSH?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -47312,6 +47582,8 @@ export type ServerConfigWhere = {
   allowedFileTypes_INCLUDES?: InputMaybe<Scalars['String']['input']>;
   enableDownloads?: InputMaybe<Scalars['Boolean']['input']>;
   enableEvents?: InputMaybe<Scalars['Boolean']['input']>;
+  pluginPipelines?: InputMaybe<Scalars['JSON']['input']>;
+  pluginPipelines_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
   pluginRegistries?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   pluginRegistries_INCLUDES?: InputMaybe<Scalars['String']['input']>;
   rules?: InputMaybe<Scalars['JSON']['input']>;
@@ -48260,6 +48532,9 @@ export type Subscription = {
   notificationCreated: NotificationCreatedEvent;
   notificationDeleted: NotificationDeletedEvent;
   notificationUpdated: NotificationUpdatedEvent;
+  pipelineStepCreated: PipelineStepCreatedEvent;
+  pipelineStepDeleted: PipelineStepDeletedEvent;
+  pipelineStepUpdated: PipelineStepUpdatedEvent;
   pluginCreated: PluginCreatedEvent;
   pluginDeleted: PluginDeletedEvent;
   pluginRelationshipCreated: PluginRelationshipCreatedEvent;
@@ -49219,6 +49494,21 @@ export type SubscriptionNotificationDeletedArgs = {
 
 export type SubscriptionNotificationUpdatedArgs = {
   where?: InputMaybe<NotificationSubscriptionWhere>;
+};
+
+
+export type SubscriptionPipelineStepCreatedArgs = {
+  where?: InputMaybe<PipelineStepSubscriptionWhere>;
+};
+
+
+export type SubscriptionPipelineStepDeletedArgs = {
+  where?: InputMaybe<PipelineStepSubscriptionWhere>;
+};
+
+
+export type SubscriptionPipelineStepUpdatedArgs = {
+  where?: InputMaybe<PipelineStepSubscriptionWhere>;
 };
 
 
@@ -52892,6 +53182,12 @@ export type UpdateNotificationsMutationResponse = {
   __typename?: 'UpdateNotificationsMutationResponse';
   info: UpdateInfo;
   notifications: Array<Notification>;
+};
+
+export type UpdatePipelineStepsMutationResponse = {
+  __typename?: 'UpdatePipelineStepsMutationResponse';
+  info: UpdateInfo;
+  pipelineSteps: Array<PipelineStep>;
 };
 
 export type UpdatePluginRunsMutationResponse = {
