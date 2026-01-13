@@ -318,11 +318,11 @@ query GetPipelineRuns($targetId: ID!, $targetType: String!) {
 
 ---
 
-## Phase 4: Dynamic Forms from Plugin UI Schema
+## Phase 4: Dynamic Forms from Plugin UI Schema ✅ COMPLETE
 
 **Goal**: Generate configuration forms from plugin's `ui.forms` definition.
 
-### 4.1 Understand UI Schema Format
+### 4.1 Understand UI Schema Format ✅
 
 From the plugins repo, the `ui.forms` structure is:
 
@@ -361,48 +361,61 @@ From the plugins repo, the `ui.forms` structure is:
 }
 ```
 
-### 4.2 Create Dynamic Form Components
+### 4.2 Create Dynamic Form Components ✅
 
-**New Files**:
-- `components/plugins/PluginSettingsForm.vue` - Main form container
-- `components/plugins/fields/PluginTextField.vue`
-- `components/plugins/fields/PluginNumberField.vue`
-- `components/plugins/fields/PluginBooleanField.vue`
-- `components/plugins/fields/PluginSelectField.vue`
-- `components/plugins/fields/PluginSecretField.vue`
+**New Files Created**:
+- ✅ `components/plugins/PluginSettingsForm.vue` - Main form container
+- ✅ `components/plugins/fields/PluginTextField.vue` - Text/textarea inputs
+- ✅ `components/plugins/fields/PluginNumberField.vue` - Number input with range hints
+- ✅ `components/plugins/fields/PluginBooleanField.vue` - Toggle switch
+- ✅ `components/plugins/fields/PluginSelectField.vue` - Dropdown select
+- ✅ `components/plugins/fields/PluginSecretField.vue` - Password with validation status
+- ✅ `types/pluginForms.ts` - TypeScript interfaces for form schema
 
 **Tasks**:
-- [ ] Create form container that iterates over sections
-- [ ] Create field components for each type
-- [ ] Implement validation based on `validation` object
-- [ ] Handle defaults from schema
-- [ ] Emit changes for parent to save
-- [ ] Style consistently with existing forms
+- [x] Create form container that iterates over sections
+- [x] Create field components for each type (text, textarea, number, boolean, select, secret)
+- [x] Implement validation based on `validation` object (min/max, minLength/maxLength, pattern, required)
+- [x] Handle defaults from schema
+- [x] Emit changes for parent to save
+- [x] Style consistently with existing forms (Tailwind, dark mode support)
 
-### 4.3 Integrate Dynamic Forms into Plugin Detail
+### 4.3 Integrate Dynamic Forms into Plugin Detail ✅
 
 **File**: `pages/admin/settings/plugins/[pluginId].vue`
 
 **Tasks**:
-- [ ] Replace hardcoded settings UI with dynamic form
-- [ ] Load `ui.forms.server` from plugin manifest
-- [ ] Pass current settings values to form
-- [ ] Save settings via `enableServerPlugin` mutation
-- [ ] Show validation errors inline
+- [x] Import and use PluginSettingsForm component
+- [x] Load `ui.forms.server` from plugin manifest
+- [x] Pass current settings values to form
+- [x] Save settings via `enableServerPlugin` mutation
+- [x] Show validation errors inline
+- [x] Initialize settings from installed plugin on load
 
-### 4.4 Secret Fields with Validation Status
+### 4.4 Secret Fields with Validation Status ✅
 
-**Features**:
+**Features Implemented**:
 - Password input with show/hide toggle
-- Validation status indicator (Not Set, Testing, Valid, Invalid)
-- "Validate" button to test credentials
-- Error message display
+- Validation status indicator (Not Set, Set (untested), Valid, Invalid)
+- "Validate" button to test credentials with loading spinner
+- Error message display from validation
+- Last validated timestamp display
 
 **Tasks**:
-- [ ] Create `PluginSecretField.vue` component
-- [ ] Integrate with `setServerPluginSecret` mutation
-- [ ] Show validation status from `getServerPluginSecrets`
-- [ ] Add loading state during validation
+- [x] Create `PluginSecretField.vue` component with status badges
+- [x] Integrate with `validateServerPluginSecret` mutation
+- [x] Show validation status from `getServerPluginSecrets`
+- [x] Add per-secret loading state during validation (using Set<string>)
+
+### 4.5 Unit Tests ✅
+
+**File Created**: `components/plugins/fields/pluginFields.spec.ts` (27 tests)
+
+**Test Coverage**:
+- [x] Type definitions (PluginFieldValidation, PluginField, PluginFormSection, PluginSecretStatus)
+- [x] Field component logic (default values, validation attributes, value parsing)
+- [x] Form validation (required fields, number ranges, string length, patterns)
+- [x] Secret field interactions (status tracking, color/text helpers)
 
 ---
 
@@ -495,7 +508,7 @@ type InstalledPlugin {
 
 ## Phase 7: Plugin Pipeline Configuration UI
 
-**Goal**: Allow admins to configure plugin execution pipelines via UI.
+**Goal**: Allow admins to configure plugin execution pipelines via UI with a hybrid YAML/Visual approach.
 
 ### 7.1 Backend: Pipeline Mutation ✅ COMPLETE
 
@@ -503,42 +516,131 @@ Already implemented in Phase 1:
 - `updatePluginPipelines` mutation accepts pipeline configuration
 - Supports conditions, stopOnFirstFailure, continueOnError
 
-### 7.2 Frontend: Pipeline Configuration UI
+### 7.2 Hybrid Approach: YAML + Visual Editor
 
-**New File**: `components/plugins/PluginPipelineEditor.vue`
+A hybrid approach provides the best of both worlds:
+- **YAML Mode** (default for power users): Monaco editor with syntax highlighting, schema validation, autocomplete
+- **Visual Mode** (optional): Simple ordered list UI for users who prefer GUI
 
-**Features**:
-- Visual editor for pipeline configuration
-- Drag-and-drop to reorder plugins within a pipeline
-- Add/remove steps
-- Configure conditions per step (ALWAYS, PREVIOUS_SUCCEEDED, PREVIOUS_FAILED)
-- Toggle continueOnError per step
-- Toggle stopOnFirstFailure per pipeline
-- Select which event triggers the pipeline
+**Benefits of YAML**:
+- Familiar to developers (GitHub Actions, GitLab CI style)
+- Version controllable - can copy/paste, store in git
+- Expressive - naturally supports ordered lists, conditions, variables
+- Schema validation provides autocomplete and error hints
+
+### 7.3 Frontend: Pipeline YAML Editor
+
+**New Files**:
+- `components/plugins/PluginPipelineEditor.vue` - Main editor with mode toggle
+- `components/plugins/PipelineYamlEditor.vue` - Monaco YAML editor
+- `components/plugins/PipelineVisualEditor.vue` - Simple visual list editor
+- `utils/pipelineSchema.ts` - JSON Schema for YAML validation
+
+**YAML Schema Format**:
+```yaml
+# Pipeline configuration for downloadableFile.created event
+pipelines:
+  - event: downloadableFile.created
+    stopOnFirstFailure: true
+    steps:
+      - plugin: security-attachment-scan
+        condition: ALWAYS
+        continueOnError: false
+
+      - plugin: auto-labeler
+        condition: PREVIOUS_SUCCEEDED
+        continueOnError: true
+
+      - plugin: thumbnail-generator
+        condition: ALWAYS
+        continueOnError: true
+```
+
+**YAML Editor Features**:
+- Monaco editor with YAML syntax highlighting
+- JSON Schema validation with inline error markers
+- Autocomplete for plugin IDs, conditions, and field names
+- Format on save
+- Dark mode support
 
 **Tasks**:
-- [ ] Install drag-and-drop library (vuedraggable or similar)
-- [ ] Create pipeline editor component
+- [ ] Install Monaco editor (`@monaco-editor/vue` or similar)
+- [ ] Create JSON Schema for pipeline configuration
+- [ ] Create YAML editor component with schema validation
+- [ ] Create visual editor component for simple reordering
+- [ ] Create mode toggle between YAML and Visual
+- [ ] Convert between YAML and internal JSON format
 - [ ] Integrate with `updatePluginPipelines` mutation
-- [ ] Add to plugin settings page or separate pipeline config page
-- [ ] Add validation (at least one step, valid plugin IDs)
+- [ ] Add to plugin settings page as "Pipeline Configuration" section
+- [ ] Show available plugins for autocomplete
+
+### 7.4 Visual Editor (Alternative Mode)
+
+For users who prefer a GUI:
+
+**Features**:
+- Ordered list of steps (drag handles for reordering via vuedraggable)
+- Dropdown to add new steps from available plugins
+- Condition selector per step
+- Toggle switches for continueOnError
+- Remove button per step
 
 **UI Mockup**:
 ```
 ┌─ Pipeline: downloadableFile.created ─────────────────┐
-│ ☑ Stop on first failure                             │
+│ [YAML] [Visual]                          Mode Toggle │
+├──────────────────────────────────────────────────────┤
+│ ☑ Stop on first failure                              │
 │                                                      │
-│  ≡ [1] security-attachment-scan                      │
-│      Condition: ALWAYS  ☐ Continue on error         │
+│  ≡ 1. security-attachment-scan                       │
+│      Condition: [ALWAYS ▼]  ☐ Continue on error  [×] │
 │                                                      │
-│  ≡ [2] auto-labeler                                  │
-│      Condition: PREVIOUS_SUCCEEDED  ☐ Continue on error│
+│  ≡ 2. auto-labeler                                   │
+│      Condition: [PREVIOUS_SUCCEEDED ▼]  ☑ Continue   │
 │                                                      │
 │  [+ Add Step]                                        │
 │                                                      │
 │  [Save Pipeline]                                     │
 └──────────────────────────────────────────────────────┘
 ```
+
+### 7.5 YAML Mode (Primary Mode)
+
+**UI Mockup**:
+```
+┌─ Pipeline Configuration ─────────────────────────────┐
+│ [YAML] [Visual]                          Mode Toggle │
+├──────────────────────────────────────────────────────┤
+│ ┌──────────────────────────────────────────────────┐ │
+│ │ pipelines:                                       │ │
+│ │   - event: downloadableFile.created             │ │
+│ │     stopOnFirstFailure: true                    │ │
+│ │     steps:                                      │ │
+│ │       - plugin: security-attachment-scan        │ │
+│ │         condition: ALWAYS                       │ │
+│ │                                                 │ │
+│ │       - plugin: auto-labeler                    │ │
+│ │         condition: PREVIOUS_SUCCEEDED           │ │
+│ │         continueOnError: true                   │ │
+│ └──────────────────────────────────────────────────┘ │
+│                                                      │
+│  Available plugins: security-attachment-scan,        │
+│  auto-labeler, thumbnail-generator                   │
+│                                                      │
+│  [Validate] [Save Pipeline]                          │
+└──────────────────────────────────────────────────────┘
+```
+
+### 7.6 Integration Location
+
+**File**: `pages/admin/settings/plugins/pipelines.vue` (new page)
+
+**Tasks**:
+- [ ] Create dedicated pipeline configuration page
+- [ ] Add link from plugin management index page
+- [ ] Load current pipeline config from ServerConfig
+- [ ] Show validation errors before save
+- [ ] Confirm before overwriting existing config
 
 ---
 
@@ -596,9 +698,13 @@ Already implemented in Phase 1:
 - [x] Toast notification integration (Phase 6)
 - [x] Enable switch visibility logic (Phase 6)
 - [x] Secret status display helpers (Phase 6)
-- [ ] PluginSettingsForm generates fields from schema (Phase 4)
-- [ ] PluginSecretField shows validation status (Phase 4)
+- [x] PluginSettingsForm generates fields from schema (Phase 4)
+- [x] Plugin field components (text, number, boolean, select, secret) (Phase 4)
+- [x] PluginSecretField shows validation status (Phase 4)
+- [x] Form validation (required, ranges, patterns) (Phase 4)
 - [ ] Version comparison logic (Phase 5)
+- [ ] Pipeline YAML editor validation (Phase 7)
+- [ ] Pipeline visual editor reordering (Phase 7)
 
 ---
 
@@ -624,10 +730,10 @@ Based on dependencies and value delivery:
 | Phase 1: Backend Fixes | 12 | Medium | ✅ Complete |
 | Phase 2: Plugin Details | 8 | Low | ✅ Complete |
 | Phase 3: Pipeline View | 15 | High | ✅ Complete |
-| Phase 4: Dynamic Forms | 10 | Medium | Not Started |
+| Phase 4: Dynamic Forms | 10 | Medium | ✅ Complete |
 | Phase 5: Version Management | 6 | Low | Not Started |
 | Phase 6: UI Polish | 8 | Low | ✅ Complete |
-| Phase 7: Pipeline Config UI | 5 | Medium | Backend Complete |
+| Phase 7: Pipeline Config UI | 12 | Medium | Backend Complete, UI Not Started |
 | Phase 8: Docs & Testing | 10 | Medium | Unit Tests Partial ✅ |
 
 ---
@@ -635,26 +741,42 @@ Based on dependencies and value delivery:
 ## Files to Create
 
 ### Frontend (multiforum-nuxt)
+
+**Phase 3 - Pipeline View** ✅
 - ✅ `components/plugins/PluginPipeline.vue`
 - ✅ `components/plugins/PluginPipelineStage.vue`
 - ✅ `components/plugins/PluginLogsModal.vue`
-- `components/plugins/PluginSettingsForm.vue`
-- `components/plugins/PluginPipelineEditor.vue`
-- `components/plugins/fields/PluginTextField.vue`
-- `components/plugins/fields/PluginNumberField.vue`
-- `components/plugins/fields/PluginBooleanField.vue`
-- `components/plugins/fields/PluginSelectField.vue`
-- `components/plugins/fields/PluginSecretField.vue`
 - ✅ `composables/usePluginPipeline.ts`
 - ✅ `graphQLData/admin/queries.js` (GET_PIPELINE_RUNS added)
+
+**Phase 4 - Dynamic Forms** ✅
+- ✅ `components/plugins/PluginSettingsForm.vue`
+- ✅ `components/plugins/fields/PluginTextField.vue`
+- ✅ `components/plugins/fields/PluginNumberField.vue`
+- ✅ `components/plugins/fields/PluginBooleanField.vue`
+- ✅ `components/plugins/fields/PluginSelectField.vue`
+- ✅ `components/plugins/fields/PluginSecretField.vue`
+- ✅ `types/pluginForms.ts`
+
+**Phase 7 - Pipeline Config UI** (Not Started)
+- `components/plugins/PluginPipelineEditor.vue` - Main editor with mode toggle
+- `components/plugins/PipelineYamlEditor.vue` - Monaco YAML editor
+- `components/plugins/PipelineVisualEditor.vue` - Visual list editor
+- `utils/pipelineSchema.ts` - JSON Schema for YAML validation
+- `pages/admin/settings/plugins/pipelines.vue` - Pipeline configuration page
+
+**Phase 8 - Documentation & Testing** (Partial)
 - `pages/admin/settings/plugins/docs.vue`
 - `tests/cypress/e2e/plugins/pluginManagement.spec.cy.ts`
-- ✅ `composables/usePluginPipeline.spec.ts`
-- ✅ `components/plugins/PluginPipeline.spec.ts`
-- ✅ `components/plugins/PluginPipelineStage.spec.ts`
-- ✅ `components/plugins/PluginLogsModal.spec.ts`
-- ✅ `pages/admin/settings/plugins/index.spec.ts` (Phase 6 tests)
-- ✅ `pages/admin/settings/plugins/pluginDetail.spec.ts` (Phase 6 tests)
+
+**Unit Tests** ✅
+- ✅ `composables/usePluginPipeline.spec.ts` (17 tests)
+- ✅ `components/plugins/PluginPipeline.spec.ts` (14 tests)
+- ✅ `components/plugins/PluginPipelineStage.spec.ts` (12 tests)
+- ✅ `components/plugins/PluginLogsModal.spec.ts` (13 tests)
+- ✅ `pages/admin/settings/plugins/index.spec.ts` (19 tests - Phase 6)
+- ✅ `pages/admin/settings/plugins/pluginDetail.spec.ts` (17 tests - Phase 6)
+- ✅ `components/plugins/fields/pluginFields.spec.ts` (27 tests - Phase 4)
 
 ### Backend (gennit-backend) - ✅ Complete
 - ✅ Updated `customResolvers/queries/getInstalledPlugins.ts`

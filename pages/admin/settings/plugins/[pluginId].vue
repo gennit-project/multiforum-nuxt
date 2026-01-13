@@ -5,7 +5,9 @@ import { useQuery, useMutation } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
+import PluginSettingsForm from '@/components/plugins/PluginSettingsForm.vue';
 import { useToast } from '@/composables/useToast';
+import type { PluginFormSection, PluginSecretStatus as PluginSecretStatusType } from '@/types/pluginForms';
 import {
   GET_AVAILABLE_PLUGINS,
   GET_INSTALLED_PLUGINS,
@@ -33,6 +35,10 @@ const toast = useToast();
 const selectedVersion = ref<string>('');
 const secretValues = ref<Record<string, string>>({});
 const showSecretInputs = ref<Record<string, boolean>>({});
+const settingsValues = ref<Record<string, any>>({});
+const settingsErrors = ref<Record<string, string>>({});
+const validatingSecrets = ref<Set<string>>(new Set());
+const savingSettings = ref(false);
 
 // Types
 interface PluginSecretStatus {
@@ -151,6 +157,23 @@ const pluginReadme = computed(() => {
   return installedPlugin.value?.readmeMarkdown;
 });
 
+// Extract server settings form sections from the plugin manifest
+const serverSettingsSections = computed((): PluginFormSection[] => {
+  const manifest = installedPlugin.value?.manifest;
+  if (!manifest?.ui?.forms?.server) return [];
+  return manifest.ui.forms.server;
+});
+
+// Convert secrets array to the format expected by PluginSecretField
+const secretStatusesForForm = computed((): PluginSecretStatusType[] => {
+  return secrets.value.map(s => ({
+    key: s.key,
+    status: s.status,
+    lastValidatedAt: s.lastValidatedAt,
+    validationError: s.validationError,
+  }));
+});
+
 const pluginRepoUrl = computed(() => {
   // Get repo URL from the installed version or manifest
   const versions = plugin.value?.Versions || [];
@@ -211,6 +234,17 @@ watch(
   (newInstalledVersion) => {
     if (newInstalledVersion && !selectedVersion.value) {
       selectedVersion.value = newInstalledVersion;
+    }
+  },
+  { immediate: true }
+);
+
+// Initialize settings values from installed plugin
+watch(
+  installedPlugin,
+  (newInstalledPlugin) => {
+    if (newInstalledPlugin?.settingsJson) {
+      settingsValues.value = { ...newInstalledPlugin.settingsJson };
     }
   },
   { immediate: true }
@@ -294,6 +328,7 @@ const handleSetSecret = async (key: string, value: string) => {
 };
 
 const handleValidateSecret = async (key: string) => {
+  validatingSecrets.value.add(key);
   try {
     const result = await validateSecretMutation({
       pluginId,
@@ -312,7 +347,54 @@ const handleValidateSecret = async (key: string) => {
     await refetchSecrets();
   } catch (err: any) {
     toast.error(`Secret validation failed: ${err.message}`);
+  } finally {
+    validatingSecrets.value.delete(key);
   }
+};
+
+const handleSaveSettings = async () => {
+  if (!installedPlugin.value) return;
+
+  savingSettings.value = true;
+  settingsErrors.value = {};
+
+  try {
+    // Validate required fields
+    for (const section of serverSettingsSections.value) {
+      for (const field of section.fields) {
+        if (field.validation?.required) {
+          const value = settingsValues.value[field.key];
+          if (value === undefined || value === null || value === '') {
+            settingsErrors.value[field.key] = `${field.label} is required`;
+          }
+        }
+      }
+    }
+
+    // If there are validation errors, don't save
+    if (Object.keys(settingsErrors.value).length > 0) {
+      toast.error('Please fix the validation errors');
+      return;
+    }
+
+    await enableMutation({
+      pluginId,
+      version: installedPlugin.value.version,
+      enabled: installedPlugin.value.enabled,
+      settingsJson: settingsValues.value,
+    });
+
+    toast.success('Settings saved successfully');
+    await refetchInstalled();
+  } catch (err: any) {
+    toast.error(`Failed to save settings: ${err.message}`);
+  } finally {
+    savingSettings.value = false;
+  }
+};
+
+const handleValidateSecretFromForm = (key: string) => {
+  handleValidateSecret(key);
 };
 
 const getSecretStatusColor = (status: string) => {
@@ -772,6 +854,44 @@ const getSecretStatusText = (status: string) => {
               Loading secrets...
             </div>
           </div>
+
+          <!-- Server Settings Section -->
+          <FormRow
+            v-if="isInstalled && serverSettingsSections.length > 0"
+            section-title="Server Settings"
+          >
+            <template #content>
+              <div class="space-y-6">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  Configure server-wide settings for this plugin.
+                </p>
+
+                <PluginSettingsForm
+                  v-model="settingsValues"
+                  :sections="serverSettingsSections"
+                  :errors="settingsErrors"
+                  :secret-statuses="secretStatusesForForm"
+                  :validating-secrets="validatingSecrets"
+                  @validate-secret="handleValidateSecretFromForm"
+                />
+
+                <div class="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <button
+                    type="button"
+                    class="rounded-md bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
+                    :disabled="savingSettings"
+                    @click="handleSaveSettings"
+                  >
+                    <i
+                      v-if="savingSettings"
+                      class="fa-solid fa-spinner mr-2 animate-spin"
+                    />
+                    Save Settings
+                  </button>
+                </div>
+              </div>
+            </template>
+          </FormRow>
 
           <!-- README Section -->
           <FormRow v-if="pluginReadme" section-title="Documentation">
