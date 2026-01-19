@@ -5,6 +5,7 @@ import { useQuery, useMutation } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
 import PluginSettingsForm from '@/components/plugins/PluginSettingsForm.vue';
 import { useToast } from '@/composables/useToast';
 import type { PluginFormSection, PluginSecretStatus as PluginSecretStatusType } from '@/types/pluginForms';
@@ -12,6 +13,7 @@ import {
   GET_AVAILABLE_PLUGINS,
   GET_INSTALLED_PLUGINS,
   GET_SERVER_PLUGIN_SECRETS,
+  GET_PLUGIN_DETAIL,
 } from '@/graphQLData/admin/queries';
 import {
   INSTALL_PLUGIN_VERSION,
@@ -39,6 +41,7 @@ const settingsValues = ref<Record<string, any>>({});
 const settingsErrors = ref<Record<string, string>>({});
 const validatingSecrets = ref<Set<string>>(new Set());
 const savingSettings = ref(false);
+const installError = ref<string | null>(null);
 
 // Types
 interface PluginSecretStatus {
@@ -94,6 +97,12 @@ const {
   loading: secretsLoading,
   refetch: refetchSecrets,
 } = useQuery(GET_SERVER_PLUGIN_SECRETS, { pluginId });
+
+// Query for plugin detail including version README (for non-installed plugins)
+const {
+  result: pluginDetailResult,
+  loading: pluginDetailLoading,
+} = useQuery(GET_PLUGIN_DETAIL, { pluginId });
 
 // Mutations
 const { mutate: installMutation, loading: installing } = useMutation(
@@ -156,8 +165,37 @@ const pluginTags = computed(() => {
   return installedPlugin.value?.plugin?.tags || plugin.value?.tags || [];
 });
 
+// Get versions with full details from the plugin detail query
+const pluginDetailVersions = computed(() => {
+  const plugins = pluginDetailResult.value?.plugins || [];
+  const pluginDetail = plugins.find((p: any) => p.id === pluginId);
+  return pluginDetail?.Versions || [];
+});
+
 const pluginReadme = computed(() => {
-  return installedPlugin.value?.readmeMarkdown;
+  // First, try installed plugin's readme
+  if (installedPlugin.value?.readmeMarkdown) {
+    return installedPlugin.value.readmeMarkdown;
+  }
+
+  // If not installed or no readme, try to get from the selected version in detail query
+  if (selectedVersion.value && pluginDetailVersions.value.length > 0) {
+    const versionDetail = pluginDetailVersions.value.find(
+      (v: any) => v.version === selectedVersion.value
+    );
+    if (versionDetail?.readmeMarkdown) {
+      return versionDetail.readmeMarkdown;
+    }
+  }
+
+  // Fallback: try first version with a readme
+  for (const v of pluginDetailVersions.value) {
+    if (v.readmeMarkdown) {
+      return v.readmeMarkdown;
+    }
+  }
+
+  return null;
 });
 
 // Extract server settings form sections from the plugin manifest
@@ -270,29 +308,57 @@ watch(
 );
 
 // Methods
-const handleInstall = async () => {
-  if (!selectedVersion.value) return;
+const handleInstall = async (versionOverride?: string) => {
+  const versionToInstall = versionOverride || selectedVersion.value;
+  if (!versionToInstall) {
+    installError.value = 'No version selected';
+    return;
+  }
+
+  // Clear any previous error
+  installError.value = null;
+
+  console.log('Installing plugin:', pluginId, 'version:', versionToInstall);
 
   try {
-    await installMutation({
+    const result = await installMutation({
       pluginId,
-      version: selectedVersion.value,
+      version: versionToInstall,
     });
 
+    console.log('Install result:', result);
+
+    // Check for GraphQL errors in the result
+    if (result?.errors?.length) {
+      const errorMsg = result.errors.map((e: any) => e.message).join(', ');
+      installError.value = `Installation failed: ${errorMsg}`;
+      return;
+    }
+
     toast.success(
-      `Plugin ${plugin.value?.name} v${selectedVersion.value} installed successfully`
+      `Plugin ${plugin.value?.name} v${versionToInstall} installed successfully`
     );
+
+    // Update selected version to match installed
+    selectedVersion.value = versionToInstall;
 
     // Refetch data
     await refetchInstalled();
     await refetchSecrets();
   } catch (err: any) {
-    if (err.message.includes('PLUGIN_VERSION_NOT_FOUND')) {
-      toast.error('Plugin version not found in registry');
-    } else if (err.message.includes('INTEGRITY_MISMATCH')) {
-      toast.error('Plugin download failed integrity check');
+    console.error('Install error:', err);
+    const errorMessage = err.message || '';
+
+    if (errorMessage.includes('PLUGIN_VERSION_NOT_FOUND') || errorMessage.includes('not found in registry')) {
+      installError.value = 'Plugin version not found in registry. Please check that this version exists in the configured plugin registry.';
+    } else if (errorMessage.includes('INTEGRITY_MISMATCH') || errorMessage.includes('SHA-256 mismatch') || errorMessage.includes('integrity verification failed')) {
+      installError.value = 'Plugin tarball integrity check failed. The SHA-256 hash of the downloaded tarball does not match the hash in the registry. The registry may need to be updated with the correct hash.';
+    } else if (errorMessage.includes('Failed to fetch plugin registry')) {
+      installError.value = 'Could not connect to the plugin registry. Please check that the registry URL is correct and accessible.';
+    } else if (errorMessage.includes('Failed to download tarball')) {
+      installError.value = 'Could not download the plugin tarball. Please check that the tarball URL in the registry is correct and accessible.';
     } else {
-      toast.error(`Installation failed: ${err.message}`);
+      installError.value = `Installation failed: ${errorMessage || 'Unknown error'}`;
     }
   }
 };
@@ -610,7 +676,7 @@ const getSecretStatusText = (status: string) => {
                   type="button"
                   class="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   :disabled="installing"
-                  @click="selectedVersion = latestVersion!; handleInstall()"
+                  @click="handleInstall(latestVersion!)"
                 >
                   <i v-if="installing" class="fa-solid fa-spinner mr-1 animate-spin" />
                   <i v-else class="fa-solid fa-arrow-up mr-1" />
@@ -619,6 +685,9 @@ const getSecretStatusText = (status: string) => {
               </div>
             </div>
           </div>
+
+          <!-- Installation Error Banner -->
+          <ErrorBanner v-if="installError" :text="installError" />
 
           <!-- Installation Section -->
           <FormRow section-title="Installation">
@@ -691,7 +760,7 @@ const getSecretStatusText = (status: string) => {
                       type="button"
                       class="rounded-md bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
                       :disabled="installing || !selectedVersion"
-                      @click="handleInstall"
+                      @click="handleInstall()"
                     >
                       <i
                         v-if="installing"
@@ -705,7 +774,7 @@ const getSecretStatusText = (status: string) => {
                       type="button"
                       class="rounded-md bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
                       :disabled="installing || !selectedVersion"
-                      @click="handleInstall"
+                      @click="handleInstall()"
                     >
                       <i
                         v-if="installing"
@@ -949,9 +1018,15 @@ const getSecretStatusText = (status: string) => {
           </FormRow>
 
           <!-- README Section -->
-          <FormRow v-if="pluginReadme" section-title="Documentation">
+          <FormRow v-if="pluginReadme || pluginDetailLoading" section-title="Documentation">
             <template #content>
-              <div class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+              <div v-if="pluginDetailLoading && !pluginReadme" class="py-4 text-center">
+                <div class="inline-flex items-center text-gray-600 dark:text-gray-400">
+                  <i class="fa-solid fa-spinner mr-2 animate-spin" />
+                  Loading documentation...
+                </div>
+              </div>
+              <div v-else class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
                 <MarkdownRenderer
                   :text="pluginReadme"
                   font-size="small"
