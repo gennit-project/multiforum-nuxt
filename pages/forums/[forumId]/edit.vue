@@ -5,7 +5,6 @@ import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { UPDATE_CHANNEL } from '@/graphQLData/channel/mutations';
 import type { CreateEditChannelFormValues } from '@/types/Channel';
 import CreateEditChannelFields from '@/components/channel/form/CreateEditChannelFields.vue';
-import RequireAuth from '@/components/auth/RequireAuth.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { usernameVar } from '@/cache';
 import type {
@@ -89,6 +88,11 @@ const existingTags = computed(() => {
 
 const ownerList = computed(() => {
   return channel.value?.Admins?.map((admin: UserData) => admin.username) || [];
+});
+
+const isOwner = computed(() => {
+  if (!usernameVar.value) return false;
+  return ownerList.value.includes(usernameVar.value);
 });
 
 const existingFilterGroups = computed(() => {
@@ -232,67 +236,56 @@ const hasError = computed(() => {
 
 <template>
   <div :key="$route.fullPath" class="px-2 md:px-8">
-    <RequireAuth
-      :require-ownership="true"
-      :owners="ownerList"
-      :loading="!dataLoaded || getChannelLoading"
+    <div
+      v-if="hasError"
+      class="mb-4 rounded-lg bg-red-100 p-4 text-red-700 dark:bg-red-800 dark:text-red-200"
     >
-      <template #has-auth>
-        <div
-          v-if="hasError"
-          class="mb-4 rounded-lg bg-red-100 p-4 text-red-700 dark:bg-red-800 dark:text-red-200"
-        >
-          <p>
-            Sorry, there was an error loading the forum data. Please try again
-            later.
-          </p>
-          <p class="mt-2 text-sm">
-            {{ getChannelError?.message || updateChannelError?.message }}
-          </p>
-        </div>
+      <p>
+        Sorry, there was an error loading the forum data. Please try again
+        later.
+      </p>
+      <p class="mt-2 text-sm">
+        {{ getChannelError?.message || updateChannelError?.message }}
+      </p>
+    </div>
 
-        <ClientOnly>
-          <CreateEditChannelFields
-            v-if="!hasError"
-            :key="dataLoaded.toString()"
-            :edit-mode="true"
-            :channel-loading="getChannelLoading"
-            :get-channel-error="getChannelError"
-            :update-channel-error="updateChannelError"
-            :edit-channel-loading="editChannelLoading"
-            :form-values="formValues"
-            :owner-list="ownerList"
-            @submit="submit"
-            @update-form-values="updateFormValues"
-          />
-          <template #fallback>
-            <div class="p-8 text-center">
-              <div class="animate-pulse">
-                <div
-                  class="mb-4 h-8 w-1/4 rounded bg-gray-200 dark:bg-gray-700"
-                />
-                <div
-                  class="mb-8 h-4 w-1/2 rounded bg-gray-200 dark:bg-gray-700"
-                />
-                <div class="space-y-4">
-                  <div class="h-10 rounded bg-gray-200 dark:bg-gray-700" />
-                  <div class="h-10 rounded bg-gray-200 dark:bg-gray-700" />
-                </div>
-              </div>
+    <ClientOnly>
+      <CreateEditChannelFields
+        v-if="!hasError"
+        :key="dataLoaded.toString()"
+        :edit-mode="true"
+        :channel-loading="getChannelLoading"
+        :get-channel-error="getChannelError"
+        :update-channel-error="updateChannelError"
+        :edit-channel-loading="editChannelLoading"
+        :form-values="formValues"
+        :owner-list="ownerList"
+        :has-permission="isOwner"
+        :data-loaded="dataLoaded"
+        @submit="submit"
+        @update-form-values="updateFormValues"
+      />
+      <template #fallback>
+        <div class="p-8 text-center">
+          <div class="animate-pulse">
+            <div
+              class="mb-4 h-8 w-1/4 rounded bg-gray-200 dark:bg-gray-700"
+            />
+            <div
+              class="mb-8 h-4 w-1/2 rounded bg-gray-200 dark:bg-gray-700"
+            />
+            <div class="space-y-4">
+              <div class="h-10 rounded bg-gray-200 dark:bg-gray-700" />
+              <div class="h-10 rounded bg-gray-200 dark:bg-gray-700" />
             </div>
-          </template>
-        </ClientOnly>
-        <Notification
-          v-if="showSavedChangesNotification"
-          title="Your changes have been saved."
-          @close-notification="showSavedChangesNotification = false"
-        />
-      </template>
-      <template #does-not-have-auth>
-        <div class="p-8 dark:text-white">
-          You don't have permission to see this page.
+          </div>
         </div>
       </template>
-    </RequireAuth>
+    </ClientOnly>
+    <Notification
+      v-if="showSavedChangesNotification"
+      title="Your changes have been saved."
+      @close-notification="showSavedChangesNotification = false"
+    />
   </div>
 </template>

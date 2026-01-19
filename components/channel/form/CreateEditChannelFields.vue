@@ -66,6 +66,14 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  hasPermission: {
+    type: Boolean,
+    default: true,
+  },
+  dataLoaded: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(['submit', 'updateFormValues']);
@@ -456,7 +464,35 @@ const getCurrentTabLabel = computed(() => {
 
             <!-- Main Content -->
             <div class="flex-1">
+              <!-- Loading state while checking permissions -->
+              <div
+                v-if="!dataLoaded"
+                class="p-8 text-center text-gray-500 dark:text-gray-400"
+              >
+                <i class="fa-solid fa-spinner mr-2 animate-spin" />
+                Loading...
+              </div>
+              <!-- Permission denied message -->
+              <div
+                v-else-if="!hasPermission"
+                class="rounded-lg bg-yellow-50 dark:bg-yellow-900/20 p-6 m-4"
+              >
+                <div class="flex items-start">
+                  <i class="fa-solid fa-lock text-yellow-500 mr-3 mt-0.5" />
+                  <div>
+                    <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                      Permission Required
+                    </h3>
+                    <p class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+                      You don't have permission to edit this forum's settings.
+                      Only forum admins can access this page.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <!-- Normal content when user has permission -->
               <NuxtPage
+                v-else
                 :edit-mode="true"
                 :form-values="formValues"
                 :title-is-invalid="titleIsInvalid"
