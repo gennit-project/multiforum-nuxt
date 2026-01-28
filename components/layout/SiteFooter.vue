@@ -42,7 +42,7 @@ const links = [
         href="https://github.com/gennit-project/multiforum-nuxt/issues"
         >GitHub repo</a
       >, or email support at
-      <a class="ml-1 text-orange-500" href="mailto:gennitdev@gmail.com"
+      <a class="ml-1 text-orange-500 underline" href="mailto:gennitdev@gmail.com"
         >gennitdev@gmail.com</a
       >.
     </div>
