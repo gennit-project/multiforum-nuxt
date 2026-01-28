@@ -5,6 +5,7 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import type { Issue } from '@/__generated__/graphql';
 import ArchiveButton from './ArchiveButton.vue';
 import SuspendUserButton from './SuspendUserButton.vue';
+import SuspendModButton from './SuspendModButton.vue';
 import AdminIcon from '../icons/AdminIcon.vue';
 import ScalesIcon from '../icons/ScalesIcon.vue';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
@@ -54,6 +55,16 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  authorType: {
+    type: String,
+    required: false,
+    default: 'user',
+  },
+  isSuspendedMod: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
   isCurrentUserOriginalPoster: {
     type: Boolean,
     required: false,
@@ -91,7 +102,9 @@ defineEmits([
 
 // Compute whether actions should be disabled
 const actionsDisabled = computed(() => {
-  return !props.issue.isOpen || props.isCurrentUserOriginalPoster;
+  return (
+    !props.issue.isOpen || props.isCurrentUserOriginalPoster || props.isSuspendedMod
+  );
 });
 
 const shouldFetchDiscussion = computed(() => {
@@ -189,6 +202,8 @@ const authorIsSuspended = computed(() => {
   return getUserSuspensionResult.value?.isOriginalPosterSuspended ?? false;
 });
 
+const isAuthorMod = computed(() => props.authorType === 'mod');
+
 const relatedContentType = computed(() => {
   if (props.commentId) return 'comment';
   if (props.eventId) return 'event';
@@ -278,6 +293,14 @@ const editButtonDisabled = computed(() => {
             {{ 'Mod actions are disabled because the issue is closed.' }}
           </p>
           <p
+            v-else-if="isSuspendedMod"
+            class="text-gray-600 dark:text-gray-400"
+          >
+            {{
+              'Mod actions are disabled because your moderator account is suspended.'
+            }}
+          </p>
+          <p
             v-else-if="isCurrentUserOriginalPoster"
             class="text-gray-600 dark:text-gray-400"
           >
@@ -348,8 +371,19 @@ const editButtonDisabled = computed(() => {
                           $emit('unarchived-successfully')
                         "
                       />
+                      <SuspendModButton
+                        v-if="authorIsSuspended && isAuthorMod"
+                        :issue="issue"
+                        :disabled="actionsDisabled"
+                        @suspended-successfully="
+                          $emit('suspended-mod-successfully')
+                        "
+                        @unsuspended-successfully="
+                          $emit('unsuspended-mod-successfully')
+                        "
+                      />
                       <SuspendUserButton
-                        v-if="authorIsSuspended"
+                        v-else-if="authorIsSuspended"
                         :issue="issue"
                         :discussion-title="contextText"
                         :discussion-id="discussionId"
@@ -477,8 +511,19 @@ const editButtonDisabled = computed(() => {
                           >
                             Actions on Author
                           </p>
+                          <SuspendModButton
+                            v-if="!authorIsSuspended && isAuthorMod"
+                            :issue="issue"
+                            :disabled="actionsDisabled"
+                            @suspended-successfully="
+                              $emit('suspended-mod-successfully')
+                            "
+                            @unsuspended-successfully="
+                              $emit('unsuspended-mod-successfully')
+                            "
+                          />
                           <SuspendUserButton
-                            v-if="!authorIsSuspended"
+                            v-else-if="!authorIsSuspended"
                             :issue="issue"
                             :discussion-title="contextText"
                             :discussion-id="discussionId"

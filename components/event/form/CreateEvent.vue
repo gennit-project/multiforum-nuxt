@@ -15,6 +15,7 @@ import type {
   Event,
 } from '@/__generated__/graphql';
 import { usernameVar } from '@/cache';
+import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 
 const now = DateTime.now();
 const route = useRoute();
@@ -72,6 +73,20 @@ const eventCreateInput = computed<EventCreateInput>(() => {
 const channelConnections = computed(() => formValues.value.selectedChannels);
 
 const createEventLoading = ref(false);
+const submitError = ref<string | null>(null);
+const submitAttempted = ref(false);
+
+const {
+  issueNumber: suspensionIssueNumber,
+  suspendedUntil: suspensionUntil,
+  suspendedIndefinitely: suspensionIndefinitely,
+  channelId: suspensionChannelId,
+} = useChannelSuspensionNotice(channelId);
+
+const showSuspensionNotice = computed(() => {
+  return submitAttempted.value && !!suspensionIssueNumber.value;
+});
+
 const {
   mutate: createEvent,
   error: createEventError,
@@ -94,6 +109,11 @@ onDone((response) => {
   createEventLoading.value = false;
   const newEventId = response.data?.createEventWithChannelConnections[0]?.id;
   const redirectChannelId = formValues.value.selectedChannels[0];
+  if (!newEventId) {
+    submitError.value =
+      'Unable to create event. Please check your permissions or try again.';
+    return;
+  }
   router.push({
     name: 'forums-forumId-events-eventId',
     params: { forumId: redirectChannelId, eventId: newEventId },
@@ -102,6 +122,8 @@ onDone((response) => {
 
 function submit() {
   createEventLoading.value = true;
+  submitAttempted.value = true;
+  submitError.value = null;
   if (!eventCreateInput.value?.title) {
     console.error('Title is required');
     return;
@@ -138,6 +160,17 @@ function updateFormValues(data: CreateEditEventFormValues) {
         :edit-mode="false"
         :form-values="formValues"
         :create-event-loading="createEventLoading"
+        :submit-error="submitError"
+        :suspension-issue-number="
+          showSuspensionNotice ? suspensionIssueNumber : null
+        "
+        :suspension-channel-id="
+          showSuspensionNotice ? suspensionChannelId : ''
+        "
+        :suspension-until="showSuspensionNotice ? suspensionUntil : null"
+        :suspension-indefinitely="
+          showSuspensionNotice ? suspensionIndefinitely : false
+        "
         @submit="submit"
         @update-form-values="updateFormValues"
       />

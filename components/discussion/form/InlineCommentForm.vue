@@ -19,6 +19,8 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
+import SuspensionNotice from '@/components/SuspensionNotice.vue';
+import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 
 const COMMENT_LIMIT = 50;
 
@@ -128,6 +130,7 @@ const createCommentInput = computed((): CommentCreateInput[] => {
 
 const createCommentLoading = ref(false);
 const showSavedNotice = ref(false);
+const submitAttempted = ref(false);
 let savedNoticeTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const {
@@ -265,6 +268,7 @@ onDone((result) => {
   if (result?.errors?.length) {
     return;
   }
+  submitAttempted.value = false;
   showSavedNotice.value = true;
   if (savedNoticeTimeout) {
     clearTimeout(savedNoticeTimeout);
@@ -273,6 +277,19 @@ onDone((result) => {
     showSavedNotice.value = false;
   }, 2000);
   createFormValues.value.text = '';
+});
+
+const {
+  issueNumber: suspensionIssueNumber,
+  suspendedUntil: suspensionUntil,
+  suspendedIndefinitely: suspensionIndefinitely,
+  channelId: suspensionChannelId,
+} = useChannelSuspensionNotice(
+  computed(() => props.discussionChannel?.channelUniqueName || '')
+);
+
+const showSuspensionNotice = computed(() => {
+  return submitAttempted.value && !!suspensionIssueNumber.value;
 });
 
 const handleCreateComment = async () => {
@@ -284,6 +301,7 @@ const handleCreateComment = async () => {
     console.warn('Could not create comment: no username');
     return;
   }
+  submitAttempted.value = true;
   createCommentLoading.value = true;
   createComment();
 };
@@ -298,6 +316,15 @@ const handleUpdateComment = (value: string) => {
     <ErrorBanner
       v-if="createCommentError"
       :text="createCommentError?.message"
+    />
+    <SuspensionNotice
+      v-if="showSuspensionNotice && suspensionChannelId"
+      class="mb-2"
+      :issue-number="suspensionIssueNumber"
+      :channel-id="suspensionChannelId"
+      :suspended-until="suspensionUntil"
+      :suspended-indefinitely="suspensionIndefinitely"
+      :message="'You are suspended in this forum and cannot comment.'"
     />
     <RequireAuth :justify-left="true" :full-width="true">
       <template #has-auth>

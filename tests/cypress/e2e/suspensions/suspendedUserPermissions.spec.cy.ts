@@ -128,6 +128,8 @@ describe('Suspended user permissions enforcement', () => {
     // Navigate to notifications page
     cy.get('[data-testid="notifications-button"]').click();
     cy.contains(/suspended.*cats/i).should('be.visible');
+    cy.contains(/issue #/i).should('be.visible');
+    cy.contains(/suspension expires on/i).should('be.visible');
 
     // Step 5: Clean up - unsuspend the user
     cy.visit('/logout');

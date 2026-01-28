@@ -5,6 +5,7 @@ import TextEditor from '@/components/TextEditor.vue';
 import CancelButton from '@/components/CancelButton.vue';
 import SaveButton from '@/components/SaveButton.vue';
 import ErrorBanner from '../ErrorBanner.vue';
+import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import type { ApolloError } from '@apollo/client/errors';
 import type { CreateEditCommentFormValues } from '@/types/Comment';
 import { usernameVar } from '@/cache';
@@ -29,6 +30,31 @@ defineProps({
     type: Boolean,
     required: true,
   },
+  suspensionIssueNumber: {
+    type: Number,
+    required: false,
+    default: null,
+  },
+  suspensionChannelId: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  suspensionUntil: {
+    type: String,
+    required: false,
+    default: null,
+  },
+  suspensionIndefinitely: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  suspensionMessage: {
+    type: String,
+    required: false,
+    default: 'You are suspended and cannot create comments.',
+  },
 });
 
 const emit = defineEmits([
@@ -47,6 +73,15 @@ const writeReplyStyle =
     <ErrorBanner
       v-if="createCommentError"
       :text="createCommentError?.message"
+    />
+    <SuspensionNotice
+      v-if="suspensionIssueNumber && suspensionChannelId"
+      class="mb-2"
+      :issue-number="suspensionIssueNumber"
+      :channel-id="suspensionChannelId"
+      :suspended-until="suspensionUntil"
+      :suspended-indefinitely="suspensionIndefinitely"
+      :message="suspensionMessage"
     />
     <div class="flex w-full gap-2">
       <RequireAuth

@@ -5,6 +5,7 @@ import TextEditor from '@/components/TextEditor.vue';
 import FormRow from '@/components/FormRow.vue';
 import TagPicker from '@/components/TagPicker.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import TextInput from '@/components/TextInput.vue';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
 import ForumPicker from '@/components/channel/ForumPicker.vue';
@@ -22,6 +23,11 @@ const props = defineProps<{
   editMode: boolean;
   downloadMode: boolean;
   createDiscussionError?: ApolloError | null;
+  submitError?: string | null;
+  suspensionIssueNumber?: number | null;
+  suspensionChannelId?: string;
+  suspensionUntil?: string | null;
+  suspensionIndefinitely?: boolean | null;
   formValues: CreateEditDiscussionFormValues | null;
   getDiscussionError?: ApolloError | null;
   updateDiscussionError?: ApolloError | null;
@@ -133,6 +139,16 @@ onMounted(() => {
         <ErrorBanner
           v-if="createDiscussionError"
           :text="createDiscussionError.message"
+        />
+        <ErrorBanner v-if="submitError" :text="submitError" />
+        <SuspensionNotice
+          v-if="suspensionIssueNumber && suspensionChannelId"
+          class="mt-2"
+          :issue-number="suspensionIssueNumber"
+          :channel-id="suspensionChannelId"
+          :suspended-until="suspensionUntil"
+          :suspended-indefinitely="suspensionIndefinitely"
+          :message="'You are suspended in this forum and cannot create discussions.'"
         />
         <ErrorBanner
           v-if="updateDiscussionError"

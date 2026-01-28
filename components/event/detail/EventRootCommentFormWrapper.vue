@@ -12,6 +12,7 @@ import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import type { Event, CommentCreateInput } from '@/__generated__/graphql';
 import type { CreateEditCommentFormValues } from '@/types/Comment';
 import { usernameVar } from '@/cache';
+import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 
 const COMMENT_LIMIT = 50;
 const props = defineProps({
@@ -118,6 +119,7 @@ const createCommentInput = computed(() => {
 const createCommentLoading = ref(false);
 const commentEditorOpen = ref(false);
 const createCommentPermissionError = ref('');
+const submitAttempted = ref(false);
 
 // Mutation for creating a comment
 const {
@@ -149,10 +151,23 @@ onDone((result) => {
     createCommentLoading.value = false;
     return;
   }
+  submitAttempted.value = false;
   createFormValues.value = createCommentDefaultValues;
   createCommentLoading.value = false;
   commentEditorOpen.value = false;
 });
+
+const {
+  issueNumber: suspensionIssueNumber,
+  suspendedUntil: suspensionUntil,
+  suspendedIndefinitely: suspensionIndefinitely,
+  channelId: suspensionChannelId,
+} = useChannelSuspensionNotice(channelId);
+
+const showSuspensionNotice = computed(() => {
+  return submitAttempted.value && !!suspensionIssueNumber.value;
+});
+
 function handleCreateComment() {
   if (!props.event) {
     console.warn(
@@ -160,6 +175,7 @@ function handleCreateComment() {
     );
     return;
   }
+  submitAttempted.value = true;
   createCommentLoading.value = true;
   createComment({ createCommentInput: createCommentInput.value });
 }
@@ -180,6 +196,17 @@ function handleUpdateComment(event: string) {
       :create-form-values="createFormValues"
       :create-comment-loading="createCommentLoading"
       :create-comment-error="createCommentError"
+      :suspension-issue-number="
+        showSuspensionNotice ? suspensionIssueNumber : null
+      "
+      :suspension-channel-id="
+        showSuspensionNotice ? suspensionChannelId : ''
+      "
+      :suspension-until="showSuspensionNotice ? suspensionUntil : null"
+      :suspension-indefinitely="
+        showSuspensionNotice ? suspensionIndefinitely : false
+      "
+      :suspension-message="'You are suspended in this forum and cannot comment.'"
       :comment-editor-open="commentEditorOpen"
       @open-comment-editor="commentEditorOpen = true"
       @close-comment-editor="commentEditorOpen = false"

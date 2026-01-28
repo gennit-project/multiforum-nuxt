@@ -3,6 +3,7 @@ import { computed, ref, onMounted } from 'vue';
 import type { PropType } from 'vue';
 import type { ApolloError } from '@apollo/client/errors';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import type { CreateEditChannelFormValues } from '@/types/Channel';
 import TailwindForm from '@/components/FormComponent.vue';
 import { useRoute, useRouter } from 'nuxt/app';
@@ -37,6 +38,10 @@ const props = defineProps({
     type: Object as PropType<ApolloError | null>,
     default: null,
   },
+  submitError: {
+    type: String,
+    default: null,
+  },
   createChannelLoading: {
     type: Boolean,
     default: false,
@@ -59,6 +64,22 @@ const props = defineProps({
     default: null,
   },
   channelLoading: {
+    type: Boolean,
+    default: false,
+  },
+  suspensionIssueNumber: {
+    type: Number,
+    default: null,
+  },
+  suspensionChannelId: {
+    type: String,
+    default: '',
+  },
+  suspensionUntil: {
+    type: String,
+    default: null,
+  },
+  suspensionIndefinitely: {
     type: Boolean,
     default: false,
   },
@@ -235,6 +256,16 @@ const getCurrentTabLabel = computed(() => {
           :text="`${error.message.split(CHANNEL_ALREADY_EXISTS_ERROR).join('Channel name is already taken')}`"
         />
       </div>
+      <ErrorBanner v-if="submitError" :text="submitError" />
+      <SuspensionNotice
+        v-if="suspensionIssueNumber && suspensionChannelId"
+        class="mt-2"
+        :issue-number="suspensionIssueNumber"
+        :channel-id="suspensionChannelId"
+        :suspended-until="suspensionUntil"
+        :suspended-indefinitely="suspensionIndefinitely"
+        :message="'You have an active suspension and cannot create forums.'"
+      />
 
       <TailwindForm
         v-if="formValues && !editMode"

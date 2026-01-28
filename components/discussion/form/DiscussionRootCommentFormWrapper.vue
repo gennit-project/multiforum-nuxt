@@ -16,6 +16,7 @@ import { usernameVar } from '@/cache';
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import { useRoute } from 'nuxt/app';
 import { gql } from '@apollo/client/core';
+import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 
 defineOptions({ inheritAttrs: false });
 
@@ -142,6 +143,7 @@ const createCommentInput = computed((): CommentCreateInput[] => {
 const createCommentLoading = ref(false);
 const commentEditorOpen = ref(false);
 const showSavedNotice = ref(false);
+const submitAttempted = ref(false);
 let savedNoticeTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const {
@@ -285,6 +287,7 @@ onDone((result) => {
   if (result?.errors?.length) {
     return;
   }
+  submitAttempted.value = false;
   createFormValues.value = createCommentDefaultValues;
   commentEditorOpen.value = false;
   showSavedNotice.value = true;
@@ -296,6 +299,21 @@ onDone((result) => {
   }, 2000);
   // clear input
   createFormValues.value.text = '';
+});
+
+const channelUniqueName = computed(() => {
+  return props.discussionChannel?.channelUniqueName || '';
+});
+
+const {
+  issueNumber: suspensionIssueNumber,
+  suspendedUntil: suspensionUntil,
+  suspendedIndefinitely: suspensionIndefinitely,
+  channelId: suspensionChannelId,
+} = useChannelSuspensionNotice(channelUniqueName);
+
+const showSuspensionNotice = computed(() => {
+  return submitAttempted.value && !!suspensionIssueNumber.value;
 });
 
 const handleCreateComment = async () => {
@@ -311,6 +329,7 @@ const handleCreateComment = async () => {
     );
     return;
   }
+  submitAttempted.value = true;
   createCommentLoading.value = true;
   createComment();
 };
@@ -326,6 +345,16 @@ const handleUpdateComment = (event: string) => {
       :create-form-values="createFormValues"
       :create-comment-loading="createCommentLoading"
       :create-comment-error="createCommentError"
+      :suspension-issue-number="
+        showSuspensionNotice ? suspensionIssueNumber : null
+      "
+      :suspension-channel-id="
+        showSuspensionNotice ? suspensionChannelId : ''
+      "
+      :suspension-until="showSuspensionNotice ? suspensionUntil : null"
+      :suspension-indefinitely="
+        showSuspensionNotice ? suspensionIndefinitely : false
+      "
       :comment-editor-open="commentEditorOpen"
       :show-saved-notice="showSavedNotice"
       :open-comment-editor="() => (commentEditorOpen = true)"
@@ -337,6 +366,17 @@ const handleUpdateComment = (event: string) => {
         :create-form-values="createFormValues"
         :create-comment-loading="createCommentLoading"
         :create-comment-error="createCommentError"
+        :suspension-issue-number="
+          showSuspensionNotice ? suspensionIssueNumber : null
+        "
+        :suspension-channel-id="
+          showSuspensionNotice ? suspensionChannelId : ''
+        "
+        :suspension-until="showSuspensionNotice ? suspensionUntil : null"
+        :suspension-indefinitely="
+          showSuspensionNotice ? suspensionIndefinitely : false
+        "
+        :suspension-message="'You are suspended in this forum and cannot comment.'"
         :comment-editor-open="commentEditorOpen"
         @open-comment-editor="commentEditorOpen = true"
         @close-comment-editor="commentEditorOpen = false"

@@ -12,6 +12,7 @@ import type {
 } from '@/__generated__/graphql';
 import { usernameVar } from '@/cache';
 import { useRouter } from 'nuxt/app';
+import { useServerSuspensionNotice } from '@/composables/useSuspensionNotice';
 
 const router = useRouter();
 
@@ -80,6 +81,19 @@ const createChannelInput = computed(() => {
 });
 
 const createChannelLoading = ref(false);
+const submitError = ref<string | null>(null);
+const submitAttempted = ref(false);
+
+const {
+  issueNumber: suspensionIssueNumber,
+  suspendedUntil: suspensionUntil,
+  suspendedIndefinitely: suspensionIndefinitely,
+  channelId: suspensionChannelId,
+} = useServerSuspensionNotice();
+
+const showSuspensionNotice = computed(() => {
+  return submitAttempted.value && !!suspensionIssueNumber.value;
+});
 
 const {
   mutate: createChannel,
@@ -113,8 +127,13 @@ const {
 }));
 
 onDone((response) => {
-  const newChannelId = response.data.createChannels.channels[0].uniqueName;
+  const newChannelId = response.data.createChannels.channels[0]?.uniqueName;
   createChannelLoading.value = false;
+  if (!newChannelId) {
+    submitError.value =
+      'Unable to create forum. Please check your permissions or try again.';
+    return;
+  }
 
   router.push({
     name: 'forums-forumId-discussions',
@@ -126,6 +145,8 @@ onDone((response) => {
 
 const submit = async () => {
   createChannelLoading.value = true;
+  submitAttempted.value = true;
+  submitError.value = null;
   if (!usernameVar.value) {
     console.error('No username found');
     return;
@@ -155,6 +176,17 @@ const updateFormValues = (data: any) => {
                 :edit-mode="false"
                 :form-values="formValues"
                 :create-channel-loading="createChannelLoading"
+                :submit-error="submitError"
+                :suspension-issue-number="
+                  showSuspensionNotice ? suspensionIssueNumber : null
+                "
+                :suspension-channel-id="
+                  showSuspensionNotice ? suspensionChannelId : ''
+                "
+                :suspension-until="showSuspensionNotice ? suspensionUntil : null"
+                :suspension-indefinitely="
+                  showSuspensionNotice ? suspensionIndefinitely : false
+                "
                 @submit="submit"
                 @update-form-values="updateFormValues"
               />

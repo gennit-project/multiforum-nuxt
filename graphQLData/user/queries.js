@@ -602,6 +602,50 @@ export const USER_IS_MOD_OR_OWNER_IN_CHANNEL = gql`
   }
 `;
 
+export const GET_USER_SUSPENSION_IN_CHANNEL = gql`
+  query getUserSuspensionInChannel(
+    $channelUniqueName: String!
+    $username: String!
+  ) {
+    channels(where: { uniqueName: $channelUniqueName }) {
+      uniqueName
+      SuspendedUsers(where: { username: $username }) {
+        id
+        suspendedUntil
+        suspendedIndefinitely
+        RelatedIssue {
+          issueNumber
+        }
+      }
+    }
+  }
+`;
+
+export const GET_USER_ACTIVE_SUSPENSIONS = gql`
+  query getUserActiveSuspensions($username: String!, $now: DateTime!) {
+    users(where: { username: $username }) {
+      username
+      Suspensions(
+        where: {
+          OR: [
+            { suspendedIndefinitely: true }
+            { suspendedUntil_GT: $now }
+          ]
+        }
+        options: { limit: 1, sort: { suspendedUntil: DESC } }
+      ) {
+        id
+        channelUniqueName
+        suspendedUntil
+        suspendedIndefinitely
+        RelatedIssue {
+          issueNumber
+        }
+      }
+    }
+  }
+`;
+
 export const GET_USER_FAVORITE_COUNTS = gql`
   query getUserFavoriteCounts($username: String!) {
     users(where: { username: $username }) {

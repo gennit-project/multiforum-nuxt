@@ -35,6 +35,9 @@ import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
 import LockIcon from '@/components/icons/LockIcon.vue';
 import PinnedAnswers from '@/components/comments/PinnedAnswers.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import SuspensionNotice from '@/components/SuspensionNotice.vue';
+import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 
 type CommentSectionQueryVariablesType = {
   discussionId?: string;
@@ -155,6 +158,7 @@ const showEditCommentFeedbackModal = ref(false);
 const parentOfCommentToDelete = ref('');
 const parentIdOfCommentToGiveFeedbackOn = ref('');
 const commentInProcess = ref(false);
+const submitAttempted = ref(false);
 const replyFormOpenAtCommentID = ref('');
 const editFormOpenAtCommentID = ref('');
 const showCopiedLinkNotification = ref(false);
@@ -334,7 +338,11 @@ onDoneSoftDeletingComment(() => {
   showDeleteCommentModal.value = false;
 });
 
-const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
+const {
+  mutate: createComment,
+  error: createCommentError,
+  onDone: onDoneCreatingComment,
+} = useMutation(
   CREATE_COMMENT,
   {
     errorPolicy: 'all',
@@ -445,6 +453,7 @@ const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
 
 onDoneCreatingComment(() => {
   commentInProcess.value = false;
+  submitAttempted.value = false;
   replyFormOpenAtCommentID.value = '';
   emit('updateCreateFormValues', {
     text: '',
@@ -452,6 +461,19 @@ onDoneCreatingComment(() => {
     depth: 1,
     parentCommentId: '',
   });
+});
+
+const {
+  issueNumber: suspensionIssueNumber,
+  suspendedUntil: suspensionUntil,
+  suspendedIndefinitely: suspensionIndefinitely,
+  channelId: suspensionChannelId,
+} = useChannelSuspensionNotice(
+  computed(() => props.commentSectionQueryVariables.channelUniqueName || '')
+);
+
+const showSuspensionNotice = computed(() => {
+  return submitAttempted.value && !!suspensionIssueNumber.value;
 });
 
 onDoneUpdatingComment(() => {
@@ -473,6 +495,7 @@ watchEffect(() => {
 
 function handleClickCreate() {
   // Simply trigger the mutation with the properly structured input from props
+  submitAttempted.value = true;
   createComment({
     createCommentInput: props.createCommentInput,
   });
@@ -658,6 +681,19 @@ const lengthOfCommentInProgress = computed(() => {
   <div class="pr-2">
     <div>
       <slot name="pre-header" />
+      <ErrorBanner
+        v-if="createCommentError"
+        :text="createCommentError.message"
+      />
+      <SuspensionNotice
+        v-if="showSuspensionNotice && suspensionChannelId"
+        class="mb-2"
+        :issue-number="suspensionIssueNumber"
+        :channel-id="suspensionChannelId"
+        :suspended-until="suspensionUntil"
+        :suspended-indefinitely="suspensionIndefinitely"
+        :message="'You are suspended in this forum and cannot comment.'"
+      />
       <div class="align-items flex justify-between">
         <div class="flex w-full items-center justify-between space-x-4">
           <h2 id="comments" class="px-1 text-lg dark:text-white">

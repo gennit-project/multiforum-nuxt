@@ -142,6 +142,12 @@ export const GET_CHANNEL = gql`
       Moderators {
         displayName
       }
+      SuspendedMods {
+        modProfileName
+      }
+      SuspendedUsers {
+        username
+      }
       DiscussionChannelsAggregate(
         where: {
           AND: [

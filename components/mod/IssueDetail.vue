@@ -184,6 +184,16 @@ const modPermissions = computed(() => {
   });
 });
 
+const isSuspendedMod = computed(() => {
+  return modPermissions.value.isSuspendedMod;
+});
+
+const authorType = computed(() => {
+  if (originalModProfileName.value) return 'mod';
+  if (originalAuthorUsername.value) return 'user';
+  return 'user';
+});
+
 const isEditingIssueBody = ref(false);
 const editedIssueBody = ref('');
 
@@ -790,6 +800,9 @@ const updateComment = (text: string) => {
 
 const handleCreateComment = async () => {
   if (!activeIssue.value) return;
+  if (isSuspendedMod.value && !isOriginalUserAuthor.value) {
+    return;
+  }
 
   // Case 1: Current user is the original author who posted as a regular user
   if (isOriginalUserAuthor.value) {
@@ -832,6 +845,7 @@ const handleCreateComment = async () => {
 
 const toggleCloseOpenIssue = async () => {
   if (!activeIssue.value || !modProfileNameVar.value) return;
+  if (isSuspendedMod.value) return;
 
   try {
     if (activeIssue.value.isOpen) {
@@ -1138,8 +1152,8 @@ const handleDeleteComment = async (commentId: string) => {
             :text="addIssueActivityFeedItemWithCommentAsUserError.message"
           />
           <ErrorBanner v-if="deleteReasonError" :text="deleteReasonError" />
-          <ModerationWizard
-            v-if="
+            <ModerationWizard
+              v-if="
               issue &&
               issueActionVisibility.showModActions
             "
@@ -1150,6 +1164,8 @@ const handleDeleteComment = async (commentId: string) => {
             :channel-unique-name="channelId"
             :close-issue-loading="closeIssueLoading"
             :is-current-user-original-poster="!issueActionVisibility.modActionsEnabled"
+            :author-type="authorType"
+            :is-suspended-mod="isSuspendedMod"
             :can-edit-comments="modPermissions.canEditComments"
             :can-edit-discussions="modPermissions.canEditDiscussions"
             :can-edit-events="modPermissions.canEditEvents"
@@ -1195,6 +1211,9 @@ const handleDeleteComment = async (commentId: string) => {
                 :test-id="'close-open-issue-button'"
                 :text="closeOpenButtonText"
                 :loading="closeIssueLoading || reopenIssueLoading"
+                :disabled="
+                  isSuspendedMod || closeIssueLoading || reopenIssueLoading
+                "
                 @click="toggleCloseOpenIssue"
               >
                 <XCircleIcon v-if="issue.isOpen" />
@@ -1203,7 +1222,10 @@ const handleDeleteComment = async (commentId: string) => {
               <SaveButton
                 :data-testid="'createCommentButton'"
                 :label="'Comment'"
-                :disabled="createFormValues.text.length === 0"
+                :disabled="
+                  createFormValues.text.length === 0 ||
+                  (isSuspendedMod && !isOriginalUserAuthor)
+                "
                 :loading="
                   addIssueActivityFeedItemWithCommentAsModLoading ||
                   addIssueActivityFeedItemWithCommentAsUserLoading

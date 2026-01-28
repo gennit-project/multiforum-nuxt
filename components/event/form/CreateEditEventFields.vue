@@ -8,6 +8,7 @@ import ErrorMessage from '@/components/ErrorMessage.vue';
 import CheckBox from '@/components/CheckBox.vue';
 import LocationSearchBar from '@/components/event/list/filters/LocationSearchBar.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import DateTimePickersRow from './DateTimePickersRow.vue';
 import type { CreateEditEventFormValues } from '@/types/Event';
 import { DateTime } from 'luxon';
@@ -45,6 +46,10 @@ const props = defineProps({
     type: Object as PropType<ApolloError | null>,
     default: null,
   },
+  submitError: {
+    type: String,
+    default: null,
+  },
   createEventLoading: {
     type: Boolean,
     default: false,
@@ -66,6 +71,22 @@ const props = defineProps({
     default: false,
   },
   updateEventLoading: {
+    type: Boolean,
+    default: false,
+  },
+  suspensionIssueNumber: {
+    type: Number,
+    default: null,
+  },
+  suspensionChannelId: {
+    type: String,
+    default: '',
+  },
+  suspensionUntil: {
+    type: String,
+    default: null,
+  },
+  suspensionIndefinitely: {
     type: Boolean,
     default: false,
   },
@@ -805,6 +826,16 @@ const touched = ref(false);
       <ErrorBanner
         v-if="needsChanges && touched"
         :text="changesRequiredMessage"
+      />
+      <ErrorBanner v-if="submitError" :text="submitError" />
+      <SuspensionNotice
+        v-if="suspensionIssueNumber && suspensionChannelId"
+        class="mt-2"
+        :issue-number="suspensionIssueNumber"
+        :channel-id="suspensionChannelId"
+        :suspended-until="suspensionUntil"
+        :suspended-indefinitely="suspensionIndefinitely"
+        :message="'You are suspended in this forum and cannot create events.'"
       />
       <!-- Create Event Errors -->
       <div v-if="createEventError">

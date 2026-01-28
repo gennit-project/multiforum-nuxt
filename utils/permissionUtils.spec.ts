@@ -45,4 +45,27 @@ describe('permissionUtils', () => {
     expect(permissions.canEditDiscussions).toBe(false);
     expect(permissions.canEditEvents).toBe(true);
   });
+
+  it('disables mod actions when the mod is suspended', () => {
+    const permissions = getAllPermissions({
+      permissionData: {
+        Moderators: [{ displayName: 'mod-one' }],
+        SuspendedMods: [{ modProfileName: 'mod-one' }],
+      },
+      standardModRole: {
+        canReport: true,
+        canGiveFeedback: true,
+      },
+      elevatedModRole: {
+        canReport: true,
+        canGiveFeedback: true,
+      },
+      username: 'user-one',
+      modProfileName: 'mod-one',
+    });
+
+    expect(permissions.isSuspendedMod).toBe(true);
+    expect(permissions.canReport).toBe(false);
+    expect(permissions.canGiveFeedback).toBe(false);
+  });
 });

@@ -20,6 +20,7 @@ import {
 } from '@/components/comments/getSortFromQuery';
 import { usernameVar } from '@/cache';
 import { useRouter, useRoute } from 'nuxt/app';
+import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 
 const DISCUSSION_PAGE_LIMIT = 10;
 const route = useRoute();
@@ -148,6 +149,19 @@ const discussionCreateInput = computed<DiscussionCreateInput>(() => {
 
 const channelConnections = computed(() => formValues.value.selectedChannels);
 const createDiscussionLoading = ref(false);
+const submitError = ref<string | null>(null);
+const submitAttempted = ref(false);
+
+const {
+  issueNumber: suspensionIssueNumber,
+  suspendedUntil: suspensionUntil,
+  suspendedIndefinitely: suspensionIndefinitely,
+  channelId: suspensionChannelId,
+} = useChannelSuspensionNotice(channelId);
+
+const showSuspensionNotice = computed(() => {
+  return submitAttempted.value && !!suspensionIssueNumber.value;
+});
 
 const {
   mutate: createDiscussion,
@@ -230,6 +244,12 @@ onDone((response) => {
   const newDiscussionId = newDiscussion?.Discussion?.id;
   createDiscussionLoading.value = false;
 
+  if (!newDiscussionId) {
+    submitError.value =
+      'Unable to create discussion. Please check your permissions or try again.';
+    return;
+  }
+
   router.push({
     name: 'forums-forumId-discussions-discussionId',
     params: {
@@ -244,6 +264,8 @@ function submit() {
     console.error('No username found');
     return;
   }
+  submitAttempted.value = true;
+  submitError.value = null;
   createDiscussionLoading.value = true;
   createDiscussion();
 }
@@ -295,6 +317,17 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
         :edit-mode="false"
         :form-values="formValues"
         :download-mode="false"
+        :submit-error="submitError"
+        :suspension-issue-number="
+          showSuspensionNotice ? suspensionIssueNumber : null
+        "
+        :suspension-channel-id="
+          showSuspensionNotice ? suspensionChannelId : ''
+        "
+        :suspension-until="showSuspensionNotice ? suspensionUntil : null"
+        :suspension-indefinitely="
+          showSuspensionNotice ? suspensionIndefinitely : null
+        "
         :crossposted-discussion="crosspostPreviewDiscussion"
         :crosspost-error="crosspostPreviewError"
         :crosspost-loading="crosspostPreviewLoading"
