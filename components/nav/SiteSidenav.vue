@@ -274,7 +274,7 @@ const selectSearchType = (type: SearchType) => {
           </div>
         </div>
 
-        <nav class="mt-4">
+        <nav class="mt-4" aria-label="Primary">
           <ul role="list" class="m-0 p-0">
             <li
               v-for="item in navigation"
@@ -313,7 +313,7 @@ const selectSearchType = (type: SearchType) => {
         >
           Recent Forums
         </div>
-        <nav>
+        <nav aria-label="Recent forums">
           <ul role="list" class="m-0 p-0">
             <li
               v-for="forum in visibleRecentForums"
@@ -342,6 +342,7 @@ const selectSearchType = (type: SearchType) => {
                   :src="forum?.channelIconURL ?? ''"
                   :is-small="true"
                   :is-square="false"
+                  :is-decorative="true"
                 />
                 <AvatarComponent
                   v-if="!forum?.channelIconURL"
@@ -350,6 +351,7 @@ const selectSearchType = (type: SearchType) => {
                   :src="forum?.channelIconURL ?? ''"
                   :is-small="true"
                   :is-square="false"
+                  :is-decorative="true"
                 />
                 {{ forum.uniqueName }}
               </nuxt-link>
@@ -374,73 +376,78 @@ const selectSearchType = (type: SearchType) => {
         </nav>
       </div>
       <ul role="list" class="m-0 mb-6 mt-6 border-t p-0 pt-4">
-        <nuxt-link
-          v-if="isAuthenticatedVar && usernameVar"
-          :to="{
-            name: 'u-username',
-            params: { username: usernameVar },
-          }"
-          class="font-semibold group flex items-center gap-x-3 rounded-md px-6 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
-          @click.prevent="
-            () => {
-              routeAndClose({
-                name: 'u-username',
-                params: { username: usernameVar },
-              });
-            }
-          "
-        >
-          <AvatarComponent
-            v-if="profilePicURL"
-            :text="usernameVar"
-            :src="profilePicURL"
-            :is-small="true"
-          />
-          My Profile
-        </nuxt-link>
-        <nuxt-link
-          v-if="isAuthenticatedVar && usernameVar"
-          to="/account_settings"
-          :class="navLinkClasses"
-          @click.prevent="
-            () => {
-              routeAndClose({
-                name: 'account_settings',
-              });
-            }
-          "
-        >
-          Account Settings
-        </nuxt-link>
-        <nuxt-link
-          :to="{
-            name: 'admin-issues',
-          }"
-          :class="navLinkClasses"
-          @click.prevent="
-            () => {
-              routeAndClose({
-                name: 'admin-issues',
-              });
-            }
-          "
-        >
-          Admin Dashboard
-        </nuxt-link>
-
-        <RequireAuth :require-ownership="false" :full-width="true">
-          <template #has-auth>
-            <SiteSidenavLogout :nav-link-classes="`w-full ${navLinkClasses}`" />
-          </template>
-          <template #does-not-have-auth>
-            <button
-              v-if="!isAuthenticatedVar"
-              :class="`w-full ${navLinkClasses}`"
-            >
-              Log In
-            </button>
-          </template>
-        </RequireAuth>
+        <li v-if="isAuthenticatedVar && usernameVar" class="m-0 list-none">
+          <nuxt-link
+            :to="{
+              name: 'u-username',
+              params: { username: usernameVar },
+            }"
+            class="font-semibold group flex items-center gap-x-3 rounded-md px-6 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
+            @click.prevent="
+              () => {
+                routeAndClose({
+                  name: 'u-username',
+                  params: { username: usernameVar },
+                });
+              }
+            "
+          >
+            <AvatarComponent
+              v-if="profilePicURL"
+              :text="usernameVar"
+              :src="profilePicURL"
+              :is-small="true"
+            />
+            My Profile
+          </nuxt-link>
+        </li>
+        <li v-if="isAuthenticatedVar && usernameVar" class="m-0 list-none">
+          <nuxt-link
+            to="/account_settings"
+            :class="navLinkClasses"
+            @click.prevent="
+              () => {
+                routeAndClose({
+                  name: 'account_settings',
+                });
+              }
+            "
+          >
+            Account Settings
+          </nuxt-link>
+        </li>
+        <li class="m-0 list-none">
+          <nuxt-link
+            :to="{
+              name: 'admin-issues',
+            }"
+            :class="navLinkClasses"
+            @click.prevent="
+              () => {
+                routeAndClose({
+                  name: 'admin-issues',
+                });
+              }
+            "
+          >
+            Admin Dashboard
+          </nuxt-link>
+        </li>
+        <li class="m-0 list-none">
+          <RequireAuth :require-ownership="false" :full-width="true">
+            <template #has-auth>
+              <SiteSidenavLogout :nav-link-classes="`w-full ${navLinkClasses}`" />
+            </template>
+            <template #does-not-have-auth>
+              <button
+                v-if="!isAuthenticatedVar"
+                :class="`w-full ${navLinkClasses}`"
+              >
+                Log In
+              </button>
+            </template>
+          </RequireAuth>
+        </li>
       </ul>
     </div>
   </div>

@@ -256,7 +256,7 @@ onBeforeUnmount(() => {
     </div>
     <div
       v-if="showPopover"
-      class="absolute left-0 right-0 z-30 mt-2 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900"
+      class="absolute left-0 right-0 z-30 mt-2 min-w-[20rem] md:min-w-[28rem] rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900"
     >
       <div class="flex flex-wrap items-center gap-2 p-3">
         <FilterChip :label="`Type: ${typeLabel}`">
@@ -338,32 +338,42 @@ onBeforeUnmount(() => {
         >
           No recent searches yet.
         </div>
-        <ul v-else class="max-h-56 overflow-y-auto pb-2">
+        <ul
+          v-else
+          class="max-h-56 overflow-y-auto pb-2"
+          tabindex="0"
+          aria-label="Recent searches"
+        >
           <li
             v-for="recent in recentSearches"
             :key="recent.timestamp"
-            class="cursor-pointer px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800"
-            @click="runRecentSearch(recent)"
+            class="px-3 py-2"
           >
-            <div class="font-medium text-gray-900 dark:text-gray-100">
-              {{ recent.query }}
-            </div>
-            <div class="text-xs text-gray-500">
-              {{
-                typeOptions.find((o) => o.value === recent.type)?.label || ''
-              }}
-              •
-              {{
-                modifiedOptions.find((o) => o.value === recent.modified)
-                  ?.label || 'All'
-              }}
-              •
-              {{
-                recent.forums.length
-                  ? `Forums (${recent.forums.length})`
-                  : 'All forums'
-              }}
-            </div>
+            <button
+              type="button"
+              class="w-full text-left text-sm hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:hover:bg-gray-800"
+              @click="runRecentSearch(recent)"
+            >
+              <div class="font-medium text-gray-900 dark:text-gray-100">
+                {{ recent.query }}
+              </div>
+              <div class="text-xs text-gray-500">
+                {{
+                  typeOptions.find((o) => o.value === recent.type)?.label || ''
+                }}
+                •
+                {{
+                  modifiedOptions.find((o) => o.value === recent.modified)
+                    ?.label || 'All'
+                }}
+                •
+                {{
+                  recent.forums.length
+                    ? `Forums (${recent.forums.length})`
+                    : 'All forums'
+                }}
+              </div>
+            </button>
           </li>
         </ul>
       </div>
