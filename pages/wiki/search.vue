@@ -194,7 +194,7 @@ watch(
                 :search-input="searchInputComputed"
               />
             </nuxt-link>
-            <span class="text-xs text-gray-500">
+            <span class="text-xs text-gray-500 dark:text-gray-300">
               {{ wikiPage.channelUniqueName }}
             </span>
           </div>
@@ -204,7 +204,10 @@ watch(
               :search-input="searchInputComputed"
             />
           </p>
-          <div v-if="wikiPage.VersionAuthor" class="mt-3 text-xs text-gray-500">
+          <div
+            v-if="wikiPage.VersionAuthor"
+            class="mt-3 text-xs text-gray-500 dark:text-gray-300"
+          >
             Updated by
             {{
               wikiPage.VersionAuthor.displayName ||
