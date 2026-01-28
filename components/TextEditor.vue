@@ -672,10 +672,10 @@ const exitFullScreen = () => {
         </div>
       </div>
       <TabGroup as="div">
-        <TabList
+        <div
           class="border-b pb-2 dark:border-gray-600 sm:flex-wrap md:flex md:justify-between"
         >
-          <div class="flex items-center">
+          <TabList class="flex items-center">
             <Tab
               as="button"
               :class="[
@@ -717,7 +717,7 @@ const exitFullScreen = () => {
             >
               Preview
             </Tab>
-          </div>
+          </TabList>
           <div
             v-if="!showFormatted"
             class="flex flex-wrap items-center space-x-1"
@@ -747,7 +747,7 @@ const exitFullScreen = () => {
               <span v-else>{{ button.label }}</span>
             </button>
           </div>
-        </TabList>
+        </div>
         <TabPanels class="mt-2">
           <TabPanel class="-m-0.5 rounded-md px-0.5 py-1">
             <textarea
