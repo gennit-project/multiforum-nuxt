@@ -686,12 +686,16 @@ const lengthOfCommentInProgress = computed(() => {
         :text="createCommentError.message"
       />
       <SuspensionNotice
-        v-if="showSuspensionNotice && suspensionChannelId"
+        v-if="
+          showSuspensionNotice &&
+          suspensionChannelId &&
+          suspensionIssueNumber !== null
+        "
         class="mb-2"
-        :issue-number="suspensionIssueNumber"
+        :issue-number="suspensionIssueNumber!"
         :channel-id="suspensionChannelId"
-        :suspended-until="suspensionUntil"
-        :suspended-indefinitely="suspensionIndefinitely"
+        :suspended-until="suspensionUntil ?? undefined"
+        :suspended-indefinitely="suspensionIndefinitely ?? false"
         :message="'You are suspended in this forum and cannot comment.'"
       />
       <div class="align-items flex justify-between">

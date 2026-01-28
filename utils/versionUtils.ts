@@ -1,10 +1,10 @@
 export const compareVersionStrings = (versionA: string, versionB: string) => {
   const normalize = (version: string) =>
-    version.replace(/^v/i, '').split('+')[0];
+    version.replace(/^v/i, '').split('+')[0] ?? '';
 
   const parse = (version: string) => {
     const normalized = normalize(version);
-    const [core, preRelease] = normalized.split('-', 2);
+    const [core = '', preRelease] = normalized.split('-', 2);
     const coreParts = core.split('.').map((part) => Number(part) || 0);
     const preParts = preRelease ? preRelease.split('.') : [];
     return { coreParts, preParts };

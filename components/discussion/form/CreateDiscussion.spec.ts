@@ -52,7 +52,7 @@ describe('CreateDiscussion', () => {
     const wrapper = mount(CreateDiscussion, {
       global: {
         stubs: {
-          RequireAuth: { template: '<div><slot /></div>' },
+          RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
           CreateEditDiscussionFields: {
             name: 'CreateEditDiscussionFields',
             props: ['suspensionIssueNumber'],
@@ -76,7 +76,7 @@ describe('CreateDiscussion', () => {
     const wrapper = mount(CreateDiscussion, {
       global: {
         stubs: {
-          RequireAuth: { template: '<div><slot /></div>' },
+          RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
           CreateEditDiscussionFields: {
             name: 'CreateEditDiscussionFields',
             props: ['submitError'],

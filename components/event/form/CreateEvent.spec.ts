@@ -46,7 +46,7 @@ describe('CreateEvent', () => {
     const wrapper = mount(CreateEvent, {
       global: {
         stubs: {
-          RequireAuth: { template: '<div><slot /></div>' },
+          RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
           CreateEditEventFields: {
             name: 'CreateEditEventFields',
             props: ['suspensionIssueNumber'],
@@ -58,7 +58,7 @@ describe('CreateEvent', () => {
     });
 
     const stub = wrapper.findComponent({ name: 'CreateEditEventFields' });
-    expect(stub.props('suspensionIssueNumber')).toBe(null);
+    expect(stub.props('suspensionIssueNumber')).toBeUndefined();
 
     await wrapper.find('[data-testid="submit"]').trigger('click');
     await wrapper.vm.$nextTick();
@@ -70,7 +70,7 @@ describe('CreateEvent', () => {
     const wrapper = mount(CreateEvent, {
       global: {
         stubs: {
-          RequireAuth: { template: '<div><slot /></div>' },
+          RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
           CreateEditEventFields: {
             name: 'CreateEditEventFields',
             props: ['submitError'],

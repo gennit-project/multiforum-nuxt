@@ -318,12 +318,16 @@ const handleUpdateComment = (value: string) => {
       :text="createCommentError?.message"
     />
     <SuspensionNotice
-      v-if="showSuspensionNotice && suspensionChannelId"
+      v-if="
+        showSuspensionNotice &&
+        suspensionChannelId &&
+        suspensionIssueNumber !== null
+      "
       class="mb-2"
-      :issue-number="suspensionIssueNumber"
+      :issue-number="suspensionIssueNumber!"
       :channel-id="suspensionChannelId"
-      :suspended-until="suspensionUntil"
-      :suspended-indefinitely="suspensionIndefinitely"
+      :suspended-until="suspensionUntil ?? undefined"
+      :suspended-indefinitely="suspensionIndefinitely ?? false"
       :message="'You are suspended in this forum and cannot comment.'"
     />
     <RequireAuth :justify-left="true" :full-width="true">

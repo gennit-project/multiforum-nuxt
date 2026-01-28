@@ -1,4 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+import { useCollectionQueries } from '@/composables/useCollectionQueries';
+import * as queries from '@/graphQLData/collection/queries';
 
 vi.mock('@/graphQLData/collection/queries', () => ({
   GET_USER_COLLECTIONS_DISCUSSIONS: Symbol('GET_USER_COLLECTIONS_DISCUSSIONS'),
@@ -13,11 +16,12 @@ vi.mock('@/graphQLData/collection/queries', () => ({
   CHECK_CHANNEL_IN_COLLECTIONS: Symbol('CHECK_CHANNEL_IN_COLLECTIONS'),
 }));
 
-import { useCollectionQueries } from '@/composables/useCollectionQueries';
-import * as queries from '@/graphQLData/collection/queries';
-
 describe('useCollectionQueries', () => {
-  it.each([
+  const collectionTypeCases: Array<{
+    name: string;
+    itemType: Parameters<typeof useCollectionQueries>[0];
+    expected: string;
+  }> = [
     {
       name: 'discussion maps to DISCUSSIONS collection type',
       itemType: 'discussion',
@@ -43,13 +47,19 @@ describe('useCollectionQueries', () => {
       itemType: 'download',
       expected: 'DOWNLOADS',
     },
-  ])('$name', ({ itemType, expected }) => {
+  ];
+
+  it.each(collectionTypeCases)('$name', ({ itemType, expected }) => {
     const { collectionType } = useCollectionQueries(itemType);
 
     expect(collectionType).toBe(expected);
   });
 
-  it.each([
+  const collectionQueryCases: Array<{
+    name: string;
+    itemType: Parameters<typeof useCollectionQueries>[0];
+    expected: unknown;
+  }> = [
     {
       name: 'discussion maps to discussion collections query',
       itemType: 'discussion',
@@ -75,13 +85,19 @@ describe('useCollectionQueries', () => {
       itemType: 'download',
       expected: queries.GET_USER_COLLECTIONS_DOWNLOADS,
     },
-  ])('$name', ({ itemType, expected }) => {
+  ];
+
+  it.each(collectionQueryCases)('$name', ({ itemType, expected }) => {
     const { getCollectionQuery } = useCollectionQueries(itemType);
 
     expect(getCollectionQuery()).toBe(expected);
   });
 
-  it.each([
+  const checkQueryCases: Array<{
+    name: string;
+    itemType: Parameters<typeof useCollectionQueries>[0];
+    expected: unknown;
+  }> = [
     {
       name: 'discussion maps to discussion check query',
       itemType: 'discussion',
@@ -107,7 +123,9 @@ describe('useCollectionQueries', () => {
       itemType: 'channel',
       expected: queries.CHECK_CHANNEL_IN_COLLECTIONS,
     },
-  ])('$name', ({ itemType, expected }) => {
+  ];
+
+  it.each(checkQueryCases)('$name', ({ itemType, expected }) => {
     const { getCheckItemQuery } = useCollectionQueries(itemType);
 
     expect(getCheckItemQuery()).toBe(expected);

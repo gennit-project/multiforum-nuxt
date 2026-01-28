@@ -160,16 +160,18 @@ function updateFormValues(data: CreateEditEventFormValues) {
         :edit-mode="false"
         :form-values="formValues"
         :create-event-loading="createEventLoading"
-        :submit-error="submitError"
+        :submit-error="submitError ?? undefined"
         :suspension-issue-number="
-          showSuspensionNotice ? suspensionIssueNumber : null
+          showSuspensionNotice ? suspensionIssueNumber ?? undefined : undefined
         "
         :suspension-channel-id="
-          showSuspensionNotice ? suspensionChannelId : ''
+          showSuspensionNotice ? suspensionChannelId ?? undefined : undefined
         "
-        :suspension-until="showSuspensionNotice ? suspensionUntil : null"
+        :suspension-until="
+          showSuspensionNotice ? suspensionUntil ?? undefined : undefined
+        "
         :suspension-indefinitely="
-          showSuspensionNotice ? suspensionIndefinitely : false
+          showSuspensionNotice ? suspensionIndefinitely ?? false : false
         "
         @submit="submit"
         @update-form-values="updateFormValues"

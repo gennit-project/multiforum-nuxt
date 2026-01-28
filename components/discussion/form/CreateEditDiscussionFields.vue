@@ -142,12 +142,16 @@ onMounted(() => {
         />
         <ErrorBanner v-if="submitError" :text="submitError" />
         <SuspensionNotice
-          v-if="suspensionIssueNumber && suspensionChannelId"
+          v-if="
+            suspensionIssueNumber !== null &&
+            suspensionIssueNumber !== undefined &&
+            suspensionChannelId
+          "
           class="mt-2"
-          :issue-number="suspensionIssueNumber"
+          :issue-number="suspensionIssueNumber!"
           :channel-id="suspensionChannelId"
-          :suspended-until="suspensionUntil"
-          :suspended-indefinitely="suspensionIndefinitely"
+          :suspended-until="suspensionUntil ?? undefined"
+          :suspended-indefinitely="suspensionIndefinitely ?? false"
           :message="'You are suspended in this forum and cannot create discussions.'"
         />
         <ErrorBanner

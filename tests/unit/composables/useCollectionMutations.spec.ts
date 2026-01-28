@@ -1,9 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const mutateByDoc = new Map<symbol, ReturnType<typeof vi.fn>>();
+import { useCollectionMutations } from '@/composables/useCollectionMutations';
+import * as mutations from '@/graphQLData/collection/mutations';
+import * as userMutations from '@/graphQLData/user/mutations';
+
+const mutateByDoc = new Map<unknown, ReturnType<typeof vi.fn>>();
 
 vi.mock('@vue/apollo-composable', () => ({
-  useMutation: (doc: symbol) => {
+  useMutation: (doc: unknown) => {
     if (!mutateByDoc.has(doc)) {
       mutateByDoc.set(doc, vi.fn());
     }
@@ -36,11 +40,118 @@ vi.mock('@/graphQLData/user/mutations', () => ({
   REMOVE_FAVORITE_CHANNEL: Symbol('REMOVE_FAVORITE_CHANNEL'),
 }));
 
-import { useCollectionMutations } from '@/composables/useCollectionMutations';
-import * as mutations from '@/graphQLData/collection/mutations';
-import * as userMutations from '@/graphQLData/user/mutations';
-
 describe('useCollectionMutations', () => {
+  const itemTypeCases = {
+    add: [
+      {
+        name: 'discussion add maps to discussion mutation',
+        itemType: 'discussion',
+        expected: mutations.ADD_DISCUSSION_TO_COLLECTION,
+      },
+      {
+        name: 'comment add maps to comment mutation',
+        itemType: 'comment',
+        expected: mutations.ADD_COMMENT_TO_COLLECTION,
+      },
+      {
+        name: 'image add maps to image mutation',
+        itemType: 'image',
+        expected: mutations.ADD_IMAGE_TO_COLLECTION,
+      },
+      {
+        name: 'channel add maps to channel mutation',
+        itemType: 'channel',
+        expected: mutations.ADD_CHANNEL_TO_COLLECTION,
+      },
+      {
+        name: 'download add maps to download mutation',
+        itemType: 'download',
+        expected: mutations.ADD_DOWNLOAD_TO_COLLECTION,
+      },
+    ],
+    remove: [
+      {
+        name: 'discussion remove maps to discussion mutation',
+        itemType: 'discussion',
+        expected: mutations.REMOVE_DISCUSSION_FROM_COLLECTION,
+      },
+      {
+        name: 'comment remove maps to comment mutation',
+        itemType: 'comment',
+        expected: mutations.REMOVE_COMMENT_FROM_COLLECTION,
+      },
+      {
+        name: 'image remove maps to image mutation',
+        itemType: 'image',
+        expected: mutations.REMOVE_IMAGE_FROM_COLLECTION,
+      },
+      {
+        name: 'channel remove maps to channel mutation',
+        itemType: 'channel',
+        expected: mutations.REMOVE_CHANNEL_FROM_COLLECTION,
+      },
+      {
+        name: 'download remove maps to download mutation',
+        itemType: 'download',
+        expected: mutations.REMOVE_DOWNLOAD_FROM_COLLECTION,
+      },
+    ],
+    addFavorite: [
+      {
+        name: 'discussion favorite add maps to discussion mutation',
+        itemType: 'discussion',
+        expected: userMutations.ADD_FAVORITE_DISCUSSION,
+      },
+      {
+        name: 'comment favorite add maps to comment mutation',
+        itemType: 'comment',
+        expected: userMutations.ADD_FAVORITE_COMMENT,
+      },
+      {
+        name: 'image favorite add maps to image mutation',
+        itemType: 'image',
+        expected: userMutations.ADD_FAVORITE_IMAGE,
+      },
+      {
+        name: 'channel favorite add maps to channel mutation',
+        itemType: 'channel',
+        expected: userMutations.ADD_FAVORITE_CHANNEL,
+      },
+      {
+        name: 'download favorite add maps to discussion mutation',
+        itemType: 'download',
+        expected: userMutations.ADD_FAVORITE_DISCUSSION,
+      },
+    ],
+    removeFavorite: [
+      {
+        name: 'discussion favorite remove maps to discussion mutation',
+        itemType: 'discussion',
+        expected: userMutations.REMOVE_FAVORITE_DISCUSSION,
+      },
+      {
+        name: 'comment favorite remove maps to comment mutation',
+        itemType: 'comment',
+        expected: userMutations.REMOVE_FAVORITE_COMMENT,
+      },
+      {
+        name: 'image favorite remove maps to image mutation',
+        itemType: 'image',
+        expected: userMutations.REMOVE_FAVORITE_IMAGE,
+      },
+      {
+        name: 'channel favorite remove maps to channel mutation',
+        itemType: 'channel',
+        expected: userMutations.REMOVE_FAVORITE_CHANNEL,
+      },
+      {
+        name: 'download favorite remove maps to discussion mutation',
+        itemType: 'download',
+        expected: userMutations.REMOVE_FAVORITE_DISCUSSION,
+      },
+    ],
+  } as const;
+
   beforeEach(() => {
     mutateByDoc.clear();
   });
@@ -51,130 +162,34 @@ describe('useCollectionMutations', () => {
     expect(createCollection).toBe(mutateByDoc.get(mutations.CREATE_COLLECTION));
   });
 
-  it.each([
-    {
-      name: 'discussion add maps to discussion mutation',
-      itemType: 'discussion',
-      expected: mutations.ADD_DISCUSSION_TO_COLLECTION,
-    },
-    {
-      name: 'comment add maps to comment mutation',
-      itemType: 'comment',
-      expected: mutations.ADD_COMMENT_TO_COLLECTION,
-    },
-    {
-      name: 'image add maps to image mutation',
-      itemType: 'image',
-      expected: mutations.ADD_IMAGE_TO_COLLECTION,
-    },
-    {
-      name: 'channel add maps to channel mutation',
-      itemType: 'channel',
-      expected: mutations.ADD_CHANNEL_TO_COLLECTION,
-    },
-    {
-      name: 'download add maps to download mutation',
-      itemType: 'download',
-      expected: mutations.ADD_DOWNLOAD_TO_COLLECTION,
-    },
-  ])('$name', ({ itemType, expected }) => {
-    const { getAddMutation } = useCollectionMutations(itemType);
+  it.each(itemTypeCases.add)('$name', ({ itemType, expected }) => {
+    const { getAddMutation } = useCollectionMutations(
+      itemType as Parameters<typeof useCollectionMutations>[0]
+    );
 
     expect(getAddMutation()).toBe(mutateByDoc.get(expected));
   });
 
-  it.each([
-    {
-      name: 'discussion remove maps to discussion mutation',
-      itemType: 'discussion',
-      expected: mutations.REMOVE_DISCUSSION_FROM_COLLECTION,
-    },
-    {
-      name: 'comment remove maps to comment mutation',
-      itemType: 'comment',
-      expected: mutations.REMOVE_COMMENT_FROM_COLLECTION,
-    },
-    {
-      name: 'image remove maps to image mutation',
-      itemType: 'image',
-      expected: mutations.REMOVE_IMAGE_FROM_COLLECTION,
-    },
-    {
-      name: 'channel remove maps to channel mutation',
-      itemType: 'channel',
-      expected: mutations.REMOVE_CHANNEL_FROM_COLLECTION,
-    },
-    {
-      name: 'download remove maps to download mutation',
-      itemType: 'download',
-      expected: mutations.REMOVE_DOWNLOAD_FROM_COLLECTION,
-    },
-  ])('$name', ({ itemType, expected }) => {
-    const { getRemoveMutation } = useCollectionMutations(itemType);
+  it.each(itemTypeCases.remove)('$name', ({ itemType, expected }) => {
+    const { getRemoveMutation } = useCollectionMutations(
+      itemType as Parameters<typeof useCollectionMutations>[0]
+    );
 
     expect(getRemoveMutation()).toBe(mutateByDoc.get(expected));
   });
 
-  it.each([
-    {
-      name: 'discussion favorite add maps to discussion mutation',
-      itemType: 'discussion',
-      expected: userMutations.ADD_FAVORITE_DISCUSSION,
-    },
-    {
-      name: 'comment favorite add maps to comment mutation',
-      itemType: 'comment',
-      expected: userMutations.ADD_FAVORITE_COMMENT,
-    },
-    {
-      name: 'image favorite add maps to image mutation',
-      itemType: 'image',
-      expected: userMutations.ADD_FAVORITE_IMAGE,
-    },
-    {
-      name: 'channel favorite add maps to channel mutation',
-      itemType: 'channel',
-      expected: userMutations.ADD_FAVORITE_CHANNEL,
-    },
-    {
-      name: 'download favorite add maps to discussion mutation',
-      itemType: 'download',
-      expected: userMutations.ADD_FAVORITE_DISCUSSION,
-    },
-  ])('$name', ({ itemType, expected }) => {
-    const { getAddFavoriteMutation } = useCollectionMutations(itemType);
+  it.each(itemTypeCases.addFavorite)('$name', ({ itemType, expected }) => {
+    const { getAddFavoriteMutation } = useCollectionMutations(
+      itemType as Parameters<typeof useCollectionMutations>[0]
+    );
 
     expect(getAddFavoriteMutation()).toBe(mutateByDoc.get(expected));
   });
 
-  it.each([
-    {
-      name: 'discussion favorite remove maps to discussion mutation',
-      itemType: 'discussion',
-      expected: userMutations.REMOVE_FAVORITE_DISCUSSION,
-    },
-    {
-      name: 'comment favorite remove maps to comment mutation',
-      itemType: 'comment',
-      expected: userMutations.REMOVE_FAVORITE_COMMENT,
-    },
-    {
-      name: 'image favorite remove maps to image mutation',
-      itemType: 'image',
-      expected: userMutations.REMOVE_FAVORITE_IMAGE,
-    },
-    {
-      name: 'channel favorite remove maps to channel mutation',
-      itemType: 'channel',
-      expected: userMutations.REMOVE_FAVORITE_CHANNEL,
-    },
-    {
-      name: 'download favorite remove maps to discussion mutation',
-      itemType: 'download',
-      expected: userMutations.REMOVE_FAVORITE_DISCUSSION,
-    },
-  ])('$name', ({ itemType, expected }) => {
-    const { getRemoveFavoriteMutation } = useCollectionMutations(itemType);
+  it.each(itemTypeCases.removeFavorite)('$name', ({ itemType, expected }) => {
+    const { getRemoveFavoriteMutation } = useCollectionMutations(
+      itemType as Parameters<typeof useCollectionMutations>[0]
+    );
 
     expect(getRemoveFavoriteMutation()).toBe(mutateByDoc.get(expected));
   });

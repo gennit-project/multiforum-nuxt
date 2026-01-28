@@ -1,7 +1,9 @@
-export default defineEventHandler((_event) => {
+import { defineEventHandler, type H3Event } from 'h3';
+
+export default defineEventHandler((_event: H3Event) => {
   const env = process.env.VITE_ENVIRONMENT;
 
-  if (env === 'development') {
+  if (env !== 'production') {
     return `User-agent: *
 Disallow: /`;
   }

@@ -197,12 +197,14 @@ function handleUpdateComment(event: string) {
       :create-comment-loading="createCommentLoading"
       :create-comment-error="createCommentError"
       :suspension-issue-number="
-        showSuspensionNotice ? suspensionIssueNumber : null
+        showSuspensionNotice ? suspensionIssueNumber ?? undefined : undefined
       "
       :suspension-channel-id="
-        showSuspensionNotice ? suspensionChannelId : ''
+        showSuspensionNotice ? suspensionChannelId ?? undefined : undefined
       "
-      :suspension-until="showSuspensionNotice ? suspensionUntil : null"
+      :suspension-until="
+        showSuspensionNotice ? suspensionUntil ?? undefined : undefined
+      "
       :suspension-indefinitely="
         showSuspensionNotice ? suspensionIndefinitely : false
       "

@@ -38,9 +38,13 @@ vi.mock('@/cache', () => ({
   },
 }));
 
-vi.mock('@/components/comments/getSortFromQuery', () => ({
-  getSortFromQuery: vi.fn().mockReturnValue('new'),
-}));
+vi.mock('@/components/comments/getSortFromQuery', async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>;
+  return {
+    ...actual,
+    getSortFromQuery: vi.fn().mockReturnValue('new'),
+  };
+});
 
 describe('CommentSection suspension notice', () => {
   beforeEach(() => {

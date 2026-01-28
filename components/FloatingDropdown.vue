@@ -7,6 +7,14 @@ defineOptions({
 });
 
 const { theme } = useAppTheme();
+defineSlots<{
+  button?: (props: {
+    activatorProps?: Record<string, unknown>;
+    class?: unknown;
+    onClose: () => void;
+  }) => unknown;
+  content?: () => unknown;
+}>();
 const props = defineProps({
   modelValue: {
     type: Boolean,
