@@ -39,7 +39,10 @@ defineEmits(['filterByTag']);
     <div class="flex items-start gap-4">
       <!-- Avatar -->
       <div class="flex-shrink-0">
-        <nuxt-link :to="`/forums/${channel.uniqueName}/discussions`">
+        <nuxt-link
+          :to="`/forums/${channel.uniqueName}/discussions`"
+          :aria-label="`Open forum ${channel.displayName || channel.uniqueName}`"
+        >
           <AvatarComponent
             :text="channel.uniqueName"
             :src="channel?.channelIconURL || ''"
