@@ -156,6 +156,7 @@ const buttonClasses = computed(() => {
                 v-if="showTooltip && !usePrimaryButton && !iconOnly"
                 location="bottom"
                 activator="parent"
+                aria-label="Create new"
                 :content-props="{ 'aria-label': 'Create new' }"
               >
                 Create new...
@@ -231,6 +232,7 @@ const buttonClasses = computed(() => {
           v-if="showFooter"
           activator="parent"
           location="bottom"
+          aria-label="Create new"
           :content-props="{ 'aria-label': 'Create new' }"
         >
           Create new...

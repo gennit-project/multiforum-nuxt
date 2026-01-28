@@ -73,6 +73,7 @@ const buttonClasses = computed(() => {
       <v-tooltip
         location="top"
         content-class="custom-tooltip"
+        :aria-label="tooltipText"
         :content-props="{ 'aria-label': tooltipText }"
       >
         <template #activator="{ props }">

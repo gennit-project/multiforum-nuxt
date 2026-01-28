@@ -76,6 +76,7 @@ export default defineComponent({
     <v-tooltip
       location="bottom"
       content-class="custom-tooltip"
+      :aria-label="tooltipAriaLabel"
       :content-props="{ 'aria-label': tooltipAriaLabel }"
     >
       <template #activator="{ props }">
