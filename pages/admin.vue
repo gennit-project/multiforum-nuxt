@@ -32,7 +32,7 @@ const isSettingsPage = computed(() => {
 
 <template>
   <NuxtLayout>
-    <main v-if="serverConfig" class="flex w-full flex-1 justify-center">
+    <div v-if="serverConfig" class="flex w-full flex-1 justify-center">
       <article
         class="w-full max-w-screen-2xl rounded-lg focus:outline-none dark:bg-black"
       >
@@ -54,7 +54,7 @@ const isSettingsPage = computed(() => {
                 <NuxtPage />
               </div>
             </div>
-            <aside
+            <div
               v-if="!isSettingsPage"
               class="w-full flex-shrink-0 bg-white dark:bg-gray-800 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto"
             >
@@ -63,11 +63,11 @@ const isSettingsPage = computed(() => {
                 :server-config="serverConfig"
                 class="p-6 pt-8"
               />
-            </aside>
+            </div>
           </div>
         </div>
       </article>
-    </main>
+    </div>
     <div v-else class="mx-4 my-6 flex-1 flex-col items-center">
       <h1 class="text-2xl font-bold">Server not found</h1>
       <p class="text-gray-500 dark:text-gray-400">
