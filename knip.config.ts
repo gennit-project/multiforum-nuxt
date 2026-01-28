@@ -29,5 +29,12 @@ export default {
     '__generated__/**',
   ],
   ignoreBinaries: ['open'],
-  ignoreDependencies: ['globals'],
+  ignoreDependencies: [
+    '@fortawesome/fontawesome-free',
+    '@fortawesome/fontawesome-svg-core',
+    '@fortawesome/free-regular-svg-icons',
+    '@fortawesome/free-solid-svg-icons',
+    '@fortawesome/vue-fontawesome',
+    'globals',
+  ],
 };
