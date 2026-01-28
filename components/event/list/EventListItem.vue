@@ -250,7 +250,10 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
           >
             Online event
           </p>
-          <p v-if="event.free" class="text-sm font-medium text-gray-600">
+          <p
+            v-if="event.free"
+            class="text-sm font-medium text-gray-600 dark:text-gray-200"
+          >
             Free
           </p>
           <nuxt-link
@@ -260,32 +263,23 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
               (isWithinChannel || !submittedToMultipleChannels)
             "
             :to="detailLink"
-            class="mt-1 flex cursor-pointer items-center justify-start gap-1 text-gray-500 dark:text-gray-100"
+            class="mt-1 inline-flex items-center justify-start gap-1 rounded-md bg-gray-100 px-4 py-1 text-xs text-black hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
           >
-            <button
-              type="button"
-              class="rounded-md bg-gray-100 px-4 py-1 text-xs text-black hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
-            >
-              <i
-                class="fa-regular fa-comment mr-2 h-4 w-4"
-                aria-hidden="true"
-              />
-              <span class="text black text-sm dark:text-white">{{
-                `${commentCount}`
-              }}</span>
-              <span v-if="!isWithinChannel" class="ml-1 text-xs">{{
-                `in c/${event.EventChannels?.[0]?.channelUniqueName}`
-              }}</span>
-            </button>
+            <i class="fa-regular fa-comment mr-2 h-4 w-4" aria-hidden="true" />
+            <span class="text black text-sm dark:text-white">{{
+              `${commentCount}`
+            }}</span>
+            <span v-if="!isWithinChannel" class="ml-1 text-xs">{{
+              `in c/${event.EventChannels?.[0]?.channelUniqueName}`
+            }}</span>
           </nuxt-link>
 
           <MenuButton
             v-else-if="showDetailLink && event"
             :items="eventDetailOptions"
           >
-            <button
-              type="button"
-              class="-ml-1 mt-1 flex items-center rounded-md bg-gray-100 px-4 pb-2 pt-2 hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
+            <span
+              class="-ml-1 mt-1 inline-flex items-center rounded-md bg-gray-100 px-4 pb-2 pt-2 text-sm text-black hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
             >
               <i
                 class="fa-regular fa-comment mr-2 h-4 w-4"
@@ -299,7 +293,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
                 }`
               }}
               <ChevronDownIcon class="-mr-1 ml-2 h-4 w-4" aria-hidden="true" />
-            </button>
+            </span>
           </MenuButton>
         </div>
 
@@ -348,7 +342,12 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
         >
           Online event
         </p>
-        <p v-if="event.free" class="text-sm font-medium text-gray-600">Free</p>
+        <p
+          v-if="event.free"
+          class="text-sm font-medium text-gray-600 dark:text-gray-200"
+        >
+          Free
+        </p>
       </div>
 
       <div class="flex gap-1">
