@@ -71,6 +71,7 @@ const isOnMapPage = computed(() => {
   <nav
     class="z-20 h-14 border-b border-b-gray-200 bg-gray-100 pr-4 dark:border-b-gray-600 dark:bg-gray-900 lg:ml-20"
     :class="[isOnMapPage ? 'fixed w-full lg:w-[calc(100%-5rem)]' : '']"
+    aria-label="Top navigation"
   >
     <div class="flex items-center justify-between py-2 pl-12 pr-2 lg:pl-2">
       <div class="flex min-w-0 items-center overflow-hidden">

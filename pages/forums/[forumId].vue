@@ -280,7 +280,7 @@ definePageMeta({
         :route="route"
         :show-create-button="true"
       />
-      <main class="flex w-full justify-center">
+      <div class="flex w-full justify-center">
         <article
           class="w-full max-w-screen-2xl rounded-lg focus:outline-none dark:bg-black"
         >
@@ -355,7 +355,7 @@ definePageMeta({
                 />
                 <NuxtPage />
               </div>
-              <aside
+              <div
                 v-if="channelId && showChannelSidebar"
                 class="flex-shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/3 md:overflow-y-auto"
               >
@@ -365,11 +365,11 @@ definePageMeta({
                   class="px-4"
                   @refetch-channel-data="handleRefetchChannelData"
                 />
-              </aside>
+              </div>
             </div>
           </div>
         </article>
-      </main>
+      </div>
     </div>
   </NuxtLayout>
 </template>
