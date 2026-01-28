@@ -165,6 +165,59 @@ const pluginTags = computed(() => {
   return installedPlugin.value?.plugin?.tags || plugin.value?.tags || [];
 });
 
+const compareVersionStrings = (versionA: string, versionB: string) => {
+  const normalize = (version: string) =>
+    version.replace(/^v/i, '').split('+')[0];
+
+  const parse = (version: string) => {
+    const normalized = normalize(version);
+    const [core, preRelease] = normalized.split('-', 2);
+    const coreParts = core.split('.').map((part) => Number(part) || 0);
+    const preParts = preRelease ? preRelease.split('.') : [];
+    return { coreParts, preParts };
+  };
+
+  const { coreParts: coreA, preParts: preA } = parse(versionA);
+  const { coreParts: coreB, preParts: preB } = parse(versionB);
+
+  const maxCoreLength = Math.max(coreA.length, coreB.length);
+  for (let i = 0; i < maxCoreLength; i += 1) {
+    const partA = coreA[i] ?? 0;
+    const partB = coreB[i] ?? 0;
+    if (partA !== partB) {
+      return partA > partB ? 1 : -1;
+    }
+  }
+
+  const hasPreA = preA.length > 0;
+  const hasPreB = preB.length > 0;
+  if (hasPreA !== hasPreB) {
+    return hasPreA ? -1 : 1;
+  }
+
+  const maxPreLength = Math.max(preA.length, preB.length);
+  for (let i = 0; i < maxPreLength; i += 1) {
+    const partA = preA[i];
+    const partB = preB[i];
+    if (partA === undefined) return -1;
+    if (partB === undefined) return 1;
+
+    const partAIsNum = /^\d+$/.test(partA);
+    const partBIsNum = /^\d+$/.test(partB);
+    if (partAIsNum && partBIsNum) {
+      const numA = Number(partA);
+      const numB = Number(partB);
+      if (numA !== numB) return numA > numB ? 1 : -1;
+    } else if (partAIsNum !== partBIsNum) {
+      return partAIsNum ? -1 : 1;
+    } else if (partA !== partB) {
+      return partA > partB ? 1 : -1;
+    }
+  }
+
+  return 0;
+};
+
 // Get versions with full details from the plugin detail query
 const pluginDetailVersions = computed(() => {
   const plugins = pluginDetailResult.value?.plugins || [];
@@ -231,7 +284,10 @@ const canEnable = computed(() => {
 });
 
 const availableVersions = computed(() => {
-  return plugin.value?.Versions || [];
+  const versions = plugin.value?.Versions || [];
+  return [...versions].sort((a: any, b: any) =>
+    compareVersionStrings(b.version, a.version)
+  );
 });
 
 const installedVersion = computed(() => {
@@ -737,12 +793,14 @@ const getSecretStatusText = (status: string) => {
                 <!-- Version Selection -->
                 <div>
                   <label
+                    for="plugin-version-select"
                     class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
                     {{ isInstalled ? 'Change Version' : 'Select Version' }}
                   </label>
                   <div class="flex items-center space-x-4">
                     <select
+                      id="plugin-version-select"
                       v-model="selectedVersion"
                       class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     >
