@@ -267,6 +267,8 @@ const isExpanded = computed(() => {
         </div>
         <button
           data-testid="discussion-filter-button"
+          :aria-label="showFilters ? 'Hide filters' : 'Show filters'"
+          :title="showFilters ? 'Hide filters' : 'Show filters'"
           :class="
             showFilters
               ? 'border-orange-500'
@@ -284,6 +286,8 @@ const isExpanded = computed(() => {
         </button>
         <button
           data-testid="discussion-search-button"
+          :aria-label="showSearch ? 'Hide search' : 'Show search'"
+          :title="showSearch ? 'Hide search' : 'Show search'"
           :class="
             showSearch
               ? 'border-orange-500'

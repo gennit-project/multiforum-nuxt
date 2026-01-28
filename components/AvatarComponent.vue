@@ -35,6 +35,11 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  isDecorative: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
 // Generate Identicon based on text and theme
@@ -61,7 +66,8 @@ const identiconData = computed(() => {
     <img
       v-if="src"
       :src="src"
-      :alt="text"
+      :alt="isDecorative ? '' : text"
+      :aria-hidden="isDecorative ? 'true' : undefined"
       :class="[
         isLarge ? 'h-48 w-48' : '',
         isMedium ? 'h-12 w-12' : '',
@@ -79,7 +85,8 @@ const identiconData = computed(() => {
         isSquare ? 'rounded-lg' : 'rounded-full',
       ]"
       :src="identiconData"
-      :alt="text"
+      :alt="isDecorative ? '' : text"
+      :aria-hidden="isDecorative ? 'true' : undefined"
     >
   </div>
 </template>

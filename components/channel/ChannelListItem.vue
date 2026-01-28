@@ -45,6 +45,7 @@ defineEmits(['filterByTag']);
             :src="channel?.channelIconURL || ''"
             :is-small="false"
             :square="true"
+            :is-decorative="true"
             class="h-12 w-12"
           />
         </nuxt-link>

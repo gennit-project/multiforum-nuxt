@@ -137,6 +137,8 @@ const hasActiveDownloadFilters = computed(() => {
         <button
           v-if="filterGroups.length > 0"
           data-testid="download-filter-button"
+          :aria-label="showFilters ? 'Hide filters' : 'Show filters'"
+          :title="showFilters ? 'Hide filters' : 'Show filters'"
           :class="[
             'flex h-9 items-center gap-1 rounded-md border px-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 lg:hidden',
             hasActiveDownloadFilters || showFilters
@@ -153,6 +155,8 @@ const hasActiveDownloadFilters = computed(() => {
 
         <button
           data-testid="download-search-button"
+          :aria-label="showSearch ? 'Hide search' : 'Show search'"
+          :title="showSearch ? 'Hide search' : 'Show search'"
           :class="
             showSearch
               ? 'border-orange-500'

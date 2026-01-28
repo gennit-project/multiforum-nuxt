@@ -64,6 +64,7 @@ const defaultLinkClasses =
               :src="forum?.channelIconURL ?? ''"
               :is-small="true"
               :is-square="false"
+              :is-decorative="true"
             />
             {{ forum.uniqueName }}
           </button>

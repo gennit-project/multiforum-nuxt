@@ -189,6 +189,7 @@ const revealSensitiveContent = () => {
                 discussion.DiscussionChannels?.[0]?.channelUniqueName || ''
               "
               :is-square="true"
+              :is-decorative="true"
               class="mr-1 h-6 w-6"
             />
             <span>{{

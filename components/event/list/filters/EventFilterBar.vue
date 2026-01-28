@@ -415,6 +415,8 @@ const updateShowArchived = (event: Event) => {
                 <template #default>
                   <button
                     class="absolute inset-y-0 right-0 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700"
+                    aria-label="More filters"
+                    title="More filters"
                     data-testid="more-filters-button"
                   >
                     <FilterIcon class="h-4 w-4 dark:text-white" />
@@ -485,6 +487,8 @@ const updateShowArchived = (event: Event) => {
                 <template #default>
                   <button
                     class="absolute inset-y-0 right-2 m-1 flex cursor-pointer items-center justify-center rounded-full bg-white p-2 dark:bg-gray-700 dark:text-white"
+                    aria-label="More filters"
+                    title="More filters"
                     data-testid="more-filters-button"
                   >
                     <FilterIcon

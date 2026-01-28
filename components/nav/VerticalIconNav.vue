@@ -238,6 +238,8 @@ const getUserActionClasses = (isActive: boolean) => {
                   ? item.href
                   : { name: item.routerName }
               "
+              :aria-label="item.name"
+              :title="item.name"
               :class="getIconCircleClasses(isActiveNavItem(item.routerName))"
             >
               <component
@@ -280,6 +282,8 @@ const getUserActionClasses = (isActive: boolean) => {
                   name: 'forums-forumId-discussions',
                   params: { forumId: forum.uniqueName },
                 }"
+                :aria-label="forum.uniqueName"
+                :title="forum.uniqueName"
                 :class="
                   getForumIconClasses(currentForumId === forum.uniqueName)
                 "
@@ -303,12 +307,15 @@ const getUserActionClasses = (isActive: boolean) => {
           <!-- More Button -->
           <div v-if="hasMoreForums" class="flex flex-col items-center">
             <IconTooltip text="More Forums">
-              <div
+              <button
+                type="button"
                 :class="getUserActionClasses(false)"
+                aria-label="More forums"
+                title="More forums"
                 @click="isDrawerOpen = true"
               >
                 <MoreIcon />
-              </div>
+              </button>
             </IconTooltip>
             <span
               class="text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
@@ -337,6 +344,8 @@ const getUserActionClasses = (isActive: boolean) => {
           <div class="flex flex-col items-center">
             <NuxtLink
               to="/admin/issues"
+              aria-label="Admin dashboard"
+              title="Admin dashboard"
               :class="getUserActionClasses(isActiveUserAction('admin-issues'))"
             >
               <AdminIcon />
@@ -386,6 +395,8 @@ const getUserActionClasses = (isActive: boolean) => {
           <div class="flex flex-col items-center">
             <NuxtLink
               to="/"
+              aria-label="Home"
+              title="Home"
               class="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-orange-500 transition-colors duration-200 hover:bg-orange-600"
             >
               <span class="text-2xl">🐝</span>
@@ -412,6 +423,8 @@ const getUserActionClasses = (isActive: boolean) => {
                     ? item.href
                     : { name: item.routerName }
                 "
+                :aria-label="item.name"
+                :title="item.name"
                 :class="getIconCircleClasses(isActiveNavItem(item.routerName))"
               >
                 <component
@@ -442,6 +455,8 @@ const getUserActionClasses = (isActive: boolean) => {
             <div class="flex flex-col items-center">
               <NuxtLink
                 to="/admin/issues"
+                aria-label="Admin dashboard"
+                title="Admin dashboard"
                 :class="
                   getUserActionClasses(isActiveUserAction('admin-issues'))
                 "
