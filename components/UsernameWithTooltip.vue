@@ -59,16 +59,25 @@ export default defineComponent({
         return '';
       }
     });
+    const tooltipAriaLabel = computed(() => {
+      const name = props.displayName || props.username;
+      return `User info for ${name}`;
+    });
 
     return {
       accountCreatedText,
+      tooltipAriaLabel,
     };
   },
 });
 </script>
 <template>
   <client-only>
-    <v-tooltip location="bottom" content-class="custom-tooltip">
+    <v-tooltip
+      location="bottom"
+      content-class="custom-tooltip"
+      :content-props="{ 'aria-label': tooltipAriaLabel }"
+    >
       <template #activator="{ props }">
         <slot>
           <div class="flex flex-row items-center gap-1">

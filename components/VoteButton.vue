@@ -70,7 +70,11 @@ const buttonClasses = computed(() => {
 <template>
   <div v-if="tooltipText">
     <client-only>
-      <v-tooltip location="top" content-class="custom-tooltip">
+      <v-tooltip
+        location="top"
+        content-class="custom-tooltip"
+        :content-props="{ 'aria-label': tooltipText }"
+      >
         <template #activator="{ props }">
           <div v-bind="props">
             <AuthButton
