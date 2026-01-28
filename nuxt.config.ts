@@ -292,6 +292,7 @@ export default defineNuxtConfig({
     { src: '@/plugins/vuetify', mode: 'all' },
     { src: '@/plugins/performance.client', mode: 'client' },
     { src: '@/plugins/click-outside.client', mode: 'client' },
+    { src: '@/plugins/accented.client', mode: 'client' },
   ],
   runtimeConfig: {
     public: {

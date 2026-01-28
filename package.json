@@ -104,6 +104,7 @@
     "webfontloader": "^1.6.28"
   },
   "devDependencies": {
+    "accented": "latest",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.23.0",
     "@graphql-codegen/cli": "5.0.7",
