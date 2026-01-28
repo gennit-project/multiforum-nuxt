@@ -31,17 +31,18 @@ export default defineComponent({
 });
 </script>
 <template>
-  <nuxt-link
-    :to="{
-      name: 'forums-forumId-events-eventId',
-      params: {
-        eventId,
-        forumId: channelId,
-      },
-    }"
+  <li
+    class="flex items-center gap-3 rounded-md bg-gray-100 px-4 py-2 dark:bg-gray-700"
   >
-    <li
-      class="flex items-center gap-3 rounded-md bg-gray-100 px-4 py-2 dark:bg-gray-700"
+    <nuxt-link
+      class="flex w-full items-center gap-3"
+      :to="{
+        name: 'forums-forumId-events-eventId',
+        params: {
+          eventId,
+          forumId: channelId,
+        },
+      }"
     >
       <AvatarComponent
         class="shadow-sm"
@@ -49,6 +50,7 @@ export default defineComponent({
         :src="channelIcon ?? ''"
         :is-small="true"
         :is-square="false"
+        :is-decorative="true"
       />
       <div class="flex-col space-y-1 text-xs">
         <div v-if="channelDisplayName" class="font-bold">
@@ -60,6 +62,6 @@ export default defineComponent({
           {{ channelId }}
         </div>
       </div>
-    </li>
-  </nuxt-link>
+    </nuxt-link>
+  </li>
 </template>

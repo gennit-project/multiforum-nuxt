@@ -504,6 +504,7 @@ const warningModalBody = computed(() => {
           v-if="showActionMenu && discussion && menuItems.length > 0"
           :items="menuItems"
           :data-testid="'discussion-menu-button'"
+          :aria-label="'Discussion actions'"
           @handle-edit="
             router.push(
               discussion.hasDownload

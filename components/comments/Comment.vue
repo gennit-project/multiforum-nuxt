@@ -1045,6 +1045,7 @@ const label = computed(() => {
                       :data-testid="'commentMenu'"
                       :items="commentMenuItems"
                       :is-marked-as-answer="isMarkedAsAnswer"
+                      :aria-label="'Comment actions'"
                       @copy-link="copyLink"
                       @handle-edit="() => handleEdit(props.commentData)"
                       @click-report="handleReport"

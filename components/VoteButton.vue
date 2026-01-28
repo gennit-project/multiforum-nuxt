@@ -20,10 +20,18 @@ const properties = defineProps({
     type: String,
     default: '',
   },
+  ariaLabel: {
+    type: String,
+    default: '',
+  },
   isPermalinked: Boolean,
   isMarkedAsAnswer: {
     type: Boolean,
     default: false,
+  },
+  buttonProps: {
+    type: Object,
+    default: () => ({}),
   },
   class: {
     type: String,
@@ -65,6 +73,11 @@ const buttonClasses = computed(() => {
     ' '
   );
 });
+
+const mergedButtonProps = computed(() => ({
+  'aria-label': properties.ariaLabel || properties.tooltipText || undefined,
+  ...properties.buttonProps,
+}));
 </script>
 
 <template>
@@ -81,6 +94,7 @@ const buttonClasses = computed(() => {
             <AuthButton
               :test-id="testId"
               :button-classes="buttonClasses"
+              :props="mergedButtonProps"
               :loading="loading"
               :show-count="showCount"
               :count="count"
@@ -103,6 +117,7 @@ const buttonClasses = computed(() => {
     <AuthButton
       :test-id="testId"
       :button-classes="buttonClasses"
+      :props="mergedButtonProps"
       :loading="loading"
       :show-count="showCount"
       :count="count"

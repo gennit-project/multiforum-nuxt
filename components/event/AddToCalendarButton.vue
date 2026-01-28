@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { DateTime } from 'luxon';
 import type { Event as EventData } from '@/__generated__/graphql';
-import PrimaryButton from '../PrimaryButton.vue';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 
 const props = defineProps({
   event: {
@@ -74,15 +74,22 @@ const calendarOptions = ref([
     event: 'outlook',
   },
 ]);
+
+const addToCalendarButtonClasses =
+  'bg-orange-400 hover:bg-orange-400 dark:border dark:border-orange-500 dark:bg-orange-400 dark:text-black dark:hover:bg-orange-400 focus:ring-orange-500 px-4 py-2 justify-center items-center whitespace-nowrap font-medium';
 </script>
 <template>
   <MenuButton
     data-testid="add-to-calendar-button"
+    :button-class="addToCalendarButtonClasses"
     :items="calendarOptions"
     @google="addToGoogleCalendar"
     @ical="addToiCal"
     @outlook="addToOutlook"
   >
-    <PrimaryButton :label="'+ Add to Calendar'" />
+    <span class="inline-flex items-center gap-2">
+      + Add to Calendar
+      <ChevronDownIcon class="h-4 w-4" aria-hidden="true" />
+    </span>
   </MenuButton>
 </template>

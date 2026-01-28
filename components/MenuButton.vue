@@ -11,6 +11,14 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  buttonClass: {
+    type: String,
+    default: '',
+  },
+  ariaLabel: {
+    type: String,
+    default: '',
+  },
   items: {
     type: Array as PropType<MenuItemType[]>,
     default: () => [],
@@ -93,8 +101,10 @@ const menuStyles = {
           :data-testid="dataTestid"
           variant="text"
           v-bind="disabled ? {} : props"
+          :aria-label="ariaLabel || undefined"
           :class="[
             buttonClasses,
+            buttonClass,
             disabled ? 'cursor-not-allowed opacity-60' : '',
           ]"
           @click="
@@ -112,12 +122,18 @@ const menuStyles = {
         </button>
       </template>
 
-      <v-list :style="menuStyles" class="dark:bg-gray-700">
+      <v-list
+        :style="menuStyles"
+        class="dark:bg-gray-700"
+        role="menu"
+        :aria-label="ariaLabel || 'Menu'"
+      >
         <template v-for="item in items" :key="item.label">
           <!-- Divider -->
           <v-list-subheader
             v-if="item.isDivider"
-            class="font-semibold cursor-default px-4 py-2 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400"
+            class="font-semibold cursor-default px-4 py-2 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-200"
+            role="presentation"
           >
             {{ item.value }}
           </v-list-subheader>
@@ -125,6 +141,7 @@ const menuStyles = {
             v-else
             :data-testid="`${dataTestid}-item-${item.label}`"
             class="dark:hover:bg-gray-600"
+            role="menuitem"
             @click="
               () => {
                 handleItemClick(item);

@@ -44,9 +44,10 @@ function handleClick() {
 <template>
   <div class="w-fit">
     <FloatingDropdown v-model="showMenu">
-      <template #button>
+      <template #button="{ activatorProps }">
         <VoteButton
           class="space-x-3"
+          :button-props="activatorProps"
           :test-id="'emoji-button'"
           :show-count="false"
           :tooltip-text="'Add reaction...'"

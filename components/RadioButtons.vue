@@ -29,6 +29,7 @@ const emit = defineEmits(['updateSelected']);
         class="mt-4 flex items-center"
       >
         <input
+          :id="`radio-${option.value}`"
           name="showBothVirtualAndInPerson"
           type="radio"
           :checked="selectedOption.value === option.value"
@@ -40,6 +41,7 @@ const emit = defineEmits(['updateSelected']);
           "
         >
         <label
+          :for="`radio-${option.value}`"
           class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300"
         >
           {{ option.label }}

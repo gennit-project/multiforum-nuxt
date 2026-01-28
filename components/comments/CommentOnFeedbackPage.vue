@@ -294,6 +294,7 @@ function handleUnarchive() {
         class="flex items-center"
         :data-testid="'feedback-comment-menu'"
         :items="commentMenuItems"
+        :aria-label="'Comment actions'"
         @copy-link="copyLink"
         @handle-edit="handleEdit"
         @click-report="handleReport"

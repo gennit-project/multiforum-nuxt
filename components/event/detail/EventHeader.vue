@@ -503,6 +503,7 @@ console.log('EVENT HEADER DEBUG:', {
           v-if="showMenuButtons && eventData && menuItems.length > 0"
           :data-testid="'event-menu-button'"
           :items="menuItems"
+          :aria-label="'Event actions'"
           @copy-link="copyLink"
           @handle-edit="
             router.push(`/forums/${channelId}/events/edit/${eventId}`)

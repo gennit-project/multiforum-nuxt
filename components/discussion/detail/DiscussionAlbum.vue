@@ -395,6 +395,9 @@ onMounted(() => {
           <div
             class="flex w-full max-w-full gap-2 overflow-x-auto p-2 lg:flex-col lg:overflow-y-auto lg:overflow-x-visible"
             :style="{ maxHeight: `${mainImageHeight}px` }"
+            tabindex="0"
+            role="region"
+            aria-label="Album thumbnails"
           >
             <CarouselThumbnail
               v-for="(image, idx) in orderedImages"
@@ -434,6 +437,7 @@ onMounted(() => {
                 <button
                   type="button"
                   class="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70"
+                  aria-label="Previous image"
                   @click.stop="goLeft"
                 >
                   <LeftArrowIcon class="h-4 w-4" />
@@ -446,6 +450,7 @@ onMounted(() => {
                 <button
                   type="button"
                   class="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70"
+                  aria-label="Next image"
                   @click.stop="goRight"
                 >
                   <RightArrowIcon class="h-4 w-4" />

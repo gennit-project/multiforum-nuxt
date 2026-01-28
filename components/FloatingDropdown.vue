@@ -31,13 +31,11 @@ function close() {
         @update:model-value="emit('update:modelValue', $event)"
       >
         <template #activator="{ props: activatorProps }">
-          <div v-bind="activatorProps">
-            <slot
-              name="button"
-              v-bind="{ ...activatorProps, class: $attrs.class }"
-              @close="close"
-            />
-          </div>
+          <slot
+            name="button"
+            v-bind="{ activatorProps, class: $attrs.class }"
+            @close="close"
+          />
         </template>
         <v-card :theme="theme">
           <slot name="content" />

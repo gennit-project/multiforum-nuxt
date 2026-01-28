@@ -29,7 +29,7 @@ defineEmits(['click']);
   <RequireAuth :full-width="false">
     <template #has-auth>
       <button
-        v-bind="props"
+        v-bind="props.props"
         :data-testid="testId"
         :class="buttonClasses"
         @click="$emit('click')"
@@ -44,7 +44,7 @@ defineEmits(['click']);
       </button>
     </template>
     <template #does-not-have-auth>
-      <button v-bind="props" :data-testid="testId" :class="buttonClasses">
+      <button v-bind="props.props" :data-testid="testId" :class="buttonClasses">
         <ButtonContent :loading="false" :show-count="showCount" :count="count">
           <slot />
         </ButtonContent>
