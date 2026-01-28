@@ -16,7 +16,7 @@ export const AUTHOR_FIELDS = gql`
   }
 `;
 
-export const CROSSPOST_PREVIEW_FIELDS = gql`
+const CROSSPOST_PREVIEW_FIELDS = gql`
   fragment CrosspostPreviewFields on Discussion {
     id
     title

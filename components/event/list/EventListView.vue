@@ -18,7 +18,7 @@ import {
 import EventFilterBar from './filters/EventFilterBar.vue';
 import TimeShortcuts from './filters/TimeShortcuts.vue';
 import OnlineInPersonShortcuts from './filters/OnlineInPersonShortcuts.vue';
-import LocationFilterTypes from './filters/locationFilterTypes';
+import { LocationFilterTypes } from './filters/locationFilterTypes';
 
 const route = useRoute();
 const router = useRouter();

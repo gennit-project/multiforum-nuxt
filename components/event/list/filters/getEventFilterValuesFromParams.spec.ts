@@ -7,7 +7,7 @@ import {
   chronologicalOrder,
   reverseChronologicalOrder,
 } from '@/components/event/list/filters/filterStrings';
-import LocationFilterTypes from '@/components/event/list/filters/locationFilterTypes';
+import { LocationFilterTypes } from '@/components/event/list/filters/locationFilterTypes';
 import {
   timeShortcutValues,
   resultOrderTypes,

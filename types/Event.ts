@@ -1,7 +1,3 @@
-export type Point = {
-  latitude: number;
-  longitude: number;
-};
 export interface CreateEditEventFormValues {
   title: string;
   description: string;
@@ -64,8 +60,6 @@ export type DistanceUnit = {
   label: string;
   value: string | number;
 };
-
-export type Distance = any;
 
 export type SearchEventValues = {
   // With the exception of 'hourRanges' and 'weekdays',

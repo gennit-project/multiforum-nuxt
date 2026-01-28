@@ -66,39 +66,11 @@ export const CANCEL_EVENT = gql`
   }
 `;
 
-export const DELETE_EVENTS = gql`
-  mutation deleteEvent($id: [ID!]) {
-    deleteEvent(filter: { id: $id }) {
-      event {
-        id
-      }
-    }
-  }
-`;
-
 export const DELETE_EVENT = gql`
   mutation deleteEvent($id: ID!) {
     deleteEvents(where: { id: $id }) {
       nodesDeleted
       relationshipsDeleted
-    }
-  }
-`;
-
-export const GIVE_FEEDBACK_ON_EVENT = gql`
-  mutation giveFeedbackOnEvent(
-    $eventId: ID!
-    $modProfileName: String!
-    $commentText: String!
-    $channelUniqueName: String!
-  ) {
-    giveFeedbackOnEvent(
-      eventId: $eventId
-      modProfileName: $modProfileName
-      commentText: $commentText
-      channelUniqueName: $channelUniqueName
-    ) {
-      text
     }
   }
 `;

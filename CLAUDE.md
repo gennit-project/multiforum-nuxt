@@ -56,6 +56,8 @@
 - Unit tests are located in `tests/unit` directory
 - Run all unit tests with `npm run test:unit`
 - Run specific tests with `npm run test:unit -- --run tests/unit/path/to/test.spec.ts`
+- Use exactly one `expect(...)` assertion per `it(...)` test case
+- Prefer `it.each(...)` tables when it helps keep tests DRY
 
 ### Unit Test Best Practices
 

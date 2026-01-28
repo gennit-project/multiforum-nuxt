@@ -12,44 +12,6 @@ export const GET_CHANNEL_NAMES = gql`
   }
 `;
 
-export const GET_CHANNEL_WIKI = gql`
-  query getChannelWiki($uniqueName: String!) {
-    channels(where: { uniqueName: $uniqueName }) {
-      uniqueName
-      wikiEnabled
-      WikiHomePage {
-        id
-        title
-        body
-        slug
-        createdAt
-        updatedAt
-        VersionAuthor {
-          username
-        }
-        PastVersions(options: { sort: [{ createdAt: DESC }] }) {
-          id
-          body
-          createdAt
-          Author {
-            username
-          }
-        }
-        ChildPages {
-          id
-          title
-          slug
-          createdAt
-          updatedAt
-          VersionAuthor {
-            username
-          }
-        }
-      }
-    }
-  }
-`;
-
 export const GET_WIKI_PAGE = gql`
   query getWikiPage($channelUniqueName: String!, $slug: String!) {
     wikiPages(where: { channelUniqueName: $channelUniqueName, slug: $slug }) {
@@ -396,63 +358,6 @@ export const GET_CHANNELS_DOWNLOADS = gql`
           count
         }
       }
-    }
-  }
-`;
-
-export const GET_CHANNELS = gql`
-  query getSortedChannels(
-    $offset: Int
-    $limit: Int
-    $tags: [String]
-    $searchInput: String
-    $countDownloads: Boolean
-    $now: DateTime = "${now}"
-  ) {
-    getSortedChannels(
-      offset: $offset
-      limit: $limit
-      tags: $tags
-      searchInput: $searchInput
-      countDownloads: $countDownloads
-    ) {
-      channels {
-        uniqueName
-        displayName
-        channelIconURL
-        description
-        Tags {
-          text
-        }
-        EventChannelsAggregate(
-          where: {
-            NOT: {
-              archived: true,
-              Event: null
-            }
-            Event: {
-              canceled: false,
-              endTime_GT: $now,
-            }
-          }
-        ) {
-          count
-        }
-        DiscussionChannelsAggregate(
-          where: {
-            AND: [
-              { NOT: { archived: true } },
-              { NOT: { Discussion: null } },
-              { NOT: {
-                Discussion: { hasDownload: true }
-               } }
-            ]
-          }
-        ) {
-          count
-        }
-      }
-      aggregateChannelCount
     }
   }
 `;

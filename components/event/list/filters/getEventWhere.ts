@@ -1,4 +1,4 @@
-import LocationFilterTypes from './locationFilterTypes';
+import { LocationFilterTypes } from './locationFilterTypes';
 import type { SearchEventValues } from '@/types/Event';
 import { timeShortcutValues } from './eventSearchOptions';
 import { DateTime } from 'luxon';

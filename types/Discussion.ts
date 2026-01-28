@@ -1,12 +1,3 @@
-export interface Image {
-  url: string;
-  caption: string;
-  copyright: string;
-  alt: string;
-  hasSensitiveContent: boolean;
-  isCoverImage: boolean;
-}
-
 export interface CreateEditDiscussionFormValues {
   title: string;
   body: string;

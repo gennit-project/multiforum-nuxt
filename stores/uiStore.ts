@@ -4,7 +4,7 @@ import { config } from '@/config';
 import { useCookie, useRoute, useRouter } from 'nuxt/app';
 
 export type FontSize = 'small' | 'medium' | 'large';
-export type ThemeMode = 'light' | 'dark';
+type ThemeMode = 'light' | 'dark';
 
 export const useUIStore = defineStore('ui', () => {
   // State

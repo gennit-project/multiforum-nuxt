@@ -163,58 +163,6 @@ export const CREATE_COMMENT = gql`
   }
 `;
 
-export const CREATE_DISCUSSION_CHANNEL = gql`
-  mutation createDiscussionChannel(
-    $createDiscussionChannelInput: [DiscussionChannelCreateInput!]!
-  ) {
-    createDiscussionChannels(input: $createDiscussionChannelInput) {
-      discussionChannels {
-        id
-        channelUniqueName
-        discussionId
-        emoji
-        archived
-        answered
-        locked
-        Discussion {
-          id
-          title
-        }
-        Channel {
-          uniqueName
-        }
-        CommentsAggregate {
-          count
-        }
-        UpvotedByUsers {
-          username
-        }
-        UpvotedByUsersAggregate {
-          count
-        }
-        Comments {
-          id
-          text
-          CommentAuthor {
-            ... on User {
-              username
-            }
-          }
-          ChildCommentsAggregate {
-            count
-          }
-          ChildComments {
-            id
-          }
-          createdAt
-          updatedAt
-          weightedVotesCount
-        }
-      }
-    }
-  }
-`;
-
 export const UPDATE_COMMENT = gql`
   mutation updateComment(
     $updateCommentInput: CommentUpdateInput

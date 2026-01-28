@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
-import LocationFilterTypes from './locationFilterTypes';
+import { LocationFilterTypes } from './locationFilterTypes';
 import { getFilterValuesFromParams } from '@/components/event/list/filters/getEventFilterValuesFromParams';
 import type { SearchEventValues } from '@/types/Event';
 import Tag from '@/components/TagComponent.vue';

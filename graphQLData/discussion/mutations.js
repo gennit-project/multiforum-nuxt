@@ -279,24 +279,6 @@ export const UNDO_UPVOTE_DISCUSSION_CHANNEL = gql`
   }
 `;
 
-export const GIVE_FEEDBACK_ON_DISCUSSION = gql`
-  mutation giveFeedbackOnDiscussion(
-    $discussionId: ID!
-    $modProfileName: String!
-    $commentText: String!
-    $channelUniqueName: String!
-  ) {
-    giveFeedbackOnDiscussion(
-      discussionId: $discussionId
-      modProfileName: $modProfileName
-      commentText: $commentText
-      channelUniqueName: $channelUniqueName
-    ) {
-      text
-    }
-  }
-`;
-
 export const ADD_FEEDBACK_COMMENT_TO_DISCUSSION = gql`
   mutation addFeedbackCommentToDiscussion(
     $modProfileName: String!

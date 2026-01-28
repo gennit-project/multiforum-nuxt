@@ -4,4 +4,3 @@ export enum LocationFilterTypes {
   WITHIN_RADIUS = 'WITHIN_RADIUS',
   NONE = 'NONE',
 }
-export default LocationFilterTypes;

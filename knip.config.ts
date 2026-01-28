@@ -1,0 +1,33 @@
+export default {
+  entry: [
+    'plugins/**/*.{ts,js}',
+    'hooks/**/*.{ts,js}',
+    'middleware/**/*.{ts,js}',
+    'server/**/*.{ts,js}',
+    'pages/**/*.{vue,ts,js}',
+    'layouts/**/*.{vue,ts,js}',
+    'components/**/*.{vue,ts,js}',
+    'composables/**/*.{ts,js}',
+    'utils/**/*.{ts,js}',
+  ],
+  project: ['**/*.{ts,tsx,js,jsx,vue}'],
+  paths: {
+    '@': ['./'],
+    '~': ['./'],
+    '~~': ['./'],
+    '@@': ['./'],
+  },
+  ignore: [
+    '**/*.spec.ts',
+    '**/*.test.ts',
+    'tests/**',
+    'cypress/**',
+    'coverage/**',
+    '.nuxt/**',
+    'dist/**',
+    'node_modules/**',
+    '__generated__/**',
+  ],
+  ignoreBinaries: ['open'],
+  ignoreDependencies: ['globals'],
+};

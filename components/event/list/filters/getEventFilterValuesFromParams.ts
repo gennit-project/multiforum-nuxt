@@ -1,6 +1,6 @@
 import type { SearchEventValues } from '@/types/Event';
 import { chronologicalOrder, reverseChronologicalOrder } from './filterStrings';
-import LocationFilterTypes from './locationFilterTypes';
+import { LocationFilterTypes } from './locationFilterTypes';
 import { timeShortcutValues, resultOrderTypes } from './eventSearchOptions';
 
 const defaultPlace = {

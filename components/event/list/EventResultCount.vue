@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
-import LocationFilterTypes from './filters/locationFilterTypes';
+import { LocationFilterTypes } from './filters/locationFilterTypes';
 
 export default defineComponent({
   name: 'EventResultCount',

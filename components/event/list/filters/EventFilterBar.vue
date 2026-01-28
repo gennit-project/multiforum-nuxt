@@ -14,7 +14,7 @@ import {
   distanceOptionsForMiles,
   MilesOrKm,
 } from '@/components/event/list/filters/eventSearchOptions';
-import LocationFilterTypes from './locationFilterTypes';
+import { LocationFilterTypes } from './locationFilterTypes';
 import { getFilterValuesFromParams } from '@/components/event/list/filters/getEventFilterValuesFromParams';
 import GenericButton from '@/components/GenericButton.vue';
 import FilterChip from '@/components/FilterChip.vue';

@@ -23,9 +23,6 @@ export const setProfilePicURL = (url: string) => {
   profilePicURLVar.value = url;
 };
 export const userDataLoadingVar = ref(false);
-export const setUserDataLoading = (status: boolean) => {
-  userDataLoadingVar.value = status;
-};
 export const modProfileNameVar = ref('');
 export const setModProfileName = (modProfileName: string) => {
   modProfileNameVar.value = modProfileName;

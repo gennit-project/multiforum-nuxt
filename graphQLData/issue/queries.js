@@ -1,18 +1,6 @@
 import { COMMENT_VOTE_FIELDS } from '../comment/queries';
 import { gql } from '@apollo/client/core';
 
-export const GET_ISSUE_FOR_COMMENT = gql`
-  query getIssueForComment($commentId: ID!) {
-    comments(where: { id: $commentId }) {
-      id
-      RelatedIssues {
-        id
-        issueNumber
-      }
-    }
-  }
-`;
-
 export const ISSUE_FIELDS = gql`
   # ${COMMENT_VOTE_FIELDS}
   fragment IssueFields on Issue {
@@ -144,41 +132,6 @@ export const CHECK_EVENT_ISSUE_EXISTENCE = gql`
   }
 `;
 
-export const CHECK_COMMENT_ISSUE_EXISTENCE = gql`
-  query getIssue($commentId: ID!, $channelUniqueName: String!) {
-    issues(
-      where: {
-        relatedCommentId: $commentId
-        channelUniqueName: $channelUniqueName
-      }
-    ) {
-      id
-      flaggedServerRuleViolation
-    }
-  }
-`;
-export const GET_ISSUES_BY_DISCUSSION = gql`
-  query getIssuesByDiscussion($discussionId: ID!) {
-    discussions(where: { id: $discussionId }) {
-      id
-      title
-      RelatedIssues {
-        issueNumber
-        title
-        Author {
-          __typename
-          ... on ModerationProfile {
-            displayName
-          }
-          ... on User {
-            username
-          }
-        }
-      }
-    }
-  }
-`;
-
 export const CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE = gql`
   query getDiscussionCommentIssue(
     $discussionId: ID!
@@ -274,77 +227,6 @@ export const GET_CLOSED_ISSUES_BY_CHANNEL = gql`
         flaggedServerRuleViolation
         ActivityFeedAggregate(where: { actionType: "report" }) {
           count
-        }
-      }
-    }
-  }
-`;
-
-export const GET_ISSUES_BY_SERVER = gql`
-  query getIssues {
-    issues {
-      id
-      issueNumber
-      title
-      authorName
-      Author {
-        __typename
-        ... on ModerationProfile {
-          displayName
-        }
-        ... on User {
-          username
-        }
-      }
-      relatedDiscussionId
-      RelatedDiscussion {
-        title
-      }
-      channelUniqueName
-      Channel {
-        uniqueName
-      }
-    }
-  }
-`;
-
-export const GET_ISSUES_BY_EVENT = gql`
-  query getIssuesByEvent {
-    events(where: { id: "d081532a-8f07-48ed-8786-40e8dcc309c2" }) {
-      id
-      title
-      RelatedIssues {
-        issueNumber
-        title
-        Author {
-          ... on ModerationProfile {
-            displayName
-          }
-          ... on User {
-            username
-          }
-        }
-      }
-    }
-  }
-`;
-
-export const GET_ISSUES_BY_COMMENT = gql`
-  query getIssuesByComment {
-    comments(where: { id: "cc153e03-62a4-41fa-9597-46e6795e7fc3" }) {
-      id
-      text
-      RelatedIssues {
-        issueNumber
-        title
-        Author {
-          __typename
-          ... on ModerationProfile {
-            displayName
-          }
-          ... on User {
-            username
-          }
         }
       }
     }

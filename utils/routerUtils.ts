@@ -1,4 +1,4 @@
-import type LocationFilterTypes from '@/components/event/list/filters/locationFilterTypes';
+import type { LocationFilterTypes } from '@/components/event/list/filters/locationFilterTypes';
 import type { LocationQuery, Router } from 'vue-router';
 import type { Comment, Discussion, Event } from '@/__generated__/graphql';
 

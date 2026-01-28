@@ -65,56 +65,6 @@ export const DISALLOW_PLUGIN = gql`
   }
 `;
 
-export const INSTALL_PLUGIN = gql`
-  mutation InstallPlugin($pluginVersionId: ID!, $serverName: String!) {
-    updateServerConfigs(
-      where: { serverName: $serverName }
-      connect: {
-        InstalledVersions: { where: { node: { id: $pluginVersionId } } }
-      }
-    ) {
-      serverConfigs {
-        serverName
-        InstalledVersions {
-          id
-          version
-          repoUrl
-          entryPath
-          Plugin {
-            id
-            name
-          }
-        }
-      }
-    }
-  }
-`;
-
-export const UNINSTALL_PLUGIN = gql`
-  mutation UninstallPlugin($pluginVersionId: ID!, $serverName: String!) {
-    updateServerConfigs(
-      where: { serverName: $serverName }
-      disconnect: {
-        InstalledVersions: { where: { node: { id: $pluginVersionId } } }
-      }
-    ) {
-      serverConfigs {
-        serverName
-        InstalledVersions {
-          id
-          version
-          repoUrl
-          entryPath
-          Plugin {
-            id
-            name
-          }
-        }
-      }
-    }
-  }
-`;
-
 export const INSTALL_PLUGIN_VERSION = gql`
   mutation InstallPluginVersion($pluginId: String!, $version: String!) {
     installPluginVersion(pluginId: $pluginId, version: $version) {

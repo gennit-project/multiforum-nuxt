@@ -12,7 +12,7 @@ export const COMMENT_VOTE_FIELDS = gql`
   }
 `;
 
-export const COMMENT_FIELDS = gql`
+const COMMENT_FIELDS = gql`
   ${COMMENT_VOTE_FIELDS}
   fragment CommentFields on Comment {
     id
@@ -226,43 +226,6 @@ export const GET_EVENT_COMMENTS = gql`
       }
     }
   }
-  ${COMMENT_FIELDS}
-  ${COMMENT_VOTE_FIELDS}
-`;
-
-export const GET_DISCUSSION_CHANNEL_BY_ID = gql`
-  query getDiscussionChannel($id: ID!) {
-    discussionChannels(where: { id: $id }) {
-      id
-      archived
-      weightedVotesCount
-      discussionId
-      channelUniqueName
-      Channel {
-        uniqueName
-      }
-      Discussion {
-        id
-        title
-        Author {
-          ...AuthorFields
-        }
-      }
-      CommentsAggregate {
-        count
-      }
-      UpvotedByUsersAggregate {
-        count
-      }
-      Comments(where: { isRootComment: true }) {
-        ...CommentFields
-        ChildComments {
-          ...CommentFields
-        }
-      }
-    }
-  }
-  ${AUTHOR_FIELDS}
   ${COMMENT_FIELDS}
   ${COMMENT_VOTE_FIELDS}
 `;

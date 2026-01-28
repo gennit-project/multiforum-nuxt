@@ -1,14 +1,14 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-export interface Toast {
+interface Toast {
   id: string;
   message: string;
   type?: 'success' | 'error' | 'info';
   action?: ToastAction;
 }
 
-export interface ToastAction {
+interface ToastAction {
   label: string;
   onClick: () => void;
 }

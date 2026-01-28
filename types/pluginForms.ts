@@ -31,15 +31,6 @@ export interface PluginFormSection {
   fields: PluginField[];
 }
 
-export interface PluginUIForms {
-  server?: PluginFormSection[];
-  channel?: PluginFormSection[];
-}
-
-export interface PluginUI {
-  forms?: PluginUIForms;
-}
-
 // Secret status from the backend
 export interface PluginSecretStatus {
   key: string;

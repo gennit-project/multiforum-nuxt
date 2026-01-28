@@ -6,7 +6,7 @@ import type {
   SelectedWeekdayObject,
   DistanceUnit,
 } from '@/types/Event';
-import LocationFilterTypes from './locationFilterTypes';
+import { LocationFilterTypes } from './locationFilterTypes';
 
 export const timeShortcutValues = {
   NONE: 'NONE',
