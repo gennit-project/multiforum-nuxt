@@ -3,6 +3,13 @@ import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 import Tag from '@/components/TagComponent.vue';
 import type { Channel } from '@/__generated__/graphql';
+
+type BotSummary = {
+  username: string;
+  displayName?: string | null;
+  botProfileId?: string | null;
+  isDeprecated?: boolean | null;
+};
 import ChannelRules from '@/components/channel/Rules.vue';
 import SidebarEventList from '@/components/channel/SidebarEventList.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
@@ -37,6 +44,10 @@ const channelId = computed(() => {
 });
 
 const channelRules = computed(() => props.channel?.rules ?? '');
+const botAccounts = computed(() => {
+  const channel = props.channel as Channel & { Bots?: BotSummary[] };
+  return channel?.Bots ?? [];
+});
 
 // Check if we're on the discussion detail page (including comment permalinks)
 const isDiscussionDetailPage = computed(() => {
@@ -215,6 +226,52 @@ const handleBecomeAdminSuccess = () => {
             >
               Become an admin of this forum
             </button>
+          </div>
+
+          <div class="flex justify-between">
+            <span
+              class="my-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+            >
+              <i class="fa-solid fa-robot mr-2" />Bots
+            </span>
+          </div>
+
+          <div
+            v-if="botAccounts.length > 0"
+            class="flex-col space-y-2 text-sm font-bold"
+          >
+            <div v-for="bot in botAccounts" :key="bot.username">
+              <nuxt-link
+                :to="{
+                  name: 'u-username',
+                  params: { username: bot.username },
+                }"
+                class="flex items-center dark:text-white"
+              >
+                <AvatarComponent
+                  :text="bot.username"
+                  :src="''"
+                  class="mr-2 h-6 w-6"
+                />
+                <span class="flex flex-row items-center gap-2">
+                  <span class="font-bold">
+                    {{ bot.displayName || bot.username }}
+                  </span>
+                  <span
+                    v-if="bot.isDeprecated"
+                    class="rounded-full bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-200"
+                  >
+                    Inactive
+                  </span>
+                </span>
+              </nuxt-link>
+            </div>
+          </div>
+
+          <div v-else class="my-3 mb-6">
+            <p class="mb-3 text-sm dark:text-gray-400">
+              This forum does not have any bots yet.
+            </p>
           </div>
         </div>
       </div>

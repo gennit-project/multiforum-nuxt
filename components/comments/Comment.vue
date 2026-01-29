@@ -138,6 +138,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  botSuggestions: {
+    type: Array as PropType<
+      { value: string; label: string; isDeprecated?: boolean }[]
+    >,
+    default: () => [],
+  },
   showLabel: {
     type: Boolean,
     default: false,
@@ -1003,6 +1009,7 @@ const label = computed(() => {
                     :save-disabled="saveDisabled"
                     :length-of-comment-in-progress="lengthOfCommentInProgress"
                     :reply-has-bot-mention="props.replyHasBotMention"
+                    :bot-suggestions="props.botSuggestions"
                     :is-permalinked="isHighlighted"
                     :is-marked-as-answer="isMarkedAsAnswer"
                     @start-comment-save="emit('startCommentSave', $event)"

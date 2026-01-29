@@ -37,6 +37,13 @@ const props = defineProps({
     required: false,
     default: true,
   },
+  botSuggestions: {
+    type: Array as PropType<
+      { value: string; label: string; isDeprecated?: boolean }[]
+    >,
+    required: false,
+    default: () => [],
+  },
   suspensionIssueNumber: {
     type: Number,
     required: false,
@@ -139,6 +146,8 @@ const botMentionsBlocked = computed(() => {
           :placeholder="'Please be kind'"
           :show-char-counter="true"
           :max-chars="MAX_CHARS_IN_COMMENT"
+          :enable-bot-autocomplete="allowBotMentions"
+          :bot-suggestions="botSuggestions"
           @update="emit('handleUpdateComment', $event)"
         />
         <div class="mt-3 flex justify-start">

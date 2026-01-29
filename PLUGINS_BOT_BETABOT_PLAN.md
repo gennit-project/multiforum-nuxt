@@ -111,25 +111,25 @@ This document tracks the end-to-end work to add `/bot/<name>` mentions, forum-sc
     - `gennit-nuxt/components/mod/IssueDetail.vue`
     - `gennit-nuxt/components/GenericFeedbackFormModal.vue`
 
-- [ ] **GraphQL query**
+- [x] **GraphQL query**
   - Add `Channel.Bots { id username displayName isDeprecated }`
   - Files:
     - `gennit-nuxt/graphQLData/...` (forum query)
 
-- [ ] **Sidebar list**
+- [x] **Sidebar list**
   - Display bots like Admins list
   - Link to bot profile page
   - Show “Inactive” badge for `isDeprecated`
   - Files:
-    - `gennit-nuxt/components/channel/DownloadSidebar.vue` (or forum sidebar component)
-    - `gennit-nuxt/components/channel/ForumSidebar.vue` (if exists)
+    - `gennit-nuxt/components/channel/ChannelSidebar.vue`
 
-- [ ] **Editor autocomplete**
+- [x] **Editor autocomplete**
   - Use `Channel.Bots` to suggest `/bot/<name>` entries
   - Disable deprecated bots in list
   - Files:
-    - `gennit-nuxt/components/editor/...` (Text editor component)
-    - `gennit-nuxt/composables/...` (mention/autocomplete logic)
+    - `gennit-nuxt/components/TextEditor.vue`
+    - `gennit-nuxt/components/discussion/form/InlineCommentForm.vue`
+    - `gennit-nuxt/utils/botMentions.ts`
 
 ---
 

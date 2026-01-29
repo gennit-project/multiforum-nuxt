@@ -101,6 +101,12 @@ export const GET_CHANNEL = gql`
         discussionKarma
         createdAt
       }
+      Bots {
+        username
+        displayName
+        botProfileId
+        isDeprecated
+      }
       Moderators {
         displayName
       }

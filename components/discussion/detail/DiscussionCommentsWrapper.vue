@@ -22,6 +22,7 @@ import Notification from '@/components/NotificationComponent.vue';
 import SubscribeButton from '@/components/SubscribeButton.vue';
 import InlineCommentForm from '@/components/discussion/form/InlineCommentForm.vue';
 import DiscussionRootCommentFormWrapper from '@/components/discussion/form/DiscussionRootCommentFormWrapper.vue';
+import { buildBotMentionOptions } from '@/utils/botMentions';
 
 const COMMENT_LIMIT = 50;
 
@@ -124,6 +125,25 @@ const channelId = computed(() => {
     return route.params.forumId;
   }
   return '';
+});
+
+const botSuggestions = computed(() => {
+  const channel = props.discussionChannel as DiscussionChannel & {
+    Channel?: {
+      uniqueName?: string | null;
+      Bots?: Array<{
+        username: string;
+        displayName?: string | null;
+        botProfileId?: string | null;
+        isDeprecated?: boolean | null;
+      }>;
+    };
+  };
+
+  return buildBotMentionOptions({
+    channelUniqueName: channel?.Channel?.uniqueName,
+    bots: channel?.Channel?.Bots || [],
+  });
 });
 
 // Query for user data to get notification preferences
@@ -428,6 +448,7 @@ const handleSubscriptionToggle = () => {
     :show-nuxt-page="true"
     :answers="answers"
     :enable-feedback="enableFeedback"
+    :bot-suggestions="botSuggestions"
     @decrement-comment-count="decrementCommentCount"
     @increment-comment-count="incrementCommentCount"
     @update-comment-section-query-result="updateCommentSectionQueryResult"
@@ -440,6 +461,7 @@ const handleSubscriptionToggle = () => {
           :discussion-channel="discussionChannel"
           :mod-name="modName"
           :previous-offset="previousOffset"
+          :bot-suggestions="botSuggestions"
         />
       </div>
     </template>
@@ -459,6 +481,7 @@ const handleSubscriptionToggle = () => {
         :discussion-channel="discussionChannel"
         :mod-name="modName"
         :previous-offset="previousOffset"
+        :bot-suggestions="botSuggestions"
       />
     </template>
   </CommentSection>

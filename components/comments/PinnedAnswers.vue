@@ -29,6 +29,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  botSuggestions: {
+    type: Array as PropType<
+      { value: string; label: string; isDeprecated?: boolean }[]
+    >,
+    default: () => [],
+  },
 });
 
 const emit = defineEmits([
@@ -92,6 +98,7 @@ const hasAnswers = computed(() => {
           :original-poster="originalPoster"
           :answers="answers"
           :reply-has-bot-mention="replyHasBotMention"
+          :bot-suggestions="botSuggestions"
           :show-comment-buttons="true"
           :show-header="true"
           @create-comment="emit('createComment', $event)"
