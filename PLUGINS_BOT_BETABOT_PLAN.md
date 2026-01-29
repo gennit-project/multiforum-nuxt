@@ -17,21 +17,21 @@ This document tracks the end-to-end work to add `/bot/<name>` mentions, forum-sc
 
 ### Backend (gennit-backend)
 
-- **Schema: User**
+- [x] **Schema: User**
   - Add fields: `isBot`, `botProfileId`, `isDeprecated`, `deprecatedReason`
   - Files:
     - `gennit-backend/typeDefs.ts`
     - `gennit-backend/src/generated/graphql.ts` (regen)
     - `gennit-backend/ogm_types.ts` (regen)
 
-- **Schema: Channel**
+- [x] **Schema: Channel**
   - Add relationship: `Bots` (`BOT` edge)
   - Files:
     - `gennit-backend/typeDefs.ts`
     - `gennit-backend/src/generated/graphql.ts` (regen)
     - `gennit-backend/ogm_types.ts` (regen)
 
-- **Username prefix guard**
+- [x] **Username prefix guard**
   - Block `bot-` usernames for non-bot signups
   - Files (candidate):
     - `gennit-backend/customResolvers/mutations/registerUser.ts` (or equivalent)
@@ -44,15 +44,17 @@ This document tracks the end-to-end work to add `/bot/<name>` mentions, forum-sc
 
 ### Backend (gennit-backend)
 
-- **Strict bot mention parser**
+- [x] **Strict bot mention parser**
   - Parse `/bot/<botName>` and `/bot/<botName>:<profile-id>`
   - Validate `[a-z0-9-]+` for both segments
+  - [x] Only attach mentions for discussion comments (skip events/issues/feedback)
   - Files (candidate):
     - `gennit-backend/utils/mentionParser.ts` (new)
     - `gennit-backend/services/commentService.ts` (wire in)
 
-- **Event payload**
+- [x] **Event payload**
   - Include parsed bot mentions in `comment.created`
+  - [x] Gate bot plugin execution to discussion comments only (skip Event/Feedback comments)
   - Files:
     - `gennit-backend/services/pluginRunner.ts`
     - `gennit-backend/customResolvers/mutations/createComment.ts`
@@ -63,7 +65,7 @@ This document tracks the end-to-end work to add `/bot/<name>` mentions, forum-sc
 
 ### Backend (gennit-backend)
 
-- **Bot user creation/lookup**
+- [x] **Bot user creation/lookup**
   - Find or create bot user for (Channel + bot profile)
   - Enforce `bot-<channel>-<botName>` naming
   - Create `BOT` relationship to Channel
@@ -71,14 +73,21 @@ This document tracks the end-to-end work to add `/bot/<name>` mentions, forum-sc
     - `gennit-backend/services/botUserService.ts` (new)
     - `gennit-backend/services/commentService.ts`
 
-- **Plugin context: create comment as bot**
+- [x] **Pre-provision bots on enable**
+  - When the plugin is enabled for a channel, create bot users for the default profile and any configured profiles.
+  - When profiles change, reconcile bot users (create missing, mark deprecated if removed).
+  - Files:
+    - `gennit-backend/customResolvers/mutations/enableServerPlugin.ts`
+    - `gennit-backend/customResolvers/mutations/updateChannelPluginPipelines.ts`
+    - `gennit-backend/services/botUserService.ts`
+
+- [x] **Plugin context: create comment as bot**
   - Add context method: `createCommentAsBot(...)`
   - Ensure only plugin runner can call this
   - Files:
-    - `gennit-backend/services/pluginContext.ts`
     - `gennit-backend/services/pluginRunner.ts`
 
-- **Permissions**
+- [ ] **Permissions**
   - Bot accounts cannot log in
   - Bot accounts can create comments only via plugin context
   - Files:
@@ -91,12 +100,23 @@ This document tracks the end-to-end work to add `/bot/<name>` mentions, forum-sc
 
 ### Frontend (multiforum-nuxt)
 
-- **GraphQL query**
+- [x] Block `/bot/...` mentions in non-discussion comment editors
+  - Applies to event comments, issue comments, and feedback modals
+  - Files:
+    - `gennit-nuxt/components/comments/CreateRootCommentForm.vue`
+    - `gennit-nuxt/components/comments/CommentButtons.vue`
+    - `gennit-nuxt/components/comments/CommentSection.vue`
+    - `gennit-nuxt/components/event/detail/EventCommentsWrapper.vue`
+    - `gennit-nuxt/components/event/detail/EventRootCommentFormWrapper.vue`
+    - `gennit-nuxt/components/mod/IssueDetail.vue`
+    - `gennit-nuxt/components/GenericFeedbackFormModal.vue`
+
+- [ ] **GraphQL query**
   - Add `Channel.Bots { id username displayName isDeprecated }`
   - Files:
     - `gennit-nuxt/graphQLData/...` (forum query)
 
-- **Sidebar list**
+- [ ] **Sidebar list**
   - Display bots like Admins list
   - Link to bot profile page
   - Show “Inactive” badge for `isDeprecated`
@@ -104,7 +124,7 @@ This document tracks the end-to-end work to add `/bot/<name>` mentions, forum-sc
     - `gennit-nuxt/components/channel/DownloadSidebar.vue` (or forum sidebar component)
     - `gennit-nuxt/components/channel/ForumSidebar.vue` (if exists)
 
-- **Editor autocomplete**
+- [ ] **Editor autocomplete**
   - Use `Channel.Bots` to suggest `/bot/<name>` entries
   - Disable deprecated bots in list
   - Files:
@@ -117,20 +137,33 @@ This document tracks the end-to-end work to add `/bot/<name>` mentions, forum-sc
 
 ### Plugins repo (multiforum-plugins)
 
-- **Plugin manifest**
-  - `id: beta-bot`
-  - `secrets`: `OPENAI_API_KEY` (server scope)
-  - `settingsDefaults.server`: `model`, `temperature`, `profiles[]`, `defaultProfileId`
-  - `settingsDefaults.channel`: `overrideProfiles`, `profiles[]`, `defaultProfileId`
-  - Files:
-    - `multiforum-plugins/plugins/beta-bot/plugin.json`
+- [ ] **Plugin manifest**
+  - (Replaced by demo plugins below; keep or delete if we still want a dedicated beta-bot.)
 
-- **Plugin code**
-  - On `comment.created`: detect `/bot/betabot`
-  - Resolve profile via settings (channel override > server)
-  - Call OpenAI, post reply as bot user
+- [ ] **Plugin code**
+  - (Replaced by demo plugins below; keep or delete if we still want a dedicated beta-bot.)
+
+---
+
+## Phase 5.5 — Demo Plugins (Multiforum Plugins Repo)
+
+### Plugins repo (multiforum-plugins)
+
+- [x] **Generic ChatGPT Bot Profiles**
+  - `id: chatgpt-bot-profiles`
+  - Configurable profile array + default profile
+  - Uses `/bot/<name>` with profile selection
   - Files:
-    - `multiforum-plugins/plugins/beta-bot/src/index.ts`
+    - `multiforum-plugins/plugins/chatgpt-bot-profiles/plugin.json`
+    - `multiforum-plugins/plugins/chatgpt-bot-profiles/index.ts`
+
+- [x] **Creative Writing Beta Reader**
+  - `id: beta-reader-bot`
+  - Ships with 4 default prompts
+  - Same bot reply flow, tuned to writing feedback
+  - Files:
+    - `multiforum-plugins/plugins/beta-reader-bot/plugin.json`
+    - `multiforum-plugins/plugins/beta-reader-bot/index.ts`
 
 ---
 
@@ -138,13 +171,13 @@ This document tracks the end-to-end work to add `/bot/<name>` mentions, forum-sc
 
 ### Frontend (multiforum-nuxt)
 
-- **Server settings**
+- [ ] **Server settings**
   - Render profiles array (repeatable fields)
   - Files:
     - `gennit-nuxt/components/plugins/PluginSettingsForm.vue`
     - `gennit-nuxt/components/plugins/fields/*`
 
-- **Channel settings override**
+- [ ] **Channel settings override**
   - Toggle + profiles editor
   - Files:
     - `gennit-nuxt/pages/forums/[forumId]/edit/plugins.vue`
@@ -156,15 +189,15 @@ This document tracks the end-to-end work to add `/bot/<name>` mentions, forum-sc
 
 ### Backend (gennit-backend)
 
-- Mark bot users as deprecated
-- Prevent posting if deprecated
+- [ ] Mark bot users as deprecated
+- [ ] Prevent posting if deprecated
 - Files:
   - `gennit-backend/services/botUserService.ts`
   - `gennit-backend/services/pluginRunner.ts`
 
 ### Frontend (multiforum-nuxt)
 
-- Show inactive badge in sidebar/autocomplete
+- [ ] Show inactive badge in sidebar/autocomplete
 - Files:
   - `gennit-nuxt/components/channel/ForumSidebar.vue`
   - `gennit-nuxt/components/editor/...`

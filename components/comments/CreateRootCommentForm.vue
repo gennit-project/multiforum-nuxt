@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import { computed } from 'vue';
 import type { PropType } from 'vue';
 import TextEditor from '@/components/TextEditor.vue';
 import CancelButton from '@/components/CancelButton.vue';
@@ -11,8 +12,9 @@ import type { CreateEditCommentFormValues } from '@/types/Comment';
 import { usernameVar } from '@/cache';
 import LoggedInUserAvatar from './LoggedInUserAvatar.vue';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
+import { hasBotMention } from '@/utils/botMentions';
 
-defineProps({
+const props = defineProps({
   createCommentError: {
     type: Object as PropType<ApolloError | null>,
     required: false,
@@ -29,6 +31,11 @@ defineProps({
   commentEditorOpen: {
     type: Boolean,
     required: true,
+  },
+  allowBotMentions: {
+    type: Boolean,
+    required: false,
+    default: true,
   },
   suspensionIssueNumber: {
     type: Number,
@@ -66,6 +73,10 @@ const emit = defineEmits([
 
 const writeReplyStyle =
   'block h-10 w-full rounded-lg border-gray-300 dark:bg-gray-700 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:ring-gray-9';
+
+const botMentionsBlocked = computed(() => {
+  return !props.allowBotMentions && hasBotMention(props.createFormValues?.text);
+});
 </script>
 
 <template>
@@ -82,6 +93,11 @@ const writeReplyStyle =
       :suspended-until="suspensionUntil"
       :suspended-indefinitely="suspensionIndefinitely"
       :message="suspensionMessage"
+    />
+    <ErrorBanner
+      v-if="botMentionsBlocked"
+      class="mb-2"
+      :text="'Bot mentions are only available in discussion comments.'"
     />
     <div class="flex w-full gap-2">
       <RequireAuth
@@ -131,7 +147,8 @@ const writeReplyStyle =
             data-testid="createCommentButton"
             :disabled="
               createFormValues.text.length === 0 ||
-              createFormValues.text.length > MAX_CHARS_IN_COMMENT
+              createFormValues.text.length > MAX_CHARS_IN_COMMENT ||
+              botMentionsBlocked
             "
             :loading="createCommentLoading && !createCommentError"
             @click.prevent="emit('handleCreateComment')"

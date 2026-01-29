@@ -38,6 +38,7 @@ import InfoBanner from '@/components/InfoBanner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
+import { hasBotMention } from '@/utils/botMentions';
 
 type CommentSectionQueryVariablesType = {
   discussionId?: string;
@@ -118,6 +119,10 @@ const props = defineProps({
   answers: {
     type: Array as PropType<CommentType[]>,
     default: () => [],
+  },
+  allowBotMentions: {
+    type: Boolean,
+    default: true,
   },
 });
 
@@ -675,6 +680,12 @@ const lengthOfCommentInProgress = computed(() => {
   }
   return 0;
 });
+
+const replyHasBotMention = computed(() => {
+  return (
+    !props.allowBotMentions && hasBotMention(props.createFormValues?.text || '')
+  );
+});
 </script>
 
 <template>
@@ -719,6 +730,7 @@ const lengthOfCommentInProgress = computed(() => {
         :locked="locked || archived"
         :archived="archived"
         :original-poster="originalPoster"
+        :reply-has-bot-mention="replyHasBotMention"
         @create-comment="handleClickCreate"
         @delete-comment="handleClickDelete"
         @click-edit-comment="handleClickEdit"
@@ -877,6 +889,7 @@ const lengthOfCommentInProgress = computed(() => {
               :mod-profile-name="modProfileNameVar"
               :original-poster="originalPoster"
               :length-of-comment-in-progress="lengthOfCommentInProgress"
+              :reply-has-bot-mention="replyHasBotMention"
               :answers="answers"
               @start-comment-save="commentInProcess = true"
               @open-reply-editor="openReplyEditor"

@@ -134,6 +134,10 @@ const props = defineProps({
     type: Number,
     default: 1,
   },
+  replyHasBotMention: {
+    type: Boolean,
+    default: false,
+  },
   showLabel: {
     type: Boolean,
     default: false,
@@ -998,6 +1002,7 @@ const label = computed(() => {
                     "
                     :save-disabled="saveDisabled"
                     :length-of-comment-in-progress="lengthOfCommentInProgress"
+                    :reply-has-bot-mention="props.replyHasBotMention"
                     :is-permalinked="isHighlighted"
                     :is-marked-as-answer="isMarkedAsAnswer"
                     @start-comment-save="emit('startCommentSave', $event)"

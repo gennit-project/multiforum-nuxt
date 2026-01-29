@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
+import { hasBotMention } from '@/utils/botMentions';
 import {
   GET_CLOSED_ISSUES_BY_CHANNEL,
   GET_ISSUE,
@@ -681,6 +682,9 @@ const closeOpenButtonText = computed(() => {
 // Form values for creating comments
 const createCommentDefaultValues = { text: '', isRootComment: true, depth: 1 };
 const createFormValues = ref(createCommentDefaultValues);
+const botMentionsBlocked = computed(() =>
+  hasBotMention(createFormValues.value.text)
+);
 const deleteReasonError = ref('');
 
 const issue = computed<Issue | null>(
@@ -1198,6 +1202,11 @@ const handleDeleteComment = async (commentId: string) => {
             <h2 v-if="activeIssue" class="mt-8 border-b pb-1 text-xl font-bold">
               Leave a comment
             </h2>
+            <ErrorBanner
+              v-if="botMentionsBlocked"
+              class="mt-2"
+              :text="'Bot mentions are only available in discussion comments.'"
+            />
             <TextEditor
               :key="`${createFormValues.text === ''}`"
               :test-id="'texteditor-textarea'"
@@ -1224,7 +1233,8 @@ const handleDeleteComment = async (commentId: string) => {
                 :label="'Comment'"
                 :disabled="
                   createFormValues.text.length === 0 ||
-                  (isSuspendedMod && !isOriginalUserAuthor)
+                  (isSuspendedMod && !isOriginalUserAuthor) ||
+                  botMentionsBlocked
                 "
                 :loading="
                   addIssueActivityFeedItemWithCommentAsModLoading ||

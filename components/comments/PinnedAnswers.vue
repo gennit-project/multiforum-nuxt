@@ -25,6 +25,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  replyHasBotMention: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits([
@@ -87,6 +91,7 @@ const hasAnswers = computed(() => {
           :locked="locked || archived"
           :original-poster="originalPoster"
           :answers="answers"
+          :reply-has-bot-mention="replyHasBotMention"
           :show-comment-buttons="true"
           :show-header="true"
           @create-comment="emit('createComment', $event)"

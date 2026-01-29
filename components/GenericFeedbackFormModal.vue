@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import GenericModal from '@/components/GenericModal.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import CharCounter from '@/components/CharCounter.vue';
+import { hasBotMention } from '@/utils/botMentions';
 
 const FEEDBACK_MIN_LENGTH = 15;
 const FEEDBACK_MAX_LENGTH = 500;
@@ -32,9 +33,12 @@ const emit = defineEmits(['updateFeedback']);
 const title = 'Give Semi-anonymous Feedback';
 const body = 'Do you have any actionable feedback for the author?';
 const currentLength = ref(0);
+const feedbackText = ref('');
+const botMentionsBlocked = computed(() => hasBotMention(feedbackText.value));
 
 function updateFeedback(text: string) {
   currentLength.value = text.length;
+  feedbackText.value = text;
   emit('updateFeedback', text);
 }
 </script>
@@ -49,6 +53,7 @@ function updateFeedback(text: string) {
       props.loading ||
       props.primaryButtonDisabled ||
       !!props.error ||
+      botMentionsBlocked ||
       currentLength < FEEDBACK_MIN_LENGTH ||
       currentLength > FEEDBACK_MAX_LENGTH
     "
@@ -78,6 +83,12 @@ function updateFeedback(text: string) {
         :max="FEEDBACK_MAX_LENGTH"
         :min="FEEDBACK_MIN_LENGTH"
       />
+      <p
+        v-if="botMentionsBlocked"
+        class="mt-1 text-sm text-red-600 dark:text-red-400"
+      >
+        Bot mentions are only available in discussion comments.
+      </p>
       <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
         Feedback is intended to be a helpful tool for the author. If you think
         the post should be removed, report it.

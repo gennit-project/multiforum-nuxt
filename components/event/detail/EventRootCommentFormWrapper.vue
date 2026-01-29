@@ -196,6 +196,7 @@ function handleUpdateComment(event: string) {
       :create-form-values="createFormValues"
       :create-comment-loading="createCommentLoading"
       :create-comment-error="createCommentError"
+      :allow-bot-mentions="false"
       :suspension-issue-number="
         showSuspensionNotice ? suspensionIssueNumber ?? undefined : undefined
       "
