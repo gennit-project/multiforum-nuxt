@@ -36,6 +36,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  botSuggestions: {
+    type: Array as PropType<
+      { value: string; label: string; isDeprecated?: boolean }[]
+    >,
+    default: () => [],
+  },
   locked: {
     type: Boolean,
     default: false,
@@ -256,6 +262,8 @@ function toggleEmojiPicker() {
         :placeholder="'Please be kind'"
         :show-char-counter="true"
         :max-chars="MAX_CHARS_IN_COMMENT"
+        :enable-bot-autocomplete="true"
+        :bot-suggestions="botSuggestions"
         @update="
           emit('updateNewComment', {
             text: $event,

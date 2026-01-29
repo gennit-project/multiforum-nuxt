@@ -44,6 +44,12 @@ const props = defineProps({
     required: false,
     default: '',
   },
+  botSuggestions: {
+    type: Array as PropType<
+      { value: string; label: string; isDeprecated?: boolean }[]
+    >,
+    default: () => [],
+  },
 });
 
 const COMMENT_LIMIT = 50;
@@ -368,6 +374,7 @@ const handleUpdateComment = (event: string) => {
         :create-form-values="createFormValues"
         :create-comment-loading="createCommentLoading"
         :create-comment-error="createCommentError"
+        :bot-suggestions="botSuggestions"
         :suspension-issue-number="
           showSuspensionNotice ? suspensionIssueNumber ?? undefined : undefined
         "

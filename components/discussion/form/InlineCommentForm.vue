@@ -21,6 +21,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
+import { getBotMentionState, filterBotSuggestions } from '@/utils/botMentions';
 
 const COMMENT_LIMIT = 50;
 
@@ -38,6 +39,12 @@ const props = defineProps({
     type: String,
     required: false,
     default: '',
+  },
+  botSuggestions: {
+    type: Array as PropType<
+      { value: string; label: string; isDeprecated?: boolean }[]
+    >,
+    default: () => [],
   },
 });
 
@@ -132,6 +139,8 @@ const createCommentLoading = ref(false);
 const showSavedNotice = ref(false);
 const submitAttempted = ref(false);
 let savedNoticeTimeout: ReturnType<typeof setTimeout> | null = null;
+const cursorIndex = ref(0);
+const inlineTextarea = ref<HTMLTextAreaElement | null>(null);
 
 const {
   mutate: createComment,
@@ -309,6 +318,46 @@ const handleCreateComment = async () => {
 const handleUpdateComment = (value: string) => {
   createFormValues.value.text = value;
 };
+
+const updateCursorIndex = (event: Event) => {
+  const target = event.target as HTMLTextAreaElement | null;
+  if (!target) return;
+  cursorIndex.value = target.selectionStart ?? 0;
+};
+
+const mentionState = computed(() =>
+  getBotMentionState(createFormValues.value.text || '', cursorIndex.value)
+);
+
+const filteredBotSuggestions = computed(() => {
+  const state = mentionState.value;
+  if (!state || props.botSuggestions.length === 0) return [];
+  const activeSuggestions = props.botSuggestions.filter(
+    (bot) => !bot.isDeprecated
+  );
+  return filterBotSuggestions(activeSuggestions, state.query);
+});
+
+const showBotSuggestions = computed(() => filteredBotSuggestions.value.length > 0);
+
+const applyBotSuggestion = (value: string) => {
+  const state = mentionState.value;
+  const textarea = inlineTextarea.value;
+  if (!state || !textarea) return;
+
+  const before = createFormValues.value.text.slice(0, state.triggerIndex);
+  const after = createFormValues.value.text.slice(cursorIndex.value);
+  const insertion = `/bot/${value}`;
+  const needsSpace = after.length > 0 && !after.startsWith(' ');
+  const nextText = `${before}${insertion}${needsSpace ? ' ' : ''}${after}`;
+
+  createFormValues.value.text = nextText;
+  textarea.value = nextText;
+  const nextCursor = before.length + insertion.length + (needsSpace ? 1 : 0);
+  textarea.setSelectionRange(nextCursor, nextCursor);
+  cursorIndex.value = nextCursor;
+  textarea.focus();
+};
 </script>
 
 <template>
@@ -333,11 +382,12 @@ const handleUpdateComment = (value: string) => {
     <RequireAuth :justify-left="true" :full-width="true">
       <template #has-auth>
         <form
-          class="flex w-full items-center gap-3 rounded-lg border border-orange-400 bg-white px-3 py-2 dark:bg-gray-900"
+          class="relative flex w-full items-center gap-3 rounded-lg border border-orange-400 bg-white px-3 py-2 dark:bg-gray-900"
           @submit.prevent="handleCreateComment"
         >
           <textarea
             data-testid="discussion-inline-comment"
+            ref="inlineTextarea"
             class="bg-transparent min-h-[44px] flex-1 resize-none text-sm text-gray-900 placeholder-gray-500 outline-none focus:outline-none focus:ring-0 focus-visible:outline-none dark:text-gray-100 dark:placeholder-gray-400"
             name="discussionInlineComment"
             :rows="1"
@@ -345,9 +395,26 @@ const handleUpdateComment = (value: string) => {
             :value="createFormValues.text"
             :maxlength="MAX_CHARS_IN_COMMENT"
             @input="
-              handleUpdateComment(($event.target as HTMLTextAreaElement).value)
+              handleUpdateComment(($event.target as HTMLTextAreaElement).value);
+              updateCursorIndex($event);
             "
+            @click="updateCursorIndex"
+            @keyup="updateCursorIndex"
           />
+          <div
+            v-if="showBotSuggestions"
+            class="absolute left-0 right-0 top-full z-20 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+          >
+            <button
+              v-for="suggestion in filteredBotSuggestions"
+              :key="suggestion.value"
+              type="button"
+              class="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
+              @click.prevent="applyBotSuggestion(suggestion.value)"
+            >
+              <span>{{ suggestion.label }}</span>
+            </button>
+          </div>
           <button
             type="submit"
             class="font-semibold flex items-center justify-center rounded-md bg-orange-400 px-4 py-2 text-sm text-black hover:bg-orange-500 focus:outline-none focus:ring-0 focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-orange-200 dark:disabled:bg-orange-950 dark:disabled:text-orange-400"

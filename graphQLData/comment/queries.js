@@ -95,6 +95,12 @@ export const GET_DISCUSSION_COMMENTS = gql`
         Channel {
           uniqueName
           feedbackEnabled
+          Bots {
+            username
+            displayName
+            botProfileId
+            isDeprecated
+          }
         }
         Discussion {
           id

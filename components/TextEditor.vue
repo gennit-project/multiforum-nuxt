@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { ref, nextTick, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue';
 import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
@@ -17,6 +17,10 @@ import {
   insertEmoji as insertEmojiAtPosition,
   type FormatType,
 } from '@/utils/textFormatting';
+import {
+  getBotMentionState,
+  filterBotSuggestions,
+} from '@/utils/botMentions';
 
 type FileChangeInput = {
   // event of HTMLInputElement;
@@ -26,6 +30,12 @@ type FileChangeInput = {
 
 type EmojiClickEvent = {
   unicode: string;
+};
+
+type BotSuggestion = {
+  value: string;
+  label: string;
+  isDeprecated?: boolean;
 };
 
 // Props
@@ -66,6 +76,14 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  enableBotAutocomplete: {
+    type: Boolean,
+    default: false,
+  },
+  botSuggestions: {
+    type: Array as () => BotSuggestion[],
+    default: () => [],
+  },
 });
 const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
   useMutation(CREATE_SIGNED_STORAGE_URL);
@@ -77,6 +95,7 @@ const showFormatted = ref(false);
 const showEmojiPicker = ref(false);
 const emojiPickerPosition = ref({ top: '0px', left: '0px' });
 const isFullScreen = ref(false);
+const cursorIndex = ref(0);
 
 // Methods
 const focusEditor = () => {
@@ -92,6 +111,19 @@ const emit = defineEmits(['update']);
 const updateText = (newText: string) => {
   text.value = newText;
   emit('update', newText);
+};
+
+const updateCursorIndex = (event: Event) => {
+  const target = event.target as HTMLTextAreaElement | null;
+  if (!target) return;
+  cursorIndex.value = target.selectionStart ?? 0;
+};
+
+const handleEditorInput = (event: Event) => {
+  const target = event.target as HTMLTextAreaElement | null;
+  if (!target) return;
+  updateText(target.value);
+  updateCursorIndex(event);
 };
 
 const insertEmoji = (event: EmojiClickEvent) => {
@@ -175,6 +207,45 @@ const formatTextArea = (format: string) => {
 
   textarea.setRangeText(formattedText, start, end, 'end');
   updateText(textarea.value);
+};
+
+const mentionState = computed(() =>
+  getBotMentionState(text.value || '', cursorIndex.value)
+);
+
+const filteredBotSuggestions = computed(() => {
+  if (!props.enableBotAutocomplete || props.botSuggestions.length === 0) {
+    return [];
+  }
+  const state = mentionState.value;
+  if (!state) return [];
+  return filterBotSuggestions(
+    props.botSuggestions.filter((bot) => !bot.isDeprecated),
+    state.query
+  );
+});
+
+const showBotSuggestions = computed(() => {
+  return props.enableBotAutocomplete && filteredBotSuggestions.value.length > 0;
+});
+
+const applyBotSuggestion = (suggestion: BotSuggestion) => {
+  const state = mentionState.value;
+  const textarea = editorRef.value;
+  if (!state || !textarea) return;
+
+  const before = text.value.slice(0, state.triggerIndex);
+  const after = text.value.slice(cursorIndex.value);
+  const insertion = `/bot/${suggestion.value}`;
+  const needsSpace = after.length > 0 && !after.startsWith(' ');
+  const nextText = `${before}${insertion}${needsSpace ? ' ' : ''}${after}`;
+
+  updateText(nextText);
+  textarea.value = nextText;
+  const nextCursor = before.length + insertion.length + (needsSpace ? 1 : 0);
+  textarea.setSelectionRange(nextCursor, nextCursor);
+  cursorIndex.value = nextCursor;
+  textarea.focus();
 };
 
 const handlePaste = async (event: ClipboardEvent) => {
@@ -613,7 +684,9 @@ const exitFullScreen = () => {
               class="mb-2 w-full flex-1 resize-none rounded-md border border-gray-200 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
               :value="text"
               :placeholder="props.placeholder"
-              @input="updateText(($event.target as HTMLInputElement).value)"
+              @input="handleEditorInput"
+              @click="updateCursorIndex"
+              @keyup="updateCursorIndex"
               @dragover.prevent
               @drop="handleDrop"
             />
@@ -758,10 +831,26 @@ const exitFullScreen = () => {
               :placeholder="props.placeholder"
               class="block w-full rounded-md border border-gray-200 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
               :value="text"
-              @input="updateText(($event.target as HTMLInputElement).value)"
+              @input="handleEditorInput"
+              @click="updateCursorIndex"
+              @keyup="updateCursorIndex"
               @dragover.prevent
               @drop="handleDrop"
             />
+            <div
+              v-if="showBotSuggestions"
+              class="absolute left-0 right-0 z-20 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+            >
+              <button
+                v-for="suggestion in filteredBotSuggestions"
+                :key="suggestion.value"
+                type="button"
+                class="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
+                @click.prevent="applyBotSuggestion(suggestion)"
+              >
+                <span>{{ suggestion.label }}</span>
+              </button>
+            </div>
             <div class="mt-2 flex-col divide-gray-400 dark:divide-gray-300">
               <a
                 target="_blank"
