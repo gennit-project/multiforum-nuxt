@@ -139,6 +139,13 @@ const tabs = computed(() => {
     fontAwesome: 'fa-solid fa-diagram-project',
   });
 
+  baseTabs.push({
+    key: 'plugins',
+    label: 'Plugins',
+    icon: null,
+    fontAwesome: 'fa-solid fa-plug',
+  });
+
   baseTabs.push(
     {
       key: 'feedback',

@@ -459,3 +459,29 @@ export const GET_CHANNEL_PLUGIN_PIPELINES = gql`
     }
   }
 `;
+
+export const GET_CHANNEL_PLUGIN_SETTINGS = gql`
+  query GetChannelPluginSettings($channelUniqueName: String!) {
+    channels(where: { uniqueName: $channelUniqueName }) {
+      uniqueName
+      displayName
+      EnabledPluginsConnection {
+        edges {
+          node {
+            id
+            version
+            Plugin {
+              id
+              name
+              displayName
+              description
+            }
+          }
+          properties {
+            settingsJson
+          }
+        }
+      }
+    }
+  }
+`;
