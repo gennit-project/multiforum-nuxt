@@ -57,6 +57,7 @@
 - Run all unit tests with `npm run test:unit`
 - Run specific tests with `npm run test:unit -- --run tests/unit/path/to/test.spec.ts`
 - Use exactly one `expect(...)` assertion per `it(...)` test case
+- If you need multiple checks, split into multiple `it(...)` blocks or combine into a single structured `expect(...)`
 - Prefer `it.each(...)` tables when it helps keep tests DRY
 
 ### Unit Test Best Practices

@@ -37,6 +37,12 @@ export const PIPELINE_EVENTS = [
     description: 'Triggered when a downloadable file is modified',
     scope: 'server' as PipelineScope,
   },
+  {
+    value: 'comment.created',
+    label: 'Comment Created',
+    description: 'Triggered when a comment is created',
+    scope: 'server' as PipelineScope,
+  },
   // Channel-scoped events (configured by channel admin)
   {
     value: 'discussionChannel.created',
