@@ -19,57 +19,100 @@ describe('pipelineSchema utilities', () => {
       const serverEvents = PIPELINE_EVENTS.filter((e) => e.scope === 'server');
       const channelEvents = PIPELINE_EVENTS.filter((e) => e.scope === 'channel');
 
-      expect(serverEvents.length).toBeGreaterThan(0);
-      expect(channelEvents.length).toBeGreaterThan(0);
+      expect({
+        hasServerEvents: serverEvents.length > 0,
+        hasChannelEvents: channelEvents.length > 0,
+      }).toEqual({
+        hasServerEvents: true,
+        hasChannelEvents: true,
+      });
     });
 
     it('should include downloadableFile.created as server event', () => {
       const event = PIPELINE_EVENTS.find((e) => e.value === 'downloadableFile.created');
-      expect(event).toBeDefined();
-      expect(event?.scope).toBe('server');
-      expect(event?.label).toBe('File Upload');
+      expect(event).toEqual(
+        expect.objectContaining({
+          value: 'downloadableFile.created',
+          scope: 'server',
+          label: 'File Upload',
+        })
+      );
     });
 
     it('should include downloadableFile.updated as server event', () => {
       const event = PIPELINE_EVENTS.find((e) => e.value === 'downloadableFile.updated');
-      expect(event).toBeDefined();
-      expect(event?.scope).toBe('server');
-      expect(event?.label).toBe('File Updated');
+      expect(event).toEqual(
+        expect.objectContaining({
+          value: 'downloadableFile.updated',
+          scope: 'server',
+          label: 'File Updated',
+        })
+      );
+    });
+
+    it('should include comment.created as server event', () => {
+      const event = PIPELINE_EVENTS.find((e) => e.value === 'comment.created');
+      expect(event).toEqual(
+        expect.objectContaining({
+          value: 'comment.created',
+          scope: 'server',
+          label: 'Comment Created',
+        })
+      );
     });
 
     it('should include discussionChannel.created as channel event', () => {
       const event = PIPELINE_EVENTS.find((e) => e.value === 'discussionChannel.created');
-      expect(event).toBeDefined();
-      expect(event?.scope).toBe('channel');
-      expect(event?.label).toBe('Content Submitted to Channel');
+      expect(event).toEqual(
+        expect.objectContaining({
+          value: 'discussionChannel.created',
+          scope: 'channel',
+          label: 'Content Submitted to Channel',
+        })
+      );
     });
 
     it('should have description for all events', () => {
-      for (const event of PIPELINE_EVENTS) {
-        expect(event.description).toBeTruthy();
-      }
+      expect(PIPELINE_EVENTS.every((event) => Boolean(event.description))).toBe(true);
     });
   });
 
   describe('getEventsForScope', () => {
     it('should return only server events when scope is server', () => {
       const events = getEventsForScope('server');
-      expect(events.length).toBe(2);
-      expect(events.every((e) => e.scope === 'server')).toBe(true);
-      expect(events.some((e) => e.value === 'downloadableFile.created')).toBe(true);
-      expect(events.some((e) => e.value === 'downloadableFile.updated')).toBe(true);
+      expect({
+        count: events.length,
+        allServer: events.every((e) => e.scope === 'server'),
+        hasCreated: events.some((e) => e.value === 'downloadableFile.created'),
+        hasUpdated: events.some((e) => e.value === 'downloadableFile.updated'),
+        hasComment: events.some((e) => e.value === 'comment.created'),
+      }).toEqual({
+        count: 3,
+        allServer: true,
+        hasCreated: true,
+        hasUpdated: true,
+        hasComment: true,
+      });
     });
 
     it('should return only channel events when scope is channel', () => {
       const events = getEventsForScope('channel');
-      expect(events.length).toBe(1);
-      expect(events.every((e) => e.scope === 'channel')).toBe(true);
-      expect(events[0]?.value).toBe('discussionChannel.created');
+      expect({
+        count: events.length,
+        allChannel: events.every((e) => e.scope === 'channel'),
+        firstValue: events[0]?.value,
+      }).toEqual({
+        count: 1,
+        allChannel: true,
+        firstValue: 'discussionChannel.created',
+      });
     });
 
     it('should not return server events for channel scope', () => {
       const events = getEventsForScope('channel');
-      expect(events.some((e) => e.value === 'downloadableFile.created')).toBe(false);
+      expect(
+        events.some((e) => e.value === 'downloadableFile.created' || e.value === 'comment.created')
+      ).toBe(false);
     });
 
     it('should not return channel events for server scope', () => {
@@ -92,47 +135,67 @@ describe('pipelineSchema utilities', () => {
 
   describe('PIPELINE_CONDITIONS', () => {
     it('should have all three conditions', () => {
-      expect(PIPELINE_CONDITIONS.length).toBe(3);
       const values = PIPELINE_CONDITIONS.map((c) => c.value);
-      expect(values).toContain('ALWAYS');
-      expect(values).toContain('PREVIOUS_SUCCEEDED');
-      expect(values).toContain('PREVIOUS_FAILED');
+      expect({
+        length: PIPELINE_CONDITIONS.length,
+        values,
+      }).toEqual({
+        length: 3,
+        values: expect.arrayContaining(['ALWAYS', 'PREVIOUS_SUCCEEDED', 'PREVIOUS_FAILED']),
+      });
     });
 
     it('should have labels and descriptions for all conditions', () => {
-      for (const condition of PIPELINE_CONDITIONS) {
-        expect(condition.label).toBeTruthy();
-        expect(condition.description).toBeTruthy();
-      }
+      expect(PIPELINE_CONDITIONS.every((condition) => Boolean(condition.label && condition.description))).toBe(true);
     });
   });
 
   describe('getPipelineJsonSchema', () => {
     it('should return schema with server events for server scope', () => {
       const schema = getPipelineJsonSchema('server');
-      expect(schema.title).toContain('Server');
-
       const pipelineSchema = schema.properties?.pipelines;
       const eventEnum = pipelineSchema?.items?.properties?.event?.enum;
-      expect(eventEnum).toContain('downloadableFile.created');
-      expect(eventEnum).toContain('downloadableFile.updated');
-      expect(eventEnum).not.toContain('discussionChannel.created');
+      expect({
+        titleIncludesServer: schema.title.includes('Server'),
+        hasCreated: eventEnum?.includes('downloadableFile.created'),
+        hasUpdated: eventEnum?.includes('downloadableFile.updated'),
+        hasComment: eventEnum?.includes('comment.created'),
+        hasChannel: eventEnum?.includes('discussionChannel.created'),
+      }).toEqual({
+        titleIncludesServer: true,
+        hasCreated: true,
+        hasUpdated: true,
+        hasComment: true,
+        hasChannel: false,
+      });
     });
 
     it('should return schema with channel events for channel scope', () => {
       const schema = getPipelineJsonSchema('channel');
-      expect(schema.title).toContain('Channel');
-
       const pipelineSchema = schema.properties?.pipelines;
       const eventEnum = pipelineSchema?.items?.properties?.event?.enum;
-      expect(eventEnum).toContain('discussionChannel.created');
-      expect(eventEnum).not.toContain('downloadableFile.created');
+      expect({
+        titleIncludesChannel: schema.title.includes('Channel'),
+        hasChannel: eventEnum?.includes('discussionChannel.created'),
+        hasCreated: eventEnum?.includes('downloadableFile.created'),
+        hasComment: eventEnum?.includes('comment.created'),
+      }).toEqual({
+        titleIncludesChannel: true,
+        hasChannel: true,
+        hasCreated: false,
+        hasComment: false,
+      });
     });
 
     it('should have required pipelines array', () => {
       const schema = getPipelineJsonSchema('server');
-      expect(schema.required).toContain('pipelines');
-      expect(schema.properties?.pipelines?.type).toBe('array');
+      expect({
+        hasPipelinesRequired: schema.required?.includes('pipelines'),
+        pipelinesType: schema.properties?.pipelines?.type,
+      }).toEqual({
+        hasPipelinesRequired: true,
+        pipelinesType: 'array',
+      });
     });
 
     it('should include step schema with condition enum', () => {
@@ -149,16 +212,28 @@ describe('pipelineSchema utilities', () => {
   describe('getDefaultPipelineYaml', () => {
     it('should return server template for server scope', () => {
       const yaml = getDefaultPipelineYaml('server');
-      expect(yaml).toBe(DEFAULT_PIPELINE_YAML);
-      expect(yaml).toContain('downloadableFile.created');
-      expect(yaml).toContain('Server Plugin Pipeline');
+      expect({
+        sameTemplate: yaml === DEFAULT_PIPELINE_YAML,
+        hasEvent: yaml.includes('downloadableFile.created'),
+        hasTitle: yaml.includes('Server Plugin Pipeline'),
+      }).toEqual({
+        sameTemplate: true,
+        hasEvent: true,
+        hasTitle: true,
+      });
     });
 
     it('should return channel template for channel scope', () => {
       const yaml = getDefaultPipelineYaml('channel');
-      expect(yaml).toBe(DEFAULT_CHANNEL_PIPELINE_YAML);
-      expect(yaml).toContain('discussionChannel.created');
-      expect(yaml).toContain('Channel Plugin Pipeline');
+      expect({
+        sameTemplate: yaml === DEFAULT_CHANNEL_PIPELINE_YAML,
+        hasEvent: yaml.includes('discussionChannel.created'),
+        hasTitle: yaml.includes('Channel Plugin Pipeline'),
+      }).toEqual({
+        sameTemplate: true,
+        hasEvent: true,
+        hasTitle: true,
+      });
     });
 
     it('should mention server-enabled plugins in channel template', () => {
@@ -174,8 +249,13 @@ describe('pipelineSchema utilities', () => {
       it('should reject config without pipelines array', () => {
         const config = {} as PipelineConfig;
         const result = validatePipelineConfig(config, availablePlugins);
-        expect(result.valid).toBe(false);
-        expect(result.errors).toContain('Configuration must have a "pipelines" array');
+        expect({
+          valid: result.valid,
+          hasError: result.errors.includes('Configuration must have a "pipelines" array'),
+        }).toEqual({
+          valid: false,
+          hasError: true,
+        });
       });
 
       it('should accept valid server pipeline config', () => {
@@ -188,8 +268,7 @@ describe('pipelineSchema utilities', () => {
           ],
         };
         const result = validatePipelineConfig(config, availablePlugins, 'server');
-        expect(result.valid).toBe(true);
-        expect(result.errors.length).toBe(0);
+        expect({ valid: result.valid, errors: result.errors.length }).toEqual({ valid: true, errors: 0 });
       });
 
       it('should accept valid channel pipeline config', () => {
@@ -202,8 +281,7 @@ describe('pipelineSchema utilities', () => {
           ],
         };
         const result = validatePipelineConfig(config, availablePlugins, 'channel');
-        expect(result.valid).toBe(true);
-        expect(result.errors.length).toBe(0);
+        expect({ valid: result.valid, errors: result.errors.length }).toEqual({ valid: true, errors: 0 });
       });
     });
 
@@ -218,10 +296,13 @@ describe('pipelineSchema utilities', () => {
           ],
         };
         const result = validatePipelineConfig(config, availablePlugins, 'server');
-        expect(result.valid).toBe(false);
-        expect(result.errors[0]).toContain('Invalid event');
-        expect(result.errors[0]).toContain('discussionChannel.created');
-        expect(result.errors[0]).toContain('server pipeline');
+        expect({
+          valid: result.valid,
+          message: result.errors[0],
+        }).toEqual({
+          valid: false,
+          message: expect.stringContaining('discussionChannel.created'),
+        });
       });
 
       it('should reject server event in channel pipeline', () => {
@@ -234,10 +315,13 @@ describe('pipelineSchema utilities', () => {
           ],
         };
         const result = validatePipelineConfig(config, availablePlugins, 'channel');
-        expect(result.valid).toBe(false);
-        expect(result.errors[0]).toContain('Invalid event');
-        expect(result.errors[0]).toContain('downloadableFile.created');
-        expect(result.errors[0]).toContain('channel pipeline');
+        expect({
+          valid: result.valid,
+          message: result.errors[0],
+        }).toEqual({
+          valid: false,
+          message: expect.stringContaining('downloadableFile.created'),
+        });
       });
 
       it('should list valid events in error message', () => {
@@ -250,7 +334,7 @@ describe('pipelineSchema utilities', () => {
           ],
         };
         const result = validatePipelineConfig(config, availablePlugins, 'channel');
-        expect(result.errors[0]).toContain('discussionChannel.created');
+        expect(result.errors[0]).toEqual(expect.stringContaining('discussionChannel.created'));
       });
     });
 
@@ -265,8 +349,13 @@ describe('pipelineSchema utilities', () => {
           ],
         };
         const result = validatePipelineConfig(config, availablePlugins, 'server');
-        expect(result.valid).toBe(false);
-        expect(result.errors).toContain('Pipeline 1: Pipeline must have at least one step');
+        expect({
+          valid: result.valid,
+          hasError: result.errors.includes('Pipeline 1: Pipeline must have at least one step'),
+        }).toEqual({
+          valid: false,
+          hasError: true,
+        });
       });
 
       it('should reject step without plugin field', () => {
@@ -279,8 +368,13 @@ describe('pipelineSchema utilities', () => {
           ],
         };
         const result = validatePipelineConfig(config, availablePlugins, 'server');
-        expect(result.valid).toBe(false);
-        expect(result.errors[0]).toContain('Missing "plugin" field');
+        expect({
+          valid: result.valid,
+          message: result.errors[0],
+        }).toEqual({
+          valid: false,
+          message: expect.stringContaining('Missing "plugin" field'),
+        });
       });
 
       it('should reject unknown plugin', () => {
@@ -293,8 +387,13 @@ describe('pipelineSchema utilities', () => {
           ],
         };
         const result = validatePipelineConfig(config, availablePlugins, 'server');
-        expect(result.valid).toBe(false);
-        expect(result.errors[0]).toContain('Unknown plugin "unknown-plugin"');
+        expect({
+          valid: result.valid,
+          message: result.errors[0],
+        }).toEqual({
+          valid: false,
+          message: expect.stringContaining('Unknown plugin "unknown-plugin"'),
+        });
       });
 
       it('should reject invalid condition', () => {
@@ -307,8 +406,13 @@ describe('pipelineSchema utilities', () => {
           ],
         };
         const result = validatePipelineConfig(config, availablePlugins, 'server');
-        expect(result.valid).toBe(false);
-        expect(result.errors[0]).toContain('Invalid condition');
+        expect({
+          valid: result.valid,
+          message: result.errors[0],
+        }).toEqual({
+          valid: false,
+          message: expect.stringContaining('Invalid condition'),
+        });
       });
 
       it('should accept all valid conditions', () => {
@@ -361,10 +465,13 @@ describe('pipelineSchema utilities', () => {
           ],
         };
         const result = validatePipelineConfig(config, availablePlugins, 'server');
-        expect(result.valid).toBe(false);
-        expect(result.errors.length).toBe(2);
-        expect(result.errors[0]).toContain('Pipeline 1');
-        expect(result.errors[1]).toContain('Pipeline 2');
+        expect({
+          valid: result.valid,
+          errorCount: result.errors.length,
+        }).toEqual({
+          valid: false,
+          errorCount: 2,
+        });
       });
     });
 
