@@ -48,7 +48,7 @@ const showChannelTabs = computed(() => {
     routeName.startsWith('forums-forumId-edit') &&
     (routeName === 'forums-forumId-edit' ||
       routeName.match(
-        /^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|calendar|feedback|wiki|pipelines)$/
+        /^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|calendar|feedback|wiki|pipelines|plugins)$/
       ));
 
   // Only hide tabs for content editing (discussions, events, etc), not forum settings
@@ -72,7 +72,7 @@ const showChannelSidebar = computed(() => {
     routeName.startsWith('forums-forumId-edit') &&
     (routeName === 'forums-forumId-edit' ||
       routeName.match(
-        /^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|calendar|feedback|wiki|pipelines)$/
+        /^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|calendar|feedback|wiki|pipelines|plugins)$/
       ));
 
   if (isForumSettingsPage) {

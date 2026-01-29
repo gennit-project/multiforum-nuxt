@@ -167,3 +167,19 @@ export const UPDATE_CHANNEL_PLUGIN_PIPELINES = gql`
     )
   }
 `;
+
+export const UPDATE_CHANNEL_ENABLED_PLUGINS = gql`
+  mutation UpdateChannelEnabledPlugins(
+    $channelUniqueName: String!
+    $enabledPlugins: [ChannelEnabledPluginsUpdateFieldInput!]!
+  ) {
+    updateChannels(
+      where: { uniqueName: $channelUniqueName }
+      update: { EnabledPlugins: $enabledPlugins }
+    ) {
+      channels {
+        uniqueName
+      }
+    }
+  }
+`;

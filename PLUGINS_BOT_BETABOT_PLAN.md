@@ -171,17 +171,18 @@ This document tracks the end-to-end work to add `/bot/<name>` mentions, forum-sc
 
 ### Frontend (multiforum-nuxt)
 
-- [ ] **Server settings**
-  - Render profiles array (repeatable fields)
+- [x] **Server settings**
+  - Render server settings form (JSON profile editor via textarea fields)
   - Files:
+    - `gennit-nuxt/pages/admin/settings/plugins/[pluginId].vue`
     - `gennit-nuxt/components/plugins/PluginSettingsForm.vue`
-    - `gennit-nuxt/components/plugins/fields/*`
 
-- [ ] **Channel settings override**
-  - Toggle + profiles editor
+- [x] **Channel settings override**
+  - Toggle + channel settings form per plugin
   - Files:
     - `gennit-nuxt/pages/forums/[forumId]/edit/plugins.vue`
-    - `gennit-nuxt/components/plugins/PluginSettingsForm.vue`
+    - `gennit-nuxt/components/channel/form/CreateEditChannelFields.vue`
+    - `gennit-nuxt/pages/forums/[forumId].vue`
 
 ---
 
