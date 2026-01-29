@@ -11,6 +11,7 @@ import CancelButton from '@/components/CancelButton.vue';
 import EmojiButtons from './EmojiButtons.vue';
 import NewEmojiButton from './NewEmojiButton.vue';
 import AddToCommentFavorites from '@/components/favorites/AddToCommentFavorites.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
 import { usernameVar, modProfileNameVar } from '@/cache';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 
@@ -30,6 +31,10 @@ const props = defineProps({
   lengthOfCommentInProgress: {
     type: Number,
     default: 0,
+  },
+  replyHasBotMention: {
+    type: Boolean,
+    default: false,
   },
   locked: {
     type: Boolean,
@@ -242,6 +247,11 @@ function toggleEmojiPicker() {
       v-if="commentData && replyFormOpenAtCommentID === commentData.id"
       class="my-2 mt-1 w-full px-3 py-4 dark:bg-gray-700"
     >
+      <ErrorBanner
+        v-if="replyHasBotMention"
+        class="mb-2"
+        :text="'Bot mentions are only available in discussion comments.'"
+      />
       <TextEditor
         :placeholder="'Please be kind'"
         :show-char-counter="true"
@@ -260,7 +270,8 @@ function toggleEmojiPicker() {
           :loading="commentInProcess"
           :disabled="
             lengthOfCommentInProgress === 0 ||
-            lengthOfCommentInProgress > MAX_CHARS_IN_COMMENT
+            lengthOfCommentInProgress > MAX_CHARS_IN_COMMENT ||
+            replyHasBotMention
           "
           @click.prevent="
             () => {

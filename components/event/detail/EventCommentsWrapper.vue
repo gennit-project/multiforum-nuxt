@@ -381,6 +381,7 @@ const handleSubscriptionToggle = () => {
     :comment-section-query-variables="commentSectionQueryVariables"
     :create-form-values="createFormValues"
     :create-comment-input="createCommentInput"
+    :allow-bot-mentions="false"
     :previous-offset="previousOffset"
     :enable-feedback="false"
     :original-poster="originalPoster"
