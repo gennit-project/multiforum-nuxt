@@ -24,7 +24,7 @@ The Multiforum plugin system allows server administrators to extend platform fun
 const registryContent = `
 ### Setting Up a Plugin Registry
 
-A plugin registry is a JSON file hosted at an HTTP URL or Google Cloud Storage bucket. Configure your registry URL in the "Plugin Registries" section of the plugin management page.
+A plugin registry is a JSON file hosted at an HTTP URL or Google Cloud Storage bucket. Configure your registry URL in the "Registries" tab of the plugins area.
 
 **Example registry URLs:**
 - \`https://example.com/plugins/registry.json\`
@@ -260,7 +260,7 @@ Logs include:
         </p>
       </div>
       <NuxtLink
-        to="/admin/settings/plugins"
+        to="/admin/plugins"
         class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
       >
         <i class="fa-solid fa-arrow-left mr-2" />

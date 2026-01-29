@@ -643,7 +643,7 @@ const getSecretStatusText = (status: string) => {
               </div>
             </div>
             <NuxtLink
-              to="/admin/settings/plugins"
+              to="/admin/plugins"
               class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
             >
               <i class="fa-solid fa-arrow-left mr-2" />

@@ -92,7 +92,7 @@ async function handleSave(config: PipelineConfig) {
             </p>
           </div>
           <NuxtLink
-            to="/admin/settings/plugins"
+            to="/admin/plugins"
             class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
           >
             <i class="fa-solid fa-arrow-left mr-2" />
@@ -169,7 +169,7 @@ async function handleSave(config: PipelineConfig) {
                     You need to install and enable at least one plugin before configuring pipelines.
                   </p>
                   <NuxtLink
-                    to="/admin/settings/plugins"
+                    to="/admin/plugins"
                     class="mt-2 inline-flex items-center text-yellow-800 dark:text-yellow-200 hover:underline"
                   >
                     Go to Plugin Management

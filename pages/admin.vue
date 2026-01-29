@@ -26,7 +26,8 @@ const serverConfig = computed(() => {
 });
 
 const isSettingsPage = computed(() => {
-  return route.name?.toString().includes('admin-settings');
+  const routeName = route.name?.toString() || '';
+  return routeName.includes('admin-settings') || routeName.includes('admin-plugins');
 });
 </script>
 

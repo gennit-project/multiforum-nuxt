@@ -2,7 +2,13 @@ import { getConstantsForCypress } from '../constants';
 import { setupTestData } from '../../support/testSetup';
 
 const constants = getConstantsForCypress(Cypress.env('baseUrl'));
-const { PLUGIN_MANAGEMENT, PLUGIN_DOCS, PLUGIN_PIPELINES, DISCUSSION_LIST } = constants;
+const {
+  PLUGIN_MANAGEMENT,
+  PLUGIN_DOCS,
+  PLUGIN_PIPELINES,
+  PLUGIN_REGISTRIES,
+  DISCUSSION_LIST,
+} = constants;
 
 describe('Plugin Management', () => {
   // Set up test data once for all tests in this file
@@ -33,7 +39,7 @@ describe('Plugin Management', () => {
       cy.authenticateOnCurrentPage();
       cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
 
-      cy.visit(PLUGIN_MANAGEMENT);
+      cy.visit(PLUGIN_REGISTRIES);
       cy.wait('@graphqlRequest');
 
       // Check for registry configuration section
@@ -154,7 +160,7 @@ describe('Plugin Management', () => {
 
       // Click and verify navigation
       cy.contains('Back to Plugins').click();
-      cy.url().should('include', '/admin/settings/plugins');
+      cy.url().should('include', '/admin/plugins');
       cy.url().should('not.include', '/docs');
     });
 
