@@ -2,7 +2,6 @@
 import { ref, computed, watch } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
-import PluginsTabs from '@/components/admin/PluginsTabs.vue';
 import { useToast } from '@/composables/useToast';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { UPDATE_SERVER_CONFIG, REFRESH_PLUGINS } from '@/graphQLData/admin/mutations';
@@ -95,8 +94,6 @@ const refreshPlugins = async () => {
 
 <template>
   <div class="space-y-4 sm:space-y-5">
-    <PluginsTabs />
-
     <div v-if="serverLoading" class="py-8 text-center">
       <div class="inline-flex items-center">
         <i class="fa-solid fa-spinner mr-2 animate-spin" />

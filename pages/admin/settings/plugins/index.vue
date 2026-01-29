@@ -2,7 +2,6 @@
 import { ref, computed, onMounted } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
-import PluginsTabs from '@/components/admin/PluginsTabs.vue';
 import { useToast } from '@/composables/useToast';
 import {
   ALLOW_PLUGIN,
@@ -268,8 +267,6 @@ onMounted(() => {
 
 <template>
   <div class="space-y-4 sm:space-y-5">
-    <PluginsTabs />
-
     <!-- Plugin Management Section -->
     <FormRow section-title="Plugin Management">
       <template #content>

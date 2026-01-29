@@ -133,10 +133,10 @@ const getCurrentTabLabel = computed(() => {
 
       <TailwindForm
         v-if="formValues && editMode"
-        form-title="Server Settings"
         :loading="editServerLoading"
         :needs-changes="false"
         :show-cancel-button="false"
+        :show-buttons-in-header="false"
         @submit="emit('submit')"
       >
         <div class="mt-5 w-full">
@@ -197,12 +197,9 @@ const getCurrentTabLabel = computed(() => {
                 v-if="isDropdownOpen"
                 class="absolute z-10 mt-1 w-full rounded-md border bg-white shadow-lg dark:bg-gray-800"
               >
-                <li
-                  v-for="tab in tabs"
-                  :key="tab.key"
-                >
+                <li v-for="tab in tabs" :key="tab.key">
                   <router-link
-                    class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    class="flex items-center py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                     :class="{
                       'bg-gray-50 text-orange-500 dark:bg-gray-700':
                         typeof route.name === 'string' &&
