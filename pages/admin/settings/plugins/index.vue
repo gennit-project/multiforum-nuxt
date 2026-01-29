@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import type { PropType } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
+import PluginsTabs from '@/components/admin/PluginsTabs.vue';
 import { useToast } from '@/composables/useToast';
 import {
-  REFRESH_PLUGINS,
   ALLOW_PLUGIN,
   DISALLOW_PLUGIN,
 } from '@/graphQLData/admin/mutations';
@@ -14,11 +13,7 @@ import {
   GET_INSTALLED_PLUGINS,
 } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
-import type {
-  ServerConfigUpdateInput,
-  Plugin,
-  PluginVersion,
-} from '@/__generated__/graphql';
+import type { Plugin, PluginVersion } from '@/__generated__/graphql';
 
 // Toast notifications
 const toast = useToast();
@@ -32,23 +27,6 @@ const searchQuery = ref('');
 const statusFilter = ref<'all' | 'available' | 'allowed' | 'installed' | 'enabled'>('all');
 const sortBy = ref<'name' | 'status'>('name');
 const sortDirection = ref<'asc' | 'desc'>('asc');
-
-const props = defineProps({
-  editMode: {
-    type: Boolean,
-    required: false,
-    default: true,
-  },
-  formValues: {
-    type: Object as PropType<ServerConfigUpdateInput | null>,
-    required: false,
-    default: null,
-  },
-});
-
-const emit = defineEmits(['updateFormValues']);
-
-const newRegistry = ref('');
 
 // Plugin state interface
 interface PluginState {
@@ -238,59 +216,9 @@ const toggleSort = (field: 'name' | 'status') => {
   }
 };
 
-const {
-  mutate: refreshPluginsMutation,
-  loading: refreshPluginsLoading,
-  error: refreshPluginsError,
-} = useMutation(REFRESH_PLUGINS);
-
-const pluginRegistries = computed({
-  get: () => {
-    if (!props.formValues) return [];
-    return (props.formValues.pluginRegistries || []).filter(
-      (r): r is string => r !== null
-    );
-  },
-  set: (value: string[]) => {
-    if (props.formValues) {
-      emit('updateFormValues', { pluginRegistries: value });
-    }
-  },
-});
-
-const addRegistry = () => {
-  if (newRegistry.value.trim()) {
-    const currentRegistries = [...pluginRegistries.value];
-    if (!currentRegistries.includes(newRegistry.value.trim())) {
-      currentRegistries.push(newRegistry.value.trim());
-      pluginRegistries.value = currentRegistries;
-    }
-    newRegistry.value = '';
-  }
-};
-
-const removeRegistry = (index: number) => {
-  const currentRegistries = [...pluginRegistries.value];
-  currentRegistries.splice(index, 1);
-  pluginRegistries.value = currentRegistries;
-};
-
 // Plugin management mutations
 const { mutate: allowPluginMutation } = useMutation(ALLOW_PLUGIN);
 const { mutate: disallowPluginMutation } = useMutation(DISALLOW_PLUGIN);
-
-const refreshPlugins = async () => {
-  try {
-    await refreshPluginsMutation();
-    // Refetch plugin management data to get updated data
-    await refetchPluginManagement();
-    // Also refetch installed plugins
-    await refetchInstalledPlugins();
-    toast.success('Plugins refreshed successfully');
-  } catch (err: any) {
-    toast.error(`Error refreshing plugins: ${err.message}`);
-  }
-};
 
 const allowPlugin = async (pluginId: string) => {
   allowingPluginIds.value.add(pluginId);
@@ -340,103 +268,7 @@ onMounted(() => {
 
 <template>
   <div class="space-y-4 sm:space-y-5">
-    <FormRow section-title="Plugin Registries">
-      <template #content>
-        <div class="my-3 space-y-4">
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            Configure plugin registries to allow plugins to be installed on your
-            server.
-          </p>
-
-          <!-- Current Registries -->
-          <div class="space-y-2">
-            <h4 class="text-sm font-medium text-gray-900 dark:text-white">
-              Current Registries ({{ pluginRegistries.length }})
-            </h4>
-            <div v-if="pluginRegistries.length > 0" class="space-y-2">
-              <div
-                v-for="(registry, index) in pluginRegistries"
-                :key="index"
-                class="flex items-center justify-between rounded-md border border-gray-300 px-3 py-2 dark:border-gray-600"
-              >
-                <span class="text-sm text-gray-900 dark:text-white">
-                  {{ registry }}
-                </span>
-                <button
-                  type="button"
-                  class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                  @click="removeRegistry(index)"
-                >
-                  <i class="fa-solid fa-times" /> Remove
-                </button>
-              </div>
-            </div>
-            <div v-else class="text-sm text-gray-500 dark:text-gray-400">
-              No plugin registries configured yet.
-            </div>
-          </div>
-
-          <!-- Add New Registry -->
-          <div class="space-y-2">
-            <h4 class="text-sm font-medium text-gray-900 dark:text-white">
-              Add New Registry
-            </h4>
-            <div class="flex space-x-2">
-              <input
-                v-model="newRegistry"
-                type="url"
-                placeholder="https://registry.example.com"
-                class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                @keyup.enter="addRegistry"
-              >
-              <button
-                type="button"
-                class="rounded-md bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-                :disabled="!newRegistry.trim()"
-                @click="addRegistry"
-              >
-                Add
-              </button>
-            </div>
-          </div>
-
-          <!-- Refresh Plugins -->
-          <div class="border-t border-gray-200 pt-4 dark:border-gray-700">
-            <div class="flex items-center justify-between">
-              <div>
-                <h4 class="text-sm font-medium text-gray-900 dark:text-white">
-                  Plugin Discovery
-                </h4>
-                <p class="text-xs text-gray-600 dark:text-gray-400">
-                  Refresh to discover new plugins from configured registries
-                </p>
-              </div>
-              <button
-                type="button"
-                class="rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
-                :disabled="refreshPluginsLoading"
-                @click="refreshPlugins"
-              >
-                <i
-                  class="fa-solid fa-refresh mr-2"
-                  :class="{ 'animate-spin': refreshPluginsLoading }"
-                />
-                {{
-                  refreshPluginsLoading ? 'Refreshing...' : 'Refresh Plugins'
-                }}
-              </button>
-            </div>
-
-            <div
-              v-if="refreshPluginsError"
-              class="mt-2 text-sm text-red-600 dark:text-red-400"
-            >
-              Error refreshing plugins: {{ refreshPluginsError.message }}
-            </div>
-          </div>
-        </div>
-      </template>
-    </FormRow>
+    <PluginsTabs />
 
     <!-- Plugin Management Section -->
     <FormRow section-title="Plugin Management">
@@ -448,14 +280,14 @@ onMounted(() => {
             </p>
             <div class="flex items-center space-x-2">
               <NuxtLink
-                to="/admin/settings/plugins/docs"
+                to="/admin/plugins/docs"
                 class="inline-flex items-center rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
               >
                 <i class="fa-solid fa-book mr-2" />
                 Documentation
               </NuxtLink>
               <NuxtLink
-                to="/admin/settings/plugins/pipelines"
+                to="/admin/plugins/pipelines"
                 class="inline-flex items-center rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
               >
                 <i class="fa-solid fa-diagram-project mr-2" />
@@ -583,7 +415,7 @@ onMounted(() => {
                     class="text-base font-medium text-gray-900 dark:text-white"
                   >
                     <NuxtLink
-                      :to="`/admin/settings/plugins/${plugin.id}`"
+                      :to="`/admin/plugins/${plugin.id}`"
                       class="text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300"
                     >
                       {{ plugin.name }}
@@ -669,7 +501,7 @@ onMounted(() => {
                   <!-- Allowed Plugin Actions -->
                   <template v-else-if="plugin.status === 'allowed'">
                     <NuxtLink
-                      :to="`/admin/settings/plugins/${plugin.id}`"
+                      :to="`/admin/plugins/${plugin.id}`"
                       class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                     >
                       Install
@@ -697,14 +529,14 @@ onMounted(() => {
                   >
                     <NuxtLink
                       v-if="plugin.hasUpdate"
-                      :to="`/admin/settings/plugins/${plugin.id}?update=true`"
+                      :to="`/admin/plugins/${plugin.id}?update=true`"
                       class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                     >
                       <i class="fa-solid fa-arrow-up mr-1" />
                       Update
                     </NuxtLink>
                     <NuxtLink
-                      :to="`/admin/settings/plugins/${plugin.id}`"
+                      :to="`/admin/plugins/${plugin.id}`"
                       class="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
                       Manage
@@ -721,13 +553,13 @@ onMounted(() => {
               <i class="fa-solid fa-puzzle-piece mb-3 text-4xl text-gray-300 dark:text-gray-600" />
               <p class="text-lg font-medium">No plugins available yet</p>
               <p class="mt-2 text-sm">
-                Add a plugin registry above and click "Refresh Plugins" to discover available plugins.
+                Add a plugin registry in the Registries tab and refresh plugins.
               </p>
               <div class="mt-4 text-xs">
                 <p class="font-medium">Getting started:</p>
                 <ol class="mt-2 list-inside list-decimal text-left inline-block">
-                  <li>Add a plugin registry URL in the section above</li>
-                  <li>Click "Refresh Plugins" to fetch available plugins</li>
+                  <li>Add a plugin registry URL in the Registries tab</li>
+                  <li>Refresh plugins to fetch available entries</li>
                   <li>Allow plugins you want to use on your server</li>
                   <li>Install and configure each plugin</li>
                 </ol>

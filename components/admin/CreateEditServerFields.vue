@@ -79,12 +79,6 @@ const tabs = [
     icon: DownloadIcon,
     fontAwesome: null,
   },
-  {
-    key: 'plugins',
-    label: 'Plugins',
-    icon: null,
-    fontAwesome: 'fa-solid fa-plug',
-  },
 ];
 
 const isDropdownOpen = ref(false);

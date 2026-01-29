@@ -10,9 +10,10 @@ export const CATS_FORUM = `${baseUrl}/forums/cats/discussions`;
 export const CATS_FORUM_EVENTS = `${baseUrl}/forums/cats/events`;
 export const ADMIN_ISSUES = `${baseUrl}/admin/issues`;
 export const CHANNEL_ISSUES = `${baseUrl}/forums/cats/issues`;
-export const PLUGIN_MANAGEMENT = `${baseUrl}/admin/settings/plugins`;
-export const PLUGIN_DOCS = `${baseUrl}/admin/settings/plugins/docs`;
-export const PLUGIN_PIPELINES = `${baseUrl}/admin/settings/plugins/pipelines`;
+export const PLUGIN_MANAGEMENT = `${baseUrl}/admin/plugins`;
+export const PLUGIN_DOCS = `${baseUrl}/admin/plugins/docs`;
+export const PLUGIN_PIPELINES = `${baseUrl}/admin/plugins/pipelines`;
+export const PLUGIN_REGISTRIES = `${baseUrl}/admin/plugins/registries`;
 
 export const getConstantsForCypress = (baseUrl: string) => {
   // Cypress can't use the environment variables in the same way,
@@ -28,8 +29,9 @@ export const getConstantsForCypress = (baseUrl: string) => {
     ADMIN_ISSUES: `${baseUrl}/admin/issues`,
     CHANNEL_ISSUES: `${baseUrl}/forums/cats/issues`,
     CATS_FORUM_EVENTS: `${baseUrl}/forums/cats/events`,
-    PLUGIN_MANAGEMENT: `${baseUrl}/admin/settings/plugins`,
-    PLUGIN_DOCS: `${baseUrl}/admin/settings/plugins/docs`,
-    PLUGIN_PIPELINES: `${baseUrl}/admin/settings/plugins/pipelines`,
+    PLUGIN_MANAGEMENT: `${baseUrl}/admin/plugins`,
+    PLUGIN_DOCS: `${baseUrl}/admin/plugins/docs`,
+    PLUGIN_PIPELINES: `${baseUrl}/admin/plugins/pipelines`,
+    PLUGIN_REGISTRIES: `${baseUrl}/admin/plugins/registries`,
   };
 };
