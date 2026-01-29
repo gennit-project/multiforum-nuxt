@@ -57,6 +57,7 @@ function handleCancel() {
     <div>
       <div class="flex justify-between">
         <h2
+          v-if="props.formTitle"
           class="pt-3 text-xl font-bold leading-7 text-gray-900 dark:text-gray-100"
         >
           {{ props.formTitle }}

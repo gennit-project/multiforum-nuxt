@@ -4,7 +4,7 @@ import type { PluginField } from '@/types/pluginForms';
 
 const props = defineProps<{
   field: PluginField;
-  modelValue: string;
+  modelValue: string | undefined;
   error?: string;
 }>();
 

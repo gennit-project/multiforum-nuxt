@@ -54,6 +54,7 @@ function getFieldComponent(field: PluginField) {
     case 'number':
       return PluginNumberField;
     case 'boolean':
+    case 'toggle':
       return PluginBooleanField;
     case 'select':
       return PluginSelectField;

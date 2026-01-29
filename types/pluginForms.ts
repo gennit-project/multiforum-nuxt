@@ -16,7 +16,7 @@ export interface PluginFieldOption {
 
 export interface PluginField {
   key: string;
-  type: 'text' | 'number' | 'boolean' | 'select' | 'secret' | 'textarea';
+  type: 'text' | 'number' | 'boolean' | 'toggle' | 'select' | 'secret' | 'textarea';
   label: string;
   description?: string;
   default?: string | number | boolean;

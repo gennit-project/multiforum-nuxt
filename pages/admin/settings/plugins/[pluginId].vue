@@ -9,7 +9,10 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import PluginSettingsForm from '@/components/plugins/PluginSettingsForm.vue';
 import { useToast } from '@/composables/useToast';
 import { compareVersionStrings } from '@/utils/versionUtils';
-import type { PluginFormSection, PluginSecretStatus as PluginSecretStatusType } from '@/types/pluginForms';
+import type {
+  PluginFormSection,
+  PluginSecretStatus as PluginSecretStatusType,
+} from '@/types/pluginForms';
 import {
   GET_AVAILABLE_PLUGINS,
   GET_INSTALLED_PLUGINS,
@@ -100,10 +103,10 @@ const {
 } = useQuery(GET_SERVER_PLUGIN_SECRETS, { pluginId });
 
 // Query for plugin detail including version README (for non-installed plugins)
-const {
-  result: pluginDetailResult,
-  loading: pluginDetailLoading,
-} = useQuery(GET_PLUGIN_DETAIL, { pluginId });
+const { result: pluginDetailResult, loading: pluginDetailLoading } = useQuery(
+  GET_PLUGIN_DETAIL,
+  { pluginId }
+);
 
 // Mutations
 const { mutate: installMutation, loading: installing } = useMutation(
@@ -124,7 +127,9 @@ const plugin = computed(() => {
 
 const installedPlugin = computed((): InstalledPlugin | null => {
   const installed = installedResult.value?.getInstalledPlugins || [];
-  return installed.find((p: InstalledPlugin) => p.plugin.id === pluginId) || null;
+  return (
+    installed.find((p: InstalledPlugin) => p.plugin.id === pluginId) || null
+  );
 });
 
 const secrets = computed((): PluginSecretStatus[] => {
@@ -136,14 +141,18 @@ const isEnabled = computed(() => installedPlugin.value?.enabled ?? false);
 
 // Plugin metadata computed properties
 const pluginDisplayName = computed(() => {
-  return installedPlugin.value?.plugin?.displayName ||
-         plugin.value?.displayName ||
-         plugin.value?.name ||
-         pluginId;
+  return (
+    installedPlugin.value?.plugin?.displayName ||
+    plugin.value?.displayName ||
+    plugin.value?.name ||
+    pluginId
+  );
 });
 
 const pluginDescription = computed(() => {
-  return installedPlugin.value?.plugin?.description || plugin.value?.description;
+  return (
+    installedPlugin.value?.plugin?.description || plugin.value?.description
+  );
 });
 
 const pluginAuthorName = computed(() => {
@@ -208,7 +217,7 @@ const serverSettingsSections = computed((): PluginFormSection[] => {
 
 // Convert secrets array to the format expected by PluginSecretField
 const secretStatusesForForm = computed((): PluginSecretStatusType[] => {
-  return secrets.value.map(s => ({
+  return secrets.value.map((s) => ({
     key: s.key,
     status: s.status,
     lastValidatedAt: s.lastValidatedAt,
@@ -219,7 +228,9 @@ const secretStatusesForForm = computed((): PluginSecretStatusType[] => {
 const pluginRepoUrl = computed(() => {
   // Get repo URL from the installed version or manifest
   const versions = plugin.value?.Versions || [];
-  const currentVersion = versions.find((v: any) => v.version === installedVersion.value);
+  const currentVersion = versions.find(
+    (v: any) => v.version === installedVersion.value
+  );
   return currentVersion?.repoUrl;
 });
 
@@ -256,7 +267,9 @@ const hasNewerVersions = computed(() => {
 // Version update info from backend
 const hasUpdate = computed(() => installedPlugin.value?.hasUpdate ?? false);
 const latestVersion = computed(() => installedPlugin.value?.latestVersion);
-const registryVersions = computed(() => installedPlugin.value?.availableVersions || []);
+const registryVersions = computed(
+  () => installedPlugin.value?.availableVersions || []
+);
 
 // Check for ?update=true query param to auto-select latest version
 const shouldAutoUpdate = computed(() => route.query.update === 'true');
@@ -353,14 +366,25 @@ const handleInstall = async (versionOverride?: string) => {
     console.error('Install error:', err);
     const errorMessage = err.message || '';
 
-    if (errorMessage.includes('PLUGIN_VERSION_NOT_FOUND') || errorMessage.includes('not found in registry')) {
-      installError.value = 'Plugin version not found in registry. Please check that this version exists in the configured plugin registry.';
-    } else if (errorMessage.includes('INTEGRITY_MISMATCH') || errorMessage.includes('SHA-256 mismatch') || errorMessage.includes('integrity verification failed')) {
-      installError.value = 'Plugin tarball integrity check failed. The SHA-256 hash of the downloaded tarball does not match the hash in the registry. The registry may need to be updated with the correct hash.';
+    if (
+      errorMessage.includes('PLUGIN_VERSION_NOT_FOUND') ||
+      errorMessage.includes('not found in registry')
+    ) {
+      installError.value =
+        'Plugin version not found in registry. Please check that this version exists in the configured plugin registry.';
+    } else if (
+      errorMessage.includes('INTEGRITY_MISMATCH') ||
+      errorMessage.includes('SHA-256 mismatch') ||
+      errorMessage.includes('integrity verification failed')
+    ) {
+      installError.value =
+        'Plugin tarball integrity check failed. The SHA-256 hash of the downloaded tarball does not match the hash in the registry. The registry may need to be updated with the correct hash.';
     } else if (errorMessage.includes('Failed to fetch plugin registry')) {
-      installError.value = 'Could not connect to the plugin registry. Please check that the registry URL is correct and accessible.';
+      installError.value =
+        'Could not connect to the plugin registry. Please check that the registry URL is correct and accessible.';
     } else if (errorMessage.includes('Failed to download tarball')) {
-      installError.value = 'Could not download the plugin tarball. Please check that the tarball URL in the registry is correct and accessible.';
+      installError.value =
+        'Could not download the plugin tarball. Please check that the tarball URL in the registry is correct and accessible.';
     } else {
       installError.value = `Installation failed: ${errorMessage || 'Unknown error'}`;
     }
@@ -560,7 +584,9 @@ const getSecretStatusText = (status: string) => {
               </div>
 
               <!-- Author and License -->
-              <div class="mt-1 flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+              <div
+                class="mt-1 flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400"
+              >
                 <span v-if="pluginAuthorName">
                   by
                   <a
@@ -574,7 +600,11 @@ const getSecretStatusText = (status: string) => {
                   </a>
                   <span v-else>{{ pluginAuthorName }}</span>
                 </span>
-                <span v-if="pluginAuthorName && pluginLicense" class="text-gray-400">•</span>
+                <span
+                  v-if="pluginAuthorName && pluginLicense"
+                  class="text-gray-400"
+                  >•</span
+                >
                 <span
                   v-if="pluginLicense"
                   class="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium dark:bg-gray-700"
@@ -616,7 +646,10 @@ const getSecretStatusText = (status: string) => {
               </div>
 
               <!-- Tags -->
-              <div v-if="pluginTags.length > 0" class="mt-3 flex flex-wrap gap-2">
+              <div
+                v-if="pluginTags.length > 0"
+                class="mt-3 flex flex-wrap gap-2"
+              >
                 <span
                   v-for="tag in pluginTags"
                   :key="tag"
@@ -654,20 +687,24 @@ const getSecretStatusText = (status: string) => {
           <!-- Update Available Banner -->
           <div
             v-if="hasUpdate && latestVersion"
-            class="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20"
+            class="bg-blue-50 rounded-lg border border-blue-200 p-4 dark:border-blue-800 dark:bg-blue-900/20"
           >
             <div class="flex items-start">
               <div class="flex-shrink-0">
                 <i class="fa-solid fa-arrow-circle-up text-xl text-blue-500" />
               </div>
               <div class="ml-3 flex-1">
-                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+                <h3
+                  class="text-sm font-medium text-blue-800 dark:text-blue-200"
+                >
                   Update Available
                 </h3>
                 <div class="mt-1 text-sm text-blue-700 dark:text-blue-300">
                   <p>
                     A newer version is available:
-                    <span class="font-semibold font-mono">v{{ latestVersion }}</span>
+                    <span class="font-semibold font-mono"
+                      >v{{ latestVersion }}</span
+                    >
                     (currently installed: v{{ installedVersion }})
                   </p>
                   <p v-if="registryVersions.length > 1" class="mt-1 text-xs">
@@ -682,7 +719,10 @@ const getSecretStatusText = (status: string) => {
                   :disabled="installing"
                   @click="handleInstall(latestVersion!)"
                 >
-                  <i v-if="installing" class="fa-solid fa-spinner mr-1 animate-spin" />
+                  <i
+                    v-if="installing"
+                    class="fa-solid fa-spinner mr-1 animate-spin"
+                  />
                   <i v-else class="fa-solid fa-arrow-up mr-1" />
                   Update to v{{ latestVersion }}
                 </button>
@@ -757,7 +797,17 @@ const getSecretStatusText = (status: string) => {
                         :key="version.version"
                         :value="version.version"
                       >
-                        v{{ version.version }}{{ version.version === installedVersion ? ' (Installed)' : '' }}{{ version.version === latestVersion && version.version !== installedVersion ? ' (Latest)' : '' }}
+                        v{{ version.version
+                        }}{{
+                          version.version === installedVersion
+                            ? ' (Installed)'
+                            : ''
+                        }}{{
+                          version.version === latestVersion &&
+                          version.version !== installedVersion
+                            ? ' (Latest)'
+                            : ''
+                        }}
                       </option>
                     </select>
 
@@ -852,7 +902,7 @@ const getSecretStatusText = (status: string) => {
                             (e.target as HTMLInputElement).checked
                           )
                       "
-                    >
+                    />
                     <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
                       {{ isEnabled ? 'Enabled' : 'Disabled' }}
                     </span>
@@ -908,7 +958,7 @@ const getSecretStatusText = (status: string) => {
                       type="password"
                       placeholder="Enter secret value"
                       class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    >
+                    />
                     <div class="flex space-x-2">
                       <button
                         type="button"
@@ -1005,7 +1055,9 @@ const getSecretStatusText = (status: string) => {
                   @validate-secret="handleValidateSecretFromForm"
                 />
 
-                <div class="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div
+                  class="flex justify-end border-t border-gray-200 pt-4 dark:border-gray-700"
+                >
                   <button
                     type="button"
                     class="rounded-md bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
@@ -1024,19 +1076,27 @@ const getSecretStatusText = (status: string) => {
           </FormRow>
 
           <!-- README Section -->
-          <FormRow v-if="pluginReadme || pluginDetailLoading" section-title="Documentation">
+          <FormRow
+            v-if="pluginReadme || pluginDetailLoading"
+            section-title="Documentation"
+          >
             <template #content>
-              <div v-if="pluginDetailLoading && !pluginReadme" class="py-4 text-center">
-                <div class="inline-flex items-center text-gray-600 dark:text-gray-400">
+              <div
+                v-if="pluginDetailLoading && !pluginReadme"
+                class="py-4 text-center"
+              >
+                <div
+                  class="inline-flex items-center text-gray-600 dark:text-gray-400"
+                >
                   <i class="fa-solid fa-spinner mr-2 animate-spin" />
                   Loading documentation...
                 </div>
               </div>
-              <div v-else class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
-                <MarkdownRenderer
-                  :text="pluginReadme"
-                  font-size="small"
-                />
+              <div
+                v-else
+                class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800"
+              >
+                <MarkdownRenderer :text="pluginReadme" font-size="small" />
               </div>
             </template>
           </FormRow>
