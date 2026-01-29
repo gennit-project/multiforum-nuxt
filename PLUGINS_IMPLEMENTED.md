@@ -328,6 +328,12 @@ Displays both server and channel pipeline results in the download sidebar:
 
 ## Plugins Repository (multiforum-plugins)
 
+### Release Model (Plugin-Scoped)
+
+- Each plugin is versioned independently via its `plugin.json.version`.
+- Releases are tagged per plugin (recommended: `<plugin-id>@<version>`).
+- Registries may host any subset of plugins and should preserve older versions.
+
 ### Available Plugins
 
 1. **hello-world** - Demo plugin for testing
@@ -339,8 +345,8 @@ Displays both server and channel pipeline results in the download sidebar:
    - Ready for implementation of actual labeling logic
 
 ### CI/CD Pipeline
-- GitHub Actions workflow for building and publishing
-- Automatic registry generation
+- GitHub Actions workflow for building and publishing (plugin-scoped releases)
+- Registry merging (preserves existing plugins and older versions)
 - GCS deployment for plugin artifacts
 - Deterministic tarball bundling
 - SHA256 integrity hashes

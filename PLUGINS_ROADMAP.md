@@ -102,6 +102,12 @@ When a video game mod is uploaded and submitted to a channel:
 
 ## Technical Considerations
 
+### Registry Publishing Model (Plugin-Scoped)
+
+- Each plugin release is versioned independently in its own `plugin.json`.
+- Registries should merge new versions without removing other plugins or older versions.
+- Multiple registries are supported; servers may point to different registries for different plugin catalogs.
+
 ### Permission Model
 
 **Server Pipeline Configuration**:
