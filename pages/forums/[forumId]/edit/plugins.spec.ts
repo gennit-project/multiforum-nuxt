@@ -66,10 +66,12 @@ describe('Forum Plugins Page', () => {
         plugins: [createTestingPinia()],
         stubs: {
           FormRow: {
+            name: 'FormRow',
             template: '<div class="form-row"><slot name="content" /></div>',
             props: ['sectionTitle', 'description'],
           },
           PluginSettingsForm: {
+            name: 'PluginSettingsForm',
             template: '<div class="plugin-settings-form" />',
             props: ['sections', 'modelValue'],
           },
