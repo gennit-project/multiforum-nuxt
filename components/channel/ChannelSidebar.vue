@@ -3,13 +3,6 @@ import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 import Tag from '@/components/TagComponent.vue';
 import type { Channel } from '@/__generated__/graphql';
-
-type BotSummary = {
-  username: string;
-  displayName?: string | null;
-  botProfileId?: string | null;
-  isDeprecated?: boolean | null;
-};
 import ChannelRules from '@/components/channel/Rules.vue';
 import SidebarEventList from '@/components/channel/SidebarEventList.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
@@ -18,6 +11,13 @@ import FontSizeControl from '@/components/channel/FontSizeControl.vue';
 import BecomeAdminModal from '@/components/channel/BecomeAdminModal.vue';
 import AddToChannelFavorites from '@/components/favorites/AddToChannelFavorites.vue';
 import { isAuthenticatedVar } from '@/cache';
+
+type BotSummary = {
+  username: string;
+  displayName?: string | null;
+  botProfileId?: string | null;
+  isDeprecated?: boolean | null;
+};
 
 const props = defineProps({
   channel: {

@@ -1,5 +1,5 @@
 export default defineNuxtPlugin(async () => {
-  if (!process.dev || !process.client) {
+  if (!import.meta.dev || !import.meta.client) {
     return;
   }
 

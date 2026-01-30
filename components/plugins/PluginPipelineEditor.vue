@@ -18,6 +18,7 @@ const props = withDefaults(
     scope?: PipelineScope;
   }>(),
   {
+    initialConfig: undefined,
     scope: 'server',
   }
 );

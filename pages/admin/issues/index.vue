@@ -124,8 +124,8 @@ watch(
       />
       <div class="flex items-center justify-end">
         <input
-          type="checkbox"
           id="show-only-server-rule-violations"
+          type="checkbox"
           :checked="showOnlyServerRuleViolations"
           class="mr-2"
           data-testid="show-only-server-rule-violations"

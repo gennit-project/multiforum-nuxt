@@ -386,8 +386,8 @@ const applyBotSuggestion = (value: string) => {
           @submit.prevent="handleCreateComment"
         >
           <textarea
-            data-testid="discussion-inline-comment"
             ref="inlineTextarea"
+            data-testid="discussion-inline-comment"
             class="bg-transparent min-h-[44px] flex-1 resize-none text-sm text-gray-900 placeholder-gray-500 outline-none focus:outline-none focus:ring-0 focus-visible:outline-none dark:text-gray-100 dark:placeholder-gray-400"
             name="discussionInlineComment"
             :rows="1"
