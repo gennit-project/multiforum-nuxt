@@ -229,15 +229,13 @@ const hasActiveDownloadFilters = computed(() => {
           </template>
         </FilterChip>
 
-        <div class="flex items-center gap-2 text-sm">
+        <div class="text-sm">
           <CheckBox
             data-testid="show-archived-downloads"
             :checked="filterValues.showArchived"
+            :label="'Show archived downloads'"
             @input="updateShowArchived"
           />
-          <label class="cursor-pointer" @click="updateShowArchived">
-            Show archived downloads
-          </label>
         </div>
       </div>
     </div>
@@ -265,13 +263,13 @@ const hasActiveDownloadFilters = computed(() => {
           </div>
         </template>
       </FilterChip>
-      <div class="flex items-center gap-2 pr-2 text-sm">
+      <div class="pr-2 text-sm">
         <CheckBox
           data-testid="show-archived-downloads"
           :checked="filterValues.showArchived"
+          :label="'Show archived downloads'"
           @input="updateShowArchived"
         />
-        Show archived downloads
       </div>
     </div>
   </div>

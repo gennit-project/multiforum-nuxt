@@ -169,6 +169,7 @@ const handleImageChange = async (input: FileChangeInput) => {
             :disabled="true"
             :value="formValues.uniqueName"
             :placeholder="'Add unique name with no spaces. Ex. forum_name'"
+            :aria-label="'Forum unique name'"
             :full-width="true"
           />
         </template>
@@ -181,6 +182,7 @@ const handleImageChange = async (input: FileChangeInput) => {
             :test-id="'display-name-input'"
             :value="formValues.displayName"
             :placeholder="'A more human readable display name'"
+            :aria-label="'Forum display name'"
             :full-width="true"
             @update="$emit('updateFormValues', { displayName: $event })"
           />
@@ -264,17 +266,13 @@ const handleImageChange = async (input: FileChangeInput) => {
           <h3 class="mb-3 text-lg font-medium text-red-600 dark:text-red-400">
             Dangerous Settings
           </h3>
-          <div class="align-items mt-4 flex gap-2">
+          <div class="align-items mt-4">
             <CheckBox
               :test-id="'lock-forum-checkbox'"
               :checked="formValues.locked"
+              :label="'Lock Forum'"
               @update="$emit('updateFormValues', { locked: $event })"
             />
-            <label
-              class="text-sm text-gray-600 dark:text-gray-400"
-              for="lock-forum-checkbox"
-              >Lock Forum</label
-            >
           </div>
           <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
             Locking a forum will prevent users from creating new threads or

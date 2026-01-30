@@ -590,15 +590,12 @@ const updateShowArchived = (event: Event) => {
         v-if="toggleShowArchivedEnabled"
         class="flex flex-wrap items-center justify-start gap-4 py-2 dark:text-gray-300"
       >
-        <label class="flex items-center gap-2">
-          <CheckBox
-            :checked="filterValues.showArchived"
-            class="align-middle"
-            data-testid="show-archived-discussions"
-            @input="updateShowArchived"
-          />
-          <span>Show archived events</span>
-        </label>
+        <CheckBox
+          :checked="filterValues.showArchived"
+          data-testid="show-archived-discussions"
+          :label="'Show archived events'"
+          @input="updateShowArchived"
+        />
         <!-- Tags dropdown moved here -->
         <FilterChip
           class="items-center align-middle"

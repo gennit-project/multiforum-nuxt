@@ -113,21 +113,13 @@ const updateEventsEnabled = (enabled: boolean) => {
 
       <!-- Enable Events Section -->
       <div class="space-y-4">
-        <div class="flex items-center space-x-2">
+        <div>
           <CheckBox
             :checked="eventsEnabled"
             :disabled="eventCheckboxDisabled"
+            :label="'Enable calendar tab in this forum'"
             @update="updateEventsEnabled"
           />
-          <label
-            class="text-sm font-medium"
-            :class="{
-              'text-gray-900 dark:text-white': !eventCheckboxDisabled,
-              'text-gray-400 dark:text-gray-500': eventCheckboxDisabled,
-            }"
-          >
-            Enable calendar tab in this forum
-          </label>
         </div>
 
         <p class="text-sm text-gray-600 dark:text-gray-400">

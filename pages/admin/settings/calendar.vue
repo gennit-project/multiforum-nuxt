@@ -25,14 +25,12 @@ const emit = defineEmits(['updateFormValues']);
       <template #content>
         <div class="space-y-4">
           <!-- Enable Events Checkbox -->
-          <div class="flex items-center space-x-2">
+          <div>
             <CheckBox
               :checked="props.formValues?.enableEvents || false"
+              :label="'Enable events/calendar tab in individual forums'"
               @update="emit('updateFormValues', { enableEvents: $event })"
             />
-            <label class="text-sm font-medium text-gray-900 dark:text-white">
-              Enable events/calendar tab in individual forums
-            </label>
           </div>
 
           <p class="text-sm text-gray-600 dark:text-gray-400">

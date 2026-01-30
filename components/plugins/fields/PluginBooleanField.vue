@@ -40,6 +40,7 @@ const toggleValue = () => {
   <div class="space-y-1">
     <div class="flex items-center gap-3">
       <button
+        :id="field.key"
         type="button"
         role="switch"
         :aria-checked="inputValue"
