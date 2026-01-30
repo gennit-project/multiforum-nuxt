@@ -59,10 +59,7 @@ const formatPermissionName = (name: string) => {
 const updatingKey = (roleName: string, permission: string) =>
   `${roleName}-${permission}`;
 
-const isUpdating = (
-  roleName: string | null | undefined,
-  permission: string
-) => {
+const isUpdating = (roleName: string | null | undefined, permission: string) => {
   if (!roleName) return false;
   return updatingStates.value[updatingKey(roleName, permission)] ?? false;
 };
@@ -94,7 +91,8 @@ const onTogglePermission = async (
     });
   } catch {
     role[permission] = previousValue;
-    mutationError.value = 'Unable to save changes right now. Please try again.';
+    mutationError.value =
+      'Unable to save changes right now. Please try again.';
   } finally {
     updatingStates.value[key] = false;
   }
@@ -103,15 +101,15 @@ const onTogglePermission = async (
 
 <template>
   <div
-    class="dark:border-slate-800 dark:bg-slate-950 rounded-lg border border-gray-200 p-4 shadow-sm"
+    class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-slate-800"
   >
     <div class="mb-4 space-y-1">
-      <h2 class="font-semibold text-lg text-gray-900 dark:text-gray-100">
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
         Channel Mod Roles
       </h2>
       <p class="text-sm text-gray-600 dark:text-gray-300">
-        Toggle permissions (including edit permissions) for each
-        channel-specific mod role.
+        Toggle permissions (including edit permissions) for each channel-specific
+        mod role.
       </p>
     </div>
 
@@ -121,26 +119,21 @@ const onTogglePermission = async (
     <div v-else-if="error" class="text-sm text-red-600">
       Unable to load roles right now.
     </div>
-    <div
-      v-else-if="!sortedRoles.length"
-      class="text-sm text-gray-600 dark:text-gray-300"
-    >
+    <div v-else-if="!sortedRoles.length" class="text-sm text-gray-600 dark:text-gray-300">
       No moderator roles found.
     </div>
     <div v-else class="space-y-4">
       <div
         v-for="(role, roleIndex) in sortedRoles"
         :key="role.name ?? role.channelUniqueName ?? roleIndex"
-        class="bg-gray-50 dark:border-slate-800 dark:bg-slate-900 rounded-md border border-gray-200 p-4"
+        class="rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-slate-900/60"
       >
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div class="space-y-1">
-            <p
-              class="font-semibold text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
-            >
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
               Channel: {{ role.channelUniqueName || 'Server default' }}
             </p>
-            <h3 class="font-semibold text-base text-gray-900 dark:text-white">
+            <h3 class="text-base font-semibold text-gray-900 dark:text-white">
               {{ role.name }}
             </h3>
             <p class="text-sm text-gray-600 dark:text-gray-300">
@@ -149,7 +142,7 @@ const onTogglePermission = async (
           </div>
           <div
             v-if="isRoleUpdating(role.name)"
-            class="bg-amber-100 font-semibold text-amber-800 rounded px-2 py-1 text-xs"
+            class="rounded bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800"
           >
             Saving...
           </div>
@@ -159,7 +152,7 @@ const onTogglePermission = async (
           <label
             v-for="permission in permissionKeys"
             :key="permission"
-            class="dark:border-slate-700 dark:bg-slate-900 flex items-center justify-between rounded border border-gray-200 bg-white px-3 py-2 text-sm"
+            class="flex items-center justify-between rounded border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-slate-800"
             :data-test="`permission-${permission}`"
           >
             <span class="text-gray-800 dark:text-gray-100">
@@ -167,7 +160,7 @@ const onTogglePermission = async (
             </span>
             <input
               type="checkbox"
-              class="h-4 w-4 accent-blue-600 dark:accent-blue-400"
+              class="h-4 w-4 accent-blue-600"
               :checked="!!role[permission]"
               :disabled="loading || isUpdating(role.name, permission)"
               @change="

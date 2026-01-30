@@ -15,12 +15,10 @@ const props = defineProps<{
   modelValue: Record<string, any>;
   errors?: Record<string, string>;
   secretStatuses?: PluginSecretStatus[];
-  validatingSecrets?: Set<string>;
 }>();
 
 const emit = defineEmits<{
   'update:modelValue': [value: Record<string, any>];
-  'validateSecret': [key: string];
 }>();
 
 function updateFieldValue(key: string, value: any) {
@@ -40,10 +38,6 @@ function getFieldError(key: string): string | undefined {
 
 function getSecretStatus(key: string): PluginSecretStatus | undefined {
   return props.secretStatuses?.find((s) => s.key === key);
-}
-
-function isValidatingSecret(key: string): boolean {
-  return props.validatingSecrets?.has(key) ?? false;
 }
 
 function getFieldComponent(field: PluginField) {
@@ -74,9 +68,9 @@ function getFieldComponent(field: PluginField) {
       class="space-y-4"
     >
       <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+        <h4 class="text-base font-semibold text-gray-900 dark:text-white">
           {{ section.title }}
-        </h3>
+        </h4>
         <p
           v-if="section.description"
           class="mt-1 text-sm text-gray-500 dark:text-gray-400"
@@ -96,9 +90,7 @@ function getFieldComponent(field: PluginField) {
             :model-value="getFieldValue(field.key)"
             :error="getFieldError(field.key)"
             :secret-status="field.type === 'secret' ? getSecretStatus(field.key) : undefined"
-            :validating="field.type === 'secret' ? isValidatingSecret(field.key) : undefined"
             @update:model-value="updateFieldValue(field.key, $event)"
-            @validate="$emit('validateSecret', field.key)"
           />
         </template>
       </div>

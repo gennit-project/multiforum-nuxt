@@ -39148,11 +39148,9 @@ export type MutationCreateIssueArgs = {
   input: IssueCreateInput;
 };
 
-
 export type MutationCreateIssueInfosArgs = {
   input: Array<IssueInfoCreateInput>;
 };
-
 
 export type MutationCreateIssuesArgs = {
   input: Array<IssueCreateInput>;

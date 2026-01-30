@@ -22,6 +22,7 @@ export interface PluginField {
   default?: string | number | boolean;
   placeholder?: string;
   validation?: PluginFieldValidation;
+  required?: boolean;
   options?: PluginFieldOption[]; // For select fields
 }
 

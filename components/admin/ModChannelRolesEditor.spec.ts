@@ -71,15 +71,15 @@ describe('ModChannelRolesEditor', () => {
 
   it('renders permissions including edit permissions', () => {
     const wrapper = mount(ModChannelRolesEditor);
-    expect(
-      wrapper.find('[data-test="permission-canEditComments"]').exists()
-    ).toBe(true);
-    expect(
-      wrapper.find('[data-test="permission-canEditDiscussions"]').exists()
-    ).toBe(true);
-    expect(
-      wrapper.find('[data-test="permission-canEditEvents"]').exists()
-    ).toBe(true);
+    expect(wrapper.find('[data-test="permission-canEditComments"]').exists()).toBe(
+      true
+    );
+    expect(wrapper.find('[data-test="permission-canEditDiscussions"]').exists()).toBe(
+      true
+    );
+    expect(wrapper.find('[data-test="permission-canEditEvents"]').exists()).toBe(
+      true
+    );
   });
 
   it('calls mutation when toggling a permission', async () => {

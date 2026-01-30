@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import type { PluginField } from '@/types/pluginForms';
 
 const props = defineProps<{
@@ -12,17 +12,34 @@ const emit = defineEmits<{
   'update:modelValue': [value: string | number | boolean];
 }>();
 
+const touched = ref(false);
+
 const inputValue = computed({
   get: () => props.modelValue ?? props.field.default ?? '',
-  set: (value: string | number | boolean) => emit('update:modelValue', value),
+  set: (value: string | number | boolean) => {
+    if (!touched.value) {
+      touched.value = true;
+    }
+    emit('update:modelValue', value);
+  },
 });
 
 const validationAttrs = computed(() => {
   const attrs: Record<string, any> = {};
-  if (props.field.validation?.required) {
+  if (props.field.validation?.required || props.field.required) {
     attrs.required = true;
   }
   return attrs;
+});
+
+const validationError = computed(() => {
+  if (!touched.value) return '';
+  const required = props.field.validation?.required || props.field.required;
+  const value = props.modelValue ?? '';
+  if (required && (value === '' || value === undefined || value === null)) {
+    return `${props.field.label} is required`;
+  }
+  return '';
 });
 </script>
 
@@ -34,7 +51,7 @@ const validationAttrs = computed(() => {
     >
       {{ field.label }}
       <span
-        v-if="field.validation?.required"
+        v-if="field.validation?.required || field.required"
         class="text-red-500"
       >*</span>
     </label>
@@ -49,7 +66,7 @@ const validationAttrs = computed(() => {
       v-model="inputValue"
       v-bind="validationAttrs"
       class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-      :class="{ 'border-red-500': error }"
+      :class="{ 'border-red-500': error || validationError }"
     >
       <option
         v-if="field.placeholder"
@@ -67,10 +84,10 @@ const validationAttrs = computed(() => {
       </option>
     </select>
     <p
-      v-if="error"
+      v-if="error || validationError"
       class="text-xs text-red-600 dark:text-red-400"
     >
-      {{ error }}
+      {{ error || validationError }}
     </p>
   </div>
 </template>

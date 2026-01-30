@@ -23,7 +23,6 @@ import {
   INSTALL_PLUGIN_VERSION,
   ENABLE_SERVER_PLUGIN,
   SET_SERVER_PLUGIN_SECRET,
-  VALIDATE_SERVER_PLUGIN_SECRET,
 } from '@/graphQLData/admin/mutations';
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
@@ -43,7 +42,6 @@ const secretValues = ref<Record<string, string>>({});
 const showSecretInputs = ref<Record<string, boolean>>({});
 const settingsValues = ref<Record<string, any>>({});
 const settingsErrors = ref<Record<string, string>>({});
-const validatingSecrets = ref<Set<string>>(new Set());
 const savingSettings = ref(false);
 const installError = ref<string | null>(null);
 
@@ -115,9 +113,6 @@ const { mutate: installMutation, loading: installing } = useMutation(
 const { mutate: enableMutation, loading: enabling } =
   useMutation(ENABLE_SERVER_PLUGIN);
 const { mutate: setSecretMutation } = useMutation(SET_SERVER_PLUGIN_SECRET);
-const { mutate: validateSecretMutation } = useMutation(
-  VALIDATE_SERVER_PLUGIN_SECRET
-);
 
 // Computed
 const plugin = computed(() => {
@@ -251,6 +246,14 @@ const availableVersions = computed(() => {
 
 const installedVersion = computed(() => {
   return installedPlugin.value?.version;
+});
+
+const pluginSlug = computed(() => {
+  return (
+    installedPlugin.value?.plugin?.name ||
+    plugin.value?.name ||
+    ''
+  );
 });
 
 const isSelectedVersionInstalled = computed(() => {
@@ -393,10 +396,11 @@ const handleInstall = async (versionOverride?: string) => {
 
 const handleToggleEnabled = async (enabled: boolean) => {
   if (!installedPlugin.value) return;
+  if (!pluginSlug.value) return;
 
   try {
     await enableMutation({
-      pluginId,
+      pluginId: pluginSlug.value,
       version: installedPlugin.value.version,
       enabled,
       settingsJson: installedPlugin.value.settingsJson || {},
@@ -420,9 +424,11 @@ const handleToggleEnabled = async (enabled: boolean) => {
 };
 
 const handleSetSecret = async (key: string, value: string) => {
+  if (!pluginSlug.value) return;
+
   try {
     await setSecretMutation({
-      pluginId,
+      pluginId: pluginSlug.value,
       key,
       value,
     });
@@ -440,33 +446,10 @@ const handleSetSecret = async (key: string, value: string) => {
   }
 };
 
-const handleValidateSecret = async (key: string) => {
-  validatingSecrets.value.add(key);
-  try {
-    const result = await validateSecretMutation({
-      pluginId,
-      key,
-    });
-
-    if (result?.data?.validateServerPluginSecret?.isValid) {
-      toast.success(`Secret "${key}" is valid`);
-    } else {
-      const errorMsg =
-        result?.data?.validateServerPluginSecret?.error || 'Unknown error';
-      toast.error(`Secret validation failed: ${errorMsg}`);
-    }
-
-    // Refetch secrets to update status
-    await refetchSecrets();
-  } catch (err: any) {
-    toast.error(`Secret validation failed: ${err.message}`);
-  } finally {
-    validatingSecrets.value.delete(key);
-  }
-};
 
 const handleSaveSettings = async () => {
   if (!installedPlugin.value) return;
+  if (!pluginSlug.value) return;
 
   savingSettings.value = true;
   settingsErrors.value = {};
@@ -491,7 +474,7 @@ const handleSaveSettings = async () => {
     }
 
     await enableMutation({
-      pluginId,
+      pluginId: pluginSlug.value,
       version: installedPlugin.value.version,
       enabled: installedPlugin.value.enabled,
       settingsJson: settingsValues.value,
@@ -506,9 +489,6 @@ const handleSaveSettings = async () => {
   }
 };
 
-const handleValidateSecretFromForm = (key: string) => {
-  handleValidateSecret(key);
-};
 
 const getSecretStatusColor = (status: string) => {
   switch (status) {
@@ -872,9 +852,14 @@ const getSecretStatusText = (status: string) => {
           </FormRow>
 
           <!-- Enable/Disable Section -->
-          <FormRow v-if="isInstalled" section-title="Plugin Status">
+          <FormRow v-if="isInstalled" section-title="">
             <template #content>
               <div class="space-y-4">
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
+                  <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    Plugin Status
+                  </h2>
+                </div>
                 <div class="flex items-center justify-between">
                   <div>
                     <label
@@ -886,7 +871,7 @@ const getSecretStatusText = (status: string) => {
                       {{
                         canEnable
                           ? 'Plugin is ready to be enabled'
-                          : 'Set required secrets to enable'
+                          : 'Required secrets are not configured'
                       }}
                     </p>
                   </div>
@@ -902,9 +887,9 @@ const getSecretStatusText = (status: string) => {
                             (e.target as HTMLInputElement).checked
                           )
                       "
-                    />
+                    >
                     <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                      {{ isEnabled ? 'Enabled' : 'Disabled' }}
+                      {{ isEnabled ? 'Enabled' : 'Enable' }}
                     </span>
                     <i
                       v-if="enabling"
@@ -912,6 +897,10 @@ const getSecretStatusText = (status: string) => {
                     />
                   </label>
                 </div>
+                <ErrorBanner
+                  v-if="!canEnable"
+                  text="This plugin can’t be enabled until all required secrets are configured."
+                />
               </div>
             </template>
           </FormRow>
@@ -958,7 +947,7 @@ const getSecretStatusText = (status: string) => {
                       type="password"
                       placeholder="Enter secret value"
                       class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    />
+                    >
                     <div class="flex space-x-2">
                       <button
                         type="button"
@@ -996,31 +985,6 @@ const getSecretStatusText = (status: string) => {
                           : 'Update Secret'
                       }}
                     </button>
-                    <button
-                      v-if="secret.status !== 'NOT_SET'"
-                      type="button"
-                      class="rounded bg-blue-100 px-3 py-1 text-sm text-blue-700 hover:bg-blue-200 dark:bg-blue-800 dark:text-blue-300 dark:hover:bg-blue-700"
-                      @click="handleValidateSecret(secret.key)"
-                    >
-                      Test
-                    </button>
-                  </div>
-
-                  <!-- Validation Error -->
-                  <div
-                    v-if="secret.validationError"
-                    class="mt-2 text-sm text-red-600 dark:text-red-400"
-                  >
-                    {{ secret.validationError }}
-                  </div>
-
-                  <!-- Last Validated -->
-                  <div
-                    v-if="secret.lastValidatedAt"
-                    class="mt-2 text-xs text-gray-500 dark:text-gray-400"
-                  >
-                    Last validated:
-                    {{ new Date(secret.lastValidatedAt).toLocaleString() }}
                   </div>
                 </div>
               </div>
@@ -1038,21 +1002,24 @@ const getSecretStatusText = (status: string) => {
           <!-- Server Settings Section -->
           <FormRow
             v-if="isInstalled && serverSettingsSections.length > 0"
-            section-title="Server Settings"
+            section-title=""
           >
             <template #content>
               <div class="space-y-6">
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                  Configure server-wide settings for this plugin.
-                </p>
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
+                  <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    Server-Scoped Plugin Settings
+                  </h2>
+                  <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    Configure server-wide settings for this plugin.
+                  </p>
+                </div>
 
                 <PluginSettingsForm
                   v-model="settingsValues"
                   :sections="serverSettingsSections"
                   :errors="settingsErrors"
                   :secret-statuses="secretStatusesForForm"
-                  :validating-secrets="validatingSecrets"
-                  @validate-secret="handleValidateSecretFromForm"
                 />
 
                 <div

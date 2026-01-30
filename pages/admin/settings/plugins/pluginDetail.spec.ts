@@ -40,7 +40,6 @@ vi.mock('@/graphQLData/admin/mutations', () => ({
   INSTALL_PLUGIN_VERSION: 'mock-mutation',
   ENABLE_SERVER_PLUGIN: 'mock-mutation',
   SET_SERVER_PLUGIN_SECRET: 'mock-mutation',
-  VALIDATE_SERVER_PLUGIN_SECRET: 'mock-mutation',
 }));
 
 // Mock useToast
@@ -269,77 +268,6 @@ describe('Plugin Detail Page - Phase 6 Features', () => {
       });
     });
 
-    describe('handleValidateSecret', () => {
-      it('should show success toast when secret is valid', async () => {
-        const mockValidateMutation = vi.fn().mockResolvedValue({
-          data: {
-            validateServerPluginSecret: {
-              isValid: true,
-            },
-          },
-        });
-        const key = 'API_KEY';
-
-        const result = await mockValidateMutation({
-          pluginId: 'test-plugin',
-          key,
-        });
-
-        if (result?.data?.validateServerPluginSecret?.isValid) {
-          mockToast.success(`Secret "${key}" is valid`);
-        }
-
-        expect(mockToast.success).toHaveBeenCalledWith(
-          'Secret "API_KEY" is valid'
-        );
-      });
-
-      it('should show error toast when secret is invalid', async () => {
-        const mockValidateMutation = vi.fn().mockResolvedValue({
-          data: {
-            validateServerPluginSecret: {
-              isValid: false,
-              error: 'Invalid API key format',
-            },
-          },
-        });
-        const key = 'API_KEY';
-
-        const result = await mockValidateMutation({
-          pluginId: 'test-plugin',
-          key,
-        });
-
-        if (!result?.data?.validateServerPluginSecret?.isValid) {
-          const errorMsg =
-            result?.data?.validateServerPluginSecret?.error || 'Unknown error';
-          mockToast.error(`Secret validation failed: ${errorMsg}`);
-        }
-
-        expect(mockToast.error).toHaveBeenCalledWith(
-          'Secret validation failed: Invalid API key format'
-        );
-      });
-
-      it('should show error toast when validation throws', async () => {
-        const mockValidateMutation = vi
-          .fn()
-          .mockRejectedValue(new Error('Network error'));
-
-        try {
-          await mockValidateMutation({
-            pluginId: 'test-plugin',
-            key: 'API_KEY',
-          });
-        } catch (err: any) {
-          mockToast.error(`Secret validation failed: ${err.message}`);
-        }
-
-        expect(mockToast.error).toHaveBeenCalledWith(
-          'Secret validation failed: Network error'
-        );
-      });
-    });
   });
 
   describe('Enable Switch Visibility Logic', () => {
