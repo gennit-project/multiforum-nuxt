@@ -365,7 +365,7 @@ async function handleSave(plugin: any) {
               <p class="text-sm text-gray-600 dark:text-gray-400">
                 {{ plugin.plugin.description || 'No description provided.' }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-500">
+              <p class="text-xs text-gray-600 dark:text-gray-300">
                 Version {{ plugin.version }}
               </p>
             </div>
@@ -403,7 +403,7 @@ async function handleSave(plugin: any) {
           <div class="mt-4 flex justify-end">
             <button
               type="button"
-              class="rounded-md bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
+              class="rounded-md bg-orange-700 px-4 py-2 text-white hover:bg-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
               :disabled="isSaving(plugin.plugin.id) || !isDirty(plugin.plugin.id)"
               @click="handleSave(plugin)"
             >
