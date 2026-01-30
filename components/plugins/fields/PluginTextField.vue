@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import type { PluginField } from '@/types/pluginForms';
 
 const props = defineProps<{
@@ -12,9 +12,16 @@ const emit = defineEmits<{
   'update:modelValue': [value: string];
 }>();
 
+const touched = ref(false);
+
 const inputValue = computed({
   get: () => props.modelValue ?? (props.field.default as string) ?? '',
-  set: (value: string) => emit('update:modelValue', value),
+  set: (value: string) => {
+    if (!touched.value) {
+      touched.value = true;
+    }
+    emit('update:modelValue', value);
+  },
 });
 
 const isTextarea = computed(() => props.field.type === 'textarea');
@@ -35,7 +42,39 @@ const validationAttrs = computed(() => {
       attrs.required = true;
     }
   }
+  if (props.field.required) {
+    attrs.required = true;
+  }
   return attrs;
+});
+
+const validationError = computed(() => {
+  if (!touched.value) return '';
+
+  const value = props.modelValue ?? '';
+  const validation = props.field.validation;
+  const required = validation?.required || props.field.required;
+
+  if (required && value.trim().length === 0) {
+    return `${props.field.label} is required`;
+  }
+  if (validation?.minLength !== undefined && value.length < validation.minLength) {
+    return `${props.field.label} must be at least ${validation.minLength} characters`;
+  }
+  if (validation?.maxLength !== undefined && value.length > validation.maxLength) {
+    return `${props.field.label} must be ${validation.maxLength} characters or fewer`;
+  }
+  if (validation?.pattern) {
+    try {
+      const regex = new RegExp(validation.pattern);
+      if (!regex.test(value)) {
+        return `${props.field.label} format is invalid`;
+      }
+    } catch {
+      // Ignore invalid regex patterns
+    }
+  }
+  return '';
 });
 </script>
 
@@ -47,7 +86,7 @@ const validationAttrs = computed(() => {
     >
       {{ field.label }}
       <span
-        v-if="field.validation?.required"
+        v-if="field.validation?.required || field.required"
         class="text-red-500"
       >*</span>
     </label>
@@ -65,7 +104,7 @@ const validationAttrs = computed(() => {
       v-bind="validationAttrs"
       rows="3"
       class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-      :class="{ 'border-red-500': error }"
+      :class="{ 'border-red-500': error || validationError }"
     />
     <input
       v-else
@@ -75,13 +114,13 @@ const validationAttrs = computed(() => {
       :placeholder="field.placeholder"
       v-bind="validationAttrs"
       class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-      :class="{ 'border-red-500': error }"
+      :class="{ 'border-red-500': error || validationError }"
     >
     <p
-      v-if="error"
+      v-if="error || validationError"
       class="text-xs text-red-600 dark:text-red-400"
     >
-      {{ error }}
+      {{ error || validationError }}
     </p>
   </div>
 </template>

@@ -89,7 +89,6 @@ Plugins run in configurable pipelines with ordering, conditions, and error handl
 - `enableServerPlugin` - Enable with settings
 - `disableServerPlugin` - Disable plugin
 - `setServerPluginSecret` - Store encrypted secret
-- `validateServerPluginSecret` - Test secret validity
 - `updatePluginPipelines` - Configure server-level pipeline execution order
 - `updateChannelPluginPipelines` - Configure channel-level pipeline execution order
 

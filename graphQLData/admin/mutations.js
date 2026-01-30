@@ -115,15 +115,6 @@ export const SET_SERVER_PLUGIN_SECRET = gql`
   }
 `;
 
-export const VALIDATE_SERVER_PLUGIN_SECRET = gql`
-  mutation ValidateServerPluginSecret($pluginId: String!, $key: String!) {
-    validateServerPluginSecret(pluginId: $pluginId, key: $key) {
-      isValid
-      error
-    }
-  }
-`;
-
 export const UPDATE_MOD_CHANNEL_ROLE = gql`
   mutation UpdateModChannelRole(
     $name: String!

@@ -4,22 +4,26 @@ import type { PluginField, PluginSecretStatus } from '@/types/pluginForms';
 
 const props = defineProps<{
   field: PluginField;
-  modelValue: string;
+  modelValue: string | undefined;
   error?: string;
   secretStatus?: PluginSecretStatus;
-  validating?: boolean;
 }>();
 
 const emit = defineEmits<{
   'update:modelValue': [value: string];
-  'validate': [];
 }>();
 
 const showValue = ref(false);
+const touched = ref(false);
 
 const inputValue = computed({
   get: () => props.modelValue ?? '',
-  set: (value: string) => emit('update:modelValue', value),
+  set: (value: string) => {
+    if (!touched.value) {
+      touched.value = true;
+    }
+    emit('update:modelValue', value);
+  },
 });
 
 const hasValue = computed(() => {
@@ -75,7 +79,39 @@ const validationAttrs = computed(() => {
       attrs.required = true;
     }
   }
+  if (props.field.required && !hasValue.value) {
+    attrs.required = true;
+  }
   return attrs;
+});
+
+const validationError = computed(() => {
+  if (!touched.value) return '';
+
+  const value = props.modelValue ?? '';
+  const validation = props.field.validation;
+  const required = validation?.required || props.field.required;
+
+  if (required && value.trim().length === 0 && !hasValue.value) {
+    return `${props.field.label} is required`;
+  }
+  if (validation?.minLength !== undefined && value.length < validation.minLength) {
+    return `${props.field.label} must be at least ${validation.minLength} characters`;
+  }
+  if (validation?.maxLength !== undefined && value.length > validation.maxLength) {
+    return `${props.field.label} must be ${validation.maxLength} characters or fewer`;
+  }
+  if (validation?.pattern) {
+    try {
+      const regex = new RegExp(validation.pattern);
+      if (!regex.test(value)) {
+        return `${props.field.label} format is invalid`;
+      }
+    } catch {
+      // Ignore invalid regex patterns
+    }
+  }
+  return '';
 });
 </script>
 
@@ -88,7 +124,7 @@ const validationAttrs = computed(() => {
       >
         {{ field.label }}
         <span
-          v-if="field.validation?.required"
+          v-if="field.validation?.required || field.required"
           class="text-red-500"
         >*</span>
       </label>
@@ -158,49 +194,6 @@ const validationAttrs = computed(() => {
             />
           </svg>
         </button>
-        <button
-          v-if="hasValue"
-          type="button"
-          class="p-1 text-gray-400 hover:text-orange-500 disabled:opacity-50"
-          title="Validate"
-          :disabled="validating"
-          @click="$emit('validate')"
-        >
-          <svg
-            v-if="validating"
-            class="h-4 w-4 animate-spin"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            />
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
-          <svg
-            v-else
-            class="h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </button>
       </div>
     </div>
     <p
@@ -210,10 +203,10 @@ const validationAttrs = computed(() => {
       {{ secretStatus.validationError }}
     </p>
     <p
-      v-else-if="error"
+      v-else-if="error || validationError"
       class="text-xs text-red-600 dark:text-red-400"
     >
-      {{ error }}
+      {{ error || validationError }}
     </p>
     <p
       v-else-if="secretStatus?.lastValidatedAt"

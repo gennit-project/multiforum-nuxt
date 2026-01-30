@@ -129,7 +129,7 @@ const clickUnsuspend = () => {
     </button>
     <button
       v-else
-      class="font-semibold flex w-full items-start justify-center gap-2 rounded px-4 py-2 text-left text-sm text-white"
+      class="flex w-full items-start justify-center gap-2 rounded px-4 py-2 text-left text-white"
       :class="{
         'cursor-pointer bg-red-600 hover:bg-red-500': !disabled,
         'cursor-not-allowed bg-gray-500': disabled,

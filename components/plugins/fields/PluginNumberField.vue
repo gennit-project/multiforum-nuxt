@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import type { PluginField } from '@/types/pluginForms';
 
 const props = defineProps<{
@@ -12,9 +12,14 @@ const emit = defineEmits<{
   'update:modelValue': [value: number | undefined];
 }>();
 
+const touched = ref(false);
+
 const inputValue = computed({
   get: () => props.modelValue ?? (props.field.default as number),
   set: (value: number | string) => {
+    if (!touched.value) {
+      touched.value = true;
+    }
     const numValue = typeof value === 'string' ? parseFloat(value) : value;
     emit('update:modelValue', isNaN(numValue) ? undefined : numValue);
   },
@@ -33,6 +38,9 @@ const validationAttrs = computed(() => {
       attrs.required = true;
     }
   }
+  if (props.field.required) {
+    attrs.required = true;
+  }
   return attrs;
 });
 
@@ -50,6 +58,28 @@ const rangeHint = computed(() => {
   }
   return null;
 });
+
+const validationError = computed(() => {
+  if (!touched.value) return '';
+
+  const value = props.modelValue;
+  const validation = props.field.validation;
+  const required = validation?.required || props.field.required;
+
+  if (required && (value === undefined || value === null)) {
+    return `${props.field.label} is required`;
+  }
+  if (value === undefined || value === null) {
+    return '';
+  }
+  if (validation?.min !== undefined && value < validation.min) {
+    return `${props.field.label} must be at least ${validation.min}`;
+  }
+  if (validation?.max !== undefined && value > validation.max) {
+    return `${props.field.label} must be ${validation.max} or less`;
+  }
+  return '';
+});
 </script>
 
 <template>
@@ -60,7 +90,7 @@ const rangeHint = computed(() => {
     >
       {{ field.label }}
       <span
-        v-if="field.validation?.required"
+        v-if="field.validation?.required || field.required"
         class="text-red-500"
       >*</span>
     </label>
@@ -77,19 +107,19 @@ const rangeHint = computed(() => {
       :placeholder="field.placeholder"
       v-bind="validationAttrs"
       class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-      :class="{ 'border-red-500': error }"
+      :class="{ 'border-red-500': error || validationError }"
     >
     <p
-      v-if="rangeHint && !error"
+      v-if="rangeHint && !error && !validationError"
       class="text-xs text-gray-400 dark:text-gray-500"
     >
       {{ rangeHint }}
     </p>
     <p
-      v-if="error"
+      v-if="error || validationError"
       class="text-xs text-red-600 dark:text-red-400"
     >
-      {{ error }}
+      {{ error || validationError }}
     </p>
   </div>
 </template>

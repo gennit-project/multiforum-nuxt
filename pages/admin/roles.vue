@@ -4,14 +4,13 @@ import { GET_SERVER_PERMISSIONS } from '@/graphQLData/admin/queries';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { useQuery } from '@vue/apollo-composable';
 import { config } from '@/config';
-import DefaultRolesEditor from '@/components/admin/DefaultRolesEditor.vue';
+import RoleSection from '@/components/admin/RoleSection.vue';
 import ModChannelRolesEditor from '@/components/admin/ModChannelRolesEditor.vue';
 
 const {
   result: getServerResult,
   error: getServerError,
   loading: getServerLoading,
-  refetch: refetchServerConfig,
 } = useQuery(
   GET_SERVER_PERMISSIONS,
   {
@@ -38,39 +37,49 @@ const serverConfig = computed(() => {
           <div class="mb-6">
             <h1 class="mb-2 text-2xl font-bold">Server Roles</h1>
             <p class="text-gray-600 dark:text-gray-300">
-              These are the default roles for your server. Edit the defaults
-              below, and adjust channel-specific moderator roles afterward.
+              These are the default roles for your server. They are included
+              here for documentation, and channel-specific moderator roles can
+              be edited below.
             </p>
           </div>
-
-          <section class="space-y-4">
-            <h2 class="font-semibold text-xl text-gray-900 dark:text-gray-100">
-              Standard User Roles
-            </h2>
-            <DefaultRolesEditor
-              :server-config="serverConfig"
-              :types="['server']"
-              :title="'Standard User Roles'"
-              :show-title="false"
-              :on-updated="() => refetchServerConfig()"
-            />
-          </section>
-
-          <section class="space-y-4">
-            <h2 class="font-semibold text-xl text-gray-900 dark:text-gray-100">
-              Mod Roles
-            </h2>
-            <DefaultRolesEditor
-              :server-config="serverConfig"
-              :types="['mod']"
-              :title="'Mod Roles'"
-              :show-title="false"
-              :on-updated="() => refetchServerConfig()"
-            />
-            <div class="pt-2">
-              <ModChannelRolesEditor />
-            </div>
-          </section>
+          <RoleSection
+            v-if="serverConfig.DefaultServerRole"
+            :section-title="'Default Server Role'"
+            :role-title="serverConfig.DefaultServerRole.name"
+            :role-description="serverConfig.DefaultServerRole.description"
+            :permissions="serverConfig.DefaultServerRole"
+          />
+          <RoleSection
+            v-if="serverConfig.DefaultModRole"
+            :section-title="'Default Mod Role'"
+            :role-title="serverConfig.DefaultModRole.name"
+            :role-description="serverConfig.DefaultModRole.description"
+            :permissions="serverConfig.DefaultModRole"
+          />
+          <RoleSection
+            v-if="serverConfig.DefaultElevatedModRole"
+            :section-title="'Default Elevated Mod Role'"
+            :role-title="serverConfig.DefaultElevatedModRole.name"
+            :role-description="serverConfig.DefaultElevatedModRole.description"
+            :permissions="serverConfig.DefaultElevatedModRole"
+          />
+          <RoleSection
+            v-if="serverConfig.DefaultSuspendedRole"
+            :section-title="'Default Suspended Role'"
+            :role-title="serverConfig.DefaultSuspendedRole.name"
+            :role-description="serverConfig.DefaultSuspendedRole.description"
+            :permissions="serverConfig.DefaultSuspendedRole"
+          />
+          <RoleSection
+            v-if="serverConfig.DefaultSuspendedModRole"
+            :section-title="'Default Suspended Mod Role'"
+            :role-title="serverConfig.DefaultSuspendedModRole.name"
+            :role-description="serverConfig.DefaultSuspendedModRole.description"
+            :permissions="serverConfig.DefaultSuspendedModRole"
+          />
+          <div class="mt-10">
+            <ModChannelRolesEditor />
+          </div>
         </div>
       </template>
       <template #does-not-have-auth>
