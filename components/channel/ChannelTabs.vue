@@ -126,12 +126,19 @@ const iconSize = computed(() =>
 
 const { smAndDown, mdAndUp } = useDisplay();
 
+// Check if a tab should be active based on route
+const isTabActive = (tab: Tab) => {
+  const path = route.path;
+  // Special case: wiki tab should not be active on wiki-settings page
+  if (tab.routeSuffix === 'wiki' && path.includes('/edit/wiki-settings')) {
+    return false;
+  }
+  return path.includes(tab.routeSuffix);
+};
+
 // Find the current active tab
 const activeTab = computed(() => {
-  return (
-    tabs.value.find((tab) => route.path.includes(tab.routeSuffix)) ||
-    tabs.value[0]
-  );
+  return tabs.value.find((tab) => isTabActive(tab)) || tabs.value[0];
 });
 
 // Base tabs that are always shown (SSR-safe, no client-specific conditions)
@@ -279,7 +286,7 @@ const tabs = computed((): Tab[] => {
                 : 0
           "
           :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
-          :is-active="route.path.includes(tab.routeSuffix)"
+          :is-active="isTabActive(tab)"
           :label="tab.label"
           :show-count="showCounts && !!tab.countProperty"
           :to="tabRoutes[tab.name]"
@@ -333,7 +340,7 @@ const tabs = computed((): Tab[] => {
                   :data-testid="`mobile-dropdown-${tab.name}`"
                   class="flex items-center justify-between px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
                   :class="[
-                    route.path.includes(tab.routeSuffix)
+                    isTabActive(tab)
                       ? 'bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-300'
                       : 'text-gray-700 dark:text-gray-200',
                   ]"
@@ -386,7 +393,7 @@ const tabs = computed((): Tab[] => {
                   : 0
             "
             :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
-            :is-active="route.path.includes(tab.routeSuffix)"
+            :is-active="isTabActive(tab)"
             :label="tab.label"
             :show-count="showCounts && !!tab.countProperty"
             :to="tabRoutes[tab.name]"
