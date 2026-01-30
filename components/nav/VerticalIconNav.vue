@@ -205,11 +205,10 @@ const getUserActionClasses = (isActive: boolean) => {
 </script>
 
 <template>
-  <ClientOnly>
-    <div
-      class="fixed left-0 top-0 z-[18] hidden h-full w-20 flex-col items-center border-r border-gray-200 bg-gray-100 dark:border-gray-600 dark:bg-gray-900 lg:flex"
-      :class="{ 'py-2': isVerticallyShort, 'py-4': !isVerticallyShort }"
-    >
+  <div
+    class="fixed left-0 top-0 z-[18] hidden h-full w-20 flex-col items-center border-r border-gray-200 bg-gray-100 dark:border-gray-600 dark:bg-gray-900 lg:flex"
+    :class="{ 'py-2': isVerticallyShort, 'py-4': !isVerticallyShort }"
+  >
       <!-- Create Button -->
       <IconTooltip
         text="Create new"
@@ -385,5 +384,4 @@ const getUserActionClasses = (isActive: boolean) => {
         @close="isDrawerOpen = false"
       />
     </div>
-  </ClientOnly>
 </template>
