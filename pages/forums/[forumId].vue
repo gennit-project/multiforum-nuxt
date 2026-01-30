@@ -67,7 +67,7 @@ const showChannelTabs = computed(() => {
 const showChannelSidebar = computed(() => {
   const routeName = String(route.name);
 
-  // Always show sidebar on forum settings pages (including wiki settings)
+  // Hide sidebar on forum settings pages (including wiki settings)
   const isForumSettingsPage =
     routeName.startsWith('forums-forumId-edit') &&
     (routeName === 'forums-forumId-edit' ||
@@ -76,7 +76,7 @@ const showChannelSidebar = computed(() => {
       ));
 
   if (isForumSettingsPage) {
-    return true;
+    return false;
   }
 
   // Hide sidebar on wiki content pages and downloads pages to give more reading space
