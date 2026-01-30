@@ -249,7 +249,7 @@ const getUserActionClasses = (isActive: boolean) => {
               />
             </NuxtLink>
             <span
-              class="w-12 text-center text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
+              class="w-12 text-center text-[10px] leading-[10px] text-gray-600 dark:text-gray-300"
             >
               {{ item.name }}
             </span>
@@ -297,7 +297,7 @@ const getUserActionClasses = (isActive: boolean) => {
                 />
               </NuxtLink>
               <span
-                class="w-12 truncate text-center text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
+                class="w-12 truncate text-center text-[10px] leading-[10px] text-gray-600 dark:text-gray-300"
               >
                 {{ forum.uniqueName }}
               </span>
@@ -318,7 +318,7 @@ const getUserActionClasses = (isActive: boolean) => {
               </button>
             </IconTooltip>
             <span
-              class="text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
+              class="text-[10px] leading-[10px] text-gray-600 dark:text-gray-300"
               >More</span
             >
           </div>

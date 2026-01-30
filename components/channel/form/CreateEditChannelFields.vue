@@ -380,58 +380,58 @@ const getCurrentTabLabel = computed(() => {
                 v-if="isDropdownOpen"
                 class="absolute z-10 mt-1 w-full rounded-md border bg-white shadow-lg dark:bg-gray-800"
               >
-                <router-link
-                  v-for="tab in tabs"
-                  :key="tab.key"
-                  class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  :class="{
-                    'bg-gray-50 text-orange-500 dark:bg-gray-700':
-                      typeof route.name === 'string' &&
-                      route.name?.includes(`edit-${tab.key}`),
-                    'text-gray-700 dark:text-gray-300':
-                      typeof route.name === 'string' &&
-                      !route.name?.includes(`edit-${tab.key}`),
-                  }"
-                  :to="{
-                    name: `forums-forumId-edit-${tab.key}`,
-                    params: {
-                      forumId,
-                    },
-                  }"
-                  @click="isDropdownOpen = false"
-                >
-                  <!-- For Font Awesome icons -->
-                  <i
-                    v-if="tab.fontAwesome"
-                    :class="[
-                      tab.fontAwesome,
-                      'mr-2',
-                      {
+                <li v-for="tab in tabs" :key="tab.key">
+                  <router-link
+                    class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    :class="{
+                      'bg-gray-50 text-orange-500 dark:bg-gray-700':
+                        typeof route.name === 'string' &&
+                        route.name?.includes(`edit-${tab.key}`),
+                      'text-gray-700 dark:text-gray-300':
+                        typeof route.name === 'string' &&
+                        !route.name?.includes(`edit-${tab.key}`),
+                    }"
+                    :to="{
+                      name: `forums-forumId-edit-${tab.key}`,
+                      params: {
+                        forumId,
+                      },
+                    }"
+                    @click="isDropdownOpen = false"
+                  >
+                    <!-- For Font Awesome icons -->
+                    <i
+                      v-if="tab.fontAwesome"
+                      :class="[
+                        tab.fontAwesome,
+                        'mr-2',
+                        {
+                          'text-orange-500':
+                            typeof route.name === 'string' &&
+                            route.name?.includes(`edit-${tab.key}`),
+                          'text-gray-400 dark:text-gray-400':
+                            typeof route.name === 'string' &&
+                            !route.name?.includes(`edit-${tab.key}`),
+                        },
+                      ]"
+                    />
+                    <!-- For component icons -->
+                    <component
+                      :is="tab.icon"
+                      v-else-if="tab.icon"
+                      class="mr-2 h-5 w-5"
+                      :class="{
                         'text-orange-500':
                           typeof route.name === 'string' &&
                           route.name?.includes(`edit-${tab.key}`),
                         'text-gray-400 dark:text-gray-400':
                           typeof route.name === 'string' &&
                           !route.name?.includes(`edit-${tab.key}`),
-                      },
-                    ]"
-                  />
-                  <!-- For component icons -->
-                  <component
-                    :is="tab.icon"
-                    v-else-if="tab.icon"
-                    class="mr-2 h-5 w-5"
-                    :class="{
-                      'text-orange-500':
-                        typeof route.name === 'string' &&
-                        route.name?.includes(`edit-${tab.key}`),
-                      'text-gray-400 dark:text-gray-400':
-                        typeof route.name === 'string' &&
-                        !route.name?.includes(`edit-${tab.key}`),
-                    }"
-                  />
-                  {{ tab.label }}
-                </router-link>
+                      }"
+                    />
+                    {{ tab.label }}
+                  </router-link>
+                </li>
               </ul>
             </div>
           </div>
@@ -443,60 +443,60 @@ const getCurrentTabLabel = computed(() => {
               class="bg-gray-50 mr-4 hidden w-1/4 border-r border-gray-300 dark:border-gray-300 lg:block"
             >
               <ul class="flex flex-col space-y-2">
-                <router-link
-                  v-for="tab in tabs"
-                  :key="tab.key"
-                  class="flex cursor-pointer items-center py-2 text-xs"
-                  :class="{
-                    'border-r-2 border-orange-500 dark:text-white':
-                      typeof route.name === 'string' &&
-                      route.name?.includes(`edit-${tab.key}`),
-                    'text-gray-900':
-                      typeof route.name === 'string' &&
-                      route.name?.includes(`edit-${tab.key}`),
-                    'text-gray-400 dark:text-gray-400 dark:hover:text-gray-300':
-                      typeof route.name === 'string' &&
-                      !route.name?.includes(`edit-${tab.key}`),
-                  }"
-                  :to="{
-                    name: `forums-forumId-edit-${tab.key}`,
-                    params: {
-                      forumId,
-                    },
-                  }"
-                >
-                  <!-- For Font Awesome icons -->
-                  <i
-                    v-if="tab.fontAwesome"
-                    :class="[
-                      tab.fontAwesome,
-                      'mr-2',
-                      {
+                <li v-for="tab in tabs" :key="tab.key">
+                  <router-link
+                    class="flex cursor-pointer items-center py-2 text-xs"
+                    :class="{
+                      'border-r-2 border-orange-500 dark:text-white':
+                        typeof route.name === 'string' &&
+                        route.name?.includes(`edit-${tab.key}`),
+                      'text-gray-900':
+                        typeof route.name === 'string' &&
+                        route.name?.includes(`edit-${tab.key}`),
+                      'text-gray-400 dark:text-gray-400 dark:hover:text-gray-300':
+                        typeof route.name === 'string' &&
+                        !route.name?.includes(`edit-${tab.key}`),
+                    }"
+                    :to="{
+                      name: `forums-forumId-edit-${tab.key}`,
+                      params: {
+                        forumId,
+                      },
+                    }"
+                  >
+                    <!-- For Font Awesome icons -->
+                    <i
+                      v-if="tab.fontAwesome"
+                      :class="[
+                        tab.fontAwesome,
+                        'mr-2',
+                        {
+                          'text-orange-500':
+                            typeof route.name === 'string' &&
+                            route.name?.includes(`edit-${tab.key}`),
+                          'text-gray-400 dark:text-gray-400':
+                            typeof route.name === 'string' &&
+                            !route.name?.includes(`edit-${tab.key}`),
+                        },
+                      ]"
+                    />
+                    <!-- For component icons -->
+                    <component
+                      :is="tab.icon"
+                      v-else-if="tab.icon"
+                      class="mr-2 h-4 w-4"
+                      :class="{
                         'text-orange-500':
                           typeof route.name === 'string' &&
                           route.name?.includes(`edit-${tab.key}`),
                         'text-gray-400 dark:text-gray-400':
                           typeof route.name === 'string' &&
                           !route.name?.includes(`edit-${tab.key}`),
-                      },
-                    ]"
-                  />
-                  <!-- For component icons -->
-                  <component
-                    :is="tab.icon"
-                    v-else-if="tab.icon"
-                    class="mr-2 h-4 w-4"
-                    :class="{
-                      'text-orange-500':
-                        typeof route.name === 'string' &&
-                        route.name?.includes(`edit-${tab.key}`),
-                      'text-gray-400 dark:text-gray-400':
-                        typeof route.name === 'string' &&
-                        !route.name?.includes(`edit-${tab.key}`),
-                    }"
-                  />
-                  {{ tab.label }}
-                </router-link>
+                      }"
+                    />
+                    {{ tab.label }}
+                  </router-link>
+                </li>
               </ul>
             </div>
 
