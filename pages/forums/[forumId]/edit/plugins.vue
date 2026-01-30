@@ -33,19 +33,23 @@ const {
   { enabled: computed(() => !!channelUniqueName.value) }
 );
 
-const {
-  result: installedResult,
-  loading: installedLoading,
-} = useQuery(GET_INSTALLED_PLUGINS, null, {
-  fetchPolicy: 'cache-and-network',
-});
-
-const { mutate: updateChannelEnabledPlugins } = useMutation(
-  UPDATE_CHANNEL_ENABLED_PLUGINS
+const { result: installedResult, loading: installedLoading } = useQuery(
+  GET_INSTALLED_PLUGINS,
+  null,
+  {
+    fetchPolicy: 'cache-and-network',
+  }
 );
 
+const {
+  mutate: updateChannelEnabledPlugins,
+  error: updateChannelEnabledPluginsError,
+} = useMutation(UPDATE_CHANNEL_ENABLED_PLUGINS);
+
 const channelDisplayName = computed(() => {
-  return channelResult.value?.channels?.[0]?.displayName || channelUniqueName.value;
+  return (
+    channelResult.value?.channels?.[0]?.displayName || channelUniqueName.value
+  );
 });
 
 const enabledPluginEdges = computed(() => {
@@ -83,7 +87,9 @@ const pluginStates = ref<Record<string, PluginState>>({});
 const dirtyPluginIds = ref<Set<string>>(new Set());
 const savingPluginIds = ref<Set<string>>(new Set());
 
-const isLoading = computed(() => channelLoading.value || installedLoading.value);
+const isLoading = computed(
+  () => channelLoading.value || installedLoading.value
+);
 
 function getChannelDefaults(manifest: any): Record<string, any> {
   const defaults = manifest?.settingsDefaults?.channel;
@@ -244,7 +250,11 @@ async function handleSave(plugin: any) {
     await refetchChannel();
     toast.success('Plugin settings saved for this forum.');
   } catch (err: any) {
-    toast.error(`Failed to save plugin settings: ${err.message}`);
+    const message =
+      updateChannelEnabledPluginsError.value?.message ||
+      err?.message ||
+      'Failed to save plugin settings. Please try again.';
+    toast.error(`Failed to save plugin settings: ${message}`);
   } finally {
     savingPluginIds.value.delete(pluginId);
   }
@@ -263,29 +273,31 @@ async function handleSave(plugin: any) {
     </div>
 
     <div
-      v-if="isLoading"
-      class="py-8 text-center"
+      v-if="updateChannelEnabledPluginsError?.message"
+      class="bg-red-50 rounded-lg border border-red-200 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200"
+      role="alert"
     >
+      <div class="flex items-start gap-2">
+        <i class="fa-solid fa-triangle-exclamation mt-0.5" aria-hidden="true" />
+        <span>{{ updateChannelEnabledPluginsError?.message }}</span>
+      </div>
+    </div>
+
+    <div v-if="isLoading" class="py-8 text-center">
       <div class="inline-flex items-center">
         <i class="fa-solid fa-spinner mr-2 animate-spin" />
         Loading plugin settings...
       </div>
     </div>
 
-    <div
-      v-else-if="channelError"
-      class="py-8 text-center"
-    >
+    <div v-else-if="channelError" class="py-8 text-center">
       <div class="text-red-600 dark:text-red-400">
         Error loading plugin settings: {{ channelError.message }}
       </div>
     </div>
 
-    <div
-      v-else
-      class="space-y-6"
-    >
-      <div class="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-4">
+    <div v-else class="space-y-6">
+      <div class="bg-blue-50 rounded-lg p-4 dark:bg-blue-900/20">
         <div class="flex">
           <div class="flex-shrink-0">
             <i class="fa-solid fa-info-circle text-blue-400" />
@@ -306,7 +318,7 @@ async function handleSave(plugin: any) {
 
       <div
         v-if="orphanedChannelPlugins.length > 0"
-        class="rounded-lg bg-yellow-50 dark:bg-yellow-900/20 p-4"
+        class="bg-yellow-50 rounded-lg p-4 dark:bg-yellow-900/20"
       >
         <div class="flex">
           <div class="flex-shrink-0">
@@ -317,11 +329,8 @@ async function handleSave(plugin: any) {
               Some plugins are enabled for this forum but are no longer enabled
               on the server:
             </p>
-            <ul class="mt-2 list-disc list-inside space-y-1">
-              <li
-                v-for="edge in orphanedChannelPlugins"
-                :key="edge.node.id"
-              >
+            <ul class="mt-2 list-inside list-disc space-y-1">
+              <li v-for="edge in orphanedChannelPlugins" :key="edge.node.id">
                 {{ edge.node.Plugin.displayName || edge.node.Plugin.name }}
               </li>
             </ul>
@@ -331,20 +340,22 @@ async function handleSave(plugin: any) {
 
       <div
         v-if="serverEnabledPlugins.length === 0"
-        class="rounded-lg bg-yellow-50 dark:bg-yellow-900/20 p-4"
+        class="bg-yellow-50 rounded-lg p-4 dark:bg-yellow-900/20"
       >
         <div class="flex">
           <div class="flex-shrink-0">
             <i class="fa-solid fa-exclamation-triangle text-yellow-400" />
           </div>
           <div class="ml-3">
-            <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+            <h3
+              class="text-sm font-medium text-yellow-800 dark:text-yellow-200"
+            >
               No Server Plugins Available
             </h3>
             <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
               <p>
-                Ask a server admin to install and enable plugins before configuring
-                them for this forum.
+                Ask a server admin to install and enable plugins before
+                configuring them for this forum.
               </p>
             </div>
           </div>
@@ -359,7 +370,7 @@ async function handleSave(plugin: any) {
         >
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div class="space-y-1">
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 class="font-semibold text-lg text-gray-900 dark:text-white">
                 {{ plugin.plugin.displayName || plugin.plugin.name }}
               </h3>
               <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -369,7 +380,9 @@ async function handleSave(plugin: any) {
                 Version {{ plugin.version }}
               </p>
             </div>
-            <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+            <label
+              class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300"
+            >
               <input
                 type="checkbox"
                 class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
@@ -380,12 +393,15 @@ async function handleSave(plugin: any) {
                     ($event.target as HTMLInputElement).checked
                   )
                 "
-              >
+              />
               Enable for this forum
             </label>
           </div>
 
-          <div v-if="pluginStates[plugin.plugin.id]?.enabled" class="mt-4 space-y-4">
+          <div
+            v-if="pluginStates[plugin.plugin.id]?.enabled"
+            class="mt-4 space-y-4"
+          >
             <FormRow
               section-title="Forum Settings"
               description="Configure forum-specific settings for this plugin."
@@ -394,7 +410,9 @@ async function handleSave(plugin: any) {
                 <PluginSettingsForm
                   :sections="getChannelSections(plugin.manifest)"
                   :model-value="pluginStates[plugin.plugin.id]?.settings || {}"
-                  @update:model-value="updatePluginSettings(plugin.plugin.id, $event)"
+                  @update:model-value="
+                    updatePluginSettings(plugin.plugin.id, $event)
+                  "
                 />
               </template>
             </FormRow>
@@ -404,7 +422,9 @@ async function handleSave(plugin: any) {
             <button
               type="button"
               class="rounded-md bg-orange-700 px-4 py-2 text-white hover:bg-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
-              :disabled="isSaving(plugin.plugin.id) || !isDirty(plugin.plugin.id)"
+              :disabled="
+                isSaving(plugin.plugin.id) || !isDirty(plugin.plugin.id)
+              "
               @click="handleSave(plugin)"
             >
               <i
