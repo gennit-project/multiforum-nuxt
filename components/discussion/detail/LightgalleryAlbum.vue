@@ -115,6 +115,7 @@ const canScrollRight = computed(
           class="flex items-center justify-center p-1 text-white hover:text-gray-300"
           :class="{ 'cursor-not-allowed opacity-50': !canScrollLeft }"
           :disabled="!canScrollLeft"
+          aria-label="Scroll thumbnails left"
           @click="scrollThumbnailsLeft"
         >
           <LeftArrowIcon class="h-6 w-6" />
@@ -147,6 +148,7 @@ const canScrollRight = computed(
           class="flex items-center justify-center p-1 text-white hover:text-gray-300"
           :class="{ 'cursor-not-allowed opacity-50': !canScrollRight }"
           :disabled="!canScrollRight"
+          aria-label="Scroll thumbnails right"
           @click="scrollThumbnailsRight"
         >
           <RightArrowIcon class="h-6 w-6" />

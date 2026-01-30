@@ -79,6 +79,7 @@ const goToUserProfile = () => {
 <template>
   <IconButtonDropdown
     :items="menuItems"
+    aria-label="User profile menu"
     @go-to-mod-profile="goToModProfile"
     @go-to-user-profile="goToUserProfile"
     @logout="handleLogout"

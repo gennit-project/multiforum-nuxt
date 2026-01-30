@@ -11,7 +11,7 @@ export type MenuItemType = {
   isDivider?: boolean;
 };
 
-defineProps({
+const props = defineProps({
   darkBackground: {
     type: Boolean,
     required: false,
@@ -25,6 +25,11 @@ defineProps({
     type: String,
     required: false,
     default: '',
+  },
+  ariaLabel: {
+    type: String,
+    required: false,
+    default: 'Menu',
   },
 });
 
@@ -49,8 +54,9 @@ const handleItemClick = (item: MenuItemType) => {
           'font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none dark:text-gray-300 dark:hover:text-white',
           darkBackground ? 'text-gray-200 hover:text-white' : '',
         ]"
+        :aria-label="props.ariaLabel"
       >
-        <i v-if="menuButtonIcon" :class="` ${menuButtonIcon} `" />
+        <i v-if="menuButtonIcon" :class="` ${menuButtonIcon} `" aria-hidden="true" />
         <div v-else class="flex items-center">
           <slot />
         </div>
@@ -102,8 +108,9 @@ const handleItemClick = (item: MenuItemType) => {
     <template #fallback>
       <button
         class="font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none dark:text-white"
+        :aria-label="props.ariaLabel"
       >
-        <i v-if="menuButtonIcon" :class="` ${menuButtonIcon} `" />
+        <i v-if="menuButtonIcon" :class="` ${menuButtonIcon} `" aria-hidden="true" />
         <div v-else class="flex items-center">
           <slot />
         </div>

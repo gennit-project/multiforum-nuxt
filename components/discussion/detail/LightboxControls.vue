@@ -106,6 +106,7 @@ const downloadImage = (imageUrl: string) => {
       <button
         class="bg-transparent cursor-pointer border-0 text-white"
         :class="{ 'text-2xl': panelOnSide, 'text-3xl': !panelOnSide }"
+        aria-label="Close lightbox"
         @click="emit('close')"
       >
         ×
@@ -133,6 +134,7 @@ const downloadImage = (imageUrl: string) => {
             { 'cursor-not-allowed opacity-50': zoomLevel <= 1 },
           ]"
           title="Zoom out"
+          aria-label="Zoom out"
           :disabled="zoomLevel <= 1"
           @click="emit('zoom-out')"
         >
@@ -156,6 +158,7 @@ const downloadImage = (imageUrl: string) => {
             { 'cursor-not-allowed opacity-50': zoomLevel >= 3 },
           ]"
           title="Zoom in"
+          aria-label="Zoom in"
           :disabled="zoomLevel >= 3"
           @click="emit('zoom-in')"
         >
@@ -169,6 +172,7 @@ const downloadImage = (imageUrl: string) => {
             'h-6 w-6': !panelOnSide,
           }"
           title="Reset zoom"
+          aria-label="Reset zoom"
           @click="emit('reset-zoom')"
         >
           <RefreshIcon
@@ -188,6 +192,7 @@ const downloadImage = (imageUrl: string) => {
           'px-2 py-1 text-sm': !panelOnSide,
         }"
         :title="isPanelVisible ? 'Hide panel' : 'Show panel'"
+        :aria-label="isPanelVisible ? 'Hide panel' : 'Show panel'"
         @click="emit('toggle-panel')"
       >
         <span v-if="isPanelVisible">{{
@@ -209,6 +214,7 @@ const downloadImage = (imageUrl: string) => {
         class="flex cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white hover:bg-opacity-20"
         :class="{ 'h-6 w-6': panelOnSide, 'h-8 w-8': !panelOnSide }"
         :title="panelOnSide ? 'Move panel to side' : 'Move panel to bottom'"
+        :aria-label="panelOnSide ? 'Move panel to side' : 'Move panel to bottom'"
         @click="emit('toggle-panel-position')"
       >
         <SwitchHorizontalIcon
@@ -221,6 +227,7 @@ const downloadImage = (imageUrl: string) => {
         class="flex cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white hover:bg-opacity-20"
         :class="{ 'h-6 w-6': panelOnSide, 'h-8 w-8': !panelOnSide }"
         :href="currentImageUrl"
+        aria-label="Download image"
         @click="() => downloadImage(currentImageUrl)"
       >
         <DownloadIcon
