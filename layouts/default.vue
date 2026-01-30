@@ -89,7 +89,15 @@ const handleSessionExpiredLogin = () => {
 
         <div class="relative flex flex-grow flex-col">
           <!-- Vertical Icon Navigation for Large Screens -->
-          <VerticalIconNav />
+          <ClientOnly>
+            <VerticalIconNav />
+            <template #fallback>
+              <div
+                class="hidden h-full w-20 lg:block"
+                aria-hidden="true"
+              />
+            </template>
+          </ClientOnly>
 
           <!-- Mobile/Tablet Side Navigation -->
           <SiteSidenav
