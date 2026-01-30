@@ -60,8 +60,8 @@ describe('FormComponent', () => {
     // Form should render
     expect(wrapper.find('form').exists()).toBe(true);
 
-    // Form title should be empty by default
-    expect(wrapper.find('h2').text()).toBe('');
+    // Form title should not render by default
+    expect(wrapper.find('h2').exists()).toBe(false);
 
     // Buttons should be present - with showButtonsInHeader=true (default),
     // buttons appear in both header and footer sections
