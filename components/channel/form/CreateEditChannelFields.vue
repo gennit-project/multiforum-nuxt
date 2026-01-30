@@ -445,7 +445,7 @@ const getCurrentTabLabel = computed(() => {
               <ul class="flex flex-col space-y-2">
                 <li v-for="tab in tabs" :key="tab.key">
                   <router-link
-                    class="flex cursor-pointer items-center py-2 text-xs"
+                    class="flex cursor-pointer items-center py-2 text-sm"
                     :class="{
                       'border-r-2 border-orange-500 dark:text-white':
                         typeof route.name === 'string' &&
@@ -513,15 +513,19 @@ const getCurrentTabLabel = computed(() => {
               <!-- Permission denied message -->
               <div
                 v-else-if="!hasPermission"
-                class="rounded-lg bg-yellow-50 dark:bg-yellow-900/20 p-6 m-4"
+                class="bg-yellow-50 m-4 rounded-lg p-6 dark:bg-yellow-900/20"
               >
                 <div class="flex items-start">
-                  <i class="fa-solid fa-lock text-yellow-500 mr-3 mt-0.5" />
+                  <i class="fa-solid fa-lock mr-3 mt-0.5 text-yellow-500" />
                   <div>
-                    <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                    <h3
+                      class="text-sm font-medium text-yellow-800 dark:text-yellow-200"
+                    >
                       Permission Required
                     </h3>
-                    <p class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+                    <p
+                      class="mt-1 text-sm text-yellow-700 dark:text-yellow-300"
+                    >
                       You don't have permission to edit this forum's settings.
                       Only forum admins can access this page.
                     </p>
