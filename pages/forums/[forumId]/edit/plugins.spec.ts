@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 import { createTestingPinia } from '@pinia/testing';
 import PluginsPage from './plugins.vue';
@@ -12,8 +12,15 @@ vi.mock('@vue/apollo-composable', () => ({
     error: ref(null),
     refetch: vi.fn(),
   })),
+  useApolloClient: vi.fn(() => ({
+    client: {
+      refetchQueries: vi.fn(),
+    },
+  })),
   useMutation: vi.fn(() => ({
     mutate: vi.fn(),
+    error: ref(null),
+    onDone: vi.fn(),
   })),
 }));
 
@@ -249,5 +256,60 @@ describe('Forum Plugins Page', () => {
 
     const wrapper = createWrapper();
     expect(wrapper.find('.plugin-settings-form').exists()).toBe(true);
+  });
+
+  it('parses string settingsJson into plugin settings', async () => {
+    vi.mocked(useQuery)
+      .mockReturnValueOnce({
+        result: ref({
+          channels: [
+            {
+              displayName: 'Test',
+              EnabledPluginsConnection: {
+                edges: [
+                  {
+                    node: {
+                      id: 'pv-1',
+                      version: '1.0.0',
+                      Plugin: { id: 'plugin-1', name: 'Plugin One', displayName: 'Plugin One' },
+                    },
+                    properties: {
+                      settingsJson: '{"overrideProfiles":true,"botName":"Helper"}',
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+        loading: ref(false),
+        error: ref(null),
+        refetch: vi.fn(),
+      } as any)
+      .mockReturnValueOnce({
+        result: ref({
+          getInstalledPlugins: [
+            {
+              plugin: { id: 'plugin-1', name: 'Plugin One', displayName: 'Plugin One' },
+              enabled: true,
+              version: '1.0.0',
+              manifest: {
+                ui: { forms: { channel: [{ title: 'Channel Overrides', fields: [] }] } },
+                settingsDefaults: { channel: {} },
+              },
+            },
+          ],
+        }),
+        loading: ref(false),
+      } as any);
+
+    const wrapper = createWrapper();
+    await nextTick();
+    const settingsForm = wrapper.findComponent({ name: 'PluginSettingsForm' });
+    expect(settingsForm.exists()).toBe(true);
+    expect(settingsForm.props('modelValue')).toEqual({
+      overrideProfiles: true,
+      botName: 'Helper',
+    });
   });
 });
