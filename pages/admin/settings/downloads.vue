@@ -43,14 +43,12 @@ const updateAllowedFileTypes = (value: string) => {
       <template #content>
         <div class="space-y-4">
           <!-- Enable Downloads Checkbox -->
-          <div class="flex items-center space-x-2">
+          <div>
             <CheckBox
               :checked="props.formValues?.enableDownloads || false"
+              :label="'Enable downloads tab in individual forums'"
               @update="emit('updateFormValues', { enableDownloads: $event })"
             />
-            <label class="text-sm font-medium text-gray-900 dark:text-white">
-              Enable downloads tab in individual forums
-            </label>
           </div>
 
           <!-- Allowed File Types Section - Conditional -->
@@ -59,6 +57,7 @@ const updateAllowedFileTypes = (value: string) => {
               <div class="space-y-2">
                 <TextInput
                   :placeholder="'Enter allowed file extensions separated by commas (e.g., .pdf, .zip, .txt, .doc, .docx)'"
+                  :aria-label="'Allowed file types'"
                   :value="allowedFileTypesString"
                   :disabled="!props.formValues?.enableDownloads"
                   @update="updateAllowedFileTypes($event)"

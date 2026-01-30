@@ -196,20 +196,14 @@ const handleMultiSelectUpdate = (
           <div
             v-for="option in group.options"
             :key="option.id"
-            class="flex items-center"
           >
             <CheckBox
               :checked="
                 selectedFilters[group.key]?.includes(option.value) || false
               "
+              :label="option.displayName"
               @update="toggleFilter(group.key, option.value)"
             />
-            <label
-              class="ml-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300"
-              @click="toggleFilter(group.key, option.value)"
-            >
-              {{ option.displayName }}
-            </label>
           </div>
         </div>
       </div>

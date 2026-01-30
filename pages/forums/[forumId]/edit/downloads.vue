@@ -129,21 +129,13 @@ const updateFilterGroups = (filterGroups: FilterGroup[]) => {
 
       <!-- Enable Downloads Section -->
       <div class="space-y-4">
-        <div class="flex items-center space-x-2">
+        <div>
           <CheckBox
             :checked="downloadsEnabled"
             :disabled="downloadCheckboxDisabled"
+            :label="'Enable downloads tab in this forum'"
             @update="updateDownloadsEnabled"
           />
-          <label
-            class="text-sm font-medium"
-            :class="{
-              'text-gray-900 dark:text-white': !downloadCheckboxDisabled,
-              'text-gray-400 dark:text-gray-500': downloadCheckboxDisabled,
-            }"
-          >
-            Enable downloads tab in this forum
-          </label>
         </div>
 
         <p class="text-sm text-gray-600 dark:text-gray-400">

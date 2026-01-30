@@ -84,9 +84,19 @@ const props = defineProps({
     type: Array as () => BotSuggestion[],
     default: () => [],
   },
+  // Accessibility props
+  ariaLabel: {
+    type: String,
+    default: '',
+  },
 });
 const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
   useMutation(CREATE_SIGNED_STORAGE_URL);
+
+// Compute accessible label - use ariaLabel if provided, otherwise fall back to placeholder
+const accessibleLabel = computed(() => {
+  return props.ariaLabel || props.placeholder || 'Text editor';
+});
 
 // Refs
 const editorRef = ref<HTMLTextAreaElement | null>(null);
@@ -681,6 +691,7 @@ const exitFullScreen = () => {
             <textarea
               ref="editorRef"
               :data-testid="props.testId + '-fullscreen'"
+              :aria-label="accessibleLabel"
               class="mb-2 w-full flex-1 resize-none rounded-md border border-gray-200 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
               :value="text"
               :placeholder="props.placeholder"
@@ -827,6 +838,7 @@ const exitFullScreen = () => {
             <textarea
               ref="editorRef"
               :data-testid="props.testId"
+              :aria-label="accessibleLabel"
               :rows="props.rows"
               :placeholder="props.placeholder"
               class="block w-full rounded-md border border-gray-200 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
