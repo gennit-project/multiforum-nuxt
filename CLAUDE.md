@@ -190,6 +190,9 @@
 - **Imports**: Group imports by type (Vue, libraries, local components, utils)
 - **Testing**: Each feature requires Cypress tests, seed data before tests and clean up after
 - **CSS**: Use Tailwind utility classes, dark mode compatible with `dark:` prefix
+- **Accessibility**:
+  - Ensure color contrast meets minimum thresholds (WCAG AA 4.5:1 for normal text).
+  - Provide accessible names for inputs and interactive controls (use explicit `<label>` or `aria-label`/`aria-labelledby` as appropriate).
 - **Composables**: Extract reusable logic into composables under `composables/` directory
 - **Reactivity and Watchers**:
   - Avoid unnecessary watchers. Use Vue's built-in reactivity system (props, computed, refs) whenever possible
