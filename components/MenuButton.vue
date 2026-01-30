@@ -96,11 +96,11 @@ const menuStyles = {
 <template>
   <client-only>
     <v-menu v-model="isMenuOpen" :close-on-content-click="true" offset-y>
-      <template #activator="{ props }">
+      <template #activator="{ props: activatorProps }">
         <button
           :data-testid="dataTestid"
           variant="text"
-          v-bind="disabled ? {} : props"
+          v-bind="disabled ? {} : activatorProps"
           :aria-label="ariaLabel || undefined"
           :class="[
             buttonClasses,

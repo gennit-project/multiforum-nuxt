@@ -431,7 +431,7 @@ async function handleSave(plugin: any) {
                     ($event.target as HTMLInputElement).checked
                   )
                 "
-              />
+              >
               Enable for this forum
             </label>
           </div>

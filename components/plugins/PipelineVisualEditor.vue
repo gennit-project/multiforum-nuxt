@@ -19,6 +19,7 @@ const props = withDefaults(
     events?: EventOption[];
   }>(),
   {
+    errors: () => [],
     // Default to all events if none provided
     events: () => PIPELINE_EVENTS as unknown as EventOption[],
   }

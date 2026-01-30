@@ -16,7 +16,6 @@ const props = defineProps({
   },
   title: {
     type: String,
-    required: true,
     default: 'Are you sure?',
   },
   highlightColor: {

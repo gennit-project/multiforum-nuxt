@@ -203,6 +203,7 @@ const handleClose = () => {
               <div
                 class="h-full min-h-[200px] overflow-auto rounded border border-red-300 bg-white p-3 dark:border-red-700 dark:bg-gray-900 dark:text-gray-200"
               >
+                <!-- eslint-disable-next-line vue/no-v-html -- Content is sanitized (HTML entities escaped) before rendering -->
                 <div v-html="diffHtml.left" />
               </div>
             </div>
@@ -219,6 +220,7 @@ const handleClose = () => {
               <div
                 class="h-full min-h-[200px] overflow-auto rounded border border-green-300 bg-white p-3 dark:border-green-700 dark:bg-gray-900 dark:text-gray-200"
               >
+                <!-- eslint-disable-next-line vue/no-v-html -- Content is sanitized (HTML entities escaped) before rendering -->
                 <div v-html="diffHtml.right" />
               </div>
             </div>
