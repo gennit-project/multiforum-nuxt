@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import type { PropType } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import type {
@@ -328,7 +328,6 @@ const updateCursorIndex = (event: Event) => {
 const mentionState = computed(() =>
   getBotMentionState(createFormValues.value.text || '', cursorIndex.value)
 );
-
 const filteredBotSuggestions = computed(() => {
   const state = mentionState.value;
   if (!state || props.botSuggestions.length === 0) return [];
@@ -338,7 +337,17 @@ const filteredBotSuggestions = computed(() => {
   return filterBotSuggestions(activeSuggestions, state.query);
 });
 
-const showBotSuggestions = computed(() => filteredBotSuggestions.value.length > 0);
+const hasExactMatch = computed(() => {
+  const query = mentionState.value?.query;
+  if (!query) return false;
+  return filteredBotSuggestions.value.some(
+    (bot) => bot.value.toLowerCase() === query.toLowerCase()
+  );
+});
+
+const showBotSuggestions = computed(
+  () => filteredBotSuggestions.value.length > 0 && !hasExactMatch.value
+);
 
 const applyBotSuggestion = (value: string) => {
   const state = mentionState.value;
@@ -403,16 +412,24 @@ const applyBotSuggestion = (value: string) => {
           />
           <div
             v-if="showBotSuggestions"
-            class="absolute left-0 right-0 top-full z-20 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+            class="absolute left-0 top-full z-20 mt-1 min-w-[220px] max-w-sm rounded-md border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800"
           >
             <button
               v-for="suggestion in filteredBotSuggestions"
               :key="suggestion.value"
               type="button"
-              class="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
+              class="flex w-full cursor-pointer flex-col text-left px-3 py-2 transition hover:bg-gray-100 dark:hover:bg-gray-700"
               @click.prevent="applyBotSuggestion(suggestion.value)"
             >
-              <span>{{ suggestion.label }}</span>
+              <span class="text-sm font-semibold text-gray-900 dark:text-white">
+                {{ suggestion.mention }}
+              </span>
+              <span
+                v-if="suggestion.displayName"
+                class="text-xs text-gray-500 dark:text-gray-400"
+              >
+                {{ suggestion.displayName }}
+              </span>
             </button>
           </div>
           <button

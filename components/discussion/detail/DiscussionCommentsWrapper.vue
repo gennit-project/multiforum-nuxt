@@ -141,7 +141,8 @@ const botSuggestions = computed(() => {
   };
 
   return buildBotMentionOptions({
-    channelUniqueName: channel?.Channel?.uniqueName,
+    channelUniqueName:
+      channel?.Channel?.uniqueName || props.discussionChannel?.channelUniqueName,
     bots: channel?.Channel?.Bots || [],
   });
 });

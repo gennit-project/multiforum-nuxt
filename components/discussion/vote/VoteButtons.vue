@@ -163,18 +163,21 @@ const clickUp = () => {
           @undo-feedback="undoFeedback"
           @view-feedback="viewFeedback"
         >
-          <VoteButton
-            :active="downvoteActive"
-            :is-permalinked="isPermalinked"
-            :loading="downvoteLoading"
-            :show-count="false"
-            :test-id="'downvote-discussion-button'"
-          >
-            <span class="flex items-center gap-1 text-xs font-medium">
-              <FlagIcon class="h-4 w-4" />
-              <span>Feedback</span>
-            </span>
-          </VoteButton>
+          <template #activator="{ props: activatorProps }">
+            <VoteButton
+              :active="downvoteActive"
+              :is-permalinked="isPermalinked"
+              :loading="downvoteLoading"
+              :show-count="false"
+              :test-id="'downvote-discussion-button'"
+              :button-props="activatorProps"
+            >
+              <span class="flex items-center gap-1 text-xs font-medium">
+                <FlagIcon class="h-4 w-4" />
+                <span>Feedback</span>
+              </span>
+            </VoteButton>
+          </template>
         </MenuButton>
       </div>
     </template>
@@ -201,19 +204,22 @@ const clickUp = () => {
           :items="thumbsDownMenuItems"
           :disabled="true"
         >
-          <VoteButton
-            :active="downvoteActive"
-            :is-permalinked="isPermalinked"
-            :loading="downvoteLoading"
-            :show-count="false"
-            :test-id="'downvote-discussion-button'"
-            :tooltip-text="'Give semi-anonymous feedback'"
-          >
-            <span class="flex items-center gap-1 text-xs font-medium">
-              <FlagIcon class="h-4 w-4" />
-              <span>Feedback</span>
-            </span>
-          </VoteButton>
+          <template #activator="{ props: activatorProps }">
+            <VoteButton
+              :active="downvoteActive"
+              :is-permalinked="isPermalinked"
+              :loading="downvoteLoading"
+              :show-count="false"
+              :test-id="'downvote-discussion-button'"
+              :tooltip-text="'Give semi-anonymous feedback'"
+              :button-props="activatorProps"
+            >
+              <span class="flex items-center gap-1 text-xs font-medium">
+                <FlagIcon class="h-4 w-4" />
+                <span>Feedback</span>
+              </span>
+            </VoteButton>
+          </template>
         </MenuButton>
       </div>
     </template>

@@ -20,7 +20,9 @@ import {
 import {
   getBotMentionState,
   filterBotSuggestions,
+  type BotSuggestion,
 } from '@/utils/botMentions';
+import { useDisplay } from 'vuetify';
 
 type FileChangeInput = {
   // event of HTMLInputElement;
@@ -30,12 +32,6 @@ type FileChangeInput = {
 
 type EmojiClickEvent = {
   unicode: string;
-};
-
-type BotSuggestion = {
-  value: string;
-  label: string;
-  isDeprecated?: boolean;
 };
 
 // Props
@@ -106,6 +102,7 @@ const showEmojiPicker = ref(false);
 const emojiPickerPosition = ref({ top: '0px', left: '0px' });
 const isFullScreen = ref(false);
 const cursorIndex = ref(0);
+const caretCoordinates = ref({ top: 0, left: 0 });
 
 // Methods
 const focusEditor = () => {
@@ -127,6 +124,9 @@ const updateCursorIndex = (event: Event) => {
   const target = event.target as HTMLTextAreaElement | null;
   if (!target) return;
   cursorIndex.value = target.selectionStart ?? 0;
+  nextTick(() => {
+    updateCaretCoordinates();
+  });
 };
 
 const handleEditorInput = (event: Event) => {
@@ -235,9 +235,50 @@ const filteredBotSuggestions = computed(() => {
   );
 });
 
-const showBotSuggestions = computed(() => {
-  return props.enableBotAutocomplete && filteredBotSuggestions.value.length > 0;
+const hasExactMatch = computed(() => {
+  const query = mentionState.value?.query;
+  if (!query) return false;
+  return filteredBotSuggestions.value.some(
+    (bot) => bot.value.toLowerCase() === query.toLowerCase()
+  );
 });
+
+const showBotSuggestions = computed(() => {
+  return (
+    props.enableBotAutocomplete &&
+    filteredBotSuggestions.value.length > 0 &&
+    !hasExactMatch.value
+  );
+});
+
+const { width } = useDisplay();
+const isSmallScreen = computed(() => width.value < 640);
+
+const suggestionPopoverStyle = computed(() => {
+  const textarea = editorRef.value;
+  if (!textarea) return {};
+
+  const popoverWidth = Math.min(320, Math.max(textarea.clientWidth - 16, 220));
+  const editorWidth = textarea.clientWidth;
+  const maxLeft = Math.max(editorWidth - popoverWidth - 8, 0);
+  const baseLeft = caretCoordinates.value.left + 14;
+  const left = isSmallScreen.value ? 0 : Math.min(baseLeft, maxLeft);
+
+  const maxTop = Math.max(textarea.clientHeight, 0);
+  const top = isSmallScreen.value
+    ? '100%'
+    : `${Math.min(caretCoordinates.value.top + 30, maxTop)}px`;
+
+  return {
+    left: `${left}px`,
+    top,
+    width: `${popoverWidth}px`,
+  };
+});
+
+const showBotHelperText = computed(
+  () => props.enableBotAutocomplete && props.botSuggestions.length > 0
+);
 
 const applyBotSuggestion = (suggestion: BotSuggestion) => {
   const state = mentionState.value;
@@ -256,6 +297,72 @@ const applyBotSuggestion = (suggestion: BotSuggestion) => {
   textarea.setSelectionRange(nextCursor, nextCursor);
   cursorIndex.value = nextCursor;
   textarea.focus();
+  updateCaretCoordinates();
+};
+
+const updateCaretCoordinates = () => {
+  const textarea = editorRef.value;
+  if (!textarea) return;
+  caretCoordinates.value = getCaretCoordinates(textarea, cursorIndex.value);
+};
+
+const getCaretCoordinates = (
+  element: HTMLTextAreaElement,
+  position: number
+): { top: number; left: number } => {
+  const div = document.createElement('div');
+  const style = getComputedStyle(element);
+  const properties = [
+    'direction',
+    'boxSizing',
+    'width',
+    'height',
+    'overflowX',
+    'overflowY',
+    'borderTopWidth',
+    'borderRightWidth',
+    'borderBottomWidth',
+    'borderLeftWidth',
+    'paddingTop',
+    'paddingRight',
+    'paddingBottom',
+    'paddingLeft',
+    'fontStyle',
+    'fontVariant',
+    'fontWeight',
+    'fontStretch',
+    'fontSize',
+    'lineHeight',
+    'fontFamily',
+    'textAlign',
+    'textTransform',
+    'textIndent',
+    'letterSpacing',
+    'wordSpacing',
+  ];
+
+  div.style.position = 'absolute';
+  div.style.visibility = 'hidden';
+  div.style.whiteSpace = 'pre-wrap';
+  div.style.wordWrap = 'break-word';
+  properties.forEach((prop) => {
+    div.style.setProperty(prop, style.getPropertyValue(prop));
+  });
+  div.style.width = `${element.clientWidth}px`;
+  div.textContent = element.value.substr(0, position);
+
+  const span = document.createElement('span');
+  span.textContent = element.value.substr(position) || '.';
+  div.appendChild(span);
+  document.body.appendChild(div);
+
+  const coords = {
+    top: span.offsetTop - element.scrollTop,
+    left: span.offsetLeft - element.scrollLeft,
+  };
+
+  document.body.removeChild(div);
+  return coords;
 };
 
 const handlePaste = async (event: ClipboardEvent) => {
@@ -526,10 +633,13 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 onMounted(() => {
   document.addEventListener('keydown', handleKeydown);
+  window.addEventListener('resize', updateCaretCoordinates);
+  updateCaretCoordinates();
 });
 
 onBeforeUnmount(() => {
   document.removeEventListener('keydown', handleKeydown);
+  window.removeEventListener('resize', updateCaretCoordinates);
 });
 
 // Format buttons configuration
@@ -705,7 +815,7 @@ const exitFullScreen = () => {
               <a
                 target="_blank"
                 :href="markdownDocsLink"
-                class="text-sm text-gray-400 hover:underline dark:text-gray-300"
+                class="text-sm text-gray-600 hover:underline dark:text-gray-300"
               >
                 Markdown is supported
               </a>
@@ -851,23 +961,48 @@ const exitFullScreen = () => {
             />
             <div
               v-if="showBotSuggestions"
-              class="absolute left-0 right-0 z-20 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+              class="absolute z-20 mt-1 rounded-md border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800"
+              :style="{
+                position: 'absolute',
+                ...suggestionPopoverStyle,
+              }"
             >
               <button
-                v-for="suggestion in filteredBotSuggestions"
+                v-for="(suggestion, index) in filteredBotSuggestions"
                 :key="suggestion.value"
                 type="button"
-                class="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
+                :class="[
+                  'flex w-full cursor-pointer items-center justify-between px-3 py-2 text-left transition',
+                  'font-semibold text-sm',
+                  index === 0
+                    ? 'bg-orange-50 border-l-4 border-orange-400 dark:border-orange-500 dark:bg-gray-900/40'
+                    : 'bg-white dark:bg-gray-800',
+                  'hover:bg-gray-100 dark:hover:bg-gray-700',
+                ]"
                 @click.prevent="applyBotSuggestion(suggestion)"
               >
-                <span>{{ suggestion.label }}</span>
+                <span class="flex-1 text-gray-900 dark:text-white">
+                  {{ suggestion.mention }}
+                </span>
+                <span
+                  v-if="suggestion.displayName"
+                  class="text-xs text-gray-500 dark:text-gray-300"
+                >
+                  {{ suggestion.displayName }}
+                </span>
               </button>
             </div>
             <div class="mt-2 flex-col divide-gray-400 dark:divide-gray-300">
+              <p
+                v-if="showBotHelperText"
+                class="text-xs text-gray-500 dark:text-gray-300"
+              >
+                Type <span class="font-mono">/bot/</span> to see available bots.
+              </p>
               <a
                 target="_blank"
                 :href="markdownDocsLink"
-                class="text-sm text-gray-400 hover:underline dark:text-gray-300"
+                class="text-sm text-gray-600 hover:underline dark:text-gray-300"
               >
                 Markdown is supported
               </a>

@@ -86,7 +86,7 @@ if (route.name === 'admin-plugins' && route.path !== '/admin/plugins') {
                     class="mr-2 h-5 w-5"
                     :class="{
                       'text-orange-500': activeTabKey === tab.key,
-                      'text-gray-400 dark:text-gray-400': activeTabKey !== tab.key,
+                      'text-gray-500 dark:text-gray-400': activeTabKey !== tab.key,
                     }"
                   />
                   {{ tab.label }}
@@ -106,10 +106,9 @@ if (route.name === 'admin-plugins' && route.path !== '/admin/plugins') {
                 <router-link
                   class="flex cursor-pointer items-center px-3 py-2"
                   :class="{
-                    'border-r-2 border-orange-500 dark:text-white':
+                    'border-r-2 border-orange-500 bg-orange-50 text-gray-900 font-medium dark:bg-orange-900/20 dark:text-white':
                       activeTabKey === tab.key,
-                    'text-gray-900': activeTabKey === tab.key,
-                    'text-gray-400 dark:text-gray-400 dark:hover:text-gray-300':
+                    'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300':
                       activeTabKey !== tab.key,
                   }"
                   :to="tab.routePath"
@@ -119,7 +118,7 @@ if (route.name === 'admin-plugins' && route.path !== '/admin/plugins') {
                     class="mr-2 h-5 w-5"
                     :class="{
                       'text-orange-500': activeTabKey === tab.key,
-                      'text-gray-400 dark:text-gray-400': activeTabKey !== tab.key,
+                      'text-gray-500 dark:text-gray-400': activeTabKey !== tab.key,
                     }"
                   />
                   {{ tab.label }}

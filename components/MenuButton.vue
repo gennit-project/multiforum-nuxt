@@ -74,6 +74,28 @@ const adjustMenuPosition = () => {
   });
 };
 
+const buildActivatorProps = (activatorProps: Record<string, unknown>) => {
+  if (props.disabled) {
+    return {
+      disabled: true,
+      'aria-disabled': 'true',
+    };
+  }
+
+  const onClick = (activatorProps as { onClick?: (event: Event) => void })
+    .onClick;
+
+  return {
+    ...activatorProps,
+    onClick: (event: Event) => {
+      if (typeof onClick === 'function') {
+        onClick(event);
+      }
+      adjustMenuPosition();
+    },
+  };
+};
+
 onMounted(() => {
   adjustMenuPosition();
   window.addEventListener('resize', adjustMenuPosition);
@@ -97,29 +119,29 @@ const menuStyles = {
   <client-only>
     <v-menu v-model="isMenuOpen" :close-on-content-click="true" offset-y>
       <template #activator="{ props: activatorProps }">
-        <button
-          :data-testid="dataTestid"
-          variant="text"
-          v-bind="disabled ? {} : activatorProps"
-          :aria-label="ariaLabel || undefined"
-          :class="[
-            buttonClasses,
-            buttonClass,
-            disabled ? 'cursor-not-allowed opacity-60' : '',
-          ]"
-          @click="
-            () => {
-              if (!disabled) {
-                adjustMenuPosition();
-              }
-            }
-          "
+        <slot
+          name="activator"
+          :props="buildActivatorProps(activatorProps)"
+          :disabled="disabled"
         >
-          <slot>
-            Options
-            <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
-          </slot>
-        </button>
+          <button
+            :data-testid="dataTestid"
+            variant="text"
+            v-bind="buildActivatorProps(activatorProps)"
+            :aria-label="ariaLabel || undefined"
+            :disabled="disabled"
+            :class="[
+              buttonClasses,
+              buttonClass,
+              disabled ? 'cursor-not-allowed opacity-60' : '',
+            ]"
+          >
+            <slot>
+              Options
+              <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
+            </slot>
+          </button>
+        </slot>
       </template>
 
       <v-list
