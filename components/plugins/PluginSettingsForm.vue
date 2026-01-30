@@ -68,9 +68,9 @@ function getFieldComponent(field: PluginField) {
       class="space-y-4"
     >
       <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
-        <h4 class="text-base font-semibold text-gray-900 dark:text-white">
+        <h3 class="text-base font-semibold text-gray-900 dark:text-white">
           {{ section.title }}
-        </h4>
+        </h3>
         <p
           v-if="section.description"
           class="mt-1 text-sm text-gray-500 dark:text-gray-400"

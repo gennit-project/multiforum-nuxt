@@ -587,7 +587,7 @@ const getSecretStatusText = (status: string) => {
                 >
                 <span
                   v-if="pluginLicense"
-                  class="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium dark:bg-gray-700"
+                  class="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-200"
                 >
                   {{ pluginLicense }}
                 </span>
@@ -729,11 +729,11 @@ const getSecretStatusText = (status: string) => {
                       />
                     </div>
                     <div class="ml-3">
-                      <h3
+                      <p
                         class="text-sm font-medium text-green-800 dark:text-green-200"
                       >
                         Plugin Installed
-                      </h3>
+                      </p>
                       <div
                         class="mt-1 text-sm text-green-700 dark:text-green-300"
                       >
@@ -1027,7 +1027,7 @@ const getSecretStatusText = (status: string) => {
                 >
                   <button
                     type="button"
-                    class="rounded-md bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
+                    class="rounded-md bg-orange-700 px-4 py-2 text-white hover:bg-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
                     :disabled="savingSettings"
                     @click="handleSaveSettings"
                   >
