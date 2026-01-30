@@ -169,31 +169,33 @@ function updateFormValues(data: ServerConfigUpdateInput) {
 </script>
 
 <template>
-  <div class="px-8">
-    <RequireAuth :loading="getServerLoading">
-      <template #has-auth>
-        <CreateEditServerFields
-          :key="`${dataLoaded.toString()}-${formValues.enableDownloads}`"
-          :edit-mode="true"
-          :server-loading="getServerLoading"
-          :get-server-error="getServerError"
-          :update-server-error="updateServerError"
-          :edit-server-loading="editServerLoading"
-          :form-values="formValues"
-          @submit="submit"
-          @update-form-values="updateFormValues"
-        />
-        <Notification
-          v-if="showSavedChangesNotification"
-          title="Your changes have been saved."
-          @close-notification="showSavedChangesNotification = false"
-        />
-      </template>
-      <template #does-not-have-auth>
-        <div class="p-8 dark:text-white">
-          You don't have permission to see this page.
-        </div>
-      </template>
-    </RequireAuth>
-  </div>
+  <ClientOnly>
+    <div class="px-8">
+      <RequireAuth :loading="getServerLoading">
+        <template #has-auth>
+          <CreateEditServerFields
+            :key="`${dataLoaded.toString()}-${formValues.enableDownloads}`"
+            :edit-mode="true"
+            :server-loading="getServerLoading"
+            :get-server-error="getServerError"
+            :update-server-error="updateServerError"
+            :edit-server-loading="editServerLoading"
+            :form-values="formValues"
+            @submit="submit"
+            @update-form-values="updateFormValues"
+          />
+          <Notification
+            v-if="showSavedChangesNotification"
+            title="Your changes have been saved."
+            @close-notification="showSavedChangesNotification = false"
+          />
+        </template>
+        <template #does-not-have-auth>
+          <div class="p-8 dark:text-white">
+            You don't have permission to see this page.
+          </div>
+        </template>
+      </RequireAuth>
+    </div>
+  </ClientOnly>
 </template>
