@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'nuxt/app';
-import { useMutation, useQuery } from '@vue/apollo-composable';
+import { useApolloClient, useMutation, useQuery } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
 import PluginSettingsForm from '@/components/plugins/PluginSettingsForm.vue';
 import { useToast } from '@/composables/useToast';
 import { GET_INSTALLED_PLUGINS } from '@/graphQLData/admin/queries';
-import { GET_CHANNEL_PLUGIN_SETTINGS } from '@/graphQLData/channel/queries';
+import {
+  GET_CHANNEL,
+  GET_CHANNEL_PLUGIN_SETTINGS,
+} from '@/graphQLData/channel/queries';
 import { UPDATE_CHANNEL_ENABLED_PLUGINS } from '@/graphQLData/channel/mutations';
 import type { PluginFormSection } from '@/types/pluginForms';
 
@@ -17,6 +20,7 @@ type PluginState = {
 
 const route = useRoute();
 const toast = useToast();
+const { client } = useApolloClient();
 
 const channelUniqueName = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
@@ -44,7 +48,13 @@ const { result: installedResult, loading: installedLoading } = useQuery(
 const {
   mutate: updateChannelEnabledPlugins,
   error: updateChannelEnabledPluginsError,
+  onDone: onUpdateChannelEnabledPluginsDone,
 } = useMutation(UPDATE_CHANNEL_ENABLED_PLUGINS);
+
+onUpdateChannelEnabledPluginsDone(() => {
+  // Clear mutation error so the banner hides after a successful save.
+  updateChannelEnabledPluginsError.value = null;
+});
 
 const channelDisplayName = computed(() => {
   return (
@@ -113,9 +123,34 @@ function initializePluginState(pluginId: string, manifest: any, edge?: any) {
     enabled: !!edge,
     settings: {
       ...defaults,
-      ...(settingsJson && typeof settingsJson === 'object' ? settingsJson : {}),
+      ...parseSettingsJson(settingsJson),
     },
   };
+}
+
+function parseSettingsJson(settingsJson: unknown): Record<string, any> {
+  if (!settingsJson) {
+    return {};
+  }
+  if (typeof settingsJson === 'string') {
+    try {
+      const parsed = JSON.parse(settingsJson);
+      return parsed && typeof parsed === 'object' ? parsed : {};
+    } catch {
+      return {};
+    }
+  }
+  if (typeof settingsJson === 'object') {
+    return settingsJson as Record<string, any>;
+  }
+  return {};
+}
+
+function serializeSettingsJson(settings: unknown) {
+  if (typeof settings === 'string') {
+    return settings;
+  }
+  return JSON.stringify(settings ?? {});
 }
 
 watch(
@@ -190,6 +225,7 @@ async function handleSave(plugin: any) {
   }
 
   const enabledPluginsInput: any[] = [];
+  const settingsJson = serializeSettingsJson(state.settings);
 
   if (state.enabled) {
     if (edge) {
@@ -202,7 +238,7 @@ async function handleSave(plugin: any) {
         },
         update: {
           edge: {
-            settingsJson: state.settings || {},
+            settingsJson,
           },
         },
       });
@@ -217,7 +253,8 @@ async function handleSave(plugin: any) {
               },
             },
             edge: {
-              settingsJson: state.settings || {},
+              enabled: true,
+              settingsJson,
             },
           },
         ],
@@ -248,6 +285,7 @@ async function handleSave(plugin: any) {
     });
     dirtyPluginIds.value.delete(pluginId);
     await refetchChannel();
+    await client.refetchQueries({ include: [GET_CHANNEL] });
     toast.success('Plugin settings saved for this forum.');
   } catch (err: any) {
     const message =
