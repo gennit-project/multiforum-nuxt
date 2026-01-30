@@ -156,9 +156,9 @@ const commentToArchiveAndSuspendId = ref<string | null>(null);
       Feedback Comments ({{ feedbackCommentsAggregate }})
     </h2>
     <InfoBanner
-      v-if="feedbackCommentsAggregate > 0"
-      class="mb-4"
-      :text="'Feedback should focus on the writing, not the writer. If the feedback is rude or non-actionable, please report it.'"
+      class="mb-4 mt-2"
+      header-text="Feedback should focus on the writing, not the writer."
+      text="This is a peer-to-peer critique space, not a popularity contest or a pile-on. If a comment is rude or non-actionable, it can be flagged for review."
     />
     <div
       v-if="feedbackCommentsAggregate === 0"
