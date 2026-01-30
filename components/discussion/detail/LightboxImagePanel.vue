@@ -84,6 +84,7 @@ const handleClick = (event: MouseEvent) => {
     <button
       v-if="showNavigation"
       class="absolute left-5 z-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-0 bg-black bg-opacity-50 text-white"
+      aria-label="Previous image"
       @click="emit('prev-image')"
     >
       <LeftArrowIcon class="h-6 w-6" />
@@ -147,6 +148,7 @@ const handleClick = (event: MouseEvent) => {
     <button
       v-if="showNavigation"
       class="absolute right-5 z-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-0 bg-black bg-opacity-50 text-white"
+      aria-label="Next image"
       @click="emit('next-image')"
     >
       <RightArrowIcon class="h-6 w-6" />
