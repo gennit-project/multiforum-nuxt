@@ -154,8 +154,8 @@ const tabs = computed(() => {
       fontAwesome: null,
     },
     {
-      key: 'wiki',
-      label: 'Wiki',
+      key: 'wiki-settings',
+      label: 'Wiki Settings',
       icon: PencilIcon,
       fontAwesome: null,
     },
