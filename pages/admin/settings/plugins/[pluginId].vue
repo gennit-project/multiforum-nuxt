@@ -99,12 +99,6 @@ const {
   fetchPolicy: 'cache-and-network',
 });
 
-const {
-  result: secretsResult,
-  loading: secretsLoading,
-  refetch: refetchSecrets,
-} = useQuery(GET_SERVER_PLUGIN_SECRETS, { pluginId });
-
 // Query for plugin detail including version README (for non-installed plugins)
 const { result: pluginDetailResult, loading: pluginDetailLoading } = useQuery(
   GET_PLUGIN_DETAIL,
@@ -119,7 +113,7 @@ const { mutate: enableMutation, loading: enabling } =
   useMutation(ENABLE_SERVER_PLUGIN);
 const { mutate: setSecretMutation } = useMutation(SET_SERVER_PLUGIN_SECRET);
 
-// Computed
+// Core computed properties needed for secrets query
 const plugin = computed(() => {
   const plugins = pluginsResult.value?.plugins || [];
   return plugins.find((p: any) => p.id === pluginId);
@@ -130,6 +124,29 @@ const installedPlugin = computed((): InstalledPlugin | null => {
   return (
     installed.find((p: InstalledPlugin) => p.plugin.id === pluginId) || null
   );
+});
+
+// Plugin slug (name) used for secrets - must be defined before secrets query
+const pluginSlug = computed(() => {
+  return (
+    installedPlugin.value?.plugin?.name ||
+    plugin.value?.name ||
+    ''
+  );
+});
+
+// Secrets query - uses pluginSlug (plugin name) not the route param (plugin id)
+const secretsQueryVars = computed(() => ({
+  pluginId: pluginSlug.value || pluginId,
+}));
+
+const {
+  result: secretsResult,
+  loading: secretsLoading,
+  refetch: refetchSecrets,
+} = useQuery(GET_SERVER_PLUGIN_SECRETS, secretsQueryVars, {
+  // Only run when we have a pluginSlug
+  enabled: computed(() => !!pluginSlug.value),
 });
 
 const secrets = computed((): PluginSecretStatus[] => {
@@ -251,14 +268,6 @@ const availableVersions = computed(() => {
 
 const installedVersion = computed(() => {
   return installedPlugin.value?.version;
-});
-
-const pluginSlug = computed(() => {
-  return (
-    installedPlugin.value?.plugin?.name ||
-    plugin.value?.name ||
-    ''
-  );
 });
 
 const isSelectedVersionInstalled = computed(() => {
