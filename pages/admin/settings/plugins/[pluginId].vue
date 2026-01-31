@@ -473,15 +473,52 @@ const handleSaveSettings = async () => {
       return;
     }
 
+    // Identify secret fields from the form sections
+    const secretKeys = new Set<string>();
+    for (const section of serverSettingsSections.value) {
+      for (const field of section.fields) {
+        if (field.type === 'secret') {
+          secretKeys.add(field.key);
+        }
+      }
+    }
+
+    // Save secrets separately via setServerPluginSecret
+    for (const key of secretKeys) {
+      const value = settingsValues.value[key];
+      if (value && typeof value === 'string' && value.trim()) {
+        await setSecretMutation({
+          pluginId: pluginSlug.value,
+          key,
+          value,
+        });
+      }
+    }
+
+    // Filter out secrets from settingsJson
+    const nonSecretSettings: Record<string, any> = {};
+    for (const [key, value] of Object.entries(settingsValues.value)) {
+      if (!secretKeys.has(key)) {
+        nonSecretSettings[key] = value;
+      }
+    }
+
     await enableMutation({
       pluginId: pluginSlug.value,
       version: installedPlugin.value.version,
       enabled: installedPlugin.value.enabled,
-      settingsJson: settingsValues.value,
+      settingsJson: nonSecretSettings,
     });
 
     toast.success('Settings saved successfully');
+
+    // Clear secret values from local state after successful save
+    for (const key of secretKeys) {
+      settingsValues.value[key] = '';
+    }
+
     await refetchInstalled();
+    await refetchSecrets();
   } catch (err: any) {
     toast.error(`Failed to save settings: ${err.message}`);
   } finally {
