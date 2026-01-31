@@ -118,15 +118,17 @@ export function useBotAutocomplete(params: UseBotAutocompleteParams) {
   );
 
   /**
-   * Get filtered bot suggestions based on current query
+   * Get filtered bot suggestions based on current query.
+   * Access all getters upfront to ensure Vue tracks all dependencies.
    */
   const filteredBotSuggestions = computed(() => {
+    const enabled = isEnabled();
     const suggestions = getBotSuggestions();
-    if (!isEnabled() || suggestions.length === 0) {
+    const state = mentionState.value;
+
+    if (!enabled || suggestions.length === 0 || !state) {
       return [];
     }
-    const state = mentionState.value;
-    if (!state) return [];
     return filterBotSuggestions(
       suggestions.filter((bot) => !bot.isDeprecated),
       state.query
@@ -145,22 +147,21 @@ export function useBotAutocomplete(params: UseBotAutocompleteParams) {
   });
 
   /**
-   * Whether to show the bot suggestions popover
+   * Whether to show the bot suggestions popover.
+   * Access all dependencies upfront for proper reactivity tracking.
    */
   const showBotSuggestions = computed(() => {
-    return (
-      isEnabled() &&
-      filteredBotSuggestions.value.length > 0 &&
-      !hasExactMatch.value
-    );
+    const enabled = isEnabled();
+    const hasSuggestions = filteredBotSuggestions.value.length > 0;
+    const exactMatch = hasExactMatch.value;
+    return enabled && hasSuggestions && !exactMatch;
   });
 
-  /**
-   * Whether to show the helper text about bot mentions
-   */
-  const showBotHelperText = computed(
-    () => isEnabled() && getBotSuggestions().length > 0
-  );
+  const showBotHelperText = computed(() => {
+    const enabled = isEnabled();
+    const suggestions = getBotSuggestions();
+    return enabled && suggestions.length > 0;
+  });
 
   /**
    * Calculate the style for the suggestion popover positioning
@@ -232,5 +233,6 @@ export function useBotAutocomplete(params: UseBotAutocompleteParams) {
     caretCoordinates,
     updateCaretCoordinates,
     applyBotSuggestion,
+    showBotHelperText,
   };
 }

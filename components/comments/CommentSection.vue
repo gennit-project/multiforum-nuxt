@@ -38,7 +38,7 @@ import InfoBanner from '@/components/InfoBanner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
-import { hasBotMention } from '@/utils/botMentions';
+import { hasBotMention, type BotSuggestion } from '@/utils/botMentions';
 
 type CommentSectionQueryVariablesType = {
   discussionId?: string;
@@ -125,9 +125,7 @@ const props = defineProps({
     default: true,
   },
   botSuggestions: {
-    type: Array as PropType<
-      { value: string; label: string; isDeprecated?: boolean }[]
-    >,
+    type: Array as PropType<BotSuggestion[]>,
     default: () => [],
   },
 });

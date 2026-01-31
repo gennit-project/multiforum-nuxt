@@ -17,6 +17,7 @@ import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import { useRoute } from 'nuxt/app';
 import { gql } from '@apollo/client/core';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
+import type { BotSuggestion } from '@/utils/botMentions';
 
 defineOptions({ inheritAttrs: false });
 
@@ -45,9 +46,7 @@ const props = defineProps({
     default: '',
   },
   botSuggestions: {
-    type: Array as PropType<
-      { value: string; label: string; isDeprecated?: boolean }[]
-    >,
+    type: Array as PropType<BotSuggestion[]>,
     default: () => [],
   },
 });

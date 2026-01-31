@@ -19,6 +19,7 @@ import { ALLOWED_ICONS } from '@/utils';
 import { usernameVar, modProfileNameVar } from '@/cache';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 import { getFeedbackPermalinkObject } from '@/utils/routerUtils';
+import type { BotSuggestion } from '@/utils/botMentions';
 import { getAllPermissions } from '@/utils/permissionUtils';
 import ArchivedCommentText from './ArchivedCommentText.vue';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
@@ -139,9 +140,7 @@ const props = defineProps({
     default: false,
   },
   botSuggestions: {
-    type: Array as PropType<
-      { value: string; label: string; isDeprecated?: boolean }[]
-    >,
+    type: Array as PropType<BotSuggestion[]>,
     default: () => [],
   },
   showLabel: {
