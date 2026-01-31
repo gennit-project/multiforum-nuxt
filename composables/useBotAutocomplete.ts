@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import {
   getBotMentionState,
   filterBotSuggestions,
@@ -154,7 +154,26 @@ export function useBotAutocomplete(params: UseBotAutocompleteParams) {
     const enabled = isEnabled();
     const hasSuggestions = filteredBotSuggestions.value.length > 0;
     const exactMatch = hasExactMatch.value;
-    return enabled && hasSuggestions && !exactMatch;
+    const show = enabled && hasSuggestions && !exactMatch;
+    console.log('show', {
+      enabled,
+      hasSuggestions,
+      exactMatch,
+      show,
+    });
+    return show;
+  });
+
+  const activeSuggestionIndex = ref(0);
+
+  watch(filteredBotSuggestions, (suggestions) => {
+    if (!suggestions.length) {
+      activeSuggestionIndex.value = 0;
+      return;
+    }
+    if (activeSuggestionIndex.value >= suggestions.length) {
+      activeSuggestionIndex.value = suggestions.length - 1;
+    }
   });
 
   const showBotHelperText = computed(() => {
@@ -162,6 +181,20 @@ export function useBotAutocomplete(params: UseBotAutocompleteParams) {
     const suggestions = getBotSuggestions();
     return enabled && suggestions.length > 0;
   });
+
+  function moveActiveSuggestion(delta: number) {
+    const suggestions = filteredBotSuggestions.value;
+    if (!suggestions.length) {
+      activeSuggestionIndex.value = 0;
+      return;
+    }
+
+    const nextIndex = Math.max(
+      0,
+      Math.min(activeSuggestionIndex.value + delta, suggestions.length - 1)
+    );
+    activeSuggestionIndex.value = nextIndex;
+  }
 
   /**
    * Calculate the style for the suggestion popover positioning
@@ -236,5 +269,7 @@ export function useBotAutocomplete(params: UseBotAutocompleteParams) {
     caretCoordinates,
     updateCaretCoordinates,
     applyBotSuggestion,
+    activeSuggestionIndex,
+    moveActiveSuggestion,
   };
 }

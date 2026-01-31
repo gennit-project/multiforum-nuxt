@@ -40,7 +40,17 @@ const { mutate: updatePipelines, loading: saving } = useMutation(UPDATE_CHANNEL_
 
 // Computed
 const currentPipelines = computed((): PipelineConfig | undefined => {
-  const pipelines = pipelinesResult.value?.channels?.[0]?.pluginPipelines;
+  let pipelines = pipelinesResult.value?.channels?.[0]?.pluginPipelines;
+
+  // Handle JSON string from Neo4j storage
+  if (typeof pipelines === 'string') {
+    try {
+      pipelines = JSON.parse(pipelines);
+    } catch {
+      return undefined;
+    }
+  }
+
   if (pipelines && Array.isArray(pipelines)) {
     return { pipelines };
   }
@@ -52,12 +62,13 @@ const channelDisplayName = computed(() => {
 });
 
 // Only show plugins that are enabled at server level
+// Use plugin.name (slug) as the ID for pipeline configuration, not the UUID
 const availablePlugins = computed(() => {
   const installed = installedResult.value?.getInstalledPlugins || [];
   return installed
     .filter((p: any) => p.enabled)
     .map((p: any) => ({
-      id: p.plugin.id,
+      id: p.plugin.name,
       name: p.plugin.displayName || p.plugin.name,
     }));
 });
