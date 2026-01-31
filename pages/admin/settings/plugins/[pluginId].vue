@@ -9,6 +9,11 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import PluginSettingsForm from '@/components/plugins/PluginSettingsForm.vue';
 import { useToast } from '@/composables/useToast';
 import { compareVersionStrings } from '@/utils/versionUtils';
+import {
+  extractSecretKeys,
+  filterOutSecrets,
+  getSecretsToSave,
+} from '@/utils/pluginSettingsUtils';
 import type {
   PluginFormSection,
   PluginSecretStatus as PluginSecretStatusType,
@@ -474,34 +479,20 @@ const handleSaveSettings = async () => {
     }
 
     // Identify secret fields from the form sections
-    const secretKeys = new Set<string>();
-    for (const section of serverSettingsSections.value) {
-      for (const field of section.fields) {
-        if (field.type === 'secret') {
-          secretKeys.add(field.key);
-        }
-      }
-    }
+    const secretKeys = extractSecretKeys(serverSettingsSections.value);
 
     // Save secrets separately via setServerPluginSecret
-    for (const key of secretKeys) {
-      const value = settingsValues.value[key];
-      if (value && typeof value === 'string' && value.trim()) {
-        await setSecretMutation({
-          pluginId: pluginSlug.value,
-          key,
-          value,
-        });
-      }
+    const secretsToSave = getSecretsToSave(settingsValues.value, secretKeys);
+    for (const { key, value } of secretsToSave) {
+      await setSecretMutation({
+        pluginId: pluginSlug.value,
+        key,
+        value,
+      });
     }
 
     // Filter out secrets from settingsJson
-    const nonSecretSettings: Record<string, any> = {};
-    for (const [key, value] of Object.entries(settingsValues.value)) {
-      if (!secretKeys.has(key)) {
-        nonSecretSettings[key] = value;
-      }
-    }
+    const nonSecretSettings = filterOutSecrets(settingsValues.value, secretKeys);
 
     await enableMutation({
       pluginId: pluginSlug.value,
