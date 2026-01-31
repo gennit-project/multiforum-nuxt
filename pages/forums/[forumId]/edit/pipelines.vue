@@ -52,7 +52,18 @@ const currentPipelines = computed((): PipelineConfig | undefined => {
   }
 
   if (pipelines && Array.isArray(pipelines)) {
-    return { pipelines };
+    // Transform from backend format (pluginId) to frontend format (plugin)
+    const transformedPipelines = pipelines.map((pipeline: any) => ({
+      event: pipeline.event,
+      stopOnFirstFailure: pipeline.stopOnFirstFailure,
+      steps: (pipeline.steps || []).map((step: any) => ({
+        plugin: step.pluginId || step.plugin,
+        version: step.version,
+        condition: step.condition,
+        continueOnError: step.continueOnError,
+      })),
+    }));
+    return { pipelines: transformedPipelines };
   }
   return undefined;
 });
@@ -84,6 +95,7 @@ async function handleSave(config: PipelineConfig) {
       stopOnFirstFailure: pipeline.stopOnFirstFailure || false,
       steps: pipeline.steps.map((step) => ({
         pluginId: step.plugin,
+        version: step.version,  // Preserve version field
         condition: step.condition || 'ALWAYS',
         continueOnError: step.continueOnError || false,
       })),
