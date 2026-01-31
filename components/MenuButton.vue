@@ -78,7 +78,7 @@ const buildActivatorProps = (activatorProps: Record<string, unknown>) => {
   if (props.disabled) {
     return {
       disabled: true,
-      'aria-disabled': 'true',
+      'aria-disabled': true,
     };
   }
 

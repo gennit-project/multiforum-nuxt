@@ -545,7 +545,7 @@ describe('Plugin Secrets Saving', () => {
 
             // Verify setServerPluginSecret was not called
             cy.wrap(null).then(() => {
-              expect(setSecretCalled).to.be.false;
+              expect(setSecretCalled).to.equal(false);
             });
           } else {
             cy.log('No settings form in this plugin');

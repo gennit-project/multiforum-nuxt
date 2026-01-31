@@ -8,10 +8,7 @@ import PipelinesPage from './pipelines.vue';
 import { useQuery } from '@vue/apollo-composable';
 
 // Import from the pipelineSchema for integration tests
-import {
-  CHANNEL_PIPELINE_EVENTS,
-  SERVER_PIPELINE_EVENTS,
-} from '@/utils/pipelineSchema';
+import { CHANNEL_PIPELINE_EVENTS } from '@/utils/pipelineSchema';
 
 // Mock the Apollo composable
 vi.mock('@vue/apollo-composable', () => ({
@@ -305,14 +302,18 @@ describe('Channel Pipelines Page', () => {
 describe('Channel Pipeline Integration', () => {
   describe('event validation', () => {
     it('should only allow channel events in channel pipeline editor', () => {
-      // Channel events should only include discussionChannel.created
-      expect(CHANNEL_PIPELINE_EVENTS.length).toBe(1);
-      expect(CHANNEL_PIPELINE_EVENTS[0].value).toBe('discussionChannel.created');
+      // Channel events include comment.created and discussionChannel.created
+      expect(CHANNEL_PIPELINE_EVENTS.length).toBe(2);
+      const channelEventValues = CHANNEL_PIPELINE_EVENTS.map((e: any) => e.value);
+      expect(channelEventValues).toContain('comment.created');
+      expect(channelEventValues).toContain('discussionChannel.created');
 
-      // Server events should NOT be in channel events
-      for (const serverEvent of SERVER_PIPELINE_EVENTS) {
+      // Server-only events (file operations) should NOT be in channel events
+      // Note: some events like comment.created can exist in both scopes
+      const serverOnlyEvents = ['downloadableFile.created', 'downloadableFile.updated'];
+      for (const serverOnlyEvent of serverOnlyEvents) {
         const isInChannel = CHANNEL_PIPELINE_EVENTS.some(
-          (e: any) => e.value === serverEvent.value
+          (e: any) => e.value === serverOnlyEvent
         );
         expect(isInChannel).toBe(false);
       }
