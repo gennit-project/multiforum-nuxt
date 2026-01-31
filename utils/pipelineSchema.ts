@@ -5,6 +5,7 @@ export type PipelineCondition = 'ALWAYS' | 'PREVIOUS_SUCCEEDED' | 'PREVIOUS_FAIL
 
 export interface PipelineStep {
   plugin: string;
+  version?: string;  // Optional: specific version to use. If not specified, uses latest enabled version.
   condition?: PipelineCondition;
   continueOnError?: boolean;
 }
@@ -129,6 +130,10 @@ const createPipelineJsonSchema = (scope: PipelineScope) => {
                     type: 'string',
                     description: 'Plugin ID to execute',
                   },
+                  version: {
+                    type: 'string',
+                    description: 'Specific plugin version to use (e.g., "0.1.3"). If not specified, uses the latest enabled version.',
+                  },
                   condition: {
                     type: 'string',
                     description: 'When to execute this step',
@@ -169,6 +174,7 @@ pipelines:
     steps:
       # Add your plugin steps here
       # - plugin: security-attachment-scan
+      #   version: "1.0.0"        # Optional: pin to specific version
       #   condition: ALWAYS
       #   continueOnError: false
       #
@@ -188,6 +194,7 @@ pipelines:
       # Add your plugin steps here
       # Only plugins enabled at the server level can be used
       # - plugin: auto-labeler
+      #   version: "1.0.0"        # Optional: pin to specific version
       #   condition: ALWAYS
       #   continueOnError: false
 `;
