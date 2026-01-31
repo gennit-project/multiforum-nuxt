@@ -128,6 +128,7 @@ const {
 // Bot autocomplete composable with getter functions for proper reactivity
 const {
   showBotSuggestions,
+  showBotHelperText,
   filteredBotSuggestions,
   suggestionPopoverStyle,
   updateCaretCoordinates,

@@ -170,16 +170,19 @@ export function useBotAutocomplete(params: UseBotAutocompleteParams) {
     const textarea = getEditorRef();
     if (!textarea) return { left: '0px', top: '0px', width: '220px' };
 
-    const popoverWidth = Math.min(320, Math.max(textarea.clientWidth - 16, 220));
+    const popoverWidth = Math.min(
+      320,
+      Math.max(textarea.clientWidth - 16, 220)
+    );
     const editorWidth = textarea.clientWidth;
     const maxLeft = Math.max(editorWidth - popoverWidth - 8, 0);
-    const baseLeft = caretCoordinates.value.left + 14;
+    const baseLeft = caretCoordinates.value.left + 20;
     const left = getIsSmallScreen() ? 0 : Math.min(baseLeft, maxLeft);
 
     const maxTop = Math.max(textarea.clientHeight, 0);
     const top = getIsSmallScreen()
       ? '100%'
-      : `${Math.min(caretCoordinates.value.top + 30, maxTop)}px`;
+      : `${Math.min(caretCoordinates.value.top + 55, maxTop)}px`;
 
     return {
       left: `${left}px`,
@@ -233,6 +236,5 @@ export function useBotAutocomplete(params: UseBotAutocompleteParams) {
     caretCoordinates,
     updateCaretCoordinates,
     applyBotSuggestion,
-    showBotHelperText,
   };
 }
