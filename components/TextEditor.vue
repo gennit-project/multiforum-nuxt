@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { ref, nextTick, onMounted, onBeforeUnmount, computed, toRef } from 'vue';
+import {
+  ref,
+  nextTick,
+  onMounted,
+  onBeforeUnmount,
+  computed,
+  toRef,
+} from 'vue';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue';
 import { useDisplay } from 'vuetify';
 
@@ -14,7 +21,10 @@ import BotSuggestionsPopover from '@/components/text-editor/BotSuggestionsPopove
 
 // Composables
 import { useImageUpload } from '@/composables/useImageUpload';
-import { useEmojiPicker, type EmojiClickEvent } from '@/composables/useEmojiPicker';
+import {
+  useEmojiPicker,
+  type EmojiClickEvent,
+} from '@/composables/useEmojiPicker';
 import { useBotAutocomplete } from '@/composables/useBotAutocomplete';
 import { useFullScreenEditor } from '@/composables/useFullScreenEditor';
 
@@ -118,7 +128,6 @@ const {
 // Bot autocomplete composable with getter functions for proper reactivity
 const {
   showBotSuggestions,
-  showBotHelperText,
   filteredBotSuggestions,
   suggestionPopoverStyle,
   updateCaretCoordinates,
@@ -131,19 +140,17 @@ const {
   getEditorRef: () => editorRef.value,
   getIsSmallScreen: () => isSmallScreen.value,
   onUpdate: updateText,
-  onCursorUpdate: (index: number) => { cursorIndex.value = index; },
+  onCursorUpdate: (index: number) => {
+    cursorIndex.value = index;
+  },
 });
 
 // Full-screen editor composable
-const {
-  isFullScreen,
-  showFormatted,
-  toggleFullScreen,
-  exitFullScreen,
-} = useFullScreenEditor({
-  editorRef,
-  disableAutoFocus: toRef(props, 'disableAutoFocus'),
-});
+const { isFullScreen, showFormatted, toggleFullScreen, exitFullScreen } =
+  useFullScreenEditor({
+    editorRef,
+    disableAutoFocus: toRef(props, 'disableAutoFocus'),
+  });
 
 // Methods
 function updateText(newText: string) {
@@ -221,10 +228,18 @@ async function handleFormStateDuringUpload(file: File) {
   const cursorPositionEnd = textarea.selectionEnd;
 
   const uploadId = Date.now().toString();
-  const { markdown: markdownLink, placeholderText } = createUploadPlaceholder(file, uploadId);
+  const { markdown: markdownLink, placeholderText } = createUploadPlaceholder(
+    file,
+    uploadId
+  );
 
   // Insert placeholder
-  textarea.setRangeText(markdownLink, cursorPositionStart, cursorPositionEnd, 'end');
+  textarea.setRangeText(
+    markdownLink,
+    cursorPositionStart,
+    cursorPositionEnd,
+    'end'
+  );
   text.value = textarea.value;
 
   const placeholderStart = cursorPositionStart;
@@ -234,8 +249,16 @@ async function handleFormStateDuringUpload(file: File) {
     const result = await uploadFile(file);
 
     if (!result.success || !result.embeddedLink) {
-      const errorMarkdown = createErrorMarkdown(file.name, result.error || 'Failed to upload');
-      replaceTextRange(textarea, placeholderStart, placeholderEnd, errorMarkdown);
+      const errorMarkdown = createErrorMarkdown(
+        file.name,
+        result.error || 'Failed to upload'
+      );
+      replaceTextRange(
+        textarea,
+        placeholderStart,
+        placeholderEnd,
+        errorMarkdown
+      );
       return;
     }
 
@@ -267,7 +290,8 @@ async function handleFormStateDuringUpload(file: File) {
       placeholderStart + newMarkdown.length
     );
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     const errorMarkdown = createErrorMarkdown(file.name, errorMessage);
 
     const placeholderRegex = createPlaceholderRegex(placeholderText, uploadId);
@@ -275,17 +299,31 @@ async function handleFormStateDuringUpload(file: File) {
       const newText = textarea.value.replace(placeholderRegex, errorMarkdown);
       updateTextareaAndModel(textarea, newText);
     } else {
-      replaceTextRange(textarea, placeholderStart, placeholderEnd, errorMarkdown);
+      replaceTextRange(
+        textarea,
+        placeholderStart,
+        placeholderEnd,
+        errorMarkdown
+      );
     }
   }
 }
 
-function replaceTextRange(textarea: HTMLTextAreaElement, start: number, end: number, replacement: string) {
-  const newText = textarea.value.slice(0, start) + replacement + textarea.value.slice(end);
+function replaceTextRange(
+  textarea: HTMLTextAreaElement,
+  start: number,
+  end: number,
+  replacement: string
+) {
+  const newText =
+    textarea.value.slice(0, start) + replacement + textarea.value.slice(end);
   updateTextareaAndModel(textarea, newText);
 }
 
-function updateTextareaAndModel(textarea: HTMLTextAreaElement, newText: string) {
+function updateTextareaAndModel(
+  textarea: HTMLTextAreaElement,
+  newText: string
+) {
   text.value = newText;
   textarea.value = newText;
   emit('update', text.value);
@@ -485,7 +523,7 @@ const markdownDocsLink = 'https://www.markdownguide.org/basic-syntax/';
                 v-if="showBotHelperText"
                 class="text-xs text-gray-500 dark:text-gray-300"
               >
-                Type <span class="font-mono">/bot/</span> to see available bots.
+                Type <span class="font-mono">/bots/</span> or <span class="font-mono">/bot/</span> to see available bots.
               </p>
               <a
                 target="_blank"

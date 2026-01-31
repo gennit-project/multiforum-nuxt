@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import type { PropType } from 'vue';
 import type { Comment as CommentType } from '@/__generated__/graphql';
+import type { BotSuggestion } from '@/utils/botMentions';
 import Comment from './Comment.vue';
 
 const props = defineProps({
@@ -30,9 +31,7 @@ const props = defineProps({
     default: false,
   },
   botSuggestions: {
-    type: Array as PropType<
-      { value: string; label: string; isDeprecated?: boolean }[]
-    >,
+    type: Array as PropType<BotSuggestion[]>,
     default: () => [],
   },
 });

@@ -21,7 +21,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
-import { getBotMentionState, filterBotSuggestions } from '@/utils/botMentions';
+import { getBotMentionState, filterBotSuggestions, type BotSuggestion } from '@/utils/botMentions';
 
 const COMMENT_LIMIT = 50;
 
@@ -41,9 +41,7 @@ const props = defineProps({
     default: '',
   },
   botSuggestions: {
-    type: Array as PropType<
-      { value: string; label: string; isDeprecated?: boolean }[]
-    >,
+    type: Array as PropType<BotSuggestion[]>,
     default: () => [],
   },
 });

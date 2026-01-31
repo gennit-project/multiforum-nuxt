@@ -80,35 +80,55 @@ export const getBotMentionState = (
 ): BotMentionState | null => {
   if (!text || cursorIndex < 0) return null;
   const beforeCursor = text.slice(0, cursorIndex);
-  const slashTrigger = '/bot/';
-  const bareTrigger = 'bot/';
+  const slashTriggers = ['/bots/', '/bot/'];
+  const bareTriggers = ['bots/', 'bot/'];
 
-  let triggerIndex = beforeCursor.lastIndexOf(slashTrigger);
-  let triggerLength = slashTrigger.length;
+  let triggerIndex = -1;
+  let triggerLength = 0;
+
+  for (const trigger of slashTriggers) {
+    const index = beforeCursor.lastIndexOf(trigger);
+    if (index > triggerIndex) {
+      triggerIndex = index;
+      triggerLength = trigger.length;
+    }
+  }
 
   if (triggerIndex === -1) {
-    const bareIndex = beforeCursor.lastIndexOf(bareTrigger);
-    if (bareIndex === -1) {
-      return null;
+    for (const trigger of bareTriggers) {
+      const bareIndex = beforeCursor.lastIndexOf(trigger);
+      if (bareIndex === -1) {
+        continue;
+      }
+
+      const precedingChar = beforeCursor[bareIndex - 1];
+      const isValidBoundary =
+        bareIndex === 0 ||
+        precedingChar === ' ' ||
+        precedingChar === '\n' ||
+        precedingChar === '\t';
+
+      if (!isValidBoundary) {
+        continue;
+      }
+
+      if (bareIndex > triggerIndex) {
+        triggerIndex = bareIndex;
+        triggerLength = trigger.length;
+      }
     }
+  }
 
-    const precedingChar = beforeCursor[bareIndex - 1];
-    const isValidBoundary =
-      bareIndex === 0 ||
-      precedingChar === ' ' ||
-      precedingChar === '\n' ||
-      precedingChar === '\t';
-
-    if (!isValidBoundary) {
-      return null;
-    }
-
-    triggerIndex = bareIndex;
-    triggerLength = bareTrigger.length;
+  if (triggerIndex === -1) {
+    return null;
   }
 
   const afterTrigger = beforeCursor.slice(triggerIndex + triggerLength);
-  if (afterTrigger.includes(' ') || afterTrigger.includes('\n') || afterTrigger.includes('\t')) {
+  if (
+    afterTrigger.includes(' ') ||
+    afterTrigger.includes('\n') ||
+    afterTrigger.includes('\t')
+  ) {
     return null;
   }
 

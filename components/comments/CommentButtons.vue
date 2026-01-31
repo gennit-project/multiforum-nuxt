@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import type { PropType } from 'vue';
 import type { Comment, ModerationProfile, User } from '@/__generated__/graphql';
+import type { BotSuggestion } from '@/utils/botMentions';
 import VoteButtons from './VoteButtons.vue';
 import ReplyButton from './ReplyButton.vue';
 import SaveButton from '@/components/SaveButton.vue';
@@ -37,9 +38,7 @@ const props = defineProps({
     default: false,
   },
   botSuggestions: {
-    type: Array as PropType<
-      { value: string; label: string; isDeprecated?: boolean }[]
-    >,
+    type: Array as PropType<BotSuggestion[]>,
     default: () => [],
   },
   locked: {

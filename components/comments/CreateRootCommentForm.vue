@@ -12,7 +12,7 @@ import type { CreateEditCommentFormValues } from '@/types/Comment';
 import { usernameVar } from '@/cache';
 import LoggedInUserAvatar from './LoggedInUserAvatar.vue';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
-import { hasBotMention } from '@/utils/botMentions';
+import { hasBotMention, type BotSuggestion } from '@/utils/botMentions';
 
 const props = defineProps({
   createCommentError: {
@@ -38,9 +38,7 @@ const props = defineProps({
     default: true,
   },
   botSuggestions: {
-    type: Array as PropType<
-      { value: string; label: string; isDeprecated?: boolean }[]
-    >,
+    type: Array as PropType<BotSuggestion[]>,
     required: false,
     default: () => [],
   },
