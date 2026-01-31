@@ -43,6 +43,12 @@ export const PIPELINE_EVENTS = [
     description: 'Triggered when a comment is created',
     scope: 'server' as PipelineScope,
   },
+  {
+    value: 'comment.created',
+    label: 'Comment Created',
+    description: 'Triggered when a comment is created in a channel',
+    scope: 'channel' as PipelineScope,
+  },
   // Channel-scoped events (configured by channel admin)
   {
     value: 'discussionChannel.created',
@@ -240,7 +246,8 @@ export function validatePipelineConfig(
         if (!step.plugin) {
           errors.push(`${stepPrefix}: Missing "plugin" field`);
         } else if (availablePlugins.length > 0 && !availablePlugins.includes(step.plugin)) {
-          errors.push(`${stepPrefix}: Unknown plugin "${step.plugin}"`);
+          const pluginList = availablePlugins.join(', ') || 'none';
+          errors.push(`${stepPrefix}: Unknown plugin "${step.plugin}". Available plugins: ${pluginList}`);
         }
 
         if (step.condition && !['ALWAYS', 'PREVIOUS_SUCCEEDED', 'PREVIOUS_FAILED'].includes(step.condition)) {

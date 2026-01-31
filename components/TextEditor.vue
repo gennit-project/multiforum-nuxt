@@ -133,6 +133,8 @@ const {
   suggestionPopoverStyle,
   updateCaretCoordinates,
   applyBotSuggestion,
+  activeSuggestionIndex,
+  moveActiveSuggestion,
 } = useBotAutocomplete({
   getText: () => text.value,
   getCursorIndex: () => cursorIndex.value,
@@ -184,6 +186,34 @@ function handleEditorInput(event: Event) {
   if (!target) return;
   updateText(target.value);
   updateCursorIndex(event);
+}
+
+function handleEditorKeydown(event: KeyboardEvent) {
+  if (!showBotSuggestions || filteredBotSuggestions.value.length === 0) {
+    return;
+  }
+
+  if (event.key === 'Enter' || event.key === 'Tab') {
+    event.preventDefault();
+    const suggestion =
+      filteredBotSuggestions.value[activeSuggestionIndex.value] ||
+      filteredBotSuggestions.value[0];
+    if (suggestion) {
+      applyBotSuggestion(suggestion);
+    }
+    return;
+  }
+
+  if (event.key === 'ArrowDown') {
+    event.preventDefault();
+    moveActiveSuggestion(1);
+    return;
+  }
+
+  if (event.key === 'ArrowUp') {
+    event.preventDefault();
+    moveActiveSuggestion(-1);
+  }
 }
 
 function handleEmojiClick(event: EmojiClickEvent) {
@@ -508,6 +538,7 @@ const markdownDocsLink = 'https://www.markdownguide.org/basic-syntax/';
               @input="handleEditorInput"
               @click="updateCursorIndex"
               @keyup="updateCursorIndex"
+              @keydown="handleEditorKeydown"
               @dragover.prevent
               @drop="handleDrop"
             />
@@ -516,6 +547,7 @@ const markdownDocsLink = 'https://www.markdownguide.org/basic-syntax/';
               v-if="showBotSuggestions"
               :suggestions="filteredBotSuggestions"
               :style="suggestionPopoverStyle"
+              :active-index="activeSuggestionIndex"
               @select="applyBotSuggestion"
             />
 
@@ -524,7 +556,8 @@ const markdownDocsLink = 'https://www.markdownguide.org/basic-syntax/';
                 v-if="showBotHelperText"
                 class="text-xs text-gray-500 dark:text-gray-300"
               >
-                Type <span class="font-mono">/bots/</span> or <span class="font-mono">/bot/</span> to see available bots.
+                Type <span class="font-mono">/bots/</span> or
+                <span class="font-mono">/bot/</span> to see available bots.
               </p>
               <a
                 target="_blank"

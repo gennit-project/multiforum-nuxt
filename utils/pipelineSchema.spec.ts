@@ -97,21 +97,16 @@ describe('pipelineSchema utilities', () => {
 
     it('should return only channel events when scope is channel', () => {
       const events = getEventsForScope('channel');
-      expect({
-        count: events.length,
-        allChannel: events.every((e) => e.scope === 'channel'),
-        firstValue: events[0]?.value,
-      }).toEqual({
-        count: 1,
-        allChannel: true,
-        firstValue: 'discussionChannel.created',
-      });
+      const values = events.map((event) => event.value);
+      expect(events.length).toBe(2);
+      expect(events.every((e) => e.scope === 'channel')).toBe(true);
+      expect(values).toEqual(expect.arrayContaining(['discussionChannel.created', 'comment.created']));
     });
 
-    it('should not return server events for channel scope', () => {
+    it('should not return server-only events for channel scope', () => {
       const events = getEventsForScope('channel');
       expect(
-        events.some((e) => e.value === 'downloadableFile.created' || e.value === 'comment.created')
+        events.some((e) => e.value === 'downloadableFile.created' || e.value === 'downloadableFile.updated')
       ).toBe(false);
     });
 
@@ -183,7 +178,7 @@ describe('pipelineSchema utilities', () => {
         titleIncludesChannel: true,
         hasChannel: true,
         hasCreated: false,
-        hasComment: false,
+        hasComment: true,
       });
     });
 
@@ -377,7 +372,7 @@ describe('pipelineSchema utilities', () => {
         });
       });
 
-      it('should reject unknown plugin', () => {
+      it('should reject unknown plugin and list available plugins', () => {
         const config: PipelineConfig = {
           pipelines: [
             {
@@ -389,10 +384,12 @@ describe('pipelineSchema utilities', () => {
         const result = validatePipelineConfig(config, availablePlugins, 'server');
         expect({
           valid: result.valid,
-          message: result.errors[0],
+          hasUnknownError: result.errors[0]?.includes('Unknown plugin "unknown-plugin"'),
+          listsAvailable: result.errors[0]?.includes('Available plugins:'),
         }).toEqual({
           valid: false,
-          message: expect.stringContaining('Unknown plugin "unknown-plugin"'),
+          hasUnknownError: true,
+          listsAvailable: true,
         });
       });
 
