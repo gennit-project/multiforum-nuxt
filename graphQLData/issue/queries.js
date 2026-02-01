@@ -25,6 +25,12 @@ export const ISSUE_FIELDS = gql`
       }
     }
     flaggedServerRuleViolation
+    locked
+    lockedAt
+    lockReason
+    LockedBy {
+      displayName
+    }
     ActivityFeed(options: { sort: { createdAt: DESC } }) {
       ... on ModerationAction {
         id
@@ -190,6 +196,12 @@ export const GET_ISSUES_BY_CHANNEL = gql`
           uniqueName
         }
         flaggedServerRuleViolation
+        locked
+        lockedAt
+        lockReason
+        LockedBy {
+          displayName
+        }
         ActivityFeedAggregate(where: { actionType: "report" }) {
           count
         }
@@ -234,6 +246,12 @@ export const GET_CLOSED_ISSUES_BY_CHANNEL = gql`
           uniqueName
         }
         flaggedServerRuleViolation
+        locked
+        lockedAt
+        lockReason
+        LockedBy {
+          displayName
+        }
         ActivityFeedAggregate(where: { actionType: "report" }) {
           count
         }
@@ -256,6 +274,12 @@ export const GET_ISSUES = gql`
       relatedDiscussionId
       relatedEventId
       flaggedServerRuleViolation
+      locked
+      lockedAt
+      lockReason
+      LockedBy {
+        displayName
+      }
       Channel {
         uniqueName
       }
@@ -292,6 +316,12 @@ export const GET_CLOSED_ISSUES = gql`
         uniqueName
       }
       channelUniqueName
+      locked
+      lockedAt
+      lockReason
+      LockedBy {
+        displayName
+      }
       Author {
         __typename
         ... on ModerationProfile {

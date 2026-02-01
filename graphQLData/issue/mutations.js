@@ -377,3 +377,21 @@ export const UNARCHIVE_COMMENT = gql`
     }
   }
 `;
+
+export const LOCK_ISSUE = gql`
+  ${ISSUE_FIELDS}
+  mutation lockIssue($issueId: ID!, $reason: String!) {
+    lockIssue(issueId: $issueId, reason: $reason) {
+      ...IssueFields
+    }
+  }
+`;
+
+export const UNLOCK_ISSUE = gql`
+  ${ISSUE_FIELDS}
+  mutation unlockIssue($issueId: ID!, $reason: String) {
+    unlockIssue(issueId: $issueId, reason: $reason) {
+      ...IssueFields
+    }
+  }
+`;
