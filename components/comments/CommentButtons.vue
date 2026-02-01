@@ -135,7 +135,7 @@ function toggleEmojiPicker() {
 </script>
 
 <template>
-  <div class="w-full">
+  <div class="-mt-3 mb-4 w-full">
     <EmojiButtons
       v-if="!locked"
       :key="commentData.emoji"
