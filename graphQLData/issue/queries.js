@@ -162,8 +162,8 @@ export const GET_ISSUES_BY_CHANNEL = gql`
         where: {
           isOpen: true
           OR: [
-            { title_CONTAINS: $searchInput }
-            { body_CONTAINS: $searchInput }
+            { title_MATCHES: $searchInput }
+            { body_MATCHES: $searchInput }
           ]
         }
         options: { sort: { createdAt: DESC } }
@@ -206,8 +206,8 @@ export const GET_CLOSED_ISSUES_BY_CHANNEL = gql`
         where: {
           isOpen: false
           OR: [
-            { title_CONTAINS: $searchInput }
-            { body_CONTAINS: $searchInput }
+            { title_MATCHES: $searchInput }
+            { body_MATCHES: $searchInput }
           ]
         }
         options: { sort: { createdAt: DESC } }

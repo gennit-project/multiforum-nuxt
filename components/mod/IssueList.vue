@@ -5,6 +5,7 @@ import { GET_ISSUES_BY_CHANNEL } from '@/graphQLData/issue/queries';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
 import { updateFilters } from '@/utils/routerUtils';
+import { createCaseInsensitivePattern } from '@/utils/searchUtils';
 import SearchBar from '@/components/SearchBar.vue';
 import ModIssueListItem from './ModIssueListItem.vue';
 
@@ -30,7 +31,7 @@ export default defineComponent({
 
     const queryVariables = computed(() => ({
       channelUniqueName: channelId.value,
-      searchInput: searchInput.value.trim(),
+      searchInput: createCaseInsensitivePattern(searchInput.value) || '.*',
     }));
 
     const {
