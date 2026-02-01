@@ -14,6 +14,8 @@ import {
   ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD,
   ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_USER,
   UPDATE_ISSUE,
+  LOCK_ISSUE,
+  UNLOCK_ISSUE,
 } from '@/graphQLData/issue/mutations';
 import { DELETE_DISCUSSION } from '@/graphQLData/discussion/mutations';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
@@ -50,7 +52,13 @@ import {
   getOriginalPoster,
 } from '@/utils/originalPoster';
 
-type Issue = GeneratedIssue & { issueNumber: number };
+type Issue = GeneratedIssue & {
+  issueNumber: number;
+  locked?: boolean;
+  lockedAt?: string;
+  lockReason?: string;
+  LockedBy?: { displayName?: string };
+};
 
 // Setup
 const route = useRoute();
@@ -148,6 +156,11 @@ const isIssueAuthor = computed(() => {
   return false;
 });
 
+const isLocked = computed(() => activeIssue.value?.locked === true);
+
+const lockReasonInput = ref('');
+const showLockDialog = ref(false);
+
 const standardModRole = computed(() => {
   if (getChannelResult.value?.channels?.[0]?.DefaultModRole) {
     return getChannelResult.value.channels[0].DefaultModRole;
@@ -222,7 +235,7 @@ const issueBodyHasChanges = computed(() => {
 });
 
 const startIssueBodyEdit = () => {
-  if (!isIssueAuthor.value) return;
+  if (!isIssueAuthor.value || isLocked.value) return;
   editedIssueBody.value = activeIssue.value?.body || '';
   isEditingIssueBody.value = true;
 };
@@ -673,6 +686,64 @@ const { mutate: deleteEvent } = useMutation(DELETE_EVENT);
 
 const { mutate: deleteComment } = useMutation(DELETE_COMMENT);
 
+const {
+  mutate: lockIssueMutation,
+  loading: lockIssueLoading,
+  error: lockIssueError,
+} = useMutation(LOCK_ISSUE, () => ({
+  variables: {
+    issueId: activeIssueId.value,
+    reason: lockReasonInput.value,
+  },
+}));
+
+const {
+  mutate: unlockIssueMutation,
+  loading: unlockIssueLoading,
+  error: unlockIssueError,
+} = useMutation(UNLOCK_ISSUE, () => ({
+  variables: {
+    issueId: activeIssueId.value,
+    reason: null,
+  },
+}));
+
+const handleLockIssue = async () => {
+  if (!activeIssue.value || !lockReasonInput.value.trim()) return;
+  if (isSuspendedMod.value) return;
+
+  try {
+    await lockIssueMutation();
+    await refetchIssue();
+    showLockDialog.value = false;
+    lockReasonInput.value = '';
+  } catch (error) {
+    console.error('Error locking issue:', error);
+  }
+};
+
+const handleUnlockIssue = async () => {
+  if (!activeIssue.value) return;
+  if (isSuspendedMod.value) return;
+
+  try {
+    await unlockIssueMutation();
+    await refetchIssue();
+  } catch (error) {
+    console.error('Error unlocking issue:', error);
+  }
+};
+
+const openLockDialog = () => {
+  lockReasonInput.value = '';
+  showLockDialog.value = true;
+};
+
+const closeLockDialog = () => {
+  showLockDialog.value = false;
+  lockReasonInput.value = '';
+};
+
 const closeOpenButtonText = computed(() => {
   if (activeIssue.value?.isOpen)
     return createFormValues.value.text ? 'Close with comment' : 'Close issue';
@@ -1029,7 +1100,47 @@ const handleDeleteComment = async (commentId: string) => {
       class="mt-2 px-4"
       :text="getIssueError.message"
     />
-    <div v-else-if="activeIssue" class="mt-2 flex flex-col gap-2 px-4">
+    <!-- Lock Status Banner -->
+    <div
+      v-if="isLocked"
+      class="mx-4 mt-2 rounded-lg border border-yellow-300 bg-yellow-50 p-4 dark:border-yellow-600 dark:bg-yellow-900/30"
+    >
+      <div class="flex items-center gap-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 text-yellow-600 dark:text-yellow-400"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        <span class="font-medium text-yellow-800 dark:text-yellow-200"
+          >This issue is locked</span
+        >
+      </div>
+      <p
+        v-if="activeIssue?.lockReason"
+        class="mt-1 text-sm text-yellow-700 dark:text-yellow-300"
+      >
+        <span class="font-medium">Reason:</span> {{ activeIssue.lockReason }}
+      </p>
+      <p class="mt-1 text-sm text-yellow-600 dark:text-yellow-400">
+        Locked by {{ activeIssue?.LockedBy?.displayName || 'Unknown' }}
+        <span v-if="activeIssue?.lockedAt">
+          on
+          {{
+            DateTime.fromISO(activeIssue.lockedAt).toLocaleString(
+              DateTime.DATETIME_MED
+            )
+          }}
+        </span>
+      </p>
+    </div>
+    <div v-if="activeIssue" class="mt-2 flex flex-col gap-2 px-4">
       <div v-if="hasRelatedContent" class="flex items-center justify-between">
         <h2 class="text-xl font-bold">
           {{
@@ -1087,7 +1198,7 @@ const handleDeleteComment = async (commentId: string) => {
         <div v-if="activeIssue?.body || isIssueAuthor" class="py-2">
           <div class="mb-2 flex items-center justify-between gap-2">
             <h3 class="font-semibold text-lg">Issue details</h3>
-            <div v-if="isIssueAuthor" class="flex items-center gap-2">
+            <div v-if="isIssueAuthor && !isLocked" class="flex items-center gap-2">
               <GenericButton
                 v-if="!isEditingIssueBody"
                 :text="'Edit'"
@@ -1215,13 +1326,68 @@ const handleDeleteComment = async (commentId: string) => {
               :initial-value="createFormValues.text"
               @update="updateComment"
             />
-            <div class="mt-3 flex justify-end">
+            <!-- Lock/Unlock errors -->
+            <ErrorBanner
+              v-if="lockIssueError"
+              class="mt-2"
+              :text="lockIssueError.message"
+            />
+            <ErrorBanner
+              v-if="unlockIssueError"
+              class="mt-2"
+              :text="unlockIssueError.message"
+            />
+
+            <div class="mt-3 flex justify-end gap-2">
+              <!-- Lock/Unlock Button -->
+              <GenericButton
+                v-if="!isLocked && !isSuspendedMod"
+                :text="'Lock Issue'"
+                :disabled="lockIssueLoading"
+                :loading="lockIssueLoading"
+                @click="openLockDialog"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </GenericButton>
+              <GenericButton
+                v-if="isLocked && !isSuspendedMod"
+                :text="'Unlock Issue'"
+                :disabled="unlockIssueLoading"
+                :loading="unlockIssueLoading"
+                @click="handleUnlockIssue"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H7V7a3 3 0 015.905-.75 1 1 0 001.937-.5A5.002 5.002 0 0010 2z"
+                  />
+                </svg>
+              </GenericButton>
+
               <GenericButton
                 :test-id="'close-open-issue-button'"
                 :text="closeOpenButtonText"
                 :loading="closeIssueLoading || reopenIssueLoading"
                 :disabled="
-                  isSuspendedMod || closeIssueLoading || reopenIssueLoading
+                  isSuspendedMod ||
+                  closeIssueLoading ||
+                  reopenIssueLoading ||
+                  isLocked
                 "
                 @click="toggleCloseOpenIssue"
               >
@@ -1234,7 +1400,8 @@ const handleDeleteComment = async (commentId: string) => {
                 :disabled="
                   createFormValues.text.length === 0 ||
                   (isSuspendedMod && !isOriginalUserAuthor) ||
-                  botMentionsBlocked
+                  botMentionsBlocked ||
+                  isLocked
                 "
                 :loading="
                   addIssueActivityFeedItemWithCommentAsModLoading ||
@@ -1247,5 +1414,40 @@ const handleDeleteComment = async (commentId: string) => {
         </div>
       </v-col>
     </v-row>
+
+    <!-- Lock Issue Dialog -->
+    <div
+      v-if="showLockDialog"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      @click.self="closeLockDialog"
+    >
+      <div
+        class="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800"
+      >
+        <h3 class="mb-4 text-lg font-bold dark:text-white">Lock Issue</h3>
+        <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+          Locking an issue prevents further modifications including comments,
+          status changes, and edits.
+        </p>
+        <label class="mb-2 block text-sm font-medium dark:text-gray-300">
+          Reason for locking (required)
+        </label>
+        <textarea
+          v-model="lockReasonInput"
+          class="w-full rounded-lg border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+          rows="3"
+          placeholder="Enter the reason for locking this issue..."
+        />
+        <div class="mt-4 flex justify-end gap-2">
+          <GenericButton :text="'Cancel'" @click="closeLockDialog" />
+          <SaveButton
+            :label="'Lock Issue'"
+            :disabled="!lockReasonInput.trim() || lockIssueLoading"
+            :loading="lockIssueLoading"
+            @click="handleLockIssue"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
