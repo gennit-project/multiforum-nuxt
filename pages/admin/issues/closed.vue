@@ -7,6 +7,7 @@ import { useRoute, useRouter } from 'nuxt/app';
 import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
 import SearchBar from '@/components/SearchBar.vue';
 import { updateFilters } from '@/utils/routerUtils';
+import { createCaseInsensitivePattern } from '@/utils/searchUtils';
 
 const route = useRoute();
 const router = useRouter();
@@ -23,12 +24,12 @@ const searchInput = ref(
 );
 
 const variables = computed(() => {
-  const trimmedSearch = searchInput.value.trim();
-  const searchFilter = trimmedSearch
+  const searchPattern = createCaseInsensitivePattern(searchInput.value);
+  const searchFilter = searchPattern
     ? {
         OR: [
-          { title_CONTAINS: trimmedSearch },
-          { body_CONTAINS: trimmedSearch },
+          { title_MATCHES: searchPattern },
+          { body_MATCHES: searchPattern },
         ],
       }
     : {};

@@ -14,6 +14,7 @@ import type {
 } from '@/components/MultiSelect.vue';
 import type { Channel } from '@/__generated__/graphql';
 import { usernameVar, isAuthenticatedVar } from '@/cache';
+import { createCaseInsensitivePattern } from '@/utils/searchUtils';
 
 // Props definition - used in template
 const props = defineProps({
@@ -36,16 +37,11 @@ const emit = defineEmits(['setSelectedChannels']);
 
 const searchQuery = ref('');
 
-const escapeRegex = (value: string) =>
-  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
 const { loading: channelsLoading, result: channelsResult } = useQuery(
   GET_CHANNEL_NAMES,
   computed(() => ({
     channelWhere: {
-      uniqueName_MATCHES: searchQuery.value
-        ? `(?i).*${escapeRegex(searchQuery.value)}.*`
-        : '.*',
+      uniqueName_MATCHES: createCaseInsensitivePattern(searchQuery.value) || '.*',
     },
   })),
   {
