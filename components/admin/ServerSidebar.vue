@@ -25,6 +25,8 @@ const serverDescription = computed(
 <template>
   <div
     :class="[useScrollbar ? 'max-h-screen overflow-auto' : '']"
+    :tabindex="useScrollbar ? 0 : undefined"
+    :aria-label="useScrollbar ? 'Admin sidebar content' : undefined"
     class="pb-8 pt-4"
   >
     <div class="items-center gap-2" />

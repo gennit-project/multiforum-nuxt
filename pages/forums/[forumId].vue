@@ -358,6 +358,8 @@ definePageMeta({
               <div
                 v-if="channelId && showChannelSidebar"
                 class="flex-shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/3 md:overflow-y-auto"
+                tabindex="0"
+                aria-label="Forum sidebar"
               >
                 <ChannelSidebar
                   v-if="channel"

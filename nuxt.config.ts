@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   srcDir: '.',
   app: {
     head: {
-      title: config.serverDisplayName,
+      title: config.serverDisplayName || 'Multiforum',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -19,6 +19,7 @@ export default defineNuxtConfig({
         { name: 'color-scheme', content: 'dark light' },
       ],
       htmlAttrs: {
+        lang: 'en',
         class: 'dark dark-mode-ready', // Default to dark mode for initial SSR
       },
     },

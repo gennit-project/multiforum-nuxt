@@ -283,9 +283,9 @@ watch(() => route.params, updateParams, { immediate: true });
     <div v-else-if="discussion">
       <p class="mb-4 px-2">This page collects feedback on this discussion:</p>
       <div class="ml-2 flex flex-col gap-2 border-l pl-4">
-        <h3 class="text-wrap px-1 px-2 text-xl font-bold sm:tracking-tight">
+        <h2 class="text-wrap px-1 px-2 text-xl font-bold sm:tracking-tight">
           {{ discussion && discussion.title ? discussion.title : '[Deleted]' }}
-        </h3>
+        </h2>
         <div class="space-y-3 px-2">
           <div
             class="dark:bg-gray-950 rounded-lg border px-4 pb-2 dark:border-gray-700 dark:bg-gray-700"

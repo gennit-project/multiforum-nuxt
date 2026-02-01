@@ -1,5 +1,6 @@
 // Import commands using require instead of import
 import './commands';
+import 'cypress-axe';
 
 Cypress.on('fail', (error) => {
   if (error.message.includes('SAFETY CHECK FAILED')) {
