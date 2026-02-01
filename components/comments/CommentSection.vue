@@ -128,6 +128,10 @@ const props = defineProps({
     type: Array as PropType<BotSuggestion[]>,
     default: () => [],
   },
+  botUsernames: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  },
 });
 
 // Emits
@@ -736,6 +740,7 @@ const replyHasBotMention = computed(() => {
         :original-poster="originalPoster"
         :reply-has-bot-mention="replyHasBotMention"
         :bot-suggestions="botSuggestions"
+        :bot-usernames="botUsernames"
         @create-comment="handleClickCreate"
         @delete-comment="handleClickDelete"
         @click-edit-comment="handleClickEdit"
@@ -896,6 +901,7 @@ const replyHasBotMention = computed(() => {
               :length-of-comment-in-progress="lengthOfCommentInProgress"
               :reply-has-bot-mention="replyHasBotMention"
               :bot-suggestions="botSuggestions"
+              :bot-usernames="botUsernames"
               :answers="answers"
               @start-comment-save="commentInProcess = true"
               @open-reply-editor="openReplyEditor"
