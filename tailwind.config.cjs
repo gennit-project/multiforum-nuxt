@@ -36,16 +36,17 @@ module.exports = {
       '9xl': '7rem',
     },
     colors: {
+      // GitHub-inspired dark theme gray scale with proper contrast
       gray: {
-        900: '#0d1117',
-        800: '#0d1117',
-        700: '#161b22',
-        600: '#30363d',
-        500: '#484f58',
-        400: '#7c7d80',
-        300: '#b4b5b7',
-        200: '#e3e4e5',
-        100: '#f5f5f6',
+        900: '#0d1117', // Darkest - backgrounds
+        800: '#161b22', // Fixed: was identical to 900
+        700: '#21262d', // Dark backgrounds
+        600: '#30363d', // Borders on dark
+        500: '#6e7681', // Muted text (improved contrast)
+        400: '#8b949e', // Secondary text
+        300: '#c9d1d9', // Primary text on dark (light enough for contrast)
+        200: '#e6edf3', // Lighter text
+        100: '#f0f6fc', // Lightest
       },
       white: '#ffffff',
       black: '#000000',
@@ -105,17 +106,17 @@ module.exports = {
         100: '#f5fdf5',
       },
       orange: {
-        // Bright creamsicle orange with improved contrast
-        950: '#2a1409',
-        900: '#3b1c0e',
-        800: '#4c2712',
-        700: '#5e3317',
-        600: '#b8800a',
-        500: '#d4940c',
-        400: '#ffcd33',
-        300: '#ffdb66',
-        200: '#ffe6b3',
-        100: '#fff2e6',
+        // Fixed: proper orange scale with smooth progression
+        950: '#431407',
+        900: '#7c2d12',
+        800: '#9a3412',
+        700: '#c2410c', // Now a visible burnt orange
+        600: '#ea580c',
+        500: '#f97316', // Vibrant orange
+        400: '#fb923c',
+        300: '#fdba74',
+        200: '#fed7aa',
+        100: '#ffedd5',
       },
     },
     container: {

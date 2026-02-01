@@ -80,6 +80,8 @@ const handleBecomeAdminSuccess = () => {
 <template>
   <div
     :class="[useScrollbar ? 'max-h-screen overflow-auto' : '']"
+    :tabindex="useScrollbar ? 0 : undefined"
+    :aria-label="useScrollbar ? 'Forum sidebar content' : undefined"
     class="pb-8 pt-4"
   >
     <div v-if="channelId && channel" class="items-center gap-2" />

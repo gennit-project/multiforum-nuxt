@@ -58,6 +58,8 @@ const isSettingsPage = computed(() => {
             <div
               v-if="!isSettingsPage"
               class="w-full flex-shrink-0 bg-white dark:bg-gray-800 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto"
+              tabindex="0"
+              aria-label="Admin sidebar"
             >
               <ServerSidebar
                 :key="serverConfig.rules"
