@@ -248,11 +248,12 @@ const handleBecomeAdminSuccess = () => {
                 }"
                 class="flex items-center dark:text-white"
               >
-                <AvatarComponent
-                  :text="bot.username"
-                  :src="''"
-                  class="mr-2 h-6 w-6"
-                />
+                <div
+                  class="mr-2 flex h-6 w-6 items-center justify-center rounded-full border bg-blue-100 dark:border-gray-600 dark:bg-blue-900"
+                  title="Bot account"
+                >
+                  <span class="text-sm">🤖</span>
+                </div>
                 <span class="flex flex-row items-center gap-2">
                   <span class="font-bold">
                     {{ bot.displayName || bot.username }}

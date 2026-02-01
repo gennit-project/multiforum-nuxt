@@ -143,6 +143,10 @@ const props = defineProps({
     type: Array as PropType<BotSuggestion[]>,
     default: () => [],
   },
+  botUsernames: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  },
   showLabel: {
     type: Boolean,
     default: false,
@@ -905,6 +909,7 @@ const label = computed(() => {
               :original-poster="props.originalPoster"
               :label="label"
               :is-answer="isMarkedAsAnswer"
+              :bot-usernames="props.botUsernames"
             />
             <div
               class="ml-4 flex-grow border-l border-gray-300 pl-4 dark:border-gray-600"
@@ -1166,6 +1171,7 @@ const label = computed(() => {
                 :original-poster="props.originalPoster"
                 :length-of-comment-in-progress="props.lengthOfCommentInProgress"
                 :answers="props.answers"
+                :bot-usernames="props.botUsernames"
                 @start-comment-save="emit('startCommentSave')"
                 @click-edit-comment="handleEdit"
                 @click-report="emit('clickReport', $event)"

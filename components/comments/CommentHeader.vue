@@ -46,6 +46,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  botUsernames: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  },
 });
 // Use the utility function to determine admin/mod status
 const authorStatus = computed(() => {
@@ -66,6 +70,14 @@ const commentAuthorProfilePic = computed(
 const commentAuthorDisplayName = computed(
   () => props.commentData.CommentAuthor?.displayName
 );
+
+// Check if the comment author is a bot
+const isBot = computed(() => {
+  if (!commentAuthorUsername.value || !props.botUsernames.length) {
+    return false;
+  }
+  return props.botUsernames.includes(commentAuthorUsername.value);
+});
 
 const createdAtFormatted = computed(() => {
   if (!props.commentData.createdAt) {
@@ -182,6 +194,14 @@ const contextLinkObject = computed(() => {
 <template>
   <div class="flex w-full">
     <p v-if="!commentData">[Deleted]</p>
+    <!-- Bot avatar - show robot emoji instead of regular avatar -->
+    <div
+      v-else-if="isBot"
+      class="z-10 flex h-8 w-8 items-center justify-center rounded-full border bg-blue-100 dark:border-gray-600 dark:bg-blue-900"
+      :title="'This reply is from a bot configured by forum admins.'"
+    >
+      <span class="text-lg">🤖</span>
+    </div>
     <AvatarComponent
       v-else-if="commentAuthorUsername"
       class="z-10"
@@ -234,6 +254,12 @@ const contextLinkObject = computed(() => {
                 >{{ `(u/${commentAuthorUsername})` }}</span
               >
 
+              <span
+                v-if="isBot"
+                class="rounded-md border border-blue-500 bg-blue-100 px-1 py-0 text-xs text-blue-600 dark:border-blue-400 dark:bg-blue-900 dark:text-blue-300"
+                :title="'This reply is from a bot configured by forum admins.'"
+                >Bot</span
+              >
               <span
                 v-if="isAdmin"
                 class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"

@@ -147,6 +147,19 @@ const botSuggestions = computed(() => {
   });
 });
 
+// Extract bot usernames to identify bot-authored comments
+const botUsernames = computed(() => {
+  const channel = props.discussionChannel as DiscussionChannel & {
+    Channel?: {
+      Bots?: Array<{
+        username: string;
+      }>;
+    };
+  };
+
+  return (channel?.Channel?.Bots || []).map((bot) => bot.username);
+});
+
 // Query for user data to get notification preferences
 const { result: getUserResult } = useQuery(
   GET_USER,
@@ -450,6 +463,7 @@ const handleSubscriptionToggle = () => {
     :answers="answers"
     :enable-feedback="enableFeedback"
     :bot-suggestions="botSuggestions"
+    :bot-usernames="botUsernames"
     @decrement-comment-count="decrementCommentCount"
     @increment-comment-count="incrementCommentCount"
     @update-comment-section-query-result="updateCommentSectionQueryResult"

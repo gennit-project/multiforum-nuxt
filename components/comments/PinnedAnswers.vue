@@ -34,6 +34,10 @@ const props = defineProps({
     type: Array as PropType<BotSuggestion[]>,
     default: () => [],
   },
+  botUsernames: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  },
 });
 
 const emit = defineEmits([
@@ -98,6 +102,7 @@ const hasAnswers = computed(() => {
           :answers="answers"
           :reply-has-bot-mention="replyHasBotMention"
           :bot-suggestions="botSuggestions"
+          :bot-usernames="botUsernames"
           :show-comment-buttons="true"
           :show-header="true"
           @create-comment="emit('createComment', $event)"
