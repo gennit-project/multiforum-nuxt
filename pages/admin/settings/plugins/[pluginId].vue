@@ -715,7 +715,7 @@ const getSecretStatusText = (status: string) => {
                 'rounded-xl border-2 p-6 transition-all',
                 isEnabled
                   ? 'border-blue-300 bg-blue-50 dark:border-blue-700 dark:bg-blue-900/30'
-                  : 'border-orange-300 bg-orange-50 dark:border-orange-700 dark:bg-orange-900/30'
+                  : 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/50'
               ]"
             >
               <!-- Enabled State -->
@@ -748,19 +748,19 @@ const getSecretStatusText = (status: string) => {
 
               <!-- Disabled State - Large CTA -->
               <div v-else class="flex flex-col items-center text-center">
-                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-800">
-                  <i class="fa-solid fa-power-off text-2xl text-orange-600 dark:text-orange-300" />
+                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
+                  <i class="fa-solid fa-power-off text-2xl text-gray-500 dark:text-gray-400" />
                 </div>
-                <p class="mt-3 text-lg font-semibold text-orange-800 dark:text-orange-200">
+                <p class="mt-3 text-lg font-semibold text-gray-800 dark:text-gray-200">
                   Plugin Disabled
                 </p>
-                <p class="mt-1 text-sm text-orange-700 dark:text-orange-300">
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                   {{ canEnable ? 'Ready to enable' : 'Configure required secrets first' }}
                 </p>
                 <button
                   v-if="canEnable"
                   type="button"
-                  class="mt-4 w-full rounded-lg bg-orange-700 px-6 py-3 text-lg font-semibold text-white shadow-lg hover:bg-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  class="mt-4 w-full rounded-lg bg-green-700 px-6 py-3 text-lg font-semibold text-white shadow-lg hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   :disabled="enabling"
                   @click="handleToggleEnabled(true)"
                 >
@@ -768,7 +768,11 @@ const getSecretStatusText = (status: string) => {
                   <i v-else class="fa-solid fa-power-off mr-2" />
                   Enable Plugin
                 </button>
-                <p v-else class="mt-3 text-xs text-orange-600 dark:text-orange-400">
+                <p v-if="canEnable" class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                  <i class="fa-solid fa-info-circle mr-1" />
+                  After enabling, restart the backend for changes to take effect
+                </p>
+                <p v-else class="mt-3 text-xs text-gray-500 dark:text-gray-400">
                   <i class="fa-solid fa-lock mr-1" />
                   Configure secrets below to enable
                 </p>
