@@ -104,7 +104,7 @@ const botMentionsBlocked = computed(() => {
       class="mb-2"
       :text="'Bot mentions are only available in discussion comments.'"
     />
-    <div class="flex w-full gap-2">
+    <div class="mt-2 flex w-full gap-2">
       <RequireAuth
         v-if="!commentEditorOpen"
         :justify-left="true"
