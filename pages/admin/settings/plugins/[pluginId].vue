@@ -676,21 +676,6 @@ const getSecretStatusText = (status: string) => {
                 </span>
               </div>
 
-              <!-- Status Badges -->
-              <div class="mt-3 flex space-x-2">
-                <span
-                  v-if="isInstalled"
-                  class="font-semibold rounded-full bg-green-100 px-2 py-1 text-xs text-green-800 dark:bg-green-800 dark:text-green-200"
-                >
-                  Installed
-                </span>
-                <span
-                  v-if="isEnabled"
-                  class="font-semibold rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-800 dark:bg-blue-800 dark:text-blue-200"
-                >
-                  Enabled
-                </span>
-              </div>
             </div>
             <NuxtLink
               to="/admin/plugins"
@@ -699,6 +684,96 @@ const getSecretStatusText = (status: string) => {
               <i class="fa-solid fa-arrow-left mr-2" />
               Back to Plugins
             </NuxtLink>
+          </div>
+
+          <!-- Prominent Status Cards (only shown when installed) -->
+          <div v-if="isInstalled" class="space-y-4">
+            <!-- Installed Status Card -->
+            <div
+              class="rounded-xl border-2 border-green-300 bg-green-50 p-6 dark:border-green-700 dark:bg-green-900/30"
+            >
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-800">
+                    <i class="fa-solid fa-check text-2xl text-green-600 dark:text-green-300" />
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <p class="text-lg font-semibold text-green-800 dark:text-green-200">
+                    Plugin Installed
+                  </p>
+                  <p class="text-sm text-green-700 dark:text-green-300">
+                    Version <span class="font-mono font-semibold">v{{ installedVersion }}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Enable/Disable Status Card -->
+            <div
+              :class="[
+                'rounded-xl border-2 p-6 transition-all',
+                isEnabled
+                  ? 'border-blue-300 bg-blue-50 dark:border-blue-700 dark:bg-blue-900/30'
+                  : 'border-orange-300 bg-orange-50 dark:border-orange-700 dark:bg-orange-900/30'
+              ]"
+            >
+              <!-- Enabled State -->
+              <div v-if="isEnabled" class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-800">
+                      <i class="fa-solid fa-power-off text-2xl text-blue-600 dark:text-blue-300" />
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-lg font-semibold text-blue-800 dark:text-blue-200">
+                      Plugin Enabled
+                    </p>
+                    <p class="text-sm text-blue-700 dark:text-blue-300">
+                      Running server-wide
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  class="rounded-lg border border-blue-300 bg-white px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-blue-600 dark:bg-blue-800 dark:text-blue-200 dark:hover:bg-blue-700"
+                  :disabled="enabling"
+                  @click="handleToggleEnabled(false)"
+                >
+                  <i v-if="enabling" class="fa-solid fa-spinner mr-2 animate-spin" />
+                  Disable
+                </button>
+              </div>
+
+              <!-- Disabled State - Large CTA -->
+              <div v-else class="flex flex-col items-center text-center">
+                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-800">
+                  <i class="fa-solid fa-power-off text-2xl text-orange-600 dark:text-orange-300" />
+                </div>
+                <p class="mt-3 text-lg font-semibold text-orange-800 dark:text-orange-200">
+                  Plugin Disabled
+                </p>
+                <p class="mt-1 text-sm text-orange-700 dark:text-orange-300">
+                  {{ canEnable ? 'Ready to enable' : 'Configure required secrets first' }}
+                </p>
+                <button
+                  v-if="canEnable"
+                  type="button"
+                  class="mt-4 w-full rounded-lg bg-orange-700 px-6 py-3 text-lg font-semibold text-white shadow-lg hover:bg-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  :disabled="enabling"
+                  @click="handleToggleEnabled(true)"
+                >
+                  <i v-if="enabling" class="fa-solid fa-spinner mr-2 animate-spin" />
+                  <i v-else class="fa-solid fa-power-off mr-2" />
+                  Enable Plugin
+                </button>
+                <p v-else class="mt-3 text-xs text-orange-600 dark:text-orange-400">
+                  <i class="fa-solid fa-lock mr-1" />
+                  Configure secrets below to enable
+                </p>
+              </div>
+            </div>
           </div>
 
           <!-- Update Available Banner -->
@@ -754,47 +829,6 @@ const getSecretStatusText = (status: string) => {
           <FormRow section-title="Installation">
             <template #content>
               <div class="space-y-4">
-                <!-- Currently Installed Info -->
-                <div
-                  v-if="isInstalled"
-                  class="bg-green-50 rounded-lg border border-green-200 p-4 dark:border-green-800 dark:bg-green-900/20"
-                >
-                  <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                      <i
-                        class="fa-solid fa-check-circle text-xl text-green-400"
-                      />
-                    </div>
-                    <div class="ml-3">
-                      <p
-                        class="text-sm font-medium text-green-800 dark:text-green-200"
-                      >
-                        Plugin Installed
-                      </p>
-                      <div
-                        class="mt-1 text-sm text-green-700 dark:text-green-300"
-                      >
-                        Currently installed:
-                        <span class="font-semibold font-mono"
-                          >v{{ installedVersion }}</span
-                        >
-                        <span
-                          v-if="isEnabled"
-                          class="ml-2 inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-800 dark:text-blue-200"
-                        >
-                          Enabled
-                        </span>
-                        <span
-                          v-else
-                          class="ml-2 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-800 dark:text-gray-200"
-                        >
-                          Disabled
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
                 <!-- Version Selection -->
                 <div>
                   <label
@@ -884,60 +918,6 @@ const getSecretStatusText = (status: string) => {
                     <p v-else>You have the only available version installed.</p>
                   </div>
                 </div>
-              </div>
-            </template>
-          </FormRow>
-
-          <!-- Enable/Disable Section -->
-          <FormRow v-if="isInstalled" section-title="">
-            <template #content>
-              <div class="space-y-4">
-                <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
-                  <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
-                    Plugin Status
-                  </h2>
-                </div>
-                <div class="flex items-center justify-between">
-                  <div>
-                    <label
-                      class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                    >
-                      Enable server-wide
-                    </label>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                      {{
-                        canEnable
-                          ? 'Plugin is ready to be enabled'
-                          : 'Required secrets are not configured'
-                      }}
-                    </p>
-                  </div>
-                  <label class="inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      :checked="isEnabled"
-                      :disabled="!canEnable || enabling"
-                      class="form-checkbox h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500 disabled:opacity-50"
-                      @change="
-                        (e) =>
-                          handleToggleEnabled(
-                            (e.target as HTMLInputElement).checked
-                          )
-                      "
-                    >
-                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                      {{ isEnabled ? 'Enabled' : 'Enable' }}
-                    </span>
-                    <i
-                      v-if="enabling"
-                      class="fa-solid fa-spinner ml-2 animate-spin"
-                    />
-                  </label>
-                </div>
-                <ErrorBanner
-                  v-if="!canEnable"
-                  text="This plugin can’t be enabled until all required secrets are configured."
-                />
               </div>
             </template>
           </FormRow>
