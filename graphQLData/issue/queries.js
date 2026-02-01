@@ -199,10 +199,19 @@ export const GET_ISSUES_BY_CHANNEL = gql`
 `;
 
 export const GET_CLOSED_ISSUES_BY_CHANNEL = gql`
-  query getClosedIssuesByChannel($channelUniqueName: String!) {
+  query getClosedIssuesByChannel($channelUniqueName: String!, $searchInput: String) {
     channels(where: { uniqueName: $channelUniqueName }) {
       uniqueName
-      Issues(where: { isOpen: false }, options: { sort: { createdAt: DESC } }) {
+      Issues(
+        where: {
+          isOpen: false
+          OR: [
+            { title_CONTAINS: $searchInput }
+            { body_CONTAINS: $searchInput }
+          ]
+        }
+        options: { sort: { createdAt: DESC } }
+      ) {
         id
         issueNumber
         title
