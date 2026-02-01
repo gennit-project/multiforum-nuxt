@@ -12,6 +12,8 @@ import FilterChip from '@/components/FilterChip.vue';
 import SearchBar from '@/components/SearchBar.vue';
 import SearchableTagList from '@/components/SearchableTagList.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { getTagLabel } from '@/utils';
 import type { LocationQueryValue } from 'vue-router';
 import type { Channel } from '@/__generated__/graphql';
@@ -252,6 +254,21 @@ const defaultLabels = {
               </div>
             </template>
           </FilterChip>
+
+          <RequireAuth
+            class="ml-2"
+            :full-width="false"
+          >
+            <template #has-auth>
+              <PrimaryButton
+                label="New Forum"
+                @click="$router.push('/forums/create')"
+              />
+            </template>
+            <template #does-not-have-auth>
+              <PrimaryButton label="New Forum" />
+            </template>
+          </RequireAuth>
         </div>
         <ClientOnly>
           <ErrorBanner
