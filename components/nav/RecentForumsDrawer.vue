@@ -49,7 +49,7 @@ const navigateToCreateForum = () => {
     >
       <div
         v-if="isOpen"
-        class="fixed left-16 top-0 z-40 h-full w-80 overflow-y-auto border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+        class="fixed left-0 top-0 z-40 h-full w-80 overflow-y-auto border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
       >
         <!-- Header -->
         <div
