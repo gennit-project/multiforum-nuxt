@@ -104,7 +104,7 @@ export default defineComponent({
           name: 'forums-forumId-issues-create',
           params: { forumId: channelId },
         }"
-        class="text-blue-600 hover:underline dark:text-blue-400"
+        class="text-blue-600 underline hover:underline dark:text-blue-400"
       >
         Create one?
       </nuxt-link>

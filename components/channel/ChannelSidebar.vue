@@ -230,52 +230,45 @@ const handleBecomeAdminSuccess = () => {
             </button>
           </div>
 
-          <div class="flex justify-between">
-            <span
-              class="my-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
-            >
-              <i class="fa-solid fa-robot mr-2" />Bots
-            </span>
-          </div>
-
-          <div
-            v-if="botAccounts.length > 0"
-            class="flex-col space-y-2 text-sm font-bold"
-          >
-            <div v-for="bot in botAccounts" :key="bot.username">
-              <nuxt-link
-                :to="{
-                  name: 'u-username',
-                  params: { username: bot.username },
-                }"
-                class="flex items-center dark:text-white"
+          <template v-if="botAccounts.length > 0">
+            <div class="flex justify-between">
+              <span
+                class="my-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
               >
-                <div
-                  class="mr-2 flex h-6 w-6 items-center justify-center rounded-full border bg-blue-100 dark:border-gray-600 dark:bg-blue-900"
-                  title="Bot account"
-                >
-                  <span class="text-sm">🤖</span>
-                </div>
-                <span class="flex flex-row items-center gap-2">
-                  <span class="font-bold">
-                    {{ bot.displayName || bot.username }}
-                  </span>
-                  <span
-                    v-if="bot.isDeprecated"
-                    class="rounded-full bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-200"
-                  >
-                    Inactive
-                  </span>
-                </span>
-              </nuxt-link>
+                <i class="fa-solid fa-robot mr-2" />Bots
+              </span>
             </div>
-          </div>
 
-          <div v-else class="my-3 mb-6">
-            <p class="mb-3 text-sm dark:text-gray-400">
-              This forum does not have any bots yet.
-            </p>
-          </div>
+            <div class="flex-col space-y-2 text-sm font-bold">
+              <div v-for="bot in botAccounts" :key="bot.username">
+                <nuxt-link
+                  :to="{
+                    name: 'u-username',
+                    params: { username: bot.username },
+                  }"
+                  class="flex items-center dark:text-white"
+                >
+                  <div
+                    class="mr-2 flex h-6 w-6 items-center justify-center rounded-full border bg-blue-100 dark:border-gray-600 dark:bg-blue-900"
+                    title="Bot account"
+                  >
+                    <span class="text-sm">🤖</span>
+                  </div>
+                  <span class="flex flex-row items-center gap-2">
+                    <span class="font-bold">
+                      {{ bot.displayName || bot.username }}
+                    </span>
+                    <span
+                      v-if="bot.isDeprecated"
+                      class="rounded-full bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-200"
+                    >
+                      Inactive
+                    </span>
+                  </span>
+                </nuxt-link>
+              </div>
+            </div>
+          </template>
         </div>
       </div>
     </div>
