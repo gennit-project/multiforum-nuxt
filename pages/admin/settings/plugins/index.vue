@@ -314,6 +314,7 @@ onMounted(() => {
               <!-- Status Filter -->
               <select
                 v-model="statusFilter"
+                aria-label="Filter plugins by status"
                 class="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               >
                 <option value="all">All Status</option>

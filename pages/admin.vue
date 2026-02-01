@@ -27,7 +27,9 @@ const serverConfig = computed(() => {
 
 const isSettingsPage = computed(() => {
   const routeName = route.name?.toString() || '';
-  return routeName.includes('admin-settings') || routeName.includes('admin-plugins');
+  return (
+    routeName.includes('admin-settings') || routeName.includes('admin-plugins')
+  );
 });
 </script>
 
@@ -49,7 +51,7 @@ const isSettingsPage = computed(() => {
           <div class="flex flex-col divide-x dark:divide-gray-500 md:flex-row">
             <div
               :class="isSettingsPage ? 'w-full' : 'min-w-0 flex-1'"
-              class="bg-white p-4 dark:bg-gray-800 md:p-6"
+              class="p-4 md:p-6"
             >
               <div class="max-w-full">
                 <NuxtPage />
