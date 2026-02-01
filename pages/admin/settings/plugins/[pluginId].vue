@@ -295,6 +295,13 @@ const canInstall = computed(() => {
   return !isSelectedVersionInstalled.value && selectedVersion.value;
 });
 
+// Get full manifest JSON for display
+const manifestJson = computed(() => {
+  const manifest = installedPlugin.value?.manifest;
+  if (!manifest) return null;
+  return JSON.stringify(manifest, null, 2);
+});
+
 // Set default version when plugin loads
 watch(
   [availableVersions, () => latestVersion.value, () => shouldAutoUpdate.value],
@@ -1059,6 +1066,23 @@ const getSecretStatusText = (status: string) => {
                     Save Settings
                   </button>
                 </div>
+              </div>
+            </template>
+          </FormRow>
+
+          <!-- Plugin Manifest JSON -->
+          <FormRow
+            v-if="manifestJson"
+            section-title="Plugin Manifest"
+          >
+            <template #content>
+              <div
+                tabindex="0"
+                role="region"
+                aria-label="Plugin manifest JSON"
+                class="max-h-96 overflow-auto rounded-md border border-gray-300 bg-gray-900 p-3 dark:border-gray-600"
+              >
+                <pre class="whitespace-pre-wrap break-words text-sm text-gray-100">{{ manifestJson }}</pre>
               </div>
             </template>
           </FormRow>
