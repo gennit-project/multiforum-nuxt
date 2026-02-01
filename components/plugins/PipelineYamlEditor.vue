@@ -5,6 +5,9 @@ import * as yaml from 'js-yaml';
 import { Codemirror } from 'vue-codemirror';
 import { basicSetup } from 'codemirror';
 import { yaml as yamlLang } from '@codemirror/lang-yaml';
+import { oneDark } from '@codemirror/theme-one-dark';
+import { useUIStore } from '@/stores/uiStore';
+import { storeToRefs } from 'pinia';
 
 const props = defineProps<{
   modelValue: string;
@@ -17,9 +20,19 @@ const emit = defineEmits<{
   parse: [config: PipelineConfig | null, error: string | null];
 }>();
 
+const uiStore = useUIStore();
+const { theme } = storeToRefs(uiStore);
+const isDarkMode = computed(() => theme.value === 'dark');
+
 const parseError = ref<string | null>(null);
 const editorValue = ref(props.modelValue);
-const extensions = computed(() => [basicSetup, yamlLang()]);
+const extensions = computed(() => {
+  const baseExtensions = [basicSetup, yamlLang()];
+  if (isDarkMode.value) {
+    baseExtensions.push(oneDark);
+  }
+  return baseExtensions;
+});
 let syncingFromProps = false;
 
 function parseYaml(content: string) {
@@ -63,6 +76,7 @@ watch(editorValue, (value) => {
         placeholder="Pipeline configuration..."
         :indent-with-tab="true"
         :tab-size="2"
+        aria-label="Pipeline YAML configuration editor"
       />
       <template #fallback>
         <div class="h-96 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
