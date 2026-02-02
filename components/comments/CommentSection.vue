@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { ref, computed, watch, watchEffect } from 'vue';
-import { useMutation } from '@vue/apollo-composable';
 import Comment from './Comment.vue';
 import LoadMore from '../LoadMore.vue';
 import WarningModal from '../WarningModal.vue';
@@ -10,14 +9,6 @@ import SortButtons from '@/components/SortButtons.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import ConfirmUndoCommentFeedbackModal from '@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue';
 import EditCommentFeedbackModal from '@/components/comments/EditCommentFeedbackModal.vue';
-import { GET_COMMENT_REPLIES } from '@/graphQLData/comment/queries';
-import {
-  DELETE_COMMENT,
-  UPDATE_COMMENT,
-  SOFT_DELETE_COMMENT,
-  CREATE_COMMENT,
-  ADD_FEEDBACK_COMMENT_TO_COMMENT,
-} from '@/graphQLData/comment/mutations';
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import type {
   CommentCreateInput,
@@ -26,9 +17,8 @@ import type {
 import type {
   CreateEditCommentFormValues,
   CreateReplyInputData,
-  DeleteCommentInputData,
 } from '@/types/Comment';
-import type { Ref, PropType } from 'vue';
+import type { PropType } from 'vue';
 import { modProfileNameVar } from '@/cache';
 import { useRouter, useRoute } from 'nuxt/app';
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
@@ -40,6 +30,12 @@ import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { hasBotMention, type BotSuggestion } from '@/utils/botMentions';
 
+// Import new composables
+import { useCommentSectionNotifications } from '@/composables/useCommentSectionNotifications';
+import { useCommentSectionModals } from '@/composables/useCommentSectionModals';
+import { useCommentFeedbackMutation } from '@/composables/useCommentFeedbackMutation';
+import { useCommentCrudMutations } from '@/composables/useCommentCrudMutations';
+
 type CommentSectionQueryVariablesType = {
   discussionId?: string;
   eventId?: string;
@@ -47,15 +43,6 @@ type CommentSectionQueryVariablesType = {
   limit: number;
   offset: number;
   sort: string;
-};
-
-type GiveFeedbackInput = {
-  commentData: CommentType;
-  parentCommentId: string;
-};
-
-type EditFeedbackInput = {
-  commentData: CommentType;
 };
 
 // Props
@@ -155,44 +142,56 @@ const channelId = computed(() =>
 const activeSort = computed(() => getSortFromQuery(route.query));
 const permalinkedCommentId = ref(`${route.params.commentId}`);
 
-// Comment form state
-const commentToDeleteId = ref('');
+// Use notification composable
+const {
+  showCopiedLinkNotification,
+  showMarkedAsBestAnswerNotification,
+  showUnmarkedAsBestAnswerNotification,
+  showFeedbackSubmittedSuccessfully,
+  showSuccessfullyReported,
+  showSuccessfullyArchived,
+  showSuccessfullyArchivedAndSuspended,
+  showSuccessfullyUnarchived,
+} = useCommentSectionNotifications();
 
-const commentToDeleteReplyCount = ref(0);
-const commentToEdit: Ref<CommentType | null> = ref(null);
-const showFeedbackSubmittedSuccessfully = ref(false);
-const showFeedbackFormModal = ref(false);
-const commentToGiveFeedbackOn: Ref<CommentType | null> = ref(null);
-const commentToRemoveFeedbackFrom: Ref<CommentType | null> = ref(null);
-const commentToReport: Ref<CommentType | null> = ref(null);
-const showDeleteCommentModal = ref(false);
-const showConfirmUndoFeedbackModal = ref(false);
-const showEditCommentFeedbackModal = ref(false);
-const parentOfCommentToDelete = ref('');
-const parentIdOfCommentToGiveFeedbackOn = ref('');
+// Use modals composable
+const {
+  showDeleteModal: showDeleteCommentModal,
+  commentToDeleteId,
+  commentToDeleteReplyCount,
+  parentOfCommentToDelete,
+  handleClickDelete,
+  showFeedbackFormModal,
+  showConfirmUndoFeedbackModal,
+  showEditCommentFeedbackModal,
+  commentToGiveFeedbackOn,
+  commentToRemoveFeedbackFrom,
+  parentIdOfCommentToGiveFeedbackOn,
+  handleClickGiveFeedback,
+  handleClickUndoFeedback,
+  handleClickEditFeedback,
+  showBrokenRulesModal,
+  commentToReport,
+  handleClickReport,
+  showArchiveModal,
+  showArchiveAndSuspendModal,
+  showUnarchiveModal,
+  commentToArchiveId,
+  commentToArchiveAndSuspendId,
+  commentToUnarchiveId,
+  handleClickArchive,
+  handleClickArchiveAndSuspend,
+  handleClickUnarchive,
+} = useCommentSectionModals();
+
+// Comment form state
+const commentToEdit = ref<CommentType | null>(null);
 const commentInProcess = ref(false);
 const submitAttempted = ref(false);
 const replyFormOpenAtCommentID = ref('');
 const editFormOpenAtCommentID = ref('');
-const showCopiedLinkNotification = ref(false);
-const showMarkedAsBestAnswerNotification = ref(false);
-const showUnmarkedAsBestAnswerNotification = ref(false);
-
-
-// Moderation related state
-const commentToArchiveId = ref('');
-const commentToArchiveAndSuspendId = ref('');
-const commentToUnarchiveId = ref('');
-const showArchiveModal = ref(false);
-const showArchiveAndSuspendModal = ref(false);
-const showUnarchiveModal = ref(false);
-const showModProfileModal = ref(false);
-const showBrokenRulesModal = ref(false);
-const showSuccessfullyReported = ref(false);
-const showSuccessfullyArchived = ref(false);
-const showSuccessfullyArchivedAndSuspended = ref(false);
-const showSuccessfullyUnarchived = ref(false);
 const locked = ref(props.locked);
+const showModProfileModal = ref(false);
 
 const hasLoadedComments = ref(
   (props.comments?.length || 0) > 0 || !props.loading
@@ -226,254 +225,74 @@ const editFormValues = ref<CreateEditCommentFormValues>({
   depth: 1,
 });
 
+// Use feedback mutation composable
 const {
-  mutate: addFeedbackCommentToComment,
-  loading: addFeedbackCommentToCommentLoading,
-  error: addFeedbackCommentToCommentError,
-  onDone: onAddFeedbackCommentToCommentDone,
-} = useMutation(ADD_FEEDBACK_COMMENT_TO_COMMENT, {
-  update: (cache, result) => {
-    const parentId = JSON.parse(
-      JSON.stringify(parentIdOfCommentToGiveFeedbackOn.value)
-    );
-    const newFeedbackComment = result.data.createComments.comments[0];
-    const commentWeGaveFeedbackOn = commentToGiveFeedbackOn.value;
-
-    if (parentId && commentWeGaveFeedbackOn) {
-      // Modify the comment to add feedback
-      cache.modify({
-        id: cache.identify({
-          __typename: 'Comment',
-          id: commentWeGaveFeedbackOn.id,
-        }),
-        fields: {
-          FeedbackComments(existing = []) {
-            return [...existing, newFeedbackComment];
-          },
-        },
-      });
-    } else {
-      emit('updateCommentSectionQueryResult', {
-        cache,
-        commentToAddFeedbackTo: commentToGiveFeedbackOn.value,
-        newFeedbackComment,
-      });
-    }
+  addFeedbackCommentToComment,
+  addFeedbackLoading: addFeedbackCommentToCommentLoading,
+  addFeedbackError: addFeedbackCommentToCommentError,
+} = useCommentFeedbackMutation({
+  parentIdOfCommentToGiveFeedbackOn,
+  commentToGiveFeedbackOn,
+  onFeedbackAdded: () => {
+    showFeedbackFormModal.value = false;
+    showFeedbackSubmittedSuccessfully.value = true;
+  },
+  onUpdateQueryResult: (params) => {
+    emit('updateCommentSectionQueryResult', params);
   },
 });
 
-onAddFeedbackCommentToCommentDone(() => {
-  showFeedbackFormModal.value = false;
-  showFeedbackSubmittedSuccessfully.value = true;
-});
+// Computed ref for discussion ID
+const discussionIdRef = computed(
+  () => props.commentSectionQueryVariables.discussionId
+);
 
+// Use CRUD mutations composable
 const {
-  mutate: editComment,
-  error: editCommentError,
-  onDone: onDoneUpdatingComment,
-} = useMutation(UPDATE_COMMENT);
-
-const {
-  mutate: deleteComment,
-  onDone: onDoneDeletingComment,
-  loading: deleteCommentLoading,
-} = useMutation(DELETE_COMMENT, {
-  update: (cache) => {
-    // First evict the comment itself
-    cache.evict({
-      id: cache.identify({
-        __typename: 'Comment',
-        id: commentToDeleteId.value,
-      }),
+  createComment,
+  createCommentError,
+  editComment,
+  editCommentError,
+  onDoneUpdatingComment,
+  deleteComment,
+  deleteCommentLoading,
+  softDeleteComment,
+} = useCommentCrudMutations({
+  discussionId: discussionIdRef,
+  commentToDeleteId,
+  parentOfCommentToDelete,
+  onCommentCreated: () => {
+    commentInProcess.value = false;
+    submitAttempted.value = false;
+    replyFormOpenAtCommentID.value = '';
+    emit('updateCreateFormValues', {
+      text: '',
+      isRootComment: true,
+      depth: 1,
+      parentCommentId: '',
     });
-
-    if (parentOfCommentToDelete.value) {
-      // For replies, update the parent's child comments and count
-      cache.modify({
-        id: cache.identify({
-          __typename: 'Comment',
-          id: parentOfCommentToDelete.value,
-        }),
-        fields: {
-          ChildComments(existing = []) {
-            return existing.filter(
-              (reply: CommentType) => reply.id !== commentToDeleteId.value
-            );
-          },
-          ChildCommentsAggregate(existing = { count: 0 }) {
-            return {
-              ...existing,
-              count: Math.max(0, (existing.count || 0) - 1),
-            };
-          },
-        },
-      });
-    } else {
-      // For root comments, update the DiscussionChannel's comments
-      cache.modify({
-        id: cache.identify({
-          __typename: 'DiscussionChannel',
-          id: props.commentSectionQueryVariables.discussionId,
-        }),
-        fields: {
-          Comments(existing = []) {
-            return existing.filter(
-              (comment: CommentType) => comment.id !== commentToDeleteId.value
-            );
-          },
-          CommentsAggregate(existing = { count: 0 }) {
-            return {
-              ...existing,
-              count: Math.max(0, (existing.count || 0) - 1),
-            };
-          },
-        },
-      });
-    }
-
-    // Clean up any dangling references
-    cache.gc();
-
+  },
+  onCommentDeleted: () => {
+    commentToDeleteId.value = '';
+    showDeleteCommentModal.value = false;
+  },
+  onIncrementCommentCount: (cache) => {
+    emit('incrementCommentCount', cache);
+  },
+  onDecrementCommentCount: (cache) => {
     emit('decrementCommentCount', cache);
   },
 });
 
-onDoneDeletingComment(() => {
-  commentToDeleteId.value = '';
-  showDeleteCommentModal.value = false;
-});
-
-const { mutate: softDeleteComment, onDone: onDoneSoftDeletingComment } =
-  useMutation(SOFT_DELETE_COMMENT);
-
-onDoneSoftDeletingComment(() => {
-  commentToDeleteId.value = '';
-  showDeleteCommentModal.value = false;
-});
-
-const {
-  mutate: createComment,
-  error: createCommentError,
-  onDone: onDoneCreatingComment,
-} = useMutation(
-  CREATE_COMMENT,
-  {
-    errorPolicy: 'all',
-    update: (cache, result) => {
-      const newComment: CommentType = result.data?.createComments?.comments[0];
-      const newCommentParentId = newComment?.ParentComment?.id;
-
-      // Handle root comments
-      if (!newCommentParentId) {
-        cache.modify({
-          id: cache.identify({
-            __typename: 'DiscussionChannel',
-            id: props.commentSectionQueryVariables.discussionId,
-          }),
-          fields: {
-            Comments(existingComments = []) {
-              return [newComment, ...existingComments];
-            },
-            CommentsAggregate(existing = { count: 0 }) {
-              return {
-                ...existing,
-                count: (existing?.count || 0) + 1,
-              };
-            },
-          },
-        });
-        emit('incrementCommentCount', cache);
-        return;
-      }
-
-      // Handle replies - always use GET_COMMENT_REPLIES query
-      try {
-        const existingData = cache.readQuery({
-          query: GET_COMMENT_REPLIES,
-          variables: {
-            commentId: newCommentParentId,
-            modName: modProfileNameVar.value,
-            limit: 5,
-            offset: 0,
-            sort: getSortFromQuery(route.query),
-          },
-        });
-
-        const existingReplies =
-          (
-            existingData as {
-              getCommentReplies?: {
-                ChildComments?: CommentType[];
-                aggregateChildCommentCount?: number;
-              };
-            }
-          )?.getCommentReplies?.ChildComments || [];
-        const existingCount =
-          (
-            existingData as {
-              getCommentReplies?: {
-                ChildComments?: CommentType[];
-                aggregateChildCommentCount?: number;
-              };
-            }
-          )?.getCommentReplies?.aggregateChildCommentCount || 0;
-
-        // Write the updated data back to the cache
-        cache.writeQuery({
-          query: GET_COMMENT_REPLIES,
-          variables: {
-            commentId: newCommentParentId,
-            modName: modProfileNameVar.value,
-            limit: 5,
-            offset: 0,
-            sort: getSortFromQuery(route.query),
-          },
-          data: {
-            getCommentReplies: {
-              __typename: 'CommentReplies',
-              ChildComments: [newComment, ...existingReplies],
-              aggregateChildCommentCount: existingCount + 1,
-            },
-          },
-        });
-
-        // Update the parent comment's counts
-        cache.modify({
-          id: cache.identify({
-            __typename: 'Comment',
-            id: newCommentParentId,
-          }),
-          fields: {
-            ChildCommentsAggregate(existing = { count: 0 }) {
-              return {
-                __typename: 'CommentsAggregate',
-                count: (existing.count || 0) + 1,
-              };
-            },
-            replyCount(existing = 0) {
-              return (existing || 0) + 1;
-            },
-          },
-        });
-
-        emit('incrementCommentCount', cache);
-      } catch (error) {
-        console.error('Error updating cache:', error);
-      }
-    },
-  }
-);
-
-onDoneCreatingComment(() => {
+onDoneUpdatingComment(() => {
   commentInProcess.value = false;
-  submitAttempted.value = false;
-  replyFormOpenAtCommentID.value = '';
-  emit('updateCreateFormValues', {
+  editFormOpenAtCommentID.value = '';
+  commentToEdit.value = null;
+  editFormValues.value = {
     text: '',
     isRootComment: true,
     depth: 1,
-    parentCommentId: '',
-  });
+  };
 });
 
 const {
@@ -489,17 +308,6 @@ const showSuspensionNotice = computed(() => {
   return submitAttempted.value && !!suspensionIssueNumber.value;
 });
 
-onDoneUpdatingComment(() => {
-  commentInProcess.value = false;
-  editFormOpenAtCommentID.value = '';
-  commentToEdit.value = null;
-  editFormValues.value = {
-    text: '',
-    isRootComment: true,
-    depth: 1,
-  };
-});
-
 watchEffect(() => {
   if (typeof route.params.commentId === 'string') {
     permalinkedCommentId.value = route.params.commentId;
@@ -507,7 +315,6 @@ watchEffect(() => {
 });
 
 function handleClickCreate() {
-  // Simply trigger the mutation with the properly structured input from props
   submitAttempted.value = true;
   createComment({
     createCommentInput: props.createCommentInput,
@@ -519,7 +326,6 @@ function updateCreateInputValuesForReply(input: CreateReplyInputData) {
   if (!parentCommentId) {
     throw new Error('parentCommentId is required to reply to a comment');
   }
-  // Emit to parent to update the form values
   emit('updateCreateReplyCommentInput', {
     text,
     isRootComment: false,
@@ -544,14 +350,6 @@ function updateEditInputValues(text: string, isRootComment: boolean) {
     text,
     isRootComment,
   };
-}
-
-function handleClickDelete(input: DeleteCommentInputData) {
-  const { commentId, parentCommentId, replyCount } = input;
-  showDeleteCommentModal.value = true;
-  commentToDeleteId.value = commentId;
-  commentToDeleteReplyCount.value = replyCount;
-  parentOfCommentToDelete.value = parentCommentId;
 }
 
 function handleSaveEdit() {
@@ -603,46 +401,6 @@ function openEditCommentEditor(commentId: string) {
 function hideEditCommentEditor() {
   editFormOpenAtCommentID.value = '';
   commentToEdit.value = null; // Clear edited comment data
-}
-
-function handleClickGiveFeedback(input: GiveFeedbackInput) {
-  const { commentData, parentCommentId } = input;
-  showFeedbackFormModal.value = true;
-  parentIdOfCommentToGiveFeedbackOn.value = parentCommentId;
-  commentToGiveFeedbackOn.value = commentData;
-}
-
-function handleClickUndoFeedback(input: GiveFeedbackInput) {
-  const { commentData, parentCommentId } = input;
-  showConfirmUndoFeedbackModal.value = true;
-  parentIdOfCommentToGiveFeedbackOn.value = parentCommentId;
-  commentToRemoveFeedbackFrom.value = commentData;
-}
-
-function handleClickEditFeedback(input: EditFeedbackInput) {
-  const { commentData } = input;
-  commentToGiveFeedbackOn.value = commentData;
-  showEditCommentFeedbackModal.value = true;
-}
-
-function handleClickReport(commentData: CommentType) {
-  commentToReport.value = commentData;
-  showBrokenRulesModal.value = true;
-}
-
-function handleClickArchive(commentId: string) {
-  commentToArchiveId.value = commentId;
-  showArchiveModal.value = true;
-}
-
-function handleClickArchiveAndSuspend(commentId: string) {
-  commentToArchiveAndSuspendId.value = commentId;
-  showArchiveAndSuspendModal.value = true;
-}
-
-function handleClickUnarchive(commentId: string) {
-  commentToUnarchiveId.value = commentId;
-  showUnarchiveModal.value = true;
 }
 
 function handleSubmitFeedback() {
