@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useDisplay } from 'vuetify';
 import TopNav from '@/components/nav/TopNav.vue';
@@ -54,6 +54,32 @@ const handleSessionExpiredLogin = () => {
     loginWithRedirect();
   }
 };
+
+// Mark Vuetify overlay container as hidden from accessibility tree when empty
+// This prevents axe from flagging it as content outside landmarks
+// When an overlay is active, we remove aria-hidden so it remains accessible
+onMounted(() => {
+  const updateOverlayAccessibility = () => {
+    document.querySelectorAll('.v-overlay-container').forEach((container) => {
+      // Check if there are any active overlays inside
+      const hasActiveOverlay = container.querySelector('.v-overlay--active');
+      if (hasActiveOverlay) {
+        container.removeAttribute('aria-hidden');
+      } else {
+        container.setAttribute('aria-hidden', 'true');
+      }
+    });
+  };
+
+  const observer = new MutationObserver(() => {
+    updateOverlayAccessibility();
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Initial setup
+  updateOverlayAccessibility();
+});
 </script>
 
 <template>
@@ -66,6 +92,7 @@ const handleSessionExpiredLogin = () => {
       <div
         v-if="isSessionExpired && isAuthenticatedVar"
         class="bg-red-500 p-4 text-center text-white"
+        role="alert"
       >
         Your session has expired. Please
         <button
@@ -79,18 +106,22 @@ const handleSessionExpiredLogin = () => {
       <div
         class="flex flex-grow list-disc flex-col bg-gray-200 dark:bg-black dark:text-gray-200"
       >
-        <TopNav
-          :show-user-profile-dropdown="showUserProfileDropdown"
-          :side-nav-is-open="sideNavIsOpenVar"
-          @close-user-profile-dropdown="closeUserProfileDropdown"
-          @toggle-dropdown="toggleDropdown"
-          @toggle-user-profile-dropdown="toggleUserProfileDropdown"
-        />
+        <header>
+          <TopNav
+            :show-user-profile-dropdown="showUserProfileDropdown"
+            :side-nav-is-open="sideNavIsOpenVar"
+            @close-user-profile-dropdown="closeUserProfileDropdown"
+            @toggle-dropdown="toggleDropdown"
+            @toggle-user-profile-dropdown="toggleUserProfileDropdown"
+          />
+        </header>
 
         <div class="relative flex flex-grow flex-col">
           <!-- Vertical Icon Navigation for Large Screens -->
           <ClientOnly>
-            <VerticalIconNav />
+            <nav aria-label="Main navigation">
+              <VerticalIconNav />
+            </nav>
             <template #fallback>
               <div
                 class="hidden h-full w-20 lg:block"
@@ -100,12 +131,16 @@ const handleSessionExpiredLogin = () => {
           </ClientOnly>
 
           <!-- Mobile/Tablet Side Navigation -->
-          <SiteSidenav
+          <nav
             v-if="!lgAndUp"
-            :key="`${sideNavIsOpenVar}`"
-            :show-dropdown="sideNavIsOpenVar"
-            @close="setSideNavIsOpenVar(false)"
-          />
+            aria-label="Mobile navigation"
+          >
+            <SiteSidenav
+              :key="`${sideNavIsOpenVar}`"
+              :show-dropdown="sideNavIsOpenVar"
+              @close="setSideNavIsOpenVar(false)"
+            />
+          </nav>
 
           <div
             class="flex min-w-0 flex-1 flex-col bg-white dark:bg-black lg:pl-20"
@@ -113,13 +148,17 @@ const handleSessionExpiredLogin = () => {
             <slot />
           </div>
           <ClientOnly>
-            <SiteFooter
-              v-if="showFooter"
-              class="mt-auto"
-              :class="{ 'pl-16': mdAndUp }"
-            />
+            <footer>
+              <SiteFooter
+                v-if="showFooter"
+                class="mt-auto"
+                :class="{ 'pl-16': mdAndUp }"
+              />
+            </footer>
             <template #fallback>
-              <SiteFooter v-if="showFooter" class="mt-auto" />
+              <footer>
+                <SiteFooter v-if="showFooter" class="mt-auto" />
+              </footer>
             </template>
           </ClientOnly>
         </div>
