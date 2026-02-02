@@ -284,13 +284,6 @@ export function encodeSpacesInURL(url: string) {
 export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
   const { signedStorageURL, filename, file } = input;
 
-  // Log debug info
-  console.log('File info:', {
-    name: file.name,
-    type: file.type,
-    size: file.size,
-  });
-
   // Check validation
   const sizeCheck = isFileSizeValid({ file });
   if (!sizeCheck.valid) {
@@ -324,10 +317,6 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
       }
     })();
 
-  console.log('Using content type:', contentType);
-  console.log('Upload starting...');
-  console.log('SignedStorageURL prefix:', signedStorageURL.split('?')[0]);
-
   try {
     const response = await fetch(signedStorageURL, {
       method: 'PUT',
@@ -335,12 +324,6 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
       headers: {
         'Content-Type': contentType,
       },
-    });
-
-    console.log('Upload response:', {
-      status: response.status,
-      statusText: response.statusText,
-      ok: response.ok,
     });
 
     if (!response.ok) {
@@ -351,9 +334,6 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
       );
       throw new Error(`Upload failed with status ${response.status}`);
     }
-
-    // Verify the URL is accessible
-    console.log('Upload complete, URL should be:', embeddedLink);
 
     return embeddedLink;
   } catch (error) {

@@ -118,7 +118,6 @@ const clearAuthState = () => {
         localStorage.removeItem(key);
       }
     });
-    console.log('Auth state cleared due to invalid tokens');
   } catch (error) {
     console.error('Error clearing auth state:', error);
   }
@@ -168,7 +167,6 @@ if (import.meta.env.SSR === false) {
 
       if (lastRefreshAt && parseInt(lastRefreshAt) > thirtySecondsAgo) {
         // Already refreshed recently, use the existing token
-        console.log('Using recently refreshed token');
         return true;
       }
 
@@ -181,7 +179,6 @@ if (import.meta.env.SSR === false) {
         if (freshToken && idTokenClaims.value) {
           localStorage.setItem('token', idTokenClaims.value.__raw || '');
           sessionStorage.setItem('tokenRefreshedAt', now.toString());
-          console.log('Token refreshed after session expired error');
           return true;
         }
         return false;
@@ -196,7 +193,6 @@ if (import.meta.env.SSR === false) {
           (innerError.message.includes('Unknown or invalid refresh token') ||
             innerError.error === 'invalid_grant')
         ) {
-          console.log('Invalid refresh token detected, clearing auth state');
           clearAuthState();
           return false;
         }
@@ -249,12 +245,8 @@ if (import.meta.env.SSR === false) {
               localStorage.setItem('token', idTokenClaims.value?.__raw || '');
               // Set the flag to prevent multiple refreshes
               sessionStorage.setItem('tokenRefreshedAt', now.toString());
-              console.log('Token refreshed on page load');
             }
           } catch (tokenError) {
-            // Handle token refresh errors gracefully
-            console.log('Token refresh failed on mount:', tokenError);
-
             // Check for invalid grant specifically
             if (
               isAuth0Error(tokenError) &&
@@ -262,18 +254,12 @@ if (import.meta.env.SSR === false) {
                 (tokenError.message &&
                   tokenError.message.includes('Unknown or invalid refresh token')))
             ) {
-              console.log(
-                'Invalid refresh token detected on mount, clearing auth state'
-              );
               clearAuthState();
 
               // Prevent further auth attempts in this session
               sessionStorage.setItem('authFailure', 'true');
               return;
             }
-
-            // For other token errors, just log and continue
-            console.log('Non-critical token error, continuing without refresh');
           }
         } else if (idTokenClaims.value) {
           // Handle case for returning from a redirect
@@ -315,28 +301,21 @@ if (import.meta.env.SSR === false) {
         clearAuthState();
       }
 
-      // Add debug statements for troubleshooting
-      console.log('Login button clicked');
-
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
       // @ts-ignore
       if (window?.parent?.Cypress || isMobile) {
         // Make sure to return early after redirect to prevent additional actions
-        console.log('Using redirect for Cypress or mobile');
         await loginWithRedirect();
         return;
       }
 
-      console.log('Attempting popup login');
       await loginWithPopup();
-      console.log('Popup login completed');
 
       // Ensure state is updated
       if (isAuthenticated.value) {
         setIsAuthenticated(true);
         setAuthHint(true); // Set auth hint cookie after successful login
-        console.log('Authentication state updated');
       }
 
       await storeToken();
