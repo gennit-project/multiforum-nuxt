@@ -138,7 +138,7 @@ const isDownloadDetailPage = computed(() => {
         <v-skeleton-loader class="w-28" type="button" :theme="theme" />
       </div>
       <div v-else ref="discussionDetail" class="flex-1">
-        <h2
+        <h1
           v-if="!titleEditMode"
           class="text-wrap px-1 text-lg sm:tracking-tight md:text-2xl"
         >
@@ -147,7 +147,7 @@ const isDownloadDetailPage = computed(() => {
               ? discussion.title
               : "Couldn't find the discussion"
           }}
-        </h2>
+        </h1>
 
         <TextInput
           v-if="titleEditMode"

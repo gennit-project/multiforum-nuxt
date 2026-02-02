@@ -104,12 +104,12 @@ const { theme } = useAppTheme();
         :theme="theme"
       />
       <div v-else ref="eventDetail" class="flex-1">
-        <h2
+        <h1
           v-if="!titleEditMode"
           class="text-md text-wrap px-1 sm:tracking-tight md:text-3xl"
         >
           {{ event?.title || '[Deleted]' }}
-        </h2>
+        </h1>
         <TextInput
           v-else
           ref="titleInputRef"
