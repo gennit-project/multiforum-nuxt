@@ -214,7 +214,7 @@ const filterByTag = (tag: string) => {
 };
 
 type SetMarkerDataInput = {
-  map: any;
+  map: google.maps.Map | null;
   markerMap: MarkerMap;
 };
 
@@ -242,7 +242,7 @@ type HighlightEventInput = {
   eventData: EventData;
   clickedMapMarker: boolean;
   markerMap: MarkerMap;
-  map: any;
+  map: google.maps.Map | null;
 };
 
 const highlightEventOnMap = (input: HighlightEventInput) => {
@@ -348,12 +348,8 @@ const highlightEventOnMap = (input: HighlightEventInput) => {
 
     if (numberOfEvents > 1) {
       const selectedEventsObject = markerMap.markers[eventLocationId].events;
-      const getArrayFromObject = (obj: any) => {
-        const ary = [];
-        for (const key in obj) {
-          ary.push(obj[key]);
-        }
-        return ary;
+      const getArrayFromObject = <T>(obj: Record<string, T>): T[] => {
+        return Object.values(obj);
       };
       selectedEvents.value = getArrayFromObject(selectedEventsObject);
     }

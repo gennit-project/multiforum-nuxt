@@ -2,6 +2,8 @@
 /* eslint-disable vue/no-v-html */
 import { computed, ref } from 'vue';
 import MarkdownIt from 'markdown-it';
+import type Token from 'markdown-it/lib/token.mjs';
+import type Renderer from 'markdown-it/lib/renderer.mjs';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github-dark.css';
 
@@ -40,7 +42,7 @@ const props = defineProps({
 
 const md = new MarkdownIt({
   html: true, // Enable HTML tags in source
-  highlight: (str, lang): any => {
+  highlight: (str: string, lang: string): string => {
     if (lang && hljs.getLanguage(lang)) {
       try {
         return `<pre class="hljs p-4 text-xs"><code>${hljs.highlight(str, { language: lang }).value}</code></pre>`;
@@ -54,27 +56,29 @@ const md = new MarkdownIt({
 
 // Configure renderer to add target="_blank" and rel="noopener noreferrer" to all links
 md.renderer.rules.link_open = (
-  tokens: any,
+  tokens: Token[],
   idx: number,
-  options: any,
-  _env: any,
-  self: any
-) => {
+  options: MarkdownIt.Options,
+  _env: unknown,
+  self: Renderer
+): string => {
   const token = tokens[idx];
-  token.attrPush(['target', '_blank']);
-  token.attrPush(['rel', 'noopener noreferrer']);
-  token.attrPush(['class', 'external-link']);
+  if (token) {
+    token.attrPush(['target', '_blank']);
+    token.attrPush(['rel', 'noopener noreferrer']);
+    token.attrPush(['class', 'external-link']);
+  }
   return self.renderToken(tokens, idx, options);
 };
 
 // Configure heading renderer to add anchors
 md.renderer.rules.heading_open = (
-  tokens: any,
+  tokens: Token[],
   idx: number,
-  options: any,
-  _env: any,
-  self: any
-) => {
+  options: MarkdownIt.Options,
+  _env: unknown,
+  self: Renderer
+): string => {
   const token = tokens[idx];
 
   // Get the heading text from the next token
@@ -83,8 +87,10 @@ md.renderer.rules.heading_open = (
     nextToken && nextToken.content ? nextToken.content : `heading-${idx}`;
   const headingId = generateHeadingId(headingText) || `heading-${idx}`;
 
-  token.attrPush(['id', headingId]);
-  token.attrPush(['class', 'heading-with-anchor']);
+  if (token) {
+    token.attrPush(['id', headingId]);
+    token.attrPush(['class', 'heading-with-anchor']);
+  }
 
   return self.renderToken(tokens, idx, options);
 };

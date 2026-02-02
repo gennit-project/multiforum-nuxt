@@ -57,7 +57,7 @@ watch(
   (newResult) => {
     if (newResult?.users?.[0]?.FavoriteImages) {
       isFavorited.value = newResult.users[0].FavoriteImages.some(
-        (image: any) => image.id === props.imageId
+        (image: { id: string }) => image.id === props.imageId
       );
     }
   },

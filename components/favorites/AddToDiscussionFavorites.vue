@@ -8,7 +8,7 @@ import {
 } from '@/graphQLData/user/mutations';
 import { usernameVar } from '@/cache';
 import { useToastStore } from '@/stores/toastStore';
-import { useAddToListModalStore } from '@/stores/addToListModalStore';
+import { useAddToListModalStore, type AllowedItemType } from '@/stores/addToListModalStore';
 import AddToFavoritesButton from '@/components/favorites/AddToFavoritesButton.vue';
 
 const props = defineProps({
@@ -71,7 +71,7 @@ watch(
   (newResult) => {
     if (newResult?.users?.[0]?.FavoriteDiscussions) {
       isFavorited.value = newResult.users[0].FavoriteDiscussions.some(
-        (discussion: any) => discussion.id === props.discussionId
+        (discussion: { id: string }) => discussion.id === props.discussionId
       );
     }
   },
@@ -94,7 +94,7 @@ const showAddedToast = () => {
     onClick: () =>
       addToListModalStore.open({
         itemId: props.discussionId,
-        itemType: props.entityType as any,
+        itemType: props.entityType as AllowedItemType,
         isAlreadyFavorite: true,
       }),
   });

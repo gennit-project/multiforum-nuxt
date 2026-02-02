@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import type { FilterGroup } from '@/__generated__/graphql';
+import type { FilterGroup, Channel, FilterGroupChannelConnection, FilterGroupOptionsConnection, FilterOption, FilterOptionGroupConnection } from '@/__generated__/graphql';
 import { FilterMode } from '@/__generated__/graphql';
+
+// Stub types for required GraphQL fields that aren't used in this form context
+const emptyChannel = {} as Channel;
+const emptyChannelConnection = {} as FilterGroupChannelConnection;
+const emptyOptionsConnection = {} as FilterGroupOptionsConnection;
+const emptyGroupConnection = {} as FilterOptionGroupConnection;
+const emptyFilterGroup = {} as FilterGroup;
 import FilterOptionManager from './FilterOptionManager.vue';
 import yaml from 'js-yaml';
 // import CheckBox from "@/components/CheckBox.vue"; // Unused for now
@@ -119,17 +126,17 @@ const convertYamlToFilterGroups = (
           order: option.order ?? optionIndex,
           // Required GraphQL fields
           __typename: 'FilterOption' as const,
-          group: {} as any, // Will be populated by parent
+          group: emptyFilterGroup, // Will be populated by parent
           groupAggregate: null,
-          groupConnection: {} as any,
+          groupConnection: emptyGroupConnection,
         })),
         // Required GraphQL fields
         __typename: 'FilterGroup' as const,
-        channel: {} as any,
+        channel: emptyChannel,
         channelAggregate: null,
-        channelConnection: {} as any,
+        channelConnection: emptyChannelConnection,
         optionsAggregate: null,
-        optionsConnection: {} as any,
+        optionsConnection: emptyOptionsConnection,
       };
     });
 
@@ -156,11 +163,11 @@ const addNewGroup = () => {
     options: [],
     // Required fields for GraphQL type but not used in this context
     __typename: 'FilterGroup' as const,
-    channel: {} as any,
+    channel: emptyChannel,
     channelAggregate: null,
-    channelConnection: {} as any,
+    channelConnection: emptyChannelConnection,
     optionsAggregate: null,
-    optionsConnection: {} as any,
+    optionsConnection: emptyOptionsConnection,
   };
 
   const updatedGroups = [...props.filterGroups, newGroup];

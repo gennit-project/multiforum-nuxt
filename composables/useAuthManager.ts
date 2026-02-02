@@ -16,6 +16,13 @@ import {
 } from '@/cache';
 import { useSSRAuth } from '@/composables/useSSRAuth';
 
+// Type for Auth0 error objects
+interface Auth0Error {
+  error?: string;
+  error_description?: string;
+  message?: string;
+}
+
 export function useAuthManager() {
   const router = useRouter();
   const userEmail = ref('');
@@ -91,8 +98,19 @@ export function useAuthManager() {
     }
   };
 
+  // Type guard to check if an error is an Auth0Error
+  const isAuth0ErrorObject = (error: unknown): error is Auth0Error => {
+    return (
+      typeof error === 'object' &&
+      error !== null &&
+      ('error' in error || 'error_description' in error || 'message' in error)
+    );
+  };
+
   // Handle authentication errors
-  const handleAuthError = (error: any) => {
+  const handleAuthError = (error: unknown) => {
+    if (!isAuth0ErrorObject(error)) return;
+
     if (
       error.error === 'invalid_grant' ||
       (error.error_description &&
@@ -234,7 +252,9 @@ export function useAuthManager() {
   };
 
   // Check if error is auth-related
-  const isAuthError = (error: any) => {
+  const isAuthError = (error: unknown) => {
+    if (!isAuth0ErrorObject(error)) return false;
+
     return (
       error.error === 'login_required' ||
       error.error === 'unauthorized' ||

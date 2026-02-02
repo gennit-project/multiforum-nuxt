@@ -62,7 +62,7 @@ watch(
   (newResult) => {
     if (newResult?.users?.[0]?.FavoriteChannels) {
       isFavorited.value = newResult.users[0].FavoriteChannels.some(
-        (channel: any) => channel.uniqueName === props.channelUniqueName
+        (channel: { uniqueName: string }) => channel.uniqueName === props.channelUniqueName
       );
     }
   },

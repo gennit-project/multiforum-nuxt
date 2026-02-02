@@ -2,8 +2,11 @@
 import { ref, computed, watch, nextTick } from 'vue';
 import type { PropType } from 'vue';
 
+// Type for option values
+export type MultiSelectValue = string;
+
 export interface MultiSelectOption {
-  value: any;
+  value: MultiSelectValue;
   label: string;
   icon?: string;
   avatar?: string;
@@ -22,7 +25,7 @@ export interface MultiSelectSection {
 const props = defineProps({
   // Selected values
   modelValue: {
-    type: Array as PropType<any[]>,
+    type: Array as PropType<MultiSelectValue[]>,
     default: () => [],
   },
   // Available options (legacy, for backwards compatibility)
@@ -93,13 +96,13 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [value: any[]];
+  'update:modelValue': [value: MultiSelectValue[]];
   search: [query: string];
 }>();
 
 const isDropdownOpen = ref(false);
 const searchQuery = ref('');
-const selected = ref<any[]>([...props.modelValue]);
+const selected = ref<MultiSelectValue[]>([...props.modelValue]);
 const searchInputRef = ref<HTMLInputElement | null>(null);
 const expandedSections = ref<Set<number>>(new Set());
 const expandedCollections = ref<Set<string>>(new Set());
@@ -121,7 +124,7 @@ const closeDropdown = () => {
   searchQuery.value = '';
 };
 
-const toggleSelection = (value: any) => {
+const toggleSelection = (value: MultiSelectValue) => {
   if (!props.multiple) {
     selected.value = selected.value.includes(value) ? [] : [value];
     closeDropdown();
@@ -204,7 +207,7 @@ const toggleSectionExpansion = (sectionIndex: number) => {
   expandedSections.value = new Set(expandedSections.value);
 };
 
-const removeSelection = (value: any, event?: Event) => {
+const removeSelection = (value: MultiSelectValue, event?: Event) => {
   if (event) {
     event.stopPropagation();
   }
@@ -269,7 +272,7 @@ const filteredOptions = computed(() => {
 });
 
 // Get option by value
-const getOptionByValue = (value: any): MultiSelectOption | undefined => {
+const getOptionByValue = (value: MultiSelectValue): MultiSelectOption | undefined => {
   return allOptions.value.find((option) => option.value === value);
 };
 
@@ -456,6 +459,7 @@ const selectedOptions = computed(() => {
                   <input
                     type="checkbox"
                     :checked="isSectionFullySelected(section.options)"
+                    :aria-label="section.selectAllLabel"
                     class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                     @click.stop="toggleSelectAll(section.options)"
                   >
@@ -519,14 +523,14 @@ const selectedOptions = computed(() => {
                 :class="[
                   'flex cursor-pointer items-center border-b px-4 py-2 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700',
                   isCollectionFullySelected(
-                    (collectionOption as any).channels || []
+                    collectionOption.channels || []
                   )
                     ? 'bg-orange-50 dark:bg-orange-900/20'
                     : '',
                 ]"
                 @click="
                   toggleCollectionChannels(
-                    (collectionOption as any).channels || []
+                    collectionOption.channels || []
                   )
                 "
               >
@@ -536,13 +540,14 @@ const selectedOptions = computed(() => {
                     type="checkbox"
                     :checked="
                       isCollectionFullySelected(
-                        (collectionOption as any).channels || []
+                        collectionOption.channels || []
                       )
                     "
+                    :aria-label="`Select all forums in ${collectionOption.label}`"
                     class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                     @click.stop="
                       toggleCollectionChannels(
-                        (collectionOption as any).channels || []
+                        collectionOption.channels || []
                       )
                     "
                   >
@@ -556,17 +561,17 @@ const selectedOptions = computed(() => {
                   <span class="ml-1 text-gray-500 dark:text-gray-400">
                     (<span
                       v-if="
-                        ((collectionOption as any).channels || []).length <= 3
+                        (collectionOption.channels || []).length <= 3
                       "
                       >{{
-                        ((collectionOption as any).channels || []).join(', ')
+                        (collectionOption.channels || []).join(', ')
                       }}</span
                     ><span
                       v-else-if="
                         !expandedCollections.has(String(collectionOption.value))
                       "
                       >{{
-                        ((collectionOption as any).channels || [])
+                        (collectionOption.channels || [])
                           .slice(0, 3)
                           .join(', ')
                       }}<button
@@ -581,7 +586,7 @@ const selectedOptions = computed(() => {
                         show more
                       </button></span
                     ><span v-else
-                      >{{ ((collectionOption as any).channels || []).join(', ')
+                      >{{ (collectionOption.channels || []).join(', ')
                       }}<button
                         type="button"
                         class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
@@ -601,7 +606,7 @@ const selectedOptions = computed(() => {
                 <span
                   class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300"
                 >
-                  {{ ((collectionOption as any).channels || []).length }}
+                  {{ (collectionOption.channels || []).length }}
                 </span>
               </div>
             </div>
@@ -634,6 +639,7 @@ const selectedOptions = computed(() => {
                     type="checkbox"
                     :checked="selected.includes(option.value)"
                     :disabled="option.disabled"
+                    :aria-label="`Select ${option.label}`"
                     class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                     @click.stop
                   >
@@ -696,6 +702,7 @@ const selectedOptions = computed(() => {
                 type="checkbox"
                 :checked="selected.includes(option.value)"
                 :disabled="option.disabled"
+                :aria-label="`Select ${option.label}`"
                 class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                 @click.stop
               >

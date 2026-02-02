@@ -12,6 +12,7 @@ import type { CreateEditCommentFormValues } from '@/types/Comment';
 import { usernameVar } from '@/cache';
 import { useRoute } from 'nuxt/app';
 import { useQuery, useMutation } from '@vue/apollo-composable';
+import type { ApolloCache } from '@apollo/client/core';
 import { GET_USER } from '@/graphQLData/user/queries';
 import {
   SUBSCRIBE_TO_EVENT,
@@ -192,7 +193,7 @@ function updateCreateReplyCommentInput(event: CreateEditCommentFormValues) {
 }
 
 function updateCommentSectionQueryResult(input: {
-  cache: any;
+  cache: ApolloCache<unknown>;
   commentToDeleteId: string;
 }) {
   try {
@@ -215,7 +216,7 @@ function updateCommentSectionQueryResult(input: {
   }
 }
 
-function incrementCommentCount(cache: any) {
+function incrementCommentCount(cache: ApolloCache<unknown>) {
   try {
     if (!props.event?.id) {
       console.error('No event ID found for incrementing comment count');
@@ -237,10 +238,11 @@ function incrementCommentCount(cache: any) {
     cache.modify({
       id: eventId,
       fields: {
-        CommentsAggregate(existing: any = {}) {
+        CommentsAggregate(existing) {
+          const data = (existing || {}) as { count?: number };
           return {
-            ...existing,
-            count: (existing.count || 0) + 1,
+            ...data,
+            count: (data.count || 0) + 1,
           };
         },
       },
@@ -250,7 +252,7 @@ function incrementCommentCount(cache: any) {
   }
 }
 
-function decrementCommentCount(cache: any) {
+function decrementCommentCount(cache: ApolloCache<unknown>) {
   try {
     if (!props.event?.id) {
       console.error('No event ID found for decrementing comment count');
@@ -272,10 +274,11 @@ function decrementCommentCount(cache: any) {
     cache.modify({
       id: eventId,
       fields: {
-        CommentsAggregate(existing: any = {}) {
+        CommentsAggregate(existing) {
+          const data = (existing || {}) as { count?: number };
           return {
-            ...existing,
-            count: Math.max(0, (existing.count || 0) - 1),
+            ...data,
+            count: Math.max(0, (data.count || 0) - 1),
           };
         },
       },

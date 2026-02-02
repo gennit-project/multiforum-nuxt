@@ -154,7 +154,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
 
   // Tag filter
   if (tags && tags.length > 0) {
-    const matchTags = tags.reduce((prev: any, curr: any) => {
+    const matchTags = tags.reduce((prev: Array<{ text_CONTAINS: string }>, curr: string) => {
       return prev.concat({ text_CONTAINS: curr });
     }, []);
     conditions.push({
@@ -193,10 +193,14 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
     // If we are in the sitewide event search page,
     // show events from any channel in the query params.
 
+    type ChannelMatchCondition = {
+      channelUniqueName_CONTAINS: string;
+      archived?: boolean;
+    };
     const matchChannels = truthyChannels.reduce(
       // Technically a selected channel could be an array
       // of strings, but we expect it to always be a string.
-      (prev: any, curr: any) => {
+      (prev: ChannelMatchCondition[], curr: string) => {
         if (!showArchived) {
           return prev.concat({
             channelUniqueName_CONTAINS: curr,

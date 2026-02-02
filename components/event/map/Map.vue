@@ -7,8 +7,11 @@ import { config } from '@/config';
 import { useAppTheme } from '@/composables/useTheme';
 import type { Event } from '@/__generated__/graphql';
 
+// Type for Google Maps markers - can be legacy or advanced markers
+type GoogleMapMarker = google.maps.Marker | google.maps.marker.AdvancedMarkerElement;
+
 export interface MarkerData {
-  marker: any | null; // Changed to any since we can have both legacy and advanced markers, null during initialization
+  marker: GoogleMapMarker | null; // Can be legacy or advanced markers, null during initialization
   events: { [key: string]: Event };
   numberOfEvents: number;
 }
@@ -93,12 +96,12 @@ const clearMarkers = () => {
     const marker = markerData.marker;
 
     if (marker) {
-      // Handle both legacy and advanced markers
-      if (marker.setMap) {
+      // Handle both legacy and advanced markers using type guards
+      if ('setMap' in marker && typeof marker.setMap === 'function') {
         marker.setMap(null);
       }
-      if (marker.map) {
-        marker.map = null;
+      if ('map' in marker && marker.map !== undefined) {
+        (marker as google.maps.marker.AdvancedMarkerElement).map = null;
       }
       google.maps.event.clearInstanceListeners(marker);
     }

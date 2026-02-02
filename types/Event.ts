@@ -1,3 +1,5 @@
+import type { EventSort } from '@/__generated__/graphql';
+
 export interface CreateEditEventFormValues {
   title: string;
   description: string;
@@ -82,7 +84,7 @@ export type SearchEventValues = {
   searchInput?: string;
   showCanceledEvents?: boolean;
   free?: boolean;
-  resultsOrder?: any;
+  resultsOrder?: EventSort;
   hasVirtualEventUrl?: boolean;
   showArchived?: boolean;
 };

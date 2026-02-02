@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-type AllowedItemType =
+export type AllowedItemType =
   | 'discussion'
   | 'comment'
   | 'image'

@@ -10,25 +10,28 @@ import PluginBooleanField from './fields/PluginBooleanField.vue';
 import PluginSelectField from './fields/PluginSelectField.vue';
 import PluginSecretField from './fields/PluginSecretField.vue';
 
+// Type for plugin configuration values
+type PluginConfigValue = string | number | boolean;
+
 const props = defineProps<{
   sections: PluginFormSection[];
-  modelValue: Record<string, any>;
+  modelValue: Record<string, PluginConfigValue>;
   errors?: Record<string, string>;
   secretStatuses?: PluginSecretStatus[];
 }>();
 
 const emit = defineEmits<{
-  'update:modelValue': [value: Record<string, any>];
+  'update:modelValue': [value: Record<string, PluginConfigValue>];
 }>();
 
-function updateFieldValue(key: string, value: any) {
+function updateFieldValue(key: string, value: PluginConfigValue) {
   emit('update:modelValue', {
     ...props.modelValue,
     [key]: value,
   });
 }
 
-function getFieldValue(key: string): any {
+function getFieldValue(key: string): PluginConfigValue | undefined {
   return props.modelValue[key];
 }
 
@@ -68,9 +71,9 @@ function getFieldComponent(field: PluginField) {
       class="space-y-4"
     >
       <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
-        <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+        <h2 class="text-base font-semibold text-gray-900 dark:text-white">
           {{ section.title }}
-        </h3>
+        </h2>
         <p
           v-if="section.description"
           class="mt-1 text-sm text-gray-500 dark:text-gray-400"

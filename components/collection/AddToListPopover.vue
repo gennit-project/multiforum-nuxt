@@ -4,9 +4,18 @@ import type { PropType } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { usernameVar } from '@/cache';
 import { useToastStore } from '@/stores/toastStore';
-import type { CollectionVisibility } from '@/__generated__/graphql';
+import type { CollectionVisibility, Collection, Channel, Discussion, Comment, Image } from '@/__generated__/graphql';
 import { useCollectionMutations } from '@/composables/useCollectionMutations';
 import { useCollectionQueries } from '@/composables/useCollectionQueries';
+
+// Type for item types that can be added to collections
+type ItemType = 'discussion' | 'comment' | 'image' | 'channel' | 'download';
+
+// Type for items that can be in a collection (union of possible types)
+type CollectionItem = { id?: string; uniqueName?: string };
+
+// Type for collection objects used in this component
+type CollectionListItem = Pick<Collection, 'id' | 'name'>;
 import {
   usePopoverPositioning,
   type PopoverPosition,
@@ -54,14 +63,14 @@ const toastStore = useToastStore();
 
 // Use composables
 const { collectionType, getCollectionQuery, getCheckItemQuery } =
-  useCollectionQueries(props.itemType as any);
+  useCollectionQueries(props.itemType as ItemType);
 const {
   createCollection,
   getAddMutation,
   getRemoveMutation,
   getAddFavoriteMutation,
   getRemoveFavoriteMutation,
-} = useCollectionMutations(props.itemType as any);
+} = useCollectionMutations(props.itemType as ItemType);
 
 // Fetch user collections
 // Use cache-and-network to prevent cache collision with itemInCollections query
@@ -156,14 +165,14 @@ const isItemInFavorites = computed(() => {
     // Channels use uniqueName instead of id
     return (
       favoritesList.value?.items?.some(
-        (item: any) => item.uniqueName === props.itemId
+        (item: CollectionItem) => item.uniqueName === props.itemId
       ) || false
     );
   } else {
     // Other item types use id
     return (
       favoritesList.value?.items?.some(
-        (item: any) => item.id === props.itemId
+        (item: CollectionItem) => item.id === props.itemId
       ) || false
     );
   }
@@ -171,7 +180,7 @@ const isItemInFavorites = computed(() => {
 
 const filteredCollections = computed(() => {
   if (!searchTerm.value) return collections.value;
-  return collections.value.filter((collection: any) =>
+  return collections.value.filter((collection: Pick<Collection, 'name'>) =>
     collection.name.toLowerCase().includes(searchTerm.value.toLowerCase())
   );
 });
@@ -235,7 +244,7 @@ const handleCreateNewCollection = async () => {
   }
 };
 
-const handleToggleInCollection = async (collection: any) => {
+const handleToggleInCollection = async (collection: CollectionListItem) => {
   // Check if this is the favorites list (has an id starting with 'favorites-')
   if (collection.id && collection.id.startsWith('favorites-')) {
     // Handle favorites list
@@ -286,7 +295,7 @@ const handleToggleInCollection = async (collection: any) => {
   } else {
     // Handle regular collections
     const isInCollection = itemInCollections.value.some(
-      (c: any) => c.id === collection.id
+      (c: CollectionListItem) => c.id === collection.id
     );
 
     isLoading.value = true;
@@ -500,7 +509,7 @@ const popoverStyles = computed(() => {
             <input
               type="checkbox"
               :checked="
-                itemInCollections.some((c: any) => c.id === collection.id)
+                itemInCollections.some((c: CollectionListItem) => c.id === collection.id)
               "
               class="rounded text-blue-600 focus:ring-blue-500"
               readonly
@@ -664,7 +673,7 @@ const popoverStyles = computed(() => {
           <input
             type="checkbox"
             :checked="
-              itemInCollections.some((c: any) => c.id === collection.id)
+              itemInCollections.some((c: CollectionListItem) => c.id === collection.id)
             "
             class="rounded text-blue-600 focus:ring-blue-500"
             readonly

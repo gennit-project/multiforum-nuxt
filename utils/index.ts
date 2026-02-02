@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client/core';
+import type { ApolloCache, Reference } from '@apollo/client/core';
 import { config } from '@/config';
 import type { Duration } from 'luxon';
 import { DateTime, Interval } from 'luxon';
@@ -112,7 +113,7 @@ const formatDuration = (eventDurationObj: Duration) => {
   }
 };
 
-const getDatePieces = (startTimeObj: any, isAllDay?: boolean) => {
+const getDatePieces = (startTimeObj: DateTime, isAllDay?: boolean) => {
   const timeOfDay = isAllDay
     ? 'all day'
     : startTimeObj.toLocaleString(DateTime.TIME_SIMPLE);
@@ -418,11 +419,10 @@ export const getChannelLabel = (selectedChannels: Array<string>) => {
   return `Forums (${selectedChannels.length})`;
 };
 
-export const updateTagsInCache = (cache: any, updatedTags: Array<TagData>) => {
+export const updateTagsInCache = (cache: ApolloCache<unknown>, updatedTags: Array<TagData>) => {
   cache.modify({
     fields: {
-      tags(existingTagRefs = [], fieldInfo: any) {
-        const readField = fieldInfo.readField;
+      tags(existingTagRefs: readonly Reference[] = [], { readField }) {
 
         const tagRefsOnDiscussion = updatedTags.map((tagData: TagData) => {
           return cache.writeFragment({
@@ -435,15 +435,15 @@ export const updateTagsInCache = (cache: any, updatedTags: Array<TagData>) => {
           });
         });
 
-        const newTagRefs = [];
+        const newTagRefs: Reference[] = [];
 
         for (let i = 0; i < tagRefsOnDiscussion.length; i++) {
           const newTagRef = tagRefsOnDiscussion[i];
           const alreadyExists = existingTagRefs.some(
-            (ref: any) =>
+            (ref: Reference) =>
               readField('text', ref) === readField('text', newTagRef)
           );
-          if (!alreadyExists) {
+          if (!alreadyExists && newTagRef) {
             newTagRefs.push(newTagRef);
           }
         }

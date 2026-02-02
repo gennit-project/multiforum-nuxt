@@ -39,6 +39,35 @@ type ChannelOption = {
   description: string;
 };
 
+// Type for raw channel data from GraphQL
+type RawChannelData = {
+  uniqueName: string;
+  displayName?: string | null;
+  channelIconURL?: string | null;
+};
+
+// Type for raw collection data from GraphQL
+type RawCollectionData = {
+  id: string;
+  name: string;
+  Channels?: RawChannelData[];
+};
+
+// Simplified channel type for collections (doesn't have description)
+type CollectionChannelOption = {
+  uniqueName: string;
+  displayName: string;
+  icon: string;
+};
+
+// Type for processed collection with channels
+type ProcessedCollection = {
+  id: string;
+  name: string;
+  channels: CollectionChannelOption[];
+  allChannels: CollectionChannelOption[];
+};
+
 const emit = defineEmits(['setChannelNames', 'toggleSelection']);
 const searchInput = ref<string>('');
 const selected = ref([...props.selectedChannels]);
@@ -88,8 +117,8 @@ const channelCollections = computed(() => {
   const collections = collectionsResult.value?.users?.[0]?.Collections || [];
 
   return collections
-    .map((collection: any) => {
-      const channels = (collection.Channels || []).map((channel: any) => ({
+    .map((collection: RawCollectionData) => {
+      const channels = (collection.Channels || []).map((channel: RawChannelData) => ({
         uniqueName: channel.uniqueName,
         displayName: channel.displayName || channel.uniqueName,
         icon: channel.channelIconURL || '',
@@ -98,7 +127,7 @@ const channelCollections = computed(() => {
       // Filter by search if there's a search query
       const filteredChannels = searchInput.value
         ? channels.filter(
-            (channel: ChannelOption) =>
+            (channel: CollectionChannelOption) =>
               channel.uniqueName
                 .toLowerCase()
                 .includes(searchInput.value.toLowerCase()) ||
@@ -116,7 +145,7 @@ const channelCollections = computed(() => {
       };
     })
     .filter(
-      (collection: any) => collection.channels.length > 0 || !searchInput.value
+      (collection: ProcessedCollection) => collection.channels.length > 0 || !searchInput.value
     );
 });
 
@@ -176,7 +205,7 @@ const favoriteChannels = computed(() => {
   const favorites = favoritesResult.value?.users?.[0]?.FavoriteChannels || [];
 
   // Map to ChannelOption format
-  const mappedFavorites = favorites.map((channel: any) => ({
+  const mappedFavorites = favorites.map((channel: RawChannelData) => ({
     uniqueName: channel.uniqueName,
     displayName: channel.displayName || channel.uniqueName,
     icon: channel.channelIconURL || '',

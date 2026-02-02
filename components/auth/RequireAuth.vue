@@ -9,7 +9,23 @@ import {
 } from '@/cache';
 import { useSSRAuth } from '@/composables/useSSRAuth';
 
-/* 
+// Type for Auth0 error objects
+interface Auth0Error {
+  error?: string;
+  error_description?: string;
+  message?: string;
+}
+
+// Type guard to safely access error properties
+function isAuth0Error(error: unknown): error is Auth0Error {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    ('error' in error || 'message' in error)
+  );
+}
+
+/*
 This component is a wrapper around content that requires authentication.
 It shows the content if the user is authenticated, and a login button 
 if they're not.
@@ -175,11 +191,10 @@ if (import.meta.env.SSR === false) {
 
         // If this is an invalid refresh token, we need to log the user out and re-authenticate
         if (
-          (innerError as any)?.message &&
-          ((innerError as any).message.includes(
-            'Unknown or invalid refresh token'
-          ) ||
-            (innerError as any).error === 'invalid_grant')
+          isAuth0Error(innerError) &&
+          innerError.message &&
+          (innerError.message.includes('Unknown or invalid refresh token') ||
+            innerError.error === 'invalid_grant')
         ) {
           console.log('Invalid refresh token detected, clearing auth state');
           clearAuthState();
@@ -242,11 +257,10 @@ if (import.meta.env.SSR === false) {
 
             // Check for invalid grant specifically
             if (
-              (tokenError as any)?.error === 'invalid_grant' ||
-              ((tokenError as any)?.message &&
-                (tokenError as any).message.includes(
-                  'Unknown or invalid refresh token'
-                ))
+              isAuth0Error(tokenError) &&
+              (tokenError.error === 'invalid_grant' ||
+                (tokenError.message &&
+                  tokenError.message.includes('Unknown or invalid refresh token')))
             ) {
               console.log(
                 'Invalid refresh token detected on mount, clearing auth state'

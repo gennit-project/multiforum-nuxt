@@ -60,7 +60,7 @@ type PermissionData = {
   SuspendedMods?: Array<{ modProfileName: string }>;
   SuspendedUsers?: Array<{ username: string }>;
   uniqueName?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 // Parameter types for the exported functions

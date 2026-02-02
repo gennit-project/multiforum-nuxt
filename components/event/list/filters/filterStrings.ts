@@ -1,2 +1,4 @@
-export const chronologicalOrder = { startTime: 'ASC' };
-export const reverseChronologicalOrder = { startTime: 'DESC' };
+import { SortDirection } from '@/__generated__/graphql';
+
+export const chronologicalOrder = { startTime: SortDirection.Asc };
+export const reverseChronologicalOrder = { startTime: SortDirection.Desc };

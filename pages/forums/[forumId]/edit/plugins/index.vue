@@ -2,8 +2,6 @@
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useApolloClient, useMutation, useQuery } from '@vue/apollo-composable';
-import FormRow from '@/components/FormRow.vue';
-import PluginSettingsForm from '@/components/plugins/PluginSettingsForm.vue';
 import { useToast } from '@/composables/useToast';
 import { GET_INSTALLED_PLUGINS } from '@/graphQLData/admin/queries';
 import {
@@ -11,7 +9,6 @@ import {
   GET_CHANNEL_PLUGIN_SETTINGS,
 } from '@/graphQLData/channel/queries';
 import { UPDATE_CHANNEL_ENABLED_PLUGINS } from '@/graphQLData/channel/mutations';
-import type { PluginFormSection } from '@/types/pluginForms';
 
 type PluginState = {
   enabled: boolean;
@@ -52,7 +49,6 @@ const {
 } = useMutation(UPDATE_CHANNEL_ENABLED_PLUGINS);
 
 onUpdateChannelEnabledPluginsDone(() => {
-  // Clear mutation error so the banner hides after a successful save.
   updateChannelEnabledPluginsError.value = null;
 });
 
@@ -94,8 +90,7 @@ const orphanedChannelPlugins = computed(() => {
 });
 
 const pluginStates = ref<Record<string, PluginState>>({});
-const dirtyPluginIds = ref<Set<string>>(new Set());
-const savingPluginIds = ref<Set<string>>(new Set());
+const togglingPluginIds = ref<Set<string>>(new Set());
 
 const isLoading = computed(
   () => channelLoading.value || installedLoading.value
@@ -107,13 +102,6 @@ function getChannelDefaults(manifest: any): Record<string, any> {
     return {};
   }
   return { ...defaults };
-}
-
-function getChannelSections(manifest: any): PluginFormSection[] {
-  if (!manifest?.ui?.forms?.channel) {
-    return [];
-  }
-  return manifest.ui.forms.channel;
 }
 
 function initializePluginState(pluginId: string, manifest: any, edge?: any) {
@@ -162,33 +150,11 @@ watch(
       const edge = enabledMap.get(pluginId);
       if (!pluginStates.value[pluginId]) {
         initializePluginState(pluginId, manifest, edge);
-        continue;
-      }
-      if (!dirtyPluginIds.value.has(pluginId)) {
-        initializePluginState(pluginId, manifest, edge);
       }
     }
   },
   { immediate: true }
 );
-
-function setPluginEnabled(pluginId: string, enabled: boolean) {
-  if (!pluginStates.value[pluginId]) {
-    pluginStates.value[pluginId] = { enabled, settings: {} };
-  } else {
-    pluginStates.value[pluginId].enabled = enabled;
-  }
-  dirtyPluginIds.value.add(pluginId);
-}
-
-function updatePluginSettings(pluginId: string, settings: Record<string, any>) {
-  if (!pluginStates.value[pluginId]) {
-    pluginStates.value[pluginId] = { enabled: true, settings };
-  } else {
-    pluginStates.value[pluginId].settings = settings;
-  }
-  dirtyPluginIds.value.add(pluginId);
-}
 
 function getPluginVersion(pluginId: string) {
   const edge = enabledPluginsById.value.get(pluginId);
@@ -201,21 +167,17 @@ function getPluginVersion(pluginId: string) {
   return installed?.version;
 }
 
-function isDirty(pluginId: string) {
-  return dirtyPluginIds.value.has(pluginId);
+function isToggling(pluginId: string) {
+  return togglingPluginIds.value.has(pluginId);
 }
 
-function isSaving(pluginId: string) {
-  return savingPluginIds.value.has(pluginId);
+function isPluginEnabled(pluginId: string) {
+  return pluginStates.value[pluginId]?.enabled ?? false;
 }
 
-async function handleSave(plugin: any) {
+async function handleToggleEnabled(plugin: any, enabled: boolean) {
   const pluginId = plugin.plugin.id;
   const state = pluginStates.value[pluginId];
-  if (!state) {
-    return;
-  }
-
   const edge = enabledPluginsById.value.get(pluginId);
   const version = getPluginVersion(pluginId);
 
@@ -225,10 +187,11 @@ async function handleSave(plugin: any) {
   }
 
   const enabledPluginsInput: any[] = [];
-  const settingsJson = serializeSettingsJson(state.settings);
+  const settingsJson = serializeSettingsJson(state?.settings || {});
 
-  if (state.enabled) {
+  if (enabled) {
     if (edge) {
+      // Already connected, just update
       enabledPluginsInput.push({
         where: {
           node: {
@@ -243,6 +206,7 @@ async function handleSave(plugin: any) {
         },
       });
     } else {
+      // Connect the plugin
       enabledPluginsInput.push({
         connect: [
           {
@@ -261,6 +225,7 @@ async function handleSave(plugin: any) {
       });
     }
   } else if (edge) {
+    // Disconnect the plugin
     enabledPluginsInput.push({
       disconnect: [
         {
@@ -277,24 +242,27 @@ async function handleSave(plugin: any) {
     return;
   }
 
-  savingPluginIds.value.add(pluginId);
+  togglingPluginIds.value.add(pluginId);
   try {
     await updateChannelEnabledPlugins({
       channelUniqueName: channelUniqueName.value,
       enabledPlugins: enabledPluginsInput,
     });
-    dirtyPluginIds.value.delete(pluginId);
+    // Update local state
+    if (pluginStates.value[pluginId]) {
+      pluginStates.value[pluginId].enabled = enabled;
+    }
     await refetchChannel();
     await client.refetchQueries({ include: [GET_CHANNEL] });
-    toast.success('Plugin settings saved for this forum.');
+    toast.success(enabled ? 'Plugin enabled for this forum.' : 'Plugin disabled for this forum.');
   } catch (err: any) {
     const message =
       updateChannelEnabledPluginsError.value?.message ||
       err?.message ||
-      'Failed to save plugin settings. Please try again.';
-    toast.error(`Failed to save plugin settings: ${message}`);
+      'Failed to update plugin. Please try again.';
+    toast.error(`Failed to update plugin: ${message}`);
   } finally {
-    savingPluginIds.value.delete(pluginId);
+    togglingPluginIds.value.delete(pluginId);
   }
 }
 </script>
@@ -312,7 +280,7 @@ async function handleSave(plugin: any) {
 
     <div
       v-if="updateChannelEnabledPluginsError?.message"
-      class="bg-red-50 rounded-lg border border-red-200 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200"
+      class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200"
       role="alert"
     >
       <div class="flex items-start gap-2">
@@ -324,18 +292,18 @@ async function handleSave(plugin: any) {
     <div v-if="isLoading" class="py-8 text-center">
       <div class="inline-flex items-center">
         <i class="fa-solid fa-spinner mr-2 animate-spin" />
-        Loading plugin settings...
+        Loading plugins...
       </div>
     </div>
 
     <div v-else-if="channelError" class="py-8 text-center">
       <div class="text-red-600 dark:text-red-400">
-        Error loading plugin settings: {{ channelError.message }}
+        Error loading plugins: {{ channelError.message }}
       </div>
     </div>
 
-    <div v-else class="space-y-6">
-      <div class="bg-blue-50 rounded-lg p-4 dark:bg-blue-900/20">
+    <div v-else class="space-y-4">
+      <div class="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
         <div class="flex">
           <div class="flex-shrink-0">
             <i class="fa-solid fa-info-circle text-blue-400" />
@@ -356,7 +324,7 @@ async function handleSave(plugin: any) {
 
       <div
         v-if="orphanedChannelPlugins.length > 0"
-        class="bg-yellow-50 rounded-lg p-4 dark:bg-yellow-900/20"
+        class="rounded-lg bg-yellow-50 p-4 dark:bg-yellow-900/20"
       >
         <div class="flex">
           <div class="flex-shrink-0">
@@ -378,16 +346,14 @@ async function handleSave(plugin: any) {
 
       <div
         v-if="serverEnabledPlugins.length === 0"
-        class="bg-yellow-50 rounded-lg p-4 dark:bg-yellow-900/20"
+        class="rounded-lg bg-yellow-50 p-4 dark:bg-yellow-900/20"
       >
         <div class="flex">
           <div class="flex-shrink-0">
             <i class="fa-solid fa-exclamation-triangle text-yellow-400" />
           </div>
           <div class="ml-3">
-            <h3
-              class="text-sm font-medium text-yellow-800 dark:text-yellow-200"
-            >
+            <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
               No Server Plugins Available
             </h3>
             <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
@@ -400,77 +366,73 @@ async function handleSave(plugin: any) {
         </div>
       </div>
 
-      <div class="space-y-6">
+      <div class="space-y-3">
         <div
           v-for="plugin in serverEnabledPlugins"
           :key="plugin.plugin.id"
-          class="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
+          class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
         >
-          <div class="flex flex-wrap items-start justify-between gap-4">
-            <div class="space-y-1">
-              <h3 class="font-semibold text-lg text-gray-900 dark:text-white">
-                {{ plugin.plugin.displayName || plugin.plugin.name }}
-              </h3>
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div class="flex-1 space-y-1">
+              <div class="flex items-center gap-2">
+                <NuxtLink
+                  :to="`/forums/${channelUniqueName}/edit/plugins/${plugin.plugin.id}`"
+                  class="text-lg font-semibold text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300"
+                >
+                  {{ plugin.plugin.displayName || plugin.plugin.name }}
+                </NuxtLink>
+                <span
+                  class="rounded bg-gray-100 px-2 py-0.5 font-mono text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                >
+                  v{{ plugin.version }}
+                </span>
+                <span
+                  v-if="isPluginEnabled(plugin.plugin.id)"
+                  class="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-800 dark:text-green-200"
+                >
+                  Enabled
+                </span>
+                <span
+                  v-else
+                  class="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                >
+                  Disabled
+                </span>
+              </div>
               <p class="text-sm text-gray-600 dark:text-gray-400">
                 {{ plugin.plugin.description || 'No description provided.' }}
               </p>
-              <p class="text-xs text-gray-600 dark:text-gray-300">
-                Version {{ plugin.version }}
-              </p>
             </div>
-            <label
-              class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300"
-            >
-              <input
-                type="checkbox"
-                class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                :checked="pluginStates[plugin.plugin.id]?.enabled"
-                @change="
-                  setPluginEnabled(
-                    plugin.plugin.id,
-                    ($event.target as HTMLInputElement).checked
-                  )
-                "
-              >
-              Enable for this forum
-            </label>
-          </div>
 
-          <div
-            v-if="pluginStates[plugin.plugin.id]?.enabled"
-            class="mt-4 space-y-4"
-          >
-            <FormRow
-              section-title="Forum Settings"
-              description="Configure forum-specific settings for this plugin."
-            >
-              <template #content>
-                <PluginSettingsForm
-                  :sections="getChannelSections(plugin.manifest)"
-                  :model-value="pluginStates[plugin.plugin.id]?.settings || {}"
-                  @update:model-value="
-                    updatePluginSettings(plugin.plugin.id, $event)
+            <div class="flex flex-shrink-0 items-center gap-3">
+              <label class="flex cursor-pointer items-center gap-2">
+                <input
+                  type="checkbox"
+                  class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                  :checked="isPluginEnabled(plugin.plugin.id)"
+                  :disabled="isToggling(plugin.plugin.id)"
+                  @change="
+                    handleToggleEnabled(
+                      plugin,
+                      ($event.target as HTMLInputElement).checked
+                    )
                   "
                 />
-              </template>
-            </FormRow>
-          </div>
-
-          <div class="mt-4 flex justify-end">
-            <button
-              type="button"
-              class="rounded-md bg-orange-700 px-4 py-2 text-white hover:bg-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
-              :disabled="
-                isSaving(plugin.plugin.id) || !isDirty(plugin.plugin.id)
-              "
-              @click="handleSave(plugin)"
-            >
-              <i
-                v-if="isSaving(plugin.plugin.id)"
-                class="fa-solid fa-spinner mr-2 animate-spin"
-              />
-              Save Settings
-            </button>
+                <span class="text-sm text-gray-700 dark:text-gray-300">
+                  <i
+                    v-if="isToggling(plugin.plugin.id)"
+                    class="fa-solid fa-spinner animate-spin"
+                  />
+                  <span v-else>Enable</span>
+                </span>
+              </label>
+              <NuxtLink
+                :to="`/forums/${channelUniqueName}/edit/plugins/${plugin.plugin.id}`"
+                class="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+              >
+                Configure
+              </NuxtLink>
+            </div>
           </div>
         </div>
       </div>
