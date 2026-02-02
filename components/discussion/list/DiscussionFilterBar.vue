@@ -7,17 +7,19 @@ import TagIcon from '@/components/icons/TagIcon.vue';
 import SearchableForumList from '@/components/channel/SearchableForumList.vue';
 import SearchableTagList from '@/components/SearchableTagList.vue';
 import SortButtons from '@/components/SortButtons.vue';
-import { getTagLabel, getChannelLabel } from '@/utils';
 import { getFilterValuesFromParams } from './getDiscussionFilterValuesFromParams';
 import type { SearchDiscussionValues } from '@/types/Discussion';
-import { updateFilters } from '@/utils/routerUtils';
-import { useRoute, useRouter } from 'nuxt/app';
 import FilterIcon from '@/components/icons/FilterIcon.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import SearchIcon from '@/components/icons/SearchIcon.vue';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
+import {
+  useFilterBar,
+  DEFAULT_FILTER_LABELS,
+} from '@/composables/useFilterBar';
+import { updateFilters } from '@/utils/routerUtils';
 
 defineProps({
   isForumScoped: {
@@ -34,37 +36,25 @@ defineProps({
   },
 });
 
-// Nuxt route and router
-const route = useRoute();
-const router = useRouter();
-
-// Default filter labels
-const defaultFilterLabels = {
-  channels: 'All Forums',
-  tags: 'Tags',
-};
-
-// Computed property for channelId from route params
-const channelId = computed(() => {
-  if (typeof route.params.forumId === 'string') {
-    return route.params.forumId;
-  }
-  return '';
+// Use shared filter bar composable
+const {
+  route,
+  router,
+  channelId,
+  filterValues,
+  channelLabel,
+  tagLabel,
+  updateSearchInput,
+  updateShowArchived,
+  toggleSelectedChannel,
+  toggleSelectedTag,
+  updateFilter,
+} = useFilterBar<SearchDiscussionValues>({
+  getFilterValuesFromParams,
 });
 
-// Local reactive state for filter values
-const filterValues = ref<SearchDiscussionValues>(
-  getFilterValuesFromParams({
-    route,
-    channelId: channelId.value,
-  })
-);
-
-// Computed properties for labels
-const channelLabel = computed(() =>
-  getChannelLabel(filterValues.value.channels || [])
-);
-const tagLabel = computed(() => getTagLabel(filterValues.value.tags || []));
+// Default filter labels (use shared constant)
+const defaultFilterLabels = DEFAULT_FILTER_LABELS;
 
 const shouldOpenSearch = () => {
   const hasSearchOpen = route.query.searchOpen === 'true';
@@ -77,92 +67,24 @@ const shouldOpenSearch = () => {
 const showFilters = ref(false);
 const showSearch = ref(shouldOpenSearch());
 
-// Watch for route query changes to update filter values
+// Watch for route query changes to update search visibility
 watch(
   () => route.query,
   () => {
-    if (route.query) {
-      filterValues.value = getFilterValuesFromParams({
-        route,
-        channelId: channelId.value,
-      });
-    }
     if (shouldOpenSearch()) {
       showSearch.value = true;
     }
   }
 );
 
-const setSelectedChannels = (channels: string[]) => {
-  updateFilters({
-    router,
-    route,
-    params: { channels },
-  });
-};
-
-const setSelectedTags = (tags: string[]) => {
-  updateFilters({
-    router,
-    route,
-    params: { tags },
-  });
-};
-
-const updateSearchInput = (searchInput: string) => {
-  updateFilters({
-    router,
-    route,
-    params: { searchInput },
-  });
-};
 // Check if we're on the downloads page
 const isDownloadPage = computed(() => {
   return route.name && route.name.toString().includes('downloads');
 });
 
-const toggleSelectedChannel = (channel: string) => {
-  if (!filterValues.value.channels) {
-    filterValues.value.channels = [];
-  }
-  const index = filterValues.value.channels.indexOf(channel);
-  if (index === -1) {
-    filterValues.value.channels.push(channel);
-  } else {
-    filterValues.value.channels.splice(index, 1);
-  }
-  setSelectedChannels(filterValues.value.channels);
-};
-
-const toggleSelectedTag = (tag: string) => {
-  if (!filterValues.value.tags) {
-    filterValues.value.tags = [];
-  }
-  const index = filterValues.value.tags.indexOf(tag);
-  if (index === -1) {
-    filterValues.value.tags.push(tag);
-  } else {
-    filterValues.value.tags.splice(index, 1);
-  }
-  setSelectedTags(filterValues.value.tags);
-};
-
-const updateShowArchived = (event: Event) => {
-  const checkbox = event.target as HTMLInputElement;
-  updateFilters({
-    router,
-    route,
-    params: { showArchived: checkbox.checked },
-  });
-};
-
 const updateShowUnanswered = (event: Event) => {
   const checkbox = event.target as HTMLInputElement;
-  updateFilters({
-    router,
-    route,
-    params: { showUnanswered: checkbox.checked },
-  });
+  updateFilter('showUnanswered', checkbox.checked);
 };
 
 // Get UI store for expand/collapse functionality

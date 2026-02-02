@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch, defineAsyncComponent } from 'vue';
-import { useRoute, useRouter } from 'nuxt/app';
+import { computed, ref, defineAsyncComponent } from 'vue';
 import type { DistanceUnit, SearchEventValues } from '@/types/Event';
 import type { UpdateLocationInput } from '@/components/event/form/CreateEditEventFields.vue';
 import LocationSearchBar from '@/components/event/list/filters/LocationSearchBar.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import TagIcon from '@/components/icons/TagIcon.vue';
 import FilterIcon from '@/components/icons/FilterIcon.vue';
-import { getTagLabel, getChannelLabel } from '@/utils';
 import SearchBar from '../../../SearchBar.vue';
 import {
   distanceOptionsForKilometers,
@@ -25,6 +23,10 @@ import SearchableTagList from '@/components/SearchableTagList.vue';
 import { updateFilters } from '@/utils/routerUtils';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import {
+  useFilterBar,
+  DEFAULT_FILTER_LABELS,
+} from '@/composables/useFilterBar';
 // Import Popper dynamically to avoid SSR issues with regeneratorRuntime
 const Popper = defineAsyncComponent(() => import('vue3-popper'));
 
@@ -67,18 +69,38 @@ const props = defineProps({
   },
 });
 
-// Setup function
-const route = useRoute();
-const router = useRouter();
-
-const defaultFilterLabels = {
-  channels: 'All Forums',
-  tags: 'Tags',
-};
-
-const channelId = computed(() => {
-  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
+// Use shared filter bar composable
+const {
+  route,
+  router,
+  channelId,
+  filterValues,
+  channelLabel,
+  tagLabel,
+  updateSearchInput,
+  updateShowArchived,
+  toggleSelectedChannel,
+  toggleSelectedTag,
+} = useFilterBar<SearchEventValues>({
+  getFilterValuesFromParams: (params) => {
+    const showOnlineOnly = params.route.name === 'SearchEventsList';
+    const showInPersonOnly =
+      params.route.name &&
+      typeof params.route.name === 'string' &&
+      params.route.name.includes('map-search')
+        ? true
+        : undefined;
+    return getFilterValuesFromParams({
+      route: params.route,
+      channelId: params.channelId,
+      showOnlineOnly,
+      showInPersonOnly,
+    });
+  },
 });
+
+// Default filter labels (use shared constant)
+const defaultFilterLabels = DEFAULT_FILTER_LABELS;
 
 const createEventLink = computed(() => {
   if (channelId.value) {
@@ -94,23 +116,6 @@ const showInPersonOnly = computed(() => {
     route.name.includes('map-search')
     ? true
     : undefined;
-});
-
-const filterValues = ref<SearchEventValues>(
-  getFilterValuesFromParams({
-    route,
-    channelId: channelId.value,
-    showOnlineOnly: showOnlineOnly.value,
-    showInPersonOnly: showInPersonOnly.value,
-  })
-);
-
-const channelLabel = computed(() => {
-  return getChannelLabel(filterValues.value.channels || []);
-});
-
-const tagLabel = computed(() => {
-  return getTagLabel(filterValues.value.tags || []);
 });
 
 const showLocationSearchBarAndDistanceButtons = computed(() => {
@@ -136,43 +141,7 @@ const radiusLabel = computed(() => {
   return distance ? `${Math.round(distance / 1.609)} mi` : '';
 });
 
-// Watcher to update filters on query change
-watch(
-  () => route.query,
-  () => {
-    filterValues.value = getFilterValuesFromParams({
-      route,
-      channelId: channelId.value,
-      showOnlineOnly: showOnlineOnly.value,
-      showInPersonOnly: showInPersonOnly.value,
-    });
-  },
-  { immediate: true }
-);
-
-const setSelectedChannels = (channels: string[]) => {
-  updateFilters({
-    router,
-    route,
-    params: { channels },
-  });
-};
-
-const setSelectedTags = (tags: string[]) => {
-  updateFilters({
-    router,
-    route,
-    params: { tags },
-  });
-};
-
-const updateSearchInput = (searchInput: string) => {
-  updateFilters({
-    router,
-    route,
-    params: { searchInput },
-  });
-};
+// Note: Route query watching is handled by useFilterBar composable
 
 const updateLocationInput = (placeData: UpdateLocationInput) => {
   updateFilters({
@@ -256,31 +225,7 @@ const toggleShowMainFilters = () => {
   internalShowMainFilters.value = !internalShowMainFilters.value;
 };
 
-const toggleSelectedChannel = (channel: string) => {
-  if (!filterValues.value.channels) {
-    filterValues.value.channels = [];
-  }
-  const index = filterValues.value.channels.indexOf(channel);
-  if (index === -1) {
-    filterValues.value.channels.push(channel);
-  } else {
-    filterValues.value.channels.splice(index, 1);
-  }
-  setSelectedChannels(filterValues.value.channels);
-};
-
-const toggleSelectedTag = (tag: string) => {
-  if (!filterValues.value.tags) {
-    filterValues.value.tags = [];
-  }
-  const index = filterValues.value.tags.indexOf(tag);
-  if (index === -1) {
-    filterValues.value.tags.push(tag);
-  } else {
-    filterValues.value.tags.splice(index, 1);
-  }
-  setSelectedTags(filterValues.value.tags);
-};
+// Note: toggleSelectedChannel and toggleSelectedTag are provided by useFilterBar composable
 
 type ChannelOption = {
   uniqueName: string;
@@ -308,14 +253,7 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
     description: '',
   },
 ];
-const updateShowArchived = (event: Event) => {
-  const checkbox = event.target as HTMLInputElement;
-  updateFilters({
-    router,
-    route,
-    params: { showArchived: checkbox.checked },
-  });
-};
+// Note: updateShowArchived is provided by useFilterBar composable
 </script>
 
 <template>

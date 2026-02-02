@@ -17,6 +17,144 @@ type AuthorWithRoles =
     })
   | Pick<ModerationProfile, '__typename'>;
 
+// Content type for archive/unarchive operations
+type ContentType = 'discussion' | 'event' | 'comment';
+
+// Permission key for hiding content by type
+const HIDE_PERMISSION_MAP: Record<ContentType, string> = {
+  discussion: 'canHideDiscussion',
+  event: 'canHideEvent',
+  comment: 'canHideComment',
+};
+
+/**
+ * Checks if a user can perform moderation actions based on their permissions
+ *
+ * @param userPermissions - Object with all user permissions
+ * @param contentType - The type of content being moderated (affects which permissions are checked)
+ * @returns boolean indicating if the user can perform mod actions
+ */
+export const canPerformModActions = (
+  userPermissions: Record<string, boolean>,
+  contentType?: ContentType
+): boolean => {
+  // Suspended mods cannot perform any mod actions
+  if (userPermissions.isSuspendedMod) {
+    return false;
+  }
+
+  // Base checks that apply to all content types
+  const hasBasePermission =
+    userPermissions.isChannelOwner ||
+    userPermissions.isElevatedMod ||
+    userPermissions.canReport ||
+    userPermissions.canGiveFeedback;
+
+  if (hasBasePermission) {
+    return true;
+  }
+
+  // Additional checks for specific content types
+  if (contentType === 'discussion') {
+    return !!(
+      userPermissions.canHideDiscussion || userPermissions.canSuspendUser
+    );
+  }
+
+  if (contentType === 'event') {
+    return !!(userPermissions.canHideEvent || userPermissions.canSuspendUser);
+  }
+
+  if (contentType === 'comment') {
+    return !!(userPermissions.canHideComment || userPermissions.canSuspendUser);
+  }
+
+  return false;
+};
+
+/**
+ * Builds archive/unarchive menu items based on content state and permissions
+ *
+ * @param params - Parameters for building archive menu items
+ * @returns Array of menu items for archive/unarchive actions
+ */
+export const buildArchiveMenuItems = (params: {
+  isArchived: boolean;
+  userPermissions: Record<string, boolean>;
+  contentType: ContentType;
+  contentId: string;
+  archiveEvent?: string;
+  unarchiveEvent?: string;
+  archiveAndSuspendEvent?: string;
+}): MenuItem[] => {
+  const {
+    isArchived,
+    userPermissions,
+    contentType,
+    contentId,
+    archiveEvent = 'handleClickArchive',
+    unarchiveEvent = 'handleClickUnarchive',
+    archiveAndSuspendEvent = 'handleClickArchiveAndSuspend',
+  } = params;
+
+  const modActions: MenuItem[] = [];
+  const hidePermission = HIDE_PERMISSION_MAP[contentType];
+
+  if (!isArchived) {
+    if (userPermissions[hidePermission]) {
+      modActions.push({
+        label: 'Archive',
+        event: archiveEvent,
+        icon: ALLOWED_ICONS.ARCHIVE,
+        value: contentId,
+      });
+    }
+
+    if (userPermissions.canSuspendUser) {
+      modActions.push({
+        label: 'Archive and Suspend',
+        event: archiveAndSuspendEvent,
+        icon: ALLOWED_ICONS.SUSPEND,
+        value: contentId,
+      });
+    }
+  } else {
+    if (userPermissions[hidePermission]) {
+      modActions.push({
+        label: 'Unarchive',
+        event: unarchiveEvent,
+        icon: ALLOWED_ICONS.UNARCHIVE,
+        value: contentId,
+      });
+    }
+  }
+
+  return modActions;
+};
+
+/**
+ * Builds the moderation section with divider and actions
+ *
+ * @param modActions - Array of moderation action menu items
+ * @returns Array with divider and actions, or empty array if no actions
+ */
+export const buildModerationSection = (
+  modActions: MenuItem[]
+): MenuItem[] => {
+  if (modActions.length === 0) {
+    return [];
+  }
+
+  return [
+    {
+      value: 'Moderation Actions',
+      isDivider: true,
+      label: '',
+    },
+    ...modActions,
+  ];
+};
+
 /**
  * Determines which actions should be available in the discussion header menu
  * based on user permissions and the discussion state
@@ -111,19 +249,12 @@ export const getDiscussionHeaderMenuItems = (params: {
     });
   }
 
-  // Check if the user has any moderation permission (standard mod or above)
-  // Standard mods are neither elevated nor suspended, but should still see Report and Give Feedback options
-  const canPerformModActions =
-    !userPermissions.isSuspendedMod &&
-    (userPermissions.isChannelOwner ||
-      userPermissions.isElevatedMod ||
-      userPermissions.canReport ||
-      userPermissions.canGiveFeedback ||
-      userPermissions.canHideEvent ||
-      userPermissions.canSuspendUser);
-
   // Show mod actions if user has any mod permissions and isn't the discussion creator
-  if (isLoggedIn && canPerformModActions && !isOwnDiscussion) {
+  if (
+    isLoggedIn &&
+    canPerformModActions(userPermissions, 'discussion') &&
+    !isOwnDiscussion
+  ) {
     // Create a list for mod actions
     const modActions: MenuItem[] = [];
 
@@ -147,44 +278,17 @@ export const getDiscussionHeaderMenuItems = (params: {
       });
     }
 
-    // Add archive/unarchive actions based on current state and permissions
-    if (!isArchived) {
-      if (userPermissions.canHideDiscussion) {
-        modActions.push({
-          label: 'Archive',
-          event: 'handleClickArchive',
-          icon: ALLOWED_ICONS.ARCHIVE,
-          value: discussionId,
-        });
-      }
+    // Add archive/unarchive actions using shared helper
+    const archiveItems = buildArchiveMenuItems({
+      isArchived,
+      userPermissions,
+      contentType: 'discussion',
+      contentId: discussionId,
+    });
+    modActions.push(...archiveItems);
 
-      if (userPermissions.canSuspendUser) {
-        modActions.push({
-          label: 'Archive and Suspend',
-          event: 'handleClickArchiveAndSuspend',
-          icon: ALLOWED_ICONS.SUSPEND,
-          value: discussionId,
-        });
-      }
-    } else {
-      if (userPermissions.canHideDiscussion) {
-        modActions.push({
-          label: 'Unarchive',
-          event: 'handleClickUnarchive',
-          icon: ALLOWED_ICONS.UNARCHIVE,
-          value: discussionId,
-        });
-      }
-    }
-
-    // Only add the mod actions section if there are actually actions to show
-    if (modActions.length > 0) {
-      menuItems.push({
-        value: 'Moderation Actions',
-        isDivider: true,
-      });
-      menuItems = menuItems.concat(modActions);
-    }
+    // Add the mod actions section using shared helper
+    menuItems = menuItems.concat(buildModerationSection(modActions));
   }
 
   return menuItems;
@@ -296,17 +400,12 @@ export const getEventHeaderMenuItems = (params: {
     }
   }
 
-  // Check if the user has any moderation permission (standard mod or above)
-  // Standard mods are neither elevated nor suspended, but should still see Report and Give Feedback options
-  const canPerformModActions =
-    !userPermissions.isSuspendedMod &&
-    (userPermissions.isChannelOwner ||
-      userPermissions.isElevatedMod ||
-      userPermissions.canReport ||
-      userPermissions.canGiveFeedback);
-
   // Show mod actions if user has any mod permissions and isn't the event creator
-  if (isLoggedIn && canPerformModActions && !isOwnEvent) {
+  if (
+    isLoggedIn &&
+    canPerformModActions(userPermissions, 'event') &&
+    !isOwnEvent
+  ) {
     // Create a list for mod actions
     const modActions: MenuItem[] = [];
 
@@ -328,44 +427,17 @@ export const getEventHeaderMenuItems = (params: {
       });
     }
 
-    // Add archive/unarchive actions based on current state and permissions
-    if (!isArchived) {
-      if (userPermissions.canHideEvent) {
-        modActions.push({
-          label: 'Archive',
-          event: 'handleClickArchive',
-          icon: ALLOWED_ICONS.ARCHIVE,
-          value: eventId,
-        });
-      }
+    // Add archive/unarchive actions using shared helper
+    const archiveItems = buildArchiveMenuItems({
+      isArchived,
+      userPermissions,
+      contentType: 'event',
+      contentId: eventId,
+    });
+    modActions.push(...archiveItems);
 
-      if (userPermissions.canSuspendUser) {
-        modActions.push({
-          label: 'Archive and Suspend',
-          event: 'handleClickArchiveAndSuspend',
-          icon: ALLOWED_ICONS.SUSPEND,
-          value: eventId,
-        });
-      }
-    } else {
-      if (userPermissions.canHideEvent) {
-        modActions.push({
-          label: 'Unarchive',
-          event: 'handleClickUnarchive',
-          icon: ALLOWED_ICONS.UNARCHIVE,
-          value: eventId,
-        });
-      }
-    }
-
-    // Only add the mod actions section if there are actually actions to show
-    if (modActions.length > 0) {
-      menuItems.push({
-        value: 'Moderation Actions',
-        isDivider: true,
-      });
-      menuItems = menuItems.concat(modActions);
-    }
+    // Add the mod actions section using shared helper
+    menuItems = menuItems.concat(buildModerationSection(modActions));
   }
 
   return menuItems;
@@ -516,19 +588,12 @@ export const getCommentMenuItems = (params: {
     }
   }
 
-  // Check if the user has any moderation permission (standard mod or above)
-  // Standard mods are neither elevated nor suspended, but should still see Report and Give Feedback options
-  const canPerformModActions =
-    !userPermissions.isSuspendedMod &&
-    (userPermissions.isChannelOwner ||
-      userPermissions.isElevatedMod ||
-      userPermissions.canReport ||
-      userPermissions.canGiveFeedback ||
-      userPermissions.canHideComment ||
-      userPermissions.canSuspendUser);
-
   // Show mod actions if user has any mod permissions and isn't the comment author
-  if (isLoggedIn && canPerformModActions && !isOwnComment) {
+  if (
+    isLoggedIn &&
+    canPerformModActions(userPermissions, 'comment') &&
+    !isOwnComment
+  ) {
     // Create a list for mod actions
     const modActions: MenuItem[] = [];
 
@@ -568,45 +633,17 @@ export const getCommentMenuItems = (params: {
       });
     }
 
-    // Add archive/unarchive actions based on current state and permissions
-    if (!isArchived) {
-      if (userPermissions.canHideComment) {
-        modActions.push({
-          label: 'Archive',
-          event: 'handleClickArchive',
-          icon: ALLOWED_ICONS.ARCHIVE,
-          value: '',
-        });
-      }
+    // Add archive/unarchive actions using shared helper
+    const archiveItems = buildArchiveMenuItems({
+      isArchived,
+      userPermissions,
+      contentType: 'comment',
+      contentId: '',
+    });
+    modActions.push(...archiveItems);
 
-      if (userPermissions.canSuspendUser) {
-        modActions.push({
-          label: 'Archive and Suspend',
-          event: 'handleClickArchiveAndSuspend',
-          icon: ALLOWED_ICONS.SUSPEND,
-          value: '',
-        });
-      }
-    } else {
-      if (userPermissions.canHideComment) {
-        modActions.push({
-          label: 'Unarchive',
-          event: 'handleClickUnarchive',
-          icon: ALLOWED_ICONS.UNARCHIVE,
-          value: '',
-        });
-      }
-    }
-
-    // Only add the mod actions section if there are actually actions to show
-    if (modActions.length > 0) {
-      menuItems.push({
-        value: 'Moderation Actions',
-        isDivider: true,
-        label: '',
-      });
-      menuItems = menuItems.concat(modActions);
-    }
+    // Add the mod actions section using shared helper
+    menuItems = menuItems.concat(buildModerationSection(modActions));
   }
 
   return menuItems;
