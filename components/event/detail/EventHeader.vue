@@ -444,12 +444,17 @@ console.log('EVENT HEADER DEBUG:', {
           </div>
           <div class="inline">
             {{ eventData.address }}
-            <span v-if="!addressCopied" class="inline-flex items-center">
+            <button
+              v-if="!addressCopied"
+              type="button"
+              class="inline-flex items-center"
+              aria-label="Copy address to clipboard"
+              @click="copyAddress"
+            >
               <ClipboardIcon
                 class="ml-1 inline-block h-4 w-4 cursor-pointer align-text-bottom"
-                @click="copyAddress"
               />
-            </span>
+            </button>
             <span
               v-else
               class="ml-1 text-sm text-green-600 dark:text-green-400"

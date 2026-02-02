@@ -411,6 +411,7 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
                   class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
                   :checked="isPluginEnabled(plugin.plugin.id)"
                   :disabled="isToggling(plugin.plugin.id)"
+                  :aria-label="`Enable ${plugin.plugin.displayName || plugin.plugin.name}`"
                   @change="
                     handleToggleEnabled(
                       plugin,

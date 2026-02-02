@@ -31,6 +31,7 @@ const toggleExpandDetail = () => {
       type="checkbox"
       :value="rule.summary"
       :checked="selected.includes(rule.summary)"
+      :aria-label="`Select rule: ${rule.summary}`"
       class="mt-1 border border-gray-300 text-orange-600 dark:border-gray-600"
       @change="() => emit('toggleSelection', rule.summary)"
     >

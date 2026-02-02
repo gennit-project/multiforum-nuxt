@@ -336,11 +336,13 @@ const saveRole = async () => {
           </p>
           <div class="space-y-1">
             <label
+              for="role-name-input"
               class="font-semibold text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
             >
               Role name
             </label>
             <input
+              id="role-name-input"
               v-model="roleState[editingDefinition.key]!.name"
               type="text"
               class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
@@ -349,11 +351,13 @@ const saveRole = async () => {
           </div>
           <div class="space-y-1">
             <label
+              for="role-description-input"
               class="font-semibold text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
             >
               Role description
             </label>
             <textarea
+              id="role-description-input"
               v-model="roleState[editingDefinition.key]!.description"
               rows="3"
               class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
@@ -374,6 +378,7 @@ const saveRole = async () => {
                 type="checkbox"
                 class="h-4 w-4 rounded border border-gray-300 accent-blue-600 dark:border-gray-600 dark:accent-blue-400"
                 :disabled="mutationLoading"
+                :aria-label="formatPermissionName(perm)"
               >
             </label>
           </div>

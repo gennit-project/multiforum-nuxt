@@ -110,6 +110,7 @@ const eventDescription = computed(() => {
           <input
             type="checkbox"
             :checked="pipeline.stopOnFirstFailure"
+            aria-label="Stop on first failure"
             class="form-checkbox h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
             @change="updateStopOnFirstFailure(($event.target as HTMLInputElement).checked)"
           >
@@ -197,6 +198,7 @@ const eventDescription = computed(() => {
                     <input
                       type="checkbox"
                       :checked="step.continueOnError"
+                      aria-label="Continue on error"
                       class="form-checkbox h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
                       @change="updateStep(index, { continueOnError: ($event.target as HTMLInputElement).checked })"
                     >

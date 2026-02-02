@@ -132,6 +132,7 @@ const handleAddTag = async (event: KeyboardEvent) => {
           type="checkbox"
           :value="tag.text"
           :checked="selected.includes(tag.text)"
+          :aria-label="`Select tag ${tag.text}`"
           class="border border-gray-300 text-orange-600 dark:border-gray-600"
           @change="() => emit('toggleSelection', tag.text)"
         >

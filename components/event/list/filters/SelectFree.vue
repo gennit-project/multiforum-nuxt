@@ -21,8 +21,9 @@ const toggleShowOnlyFree = () => {
   <div>
     <div class="grid grid-cols-2 gap-2">
       <div class="cursor-pointer rounded p-2">
-        <label :for="'free'" class="flex items-center">
+        <label for="free-checkbox" class="flex items-center">
           <input
+            id="free-checkbox"
             type="checkbox"
             :data-testid="'free-checkbox'"
             class="mr-1 h-4 w-4 rounded border border-gray-400 text-orange-600 focus:ring-orange-500"
