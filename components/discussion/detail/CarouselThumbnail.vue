@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
+import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
 
 const props = defineProps({
   image: {
@@ -27,14 +28,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['click']);
-
-const hasGlbExtension = (url: string) => {
-  return url?.toLowerCase().endsWith('.glb');
-};
-
-const hasStlExtension = (url: string) => {
-  return url?.toLowerCase().endsWith('.stl');
-};
 
 const thumbnailWidth = computed(() => props.width ?? props.size);
 const thumbnailHeight = computed(() => props.height ?? props.size);

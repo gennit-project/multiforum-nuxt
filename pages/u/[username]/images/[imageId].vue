@@ -9,6 +9,7 @@ import StlViewer from '@/components/download/StlViewer.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import AddImageToFavorites from '@/components/favorites/AddImageToFavorites.vue';
+import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
@@ -59,15 +60,6 @@ const isCorrectUserPage = computed(() => {
 
 // Custom lightbox state
 const isLightboxOpen = ref(false);
-
-// Check file types
-const hasGlbExtension = (url: string) => {
-  return url?.toLowerCase().endsWith('.glb');
-};
-
-const hasStlExtension = (url: string) => {
-  return url?.toLowerCase().endsWith('.stl');
-};
 
 // Zoom functionality
 const zoomLevel = ref(1);

@@ -4,6 +4,7 @@ import type { Image } from '@/__generated__/graphql';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
 import AddToImageFavorites from '@/components/favorites/AddToImageFavorites.vue';
+import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
 
 const props = defineProps({
   allowAddToList: {
@@ -23,15 +24,6 @@ const props = defineProps({
     default: true,
   },
 });
-
-// Check file types
-const hasGlbExtension = (url: string) => {
-  return url?.toLowerCase().endsWith('.glb');
-};
-
-const hasStlExtension = (url: string) => {
-  return url?.toLowerCase().endsWith('.stl');
-};
 
 const getImageAlt = (image: Image) => {
   return image.alt || image.caption || 'Image';
