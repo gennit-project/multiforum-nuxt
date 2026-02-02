@@ -20,8 +20,10 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'fetchedOriginalAuthorUsername', username: string): void;
-  (e: 'fetchedOriginalModProfileName', modProfileName: string): void;
+  (
+    e: 'fetchedOriginalAuthorUsername' | 'fetchedOriginalModProfileName',
+    value: string
+  ): void;
 }>();
 
 const getContentTypeLabel = (issue: Issue) => {

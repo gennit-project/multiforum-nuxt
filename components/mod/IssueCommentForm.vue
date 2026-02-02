@@ -25,10 +25,9 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:commentText', value: string): void;
-  (e: 'toggleCloseOpen'): void;
-  (e: 'createComment'): void;
-  (e: 'openLockDialog'): void;
-  (e: 'unlockIssue'): void;
+  (
+    e: 'toggleCloseOpen' | 'createComment' | 'openLockDialog' | 'unlockIssue'
+  ): void;
 }>();
 
 const botMentionsBlocked = computed(() => hasBotMention(props.commentText));

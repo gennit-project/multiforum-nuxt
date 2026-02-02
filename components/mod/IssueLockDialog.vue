@@ -9,8 +9,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:lockReasonInput', value: string): void;
-  (e: 'close'): void;
-  (e: 'lock'): void;
+  (e: 'close' | 'lock'): void;
 }>();
 
 const handleReasonUpdate = (event: Event) => {
