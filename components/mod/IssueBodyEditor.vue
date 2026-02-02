@@ -5,7 +5,7 @@ import SaveButton from '@/components/SaveButton.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import TextEditor from '@/components/TextEditor.vue';
 
-const props = defineProps<{
+defineProps<{
   issueId?: string;
   issueBody?: string | null;
   isIssueAuthor: boolean;
@@ -18,9 +18,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'startEdit'): void;
-  (e: 'cancelEdit'): void;
-  (e: 'saveEdit'): void;
+  (e: 'startEdit' | 'cancelEdit' | 'saveEdit'): void;
   (e: 'update:editedIssueBody', value: string): void;
 }>();
 </script>
