@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useRoute, useRouter } from 'nuxt/app';
+import { useRoute } from 'nuxt/app';
 import type { PropType } from 'vue';
-import type { ApolloError, Reference } from '@apollo/client/core';
-import { gql } from '@apollo/client/core';
+import type { ApolloError } from '@apollo/client/core';
 import type { Comment } from '@/__generated__/graphql';
 import type { CreateReplyInputData } from '@/types/Comment';
-import type { MenuItemType } from '@/components/IconButtonDropdown.vue';
 import TextEditor from '../TextEditor.vue';
 import ChildComments from './ChildComments.vue';
 import CommentButtons from './CommentButtons.vue';
@@ -15,23 +13,14 @@ import EllipsisHorizontal from '@/components/icons/EllipsisHorizontal.vue';
 import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import CommentHeader from './CommentHeader.vue';
-import { ALLOWED_ICONS } from '@/utils';
-import { usernameVar, modProfileNameVar } from '@/cache';
+import { usernameVar } from '@/cache';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
-import { getFeedbackPermalinkObject } from '@/utils/routerUtils';
 import type { BotSuggestion } from '@/utils/botMentions';
-import { getAllPermissions } from '@/utils/permissionUtils';
 import ArchivedCommentText from './ArchivedCommentText.vue';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
-import {
-  MARK_AS_ANSWERED_BY_COMMENT,
-  UNMARK_COMMENT_AS_ANSWER,
-} from '@/graphQLData/discussion/mutations';
-import { DateTime } from 'luxon';
-import { config } from '@/config';
-import { useQuery, useMutation } from '@vue/apollo-composable';
+import { useCommentPermissions } from '@/composables/useCommentPermissions';
+import { useBestAnswerMutations } from '@/composables/useBestAnswerMutations';
+import { useCommentPermalink } from '@/composables/useCommentPermalink';
+import { getCommentMenuItems } from '@/utils/headerPermissionUtils';
 
 const MAX_COMMENT_DEPTH = 5;
 const SHOW_MORE_THRESHOLD = 1000;
@@ -186,9 +175,9 @@ const emit = defineEmits([
 ]);
 
 const route = useRoute();
-const router = useRouter();
 const { discussionId, eventId, issueNumber } = route.params;
 
+// Compute forumId from comment data or route
 const forumId = computed(() => {
   if (props.commentData?.Channel?.uniqueName) {
     return props.commentData.Channel.uniqueName;
@@ -205,186 +194,66 @@ const forumId = computed(() => {
   return '';
 });
 
-const { result: getChannelResult } = useQuery(
-  GET_CHANNEL,
-  {
-    uniqueName: forumId,
-    // Using luxon, round down to the nearest hour
-    now: DateTime.local().startOf('hour').toISO(),
-  },
-  {
-    fetchPolicy: 'cache-first',
-    nextFetchPolicy: 'cache-first',
-  }
-);
+// Use the permission composable
+const { userPermissions } = useCommentPermissions(forumId);
 
-const { result: getServerResult } = useQuery(
-  GET_SERVER_CONFIG,
-  {
-    serverName: config.serverName,
-  },
-  {
-    fetchPolicy: 'cache-first',
-  }
-);
-
-const standardModRole = computed(() => {
-  // If the channel has a Default Mod Role, return that.
-  if (getChannelResult.value?.channels[0]?.DefaultModRole) {
-    return getChannelResult.value?.channels[0]?.DefaultModRole;
-  }
-  // Otherwise, return the default mod role from the server config.
-  if (getServerResult.value?.serverConfigs[0]?.DefaultModRole) {
-    return getServerResult.value?.serverConfigs[0]?.DefaultModRole;
-  }
-  return null;
+// Reactive refs for the best answer composable
+const commentIdRef = computed(() => props.commentData.id);
+const originalPosterRef = computed(() => props.originalPoster);
+const answersRef = computed(() => props.answers);
+const discussionIdRef = computed(() => {
+  const discussionIdFromRoute =
+    typeof discussionId === 'string'
+      ? discussionId
+      : Array.isArray(discussionId)
+        ? discussionId[0]
+        : undefined;
+  return discussionIdFromRoute || props.commentData.DiscussionChannel?.discussionId;
 });
 
-const elevatedModRole = computed(() => {
-  // If the channel has a Default Elevated Mod Role, return that.
-  if (getChannelResult.value?.channels[0]?.ElevatedModRole) {
-    return getChannelResult.value?.channels[0]?.ElevatedModRole;
-  }
-  // Otherwise, return the default elevated mod role from the server config.
-  if (getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole) {
-    return getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole;
-  }
-  return null;
-});
-
-const { result: getPermissionResult } = useQuery(
-  USER_IS_MOD_OR_OWNER_IN_CHANNEL,
-  {
-    modDisplayName: modProfileNameVar.value,
-    username: usernameVar.value,
-    channelUniqueName: forumId.value || '',
+// Use the best answer mutations composable
+const {
+  isDiscussionAuthor,
+  isMarkedAsAnswer,
+  handleMarkAsBestAnswer,
+  handleUnmarkAsBestAnswer,
+} = useBestAnswerMutations({
+  commentId: commentIdRef,
+  forumId,
+  discussionId: discussionIdRef,
+  originalPoster: originalPosterRef,
+  answers: answersRef,
+  onMarked: () => {
+    emit('showMarkedAsBestAnswerNotification', true);
+    setTimeout(() => {
+      emit('showMarkedAsBestAnswerNotification', false);
+    }, 3000);
   },
-  {
-    enabled:
-      !!modProfileNameVar.value && !!usernameVar.value && !!forumId.value,
-    fetchPolicy: 'cache-first',
-  }
-);
-
-// Mutations for marking comments as best answers
-const { mutate: markAsAnsweredByComment } = useMutation(
-  MARK_AS_ANSWERED_BY_COMMENT,
-  {
-    update: (cache, { data }) => {
-      // The mutation response contains the updated discussionChannel with new Answers array
-      if (data?.updateDiscussionChannels?.discussionChannels?.[0]) {
-        const updatedChannel =
-          data.updateDiscussionChannels.discussionChannels[0];
-
-        // Update any cached queries that might contain this data
-        cache.modify({
-          fields: {
-            discussionChannels(existingChannels = [], { readField }) {
-              return existingChannels.map((channelRef: Reference) => {
-                const channelId = readField('id', channelRef);
-                if (channelId === updatedChannel.id) {
-                  cache.writeFragment({
-                    id: cache.identify(channelRef),
-                    fragment: gql`
-                      fragment UpdatedAnswers on DiscussionChannel {
-                        id
-                        answered
-                        Answers {
-                          id
-                          text
-                          CommentAuthor {
-                            ... on User {
-                              username
-                            }
-                            ... on ModerationProfile {
-                              displayName
-                            }
-                          }
-                        }
-                      }
-                    `,
-                    data: updatedChannel,
-                  });
-                }
-                return channelRef;
-              });
-            },
-          },
-        });
-      }
-    },
-  }
-);
-
-const { mutate: unmarkCommentAsAnswer } = useMutation(
-  UNMARK_COMMENT_AS_ANSWER,
-  {
-    update: (cache, { data }) => {
-      // The mutation response contains the updated discussionChannel with new Answers array
-      if (data?.updateDiscussionChannels?.discussionChannels?.[0]) {
-        const updatedChannel =
-          data.updateDiscussionChannels.discussionChannels[0];
-
-        // Update any cached queries that might contain this data
-        // This will trigger reactivity and update the UI immediately
-        cache.modify({
-          fields: {
-            // Force a refresh of any queries that depend on the answers
-            discussionChannels(existingChannels = [], { readField }) {
-              return existingChannels.map((channelRef: Reference) => {
-                const channelId = readField('id', channelRef);
-                if (channelId === updatedChannel.id) {
-                  // Update this channel with the new answers
-                  cache.writeFragment({
-                    id: cache.identify(channelRef),
-                    fragment: gql`
-                      fragment UpdatedAnswers on DiscussionChannel {
-                        id
-                        answered
-                        Answers {
-                          id
-                          text
-                          CommentAuthor {
-                            ... on User {
-                              username
-                            }
-                            ... on ModerationProfile {
-                              displayName
-                            }
-                          }
-                        }
-                      }
-                    `,
-                    data: updatedChannel,
-                  });
-                }
-                return channelRef;
-              });
-            },
-          },
-        });
-      }
-    },
-  }
-);
-
-const permissionData = computed(() => {
-  if (getPermissionResult.value?.channels?.[0]) {
-    return getPermissionResult.value.channels[0];
-  }
-  return null;
+  onUnmarked: () => {
+    emit('showUnmarkedAsBestAnswerNotification', true);
+    setTimeout(() => {
+      emit('showUnmarkedAsBestAnswerNotification', false);
+    }, 3000);
+  },
 });
 
-// Use the utility function to get all permissions at once
-const userPermissions = computed(() => {
-  return getAllPermissions({
-    permissionData: permissionData.value,
-    standardModRole: standardModRole.value,
-    elevatedModRole: elevatedModRole.value,
-    username: usernameVar.value,
-    modProfileName: modProfileNameVar.value,
+// Use the permalink composable
+const commentDataRef = computed(() => props.commentData);
+const {
+  canShowPermalink,
+  permalinkObject,
+  copyLink: copyLinkFromComposable,
+} = useCommentPermalink({
+  commentData: commentDataRef,
+  forumId,
+});
+
+// Wrap copyLink to emit notification
+const copyLink = async () => {
+  await copyLinkFromComposable((value: boolean) => {
+    emit('showCopiedLinkNotification', value);
   });
-});
+};
 
 const permalinkedCommentId = route.params.commentId;
 const isHighlighted = computed(() => {
@@ -400,403 +269,26 @@ const replyCount = computed(() => {
 
 const textCopy = computed(() => props.commentData.text);
 
-const canShowPermalink = computed(() => {
-  const channelUniqueName =
-    props.commentData.Channel?.uniqueName ||
-    props.commentData?.DiscussionChannel?.channelUniqueName;
-  const hasForumContext = !!(channelUniqueName || forumId.value);
-
-  return !!(
-    props.commentData.DiscussionChannel ||
-    props.commentData.Event ||
-    props.commentData.Issue ||
-    props.commentData.Channel ||
-    (issueNumber && forumId.value && props.commentData.id) || // For issue comments
-    (discussionId && forumId.value) || // For discussion comments
-    (eventId && forumId.value) || // For event comments
-    (hasForumContext &&
-      (props.commentData.GivesFeedbackOnDiscussion ||
-        props.commentData.GivesFeedbackOnEvent ||
-        props.commentData.GivesFeedbackOnComment))
-  );
-});
-
-const isFeedbackComment = computed(() => {
-  return (
-    props.commentData.GivesFeedbackOnDiscussion ||
-    props.commentData.GivesFeedbackOnEvent ||
-    props.commentData.GivesFeedbackOnComment
-  );
-});
-
-const permalinkObject = computed(() => {
-  if (!canShowPermalink.value) {
-    return {};
-  }
-
-  const channelUniqueName =
-    props.commentData.Channel?.uniqueName ||
-    props.commentData?.DiscussionChannel?.channelUniqueName;
-
-  // If we don't have a valid forumId and we're not on a page with a forumId param,
-  // we can't create a permalink
-  if (!channelUniqueName && !forumId.value) {
-    console.warn('Missing forumId for comment permalink', props.commentData.id);
-    return {};
-  }
-
-  if (isFeedbackComment.value) {
-    if (!channelUniqueName && !forumId.value) {
-      return {};
-    }
-    return (
-      getFeedbackPermalinkObject({
-        routeName: route.name as string,
-        forumId: channelUniqueName || (forumId.value as string),
-        discussionId:
-          props.commentData.GivesFeedbackOnDiscussion?.id ||
-          (discussionId as string) ||
-          props.commentData?.DiscussionChannel?.discussionId,
-        eventId:
-          props.commentData.GivesFeedbackOnEvent?.id || (eventId as string),
-        commentId: props.commentData.id,
-        GivesFeedbackOnComment:
-          props.commentData.GivesFeedbackOnComment || undefined,
-        GivesFeedbackOnDiscussion:
-          props.commentData.GivesFeedbackOnDiscussion || undefined,
-        GivesFeedbackOnEvent:
-          props.commentData.GivesFeedbackOnEvent || undefined,
-      }) || {}
-    );
-  }
-  // This is the default comment permalink object
-  let result = {};
-
-  const discussionIdInLink =
-    discussionId || props.commentData?.DiscussionChannel?.discussionId;
-  if (discussionIdInLink && (channelUniqueName || forumId.value)) {
-    // Permalink for comment on a discussion
-    result = {
-      name: 'forums-forumId-discussions-discussionId-comments-commentId',
-      params: {
-        discussionId: discussionIdInLink,
-        commentId: props.commentData.id,
-        forumId: channelUniqueName || forumId.value,
-      },
-    };
-  }
-  const eventIdInLink = eventId || props.commentData?.Event?.id;
-  if (eventIdInLink && (channelUniqueName || forumId.value)) {
-    result = {
-      name: 'forums-forumId-events-eventId-comments-commentId',
-      params: {
-        eventId: props.commentData.Event?.id,
-        forumId: channelUniqueName || forumId.value,
-        commentId: props.commentData.id,
-      },
-    };
-  }
-  const issueNumberInLink =
-    issueNumber || props.commentData?.Issue?.issueNumber;
-  if (issueNumberInLink && channelUniqueName) {
-    result = {
-      name: 'forums-forumId-issues-issueNumber-comments-commentId',
-      params: {
-        issueNumber: issueNumberInLink,
-        forumId: channelUniqueName,
-        commentId: props.commentData.id,
-      },
-    };
-  }
-
-  return result;
-});
-
-let basePath = '';
-if (import.meta.client) {
-  basePath = window.location.origin;
-} else {
-  basePath = process.env.BASE_URL || '';
-}
-
-const permalink = computed(() => {
-  if (!Object.keys(permalinkObject.value ?? {}).length) {
-    return '';
-  }
-  return `${basePath}${router.resolve(permalinkObject.value ?? {}).href}`;
-});
-
-const copyLink = async () => {
-  if (!permalink.value) {
-    console.warn('No permalink available to copy');
-    return;
-  }
-
-  try {
-    await navigator.clipboard.writeText(permalink.value);
-    emit('showCopiedLinkNotification', true);
-  } catch (e: unknown) {
-    throw e instanceof Error ? e : new Error(String(e));
-  }
-  setTimeout(() => {
-    emit('showCopiedLinkNotification', false);
-  }, 2000);
-};
-
-// Check if the current user is the discussion author
-const isDiscussionAuthor = computed(() => {
-  return props.originalPoster === usernameVar.value;
-});
-
-// Check if this comment is currently marked as an answer
-const isMarkedAsAnswer = computed(() => {
-  if (!props.answers || props.answers.length === 0) {
-    return false;
-  }
-
-  // Check if this comment's ID is in the Answers array
-  return props.answers.some(
-    (answer: Comment) => answer.id === props.commentData.id
-  );
-});
-
-// Functions for marking/unmarking as best answer
-const handleMarkAsBestAnswer = async () => {
-  // Get discussionId from route params or comment data
-  const discussionIdFromRoute =
-    typeof discussionId === 'string'
-      ? discussionId
-      : Array.isArray(discussionId)
-        ? discussionId[0]
-        : undefined;
-  const discussionIdToUse =
-    discussionIdFromRoute || props.commentData.DiscussionChannel?.discussionId;
-
-  if (!discussionIdToUse) {
-    console.warn('No discussion ID found for comment');
-    return;
-  }
-
-  try {
-    await markAsAnsweredByComment({
-      commentId: props.commentData.id,
-      channelId: forumId.value,
-      discussionId: discussionIdToUse,
-    });
-    emit('showMarkedAsBestAnswerNotification', true);
-    setTimeout(() => {
-      emit('showMarkedAsBestAnswerNotification', false);
-    }, 3000);
-  } catch (error) {
-    console.error('Error marking comment as best answer:', error);
-  }
-};
-
-const handleUnmarkAsBestAnswer = async () => {
-  // Get discussionId from route params or comment data
-  const discussionIdFromRoute =
-    typeof discussionId === 'string'
-      ? discussionId
-      : Array.isArray(discussionId)
-        ? discussionId[0]
-        : undefined;
-  const discussionIdToUse =
-    discussionIdFromRoute || props.commentData.DiscussionChannel?.discussionId;
-
-  if (!discussionIdToUse) {
-    console.warn('No discussion ID found for comment');
-    return;
-  }
-
-  try {
-    await unmarkCommentAsAnswer({
-      commentId: props.commentData.id,
-      channelId: forumId.value,
-      discussionId: discussionIdToUse,
-    });
-    emit('showUnmarkedAsBestAnswerNotification', true);
-    setTimeout(() => {
-      emit('showUnmarkedAsBestAnswerNotification', false);
-    }, 3000);
-  } catch (error) {
-    console.error('Error unmarking comment as best answer:', error);
-  }
-};
-
+// Compute menu items using the utility function
 const commentMenuItems = computed(() => {
-  let menuItems: MenuItemType[] = [];
-
-  // Always add these base items for authenticated or unauthenticated users
-
-  // Only show Copy Link when we have a valid permalink
-  if (
-    canShowPermalink.value &&
-    Object.keys(permalinkObject.value ?? {}).length > 0
-  ) {
-    menuItems.push({
-      label: 'Copy Link',
-      value: '',
-      event: 'copyLink',
-      icon: ALLOWED_ICONS.COPY_LINK,
-    });
-  }
-
-  // Always show feedback option if enabled
-  if (props.enableFeedback) {
-    menuItems.push({
-      label: 'View Feedback',
-      value: '',
-      event: 'handleViewFeedback',
-      icon: ALLOWED_ICONS.VIEW_FEEDBACK,
-    });
-  }
-
-  // Return early if user is not logged in
-  if (!usernameVar.value) {
-    return menuItems;
-  }
-
   const isOwnComment =
     props.commentData?.CommentAuthor?.__typename === 'User' &&
     props.commentData?.CommentAuthor?.username === usernameVar.value;
 
-  // If user is the author of the comment
-  if (isOwnComment) {
-    menuItems.push({
-      label: 'Edit',
-      value: '',
-      event: 'handleEdit',
-      icon: ALLOWED_ICONS.EDIT,
-    });
-    menuItems.push({
-      label: 'Delete',
-      value: '',
-      event: 'handleDelete',
-      icon: ALLOWED_ICONS.DELETE,
-    });
-  }
-
-  // If user is the discussion author and this is a root comment in a discussion
-  if (
-    isDiscussionAuthor.value &&
-    discussionId &&
-    props.depth === 1 &&
-    !isOwnComment
-  ) {
-    if (!isMarkedAsAnswer.value) {
-      menuItems.push({
-        label: 'Mark as Best Answer',
-        value: '',
-        event: 'handleMarkAsBestAnswer',
-        icon: ALLOWED_ICONS.MARK_BEST_ANSWER,
-      });
-    } else {
-      menuItems.push({
-        label: 'Undo Mark as Best Answer',
-        value: '',
-        event: 'handleUnmarkAsBestAnswer',
-        icon: ALLOWED_ICONS.UNDO,
-      });
-    }
-  }
-
-  // Check if the user has any moderation permission (standard mod or above)
-  // Standard mods are neither elevated nor suspended, but should still see Report and Give Feedback options
-  const canPerformModActions =
-    !userPermissions.value.isSuspendedMod &&
-    (userPermissions.value.isChannelOwner ||
-      userPermissions.value.isElevatedMod ||
-      userPermissions.value.canReport ||
-      userPermissions.value.canGiveFeedback ||
-      userPermissions.value.canHideComment ||
-      userPermissions.value.canSuspendUser);
-
-  // Show mod actions if user has any mod permissions and isn't the comment author
-  if (usernameVar.value && canPerformModActions && !isOwnComment) {
-    // Create a list for mod actions
-    const modActions: MenuItemType[] = [];
-
-    // Add report action if user has permission
-    if (userPermissions.value.canReport) {
-      modActions.push({
-        label: 'Report',
-        value: '',
-        event: 'clickReport',
-        icon: ALLOWED_ICONS.REPORT,
-      });
-    }
-
-    // Add feedback action if user has permission and feedback is enabled
-    if (userPermissions.value.canGiveFeedback && props.enableFeedback) {
-      modActions.push({
-        label: 'Give Feedback',
-        value: '',
-        event: 'clickFeedback',
-        icon: ALLOWED_ICONS.GIVE_FEEDBACK,
-      });
-    }
-
-    // Add feedback management actions if comment has feedback
-    if (
-      props.enableFeedback &&
-      props.commentData.FeedbackComments?.length > 0
-    ) {
-      modActions.push({
-        label: 'Undo Feedback',
-        value: '',
-        event: 'clickUndoFeedback',
-        icon: ALLOWED_ICONS.UNDO,
-      });
-      modActions.push({
-        label: 'Edit Feedback',
-        value: '',
-        event: 'clickEditFeedback',
-        icon: ALLOWED_ICONS.EDIT,
-      });
-    }
-
-    // Add archive/unarchive actions based on current state and permissions
-    if (!props.commentData.archived) {
-      if (userPermissions.value.canHideComment) {
-        modActions.push({
-          label: 'Archive',
-          event: 'handleClickArchive',
-          icon: ALLOWED_ICONS.ARCHIVE,
-          value: '',
-        });
-      }
-
-      if (userPermissions.value.canSuspendUser) {
-        modActions.push({
-          label: 'Archive and Suspend',
-          event: 'handleClickArchiveAndSuspend',
-          icon: ALLOWED_ICONS.SUSPEND,
-          value: '',
-        });
-      }
-    } else {
-      if (userPermissions.value.canHideComment) {
-        modActions.push({
-          label: 'Unarchive',
-          event: 'handleClickUnarchive',
-          icon: ALLOWED_ICONS.UNARCHIVE,
-          value: '',
-        });
-      }
-    }
-
-    // Only add the mod actions section if there are actually actions to show
-    if (modActions.length > 0) {
-      menuItems.push({
-        value: 'Moderation Actions',
-        isDivider: true,
-        label: '',
-      });
-      menuItems = menuItems.concat(modActions);
-    }
-  }
-
-  return menuItems;
+  return getCommentMenuItems({
+    isOwnComment,
+    isArchived: !!props.commentData.archived,
+    isDiscussionAuthor: isDiscussionAuthor.value,
+    isMarkedAsAnswer: isMarkedAsAnswer.value,
+    depth: props.depth,
+    discussionId: typeof discussionId === 'string' ? discussionId : undefined,
+    userPermissions: userPermissions.value,
+    isLoggedIn: !!usernameVar.value,
+    enableFeedback: props.enableFeedback,
+    canShowPermalink: canShowPermalink.value,
+    hasPermalinkObject: Object.keys(permalinkObject.value ?? {}).length > 0,
+    hasFeedbackComments: (props.commentData.FeedbackComments?.length ?? 0) > 0,
+  });
 });
 
 const showReplies = ref(true);
