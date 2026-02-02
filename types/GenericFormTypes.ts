@@ -1,13 +1,13 @@
-export type SelectOptionData = {
+export type SelectOptionData<T = string | number | boolean> = {
   label: string;
-  value: any;
+  value: T;
   event: string;
   icon: string;
 };
 
-export type MenuItem = {
+export type MenuItem<T = string> = {
   label?: string;
-  value?: string | any;
+  value?: T;
   event?: string;
   icon?: string;
   isDivider?: boolean;

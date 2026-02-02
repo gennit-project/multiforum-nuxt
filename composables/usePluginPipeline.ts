@@ -25,7 +25,7 @@ export interface PipelineRun {
   durationMs?: number;
   executionOrder: number;
   skippedReason?: string;
-  payload?: any;
+  payload?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
 }

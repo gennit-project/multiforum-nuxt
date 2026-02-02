@@ -56,14 +56,19 @@ export function ensureArray<T>(value: T[] | undefined | null): T[] {
  * @returns Property value or fallback
  */
 export function safeGet<T>(
-  obj: any,
+  obj: unknown,
   path: string,
   fallback: T | null = null
 ): T | null {
   try {
-    return (
-      path.split('.').reduce((current, key) => current?.[key], obj) ?? fallback
-    );
+    let current: unknown = obj;
+    for (const key of path.split('.')) {
+      if (current === null || current === undefined) {
+        return fallback;
+      }
+      current = (current as Record<string, unknown>)[key];
+    }
+    return (current ?? fallback) as T | null;
   } catch {
     return fallback;
   }
@@ -96,10 +101,13 @@ export function clientOnly<T>(
  * @returns Normalized discussion with guaranteed array properties
  */
 export function validateDiscussionData<
-  T extends { DownloadableFiles?: any; DiscussionChannels?: any },
+  T extends {
+    DownloadableFiles?: unknown[] | null;
+    DiscussionChannels?: unknown[] | null;
+  },
 >(
   discussion: T | null | undefined
-): (T & { DownloadableFiles: any[]; DiscussionChannels: any[] }) | null {
+): (T & { DownloadableFiles: unknown[]; DiscussionChannels: unknown[] }) | null {
   if (!discussion) return null;
 
   return {
@@ -114,9 +122,9 @@ export function validateDiscussionData<
  * @param event - Event object from GraphQL
  * @returns Normalized event with guaranteed array properties
  */
-export function validateEventData<T extends { EventChannels?: any }>(
+export function validateEventData<T extends { EventChannels?: unknown[] | null }>(
   event: T | null | undefined
-): (T & { EventChannels: any[] }) | null {
+): (T & { EventChannels: unknown[] }) | null {
   if (!event) return null;
 
   return {

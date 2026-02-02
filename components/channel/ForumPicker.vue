@@ -12,7 +12,7 @@ import type {
   MultiSelectOption,
   MultiSelectSection,
 } from '@/components/MultiSelect.vue';
-import type { Channel } from '@/__generated__/graphql';
+import type { Channel, Collection } from '@/__generated__/graphql';
 import { usernameVar, isAuthenticatedVar } from '@/cache';
 import { createCaseInsensitivePattern } from '@/utils/searchUtils';
 
@@ -84,7 +84,7 @@ const channelOptions = computed<MultiSelectOption[]>(() => {
   // Always include selected channels in options, even if they don't match current search
   // This ensures selected chips can always be displayed
   const existingChannelValues = new Set(
-    mappedChannels.map((ch: any) => ch.value)
+    mappedChannels.map((ch: MultiSelectOption) => ch.value)
   );
 
   // Add any selected channels that aren't in the current search results
@@ -116,7 +116,7 @@ const channelSections = computed<MultiSelectSection[]>(() => {
       "Can't show favorite forums because you are not logged in.";
   }
 
-  const favoriteOptions = favoriteChannels.map((channel: any) => ({
+  const favoriteOptions = favoriteChannels.map((channel: Pick<Channel, 'uniqueName' | 'displayName'>) => ({
     value: channel.uniqueName,
     label: channel.displayName || channel.uniqueName,
   }));
@@ -132,17 +132,17 @@ const channelSections = computed<MultiSelectSection[]>(() => {
   // Channel collections - consolidated under single heading
   const collections = collectionsResult.value?.users?.[0]?.Collections || [];
   const collectionsWithChannels = collections.filter(
-    (collection: any) => collection.Channels && collection.Channels.length > 0
+    (collection: Pick<Collection, 'Channels'>) => collection.Channels && collection.Channels.length > 0
   );
 
   if (collectionsWithChannels.length > 0) {
     // Create options for each collection (for select all functionality)
     const collectionOptions = collectionsWithChannels.map(
-      (collection: any) => ({
+      (collection: Pick<Collection, 'id' | 'name' | 'Channels'>) => ({
         value: collection.id,
         label: collection.name,
         // Store the channel uniqueNames for select all functionality
-        channels: (collection.Channels || []).map((ch: any) => ch.uniqueName),
+        channels: (collection.Channels || []).map((ch: Pick<Channel, 'uniqueName'>) => ch.uniqueName),
       })
     );
 

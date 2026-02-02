@@ -6,6 +6,15 @@
 
 import type { MenuItem } from '@/types/GenericFormTypes';
 import { ALLOWED_ICONS } from '@/utils';
+import type { User, ModerationProfile } from '@/__generated__/graphql';
+
+// Type for comment author with role information
+type AuthorWithRoles =
+  | (Pick<User, '__typename'> & {
+      ServerRoles?: Array<{ showAdminTag?: boolean | null }>;
+      ChannelRoles?: Array<{ showModTag?: boolean | null }>;
+    })
+  | Pick<ModerationProfile, '__typename'>;
 
 /**
  * Determines which actions should be available in the discussion header menu
@@ -370,7 +379,7 @@ export const getEventHeaderMenuItems = (params: {
  * @returns Object with isAdmin and isMod booleans
  */
 export const getCommentAuthorStatus = (params: {
-  author: any; // Using 'any' here because of the complex union type in the original component
+  author: AuthorWithRoles | null | undefined;
 }): { isAdmin: boolean; isMod: boolean } => {
   const { author } = params;
 
@@ -384,12 +393,12 @@ export const getCommentAuthorStatus = (params: {
   if (author.__typename === 'User') {
     // Check admin status from ServerRoles
     if (author.ServerRoles && author.ServerRoles.length > 0) {
-      isAdmin = !!author.ServerRoles[0].showAdminTag;
+      isAdmin = !!author.ServerRoles[0]?.showAdminTag;
     }
 
     // Check mod status from ChannelRoles
     if (author.ChannelRoles && author.ChannelRoles.length > 0) {
-      isMod = !!author.ChannelRoles[0].showModTag;
+      isMod = !!author.ChannelRoles[0]?.showModTag;
     }
   }
 

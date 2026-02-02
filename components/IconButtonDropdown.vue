@@ -33,8 +33,8 @@ const props = defineProps({
   },
 });
 
-// Allow emitting any string event
-const emit = defineEmits<(event: string, ...args: any[]) => void>();
+// Allow emitting dynamic string events with typed arguments
+const emit = defineEmits<(event: string, ...args: unknown[]) => void>();
 const router = useRouter();
 
 const handleItemClick = (item: MenuItemType) => {

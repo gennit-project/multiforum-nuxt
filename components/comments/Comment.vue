@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import type { PropType } from 'vue';
-import type { ApolloError } from '@apollo/client/core';
+import type { ApolloError, Reference } from '@apollo/client/core';
 import { gql } from '@apollo/client/core';
 import type { Comment } from '@/__generated__/graphql';
 import type { CreateReplyInputData } from '@/types/Comment';
@@ -280,7 +280,7 @@ const { mutate: markAsAnsweredByComment } = useMutation(
         cache.modify({
           fields: {
             discussionChannels(existingChannels = [], { readField }) {
-              return existingChannels.map((channelRef: any) => {
+              return existingChannels.map((channelRef: Reference) => {
                 const channelId = readField('id', channelRef);
                 if (channelId === updatedChannel.id) {
                   cache.writeFragment({
@@ -331,7 +331,7 @@ const { mutate: unmarkCommentAsAnswer } = useMutation(
           fields: {
             // Force a refresh of any queries that depend on the answers
             discussionChannels(existingChannels = [], { readField }) {
-              return existingChannels.map((channelRef: any) => {
+              return existingChannels.map((channelRef: Reference) => {
                 const channelId = readField('id', channelRef);
                 if (channelId === updatedChannel.id) {
                   // Update this channel with the new answers
@@ -535,8 +535,8 @@ const copyLink = async () => {
   try {
     await navigator.clipboard.writeText(permalink.value);
     emit('showCopiedLinkNotification', true);
-  } catch (e: any) {
-    throw new Error(e);
+  } catch (e: unknown) {
+    throw e instanceof Error ? e : new Error(String(e));
   }
   setTimeout(() => {
     emit('showCopiedLinkNotification', false);
@@ -556,7 +556,7 @@ const isMarkedAsAnswer = computed(() => {
 
   // Check if this comment's ID is in the Answers array
   return props.answers.some(
-    (answer: any) => answer.id === props.commentData.id
+    (answer: Comment) => answer.id === props.commentData.id
   );
 });
 

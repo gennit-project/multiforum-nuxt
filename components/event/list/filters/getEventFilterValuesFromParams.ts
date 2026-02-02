@@ -3,6 +3,15 @@ import { chronologicalOrder, reverseChronologicalOrder } from './filterStrings';
 import { LocationFilterTypes } from './locationFilterTypes';
 import { timeShortcutValues, resultOrderTypes } from './eventSearchOptions';
 
+// Minimal route type for the fields actually used by this function
+// Uses Record<string, unknown> for query to allow flexible test mocking and vue-router compatibility
+type RouteWithQuery = {
+  name?: string | symbol | null;
+  query?: Record<string, unknown>;
+};
+
+export type { RouteWithQuery };
+
 const defaultPlace = {
   // Default map center is Tempe Public Library
   name: 'Tempe Public Library',
@@ -13,7 +22,7 @@ const defaultPlace = {
 };
 
 type GetFilterValuesInput = {
-  route: any;
+  route: RouteWithQuery | null;
   channelId: string;
   showOnlineOnly?: boolean;
   showInPersonOnly?: boolean;
@@ -53,8 +62,9 @@ const getFilterValuesFromParams = function (
     cleanedValues.locationFilter = LocationFilterTypes.ONLY_WITH_ADDRESS;
   }
 
-  for (const key in route?.query || {}) {
-    const val = route.query[key];
+  const query = route?.query || {};
+  for (const key in query) {
+    const val = query[key];
 
     switch (key) {
       case 'timeShortcut':
@@ -63,8 +73,10 @@ const getFilterValuesFromParams = function (
         }
         break;
       case 'radius':
-        cleanedValues.radius = parseFloat(val);
-        cleanedValues.locationFilter = LocationFilterTypes.WITHIN_RADIUS;
+        if (typeof val === 'string' || typeof val === 'number') {
+          cleanedValues.radius = parseFloat(String(val));
+          cleanedValues.locationFilter = LocationFilterTypes.WITHIN_RADIUS;
+        }
         break;
       case 'placeName':
         if (typeof val === 'string') {
@@ -97,10 +109,10 @@ const getFilterValuesFromParams = function (
       case 'tags':
         if (typeof val === 'string') {
           cleanedValues.tags = val.split(',');
-        } else if (typeof val === 'object') {
+        } else if (Array.isArray(val)) {
           // If it is an array of strings, which
           // is good, then the type is an object.
-          cleanedValues.tags = val;
+          cleanedValues.tags = val as string[];
         } else {
           cleanedValues.tags = [];
         }
@@ -109,10 +121,10 @@ const getFilterValuesFromParams = function (
         if (typeof val === 'string') {
           cleanedValues.channels = [val];
         }
-        if (typeof val === 'object') {
+        if (Array.isArray(val)) {
           // If it is an array of strings, which
           // is good, then the type is an object.
-          cleanedValues.channels = val;
+          cleanedValues.channels = val as string[];
         }
         break;
       case 'searchInput':

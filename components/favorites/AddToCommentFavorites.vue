@@ -62,7 +62,7 @@ watch(
   (newResult) => {
     if (newResult?.users?.[0]?.FavoriteComments) {
       isFavorited.value = newResult.users[0].FavoriteComments.some(
-        (comment: any) => comment.id === props.commentId
+        (comment: { id: string }) => comment.id === props.commentId
       );
     }
   },

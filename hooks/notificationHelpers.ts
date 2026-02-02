@@ -1,5 +1,22 @@
+// Interface for Neo4j OGM Model with update method
+interface OGMModel {
+  update(params: {
+    where: { username: string };
+    update: {
+      Notifications: Array<{
+        create: Array<{
+          node: {
+            text: string;
+            read: boolean;
+          };
+        }>;
+      }>;
+    };
+  }): Promise<{ users?: unknown[] }>;
+}
+
 type CreateInAppNotificationInput = {
-  UserModel: any;
+  UserModel: OGMModel;
   username: string;
   text: string;
 };
