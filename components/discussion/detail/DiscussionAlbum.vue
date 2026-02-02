@@ -15,6 +15,7 @@ import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
 import CarouselThumbnail from '@/components/discussion/detail/CarouselThumbnail.vue';
 import ImageLightbox from '@/components/discussion/detail/ImageLightbox.vue';
+import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
 
 const props = defineProps({
   album: {
@@ -207,15 +208,6 @@ const closeLightbox = () => {
   emit('close-lightbox');
 };
 
-// Check if a URL has a .glb extension
-const hasGlbExtension = (url: string) => {
-  return url?.toLowerCase().endsWith('.glb');
-};
-
-// Check if a URL has a .stl extension
-const hasStlExtension = (url: string) => {
-  return url?.toLowerCase().endsWith('.stl');
-};
 
 // Touch swipe handling for carousel
 const touchStartX = ref(0);

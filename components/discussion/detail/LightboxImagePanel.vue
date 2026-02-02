@@ -4,6 +4,7 @@ import LeftArrowIcon from '@/components/icons/LeftArrowIcon.vue';
 import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
+import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
 
 const props = defineProps({
   currentImage: {
@@ -49,15 +50,6 @@ const emit = defineEmits([
   'touchmove',
 ]);
 
-// Check if a URL has a .glb extension
-const hasGlbExtension = (url: string) => {
-  return url?.toLowerCase().endsWith('.glb');
-};
-
-// Check if a URL has a .stl extension
-const hasStlExtension = (url: string) => {
-  return url?.toLowerCase().endsWith('.stl');
-};
 
 const handleClick = (event: MouseEvent) => {
   // Don't close editing mode if click happens within editor
