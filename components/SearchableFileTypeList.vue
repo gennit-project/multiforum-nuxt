@@ -106,6 +106,7 @@ function updateSearchResult(input: string) {
           type="checkbox"
           :value="fileType"
           :checked="selected.includes(fileType)"
+          :aria-label="`Select file type ${fileType}`"
           class="border border-gray-300 text-orange-600 dark:border-gray-600"
           @change="() => emit('toggleSelection', fileType)"
         >

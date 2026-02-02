@@ -557,6 +557,7 @@ const popoverStyles = computed(() => {
           Add to List
         </h3>
         <button
+          aria-label="Close"
           class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
           @click="emit('close')"
         >
@@ -570,6 +571,7 @@ const popoverStyles = computed(() => {
           v-model="searchTerm"
           type="text"
           placeholder="Search lists..."
+          aria-label="Search lists"
           class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
         >
       </div>
@@ -590,6 +592,7 @@ const popoverStyles = computed(() => {
             v-model="newCollectionName"
             type="text"
             placeholder="Enter list name..."
+            aria-label="New list name"
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
             @keyup.enter="handleCreateNewCollection"
             @keyup.escape="isCreatingNew = false"
@@ -634,6 +637,7 @@ const popoverStyles = computed(() => {
           <input
             type="checkbox"
             :checked="isItemInFavorites"
+            :aria-label="`${isItemInFavorites ? 'Remove from' : 'Add to'} ${favoritesList.name}`"
             class="rounded text-blue-600 focus:ring-blue-500"
             readonly
           >
@@ -675,6 +679,7 @@ const popoverStyles = computed(() => {
             :checked="
               itemInCollections.some((c: CollectionListItem) => c.id === collection.id)
             "
+            :aria-label="`${itemInCollections.some((c: CollectionListItem) => c.id === collection.id) ? 'Remove from' : 'Add to'} ${collection.name}`"
             class="rounded text-blue-600 focus:ring-blue-500"
             readonly
           >

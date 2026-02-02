@@ -155,6 +155,7 @@ const isExpanded = computed(() => {
         >
           <button
             data-testid="expand-all-button"
+            aria-label="Expand all discussions"
             :aria-pressed="isExpanded"
             :class="[
               // layout

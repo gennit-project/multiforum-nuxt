@@ -28,6 +28,7 @@ const emit = defineEmits(['toggleSelection']);
       type="checkbox"
       :value="channel.uniqueName"
       :checked="selected.includes(channel.uniqueName)"
+      :aria-label="`Select ${channel.displayName || channel.uniqueName}`"
       class="h-4 w-4 border border-gray-300 text-orange-600 dark:border-gray-600"
       @change="() => emit('toggleSelection', channel.uniqueName)"
     >

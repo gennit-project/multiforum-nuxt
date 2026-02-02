@@ -386,6 +386,7 @@ const areAllFavoritesSelected = computed(() => {
                 <input
                   type="checkbox"
                   :checked="areAllFavoritesSelected"
+                  aria-label="Select all favorite forums"
                   class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                   @click.stop="toggleSelectAllFavorites"
                 >
@@ -473,6 +474,7 @@ const areAllFavoritesSelected = computed(() => {
               <input
                 type="checkbox"
                 :checked="isCollectionFullySelected(collection)"
+                :aria-label="`Select all forums in ${collection.name}`"
                 class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                 @click.stop="toggleSelectAllCollection(collection)"
               >

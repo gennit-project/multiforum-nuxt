@@ -170,6 +170,7 @@ const onTogglePermission = async (
               class="h-4 w-4 accent-blue-600"
               :checked="!!role[permission]"
               :disabled="loading || isUpdating(role.name, permission)"
+              :aria-label="`${formatPermissionName(permission)} for ${role.name}`"
               @change="
                 onTogglePermission(
                   role,
