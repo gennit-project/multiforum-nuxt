@@ -4,9 +4,169 @@ import {
   getEventHeaderMenuItems,
   getCommentAuthorStatus,
   getCommentMenuItems,
+  canPerformModActions,
+  buildArchiveMenuItems,
+  buildModerationSection,
 } from './headerPermissionUtils';
 
 describe('headerPermissionUtils', () => {
+  // Base permissions object - all false by default (shared across tests)
+  const basePermissions = {
+    canReport: false,
+    canGiveFeedback: false,
+    canHideComment: false,
+    canHideDiscussion: false,
+    canHideEvent: false,
+    canSuspendUser: false,
+    isChannelOwner: false,
+    isElevatedMod: false,
+    isSuspendedMod: false,
+    isSuspendedUser: false,
+  };
+
+  describe('canPerformModActions', () => {
+    it('should return false for suspended mods', () => {
+      const permissions = { ...basePermissions, isSuspendedMod: true, canReport: true };
+      expect(canPerformModActions(permissions, 'discussion')).toBe(false);
+    });
+
+    it('should return true for channel owners', () => {
+      const permissions = { ...basePermissions, isChannelOwner: true };
+      expect(canPerformModActions(permissions, 'discussion')).toBe(true);
+    });
+
+    it('should return true for elevated mods', () => {
+      const permissions = { ...basePermissions, isElevatedMod: true };
+      expect(canPerformModActions(permissions, 'discussion')).toBe(true);
+    });
+
+    it('should return true if user can report', () => {
+      const permissions = { ...basePermissions, canReport: true };
+      expect(canPerformModActions(permissions, 'discussion')).toBe(true);
+    });
+
+    it('should return true if user can give feedback', () => {
+      const permissions = { ...basePermissions, canGiveFeedback: true };
+      expect(canPerformModActions(permissions, 'event')).toBe(true);
+    });
+
+    it('should return true for discussion if user canHideDiscussion', () => {
+      const permissions = { ...basePermissions, canHideDiscussion: true };
+      expect(canPerformModActions(permissions, 'discussion')).toBe(true);
+    });
+
+    it('should return true for event if user canHideEvent', () => {
+      const permissions = { ...basePermissions, canHideEvent: true };
+      expect(canPerformModActions(permissions, 'event')).toBe(true);
+    });
+
+    it('should return true for comment if user canHideComment', () => {
+      const permissions = { ...basePermissions, canHideComment: true };
+      expect(canPerformModActions(permissions, 'comment')).toBe(true);
+    });
+
+    it('should return true if user canSuspendUser for any content type', () => {
+      const permissions = { ...basePermissions, canSuspendUser: true };
+      expect(canPerformModActions(permissions, 'discussion')).toBe(true);
+      expect(canPerformModActions(permissions, 'event')).toBe(true);
+      expect(canPerformModActions(permissions, 'comment')).toBe(true);
+    });
+
+    it('should return false if no permissions and no content type', () => {
+      expect(canPerformModActions(basePermissions)).toBe(false);
+    });
+  });
+
+  describe('buildArchiveMenuItems', () => {
+    it('should return archive option when not archived and user has permission', () => {
+      const permissions = { ...basePermissions, canHideDiscussion: true };
+      const items = buildArchiveMenuItems({
+        isArchived: false,
+        userPermissions: permissions,
+        contentType: 'discussion',
+        contentId: 'disc123',
+      });
+
+      expect(items).toHaveLength(1);
+      expect(items[0].label).toBe('Archive');
+      expect(items[0].event).toBe('handleClickArchive');
+    });
+
+    it('should return archive and suspend options when user has both permissions', () => {
+      const permissions = { ...basePermissions, canHideEvent: true, canSuspendUser: true };
+      const items = buildArchiveMenuItems({
+        isArchived: false,
+        userPermissions: permissions,
+        contentType: 'event',
+        contentId: 'event123',
+      });
+
+      expect(items).toHaveLength(2);
+      expect(items[0].label).toBe('Archive');
+      expect(items[1].label).toBe('Archive and Suspend');
+    });
+
+    it('should return unarchive option when archived and user has permission', () => {
+      const permissions = { ...basePermissions, canHideComment: true };
+      const items = buildArchiveMenuItems({
+        isArchived: true,
+        userPermissions: permissions,
+        contentType: 'comment',
+        contentId: '',
+      });
+
+      expect(items).toHaveLength(1);
+      expect(items[0].label).toBe('Unarchive');
+      expect(items[0].event).toBe('handleClickUnarchive');
+    });
+
+    it('should return empty array when user has no permissions', () => {
+      const items = buildArchiveMenuItems({
+        isArchived: false,
+        userPermissions: basePermissions,
+        contentType: 'discussion',
+        contentId: 'disc123',
+      });
+
+      expect(items).toHaveLength(0);
+    });
+
+    it('should use custom event names when provided', () => {
+      const permissions = { ...basePermissions, canHideDiscussion: true };
+      const items = buildArchiveMenuItems({
+        isArchived: false,
+        userPermissions: permissions,
+        contentType: 'discussion',
+        contentId: 'disc123',
+        archiveEvent: 'customArchive',
+      });
+
+      expect(items[0].event).toBe('customArchive');
+    });
+  });
+
+  describe('buildModerationSection', () => {
+    it('should return empty array when no actions provided', () => {
+      const result = buildModerationSection([]);
+      expect(result).toHaveLength(0);
+    });
+
+    it('should return divider followed by actions', () => {
+      const modActions = [
+        { label: 'Report', event: 'report', value: '' },
+        { label: 'Archive', event: 'archive', value: '' },
+      ];
+
+      const result = buildModerationSection(modActions);
+
+      expect(result).toHaveLength(3);
+      expect(result[0].isDivider).toBe(true);
+      expect(result[0].value).toBe('Moderation Actions');
+      expect(result[1].label).toBe('Report');
+      expect(result[2].label).toBe('Archive');
+    });
+  });
+
   describe('getDiscussionHeaderMenuItems', () => {
     // Common test data
     const discussionId = 'discussion123';
