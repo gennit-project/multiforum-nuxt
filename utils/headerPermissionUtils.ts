@@ -7,6 +7,7 @@
 import type { MenuItem } from '@/types/GenericFormTypes';
 import { ALLOWED_ICONS } from '@/utils';
 import type { User, ModerationProfile } from '@/__generated__/graphql';
+import type { RouteLocationRaw } from 'vue-router';
 
 // Type for comment author with role information
 type AuthorWithRoles =
@@ -37,8 +38,8 @@ export const getDiscussionHeaderMenuItems = (params: {
   hasAlbum?: boolean;
   feedbackEnabled?: boolean;
   hasSensitiveContent?: boolean;
-  relatedIssueLink?: MenuItem['value'] | null;
-}): MenuItem[] => {
+  relatedIssueLink?: RouteLocationRaw | null;
+}): MenuItem<string | RouteLocationRaw>[] => {
   const {
     isOwnDiscussion,
     isArchived,
@@ -50,7 +51,7 @@ export const getDiscussionHeaderMenuItems = (params: {
     hasSensitiveContent = false,
     relatedIssueLink = null,
   } = params;
-  let menuItems: MenuItem[] = [];
+  let menuItems: MenuItem<string | RouteLocationRaw>[] = [];
 
   if (relatedIssueLink) {
     menuItems.push({
@@ -212,8 +213,8 @@ export const getEventHeaderMenuItems = (params: {
   eventId: string;
   isOnFeedbackPage?: boolean;
   feedbackEnabled?: boolean;
-  relatedIssueLink?: MenuItem['value'] | null;
-}): MenuItem[] => {
+  relatedIssueLink?: RouteLocationRaw | null;
+}): MenuItem<string | RouteLocationRaw>[] => {
   const {
     isOwnEvent,
     isArchived,
@@ -237,7 +238,7 @@ export const getEventHeaderMenuItems = (params: {
     isCanceled,
   });
 
-  let menuItems: MenuItem[] = [];
+  let menuItems: MenuItem<string | RouteLocationRaw>[] = [];
 
   if (relatedIssueLink) {
     menuItems.push({
