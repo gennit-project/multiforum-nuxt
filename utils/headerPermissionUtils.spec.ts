@@ -3,6 +3,7 @@ import {
   getDiscussionHeaderMenuItems,
   getEventHeaderMenuItems,
   getCommentAuthorStatus,
+  getCommentMenuItems,
 } from './headerPermissionUtils';
 
 describe('headerPermissionUtils', () => {
@@ -614,6 +615,329 @@ describe('headerPermissionUtils', () => {
 
       expect(result.isAdmin).toBe(false);
       expect(result.isMod).toBe(false);
+    });
+  });
+
+  describe('getCommentMenuItems', () => {
+    // Base permissions object - all false by default
+    const basePermissions = {
+      canReport: false,
+      canGiveFeedback: false,
+      canHideComment: false,
+      canHideDiscussion: false,
+      canHideEvent: false,
+      canSuspendUser: false,
+      canOpenSupportTickets: false,
+      canCloseSupportTickets: false,
+      canLockChannel: false,
+      canEditWiki: false,
+      canAddMods: false,
+      canRemoveMods: false,
+      canAddOwners: false,
+      canRemoveOwners: false,
+      canChangeSettings: false,
+      isChannelOwner: false,
+      isElevatedMod: false,
+      isSuspendedMod: false,
+      isSuspendedUser: false,
+    };
+
+    const defaultParams = {
+      isOwnComment: false,
+      isArchived: false,
+      isDiscussionAuthor: false,
+      isMarkedAsAnswer: false,
+      depth: 1,
+      discussionId: 'discussion123',
+      userPermissions: basePermissions,
+      isLoggedIn: false,
+      enableFeedback: true,
+      canShowPermalink: true,
+      hasPermalinkObject: true,
+      hasFeedbackComments: false,
+    };
+
+    describe('for unauthenticated users', () => {
+      it('should return 2 menu items', () => {
+        const menuItems = getCommentMenuItems(defaultParams);
+
+        expect(menuItems.length).toBe(2);
+      });
+
+      it('should have copyLink as first option', () => {
+        const menuItems = getCommentMenuItems(defaultParams);
+
+        expect(menuItems[0].event).toBe('copyLink');
+      });
+
+      it('should have handleViewFeedback as second option', () => {
+        const menuItems = getCommentMenuItems(defaultParams);
+
+        expect(menuItems[1].event).toBe('handleViewFeedback');
+      });
+    });
+
+    describe('when canShowPermalink is false', () => {
+      it('should not include Copy Link option', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          canShowPermalink: false,
+          hasPermalinkObject: false,
+        });
+
+        expect(menuItems.find((item) => item.event === 'copyLink')).toBeUndefined();
+      });
+    });
+
+    describe('when enableFeedback is false', () => {
+      it('should not include View Feedback option', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          enableFeedback: false,
+        });
+
+        expect(menuItems.find((item) => item.event === 'handleViewFeedback')).toBeUndefined();
+      });
+    });
+
+    describe('for comment author', () => {
+      it('should include edit option', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          isOwnComment: true,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'handleEdit')).toBeDefined();
+      });
+
+      it('should include delete option', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          isOwnComment: true,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'handleDelete')).toBeDefined();
+      });
+    });
+
+    describe('for discussion author on root comments', () => {
+      it('should show Mark as Best Answer option', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          isDiscussionAuthor: true,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'handleMarkAsBestAnswer')).toBeDefined();
+      });
+
+      it('should show Undo Mark when comment is already marked', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          isDiscussionAuthor: true,
+          isMarkedAsAnswer: true,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'handleUnmarkAsBestAnswer')).toBeDefined();
+      });
+
+      it('should not show Mark as Best Answer for nested comments', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          isDiscussionAuthor: true,
+          depth: 2,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'handleMarkAsBestAnswer')).toBeUndefined();
+      });
+    });
+
+    describe('for elevated moderators', () => {
+      const elevatedModPermissions = {
+        ...basePermissions,
+        isElevatedMod: true,
+        canReport: true,
+        canGiveFeedback: true,
+        canHideComment: true,
+      };
+
+      it('should include mod actions divider', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          userPermissions: elevatedModPermissions,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.isDivider === true)).toBeDefined();
+      });
+
+      it('should include report option', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          userPermissions: elevatedModPermissions,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'clickReport')).toBeDefined();
+      });
+
+      it('should include give feedback option', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          userPermissions: elevatedModPermissions,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'clickFeedback')).toBeDefined();
+      });
+
+      it('should include archive option', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          userPermissions: elevatedModPermissions,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'handleClickArchive')).toBeDefined();
+      });
+    });
+
+    describe('for suspended moderators', () => {
+      it('should not include mod actions divider', () => {
+        const suspendedModPermissions = {
+          ...basePermissions,
+          isElevatedMod: true,
+          isSuspendedMod: true,
+          canReport: true,
+        };
+
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          userPermissions: suspendedModPermissions,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.isDivider === true)).toBeUndefined();
+      });
+    });
+
+    describe('for archived comments', () => {
+      it('should show unarchive option', () => {
+        const modPermissions = {
+          ...basePermissions,
+          isElevatedMod: true,
+          canHideComment: true,
+        };
+
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          isArchived: true,
+          userPermissions: modPermissions,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'handleClickUnarchive')).toBeDefined();
+      });
+
+      it('should not show archive option', () => {
+        const modPermissions = {
+          ...basePermissions,
+          isElevatedMod: true,
+          canHideComment: true,
+        };
+
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          isArchived: true,
+          userPermissions: modPermissions,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'handleClickArchive')).toBeUndefined();
+      });
+    });
+
+    describe('for comments with feedback', () => {
+      it('should show undo feedback option', () => {
+        const modPermissions = {
+          ...basePermissions,
+          isElevatedMod: true,
+          canGiveFeedback: true,
+        };
+
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          userPermissions: modPermissions,
+          isLoggedIn: true,
+          hasFeedbackComments: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'clickUndoFeedback')).toBeDefined();
+      });
+
+      it('should show edit feedback option', () => {
+        const modPermissions = {
+          ...basePermissions,
+          isElevatedMod: true,
+          canGiveFeedback: true,
+        };
+
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          userPermissions: modPermissions,
+          isLoggedIn: true,
+          hasFeedbackComments: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'clickEditFeedback')).toBeDefined();
+      });
+    });
+
+    describe('for comment author who is also a mod', () => {
+      const modPermissions = {
+        ...basePermissions,
+        isElevatedMod: true,
+        canReport: true,
+        canGiveFeedback: true,
+        canHideComment: true,
+      };
+
+      it('should show edit option', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          isOwnComment: true,
+          userPermissions: modPermissions,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'handleEdit')).toBeDefined();
+      });
+
+      it('should show delete option', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          isOwnComment: true,
+          userPermissions: modPermissions,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'handleDelete')).toBeDefined();
+      });
+
+      it('should not show mod actions divider', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          isOwnComment: true,
+          userPermissions: modPermissions,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.isDivider === true)).toBeUndefined();
+      });
     });
   });
 });

@@ -405,3 +405,209 @@ export const getCommentAuthorStatus = (params: {
 
   return { isAdmin, isMod };
 };
+
+/**
+ * Determines which actions should be available in the comment menu
+ * based on user permissions and the comment state
+ *
+ * @param params - Parameters to determine which menu items to show:
+ *   - isOwnComment - Whether the current user is the author of the comment
+ *   - isArchived - Whether the comment is archived
+ *   - isDiscussionAuthor - Whether the current user is the author of the discussion
+ *   - isMarkedAsAnswer - Whether this comment is marked as a best answer
+ *   - depth - The nesting depth of the comment (1 = root comment)
+ *   - discussionId - ID of the discussion (if applicable)
+ *   - userPermissions - Object with all user permissions from getAllPermissions utility
+ *   - isLoggedIn - Whether the user is logged in
+ *   - enableFeedback - Whether feedback is enabled on the channel
+ *   - canShowPermalink - Whether we can show a permalink for this comment
+ *   - hasPermalinkObject - Whether we have a valid permalink object
+ *   - hasFeedbackComments - Whether this comment has feedback comments
+ * @returns Array of menu items to display
+ */
+export const getCommentMenuItems = (params: {
+  isOwnComment: boolean;
+  isArchived: boolean;
+  isDiscussionAuthor: boolean;
+  isMarkedAsAnswer: boolean;
+  depth: number;
+  discussionId: string | undefined;
+  userPermissions: Record<string, boolean>;
+  isLoggedIn: boolean;
+  enableFeedback: boolean;
+  canShowPermalink: boolean;
+  hasPermalinkObject: boolean;
+  hasFeedbackComments: boolean;
+}): MenuItem[] => {
+  const {
+    isOwnComment,
+    isArchived,
+    isDiscussionAuthor,
+    isMarkedAsAnswer,
+    depth,
+    discussionId,
+    userPermissions,
+    isLoggedIn,
+    enableFeedback,
+    canShowPermalink,
+    hasPermalinkObject,
+    hasFeedbackComments,
+  } = params;
+
+  let menuItems: MenuItem[] = [];
+
+  // Only show Copy Link when we have a valid permalink
+  if (canShowPermalink && hasPermalinkObject) {
+    menuItems.push({
+      label: 'Copy Link',
+      value: '',
+      event: 'copyLink',
+      icon: ALLOWED_ICONS.COPY_LINK,
+    });
+  }
+
+  // Always show feedback option if enabled
+  if (enableFeedback) {
+    menuItems.push({
+      label: 'View Feedback',
+      value: '',
+      event: 'handleViewFeedback',
+      icon: ALLOWED_ICONS.VIEW_FEEDBACK,
+    });
+  }
+
+  // Return early if user is not logged in
+  if (!isLoggedIn) {
+    return menuItems;
+  }
+
+  // If user is the author of the comment
+  if (isOwnComment) {
+    menuItems.push({
+      label: 'Edit',
+      value: '',
+      event: 'handleEdit',
+      icon: ALLOWED_ICONS.EDIT,
+    });
+    menuItems.push({
+      label: 'Delete',
+      value: '',
+      event: 'handleDelete',
+      icon: ALLOWED_ICONS.DELETE,
+    });
+  }
+
+  // If user is the discussion author and this is a root comment in a discussion
+  if (isDiscussionAuthor && discussionId && depth === 1 && !isOwnComment) {
+    if (!isMarkedAsAnswer) {
+      menuItems.push({
+        label: 'Mark as Best Answer',
+        value: '',
+        event: 'handleMarkAsBestAnswer',
+        icon: ALLOWED_ICONS.MARK_BEST_ANSWER,
+      });
+    } else {
+      menuItems.push({
+        label: 'Undo Mark as Best Answer',
+        value: '',
+        event: 'handleUnmarkAsBestAnswer',
+        icon: ALLOWED_ICONS.UNDO,
+      });
+    }
+  }
+
+  // Check if the user has any moderation permission (standard mod or above)
+  // Standard mods are neither elevated nor suspended, but should still see Report and Give Feedback options
+  const canPerformModActions =
+    !userPermissions.isSuspendedMod &&
+    (userPermissions.isChannelOwner ||
+      userPermissions.isElevatedMod ||
+      userPermissions.canReport ||
+      userPermissions.canGiveFeedback ||
+      userPermissions.canHideComment ||
+      userPermissions.canSuspendUser);
+
+  // Show mod actions if user has any mod permissions and isn't the comment author
+  if (isLoggedIn && canPerformModActions && !isOwnComment) {
+    // Create a list for mod actions
+    const modActions: MenuItem[] = [];
+
+    // Add report action if user has permission
+    if (userPermissions.canReport) {
+      modActions.push({
+        label: 'Report',
+        value: '',
+        event: 'clickReport',
+        icon: ALLOWED_ICONS.REPORT,
+      });
+    }
+
+    // Add feedback action if user has permission and feedback is enabled
+    if (userPermissions.canGiveFeedback && enableFeedback) {
+      modActions.push({
+        label: 'Give Feedback',
+        value: '',
+        event: 'clickFeedback',
+        icon: ALLOWED_ICONS.GIVE_FEEDBACK,
+      });
+    }
+
+    // Add feedback management actions if comment has feedback
+    if (enableFeedback && hasFeedbackComments) {
+      modActions.push({
+        label: 'Undo Feedback',
+        value: '',
+        event: 'clickUndoFeedback',
+        icon: ALLOWED_ICONS.UNDO,
+      });
+      modActions.push({
+        label: 'Edit Feedback',
+        value: '',
+        event: 'clickEditFeedback',
+        icon: ALLOWED_ICONS.EDIT,
+      });
+    }
+
+    // Add archive/unarchive actions based on current state and permissions
+    if (!isArchived) {
+      if (userPermissions.canHideComment) {
+        modActions.push({
+          label: 'Archive',
+          event: 'handleClickArchive',
+          icon: ALLOWED_ICONS.ARCHIVE,
+          value: '',
+        });
+      }
+
+      if (userPermissions.canSuspendUser) {
+        modActions.push({
+          label: 'Archive and Suspend',
+          event: 'handleClickArchiveAndSuspend',
+          icon: ALLOWED_ICONS.SUSPEND,
+          value: '',
+        });
+      }
+    } else {
+      if (userPermissions.canHideComment) {
+        modActions.push({
+          label: 'Unarchive',
+          event: 'handleClickUnarchive',
+          icon: ALLOWED_ICONS.UNARCHIVE,
+          value: '',
+        });
+      }
+    }
+
+    // Only add the mod actions section if there are actually actions to show
+    if (modActions.length > 0) {
+      menuItems.push({
+        value: 'Moderation Actions',
+        isDivider: true,
+        label: '',
+      });
+      menuItems = menuItems.concat(modActions);
+    }
+  }
+
+  return menuItems;
+};
