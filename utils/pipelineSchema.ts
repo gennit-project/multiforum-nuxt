@@ -20,8 +20,8 @@ export interface PipelineConfig {
   pipelines: EventPipeline[];
 }
 
-// Pipeline scope types
-export type PipelineScope = 'server' | 'channel';
+// Pipeline scope types (lowercase for configuration, distinct from runtime PipelineScope in usePluginPipeline)
+export type PipelineConfigScope = 'server' | 'channel';
 
 // Available events that can trigger pipelines
 export const PIPELINE_EVENTS = [
@@ -30,37 +30,37 @@ export const PIPELINE_EVENTS = [
     value: 'downloadableFile.created',
     label: 'File Upload',
     description: 'Triggered when a downloadable file is uploaded',
-    scope: 'server' as PipelineScope,
+    scope: 'server' as PipelineConfigScope,
   },
   {
     value: 'downloadableFile.updated',
     label: 'File Updated',
     description: 'Triggered when a downloadable file is modified',
-    scope: 'server' as PipelineScope,
+    scope: 'server' as PipelineConfigScope,
   },
   {
     value: 'comment.created',
     label: 'Comment Created',
     description: 'Triggered when a comment is created',
-    scope: 'server' as PipelineScope,
+    scope: 'server' as PipelineConfigScope,
   },
   {
     value: 'comment.created',
     label: 'Comment Created',
     description: 'Triggered when a comment is created in a channel',
-    scope: 'channel' as PipelineScope,
+    scope: 'channel' as PipelineConfigScope,
   },
   // Channel-scoped events (configured by channel admin)
   {
     value: 'discussionChannel.created',
     label: 'Content Submitted to Channel',
     description: 'Triggered when a discussion with download is submitted to this channel',
-    scope: 'channel' as PipelineScope,
+    scope: 'channel' as PipelineConfigScope,
   },
 ] as const;
 
 // Get events filtered by scope
-export const getEventsForScope = (scope: PipelineScope) => {
+export const getEventsForScope = (scope: PipelineConfigScope) => {
   return PIPELINE_EVENTS.filter((event) => event.scope === scope);
 };
 
@@ -90,7 +90,7 @@ export const PIPELINE_CONDITIONS: { value: PipelineCondition; label: string; des
 ];
 
 // Create JSON Schema for YAML validation in Monaco editor
-const createPipelineJsonSchema = (scope: PipelineScope) => {
+const createPipelineJsonSchema = (scope: PipelineConfigScope) => {
   const events = getEventsForScope(scope);
   return {
     $schema: 'http://json-schema.org/draft-07/schema#',
@@ -162,7 +162,7 @@ export const pipelineJsonSchema = createPipelineJsonSchema('server');
 export const channelPipelineJsonSchema = createPipelineJsonSchema('channel');
 
 // Get schema for a specific scope
-export const getPipelineJsonSchema = (scope: PipelineScope) => createPipelineJsonSchema(scope);
+export const getPipelineJsonSchema = (scope: PipelineConfigScope) => createPipelineJsonSchema(scope);
 
 // Default pipeline configuration template for server pipelines
 export const DEFAULT_PIPELINE_YAML = `# Server Plugin Pipeline Configuration
@@ -200,7 +200,7 @@ pipelines:
 `;
 
 // Get default YAML for a specific scope
-export const getDefaultPipelineYaml = (scope: PipelineScope): string => {
+export const getDefaultPipelineYaml = (scope: PipelineConfigScope): string => {
   return scope === 'server' ? DEFAULT_PIPELINE_YAML : DEFAULT_CHANNEL_PIPELINE_YAML;
 };
 
@@ -214,7 +214,7 @@ export function pipelineToYaml(_config: PipelineConfig): string {
 export function validatePipelineConfig(
   config: PipelineConfig,
   availablePlugins: string[],
-  scope: PipelineScope = 'server'
+  scope: PipelineConfigScope = 'server'
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
   const validEvents = getEventsForScope(scope);
