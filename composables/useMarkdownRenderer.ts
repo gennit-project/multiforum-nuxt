@@ -3,6 +3,7 @@ import type Token from 'markdown-it/lib/token.mjs';
 import type Renderer from 'markdown-it/lib/renderer.mjs';
 import hljs from 'highlight.js';
 import { generateHeadingId } from '@/utils/markdown';
+import { config } from '@/config';
 
 /**
  * Creates and configures a MarkdownIt instance with:
@@ -27,7 +28,23 @@ export function useMarkdownRenderer() {
     },
   });
 
-  // Configure renderer to add target="_blank" and rel="noopener noreferrer" to all links
+  const isExternalHref = (href: string | null | undefined): boolean => {
+    if (!href) return false;
+    const trimmed = href.trim();
+    if (
+      trimmed.startsWith('/') ||
+      trimmed.startsWith('#') ||
+      trimmed.startsWith('mailto:')
+    ) {
+      return false;
+    }
+    if (config.baseUrl && trimmed.startsWith(config.baseUrl)) {
+      return false;
+    }
+    return /^https?:\/\//i.test(trimmed);
+  };
+
+  // Configure renderer to add target="_blank" and rel="noopener noreferrer" to external links
   md.renderer.rules.link_open = (
     tokens: Token[],
     idx: number,
@@ -37,9 +54,13 @@ export function useMarkdownRenderer() {
   ): string => {
     const token = tokens[idx];
     if (token) {
-      token.attrPush(['target', '_blank']);
-      token.attrPush(['rel', 'noopener noreferrer']);
-      token.attrPush(['class', 'external-link']);
+      const href = token.attrGet('href');
+      if (isExternalHref(href)) {
+        token.attrPush(['target', '_blank']);
+        token.attrPush(['rel', 'noopener noreferrer']);
+        token.attrPush(['class', 'external-link']);
+        token.attrPush(['data-external', 'true']);
+      }
     }
     return self.renderToken(tokens, idx, options);
   };
@@ -69,8 +90,18 @@ export function useMarkdownRenderer() {
   };
 
   // Add external link icon after the link content
-  md.renderer.rules.link_close = () => {
-    return '</a><span class="external-link-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>';
+  md.renderer.rules.link_close = (
+    tokens: Token[],
+    idx: number,
+    options: MarkdownIt.Options,
+    _env: unknown,
+    self: Renderer
+  ) => {
+    const openToken = tokens[idx - 1];
+    if (openToken?.attrGet('data-external') === 'true') {
+      return `${self.renderToken(tokens, idx, options)}<span class="external-link-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>`;
+    }
+    return self.renderToken(tokens, idx, options);
   };
 
   /**

@@ -323,6 +323,7 @@ function handleUnarchive() {
         v-else-if="comment.text && !editCommentMode"
         :text="comment.text"
         :disable-gallery="true"
+        :bot-mention-forum-id="forumId as string"
       />
       <div v-else-if="editCommentMode">
         <TextEditor
