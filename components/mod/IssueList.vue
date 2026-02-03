@@ -107,34 +107,31 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="lg:flex lg:gap-6">
+  <div class="border-t border-gray-200 dark:border-gray-800 dark:text-white">
+    <div class="px-4 py-4">
+      <SearchBar
+        :initial-value="searchInput"
+        :search-placeholder="'Search issues'"
+        :test-id="'issue-search-input'"
+        :debounce-ms="500"
+        @update-search-input="updateSearchInput"
+      />
+    </div>
     <div
-      class="border-t border-gray-200 dark:border-gray-800 dark:text-white lg:w-1/2 lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto"
+      v-if="!getIssuesByChannelLoading && issues.length === 0"
+      class="px-4 py-6 text-sm text-gray-600 dark:text-gray-300"
     >
-      <div class="px-4 py-4">
-        <SearchBar
-          :initial-value="searchInput"
-          :search-placeholder="'Search issues'"
-          :test-id="'issue-search-input'"
-          :debounce-ms="500"
-          @update-search-input="updateSearchInput"
-        />
-      </div>
-      <div
-        v-if="!getIssuesByChannelLoading && issues.length === 0"
-        class="px-4 py-6 text-sm text-gray-600 dark:text-gray-300"
+      There are no issues yet.
+      <nuxt-link
+        :to="{
+          name: 'forums-forumId-issues-create',
+          params: { forumId: channelId },
+        }"
+        class="text-blue-600 underline hover:underline dark:text-blue-400"
       >
-        There are no issues yet.
-        <nuxt-link
-          :to="{
-            name: 'forums-forumId-issues-create',
-            params: { forumId: channelId },
-          }"
-          class="text-blue-600 underline hover:underline dark:text-blue-400"
-        >
-          Create one?
-        </nuxt-link>
-      </div>
+        Create one?
+      </nuxt-link>
+    </div>
     <ul class="divide-y" data-testid="issue-list">
       <ModIssueListItem
         v-for="issue in issues"
@@ -146,16 +143,6 @@ export default defineComponent({
         @select="handleSelectIssue"
       />
     </ul>
-    </div>
-    <div
-      class="hidden lg:flex lg:w-1/2 lg:h-[calc(100vh-3.5rem)] lg:items-center lg:justify-center lg:overflow-y-auto"
-    >
-      <div
-        class="w-full rounded-lg border border-dashed border-gray-300 p-6 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400"
-      >
-        Select an issue to view details.
-      </div>
-    </div>
   </div>
 </template>
 
