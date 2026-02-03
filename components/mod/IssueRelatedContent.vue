@@ -13,10 +13,11 @@ type Issue = GeneratedIssue & {
   LockedBy?: { displayName?: string };
 };
 
-defineProps<{
+const props = defineProps<{
   activeIssue: Issue;
   reportCount: number | null;
   reportCountLabel: string;
+  channelId?: string;
 }>();
 
 const emit = defineEmits<{
@@ -58,6 +59,7 @@ const getContentTypeLabel = (issue: Issue) => {
     <DiscussionDetails
       v-if="activeIssue?.relatedDiscussionId"
       :active-issue="activeIssue"
+      :channel-id="props.channelId"
       @fetched-original-author-username="
         emit('fetchedOriginalAuthorUsername', $event)
       "

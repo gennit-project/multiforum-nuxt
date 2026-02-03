@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
+import { useRoute } from 'nuxt/app';
 import type { Discussion, ModerationAction } from '@/__generated__/graphql';
 import ActivityFeedListItem from './ActivityFeedListItem.vue';
 import { ActionType } from '@/types/Comment';
@@ -10,6 +11,11 @@ const props = defineProps<{
   originalModAuthorName: string;
   relatedDiscussion?: Discussion | null;
 }>();
+
+const route = useRoute();
+const hasIssueNumberInRoute = computed(
+  () => typeof route.params.issueNumber === 'string'
+);
 
 const reversedFeedItems = computed(() => {
   return props.feedItems.slice().reverse();
@@ -192,7 +198,7 @@ const displayFeedItems = computed(() => {
 
 <template>
   <div class="flow-root">
-    <NuxtPage />
+    <NuxtPage v-if="hasIssueNumberInRoute" />
     <ul role="list">
       <ActivityFeedListItem
         v-for="displayItem in displayFeedItems"

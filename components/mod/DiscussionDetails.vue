@@ -19,6 +19,7 @@ import { getOriginalPoster } from '@/utils/originalPoster';
 
 const props = defineProps<{
   activeIssue: Issue;
+  channelId?: string;
 }>();
 
 const emit = defineEmits(['fetchedOriginalAuthorUsername']);
@@ -28,9 +29,10 @@ const route = useRoute();
 
 const discussionId = computed(() => props.activeIssue.relatedDiscussionId);
 
-const channelId = computed(() =>
-  typeof route.params.forumId === 'string' ? route.params.forumId : ''
-);
+const channelId = computed(() => {
+  if (props.channelId) return props.channelId;
+  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
+});
 
 /* ---------- GraphQL query ---------- */
 const {
@@ -71,6 +73,13 @@ const editedAt = computed(() => {
   return `Edited ${stableRelativeTime(discussion.value.updatedAt)}`;
 });
 
+const metaLine = computed(() => {
+  if (!discussion.value) return '';
+  const posted = `posted on ${formatDate(discussion.value.createdAt)}`;
+  if (!discussion.value.updatedAt) return posted;
+  return `${posted} · ${editedAt.value}`;
+});
+
 const formatFileSize = (sizeInBytes: number | null | undefined): string => {
   if (!sizeInBytes || sizeInBytes === 0) return '0 B';
 
@@ -105,34 +114,36 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
             name: 'u-username',
             params: { username: discussion?.Author?.username },
           }"
-          class="flex items-center dark:text-white"
+          class="flex flex-wrap items-center gap-1 dark:text-white"
         >
-          <AvatarComponent
-            :text="discussion?.Author.username"
-            :src="discussion?.Author.profilePicURL ?? ''"
-            class="mr-2 h-6 w-6"
-          />
-          <UsernameWithTooltip
-            v-if="discussion?.Author?.username"
-            :username="discussion?.Author?.username"
-            :src="discussion?.Author.profilePicURL ?? ''"
-            :display-name="discussion?.Author.displayName ?? ''"
-            :comment-karma="discussion?.Author.commentKarma ?? 0"
-            :discussion-karma="discussion?.Author.discussionKarma ?? 0"
-            :account-created="discussion?.Author.createdAt ?? ''"
-          />
-          <ClientOnly>
-            <span class="ml-1"
-              >posted on {{ formatDate(discussion.createdAt) }}</span
-            >
-            <span v-if="discussion.updatedAt" class="mx-2">&middot;</span>
-            <span v-if="discussion.updatedAt">{{ editedAt }}</span>
-            <template #fallback>
-              <span class="ml-1"
-                >posted on {{ discussion.createdAt.split('T')[0] }}</span
-              >
-            </template>
-          </ClientOnly>
+          <span class="flex items-center">
+            <AvatarComponent
+              :text="discussion?.Author.username"
+              :src="discussion?.Author.profilePicURL ?? ''"
+              class="mr-2 h-6 w-6"
+            />
+          </span>
+          <span class="inline-flex flex-wrap items-center gap-1">
+            <UsernameWithTooltip
+              v-if="discussion?.Author?.username"
+              :username="discussion?.Author?.username"
+              :src="discussion?.Author.profilePicURL ?? ''"
+              :display-name="discussion?.Author.displayName ?? ''"
+              :comment-karma="discussion?.Author.commentKarma ?? 0"
+              :discussion-karma="discussion?.Author.discussionKarma ?? 0"
+              :account-created="discussion?.Author.createdAt ?? ''"
+            />
+            <ClientOnly tag="span">
+              <span class="text-sm text-gray-600 dark:text-gray-300">
+                {{ metaLine }}
+              </span>
+              <template #fallback>
+                <span class="text-sm text-gray-600 dark:text-gray-300">
+                  posted on {{ discussion.createdAt.split('T')[0] }}
+                </span>
+              </template>
+            </ClientOnly>
+          </span>
         </nuxt-link>
 
         <div class="border-l border-l-2 pl-6">
