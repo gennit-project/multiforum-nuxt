@@ -12,6 +12,7 @@ import {
 import type { Channel, User } from '@/__generated__/graphql';
 import { computed } from 'vue';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
+import EventDetail from '@/components/event/detail/EventDetail.vue';
 import ChannelSidebar from '@/components/channel/ChannelSidebar.vue';
 import IssueDetail from '@/components/mod/IssueDetail.vue';
 import { useRoute, useRouter, useHead } from 'nuxt/app';
@@ -33,6 +34,8 @@ const uiStore = useUIStore();
 const {
   selectedChannelDiscussionId,
   selectedChannelDiscussionTitle,
+  selectedChannelEventId,
+  selectedChannelEventTitle,
   selectedIssueNumber,
   selectedIssueTitle,
   selectedIssueChannelId,
@@ -80,12 +83,20 @@ const showChannelDiscussionPanel = computed(() => {
   return route.name === 'forums-forumId-discussions';
 });
 
+const showChannelEventPanel = computed(() => {
+  return route.name === 'forums-forumId-events';
+});
+
 const enableDiscussionSplitScroll = computed(() => {
   return route.name === 'forums-forumId-discussions';
 });
 
+const enableEventSplitScroll = computed(() => {
+  return route.name === 'forums-forumId-events';
+});
+
 const showChannelSidebarOnDetail = computed(() => {
-  return showDiscussionTitle.value;
+  return showDiscussionTitle.value || showEventTitle.value;
 });
 
 const showChannelSidebarOnIssueDetail = computed(() => {
@@ -357,9 +368,11 @@ definePageMeta({
               class="flex flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row"
             >
               <div
-                class="min-w-0 flex-1 px-4"
+                class="min-w-0 flex-1 overflow-x-hidden px-4"
                 :class="
-                  enableDiscussionSplitScroll || enableIssueSplitScroll
+                  enableDiscussionSplitScroll ||
+                  enableEventSplitScroll ||
+                  enableIssueSplitScroll
                     ? 'lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto lg:w-1/2'
                     : ''
                 "
@@ -421,6 +434,47 @@ definePageMeta({
                   class="flex h-full items-center justify-center rounded-lg border border-dashed border-gray-300 p-6 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400"
                 >
                   Select a discussion to view details.
+                </div>
+              </div>
+              <div
+                v-if="showChannelEventPanel"
+                class="hidden lg:flex lg:w-1/2 lg:flex-col lg:overflow-y-auto"
+                :class="
+                  enableEventSplitScroll ? 'lg:h-[calc(100vh-3.5rem)]' : ''
+                "
+              >
+                <div
+                  v-if="selectedChannelEventId"
+                  class="flex w-full flex-col justify-center rounded-lg border border-gray-200 p-4 dark:border-gray-700"
+                >
+                  <div class="mb-3 flex items-start justify-between gap-3">
+                    <div class="flex-1">
+                      <h2
+                        v-if="selectedChannelEventTitle"
+                        class="text-lg font-semibold text-gray-900 dark:text-gray-100"
+                      >
+                        {{ selectedChannelEventTitle }}
+                      </h2>
+                    </div>
+                    <a
+                      :href="`/forums/${channelId}/events/${selectedChannelEventId}`"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-xs font-medium text-orange-600 hover:underline dark:text-orange-400"
+                    >
+                      Open in new tab
+                    </a>
+                  </div>
+                  <EventDetail
+                    :event-id="selectedChannelEventId"
+                    :channel-unique-name="channelId"
+                  />
+                </div>
+                <div
+                  v-else
+                  class="flex h-full items-center justify-center rounded-lg border border-dashed border-gray-300 p-6 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400"
+                >
+                  Select an event to view details.
                 </div>
               </div>
               <div

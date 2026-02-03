@@ -282,7 +282,7 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="fixed left-0 top-0 z-50 flex h-full w-full bg-black transition-all duration-300 ease-in-out"
+    class="fixed left-0 top-0 z-[1000] flex h-full w-full bg-black transition-all duration-300 ease-in-out"
     :class="{
       'flex-col': panelOnSide && isPanelVisible,
       'flex-row': !panelOnSide && isPanelVisible,

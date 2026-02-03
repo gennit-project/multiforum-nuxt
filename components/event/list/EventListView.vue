@@ -19,9 +19,13 @@ import EventFilterBar from './filters/EventFilterBar.vue';
 import TimeShortcuts from './filters/TimeShortcuts.vue';
 import OnlineInPersonShortcuts from './filters/OnlineInPersonShortcuts.vue';
 import { LocationFilterTypes } from './filters/locationFilterTypes';
+import { useUIStore } from '@/stores/uiStore';
+import { storeToRefs } from 'pinia';
 
 const route = useRoute();
 const router = useRouter();
+const uiStore = useUIStore();
+const { selectedChannelEventId } = storeToRefs(uiStore);
 
 const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
@@ -108,6 +112,15 @@ watch(
   { immediate: true }
 );
 
+watch(
+  channelId,
+  (newChannelId, oldChannelId) => {
+    if (newChannelId !== oldChannelId) {
+      uiStore.clearSelectedChannelEventSelection();
+    }
+  }
+);
+
 const openPreview = () => {
   previewIsOpen.value = true;
 };
@@ -170,6 +183,14 @@ const filterByChannel = (channel: string) => {
 const showMainFilters = ref(true);
 const toggleShowMainFilters = () => {
   showMainFilters.value = !showMainFilters.value;
+};
+
+const handleSelectEvent = (payload: { eventId: string; title: string }) => {
+  if (!channelId.value) return;
+  uiStore.setSelectedChannelEventSelection({
+    eventId: payload.eventId,
+    title: payload.title,
+  });
 };
 </script>
 
@@ -239,10 +260,13 @@ const toggleShowMainFilters = () => {
       :selected-tags="filterValues.tags"
       :selected-channels="filterValues.channels"
       :show-map="false"
+      :is-selectable="!!channelId"
+      :selected-event-id="selectedChannelEventId"
       @filter-by-tag="filterByTag"
       @filter-by-channel="filterByChannel"
       @load-more="loadMore"
       @open-preview="openPreview"
+      @select="handleSelectEvent"
     />
   </div>
 </template>

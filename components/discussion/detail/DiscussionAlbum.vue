@@ -272,7 +272,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="w-full">
+  <div
+    class="relative w-full"
+    :class="{
+      'z-40': expandedView,
+    }"
+  >
     <!-- Normal thumbnail grid view -->
     <div
       v-if="!isLightboxOpen && !startInLightbox"
@@ -563,13 +568,17 @@ onMounted(() => {
     </div>
 
     <!-- Lightbox -->
-    <ImageLightbox
-      v-if="isLightboxOpen"
-      :ordered-images="orderedImages"
-      :initial-index="lightboxIndex"
-      :is-logged-in-author="isLoggedInAuthor"
-      @close="closeLightbox"
-      @album-updated="emit('album-updated')"
-    />
+    <ClientOnly>
+      <Teleport to="body">
+        <ImageLightbox
+          v-if="isLightboxOpen"
+          :ordered-images="orderedImages"
+          :initial-index="lightboxIndex"
+          :is-logged-in-author="isLoggedInAuthor"
+          @close="closeLightbox"
+          @album-updated="emit('album-updated')"
+        />
+      </Teleport>
+    </ClientOnly>
   </div>
 </template>

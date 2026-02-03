@@ -40,9 +40,17 @@ const props = defineProps({
     required: false,
     default: true,
   },
+  isSelectable: {
+    type: Boolean,
+    default: false,
+  },
+  selectedEventId: {
+    type: String,
+    default: '',
+  },
 });
 
-const emit = defineEmits(['openPreview']);
+const emit = defineEmits(['openPreview', 'select']);
 
 const route = useRoute();
 const router = useRouter();
@@ -89,6 +97,7 @@ const eventDetailOptions = computed(() => {
 });
 
 const isWithinChannel = props.currentChannelId ? true : false;
+const isSelected = computed(() => props.selectedEventId === props.event.id);
 
 const handleClickTag = (tagText: string) => {
   const currentQuery = route.query;
@@ -139,12 +148,27 @@ const updateFilters = (params: SearchEventValues) => {
 };
 
 const handleClick = async () => {
+  if (
+    props.isSelectable &&
+    import.meta.client &&
+    window.matchMedia('(min-width: 1024px)').matches
+  ) {
+    return;
+  }
   if (props.currentChannelId || route.name === 'events-list-search') {
     await nextTick();
     router.push(detailLink.value);
   } else {
     emit('openPreview');
   }
+};
+
+const handleSelect = () => {
+  if (!props.isSelectable) return;
+  emit('select', {
+    eventId: props.event.id,
+    title: props.event.title || '',
+  });
 };
 
 const isArchived = computed(() => {
@@ -211,23 +235,48 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
         class="mb-4 block max-h-48 rounded-lg md:hidden"
       >
       <!-- Title and image section for medium+ screens -->
-      <div class="hidden md:flex md:items-start md:gap-4">
-        <div class="flex-1">
-          <router-link
-            :to="detailLink"
-            :data-testid="'event-title'"
-            class="text-md mt-2 flex cursor-pointer flex-wrap items-center gap-2 text-gray-800 hover:text-orange-700 dark:text-gray-200"
-          >
-            <HighlightedSearchTerms
-              :text="event.title"
-              :search-input="searchInput"
-            />
-            <span
-              v-if="isArchived"
-              class="rounded-full border border-red-500 px-2 text-xs text-red-500 dark:border-red-400 dark:text-red-400"
-              >Archived</span
+        <div class="hidden md:flex md:items-start md:gap-4">
+          <div class="flex-1">
+            <router-link
+              :to="detailLink"
+              :data-testid="'event-title'"
+              class="text-md mt-2 flex cursor-pointer flex-wrap items-center gap-2 text-gray-800 hover:text-orange-700 dark:text-gray-200 lg:hidden"
+              @click="handleSelect"
             >
-          </router-link>
+              <HighlightedSearchTerms
+                :text="event.title"
+                :search-input="searchInput"
+              />
+              <span
+                v-if="isArchived"
+                class="rounded-full border border-red-500 px-2 text-xs text-red-500 dark:border-red-400 dark:text-red-400"
+                >Archived</span
+              >
+            </router-link>
+            <button
+              type="button"
+              class="text-md mt-2 hidden w-full cursor-pointer flex-wrap items-center gap-2 text-left text-gray-800 hover:text-orange-700 dark:text-gray-200 lg:flex"
+              @click="handleSelect"
+            >
+              <span
+                :class="
+                  isSelected
+                    ? 'rounded bg-gray-100 px-1 dark:bg-gray-700'
+                    : ''
+                "
+                class="cursor-pointer"
+              >
+                <HighlightedSearchTerms
+                  :text="event.title"
+                  :search-input="searchInput"
+                />
+              </span>
+              <span
+                v-if="isArchived"
+                class="rounded-full border border-red-500 px-2 text-xs text-red-500 dark:border-red-400 dark:text-red-400"
+                >Archived</span
+              >
+            </button>
           <span
             v-if="event.canceled"
             class="ml-2 rounded-lg bg-red-100 px-3 py-1 text-sm text-red-500 dark:bg-red-500 dark:text-white"
@@ -311,6 +360,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
           :to="detailLink"
           :data-testid="'event-title'"
           class="text-md mt-2 flex cursor-pointer flex-wrap items-center gap-2 text-gray-800 hover:text-orange-700 dark:text-gray-200"
+          @click="handleSelect"
         >
           <HighlightedSearchTerms
             :text="event.title"
