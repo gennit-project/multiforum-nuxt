@@ -627,6 +627,7 @@ const handleLockReasonUpdate = (value: string) => {
         :active-issue="activeIssue"
         :report-count="reportCount"
         :report-count-label="reportCountLabel"
+        :channel-id="channelId"
         @fetched-original-author-username="setOriginalAuthorUsername"
         @fetched-original-mod-profile-name="setOriginalModProfileName"
       >

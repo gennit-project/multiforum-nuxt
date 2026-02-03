@@ -64,7 +64,7 @@ const updateComment = (text: string) => {
     <TextEditor
       :key="`${commentText === ''}`"
       :test-id="'texteditor-textarea'"
-      :disable-auto-focus="false"
+      :disable-auto-focus="true"
       :placeholder="'Please be kind'"
       :initial-value="commentText"
       @update="updateComment"
