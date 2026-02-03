@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
@@ -53,12 +53,12 @@ const {
   error: getDiscussionChannelError,
   loading: getDiscussionChannelLoading,
   fetchMore: fetchMoreComments,
+  refetch: refetchDiscussionChannel,
 } = useQuery(
   GET_DISCUSSION_COMMENTS,
   () => ({
     discussionId: discussionId.value,
     channelUniqueName: channelId.value,
-    username: usernameVar.value,
     modName: loggedInUserModName.value,
     offset: 0,
     limit: COMMENT_LIMIT,
@@ -67,6 +67,20 @@ const {
     fetchPolicy: 'cache-first',
   }
 );
+
+watch(
+  () => usernameVar.value,
+  (newUsername, prevUsername) => {
+    if (!newUsername || newUsername === prevUsername) return;
+    refetchDiscussionChannel();
+  }
+);
+
+onMounted(() => {
+  if (usernameVar.value) {
+    refetchDiscussionChannel();
+  }
+});
 
 const { result: getDiscussionChannelCommentAggregateResult } = useQuery(
   GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,

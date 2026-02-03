@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
+import type { PropType } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { gql } from '@apollo/client/core';
 import {
@@ -28,42 +29,49 @@ const props = defineProps({
     type: String,
     default: 'Comment',
   },
+  isFavorited: {
+    type: [Boolean, null] as PropType<boolean | null>,
+    default: null,
+  },
 });
 
 const GET_USER_FAVORITE_COMMENT = gql`
-  query getUserFavoriteComment($username: String!, $commentId: ID!) {
-    users(where: { username: $username }) {
-      username
-      FavoriteComments(where: { id: $commentId }) {
-        id
-      }
-    }
+  query getUserFavoriteComment($commentId: ID!) {
+    getUserFavoriteComment(commentId: $commentId)
   }
 `;
 
-const isFavorited = ref(false);
+const isFavorited = ref(props.isFavorited ?? false);
 const isLoading = ref(false);
 const toastStore = useToastStore();
 const addToListModalStore = useAddToListModalStore();
+const shouldLookupFavorite = computed(() => props.isFavorited === null);
 
 const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
   GET_USER_FAVORITE_COMMENT,
   () => ({
-    username: usernameVar.value,
     commentId: props.commentId,
   }),
   () => ({
-    enabled: !!usernameVar.value && !!props.commentId,
+    enabled: shouldLookupFavorite.value && !!props.commentId && !!usernameVar.value,
   })
+);
+
+watch(
+  () => props.isFavorited,
+  (newValue) => {
+    if (isLoading.value) return;
+    if (newValue === null) return;
+    isFavorited.value = newValue;
+  }
 );
 
 watch(
   favoritesResult,
   (newResult) => {
-    if (newResult?.users?.[0]?.FavoriteComments) {
-      isFavorited.value = newResult.users[0].FavoriteComments.some(
-        (comment: { id: string }) => comment.id === props.commentId
-      );
+    if (!shouldLookupFavorite.value) return;
+    if (typeof newResult?.getUserFavoriteComment === 'boolean') {
+      isFavorited.value = newResult.getUserFavoriteComment;
     }
   },
   { immediate: true }
@@ -114,7 +122,9 @@ const handleToggleFavorite = async () => {
       });
       showAddedToast();
     }
-    refetchFavorites();
+    if (shouldLookupFavorite.value) {
+      refetchFavorites();
+    }
   } catch (error) {
     console.error('Error toggling favorite:', error);
     // Revert optimistic update on error
