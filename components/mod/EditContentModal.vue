@@ -364,7 +364,10 @@ defineExpose({
           />
         </div>
 
-        <p v-if="validationError" class="text-sm text-red-600">
+        <p
+          v-if="validationError"
+          class="text-sm text-red-600 dark:text-red-400"
+        >
           {{ validationError }}
         </p>
         <ErrorBanner v-if="mutationError" :text="mutationError" />

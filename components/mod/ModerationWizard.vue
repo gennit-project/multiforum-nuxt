@@ -87,6 +87,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  reportCount: {
+    type: Number,
+    required: false,
+    default: null,
+  },
 });
 
 defineEmits([
@@ -234,6 +239,11 @@ const editActions = computed(() => {
 });
 
 const editModalOpen = ref(false);
+
+const shouldShowEditActions = computed(() => {
+  const isReported = typeof props.reportCount === 'number' && props.reportCount > 0;
+  return isReported && ['comment', 'discussion'].includes(relatedContentType.value || '');
+});
 
 const hasEditPermission = computed(() => {
   switch (relatedContentType.value) {
@@ -422,14 +432,17 @@ const editButtonDisabled = computed(() => {
                       />
                     </div>
 
-                    <div v-if="editActions.length" class="flex flex-col gap-2">
+                    <div
+                      v-if="shouldShowEditActions && editActions.length"
+                      class="flex flex-col gap-2"
+                    >
                       <p class="text-sm text-gray-700 dark:text-gray-300">
                         As an alternative to simply closing the issue, you can
                         address the violation by editing the original post or
                         taking stronger action.
                       </p>
                       <p
-                        v-if="isArchived"
+                        v-if="isArchived && shouldShowEditActions"
                         class="text-sm text-gray-700 dark:text-gray-300"
                       >
                         You can first edit, then unarchive the content.
