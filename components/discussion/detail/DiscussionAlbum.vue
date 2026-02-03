@@ -134,6 +134,10 @@ const orderedImages = computed(() => {
   return allImages;
 });
 
+const activeImage = computed(() => {
+  return orderedImages.value[activeIndex.value] || null;
+});
+
 // Caption editing for thumbnail grid
 const editingCaptionIndex = ref(-1);
 const editingCaption = ref('');
@@ -207,7 +211,6 @@ const closeLightbox = () => {
   isLightboxOpen.value = false;
   emit('close-lightbox');
 };
-
 
 // Touch swipe handling for carousel
 const touchStartX = ref(0);
@@ -308,7 +311,7 @@ onMounted(() => {
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="shadow-sm"
-          >
+          />
           <div
             v-if="editingCaptionIndex === idx"
             class="mt-1 text-center text-xs"
@@ -414,6 +417,9 @@ onMounted(() => {
                 'w-full min-w-0 max-w-full': expandedView,
                 'max-w-96': !expandedView,
               }"
+              :style="{
+                height: expandedView ? `${mainImageHeight}px` : 'auto',
+              }"
               @touchstart="handleTouchStart"
               @touchend="handleTouchEnd"
             >
@@ -449,19 +455,39 @@ onMounted(() => {
                 </button>
               </div>
               <div
-                v-for="(image, idx) in orderedImages"
-                :key="image?.id || idx"
+                v-if="activeImage"
+                class="cursor-pointer"
+                @click="openLightbox(activeIndex)"
               >
-                <div class="cursor-pointer" @click="openLightbox(idx)">
-                  <ModelViewer
-                    v-if="
-                      image &&
-                      image.url &&
-                      hasGlbExtension(image.url) &&
-                      idx === activeIndex
-                    "
-                    :model-url="image.url"
-                    :height="expandedView ? '400px' : '256px'"
+                <ModelViewer
+                  v-if="
+                    activeImage &&
+                    activeImage.url &&
+                    hasGlbExtension(activeImage.url)
+                  "
+                  :model-url="activeImage.url"
+                  :height="expandedView ? '400px' : '256px'"
+                  class="object-contain shadow-sm"
+                  :style="{
+                    aspectRatio: '3/2',
+                    width: '100%',
+                    maxWidth: expandedView ? '600px' : '384px',
+                    maxHeight: expandedView ? '400px' : '256px',
+                  }"
+                  :show-fullscreen-button="false"
+                />
+                <ClientOnly
+                  v-else-if="
+                    activeImage &&
+                    activeImage.url &&
+                    hasStlExtension(activeImage.url)
+                  "
+                >
+                  <StlViewer
+                    :src="activeImage.url"
+                    width="100%"
+                    :height="expandedView ? 400 : 256"
+                    :max-width="expandedView ? '600px' : '384px'"
                     class="object-contain shadow-sm"
                     :style="{
                       aspectRatio: '3/2',
@@ -469,81 +495,26 @@ onMounted(() => {
                       maxWidth: expandedView ? '600px' : '384px',
                       maxHeight: expandedView ? '400px' : '256px',
                     }"
-                    :show-fullscreen-button="false"
                   />
-                  <ClientOnly
-                    v-else-if="
-                      image &&
-                      image.url &&
-                      hasStlExtension(image.url) &&
-                      idx === activeIndex
-                    "
-                  >
-                    <StlViewer
-                      :src="image.url"
-                      width="100%"
-                      :height="expandedView ? 400 : 256"
-                      :max-width="expandedView ? '600px' : '384px'"
-                      class="object-contain shadow-sm"
-                      :style="{
-                        aspectRatio: '3/2',
-                        width: '100%',
-                        maxWidth: expandedView ? '600px' : '384px',
-                        maxHeight: expandedView ? '400px' : '256px',
-                      }"
-                    />
-                  </ClientOnly>
-                  <img
-                    v-else-if="image"
-                    :src="image.url || ''"
-                    :alt="image.alt || ''"
-                    class="shadow-sm"
-                    :class="{
-                      hidden: idx !== activeIndex,
-                      'max-h-96 max-w-96 object-contain': !expandedView,
-                      'w-full object-cover': expandedView,
-                    }"
-                    :style="{
-                      maxWidth: expandedView ? '100%' : '384px',
-                      maxHeight: `${mainImageHeight}px`,
-                      height: expandedView ? `${mainImageHeight}px` : 'auto',
-                    }"
-                  >
-                  <div
-                    v-if="editingCaptionIndex === idx && idx === activeIndex"
-                    class="mt-1 text-center text-xs"
-                  >
-                    <TextEditor
-                      :initial-value="editingCaption"
-                      placeholder="Write a caption..."
-                      :rows="2"
-                      @update="(text) => (editingCaption = text)"
-                    />
-                    <div class="mt-1 flex justify-center gap-2">
-                      <SaveButton
-                        size="xs"
-                        :disabled="updateLoading"
-                        :loading="updateLoading"
-                        @click="saveCaption"
-                      />
-                      <CancelButton size="xs" @click="cancelEditingCaption" />
-                    </div>
-                  </div>
-                  <div
-                    v-else
-                    class="group relative min-h-[1.5rem] text-center text-xs"
-                    :class="{ hidden: idx !== activeIndex }"
-                  >
-                    <span v-if="image?.caption">
-                      {{ image.caption }}
-                    </span>
-                    <span v-else>&nbsp;</span>
-                  </div>
-                </div>
+                </ClientOnly>
+                <img
+                  v-else
+                  :src="activeImage.url || ''"
+                  :alt="activeImage.alt || ''"
+                  class="shadow-sm"
+                  :class="{
+                    'max-h-96 max-w-96 object-contain': !expandedView,
+                    'h-full w-full object-cover': expandedView,
+                  }"
+                  :style="{
+                    maxWidth: expandedView ? '100%' : '384px',
+                    maxHeight: expandedView ? 'none' : `${mainImageHeight}px`,
+                    height: expandedView ? '100%' : 'auto',
+                  }"
+                />
               </div>
             </div>
           </div>
-
           <!-- Thumbnails row for non-expanded view or small screens -->
           <div
             v-if="showThumbnails && !expandedView && orderedImages.length > 1"
@@ -561,6 +532,33 @@ onMounted(() => {
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Caption below image and thumbnails -->
+      <div v-if="activeImage" class="mt-2 px-2 text-center text-xs">
+        <div v-if="editingCaptionIndex === activeIndex">
+          <TextEditor
+            :initial-value="editingCaption"
+            placeholder="Write a caption..."
+            :rows="2"
+            @update="(text) => (editingCaption = text)"
+          />
+          <div class="mt-1 flex justify-center gap-2">
+            <SaveButton
+              size="xs"
+              :disabled="updateLoading"
+              :loading="updateLoading"
+              @click="saveCaption"
+            />
+            <CancelButton size="xs" @click="cancelEditingCaption" />
+          </div>
+        </div>
+        <div v-else-if="activeImage?.caption" class="group relative">
+          <span>
+            {{ activeImage.caption }}
+          </span>
+        </div>
+        <div v-else class="h-3"></div>
       </div>
     </div>
 
