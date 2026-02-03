@@ -37,7 +37,7 @@ const containerStyle = computed(() => {
 </script>
 
 <template>
-  <div class="markdown-container" :style="containerStyle">
+  <div class="markdown-container flex justify-center" :style="containerStyle">
     <div
       ref="slotContainer"
       class="markdown-body"
