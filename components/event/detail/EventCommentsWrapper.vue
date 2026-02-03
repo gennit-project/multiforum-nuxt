@@ -68,6 +68,9 @@ const emit = defineEmits(['loadMore']);
 const route = useRoute();
 
 const eventId = computed(() => props.event?.id);
+const hasEventIdInRoute = computed(
+  () => typeof route.params.eventId === 'string'
+);
 
 const aggregateCommentCount = computed(() => {
   return props.event?.CommentsAggregate?.count || 0;
@@ -391,7 +394,7 @@ const handleSubscriptionToggle = () => {
     :show-comment-sort-buttons="false"
     :locked="locked"
     :archived="archived"
-    :show-nuxt-page="true"
+    :show-nuxt-page="hasEventIdInRoute"
     @decrement-comment-count="decrementCommentCount"
     @increment-comment-count="incrementCommentCount"
     @update-comment-section-query-result="updateCommentSectionQueryResult"

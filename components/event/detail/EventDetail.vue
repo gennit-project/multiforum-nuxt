@@ -94,11 +94,7 @@ const eventId = ref(
 
 // Add a watcher for the route params and props
 watch(
-  [
-    () => props.eventId,
-    () => props.issueEventId,
-    () => route.params.eventId,
-  ],
+  [() => props.eventId, () => props.issueEventId, () => route.params.eventId],
   ([newEventIdProp, newIssueEventId, newRouteEventId]) => {
     eventId.value =
       newEventIdProp ||
@@ -356,9 +352,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div
-    class="w-full space-y-4 bg-white dark:bg-gray-800 dark:text-white md:px-6"
-  >
+  <div class="w-full space-y-4 bg-white dark:bg-black dark:text-white md:px-6">
     <div class="mb-10 flex w-full justify-center rounded-lg px-2">
       <div class="w-full">
         <div class="mt-1 w-full space-y-2">

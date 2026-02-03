@@ -6,6 +6,7 @@ import EventList from './EventList.vue';
 import 'md-editor-v3/lib/style.css';
 import { GET_EVENTS } from '@/graphQLData/event/queries';
 import getEventWhere from '@/components/event/list/filters/getEventWhere';
+import EventDetail from '@/components/event/detail/EventDetail.vue';
 import type { SearchEventValues } from '@/types/Event';
 import { getFilterValuesFromParams } from './filters/getEventFilterValuesFromParams';
 import ErrorBanner from '../../ErrorBanner.vue';
@@ -26,6 +27,7 @@ const route = useRoute();
 const router = useRouter();
 const uiStore = useUIStore();
 const { selectedChannelEventId } = storeToRefs(uiStore);
+const selectedSearchEventId = ref('');
 
 const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
@@ -112,18 +114,35 @@ watch(
   { immediate: true }
 );
 
-watch(
-  channelId,
-  (newChannelId, oldChannelId) => {
-    if (newChannelId !== oldChannelId) {
-      uiStore.clearSelectedChannelEventSelection();
-    }
+watch(channelId, (newChannelId, oldChannelId) => {
+  if (newChannelId !== oldChannelId) {
+    uiStore.clearSelectedChannelEventSelection();
   }
-);
+});
 
 const openPreview = () => {
   previewIsOpen.value = true;
 };
+
+const selectedSearchEvent = computed(() => {
+  if (!selectedSearchEventId.value) return null;
+  return (
+    eventResult.value?.events?.find(
+      (event) => event.id === selectedSearchEventId.value
+    ) || null
+  );
+});
+
+const selectedSearchEventChannelId = computed(() => {
+  return selectedSearchEvent.value?.EventChannels?.[0]?.channelUniqueName || '';
+});
+
+const effectiveSelectedEventId = computed(() => {
+  if (isSearchListRoute.value) {
+    return selectedSearchEventId.value;
+  }
+  return selectedChannelEventId.value;
+});
 
 const updateFilters = (params: SearchEventValues) => {
   const existingQuery = route.query;
@@ -186,87 +205,138 @@ const toggleShowMainFilters = () => {
 };
 
 const handleSelectEvent = (payload: { eventId: string; title: string }) => {
+  if (isSearchListRoute.value) {
+    selectedSearchEventId.value = payload.eventId;
+    return;
+  }
   if (!channelId.value) return;
   uiStore.setSelectedChannelEventSelection({
     eventId: payload.eventId,
     title: payload.title,
   });
 };
+
+watch(
+  [eventResult, selectedSearchEventId],
+  () => {
+    if (!isSearchListRoute.value) return;
+    if (selectedSearchEventId.value && !selectedSearchEvent.value) {
+      selectedSearchEventId.value = '';
+    }
+  },
+  { immediate: true }
+);
+
+watch(isSearchListRoute, (isSearchRoute) => {
+  if (!isSearchRoute && selectedSearchEventId.value) {
+    selectedSearchEventId.value = '';
+  }
+});
 </script>
 
 <template>
   <div
-    class="flex flex-col justify-center gap-2 rounded-lg bg-white dark:bg-gray-800 lg:px-4"
+    class="flex flex-col justify-center gap-2 rounded-lg bg-white dark:bg-black lg:px-4"
+    :class="isSearchListRoute ? 'lg:flex-row lg:gap-6' : ''"
   >
     <div
-      v-if="isSearchListRoute"
-      class="flex items-center justify-between px-1 pt-1"
-    >
-      <div
-        class="font-semibold text-sm tracking-wide text-gray-900 [font-variant-caps:all-small-caps] dark:text-gray-100"
-      >
-        Online events
-      </div>
-      <div class="flex items-center gap-2">
-        <button
-          class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-300 dark:text-gray-300 dark:hover:bg-gray-700"
-          :class="[showMainFilters ? 'bg-gray-200 dark:bg-gray-700' : '']"
-          data-testid="toggle-main-filters-button"
-          type="button"
-          @click="toggleShowMainFilters"
-        >
-          {{ showMainFilters ? 'Hide filters' : 'Show filters' }}
-        </button>
-        <button
-          class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-300 dark:text-gray-300 dark:hover:bg-gray-700"
-          type="button"
-          @click="goToInPersonMap"
-        >
-          In-person map
-        </button>
-      </div>
-    </div>
-    <EventFilterBar
-      :show-distance-filters="false"
-      :allow-hiding-main-filters="true"
-      :show-main-filters-by-default="!channelId"
-      :toggle-show-archived-enabled="true"
-      :hide-filters-button-externally="isSearchListRoute"
-      :show-new-event-next-to-search-bar="isSearchListRoute"
-      :external-show-main-filters="
-        isSearchListRoute ? showMainFilters : undefined
+      class="flex flex-col gap-2 lg:min-w-0 lg:flex-1"
+      :class="
+        isSearchListRoute ? 'lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto' : ''
       "
     >
-      <TimeShortcuts :is-list-view="true" />
-      <OnlineInPersonShortcuts v-if="channelId" />
-    </EventFilterBar>
+      <div
+        v-if="isSearchListRoute"
+        class="flex items-center justify-between px-4 pt-1"
+      >
+        <h1
+          class="font-semibold text-sm tracking-wide text-gray-900 dark:text-gray-100"
+        >
+          Online events
+        </h1>
+        <div class="flex items-center gap-2">
+          <button
+            class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-300 dark:text-gray-300 dark:hover:bg-gray-700"
+            :class="[showMainFilters ? 'bg-gray-200 dark:bg-gray-700' : '']"
+            data-testid="toggle-main-filters-button"
+            type="button"
+            @click="toggleShowMainFilters"
+          >
+            {{ showMainFilters ? 'Hide filters' : 'Show filters' }}
+          </button>
+          <button
+            class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-300 dark:text-gray-300 dark:hover:bg-gray-700"
+            type="button"
+            @click="goToInPersonMap"
+          >
+            In-person map
+          </button>
+        </div>
+      </div>
+      <EventFilterBar
+        :show-distance-filters="false"
+        :allow-hiding-main-filters="true"
+        :show-main-filters-by-default="!channelId"
+        :toggle-show-archived-enabled="true"
+        :hide-filters-button-externally="isSearchListRoute"
+        :show-new-event-next-to-search-bar="isSearchListRoute"
+        :external-show-main-filters="
+          isSearchListRoute ? showMainFilters : undefined
+        "
+      >
+        <TimeShortcuts :is-list-view="true" />
+        <OnlineInPersonShortcuts v-if="channelId" />
+      </EventFilterBar>
 
-    <ErrorBanner
-      v-if="eventError"
-      class="mx-auto block"
-      :text="eventError.message"
-    />
+      <ErrorBanner
+        v-if="eventError"
+        class="mx-auto block"
+        :text="eventError.message"
+      />
 
-    <LoadingSpinner v-if="!eventResult && !eventError" class="mx-auto my-4" />
+      <LoadingSpinner v-if="!eventResult && !eventError" class="mx-auto my-4" />
 
-    <EventList
-      v-if="eventResult?.events"
-      id="listView"
-      class="relative"
-      :result-count="eventResult.eventsAggregate?.count || 0"
-      :events="eventResult.events"
-      :channel-id="channelId"
-      :search-input="filterValues.searchInput"
-      :selected-tags="filterValues.tags"
-      :selected-channels="filterValues.channels"
-      :show-map="false"
-      :is-selectable="!!channelId"
-      :selected-event-id="selectedChannelEventId"
-      @filter-by-tag="filterByTag"
-      @filter-by-channel="filterByChannel"
-      @load-more="loadMore"
-      @open-preview="openPreview"
-      @select="handleSelectEvent"
-    />
+      <EventList
+        v-if="eventResult?.events"
+        id="listView"
+        class="relative"
+        :result-count="eventResult.eventsAggregate?.count || 0"
+        :events="eventResult.events"
+        :channel-id="channelId"
+        :search-input="filterValues.searchInput"
+        :selected-tags="filterValues.tags"
+        :selected-channels="filterValues.channels"
+        :show-map="false"
+        :is-selectable="!!channelId || isSearchListRoute"
+        :selected-event-id="effectiveSelectedEventId"
+        @filter-by-tag="filterByTag"
+        @filter-by-channel="filterByChannel"
+        @load-more="loadMore"
+        @open-preview="openPreview"
+        @select="handleSelectEvent"
+      />
+    </div>
+    <aside
+      v-if="isSearchListRoute"
+      class="hidden lg:flex lg:h-[calc(100vh-3.5rem)] lg:w-1/2 lg:flex-col lg:overflow-y-auto lg:px-2 lg:py-4"
+    >
+      <div
+        v-if="selectedSearchEventId"
+        class="flex w-full flex-col justify-center rounded-lg border border-gray-200 p-4 dark:border-gray-700"
+      >
+        <EventDetail
+          :event-id="selectedSearchEventId"
+          :channel-unique-name="selectedSearchEventChannelId"
+          :show-comments="false"
+          :show-title="true"
+        />
+      </div>
+      <div
+        v-else
+        class="flex h-full items-center justify-center rounded-lg border border-dashed border-gray-300 p-6 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400"
+      >
+        Select an event to view details.
+      </div>
+    </aside>
   </div>
 </template>

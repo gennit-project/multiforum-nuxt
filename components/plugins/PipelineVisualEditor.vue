@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import draggable from 'vuedraggable';
-import type { EventPipeline, PipelineStep, PipelineCondition } from '@/utils/pipelineSchema';
+import type {
+  EventPipeline,
+  PipelineStep,
+  PipelineCondition,
+} from '@/utils/pipelineSchema';
 import { PIPELINE_EVENTS, PIPELINE_CONDITIONS } from '@/utils/pipelineSchema';
 
 type EventOption = {
@@ -96,7 +100,7 @@ const eventDescription = computed(() => {
 <template>
   <div class="pipeline-visual-editor space-y-4">
     <!-- Pipeline Header -->
-    <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+    <div class="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
       <div class="flex items-center justify-between">
         <div>
           <h3 class="text-lg font-medium text-gray-900 dark:text-white">
@@ -112,9 +116,15 @@ const eventDescription = computed(() => {
             :checked="pipeline.stopOnFirstFailure"
             aria-label="Stop on first failure"
             class="form-checkbox h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-            @change="updateStopOnFirstFailure(($event.target as HTMLInputElement).checked)"
+            @change="
+              updateStopOnFirstFailure(
+                ($event.target as HTMLInputElement).checked
+              )
+            "
+          />
+          <span class="text-sm text-gray-700 dark:text-gray-300"
+            >Stop on first failure</span
           >
-          <span class="text-sm text-gray-700 dark:text-gray-300">Stop on first failure</span>
         </label>
       </div>
     </div>
@@ -130,17 +140,23 @@ const eventDescription = computed(() => {
       >
         <template #item="{ element: step, index }">
           <div
-            class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4"
+            class="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-black"
           >
             <div class="flex items-start gap-4">
               <!-- Drag Handle -->
-              <div class="drag-handle cursor-move text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 pt-2">
+              <div
+                class="drag-handle cursor-move pt-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
                 <i class="fa-solid fa-grip-vertical" />
               </div>
 
               <!-- Step Number -->
-              <div class="flex-shrink-0 w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
-                <span class="text-sm font-medium text-orange-600 dark:text-orange-300">
+              <div
+                class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900"
+              >
+                <span
+                  class="text-sm font-medium text-orange-600 dark:text-orange-300"
+                >
                   {{ index + 1 }}
                 </span>
               </div>
@@ -149,20 +165,21 @@ const eventDescription = computed(() => {
               <div class="flex-1 space-y-3">
                 <!-- Plugin Select -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label
+                    class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
                     Plugin
                   </label>
                   <select
                     :value="step.plugin"
                     class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    @change="updateStep(index, { plugin: ($event.target as HTMLSelectElement).value })"
+                    @change="
+                      updateStep(index, {
+                        plugin: ($event.target as HTMLSelectElement).value,
+                      })
+                    "
                   >
-                    <option
-                      value=""
-                      disabled
-                    >
-                      Select a plugin...
-                    </option>
+                    <option value="" disabled>Select a plugin...</option>
                     <option
                       v-for="plugin in availablePlugins"
                       :key="plugin.id"
@@ -176,13 +193,20 @@ const eventDescription = computed(() => {
                 <!-- Condition & Continue on Error -->
                 <div class="flex items-center gap-4">
                   <div class="flex-1">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label
+                      class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
                       Condition
                     </label>
                     <select
                       :value="step.condition || 'ALWAYS'"
                       class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                      @change="updateStep(index, { condition: ($event.target as HTMLSelectElement).value as PipelineCondition })"
+                      @change="
+                        updateStep(index, {
+                          condition: ($event.target as HTMLSelectElement)
+                            .value as PipelineCondition,
+                        })
+                      "
                     >
                       <option
                         v-for="condition in PIPELINE_CONDITIONS"
@@ -200,9 +224,16 @@ const eventDescription = computed(() => {
                       :checked="step.continueOnError"
                       aria-label="Continue on error"
                       class="form-checkbox h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                      @change="updateStep(index, { continueOnError: ($event.target as HTMLInputElement).checked })"
+                      @change="
+                        updateStep(index, {
+                          continueOnError: ($event.target as HTMLInputElement)
+                            .checked,
+                        })
+                      "
+                    />
+                    <span class="text-sm text-gray-700 dark:text-gray-300"
+                      >Continue on error</span
                     >
-                    <span class="text-sm text-gray-700 dark:text-gray-300">Continue on error</span>
                   </label>
                 </div>
               </div>
@@ -210,7 +241,7 @@ const eventDescription = computed(() => {
               <!-- Remove Button -->
               <button
                 type="button"
-                class="text-gray-400 hover:text-red-500 p-2"
+                class="p-2 text-gray-400 hover:text-red-500"
                 title="Remove step"
                 @click="removeStep(index)"
               >
@@ -224,18 +255,20 @@ const eventDescription = computed(() => {
       <!-- Empty State -->
       <div
         v-if="steps.length === 0"
-        class="rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 p-8 text-center"
+        class="rounded-lg border-2 border-dashed border-gray-300 p-8 text-center dark:border-gray-600"
       >
-        <i class="fa-solid fa-plug text-3xl text-gray-400 mb-2" />
+        <i class="fa-solid fa-plug mb-2 text-3xl text-gray-400" />
         <p class="text-gray-500 dark:text-gray-400">No steps configured</p>
-        <p class="text-sm text-gray-400 dark:text-gray-500">Add a step to define which plugins run</p>
+        <p class="text-sm text-gray-400 dark:text-gray-500">
+          Add a step to define which plugins run
+        </p>
       </div>
     </div>
 
     <!-- Add Step Button -->
     <button
       type="button"
-      class="w-full rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 p-4 text-gray-500 hover:border-orange-500 hover:text-orange-500 transition-colors"
+      class="w-full rounded-lg border-2 border-dashed border-gray-300 p-4 text-gray-500 transition-colors hover:border-orange-500 hover:text-orange-500 dark:border-gray-600"
       @click="addStep"
     >
       <i class="fa-solid fa-plus mr-2" />
@@ -245,17 +278,14 @@ const eventDescription = computed(() => {
     <!-- Validation Errors -->
     <div
       v-if="errors && errors.length > 0"
-      class="rounded-md bg-yellow-50 dark:bg-yellow-900/20 p-3 text-sm text-yellow-700 dark:text-yellow-300"
+      class="bg-yellow-50 rounded-md p-3 text-sm text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300"
     >
       <div class="flex items-start">
         <i class="fa-solid fa-exclamation-circle mr-2 mt-0.5" />
         <div>
           <p class="font-medium">Validation Errors</p>
-          <ul class="mt-1 list-disc list-inside space-y-1">
-            <li
-              v-for="(error, index) in errors"
-              :key="index"
-            >
+          <ul class="mt-1 list-inside list-disc space-y-1">
+            <li v-for="(error, index) in errors" :key="index">
               {{ error }}
             </li>
           </ul>
