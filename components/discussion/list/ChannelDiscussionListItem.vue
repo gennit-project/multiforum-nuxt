@@ -192,15 +192,11 @@ const handleSelect = () => {
     title: props.discussion?.title || '',
   });
 };
+
 </script>
 
 <template>
-  <li
-    class="mb-2 flex border-gray-800 pt-2 md:rounded-lg"
-    :class="{
-      'bg-gray-100 dark:bg-gray-700': isSelected,
-    }"
-  >
+  <li class="mb-2 flex border-gray-800 pt-2 md:rounded-lg">
     <div
       class="flex w-full min-w-0 flex-row justify-start gap-4 overflow-hidden rounded-lg"
     >
@@ -221,6 +217,11 @@ const handleSelect = () => {
                 @click="handleSelect"
               >
                 <span
+                  :class="
+                    isSelected
+                      ? 'rounded bg-gray-100 px-1 dark:bg-gray-700'
+                      : ''
+                  "
                   class="cursor-pointer hover:text-gray-500 dark:text-gray-100"
                 >
                   <HighlightedSearchTerms
@@ -261,6 +262,11 @@ const handleSelect = () => {
                 @click="handleSelect"
               >
                 <span
+                  :class="
+                    isSelected
+                      ? 'rounded bg-gray-100 px-1 dark:bg-gray-700'
+                      : ''
+                  "
                   class="cursor-pointer hover:text-gray-500 dark:text-gray-100"
                 >
                   <HighlightedSearchTerms
@@ -312,6 +318,7 @@ const handleSelect = () => {
                     :comment-karma="authorCommentKarma"
                     :discussion-karma="authorDiscussionKarma"
                     :account-created="authorAccountCreated"
+                    :disable-tooltip="true"
                   />
                 </div>
                 <AddToDiscussionFavorites
