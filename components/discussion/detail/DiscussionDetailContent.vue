@@ -177,6 +177,16 @@ const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
   );
 });
 
+const formDiscussionChannel = computed<DiscussionChannel | null>(() => {
+  const discussionChannels = discussion.value?.DiscussionChannels || [];
+  return (
+    discussionChannels.find(
+      (discussionChannel) =>
+        discussionChannel.channelUniqueName === channelId.value
+    ) || null
+  );
+});
+
 const answers = computed(() => {
   return activeDiscussionChannel.value
     ? activeDiscussionChannel.value.Answers
@@ -476,6 +486,7 @@ const handleEditAlbum = () => {
               :comments="comments"
               :discussion-author="discussionAuthor || ''"
               :discussion-channel="activeDiscussionChannel || undefined"
+              :form-discussion-channel="formDiscussionChannel || undefined"
               :channel-id="channelId"
               :enable-feedback="
                 activeDiscussionChannel?.Channel?.feedbackEnabled ?? true

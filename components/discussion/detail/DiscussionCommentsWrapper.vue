@@ -48,6 +48,11 @@ const props = defineProps({
     required: false,
     default: () => null,
   },
+  formDiscussionChannel: {
+    type: Object as PropType<DiscussionChannel>,
+    required: false,
+    default: () => null,
+  },
   discussionAuthor: {
     type: String,
     required: true,
@@ -148,8 +153,12 @@ const effectiveShowNuxtPage = computed(() => {
   return props.showNuxtPage && hasDiscussionIdInRoute.value;
 });
 
+const formDiscussionChannel = computed(
+  () => props.discussionChannel || props.formDiscussionChannel || null
+);
+
 const botSuggestions = computed(() => {
-  const channel = props.discussionChannel as DiscussionChannel & {
+  const channel = formDiscussionChannel.value as DiscussionChannel & {
     Channel?: {
       uniqueName?: string | null;
       Bots?: Array<{
@@ -163,14 +172,14 @@ const botSuggestions = computed(() => {
 
   return buildBotMentionOptions({
     channelUniqueName:
-      channel?.Channel?.uniqueName || props.discussionChannel?.channelUniqueName,
+      channel?.Channel?.uniqueName || formDiscussionChannel.value?.channelUniqueName,
     bots: channel?.Channel?.Bots || [],
   });
 });
 
 // Extract bot usernames to identify bot-authored comments
 const botUsernames = computed(() => {
-  const channel = props.discussionChannel as DiscussionChannel & {
+  const channel = formDiscussionChannel.value as DiscussionChannel & {
     Channel?: {
       Bots?: Array<{
         username: string;
@@ -492,9 +501,9 @@ const handleSubscriptionToggle = () => {
     @load-more="$emit('loadMore')"
   >
     <template #pre-header>
-      <div v-if="isMounted && discussionChannel && !archived && !locked">
+      <div v-if="isMounted && formDiscussionChannel && !archived && !locked">
         <InlineCommentForm
-          :discussion-channel="discussionChannel"
+          :discussion-channel="formDiscussionChannel"
           :mod-name="modName"
           :previous-offset="previousOffset"
           :bot-suggestions="botSuggestions"
@@ -512,9 +521,9 @@ const handleSubscriptionToggle = () => {
     </template>
     <template #default>
       <DiscussionRootCommentFormWrapper
-        v-if="isMounted && discussionChannel && !archived && !locked"
+        v-if="isMounted && formDiscussionChannel && !archived && !locked"
         class="pr-1"
-        :discussion-channel="discussionChannel"
+        :discussion-channel="formDiscussionChannel"
         :mod-name="modName"
         :previous-offset="previousOffset"
         :bot-suggestions="botSuggestions"

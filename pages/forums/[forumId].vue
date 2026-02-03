@@ -13,6 +13,7 @@ import type { Channel, User } from '@/__generated__/graphql';
 import { computed } from 'vue';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
 import ChannelSidebar from '@/components/channel/ChannelSidebar.vue';
+import IssueDetail from '@/components/mod/IssueDetail.vue';
 import { useRoute, useRouter, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon';
@@ -29,8 +30,13 @@ import type { ForumItem } from '@/types/forum';
 const route = useRoute();
 const router = useRouter();
 const uiStore = useUIStore();
-const { selectedChannelDiscussionId, selectedChannelDiscussionTitle } =
-  storeToRefs(uiStore);
+const {
+  selectedChannelDiscussionId,
+  selectedChannelDiscussionTitle,
+  selectedIssueNumber,
+  selectedIssueTitle,
+  selectedIssueChannelId,
+} = storeToRefs(uiStore);
 
 const showDiscussionTitle = computed(() =>
   route.name?.toString().includes('forums-forumId-discussions-discussionId')
@@ -86,6 +92,14 @@ const showChannelSidebarOnIssueDetail = computed(() => {
   return route.name
     ?.toString()
     .includes('forums-forumId-issues-issueNumber');
+});
+
+const enableIssueSplitScroll = computed(() => {
+  return route.name === 'forums-forumId-issues';
+});
+
+const showChannelIssuePanel = computed(() => {
+  return route.name === 'forums-forumId-issues';
 });
 
 const channelId = computed(() => {
@@ -345,8 +359,8 @@ definePageMeta({
               <div
                 class="min-w-0 flex-1 px-4"
                 :class="
-                  enableDiscussionSplitScroll
-                    ? 'lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto'
+                  enableDiscussionSplitScroll || enableIssueSplitScroll
+                    ? 'lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto lg:w-1/2'
                     : ''
                 "
               >
@@ -407,6 +421,47 @@ definePageMeta({
                   class="flex h-full items-center justify-center rounded-lg border border-dashed border-gray-300 p-6 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400"
                 >
                   Select a discussion to view details.
+                </div>
+              </div>
+              <div
+                v-if="showChannelIssuePanel"
+                class="hidden lg:flex lg:w-1/2 lg:flex-col lg:overflow-y-auto"
+                :class="
+                  enableIssueSplitScroll ? 'lg:h-[calc(100vh-3.5rem)]' : ''
+                "
+              >
+                <div
+                  v-if="selectedIssueNumber && selectedIssueChannelId"
+                  class="flex w-full flex-col justify-center rounded-lg border border-gray-200 p-4 dark:border-gray-700"
+                >
+                  <div class="mb-3 flex items-start justify-between gap-3">
+                    <div class="flex-1">
+                      <h2
+                        v-if="selectedIssueTitle"
+                        class="text-lg font-semibold text-gray-900 dark:text-gray-100"
+                      >
+                        {{ selectedIssueTitle }}
+                      </h2>
+                    </div>
+                    <a
+                      :href="`/forums/${selectedIssueChannelId}/issues/${selectedIssueNumber}`"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-xs font-medium text-orange-600 hover:underline dark:text-orange-400"
+                    >
+                      Open in new tab
+                    </a>
+                  </div>
+                  <IssueDetail
+                    :channel-id="selectedIssueChannelId"
+                    :issue-number="selectedIssueNumber"
+                  />
+                </div>
+                <div
+                  v-else
+                  class="flex h-full items-center justify-center rounded-lg border border-dashed border-gray-300 p-6 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400"
+                >
+                  Select an issue to view details.
                 </div>
               </div>
               <div
