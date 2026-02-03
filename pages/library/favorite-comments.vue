@@ -260,6 +260,7 @@ const favoriteComments = computed(() => {
                     <AddToCommentFavorites
                       :allow-add-to-list="false"
                       :comment-id="comment.id"
+                      :is-favorited="true"
                       size="medium"
                     />
                   </div>

@@ -243,6 +243,7 @@ function toggleEmojiPicker() {
         v-if="commentData"
         :allow-add-to-list="true"
         :comment-id="commentData.id"
+        :is-favorited="commentData.isFavoritedByUser ?? null"
         size="small"
       />
       <slot />

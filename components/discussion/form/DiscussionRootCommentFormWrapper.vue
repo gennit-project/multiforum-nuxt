@@ -212,7 +212,6 @@ const {
       const commentSectionQueryVariables = {
         discussionId: props.discussionChannel.discussionId,
         channelUniqueName: props.discussionChannel.channelUniqueName,
-        username: usernameVar.value,
         modName: props.modName,
         limit: COMMENT_LIMIT,
         offset: props.previousOffset,

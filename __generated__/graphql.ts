@@ -9610,6 +9610,7 @@ export type Comment = {
   editReason?: Maybe<Scalars['String']['output']>;
   emoji?: Maybe<Scalars['JSON']['output']>;
   id: Scalars['ID']['output'];
+  isFavoritedByUser?: Maybe<Scalars['Boolean']['output']>;
   isFeedbackComment?: Maybe<Scalars['Boolean']['output']>;
   isRootComment: Scalars['Boolean']['output'];
   text?: Maybe<Scalars['String']['output']>;

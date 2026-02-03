@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, watch, watchEffect } from 'vue';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import Tag from '@/components/TagComponent.vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_EVENT } from '@/graphQLData/event/queries';
@@ -25,7 +25,7 @@ import EventRootCommentFormWrapper from '@/components/event/detail/EventRootComm
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import EventChannelLinks from '@/components/event/detail/EventChannelLinks.vue';
 import { useRoute, useHead } from 'nuxt/app';
-import { modProfileNameVar } from '@/cache';
+import { modProfileNameVar, usernameVar } from '@/cache';
 import AddToCalendarButton from '../AddToCalendarButton.vue';
 import ArchivedEventInfoBanner from './ArchivedEventInfoBanner.vue';
 import { getOriginalPoster } from '@/utils/originalPoster';
@@ -152,6 +152,20 @@ const {
 watch(commentSort, () =>
   fetchMoreComments({ variables: { sort: commentSort.value } })
 );
+
+watch(
+  () => usernameVar.value,
+  (newUsername, prevUsername) => {
+    if (!newUsername || newUsername === prevUsername) return;
+    loadEventComments();
+  }
+);
+
+onMounted(() => {
+  if (usernameVar.value) {
+    loadEventComments();
+  }
+});
 
 const comments = computed<Comment[]>(
   () => getEventCommentsResult.value?.getEventComments?.Comments || []

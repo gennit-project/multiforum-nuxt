@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import {
@@ -18,7 +18,7 @@ import DiscussionCommentsWrapper from '@/components/discussion/detail/Discussion
 import DiscussionChannelLinks from '@/components/discussion/detail/DiscussionChannelLinks.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
-import { modProfileNameVar } from '@/cache';
+import { modProfileNameVar, usernameVar } from '@/cache';
 import { useRoute } from 'nuxt/app';
 import DiscussionBodyEditForm from './DiscussionBodyEditForm.vue';
 import AlbumEditForm from './AlbumEditForm.vue';
@@ -105,7 +105,6 @@ const {
   () => ({
     discussionId: props.discussionId,
     channelUniqueName: channelId.value,
-    username: undefined,
     modName: loggedInUserModName.value,
     offset: offset.value,
     limit: COMMENT_LIMIT,
@@ -130,6 +129,20 @@ watch(commentSort, () =>
   // @ts-ignore - the sort is correctly typed.
   fetchMoreComments({ variables: { sort: commentSort.value } })
 );
+
+watch(
+  () => usernameVar.value,
+  (newUsername, prevUsername) => {
+    if (!newUsername || newUsername === prevUsername) return;
+    refetchDiscussionChannel();
+  }
+);
+
+onMounted(() => {
+  if (usernameVar.value) {
+    refetchDiscussionChannel();
+  }
+});
 
 const setLastValidCommentSection = (
   section: {

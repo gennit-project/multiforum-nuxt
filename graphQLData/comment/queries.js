@@ -22,6 +22,7 @@ const COMMENT_FIELDS = gql`
     createdAt
     updatedAt
     archived
+    isFavoritedByUser
     CommentAuthor {
       ... on ModerationProfile {
         displayName
@@ -67,7 +68,6 @@ const COMMENT_FIELDS = gql`
 export const GET_DISCUSSION_COMMENTS = gql`
   query getCommentSection(
     $channelUniqueName: String!
-    $username: String
     $discussionId: ID!
     $modName: String
     $offset: Int
@@ -76,7 +76,6 @@ export const GET_DISCUSSION_COMMENTS = gql`
   ) {
     getCommentSection(
       channelUniqueName: $channelUniqueName
-      username: $username
       discussionId: $discussionId
       modName: $modName
       offset: $offset
@@ -149,6 +148,7 @@ export const GET_DISCUSSION_COMMENTS = gql`
         createdAt
         updatedAt
         archived
+        isFavoritedByUser
         CommentAuthor {
           ...AuthorFields
           ... on User {
