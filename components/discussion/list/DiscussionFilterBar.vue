@@ -125,7 +125,10 @@ const isExpanded = computed(() => {
 
 <template>
   <div class="pb-2 pt-2">
-    <div>
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <h1 class="font-semibold h-9 px-4 text-xl leading-9 dark:text-white">
+        Discuss
+      </h1>
       <div class="flex flex-wrap items-center justify-end gap-1">
         <FilterChip
           v-if="!isForumScoped"
@@ -252,7 +255,7 @@ const isExpanded = computed(() => {
         </div>
       </div>
     </div>
-    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" >
+    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" />
     <div
       v-if="showSearch"
       class="flex flex-col gap-2 bg-gray-100 py-2 dark:bg-gray-700 dark:text-gray-300"
@@ -294,14 +297,15 @@ const isExpanded = computed(() => {
         <CheckBox
           data-testid="show-archived-discussions"
           :checked="filterValues.showArchived"
-          :label="isDownloadPage ? 'Show archived downloads' : 'Show archived discussions'"
+          :label="
+            isDownloadPage
+              ? 'Show archived downloads'
+              : 'Show archived discussions'
+          "
           @input="updateShowArchived"
         />
       </div>
-      <div
-        v-if="isForumScoped && !isDownloadPage"
-        class="pr-2 text-sm"
-      >
+      <div v-if="isForumScoped && !isDownloadPage" class="pr-2 text-sm">
         <CheckBox
           data-testid="show-unanswered-discussions"
           :checked="filterValues.showUnanswered"
