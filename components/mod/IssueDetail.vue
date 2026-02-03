@@ -45,15 +45,30 @@ type Issue = GeneratedIssue & {
   LockedBy?: { displayName?: string };
 };
 
+const props = defineProps({
+  channelId: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  issueNumber: {
+    type: Number,
+    required: false,
+    default: null,
+  },
+});
+
 // Setup
 const route = useRoute();
 
 // Route and issueNumber computations
 const channelId = computed(() => {
+  if (props.channelId) return props.channelId;
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
 const issueNumber = computed(() => {
+  if (props.issueNumber !== null) return props.issueNumber;
   const value = route.params.issueNumber;
   if (typeof value === 'string') {
     const parsed = Number.parseInt(value, 10);
