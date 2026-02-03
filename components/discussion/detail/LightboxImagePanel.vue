@@ -71,6 +71,8 @@ const handleClick = (event: MouseEvent) => {
 <template>
   <div
     class="relative flex h-full flex-1 items-center justify-center overflow-hidden"
+    role="region"
+    aria-label="Lightbox image"
     @click="handleClick"
   >
     <button

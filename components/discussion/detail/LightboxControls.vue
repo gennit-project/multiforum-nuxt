@@ -97,6 +97,8 @@ const downloadImage = (imageUrl: string) => {
 <template>
   <div
     class="z-50 flex min-w-0 items-center justify-between overflow-visible p-2 text-white"
+    role="region"
+    aria-label="Lightbox controls"
     :class="{ 'px-3': panelOnSide, 'px-5': !panelOnSide }"
   >
     <div
