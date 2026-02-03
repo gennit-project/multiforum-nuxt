@@ -157,6 +157,12 @@ const secrets = computed((): PluginSecretStatus[] => {
 const isInstalled = computed(() => !!installedPlugin.value);
 const isEnabled = computed(() => installedPlugin.value?.enabled ?? false);
 
+// Only show full-page loading on initial load, not during refetches
+// Check if we're loading AND don't have any data yet
+const isInitialLoading = computed(() =>
+  (pluginsLoading.value || installedLoading.value) && !pluginsResult.value
+);
+
 // Plugin metadata computed properties
 const pluginDisplayName = computed(() => {
   return (
@@ -539,8 +545,8 @@ const handleSaveSettings = async () => {
   <div class="px-8">
     <RequireAuth>
       <template #has-auth>
-        <!-- Loading State -->
-        <div v-if="pluginsLoading || installedLoading" class="py-8 text-center">
+        <!-- Loading State (only show on initial load, not refetches) -->
+        <div v-if="isInitialLoading" class="py-8 text-center">
           <div class="inline-flex items-center">
             <i class="fa-solid fa-spinner mr-2 animate-spin" />
             Loading plugin details...

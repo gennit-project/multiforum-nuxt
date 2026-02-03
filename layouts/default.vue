@@ -131,16 +131,21 @@ onMounted(() => {
           </ClientOnly>
 
           <!-- Mobile/Tablet Side Navigation -->
-          <nav
-            v-if="!lgAndUp"
-            aria-label="Mobile navigation"
-          >
-            <SiteSidenav
-              :key="`${sideNavIsOpenVar}`"
-              :show-dropdown="sideNavIsOpenVar"
-              @close="setSideNavIsOpenVar(false)"
-            />
-          </nav>
+          <ClientOnly>
+            <nav
+              v-if="!lgAndUp"
+              aria-label="Mobile navigation"
+            >
+              <SiteSidenav
+                :key="`${sideNavIsOpenVar}`"
+                :show-dropdown="sideNavIsOpenVar"
+                @close="setSideNavIsOpenVar(false)"
+              />
+            </nav>
+            <template #fallback>
+              <div aria-hidden="true" />
+            </template>
+          </ClientOnly>
 
           <div
             class="flex min-w-0 flex-1 flex-col bg-white dark:bg-black lg:pl-20"
