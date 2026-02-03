@@ -34,6 +34,14 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+  isSelectable: {
+    type: Boolean,
+    default: false,
+  },
+  selectedDiscussionId: {
+    type: String,
+    default: '',
+  },
   discussionChannel: {
     type: Object as PropType<DiscussionChannel>,
     required: true,
@@ -60,7 +68,7 @@ const props = defineProps({
   },
 });
 
-defineEmits(['filterByTag']);
+const emit = defineEmits(['filterByTag', 'filterByChannel', 'select']);
 
 const route = useRoute();
 const uiStore = useUIStore();
@@ -101,6 +109,19 @@ const errorMessage = ref('');
 // Local state for this specific discussion item's expanded/collapsed state
 // Initial value is based on the defaultExpanded prop
 const isExpanded = ref(props.defaultExpanded);
+
+const discussionIdInParams = computed(() =>
+  typeof route.params.discussionId === 'string' ? route.params.discussionId : ''
+);
+const discussionId = computed(
+  () => props.discussionChannel?.discussionId || props.discussion?.id || ''
+);
+const isSelected = computed(() => {
+  if (props.selectedDiscussionId) {
+    return props.selectedDiscussionId === discussionId.value;
+  }
+  return discussionIdInParams.value === discussionId.value;
+});
 
 // Later in the lifecycle, clicking Expand/Collapse on this item only affects this item
 // Clicking Expand All/Collapse All will set the default for new items
@@ -160,10 +181,26 @@ const shouldShowContent = computed(() => {
 const revealSensitiveContent = () => {
   sensitiveContentRevealed.value = true;
 };
+
+const handleSelect = () => {
+  if (!props.isSelectable) return;
+  const idToSelect =
+    props.discussionChannel?.discussionId || props.discussion?.id || '';
+  if (!idToSelect) return;
+  emit('select', {
+    discussionId: idToSelect,
+    title: props.discussion?.title || '',
+  });
+};
 </script>
 
 <template>
-  <li class="mb-2 flex border-gray-800 pt-2 md:rounded-lg">
+  <li
+    class="mb-2 flex border-gray-800 pt-2 md:rounded-lg"
+    :class="{
+      'bg-gray-100 dark:bg-gray-700': isSelected,
+    }"
+  >
     <div
       class="flex w-full min-w-0 flex-row justify-start gap-4 overflow-hidden rounded-lg"
     >
@@ -180,7 +217,8 @@ const revealSensitiveContent = () => {
                   },
                   query: filteredQuery,
                 }"
-                class="mb-1 flex w-full items-center gap-2"
+                class="mb-1 flex w-full items-start gap-2 lg:hidden"
+                @click="handleSelect"
               >
                 <span
                   class="cursor-pointer hover:text-gray-500 dark:text-gray-100"
@@ -217,6 +255,46 @@ const revealSensitiveContent = () => {
                   Sensitive
                 </span>
               </nuxt-link>
+              <button
+                type="button"
+                class="mb-1 hidden w-full items-start gap-2 text-left lg:flex"
+                @click="handleSelect"
+              >
+                <span
+                  class="cursor-pointer hover:text-gray-500 dark:text-gray-100"
+                >
+                  <HighlightedSearchTerms
+                    :text="title"
+                    :search-input="searchInput"
+                    :classes="[
+                      'hover:underline dark:text-gray-100 dark:hover:text-gray-300',
+                      fontSize === 'small'
+                        ? 'text-sm'
+                        : fontSize === 'medium'
+                          ? 'text-base'
+                          : 'text-lg',
+                    ]"
+                  />
+                </span>
+                <span
+                  v-if="discussionChannel.archived"
+                  class="rounded-full border border-red-500 px-2 text-xs text-red-500 dark:border-red-400 dark:text-red-400"
+                  >Archived</span
+                >
+                <span
+                  v-if="discussionChannel.answered"
+                  class="mr-1 flex items-center gap-1 rounded-full border border-green-500 px-2 py-0.5 text-xs text-green-500 dark:border-green-400 dark:text-green-400"
+                  aria-label="This discussion has been answered"
+                >
+                  <CheckCircleIcon class="h-4 w-4" /> Answered
+                </span>
+                <span
+                  v-if="hasSensitiveContent"
+                  class="rounded-full border border-orange-600 px-2 text-xs text-orange-600 dark:border-orange-400 dark:text-orange-400"
+                >
+                  Sensitive
+                </span>
+              </button>
               <div
                 class="flex items-center gap-2 text-xs font-medium text-gray-600 no-underline dark:text-gray-300"
               >
@@ -325,7 +403,7 @@ const revealSensitiveContent = () => {
                 </div>
                 <div
                   v-if="discussion.Album && discussion.Album?.Images.length > 0"
-                  class="my-4 max-w-full overflow-x-auto bg-black"
+                  class="relative z-30 my-4 max-w-full overflow-x-auto bg-black"
                 >
                   <DiscussionAlbum
                     :album="discussion.Album"

@@ -6,8 +6,9 @@ import {
   onBeforeUnmount,
   computed,
   toRef,
+  defineAsyncComponent,
 } from 'vue';
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue';
+import { Tab, TabGroup, TabList } from '@headlessui/vue';
 import { useDisplay } from 'vuetify';
 
 // Components
@@ -15,9 +16,18 @@ import AddImage from '@/components/AddImage.vue';
 import ErrorBanner from './ErrorBanner.vue';
 import CharCounter from '@/components/CharCounter.vue';
 import TextEditorToolbar from '@/components/text-editor/TextEditorToolbar.vue';
-import TextEditorFullScreen from '@/components/text-editor/TextEditorFullScreen.vue';
-import EmojiPickerWrapper from '@/components/text-editor/EmojiPickerWrapper.vue';
 import BotSuggestionsPopover from '@/components/text-editor/BotSuggestionsPopover.vue';
+
+// Lazy-loaded components (heavy dependencies)
+const TextEditorFullScreen = defineAsyncComponent(
+  () => import('@/components/text-editor/TextEditorFullScreen.vue')
+);
+const EmojiPickerWrapper = defineAsyncComponent(
+  () => import('@/components/text-editor/EmojiPickerWrapper.vue')
+);
+const MarkdownRenderer = defineAsyncComponent(
+  () => import('@/components/MarkdownRenderer.vue')
+);
 
 // Composables
 import { useImageUpload } from '@/composables/useImageUpload';
@@ -525,8 +535,9 @@ const markdownDocsLink = 'https://www.markdownguide.org/basic-syntax/';
           />
         </div>
 
-        <TabPanels class="mt-2">
-          <TabPanel class="-m-0.5 rounded-md px-0.5 py-1">
+        <!-- Use v-if instead of TabPanels to prevent MarkdownRenderer from loading until needed -->
+        <div class="mt-2">
+          <div v-if="selectedTab === 0" class="-m-0.5 rounded-md px-0.5 py-1">
             <textarea
               ref="editorRef"
               :data-testid="props.testId"
@@ -573,15 +584,15 @@ const markdownDocsLink = 'https://www.markdownguide.org/basic-syntax/';
                 @file-change="handleFileChange"
               />
             </div>
-          </TabPanel>
+          </div>
 
-          <TabPanel class="-m-0.5 overflow-auto rounded-md p-0.5">
+          <div v-else class="-m-0.5 overflow-auto rounded-md p-0.5">
             <MarkdownRenderer
               :text="text"
               class="block w-full max-w-2xl rounded-md border-gray-300 text-xs shadow-sm dark:border-gray-800 dark:bg-gray-700 dark:text-gray-100"
             />
-          </TabPanel>
-        </TabPanels>
+          </div>
+        </div>
       </TabGroup>
 
       <CharCounter

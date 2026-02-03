@@ -1,8 +1,16 @@
 <script setup lang="ts">
+import { defineAsyncComponent } from 'vue';
 import TextEditorToolbar from './TextEditorToolbar.vue';
-import EmojiPickerWrapper from './EmojiPickerWrapper.vue';
 import AddImage from '@/components/AddImage.vue';
 import type { EmojiClickEvent } from '@/composables/useEmojiPicker';
+
+// Lazy-loaded components (heavy dependencies)
+const EmojiPickerWrapper = defineAsyncComponent(
+  () => import('./EmojiPickerWrapper.vue')
+);
+const MarkdownRenderer = defineAsyncComponent(
+  () => import('@/components/MarkdownRenderer.vue')
+);
 
 type FileChangeInput = {
   event: Event & { target: HTMLInputElement | null };
