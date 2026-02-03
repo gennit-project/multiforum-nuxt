@@ -3,20 +3,8 @@ import { ref } from 'vue';
 import { config } from './config';
 
 export const usernameVar = ref('');
-const shouldLogAuth = import.meta.env.DEV;
 export const setUsername = (username: string) => {
-  if (shouldLogAuth) {
-    console.log(
-      '🔧 setUsername called with:',
-      username,
-      'current value:',
-      usernameVar.value
-    );
-  }
   usernameVar.value = username;
-  if (shouldLogAuth) {
-    console.log('🔧 setUsername result:', usernameVar.value);
-  }
 };
 export const profilePicURLVar = ref('');
 export const setProfilePicURL = (url: string) => {

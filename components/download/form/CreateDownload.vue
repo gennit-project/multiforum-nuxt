@@ -66,13 +66,6 @@ const {
 } = useMutation(UPDATE_DISCUSSION);
 
 onDone(async (response) => {
-  console.log('CreateDownload onDone response:', response);
-  console.log('Full response.data:', response.data);
-  console.log(
-    'createDiscussionWithChannelConnections:',
-    response.data?.createDiscussionWithChannelConnections
-  );
-
   // Try both possible response structures
   const directId = response.data?.createDiscussionWithChannelConnections?.id;
   const arrayId =
@@ -80,12 +73,10 @@ onDone(async (response) => {
       ?.DiscussionChannels?.[0]?.Discussion?.id;
 
   const newDiscussionId = directId || arrayId;
-  console.log('Extracted discussionId:', newDiscussionId);
 
   if (newDiscussionId) {
     // Handle album if there are images
     if (formValues.value.album?.images?.length > 0) {
-      console.log('Saving album images:', formValues.value.album.images);
       await saveDownloadAlbum(newDiscussionId);
     }
 
@@ -94,14 +85,8 @@ onDone(async (response) => {
       formValues.value.downloadLabels &&
       Object.keys(formValues.value.downloadLabels).length > 0
     ) {
-      console.log('Saving download labels:', formValues.value.downloadLabels);
       await saveDownloadLabels(newDiscussionId);
     }
-
-    console.log('Navigating to download detail page:', {
-      forumId: channelId.value,
-      discussionId: newDiscussionId,
-    });
     router.push({
       name: 'forums-forumId-downloads-discussionId',
       params: {
@@ -117,9 +102,6 @@ onDone(async (response) => {
 // Helper function to save album after discussion creation
 const saveDownloadAlbum = async (discussionId: string) => {
   try {
-    console.log('Creating album for discussion:', discussionId);
-    console.log('Album data:', formValues.value.album);
-
     // Build the album node
     const albumNode: any = {
       imageOrder: formValues.value.album?.imageOrder || [],
@@ -142,17 +124,10 @@ const saveDownloadAlbum = async (discussionId: string) => {
       },
     };
 
-    console.log(
-      'Album update input:',
-      JSON.stringify(albumUpdateInput, null, 2)
-    );
-
     await updateDiscussion({
       where: { id: discussionId },
       updateDiscussionInput: albumUpdateInput,
     });
-
-    console.log('Successfully created album');
   } catch (error) {
     console.error('Error creating album:', error);
   }
@@ -169,12 +144,6 @@ const saveDownloadLabels = async (discussionId: string) => {
       console.warn('No FilterGroups found in channel data');
       return;
     }
-
-    console.log(
-      'Converting downloadLabels to FilterOption IDs:',
-      formValues.value.downloadLabels
-    );
-    console.log('Available FilterGroups:', channelData.value.FilterGroups);
 
     Object.entries(formValues.value.downloadLabels || {}).forEach(
       ([groupKey, selectedValues]) => {
@@ -194,15 +163,12 @@ const saveDownloadLabels = async (discussionId: string) => {
       }
     );
 
-    console.log('Final labelOptionIds to connect:', labelOptionIds);
-
     if (labelOptionIds.length > 0) {
       await updateDiscussionChannelLabels({
         channelUniqueName: channelId.value,
         discussionId: discussionId,
         labelOptionIds: labelOptionIds,
       });
-      console.log('Successfully saved download labels');
     }
   } catch (error) {
     console.error('Error saving download labels:', error);
@@ -217,15 +183,6 @@ const updateFormValues = (
 
 const submitForm = async () => {
   try {
-    console.log(
-      'CreateDownload submitForm - formValues.album:',
-      formValues.value.album
-    );
-    console.log(
-      'CreateDownload submitForm - album images:',
-      formValues.value.album?.images
-    );
-
     const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
       onCreate: {
         node: { text: tag },

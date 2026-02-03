@@ -160,15 +160,12 @@ const acceptAttribute = computed(() => {
 
 // Initialize form values after component is mounted
 onMounted(() => {
-  console.log('DownloadEditForm mounted, initializing formValues');
-  console.log('Files:', downloadableFiles.value);
 
   formValues.value.downloadableFiles = [...downloadableFiles.value];
 
   // Initialize download labels from props
   formValues.value.downloadLabels = { ...props.existingDownloadLabels };
 
-  console.log('Initialized formValues:', formValues.value);
 });
 
 // File validation
@@ -466,18 +463,7 @@ function getUpdateDiscussionInputForDownloadableFiles(): DiscussionUpdateInput {
 
 // For handling save
 function handleSave() {
-  console.log('handleSave called, isCreateMode:', isCreateMode.value);
-  console.log(
-    'Current downloadable files data:',
-    JSON.stringify(formValues.value.downloadableFiles)
-  );
-  console.log(
-    'Current download labels:',
-    JSON.stringify(formValues.value.downloadLabels)
-  );
-
   // Always emit to parent - let the parent decide how to handle the save
-  console.log('Emitting updateFormValues to parent');
   emit('updateFormValues', {
     downloadableFiles: formValues.value.downloadableFiles,
     downloadLabels: formValues.value.downloadLabels,
@@ -660,10 +646,6 @@ function handleSave() {
             :selected-labels="formValues.downloadLabels"
             @update:selected-labels="
               (newLabels) => {
-                console.log(
-                  'DownloadEditForm received label update:',
-                  newLabels
-                );
                 formValues.downloadLabels = newLabels;
                 // Emit the changes to parent immediately
                 handleSave();

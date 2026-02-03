@@ -23,6 +23,5 @@
 
 <script setup lang="ts">
 const doSomething = () => {
-  console.log('clicked');
 };
 </script>

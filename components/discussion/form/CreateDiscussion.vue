@@ -280,20 +280,16 @@ function submit() {
 }
 
 function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
-  console.log('CreateDiscussion received form update:', JSON.stringify(data));
 
   // Handle album updates specially to avoid overwriting the entire album object
   if (data.album) {
-    console.log('Album data detected in update:', data.album);
 
     // Explicitly handle images and imageOrder to ensure they stay in sync
     if (data.album.images) {
-      console.log('Updating album images:', data.album.images);
       formValues.value.album.images = data.album.images;
     }
 
     if (data.album.imageOrder) {
-      console.log('Updating album imageOrder:', data.album.imageOrder);
       formValues.value.album.imageOrder = data.album.imageOrder;
     }
 
@@ -306,7 +302,6 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
       ...restData,
     };
 
-    console.log('Updated form values:', JSON.stringify(formValues.value.album));
   } else {
     // If no album data, just update normally
     formValues.value = {

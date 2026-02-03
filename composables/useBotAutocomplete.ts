@@ -155,12 +155,6 @@ export function useBotAutocomplete(params: UseBotAutocompleteParams) {
     const hasSuggestions = filteredBotSuggestions.value.length > 0;
     const exactMatch = hasExactMatch.value;
     const show = enabled && hasSuggestions && !exactMatch;
-    console.log('show', {
-      enabled,
-      hasSuggestions,
-      exactMatch,
-      show,
-    });
     return show;
   });
 

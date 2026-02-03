@@ -332,15 +332,6 @@ export const getEventHeaderMenuItems = (params: {
   } = params;
 
   // Debug log to see the permissions before making menu decisions
-  console.log('EVENT HEADER MENU PERMISSIONS:', {
-    canHideEvent: userPermissions?.canHideEvent,
-    isElevatedMod: userPermissions?.isElevatedMod,
-    canReport: userPermissions?.canReport,
-    canGiveFeedback: userPermissions?.canGiveFeedback,
-    isOwnEvent,
-    isArchived,
-    isCanceled,
-  });
 
   let menuItems: MenuItem<string | RouteLocationRaw>[] = [];
 

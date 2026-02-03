@@ -15,7 +15,6 @@ const props = defineProps({
 
 const handleAddToCollection = () => {
   // TODO: Implement addToFavorites mutation
-  console.log('Adding channel to favorites:', props.channelId);
   // This would call the addToFavorites mutation with itemType: 'CHANNEL'
 };
 </script>

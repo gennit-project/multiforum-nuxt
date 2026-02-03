@@ -310,14 +310,6 @@ export default defineComponent({
           ? existingDownloadLabels
           : downloadLabels,
       };
-      console.log(
-        'onGetDiscussionResult: hasExistingLabels:',
-        hasExistingLabels
-      );
-      console.log(
-        'onGetDiscussionResult: Using downloadLabels:',
-        hasExistingLabels ? existingDownloadLabels : downloadLabels
-      );
       formValues.value = formFields;
       dataLoaded.value = true;
     });
@@ -530,34 +522,13 @@ export default defineComponent({
       const selectedIds: string[] = [];
       const downloadLabels = formValues.value.downloadLabels || {};
 
-      console.log('Converting downloadLabels to IDs:', downloadLabels);
-      console.log('downloadLabels type:', typeof downloadLabels);
-      console.log('downloadLabels keys:', Object.keys(downloadLabels));
-      console.log('downloadLabels JSON:', JSON.stringify(downloadLabels));
-
       // Get all filter groups from channel data
       const filterGroups = channelData.value?.FilterGroups || [];
-      console.log(
-        'Available filter groups:',
-        filterGroups.map((fg: FilterGroup) => ({
-          key: fg.key,
-          optionCount: fg.options?.length,
-        }))
-      );
 
       Object.entries(downloadLabels).forEach(([groupKey, selectedValues]) => {
-        console.log(
-          `Processing group "${groupKey}" with values:`,
-          selectedValues
-        );
-
         // Find the filter group
         const group = filterGroups.find(
           (fg: FilterGroup) => fg.key === groupKey
-        );
-        console.log(
-          `Found group for "${groupKey}":`,
-          group ? `Yes (${group.options?.length} options)` : 'No'
         );
 
         if (group?.options) {
@@ -566,10 +537,6 @@ export default defineComponent({
             const option = group.options?.find(
               (opt: FilterOption) => opt.value === value
             );
-            console.log(
-              `Looking for option with value "${value}":`,
-              option ? `Found ID ${option.id}` : 'Not found'
-            );
             if (option?.id) {
               selectedIds.push(option.id);
             }
@@ -577,7 +544,6 @@ export default defineComponent({
         }
       });
 
-      console.log('Final label option IDs:', selectedIds);
       return selectedIds;
     };
 
@@ -635,31 +601,11 @@ export default defineComponent({
       this.updateDiscussion();
     },
     updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
-      console.log('updateFormValues called with:', data);
-      console.log('data.downloadLabels:', JSON.stringify(data.downloadLabels));
-      console.log(
-        'Existing formValues.downloadLabels before update:',
-        JSON.stringify(this.formValues.downloadLabels)
-      );
-
       const existingValues = this.formValues;
       this.formValues = {
         ...existingValues,
         ...data,
       };
-      console.log('Updated formValues:', this.formValues);
-      console.log(
-        'Updated formValues.downloadLabels:',
-        JSON.stringify(this.formValues.downloadLabels)
-      );
-
-      // Add a setTimeout to check if the value persists
-      setTimeout(() => {
-        console.log(
-          'formValues.downloadLabels after 100ms:',
-          JSON.stringify(this.formValues.downloadLabels)
-        );
-      }, 100);
     },
     handleCancel() {
       this.router.push({

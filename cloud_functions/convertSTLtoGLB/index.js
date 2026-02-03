@@ -187,7 +187,6 @@ class ImprovedGLBCreator {
 }
 
 exports.convertSTLtoGLB = async (event, context) => {
-  console.log('STL to GLB conversion triggered');
   
   try {
     const data = JSON.parse(Buffer.from(event.data, 'base64').toString());
@@ -195,19 +194,15 @@ exports.convertSTLtoGLB = async (event, context) => {
     const fileName = data.name;
     
     if (!fileName.toLowerCase().endsWith(".stl")) {
-      console.log(`Skipping non-STL file: ${fileName}`);
       return;
     }
 
-    console.log(`Converting ${fileName} from bucket ${bucketName}`);
 
     // Download STL file
     const [stlBuffer] = await storage.bucket(bucketName).file(fileName).download();
-    console.log(`Downloaded STL: ${stlBuffer.length} bytes`);
 
     // Parse STL
     const mesh = parseSTL(stlBuffer);
-    console.log(`Parsed: ${mesh.positions.length} vertices, ${mesh.cells.length} faces`);
 
     // Create flat arrays for positions and normals
     const positions = [];
@@ -254,7 +249,6 @@ exports.convertSTLtoGLB = async (event, context) => {
         }
       });
 
-    console.log(`Uploaded ${glbFileName}: ${glbBuffer.length} bytes`);
     
     return {
       success: true,

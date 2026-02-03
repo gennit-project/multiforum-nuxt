@@ -14,7 +14,6 @@ if (import.meta.env.SSR === false) {
 
   handleLogout = () => {
     try {
-      console.log('Logout initiated');
 
       const route = useRoute();
       // Store the current path in local storage
@@ -23,7 +22,6 @@ if (import.meta.env.SSR === false) {
       // Create the full absolute URL for the logout redirect
       const baseUrl = config.baseUrl || window.location.origin;
       const logoutReturnUrl = `${baseUrl}/logout`;
-      console.log('Logout return URL:', logoutReturnUrl);
 
       // Clear any Auth0 token from localStorage
       localStorage.removeItem('token');

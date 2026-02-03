@@ -11,7 +11,6 @@ export default defineNuxtPlugin(() => {
     if (storedUsername) {
       // Set the username in the reactive state
       setUsername(storedUsername);
-      console.log('Loaded username from local storage:', storedUsername);
     }
   }
 });
