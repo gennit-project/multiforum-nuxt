@@ -126,7 +126,9 @@ const isExpanded = computed(() => {
 <template>
   <div class="pb-2 pt-2">
     <div class="flex flex-wrap items-center justify-between gap-2">
-      <h1 class="font-semibold h-9 px-4 text-xl leading-9 dark:text-white">
+      <h1
+        class="font-semibold h-9 px-4 text-xl leading-9 dark:text-white lg:px-0"
+      >
         Discuss
       </h1>
       <div class="flex flex-wrap items-center justify-end gap-1">

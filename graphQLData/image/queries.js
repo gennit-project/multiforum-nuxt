@@ -20,6 +20,112 @@ export const GET_IMAGE_DETAILS = gql`
       }
       Album {
         id
+        imageOrder
+        Owner {
+          username
+          displayName
+        }
+        Images {
+          id
+          url
+          alt
+          caption
+          Uploader {
+            username
+          }
+        }
+        Discussions {
+          id
+          title
+          createdAt
+          Author {
+            username
+            displayName
+          }
+          DiscussionChannels {
+            id
+            channelUniqueName
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_ALBUM_DETAILS = gql`
+  query GetAlbumDetails($albumId: ID!) {
+    albums(where: { id: $albumId }) {
+      id
+      imageOrder
+      Owner {
+        username
+        displayName
+      }
+      Images {
+        id
+        url
+        alt
+        caption
+        createdAt
+        Uploader {
+          username
+          displayName
+        }
+      }
+      Discussions {
+        id
+        title
+        createdAt
+        Author {
+          username
+          displayName
+        }
+        DiscussionChannels {
+          id
+          channelUniqueName
+        }
+      }
+    }
+  }
+`;
+
+export const GET_USER_ALBUMS = gql`
+  query GetUserAlbums($username: String!) {
+    albums(
+      where: {
+        OR: [
+          { Owner: { username: $username } }
+          { Images_SOME: { Uploader: { username: $username } } }
+        ]
+      }
+    ) {
+      id
+      imageOrder
+      Owner {
+        username
+        displayName
+      }
+      Images(options: { limit: 4, sort: { createdAt: DESC } }) {
+        id
+        url
+        alt
+        caption
+        createdAt
+        Uploader {
+          username
+        }
+      }
+      ImagesAggregate {
+        count
+      }
+      Discussions(options: { limit: 1, sort: { createdAt: DESC } }) {
+        id
+        title
+        createdAt
+        DiscussionChannels {
+          id
+          channelUniqueName
+        }
       }
     }
   }

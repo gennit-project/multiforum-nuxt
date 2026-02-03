@@ -44,6 +44,9 @@ export const GET_USER = gql`
       ImagesAggregate {
         count
       }
+      AlbumsAggregate {
+        count
+      }
       ServerRoles {
         showAdminTag
       }

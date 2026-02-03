@@ -14,6 +14,7 @@ import { UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
 import AlbumEditor from '@/components/discussion/form/AlbumEditor.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { useRoute } from 'vue-router';
+import { usernameVar } from '@/cache';
 
 // Define a simplified type for images used in the form
 type AlbumFormImage = {
@@ -150,21 +151,33 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
   if (!albumId.value) {
     const newImages = formValues.value.album.images;
 
+    // Build the album node with Owner if user is logged in
+    const albumNode: any = {
+      imageOrder: formValues.value.album.imageOrder,
+      Images: {
+        // Connect to existing images using their IDs
+        connect: newImages
+          .filter((img): img is AlbumFormImage => Boolean(img.id))
+          .map((img) => ({
+            where: { node: { id: img.id } },
+          })),
+      },
+    };
+
+    // Set the Owner to the current logged-in user
+    if (usernameVar.value) {
+      albumNode.Owner = {
+        connect: {
+          where: { node: { username: usernameVar.value } },
+        },
+      };
+    }
+
     // All images should already have IDs since they're created when uploaded
     return {
       Album: {
         create: {
-          node: {
-            imageOrder: formValues.value.album.imageOrder,
-            Images: {
-              // Connect to existing images using their IDs
-              connect: newImages
-                .filter((img): img is AlbumFormImage => Boolean(img.id))
-                .map((img) => ({
-                  where: { node: { id: img.id } },
-                })),
-            },
-          },
+          node: albumNode,
         },
       },
     };
