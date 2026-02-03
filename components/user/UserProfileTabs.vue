@@ -18,6 +18,9 @@ type UserProfileCounts = User & {
   DownloadsAggregate?: {
     count?: number | null;
   } | null;
+  AlbumsAggregate?: {
+    count?: number | null;
+  } | null;
 };
 
 const props = defineProps({
@@ -79,6 +82,12 @@ const tabs = computed(() => {
       href: `/u/${usernameInParams.value}/images`,
       current: false,
       count: props.user?.ImagesAggregate?.count,
+    },
+    {
+      name: 'Albums',
+      href: `/u/${usernameInParams.value}/albums`,
+      current: false,
+      count: props.user?.AlbumsAggregate?.count,
     },
     {
       name: 'Owned Forums',

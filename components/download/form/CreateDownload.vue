@@ -120,21 +120,33 @@ const saveDownloadAlbum = async (discussionId: string) => {
     console.log('Creating album for discussion:', discussionId);
     console.log('Album data:', formValues.value.album);
 
+    // Build the album node
+    const albumNode: any = {
+      imageOrder: formValues.value.album?.imageOrder || [],
+      Images: {
+        // Connect to existing images using their IDs
+        connect: (formValues.value.album?.images || [])
+          .filter((img) => Boolean(img.id))
+          .map((img) => ({
+            where: { node: { id: img.id } },
+          })),
+      },
+    };
+
+    // Set the Owner to the current logged-in user
+    if (usernameVar.value) {
+      albumNode.Owner = {
+        connect: {
+          where: { node: { username: usernameVar.value } },
+        },
+      };
+    }
+
     // Create album structure similar to getUpdateDiscussionInputForAlbum
     const albumUpdateInput = {
       Album: {
         create: {
-          node: {
-            imageOrder: formValues.value.album?.imageOrder || [],
-            Images: {
-              // Connect to existing images using their IDs
-              connect: (formValues.value.album?.images || [])
-                .filter((img) => Boolean(img.id))
-                .map((img) => ({
-                  where: { node: { id: img.id } },
-                })),
-            },
-          },
+          node: albumNode,
         },
       },
     };

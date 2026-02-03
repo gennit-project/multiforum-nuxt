@@ -16,6 +16,7 @@ import TextEditor from '@/components/TextEditor.vue';
 import SaveButton from '@/components/SaveButton.vue';
 import CancelButton from '@/components/CancelButton.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
+import AlbumThumbnailGrid from '@/components/album/AlbumThumbnailGrid.vue';
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
@@ -129,6 +130,34 @@ const saveAlt = async () => {
     alert('Error saving alt text. Please try again.');
   }
 };
+
+// Album discussions - discussions that use the album containing this image
+const albumDiscussions = computed(() => {
+  return image.value?.Album?.Discussions || [];
+});
+
+// Album images - ordered according to imageOrder, excluding current image
+const albumImages = computed(() => {
+  const album = image.value?.Album;
+  if (!album?.Images) return [];
+
+  const images = album.Images;
+  const imageOrder = album.imageOrder;
+
+  // Order images according to imageOrder if available
+  let orderedImages;
+  if (imageOrder && imageOrder.length > 0) {
+    orderedImages = imageOrder
+      .filter((imgId): imgId is string => imgId !== null && imgId !== undefined)
+      .map((imgId) => images.find((img) => img.id === imgId))
+      .filter((img): img is NonNullable<typeof img> => img !== undefined);
+  } else {
+    orderedImages = images;
+  }
+
+  // Exclude the current image from the list
+  return orderedImages.filter((img) => img.id !== image.value?.id);
+});
 
 // Custom lightbox state
 const isLightboxOpen = ref(false);
@@ -348,6 +377,9 @@ onUnmounted(() => {
       <div v-else class="space-y-6">
         <h1 class="text-2xl font-bold dark:text-white">
           Image uploaded by {{ uploader?.displayName || uploader?.username }}
+          <span v-if="uploader?.displayName && uploader?.username" class="text-gray-500 dark:text-gray-400">
+            ({{ uploader.username }})
+          </span>
         </h1>
 
         <!-- Header with navigation and actions -->
@@ -575,6 +607,59 @@ onUnmounted(() => {
               <p class="text-sm text-red-800 dark:text-red-200">
                 🚫 This image contains spoilers
               </p>
+            </div>
+          </div>
+
+          <!-- Appears in album -->
+          <div
+            v-if="image.Album && uploader?.username"
+            class="rounded-lg border bg-white p-6 dark:bg-gray-900"
+          >
+            <h2 class="font-semibold mb-3 text-lg dark:text-gray-300">
+              Appears in
+            </h2>
+            <NuxtLink
+              :to="`/u/${uploader.username}/albums/${image.Album.id}`"
+              class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              Album by {{ uploader.displayName || uploader.username }}
+              <span v-if="uploader.displayName">({{ uploader.username }})</span>
+            </NuxtLink>
+            <div
+              v-if="albumDiscussions.length > 0 && albumDiscussions[0]"
+              class="mt-3 border-t pt-3 dark:border-gray-700"
+            >
+              <p class="mb-2 text-sm text-gray-600 dark:text-gray-400">
+                Related discussion:
+              </p>
+              <NuxtLink
+                :to="`/forums/${albumDiscussions[0]?.DiscussionChannels?.[0]?.channelUniqueName}/discussions/${albumDiscussions[0]?.id}`"
+                class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                {{ albumDiscussions[0]?.title }}
+              </NuxtLink>
+            </div>
+            <!-- Other images in the album -->
+            <div
+              v-if="albumImages.length > 0"
+              class="mt-4 border-t pt-4 dark:border-gray-700"
+            >
+              <p class="mb-3 text-sm text-gray-600 dark:text-gray-400">
+                Other images in this album:
+              </p>
+              <AlbumThumbnailGrid
+                :images="albumImages"
+                :max-images="8"
+                :show-captions="false"
+                columns="grid-cols-4 sm:grid-cols-4 md:grid-cols-4"
+              />
+              <NuxtLink
+                v-if="albumImages.length > 8"
+                :to="`/u/${uploader.username}/albums/${image.Album.id}`"
+                class="mt-3 block text-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                View all {{ albumImages.length + 1 }} images in album
+              </NuxtLink>
             </div>
           </div>
         </div>

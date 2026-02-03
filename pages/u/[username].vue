@@ -49,6 +49,7 @@ const user = computed(() => {
       DownloadsAggregate: { count: 0 },
       EventsAggregate: { count: 0 },
       ImagesAggregate: { count: 0 },
+      AlbumsAggregate: { count: 0 },
       AdminOfChannelsAggregate: { count: 0 },
       ModOfChannelsAggregate: { count: 0 },
     };
