@@ -283,6 +283,9 @@ onUnmounted(() => {
 <template>
   <div
     class="fixed left-0 top-0 z-[1000] flex h-full w-full bg-black transition-all duration-300 ease-in-out"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Image lightbox"
     :class="{
       'flex-col': panelOnSide && isPanelVisible,
       'flex-row': !panelOnSide && isPanelVisible,
@@ -291,6 +294,8 @@ onUnmounted(() => {
     <!-- Image panel -->
     <div
       class="relative z-40 flex flex-col overflow-hidden transition-all duration-300 ease-in-out"
+      role="region"
+      aria-label="Image viewer"
       :class="{
         'h-full w-3/4': !panelOnSide && isPanelVisible,
         'h-full w-full':
@@ -341,6 +346,8 @@ onUnmounted(() => {
     <div
       v-if="isPanelVisible"
       class="z-40 overflow-y-auto bg-gray-900 text-white transition-all duration-300 ease-in-out"
+      role="complementary"
+      aria-label="Image details"
       :class="{
         'h-full w-1/4': !panelOnSide,
         'max-h-[30vh] w-full': panelOnSide,
