@@ -33,9 +33,7 @@ exports.scanImage = async (event, context) => {
       // In the future I will also update this area of the code so that it triggers a 
       // notification, which will tell the user that their image was deleted because it didn't 
       // pass the content filter.
-      console.log(`Deleted unsafe image: ${fileName}`);
     } else {
-      console.log(`Image passed moderation: ${fileName}`);
     }
   } catch (error) {
     console.error(`Error scanning image: ${fileName}`, error);

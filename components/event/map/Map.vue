@@ -205,14 +205,9 @@ const renderMap = async () => {
 
       // Add hover functionality for mobile too
       marker.addListener('mouseover', () => {
-        console.log('Marker mouseover triggered', {
-          eventLocationId,
-          colorLocked: props.colorLocked,
-        });
         if (!props.colorLocked) {
           // Get current marker data from markerMap
           const currentMarkerData = markerMap.markers[eventLocationId];
-          console.log('Marker data:', currentMarkerData);
           if (currentMarkerData) {
             // Show tooltip with event info on hover
             const content =
@@ -220,7 +215,6 @@ const renderMap = async () => {
                 ? `<div style="text-align:center"><b>${firstEvent?.title || 'Untitled Event'}</b>${firstEvent?.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`
                 : `<div style="text-align:center"><b>${currentMarkerData.numberOfEvents} events</b>${firstEvent?.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`;
 
-            console.log('Infowindow content:', content);
             infowindow.setContent(content);
             infowindow.open({
               anchor: marker,
@@ -273,14 +267,9 @@ const renderMap = async () => {
       });
 
       marker.addListener('mouseover', () => {
-        console.log('Marker mouseover triggered', {
-          eventLocationId,
-          colorLocked: props.colorLocked,
-        });
         if (!props.colorLocked) {
           // Get current marker data from markerMap
           const currentMarkerData = markerMap.markers[eventLocationId];
-          console.log('Marker data:', currentMarkerData);
           if (currentMarkerData) {
             // Show tooltip with event info on hover
             const content =
@@ -288,7 +277,6 @@ const renderMap = async () => {
                 ? `<div style="text-align:center"><b>${firstEvent?.title || 'Untitled Event'}</b>${firstEvent?.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`
                 : `<div style="text-align:center"><b>${currentMarkerData.numberOfEvents} events</b>${firstEvent?.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`;
 
-            console.log('Infowindow content:', content);
             infowindow.setContent(content);
             infowindow.open({
               anchor: marker,
@@ -326,13 +314,6 @@ const renderMap = async () => {
       markerMap.markers[eventLocationId].marker = marker;
     }
     markers.push(marker);
-
-    console.log(`Created marker for location ${eventLocationId}:`, {
-      marker,
-      eventsCount: markerData?.numberOfEvents,
-      hasClickListener: !!(marker as any).gm_bindings_?.click,
-      hasMouseoverListener: !!(marker as any).gm_bindings_?.mouseover,
-    });
   });
 
   // First remove markers from map so clusterer can manage them properly
@@ -353,13 +334,6 @@ const renderMap = async () => {
     },
   });
 
-  console.log('MarkerClusterer created with markers:', {
-    markerCount: markers.length,
-    clusterer: markerClusterer.value,
-    firstMarker: markers[0],
-    firstMarkerMap: markers[0]?.getMap(),
-  });
-
   markerMap.infowindow = infowindow;
 
   // Test marker - create a simple test marker to see if events work
@@ -370,7 +344,6 @@ const renderMap = async () => {
   });
 
   testMarker.addListener('mouseover', () => {
-    console.log('TEST MARKER HOVER WORKS!');
   });
 
   // fit and cap zoom

@@ -86,9 +86,6 @@ const getRepositoryName = (index) => {
 // Generate the sample data
 const sampleData = generateSampleData();
 
-// For illustration purposes, here's what the data structure looks like:
-console.log(sampleData);
-
 // How to use this data in a Vue component:
 /*
 <template>

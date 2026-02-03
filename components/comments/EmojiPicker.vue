@@ -64,7 +64,6 @@ const props = defineProps({
 
 // Handle clicking an emoji and sending mutations based on comment or discussion ID
 function handleEmojiClick(event: any) {
-  console.log('EmojiPicker received event:', event);
 
   if (!event) {
     console.error('No event data received in handleEmojiClick');

@@ -375,25 +375,6 @@ function handleViewFeedback() {
 function handleFeedbackInput(event: string) {
   feedbackText.value = event;
 }
-// Enhanced debug log to diagnose why permissionData is null
-console.log('EVENT HEADER DEBUG:', {
-  userPerms: userPermissions.value,
-  queryParams: {
-    modDisplayName: modProfileNameVar.value,
-    username: usernameVar.value,
-    channelUniqueName: props.eventChannelId || channelId.value || '',
-    queryEnabled:
-      !!modProfileNameVar.value &&
-      !!usernameVar.value &&
-      (!!props.eventChannelId || !!channelId.value),
-  },
-  permissionQueryResult: getPermissionResult.value,
-  permissionData: permissionData.value,
-  roles: {
-    standardModRole: standardModRole.value,
-    elevatedModRole: elevatedModRole.value,
-  },
-});
 </script>
 
 <template>

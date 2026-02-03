@@ -112,7 +112,6 @@ const initialImageOrder = computed<string[]>(() => {
 
   // If no order exists, create one from the images array
   if (images.value.length > 0) {
-    console.log('Creating image order from images');
     // Create an order from the image IDs
     return images.value
       .filter((img): img is (typeof images.value)[number] => Boolean(img.id))
@@ -135,14 +134,8 @@ const savedSuccessfully = ref(false);
 
 // Initialize form values after component is mounted
 onMounted(() => {
-  console.log('AlbumEditForm mounted, initializing formValues');
-  console.log('Images:', images.value);
-  console.log('ImageOrder:', initialImageOrder.value);
-
   formValues.value.album.images = [...images.value];
   formValues.value.album.imageOrder = [...initialImageOrder.value];
-
-  console.log('Initialized formValues:', formValues.value);
 });
 
 function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
@@ -257,15 +250,9 @@ onDone(() => {
 
 // For handling save
 function handleSave() {
-  console.log('handleSave called, isCreateMode:', isCreateMode.value);
-  console.log('Current album data:', JSON.stringify(formValues.value.album));
-
   // For both cases where we're inside CreateEditDiscussionFields (temp-id)
   if (props.discussion?.id === 'temp-id') {
     // Always emit the form values to update the parent component
-    console.log(
-      'Emitting updateFormValues in CreateEditDiscussionFields context'
-    );
     emit('updateFormValues', {
       album: formValues.value.album,
     });
@@ -276,38 +263,22 @@ function handleSave() {
     }, 3000); // Hide after 3 seconds
   } else {
     // In actual edit mode for an existing discussion, perform the API mutation
-    console.log('Calling updateDiscussion in edit mode');
     updateDiscussion();
   }
 }
 
 function handleUpdateAlbum(newVals: AlbumFormData) {
-  console.log(
-    'AlbumEditForm received update from AlbumEditor:',
-    JSON.stringify(newVals)
-  );
-
   // Update the album data
   formValues.value.album = {
     images: newVals.album.images,
     imageOrder: newVals.album.imageOrder,
   };
 
-  console.log(
-    'Updated formValues in AlbumEditForm:',
-    JSON.stringify(formValues.value.album)
-  );
-
   // In create mode, automatically emit the updated album data to parent
-  console.log('AlbumEditForm: checking isCreateMode:', isCreateMode.value);
-  console.log('AlbumEditForm: discussion id:', props.discussion?.id);
   if (isCreateMode.value) {
-    console.log('Auto-emitting album data to parent in create mode');
     emit('updateFormValues', {
       album: formValues.value.album,
     });
-  } else {
-    console.log('Not in create mode - not auto-emitting');
   }
 }
 </script>

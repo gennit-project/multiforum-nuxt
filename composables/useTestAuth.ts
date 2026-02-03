@@ -24,21 +24,10 @@ export const useTestAuth = () => {
       window.Cypress;
 
     if (isTestEnv) {
-      console.log('🔧 Exposing test auth functions');
-
       // Debug function to monitor reactive state
-      window.__DEBUG_AUTH_STATE__ = () => {
-        console.log('=== AUTH STATE DEBUG ===');
-        console.log(
-          'localStorage token:',
-          localStorage.getItem('token') ? 'EXISTS' : 'NOT_FOUND'
-        );
-        console.log('========================');
-
-        return {
-          hasToken: !!localStorage.getItem('token'),
-        };
-      };
+      window.__DEBUG_AUTH_STATE__ = () => ({
+        hasToken: !!localStorage.getItem('token'),
+      });
 
       // Direct auth state setter for testing
       window.__SET_AUTH_STATE_DIRECT__ = (
@@ -48,10 +37,7 @@ export const useTestAuth = () => {
           modProfileName?: string;
         } = {}
       ) => {
-        console.log('=== BEFORE SETTING AUTH STATE ===');
         window.__DEBUG_AUTH_STATE__?.();
-
-        console.log('Setting auth state directly for testing');
 
         // Force set all auth-related reactive variables
         setIsAuthenticated(true);
@@ -62,9 +48,7 @@ export const useTestAuth = () => {
         if (userData.profilePicURL) setProfilePicURL(userData.profilePicURL);
         if (userData.modProfileName) setModProfileName(userData.modProfileName);
 
-        console.log('=== AFTER SETTING AUTH STATE ===');
         window.__DEBUG_AUTH_STATE__?.();
-        console.log('Auth state setters have been called');
       };
 
       // Also expose the refresh function (defined below)
@@ -76,13 +60,11 @@ export const useTestAuth = () => {
 
   const refreshAuthState = async () => {
     // Log environment for debugging
-    console.log('Running auth state refresh, NODE_ENV:', process.env.NODE_ENV);
 
     try {
       // Get the token from localStorage (set by Cypress)
       const token = localStorage.getItem('token');
       if (!token) {
-        console.log('No token found in localStorage');
         return;
       }
 
@@ -91,9 +73,7 @@ export const useTestAuth = () => {
       try {
         auth0 = useAuth0();
       } catch (error) {
-        console.log(
-          'Auth0 not available, proceeding with manual state sync. ' + error
-        );
+        // Auth0 not available, proceed with manual state sync
       }
 
       // If Auth0 is available, try to sync its state
@@ -104,8 +84,6 @@ export const useTestAuth = () => {
 
           // If Auth0 recognizes the user, let the normal flow handle it
           if (auth0.isAuthenticated.value && auth0.user.value?.email) {
-            console.log('Auth0 state refreshed, triggering user data load');
-
             // Set loading state
             setIsLoadingAuth(true);
             setIsAuthenticated(true);
@@ -130,11 +108,6 @@ export const useTestAuth = () => {
                 setNotificationCount(
                   userData.NotificationsAggregate?.count || 0
                 );
-
-                console.log('Test auth state refreshed successfully', {
-                  username: userData.username,
-                  authenticated: true,
-                });
               }
             });
 
@@ -142,10 +115,7 @@ export const useTestAuth = () => {
             return;
           }
         } catch (error) {
-          console.log(
-            'Auth0 checkSession failed, falling back to manual sync:',
-            error
-          );
+          // Auth0 checkSession failed, falling back to manual sync
         }
       }
 
@@ -158,8 +128,6 @@ export const useTestAuth = () => {
           const userEmail = payload.email;
 
           if (userEmail) {
-            console.log('Manually refreshing auth state for:', userEmail);
-
             // Set basic auth state immediately
             setIsAuthenticated(true);
             setIsLoadingAuth(true);
@@ -183,11 +151,6 @@ export const useTestAuth = () => {
                 setNotificationCount(
                   userData.NotificationsAggregate?.count || 0
                 );
-
-                console.log('Manual auth state refresh successful', {
-                  username: userData.username,
-                  authenticated: true,
-                });
               }
             });
 
@@ -203,7 +166,6 @@ export const useTestAuth = () => {
       }
 
       // Final fallback: just set basic auth state
-      console.log('Setting basic auth state as fallback');
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Error refreshing auth state:', error);

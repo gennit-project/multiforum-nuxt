@@ -69,14 +69,10 @@ export function useAuthManager() {
           const expiresAt = (claims.value as { exp?: number }).exp;
 
           if (expiresAt && expiresAt <= currentTime + 60) {
-            console.log(
-              'Token is expired or about to expire, attempting refresh'
-            );
             isSessionExpired.value = true;
 
             try {
               await auth0.getAccessTokenSilently({ cacheMode: 'off' });
-              console.log('Token refreshed successfully');
               isSessionExpired.value = false;
             } catch (refreshError) {
               console.error('Failed to refresh token:', refreshError);
@@ -182,9 +178,6 @@ export function useAuthManager() {
         }
 
         sessionStorage.setItem('hasCheckedUsername', 'true');
-        console.log(
-          'Email not found in system, redirecting to create username page'
-        );
         router.push('/create-username');
       }
     }

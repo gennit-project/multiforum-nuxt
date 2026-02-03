@@ -210,12 +210,6 @@ onError((error) => {
 function submit() {
   try {
     const updateInput = channelUpdateInput.value;
-    console.log('Channel update input FilterGroups:', {
-      connect: updateInput.FilterGroups?.[0]?.connect?.length || 0,
-      create: updateInput.FilterGroups?.[0]?.create?.length || 0,
-      disconnect: updateInput.FilterGroups?.[0]?.disconnect?.length || 0,
-    });
-
     updateChannel({
       where: { uniqueName: channelId },
       update: updateInput,

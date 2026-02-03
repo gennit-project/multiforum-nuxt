@@ -112,11 +112,6 @@ const allEdits = computed(() => {
 
 // Navigate to revision detail page
 const viewRevisionDiff = (revision: WikiRevisionData) => {
-  console.log('Navigating to revision:', revision.id);
-  console.log(
-    'Path:',
-    `/forums/${forumId}/wiki/revisions/diff/${slug}/${revision.id}`
-  );
   try {
     router.push(
       `/forums/${forumId}/wiki/revisions/diff/${slug}/${revision.id}`
@@ -214,7 +209,6 @@ useHead({
           class="hover:bg-gray-50 cursor-pointer rounded-md border border-gray-200 px-3 py-2 transition-colors dark:border-gray-700 dark:hover:bg-gray-800/50"
           @click="
             () => {
-              console.log('Click detected on revision:', edit.id);
               viewRevisionDiff(edit);
             }
           "

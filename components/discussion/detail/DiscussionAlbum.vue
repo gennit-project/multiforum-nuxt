@@ -87,26 +87,13 @@ const orderedImages = computed(() => {
   let albumImages: any[] = [];
 
   if (props.album) {
-    console.log('DiscussionAlbum: Album data:', {
-      album: props.album,
-      images: props.album.Images,
-      imageOrder: props.album.imageOrder,
-      imagesLength: props.album.Images?.length,
-      imageOrderLength: props.album.imageOrder?.length,
-    });
-
     if (!props.album.imageOrder || props.album.imageOrder.length === 0) {
-      console.log('DiscussionAlbum: No imageOrder, using Images directly');
       albumImages = props.album.Images || [];
     } else {
       albumImages = props.album.imageOrder
         .map((imageId) => {
           const foundImage = props.album?.Images?.find(
             (image) => image.id === imageId
-          );
-          console.log(
-            `DiscussionAlbum: Looking for image ${imageId}, found:`,
-            foundImage
           );
           return foundImage;
         })
@@ -126,11 +113,6 @@ const orderedImages = computed(() => {
 
   // Combine album images with STL files
   const allImages = [...albumImages, ...stlAsImages];
-
-  console.log(
-    'DiscussionAlbum: Final ordered images (including STL):',
-    allImages
-  );
   return allImages;
 });
 
@@ -176,8 +158,6 @@ const saveCaption = async () => {
 
     emit('album-updated');
     cancelEditingCaption();
-
-    console.log('Caption saved successfully:', result);
   } catch (error) {
     console.error('Error updating caption:', error);
     alert('Error saving caption. Please try again.');

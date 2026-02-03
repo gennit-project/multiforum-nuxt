@@ -37,9 +37,6 @@ const onFileSelected = (event: Event) => {
   const input = event.target as HTMLInputElement;
   if (input && input.files && input.files.length > 0) {
     const file = input.files[0];
-    console.log(
-      `File selected: ${file?.name}, type: ${file?.type}, size: ${file?.size}`
-    );
   }
 
   emit('file-change', {

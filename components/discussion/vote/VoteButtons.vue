@@ -127,7 +127,6 @@ const viewFeedback = () => {
 };
 
 const clickUp = () => {
-  console.log('clickUp');
   emit('clickUp');
 };
 </script>

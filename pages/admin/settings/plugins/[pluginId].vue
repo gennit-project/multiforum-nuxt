@@ -360,7 +360,6 @@ const handleInstall = async (versionOverride?: string) => {
   // Clear any previous error
   installError.value = null;
 
-  console.log('Installing plugin:', pluginId, 'version:', versionToInstall);
 
   try {
     const result = await installMutation({
@@ -368,7 +367,6 @@ const handleInstall = async (versionOverride?: string) => {
       version: versionToInstall,
     });
 
-    console.log('Install result:', result);
 
     // Check for GraphQL errors in the result
     if (result?.errors?.length) {

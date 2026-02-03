@@ -23,13 +23,9 @@ export async function handleAuthError<T>(
   );
 
   if (isAuthError && window.refreshAuthToken) {
-    console.log(
-      'Auth error detected in operation, attempting to refresh token'
-    );
     const refreshSucceeded = await window.refreshAuthToken();
 
     if (refreshSucceeded) {
-      console.log('Token refreshed, retrying operation');
       // Retry the operation with the fresh token
       return await retryFn();
     }

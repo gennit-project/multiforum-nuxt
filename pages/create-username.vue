@@ -22,12 +22,10 @@ if (import.meta.client) {
 
     // Redirect unauthenticated users to home page
     if (!isAuthenticated.value) {
-      console.log('Not authenticated, redirecting to home');
       router.push('/');
     }
     // If we already have a username in state or storage, redirect back to previous page or home
     else if (usernameVar.value || storedUsername) {
-      console.log('Username already exists, no need for creation page');
       const previousPath = sessionStorage.getItem('previousPath') || '/';
       router.push(previousPath);
     }

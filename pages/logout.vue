@@ -9,7 +9,6 @@ const message = ref('Logging out...');
 
 onMounted(() => {
   try {
-    console.log('Logout page mounted');
 
     // Reset authentication state
     setIsAuthenticated(false);
@@ -18,12 +17,10 @@ onMounted(() => {
     // Clear auth tokens
     if (localStorage) {
       localStorage.removeItem('token');
-      console.log('Token removed');
 
       // Get redirect path
       const postLogoutRedirect =
         localStorage.getItem('postLogoutRedirect') || '/';
-      console.log('Redirecting to:', postLogoutRedirect);
 
       // Clear the stored path
       localStorage.removeItem('postLogoutRedirect');

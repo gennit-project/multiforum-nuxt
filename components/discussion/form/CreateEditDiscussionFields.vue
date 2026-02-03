@@ -236,10 +236,6 @@ onMounted(() => {
                   @close-editor="() => {}"
                   @update-form-values="
                     (downloadData) => {
-                      console.log(
-                        'CreateEditDiscussionFields received updateFormValues:',
-                        downloadData
-                      );
                       $emit('updateFormValues', {
                         downloadableFiles: downloadData.downloadableFiles,
                         downloadLabels: downloadData.downloadLabels,
@@ -276,10 +272,6 @@ onMounted(() => {
                   @close-editor="() => {}"
                   @update-form-values="
                     (albumData) => {
-                      console.log(
-                        'CreateEditDiscussionFields received updateFormValues:',
-                        albumData
-                      );
                       $emit('updateFormValues', { album: albumData.album });
                     }
                   "

@@ -52,14 +52,6 @@ onGetServerResult((result) => {
     console.error('Error parsing server rules', e);
   }
 
-  console.log('Loading server config:', {
-    enableDownloads: serverConfig.enableDownloads,
-    enableEvents: serverConfig.enableEvents,
-    serverDescription: serverConfig.serverDescription,
-    allowedFileTypes: serverConfig.allowedFileTypes,
-    pluginRegistries: serverConfig.pluginRegistries,
-  });
-
   formValues.value = {
     serverDescription: serverConfig.serverDescription || '',
     rules,
@@ -68,8 +60,6 @@ onGetServerResult((result) => {
     enableEvents: Boolean(serverConfig.enableEvents),
     pluginRegistries: serverConfig.pluginRegistries || [],
   };
-
-  console.log('Updated form values:', formValues.value);
 });
 
 const serverUpdateInput = computed(() => {
@@ -96,7 +86,6 @@ const {
 } = useMutation(UPDATE_SERVER_CONFIG, {
   update: (cache, { data }) => {
     const newServerConfig = data?.updateServerConfigs.serverConfigs[0];
-    console.log('Mutation response:', { data, newServerConfig });
 
     if (newServerConfig) {
       try {
@@ -119,7 +108,6 @@ const {
           enableEvents: Boolean(newServerConfig.enableEvents),
         };
 
-        console.log('Updated form values after mutation:', formValues.value);
 
         // Also update the cache - reconstruct the full config
         cache.writeQuery({
@@ -152,11 +140,6 @@ onDone(() => {
 });
 
 function submit() {
-  console.log('Submitting server config with:', {
-    input: serverUpdateInput.value,
-    formValues: formValues.value,
-  });
-
   updateServer({
     input: serverUpdateInput.value,
     serverName: config.serverName,
