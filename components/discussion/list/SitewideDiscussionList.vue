@@ -19,6 +19,7 @@ import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import { config } from '@/config';
 import { useAppTheme } from '@/composables/useTheme';
+import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 
 const { theme } = useAppTheme();
 
@@ -100,7 +101,7 @@ const serverConfig = computed(() => {
   return getServerResult.value?.serverConfigs[0] || null;
 });
 
-const discussions = computed(() => {
+const discussions = computed<Discussion[]>(() => {
   if (!discussionResult.value) {
     return [];
   }
@@ -114,7 +115,7 @@ const discussions = computed(() => {
 const selectedDiscussionTitle = computed(() => {
   if (!selectedDiscussionId.value) return '';
   const selected = discussions.value.find(
-    (discussion) => discussion.id === selectedDiscussionId.value
+    (discussion: Discussion) => discussion.id === selectedDiscussionId.value
   );
   return selected?.title || '';
 });
@@ -127,14 +128,14 @@ const selectedDiscussionLink = computed(() => {
 const selectedDiscussionChannels = computed(() => {
   if (!selectedDiscussionId.value) return [];
   const selected = discussions.value.find(
-    (discussion) => discussion.id === selectedDiscussionId.value
+    (discussion: Discussion) => discussion.id === selectedDiscussionId.value
   );
   if (!selected?.DiscussionChannels) return [];
   return selected.DiscussionChannels;
 });
 
 const selectedDiscussionChannelLinks = computed(() => {
-  return selectedDiscussionChannels.value.map((discussionChannel) => {
+  return selectedDiscussionChannels.value.map((discussionChannel: DiscussionChannel) => {
     const commentCount = discussionChannel.CommentsAggregate?.count || 0;
     return {
       channelUniqueName: discussionChannel.channelUniqueName,

@@ -139,7 +139,7 @@ export default defineComponent({
         :issue="issue"
         :channel-id="channelId"
         :is-selectable="true"
-        :selected-issue-number="selectedIssueNumber"
+        :selected-issue-number="selectedIssueNumber ?? undefined"
         @select="handleSelectIssue"
       />
     </ul>

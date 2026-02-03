@@ -717,7 +717,7 @@ const handleLockReasonUpdate = (value: string) => {
             :can-edit-comments="modPermissions.canEditComments"
             :can-edit-discussions="modPermissions.canEditDiscussions"
             :can-edit-events="modPermissions.canEditEvents"
-            :report-count="reportCount"
+            :report-count="reportCount ?? undefined"
             @archived-successfully="refetchIssue"
             @unarchived-successfully="refetchIssue"
             @suspended-user-successfully="refetchIssue"
