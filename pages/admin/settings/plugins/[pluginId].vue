@@ -293,7 +293,7 @@ const registryVersions = computed(
 const shouldAutoUpdate = computed(() => route.query.update === 'true');
 
 const canInstall = computed(() => {
-  return !isSelectedVersionInstalled.value && selectedVersion.value;
+  return !isSelectedVersionInstalled.value && !!selectedVersion.value;
 });
 
 // Get full manifest JSON for display

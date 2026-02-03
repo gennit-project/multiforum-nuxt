@@ -22,6 +22,7 @@ import OnlineInPersonShortcuts from './filters/OnlineInPersonShortcuts.vue';
 import { LocationFilterTypes } from './filters/locationFilterTypes';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
+import type { Event } from '@/__generated__/graphql';
 
 const route = useRoute();
 const router = useRouter();
@@ -128,7 +129,7 @@ const selectedSearchEvent = computed(() => {
   if (!selectedSearchEventId.value) return null;
   return (
     eventResult.value?.events?.find(
-      (event) => event.id === selectedSearchEventId.value
+      (event: Event) => event.id === selectedSearchEventId.value
     ) || null
   );
 });
