@@ -14,7 +14,6 @@ import { UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
 import AlbumEditor from '@/components/discussion/form/AlbumEditor.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { useRoute } from 'vue-router';
-import { usernameVar } from '@/cache';
 
 // Define a simplified type for images used in the form
 type AlbumFormImage = {
@@ -163,15 +162,6 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
           })),
       },
     };
-
-    // Set the Owner to the current logged-in user
-    if (usernameVar.value) {
-      albumNode.Owner = {
-        connect: {
-          where: { node: { username: usernameVar.value } },
-        },
-      };
-    }
 
     // All images should already have IDs since they're created when uploaded
     return {

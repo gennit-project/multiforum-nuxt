@@ -109,7 +109,6 @@ const createEventLink = computed(() => {
   return '/events/create';
 });
 
-const showOnlineOnly = computed(() => route.name === 'SearchEventsList');
 const showInPersonOnly = computed(() => {
   return route.name &&
     typeof route.name === 'string' &&

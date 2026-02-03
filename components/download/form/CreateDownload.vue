@@ -133,15 +133,6 @@ const saveDownloadAlbum = async (discussionId: string) => {
       },
     };
 
-    // Set the Owner to the current logged-in user
-    if (usernameVar.value) {
-      albumNode.Owner = {
-        connect: {
-          where: { node: { username: usernameVar.value } },
-        },
-      };
-    }
-
     // Create album structure similar to getUpdateDiscussionInputForAlbum
     const albumUpdateInput = {
       Album: {

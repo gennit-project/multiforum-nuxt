@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ref } from 'vue';
 import { DEFAULT_FILTER_LABELS } from './useFilterBar';
 
 // Mock the router utils
@@ -18,7 +17,12 @@ vi.mock('@/utils', () => ({
 }));
 
 // Mock nuxt/app router
-const mockRoute = {
+const mockRoute: {
+  params: Record<string, string>;
+  query: Record<string, any>;
+  name: string;
+  path: string;
+} = {
   params: { forumId: 'test-forum' },
   query: {},
   name: 'test-route',

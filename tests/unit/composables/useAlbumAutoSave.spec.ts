@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useAlbumAutoSave } from '@/composables/useAlbumAutoSave';
-import * as mutations from '@/graphQLData/discussion/mutations';
 
 const mockMutate = vi.fn();
 
@@ -22,7 +21,7 @@ describe('useAlbumAutoSave', () => {
 
   describe('album update input building', () => {
     it('returns empty object when no album data', () => {
-      const { debouncedAutoSave, isAutoSaving } = useAlbumAutoSave({
+      const { isAutoSaving } = useAlbumAutoSave({
         discussionId: 'disc-1',
         existingAlbum: null,
         getAlbumData: () => ({ images: [], imageOrder: [] }),

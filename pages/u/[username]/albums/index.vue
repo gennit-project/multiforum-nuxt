@@ -61,10 +61,6 @@ const otherAlbums = computed(() => {
   return sortByNewest(other);
 });
 
-const totalAlbums = computed(() => {
-  return allAlbums.value.length;
-});
-
 // Get first image from album for thumbnail
 const getAlbumThumbnail = (album: any) => {
   if (album.imageOrder && album.imageOrder.length > 0 && album.Images) {
@@ -75,14 +71,6 @@ const getAlbumThumbnail = (album: any) => {
   return album.Images?.[0]?.url || '';
 };
 
-// Get discussion link if album has one
-const getDiscussionLink = (album: any) => {
-  const discussion = album.Discussions?.[0];
-  if (discussion && discussion.DiscussionChannels?.[0]) {
-    return `/forums/${discussion.DiscussionChannels[0].channelUniqueName}/discussions/${discussion.id}`;
-  }
-  return null;
-};
 </script>
 
 <template>

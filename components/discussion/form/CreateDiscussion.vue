@@ -114,22 +114,31 @@ const discussionCreateInput = computed<DiscussionCreateInput>(() => {
     const imageIds = formValues.value.album.images.map((img) => img.id);
 
     // Images already have IDs from when they were uploaded and created in the database
+    const validImages = formValues.value.album.images.filter(
+      (image): image is (typeof image & { id: string }) => Boolean(image.id)
+    );
+
+    const albumNode: {
+      imageOrder: string[];
+      Images: {
+        connect: { where: { node: { id: string } } }[];
+      };
+    } = {
+      // Use the explicit imageOrder if it's valid, otherwise generate from image IDs
+      imageOrder:
+        formValues.value.album.imageOrder.length === imageIds.length
+          ? formValues.value.album.imageOrder.filter((id) => id !== undefined)
+          : imageIds.filter((id) => id !== undefined),
+      Images: {
+        connect: validImages.map((image) => ({
+          where: { node: { id: image.id } },
+        })),
+      },
+    };
+
     result.Album = {
       create: {
-        node: {
-          // Use the explicit imageOrder if it's valid, otherwise generate from image IDs
-          imageOrder:
-            formValues.value.album.imageOrder.length === imageIds.length
-              ? formValues.value.album.imageOrder.filter(
-                  (id) => id !== undefined
-                )
-              : imageIds.filter((id) => id !== undefined),
-          Images: {
-            connect: formValues.value.album.images.map((image) => ({
-              where: { node: { id: image.id } },
-            })),
-          },
-        },
+        node: albumNode,
       },
     };
   }
