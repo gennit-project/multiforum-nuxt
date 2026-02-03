@@ -112,7 +112,7 @@ const toggleDropdown = () => {
         v-if="isDropdownOpen"
         class="absolute left-0 right-0 top-full z-10 mt-1 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800"
       >
-        <nav class="max-h-64 overflow-y-auto p-2">
+        <nav class="max-h-64 overflow-y-auto p-2" aria-label="On this page">
           <button
             v-for="heading in filteredHeadings"
             :key="heading.id"
@@ -146,7 +146,7 @@ const toggleDropdown = () => {
       >
         On This Page
       </h3>
-      <nav class="space-y-1">
+      <nav class="space-y-1" aria-label="On this page">
         <button
           v-for="heading in filteredHeadings"
           :key="heading.id"

@@ -197,7 +197,7 @@ onGetWikiPageResult((result) => {
       <!-- Wiki Page Content -->
       <div class="mb-4">
         <!-- Breadcrumb navigation -->
-        <nav class="mb-4">
+        <nav class="mb-4" aria-label="Wiki breadcrumb">
           <span
             class="cursor-pointer text-orange-600 hover:underline dark:text-orange-400"
             @click="goToWikiHome"
@@ -259,7 +259,11 @@ onGetWikiPageResult((result) => {
       <div class="flex flex-col gap-6 xl:flex-row">
         <!-- Main content - first on mobile/tablet, middle on desktop -->
         <div class="min-w-0 flex-1 xl:order-2">
-          <MarkdownRenderer :text="wikiPage.body" :font-size="fontSize" />
+          <div class="flex w-full justify-center">
+            <div>
+              <MarkdownRenderer :text="wikiPage.body" :font-size="fontSize" />
+            </div>
+          </div>
 
           <!-- Bottom edit button - Docusaurus style -->
           <div class="mt-8 border-t border-gray-200 pt-6 dark:border-gray-700">

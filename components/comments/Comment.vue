@@ -208,7 +208,9 @@ const discussionIdRef = computed(() => {
       : Array.isArray(discussionId)
         ? discussionId[0]
         : undefined;
-  return discussionIdFromRoute || props.commentData.DiscussionChannel?.discussionId;
+  return (
+    discussionIdFromRoute || props.commentData.DiscussionChannel?.discussionId
+  );
 });
 
 // Use the best answer mutations composable
@@ -410,6 +412,7 @@ const label = computed(() => {
                 <div class="w-full overflow-auto">
                   <ArchivedCommentText
                     v-if="props.commentData?.archived"
+                    class="mb-4"
                     :channel-id="forumId"
                     :comment-id="props.commentData.id"
                   />
