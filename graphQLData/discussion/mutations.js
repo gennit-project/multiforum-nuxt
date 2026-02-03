@@ -443,11 +443,12 @@ export const UNMARK_COMMENT_AS_ANSWER = gql`
 `;
 
 export const UPDATE_IMAGE = gql`
-  mutation updateImage($imageId: ID!, $caption: String) {
-    updateImages(where: { id: $imageId }, update: { caption: $caption }) {
+  mutation updateImage($imageId: ID!, $caption: String, $alt: String) {
+    updateImages(where: { id: $imageId }, update: { caption: $caption, alt: $alt }) {
       images {
         id
         caption
+        alt
         url
       }
     }

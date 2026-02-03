@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { computed, watchEffect, ref, onMounted, onUnmounted } from 'vue';
-import { useQuery } from '@vue/apollo-composable';
+import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useRoute, useHead } from 'nuxt/app';
 import { GET_IMAGE_DETAILS } from '@/graphQLData/image/queries';
+import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
 import type { Image } from '@/__generated__/graphql';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
@@ -10,6 +11,11 @@ import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import AddImageToFavorites from '@/components/favorites/AddImageToFavorites.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
+import { usernameVar } from '@/cache';
+import TextEditor from '@/components/TextEditor.vue';
+import SaveButton from '@/components/SaveButton.vue';
+import CancelButton from '@/components/CancelButton.vue';
+import PencilIcon from '@/components/icons/PencilIcon.vue';
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
@@ -57,6 +63,72 @@ const uploader = computed(() => {
 const isCorrectUserPage = computed(() => {
   return uploader.value?.username === username.value;
 });
+
+// Check if logged-in user is the uploader
+const isLoggedInUploader = computed(() => {
+  return usernameVar.value === uploader.value?.username;
+});
+
+// Caption and alt text editing
+type EditingField = 'caption' | 'alt' | null;
+const editingField = ref<EditingField>(null);
+const editingCaption = ref('');
+const editingAlt = ref('');
+
+// Mutation to update image
+const {
+  mutate: updateImage,
+  loading: updateLoading,
+  onDone: onUpdateDone,
+} = useMutation(UPDATE_IMAGE);
+
+onUpdateDone(() => {
+  cancelEditing();
+});
+
+const startEditingCaption = () => {
+  editingField.value = 'caption';
+  editingCaption.value = image.value?.caption || '';
+};
+
+const startEditingAlt = () => {
+  editingField.value = 'alt';
+  editingAlt.value = image.value?.alt || '';
+};
+
+const cancelEditing = () => {
+  editingField.value = null;
+  editingCaption.value = '';
+  editingAlt.value = '';
+};
+
+const saveCaption = async () => {
+  if (!image.value) return;
+
+  try {
+    await updateImage({
+      imageId: image.value.id,
+      caption: editingCaption.value,
+    });
+  } catch (error) {
+    console.error('Error updating caption:', error);
+    alert('Error saving caption. Please try again.');
+  }
+};
+
+const saveAlt = async () => {
+  if (!image.value) return;
+
+  try {
+    await updateImage({
+      imageId: image.value.id,
+      alt: editingAlt.value,
+    });
+  } catch (error) {
+    console.error('Error updating alt text:', error);
+    alert('Error saving alt text. Please try again.');
+  }
+};
 
 // Custom lightbox state
 const isLightboxOpen = ref(false);
@@ -274,6 +346,10 @@ onUnmounted(() => {
 
       <!-- Main content -->
       <div v-else class="space-y-6">
+        <h1 class="text-2xl font-bold dark:text-white">
+          Image uploaded by {{ uploader?.displayName || uploader?.username }}
+        </h1>
+
         <!-- Header with navigation and actions -->
         <div class="flex items-center justify-between">
           <NuxtLink
@@ -369,24 +445,91 @@ onUnmounted(() => {
 
         <!-- Image details -->
         <div class="space-y-4">
+          <!-- Caption section -->
           <div
-            v-if="image.caption"
+            v-if="image.caption || isLoggedInUploader"
             class="rounded-lg border bg-white p-6 dark:bg-gray-900"
           >
-            <h2 class="font-semibold mb-3 text-lg dark:text-gray-300">
-              Caption
-            </h2>
-            <MarkdownPreview :text="image.caption" />
+            <div class="mb-3 flex items-center justify-between">
+              <h2 class="font-semibold text-lg dark:text-gray-300">
+                Caption
+              </h2>
+              <button
+                v-if="isLoggedInUploader && editingField !== 'caption'"
+                type="button"
+                class="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                @click="startEditingCaption"
+              >
+                <PencilIcon class="h-4 w-4" />
+                Edit
+              </button>
+            </div>
+            <div v-if="editingField === 'caption'">
+              <TextEditor
+                :initial-value="editingCaption"
+                :allow-image-upload="false"
+                placeholder="Write a caption..."
+                :rows="3"
+                @update="(text) => (editingCaption = text)"
+              />
+              <div class="mt-3 flex gap-2">
+                <SaveButton
+                  :disabled="updateLoading"
+                  :loading="updateLoading"
+                  @click="saveCaption"
+                />
+                <CancelButton @click="cancelEditing" />
+              </div>
+            </div>
+            <div v-else-if="image.caption">
+              <MarkdownPreview :text="image.caption" />
+            </div>
+            <p v-else class="italic text-gray-500 dark:text-gray-400">
+              No caption added yet.
+            </p>
           </div>
 
+          <!-- Alt text section -->
           <div
-            v-if="image.alt"
+            v-if="image.alt || isLoggedInUploader"
             class="rounded-lg border bg-white p-6 dark:bg-gray-900"
           >
-            <h2 class="font-semibold mb-3 text-lg dark:text-gray-300">
-              Alt Text
-            </h2>
-            <p class="text-gray-700 dark:text-gray-300">{{ image.alt }}</p>
+            <div class="mb-3 flex items-center justify-between">
+              <h2 class="font-semibold text-lg dark:text-gray-300">
+                Alt Text
+              </h2>
+              <button
+                v-if="isLoggedInUploader && editingField !== 'alt'"
+                type="button"
+                class="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                @click="startEditingAlt"
+              >
+                <PencilIcon class="h-4 w-4" />
+                Edit
+              </button>
+            </div>
+            <div v-if="editingField === 'alt'">
+              <textarea
+                v-model="editingAlt"
+                class="w-full rounded-lg border border-gray-300 p-3 text-gray-700 focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                rows="2"
+                placeholder="Describe the image for accessibility..."
+              />
+              <div class="mt-3 flex gap-2">
+                <SaveButton
+                  :disabled="updateLoading"
+                  :loading="updateLoading"
+                  @click="saveAlt"
+                />
+                <CancelButton @click="cancelEditing" />
+              </div>
+            </div>
+            <p v-else-if="image.alt" class="text-gray-700 dark:text-gray-300">
+              {{ image.alt }}
+            </p>
+            <p v-else class="italic text-gray-500 dark:text-gray-400">
+              No alt text added yet.
+            </p>
           </div>
 
           <div
