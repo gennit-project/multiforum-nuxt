@@ -2,7 +2,7 @@
 import { ref, computed, watch } from 'vue';
 import * as yaml from 'js-yaml';
 import PipelineYamlEditor from './PipelineYamlEditor.vue';
-import type { PipelineConfig, PipelineScope } from '@/utils/pipelineSchema';
+import type { PipelineConfig, PipelineConfigScope } from '@/utils/pipelineSchema';
 import {
   getDefaultPipelineYaml,
   validatePipelineConfig,
@@ -14,7 +14,7 @@ const props = withDefaults(
     initialConfig?: PipelineConfig;
     availablePlugins: { id: string; name: string }[];
     saving?: boolean;
-    scope?: PipelineScope;
+    scope?: PipelineConfigScope;
   }>(),
   {
     initialConfig: undefined,
