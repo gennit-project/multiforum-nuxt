@@ -456,7 +456,7 @@ onMounted(() => {
               </div>
               <div
                 v-if="activeImage"
-                class="cursor-pointer"
+                class="h-full w-full cursor-pointer"
                 @click="openLightbox(activeIndex)"
               >
                 <ModelViewer
