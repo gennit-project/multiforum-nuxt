@@ -2,11 +2,16 @@
 import { ref, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useQuery, useMutation } from '@vue/apollo-composable';
-import FormRow from '@/components/FormRow.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import PluginSettingsForm from '@/components/plugins/PluginSettingsForm.vue';
+import PluginDetailHeader from '@/components/admin/plugins/PluginDetailHeader.vue';
+import PluginStatusCards from '@/components/admin/plugins/PluginStatusCards.vue';
+import PluginUpdateBanner from '@/components/admin/plugins/PluginUpdateBanner.vue';
+import PluginInstallSection from '@/components/admin/plugins/PluginInstallSection.vue';
+import PluginSecretsSection from '@/components/admin/plugins/PluginSecretsSection.vue';
+import PluginSettingsSection from '@/components/admin/plugins/PluginSettingsSection.vue';
+import PluginManifestSection from '@/components/admin/plugins/PluginManifestSection.vue';
+import PluginReadmeSection from '@/components/admin/plugins/PluginReadmeSection.vue';
 import { useToast } from '@/composables/useToast';
 import { compareVersionStrings } from '@/utils/versionUtils';
 import {
@@ -128,11 +133,7 @@ const installedPlugin = computed((): InstalledPlugin | null => {
 
 // Plugin slug (name) used for secrets - must be defined before secrets query
 const pluginSlug = computed(() => {
-  return (
-    installedPlugin.value?.plugin?.name ||
-    plugin.value?.name ||
-    ''
-  );
+  return installedPlugin.value?.plugin?.name || plugin.value?.name || '';
 });
 
 // Secrets query - uses pluginSlug (plugin name) not the route param (plugin id)
@@ -467,7 +468,6 @@ const handleSetSecret = async (key: string, value: string) => {
   }
 };
 
-
 const handleSaveSettings = async () => {
   if (!installedPlugin.value) return;
   if (!pluginSlug.value) return;
@@ -508,7 +508,10 @@ const handleSaveSettings = async () => {
     }
 
     // Filter out secrets from settingsJson
-    const nonSecretSettings = filterOutSecrets(settingsValues.value, secretKeys);
+    const nonSecretSettings = filterOutSecrets(
+      settingsValues.value,
+      secretKeys
+    );
 
     await enableMutation({
       pluginId: pluginSlug.value,
@@ -530,33 +533,6 @@ const handleSaveSettings = async () => {
     toast.error(`Failed to save settings: ${err.message}`);
   } finally {
     savingSettings.value = false;
-  }
-};
-
-
-const getSecretStatusColor = (status: string) => {
-  switch (status) {
-    case 'VALID':
-      return 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200';
-    case 'INVALID':
-      return 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-200';
-    case 'SET_UNTESTED':
-      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200';
-    default:
-      return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
-  }
-};
-
-const getSecretStatusText = (status: string) => {
-  switch (status) {
-    case 'VALID':
-      return 'Valid';
-    case 'INVALID':
-      return 'Invalid';
-    case 'SET_UNTESTED':
-      return 'Set (untested)';
-    default:
-      return 'Not set';
   }
 };
 </script>
@@ -592,432 +568,63 @@ const getSecretStatusText = (status: string) => {
         <!-- Plugin Detail -->
         <div v-else class="space-y-6">
           <!-- Header -->
-          <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <!-- Plugin Name and Version -->
-              <div class="flex items-center space-x-3">
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                  {{ pluginDisplayName }}
-                </h1>
-                <span
-                  v-if="installedVersion"
-                  class="rounded bg-gray-100 px-2 py-1 font-mono text-sm text-gray-600 dark:bg-gray-700 dark:text-gray-300"
-                >
-                  v{{ installedVersion }}
-                </span>
-              </div>
-
-              <!-- Author and License -->
-              <div
-                class="mt-1 flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400"
-              >
-                <span v-if="pluginAuthorName">
-                  by
-                  <a
-                    v-if="pluginAuthorUrl"
-                    :href="pluginAuthorUrl"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-orange-600 hover:underline dark:text-orange-400"
-                  >
-                    {{ pluginAuthorName }}
-                  </a>
-                  <span v-else>{{ pluginAuthorName }}</span>
-                </span>
-                <span
-                  v-if="pluginAuthorName && pluginLicense"
-                  class="text-gray-400"
-                  >•</span
-                >
-                <span
-                  v-if="pluginLicense"
-                  class="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-200"
-                >
-                  {{ pluginLicense }}
-                </span>
-              </div>
-
-              <!-- Description -->
-              <p
-                v-if="pluginDescription"
-                class="mt-2 text-sm text-gray-600 dark:text-gray-400"
-              >
-                {{ pluginDescription }}
-              </p>
-
-              <!-- Links -->
-              <div class="mt-2 flex items-center space-x-4 text-sm">
-                <a
-                  v-if="pluginHomepage"
-                  :href="pluginHomepage"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="flex items-center text-orange-600 hover:underline dark:text-orange-400"
-                >
-                  <i class="fa-solid fa-home mr-1" />
-                  Homepage
-                </a>
-                <a
-                  v-if="pluginRepoUrl"
-                  :href="pluginRepoUrl"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="flex items-center text-orange-600 hover:underline dark:text-orange-400"
-                >
-                  <i class="fa-solid fa-code mr-1" />
-                  View Source
-                </a>
-              </div>
-
-              <!-- Tags -->
-              <div
-                v-if="pluginTags.length > 0"
-                class="mt-3 flex flex-wrap gap-2"
-              >
-                <span
-                  v-for="tag in pluginTags"
-                  :key="tag"
-                  class="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-300"
-                >
-                  {{ tag }}
-                </span>
-              </div>
-
-            </div>
-            <NuxtLink
-              to="/admin/plugins"
-              class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-            >
-              <i class="fa-solid fa-arrow-left mr-2" />
-              Back to Plugins
-            </NuxtLink>
-          </div>
+          <PluginDetailHeader
+            :plugin-display-name="pluginDisplayName"
+            :installed-version="installedVersion"
+            :plugin-author-name="pluginAuthorName"
+            :plugin-author-url="pluginAuthorUrl"
+            :plugin-license="pluginLicense"
+            :plugin-description="pluginDescription"
+            :plugin-homepage="pluginHomepage"
+            :plugin-repo-url="pluginRepoUrl"
+            :plugin-tags="pluginTags"
+          />
 
           <!-- Prominent Status Cards (only shown when installed) -->
-          <div v-if="isInstalled" class="space-y-4">
-            <!-- Installed Status Card -->
-            <div
-              class="rounded-xl border-2 border-green-300 bg-green-50 p-6 dark:border-green-700 dark:bg-green-900/30"
-            >
-              <div class="flex items-center">
-                <div class="flex-shrink-0">
-                  <div class="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-800">
-                    <i class="fa-solid fa-check text-2xl text-green-600 dark:text-green-300" />
-                  </div>
-                </div>
-                <div class="ml-4">
-                  <p class="text-lg font-semibold text-green-800 dark:text-green-200">
-                    Plugin Installed
-                  </p>
-                  <p class="text-sm text-green-700 dark:text-green-300">
-                    Version <span class="font-mono font-semibold">v{{ installedVersion }}</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Enable/Disable Status Card -->
-            <div
-              :class="[
-                'rounded-xl border-2 p-6 transition-all',
-                isEnabled
-                  ? 'border-blue-300 bg-blue-50 dark:border-blue-700 dark:bg-blue-900/30'
-                  : 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/50'
-              ]"
-            >
-              <!-- Enabled State -->
-              <div v-if="isEnabled" class="flex items-center justify-between">
-                <div class="flex items-center">
-                  <div class="flex-shrink-0">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-800">
-                      <i class="fa-solid fa-power-off text-2xl text-blue-600 dark:text-blue-300" />
-                    </div>
-                  </div>
-                  <div class="ml-4">
-                    <p class="text-lg font-semibold text-blue-800 dark:text-blue-200">
-                      Plugin Enabled
-                    </p>
-                    <p class="text-sm text-blue-700 dark:text-blue-300">
-                      Running server-wide
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  class="rounded-lg border border-blue-300 bg-white px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-blue-600 dark:bg-blue-800 dark:text-blue-200 dark:hover:bg-blue-700"
-                  :disabled="enabling"
-                  @click="handleToggleEnabled(false)"
-                >
-                  <i v-if="enabling" class="fa-solid fa-spinner mr-2 animate-spin" />
-                  Disable
-                </button>
-              </div>
-
-              <!-- Disabled State - Large CTA -->
-              <div v-else class="flex flex-col items-center text-center">
-                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
-                  <i class="fa-solid fa-power-off text-2xl text-gray-500 dark:text-gray-400" />
-                </div>
-                <p class="mt-3 text-lg font-semibold text-gray-800 dark:text-gray-200">
-                  Plugin Disabled
-                </p>
-                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                  {{ canEnable ? 'Ready to enable' : 'Configure required secrets first' }}
-                </p>
-                <button
-                  v-if="canEnable"
-                  type="button"
-                  class="mt-4 w-full rounded-lg bg-green-700 px-6 py-3 text-lg font-semibold text-white shadow-lg hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  :disabled="enabling"
-                  @click="handleToggleEnabled(true)"
-                >
-                  <i v-if="enabling" class="fa-solid fa-spinner mr-2 animate-spin" />
-                  <i v-else class="fa-solid fa-power-off mr-2" />
-                  Enable Plugin
-                </button>
-                <p v-if="canEnable" class="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                  <i class="fa-solid fa-info-circle mr-1" />
-                  After enabling, restart the backend for changes to take effect
-                </p>
-                <p v-else class="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                  <i class="fa-solid fa-lock mr-1" />
-                  Configure secrets below to enable
-                </p>
-              </div>
-            </div>
-          </div>
+          <PluginStatusCards
+            v-if="isInstalled"
+            :is-enabled="isEnabled"
+            :installed-version="installedVersion"
+            :can-enable="canEnable"
+            :enabling="enabling"
+            @toggle-enabled="handleToggleEnabled"
+          />
 
           <!-- Update Available Banner -->
-          <div
+          <PluginUpdateBanner
             v-if="hasUpdate && latestVersion"
-            class="bg-blue-50 rounded-lg border border-blue-200 p-4 dark:border-blue-800 dark:bg-blue-900/20"
-          >
-            <div class="flex items-start">
-              <div class="flex-shrink-0">
-                <i class="fa-solid fa-arrow-circle-up text-xl text-blue-500" />
-              </div>
-              <div class="ml-3 flex-1">
-                <h3
-                  class="text-sm font-medium text-blue-800 dark:text-blue-200"
-                >
-                  Update Available
-                </h3>
-                <div class="mt-1 text-sm text-blue-700 dark:text-blue-300">
-                  <p>
-                    A newer version is available:
-                    <span class="font-semibold font-mono"
-                      >v{{ latestVersion }}</span
-                    >
-                    (currently installed: v{{ installedVersion }})
-                  </p>
-                  <p v-if="registryVersions.length > 1" class="mt-1 text-xs">
-                    {{ registryVersions.length }} versions available in registry
-                  </p>
-                </div>
-              </div>
-              <div class="ml-4">
-                <button
-                  type="button"
-                  class="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                  :disabled="installing"
-                  @click="handleInstall(latestVersion!)"
-                >
-                  <i
-                    v-if="installing"
-                    class="fa-solid fa-spinner mr-1 animate-spin"
-                  />
-                  <i v-else class="fa-solid fa-arrow-up mr-1" />
-                  Update to v{{ latestVersion }}
-                </button>
-              </div>
-            </div>
-          </div>
+            :latest-version="latestVersion"
+            :installed-version="installedVersion"
+            :registry-versions="registryVersions"
+            :installing="installing"
+            @install-latest="handleInstall(latestVersion!)"
+          />
 
           <!-- Installation Error Banner -->
           <ErrorBanner v-if="installError" :text="installError" />
 
           <!-- Installation Section -->
-          <FormRow section-title="Installation">
-            <template #content>
-              <div class="space-y-4">
-                <!-- Version Selection -->
-                <div>
-                  <label
-                    for="plugin-version-select"
-                    class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {{ isInstalled ? 'Change Version' : 'Select Version' }}
-                  </label>
-                  <div class="flex items-center space-x-4">
-                    <select
-                      id="plugin-version-select"
-                      v-model="selectedVersion"
-                      class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    >
-                      <option
-                        v-for="version in availableVersions"
-                        :key="version.version"
-                        :value="version.version"
-                      >
-                        v{{ version.version
-                        }}{{
-                          version.version === installedVersion
-                            ? ' (Installed)'
-                            : ''
-                        }}{{
-                          version.version === latestVersion &&
-                          version.version !== installedVersion
-                            ? ' (Latest)'
-                            : ''
-                        }}
-                      </option>
-                    </select>
-
-                    <button
-                      v-if="!isInstalled"
-                      type="button"
-                      class="rounded-md bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
-                      :disabled="installing || !selectedVersion"
-                      @click="handleInstall()"
-                    >
-                      <i
-                        v-if="installing"
-                        class="fa-solid fa-spinner mr-2 animate-spin"
-                      />
-                      Install
-                    </button>
-
-                    <button
-                      v-else-if="canInstall"
-                      type="button"
-                      class="rounded-md bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
-                      :disabled="installing || !selectedVersion"
-                      @click="handleInstall()"
-                    >
-                      <i
-                        v-if="installing"
-                        class="fa-solid fa-spinner mr-2 animate-spin"
-                      />
-                      Install v{{ selectedVersion }}
-                    </button>
-
-                    <div
-                      v-else-if="isSelectedVersionInstalled"
-                      class="flex items-center text-sm text-green-600 dark:text-green-400"
-                    >
-                      <i class="fa-solid fa-check mr-2" />
-                      This version is already installed
-                    </div>
-
-                    <div
-                      v-else-if="!hasNewerVersions"
-                      class="text-sm text-gray-500 dark:text-gray-400"
-                    >
-                      No other versions available
-                    </div>
-                  </div>
-
-                  <!-- Version Status Help -->
-                  <div
-                    v-if="isInstalled"
-                    class="mt-2 text-xs text-gray-500 dark:text-gray-400"
-                  >
-                    <p v-if="hasNewerVersions">
-                      Select a different version to install an update or
-                      downgrade.
-                    </p>
-                    <p v-else>You have the only available version installed.</p>
-                  </div>
-                </div>
-              </div>
-            </template>
-          </FormRow>
+          <PluginInstallSection
+            v-model="selectedVersion"
+            :is-installed="isInstalled"
+            :available-versions="availableVersions"
+            :installed-version="installedVersion"
+            :latest-version="latestVersion"
+            :installing="installing"
+            :can-install="canInstall"
+            :is-selected-version-installed="isSelectedVersionInstalled"
+            :has-newer-versions="hasNewerVersions"
+            @install="handleInstall()"
+          />
 
           <!-- Secrets Section -->
-          <FormRow
-            v-if="isInstalled && secrets.length > 0"
-            section-title="Required Secrets"
-          >
-            <template #content>
-              <div class="space-y-4">
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                  Configure server-wide secrets required by this plugin.
-                </p>
-
-                <div
-                  v-for="secret in secrets"
-                  :key="secret.key"
-                  class="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
-                >
-                  <div class="mb-3 flex items-center justify-between">
-                    <div class="flex items-center space-x-2">
-                      <span class="font-medium text-gray-900 dark:text-white">
-                        {{ secret.key }}
-                      </span>
-                      <span
-                        class="font-semibold rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-300"
-                      >
-                        Server
-                      </span>
-                      <span
-                        class="font-semibold rounded-full px-2 py-1 text-xs"
-                        :class="getSecretStatusColor(secret.status)"
-                      >
-                        {{ getSecretStatusText(secret.status) }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- Secret Input -->
-                  <div v-if="showSecretInputs[secret.key]" class="space-y-2">
-                    <input
-                      v-model="secretValues[secret.key]"
-                      type="password"
-                      placeholder="Enter secret value"
-                      class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    >
-                    <div class="flex space-x-2">
-                      <button
-                        type="button"
-                        class="rounded bg-orange-600 px-3 py-1 text-sm text-white hover:bg-orange-700"
-                        :disabled="!secretValues[secret.key]"
-                        @click="
-                          handleSetSecret(
-                            secret.key,
-                            secretValues[secret.key] || ''
-                          )
-                        "
-                      >
-                        Save
-                      </button>
-                      <button
-                        type="button"
-                        class="rounded bg-gray-300 px-3 py-1 text-sm text-gray-700 hover:bg-gray-400"
-                        @click="showSecretInputs[secret.key] = false"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Action Buttons -->
-                  <div v-else class="flex space-x-2">
-                    <button
-                      type="button"
-                      class="rounded bg-gray-100 px-3 py-1 text-sm text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-                      @click="showSecretInputs[secret.key] = true"
-                    >
-                      {{
-                        secret.status === 'NOT_SET'
-                          ? 'Set Secret'
-                          : 'Update Secret'
-                      }}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </template>
-          </FormRow>
+          <PluginSecretsSection
+            v-if="isInstalled"
+            v-model:secret-values="secretValues"
+            v-model:show-secret-inputs="showSecretInputs"
+            :secrets="secrets"
+            @set-secret="handleSetSecret"
+          />
 
           <!-- Loading State for Secrets -->
           <div v-if="secretsLoading" class="py-4 text-center">
@@ -1028,90 +635,24 @@ const getSecretStatusText = (status: string) => {
           </div>
 
           <!-- Server Settings Section -->
-          <FormRow
-            v-if="isInstalled && serverSettingsSections.length > 0"
-            section-title=""
-          >
-            <template #content>
-              <div class="space-y-6">
-                <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
-                  <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
-                    Server-Scoped Plugin Settings
-                  </h2>
-                  <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    Configure server-wide settings for this plugin.
-                  </p>
-                </div>
-
-                <PluginSettingsForm
-                  v-model="settingsValues"
-                  :sections="serverSettingsSections"
-                  :errors="settingsErrors"
-                  :secret-statuses="secretStatusesForForm"
-                />
-
-                <div
-                  class="flex justify-end border-t border-gray-200 pt-4 dark:border-gray-700"
-                >
-                  <button
-                    type="button"
-                    class="rounded-md bg-orange-700 px-4 py-2 text-white hover:bg-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
-                    :disabled="savingSettings"
-                    @click="handleSaveSettings"
-                  >
-                    <i
-                      v-if="savingSettings"
-                      class="fa-solid fa-spinner mr-2 animate-spin"
-                    />
-                    Save Settings
-                  </button>
-                </div>
-              </div>
-            </template>
-          </FormRow>
+          <PluginSettingsSection
+            v-if="isInstalled"
+            v-model="settingsValues"
+            :sections="serverSettingsSections"
+            :errors="settingsErrors"
+            :secret-statuses="secretStatusesForForm"
+            :saving="savingSettings"
+            @save="handleSaveSettings"
+          />
 
           <!-- Plugin Manifest JSON -->
-          <FormRow
-            v-if="manifestJson"
-            section-title="Plugin Manifest"
-          >
-            <template #content>
-              <div
-                tabindex="0"
-                role="region"
-                aria-label="Plugin manifest JSON"
-                class="max-h-96 overflow-auto rounded-md border border-gray-300 bg-gray-900 p-3 dark:border-gray-600"
-              >
-                <pre class="whitespace-pre-wrap break-words text-sm text-gray-100">{{ manifestJson }}</pre>
-              </div>
-            </template>
-          </FormRow>
+          <PluginManifestSection :manifest-json="manifestJson" />
 
           <!-- README Section -->
-          <FormRow
-            v-if="pluginReadme || pluginDetailLoading"
-            section-title="Documentation"
-          >
-            <template #content>
-              <div
-                v-if="pluginDetailLoading && !pluginReadme"
-                class="py-4 text-center"
-              >
-                <div
-                  class="inline-flex items-center text-gray-600 dark:text-gray-400"
-                >
-                  <i class="fa-solid fa-spinner mr-2 animate-spin" />
-                  Loading documentation...
-                </div>
-              </div>
-              <div
-                v-else
-                class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800"
-              >
-                <MarkdownRenderer :text="pluginReadme" font-size="small" />
-              </div>
-            </template>
-          </FormRow>
+          <PluginReadmeSection
+            :plugin-readme="pluginReadme"
+            :plugin-detail-loading="pluginDetailLoading"
+          />
         </div>
       </template>
       <template #does-not-have-auth>
