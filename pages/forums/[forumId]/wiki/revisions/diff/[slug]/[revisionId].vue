@@ -287,7 +287,10 @@ useHead({
     <div v-else class="space-y-6">
       <!-- Header -->
       <div class="border-b border-gray-200 pb-4 dark:border-gray-700">
-        <nav class="mb-4 flex items-center space-x-2 text-sm">
+        <nav
+          class="mb-4 flex items-center space-x-2 text-sm"
+          aria-label="Wiki revision detail breadcrumb"
+        >
           <button
             class="text-orange-600 hover:underline dark:text-orange-400"
             @click="goBackToWiki"
