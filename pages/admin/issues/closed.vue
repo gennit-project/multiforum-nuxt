@@ -8,9 +8,13 @@ import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
 import SearchBar from '@/components/SearchBar.vue';
 import { updateFilters } from '@/utils/routerUtils';
 import { createCaseInsensitivePattern } from '@/utils/searchUtils';
+import { useUIStore } from '@/stores/uiStore';
+import { storeToRefs } from 'pinia';
 
 const route = useRoute();
 const router = useRouter();
+const uiStore = useUIStore();
+const { selectedIssueNumber } = storeToRefs(uiStore);
 
 const channelId = computed(() => {
   if (typeof route.params.forumId !== 'string') {
@@ -66,6 +70,14 @@ const updateSearchInput = (value: string) => {
   });
 };
 
+const handleSelectIssue = (payload: {
+  issueNumber: number;
+  title: string;
+  channelId: string;
+}) => {
+  uiStore.setSelectedIssueSelection(payload);
+};
+
 // Watch for route change to update searchInput and refetch
 watch(
   () => route.query,
@@ -96,12 +108,15 @@ watch(
       class="divide-y border-t border-gray-200 dark:border-gray-800 dark:text-white"
       data-testid="issue-list"
     >
-      <ModIssueListItem
-        v-for="issue in issues"
-        :key="issue.id"
-        :issue="issue"
-        :channel-id="channelId"
-      />
+        <ModIssueListItem
+          v-for="issue in issues"
+          :key="issue.id"
+          :issue="issue"
+          :channel-id="channelId"
+          :is-selectable="true"
+          :selected-issue-number="selectedIssueNumber"
+          @select="handleSelectIssue"
+        />
     </ul>
   </div>
 </template>

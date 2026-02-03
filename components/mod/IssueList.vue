@@ -1,6 +1,7 @@
 <script lang="ts">
 import { computed, defineComponent, ref, watch } from 'vue';
 import type { Issue } from '@/__generated__/graphql';
+import { useUIStore } from '@/stores/uiStore';
 import { GET_ISSUES_BY_CHANNEL } from '@/graphQLData/issue/queries';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
@@ -8,6 +9,7 @@ import { updateFilters } from '@/utils/routerUtils';
 import { createCaseInsensitivePattern } from '@/utils/searchUtils';
 import SearchBar from '@/components/SearchBar.vue';
 import ModIssueListItem from './ModIssueListItem.vue';
+import { storeToRefs } from 'pinia';
 
 export default defineComponent({
   components: {
@@ -15,6 +17,8 @@ export default defineComponent({
     SearchBar,
   },
   setup() {
+    const uiStore = useUIStore();
+    const { selectedIssueNumber } = storeToRefs(uiStore);
     const route = useRoute();
     const router = useRouter();
 
@@ -61,6 +65,14 @@ export default defineComponent({
       });
     };
 
+    const handleSelectIssue = (payload: {
+      issueNumber: number;
+      title: string;
+      channelId: string;
+    }) => {
+      uiStore.setSelectedIssueSelection(payload);
+    };
+
     watch(
       () => route.query,
       () => {
@@ -72,51 +84,78 @@ export default defineComponent({
       }
     );
 
+    watch(
+      channelId,
+      (newChannelId, oldChannelId) => {
+        if (newChannelId !== oldChannelId) {
+          uiStore.clearSelectedIssueSelection();
+        }
+      }
+    );
+
     return {
       channelId,
       issues,
       getIssuesByChannelLoading,
       searchInput,
       updateSearchInput,
+      handleSelectIssue,
+      selectedIssueNumber,
     };
   },
 });
 </script>
 
 <template>
-  <div class="border-t border-gray-200 dark:border-gray-800 dark:text-white">
-    <div class="px-4 py-4">
-      <SearchBar
-        :initial-value="searchInput"
-        :search-placeholder="'Search issues'"
-        :test-id="'issue-search-input'"
-        :debounce-ms="500"
-        @update-search-input="updateSearchInput"
-      />
-    </div>
+  <div class="lg:flex lg:gap-6">
     <div
-      v-if="!getIssuesByChannelLoading && issues.length === 0"
-      class="px-4 py-6 text-sm text-gray-600 dark:text-gray-300"
+      class="border-t border-gray-200 dark:border-gray-800 dark:text-white lg:w-1/2 lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto"
     >
-      There are no issues yet.
-      <nuxt-link
-        :to="{
-          name: 'forums-forumId-issues-create',
-          params: { forumId: channelId },
-        }"
-        class="text-blue-600 underline hover:underline dark:text-blue-400"
+      <div class="px-4 py-4">
+        <SearchBar
+          :initial-value="searchInput"
+          :search-placeholder="'Search issues'"
+          :test-id="'issue-search-input'"
+          :debounce-ms="500"
+          @update-search-input="updateSearchInput"
+        />
+      </div>
+      <div
+        v-if="!getIssuesByChannelLoading && issues.length === 0"
+        class="px-4 py-6 text-sm text-gray-600 dark:text-gray-300"
       >
-        Create one?
-      </nuxt-link>
-    </div>
+        There are no issues yet.
+        <nuxt-link
+          :to="{
+            name: 'forums-forumId-issues-create',
+            params: { forumId: channelId },
+          }"
+          class="text-blue-600 underline hover:underline dark:text-blue-400"
+        >
+          Create one?
+        </nuxt-link>
+      </div>
     <ul class="divide-y" data-testid="issue-list">
       <ModIssueListItem
         v-for="issue in issues"
         :key="issue.id"
         :issue="issue"
         :channel-id="channelId"
+        :is-selectable="true"
+        :selected-issue-number="selectedIssueNumber"
+        @select="handleSelectIssue"
       />
     </ul>
+    </div>
+    <div
+      class="hidden lg:flex lg:w-1/2 lg:h-[calc(100vh-3.5rem)] lg:items-center lg:justify-center lg:overflow-y-auto"
+    >
+      <div
+        class="w-full rounded-lg border border-dashed border-gray-300 p-6 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400"
+      >
+        Select an issue to view details.
+      </div>
+    </div>
   </div>
 </template>
 

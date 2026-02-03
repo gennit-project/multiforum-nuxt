@@ -8,9 +8,15 @@ import {
 } from '@/graphQLData/mod/queries';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
+import IssueDetail from '@/components/mod/IssueDetail.vue';
+import { useUIStore } from '@/stores/uiStore';
+import { storeToRefs } from 'pinia';
 
 const route = useRoute();
 const router = useRouter();
+const uiStore = useUIStore();
+const { selectedIssueNumber, selectedIssueTitle, selectedIssueChannelId } =
+  storeToRefs(uiStore);
 const {
   result: issuesResult,
   error: issuesError,

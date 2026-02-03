@@ -5,6 +5,7 @@ import FlagIcon from '@/components/icons/FlagIcon.vue';
 import CogIcon from '@/components/icons/CogIcon.vue';
 import IdentificationIcon from '../icons/IdentificationIcon.vue';
 import PlugIcon from '@/components/icons/PlugIcon.vue';
+import InfoIcon from '@/components/icons/InfoIcon.vue';
 import type { Channel } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
 
@@ -43,6 +44,7 @@ const tabRoutes = computed(() => {
     settings: `/admin/settings`,
     roles: `/admin/roles`,
     plugins: `/admin/plugins`,
+    about: `/admin/about`,
   };
   return routes;
 });
@@ -79,6 +81,13 @@ const tabs = computed((): Tab[] => {
       routeSuffix: 'plugins',
       label: 'Plugins',
       icon: PlugIcon,
+      countProperty: null,
+    },
+    {
+      name: 'about',
+      routeSuffix: 'about',
+      label: 'About',
+      icon: InfoIcon,
       countProperty: null,
     },
   ];

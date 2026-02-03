@@ -82,6 +82,12 @@ const showChannelSidebarOnDetail = computed(() => {
   return showDiscussionTitle.value;
 });
 
+const showChannelSidebarOnIssueDetail = computed(() => {
+  return route.name
+    ?.toString()
+    .includes('forums-forumId-issues-issueNumber');
+});
+
 const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
@@ -402,6 +408,19 @@ definePageMeta({
                 >
                   Select a discussion to view details.
                 </div>
+              </div>
+              <div
+                v-if="showChannelSidebarOnIssueDetail"
+                class="hidden md:flex md:w-1/3 md:flex-col md:overflow-y-auto"
+                tabindex="0"
+                aria-label="Forum sidebar"
+              >
+                <ChannelSidebar
+                  v-if="channel"
+                  :channel="channel"
+                  class="px-4"
+                  @refetch-channel-data="handleRefetchChannelData"
+                />
               </div>
               <div
                 v-if="showChannelSidebarOnDetail"

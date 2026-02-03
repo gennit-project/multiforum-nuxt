@@ -14,7 +14,19 @@ const props = defineProps({
     type: Object as () => Issue,
     required: true,
   },
+  isSelectable: {
+    type: Boolean,
+    default: false,
+  },
+  selectedIssueNumber: {
+    type: Number,
+    default: null,
+  },
 });
+
+const emit = defineEmits<{
+  select: [payload: { issueNumber: number; title: string; channelId: string }];
+}>();
 
 const formatDate = (date: string) => {
   return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);
@@ -41,6 +53,19 @@ const reportCountLabel = computed(() => {
   if (reportCount.value === null) return '';
   return `${reportCount.value} ${reportCount.value === 1 ? 'report' : 'reports'}`;
 });
+
+const handleSelect = () => {
+  if (!props.issue?.issueNumber || !props.issue.Channel?.uniqueName) return;
+  emit('select', {
+    issueNumber: props.issue.issueNumber,
+    title: props.issue.title || '',
+    channelId: props.issue.Channel.uniqueName,
+  });
+};
+
+const isSelected = computed(() => {
+  return props.selectedIssueNumber === props.issue?.issueNumber;
+});
 </script>
 
 <template>
@@ -55,7 +80,7 @@ const reportCountLabel = computed(() => {
         <span v-if="issue.Channel" class="flex flex-wrap items-center gap-2">
           <nuxt-link
             v-if="issue.issueNumber"
-            class="hover:underline dark:text-gray-200"
+            class="hover:underline dark:text-gray-200 lg:hidden"
             :to="{
               name: 'forums-forumId-issues-issueNumber',
               params: {
@@ -63,9 +88,26 @@ const reportCountLabel = computed(() => {
                 forumId: issue.Channel?.uniqueName,
               },
             }"
+            @click="handleSelect"
           >
             {{ issue.title }}
           </nuxt-link>
+          <button
+            v-if="issue.issueNumber"
+            type="button"
+            class="hidden text-left hover:underline dark:text-gray-200 lg:inline-block"
+            @click="handleSelect"
+          >
+            <span
+              :class="
+                isSelected
+                  ? 'rounded bg-gray-100 px-1 dark:bg-gray-700'
+                  : ''
+              "
+            >
+              {{ issue.title }}
+            </span>
+          </button>
           <span v-else class="dark:text-gray-200">{{ issue.title }}</span>
           <span
             v-if="issue.locked"
