@@ -80,16 +80,12 @@ describe('useAlbumImageUpload', () => {
     it('creates image record and returns image data', async () => {
       mockCreateImage.mockResolvedValue({
         data: {
-          createImages: {
-            images: [
-              {
-                id: 'img-123',
-                url: 'https://example.com/image.jpg',
-                alt: '',
-                caption: '',
-                copyright: '',
-              },
-            ],
+          createImageWithUploader: {
+            id: 'img-123',
+            url: 'https://example.com/image.jpg',
+            alt: '',
+            caption: '',
+            copyright: '',
           },
         },
       });
@@ -114,9 +110,7 @@ describe('useAlbumImageUpload', () => {
     it('returns null when image creation fails', async () => {
       mockCreateImage.mockResolvedValue({
         data: {
-          createImages: {
-            images: [],
-          },
+          createImageWithUploader: null,
         },
       });
 
@@ -182,8 +176,12 @@ describe('useAlbumImageUpload', () => {
       });
       mockCreateImage.mockResolvedValue({
         data: {
-          createImages: {
-            images: [{ id: 'img-1', url: 'https://example.com/1.jpg', alt: 'file1.jpg', caption: '', copyright: '' }],
+          createImageWithUploader: {
+            id: 'img-1',
+            url: 'https://example.com/1.jpg',
+            alt: 'file1.jpg',
+            caption: '',
+            copyright: '',
           },
         },
       });

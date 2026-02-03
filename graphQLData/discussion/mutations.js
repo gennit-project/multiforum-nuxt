@@ -10,34 +10,28 @@ export const CREATE_SIGNED_STORAGE_URL = gql`
 
 export const CREATE_IMAGE = gql`
   mutation createImage(
-    $url: String!
+    $url: String
     $alt: String
     $caption: String
     $copyright: String
-    $username: String!
+    $albumId: ID
   ) {
-    createImages(
-      input: [
-        {
-          url: $url
-          alt: $alt
-          caption: $caption
-          copyright: $copyright
-          hasSensitiveContent: false
-          hasSpoiler: false
-          Uploader: { connect: { where: { node: { username: $username } } } }
-        }
-      ]
+    createImageWithUploader(
+      input: {
+        url: $url
+        alt: $alt
+        caption: $caption
+        copyright: $copyright
+        albumId: $albumId
+      }
     ) {
-      images {
-        id
-        url
-        alt
-        caption
-        copyright
-        Uploader {
-          username
-        }
+      id
+      url
+      alt
+      caption
+      copyright
+      Uploader {
+        username
       }
     }
   }

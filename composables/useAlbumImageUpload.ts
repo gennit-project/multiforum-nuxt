@@ -91,15 +91,15 @@ export function useAlbumImageUpload(params: UseAlbumImageUploadParams) {
       }
 
       // Create the Image record in the database
+      // The backend automatically sets the Uploader from the logged-in user's context
       const createImageResult = await createImage({
         url: fileUrl,
         alt: file.name,
         caption: '',
         copyright: '',
-        username: usernameVar.value,
       });
 
-      const createdImage = createImageResult?.data?.createImages?.images?.[0];
+      const createdImage = createImageResult?.data?.createImageWithUploader;
 
       if (!createdImage || !createdImage.id) {
         throw new Error('Failed to create image record in database');
@@ -226,15 +226,15 @@ export function useAlbumImageUpload(params: UseAlbumImageUploadParams) {
     }
 
     try {
+      // The backend automatically sets the Uploader from the logged-in user's context
       const createImageResult = await createImage({
         url: url.trim(),
         alt: '',
         caption: '',
         copyright: '',
-        username: usernameVar.value,
       });
 
-      const createdImage = createImageResult?.data?.createImages?.images?.[0];
+      const createdImage = createImageResult?.data?.createImageWithUploader;
 
       if (!createdImage || !createdImage.id) {
         throw new Error('Failed to create image record in database');
