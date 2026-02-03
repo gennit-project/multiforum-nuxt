@@ -29,6 +29,14 @@ const props = defineProps({
     type: Object as PropType<Discussion>,
     default: null,
   },
+  isSelectable: {
+    type: Boolean,
+    default: false,
+  },
+  selectedDiscussionId: {
+    type: String,
+    default: '',
+  },
   score: {
     type: Number,
     default: 0,
@@ -51,7 +59,7 @@ const props = defineProps({
   },
 });
 
-defineEmits(['filterByTag']);
+const emit = defineEmits(['filterByTag', 'select']);
 
 const route = useRoute();
 
@@ -135,6 +143,12 @@ const discussionIdInParams = computed(() =>
   typeof route.params.discussionId === 'string' ? route.params.discussionId : ''
 );
 const discussionId = computed(() => props.discussion?.id || '');
+const isSelected = computed(() => {
+  if (props.selectedDiscussionId) {
+    return props.selectedDiscussionId === discussionId.value;
+  }
+  return discussionIdInParams.value === discussionId.value;
+});
 const title = computed(() => props.discussion?.title || '[Deleted]');
 const tags = computed(
   () => props.discussion?.Tags.map((tag: Tag) => tag.text) || []
@@ -167,13 +181,21 @@ const shouldShowContent = computed(() => {
 const revealSensitiveContent = () => {
   sensitiveContentRevealed.value = true;
 };
+
+const handleSelect = () => {
+  if (!props.isSelectable || !props.discussion) return;
+  emit('select', {
+    discussionId: props.discussion.id,
+    channelId: forumId.value,
+  });
+};
 </script>
 
 <template>
   <li
     class="list-none px-4 py-2"
     :class="{
-      'bg-gray-100 dark:bg-gray-700': discussionIdInParams === discussionId,
+      'bg-gray-100 dark:bg-gray-700': isSelected,
     }"
   >
     <div class="flex w-full justify-between">
@@ -200,12 +222,14 @@ const revealSensitiveContent = () => {
         <div class="flex gap-2">
           <div>
             <div class="flex items-center gap-2">
-              <nuxt-link v-if="discussion" :to="getDetailLink()">
-                <div class="flex items-center gap-2">
+              <nuxt-link
+                v-if="discussion"
+                :to="getDetailLink()"
+                class="w-full text-left lg:hidden"
+              >
+                <div class="flex items-start gap-2">
                   <span
-                    :class="
-                      discussionIdInParams === discussionId ? 'text-black' : ''
-                    "
+                    :class="isSelected ? 'text-black' : ''"
                     class="cursor-pointer text-sm hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
                   >
                     <HighlightedSearchTerms
@@ -221,6 +245,30 @@ const revealSensitiveContent = () => {
                   </span>
                 </div>
               </nuxt-link>
+              <button
+                v-if="discussion"
+                type="button"
+                class="hidden w-full text-left lg:block"
+                @click="handleSelect"
+              >
+                <div class="flex items-start gap-2">
+                  <span
+                    :class="isSelected ? 'text-black' : ''"
+                    class="cursor-pointer text-sm hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
+                  >
+                    <HighlightedSearchTerms
+                      :text="title"
+                      :search-input="searchInput"
+                    />
+                  </span>
+                  <span
+                    v-if="hasSensitiveContent"
+                    class="rounded-full border border-orange-600 px-2 text-xs text-orange-600 dark:border-orange-400 dark:text-orange-400"
+                  >
+                    Sensitive
+                  </span>
+                </div>
+              </button>
             </div>
             <div
               class="pt-1 text-xs text-gray-500 no-underline dark:text-gray-300"
@@ -349,7 +397,7 @@ const revealSensitiveContent = () => {
                 />
                 <div
                   v-if="discussion.Album"
-                  class="my-4 w-full max-w-full overflow-hidden bg-black"
+                  class="relative z-30 my-4 w-full max-w-full overflow-hidden bg-black"
                 >
                   <div class="mx-auto max-w-96">
                     <DiscussionAlbum

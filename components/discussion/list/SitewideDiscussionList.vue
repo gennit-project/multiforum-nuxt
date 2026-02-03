@@ -4,6 +4,7 @@ import ErrorBanner from '../../ErrorBanner.vue';
 import SitewideDiscussionListItem from './SitewideDiscussionListItem.vue';
 import SitewideDiscussionSidebar from './SitewideDiscussionSidebar.vue';
 import LoadMore from '../../LoadMore.vue';
+import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
 import { GET_SITE_WIDE_DISCUSSION_LIST } from '@/graphQLData/discussion/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { useQuery } from '@vue/apollo-composable';
@@ -38,6 +39,9 @@ const channelId = computed(() => {
 const filterValues = ref(
   getFilterValuesFromParams({ route, channelId: channelId.value })
 );
+const isSitewideSidebarOpen = ref(false);
+const selectedDiscussionId = ref('');
+const selectedChannelId = ref('');
 
 const selectedChannelsComputed = computed(() => {
   return filterValues.value.channels;
@@ -107,6 +111,39 @@ const discussions = computed(() => {
   return getSiteWideDiscussionList.discussions;
 });
 
+const selectedDiscussionTitle = computed(() => {
+  if (!selectedDiscussionId.value) return '';
+  const selected = discussions.value.find(
+    (discussion) => discussion.id === selectedDiscussionId.value
+  );
+  return selected?.title || '';
+});
+
+const selectedDiscussionLink = computed(() => {
+  if (!selectedDiscussionId.value || !selectedChannelId.value) return '';
+  return `/forums/${selectedChannelId.value}/discussions/${selectedDiscussionId.value}`;
+});
+
+const selectedDiscussionChannels = computed(() => {
+  if (!selectedDiscussionId.value) return [];
+  const selected = discussions.value.find(
+    (discussion) => discussion.id === selectedDiscussionId.value
+  );
+  if (!selected?.DiscussionChannels) return [];
+  return selected.DiscussionChannels;
+});
+
+const selectedDiscussionChannelLinks = computed(() => {
+  return selectedDiscussionChannels.value.map((discussionChannel) => {
+    const commentCount = discussionChannel.CommentsAggregate?.count || 0;
+    return {
+      channelUniqueName: discussionChannel.channelUniqueName,
+      commentCount,
+      link: `/forums/${discussionChannel.channelUniqueName}/discussions/${selectedDiscussionId.value}`,
+    };
+  });
+});
+
 const aggregateDiscussionCount = computed(() => {
   if (!discussionResult.value) {
     return 0;
@@ -173,6 +210,14 @@ const filterByTag = (tag: string) => {
 const filterByChannel = (channel: string) => {
   emit('filterByChannel', channel);
 };
+
+const handleSelectDiscussion = (payload: {
+  discussionId: string;
+  channelId: string;
+}) => {
+  selectedDiscussionId.value = payload.discussionId;
+  selectedChannelId.value = payload.channelId;
+};
 </script>
 
 <template>
@@ -184,6 +229,18 @@ const filterByChannel = (channel: string) => {
         >
           <div class="flex-1 md:px-2">
             <slot />
+            <div class="mt-2 flex justify-end lg:pr-2">
+              <button
+                v-if="serverConfig"
+                type="button"
+                class="hidden items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 lg:inline-flex"
+                :aria-expanded="isSitewideSidebarOpen"
+                aria-controls="sitewide-sidebar-drawer"
+                @click="isSitewideSidebarOpen = true"
+              >
+                About
+              </button>
+            </div>
             <div
               v-if="
                 discussionLoading && (!discussions || discussions.length === 0)
@@ -240,12 +297,15 @@ const filterByChannel = (channel: string) => {
                   :key="`${discussion.id}-${expandSitewideDiscussions}`"
                   :default-expanded="expandSitewideDiscussions"
                   :discussion="discussion"
+                  :is-selectable="true"
                   :score="discussion.score"
                   :search-input="filterValues.searchInput"
                   :selected-channels="filterValues.channels"
+                  :selected-discussion-id="selectedDiscussionId"
                   :selected-tags="filterValues.tags"
                   @filter-by-channel="filterByChannel"
                   @filter-by-tag="filterByTag"
+                  @select="handleSelectDiscussion"
                 />
               </ul>
               <div
@@ -269,13 +329,117 @@ const filterByChannel = (channel: string) => {
           </div>
           <aside
             v-if="serverConfig"
-            class="flex-shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto"
+            class="flex-shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto lg:hidden"
           >
             <SitewideDiscussionSidebar
               :server-config="serverConfig"
               class="px-4"
             />
           </aside>
+          <aside
+            class="hidden flex-shrink-0 lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:w-1/2 lg:flex-col lg:overflow-y-auto lg:px-6 lg:py-4"
+          >
+            <div
+              v-if="selectedDiscussionId"
+              class="flex w-full flex-col justify-center px-2 py-4"
+            >
+              <h2 v-if="selectedDiscussionTitle" class="mb-3">
+                <nuxt-link
+                  v-if="selectedDiscussionLink"
+                  :to="selectedDiscussionLink"
+                  class="text-lg font-semibold text-gray-900 hover:underline dark:text-gray-100"
+                >
+                  {{ selectedDiscussionTitle }}
+                </nuxt-link>
+                <span
+                  v-else
+                  class="text-lg font-semibold text-gray-900 dark:text-gray-100"
+                >
+                  {{ selectedDiscussionTitle }}
+                </span>
+              </h2>
+              <DiscussionDetailContent
+                :discussion-id="selectedDiscussionId"
+                :channel-id="selectedChannelId"
+                :show-comments="false"
+                class="w-full"
+              />
+              <div class="mt-6 w-full rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+                <p class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-200">
+                  Select a forum to view comments
+                </p>
+                <ul
+                  v-if="selectedDiscussionChannelLinks.length > 0"
+                  class="flex flex-col gap-2"
+                >
+                  <li
+                    v-for="channelLink in selectedDiscussionChannelLinks"
+                    :key="channelLink.channelUniqueName"
+                    class="flex items-center justify-between text-sm"
+                  >
+                    <span class="text-gray-700 dark:text-gray-200">
+                      {{ channelLink.channelUniqueName }}
+                    </span>
+                    <a
+                      :href="channelLink.link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-orange-600 hover:underline dark:text-orange-400"
+                    >
+                      {{ channelLink.commentCount }}
+                      {{
+                        channelLink.commentCount === 1
+                          ? 'comment'
+                          : 'comments'
+                      }}
+                    </a>
+                  </li>
+                </ul>
+                <p v-else class="text-sm text-gray-500 dark:text-gray-400">
+                  No forum comment sections are available for this discussion.
+                </p>
+              </div>
+            </div>
+            <div
+              v-else
+              class="flex h-full items-center justify-center px-6 text-sm text-gray-500 dark:text-gray-300"
+            >
+              Select a discussion to view details.
+            </div>
+          </aside>
+        </div>
+        <div
+          v-if="serverConfig && isSitewideSidebarOpen"
+          class="fixed inset-0 z-40 hidden lg:block"
+          aria-hidden="false"
+        >
+          <div
+            class="absolute inset-0 bg-black/50"
+            @click="isSitewideSidebarOpen = false"
+          />
+          <div
+            id="sitewide-sidebar-drawer"
+            class="absolute right-0 top-0 h-full w-full max-w-sm overflow-y-auto bg-white shadow-xl dark:bg-gray-900"
+            role="dialog"
+            aria-label="About this forum"
+          >
+            <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700">
+              <span class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                About
+              </span>
+              <button
+                type="button"
+                class="rounded-md px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                @click="isSitewideSidebarOpen = false"
+              >
+                Close
+              </button>
+            </div>
+            <SitewideDiscussionSidebar
+              :server-config="serverConfig"
+              class="px-4 py-4"
+            />
+          </div>
         </div>
       </div>
     </div>

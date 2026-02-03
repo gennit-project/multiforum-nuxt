@@ -25,7 +25,8 @@ const emit = defineEmits(['filterByTag', 'filterByChannel']);
 
 const route = useRoute();
 const uiStore = useUIStore();
-const { expandChannelDiscussions } = storeToRefs(uiStore);
+const { expandChannelDiscussions, selectedChannelDiscussionId } =
+  storeToRefs(uiStore);
 
 const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
@@ -152,6 +153,15 @@ watch(
   }
 );
 
+watch(
+  channelId,
+  (newChannelId, oldChannelId) => {
+    if (newChannelId !== oldChannelId) {
+      uiStore.clearSelectedChannelDiscussion();
+    }
+  }
+);
+
 // Methods
 const filterByTag = (tag: string) => {
   emit('filterByTag', tag);
@@ -169,92 +179,109 @@ const reachedEndOfResults = computed(() => {
       .length
   );
 });
+
+const handleSelectDiscussion = (payload: {
+  discussionId: string;
+  title: string;
+}) => {
+  uiStore.setSelectedChannelDiscussionSelection({
+    discussionId: payload.discussionId,
+    title: payload.title,
+  });
+};
 </script>
 
 <template>
   <div class="px-2">
-    <slot />
-    <div
-      v-if="!discussionChannelResult && discussionLoading"
-      class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700"
-    >
-      <div v-for="n in 5" :key="n" class="mb-2 flex flex-col gap-2 py-4">
-        <v-skeleton-loader class="w-3/4" type="text" :theme="theme" />
-        <v-skeleton-loader class="w-1/3" type="text" :theme="theme" />
+    <div>
+      <div>
+        <slot />
+        <div
+          v-if="!discussionChannelResult && discussionLoading"
+          class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700"
+        >
+          <div v-for="n in 5" :key="n" class="mb-2 flex flex-col gap-2 py-4">
+            <v-skeleton-loader class="w-3/4" type="text" :theme="theme" />
+            <v-skeleton-loader class="w-1/3" type="text" :theme="theme" />
+          </div>
+        </div>
+        <ErrorBanner
+          v-else-if="discussionError"
+          class="max-w-5xl"
+          :text="discussionError.message"
+        />
+        <p
+          v-else-if="
+            discussionChannelResult?.getDiscussionsInChannel?.discussionChannels
+              ?.length === 0
+          "
+          class="flex gap-2 p-4"
+        >
+          <span class="dark:text-white">There are no discussions to show.</span>
+
+          <RequireAuth :full-width="false">
+            <template #has-auth>
+              <nuxt-link
+                v-if="channelId"
+                :to="{
+                  name: 'forums-forumId-discussions-create',
+                  params: {
+                    forumId: channelId,
+                  },
+                }"
+                class="text-orange-500 underline"
+              >
+                Create one?
+              </nuxt-link>
+            </template>
+            <template #does-not-have-auth>
+              <span class="cursor-pointer text-orange-500 underline"
+                >Create one?</span
+              >
+            </template>
+          </RequireAuth>
+        </p>
+
+        <ul
+          v-else-if="
+            discussionChannelResult?.getDiscussionsInChannel?.discussionChannels
+              ?.length > 0
+          "
+          class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700"
+          data-testid="channel-discussion-list"
+        >
+          <ChannelDiscussionListItem
+            v-for="discussionChannel in discussionChannelResult
+              .getDiscussionsInChannel.discussionChannels"
+            :key="`${discussionChannel.id}-${expandChannelDiscussions}`"
+            :discussion="discussionChannel.Discussion"
+            :discussion-channel="discussionChannel"
+            :search-input="searchInput"
+            :selected-tags="selectedTags"
+            :selected-channels="selectedChannels"
+            :default-expanded="expandChannelDiscussions"
+            :is-selectable="true"
+            :selected-discussion-id="selectedChannelDiscussionId"
+            @open-mod-profile="showModProfileModal = true"
+            @filter-by-tag="filterByTag"
+            @filter-by-channel="filterByChannel"
+            @select="handleSelectDiscussion"
+          />
+        </ul>
+        <div
+          v-if="
+            discussionChannelResult?.getDiscussionsInChannel?.discussionChannels
+              ?.length > 0
+          "
+        >
+          <LoadMore
+            class="mb-6 justify-self-center"
+            :loading="discussionLoading"
+            :reached-end-of-results="reachedEndOfResults"
+            @load-more="loadMore"
+          />
+        </div>
       </div>
-    </div>
-    <ErrorBanner
-      v-else-if="discussionError"
-      class="max-w-5xl"
-      :text="discussionError.message"
-    />
-    <p
-      v-else-if="
-        discussionChannelResult?.getDiscussionsInChannel?.discussionChannels
-          ?.length === 0
-      "
-      class="flex gap-2 p-4"
-    >
-      <span class="dark:text-white">There are no discussions to show.</span>
-
-      <RequireAuth :full-width="false">
-        <template #has-auth>
-          <nuxt-link
-            v-if="channelId"
-            :to="{
-              name: 'forums-forumId-discussions-create',
-              params: {
-                forumId: channelId,
-              },
-            }"
-            class="text-orange-500 underline"
-          >
-            Create one?
-          </nuxt-link>
-        </template>
-        <template #does-not-have-auth>
-          <span class="cursor-pointer text-orange-500 underline"
-            >Create one?</span
-          >
-        </template>
-      </RequireAuth>
-    </p>
-
-    <ul
-      v-else-if="
-        discussionChannelResult?.getDiscussionsInChannel?.discussionChannels
-          ?.length > 0
-      "
-      class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700"
-      data-testid="channel-discussion-list"
-    >
-      <ChannelDiscussionListItem
-        v-for="discussionChannel in discussionChannelResult
-          .getDiscussionsInChannel.discussionChannels"
-        :key="`${discussionChannel.id}-${expandChannelDiscussions}`"
-        :discussion="discussionChannel.Discussion"
-        :discussion-channel="discussionChannel"
-        :search-input="searchInput"
-        :selected-tags="selectedTags"
-        :selected-channels="selectedChannels"
-        :default-expanded="expandChannelDiscussions"
-        @open-mod-profile="showModProfileModal = true"
-        @filter-by-tag="filterByTag"
-        @filter-by-channel="filterByChannel"
-      />
-    </ul>
-    <div
-      v-if="
-        discussionChannelResult?.getDiscussionsInChannel?.discussionChannels
-          ?.length > 0
-      "
-    >
-      <LoadMore
-        class="mb-6 justify-self-center"
-        :loading="discussionLoading"
-        :reached-end-of-results="reachedEndOfResults"
-        @load-more="loadMore"
-      />
     </div>
   </div>
 </template>

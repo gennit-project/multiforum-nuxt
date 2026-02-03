@@ -17,6 +17,8 @@ export const useUIStore = defineStore('ui', () => {
   // Discussion list states - separate for channel view and sitewide view
   const expandChannelDiscussions = ref(true); // Default expanded for channel view
   const expandSitewideDiscussions = ref(false); // Default collapsed for sitewide view
+  const selectedChannelDiscussionId = ref('');
+  const selectedChannelDiscussionTitle = ref('');
 
   // Theme state
   const themeMode = ref<ThemeMode>('dark');
@@ -141,6 +143,19 @@ export const useUIStore = defineStore('ui', () => {
     }
   }
 
+  function setSelectedChannelDiscussionSelection(params: {
+    discussionId: string;
+    title: string;
+  }) {
+    selectedChannelDiscussionId.value = params.discussionId;
+    selectedChannelDiscussionTitle.value = params.title;
+  }
+
+  function clearSelectedChannelDiscussion() {
+    selectedChannelDiscussionId.value = '';
+    selectedChannelDiscussionTitle.value = '';
+  }
+
   return {
     // State
     sideNavIsOpen,
@@ -150,6 +165,8 @@ export const useUIStore = defineStore('ui', () => {
     themeMode,
     expandChannelDiscussions,
     expandSitewideDiscussions,
+    selectedChannelDiscussionId,
+    selectedChannelDiscussionTitle,
 
     // Actions
     setSideNavIsOpen,
@@ -157,5 +174,7 @@ export const useUIStore = defineStore('ui', () => {
     setFontSize,
     setTheme,
     toggleExpandDiscussions,
+    setSelectedChannelDiscussionSelection,
+    clearSelectedChannelDiscussion,
   };
 });

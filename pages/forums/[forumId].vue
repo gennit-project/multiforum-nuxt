@@ -10,13 +10,16 @@ import {
   GET_CHANNEL_DOWNLOAD_COUNT,
 } from '@/graphQLData/channel/queries';
 import type { Channel, User } from '@/__generated__/graphql';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import ChannelSidebar from '@/components/channel/ChannelSidebar.vue';
+import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
 import { useRoute, useRouter, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon';
 import BackLink from '@/components/BackLink.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
+import { useUIStore } from '@/stores/uiStore';
+import { storeToRefs } from 'pinia';
 import {
   getLocalStorageItem,
   setLocalStorageItem,
@@ -25,6 +28,9 @@ import type { ForumItem } from '@/types/forum';
 
 const route = useRoute();
 const router = useRouter();
+const uiStore = useUIStore();
+const { selectedChannelDiscussionId, selectedChannelDiscussionTitle } =
+  storeToRefs(uiStore);
 
 const showDiscussionTitle = computed(() =>
   route.name?.toString().includes('forums-forumId-discussions-discussionId')
@@ -86,6 +92,19 @@ const showChannelSidebar = computed(() => {
     !routeName.includes('forums-forumId-downloads')
   );
 });
+
+const showChannelDiscussionPanel = computed(() => {
+  return (
+    route.name === 'forums-forumId-discussions' &&
+    !!selectedChannelDiscussionId.value
+  );
+});
+
+const showChannelSidebarColumn = computed(() => {
+  return showChannelSidebar.value && showDiscussionTitle.value;
+});
+
+const isChannelSidebarOpen = ref(false);
 
 const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
@@ -342,22 +361,35 @@ definePageMeta({
               class="flex flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row"
             >
               <div class="min-w-0 flex-1 px-4">
-                <ChannelTabs
-                  v-if="showChannelTabs"
-                  :admin-list="adminList"
-                  :channel="channel"
-                  :download-count="downloadCount"
-                  class="w-full border-b border-gray-300 dark:border-gray-600 md:ml-2"
-                  :desktop="false"
-                  :route="route"
-                  :show-counts="true"
-                  :vertical="false"
-                />
+                <div class="flex items-center justify-between">
+                  <ChannelTabs
+                    v-if="showChannelTabs"
+                    :admin-list="adminList"
+                    :channel="channel"
+                    :download-count="downloadCount"
+                    class="w-full border-b border-gray-300 dark:border-gray-600 md:ml-2"
+                    :desktop="false"
+                    :route="route"
+                    :show-counts="true"
+                    :vertical="false"
+                  />
+                  <button
+                    v-if="channelId && showChannelSidebar"
+                    type="button"
+                    class="ml-2 hidden items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 lg:inline-flex"
+                    :aria-expanded="isChannelSidebarOpen"
+                    aria-controls="channel-sidebar-drawer"
+                    @click="isChannelSidebarOpen = true"
+                  >
+                    Forum info
+                  </button>
+                </div>
                 <NuxtPage />
               </div>
               <div
                 v-if="channelId && showChannelSidebar"
-                class="flex-shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/3 md:overflow-y-auto"
+                class="flex-shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto"
+                :class="showChannelSidebarColumn ? 'lg:flex' : 'lg:hidden'"
                 tabindex="0"
                 aria-label="Forum sidebar"
               >
@@ -365,6 +397,73 @@ definePageMeta({
                   v-if="channel"
                   :channel="channel"
                   class="px-4"
+                  @refetch-channel-data="handleRefetchChannelData"
+                />
+              </div>
+              <div
+                v-if="showChannelDiscussionPanel"
+                class="hidden lg:flex lg:w-1/2 lg:flex-col lg:overflow-y-auto"
+              >
+                <div
+                  class="flex w-full flex-col justify-center rounded-lg border border-gray-200 p-4 dark:border-gray-700"
+                >
+                  <div class="mb-3 flex items-start justify-between gap-3">
+                    <div class="flex-1">
+                      <h2
+                        v-if="selectedChannelDiscussionTitle"
+                        class="text-lg font-semibold text-gray-900 dark:text-gray-100"
+                      >
+                        {{ selectedChannelDiscussionTitle }}
+                      </h2>
+                    </div>
+                    <a
+                      :href="`/forums/${channelId}/discussions/${selectedChannelDiscussionId}`"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-xs font-medium text-orange-600 hover:underline dark:text-orange-400"
+                    >
+                      Open in new tab
+                    </a>
+                  </div>
+                  <DiscussionDetailContent
+                    :discussion-id="selectedChannelDiscussionId"
+                    :channel-id="channelId"
+                    class="w-full"
+                  />
+                </div>
+              </div>
+            </div>
+            <div
+              v-if="channelId && showChannelSidebar && isChannelSidebarOpen"
+              class="fixed inset-0 z-40 hidden lg:block"
+              aria-hidden="false"
+            >
+              <div
+                class="absolute inset-0 bg-black/50"
+                @click="isChannelSidebarOpen = false"
+              />
+              <div
+                id="channel-sidebar-drawer"
+                class="absolute right-0 top-0 h-full w-full max-w-sm overflow-y-auto bg-white shadow-xl dark:bg-gray-900"
+                role="dialog"
+                aria-label="Forum sidebar"
+              >
+                <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700">
+                  <span class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    Forum info
+                  </span>
+                  <button
+                    type="button"
+                    class="rounded-md px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                    @click="isChannelSidebarOpen = false"
+                  >
+                    Close
+                  </button>
+                </div>
+                <ChannelSidebar
+                  v-if="channel"
+                  :channel="channel"
+                  class="px-4 py-4"
                   @refetch-channel-data="handleRefetchChannelData"
                 />
               </div>

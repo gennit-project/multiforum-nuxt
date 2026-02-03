@@ -38,6 +38,11 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  channelId: {
+    type: String,
+    required: false,
+    default: '',
+  },
   discussionChannel: {
     type: Object as PropType<DiscussionChannel>,
     required: false,
@@ -90,6 +95,11 @@ const props = defineProps({
     required: false,
     default: true,
   },
+  showNuxtPage: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
 });
 
 const route = useRoute();
@@ -121,10 +131,21 @@ onMounted(() => {
 });
 
 const channelId = computed(() => {
+  if (props.channelId) {
+    return props.channelId;
+  }
   if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
   return '';
+});
+
+const hasDiscussionIdInRoute = computed(() => {
+  return typeof route.params.discussionId === 'string';
+});
+
+const effectiveShowNuxtPage = computed(() => {
+  return props.showNuxtPage && hasDiscussionIdInRoute.value;
 });
 
 const botSuggestions = computed(() => {
@@ -459,7 +480,7 @@ const handleSubscriptionToggle = () => {
     :original-poster="discussionAuthor"
     :locked="locked"
     :archived="archived"
-    :show-nuxt-page="true"
+    :show-nuxt-page="effectiveShowNuxtPage"
     :answers="answers"
     :enable-feedback="enableFeedback"
     :bot-suggestions="botSuggestions"

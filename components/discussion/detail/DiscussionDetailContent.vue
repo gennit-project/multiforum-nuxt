@@ -33,6 +33,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  channelId: {
+    type: String,
+    default: '',
+  },
   compactMode: {
     type: Boolean,
     default: false,
@@ -41,13 +45,20 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  showComments: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const route = useRoute();
 const offset = ref(0);
-const channelId = computed(() =>
-  typeof route.params.forumId === 'string' ? route.params.forumId : ''
-);
+const channelId = computed(() => {
+  if (props.channelId) {
+    return props.channelId;
+  }
+  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
+});
 const loggedInUserModName = computed(() => modProfileNameVar.value);
 const lastValidDiscussion = ref<Discussion | null>(null);
 
@@ -59,11 +70,11 @@ const {
   onResult: onGetDiscussionResult,
 } = useQuery(
   GET_DISCUSSION,
-  {
+  () => ({
     id: props.discussionId,
-    loggedInModName: loggedInUserModName,
+    loggedInModName: loggedInUserModName.value,
     channelUniqueName: channelId.value,
-  },
+  }),
   {
     fetchPolicy: 'cache-first',
   }
@@ -204,10 +215,10 @@ const loadedRootCommentCount = computed(() => {
 
 const { result: getDiscussionChannelCommentAggregateResult } = useQuery(
   GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
-  {
+  () => ({
     discussionId: props.discussionId,
-    channelUniqueName: channelId,
-  },
+    channelUniqueName: channelId.value,
+  }),
   {
     fetchPolicy: 'cache-first',
   }
@@ -215,10 +226,10 @@ const { result: getDiscussionChannelCommentAggregateResult } = useQuery(
 
 const { result: getDiscussionChannelRootCommentAggregateResult } = useQuery(
   GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
-  {
+  () => ({
     discussionId: props.discussionId,
-    channelUniqueName: channelId,
-  },
+    channelUniqueName: channelId.value,
+  }),
   {
     fetchPolicy: 'cache-first',
   }
@@ -457,7 +468,7 @@ const handleEditAlbum = () => {
         </div>
 
         <!-- Comments section (shown for non-download mode) -->
-        <div v-if="!downloadMode">
+        <div v-if="!downloadMode && showComments">
           <div class="my-2 px-2 pt-2">
             <DiscussionCommentsWrapper
               :key="activeDiscussionChannel?.id"
@@ -465,6 +476,7 @@ const handleEditAlbum = () => {
               :comments="comments"
               :discussion-author="discussionAuthor || ''"
               :discussion-channel="activeDiscussionChannel || undefined"
+              :channel-id="channelId"
               :enable-feedback="
                 activeDiscussionChannel?.Channel?.feedbackEnabled ?? true
               "
