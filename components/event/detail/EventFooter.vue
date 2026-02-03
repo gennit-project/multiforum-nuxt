@@ -33,10 +33,10 @@ export default defineComponent({
     const route = useRoute();
 
     const eventId = computed(() => {
-      if (typeof route.params.eventId === 'string') {
-        return route.params.eventId;
-      }
-      return '';
+      return (
+        props.eventData?.id ||
+        (typeof route.params.eventId === 'string' ? route.params.eventId : '')
+      );
     });
 
     const channelId = computed(() => {

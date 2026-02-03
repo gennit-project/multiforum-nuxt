@@ -41,6 +41,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  eventId: {
+    type: String,
+    default: '',
+  },
+  channelUniqueName: {
+    type: String,
+    default: '',
+  },
   issueEventId: {
     type: String,
     required: false,
@@ -79,23 +87,32 @@ const offset = ref(0);
 
 // Instead of a computed property, make it a ref
 const eventId = ref(
-  typeof route.params.eventId === 'string'
-    ? route.params.eventId
-    : props.issueEventId || ''
+  props.eventId ||
+    props.issueEventId ||
+    (typeof route.params.eventId === 'string' ? route.params.eventId : '')
 );
 
-// Add a watcher for the route params
+// Add a watcher for the route params and props
 watch(
-  () => route.params.eventId,
-  (newEventId) => {
+  [
+    () => props.eventId,
+    () => props.issueEventId,
+    () => route.params.eventId,
+  ],
+  ([newEventIdProp, newIssueEventId, newRouteEventId]) => {
     eventId.value =
-      typeof newEventId === 'string' ? newEventId : props.issueEventId || '';
+      newEventIdProp ||
+      newIssueEventId ||
+      (typeof newRouteEventId === 'string' ? newRouteEventId : '');
   }
 );
 
-const channelId = computed(() =>
-  typeof route.params.forumId === 'string' ? route.params.forumId : ''
-);
+const channelId = computed(() => {
+  if (props.channelUniqueName) {
+    return props.channelUniqueName;
+  }
+  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
+});
 
 const loggedInUserModName = computed(() => modProfileNameVar.value);
 
@@ -177,8 +194,8 @@ const {
   eventId: eventId,
 });
 
-watch(eventId, (newEventId) => {
-  if (newEventId) {
+watch([eventId, channelId], ([newEventId, newChannelId]) => {
+  if (newEventId && newChannelId !== undefined) {
     loadEvent();
     loadEventComments();
     loadEventRootCommentAggregate();

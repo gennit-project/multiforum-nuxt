@@ -74,7 +74,10 @@ const showSuccessfullyArchivedAndSuspended = ref(false);
 const showSuccessfullyReported = ref(false);
 
 const eventId = computed(() => {
-  return typeof route.params.eventId === 'string' ? route.params.eventId : '';
+  return (
+    props.eventData?.id ||
+    (typeof route.params.eventId === 'string' ? route.params.eventId : '')
+  );
 });
 
 const channelId = computed(() => {

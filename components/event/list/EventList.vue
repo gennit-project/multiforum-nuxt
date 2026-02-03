@@ -44,6 +44,14 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  isSelectable: {
+    type: Boolean,
+    default: false,
+  },
+  selectedEventId: {
+    type: String,
+    default: '',
+  },
 });
 
 const emit = defineEmits([
@@ -53,6 +61,7 @@ const emit = defineEmits([
   'unhighlight',
   'openPreview',
   'loadMore',
+  'select',
 ]);
 
 const route = useRoute();
@@ -159,6 +168,8 @@ const onMouseLeaveEventListItem = () => {
         :search-input="searchInput"
         :current-channel-id="channelId"
         :show-detail-link="!showMap"
+        :is-selectable="isSelectable"
+        :selected-event-id="selectedEventId"
         :class="[
           event.id === highlightedEventId ||
           (!highlightedEventId &&
@@ -167,6 +178,7 @@ const onMouseLeaveEventListItem = () => {
             : '',
         ]"
         :show-map="showMap"
+        @select="$emit('select', $event)"
         @mouseover="onMouseOverEventListItem(event)"
         @mouseleave="onMouseLeaveEventListItem"
         @clicked-event-list-item="handleClickEventListItem(event)"

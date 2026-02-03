@@ -19,6 +19,8 @@ export const useUIStore = defineStore('ui', () => {
   const expandSitewideDiscussions = ref(false); // Default collapsed for sitewide view
   const selectedChannelDiscussionId = ref('');
   const selectedChannelDiscussionTitle = ref('');
+  const selectedChannelEventId = ref('');
+  const selectedChannelEventTitle = ref('');
   const selectedIssueNumber = ref<number | null>(null);
   const selectedIssueTitle = ref('');
   const selectedIssueChannelId = ref('');
@@ -159,6 +161,19 @@ export const useUIStore = defineStore('ui', () => {
     selectedChannelDiscussionTitle.value = '';
   }
 
+  function setSelectedChannelEventSelection(params: {
+    eventId: string;
+    title: string;
+  }) {
+    selectedChannelEventId.value = params.eventId;
+    selectedChannelEventTitle.value = params.title;
+  }
+
+  function clearSelectedChannelEventSelection() {
+    selectedChannelEventId.value = '';
+    selectedChannelEventTitle.value = '';
+  }
+
   function setSelectedIssueSelection(params: {
     issueNumber: number;
     title: string;
@@ -186,6 +201,8 @@ export const useUIStore = defineStore('ui', () => {
     expandSitewideDiscussions,
     selectedChannelDiscussionId,
     selectedChannelDiscussionTitle,
+    selectedChannelEventId,
+    selectedChannelEventTitle,
     selectedIssueNumber,
     selectedIssueTitle,
     selectedIssueChannelId,
@@ -198,6 +215,8 @@ export const useUIStore = defineStore('ui', () => {
     toggleExpandDiscussions,
     setSelectedChannelDiscussionSelection,
     clearSelectedChannelDiscussion,
+    setSelectedChannelEventSelection,
+    clearSelectedChannelEventSelection,
     setSelectedIssueSelection,
     clearSelectedIssueSelection,
   };
