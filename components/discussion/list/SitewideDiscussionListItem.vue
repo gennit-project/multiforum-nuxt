@@ -181,7 +181,7 @@ const revealSensitiveContent = () => {
         <nuxt-link
           v-if="discussion"
           :to="getDetailLink()"
-          class="mb-1 flex items-center gap-2 text-xs dark:text-white"
+          class="-ml-1 mb-1 flex items-center gap-2 text-xs dark:text-white"
         >
           <div class="flex items-center text-orange-700 dark:text-white">
             <AvatarComponent

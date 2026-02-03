@@ -158,7 +158,7 @@ const handleOpenAlbum = () => {
     <div class="relative">
       <nuxt-link
         v-if="primaryChannel"
-        class="block overflow-hidden rounded-md border border-gray-100 dark:border-gray-700"
+        class="overflow-hidden rounded-md border border-gray-100 dark:border-gray-700"
         :to="defaultLink"
       >
         <div class="bg-gray-50 aspect-square w-full dark:bg-gray-800">
@@ -167,7 +167,7 @@ const handleOpenAlbum = () => {
             :src="firstAlbumImage"
             :alt="discussion.title || 'Download preview'"
             class="h-full w-full object-cover"
-          >
+          />
           <div
             v-else
             class="flex h-full w-full items-center justify-center text-center text-sm text-gray-500 dark:text-gray-400"
