@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import type { FilterGroup, Channel, FilterGroupChannelConnection, FilterGroupOptionsConnection, FilterOption, FilterOptionGroupConnection } from '@/__generated__/graphql';
+import yaml from 'js-yaml';
+import type {
+  FilterGroup,
+  Channel,
+  FilterGroupChannelConnection,
+  FilterGroupOptionsConnection,
+  FilterOptionGroupConnection,
+} from '@/__generated__/graphql';
 import { FilterMode } from '@/__generated__/graphql';
+import FilterOptionManager from './FilterOptionManager.vue';
 
 // Stub types for required GraphQL fields that aren't used in this form context
 const emptyChannel = {} as Channel;
@@ -9,8 +17,6 @@ const emptyChannelConnection = {} as FilterGroupChannelConnection;
 const emptyOptionsConnection = {} as FilterGroupOptionsConnection;
 const emptyGroupConnection = {} as FilterOptionGroupConnection;
 const emptyFilterGroup = {} as FilterGroup;
-import FilterOptionManager from './FilterOptionManager.vue';
-import yaml from 'js-yaml';
 // import CheckBox from "@/components/CheckBox.vue"; // Unused for now
 
 const props = defineProps({

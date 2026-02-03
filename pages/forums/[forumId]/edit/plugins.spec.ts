@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref, nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 import { createTestingPinia } from '@pinia/testing';
-import PluginsPage from './plugins.vue';
+import PluginsPage from './plugins/index.vue';
 import { useQuery } from '@vue/apollo-composable';
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -94,7 +94,7 @@ describe('Forum Plugins Page', () => {
       } as any);
 
     const wrapper = createWrapper();
-    expect(wrapper.text()).toContain('Loading plugin settings');
+    expect(wrapper.text()).toContain('Loading plugins...');
   });
 
   it('shows loading when installed plugins are loading', () => {
@@ -111,7 +111,7 @@ describe('Forum Plugins Page', () => {
       } as any);
 
     const wrapper = createWrapper();
-    expect(wrapper.text()).toContain('Loading plugin settings');
+    expect(wrapper.text()).toContain('Loading plugins...');
   });
 
   it('shows error when channel query fails', () => {
@@ -128,7 +128,7 @@ describe('Forum Plugins Page', () => {
       } as any);
 
     const wrapper = createWrapper();
-    expect(wrapper.text()).toContain('Error loading plugin settings');
+    expect(wrapper.text()).toContain('Error loading plugins: Failed to load');
   });
 
   it('shows warning when no server plugins are enabled', () => {
@@ -213,7 +213,7 @@ describe('Forum Plugins Page', () => {
     expect(wrapper.text()).toContain('Plugin One');
   });
 
-  it('renders channel settings form when plugin is enabled for forum', () => {
+  it('shows enabled badge when plugin is enabled for forum', () => {
     vi.mocked(useQuery)
       .mockReturnValueOnce({
         result: ref({
@@ -254,13 +254,14 @@ describe('Forum Plugins Page', () => {
           ],
         }),
         loading: ref(false),
-      } as any);
+    } as any);
 
     const wrapper = createWrapper();
-    expect(wrapper.find('.plugin-settings-form').exists()).toBe(true);
+    expect(wrapper.text()).toContain('Enabled');
+    expect(wrapper.text()).not.toContain('Disabled');
   });
 
-  it('parses string settingsJson into plugin settings', async () => {
+  it('renders plugin card when settingsJson is a string', async () => {
     vi.mocked(useQuery)
       .mockReturnValueOnce({
         result: ref({
@@ -303,15 +304,11 @@ describe('Forum Plugins Page', () => {
           ],
         }),
         loading: ref(false),
-      } as any);
+    } as any);
 
     const wrapper = createWrapper();
     await nextTick();
-    const settingsForm = wrapper.findComponent({ name: 'PluginSettingsForm' });
-    expect(settingsForm.exists()).toBe(true);
-    expect(settingsForm.props('modelValue')).toEqual({
-      overrideProfiles: true,
-      botName: 'Helper',
-    });
+    expect(wrapper.text()).toContain('Plugin One');
+    expect(wrapper.text()).toContain('Enabled');
   });
 });

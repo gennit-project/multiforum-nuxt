@@ -4,9 +4,13 @@ import type { PropType } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { usernameVar } from '@/cache';
 import { useToastStore } from '@/stores/toastStore';
-import type { CollectionVisibility, Collection, Channel, Discussion, Comment, Image } from '@/__generated__/graphql';
+import type { CollectionVisibility, Collection } from '@/__generated__/graphql';
 import { useCollectionMutations } from '@/composables/useCollectionMutations';
 import { useCollectionQueries } from '@/composables/useCollectionQueries';
+import {
+  usePopoverPositioning,
+  type PopoverPosition,
+} from '@/composables/usePopoverPositioning';
 
 // Type for item types that can be added to collections
 type ItemType = 'discussion' | 'comment' | 'image' | 'channel' | 'download';
@@ -16,10 +20,6 @@ type CollectionItem = { id?: string; uniqueName?: string };
 
 // Type for collection objects used in this component
 type CollectionListItem = Pick<Collection, 'id' | 'name'>;
-import {
-  usePopoverPositioning,
-  type PopoverPosition,
-} from '@/composables/usePopoverPositioning';
 
 const props = defineProps({
   itemId: {

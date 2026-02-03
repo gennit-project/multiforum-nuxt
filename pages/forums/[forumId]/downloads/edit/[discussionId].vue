@@ -357,23 +357,32 @@ export default defineComponent({
         const newImages = albumData.images || [];
 
         // Filter out images without IDs (shouldn't happen with our new flow)
-        const validImages = newImages.filter((img) => img.id);
+        const validImages = newImages.filter(
+          (img): img is (typeof img & { id: string }) => Boolean(img.id)
+        );
 
         if (validImages.length === 0) {
           return {}; // No valid images to connect
         }
 
+        const albumNode: {
+          imageOrder: string[];
+          Images: {
+            connect: { where: { node: { id: string } } }[];
+          };
+        } = {
+          imageOrder: albumData.imageOrder || [],
+          Images: {
+            connect: validImages.map((img) => ({
+              where: { node: { id: img.id } },
+            })),
+          },
+        };
+
         return {
           Album: {
             create: {
-              node: {
-                imageOrder: albumData.imageOrder || [],
-                Images: {
-                  connect: validImages.map((img) => ({
-                    where: { node: { id: img.id } },
-                  })),
-                },
-              },
+              node: albumNode,
             },
           },
         };

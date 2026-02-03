@@ -348,7 +348,7 @@ const highlightEventOnMap = (input: HighlightEventInput) => {
 
     if (numberOfEvents > 1) {
       const selectedEventsObject = markerMap.markers[eventLocationId].events;
-      const getArrayFromObject = <T>(obj: Record<string, T>): T[] => {
+      const getArrayFromObject = <T,>(obj: Record<string, T>): T[] => {
         return Object.values(obj);
       };
       selectedEvents.value = getArrayFromObject(selectedEventsObject);

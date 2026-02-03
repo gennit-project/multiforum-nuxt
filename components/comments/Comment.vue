@@ -175,7 +175,7 @@ const emit = defineEmits([
 ]);
 
 const route = useRoute();
-const { discussionId, eventId, issueNumber } = route.params;
+const { discussionId } = route.params;
 
 // Compute forumId from comment data or route
 const forumId = computed(() => {
