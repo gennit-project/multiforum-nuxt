@@ -248,15 +248,13 @@ const tabs = computed((): Tab[] => {
     }
   }
 
-  if (smAndDown.value) {
-    filteredResult.push({
-      name: 'about',
-      routeSuffix: 'about',
-      label: 'About',
-      icon: InfoIcon,
-      countProperty: null,
-    });
-  }
+  filteredResult.push({
+    name: 'about',
+    routeSuffix: 'about',
+    label: 'About',
+    icon: InfoIcon,
+    countProperty: null,
+  });
 
   return filteredResult;
 });

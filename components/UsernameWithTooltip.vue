@@ -49,6 +49,11 @@ export default defineComponent({
       required: false,
       default: false,
     },
+    disableTooltip: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   setup(props) {
     const accountCreatedText = computed(() => {
@@ -74,6 +79,7 @@ export default defineComponent({
 <template>
   <client-only>
     <v-tooltip
+      v-if="!disableTooltip"
       location="bottom"
       content-class="custom-tooltip"
       :aria-label="tooltipAriaLabel"
@@ -143,6 +149,40 @@ export default defineComponent({
         </div>
       </template>
     </v-tooltip>
+
+    <template v-else>
+      <div class="flex flex-row items-center gap-1">
+        <nuxt-link
+          :to="{
+            name: 'u-username',
+            params: { username },
+          }"
+          class="flex flex-row items-center gap-1 hover:underline"
+        >
+          <span v-if="!displayName" class="font-bold">{{ username }}</span>
+          <span v-if="displayName" class="font-bold">{{ displayName }}</span>
+          <span v-if="displayName" class="text-gray-500 dark:text-gray-300">{{
+            `(u/${username})`
+          }}</span>
+        </nuxt-link>
+        <span
+          v-if="isAdmin"
+          class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+          >Admin</span
+        >
+        <span
+          v-else-if="isMod"
+          class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+        >
+          Mod
+        </span>
+        <span
+          v-if="isOriginalPoster"
+          class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+          >OP</span
+        >
+      </div>
+    </template>
 
     <!-- SSR Fallback -->
     <template #fallback>

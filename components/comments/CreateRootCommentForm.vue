@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import { computed } from 'vue';
+import { computed, defineAsyncComponent } from 'vue';
 import type { PropType } from 'vue';
-import TextEditor from '@/components/TextEditor.vue';
 import CancelButton from '@/components/CancelButton.vue';
 import SaveButton from '@/components/SaveButton.vue';
 import ErrorBanner from '../ErrorBanner.vue';
@@ -13,6 +12,11 @@ import { usernameVar } from '@/cache';
 import LoggedInUserAvatar from './LoggedInUserAvatar.vue';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 import { hasBotMention, type BotSuggestion } from '@/utils/botMentions';
+
+// Lazy-load TextEditor to defer loading until user clicks "Write a comment"
+const TextEditor = defineAsyncComponent(
+  () => import('@/components/TextEditor.vue')
+);
 
 const props = defineProps({
   createCommentError: {

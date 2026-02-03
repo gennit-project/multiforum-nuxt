@@ -227,7 +227,9 @@ const handleSelectDiscussion = (payload: {
         <div
           class="flex flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row"
         >
-          <div class="flex-1 md:px-2">
+          <div
+            class="flex-1 md:px-2 lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto"
+          >
             <slot />
             <div class="mt-2 flex justify-end lg:pr-2">
               <button
@@ -337,7 +339,7 @@ const handleSelectDiscussion = (payload: {
             />
           </aside>
           <aside
-            class="hidden flex-shrink-0 lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:w-1/2 lg:flex-col lg:overflow-y-auto lg:px-6 lg:py-4"
+            class="hidden flex-shrink-0 lg:flex lg:h-[calc(100vh-3.5rem)] lg:w-1/2 lg:flex-col lg:overflow-y-auto lg:px-6 lg:py-4"
           >
             <div
               v-if="selectedDiscussionId"
