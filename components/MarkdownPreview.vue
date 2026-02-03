@@ -66,6 +66,19 @@ function linkifyChannelNames(markdownString: string) {
   });
 }
 
+function linkifyBotMentions(markdownString: string, forumId: string) {
+  const forum = forumId.trim().toLowerCase();
+  if (!forum) {
+    return markdownString;
+  }
+
+  const regex = /(^|[\s([{"'])(\/bot\/([a-z0-9-]+)(?::[a-z0-9-]+)?)/g;
+  return markdownString.replace(regex, (match, leading, mention, botName) => {
+    const profileUsername = `bot-${forum}-${botName}`;
+    return `${leading}[${mention}](/u/${profileUsername})`;
+  });
+}
+
 function linkifyUrls(text: string) {
   const urlRegex = /(?:https?:\/\/|www\.)[^\s/$.?#].[^\s)]+[^\s)]+/g;
   const markdownLinkRegex =
@@ -148,6 +161,10 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    botMentionForumId: {
+      type: String,
+      default: '',
+    },
     wordLimit: {
       type: Number,
       default: 100,
@@ -227,7 +244,11 @@ export default defineComponent({
 
     const linkifiedMarkdown = computed(() => {
       const usernamesLinkified = linkifyUsernames(props.text);
-      const channelNamesLinkified = linkifyChannelNames(usernamesLinkified);
+      const botMentionsLinkified = linkifyBotMentions(
+        usernamesLinkified,
+        props.botMentionForumId
+      );
+      const channelNamesLinkified = linkifyChannelNames(botMentionsLinkified);
       return linkifyUrls(channelNamesLinkified);
     });
 

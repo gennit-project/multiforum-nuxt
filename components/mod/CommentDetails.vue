@@ -51,6 +51,15 @@ const originalComment = computed(() => {
   return commentResult.value?.comments && commentResult.value?.comments[0];
 });
 
+const botMentionForumId = computed(() => {
+  return (
+    originalComment.value?.DiscussionChannel?.channelUniqueName ||
+    originalComment.value?.Channel?.uniqueName ||
+    channelId.value ||
+    ''
+  );
+});
+
 onCommentResult(({ data }) => {
   if (data?.comments?.length) {
     const author = getOriginalPoster({ Comment: data.comments[0] });
@@ -147,6 +156,7 @@ const permalinkObject = computed(() => {
           class="-ml-2"
           :text="originalComment?.text || '[Deleted]'"
           :disable-gallery="true"
+          :bot-mention-forum-id="botMentionForumId"
         />
       </div>
     </template>

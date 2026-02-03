@@ -436,6 +436,7 @@ const label = computed(() => {
                         :text="textCopy || ''"
                         :word-limit="SHOW_MORE_THRESHOLD"
                         :disable-gallery="false"
+                        :bot-mention-forum-id="forumId"
                       />
                       <router-link
                         v-else-if="Object.keys(permalinkObject ?? {}).length"
@@ -446,6 +447,7 @@ const label = computed(() => {
                           :text="textCopy || ''"
                           :word-limit="SHOW_MORE_THRESHOLD"
                           :disable-gallery="true"
+                          :bot-mention-forum-id="forumId"
                         />
                       </router-link>
                       <template #fallback>
@@ -454,6 +456,7 @@ const label = computed(() => {
                           :text="textCopy || ''"
                           :word-limit="SHOW_MORE_THRESHOLD"
                           :disable-gallery="false"
+                          :bot-mention-forum-id="forumId"
                         />
                       </template>
                     </ClientOnly>
