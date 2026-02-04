@@ -93,7 +93,9 @@ const pluginStates = ref<Record<string, PluginState>>({});
 const togglingPluginIds = ref<Set<string>>(new Set());
 
 const isLoading = computed(
-  () => channelLoading.value || installedLoading.value
+  () =>
+    (channelLoading.value && !channelResult.value) ||
+    (installedLoading.value && !installedResult.value)
 );
 
 function getChannelDefaults(manifest: any): Record<string, any> {
@@ -167,8 +169,12 @@ function getPluginVersion(pluginId: string) {
   return installed?.version;
 }
 
-function isToggling(pluginId: string) {
-  return togglingPluginIds.value.has(pluginId);
+function getPluginKey(plugin: any) {
+  return `${plugin.plugin.id}:${plugin.version ?? 'unknown'}`;
+}
+
+function isToggling(plugin: any) {
+  return togglingPluginIds.value.has(getPluginKey(plugin));
 }
 
 function isPluginEnabled(pluginId: string) {
@@ -177,6 +183,7 @@ function isPluginEnabled(pluginId: string) {
 
 async function handleToggleEnabled(plugin: any, enabled: boolean) {
   const pluginId = plugin.plugin.id;
+  const pluginKey = getPluginKey(plugin);
   const state = pluginStates.value[pluginId];
   const edge = enabledPluginsById.value.get(pluginId);
   const version = getPluginVersion(pluginId);
@@ -242,7 +249,7 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
     return;
   }
 
-  togglingPluginIds.value.add(pluginId);
+  togglingPluginIds.value.add(pluginKey);
   try {
     await updateChannelEnabledPlugins({
       channelUniqueName: channelUniqueName.value,
@@ -262,7 +269,7 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
       'Failed to update plugin. Please try again.';
     toast.error(`Failed to update plugin: ${message}`);
   } finally {
-    togglingPluginIds.value.delete(pluginId);
+    togglingPluginIds.value.delete(pluginKey);
   }
 }
 </script>
@@ -369,7 +376,7 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
       <div class="space-y-3">
         <div
           v-for="plugin in serverEnabledPlugins"
-          :key="plugin.plugin.id"
+          :key="getPluginKey(plugin)"
           class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
         >
           <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -410,7 +417,7 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
                   type="checkbox"
                   class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
                   :checked="isPluginEnabled(plugin.plugin.id)"
-                  :disabled="isToggling(plugin.plugin.id)"
+                  :disabled="isToggling(plugin)"
                   :aria-label="`Enable ${plugin.plugin.displayName || plugin.plugin.name}`"
                   @change="
                     handleToggleEnabled(
@@ -421,7 +428,7 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
                 />
                 <span class="text-sm text-gray-700 dark:text-gray-300">
                   <i
-                    v-if="isToggling(plugin.plugin.id)"
+                    v-if="isToggling(plugin)"
                     class="fa-solid fa-spinner animate-spin"
                   />
                   <span v-else>Enable</span>
