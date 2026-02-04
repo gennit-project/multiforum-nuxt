@@ -1,9 +1,9 @@
 import { COMMENT_VOTE_FIELDS } from '../comment/queries';
 import { gql } from '@apollo/client/core';
 
-export const ISSUE_FIELDS = gql`
+export const ISSUE_BASE_FIELDS = gql`
   # ${COMMENT_VOTE_FIELDS}
-  fragment IssueFields on Issue {
+  fragment IssueBaseFields on Issue {
     id
     issueNumber
     title
@@ -31,6 +31,13 @@ export const ISSUE_FIELDS = gql`
     LockedBy {
       displayName
     }
+  }
+`;
+
+export const ISSUE_FIELDS = gql`
+  ${ISSUE_BASE_FIELDS}
+  fragment IssueFields on Issue {
+    ...IssueBaseFields
     ActivityFeed(options: { sort: { createdAt: DESC } }) {
       ... on ModerationAction {
         id
@@ -98,15 +105,89 @@ export const ISSUE_FIELDS = gql`
 `;
 
 export const GET_ISSUE = gql`
-  ${ISSUE_FIELDS}
-  query getIssue($channelUniqueName: String!, $issueNumber: Int!) {
+  ${ISSUE_BASE_FIELDS}
+  query getIssue(
+    $channelUniqueName: String!
+    $issueNumber: Int!
+    $activityFeedLimit: Int
+    $activityFeedOffset: Int
+  ) {
     issues(
       where: {
         channelUniqueName: $channelUniqueName
         issueNumber: $issueNumber
       }
     ) {
-      ...IssueFields
+      ...IssueBaseFields
+      ActivityFeed(
+        options: {
+          sort: { createdAt: DESC }
+          limit: $activityFeedLimit
+          offset: $activityFeedOffset
+        }
+      ) {
+        ... on ModerationAction {
+          id
+          actionDescription
+          actionType
+          createdAt
+          ModerationProfile {
+            displayName
+          }
+          User {
+            username
+          }
+          Revision {
+            id
+            body
+            createdAt
+            Author {
+              username
+            }
+          }
+          Comment {
+            id
+            text
+            emoji
+            weightedVotesCount
+            createdAt
+            updatedAt
+            Issue {
+              id
+            }
+            CommentAuthor {
+              ... on ModerationProfile {
+                displayName
+              }
+              ... on User {
+                username
+              }
+            }
+            Channel {
+              uniqueName
+            }
+            ChildCommentsAggregate {
+              count
+            }
+            ParentComment {
+              id
+            }
+            editReason
+            PastVersions(options: { sort: [{ createdAt: DESC }] }) {
+              id
+              body
+              createdAt
+              Author {
+                username
+              }
+            }
+            ...CommentVoteFields
+          }
+        }
+      }
+      ActivityFeedAggregate(where: { actionType: "report" }) {
+        count
+      }
     }
   }
 `;

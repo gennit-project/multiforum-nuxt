@@ -18,9 +18,13 @@ type Issue = GeneratedIssue & {
 
 type UseIssueActivityFeedParams = {
   channelId: Ref<string>;
+  activityFeedLimit?: number;
 };
 
-export function useIssueActivityFeed({ channelId }: UseIssueActivityFeedParams) {
+export function useIssueActivityFeed({
+  channelId,
+  activityFeedLimit,
+}: UseIssueActivityFeedParams) {
   const createCacheUpdater = () => ({
     // @ts-ignore - Apollo cache update typing is complex
     update: (cache: any, { data }: any) => {
@@ -31,12 +35,19 @@ export function useIssueActivityFeed({ channelId }: UseIssueActivityFeedParams) 
       if (!updatedIssue) return;
 
       // Attempt to read the existing issues from the cache
+      const variables: Record<string, any> = {
+        channelUniqueName: updatedIssue.channelUniqueName || channelId.value,
+        issueNumber: updatedIssue.issueNumber,
+      };
+
+      if (typeof activityFeedLimit === 'number') {
+        variables.activityFeedLimit = activityFeedLimit;
+        variables.activityFeedOffset = 0;
+      }
+
       const existingIssueData = cache.readQuery({
         query: GET_ISSUE,
-        variables: {
-          channelUniqueName: updatedIssue.channelUniqueName || channelId.value,
-          issueNumber: updatedIssue.issueNumber,
-        },
+        variables,
       });
 
       if (existingIssueData?.issues?.length > 0) {
@@ -48,10 +59,7 @@ export function useIssueActivityFeed({ channelId }: UseIssueActivityFeedParams) 
 
         cache.writeQuery({
           query: GET_ISSUE,
-          variables: {
-            channelUniqueName: updatedIssue.channelUniqueName || channelId.value,
-            issueNumber: updatedIssue.issueNumber,
-          },
+          variables,
           data: {
             issues: newIssues,
           },
