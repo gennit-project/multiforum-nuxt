@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { GET_ISSUE } from '@/graphQLData/issue/queries';
 import { DELETE_DISCUSSION } from '@/graphQLData/discussion/mutations';
@@ -9,7 +9,10 @@ import { DELETE_COMMENT } from '@/graphQLData/comment/mutations';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { DateTime } from 'luxon';
-import type { Issue as GeneratedIssue } from '@/__generated__/graphql';
+import type {
+  Issue as GeneratedIssue,
+  ModerationAction,
+} from '@/__generated__/graphql';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import 'md-editor-v3/lib/style.css';
 import PageNotFound from '@/components/PageNotFound.vue';
@@ -58,6 +61,8 @@ const props = defineProps({
   },
 });
 
+const ACTIVITY_FEED_PAGE_SIZE = 10;
+
 // Setup
 const route = useRoute();
 
@@ -77,17 +82,23 @@ const issueNumber = computed(() => {
   return null;
 });
 
+const lastActivityFeedBatchSize = ref(ACTIVITY_FEED_PAGE_SIZE);
+
 // Fetch issue data
 const {
   result: getIssueResult,
   error: getIssueError,
   loading: getIssueLoading,
   refetch: refetchIssue,
+  fetchMore: fetchMoreIssue,
+  onResult: onIssueResult,
 } = useQuery(
   GET_ISSUE,
   () => ({
     channelUniqueName: channelId.value,
     issueNumber: issueNumber.value,
+    activityFeedLimit: ACTIVITY_FEED_PAGE_SIZE,
+    activityFeedOffset: 0,
   }),
   () => ({
     enabled: issueNumber.value !== null,
@@ -137,6 +148,67 @@ const { result: relatedDiscussionResult } = useQuery(
 const relatedDiscussion = computed(() => {
   return relatedDiscussionResult.value?.discussions?.[0] ?? null;
 });
+
+const activityFeedItems = computed<ModerationAction[]>(() => {
+  return activeIssue.value?.ActivityFeed ?? [];
+});
+
+onIssueResult((result) => {
+  const issue = result.data?.issues?.[0];
+  if (!issue) {
+    return;
+  }
+  lastActivityFeedBatchSize.value = issue.ActivityFeed?.length ?? 0;
+});
+
+const hasMoreActivityFeed = computed(() => {
+  return lastActivityFeedBatchSize.value === ACTIVITY_FEED_PAGE_SIZE;
+});
+
+const loadMoreActivityFeed = async () => {
+  if (getIssueLoading.value || !hasMoreActivityFeed.value) {
+    return;
+  }
+
+  const previousCount = activityFeedItems.value.length;
+  const result = await fetchMoreIssue({
+    variables: {
+      channelUniqueName: channelId.value,
+      issueNumber: issueNumber.value,
+      activityFeedLimit: ACTIVITY_FEED_PAGE_SIZE,
+      activityFeedOffset: previousCount,
+    },
+    updateQuery: (previousResult, { fetchMoreResult }) => {
+      if (!fetchMoreResult?.issues?.[0]) {
+        return previousResult;
+      }
+
+      const prevIssue = previousResult.issues[0];
+      const nextIssue = fetchMoreResult.issues[0];
+      const prevFeed = prevIssue.ActivityFeed ?? [];
+      const nextFeed = nextIssue.ActivityFeed ?? [];
+
+      return {
+        ...previousResult,
+        issues: [
+          {
+            ...prevIssue,
+            ActivityFeed: [...prevFeed, ...nextFeed],
+          },
+        ],
+      };
+    },
+  });
+
+  const newCount =
+    result?.data?.issues?.[0]?.ActivityFeed?.length ?? previousCount;
+  lastActivityFeedBatchSize.value = Math.max(newCount - previousCount, 0);
+};
+
+const resetActivityFeed = async () => {
+  lastActivityFeedBatchSize.value = ACTIVITY_FEED_PAGE_SIZE;
+  await refetchIssue();
+};
 
 const isIssueAuthor = computed(() => {
   const author = activeIssue.value?.Author;
@@ -200,8 +272,8 @@ const isSuspendedMod = computed(() => {
 });
 
 const authorType = computed(() => {
-  if (originalModProfileName.value) return 'mod';
-  if (originalAuthorUsername.value) return 'user';
+  if (resolvedOriginalModProfileName.value) return 'mod';
+  if (resolvedOriginalAuthorUsername.value) return 'user';
   return 'user';
 });
 
@@ -221,7 +293,7 @@ const {
   addIssueActivityFeedItemWithCommentAsUser,
   addIssueActivityFeedItemWithCommentAsUserLoading,
   addIssueActivityFeedItemWithCommentAsUserError,
-} = useIssueActivityFeed({ channelId });
+} = useIssueActivityFeed({ channelId, activityFeedLimit: ACTIVITY_FEED_PAGE_SIZE });
 
 const {
   lockReasonInput,
@@ -238,7 +310,7 @@ const {
   activeIssueId,
   activeIssue,
   isSuspendedMod,
-  refetchIssue,
+  refetchIssue: resetActivityFeed,
 });
 
 const {
@@ -255,7 +327,7 @@ const {
   activeIssueId,
   isIssueAuthor,
   isLocked,
-  refetchIssue,
+  refetchIssue: resetActivityFeed,
 });
 
 const { mutate: deleteDiscussion } = useMutation(DELETE_DISCUSSION);
@@ -267,9 +339,7 @@ const createCommentDefaultValues = { text: '', isRootComment: true, depth: 1 };
 const createFormValues = ref(createCommentDefaultValues);
 const deleteReasonError = ref('');
 
-const issue = computed<Issue | null>(
-  () => getIssueResult.value?.issues[0] || null
-);
+const issue = computed<Issue | null>(() => activeIssue.value || null);
 
 const hasRelatedContent = computed(() => {
   return (
@@ -313,43 +383,36 @@ const setOriginalModProfileName = (modProfileName: string) => {
   }
 };
 
-watch(
-  () => relatedDiscussion.value?.Author?.username,
-  (_username) => {
-    const author = getOriginalPoster({ Discussion: relatedDiscussion.value });
-    if (author.username) {
-      setOriginalAuthorUsername(author.username);
-    }
-  },
-  { immediate: true }
-);
+const derivedOriginalPoster = computed(() => {
+  const discussionAuthor = getOriginalPoster({ Discussion: relatedDiscussion.value });
+  if (discussionAuthor.username || discussionAuthor.modProfileName) {
+    return discussionAuthor;
+  }
 
-watch(
-  () => activeIssue.value,
-  (currentIssue) => {
-    if (!currentIssue || hasRelatedContent.value) return;
+  const issueAuthor = activeIssue.value?.Author;
+  if (issueAuthor?.__typename === 'User') {
+    return { username: issueAuthor.username || '', modProfileName: '' };
+  }
+  if (issueAuthor?.__typename === 'ModerationProfile') {
+    return { username: '', modProfileName: issueAuthor.displayName || '' };
+  }
+  return { username: '', modProfileName: '' };
+});
 
-    if (
-      !originalAuthorUsername.value &&
-      currentIssue.Author?.__typename === 'User'
-    ) {
-      setOriginalAuthorUsername(currentIssue.Author.username || '');
-    }
+const resolvedOriginalAuthorUsername = computed(() => {
+  return originalAuthorUsername.value || derivedOriginalPoster.value.username || '';
+});
 
-    if (
-      !originalModProfileName.value &&
-      currentIssue.Author?.__typename === 'ModerationProfile'
-    ) {
-      setOriginalModProfileName(currentIssue.Author.displayName || '');
-    }
-  },
-  { immediate: true }
-);
+const resolvedOriginalModProfileName = computed(() => {
+  return (
+    originalModProfileName.value || derivedOriginalPoster.value.modProfileName || ''
+  );
+});
 
 // Determine if the current user is the original author via username
 const isOriginalUserAuthor = computed(() => {
   return (
-    !!usernameVar.value && originalAuthorUsername.value === usernameVar.value
+    !!usernameVar.value && resolvedOriginalAuthorUsername.value === usernameVar.value
   );
 });
 
@@ -357,15 +420,15 @@ const isOriginalUserAuthor = computed(() => {
 const isOriginalModAuthor = computed(() => {
   return (
     !!modProfileNameVar.value &&
-    originalModProfileName.value === modProfileNameVar.value
+    resolvedOriginalModProfileName.value === modProfileNameVar.value
   );
 });
 
 // Determine if the current user is the original poster (either as user or mod)
 const isCurrentUserOriginalPoster = computed(() => {
   return isOriginalPoster({
-    originalAuthorUsername: originalAuthorUsername.value,
-    originalModProfileName: originalModProfileName.value,
+    originalAuthorUsername: resolvedOriginalAuthorUsername.value,
+    originalModProfileName: resolvedOriginalModProfileName.value,
     currentUsername: usernameVar.value,
     currentModProfileName: modProfileNameVar.value,
   });
@@ -425,6 +488,7 @@ const handleCreateComment = async () => {
   }
 
   createFormValues.value.text = '';
+  await resetActivityFeed();
 };
 
 const toggleCloseOpenIssue = async () => {
@@ -485,6 +549,7 @@ const toggleCloseOpenIssue = async () => {
 
     // Reset comment form
     createFormValues.value.text = '';
+    await resetActivityFeed();
   } catch (error) {
     console.error('Error toggling issue open/close state:', error);
   }
@@ -531,7 +596,7 @@ const handleDeleteDiscussion = async (discussionId: string) => {
     await deleteDiscussion({ id: discussionId });
     createFormValues.value.text = '';
     deleteReasonError.value = '';
-    await refetchIssue();
+    await resetActivityFeed();
   } catch (error) {
     console.error('Error deleting discussion:', error);
   }
@@ -560,7 +625,7 @@ const handleDeleteEvent = async (eventId: string) => {
     await deleteEvent({ id: eventId });
     createFormValues.value.text = '';
     deleteReasonError.value = '';
-    await refetchIssue();
+    await resetActivityFeed();
   } catch (error) {
     console.error('Error deleting event:', error);
   }
@@ -589,7 +654,7 @@ const handleDeleteComment = async (commentId: string) => {
     await deleteComment({ id: commentId });
     createFormValues.value.text = '';
     deleteReasonError.value = '';
-    await refetchIssue();
+    await resetActivityFeed();
   } catch (error) {
     console.error('Error deleting comment:', error);
   }
@@ -681,13 +746,21 @@ const handleLockReasonUpdate = (value: string) => {
         <div class="px-4">
           <h2 v-if="activeIssue" class="text-xl font-bold">Activity Feed</h2>
 
+          <button
+            v-if="activeIssue && hasMoreActivityFeed"
+            type="button"
+            class="mb-4 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+            :disabled="getIssueLoading"
+            @click="loadMoreActivityFeed"
+          >
+            Load older posts
+          </button>
           <ActivityFeed
-            v-if="activeIssue"
-            :key="activeIssue.id"
+            v-if="activeIssue || activityFeedItems.length"
             class="mb-6 border-l-4 border-l-blue-400 pl-4 dark:border-l-blue-500"
-            :feed-items="activeIssue.ActivityFeed || []"
-            :original-user-author-username="originalAuthorUsername"
-            :original-mod-author-name="originalModProfileName"
+            :feed-items="activityFeedItems"
+            :original-user-author-username="resolvedOriginalAuthorUsername"
+            :original-mod-author-name="resolvedOriginalModProfileName"
             :related-discussion="relatedDiscussion"
           />
 
@@ -718,12 +791,12 @@ const handleLockReasonUpdate = (value: string) => {
             :can-edit-discussions="modPermissions.canEditDiscussions"
             :can-edit-events="modPermissions.canEditEvents"
             :report-count="reportCount ?? undefined"
-            @archived-successfully="refetchIssue"
-            @unarchived-successfully="refetchIssue"
-            @suspended-user-successfully="refetchIssue"
-            @suspended-mod-successfully="refetchIssue"
-            @unsuspended-user-successfully="refetchIssue"
-            @unsuspended-mod-successfully="refetchIssue"
+            @archived-successfully="resetActivityFeed"
+            @unarchived-successfully="resetActivityFeed"
+            @suspended-user-successfully="resetActivityFeed"
+            @suspended-mod-successfully="resetActivityFeed"
+            @unsuspended-user-successfully="resetActivityFeed"
+            @unsuspended-mod-successfully="resetActivityFeed"
             @open-issue="toggleCloseOpenIssue"
             @close-issue="toggleCloseOpenIssue"
           />
