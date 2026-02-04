@@ -2,7 +2,7 @@
 import CirclePlusIcon from '@/components/icons/CirclePlusIcon.vue';
 import { isAuthenticatedVar } from '@/cache';
 
-const props = defineProps({
+defineProps({
   channelId: {
     type: String,
     required: true,

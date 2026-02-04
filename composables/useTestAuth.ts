@@ -72,7 +72,7 @@ export const useTestAuth = () => {
       let auth0;
       try {
         auth0 = useAuth0();
-      } catch (error) {
+      } catch {
         // Auth0 not available, proceed with manual state sync
       }
 
@@ -114,7 +114,7 @@ export const useTestAuth = () => {
             loadUserData();
             return;
           }
-        } catch (error) {
+        } catch {
           // Auth0 checkSession failed, falling back to manual sync
         }
       }

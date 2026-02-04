@@ -257,7 +257,7 @@ const isExpanded = computed(() => {
         </div>
       </div>
     </div>
-    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" />
+    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" >
     <div
       v-if="showSearch"
       class="flex flex-col gap-2 bg-gray-100 py-2 dark:bg-gray-700 dark:text-gray-300"

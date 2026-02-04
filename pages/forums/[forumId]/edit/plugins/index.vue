@@ -427,7 +427,7 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
                       ($event.target as HTMLInputElement).checked
                     )
                   "
-                />
+                >
                 <span class="text-sm text-gray-700 dark:text-gray-300">
                   <i
                     v-if="isToggling(plugin)"

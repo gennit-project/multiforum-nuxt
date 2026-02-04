@@ -407,7 +407,7 @@ const popoverStyles = computed(() => {
             type="text"
             placeholder="Search lists..."
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-          />
+          >
         </div>
 
         <!-- Create New List -->
@@ -429,7 +429,7 @@ const popoverStyles = computed(() => {
               class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
               @keyup.enter="handleCreateNewCollection"
               @keyup.escape="isCreatingNew = false"
-            />
+            >
             <div class="flex gap-2">
               <button
                 class="flex-1 rounded-md bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
@@ -452,7 +452,7 @@ const popoverStyles = computed(() => {
         </div>
 
         <!-- Divider -->
-        <hr class="mb-3 border-gray-200 dark:border-gray-600" />
+        <hr class="mb-3 border-gray-200 dark:border-gray-600" >
 
         <!-- Lists -->
         <div class="max-h-64 space-y-1 overflow-y-auto">
@@ -472,7 +472,7 @@ const popoverStyles = computed(() => {
               :checked="isItemInFavorites"
               class="rounded text-blue-600 focus:ring-blue-500"
               readonly
-            />
+            >
           </div>
 
           <!-- Divider between Favorites and Collections -->
@@ -483,7 +483,7 @@ const popoverStyles = computed(() => {
             "
             class="my-2"
           >
-            <hr class="border-gray-200 dark:border-gray-600" />
+            <hr class="border-gray-200 dark:border-gray-600" >
             <div
               class="mb-1 mt-2 px-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
             >
@@ -515,7 +515,7 @@ const popoverStyles = computed(() => {
               "
               class="rounded text-blue-600 focus:ring-blue-500"
               readonly
-            />
+            >
           </div>
 
           <!-- No Search Results -->
@@ -575,7 +575,7 @@ const popoverStyles = computed(() => {
           placeholder="Search lists..."
           aria-label="Search lists"
           class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-        />
+        >
       </div>
 
       <!-- Create New List -->
@@ -598,7 +598,7 @@ const popoverStyles = computed(() => {
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
             @keyup.enter="handleCreateNewCollection"
             @keyup.escape="isCreatingNew = false"
-          />
+          >
           <div class="flex gap-2">
             <button
               class="flex-1 rounded-md bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
@@ -621,7 +621,7 @@ const popoverStyles = computed(() => {
       </div>
 
       <!-- Divider -->
-      <hr class="mb-3 border-gray-200 dark:border-gray-600" />
+      <hr class="mb-3 border-gray-200 dark:border-gray-600" >
 
       <!-- Lists -->
       <div class="max-h-64 space-y-1 overflow-y-auto">
@@ -642,7 +642,7 @@ const popoverStyles = computed(() => {
             :aria-label="`${isItemInFavorites ? 'Remove from' : 'Add to'} ${favoritesList.name}`"
             class="rounded text-blue-600 focus:ring-blue-500"
             readonly
-          />
+          >
         </div>
 
         <!-- Divider between Favorites and Collections -->
@@ -653,7 +653,7 @@ const popoverStyles = computed(() => {
           "
           class="my-2"
         >
-          <hr class="border-gray-200 dark:border-gray-600" />
+          <hr class="border-gray-200 dark:border-gray-600" >
           <div
             class="mb-1 mt-2 px-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
           >
@@ -686,7 +686,7 @@ const popoverStyles = computed(() => {
             :aria-label="`${itemInCollections.some((c: CollectionListItem) => c.id === collection.id) ? 'Remove from' : 'Add to'} ${collection.name}`"
             class="rounded text-blue-600 focus:ring-blue-500"
             readonly
-          />
+          >
         </div>
 
         <!-- No Search Results -->

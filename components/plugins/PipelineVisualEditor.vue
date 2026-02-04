@@ -121,7 +121,7 @@ const eventDescription = computed(() => {
                 ($event.target as HTMLInputElement).checked
               )
             "
-          />
+          >
           <span class="text-sm text-gray-700 dark:text-gray-300"
             >Stop on first failure</span
           >
@@ -230,7 +230,7 @@ const eventDescription = computed(() => {
                             .checked,
                         })
                       "
-                    />
+                    >
                     <span class="text-sm text-gray-700 dark:text-gray-300"
                       >Continue on error</span
                     >
