@@ -64,12 +64,13 @@ const enabledPluginEdges = computed(() => {
   );
 });
 
-const enabledPluginsById = computed(() => {
+const enabledPluginsByKey = computed(() => {
   const map = new Map<string, any>();
   for (const edge of enabledPluginEdges.value) {
     const pluginId = edge?.node?.Plugin?.id;
-    if (pluginId) {
-      map.set(pluginId, edge);
+    const version = edge?.node?.version;
+    if (pluginId && version) {
+      map.set(`${pluginId}:${version}`, edge);
     }
   }
   return map;
@@ -81,11 +82,14 @@ const serverEnabledPlugins = computed(() => {
 });
 
 const orphanedChannelPlugins = computed(() => {
-  const serverIds = new Set(
-    serverEnabledPlugins.value.map((plugin: any) => plugin.plugin.id)
+  const serverKeys = new Set(
+    serverEnabledPlugins.value.map(
+      (plugin: any) => `${plugin.plugin.id}:${plugin.version}`
+    )
   );
   return enabledPluginEdges.value.filter(
-    (edge: any) => !serverIds.has(edge?.node?.Plugin?.id)
+    (edge: any) =>
+      !serverKeys.has(`${edge?.node?.Plugin?.id}:${edge?.node?.version}`)
   );
 });
 
@@ -106,10 +110,14 @@ function getChannelDefaults(manifest: any): Record<string, any> {
   return { ...defaults };
 }
 
-function initializePluginState(pluginId: string, manifest: any, edge?: any) {
+function initializePluginState(
+  pluginKey: string,
+  manifest: any,
+  edge?: any
+) {
   const settingsJson = edge?.properties?.settingsJson;
   const defaults = getChannelDefaults(manifest);
-  pluginStates.value[pluginId] = {
+  pluginStates.value[pluginKey] = {
     enabled: !!edge,
     settings: {
       ...defaults,
@@ -144,30 +152,21 @@ function serializeSettingsJson(settings: unknown) {
 }
 
 watch(
-  [serverEnabledPlugins, enabledPluginsById],
+  [serverEnabledPlugins, enabledPluginsByKey],
   ([serverPlugins, enabledMap]) => {
     for (const plugin of serverPlugins) {
       const pluginId = plugin.plugin.id;
+      const version = plugin.version;
       const manifest = plugin.manifest;
-      const edge = enabledMap.get(pluginId);
-      if (!pluginStates.value[pluginId]) {
-        initializePluginState(pluginId, manifest, edge);
+      const pluginKey = `${pluginId}:${version}`;
+      const edge = enabledMap.get(pluginKey);
+      if (!pluginStates.value[pluginKey]) {
+        initializePluginState(pluginKey, manifest, edge);
       }
     }
   },
   { immediate: true }
 );
-
-function getPluginVersion(pluginId: string) {
-  const edge = enabledPluginsById.value.get(pluginId);
-  if (edge?.node?.version) {
-    return edge.node.version;
-  }
-  const installed = serverEnabledPlugins.value.find(
-    (plugin: any) => plugin.plugin.id === pluginId
-  );
-  return installed?.version;
-}
 
 function getPluginKey(plugin: any) {
   return `${plugin.plugin.id}:${plugin.version ?? 'unknown'}`;
@@ -177,16 +176,16 @@ function isToggling(plugin: any) {
   return togglingPluginIds.value.has(getPluginKey(plugin));
 }
 
-function isPluginEnabled(pluginId: string) {
-  return pluginStates.value[pluginId]?.enabled ?? false;
+function isPluginEnabled(plugin: any) {
+  return pluginStates.value[getPluginKey(plugin)]?.enabled ?? false;
 }
 
 async function handleToggleEnabled(plugin: any, enabled: boolean) {
   const pluginId = plugin.plugin.id;
   const pluginKey = getPluginKey(plugin);
-  const state = pluginStates.value[pluginId];
-  const edge = enabledPluginsById.value.get(pluginId);
-  const version = getPluginVersion(pluginId);
+  const state = pluginStates.value[pluginKey];
+  const edge = enabledPluginsByKey.value.get(pluginKey);
+  const version = plugin.version ?? edge?.node?.version;
 
   if (!version) {
     toast.error('Could not determine plugin version for this forum.');
@@ -256,8 +255,8 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
       enabledPlugins: enabledPluginsInput,
     });
     // Update local state
-    if (pluginStates.value[pluginId]) {
-      pluginStates.value[pluginId].enabled = enabled;
+    if (pluginStates.value[pluginKey]) {
+      pluginStates.value[pluginKey].enabled = enabled;
     }
     await refetchChannel();
     await client.refetchQueries({ include: [GET_CHANNEL] });
@@ -345,6 +344,9 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
             <ul class="mt-2 list-inside list-disc space-y-1">
               <li v-for="edge in orphanedChannelPlugins" :key="edge.node.id">
                 {{ edge.node.Plugin.displayName || edge.node.Plugin.name }}
+                <span class="text-xs text-yellow-700/80 dark:text-yellow-300/80">
+                  (v{{ edge.node.version }})
+                </span>
               </li>
             </ul>
           </div>
@@ -394,7 +396,7 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
                   v{{ plugin.version }}
                 </span>
                 <span
-                  v-if="isPluginEnabled(plugin.plugin.id)"
+                  v-if="isPluginEnabled(plugin)"
                   class="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-800 dark:text-green-200"
                 >
                   Enabled
@@ -416,7 +418,7 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
                 <input
                   type="checkbox"
                   class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                  :checked="isPluginEnabled(plugin.plugin.id)"
+                  :checked="isPluginEnabled(plugin)"
                   :disabled="isToggling(plugin)"
                   :aria-label="`Enable ${plugin.plugin.displayName || plugin.plugin.name}`"
                   @change="
