@@ -30,13 +30,6 @@ const serverConfig = computed(() => {
   return getServerResult.value?.serverConfigs[0] || null;
 });
 
-const isSettingsPage = computed(() => {
-  const routeName = route.name?.toString() || '';
-  return (
-    routeName.includes('admin-settings') || routeName.includes('admin-plugins')
-  );
-});
-
 const showIssueDetailPane = computed(() => {
   const routeName = route.name?.toString() || '';
   return routeName === 'admin-issues' || routeName === 'admin-issues-closed';

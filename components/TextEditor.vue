@@ -18,17 +18,6 @@ import CharCounter from '@/components/CharCounter.vue';
 import TextEditorToolbar from '@/components/text-editor/TextEditorToolbar.vue';
 import BotSuggestionsPopover from '@/components/text-editor/BotSuggestionsPopover.vue';
 
-// Lazy-loaded components (heavy dependencies)
-const TextEditorFullScreen = defineAsyncComponent(
-  () => import('@/components/text-editor/TextEditorFullScreen.vue')
-);
-const EmojiPickerWrapper = defineAsyncComponent(
-  () => import('@/components/text-editor/EmojiPickerWrapper.vue')
-);
-const MarkdownRenderer = defineAsyncComponent(
-  () => import('@/components/MarkdownRenderer.vue')
-);
-
 // Composables
 import { useImageUpload } from '@/composables/useImageUpload';
 import {
@@ -42,6 +31,17 @@ import { useFullScreenEditor } from '@/composables/useFullScreenEditor';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 import { formatText, type FormatType } from '@/utils/textFormatting';
 import type { BotSuggestion } from '@/utils/botMentions';
+
+// Lazy-loaded components (heavy dependencies)
+const TextEditorFullScreen = defineAsyncComponent(
+  () => import('@/components/text-editor/TextEditorFullScreen.vue')
+);
+const EmojiPickerWrapper = defineAsyncComponent(
+  () => import('@/components/text-editor/EmojiPickerWrapper.vue')
+);
+const MarkdownRenderer = defineAsyncComponent(
+  () => import('@/components/MarkdownRenderer.vue')
+);
 
 type FileChangeInput = {
   event: Event & { target: HTMLInputElement | null };

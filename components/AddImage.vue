@@ -34,11 +34,6 @@ const clearFileInput = () => {
 const onFileSelected = (event: Event) => {
   if (props.disabled) return;
 
-  const input = event.target as HTMLInputElement;
-  if (input && input.files && input.files.length > 0) {
-    const file = input.files[0];
-  }
-
   emit('file-change', {
     event,
     fieldName: props.fieldName,

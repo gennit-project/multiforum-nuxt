@@ -49,19 +49,6 @@ const props = defineProps({
 
 const emit = defineEmits(['closeEditor', 'updateFormValues']);
 
-// Check if we're in create mode (using a temporary ID) or edit mode
-const isCreateMode = computed(() => {
-  if (props.discussion.id !== 'temp-id') {
-    return false;
-  }
-
-  // If we have files with IDs, we're editing an existing download (not in create mode)
-  const hasExistingFiles = props.discussion?.DownloadableFiles?.some(
-    (file) => file.id
-  );
-  return !hasExistingFiles;
-});
-
 const downloadableFiles = computed(() => {
   if (!props.discussion?.DownloadableFiles) return [];
   return props.discussion.DownloadableFiles.map((file: DownloadableFile) => {

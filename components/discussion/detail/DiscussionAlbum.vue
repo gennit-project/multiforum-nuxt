@@ -151,7 +151,7 @@ const saveCaption = async () => {
   if (!image) return;
 
   try {
-    const result = await updateImage({
+    await updateImage({
       imageId: image.id,
       caption: editingCaption.value,
     });
@@ -296,7 +296,7 @@ onMounted(() => {
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="shadow-sm"
-          />
+          >
           <div
             v-if="editingCaptionIndex === idx"
             class="mt-1 text-center text-xs"
@@ -496,7 +496,7 @@ onMounted(() => {
                     maxHeight: expandedView ? 'none' : `${mainImageHeight}px`,
                     height: expandedView ? '100%' : 'auto',
                   }"
-                />
+                >
               </div>
             </div>
           </div>
@@ -543,7 +543,7 @@ onMounted(() => {
             {{ activeImage.caption }}
           </span>
         </div>
-        <div v-else class="h-3"></div>
+        <div v-else class="h-3"/>
       </div>
     </div>
 

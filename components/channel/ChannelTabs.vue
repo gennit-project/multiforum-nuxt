@@ -124,7 +124,7 @@ const iconSize = computed(() =>
   props.vertical ? 'h-6 w-6 shrink-0' : 'h-5 w-5 shrink-0'
 );
 
-const { smAndDown, mdAndUp } = useDisplay();
+const { mdAndUp } = useDisplay();
 
 // Check if a tab should be active based on route
 const isTabActive = (tab: Tab) => {
