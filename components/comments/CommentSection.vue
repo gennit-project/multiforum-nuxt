@@ -251,6 +251,8 @@ const discussionIdRef = computed(
 const {
   createComment,
   createCommentError,
+  onDoneCreatingComment,
+  onErrorCreatingComment,
   editComment,
   editCommentError,
   onDoneUpdatingComment,
@@ -261,17 +263,6 @@ const {
   discussionId: discussionIdRef,
   commentToDeleteId,
   parentOfCommentToDelete,
-  onCommentCreated: () => {
-    commentInProcess.value = false;
-    submitAttempted.value = false;
-    replyFormOpenAtCommentID.value = '';
-    emit('updateCreateFormValues', {
-      text: '',
-      isRootComment: true,
-      depth: 1,
-      parentCommentId: '',
-    });
-  },
   onCommentDeleted: () => {
     commentToDeleteId.value = '';
     showDeleteCommentModal.value = false;
@@ -282,6 +273,22 @@ const {
   onDecrementCommentCount: (cache) => {
     emit('decrementCommentCount', cache);
   },
+});
+
+onDoneCreatingComment(() => {
+  commentInProcess.value = false;
+  submitAttempted.value = false;
+  replyFormOpenAtCommentID.value = '';
+  emit('updateCreateFormValues', {
+    text: '',
+    isRootComment: true,
+    depth: 1,
+    parentCommentId: '',
+  });
+});
+
+onErrorCreatingComment(() => {
+  commentInProcess.value = false;
 });
 
 onDoneUpdatingComment(() => {
@@ -295,14 +302,31 @@ onDoneUpdatingComment(() => {
   };
 });
 
+const fallbackChannelUniqueName = computed(() => {
+  const firstComment = (props.comments || []).find(
+    (comment) => !!comment?.id
+  );
+  return (
+    firstComment?.DiscussionChannel?.channelUniqueName ||
+    firstComment?.Channel?.uniqueName ||
+    ''
+  );
+});
+
+const effectiveChannelUniqueName = computed(() => {
+  return (
+    props.commentSectionQueryVariables.channelUniqueName ||
+    fallbackChannelUniqueName.value ||
+    ''
+  );
+});
+
 const {
   issueNumber: suspensionIssueNumber,
   suspendedUntil: suspensionUntil,
   suspendedIndefinitely: suspensionIndefinitely,
   channelId: suspensionChannelId,
-} = useChannelSuspensionNotice(
-  computed(() => props.commentSectionQueryVariables.channelUniqueName || '')
-);
+} = useChannelSuspensionNotice(effectiveChannelUniqueName);
 
 const showSuspensionNotice = computed(() => {
   return submitAttempted.value && !!suspensionIssueNumber.value;
@@ -459,7 +483,7 @@ const replyHasBotMention = computed(() => {
     <div>
       <slot name="pre-header" />
       <ErrorBanner
-        v-if="createCommentError"
+        v-if="createCommentError && !replyFormOpenAtCommentID"
         :text="createCommentError.message"
       />
       <SuspensionNotice
@@ -497,6 +521,11 @@ const replyHasBotMention = computed(() => {
         :archived="archived"
         :original-poster="originalPoster"
         :reply-has-bot-mention="replyHasBotMention"
+        :create-comment-error="createCommentError"
+        :suspension-issue-number="suspensionIssueNumber ?? null"
+        :suspension-channel-id="suspensionChannelId ?? ''"
+        :suspension-until="suspensionUntil ?? null"
+        :suspension-indefinitely="suspensionIndefinitely ?? false"
         :bot-suggestions="botSuggestions"
         :bot-usernames="botUsernames"
         @create-comment="handleClickCreate"
@@ -647,6 +676,11 @@ const replyHasBotMention = computed(() => {
               :aggregate-comment-count="aggregateCommentCount"
               :compact="true"
               :comment-data="comment"
+              :create-comment-error="createCommentError"
+              :suspension-issue-number="suspensionIssueNumber ?? null"
+              :suspension-channel-id="suspensionChannelId ?? ''"
+              :suspension-until="suspensionUntil ?? null"
+              :suspension-indefinitely="suspensionIndefinitely ?? false"
               :enable-feedback="enableFeedback"
               :depth="1"
               :locked="locked || archived"

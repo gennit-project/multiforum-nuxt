@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import type { PropType } from 'vue';
 import type { Comment as CommentType } from '@/__generated__/graphql';
 import type { BotSuggestion } from '@/utils/botMentions';
+import type { ApolloError } from '@apollo/client/core';
 import Comment from './Comment.vue';
 
 const props = defineProps({
@@ -28,6 +29,31 @@ const props = defineProps({
   },
   replyHasBotMention: {
     type: Boolean,
+    default: false,
+  },
+  createCommentError: {
+    type: Object as PropType<ApolloError | null>,
+    required: false,
+    default: null,
+  },
+  suspensionIssueNumber: {
+    type: Number,
+    required: false,
+    default: null,
+  },
+  suspensionChannelId: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  suspensionUntil: {
+    type: String,
+    required: false,
+    default: null,
+  },
+  suspensionIndefinitely: {
+    type: Boolean,
+    required: false,
     default: false,
   },
   botSuggestions: {
@@ -101,6 +127,11 @@ const hasAnswers = computed(() => {
           :original-poster="originalPoster"
           :answers="answers"
           :reply-has-bot-mention="replyHasBotMention"
+          :create-comment-error="createCommentError"
+          :suspension-issue-number="suspensionIssueNumber"
+          :suspension-channel-id="suspensionChannelId"
+          :suspension-until="suspensionUntil"
+          :suspension-indefinitely="suspensionIndefinitely"
           :bot-suggestions="botSuggestions"
           :bot-usernames="botUsernames"
           :show-comment-buttons="true"

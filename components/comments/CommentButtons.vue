@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import type { PropType } from 'vue';
 import type { Comment, ModerationProfile, User } from '@/__generated__/graphql';
+import type { ApolloError } from '@apollo/client/core';
 import type { BotSuggestion } from '@/utils/botMentions';
 import VoteButtons from './VoteButtons.vue';
 import ReplyButton from './ReplyButton.vue';
@@ -13,6 +14,7 @@ import EmojiButtons from './EmojiButtons.vue';
 import NewEmojiButton from './NewEmojiButton.vue';
 import AddToCommentFavorites from '@/components/favorites/AddToCommentFavorites.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { usernameVar, modProfileNameVar } from '@/cache';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 
@@ -35,6 +37,31 @@ const props = defineProps({
   },
   replyHasBotMention: {
     type: Boolean,
+    default: false,
+  },
+  createCommentError: {
+    type: Object as PropType<ApolloError | null>,
+    required: false,
+    default: null,
+  },
+  suspensionIssueNumber: {
+    type: Number,
+    required: false,
+    default: null,
+  },
+  suspensionChannelId: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  suspensionUntil: {
+    type: String,
+    required: false,
+    default: null,
+  },
+  suspensionIndefinitely: {
+    type: Boolean,
+    required: false,
     default: false,
   },
   botSuggestions: {
@@ -253,6 +280,24 @@ function toggleEmojiPicker() {
       v-if="commentData && replyFormOpenAtCommentID === commentData.id"
       class="my-2 mt-1 w-full px-3 py-4 dark:bg-gray-700"
     >
+      <SuspensionNotice
+        v-if="
+          createCommentError &&
+          suspensionIssueNumber &&
+          suspensionChannelId
+        "
+        class="mb-2"
+        :issue-number="suspensionIssueNumber"
+        :channel-id="suspensionChannelId"
+        :suspended-until="suspensionUntil"
+        :suspended-indefinitely="suspensionIndefinitely"
+        :message="'You are suspended in this forum and cannot comment.'"
+      />
+      <ErrorBanner
+        v-else-if="createCommentError"
+        class="mb-2"
+        :text="createCommentError?.message"
+      />
       <ErrorBanner
         v-if="replyHasBotMention"
         class="mb-2"

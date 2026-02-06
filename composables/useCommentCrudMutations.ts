@@ -16,7 +16,6 @@ type UseCommentCrudMutationsParams = {
   discussionId: Ref<string | undefined>;
   commentToDeleteId: Ref<string>;
   parentOfCommentToDelete: Ref<string>;
-  onCommentCreated?: () => void;
   onCommentDeleted?: () => void;
   onIncrementCommentCount?: (cache: unknown) => void;
   onDecrementCommentCount?: (cache: unknown) => void;
@@ -30,7 +29,6 @@ type UseCommentCrudMutationsParams = {
  *   - discussionId: The discussion channel ID for cache updates
  *   - commentToDeleteId: Ref to the ID of comment being deleted
  *   - parentOfCommentToDelete: Ref to the parent comment ID (for replies)
- *   - onCommentCreated: Optional callback after comment creation
  *   - onCommentDeleted: Optional callback after comment deletion
  *   - onIncrementCommentCount: Optional callback to emit comment count increment
  *   - onDecrementCommentCount: Optional callback to emit comment count decrement
@@ -41,7 +39,6 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
     discussionId,
     commentToDeleteId,
     parentOfCommentToDelete,
-    onCommentCreated,
     onCommentDeleted,
     onIncrementCommentCount,
     onDecrementCommentCount,
@@ -54,8 +51,9 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
     mutate: createComment,
     error: createCommentError,
     onDone: onDoneCreatingComment,
+    onError: onErrorCreatingComment,
   } = useMutation(CREATE_COMMENT, {
-    errorPolicy: 'all',
+    errorPolicy: 'none',
     update: (cache, result) => {
       const newComment: CommentType = result.data?.createComments?.comments[0];
       const newCommentParentId = newComment?.ParentComment?.id;
@@ -160,10 +158,6 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
     },
   });
 
-  onDoneCreatingComment(() => {
-    onCommentCreated?.();
-  });
-
   // UPDATE COMMENT mutation
   const {
     mutate: editComment,
@@ -253,6 +247,8 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
     // Create
     createComment,
     createCommentError,
+    onDoneCreatingComment,
+    onErrorCreatingComment,
 
     // Update
     editComment,

@@ -126,15 +126,16 @@ describe('useCommentCrudMutations', () => {
   });
 
   describe('callbacks', () => {
-    it('should call onCommentCreated when comment is created', () => {
+    it('should call onDoneCreatingComment callback when comment is created', () => {
       const onCommentCreated = vi.fn();
 
-      useCommentCrudMutations({
+      const { onDoneCreatingComment } = useCommentCrudMutations({
         discussionId: computed(() => 'discussion-123'),
         commentToDeleteId: ref(''),
         parentOfCommentToDelete: ref(''),
-        onCommentCreated,
       });
+
+      onDoneCreatingComment(onCommentCreated);
 
       // Trigger the first onDone callback (CREATE_COMMENT)
       const createCallback = onDoneCallbacks.get('mutation-1');
@@ -196,7 +197,7 @@ describe('useCommentCrudMutations', () => {
       expect(useMutation).toHaveBeenCalledTimes(4);
     });
 
-    it('should configure CREATE_COMMENT with errorPolicy all', () => {
+    it('should configure CREATE_COMMENT with errorPolicy none', () => {
       useCommentCrudMutations({
         discussionId: computed(() => 'discussion-123'),
         commentToDeleteId: ref(''),
@@ -204,7 +205,7 @@ describe('useCommentCrudMutations', () => {
       });
 
       const createMutationCall = (useMutation as any).mock.calls[0];
-      expect(createMutationCall[1]).toHaveProperty('errorPolicy', 'all');
+      expect(createMutationCall[1]).toHaveProperty('errorPolicy', 'none');
     });
 
     it('should configure CREATE_COMMENT with update function', () => {

@@ -6,6 +6,7 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import {
   GET_USER_FAVORITE_COUNTS,
   GET_USER_FAVORITE_DOWNLOADS_COUNT,
+  GET_USER_OWNED_DOWNLOADS_COUNT,
 } from '@/graphQLData/user/queries';
 import { GET_ALL_USER_COLLECTIONS } from '@/graphQLData/collection/queries';
 import { usernameVar, isAuthenticatedVar } from '@/cache';
@@ -54,6 +55,20 @@ const { result: favoriteDownloadsResult, refetch: refetchDownloads } = useQuery(
   })
 );
 
+const {
+  result: ownedDownloadsCountResult,
+  refetch: refetchOwnedDownloads,
+} = useQuery(
+  GET_USER_OWNED_DOWNLOADS_COUNT,
+  () => ({
+    username: username.value,
+  }),
+  () => ({
+    enabled: !!username.value && isAuthenticated.value,
+    fetchPolicy: 'cache-and-network',
+  })
+);
+
 const { result: customCollectionsResult, refetch: refetchCustomCollections } =
   useQuery(
     GET_ALL_USER_COLLECTIONS,
@@ -73,6 +88,7 @@ watch(
     if (newUsername && newIsAuthenticated) {
       refetchCounts();
       refetchDownloads();
+      refetchOwnedDownloads();
       refetchCustomCollections();
     }
   }
@@ -83,6 +99,7 @@ const isLoading = computed(() => {
   return (
     !favoriteCountsResult.value &&
     !favoriteDownloadsResult.value &&
+    !ownedDownloadsCountResult.value &&
     !customCollectionsResult.value &&
     isAuthenticated.value &&
     !!username.value
@@ -113,6 +130,13 @@ const favoriteCounts = computed(() => {
   }
 
   return counts;
+});
+
+const ownedDownloadsCount = computed(() => {
+  return (
+    ownedDownloadsCountResult.value?.users?.[0]?.OwnedDownloadsAggregate
+      ?.count || 0
+  );
 });
 
 // Collections with real counts
@@ -264,6 +288,27 @@ const getCollectionTypeInfo = (collectionType: string) => {
                       {{ filter.label }}
                     </button>
                   </div>
+                </div>
+
+                <!-- My Downloads Section -->
+                <div class="mb-8">
+                  <div
+                    class="mb-2 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                  >
+                    My Downloads
+                  </div>
+                  <NuxtLink
+                    to="/library/my-downloads"
+                    class="block rounded-md py-2 text-sm transition-colors"
+                    active-class="bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300 font-semibold"
+                  >
+                    <div class="flex items-center justify-between">
+                      <span class="font-medium">My Downloads</span>
+                      <span class="text-gray-500 dark:text-gray-400">
+                        ({{ ownedDownloadsCount }})
+                      </span>
+                    </div>
+                  </NuxtLink>
                 </div>
 
                 <!-- Collections Section -->

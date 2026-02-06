@@ -62,6 +62,31 @@ const props = defineProps({
     required: false,
     default: null,
   },
+  createCommentError: {
+    type: Object as PropType<ApolloError | null>,
+    required: false,
+    default: null,
+  },
+  suspensionIssueNumber: {
+    type: Number,
+    required: false,
+    default: null,
+  },
+  suspensionChannelId: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  suspensionUntil: {
+    type: String,
+    required: false,
+    default: null,
+  },
+  suspensionIndefinitely: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
   editFormOpenAtCommentID: {
     type: String,
     default: '',
@@ -494,6 +519,11 @@ const label = computed(() => {
                     v-if="forumId && props.showCommentButtons"
                     class="mb-1 ml-2"
                     :comment-data="props.commentData"
+                    :create-comment-error="props.createCommentError"
+                    :suspension-issue-number="props.suspensionIssueNumber"
+                    :suspension-channel-id="props.suspensionChannelId"
+                    :suspension-until="props.suspensionUntil"
+                    :suspension-indefinitely="props.suspensionIndefinitely"
                     :enable-feedback="props.enableFeedback"
                     :depth="props.depth"
                     :locked="props.locked"
@@ -659,6 +689,11 @@ const label = computed(() => {
                 v-if="childComment.id !== permalinkedCommentId"
                 :compact="true"
                 :comment-data="childComment"
+                :create-comment-error="props.createCommentError"
+                :suspension-issue-number="props.suspensionIssueNumber"
+                :suspension-channel-id="props.suspensionChannelId"
+                :suspension-until="props.suspensionUntil"
+                :suspension-indefinitely="props.suspensionIndefinitely"
                 :depth="props.depth + 1"
                 :locked="props.locked"
                 :parent-comment-id="props.commentData.id"
