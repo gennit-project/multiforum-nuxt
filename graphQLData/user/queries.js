@@ -215,6 +215,75 @@ export const GET_USER_DOWNLOADS = gql`
   }
 `;
 
+export const GET_USER_OWNED_DOWNLOADS = gql`
+  query getUserOwnedDownloads($username: String!) {
+    users(where: { username: $username }) {
+      username
+      OwnedDownloads(
+        where: { hasDownload: true }
+        options: { sort: { createdAt: DESC } }
+      ) {
+        id
+        title
+        body
+        createdAt
+        updatedAt
+        hasDownload
+        Author {
+          username
+          displayName
+          profilePicURL
+          commentKarma
+          discussionKarma
+          createdAt
+          ServerRoles {
+            showAdminTag
+          }
+        }
+        DiscussionChannels {
+          id
+          channelUniqueName
+          archived
+          answered
+          locked
+          weightedVotesCount
+          Channel {
+            uniqueName
+            displayName
+          }
+          CommentsAggregate {
+            count
+          }
+        }
+        Tags {
+          text
+        }
+        Album {
+          id
+          imageOrder
+          Images {
+            id
+            url
+            caption
+          }
+        }
+        hasSensitiveContent
+      }
+    }
+  }
+`;
+
+export const GET_USER_OWNED_DOWNLOADS_COUNT = gql`
+  query getUserOwnedDownloadsCount($username: String!) {
+    users(where: { username: $username }) {
+      username
+      OwnedDownloadsAggregate(where: { hasDownload: true }) {
+        count
+      }
+    }
+  }
+`;
+
 export const GET_USER_EVENTS = gql`
   query getUserEvents($username: String!) {
     users(where: { username: $username }) {
