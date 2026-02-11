@@ -352,11 +352,11 @@ const areAllFavoritesSelected = computed(() => {
         v-if="isAuthenticatedVar || favoriteChannels.length > 0"
         class="border-b dark:border-gray-600"
       >
-        <h3
-          class="px-3 pt-3 text-sm uppercase text-gray-700 dark:text-gray-300"
+        <p
+          class="px-3 pt-3 text-sm font-semibold uppercase text-gray-700 dark:text-gray-300"
         >
           Favorite Forums
-        </h3>
+        </p>
         <div
           v-if="!isAuthenticatedVar"
           class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400"
@@ -453,11 +453,11 @@ const areAllFavoritesSelected = computed(() => {
         v-if="channelCollections.length > 0"
         class="border-b dark:border-gray-600"
       >
-        <h3
-          class="px-3 pt-3 text-sm uppercase text-gray-700 dark:text-gray-300"
+        <p
+          class="px-3 pt-3 text-sm font-semibold uppercase text-gray-700 dark:text-gray-300"
         >
           Forum Lists From Your Collections
-        </h3>
+        </p>
         <div v-for="collection in channelCollections" :key="collection.id">
           <div
             v-if="collection.channels.length > 0"
@@ -532,11 +532,11 @@ const areAllFavoritesSelected = computed(() => {
         v-if="featuredChannels.length > 0"
         class="border-b dark:border-gray-600"
       >
-        <h3
-          class="px-3 pt-3 text-sm uppercase text-gray-700 dark:text-gray-300"
+        <p
+          class="px-3 pt-3 text-sm font-semibold uppercase text-gray-700 dark:text-gray-300"
         >
           Featured Forums
-        </h3>
+        </p>
         <div
           v-for="channel in featuredChannels"
           :key="channel.uniqueName"
@@ -552,9 +552,9 @@ const areAllFavoritesSelected = computed(() => {
         </div>
       </div>
       <div class="pt-3">
-        <h3 class="px-3 text-sm uppercase text-gray-700 dark:text-gray-300">
+        <p class="px-3 text-sm font-semibold uppercase text-gray-700 dark:text-gray-300">
           All Forums
-        </h3>
+        </p>
         <div
           v-for="channel in regularChannels"
           :key="channel.uniqueName"
