@@ -118,17 +118,9 @@ onMounted(() => {
 
         <div class="relative flex flex-grow flex-col">
           <!-- Vertical Icon Navigation for Large Screens -->
-          <ClientOnly>
-            <nav aria-label="Main navigation">
-              <VerticalIconNav />
-            </nav>
-            <template #fallback>
-              <div
-                class="hidden h-full w-20 lg:block"
-                aria-hidden="true"
-              />
-            </template>
-          </ClientOnly>
+          <nav aria-label="Main navigation">
+            <VerticalIconNav />
+          </nav>
 
           <!-- Mobile/Tablet Side Navigation -->
           <ClientOnly>
