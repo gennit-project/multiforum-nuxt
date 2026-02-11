@@ -133,7 +133,7 @@ const needsChanges = computed(() => {
 
 <template>
   <div>
-    <div v-if="userLoading && !formValues">Loading...</div>
+    <div v-if="userLoading && !formValues">{{ $t('common.loading') }}</div>
     <div v-else-if="getUserError">
       <div v-for="(error, i) of getUserError?.graphQLErrors" :key="i">
         {{ error.message }}
@@ -141,7 +141,7 @@ const needsChanges = computed(() => {
     </div>
     <FormComponent
       v-else-if="formValues"
-      :form-title="'Edit Account Settings'"
+      :form-title="$t('accountSettings.title')"
       :needs-changes="needsChanges"
       :show-cancel-button="false"
       :loading="updateUserLoading"
@@ -150,31 +150,31 @@ const needsChanges = computed(() => {
     >
       <div class="space-y-8 divide-y divide-gray-200">
         <div class="space-y-4">
-          <FormRow section-title="Username">
+          <FormRow :section-title="$t('accountSettings.username')">
             <template #content>
               <TextInput
                 ref="titleInputRef"
                 :test-id="'username-input'"
                 :disabled="true"
                 :value="usernameVar"
-                :placeholder="'Add unique name'"
+                :placeholder="$t('accountSettings.usernamePlaceholder')"
                 :full-width="true"
               />
             </template>
           </FormRow>
-          <FormRow section-title="Display Name" :required="false">
+          <FormRow :section-title="$t('accountSettings.displayName')" :required="false">
             <template #content>
               <TextInput
                 ref="displayNameInputRef"
                 :test-id="'display-name-input'"
                 :value="formValues.displayName"
-                :placeholder="'Add a more human readable display name'"
+                :placeholder="$t('accountSettings.displayNamePlaceholder')"
                 :full-width="true"
                 @update="emit('updateFormValues', { displayName: $event })"
               />
             </template>
           </FormRow>
-          <FormRow section-title="Bio">
+          <FormRow :section-title="$t('accountSettings.bio')">
             <template #content>
               <TextEditor
                 id="editExistingComment"
@@ -192,7 +192,7 @@ const needsChanges = computed(() => {
               />
             </template>
           </FormRow>
-          <FormRow section-title="Profile Picture">
+          <FormRow :section-title="$t('accountSettings.profilePicture')">
             <template #content>
               <AvatarComponent
                 class="shadow-sm"

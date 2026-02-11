@@ -245,6 +245,32 @@ export default defineNuxtConfig({
         preconnect: true,
       },
     ],
+    [
+      '@nuxtjs/i18n',
+      {
+        locales: [
+          {
+            code: 'en',
+            name: 'English',
+            file: 'en.yaml',
+          },
+          {
+            code: 'es',
+            name: 'Espanol',
+            file: 'es.yaml',
+          },
+        ],
+        defaultLocale: 'en',
+        lazy: true,
+        langDir: 'locales',
+        strategy: 'no_prefix',
+        detectBrowserLanguage: {
+          useCookie: true,
+          cookieKey: 'i18n_redirected',
+          fallbackLocale: 'en',
+        },
+      },
+    ],
   ],
   sentry: {
     dsn: process.env.VITE_SENTRY_DSN,

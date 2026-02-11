@@ -69,6 +69,7 @@ const handleEndTimeTimeChange = (timeValue: string) => {
         <DatePicker
           test-id="start-time-date-input"
           :value="formattedStartTimeDate"
+          aria-label="Start date"
           data-testid="start-date-picker"
           @update="handleStartTimeDateChange"
         />
@@ -78,6 +79,7 @@ const handleEndTimeTimeChange = (timeValue: string) => {
           v-if="!isAllDay"
           test-id="start-time-time-input"
           :value="DateTime.fromJSDate(startTime).toFormat('HH:mm')"
+          aria-label="Start time"
           data-testid="start-time-picker"
           @update="handleStartTimeTimeChange"
         />
@@ -110,6 +112,7 @@ const handleEndTimeTimeChange = (timeValue: string) => {
           v-if="isMultiDay"
           test-id="end-time-date-input"
           :value="formattedEndTimeDate"
+          aria-label="End date"
           data-testid="end-date-picker"
           @update="handleEndTimeDateChange"
         />
@@ -119,6 +122,7 @@ const handleEndTimeTimeChange = (timeValue: string) => {
           v-if="!isAllDay"
           test-id="end-time-time-input"
           :value="DateTime.fromJSDate(endTime).toFormat('HH:mm')"
+          aria-label="End time"
           data-testid="end-time-picker"
           @update="handleEndTimeTimeChange"
         />

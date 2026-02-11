@@ -55,5 +55,5 @@ const containerStyle = computed(() => {
 </template>
 
 <style lang="scss">
-@import '@/assets/css/markdown-body.scss';
+@use '@/assets/css/markdown-body.scss' as *;
 </style>

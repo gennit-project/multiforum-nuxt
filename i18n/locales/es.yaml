@@ -1,0 +1,44 @@
+# Spanish locale file
+# Este archivo contiene todas las cadenas de texto traducibles de la interfaz
+
+common:
+  loading: Cargando...
+  save: Guardar
+  cancel: Cancelar
+
+accountSettings:
+  title: Editar Configuracion de Cuenta
+  account: Cuenta
+  preferences: Preferencias
+
+  # Profile fields
+  username: Nombre de usuario
+  usernamePlaceholder: Agregar nombre unico
+  displayName: Nombre para mostrar
+  displayNamePlaceholder: Agregar un nombre mas legible
+  bio: Biografia
+  profilePicture: Foto de perfil
+
+  # Email
+  emailAddress: Direccion de correo electronico
+  noEmailAssociated: No hay direccion de correo asociada
+
+  # Notifications
+  emailNotifications: Notificaciones por correo
+  notifyOnCommentReply: Enviarme un correo cuando alguien responda a mis comentarios
+  notifyOnDiscussionReply: Enviarme un correo cuando alguien responda a mis discusiones
+  notifyOnEventReply: Enviarme un correo cuando alguien responda a mis eventos
+  notifyWhenTagged: Enviarme un correo cuando alguien me mencione en un comentario
+  notifyOnFeedback: Enviarme un correo cuando reciba comentarios de los moderadores
+
+  # Content preferences
+  contentPreferences: Preferencias de contenido
+  enableSensitiveContent: Soy mayor de 18 anos y quiero ver contenido sensible por defecto
+
+  # Language
+  language: Idioma
+
+  # Status messages
+  loadingNotifications: Cargando configuracion de notificaciones...
+  settingsSaved: Tu configuracion ha sido guardada.
+  requiresAuth: Debes iniciar sesion para acceder a la configuracion de la cuenta.

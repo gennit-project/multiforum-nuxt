@@ -14,6 +14,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  ariaLabel: {
+    type: String,
+    default: 'Select date',
+  },
 });
 
 const emit = defineEmits(['update']);
@@ -42,6 +46,7 @@ const baseStyles = computed(() => {
       :data-testid="testId"
       type="date"
       :value="value"
+      :aria-label="ariaLabel"
       style="color-scheme: light dark"
       @input="handleChange"
     >
