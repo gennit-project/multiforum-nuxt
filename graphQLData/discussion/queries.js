@@ -79,6 +79,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
         id
         discussionId
         channelUniqueName
+        isFavorited
         CommentsAggregate {
           count
         }
@@ -151,6 +152,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
     $showArchived: Boolean!
     $options: DiscussionListOptions
     $hasDownload: Boolean
+    $loggedInUsername: String
   ) {
     getSiteWideDiscussionList(
       searchInput: $searchInput
@@ -159,6 +161,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
       showArchived: $showArchived
       options: $options
       hasDownload: $hasDownload
+      loggedInUsername: $loggedInUsername
     ) {
       aggregateDiscussionCount
       discussions {
@@ -168,6 +171,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
         createdAt
         updatedAt
         hasSensitiveContent
+        isFavorited
         Author {
           ...AuthorFields
         }

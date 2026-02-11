@@ -17,6 +17,7 @@ import {
   getTimeFrameFromQuery,
 } from '@/components/comments/getSortFromQuery';
 import { config } from '@/config';
+import { usernameVar } from '@/cache';
 import type { SearchDiscussionValues } from '@/types/Discussion';
 import type { Album, Discussion } from '@/__generated__/graphql';
 
@@ -50,18 +51,27 @@ const {
   loading: discussionLoading,
   refetch: refetchDiscussions,
   fetchMore,
-} = useQuery(GET_SITE_WIDE_DISCUSSION_LIST, {
-  searchInput,
-  selectedChannels,
-  selectedTags,
-  showArchived: false,
-  hasDownload: true,
-  options: {
-    limit: DISCUSSION_PAGE_LIMIT,
-    offset: 0,
-    sort: activeSort,
-    timeFrame: activeTimeFrame,
-  },
+} = useQuery(
+  GET_SITE_WIDE_DISCUSSION_LIST,
+  () => ({
+    searchInput: searchInput.value,
+    selectedChannels: selectedChannels.value,
+    selectedTags: selectedTags.value,
+    showArchived: false,
+    hasDownload: true,
+    loggedInUsername: usernameVar.value || null,
+    options: {
+      limit: DISCUSSION_PAGE_LIMIT,
+      offset: 0,
+      sort: activeSort.value,
+      timeFrame: activeTimeFrame.value,
+    },
+  })
+);
+
+// Refetch when user logs in/out to update isFavorited status
+watch(usernameVar, () => {
+  refetchDiscussions();
 });
 
 const { result: getServerResult, error: getServerError } = useQuery(

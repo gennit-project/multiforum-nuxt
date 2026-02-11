@@ -177,6 +177,7 @@ const filteredQuery = computed(() => {
                 :allow-add-to-list="true"
                 :discussion-id="discussion.id"
                 :discussion-title="discussion.title"
+                :initial-is-favorited="(discussionChannel as any).isFavorited"
                 entity-name="Download"
                 size="small"
               />
