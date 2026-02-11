@@ -217,6 +217,12 @@ const handleSelect = () => {
             <span>{{
               discussion.DiscussionChannels?.[0]?.channelUniqueName || ''
             }}</span>
+            <span
+              v-if="submittedToMultipleChannels"
+              class="ml-1 text-gray-500 dark:text-gray-400"
+            >
+              and {{ channelCount - 1 }} more
+            </span>
           </div>
         </nuxt-link>
         <div class="flex gap-2">
