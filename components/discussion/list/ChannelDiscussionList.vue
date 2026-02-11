@@ -87,14 +87,11 @@ const {
     timeFrame: activeTimeFrame,
   },
 });
+// Refetch when user logs in/out to update isFavorited and upvote status
 watch(
   () => usernameVar.value,
-  (newValue) => {
-    if (newValue) {
-      // This makes it so that items upvoted by the logged
-      // in user show the orange active upvote button.
-      refetchDiscussions();
-    }
+  () => {
+    refetchDiscussions();
   }
 );
 

@@ -36,6 +36,14 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // When provided from parent query, skip making a separate API call
+  // undefined = field not in response, need to fetch
+  // null = field in response but user not logged in, don't fetch
+  // true/false = field in response with value, don't fetch
+  initialIsFavorited: {
+    type: [Boolean, null] as unknown as () => boolean | null | undefined,
+    default: undefined,
+  },
 });
 
 const GET_USER_FAVORITE_DISCUSSION = gql`
@@ -50,10 +58,17 @@ const GET_USER_FAVORITE_DISCUSSION = gql`
   }
 `;
 
-const isFavorited = ref(false);
+// Treat null (user not logged in) and false the same way
+const isFavorited = ref(props.initialIsFavorited === true);
 const isLoading = ref(false);
 const toastStore = useToastStore();
 const addToListModalStore = useAddToListModalStore();
+
+// Only query if initialIsFavorited was not provided (undefined means field not in response)
+// null means the field was returned but user is not logged in - don't fetch
+const shouldFetchFavorite = computed(() =>
+  props.initialIsFavorited === undefined && !!usernameVar.value && !!props.discussionId
+);
 
 const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
   GET_USER_FAVORITE_DISCUSSION,
@@ -62,14 +77,27 @@ const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
     discussionId: props.discussionId,
   }),
   () => ({
-    enabled: !!usernameVar.value && !!props.discussionId,
+    enabled: shouldFetchFavorite.value,
   })
 );
 
+// Watch for changes to initialIsFavorited prop (e.g., when parent refetches)
+watch(
+  () => props.initialIsFavorited,
+  (newValue) => {
+    // Update when we get a definitive value from parent
+    // null means user not logged in, treat as false
+    if (newValue !== undefined) {
+      isFavorited.value = newValue === true;
+    }
+  }
+);
+
+// Watch query result only when we're fetching
 watch(
   favoritesResult,
   (newResult) => {
-    if (newResult?.users?.[0]?.FavoriteDiscussions) {
+    if (shouldFetchFavorite.value && newResult?.users?.[0]?.FavoriteDiscussions) {
       isFavorited.value = newResult.users[0].FavoriteDiscussions.some(
         (discussion: { id: string }) => discussion.id === props.discussionId
       );
@@ -123,7 +151,10 @@ const handleToggleFavorite = async () => {
       });
       showAddedToast();
     }
-    refetchFavorites();
+    // Only refetch if we're managing our own query (parent didn't provide isFavorited)
+    if (shouldFetchFavorite.value) {
+      refetchFavorites();
+    }
   } catch (error) {
     console.error('Error toggling favorite:', error);
     // Revert optimistic update on error

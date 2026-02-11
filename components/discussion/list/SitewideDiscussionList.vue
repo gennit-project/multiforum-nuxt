@@ -20,6 +20,7 @@ import { storeToRefs } from 'pinia';
 import { config } from '@/config';
 import { useAppTheme } from '@/composables/useTheme';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
+import { usernameVar } from '@/cache';
 
 const { theme } = useAppTheme();
 
@@ -70,18 +71,27 @@ const {
   loading: discussionLoading,
   refetch: refetchDiscussions,
   fetchMore,
-} = useQuery(GET_SITE_WIDE_DISCUSSION_LIST, {
-  searchInput: searchInputComputed,
-  selectedChannels: selectedChannelsComputed,
-  selectedTags: selectedTagsComputed,
-  showArchived: false,
-  hasDownload: false,
-  options: {
-    limit: DISCUSSION_PAGE_LIMIT,
-    offset: 0,
-    sort: activeSort,
-    timeFrame: activeTimeFrame,
-  },
+} = useQuery(
+  GET_SITE_WIDE_DISCUSSION_LIST,
+  () => ({
+    searchInput: searchInputComputed.value,
+    selectedChannels: selectedChannelsComputed.value,
+    selectedTags: selectedTagsComputed.value,
+    showArchived: false,
+    hasDownload: false,
+    loggedInUsername: usernameVar.value || null,
+    options: {
+      limit: DISCUSSION_PAGE_LIMIT,
+      offset: 0,
+      sort: activeSort.value,
+      timeFrame: activeTimeFrame.value,
+    },
+  })
+);
+
+// Refetch when user logs in/out to update isFavorited status
+watch(usernameVar, () => {
+  refetchDiscussions();
 });
 
 const { result: getServerResult, error: getServerError } = useQuery(
