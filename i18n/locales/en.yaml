@@ -1,0 +1,44 @@
+# English locale file
+# This file contains all translatable UI strings
+
+common:
+  loading: Loading...
+  save: Save
+  cancel: Cancel
+
+accountSettings:
+  title: Edit Account Settings
+  account: Account
+  preferences: Preferences
+
+  # Profile fields
+  username: Username
+  usernamePlaceholder: Add unique name
+  displayName: Display Name
+  displayNamePlaceholder: Add a more human readable display name
+  bio: Bio
+  profilePicture: Profile Picture
+
+  # Email
+  emailAddress: Email Address
+  noEmailAssociated: No email address associated
+
+  # Notifications
+  emailNotifications: Email Notifications
+  notifyOnCommentReply: Email me when someone replies to my comments
+  notifyOnDiscussionReply: Email me when someone replies to my discussions
+  notifyOnEventReply: Email me when someone replies to my events
+  notifyWhenTagged: Email me when someone tags me in a comment
+  notifyOnFeedback: Email me when I receive feedback from moderators
+
+  # Content preferences
+  contentPreferences: Content Preferences
+  enableSensitiveContent: I am over 18 and want to view sensitive content by default
+
+  # Language
+  language: Language
+
+  # Status messages
+  loadingNotifications: Loading notification settings...
+  settingsSaved: Your settings have been saved.
+  requiresAuth: You must be logged in to access account settings.

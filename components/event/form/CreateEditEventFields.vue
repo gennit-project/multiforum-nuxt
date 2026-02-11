@@ -521,28 +521,20 @@ const touched = ref(false);
               <!-- Checkboxes for event options -->
               <div class="mt-3 flex flex-wrap gap-x-6 gap-y-2">
                 <!-- All-day checkbox -->
-                <div class="flex items-center">
-                  <CheckBox
-                    data-testid="all-day-input"
-                    class="align-middle"
-                    :checked="formValues.isAllDay"
-                    @input="toggleIsAllDayField"
-                  />
-                  <span class="ml-2 align-middle dark:text-white">All day</span>
-                </div>
+                <CheckBox
+                  test-id="all-day-input"
+                  :checked="formValues.isAllDay"
+                  label="All day"
+                  @update="toggleIsAllDayField"
+                />
 
                 <!-- Multi-day checkbox -->
-                <div class="flex items-center">
-                  <CheckBox
-                    data-testid="multi-day-input"
-                    class="align-middle"
-                    :checked="isMultiDayEvent"
-                    @input="toggleMultiDayEvent"
-                  />
-                  <span class="ml-2 align-middle dark:text-white"
-                    >Multi-day event</span
-                  >
-                </div>
+                <CheckBox
+                  test-id="multi-day-input"
+                  :checked="isMultiDayEvent"
+                  label="Multi-day event"
+                  @update="toggleMultiDayEvent"
+                />
               </div>
 
               <ErrorMessage :text="datePickerErrorMessage" class="mt-1" />
@@ -563,25 +555,36 @@ const touched = ref(false);
         </FormRow>
         <FormRow :required="true">
           <template #content>
-            <div
-              class="flex flex-wrap items-center gap-2 rounded-md border border-gray-200 p-2 dark:border-gray-600"
-            >
-              <!-- Mimic Zoom's UI for meeting type selection -->
+            <fieldset>
+              <legend class="sr-only">Event type</legend>
               <div
-                v-for="option in eventTypeOptions"
-                :key="option.value"
-                :class="[
-                  'cursor-pointer rounded-md px-4 py-2 transition-colors',
-                  selectedEventType === option.value
-                    ? 'bg-orange-500 text-black'
-                    : 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600',
-                ]"
-                data-testid="event-type-option"
-                @click="updateEventType(option.value)"
+                class="flex flex-wrap items-center gap-2 rounded-md border border-gray-200 p-2 dark:border-gray-600"
+                role="radiogroup"
+                aria-label="Event type"
               >
-                {{ option.label }}
+                <label
+                  v-for="option in eventTypeOptions"
+                  :key="option.value"
+                  :class="[
+                    'cursor-pointer rounded-md px-4 py-2 transition-colors',
+                    selectedEventType === option.value
+                      ? 'bg-orange-500 text-black'
+                      : 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600',
+                  ]"
+                  :data-testid="`event-type-option-${option.value}`"
+                >
+                  <input
+                    type="radio"
+                    name="event-type"
+                    :value="option.value"
+                    :checked="selectedEventType === option.value"
+                    class="sr-only"
+                    @change="updateEventType(option.value)"
+                  >
+                  {{ option.label }}
+                </label>
               </div>
-            </div>
+            </fieldset>
           </template>
         </FormRow>
         <FormRow
@@ -787,14 +790,11 @@ const touched = ref(false);
         <FormRow>
           <template #content>
             <CheckBox
-              data-testid="free-input"
-              class="align-middle"
+              test-id="free-input"
               :checked="Boolean(formValues.free)"
-              @input="toggleCostField"
+              label="This event is free"
+              @update="toggleCostField"
             />
-            <span class="ml-2 align-middle dark:text-white"
-              >This event is free</span
-            >
             <div class="mt-3">
               <TextEditor
                 data-testid="cost-input"
@@ -812,14 +812,11 @@ const touched = ref(false);
         <FormRow>
           <template #content>
             <CheckBox
-              data-testid="free-input"
-              class="align-middle"
+              test-id="hosted-by-op-input"
               :checked="formValues.isHostedByOP"
-              @input="toggleHostedByOPField"
+              label="I am hosting this event"
+              @update="toggleHostedByOPField"
             />
-            <span class="ml-2 align-middle dark:text-white"
-              >I am hosting this event</span
-            >
           </template>
         </FormRow>
       </div>

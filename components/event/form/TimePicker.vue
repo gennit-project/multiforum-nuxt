@@ -15,6 +15,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  ariaLabel: {
+    type: String,
+    default: 'Select time',
+  },
 });
 
 const emit = defineEmits(['update']);
@@ -103,9 +107,15 @@ onUnmounted(() => {
     <!-- Custom input field instead of native time input -->
     <div
       :data-testid="testId"
+      role="button"
+      :tabindex="disabled ? -1 : 0"
+      :aria-label="ariaLabel"
+      :aria-expanded="isDropdownOpen"
       class="flex h-10 w-full cursor-pointer items-center rounded border border-gray-200 px-3 pr-8 text-sm focus:border-orange-500 focus:ring-orange-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:w-32"
       :class="{ 'cursor-not-allowed opacity-60': disabled }"
       @click="!disabled && toggleDropdown()"
+      @keydown.enter="!disabled && toggleDropdown()"
+      @keydown.space.prevent="!disabled && toggleDropdown()"
     >
       {{ formattedTime }}
 
