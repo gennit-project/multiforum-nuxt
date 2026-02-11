@@ -336,6 +336,7 @@ export default defineNuxtConfig({
       auth0CallbackUrl: config?.callbackUrl,
       auth0Url: config?.auth0Url,
       auth0Audience: config?.auth0Audience,
+      enableLanguagePicker: config?.enableLanguagePicker || false,
     },
   },
   ssr: true,

@@ -9,9 +9,11 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import NotificationComponent from '@/components/NotificationComponent.vue';
 import FormRow from '@/components/FormRow.vue';
 import CheckBox from '@/components/CheckBox.vue';
-import type { EditAccountSettingsFormValues } from '@/types/User';
 import type { UserUpdateInput } from '@/__generated__/graphql';
 import { usernameVar } from '@/cache';
+import { config } from '@/config';
+
+const enableLanguagePicker = config.enableLanguagePicker;
 
 const { locale } = useI18n();
 
@@ -264,24 +266,32 @@ function handleCheckboxUpdate(
             </div>
 
             <div v-if="dataLoaded" class="space-y-6">
-              <h2 class="font-semibold mb-4 text-xl">{{ $t('accountSettings.account') }}</h2>
+              <h2 class="font-semibold mb-4 text-xl">
+                {{ $t('accountSettings.account') }}
+              </h2>
 
               <!-- Email Address -->
               <FormRow :section-title="$t('accountSettings.emailAddress')">
                 <template #content>
                   <div class="text-sm text-gray-700 dark:text-gray-300">
                     <span v-if="userEmail">{{ userEmail }}</span>
-                    <span v-else class="italic text-gray-500 dark:text-gray-400">{{
-                      $t('accountSettings.noEmailAssociated')
-                    }}</span>
+                    <span
+                      v-else
+                      class="italic text-gray-500 dark:text-gray-400"
+                      >{{ $t('accountSettings.noEmailAssociated') }}</span
+                    >
                   </div>
                 </template>
               </FormRow>
 
-              <h2 class="font-semibold mb-4 pt-6 text-xl">{{ $t('accountSettings.preferences') }}</h2>
+              <h2 class="font-semibold mb-4 pt-6 text-xl">
+                {{ $t('accountSettings.preferences') }}
+              </h2>
 
               <!-- Email Notification Preferences -->
-              <FormRow :section-title="$t('accountSettings.emailNotifications')">
+              <FormRow
+                :section-title="$t('accountSettings.emailNotifications')"
+              >
                 <template #content>
                   <div class="space-y-4">
                     <CheckBox
@@ -330,25 +340,23 @@ function handleCheckboxUpdate(
                       :test-id="'notify-tagged'"
                       :checked="notificationFormValues.notifyWhenTagged"
                       :label="$t('accountSettings.notifyWhenTagged')"
-                      @update="
-                        handleCheckboxUpdate('notifyWhenTagged', $event)
-                      "
+                      @update="handleCheckboxUpdate('notifyWhenTagged', $event)"
                     />
 
                     <CheckBox
                       :test-id="'notify-feedback'"
                       :checked="notificationFormValues.notifyOnFeedback"
                       :label="$t('accountSettings.notifyOnFeedback')"
-                      @update="
-                        handleCheckboxUpdate('notifyOnFeedback', $event)
-                      "
+                      @update="handleCheckboxUpdate('notifyOnFeedback', $event)"
                     />
                   </div>
                 </template>
               </FormRow>
 
               <!-- Content Preferences -->
-              <FormRow :section-title="$t('accountSettings.contentPreferences')">
+              <FormRow
+                :section-title="$t('accountSettings.contentPreferences')"
+              >
                 <template #content>
                   <div class="space-y-4">
                     <CheckBox
@@ -368,8 +376,11 @@ function handleCheckboxUpdate(
                 </template>
               </FormRow>
 
-              <!-- Language -->
-              <FormRow :section-title="$t('accountSettings.language')">
+              <!-- Language (gated behind NUXT_PUBLIC_ENABLE_LANGUAGE_PICKER env var) -->
+              <FormRow
+                v-if="enableLanguagePicker"
+                :section-title="$t('accountSettings.language')"
+              >
                 <template #content>
                   <select
                     :value="locale"
