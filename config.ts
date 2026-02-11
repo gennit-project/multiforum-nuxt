@@ -19,6 +19,7 @@ type ConfigType = {
   openGraphApiKey: string;
   serverName: string;
   serverDisplayName: string;
+  enableLanguagePicker: boolean;
 };
 const config: ConfigType = {
   auth0username: import.meta.env.VITE_AUTH0_USERNAME,
@@ -41,5 +42,6 @@ const config: ConfigType = {
   openGraphApiKey: import.meta.env.VITE_OPEN_GRAPH_API_KEY,
   serverName: import.meta.env.VITE_SERVER_NAME,
   serverDisplayName: import.meta.env.VITE_SERVER_DISPLAY_NAME,
+  enableLanguagePicker: import.meta.env.VITE_ENABLE_LANGUAGE_PICKER === 'true',
 };
 export { config };
