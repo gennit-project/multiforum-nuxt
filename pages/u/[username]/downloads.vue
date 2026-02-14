@@ -6,6 +6,7 @@ import SitewideDownloadListItem from '@/components/discussion/list/SitewideDownl
 import DiscussionAlbum from '@/components/discussion/detail/DiscussionAlbum.vue';
 import { useRoute } from 'nuxt/app';
 import type { Album, Discussion } from '@/__generated__/graphql';
+import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
 
 export default defineComponent({
   name: 'UserDownloads',
@@ -16,6 +17,8 @@ export default defineComponent({
 
   setup() {
     const route = useRoute();
+    const { selectedChannels, hasSelectedChannels } =
+      useSelectedChannelsFromQuery();
 
     const username = computed(() => {
       if (typeof route.params.username === 'string') {
@@ -24,10 +27,27 @@ export default defineComponent({
       return '';
     });
 
+    const downloadsWhere = computed(() => {
+      if (!hasSelectedChannels.value) {
+        return { hasDownload: true };
+      }
+      return {
+        AND: [
+          { hasDownload: true },
+          {
+            DiscussionChannels_SOME: {
+              channelUniqueName_IN: selectedChannels.value,
+            },
+          },
+        ],
+      };
+    });
+
     const { result, loading, error } = useQuery(
       GET_USER_DOWNLOADS,
       () => ({
         username: username.value,
+        where: downloadsWhere.value,
       }),
       {
         fetchPolicy: 'cache-first',

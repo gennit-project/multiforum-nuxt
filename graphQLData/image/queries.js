@@ -90,15 +90,8 @@ export const GET_ALBUM_DETAILS = gql`
 `;
 
 export const GET_USER_ALBUMS = gql`
-  query GetUserAlbums($username: String!) {
-    albums(
-      where: {
-        OR: [
-          { Owner: { username: $username } }
-          { Images_SOME: { Uploader: { username: $username } } }
-        ]
-      }
-    ) {
+  query GetUserAlbums($where: AlbumWhere) {
+    albums(where: $where) {
       id
       imageOrder
       Owner {
@@ -118,7 +111,7 @@ export const GET_USER_ALBUMS = gql`
       ImagesAggregate {
         count
       }
-      Discussions(options: { limit: 1, sort: { createdAt: DESC } }) {
+      Discussions(options: { sort: { createdAt: DESC } }) {
         id
         title
         createdAt
@@ -132,11 +125,17 @@ export const GET_USER_ALBUMS = gql`
 `;
 
 export const GET_USER_IMAGES = gql`
-  query GetUserImages($username: String!, $offset: Int!, $limit: Int!) {
+  query GetUserImages(
+    $username: String!
+    $offset: Int!
+    $limit: Int!
+    $where: ImageWhere
+  ) {
     users(where: { username: $username }) {
       username
       displayName
       Images(
+        where: $where
         options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
       ) {
         id
@@ -153,7 +152,7 @@ export const GET_USER_IMAGES = gql`
           displayName
         }
       }
-      ImagesAggregate {
+      ImagesAggregate(where: $where) {
         count
       }
     }

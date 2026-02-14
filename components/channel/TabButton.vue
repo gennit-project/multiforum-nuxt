@@ -8,7 +8,7 @@ const props = defineProps({
     default: 0,
   },
   to: {
-    type: String,
+    type: [String, Object],
     required: true,
   },
   label: {

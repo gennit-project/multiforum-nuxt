@@ -3,11 +3,39 @@ import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
 import { GET_USER_ALBUMS } from '@/graphQLData/image/queries';
+import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
 
 const route = useRoute();
+const { selectedChannels, hasSelectedChannels } = useSelectedChannelsFromQuery();
 
 const username = computed(() => {
   return typeof route.params.username === 'string' ? route.params.username : '';
+});
+
+const albumsWhere = computed(() => {
+  const userMatchWhere = {
+    OR: [
+      { Owner: { username: username.value } },
+      { Images_SOME: { Uploader: { username: username.value } } },
+    ],
+  };
+
+  if (!hasSelectedChannels.value) {
+    return userMatchWhere;
+  }
+
+  return {
+    AND: [
+      userMatchWhere,
+      {
+        Discussions_SOME: {
+          DiscussionChannels_SOME: {
+            channelUniqueName_IN: selectedChannels.value,
+          },
+        },
+      },
+    ],
+  };
 });
 
 const {
@@ -17,7 +45,7 @@ const {
 } = useQuery(
   GET_USER_ALBUMS,
   () => ({
-    username: username.value,
+    where: albumsWhere.value,
   }),
   () => ({
     enabled: !!username.value,
