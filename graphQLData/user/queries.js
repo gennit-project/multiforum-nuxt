@@ -58,11 +58,20 @@ export const GET_USER = gql`
 `;
 
 export const GET_USER_COMMENTS = gql`
-  query getUserComments($username: String!, $offset: Int!, $limit: Int!) {
+  query getUserComments(
+    $username: String!
+    $offset: Int!
+    $limit: Int!
+    $where: CommentWhere
+  ) {
     users(where: { username: $username }) {
       username
       profilePicURL
+      CommentsAggregate(where: $where) {
+        count
+      }
       Comments(
+        where: $where
         options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
       ) {
         id
@@ -114,14 +123,11 @@ export const GET_USER_COMMENTS = gql`
 `;
 
 export const GET_USER_DISCUSSIONS = gql`
-  query getUserDiscussions($username: String!) {
+  query getUserDiscussions($username: String!, $where: DiscussionWhere) {
     users(where: { username: $username }) {
       username
       profilePicURL
-      Discussions(
-        where: { OR: [{ hasDownload: false }, { hasDownload: null }] }
-        options: { sort: { createdAt: DESC } }
-      ) {
+      Discussions(where: $where, options: { sort: { createdAt: DESC } }) {
         id
         Author {
           username
@@ -156,14 +162,11 @@ export const GET_USER_DISCUSSIONS = gql`
 `;
 
 export const GET_USER_DOWNLOADS = gql`
-  query getUserDownloads($username: String!) {
+  query getUserDownloads($username: String!, $where: DiscussionWhere) {
     users(where: { username: $username }) {
       username
       profilePicURL
-      Discussions(
-        where: { hasDownload: true }
-        options: { sort: { createdAt: DESC } }
-      ) {
+      Discussions(where: $where, options: { sort: { createdAt: DESC } }) {
         id
         Author {
           username
@@ -285,11 +288,11 @@ export const GET_USER_OWNED_DOWNLOADS_COUNT = gql`
 `;
 
 export const GET_USER_EVENTS = gql`
-  query getUserEvents($username: String!) {
+  query getUserEvents($username: String!, $where: EventWhere) {
     users(where: { username: $username }) {
       username
       profilePicURL
-      Events(options: { sort: { createdAt: DESC } }) {
+      Events(where: $where, options: { sort: { createdAt: DESC } }) {
         id
         title
         startTime

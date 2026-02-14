@@ -5,6 +5,7 @@ import { GET_USER } from '@/graphQLData/user/queries';
 import UserProfileSidebar from '@/components/user/UserProfileSidebar.vue';
 import { navigateTo, useHead, useRoute } from 'nuxt/app';
 import UserContributionChart from '@/components/charts/UserContributionChart.vue';
+import UserProfileChannelFilter from '@/components/user/UserProfileChannelFilter.vue';
 
 const route = useRoute();
 const username = computed(() => {
@@ -69,6 +70,13 @@ const isAdmin = computed(() => {
 const isImageDetailPage = computed(() => {
   const path = route.path;
   return path.includes('/images/') && path.split('/').length > 4; // /u/username/images/imageId
+});
+
+const filterableTabs = ['comments', 'discussions', 'downloads', 'events', 'images', 'albums'];
+const shouldShowProfileChannelFilter = computed(() => {
+  return filterableTabs.some((tab) => {
+    return normalizedPath.value === `${baseProfilePath.value}/${tab}`;
+  });
 });
 
 // Add SEO metadata for the user profile
@@ -159,6 +167,7 @@ watchEffect(() => {
               <div class="h-10 border-b border-gray-200 dark:border-gray-600" />
             </template>
           </ClientOnly>
+          <UserProfileChannelFilter v-if="shouldShowProfileChannelFilter" />
           <NuxtPage />
         </div>
       </div>

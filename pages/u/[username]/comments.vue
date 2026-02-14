@@ -6,37 +6,45 @@ import ArchivedCommentText from '@/components/comments/ArchivedCommentText.vue';
 import Comment from '@/components/comments/Comment.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
 import LoadMore from '@/components/LoadMore.vue';
-import { GET_USER, GET_USER_COMMENTS } from '@/graphQLData/user/queries';
+import { GET_USER_COMMENTS } from '@/graphQLData/user/queries';
 import type { Comment as CommentType } from '@/__generated__/graphql';
+import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
 
 const PAGE_LIMIT = 25;
 
 const route = useRoute();
+const { selectedChannels, hasSelectedChannels } = useSelectedChannelsFromQuery();
 
 const username = computed(() => {
   return typeof route.params.username === 'string' ? route.params.username : '';
 });
 
-const {
-  result: userResult,
-  loading: getUserLoading,
-  error: getUserError,
-} = useQuery(GET_USER, () => ({
-  username: username.value,
-}));
-
-const user = computed(() => {
-  if (getUserLoading.value || getUserError.value) {
-    return null;
+const commentsWhere = computed(() => {
+  if (!hasSelectedChannels.value) {
+    return undefined;
   }
-  if (userResult.value && userResult.value.users.length > 0) {
-    return userResult.value.users[0];
-  }
-  return null;
-});
 
-const commentsAggregate = computed(() => {
-  return user.value ? user.value.CommentsAggregate.count : 0;
+  return {
+    OR: [
+      {
+        Channel: {
+          uniqueName_IN: selectedChannels.value,
+        },
+      },
+      {
+        DiscussionChannel: {
+          channelUniqueName_IN: selectedChannels.value,
+        },
+      },
+      {
+        Event: {
+          EventChannels_SOME: {
+            channelUniqueName_IN: selectedChannels.value,
+          },
+        },
+      },
+    ],
+  };
 });
 
 const {
@@ -50,19 +58,26 @@ const {
     username: username.value,
     limit: PAGE_LIMIT,
     offset: 0,
+    where: commentsWhere.value,
   }),
   {
     fetchPolicy: 'cache-first',
   }
 );
 
+const commentsAggregate = computed(() => {
+  return commentResult.value?.users?.[0]?.CommentsAggregate?.count || 0;
+});
+
 const loadMore = () => {
   if (!commentResult.value?.users?.[0]?.Comments) return;
 
   fetchMore({
     variables: {
+      username: username.value,
       limit: PAGE_LIMIT,
       offset: commentResult.value.users[0].Comments.length,
+      where: commentsWhere.value,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;

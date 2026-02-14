@@ -4,12 +4,14 @@ import TabButton from '@/components/channel/TabButton.vue';
 import type { User } from '@/__generated__/graphql';
 // import { usernameVar, isAuthenticatedVar } from "@/cache"; // Unused for now
 import { useRoute } from 'nuxt/app';
+import type { RouteLocationRaw } from 'vue-router';
 
 const route = useRoute();
 
 type TabData = {
   name: string;
-  href: string;
+  path: string;
+  to: RouteLocationRaw;
   current: boolean;
   count?: number | null;
 };
@@ -42,6 +44,28 @@ const channelId = ref(route.params.forumId);
 const usernameInParams = computed(() => {
   return typeof route.params.username === 'string' ? route.params.username : '';
 });
+const channelsQuery = computed(() => {
+  const channels = route.query.channels;
+  if (typeof channels === 'string') {
+    return channels ? [channels] : [];
+  }
+  if (Array.isArray(channels)) {
+    return channels.filter(
+      (value): value is string => typeof value === 'string' && !!value
+    );
+  }
+  return [];
+});
+
+const getTabTo = (path: string): RouteLocationRaw => {
+  const query = channelsQuery.value.length
+    ? { channels: channelsQuery.value }
+    : undefined;
+  return {
+    path,
+    query,
+  };
+};
 
 watch(
   () => route,
@@ -55,49 +79,57 @@ const tabs = computed(() => {
   const tabList: TabData[] = [
     {
       name: 'Comments',
-      href: `/u/${usernameInParams.value}/comments`,
+      path: `/u/${usernameInParams.value}/comments`,
+      to: getTabTo(`/u/${usernameInParams.value}/comments`),
       current: true,
       count: props.user?.CommentsAggregate?.count,
     },
     {
       name: 'Discussions',
-      href: `/u/${usernameInParams.value}/discussions`,
+      path: `/u/${usernameInParams.value}/discussions`,
+      to: getTabTo(`/u/${usernameInParams.value}/discussions`),
       current: false,
       count: props.user?.DiscussionsAggregate?.count,
     },
     {
       name: 'Downloads',
-      href: `/u/${usernameInParams.value}/downloads`,
+      path: `/u/${usernameInParams.value}/downloads`,
+      to: getTabTo(`/u/${usernameInParams.value}/downloads`),
       current: false,
       count: props.user?.DownloadsAggregate?.count,
     },
     {
       name: 'Events',
-      href: `/u/${usernameInParams.value}/events`,
+      path: `/u/${usernameInParams.value}/events`,
+      to: getTabTo(`/u/${usernameInParams.value}/events`),
       current: false,
       count: props.user?.EventsAggregate?.count,
     },
     {
       name: 'Images',
-      href: `/u/${usernameInParams.value}/images`,
+      path: `/u/${usernameInParams.value}/images`,
+      to: getTabTo(`/u/${usernameInParams.value}/images`),
       current: false,
       count: props.user?.ImagesAggregate?.count,
     },
     {
       name: 'Albums',
-      href: `/u/${usernameInParams.value}/albums`,
+      path: `/u/${usernameInParams.value}/albums`,
+      to: getTabTo(`/u/${usernameInParams.value}/albums`),
       current: false,
       count: props.user?.AlbumsAggregate?.count,
     },
     {
       name: 'Owned Forums',
-      href: `/u/${usernameInParams.value}/ownedForums`,
+      path: `/u/${usernameInParams.value}/ownedForums`,
+      to: getTabTo(`/u/${usernameInParams.value}/ownedForums`),
       current: false,
       count: props.user?.AdminOfChannelsAggregate?.count,
     },
     {
       name: 'Modded Forums',
-      href: `/u/${usernameInParams.value}/moddedForums`,
+      path: `/u/${usernameInParams.value}/moddedForums`,
+      to: getTabTo(`/u/${usernameInParams.value}/moddedForums`),
       current: false,
       count: props.user?.ModOfChannelsAggregate?.count,
     },
@@ -112,10 +144,10 @@ const tabs = computed(() => {
     <TabButton
       v-for="tab in tabs"
       :key="tab.name"
-      :to="tab.href"
+      :to="tab.to"
       :label="tab.name"
       :is-active="
-        route.path === tab.href || route.path.startsWith(tab.href + '/')
+        route.path === tab.path || route.path.startsWith(tab.path + '/')
       "
       :count="tab.count || undefined"
       :show-count="showCounts && !!tab.count"

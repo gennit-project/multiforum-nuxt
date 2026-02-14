@@ -1,15 +1,32 @@
 <script lang="ts" setup>
-import { computed, ref, defineProps } from 'vue';
+import { computed, ref, defineProps, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
 import { GET_USER_IMAGES } from '@/graphQLData/image/queries';
 import type { Image } from '@/__generated__/graphql';
 import ImageListItem from '@/components/image/ImageListItem.vue';
+import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
 
 const route = useRoute();
+const { selectedChannels, hasSelectedChannels } = useSelectedChannelsFromQuery();
 
 const username = computed(() => {
   return typeof route.params.username === 'string' ? route.params.username : '';
+});
+
+const imagesWhere = computed(() => {
+  if (!hasSelectedChannels.value) {
+    return undefined;
+  }
+  return {
+    Album: {
+      Discussions_SOME: {
+        DiscussionChannels_SOME: {
+          channelUniqueName_IN: selectedChannels.value,
+        },
+      },
+    },
+  };
 });
 
 const pageSize = 24; // Show 24 images per page
@@ -27,6 +44,7 @@ const {
     username: username.value,
     offset: 0,
     limit: pageSize,
+    where: imagesWhere.value,
   }),
   {
     fetchPolicy: 'cache-first',
@@ -61,6 +79,10 @@ const hasMoreImages = computed(() => {
   return images.value.length < totalImageCount.value;
 });
 
+watch([imagesWhere, username], () => {
+  currentOffset.value = 0;
+});
+
 const loadMoreImages = async () => {
   if (!hasMoreImages.value || isLoadingMore.value) return;
 
@@ -73,6 +95,7 @@ const loadMoreImages = async () => {
         username: username.value,
         offset: newOffset,
         limit: pageSize,
+        where: imagesWhere.value,
       },
       updateQuery: (previousResult, { fetchMoreResult }) => {
         if (!fetchMoreResult) return previousResult;
