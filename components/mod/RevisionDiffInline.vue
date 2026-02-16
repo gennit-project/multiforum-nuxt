@@ -111,9 +111,9 @@ const diffHtml = computed(() => {
       <div
         class="flex-1 rounded-tl-md border-b bg-red-500/10 p-3 dark:border-gray-700 dark:bg-red-500/20 md:border-b-0 md:border-r"
       >
-        <h4 class="mb-1 text-xs font-medium text-red-700 dark:text-red-200">
+        <p class="mb-1 text-xs font-medium text-red-700 dark:text-red-200">
           Previous
-        </h4>
+        </p>
         <div
           class="max-h-48 overflow-auto rounded border border-red-300 bg-white p-2 text-sm dark:border-red-700 dark:bg-gray-800"
         >
@@ -126,9 +126,9 @@ const diffHtml = computed(() => {
       <div
         class="flex-1 rounded-tr-md bg-green-500/10 p-3 dark:bg-green-500/20 md:rounded-bl-none"
       >
-        <h4 class="mb-1 text-xs font-medium text-green-700 dark:text-green-200">
+        <p class="mb-1 text-xs font-medium text-green-700 dark:text-green-200">
           Current
-        </h4>
+        </p>
         <div
           class="max-h-48 overflow-auto rounded border border-green-300 bg-white p-2 text-sm dark:border-green-700 dark:bg-gray-800"
         >
