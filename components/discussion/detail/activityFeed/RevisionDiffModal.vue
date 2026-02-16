@@ -98,43 +98,249 @@ const editReason = computed(() => {
   return newReason || oldReason || '';
 });
 
-// Computed property that generates the diff HTML
-const diffHtml = computed(() => {
+type SideKind = 'context' | 'removed' | 'added' | 'empty';
+
+interface DiffLineRow {
+  type: 'line';
+  key: string;
+  oldLineNumber: number | null;
+  newLineNumber: number | null;
+  leftText: string;
+  rightText: string;
+  leftKind: SideKind;
+  rightKind: SideKind;
+  isContext: boolean;
+}
+
+interface CollapsedDiffRow {
+  type: 'collapsed';
+  key: string;
+  hiddenCount: number;
+  hiddenRows: DiffLineRow[];
+}
+
+type DiffRow = DiffLineRow | CollapsedDiffRow;
+
+const CONTEXT_LINES = 3;
+const expandedChunks = ref<Record<string, boolean>>({});
+
+const allDiffLineRows = computed(() => {
   const dmp = new DiffMatchPatch.diff_match_patch();
-  const diffs = dmp.diff_main(oldContent.value, newContent.value);
+  const lineData = dmp.diff_linesToChars_(oldContent.value, newContent.value);
+  const diffs = dmp.diff_main(lineData.chars1, lineData.chars2, false);
+  dmp.diff_charsToLines_(diffs, lineData.lineArray);
   dmp.diff_cleanupSemantic(diffs);
 
-  // Create highlighted HTML for both sides
-  let leftHtml = '';
-  let rightHtml = '';
+  const blocks = diffs.map(([operation, text]) => {
+    const lines = text.split('\n');
+    if (lines[lines.length - 1] === '') {
+      lines.pop();
+    }
+    return { operation, lines };
+  });
 
-  diffs.forEach((diff) => {
-    const [operation, text] = diff;
-    const escapedText = text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\n/g, '<br>');
+  const rows: DiffLineRow[] = [];
+  let oldLineNumber = 1;
+  let newLineNumber = 1;
+  let rowIndex = 0;
 
-    // Operation is either -1 (deletion), 0 (equal), or 1 (insertion)
-    if (operation === -1) {
-      // Deletion - show in left column with red background
-      leftHtml += `<span class="bg-red-500/20 text-red-800 dark:bg-red-500/30 dark:text-red-100">${escapedText}</span>`;
-    } else if (operation === 1) {
-      // Insertion - show in right column with green background
-      rightHtml += `<span class="bg-green-500/20 text-green-800 dark:bg-green-500/30 dark:text-green-100">${escapedText}</span>`;
-    } else {
-      // Equal - show in both columns
-      leftHtml += `<span class="dark:text-gray-200">${escapedText}</span>`;
-      rightHtml += `<span class="dark:text-gray-200">${escapedText}</span>`;
+  const pushRow = (row: Omit<DiffLineRow, 'type' | 'key'>) => {
+    rows.push({
+      type: 'line',
+      key: `line-${rowIndex}`,
+      ...row,
+    });
+    rowIndex += 1;
+  };
+
+  let blockIndex = 0;
+  while (blockIndex < blocks.length) {
+    const block = blocks[blockIndex];
+    if (!block) {
+      blockIndex += 1;
+      continue;
+    }
+
+    const nextBlock = blocks[blockIndex + 1];
+
+    if (
+      block.operation === -1 &&
+      nextBlock &&
+      nextBlock.operation === 1
+    ) {
+      const removedLines = block.lines;
+      const addedLines = nextBlock.lines;
+      const maxLineCount = Math.max(removedLines.length, addedLines.length);
+
+      for (let lineIndex = 0; lineIndex < maxLineCount; lineIndex += 1) {
+        const hasRemovedLine = lineIndex < removedLines.length;
+        const hasAddedLine = lineIndex < addedLines.length;
+
+        pushRow({
+          oldLineNumber: hasRemovedLine ? oldLineNumber++ : null,
+          newLineNumber: hasAddedLine ? newLineNumber++ : null,
+          leftText: hasRemovedLine ? (removedLines[lineIndex] ?? '') : '',
+          rightText: hasAddedLine ? (addedLines[lineIndex] ?? '') : '',
+          leftKind: hasRemovedLine ? 'removed' : 'empty',
+          rightKind: hasAddedLine ? 'added' : 'empty',
+          isContext: false,
+        });
+      }
+
+      blockIndex += 2;
+      continue;
+    }
+
+    if (block.operation === 0) {
+      block.lines.forEach((line) => {
+        pushRow({
+          oldLineNumber: oldLineNumber++,
+          newLineNumber: newLineNumber++,
+          leftText: line,
+          rightText: line,
+          leftKind: 'context',
+          rightKind: 'context',
+          isContext: true,
+        });
+      });
+      blockIndex += 1;
+      continue;
+    }
+
+    if (block.operation === -1) {
+      block.lines.forEach((line) => {
+        pushRow({
+          oldLineNumber: oldLineNumber++,
+          newLineNumber: null,
+          leftText: line,
+          rightText: '',
+          leftKind: 'removed',
+          rightKind: 'empty',
+          isContext: false,
+        });
+      });
+      blockIndex += 1;
+      continue;
+    }
+
+    if (block.operation === 1) {
+      block.lines.forEach((line) => {
+        pushRow({
+          oldLineNumber: null,
+          newLineNumber: newLineNumber++,
+          leftText: '',
+          rightText: line,
+          leftKind: 'empty',
+          rightKind: 'added',
+          isContext: false,
+        });
+      });
+    }
+    blockIndex += 1;
+  }
+
+  return rows;
+});
+
+const collapsedDiffRows = computed(() => {
+  const rows = allDiffLineRows.value;
+  const changedIndexes = rows.reduce<number[]>((indexes, row, index) => {
+    if (!row.isContext) {
+      indexes.push(index);
+    }
+    return indexes;
+  }, []);
+
+  if (!changedIndexes.length) {
+    return rows as DiffRow[];
+  }
+
+  const visibleIndexes = new Set<number>();
+  changedIndexes.forEach((changedIndex) => {
+    const start = Math.max(0, changedIndex - CONTEXT_LINES);
+    const end = Math.min(rows.length - 1, changedIndex + CONTEXT_LINES);
+
+    for (let i = start; i <= end; i += 1) {
+      visibleIndexes.add(i);
     }
   });
 
-  return {
-    left: leftHtml,
-    right: rightHtml,
-  };
+  const output: DiffRow[] = [];
+  let cursor = 0;
+  while (cursor < rows.length) {
+    if (visibleIndexes.has(cursor)) {
+      output.push(rows[cursor] as DiffLineRow);
+      cursor += 1;
+      continue;
+    }
+
+    const hiddenRows: DiffLineRow[] = [];
+    const chunkStart = cursor;
+    while (cursor < rows.length && !visibleIndexes.has(cursor)) {
+      hiddenRows.push(rows[cursor] as DiffLineRow);
+      cursor += 1;
+    }
+
+    output.push({
+      type: 'collapsed',
+      key: `collapsed-${chunkStart}-${cursor - 1}`,
+      hiddenCount: hiddenRows.length,
+      hiddenRows,
+    });
+  }
+
+  return output;
 });
+
+const renderRows = computed(() => {
+  const rows: DiffRow[] = [];
+
+  collapsedDiffRows.value.forEach((row) => {
+    if (row.type === 'collapsed' && expandedChunks.value[row.key]) {
+      rows.push(...row.hiddenRows);
+      return;
+    }
+
+    rows.push(row);
+  });
+
+  return rows;
+});
+
+const toggleCollapsedChunk = (chunkKey: string) => {
+  expandedChunks.value = {
+    ...expandedChunks.value,
+    [chunkKey]: !expandedChunks.value[chunkKey],
+  };
+};
+
+const getCodeCellClass = (kind: SideKind) => {
+  if (kind === 'removed') {
+    return 'bg-red-500/20 text-red-800 dark:bg-red-500/30 dark:text-red-100';
+  }
+
+  if (kind === 'added') {
+    return 'bg-green-500/20 text-green-800 dark:bg-green-500/30 dark:text-green-100';
+  }
+
+  if (kind === 'empty') {
+    return 'bg-gray-50 text-gray-400 dark:bg-gray-900/40 dark:text-gray-500';
+  }
+
+  return 'text-gray-800 dark:text-gray-200';
+};
+
+const getLineNumberClass = (kind: SideKind) => {
+  if (kind === 'removed') {
+    return 'bg-red-500/10 text-red-700 dark:bg-red-500/20 dark:text-red-200';
+  }
+
+  if (kind === 'added') {
+    return 'bg-green-500/10 text-green-700 dark:bg-green-500/20 dark:text-green-200';
+  }
+
+  return 'text-gray-500 dark:text-gray-400';
+};
 
 // Set up delete mutation with dynamic variables
 const {
@@ -248,10 +454,52 @@ const handleClose = () => {
                 Previous Version
               </h3>
               <div
-                class="h-full min-h-[200px] overflow-auto rounded border border-red-300 bg-white p-3 dark:border-red-700 dark:bg-gray-800"
+                class="h-full min-h-[200px] overflow-auto rounded border border-red-300 bg-white dark:border-red-700 dark:bg-gray-800"
               >
-                <!-- eslint-disable-next-line vue/no-v-html -->
-                <div v-html="diffHtml.left" />
+                <table class="w-full border-collapse text-xs">
+                  <tbody>
+                    <tr
+                      v-for="row in renderRows"
+                      :key="`left-${row.key}`"
+                      class="border-b border-gray-100 dark:border-gray-800"
+                    >
+                      <template v-if="row.type === 'collapsed'">
+                        <td
+                          colspan="2"
+                          class="bg-gray-100 px-3 py-2 text-center text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                        >
+                          <button
+                            type="button"
+                            class="font-medium underline"
+                            @click="toggleCollapsedChunk(row.key)"
+                          >
+                            {{
+                              expandedChunks[row.key]
+                                ? `Hide ${row.hiddenCount} unchanged lines`
+                                : `Show ${row.hiddenCount} unchanged lines`
+                            }}
+                          </button>
+                        </td>
+                      </template>
+                      <template v-else>
+                        <td
+                          class="w-12 select-none px-2 py-1 text-right font-mono"
+                          :class="getLineNumberClass(row.leftKind)"
+                        >
+                          {{ row.oldLineNumber ?? '' }}
+                        </td>
+                        <td
+                          class="px-3 py-1 font-mono"
+                          :class="getCodeCellClass(row.leftKind)"
+                        >
+                          <pre
+                            class="m-0 whitespace-pre-wrap break-words"
+                          ><code>{{ row.leftText }}</code></pre>
+                        </td>
+                      </template>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
 
@@ -265,10 +513,52 @@ const handleClose = () => {
                 Current Version
               </h3>
               <div
-                class="h-full min-h-[200px] overflow-auto rounded border border-green-300 bg-white p-3 dark:border-green-700 dark:bg-gray-800"
+                class="h-full min-h-[200px] overflow-auto rounded border border-green-300 bg-white dark:border-green-700 dark:bg-gray-800"
               >
-                <!-- eslint-disable-next-line vue/no-v-html -->
-                <div v-html="diffHtml.right" />
+                <table class="w-full border-collapse text-xs">
+                  <tbody>
+                    <tr
+                      v-for="row in renderRows"
+                      :key="`right-${row.key}`"
+                      class="border-b border-gray-100 dark:border-gray-800"
+                    >
+                      <template v-if="row.type === 'collapsed'">
+                        <td
+                          colspan="2"
+                          class="bg-gray-100 px-3 py-2 text-center text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                        >
+                          <button
+                            type="button"
+                            class="font-medium underline"
+                            @click="toggleCollapsedChunk(row.key)"
+                          >
+                            {{
+                              expandedChunks[row.key]
+                                ? `Hide ${row.hiddenCount} unchanged lines`
+                                : `Show ${row.hiddenCount} unchanged lines`
+                            }}
+                          </button>
+                        </td>
+                      </template>
+                      <template v-else>
+                        <td
+                          class="w-12 select-none px-2 py-1 text-right font-mono"
+                          :class="getLineNumberClass(row.rightKind)"
+                        >
+                          {{ row.newLineNumber ?? '' }}
+                        </td>
+                        <td
+                          class="px-3 py-1 font-mono"
+                          :class="getCodeCellClass(row.rightKind)"
+                        >
+                          <pre
+                            class="m-0 whitespace-pre-wrap break-words"
+                          ><code>{{ row.rightText }}</code></pre>
+                        </td>
+                      </template>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
