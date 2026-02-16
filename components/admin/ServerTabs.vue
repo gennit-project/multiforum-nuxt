@@ -100,7 +100,9 @@ const tabs = computed((): Tab[] => {
   <div>
     <nav
       :class="
-        vertical ? 'text-md flex flex-col' : 'flex space-x-2 pt-1 text-sm'
+        vertical
+          ? 'text-md flex flex-col'
+          : 'flex flex-wrap gap-x-2 gap-y-1 pt-1 text-sm sm:flex-nowrap'
       "
       aria-label="Tabs"
     >

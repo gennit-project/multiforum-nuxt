@@ -159,8 +159,8 @@ const isEnabled = computed(() => installedPlugin.value?.enabled ?? false);
 
 // Only show full-page loading on initial load, not during refetches
 // Check if we're loading AND don't have any data yet
-const isInitialLoading = computed(() =>
-  (pluginsLoading.value || installedLoading.value) && !pluginsResult.value
+const isInitialLoading = computed(
+  () => (pluginsLoading.value || installedLoading.value) && !pluginsResult.value
 );
 
 // Plugin metadata computed properties
@@ -366,13 +366,11 @@ const handleInstall = async (versionOverride?: string) => {
   // Clear any previous error
   installError.value = null;
 
-
   try {
     const result = await installMutation({
       pluginId,
       version: versionToInstall,
     });
-
 
     // Check for GraphQL errors in the result
     if (result?.errors?.length) {
@@ -542,7 +540,7 @@ const handleSaveSettings = async () => {
 </script>
 
 <template>
-  <div class="px-8">
+  <div class="md:px-8">
     <RequireAuth>
       <template #has-auth>
         <!-- Loading State (only show on initial load, not refetches) -->

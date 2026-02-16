@@ -84,20 +84,10 @@ const isOnMapPage = computed(() => {
 
         <div class="ml-2 flex min-w-0 items-center space-x-1 text-sm">
           <nuxt-link to="/" class="flex items-center gap-1">
-            <ClientOnly>
-              <span v-if="!lgAndUp">🐝</span>
-              <span
-                class="logo-font text-lg font-bold text-gray-900 dark:text-white"
-                :class="{ 'ml-1': !lgAndUp, 'ml-8': smAndDown }"
-                >Topical</span
-              >
-              <template #fallback>
-                <span
-                  class="logo-font text-lg font-bold text-gray-900 dark:text-white"
-                  >Topical</span
-                >
-              </template>
-            </ClientOnly>
+            <span
+              class="logo-font text-lg font-bold text-gray-900 dark:text-white"
+              >Topical</span
+            >
           </nuxt-link>
 
           <div
