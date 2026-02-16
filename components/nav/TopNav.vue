@@ -20,7 +20,7 @@ import {
 defineEmits(['toggleDropdown']);
 
 const route = useRoute();
-const { lgAndUp, smAndDown } = useDisplay();
+const { smAndDown } = useDisplay();
 
 const channelId = computed(() =>
   typeof route.params.forumId === 'string' ? route.params.forumId : ''
@@ -123,11 +123,22 @@ const isOnMapPage = computed(() => {
           </div>
         </div>
       </div>
-      <div class="hidden min-w-0 flex-1 justify-center px-4 md:flex">
-        <div class="w-full min-w-0 max-w-xl">
-          <TopNavSearch />
+      <ClientOnly>
+        <div
+          v-if="!smAndDown"
+          class="hidden min-w-0 flex-1 justify-center px-4 md:flex"
+        >
+          <div class="w-full min-w-0 max-w-xl">
+            <TopNavSearch />
+          </div>
         </div>
-      </div>
+        <template #fallback>
+          <div
+            class="hidden min-w-0 flex-1 justify-center px-4 md:flex"
+            aria-hidden="true"
+          />
+        </template>
+      </ClientOnly>
       <div class="flex flex-none items-center gap-2">
         <div class="hidden items-center justify-end space-x-4 sm:flex">
           <nuxt-link
@@ -139,6 +150,14 @@ const isOnMapPage = computed(() => {
           <LoginButton />
         </div>
         <div class="flex items-center space-x-2 md:mr-2">
+          <ClientOnly>
+            <div v-if="smAndDown" class="md:hidden">
+              <TopNavSearch icon-only />
+            </div>
+            <template #fallback>
+              <div class="md:hidden" aria-hidden="true" />
+            </template>
+          </ClientOnly>
           <div class="lg:hidden">
             <CreateAnythingButton :background-color="'light'" />
           </div>

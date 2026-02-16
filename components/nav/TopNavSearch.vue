@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useRouter } from 'nuxt/app';
 import SearchBar from '@/components/SearchBar.vue';
 import FilterChip from '@/components/FilterChip.vue';
 import SearchableForumList from '@/components/channel/SearchableForumList.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
+import SearchIcon from '@/components/icons/SearchIcon.vue';
 import { getChannelLabel } from '@/utils';
 import {
   getLocalStorageItem,
@@ -31,6 +32,15 @@ type RecentSearch = {
 
 const SEARCH_RECENTS_KEY = 'sitewideSearchRecents';
 const MAX_RECENTS = 6;
+
+const props = withDefaults(
+  defineProps<{
+    iconOnly?: boolean;
+  }>(),
+  {
+    iconOnly: false,
+  }
+);
 
 const router = useRouter();
 const rootRef = ref<HTMLElement | null>(null);
@@ -82,6 +92,21 @@ const forumLabel = computed(() => getChannelLabel(selectedForums.value));
 
 const openPopover = () => {
   showPopover.value = true;
+};
+
+const openPopoverAndFocus = () => {
+  openPopover();
+  nextTick(() => {
+    focusSearch();
+  });
+};
+
+const togglePopoverAndFocus = () => {
+  if (showPopover.value) {
+    closePopover();
+    return;
+  }
+  openPopoverAndFocus();
 };
 
 const closePopover = () => {
@@ -204,8 +229,7 @@ const handleGlobalKeydown = (event: KeyboardEvent) => {
       return;
     }
     event.preventDefault();
-    openPopover();
-    focusSearch();
+    openPopoverAndFocus();
   }
 
   if (event.key === 'Escape') {
@@ -240,8 +264,27 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="rootRef" class="relative w-full max-w-xl">
-    <div class="w-full" @click="openPopover" @focusin="openPopover">
+  <div
+    ref="rootRef"
+    class="relative"
+    :class="props.iconOnly ? 'w-auto' : 'w-full max-w-xl'"
+  >
+    <button
+      v-if="props.iconOnly"
+      type="button"
+      data-testid="mobile-top-nav-search-button"
+      aria-label="Open search"
+      class="inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:text-gray-300 dark:hover:text-white"
+      @click="togglePopoverAndFocus"
+    >
+      <SearchIcon class="h-5 w-5" />
+    </button>
+    <div
+      v-else
+      class="w-full"
+      @click="openPopover"
+      @focusin="openPopover"
+    >
       <SearchBar
         ref="searchBarRef"
         :auto-focus="false"
@@ -256,8 +299,26 @@ onBeforeUnmount(() => {
     </div>
     <div
       v-if="showPopover"
-      class="absolute left-0 right-0 z-30 mt-2 min-w-[20rem] md:min-w-[28rem] rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900"
+      class="z-30 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900"
+      :class="
+        props.iconOnly
+          ? 'fixed left-2 right-2 top-[3.75rem]'
+          : 'absolute left-0 right-0 mt-2 min-w-[20rem] md:min-w-[28rem]'
+      "
     >
+      <div v-if="props.iconOnly" class="border-b border-gray-200 p-3 dark:border-gray-700">
+        <SearchBar
+          ref="searchBarRef"
+          :auto-focus="false"
+          :initial-value="searchInput"
+          :search-placeholder="'Search ( / )'"
+          :small="true"
+          :test-id="'top-nav-search-input-mobile'"
+          :debounce-ms="0"
+          @update-search-input="handleSearchInput"
+          @submit="executeSearch"
+        />
+      </div>
       <div class="flex flex-wrap items-center gap-2 p-3">
         <FilterChip :label="`Type: ${typeLabel}`">
           <template #content>
@@ -329,12 +390,14 @@ onBeforeUnmount(() => {
         </button>
       </div>
       <div class="border-t border-gray-200 dark:border-gray-700">
-        <div class="px-3 py-2 text-xs uppercase tracking-wide text-gray-500">
+        <div
+          class="px-3 py-2 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+        >
           Recent searches
         </div>
         <div
           v-if="recentSearches.length === 0"
-          class="px-3 pb-3 text-sm text-gray-500"
+          class="px-3 pb-3 text-sm text-gray-500 dark:text-gray-400"
         >
           No recent searches yet.
         </div>
@@ -357,7 +420,7 @@ onBeforeUnmount(() => {
               <div class="font-medium text-gray-900 dark:text-gray-100">
                 {{ recent.query }}
               </div>
-              <div class="text-xs text-gray-500">
+              <div class="text-xs text-gray-500 dark:text-gray-400">
                 {{
                   typeOptions.find((o) => o.value === recent.type)?.label || ''
                 }}
