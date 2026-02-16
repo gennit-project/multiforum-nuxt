@@ -102,7 +102,7 @@ const primaryButtonClasses = computed(() => {
 
         <div class="fixed inset-0 z-10 overflow-y-auto">
           <div
-            class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
+            class="flex min-h-full items-end justify-center text-center sm:items-center sm:p-0 md:p-4"
           >
             <TransitionChild
               as="template"
@@ -117,7 +117,7 @@ const primaryButtonClasses = computed(() => {
                 class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all dark:bg-gray-800 sm:my-8 sm:w-full sm:max-w-2xl sm:p-6"
               >
                 <!-- Header Area with fixed height -->
-                <div class="flex-none px-4 pb-2 pt-5">
+                <div class="flex-none px-2 pb-2 pt-5 md:px-4">
                   <div class="flex items-center space-x-4">
                     <div
                       :class="[
@@ -139,7 +139,9 @@ const primaryButtonClasses = computed(() => {
                 </div>
 
                 <!-- Main Content Area with flex-grow and overflow -->
-                <div class="flex flex-grow flex-col overflow-hidden px-4">
+                <div
+                  class="flex flex-grow flex-col overflow-hidden px-2 md:px-4"
+                >
                   <p class="flex-none text-sm text-gray-500 dark:text-gray-300">
                     {{ body }}
                   </p>
