@@ -124,10 +124,7 @@ onMounted(() => {
 
           <!-- Mobile/Tablet Side Navigation -->
           <ClientOnly>
-            <nav
-              v-if="!lgAndUp"
-              aria-label="Mobile navigation"
-            >
+            <nav v-if="!lgAndUp" aria-label="Mobile navigation">
               <SiteSidenav
                 :key="`${sideNavIsOpenVar}`"
                 :show-dropdown="sideNavIsOpenVar"
