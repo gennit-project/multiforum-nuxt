@@ -1,6 +1,60 @@
 import { gql } from '@apollo/client/core';
 import { AUTHOR_FIELDS } from '../discussion/queries';
 
+// Fragment for comment search results with context links
+export const SEARCH_COMMENT_FIELDS = gql`
+  fragment SearchCommentFields on Comment {
+    id
+    text
+    createdAt
+    updatedAt
+    archived
+    CommentAuthor {
+      ... on ModerationProfile {
+        displayName
+      }
+      ... on User {
+        username
+        profilePicURL
+        displayName
+      }
+    }
+    Channel {
+      uniqueName
+      displayName
+    }
+    DiscussionChannel {
+      id
+      channelUniqueName
+      discussionId
+      Discussion {
+        id
+        title
+      }
+    }
+    Event {
+      id
+      title
+    }
+  }
+`;
+
+// Query for searching comments site-wide
+export const SEARCH_COMMENTS = gql`
+  query searchComments(
+    $where: CommentWhere
+    $options: CommentOptions
+  ) {
+    comments(where: $where, options: $options) {
+      ...SearchCommentFields
+    }
+    commentsAggregate(where: $where) {
+      count
+    }
+  }
+  ${SEARCH_COMMENT_FIELDS}
+`;
+
 export const COMMENT_VOTE_FIELDS = gql`
   fragment CommentVoteFields on Comment {
     UpvotedByUsers {
