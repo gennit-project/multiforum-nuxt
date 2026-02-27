@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import FormRow from '@/components/FormRow.vue';
 
 interface PluginSecretStatus {
@@ -20,12 +21,32 @@ const emit = defineEmits<{
   (e: 'set-secret', key: string, value: string): void;
 }>();
 
+// Track which secret is awaiting confirmation
+const confirmingSecret = ref<string | null>(null);
+
 const updateSecretValue = (key: string, value: string) => {
   emit('update:secretValues', { ...props.secretValues, [key]: value });
 };
 
 const updateShowSecretInput = (key: string, value: boolean) => {
   emit('update:showSecretInputs', { ...props.showSecretInputs, [key]: value });
+  // Reset confirmation state when hiding input
+  if (!value) {
+    confirmingSecret.value = null;
+  }
+};
+
+const requestConfirmation = (key: string) => {
+  confirmingSecret.value = key;
+};
+
+const cancelConfirmation = () => {
+  confirmingSecret.value = null;
+};
+
+const confirmAndSave = (key: string) => {
+  emit('set-secret', key, props.secretValues[key] || '');
+  confirmingSecret.value = null;
 };
 
 const getSecretStatusColor = (status: string) => {
@@ -48,7 +69,7 @@ const getSecretStatusText = (status: string) => {
     case 'INVALID':
       return 'Invalid';
     case 'SET_UNTESTED':
-      return 'Set (untested)';
+      return 'Set';
     default:
       return 'Not set';
   }
@@ -59,6 +80,17 @@ const getSecretStatusText = (status: string) => {
   <FormRow v-if="secrets.length > 0" section-title="Required Secrets">
     <template #content>
       <div class="space-y-4">
+        <!-- Security warning banner -->
+        <div class="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-900/30">
+          <i class="fa-solid fa-lock mt-0.5 text-amber-600 dark:text-amber-400" />
+          <div class="text-sm text-amber-800 dark:text-amber-200">
+            <p class="font-medium">Secrets are write-only</p>
+            <p class="mt-1">
+              Secrets are encrypted and cannot be retrieved after saving. Make sure to store your secrets securely before saving them here.
+            </p>
+          </div>
+        </div>
+
         <p class="text-sm text-gray-600 dark:text-gray-400">
           Configure server-wide secrets required by this plugin.
         </p>
@@ -87,7 +119,7 @@ const getSecretStatusText = (status: string) => {
             </div>
           </div>
 
-          <div v-if="showSecretInputs[secret.key]" class="space-y-2">
+          <div v-if="showSecretInputs[secret.key]" class="space-y-3">
             <input
               :value="secretValues[secret.key] || ''"
               type="password"
@@ -95,18 +127,52 @@ const getSecretStatusText = (status: string) => {
               class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               @input="updateSecretValue(secret.key, ($event.target as HTMLInputElement).value)"
             >
-            <div class="flex space-x-2">
+
+            <!-- Warning text below input -->
+            <p class="flex items-center gap-1.5 text-xs italic text-amber-600 dark:text-amber-400">
+              <i class="fa-solid fa-triangle-exclamation" />
+              This secret will not be visible after saving.
+            </p>
+
+            <!-- Confirmation step -->
+            <div
+              v-if="confirmingSecret === secret.key"
+              class="rounded-md border border-amber-300 bg-amber-50 p-3 dark:border-amber-600 dark:bg-amber-900/30"
+            >
+              <p class="mb-2 text-sm text-amber-800 dark:text-amber-200">
+                Are you sure? This secret cannot be viewed or retrieved after saving.
+              </p>
+              <div class="flex space-x-2">
+                <button
+                  type="button"
+                  class="rounded bg-orange-600 px-3 py-1 text-sm text-white hover:bg-orange-700"
+                  @click="confirmAndSave(secret.key)"
+                >
+                  Save Secret
+                </button>
+                <button
+                  type="button"
+                  class="rounded bg-gray-300 px-3 py-1 text-sm text-gray-700 hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+                  @click="cancelConfirmation"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+
+            <!-- Initial save/cancel buttons (before confirmation) -->
+            <div v-else class="flex space-x-2">
               <button
                 type="button"
                 class="rounded bg-orange-600 px-3 py-1 text-sm text-white hover:bg-orange-700"
                 :disabled="!secretValues[secret.key]"
-                @click="emit('set-secret', secret.key, secretValues[secret.key] || '')"
+                @click="requestConfirmation(secret.key)"
               >
                 Save
               </button>
               <button
                 type="button"
-                class="rounded bg-gray-300 px-3 py-1 text-sm text-gray-700 hover:bg-gray-400"
+                class="rounded bg-gray-300 px-3 py-1 text-sm text-gray-700 hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
                 @click="updateShowSecretInput(secret.key, false)"
               >
                 Cancel
