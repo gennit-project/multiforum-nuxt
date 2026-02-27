@@ -57,7 +57,7 @@ const statusText = computed(() => {
     case 'INVALID':
       return 'Invalid';
     case 'SET_UNTESTED':
-      return 'Set (untested)';
+      return 'Set';
     default:
       return 'Not set';
   }
@@ -72,9 +72,7 @@ const validationAttrs = computed(() => {
     if (props.field.validation.maxLength !== undefined) {
       attrs.maxlength = props.field.validation.maxLength;
     }
-    if (props.field.validation.pattern) {
-      attrs.pattern = props.field.validation.pattern;
-    }
+    // Skip pattern validation for secrets - they are validated by the backend
     if (props.field.validation.required && !hasValue.value) {
       attrs.required = true;
     }
@@ -101,16 +99,7 @@ const validationError = computed(() => {
   if (validation?.maxLength !== undefined && value.length > validation.maxLength) {
     return `${props.field.label} must be ${validation.maxLength} characters or fewer`;
   }
-  if (validation?.pattern) {
-    try {
-      const regex = new RegExp(validation.pattern);
-      if (!regex.test(value)) {
-        return `${props.field.label} format is invalid`;
-      }
-    } catch {
-      // Ignore invalid regex patterns
-    }
-  }
+  // Skip pattern validation for secrets - they are validated by the backend when used
   return '';
 });
 </script>
@@ -142,12 +131,20 @@ const validationError = computed(() => {
     >
       {{ field.description }}
     </p>
+    <!-- Write-only indicator when secret is already set -->
+    <p
+      v-if="hasValue && secretStatus && secretStatus.status !== 'NOT_SET'"
+      class="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400"
+    >
+      <i class="fa-solid fa-lock text-[10px]" />
+      Write-only: This value cannot be retrieved after saving.
+    </p>
     <div class="relative">
       <input
         :id="field.key"
         v-model="inputValue"
         :type="showValue ? 'text' : 'password'"
-        :placeholder="hasValue ? '••••••••' : field.placeholder"
+        :placeholder="hasValue ? '[encrypted - cannot be viewed]' : field.placeholder"
         v-bind="validationAttrs"
         class="w-full rounded-md border border-gray-300 px-3 py-2 pr-20 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
         :class="{ 'border-red-500': error }"
