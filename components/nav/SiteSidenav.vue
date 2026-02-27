@@ -459,9 +459,9 @@ nav li:hover,
   color: #9ca3af;
 }
 .top {
-  z-index: 19;
+  z-index: 40;
 }
 .overlay-shade {
-  z-index: 19;
+  z-index: 40;
 }
 </style>
