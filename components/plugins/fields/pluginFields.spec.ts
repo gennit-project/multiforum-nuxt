@@ -369,7 +369,7 @@ describe('Plugin Field Component Logic', () => {
           case 'INVALID':
             return 'Invalid';
           case 'SET_UNTESTED':
-            return 'Set (untested)';
+            return 'Set';
           default:
             return 'Not set';
         }
@@ -377,8 +377,66 @@ describe('Plugin Field Component Logic', () => {
 
       expect(getStatusText('VALID')).toBe('Valid');
       expect(getStatusText('INVALID')).toBe('Invalid');
-      expect(getStatusText('SET_UNTESTED')).toBe('Set (untested)');
+      expect(getStatusText('SET_UNTESTED')).toBe('Set');
       expect(getStatusText('NOT_SET')).toBe('Not set');
+    });
+
+    it('should return write-only placeholder when secret is set', () => {
+      const getPlaceholder = (hasValue: boolean, fieldPlaceholder?: string): string => {
+        return hasValue ? '[encrypted - cannot be viewed]' : (fieldPlaceholder || '');
+      };
+
+      expect(getPlaceholder(true)).toBe('[encrypted - cannot be viewed]');
+      expect(getPlaceholder(true, 'Enter API key')).toBe('[encrypted - cannot be viewed]');
+      expect(getPlaceholder(false, 'Enter API key')).toBe('Enter API key');
+      expect(getPlaceholder(false)).toBe('');
+    });
+
+    it('should show write-only indicator when secret is already set', () => {
+      const shouldShowWriteOnlyIndicator = (
+        hasValue: boolean,
+        secretStatus?: PluginSecretStatus
+      ): boolean => {
+        return hasValue && !!secretStatus && secretStatus.status !== 'NOT_SET';
+      };
+
+      expect(shouldShowWriteOnlyIndicator(true, { key: 'k', status: 'SET_UNTESTED' })).toBe(true);
+      expect(shouldShowWriteOnlyIndicator(true, { key: 'k', status: 'VALID' })).toBe(true);
+      expect(shouldShowWriteOnlyIndicator(true, { key: 'k', status: 'INVALID' })).toBe(true);
+      expect(shouldShowWriteOnlyIndicator(true, { key: 'k', status: 'NOT_SET' })).toBe(false);
+      expect(shouldShowWriteOnlyIndicator(false, { key: 'k', status: 'SET_UNTESTED' })).toBe(false);
+      expect(shouldShowWriteOnlyIndicator(true, undefined)).toBe(false);
+    });
+
+    it('should skip pattern validation for secrets', () => {
+      // Secret fields should not validate patterns - backend validates when used
+      const validateSecretField = (
+        value: string,
+        validation?: PluginFieldValidation
+      ): string | null => {
+        if (!validation) return null;
+
+        // Only validate required and length constraints, not pattern
+        if (validation.required && value.trim().length === 0) {
+          return 'Field is required';
+        }
+        if (validation.minLength !== undefined && value.length < validation.minLength) {
+          return `Must be at least ${validation.minLength} characters`;
+        }
+        if (validation.maxLength !== undefined && value.length > validation.maxLength) {
+          return `Must be at most ${validation.maxLength} characters`;
+        }
+        // Pattern validation is intentionally skipped for secrets
+        return null;
+      };
+
+      // Even with a pattern defined, secret validation should pass
+      expect(validateSecretField('any-value', { pattern: '^[a-f0-9]{64}$' })).toBeNull();
+      expect(validateSecretField('short', { pattern: '^[a-f0-9]{64}$' })).toBeNull();
+
+      // But still validate required and length
+      expect(validateSecretField('', { required: true })).toBe('Field is required');
+      expect(validateSecretField('ab', { minLength: 5 })).toBe('Must be at least 5 characters');
     });
   });
 });
@@ -572,6 +630,72 @@ describe('PluginSettingsForm Logic', () => {
       expect(validatePattern('abc', { pattern: '^[a-z]+$' })).toBeNull();
       expect(validatePattern('ABC', { pattern: '^[a-z]+$' })).toBe('Invalid format');
       expect(validatePattern('abc123', { pattern: '^[a-z]+$' })).toBe('Invalid format');
+    });
+  });
+
+  describe('Secret confirmation flow', () => {
+    it('should track which secret is awaiting confirmation', () => {
+      let confirmingSecret: string | null = null;
+
+      const requestConfirmation = (key: string) => {
+        confirmingSecret = key;
+      };
+
+      const cancelConfirmation = () => {
+        confirmingSecret = null;
+      };
+
+      expect(confirmingSecret).toBeNull();
+
+      requestConfirmation('API_KEY');
+      expect(confirmingSecret).toBe('API_KEY');
+
+      cancelConfirmation();
+      expect(confirmingSecret).toBeNull();
+    });
+
+    it('should reset confirmation when hiding input', () => {
+      let confirmingSecret: string | null = 'API_KEY';
+      const showSecretInputs: Record<string, boolean> = { API_KEY: true };
+
+      const updateShowSecretInput = (key: string, value: boolean) => {
+        showSecretInputs[key] = value;
+        if (!value) {
+          confirmingSecret = null;
+        }
+      };
+
+      expect(confirmingSecret).toBe('API_KEY');
+
+      updateShowSecretInput('API_KEY', false);
+      expect(showSecretInputs['API_KEY']).toBe(false);
+      expect(confirmingSecret).toBeNull();
+    });
+
+    it('should emit set-secret only after confirmation', () => {
+      const emittedSecrets: Array<{ key: string; value: string }> = [];
+      let confirmingSecret: string | null = null;
+      const secretValues: Record<string, string> = { API_KEY: 'test-secret-value' };
+
+      const requestConfirmation = (key: string) => {
+        confirmingSecret = key;
+      };
+
+      const confirmAndSave = (key: string) => {
+        emittedSecrets.push({ key, value: secretValues[key] || '' });
+        confirmingSecret = null;
+      };
+
+      // First click: request confirmation
+      requestConfirmation('API_KEY');
+      expect(confirmingSecret).toBe('API_KEY');
+      expect(emittedSecrets).toHaveLength(0);
+
+      // Second click: confirm and save
+      confirmAndSave('API_KEY');
+      expect(confirmingSecret).toBeNull();
+      expect(emittedSecrets).toHaveLength(1);
+      expect(emittedSecrets[0]).toEqual({ key: 'API_KEY', value: 'test-secret-value' });
     });
   });
 
