@@ -27,6 +27,13 @@ const isDarkMode = computed(() => theme.value === 'dark');
 
 const parseError = ref<string | null>(null);
 const editorValue = ref(props.modelValue);
+
+function handleEditorReady(payload: { view: EditorView }) {
+  // Make the scroller focusable for keyboard accessibility
+  if (payload.view?.scrollDOM) {
+    payload.view.scrollDOM.setAttribute('tabindex', '0');
+  }
+}
 const extensions = computed(() => {
   const baseExtensions = [
     basicSetup,
@@ -83,6 +90,7 @@ watch(editorValue, (value) => {
         placeholder="Pipeline configuration..."
         :indent-with-tab="true"
         :tab-size="2"
+        @ready="handleEditorReady"
       />
       <template #fallback>
         <div class="h-96 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
