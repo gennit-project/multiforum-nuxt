@@ -120,9 +120,9 @@ async function handleSave(config: PipelineConfig) {
                 <i class="fa-solid fa-info-circle text-blue-400" />
               </div>
               <div class="ml-3">
-                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+                <h2 class="text-sm font-medium text-blue-800 dark:text-blue-200">
                   About Plugin Pipelines
-                </h3>
+                </h2>
                 <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
                   <p>
                     Pipelines define which plugins run when certain events occur (like file uploads).
@@ -148,9 +148,9 @@ async function handleSave(config: PipelineConfig) {
                 <i class="fa-solid fa-exclamation-triangle text-yellow-400" />
               </div>
               <div class="ml-3">
-                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                <h2 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
                   No Enabled Plugins
-                </h3>
+                </h2>
                 <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
                   <p>
                     You need to install and enable at least one plugin before configuring pipelines.

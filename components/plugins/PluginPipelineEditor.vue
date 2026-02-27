@@ -147,9 +147,9 @@ const canSave = computed(() => {
       />
 
       <div class="rounded-lg bg-gray-50 dark:bg-gray-800 p-4">
-        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Available Plugins
-        </h4>
+        </h3>
         <div class="flex flex-wrap gap-2">
           <span
             v-for="plugin in availablePlugins"
@@ -170,9 +170,9 @@ const canSave = computed(() => {
       </div>
 
       <div class="rounded-lg bg-gray-50 dark:bg-gray-800 p-4">
-        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Available Events
-        </h4>
+        </h3>
         <div class="space-y-2">
           <div
             v-for="event in scopedEvents"
