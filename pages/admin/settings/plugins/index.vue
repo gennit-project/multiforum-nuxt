@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
+import PluginDiscoverySection from '@/components/admin/plugins/PluginDiscoverySection.vue';
 import { useToast } from '@/composables/useToast';
 import {
   ALLOW_PLUGIN,
@@ -263,10 +264,19 @@ const isDisallowingPlugin = (pluginId: string) => disallowingPluginIds.value.has
 onMounted(() => {
   refetchInstalledPlugins();
 });
+
+// Handler for when plugins are refreshed from the discovery section
+const handlePluginsRefreshed = async () => {
+  await refetchPluginManagement();
+  await refetchInstalledPlugins();
+};
 </script>
 
 <template>
   <div class="space-y-4 sm:space-y-5">
+    <!-- Plugin Discovery Section -->
+    <PluginDiscoverySection @refreshed="handlePluginsRefreshed" />
+
     <!-- Plugin Management Section -->
     <FormRow section-title="Plugin Management">
       <template #content>
