@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import PlugIcon from '@/components/icons/PlugIcon.vue';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
+import PipelineIcon from '@/components/icons/PipelineIcon.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -22,6 +23,13 @@ const tabs = [
     routeName: 'admin-plugins-registries',
     routePath: '/admin/plugins/registries',
   },
+  {
+    key: 'pipelines',
+    label: 'Pipelines',
+    icon: PipelineIcon,
+    routeName: 'admin-plugins-pipelines',
+    routePath: '/admin/plugins/pipelines',
+  },
 ];
 
 const isDropdownOpen = ref(false);
@@ -32,9 +40,13 @@ const getCurrentTabLabel = computed(() => {
 });
 
 const activeTabKey = computed(() => {
-  return route.path.startsWith('/admin/plugins/registries')
-    ? 'registries'
-    : 'management';
+  if (route.path.startsWith('/admin/plugins/registries')) {
+    return 'registries';
+  }
+  if (route.path.startsWith('/admin/plugins/pipelines')) {
+    return 'pipelines';
+  }
+  return 'management';
 });
 
 if (route.name === 'admin-plugins' && route.path !== '/admin/plugins') {
