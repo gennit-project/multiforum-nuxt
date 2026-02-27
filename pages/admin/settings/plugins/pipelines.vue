@@ -7,7 +7,12 @@ import PluginPipelineEditor from '@/components/plugins/PluginPipelineEditor.vue'
 import { useToast } from '@/composables/useToast';
 import { GET_PLUGIN_PIPELINES, GET_INSTALLED_PLUGINS } from '@/graphQLData/admin/queries';
 import { UPDATE_PLUGIN_PIPELINES } from '@/graphQLData/admin/mutations';
-import type { PipelineConfig, EventPipeline } from '@/utils/pipelineSchema';
+import type { PipelineConfig } from '@/utils/pipelineSchema';
+import {
+  parsePipelinesFromBackend,
+  transformPipelinesForMutation,
+  getAvailablePluginsFromInstalled,
+} from '@/utils/pipelineUtils';
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
@@ -35,43 +40,13 @@ const { mutate: updatePipelines, loading: saving } = useMutation(UPDATE_PLUGIN_P
 
 // Computed
 const currentPipelines = computed((): PipelineConfig | undefined => {
-  let pipelines = pipelinesResult.value?.serverConfigs?.[0]?.pluginPipelines;
-
-  // Handle JSON string from Neo4j storage
-  if (typeof pipelines === 'string') {
-    try {
-      pipelines = JSON.parse(pipelines);
-    } catch {
-      return undefined;
-    }
-  }
-
-  if (pipelines && Array.isArray(pipelines)) {
-    // Transform from backend format (pluginId) to frontend format (plugin)
-    const transformedPipelines = pipelines.map((pipeline: any) => ({
-      event: pipeline.event,
-      stopOnFirstFailure: pipeline.stopOnFirstFailure,
-      steps: (pipeline.steps || []).map((step: any) => ({
-        plugin: step.pluginId || step.plugin,
-        version: step.version,
-        condition: step.condition,
-        continueOnError: step.continueOnError,
-      })),
-    }));
-    return { pipelines: transformedPipelines };
-  }
-  return undefined;
+  const pipelines = pipelinesResult.value?.serverConfigs?.[0]?.pluginPipelines;
+  return parsePipelinesFromBackend(pipelines);
 });
 
-// Use plugin.name (slug) as the ID for pipeline configuration, not the UUID
 const availablePlugins = computed(() => {
   const installed = installedResult.value?.getInstalledPlugins || [];
-  return installed
-    .filter((p: any) => p.enabled)
-    .map((p: any) => ({
-      id: p.plugin.name,
-      name: p.plugin.displayName || p.plugin.name,
-    }));
+  return getAvailablePluginsFromInstalled(installed);
 });
 
 const isLoading = computed(() => pipelinesLoading.value || installedLoading.value);
@@ -79,18 +54,7 @@ const isLoading = computed(() => pipelinesLoading.value || installedLoading.valu
 // Methods
 async function handleSave(config: PipelineConfig) {
   try {
-    // Transform to the input format expected by the mutation
-    const pipelinesInput = config.pipelines.map((pipeline: EventPipeline) => ({
-      event: pipeline.event,
-      stopOnFirstFailure: pipeline.stopOnFirstFailure || false,
-      steps: pipeline.steps.map((step) => ({
-        pluginId: step.plugin,
-        version: step.version,  // Preserve version field
-        condition: step.condition || 'ALWAYS',
-        continueOnError: step.continueOnError || false,
-      })),
-    }));
-
+    const pipelinesInput = transformPipelinesForMutation(config);
     await updatePipelines({ pipelines: pipelinesInput });
     toast.success('Pipeline configuration saved successfully');
     await refetchPipelines();
