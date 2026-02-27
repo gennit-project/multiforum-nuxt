@@ -81,6 +81,40 @@ const serverEnabledPlugins = computed(() => {
   return installed.filter((plugin: any) => plugin.enabled);
 });
 
+type ConsolidatedPlugin = {
+  plugin: any;
+  versions: any[];
+  latestVersion: string;
+  availableVersions: string[];
+};
+
+const consolidatedPlugins = computed<ConsolidatedPlugin[]>(() => {
+  const pluginMap = new Map<string, ConsolidatedPlugin>();
+
+  for (const item of serverEnabledPlugins.value) {
+    const pluginId = item.plugin.id;
+    if (!pluginMap.has(pluginId)) {
+      pluginMap.set(pluginId, {
+        plugin: item.plugin,
+        versions: [],
+        latestVersion: item.latestVersion || item.version,
+        availableVersions: item.availableVersions || [item.version],
+      });
+    }
+    pluginMap.get(pluginId)!.versions.push(item);
+  }
+
+  // Sort versions within each plugin (newest first)
+  for (const consolidated of pluginMap.values()) {
+    consolidated.versions.sort((a, b) => {
+      // Simple version comparison - could be improved with semver
+      return b.version.localeCompare(a.version, undefined, { numeric: true });
+    });
+  }
+
+  return Array.from(pluginMap.values());
+});
+
 const orphanedChannelPlugins = computed(() => {
   const serverKeys = new Set(
     serverEnabledPlugins.value.map(
@@ -172,12 +206,69 @@ function getPluginKey(plugin: any) {
   return `${plugin.plugin.id}:${plugin.version ?? 'unknown'}`;
 }
 
-function isToggling(plugin: any) {
-  return togglingPluginIds.value.has(getPluginKey(plugin));
+function getEnabledVersionForPlugin(consolidated: ConsolidatedPlugin): string | null {
+  for (const versionItem of consolidated.versions) {
+    const pluginKey = getPluginKey(versionItem);
+    if (pluginStates.value[pluginKey]?.enabled) {
+      return versionItem.version;
+    }
+  }
+  return null;
 }
 
-function isPluginEnabled(plugin: any) {
-  return pluginStates.value[getPluginKey(plugin)]?.enabled ?? false;
+function getVersionItem(consolidated: ConsolidatedPlugin, version: string) {
+  return consolidated.versions.find((v) => v.version === version);
+}
+
+function isAnyVersionEnabled(consolidated: ConsolidatedPlugin): boolean {
+  return getEnabledVersionForPlugin(consolidated) !== null;
+}
+
+function isConsolidatedToggling(consolidated: ConsolidatedPlugin): boolean {
+  return consolidated.versions.some((v) => isToggling(v));
+}
+
+async function handleVersionChange(consolidated: ConsolidatedPlugin, newVersion: string) {
+  const currentEnabledVersion = getEnabledVersionForPlugin(consolidated);
+  const newVersionItem = getVersionItem(consolidated, newVersion);
+
+  if (!newVersionItem) {
+    toast.error('Could not find the selected version.');
+    return;
+  }
+
+  // If a different version is currently enabled, disable it first
+  if (currentEnabledVersion && currentEnabledVersion !== newVersion) {
+    const currentVersionItem = getVersionItem(consolidated, currentEnabledVersion);
+    if (currentVersionItem) {
+      await handleToggleEnabled(currentVersionItem, false);
+    }
+  }
+
+  // Enable the new version
+  await handleToggleEnabled(newVersionItem, true);
+}
+
+async function handleConsolidatedToggle(consolidated: ConsolidatedPlugin, enabled: boolean) {
+  const enabledVersion = getEnabledVersionForPlugin(consolidated);
+
+  if (enabled) {
+    // Enable the latest/first available version
+    const versionToEnable = consolidated.versions[0];
+    if (versionToEnable) {
+      await handleToggleEnabled(versionToEnable, true);
+    }
+  } else if (enabledVersion) {
+    // Disable the currently enabled version
+    const versionItem = getVersionItem(consolidated, enabledVersion);
+    if (versionItem) {
+      await handleToggleEnabled(versionItem, false);
+    }
+  }
+}
+
+function isToggling(plugin: any) {
+  return togglingPluginIds.value.has(getPluginKey(plugin));
 }
 
 async function handleToggleEnabled(plugin: any, enabled: boolean) {
@@ -354,7 +445,7 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
       </div>
 
       <div
-        v-if="serverEnabledPlugins.length === 0"
+        v-if="consolidatedPlugins.length === 0"
         class="rounded-lg bg-yellow-50 p-4 dark:bg-yellow-900/20"
       >
         <div class="flex">
@@ -377,26 +468,21 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
 
       <div class="space-y-3">
         <div
-          v-for="plugin in serverEnabledPlugins"
-          :key="getPluginKey(plugin)"
+          v-for="consolidated in consolidatedPlugins"
+          :key="consolidated.plugin.id"
           class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
         >
           <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div class="flex-1 space-y-1">
               <div class="flex items-center gap-2">
                 <NuxtLink
-                  :to="`/forums/${channelUniqueName}/edit/plugins/${plugin.plugin.id}`"
+                  :to="`/forums/${channelUniqueName}/edit/plugins/${consolidated.plugin.id}`"
                   class="text-lg font-semibold text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300"
                 >
-                  {{ plugin.plugin.displayName || plugin.plugin.name }}
+                  {{ consolidated.plugin.displayName || consolidated.plugin.name }}
                 </NuxtLink>
                 <span
-                  class="rounded bg-gray-100 px-2 py-0.5 font-mono text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300"
-                >
-                  v{{ plugin.version }}
-                </span>
-                <span
-                  v-if="isPluginEnabled(plugin)"
+                  v-if="isAnyVersionEnabled(consolidated)"
                   class="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-800 dark:text-green-200"
                 >
                   Enabled
@@ -409,35 +495,63 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
                 </span>
               </div>
               <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ plugin.plugin.description || 'No description provided.' }}
+                {{ consolidated.plugin.description || 'No description provided.' }}
               </p>
             </div>
 
             <div class="flex flex-shrink-0 items-center gap-3">
+              <!-- Version selector -->
+              <div class="flex items-center gap-2">
+                <label
+                  :for="`version-${consolidated.plugin.id}`"
+                  class="text-sm text-gray-600 dark:text-gray-400"
+                >
+                  Version:
+                </label>
+                <select
+                  :id="`version-${consolidated.plugin.id}`"
+                  class="rounded-md border border-gray-300 bg-white py-1 pl-2 pr-8 text-sm font-mono text-gray-700 focus:border-orange-500 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                  :value="getEnabledVersionForPlugin(consolidated) || consolidated.versions[0]?.version"
+                  :disabled="isConsolidatedToggling(consolidated) || !isAnyVersionEnabled(consolidated)"
+                  @change="handleVersionChange(consolidated, ($event.target as HTMLSelectElement).value)"
+                >
+                  <option
+                    v-for="versionItem in consolidated.versions"
+                    :key="versionItem.version"
+                    :value="versionItem.version"
+                  >
+                    v{{ versionItem.version }}{{ versionItem.version === consolidated.latestVersion ? ' (latest)' : '' }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Enable/Disable toggle -->
               <label class="flex cursor-pointer items-center gap-2">
                 <input
                   type="checkbox"
                   class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                  :checked="isPluginEnabled(plugin)"
-                  :disabled="isToggling(plugin)"
-                  :aria-label="`Enable ${plugin.plugin.displayName || plugin.plugin.name}`"
+                  :checked="isAnyVersionEnabled(consolidated)"
+                  :disabled="isConsolidatedToggling(consolidated)"
+                  :aria-label="`Enable ${consolidated.plugin.displayName || consolidated.plugin.name}`"
                   @change="
-                    handleToggleEnabled(
-                      plugin,
+                    handleConsolidatedToggle(
+                      consolidated,
                       ($event.target as HTMLInputElement).checked
                     )
                   "
                 >
                 <span class="text-sm text-gray-700 dark:text-gray-300">
                   <i
-                    v-if="isToggling(plugin)"
+                    v-if="isConsolidatedToggling(consolidated)"
                     class="fa-solid fa-spinner animate-spin"
                   />
                   <span v-else>Enable</span>
                 </span>
               </label>
+
+              <!-- Configure button -->
               <NuxtLink
-                :to="`/forums/${channelUniqueName}/edit/plugins/${plugin.plugin.id}`"
+                :to="`/forums/${channelUniqueName}/edit/plugins/${consolidated.plugin.id}`"
                 class="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
               >
                 Configure
