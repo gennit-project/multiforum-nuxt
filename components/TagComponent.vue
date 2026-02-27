@@ -53,7 +53,7 @@ const tagClasses = computed(() => {
   return [
     props.large ? 'text-md py-1 shadow rounded-full' : '',
     props.titleMode ? 'text-xl py-1.5' : '',
-    !props.large && !props.titleMode ? 'text-sm py-0.5' : '',
+    !props.large && !props.titleMode ? 'text-xs py-0.5' : '',
     props.clearable ? 'pr-1' : 'cursor-pointer pr-2',
     getButtonStyles(),
     'pl-1 font-medium tag rounded flex items-center gap-1',

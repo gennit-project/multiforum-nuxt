@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import RevisionDiffModal from './RevisionDiffModal.vue';
+import WikiRevisionDiffModal from './WikiRevisionDiffModal.vue';
 
 vi.mock('@headlessui/vue', () => ({
   TransitionRoot: { name: 'TransitionRoot', template: '<div><slot /></div>' },
@@ -18,27 +18,26 @@ vi.mock('@/components/GenericModal.vue', () => ({
   },
 }));
 
-const baseVersion = {
-  id: 'v1',
+const oldVersion = {
+  id: 'w1',
   body: 'old content',
   createdAt: new Date().toISOString(),
-  Author: { username: 'olduser' },
+  Author: { username: 'old-wiki-user' },
 };
 
 const newVersion = {
-  id: 'v2',
+  id: 'w2',
   body: 'new content',
-  editReason: 'Updated for clarity',
   createdAt: new Date().toISOString(),
-  Author: { username: 'newuser' },
+  Author: { username: 'new-wiki-user' },
 };
 
-describe('RevisionDiffModal (discussion)', () => {
-  it('renders edit reason when provided', () => {
-    const wrapper = mount(RevisionDiffModal, {
+describe('WikiRevisionDiffModal', () => {
+  it('renders revision metadata', () => {
+    const wrapper = mount(WikiRevisionDiffModal, {
       props: {
         open: true,
-        oldVersion: baseVersion,
+        oldVersion,
         newVersion,
         isMostRecent: true,
       },
@@ -46,11 +45,11 @@ describe('RevisionDiffModal (discussion)', () => {
 
     const text = wrapper.text();
     expect({
-      hasLabel: text.includes('Edit reason:'),
-      hasReason: text.includes('Updated for clarity'),
+      hasOldUser: text.includes('From version by old-wiki-user'),
+      hasNewUser: text.includes('To version by new-wiki-user'),
     }).toEqual({
-      hasLabel: true,
-      hasReason: true,
+      hasOldUser: true,
+      hasNewUser: true,
     });
   });
 
@@ -75,11 +74,11 @@ describe('RevisionDiffModal (discussion)', () => {
 
     const newBody = oldBody.replace('line 8 old', 'line 8 new');
 
-    const wrapper = mount(RevisionDiffModal, {
+    const wrapper = mount(WikiRevisionDiffModal, {
       props: {
         open: true,
         oldVersion: {
-          ...baseVersion,
+          ...oldVersion,
           body: oldBody,
         },
         newVersion: {

@@ -44,7 +44,60 @@ describe('CommentRevisionDiffModal', () => {
       },
     });
 
-    expect(wrapper.text()).toContain('Edit reason:');
-    expect(wrapper.text()).toContain('Fixed typo');
+    const text = wrapper.text();
+    expect({
+      hasLabel: text.includes('Edit reason:'),
+      hasReason: text.includes('Fixed typo'),
+    }).toEqual({
+      hasLabel: true,
+      hasReason: true,
+    });
+  });
+
+  it('collapses unchanged lines and keeps context around changes', () => {
+    const oldBody = [
+      'line 1',
+      'line 2',
+      'line 3',
+      'line 4',
+      'line 5',
+      'line 6',
+      'line 7',
+      'line 8 old',
+      'line 9',
+      'line 10',
+      'line 11',
+      'line 12',
+      'line 13',
+      'line 14',
+      'line 15',
+    ].join('\n');
+
+    const newBody = oldBody.replace('line 8 old', 'line 8 new');
+
+    const wrapper = mount(CommentRevisionDiffModal, {
+      props: {
+        open: true,
+        oldVersion: {
+          ...oldVersion,
+          body: oldBody,
+        },
+        newVersion: {
+          ...newVersion,
+          body: newBody,
+        },
+      },
+    });
+
+    const text = wrapper.text();
+    expect({
+      hasCollapsedIndicator: text.includes('Show 4 unchanged lines'),
+      hasOldLine: text.includes('line 8 old'),
+      hasNewLine: text.includes('line 8 new'),
+    }).toEqual({
+      hasCollapsedIndicator: true,
+      hasOldLine: true,
+      hasNewLine: true,
+    });
   });
 });
