@@ -144,11 +144,7 @@ function getChannelDefaults(manifest: any): Record<string, any> {
   return { ...defaults };
 }
 
-function initializePluginState(
-  pluginKey: string,
-  manifest: any,
-  edge?: any
-) {
+function initializePluginState(pluginKey: string, manifest: any, edge?: any) {
   const settingsJson = edge?.properties?.settingsJson;
   const defaults = getChannelDefaults(manifest);
   pluginStates.value[pluginKey] = {
@@ -206,7 +202,9 @@ function getPluginKey(plugin: any) {
   return `${plugin.plugin.id}:${plugin.version ?? 'unknown'}`;
 }
 
-function getEnabledVersionForPlugin(consolidated: ConsolidatedPlugin): string | null {
+function getEnabledVersionForPlugin(
+  consolidated: ConsolidatedPlugin
+): string | null {
   for (const versionItem of consolidated.versions) {
     const pluginKey = getPluginKey(versionItem);
     if (pluginStates.value[pluginKey]?.enabled) {
@@ -228,7 +226,10 @@ function isConsolidatedToggling(consolidated: ConsolidatedPlugin): boolean {
   return consolidated.versions.some((v) => isToggling(v));
 }
 
-async function handleVersionChange(consolidated: ConsolidatedPlugin, newVersion: string) {
+async function handleVersionChange(
+  consolidated: ConsolidatedPlugin,
+  newVersion: string
+) {
   const currentEnabledVersion = getEnabledVersionForPlugin(consolidated);
   const newVersionItem = getVersionItem(consolidated, newVersion);
 
@@ -239,7 +240,10 @@ async function handleVersionChange(consolidated: ConsolidatedPlugin, newVersion:
 
   // If a different version is currently enabled, disable it first
   if (currentEnabledVersion && currentEnabledVersion !== newVersion) {
-    const currentVersionItem = getVersionItem(consolidated, currentEnabledVersion);
+    const currentVersionItem = getVersionItem(
+      consolidated,
+      currentEnabledVersion
+    );
     if (currentVersionItem) {
       await handleToggleEnabled(currentVersionItem, false);
     }
@@ -249,7 +253,10 @@ async function handleVersionChange(consolidated: ConsolidatedPlugin, newVersion:
   await handleToggleEnabled(newVersionItem, true);
 }
 
-async function handleConsolidatedToggle(consolidated: ConsolidatedPlugin, enabled: boolean) {
+async function handleConsolidatedToggle(
+  consolidated: ConsolidatedPlugin,
+  enabled: boolean
+) {
   const enabledVersion = getEnabledVersionForPlugin(consolidated);
 
   if (enabled) {
@@ -351,7 +358,11 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
     }
     await refetchChannel();
     await client.refetchQueries({ include: [GET_CHANNEL] });
-    toast.success(enabled ? 'Plugin enabled for this forum.' : 'Plugin disabled for this forum.');
+    toast.success(
+      enabled
+        ? 'Plugin enabled for this forum.'
+        : 'Plugin disabled for this forum.'
+    );
   } catch (err: any) {
     const message =
       updateChannelEnabledPluginsError.value?.message ||
@@ -377,7 +388,7 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
 
     <div
       v-if="updateChannelEnabledPluginsError?.message"
-      class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200"
+      class="bg-red-50 mb-4 rounded-lg border border-red-200 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200"
       role="alert"
     >
       <div class="flex items-start gap-2">
@@ -400,7 +411,7 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
     </div>
 
     <div v-else class="space-y-4">
-      <div class="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
+      <div class="bg-blue-50 rounded-lg p-4 dark:bg-blue-900/20">
         <div class="flex">
           <div class="flex-shrink-0">
             <i class="fa-solid fa-info-circle text-blue-400" />
@@ -421,7 +432,7 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
 
       <div
         v-if="orphanedChannelPlugins.length > 0"
-        class="rounded-lg bg-yellow-50 p-4 dark:bg-yellow-900/20"
+        class="bg-yellow-50 rounded-lg p-4 dark:bg-yellow-900/20"
       >
         <div class="flex">
           <div class="flex-shrink-0">
@@ -435,7 +446,9 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
             <ul class="mt-2 list-inside list-disc space-y-1">
               <li v-for="edge in orphanedChannelPlugins" :key="edge.node.id">
                 {{ edge.node.Plugin.displayName || edge.node.Plugin.name }}
-                <span class="text-xs text-yellow-700/80 dark:text-yellow-300/80">
+                <span
+                  class="text-xs text-yellow-700/80 dark:text-yellow-300/80"
+                >
                   (v{{ edge.node.version }})
                 </span>
               </li>
@@ -446,14 +459,16 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
 
       <div
         v-if="consolidatedPlugins.length === 0"
-        class="rounded-lg bg-yellow-50 p-4 dark:bg-yellow-900/20"
+        class="bg-yellow-50 rounded-lg p-4 dark:bg-yellow-900/20"
       >
         <div class="flex">
           <div class="flex-shrink-0">
             <i class="fa-solid fa-exclamation-triangle text-yellow-400" />
           </div>
           <div class="ml-3">
-            <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+            <h3
+              class="text-sm font-medium text-yellow-800 dark:text-yellow-200"
+            >
               No Server Plugins Available
             </h3>
             <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
@@ -472,14 +487,18 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
           :key="consolidated.plugin.id"
           class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
         >
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div
+            class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+          >
             <div class="flex-1 space-y-1">
               <div class="flex items-center gap-2">
                 <NuxtLink
                   :to="`/forums/${channelUniqueName}/edit/plugins/${consolidated.plugin.id}`"
-                  class="text-lg font-semibold text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300"
+                  class="font-semibold text-lg text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300"
                 >
-                  {{ consolidated.plugin.displayName || consolidated.plugin.name }}
+                  {{
+                    consolidated.plugin.displayName || consolidated.plugin.name
+                  }}
                 </NuxtLink>
                 <span
                   v-if="isAnyVersionEnabled(consolidated)"
@@ -495,7 +514,9 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
                 </span>
               </div>
               <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ consolidated.plugin.description || 'No description provided.' }}
+                {{
+                  consolidated.plugin.description || 'No description provided.'
+                }}
               </p>
             </div>
 
@@ -510,17 +531,33 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
                 </label>
                 <select
                   :id="`version-${consolidated.plugin.id}`"
-                  class="rounded-md border border-gray-300 bg-white py-1 pl-2 pr-8 text-sm font-mono text-gray-700 focus:border-orange-500 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
-                  :value="getEnabledVersionForPlugin(consolidated) || consolidated.versions[0]?.version"
-                  :disabled="isConsolidatedToggling(consolidated) || !isAnyVersionEnabled(consolidated)"
-                  @change="handleVersionChange(consolidated, ($event.target as HTMLSelectElement).value)"
+                  class="rounded-md border border-gray-300 bg-white py-1 pl-2 pr-8 font-mono text-sm text-gray-700 focus:border-orange-500 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                  :value="
+                    getEnabledVersionForPlugin(consolidated) ||
+                    consolidated.versions[0]?.version
+                  "
+                  :disabled="
+                    isConsolidatedToggling(consolidated) ||
+                    !isAnyVersionEnabled(consolidated)
+                  "
+                  @change="
+                    handleVersionChange(
+                      consolidated,
+                      ($event.target as HTMLSelectElement).value
+                    )
+                  "
                 >
                   <option
                     v-for="versionItem in consolidated.versions"
                     :key="versionItem.version"
                     :value="versionItem.version"
                   >
-                    v{{ versionItem.version }}{{ versionItem.version === consolidated.latestVersion ? ' (latest)' : '' }}
+                    v{{ versionItem.version
+                    }}{{
+                      versionItem.version === consolidated.latestVersion
+                        ? ' (latest)'
+                        : ''
+                    }}
                   </option>
                 </select>
               </div>
@@ -539,13 +576,13 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
                       ($event.target as HTMLInputElement).checked
                     )
                   "
-                >
+                />
                 <span class="text-sm text-gray-700 dark:text-gray-300">
                   <i
                     v-if="isConsolidatedToggling(consolidated)"
                     class="fa-solid fa-spinner animate-spin"
                   />
-                  <span v-else>Enable</span>
+                  <span v-else>Enabled</span>
                 </span>
               </label>
 

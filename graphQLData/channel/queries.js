@@ -465,6 +465,12 @@ export const GET_CHANNEL_PLUGIN_SETTINGS = gql`
     channels(where: { uniqueName: $channelUniqueName }) {
       uniqueName
       displayName
+      Bots {
+        username
+        displayName
+        botProfileId
+        isDeprecated
+      }
       EnabledPluginsConnection {
         edges {
           node {
@@ -475,6 +481,7 @@ export const GET_CHANNEL_PLUGIN_SETTINGS = gql`
               name
               displayName
               description
+              tags
             }
           }
           properties {

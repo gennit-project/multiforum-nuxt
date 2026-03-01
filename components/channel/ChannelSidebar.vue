@@ -49,6 +49,19 @@ const botAccounts = computed(() => {
   return channel?.Bots ?? [];
 });
 
+// Extract the invoke handle from a bot username
+// Username format: bot-{channel}-{botName} or bot-{channel}-{botName}-{profileId}
+// Invoke format: /bot/{botName} or /bot/{botName}-{profileId}
+const getBotInvokeHandle = (username: string): string => {
+  const channelName = props.channel?.uniqueName || '';
+  const prefix = `bot-${channelName}-`;
+  if (username.startsWith(prefix)) {
+    return username.slice(prefix.length);
+  }
+  // Fallback: just remove the leading "bot-" if channel prefix doesn't match
+  return username.replace(/^bot-/, '');
+};
+
 // Check if we're on the discussion detail page (including comment permalinks)
 const isDiscussionDetailPage = computed(() => {
   return (
@@ -239,32 +252,43 @@ const handleBecomeAdminSuccess = () => {
               </span>
             </div>
 
-            <div class="flex-col space-y-2 text-sm font-bold">
+            <div class="flex-col space-y-3 text-sm">
               <div v-for="bot in botAccounts" :key="bot.username">
                 <nuxt-link
                   :to="{
                     name: 'u-username',
                     params: { username: bot.username },
                   }"
-                  class="flex items-center dark:text-white"
+                  class="flex items-start dark:text-white"
                 >
                   <div
-                    class="mr-2 flex h-6 w-6 items-center justify-center rounded-full border bg-blue-100 dark:border-gray-600 dark:bg-blue-900"
+                    class="mr-2 mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border bg-blue-100 dark:border-gray-600 dark:bg-blue-900"
                     title="Bot account"
                   >
                     <span class="text-sm">🤖</span>
                   </div>
-                  <span class="flex flex-row items-center gap-2">
-                    <span class="font-bold">
-                      {{ bot.displayName || bot.username }}
+                  <div class="flex flex-col">
+                    <span class="flex flex-row items-center gap-2">
+                      <span class="font-bold">
+                        {{ bot.username }}
+                      </span>
+                      <span
+                        v-if="bot.displayName"
+                        class="text-gray-500 dark:text-gray-400"
+                      >
+                        ({{ bot.displayName }})
+                      </span>
+                      <span
+                        v-if="bot.isDeprecated"
+                        class="rounded-full bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-200"
+                      >
+                        Inactive
+                      </span>
                     </span>
-                    <span
-                      v-if="bot.isDeprecated"
-                      class="rounded-full bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-200"
-                    >
-                      Inactive
+                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                      Invoke with /bot/{{ getBotInvokeHandle(bot.username) }}
                     </span>
-                  </span>
+                  </div>
                 </nuxt-link>
               </div>
             </div>

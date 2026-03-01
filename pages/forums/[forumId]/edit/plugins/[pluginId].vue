@@ -4,6 +4,8 @@ import { useRoute } from 'nuxt/app';
 import { useApolloClient, useMutation, useQuery } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
 import PluginSettingsForm from '@/components/plugins/PluginSettingsForm.vue';
+import BotProfilesEditor from '@/components/plugins/BotProfilesEditor.vue';
+import type { BotProfile, ExistingBot } from '@/components/plugins/BotProfilesEditor.vue';
 import { useToast } from '@/composables/useToast';
 import { GET_INSTALLED_PLUGINS } from '@/graphQLData/admin/queries';
 import {
@@ -356,10 +358,129 @@ const manifestJson = computed(() => {
   return JSON.stringify(manifest, null, 2);
 });
 
-const hasChannelSettings = computed(() => {
-  if (!plugin.value?.manifest) return false;
+// Bot plugin detection and handling
+const BOT_TAGS = ['bot', 'bots'];
+
+const isBotPlugin = computed(() => {
+  const tags = plugin.value?.plugin?.tags || [];
+  return tags.some((tag: string) => BOT_TAGS.includes(tag.toLowerCase()));
+});
+
+// Get bot name from server-level settings or manifest defaults
+const serverBotName = computed(() => {
+  // First check user-set server settings
+  if (plugin.value?.settingsJson) {
+    const settings = parseSettingsJson(plugin.value.settingsJson);
+    if (settings?.botName) {
+      return settings.botName;
+    }
+  }
+  // Fall back to manifest defaults
+  const manifest = plugin.value?.manifest;
+  if (manifest?.settingsDefaults?.server?.botName) {
+    return manifest.settingsDefaults.server.botName;
+  }
+  return '';
+});
+
+// Get existing bots for this channel
+const existingBots = computed<ExistingBot[]>(() => {
+  const bots = channelResult.value?.channels?.[0]?.Bots || [];
+  return bots.map((bot: any) => ({
+    username: bot.username,
+    botProfileId: bot.botProfileId,
+    isDeprecated: bot.isDeprecated,
+  }));
+});
+
+// Get server-level profiles from settings or manifest defaults
+const serverProfiles = computed<BotProfile[]>(() => {
+  // First check user-set server settings
+  if (plugin.value?.settingsJson) {
+    const settings = parseSettingsJson(plugin.value.settingsJson);
+    // Check profilesJson first (user-configured)
+    if (settings?.profilesJson) {
+      try {
+        const parsed = typeof settings.profilesJson === 'string'
+          ? JSON.parse(settings.profilesJson)
+          : settings.profilesJson;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((p: any) => ({
+            id: p.id || '',
+            label: p.label || p.displayName || '',
+            prompt: p.prompt || '',
+          }));
+        }
+      } catch {
+        // Fall through to other sources
+      }
+    }
+    // Check profiles array
+    if (Array.isArray(settings?.profiles) && settings.profiles.length > 0) {
+      return settings.profiles.map((p: any) => ({
+        id: p.id || '',
+        label: p.label || p.displayName || '',
+        prompt: p.prompt || '',
+      }));
+    }
+  }
+  // Fall back to manifest defaults
+  const manifest = plugin.value?.manifest;
+  if (manifest?.settingsDefaults?.server?.profiles) {
+    const profiles = manifest.settingsDefaults.server.profiles;
+    if (Array.isArray(profiles) && profiles.length > 0) {
+      return profiles.map((p: any) => ({
+        id: p.id || '',
+        label: p.label || p.displayName || '',
+        prompt: p.prompt || '',
+      }));
+    }
+  }
+  return [];
+});
+
+// Parse channel-level profiles from settings
+const botProfiles = computed<BotProfile[]>(() => {
+  const profilesJson = pluginState.value.settings?.profilesJson;
+  if (!profilesJson) return [];
+  try {
+    const parsed = typeof profilesJson === 'string' ? JSON.parse(profilesJson) : profilesJson;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map((p: any) => ({
+      id: p.id || '',
+      label: p.label || '',
+      prompt: p.prompt || '',
+    }));
+  } catch {
+    return [];
+  }
+});
+
+function updateBotProfiles(profiles: BotProfile[]) {
+  pluginState.value.settings = {
+    ...pluginState.value.settings,
+    profilesJson: JSON.stringify(profiles),
+  };
+  isDirty.value = true;
+}
+
+// Filter out profilesJson from channel sections when it's a bot plugin
+// since we handle it with the custom editor
+const filteredChannelSections = computed<PluginFormSection[]>(() => {
+  if (!plugin.value?.manifest) return [];
   const sections = getChannelSections(plugin.value.manifest);
-  return sections.length > 0;
+
+  if (!isBotPlugin.value) return sections;
+
+  // Filter out profilesJson field from sections
+  return sections.map((section) => ({
+    ...section,
+    fields: section.fields.filter((field) => field.key !== 'profilesJson'),
+  })).filter((section) => section.fields.length > 0);
+});
+
+const hasFilteredChannelSettings = computed(() => {
+  return filteredChannelSections.value.length > 0;
 });
 </script>
 
@@ -501,16 +622,70 @@ const hasChannelSettings = computed(() => {
         </div>
       </div>
 
-      <!-- Forum Settings Section -->
+      <!-- Bot Profiles Section (for bot plugins) -->
       <FormRow
-        v-if="hasChannelSettings"
+        v-if="isBotPlugin && serverBotName"
+        section-title="Bot Profiles"
+        description="Configure bot personalities for this forum. Each profile creates a separate bot user with its own identity and behavior."
+      >
+        <template #content>
+          <div class="space-y-4">
+            <BotProfilesEditor
+              :profiles="botProfiles"
+              :channel-unique-name="channelUniqueName"
+              :bot-name="serverBotName"
+              :existing-bots="existingBots"
+              scope="channel"
+              :server-profiles="serverProfiles"
+              @update:profiles="updateBotProfiles"
+            />
+
+            <div class="flex justify-end border-t border-gray-200 pt-4 dark:border-gray-700">
+              <button
+                type="button"
+                class="rounded-md bg-orange-700 px-4 py-2 text-white hover:bg-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
+                :disabled="saving || !isDirty"
+                @click="handleSave"
+              >
+                <i v-if="saving" class="fa-solid fa-spinner mr-2 animate-spin" />
+                Save Bot Profiles
+              </button>
+            </div>
+          </div>
+        </template>
+      </FormRow>
+
+      <!-- Bot Plugin Missing Bot Name Warning -->
+      <FormRow
+        v-if="isBotPlugin && !serverBotName"
+        section-title="Bot Profiles"
+        description="Configure bot personalities for this forum."
+      >
+        <template #content>
+          <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
+            <div class="flex items-start gap-2 text-amber-800 dark:text-amber-200">
+              <i class="fa-solid fa-triangle-exclamation mt-0.5" />
+              <div>
+                <p class="font-medium">Bot name not configured</p>
+                <p class="mt-1 text-sm text-amber-700 dark:text-amber-300">
+                  This bot plugin requires a bot name to be set in the server-level plugin settings before you can configure profiles.
+                </p>
+              </div>
+            </div>
+          </div>
+        </template>
+      </FormRow>
+
+      <!-- Forum Settings Section (other settings, filtered for bot plugins) -->
+      <FormRow
+        v-if="hasFilteredChannelSettings"
         section-title="Forum Settings"
         description="Configure forum-specific settings for this plugin."
       >
         <template #content>
           <div class="space-y-4">
             <PluginSettingsForm
-              :sections="getChannelSections(plugin.manifest)"
+              :sections="filteredChannelSections"
               :model-value="pluginState.settings"
               @update:model-value="updateSettings"
             />
