@@ -95,14 +95,34 @@ type BotPreviewEntry = {
   label: string | null;
 };
 
+// Normalize ID helper (matches backend logic)
+function normalizeId(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9_-]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^[-_]+|[-_]+$/g, '');
+}
+
 // Compute preview data for the bot status section
 const botStatusPreview = computed(() => {
   const existing: BotPreviewEntry[] = [];
   const newBots: BotPreviewEntry[] = [];
   const deprecated: BotPreviewEntry[] = [];
 
+  // Filter existingBots to only include bots belonging to this plugin
+  const normalizedChannel = normalizeId(props.channelUniqueName);
+  const normalizedBot = normalizeId(props.botName);
+  const botPrefix = `bot-${normalizedChannel}-${normalizedBot}`;
+
+  const relevantBots = (props.existingBots || []).filter(
+    (bot) => bot.username.startsWith(botPrefix)
+  );
+
   const existingBotMap = new Map<string, ExistingBot>();
-  for (const bot of props.existingBots || []) {
+  for (const bot of relevantBots) {
     existingBotMap.set(bot.username, bot);
   }
 
@@ -145,8 +165,9 @@ const botStatusPreview = computed(() => {
   }
 
   // Find bots that will be deprecated (exist but not in desired set)
-  for (const bot of props.existingBots || []) {
-    if (bot.username.startsWith('bot-') && !desiredUsernames.has(bot.username)) {
+  // Only check bots belonging to this plugin (already filtered in relevantBots)
+  for (const bot of relevantBots) {
+    if (!desiredUsernames.has(bot.username)) {
       deprecated.push({
         username: bot.username,
         profileId: bot.botProfileId || null,
@@ -242,9 +263,9 @@ function getIdValidationError(id: string): string {
           </div>
           <div v-if="profile.prompt">
             <span class="font-medium text-gray-600 dark:text-gray-400">System Prompt:</span>
-            <p class="mt-1 rounded bg-white p-2 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-              {{ profile.prompt }}
-            </p>
+            <div class="mt-1 rounded bg-white p-2 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+              <MarkdownPreview :text="profile.prompt" />
+            </div>
           </div>
         </div>
       </div>
@@ -396,16 +417,16 @@ function getIdValidationError(id: string): string {
           <span class="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
             <i class="fa-solid fa-check text-xs" />
           </span>
-          <div class="flex flex-col">
-            <span class="flex items-center gap-2">
+          <div>
+            <span class="flex flex-wrap items-center gap-x-2">
               <span class="font-mono text-gray-700 dark:text-gray-300">{{ bot.username }}</span>
               <span v-if="bot.label" class="text-gray-500 dark:text-gray-400">({{ bot.label }})</span>
               <span v-else-if="!bot.profileId" class="text-gray-500 dark:text-gray-400">(Base Bot)</span>
               <span class="text-green-600 dark:text-green-400">(active)</span>
             </span>
-            <span class="text-xs text-gray-500 dark:text-gray-400">
+            <div class="text-xs text-gray-500 dark:text-gray-400">
               Invoke with /bot/{{ bot.invokeHandle }}
-            </span>
+            </div>
           </div>
         </div>
 
@@ -418,16 +439,16 @@ function getIdValidationError(id: string): string {
           <span class="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
             <i class="fa-solid fa-plus text-xs" />
           </span>
-          <div class="flex flex-col">
-            <span class="flex items-center gap-2">
+          <div>
+            <span class="flex flex-wrap items-center gap-x-2">
               <span class="font-mono text-gray-700 dark:text-gray-300">{{ bot.username }}</span>
               <span v-if="bot.label" class="text-gray-500 dark:text-gray-400">({{ bot.label }})</span>
               <span v-else-if="!bot.profileId" class="text-gray-500 dark:text-gray-400">(Base Bot)</span>
               <span class="text-blue-600 dark:text-blue-400">(will be created)</span>
             </span>
-            <span class="text-xs text-gray-500 dark:text-gray-400">
+            <div class="text-xs text-gray-500 dark:text-gray-400">
               Invoke with /bot/{{ bot.invokeHandle }}
-            </span>
+            </div>
           </div>
         </div>
 
@@ -440,8 +461,8 @@ function getIdValidationError(id: string): string {
           <span class="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-200">
             <i class="fa-solid fa-archive text-xs" />
           </span>
-          <div class="flex flex-col">
-            <span class="flex items-center gap-2">
+          <div>
+            <span class="flex flex-wrap items-center gap-x-2">
               <span class="font-mono text-gray-700 dark:text-gray-300">{{ bot.username }}</span>
               <span class="text-amber-600 dark:text-yellow-300">(will be deprecated)</span>
             </span>
