@@ -108,7 +108,7 @@
     "@types/node": "^24.0.0",
     "@types/webpack-env": "^1.18.8",
     "@vitejs/plugin-vue": "^5.2.4",
-    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/coverage-v8": "^4.0.18",
     "@vue/test-utils": "^2.4.6",
     "accented": "latest",
     "axe-core": "^4.11.1",
