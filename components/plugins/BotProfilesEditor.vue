@@ -129,23 +129,10 @@ const botStatusPreview = computed(() => {
   // Get valid profiles from allProfiles (includes server profiles in channel scope)
   const validProfiles = allProfiles.value.filter((p) => p.id?.trim());
 
-  const baseUsername = buildBotUsername(null);
-  const desiredUsernames = new Set<string>([baseUsername]);
+  // Only profile-specific bots are created (no base bot)
+  const desiredUsernames = new Set<string>();
 
-  // Always include the base bot
-  const baseEntry: BotPreviewEntry = {
-    username: baseUsername,
-    profileId: null,
-    invokeHandle: buildInvokeHandle(null),
-    label: null,
-  };
-  if (existingBotMap.has(baseUsername)) {
-    existing.push(baseEntry);
-  } else {
-    newBots.push(baseEntry);
-  }
-
-  // Profile bots
+  // Profile bots only
   for (const profile of validProfiles) {
     const username = buildBotUsername(profile.id);
     desiredUsernames.add(username);
@@ -264,7 +251,7 @@ function getIdValidationError(id: string): string {
           <div v-if="profile.prompt">
             <span class="font-medium text-gray-600 dark:text-gray-400">System Prompt:</span>
             <div class="mt-1 rounded bg-white p-2 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-              <MarkdownPreview :text="profile.prompt" />
+              <MarkdownPreview :text="profile.prompt.replace(/\\n/g, '\n')" />
             </div>
           </div>
         </div>
@@ -377,10 +364,11 @@ function getIdValidationError(id: string): string {
       <!-- Empty State -->
       <div
         v-if="profiles.length === 0 && (!isChannelScope || !serverProfiles || serverProfiles.length === 0)"
-        class="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center dark:border-gray-600"
+        class="rounded-lg border-2 border-dashed border-amber-300 bg-amber-50 p-6 text-center dark:border-amber-600 dark:bg-amber-900/20"
       >
-        <p class="text-gray-500 dark:text-gray-400">
-          No bot profiles defined. Add a profile to create specialized bot personalities.
+        <p class="text-amber-700 dark:text-amber-300">
+          <i class="fa-solid fa-triangle-exclamation mr-2" />
+          At least one bot profile is required. Add a profile to create bot users.
         </p>
       </div>
 
@@ -421,7 +409,6 @@ function getIdValidationError(id: string): string {
             <span class="flex flex-wrap items-center gap-x-2">
               <span class="font-mono text-gray-700 dark:text-gray-300">{{ bot.username }}</span>
               <span v-if="bot.label" class="text-gray-500 dark:text-gray-400">({{ bot.label }})</span>
-              <span v-else-if="!bot.profileId" class="text-gray-500 dark:text-gray-400">(Base Bot)</span>
               <span class="text-green-600 dark:text-green-400">(active)</span>
             </span>
             <div class="text-xs text-gray-500 dark:text-gray-400">
@@ -443,7 +430,6 @@ function getIdValidationError(id: string): string {
             <span class="flex flex-wrap items-center gap-x-2">
               <span class="font-mono text-gray-700 dark:text-gray-300">{{ bot.username }}</span>
               <span v-if="bot.label" class="text-gray-500 dark:text-gray-400">({{ bot.label }})</span>
-              <span v-else-if="!bot.profileId" class="text-gray-500 dark:text-gray-400">(Base Bot)</span>
               <span class="text-blue-600 dark:text-blue-400">(will be created)</span>
             </span>
             <div class="text-xs text-gray-500 dark:text-gray-400">
