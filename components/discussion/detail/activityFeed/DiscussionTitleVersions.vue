@@ -87,9 +87,9 @@ const toggleOlderEdits = () => {
 
 <template>
   <div v-if="showActivityFeed" class="mb-6 mt-4">
-    <h3 class="mb-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+    <p class="mb-2 text-xs font-medium text-gray-500 dark:text-gray-400">
       Title Edit History
-    </h3>
+    </p>
     <ul role="list" class="flow-root">
       <!-- Show older edits button -->
       <li v-if="hiddenCount > 0 && !showOlderEdits" class="relative pb-4">
