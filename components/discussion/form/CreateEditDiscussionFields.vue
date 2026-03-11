@@ -269,7 +269,7 @@ onMounted(() => {
                 <AlbumEditForm
                   v-if="formValues"
                   :discussion="discussion"
-                  @close-editor="() => {}"
+                  :show-close-button="false"
                   @update-form-values="
                     (albumData) => {
                       $emit('updateFormValues', { album: albumData.album });

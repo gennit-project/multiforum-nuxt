@@ -48,6 +48,10 @@ const props = defineProps({
     required: false,
     default: undefined,
   },
+  showCloseButton: {
+    type: Boolean,
+    default: true,
+  },
 });
 const emit = defineEmits<{
   closeEditor: [];
@@ -299,7 +303,10 @@ function handleUpdateAlbum(newVals: AlbumFormData) {
       />
 
       <!-- Only show Save Album button in create mode (when discussionId is not provided) -->
-      <div v-if="isCreateMode" class="align-items mt-4 flex justify-end gap-2">
+      <div
+        v-if="isCreateMode && showCloseButton"
+        class="align-items mt-4 flex justify-end gap-2"
+      >
         <GenericButton :text="'Cancel'" @click="emit('closeEditor')" />
         <PrimaryButton
           :label="'Save Album'"
@@ -309,7 +316,10 @@ function handleUpdateAlbum(newVals: AlbumFormData) {
       </div>
 
       <!-- Show auto-save info in edit mode -->
-      <div v-else class="mt-4 flex items-center justify-between">
+      <div
+        v-else-if="!isCreateMode && showCloseButton"
+        class="mt-4 flex items-center justify-between"
+      >
         <span class="text-sm text-gray-600 dark:text-gray-400">
           Album changes are saved automatically
         </span>
