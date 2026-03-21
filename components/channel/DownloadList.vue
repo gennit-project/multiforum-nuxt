@@ -271,7 +271,7 @@ const reachedEndOfResults = computed(() => {
       </p>
     </div>
 
-    <div
+    <ul
       v-else-if="filteredDownloads.length > 0"
       class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
       data-testid="channel-download-list"
@@ -290,7 +290,7 @@ const reachedEndOfResults = computed(() => {
         @open-mod-profile="showModProfileModal = true"
         @open-album="handleOpenAlbum"
       />
-    </div>
+    </ul>
     <div v-if="filteredDownloads.length > 0">
       <LoadMore
         class="mb-6 justify-self-center"
