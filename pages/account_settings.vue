@@ -10,6 +10,7 @@ import NotificationComponent from '@/components/NotificationComponent.vue';
 import FormRow from '@/components/FormRow.vue';
 import CheckBox from '@/components/CheckBox.vue';
 import type { UserUpdateInput } from '@/__generated__/graphql';
+import type { EditAccountSettingsFormValues } from '@/types/User';
 import { usernameVar } from '@/cache';
 import { config } from '@/config';
 
@@ -45,12 +46,12 @@ const {
   refetch: refetchUser,
 } = useQuery(
   GET_USER,
-  {
-    username: usernameVar,
-  },
-  {
+  () => ({
+    username: usernameVar.value,
+  }),
+  () => ({
     enabled: !!usernameVar.value,
-  }
+  })
 );
 
 // Basic settings form values
