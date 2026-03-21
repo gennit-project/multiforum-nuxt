@@ -84,10 +84,11 @@ const isOnMapPage = computed(() => {
 
         <div class="ml-2 flex min-w-0 items-center space-x-1 text-sm">
           <nuxt-link to="/" class="flex items-center gap-1">
-            <span
+            <h1
               class="logo-font text-lg font-bold text-gray-900 dark:text-white"
-              >Topical</span
             >
+              Topical
+            </h1>
           </nuxt-link>
 
           <div
