@@ -5,6 +5,55 @@ import hljs from 'highlight.js';
 import { generateHeadingId } from '@/utils/markdown';
 import { config } from '@/config';
 
+const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+const USER_MENTION_REGEX =
+  /(^|[^A-Za-z0-9_]|(?<!https?:\/\/[\w.-]+))(u\/|@)([a-zA-Z0-9_-]+)/g;
+
+const linkifyUserMentions = (text: string): string => {
+  const emails: Array<{ start: number; end: number }> = [];
+  let emailMatch: RegExpExecArray | null;
+
+  while ((emailMatch = EMAIL_REGEX.exec(text)) !== null) {
+    emails.push({
+      start: emailMatch.index,
+      end: emailMatch.index + emailMatch[0].length,
+    });
+  }
+
+  const isInsideEmail = (index: number) =>
+    emails.some((email) => index >= email.start && index < email.end);
+
+  const parts: string[] = [];
+  let lastIndex = 0;
+  let mentionMatch: RegExpExecArray | null;
+
+  while ((mentionMatch = USER_MENTION_REGEX.exec(text)) !== null) {
+    const matchStart = mentionMatch.index;
+
+    if (isInsideEmail(matchStart)) {
+      continue;
+    }
+
+    const leading = mentionMatch[1];
+    const prefix = mentionMatch[2];
+    const username = mentionMatch[3];
+    if (leading === undefined || !prefix || !username) {
+      continue;
+    }
+
+    parts.push(text.slice(lastIndex, matchStart));
+    parts.push(leading);
+    parts.push(`[${prefix}${username}](/u/${username})`);
+    lastIndex = matchStart + mentionMatch[0].length;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts.length ? parts.join('') : text;
+};
+
 /**
  * Creates and configures a MarkdownIt instance with:
  * - Syntax highlighting via highlight.js
@@ -117,7 +166,8 @@ export function useMarkdownRenderer() {
    */
   function renderMarkdown(text: string): string {
     // Preprocess text to handle spoiler markup before markdown processing
-    const preprocessedText = text.replace(
+    const mentionLinkifiedText = linkifyUserMentions(text);
+    const preprocessedText = mentionLinkifiedText.replace(
       />!([^!]+)!</g,
       '§SPOILER§$1§/SPOILER§'
     );

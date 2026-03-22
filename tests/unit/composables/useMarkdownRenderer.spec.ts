@@ -66,6 +66,26 @@ describe('useMarkdownRenderer', () => {
 
       expect(result).toContain('<svg');
     });
+
+    it('linkifies @username mentions to user profile links', () => {
+      const result = renderMarkdown('hello @cluse');
+
+      expect(result).toContain('<a href="/u/cluse">@cluse</a>');
+    });
+
+    it('linkifies u/username mentions to user profile links', () => {
+      const result = renderMarkdown('hello u/cluse');
+
+      expect(result).toContain('<a href="/u/cluse">u/cluse</a>');
+    });
+
+    it('does not treat email addresses as mentions', () => {
+      const result = renderMarkdown('email cluse@example.com and tag @alice');
+
+      expect(result).toContain('cluse@example.com');
+      expect(result).toContain('<a href="/u/alice">@alice</a>');
+      expect(result).not.toContain('href="/u/example"');
+    });
   });
 
   describe('heading anchors', () => {

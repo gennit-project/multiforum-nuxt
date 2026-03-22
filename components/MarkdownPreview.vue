@@ -7,58 +7,6 @@ import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 
-function linkifyUsernames(markdownString: string) {
-  // First find all email addresses and their positions
-  const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
-  const emails: { email: string; start: number; end: number }[] = [];
-  let match;
-
-  while ((match = emailRegex.exec(markdownString)) !== null) {
-    emails.push({
-      email: match[0],
-      start: match.index,
-      end: match.index + match[0].length,
-    });
-  }
-
-  // Function to check if a position is within an email
-  const isInEmail = (pos: number): boolean => {
-    return emails.some((email) => pos >= email.start && pos < email.end);
-  };
-
-  // Now find usernames, but skip those within emails
-  const regex = /(?<!https?:\/\/(?:[\w.-]+))\b(u\/|@)([a-zA-Z0-9_-]+)/g;
-  const parts: string[] = [];
-  let lastIndex = 0;
-
-  while ((match = regex.exec(markdownString)) !== null) {
-    const matchStart = match.index;
-
-    // Skip if this username is part of an email
-    if (isInEmail(matchStart)) {
-      continue;
-    }
-
-    const prefix = match[1]; // 'u/' or '@'
-    const username = match[2];
-
-    // Add text before this match
-    parts.push(markdownString.substring(lastIndex, matchStart));
-
-    // Add the username as a markdown link
-    parts.push(`[${prefix}${username}](${config.baseUrl}u/${username})`);
-
-    lastIndex = matchStart + match[0].length;
-  }
-
-  // Add any remaining text
-  if (lastIndex < markdownString.length) {
-    parts.push(markdownString.substring(lastIndex));
-  }
-
-  return parts.join('');
-}
-
 function linkifyChannelNames(markdownString: string) {
   const regex = /(?<!https?:\/\/(?:[\w.-]+))\bc\/([a-zA-Z0-9_-]+)/g;
   return markdownString.replace(regex, (match, channelName) => {
@@ -243,9 +191,8 @@ export default defineComponent({
     });
 
     const linkifiedMarkdown = computed(() => {
-      const usernamesLinkified = linkifyUsernames(props.text);
       const botMentionsLinkified = linkifyBotMentions(
-        usernamesLinkified,
+        props.text,
         props.botMentionForumId
       );
       const channelNamesLinkified = linkifyChannelNames(botMentionsLinkified);
