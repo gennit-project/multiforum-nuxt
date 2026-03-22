@@ -3,6 +3,11 @@ export default defineNuxtPlugin(async () => {
     return;
   }
 
+  const runtimeConfig = useRuntimeConfig();
+  if (!runtimeConfig.public.enableAccented) {
+    return;
+  }
+
   const win = window as Window & { __ACCENTED_DISABLE__?: () => void };
   if (win.__ACCENTED_DISABLE__) {
     return;
