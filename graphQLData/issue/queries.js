@@ -25,6 +25,9 @@ export const ISSUE_BASE_FIELDS = gql`
       }
     }
     flaggedServerRuleViolation
+    SubscribedToNotifications {
+      username
+    }
     locked
     lockedAt
     lockReason

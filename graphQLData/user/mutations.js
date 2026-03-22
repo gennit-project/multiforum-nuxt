@@ -12,6 +12,7 @@ export const UPDATE_USER = gql`
         notifyOnReplyToDiscussionByDefault
         notifyOnReplyToEventByDefault
         notifyWhenTagged
+        notifyOnSubscribedIssueUpdates
         notifyOnFeedback
         notificationBundleInterval
         notificationBundleEnabled

@@ -4,6 +4,8 @@ import { useQuery, useMutation } from '@vue/apollo-composable';
 import { GET_ISSUE } from '@/graphQLData/issue/queries';
 import { DELETE_DISCUSSION } from '@/graphQLData/discussion/mutations';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
+import { GET_EVENT } from '@/graphQLData/event/queries';
+import { GET_COMMENT } from '@/graphQLData/comment/queries';
 import { DELETE_EVENT } from '@/graphQLData/event/mutations';
 import { DELETE_COMMENT } from '@/graphQLData/comment/mutations';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
@@ -25,7 +27,7 @@ import IssueCommentForm from '@/components/mod/IssueCommentForm.vue';
 import IssueBodyEditor from '@/components/mod/IssueBodyEditor.vue';
 import IssueRelatedContent from '@/components/mod/IssueRelatedContent.vue';
 import { modProfileNameVar, usernameVar } from '@/cache';
-import { useRoute } from 'nuxt/app';
+import { useRoute, useRouter } from 'nuxt/app';
 import { getAllPermissions } from '@/utils/permissionUtils';
 import { config } from '@/config';
 import {
@@ -39,6 +41,13 @@ import { useIssueCloseReopen } from '@/composables/useIssueCloseReopen';
 import { useIssueActivityFeed } from '@/composables/useIssueActivityFeed';
 import { useIssueLock } from '@/composables/useIssueLock';
 import { useIssueBodyEdit } from '@/composables/useIssueBodyEdit';
+import {
+  SUBSCRIBE_TO_ISSUE,
+  UNSUBSCRIBE_FROM_ISSUE,
+} from '@/graphQLData/issue/mutations';
+import NotificationComponent from '@/components/NotificationComponent.vue';
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import GenericButton from '@/components/GenericButton.vue';
 
 type Issue = GeneratedIssue & {
   issueNumber: number;
@@ -65,6 +74,7 @@ const ACTIVITY_FEED_PAGE_SIZE = 10;
 
 // Setup
 const route = useRoute();
+const router = useRouter();
 
 // Route and issueNumber computations
 const channelId = computed(() => {
@@ -128,16 +138,34 @@ const activeIssue = computed<Issue | null>(() => {
 });
 
 const activeIssueId = computed(() => activeIssue.value?.id || '');
+const showSubscribeCta = ref(route.query.subscribeCta === '1');
+const showIssueSubscriptionNotification = ref(false);
+const issueSubscriptionNotificationTitle = ref('');
 const relatedDiscussionId = computed(
   () => activeIssue.value?.relatedDiscussionId || ''
 );
+const issueChannelUniqueName = computed(
+  () => activeIssue.value?.channelUniqueName || channelId.value
+);
+const relatedEventId = computed(() => activeIssue.value?.relatedEventId || '');
+const relatedCommentId = computed(
+  () => activeIssue.value?.relatedCommentId || ''
+);
+const isIssueSubscribed = computed(() => {
+  if (!usernameVar.value) return false;
+  return Boolean(
+    activeIssue.value?.SubscribedToNotifications?.some(
+      (user) => user.username === usernameVar.value
+    )
+  );
+});
 
 const { result: relatedDiscussionResult } = useQuery(
   GET_DISCUSSION,
   () => ({
     id: relatedDiscussionId.value,
     loggedInModName: modProfileNameVar.value,
-    channelUniqueName: channelId.value,
+    channelUniqueName: issueChannelUniqueName.value,
   }),
   () => ({
     fetchPolicy: 'cache-first',
@@ -147,6 +175,38 @@ const { result: relatedDiscussionResult } = useQuery(
 
 const relatedDiscussion = computed(() => {
   return relatedDiscussionResult.value?.discussions?.[0] ?? null;
+});
+
+const { result: relatedEventResult } = useQuery(
+  GET_EVENT,
+  () => ({
+    id: relatedEventId.value,
+    channelUniqueName: issueChannelUniqueName.value,
+    loggedInModName: modProfileNameVar.value,
+  }),
+  () => ({
+    fetchPolicy: 'cache-first',
+    enabled: !!relatedEventId.value && !!issueChannelUniqueName.value,
+  })
+);
+
+const relatedEvent = computed(() => {
+  return relatedEventResult.value?.events?.[0] ?? null;
+});
+
+const { result: relatedCommentResult } = useQuery(
+  GET_COMMENT,
+  () => ({
+    id: relatedCommentId.value,
+  }),
+  () => ({
+    fetchPolicy: 'cache-first',
+    enabled: !!relatedCommentId.value,
+  })
+);
+
+const relatedComment = computed(() => {
+  return relatedCommentResult.value?.comments?.[0] ?? null;
 });
 
 const activityFeedItems = computed<ModerationAction[]>(() => {
@@ -210,6 +270,16 @@ const resetActivityFeed = async () => {
   await refetchIssue();
 };
 
+const clearSubscribeCtaQuery = async () => {
+  if (route.query.subscribeCta !== '1') {
+    return;
+  }
+
+  const nextQuery = { ...route.query };
+  delete nextQuery.subscribeCta;
+  await router.replace({ query: nextQuery });
+};
+
 const isIssueAuthor = computed(() => {
   const author = activeIssue.value?.Author;
   if (!author) return false;
@@ -227,6 +297,39 @@ const isIssueAuthor = computed(() => {
 
   return false;
 });
+
+const {
+  mutate: subscribeToIssue,
+  loading: subscribeToIssueLoading,
+} = useMutation(SUBSCRIBE_TO_ISSUE);
+
+const {
+  mutate: unsubscribeFromIssue,
+  loading: unsubscribeFromIssueLoading,
+} = useMutation(UNSUBSCRIBE_FROM_ISSUE);
+
+const toggleIssueSubscription = async () => {
+  if (!activeIssue.value?.id || !usernameVar.value) return;
+
+  if (isIssueSubscribed.value) {
+    await unsubscribeFromIssue({ issueId: activeIssue.value.id });
+    issueSubscriptionNotificationTitle.value =
+      'Unsubscribed from issue updates';
+  } else {
+    await subscribeToIssue({ issueId: activeIssue.value.id });
+    issueSubscriptionNotificationTitle.value = 'Subscribed to issue updates';
+  }
+
+  showIssueSubscriptionNotification.value = true;
+  showSubscribeCta.value = false;
+  await clearSubscribeCtaQuery();
+  await refetchIssue();
+};
+
+const dismissSubscribeCta = async () => {
+  showSubscribeCta.value = false;
+  await clearSubscribeCtaQuery();
+};
 
 const isLocked = computed(() => activeIssue.value?.locked === true);
 
@@ -365,48 +468,25 @@ const shouldShowIssueDetailsSection = computed(() => {
   );
 });
 
-// Get the username of the original author of the reported content
-const originalAuthorUsername = ref('');
-
-// Get the mod profile name of the original author, if applicable
-const originalModProfileName = ref('');
-
-const setOriginalAuthorUsername = (username: string) => {
-  if (username) {
-    originalAuthorUsername.value = username;
-  }
-};
-
-const setOriginalModProfileName = (modProfileName: string) => {
-  if (modProfileName) {
-    originalModProfileName.value = modProfileName;
-  }
-};
-
 const derivedOriginalPoster = computed(() => {
-  const discussionAuthor = getOriginalPoster({ Discussion: relatedDiscussion.value });
-  if (discussionAuthor.username || discussionAuthor.modProfileName) {
-    return discussionAuthor;
+  const author = getOriginalPoster({
+    Discussion: relatedDiscussion.value,
+    Event: relatedEvent.value,
+    Comment: relatedComment.value,
+  });
+  if (author.username || author.modProfileName) {
+    return author;
   }
 
-  const issueAuthor = activeIssue.value?.Author;
-  if (issueAuthor?.__typename === 'User') {
-    return { username: issueAuthor.username || '', modProfileName: '' };
-  }
-  if (issueAuthor?.__typename === 'ModerationProfile') {
-    return { username: '', modProfileName: issueAuthor.displayName || '' };
-  }
   return { username: '', modProfileName: '' };
 });
 
 const resolvedOriginalAuthorUsername = computed(() => {
-  return originalAuthorUsername.value || derivedOriginalPoster.value.username || '';
+  return derivedOriginalPoster.value.username || '';
 });
 
 const resolvedOriginalModProfileName = computed(() => {
-  return (
-    originalModProfileName.value || derivedOriginalPoster.value.modProfileName || ''
-  );
+  return derivedOriginalPoster.value.modProfileName || '';
 });
 
 // Determine if the current user is the original author via username
@@ -693,8 +773,6 @@ const handleLockReasonUpdate = (value: string) => {
         :report-count="reportCount"
         :report-count-label="reportCountLabel"
         :channel-id="channelId"
-        @fetched-original-author-username="setOriginalAuthorUsername"
-        @fetched-original-mod-profile-name="setOriginalModProfileName"
       >
         <template #issue-body>
           <IssueBodyEditor
@@ -744,6 +822,49 @@ const handleLockReasonUpdate = (value: string) => {
     <v-row v-if="issue" class="flex justify-center dark:text-white">
       <v-col>
         <div class="px-4">
+          <div
+            v-if="usernameVar && activeIssue"
+            class="mb-4 flex flex-col gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/60"
+          >
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 class="text-base font-semibold">Issue notifications</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-300">
+                  Subscribe to replies and moderator updates on this issue.
+                </p>
+              </div>
+              <GenericButton
+                :text="isIssueSubscribed ? 'Unsubscribe' : 'Subscribe'"
+                :loading="
+                  subscribeToIssueLoading || unsubscribeFromIssueLoading
+                "
+                :active="isIssueSubscribed"
+                test-id="toggle-issue-subscription"
+                @click="toggleIssueSubscription"
+              />
+            </div>
+
+            <div
+              v-if="showSubscribeCta && !isIssueSubscribed"
+              class="rounded-lg border border-orange-200 bg-orange-50 p-3 text-sm dark:border-orange-500/40 dark:bg-orange-500/10"
+            >
+              <p class="font-medium text-gray-900 dark:text-gray-100">
+                Subscribe to updates on this issue?
+              </p>
+              <p class="mt-1 text-gray-700 dark:text-gray-300">
+                You can get notifications for replies and moderator actions.
+              </p>
+              <div class="mt-3 flex gap-2">
+                <PrimaryButton
+                  :label="'Subscribe'"
+                  :loading="subscribeToIssueLoading"
+                  @click="toggleIssueSubscription"
+                />
+                <GenericButton :text="'Not now'" @click="dismissSubscribeCta" />
+              </div>
+            </div>
+          </div>
+
           <h2 v-if="activeIssue" class="text-xl font-bold">Activity Feed</h2>
 
           <button
@@ -850,6 +971,11 @@ const handleLockReasonUpdate = (value: string) => {
       @update:lock-reason-input="handleLockReasonUpdate"
       @close="closeLockDialog"
       @lock="handleLockIssue"
+    />
+    <NotificationComponent
+      v-if="showIssueSubscriptionNotification"
+      :title="issueSubscriptionNotificationTitle"
+      @close-notification="showIssueSubscriptionNotification = false"
     />
   </div>
 </template>

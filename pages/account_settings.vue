@@ -33,6 +33,7 @@ type NotificationFormValues = {
   notifyOnReplyToDiscussionByDefault: boolean;
   notifyOnReplyToEventByDefault: boolean;
   notifyWhenTagged: boolean;
+  notifyOnSubscribedIssueUpdates: boolean;
   notifyOnFeedback: boolean;
   notificationBundleInterval: string;
   notificationBundleEnabled: boolean;
@@ -71,6 +72,7 @@ const getDefaultNotificationValues = (): NotificationFormValues => ({
   notifyOnReplyToDiscussionByDefault: false,
   notifyOnReplyToEventByDefault: false,
   notifyWhenTagged: false,
+  notifyOnSubscribedIssueUpdates: true,
   notifyOnFeedback: false,
   notificationBundleInterval: 'hourly',
   notificationBundleEnabled: true,
@@ -111,6 +113,8 @@ watch(getUserResult, (newVal) => {
       user.notifyOnReplyToEventByDefault ?? false;
     notificationFormValues.value.notifyWhenTagged =
       user.notifyWhenTagged ?? false;
+    notificationFormValues.value.notifyOnSubscribedIssueUpdates =
+      user.notifyOnSubscribedIssueUpdates ?? true;
     notificationFormValues.value.notifyOnFeedback =
       user.notifyOnFeedback ?? false;
     notificationFormValues.value.notificationBundleInterval =
@@ -142,6 +146,8 @@ if (getUserResult.value && getUserResult.value.users.length > 0) {
     user.notifyOnReplyToEventByDefault ?? false;
   notificationFormValues.value.notifyWhenTagged =
     user.notifyWhenTagged ?? false;
+  notificationFormValues.value.notifyOnSubscribedIssueUpdates =
+    user.notifyOnSubscribedIssueUpdates ?? true;
   notificationFormValues.value.notifyOnFeedback =
     user.notifyOnFeedback ?? false;
   notificationFormValues.value.notificationBundleInterval =
@@ -171,6 +177,8 @@ const notificationUserUpdateInput = computed(() => {
     notifyOnReplyToEventByDefault:
       notificationFormValues.value.notifyOnReplyToEventByDefault,
     notifyWhenTagged: notificationFormValues.value.notifyWhenTagged,
+    notifyOnSubscribedIssueUpdates:
+      notificationFormValues.value.notifyOnSubscribedIssueUpdates,
     notifyOnFeedback: notificationFormValues.value.notifyOnFeedback,
     notificationBundleInterval:
       notificationFormValues.value.notificationBundleInterval,
@@ -342,6 +350,20 @@ function handleCheckboxUpdate(
                       :checked="notificationFormValues.notifyWhenTagged"
                       :label="$t('accountSettings.notifyWhenTagged')"
                       @update="handleCheckboxUpdate('notifyWhenTagged', $event)"
+                    />
+
+                    <CheckBox
+                      :test-id="'notify-subscribed-issues'"
+                      :checked="
+                        notificationFormValues.notifyOnSubscribedIssueUpdates
+                      "
+                      :label="'Email me about issues I am subscribed to'"
+                      @update="
+                        handleCheckboxUpdate(
+                          'notifyOnSubscribedIssueUpdates',
+                          $event
+                        )
+                      "
                     />
 
                     <CheckBox

@@ -191,11 +191,13 @@ onCreateIssueDone((result) => {
     router.push({
       name: 'forums-forumId-issues-issueNumber',
       params: { forumId, issueNumber: newIssue.issueNumber },
+      query: { subscribeCta: '1' },
     });
   } else {
     router.push({
       name: 'admin-issues-issueNumber',
       params: { issueNumber: newIssue.issueNumber },
+      query: { subscribeCta: '1' },
     });
   }
 });

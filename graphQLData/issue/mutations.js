@@ -72,6 +72,32 @@ export const UPDATE_ISSUE = gql`
   }
 `;
 
+export const SUBSCRIBE_TO_ISSUE = gql`
+  mutation subscribeToIssue($issueId: ID!) {
+    subscribeToIssue(issueId: $issueId) {
+      id
+      issueNumber
+      channelUniqueName
+      SubscribedToNotifications {
+        username
+      }
+    }
+  }
+`;
+
+export const UNSUBSCRIBE_FROM_ISSUE = gql`
+  mutation unsubscribeFromIssue($issueId: ID!) {
+    unsubscribeFromIssue(issueId: $issueId) {
+      id
+      issueNumber
+      channelUniqueName
+      SubscribedToNotifications {
+        username
+      }
+    }
+  }
+`;
+
 export const ADD_ISSUE_ACTIVITY_FEED_ITEM = gql`
   ${ISSUE_FIELDS}
   mutation addIssueActivityFeedItem(

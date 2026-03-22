@@ -19,6 +19,7 @@ export const GET_USER = gql`
       notifyOnReplyToDiscussionByDefault
       notifyOnReplyToEventByDefault
       notifyWhenTagged
+      notifyOnSubscribedIssueUpdates
       notifyOnFeedback
       notificationBundleInterval
       notificationBundleEnabled
