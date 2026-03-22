@@ -25,16 +25,18 @@ describe('useCommentCrudMutations', () => {
     vi.clearAllMocks();
     onDoneCallbacks = new Map();
 
-    (useMutation as any).mockImplementation(() => ({
-      mutate: mockMutate,
-      error: ref(null),
-      loading: ref(false),
-      onDone: (callback: () => void) => {
-        // Store callback for the most recent mutation type
-        const callCount = (useMutation as any).mock.calls.length;
-        onDoneCallbacks.set(`mutation-${callCount}`, callback);
-      },
-    }));
+    (useMutation as any).mockImplementation(() => {
+      const callCount = (useMutation as any).mock.calls.length;
+
+      return {
+        mutate: mockMutate,
+        error: ref(null),
+        loading: ref(false),
+        onDone: (callback: () => void) => {
+          onDoneCallbacks.set(`mutation-${callCount}`, callback);
+        },
+      };
+    });
   });
 
   describe('initialization', () => {

@@ -14,6 +14,8 @@ import ArchiveBox from '@/components/icons/ArchiveBox.vue';
 import UnarchiveBox from '@/components/icons/UnarchiveBox.vue';
 import UserPlus from '@/components/icons/UserPlus.vue';
 import UserMinus from '@/components/icons/UserMinus.vue';
+import BellIcon from '@/components/icons/BellIcon.vue';
+import BellSlashIcon from '@/components/icons/BellSlashIcon.vue';
 import type { Event, Tag as TagData } from '@/__generated__/graphql';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import CheckCircle from '@/components/icons/CheckCircle.vue';
@@ -485,6 +487,8 @@ const ALLOWED_ICONS = {
   UNARCHIVE: 'UNARCHIVE',
   SUSPEND: 'SUSPEND',
   UNSUSPEND: 'UNSUSPEND',
+  WATCH: 'WATCH',
+  UNWATCH: 'UNWATCH',
   ADD_ALBUM: 'ADD_ALBUM',
   MARK_BEST_ANSWER: 'MARK_BEST_ANSWER',
   MARK_SENSITIVE: 'MARK_SENSITIVE',
@@ -504,6 +508,8 @@ const actionIconMap = {
   [ALLOWED_ICONS.UNARCHIVE]: UnarchiveBox,
   [ALLOWED_ICONS.SUSPEND]: UserMinus,
   [ALLOWED_ICONS.UNSUSPEND]: UserPlus,
+  [ALLOWED_ICONS.WATCH]: BellIcon,
+  [ALLOWED_ICONS.UNWATCH]: BellSlashIcon,
   [ALLOWED_ICONS.ADD_ALBUM]: ImageIcon,
   [ALLOWED_ICONS.MARK_BEST_ANSWER]: CheckCircle,
   [ALLOWED_ICONS.MARK_SENSITIVE]: EyeIcon,

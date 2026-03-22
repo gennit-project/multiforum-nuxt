@@ -27,13 +27,11 @@ const emit = defineEmits<{
 }>();
 
 const isChannelScope = computed(() => props.scope === 'channel');
-const isServerScope = computed(() => props.scope === 'server' || !props.scope);
 
 // Combined profiles for preview (server + channel in channel scope)
 const allProfiles = computed(() => {
   if (isChannelScope.value) {
     // In channel scope, combine server profiles with channel profiles
-    const serverIds = new Set((props.serverProfiles || []).map((p) => p.id));
     // Channel profiles can override server profiles with same ID
     const channelOverrides = props.profiles.filter((p) => p.id?.trim());
     const channelIds = new Set(channelOverrides.map((p) => p.id));

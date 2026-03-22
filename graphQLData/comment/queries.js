@@ -107,6 +107,9 @@ const COMMENT_FIELDS = gql`
         username
       }
     }
+    SubscribedToNotifications {
+      username
+    }
     Event {
       id
     }
@@ -231,6 +234,9 @@ export const GET_DISCUSSION_COMMENTS = gql`
           Author {
             username
           }
+        }
+        SubscribedToNotifications {
+          username
         }
         ...CommentVoteFields
       }

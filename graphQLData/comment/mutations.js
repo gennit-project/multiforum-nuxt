@@ -243,6 +243,28 @@ export const DELETE_COMMENT = gql`
   }
 `;
 
+export const SUBSCRIBE_TO_COMMENT = gql`
+  mutation subscribeToComment($commentId: ID!) {
+    subscribeToComment(commentId: $commentId) {
+      id
+      SubscribedToNotifications {
+        username
+      }
+    }
+  }
+`;
+
+export const UNSUBSCRIBE_FROM_COMMENT = gql`
+  mutation unsubscribeFromComment($commentId: ID!) {
+    unsubscribeFromComment(commentId: $commentId) {
+      id
+      SubscribedToNotifications {
+        username
+      }
+    }
+  }
+`;
+
 export const ADD_FEEDBACK_COMMENT_TO_COMMENT = gql`
   mutation addFeedbackCommentToComment(
     $modProfileName: String!

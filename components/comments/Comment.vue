@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import type { PropType } from 'vue';
 import type { ApolloError } from '@apollo/client/core';
+import { useMutation } from '@vue/apollo-composable';
 import type { Comment } from '@/__generated__/graphql';
 import type { CreateReplyInputData } from '@/types/Comment';
 import TextEditor from '../TextEditor.vue';
@@ -21,6 +22,10 @@ import { useCommentPermissions } from '@/composables/useCommentPermissions';
 import { useBestAnswerMutations } from '@/composables/useBestAnswerMutations';
 import { useCommentPermalink } from '@/composables/useCommentPermalink';
 import { getCommentMenuItems } from '@/utils/headerPermissionUtils';
+import {
+  SUBSCRIBE_TO_COMMENT,
+  UNSUBSCRIBE_FROM_COMMENT,
+} from '@/graphQLData/comment/mutations';
 
 const MAX_COMMENT_DEPTH = 5;
 const SHOW_MORE_THRESHOLD = 1000;
@@ -301,9 +306,14 @@ const commentMenuItems = computed(() => {
   const isOwnComment =
     props.commentData?.CommentAuthor?.__typename === 'User' &&
     props.commentData?.CommentAuthor?.username === usernameVar.value;
+  const isWatchingReplies =
+    props.commentData?.SubscribedToNotifications?.some(
+      (user) => user.username === usernameVar.value
+    ) ?? false;
 
   return getCommentMenuItems({
     isOwnComment,
+    isWatchingReplies,
     isArchived: !!props.commentData.archived,
     isDiscussionAuthor: isDiscussionAuthor.value,
     isMarkedAsAnswer: isMarkedAsAnswer.value,
@@ -317,6 +327,45 @@ const commentMenuItems = computed(() => {
     hasFeedbackComments: (props.commentData.FeedbackComments?.length ?? 0) > 0,
   });
 });
+
+const { mutate: subscribeToComment } = useMutation(SUBSCRIBE_TO_COMMENT, {
+  update: (cache, result) => {
+    if (result.data?.subscribeToComment) {
+      cache.modify({
+        id: cache.identify({
+          __typename: 'Comment',
+          id: props.commentData.id,
+        }),
+        fields: {
+          SubscribedToNotifications(_) {
+            return result.data.subscribeToComment.SubscribedToNotifications;
+          },
+        },
+      });
+    }
+  },
+});
+
+const { mutate: unsubscribeFromComment } = useMutation(
+  UNSUBSCRIBE_FROM_COMMENT,
+  {
+    update: (cache, result) => {
+      if (result.data?.unsubscribeFromComment) {
+        cache.modify({
+          id: cache.identify({
+            __typename: 'Comment',
+            id: props.commentData.id,
+          }),
+          fields: {
+            SubscribedToNotifications(_) {
+              return result.data.unsubscribeFromComment.SubscribedToNotifications;
+            },
+          },
+        });
+      }
+    },
+  }
+);
 
 const showReplies = ref(true);
 const highlight = ref(false);
@@ -353,6 +402,18 @@ function updateNewComment(input: CreateReplyInputData) {
 
 function handleReport() {
   emit('clickReport', props.commentData);
+}
+
+function handleWatchReplies() {
+  subscribeToComment({
+    commentId: props.commentData.id,
+  });
+}
+
+function handleUnwatchReplies() {
+  unsubscribeFromComment({
+    commentId: props.commentData.id,
+  });
 }
 
 function handleFeedback(input: HandleFeedbackInput) {
@@ -625,6 +686,8 @@ const label = computed(() => {
                         () =>
                           handleEditFeedback({ commentData: props.commentData })
                       "
+                      @handle-watch-replies="handleWatchReplies"
+                      @handle-unwatch-replies="handleUnwatchReplies"
                       @handle-click-archive="
                         () => {
                           emit('handleClickArchive', props.commentData.id);

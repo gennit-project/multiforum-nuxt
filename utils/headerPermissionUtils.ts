@@ -490,6 +490,7 @@ export const getCommentAuthorStatus = (params: {
  */
 export const getCommentMenuItems = (params: {
   isOwnComment: boolean;
+  isWatchingReplies: boolean;
   isArchived: boolean;
   isDiscussionAuthor: boolean;
   isMarkedAsAnswer: boolean;
@@ -504,6 +505,7 @@ export const getCommentMenuItems = (params: {
 }): MenuItem[] => {
   const {
     isOwnComment,
+    isWatchingReplies,
     isArchived,
     isDiscussionAuthor,
     isMarkedAsAnswer,
@@ -543,6 +545,17 @@ export const getCommentMenuItems = (params: {
   if (!isLoggedIn) {
     return menuItems;
   }
+
+  menuItems.push({
+    label: isWatchingReplies ? 'Unwatch Replies' : 'Watch Replies',
+    value: '',
+    event: isWatchingReplies
+      ? 'handleUnwatchReplies'
+      : 'handleWatchReplies',
+    icon: isWatchingReplies
+      ? ALLOWED_ICONS.UNWATCH
+      : ALLOWED_ICONS.WATCH,
+  });
 
   // If user is the author of the comment
   if (isOwnComment) {

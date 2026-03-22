@@ -804,6 +804,7 @@ describe('headerPermissionUtils', () => {
 
     const defaultParams = {
       isOwnComment: false,
+      isWatchingReplies: false,
       isArchived: false,
       isDiscussionAuthor: false,
       isMarkedAsAnswer: false,
@@ -834,6 +835,31 @@ describe('headerPermissionUtils', () => {
         const menuItems = getCommentMenuItems(defaultParams);
 
         expect(menuItems[1].event).toBe('handleViewFeedback');
+      });
+    });
+
+    describe('for authenticated users', () => {
+      it('should include Watch Replies when not subscribed', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          isLoggedIn: true,
+        });
+
+        expect(
+          menuItems.find((item) => item.event === 'handleWatchReplies')
+        ).toBeDefined();
+      });
+
+      it('should include Unwatch Replies when subscribed', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          isLoggedIn: true,
+          isWatchingReplies: true,
+        });
+
+        expect(
+          menuItems.find((item) => item.event === 'handleUnwatchReplies')
+        ).toBeDefined();
       });
     });
 

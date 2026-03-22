@@ -18,9 +18,25 @@ vi.mock('@vue/apollo-composable', () => ({
   useMutation: vi.fn(() => ({
     mutate: vi.fn(),
     onDone: vi.fn(),
+    onError: vi.fn(),
     error: null,
     loading: false,
   })),
+}));
+
+vi.mock('@/composables/useCommentCrudMutations', () => ({
+  useCommentCrudMutations: () => ({
+    createComment: vi.fn(),
+    createCommentError: ref(null),
+    onDoneCreatingComment: vi.fn(),
+    onErrorCreatingComment: vi.fn(),
+    editComment: vi.fn(),
+    editCommentError: ref(null),
+    onDoneUpdatingComment: vi.fn(),
+    deleteComment: vi.fn(),
+    deleteCommentLoading: ref(false),
+    softDeleteComment: vi.fn(),
+  }),
 }));
 
 vi.mock('@/composables/useSuspensionNotice', () => ({
