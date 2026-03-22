@@ -58,6 +58,9 @@ export const EVENT_FIELDS = gql`
     SubscribedToNotifications {
       username
     }
+    SubscribedToEventUpdates {
+      username
+    }
   }
 `;
 

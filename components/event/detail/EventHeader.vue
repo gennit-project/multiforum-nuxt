@@ -251,9 +251,10 @@ const {
   onDone: onDoneCanceling,
 } = useMutation(CANCEL_EVENT, {
   variables: {
-    id: eventId.value,
     updateEventInput: { canceled: true },
     eventWhere: { id: eventId.value },
+    channelConnections: [],
+    channelDisconnections: [],
   },
 });
 

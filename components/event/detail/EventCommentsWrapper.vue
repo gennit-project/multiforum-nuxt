@@ -16,10 +16,12 @@ import type { ApolloCache } from '@apollo/client/core';
 import { GET_USER } from '@/graphQLData/user/queries';
 import {
   SUBSCRIBE_TO_EVENT,
+  SUBSCRIBE_TO_EVENT_UPDATES,
   UNSUBSCRIBE_FROM_EVENT,
+  UNSUBSCRIBE_FROM_EVENT_UPDATES,
 } from '@/graphQLData/event/mutations';
 import Notification from '@/components/NotificationComponent.vue';
-import SubscribeButton from '@/components/SubscribeButton.vue';
+import EventNotificationsMenu from './EventNotificationsMenu.vue';
 
 const COMMENT_LIMIT = 50;
 
@@ -292,8 +294,9 @@ function decrementCommentCount(cache: ApolloCache<unknown>) {
 }
 
 // Subscription functionality
-const showSubscribedNotification = ref(false);
-const showUnsubscribedNotification = ref(false);
+const showSubscriptionNotification = ref(false);
+const notificationTitle = ref('');
+const notificationDetail = ref('');
 
 const isSubscribed = computed(() => {
   if (!props.event?.SubscribedToNotifications || !usernameVar.value) {
@@ -302,6 +305,19 @@ const isSubscribed = computed(() => {
   return props.event.SubscribedToNotifications.some(
     (user) => user.username === usernameVar.value
   );
+});
+
+const isSubscribedToEventUpdates = computed(() => {
+  const updateSubscribers =
+    ((props.event as Event & {
+      SubscribedToEventUpdates?: Array<{ username: string }>;
+    })?.SubscribedToEventUpdates || []);
+
+  if (!usernameVar.value) {
+    return false;
+  }
+
+  return updateSubscribers.some((user) => user.username === usernameVar.value);
 });
 
 const {
@@ -327,7 +343,9 @@ const {
 });
 
 onSubscribeComplete(() => {
-  showSubscribedNotification.value = true;
+  notificationTitle.value = 'Comment notifications turned on';
+  notificationDetail.value = 'You will get updates for new comments on this event.';
+  showSubscriptionNotification.value = true;
 });
 
 const {
@@ -353,11 +371,78 @@ const {
 });
 
 onUnsubscribeComplete(() => {
-  showUnsubscribedNotification.value = true;
+  notificationTitle.value = 'Comment notifications turned off';
+  notificationDetail.value = 'You will stop getting updates for new comments on this event.';
+  showSubscriptionNotification.value = true;
 });
 
-const subscriptionLoading = computed(
+const commentSubscriptionLoading = computed(
   () => subscribeLoading.value || unsubscribeLoading.value
+);
+
+const {
+  mutate: subscribeToEventUpdates,
+  loading: subscribeToEventUpdatesLoading,
+  onDone: onSubscribeToEventUpdatesDone,
+} = useMutation(SUBSCRIBE_TO_EVENT_UPDATES, {
+  update: (cache, result) => {
+    if (result.data?.subscribeToEventUpdates && props.event?.id) {
+      cache.modify({
+        id: cache.identify({
+          __typename: 'Event',
+          id: props.event.id,
+        }),
+        fields: {
+          SubscribedToEventUpdates(_) {
+            return result.data.subscribeToEventUpdates.SubscribedToEventUpdates;
+          },
+        },
+      });
+    }
+  },
+});
+
+onSubscribeToEventUpdatesDone(() => {
+  notificationTitle.value = 'Event update notifications turned on';
+  notificationDetail.value =
+    'You will get notified if this event is canceled or its key details change.';
+  showSubscriptionNotification.value = true;
+});
+
+const {
+  mutate: unsubscribeFromEventUpdates,
+  loading: unsubscribeFromEventUpdatesLoading,
+  onDone: onUnsubscribeFromEventUpdatesDone,
+} = useMutation(UNSUBSCRIBE_FROM_EVENT_UPDATES, {
+  update: (cache, result) => {
+    if (result.data?.unsubscribeFromEventUpdates && props.event?.id) {
+      cache.modify({
+        id: cache.identify({
+          __typename: 'Event',
+          id: props.event.id,
+        }),
+        fields: {
+          SubscribedToEventUpdates(_) {
+            return result.data.unsubscribeFromEventUpdates
+              .SubscribedToEventUpdates;
+          },
+        },
+      });
+    }
+  },
+});
+
+onUnsubscribeFromEventUpdatesDone(() => {
+  notificationTitle.value = 'Event update notifications turned off';
+  notificationDetail.value =
+    'You will stop getting notifications when this event changes.';
+  showSubscriptionNotification.value = true;
+});
+
+const eventUpdatesLoading = computed(
+  () =>
+    subscribeToEventUpdatesLoading.value ||
+    unsubscribeFromEventUpdatesLoading.value
 );
 
 const handleSubscriptionToggle = () => {
@@ -372,6 +457,23 @@ const handleSubscriptionToggle = () => {
     });
   } else {
     subscribeToEvent({
+      eventId: props.event.id,
+    });
+  }
+};
+
+const handleEventUpdateSubscriptionToggle = () => {
+  if (!props.event?.id) {
+    console.error('No event ID found');
+    return;
+  }
+
+  if (isSubscribedToEventUpdates.value) {
+    unsubscribeFromEventUpdates({
+      eventId: props.event.id,
+    });
+  } else {
+    subscribeToEventUpdates({
       eventId: props.event.id,
     });
   }
@@ -402,10 +504,13 @@ const handleSubscriptionToggle = () => {
     @load-more="emit('loadMore')"
   >
     <template #subscription-button>
-      <SubscribeButton
-        :is-subscribed="isSubscribed"
-        :loading="subscriptionLoading"
-        @toggle="handleSubscriptionToggle"
+      <EventNotificationsMenu
+        :watch-comments="isSubscribed"
+        :watch-updates="isSubscribedToEventUpdates"
+        :comments-loading="commentSubscriptionLoading"
+        :updates-loading="eventUpdatesLoading"
+        @toggle-comments="handleSubscriptionToggle"
+        @toggle-updates="handleEventUpdateSubscriptionToggle"
       />
     </template>
     <slot />
@@ -413,13 +518,9 @@ const handleSubscriptionToggle = () => {
 
   <!-- Notification toasts -->
   <Notification
-    :show="showSubscribedNotification"
-    :title="'Successfully subscribed to notifications for this event'"
-    @close-notification="showSubscribedNotification = false"
-  />
-  <Notification
-    :show="showUnsubscribedNotification"
-    :title="'Successfully unsubscribed from notifications for this event'"
-    @close-notification="showUnsubscribedNotification = false"
+    :show="showSubscriptionNotification"
+    :title="notificationTitle"
+    :detail="notificationDetail"
+    @close-notification="showSubscriptionNotification = false"
   />
 </template>

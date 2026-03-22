@@ -56,12 +56,20 @@ export const UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS = gql`
 `;
 
 export const CANCEL_EVENT = gql`
-  mutation ($updateEventInput: EventUpdateInput, $eventWhere: EventWhere) {
-    updateEvents(update: $updateEventInput, where: $eventWhere) {
-      events {
-        id
-        canceled
-      }
+  mutation cancelEvent(
+    $updateEventInput: EventUpdateInput!
+    $eventWhere: EventWhere!
+    $channelConnections: [String!]!
+    $channelDisconnections: [String!]!
+  ) {
+    updateEventWithChannelConnections(
+      eventUpdateInput: $updateEventInput
+      where: $eventWhere
+      channelConnections: $channelConnections
+      channelDisconnections: $channelDisconnections
+    ) {
+      id
+      canceled
     }
   }
 `;
@@ -139,6 +147,28 @@ export const UNSUBSCRIBE_FROM_EVENT = gql`
     unsubscribeFromEvent(eventId: $eventId) {
       id
       SubscribedToNotifications {
+        username
+      }
+    }
+  }
+`;
+
+export const SUBSCRIBE_TO_EVENT_UPDATES = gql`
+  mutation subscribeToEventUpdates($eventId: ID!) {
+    subscribeToEventUpdates(eventId: $eventId) {
+      id
+      SubscribedToEventUpdates {
+        username
+      }
+    }
+  }
+`;
+
+export const UNSUBSCRIBE_FROM_EVENT_UPDATES = gql`
+  mutation unsubscribeFromEventUpdates($eventId: ID!) {
+    unsubscribeFromEventUpdates(eventId: $eventId) {
+      id
+      SubscribedToEventUpdates {
         username
       }
     }
