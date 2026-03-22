@@ -23,6 +23,7 @@ import { timeShortcutValues } from '../list/filters/eventSearchOptions';
 import type { Event as EventData } from '@/__generated__/graphql';
 import type { SearchEventValues } from '@/types/Event';
 import type { Ref, PropType } from 'vue';
+import { isEventSearchRoute } from '../list/isEventSearchRoute';
 
 const props = defineProps({
   selectedTags: {
@@ -54,7 +55,7 @@ defineEmits([
 const { mdAndUp } = useDisplay();
 const route = useRoute();
 const router = useRouter();
-const showOnlineOnly = route.name === 'events-list-search';
+const showOnlineOnly = isEventSearchRoute(route);
 const showInPersonOnly =
   route.name === 'map-search-eventId' || route.name === 'map-search';
 const isMapRoute = computed(() => route.path.startsWith('/map/search'));

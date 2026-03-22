@@ -9,6 +9,7 @@ import type { PropType } from 'vue';
 import type { Event } from '@/__generated__/graphql';
 import type { SearchEventValues } from '@/types/Event';
 import { useRoute, useRouter } from 'nuxt/app';
+import { isEventSearchRoute } from './isEventSearchRoute';
 
 const props = defineProps({
   event: {
@@ -153,9 +154,10 @@ const handleClick = async () => {
     import.meta.client &&
     window.matchMedia('(min-width: 1024px)').matches
   ) {
+    handleSelect();
     return;
   }
-  if (props.currentChannelId || route.name === 'events-list-search') {
+  if (props.currentChannelId || isEventSearchRoute(route)) {
     await nextTick();
     router.push(detailLink.value);
   } else {

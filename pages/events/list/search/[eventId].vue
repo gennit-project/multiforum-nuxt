@@ -1,7 +1,16 @@
 <script setup lang="ts">
-import EventDetail from '@/components/event/detail/EventDetail.vue';
+import { useHead } from 'nuxt/app';
+import EventListView from '@/components/event/list/EventListView.vue';
+
+useHead({
+  title: 'Online Events',
+});
 </script>
 
 <template>
-  <EventDetail />
+  <NuxtLayout>
+    <div class="px-3 md:px-12">
+      <EventListView />
+    </div>
+  </NuxtLayout>
 </template>

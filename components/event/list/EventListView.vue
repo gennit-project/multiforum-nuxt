@@ -23,6 +23,7 @@ import { LocationFilterTypes } from './filters/locationFilterTypes';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import type { Event } from '@/__generated__/graphql';
+import { isEventSearchRoute as getIsEventSearchRoute } from './isEventSearchRoute';
 
 const route = useRoute();
 const router = useRouter();
@@ -34,7 +35,11 @@ const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
-const isSearchListRoute = computed(() => route.path === '/events/list/search');
+const routeSearchEventId = computed(() => {
+  return typeof route.params.eventId === 'string' ? route.params.eventId : '';
+});
+
+const isSearchListRoute = computed(() => getIsEventSearchRoute(route));
 
 const filterValues = ref(
   getFilterValuesFromParams({
@@ -208,6 +213,10 @@ const toggleShowMainFilters = () => {
 const handleSelectEvent = (payload: { eventId: string; title: string }) => {
   if (isSearchListRoute.value) {
     selectedSearchEventId.value = payload.eventId;
+    router.push({
+      path: `/events/list/search/${payload.eventId}`,
+      query: route.query,
+    });
     return;
   }
   if (!channelId.value) return;
@@ -224,6 +233,15 @@ watch(
     if (selectedSearchEventId.value && !selectedSearchEvent.value) {
       selectedSearchEventId.value = '';
     }
+  },
+  { immediate: true }
+);
+
+watch(
+  [isSearchListRoute, routeSearchEventId],
+  ([isSearchRoute, eventId]) => {
+    if (!isSearchRoute) return;
+    selectedSearchEventId.value = eventId;
   },
   { immediate: true }
 );

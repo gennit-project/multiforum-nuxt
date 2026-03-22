@@ -2,11 +2,13 @@ import type { SearchEventValues } from '@/types/Event';
 import { chronologicalOrder, reverseChronologicalOrder } from './filterStrings';
 import { LocationFilterTypes } from './locationFilterTypes';
 import { timeShortcutValues, resultOrderTypes } from './eventSearchOptions';
+import { isEventSearchRoute } from '../isEventSearchRoute';
 
 // Minimal route type for the fields actually used by this function
 // Uses Record<string, unknown> for query to allow flexible test mocking and vue-router compatibility
 type RouteWithQuery = {
   name?: string | symbol | null;
+  path?: string | null;
   query?: Record<string, unknown>;
 };
 
@@ -50,7 +52,7 @@ const getFilterValuesFromParams = function (
 
   // For the online events list, only include
   // events with a virtual event URL.
-  if (route?.name === 'events-list-search') {
+  if (isEventSearchRoute(route)) {
     cleanedValues.hasVirtualEventUrl = true;
   }
 

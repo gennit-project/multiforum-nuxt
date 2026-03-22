@@ -50,6 +50,21 @@ describe('getEventFilterValuesFromParams', () => {
     expect(result.hasVirtualEventUrl).toBe(true);
   });
 
+  it('sets hasVirtualEventUrl to true for events-list-search detail route', () => {
+    const input = {
+      route: {
+        query: {},
+        name: 'events-list-search-eventId',
+        path: '/events/list/search/test-event-id',
+      },
+      channelId: '',
+    };
+
+    const result = getFilterValuesFromParams(input);
+
+    expect(result.hasVirtualEventUrl).toBe(true);
+  });
+
   it('sets locationFilter to ONLY_VIRTUAL when showOnlineOnly is true', () => {
     const input = {
       route: { query: {} },
