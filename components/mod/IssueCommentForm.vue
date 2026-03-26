@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { hasBotMention } from '@/utils/botMentions';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import GenericButton from '@/components/GenericButton.vue';
@@ -7,6 +7,9 @@ import SaveButton from '@/components/SaveButton.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import XCircleIcon from '@/components/icons/XCircleIcon.vue';
 import ArrowPathIcon from '@/components/icons/ArrowPath.vue';
+
+// Track when the editor should reset (after clearing)
+const editorResetKey = ref(0);
 
 const props = defineProps<{
   commentText: string;
@@ -51,6 +54,16 @@ const isCommentDisabled = computed(() => {
 const updateComment = (text: string) => {
   emit('update:commentText', text);
 };
+
+// Reset editor when commentText is cleared externally (e.g., after submission)
+watch(
+  () => props.commentText,
+  (newVal, oldVal) => {
+    if (newVal === '' && oldVal !== '') {
+      editorResetKey.value++;
+    }
+  }
+);
 </script>
 
 <template>
@@ -62,7 +75,7 @@ const updateComment = (text: string) => {
       :text="'Bot mentions are only available in discussion comments.'"
     />
     <TextEditor
-      :key="`${commentText === ''}`"
+      :key="editorResetKey"
       :test-id="'texteditor-textarea'"
       :disable-auto-focus="true"
       :placeholder="'Please be kind'"
