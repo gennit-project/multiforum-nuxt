@@ -42,6 +42,16 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  isLocked: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  isClosed: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
 const emit = defineEmits([
@@ -53,10 +63,21 @@ const emit = defineEmits([
 const router = useRouter();
 const showDeleteConfirmModal = ref(false);
 const canUseActions = computed(() => {
-  return props.isCurrentUserOriginalPoster && !props.actionsDisabled;
+  return (
+    props.isCurrentUserOriginalPoster &&
+    !props.actionsDisabled &&
+    !props.isLocked &&
+    !props.isClosed
+  );
 });
 
 const disabledMessage = computed(() => {
+  if (props.isLocked) {
+    return 'Original poster actions are disabled because this issue is locked.';
+  }
+  if (props.isClosed) {
+    return 'Original poster actions are disabled because this issue is closed.';
+  }
   if (props.actionsDisabled) {
     return 'Original poster actions are disabled on this page.';
   }

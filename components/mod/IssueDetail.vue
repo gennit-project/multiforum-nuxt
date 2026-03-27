@@ -931,6 +931,8 @@ const handleLockReasonUpdate = (value: string) => {
             :channel-unique-name="channelId"
             :is-current-user-original-poster="isCurrentUserOriginalPoster"
             :actions-disabled="!issueActionVisibility.opActionsEnabled"
+            :is-locked="isLocked"
+            :is-closed="!activeIssue?.isOpen"
             @delete-discussion="handleDeleteDiscussion"
             @delete-event="handleDeleteEvent"
             @delete-comment="handleDeleteComment"
