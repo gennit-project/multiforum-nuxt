@@ -968,6 +968,7 @@ const handleLockReasonUpdate = (value: string) => {
       v-if="showLockDialog"
       :lock-reason-input="lockReasonInput"
       :lock-issue-loading="lockIssueLoading"
+      :lock-issue-error="lockIssueError"
       @update:lock-reason-input="handleLockReasonUpdate"
       @close="closeLockDialog"
       @lock="handleLockIssue"

@@ -1,10 +1,13 @@
 <script lang="ts" setup>
+import type { ApolloError } from '@apollo/client/errors';
 import GenericButton from '@/components/GenericButton.vue';
 import SaveButton from '@/components/SaveButton.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
 
 const props = defineProps<{
   lockReasonInput: string;
   lockIssueLoading: boolean;
+  lockIssueError?: ApolloError | null;
 }>();
 
 const emit = defineEmits<{
@@ -27,6 +30,11 @@ const handleReasonUpdate = (event: Event) => {
       class="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800"
     >
       <h3 class="mb-4 text-lg font-bold dark:text-white">Lock Issue</h3>
+      <ErrorBanner
+        v-if="props.lockIssueError"
+        class="mb-4"
+        :text="props.lockIssueError.message"
+      />
       <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
         Locking an issue prevents further modifications including comments,
         status changes, and edits.
