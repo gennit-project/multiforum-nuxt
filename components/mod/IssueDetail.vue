@@ -798,7 +798,7 @@ const handleLockReasonUpdate = (value: string) => {
       <div
         v-else-if="shouldShowIssueDetailsSection"
         id="original-post-container"
-        class="rounded-lg border border-l-4 border-blue-200 border-l-blue-400 bg-blue-50 px-4 py-2 dark:border-gray-600 dark:border-l-blue-500 dark:bg-gray-800"
+        class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 dark:border-gray-600 dark:bg-gray-800"
       >
         <IssueBodyEditor
           v-if="activeIssue?.body || isIssueAuthor"
@@ -878,7 +878,7 @@ const handleLockReasonUpdate = (value: string) => {
           </button>
           <ActivityFeed
             v-if="activeIssue || activityFeedItems.length"
-            class="mb-6 border-l-4 border-l-blue-400 pl-4 dark:border-l-blue-500"
+            class="mb-6"
             :feed-items="activityFeedItems"
             :original-user-author-username="resolvedOriginalAuthorUsername"
             :original-mod-author-name="resolvedOriginalModProfileName"
