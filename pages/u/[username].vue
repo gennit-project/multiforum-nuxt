@@ -6,6 +6,7 @@ import UserProfileSidebar from '@/components/user/UserProfileSidebar.vue';
 import { navigateTo, useHead, useRoute } from 'nuxt/app';
 import UserContributionChart from '@/components/charts/UserContributionChart.vue';
 import UserProfileChannelFilter from '@/components/user/UserProfileChannelFilter.vue';
+import ContributionChartSkeleton from '@/components/charts/ContributionChartSkeleton.vue';
 
 const route = useRoute();
 const username = computed(() => {
@@ -154,6 +155,23 @@ watchEffect(() => {
         <div class="min-w-0 flex-1 flex-col pt-4">
           <client-only>
             <UserContributionChart />
+            <template #fallback>
+              <!-- Skeleton placeholder to prevent content shift -->
+              <div
+                class="mb-4 flex flex-col space-y-4 rounded-lg px-4"
+              >
+                <!-- Header skeleton -->
+                <div class="flex items-center justify-between">
+                  <div class="h-7 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+                  <div class="flex items-center space-x-2">
+                    <div class="h-4 w-10 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+                    <div class="h-8 w-20 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+                  </div>
+                </div>
+                <!-- Chart grid skeleton -->
+                <ContributionChartSkeleton :dark-mode="false" />
+              </div>
+            </template>
           </client-only>
           <ClientOnly>
             <UserProfileTabs
