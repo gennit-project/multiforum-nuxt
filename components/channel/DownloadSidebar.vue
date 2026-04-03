@@ -2,6 +2,7 @@
 import type { PropType } from 'vue';
 import type { Discussion } from '@/__generated__/graphql';
 import PrimaryButton from '@/components/PrimaryButton.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
 import DownloadSuccessPopover from '@/components/download/DownloadSuccessPopover.vue';
 import ScopedPipelineView from '@/components/plugins/ScopedPipelineView.vue';
 import { computed, ref } from 'vue';
@@ -185,12 +186,23 @@ const handleDownload = () => {
       </div>
 
       <!-- Download Button -->
-      <PrimaryButton
-        class="w-full justify-center"
-        :label="'Download Now'"
-        :disabled="!primaryFile"
-        @click="handleDownload"
-      />
+      <RequireAuth :full-width="true">
+        <template #has-auth>
+          <PrimaryButton
+            class="w-full justify-center"
+            :label="'Download Now'"
+            :disabled="!primaryFile?.url"
+            @click="handleDownload"
+          />
+        </template>
+        <template #does-not-have-auth>
+          <PrimaryButton
+            class="w-full justify-center"
+            :label="'Download Now'"
+            :disabled="!primaryFile"
+          />
+        </template>
+      </RequireAuth>
       <div
         v-if="priceDisplay.label === 'Free Download'"
         class="mt-2 text-xs text-gray-500 dark:text-gray-400"
