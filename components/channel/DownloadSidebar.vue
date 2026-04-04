@@ -158,11 +158,11 @@ const handleDownload = () => {
         class="bg-gray-50 mb-4 rounded-lg border border-orange-400 p-4 dark:border-orange-500 dark:bg-gray-700"
       >
         <!-- File Name -->
-        <h3
+        <h2
           class="mb-3 break-words text-sm font-medium text-gray-900 dark:text-white"
         >
           {{ primaryFile.fileName || 'Untitled File' }}
-        </h3>
+        </h2>
         <!-- File Type and Size -->
         <div class="mb-3 text-sm text-gray-600 dark:text-gray-300">
           {{ primaryFile.kind || 'OTHER' }} •
@@ -215,9 +215,9 @@ const handleDownload = () => {
 
       <!-- License Section -->
       <div class="border-t border-gray-200 pt-4 dark:border-gray-700">
-        <h3 class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        <h2 class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
           License
-        </h3>
+        </h2>
         <p class="text-sm text-gray-600 dark:text-gray-400">
           {{ licenseInfo }}
         </p>
@@ -228,9 +228,9 @@ const handleDownload = () => {
         v-if="Object.keys(groupedLabels).length > 0"
         class="border-t border-gray-200 pt-4 dark:border-gray-700"
       >
-        <h3 class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        <h2 class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
           Labels
-        </h3>
+        </h2>
         <div class="space-y-2">
           <div
             v-for="(labels, groupKey) in groupedLabels"
