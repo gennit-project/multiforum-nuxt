@@ -49,6 +49,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  horizontalAlbumThumbnails: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const route = useRoute();
@@ -477,6 +481,7 @@ const handleEditAlbum = () => {
                   :active-discussion-channel="activeDiscussionChannel"
                   :download-mode="downloadMode"
                   :aggregate-comment-count="aggregateCommentCount"
+                  :horizontal-album-thumbnails="horizontalAlbumThumbnails"
                   @discussion-refetch="refetchDiscussion"
                   @discussion-channel-refetch="refetchDiscussionChannel"
                   @handle-click-add-album="handleClickAddAlbum"

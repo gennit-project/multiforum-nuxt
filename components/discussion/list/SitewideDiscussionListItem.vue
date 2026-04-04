@@ -59,8 +59,6 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['filterByTag', 'select']);
-
 const route = useRoute();
 
 // Get user preferences for sensitive content
@@ -139,6 +137,23 @@ const getDetailLink = () => {
   };
 };
 
+const getDesktopSelectionLink = () => {
+  if (!props.discussion) {
+    return {
+      path: route.path,
+      query: route.query,
+    };
+  }
+
+  return {
+    path: route.path,
+    query: {
+      ...route.query,
+      selectedDiscussionId: props.discussion.id,
+    },
+  };
+};
+
 const discussionIdInParams = computed(() =>
   typeof route.params.discussionId === 'string' ? route.params.discussionId : ''
 );
@@ -182,13 +197,6 @@ const revealSensitiveContent = () => {
   sensitiveContentRevealed.value = true;
 };
 
-const handleSelect = () => {
-  if (!props.isSelectable || !props.discussion) return;
-  emit('select', {
-    discussionId: props.discussion.id,
-    channelId: forumId.value,
-  });
-};
 </script>
 
 <template>
@@ -251,11 +259,10 @@ const handleSelect = () => {
                   </span>
                 </div>
               </nuxt-link>
-              <button
+              <nuxt-link
                 v-if="discussion"
-                type="button"
                 class="hidden w-full text-left lg:block"
-                @click="handleSelect"
+                :to="getDesktopSelectionLink()"
               >
                 <div class="flex items-start gap-2">
                   <span
@@ -274,7 +281,7 @@ const handleSelect = () => {
                     Sensitive
                   </span>
                 </div>
-              </button>
+              </nuxt-link>
             </div>
             <div
               class="pt-1 text-xs text-gray-500 no-underline dark:text-gray-300"

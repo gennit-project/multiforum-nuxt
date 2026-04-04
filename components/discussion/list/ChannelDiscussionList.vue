@@ -16,6 +16,7 @@ import {
   getTimeFrameFromQuery,
 } from '@/components/comments/getSortFromQuery';
 import { useAppTheme } from '@/composables/useTheme';
+import type { DiscussionChannel } from '@/__generated__/graphql';
 
 const { theme } = useAppTheme();
 
@@ -25,8 +26,7 @@ const emit = defineEmits(['filterByTag', 'filterByChannel']);
 
 const route = useRoute();
 const uiStore = useUIStore();
-const { expandChannelDiscussions, selectedChannelDiscussionId } =
-  storeToRefs(uiStore);
+const { expandChannelDiscussions } = storeToRefs(uiStore);
 
 const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
@@ -57,6 +57,12 @@ const selectedTags = computed(() => {
 
 const selectedChannels = computed(() => {
   return filterValues.value.channels;
+});
+
+const selectedDiscussionId = computed(() => {
+  return typeof route.query.selectedDiscussionId === 'string'
+    ? route.query.selectedDiscussionId
+    : '';
 });
 
 const showArchived = computed(() => {
@@ -177,15 +183,32 @@ const reachedEndOfResults = computed(() => {
   );
 });
 
-const handleSelectDiscussion = (payload: {
-  discussionId: string;
-  title: string;
-}) => {
-  uiStore.setSelectedChannelDiscussionSelection({
-    discussionId: payload.discussionId,
-    title: payload.title,
-  });
-};
+watch(
+  [selectedDiscussionId, discussionChannelResult],
+  ([newSelectedDiscussionId, newDiscussionChannelResult]) => {
+    if (!newSelectedDiscussionId) {
+      uiStore.clearSelectedChannelDiscussion();
+      return;
+    }
+
+    const selectedDiscussionChannel = newDiscussionChannelResult?.getDiscussionsInChannel?.discussionChannels?.find(
+      (discussionChannel: DiscussionChannel) =>
+        discussionChannel.discussionId === newSelectedDiscussionId
+    );
+
+    if (!selectedDiscussionChannel?.Discussion?.title) {
+      return;
+    }
+
+    uiStore.setSelectedChannelDiscussionSelection({
+      discussionId: newSelectedDiscussionId,
+      title: selectedDiscussionChannel.Discussion.title,
+    });
+  },
+  {
+    immediate: true,
+  }
+);
 </script>
 
 <template>
@@ -258,11 +281,10 @@ const handleSelectDiscussion = (payload: {
             :selected-channels="selectedChannels"
             :default-expanded="expandChannelDiscussions"
             :is-selectable="true"
-            :selected-discussion-id="selectedChannelDiscussionId"
+            :selected-discussion-id="selectedDiscussionId"
             @open-mod-profile="showModProfileModal = true"
             @filter-by-tag="filterByTag"
             @filter-by-channel="filterByChannel"
-            @select="handleSelectDiscussion"
           />
         </ul>
         <div

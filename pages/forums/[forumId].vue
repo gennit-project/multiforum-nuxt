@@ -12,6 +12,7 @@ import {
 import type { Channel, User } from '@/__generated__/graphql';
 import { computed } from 'vue';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
+import DiscussionDetailEmptyState from '@/components/discussion/list/DiscussionDetailEmptyState.vue';
 import EventDetail from '@/components/event/detail/EventDetail.vue';
 import ChannelSidebar from '@/components/channel/ChannelSidebar.vue';
 import IssueDetail from '@/components/mod/IssueDetail.vue';
@@ -32,7 +33,6 @@ const route = useRoute();
 const router = useRouter();
 const uiStore = useUIStore();
 const {
-  selectedChannelDiscussionId,
   selectedChannelDiscussionTitle,
   selectedChannelEventId,
   selectedChannelEventTitle,
@@ -40,6 +40,12 @@ const {
   selectedIssueTitle,
   selectedIssueChannelId,
 } = storeToRefs(uiStore);
+
+const selectedChannelDiscussionId = computed(() => {
+  return typeof route.query.selectedDiscussionId === 'string'
+    ? route.query.selectedDiscussionId
+    : '';
+});
 
 const showDiscussionTitle = computed(() =>
   route.name?.toString().includes('forums-forumId-discussions-discussionId')
@@ -426,14 +432,15 @@ definePageMeta({
                   <DiscussionDetailContent
                     :discussion-id="selectedChannelDiscussionId"
                     :channel-id="channelId"
+                    :horizontal-album-thumbnails="true"
                     class="w-full"
                   />
                 </div>
                 <div
                   v-else
-                  class="flex h-full items-center justify-center rounded-lg border border-dashed border-gray-300 p-6 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400"
+                  class="h-full"
                 >
-                  Select a discussion to view details.
+                  <DiscussionDetailEmptyState />
                 </div>
               </div>
               <div
