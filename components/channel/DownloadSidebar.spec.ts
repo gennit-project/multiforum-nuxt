@@ -99,7 +99,11 @@ describe('DownloadSidebar', () => {
       },
     });
 
-    await wrapper.get('button').trigger('click');
+    const button = wrapper.get('button');
+
+    expect(button.attributes('disabled')).toBeUndefined();
+
+    await button.trigger('click');
     vi.runAllTimers();
 
     expect(appendSpy).not.toHaveBeenCalled();

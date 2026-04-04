@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { PropType } from 'vue';
 import type { Discussion } from '@/__generated__/graphql';
-import PrimaryButton from '@/components/PrimaryButton.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import DownloadNowButton from '@/components/channel/DownloadNowButton.vue';
+import FunctionalDownloadNow from '@/components/channel/FunctionalDownloadNow.vue';
 import DownloadSuccessPopover from '@/components/download/DownloadSuccessPopover.vue';
 import ScopedPipelineView from '@/components/plugins/ScopedPipelineView.vue';
 import { computed, ref } from 'vue';
@@ -31,6 +32,10 @@ const showSuccessPopover = ref(false);
 // Get the primary downloadable file (first one)
 const primaryFile = computed(() => {
   return props.discussion?.DownloadableFiles?.[0] || null;
+});
+
+const hasDownloadableFile = computed(() => {
+  return (props.discussion?.DownloadableFiles?.length || 0) > 0;
 });
 
 // Format price display
@@ -120,31 +125,6 @@ const groupedLabels = computed(() => {
 
   return groups;
 });
-
-const handleDownload = () => {
-  if (!primaryFile.value?.url) {
-    console.error('No download URL available');
-    return;
-  }
-
-  // Only execute on client side
-  if (import.meta.client) {
-    // Create a temporary anchor element to trigger download
-    const link = document.createElement('a');
-    link.href = primaryFile.value.url;
-    link.download = primaryFile.value.fileName || 'download';
-
-    // Append to body, click, and remove
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-
-  // Show success popover after a short delay to ensure download started
-  setTimeout(() => {
-    showSuccessPopover.value = true;
-  }, 500);
-};
 </script>
 
 <template>
@@ -196,19 +176,15 @@ const handleDownload = () => {
       <!-- Download Button -->
       <RequireAuth :full-width="true">
         <template #has-auth>
-          <PrimaryButton
-            class="w-full justify-center"
-            :label="'Download Now'"
-            :disabled="!primaryFile?.url"
-            @click="handleDownload"
+          <FunctionalDownloadNow
+            :disabled="!hasDownloadableFile"
+            :url="primaryFile?.url || ''"
+            :file-name="primaryFile?.fileName || 'download'"
+            @downloaded="showSuccessPopover = true"
           />
         </template>
         <template #does-not-have-auth>
-          <PrimaryButton
-            class="w-full justify-center"
-            :label="'Download Now'"
-            :disabled="!primaryFile"
-          />
+          <DownloadNowButton :disabled="!hasDownloadableFile" />
         </template>
       </RequireAuth>
       <div
