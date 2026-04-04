@@ -123,4 +123,20 @@ describe('DownloadSidebar', () => {
 
     expect(wrapper.text()).toContain('Download success');
   });
+
+  it('shows the unavailable message without rendering license details when no files exist', () => {
+    const wrapper = mount(DownloadSidebar, {
+      props: {
+        discussion: {
+          ...discussionWithFile,
+          DownloadableFiles: [],
+        } as any,
+        discussionId: 'discussion-1',
+        channelUniqueName: 'test-forum',
+      },
+    });
+
+    expect(wrapper.text()).toContain('No downloadable files available');
+    expect(wrapper.text()).not.toContain('No license specified');
+  });
 });

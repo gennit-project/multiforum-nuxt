@@ -185,6 +185,14 @@ const handleDownload = () => {
         </div>
       </div>
 
+      <!-- No File Available -->
+      <div
+        v-if="!primaryFile"
+        class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4 text-center text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-300"
+      >
+        No downloadable files available
+      </div>
+
       <!-- Download Button -->
       <RequireAuth :full-width="true">
         <template #has-auth>
@@ -204,7 +212,7 @@ const handleDownload = () => {
         </template>
       </RequireAuth>
       <div
-        v-if="priceDisplay.label === 'Free Download'"
+        v-if="primaryFile && priceDisplay.label === 'Free Download'"
         class="mt-2 text-xs text-gray-500 dark:text-gray-400"
       >
         By downloading, you agree to the content license
@@ -214,7 +222,10 @@ const handleDownload = () => {
       </div> -->
 
       <!-- License Section -->
-      <div class="border-t border-gray-200 pt-4 dark:border-gray-700">
+      <div
+        v-if="primaryFile"
+        class="border-t border-gray-200 pt-4 dark:border-gray-700"
+      >
         <h2 class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
           License
         </h2>
@@ -253,14 +264,6 @@ const handleDownload = () => {
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- No File Available -->
-      <div
-        v-if="!primaryFile"
-        class="text-center text-gray-500 dark:text-gray-400"
-      >
-        No downloadable files available
       </div>
 
       <!-- Plugin Pipeline Section -->
