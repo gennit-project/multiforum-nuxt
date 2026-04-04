@@ -29,6 +29,10 @@ const props = defineProps({
     type: Object as () => DiscussionChannel | null,
     default: null,
   },
+  horizontalAlbumThumbnails: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits<{
@@ -90,6 +94,7 @@ const hasAlbum = computed(() => {
             :download-mode="false"
             :discussion-author="discussion.Author?.username || ''"
             :discussion-id="discussionId"
+            :horizontal-expanded-thumbnails="horizontalAlbumThumbnails"
             :stl-files="stlFiles"
             @album-updated="emit('discussionRefetch')"
             @edit-album="emit('editAlbum')"

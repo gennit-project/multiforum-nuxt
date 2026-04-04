@@ -5,6 +5,7 @@ import SitewideDiscussionListItem from './SitewideDiscussionListItem.vue';
 import SitewideDiscussionSidebar from './SitewideDiscussionSidebar.vue';
 import LoadMore from '../../LoadMore.vue';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
+import DiscussionDetailEmptyState from '@/components/discussion/list/DiscussionDetailEmptyState.vue';
 import { GET_SITE_WIDE_DISCUSSION_LIST } from '@/graphQLData/discussion/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { useQuery } from '@vue/apollo-composable';
@@ -21,6 +22,7 @@ import { config } from '@/config';
 import { useAppTheme } from '@/composables/useTheme';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 import { usernameVar } from '@/cache';
+import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 
 const { theme } = useAppTheme();
 
@@ -42,8 +44,12 @@ const filterValues = ref(
   getFilterValuesFromParams({ route, channelId: channelId.value })
 );
 const isSitewideSidebarOpen = ref(false);
-const selectedDiscussionId = ref('');
-const selectedChannelId = ref('');
+
+const selectedDiscussionId = computed(() => {
+  return typeof route.query.selectedDiscussionId === 'string'
+    ? route.query.selectedDiscussionId
+    : '';
+});
 
 const selectedChannelsComputed = computed(() => {
   return filterValues.value.channels;
@@ -122,12 +128,24 @@ const discussions = computed<Discussion[]>(() => {
   return getSiteWideDiscussionList.discussions;
 });
 
-const selectedDiscussionTitle = computed(() => {
-  if (!selectedDiscussionId.value) return '';
-  const selected = discussions.value.find(
-    (discussion: Discussion) => discussion.id === selectedDiscussionId.value
+const selectedDiscussion = computed<Discussion | null>(() => {
+  if (!selectedDiscussionId.value) return null;
+  return (
+    discussions.value.find(
+      (discussion: Discussion) => discussion.id === selectedDiscussionId.value
+    ) || null
   );
-  return selected?.title || '';
+});
+
+const selectedChannelId = computed(() => {
+  const firstChannel = safeArrayFirst(
+    selectedDiscussion.value?.DiscussionChannels || []
+  );
+  return firstChannel?.channelUniqueName || '';
+});
+
+const selectedDiscussionTitle = computed(() => {
+  return selectedDiscussion.value?.title || '';
 });
 
 const selectedDiscussionLink = computed(() => {
@@ -136,12 +154,8 @@ const selectedDiscussionLink = computed(() => {
 });
 
 const selectedDiscussionChannels = computed(() => {
-  if (!selectedDiscussionId.value) return [];
-  const selected = discussions.value.find(
-    (discussion: Discussion) => discussion.id === selectedDiscussionId.value
-  );
-  if (!selected?.DiscussionChannels) return [];
-  return selected.DiscussionChannels;
+  if (!selectedDiscussion.value?.DiscussionChannels) return [];
+  return selectedDiscussion.value.DiscussionChannels;
 });
 
 const selectedDiscussionChannelLinks = computed(() => {
@@ -220,14 +234,6 @@ const filterByTag = (tag: string) => {
 
 const filterByChannel = (channel: string) => {
   emit('filterByChannel', channel);
-};
-
-const handleSelectDiscussion = (payload: {
-  discussionId: string;
-  channelId: string;
-}) => {
-  selectedDiscussionId.value = payload.discussionId;
-  selectedChannelId.value = payload.channelId;
 };
 </script>
 
@@ -318,7 +324,6 @@ const handleSelectDiscussion = (payload: {
                   :selected-tags="filterValues.tags"
                   @filter-by-channel="filterByChannel"
                   @filter-by-tag="filterByTag"
-                  @select="handleSelectDiscussion"
                 />
               </ul>
               <div
@@ -374,6 +379,7 @@ const handleSelectDiscussion = (payload: {
               <DiscussionDetailContent
                 :discussion-id="selectedDiscussionId"
                 :channel-id="selectedChannelId"
+                :horizontal-album-thumbnails="true"
                 :show-comments="false"
                 class="w-full"
               />
@@ -415,9 +421,9 @@ const handleSelectDiscussion = (payload: {
             </div>
             <div
               v-else
-              class="flex h-full items-center justify-center px-6 text-sm text-gray-500 dark:text-gray-300"
+              class="h-full px-6 py-4"
             >
-              Select a discussion to view details.
+              <DiscussionDetailEmptyState />
             </div>
           </aside>
         </div>

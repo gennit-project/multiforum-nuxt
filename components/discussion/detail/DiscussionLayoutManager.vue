@@ -29,6 +29,10 @@ defineProps({
     type: Number,
     default: 0,
   },
+  horizontalAlbumThumbnails: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits<{
@@ -67,6 +71,7 @@ const emit = defineEmits<{
       :discussion-id="discussionId"
       :channel-id="channelId"
       :active-discussion-channel="activeDiscussionChannel"
+      :horizontal-album-thumbnails="horizontalAlbumThumbnails"
       @discussion-refetch="emit('discussionRefetch')"
       @discussion-channel-refetch="emit('discussionChannelRefetch')"
       @edit-album="emit('editAlbum')"

@@ -61,6 +61,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  horizontalExpandedThumbnails: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // Carousel navigation state
@@ -364,17 +368,31 @@ onMounted(() => {
         class="w-full min-w-0 overflow-hidden rounded-lg bg-black"
         :class="{
           'flex flex-col': true,
-          'lg:flex-row': expandedView && orderedImages.length > 1,
+          'lg:flex-row':
+            expandedView &&
+            orderedImages.length > 1 &&
+            !horizontalExpandedThumbnails,
         }"
       >
         <!-- Thumbnails on the left for large screens in expanded view -->
         <div
           v-if="expandedView && orderedImages.length > 1"
-          class="order-2 lg:order-1 lg:flex-shrink-0"
+          class="order-2"
+          :class="{
+            'lg:order-1 lg:flex-shrink-0': !horizontalExpandedThumbnails,
+          }"
         >
           <div
-            class="flex w-full max-w-full gap-2 overflow-x-auto p-2 lg:flex-col lg:overflow-y-auto lg:overflow-x-visible"
-            :style="{ maxHeight: `${mainImageHeight}px` }"
+            class="flex w-full max-w-full gap-2 overflow-x-auto p-2"
+            :class="{
+              'lg:flex-col lg:overflow-y-auto lg:overflow-x-visible':
+                !horizontalExpandedThumbnails,
+            }"
+            :style="
+              horizontalExpandedThumbnails
+                ? undefined
+                : { maxHeight: `${mainImageHeight}px` }
+            "
             tabindex="0"
             role="region"
             aria-label="Album thumbnails"
@@ -393,7 +411,12 @@ onMounted(() => {
         </div>
 
         <!-- Main content area -->
-        <div class="order-1 flex min-w-0 flex-col lg:order-2 lg:flex-1">
+        <div
+          class="order-1 flex min-w-0 flex-col"
+          :class="{
+            'lg:order-2 lg:flex-1': !horizontalExpandedThumbnails,
+          }"
+        >
           <!-- Image container -->
           <div class="flex items-center justify-center">
             <div
