@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useDisplay } from 'vuetify';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
@@ -90,12 +90,16 @@ if (import.meta.client) {
 
 const route = useRoute();
 const { height } = useDisplay();
+const hasMounted = ref(false);
 
-// Check if screen is vertically short (less than 700px)
-// Use client-side only to avoid hydration mismatches
+// Keep SSR and client hydration aligned, then apply viewport-height layout after mount.
 const isVerticallyShort = computed(() => {
-  if (!import.meta.client) return false; // Default to false on server
+  if (!hasMounted.value) return false;
   return height.value < 700;
+});
+
+onMounted(() => {
+  hasMounted.value = true;
 });
 
 // Drawer state
