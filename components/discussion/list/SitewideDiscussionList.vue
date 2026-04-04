@@ -5,6 +5,7 @@ import SitewideDiscussionListItem from './SitewideDiscussionListItem.vue';
 import SitewideDiscussionSidebar from './SitewideDiscussionSidebar.vue';
 import LoadMore from '../../LoadMore.vue';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
+import DiscussionDetailEmptyState from '@/components/discussion/list/DiscussionDetailEmptyState.vue';
 import { GET_SITE_WIDE_DISCUSSION_LIST } from '@/graphQLData/discussion/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { useQuery } from '@vue/apollo-composable';
@@ -420,9 +421,9 @@ const filterByChannel = (channel: string) => {
             </div>
             <div
               v-else
-              class="flex h-full items-center justify-center px-6 text-sm text-gray-500 dark:text-gray-300"
+              class="h-full px-6 py-4"
             >
-              Select a discussion to view details.
+              <DiscussionDetailEmptyState />
             </div>
           </aside>
         </div>
