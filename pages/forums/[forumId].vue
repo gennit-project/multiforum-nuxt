@@ -32,7 +32,6 @@ const route = useRoute();
 const router = useRouter();
 const uiStore = useUIStore();
 const {
-  selectedChannelDiscussionId,
   selectedChannelDiscussionTitle,
   selectedChannelEventId,
   selectedChannelEventTitle,
@@ -40,6 +39,12 @@ const {
   selectedIssueTitle,
   selectedIssueChannelId,
 } = storeToRefs(uiStore);
+
+const selectedChannelDiscussionId = computed(() => {
+  return typeof route.query.selectedDiscussionId === 'string'
+    ? route.query.selectedDiscussionId
+    : '';
+});
 
 const showDiscussionTitle = computed(() =>
   route.name?.toString().includes('forums-forumId-discussions-discussionId')
@@ -426,6 +431,7 @@ definePageMeta({
                   <DiscussionDetailContent
                     :discussion-id="selectedChannelDiscussionId"
                     :channel-id="channelId"
+                    :horizontal-album-thumbnails="true"
                     class="w-full"
                   />
                 </div>

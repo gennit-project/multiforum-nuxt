@@ -68,8 +68,6 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['filterByTag', 'filterByChannel', 'select']);
-
 const route = useRoute();
 const uiStore = useUIStore();
 const { fontSize } = storeToRefs(uiStore);
@@ -160,6 +158,16 @@ const filteredQuery = computed(() => {
   return query;
 });
 
+const desktopSelectionLink = computed(() => {
+  return {
+    path: route.path,
+    query: {
+      ...filteredQuery.value,
+      selectedDiscussionId: discussionId.value,
+    },
+  };
+});
+
 // Sensitive content logic
 const sensitiveContentRevealed = ref(false);
 const hasSensitiveContent = computed(
@@ -180,17 +188,6 @@ const shouldShowContent = computed(() => {
 
 const revealSensitiveContent = () => {
   sensitiveContentRevealed.value = true;
-};
-
-const handleSelect = () => {
-  if (!props.isSelectable) return;
-  const idToSelect =
-    props.discussionChannel?.discussionId || props.discussion?.id || '';
-  if (!idToSelect) return;
-  emit('select', {
-    discussionId: idToSelect,
-    title: props.discussion?.title || '',
-  });
 };
 
 </script>
@@ -214,7 +211,6 @@ const handleSelect = () => {
                   query: filteredQuery,
                 }"
                 class="mb-1 flex w-full items-start gap-2 lg:hidden"
-                @click="handleSelect"
               >
                 <span
                   :class="
@@ -256,10 +252,9 @@ const handleSelect = () => {
                   Sensitive
                 </span>
               </nuxt-link>
-              <button
-                type="button"
+              <nuxt-link
+                :to="desktopSelectionLink"
                 class="mb-1 hidden w-full items-start gap-2 text-left lg:flex"
-                @click="handleSelect"
               >
                 <span
                   :class="
@@ -300,7 +295,7 @@ const handleSelect = () => {
                 >
                   Sensitive
                 </span>
-              </button>
+              </nuxt-link>
               <div
                 class="flex items-center gap-2 text-xs font-medium text-gray-600 no-underline dark:text-gray-300"
               >
