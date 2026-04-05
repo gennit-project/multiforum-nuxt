@@ -69,8 +69,14 @@ watch(
   { immediate: true }
 );
 
-const { mutate: addFavorite } = useMutation(ADD_FAVORITE_CHANNEL);
-const { mutate: removeFavorite } = useMutation(REMOVE_FAVORITE_CHANNEL);
+const {
+  mutate: addFavorite,
+  onDone: onAddFavoriteDone,
+} = useMutation(ADD_FAVORITE_CHANNEL);
+const {
+  mutate: removeFavorite,
+  onDone: onRemoveFavoriteDone,
+} = useMutation(REMOVE_FAVORITE_CHANNEL);
 
 const showAddedToast = () => {
   const message = 'Added to Favorites.';
@@ -89,6 +95,20 @@ const showAddedToast = () => {
         isAlreadyFavorite: true,
       }),
   });
+};
+
+onAddFavoriteDone(() => {
+  isFavorited.value = true;
+  isLoading.value = false;
+});
+
+onRemoveFavoriteDone(() => {
+  isFavorited.value = false;
+  isLoading.value = false;
+});
+
+const handleFavoriteChange = (nextIsFavorited: boolean) => {
+  isFavorited.value = nextIsFavorited;
 };
 
 const handleToggleFavorite = async () => {
@@ -139,5 +159,6 @@ const handleToggleFavorite = async () => {
     :size="size"
     :item-id="channelUniqueName"
     @toggle="handleToggleFavorite"
+    @favorite-change="handleFavoriteChange"
   />
 </template>
