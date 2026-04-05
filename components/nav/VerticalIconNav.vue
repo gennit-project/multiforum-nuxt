@@ -93,13 +93,12 @@ const { height } = useDisplay();
 const hasMounted = ref(false);
 
 // Keep SSR and client hydration aligned, then apply viewport-height layout after mount.
+onMounted(() => {
+  hasMounted.value = true;
+});
 const isVerticallyShort = computed(() => {
   if (!hasMounted.value) return false;
   return height.value < 700;
-});
-
-onMounted(() => {
-  hasMounted.value = true;
 });
 
 // Drawer state

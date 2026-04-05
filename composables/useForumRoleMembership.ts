@@ -21,6 +21,12 @@ type MaybeRefString = string | Ref<string> | ComputedRef<string>;
 const forumRoleMembershipKey: InjectionKey<ForumRoleMembership> =
   Symbol('forumRoleMembership');
 
+const defaultForumRoleMembership: ForumRoleMembership = {
+  forumAdminUsernames: computed(() => []),
+  forumModUsernames: computed(() => []),
+  forumModProfileNames: computed(() => []),
+};
+
 export const createForumRoleMembership = (
   channelUniqueName: MaybeRefString
 ): ForumRoleMembership => {
@@ -77,11 +83,5 @@ export const provideForumRoleMembership = (
 };
 
 export const useForumRoleMembership = (): ForumRoleMembership => {
-  return (
-    inject(forumRoleMembershipKey) || {
-      forumAdminUsernames: computed(() => []),
-      forumModUsernames: computed(() => []),
-      forumModProfileNames: computed(() => []),
-    }
-  );
+  return inject(forumRoleMembershipKey, defaultForumRoleMembership);
 };
