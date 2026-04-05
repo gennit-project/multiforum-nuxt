@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import type { PropType } from 'vue';
 import type { Comment, User } from '@/__generated__/graphql';
 import { stableRelativeTime } from '@/utils';
-import { getCommentAuthorStatus } from '@/utils/headerPermissionUtils';
+import type { ForumRoleBadge } from '@/utils/forumRoleBadges';
 import {
   getPermalinkToDiscussionComment,
   getPermalinkToDiscussion,
@@ -50,16 +50,11 @@ const props = defineProps({
     type: Array as PropType<string[]>,
     default: () => [],
   },
+  forumRoleBadge: {
+    type: String as PropType<ForumRoleBadge>,
+    default: null,
+  },
 });
-// Use the utility function to determine admin/mod status
-const authorStatus = computed(() => {
-  return getCommentAuthorStatus({
-    author: props.commentData.CommentAuthor,
-  });
-});
-
-const isAdmin = computed(() => authorStatus.value.isAdmin);
-const isMod = computed(() => authorStatus.value.isMod);
 
 const commentAuthorUsername = computed(
   () => (props.commentData.CommentAuthor as User)?.username
@@ -261,14 +256,14 @@ const contextLinkObject = computed(() => {
                 >Bot</span
               >
               <span
-                v-if="isAdmin"
+                v-if="forumRoleBadge === 'forumAdmin'"
                 class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
-                >Admin</span
+                >Forum Admin</span
               >
               <span
-                v-else-if="isMod"
+                v-else-if="forumRoleBadge === 'forumMod'"
                 class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
-                >Mod</span
+                >Forum Mod</span
               >
               <span
                 v-if="commentAuthorUsername === originalPoster"

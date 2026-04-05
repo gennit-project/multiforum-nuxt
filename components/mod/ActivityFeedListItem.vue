@@ -24,6 +24,8 @@ import { useMutation } from '@vue/apollo-composable';
 import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
 import { modProfileNameVar, usernameVar } from '@/cache';
 import RevisionDiffInline from '@/components/mod/RevisionDiffInline.vue';
+import { getForumRoleBadge } from '@/utils/forumRoleBadges';
+import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
 
 const actionTypeToIcon: Record<string, any> = {
   [ActionType.Close]: XCircleIcon,
@@ -73,6 +75,8 @@ const props = defineProps({
 const commentIdInParams = useRoute().params.commentId as string;
 const isPermalinked =
   commentIdInParams && commentIdInParams === props.activityItem.Comment?.id;
+const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
+  useForumRoleMembership();
 
 const isCommentAuthor = computed(() => {
   const author = props.activityItem.Comment?.CommentAuthor;
@@ -302,6 +306,16 @@ const showCommentBody = computed(() => {
   return !isEditAction.value || !hasCommentRevision.value;
 });
 
+const actorForumRoleBadge = computed(() => {
+  return getForumRoleBadge({
+    username: props.activityItem.User?.username,
+    modProfileName: props.activityItem.ModerationProfile?.displayName,
+    adminUsernames: forumAdminUsernames.value,
+    modUsernames: forumModUsernames.value,
+    modProfileNames: forumModProfileNames.value,
+  });
+});
+
 // Build the comment revision content for the diff
 const commentRevisionContent = computed(() => {
   if (props.commentEditIndex === null) return null;
@@ -459,6 +473,16 @@ const saveEdit = async () => {
                 <span class="flex flex-row items-center gap-1">
                   {{ activityItem.ModerationProfile?.displayName }}
                   <span
+                    v-if="actorForumRoleBadge === 'forumAdmin'"
+                    class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                    >Forum Admin</span
+                  >
+                  <span
+                    v-else-if="actorForumRoleBadge === 'forumMod'"
+                    class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                    >Forum Mod</span
+                  >
+                  <span
                     v-if="isOriginalPoster"
                     class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >OP</span
@@ -484,6 +508,16 @@ const saveEdit = async () => {
               >
                 <span class="flex items-center gap-1">
                   {{ activityItem.User.username }}
+                  <span
+                    v-if="actorForumRoleBadge === 'forumAdmin'"
+                    class="rounded-md border border-gray-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                    >Forum Admin</span
+                  >
+                  <span
+                    v-else-if="actorForumRoleBadge === 'forumMod'"
+                    class="rounded-md border border-orange-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                    >Forum Mod</span
+                  >
                   <span
                     v-if="isOriginalPoster"
                     class="rounded-md border border-gray-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
