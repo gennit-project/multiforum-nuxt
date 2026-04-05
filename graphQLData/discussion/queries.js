@@ -190,6 +190,10 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
           CommentsAggregate {
             count
           }
+          Channel {
+            uniqueName
+            displayName
+          }
         }
         Album {
           id
