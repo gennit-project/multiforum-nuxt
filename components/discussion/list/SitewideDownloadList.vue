@@ -66,7 +66,10 @@ const {
       sort: activeSort.value,
       timeFrame: activeTimeFrame.value,
     },
-  })
+  }),
+  {
+    keepPreviousResult: true,
+  }
 );
 
 // Refetch when user logs in/out to update isFavorited status
@@ -109,7 +112,7 @@ const aggregateDiscussionCount = computed(() => {
 });
 
 const isInitialLoading = computed(
-  () => discussionLoading.value && !discussionResult.value
+  () => discussionLoading.value && discussions.value.length === 0
 );
 
 const loadMore = () => {
