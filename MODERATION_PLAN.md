@@ -6,6 +6,81 @@ This document analyzes the current moderation implementation across both the fro
 
 ---
 
+## Tech Debt & Refactoring
+
+### High Priority
+
+| Task | Location | Reason |
+|------|----------|--------|
+| Fix server-scope permission correctness in `canCreateChannel` | Backend | `rules.ts` currently calls `hasServerPermission(...)` without awaiting it, so forum-creation suspension enforcement is not trustworthy until corrected |
+| Consolidate suspension target resolution into one shared backend helper | Backend | `createSuspensionResolver.ts`, `createUnsuspendResolver.ts`, and `isOriginalPosterSuspended.ts` each rediscover the issue target independently, which is brittle and likely to drift |
+| Unify suspension state reads around `getActiveSuspension()` | Backend | Expiration cleanup, issue-linked suspension state, and permission checks should all use the same active/expired determination logic |
+| Standardize suspension-blocked UX for existing actions | Frontend | Current flows mix silent failures, raw GraphQL errors, and explicit suspension notices; emoji/forum/comment/create flows should behave consistently |
+| Replace `showAdminTag` with ServerConfig-scoped admin/mod relationships | Both | Server-scoped moderation UX should mirror channel-scoped moderation: labels and permissions should come from relationships attached directly to `ServerConfig`, not role flags embedded on users |
+| Add targeted TypeScript coverage for moderation permission objects | Frontend | Permission and moderation components still rely on weakly typed objects, which makes regressions in role shape and fallback behavior harder to catch |
+
+### Medium Priority
+
+| Task | Location | Reason |
+|------|----------|--------|
+| Create a unified moderation action workflow layer for suspend/unsuspend/archive entry points | Frontend | Modal launching, success notifications, and issue refetch logic are duplicated across `SuspendUserButton`, `SuspendModButton`, and related issue components |
+| Extract suspend/unsuspend modal behavior into composables after backend stabilization | Frontend | Several moderation components repeat the same mutation, cache update, and notification pattern |
+| Add focused backend indexing for active-suspension lookups | Backend | Once logic is stabilized, `username`, `modProfileName`, `suspendedUntil`, and `suspendedIndefinitely` become obvious hot-path fields for permission checks |
+| Add a moderation architecture note documenting permission flow and suspension lifecycle | Both | The system now spans user permissions, mod permissions, issue workflows, cleanup side effects, and server-vs-channel membership concepts; it needs one canonical reference before more roadmap work lands |
+
+### Low Priority
+
+| Task | Location | Reason |
+|------|----------|--------|
+| Consolidate broader permission helpers into a single frontend composable | Frontend | Valuable eventually, but lower leverage than first fixing backend correctness and shared suspension resolution |
+| Add caching for non-critical permission lookups | Backend | Helpful for scale, but should follow correctness and test coverage |
+| Standardize all GraphQL error text for moderation blocks | Backend | Useful polish after suspension flows and notices are behaviorally consistent |
+
+---
+
+## Test Coverage Gaps
+
+### Stabilization Tests
+
+| Test | Priority | Location |
+|------|----------|----------|
+| `canCreateChannel` actually awaits and enforces `hasServerPermission()` | High | Backend rule test |
+| Server-level suspended user cannot create forum after permission fix | High | `tests/cypress/e2e/suspensions/` |
+| `isOriginalPosterSuspended` agrees with `getActiveSuspension()` for user and mod targets | High | Backend tests |
+| Expired suspension disconnects on attempted action and then allows the action | High | Backend + `tests/cypress/e2e/suspensions/` |
+| Unsuspension immediately restores blocked actions without stale UI state | High | `tests/cypress/e2e/suspensions/` |
+| Server-scoped admin/mod labels resolve from `ServerConfig` relationships instead of `showAdminTag` | High | Backend + frontend tests |
+
+### Missing E2E Tests
+
+| Test | Priority | Location |
+|------|----------|----------|
+| Suspended user cannot react with emoji | High | `tests/cypress/e2e/suspensions/` |
+| Suspended mod sees no mod UI elements | High | `tests/cypress/e2e/mod/` |
+| Suspended mod cannot act on issue detail, comments, or feedback pages | High | `tests/cypress/e2e/mod/` |
+| Reporting mod comment from feedback page | Medium | `tests/cypress/e2e/mod/` |
+| Reporting mod from profile page | Medium | `tests/cypress/e2e/mod/` |
+| Reporting mod from issue detail / mod action context | Medium | `tests/cypress/e2e/mod/` |
+| Mod suspension doesn't affect user actions | High | `tests/cypress/e2e/suspensions/` |
+| Server admin badge on comments via ServerConfig membership | Medium | `tests/cypress/e2e/comments/` |
+| Server mod badge on comments via ServerConfig membership | Medium | `tests/cypress/e2e/comments/` |
+| Bot deprecation prevents actions | Medium | `tests/cypress/e2e/bots/` |
+
+### Missing Unit Tests
+
+| Test | Priority | Location |
+|------|----------|----------|
+| `isExpiredSuspension()` logic | High | Backend tests |
+| `getActiveSuspension()` edge cases | High | Backend tests |
+| `disconnectExpiredSuspensions()` no-op and mixed user/mod cleanup paths | High | Backend tests |
+| Shared suspension target resolution for discussion/event/comment-backed issues | High | Backend tests |
+| Frontend permission fallback chains for user vs suspended user vs suspended mod | Medium | Frontend tests |
+| Mod action visibility on issue detail for suspended vs unsuspended mods | Medium | Frontend tests |
+| Emoji/reaction controls hidden or disabled for suspended users | Medium | Frontend tests |
+| Server-scoped author badge resolution using ServerConfig admin/mod relationships | Medium | Frontend tests |
+
+---
+
 ## Current Implementation Overview
 
 ### What's Already Built
@@ -13,7 +88,7 @@ This document analyzes the current moderation implementation across both the fro
 #### Suspension System
 - **User Suspensions**: Time-limited or indefinite, channel-scoped
 - **Mod Suspensions**: Separate from user suspensions, uses SuspendedModRole
-- **Server-Level Checks**: `hasServerPermission.ts` blocks `canCreateChannel` for suspended users
+- **Server-Level Checks**: `hasServerPermission.ts` is intended to block `canCreateChannel` for suspended users, but the GraphQL rule path still needs a correctness fix before this can be treated as fully reliable
 - **Automatic Expiration**: Expired suspensions are disconnected from channels (fire-and-forget cleanup)
 - **Notifications**: In-app notifications sent when suspended users are blocked from actions
 
@@ -21,6 +96,7 @@ This document analyzes the current moderation implementation across both the fro
 - **Two-Tier System**: User permissions vs Moderator permissions
 - **Role Hierarchy**: Admin > Elevated Mod > Standard Mod > Suspended Mod
 - **Channel & Server Scopes**: Different enforcement paths for each
+- **Server-Scoped Identity UX**: Current comment/list UIs still lean on `showAdminTag` in some places; planned direction is to deprecate that and derive server-scoped admin/mod labels from relationships attached directly to `ServerConfig`, mirroring channel-scoped admin/mod membership on `Channel`
 
 #### Moderation Actions
 - Report, Archive, Unarchive (discussions, events, comments)
@@ -43,15 +119,16 @@ This document analyzes the current moderation implementation across both the fro
 > "suspended user can't do emoji - borrow can comment rule - suppress error"
 
 **Current State:**
-- Emoji reactions likely not permission-checked against suspension status
-- Need to investigate if `canComment` or similar permission controls emoji reactions
+- Backend emoji mutations are already gated through `canUpvoteComment` / `canUpvoteDiscussion`, and suspended roles deny those permissions
+- Frontend reaction controls are still rendered broadly, so the current gap is mostly UX consistency, graceful failure, and explicit coverage
+- The roadmap note to "borrow can comment rule" does not appear necessary if the current upvote-based permission model is kept
 
 **Required Work:**
 | Task | Location | Type |
 |------|----------|------|
-| Add emoji reaction permission check using canComment permission | Backend | Feature |
-| Suppress error for suspended users attempting emoji (graceful failure) | Backend | Feature |
-| Verify UI doesn't show error toast for suspended emoji attempts | Frontend | Feature |
+| Verify existing emoji mutations are blocked for suspended users via `canUpvote*` permissions | Backend | Verification |
+| Suppress raw mutation errors for suspended users attempting emoji | Frontend | Feature |
+| Hide or disable emoji controls for suspended users where suspension state is already known | Frontend | Feature |
 | Add E2E test for suspended user emoji restriction | Frontend | Test |
 
 ---
@@ -62,13 +139,15 @@ This document analyzes the current moderation implementation across both the fro
 > "when suspended at server scope, cannot create forums"
 
 **Current State:**
-- ✅ Backend implements this in `hasServerPermission.ts` (lines 59-122)
+- ⚠️ Backend permission logic exists in `hasServerPermission.ts`, but the GraphQL rule path needs a correctness fix because `canCreateChannel` does not currently await that permission check
 - ✅ Frontend test exists: `serverLevelSuspension.spec.cy.ts`
-- ❓ Need to verify the test is passing and comprehensive
+- ❓ Need to verify the existing test is actually covering the fixed behavior after the backend rule bug is corrected
 
 **Required Work:**
 | Task | Location | Type |
 |------|----------|------|
+| Fix `canCreateChannel` to await `hasServerPermission()` | Backend | Bug Fix |
+| Add backend rule test proving suspended users are blocked from forum creation | Backend | Test |
 | Verify `serverLevelSuspension.spec.cy.ts` test passes | Frontend | Test Verification |
 | Add test case for indefinite server suspension | Frontend | Test |
 | Consider `canSuspendFromServer` permission for mod profiles | Backend | Decision/Feature |
@@ -92,6 +171,7 @@ This document analyzes the current moderation implementation across both the fro
 - ✅ Implemented in `disconnectExpiredSuspensions.ts`
 - Uses fire-and-forget async pattern
 - Keeps Suspension node for historical tracking, removes relationship
+- ⚠️ Expiration behavior should be unified with `getActiveSuspension()` and `isOriginalPosterSuspended()` so all reads agree on active vs expired state
 
 **Required Work:**
 | Task | Location | Type |
@@ -99,6 +179,7 @@ This document analyzes the current moderation implementation across both the fro
 | Add E2E test verifying expired suspension cleanup | Frontend | Test |
 | Add unit test for `isExpiredSuspension()` logic | Backend | Test |
 | Verify cleanup handles both user and mod suspensions | Backend | Test |
+| Refactor issue-linked suspension reads to use the same active/expired source of truth | Backend | Refactor |
 
 ---
 
@@ -113,7 +194,7 @@ This document analyzes the current moderation implementation across both the fro
 - ✅ Content creation blocked (`suspendedUserPermissions.spec.cy.ts`)
 - ✅ Notifications sent with issue link and expiration date (`suspensionNotification.ts`)
 - ❓ Need to verify notification content includes all required info
-- ❓ Need to verify reversal workflow works
+- ❓ Need to verify reversal workflow works without stale frontend state or inconsistent error handling
 
 **Required Work:**
 | Task | Location | Type |
@@ -122,6 +203,7 @@ This document analyzes the current moderation implementation across both the fro
 | Add E2E test for unsuspension enabling previously blocked action | Frontend | Test |
 | Add test for notification received on blocked action | Frontend | Test |
 | Ensure notification UI shows issue link and expiration clearly | Frontend | Feature/Polish |
+| Standardize create-flow handling so suspended forum/comment/discussion/event attempts show the same suspension UX | Frontend | Refactor |
 
 ---
 
@@ -166,7 +248,8 @@ This document analyzes the current moderation implementation across both the fro
 
 **Current State:**
 - ✅ `headerPermissionUtils.ts` checks mod suspension status
-- ✅ `canPerformModActions()` returns false for suspended mods
+- ✅ Backend mod permission enforcement exists via `hasChannelModPermission.ts`
+- ⚠️ Frontend mod-action disablement is spread across multiple components and needs a broader audit than one helper
 - ❓ Need to verify ALL mod UI elements are hidden/disabled
 
 **Required Work:**
@@ -206,7 +289,7 @@ This document analyzes the current moderation implementation across both the fro
 - ❌ Bots are DEPRECATED, not SUSPENDED
 - Bots use ModerationProfile for comments
 - `channelBotsMiddleware.ts` marks bots as deprecated, not suspended
-- No Suspension nodes created for bots
+- Bot accounts are still real `User` records with moderation profiles, so some human suspension logic may already apply depending on which mutation path a bot uses
 
 **Required Work:**
 
@@ -215,6 +298,7 @@ This document analyzes the current moderation implementation across both the fro
 | Task | Location | Type |
 |------|----------|------|
 | DECISION: Define bot suspension vs deprecation strategy | Both | Design Decision |
+| Audit bot action paths to confirm whether existing permission checks already block suspended/deprecated bot actions | Backend | Investigation |
 | If suspendable: Add bot suspension support to backend | Backend | Feature |
 | If suspendable: Add bot suspension UI | Frontend | Feature |
 | If deprecated only: Document that bots can't be suspended | Docs | Documentation |
@@ -231,11 +315,13 @@ This document analyzes the current moderation implementation across both the fro
 - ✅ Separate Suspension nodes for users vs mods
 - ✅ `SuspendedMods` relationship on Channel
 - ✅ `SUSPEND_MOD` and `UNSUSPEND_MOD` mutations exist
-- ❓ UI workflow may need improvement
+- ❓ Current model supports suspension, but "ban mod profile while leaving user intact" likely needs explicit product and schema semantics beyond the current suspension workflow
 
 **Required Work:**
 | Task | Location | Type |
 |------|----------|------|
+| Decide whether mod-profile bans are a new state distinct from suspension | Both | Design Decision |
+| If yes, design mod-profile-only ban model and permission effects | Backend | Design |
 | Verify mod suspension doesn't affect user permissions | Backend | Test |
 | Verify suspended mod can still create content as user | Frontend | Test |
 | Add clear UI indication when mod profile suspended vs user account | Frontend | Feature |
@@ -251,7 +337,7 @@ This document analyzes the current moderation implementation across both the fro
 
 **Current State:**
 - ❌ Not implemented
-- Plugin system exists for other purposes
+- Plugin system exists and is already capable of channel opt-in, bot user provisioning, and pipeline-style execution, so this should be built as a plugin feature rather than a bespoke moderation subsystem
 
 **Required Work:**
 
@@ -288,90 +374,33 @@ This document analyzes the current moderation implementation across both the fro
 > "can make list of server admins, comments by server admins are labeled as such in comments"
 
 **Current State:**
-- ❓ ServerRoles exist but unclear if "server admin" is distinguished
-- Comment author status extraction exists in `getCommentAuthorStatus()`
-- Some badge display logic exists
+- ⚠️ `showAdminTag` exists today and is already queried in several discussion/event/comment surfaces, but it should be treated as deprecated
+- ✅ Some author-status and badge-display logic already exists
+- ❓ Missing pieces are a canonical server-admin/server-mod membership model on `ServerConfig` and consistent comment labeling across all comment contexts
 
 **Required Work:**
 | Task | Location | Type |
 |------|----------|------|
-| Add `ServerAdmins` relationship to ServerConfig | Backend | Feature |
-| Add query to fetch server admins | Backend | Feature |
-| Add server admin management UI in admin panel | Frontend | Feature |
-| Update `getCommentAuthorStatus()` to detect server admin | Frontend | Feature |
-| Display "Server Admin" badge on comments | Frontend | Feature |
-| E2E test for server admin badge display | Frontend | Test |
-
----
-
-## Tech Debt & Refactoring
-
-### High Priority
-
-| Task | Location | Reason |
-|------|----------|--------|
-| Consolidate permission checking into single composable | Frontend | Code scattered across multiple utils |
-| Add comprehensive TypeScript types for all permission objects | Frontend | Many `any` casts in permission code |
-| Create unified moderation action handler | Frontend | Duplicate modal/action logic across components |
-| Add error boundary for failed permission checks | Frontend | Silent failures possible |
-| Index frequently queried suspension fields | Backend | Performance optimization |
-
-### Medium Priority
-
-| Task | Location | Reason |
-|------|----------|--------|
-| Extract modal workflows into composables | Frontend | Reduce component complexity |
-| Consolidate `suspendUser` and `suspendMod` resolvers | Backend | Shared logic in createSuspensionResolver.ts |
-| Add caching for permission lookups | Backend | Reduce DB queries |
-| Create permission documentation page | Frontend | Complex system needs docs |
-
-### Low Priority
-
-| Task | Location | Reason |
-|------|----------|--------|
-| Standardize GraphQL error messages for suspension blocks | Backend | Inconsistent messaging |
-| Add analytics for moderation actions | Backend | Track mod activity |
-| Create moderation dashboard with metrics | Frontend | Visibility into mod workload |
-
----
-
-## Test Coverage Gaps
-
-### Missing E2E Tests
-
-| Test | Priority | Location |
-|------|----------|----------|
-| Suspended user cannot react with emoji | High | `tests/cypress/e2e/suspensions/` |
-| Expired suspension allows action | High | `tests/cypress/e2e/suspensions/` |
-| Unsuspension immediately enables actions | High | `tests/cypress/e2e/suspensions/` |
-| Suspended mod sees no mod UI elements | High | `tests/cypress/e2e/mod/` |
-| Reporting mod comment from feedback page | Medium | `tests/cypress/e2e/mod/` |
-| Reporting mod from profile page | Medium | `tests/cypress/e2e/mod/` |
-| Mod suspension doesn't affect user actions | High | `tests/cypress/e2e/suspensions/` |
-| Server admin badge on comments | Low | `tests/cypress/e2e/comments/` |
-| Bot deprecation prevents actions | Medium | `tests/cypress/e2e/bots/` |
-
-### Missing Unit Tests
-
-| Test | Priority | Location |
-|------|----------|----------|
-| `isExpiredSuspension()` logic | High | Backend tests |
-| `getActiveSuspension()` edge cases | High | Backend tests |
-| `canPerformModActions()` all paths | Medium | Frontend tests |
-| Permission fallback chains | Medium | Frontend tests |
+| Add `ServerAdmins` and `ServerModerators` relationships to `ServerConfig` | Backend | Feature |
+| Deprecate `showAdminTag`-driven server moderation UX and migrate callers to ServerConfig membership lookups | Both | Refactor |
+| Add query and admin view to list/manage server admins and server moderators | Both | Feature |
+| Rework comment/detail/list badge resolution so server-scoped labels mirror channel-scoped labels | Frontend | Refactor |
+| Display "Server Admin" and "Server Mod" labels consistently on comments | Frontend | Feature |
+| E2E tests for server admin and server mod badge display | Frontend | Test |
 
 ---
 
 ## Implementation Phases
 
-### Phase 1: Foundation & Missing Tests (Week 1-2)
-1. Audit and verify existing tests pass
-2. Add missing tests for current features
-3. Fix any broken permission checks found during audit
-4. Add TypeScript types for permission objects
+### Phase 1: Stabilization & Correctness (Week 1-2)
+1. Fix backend permission correctness for server-scope forum creation
+2. Consolidate suspension target resolution and active-suspension reads
+3. Introduce ServerConfig-scoped server admin/mod relationships and start deprecating `showAdminTag`
+4. Add backend rule/unit coverage for suspension lifecycle, cleanup, and server membership reads
+5. Add targeted frontend typing and consistent suspension-blocked UX for existing flows
 
 ### Phase 2: Suspended User Polish (Week 3)
-1. Implement emoji reaction restriction
+1. Finish suspended-user reaction UX and error suppression
 2. Verify notification content is complete
 3. Add suspension status UI improvements
 4. E2E tests for all suspended user flows
@@ -379,13 +408,13 @@ This document analyzes the current moderation implementation across both the fro
 ### Phase 3: Suspended Mod Workflows (Week 4-5)
 1. Add "Report" options to mod comments/profiles/actions
 2. Add "Suspend Mod" from various contexts
-3. Verify mod/user separation is complete
+3. Verify mod/user separation is complete and decide whether mod-profile bans are distinct from suspensions
 4. E2E tests for mod suspension workflows
 
 ### Phase 4: Bot Decision & Server Admins (Week 6)
-1. Make decision on bot suspension vs deprecation
+1. Audit current bot action enforcement and make decision on bot suspension vs deprecation
 2. Implement chosen bot strategy
-3. Implement server admin list and badges
+3. Finish ServerConfig-based server admin/server mod list and badge migration
 4. E2E tests for new features
 
 ### Phase 5: Auto-Moderation Plugin (Week 7-8)
@@ -396,8 +425,8 @@ This document analyzes the current moderation implementation across both the fro
 5. Comprehensive E2E tests
 
 ### Phase 6: Tech Debt & Documentation (Week 9)
-1. Consolidate permission code
-2. Add caching optimizations
+1. Consolidate broader permission code where still justified after stabilization
+2. Add indexing/caching optimizations
 3. Create moderation documentation
 4. Final test coverage review
 
@@ -407,16 +436,20 @@ This document analyzes the current moderation implementation across both the fro
 
 1. **Bot Suspension**: Should bots be suspendable (creating Suspension nodes) or is deprecation sufficient? Deprecation removes the bot entirely, while suspension would just block its actions temporarily.
 
-2. **Server-Level Mod Suspension**: Should there be a `canSuspendFromServer` permission allowing server admins to suspend users across all channels? Current system requires channel-by-channel suspension.
+2. **Server-Level Mod Suspension**: Should there be a `canSuspendFromServer` permission allowing server admins to suspend users or mods across all channels? Current system requires channel-by-channel suspension.
 
-3. **Auto-Moderation Scope**: Should the auto-moderation bot:
+3. **Mod Profile Bans**: Is "ban mod profile while leaving user profile intact" a distinct state from suspension, or should permanent mod suspension cover that use case?
+
+4. **ServerConfig Membership Model**: Should server-scoped admin/mod relationships fully replace `showAdminTag`, or is there any remaining role-flag use case that still needs to survive the migration?
+
+5. **Auto-Moderation Scope**: Should the auto-moderation bot:
    - Only archive, or also suspend?
    - Work on server rules, channel rules, or both?
    - Require human review before taking action?
 
-4. **Appeal Timeline**: What should the SLA be for reviewing appeals of auto-moderated content?
+6. **Appeal Timeline**: What should the SLA be for reviewing appeals of auto-moderated content?
 
-5. **Notification Preferences**: Should suspended users be able to opt out of receiving suspension notifications? (Currently they cannot.)
+7. **Notification Preferences**: Should suspended users be able to opt out of receiving suspension notifications? (Currently they cannot.)
 
 ---
 
@@ -430,26 +463,31 @@ This document analyzes the current moderation implementation across both the fro
 - `/tests/cypress/e2e/suspensions/` - Suspension tests
 
 ### Backend Key Files
-- `/customResolvers/rules/permission/hasChannelPermission.ts` - User permission enforcement
-- `/customResolvers/rules/permission/hasChannelModPermission.ts` - Mod permission enforcement
-- `/customResolvers/rules/permission/hasServerPermission.ts` - Server permission enforcement
-- `/customResolvers/rules/permission/getActiveSuspension.ts` - Suspension detection
-- `/customResolvers/rules/permission/disconnectExpiredSuspensions.ts` - Expiration cleanup
-- `/customResolvers/rules/permission/suspensionNotification.ts` - Notification creation
+- `/rules/rules.ts` - GraphQL Shield rules including `canCreateChannel`
+- `/rules/permission/hasChannelPermission.ts` - User permission enforcement
+- `/rules/permission/hasChannelModPermission.ts` - Mod permission enforcement
+- `/rules/permission/hasServerPermission.ts` - Server permission enforcement
+- `/rules/permission/getActiveSuspension.ts` - Suspension detection
+- `/rules/permission/disconnectExpiredSuspensions.ts` - Expiration cleanup
+- `/rules/permission/suspensionNotification.ts` - Notification creation
 - `/customResolvers/mutations/suspendUser.ts` - Suspension mutation
 - `/customResolvers/mutations/unsuspendUser.ts` - Unsuspension mutation
+- `/customResolvers/mutations/shared/createSuspensionResolver.ts` - Shared suspend mutation logic
+- `/customResolvers/mutations/shared/createUnsuspendResolver.ts` - Shared unsuspend mutation logic
+- `/customResolvers/queries/isOriginalPosterSuspended.ts` - Issue-linked suspension state query
 
 ---
 
 ## Conclusion
 
-The moderation system has a solid foundation with most core functionality implemented. The main gaps are:
+The moderation system has a solid foundation, but the first priority is stabilization rather than new feature breadth. The main gaps are:
 
-1. **Reporting workflows** for mod comments/profiles/actions
-2. **UI polish** for suspended user/mod experience
-3. **Bot handling** decision and implementation
-4. **Auto-moderation plugin** (new feature)
-5. **Server admin badges** (new feature)
-6. **Test coverage** for edge cases and new scenarios
+1. **Backend correctness and shared suspension logic** before expanding workflows
+2. **ServerConfig-based server moderation UX** to replace `showAdminTag` and mirror channel-scoped membership patterns
+3. **Reporting workflows** for mod comments/profiles/actions
+4. **UI consistency** for suspended user/mod experience, especially error handling and reaction controls
+5. **Bot handling** audit, decision, and implementation
+6. **Auto-moderation plugin** as a plugin-system feature
+7. **Test coverage** for stabilization, edge cases, and new scenarios
 
-The recommended approach is to start with Phase 1 (testing foundation) to ensure existing code is solid before adding new features.
+The recommended approach is to start with Phase 1 stabilization so the permission model, suspension lifecycle, and issue-linked state are correct and testable before adding new moderation workflows.
