@@ -8,6 +8,8 @@ import type { CreateEditChannelFormValues } from '@/types/Channel';
 import TailwindForm from '@/components/FormComponent.vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { MAX_CHARS_IN_CHANNEL_NAME } from '@/utils/constants';
+import { isAuthenticatedVar, isLoadingAuthVar, usernameVar } from '@/cache';
+import { useSSRAuth } from '@/composables/useSSRAuth';
 // Server config query removed since individual settings pages handle validation
 
 // Import icons
@@ -230,6 +232,7 @@ onMounted(() => {
 });
 
 const isDropdownOpen = ref(false);
+const { hasAuthHint } = useSSRAuth();
 
 const getCurrentTabLabel = computed(() => {
   const currentTab = tabs.value.find(
@@ -237,6 +240,18 @@ const getCurrentTabLabel = computed(() => {
       typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`)
   );
   return currentTab?.label || 'Settings';
+});
+
+const isPermissionCheckPending = computed(() => {
+  if (!props.editMode || props.hasPermission) {
+    return false;
+  }
+
+  if (isLoadingAuthVar.value) {
+    return true;
+  }
+
+  return (isAuthenticatedVar.value || hasAuthHint.value) && !usernameVar.value;
 });
 </script>
 
@@ -313,237 +328,247 @@ const getCurrentTabLabel = computed(() => {
         </FormRow>
       </TailwindForm>
 
-      <TailwindForm
-        v-if="formValues && editMode"
-        form-title="Forum Settings"
-        :loading="editChannelLoading"
-        :needs-changes="titleIsInvalid"
-        :show-cancel-button="false"
-        @input="touched = true"
-        @submit="emit('submit')"
-      >
-        <div class="mt-5 w-full">
-          <!-- Mobile Dropdown -->
-          <div class="mb-4 lg:hidden">
-            <div class="relative">
-              <button
-                class="bg-gray-50 flex w-full items-center justify-between rounded-md border border-gray-300 px-4 py-2 text-sm dark:text-white"
-                type="button"
-                @click="isDropdownOpen = !isDropdownOpen"
-              >
-                <div class="flex items-center">
-                  <!-- For Font Awesome icons -->
+      <ClientOnly v-if="formValues && editMode">
+        <TailwindForm
+          form-title="Forum Settings"
+          :loading="editChannelLoading"
+          :needs-changes="titleIsInvalid"
+          :show-cancel-button="false"
+          @input="touched = true"
+          @submit="emit('submit')"
+        >
+          <div class="mt-5 w-full">
+            <!-- Mobile Dropdown -->
+            <div class="mb-4 lg:hidden">
+              <div class="relative">
+                <button
+                  class="bg-gray-50 flex w-full items-center justify-between rounded-md border border-gray-300 px-4 py-2 text-sm dark:text-white"
+                  type="button"
+                  @click="isDropdownOpen = !isDropdownOpen"
+                >
+                  <div class="flex items-center">
+                    <!-- For Font Awesome icons -->
+                    <i
+                      v-if="
+                        tabs.find(
+                          (tab) =>
+                            typeof route.name === 'string' &&
+                            route.name?.includes(`edit-${tab.key}`)
+                        )?.fontAwesome
+                      "
+                      :class="[
+                        tabs.find(
+                          (tab) =>
+                            typeof route.name === 'string' &&
+                            route.name?.includes(`edit-${tab.key}`)
+                        )?.fontAwesome,
+                        'mr-2 text-orange-500',
+                      ]"
+                    />
+                    <!-- For component icons -->
+                    <component
+                      :is="
+                        tabs.find(
+                          (tab) =>
+                            typeof route.name === 'string' &&
+                            route.name?.includes(`edit-${tab.key}`)
+                        )?.icon
+                      "
+                      v-else-if="
+                        tabs.find(
+                          (tab) =>
+                            typeof route.name === 'string' &&
+                            route.name?.includes(`edit-${tab.key}`)
+                        )?.icon
+                      "
+                      class="mr-2 h-5 w-5 text-orange-500"
+                    />
+                    <span>{{ getCurrentTabLabel }}</span>
+                  </div>
                   <i
-                    v-if="
-                      tabs.find(
-                        (tab) =>
-                          typeof route.name === 'string' &&
-                          route.name?.includes(`edit-${tab.key}`)
-                      )?.fontAwesome
-                    "
-                    :class="[
-                      tabs.find(
-                        (tab) =>
-                          typeof route.name === 'string' &&
-                          route.name?.includes(`edit-${tab.key}`)
-                      )?.fontAwesome,
-                      'mr-2 text-orange-500',
-                    ]"
+                    class="fa-solid fa-chevron-down"
+                    :class="{ 'rotate-180': isDropdownOpen }"
                   />
-                  <!-- For component icons -->
-                  <component
-                    :is="
-                      tabs.find(
-                        (tab) =>
-                          typeof route.name === 'string' &&
-                          route.name?.includes(`edit-${tab.key}`)
-                      )?.icon
-                    "
-                    v-else-if="
-                      tabs.find(
-                        (tab) =>
-                          typeof route.name === 'string' &&
-                          route.name?.includes(`edit-${tab.key}`)
-                      )?.icon
-                    "
-                    class="mr-2 h-5 w-5 text-orange-500"
-                  />
-                  <span>{{ getCurrentTabLabel }}</span>
-                </div>
-                <i
-                  class="fa-solid fa-chevron-down"
-                  :class="{ 'rotate-180': isDropdownOpen }"
-                />
-              </button>
+                </button>
 
-              <ul
-                v-if="isDropdownOpen"
-                class="absolute z-10 mt-1 w-full rounded-md border bg-white shadow-lg dark:bg-gray-800"
-              >
-                <li v-for="tab in tabs" :key="tab.key">
-                  <router-link
-                    class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    :class="{
-                      'bg-gray-50 text-orange-500 dark:bg-gray-700':
-                        typeof route.name === 'string' &&
-                        route.name?.includes(`edit-${tab.key}`),
-                      'text-gray-700 dark:text-gray-300':
-                        typeof route.name === 'string' &&
-                        !route.name?.includes(`edit-${tab.key}`),
-                    }"
-                    :to="{
-                      name: `forums-forumId-edit-${tab.key}`,
-                      params: {
-                        forumId,
-                      },
-                    }"
-                    @click="isDropdownOpen = false"
-                  >
-                    <!-- For Font Awesome icons -->
-                    <i
-                      v-if="tab.fontAwesome"
-                      :class="[
-                        tab.fontAwesome,
-                        'mr-2',
-                        {
+                <ul
+                  v-if="isDropdownOpen"
+                  class="absolute z-10 mt-1 w-full rounded-md border bg-white shadow-lg dark:bg-gray-800"
+                >
+                  <li v-for="tab in tabs" :key="tab.key">
+                    <router-link
+                      class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      :class="{
+                        'bg-gray-50 text-orange-500 dark:bg-gray-700':
+                          typeof route.name === 'string' &&
+                          route.name?.includes(`edit-${tab.key}`),
+                        'text-gray-700 dark:text-gray-300':
+                          typeof route.name === 'string' &&
+                          !route.name?.includes(`edit-${tab.key}`),
+                      }"
+                      :to="{
+                        name: `forums-forumId-edit-${tab.key}`,
+                        params: {
+                          forumId,
+                        },
+                      }"
+                      @click="isDropdownOpen = false"
+                    >
+                      <!-- For Font Awesome icons -->
+                      <i
+                        v-if="tab.fontAwesome"
+                        :class="[
+                          tab.fontAwesome,
+                          'mr-2',
+                          {
+                            'text-orange-500':
+                              typeof route.name === 'string' &&
+                              route.name?.includes(`edit-${tab.key}`),
+                            'text-gray-500 dark:text-gray-400':
+                              typeof route.name === 'string' &&
+                              !route.name?.includes(`edit-${tab.key}`),
+                          },
+                        ]"
+                      />
+                      <!-- For component icons -->
+                      <component
+                        :is="tab.icon"
+                        v-else-if="tab.icon"
+                        class="mr-2 h-5 w-5"
+                        :class="{
                           'text-orange-500':
                             typeof route.name === 'string' &&
                             route.name?.includes(`edit-${tab.key}`),
                           'text-gray-500 dark:text-gray-400':
                             typeof route.name === 'string' &&
                             !route.name?.includes(`edit-${tab.key}`),
-                        },
-                      ]"
-                    />
-                    <!-- For component icons -->
-                    <component
-                      :is="tab.icon"
-                      v-else-if="tab.icon"
-                      class="mr-2 h-5 w-5"
-                      :class="{
-                        'text-orange-500':
-                          typeof route.name === 'string' &&
-                          route.name?.includes(`edit-${tab.key}`),
-                        'text-gray-500 dark:text-gray-400':
-                          typeof route.name === 'string' &&
-                          !route.name?.includes(`edit-${tab.key}`),
-                      }"
-                    />
-                    {{ tab.label }}
-                  </router-link>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Desktop Sidebar and Content -->
-          <div class="flex w-full">
-            <!-- Left Sidebar (hidden on mobile) -->
-            <div
-              class="bg-gray-50 mr-4 hidden w-1/4 border-r border-gray-300 dark:border-gray-300 lg:block"
-            >
-              <ul class="flex flex-col space-y-2">
-                <li v-for="tab in tabs" :key="tab.key">
-                  <router-link
-                    class="flex cursor-pointer items-center py-2 text-sm"
-                    :class="{
-                      'border-r-2 border-orange-500 bg-orange-50 text-gray-900 font-medium dark:bg-orange-900/20 dark:text-white':
-                        typeof route.name === 'string' &&
-                        route.name?.includes(`edit-${tab.key}`),
-                      'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300':
-                        typeof route.name === 'string' &&
-                        !route.name?.includes(`edit-${tab.key}`),
-                    }"
-                    :to="{
-                      name: `forums-forumId-edit-${tab.key}`,
-                      params: {
-                        forumId,
-                      },
-                    }"
-                  >
-                    <!-- For Font Awesome icons -->
-                    <i
-                      v-if="tab.fontAwesome"
-                      :class="[
-                        tab.fontAwesome,
-                        'mr-2',
-                        {
-                          'text-orange-500':
-                            typeof route.name === 'string' &&
-                            route.name?.includes(`edit-${tab.key}`),
-                          'text-gray-500 dark:text-gray-400':
-                            typeof route.name === 'string' &&
-                            !route.name?.includes(`edit-${tab.key}`),
-                        },
-                      ]"
-                    />
-                    <!-- For component icons -->
-                    <component
-                      :is="tab.icon"
-                      v-else-if="tab.icon"
-                      class="mr-2 h-4 w-4"
-                      :class="{
-                        'text-orange-500':
-                          typeof route.name === 'string' &&
-                          route.name?.includes(`edit-${tab.key}`),
-                        'text-gray-500 dark:text-gray-400':
-                          typeof route.name === 'string' &&
-                          !route.name?.includes(`edit-${tab.key}`),
-                      }"
-                    />
-                    {{ tab.label }}
-                  </router-link>
-                </li>
-              </ul>
-            </div>
-
-            <!-- Main Content -->
-            <div class="flex-1">
-              <!-- Loading state while checking permissions -->
-              <div
-                v-if="!dataLoaded"
-                class="p-8 text-center text-gray-500 dark:text-gray-400"
-              >
-                <i class="fa-solid fa-spinner mr-2 animate-spin" />
-                Loading...
+                        }"
+                      />
+                      {{ tab.label }}
+                    </router-link>
+                  </li>
+                </ul>
               </div>
-              <!-- Permission denied message -->
+            </div>
+
+            <!-- Desktop Sidebar and Content -->
+            <div class="flex w-full">
+              <!-- Left Sidebar (hidden on mobile) -->
               <div
-                v-else-if="!hasPermission"
-                class="bg-yellow-50 m-4 rounded-lg p-6 dark:bg-yellow-900/20"
+                class="bg-gray-50 mr-4 hidden w-1/4 border-r border-gray-300 dark:border-gray-300 lg:block"
               >
-                <div class="flex items-start">
-                  <i class="fa-solid fa-lock mr-3 mt-0.5 text-yellow-500" />
-                  <div>
-                    <h3
-                      class="text-sm font-medium text-yellow-800 dark:text-yellow-200"
+                <ul class="flex flex-col space-y-2">
+                  <li v-for="tab in tabs" :key="tab.key">
+                    <router-link
+                      class="flex cursor-pointer items-center py-2 text-sm"
+                      :class="{
+                        'border-r-2 border-orange-500 bg-orange-50 text-gray-900 font-medium dark:bg-orange-900/20 dark:text-white':
+                          typeof route.name === 'string' &&
+                          route.name?.includes(`edit-${tab.key}`),
+                        'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300':
+                          typeof route.name === 'string' &&
+                          !route.name?.includes(`edit-${tab.key}`),
+                      }"
+                      :to="{
+                        name: `forums-forumId-edit-${tab.key}`,
+                        params: {
+                          forumId,
+                        },
+                      }"
                     >
-                      Permission Required
-                    </h3>
-                    <p
-                      class="mt-1 text-sm text-yellow-700 dark:text-yellow-300"
-                    >
-                      You don't have permission to edit this forum's settings.
-                      Only forum admins can access this page.
-                    </p>
+                      <!-- For Font Awesome icons -->
+                      <i
+                        v-if="tab.fontAwesome"
+                        :class="[
+                          tab.fontAwesome,
+                          'mr-2',
+                          {
+                            'text-orange-500':
+                              typeof route.name === 'string' &&
+                              route.name?.includes(`edit-${tab.key}`),
+                            'text-gray-500 dark:text-gray-400':
+                              typeof route.name === 'string' &&
+                              !route.name?.includes(`edit-${tab.key}`),
+                          },
+                        ]"
+                      />
+                      <!-- For component icons -->
+                      <component
+                        :is="tab.icon"
+                        v-else-if="tab.icon"
+                        class="mr-2 h-4 w-4"
+                        :class="{
+                          'text-orange-500':
+                            typeof route.name === 'string' &&
+                            route.name?.includes(`edit-${tab.key}`),
+                          'text-gray-500 dark:text-gray-400':
+                            typeof route.name === 'string' &&
+                            !route.name?.includes(`edit-${tab.key}`),
+                        }"
+                      />
+                      {{ tab.label }}
+                    </router-link>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Main Content -->
+              <div class="flex-1">
+                <div
+                  v-if="!dataLoaded || isPermissionCheckPending"
+                  class="p-8 text-center text-gray-500 dark:text-gray-400"
+                >
+                  <i class="fa-solid fa-spinner mr-2 animate-spin" />
+                  Loading...
+                </div>
+                <div
+                  v-else-if="!hasPermission"
+                  class="bg-yellow-50 m-4 rounded-lg p-6 dark:bg-yellow-900/20"
+                >
+                  <div class="flex items-start">
+                    <i class="fa-solid fa-lock mr-3 mt-0.5 text-yellow-500" />
+                    <div>
+                      <h3
+                        class="text-sm font-medium text-yellow-800 dark:text-yellow-200"
+                      >
+                        Permission Required
+                      </h3>
+                      <p
+                        class="mt-1 text-sm text-yellow-700 dark:text-yellow-300"
+                      >
+                        You don't have permission to edit this forum's settings.
+                        Only forum admins can access this page.
+                      </p>
+                    </div>
                   </div>
                 </div>
+                <NuxtPage
+                  v-else
+                  :edit-mode="true"
+                  :form-values="formValues"
+                  :title-is-invalid="titleIsInvalid"
+                  :touched="touched"
+                  :owner-list="ownerList"
+                  @submit="$emit('submit', $event)"
+                  @update-form-values="emit('updateFormValues', $event)"
+                />
               </div>
-              <!-- Normal content when user has permission -->
-              <NuxtPage
-                v-else
-                :edit-mode="true"
-                :form-values="formValues"
-                :title-is-invalid="titleIsInvalid"
-                :touched="touched"
-                :owner-list="ownerList"
-                @submit="$emit('submit', $event)"
-                @update-form-values="emit('updateFormValues', $event)"
-              />
             </div>
           </div>
-        </div>
-      </TailwindForm>
+        </TailwindForm>
+        <template #fallback>
+          <div class="animate-pulse rounded-lg p-4">
+            <div class="mb-4 h-8 w-48 rounded bg-gray-200 dark:bg-gray-700" />
+            <div class="mb-6 h-10 rounded bg-gray-200 dark:bg-gray-700" />
+            <div class="flex gap-4">
+              <div
+                class="hidden h-64 w-1/4 rounded bg-gray-200 dark:bg-gray-700 lg:block"
+              />
+              <div class="h-64 flex-1 rounded bg-gray-200 dark:bg-gray-700" />
+            </div>
+          </div>
+        </template>
+      </ClientOnly>
 
       <div v-for="(error, i) in getChannelError?.graphQLErrors" :key="i">
         {{ error.message }}
