@@ -13,6 +13,8 @@ import {
   getPermalinkToEventComment,
 } from '@/utils/routerUtils';
 import { getOriginalPoster } from '@/utils/originalPoster';
+import { getForumRoleBadge } from '@/utils/forumRoleBadges';
+import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
 
 const props = defineProps({
   commentId: {
@@ -27,6 +29,8 @@ const emit = defineEmits([
 ]);
 
 const route = useRoute();
+const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
+  useForumRoleMembership();
 const channelId = computed(() => {
   if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
@@ -49,6 +53,21 @@ const originalComment = computed(() => {
   }
 
   return commentResult.value?.comments && commentResult.value?.comments[0];
+});
+
+const forumRoleBadge = computed(() => {
+  const author = originalComment.value?.CommentAuthor;
+  const username = author?.__typename === 'User' ? author.username : null;
+  const modProfileName =
+    author?.__typename === 'ModerationProfile' ? author.displayName : null;
+
+  return getForumRoleBadge({
+    username,
+    modProfileName,
+    adminUsernames: forumAdminUsernames.value,
+    modUsernames: forumModUsernames.value,
+    modProfileNames: forumModProfileNames.value,
+  });
 });
 
 const botMentionForumId = computed(() => {
@@ -146,6 +165,7 @@ const permalinkObject = computed(() => {
           :parent-comment-id="originalComment?.parentCommentId"
           :show-context-link="true"
           :show-channel="false"
+          :forum-role-badge="forumRoleBadge"
         />
         <nuxt-link :to="permalinkObject" class="text-orange-500 underline">
           Context
