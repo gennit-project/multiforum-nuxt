@@ -1,5 +1,5 @@
 <script setup>
-import CirclePlusIcon from '@/components/icons/CirclePlusIcon.vue';
+import AddToChannelFavorites from '@/components/favorites/AddToChannelFavorites.vue';
 import { isAuthenticatedVar } from '@/cache';
 
 defineProps({
@@ -13,10 +13,6 @@ defineProps({
   },
 });
 
-const handleAddToCollection = () => {
-  // TODO: Implement addToFavorites mutation
-  // This would call the addToFavorites mutation with itemType: 'CHANNEL'
-};
 </script>
 
 <template>
@@ -50,14 +46,12 @@ const handleAddToCollection = () => {
     </div>
     <ClientOnly>
       <div v-if="isAuthenticatedVar" class="flex items-center pr-4">
-        <button
-          type="button"
-          :aria-label="`Add ${channel?.displayName || channelId} to collection`"
-          class="rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400"
-          @click="handleAddToCollection"
-        >
-          <CirclePlusIcon class="h-6 w-6" />
-        </button>
+        <AddToChannelFavorites
+          :allow-add-to-list="true"
+          :channel-unique-name="channelId"
+          :channel-display-name="channel?.displayName || ''"
+          size="medium"
+        />
       </div>
     </ClientOnly>
   </div>
