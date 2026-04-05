@@ -52,6 +52,7 @@ const props = defineProps({
 
 const emit = defineEmits<{
   close: [];
+  favoriteChange: [isFavorited: boolean];
 }>();
 
 const popoverRef = ref<HTMLElement | null>(null);
@@ -60,6 +61,9 @@ const isCreatingNew = ref(false);
 const newCollectionName = ref('');
 const isLoading = ref(false);
 const toastStore = useToastStore();
+const popoverIdBase = `add-to-list-popover-${props.itemType}-${props.itemId.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
+const popoverTitleId = `${popoverIdBase}-title`;
+const popoverDescriptionId = `${popoverIdBase}-description`;
 
 // Use composables
 const { collectionType, getCollectionQuery, getCheckItemQuery } =
@@ -267,6 +271,7 @@ const handleToggleInCollection = async (collection: CollectionListItem) => {
 
         await removeMutation(params);
         toastStore.showToast(`Removed from "${collection.name}"`);
+        emit('favoriteChange', false);
       } else {
         // Add to favorites
         const addMutation = getAddFavoriteMutation();
@@ -282,6 +287,7 @@ const handleToggleInCollection = async (collection: CollectionListItem) => {
 
         await addMutation(params);
         toastStore.showToast(`Added to "${collection.name}"`);
+        emit('favoriteChange', true);
       }
 
       // Refresh the data
@@ -386,19 +392,36 @@ const popoverStyles = computed(() => {
       class="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 px-4"
       @click="emit('close')"
     >
-      <div ref="popoverRef" :class="popoverClasses" @click.stop>
+      <div
+        ref="popoverRef"
+        :class="popoverClasses"
+        role="dialog"
+        aria-modal="true"
+        :aria-labelledby="popoverTitleId"
+        :aria-describedby="popoverDescriptionId"
+        tabindex="-1"
+        @click.stop
+      >
         <!-- Header -->
         <div class="mb-3 flex items-center justify-between">
-          <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+          <p
+            :id="popoverTitleId"
+            class="text-sm font-medium text-gray-900 dark:text-white"
+          >
             Add to List
-          </h3>
+          </p>
           <button
+            type="button"
+            aria-label="Close"
             class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             @click="emit('close')"
           >
             ×
           </button>
         </div>
+        <p :id="popoverDescriptionId" class="sr-only">
+          Add this item to favorites or one of your collections.
+        </p>
 
         <!-- Search Bar -->
         <div class="mb-3">
@@ -406,6 +429,7 @@ const popoverStyles = computed(() => {
             v-model="searchTerm"
             type="text"
             placeholder="Search lists..."
+            aria-label="Search lists"
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
           >
         </div>
@@ -426,6 +450,7 @@ const popoverStyles = computed(() => {
               v-model="newCollectionName"
               type="text"
               placeholder="Enter list name..."
+              aria-label="New list name"
               class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
               @keyup.enter="handleCreateNewCollection"
               @keyup.escape="isCreatingNew = false"
@@ -546,19 +571,28 @@ const popoverStyles = computed(() => {
         </div>
       </div>
     </div>
-    <div
-      v-else-if="isVisible"
-      ref="popoverRef"
-      :class="popoverClasses"
-      :style="popoverStyles"
-      @click.stop
-    >
+      <div
+        v-else-if="isVisible"
+        ref="popoverRef"
+        :class="popoverClasses"
+        :style="popoverStyles"
+        role="dialog"
+        aria-modal="false"
+        :aria-labelledby="popoverTitleId"
+        :aria-describedby="popoverDescriptionId"
+        tabindex="-1"
+        @click.stop
+      >
       <!-- Header -->
       <div class="mb-3 flex items-center justify-between">
-        <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+        <p
+          :id="popoverTitleId"
+          class="text-sm font-medium text-gray-900 dark:text-white"
+        >
           Add to List
-        </h3>
+        </p>
         <button
+          type="button"
           aria-label="Close"
           class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
           @click="emit('close')"
@@ -566,6 +600,9 @@ const popoverStyles = computed(() => {
           ×
         </button>
       </div>
+      <p :id="popoverDescriptionId" class="sr-only">
+        Add this item to favorites or one of your collections.
+      </p>
 
       <!-- Search Bar -->
       <div class="mb-3">

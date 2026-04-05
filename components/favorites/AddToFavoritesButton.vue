@@ -36,6 +36,7 @@ const props = defineProps({
 
 const emit = defineEmits<{
   toggle: [];
+  favoriteChange: [isFavorited: boolean];
 }>();
 
 const isAnimating = ref(false);
@@ -147,6 +148,10 @@ const updatePopoverPosition = async () => {
 
 const closePopover = () => {
   showPopover.value = false;
+};
+
+const handleFavoriteChange = (isFavorited: boolean) => {
+  emit('favoriteChange', isFavorited);
 };
 
 const updateTooltipPosition = async () => {
@@ -321,6 +326,7 @@ watch(
           :position="popoverPosition"
           :is-already-favorite="isFavorited"
           @close="closePopover"
+          @favorite-change="handleFavoriteChange"
         />
       </div>
     </template>
@@ -377,6 +383,7 @@ watch(
           :position="popoverPosition"
           :is-already-favorite="isFavorited"
           @close="closePopover"
+          @favorite-change="handleFavoriteChange"
         />
       </div>
     </template>
