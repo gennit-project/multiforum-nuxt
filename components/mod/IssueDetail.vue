@@ -48,6 +48,7 @@ import {
 import NotificationComponent from '@/components/NotificationComponent.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
+import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
 
 type Issue = GeneratedIssue & {
   issueNumber: number;
@@ -81,6 +82,8 @@ const channelId = computed(() => {
   if (props.channelId) return props.channelId;
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
+
+provideForumRoleMembership(channelId);
 
 const issueNumber = computed(() => {
   if (props.issueNumber !== null) return props.issueNumber;

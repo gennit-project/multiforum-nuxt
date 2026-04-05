@@ -25,6 +25,7 @@ import AlbumEditForm from './AlbumEditForm.vue';
 import ArchivedDiscussionInfoBanner from './ArchivedDiscussionInfoBanner.vue';
 import DiscussionLayoutManager from './DiscussionLayoutManager.vue';
 import FeedbackModalManager from './FeedbackModalManager.vue';
+import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
 
 const COMMENT_LIMIT = 50;
 
@@ -65,6 +66,8 @@ const channelId = computed(() => {
 });
 const loggedInUserModName = computed(() => modProfileNameVar.value);
 const lastValidDiscussion = ref<Discussion | null>(null);
+
+provideForumRoleMembership(channelId);
 
 const {
   result: getDiscussionResult,

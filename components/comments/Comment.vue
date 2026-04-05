@@ -22,6 +22,8 @@ import { useCommentPermissions } from '@/composables/useCommentPermissions';
 import { useBestAnswerMutations } from '@/composables/useBestAnswerMutations';
 import { useCommentPermalink } from '@/composables/useCommentPermalink';
 import { getCommentMenuItems } from '@/utils/headerPermissionUtils';
+import { getForumRoleBadge } from '@/utils/forumRoleBadges';
+import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
 import {
   SUBSCRIBE_TO_COMMENT,
   UNSUBSCRIBE_FROM_COMMENT,
@@ -226,6 +228,8 @@ const forumId = computed(() => {
 
 // Use the permission composable
 const { userPermissions } = useCommentPermissions(forumId);
+const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
+  useForumRoleMembership();
 
 // Reactive refs for the best answer composable
 const commentIdRef = computed(() => props.commentData.id);
@@ -300,6 +304,20 @@ const replyCount = computed(() => {
 });
 
 const textCopy = computed(() => props.commentData.text);
+const forumRoleBadge = computed(() => {
+  const author = props.commentData?.CommentAuthor;
+  const username = author?.__typename === 'User' ? author.username : null;
+  const modProfileName =
+    author?.__typename === 'ModerationProfile' ? author.displayName : null;
+
+  return getForumRoleBadge({
+    username,
+    modProfileName,
+    adminUsernames: forumAdminUsernames.value,
+    modUsernames: forumModUsernames.value,
+    modProfileNames: forumModProfileNames.value,
+  });
+});
 
 // Compute menu items using the utility function
 const commentMenuItems = computed(() => {
@@ -490,6 +508,7 @@ const label = computed(() => {
               :label="label"
               :is-answer="isMarkedAsAnswer"
               :bot-usernames="props.botUsernames"
+              :forum-role-badge="forumRoleBadge"
             />
             <div
               class="ml-4 flex-grow border-l border-gray-300 pl-4 dark:border-gray-600"
