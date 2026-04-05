@@ -81,6 +81,39 @@ This document analyzes the current moderation implementation across both the fro
 
 ---
 
+## Phase 1 Execution Checklist
+
+### Backend First
+
+- [ ] Fix `canCreateChannel` in `/rules/rules.ts` so server-scope forum-creation checks actually await `hasServerPermission()`
+- [ ] Add a backend rule test that proves suspended users are blocked from forum creation after the fix
+- [ ] Create one shared helper for resolving the issue target from discussion/event/comment-backed issues
+- [ ] Refactor `createSuspensionResolver.ts`, `createUnsuspendResolver.ts`, and `isOriginalPosterSuspended.ts` to use that shared helper
+- [ ] Make issue-linked suspension reads use the same active/expired logic as `getActiveSuspension()`
+- [ ] Add backend tests for `isExpiredSuspension()`, `getActiveSuspension()` edge cases, and mixed user/mod cleanup in `disconnectExpiredSuspensions()`
+- [ ] Introduce `ServerAdmins` and `ServerModerators` relationships on `ServerConfig`
+- [ ] Add backend queries/helpers that resolve server-scoped admin/mod membership from `ServerConfig`, not `showAdminTag`
+- [ ] Add backend tests proving server-scoped badge resolution and membership reads come from `ServerConfig`
+
+### Frontend Second
+
+- [ ] Standardize suspension-blocked UX across forum creation, discussion creation, event creation, comment creation, and emoji/reaction attempts
+- [ ] Hide or disable emoji controls where suspended state is already known, while preserving backend enforcement as the source of truth
+- [ ] Add stronger TypeScript typing for moderation permission objects and suspension-related UI state
+- [ ] Start replacing `showAdminTag`-driven server-scoped labels with data derived from `ServerConfig` membership
+- [ ] Rework comment/detail/list author badge resolution so server-scoped labels mirror channel-scoped labels
+- [ ] Add frontend tests for suspended-user reaction UI, permission fallback chains, suspended-mod action visibility, and ServerConfig-based badge resolution
+
+### Verification Then Follow-On
+
+- [ ] Re-run and tighten `tests/cypress/e2e/suspensions/serverLevelSuspension.spec.cy.ts` against the fixed backend rule path
+- [ ] Add E2E coverage for expired suspension cleanup and immediate post-unsuspension recovery
+- [ ] Add E2E coverage for server admin and server mod badges based on `ServerConfig` relationships
+- [ ] Confirm any remaining `showAdminTag` usage is either removed or explicitly scoped as temporary migration code
+- [ ] Only after the above is stable, move into suspended-user polish and suspended-mod workflow expansion
+
+---
+
 ## Current Implementation Overview
 
 ### What's Already Built
