@@ -184,6 +184,8 @@
   ```
 
 - **Vue Components**: Use script setup API with TypeScript and properly typed props/emits
+- **RequireAuth slot pattern**: For auth-gated controls that should look identical in both auth states, extract a shared presentational child component.
+  Use a thin functional wrapper for the authenticated slot when the real behavior needs to be attached, and render the shared child directly in the unauthenticated slot unless a placebo wrapper is genuinely useful.
 - **Error Handling**: Use try/catch with specific error types, validate GraphQL responses
 - **Apollo useMutation**: Always leverage `useMutation`’s built-in `loading`, `error`, and `onDone` hooks instead of recreating that state yourself. Bind UI disabled/loading states directly to the mutation’s `loading` ref and surface errors via the `error` ref.
 - **Naming**: camelCase for variables/functions, PascalCase for components/interfaces
