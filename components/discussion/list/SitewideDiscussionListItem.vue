@@ -225,7 +225,7 @@ const revealSensitiveContent = () => {
             <div class="flex items-start gap-2">
               <span
                 :class="isSelected ? 'text-black' : ''"
-                class="cursor-pointer text-sm hover:text-gray-500 dark:text-orange-400 dark:hover:text-orange-300"
+                class="cursor-pointer text-sm hover:text-gray-500 dark:text-orange-300 dark:hover:text-orange-200"
               >
                 <HighlightedSearchTerms
                   :text="title"
@@ -248,7 +248,7 @@ const revealSensitiveContent = () => {
             <div class="flex items-start gap-2">
               <span
                 :class="isSelected ? 'text-black' : ''"
-                class="cursor-pointer text-sm hover:text-gray-500 dark:text-orange-400 dark:hover:text-orange-300"
+                class="cursor-pointer text-sm hover:text-gray-500 dark:text-orange-300 dark:hover:text-orange-200"
               >
                 <HighlightedSearchTerms
                   :text="title"
