@@ -24,6 +24,7 @@ import ArchivedCommentText from '@/components/comments/ArchivedCommentText.vue';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
+import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 
 const props = defineProps({
   comment: {
@@ -223,30 +224,47 @@ function updateText(text: string) {
   updateCommentInput.value.text = text;
 }
 
-const showBrokenRulesModal = ref(false);
-const showSuccessfullyReported = ref(false);
-const showArchiveModal = ref(false);
-const showSuccessfullyArchived = ref(false);
-const showArchiveAndSuspendModal = ref(false);
-const showSuccessfullyArchivedAndSuspended = ref(false);
+const {
+  showReportModal: showBrokenRulesModal,
+  showArchiveModal,
+  showUnarchiveModal,
+  showArchiveAndSuspendModal,
+  showSuccessfullyReported,
+  showSuccessfullyArchived,
+  showSuccessfullyUnarchived,
+  showSuccessfullyArchivedAndSuspended,
+  openReportModal,
+  openArchiveModal,
+  openUnarchiveModal,
+  openArchiveAndSuspendModal,
+  closeReportModal,
+  closeArchiveModal,
+  closeUnarchiveModal,
+  closeArchiveAndSuspendModal,
+  handleReportedSuccessfully,
+  handleArchivedSuccessfully,
+  handleUnarchivedSuccessfully,
+  handleArchivedAndSuspendedSuccessfully,
+  dismissReportedNotification,
+  dismissArchivedNotification,
+  dismissUnarchivedNotification,
+  dismissArchivedAndSuspendedNotification,
+} = useModerationOutcomeUI();
 
 function handleReport() {
-  showBrokenRulesModal.value = true;
+  openReportModal();
 }
 
 function handleArchive() {
-  showArchiveModal.value = true;
+  openArchiveModal();
 }
 
 function handleArchiveAndSuspend() {
-  showArchiveAndSuspendModal.value = true;
+  openArchiveAndSuspendModal();
 }
 
-const showUnarchiveModal = ref(false);
-const showSuccessfullyUnarchived = ref(false);
-
 function handleUnarchive() {
-  showUnarchiveModal.value = true;
+  openUnarchiveModal();
 }
 </script>
 
@@ -375,26 +393,16 @@ function handleUnarchive() {
       :comment-id="comment.id"
       :comment="comment"
       :channel-unique-name="forumId as string"
-      @close="showBrokenRulesModal = false"
-      @report-submitted-successfully="
-        () => {
-          showSuccessfullyReported = true;
-          showBrokenRulesModal = false;
-        }
-      "
+      @close="closeReportModal"
+      @report-submitted-successfully="handleReportedSuccessfully"
     />
     <BrokenRulesModal
       v-if="showArchiveModal"
       :open="showArchiveModal"
       :comment-id="comment.id"
       :archive-after-reporting="true"
-      @close="showArchiveModal = false"
-      @reported-and-archived-successfully="
-        () => {
-          showSuccessfullyArchived = true;
-          showArchiveModal = false;
-        }
-      "
+      @close="closeArchiveModal"
+      @reported-and-archived-successfully="handleArchivedSuccessfully"
     />
     <BrokenRulesModal
       v-if="showArchiveAndSuspendModal"
@@ -403,45 +411,35 @@ function handleUnarchive() {
       :comment-id="comment.id"
       :suspend-user-enabled="true"
       :text-box-label="'(Optional) Explain why you are suspending this author:'"
-      @close="showArchiveAndSuspendModal = false"
-      @suspended-user-successfully="
-        () => {
-          showSuccessfullyArchivedAndSuspended = true;
-          showArchiveAndSuspendModal = false;
-        }
-      "
+      @close="closeArchiveAndSuspendModal"
+      @suspended-user-successfully="handleArchivedAndSuspendedSuccessfully"
     />
     <UnarchiveModal
       v-if="showUnarchiveModal"
       :open="showUnarchiveModal"
       :comment-id="comment.id"
-      @close="showUnarchiveModal = false"
-      @unarchived-successfully="
-        () => {
-          showSuccessfullyUnarchived = true;
-          showUnarchiveModal = false;
-        }
-      "
+      @close="closeUnarchiveModal"
+      @unarchived-successfully="handleUnarchivedSuccessfully"
     />
     <Notification
       :show="showSuccessfullyReported"
       :title="'Your report was submitted successfully.'"
-      @close-notification="showSuccessfullyReported = false"
+      @close-notification="dismissReportedNotification"
     />
     <Notification
       :show="showSuccessfullyArchived"
       :title="'The content was reported and archived successfully.'"
-      @close-notification="showSuccessfullyArchived = false"
+      @close-notification="dismissArchivedNotification"
     />
     <Notification
       :show="showSuccessfullyArchivedAndSuspended"
       :title="'Archived the post and suspended the author.'"
-      @close-notification="showSuccessfullyArchivedAndSuspended = false"
+      @close-notification="dismissArchivedAndSuspendedNotification"
     />
     <Notification
       :show="showSuccessfullyUnarchived"
       :title="'The content was unarchived successfully.'"
-      @close-notification="showSuccessfullyUnarchived = false"
+      @close-notification="dismissUnarchivedNotification"
     />
   </div>
 </template>
