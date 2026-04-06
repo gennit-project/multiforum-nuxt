@@ -5,11 +5,9 @@ import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
 import { usernameVar, modProfileNameVar } from '@/cache';
-import {
-  getAllPermissions,
-  type PermissionFlags,
-} from '@/utils/permissionUtils';
+import type { PermissionFlags } from '@/utils/permissionUtils';
 import { config } from '@/config';
+import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
 
 type UseCommentPermissionsReturn = {
   userPermissions: ComputedRef<PermissionFlags>;
@@ -69,45 +67,20 @@ export function useCommentPermissions(
     }
   );
 
-  // Compute the standard (default) mod role from channel or server config
-  const standardModRole = computed(() => {
-    if (getChannelResult.value?.channels[0]?.DefaultModRole) {
-      return getChannelResult.value.channels[0].DefaultModRole;
-    }
-    if (getServerResult.value?.serverConfigs[0]?.DefaultModRole) {
-      return getServerResult.value.serverConfigs[0].DefaultModRole;
-    }
-    return null;
-  });
+  const channelData = computed(() => getChannelResult.value?.channels?.[0] ?? null);
+  const serverConfig = computed(
+    () => getServerResult.value?.serverConfigs?.[0] ?? null
+  );
+  const permissionData = computed(
+    () => getPermissionResult.value?.channels?.[0] ?? null
+  );
 
-  // Compute the elevated mod role from channel or server config
-  const elevatedModRole = computed(() => {
-    if (getChannelResult.value?.channels[0]?.ElevatedModRole) {
-      return getChannelResult.value.channels[0].ElevatedModRole;
-    }
-    if (getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole) {
-      return getServerResult.value.serverConfigs[0].DefaultElevatedModRole;
-    }
-    return null;
-  });
-
-  // Extract permission data from the channel query
-  const permissionData = computed(() => {
-    if (getPermissionResult.value?.channels?.[0]) {
-      return getPermissionResult.value.channels[0];
-    }
-    return null;
-  });
-
-  // Compute all user permissions using the utility function
-  const userPermissions = computed(() => {
-    return getAllPermissions({
-      permissionData: permissionData.value,
-      standardModRole: standardModRole.value,
-      elevatedModRole: elevatedModRole.value,
-      username: usernameVar.value,
-      modProfileName: modProfileNameVar.value,
-    });
+  const { userPermissions } = useResolvedModPermissions({
+    channelData,
+    serverConfig,
+    permissionData,
+    username: computed(() => usernameVar.value),
+    modProfileName: computed(() => modProfileNameVar.value),
   });
 
   // Combined loading state

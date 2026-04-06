@@ -28,7 +28,6 @@ import IssueBodyEditor from '@/components/mod/IssueBodyEditor.vue';
 import IssueRelatedContent from '@/components/mod/IssueRelatedContent.vue';
 import { modProfileNameVar, usernameVar } from '@/cache';
 import { useRoute, useRouter } from 'nuxt/app';
-import { getAllPermissions } from '@/utils/permissionUtils';
 import { config } from '@/config';
 import {
   isCurrentUserOriginalPoster as isOriginalPoster,
@@ -49,6 +48,7 @@ import NotificationComponent from '@/components/NotificationComponent.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
+import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
 
 type Issue = GeneratedIssue & {
   issueNumber: number;
@@ -336,41 +336,17 @@ const dismissSubscribeCta = async () => {
 
 const isLocked = computed(() => activeIssue.value?.locked === true);
 
-const standardModRole = computed(() => {
-  if (getChannelResult.value?.channels?.[0]?.DefaultModRole) {
-    return getChannelResult.value.channels[0].DefaultModRole;
-  }
-  if (getServerResult.value?.serverConfigs?.[0]?.DefaultModRole) {
-    return getServerResult.value.serverConfigs[0].DefaultModRole;
-  }
-  return null;
-});
-
-const elevatedModRole = computed(() => {
-  if (getChannelResult.value?.channels?.[0]?.ElevatedModRole) {
-    return getChannelResult.value.channels[0].ElevatedModRole;
-  }
-  if (getServerResult.value?.serverConfigs?.[0]?.DefaultElevatedModRole) {
-    return getServerResult.value.serverConfigs[0].DefaultElevatedModRole;
-  }
-  return null;
-});
-
-const permissionData = computed(() => {
-  if (getChannelResult.value?.channels?.[0]) {
-    return getChannelResult.value.channels[0];
-  }
-  return null;
-});
-
-const modPermissions = computed(() => {
-  return getAllPermissions({
-    permissionData: permissionData.value,
-    standardModRole: standardModRole.value,
-    elevatedModRole: elevatedModRole.value,
-    username: usernameVar.value,
-    modProfileName: modProfileNameVar.value,
-  });
+const channelPermissionData = computed(
+  () => getChannelResult.value?.channels?.[0] ?? null
+);
+const serverConfig = computed(
+  () => getServerResult.value?.serverConfigs?.[0] ?? null
+);
+const { userPermissions: modPermissions } = useResolvedModPermissions({
+  channelData: channelPermissionData,
+  serverConfig,
+  username: computed(() => usernameVar.value),
+  modProfileName: computed(() => modProfileNameVar.value),
 });
 
 const isSuspendedMod = computed(() => {

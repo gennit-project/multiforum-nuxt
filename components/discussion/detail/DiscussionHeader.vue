@@ -13,7 +13,6 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import EllipsisHorizontal from '@/components/icons/EllipsisHorizontal.vue';
-import { getAllPermissions } from '@/utils/permissionUtils';
 import { getDiscussionHeaderMenuItems } from '@/utils/headerPermissionUtils';
 import { usernameVar, modProfileNameVar } from '@/cache';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
@@ -32,6 +31,7 @@ import type { Discussion } from '@/__generated__/graphql';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
+import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
 
 const props = defineProps<{
   discussion: Discussion | null;
@@ -213,31 +213,6 @@ const { result: getServerResult } = useQuery(
   }
 );
 
-// Get the standard and elevated mod roles from the channel or server default
-const standardModRole = computed(() => {
-  // If the channel has a Default Mod Role, return that
-  if (getChannelResult.value?.channels[0]?.DefaultModRole) {
-    return getChannelResult.value?.channels[0]?.DefaultModRole;
-  }
-  // Otherwise, return the default mod role from the server config
-  if (getServerResult.value?.serverConfigs[0]?.DefaultModRole) {
-    return getServerResult.value?.serverConfigs[0]?.DefaultModRole;
-  }
-  return null;
-});
-
-const elevatedModRole = computed(() => {
-  // If the channel has a Default Elevated Mod Role, return that
-  if (getChannelResult.value?.channels[0]?.ElevatedModRole) {
-    return getChannelResult.value?.channels[0]?.ElevatedModRole;
-  }
-  // Otherwise, return the default elevated mod role from server config
-  if (getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole) {
-    return getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole;
-  }
-  return null;
-});
-
 // Query user's permissions in the channel
 const { result: getPermissionResult } = useQuery(
   USER_IS_MOD_OR_OWNER_IN_CHANNEL,
@@ -259,23 +234,19 @@ const { result: getPermissionResult } = useQuery(
   }
 );
 
-// Get permission data from the query result
-const permissionData = computed(() => {
-  if (getPermissionResult.value?.channels?.[0]) {
-    return getPermissionResult.value.channels[0];
-  }
-  return null;
-});
-
-// Get all permissions for the current user using our utility function
-const userPermissions = computed(() => {
-  return getAllPermissions({
-    permissionData: permissionData.value,
-    standardModRole: standardModRole.value,
-    elevatedModRole: elevatedModRole.value,
-    username: usernameVar.value,
-    modProfileName: modProfileNameVar.value,
-  });
+const channelData = computed(() => getChannelResult.value?.channels?.[0] ?? null);
+const serverConfig = computed(
+  () => getServerResult.value?.serverConfigs?.[0] ?? null
+);
+const permissionData = computed(
+  () => getPermissionResult.value?.channels?.[0] ?? null
+);
+const { userPermissions } = useResolvedModPermissions({
+  channelData,
+  serverConfig,
+  permissionData,
+  username: computed(() => usernameVar.value),
+  modProfileName: computed(() => modProfileNameVar.value),
 });
 
 const permalinkObject = computed(() => {
