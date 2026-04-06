@@ -9,6 +9,10 @@ import { ALLOWED_ICONS } from '@/utils';
 import type { User, ModerationProfile } from '@/__generated__/graphql';
 import type { RouteLocationRaw } from 'vue-router';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import type {
+  PermissionFlags,
+  CorePermissionFlag,
+} from '@/utils/permissionUtils';
 
 // Type for comment author with role information
 type AuthorWithRoles =
@@ -25,7 +29,10 @@ type AuthorWithRoles =
 type ContentType = 'discussion' | 'event' | 'comment';
 
 // Permission key for hiding content by type
-const HIDE_PERMISSION_MAP: Record<ContentType, string> = {
+const HIDE_PERMISSION_MAP: Record<
+  ContentType,
+  'canHideDiscussion' | 'canHideEvent' | 'canHideComment'
+> = {
   discussion: 'canHideDiscussion',
   event: 'canHideEvent',
   comment: 'canHideComment',
@@ -39,7 +46,7 @@ const HIDE_PERMISSION_MAP: Record<ContentType, string> = {
  * @returns boolean indicating if the user can perform mod actions
  */
 export const canPerformModActions = (
-  userPermissions: Record<string, boolean>,
+  userPermissions: PermissionFlags,
   contentType?: ContentType
 ): boolean => {
   // Suspended mods cannot perform any mod actions
@@ -84,7 +91,7 @@ export const canPerformModActions = (
  */
 export const buildArchiveMenuItems = (params: {
   isArchived: boolean;
-  userPermissions: Record<string, boolean>;
+  userPermissions: PermissionFlags;
   contentType: ContentType;
   contentId: string;
   archiveEvent?: string;
@@ -102,7 +109,7 @@ export const buildArchiveMenuItems = (params: {
   } = params;
 
   const modActions: MenuItem[] = [];
-  const hidePermission = HIDE_PERMISSION_MAP[contentType];
+  const hidePermission: CorePermissionFlag = HIDE_PERMISSION_MAP[contentType];
 
   if (!isArchived) {
     if (userPermissions[hidePermission]) {
@@ -174,7 +181,7 @@ export const buildModerationSection = (
 export const getDiscussionHeaderMenuItems = (params: {
   isOwnDiscussion: boolean;
   isArchived: boolean;
-  userPermissions: Record<string, boolean>;
+  userPermissions: PermissionFlags;
   isLoggedIn: boolean;
   discussionId: string;
   hasAlbum?: boolean;
@@ -316,7 +323,7 @@ export const getEventHeaderMenuItems = (params: {
   isOwnEvent: boolean;
   isArchived: boolean;
   isCanceled: boolean;
-  userPermissions: Record<string, boolean>;
+  userPermissions: PermissionFlags;
   isLoggedIn: boolean;
   eventId: string;
   isOnFeedbackPage?: boolean;
@@ -527,7 +534,7 @@ export const getCommentMenuItems = (params: {
   isMarkedAsAnswer: boolean;
   depth: number;
   discussionId: string | undefined;
-  userPermissions: Record<string, boolean>;
+  userPermissions: PermissionFlags;
   isLoggedIn: boolean;
   enableFeedback: boolean;
   canShowPermalink: boolean;
