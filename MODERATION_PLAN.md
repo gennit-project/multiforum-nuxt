@@ -1,69 +1,5 @@
 # Moderation Features: Current State vs Roadmap Plan
 
-## Executive Summary
-
-This document analyzes the current moderation implementation across both the frontend (gennit-nuxt) and backend (gennit-backend) codebases, compares it against the planned roadmap, identifies gaps, and proposes implementation tasks including tech debt items and new tests.
-
----
-
-## Needs Manual Testing/QA
-
-These items are implemented and should stay visible for validation, regression checks, and UX review, but they are no longer part of the active to-do list.
-
-### Implemented Tests To Re-Verify
-
-| Item                                                                                                                                    | Location                             | QA Focus                                                                                                  |
-| --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| `canCreateChannel` actually awaits and enforces `hasServerPermission()`                                                                 | Backend rule test                    | Keep this in backend coverage and verify it protects the real server-suspension forum-creation path       |
-| `isOriginalPosterSuspended` agrees with `getActiveSuspension()` for user and mod targets                                                | Backend tests                        | Re-verify against future suspension refactors                                                             |
-| `isExpiredSuspension()` logic                                                                                                           | Backend tests                        | Validate expiry edge cases against production-like timestamps                                             |
-| `disconnectExpiredSuspensions()` no-op and mixed user/mod cleanup paths                                                                 | Backend tests                        | Re-verify both cleanup branches under real mutation flows                                                 |
-| Shared suspension target resolution for discussion/event/comment-backed issues                                                          | Backend tests                        | Re-verify issue target resolution against future issue model changes                                      |
-| Server-scoped admin/mod membership resolves from `ServerConfig` relationships instead of `showAdminTag`                                 | Backend + frontend implementation    | Manual validation across comments, discussions, events, profile/library surfaces, and admin editing flows |
-| Display "Server Admin" and "Server Mod" labels consistently on comments                                                                 | Frontend implementation              | Manual cross-surface verification before relying solely on E2E coverage                                   |
-| Create/forum/discussion/event/comment flows suppress raw suspension-blocked errors when suspension context is available                 | Frontend unit tests + implementation | Re-verify against real GraphQL permission failures and stale cache cases                                  |
-| Comment and discussion emoji controls show suspension-aware blocked-action UI                                                           | Frontend unit tests + implementation | Manual verification across both existing reactions and add-reaction entry points                          |
-| Suspended moderator issue-comment and moderation controls stay disabled in the main moderation UI                                       | Frontend unit tests + implementation | Re-verify on actual issue detail pages and related moderation surfaces                                    |
-| `useServerRoleMembership()` maps `ServerConfig.Admins` and `ServerConfig.Moderators` into the shared badge inputs                       | Frontend unit tests                  | Re-verify if the `ServerConfig` membership shape changes again                                            |
-| Inline discussion and event root-comment forms suppress raw permission errors when suspension context is already known                  | Frontend unit tests + implementation | Re-verify against real blocked comment mutations in discussion and event detail pages                     |
-| Shared suspend/unsuspend button UI composable preserves modal and notification behavior                                                 | Frontend unit tests + refactor       | Re-verify suspend/unsuspend flows across both user and mod issue actions                                  |
-| Shared moderation outcome UI composable preserves report/archive/unarchive/archive-and-suspend notifications and modal closing behavior | Frontend unit tests + refactor       | Re-verify discussion, event, and feedback moderation flows after real modal submissions                   |
-| Comment section and archive button now rely on the shared moderation outcome workflow                                                   | Frontend unit tests + refactor       | Re-verify archive/unarchive/report flows from comment lists and issue action surfaces                     |
-
----
-
-## Verification & QA Backlog
-
-This section is intentionally verification-only. If an item requires new product code, it belongs later in the document under implementation planning.
-
-### Manual / Product QA
-
-| Task                                                                                                                 | Location | Reason                                                                                                                                                        |
-| -------------------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Verify blocked-action UX on real pages after the shared suspension-aware pass                                        | Frontend | The major create, reaction, and comment-entry paths are implemented; what remains is manual verification against real GraphQL failures and stale cache states |
-| Re-check `getActiveSuspension()` against any newly discovered production edge case before broadening its API surface | Backend  | The helper now has direct sequencing and fallback coverage; remaining risk is mostly production-data shape drift rather than a known code gap                 |
-| Validate the new server membership editor UX for larger admin/mod lists                                              | Frontend | The data model migration is done; remaining risk is usability for large server teams                                                                          |
-
-### Non-E2E Verification Gaps
-
-| Test                                                                                      | Priority | Location       |
-| ----------------------------------------------------------------------------------------- | -------- | -------------- |
-| Verify whether expired suspension cleanup still has uncovered active/no-active edge cases | High     | Backend tests  |
-| Additional component-level server badge rendering on any still-uncovered major surface    | Medium   | Frontend tests |
-
-### Verification Checklist
-
-- [ ] Manually verify the implemented blocked-action flows on real pages and move any failures into the Cypress section or a new bug list
-- [ ] Re-verify `getActiveSuspension()` only if a new production edge case appears during QA or future suspension work
-- [ ] Add component-level badge coverage only if QA uncovers an untested major surface
-- [ ] Run the remaining stabilization verification from the dedicated Cypress section at the end of this document
-- [ ] Verify existing emoji mutations are blocked for suspended users via `canUpvote*` permissions
-- [ ] Re-check expired suspension cleanup behavior
-- [ ] Verify suspended issue notification includes issue link, expiration date, and blocked action context
-- [ ] Verify issue page editing is disabled for suspended mods
-- [ ] Verify blocked and restored mod-action behavior across suspended, unsuspended, and expired states
-- [ ] Validate the new server membership editor UX for larger admin/mod lists
-
 ## Planned Code Changes
 
 ### Tech Debt & Refactoring
@@ -110,6 +46,8 @@ This section is intentionally verification-only. If an item requires new product
 | Task | Location | Type |
 |------|----------|------|
 | Ensure notification UI shows issue link and expiration clearly | Frontend | Feature/Polish |
+| Add suspension notification opt-out to notification settings | Frontend | Feature |
+| Persist and honor the suspension-notification preference in backend notification delivery | Backend | Feature |
 
 ---
 
@@ -149,7 +87,7 @@ This section is intentionally verification-only. If an item requires new product
 | Audit all mod-only UI elements for suspension checks | Frontend | Tech Debt |
 | Add "You are suspended" banner on moderation pages for suspended mods. Make sure it has a working issue link. | Frontend | Feature |
 
-### 8. Suspended Bots
+### Suspended Bots
 
 **Current State:**
 
@@ -172,7 +110,7 @@ This section is intentionally verification-only. If an item requires new product
 
 ---
 
-### 9. Mod Profile Suspension Workflow
+### Mod Profile Suspension Workflow
 
 **Planned Code Changes:**
 | Task | Location | Type |
@@ -188,7 +126,7 @@ This section is intentionally verification-only. If an item requires new product
 
 ---
 
-### 10. Auto-Moderation Bot Plugin
+### Auto-Moderation Bot Plugin
 
 **Current State:**
 
@@ -211,13 +149,13 @@ This section is intentionally verification-only. If an item requires new product
 
 #### Frontend
 
-| Task                                                                                                                                                             | Location          | Type            |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | --------------- |
-| Add the experimental channel-scoped moderation bot plugin to channel settings                                                                                    | Frontend          | Feature         |
-| Configure which rules trigger auto-moderation                                                                                                                    | Frontend          | Feature         |
-| Display bot comments with clear "automated" indicator                                                                                                            | Frontend          | Feature         |
-| Add README/docs explaining that this is an experimental proof of concept that only reports for human review today and may later expand to actions like archiving | Frontend + Plugin | Documentation   |
-| Decide whether the future server-scoped moderation bot should be a separate plugin or a scope mode of the same plugin                                            | Both              | Design Decision |
+| Task                                                                                                                                                             | Location          | Type          |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------- |
+| Add the experimental moderation bot plugin to channel settings with configurable scope mode                                                                      | Frontend          | Feature       |
+| Configure which rules trigger auto-moderation                                                                                                                    | Frontend          | Feature       |
+| Display bot comments with clear "automated" indicator                                                                                                            | Frontend          | Feature       |
+| Add README/docs explaining that this is an experimental proof of concept that only reports for human review today and may later expand to actions like archiving | Frontend + Plugin | Documentation |
+| Support scope configuration in the plugin UI so the same plugin can run in channel-scoped or server-scoped mode                                                  | Frontend          | Feature       |
 
 **Verification / QA:**
 
@@ -230,14 +168,7 @@ This section is intentionally verification-only. If an item requires new product
 **Planned Code Changes:**
 
 - Bring `ServerConfig` admin/mod membership management to feature parity with the channel-scope invite-style workflow
-
-## Open Questions for Product Decision
-
-1. **ServerConfig Membership UX**: The target is feature parity with the channel-scope invite-style workflow. Do we want to explicitly track the later “restricted admin account” / anti-privilege-escalation design as a separate roadmap item now, or leave it out of this moderation plan for the moment?
-
-2. **Auto-Moderation Plugin Shape**: I lean toward one moderation-bot plugin with a scope mode rather than separate channel-scoped and server-scoped plugins, because the workflow, bot identity, and review/audit model appear likely to stay the same while only the scope changes. If you want them separate anyway, that should be treated as an explicit product decision before implementation.
-
-3. **Notification Preferences**: Suspended users should be able to opt out of suspension notifications, so this should be added to notification settings. The remaining question is whether there are any suspension-related notifications that should remain mandatory despite that preference.
+- Add a later-phase restricted-admin design using `ServerConfig.SuperAdmins` plus a `canCreateAdmins` server-role permission so non-super-admin accounts cannot create additional admins
 
 ---
 
@@ -304,3 +235,53 @@ This section intentionally centralizes all Cypress work so the rest of the roadm
 | Moderation bot plugin enablement works end to end                       | Medium   | `tests/cypress/e2e/bots/`        |
 | Moderation bot creates report issues for matching rule violations       | Medium   | `tests/cypress/e2e/bots/`        |
 | Moderation bot comment appears on reported content / issue context      | Medium   | `tests/cypress/e2e/bots/`        |
+
+## Needs Manual Testing/QA
+
+These items are implemented and should stay visible for validation, regression checks, and UX review, but they are no longer part of the active to-do list.
+
+### Implemented Tests To Re-Verify
+
+| Item                                                                                                                                    | Location                             | QA Focus                                                                                                  |
+| --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `canCreateChannel` actually awaits and enforces `hasServerPermission()`                                                                 | Backend rule test                    | Keep this in backend coverage and verify it protects the real server-suspension forum-creation path       |
+| `isOriginalPosterSuspended` agrees with `getActiveSuspension()` for user and mod targets                                                | Backend tests                        | Re-verify against future suspension refactors                                                             |
+| `isExpiredSuspension()` logic                                                                                                           | Backend tests                        | Validate expiry edge cases against production-like timestamps                                             |
+| `disconnectExpiredSuspensions()` no-op and mixed user/mod cleanup paths                                                                 | Backend tests                        | Re-verify both cleanup branches under real mutation flows                                                 |
+| Shared suspension target resolution for discussion/event/comment-backed issues                                                          | Backend tests                        | Re-verify issue target resolution against future issue model changes                                      |
+| Server-scoped admin/mod membership resolves from `ServerConfig` relationships instead of `showAdminTag`                                 | Backend + frontend implementation    | Manual validation across comments, discussions, events, profile/library surfaces, and admin editing flows |
+| Display "Server Admin" and "Server Mod" labels consistently on comments                                                                 | Frontend implementation              | Manual cross-surface verification before relying solely on E2E coverage                                   |
+| Create/forum/discussion/event/comment flows suppress raw suspension-blocked errors when suspension context is available                 | Frontend unit tests + implementation | Re-verify against real GraphQL permission failures and stale cache cases                                  |
+| Comment and discussion emoji controls show suspension-aware blocked-action UI                                                           | Frontend unit tests + implementation | Manual verification across both existing reactions and add-reaction entry points                          |
+| Suspended moderator issue-comment and moderation controls stay disabled in the main moderation UI                                       | Frontend unit tests + implementation | Re-verify on actual issue detail pages and related moderation surfaces                                    |
+| `useServerRoleMembership()` maps `ServerConfig.Admins` and `ServerConfig.Moderators` into the shared badge inputs                       | Frontend unit tests                  | Re-verify if the `ServerConfig` membership shape changes again                                            |
+| Inline discussion and event root-comment forms suppress raw permission errors when suspension context is already known                  | Frontend unit tests + implementation | Re-verify against real blocked comment mutations in discussion and event detail pages                     |
+| Shared suspend/unsuspend button UI composable preserves modal and notification behavior                                                 | Frontend unit tests + refactor       | Re-verify suspend/unsuspend flows across both user and mod issue actions                                  |
+| Shared moderation outcome UI composable preserves report/archive/unarchive/archive-and-suspend notifications and modal closing behavior | Frontend unit tests + refactor       | Re-verify discussion, event, and feedback moderation flows after real modal submissions                   |
+| Comment section and archive button now rely on the shared moderation outcome workflow                                                   | Frontend unit tests + refactor       | Re-verify archive/unarchive/report flows from comment lists and issue action surfaces                     |
+
+---
+
+## Verification & QA Backlog
+
+This section is intentionally verification-only. If an item requires new product code, it belongs later in the document under implementation planning. |
+
+### Non-E2E Verification Gaps
+
+| Test                                                                                      | Priority | Location       |
+| ----------------------------------------------------------------------------------------- | -------- | -------------- |
+| Verify whether expired suspension cleanup still has uncovered active/no-active edge cases | High     | Backend tests  |
+| Additional component-level server badge rendering on any still-uncovered major surface    | Medium   | Frontend tests |
+
+### Verification Checklist
+
+- [ ] Manually verify the implemented blocked-action flows on real pages and move any failures into the Cypress section or a new bug list
+- [ ] Re-verify `getActiveSuspension()` only if a new production edge case appears during QA or future suspension work
+- [ ] Add component-level badge coverage only if QA uncovers an untested major surface
+- [ ] Run the remaining stabilization verification from the dedicated Cypress section at the end of this document
+- [ ] Verify existing emoji mutations are blocked for suspended users via `canUpvote*` permissions
+- [ ] Re-check expired suspension cleanup behavior
+- [ ] Verify suspended issue notification includes issue link, expiration date, and blocked action context
+- [ ] Verify issue page editing is disabled for suspended mods
+- [ ] Verify blocked and restored mod-action behavior across suspended, unsuspended, and expired states
+- [ ] Validate the new server membership editor UX for larger admin/mod lists
