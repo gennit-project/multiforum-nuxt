@@ -1,5 +1,6 @@
 import { ref, type Ref } from 'vue';
 import type { Comment } from '@/__generated__/graphql';
+import { useModerationOutcomeUI } from './useModerationOutcomeUI';
 
 type DeleteCommentInputData = {
   commentId: string;
@@ -39,6 +40,7 @@ type UseCommentSectionModalsReturn = {
   showBrokenRulesModal: Ref<boolean>;
   commentToReport: Ref<Comment | null>;
   handleClickReport: (comment: Comment) => void;
+  closeReportModal: () => void;
 
   // Archive modals
   showArchiveModal: Ref<boolean>;
@@ -50,6 +52,9 @@ type UseCommentSectionModalsReturn = {
   handleClickArchive: (commentId: string) => void;
   handleClickArchiveAndSuspend: (commentId: string) => void;
   handleClickUnarchive: (commentId: string) => void;
+  closeArchiveModal: () => void;
+  closeArchiveAndSuspendModal: () => void;
+  closeUnarchiveModal: () => void;
 };
 
 /**
@@ -74,16 +79,27 @@ export function useCommentSectionModals(): UseCommentSectionModalsReturn {
   const parentIdOfCommentToGiveFeedbackOn = ref('');
 
   // Report modal state
-  const showBrokenRulesModal = ref(false);
   const commentToReport: Ref<Comment | null> = ref(null);
 
   // Archive modal state
-  const showArchiveModal = ref(false);
-  const showArchiveAndSuspendModal = ref(false);
-  const showUnarchiveModal = ref(false);
   const commentToArchiveId = ref('');
   const commentToArchiveAndSuspendId = ref('');
   const commentToUnarchiveId = ref('');
+  const {
+    showReportModal,
+    showArchiveModal,
+    showArchiveAndSuspendModal,
+    showUnarchiveModal,
+    openReportModal,
+    closeReportModal,
+    openArchiveModal,
+    closeArchiveModal,
+    openArchiveAndSuspendModal,
+    closeArchiveAndSuspendModal,
+    openUnarchiveModal,
+    closeUnarchiveModal,
+  } = useModerationOutcomeUI();
+  const showBrokenRulesModal = showReportModal;
 
   // Delete handlers
   function handleClickDelete(input: DeleteCommentInputData) {
@@ -118,23 +134,23 @@ export function useCommentSectionModals(): UseCommentSectionModalsReturn {
   // Report handler
   function handleClickReport(commentData: Comment) {
     commentToReport.value = commentData;
-    showBrokenRulesModal.value = true;
+    openReportModal();
   }
 
   // Archive handlers
   function handleClickArchive(commentId: string) {
     commentToArchiveId.value = commentId;
-    showArchiveModal.value = true;
+    openArchiveModal();
   }
 
   function handleClickArchiveAndSuspend(commentId: string) {
     commentToArchiveAndSuspendId.value = commentId;
-    showArchiveAndSuspendModal.value = true;
+    openArchiveAndSuspendModal();
   }
 
   function handleClickUnarchive(commentId: string) {
     commentToUnarchiveId.value = commentId;
-    showUnarchiveModal.value = true;
+    openUnarchiveModal();
   }
 
   return {
@@ -160,6 +176,7 @@ export function useCommentSectionModals(): UseCommentSectionModalsReturn {
     showBrokenRulesModal,
     commentToReport,
     handleClickReport,
+    closeReportModal,
 
     // Archive modals
     showArchiveModal,
@@ -171,5 +188,8 @@ export function useCommentSectionModals(): UseCommentSectionModalsReturn {
     handleClickArchive,
     handleClickArchiveAndSuspend,
     handleClickUnarchive,
+    closeArchiveModal,
+    closeArchiveAndSuspendModal,
+    closeUnarchiveModal,
   };
 }
