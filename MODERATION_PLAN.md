@@ -6,16 +6,15 @@
 
 ### High Priority
 
-| Task                                                                                                                                          | Location | Reason                                                                                                                                                           |
-| --------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Audit whether any remaining archive/report moderation surfaces still keep separate success/modal state after the current shared-workflow pass | Frontend | The main header, feedback, comment section, and archive button flows are now shared; this is now a narrow cleanup audit rather than a planned extraction project |
+| Task                                              | Location | Reason                                                                                                                                       |
+| ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| No additional high-priority tech-debt item is currently identified here | Both     | The shared moderation outcome audit is complete and the moderation architecture note is now written; remaining work is lower-priority follow-on |
 
 ### Medium Priority
 
 | Task                                                                                    | Location | Reason                                                                                                                                                                                                    |
 | --------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Add focused backend indexing for active-suspension lookups                              | Backend  | Once logic is stabilized, `username`, `modProfileName`, `suspendedUntil`, and `suspendedIndefinitely` become obvious hot-path fields for permission checks                                                |
-| Add a moderation architecture note documenting permission flow and suspension lifecycle | Both     | The system now spans user permissions, mod permissions, issue workflows, cleanup side effects, and server-vs-channel membership concepts; it needs one canonical reference before more roadmap work lands |
 
 ### Low Priority
 
@@ -91,7 +90,7 @@
 
 **Current State:**
 
-- ❌ Bots are DEPRECATED, not SUSPENDED
+- ❌ Bots do not yet participate in the full suspension workflow used for users and mods
 - Bots use ModerationProfile for comments
 - `channelBotsMiddleware.ts` marks bots as deprecated, not suspended
 - Bot accounts are still real `User` records with moderation profiles, so some human suspension logic may already apply depending on which mutation path a bot uses
@@ -138,14 +137,14 @@
 
 #### Backend
 
-| Task                                                                                                                                               | Location          | Type    |
-| -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------- |
-| Create an experimental plugin in `/Users/catherineluse/gennit/gennit-nuxt/multiforum-plugins` for a channel-scoped moderation bot proof of concept | Frontend + Plugin | Feature |
-| Define plugin schema for a report-only moderation bot                                                                                              | Backend           | Design  |
-| Create `ModerationBotPlugin` type or equivalent report-only plugin model                                                                           | Backend           | Feature |
-| Create bot user for automated moderation                                                                                                           | Backend           | Feature |
-| Implement report-only issue creation based on rule violations                                                                                      | Backend           | Feature |
-| Have the bot leave issue-linked/report-linked comments that clearly indicate automated reporting                                                   | Backend           | Feature |
+| Task                                                                                                                                  | Location          | Type    |
+| ------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------- |
+| Create an experimental moderation bot plugin in `/Users/catherineluse/gennit/gennit-nuxt/multiforum-plugins` with configurable scope mode | Frontend + Plugin | Feature |
+| Define plugin schema for a report-only moderation bot                                                                                 | Backend           | Design  |
+| Create `ModerationBotPlugin` type or equivalent report-only plugin model                                                              | Backend           | Feature |
+| Create bot user for automated moderation                                                                                              | Backend           | Feature |
+| Implement report-only issue creation based on rule violations                                                                         | Backend           | Feature |
+| Have the bot leave issue-linked/report-linked comments that clearly indicate automated reporting                                      | Backend           | Feature |
 
 #### Frontend
 
@@ -163,7 +162,7 @@
 
 ---
 
-### 11. Server Admin Labels
+### Server Admin Labels
 
 **Planned Code Changes:**
 
