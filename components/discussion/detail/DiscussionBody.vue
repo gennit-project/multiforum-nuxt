@@ -11,6 +11,8 @@ import { useRouter } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
 import { usernameVar, isAuthenticatedVar } from '@/cache';
+import SuspensionNotice from '@/components/SuspensionNotice.vue';
+import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 
 const router = useRouter();
 
@@ -126,6 +128,23 @@ const hasAlbum = computed(() => {
 const hasEmoiji = computed(() => {
   return props.discussionChannelId && props.emojiJson && props.showEmojiButton;
 });
+
+const {
+  issueNumber: suspensionIssueNumber,
+  suspendedUntil: suspensionUntil,
+  suspendedIndefinitely: suspensionIndefinitely,
+  channelId: suspensionChannelId,
+} = useChannelSuspensionNotice(computed(() => props.channelId));
+
+const showReactionSuspensionNotice = ref(false);
+
+const hasReactionSuspension = computed(() => {
+  return !!suspensionIssueNumber.value && !!suspensionChannelId.value;
+});
+
+function handleBlockedReaction() {
+  showReactionSuspensionNotice.value = true;
+}
 </script>
 
 <template>
@@ -184,8 +203,19 @@ const hasEmoiji = computed(() => {
         :key="emojiJson"
         :discussion-channel-id="discussionChannelId"
         :emoji-json="emojiJson"
+        :interaction-disabled="hasReactionSuspension"
+        @blocked-action="handleBlockedReaction"
       />
     </div>
+    <SuspensionNotice
+      v-if="showReactionSuspensionNotice && hasReactionSuspension"
+      class="mt-1"
+      :issue-number="suspensionIssueNumber!"
+      :channel-id="suspensionChannelId"
+      :suspended-until="suspensionUntil ?? undefined"
+      :suspended-indefinitely="suspensionIndefinitely ?? false"
+      :message="'You are suspended in this forum and cannot react.'"
+    />
     <div
       v-if="discussion?.Tags && discussion.Tags.length > 0"
       class="flex gap-2"

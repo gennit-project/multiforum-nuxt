@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useMutation } from '@vue/apollo-composable';
 import type { User } from '@/__generated__/graphql';
@@ -11,6 +11,8 @@ import VoteButtons from '@/components/discussion/vote/VoteButtons.vue';
 import NewEmojiButton from '@/components/comments/NewEmojiButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import { usernameVar, modProfileNameVar } from '@/cache';
+import SuspensionNotice from '@/components/SuspensionNotice.vue';
+import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 
 const props = defineProps({
   discussionChannel: {
@@ -50,6 +52,24 @@ const discussionIdInParams = computed(() => {
 });
 
 const discussionChannelId = computed(() => props.discussionChannel.id || '');
+const channelUniqueName = computed(
+  () =>
+    props.discussionChannel?.channelUniqueName ||
+    props.discussionChannel?.Channel?.uniqueName ||
+    ''
+);
+
+const {
+  issueNumber: suspensionIssueNumber,
+  suspendedUntil: suspensionUntil,
+  suspendedIndefinitely: suspensionIndefinitely,
+  channelId: suspensionChannelId,
+} = useChannelSuspensionNotice(channelUniqueName);
+
+const showReactionSuspensionNotice = ref(false);
+const hasReactionSuspension = computed(() => {
+  return !!suspensionIssueNumber.value && !!suspensionChannelId.value;
+});
 
 const {
   mutate: upvoteDiscussionChannel,
@@ -146,6 +166,10 @@ function handleClickViewFeedback() {
     params: { discussionId: discussionIdInParams.value },
   });
 }
+
+function handleBlockedReaction() {
+  showReactionSuspensionNotice.value = true;
+}
 </script>
 
 <template>
@@ -156,6 +180,15 @@ function handleClickViewFeedback() {
       undoUpvoteDiscussionChannelError?.message ||
       ''
     "
+  />
+  <SuspensionNotice
+    v-if="showReactionSuspensionNotice && hasReactionSuspension"
+    class="mb-2"
+    :issue-number="suspensionIssueNumber!"
+    :channel-id="suspensionChannelId"
+    :suspended-until="suspensionUntil ?? undefined"
+    :suspended-indefinitely="suspensionIndefinitely ?? false"
+    :message="'You are suspended in this forum and cannot react.'"
   />
   <div class="flex items-center justify-between">
     <div class="flex items-center gap-2">
@@ -178,6 +211,8 @@ function handleClickViewFeedback() {
       <NewEmojiButton
         v-if="showEmojiButton"
         :discussion-channel-id="discussionChannelId"
+        :interaction-disabled="hasReactionSuspension"
+        @blocked-action="handleBlockedReaction"
       />
     </div>
     <div class="flex items-center">

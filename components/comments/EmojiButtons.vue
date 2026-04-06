@@ -34,7 +34,14 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  interactionDisabled: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
+
+const emit = defineEmits(['blocked-action']);
 
 const emojiObject = ref<Record<string, Record<string, string[]>>>({});
 if (props.emojiJson) {
@@ -73,6 +80,10 @@ function isActive(emojiLabel: string) {
 }
 
 function toggleCommentEmoji(emojiVoteInput: EmojiVoteInput) {
+  if (props.interactionDisabled) {
+    emit('blocked-action');
+    return;
+  }
   if (isActive(emojiVoteInput.emojiLabel)) {
     removeEmojiFromComment(emojiVoteInput);
   } else {
@@ -81,6 +92,10 @@ function toggleCommentEmoji(emojiVoteInput: EmojiVoteInput) {
 }
 
 function toggleDiscussionChannelEmoji(emojiVoteInput: EmojiVoteInput) {
+  if (props.interactionDisabled) {
+    emit('blocked-action');
+    return;
+  }
   if (isActive(emojiVoteInput.emojiLabel)) {
     removeEmojiFromDiscussionChannel(emojiVoteInput);
   } else {
@@ -119,8 +134,11 @@ function getDefaultVariant(emojiLabel: string) {
   <div class="flex flex-wrap gap-1">
     <div v-for="emojiLabel in Object.keys(emojiObject)" :key="emojiLabel">
       <VoteButton
-        class="space-x-2"
+        :class="interactionDisabled ? 'space-x-2 opacity-60' : 'space-x-2'"
         :active="isActive(emojiLabel)"
+        :button-props="
+          interactionDisabled ? { 'aria-disabled': 'true' } : undefined
+        "
         :test-id="'upvote-emoji-button'"
         :show-count="true"
         :count="getCount(emojiLabel)"

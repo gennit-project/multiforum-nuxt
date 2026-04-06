@@ -99,6 +99,15 @@ const changesRequiredMessage = computed(() => {
   return '';
 });
 
+const showCreateDiscussionError = computed(() => {
+  return !(
+    props.createDiscussionError &&
+    props.suspensionIssueNumber !== null &&
+    props.suspensionIssueNumber !== undefined &&
+    props.suspensionChannelId
+  );
+});
+
 onMounted(() => {
   if (titleInputRef.value) {
     nextTick(() => {
@@ -137,7 +146,7 @@ onMounted(() => {
           :text="changesRequiredMessage"
         />
         <ErrorBanner
-          v-if="createDiscussionError"
+          v-if="createDiscussionError && showCreateDiscussionError"
           :text="createDiscussionError.message"
         />
         <ErrorBanner v-if="submitError" :text="submitError" />

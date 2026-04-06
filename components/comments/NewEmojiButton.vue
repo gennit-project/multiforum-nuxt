@@ -4,7 +4,7 @@ import VoteButton from '@/components/VoteButton.vue';
 import FloatingDropdown from '@/components/FloatingDropdown.vue';
 import EmojiPicker from '@/components/comments/EmojiPicker.vue';
 
-defineProps({
+const props = defineProps({
   commentId: {
     type: String,
     required: false,
@@ -30,13 +30,28 @@ defineProps({
     required: false,
     default: false,
   },
+  interactionDisabled: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  disabledTooltipText: {
+    type: String,
+    required: false,
+    default: 'You are suspended in this forum and cannot react.',
+  },
 });
 
 const showMenu = ref(false);
 
-const emit = defineEmits(['toggleEmojiPicker']);
+const emit = defineEmits(['toggleEmojiPicker', 'blocked-action']);
 
 function handleClick() {
+  if (props.interactionDisabled) {
+    showMenu.value = false;
+    emit('blocked-action');
+    return;
+  }
   emit('toggleEmojiPicker');
 }
 </script>
@@ -46,11 +61,21 @@ function handleClick() {
     <FloatingDropdown v-model="showMenu">
       <template #button="{ activatorProps }">
         <VoteButton
-          class="space-x-3"
-          :button-props="activatorProps"
+          :class="
+            props.interactionDisabled ? 'space-x-3 opacity-60' : 'space-x-3'
+          "
+          :button-props="
+            props.interactionDisabled
+              ? { ...activatorProps, 'aria-disabled': 'true' }
+              : activatorProps
+          "
           :test-id="'emoji-button'"
           :show-count="false"
-          :tooltip-text="'Add reaction...'"
+          :tooltip-text="
+            props.interactionDisabled
+              ? props.disabledTooltipText
+              : 'Add reaction...'
+          "
           :is-permalinked="isPermalinked"
           :is-marked-as-answer="isMarkedAsAnswer"
           @vote="handleClick"
