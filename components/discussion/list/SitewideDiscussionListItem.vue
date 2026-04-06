@@ -19,6 +19,8 @@ import { relativeTime } from '@/utils';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
 import { usernameVar, isAuthenticatedVar } from '@/cache';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 // Lazy load the album component since it's not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(
   () => import('@/components/discussion/detail/DiscussionAlbum.vue')
@@ -60,6 +62,7 @@ const props = defineProps({
 });
 
 const route = useRoute();
+const { serverAdminUsernames } = useServerRoleMembership();
 
 // Get user preferences for sensitive content
 const { result: getUserResult } = useQuery(
@@ -124,8 +127,12 @@ const primaryForumName = computed(() => {
 });
 
 const authorIsAdmin = computed(() => {
-  const serverRoles = props.discussion?.Author?.ServerRoles;
-  return serverRoles?.[0]?.showAdminTag || false;
+  return (
+    getServerRoleBadge({
+      username: props.discussion?.Author?.username,
+      adminUsernames: serverAdminUsernames.value,
+    }) === 'serverAdmin'
+  );
 });
 
 const getDetailLink = () => {

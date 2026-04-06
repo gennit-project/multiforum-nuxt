@@ -18,6 +18,8 @@ import ImageIcon from '@/components/icons/ImageIcon.vue';
 import { storeToRefs } from 'pinia';
 import { useUIStore } from '@/stores/uiStore';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
 // Define props
 const props = defineProps({
@@ -59,13 +61,18 @@ const channelIdInParams = computed(() =>
 const defaultUniqueName = computed(
   () => channelIdInParams.value || props.discussionChannel.channelUniqueName
 );
+const { serverAdminUsernames } = useServerRoleMembership();
 const commentCount = computed(
   () => props.discussionChannel?.CommentsAggregate?.count || 0
 );
 
 const authorIsAdmin = computed(() => {
-  const author = props.discussion?.Author;
-  return author?.ServerRoles?.[0]?.showAdminTag || false;
+  return (
+    getServerRoleBadge({
+      username: props.discussion?.Author?.username,
+      adminUsernames: serverAdminUsernames.value,
+    }) === 'serverAdmin'
+  );
 });
 
 const authorIsMod = computed(() => {

@@ -9,6 +9,8 @@ import ImageIcon from '@/components/icons/ImageIcon.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import { relativeTime } from '@/utils';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
 type AlbumPayload = {
   discussion: Discussion;
@@ -40,6 +42,7 @@ const emit = defineEmits<{
 }>();
 
 const route = useRoute();
+const { serverAdminUsernames } = useServerRoleMembership();
 
 const filteredQuery = computed(() => {
   const query = { ...route.query };
@@ -120,8 +123,12 @@ const authorAccountCreated = computed(
 );
 
 const authorIsAdmin = computed(() => {
-  const author = props.discussion?.Author;
-  return author?.ServerRoles?.[0]?.showAdminTag || false;
+  return (
+    getServerRoleBadge({
+      username: props.discussion?.Author?.username,
+      adminUsernames: serverAdminUsernames.value,
+    }) === 'serverAdmin'
+  );
 });
 
 const firstAlbumImage = computed(() => {

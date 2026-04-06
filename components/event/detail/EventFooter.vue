@@ -6,6 +6,8 @@ import { useRoute } from 'nuxt/app';
 import { DateTime } from 'luxon';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import { stableRelativeTime } from '@/utils';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
 export default defineComponent({
   components: {
@@ -31,6 +33,7 @@ export default defineComponent({
   },
   setup(props) {
     const route = useRoute();
+    const { serverAdminUsernames } = useServerRoleMembership();
 
     const eventId = computed(() => {
       return (
@@ -47,18 +50,12 @@ export default defineComponent({
     });
 
     const posterIsAdmin = computed(() => {
-      const serverRoles = props.eventData.Poster?.ServerRoles;
-      if (!serverRoles) {
-        return false;
-      }
-      if (serverRoles.length === 0) {
-        return false;
-      }
-      const serverRole = serverRoles[0];
-      if (serverRole?.showAdminTag) {
-        return true;
-      }
-      return false;
+      return (
+        getServerRoleBadge({
+          username: props.eventData.Poster?.username,
+          adminUsernames: serverAdminUsernames.value,
+        }) === 'serverAdmin'
+      );
     });
 
     const posterIsMod = computed(() => {
