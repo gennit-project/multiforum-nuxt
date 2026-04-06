@@ -20,6 +20,9 @@ These items are implemented and should stay visible for validation, regression c
 - Admin UI now manages server-scoped membership directly from the admin roles page
 - Comment/detail/list author badge resolution now mirrors channel-scoped labels for server-scoped membership
 - Remaining `showAdminTag` usage has been removed from the user-facing frontend
+- Create/forum/discussion/event/comment suspension flows now prefer suspension notices over raw permission errors where suspension context is already known
+- Comment and discussion emoji interactions now surface suspension-aware blocked-action UI instead of falling through to mutation noise
+- Moderation permission objects now use an explicit shared frontend type instead of loose `Record<string, boolean>` maps
 
 ### Implemented Tests To Re-Verify
 
@@ -32,6 +35,9 @@ These items are implemented and should stay visible for validation, regression c
 | Shared suspension target resolution for discussion/event/comment-backed issues | Backend tests | Re-verify issue target resolution against future issue model changes |
 | Server-scoped admin/mod membership resolves from `ServerConfig` relationships instead of `showAdminTag` | Backend + frontend implementation | Manual validation across comments, discussions, events, profile/library surfaces, and admin editing flows |
 | Display "Server Admin" and "Server Mod" labels consistently on comments | Frontend implementation | Manual cross-surface verification before relying solely on E2E coverage |
+| Create/forum/discussion/event/comment flows suppress raw suspension-blocked errors when suspension context is available | Frontend unit tests + implementation | Re-verify against real GraphQL permission failures and stale cache cases |
+| Comment and discussion emoji controls show suspension-aware blocked-action UI | Frontend unit tests + implementation | Manual verification across both existing reactions and add-reaction entry points |
+| Suspended moderator issue-comment and moderation controls stay disabled in the main moderation UI | Frontend unit tests + implementation | Re-verify on actual issue detail pages and related moderation surfaces |
 
 ### Phase 1 Checklist Items Completed
 
@@ -52,6 +58,9 @@ These items are implemented and should stay visible for validation, regression c
 - Replace `showAdminTag`-driven server-scoped labels with data derived from `ServerConfig` membership
 - Rework comment/detail/list author badge resolution so server-scoped labels mirror channel-scoped labels
 - Confirm remaining `showAdminTag` usage is removed or explicitly scoped
+- Standardize suspension-blocked UX across the implemented create/reaction surfaces
+- Add explicit frontend typing for moderation permission objects
+- Add focused suspended-mod UI coverage for issue comment and moderation controls
 
 ---
 
@@ -61,12 +70,9 @@ These items are implemented and should stay visible for validation, regression c
 
 | Task                                                                    | Location | Reason                                                                                                                                                                                           |
 | ----------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Fix server-scope permission correctness in `canCreateChannel`           | Backend  | `rules.ts` currently calls `hasServerPermission(...)` without awaiting it, so forum-creation suspension enforcement is not trustworthy until corrected                                           |
-| Consolidate suspension target resolution into one shared backend helper | Backend  | `createSuspensionResolver.ts`, `createUnsuspendResolver.ts`, and `isOriginalPosterSuspended.ts` each rediscover the issue target independently, which is brittle and likely to drift             |
-| Unify suspension state reads around `getActiveSuspension()`             | Backend  | Expiration cleanup, issue-linked suspension state, and permission checks should all use the same active/expired determination logic                                                              |
-| Standardize suspension-blocked UX for existing actions                  | Frontend | Current flows mix silent failures, raw GraphQL errors, and explicit suspension notices; emoji/forum/comment/create flows should behave consistently                                              |
-| Replace `showAdminTag` with ServerConfig-scoped admin/mod relationships | Both     | Server-scoped moderation UX should mirror channel-scoped moderation: labels and permissions should come from relationships attached directly to `ServerConfig`, not role flags embedded on users |
-| Add targeted TypeScript coverage for moderation permission objects      | Frontend | Permission and moderation components still rely on weakly typed objects, which makes regressions in role shape and fallback behavior harder to catch                                             |
+| Complete suspension-blocked UX consistency in remaining moderation surfaces | Frontend | The main create/reaction paths are now covered, but other blocked-action flows still need the same suspension-aware handling and messaging |
+| Finish frontend test coverage for suspension/reaction/moderation permission fallbacks | Frontend | The typed permission layer is in place, but remaining UI paths still need direct test coverage to prevent regressions |
+| Add any remaining backend edge-case coverage around active/expired suspension resolution | Backend | The shared backend suspension path is stabilized, but a few edge-case tests are still intentionally tracked as remaining stabilization work |
 
 ### Medium Priority
 
@@ -119,7 +125,6 @@ These items are implemented and should stay visible for validation, regression c
 | -------------------------------------------------------------------------------- | -------------- | -------------- |
 | `getActiveSuspension()` edge cases                                               | High           | Backend tests  |
 | Frontend permission fallback chains for user vs suspended user vs suspended mod  | Medium         | Frontend tests |
-| Mod action visibility on issue detail for suspended vs unsuspended mods          | Medium         | Frontend tests |
 | Emoji/reaction controls hidden or disabled for suspended users                   | Medium         | Frontend tests |
 | Server-scoped author badge resolution using ServerConfig admin/mod relationships | Medium         | Frontend tests |
 
@@ -133,51 +138,16 @@ These items are implemented and should stay visible for validation, regression c
 
 ### Frontend Second
 
-- [ ] Standardize suspension-blocked UX across forum creation, discussion creation, event creation, comment creation, and emoji/reaction attempts
-- [ ] Hide or disable emoji controls where suspended state is already known, while preserving backend enforcement as the source of truth
-- [ ] Add stronger TypeScript typing for moderation permission objects and suspension-related UI state
-- [ ] Add frontend tests for suspended-user reaction UI, permission fallback chains, suspended-mod action visibility, and ServerConfig-based badge resolution
+- [ ] Finish suspension-blocked UX cleanup in any remaining blocked-action surfaces beyond the implemented create/reaction paths
+- [ ] Add frontend tests for suspended-user reaction UI, permission fallback chains, and ServerConfig-based badge resolution
 
 ### Verification Then Follow-On
 
 - [ ] Re-run and tighten `tests/cypress/e2e/suspensions/serverLevelSuspension.spec.cy.ts` against the fixed backend rule path
 - [ ] Add E2E coverage for expired suspension cleanup and immediate post-unsuspension recovery
 - [ ] Add E2E coverage for server admin and server mod badges based on `ServerConfig` relationships
+- [ ] Add E2E coverage confirming suspended mods cannot use issue-detail moderation controls
 - [ ] Only after the above is stable, move into suspended-user polish and suspended-mod workflow expansion
-
----
-
-## Current Implementation Overview
-
-### What's Already Built
-
-#### Suspension System
-
-- **User Suspensions**: Time-limited or indefinite, channel-scoped
-- **Mod Suspensions**: Separate from user suspensions, uses SuspendedModRole
-- **Server-Level Checks**: `hasServerPermission.ts` now feeds a correctly awaited `canCreateChannel` rule, so server-scope forum creation checks are on the same enforcement path as the rest of the permission system
-- **Automatic Expiration**: Expired suspensions are disconnected from channels (fire-and-forget cleanup)
-- **Notifications**: In-app notifications sent when suspended users are blocked from actions
-
-#### Permission Enforcement
-
-- **Two-Tier System**: User permissions vs Moderator permissions
-- **Role Hierarchy**: Admin > Elevated Mod > Standard Mod > Suspended Mod
-- **Channel & Server Scopes**: Different enforcement paths for each
-- **Server-Scoped Identity UX**: Backend primitives and frontend badge/rendering paths now use `ServerConfig`-attached `Admins` and `Moderators`; `showAdminTag` has been removed from the user-facing frontend and replaced with explicit server membership management in the admin UI
-
-#### Moderation Actions
-
-- Report, Archive, Unarchive (discussions, events, comments)
-- Give Feedback system
-- Issue tracking with ActivityFeed
-- Lock/Unlock issues
-
-#### E2E Tests
-
-- `suspendedUserPermissions.spec.cy.ts` - Tests suspended users can't create content
-- `serverLevelSuspension.spec.cy.ts` - Tests server-level forum creation block
-- Various archive/report/feedback tests
 
 ---
 
@@ -189,18 +159,10 @@ These items are implemented and should stay visible for validation, regression c
 
 > "suspended user can't do emoji - borrow can comment rule - suppress error"
 
-**Current State:**
-
-- Backend emoji mutations are already gated through `canUpvoteComment` / `canUpvoteDiscussion`, and suspended roles deny those permissions
-- Frontend reaction controls are still rendered broadly, so the current gap is mostly UX consistency, graceful failure, and explicit coverage
-- The roadmap note to "borrow can comment rule" does not appear necessary if the current upvote-based permission model is kept
-
 **Required Work:**
 | Task | Location | Type |
 |------|----------|------|
 | Verify existing emoji mutations are blocked for suspended users via `canUpvote*` permissions | Backend | Verification |
-| Suppress raw mutation errors for suspended users attempting emoji | Frontend | Feature |
-| Hide or disable emoji controls for suspended users where suspension state is already known | Frontend | Feature |
 | Add E2E test for suspended user emoji restriction | Frontend | Test |
 
 ---
@@ -211,16 +173,9 @@ These items are implemented and should stay visible for validation, regression c
 
 > "when suspended at server scope, cannot create forums"
 
-**Current State:**
-
-- Backend permission logic now correctly awaits `hasServerPermission.ts` through the `canCreateChannel` rule path
-- Frontend test exists: `serverLevelSuspension.spec.cy.ts`
-- ❓ Need to verify the existing test is actually covering the fixed behavior after the backend rule bug is corrected
-
 **Required Work:**
 | Task | Location | Type |
 |------|----------|------|
-| Verify the new `canCreateChannel` rule test remains part of backend coverage | Backend | Verification |
 | Verify `serverLevelSuspension.spec.cy.ts` test passes | Frontend | Test Verification |
 | Add test case for indefinite server suspension | Frontend | Test |
 | Consider `canSuspendFromServer` permission for mod profiles | Backend | Decision/Feature |
@@ -243,13 +198,6 @@ These items are implemented and should stay visible for validation, regression c
 
 > "when a user tries to do something with an expired suspension, the suspension gets severed from channel"
 
-**Current State:**
-
-- Implemented in `disconnectExpiredSuspensions.ts`
-- Uses fire-and-forget async pattern
-- Keeps Suspension node for historical tracking, removes relationship
-- Issue-linked suspension reads now go through the same active/expired logic as `getActiveSuspension()`
-
 **Required Work:**
 | Task | Location | Type |
 |------|----------|------|
@@ -266,13 +214,6 @@ These items are implemented and should stay visible for validation, regression c
 > - "If the mod reverses the decision, I can do the action"
 > - "on failing to create, suspended user receives a notification with a link to the relevant issue, and can see the message about my suspension. I can see the related issue and expiration date."
 
-**Current State:**
-
-- Content creation is blocked (`suspendedUserPermissions.spec.cy.ts`)
-- Notifications are sent with issue link and expiration date (`suspensionNotification.ts`)
-- ❓ Need to verify notification content includes all required info
-- ❓ Need to verify reversal workflow works without stale frontend state or inconsistent error handling
-
 **Required Work:**
 | Task | Location | Type |
 |------|----------|------|
@@ -280,7 +221,7 @@ These items are implemented and should stay visible for validation, regression c
 | Add E2E test for unsuspension enabling previously blocked action | Frontend | Test |
 | Add test for notification received on blocked action | Frontend | Test |
 | Ensure notification UI shows issue link and expiration clearly | Frontend | Feature/Polish |
-| Standardize create-flow handling so suspended forum/comment/discussion/event attempts show the same suspension UX | Frontend | Refactor |
+| Finish any remaining create-flow suspension UX cleanup beyond the implemented forum/comment/discussion/event paths | Frontend | Refactor |
 
 ---
 
@@ -328,13 +269,6 @@ These items are implemented and should stay visible for validation, regression c
 
 > "from suspended mod's perspective all mod actions should be disabled"
 
-**Current State:**
-
-- `headerPermissionUtils.ts` checks mod suspension status
-- Backend mod permission enforcement exists via `hasChannelModPermission.ts`
-- ⚠️ Frontend mod-action disablement is spread across multiple components and needs a broader audit than one helper
-- ❓ Need to verify ALL mod UI elements are hidden/disabled
-
 **Required Work:**
 | Task | Location | Type |
 |------|----------|------|
@@ -350,11 +284,6 @@ These items are implemented and should stay visible for validation, regression c
 **Roadmap Item:**
 
 > "cannot take mod actions unless suspension is reversed or expired"
-
-**Current State:**
-
-- Backend enforces via `hasChannelModPermission.ts`
-- Applies SuspendedModRole (typically all permissions false)
 
 **Required Work:**
 | Task | Location | Type |
@@ -398,13 +327,6 @@ These items are implemented and should stay visible for validation, regression c
 **Roadmap Item:**
 
 > "Plan, implement and test workflows for suspending and banning mod profiles while leaving user profiles intact"
-
-**Current State:**
-
-- Separate Suspension nodes for users vs mods
-- `SuspendedMods` relationship on Channel
-- `SUSPEND_MOD` and `UNSUSPEND_MOD` mutations exist
-- ❓ Current model supports suspension, but "ban mod profile while leaving user intact" likely needs explicit product and schema semantics beyond the current suspension workflow
 
 **Required Work:**
 | Task | Location | Type |
@@ -470,13 +392,6 @@ Note: work is not to begin on this feature until Catherine fills out more detail
 
 > "can make list of server admins, comments by server admins are labeled as such in comments"
 
-**Current State:**
-
-- `ServerConfig` now owns explicit `Admins` and `Moderators` relationships in the backend
-- User-facing frontend badge resolution has been migrated off `showAdminTag`
-- Admin UI now manages server-scoped membership directly from the admin roles page
-- ❓ Remaining work is mostly verification and UX polish: comment-surface consistency checks, E2E coverage, and any follow-on search/autocomplete improvements for membership editing
-
 **Required Work:**
 | Task | Location | Type |
 |------|----------|------|
@@ -489,11 +404,10 @@ Note: work is not to begin on this feature until Catherine fills out more detail
 
 ### Phase 1: Stabilization & Correctness (Week 1-2)
 
-1. Fix backend permission correctness for server-scope forum creation
-2. Consolidate suspension target resolution and active-suspension reads
-3. Introduce ServerConfig-scoped server admin/mod relationships and complete the `showAdminTag` deprecation in user-facing/frontend admin flows
-4. Add backend rule/unit coverage for suspension lifecycle, cleanup, and server membership reads
-5. Add targeted frontend typing and consistent suspension-blocked UX for existing flows
+1. Finish remaining backend edge-case coverage around active/expired suspension resolution
+2. Finish remaining suspension-blocked UX cleanup outside the already-implemented create/reaction paths
+3. Add the remaining frontend permission-fallback and ServerConfig badge tests
+4. Re-run and tighten the key suspension/server-membership E2E coverage
 
 ### Phase 2: Suspended User Polish (Week 3)
 
@@ -583,14 +497,14 @@ Note: work is not to begin on this feature until Catherine fills out more detail
 
 ## Conclusion
 
-The moderation system has a solid foundation, but the first priority is stabilization rather than new feature breadth. The main gaps are:
+The remaining work is now concentrated on verification, coverage, and the roadmap items that still do not exist. The main gaps are:
 
-1. **Backend correctness and shared suspension logic** before expanding workflows
-2. **ServerConfig-based server moderation UX** is now in place; the remaining work is E2E coverage and editor polish
+1. **Stabilization verification** for suspension expiry, unsuspension recovery, and server-scope forum restrictions
+2. **Suspended user polish** around reaction coverage, notification verification, and any remaining blocked-action UX cleanup
 3. **Reporting workflows** for mod comments/profiles/actions
-4. **UI consistency** for suspended user/mod experience, especially error handling and reaction controls
+4. **Suspended-mod coverage and workflow expansion** beyond the current disabled-state implementation
 5. **Bot handling** audit, decision, and implementation
 6. **Auto-moderation plugin** as a plugin-system feature
-7. **Test coverage** for stabilization, edge cases, and new scenarios
+7. **Test coverage** for remaining stabilization gaps and new scenarios
 
-The recommended approach is to start with Phase 1 stabilization so the permission model, suspension lifecycle, and issue-linked state are correct and testable before adding new moderation workflows.
+The recommended approach is to finish the remaining Phase 1 verification work before expanding into new suspended-mod workflows, bot decisions, or the moderation plugin feature.
