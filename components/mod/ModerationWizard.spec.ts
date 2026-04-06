@@ -30,8 +30,8 @@ vi.mock('@/cache', () => ({
 }));
 
 describe('ModerationWizard', () => {
-  it('shows suspended-mod message and disables moderation controls', () => {
-    const wrapper = mount(ModerationWizard, {
+  const mountWrapper = () =>
+    mount(ModerationWizard, {
       props: {
         issue: {
           id: 'issue-1',
@@ -74,15 +74,33 @@ describe('ModerationWizard', () => {
       },
     });
 
+  it('shows the suspended-mod message', () => {
+    const wrapper = mountWrapper();
+
     expect(wrapper.text()).toContain(
       'Mod actions are disabled because your moderator account is suspended.'
     );
+  });
+
+  it('disables the archive button when the moderator is suspended', () => {
+    const wrapper = mountWrapper();
+
     expect(wrapper.get('[data-testid="archive-button"]').attributes('data-disabled')).toBe(
       'true'
     );
+  });
+
+  it('disables the suspend-user button when the moderator is suspended', () => {
+    const wrapper = mountWrapper();
+
     expect(wrapper.get('[data-testid="suspend-user-button"]').attributes('data-disabled')).toBe(
       'true'
     );
+  });
+
+  it('disables the edit action when the moderator is suspended', () => {
+    const wrapper = mountWrapper();
+
     expect(wrapper.get('[data-test="edit-comment"]').attributes('disabled')).toBeDefined();
   });
 });

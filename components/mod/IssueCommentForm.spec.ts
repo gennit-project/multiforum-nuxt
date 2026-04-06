@@ -3,8 +3,8 @@ import { mount } from '@vue/test-utils';
 import IssueCommentForm from './IssueCommentForm.vue';
 
 describe('IssueCommentForm', () => {
-  it('disables suspended mod actions when the user is not the original author', () => {
-    const wrapper = mount(IssueCommentForm, {
+  const mountWrapper = () =>
+    mount(IssueCommentForm, {
       props: {
         commentText: 'Need moderator action',
         isIssueOpen: true,
@@ -40,10 +40,22 @@ describe('IssueCommentForm', () => {
       },
     });
 
+  it('hides the lock button for suspended mods who are not the original author', () => {
+    const wrapper = mountWrapper();
     expect(wrapper.text()).not.toContain('Lock Issue');
+  });
+
+  it('disables the close-open issue button for suspended mods who are not the original author', () => {
+    const wrapper = mountWrapper();
+
     expect(
       wrapper.get('[data-testid="close-open-issue-button"]').attributes('disabled')
     ).toBeDefined();
+  });
+
+  it('disables the comment button for suspended mods who are not the original author', () => {
+    const wrapper = mountWrapper();
+
     expect(
       wrapper.get('[data-testid="createCommentButton"]').attributes('disabled')
     ).toBeDefined();
