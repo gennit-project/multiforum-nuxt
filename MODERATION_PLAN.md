@@ -1,56 +1,6 @@
 # Moderation Features: Current State vs Roadmap Plan
 
-## Planned Code Changes
-
-### Tech Debt & Refactoring
-
-### High Priority
-
-| Task                                              | Location | Reason                                                                                                                                       |
-| ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| No additional high-priority tech-debt item is currently identified here | Both     | The shared moderation outcome audit is complete and the moderation architecture note is now written; remaining work is lower-priority follow-on |
-
-### Medium Priority
-
-| Task                                                                                    | Location | Reason                                                                                                                                                                                                    |
-| --------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Add focused backend indexing for active-suspension lookups                              | Backend  | Once logic is stabilized, `username`, `modProfileName`, `suspendedUntil`, and `suspendedIndefinitely` become obvious hot-path fields for permission checks                                                |
-
-### Low Priority
-
-| Task                                                                     | Location | Reason                                                                                                         |
-| ------------------------------------------------------------------------ | -------- | -------------------------------------------------------------------------------------------------------------- |
-| Consolidate broader permission helpers into a single frontend composable | Frontend | Valuable eventually, but lower leverage than first fixing backend correctness and shared suspension resolution |
-| Add caching for non-critical permission lookups                          | Backend  | Helpful for scale, but should follow correctness and test coverage                                             |
-| Standardize all GraphQL error text for moderation blocks                 | Backend  | Useful polish after suspension flows and notices are behaviorally consistent                                   |
-
----
-
-## Roadmap
-
-### Server-Scope Suspension - Forum Creation
-
-**Planned Code Changes:**
-| Task | Location | Type |
-|------|----------|------|
-| Use existing `ModServerRole.canSuspendUser` as the server-scope suspension permission instead of adding a new permission field | Backend | Refactor/Feature |
-| Add `SuspendedUsers` and `SuspendedMods` relationships to `ServerConfig`, mirroring `Channel` | Backend | Feature |
-| Use `ServerConfig.SuspendedUsers` when deciding whether a user can create a forum | Backend | Feature |
-| Use `ServerConfig.SuspendedMods` when deciding whether a mod can take server-scoped moderation actions | Backend | Feature |
-| Mirror channel-scope suspension/admin UI patterns for server-scope suspension management | Frontend | Feature |
-
-### Suspended User Content Creation + Notifications
-
-**Planned Code Changes:**
-| Task | Location | Type |
-|------|----------|------|
-| Ensure notification UI shows issue link and expiration clearly | Frontend | Feature/Polish |
-| Add suspension notification opt-out to notification settings | Frontend | Feature |
-| Persist and honor the suspension-notification preference in backend notification delivery | Backend | Feature |
-
----
-
-### Suspended Mods - Reporting Workflow
+## Suspended Mods - Reporting Workflow
 
 **Current State:**
 
@@ -59,7 +9,7 @@
 - ❌ No "Report" option on mod actions in issue activity feed
 - `SuspendModButton.vue` exists for suspending mods
 
-#### Phase 1: Add Report Mod Comment UI
+### Phase 1: Add Report Mod Comment UI
 
 | Task                                                    | Location | Type    |
 | ------------------------------------------------------- | -------- | ------- |
@@ -68,7 +18,7 @@
 | Add "Report" option to issue activity feed mod actions  | Frontend | Feature |
 | Create `reportModComment` mutation if needed            | Backend  | Feature |
 
-#### Phase 2: Suspend from Mod Actions
+### Phase 2: Suspend from Mod Actions
 
 | Task                                                               | Location | Type    |
 | ------------------------------------------------------------------ | -------- | ------- |
@@ -76,17 +26,40 @@
 | Add "Suspend Mod" option to mod action context in activity feed    | Frontend | Feature |
 | Ensure suspension creates proper Issue linking to reported content | Backend  | Feature |
 
----
+## Mod Profile Suspension Workflow
 
-### Suspended Mod Perspective
+| Task                                                                                                                          | Location | Type     |
+| ----------------------------------------------------------------------------------------------------------------------------- | -------- | -------- |
+| Treat channel-scope and server-scope suspended-mod lists as the primary model instead of introducing a separate mod-ban state | Both     | Decision |
+| Add `ServerConfig.SuspendedMods` support so server-scoped mod suspension mirrors the existing channel-scoped model            | Backend  | Feature  |
+| Add clear UI indication when mod profile suspended vs user account                                                            | Frontend | Feature  |
 
-**Planned Code Changes:**
-| Task | Location | Type |
-|------|----------|------|
-| Audit all mod-only UI elements for suspension checks | Frontend | Tech Debt |
-| Add "You are suspended" banner on moderation pages for suspended mods. Make sure it has a working issue link. | Frontend | Feature |
+## Suspended Mod Perspective
 
-### Suspended Bots
+| Task                                                                                                          | Location | Type      |
+| ------------------------------------------------------------------------------------------------------------- | -------- | --------- |
+| Audit all mod-only UI elements for suspension checks                                                          | Frontend | Tech Debt |
+| Add "You are suspended" banner on moderation pages for suspended mods. Make sure it has a working issue link. | Frontend | Feature   |
+
+## Server-Scope Suspension - Forum Creation
+
+| Task                                                                                                                           | Location | Type             |
+| ------------------------------------------------------------------------------------------------------------------------------ | -------- | ---------------- |
+| Use existing `ModServerRole.canSuspendUser` as the server-scope suspension permission instead of adding a new permission field | Backend  | Refactor/Feature |
+| Add `SuspendedUsers` and `SuspendedMods` relationships to `ServerConfig`, mirroring `Channel`                                  | Backend  | Feature          |
+| Use `ServerConfig.SuspendedUsers` when deciding whether a user can create a forum                                              | Backend  | Feature          |
+| Use `ServerConfig.SuspendedMods` when deciding whether a mod can take server-scoped moderation actions                         | Backend  | Feature          |
+| Mirror channel-scope suspension/admin UI patterns for server-scope suspension management                                       | Frontend | Feature          |
+
+## Suspended User Content Creation + Notifications
+
+| Task                                                                                      | Location | Type           |
+| ----------------------------------------------------------------------------------------- | -------- | -------------- |
+| Ensure notification UI shows issue link and expiration clearly                            | Frontend | Feature/Polish |
+| Add suspension notification opt-out to notification settings                              | Frontend | Feature        |
+| Persist and honor the suspension-notification preference in backend notification delivery | Backend  | Feature        |
+
+## Suspended Bots
 
 **Current State:**
 
@@ -95,37 +68,13 @@
 - `channelBotsMiddleware.ts` marks bots as deprecated, not suspended
 - Bot accounts are still real `User` records with moderation profiles, so some human suspension logic may already apply depending on which mutation path a bot uses
 
-**Planned Code Changes:**
-
 | Task                                                                                                                                   | Location | Type    |
 | -------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------- |
 | Reuse the existing report -> issue -> suspend workflow for bots so moderation actions create the same paper trail as human suspensions | Both     | Feature |
 | Extend suspension target resolution and permission checks so bots can be suspended like human accounts                                 | Backend  | Feature |
 | Surface bot suspension state, linked issues, and reason visibility through the existing moderation UI patterns                         | Frontend | Feature |
 
-**Verification / QA:**
-
-- Audit bot action paths to confirm suspended bots are blocked consistently and link back to the relevant issue context
-
----
-
-### Mod Profile Suspension Workflow
-
-**Planned Code Changes:**
-| Task | Location | Type |
-|------|----------|------|
-| Treat channel-scope and server-scope suspended-mod lists as the primary model instead of introducing a separate mod-ban state | Both | Decision |
-| Add `ServerConfig.SuspendedMods` support so server-scoped mod suspension mirrors the existing channel-scoped model | Backend | Feature |
-| Add clear UI indication when mod profile suspended vs user account | Frontend | Feature |
-
-**Verification / QA:**
-
-- Verify mod suspension does not affect user permissions
-- Verify a suspended mod can still create content as a user
-
----
-
-### Auto-Moderation Bot Plugin
+## Auto-Moderation Bot Plugin
 
 **Current State:**
 
@@ -133,18 +82,16 @@
 - Plugin system exists and is already capable of channel opt-in, bot user provisioning, and pipeline-style execution, so this should be built as a plugin feature rather than a bespoke moderation subsystem
 - First version should only report content and create issues for human review; it should not archive or suspend automatically
 
-**Planned Code Changes:**
+### Backend
 
-#### Backend
-
-| Task                                                                                                                                  | Location          | Type    |
-| ------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------- |
+| Task                                                                                                                                      | Location          | Type    |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------- |
 | Create an experimental moderation bot plugin in `/Users/catherineluse/gennit/gennit-nuxt/multiforum-plugins` with configurable scope mode | Frontend + Plugin | Feature |
-| Define plugin schema for a report-only moderation bot                                                                                 | Backend           | Design  |
-| Create `ModerationBotPlugin` type or equivalent report-only plugin model                                                              | Backend           | Feature |
-| Create bot user for automated moderation                                                                                              | Backend           | Feature |
-| Implement report-only issue creation based on rule violations                                                                         | Backend           | Feature |
-| Have the bot leave issue-linked/report-linked comments that clearly indicate automated reporting                                      | Backend           | Feature |
+| Define plugin schema for a report-only moderation bot                                                                                     | Backend           | Design  |
+| Create `ModerationBotPlugin` type or equivalent report-only plugin model                                                                  | Backend           | Feature |
+| Create bot user for automated moderation                                                                                                  | Backend           | Feature |
+| Implement report-only issue creation based on rule violations                                                                             | Backend           | Feature |
+| Have the bot leave issue-linked/report-linked comments that clearly indicate automated reporting                                          | Backend           | Feature |
 
 #### Frontend
 
@@ -156,15 +103,7 @@
 | Add README/docs explaining that this is an experimental proof of concept that only reports for human review today and may later expand to actions like archiving | Frontend + Plugin | Documentation |
 | Support scope configuration in the plugin UI so the same plugin can run in channel-scoped or server-scoped mode                                                  | Frontend          | Feature       |
 
-**Verification / QA:**
-
-- Add automated non-Cypress coverage for report-only moderation bot enablement, issue creation, and bot comments where practical
-
----
-
-### Server Admin Labels
-
-**Planned Code Changes:**
+## Server Admin Labels
 
 - Bring `ServerConfig` admin/mod membership management to feature parity with the channel-scope invite-style workflow
 - Add a later-phase restricted-admin design using `ServerConfig.SuperAdmins` plus a `canCreateAdmins` server-role permission so non-super-admin accounts cannot create additional admins
@@ -248,6 +187,9 @@ These items are implemented and should stay visible for validation, regression c
 | `isExpiredSuspension()` logic                                                                                                           | Backend tests                        | Validate expiry edge cases against production-like timestamps                                             |
 | `disconnectExpiredSuspensions()` no-op and mixed user/mod cleanup paths                                                                 | Backend tests                        | Re-verify both cleanup branches under real mutation flows                                                 |
 | Shared suspension target resolution for discussion/event/comment-backed issues                                                          | Backend tests                        | Re-verify issue target resolution against future issue model changes                                      |
+| `getActiveSuspension()` uses targeted database reads instead of loading and filtering full channel suspension lists                     | Backend refactor + tests             | Re-verify query behavior, expiry cleanup handoff, and mutation latency improvements under real load       |
+| Request-scoped permission caching reuses `ServerConfig` and active server-suspension lookups within a single GraphQL request            | Backend refactor + tests             | Re-verify repeated permission checks on mutation-heavy flows and watch for stale-request edge cases       |
+| Moderation-related permission failures now return consistent channel/server/mod error text instead of mixed ad-hoc strings              | Backend refactor + tests             | Re-verify blocked create/react/moderation flows and confirm the frontend suppression paths still match    |
 | Server-scoped admin/mod membership resolves from `ServerConfig` relationships instead of `showAdminTag`                                 | Backend + frontend implementation    | Manual validation across comments, discussions, events, profile/library surfaces, and admin editing flows |
 | Display "Server Admin" and "Server Mod" labels consistently on comments                                                                 | Frontend implementation              | Manual cross-surface verification before relying solely on E2E coverage                                   |
 | Create/forum/discussion/event/comment flows suppress raw suspension-blocked errors when suspension context is available                 | Frontend unit tests + implementation | Re-verify against real GraphQL permission failures and stale cache cases                                  |
@@ -284,3 +226,7 @@ This section is intentionally verification-only. If an item requires new product
 - [ ] Verify issue page editing is disabled for suspended mods
 - [ ] Verify blocked and restored mod-action behavior across suspended, unsuspended, and expired states
 - [ ] Validate the new server membership editor UX for larger admin/mod lists
+- [ ] Audit bot action paths to confirm suspended bots are blocked consistently and link back to the relevant issue context
+- [ ] Verify mod suspension does not affect user permissions
+- [ ] Verify a suspended mod can still create content as a user
+- [ ] Add automated non-Cypress coverage for report-only moderation bot enablement, issue creation, and bot comments where practical
