@@ -38,6 +38,7 @@ These items are implemented and should stay visible for validation, regression c
 | Create/forum/discussion/event/comment flows suppress raw suspension-blocked errors when suspension context is available | Frontend unit tests + implementation | Re-verify against real GraphQL permission failures and stale cache cases |
 | Comment and discussion emoji controls show suspension-aware blocked-action UI | Frontend unit tests + implementation | Manual verification across both existing reactions and add-reaction entry points |
 | Suspended moderator issue-comment and moderation controls stay disabled in the main moderation UI | Frontend unit tests + implementation | Re-verify on actual issue detail pages and related moderation surfaces |
+| `useServerRoleMembership()` maps `ServerConfig.Admins` and `ServerConfig.Moderators` into the shared badge inputs | Frontend unit tests | Re-verify if the `ServerConfig` membership shape changes again |
 
 ### Phase 1 Checklist Items Completed
 
@@ -99,25 +100,7 @@ These items are implemented and should stay visible for validation, regression c
 
 | Test                                                                                               | Priority | Location                                   |
 | -------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------ |
-| Server-level suspended user cannot create forum after permission fix                               | High     | `tests/cypress/e2e/suspensions/`           |
-| Expired suspension disconnects on attempted action and then allows the action                      | High     | Backend + `tests/cypress/e2e/suspensions/` |
-| Unsuspension immediately restores blocked actions without stale UI state                           | High     | `tests/cypress/e2e/suspensions/`           |
-| Server-scoped admin/mod membership badge rendering is covered by end-to-end tests                  | High     | `tests/cypress/e2e/comments/`              |
-
-### Missing E2E Tests
-
-| Test                                                                  | Priority | Location                         |
-| --------------------------------------------------------------------- | -------- | -------------------------------- |
-| Suspended user cannot react with emoji                                | High     | `tests/cypress/e2e/suspensions/` |
-| Suspended mod sees no mod UI elements                                 | High     | `tests/cypress/e2e/mod/`         |
-| Suspended mod cannot act on issue detail, comments, or feedback pages | High     | `tests/cypress/e2e/mod/`         |
-| Reporting mod comment from feedback page                              | Medium   | `tests/cypress/e2e/mod/`         |
-| Reporting mod from profile page                                       | Medium   | `tests/cypress/e2e/mod/`         |
-| Reporting mod from issue detail / mod action context                  | Medium   | `tests/cypress/e2e/mod/`         |
-| Mod suspension doesn't affect user actions                            | High     | `tests/cypress/e2e/suspensions/` |
-| Server admin badge on comments via ServerConfig membership            | Medium   | `tests/cypress/e2e/comments/`    |
-| Server mod badge on comments via ServerConfig membership              | Medium   | `tests/cypress/e2e/comments/`    |
-| Bot deprecation prevents actions                                      | Medium   | `tests/cypress/e2e/bots/`        |
+| Expired suspension cleanup returns the correct active/no-active result across edge cases          | High     | Backend tests                              |
 
 ### Missing Unit Tests
 
@@ -125,8 +108,7 @@ These items are implemented and should stay visible for validation, regression c
 | -------------------------------------------------------------------------------- | -------------- | -------------- |
 | `getActiveSuspension()` edge cases                                               | High           | Backend tests  |
 | Frontend permission fallback chains for user vs suspended user vs suspended mod  | Medium         | Frontend tests |
-| Emoji/reaction controls hidden or disabled for suspended users                   | Medium         | Frontend tests |
-| Server-scoped author badge resolution using ServerConfig admin/mod relationships | Medium         | Frontend tests |
+| Broader component-level server badge rendering remains covered across all major surfaces | Medium         | Frontend tests |
 
 ---
 
@@ -139,11 +121,11 @@ These items are implemented and should stay visible for validation, regression c
 ### Frontend Second
 
 - [ ] Finish suspension-blocked UX cleanup in any remaining blocked-action surfaces beyond the implemented create/reaction paths
-- [ ] Add frontend tests for suspended-user reaction UI, permission fallback chains, and ServerConfig-based badge resolution
+- [ ] Add any remaining frontend tests for blocked-action surfaces that still do not use the shared suspension-aware behavior
 
 ### Verification Then Follow-On
 
-- [ ] Re-run and tighten `tests/cypress/e2e/suspensions/serverLevelSuspension.spec.cy.ts` against the fixed backend rule path
+- [ ] Re-run the remaining Cypress stabilization coverage from the dedicated E2E section at the end of this document
 - [ ] Add E2E coverage for expired suspension cleanup and immediate post-unsuspension recovery
 - [ ] Add E2E coverage for server admin and server mod badges based on `ServerConfig` relationships
 - [ ] Add E2E coverage confirming suspended mods cannot use issue-detail moderation controls
@@ -163,7 +145,7 @@ These items are implemented and should stay visible for validation, regression c
 | Task | Location | Type |
 |------|----------|------|
 | Verify existing emoji mutations are blocked for suspended users via `canUpvote*` permissions | Backend | Verification |
-| Add E2E test for suspended user emoji restriction | Frontend | Test |
+| Run the new E2E test for suspended user emoji restriction against the safe test database | Frontend | Test Verification |
 
 ---
 
@@ -494,6 +476,35 @@ Note: work is not to begin on this feature until Catherine fills out more detail
 - `/customResolvers/queries/isOriginalPosterSuspended.ts` - Issue-linked suspension state query
 
 ---
+
+## Cypress / End-to-End Verification
+
+This section intentionally centralizes all Cypress work so the rest of the roadmap can stay focused on implementation and non-E2E stabilization tasks.
+
+### Phase 1 Stabilization Cypress
+
+| Test | Priority | Location |
+| ---- | -------- | -------- |
+| Re-run and tighten server-level suspended user forum-creation coverage after the backend permission fix | High | `tests/cypress/e2e/suspensions/serverLevelSuspension.spec.cy.ts` |
+| Run the new suspended-user emoji coverage in a safe local test environment pointed at the test database | High | `tests/cypress/e2e/suspensions/suspendedUserPermissions.spec.cy.ts` |
+| Add expired-suspension cleanup coverage that proves the blocked action becomes allowed after cleanup | High | `tests/cypress/e2e/suspensions/` |
+| Add unsuspension recovery coverage that proves blocked actions re-enable immediately without stale UI state | High | `tests/cypress/e2e/suspensions/` |
+| Add server admin and server mod badge coverage based on `ServerConfig` relationships | High | `tests/cypress/e2e/comments/` |
+| Add suspended-mod issue-detail coverage proving moderation controls stay unavailable | High | `tests/cypress/e2e/mod/` |
+
+### Roadmap Cypress Backlog
+
+| Test | Priority | Location |
+| ---- | -------- | -------- |
+| Suspended mod sees no mod UI elements | High | `tests/cypress/e2e/mod/` |
+| Suspended mod cannot act on issue detail, comments, or feedback pages | High | `tests/cypress/e2e/mod/` |
+| Reporting mod comment from feedback page | Medium | `tests/cypress/e2e/mod/` |
+| Reporting mod from profile page | Medium | `tests/cypress/e2e/mod/` |
+| Reporting mod from issue detail / mod action context | Medium | `tests/cypress/e2e/mod/` |
+| Mod suspension doesn't affect user actions | High | `tests/cypress/e2e/suspensions/` |
+| Server admin badge on comments via ServerConfig membership | Medium | `tests/cypress/e2e/comments/` |
+| Server mod badge on comments via ServerConfig membership | Medium | `tests/cypress/e2e/comments/` |
+| Bot deprecation prevents actions | Medium | `tests/cypress/e2e/bots/` |
 
 ## Conclusion
 

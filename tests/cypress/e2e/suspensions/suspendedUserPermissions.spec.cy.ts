@@ -422,6 +422,93 @@ describe('Suspended user permissions enforcement', () => {
     });
   });
 
+  it('suspended user cannot react with emoji', () => {
+    cy.intercept('POST', '**/graphql').as('graphqlRequest');
+
+    loginWithAuthUser('user1');
+
+    cy.visit(CATS_FORUM);
+    waitForGraphQL();
+
+    const triggerDiscussion = 'Trigger emoji suspension test ' + Date.now();
+    cy.contains('Create Discussion').click();
+    waitForGraphQL();
+
+    cy.get('input[placeholder="Title"]').type(triggerDiscussion);
+    cy.get('[data-testid="texteditor-textarea"]').type(
+      'Discussion for blocked emoji reaction coverage.'
+    );
+    cy.get('[data-testid="forum-picker"]').click();
+    cy.contains('Cats').click();
+    cy.get('button').contains('Create').click();
+    waitForGraphQL();
+
+    cy.visit('/logout');
+    waitForGraphQL();
+
+    loginWithAuthUser('user2');
+
+    cy.visit(CATS_FORUM);
+    waitForGraphQL();
+
+    cy.contains(triggerDiscussion).click();
+    waitForGraphQL();
+
+    cy.get('button[data-testid="discussion-menu-button"]').click();
+    cy.get(
+      'div[data-testid="discussion-menu-button-item-Archive and Suspend"]'
+    ).click();
+
+    cy.get('h3')
+      .contains('Forum rules')
+      .parent()
+      .find('input[type="checkbox"]')
+      .first()
+      .check();
+    cy.get('select').select('One Week');
+    cy.get('textarea[data-testid="report-discussion-input"]').type(
+      'Emoji suspension test.'
+    );
+    cy.get('button').contains('Submit').click();
+    waitForGraphQL();
+
+    cy.visit('/logout');
+    waitForGraphQL();
+
+    loginWithAuthUser('user1');
+
+    cy.visit(CATS_FORUM);
+    waitForGraphQL();
+
+    cy.contains(triggerDiscussion).click();
+    waitForGraphQL();
+
+    cy.get('[data-testid="emoji-button"]').first().click();
+
+    cy.contains('You are suspended in this forum and cannot react.').should(
+      'be.visible'
+    );
+
+    cy.visit('/logout');
+    waitForGraphQL();
+
+    loginWithAuthUser('user2');
+
+    cy.visit(`${CATS_FORUM.replace('discussions', 'edit/suspended-users')}`);
+    waitForGraphQL();
+
+    cy.contains(authorUsername).should('be.visible');
+    cy.contains('Related Issue').click();
+    waitForGraphQL();
+
+    cy.contains('Unsuspend User').click();
+    cy.get('textarea[data-testid="report-discussion-input"]').type(
+      'Cleanup after emoji test.'
+    );
+    cy.get('button').contains('Submit').click();
+    waitForGraphQL();
+  });
+
   it('unsuspended user can create content again', () => {
     cy.intercept('POST', '**/graphql').as('graphqlRequest');
 
