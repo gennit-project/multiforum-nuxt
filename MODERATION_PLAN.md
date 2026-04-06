@@ -23,6 +23,9 @@ These items are implemented and should stay visible for validation, regression c
 - Create/forum/discussion/event/comment suspension flows now prefer suspension notices over raw permission errors where suspension context is already known
 - Comment and discussion emoji interactions now surface suspension-aware blocked-action UI instead of falling through to mutation noise
 - Moderation permission objects now use an explicit shared frontend type instead of loose `Record<string, boolean>` maps
+- Inline discussion and event root-comment forms now suppress raw permission errors when suspension context is already known
+- Component-level server badge rendering is now covered directly in discussion and event UI
+- Suspend/unsuspend button UI now shares one composable for modal state and success-notification handling
 
 ### Implemented Tests To Re-Verify
 
@@ -39,6 +42,8 @@ These items are implemented and should stay visible for validation, regression c
 | Comment and discussion emoji controls show suspension-aware blocked-action UI                                           | Frontend unit tests + implementation | Manual verification across both existing reactions and add-reaction entry points                          |
 | Suspended moderator issue-comment and moderation controls stay disabled in the main moderation UI                       | Frontend unit tests + implementation | Re-verify on actual issue detail pages and related moderation surfaces                                    |
 | `useServerRoleMembership()` maps `ServerConfig.Admins` and `ServerConfig.Moderators` into the shared badge inputs       | Frontend unit tests                  | Re-verify if the `ServerConfig` membership shape changes again                                            |
+| Inline discussion and event root-comment forms suppress raw permission errors when suspension context is already known | Frontend unit tests + implementation | Re-verify against real blocked comment mutations in discussion and event detail pages                     |
+| Shared suspend/unsuspend button UI composable preserves modal and notification behavior                                | Frontend unit tests + refactor       | Re-verify suspend/unsuspend flows across both user and mod issue actions                                  |
 
 ### Phase 1 Checklist Items Completed
 
@@ -62,6 +67,8 @@ These items are implemented and should stay visible for validation, regression c
 - Standardize suspension-blocked UX across the implemented create/reaction surfaces
 - Add explicit frontend typing for moderation permission objects
 - Add focused suspended-mod UI coverage for issue comment and moderation controls
+- Add component-level coverage for ServerConfig-based badge rendering
+- Add blocked-comment-form coverage for the remaining discussion/event root-comment surfaces
 
 ---
 
@@ -71,16 +78,15 @@ These items are implemented and should stay visible for validation, regression c
 
 | Task                                                                                     | Location | Reason                                                                                                                                      |
 | ---------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Complete suspension-blocked UX consistency in remaining moderation surfaces              | Frontend | The main create/reaction paths are now covered, but other blocked-action flows still need the same suspension-aware handling and messaging  |
-| Finish frontend test coverage for suspension/reaction/moderation permission fallbacks    | Frontend | The typed permission layer is in place, but remaining UI paths still need direct test coverage to prevent regressions                       |
-| Add any remaining backend edge-case coverage around active/expired suspension resolution | Backend  | The shared backend suspension path is stabilized, but a few edge-case tests are still intentionally tracked as remaining stabilization work |
+| Verify whether any remaining moderation surfaces still bypass the shared suspension-aware blocked-action behavior | Frontend | The major create, reaction, and comment-entry paths are now covered; this is now an audit/polish item rather than a known implementation gap |
+| Verify whether any `getActiveSuspension()` cleanup/selection edge cases remain uncovered after the latest sequencing tests | Backend | The main active/expired cases are now covered; this is now a narrow follow-up audit instead of a broad stabilization task |
 
 ### Medium Priority
 
 | Task                                                                                         | Location | Reason                                                                                                                                                                                                    |
 | -------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Create a unified moderation action workflow layer for suspend/unsuspend/archive entry points | Frontend | Modal launching, success notifications, and issue refetch logic are duplicated across `SuspendUserButton`, `SuspendModButton`, and related issue components                                               |
-| Extract suspend/unsuspend modal behavior into composables after backend stabilization        | Frontend | Several moderation components repeat the same mutation, cache update, and notification pattern                                                                                                            |
+| Extend the shared moderation action workflow layer beyond suspend/unsuspend buttons into archive/report entry points | Frontend | Suspend user/mod buttons now share the basic modal and notification state, but archive/report actions still duplicate adjacent workflow logic |
+| Extract additional moderation modal behavior into composables where the remaining duplication is still high-value | Frontend | The suspend/unsuspend button state is shared now; the next step is only worth doing for the heavier archive/report flows |
 | Add focused backend indexing for active-suspension lookups                                   | Backend  | Once logic is stabilized, `username`, `modProfileName`, `suspendedUntil`, and `suspendedIndefinitely` become obvious hot-path fields for permission checks                                                |
 | Add a moderation architecture note documenting permission flow and suspension lifecycle      | Both     | The system now spans user permissions, mod permissions, issue workflows, cleanup side effects, and server-vs-channel membership concepts; it needs one canonical reference before more roadmap work lands |
 
@@ -100,15 +106,13 @@ These items are implemented and should stay visible for validation, regression c
 
 | Test                                                                                     | Priority | Location      |
 | ---------------------------------------------------------------------------------------- | -------- | ------------- |
-| Expired suspension cleanup returns the correct active/no-active result across edge cases | High     | Backend tests |
+| Verify whether expired suspension cleanup still has uncovered active/no-active edge cases | High     | Backend tests |
 
 ### Missing Unit Tests
 
 | Test                                                                                     | Priority | Location       |
 | ---------------------------------------------------------------------------------------- | -------- | -------------- |
-| `getActiveSuspension()` edge cases                                                       | High     | Backend tests  |
-| Frontend permission fallback chains for user vs suspended user vs suspended mod          | Medium   | Frontend tests |
-| Broader component-level server badge rendering remains covered across all major surfaces | Medium   | Frontend tests |
+| Additional component-level server badge rendering on any still-uncovered major surface   | Medium   | Frontend tests |
 
 ---
 
@@ -116,12 +120,12 @@ These items are implemented and should stay visible for validation, regression c
 
 ### Backend First
 
-- [ ] Add any remaining backend edge-case tests for `getActiveSuspension()` that are still missing after the current coverage pass
+- [ ] Audit whether any backend `getActiveSuspension()` edge cases remain after the current coverage pass
 
 ### Frontend Second
 
-- [ ] Finish suspension-blocked UX cleanup in any remaining blocked-action surfaces beyond the implemented create/reaction paths
-- [ ] Add any remaining frontend tests for blocked-action surfaces that still do not use the shared suspension-aware behavior
+- [ ] Audit whether any remaining blocked-action surfaces still bypass the shared suspension-aware behavior
+- [ ] Add component-level badge coverage only if additional uncovered surfaces are identified
 
 ### Verification Then Follow-On
 

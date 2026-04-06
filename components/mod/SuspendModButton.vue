@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import type { PropType } from 'vue';
 import UserPlus from '../icons/UserPlus.vue';
 import UserMinus from '../icons/UserMinus.vue';
@@ -9,6 +9,7 @@ import { IS_ORIGINAL_POSTER_SUSPENDED } from '@/graphQLData/mod/queries';
 import type { Issue } from '@/__generated__/graphql';
 import SuspendModModal from '@/components/mod/SuspendModModal.vue';
 import UnsuspendModModal from '@/components/mod/UnsuspendModModal.vue';
+import { useSuspensionActionUI } from '@/composables/useSuspensionActionUI';
 
 const props = defineProps({
   issue: {
@@ -49,20 +50,22 @@ const modIsSuspendedFromChannel = computed(() => {
   return getModSuspensionResult.value?.isOriginalPosterSuspended ?? false;
 });
 
-const showSuspendModal = ref(false);
-const showUnsuspendModal = ref(false);
-const showSuccessfullySuspended = ref(false);
-const showSuccessfullyUnsuspended = ref(false);
-
-const clickSuspend = () => {
-  if (props.disabled) return;
-  showSuspendModal.value = true;
-};
-
-const clickUnsuspend = () => {
-  if (props.disabled) return;
-  showUnsuspendModal.value = true;
-};
+const {
+  showSuspendModal,
+  showUnsuspendModal,
+  showSuccessfullySuspended,
+  showSuccessfullyUnsuspended,
+  openSuspendModal,
+  openUnsuspendModal,
+  closeSuspendModal,
+  closeUnsuspendModal,
+  handleSuspendedSuccessfully,
+  handleUnsuspendedSuccessfully,
+  dismissSuspendedNotification,
+  dismissUnsuspendedNotification,
+} = useSuspensionActionUI({
+  isDisabled: () => props.disabled,
+});
 </script>
 
 <template>
@@ -74,7 +77,7 @@ const clickUnsuspend = () => {
         'cursor-pointer bg-green-600 hover:bg-green-500': !disabled,
         'cursor-not-allowed bg-gray-500': disabled,
       }"
-      @click="clickUnsuspend"
+      @click="openUnsuspendModal"
     >
       <UserPlus class="h-6 w-6" />
       Unsuspend Mod
@@ -86,7 +89,7 @@ const clickUnsuspend = () => {
         'cursor-pointer bg-red-600 hover:bg-red-500': !disabled,
         'cursor-not-allowed bg-gray-500': disabled,
       }"
-      @click="clickSuspend"
+      @click="openSuspendModal"
     >
       <span class="flex shrink-0 self-start">
         <UserMinus />
@@ -97,11 +100,10 @@ const clickUnsuspend = () => {
       :title="'Suspend Mod'"
       :open="showSuspendModal"
       :issue-id="issue.id"
-      @close="showSuspendModal = false"
+      @close="closeSuspendModal"
       @suspended-successfully="
         () => {
-          showSuccessfullySuspended = true;
-          showSuspendModal = false;
+          handleSuspendedSuccessfully();
           $emit('suspended-successfully');
         }
       "
@@ -110,11 +112,10 @@ const clickUnsuspend = () => {
       :title="'Unsuspend Mod'"
       :open="showUnsuspendModal"
       :issue-id="issue.id"
-      @close="showUnsuspendModal = false"
+      @close="closeUnsuspendModal"
       @unsuspended-successfully="
         () => {
-          showSuccessfullyUnsuspended = true;
-          showUnsuspendModal = false;
+          handleUnsuspendedSuccessfully();
           $emit('unsuspended-successfully');
         }
       "
@@ -122,12 +123,12 @@ const clickUnsuspend = () => {
     <Notification
       :show="showSuccessfullySuspended"
       :title="'The mod was suspended.'"
-      @close-notification="showSuccessfullySuspended = false"
+      @close-notification="dismissSuspendedNotification"
     />
     <Notification
       :show="showSuccessfullyUnsuspended"
       :title="'The mod was unsuspended.'"
-      @close-notification="showSuccessfullyUnsuspended = false"
+      @close-notification="dismissUnsuspendedNotification"
     />
   </div>
 </template>
