@@ -13,8 +13,8 @@ vi.mock('nuxt/app', () => ({
 }));
 
 describe('NewEmojiButton', () => {
-  it('emits blocked-action instead of opening the picker when interaction is disabled', async () => {
-    const wrapper = mount(NewEmojiButton, {
+  const mountWrapper = () =>
+    mount(NewEmojiButton, {
       props: {
         interactionDisabled: true,
       },
@@ -40,9 +40,19 @@ describe('NewEmojiButton', () => {
       },
     });
 
+  it('emits blocked-action when interaction is disabled', async () => {
+    const wrapper = mountWrapper();
+
     await wrapper.get('[data-testid="emoji-button"]').trigger('click');
 
     expect(wrapper.emitted('blocked-action')).toHaveLength(1);
+  });
+
+  it('does not emit toggleEmojiPicker when interaction is disabled', async () => {
+    const wrapper = mountWrapper();
+
+    await wrapper.get('[data-testid="emoji-button"]').trigger('click');
+
     expect(wrapper.emitted('toggleEmojiPicker')).toBeUndefined();
   });
 });
