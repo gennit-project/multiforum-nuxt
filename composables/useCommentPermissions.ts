@@ -5,11 +5,14 @@ import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
 import { usernameVar, modProfileNameVar } from '@/cache';
-import { getAllPermissions } from '@/utils/permissionUtils';
+import {
+  getAllPermissions,
+  type PermissionFlags,
+} from '@/utils/permissionUtils';
 import { config } from '@/config';
 
 type UseCommentPermissionsReturn = {
-  userPermissions: ComputedRef<Record<string, boolean>>;
+  userPermissions: ComputedRef<PermissionFlags>;
   loading: ComputedRef<boolean>;
 };
 
