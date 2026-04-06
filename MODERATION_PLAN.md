@@ -26,19 +26,19 @@ These items are implemented and should stay visible for validation, regression c
 
 ### Implemented Tests To Re-Verify
 
-| Item | Location | QA Focus |
-| ---- | -------- | -------- |
-| `canCreateChannel` actually awaits and enforces `hasServerPermission()` | Backend rule test | Keep this in backend coverage and verify it protects the real server-suspension forum-creation path |
-| `isOriginalPosterSuspended` agrees with `getActiveSuspension()` for user and mod targets | Backend tests | Re-verify against future suspension refactors |
-| `isExpiredSuspension()` logic | Backend tests | Validate expiry edge cases against production-like timestamps |
-| `disconnectExpiredSuspensions()` no-op and mixed user/mod cleanup paths | Backend tests | Re-verify both cleanup branches under real mutation flows |
-| Shared suspension target resolution for discussion/event/comment-backed issues | Backend tests | Re-verify issue target resolution against future issue model changes |
-| Server-scoped admin/mod membership resolves from `ServerConfig` relationships instead of `showAdminTag` | Backend + frontend implementation | Manual validation across comments, discussions, events, profile/library surfaces, and admin editing flows |
-| Display "Server Admin" and "Server Mod" labels consistently on comments | Frontend implementation | Manual cross-surface verification before relying solely on E2E coverage |
-| Create/forum/discussion/event/comment flows suppress raw suspension-blocked errors when suspension context is available | Frontend unit tests + implementation | Re-verify against real GraphQL permission failures and stale cache cases |
-| Comment and discussion emoji controls show suspension-aware blocked-action UI | Frontend unit tests + implementation | Manual verification across both existing reactions and add-reaction entry points |
-| Suspended moderator issue-comment and moderation controls stay disabled in the main moderation UI | Frontend unit tests + implementation | Re-verify on actual issue detail pages and related moderation surfaces |
-| `useServerRoleMembership()` maps `ServerConfig.Admins` and `ServerConfig.Moderators` into the shared badge inputs | Frontend unit tests | Re-verify if the `ServerConfig` membership shape changes again |
+| Item                                                                                                                    | Location                             | QA Focus                                                                                                  |
+| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `canCreateChannel` actually awaits and enforces `hasServerPermission()`                                                 | Backend rule test                    | Keep this in backend coverage and verify it protects the real server-suspension forum-creation path       |
+| `isOriginalPosterSuspended` agrees with `getActiveSuspension()` for user and mod targets                                | Backend tests                        | Re-verify against future suspension refactors                                                             |
+| `isExpiredSuspension()` logic                                                                                           | Backend tests                        | Validate expiry edge cases against production-like timestamps                                             |
+| `disconnectExpiredSuspensions()` no-op and mixed user/mod cleanup paths                                                 | Backend tests                        | Re-verify both cleanup branches under real mutation flows                                                 |
+| Shared suspension target resolution for discussion/event/comment-backed issues                                          | Backend tests                        | Re-verify issue target resolution against future issue model changes                                      |
+| Server-scoped admin/mod membership resolves from `ServerConfig` relationships instead of `showAdminTag`                 | Backend + frontend implementation    | Manual validation across comments, discussions, events, profile/library surfaces, and admin editing flows |
+| Display "Server Admin" and "Server Mod" labels consistently on comments                                                 | Frontend implementation              | Manual cross-surface verification before relying solely on E2E coverage                                   |
+| Create/forum/discussion/event/comment flows suppress raw suspension-blocked errors when suspension context is available | Frontend unit tests + implementation | Re-verify against real GraphQL permission failures and stale cache cases                                  |
+| Comment and discussion emoji controls show suspension-aware blocked-action UI                                           | Frontend unit tests + implementation | Manual verification across both existing reactions and add-reaction entry points                          |
+| Suspended moderator issue-comment and moderation controls stay disabled in the main moderation UI                       | Frontend unit tests + implementation | Re-verify on actual issue detail pages and related moderation surfaces                                    |
+| `useServerRoleMembership()` maps `ServerConfig.Admins` and `ServerConfig.Moderators` into the shared badge inputs       | Frontend unit tests                  | Re-verify if the `ServerConfig` membership shape changes again                                            |
 
 ### Phase 1 Checklist Items Completed
 
@@ -69,11 +69,11 @@ These items are implemented and should stay visible for validation, regression c
 
 ### High Priority
 
-| Task                                                                    | Location | Reason                                                                                                                                                                                           |
-| ----------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Complete suspension-blocked UX consistency in remaining moderation surfaces | Frontend | The main create/reaction paths are now covered, but other blocked-action flows still need the same suspension-aware handling and messaging |
-| Finish frontend test coverage for suspension/reaction/moderation permission fallbacks | Frontend | The typed permission layer is in place, but remaining UI paths still need direct test coverage to prevent regressions |
-| Add any remaining backend edge-case coverage around active/expired suspension resolution | Backend | The shared backend suspension path is stabilized, but a few edge-case tests are still intentionally tracked as remaining stabilization work |
+| Task                                                                                     | Location | Reason                                                                                                                                      |
+| ---------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Complete suspension-blocked UX consistency in remaining moderation surfaces              | Frontend | The main create/reaction paths are now covered, but other blocked-action flows still need the same suspension-aware handling and messaging  |
+| Finish frontend test coverage for suspension/reaction/moderation permission fallbacks    | Frontend | The typed permission layer is in place, but remaining UI paths still need direct test coverage to prevent regressions                       |
+| Add any remaining backend edge-case coverage around active/expired suspension resolution | Backend  | The shared backend suspension path is stabilized, but a few edge-case tests are still intentionally tracked as remaining stabilization work |
 
 ### Medium Priority
 
@@ -98,17 +98,17 @@ These items are implemented and should stay visible for validation, regression c
 
 ### Stabilization Tests
 
-| Test                                                                                               | Priority | Location                                   |
-| -------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------ |
-| Expired suspension cleanup returns the correct active/no-active result across edge cases          | High     | Backend tests                              |
+| Test                                                                                     | Priority | Location      |
+| ---------------------------------------------------------------------------------------- | -------- | ------------- |
+| Expired suspension cleanup returns the correct active/no-active result across edge cases | High     | Backend tests |
 
 ### Missing Unit Tests
 
-| Test                                                                             | Priority       | Location       |
-| -------------------------------------------------------------------------------- | -------------- | -------------- |
-| `getActiveSuspension()` edge cases                                               | High           | Backend tests  |
-| Frontend permission fallback chains for user vs suspended user vs suspended mod  | Medium         | Frontend tests |
-| Broader component-level server badge rendering remains covered across all major surfaces | Medium         | Frontend tests |
+| Test                                                                                     | Priority | Location       |
+| ---------------------------------------------------------------------------------------- | -------- | -------------- |
+| `getActiveSuspension()` edge cases                                                       | High     | Backend tests  |
+| Frontend permission fallback chains for user vs suspended user vs suspended mod          | Medium   | Frontend tests |
+| Broader component-level server badge rendering remains covered across all major surfaces | Medium   | Frontend tests |
 
 ---
 
@@ -125,10 +125,7 @@ These items are implemented and should stay visible for validation, regression c
 
 ### Verification Then Follow-On
 
-- [ ] Re-run the remaining Cypress stabilization coverage from the dedicated E2E section at the end of this document
-- [ ] Add E2E coverage for expired suspension cleanup and immediate post-unsuspension recovery
-- [ ] Add E2E coverage for server admin and server mod badges based on `ServerConfig` relationships
-- [ ] Add E2E coverage confirming suspended mods cannot use issue-detail moderation controls
+- [ ] Run the remaining stabilization verification from the dedicated Cypress section at the end of this document
 - [ ] Only after the above is stable, move into suspended-user polish and suspended-mod workflow expansion
 
 ---
@@ -145,7 +142,6 @@ These items are implemented and should stay visible for validation, regression c
 | Task | Location | Type |
 |------|----------|------|
 | Verify existing emoji mutations are blocked for suspended users via `canUpvote*` permissions | Backend | Verification |
-| Run the new E2E test for suspended user emoji restriction against the safe test database | Frontend | Test Verification |
 
 ---
 
@@ -158,8 +154,6 @@ These items are implemented and should stay visible for validation, regression c
 **Required Work:**
 | Task | Location | Type |
 |------|----------|------|
-| Verify `serverLevelSuspension.spec.cy.ts` test passes | Frontend | Test Verification |
-| Add test case for indefinite server suspension | Frontend | Test |
 | Consider `canSuspendFromServer` permission for mod profiles | Backend | Decision/Feature |
 
 **Open Question:**
@@ -183,7 +177,6 @@ These items are implemented and should stay visible for validation, regression c
 **Required Work:**
 | Task | Location | Type |
 |------|----------|------|
-| Add E2E test verifying expired suspension cleanup | Frontend | Test |
 | Add any missing edge-case coverage around `getActiveSuspension()` and cleanup interactions | Backend | Test |
 
 ---
@@ -200,8 +193,6 @@ These items are implemented and should stay visible for validation, regression c
 | Task | Location | Type |
 |------|----------|------|
 | Verify notification includes issue link, expiration date, blocked action | Backend | Verification |
-| Add E2E test for unsuspension enabling previously blocked action | Frontend | Test |
-| Add test for notification received on blocked action | Frontend | Test |
 | Ensure notification UI shows issue link and expiration clearly | Frontend | Feature/Polish |
 | Finish any remaining create-flow suspension UX cleanup beyond the implemented forum/comment/discussion/event paths | Frontend | Refactor |
 
@@ -231,9 +222,6 @@ These items are implemented and should stay visible for validation, regression c
 | Add "Report" button/menu to mod profile page            | Frontend | Feature |
 | Add "Report" option to issue activity feed mod actions  | Frontend | Feature |
 | Create `reportModComment` mutation if needed            | Backend  | Feature |
-| E2E test for reporting mod from feedback page           | Frontend | Test    |
-| E2E test for reporting mod from profile page            | Frontend | Test    |
-| E2E test for reporting mod from issue page              | Frontend | Test    |
 
 #### Phase 2: Suspend from Mod Actions
 
@@ -256,7 +244,6 @@ These items are implemented and should stay visible for validation, regression c
 |------|----------|------|
 | Audit all mod-only UI elements for suspension checks | Frontend | Tech Debt |
 | Add "You are suspended" banner on moderation pages for suspended mods | Frontend | Feature |
-| E2E test verifying suspended mod cannot see any mod actions | Frontend | Test |
 | Verify issue page editing disabled for suspended mods | Frontend | Verification |
 
 ---
@@ -270,9 +257,7 @@ These items are implemented and should stay visible for validation, regression c
 **Required Work:**
 | Task | Location | Type |
 |------|----------|------|
-| Add E2E test for mod action blocked when suspended | Frontend | Test |
-| Add E2E test for mod action enabled after unsuspension | Frontend | Test |
-| Add E2E test for mod action enabled after suspension expires | Frontend | Test |
+| Verify blocked and restored mod-action behavior across suspended, unsuspended, and expired states | Frontend | Verification |
 
 ---
 
@@ -318,8 +303,6 @@ These items are implemented and should stay visible for validation, regression c
 | Verify mod suspension doesn't affect user permissions | Backend | Test |
 | Verify suspended mod can still create content as user | Frontend | Test |
 | Add clear UI indication when mod profile suspended vs user account | Frontend | Feature |
-| E2E test: suspend mod, verify can still post as user | Frontend | Test |
-| E2E test: suspend mod, verify can't moderate | Frontend | Test |
 
 ---
 
@@ -359,12 +342,9 @@ Note: work is not to begin on this feature until Catherine fills out more detail
 
 #### Tests
 
-| Task                                                   | Location | Type |
-| ------------------------------------------------------ | -------- | ---- |
-| E2E test for enabling moderation bot plugin            | Frontend | Test |
-| E2E test for bot auto-archiving rule violation         | Frontend | Test |
-| E2E test for bot comment appearing on archived content | Frontend | Test |
-| E2E test for appeal workflow                           | Frontend | Test |
+| Task                                                                                                 | Location | Type |
+| ---------------------------------------------------------------------------------------------------- | -------- | ---- |
+| Add automated test coverage for moderation bot enablement, auto-archiving, bot comments, and appeals | Frontend | Test |
 
 ---
 
@@ -378,54 +358,8 @@ Note: work is not to begin on this feature until Catherine fills out more detail
 | Task | Location | Type |
 |------|----------|------|
 | Validate the new server membership editor UX for larger admin/mod lists | Frontend | QA/Polish |
-| E2E tests for server admin and server mod badge display | Frontend | Test |
 
 ---
-
-## Implementation Phases
-
-### Phase 1: Stabilization & Correctness (Week 1-2)
-
-1. Finish remaining backend edge-case coverage around active/expired suspension resolution
-2. Finish remaining suspension-blocked UX cleanup outside the already-implemented create/reaction paths
-3. Add the remaining frontend permission-fallback and ServerConfig badge tests
-4. Re-run and tighten the key suspension/server-membership E2E coverage
-
-### Phase 2: Suspended User Polish (Week 3)
-
-1. Finish suspended-user reaction UX and error suppression
-2. Verify notification content is complete
-3. Add suspension status UI improvements
-4. E2E tests for all suspended user flows
-
-### Phase 3: Suspended Mod Workflows (Week 4-5)
-
-1. Add "Report" options to mod comments/profiles/actions
-2. Add "Suspend Mod" from various contexts
-3. Verify mod/user separation is complete and decide whether mod-profile bans are distinct from suspensions
-4. E2E tests for mod suspension workflows
-
-### Phase 4: Bot Decision & Server Admins (Week 6)
-
-1. Audit current bot action enforcement and make decision on bot suspension vs deprecation
-2. Implement chosen bot strategy
-3. Add E2E coverage and UX polish for ServerConfig-based server admin/server mod management and badge rendering
-4. E2E tests for new features
-
-### Phase 5: Auto-Moderation Plugin (Week 7-8)
-
-1. Design plugin schema
-2. Implement backend bot logic
-3. Implement frontend configuration
-4. Implement appeal workflow
-5. Comprehensive E2E tests
-
-### Phase 6: Tech Debt & Documentation (Week 9)
-
-1. Consolidate broader permission code where still justified after stabilization
-2. Add indexing/caching optimizations
-3. Create moderation documentation
-4. Final test coverage review
 
 ---
 
@@ -483,39 +417,34 @@ This section intentionally centralizes all Cypress work so the rest of the roadm
 
 ### Phase 1 Stabilization Cypress
 
-| Test | Priority | Location |
-| ---- | -------- | -------- |
-| Re-run and tighten server-level suspended user forum-creation coverage after the backend permission fix | High | `tests/cypress/e2e/suspensions/serverLevelSuspension.spec.cy.ts` |
-| Run the new suspended-user emoji coverage in a safe local test environment pointed at the test database | High | `tests/cypress/e2e/suspensions/suspendedUserPermissions.spec.cy.ts` |
-| Add expired-suspension cleanup coverage that proves the blocked action becomes allowed after cleanup | High | `tests/cypress/e2e/suspensions/` |
-| Add unsuspension recovery coverage that proves blocked actions re-enable immediately without stale UI state | High | `tests/cypress/e2e/suspensions/` |
-| Add server admin and server mod badge coverage based on `ServerConfig` relationships | High | `tests/cypress/e2e/comments/` |
-| Add suspended-mod issue-detail coverage proving moderation controls stay unavailable | High | `tests/cypress/e2e/mod/` |
+| Test                                                                                                        | Priority | Location                                                            |
+| ----------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------- |
+| Re-run and tighten server-level suspended user forum-creation coverage after the backend permission fix     | High     | `tests/cypress/e2e/suspensions/serverLevelSuspension.spec.cy.ts`    |
+| Add indefinite server-suspension forum-creation coverage                                                    | High     | `tests/cypress/e2e/suspensions/serverLevelSuspension.spec.cy.ts`    |
+| Run the new suspended-user emoji coverage in a safe local test environment pointed at the test database     | High     | `tests/cypress/e2e/suspensions/suspendedUserPermissions.spec.cy.ts` |
+| Add expired-suspension cleanup coverage that proves the blocked action becomes allowed after cleanup        | High     | `tests/cypress/e2e/suspensions/`                                    |
+| Add unsuspension recovery coverage that proves blocked actions re-enable immediately without stale UI state | High     | `tests/cypress/e2e/suspensions/`                                    |
+| Add blocked-action notification coverage for suspended-user create flows                                    | High     | `tests/cypress/e2e/suspensions/`                                    |
+| Add server admin and server mod badge coverage based on `ServerConfig` relationships                        | High     | `tests/cypress/e2e/comments/`                                       |
+| Add suspended-mod issue-detail coverage proving moderation controls stay unavailable                        | High     | `tests/cypress/e2e/mod/`                                            |
 
 ### Roadmap Cypress Backlog
 
-| Test | Priority | Location |
-| ---- | -------- | -------- |
-| Suspended mod sees no mod UI elements | High | `tests/cypress/e2e/mod/` |
-| Suspended mod cannot act on issue detail, comments, or feedback pages | High | `tests/cypress/e2e/mod/` |
-| Reporting mod comment from feedback page | Medium | `tests/cypress/e2e/mod/` |
-| Reporting mod from profile page | Medium | `tests/cypress/e2e/mod/` |
-| Reporting mod from issue detail / mod action context | Medium | `tests/cypress/e2e/mod/` |
-| Mod suspension doesn't affect user actions | High | `tests/cypress/e2e/suspensions/` |
-| Server admin badge on comments via ServerConfig membership | Medium | `tests/cypress/e2e/comments/` |
-| Server mod badge on comments via ServerConfig membership | Medium | `tests/cypress/e2e/comments/` |
-| Bot deprecation prevents actions | Medium | `tests/cypress/e2e/bots/` |
-
-## Conclusion
-
-The remaining work is now concentrated on verification, coverage, and the roadmap items that still do not exist. The main gaps are:
-
-1. **Stabilization verification** for suspension expiry, unsuspension recovery, and server-scope forum restrictions
-2. **Suspended user polish** around reaction coverage, notification verification, and any remaining blocked-action UX cleanup
-3. **Reporting workflows** for mod comments/profiles/actions
-4. **Suspended-mod coverage and workflow expansion** beyond the current disabled-state implementation
-5. **Bot handling** audit, decision, and implementation
-6. **Auto-moderation plugin** as a plugin-system feature
-7. **Test coverage** for remaining stabilization gaps and new scenarios
-
-The recommended approach is to finish the remaining Phase 1 verification work before expanding into new suspended-mod workflows, bot decisions, or the moderation plugin feature.
+| Test                                                                    | Priority | Location                         |
+| ----------------------------------------------------------------------- | -------- | -------------------------------- |
+| Suspended mod sees no mod UI elements                                   | High     | `tests/cypress/e2e/mod/`         |
+| Suspended mod cannot act on issue detail, comments, or feedback pages   | High     | `tests/cypress/e2e/mod/`         |
+| Reporting mod comment from feedback page                                | Medium   | `tests/cypress/e2e/mod/`         |
+| Reporting mod from profile page                                         | Medium   | `tests/cypress/e2e/mod/`         |
+| Reporting mod from issue detail / mod action context                    | Medium   | `tests/cypress/e2e/mod/`         |
+| Mod suspension doesn't affect user actions                              | High     | `tests/cypress/e2e/suspensions/` |
+| Suspended mod can still post as a user while moderation remains blocked | High     | `tests/cypress/e2e/suspensions/` |
+| Mod actions re-enable after unsuspension                                | High     | `tests/cypress/e2e/mod/`         |
+| Mod actions re-enable after suspension expiry                           | High     | `tests/cypress/e2e/mod/`         |
+| Server admin badge on comments via ServerConfig membership              | Medium   | `tests/cypress/e2e/comments/`    |
+| Server mod badge on comments via ServerConfig membership                | Medium   | `tests/cypress/e2e/comments/`    |
+| Bot deprecation prevents actions                                        | Medium   | `tests/cypress/e2e/bots/`        |
+| Moderation bot plugin enablement works end to end                       | Medium   | `tests/cypress/e2e/bots/`        |
+| Moderation bot auto-archives matching rule violations                   | Medium   | `tests/cypress/e2e/bots/`        |
+| Moderation bot comment appears on archived content                      | Medium   | `tests/cypress/e2e/bots/`        |
+| Moderation bot appeal workflow works end to end                         | Medium   | `tests/cypress/e2e/bots/`        |
