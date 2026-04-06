@@ -88,7 +88,6 @@ describe('DefaultRolesEditor', () => {
       canUpvoteComment: true,
       canUploadFile: false,
       canGiveFeedback: false,
-      showAdminTag: false,
     },
     DefaultModRole: {
       name: 'ModRole',

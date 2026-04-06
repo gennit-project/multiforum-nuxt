@@ -7,8 +7,10 @@ import { navigateTo, useHead, useRoute } from 'nuxt/app';
 import UserContributionChart from '@/components/charts/UserContributionChart.vue';
 import UserProfileChannelFilter from '@/components/user/UserProfileChannelFilter.vue';
 import ContributionChartSkeleton from '@/components/charts/ContributionChartSkeleton.vue';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 
 const route = useRoute();
+const { serverAdminUsernames } = useServerRoleMembership();
 const username = computed(() => {
   return typeof route.params.username === 'string' ? route.params.username : '';
 });
@@ -60,11 +62,11 @@ const user = computed(() => {
 });
 
 const isAdmin = computed(() => {
-  if (user.value) {
-    const serverRole = user.value.ServerRoles?.[0];
-    return serverRole?.showAdminTag;
+  if (!user.value?.username) {
+    return false;
   }
-  return false;
+
+  return serverAdminUsernames.value.includes(user.value.username);
 });
 
 // Check if we're on an image detail page

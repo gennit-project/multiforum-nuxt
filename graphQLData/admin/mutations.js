@@ -155,7 +155,82 @@ export const UPDATE_SERVER_ROLE = gql`
         canUpvoteComment
         canUploadFile
         canGiveFeedback
-        showAdminTag
+      }
+    }
+  }
+`;
+
+export const ADD_SERVER_ADMIN = gql`
+  mutation AddServerAdmin($serverName: String!, $username: String!) {
+    updateServerConfigs(
+      where: { serverName: $serverName }
+      connect: { Admins: [{ where: { node: { username: $username } } }] }
+    ) {
+      serverConfigs {
+        serverName
+        Admins {
+          username
+          displayName
+        }
+      }
+    }
+  }
+`;
+
+export const REMOVE_SERVER_ADMIN = gql`
+  mutation RemoveServerAdmin($serverName: String!, $username: String!) {
+    updateServerConfigs(
+      where: { serverName: $serverName }
+      disconnect: { Admins: [{ where: { node: { username: $username } } }] }
+    ) {
+      serverConfigs {
+        serverName
+        Admins {
+          username
+          displayName
+        }
+      }
+    }
+  }
+`;
+
+export const ADD_SERVER_MODERATOR = gql`
+  mutation AddServerModerator($serverName: String!, $displayName: String!) {
+    updateServerConfigs(
+      where: { serverName: $serverName }
+      connect: {
+        Moderators: [{ where: { node: { displayName: $displayName } } }]
+      }
+    ) {
+      serverConfigs {
+        serverName
+        Moderators {
+          displayName
+          User {
+            username
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const REMOVE_SERVER_MODERATOR = gql`
+  mutation RemoveServerModerator($serverName: String!, $displayName: String!) {
+    updateServerConfigs(
+      where: { serverName: $serverName }
+      disconnect: {
+        Moderators: [{ where: { node: { displayName: $displayName } } }]
+      }
+    ) {
+      serverConfigs {
+        serverName
+        Moderators {
+          displayName
+          User {
+            username
+          }
+        }
       }
     }
   }
