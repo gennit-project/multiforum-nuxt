@@ -31,6 +31,7 @@ import EditsDropdown from './activityFeed/EditsDropdown.vue';
 import type { Discussion } from '@/__generated__/graphql';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 
 const props = defineProps<{
   discussion: Discussion | null;
@@ -348,15 +349,32 @@ const handleCrosspost = () => {
 };
 const deleteModalIsOpen = ref(false);
 
-const showBrokenRulesModal = ref(false);
-const showArchiveModal = ref(false);
-const showUnarchiveModal = ref(false);
-const showArchiveAndSuspendModal = ref(false);
-
-const showSuccessfullyReported = ref(false);
-const showSuccessfullyArchived = ref(false);
-const showSuccessfullyUnarchived = ref(false);
-const showSuccessfullyArchivedAndSuspended = ref(false);
+const {
+  showReportModal: showBrokenRulesModal,
+  showArchiveModal,
+  showUnarchiveModal,
+  showArchiveAndSuspendModal,
+  showSuccessfullyReported,
+  showSuccessfullyArchived,
+  showSuccessfullyUnarchived,
+  showSuccessfullyArchivedAndSuspended,
+  openReportModal,
+  openArchiveModal,
+  openUnarchiveModal,
+  openArchiveAndSuspendModal,
+  closeReportModal,
+  closeArchiveModal,
+  closeUnarchiveModal,
+  closeArchiveAndSuspendModal,
+  handleReportedSuccessfully,
+  handleArchivedSuccessfully,
+  handleUnarchivedSuccessfully,
+  handleArchivedAndSuspendedSuccessfully,
+  dismissReportedNotification,
+  dismissArchivedNotification,
+  dismissUnarchivedNotification,
+  dismissArchivedAndSuspendedNotification,
+} = useModerationOutcomeUI();
 const showSuccessfullyUpdatedSensitiveContent = ref(false);
 
 const menuItems = computed(() => {
@@ -521,10 +539,10 @@ const warningModalBody = computed(() => {
             )
           "
           @handle-delete="deleteModalIsOpen = true"
-          @handle-click-report="showBrokenRulesModal = true"
-          @handle-click-archive="showArchiveModal = true"
-          @handle-click-archive-and-suspend="showArchiveAndSuspendModal = true"
-          @handle-click-unarchive="showUnarchiveModal = true"
+          @handle-click-report="openReportModal"
+          @handle-click-archive="openArchiveModal"
+          @handle-click-archive-and-suspend="openArchiveAndSuspendModal"
+          @handle-click-unarchive="openUnarchiveModal"
           @handle-feedback="emit('handleClickGiveFeedback')"
           @handle-add-album="emit('handleClickAddAlbum')"
           @handle-toggle-sensitive-content="handleToggleSensitiveContent"
@@ -559,13 +577,8 @@ const warningModalBody = computed(() => {
       :discussion-title="discussion?.title"
       :discussion-id="discussion?.id"
       :archive-after-reporting="false"
-      @close="showBrokenRulesModal = false"
-      @report-submitted-successfully="
-        () => {
-          showSuccessfullyReported = true;
-          showBrokenRulesModal = false;
-        }
-      "
+      @close="closeReportModal"
+      @report-submitted-successfully="handleReportedSuccessfully"
     />
     <BrokenRulesModal
       :v-if="discussion"
@@ -574,26 +587,16 @@ const warningModalBody = computed(() => {
       :discussion-id="discussion?.id"
       :archive-after-reporting="true"
       :discussion-channel-id="discussionChannelId"
-      @close="showArchiveModal = false"
-      @reported-and-archived-successfully="
-        () => {
-          showSuccessfullyArchived = true;
-          showArchiveModal = false;
-        }
-      "
+      @close="closeArchiveModal"
+      @reported-and-archived-successfully="handleArchivedSuccessfully"
     />
     <UnarchiveModal
       v-if="discussionChannelId && discussion?.id"
       :open="showUnarchiveModal"
       :discussion-channel-id="discussionChannelId"
       :discussion-id="discussion?.id"
-      @close="showUnarchiveModal = false"
-      @unarchived-successfully="
-        () => {
-          showSuccessfullyUnarchived = true;
-          showUnarchiveModal = false;
-        }
-      "
+      @close="closeUnarchiveModal"
+      @unarchived-successfully="handleUnarchivedSuccessfully"
     />
     <BrokenRulesModal
       v-if="discussion"
@@ -604,33 +607,28 @@ const warningModalBody = computed(() => {
       :discussion-channel-id="discussionChannelId"
       :suspend-user-enabled="true"
       :text-box-label="'(Optional) Explain why you are suspending this author:'"
-      @close="showArchiveAndSuspendModal = false"
-      @suspended-user-successfully="
-        () => {
-          showSuccessfullyArchivedAndSuspended = true;
-          showArchiveAndSuspendModal = false;
-        }
-      "
+      @close="closeArchiveAndSuspendModal"
+      @suspended-user-successfully="handleArchivedAndSuspendedSuccessfully"
     />
     <Notification
       :show="showSuccessfullyReported"
       :title="'Your report was submitted successfully.'"
-      @close-notification="showSuccessfullyReported = false"
+      @close-notification="dismissReportedNotification"
     />
     <Notification
       :show="showSuccessfullyArchived"
       :title="'The content was reported and archived successfully.'"
-      @close-notification="showSuccessfullyArchived = false"
+      @close-notification="dismissArchivedNotification"
     />
     <Notification
       :show="showSuccessfullyArchivedAndSuspended"
       :title="'Archived the post and suspended the author.'"
-      @close-notification="showSuccessfullyArchivedAndSuspended = false"
+      @close-notification="dismissArchivedAndSuspendedNotification"
     />
     <Notification
       :show="showSuccessfullyUnarchived"
       :title="'The content was unarchived successfully.'"
-      @close-notification="showSuccessfullyUnarchived = false"
+      @close-notification="dismissUnarchivedNotification"
     />
     <Notification
       :show="showSuccessfullyUpdatedSensitiveContent"

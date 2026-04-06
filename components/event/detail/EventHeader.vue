@@ -34,6 +34,7 @@ import { config } from '@/config';
 import { CHECK_EVENT_ISSUE_EXISTENCE } from '@/graphQLData/issue/queries';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 
 const props = defineProps({
   eventData: {
@@ -65,16 +66,32 @@ const showFeedbackFormModal = ref(false);
 const showFeedbackSubmittedSuccessfully = ref(false);
 const confirmDeleteIsOpen = ref(false);
 const confirmCancelIsOpen = ref(false);
-const showArchiveAndSuspendModal = ref(false);
-
-const showReportEventModal = ref(false);
-const showArchiveModal = ref(false);
-const showUnarchiveModal = ref(false);
-const showSuccessfullyArchived = ref(false);
-const showSuccessfullyUnarchived = ref(false);
-const showSuccessfullySuspended = ref(false);
-const showSuccessfullyArchivedAndSuspended = ref(false);
-const showSuccessfullyReported = ref(false);
+const {
+  showReportModal: showReportEventModal,
+  showArchiveModal,
+  showUnarchiveModal,
+  showArchiveAndSuspendModal,
+  showSuccessfullyArchived,
+  showSuccessfullyUnarchived,
+  showSuccessfullyArchivedAndSuspended,
+  showSuccessfullyReported,
+  openReportModal,
+  openArchiveModal,
+  openUnarchiveModal,
+  openArchiveAndSuspendModal,
+  closeReportModal,
+  closeArchiveModal,
+  closeUnarchiveModal,
+  closeArchiveAndSuspendModal,
+  handleReportedSuccessfully,
+  handleArchivedSuccessfully,
+  handleUnarchivedSuccessfully,
+  handleArchivedAndSuspendedSuccessfully,
+  dismissReportedNotification,
+  dismissArchivedNotification,
+  dismissUnarchivedNotification,
+  dismissArchivedAndSuspendedNotification,
+} = useModerationOutcomeUI();
 
 const eventId = computed(() => {
   return (
@@ -507,12 +524,12 @@ function handleFeedbackInput(event: string) {
           "
           @handle-delete="confirmDeleteIsOpen = true"
           @handle-cancel="confirmCancelIsOpen = true"
-          @handle-report="showReportEventModal = true"
+          @handle-report="openReportModal"
           @handle-feedback="showFeedbackFormModal = true"
           @handle-view-feedback="handleViewFeedback"
-          @handle-click-archive="showArchiveModal = true"
-          @handle-click-archive-and-suspend="showArchiveAndSuspendModal = true"
-          @handle-click-unarchive="showUnarchiveModal = true"
+          @handle-click-archive="openArchiveModal"
+          @handle-click-archive-and-suspend="openArchiveAndSuspendModal"
+          @handle-click-unarchive="openUnarchiveModal"
         >
           <EllipsisHorizontal
             class="h-6 w-6 cursor-pointer hover:text-black dark:text-gray-300 dark:hover:text-white"
@@ -570,18 +587,13 @@ function handleFeedbackInput(event: string) {
           :event-channel-id="eventChannelId"
           :suspend-user-enabled="true"
           :text-box-label="'(Optional) Explain why you are suspending the event submitter:'"
-          @close="showArchiveAndSuspendModal = false"
-          @suspended-user-successfully="
-            () => {
-              showSuccessfullyArchivedAndSuspended = true;
-              showArchiveAndSuspendModal = false;
-            }
-          "
+          @close="closeArchiveAndSuspendModal"
+          @suspended-user-successfully="handleArchivedAndSuspendedSuccessfully"
         />
         <Notification
           :show="showSuccessfullyArchivedAndSuspended"
           :title="'Archived the post and suspended the author.'"
-          @close-notification="showSuccessfullyArchivedAndSuspended = false"
+          @close-notification="dismissArchivedAndSuspendedNotification"
         />
         <Notification
           :show="showFeedbackSubmittedSuccessfully"
@@ -592,13 +604,8 @@ function handleFeedbackInput(event: string) {
           :open="showReportEventModal"
           :event-title="eventData.title"
           :event-id="eventId"
-          @close="showReportEventModal = false"
-          @report-submitted-successfully="
-            () => {
-              showSuccessfullyReported = true;
-              showReportEventModal = false;
-            }
-          "
+          @close="closeReportModal"
+          @report-submitted-successfully="handleReportedSuccessfully"
         />
         <BrokenRulesModal
           :v-if="eventData && eventData.id"
@@ -607,11 +614,10 @@ function handleFeedbackInput(event: string) {
           :event-id="eventData?.id"
           :archive-after-reporting="true"
           :event-channel-id="eventChannelId"
-          @close="showArchiveModal = false"
+          @close="closeArchiveModal"
           @reported-and-archived-successfully="
             () => {
-              showSuccessfullyArchived = true;
-              showArchiveModal = false;
+              handleArchivedSuccessfully();
               $emit('archived-successfully');
             }
           "
@@ -621,33 +627,23 @@ function handleFeedbackInput(event: string) {
           :open="showUnarchiveModal"
           :event-channel-id="eventChannelId"
           :event-id="eventData?.id"
-          @close="showUnarchiveModal = false"
-          @unarchived-successfully="
-            () => {
-              showSuccessfullyUnarchived = true;
-              showUnarchiveModal = false;
-            }
-          "
+          @close="closeUnarchiveModal"
+          @unarchived-successfully="handleUnarchivedSuccessfully"
         />
         <Notification
           :show="showSuccessfullyReported"
           :title="'Your report was submitted successfully.'"
-          @close-notification="showSuccessfullyReported = false"
+          @close-notification="dismissReportedNotification"
         />
         <Notification
           :show="showSuccessfullyArchived"
           :title="'The event was reported and archived successfully.'"
-          @close-notification="showSuccessfullyArchived = false"
+          @close-notification="dismissArchivedNotification"
         />
         <Notification
           :show="showSuccessfullyUnarchived"
           :title="'The event was unarchived successfully.'"
-          @close-notification="showSuccessfullyUnarchived = false"
-        />
-        <Notification
-          :show="showSuccessfullySuspended"
-          :title="'The event was suspended successfully.'"
-          @close-notification="showSuccessfullySuspended = false"
+          @close-notification="dismissUnarchivedNotification"
         />
       </div>
     </client-only>
