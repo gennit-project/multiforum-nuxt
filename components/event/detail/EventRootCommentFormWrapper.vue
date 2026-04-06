@@ -168,6 +168,15 @@ const showSuspensionNotice = computed(() => {
   return submitAttempted.value && !!suspensionIssueNumber.value;
 });
 
+const showCreateCommentPermissionError = computed(() => {
+  return !(
+    createCommentPermissionError.value &&
+    showSuspensionNotice.value &&
+    suspensionChannelId.value &&
+    suspensionIssueNumber.value !== null
+  );
+});
+
 function handleCreateComment() {
   if (!props.event) {
     console.warn(
@@ -188,7 +197,7 @@ function handleUpdateComment(event: string) {
 <template>
   <div>
     <ErrorBanner
-      v-if="createCommentPermissionError"
+      v-if="createCommentPermissionError && showCreateCommentPermissionError"
       :text="createCommentPermissionError"
     />
     <CreateRootCommentForm

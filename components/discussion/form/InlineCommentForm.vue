@@ -298,6 +298,15 @@ const showSuspensionNotice = computed(() => {
   return submitAttempted.value && !!suspensionIssueNumber.value;
 });
 
+const showCreateCommentError = computed(() => {
+  return !(
+    createCommentError.value &&
+    showSuspensionNotice.value &&
+    suspensionChannelId.value &&
+    suspensionIssueNumber.value !== null
+  );
+});
+
 const handleCreateComment = async () => {
   if (!props.discussionChannel) {
     console.warn('Could not create comment: no discussion channel');
@@ -369,7 +378,7 @@ const applyBotSuggestion = (value: string) => {
 <template>
   <div class="mb-3 w-full">
     <ErrorBanner
-      v-if="createCommentError"
+      v-if="createCommentError && showCreateCommentError"
       :text="createCommentError?.message"
     />
     <SuspensionNotice

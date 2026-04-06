@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, defineProps, computed } from 'vue';
+import { defineProps, computed } from 'vue';
 import type { PropType } from 'vue';
 import UserPlus from '../icons/UserPlus.vue';
 import UserMinus from '../icons/UserMinus.vue';
@@ -13,6 +13,7 @@ import {
 } from '@/graphQLData/mod/queries';
 import UnsuspendUserModal from '@/components/mod/UnsuspendUserModal.vue';
 import type { Issue } from '@/__generated__/graphql';
+import { useSuspensionActionUI } from '@/composables/useSuspensionActionUI';
 
 const props = defineProps({
   issue: {
@@ -75,10 +76,22 @@ const userIsSuspendedFromChannel = computed(() => {
   return getUserSuspensionResult.value?.isOriginalPosterSuspended ?? false;
 });
 
-const showSuspendModal = ref(false);
-const showUnsuspendModal = ref(false);
-const showSuccessfullySuspended = ref(false);
-const showSuccessfullyUnsuspended = ref(false);
+const {
+  showSuspendModal,
+  showUnsuspendModal,
+  showSuccessfullySuspended,
+  showSuccessfullyUnsuspended,
+  openSuspendModal,
+  openUnsuspendModal,
+  closeSuspendModal,
+  closeUnsuspendModal,
+  handleSuspendedSuccessfully,
+  handleUnsuspendedSuccessfully,
+  dismissSuspendedNotification,
+  dismissUnsuspendedNotification,
+} = useSuspensionActionUI({
+  isDisabled: () => props.disabled,
+});
 
 const { result: getDiscussionChannelResult } = useQuery(
   GET_DISCUSSION_CHANNEL,
@@ -101,15 +114,6 @@ const eventChannelId = computed(() => {
   return getEventChannelResult.value?.eventChannels?.[0]?.id ?? '';
 });
 
-const clickSuspend = () => {
-  if (props.disabled) return;
-  showSuspendModal.value = true;
-};
-
-const clickUnsuspend = () => {
-  if (props.disabled) return;
-  showUnsuspendModal.value = true;
-};
 </script>
 
 <template>
@@ -121,7 +125,7 @@ const clickUnsuspend = () => {
         'cursor-pointer bg-green-600 hover:bg-green-500': !disabled,
         'cursor-not-allowed bg-gray-500': disabled,
       }"
-      @click="clickUnsuspend"
+      @click="openUnsuspendModal"
     >
       <UserPlus class="h-6 w-6" />
       Unsuspend Author
@@ -133,7 +137,7 @@ const clickUnsuspend = () => {
         'cursor-pointer bg-red-600 hover:bg-red-500': !disabled,
         'cursor-not-allowed bg-gray-500': disabled,
       }"
-      @click="clickSuspend"
+      @click="openSuspendModal"
     >
       <span class="flex shrink-0 self-start">
         <UserMinus />
@@ -153,11 +157,10 @@ const clickUnsuspend = () => {
       :suspend-user-enabled="true"
       :text-box-label="'(Optional) Explain why you are suspending this author:'"
       :issue-id="issue.id"
-      @close="showSuspendModal = false"
+      @close="closeSuspendModal"
       @suspended-user-successfully="
         () => {
-          showSuccessfullySuspended = true;
-          showSuspendModal = false;
+          handleSuspendedSuccessfully();
           $emit('suspended-successfully');
         }
       "
@@ -166,11 +169,10 @@ const clickUnsuspend = () => {
       :title="'Unsuspend Author'"
       :open="showUnsuspendModal"
       :issue-id="issue.id"
-      @close="showUnsuspendModal = false"
+      @close="closeUnsuspendModal"
       @unsuspended-successfully="
         () => {
-          showSuccessfullyUnsuspended = true;
-          showUnsuspendModal = false;
+          handleUnsuspendedSuccessfully();
           $emit('unsuspended-successfully');
         }
       "
@@ -178,12 +180,12 @@ const clickUnsuspend = () => {
     <Notification
       :show="showSuccessfullySuspended"
       :title="'The author was suspended.'"
-      @close-notification="showSuccessfullySuspended = false"
+      @close-notification="dismissSuspendedNotification"
     />
     <Notification
       :show="showSuccessfullyUnsuspended"
       :title="'The author was unsuspended.'"
-      @close-notification="showSuccessfullyUnsuspended = false"
+      @close-notification="dismissUnsuspendedNotification"
     />
   </div>
 </template>
