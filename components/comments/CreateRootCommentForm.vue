@@ -86,12 +86,20 @@ const writeReplyStyle =
 const botMentionsBlocked = computed(() => {
   return !props.allowBotMentions && hasBotMention(props.createFormValues?.text);
 });
+
+const showCreateCommentError = computed(() => {
+  return !(
+    props.createCommentError &&
+    props.suspensionIssueNumber &&
+    props.suspensionChannelId
+  );
+});
 </script>
 
 <template>
   <div class="ml-1 flex w-full flex-col space-x-2">
     <ErrorBanner
-      v-if="createCommentError"
+      v-if="createCommentError && showCreateCommentError"
       :text="createCommentError?.message"
     />
     <SuspensionNotice

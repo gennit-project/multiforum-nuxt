@@ -253,6 +253,14 @@ const isPermissionCheckPending = computed(() => {
 
   return (isAuthenticatedVar.value || hasAuthHint.value) && !usernameVar.value;
 });
+
+const showCreateChannelError = computed(() => {
+  return !(
+    props.createChannelError &&
+    props.suspensionIssueNumber &&
+    props.suspensionChannelId
+  );
+});
 </script>
 
 <template>
@@ -271,7 +279,7 @@ const isPermissionCheckPending = computed(() => {
           :text="error.message"
         />
       </div>
-      <div v-if="createChannelError">
+      <div v-if="createChannelError && showCreateChannelError">
         <ErrorBanner
           v-for="(error, i) in createChannelError?.graphQLErrors"
           :key="i"
