@@ -98,6 +98,25 @@ export const GET_SERVER_PERMISSIONS = gql`
   query getServerConfig($serverName: String!) {
     serverConfigs(where: { serverName: $serverName }) {
       serverName
+      Admins {
+        username
+        displayName
+        profilePicURL
+        commentKarma
+        discussionKarma
+        createdAt
+      }
+      Moderators {
+        displayName
+        User {
+          username
+          displayName
+          profilePicURL
+          commentKarma
+          discussionKarma
+          createdAt
+        }
+      }
       DefaultModRole {
         name
         description

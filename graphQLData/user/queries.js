@@ -48,9 +48,6 @@ export const GET_USER = gql`
       AlbumsAggregate {
         count
       }
-      ServerRoles {
-        showAdminTag
-      }
       AdminOfChannelsAggregate {
         count
       }
@@ -176,9 +173,6 @@ export const GET_USER_DOWNLOADS = gql`
           commentKarma
           discussionKarma
           createdAt
-          ServerRoles {
-            showAdminTag
-          }
         }
         title
         body
@@ -240,9 +234,6 @@ export const GET_USER_OWNED_DOWNLOADS = gql`
           commentKarma
           discussionKarma
           createdAt
-          ServerRoles {
-            showAdminTag
-          }
         }
         DiscussionChannels {
           id

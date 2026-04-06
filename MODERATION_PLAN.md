@@ -49,7 +49,7 @@ This document analyzes the current moderation implementation across both the fro
 | `isOriginalPosterSuspended` agrees with `getActiveSuspension()` for user and mod targets           | Done     | Backend tests                              |
 | Expired suspension disconnects on attempted action and then allows the action                      | High     | Backend + `tests/cypress/e2e/suspensions/` |
 | Unsuspension immediately restores blocked actions without stale UI state                           | High     | `tests/cypress/e2e/suspensions/`           |
-| Server-scoped admin/mod membership resolves from `ServerConfig` relationships instead of `showAdminTag` | Partially Done | Backend tests complete, frontend tests pending |
+| Server-scoped admin/mod membership resolves from `ServerConfig` relationships instead of `showAdminTag` | Done | Backend and frontend implementation complete; E2E coverage still pending |
 
 ### Missing E2E Tests
 
@@ -100,8 +100,8 @@ This document analyzes the current moderation implementation across both the fro
 - [ ] Standardize suspension-blocked UX across forum creation, discussion creation, event creation, comment creation, and emoji/reaction attempts
 - [ ] Hide or disable emoji controls where suspended state is already known, while preserving backend enforcement as the source of truth
 - [ ] Add stronger TypeScript typing for moderation permission objects and suspension-related UI state
-- [ ] Start replacing `showAdminTag`-driven server-scoped labels with data derived from `ServerConfig` membership
-- [ ] Rework comment/detail/list author badge resolution so server-scoped labels mirror channel-scoped labels
+- [x] Start replacing `showAdminTag`-driven server-scoped labels with data derived from `ServerConfig` membership
+- [x] Rework comment/detail/list author badge resolution so server-scoped labels mirror channel-scoped labels
 - [ ] Add frontend tests for suspended-user reaction UI, permission fallback chains, suspended-mod action visibility, and ServerConfig-based badge resolution
 
 ### Verification Then Follow-On
@@ -109,7 +109,7 @@ This document analyzes the current moderation implementation across both the fro
 - [ ] Re-run and tighten `tests/cypress/e2e/suspensions/serverLevelSuspension.spec.cy.ts` against the fixed backend rule path
 - [ ] Add E2E coverage for expired suspension cleanup and immediate post-unsuspension recovery
 - [ ] Add E2E coverage for server admin and server mod badges based on `ServerConfig` relationships
-- [ ] Confirm any remaining `showAdminTag` usage is either removed or explicitly scoped as temporary migration code
+- [x] Confirm any remaining `showAdminTag` usage is either removed or explicitly scoped as temporary migration code
 - [ ] Only after the above is stable, move into suspended-user polish and suspended-mod workflow expansion
 
 ---
@@ -131,7 +131,7 @@ This document analyzes the current moderation implementation across both the fro
 - **Two-Tier System**: User permissions vs Moderator permissions
 - **Role Hierarchy**: Admin > Elevated Mod > Standard Mod > Suspended Mod
 - **Channel & Server Scopes**: Different enforcement paths for each
-- **Server-Scoped Identity UX**: Backend primitives now exist for `ServerConfig`-attached `Admins` and `Moderators`, plus a shared membership helper with legacy fallback; current comment/list UIs still lean on `showAdminTag` in some places, so the remaining work is the frontend migration onto those relationships
+- **Server-Scoped Identity UX**: Backend primitives and frontend badge/rendering paths now use `ServerConfig`-attached `Admins` and `Moderators`; `showAdminTag` has been removed from the user-facing frontend and replaced with explicit server membership management in the admin UI
 
 #### Moderation Actions
 
@@ -441,18 +441,19 @@ Note: work is not to begin on this feature until Catherine fills out more detail
 
 **Current State:**
 
-- ⚠️ `showAdminTag` exists today and is already queried in several discussion/event/comment surfaces, but it should be treated as deprecated
-- ✅ Some author-status and badge-display logic already exists
-- ❓ Missing pieces are a canonical server-admin/server-mod membership model on `ServerConfig` and consistent comment labeling across all comment contexts
+- ✅ `ServerConfig` now owns explicit `Admins` and `Moderators` relationships in the backend
+- ✅ User-facing frontend badge resolution has been migrated off `showAdminTag`
+- ✅ Admin UI now manages server-scoped membership directly from the admin roles page
+- ❓ Remaining work is mostly verification and UX polish: comment-surface consistency checks, E2E coverage, and any follow-on search/autocomplete improvements for membership editing
 
 **Required Work:**
 | Task | Location | Type |
 |------|----------|------|
-| Add `ServerAdmins` and `ServerModerators` relationships to `ServerConfig` | Backend | Feature |
-| Deprecate `showAdminTag`-driven server moderation UX and migrate callers to ServerConfig membership lookups | Both | Refactor |
-| Add query and admin view to list/manage server admins and server moderators | Both | Feature |
-| Rework comment/detail/list badge resolution so server-scoped labels mirror channel-scoped labels | Frontend | Refactor |
-| Display "Server Admin" and "Server Mod" labels consistently on comments | Frontend | Feature |
+| Add `ServerAdmins` and `ServerModerators` relationships to `ServerConfig` | Backend | Done |
+| Deprecate `showAdminTag`-driven server moderation UX and migrate callers to ServerConfig membership lookups | Both | Done |
+| Add query and admin view to list/manage server admins and server moderators | Both | Done |
+| Rework comment/detail/list badge resolution so server-scoped labels mirror channel-scoped labels | Frontend | Done |
+| Display "Server Admin" and "Server Mod" labels consistently on comments | Frontend | Implemented; E2E verification pending |
 | E2E tests for server admin and server mod badge display | Frontend | Test |
 
 ---
@@ -463,7 +464,7 @@ Note: work is not to begin on this feature until Catherine fills out more detail
 
 1. Fix backend permission correctness for server-scope forum creation
 2. Consolidate suspension target resolution and active-suspension reads
-3. Introduce ServerConfig-scoped server admin/mod relationships and start deprecating `showAdminTag`
+3. Introduce ServerConfig-scoped server admin/mod relationships and complete the `showAdminTag` deprecation in user-facing/frontend admin flows
 4. Add backend rule/unit coverage for suspension lifecycle, cleanup, and server membership reads
 5. Add targeted frontend typing and consistent suspension-blocked UX for existing flows
 
@@ -485,7 +486,7 @@ Note: work is not to begin on this feature until Catherine fills out more detail
 
 1. Audit current bot action enforcement and make decision on bot suspension vs deprecation
 2. Implement chosen bot strategy
-3. Finish ServerConfig-based server admin/server mod list and badge migration
+3. Add E2E coverage and UX polish for ServerConfig-based server admin/server mod management and badge rendering
 4. E2E tests for new features
 
 ### Phase 5: Auto-Moderation Plugin (Week 7-8)
@@ -513,7 +514,7 @@ Note: work is not to begin on this feature until Catherine fills out more detail
 
 3. **Mod Profile Bans**: Is "ban mod profile while leaving user profile intact" a distinct state from suspension, or should permanent mod suspension cover that use case?
 
-4. **ServerConfig Membership Model**: Should server-scoped admin/mod relationships fully replace `showAdminTag`, or is there any remaining role-flag use case that still needs to survive the migration?
+4. **ServerConfig Membership UX**: Does the new admin/mod membership editor need search, autocomplete, or invite-style workflows before it is considered complete for moderators managing large server teams?
 
 5. **Auto-Moderation Scope**: Should the auto-moderation bot:
    - Only archive, or also suspend?
@@ -558,7 +559,7 @@ Note: work is not to begin on this feature until Catherine fills out more detail
 The moderation system has a solid foundation, but the first priority is stabilization rather than new feature breadth. The main gaps are:
 
 1. **Backend correctness and shared suspension logic** before expanding workflows
-2. **ServerConfig-based server moderation UX** to replace `showAdminTag` and mirror channel-scoped membership patterns
+2. **ServerConfig-based server moderation UX** is now in place; the remaining work is E2E coverage and editor polish
 3. **Reporting workflows** for mod comments/profiles/actions
 4. **UI consistency** for suspended user/mod experience, especially error handling and reaction controls
 5. **Bot handling** audit, decision, and implementation

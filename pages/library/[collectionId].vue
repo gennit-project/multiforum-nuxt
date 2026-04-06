@@ -22,6 +22,8 @@ import WarningModal from '@/components/WarningModal.vue';
 import { relativeTime } from '@/utils';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import { usernameVar } from '@/cache';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
 // Lazy load the album component since it's not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(
@@ -30,6 +32,7 @@ const DiscussionAlbum = defineAsyncComponent(
 
 const route = useRoute();
 const collectionId = computed(() => route.params.collectionId as string);
+const { serverAdminUsernames } = useServerRoleMembership();
 
 const {
   result,
@@ -74,6 +77,11 @@ const getAuthorInfo = (item: any) => {
   const author = item?.CommentAuthor || item?.Author;
   if (!author) return null;
 
+  const serverRoleBadge = getServerRoleBadge({
+    username: author.username,
+    adminUsernames: serverAdminUsernames.value,
+  });
+
   return {
     username: author.username || '',
     displayName: author.displayName || '',
@@ -81,7 +89,7 @@ const getAuthorInfo = (item: any) => {
     commentKarma: author.commentKarma ?? 0,
     discussionKarma: author.discussionKarma ?? 0,
     createdAt: author.createdAt || '',
-    isAdmin: author.ServerRoles?.[0]?.showAdminTag || false,
+    isAdmin: serverRoleBadge === 'serverAdmin',
   };
 };
 

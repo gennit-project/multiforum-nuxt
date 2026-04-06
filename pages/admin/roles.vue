@@ -6,11 +6,13 @@ import { useQuery } from '@vue/apollo-composable';
 import { config } from '@/config';
 import RoleSection from '@/components/admin/RoleSection.vue';
 import ModChannelRolesEditor from '@/components/admin/ModChannelRolesEditor.vue';
+import ServerMembershipEditor from '@/components/admin/ServerMembershipEditor.vue';
 
 const {
   result: getServerResult,
   error: getServerError,
   loading: getServerLoading,
+  refetch: refetchServerConfig,
 } = useQuery(
   GET_SERVER_PERMISSIONS,
   {
@@ -76,6 +78,11 @@ const serverConfig = computed(() => {
             :role-title="serverConfig.DefaultSuspendedModRole.name"
             :role-description="serverConfig.DefaultSuspendedModRole.description"
             :permissions="serverConfig.DefaultSuspendedModRole"
+          />
+          <ServerMembershipEditor
+            v-if="serverConfig"
+            :server-config="serverConfig"
+            :on-updated="refetchServerConfig"
           />
           <div class="mt-10">
             <ModChannelRolesEditor />

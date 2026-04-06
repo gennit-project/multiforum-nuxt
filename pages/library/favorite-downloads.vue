@@ -10,6 +10,8 @@ import TagComponent from '@/components/TagComponent.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import { relativeTime } from '@/utils';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
 useHead({
   title: 'Favorite Downloads - Library',
@@ -37,9 +39,6 @@ const GET_USER_FAVORITE_DOWNLOADS = gql`
           commentKarma
           discussionKarma
           createdAt
-          ServerRoles {
-            showAdminTag
-          }
         }
         DiscussionChannels {
           id
@@ -87,6 +86,7 @@ const { result, loading, error } = useQuery(
 const favoriteDownloads = computed(() => {
   return result.value?.users?.[0]?.FavoriteDiscussions || [];
 });
+const { serverAdminUsernames } = useServerRoleMembership();
 
 const getDownloadLink = (download: any) => {
   const firstChannel = safeArrayFirst(download.DiscussionChannels) as any;
@@ -104,6 +104,11 @@ const getAuthorInfo = (download: any) => {
   const author = download?.Author;
   if (!author) return null;
 
+  const serverRoleBadge = getServerRoleBadge({
+    username: author.username,
+    adminUsernames: serverAdminUsernames.value,
+  });
+
   return {
     username: author.username || '',
     displayName: author.displayName || '',
@@ -111,7 +116,7 @@ const getAuthorInfo = (download: any) => {
     commentKarma: author.commentKarma ?? 0,
     discussionKarma: author.discussionKarma ?? 0,
     createdAt: author.createdAt || '',
-    isAdmin: author.ServerRoles?.[0]?.showAdminTag || false,
+    isAdmin: serverRoleBadge === 'serverAdmin',
   };
 };
 

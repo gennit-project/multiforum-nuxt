@@ -151,9 +151,6 @@ export const GET_COLLECTION_ITEMS = gql`
           commentKarma
           discussionKarma
           createdAt
-          ServerRoles {
-            showAdminTag
-          }
         }
         DiscussionChannels {
           id
@@ -188,9 +185,6 @@ export const GET_COLLECTION_ITEMS = gql`
             commentKarma
             discussionKarma
             createdAt
-            ServerRoles {
-              showAdminTag
-            }
           }
         }
         DiscussionChannel {
@@ -220,9 +214,6 @@ export const GET_COLLECTION_ITEMS = gql`
           commentKarma
           discussionKarma
           createdAt
-          ServerRoles {
-            showAdminTag
-          }
         }
         DiscussionChannels {
           id
@@ -314,9 +305,6 @@ export const GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD = gql`
           commentKarma
           discussionKarma
           createdAt
-          ServerRoles {
-            showAdminTag
-          }
         }
       }
     }
