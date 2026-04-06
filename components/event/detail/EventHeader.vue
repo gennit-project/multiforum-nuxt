@@ -32,6 +32,8 @@ import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
 import { CHECK_EVENT_ISSUE_EXISTENCE } from '@/graphQLData/issue/queries';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
 const props = defineProps({
   eventData: {
@@ -56,6 +58,7 @@ defineEmits(['archived-successfully']);
 
 const route = useRoute();
 const router = useRouter();
+const { serverAdminUsernames } = useServerRoleMembership();
 
 const showCopiedLinkNotification = ref(false);
 const showFeedbackFormModal = ref(false);
@@ -304,8 +307,12 @@ const copyLink = async () => {
 };
 
 const isAdmin = computed(() => {
-  const serverRoles = props.eventData.Poster?.ServerRoles;
-  return serverRoles && serverRoles?.length > 0 && serverRoles[0]?.showAdminTag;
+  return (
+    getServerRoleBadge({
+      username: props.eventData.Poster?.username,
+      adminUsernames: serverAdminUsernames.value,
+    }) === 'serverAdmin'
+  );
 });
 
 const menuItems = computed(() => {

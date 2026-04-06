@@ -29,6 +29,8 @@ import { config } from '@/config';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import EditsDropdown from './activityFeed/EditsDropdown.vue';
 import type { Discussion } from '@/__generated__/graphql';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
 const props = defineProps<{
   discussion: Discussion | null;
@@ -50,6 +52,7 @@ const emit = defineEmits([
 
 const route = useRoute();
 const router = useRouter();
+const { serverAdminUsernames } = useServerRoleMembership();
 
 const editedAt = computed(() => {
   if (!props.discussion?.updatedAt) return '';
@@ -376,9 +379,14 @@ const menuItems = computed(() => {
   });
 });
 
-const authorIsAdmin = computed(
-  () => props.discussion?.Author?.ServerRoles?.[0]?.showAdminTag || false
-);
+const authorIsAdmin = computed(() => {
+  return (
+    getServerRoleBadge({
+      username: props.discussion?.Author?.username,
+      adminUsernames: serverAdminUsernames.value,
+    }) === 'serverAdmin'
+  );
+});
 const authorIsMod = computed(
   () => props.discussion?.Author?.ChannelRoles?.[0]?.showModTag || false
 );

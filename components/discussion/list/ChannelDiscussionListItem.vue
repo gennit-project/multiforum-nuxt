@@ -22,6 +22,8 @@ import { useUIStore } from '@/stores/uiStore';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
 import { usernameVar, isAuthenticatedVar } from '@/cache';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 // UI state is now handled via props
 // Lazy load the album component since it's not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(
@@ -86,6 +88,7 @@ const { result: getUserResult } = useQuery(
 const channelIdInParams = computed(() =>
   typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
+const { serverAdminUsernames } = useServerRoleMembership();
 const defaultUniqueName = computed(
   () => channelIdInParams.value || props.discussionChannel.channelUniqueName
 );
@@ -94,8 +97,12 @@ const commentCount = computed(
 );
 
 const authorIsAdmin = computed(() => {
-  const author = props.discussion?.Author;
-  return author?.ServerRoles?.[0]?.showAdminTag || false;
+  return (
+    getServerRoleBadge({
+      username: props.discussion?.Author?.username,
+      adminUsernames: serverAdminUsernames.value,
+    }) === 'serverAdmin'
+  );
 });
 
 const authorIsMod = computed(() => {

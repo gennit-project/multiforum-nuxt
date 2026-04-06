@@ -6,6 +6,15 @@ export const GET_SERVER_CONFIG = gql`
       serverName
       serverIconURL
       serverDescription
+      Admins {
+        username
+      }
+      Moderators {
+        displayName
+        User {
+          username
+        }
+      }
       DefaultServerRole {
         name
         description
