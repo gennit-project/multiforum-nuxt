@@ -23,6 +23,14 @@ export function useCommentSectionNotifications() {
     showSuccessfullyArchived,
     showSuccessfullyArchivedAndSuspended,
     showSuccessfullyUnarchived,
+    handleReportedSuccessfully,
+    handleArchivedSuccessfully,
+    handleArchivedAndSuspendedSuccessfully,
+    handleUnarchivedSuccessfully,
+    dismissReportedNotification,
+    dismissArchivedNotification,
+    dismissArchivedAndSuspendedNotification,
+    dismissUnarchivedNotification,
   } = useModerationOutcomeUI();
 
   return {
@@ -34,5 +42,13 @@ export function useCommentSectionNotifications() {
     showSuccessfullyArchived,
     showSuccessfullyArchivedAndSuspended,
     showSuccessfullyUnarchived,
+    handleReportedSuccessfully,
+    handleArchivedSuccessfully,
+    handleArchivedAndSuspendedSuccessfully,
+    handleUnarchivedSuccessfully,
+    dismissReportedNotification,
+    dismissArchivedNotification,
+    dismissArchivedAndSuspendedNotification,
+    dismissUnarchivedNotification,
   };
 }

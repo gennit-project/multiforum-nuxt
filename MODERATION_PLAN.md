@@ -26,6 +26,8 @@ These items are implemented and should stay visible for validation, regression c
 - Inline discussion and event root-comment forms now suppress raw permission errors when suspension context is already known
 - Component-level server badge rendering is now covered directly in discussion and event UI
 - Suspend/unsuspend button UI now shares one composable for modal state and success-notification handling
+- Report/archive/unarchive/archive-and-suspend outcome state is now shared across discussion headers, event headers, and feedback moderation surfaces
+- Comment-section and archive-button moderation flows now use the same shared moderation outcome state instead of local duplicate modal/notification logic
 
 ### Implemented Tests To Re-Verify
 
@@ -44,6 +46,8 @@ These items are implemented and should stay visible for validation, regression c
 | `useServerRoleMembership()` maps `ServerConfig.Admins` and `ServerConfig.Moderators` into the shared badge inputs       | Frontend unit tests                  | Re-verify if the `ServerConfig` membership shape changes again                                            |
 | Inline discussion and event root-comment forms suppress raw permission errors when suspension context is already known | Frontend unit tests + implementation | Re-verify against real blocked comment mutations in discussion and event detail pages                     |
 | Shared suspend/unsuspend button UI composable preserves modal and notification behavior                                | Frontend unit tests + refactor       | Re-verify suspend/unsuspend flows across both user and mod issue actions                                  |
+| Shared moderation outcome UI composable preserves report/archive/unarchive/archive-and-suspend notifications and modal closing behavior | Frontend unit tests + refactor | Re-verify discussion, event, and feedback moderation flows after real modal submissions |
+| Comment section and archive button now rely on the shared moderation outcome workflow                                  | Frontend unit tests + refactor       | Re-verify archive/unarchive/report flows from comment lists and issue action surfaces                     |
 
 ### Phase 1 Checklist Items Completed
 
@@ -69,6 +73,8 @@ These items are implemented and should stay visible for validation, regression c
 - Add focused suspended-mod UI coverage for issue comment and moderation controls
 - Add component-level coverage for ServerConfig-based badge rendering
 - Add blocked-comment-form coverage for the remaining discussion/event root-comment surfaces
+- Share moderation outcome workflow state across headers and feedback moderation surfaces
+- Share moderation outcome workflow state across comment sections and archive button surfaces
 
 ---
 
@@ -85,8 +91,7 @@ These items are implemented and should stay visible for validation, regression c
 
 | Task                                                                                         | Location | Reason                                                                                                                                                                                                    |
 | -------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Extend the shared moderation action workflow layer beyond suspend/unsuspend buttons into archive/report entry points | Frontend | Suspend user/mod buttons now share the basic modal and notification state, but archive/report actions still duplicate adjacent workflow logic |
-| Extract additional moderation modal behavior into composables where the remaining duplication is still high-value | Frontend | The suspend/unsuspend button state is shared now; the next step is only worth doing for the heavier archive/report flows |
+| Audit whether any remaining archive/report moderation surfaces still keep separate success/modal state after the current shared-workflow pass | Frontend | The main header, feedback, comment section, and archive button flows are now shared; this is now a narrow cleanup audit rather than a planned extraction project |
 | Add focused backend indexing for active-suspension lookups                                   | Backend  | Once logic is stabilized, `username`, `modProfileName`, `suspendedUntil`, and `suspendedIndefinitely` become obvious hot-path fields for permission checks                                                |
 | Add a moderation architecture note documenting permission flow and suspension lifecycle      | Both     | The system now spans user permissions, mod permissions, issue workflows, cleanup side effects, and server-vs-channel membership concepts; it needs one canonical reference before more roadmap work lands |
 

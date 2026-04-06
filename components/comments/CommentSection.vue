@@ -152,6 +152,14 @@ const {
   showSuccessfullyArchived,
   showSuccessfullyArchivedAndSuspended,
   showSuccessfullyUnarchived,
+  handleReportedSuccessfully,
+  handleArchivedSuccessfully,
+  handleArchivedAndSuspendedSuccessfully,
+  handleUnarchivedSuccessfully,
+  dismissReportedNotification,
+  dismissArchivedNotification,
+  dismissArchivedAndSuspendedNotification,
+  dismissUnarchivedNotification,
 } = useCommentSectionNotifications();
 
 // Use modals composable
@@ -173,6 +181,7 @@ const {
   showBrokenRulesModal,
   commentToReport,
   handleClickReport,
+  closeReportModal,
   showArchiveModal,
   showArchiveAndSuspendModal,
   showUnarchiveModal,
@@ -182,6 +191,9 @@ const {
   handleClickArchive,
   handleClickArchiveAndSuspend,
   handleClickUnarchive,
+  closeArchiveModal,
+  closeArchiveAndSuspendModal,
+  closeUnarchiveModal,
 } = useCommentSectionModals();
 
 // Comment form state
@@ -752,38 +764,23 @@ const replyHasBotMention = computed(() => {
       :open="showBrokenRulesModal"
       :comment-id="commentToReport?.id"
       :comment="commentToReport"
-      @close="showBrokenRulesModal = false"
-      @report-submitted-successfully="
-        () => {
-          showSuccessfullyReported = true;
-          showBrokenRulesModal = false;
-        }
-      "
+      @close="closeReportModal"
+      @report-submitted-successfully="handleReportedSuccessfully"
     />
     <BrokenRulesModal
       v-if="commentToArchiveId"
       :open="showArchiveModal"
       :comment-id="commentToArchiveId"
       :archive-after-reporting="true"
-      @close="showArchiveModal = false"
-      @reported-and-archived-successfully="
-        () => {
-          showSuccessfullyArchived = true;
-          showArchiveModal = false;
-        }
-      "
+      @close="closeArchiveModal"
+      @reported-and-archived-successfully="handleArchivedSuccessfully"
     />
     <UnarchiveModal
       v-if="commentToUnarchiveId"
       :open="showUnarchiveModal"
       :comment-id="commentToUnarchiveId"
-      @close="showUnarchiveModal = false"
-      @unarchived-successfully="
-        () => {
-          showSuccessfullyUnarchived = true;
-          showUnarchiveModal = false;
-        }
-      "
+      @close="closeUnarchiveModal"
+      @unarchived-successfully="handleUnarchivedSuccessfully"
     />
     <BrokenRulesModal
       v-if="commentToArchiveAndSuspendId"
@@ -792,13 +789,8 @@ const replyHasBotMention = computed(() => {
       :comment-id="commentToArchiveAndSuspendId"
       :suspend-user-enabled="true"
       :text-box-label="'(Optional) Explain why you are suspending this author:'"
-      @close="showArchiveAndSuspendModal = false"
-      @suspended-user-successfully="
-        () => {
-          showSuccessfullyArchivedAndSuspended = true;
-          showArchiveAndSuspendModal = false;
-        }
-      "
+      @close="closeArchiveAndSuspendModal"
+      @suspended-user-successfully="handleArchivedAndSuspendedSuccessfully"
     />
     <Notification
       :show="showCopiedLinkNotification"
@@ -847,22 +839,22 @@ const replyHasBotMention = computed(() => {
     <Notification
       :show="showSuccessfullyReported"
       :title="'Your report was submitted successfully.'"
-      @close-notification="showSuccessfullyReported = false"
+      @close-notification="dismissReportedNotification"
     />
     <Notification
       :show="showSuccessfullyArchived"
       :title="'The content was reported and archived successfully.'"
-      @close-notification="showSuccessfullyArchived = false"
+      @close-notification="dismissArchivedNotification"
     />
     <Notification
       :show="showSuccessfullyArchivedAndSuspended"
       :title="'Archived the post and suspended the author.'"
-      @close-notification="showSuccessfullyArchivedAndSuspended = false"
+      @close-notification="dismissArchivedAndSuspendedNotification"
     />
     <Notification
       :show="showSuccessfullyUnarchived"
       :title="'The content was unarchived successfully.'"
-      @close-notification="showSuccessfullyUnarchived = false"
+      @close-notification="dismissUnarchivedNotification"
     />
   </div>
 </template>
