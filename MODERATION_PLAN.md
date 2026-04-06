@@ -84,8 +84,8 @@ These items are implemented and should stay visible for validation, regression c
 
 | Task                                                                                     | Location | Reason                                                                                                                                      |
 | ---------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Verify whether any remaining moderation surfaces still bypass the shared suspension-aware blocked-action behavior | Frontend | The major create, reaction, and comment-entry paths are now covered; this is now an audit/polish item rather than a known implementation gap |
-| Verify whether any `getActiveSuspension()` cleanup/selection edge cases remain uncovered after the latest sequencing tests | Backend | The main active/expired cases are now covered; this is now a narrow follow-up audit instead of a broad stabilization task |
+| Verify blocked-action UX on real pages after the shared suspension-aware pass            | Frontend | The major create, reaction, and comment-entry paths are implemented; what remains is manual verification against real GraphQL failures and stale cache states |
+| Re-check `getActiveSuspension()` against any newly discovered production edge case before broadening its API surface | Backend | The helper now has direct sequencing and fallback coverage; remaining risk is mostly production-data shape drift rather than a known code gap |
 
 ### Medium Priority
 
@@ -125,12 +125,12 @@ These items are implemented and should stay visible for validation, regression c
 
 ### Backend First
 
-- [ ] Audit whether any backend `getActiveSuspension()` edge cases remain after the current coverage pass
+- [ ] Re-verify `getActiveSuspension()` only if a new production edge case appears during QA or future suspension work
 
 ### Frontend Second
 
-- [ ] Audit whether any remaining blocked-action surfaces still bypass the shared suspension-aware behavior
-- [ ] Add component-level badge coverage only if additional uncovered surfaces are identified
+- [ ] Manually verify the implemented blocked-action flows on real pages and move any failures into the Cypress section or a new bug list
+- [ ] Add component-level badge coverage only if QA uncovers an untested major surface
 
 ### Verification Then Follow-On
 
