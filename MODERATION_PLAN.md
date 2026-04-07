@@ -1,5 +1,19 @@
 # Moderation Features: Current State vs Roadmap Plan
 
+## Mod Profile Suspension Workflow
+
+| Task                                                                                                                          | Location | Type     |
+| ----------------------------------------------------------------------------------------------------------------------------- | -------- | -------- |
+| Treat channel-scope and server-scope suspended-mod lists as the primary model instead of introducing a separate mod-ban state | Both     | Decision |
+| Add clear UI indication when mod profile suspended vs user account                                                            | Frontend | Feature  |
+
+## Suspended Mod Perspective
+
+| Task                                                                                                          | Location | Type      |
+| ------------------------------------------------------------------------------------------------------------- | -------- | --------- |
+| Audit all mod-only UI elements for suspension checks                                                          | Frontend | Tech Debt |
+| Add "You are suspended" banner on moderation pages for suspended mods. Make sure it has a working issue link. | Frontend | Feature   |
+
 ## Suspended Mods - Reporting Workflow
 
 **Current State:**
@@ -25,31 +39,6 @@
 | Add "Suspend Mod" option to issue comment context menu             | Frontend | Feature |
 | Add "Suspend Mod" option to mod action context in activity feed    | Frontend | Feature |
 | Ensure suspension creates proper Issue linking to reported content | Backend  | Feature |
-
-## Mod Profile Suspension Workflow
-
-| Task                                                                                                                          | Location | Type     |
-| ----------------------------------------------------------------------------------------------------------------------------- | -------- | -------- |
-| Treat channel-scope and server-scope suspended-mod lists as the primary model instead of introducing a separate mod-ban state | Both     | Decision |
-| Add `ServerConfig.SuspendedMods` support so server-scoped mod suspension mirrors the existing channel-scoped model            | Backend  | Feature  |
-| Add clear UI indication when mod profile suspended vs user account                                                            | Frontend | Feature  |
-
-## Suspended Mod Perspective
-
-| Task                                                                                                          | Location | Type      |
-| ------------------------------------------------------------------------------------------------------------- | -------- | --------- |
-| Audit all mod-only UI elements for suspension checks                                                          | Frontend | Tech Debt |
-| Add "You are suspended" banner on moderation pages for suspended mods. Make sure it has a working issue link. | Frontend | Feature   |
-
-## Server-Scope Suspension - Forum Creation
-
-| Task                                                                                                                           | Location | Type             |
-| ------------------------------------------------------------------------------------------------------------------------------ | -------- | ---------------- |
-| Use existing `ModServerRole.canSuspendUser` as the server-scope suspension permission instead of adding a new permission field | Backend  | Refactor/Feature |
-| Add `SuspendedUsers` and `SuspendedMods` relationships to `ServerConfig`, mirroring `Channel`                                  | Backend  | Feature          |
-| Use `ServerConfig.SuspendedUsers` when deciding whether a user can create a forum                                              | Backend  | Feature          |
-| Use `ServerConfig.SuspendedMods` when deciding whether a mod can take server-scoped moderation actions                         | Backend  | Feature          |
-| Mirror channel-scope suspension/admin UI patterns for server-scope suspension management                                       | Frontend | Feature          |
 
 ## Suspended User Content Creation + Notifications
 
@@ -191,7 +180,10 @@ These items are implemented and should stay visible for validation, regression c
 | Request-scoped permission caching reuses `ServerConfig` and active server-suspension lookups within a single GraphQL request            | Backend refactor + tests             | Re-verify repeated permission checks on mutation-heavy flows and watch for stale-request edge cases       |
 | Moderation-related permission failures now return consistent channel/server/mod error text instead of mixed ad-hoc strings              | Backend refactor + tests             | Re-verify blocked create/react/moderation flows and confirm the frontend suppression paths still match    |
 | Server-scoped admin/mod membership resolves from `ServerConfig` relationships instead of `showAdminTag`                                 | Backend + frontend implementation    | Manual validation across comments, discussions, events, profile/library surfaces, and admin editing flows |
+| Server-scoped suspension enforcement now uses `ServerConfig.SuspendedUsers` and `ServerConfig.SuspendedMods` plus `ModServerRole.canSuspendUser` | Backend implementation + tests       | Re-verify forum creation blocks, server-scoped mod-action blocks, unsuspend flows, and issue-linked state |
+| Server-scoped suspend/unsuspend resolution now supports issues without a channel by resolving targets from server-scoped issue metadata | Backend implementation + tests       | Re-verify server-scoped issue targets for both user and mod suspensions                                    |
 | Display "Server Admin" and "Server Mod" labels consistently on comments                                                                 | Frontend implementation              | Manual cross-surface verification before relying solely on E2E coverage                                   |
+| Server-scoped suspension management now has dedicated admin pages that mirror the channel-scope suspended-user and suspended-mod views  | Frontend implementation              | Manually review navigation, issue links, empty states, and parity with forum-level suspension pages       |
 | Create/forum/discussion/event/comment flows suppress raw suspension-blocked errors when suspension context is available                 | Frontend unit tests + implementation | Re-verify against real GraphQL permission failures and stale cache cases                                  |
 | Comment and discussion emoji controls show suspension-aware blocked-action UI                                                           | Frontend unit tests + implementation | Manual verification across both existing reactions and add-reaction entry points                          |
 | Suspended moderator issue-comment and moderation controls stay disabled in the main moderation UI                                       | Frontend unit tests + implementation | Re-verify on actual issue detail pages and related moderation surfaces                                    |
@@ -223,6 +215,9 @@ This section is intentionally verification-only. If an item requires new product
 - [ ] Verify existing emoji mutations are blocked for suspended users via `canUpvote*` permissions
 - [ ] Re-check expired suspension cleanup behavior
 - [ ] Verify suspended issue notification includes issue link, expiration date, and blocked action context
+- [ ] Verify server-scoped suspended users cannot create forums and server-scoped suspended mods cannot take server moderation actions
+- [ ] Verify server-scoped suspend and unsuspend flows resolve the correct target and linked issue when the issue has no channel
+- [ ] Review the new `/admin/suspended-users` and `/admin/suspended-mods` pages for channel-parity UX, empty states, and related-issue navigation
 - [ ] Verify issue page editing is disabled for suspended mods
 - [ ] Verify blocked and restored mod-action behavior across suspended, unsuspended, and expired states
 - [ ] Validate the new server membership editor UX for larger admin/mod lists
