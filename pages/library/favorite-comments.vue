@@ -16,6 +16,7 @@ import {
   getCommentContextType,
   getCommentAuthorInfo,
 } from '@/utils/commentUtils';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 
 useHead({
   title: 'Favorite Comments - Library',
@@ -39,9 +40,6 @@ const GET_USER_FAVORITE_COMMENTS = gql`
             commentKarma
             discussionKarma
             createdAt
-            ServerRoles {
-              showAdminTag
-            }
           }
           ... on ModerationProfile {
             __typename
@@ -88,6 +86,16 @@ const { result, loading, error } = useQuery(
 const favoriteComments = computed(() => {
   return result.value?.users?.[0]?.FavoriteComments || [];
 });
+
+const { serverAdminUsernames } = useServerRoleMembership();
+
+const getFavoriteCommentAuthorInfo = (
+  comment: Parameters<typeof getCommentAuthorInfo>[0]
+) => {
+  return getCommentAuthorInfo(comment, {
+    serverAdminUsernames: serverAdminUsernames.value,
+  });
+};
 
 // Comment utility functions are imported from utils/commentUtils.ts
 </script>
@@ -214,33 +222,33 @@ const favoriteComments = computed(() => {
                       <span class="mr-1">by</span>
                       <UsernameWithTooltip
                         v-if="
-                          getCommentAuthorInfo(comment) &&
-                          !getCommentAuthorInfo(comment)!.isModerationProfile
+                          getFavoriteCommentAuthorInfo(comment) &&
+                          !getFavoriteCommentAuthorInfo(comment)!.isModerationProfile
                         "
-                        :username="getCommentAuthorInfo(comment)!.username"
+                        :username="getFavoriteCommentAuthorInfo(comment)!.username"
                         :display-name="
-                          getCommentAuthorInfo(comment)!.displayName
+                          getFavoriteCommentAuthorInfo(comment)!.displayName
                         "
-                        :src="getCommentAuthorInfo(comment)!.profilePicURL"
-                        :is-admin="getCommentAuthorInfo(comment)!.isAdmin"
+                        :src="getFavoriteCommentAuthorInfo(comment)!.profilePicURL"
+                        :is-admin="getFavoriteCommentAuthorInfo(comment)!.isAdmin"
                         :comment-karma="
-                          getCommentAuthorInfo(comment)!.commentKarma
+                          getFavoriteCommentAuthorInfo(comment)!.commentKarma
                         "
                         :discussion-karma="
-                          getCommentAuthorInfo(comment)!.discussionKarma
+                          getFavoriteCommentAuthorInfo(comment)!.discussionKarma
                         "
                         :account-created="
-                          getCommentAuthorInfo(comment)!.createdAt
+                          getFavoriteCommentAuthorInfo(comment)!.createdAt
                         "
                       />
                       <span
                         v-else-if="
-                          getCommentAuthorInfo(comment) &&
-                          getCommentAuthorInfo(comment)!.isModerationProfile
+                          getFavoriteCommentAuthorInfo(comment) &&
+                          getFavoriteCommentAuthorInfo(comment)!.isModerationProfile
                         "
                         class="text-orange-600 dark:text-orange-400"
                       >
-                        {{ getCommentAuthorInfo(comment)!.displayName }}
+                        {{ getFavoriteCommentAuthorInfo(comment)!.displayName }}
                         (Moderator)
                       </span>
                       <span v-else>Deleted</span>

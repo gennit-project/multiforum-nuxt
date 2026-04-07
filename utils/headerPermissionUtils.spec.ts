@@ -699,23 +699,27 @@ describe('headerPermissionUtils', () => {
       expect(result.isMod).toBe(false);
     });
 
-    it('should return correct admin status when user has ServerRoles', () => {
+    it('should return correct admin status when user is in server admin membership', () => {
       const adminAuthor = {
         __typename: 'User',
         username: 'admin1',
-        ServerRoles: [{ showAdminTag: true }],
         ChannelRoles: [],
       };
 
       const nonAdminAuthor = {
         __typename: 'User',
         username: 'user1',
-        ServerRoles: [{ showAdminTag: false }],
         ChannelRoles: [],
       };
 
-      const adminResult = getCommentAuthorStatus({ author: adminAuthor });
-      const nonAdminResult = getCommentAuthorStatus({ author: nonAdminAuthor });
+      const adminResult = getCommentAuthorStatus({
+        author: adminAuthor,
+        serverAdminUsernames: ['admin1'],
+      });
+      const nonAdminResult = getCommentAuthorStatus({
+        author: nonAdminAuthor,
+        serverAdminUsernames: ['admin1'],
+      });
 
       expect(adminResult.isAdmin).toBe(true);
       expect(adminResult.isMod).toBe(false);
@@ -724,23 +728,27 @@ describe('headerPermissionUtils', () => {
       expect(nonAdminResult.isMod).toBe(false);
     });
 
-    it('should return correct mod status when user has ChannelRoles', () => {
+    it('should return correct mod status when user is in server moderator membership', () => {
       const modAuthor = {
         __typename: 'User',
         username: 'mod1',
-        ServerRoles: [],
-        ChannelRoles: [{ showModTag: true }],
+        ChannelRoles: [],
       };
 
       const nonModAuthor = {
         __typename: 'User',
         username: 'user1',
-        ServerRoles: [],
-        ChannelRoles: [{ showModTag: false }],
+        ChannelRoles: [],
       };
 
-      const modResult = getCommentAuthorStatus({ author: modAuthor });
-      const nonModResult = getCommentAuthorStatus({ author: nonModAuthor });
+      const modResult = getCommentAuthorStatus({
+        author: modAuthor,
+        serverModUsernames: ['mod1'],
+      });
+      const nonModResult = getCommentAuthorStatus({
+        author: nonModAuthor,
+        serverModUsernames: ['mod1'],
+      });
 
       expect(modResult.isAdmin).toBe(false);
       expect(modResult.isMod).toBe(true);
@@ -753,11 +761,14 @@ describe('headerPermissionUtils', () => {
       const adminModAuthor = {
         __typename: 'User',
         username: 'adminmod1',
-        ServerRoles: [{ showAdminTag: true }],
-        ChannelRoles: [{ showModTag: true }],
+        ChannelRoles: [],
       };
 
-      const result = getCommentAuthorStatus({ author: adminModAuthor });
+      const result = getCommentAuthorStatus({
+        author: adminModAuthor,
+        serverAdminUsernames: ['adminmod1'],
+        serverModUsernames: ['adminmod1'],
+      });
 
       expect(result.isAdmin).toBe(true);
       expect(result.isMod).toBe(true);
@@ -767,7 +778,6 @@ describe('headerPermissionUtils', () => {
       const authorWithEmptyRoles = {
         __typename: 'User',
         username: 'user1',
-        ServerRoles: [],
         ChannelRoles: [],
       };
 
@@ -776,6 +786,7 @@ describe('headerPermissionUtils', () => {
       expect(result.isAdmin).toBe(false);
       expect(result.isMod).toBe(false);
     });
+
   });
 
   describe('getCommentMenuItems', () => {

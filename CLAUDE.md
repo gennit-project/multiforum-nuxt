@@ -277,125 +277,24 @@ it('should test authenticated functionality', () => {
 
 ## Permission System
 
-The application has two separate but related permission systems:
+The canonical reference for moderation permissions and suspension behavior is:
 
-1. **User Permissions** - Control what regular users can do (create content, upvote, etc.)
-2. **Moderator Permissions** - Control what moderators can do (archive content, give feedback, etc.)
+- [docs/moderation-architecture.md](./docs/moderation-architecture.md)
 
-### User Permission Levels
+Keep `CLAUDE.md` concise and treat the moderation architecture doc as the single source of truth for:
 
-1. **Standard Users**:
-   - Use the DefaultChannelRole for the channel (or DefaultServerRole as fallback)
-   - Have permissions like createDiscussion, createComment, upvoteContent, etc.
+- user vs moderator permission levels
+- permission precedence and fallback order
+- suspension lifecycle and expiry cleanup
+- issue-linked moderation workflow
+- server-scope vs channel-scope moderation model
 
-2. **Channel Admins/Owners**:
-   - Users in the `Channel.Admins` list
-   - Have all user and moderator permissions automatically
+Practical reminders:
 
-3. **Suspended Users**:
-   - Users in the `Channel.SuspendedUsers` list
-   - Have very restricted permissions via SuspendedRole (or DefaultSuspendedRole as fallback)
-
-### Moderator Permission Levels
-
-1. **Standard/Normal Moderators**:
-   - All authenticated users are considered standard moderators by default
-   - Not explicitly included in `Channel.Moderators` list, not in `Channel.SuspendedMods`
-   - Can perform basic moderation actions (report, give feedback) based on DefaultModRole
-   - These permissions are controlled by the DefaultModRole configuration
-
-2. **Elevated Moderators**:
-   - Explicitly included in the `Channel.Moderators` list
-   - Have additional permissions beyond standard moderators
-   - Can typically archive content, manage other moderators, etc.
-   - These permissions are controlled by the ElevatedModRole configuration
-
-3. **Suspended Moderators**:
-   - Included in the `Channel.SuspendedMods` list
-   - Have severely restricted permissions
-   - These permissions are controlled by the SuspendedModRole configuration
-
-### Important Concepts
-
-- **Role Determination**:
-  - User roles are determined by admin/owner status and suspension status
-  - Mod roles are determined by presence in Moderators or SuspendedMods lists
-- **Permission Flow**:
-  - Channel-specific roles take precedence over server-wide defaults
-  - Channel owners/admins bypass all permission checks (both user and mod)
-  - Suspended status overrides all other status for that permission type
-- **Fallback Chain**:
-  - Channel-specific roles -> Server default roles -> Deny access
-
-- **User vs. Mod Actions**:
-  - Some UI actions require BOTH user and mod permissions
-  - For example, to archive content: need canHideDiscussion (mod) AND be an elevated mod or admin
-
-### Permission Implementation
-
-- The `permissionUtils.ts` file contains the core permission checking logic for both systems
-- The `headerPermissionUtils.ts` file implements component-specific permission logic for UI elements
-- Channel owners/admins (users in `Channel.Admins` list) bypass all permission checks
-
-### Permission Checking Flow
-
-1. Check if the user is a channel owner/admin - if yes, grant all permissions
-2. Check user suspension status - if suspended, use suspended role permissions
-3. Check mod suspension status - if suspended mod, use suspended mod role permissions
-4. Check if the user is an elevated mod - if yes, use elevated mod role permissions
-5. Otherwise, use standard user/mod role permissions
-
-Any UI component should respect the permissions provided by these roles without adding additional restrictions.
-
-### Common Issues
-
-- The moderator menus in headers (Discussion/Event/Comment) should show the "Give Feedback" and "Report" options for standard moderators
-- The "Moderation Actions" menu section should appear for any user who has at least one moderation permission
-- Ensure menu items are generated correctly in each header component by checking for specific permissions, not just moderator status
-
-### Suspension System
-
-The application enforces suspensions at both channel and server levels. Suspensions can be time-limited or indefinite.
-
-#### How Suspensions Work
-
-1. **Suspension Creation**: When a moderator suspends a user (e.g., via "Archive and Suspend" on a discussion), a `Suspension` node is created with:
-   - `suspendedUntil` - Expiration date (for time-limited suspensions)
-   - `suspendedIndefinitely` - Flag for permanent suspensions
-   - Link to the related moderation issue
-
-2. **Suspension Detection**: The backend checks for active suspensions when users attempt actions:
-   - A suspension is active if `suspendedIndefinitely` is true OR `suspendedUntil` is in the future
-   - Expired suspensions are automatically cleaned up (disconnected from channel relationships)
-
-3. **Permission Enforcement**:
-   - **Channel-level**: Suspended users use `SuspendedRole` permissions (typically very restricted)
-   - **Server-level**: Users with any active suspension use `DefaultSuspendedRole` for server actions (e.g., creating new forums)
-
-4. **User Notifications**: When a suspended user is blocked from an action, they receive an in-app notification explaining:
-   - Which channel they're suspended in
-   - What action was blocked
-   - Reference to the related moderation issue
-
-#### Suspension-Related E2E Tests
-
-Tests for suspension functionality are located in `tests/cypress/e2e/suspensions/`:
-
-- `suspendedUserPermissions.spec.cy.ts` - Tests that suspended users can't create discussions, comments, or events
-- `serverLevelSuspension.spec.cy.ts` - Tests that suspended users can't create new forums
-
-#### Unsuspension
-
-Users can be unsuspended through the moderation issue interface, which removes the suspension relationship from the channel.
-
-### Testing Moderator Permissions
-
-When testing moderator permissions:
-
-- Make sure the test user has the expected permission level
-- Check that appropriate UI elements appear based on permission level
-- Verify that unprivileged users don't see moderation options
-- Test that suspended moderators can't access moderation features
+- moderator menus in headers should show standard actions like "Give Feedback" and "Report" whenever the resolved permissions allow them
+- the "Moderation Actions" section should appear for any actor with at least one moderation permission
+- UI components should check specific permission flags rather than inferring from moderator status alone
+- tests should verify that unprivileged users do not see moderation actions and that suspended moderators cannot use them
 
 ## SSR and Hydration
 

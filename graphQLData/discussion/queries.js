@@ -8,11 +8,6 @@ export const AUTHOR_FIELDS = gql`
     createdAt
     discussionKarma
     commentKarma
-    ... on User {
-      ServerRoles {
-        showAdminTag
-      }
-    }
   }
 `;
 
@@ -112,9 +107,6 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
               commentKarma
               username
               profilePicURL
-              ServerRoles {
-                showAdminTag
-              }
             }
             ChannelRoles(where: { channelUniqueName: $channelUniqueName }) {
               showModTag

@@ -110,6 +110,14 @@ const eventTypeOptions = [
 // Initialize from existing formValues.eventType if available
 const selectedEventType = ref(props.formValues.eventType || 'in-person');
 
+const showCreateEventError = computed(() => {
+  return !(
+    props.createEventError &&
+    props.suspensionIssueNumber &&
+    props.suspensionChannelId
+  );
+});
+
 // Function to update event type selection
 const updateEventType = (type: string) => {
   selectedEventType.value = type;
@@ -835,7 +843,7 @@ const touched = ref(false);
         :message="'You are suspended in this forum and cannot create events.'"
       />
       <!-- Create Event Errors -->
-      <div v-if="createEventError">
+      <div v-if="createEventError && showCreateEventError">
         <ErrorBanner
           v-if="createEventError.message"
           :text="createEventError.message"

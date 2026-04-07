@@ -310,6 +310,36 @@ describe('CreateEditEventFields Component', () => {
     });
   });
 
+  it('suppresses create error banner when suspension notice is present', () => {
+    const wrapper = mount(CreateEditEventFields, {
+      props: {
+        editMode: false,
+        createEventError: {
+          message: 'Forbidden',
+          graphQLErrors: [],
+        },
+        createEventLoading: false,
+        formValues: {
+          ...defaultFormValues,
+          title: 'Town hall',
+          selectedChannels: ['cats'],
+        },
+        suspensionIssueNumber: 88,
+        suspensionChannelId: 'cats',
+        getEventError: null,
+        updateEventError: null,
+        eventLoading: false,
+        updateEventLoading: false,
+      },
+      global: {
+        stubs: mockComponents,
+      },
+    });
+
+    const errorBanners = wrapper.findAll('[data-testid="error-banner"]');
+    expect(errorBanners.some((banner) => banner.text().includes('Forbidden'))).toBe(false);
+  });
+
   describe('Date validation', () => {
     it('warns when start time is in the past', async () => {
       // Set start time to one day ago

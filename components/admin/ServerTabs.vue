@@ -6,6 +6,7 @@ import CogIcon from '@/components/icons/CogIcon.vue';
 import IdentificationIcon from '../icons/IdentificationIcon.vue';
 import PlugIcon from '@/components/icons/PlugIcon.vue';
 import InfoIcon from '@/components/icons/InfoIcon.vue';
+import UserIcon from '@/components/icons/UserIcon.vue';
 import type { Channel } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
 
@@ -43,6 +44,8 @@ const tabRoutes = computed(() => {
     issues: `/admin/issues`,
     settings: `/admin/settings`,
     roles: `/admin/roles`,
+    suspendedUsers: `/admin/suspended-users`,
+    suspendedMods: `/admin/suspended-mods`,
     plugins: `/admin/plugins`,
     about: `/admin/about`,
   };
@@ -74,6 +77,20 @@ const tabs = computed((): Tab[] => {
       routeSuffix: 'roles',
       label: 'Roles',
       icon: IdentificationIcon,
+      countProperty: null,
+    },
+    {
+      name: 'suspendedUsers',
+      routeSuffix: 'suspended-users',
+      label: 'Suspended Users',
+      icon: UserIcon,
+      countProperty: null,
+    },
+    {
+      name: 'suspendedMods',
+      routeSuffix: 'suspended-mods',
+      label: 'Suspended Mods',
+      icon: UserIcon,
       countProperty: null,
     },
     {

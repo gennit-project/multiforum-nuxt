@@ -35,6 +35,7 @@ type NotificationFormValues = {
   notifyWhenTagged: boolean;
   notifyOnSubscribedIssueUpdates: boolean;
   notifyOnFeedback: boolean;
+  notifyOnSuspensionBlocks: boolean;
   notificationBundleInterval: string;
   notificationBundleEnabled: boolean;
   enableSensitiveContentByDefault: boolean;
@@ -74,6 +75,7 @@ const getDefaultNotificationValues = (): NotificationFormValues => ({
   notifyWhenTagged: false,
   notifyOnSubscribedIssueUpdates: true,
   notifyOnFeedback: false,
+  notifyOnSuspensionBlocks: true,
   notificationBundleInterval: 'hourly',
   notificationBundleEnabled: true,
   enableSensitiveContentByDefault: false,
@@ -117,6 +119,8 @@ watch(getUserResult, (newVal) => {
       user.notifyOnSubscribedIssueUpdates ?? true;
     notificationFormValues.value.notifyOnFeedback =
       user.notifyOnFeedback ?? false;
+    notificationFormValues.value.notifyOnSuspensionBlocks =
+      user.notifyOnSuspensionBlocks ?? true;
     notificationFormValues.value.notificationBundleInterval =
       user.notificationBundleInterval ?? 'hourly';
     notificationFormValues.value.notificationBundleEnabled =
@@ -150,6 +154,8 @@ if (getUserResult.value && getUserResult.value.users.length > 0) {
     user.notifyOnSubscribedIssueUpdates ?? true;
   notificationFormValues.value.notifyOnFeedback =
     user.notifyOnFeedback ?? false;
+  notificationFormValues.value.notifyOnSuspensionBlocks =
+    user.notifyOnSuspensionBlocks ?? true;
   notificationFormValues.value.notificationBundleInterval =
     user.notificationBundleInterval ?? 'hourly';
   notificationFormValues.value.notificationBundleEnabled =
@@ -180,6 +186,8 @@ const notificationUserUpdateInput = computed(() => {
     notifyOnSubscribedIssueUpdates:
       notificationFormValues.value.notifyOnSubscribedIssueUpdates,
     notifyOnFeedback: notificationFormValues.value.notifyOnFeedback,
+    notifyOnSuspensionBlocks:
+      notificationFormValues.value.notifyOnSuspensionBlocks,
     notificationBundleInterval:
       notificationFormValues.value.notificationBundleInterval,
     notificationBundleEnabled:
@@ -371,6 +379,17 @@ function handleCheckboxUpdate(
                       :checked="notificationFormValues.notifyOnFeedback"
                       :label="$t('accountSettings.notifyOnFeedback')"
                       @update="handleCheckboxUpdate('notifyOnFeedback', $event)"
+                    />
+
+                    <CheckBox
+                      :test-id="'notify-suspension-blocks'"
+                      :checked="notificationFormValues.notifyOnSuspensionBlocks"
+                      :label="
+                        'Notify me when a suspension blocks one of my actions'
+                      "
+                      @update="
+                        handleCheckboxUpdate('notifyOnSuspensionBlocks', $event)
+                      "
                     />
                   </div>
                 </template>

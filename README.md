@@ -11,12 +11,6 @@ Multiforum is an online platform for communities to run forums with discussions,
 - **Map-based discovery**: browse/filter events by location, tags, time, and forum
 - **Responsive UI**: desktop and mobile support
 
-## Video Demo
-
-Note: screenshots are more recently updated than the video.
-
-[![Video demo of Multiforum](./screenshots/video-demo-thumbnail.png)](https://www.loom.com/share/c94dcfcad181448abf6501584e01f9d2?sid=5d53630c-813f-4cfe-bb22-1d7289effc2e)
-
 ## Quick Start
 
 ```bash
@@ -24,12 +18,16 @@ npm install
 npm run dev
 ```
 
+## Screenshots
+
+- [Screenshots gallery](./docs/screenshots.md)
+
 ## Documentation
 
 - [Development setup](./docs/development-setup.md)
 - [Architecture and authentication](./docs/architecture-and-auth.md)
+- [Moderation architecture](./docs/moderation-architecture.md)
 - [Feature updates (2025)](./docs/feature-updates.md)
-- [Screenshots gallery](./docs/screenshots.md)
 - [Contributing guide](./CONTRIBUTING.md)
 - [Performance details](./PERFORMANCE.md)
 - [Developer workflow and standards](./CLAUDE.md)

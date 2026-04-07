@@ -39,6 +39,47 @@ type UserPermissionKey =
 // Combined permission keys type
 type PermissionKey = ModPermissionKey | UserPermissionKey | string;
 
+export const CORE_PERMISSION_KEYS = [
+  'canReport',
+  'canGiveFeedback',
+  'canHideComment',
+  'canHideDiscussion',
+  'canHideEvent',
+  'canEditComments',
+  'canEditDiscussions',
+  'canEditEvents',
+  'canSuspendUser',
+  'canOpenSupportTickets',
+  'canCloseSupportTickets',
+  'canLockChannel',
+] as const;
+
+export const ADDITIONAL_PERMISSION_KEYS = [
+  'canEditWiki',
+  'canAddMods',
+  'canRemoveMods',
+  'canAddOwners',
+  'canRemoveOwners',
+  'canChangeSettings',
+] as const;
+
+export const ROLE_STATE_KEYS = [
+  'isChannelOwner',
+  'isElevatedMod',
+  'isSuspendedMod',
+  'isSuspendedUser',
+] as const;
+
+export type CorePermissionFlag = (typeof CORE_PERMISSION_KEYS)[number];
+export type AdditionalPermissionFlag = (typeof ADDITIONAL_PERMISSION_KEYS)[number];
+export type RoleStateFlag = (typeof ROLE_STATE_KEYS)[number];
+export type KnownPermissionFlag =
+  | CorePermissionFlag
+  | AdditionalPermissionFlag
+  | RoleStateFlag;
+
+export type PermissionFlags = Record<KnownPermissionFlag, boolean>;
+
 // Role type used in the utility functions
 type Role = {
   [K in PermissionKey]?: boolean;
@@ -194,9 +235,32 @@ export const checkPermission = (params: CheckPermissionParams): boolean => {
  */
 export const getAllPermissions = (
   params: GetAllPermissionsParams
-): Record<string, boolean> => {
+): PermissionFlags => {
   if (!params) {
-    return {};
+    return {
+      canReport: false,
+      canGiveFeedback: false,
+      canHideComment: false,
+      canHideDiscussion: false,
+      canHideEvent: false,
+      canEditComments: false,
+      canEditDiscussions: false,
+      canEditEvents: false,
+      canSuspendUser: false,
+      canOpenSupportTickets: false,
+      canCloseSupportTickets: false,
+      canLockChannel: false,
+      canEditWiki: false,
+      canAddMods: false,
+      canRemoveMods: false,
+      canAddOwners: false,
+      canRemoveOwners: false,
+      canChangeSettings: false,
+      isChannelOwner: false,
+      isElevatedMod: false,
+      isSuspendedMod: false,
+      isSuspendedUser: false,
+    };
   }
   const {
     permissionData,
@@ -207,36 +271,9 @@ export const getAllPermissions = (
   } = params;
 
   // Define all possible permissions from ModChannelRole and ModServerRole
-  const corePermissions: PermissionKey[] = [
-    'canReport',
-    'canGiveFeedback',
-    'canHideComment',
-    'canHideDiscussion',
-    'canHideEvent',
-    'canEditComments',
-    'canEditDiscussions',
-    'canEditEvents',
-    'canSuspendUser',
-    'canOpenSupportTickets',
-    'canCloseSupportTickets',
-    'canLockChannel',
-  ];
+  const allActions = [...CORE_PERMISSION_KEYS, ...ADDITIONAL_PERMISSION_KEYS];
 
-  // Additional permissions specific to our application
-  const additionalPermissions: string[] = [
-    'canEditWiki',
-    'canAddMods',
-    'canRemoveMods',
-    'canAddOwners',
-    'canRemoveOwners',
-    'canChangeSettings',
-  ];
-
-  // Combine all permission types
-  const allActions = [...corePermissions, ...additionalPermissions];
-
-  // Create an object with all permissions
-  const permissions: Record<string, boolean> = {};
+  const permissions = {} as PermissionFlags;
 
   allActions.forEach((action) => {
     permissions[action] = checkPermission({

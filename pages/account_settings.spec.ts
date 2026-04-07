@@ -19,6 +19,7 @@ const getUserResult = ref({
       notifyWhenTagged: false,
       notifyOnSubscribedIssueUpdates: null,
       notifyOnFeedback: false,
+      notifyOnSuspensionBlocks: null,
       notificationBundleInterval: 'hourly',
       notificationBundleEnabled: true,
       enableSensitiveContentByDefault: false,
@@ -141,6 +142,26 @@ describe('account_settings', () => {
       where: { username: 'alice' },
       update: expect.objectContaining({
         notifyOnSubscribedIssueUpdates: false,
+      }),
+    });
+  });
+
+  it('defaults suspension block notifications to enabled when the user field is null', () => {
+    const wrapper = buildWrapper();
+    const checkbox = wrapper.get('[data-testid="notify-suspension-blocks"]');
+    expect(checkbox.attributes('data-checked')).toBe('true');
+  });
+
+  it('autosaves suspension block notification preference changes', async () => {
+    const wrapper = buildWrapper();
+
+    await wrapper.get('[data-testid="notify-suspension-blocks"]').trigger('click');
+    await vi.advanceTimersByTimeAsync(900);
+
+    expect(updateUser).toHaveBeenCalledWith({
+      where: { username: 'alice' },
+      update: expect.objectContaining({
+        notifyOnSuspensionBlocks: false,
       }),
     });
   });

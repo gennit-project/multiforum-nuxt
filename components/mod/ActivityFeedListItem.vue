@@ -4,9 +4,10 @@ import TextEditor from '@/components/TextEditor.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import SaveButton from '@/components/SaveButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import Notification from '@/components/NotificationComponent.vue';
 import { ref, computed, watch, type PropType } from 'vue';
 import { timeAgo } from '@/utils';
-import type { Discussion, ModerationAction } from '@/__generated__/graphql';
+import type { Discussion, Issue, ModerationAction } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
 import ArchiveBox from '../icons/ArchiveBox.vue';
 import ArchiveBoxXMark from '../icons/ArchiveBoxXMark.vue';
@@ -26,6 +27,9 @@ import { modProfileNameVar, usernameVar } from '@/cache';
 import RevisionDiffInline from '@/components/mod/RevisionDiffInline.vue';
 import { getForumRoleBadge } from '@/utils/forumRoleBadges';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
+import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
+import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
+import SuspendModButton from '@/components/mod/SuspendModButton.vue';
 
 const actionTypeToIcon: Record<string, any> = {
   [ActionType.Close]: XCircleIcon,
@@ -71,6 +75,14 @@ const props = defineProps({
     type: Number as PropType<number | null>,
     default: null,
   },
+  issue: {
+    type: Object as PropType<Issue | null>,
+    default: null,
+  },
+  suspendModDisabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 const commentIdInParams = useRoute().params.commentId as string;
 const isPermalinked =
@@ -94,6 +106,39 @@ const isCommentAuthor = computed(() => {
   }
 
   return false;
+});
+
+const isReportableModComment = computed(() => {
+  const author = props.activityItem.Comment?.CommentAuthor;
+  if (!author || !('displayName' in author) || !author.displayName) {
+    return false;
+  }
+
+  if (!usernameVar.value && !modProfileNameVar.value) {
+    return false;
+  }
+
+  return author.displayName !== modProfileNameVar.value;
+});
+
+const canSuspendIssueTargetModFromComment = computed(() => {
+  const author = props.activityItem.Comment?.CommentAuthor;
+
+  if (!author || !('displayName' in author) || !author.displayName) {
+    return false;
+  }
+
+  return props.issue?.relatedModProfileName === author.displayName;
+});
+
+const canSuspendIssueTargetModFromActivityActor = computed(() => {
+  const actorModName = props.activityItem.ModerationProfile?.displayName;
+
+  if (!actorModName) {
+    return false;
+  }
+
+  return props.issue?.relatedModProfileName === actorModName;
 });
 
 const isEditing = ref(false);
@@ -413,6 +458,15 @@ const saveEdit = async () => {
     console.error('Error updating comment', error);
   }
 };
+
+const {
+  showReportModal,
+  showSuccessfullyReported,
+  openReportModal,
+  closeReportModal,
+  handleReportedSuccessfully,
+  dismissReportedNotification,
+} = useModerationOutcomeUI();
 </script>
 
 <template>
@@ -536,6 +590,13 @@ const saveEdit = async () => {
             }}</span>
           </div>
 
+          <div
+            v-if="issue && canSuspendIssueTargetModFromActivityActor"
+            class="mt-2 flex flex-wrap items-center gap-2"
+          >
+            <SuspendModButton :issue="issue" :disabled="suspendModDisabled" />
+          </div>
+
           <div class="border-l-2 border-gray-200 pl-2 dark:border-gray-500">
             <div
               v-if="activityItem.Comment && showCommentBody"
@@ -584,6 +645,20 @@ const saveEdit = async () => {
               class="mt-2"
               :text="updateCommentError.message"
             />
+            <div
+              v-if="activityItem.Comment && isReportableModComment"
+              class="mt-2 flex flex-wrap items-center gap-2"
+            >
+              <GenericButton
+                :text="'Report Mod Comment'"
+                @click="openReportModal"
+              />
+              <SuspendModButton
+                v-if="issue && canSuspendIssueTargetModFromComment"
+                :issue="issue"
+                :disabled="suspendModDisabled"
+              />
+            </div>
             <!-- Discussion revision diffs -->
             <div v-if="discussionRevisionContents.length" class="space-y-2">
               <div
@@ -612,5 +687,18 @@ const saveEdit = async () => {
         </div>
       </div>
     </div>
+    <BrokenRulesModal
+      v-if="showReportModal"
+      :open="showReportModal"
+      :comment-id="activityItem.Comment?.id || ''"
+      :comment="activityItem.Comment"
+      @close="closeReportModal"
+      @report-submitted-successfully="handleReportedSuccessfully"
+    />
+    <Notification
+      :show="showSuccessfullyReported"
+      :title="'Your report was submitted successfully.'"
+      @close-notification="dismissReportedNotification"
+    />
   </li>
 </template>

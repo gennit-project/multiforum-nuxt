@@ -10,6 +10,8 @@ import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavo
 import { GET_USER_OWNED_DOWNLOADS } from '@/graphQLData/user/queries';
 import { relativeTime } from '@/utils';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
 useHead({
   title: 'My Downloads - Library',
@@ -28,6 +30,7 @@ const { result, loading, error } = useQuery(
 const ownedDownloads = computed(() => {
   return result.value?.users?.[0]?.OwnedDownloads || [];
 });
+const { serverAdminUsernames } = useServerRoleMembership();
 
 const getDownloadLink = (download: any) => {
   const firstChannel = safeArrayFirst(download.DiscussionChannels) as any;
@@ -45,6 +48,11 @@ const getAuthorInfo = (download: any) => {
   const author = download?.Author;
   if (!author) return null;
 
+  const serverRoleBadge = getServerRoleBadge({
+    username: author.username,
+    adminUsernames: serverAdminUsernames.value,
+  });
+
   return {
     username: author.username || '',
     displayName: author.displayName || '',
@@ -52,7 +60,7 @@ const getAuthorInfo = (download: any) => {
     commentKarma: author.commentKarma ?? 0,
     discussionKarma: author.discussionKarma ?? 0,
     createdAt: author.createdAt || '',
-    isAdmin: author.ServerRoles?.[0]?.showAdminTag || false,
+    isAdmin: serverRoleBadge === 'serverAdmin',
   };
 };
 
