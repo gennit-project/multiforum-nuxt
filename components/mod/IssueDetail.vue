@@ -873,6 +873,14 @@ const handleLockReasonUpdate = (value: string) => {
             :text="addIssueActivityFeedItemWithCommentAsUserError.message"
           />
           <ErrorBanner v-if="deleteReasonError" :text="deleteReasonError" />
+          <div
+            v-if="isSuspendedMod"
+            class="mb-6 rounded-lg border border-orange-200 bg-orange-50 p-4 text-sm text-gray-700 dark:border-orange-500/40 dark:bg-orange-500/10 dark:text-gray-200"
+          >
+            Your moderator account is suspended. You can still use your user
+            account where normal user permissions allow it, but moderation
+            actions remain disabled until the suspension is reversed or expires.
+          </div>
 
           <ModerationWizard
             v-if="issue && issueActionVisibility.showModActions"

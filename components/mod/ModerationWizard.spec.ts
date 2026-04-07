@@ -78,7 +78,7 @@ describe('ModerationWizard', () => {
     const wrapper = mountWrapper();
 
     expect(wrapper.text()).toContain(
-      'Mod actions are disabled because your moderator account is suspended.'
+      'Mod actions are disabled because your moderator account is suspended. This does not suspend your user account.'
     );
   });
 
