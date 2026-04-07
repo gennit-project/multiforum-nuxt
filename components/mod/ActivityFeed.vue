@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 import { useRoute } from 'nuxt/app';
-import type { Discussion, ModerationAction } from '@/__generated__/graphql';
+import type { Discussion, Issue, ModerationAction } from '@/__generated__/graphql';
 import ActivityFeedListItem from './ActivityFeedListItem.vue';
 import { ActionType } from '@/types/Comment';
 
@@ -10,6 +10,8 @@ const props = defineProps<{
   originalUserAuthorUsername: string;
   originalModAuthorName: string;
   relatedDiscussion?: Discussion | null;
+  issue?: Issue | null;
+  suspendModDisabled?: boolean;
 }>();
 
 const route = useRoute();
@@ -212,6 +214,8 @@ const displayFeedItems = computed(() => {
             originalModAuthorName
         "
         :related-discussion="relatedDiscussion"
+        :issue="issue"
+        :suspend-mod-disabled="suspendModDisabled"
         :next-revision-body="displayItem.nextRevisionBody"
         :paired-next-revision-body="displayItem.pairedNextRevisionBody"
         :comment-edit-index="displayItem.commentEditIndex"

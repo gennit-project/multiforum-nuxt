@@ -7,7 +7,7 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { ref, computed, watch, type PropType } from 'vue';
 import { timeAgo } from '@/utils';
-import type { Discussion, ModerationAction } from '@/__generated__/graphql';
+import type { Discussion, Issue, ModerationAction } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
 import ArchiveBox from '../icons/ArchiveBox.vue';
 import ArchiveBoxXMark from '../icons/ArchiveBoxXMark.vue';
@@ -29,6 +29,7 @@ import { getForumRoleBadge } from '@/utils/forumRoleBadges';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
+import SuspendModButton from '@/components/mod/SuspendModButton.vue';
 
 const actionTypeToIcon: Record<string, any> = {
   [ActionType.Close]: XCircleIcon,
@@ -74,6 +75,14 @@ const props = defineProps({
     type: Number as PropType<number | null>,
     default: null,
   },
+  issue: {
+    type: Object as PropType<Issue | null>,
+    default: null,
+  },
+  suspendModDisabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 const commentIdInParams = useRoute().params.commentId as string;
 const isPermalinked =
@@ -110,6 +119,16 @@ const isReportableModComment = computed(() => {
   }
 
   return author.displayName !== modProfileNameVar.value;
+});
+
+const canSuspendIssueTargetModFromComment = computed(() => {
+  const author = props.activityItem.Comment?.CommentAuthor;
+
+  if (!author || !('displayName' in author) || !author.displayName) {
+    return false;
+  }
+
+  return props.issue?.relatedModProfileName === author.displayName;
 });
 
 const isEditing = ref(false);
@@ -616,6 +635,11 @@ const {
               <GenericButton
                 :text="'Report Mod Comment'"
                 @click="openReportModal"
+              />
+              <SuspendModButton
+                v-if="issue && canSuspendIssueTargetModFromComment"
+                :issue="issue"
+                :disabled="suspendModDisabled"
               />
             </div>
             <!-- Discussion revision diffs -->

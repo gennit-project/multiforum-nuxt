@@ -38,6 +38,10 @@ describe('ActivityFeedListItem', () => {
   const mountWrapper = () =>
     mount(ActivityFeedListItem, {
       props: {
+        issue: {
+          id: 'issue-1',
+          relatedModProfileName: 'mod-bob',
+        },
         activityItem: {
           id: 'activity-1',
           actionType: 'comment',
@@ -70,6 +74,10 @@ describe('ActivityFeedListItem', () => {
             template: '<div data-testid="report-modal" />',
             props: ['open', 'commentId', 'comment'],
           },
+          SuspendModButton: {
+            template: '<div data-testid="suspend-mod-button" />',
+            props: ['issue', 'disabled'],
+          },
           GenericButton: {
             template:
               '<button :data-testid="text" @click="$emit(\'click\')">{{ text }}</button>',
@@ -93,5 +101,11 @@ describe('ActivityFeedListItem', () => {
     await wrapper.get('[data-testid="Report Mod Comment"]').trigger('click');
 
     expect(wrapper.find('[data-testid="report-modal"]').exists()).toBe(true);
+  });
+
+  it('shows a suspend action when the issue already targets the comment author mod profile', () => {
+    const wrapper = mountWrapper();
+
+    expect(wrapper.find('[data-testid="suspend-mod-button"]').exists()).toBe(true);
   });
 });
