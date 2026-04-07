@@ -24,7 +24,6 @@ Both the moderation bot plugin and the existing partially completed beta bot nee
 
 | Task                                                                                                                                               | Location         | Type             |
 | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ---------------- |
-| Add debug logging for the final prompt/context sent to bots, at least in local logs                                                                | Backend + Plugin | Debugging        |
 
 ### Beta Bot Overlap
 
@@ -192,6 +191,7 @@ These items are implemented and should stay visible for validation, regression c
 | Issue activity feed comments now open the reporting modal from the moderation activity feed                                                      | Frontend implementation + tests      | Re-verify report modal routing, issue creation, and notification behavior from issue detail activity feeds |
 | Comment-report issues now preserve and backfill `relatedUsername` / `relatedModProfileName` so later suspension flows can resolve the correct target | Backend implementation + tests       | Re-verify new and pre-existing comment-report issues, especially older issues reopened by later reports    |
 | Shared bot invocation context now ships as additive `payload.context` across comment, discussion-channel, and downloadable-file plugin events     | Backend implementation + tests       | Re-verify forum metadata, discussion context, invocation type, and parent-thread assembly across event types |
+| Plugin execution contexts now expose `logPromptDebug(...)` so bot plugins can write final prompt/context payloads to local run logs               | Backend implementation + tests       | Re-verify local logging volume and confirm plugins can capture final prompt payloads without custom plumbing |
 | `useServerRoleMembership()` maps `ServerConfig.Admins` and `ServerConfig.Moderators` into the shared badge inputs                                | Frontend unit tests                  | Re-verify if the `ServerConfig` membership shape changes again                                            |
 | Inline discussion and event root-comment forms suppress raw permission errors when suspension context is already known                           | Frontend unit tests + implementation | Re-verify against real blocked comment mutations in discussion and event detail pages                     |
 | Shared suspend/unsuspend button UI composable preserves modal and notification behavior                                                          | Frontend unit tests + refactor       | Re-verify suspend/unsuspend flows across both user and mod issue actions                                  |
