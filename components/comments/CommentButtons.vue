@@ -152,12 +152,27 @@ const loggedInUserIsAuthor = computed(() => {
 });
 
 const showEmojiPicker = ref(false);
+const showReactionSuspensionNotice = ref(false);
+const hasReactionSuspension = computed(() => {
+  return !!props.suspensionIssueNumber && !!props.suspensionChannelId;
+});
 
 function toggleEmojiPicker() {
+  if (hasReactionSuspension.value) {
+    showEmojiPicker.value = false;
+    showReactionSuspensionNotice.value = true;
+    emit('hideReplyEditor');
+    return;
+  }
   showEmojiPicker.value = !showEmojiPicker.value;
   if (showEmojiPicker.value) {
     emit('hideReplyEditor');
   }
+}
+
+function handleBlockedReaction() {
+  showEmojiPicker.value = false;
+  showReactionSuspensionNotice.value = true;
 }
 </script>
 
@@ -170,7 +185,18 @@ function toggleEmojiPicker() {
       :comment-id="commentData.id"
       :emoji-json="commentData.emoji"
       :is-permalinked="isPermalinked"
+      :interaction-disabled="hasReactionSuspension"
       @toggle-emoji-picker="toggleEmojiPicker"
+      @blocked-action="handleBlockedReaction"
+    />
+    <SuspensionNotice
+      v-if="showReactionSuspensionNotice && hasReactionSuspension"
+      class="mb-2"
+      :issue-number="suspensionIssueNumber"
+      :channel-id="suspensionChannelId"
+      :suspended-until="suspensionUntil"
+      :suspended-indefinitely="suspensionIndefinitely"
+      :message="'You are suspended in this forum and cannot react.'"
     />
     <div class="flex flex-wrap items-center gap-1 text-xs">
       <VoteButtons
@@ -188,7 +214,9 @@ function toggleEmojiPicker() {
         :comment-id="commentData.id"
         :is-permalinked="isPermalinked"
         :is-marked-as-answer="isMarkedAsAnswer"
+        :interaction-disabled="hasReactionSuspension"
         @toggle-emoji-picker="toggleEmojiPicker"
+        @blocked-action="handleBlockedReaction"
       />
       <ReplyButton
         v-if="!locked"

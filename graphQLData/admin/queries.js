@@ -6,6 +6,15 @@ export const GET_SERVER_CONFIG = gql`
       serverName
       serverIconURL
       serverDescription
+      Admins {
+        username
+      }
+      Moderators {
+        displayName
+        User {
+          username
+        }
+      }
       DefaultServerRole {
         name
         description
@@ -89,6 +98,25 @@ export const GET_SERVER_PERMISSIONS = gql`
   query getServerConfig($serverName: String!) {
     serverConfigs(where: { serverName: $serverName }) {
       serverName
+      Admins {
+        username
+        displayName
+        profilePicURL
+        commentKarma
+        discussionKarma
+        createdAt
+      }
+      Moderators {
+        displayName
+        User {
+          username
+          displayName
+          profilePicURL
+          commentKarma
+          discussionKarma
+          createdAt
+        }
+      }
       DefaultModRole {
         name
         description
@@ -160,6 +188,62 @@ export const GET_SERVER_PERMISSIONS = gql`
         canCreateDiscussion
         canCreateComment
         canCreateChannel
+      }
+    }
+  }
+`;
+
+export const GET_SERVER_SUSPENDED_USERS = gql`
+  query getServerSuspendedUsers($serverName: String!) {
+    serverConfigs(where: { serverName: $serverName }) {
+      serverName
+      SuspendedUsersAggregate {
+        count
+      }
+      SuspendedUsers {
+        id
+        username
+        createdAt
+        suspendedUntil
+        suspendedIndefinitely
+        SuspendedUser {
+          username
+          displayName
+          profilePicURL
+          commentKarma
+          discussionKarma
+          createdAt
+        }
+        RelatedIssue {
+          id
+          issueNumber
+        }
+      }
+    }
+  }
+`;
+
+export const GET_SERVER_SUSPENDED_MODS = gql`
+  query getServerSuspendedMods($serverName: String!) {
+    serverConfigs(where: { serverName: $serverName }) {
+      serverName
+      SuspendedModsAggregate {
+        count
+      }
+      SuspendedMods {
+        id
+        modProfileName
+        username
+        createdAt
+        suspendedUntil
+        suspendedIndefinitely
+        SuspendedMod {
+          displayName
+        }
+        RelatedIssue {
+          id
+          issueNumber
+        }
       }
     }
   }

@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import type { Issue } from '@/__generated__/graphql';
 import ArchiveBox from '@/components/icons/ArchiveBox.vue';
 import ArchiveBoxXMark from '@/components/icons/ArchiveBoxXMark.vue';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
 import Notification from '@/components/NotificationComponent.vue';
+import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 import { useQuery } from '@vue/apollo-composable';
 import {
   GET_DISCUSSION_CHANNEL,
@@ -85,25 +86,33 @@ const eventChannelId = computed(() => {
   return getEventChannelResult.value?.eventChannels?.[0]?.id ?? '';
 });
 
-defineEmits(['archived-successfully', 'unarchived-successfully']);
-
-const showArchiveModal = ref(false);
-const showUnarchiveModal = ref(false);
-
-const showSuccessfullyArchived = ref(false);
-const showSuccessfullyUnarchived = ref(false);
+const emit = defineEmits(['archived-successfully', 'unarchived-successfully']);
+const {
+  showArchiveModal,
+  showUnarchiveModal,
+  showSuccessfullyArchived,
+  showSuccessfullyUnarchived,
+  openArchiveModal,
+  closeArchiveModal,
+  openUnarchiveModal,
+  closeUnarchiveModal,
+  handleArchivedSuccessfully,
+  handleUnarchivedSuccessfully,
+  dismissArchivedNotification,
+  dismissUnarchivedNotification,
+} = useModerationOutcomeUI();
 
 const clickUnarchive = () => {
   if (props.disabled) {
     return;
   }
-  showUnarchiveModal.value = true;
+  openUnarchiveModal();
 };
 const clickArchive = () => {
   if (props.disabled) {
     return;
   }
-  showArchiveModal.value = true;
+  openArchiveModal();
 };
 
 const archivedContentType = computed(() => {
@@ -156,12 +165,11 @@ const archivedContentType = computed(() => {
     :archive-after-reporting="true"
     :discussion-channel-id="discussionChannelId"
     :event-channel-id="eventChannelId"
-    @close="showArchiveModal = false"
+    @close="closeArchiveModal"
     @reported-and-archived-successfully="
       () => {
-        showSuccessfullyArchived = true;
-        showArchiveModal = false;
-        $emit('archived-successfully');
+        handleArchivedSuccessfully();
+        emit('archived-successfully');
       }
     "
   />
@@ -177,23 +185,22 @@ const archivedContentType = computed(() => {
     :discussion-id="discussionId"
     :event-id="eventId"
     :comment-id="commentId"
-    @close="showUnarchiveModal = false"
+    @close="closeUnarchiveModal"
     @unarchived-successfully="
       () => {
-        showSuccessfullyUnarchived = true;
-        showUnarchiveModal = false;
-        $emit('unarchived-successfully');
+        handleUnarchivedSuccessfully();
+        emit('unarchived-successfully');
       }
     "
   />
   <Notification
     :show="showSuccessfullyArchived"
     :title="'The content was reported and archived successfully.'"
-    @close-notification="showSuccessfullyArchived = false"
+    @close-notification="dismissArchivedNotification"
   />
   <Notification
     :show="showSuccessfullyUnarchived"
     :title="'The content was unarchived successfully.'"
-    @close-notification="showSuccessfullyUnarchived = false"
+    @close-notification="dismissUnarchivedNotification"
   />
 </template>

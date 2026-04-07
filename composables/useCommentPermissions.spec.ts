@@ -203,6 +203,122 @@ describe('useCommentPermissions', () => {
     });
   });
 
+  describe('permission fallback precedence', () => {
+    it('prefers channel default mod role over server default mod role', () => {
+      const channelQueryMock = {
+        result: ref({
+          channels: [
+            {
+              DefaultModRole: {
+                canReport: false,
+              },
+              ElevatedModRole: null,
+            },
+          ],
+        }),
+        loading: ref(false),
+      };
+
+      const serverQueryMock = {
+        result: ref({
+          serverConfigs: [
+            {
+              DefaultModRole: {
+                canReport: true,
+              },
+              DefaultElevatedModRole: null,
+            },
+          ],
+        }),
+        loading: ref(false),
+      };
+
+      const permissionQueryMock = {
+        result: ref({
+          channels: [
+            {
+              Admins: [],
+              Moderators: [],
+              SuspendedMods: [],
+              SuspendedUsers: [],
+            },
+          ],
+        }),
+        loading: ref(false),
+      };
+
+      let callCount = 0;
+      (useQuery as any).mockImplementation(() => {
+        callCount++;
+        if (callCount === 1) return channelQueryMock;
+        if (callCount === 2) return serverQueryMock;
+        return permissionQueryMock;
+      });
+
+      const forumId = ref('test-forum');
+      const { userPermissions } = useCommentPermissions(forumId);
+
+      expect(userPermissions.value.canReport).toBe(false);
+    });
+
+    it('prefers channel elevated mod role over server elevated mod role', () => {
+      const channelQueryMock = {
+        result: ref({
+          channels: [
+            {
+              DefaultModRole: null,
+              ElevatedModRole: {
+                canHideComment: false,
+              },
+            },
+          ],
+        }),
+        loading: ref(false),
+      };
+
+      const serverQueryMock = {
+        result: ref({
+          serverConfigs: [
+            {
+              DefaultModRole: null,
+              DefaultElevatedModRole: {
+                canHideComment: true,
+              },
+            },
+          ],
+        }),
+        loading: ref(false),
+      };
+
+      const permissionQueryMock = {
+        result: ref({
+          channels: [
+            {
+              Admins: [],
+              Moderators: [{ displayName: 'testmod' }],
+              SuspendedMods: [],
+              SuspendedUsers: [],
+            },
+          ],
+        }),
+        loading: ref(false),
+      };
+
+      let callCount = 0;
+      (useQuery as any).mockImplementation(() => {
+        callCount++;
+        if (callCount === 1) return channelQueryMock;
+        if (callCount === 2) return serverQueryMock;
+        return permissionQueryMock;
+      });
+
+      const forumId = ref('test-forum');
+      const { userPermissions } = useCommentPermissions(forumId);
+
+      expect(userPermissions.value.canHideComment).toBe(false);
+    });
+  });
+
   describe('when user is elevated moderator', () => {
     beforeEach(() => {
       const channelQueryMock = {

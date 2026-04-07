@@ -58,7 +58,6 @@ const serverPermissionKeys = [
   'canUpvoteComment',
   'canUploadFile',
   'canGiveFeedback',
-  'showAdminTag',
 ];
 
 const modPermissionKeys = [

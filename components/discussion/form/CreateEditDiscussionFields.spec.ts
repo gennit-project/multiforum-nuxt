@@ -247,6 +247,37 @@ describe('CreateEditDiscussionFields Component', () => {
     });
   });
 
+  it('suppresses create error banner when suspension notice is present', () => {
+    const wrapper = mount(CreateEditDiscussionFields, {
+      props: {
+        editMode: false,
+        downloadMode: false,
+        createDiscussionError: {
+          message: 'Forbidden',
+          graphQLErrors: [],
+        },
+        formValues: {
+          ...defaultFormValues,
+          title: 'Test discussion',
+          selectedChannels: ['cats'],
+        },
+        suspensionIssueNumber: 42,
+        suspensionChannelId: 'cats',
+        getDiscussionError: null,
+        updateDiscussionError: null,
+        discussionLoading: false,
+        createDiscussionLoading: false,
+        updateDiscussionLoading: false,
+      },
+      global: {
+        stubs: mockComponents,
+      },
+    });
+
+    const errorBanners = wrapper.findAll('[data-testid="error-banner"]');
+    expect(errorBanners.some((banner) => banner.text().includes('Forbidden'))).toBe(false);
+  });
+
   describe('Form rendering', () => {
     it('renders the correct form title for create mode', async () => {
       const wrapper = mountComponent(defaultFormValues, false);

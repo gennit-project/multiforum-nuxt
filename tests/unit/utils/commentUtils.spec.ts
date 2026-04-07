@@ -506,11 +506,12 @@ describe('commentUtils', () => {
             commentKarma: 100,
             discussionKarma: 50,
             createdAt: '2024-01-01T00:00:00Z',
-            ServerRoles: [{ showAdminTag: true }],
           },
         };
 
-        const result = getCommentAuthorInfo(comment);
+        const result = getCommentAuthorInfo(comment, {
+          serverAdminUsernames: ['testuser'],
+        });
 
         expect(result).toEqual({
           username: 'testuser',
@@ -545,12 +546,11 @@ describe('commentUtils', () => {
         });
       });
 
-      it('handles empty ServerRoles array', () => {
+      it('handles user without server membership as non-admin', () => {
         const comment = {
           CommentAuthor: {
             __typename: 'User',
             username: 'user-no-roles',
-            ServerRoles: [],
           },
         };
 
@@ -559,18 +559,19 @@ describe('commentUtils', () => {
         expect(result?.isAdmin).toBe(false);
       });
 
-      it('handles ServerRoles with showAdminTag false', () => {
+      it('handles server admin membership when provided', () => {
         const comment = {
           CommentAuthor: {
             __typename: 'User',
-            username: 'regular-user',
-            ServerRoles: [{ showAdminTag: false }],
+            username: 'server-admin',
           },
         };
 
-        const result = getCommentAuthorInfo(comment);
+        const result = getCommentAuthorInfo(comment, {
+          serverAdminUsernames: ['server-admin'],
+        });
 
-        expect(result?.isAdmin).toBe(false);
+        expect(result?.isAdmin).toBe(true);
       });
 
       it('handles zero karma values correctly', () => {

@@ -49,24 +49,37 @@ describe('useCommentSectionNotifications', () => {
   });
 
   describe('reactivity', () => {
-    it('should allow setting notification values', () => {
-      const { showCopiedLinkNotification, showSuccessfullyReported } =
-        useCommentSectionNotifications();
+    it('should allow setting the copied link notification', () => {
+      const { showCopiedLinkNotification } = useCommentSectionNotifications();
 
       showCopiedLinkNotification.value = true;
-      showSuccessfullyReported.value = true;
 
       expect(showCopiedLinkNotification.value).toBe(true);
+    });
+
+    it('should allow report success handler to show the notification', () => {
+      const { handleReportedSuccessfully, showSuccessfullyReported } =
+        useCommentSectionNotifications();
+
+      handleReportedSuccessfully();
+
       expect(showSuccessfullyReported.value).toBe(true);
     });
 
-    it('should maintain separate state for each call', () => {
+    it('should maintain separate state for the first call', () => {
+      const notifications1 = useCommentSectionNotifications();
+
+      notifications1.showCopiedLinkNotification.value = true;
+
+      expect(notifications1.showCopiedLinkNotification.value).toBe(true);
+    });
+
+    it('should maintain separate state for the second call', () => {
       const notifications1 = useCommentSectionNotifications();
       const notifications2 = useCommentSectionNotifications();
 
       notifications1.showCopiedLinkNotification.value = true;
 
-      expect(notifications1.showCopiedLinkNotification.value).toBe(true);
       expect(notifications2.showCopiedLinkNotification.value).toBe(false);
     });
   });

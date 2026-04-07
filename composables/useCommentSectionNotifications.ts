@@ -1,4 +1,5 @@
 import { ref } from 'vue';
+import { useModerationOutcomeUI } from './useModerationOutcomeUI';
 
 /**
  * Composable that manages notification state for the comment section.
@@ -17,13 +18,20 @@ export function useCommentSectionNotifications() {
   // Feedback notification
   const showFeedbackSubmittedSuccessfully = ref(false);
 
-  // Report notification
-  const showSuccessfullyReported = ref(false);
-
-  // Archive notifications
-  const showSuccessfullyArchived = ref(false);
-  const showSuccessfullyArchivedAndSuspended = ref(false);
-  const showSuccessfullyUnarchived = ref(false);
+  const {
+    showSuccessfullyReported,
+    showSuccessfullyArchived,
+    showSuccessfullyArchivedAndSuspended,
+    showSuccessfullyUnarchived,
+    handleReportedSuccessfully,
+    handleArchivedSuccessfully,
+    handleArchivedAndSuspendedSuccessfully,
+    handleUnarchivedSuccessfully,
+    dismissReportedNotification,
+    dismissArchivedNotification,
+    dismissArchivedAndSuspendedNotification,
+    dismissUnarchivedNotification,
+  } = useModerationOutcomeUI();
 
   return {
     showCopiedLinkNotification,
@@ -34,5 +42,13 @@ export function useCommentSectionNotifications() {
     showSuccessfullyArchived,
     showSuccessfullyArchivedAndSuspended,
     showSuccessfullyUnarchived,
+    handleReportedSuccessfully,
+    handleArchivedSuccessfully,
+    handleArchivedAndSuspendedSuccessfully,
+    handleUnarchivedSuccessfully,
+    dismissReportedNotification,
+    dismissArchivedNotification,
+    dismissArchivedAndSuspendedNotification,
+    dismissUnarchivedNotification,
   };
 }

@@ -307,7 +307,7 @@ const editButtonDisabled = computed(() => {
             class="text-gray-600 dark:text-gray-400"
           >
             {{
-              'Mod actions are disabled because your moderator account is suspended.'
+              'Mod actions are disabled because your moderator account is suspended. This does not suspend your user account.'
             }}
           </p>
           <p

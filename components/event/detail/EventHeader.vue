@@ -19,7 +19,6 @@ import WarningModal from '@/components/WarningModal.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import { getDuration } from '@/utils';
-import { getAllPermissions } from '@/utils/permissionUtils';
 import { getEventHeaderMenuItems } from '@/utils/headerPermissionUtils';
 import GenericFeedbackFormModal from '@/components/GenericFeedbackFormModal.vue';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
@@ -32,6 +31,10 @@ import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
 import { CHECK_EVENT_ISSUE_EXISTENCE } from '@/graphQLData/issue/queries';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
+import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
 
 const props = defineProps({
   eventData: {
@@ -56,22 +59,39 @@ defineEmits(['archived-successfully']);
 
 const route = useRoute();
 const router = useRouter();
+const { serverAdminUsernames } = useServerRoleMembership();
 
 const showCopiedLinkNotification = ref(false);
 const showFeedbackFormModal = ref(false);
 const showFeedbackSubmittedSuccessfully = ref(false);
 const confirmDeleteIsOpen = ref(false);
 const confirmCancelIsOpen = ref(false);
-const showArchiveAndSuspendModal = ref(false);
-
-const showReportEventModal = ref(false);
-const showArchiveModal = ref(false);
-const showUnarchiveModal = ref(false);
-const showSuccessfullyArchived = ref(false);
-const showSuccessfullyUnarchived = ref(false);
-const showSuccessfullySuspended = ref(false);
-const showSuccessfullyArchivedAndSuspended = ref(false);
-const showSuccessfullyReported = ref(false);
+const {
+  showReportModal: showReportEventModal,
+  showArchiveModal,
+  showUnarchiveModal,
+  showArchiveAndSuspendModal,
+  showSuccessfullyArchived,
+  showSuccessfullyUnarchived,
+  showSuccessfullyArchivedAndSuspended,
+  showSuccessfullyReported,
+  openReportModal,
+  openArchiveModal,
+  openUnarchiveModal,
+  openArchiveAndSuspendModal,
+  closeReportModal,
+  closeArchiveModal,
+  closeUnarchiveModal,
+  closeArchiveAndSuspendModal,
+  handleReportedSuccessfully,
+  handleArchivedSuccessfully,
+  handleUnarchivedSuccessfully,
+  handleArchivedAndSuspendedSuccessfully,
+  dismissReportedNotification,
+  dismissArchivedNotification,
+  dismissUnarchivedNotification,
+  dismissArchivedAndSuspendedNotification,
+} = useModerationOutcomeUI();
 
 const eventId = computed(() => {
   return (
@@ -112,31 +132,6 @@ const { result: getServerResult } = useQuery(
     fetchPolicy: 'cache-first',
   }
 );
-
-// Get the standard and elevated mod roles from the channel or server default
-const standardModRole = computed(() => {
-  // If the channel has a Default Mod Role, return that
-  if (getChannelResult.value?.channels[0]?.DefaultModRole) {
-    return getChannelResult.value?.channels[0]?.DefaultModRole;
-  }
-  // Otherwise, return the default mod role from the server config
-  if (getServerResult.value?.serverConfigs[0]?.DefaultModRole) {
-    return getServerResult.value?.serverConfigs[0]?.DefaultModRole;
-  }
-  return null;
-});
-
-const elevatedModRole = computed(() => {
-  // If the channel has a Default Elevated Mod Role, return that
-  if (getChannelResult.value?.channels[0]?.ElevatedModRole) {
-    return getChannelResult.value?.channels[0]?.ElevatedModRole;
-  }
-  // Otherwise, return the default elevated mod role from server config
-  if (getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole) {
-    return getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole;
-  }
-  return null;
-});
 
 // Query user's permissions in the channel
 const { result: getPermissionResult } = useQuery(
@@ -185,23 +180,19 @@ const relatedIssueLink = computed(() => {
   };
 });
 
-// Get permission data from the query result
-const permissionData = computed(() => {
-  if (getPermissionResult.value?.channels?.[0]) {
-    return getPermissionResult.value.channels[0];
-  }
-  return null;
-});
-
-// Get all permissions for the current user using our utility function
-const userPermissions = computed(() => {
-  return getAllPermissions({
-    permissionData: permissionData.value,
-    standardModRole: standardModRole.value,
-    elevatedModRole: elevatedModRole.value,
-    username: usernameVar.value,
-    modProfileName: modProfileNameVar.value,
-  });
+const channelData = computed(() => getChannelResult.value?.channels?.[0] ?? null);
+const serverConfig = computed(
+  () => getServerResult.value?.serverConfigs?.[0] ?? null
+);
+const permissionData = computed(
+  () => getPermissionResult.value?.channels?.[0] ?? null
+);
+const { userPermissions } = useResolvedModPermissions({
+  channelData,
+  serverConfig,
+  permissionData,
+  username: computed(() => usernameVar.value),
+  modProfileName: computed(() => modProfileNameVar.value),
 });
 
 const permalinkObject = computed(() => {
@@ -304,8 +295,12 @@ const copyLink = async () => {
 };
 
 const isAdmin = computed(() => {
-  const serverRoles = props.eventData.Poster?.ServerRoles;
-  return serverRoles && serverRoles?.length > 0 && serverRoles[0]?.showAdminTag;
+  return (
+    getServerRoleBadge({
+      username: props.eventData.Poster?.username,
+      adminUsernames: serverAdminUsernames.value,
+    }) === 'serverAdmin'
+  );
 });
 
 const menuItems = computed(() => {
@@ -500,12 +495,12 @@ function handleFeedbackInput(event: string) {
           "
           @handle-delete="confirmDeleteIsOpen = true"
           @handle-cancel="confirmCancelIsOpen = true"
-          @handle-report="showReportEventModal = true"
+          @handle-report="openReportModal"
           @handle-feedback="showFeedbackFormModal = true"
           @handle-view-feedback="handleViewFeedback"
-          @handle-click-archive="showArchiveModal = true"
-          @handle-click-archive-and-suspend="showArchiveAndSuspendModal = true"
-          @handle-click-unarchive="showUnarchiveModal = true"
+          @handle-click-archive="openArchiveModal"
+          @handle-click-archive-and-suspend="openArchiveAndSuspendModal"
+          @handle-click-unarchive="openUnarchiveModal"
         >
           <EllipsisHorizontal
             class="h-6 w-6 cursor-pointer hover:text-black dark:text-gray-300 dark:hover:text-white"
@@ -563,18 +558,13 @@ function handleFeedbackInput(event: string) {
           :event-channel-id="eventChannelId"
           :suspend-user-enabled="true"
           :text-box-label="'(Optional) Explain why you are suspending the event submitter:'"
-          @close="showArchiveAndSuspendModal = false"
-          @suspended-user-successfully="
-            () => {
-              showSuccessfullyArchivedAndSuspended = true;
-              showArchiveAndSuspendModal = false;
-            }
-          "
+          @close="closeArchiveAndSuspendModal"
+          @suspended-user-successfully="handleArchivedAndSuspendedSuccessfully"
         />
         <Notification
           :show="showSuccessfullyArchivedAndSuspended"
           :title="'Archived the post and suspended the author.'"
-          @close-notification="showSuccessfullyArchivedAndSuspended = false"
+          @close-notification="dismissArchivedAndSuspendedNotification"
         />
         <Notification
           :show="showFeedbackSubmittedSuccessfully"
@@ -585,13 +575,8 @@ function handleFeedbackInput(event: string) {
           :open="showReportEventModal"
           :event-title="eventData.title"
           :event-id="eventId"
-          @close="showReportEventModal = false"
-          @report-submitted-successfully="
-            () => {
-              showSuccessfullyReported = true;
-              showReportEventModal = false;
-            }
-          "
+          @close="closeReportModal"
+          @report-submitted-successfully="handleReportedSuccessfully"
         />
         <BrokenRulesModal
           :v-if="eventData && eventData.id"
@@ -600,11 +585,10 @@ function handleFeedbackInput(event: string) {
           :event-id="eventData?.id"
           :archive-after-reporting="true"
           :event-channel-id="eventChannelId"
-          @close="showArchiveModal = false"
+          @close="closeArchiveModal"
           @reported-and-archived-successfully="
             () => {
-              showSuccessfullyArchived = true;
-              showArchiveModal = false;
+              handleArchivedSuccessfully();
               $emit('archived-successfully');
             }
           "
@@ -614,33 +598,23 @@ function handleFeedbackInput(event: string) {
           :open="showUnarchiveModal"
           :event-channel-id="eventChannelId"
           :event-id="eventData?.id"
-          @close="showUnarchiveModal = false"
-          @unarchived-successfully="
-            () => {
-              showSuccessfullyUnarchived = true;
-              showUnarchiveModal = false;
-            }
-          "
+          @close="closeUnarchiveModal"
+          @unarchived-successfully="handleUnarchivedSuccessfully"
         />
         <Notification
           :show="showSuccessfullyReported"
           :title="'Your report was submitted successfully.'"
-          @close-notification="showSuccessfullyReported = false"
+          @close-notification="dismissReportedNotification"
         />
         <Notification
           :show="showSuccessfullyArchived"
           :title="'The event was reported and archived successfully.'"
-          @close-notification="showSuccessfullyArchived = false"
+          @close-notification="dismissArchivedNotification"
         />
         <Notification
           :show="showSuccessfullyUnarchived"
           :title="'The event was unarchived successfully.'"
-          @close-notification="showSuccessfullyUnarchived = false"
-        />
-        <Notification
-          :show="showSuccessfullySuspended"
-          :title="'The event was suspended successfully.'"
-          @close-notification="showSuccessfullySuspended = false"
+          @close-notification="dismissUnarchivedNotification"
         />
       </div>
     </client-only>

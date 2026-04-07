@@ -5,6 +5,7 @@ import {
   getPermalinkToDiscussion,
   getPermalinkToEvent,
 } from './routerUtils';
+import { getServerRoleBadge } from './serverRoleBadges';
 
 // Type representing a comment with its context relationships
 // All fields are optional to support partial data in tests and various use cases
@@ -29,8 +30,11 @@ type CommentWithContext = {
     commentKarma?: number | null;
     discussionKarma?: number | null;
     createdAt?: string;
-    ServerRoles?: Array<{ showAdminTag?: boolean | null }>;
   } | null;
+};
+
+type GetCommentAuthorInfoOptions = {
+  serverAdminUsernames?: string[];
 };
 
 /**
@@ -153,12 +157,18 @@ export const getCommentContextType = (comment: CommentWithContext): string => {
  * Get author information from a comment, handling both User and ModerationProfile types
  */
 export const getCommentAuthorInfo = (
-  comment: CommentWithContext | null | undefined
+  comment: CommentWithContext | null | undefined,
+  options: GetCommentAuthorInfoOptions = {}
 ) => {
   const author = comment?.CommentAuthor;
   if (!author) return null;
 
   if (author.__typename === 'User') {
+    const serverRoleBadge = getServerRoleBadge({
+      username: author.username,
+      adminUsernames: options.serverAdminUsernames || [],
+    });
+
     return {
       username: author.username || '',
       displayName: author.displayName || '',
@@ -166,7 +176,7 @@ export const getCommentAuthorInfo = (
       commentKarma: author.commentKarma ?? 0,
       discussionKarma: author.discussionKarma ?? 0,
       createdAt: author.createdAt || '',
-      isAdmin: author.ServerRoles?.[0]?.showAdminTag || false,
+      isAdmin: serverRoleBadge === 'serverAdmin',
       isModerationProfile: false,
     };
   } else if (author.__typename === 'ModerationProfile') {

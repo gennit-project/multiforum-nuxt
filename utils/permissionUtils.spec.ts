@@ -68,4 +68,54 @@ describe('permissionUtils', () => {
     expect(permissions.canReport).toBe(false);
     expect(permissions.canGiveFeedback).toBe(false);
   });
+
+  it('marks the user as suspended when they appear in SuspendedUsers', () => {
+    const permissions = getAllPermissions({
+      permissionData: {
+        SuspendedUsers: [{ username: 'user-one' }],
+      },
+      standardModRole: {
+        canReport: true,
+      },
+      elevatedModRole: null,
+      username: 'user-one',
+      modProfileName: 'mod-one',
+    });
+
+    expect(permissions.isSuspendedUser).toBe(true);
+  });
+
+  it('disables report permission when the user is suspended', () => {
+    const permissions = getAllPermissions({
+      permissionData: {
+        SuspendedUsers: [{ username: 'user-one' }],
+      },
+      standardModRole: {
+        canReport: true,
+      },
+      elevatedModRole: null,
+      username: 'user-one',
+      modProfileName: 'mod-one',
+    });
+
+    expect(permissions.canReport).toBe(false);
+  });
+
+  it('marks the mod profile as suspended when it appears in SuspendedMods', () => {
+    const permissions = getAllPermissions({
+      permissionData: {
+        SuspendedMods: [{ modProfileName: 'mod-one' }],
+      },
+      standardModRole: {
+        canReport: true,
+      },
+      elevatedModRole: {
+        canReport: true,
+      },
+      username: 'user-one',
+      modProfileName: 'mod-one',
+    });
+
+    expect(permissions.isSuspendedMod).toBe(true);
+  });
 });

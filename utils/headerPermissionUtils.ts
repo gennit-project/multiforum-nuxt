@@ -8,20 +8,31 @@ import type { MenuItem } from '@/types/GenericFormTypes';
 import { ALLOWED_ICONS } from '@/utils';
 import type { User, ModerationProfile } from '@/__generated__/graphql';
 import type { RouteLocationRaw } from 'vue-router';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import type {
+  PermissionFlags,
+  CorePermissionFlag,
+} from '@/utils/permissionUtils';
 
 // Type for comment author with role information
 type AuthorWithRoles =
   | (Pick<User, '__typename'> & {
-      ServerRoles?: Array<{ showAdminTag?: boolean | null }>;
+      username?: string | null;
+      displayName?: string | null;
       ChannelRoles?: Array<{ showModTag?: boolean | null }>;
     })
-  | Pick<ModerationProfile, '__typename'>;
+  | (Pick<ModerationProfile, '__typename'> & {
+      displayName?: string | null;
+    });
 
 // Content type for archive/unarchive operations
 type ContentType = 'discussion' | 'event' | 'comment';
 
 // Permission key for hiding content by type
-const HIDE_PERMISSION_MAP: Record<ContentType, string> = {
+const HIDE_PERMISSION_MAP: Record<
+  ContentType,
+  'canHideDiscussion' | 'canHideEvent' | 'canHideComment'
+> = {
   discussion: 'canHideDiscussion',
   event: 'canHideEvent',
   comment: 'canHideComment',
@@ -35,7 +46,7 @@ const HIDE_PERMISSION_MAP: Record<ContentType, string> = {
  * @returns boolean indicating if the user can perform mod actions
  */
 export const canPerformModActions = (
-  userPermissions: Record<string, boolean>,
+  userPermissions: PermissionFlags,
   contentType?: ContentType
 ): boolean => {
   // Suspended mods cannot perform any mod actions
@@ -80,7 +91,7 @@ export const canPerformModActions = (
  */
 export const buildArchiveMenuItems = (params: {
   isArchived: boolean;
-  userPermissions: Record<string, boolean>;
+  userPermissions: PermissionFlags;
   contentType: ContentType;
   contentId: string;
   archiveEvent?: string;
@@ -98,7 +109,7 @@ export const buildArchiveMenuItems = (params: {
   } = params;
 
   const modActions: MenuItem[] = [];
-  const hidePermission = HIDE_PERMISSION_MAP[contentType];
+  const hidePermission: CorePermissionFlag = HIDE_PERMISSION_MAP[contentType];
 
   if (!isArchived) {
     if (userPermissions[hidePermission]) {
@@ -170,7 +181,7 @@ export const buildModerationSection = (
 export const getDiscussionHeaderMenuItems = (params: {
   isOwnDiscussion: boolean;
   isArchived: boolean;
-  userPermissions: Record<string, boolean>;
+  userPermissions: PermissionFlags;
   isLoggedIn: boolean;
   discussionId: string;
   hasAlbum?: boolean;
@@ -312,7 +323,7 @@ export const getEventHeaderMenuItems = (params: {
   isOwnEvent: boolean;
   isArchived: boolean;
   isCanceled: boolean;
-  userPermissions: Record<string, boolean>;
+  userPermissions: PermissionFlags;
   isLoggedIn: boolean;
   eventId: string;
   isOnFeedbackPage?: boolean;
@@ -444,8 +455,16 @@ export const getEventHeaderMenuItems = (params: {
  */
 export const getCommentAuthorStatus = (params: {
   author: AuthorWithRoles | null | undefined;
+  serverAdminUsernames?: string[];
+  serverModUsernames?: string[];
+  serverModProfileNames?: string[];
 }): { isAdmin: boolean; isMod: boolean } => {
-  const { author } = params;
+  const {
+    author,
+    serverAdminUsernames = [],
+    serverModUsernames = [],
+    serverModProfileNames = [],
+  } = params;
 
   if (!author) {
     return { isAdmin: false, isMod: false };
@@ -455,15 +474,34 @@ export const getCommentAuthorStatus = (params: {
   let isMod = false;
 
   if (author.__typename === 'User') {
-    // Check admin status from ServerRoles
-    if (author.ServerRoles && author.ServerRoles.length > 0) {
-      isAdmin = !!author.ServerRoles[0]?.showAdminTag;
-    }
+    const serverRoleBadge = getServerRoleBadge({
+      username: author.username,
+      modProfileName: author.displayName,
+      adminUsernames: serverAdminUsernames,
+      modUsernames: serverModUsernames,
+      modProfileNames: serverModProfileNames,
+    });
+    const isServerAdmin = serverRoleBadge === 'serverAdmin';
+    const isServerMod =
+      serverModUsernames.includes(author.username || '') ||
+      serverModProfileNames.includes(author.displayName || '');
+
+    isAdmin = isServerAdmin;
 
     // Check mod status from ChannelRoles
-    if (author.ChannelRoles && author.ChannelRoles.length > 0) {
-      isMod = !!author.ChannelRoles[0]?.showModTag;
-    }
+    isMod =
+      isServerMod || Boolean(author.ChannelRoles?.[0]?.showModTag);
+  } else if (author.__typename === 'ModerationProfile') {
+    const serverRoleBadge = getServerRoleBadge({
+      modProfileName: author.displayName,
+      adminUsernames: serverAdminUsernames,
+      modUsernames: serverModUsernames,
+      modProfileNames: serverModProfileNames,
+    });
+    const isServerMod = serverModProfileNames.includes(author.displayName || '');
+
+    isAdmin = serverRoleBadge === 'serverAdmin';
+    isMod = isServerMod;
   }
 
   return { isAdmin, isMod };
@@ -496,7 +534,7 @@ export const getCommentMenuItems = (params: {
   isMarkedAsAnswer: boolean;
   depth: number;
   discussionId: string | undefined;
-  userPermissions: Record<string, boolean>;
+  userPermissions: PermissionFlags;
   isLoggedIn: boolean;
   enableFeedback: boolean;
   canShowPermalink: boolean;
