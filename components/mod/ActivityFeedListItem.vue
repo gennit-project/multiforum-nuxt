@@ -131,6 +131,16 @@ const canSuspendIssueTargetModFromComment = computed(() => {
   return props.issue?.relatedModProfileName === author.displayName;
 });
 
+const canSuspendIssueTargetModFromActivityActor = computed(() => {
+  const actorModName = props.activityItem.ModerationProfile?.displayName;
+
+  if (!actorModName) {
+    return false;
+  }
+
+  return props.issue?.relatedModProfileName === actorModName;
+});
+
 const isEditing = ref(false);
 const editedComment = ref(props.activityItem.Comment?.text || '');
 
@@ -578,6 +588,13 @@ const {
             <span class="whitespace-nowrap">{{
               `${timeAgo(new Date(activityItem.createdAt))}`
             }}</span>
+          </div>
+
+          <div
+            v-if="issue && canSuspendIssueTargetModFromActivityActor"
+            class="mt-2 flex flex-wrap items-center gap-2"
+          >
+            <SuspendModButton :issue="issue" :disabled="suspendModDisabled" />
           </div>
 
           <div class="border-l-2 border-gray-200 pl-2 dark:border-gray-500">

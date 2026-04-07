@@ -108,4 +108,10 @@ describe('ActivityFeedListItem', () => {
 
     expect(wrapper.find('[data-testid="suspend-mod-button"]').exists()).toBe(true);
   });
+
+  it('shows a suspend action for activity items authored by the targeted mod profile', () => {
+    const wrapper = mountWrapper();
+
+    expect(wrapper.findAll('[data-testid="suspend-mod-button"]').length).toBe(2);
+  });
 });
