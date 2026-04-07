@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
 import { GET_MOD, GET_MOD_COMMENTS } from '@/graphQLData/mod/queries';
 import Comment from '@/components/comments/Comment.vue';
+import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
+import Notification from '@/components/NotificationComponent.vue';
+import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
+import type { Comment as CommentType } from '@/__generated__/graphql';
 
 const PAGE_LIMIT = 25;
 
@@ -78,6 +82,22 @@ const commentCount = computed(() => {
 const comments = computed(() => {
   return commentResult.value?.moderationProfiles[0]?.AuthoredComments || [];
 });
+
+const {
+  showReportModal,
+  showSuccessfullyReported,
+  openReportModal,
+  closeReportModal,
+  handleReportedSuccessfully,
+  dismissReportedNotification,
+} = useModerationOutcomeUI();
+
+const commentToReport = ref<CommentType | null>(null);
+
+const handleClickReport = (comment: CommentType) => {
+  commentToReport.value = comment;
+  openReportModal();
+};
 </script>
 
 <template>
@@ -101,6 +121,7 @@ const comments = computed(() => {
       :show-context-link="true"
       :show-label="true"
       :go-to-permalink-on-click="true"
+      @click-report="handleClickReport"
     />
     <div v-if="commentCount">
       <LoadMore
@@ -109,5 +130,18 @@ const comments = computed(() => {
         @load-more="loadMore"
       />
     </div>
+    <BrokenRulesModal
+      v-if="showReportModal"
+      :open="showReportModal"
+      :comment-id="commentToReport?.id"
+      :comment="commentToReport"
+      @close="closeReportModal"
+      @report-submitted-successfully="handleReportedSuccessfully"
+    />
+    <Notification
+      :show="showSuccessfullyReported"
+      :title="'Your report was submitted successfully.'"
+      @close-notification="dismissReportedNotification"
+    />
   </div>
 </template>
