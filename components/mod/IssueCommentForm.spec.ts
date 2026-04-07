@@ -45,6 +45,14 @@ describe('IssueCommentForm', () => {
     expect(wrapper.text()).not.toContain('Lock Issue');
   });
 
+  it('explains that only the moderator account is suspended', () => {
+    const wrapper = mountWrapper();
+
+    expect(wrapper.text()).toContain(
+      'Your moderator account is suspended, so moderation actions on this issue are disabled. This does not suspend your user account.'
+    );
+  });
+
   it('disables the close-open issue button for suspended mods who are not the original author', () => {
     const wrapper = mountWrapper();
 

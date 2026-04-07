@@ -127,6 +127,19 @@ vi.mock('@/composables/useIssueBodyEdit', () => ({
   }),
 }));
 
+const mockedPermissionFlags = {
+  isSuspendedMod: false,
+  canEditComments: false,
+  canEditDiscussions: false,
+  canEditEvents: false,
+};
+
+vi.mock('@/composables/useResolvedModPermissions', () => ({
+  useResolvedModPermissions: () => ({
+    userPermissions: ref(mockedPermissionFlags),
+  }),
+}));
+
 const GenericButtonStub = defineComponent({
   props: ['text', 'testId'],
   emits: ['click'],
@@ -175,6 +188,7 @@ const PassThroughStub = defineComponent({
 describe('IssueDetail', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockedPermissionFlags.isSuspendedMod = false;
     issueResult.value.issues[0].SubscribedToNotifications = [];
     refetchIssue.mockResolvedValue(undefined);
 
@@ -250,5 +264,14 @@ describe('IssueDetail', () => {
     expect(subscribeMutate).not.toHaveBeenCalled();
     expect(routerReplace).toHaveBeenCalledWith({ query: {} });
     expect(wrapper.text()).not.toContain('Subscribe to updates on this issue?');
+  });
+
+  it('shows the moderator-account suspension banner when the current mod is suspended', () => {
+    mockedPermissionFlags.isSuspendedMod = true;
+    const wrapper = buildWrapper();
+
+    expect(wrapper.text()).toContain(
+      'Your moderator account is suspended. You can still use your user account where normal user permissions allow it, but moderation actions remain disabled until the suspension is reversed or expires.'
+    );
   });
 });
