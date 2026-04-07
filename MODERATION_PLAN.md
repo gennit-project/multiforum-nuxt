@@ -30,14 +30,6 @@ These beta bot items are not the main moderation roadmap, but they share the sam
 
 The moderation bot should reuse the same moderation-profile-based audit surface as human moderators. That means its reports should show up on the bot's mod profile page, using the existing mod profile route and history views rather than a separate bot-only audit UI.
 
-## Suspended User Content Creation + Notifications
-
-| Task                                                                                      | Location | Type           |
-| ----------------------------------------------------------------------------------------- | -------- | -------------- |
-| Ensure notification UI shows issue link and expiration clearly                            | Frontend | Feature/Polish |
-| Add suspension notification opt-out to notification settings                              | Frontend | Feature        |
-| Persist and honor the suspension-notification preference in backend notification delivery | Backend  | Feature        |
-
 ## Suspended Bots
 
 **Current State:**
@@ -182,6 +174,7 @@ These items are implemented and should stay visible for validation, regression c
 | Mod profile comments now open the reporting modal from the mod profile route                                                                         | Frontend implementation + tests      | Re-verify reporting, issue creation, and notification behavior from `/mod/[modId]/comments`                  |
 | Issue activity feed comments now open the reporting modal from the moderation activity feed                                                          | Frontend implementation + tests      | Re-verify report modal routing, issue creation, and notification behavior from issue detail activity feeds   |
 | Comment-report issues now preserve and backfill `relatedUsername` / `relatedModProfileName` so later suspension flows can resolve the correct target | Backend implementation + tests       | Re-verify new and pre-existing comment-report issues, especially older issues reopened by later reports      |
+| Suspension-block notifications now honor a user-level opt-out preference and server-scope blocked actions generate the same issue-linked notification trail as channel-scope blocks | Backend + frontend implementation    | Re-verify account settings autosave, channel/server issue links, expiration text, and preference opt-out behavior |
 | Shared bot invocation context now ships as additive `payload.context` across comment, discussion-channel, and downloadable-file plugin events        | Backend implementation + tests       | Re-verify forum metadata, discussion context, invocation type, and parent-thread assembly across event types |
 | Plugin execution contexts now expose `logPromptDebug(...)` so bot plugins can write final prompt/context payloads to local run logs                  | Backend implementation + tests       | Re-verify local logging volume and confirm plugins can capture final prompt payloads without custom plumbing |
 | `beta-reader-bot` and `chatgpt-bot-profiles` now build prompts from shared `payload.context` and emit prompt-debug logs through `logPromptDebug(...)` | Plugin implementation + build        | Re-verify prompt quality, parent-thread formatting, and local debug logging in real tagged-comment flows     |
