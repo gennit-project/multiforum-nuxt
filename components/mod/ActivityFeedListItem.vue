@@ -4,6 +4,7 @@ import TextEditor from '@/components/TextEditor.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import SaveButton from '@/components/SaveButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import Notification from '@/components/NotificationComponent.vue';
 import { ref, computed, watch, type PropType } from 'vue';
 import { timeAgo } from '@/utils';
 import type { Discussion, ModerationAction } from '@/__generated__/graphql';
@@ -26,6 +27,8 @@ import { modProfileNameVar, usernameVar } from '@/cache';
 import RevisionDiffInline from '@/components/mod/RevisionDiffInline.vue';
 import { getForumRoleBadge } from '@/utils/forumRoleBadges';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
+import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
+import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 
 const actionTypeToIcon: Record<string, any> = {
   [ActionType.Close]: XCircleIcon,
@@ -94,6 +97,19 @@ const isCommentAuthor = computed(() => {
   }
 
   return false;
+});
+
+const isReportableModComment = computed(() => {
+  const author = props.activityItem.Comment?.CommentAuthor;
+  if (!author || !('displayName' in author) || !author.displayName) {
+    return false;
+  }
+
+  if (!usernameVar.value && !modProfileNameVar.value) {
+    return false;
+  }
+
+  return author.displayName !== modProfileNameVar.value;
 });
 
 const isEditing = ref(false);
@@ -413,6 +429,15 @@ const saveEdit = async () => {
     console.error('Error updating comment', error);
   }
 };
+
+const {
+  showReportModal,
+  showSuccessfullyReported,
+  openReportModal,
+  closeReportModal,
+  handleReportedSuccessfully,
+  dismissReportedNotification,
+} = useModerationOutcomeUI();
 </script>
 
 <template>
@@ -584,6 +609,15 @@ const saveEdit = async () => {
               class="mt-2"
               :text="updateCommentError.message"
             />
+            <div
+              v-if="activityItem.Comment && isReportableModComment"
+              class="mt-2 flex flex-wrap items-center gap-2"
+            >
+              <GenericButton
+                :text="'Report Mod Comment'"
+                @click="openReportModal"
+              />
+            </div>
             <!-- Discussion revision diffs -->
             <div v-if="discussionRevisionContents.length" class="space-y-2">
               <div
@@ -612,5 +646,18 @@ const saveEdit = async () => {
         </div>
       </div>
     </div>
+    <BrokenRulesModal
+      v-if="showReportModal"
+      :open="showReportModal"
+      :comment-id="activityItem.Comment?.id || ''"
+      :comment="activityItem.Comment"
+      @close="closeReportModal"
+      @report-submitted-successfully="handleReportedSuccessfully"
+    />
+    <Notification
+      :show="showSuccessfullyReported"
+      :title="'Your report was submitted successfully.'"
+      @close-notification="dismissReportedNotification"
+    />
   </li>
 </template>
