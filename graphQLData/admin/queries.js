@@ -117,6 +117,40 @@ export const GET_SERVER_PERMISSIONS = gql`
           createdAt
         }
       }
+      SuspendedUsers {
+        id
+        username
+        createdAt
+        suspendedUntil
+        suspendedIndefinitely
+        SuspendedUser {
+          username
+          displayName
+          profilePicURL
+          commentKarma
+          discussionKarma
+          createdAt
+        }
+        RelatedIssue {
+          id
+          issueNumber
+        }
+      }
+      SuspendedMods {
+        id
+        modProfileName
+        username
+        createdAt
+        suspendedUntil
+        suspendedIndefinitely
+        SuspendedMod {
+          displayName
+        }
+        RelatedIssue {
+          id
+          issueNumber
+        }
+      }
       DefaultModRole {
         name
         description
