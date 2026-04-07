@@ -5,21 +5,19 @@
 | Task                                                                                                                          | Location | Type     |
 | ----------------------------------------------------------------------------------------------------------------------------- | -------- | -------- |
 | Treat channel-scope and server-scope suspended-mod lists as the primary model instead of introducing a separate mod-ban state | Both     | Decision |
-| Add clear UI indication when mod profile suspended vs user account                                                            | Frontend | Feature  |
 
 ## Suspended Mod Perspective
 
 | Task                                                                                                          | Location | Type      |
 | ------------------------------------------------------------------------------------------------------------- | -------- | --------- |
 | Audit all mod-only UI elements for suspension checks                                                          | Frontend | Tech Debt |
-| Add "You are suspended" banner on moderation pages for suspended mods. Make sure it has a working issue link. | Frontend | Feature   |
 
 ## Suspended Mods - Reporting Workflow
 
 **Current State:**
 
-- ❌ No "Report" option on mod comments in feedback pages
-- ❌ No "Report" option on mod profile pages
+- Feedback-page mod comments already route into the reporting modal
+- Mod profile comments already route into the reporting modal
 - ❌ No "Report" option on mod actions in issue activity feed
 - `SuspendModButton.vue` exists for suspending mods
 
@@ -27,8 +25,6 @@
 
 | Task                                                    | Location | Type    |
 | ------------------------------------------------------- | -------- | ------- |
-| Add "Report" menu item to feedback page comment headers | Frontend | Feature |
-| Add "Report" button/menu to mod profile page            | Frontend | Feature |
 | Add "Report" option to issue activity feed mod actions  | Frontend | Feature |
 | Create `reportModComment` mutation if needed            | Backend  | Feature |
 
@@ -39,6 +35,34 @@
 | Add "Suspend Mod" option to issue comment context menu             | Frontend | Feature |
 | Add "Suspend Mod" option to mod action context in activity feed    | Frontend | Feature |
 | Ensure suspension creates proper Issue linking to reported content | Backend  | Feature |
+
+## Shared Bot Context Infrastructure
+
+Both the moderation bot plugin and the existing partially completed beta bot need the same core problem solved: build the right amount of forum/discussion/comment context before sending a prompt to a bot.
+
+### Shared Backend / Plugin Work
+
+| Task                                                                                                                                          | Location          | Type             |
+| --------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ---------------- |
+| Create shared logic for bot invocation context so beta bot and the moderation bot do not each rebuild forum/discussion/comment context differently | Backend + Plugin | Refactor/Feature |
+| Include forum context in the shared bot payload: forum name, forum description, and forum rules                                              | Backend + Plugin  | Feature          |
+| Include discussion context in the shared bot payload: discussion title and discussion body                                                    | Backend + Plugin  | Feature          |
+| Include threaded comment context in the shared bot payload, walking parent comments all the way to the root when reviewing a child comment    | Backend + Plugin  | Feature          |
+| Support different context envelopes depending on invocation type: tagged bot invocation vs automatic moderation review                         | Backend + Plugin  | Feature          |
+| Add debug logging for the final prompt/context sent to bots, at least in local logs                                                          | Backend + Plugin  | Debugging        |
+
+### Beta Bot Overlap
+
+These beta bot items are not the main moderation roadmap, but they share the same context-construction dependency and should be planned with that reuse in mind.
+
+| Task                                                                                                          | Location          | Type      |
+| ------------------------------------------------------------------------------------------------------------- | ----------------- | --------- |
+| Add API key configuration for the beta bot plugin                                                             | Frontend + Plugin | Feature   |
+| Allow channel settings to update beta bot display name, description, and prompt after the bot is created     | Frontend + Plugin | Feature   |
+| Ensure all 4 beta bot identities are created for the beta bot plugin and labeled in the sidebar              | Frontend + Plugin | Feature   |
+| Test context-rich tagged invocation in a forum like Bad Advice once shared context assembly is in place       | Verification      | QA        |
+
+The moderation bot should reuse the same moderation-profile-based audit surface as human moderators. That means its reports should show up on the bot's mod profile page, using the existing mod profile route and history views rather than a separate bot-only audit UI.
 
 ## Suspended User Content Creation + Notifications
 
@@ -79,6 +103,7 @@
 | Define plugin schema for a report-only moderation bot                                                                                     | Backend           | Design  |
 | Create `ModerationBotPlugin` type or equivalent report-only plugin model                                                                  | Backend           | Feature |
 | Create bot user for automated moderation                                                                                                  | Backend           | Feature |
+| Ensure the content moderation bot acts through a `ModerationProfile`, so its reports and actions appear on a normal mod profile page for auditability | Backend + Plugin | Feature |
 | Implement report-only issue creation based on rule violations                                                                             | Backend           | Feature |
 | Have the bot leave issue-linked/report-linked comments that clearly indicate automated reporting                                          | Backend           | Feature |
 
@@ -184,9 +209,11 @@ These items are implemented and should stay visible for validation, regression c
 | Server-scoped suspend/unsuspend resolution now supports issues without a channel by resolving targets from server-scoped issue metadata | Backend implementation + tests       | Re-verify server-scoped issue targets for both user and mod suspensions                                    |
 | Display "Server Admin" and "Server Mod" labels consistently on comments                                                                 | Frontend implementation              | Manual cross-surface verification before relying solely on E2E coverage                                   |
 | Server-scoped suspension management now has dedicated admin pages that mirror the channel-scope suspended-user and suspended-mod views  | Frontend implementation              | Manually review navigation, issue links, empty states, and parity with forum-level suspension pages       |
+| Suspended-mod moderation UI now explicitly states that the moderator account can be suspended while the user account remains separate     | Frontend implementation + tests      | Re-verify issue detail, issue comment form, and moderation wizard copy on real suspended-mod accounts      |
 | Create/forum/discussion/event/comment flows suppress raw suspension-blocked errors when suspension context is available                 | Frontend unit tests + implementation | Re-verify against real GraphQL permission failures and stale cache cases                                  |
 | Comment and discussion emoji controls show suspension-aware blocked-action UI                                                           | Frontend unit tests + implementation | Manual verification across both existing reactions and add-reaction entry points                          |
 | Suspended moderator issue-comment and moderation controls stay disabled in the main moderation UI                                       | Frontend unit tests + implementation | Re-verify on actual issue detail pages and related moderation surfaces                                    |
+| Mod profile comments now open the reporting modal from the mod profile route                                                            | Frontend implementation + tests      | Re-verify reporting, issue creation, and notification behavior from `/mod/[modId]/comments`               |
 | `useServerRoleMembership()` maps `ServerConfig.Admins` and `ServerConfig.Moderators` into the shared badge inputs                       | Frontend unit tests                  | Re-verify if the `ServerConfig` membership shape changes again                                            |
 | Inline discussion and event root-comment forms suppress raw permission errors when suspension context is already known                  | Frontend unit tests + implementation | Re-verify against real blocked comment mutations in discussion and event detail pages                     |
 | Shared suspend/unsuspend button UI composable preserves modal and notification behavior                                                 | Frontend unit tests + refactor       | Re-verify suspend/unsuspend flows across both user and mod issue actions                                  |
@@ -218,9 +245,12 @@ This section is intentionally verification-only. If an item requires new product
 - [ ] Verify server-scoped suspended users cannot create forums and server-scoped suspended mods cannot take server moderation actions
 - [ ] Verify server-scoped suspend and unsuspend flows resolve the correct target and linked issue when the issue has no channel
 - [ ] Review the new `/admin/suspended-users` and `/admin/suspended-mods` pages for channel-parity UX, empty states, and related-issue navigation
+- [ ] Verify the suspended-mod copy clearly communicates that the mod profile can be suspended while the user account remains active
 - [ ] Verify issue page editing is disabled for suspended mods
 - [ ] Verify blocked and restored mod-action behavior across suspended, unsuspended, and expired states
+- [ ] Verify reporting from `/mod/[modId]/comments` opens the expected report workflow and creates the expected issue trail
 - [ ] Validate the new server membership editor UX for larger admin/mod lists
+- [ ] Review shared bot-context design against both beta bot and moderation bot before implementing either plugin-specific context builder
 - [ ] Audit bot action paths to confirm suspended bots are blocked consistently and link back to the relevant issue context
 - [ ] Verify mod suspension does not affect user permissions
 - [ ] Verify a suspended mod can still create content as a user
