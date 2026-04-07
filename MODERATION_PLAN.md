@@ -14,7 +14,6 @@
 | ------------------------------------------------------------------ | -------- | ------- |
 | Add "Suspend Mod" option to issue comment context menu             | Frontend | Feature |
 | Add "Suspend Mod" option to mod action context in activity feed    | Frontend | Feature |
-| Ensure comment-report issues preserve `relatedUsername` or `relatedModProfileName` for later suspension workflows | Backend  | Feature |
 | Ensure suspension creates proper Issue linking to reported content | Backend  | Feature |
 
 ## Shared Bot Context Infrastructure
@@ -196,6 +195,7 @@ These items are implemented and should stay visible for validation, regression c
 | Suspended moderator issue-comment and moderation controls stay disabled in the main moderation UI                                                | Frontend unit tests + implementation | Re-verify on actual issue detail pages and related moderation surfaces                                    |
 | Mod profile comments now open the reporting modal from the mod profile route                                                                     | Frontend implementation + tests      | Re-verify reporting, issue creation, and notification behavior from `/mod/[modId]/comments`               |
 | Issue activity feed comments now open the reporting modal from the moderation activity feed                                                      | Frontend implementation + tests      | Re-verify report modal routing, issue creation, and notification behavior from issue detail activity feeds |
+| Comment-report issues now preserve and backfill `relatedUsername` / `relatedModProfileName` so later suspension flows can resolve the correct target | Backend implementation + tests       | Re-verify new and pre-existing comment-report issues, especially older issues reopened by later reports    |
 | `useServerRoleMembership()` maps `ServerConfig.Admins` and `ServerConfig.Moderators` into the shared badge inputs                                | Frontend unit tests                  | Re-verify if the `ServerConfig` membership shape changes again                                            |
 | Inline discussion and event root-comment forms suppress raw permission errors when suspension context is already known                           | Frontend unit tests + implementation | Re-verify against real blocked comment mutations in discussion and event detail pages                     |
 | Shared suspend/unsuspend button UI composable preserves modal and notification behavior                                                          | Frontend unit tests + refactor       | Re-verify suspend/unsuspend flows across both user and mod issue actions                                  |

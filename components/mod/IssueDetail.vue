@@ -862,6 +862,10 @@ const handleLockReasonUpdate = (value: string) => {
             :original-user-author-username="resolvedOriginalAuthorUsername"
             :original-mod-author-name="resolvedOriginalModProfileName"
             :related-discussion="relatedDiscussion"
+            :issue="activeIssue"
+            :suspend-mod-disabled="
+              isSuspendedMod || !issueActionVisibility.modActionsEnabled
+            "
           />
 
           <ErrorBanner
