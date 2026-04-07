@@ -24,11 +24,6 @@ Both the moderation bot plugin and the existing partially completed beta bot nee
 
 | Task                                                                                                                                               | Location         | Type             |
 | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ---------------- |
-| Create shared logic for bot invocation context so beta bot and the moderation bot do not each rebuild forum/discussion/comment context differently | Backend + Plugin | Refactor/Feature |
-| Include forum context in the shared bot payload: forum name, forum description, and forum rules                                                    | Backend + Plugin | Feature          |
-| Include discussion context in the shared bot payload: discussion title and discussion body                                                         | Backend + Plugin | Feature          |
-| Include threaded comment context in the shared bot payload, walking parent comments all the way to the root when reviewing a child comment         | Backend + Plugin | Feature          |
-| Support different context envelopes depending on invocation type: tagged bot invocation vs automatic moderation review                             | Backend + Plugin | Feature          |
 | Add debug logging for the final prompt/context sent to bots, at least in local logs                                                                | Backend + Plugin | Debugging        |
 
 ### Beta Bot Overlap
@@ -196,6 +191,7 @@ These items are implemented and should stay visible for validation, regression c
 | Mod profile comments now open the reporting modal from the mod profile route                                                                     | Frontend implementation + tests      | Re-verify reporting, issue creation, and notification behavior from `/mod/[modId]/comments`               |
 | Issue activity feed comments now open the reporting modal from the moderation activity feed                                                      | Frontend implementation + tests      | Re-verify report modal routing, issue creation, and notification behavior from issue detail activity feeds |
 | Comment-report issues now preserve and backfill `relatedUsername` / `relatedModProfileName` so later suspension flows can resolve the correct target | Backend implementation + tests       | Re-verify new and pre-existing comment-report issues, especially older issues reopened by later reports    |
+| Shared bot invocation context now ships as additive `payload.context` across comment, discussion-channel, and downloadable-file plugin events     | Backend implementation + tests       | Re-verify forum metadata, discussion context, invocation type, and parent-thread assembly across event types |
 | `useServerRoleMembership()` maps `ServerConfig.Admins` and `ServerConfig.Moderators` into the shared badge inputs                                | Frontend unit tests                  | Re-verify if the `ServerConfig` membership shape changes again                                            |
 | Inline discussion and event root-comment forms suppress raw permission errors when suspension context is already known                           | Frontend unit tests + implementation | Re-verify against real blocked comment mutations in discussion and event detail pages                     |
 | Shared suspend/unsuspend button UI composable preserves modal and notification behavior                                                          | Frontend unit tests + refactor       | Re-verify suspend/unsuspend flows across both user and mod issue actions                                  |
