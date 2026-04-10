@@ -15,6 +15,12 @@ export const GET_SERVER_CONFIG = gql`
           username
         }
       }
+      PendingAdminInvites {
+        username
+      }
+      PendingModInvites {
+        username
+      }
       DefaultServerRole {
         name
         description
@@ -116,6 +122,16 @@ export const GET_SERVER_PERMISSIONS = gql`
           discussionKarma
           createdAt
         }
+      }
+      PendingAdminInvites {
+        username
+        displayName
+        profilePicURL
+      }
+      PendingModInvites {
+        username
+        displayName
+        profilePicURL
       }
       DefaultModRole {
         name

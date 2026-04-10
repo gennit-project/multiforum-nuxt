@@ -6,8 +6,8 @@ import SaveButton from '@/components/SaveButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { ref, computed, watch, type PropType, type Component } from 'vue';
-import { timeAgo } from '@/utils';
-import type { Discussion, Issue, ModerationAction, TextVersion  } from '@/__generated__/graphql';
+import { timeAgo, ALLOWED_ICONS } from '@/utils';
+import type { Discussion, Issue, ModerationAction, TextVersion } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
 import ArchiveBox from '../icons/ArchiveBox.vue';
 import ArchiveBoxXMark from '../icons/ArchiveBoxXMark.vue';
@@ -30,6 +30,9 @@ import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 import SuspendModButton from '@/components/mod/SuspendModButton.vue';
+import MenuButton from '@/components/MenuButton.vue';
+import type { MenuItemType } from '@/components/IconButtonDropdown.vue';
+import EllipsisHorizontal from '@/components/icons/EllipsisHorizontal.vue';
 
 
 const actionTypeToIcon: Record<string, Component> = {
@@ -478,6 +481,60 @@ const {
   handleReportedSuccessfully,
   dismissReportedNotification,
 } = useModerationOutcomeUI();
+
+// Ref to trigger suspend mod modal from menu
+const showSuspendModFromMenu = ref(false);
+
+// Build context menu items for comments
+const commentMenuItems = computed<MenuItemType[]>(() => {
+  const items: MenuItemType[] = [];
+
+  // Edit option for comment authors
+  if (isCommentAuthor.value && !isEditing.value) {
+    items.push({
+      label: 'Edit',
+      value: '',
+      event: 'handleEdit',
+      icon: ALLOWED_ICONS.EDIT,
+    });
+  }
+
+  // Report option for reportable mod comments (not own comments)
+  if (isReportableModComment.value) {
+    items.push({
+      label: 'Report Mod Comment',
+      value: '',
+      event: 'handleReport',
+      icon: ALLOWED_ICONS.REPORT,
+    });
+  }
+
+  // Suspend Mod option when comment author is the issue target mod
+  if (
+    props.issue &&
+    canSuspendIssueTargetModFromComment.value &&
+    !props.suspendModDisabled
+  ) {
+    items.push({
+      label: 'Suspend Mod',
+      value: '',
+      event: 'handleSuspendMod',
+      icon: ALLOWED_ICONS.SUSPEND,
+    });
+  }
+
+  return items;
+});
+
+// Check if we should show the menu (has any items)
+const showCommentMenu = computed(() => {
+  return (
+    props.activityItem.Comment &&
+    showCommentBody.value &&
+    commentMenuItems.value.length > 0
+  );
+});
+
 </script>
 
 <template>
@@ -611,13 +668,14 @@ const {
           <div class="border-l-2 border-gray-200 pl-2 dark:border-gray-500">
             <div
               v-if="activityItem.Comment && showCommentBody"
-              class="mb-2 flex items-center justify-between gap-2"
+              class="mb-2 flex items-start justify-between gap-2"
             >
               <MarkdownPreview
                 v-if="!isEditing"
                 :text="activityItem.Comment.text || ''"
                 :word-limit="1000"
                 :disable-gallery="true"
+                class="flex-1"
               />
               <div v-else class="w-full space-y-2">
                 <TextEditor
@@ -629,47 +687,52 @@ const {
                   @update="editedComment = $event"
                 />
               </div>
+              <!-- Context menu for comment actions -->
+              <MenuButton
+                v-if="showCommentMenu && !isEditing"
+                :items="commentMenuItems"
+                aria-label="Comment actions"
+                class="flex-shrink-0"
+                @handle-edit="startEdit"
+                @handle-report="openReportModal"
+                @handle-suspend-mod="showSuspendModFromMenu = true"
+              >
+                <template #default>
+                  <EllipsisHorizontal
+                    class="h-5 w-5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  />
+                </template>
+              </MenuButton>
             </div>
+            <!-- Edit form buttons (when editing) -->
             <div
-              v-if="activityItem.Comment && isCommentAuthor"
+              v-if="activityItem.Comment && isCommentAuthor && isEditing"
               class="flex flex-wrap items-center gap-2"
             >
-              <GenericButton
-                v-if="!isEditing"
-                :text="'Edit'"
-                @click="startEdit"
+              <GenericButton :text="'Cancel'" @click="cancelEdit" />
+              <SaveButton
+                :label="'Save'"
+                :disabled="
+                  updateCommentLoading || !editedComment.trim() || !hasChanges
+                "
+                :loading="updateCommentLoading"
+                @click="saveEdit"
               />
-              <template v-else>
-                <GenericButton :text="'Cancel'" @click="cancelEdit" />
-                <SaveButton
-                  :label="'Save'"
-                  :disabled="
-                    updateCommentLoading || !editedComment.trim() || !hasChanges
-                  "
-                  :loading="updateCommentLoading"
-                  @click="saveEdit"
-                />
-              </template>
             </div>
             <ErrorBanner
               v-if="updateCommentError"
               class="mt-2"
               :text="updateCommentError.message"
             />
-            <div
-              v-if="activityItem.Comment && isReportableModComment"
-              class="mt-2 flex flex-wrap items-center gap-2"
-            >
-              <GenericButton
-                :text="'Report Mod Comment'"
-                @click="openReportModal"
-              />
-              <SuspendModButton
-                v-if="issue && canSuspendIssueTargetModFromComment"
-                :issue="issue"
-                :disabled="suspendModDisabled"
-              />
-            </div>
+            <!-- Hidden SuspendModButton triggered by menu -->
+            <SuspendModButton
+              v-if="issue && canSuspendIssueTargetModFromComment && showSuspendModFromMenu"
+              :issue="issue"
+              :disabled="suspendModDisabled"
+              :auto-open="true"
+              class="hidden"
+              @modal-closed="showSuspendModFromMenu = false"
+            />
             <!-- Discussion revision diffs -->
             <div v-if="discussionRevisionContents.length" class="space-y-2">
               <div
