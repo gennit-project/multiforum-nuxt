@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, watch, onMounted } from 'vue';
 import type { PropType } from 'vue';
 import UserPlus from '../icons/UserPlus.vue';
 import UserMinus from '../icons/UserMinus.vue';
@@ -21,9 +21,18 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  autoOpen: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
-defineEmits(['suspended-successfully', 'unsuspended-successfully']);
+const emit = defineEmits([
+  'suspended-successfully',
+  'unsuspended-successfully',
+  'modal-closed',
+]);
 
 const {
   result: getModSuspensionResult,
@@ -66,6 +75,37 @@ const {
 } = useSuspensionActionUI({
   isDisabled: () => props.disabled,
 });
+
+// Handle closing modal and emitting event
+const handleCloseSuspendModal = () => {
+  closeSuspendModal();
+  emit('modal-closed');
+};
+
+const handleCloseUnsuspendModal = () => {
+  closeUnsuspendModal();
+  emit('modal-closed');
+};
+
+// Auto-open modal on mount if autoOpen is true
+onMounted(() => {
+  if (props.autoOpen && !props.disabled) {
+    // Wait for suspension status query to load
+    watch(
+      () => getModSuspensionLoading.value,
+      (loading) => {
+        if (!loading) {
+          if (modIsSuspendedFromChannel.value) {
+            openUnsuspendModal();
+          } else {
+            openSuspendModal();
+          }
+        }
+      },
+      { immediate: true }
+    );
+  }
+});
 </script>
 
 <template>
@@ -100,11 +140,11 @@ const {
       :title="'Suspend Mod'"
       :open="showSuspendModal"
       :issue-id="issue.id"
-      @close="closeSuspendModal"
+      @close="handleCloseSuspendModal"
       @suspended-successfully="
         () => {
           handleSuspendedSuccessfully();
-          $emit('suspended-successfully');
+          emit('suspended-successfully');
         }
       "
     />
@@ -112,11 +152,11 @@ const {
       :title="'Unsuspend Mod'"
       :open="showUnsuspendModal"
       :issue-id="issue.id"
-      @close="closeUnsuspendModal"
+      @close="handleCloseUnsuspendModal"
       @unsuspended-successfully="
         () => {
           handleUnsuspendedSuccessfully();
-          $emit('unsuspended-successfully');
+          emit('unsuspended-successfully');
         }
       "
     />

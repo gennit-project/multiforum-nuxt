@@ -752,6 +752,10 @@ const handleLockReasonUpdate = (value: string) => {
         :report-count="reportCount"
         :report-count-label="reportCountLabel"
         :channel-id="channelId"
+        :is-author-mod="authorType === 'mod'"
+        :suspend-mod-disabled="isSuspendedMod || !issueActionVisibility.modActionsEnabled"
+        @suspended-mod-successfully="resetActivityFeed"
+        @unsuspended-mod-successfully="resetActivityFeed"
       >
         <template #issue-body>
           <IssueBodyEditor

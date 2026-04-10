@@ -6,15 +6,6 @@
 | ----------------------------------------------------------------------------------------------------------------------------- | -------- | -------- |
 | Treat channel-scope and server-scope suspended-mod lists as the primary model instead of introducing a separate mod-ban state | Both     | Decision |
 
-## Suspended Mods - Reporting Workflow
-
-### Planned Code Changes
-
-| Task                                                                                     | Location | Type    |
-| ---------------------------------------------------------------------------------------- | -------- | ------- |
-| Add "Suspend Mod" option to issue comment context menu                                   | Frontend | Feature |
-| Extend suspend-mod entry points beyond the currently safe targeted activity-feed cases   | Frontend | Feature |
-
 ## Shared Bot Context Infrastructure
 
 ### Beta Bot Overlap
@@ -77,7 +68,6 @@ The moderation bot should reuse the same moderation-profile-based audit surface 
 
 ## Server Admin Labels
 
-- Bring `ServerConfig` admin/mod membership management to feature parity with the channel-scope invite-style workflow
 - Add a later-phase restricted-admin design using `ServerConfig.SuperAdmins` plus a `canCreateAdmins` server-role permission so non-super-admin accounts cannot create additional admins
 
 ---
@@ -183,6 +173,9 @@ These items are implemented and should stay visible for validation, regression c
 | Shared suspend/unsuspend button UI composable preserves modal and notification behavior                                                              | Frontend unit tests + refactor       | Re-verify suspend/unsuspend flows across both user and mod issue actions                                     |
 | Shared moderation outcome UI composable preserves report/archive/unarchive/archive-and-suspend notifications and modal closing behavior              | Frontend unit tests + refactor       | Re-verify discussion, event, and feedback moderation flows after real modal submissions                      |
 | Comment section and archive button now rely on the shared moderation outcome workflow                                                                | Frontend unit tests + refactor       | Re-verify archive/unarchive/report flows from comment lists and issue action surfaces                        |
+| Issue comment context menu now includes "Suspend Mod" option via MenuButton in ActivityFeedListItem                                                  | Frontend implementation              | Verify suspend mod option appears for authorized users and opens the correct modal                           |
+| Suspend-mod entry points extended beyond activity feed to IssueRelatedContent header                                                                 | Frontend implementation              | Verify SuspendModButton appears on mod-related issue headers and functions correctly                         |
+| ServerConfig admin/mod membership now uses invite workflow matching channel-scope pattern                                                            | Backend + Frontend implementation    | Verify invite flow, pending states, accept pages, and cancel functionality for both admins and mods          |
 
 ---
 
@@ -220,3 +213,8 @@ This section is intentionally verification-only. If an item requires new product
 - [ ] Verify a suspended mod can still create content as a user
 - [ ] Add automated non-Cypress coverage for report-only moderation bot enablement, issue creation, and bot comments where practical
 - [ ] Audit all mod-only UI elements for suspension checks
+- [ ] Verify "Suspend Mod" option in issue comment context menu triggers the correct modal and creates issue-linked suspensions
+- [ ] Verify SuspendModButton in IssueRelatedContent header works for mod-related issues
+- [ ] Test server admin invite workflow: invite, pending state display, accept page, cancel functionality
+- [ ] Test server mod invite workflow: invite, pending state display, accept page (with mod profile check), cancel functionality
+- [ ] Verify accept-admin-invite and accept-mod-invite pages handle edge cases (not logged in, no mod profile for mod invites)

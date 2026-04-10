@@ -3,18 +3,22 @@ import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import ServerMembershipEditor from './ServerMembershipEditor.vue';
 
-const addServerAdmin = vi.fn();
+const inviteServerAdmin = vi.fn();
+const cancelInviteServerAdmin = vi.fn();
 const removeServerAdmin = vi.fn();
-const addServerModerator = vi.fn();
+const inviteServerMod = vi.fn();
+const cancelInviteServerMod = vi.fn();
 const removeServerModerator = vi.fn();
 const onUpdated = vi.fn();
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (fn: any) => {
     const source = fn?.loc?.source?.body || '';
-    let mutateFn = addServerAdmin;
+    let mutateFn = inviteServerAdmin;
+    if (source.includes('CancelInviteServerAdmin')) mutateFn = cancelInviteServerAdmin;
     if (source.includes('RemoveServerAdmin')) mutateFn = removeServerAdmin;
-    if (source.includes('AddServerModerator')) mutateFn = addServerModerator;
+    if (source.includes('InviteServerMod')) mutateFn = inviteServerMod;
+    if (source.includes('CancelInviteServerMod')) mutateFn = cancelInviteServerMod;
     if (source.includes('RemoveServerModerator')) mutateFn = removeServerModerator;
     return {
       mutate: mutateFn,
@@ -26,9 +30,11 @@ vi.mock('@vue/apollo-composable', () => ({
 
 describe('ServerMembershipEditor', () => {
   beforeEach(() => {
-    addServerAdmin.mockReset().mockResolvedValue({});
+    inviteServerAdmin.mockReset().mockResolvedValue({});
+    cancelInviteServerAdmin.mockReset().mockResolvedValue({});
     removeServerAdmin.mockReset().mockResolvedValue({});
-    addServerModerator.mockReset().mockResolvedValue({});
+    inviteServerMod.mockReset().mockResolvedValue({});
+    cancelInviteServerMod.mockReset().mockResolvedValue({});
     removeServerModerator.mockReset().mockResolvedValue({});
     onUpdated.mockReset();
   });
@@ -68,7 +74,7 @@ describe('ServerMembershipEditor', () => {
     expect(wrapper.text()).toContain('Mod Alice');
   });
 
-  it('adds a server admin by username', async () => {
+  it('invites a server admin by username', async () => {
     const wrapper = mount(ServerMembershipEditor, {
       props: { serverConfig, onUpdated },
       global: {
@@ -78,17 +84,19 @@ describe('ServerMembershipEditor', () => {
 
     const inputs = wrapper.findAll('input');
     await inputs[0].setValue('bob');
-    const buttons = wrapper.findAll('button');
-    await buttons[0].trigger('click');
+    const inviteButtons = wrapper
+      .findAll('button')
+      .filter((button) => button.text() === 'Invite');
+    await inviteButtons[0].trigger('click');
 
-    expect(addServerAdmin).toHaveBeenCalledWith({
+    expect(inviteServerAdmin).toHaveBeenCalledWith({
       serverName: expect.any(String),
-      username: 'bob',
+      inviteeUsername: 'bob',
     });
     expect(onUpdated).toHaveBeenCalled();
   });
 
-  it('adds a server moderator by mod profile display name', async () => {
+  it('invites a server moderator by username', async () => {
     const wrapper = mount(ServerMembershipEditor, {
       props: { serverConfig, onUpdated },
       global: {
@@ -97,15 +105,15 @@ describe('ServerMembershipEditor', () => {
     });
 
     const inputs = wrapper.findAll('input');
-    await inputs[1].setValue('Mod Bob');
-    const addButtons = wrapper
+    await inputs[1].setValue('bob');
+    const inviteButtons = wrapper
       .findAll('button')
-      .filter((button) => button.text() === 'Add');
-    await addButtons[1].trigger('click');
+      .filter((button) => button.text() === 'Invite');
+    await inviteButtons[1].trigger('click');
 
-    expect(addServerModerator).toHaveBeenCalledWith({
+    expect(inviteServerMod).toHaveBeenCalledWith({
       serverName: expect.any(String),
-      displayName: 'Mod Bob',
+      inviteeUsername: 'bob',
     });
     expect(onUpdated).toHaveBeenCalled();
   });
