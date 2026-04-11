@@ -20,7 +20,7 @@ const CROSSPOST_PREVIEW_FIELDS = gql`
     Album {
       id
       imageOrder
-      Images {
+      Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
         id
         url
         alt
@@ -115,7 +115,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
           Album {
             id
             imageOrder
-            Images {
+            Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
               id
               url
               alt
@@ -190,7 +190,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
         Album {
           id
           imageOrder
-          Images {
+          Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
             id
             url
             alt
@@ -258,7 +258,7 @@ export const GET_DISCUSSION = gql`
       Album {
         id
         imageOrder
-        Images {
+        Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
           id
           url
           alt
@@ -407,7 +407,7 @@ export const GET_DISCUSSION_FEEDBACK = gql`
       Album {
         id
         imageOrder
-        Images {
+        Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
           id
           url
           alt
