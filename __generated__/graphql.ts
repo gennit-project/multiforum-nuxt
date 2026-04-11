@@ -4169,6 +4169,11 @@ export type ChannelFilterGroupsUpdateFieldInput = {
   where?: InputMaybe<ChannelFilterGroupsConnectionWhere>;
 };
 
+export enum ChannelImageType {
+  Banner = 'BANNER',
+  Icon = 'ICON'
+}
+
 export type ChannelInCollectionsAggregateInput = {
   AND?: InputMaybe<Array<ChannelInCollectionsAggregateInput>>;
   NOT?: InputMaybe<ChannelInCollectionsAggregateInput>;
@@ -43293,9 +43298,12 @@ export type Mutation = {
   removeFromCollection: Scalars['Boolean']['output'];
   reorderCollectionItem: Scalars['Boolean']['output'];
   reportChannel?: Maybe<Issue>;
+  reportChannelImage?: Maybe<Issue>;
   reportComment?: Maybe<Issue>;
   reportDiscussion?: Maybe<Issue>;
   reportEvent?: Maybe<Issue>;
+  reportImage?: Maybe<Issue>;
+  reportProfilePicture?: Maybe<Issue>;
   reportWikiEdit?: Maybe<Issue>;
   seedDataForCypressTests?: Maybe<SeedDataResponse>;
   sendBugReport?: Maybe<Scalars['Boolean']['output']>;
@@ -44405,6 +44413,14 @@ export type MutationReportChannelArgs = {
 };
 
 
+export type MutationReportChannelImageArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  imageType: ChannelImageType;
+  reportText: Scalars['String']['input'];
+  selectedServerRules: Array<Scalars['String']['input']>;
+};
+
+
 export type MutationReportCommentArgs = {
   channelUniqueName: Scalars['String']['input'];
   commentId: Scalars['ID']['input'];
@@ -44429,6 +44445,22 @@ export type MutationReportEventArgs = {
   reportText: Scalars['String']['input'];
   selectedForumRules: Array<Scalars['String']['input']>;
   selectedServerRules: Array<Scalars['String']['input']>;
+};
+
+
+export type MutationReportImageArgs = {
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  imageId: Scalars['ID']['input'];
+  reportText: Scalars['String']['input'];
+  selectedForumRules: Array<Scalars['String']['input']>;
+  selectedServerRules: Array<Scalars['String']['input']>;
+};
+
+
+export type MutationReportProfilePictureArgs = {
+  reportText: Scalars['String']['input'];
+  selectedServerRules: Array<Scalars['String']['input']>;
+  username: Scalars['String']['input'];
 };
 
 
