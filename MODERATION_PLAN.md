@@ -56,7 +56,7 @@ The core image moderation workflow is implemented:
 **Completed:**
 - Both OP and channel mods (with `canEditDiscussions` permission) can change labels on downloads
 - When a mod changes labels on someone else's download, a ModerationAction is created
-- The mod action appears in the mod's profile activity feed via issue linkage
+- The mod action appears in the mod's profile activity feed (no issue required)
 
 **Remaining UI Fixes:**
 
@@ -1639,9 +1639,8 @@ These steps verify the download labels moderation feature implemented in the Dow
 - Labels should be updated successfully
 - A ModerationAction should be created with:
   - `actionType: "label_update"`
-  - `actionDescription` describing the label change
+  - `actionDescription` describing the label change and download title
 - The action should appear in the mod's activity feed/contributions
-- An issue should be created (or updated if one exists for this discussion)
 
 ### Verify Server Admin Can Update Download Labels
 
@@ -1700,7 +1699,5 @@ These steps verify the download labels moderation feature implemented in the Dow
 - The label update action should appear in the mod's activity feed
 - The action should show:
   - The type of action (label update)
-  - The new labels applied
-  - Link to the related download
+  - The new labels applied and download title
   - Timestamp of the action
-- The related issue should contain the ModerationAction in its ActivityFeed
