@@ -37,18 +37,110 @@ This section tracks the wiki/discussion/comment revision-history work from the c
 
 **Current State:** Not implemented
 
-#### Album and Image Moderation
+#### Current Data Model Analysis
 
-| Task                                                                                       | Location | Type    |
-| ------------------------------------------------------------------------------------------ | -------- | ------- |
-| Can report and archive images in albums                                                    | Both     | Feature |
-| Archive actions on images get recorded in mod history                                      | Backend  | Feature |
-| Admin can immediately remove image content from public view in a way that cannot be undone | Both     | Feature |
-| Profile pictures can be reported                                                           | Both     | Feature |
-| Album images can be reported                                                               | Both     | Feature |
-| Can open server-scoped ticket for channel banners and channel icons                        | Both     | Feature |
-| Photo reports appear in a server moderation queue                                          | Frontend | Feature |
-| For issues about reported images, don't show edit post button                              | Frontend | Bug     |
+- **Image type** already has `RelatedIssues: [Issue!]!` relationship - the foundation for issue linkage exists
+- **Album type** is owned by User and contains Images with ordering
+- **Profile pictures** are stored as `User.profilePicURL: String` (URL, not Image node)
+- **Channel icons/banners** are stored as `Channel.channelIconURL` and `Channel.channelBannerURL` (URLs, not Image nodes)
+
+#### Phase 1: Schema Extensions (Backend)
+
+| Task                                   | Location | Type    | Notes                                                                                                                                                                             |
+| -------------------------------------- | -------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Add image-related fields to Issue type | Backend  | Feature | Add `relatedImageId`, `relatedAlbumId`, `relatedProfilePicUserId`, `relatedChannelIconName`, `relatedChannelBannerName` to Issue type                                             |
+| Add moderation fields to Image type    | Backend  | Feature | Add `archived: Boolean`, `permanentlyRemoved: Boolean`, `permanentlyRemovedAt: DateTime`, `permanentlyRemovedBy: User` relationship                                               |
+| Extend resolveIssueTarget.ts           | Backend  | Feature | Handle `relatedImageId` → lookup Image/Uploader, `relatedAlbumId` → lookup Album/Owner, `relatedProfilePicUserId` → lookup User, channel icon/banner → lookup Channel/Admins     |
+
+#### Phase 2: Report Mutations (Backend)
+
+| Task                                 | Location | Type    | Notes                                                                                                                                                                                                       |
+| ------------------------------------ | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Create reportImage mutation          | Backend  | Feature | Takes `imageId`, `reportText`, `selectedForumRules`, `selectedServerRules`, `channelUniqueName`. If channel provided → channel-scoped, else server-scoped. Creates/updates Issue with `relatedImageId`.    |
+| Create reportProfilePicture mutation | Backend  | Feature | Takes `username`, `reportText`, `selectedServerRules`. Always server-scoped (`channelUniqueName: null`). Sets `relatedProfilePicUserId` on Issue.                                                          |
+| Create reportChannelImage mutation   | Backend  | Feature | Takes `channelUniqueName`, `imageType` (ICON/BANNER), `reportText`, `selectedServerRules`. Always server-scoped. Sets `relatedChannelIconName` or `relatedChannelBannerName`.                              |
+
+#### Phase 3: Archive Actions (Backend)
+
+| Task                                   | Location | Type    | Notes                                                                                                                                                                            |
+| -------------------------------------- | -------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Create archiveImage mutation           | Backend  | Feature | Sets `Image.archived = true`, finds/creates Issue, creates ModerationAction with `actionType: "archive"`. Follows pattern of `archiveComment.ts`.                               |
+| Create unarchiveImage mutation         | Backend  | Feature | Reversible archiving, sets `archived = false`, creates ModerationAction with `actionType: "unarchive"`.                                                                         |
+| Create permanentlyRemoveImage mutation | Backend  | Feature | Admin-only. Sets `permanentlyRemoved = true`, `permanentlyRemovedAt`, connects `permanentlyRemovedBy`. Optionally deletes underlying file. CANNOT be undone. Creates ModerationAction. |
+
+#### Phase 4: Permission Gates (Backend)
+
+| Task                                | Location | Type    | Notes                                                                                                                                      |
+| ----------------------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Add permission flags to role types  | Backend  | Feature | Add `canArchiveImage` to ModServerRole and ModChannelRole. Add `canPermanentlyRemoveImage` to ModServerRole (admin-only).                  |
+| Create hasImageModPermission helper | Backend  | Feature | New file following pattern of `hasChannelModPermission.ts`. Checks archive/remove permissions by scope.                                    |
+
+#### Phase 5: Server Moderation Queue (Frontend)
+
+| Task                                   | Location | Type    | Notes                                                                                                                                                    |
+| -------------------------------------- | -------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Create GET_IMAGE_REPORTS query         | Frontend | Feature | Query server-scoped issues with image-related `relatedXxxId` fields. Filter by open/closed.                                                              |
+| Create image-reports admin page        | Frontend | Feature | New page at `/admin/image-reports`. List issues, show thumbnails (or placeholder if removed), actions: View Issue, Archive, Permanently Remove.          |
+| Update IssueRelatedContent component   | Frontend | Feature | Handle `relatedImageId` → show image preview, `relatedProfilePicUserId` → show profile pic context, channel icon/banner → show channel image.            |
+| Hide Edit Post button for image issues | Frontend | Bug     | In IssueDetail, check if issue has `relatedImageId` and hide "Edit Post" button since images aren't editable posts.                                      |
+
+#### Phase 6: Report UI Components (Frontend)
+
+| Task                                  | Location | Type    | Notes                                                                                                                         |
+| ------------------------------------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Add report option to album images     | Frontend | Feature | Update `AlbumImageMenu.vue` with report option. Opens modal, calls `reportImage` with channel from album's discussion.        |
+| Add report option to profile pictures | Frontend | Feature | Update `UserProfileHeader.vue` with report option. Server rules only, calls `reportProfilePicture`.                           |
+| Add report options to channel images  | Frontend | Feature | Update `ChannelAboutPage.vue` Server Moderation section. Add report for icon and banner, calls `reportChannelImage`.          |
+
+#### Phase 7: Mod History Recording (Backend)
+
+All image moderation actions create `ModerationAction` nodes in Issue ActivityFeed:
+
+| Action             | actionType           | actionDescription                    |
+| ------------------ | -------------------- | ------------------------------------ |
+| Report image       | `"report"`           | `"Reported the image"`               |
+| Archive image      | `"archive"`          | `"Archived the image"`               |
+| Unarchive image    | `"unarchive"`        | `"Unarchived the image"`             |
+| Permanently remove | `"permanent_remove"` | `"Permanently removed the image"`    |
+
+These appear in Issue ActivityFeed, mod profile activity page (`/mod/[modId]`), and server mod history (`/admin/mod-activity`).
+
+#### Phase 8: Display Gating (Frontend)
+
+| Task                            | Location | Type    | Notes                                                                                                 |
+| ------------------------------- | -------- | ------- | ----------------------------------------------------------------------------------------------------- |
+| Hide archived images            | Frontend | Feature | Check `archived` field, show placeholder or "Image hidden" message. Allow mods to view with toggle.  |
+| Hide permanently removed images | Frontend | Feature | Check `permanentlyRemoved` field, show permanent placeholder. No mod override available.              |
+
+#### File Summary
+
+**Backend New Files:**
+- `customResolvers/mutations/reportImage.ts`
+- `customResolvers/mutations/reportProfilePicture.ts`
+- `customResolvers/mutations/reportChannelImage.ts`
+- `customResolvers/mutations/archiveImage.ts`
+- `customResolvers/mutations/unarchiveImage.ts`
+- `customResolvers/mutations/permanentlyRemoveImage.ts`
+- `rules/permission/hasImageModPermission.ts`
+
+**Backend Modified Files:**
+- `typeDefs.ts` (Issue, Image, ModServerRole, ModChannelRole)
+- `customResolvers/shared/resolveIssueTarget.ts`
+- `rules/rules.ts` (add new mutation permissions)
+
+**Frontend New Files:**
+- `pages/admin/image-reports.vue`
+- `components/mod/ImageReportModal.vue`
+- `components/mod/ArchiveImageModal.vue`
+- `graphQLData/mod/queries/GET_IMAGE_REPORTS.ts`
+- `graphQLData/mod/mutations/REPORT_IMAGE.ts` (and related)
+
+**Frontend Modified Files:**
+- `components/album/AlbumImageMenu.vue`
+- `components/user/UserProfileHeader.vue`
+- `components/channel/ChannelAboutPage.vue`
+- `components/mod/issue/IssueRelatedContent.vue`
+- `components/mod/issue/IssueDetail.vue`
 
 ### Download Labels and UI Fixes
 
