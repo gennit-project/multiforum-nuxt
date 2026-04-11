@@ -188,3 +188,59 @@ export const UPDATE_CHANNEL_ENABLED_PLUGINS = gql`
     }
   }
 `;
+
+export const REPORT_CHANNEL = gql`
+  mutation reportChannel(
+    $channelUniqueName: String!
+    $reportText: String!
+    $selectedServerRules: [String!]!
+  ) {
+    reportChannel(
+      channelUniqueName: $channelUniqueName
+      reportText: $reportText
+      selectedServerRules: $selectedServerRules
+    ) {
+      id
+      issueNumber
+      relatedChannelUniqueName
+    }
+  }
+`;
+
+export const LOCK_CHANNEL = gql`
+  mutation lockChannel(
+    $channelUniqueName: String!
+    $reason: String!
+    $issueId: ID
+  ) {
+    lockChannel(
+      channelUniqueName: $channelUniqueName
+      reason: $reason
+      issueId: $issueId
+    ) {
+      uniqueName
+      displayName
+      locked
+      lockedAt
+      lockReason
+      LockedBy {
+        displayName
+      }
+    }
+  }
+`;
+
+export const UNLOCK_CHANNEL = gql`
+  mutation unlockChannel($channelUniqueName: String!, $reason: String) {
+    unlockChannel(channelUniqueName: $channelUniqueName, reason: $reason) {
+      uniqueName
+      displayName
+      locked
+      lockedAt
+      lockReason
+      LockedBy {
+        displayName
+      }
+    }
+  }
+`;

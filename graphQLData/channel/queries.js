@@ -57,6 +57,11 @@ export const GET_CHANNEL = gql`
       channelBannerURL
       rules
       locked
+      lockedAt
+      lockReason
+      LockedBy {
+        displayName
+      }
       wikiEnabled
       eventsEnabled
       feedbackEnabled

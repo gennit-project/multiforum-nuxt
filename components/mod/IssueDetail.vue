@@ -26,6 +26,7 @@ import IssueLockDialog from '@/components/mod/IssueLockDialog.vue';
 import IssueCommentForm from '@/components/mod/IssueCommentForm.vue';
 import IssueBodyEditor from '@/components/mod/IssueBodyEditor.vue';
 import IssueRelatedContent from '@/components/mod/IssueRelatedContent.vue';
+import IssueRelatedChannel from '@/components/mod/IssueRelatedChannel.vue';
 import { modProfileNameVar, usernameVar } from '@/cache';
 import { useRoute, useRouter } from 'nuxt/app';
 import { config } from '@/config';
@@ -153,6 +154,9 @@ const issueChannelUniqueName = computed(
 const relatedEventId = computed(() => activeIssue.value?.relatedEventId || '');
 const relatedCommentId = computed(
   () => activeIssue.value?.relatedCommentId || ''
+);
+const relatedChannelUniqueName = computed(
+  () => (activeIssue.value as any)?.relatedChannelUniqueName || ''
 );
 const isIssueSubscribed = computed(() => {
   if (!usernameVar.value) return false;
@@ -743,6 +747,11 @@ const handleLockReasonUpdate = (value: string) => {
       :locked-by-display-name="activeIssue?.LockedBy?.displayName"
       :locked-at="activeIssue?.lockedAt"
     />
+
+    <!-- Related Channel (for server-scoped channel reports) -->
+    <div v-if="relatedChannelUniqueName" class="px-4 pt-2">
+      <IssueRelatedChannel :related-channel-unique-name="relatedChannelUniqueName" />
+    </div>
 
     <div v-if="activeIssue" class="mt-2 flex flex-col gap-2 px-4">
       <!-- Related Content Section -->
