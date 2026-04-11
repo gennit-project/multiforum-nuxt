@@ -2,17 +2,40 @@
 
 ## Remaining Implementation Work
 
+### Album and Image Moderation
+
+**Current State:** Not implemented
+
+#### Album and Image Moderation
+
+| Task | Location | Type |
+| ---- | -------- | ---- |
+| Can report and archive images in albums | Both | Feature |
+| Archive actions on images get recorded in mod history | Backend | Feature |
+| Admin can immediately remove image content from public view in a way that cannot be undone | Both | Feature |
+| Profile pictures can be reported | Both | Feature |
+| Album images can be reported | Both | Feature |
+| Can open server-scoped ticket for channel banners and channel icons | Both | Feature |
+| Photo reports appear in a server moderation queue | Frontend | Feature |
+| For issues about reported images, don't show edit post button | Frontend | Bug |
+
+### Download Labels and UI Fixes
+
+**Current State:** Partial implementation
+
+| Task | Location | Type |
+| ---- | -------- | ---- |
+| Both OP and channel mod can change labels on downloads | Both | Feature |
+| Mod action button hover state should look consistent | Frontend | Bug |
+| When clicking an archived discussion list item, banner doesn't show on detail page until you refresh | Frontend | Bug |
+
+---
+
 ### Shared Bot Context Infrastructure
 
-#### Beta Bot Overlap
+**Current State:** ✅ Complete
 
-These beta bot items are not the main moderation roadmap, but they share the same context-construction dependency and should be planned with that reuse in mind.
-
-| Task                                                                                                     | Location          | Type    |
-| -------------------------------------------------------------------------------------------------------- | ----------------- | ------- |
-| Add API key configuration for the beta bot plugin                                                        | Frontend + Plugin | Feature |
-| Allow channel settings to update beta bot display name, description, and prompt after the bot is created | Frontend + Plugin | Feature |
-| Ensure all 4 beta bot identities are created for the beta bot plugin and labeled in the sidebar          | Frontend + Plugin | Feature |
+The shared bot context infrastructure (`buildBotInvocationContext`) provides channel details, rules, discussion title/body, comment info, and parent thread context to all bot plugins. Both `beta-reader-bot` and `chatgpt-bot-profiles` consume this shared context.
 
 The moderation bot should reuse the same moderation-profile-based audit surface as human moderators. That means its reports should show up on the bot's mod profile page, using the existing mod profile route and history views rather than a separate bot-only audit UI.
 
@@ -723,6 +746,89 @@ These items should be verified through existing or new unit tests rather than ma
 
 ---
 
+### Beta Bot Plugin Verification
+
+These items verify the beta reader bot plugin configuration and display.
+
+#### Verify API Key Configuration for Beta Bot Plugin
+
+**Prerequisites:**
+- Server admin access
+- Beta reader bot plugin installed
+
+**Test Steps:**
+1. Log in as a server admin
+2. Navigate to `/admin/settings/plugins/beta-reader-bot`
+3. Find the Secrets section
+4. Enter an OpenAI API key
+5. Save the configuration
+6. Verify the secret status indicator shows "Valid" or "Set"
+
+**Expected Outcome:**
+- Secret field should accept the API key
+- Status indicator should update after validation
+- Key should be stored securely (not visible after save)
+
+#### Verify Channel Settings Update Beta Bot Profiles
+
+**Prerequisites:**
+- Server admin has configured the beta bot with a bot name
+- Channel admin access
+
+**Test Steps:**
+1. Log in as a channel admin
+2. Navigate to `/forums/[forumId]/edit/plugins/beta-reader-bot`
+3. Find the Bot Profiles section
+4. Edit an existing profile's display label
+5. Edit the profile's system prompt
+6. Save changes
+7. Verify changes persist on page reload
+
+**Expected Outcome:**
+- Display label and prompt should be editable
+- Profile ID should be read-only (immutable after creation)
+- Changes should save successfully
+- Server-level profiles should appear as read-only references
+
+#### Verify All 4 Beta Bot Identities in Sidebar
+
+**Prerequisites:**
+- Beta reader bot enabled in a channel
+- Default profiles configured (developmental-editor, line-editor, thriller-fan, character-driven-fantasy-fan)
+
+**Test Steps:**
+1. Navigate to a channel with the beta bot enabled
+2. Look at the channel sidebar
+3. Find the "Bots" section
+4. Check for all 4 bot profiles
+
+**Expected Outcome:**
+- Sidebar should show a "Bots" section
+- All 4 profiles should be listed with:
+  - Display name (or profile label)
+  - Invoke command format (`/bot/{handle}`)
+- Deprecated bots should show an "Inactive" badge
+
+#### Verify Context-Rich Tagged Invocation
+
+**Prerequisites:**
+- Beta bot configured with API key
+- A discussion with some content
+
+**Test Steps:**
+1. Navigate to a discussion in a channel with the beta bot
+2. Create a comment that tags a bot profile (e.g., `/bot/developmental-editor`)
+3. Wait for the bot to respond
+4. Check the bot's response for context awareness
+
+**Expected Outcome:**
+- Bot should respond within a reasonable time
+- Response should reference the discussion context (title, body, prior comments)
+- Response should follow the profile's system prompt personality
+- Prompt debug logs should be written (if enabled)
+
+---
+
 ### Bot Verification (Future)
 
 These items are for future verification once bot suspension is implemented.
@@ -758,6 +864,243 @@ These items are for future verification once bot suspension is implemented.
 
 ---
 
+### Channel Reporting and Locking Verification
+
+#### Verify Channel Report Creates Server-Scoped Issue
+
+**Prerequisites:**
+- A mod profile (required to report channels)
+- A channel to report
+
+**Test Steps:**
+1. Log in as a user with a mod profile
+2. Navigate to a channel's About page (`/forums/[forumId]/about`)
+3. Look for the "Server Moderation" section
+4. Click the "Report Forum" button
+5. Select one or more server rules that were violated
+6. Add optional context text
+7. Submit the report
+
+**Expected Outcome:**
+- Report modal should show server rules only (not channel rules)
+- After submission, a server-scoped issue should be created
+- Issue should appear in `/admin/channel-reports`
+- Issue should have `relatedChannelUniqueName` set to the reported channel
+- Issue should have `channelUniqueName` as null (server-scoped)
+- Success notification should appear
+
+#### Verify Channel Reports Page Displays Reports
+
+**Prerequisites:**
+- At least one channel report (or create one using the steps above)
+- Server admin or mod access
+
+**Test Steps:**
+1. Log in as a server admin or mod
+2. Navigate to `/admin/channel-reports`
+3. Review the page layout and displayed information
+4. Toggle the "Show open reports only" checkbox
+5. Click "View" on a report to see the issue detail
+
+**Expected Outcome:**
+- Page should list all channel reports
+- Each report should show:
+  - Issue number
+  - Channel name (linked to the channel)
+  - Open/Closed status badge
+  - Locked status badge (if channel is locked)
+  - Reporter name and time
+  - Report count
+- Filter should work to show/hide closed reports
+- "View" should navigate to the issue detail page
+- "Lock"/"Unlock" buttons should appear based on channel state
+
+#### Verify Lock Channel from Channel Reports Page
+
+**Prerequisites:**
+- A channel report for an unlocked channel
+- Server mod with `canLockChannel` permission
+
+**Test Steps:**
+1. Log in as a server mod
+2. Navigate to `/admin/channel-reports`
+3. Find a report for an unlocked channel
+4. Click the "Lock" button
+5. Enter a reason in the lock dialog
+6. Confirm the lock action
+
+**Expected Outcome:**
+- Lock dialog should open with channel name
+- After confirming:
+  - Channel should be marked as locked
+  - "Locked" badge should appear on the report row
+  - "Lock" button should change to "Unlock"
+  - A moderation action should be added to the issue activity feed
+
+#### Verify Unlock Channel from Channel Reports Page
+
+**Prerequisites:**
+- A locked channel with a report
+- Server mod with `canLockChannel` permission
+
+**Test Steps:**
+1. Log in as a server mod
+2. Navigate to `/admin/channel-reports`
+3. Find a report for a locked channel
+4. Click the "Unlock" button
+5. Optionally enter a reason
+6. Confirm the unlock action
+
+**Expected Outcome:**
+- Unlock dialog should open with channel name
+- After confirming:
+  - Channel should be unlocked
+  - "Locked" badge should disappear
+  - "Unlock" button should change to "Lock"
+  - A moderation action should be added to the issue activity feed
+
+#### Verify Locked Channel Banner Displays
+
+**Prerequisites:**
+- A locked channel
+
+**Test Steps:**
+1. Navigate to the locked channel (`/forums/[forumId]/discussions`)
+2. Look for the locked banner at the top of the page
+3. Check the banner content
+
+**Expected Outcome:**
+- Yellow/orange banner should appear below the header
+- Banner should state "This forum is locked"
+- Banner should show:
+  - Lock reason (if provided)
+  - Who locked it
+  - When it was locked
+- Banner should be visible on all channel pages (discussions, events, etc.)
+
+#### Verify Locked Channel Blocks Content Creation
+
+**Prerequisites:**
+- A locked channel
+- A regular user account
+
+**Test Steps:**
+1. Log in as a regular user
+2. Navigate to the locked channel
+3. Attempt to create a new discussion
+4. Attempt to create a new event (if events are enabled)
+5. Attempt to add a comment to an existing discussion
+
+**Expected Outcome:**
+- Create discussion should be blocked with an error message
+- Create event should be blocked with an error message
+- Create comment should be blocked with an error message
+- The locked banner should explain why content creation is disabled
+
+#### Verify Lock/Unlock from Channel About Page
+
+**Prerequisites:**
+- Server mod with `canLockChannel` permission
+- A channel (locked or unlocked)
+
+**Test Steps:**
+1. Log in as a server mod
+2. Navigate to a channel's About page (`/forums/[forumId]/about`)
+3. Look for the "Server Moderation" section
+4. Click "Lock Forum" (if unlocked) or "Unlock Forum" (if locked)
+5. Complete the dialog and confirm
+
+**Expected Outcome:**
+- Lock/Unlock buttons should appear in the "Server Moderation" section
+- Only one button should be visible based on current lock state
+- After action:
+  - Channel lock state should change
+  - Button should toggle to the opposite action
+  - Locked banner should appear/disappear accordingly
+
+#### Verify Issue Detail Shows Related Channel
+
+**Prerequisites:**
+- A server-scoped issue with `relatedChannelUniqueName` set
+- Server mod access
+
+**Test Steps:**
+1. Log in as a server mod
+2. Navigate to a channel report issue (`/admin/issues/[issueNumber]`)
+3. Look for the "Related Channel" section at the top of the issue
+
+**Expected Outcome:**
+- "Related Channel" section should appear
+- Should show:
+  - Channel name (linked to the channel)
+  - Lock state badge (Locked/Active)
+  - If locked: lock details (who, when, reason)
+- Should have Lock/Unlock button for server mods with permission
+- Clicking Lock/Unlock should work the same as other entry points
+
+#### Verify Channel Lock Creates/Links Issue
+
+**Prerequisites:**
+- An unlocked channel with no existing reports
+- Server mod with `canLockChannel` permission
+
+**Test Steps:**
+1. Log in as a server mod
+2. Navigate to a channel's About page
+3. Click "Lock Forum"
+4. Enter a reason and confirm
+5. Navigate to `/admin/channel-reports`
+
+**Expected Outcome:**
+- A new server-scoped issue should be created automatically
+- Issue should appear in the channel reports list
+- Issue title should indicate it's about the locked channel
+- Issue activity feed should show the lock action
+
+#### Verify Permission Checks for Channel Lock
+
+**Prerequisites:**
+- A regular user account (not a server mod)
+- A channel mod account (not a server mod)
+- A server mod account with `canLockChannel` permission
+
+**Test Steps:**
+1. Log in as a regular user
+2. Navigate to a channel's About page
+3. Check if Lock/Unlock buttons are visible (they should not be)
+4. Log in as a channel mod (not server mod)
+5. Navigate to a channel's About page
+6. Check if Lock/Unlock buttons are visible (they should not be)
+7. Log in as a server mod with `canLockChannel`
+8. Navigate to a channel's About page
+9. Check if Lock/Unlock buttons are visible (they should be)
+
+**Expected Outcome:**
+- Only server mods with `canLockChannel` permission should see lock/unlock buttons
+- Regular users should not see the "Server Moderation" section
+- Channel-only mods should not see the lock/unlock buttons
+
+#### Verify Channel Admins Receive Lock Notification
+
+**Prerequisites:**
+- A channel with at least one admin
+- Server mod with `canLockChannel` permission
+
+**Test Steps:**
+1. Log in as a server mod
+2. Lock a channel
+3. Log in as one of the channel admins
+4. Check notifications
+
+**Expected Outcome:**
+- Channel admin should receive a notification about the lock
+- Notification should include:
+  - Which channel was locked
+  - Lock reason
+  - Link to the related issue (for appeals)
+
+---
+
 ## Cypress Test Backlog
 
 These items should eventually have automated E2E coverage but can be manually verified using the instructions above.
@@ -776,3 +1119,11 @@ These items should eventually have automated E2E coverage but can be manually ve
 | Server mod badge on comments | Medium | Badge: Server Mod Badge |
 | Server admin invite workflow | Medium | Invite: Server Admin Workflow |
 | Server mod invite workflow | Medium | Invite: Server Mod Workflow |
+| Channel report creates server-scoped issue | High | Channel Lock: Report Creates Issue |
+| Lock channel from reports page | High | Channel Lock: Lock from Reports Page |
+| Unlock channel from reports page | High | Channel Lock: Unlock from Reports Page |
+| Locked channel banner displays | High | Channel Lock: Banner Displays |
+| Locked channel blocks content creation | High | Channel Lock: Blocks Content Creation |
+| Lock/unlock from channel about page | Medium | Channel Lock: About Page Actions |
+| Issue detail shows related channel | Medium | Channel Lock: Issue Related Channel |
+| Channel lock permission checks | High | Channel Lock: Permission Checks |

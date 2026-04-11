@@ -14,6 +14,7 @@ export const ISSUE_BASE_FIELDS = gql`
     relatedCommentId
     relatedDiscussionId
     relatedEventId
+    relatedChannelUniqueName
     channelUniqueName
     Author {
       __typename
@@ -413,6 +414,134 @@ export const GET_CLOSED_ISSUES = gql`
         }
         ... on User {
           username
+        }
+      }
+      ActivityFeedAggregate(where: { actionType: "report" }) {
+        count
+      }
+    }
+  }
+`;
+
+export const GET_CHANNEL_REPORTS = gql`
+  query getChannelReports($isOpen: Boolean) {
+    issues(
+      where: {
+        channelUniqueName: null
+        relatedChannelUniqueName_NOT: null
+        isOpen: $isOpen
+      }
+      options: { sort: { createdAt: DESC } }
+    ) {
+      id
+      issueNumber
+      title
+      body
+      isOpen
+      createdAt
+      updatedAt
+      relatedChannelUniqueName
+      flaggedServerRuleViolation
+      locked
+      lockedAt
+      lockReason
+      LockedBy {
+        displayName
+      }
+      Author {
+        __typename
+        ... on ModerationProfile {
+          displayName
+        }
+        ... on User {
+          username
+        }
+      }
+      ActivityFeedAggregate(where: { actionType: "report" }) {
+        count
+      }
+    }
+  }
+`;
+
+export const GET_SERVER_ISSUE = gql`
+  ${ISSUE_BASE_FIELDS}
+  query getServerIssue(
+    $issueNumber: Int!
+    $activityFeedLimit: Int
+    $activityFeedOffset: Int
+  ) {
+    issues(
+      where: {
+        channelUniqueName: null
+        issueNumber: $issueNumber
+      }
+    ) {
+      ...IssueBaseFields
+      ActivityFeed(
+        options: {
+          sort: { createdAt: DESC }
+          limit: $activityFeedLimit
+          offset: $activityFeedOffset
+        }
+      ) {
+        ... on ModerationAction {
+          id
+          actionDescription
+          actionType
+          createdAt
+          ModerationProfile {
+            displayName
+          }
+          User {
+            username
+          }
+          Revision {
+            id
+            body
+            createdAt
+            Author {
+              username
+            }
+          }
+          Comment {
+            id
+            text
+            emoji
+            weightedVotesCount
+            createdAt
+            updatedAt
+            Issue {
+              id
+            }
+            CommentAuthor {
+              ... on ModerationProfile {
+                displayName
+              }
+              ... on User {
+                username
+              }
+            }
+            Channel {
+              uniqueName
+            }
+            ChildCommentsAggregate {
+              count
+            }
+            ParentComment {
+              id
+            }
+            editReason
+            PastVersions(options: { sort: [{ createdAt: DESC }] }) {
+              id
+              body
+              createdAt
+              Author {
+                username
+              }
+            }
+            ...CommentVoteFields
+          }
         }
       }
       ActivityFeedAggregate(where: { actionType: "report" }) {

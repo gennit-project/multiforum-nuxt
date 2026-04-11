@@ -1245,6 +1245,9 @@ export type Channel = {
   Issues: Array<Issue>;
   IssuesAggregate?: Maybe<ChannelIssueIssuesAggregationSelection>;
   IssuesConnection: ChannelIssuesConnection;
+  LockedBy?: Maybe<ModerationProfile>;
+  LockedByAggregate?: Maybe<ChannelModerationProfileLockedByAggregationSelection>;
+  LockedByConnection: ChannelLockedByConnection;
   Moderators: Array<ModerationProfile>;
   ModeratorsAggregate?: Maybe<ChannelModerationProfileModeratorsAggregationSelection>;
   ModeratorsConnection: ChannelModeratorsConnection;
@@ -1295,7 +1298,9 @@ export type Channel = {
   eventsEnabled?: Maybe<Scalars['Boolean']['output']>;
   feedbackEnabled?: Maybe<Scalars['Boolean']['output']>;
   imageUploadsEnabled?: Maybe<Scalars['Boolean']['output']>;
+  lockReason?: Maybe<Scalars['String']['output']>;
   locked?: Maybe<Scalars['Boolean']['output']>;
+  lockedAt?: Maybe<Scalars['DateTime']['output']>;
   markAsAnsweredEnabled?: Maybe<Scalars['Boolean']['output']>;
   markdownImagesEnabled?: Maybe<Scalars['Boolean']['output']>;
   payoutPercent?: Maybe<Scalars['Int']['output']>;
@@ -1569,6 +1574,28 @@ export type ChannelIssuesConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ChannelIssuesConnectionSort>>;
   where?: InputMaybe<ChannelIssuesConnectionWhere>;
+};
+
+
+export type ChannelLockedByArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ModerationProfileOptions>;
+  where?: InputMaybe<ModerationProfileWhere>;
+};
+
+
+export type ChannelLockedByAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<ModerationProfileWhere>;
+};
+
+
+export type ChannelLockedByConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ChannelLockedByConnectionSort>>;
+  where?: InputMaybe<ChannelLockedByConnectionWhere>;
 };
 
 
@@ -2189,6 +2216,8 @@ export type ChannelAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   displayName: StringAggregateSelection;
+  lockReason: StringAggregateSelection;
+  lockedAt: DateTimeAggregateSelection;
   payoutPercent: IntAggregateSelection;
   uniqueName: StringAggregateSelection;
 };
@@ -2552,6 +2581,8 @@ export type ChannelChannelRelatedChannelsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   displayName: StringAggregateSelection;
+  lockReason: StringAggregateSelection;
+  lockedAt: DateTimeAggregateSelection;
   payoutPercent: IntAggregateSelection;
   uniqueName: StringAggregateSelection;
 };
@@ -2802,6 +2833,7 @@ export type ChannelConnectInput = {
   FilterGroups?: InputMaybe<Array<ChannelFilterGroupsConnectFieldInput>>;
   InCollections?: InputMaybe<Array<ChannelInCollectionsConnectFieldInput>>;
   Issues?: InputMaybe<Array<ChannelIssuesConnectFieldInput>>;
+  LockedBy?: InputMaybe<ChannelLockedByConnectFieldInput>;
   Moderators?: InputMaybe<Array<ChannelModeratorsConnectFieldInput>>;
   PendingModInvites?: InputMaybe<Array<ChannelPendingModInvitesConnectFieldInput>>;
   PendingOwnerInvites?: InputMaybe<Array<ChannelPendingOwnerInvitesConnectFieldInput>>;
@@ -2822,6 +2854,7 @@ export type ChannelConnectOrCreateInput = {
   DefaultChannelRole?: InputMaybe<ChannelDefaultChannelRoleConnectOrCreateFieldInput>;
   DefaultModRole?: InputMaybe<ChannelDefaultModRoleConnectOrCreateFieldInput>;
   ElevatedModRole?: InputMaybe<ChannelElevatedModRoleConnectOrCreateFieldInput>;
+  LockedBy?: InputMaybe<ChannelLockedByConnectOrCreateFieldInput>;
   Moderators?: InputMaybe<Array<ChannelModeratorsConnectOrCreateFieldInput>>;
   PendingModInvites?: InputMaybe<Array<ChannelPendingModInvitesConnectOrCreateFieldInput>>;
   PendingOwnerInvites?: InputMaybe<Array<ChannelPendingOwnerInvitesConnectOrCreateFieldInput>>;
@@ -2853,6 +2886,7 @@ export type ChannelConnectedRelationships = {
   FilterGroups?: Maybe<ChannelFilterGroupsConnectedRelationship>;
   InCollections?: Maybe<ChannelInCollectionsConnectedRelationship>;
   Issues?: Maybe<ChannelIssuesConnectedRelationship>;
+  LockedBy?: Maybe<ChannelLockedByConnectedRelationship>;
   Moderators?: Maybe<ChannelModeratorsConnectedRelationship>;
   PendingModInvites?: Maybe<ChannelPendingModInvitesConnectedRelationship>;
   PendingOwnerInvites?: Maybe<ChannelPendingOwnerInvitesConnectedRelationship>;
@@ -2880,6 +2914,7 @@ export type ChannelCreateInput = {
   FilterGroups?: InputMaybe<ChannelFilterGroupsFieldInput>;
   InCollections?: InputMaybe<ChannelInCollectionsFieldInput>;
   Issues?: InputMaybe<ChannelIssuesFieldInput>;
+  LockedBy?: InputMaybe<ChannelLockedByFieldInput>;
   Moderators?: InputMaybe<ChannelModeratorsFieldInput>;
   PendingModInvites?: InputMaybe<ChannelPendingModInvitesFieldInput>;
   PendingOwnerInvites?: InputMaybe<ChannelPendingOwnerInvitesFieldInput>;
@@ -2905,7 +2940,9 @@ export type ChannelCreateInput = {
   eventsEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   feedbackEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   imageUploadsEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  lockReason?: InputMaybe<Scalars['String']['input']>;
   locked?: InputMaybe<Scalars['Boolean']['input']>;
+  lockedAt?: InputMaybe<Scalars['DateTime']['input']>;
   markAsAnsweredEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   markdownImagesEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   payoutPercent?: InputMaybe<Scalars['Int']['input']>;
@@ -3223,6 +3260,7 @@ export type ChannelDeleteInput = {
   FilterGroups?: InputMaybe<Array<ChannelFilterGroupsDeleteFieldInput>>;
   InCollections?: InputMaybe<Array<ChannelInCollectionsDeleteFieldInput>>;
   Issues?: InputMaybe<Array<ChannelIssuesDeleteFieldInput>>;
+  LockedBy?: InputMaybe<ChannelLockedByDeleteFieldInput>;
   Moderators?: InputMaybe<Array<ChannelModeratorsDeleteFieldInput>>;
   PendingModInvites?: InputMaybe<Array<ChannelPendingModInvitesDeleteFieldInput>>;
   PendingOwnerInvites?: InputMaybe<Array<ChannelPendingOwnerInvitesDeleteFieldInput>>;
@@ -3257,6 +3295,7 @@ export type ChannelDisconnectInput = {
   FilterGroups?: InputMaybe<Array<ChannelFilterGroupsDisconnectFieldInput>>;
   InCollections?: InputMaybe<Array<ChannelInCollectionsDisconnectFieldInput>>;
   Issues?: InputMaybe<Array<ChannelIssuesDisconnectFieldInput>>;
+  LockedBy?: InputMaybe<ChannelLockedByDisconnectFieldInput>;
   Moderators?: InputMaybe<Array<ChannelModeratorsDisconnectFieldInput>>;
   PendingModInvites?: InputMaybe<Array<ChannelPendingModInvitesDisconnectFieldInput>>;
   PendingOwnerInvites?: InputMaybe<Array<ChannelPendingOwnerInvitesDisconnectFieldInput>>;
@@ -3951,7 +3990,9 @@ export type ChannelEventPayload = {
   eventsEnabled?: Maybe<Scalars['Boolean']['output']>;
   feedbackEnabled?: Maybe<Scalars['Boolean']['output']>;
   imageUploadsEnabled?: Maybe<Scalars['Boolean']['output']>;
+  lockReason?: Maybe<Scalars['String']['output']>;
   locked?: Maybe<Scalars['Boolean']['output']>;
+  lockedAt?: Maybe<Scalars['DateTime']['output']>;
   markAsAnsweredEnabled?: Maybe<Scalars['Boolean']['output']>;
   markdownImagesEnabled?: Maybe<Scalars['Boolean']['output']>;
   payoutPercent?: Maybe<Scalars['Int']['output']>;
@@ -4422,6 +4463,7 @@ export type ChannelIssueIssuesNodeAggregateSelection = {
   issueNumber: IntAggregateSelection;
   lockReason: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
+  relatedChannelUniqueName: StringAggregateSelection;
   relatedCommentId: IdAggregateSelection;
   relatedDiscussionId: IdAggregateSelection;
   relatedEventId: IdAggregateSelection;
@@ -4596,6 +4638,21 @@ export type ChannelIssuesNodeAggregationWhereInput = {
   lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -4676,6 +4733,132 @@ export type ChannelIssuesUpdateFieldInput = {
   where?: InputMaybe<ChannelIssuesConnectionWhere>;
 };
 
+export type ChannelLockedByAggregateInput = {
+  AND?: InputMaybe<Array<ChannelLockedByAggregateInput>>;
+  NOT?: InputMaybe<ChannelLockedByAggregateInput>;
+  OR?: InputMaybe<Array<ChannelLockedByAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ChannelLockedByNodeAggregationWhereInput>;
+};
+
+export type ChannelLockedByConnectFieldInput = {
+  connect?: InputMaybe<ModerationProfileConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<ModerationProfileConnectWhere>;
+};
+
+export type ChannelLockedByConnectOrCreateFieldInput = {
+  onCreate: ChannelLockedByConnectOrCreateFieldInputOnCreate;
+  where: ModerationProfileConnectOrCreateWhere;
+};
+
+export type ChannelLockedByConnectOrCreateFieldInputOnCreate = {
+  node: ModerationProfileOnCreateInput;
+};
+
+export type ChannelLockedByConnectedRelationship = {
+  __typename?: 'ChannelLockedByConnectedRelationship';
+  node: ModerationProfileEventPayload;
+};
+
+export type ChannelLockedByConnection = {
+  __typename?: 'ChannelLockedByConnection';
+  edges: Array<ChannelLockedByRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ChannelLockedByConnectionSort = {
+  node?: InputMaybe<ModerationProfileSort>;
+};
+
+export type ChannelLockedByConnectionWhere = {
+  AND?: InputMaybe<Array<ChannelLockedByConnectionWhere>>;
+  NOT?: InputMaybe<ChannelLockedByConnectionWhere>;
+  OR?: InputMaybe<Array<ChannelLockedByConnectionWhere>>;
+  node?: InputMaybe<ModerationProfileWhere>;
+};
+
+export type ChannelLockedByCreateFieldInput = {
+  node: ModerationProfileCreateInput;
+};
+
+export type ChannelLockedByDeleteFieldInput = {
+  delete?: InputMaybe<ModerationProfileDeleteInput>;
+  where?: InputMaybe<ChannelLockedByConnectionWhere>;
+};
+
+export type ChannelLockedByDisconnectFieldInput = {
+  disconnect?: InputMaybe<ModerationProfileDisconnectInput>;
+  where?: InputMaybe<ChannelLockedByConnectionWhere>;
+};
+
+export type ChannelLockedByFieldInput = {
+  connect?: InputMaybe<ChannelLockedByConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ChannelLockedByConnectOrCreateFieldInput>;
+  create?: InputMaybe<ChannelLockedByCreateFieldInput>;
+};
+
+export type ChannelLockedByNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ChannelLockedByNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ChannelLockedByNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ChannelLockedByNodeAggregationWhereInput>>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  displayName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ChannelLockedByRelationship = {
+  __typename?: 'ChannelLockedByRelationship';
+  cursor: Scalars['String']['output'];
+  node: ModerationProfile;
+};
+
+export type ChannelLockedByRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModerationProfileSubscriptionWhere>;
+};
+
+export type ChannelLockedByUpdateConnectionInput = {
+  node?: InputMaybe<ModerationProfileUpdateInput>;
+};
+
+export type ChannelLockedByUpdateFieldInput = {
+  connect?: InputMaybe<ChannelLockedByConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ChannelLockedByConnectOrCreateFieldInput>;
+  create?: InputMaybe<ChannelLockedByCreateFieldInput>;
+  delete?: InputMaybe<ChannelLockedByDeleteFieldInput>;
+  disconnect?: InputMaybe<ChannelLockedByDisconnectFieldInput>;
+  update?: InputMaybe<ChannelLockedByUpdateConnectionInput>;
+  where?: InputMaybe<ChannelLockedByConnectionWhere>;
+};
+
 export type ChannelModChannelRoleDefaultModRoleAggregationSelection = {
   __typename?: 'ChannelModChannelRoleDefaultModRoleAggregationSelection';
   count: Scalars['Int']['output'];
@@ -4713,6 +4896,18 @@ export type ChannelModChannelRoleSuspendedModRoleNodeAggregateSelection = {
   channelUniqueName: StringAggregateSelection;
   description: StringAggregateSelection;
   name: StringAggregateSelection;
+};
+
+export type ChannelModerationProfileLockedByAggregationSelection = {
+  __typename?: 'ChannelModerationProfileLockedByAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<ChannelModerationProfileLockedByNodeAggregateSelection>;
+};
+
+export type ChannelModerationProfileLockedByNodeAggregateSelection = {
+  __typename?: 'ChannelModerationProfileLockedByNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  displayName: StringAggregateSelection;
 };
 
 export type ChannelModerationProfileModeratorsAggregationSelection = {
@@ -4867,7 +5062,9 @@ export type ChannelOnCreateInput = {
   eventsEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   feedbackEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   imageUploadsEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  lockReason?: InputMaybe<Scalars['String']['input']>;
   locked?: InputMaybe<Scalars['Boolean']['input']>;
+  lockedAt?: InputMaybe<Scalars['DateTime']['input']>;
   markAsAnsweredEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   markdownImagesEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   payoutPercent?: InputMaybe<Scalars['Int']['input']>;
@@ -6104,6 +6301,31 @@ export type ChannelRelatedChannelsNodeAggregationWhereInput = {
   displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   payoutPercent_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -6178,6 +6400,7 @@ export type ChannelRelationInput = {
   FilterGroups?: InputMaybe<Array<ChannelFilterGroupsCreateFieldInput>>;
   InCollections?: InputMaybe<Array<ChannelInCollectionsCreateFieldInput>>;
   Issues?: InputMaybe<Array<ChannelIssuesCreateFieldInput>>;
+  LockedBy?: InputMaybe<ChannelLockedByCreateFieldInput>;
   Moderators?: InputMaybe<Array<ChannelModeratorsCreateFieldInput>>;
   PendingModInvites?: InputMaybe<Array<ChannelPendingModInvitesCreateFieldInput>>;
   PendingOwnerInvites?: InputMaybe<Array<ChannelPendingOwnerInvitesCreateFieldInput>>;
@@ -6239,6 +6462,7 @@ export type ChannelRelationshipsSubscriptionWhere = {
   FilterGroups?: InputMaybe<ChannelFilterGroupsRelationshipSubscriptionWhere>;
   InCollections?: InputMaybe<ChannelInCollectionsRelationshipSubscriptionWhere>;
   Issues?: InputMaybe<ChannelIssuesRelationshipSubscriptionWhere>;
+  LockedBy?: InputMaybe<ChannelLockedByRelationshipSubscriptionWhere>;
   Moderators?: InputMaybe<ChannelModeratorsRelationshipSubscriptionWhere>;
   PendingModInvites?: InputMaybe<ChannelPendingModInvitesRelationshipSubscriptionWhere>;
   PendingOwnerInvites?: InputMaybe<ChannelPendingOwnerInvitesRelationshipSubscriptionWhere>;
@@ -6481,7 +6705,9 @@ export type ChannelSort = {
   eventsEnabled?: InputMaybe<SortDirection>;
   feedbackEnabled?: InputMaybe<SortDirection>;
   imageUploadsEnabled?: InputMaybe<SortDirection>;
+  lockReason?: InputMaybe<SortDirection>;
   locked?: InputMaybe<SortDirection>;
+  lockedAt?: InputMaybe<SortDirection>;
   markAsAnsweredEnabled?: InputMaybe<SortDirection>;
   markdownImagesEnabled?: InputMaybe<SortDirection>;
   payoutPercent?: InputMaybe<SortDirection>;
@@ -6537,7 +6763,19 @@ export type ChannelSubscriptionWhere = {
   eventsEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   feedbackEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   imageUploadsEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  lockReason?: InputMaybe<Scalars['String']['input']>;
+  lockReason_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  lockReason_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  lockReason_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  lockReason_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  lockReason_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   locked?: InputMaybe<Scalars['Boolean']['input']>;
+  lockedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  lockedAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   markAsAnsweredEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   markdownImagesEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   payoutPercent?: InputMaybe<Scalars['Int']['input']>;
@@ -7365,6 +7603,7 @@ export type ChannelUpdateInput = {
   FilterGroups?: InputMaybe<Array<ChannelFilterGroupsUpdateFieldInput>>;
   InCollections?: InputMaybe<Array<ChannelInCollectionsUpdateFieldInput>>;
   Issues?: InputMaybe<Array<ChannelIssuesUpdateFieldInput>>;
+  LockedBy?: InputMaybe<ChannelLockedByUpdateFieldInput>;
   Moderators?: InputMaybe<Array<ChannelModeratorsUpdateFieldInput>>;
   PendingModInvites?: InputMaybe<Array<ChannelPendingModInvitesUpdateFieldInput>>;
   PendingOwnerInvites?: InputMaybe<Array<ChannelPendingOwnerInvitesUpdateFieldInput>>;
@@ -7393,7 +7632,9 @@ export type ChannelUpdateInput = {
   eventsEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   feedbackEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   imageUploadsEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  lockReason?: InputMaybe<Scalars['String']['input']>;
   locked?: InputMaybe<Scalars['Boolean']['input']>;
+  lockedAt?: InputMaybe<Scalars['DateTime']['input']>;
   markAsAnsweredEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   markdownImagesEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   payoutPercent?: InputMaybe<Scalars['Int']['input']>;
@@ -7689,6 +7930,11 @@ export type ChannelWhere = {
   Issues_SINGLE?: InputMaybe<IssueWhere>;
   /** Return Channels where some of the related Issues match this filter */
   Issues_SOME?: InputMaybe<IssueWhere>;
+  LockedBy?: InputMaybe<ModerationProfileWhere>;
+  LockedByAggregate?: InputMaybe<ChannelLockedByAggregateInput>;
+  LockedByConnection?: InputMaybe<ChannelLockedByConnectionWhere>;
+  LockedByConnection_NOT?: InputMaybe<ChannelLockedByConnectionWhere>;
+  LockedBy_NOT?: InputMaybe<ModerationProfileWhere>;
   ModeratorsAggregate?: InputMaybe<ChannelModeratorsAggregateInput>;
   /** Return Channels where all of the related ChannelModeratorsConnections match this filter */
   ModeratorsConnection_ALL?: InputMaybe<ChannelModeratorsConnectionWhere>;
@@ -7899,7 +8145,19 @@ export type ChannelWhere = {
   eventsEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   feedbackEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   imageUploadsEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  lockReason?: InputMaybe<Scalars['String']['input']>;
+  lockReason_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  lockReason_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  lockReason_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  lockReason_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  lockReason_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   locked?: InputMaybe<Scalars['Boolean']['input']>;
+  lockedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  lockedAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   markAsAnsweredEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   markdownImagesEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   payoutPercent?: InputMaybe<Scalars['Int']['input']>;
@@ -8346,6 +8604,8 @@ export type CollectionChannelChannelsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   displayName: StringAggregateSelection;
+  lockReason: StringAggregateSelection;
+  lockedAt: DateTimeAggregateSelection;
   payoutPercent: IntAggregateSelection;
   uniqueName: StringAggregateSelection;
 };
@@ -8495,6 +8755,31 @@ export type CollectionChannelsNodeAggregationWhereInput = {
   displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   payoutPercent_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -10866,6 +11151,8 @@ export type CommentChannelChannelNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   displayName: StringAggregateSelection;
+  lockReason: StringAggregateSelection;
+  lockedAt: DateTimeAggregateSelection;
   payoutPercent: IntAggregateSelection;
   uniqueName: StringAggregateSelection;
 };
@@ -11003,6 +11290,31 @@ export type CommentChannelNodeAggregationWhereInput = {
   displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   payoutPercent_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -13358,6 +13670,7 @@ export type CommentIssueIssueNodeAggregateSelection = {
   issueNumber: IntAggregateSelection;
   lockReason: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
+  relatedChannelUniqueName: StringAggregateSelection;
   relatedCommentId: IdAggregateSelection;
   relatedDiscussionId: IdAggregateSelection;
   relatedEventId: IdAggregateSelection;
@@ -13471,6 +13784,21 @@ export type CommentIssueNodeAggregationWhereInput = {
   lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -13544,6 +13872,7 @@ export type CommentIssueRelatedIssuesNodeAggregateSelection = {
   issueNumber: IntAggregateSelection;
   lockReason: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
+  relatedChannelUniqueName: StringAggregateSelection;
   relatedCommentId: IdAggregateSelection;
   relatedDiscussionId: IdAggregateSelection;
   relatedEventId: IdAggregateSelection;
@@ -14207,6 +14536,21 @@ export type CommentRelatedIssuesNodeAggregationWhereInput = {
   lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -18490,6 +18834,8 @@ export type DiscussionChannelChannelChannelNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   displayName: StringAggregateSelection;
+  lockReason: StringAggregateSelection;
+  lockedAt: DateTimeAggregateSelection;
   payoutPercent: IntAggregateSelection;
   uniqueName: StringAggregateSelection;
 };
@@ -18627,6 +18973,31 @@ export type DiscussionChannelChannelNodeAggregationWhereInput = {
   displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   payoutPercent_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -19336,6 +19707,7 @@ export type DiscussionChannelIssueRelatedIssuesNodeAggregateSelection = {
   issueNumber: IntAggregateSelection;
   lockReason: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
+  relatedChannelUniqueName: StringAggregateSelection;
   relatedCommentId: IdAggregateSelection;
   relatedDiscussionId: IdAggregateSelection;
   relatedEventId: IdAggregateSelection;
@@ -19955,6 +20327,21 @@ export type DiscussionChannelRelatedIssuesNodeAggregationWhereInput = {
   lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -26173,6 +26560,8 @@ export type EventChannelChannelChannelNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   displayName: StringAggregateSelection;
+  lockReason: StringAggregateSelection;
+  lockedAt: DateTimeAggregateSelection;
   payoutPercent: IntAggregateSelection;
   uniqueName: StringAggregateSelection;
 };
@@ -26310,6 +26699,31 @@ export type EventChannelChannelNodeAggregationWhereInput = {
   displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   payoutPercent_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -27113,6 +27527,7 @@ export type EventChannelIssueRelatedIssuesNodeAggregateSelection = {
   issueNumber: IntAggregateSelection;
   lockReason: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
+  relatedChannelUniqueName: StringAggregateSelection;
   relatedCommentId: IdAggregateSelection;
   relatedDiscussionId: IdAggregateSelection;
   relatedEventId: IdAggregateSelection;
@@ -27294,6 +27709,21 @@ export type EventChannelRelatedIssuesNodeAggregationWhereInput = {
   lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -28433,6 +28863,7 @@ export type EventIssueRelatedIssuesNodeAggregateSelection = {
   issueNumber: IntAggregateSelection;
   lockReason: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
+  relatedChannelUniqueName: StringAggregateSelection;
   relatedCommentId: IdAggregateSelection;
   relatedDiscussionId: IdAggregateSelection;
   relatedEventId: IdAggregateSelection;
@@ -29067,6 +29498,21 @@ export type EventRelatedIssuesNodeAggregationWhereInput = {
   lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -32017,6 +32463,8 @@ export type FilterGroupChannelChannelNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   displayName: StringAggregateSelection;
+  lockReason: StringAggregateSelection;
+  lockedAt: DateTimeAggregateSelection;
   payoutPercent: IntAggregateSelection;
   uniqueName: StringAggregateSelection;
 };
@@ -32154,6 +32602,31 @@ export type FilterGroupChannelNodeAggregationWhereInput = {
   displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   payoutPercent_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -33615,6 +34088,7 @@ export type ImageIssueRelatedIssuesNodeAggregateSelection = {
   issueNumber: IntAggregateSelection;
   lockReason: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
+  relatedChannelUniqueName: StringAggregateSelection;
   relatedCommentId: IdAggregateSelection;
   relatedDiscussionId: IdAggregateSelection;
   relatedEventId: IdAggregateSelection;
@@ -33796,6 +34270,21 @@ export type ImageRelatedIssuesNodeAggregationWhereInput = {
   lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -34807,6 +35296,7 @@ export type Issue = {
   lockReason?: Maybe<Scalars['String']['output']>;
   locked?: Maybe<Scalars['Boolean']['output']>;
   lockedAt?: Maybe<Scalars['DateTime']['output']>;
+  relatedChannelUniqueName?: Maybe<Scalars['String']['output']>;
   relatedCommentId?: Maybe<Scalars['ID']['output']>;
   relatedDiscussionId?: Maybe<Scalars['ID']['output']>;
   relatedEventId?: Maybe<Scalars['ID']['output']>;
@@ -35060,6 +35550,7 @@ export type IssueAggregateSelection = {
   issueNumber: IntAggregateSelection;
   lockReason: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
+  relatedChannelUniqueName: StringAggregateSelection;
   relatedCommentId: IdAggregateSelection;
   relatedDiscussionId: IdAggregateSelection;
   relatedEventId: IdAggregateSelection;
@@ -35284,6 +35775,8 @@ export type IssueChannelChannelNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   displayName: StringAggregateSelection;
+  lockReason: StringAggregateSelection;
+  lockedAt: DateTimeAggregateSelection;
   payoutPercent: IntAggregateSelection;
   uniqueName: StringAggregateSelection;
 };
@@ -35421,6 +35914,31 @@ export type IssueChannelNodeAggregationWhereInput = {
   displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   payoutPercent_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -35532,6 +36050,7 @@ export type IssueCreateInput = {
   lockReason?: InputMaybe<Scalars['String']['input']>;
   locked?: InputMaybe<Scalars['Boolean']['input']>;
   lockedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  relatedChannelUniqueName?: InputMaybe<Scalars['String']['input']>;
   relatedCommentId?: InputMaybe<Scalars['ID']['input']>;
   relatedDiscussionId?: InputMaybe<Scalars['ID']['input']>;
   relatedEventId?: InputMaybe<Scalars['ID']['input']>;
@@ -35590,6 +36109,7 @@ export type IssueEventPayload = {
   lockReason?: Maybe<Scalars['String']['output']>;
   locked?: Maybe<Scalars['Boolean']['output']>;
   lockedAt?: Maybe<Scalars['DateTime']['output']>;
+  relatedChannelUniqueName?: Maybe<Scalars['String']['output']>;
   relatedCommentId?: Maybe<Scalars['ID']['output']>;
   relatedDiscussionId?: Maybe<Scalars['ID']['output']>;
   relatedEventId?: Maybe<Scalars['ID']['output']>;
@@ -36025,6 +36545,7 @@ export type IssueSort = {
   lockReason?: InputMaybe<SortDirection>;
   locked?: InputMaybe<SortDirection>;
   lockedAt?: InputMaybe<SortDirection>;
+  relatedChannelUniqueName?: InputMaybe<SortDirection>;
   relatedCommentId?: InputMaybe<SortDirection>;
   relatedDiscussionId?: InputMaybe<SortDirection>;
   relatedEventId?: InputMaybe<SortDirection>;
@@ -36434,6 +36955,12 @@ export type IssueSubscriptionWhere = {
   lockedAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
   lockedAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  relatedChannelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  relatedChannelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  relatedChannelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  relatedChannelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  relatedChannelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  relatedChannelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   relatedCommentId?: InputMaybe<Scalars['ID']['input']>;
   relatedCommentId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   relatedCommentId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
@@ -36493,6 +37020,7 @@ export type IssueUpdateInput = {
   lockReason?: InputMaybe<Scalars['String']['input']>;
   locked?: InputMaybe<Scalars['Boolean']['input']>;
   lockedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  relatedChannelUniqueName?: InputMaybe<Scalars['String']['input']>;
   relatedCommentId?: InputMaybe<Scalars['ID']['input']>;
   relatedDiscussionId?: InputMaybe<Scalars['ID']['input']>;
   relatedEventId?: InputMaybe<Scalars['ID']['input']>;
@@ -36637,6 +37165,12 @@ export type IssueWhere = {
   lockedAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
   lockedAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  relatedChannelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  relatedChannelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  relatedChannelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  relatedChannelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  relatedChannelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  relatedChannelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   relatedCommentId?: InputMaybe<Scalars['ID']['input']>;
   relatedCommentId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   relatedCommentId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
@@ -39963,6 +40497,21 @@ export type ModerationProfileAuthoredIssuesNodeAggregationWhereInput = {
   lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -40174,6 +40723,7 @@ export type ModerationProfileIssueAuthoredIssuesNodeAggregateSelection = {
   issueNumber: IntAggregateSelection;
   lockReason: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
+  relatedChannelUniqueName: StringAggregateSelection;
   relatedCommentId: IdAggregateSelection;
   relatedDiscussionId: IdAggregateSelection;
   relatedEventId: IdAggregateSelection;
@@ -41655,6 +42205,7 @@ export type Mutation = {
   inviteForumOwner?: Maybe<Scalars['Boolean']['output']>;
   inviteServerAdmin?: Maybe<Scalars['Boolean']['output']>;
   inviteServerMod?: Maybe<Scalars['Boolean']['output']>;
+  lockChannel?: Maybe<Channel>;
   lockIssue?: Maybe<Issue>;
   refreshPlugins: Array<Plugin>;
   removeEmojiFromComment?: Maybe<Comment>;
@@ -41663,6 +42214,7 @@ export type Mutation = {
   removeForumOwner?: Maybe<Scalars['Boolean']['output']>;
   removeFromCollection: Scalars['Boolean']['output'];
   reorderCollectionItem: Scalars['Boolean']['output'];
+  reportChannel?: Maybe<Issue>;
   reportComment?: Maybe<Issue>;
   reportDiscussion?: Maybe<Issue>;
   reportEvent?: Maybe<Issue>;
@@ -41684,6 +42236,7 @@ export type Mutation = {
   unarchiveEvent?: Maybe<Issue>;
   undoUpvoteComment?: Maybe<Comment>;
   undoUpvoteDiscussionChannel?: Maybe<DiscussionChannel>;
+  unlockChannel?: Maybe<Channel>;
   unlockIssue?: Maybe<Issue>;
   unsubscribeFromComment?: Maybe<Comment>;
   unsubscribeFromDiscussionChannel?: Maybe<DiscussionChannel>;
@@ -42713,6 +43266,13 @@ export type MutationInviteServerModArgs = {
 };
 
 
+export type MutationLockChannelArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  issueId?: InputMaybe<Scalars['ID']['input']>;
+  reason: Scalars['String']['input'];
+};
+
+
 export type MutationLockIssueArgs = {
   issueId: Scalars['ID']['input'];
   reason: Scalars['String']['input'];
@@ -42756,6 +43316,13 @@ export type MutationReorderCollectionItemArgs = {
   collectionId: Scalars['ID']['input'];
   itemId: Scalars['ID']['input'];
   newPosition: Scalars['Int']['input'];
+};
+
+
+export type MutationReportChannelArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  reportText: Scalars['String']['input'];
+  selectedServerRules: Array<Scalars['String']['input']>;
 };
 
 
@@ -42907,6 +43474,12 @@ export type MutationUndoUpvoteCommentArgs = {
 export type MutationUndoUpvoteDiscussionChannelArgs = {
   discussionChannelId: Scalars['ID']['input'];
   username: Scalars['String']['input'];
+};
+
+
+export type MutationUnlockChannelArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  reason?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -55467,6 +56040,7 @@ export type SuspensionIssueRelatedIssueNodeAggregateSelection = {
   issueNumber: IntAggregateSelection;
   lockReason: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
+  relatedChannelUniqueName: StringAggregateSelection;
   relatedCommentId: IdAggregateSelection;
   relatedDiscussionId: IdAggregateSelection;
   relatedEventId: IdAggregateSelection;
@@ -55660,6 +56234,21 @@ export type SuspensionRelatedIssueNodeAggregationWhereInput = {
   lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  relatedChannelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   relatedModProfileName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -56559,6 +57148,8 @@ export type TagChannelChannelsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   displayName: StringAggregateSelection;
+  lockReason: StringAggregateSelection;
+  lockedAt: DateTimeAggregateSelection;
   payoutPercent: IntAggregateSelection;
   uniqueName: StringAggregateSelection;
 };
@@ -56708,6 +57299,31 @@ export type TagChannelsNodeAggregationWhereInput = {
   displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   payoutPercent_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -59856,6 +60472,31 @@ export type UserAdminOfChannelsNodeAggregationWhereInput = {
   displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   payoutPercent_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -60604,6 +61245,8 @@ export type UserChannelAdminOfChannelsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   displayName: StringAggregateSelection;
+  lockReason: StringAggregateSelection;
+  lockedAt: DateTimeAggregateSelection;
   payoutPercent: IntAggregateSelection;
   uniqueName: StringAggregateSelection;
 };
@@ -60621,6 +61264,8 @@ export type UserChannelFavoriteChannelsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   displayName: StringAggregateSelection;
+  lockReason: StringAggregateSelection;
+  lockedAt: DateTimeAggregateSelection;
   payoutPercent: IntAggregateSelection;
   uniqueName: StringAggregateSelection;
 };
@@ -60638,6 +61283,8 @@ export type UserChannelModOfChannelsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   displayName: StringAggregateSelection;
+  lockReason: StringAggregateSelection;
+  lockedAt: DateTimeAggregateSelection;
   payoutPercent: IntAggregateSelection;
   uniqueName: StringAggregateSelection;
 };
@@ -60655,6 +61302,8 @@ export type UserChannelPendingModInvitesNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   displayName: StringAggregateSelection;
+  lockReason: StringAggregateSelection;
+  lockedAt: DateTimeAggregateSelection;
   payoutPercent: IntAggregateSelection;
   uniqueName: StringAggregateSelection;
 };
@@ -60672,6 +61321,8 @@ export type UserChannelPendingOwnerInvitesNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   displayName: StringAggregateSelection;
+  lockReason: StringAggregateSelection;
+  lockedAt: DateTimeAggregateSelection;
   payoutPercent: IntAggregateSelection;
   uniqueName: StringAggregateSelection;
 };
@@ -60689,6 +61340,8 @@ export type UserChannelRecentlyVisitedChannelsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   displayName: StringAggregateSelection;
+  lockReason: StringAggregateSelection;
+  lockedAt: DateTimeAggregateSelection;
   payoutPercent: IntAggregateSelection;
   uniqueName: StringAggregateSelection;
 };
@@ -62681,6 +63334,31 @@ export type UserFavoriteChannelsNodeAggregationWhereInput = {
   displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   payoutPercent_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -64224,6 +64902,31 @@ export type UserModOfChannelsNodeAggregationWhereInput = {
   displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   payoutPercent_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -65025,6 +65728,31 @@ export type UserPendingModInvitesNodeAggregationWhereInput = {
   displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   payoutPercent_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -65231,6 +65959,31 @@ export type UserPendingOwnerInvitesNodeAggregationWhereInput = {
   displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   payoutPercent_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -65878,6 +66631,31 @@ export type UserRecentlyVisitedChannelsNodeAggregationWhereInput = {
   displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  lockReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  lockReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  lockedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  lockedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   payoutPercent_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   payoutPercent_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
