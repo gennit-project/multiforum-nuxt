@@ -179,7 +179,7 @@ export const UPDATE_DISCUSSION = gql`
         Album {
           id
           imageOrder
-          Images {
+          Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
             id
             url
             caption

@@ -15,10 +15,18 @@ const username = computed(() => {
 });
 
 const imagesWhere = computed(() => {
+  // Always filter out archived/removed images
+  const baseFilter = {
+    archived_NOT: true,
+    permanentlyRemoved_NOT: true,
+  };
+
   if (!hasSelectedChannels.value) {
-    return undefined;
+    return baseFilter;
   }
+
   return {
+    ...baseFilter,
     Album: {
       Discussions_SOME: {
         DiscussionChannels_SOME: {
