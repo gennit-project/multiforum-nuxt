@@ -5,7 +5,7 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 import {
   CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
-  UPDATE_DISCUSSION_CHANNEL_LABELS,
+  UPDATE_DOWNLOAD_LABELS,
   UPDATE_DISCUSSION,
 } from '@/graphQLData/discussion/mutations';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
@@ -59,7 +59,7 @@ const {
   mutate: updateDiscussionChannelLabels,
   loading: _updateLabelsLoading,
   error: _updateLabelsError,
-} = useMutation(UPDATE_DISCUSSION_CHANNEL_LABELS);
+} = useMutation(UPDATE_DOWNLOAD_LABELS);
 
 const {
   mutate: updateDiscussion,
@@ -167,8 +167,8 @@ const saveDownloadLabels = async (discussionId: string) => {
 
     if (labelOptionIds.length > 0) {
       await updateDiscussionChannelLabels({
-        channelUniqueName: channelId.value,
         discussionId: discussionId,
+        channelUniqueName: channelId.value,
         labelOptionIds: labelOptionIds,
       });
     }
