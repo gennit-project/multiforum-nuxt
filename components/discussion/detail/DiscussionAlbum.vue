@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
 import { ref, computed, onMounted } from 'vue';
+import { useRoute } from 'nuxt/app';
 import LeftArrowIcon from '@/components/icons/LeftArrowIcon.vue';
 import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
 import type { Album, Image } from '@/__generated__/graphql';
@@ -16,6 +17,13 @@ import StlViewer from '@/components/download/StlViewer.vue';
 import CarouselThumbnail from '@/components/discussion/detail/CarouselThumbnail.vue';
 import ImageLightbox from '@/components/discussion/detail/ImageLightbox.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
+
+const route = useRoute();
+
+// Get channel from route for image reporting context
+const channelUniqueName = computed(() => {
+  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
+});
 
 const props = defineProps({
   album: {
@@ -578,6 +586,7 @@ onMounted(() => {
           :ordered-images="orderedImages"
           :initial-index="lightboxIndex"
           :is-logged-in-author="isLoggedInAuthor"
+          :channel-unique-name="channelUniqueName"
           @close="closeLightbox"
           @album-updated="emit('album-updated')"
         />

@@ -421,3 +421,62 @@ export const UNLOCK_ISSUE = gql`
     }
   }
 `;
+
+export const REPORT_IMAGE = gql`
+  mutation reportImage(
+    $imageId: ID!
+    $reportText: String!
+    $selectedForumRules: [String!]!
+    $selectedServerRules: [String!]!
+    $channelUniqueName: String
+  ) {
+    reportImage(
+      imageId: $imageId
+      reportText: $reportText
+      selectedForumRules: $selectedForumRules
+      selectedServerRules: $selectedServerRules
+      channelUniqueName: $channelUniqueName
+    ) {
+      id
+      issueNumber
+    }
+  }
+`;
+
+export const ARCHIVE_IMAGE = gql`
+  mutation archiveImage(
+    $imageId: ID!
+    $selectedForumRules: [String!]!
+    $selectedServerRules: [String!]!
+    $reportText: String!
+    $channelUniqueName: String
+  ) {
+    archiveImage(
+      imageId: $imageId
+      reportText: $reportText
+      selectedForumRules: $selectedForumRules
+      selectedServerRules: $selectedServerRules
+      channelUniqueName: $channelUniqueName
+    ) {
+      id
+      issueNumber
+    }
+  }
+`;
+
+export const UNARCHIVE_IMAGE = gql`
+  mutation unarchiveImage(
+    $imageId: ID!
+    $explanation: String
+    $channelUniqueName: String
+  ) {
+    unarchiveImage(
+      imageId: $imageId
+      explanation: $explanation
+      channelUniqueName: $channelUniqueName
+    ) {
+      id
+      issueNumber
+    }
+  }
+`;
