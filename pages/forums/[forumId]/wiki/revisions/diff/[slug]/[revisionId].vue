@@ -1,46 +1,23 @@
 <script setup lang="ts">
-import { computed, ref, defineAsyncComponent } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute, useRouter, useHead } from 'nuxt/app';
 import { GET_WIKI_PAGE } from '@/graphQLData/channel/queries';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { DELETE_TEXT_VERSION } from '@/graphQLData/discussion/mutations';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import RevisionDiffContent from '@/components/revision/RevisionDiffContent.vue';
 import type { WikiPage, TextVersion } from '@/__generated__/graphql';
-import { useUIStore } from '@/stores/uiStore';
-import { storeToRefs } from 'pinia';
 import {
   buildSequentialRevisionPairs,
   getRevisionAuthorName,
-  getRevisionContent,
-  getVersionAuthorName,
 } from '@/utils/revisionHistory';
-
-// Import CodeDiff dynamically to avoid SSR issues
-const CodeDiff = defineAsyncComponent(async () => {
-  const vCodeDiffModule = await import('v-code-diff');
-  const highlightModule = await import('highlight.js/lib/languages/markdown');
-
-  // Register markdown language with highlight.js
-  if ((vCodeDiffModule as any).hljs) {
-    (vCodeDiffModule as any).hljs.registerLanguage(
-      'markdown',
-      highlightModule.default
-    );
-  }
-
-  return vCodeDiffModule.CodeDiff;
-});
 
 const route = useRoute();
 const router = useRouter();
 const forumId = route.params.forumId as string;
 const slug = route.params.slug as string;
 const revisionId = route.params.revisionId as string;
-
-// UI Store for theme
-const uiStore = useUIStore();
-const { theme } = storeToRefs(uiStore);
 
 // Query wiki page data for the specific slug
 const {
@@ -94,63 +71,6 @@ const currentRevision = computed(() => {
 
 // Deletion state
 const isDeleting = ref(false);
-
-// Computed properties for the revision
-const oldVersionUsername = computed(() => {
-  return currentRevision.value
-    ? getVersionAuthorName(currentRevision.value.oldVersionData)
-    : '[Deleted]';
-});
-
-const newVersionUsername = computed(() => {
-  return currentRevision.value
-    ? getVersionAuthorName(currentRevision.value.newVersionData)
-    : '[Deleted]';
-});
-
-const oldVersionDate = computed(() => {
-  if (!currentRevision.value?.oldVersionData?.createdAt) return '';
-  return new Date(
-    currentRevision.value.oldVersionData.createdAt
-  ).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-  });
-});
-
-const newVersionDate = computed(() => {
-  if (!currentRevision.value?.newVersionData?.createdAt) return '';
-  return new Date(
-    currentRevision.value.newVersionData.createdAt
-  ).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-  });
-});
-
-const oldContent = computed(
-  () =>
-    (currentRevision.value &&
-      getRevisionContent(currentRevision.value.oldVersionData)) ||
-    ''
-);
-const newContent = computed(
-  () =>
-    (currentRevision.value &&
-      getRevisionContent(currentRevision.value.newVersionData)) ||
-    ''
-);
-
-// Diff configuration for v-code-diff
-const outputFormat = ref('side-by-side'); // side-by-side or line-by-line
-const diffLanguage = ref('markdown'); // Now supports markdown with extended language
-const diffTheme = computed(() => (theme.value === 'dark' ? 'dark' : 'light'));
 
 // Set up delete mutation
 const {
@@ -272,14 +192,6 @@ useHead({
         <div class="flex items-center justify-between">
           <div>
             <h1 class="text-2xl font-bold dark:text-white">Revision Detail</h1>
-            <div class="mt-2 space-y-1">
-              <div class="text-sm text-gray-600 dark:text-gray-400">
-                From version by {{ oldVersionUsername }} ({{ oldVersionDate }})
-              </div>
-              <div class="text-sm text-gray-600 dark:text-gray-400">
-                To version by {{ newVersionUsername }} ({{ newVersionDate }})
-              </div>
-            </div>
             <div v-if="currentRevision.isCurrent" class="mt-2">
               <span
                 class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-800 dark:text-green-200"
@@ -314,161 +226,11 @@ useHead({
       <!-- Error banner for delete errors -->
       <ErrorBanner v-if="deleteError" :text="deleteError.message" />
 
-      <!-- Professional Diff View using v-code-diff -->
-      <div class="overflow-hidden rounded-md border dark:border-gray-700">
-        <!-- Diff mode toggle -->
-        <div
-          class="bg-gray-50 border-b px-4 py-3 dark:border-gray-700 dark:bg-gray-800"
-        >
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >View mode:</span
-              >
-              <div class="flex rounded-md shadow-sm">
-                <button
-                  class="rounded-l-md border px-3 py-1 text-xs font-medium"
-                  :class="{
-                    'border-orange-600 bg-orange-600 text-white':
-                      outputFormat === 'side-by-side',
-                    'hover:bg-gray-50 border-gray-300 bg-white text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600':
-                      outputFormat !== 'side-by-side',
-                  }"
-                  @click="outputFormat = 'side-by-side'"
-                >
-                  Side by Side
-                </button>
-                <button
-                  class="rounded-r-md border-b border-r border-t px-3 py-1 text-xs font-medium"
-                  :class="{
-                    'border-orange-600 bg-orange-600 text-white':
-                      outputFormat === 'line-by-line',
-                    'hover:bg-gray-50 border-gray-300 bg-white text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600':
-                      outputFormat !== 'line-by-line',
-                    'border-l-0': outputFormat !== 'line-by-line',
-                  }"
-                  @click="outputFormat = 'line-by-line'"
-                >
-                  Line by Line
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- V-Code-Diff Component -->
-        <div class="min-h-[400px]">
-          <ClientOnly>
-            <CodeDiff
-              :key="`${revisionId}-${outputFormat}-${diffTheme}`"
-              :old-string="oldContent"
-              :new-string="newContent"
-              :output-format="outputFormat"
-              :language="diffLanguage"
-              :theme="diffTheme"
-              :context="10"
-              class="diff-container"
-            />
-            <template #fallback>
-              <div
-                class="flex h-96 items-center justify-center text-gray-500 dark:text-gray-400"
-              >
-                <div class="text-center">
-                  <i class="fas fa-spinner fa-spin mb-2 text-2xl" />
-                  <p>Loading diff viewer...</p>
-                </div>
-              </div>
-            </template>
-          </ClientOnly>
-        </div>
-      </div>
+      <RevisionDiffContent
+        :old-version="currentRevision.oldVersionData"
+        :new-version="currentRevision.newVersionData"
+        :is-most-recent="currentRevision.isCurrent"
+      />
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Ensure the diff container takes full width */
-:deep(.diff-container) {
-  width: 100%;
-  border-radius: 0;
-}
-
-/* Override v-code-diff styles for better integration */
-:deep(.v-code-diff) {
-  border: none;
-  border-radius: 0;
-}
-
-/* Ensure proper spacing */
-:deep(.v-code-diff .d2h-wrapper) {
-  border: none;
-}
-
-/* Remove gray borders between diff rows */
-:deep(.diff-container table) {
-  border-collapse: collapse !important;
-}
-
-:deep(.diff-container td) {
-  border: none !important;
-  border-top: none !important;
-  border-bottom: none !important;
-  border-left: none !important;
-  border-right: none !important;
-  padding: 0 !important; /* Reset padding */
-}
-
-:deep(.diff-container tr) {
-  border: none !important;
-  border-top: none !important;
-  border-bottom: none !important;
-}
-
-:deep(.diff-container tbody tr) {
-  border: none !important;
-}
-
-:deep(.diff-container .d2h-code-line) {
-  border: none !important;
-  padding: 2px 8px !important; /* Consistent padding for code lines */
-  line-height: 1.4 !important; /* Consistent line height */
-}
-
-:deep(.diff-container .d2h-code-linenumber) {
-  border-right: 1px solid #e1e4e8 !important; /* Keep only the line number separator */
-  padding: 2px 8px !important; /* Consistent padding for line numbers */
-  line-height: 1.4 !important; /* Consistent line height */
-}
-
-/* Force consistent row height and spacing */
-:deep(.diff-container .d2h-code-side-line) {
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-:deep(.diff-container .d2h-code-side-linenumber) {
-  padding: 2px 8px !important;
-  margin: 0 !important;
-}
-
-/* Ensure consistent table cell spacing */
-:deep(.diff-container table td) {
-  vertical-align: top !important;
-  padding: 0 !important;
-}
-
-/* Reset any inherited padding from parent components */
-:deep(.diff-container *) {
-  box-sizing: border-box !important;
-}
-
-/* Ensure consistent styling regardless of navigation method */
-:deep(.diff-container .d2h-file-wrapper) {
-  border: none !important;
-}
-
-:deep(.diff-container .d2h-file-header) {
-  border: none !important;
-  border-bottom: 1px solid #e1e4e8 !important; /* Keep only header separator */
-}
-</style>
