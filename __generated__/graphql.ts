@@ -43123,6 +43123,7 @@ export type Mutation = {
   archiveComment?: Maybe<Issue>;
   archiveDiscussion?: Maybe<Issue>;
   archiveEvent?: Maybe<Issue>;
+  archiveImage?: Maybe<Issue>;
   becomeForumAdmin?: Maybe<Scalars['Boolean']['output']>;
   cancelInviteForumMod?: Maybe<Scalars['Boolean']['output']>;
   cancelInviteForumOwner?: Maybe<Scalars['Boolean']['output']>;
@@ -43290,6 +43291,7 @@ export type Mutation = {
   inviteServerMod?: Maybe<Scalars['Boolean']['output']>;
   lockChannel?: Maybe<Channel>;
   lockIssue?: Maybe<Issue>;
+  permanentlyRemoveImage?: Maybe<Issue>;
   refreshPlugins: Array<Plugin>;
   removeEmojiFromComment?: Maybe<Comment>;
   removeEmojiFromDiscussionChannel?: Maybe<DiscussionChannel>;
@@ -43321,6 +43323,7 @@ export type Mutation = {
   unarchiveComment?: Maybe<Issue>;
   unarchiveDiscussion?: Maybe<Issue>;
   unarchiveEvent?: Maybe<Issue>;
+  unarchiveImage?: Maybe<Issue>;
   undoUpvoteComment?: Maybe<Comment>;
   undoUpvoteDiscussionChannel?: Maybe<DiscussionChannel>;
   unlockChannel?: Maybe<Channel>;
@@ -43486,6 +43489,15 @@ export type MutationArchiveDiscussionArgs = {
 export type MutationArchiveEventArgs = {
   channelUniqueName: Scalars['String']['input'];
   eventId: Scalars['ID']['input'];
+  reportText: Scalars['String']['input'];
+  selectedForumRules: Array<Scalars['String']['input']>;
+  selectedServerRules: Array<Scalars['String']['input']>;
+};
+
+
+export type MutationArchiveImageArgs = {
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  imageId: Scalars['ID']['input'];
   reportText: Scalars['String']['input'];
   selectedForumRules: Array<Scalars['String']['input']>;
   selectedServerRules: Array<Scalars['String']['input']>;
@@ -44366,6 +44378,12 @@ export type MutationLockIssueArgs = {
 };
 
 
+export type MutationPermanentlyRemoveImageArgs = {
+  explanation?: InputMaybe<Scalars['String']['input']>;
+  imageId: Scalars['ID']['input'];
+};
+
+
 export type MutationRemoveEmojiFromCommentArgs = {
   commentId: Scalars['ID']['input'];
   emojiLabel: Scalars['String']['input'];
@@ -44583,6 +44601,13 @@ export type MutationUnarchiveEventArgs = {
   channelUniqueName: Scalars['String']['input'];
   eventId: Scalars['ID']['input'];
   explanation?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationUnarchiveImageArgs = {
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  explanation?: InputMaybe<Scalars['String']['input']>;
+  imageId: Scalars['ID']['input'];
 };
 
 
