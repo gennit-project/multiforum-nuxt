@@ -51,13 +51,19 @@ The core image moderation workflow is implemented:
 
 ### Download Labels and UI Fixes
 
-**Current State:** Partial implementation
+**Current State:** ✅ Download labels feature complete; UI bugs remain
 
-| Task                                                                                                 | Location | Type    |
-| ---------------------------------------------------------------------------------------------------- | -------- | ------- |
-| Both OP and channel mod can change labels on downloads                                               | Both     | Feature |
-| Mod action button hover state should look consistent                                                 | Frontend | Bug     |
-| When clicking an archived discussion list item, banner doesn't show on detail page until you refresh | Frontend | Bug     |
+**Completed:**
+- Both OP and channel mods (with `canEditDiscussions` permission) can change labels on downloads
+- When a mod changes labels on someone else's download, a ModerationAction is created
+- The mod action appears in the mod's profile activity feed via issue linkage
+
+**Remaining UI Fixes:**
+
+| Task                                                                                                 | Location | Type |
+| ---------------------------------------------------------------------------------------------------- | -------- | ---- |
+| Mod action button hover state should look consistent                                                 | Frontend | Bug  |
+| When clicking an archived discussion list item, banner doesn't show on detail page until you refresh | Frontend | Bug  |
 
 ---
 
@@ -1585,3 +1591,116 @@ Expected outcome:
 - Type checking succeeds in both repositories
 - All unit tests pass
 - Backend tests pass (127 tests)
+
+---
+
+## Download Labels Moderation Verification
+
+These steps verify the download labels moderation feature implemented in the Download Labels section.
+
+### Verify OP Can Update Download Labels
+
+**Prerequisites:**
+
+- A user account that owns a download
+- A channel with filter groups configured (download labels)
+
+**Test Steps:**
+
+1. Log in as the user who owns a download
+2. Navigate to the download edit page (`/forums/[forumId]/downloads/edit/[discussionId]`)
+3. Modify the download labels (select/deselect labels)
+4. Save the changes
+
+**Expected Outcome:**
+
+- Labels should be updated successfully
+- No moderation action should be created (owner is updating their own content)
+- Changes should persist when viewing the download detail page
+
+### Verify Channel Mod Can Update Download Labels
+
+**Prerequisites:**
+
+- A mod profile with `canEditDiscussions` permission for the channel
+- A download created by a different user
+- The channel has filter groups configured
+
+**Test Steps:**
+
+1. Log in as the mod user
+2. Navigate to the download edit page for someone else's download
+3. Modify the download labels
+4. Save the changes
+5. Navigate to the mod profile's activity page
+
+**Expected Outcome:**
+
+- Labels should be updated successfully
+- A ModerationAction should be created with:
+  - `actionType: "label_update"`
+  - `actionDescription` describing the label change
+- The action should appear in the mod's activity feed/contributions
+- An issue should be created (or updated if one exists for this discussion)
+
+### Verify Server Admin Can Update Download Labels
+
+**Prerequisites:**
+
+- A server admin account
+- A download created by a different user
+
+**Test Steps:**
+
+1. Log in as a server admin
+2. Navigate to the download edit page for someone else's download
+3. Modify the download labels
+4. Save the changes
+
+**Expected Outcome:**
+
+- Labels should be updated successfully
+- A ModerationAction should be created (since admin is not the owner)
+- Changes should persist when viewing the download detail page
+
+### Verify Permission Denied for Unauthorized Users
+
+**Prerequisites:**
+
+- A regular user account (not a mod or admin)
+- A download created by a different user
+
+**Test Steps:**
+
+1. Log in as a regular user
+2. Attempt to navigate to the download edit page for someone else's download
+3. If the page loads, attempt to modify labels
+
+**Expected Outcome:**
+
+- The edit page should show "You do not have permission to see this page" or similar
+- Or if labels can be modified, the mutation should fail with a permission error
+- No changes should be persisted
+
+### Verify Mod Action Appears in Activity Feed
+
+**Prerequisites:**
+
+- A mod who has updated labels on someone else's download
+
+**Test Steps:**
+
+1. Log in as the mod who updated labels
+2. Navigate to the mod profile page (`/mod/[modName]`)
+3. Look for the label update in the activity/contributions section
+4. Click to view the related issue
+
+**Expected Outcome:**
+
+- The label update action should appear in the mod's activity feed
+- The action should show:
+  - The type of action (label update)
+  - The new labels applied
+  - Link to the related download
+  - Timestamp of the action
+- The related issue should contain the ModerationAction in its ActivityFeed
