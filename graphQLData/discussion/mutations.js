@@ -548,6 +548,33 @@ export const UPDATE_DISCUSSION_CHANNEL_LABELS = gql`
   }
 `;
 
+export const UPDATE_DOWNLOAD_LABELS = gql`
+  mutation updateDownloadLabels(
+    $discussionId: ID!
+    $channelUniqueName: String!
+    $labelOptionIds: [ID!]!
+  ) {
+    updateDownloadLabels(
+      discussionId: $discussionId
+      channelUniqueName: $channelUniqueName
+      labelOptionIds: $labelOptionIds
+    ) {
+      id
+      LabelOptions {
+        id
+        value
+        displayName
+        order
+        group {
+          id
+          key
+          displayName
+        }
+      }
+    }
+  }
+`;
+
 // mutation {
 //   createFilterGroups(input: [{
 //     key: "lot_size",
