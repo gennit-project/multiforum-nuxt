@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import DiscussionDetails from '@/components/mod/DiscussionDetails.vue';
 import EventDetail from '@/components/event/detail/EventDetail.vue';
 import CommentDetails from '@/components/mod/CommentDetails.vue';
+import ImageDetails from '@/components/mod/ImageDetails.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
 import SuspendModButton from '@/components/mod/SuspendModButton.vue';
 import type { Issue as GeneratedIssue } from '@/__generated__/graphql';
@@ -35,6 +36,7 @@ const emit = defineEmits<{
 const getContentTypeLabel = (issue: Issue) => {
   if (issue.relatedDiscussionId) return 'discussion';
   if (issue.relatedEventId) return 'event';
+  if (issue.relatedImageId) return 'image';
   return 'comment';
 };
 
@@ -107,6 +109,13 @@ const showSuspendModButton = computed(() => {
       "
       @fetched-original-mod-profile-name="
         emit('fetchedOriginalModProfileName', $event)
+      "
+    />
+    <ImageDetails
+      v-if="activeIssue?.relatedImageId"
+      :image-id="activeIssue.relatedImageId"
+      @fetched-original-author-username="
+        emit('fetchedOriginalAuthorUsername', $event)
       "
     />
     <slot name="issue-body" />

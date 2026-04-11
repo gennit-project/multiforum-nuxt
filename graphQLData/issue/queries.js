@@ -14,6 +14,7 @@ export const ISSUE_BASE_FIELDS = gql`
     relatedCommentId
     relatedDiscussionId
     relatedEventId
+    relatedImageId
     relatedChannelUniqueName
     channelUniqueName
     Author {
@@ -358,6 +359,7 @@ export const GET_ISSUES = gql`
       relatedCommentId
       relatedDiscussionId
       relatedEventId
+      relatedImageId
       flaggedServerRuleViolation
       locked
       lockedAt
@@ -397,6 +399,7 @@ export const GET_CLOSED_ISSUES = gql`
       relatedCommentId
       relatedDiscussionId
       relatedEventId
+      relatedImageId
       Channel {
         uniqueName
       }
