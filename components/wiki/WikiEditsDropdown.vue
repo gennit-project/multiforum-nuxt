@@ -7,17 +7,14 @@ import {
   type PopoverPosition,
 } from '@/composables/usePopoverPositioning';
 import { timeAgo } from '@/utils';
+import {
+  buildSequentialRevisionPairs,
+  getRevisionAuthorName,
+  type RevisionPair,
+} from '@/utils/revisionHistory';
 import WikiRevisionDiffModal from './WikiRevisionDiffModal.vue';
 
-// Define type for revision data
-interface WikiRevisionData {
-  id: string;
-  author: string;
-  createdAt: string;
-  isCurrent: boolean;
-  oldVersionData?: TextVersion;
-  newVersionData?: TextVersion;
-}
+type WikiRevisionData = RevisionPair<TextVersion>;
 
 const props = defineProps({
   wikiPage: {
@@ -48,53 +45,25 @@ const hasEdits = computed(() => {
 
 // Process all versions and sort by timestamp (newest first)
 const allEdits = computed(() => {
-  const edits: WikiRevisionData[] = [];
+  const currentVersion: TextVersion = {
+    id: 'current',
+    body: props.wikiPage.body,
+    createdAt: props.wikiPage.updatedAt || props.wikiPage.createdAt,
+    Author: props.wikiPage.VersionAuthor,
+    AuthorConnection: {
+      edges: [],
+      pageInfo: { hasNextPage: false, hasPreviousPage: false },
+      totalCount: 0,
+    },
+  };
 
-  if (props.wikiPage?.PastVersions?.length) {
-    // Create current version entry (as TextVersion structure)
-    const currentVersion = {
-      id: 'current',
-      body: props.wikiPage.body,
-      createdAt: props.wikiPage.updatedAt || props.wikiPage.createdAt,
-      Author: props.wikiPage.VersionAuthor,
-      AuthorConnection: {
-        edges: [],
-        pageInfo: { hasNextPage: false, hasPreviousPage: false },
-        totalCount: 0,
-      },
-    };
-
-    // First item: most recent edit (current vs most recent past version)
-    edits.push({
-      id: 'most-recent-edit',
-      author: props.wikiPage.VersionAuthor?.username || '[Deleted]',
-      createdAt: props.wikiPage.updatedAt || props.wikiPage.createdAt,
-      isCurrent: true,
-      // Store the versions for the modal
-      oldVersionData: props.wikiPage.PastVersions[0], // Most recent past version
-      newVersionData: currentVersion, // Current version
-    });
-
-    // Subsequent items: compare each past version with the next one
-    props.wikiPage.PastVersions.forEach((version, index) => {
-      // Skip the most recent past version since it's already handled above
-      if (index === 0) return;
-
-      const nextVersion = props.wikiPage.PastVersions[index - 1]; // Next version (more recent)
-
-      edits.push({
-        id: version.id,
-        author: version.Author?.username || '[Deleted]',
-        createdAt: version.createdAt,
-        isCurrent: false,
-        // Store the versions for the modal
-        oldVersionData: version,
-        newVersionData: nextVersion,
-      });
-    });
-  }
-
-  return edits;
+  return buildSequentialRevisionPairs({
+    pastVersions: props.wikiPage?.PastVersions,
+    currentVersion,
+    currentAuthor: props.wikiPage.VersionAuthor,
+    getHistoricalPairAuthor: ({ oldVersion }) =>
+      getRevisionAuthorName(oldVersion.Author),
+  });
 });
 
 const isVisibleRef = computed(() => isOpen.value);
@@ -155,7 +124,10 @@ const handleRevisionDeleted = () => {
 
 const handleDocumentClick = (event: MouseEvent) => {
   const target = event.target as Node;
-  if (triggerRef.value?.contains(target) || popoverRef.value?.contains(target)) {
+  if (
+    triggerRef.value?.contains(target) ||
+    popoverRef.value?.contains(target)
+  ) {
     return;
   }
   closeDropdown();

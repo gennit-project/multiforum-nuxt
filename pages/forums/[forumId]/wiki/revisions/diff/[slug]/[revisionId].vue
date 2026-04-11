@@ -9,6 +9,12 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import type { WikiPage, TextVersion } from '@/__generated__/graphql';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
+import {
+  buildSequentialRevisionPairs,
+  getRevisionAuthorName,
+  getRevisionContent,
+  getVersionAuthorName,
+} from '@/utils/revisionHistory';
 
 // Import CodeDiff dynamically to avoid SSR issues
 const CodeDiff = defineAsyncComponent(async () => {
@@ -25,16 +31,6 @@ const CodeDiff = defineAsyncComponent(async () => {
 
   return vCodeDiffModule.CodeDiff;
 });
-
-// Define type for revision data
-interface WikiRevisionData {
-  id: string;
-  author: string;
-  createdAt: string;
-  isCurrent: boolean;
-  oldVersionData?: TextVersion;
-  newVersionData?: TextVersion;
-}
 
 const route = useRoute();
 const router = useRouter();
@@ -65,75 +61,30 @@ const wikiPage = computed(() => wikiPageResult.value?.wikiPages[0] as WikiPage);
 
 // Process all versions to find the specific revision
 const allEdits = computed(() => {
-  const edits: WikiRevisionData[] = [];
-
-  if (wikiPage.value?.PastVersions?.length) {
-    // Create current version entry (as TextVersion structure)
-    const currentVersion: TextVersion = {
-      id: 'current',
-      body: wikiPage.value.body,
-      createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
-      Author: wikiPage.value.VersionAuthor,
-      AuthorConnection: {
-        edges: [],
-        pageInfo: { hasNextPage: false, hasPreviousPage: false },
-        totalCount: 0,
-      },
-    };
-
-    // Add an entry for the most recent edit only if content actually changed
-    if (wikiPage.value.PastVersions.length > 0) {
-      const mostRecentPastVersion = wikiPage.value.PastVersions[0];
-      if (!mostRecentPastVersion) return edits;
-      const currentContent = wikiPage.value.body ?? undefined;
-      const pastContent = mostRecentPastVersion.body ?? undefined;
-
-      // Only add the most recent edit if content actually changed
-      if (currentContent !== pastContent) {
-        edits.push({
-          id: 'most-recent-edit',
-          author: wikiPage.value.VersionAuthor?.username || '[Deleted]',
-          createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
-          isCurrent: true,
-          // Show what changed in the most recent edit
-          oldVersionData: mostRecentPastVersion,
-          newVersionData: currentVersion,
-        });
-      }
-    }
-
-    // Process each past version - show what changed in that specific edit
-    wikiPage.value.PastVersions.forEach((version, index) => {
-      // Skip the most recent past version since we handled it above
-      if (index === 0) return;
-
-      const previousVersion: TextVersion = wikiPage.value.PastVersions[
-        index + 1
-      ] || {
-        id: 'initial',
-        body: '', // Show diff from empty if this was the first edit
-        createdAt: version.createdAt,
-        Author: null,
-        AuthorConnection: {
-          edges: [],
-          pageInfo: { hasNextPage: false, hasPreviousPage: false },
-          totalCount: 0,
-        },
-      };
-
-      edits.push({
-        id: version.id,
-        author: version.Author?.username || '[Deleted]',
-        createdAt: version.createdAt,
-        isCurrent: false,
-        // Show what changed in this specific edit
-        oldVersionData: previousVersion, // Version before this edit
-        newVersionData: version, // This version (result of the edit)
-      });
-    });
+  if (!wikiPage.value) {
+    return [];
   }
 
-  return edits;
+  const currentVersion: TextVersion = {
+    id: 'current',
+    body: wikiPage.value.body,
+    createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
+    Author: wikiPage.value.VersionAuthor,
+    AuthorConnection: {
+      edges: [],
+      pageInfo: { hasNextPage: false, hasPreviousPage: false },
+      totalCount: 0,
+    },
+  };
+
+  return buildSequentialRevisionPairs({
+    pastVersions: wikiPage.value.PastVersions,
+    currentVersion,
+    currentAuthor: wikiPage.value.VersionAuthor,
+    skipUnchangedCurrent: true,
+    getHistoricalPairAuthor: ({ oldVersion }) =>
+      getRevisionAuthorName(oldVersion.Author),
+  });
 });
 
 // Find the specific revision
@@ -146,11 +97,15 @@ const isDeleting = ref(false);
 
 // Computed properties for the revision
 const oldVersionUsername = computed(() => {
-  return currentRevision.value?.oldVersionData?.Author?.username || '[Deleted]';
+  return currentRevision.value
+    ? getVersionAuthorName(currentRevision.value.oldVersionData)
+    : '[Deleted]';
 });
 
 const newVersionUsername = computed(() => {
-  return currentRevision.value?.newVersionData?.Author?.username || '[Deleted]';
+  return currentRevision.value
+    ? getVersionAuthorName(currentRevision.value.newVersionData)
+    : '[Deleted]';
 });
 
 const oldVersionDate = computed(() => {
@@ -180,10 +135,16 @@ const newVersionDate = computed(() => {
 });
 
 const oldContent = computed(
-  () => currentRevision.value?.oldVersionData?.body || ''
+  () =>
+    (currentRevision.value &&
+      getRevisionContent(currentRevision.value.oldVersionData)) ||
+    ''
 );
 const newContent = computed(
-  () => currentRevision.value?.newVersionData?.body || ''
+  () =>
+    (currentRevision.value &&
+      getRevisionContent(currentRevision.value.newVersionData)) ||
+    ''
 );
 
 // Diff configuration for v-code-diff
