@@ -74,6 +74,10 @@ const allEdits = computed(() => {
   });
 });
 
+const getRevisionReason = (edit: WikiRevisionData) => {
+  return edit.newVersionData.editReason || edit.oldVersionData.editReason || '';
+};
+
 // Navigate to revision detail page
 const viewRevisionDiff = (revision: WikiRevisionData) => {
   try {
@@ -205,6 +209,15 @@ useHead({
                     minute: 'numeric',
                   })
                 }}
+              </div>
+              <div
+                v-if="getRevisionReason(edit)"
+                class="mt-1 text-xs text-gray-600 dark:text-gray-400"
+              >
+                <span class="font-semibold text-gray-700 dark:text-gray-200"
+                  >Edit reason:</span
+                >
+                {{ getRevisionReason(edit) }}
               </div>
             </div>
             <div

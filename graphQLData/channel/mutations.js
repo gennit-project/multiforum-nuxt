@@ -57,6 +57,7 @@ export const UPDATE_CHANNEL = gql`
           PastVersions(options: { sort: [{ createdAt: DESC }] }) {
             id
             body
+            editReason
             createdAt
             Author {
               username
@@ -89,6 +90,7 @@ export const CREATE_WIKI_PAGE = gql`
           PastVersions(options: { sort: [{ createdAt: DESC }] }) {
             id
             body
+            editReason
             createdAt
             Author {
               username
