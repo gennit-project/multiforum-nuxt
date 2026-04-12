@@ -38,6 +38,7 @@ const oldVersion = {
 const newVersion = {
   id: 'w2',
   body: 'new content',
+  editReason: 'Clarified setup steps',
   createdAt: new Date().toISOString(),
   Author: { username: 'new-wiki-user' },
 };
@@ -75,9 +76,11 @@ describe('WikiRevisionDiffModal', () => {
     expect({
       hasOldUser: text.includes('From version by old-wiki-user'),
       hasNewUser: text.includes('To version by new-wiki-user'),
+      hasEditReason: text.includes('Clarified setup steps'),
     }).toEqual({
       hasOldUser: true,
       hasNewUser: true,
+      hasEditReason: true,
     });
   });
 

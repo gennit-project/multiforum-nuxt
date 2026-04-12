@@ -122,6 +122,10 @@ const handleRevisionDeleted = () => {
   // The cache will be updated by the mutation
 };
 
+const getRevisionReason = (edit: WikiRevisionData) => {
+  return edit.newVersionData.editReason || edit.oldVersionData.editReason || '';
+};
+
 const handleDocumentClick = (event: MouseEvent) => {
   const target = event.target as Node;
   if (
@@ -198,6 +202,15 @@ onUnmounted(() => {
                 >
                   Most recent edit
                 </span>
+              </div>
+              <div
+                v-if="getRevisionReason(edit)"
+                class="mt-1 line-clamp-2 text-xs text-gray-500 dark:text-gray-400"
+              >
+                <span class="font-semibold text-gray-600 dark:text-gray-300"
+                  >Edit reason:</span
+                >
+                {{ getRevisionReason(edit) }}
               </div>
             </div>
           </li>
