@@ -35,6 +35,10 @@ const props = defineProps({
     type: String,
     default: 'Delete',
   },
+  dangerButtonText: {
+    type: String,
+    default: '',
+  },
   secondaryButtonText: {
     type: String,
     default: 'Cancel',
@@ -51,6 +55,18 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  dangerButtonDisabled: {
+    type: Boolean,
+    default: false,
+  },
+  dangerButtonLoading: {
+    type: Boolean,
+    default: false,
+  },
+  showSecondaryButton: {
+    type: Boolean,
+    default: true,
+  },
   warningColor: {
     type: Boolean,
     default: false,
@@ -61,7 +77,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['close', 'primaryButtonClick']);
+const emit = defineEmits(['close', 'primaryButtonClick', 'dangerButtonClick']);
 
 const primaryButtonClasses = computed(() => {
   if (props.primaryButtonDisabled) {
@@ -73,6 +89,14 @@ const primaryButtonClasses = computed(() => {
   }
 
   return 'border-transparent border bg-orange-600 text-white hover:bg-orange-500 focus:ring-orange-500';
+});
+
+const dangerButtonClasses = computed(() => {
+  if (props.dangerButtonDisabled) {
+    return 'border border-red-200 bg-red-50 text-red-400 dark:border-red-900 dark:bg-red-950 dark:text-red-500';
+  }
+
+  return 'border border-red-300 bg-red-100 text-red-700 hover:bg-red-200 focus:ring-red-500 dark:border-red-600 dark:bg-red-800 dark:text-red-200 dark:hover:bg-red-700';
 });
 </script>
 
@@ -172,6 +196,22 @@ const primaryButtonClasses = computed(() => {
                     {{ loading ? 'Saving...' : primaryButtonText }}
                   </button>
                   <button
+                    v-if="dangerButtonText"
+                    type="button"
+                    :data-testid="`${dataTestid}-danger-button`"
+                    :disabled="dangerButtonDisabled"
+                    :class="[
+                      dangerButtonClasses,
+                      'mt-3 inline-flex max-h-10 w-full justify-center rounded-full px-4 py-2 text-base font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:mt-0 sm:w-auto sm:text-sm',
+                    ]"
+                    @click="emit('dangerButtonClick')"
+                  >
+                    {{
+                      dangerButtonLoading ? 'Redacting...' : dangerButtonText
+                    }}
+                  </button>
+                  <button
+                    v-if="showSecondaryButton"
                     ref="cancelButtonRef"
                     type="button"
                     class="hover:bg-gray-50 inline-flex w-full justify-center rounded-full border border-gray-300 px-4 py-2 text-base font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:text-gray-200 sm:mt-0 sm:w-auto sm:text-sm"
