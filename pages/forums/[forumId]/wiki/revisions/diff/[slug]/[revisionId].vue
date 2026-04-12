@@ -7,6 +7,9 @@ import { DELETE_WIKI_REVISION } from '@/graphQLData/discussion/mutations';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import RevisionDiffContent from '@/components/revision/RevisionDiffContent.vue';
+import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
+import Notification from '@/components/NotificationComponent.vue';
+import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 import type { WikiPage, TextVersion } from '@/__generated__/graphql';
 import {
   buildSequentialRevisionPairs,
@@ -22,6 +25,15 @@ const router = useRouter();
 const forumId = route.params.forumId as string;
 const slug = route.params.slug as string;
 const revisionId = computed(() => route.params.revisionId as string);
+
+const {
+  showReportModal,
+  showSuccessfullyReported,
+  openReportModal,
+  closeReportModal,
+  handleReportedSuccessfully,
+  dismissReportedNotification,
+} = useModerationOutcomeUI();
 
 // Query wiki page data for the specific slug
 const {
@@ -134,6 +146,11 @@ const handleDelete = async () => {
     }
   }
 };
+
+const revisionToReportId = computed(() => {
+  const oldVersionId = currentRevision.value?.oldVersionData?.id;
+  return oldVersionId && oldVersionId !== 'current' ? oldVersionId : '';
+});
 
 // Navigation functions
 const goBackToRevisions = () => {
@@ -259,6 +276,13 @@ useHead({
               />
               Redact Revision
             </button>
+            <button
+              class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+              @click="openReportModal"
+            >
+              <i class="fa-solid fa-flag mr-2" />
+              Report Edit
+            </button>
           </div>
         </div>
       </div>
@@ -270,6 +294,20 @@ useHead({
         :old-version="currentRevision.oldVersionData"
         :new-version="currentRevision.newVersionData"
         :is-most-recent="currentRevision.isCurrent"
+      />
+      <BrokenRulesModal
+        v-if="wikiPage?.id"
+        :open="showReportModal"
+        :wiki-page-id="wikiPage.id"
+        :wiki-revision-id="revisionToReportId"
+        :channel-unique-name-override="forumId"
+        @close="closeReportModal"
+        @report-submitted-successfully="handleReportedSuccessfully"
+      />
+      <Notification
+        :show="showSuccessfullyReported"
+        :title="'Your report was submitted successfully.'"
+        @close-notification="dismissReportedNotification"
       />
     </div>
   </div>

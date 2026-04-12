@@ -220,6 +220,9 @@ const relatedContentType = computed(() => {
   if (props.discussionId) {
     return discussionHasDownload.value ? 'download' : 'discussion';
   }
+  if (props.issue.relatedWikiRevisionId || props.issue.relatedWikiPageId) {
+    return 'wiki edit';
+  }
   return null;
 });
 
@@ -266,6 +269,18 @@ const hasEditPermission = computed(() => {
 
 const editButtonDisabled = computed(() => {
   return actionsDisabled.value || !hasEditPermission.value;
+});
+
+const editModalTargetType = computed(() => {
+  switch (relatedContentType.value) {
+    case 'comment':
+    case 'discussion':
+    case 'download':
+    case 'event':
+      return relatedContentType.value;
+    default:
+      return null;
+  }
 });
 </script>
 
@@ -574,9 +589,9 @@ const editButtonDisabled = computed(() => {
                 </div>
               </div>
               <EditContentModal
-                v-if="relatedContentType"
+                v-if="editModalTargetType && hasEditPermission"
                 :open="editModalOpen"
-                :target-type="relatedContentType"
+                :target-type="editModalTargetType"
                 :issue-id="issue.id"
                 :comment-id="commentId"
                 :discussion-id="discussionId"

@@ -15,6 +15,8 @@ export const ISSUE_BASE_FIELDS = gql`
     relatedDiscussionId
     relatedEventId
     relatedImageId
+    relatedWikiPageId
+    relatedWikiRevisionId
     relatedChannelUniqueName
     channelUniqueName
     Author {
@@ -278,6 +280,8 @@ export const GET_ISSUES_BY_CHANNEL = gql`
         isOpen
         channelUniqueName
         relatedDiscussionId
+        relatedWikiPageId
+        relatedWikiRevisionId
         Channel {
           uniqueName
         }
@@ -328,6 +332,8 @@ export const GET_CLOSED_ISSUES_BY_CHANNEL = gql`
         isOpen
         channelUniqueName
         relatedDiscussionId
+        relatedWikiPageId
+        relatedWikiRevisionId
         Channel {
           uniqueName
         }
@@ -360,6 +366,8 @@ export const GET_ISSUES = gql`
       relatedDiscussionId
       relatedEventId
       relatedImageId
+      relatedWikiPageId
+      relatedWikiRevisionId
       relatedUsername
       flaggedServerRuleViolation
       locked
@@ -401,6 +409,8 @@ export const GET_CLOSED_ISSUES = gql`
       relatedDiscussionId
       relatedEventId
       relatedImageId
+      relatedWikiPageId
+      relatedWikiRevisionId
       Channel {
         uniqueName
       }

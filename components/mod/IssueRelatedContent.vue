@@ -37,6 +37,8 @@ const getContentTypeLabel = (issue: Issue) => {
   if (issue.relatedDiscussionId) return 'discussion';
   if (issue.relatedEventId) return 'event';
   if (issue.relatedImageId) return 'image';
+  if (issue.relatedWikiRevisionId) return 'wiki edit';
+  if (issue.relatedWikiPageId) return 'wiki page';
   return 'comment';
 };
 
@@ -118,6 +120,20 @@ const showSuspendModButton = computed(() => {
         emit('fetchedOriginalAuthorUsername', $event)
       "
     />
+    <div
+      v-if="activeIssue?.relatedWikiPageId || activeIssue?.relatedWikiRevisionId"
+      class="space-y-1 text-sm text-gray-700 dark:text-gray-200"
+    >
+      <p>
+        This issue is related to a wiki {{ activeIssue.relatedWikiRevisionId ? 'edit' : 'page' }}.
+      </p>
+      <p v-if="activeIssue.relatedWikiPageId" class="text-xs text-gray-500 dark:text-gray-400">
+        Wiki page ID: {{ activeIssue.relatedWikiPageId }}
+      </p>
+      <p v-if="activeIssue.relatedWikiRevisionId" class="text-xs text-gray-500 dark:text-gray-400">
+        Wiki revision ID: {{ activeIssue.relatedWikiRevisionId }}
+      </p>
+    </div>
     <slot name="issue-body" />
   </div>
 </template>

@@ -12,6 +12,8 @@ import TextInput from '@/components/TextInput.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import GoBack from '@/components/GoBack.vue';
+import SuspensionNotice from '@/components/SuspensionNotice.vue';
+import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { usernameVar } from '@/cache';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 
@@ -69,6 +71,25 @@ const error = computed(() => {
   return isHomePage.value ? channelError.value : wikiPageError.value;
 });
 
+const {
+  activeSuspension,
+  issueNumber: suspensionIssueNumber,
+  suspendedUntil,
+  suspendedIndefinitely,
+  channelId: suspensionChannelId,
+} = useChannelSuspensionNotice(forumId);
+
+const wikiEditBlockedBySuspension = computed(() => {
+  return !!usernameVar.value && !!activeSuspension.value;
+});
+
+const showWikiEditSuspensionNotice = computed(() => {
+  return wikiEditBlockedBySuspension.value && !!suspensionIssueNumber.value;
+});
+
+const wikiEditSuspensionMessage =
+  'You are suspended in this forum and cannot edit wiki pages.';
+
 // Form data
 const formValues = ref({
   title: '',
@@ -124,6 +145,7 @@ const updateError = computed(() => {
 
 // Handle form submission
 function handleSubmit() {
+  if (wikiEditBlockedBySuspension.value) return;
   if (!formValues.value.title || !formValues.value.body) return;
 
   if (isHomePage.value) {
@@ -248,8 +270,21 @@ onChannelDone(handleDone);
       </div>
 
       <ErrorBanner v-if="updateError" :text="updateError.message" />
+      <SuspensionNotice
+        v-if="showWikiEditSuspensionNotice"
+        class="mb-4"
+        :message="wikiEditSuspensionMessage"
+        :issue-number="suspensionIssueNumber ?? 0"
+        :channel-id="suspensionChannelId"
+        :suspended-until="suspendedUntil ?? undefined"
+        :suspended-indefinitely="suspendedIndefinitely"
+      />
 
-      <form class="space-y-6" @submit.prevent="handleSubmit">
+      <form
+        v-if="!wikiEditBlockedBySuspension"
+        class="space-y-6"
+        @submit.prevent="handleSubmit"
+      >
         <div>
           <TextInput
             id="wiki-title"
