@@ -5,7 +5,7 @@ import type { TextVersion } from '@/__generated__/graphql';
 import GenericModal from '@/components/GenericModal.vue';
 import RevisionDiffContent from '@/components/revision/RevisionDiffContent.vue';
 import { useMutation } from '@vue/apollo-composable';
-import { DELETE_TEXT_VERSION } from '@/graphQLData/discussion/mutations';
+import { DELETE_DISCUSSION_BODY_REVISION } from '@/graphQLData/discussion/mutations';
 
 interface VersionData {
   id: string;
@@ -49,14 +49,7 @@ const {
   loading,
   error,
   onDone,
-} = useMutation(DELETE_TEXT_VERSION, {
-  update: (cache, { data }) => {
-    if (data?.deleteTextVersions?.nodesDeleted) {
-      cache.evict({ id: `TextVersion:${props.oldVersion.id}` });
-      cache.gc();
-    }
-  },
-});
+} = useMutation(DELETE_DISCUSSION_BODY_REVISION);
 
 const handleDelete = async () => {
   if (
@@ -67,7 +60,7 @@ const handleDelete = async () => {
     isDeleting.value = true;
     try {
       await deleteTextVersion({
-        id: props.oldVersion.id,
+        textVersionId: props.oldVersion.id,
       });
     } catch {
       isDeleting.value = false;
