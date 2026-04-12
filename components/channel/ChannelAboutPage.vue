@@ -7,6 +7,7 @@ import type { User } from '@/__generated__/graphql';
 import ChannelSidebar from '@/components/channel/ChannelSidebar.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import ReportChannelModal from '@/components/mod/ReportChannelModal.vue';
+import ReportChannelImageModal from '@/components/mod/ReportChannelImageModal.vue';
 import LockChannelDialog from '@/components/mod/LockChannelDialog.vue';
 import UnlockChannelDialog from '@/components/mod/UnlockChannelDialog.vue';
 import { useRoute } from 'nuxt/app';
@@ -105,8 +106,14 @@ const canLockChannel = computed(() => {
 
 // Dialog states
 const showReportModal = ref(false);
+const showReportIconModal = ref(false);
+const showReportBannerModal = ref(false);
 const showLockDialog = ref(false);
 const showUnlockDialog = ref(false);
+
+// Channel image availability
+const hasChannelIcon = computed(() => !!channel.value?.channelIconURL);
+const hasChannelBanner = computed(() => !!channel.value?.channelBannerURL);
 
 const openReportModal = () => {
   showReportModal.value = true;
@@ -122,6 +129,14 @@ const openUnlockDialog = () => {
 
 const handleReported = () => {
   showReportModal.value = false;
+};
+
+const handleIconReported = () => {
+  showReportIconModal.value = false;
+};
+
+const handleBannerReported = () => {
+  showReportBannerModal.value = false;
 };
 
 const handleLocked = () => {
@@ -189,6 +204,20 @@ const handleUnlocked = () => {
               Report Forum
             </button>
             <button
+              v-if="canReportChannel && hasChannelIcon"
+              class="rounded-md border border-red-300 bg-red-50 px-3 py-1.5 text-sm text-red-700 hover:bg-red-100 dark:border-red-600 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50"
+              @click="showReportIconModal = true"
+            >
+              Report Icon
+            </button>
+            <button
+              v-if="canReportChannel && hasChannelBanner"
+              class="rounded-md border border-red-300 bg-red-50 px-3 py-1.5 text-sm text-red-700 hover:bg-red-100 dark:border-red-600 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50"
+              @click="showReportBannerModal = true"
+            >
+              Report Banner
+            </button>
+            <button
               v-if="canLockChannel && channel && !channel.locked"
               class="rounded-md border border-yellow-300 bg-yellow-50 px-3 py-1.5 text-sm text-yellow-700 hover:bg-yellow-100 dark:border-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-300 dark:hover:bg-yellow-900/50"
               @click="openLockDialog"
@@ -215,6 +244,26 @@ const handleUnlocked = () => {
       :open="showReportModal"
       @close="showReportModal = false"
       @reported="handleReported"
+    />
+
+    <ReportChannelImageModal
+      v-if="channel && hasChannelIcon"
+      :channel-unique-name="channelId"
+      :channel-display-name="channel.displayName || channelId"
+      image-type="ICON"
+      :open="showReportIconModal"
+      @close="showReportIconModal = false"
+      @report-submitted-successfully="handleIconReported"
+    />
+
+    <ReportChannelImageModal
+      v-if="channel && hasChannelBanner"
+      :channel-unique-name="channelId"
+      :channel-display-name="channel.displayName || channelId"
+      image-type="BANNER"
+      :open="showReportBannerModal"
+      @close="showReportBannerModal = false"
+      @report-submitted-successfully="handleBannerReported"
     />
 
     <LockChannelDialog
