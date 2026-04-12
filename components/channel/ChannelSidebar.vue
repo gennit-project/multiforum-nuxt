@@ -17,6 +17,9 @@ type BotSummary = {
   displayName?: string | null;
   botProfileId?: string | null;
   isDeprecated?: boolean | null;
+  SuspensionsAggregate?: {
+    count: number;
+  } | null;
 };
 
 const props = defineProps({
@@ -48,6 +51,11 @@ const botAccounts = computed(() => {
   const channel = props.channel as Channel & { Bots?: BotSummary[] };
   return channel?.Bots ?? [];
 });
+
+// Check if a bot has active suspensions
+const isBotSuspended = (bot: BotSummary): boolean => {
+  return (bot.SuspensionsAggregate?.count ?? 0) > 0;
+};
 
 // Extract the invoke handle from a bot username
 // Username format: bot-{channel}-{botName} or bot-{channel}-{botName}-{profileId}
@@ -280,7 +288,13 @@ const handleBecomeAdminSuccess = () => {
                         ({{ bot.displayName }})
                       </span>
                       <span
-                        v-if="bot.isDeprecated"
+                        v-if="isBotSuspended(bot)"
+                        class="rounded-full bg-red-200 px-2 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-900/70 dark:text-red-100"
+                      >
+                        Suspended
+                      </span>
+                      <span
+                        v-else-if="bot.isDeprecated"
                         class="rounded-full bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-200"
                       >
                         Inactive
