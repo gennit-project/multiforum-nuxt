@@ -38,10 +38,7 @@ This section tracks the wiki/discussion/comment revision-history work from the c
 
 - Profile picture reporting (`reportProfilePicture` mutation) - frontend modal and button on user profile page
 - Channel icon/banner reporting (`reportChannelImage` mutation) - frontend modal and buttons on channel About page
-
-**Remaining optional enhancements:**
-
-- Dedicated `/admin/image-reports` page (currently images appear in main issue list)
+- Dedicated `/admin/image-reports` page - shows all image-related reports with type badges
 
 ### Auto-Moderation Bot Plugin
 
@@ -1937,6 +1934,61 @@ These steps verify the image moderation workflow implemented in the Album and Im
 - Regular users should not see the Server Moderation section
 - Server mods should only see report buttons for images that exist
 - Missing images should not have corresponding report buttons
+
+### Verify Dedicated Image Reports Page
+
+**Prerequisites:**
+
+- Server admin or server mod access
+- At least one image report (album image, profile picture, or channel icon/banner)
+
+**Test Steps:**
+
+1. Log in as a server admin or mod
+2. Navigate to `/admin/image-reports`
+3. Verify the page loads and displays image reports
+4. Check the type badges for different image types:
+   - Orange badge for "Album Image"
+   - Purple badge for "Profile Picture"
+   - Blue badge for "Channel Icon" or "Channel Banner"
+5. Toggle the "Show open reports only" checkbox
+6. Click "View" on a report to navigate to the issue detail
+
+**Expected Outcome:**
+
+- Page should list all image-related reports
+- Each report should show:
+  - Issue number
+  - Image type badge with appropriate color
+  - Open/Closed status
+  - Channel context (if channel-scoped) or "(server-scoped)"
+  - Reporter name and relative timestamp
+  - Report count (if multiple reports)
+- Filter should work to show/hide closed reports
+- "View" button should navigate to the appropriate issue page (channel or admin)
+
+### Verify Image Reports Page Shows All Image Types
+
+**Prerequisites:**
+
+- Create reports for different image types:
+  - An album image (via lightbox report button)
+  - A profile picture (via user profile)
+  - A channel icon (via channel About page)
+
+**Test Steps:**
+
+1. Create reports for each image type (or ensure they exist)
+2. Navigate to `/admin/image-reports`
+3. Verify all three report types appear in the list
+4. Verify each has the correct type badge
+
+**Expected Outcome:**
+
+- Album image reports show orange "Album Image" badge
+- Profile picture reports show purple "Profile Picture" badge
+- Channel icon/banner reports show blue "Channel Icon" or "Channel Banner" badge
+- All reports are mixed together but clearly distinguishable by badge
 
 ### Automated Verification
 

@@ -478,6 +478,51 @@ export const GET_CHANNEL_REPORTS = gql`
   }
 `;
 
+export const GET_IMAGE_REPORTS = gql`
+  query getImageReports($isOpen: Boolean) {
+    issues(
+      where: {
+        OR: [
+          { relatedImageId_NOT: null }
+          { relatedProfilePicUserId_NOT: null }
+          { relatedChannelIconName_NOT: null }
+          { relatedChannelBannerName_NOT: null }
+        ]
+        isOpen: $isOpen
+      }
+      options: { sort: { createdAt: DESC } }
+    ) {
+      id
+      issueNumber
+      title
+      body
+      isOpen
+      createdAt
+      updatedAt
+      channelUniqueName
+      relatedImageId
+      relatedAlbumId
+      relatedProfilePicUserId
+      relatedChannelIconName
+      relatedChannelBannerName
+      relatedChannelUniqueName
+      flaggedServerRuleViolation
+      Author {
+        __typename
+        ... on ModerationProfile {
+          displayName
+        }
+        ... on User {
+          username
+        }
+      }
+      ActivityFeedAggregate(where: { actionType: "report" }) {
+        count
+      }
+    }
+  }
+`;
+
 export const GET_SERVER_ISSUE = gql`
   ${ISSUE_BASE_FIELDS}
   query getServerIssue(
