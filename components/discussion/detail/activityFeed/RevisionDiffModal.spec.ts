@@ -12,7 +12,17 @@ vi.mock('@headlessui/vue', () => ({
 vi.mock('@/components/GenericModal.vue', () => ({
   default: {
     name: 'GenericModal',
-    props: ['open', 'title', 'error', 'loading'],
+    props: [
+      'open',
+      'title',
+      'error',
+      'loading',
+      'primaryButtonText',
+      'dangerButtonText',
+      'dangerButtonDisabled',
+      'dangerButtonLoading',
+      'showSecondaryButton',
+    ],
     template:
       '<div><slot name="icon"></slot><slot name="content"></slot></div>',
   },
@@ -34,6 +44,24 @@ const newVersion = {
 };
 
 describe('RevisionDiffModal (discussion)', () => {
+  it('uses a neutral primary action and a danger redaction action', () => {
+    const wrapper = mount(RevisionDiffModal, {
+      props: {
+        open: true,
+        oldVersion: baseVersion,
+        newVersion,
+      },
+    });
+
+    const modal = wrapper.findComponent({ name: 'GenericModal' });
+    expect(modal.props()).toMatchObject({
+      primaryButtonText: 'Close',
+      dangerButtonText: 'Redact revision',
+      dangerButtonDisabled: false,
+      showSecondaryButton: false,
+    });
+  });
+
   it('renders edit reason when provided', () => {
     const wrapper = mount(RevisionDiffModal, {
       props: {

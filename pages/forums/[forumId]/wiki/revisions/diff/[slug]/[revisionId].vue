@@ -91,7 +91,7 @@ const handleDelete = async () => {
 
   if (
     confirm(
-      'Are you sure you want to delete this revision? This action cannot be undone.'
+      'Are you sure you want to redact this revision? This action cannot be undone.'
     )
   ) {
     isDeleting.value = true;
@@ -191,7 +191,7 @@ useHead({
             </div>
           </div>
 
-          <!-- Delete button -->
+          <!-- Redact button -->
           <div
             v-if="
               currentRevision.oldVersionData?.id &&
@@ -207,7 +207,7 @@ useHead({
                 v-if="isDeleting || deleteLoading"
                 class="fas fa-spinner fa-spin mr-2"
               />
-              Delete Revision
+              Redact Revision
             </button>
           </div>
         </div>

@@ -54,7 +54,7 @@ const {
 const handleDelete = async () => {
   if (
     confirm(
-      'Are you sure you want to delete this revision? This action cannot be undone.'
+      'Are you sure you want to redact this revision? This action cannot be undone.'
     )
   ) {
     isDeleting.value = true;
@@ -84,12 +84,16 @@ const handleClose = () => {
     :open="open"
     title="Revision History"
     :error="error ? error.message : ''"
-    :loading="isDeleting || loading"
-    primary-button-text="Delete"
-    :primary-button-disabled="!oldVersion.id || oldVersion.id === 'current'"
-    highlight-color="red"
+    primary-button-text="Close"
+    danger-button-text="Redact revision"
+    :danger-button-disabled="
+      !oldVersion.id || oldVersion.id === 'current' || isDeleting || loading
+    "
+    :danger-button-loading="isDeleting || loading"
+    :show-secondary-button="false"
     @close="handleClose"
-    @primary-button-click="handleDelete"
+    @primary-button-click="handleClose"
+    @danger-button-click="handleDelete"
   >
     <template #icon>
       <i
