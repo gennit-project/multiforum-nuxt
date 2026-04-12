@@ -376,6 +376,29 @@ export const REPORT_COMMENT = gql`
   }
 `;
 
+export const REPORT_WIKI_EDIT = gql`
+  mutation reportWikiEdit(
+    $wikiPageId: ID!
+    $wikiRevisionId: ID
+    $reportText: String!
+    $selectedForumRules: [String!]!
+    $selectedServerRules: [String!]!
+    $channelUniqueName: String!
+  ) {
+    reportWikiEdit(
+      wikiPageId: $wikiPageId
+      wikiRevisionId: $wikiRevisionId
+      reportText: $reportText
+      selectedForumRules: $selectedForumRules
+      selectedServerRules: $selectedServerRules
+      channelUniqueName: $channelUniqueName
+    ) {
+      id
+      issueNumber
+    }
+  }
+`;
+
 export const ARCHIVE_COMMENT = gql`
   mutation archiveComment(
     $commentId: ID!
@@ -436,6 +459,23 @@ export const REPORT_IMAGE = gql`
       selectedForumRules: $selectedForumRules
       selectedServerRules: $selectedServerRules
       channelUniqueName: $channelUniqueName
+    ) {
+      id
+      issueNumber
+    }
+  }
+`;
+
+export const REPORT_PROFILE_PICTURE = gql`
+  mutation reportProfilePicture(
+    $username: String!
+    $reportText: String!
+    $selectedServerRules: [String!]!
+  ) {
+    reportProfilePicture(
+      username: $username
+      reportText: $reportText
+      selectedServerRules: $selectedServerRules
     ) {
       id
       issueNumber

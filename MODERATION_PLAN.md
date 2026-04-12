@@ -6,26 +6,27 @@ This section tracks the wiki/discussion/comment revision-history work from the c
 
 ### Completed Foundation Work
 
-| Task                                       | Status | Notes                                                                                                                   |
-| ------------------------------------------ | ------ | ----------------------------------------------------------------------------------------------------------------------- |
-| Normalize shared revision diff rendering   | Done   | Added shared revision diff content and updated wiki, discussion, and comment revision modals to use it.                 |
-| Share revision pairing primitives          | Done   | Added shared revision history pairing helpers and applied them to comment/wiki edit dropdowns plus wiki revision pages. |
-| Consolidate wiki revision detail diff view | Done   | Replaced the standalone wiki revision detail `v-code-diff` implementation with the shared revision diff content.        |
+| Task                                       | Status | Notes                                                                                                                           |
+| ------------------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| Normalize shared revision diff rendering   | Done   | Added shared revision diff content and updated wiki, discussion, and comment revision modals to use it.                         |
+| Share revision pairing primitives          | Done   | Added shared revision history pairing helpers and applied them to comment/wiki edit dropdowns plus wiki revision pages.         |
+| Consolidate wiki revision detail diff view | Done   | Replaced the standalone wiki revision detail `v-code-diff` implementation with the shared revision diff content.                |
 | Use danger-action revision redaction UI    | Done   | Comment, discussion, and wiki revision modals use a neutral primary action and expose redaction as an authorized danger action. |
-| Add wiki revision diff selector            | Done   | Wiki revision diff pages can switch compared revisions without returning to the revision history list.                  |
-| Add wiki edit reasons                      | Done   | Wiki create/edit forms write edit reasons and wiki revision queries/pages display `editReason`.                        |
+| Add wiki revision diff selector            | Done   | Wiki revision diff pages can switch compared revisions without returning to the revision history list.                          |
+| Add wiki edit reasons                      | Done   | Wiki create/edit forms write edit reasons and wiki revision queries/pages display `editReason`.                                 |
 | Gate backend wiki edits for suspensions    | Done   | Backend wiki page create/update, child page creation, and wiki home page update flows use channel permission suspension checks. |
 | Gate frontend wiki edits for suspensions   | Done   | Wiki create/edit entry points and direct forms now surface `SuspensionNotice` and block suspended users before mutation submit. |
+| Add wiki revision report UI                | Done   | Wiki revision diff pages can submit reports through the shared broken-rules modal and `reportWikiEdit` mutation.                |
+| Render wiki report targets in moderation UI | Done   | Issue queries and moderation surfaces now include wiki page/revision target fields and label wiki edit reports in issue lists/detail. |
 
 ### Remaining Coding Changes
 
-| Task                                                          | Location           | Type            | Notes                                                                                                                                                                                                                       |
-| ------------------------------------------------------------- | ------------------ | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Add backend permission gates for wiki page deletion           | Backend            | Feature         | Wiki page deletion should allow the original wiki page author or a moderator with an explicit delete permission. Revision redaction gates are already implemented.                                                          |
-| Add dedicated wiki delete permissions if schema supports them | Backend            | Feature         | Prefer explicit permissions such as `canDeleteWiki` / `canDeleteWikiRevision` over reusing `canEditDiscussions` for destructive wiki actions.                                                                               |
-| Add wiki report UI and moderation activity rendering          | Frontend           | Feature         | Backend issue target support and `reportWikiEdit` exist. Add the report UI and ensure wiki reports render alongside discussions/comments/events in moderation surfaces.                                                     |
-| Add wiki edits to user profiles                               | Backend + Frontend | Feature         | Add wiki edit counts to `GET_USER`, add a "Wiki Edits" profile tab, and add a `/u/[username]/wiki-edits` page modeled after comments.                                                                                       |
-| Add wiki edits to contribution charts                         | Backend + Frontend | Feature         | Extend `GET_USER_CONTRIBUTIONS`, backend contribution resolver logic, and `UserContributionChart` so wiki edits appear in contribution history.                                                                             |
+| Task                                                          | Location           | Type    | Notes                                                                                                                                                                   |
+| ------------------------------------------------------------- | ------------------ | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Add backend permission gates for wiki page deletion           | Backend            | Feature | Wiki page deletion should allow the original wiki page author or a moderator with an explicit delete permission. Revision redaction gates are already implemented.      |
+| Add dedicated wiki delete permissions if schema supports them | Backend            | Feature | Prefer explicit permissions such as `canDeleteWiki` / `canDeleteWikiRevision` over reusing `canEditDiscussions` for destructive wiki actions.                           |
+| Add wiki edits to user profiles                               | Backend + Frontend | Feature | Add wiki edit counts to `GET_USER`, add a "Wiki Edits" profile tab, and add a `/u/[username]/wiki-edits` page modeled after comments.                                   |
+| Add wiki edits to contribution charts                         | Backend + Frontend | Feature | Extend `GET_USER_CONTRIBUTIONS`, backend contribution resolver logic, and `UserContributionChart` so wiki edits appear in contribution history.                         |
 
 ---
 
@@ -33,50 +34,14 @@ This section tracks the wiki/discussion/comment revision-history work from the c
 
 ### Album and Image Moderation
 
+**Completed enhancements:**
+
+- Profile picture reporting (`reportProfilePicture` mutation) - frontend modal and button on user profile page
+
 **Remaining optional enhancements:**
 
-- Profile picture reporting (`reportProfilePicture` mutation)
 - Channel icon/banner reporting (`reportChannelImage` mutation)
 - Dedicated `/admin/image-reports` page (currently images appear in main issue list)
-
-### Suspended Bots
-
-**Current State:**
-
-- ✅ Bots participate in the suspension workflow used for users
-- Bots are `User` records with `isBot: true`, `botProfileId`, and a linked `ModerationProfile`
-- `channelBotsMiddleware.ts` marks bots as `deprecated: true` when removed from a channel (distinct from suspension)
-- The `suspendUser` mutation works for bot users via `createSuspensionResolver`
-
-#### Completed Work
-
-| Task                                              | Location                                             | Notes                                                                                           |
-| ------------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| Extend `resolveIssueTarget` for bot targets       | `customResolvers/shared/resolveIssueTarget.ts`       | Added `isBot: boolean` to `IssueTarget` return type. All callers updated to pass `User` model.  |
-| Block bot actions when suspended                  | `services/plugin/commentTrigger.ts`                  | Added suspension checks in `createCommentAsBot` and `reportContentAsBot` context functions.     |
-| Extend `SuspendUserButton` for bot targets        | `components/mod/SuspendUserButton.vue`               | Added `isBot` prop with computed labels ("Suspend Bot" vs "Suspend Author").                    |
-| Add `isBot` to suspended users query              | `graphQLData/admin/queries.js`                       | Added `isBot` field to `GET_SERVER_SUSPENDED_USERS` query.                                      |
-| Show suspended bots in admin suspended-users page | `components/admin/ServerSuspendedUserList.vue`       | Added "🤖 Bot" badge when `suspension.SuspendedUser?.isBot` is true.                            |
-| Pass `isBot` through issue detail flow            | Multiple files                                       | Added `isBot` to `COMMENT_FIELDS`, `isAuthorBot` prop to `ModerationWizard`, computed in `IssueDetail`. |
-| Add bot indicator to issue list                   | `components/mod/ModIssueListItem.vue`                | Added `isRelatedToBot` computed checking username prefix `bot-`. Added Bot badge in template.   |
-| Surface bot suspension state in channel settings  | `components/plugins/BotProfilesEditor.vue`           | Added `SuspensionsAggregate` to queries, "Suspended" badge in bot preview section.              |
-| Surface bot suspension state in bot sidebar       | `components/channel/ChannelSidebar.vue`              | Added `SuspensionsAggregate` to `GET_CHANNEL` query, "Suspended" badge in bot list.             |
-
-#### Data Model Considerations
-
-No schema changes required. The existing model supports bot suspension:
-
-```
-User (isBot: true)
-  ├── ModerationProfile
-  │     └── Suspension (via SuspendedMods relationship)
-  └── Suspension (via SuspendedUser relationship)
-```
-
-#### Migration/Backward Compatibility
-
-- **Deprecated vs Suspended**: Existing deprecated bots (`deprecated: true`) are not the same as suspended bots. Deprecation means the channel no longer uses the bot; suspension means the bot violated rules.
-- **No migration needed**: Suspension is additive - existing bots without suspensions continue working.
 
 ### Auto-Moderation Bot Plugin
 
@@ -251,6 +216,31 @@ This section contains detailed step-by-step instructions for manually verifying 
 - A `SuspensionNotice` should explain that the user cannot edit wiki pages in the forum
 - Direct create/edit pages should show the same notice and hide the form
 - Unsuspended authenticated users should still see working wiki create/edit controls
+
+#### Verify Wiki Revision Report UI
+
+**Prerequisites:**
+
+- A moderator account with permission to report in the wiki page channel
+- A wiki page with at least one revision
+
+**Test Steps:**
+
+1. Navigate to `/forums/[forumId]/wiki/revisions/diff/[slug]/[revisionId]`
+2. Click "Report Edit"
+3. Select at least one broken forum or server rule
+4. Add optional report context
+5. Submit the report
+6. Navigate to the channel issue list and open the created issue
+
+**Expected Outcome:**
+
+- The shared broken-rules report modal should open with "Report Wiki Edit"
+- Submitting should call `reportWikiEdit` with the wiki page id, revision id, selected rules, report text, and channel id
+- A success notification should appear after submission
+- The resulting moderation issue should target the wiki page/revision and identify the wiki edit author when available
+- The channel issue list should label the issue as a wiki edit report
+- The issue detail page should show the related content type as a wiki edit and include the related wiki page/revision identifiers
 
 ### User Suspension Verification
 
@@ -1842,25 +1832,56 @@ These steps verify the image moderation workflow implemented in the Album and Im
 - Unauthorized attempts should show permission error
 - Authorized actions should succeed
 
-### Verify Image Report from User Profile (Future)
-
-**Note:** This test applies when `reportProfilePicture` is implemented.
+### Verify Profile Picture Report from User Profile Page
 
 **Prerequisites:**
 
-- A user with a profile picture
-- Mod profile access
+- A logged-in user account
+- Another user's profile with a profile picture
 
 **Test Steps:**
 
-1. Navigate to a user's profile page
-2. Look for report option on profile picture
-3. Submit a report
+1. Log in as a regular user
+2. Navigate to another user's profile page (`/u/[username]`)
+3. Look for the flag icon (report button) overlaid on the profile picture
+4. Click the report button
+5. Select one or more server rules that were violated
+6. Add optional context text
+7. Submit the report
 
 **Expected Outcome:**
 
-- Report should create a server-scoped issue
-- Issue should have `relatedProfilePicUserId` set
+- Report button should appear only when viewing another user's profile (not your own)
+- Report button should only appear if the profile has a picture
+- Report modal should open with server rules only (no forum rules)
+- Modal should show "Report Profile Picture: [username/displayName]"
+- After submission, success notification should appear
+- A new server-scoped issue should be created
+- Note banner should explain that reports are reviewed by server admins
+
+### Verify Profile Picture Report Button Visibility
+
+**Prerequisites:**
+
+- Users with and without profile pictures
+- A logged-in user account
+
+**Test Steps:**
+
+1. Log in as a user
+2. Navigate to your own profile page
+3. Check if report button is visible on your own profile picture
+4. Navigate to another user's profile who has a profile picture
+5. Check if report button is visible
+6. Navigate to a user's profile who has no profile picture (default avatar)
+7. Check if report button is visible
+
+**Expected Outcome:**
+
+- Report button should NOT appear on your own profile picture
+- Report button should appear on other users' profile pictures
+- Report button should NOT appear when viewing a user with no profile picture set
+- Report button should be a small flag icon in the bottom-right corner of the avatar
 
 ### Automated Verification
 
