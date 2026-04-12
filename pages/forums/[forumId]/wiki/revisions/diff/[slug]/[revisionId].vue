@@ -11,13 +11,16 @@ import type { WikiPage, TextVersion } from '@/__generated__/graphql';
 import {
   buildSequentialRevisionPairs,
   getRevisionAuthorName,
+  type RevisionPair,
 } from '@/utils/revisionHistory';
+
+type WikiRevisionData = RevisionPair<TextVersion>;
 
 const route = useRoute();
 const router = useRouter();
 const forumId = route.params.forumId as string;
 const slug = route.params.slug as string;
-const revisionId = route.params.revisionId as string;
+const revisionId = computed(() => route.params.revisionId as string);
 
 // Query wiki page data for the specific slug
 const {
@@ -66,8 +69,32 @@ const allEdits = computed(() => {
 
 // Find the specific revision
 const currentRevision = computed(() => {
-  return allEdits.value.find((edit) => edit.id === revisionId);
+  return allEdits.value.find((edit) => edit.id === revisionId.value);
 });
+
+const formatRevisionOptionLabel = (edit: WikiRevisionData) => {
+  const formattedDate = new Date(edit.createdAt).toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+  });
+
+  const prefix = edit.isCurrent ? 'Most recent edit' : 'Edit';
+  return `${prefix} by ${edit.author} - ${formattedDate}`;
+};
+
+const handleRevisionSelect = (event: Event) => {
+  const selectedRevisionId = (event.target as HTMLSelectElement).value;
+  if (!selectedRevisionId || selectedRevisionId === revisionId.value) {
+    return;
+  }
+
+  router.push(
+    `/forums/${forumId}/wiki/revisions/diff/${slug}/${selectedRevisionId}`
+  );
+};
 
 // Deletion state
 const isDeleting = ref(false);
@@ -179,8 +206,8 @@ useHead({
           <span class="text-gray-700 dark:text-gray-300">Revision Detail</span>
         </nav>
 
-        <div class="flex items-center justify-between">
-          <div>
+        <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div class="min-w-0">
             <h1 class="text-2xl font-bold dark:text-white">Revision Detail</h1>
             <div v-if="currentRevision.isCurrent" class="mt-2">
               <span
@@ -191,14 +218,35 @@ useHead({
             </div>
           </div>
 
-          <!-- Redact button -->
-          <div
-            v-if="
-              currentRevision.oldVersionData?.id &&
-              currentRevision.oldVersionData.id !== 'current'
-            "
-          >
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div>
+              <label
+                for="wiki-revision-select"
+                class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Compare revision
+              </label>
+              <select
+                id="wiki-revision-select"
+                class="w-full min-w-0 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 sm:w-80"
+                :value="revisionId"
+                @change="handleRevisionSelect"
+              >
+                <option
+                  v-for="edit in allEdits"
+                  :key="edit.id"
+                  :value="edit.id"
+                >
+                  {{ formatRevisionOptionLabel(edit) }}
+                </option>
+              </select>
+            </div>
+
             <button
+              v-if="
+                currentRevision.oldVersionData?.id &&
+                currentRevision.oldVersionData.id !== 'current'
+              "
               class="rounded-md border border-red-300 bg-red-100 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-200 disabled:opacity-50 dark:border-red-600 dark:bg-red-800 dark:text-red-200 dark:hover:bg-red-700"
               :disabled="isDeleting || deleteLoading"
               @click="handleDelete"
