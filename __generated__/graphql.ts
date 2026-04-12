@@ -1,4 +1,4 @@
- 
+/* eslint-disable */
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -6083,6 +6083,21 @@ export type ChannelPinnedWikiPagesNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  editReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  editReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   slug_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   slug_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   slug_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -8339,6 +8354,21 @@ export type ChannelWikiHomePageNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  editReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  editReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   slug_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   slug_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   slug_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -8415,6 +8445,7 @@ export type ChannelWikiPagePinnedWikiPagesNodeAggregateSelection = {
   body: StringAggregateSelection;
   channelUniqueName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
+  editReason: StringAggregateSelection;
   id: IdAggregateSelection;
   slug: StringAggregateSelection;
   title: StringAggregateSelection;
@@ -8432,6 +8463,7 @@ export type ChannelWikiPageWikiHomePageNodeAggregateSelection = {
   body: StringAggregateSelection;
   channelUniqueName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
+  editReason: StringAggregateSelection;
   id: IdAggregateSelection;
   slug: StringAggregateSelection;
   title: StringAggregateSelection;
@@ -17088,6 +17120,12 @@ export type CreateIssuesMutationResponse = {
   issues: Array<Issue>;
 };
 
+export type CreateLabelChangeHistoriesMutationResponse = {
+  __typename?: 'CreateLabelChangeHistoriesMutationResponse';
+  info: CreateInfo;
+  labelChangeHistories: Array<LabelChangeHistory>;
+};
+
 export type CreateLicensesMutationResponse = {
   __typename?: 'CreateLicensesMutationResponse';
   info: CreateInfo;
@@ -18561,6 +18599,9 @@ export type DiscussionChannel = {
   Discussion?: Maybe<Discussion>;
   DiscussionAggregate?: Maybe<DiscussionChannelDiscussionDiscussionAggregationSelection>;
   DiscussionConnection: DiscussionChannelDiscussionConnection;
+  LabelChangeHistory: Array<LabelChangeHistory>;
+  LabelChangeHistoryAggregate?: Maybe<DiscussionChannelLabelChangeHistoryLabelChangeHistoryAggregationSelection>;
+  LabelChangeHistoryConnection: DiscussionChannelLabelChangeHistoryConnection;
   LabelOptions: Array<FilterOption>;
   LabelOptionsAggregate?: Maybe<DiscussionChannelFilterOptionLabelOptionsAggregationSelection>;
   LabelOptionsConnection: DiscussionChannelLabelOptionsConnection;
@@ -18671,6 +18712,28 @@ export type DiscussionChannelDiscussionConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DiscussionChannelDiscussionConnectionSort>>;
   where?: InputMaybe<DiscussionChannelDiscussionConnectionWhere>;
+};
+
+
+export type DiscussionChannelLabelChangeHistoryArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<LabelChangeHistoryOptions>;
+  where?: InputMaybe<LabelChangeHistoryWhere>;
+};
+
+
+export type DiscussionChannelLabelChangeHistoryAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<LabelChangeHistoryWhere>;
+};
+
+
+export type DiscussionChannelLabelChangeHistoryConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryConnectionSort>>;
+  where?: InputMaybe<DiscussionChannelLabelChangeHistoryConnectionWhere>;
 };
 
 
@@ -19411,6 +19474,7 @@ export type DiscussionChannelConnectInput = {
   Channel?: InputMaybe<DiscussionChannelChannelConnectFieldInput>;
   Comments?: InputMaybe<Array<DiscussionChannelCommentsConnectFieldInput>>;
   Discussion?: InputMaybe<DiscussionChannelDiscussionConnectFieldInput>;
+  LabelChangeHistory?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryConnectFieldInput>>;
   LabelOptions?: InputMaybe<Array<DiscussionChannelLabelOptionsConnectFieldInput>>;
   RelatedIssues?: InputMaybe<Array<DiscussionChannelRelatedIssuesConnectFieldInput>>;
   SubscribedToNotifications?: InputMaybe<Array<DiscussionChannelSubscribedToNotificationsConnectFieldInput>>;
@@ -19433,6 +19497,7 @@ export type DiscussionChannelConnectedRelationships = {
   Channel?: Maybe<DiscussionChannelChannelConnectedRelationship>;
   Comments?: Maybe<DiscussionChannelCommentsConnectedRelationship>;
   Discussion?: Maybe<DiscussionChannelDiscussionConnectedRelationship>;
+  LabelChangeHistory?: Maybe<DiscussionChannelLabelChangeHistoryConnectedRelationship>;
   LabelOptions?: Maybe<DiscussionChannelLabelOptionsConnectedRelationship>;
   RelatedIssues?: Maybe<DiscussionChannelRelatedIssuesConnectedRelationship>;
   SubscribedToNotifications?: Maybe<DiscussionChannelSubscribedToNotificationsConnectedRelationship>;
@@ -19444,6 +19509,7 @@ export type DiscussionChannelCreateInput = {
   Channel?: InputMaybe<DiscussionChannelChannelFieldInput>;
   Comments?: InputMaybe<DiscussionChannelCommentsFieldInput>;
   Discussion?: InputMaybe<DiscussionChannelDiscussionFieldInput>;
+  LabelChangeHistory?: InputMaybe<DiscussionChannelLabelChangeHistoryFieldInput>;
   LabelOptions?: InputMaybe<DiscussionChannelLabelOptionsFieldInput>;
   RelatedIssues?: InputMaybe<DiscussionChannelRelatedIssuesFieldInput>;
   SubscribedToNotifications?: InputMaybe<DiscussionChannelSubscribedToNotificationsFieldInput>;
@@ -19470,6 +19536,7 @@ export type DiscussionChannelDeleteInput = {
   Channel?: InputMaybe<DiscussionChannelChannelDeleteFieldInput>;
   Comments?: InputMaybe<Array<DiscussionChannelCommentsDeleteFieldInput>>;
   Discussion?: InputMaybe<DiscussionChannelDiscussionDeleteFieldInput>;
+  LabelChangeHistory?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryDeleteFieldInput>>;
   LabelOptions?: InputMaybe<Array<DiscussionChannelLabelOptionsDeleteFieldInput>>;
   RelatedIssues?: InputMaybe<Array<DiscussionChannelRelatedIssuesDeleteFieldInput>>;
   SubscribedToNotifications?: InputMaybe<Array<DiscussionChannelSubscribedToNotificationsDeleteFieldInput>>;
@@ -19488,6 +19555,7 @@ export type DiscussionChannelDisconnectInput = {
   Channel?: InputMaybe<DiscussionChannelChannelDisconnectFieldInput>;
   Comments?: InputMaybe<Array<DiscussionChannelCommentsDisconnectFieldInput>>;
   Discussion?: InputMaybe<DiscussionChannelDiscussionDisconnectFieldInput>;
+  LabelChangeHistory?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryDisconnectFieldInput>>;
   LabelOptions?: InputMaybe<Array<DiscussionChannelLabelOptionsDisconnectFieldInput>>;
   RelatedIssues?: InputMaybe<Array<DiscussionChannelRelatedIssuesDisconnectFieldInput>>;
   SubscribedToNotifications?: InputMaybe<Array<DiscussionChannelSubscribedToNotificationsDisconnectFieldInput>>;
@@ -19860,6 +19928,166 @@ export type DiscussionChannelIssueRelatedIssuesNodeAggregateSelection = {
   relatedWikiRevisionId: IdAggregateSelection;
   title: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+};
+
+export type DiscussionChannelLabelChangeHistoryAggregateInput = {
+  AND?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryAggregateInput>>;
+  NOT?: InputMaybe<DiscussionChannelLabelChangeHistoryAggregateInput>;
+  OR?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<DiscussionChannelLabelChangeHistoryNodeAggregationWhereInput>;
+};
+
+export type DiscussionChannelLabelChangeHistoryConnectFieldInput = {
+  connect?: InputMaybe<Array<LabelChangeHistoryConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<LabelChangeHistoryConnectWhere>;
+};
+
+export type DiscussionChannelLabelChangeHistoryConnectedRelationship = {
+  __typename?: 'DiscussionChannelLabelChangeHistoryConnectedRelationship';
+  node: LabelChangeHistoryEventPayload;
+};
+
+export type DiscussionChannelLabelChangeHistoryConnection = {
+  __typename?: 'DiscussionChannelLabelChangeHistoryConnection';
+  edges: Array<DiscussionChannelLabelChangeHistoryRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type DiscussionChannelLabelChangeHistoryConnectionSort = {
+  node?: InputMaybe<LabelChangeHistorySort>;
+};
+
+export type DiscussionChannelLabelChangeHistoryConnectionWhere = {
+  AND?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryConnectionWhere>>;
+  NOT?: InputMaybe<DiscussionChannelLabelChangeHistoryConnectionWhere>;
+  OR?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryConnectionWhere>>;
+  node?: InputMaybe<LabelChangeHistoryWhere>;
+};
+
+export type DiscussionChannelLabelChangeHistoryCreateFieldInput = {
+  node: LabelChangeHistoryCreateInput;
+};
+
+export type DiscussionChannelLabelChangeHistoryDeleteFieldInput = {
+  delete?: InputMaybe<LabelChangeHistoryDeleteInput>;
+  where?: InputMaybe<DiscussionChannelLabelChangeHistoryConnectionWhere>;
+};
+
+export type DiscussionChannelLabelChangeHistoryDisconnectFieldInput = {
+  disconnect?: InputMaybe<LabelChangeHistoryDisconnectInput>;
+  where?: InputMaybe<DiscussionChannelLabelChangeHistoryConnectionWhere>;
+};
+
+export type DiscussionChannelLabelChangeHistoryFieldInput = {
+  connect?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryConnectFieldInput>>;
+  create?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryCreateFieldInput>>;
+};
+
+export type DiscussionChannelLabelChangeHistoryLabelChangeHistoryAggregationSelection = {
+  __typename?: 'DiscussionChannelLabelChangeHistoryLabelChangeHistoryAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<DiscussionChannelLabelChangeHistoryLabelChangeHistoryNodeAggregateSelection>;
+};
+
+export type DiscussionChannelLabelChangeHistoryLabelChangeHistoryNodeAggregateSelection = {
+  __typename?: 'DiscussionChannelLabelChangeHistoryLabelChangeHistoryNodeAggregateSelection';
+  actionType: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  labelDisplayName: StringAggregateSelection;
+  labelValue: StringAggregateSelection;
+};
+
+export type DiscussionChannelLabelChangeHistoryNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<DiscussionChannelLabelChangeHistoryNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryNodeAggregationWhereInput>>;
+  actionType_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  actionType_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  actionType_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  actionType_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  actionType_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  actionType_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  actionType_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  actionType_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  actionType_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  actionType_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  actionType_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  actionType_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  actionType_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  actionType_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  actionType_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  labelDisplayName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  labelDisplayName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  labelDisplayName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  labelDisplayName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  labelDisplayName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  labelDisplayName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  labelDisplayName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  labelDisplayName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  labelDisplayName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  labelDisplayName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  labelDisplayName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  labelDisplayName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  labelDisplayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  labelDisplayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  labelDisplayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  labelValue_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  labelValue_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  labelValue_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  labelValue_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  labelValue_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  labelValue_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  labelValue_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  labelValue_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  labelValue_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  labelValue_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  labelValue_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  labelValue_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  labelValue_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  labelValue_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  labelValue_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type DiscussionChannelLabelChangeHistoryRelationship = {
+  __typename?: 'DiscussionChannelLabelChangeHistoryRelationship';
+  cursor: Scalars['String']['output'];
+  node: LabelChangeHistory;
+};
+
+export type DiscussionChannelLabelChangeHistoryRelationshipSubscriptionWhere = {
+  node?: InputMaybe<LabelChangeHistorySubscriptionWhere>;
+};
+
+export type DiscussionChannelLabelChangeHistoryUpdateConnectionInput = {
+  node?: InputMaybe<LabelChangeHistoryUpdateInput>;
+};
+
+export type DiscussionChannelLabelChangeHistoryUpdateFieldInput = {
+  connect?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryConnectFieldInput>>;
+  create?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryCreateFieldInput>>;
+  delete?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryDisconnectFieldInput>>;
+  update?: InputMaybe<DiscussionChannelLabelChangeHistoryUpdateConnectionInput>;
+  where?: InputMaybe<DiscussionChannelLabelChangeHistoryConnectionWhere>;
 };
 
 export type DiscussionChannelLabelOptionsAggregateInput = {
@@ -20602,6 +20830,7 @@ export type DiscussionChannelRelationInput = {
   Channel?: InputMaybe<DiscussionChannelChannelCreateFieldInput>;
   Comments?: InputMaybe<Array<DiscussionChannelCommentsCreateFieldInput>>;
   Discussion?: InputMaybe<DiscussionChannelDiscussionCreateFieldInput>;
+  LabelChangeHistory?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryCreateFieldInput>>;
   LabelOptions?: InputMaybe<Array<DiscussionChannelLabelOptionsCreateFieldInput>>;
   RelatedIssues?: InputMaybe<Array<DiscussionChannelRelatedIssuesCreateFieldInput>>;
   SubscribedToNotifications?: InputMaybe<Array<DiscussionChannelSubscribedToNotificationsCreateFieldInput>>;
@@ -20647,6 +20876,7 @@ export type DiscussionChannelRelationshipsSubscriptionWhere = {
   Channel?: InputMaybe<DiscussionChannelChannelRelationshipSubscriptionWhere>;
   Comments?: InputMaybe<DiscussionChannelCommentsRelationshipSubscriptionWhere>;
   Discussion?: InputMaybe<DiscussionChannelDiscussionRelationshipSubscriptionWhere>;
+  LabelChangeHistory?: InputMaybe<DiscussionChannelLabelChangeHistoryRelationshipSubscriptionWhere>;
   LabelOptions?: InputMaybe<DiscussionChannelLabelOptionsRelationshipSubscriptionWhere>;
   RelatedIssues?: InputMaybe<DiscussionChannelRelatedIssuesRelationshipSubscriptionWhere>;
   SubscribedToNotifications?: InputMaybe<DiscussionChannelSubscribedToNotificationsRelationshipSubscriptionWhere>;
@@ -21063,6 +21293,7 @@ export type DiscussionChannelUpdateInput = {
   Channel?: InputMaybe<DiscussionChannelChannelUpdateFieldInput>;
   Comments?: InputMaybe<Array<DiscussionChannelCommentsUpdateFieldInput>>;
   Discussion?: InputMaybe<DiscussionChannelDiscussionUpdateFieldInput>;
+  LabelChangeHistory?: InputMaybe<Array<DiscussionChannelLabelChangeHistoryUpdateFieldInput>>;
   LabelOptions?: InputMaybe<Array<DiscussionChannelLabelOptionsUpdateFieldInput>>;
   RelatedIssues?: InputMaybe<Array<DiscussionChannelRelatedIssuesUpdateFieldInput>>;
   SubscribedToNotifications?: InputMaybe<Array<DiscussionChannelSubscribedToNotificationsUpdateFieldInput>>;
@@ -21534,6 +21765,23 @@ export type DiscussionChannelWhere = {
   DiscussionConnection?: InputMaybe<DiscussionChannelDiscussionConnectionWhere>;
   DiscussionConnection_NOT?: InputMaybe<DiscussionChannelDiscussionConnectionWhere>;
   Discussion_NOT?: InputMaybe<DiscussionWhere>;
+  LabelChangeHistoryAggregate?: InputMaybe<DiscussionChannelLabelChangeHistoryAggregateInput>;
+  /** Return DiscussionChannels where all of the related DiscussionChannelLabelChangeHistoryConnections match this filter */
+  LabelChangeHistoryConnection_ALL?: InputMaybe<DiscussionChannelLabelChangeHistoryConnectionWhere>;
+  /** Return DiscussionChannels where none of the related DiscussionChannelLabelChangeHistoryConnections match this filter */
+  LabelChangeHistoryConnection_NONE?: InputMaybe<DiscussionChannelLabelChangeHistoryConnectionWhere>;
+  /** Return DiscussionChannels where one of the related DiscussionChannelLabelChangeHistoryConnections match this filter */
+  LabelChangeHistoryConnection_SINGLE?: InputMaybe<DiscussionChannelLabelChangeHistoryConnectionWhere>;
+  /** Return DiscussionChannels where some of the related DiscussionChannelLabelChangeHistoryConnections match this filter */
+  LabelChangeHistoryConnection_SOME?: InputMaybe<DiscussionChannelLabelChangeHistoryConnectionWhere>;
+  /** Return DiscussionChannels where all of the related LabelChangeHistories match this filter */
+  LabelChangeHistory_ALL?: InputMaybe<LabelChangeHistoryWhere>;
+  /** Return DiscussionChannels where none of the related LabelChangeHistories match this filter */
+  LabelChangeHistory_NONE?: InputMaybe<LabelChangeHistoryWhere>;
+  /** Return DiscussionChannels where one of the related LabelChangeHistories match this filter */
+  LabelChangeHistory_SINGLE?: InputMaybe<LabelChangeHistoryWhere>;
+  /** Return DiscussionChannels where some of the related LabelChangeHistories match this filter */
+  LabelChangeHistory_SOME?: InputMaybe<LabelChangeHistoryWhere>;
   LabelOptionsAggregate?: InputMaybe<DiscussionChannelLabelOptionsAggregateInput>;
   /** Return DiscussionChannels where all of the related DiscussionChannelLabelOptionsConnections match this filter */
   LabelOptionsConnection_ALL?: InputMaybe<DiscussionChannelLabelOptionsConnectionWhere>;
@@ -38241,6 +38489,1020 @@ export type IssuesConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
+export type LabelChangeHistoriesConnection = {
+  __typename?: 'LabelChangeHistoriesConnection';
+  edges: Array<LabelChangeHistoryEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type LabelChangeHistory = {
+  __typename?: 'LabelChangeHistory';
+  ActorMod?: Maybe<ModerationProfile>;
+  ActorModAggregate?: Maybe<LabelChangeHistoryModerationProfileActorModAggregationSelection>;
+  ActorModConnection: LabelChangeHistoryActorModConnection;
+  ActorUser?: Maybe<User>;
+  ActorUserAggregate?: Maybe<LabelChangeHistoryUserActorUserAggregationSelection>;
+  ActorUserConnection: LabelChangeHistoryActorUserConnection;
+  DiscussionChannel?: Maybe<DiscussionChannel>;
+  DiscussionChannelAggregate?: Maybe<LabelChangeHistoryDiscussionChannelDiscussionChannelAggregationSelection>;
+  DiscussionChannelConnection: LabelChangeHistoryDiscussionChannelConnection;
+  actionType: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  labelDisplayName: Scalars['String']['output'];
+  labelValue: Scalars['String']['output'];
+};
+
+
+export type LabelChangeHistoryActorModArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ModerationProfileOptions>;
+  where?: InputMaybe<ModerationProfileWhere>;
+};
+
+
+export type LabelChangeHistoryActorModAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<ModerationProfileWhere>;
+};
+
+
+export type LabelChangeHistoryActorModConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<LabelChangeHistoryActorModConnectionSort>>;
+  where?: InputMaybe<LabelChangeHistoryActorModConnectionWhere>;
+};
+
+
+export type LabelChangeHistoryActorUserArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type LabelChangeHistoryActorUserAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type LabelChangeHistoryActorUserConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<LabelChangeHistoryActorUserConnectionSort>>;
+  where?: InputMaybe<LabelChangeHistoryActorUserConnectionWhere>;
+};
+
+
+export type LabelChangeHistoryDiscussionChannelArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<DiscussionChannelOptions>;
+  where?: InputMaybe<DiscussionChannelWhere>;
+};
+
+
+export type LabelChangeHistoryDiscussionChannelAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<DiscussionChannelWhere>;
+};
+
+
+export type LabelChangeHistoryDiscussionChannelConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<LabelChangeHistoryDiscussionChannelConnectionSort>>;
+  where?: InputMaybe<LabelChangeHistoryDiscussionChannelConnectionWhere>;
+};
+
+export type LabelChangeHistoryActorModAggregateInput = {
+  AND?: InputMaybe<Array<LabelChangeHistoryActorModAggregateInput>>;
+  NOT?: InputMaybe<LabelChangeHistoryActorModAggregateInput>;
+  OR?: InputMaybe<Array<LabelChangeHistoryActorModAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<LabelChangeHistoryActorModNodeAggregationWhereInput>;
+};
+
+export type LabelChangeHistoryActorModConnectFieldInput = {
+  connect?: InputMaybe<ModerationProfileConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<ModerationProfileConnectWhere>;
+};
+
+export type LabelChangeHistoryActorModConnectOrCreateFieldInput = {
+  onCreate: LabelChangeHistoryActorModConnectOrCreateFieldInputOnCreate;
+  where: ModerationProfileConnectOrCreateWhere;
+};
+
+export type LabelChangeHistoryActorModConnectOrCreateFieldInputOnCreate = {
+  node: ModerationProfileOnCreateInput;
+};
+
+export type LabelChangeHistoryActorModConnectedRelationship = {
+  __typename?: 'LabelChangeHistoryActorModConnectedRelationship';
+  node: ModerationProfileEventPayload;
+};
+
+export type LabelChangeHistoryActorModConnection = {
+  __typename?: 'LabelChangeHistoryActorModConnection';
+  edges: Array<LabelChangeHistoryActorModRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type LabelChangeHistoryActorModConnectionSort = {
+  node?: InputMaybe<ModerationProfileSort>;
+};
+
+export type LabelChangeHistoryActorModConnectionWhere = {
+  AND?: InputMaybe<Array<LabelChangeHistoryActorModConnectionWhere>>;
+  NOT?: InputMaybe<LabelChangeHistoryActorModConnectionWhere>;
+  OR?: InputMaybe<Array<LabelChangeHistoryActorModConnectionWhere>>;
+  node?: InputMaybe<ModerationProfileWhere>;
+};
+
+export type LabelChangeHistoryActorModCreateFieldInput = {
+  node: ModerationProfileCreateInput;
+};
+
+export type LabelChangeHistoryActorModDeleteFieldInput = {
+  delete?: InputMaybe<ModerationProfileDeleteInput>;
+  where?: InputMaybe<LabelChangeHistoryActorModConnectionWhere>;
+};
+
+export type LabelChangeHistoryActorModDisconnectFieldInput = {
+  disconnect?: InputMaybe<ModerationProfileDisconnectInput>;
+  where?: InputMaybe<LabelChangeHistoryActorModConnectionWhere>;
+};
+
+export type LabelChangeHistoryActorModFieldInput = {
+  connect?: InputMaybe<LabelChangeHistoryActorModConnectFieldInput>;
+  connectOrCreate?: InputMaybe<LabelChangeHistoryActorModConnectOrCreateFieldInput>;
+  create?: InputMaybe<LabelChangeHistoryActorModCreateFieldInput>;
+};
+
+export type LabelChangeHistoryActorModNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<LabelChangeHistoryActorModNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<LabelChangeHistoryActorModNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<LabelChangeHistoryActorModNodeAggregationWhereInput>>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  displayName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type LabelChangeHistoryActorModRelationship = {
+  __typename?: 'LabelChangeHistoryActorModRelationship';
+  cursor: Scalars['String']['output'];
+  node: ModerationProfile;
+};
+
+export type LabelChangeHistoryActorModRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModerationProfileSubscriptionWhere>;
+};
+
+export type LabelChangeHistoryActorModUpdateConnectionInput = {
+  node?: InputMaybe<ModerationProfileUpdateInput>;
+};
+
+export type LabelChangeHistoryActorModUpdateFieldInput = {
+  connect?: InputMaybe<LabelChangeHistoryActorModConnectFieldInput>;
+  connectOrCreate?: InputMaybe<LabelChangeHistoryActorModConnectOrCreateFieldInput>;
+  create?: InputMaybe<LabelChangeHistoryActorModCreateFieldInput>;
+  delete?: InputMaybe<LabelChangeHistoryActorModDeleteFieldInput>;
+  disconnect?: InputMaybe<LabelChangeHistoryActorModDisconnectFieldInput>;
+  update?: InputMaybe<LabelChangeHistoryActorModUpdateConnectionInput>;
+  where?: InputMaybe<LabelChangeHistoryActorModConnectionWhere>;
+};
+
+export type LabelChangeHistoryActorUserAggregateInput = {
+  AND?: InputMaybe<Array<LabelChangeHistoryActorUserAggregateInput>>;
+  NOT?: InputMaybe<LabelChangeHistoryActorUserAggregateInput>;
+  OR?: InputMaybe<Array<LabelChangeHistoryActorUserAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<LabelChangeHistoryActorUserNodeAggregationWhereInput>;
+};
+
+export type LabelChangeHistoryActorUserConnectFieldInput = {
+  connect?: InputMaybe<UserConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<UserConnectWhere>;
+};
+
+export type LabelChangeHistoryActorUserConnectOrCreateFieldInput = {
+  onCreate: LabelChangeHistoryActorUserConnectOrCreateFieldInputOnCreate;
+  where: UserConnectOrCreateWhere;
+};
+
+export type LabelChangeHistoryActorUserConnectOrCreateFieldInputOnCreate = {
+  node: UserOnCreateInput;
+};
+
+export type LabelChangeHistoryActorUserConnectedRelationship = {
+  __typename?: 'LabelChangeHistoryActorUserConnectedRelationship';
+  node: UserEventPayload;
+};
+
+export type LabelChangeHistoryActorUserConnection = {
+  __typename?: 'LabelChangeHistoryActorUserConnection';
+  edges: Array<LabelChangeHistoryActorUserRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type LabelChangeHistoryActorUserConnectionSort = {
+  node?: InputMaybe<UserSort>;
+};
+
+export type LabelChangeHistoryActorUserConnectionWhere = {
+  AND?: InputMaybe<Array<LabelChangeHistoryActorUserConnectionWhere>>;
+  NOT?: InputMaybe<LabelChangeHistoryActorUserConnectionWhere>;
+  OR?: InputMaybe<Array<LabelChangeHistoryActorUserConnectionWhere>>;
+  node?: InputMaybe<UserWhere>;
+};
+
+export type LabelChangeHistoryActorUserCreateFieldInput = {
+  node: UserCreateInput;
+};
+
+export type LabelChangeHistoryActorUserDeleteFieldInput = {
+  delete?: InputMaybe<UserDeleteInput>;
+  where?: InputMaybe<LabelChangeHistoryActorUserConnectionWhere>;
+};
+
+export type LabelChangeHistoryActorUserDisconnectFieldInput = {
+  disconnect?: InputMaybe<UserDisconnectInput>;
+  where?: InputMaybe<LabelChangeHistoryActorUserConnectionWhere>;
+};
+
+export type LabelChangeHistoryActorUserFieldInput = {
+  connect?: InputMaybe<LabelChangeHistoryActorUserConnectFieldInput>;
+  connectOrCreate?: InputMaybe<LabelChangeHistoryActorUserConnectOrCreateFieldInput>;
+  create?: InputMaybe<LabelChangeHistoryActorUserCreateFieldInput>;
+};
+
+export type LabelChangeHistoryActorUserNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<LabelChangeHistoryActorUserNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<LabelChangeHistoryActorUserNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<LabelChangeHistoryActorUserNodeAggregationWhereInput>>;
+  bio_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  location_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  username_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type LabelChangeHistoryActorUserRelationship = {
+  __typename?: 'LabelChangeHistoryActorUserRelationship';
+  cursor: Scalars['String']['output'];
+  node: User;
+};
+
+export type LabelChangeHistoryActorUserRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
+export type LabelChangeHistoryActorUserUpdateConnectionInput = {
+  node?: InputMaybe<UserUpdateInput>;
+};
+
+export type LabelChangeHistoryActorUserUpdateFieldInput = {
+  connect?: InputMaybe<LabelChangeHistoryActorUserConnectFieldInput>;
+  connectOrCreate?: InputMaybe<LabelChangeHistoryActorUserConnectOrCreateFieldInput>;
+  create?: InputMaybe<LabelChangeHistoryActorUserCreateFieldInput>;
+  delete?: InputMaybe<LabelChangeHistoryActorUserDeleteFieldInput>;
+  disconnect?: InputMaybe<LabelChangeHistoryActorUserDisconnectFieldInput>;
+  update?: InputMaybe<LabelChangeHistoryActorUserUpdateConnectionInput>;
+  where?: InputMaybe<LabelChangeHistoryActorUserConnectionWhere>;
+};
+
+export type LabelChangeHistoryAggregateSelection = {
+  __typename?: 'LabelChangeHistoryAggregateSelection';
+  actionType: StringAggregateSelection;
+  count: Scalars['Int']['output'];
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  labelDisplayName: StringAggregateSelection;
+  labelValue: StringAggregateSelection;
+};
+
+export type LabelChangeHistoryConnectInput = {
+  ActorMod?: InputMaybe<LabelChangeHistoryActorModConnectFieldInput>;
+  ActorUser?: InputMaybe<LabelChangeHistoryActorUserConnectFieldInput>;
+  DiscussionChannel?: InputMaybe<LabelChangeHistoryDiscussionChannelConnectFieldInput>;
+};
+
+export type LabelChangeHistoryConnectOrCreateInput = {
+  ActorMod?: InputMaybe<LabelChangeHistoryActorModConnectOrCreateFieldInput>;
+  ActorUser?: InputMaybe<LabelChangeHistoryActorUserConnectOrCreateFieldInput>;
+};
+
+export type LabelChangeHistoryConnectWhere = {
+  node: LabelChangeHistoryWhere;
+};
+
+export type LabelChangeHistoryConnectedRelationships = {
+  __typename?: 'LabelChangeHistoryConnectedRelationships';
+  ActorMod?: Maybe<LabelChangeHistoryActorModConnectedRelationship>;
+  ActorUser?: Maybe<LabelChangeHistoryActorUserConnectedRelationship>;
+  DiscussionChannel?: Maybe<LabelChangeHistoryDiscussionChannelConnectedRelationship>;
+};
+
+export type LabelChangeHistoryCreateInput = {
+  ActorMod?: InputMaybe<LabelChangeHistoryActorModFieldInput>;
+  ActorUser?: InputMaybe<LabelChangeHistoryActorUserFieldInput>;
+  DiscussionChannel?: InputMaybe<LabelChangeHistoryDiscussionChannelFieldInput>;
+  actionType: Scalars['String']['input'];
+  labelDisplayName: Scalars['String']['input'];
+  labelValue: Scalars['String']['input'];
+};
+
+export type LabelChangeHistoryCreatedEvent = {
+  __typename?: 'LabelChangeHistoryCreatedEvent';
+  createdLabelChangeHistory: LabelChangeHistoryEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type LabelChangeHistoryDeleteInput = {
+  ActorMod?: InputMaybe<LabelChangeHistoryActorModDeleteFieldInput>;
+  ActorUser?: InputMaybe<LabelChangeHistoryActorUserDeleteFieldInput>;
+  DiscussionChannel?: InputMaybe<LabelChangeHistoryDiscussionChannelDeleteFieldInput>;
+};
+
+export type LabelChangeHistoryDeletedEvent = {
+  __typename?: 'LabelChangeHistoryDeletedEvent';
+  deletedLabelChangeHistory: LabelChangeHistoryEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type LabelChangeHistoryDisconnectInput = {
+  ActorMod?: InputMaybe<LabelChangeHistoryActorModDisconnectFieldInput>;
+  ActorUser?: InputMaybe<LabelChangeHistoryActorUserDisconnectFieldInput>;
+  DiscussionChannel?: InputMaybe<LabelChangeHistoryDiscussionChannelDisconnectFieldInput>;
+};
+
+export type LabelChangeHistoryDiscussionChannelAggregateInput = {
+  AND?: InputMaybe<Array<LabelChangeHistoryDiscussionChannelAggregateInput>>;
+  NOT?: InputMaybe<LabelChangeHistoryDiscussionChannelAggregateInput>;
+  OR?: InputMaybe<Array<LabelChangeHistoryDiscussionChannelAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<LabelChangeHistoryDiscussionChannelNodeAggregationWhereInput>;
+};
+
+export type LabelChangeHistoryDiscussionChannelConnectFieldInput = {
+  connect?: InputMaybe<DiscussionChannelConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<DiscussionChannelConnectWhere>;
+};
+
+export type LabelChangeHistoryDiscussionChannelConnectedRelationship = {
+  __typename?: 'LabelChangeHistoryDiscussionChannelConnectedRelationship';
+  node: DiscussionChannelEventPayload;
+};
+
+export type LabelChangeHistoryDiscussionChannelConnection = {
+  __typename?: 'LabelChangeHistoryDiscussionChannelConnection';
+  edges: Array<LabelChangeHistoryDiscussionChannelRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type LabelChangeHistoryDiscussionChannelConnectionSort = {
+  node?: InputMaybe<DiscussionChannelSort>;
+};
+
+export type LabelChangeHistoryDiscussionChannelConnectionWhere = {
+  AND?: InputMaybe<Array<LabelChangeHistoryDiscussionChannelConnectionWhere>>;
+  NOT?: InputMaybe<LabelChangeHistoryDiscussionChannelConnectionWhere>;
+  OR?: InputMaybe<Array<LabelChangeHistoryDiscussionChannelConnectionWhere>>;
+  node?: InputMaybe<DiscussionChannelWhere>;
+};
+
+export type LabelChangeHistoryDiscussionChannelCreateFieldInput = {
+  node: DiscussionChannelCreateInput;
+};
+
+export type LabelChangeHistoryDiscussionChannelDeleteFieldInput = {
+  delete?: InputMaybe<DiscussionChannelDeleteInput>;
+  where?: InputMaybe<LabelChangeHistoryDiscussionChannelConnectionWhere>;
+};
+
+export type LabelChangeHistoryDiscussionChannelDisconnectFieldInput = {
+  disconnect?: InputMaybe<DiscussionChannelDisconnectInput>;
+  where?: InputMaybe<LabelChangeHistoryDiscussionChannelConnectionWhere>;
+};
+
+export type LabelChangeHistoryDiscussionChannelDiscussionChannelAggregationSelection = {
+  __typename?: 'LabelChangeHistoryDiscussionChannelDiscussionChannelAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<LabelChangeHistoryDiscussionChannelDiscussionChannelNodeAggregateSelection>;
+};
+
+export type LabelChangeHistoryDiscussionChannelDiscussionChannelNodeAggregateSelection = {
+  __typename?: 'LabelChangeHistoryDiscussionChannelDiscussionChannelNodeAggregateSelection';
+  botMentions: StringAggregateSelection;
+  channelUniqueName: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  discussionId: IdAggregateSelection;
+  id: IdAggregateSelection;
+  weightedVotesCount: FloatAggregateSelection;
+};
+
+export type LabelChangeHistoryDiscussionChannelFieldInput = {
+  connect?: InputMaybe<LabelChangeHistoryDiscussionChannelConnectFieldInput>;
+  create?: InputMaybe<LabelChangeHistoryDiscussionChannelCreateFieldInput>;
+};
+
+export type LabelChangeHistoryDiscussionChannelNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<LabelChangeHistoryDiscussionChannelNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<LabelChangeHistoryDiscussionChannelNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<LabelChangeHistoryDiscussionChannelNodeAggregationWhereInput>>;
+  botMentions_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  botMentions_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  botMentions_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  botMentions_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  botMentions_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  botMentions_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  botMentions_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  botMentions_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  botMentions_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  botMentions_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  botMentions_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  botMentions_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  botMentions_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  botMentions_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  botMentions_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  weightedVotesCount_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MAX_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MAX_GT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MAX_GTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MAX_LT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MAX_LTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MIN_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MIN_GT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MIN_GTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MIN_LT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MIN_LTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_SUM_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_SUM_GT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_SUM_GTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_SUM_LT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_SUM_LTE?: InputMaybe<Scalars['Float']['input']>;
+};
+
+export type LabelChangeHistoryDiscussionChannelRelationship = {
+  __typename?: 'LabelChangeHistoryDiscussionChannelRelationship';
+  cursor: Scalars['String']['output'];
+  node: DiscussionChannel;
+};
+
+export type LabelChangeHistoryDiscussionChannelRelationshipSubscriptionWhere = {
+  node?: InputMaybe<DiscussionChannelSubscriptionWhere>;
+};
+
+export type LabelChangeHistoryDiscussionChannelUpdateConnectionInput = {
+  node?: InputMaybe<DiscussionChannelUpdateInput>;
+};
+
+export type LabelChangeHistoryDiscussionChannelUpdateFieldInput = {
+  connect?: InputMaybe<LabelChangeHistoryDiscussionChannelConnectFieldInput>;
+  create?: InputMaybe<LabelChangeHistoryDiscussionChannelCreateFieldInput>;
+  delete?: InputMaybe<LabelChangeHistoryDiscussionChannelDeleteFieldInput>;
+  disconnect?: InputMaybe<LabelChangeHistoryDiscussionChannelDisconnectFieldInput>;
+  update?: InputMaybe<LabelChangeHistoryDiscussionChannelUpdateConnectionInput>;
+  where?: InputMaybe<LabelChangeHistoryDiscussionChannelConnectionWhere>;
+};
+
+export type LabelChangeHistoryEdge = {
+  __typename?: 'LabelChangeHistoryEdge';
+  cursor: Scalars['String']['output'];
+  node: LabelChangeHistory;
+};
+
+export type LabelChangeHistoryEventPayload = {
+  __typename?: 'LabelChangeHistoryEventPayload';
+  actionType: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  labelDisplayName: Scalars['String']['output'];
+  labelValue: Scalars['String']['output'];
+};
+
+export type LabelChangeHistoryModerationProfileActorModAggregationSelection = {
+  __typename?: 'LabelChangeHistoryModerationProfileActorModAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<LabelChangeHistoryModerationProfileActorModNodeAggregateSelection>;
+};
+
+export type LabelChangeHistoryModerationProfileActorModNodeAggregateSelection = {
+  __typename?: 'LabelChangeHistoryModerationProfileActorModNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  displayName: StringAggregateSelection;
+};
+
+export type LabelChangeHistoryOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more LabelChangeHistorySort objects to sort LabelChangeHistories by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<LabelChangeHistorySort>>;
+};
+
+export type LabelChangeHistoryRelationInput = {
+  ActorMod?: InputMaybe<LabelChangeHistoryActorModCreateFieldInput>;
+  ActorUser?: InputMaybe<LabelChangeHistoryActorUserCreateFieldInput>;
+  DiscussionChannel?: InputMaybe<LabelChangeHistoryDiscussionChannelCreateFieldInput>;
+};
+
+export type LabelChangeHistoryRelationshipCreatedEvent = {
+  __typename?: 'LabelChangeHistoryRelationshipCreatedEvent';
+  createdRelationship: LabelChangeHistoryConnectedRelationships;
+  event: EventType;
+  labelChangeHistory: LabelChangeHistoryEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type LabelChangeHistoryRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<LabelChangeHistoryRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<LabelChangeHistoryRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<LabelChangeHistoryRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<LabelChangeHistoryRelationshipsSubscriptionWhere>;
+  labelChangeHistory?: InputMaybe<LabelChangeHistorySubscriptionWhere>;
+};
+
+export type LabelChangeHistoryRelationshipDeletedEvent = {
+  __typename?: 'LabelChangeHistoryRelationshipDeletedEvent';
+  deletedRelationship: LabelChangeHistoryConnectedRelationships;
+  event: EventType;
+  labelChangeHistory: LabelChangeHistoryEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type LabelChangeHistoryRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<LabelChangeHistoryRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<LabelChangeHistoryRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<LabelChangeHistoryRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<LabelChangeHistoryRelationshipsSubscriptionWhere>;
+  labelChangeHistory?: InputMaybe<LabelChangeHistorySubscriptionWhere>;
+};
+
+export type LabelChangeHistoryRelationshipsSubscriptionWhere = {
+  ActorMod?: InputMaybe<LabelChangeHistoryActorModRelationshipSubscriptionWhere>;
+  ActorUser?: InputMaybe<LabelChangeHistoryActorUserRelationshipSubscriptionWhere>;
+  DiscussionChannel?: InputMaybe<LabelChangeHistoryDiscussionChannelRelationshipSubscriptionWhere>;
+};
+
+/** Fields to sort LabelChangeHistories by. The order in which sorts are applied is not guaranteed when specifying many fields in one LabelChangeHistorySort object. */
+export type LabelChangeHistorySort = {
+  actionType?: InputMaybe<SortDirection>;
+  createdAt?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  labelDisplayName?: InputMaybe<SortDirection>;
+  labelValue?: InputMaybe<SortDirection>;
+};
+
+export type LabelChangeHistorySubscriptionWhere = {
+  AND?: InputMaybe<Array<LabelChangeHistorySubscriptionWhere>>;
+  NOT?: InputMaybe<LabelChangeHistorySubscriptionWhere>;
+  OR?: InputMaybe<Array<LabelChangeHistorySubscriptionWhere>>;
+  actionType?: InputMaybe<Scalars['String']['input']>;
+  actionType_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  actionType_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  actionType_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  actionType_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  actionType_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  labelDisplayName?: InputMaybe<Scalars['String']['input']>;
+  labelDisplayName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  labelDisplayName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  labelDisplayName_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  labelDisplayName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  labelDisplayName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  labelValue?: InputMaybe<Scalars['String']['input']>;
+  labelValue_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  labelValue_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  labelValue_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  labelValue_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  labelValue_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type LabelChangeHistoryUpdateInput = {
+  ActorMod?: InputMaybe<LabelChangeHistoryActorModUpdateFieldInput>;
+  ActorUser?: InputMaybe<LabelChangeHistoryActorUserUpdateFieldInput>;
+  DiscussionChannel?: InputMaybe<LabelChangeHistoryDiscussionChannelUpdateFieldInput>;
+  actionType?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  labelDisplayName?: InputMaybe<Scalars['String']['input']>;
+  labelValue?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type LabelChangeHistoryUpdatedEvent = {
+  __typename?: 'LabelChangeHistoryUpdatedEvent';
+  event: EventType;
+  previousState: LabelChangeHistoryEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedLabelChangeHistory: LabelChangeHistoryEventPayload;
+};
+
+export type LabelChangeHistoryUserActorUserAggregationSelection = {
+  __typename?: 'LabelChangeHistoryUserActorUserAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<LabelChangeHistoryUserActorUserNodeAggregateSelection>;
+};
+
+export type LabelChangeHistoryUserActorUserNodeAggregateSelection = {
+  __typename?: 'LabelChangeHistoryUserActorUserNodeAggregateSelection';
+  bio: StringAggregateSelection;
+  botProfileId: StringAggregateSelection;
+  commentKarma: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  defaultEmojiSkinTone: StringAggregateSelection;
+  deprecatedReason: StringAggregateSelection;
+  discussionKarma: IntAggregateSelection;
+  displayName: StringAggregateSelection;
+  location: StringAggregateSelection;
+  notificationBundleContent: StringAggregateSelection;
+  notificationBundleInterval: StringAggregateSelection;
+  preferredTimeZone: StringAggregateSelection;
+  profilePicURL: StringAggregateSelection;
+  pronouns: StringAggregateSelection;
+  stripeAccountId: StringAggregateSelection;
+  username: StringAggregateSelection;
+};
+
+export type LabelChangeHistoryWhere = {
+  AND?: InputMaybe<Array<LabelChangeHistoryWhere>>;
+  ActorMod?: InputMaybe<ModerationProfileWhere>;
+  ActorModAggregate?: InputMaybe<LabelChangeHistoryActorModAggregateInput>;
+  ActorModConnection?: InputMaybe<LabelChangeHistoryActorModConnectionWhere>;
+  ActorModConnection_NOT?: InputMaybe<LabelChangeHistoryActorModConnectionWhere>;
+  ActorMod_NOT?: InputMaybe<ModerationProfileWhere>;
+  ActorUser?: InputMaybe<UserWhere>;
+  ActorUserAggregate?: InputMaybe<LabelChangeHistoryActorUserAggregateInput>;
+  ActorUserConnection?: InputMaybe<LabelChangeHistoryActorUserConnectionWhere>;
+  ActorUserConnection_NOT?: InputMaybe<LabelChangeHistoryActorUserConnectionWhere>;
+  ActorUser_NOT?: InputMaybe<UserWhere>;
+  DiscussionChannel?: InputMaybe<DiscussionChannelWhere>;
+  DiscussionChannelAggregate?: InputMaybe<LabelChangeHistoryDiscussionChannelAggregateInput>;
+  DiscussionChannelConnection?: InputMaybe<LabelChangeHistoryDiscussionChannelConnectionWhere>;
+  DiscussionChannelConnection_NOT?: InputMaybe<LabelChangeHistoryDiscussionChannelConnectionWhere>;
+  DiscussionChannel_NOT?: InputMaybe<DiscussionChannelWhere>;
+  NOT?: InputMaybe<LabelChangeHistoryWhere>;
+  OR?: InputMaybe<Array<LabelChangeHistoryWhere>>;
+  actionType?: InputMaybe<Scalars['String']['input']>;
+  actionType_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  actionType_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  actionType_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  actionType_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  actionType_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  labelDisplayName?: InputMaybe<Scalars['String']['input']>;
+  labelDisplayName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  labelDisplayName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  labelDisplayName_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  labelDisplayName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  labelDisplayName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  labelValue?: InputMaybe<Scalars['String']['input']>;
+  labelValue_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  labelValue_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  labelValue_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  labelValue_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  labelValue_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type LabelFilterInput = {
   groupKey: Scalars['String']['input'];
   values: Array<Scalars['String']['input']>;
@@ -39047,6 +40309,7 @@ export type ModChannelRole = {
   __typename?: 'ModChannelRole';
   canArchiveImage?: Maybe<Scalars['Boolean']['output']>;
   canCloseSupportTickets?: Maybe<Scalars['Boolean']['output']>;
+  canDeleteWiki?: Maybe<Scalars['Boolean']['output']>;
   canEditComments?: Maybe<Scalars['Boolean']['output']>;
   canEditDiscussions?: Maybe<Scalars['Boolean']['output']>;
   canEditEvents?: Maybe<Scalars['Boolean']['output']>;
@@ -39081,6 +40344,7 @@ export type ModChannelRoleConnectWhere = {
 export type ModChannelRoleCreateInput = {
   canArchiveImage?: InputMaybe<Scalars['Boolean']['input']>;
   canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canDeleteWiki?: InputMaybe<Scalars['Boolean']['input']>;
   canEditComments?: InputMaybe<Scalars['Boolean']['input']>;
   canEditDiscussions?: InputMaybe<Scalars['Boolean']['input']>;
   canEditEvents?: InputMaybe<Scalars['Boolean']['input']>;
@@ -39120,6 +40384,7 @@ export type ModChannelRoleEventPayload = {
   __typename?: 'ModChannelRoleEventPayload';
   canArchiveImage?: Maybe<Scalars['Boolean']['output']>;
   canCloseSupportTickets?: Maybe<Scalars['Boolean']['output']>;
+  canDeleteWiki?: Maybe<Scalars['Boolean']['output']>;
   canEditComments?: Maybe<Scalars['Boolean']['output']>;
   canEditDiscussions?: Maybe<Scalars['Boolean']['output']>;
   canEditEvents?: Maybe<Scalars['Boolean']['output']>;
@@ -39138,6 +40403,7 @@ export type ModChannelRoleEventPayload = {
 export type ModChannelRoleOnCreateInput = {
   canArchiveImage?: InputMaybe<Scalars['Boolean']['input']>;
   canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canDeleteWiki?: InputMaybe<Scalars['Boolean']['input']>;
   canEditComments?: InputMaybe<Scalars['Boolean']['input']>;
   canEditDiscussions?: InputMaybe<Scalars['Boolean']['input']>;
   canEditEvents?: InputMaybe<Scalars['Boolean']['input']>;
@@ -39164,6 +40430,7 @@ export type ModChannelRoleOptions = {
 export type ModChannelRoleSort = {
   canArchiveImage?: InputMaybe<SortDirection>;
   canCloseSupportTickets?: InputMaybe<SortDirection>;
+  canDeleteWiki?: InputMaybe<SortDirection>;
   canEditComments?: InputMaybe<SortDirection>;
   canEditDiscussions?: InputMaybe<SortDirection>;
   canEditEvents?: InputMaybe<SortDirection>;
@@ -39185,6 +40452,7 @@ export type ModChannelRoleSubscriptionWhere = {
   OR?: InputMaybe<Array<ModChannelRoleSubscriptionWhere>>;
   canArchiveImage?: InputMaybe<Scalars['Boolean']['input']>;
   canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canDeleteWiki?: InputMaybe<Scalars['Boolean']['input']>;
   canEditComments?: InputMaybe<Scalars['Boolean']['input']>;
   canEditDiscussions?: InputMaybe<Scalars['Boolean']['input']>;
   canEditEvents?: InputMaybe<Scalars['Boolean']['input']>;
@@ -39222,6 +40490,7 @@ export type ModChannelRoleUniqueWhere = {
 export type ModChannelRoleUpdateInput = {
   canArchiveImage?: InputMaybe<Scalars['Boolean']['input']>;
   canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canDeleteWiki?: InputMaybe<Scalars['Boolean']['input']>;
   canEditComments?: InputMaybe<Scalars['Boolean']['input']>;
   canEditDiscussions?: InputMaybe<Scalars['Boolean']['input']>;
   canEditEvents?: InputMaybe<Scalars['Boolean']['input']>;
@@ -39251,6 +40520,7 @@ export type ModChannelRoleWhere = {
   OR?: InputMaybe<Array<ModChannelRoleWhere>>;
   canArchiveImage?: InputMaybe<Scalars['Boolean']['input']>;
   canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canDeleteWiki?: InputMaybe<Scalars['Boolean']['input']>;
   canEditComments?: InputMaybe<Scalars['Boolean']['input']>;
   canEditDiscussions?: InputMaybe<Scalars['Boolean']['input']>;
   canEditEvents?: InputMaybe<Scalars['Boolean']['input']>;
@@ -39407,6 +40677,7 @@ export type ModServerRole = {
   __typename?: 'ModServerRole';
   canArchiveImage?: Maybe<Scalars['Boolean']['output']>;
   canCloseSupportTickets?: Maybe<Scalars['Boolean']['output']>;
+  canDeleteWiki?: Maybe<Scalars['Boolean']['output']>;
   canEditComments?: Maybe<Scalars['Boolean']['output']>;
   canEditDiscussions?: Maybe<Scalars['Boolean']['output']>;
   canEditEvents?: Maybe<Scalars['Boolean']['output']>;
@@ -39441,6 +40712,7 @@ export type ModServerRoleConnectWhere = {
 export type ModServerRoleCreateInput = {
   canArchiveImage?: InputMaybe<Scalars['Boolean']['input']>;
   canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canDeleteWiki?: InputMaybe<Scalars['Boolean']['input']>;
   canEditComments?: InputMaybe<Scalars['Boolean']['input']>;
   canEditDiscussions?: InputMaybe<Scalars['Boolean']['input']>;
   canEditEvents?: InputMaybe<Scalars['Boolean']['input']>;
@@ -39481,6 +40753,7 @@ export type ModServerRoleEventPayload = {
   __typename?: 'ModServerRoleEventPayload';
   canArchiveImage?: Maybe<Scalars['Boolean']['output']>;
   canCloseSupportTickets?: Maybe<Scalars['Boolean']['output']>;
+  canDeleteWiki?: Maybe<Scalars['Boolean']['output']>;
   canEditComments?: Maybe<Scalars['Boolean']['output']>;
   canEditDiscussions?: Maybe<Scalars['Boolean']['output']>;
   canEditEvents?: Maybe<Scalars['Boolean']['output']>;
@@ -39500,6 +40773,7 @@ export type ModServerRoleEventPayload = {
 export type ModServerRoleOnCreateInput = {
   canArchiveImage?: InputMaybe<Scalars['Boolean']['input']>;
   canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canDeleteWiki?: InputMaybe<Scalars['Boolean']['input']>;
   canEditComments?: InputMaybe<Scalars['Boolean']['input']>;
   canEditDiscussions?: InputMaybe<Scalars['Boolean']['input']>;
   canEditEvents?: InputMaybe<Scalars['Boolean']['input']>;
@@ -39527,6 +40801,7 @@ export type ModServerRoleOptions = {
 export type ModServerRoleSort = {
   canArchiveImage?: InputMaybe<SortDirection>;
   canCloseSupportTickets?: InputMaybe<SortDirection>;
+  canDeleteWiki?: InputMaybe<SortDirection>;
   canEditComments?: InputMaybe<SortDirection>;
   canEditDiscussions?: InputMaybe<SortDirection>;
   canEditEvents?: InputMaybe<SortDirection>;
@@ -39549,6 +40824,7 @@ export type ModServerRoleSubscriptionWhere = {
   OR?: InputMaybe<Array<ModServerRoleSubscriptionWhere>>;
   canArchiveImage?: InputMaybe<Scalars['Boolean']['input']>;
   canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canDeleteWiki?: InputMaybe<Scalars['Boolean']['input']>;
   canEditComments?: InputMaybe<Scalars['Boolean']['input']>;
   canEditDiscussions?: InputMaybe<Scalars['Boolean']['input']>;
   canEditEvents?: InputMaybe<Scalars['Boolean']['input']>;
@@ -39582,6 +40858,7 @@ export type ModServerRoleUniqueWhere = {
 export type ModServerRoleUpdateInput = {
   canArchiveImage?: InputMaybe<Scalars['Boolean']['input']>;
   canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canDeleteWiki?: InputMaybe<Scalars['Boolean']['input']>;
   canEditComments?: InputMaybe<Scalars['Boolean']['input']>;
   canEditDiscussions?: InputMaybe<Scalars['Boolean']['input']>;
   canEditEvents?: InputMaybe<Scalars['Boolean']['input']>;
@@ -39612,6 +40889,7 @@ export type ModServerRoleWhere = {
   OR?: InputMaybe<Array<ModServerRoleWhere>>;
   canArchiveImage?: InputMaybe<Scalars['Boolean']['input']>;
   canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canDeleteWiki?: InputMaybe<Scalars['Boolean']['input']>;
   canEditComments?: InputMaybe<Scalars['Boolean']['input']>;
   canEditDiscussions?: InputMaybe<Scalars['Boolean']['input']>;
   canEditEvents?: InputMaybe<Scalars['Boolean']['input']>;
@@ -43172,6 +44450,7 @@ export type Mutation = {
   createIssue?: Maybe<Issue>;
   createIssueInfos: CreateIssueInfosMutationResponse;
   createIssues: CreateIssuesMutationResponse;
+  createLabelChangeHistories: CreateLabelChangeHistoriesMutationResponse;
   createLicenses: CreateLicensesMutationResponse;
   createLinkFlairs: CreateLinkFlairsMutationResponse;
   createMessages: CreateMessagesMutationResponse;
@@ -43217,10 +44496,12 @@ export type Mutation = {
   deleteCommentAggregateResults: DeleteInfo;
   deleteCommentInfos: DeleteInfo;
   deleteCommentRepliesFormats: DeleteInfo;
+  deleteCommentRevision?: Maybe<TextVersion>;
   deleteCommentSectionFormats: DeleteInfo;
   deleteComments: DeleteInfo;
   deleteContacts: DeleteInfo;
   deleteDayData: DeleteInfo;
+  deleteDiscussionBodyRevision?: Maybe<TextVersion>;
   deleteDiscussionChannelInfos: DeleteInfo;
   deleteDiscussionChannelListFormats: DeleteInfo;
   deleteDiscussionChannelListItems: DeleteInfo;
@@ -43246,6 +44527,7 @@ export type Mutation = {
   deleteInstalledPlugins: DeleteInfo;
   deleteIssueInfos: DeleteInfo;
   deleteIssues: DeleteInfo;
+  deleteLabelChangeHistories: DeleteInfo;
   deleteLicenses: DeleteInfo;
   deleteLinkFlairs: DeleteInfo;
   deleteMessages: DeleteInfo;
@@ -43281,6 +44563,7 @@ export type Mutation = {
   deleteUserContributionData: DeleteInfo;
   deleteUsers: DeleteInfo;
   deleteWikiPages: DeleteInfo;
+  deleteWikiRevision?: Maybe<TextVersion>;
   dropDataForCypressTests?: Maybe<DropDataResponse>;
   enableServerPlugin: InstalledPlugin;
   initializeUserFavorites: Scalars['Boolean']['output'];
@@ -43356,6 +44639,7 @@ export type Mutation = {
   updateDiscussionInfos: UpdateDiscussionInfosMutationResponse;
   updateDiscussionWithChannelConnections?: Maybe<Discussion>;
   updateDiscussions: UpdateDiscussionsMutationResponse;
+  updateDownloadLabels?: Maybe<DiscussionChannel>;
   updateDownloadableFiles: UpdateDownloadableFilesMutationResponse;
   updateDropDataResponses: UpdateDropDataResponsesMutationResponse;
   updateEmails: UpdateEmailsMutationResponse;
@@ -43376,6 +44660,7 @@ export type Mutation = {
   updateInstalledPlugins: UpdateInstalledPluginsMutationResponse;
   updateIssueInfos: UpdateIssueInfosMutationResponse;
   updateIssues: UpdateIssuesMutationResponse;
+  updateLabelChangeHistories: UpdateLabelChangeHistoriesMutationResponse;
   updateLicenses: UpdateLicensesMutationResponse;
   updateLinkFlairs: UpdateLinkFlairsMutationResponse;
   updateMessages: UpdateMessagesMutationResponse;
@@ -43749,6 +45034,11 @@ export type MutationCreateIssuesArgs = {
 };
 
 
+export type MutationCreateLabelChangeHistoriesArgs = {
+  input: Array<LabelChangeHistoryCreateInput>;
+};
+
+
 export type MutationCreateLicensesArgs = {
   input: Array<LicenseCreateInput>;
 };
@@ -43979,6 +45269,11 @@ export type MutationDeleteCommentRepliesFormatsArgs = {
 };
 
 
+export type MutationDeleteCommentRevisionArgs = {
+  textVersionId: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteCommentSectionFormatsArgs = {
   where?: InputMaybe<CommentSectionFormatWhere>;
 };
@@ -43998,6 +45293,11 @@ export type MutationDeleteContactsArgs = {
 
 export type MutationDeleteDayDataArgs = {
   where?: InputMaybe<DayDataWhere>;
+};
+
+
+export type MutationDeleteDiscussionBodyRevisionArgs = {
+  textVersionId: Scalars['ID']['input'];
 };
 
 
@@ -44136,6 +45436,12 @@ export type MutationDeleteIssueInfosArgs = {
 export type MutationDeleteIssuesArgs = {
   delete?: InputMaybe<IssueDeleteInput>;
   where?: InputMaybe<IssueWhere>;
+};
+
+
+export type MutationDeleteLabelChangeHistoriesArgs = {
+  delete?: InputMaybe<LabelChangeHistoryDeleteInput>;
+  where?: InputMaybe<LabelChangeHistoryWhere>;
 };
 
 
@@ -44324,6 +45630,11 @@ export type MutationDeleteUsersArgs = {
 export type MutationDeleteWikiPagesArgs = {
   delete?: InputMaybe<WikiPageDeleteInput>;
   where?: InputMaybe<WikiPageWhere>;
+};
+
+
+export type MutationDeleteWikiRevisionArgs = {
+  textVersionId: Scalars['ID']['input'];
 };
 
 
@@ -44800,6 +46111,13 @@ export type MutationUpdateDiscussionsArgs = {
 };
 
 
+export type MutationUpdateDownloadLabelsArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  discussionId: Scalars['ID']['input'];
+  labelOptionIds: Array<Scalars['ID']['input']>;
+};
+
+
 export type MutationUpdateDownloadableFilesArgs = {
   update?: InputMaybe<DownloadableFileUpdateInput>;
   where?: InputMaybe<DownloadableFileWhere>;
@@ -44919,6 +46237,12 @@ export type MutationUpdateIssueInfosArgs = {
 export type MutationUpdateIssuesArgs = {
   update?: InputMaybe<IssueUpdateInput>;
   where?: InputMaybe<IssueWhere>;
+};
+
+
+export type MutationUpdateLabelChangeHistoriesArgs = {
+  update?: InputMaybe<LabelChangeHistoryUpdateInput>;
+  where?: InputMaybe<LabelChangeHistoryWhere>;
 };
 
 
@@ -48199,6 +49523,9 @@ export type Query = {
   issues: Array<Issue>;
   issuesAggregate: IssueAggregateSelection;
   issuesConnection: IssuesConnection;
+  labelChangeHistories: Array<LabelChangeHistory>;
+  labelChangeHistoriesAggregate: LabelChangeHistoryAggregateSelection;
+  labelChangeHistoriesConnection: LabelChangeHistoriesConnection;
   licenses: Array<License>;
   licensesAggregate: LicenseAggregateSelection;
   licensesConnection: LicensesConnection;
@@ -49162,6 +50489,25 @@ export type QueryIssuesConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<IssueSort>>>;
   where?: InputMaybe<IssueWhere>;
+};
+
+
+export type QueryLabelChangeHistoriesArgs = {
+  options?: InputMaybe<LabelChangeHistoryOptions>;
+  where?: InputMaybe<LabelChangeHistoryWhere>;
+};
+
+
+export type QueryLabelChangeHistoriesAggregateArgs = {
+  where?: InputMaybe<LabelChangeHistoryWhere>;
+};
+
+
+export type QueryLabelChangeHistoriesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<LabelChangeHistorySort>>>;
+  where?: InputMaybe<LabelChangeHistoryWhere>;
 };
 
 
@@ -55500,6 +56846,11 @@ export type Subscription = {
   issueRelationshipCreated: IssueRelationshipCreatedEvent;
   issueRelationshipDeleted: IssueRelationshipDeletedEvent;
   issueUpdated: IssueUpdatedEvent;
+  labelChangeHistoryCreated: LabelChangeHistoryCreatedEvent;
+  labelChangeHistoryDeleted: LabelChangeHistoryDeletedEvent;
+  labelChangeHistoryRelationshipCreated: LabelChangeHistoryRelationshipCreatedEvent;
+  labelChangeHistoryRelationshipDeleted: LabelChangeHistoryRelationshipDeletedEvent;
+  labelChangeHistoryUpdated: LabelChangeHistoryUpdatedEvent;
   licenseCreated: LicenseCreatedEvent;
   licenseDeleted: LicenseDeletedEvent;
   licenseUpdated: LicenseUpdatedEvent;
@@ -56351,6 +57702,31 @@ export type SubscriptionIssueRelationshipDeletedArgs = {
 
 export type SubscriptionIssueUpdatedArgs = {
   where?: InputMaybe<IssueSubscriptionWhere>;
+};
+
+
+export type SubscriptionLabelChangeHistoryCreatedArgs = {
+  where?: InputMaybe<LabelChangeHistorySubscriptionWhere>;
+};
+
+
+export type SubscriptionLabelChangeHistoryDeletedArgs = {
+  where?: InputMaybe<LabelChangeHistorySubscriptionWhere>;
+};
+
+
+export type SubscriptionLabelChangeHistoryRelationshipCreatedArgs = {
+  where?: InputMaybe<LabelChangeHistoryRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionLabelChangeHistoryRelationshipDeletedArgs = {
+  where?: InputMaybe<LabelChangeHistoryRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionLabelChangeHistoryUpdatedArgs = {
+  where?: InputMaybe<LabelChangeHistorySubscriptionWhere>;
 };
 
 
@@ -60393,6 +61769,12 @@ export type UpdateIssuesMutationResponse = {
   issues: Array<Issue>;
 };
 
+export type UpdateLabelChangeHistoriesMutationResponse = {
+  __typename?: 'UpdateLabelChangeHistoriesMutationResponse';
+  info: UpdateInfo;
+  labelChangeHistories: Array<LabelChangeHistory>;
+};
+
 export type UpdateLicensesMutationResponse = {
   __typename?: 'UpdateLicensesMutationResponse';
   info: UpdateInfo;
@@ -62375,6 +63757,21 @@ export type UserAuthoredWikiPagesNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  editReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  editReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   slug_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   slug_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   slug_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -66768,6 +68165,21 @@ export type UserOriginalWikiPagesNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  editReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  editReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   slug_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   slug_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   slug_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -69870,6 +71282,7 @@ export type UserWikiPageAuthoredWikiPagesNodeAggregateSelection = {
   body: StringAggregateSelection;
   channelUniqueName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
+  editReason: StringAggregateSelection;
   id: IdAggregateSelection;
   slug: StringAggregateSelection;
   title: StringAggregateSelection;
@@ -69887,6 +71300,7 @@ export type UserWikiPageOriginalWikiPagesNodeAggregateSelection = {
   body: StringAggregateSelection;
   channelUniqueName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
+  editReason: StringAggregateSelection;
   id: IdAggregateSelection;
   slug: StringAggregateSelection;
   title: StringAggregateSelection;
@@ -69925,6 +71339,7 @@ export type WikiPage = {
   body?: Maybe<Scalars['String']['output']>;
   channelUniqueName?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
+  editReason?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   slug: Scalars['String']['output'];
   title: Scalars['String']['output'];
@@ -70047,6 +71462,7 @@ export type WikiPageAggregateSelection = {
   channelUniqueName: StringAggregateSelection;
   count: Scalars['Int']['output'];
   createdAt: DateTimeAggregateSelection;
+  editReason: StringAggregateSelection;
   id: IdAggregateSelection;
   slug: StringAggregateSelection;
   title: StringAggregateSelection;
@@ -70158,6 +71574,21 @@ export type WikiPageChildPagesNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  editReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  editReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  editReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  editReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   slug_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   slug_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   slug_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -70257,6 +71688,7 @@ export type WikiPageCreateInput = {
   VersionAuthor?: InputMaybe<WikiPageVersionAuthorFieldInput>;
   body?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  editReason?: InputMaybe<Scalars['String']['input']>;
   slug: Scalars['String']['input'];
   title: Scalars['String']['input'];
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -70303,6 +71735,7 @@ export type WikiPageEventPayload = {
   body?: Maybe<Scalars['String']['output']>;
   channelUniqueName?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
+  editReason?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   slug: Scalars['String']['output'];
   title: Scalars['String']['output'];
@@ -70997,6 +72430,7 @@ export type WikiPageSort = {
   body?: InputMaybe<SortDirection>;
   channelUniqueName?: InputMaybe<SortDirection>;
   createdAt?: InputMaybe<SortDirection>;
+  editReason?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   slug?: InputMaybe<SortDirection>;
   title?: InputMaybe<SortDirection>;
@@ -71025,6 +72459,12 @@ export type WikiPageSubscriptionWhere = {
   createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  editReason?: InputMaybe<Scalars['String']['input']>;
+  editReason_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  editReason_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  editReason_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  editReason_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  editReason_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
@@ -71089,6 +72529,7 @@ export type WikiPageUpdateInput = {
   body?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  editReason?: InputMaybe<Scalars['String']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
 };
@@ -71582,6 +73023,12 @@ export type WikiPageWhere = {
   createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  editReason?: InputMaybe<Scalars['String']['input']>;
+  editReason_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  editReason_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  editReason_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  editReason_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  editReason_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
@@ -71618,6 +73065,7 @@ export type WikiPageWikiPageChildPagesNodeAggregateSelection = {
   body: StringAggregateSelection;
   channelUniqueName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
+  editReason: StringAggregateSelection;
   id: IdAggregateSelection;
   slug: StringAggregateSelection;
   title: StringAggregateSelection;
