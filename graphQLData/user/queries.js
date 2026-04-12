@@ -49,6 +49,9 @@ export const GET_USER = gql`
       AlbumsAggregate {
         count
       }
+      AuthoredWikiPageVersionsAggregate {
+        count
+      }
       AdminOfChannelsAggregate {
         count
       }
@@ -311,6 +314,34 @@ export const GET_USER_EVENTS = gql`
           Channel {
             uniqueName
           }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_USER_WIKI_EDITS = gql`
+  query getUserWikiEdits(
+    $where: WikiPageWhere
+    $versionWhere: TextVersionWhere
+  ) {
+    wikiPages(where: $where, options: { sort: [{ updatedAt: DESC }] }) {
+      id
+      title
+      slug
+      channelUniqueName
+      PastVersions(
+        where: $versionWhere
+        options: { sort: [{ createdAt: DESC }] }
+      ) {
+        id
+        body
+        editReason
+        createdAt
+        Author {
+          username
+          displayName
+          profilePicURL
         }
       }
     }
