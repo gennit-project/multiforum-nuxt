@@ -94,6 +94,23 @@ const publicCollections = computed(() => {
         >
           Comments ({{ aggregateCommentCount }})
         </nuxt-link>
+        <nuxt-link
+          :to="{
+            name: 'forums-forumId-downloads-discussionId-activity',
+            params: {
+              forumId: channelId,
+              discussionId: discussionId,
+            },
+          }"
+          class="border-b-2 px-1 py-2 text-sm font-medium"
+          :class="
+            typeof $route.name === 'string' && $route.name.includes('activity')
+              ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+              : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+          "
+        >
+          Activity
+        </nuxt-link>
       </nav>
     </div>
 

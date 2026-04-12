@@ -321,6 +321,20 @@ export const GET_DISCUSSION = gql`
             displayName
           }
         }
+        LabelChangeHistory(options: { sort: [{ createdAt: DESC }] }) {
+          id
+          createdAt
+          actionType
+          labelDisplayName
+          labelValue
+          ActorUser {
+            username
+            displayName
+          }
+          ActorMod {
+            displayName
+          }
+        }
       }
       Tags {
         text
