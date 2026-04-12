@@ -11,6 +11,11 @@ This section tracks the wiki/discussion/comment revision-history work from the c
 | Normalize shared revision diff rendering   | Done   | Added shared revision diff content and updated wiki, discussion, and comment revision modals to use it.                 |
 | Share revision pairing primitives          | Done   | Added shared revision history pairing helpers and applied them to comment/wiki edit dropdowns plus wiki revision pages. |
 | Consolidate wiki revision detail diff view | Done   | Replaced the standalone wiki revision detail `v-code-diff` implementation with the shared revision diff content.        |
+| Use danger-action revision redaction UI    | Done   | Comment, discussion, and wiki revision modals use a neutral primary action and expose redaction as an authorized danger action. |
+| Add wiki revision diff selector            | Done   | Wiki revision diff pages can switch compared revisions without returning to the revision history list.                  |
+| Add wiki edit reasons                      | Done   | Wiki create/edit forms write edit reasons and wiki revision queries/pages display `editReason`.                        |
+| Gate backend wiki edits for suspensions    | Done   | Backend wiki page create/update, child page creation, and wiki home page update flows use channel permission suspension checks. |
+| Gate frontend wiki edits for suspensions   | Done   | Wiki create/edit entry points and direct forms now surface `SuspensionNotice` and block suspended users before mutation submit. |
 
 ### Remaining Coding Changes
 
@@ -18,11 +23,6 @@ This section tracks the wiki/discussion/comment revision-history work from the c
 | ------------------------------------------------------------- | ------------------ | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Add backend permission gates for wiki page deletion           | Backend            | Feature         | Wiki page deletion should allow the original wiki page author or a moderator with an explicit delete permission. Revision redaction gates are already implemented.                                                          |
 | Add dedicated wiki delete permissions if schema supports them | Backend            | Feature         | Prefer explicit permissions such as `canDeleteWiki` / `canDeleteWikiRevision` over reusing `canEditDiscussions` for destructive wiki actions.                                                                               |
-| Fix revision modal action semantics                           | Frontend           | UX + Permission | Comment revision history should not have delete as the primary action. Move delete/redact to an authorized danger action and use a neutral primary action such as Close. Apply the same pattern to discussion and wiki UIs. |
-| Add revision selector dropdown on wiki diff page              | Frontend           | Feature         | The wiki revision diff page should let users switch compared revisions without returning to the history list. Reuse the shared revision pairing model.                                                                      |
-| Include and display wiki edit reasons                         | Backend + Frontend | Feature         | Add `editReason` to wiki revision queries and display it consistently with discussion/comment revision history.                                                                                                             |
-| Add edit summaries to wiki create/edit forms                  | Backend + Frontend | Feature         | Wire a wiki edit summary field to `TextVersion.editReason`. Keep product copy consistent with existing "Edit reason" language unless intentionally renamed.                                                                 |
-| Enforce suspended-user wiki edit blocking                     | Backend + Frontend | Feature         | Apply the same suspension rules used for discussions/comments to wiki create/edit/delete. Gate frontend wiki create/edit controls and forms with resolved permission state and `SuspensionNotice`.                          |
 | Add wiki report UI and moderation activity rendering          | Frontend           | Feature         | Backend issue target support and `reportWikiEdit` exist. Add the report UI and ensure wiki reports render alongside discussions/comments/events in moderation surfaces.                                                     |
 | Add wiki edits to user profiles                               | Backend + Frontend | Feature         | Add wiki edit counts to `GET_USER`, add a "Wiki Edits" profile tab, and add a `/u/[username]/wiki-edits` page modeled after comments.                                                                                       |
 | Add wiki edits to contribution charts                         | Backend + Frontend | Feature         | Extend `GET_USER_CONTRIBUTIONS`, backend contribution resolver logic, and `UserContributionChart` so wiki edits appear in contribution history.                                                                             |
@@ -59,13 +59,8 @@ This section tracks the wiki/discussion/comment revision-history work from the c
 | Show suspended bots in admin suspended-users page | `components/admin/ServerSuspendedUserList.vue`       | Added "🤖 Bot" badge when `suspension.SuspendedUser?.isBot` is true.                            |
 | Pass `isBot` through issue detail flow            | Multiple files                                       | Added `isBot` to `COMMENT_FIELDS`, `isAuthorBot` prop to `ModerationWizard`, computed in `IssueDetail`. |
 | Add bot indicator to issue list                   | `components/mod/ModIssueListItem.vue`                | Added `isRelatedToBot` computed checking username prefix `bot-`. Added Bot badge in template.   |
-
-#### Remaining Tasks
-
-| Task                                              | Location                        | Type    | Notes                                                                                    |
-| ------------------------------------------------- | ------------------------------- | ------- | ---------------------------------------------------------------------------------------- |
-| Surface bot suspension state in channel settings  | Channel bot settings components | Feature | Show "Suspended" badge if bot is suspended. Display link to related issue.               |
-| Surface bot suspension state in bot sidebar       | Bot sidebar entries             | Feature | Show "Suspended" indicator for suspended bots in channel sidebar.                        |
+| Surface bot suspension state in channel settings  | `components/plugins/BotProfilesEditor.vue`           | Added `SuspensionsAggregate` to queries, "Suspended" badge in bot preview section.              |
+| Surface bot suspension state in bot sidebar       | `components/channel/ChannelSidebar.vue`              | Added `SuspensionsAggregate` to `GET_CHANNEL` query, "Suspended" badge in bot list.             |
 
 #### Data Model Considerations
 
@@ -145,6 +140,117 @@ User (isBot: true)
 ## Verification Guide
 
 This section contains detailed step-by-step instructions for manually verifying moderation features. Each item includes prerequisites, test steps, and expected outcomes.
+
+### Wiki Revision Moderation Verification
+
+#### Verify Wiki Revision Redaction Uses a Danger Action
+
+**Prerequisites:**
+
+- A wiki page with at least two revisions
+- A user who is either the wiki page original author or a moderator/admin with revision redaction permission
+
+**Test Steps:**
+
+1. Navigate to the wiki page revision history
+2. Open a revision diff modal
+3. Check the modal footer actions
+4. Redact a revision with the authorized danger action
+5. Reload the revision history and open the same diff again
+
+**Expected Outcome:**
+
+- The primary action should be neutral, such as "Close"
+- Redaction should appear as a danger/destructive action only when authorized
+- The redacted revision remains in chronological revision history
+- The redacted body displays as `[deleted]`
+
+#### Verify Wiki Revision Diff Selector
+
+**Prerequisites:**
+
+- A wiki page with three or more revisions
+
+**Test Steps:**
+
+1. Navigate to `/forums/[forumId]/wiki/revisions/[slug]`
+2. Open a revision diff page
+3. Use the revision selector dropdown to choose a different revision
+4. Confirm the page updates to the selected comparison
+5. Navigate directly to the updated diff URL and refresh
+
+**Expected Outcome:**
+
+- The dropdown lists available revisions in a usable order
+- Selecting a revision updates the compared versions without returning to the revision list
+- The URL and rendered diff stay in sync after refresh
+
+#### Verify Wiki Edit Reasons
+
+**Prerequisites:**
+
+- Permission to create and edit wiki pages in a channel
+
+**Test Steps:**
+
+1. Create a wiki home page with an edit reason
+2. Edit the wiki home page with a different edit reason
+3. Create a child wiki page with an edit reason
+4. Edit the child wiki page with another edit reason
+5. Open each page's revision history and revision diff views
+
+**Expected Outcome:**
+
+- Wiki create/edit forms show an "Edit reason" field
+- Submitted edit reasons are saved on the corresponding revision data
+- Revision history and diff views display wiki edit reasons consistently with discussion/comment revisions
+
+#### Verify Backend Blocks Suspended Users from Wiki Edits
+
+**Prerequisites:**
+
+- A user suspended in a channel
+- A wiki-enabled channel with an existing home page
+- Access to the related issue used for the suspension
+
+**Test Steps:**
+
+1. Log in as the suspended user
+2. Attempt to create a wiki home page through GraphQL or the UI if the page is available
+3. Attempt to edit an existing wiki home page
+4. Attempt to create a child wiki page
+5. Attempt to edit an existing child wiki page
+
+**Expected Outcome:**
+
+- Backend mutations for wiki create/update should be rejected for the suspended user
+- The same channel suspension notification behavior used by discussions/comments should apply
+- The related suspension issue should be linked in any generated blocked-action notification
+- Non-wiki `updateChannels` mutations should preserve their existing behavior
+
+#### Verify Frontend Blocks Suspended Users from Wiki Edit UI
+
+**Prerequisites:**
+
+- A user suspended in a wiki-enabled channel
+- A wiki home page and at least one child wiki page
+
+**Test Steps:**
+
+1. Log in as the suspended user
+2. Navigate to `/forums/[forumId]/wiki`
+3. Check the "Add Page", "Edit Wiki", and bottom "Edit this page" actions
+4. Navigate directly to `/forums/[forumId]/wiki/create`
+5. Navigate directly to `/forums/[forumId]/wiki/create-child`
+6. Navigate directly to `/forums/[forumId]/wiki/edit/home`
+7. Navigate directly to `/forums/[forumId]/wiki/edit/[childSlug]`
+
+**Expected Outcome:**
+
+- Wiki create/edit entry point buttons should be disabled for the suspended user
+- A `SuspensionNotice` should explain that the user cannot edit wiki pages in the forum
+- Direct create/edit pages should show the same notice and hide the form
+- Unsuspended authenticated users should still see working wiki create/edit controls
 
 ### User Suspension Verification
 
@@ -1115,6 +1221,52 @@ These steps verify the bot suspension workflow implemented for bots (User record
 - No suspension block messages in server logs
 - Bot appears active in all relevant UI surfaces
 
+#### Verify Bot Suspension Badge in Channel Sidebar
+
+**Prerequisites:**
+
+- A channel with a bot enabled
+- The bot has been suspended via the suspension workflow
+
+**Test Steps:**
+
+1. Navigate to any page within the channel (e.g., discussions list)
+2. Look at the channel sidebar on the right
+3. Find the "Bots" section
+4. Look for the suspended bot in the list
+
+**Expected Outcome:**
+
+- The suspended bot should display a red "Suspended" badge
+- The badge should appear instead of the normal "(active)" indicator
+- Non-suspended bots should show as "(active)" or "Inactive" (if deprecated)
+- Suspended badge styling: red background with white text
+
+#### Verify Bot Suspension Badge in Channel Settings
+
+**Prerequisites:**
+
+- A channel with a bot plugin enabled
+- At least one bot profile that has been suspended
+- Channel admin access to view plugin settings
+
+**Test Steps:**
+
+1. Log in as a channel admin
+2. Navigate to `/forums/[forumId]/edit/plugins/[pluginId]` (e.g., beta-reader-bot)
+3. Look at the "Bot Users Preview" section
+4. Find the suspended bot in the "Existing Bots" list
+
+**Expected Outcome:**
+
+- Suspended bots should display:
+  - Red ban icon (instead of green checkmark)
+  - Red "Suspended" badge
+- Non-suspended bots should display:
+  - Green checkmark icon
+  - "(active)" label
+- Deprecated bots that are also suspended should show both "Suspended" and "(will be deprecated)" labels
+
 #### Automated Verification
 
 Run these from `/Users/catherineluse/gennit/gennit-backend`:
@@ -1441,6 +1593,8 @@ These items should eventually have automated E2E coverage but can be manually ve
 | Suspended bot cannot report                      | High     | Bot Suspension: Suspended Bot Cannot Report      |
 | Bot badge in suspended users list                | Medium   | Bot Suspension: Badge in Suspended Users List    |
 | Unsuspending bot re-enables actions              | High     | Bot Suspension: Unsuspending Re-Enables Actions  |
+| Bot suspension badge in channel sidebar          | Medium   | Bot Suspension: Badge in Channel Sidebar         |
+| Bot suspension badge in channel settings         | Medium   | Bot Suspension: Badge in Channel Settings        |
 
 ---
 
