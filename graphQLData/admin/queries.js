@@ -229,6 +229,7 @@ export const GET_SERVER_SUSPENDED_USERS = gql`
           commentKarma
           discussionKarma
           createdAt
+          isBot
         }
         RelatedIssue {
           id

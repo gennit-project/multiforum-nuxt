@@ -88,6 +88,12 @@ const humanReadableDate = (dateISO?: string | null): string => {
                 :discussion-karma="suspension.SuspendedUser?.discussionKarma ?? 0"
                 :account-created="suspension.SuspendedUser?.createdAt ?? ''"
               />
+              <span
+                v-if="suspension.SuspendedUser?.isBot"
+                class="ml-2 rounded-full bg-blue-200 px-2 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-900/70 dark:text-blue-100"
+              >
+                🤖 Bot
+              </span>
             </nuxt-link>
             <nuxt-link
               v-if="suspension.RelatedIssue"

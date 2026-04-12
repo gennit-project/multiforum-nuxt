@@ -92,6 +92,11 @@ const props = defineProps({
     required: false,
     default: null,
   },
+  isAuthorBot: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
 defineEmits([
@@ -401,6 +406,7 @@ const editButtonDisabled = computed(() => {
                         :event-id="eventId"
                         :channel-unique-name="channelUniqueName"
                         :disabled="actionsDisabled"
+                        :is-bot="isAuthorBot"
                         @suspended-successfully="
                           $emit('suspended-user-successfully')
                         "
@@ -544,6 +550,7 @@ const editButtonDisabled = computed(() => {
                             :event-id="eventId"
                             :channel-unique-name="channelUniqueName"
                             :disabled="actionsDisabled"
+                            :is-bot="isAuthorBot"
                             @suspended-successfully="
                               $emit('suspended-user-successfully')
                             "

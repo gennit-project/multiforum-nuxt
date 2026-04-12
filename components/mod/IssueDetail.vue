@@ -464,6 +464,15 @@ const derivedOriginalPoster = computed(() => {
   return { username: '', modProfileName: '' };
 });
 
+// Check if the original author is a bot
+const isAuthorBot = computed(() => {
+  const commentAuthor = relatedComment.value?.CommentAuthor;
+  if (commentAuthor && commentAuthor.__typename === 'User') {
+    return (commentAuthor as any).isBot === true;
+  }
+  return false;
+});
+
 const resolvedOriginalAuthorUsername = computed(() => {
   return derivedOriginalPoster.value.username || '';
 });
@@ -916,6 +925,7 @@ const handleLockReasonUpdate = (value: string) => {
             :can-edit-discussions="modPermissions.canEditDiscussions"
             :can-edit-events="modPermissions.canEditEvents"
             :report-count="reportCount ?? undefined"
+            :is-author-bot="isAuthorBot"
             @archived-successfully="resetActivityFeed"
             @unarchived-successfully="resetActivityFeed"
             @suspended-user-successfully="resetActivityFeed"
