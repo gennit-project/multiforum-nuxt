@@ -15,6 +15,7 @@ import {
 import WikiRevisionDiffModal from './WikiRevisionDiffModal.vue';
 
 type WikiRevisionData = RevisionPair<TextVersion>;
+type WikiPageWithEditReason = WikiPage & { editReason?: string | null };
 
 const props = defineProps({
   wikiPage: {
@@ -48,6 +49,7 @@ const allEdits = computed(() => {
   const currentVersion: TextVersion = {
     id: 'current',
     body: props.wikiPage.body,
+    editReason: (props.wikiPage as WikiPageWithEditReason).editReason,
     createdAt: props.wikiPage.updatedAt || props.wikiPage.createdAt,
     Author: props.wikiPage.VersionAuthor,
     AuthorConnection: {

@@ -48,6 +48,7 @@ export const UPDATE_CHANNEL = gql`
           id
           title
           body
+          editReason
           slug
           createdAt
           updatedAt
@@ -81,6 +82,7 @@ export const CREATE_WIKI_PAGE = gql`
           id
           title
           body
+          editReason
           slug
           createdAt
           updatedAt
@@ -112,6 +114,7 @@ export const UPDATE_WIKI_PAGE = gql`
         id
         title
         body
+        editReason
         slug
         channelUniqueName
         createdAt
@@ -145,6 +148,7 @@ export const CREATE_CHILD_WIKI_PAGE = gql`
           id
           title
           body
+          editReason
           slug
           createdAt
           updatedAt

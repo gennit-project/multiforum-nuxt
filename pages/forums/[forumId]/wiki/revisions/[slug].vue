@@ -13,6 +13,7 @@ import {
 } from '@/utils/revisionHistory';
 
 type WikiRevisionData = RevisionPair<TextVersion>;
+type WikiPageWithEditReason = WikiPage & { editReason?: string | null };
 
 const route = useRoute();
 const router = useRouter();
@@ -55,6 +56,7 @@ const allEdits = computed(() => {
   const currentVersion: TextVersion = {
     id: 'current',
     body: wikiPage.value.body,
+    editReason: (wikiPage.value as WikiPageWithEditReason).editReason,
     createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
     Author: wikiPage.value.VersionAuthor,
     AuthorConnection: {
