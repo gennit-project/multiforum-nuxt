@@ -12,6 +12,7 @@ import {
   REPORT_EVENT,
   REPORT_COMMENT,
   REPORT_IMAGE,
+  REPORT_WIKI_EDIT,
   ARCHIVE_DISCUSSION,
   ARCHIVE_EVENT,
   ARCHIVE_COMMENT,
@@ -62,6 +63,16 @@ const props = defineProps({
     default: '',
   },
   imageId: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  wikiPageId: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  wikiRevisionId: {
     type: String,
     required: false,
     default: '',
@@ -197,6 +208,13 @@ const {
 } = useMutation(REPORT_IMAGE);
 
 const {
+  mutate: reportWikiEdit,
+  loading: reportWikiEditLoading,
+  error: reportWikiEditError,
+  onDone: reportWikiEditDone,
+} = useMutation(REPORT_WIKI_EDIT);
+
+const {
   mutate: archiveDiscussion,
   loading: archiveDiscussionLoading,
   error: archiveDiscussionError,
@@ -308,6 +326,11 @@ reportImageDone(() => {
   emit('reportSubmittedSuccessfully');
 });
 
+reportWikiEditDone(() => {
+  reportText.value = '';
+  emit('reportSubmittedSuccessfully');
+});
+
 archiveDiscussionDone(() => {
   client.refetchQueries({
     include: [GET_ISSUE],
@@ -363,6 +386,8 @@ const modalTitle = computed(() => {
       return 'Report Event';
     } else if (props.imageId) {
       return 'Report Image';
+    } else if (props.wikiPageId) {
+      return 'Report Wiki Edit';
     }
   }
   return 'Report Content';
@@ -377,6 +402,8 @@ const contentType = computed(() => {
     return 'event';
   } else if (props.imageId) {
     return 'image';
+  } else if (props.wikiPageId) {
+    return 'wiki edit';
   }
   return '';
 });
@@ -393,6 +420,8 @@ const modalPlaceholder = computed(() => {
     type = 'event';
   } else if (props.imageId) {
     type = 'image';
+  } else if (props.wikiPageId) {
+    type = 'wiki edit';
   }
   return `Explain why this ${type} should be removed`;
 });
@@ -432,8 +461,14 @@ ${reportText}
 `;
 };
 const submit = async () => {
-  if (!props.discussionId && !props.eventId && !props.commentId && !props.imageId) {
-    console.error('No discussion, event, comment, or image ID provided.');
+  if (
+    !props.discussionId &&
+    !props.eventId &&
+    !props.commentId &&
+    !props.imageId &&
+    !props.wikiPageId
+  ) {
+    console.error('No discussion, event, comment, image, or wiki page ID provided.');
     return;
   }
 
@@ -553,6 +588,15 @@ const submit = async () => {
         selectedServerRules: selectedServerRules.value,
         channelUniqueName: channelId.value || null,
       });
+    } else if (props.wikiPageId) {
+      reportWikiEdit({
+        wikiPageId: props.wikiPageId,
+        wikiRevisionId: props.wikiRevisionId || null,
+        reportText: reportText.value,
+        selectedForumRules: selectedForumRules.value,
+        selectedServerRules: selectedServerRules.value,
+        channelUniqueName: channelId.value,
+      });
     }
   } else {
     // "archive" flow (also includes a report)
@@ -614,6 +658,7 @@ const close = () => {
       reportEventLoading ||
       reportCommentLoading ||
       reportImageLoading ||
+      reportWikiEditLoading ||
       archiveDiscussionLoading ||
       archiveEventLoading ||
       archiveCommentLoading ||
@@ -628,6 +673,7 @@ const close = () => {
       reportEventError?.message ||
       reportCommentError?.message ||
       reportImageError?.message ||
+      reportWikiEditError?.message ||
       archiveDiscussionError?.message ||
       archiveEventError?.message ||
       archiveCommentError?.message ||

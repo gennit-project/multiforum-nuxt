@@ -431,7 +431,9 @@ const hasRelatedContent = computed(() => {
   return (
     !!activeIssue.value?.relatedDiscussionId ||
     !!activeIssue.value?.relatedEventId ||
-    !!activeIssue.value?.relatedCommentId
+    !!activeIssue.value?.relatedCommentId ||
+    !!activeIssue.value?.relatedWikiPageId ||
+    !!activeIssue.value?.relatedWikiRevisionId
   );
 });
 
