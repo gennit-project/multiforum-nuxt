@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import GenericModal from '@/components/GenericModal.vue';
 import RevisionDiffContent from '@/components/revision/RevisionDiffContent.vue';
 import { useMutation } from '@vue/apollo-composable';
-import { DELETE_TEXT_VERSION } from '@/graphQLData/discussion/mutations';
+import { DELETE_WIKI_REVISION } from '@/graphQLData/discussion/mutations';
 
 const props = defineProps({
   open: {
@@ -33,14 +33,7 @@ const {
   loading,
   error,
   onDone,
-} = useMutation(DELETE_TEXT_VERSION, {
-  update: (cache, { data }) => {
-    if (data?.deleteTextVersions?.nodesDeleted) {
-      cache.evict({ id: `TextVersion:${props.oldVersion.id}` });
-      cache.gc();
-    }
-  },
-});
+} = useMutation(DELETE_WIKI_REVISION);
 
 onDone(() => {
   isDeleting.value = false;
@@ -57,7 +50,7 @@ const handleDelete = async () => {
     isDeleting.value = true;
     try {
       await deleteTextVersion({
-        id: props.oldVersion.id,
+        textVersionId: props.oldVersion.id,
       });
     } catch (err) {
       console.error('Error deleting revision:', err);

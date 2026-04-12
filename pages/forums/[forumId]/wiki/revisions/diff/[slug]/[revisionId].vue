@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import { useRoute, useRouter, useHead } from 'nuxt/app';
 import { GET_WIKI_PAGE } from '@/graphQLData/channel/queries';
 import { useQuery, useMutation } from '@vue/apollo-composable';
-import { DELETE_TEXT_VERSION } from '@/graphQLData/discussion/mutations';
+import { DELETE_WIKI_REVISION } from '@/graphQLData/discussion/mutations';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import RevisionDiffContent from '@/components/revision/RevisionDiffContent.vue';
@@ -78,17 +78,7 @@ const {
   loading: deleteLoading,
   error: deleteError,
   onDone,
-} = useMutation(DELETE_TEXT_VERSION, {
-  update: (cache, { data }) => {
-    if (data?.deleteTextVersions?.nodesDeleted) {
-      // Clear cache for this revision
-      cache.evict({
-        id: `TextVersion:${currentRevision.value?.oldVersionData?.id}`,
-      });
-      cache.gc();
-    }
-  },
-});
+} = useMutation(DELETE_WIKI_REVISION);
 
 onDone(() => {
   isDeleting.value = false;
@@ -107,7 +97,7 @@ const handleDelete = async () => {
     isDeleting.value = true;
     try {
       await deleteTextVersion({
-        id: currentRevision.value.oldVersionData.id,
+        textVersionId: currentRevision.value.oldVersionData.id,
       });
     } catch (err) {
       console.error('Error deleting revision:', err);

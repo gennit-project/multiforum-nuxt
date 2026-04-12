@@ -463,10 +463,32 @@ export const UPDATE_IMAGE = gql`
   }
 `;
 
-export const DELETE_TEXT_VERSION = gql`
-  mutation deleteTextVersion($id: ID!) {
-    deleteTextVersions(where: { id: $id }) {
-      nodesDeleted
+export const DELETE_DISCUSSION_BODY_REVISION = gql`
+  mutation deleteDiscussionBodyRevision($textVersionId: ID!) {
+    deleteDiscussionBodyRevision(textVersionId: $textVersionId) {
+      id
+      body
+      editReason
+      createdAt
+      updatedAt
+      Author {
+        username
+      }
+    }
+  }
+`;
+
+export const DELETE_WIKI_REVISION = gql`
+  mutation deleteWikiRevision($textVersionId: ID!) {
+    deleteWikiRevision(textVersionId: $textVersionId) {
+      id
+      body
+      editReason
+      createdAt
+      updatedAt
+      Author {
+        username
+      }
     }
   }
 `;
