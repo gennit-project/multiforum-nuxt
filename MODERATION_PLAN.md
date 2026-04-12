@@ -14,20 +14,18 @@ This section tracks the wiki/discussion/comment revision-history work from the c
 
 ### Remaining Coding Changes
 
-| Task                                                          | Location           | Type            | Notes                                                                                                                                                                                                                                                            |
-| ------------------------------------------------------------- | ------------------ | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Change revision deletion from hard delete to redaction        | Backend + Frontend | Feature         | Replace direct `deleteTextVersions` usage with purpose-specific mutations such as `deleteDiscussionBodyRevision`, `deleteCommentRevision`, and `deleteWikiRevision`. Mutations should preserve `TextVersion` chronology and replace body/title with `[deleted]`. |
-| Add backend permission gates for revision/page deletion       | Backend            | Feature         | Discussion body revision deletion should allow OP or a moderator with the relevant permission. Wiki page/revision deletion should allow original wiki page author or a moderator with explicit delete permission.                                                |
-| Add original wiki page author modeling if missing             | Backend            | Feature         | `WikiPage.VersionAuthor` appears to represent the last editor, not necessarily the original author. Add a stable original-author relationship if the backend does not already have one.                                                                          |
-| Add dedicated wiki delete permissions if schema supports them | Backend            | Feature         | Prefer explicit permissions such as `canDeleteWiki` / `canDeleteWikiRevision` over reusing `canEditWiki` for destructive actions.                                                                                                                                |
-| Fix revision modal action semantics                           | Frontend           | UX + Permission | Comment revision history should not have delete as the primary action. Move delete/redact to an authorized danger action and use a neutral primary action such as Close. Apply the same pattern to discussion and wiki revision UIs.                             |
-| Add revision selector dropdown on wiki diff page              | Frontend           | Feature         | The wiki revision diff page should let users switch compared revisions without returning to the history list. Reuse the shared revision pairing model.                                                                                                           |
-| Include and display wiki edit reasons                         | Backend + Frontend | Feature         | Add `editReason` to wiki revision queries and display it consistently with discussion/comment revision history.                                                                                                                                                  |
-| Add edit summaries to wiki create/edit forms                  | Backend + Frontend | Feature         | Wire a wiki edit summary field to `TextVersion.editReason`. Keep product copy consistent with existing "Edit reason" language unless intentionally renamed.                                                                                                      |
-| Enforce suspended-user wiki edit blocking                     | Backend + Frontend | Feature         | Apply the same suspension rules used for discussions/comments to wiki create/edit/delete. Gate frontend wiki create/edit controls and forms with resolved permission state and `SuspensionNotice`.                                                               |
-| Add report wiki edit workflow                                 | Backend + Frontend | Feature         | Extend issue targets to wiki page and/or wiki revision `TextVersion`. Add `reportWikiEdit` and related moderation activity rendering so wiki reports participate in existing report -> issue -> suspend flows.                                                   |
-| Add wiki edits to user profiles                               | Backend + Frontend | Feature         | Add wiki edit counts to `GET_USER`, add a "Wiki Edits" profile tab, and add a `/u/[username]/wiki-edits` page modeled after comments.                                                                                                                            |
-| Add wiki edits to contribution charts                         | Backend + Frontend | Feature         | Extend `GET_USER_CONTRIBUTIONS`, backend contribution resolver logic, and `UserContributionChart` so wiki edits appear in contribution history.                                                                                                                  |
+| Task                                                          | Location           | Type            | Notes                                                                                                                                                                                                                       |
+| ------------------------------------------------------------- | ------------------ | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Add backend permission gates for wiki page deletion           | Backend            | Feature         | Wiki page deletion should allow the original wiki page author or a moderator with an explicit delete permission. Revision redaction gates are already implemented.                                                          |
+| Add dedicated wiki delete permissions if schema supports them | Backend            | Feature         | Prefer explicit permissions such as `canDeleteWiki` / `canDeleteWikiRevision` over reusing `canEditDiscussions` for destructive wiki actions.                                                                               |
+| Fix revision modal action semantics                           | Frontend           | UX + Permission | Comment revision history should not have delete as the primary action. Move delete/redact to an authorized danger action and use a neutral primary action such as Close. Apply the same pattern to discussion and wiki UIs. |
+| Add revision selector dropdown on wiki diff page              | Frontend           | Feature         | The wiki revision diff page should let users switch compared revisions without returning to the history list. Reuse the shared revision pairing model.                                                                      |
+| Include and display wiki edit reasons                         | Backend + Frontend | Feature         | Add `editReason` to wiki revision queries and display it consistently with discussion/comment revision history.                                                                                                             |
+| Add edit summaries to wiki create/edit forms                  | Backend + Frontend | Feature         | Wire a wiki edit summary field to `TextVersion.editReason`. Keep product copy consistent with existing "Edit reason" language unless intentionally renamed.                                                                 |
+| Enforce suspended-user wiki edit blocking                     | Backend + Frontend | Feature         | Apply the same suspension rules used for discussions/comments to wiki create/edit/delete. Gate frontend wiki create/edit controls and forms with resolved permission state and `SuspensionNotice`.                          |
+| Add wiki report UI and moderation activity rendering          | Frontend           | Feature         | Backend issue target support and `reportWikiEdit` exist. Add the report UI and ensure wiki reports render alongside discussions/comments/events in moderation surfaces.                                                     |
+| Add wiki edits to user profiles                               | Backend + Frontend | Feature         | Add wiki edit counts to `GET_USER`, add a "Wiki Edits" profile tab, and add a `/u/[username]/wiki-edits` page modeled after comments.                                                                                       |
+| Add wiki edits to contribution charts                         | Backend + Frontend | Feature         | Extend `GET_USER_CONTRIBUTIONS`, backend contribution resolver logic, and `UserContributionChart` so wiki edits appear in contribution history.                                                                             |
 
 ---
 
@@ -38,6 +36,7 @@ This section tracks the wiki/discussion/comment revision-history work from the c
 **Current State:** ✅ Core implementation complete
 
 The core image moderation workflow is implemented:
+
 - Report, archive, unarchive, and permanently remove mutations
 - Permission gates (`canArchiveImage`, `canPermanentlyRemoveImage`)
 - Image display in moderation queue (`ImageDetails.vue`)
@@ -45,6 +44,7 @@ The core image moderation workflow is implemented:
 - Display gating (archived/removed images filtered from queries)
 
 **Remaining optional enhancements:**
+
 - Profile picture reporting (`reportProfilePicture` mutation)
 - Channel icon/banner reporting (`reportChannelImage` mutation)
 - Dedicated `/admin/image-reports` page (currently images appear in main issue list)
@@ -54,6 +54,7 @@ The core image moderation workflow is implemented:
 **Current State:** ✅ Complete
 
 **Completed:**
+
 - Both OP and channel mods (with `canEditDiscussions` permission) can change labels on downloads
 - When a mod changes labels on someone else's download, a ModerationAction is created
 - The mod action appears in the mod's profile activity feed (no issue required)
@@ -92,24 +93,24 @@ For automated moderation bots that primarily act through their `ModerationProfil
 
 #### Backend Tasks
 
-| Task                                                    | Location                                                       | Type    | Notes                                                                                                                                                                  |
-| ------------------------------------------------------- | -------------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Extend `resolveIssueTarget` for bot targets             | `customResolvers/mutations/shared/resolveIssueTarget.ts`       | Feature | Add logic to detect when target user has `isBot: true`. Return a `targetType` indicator distinguishing `"user"`, `"mod"`, and `"bot"`.                                |
-| Verify `suspendUser` works for bot users                | `customResolvers/mutations/suspendUser.ts`                     | Feature | Bots are Users, so `suspendUser` should work. Ensure permission checks allow suspending bot users. No new mutation needed.                                            |
-| Update permission checks for bot suspension state       | `rules/permission/hasChannelPermission.ts`, `hasServerPermission.ts` | Feature | Add check for bot suspension state in `getActiveSuspension()`. Bots should be blocked from acting when their User or ModerationProfile is suspended.                  |
-| Extend `isOriginalPosterSuspended` for bot issues       | `customResolvers/queries/isOriginalPosterSuspended.ts`         | Feature | When an issue targets a bot (`relatedUser.isBot === true`), return suspension state correctly.                                                                         |
-| Block bot actions when suspended                        | `plugins/channelBotsMiddleware.ts` and bot invocation paths    | Feature | Before a bot executes any action, check if the bot's User or ModerationProfile is suspended. If suspended, silently skip execution.                                   |
+| Task                                              | Location                                                             | Type    | Notes                                                                                                                                                |
+| ------------------------------------------------- | -------------------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Extend `resolveIssueTarget` for bot targets       | `customResolvers/mutations/shared/resolveIssueTarget.ts`             | Feature | Add logic to detect when target user has `isBot: true`. Return a `targetType` indicator distinguishing `"user"`, `"mod"`, and `"bot"`.               |
+| Verify `suspendUser` works for bot users          | `customResolvers/mutations/suspendUser.ts`                           | Feature | Bots are Users, so `suspendUser` should work. Ensure permission checks allow suspending bot users. No new mutation needed.                           |
+| Update permission checks for bot suspension state | `rules/permission/hasChannelPermission.ts`, `hasServerPermission.ts` | Feature | Add check for bot suspension state in `getActiveSuspension()`. Bots should be blocked from acting when their User or ModerationProfile is suspended. |
+| Extend `isOriginalPosterSuspended` for bot issues | `customResolvers/queries/isOriginalPosterSuspended.ts`               | Feature | When an issue targets a bot (`relatedUser.isBot === true`), return suspension state correctly.                                                       |
+| Block bot actions when suspended                  | `plugins/channelBotsMiddleware.ts` and bot invocation paths          | Feature | Before a bot executes any action, check if the bot's User or ModerationProfile is suspended. If suspended, silently skip execution.                  |
 
 #### Frontend Tasks
 
-| Task                                              | Location                                                              | Type    | Notes                                                                                                                                                    |
-| ------------------------------------------------- | --------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Extend `SuspendUserButton` for bot targets        | `components/mod/SuspendUserButton.vue`                                | Feature | When issue's `relatedUser` has `isBot: true`, show "Suspend Bot" instead of "Suspend Author". Reuse existing `BrokenRulesModal` and suspension workflow. |
-| Surface bot suspension state in channel settings  | Channel bot settings components                                       | Feature | Show "Suspended" badge if bot is suspended. Display link to related issue.                                                                               |
-| Surface bot suspension state in bot sidebar       | Bot sidebar entries                                                   | Feature | Show "Suspended" indicator for suspended bots.                                                                                                           |
-| Show bot suspension in issue detail page          | Issue detail components                                               | Feature | Query suspension state using `IS_ORIGINAL_POSTER_SUSPENDED`. Display suspension badges consistent with user/mod UI.                                      |
-| Add bot indicator to issue list                   | `IssueListItem.vue` or equivalent                                     | Feature | When issue targets a bot (content authored by a bot), show "Bot" indicator. Enable same moderation actions as human-authored content.                    |
-| Show suspended bots in admin suspended-users page | `/pages/admin/suspended-users/index.vue`                              | Feature | Display bots in existing suspended-users page with a "Bot" badge. Bots are users, so grouping them together makes sense.                                 |
+| Task                                              | Location                                 | Type    | Notes                                                                                                                                                    |
+| ------------------------------------------------- | ---------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Extend `SuspendUserButton` for bot targets        | `components/mod/SuspendUserButton.vue`   | Feature | When issue's `relatedUser` has `isBot: true`, show "Suspend Bot" instead of "Suspend Author". Reuse existing `BrokenRulesModal` and suspension workflow. |
+| Surface bot suspension state in channel settings  | Channel bot settings components          | Feature | Show "Suspended" badge if bot is suspended. Display link to related issue.                                                                               |
+| Surface bot suspension state in bot sidebar       | Bot sidebar entries                      | Feature | Show "Suspended" indicator for suspended bots.                                                                                                           |
+| Show bot suspension in issue detail page          | Issue detail components                  | Feature | Query suspension state using `IS_ORIGINAL_POSTER_SUSPENDED`. Display suspension badges consistent with user/mod UI.                                      |
+| Add bot indicator to issue list                   | `IssueListItem.vue` or equivalent        | Feature | When issue targets a bot (content authored by a bot), show "Bot" indicator. Enable same moderation actions as human-authored content.                    |
+| Show suspended bots in admin suspended-users page | `/pages/admin/suspended-users/index.vue` | Feature | Display bots in existing suspended-users page with a "Bot" badge. Bots are users, so grouping them together makes sense.                                 |
 
 #### Data Model Considerations
 
@@ -138,13 +139,13 @@ User (isBot: true)
 
 #### Testing Considerations
 
-| Test Case                      | Expected Outcome                                                          |
-| ------------------------------ | ------------------------------------------------------------------------- |
-| Report a bot's comment         | Issue is created with `relatedUser.isBot === true`                        |
-| Suspend the bot                | `Suspension` node is created, linked to issue                             |
-| Bot attempts to act            | Action is blocked with suspension check                                   |
-| Unsuspend the bot              | Bot can act again                                                         |
-| Suspension expiration          | Expired bot suspensions are cleaned up like human suspensions             |
+| Test Case              | Expected Outcome                                              |
+| ---------------------- | ------------------------------------------------------------- |
+| Report a bot's comment | Issue is created with `relatedUser.isBot === true`            |
+| Suspend the bot        | `Suspension` node is created, linked to issue                 |
+| Bot attempts to act    | Action is blocked with suspension check                       |
+| Unsuspend the bot      | Bot can act again                                             |
+| Suspension expiration  | Expired bot suspensions are cleaned up like human suspensions |
 
 ### Auto-Moderation Bot Plugin
 
@@ -927,6 +928,34 @@ These items should be verified through existing or new unit tests rather than ma
 - Correctly resolves targets from event-backed issues
 - Correctly resolves targets from comment-backed issues
 - Handles server-scoped issues (no channel)
+
+#### Verify Revision Redaction Preserves History
+
+**Location:** Backend resolver tests and manual GraphQL checks
+
+**What to verify:**
+
+- `deleteCommentRevision`, `deleteDiscussionBodyRevision`, and `deleteWikiRevision` update the `TextVersion.body` to `[deleted]`
+- Redaction does not delete the `TextVersion` node
+- Redaction preserves `id`, `createdAt`, `updatedAt`, `editReason`, and `Author` data needed by revision history views
+- Re-redacting an already-redacted revision is a no-op and still returns the revision
+- Direct generated `deleteTextVersions` is denied by GraphQL Shield permissions
+
+#### Verify Revision Redaction Permission Gates
+
+**Location:** Backend resolver tests and manual GraphQL checks
+
+**What to verify:**
+
+- A comment author can redact their own comment revision
+- A discussion OP can redact their own discussion body revision
+- A wiki page original author can redact a wiki revision
+- A moderator with `canEditComments` can redact comment revisions in the relevant channel
+- A moderator with `canEditDiscussions` can redact discussion body revisions in the relevant channel
+- A moderator with `canEditDiscussions` can redact wiki revisions until a dedicated wiki delete permission exists
+- A server admin can redact any supported revision type
+- Non-authors without the relevant mod permission are rejected
+- Calling a mismatched mutation, such as `deleteCommentRevision` with a wiki revision id, is rejected
 
 ---
 
