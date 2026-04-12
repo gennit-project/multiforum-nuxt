@@ -52,6 +52,7 @@ const user = computed(() => {
       DiscussionsAggregate: { count: 0 },
       DownloadsAggregate: { count: 0 },
       EventsAggregate: { count: 0 },
+      AuthoredWikiPageVersionsAggregate: { count: 0 },
       ImagesAggregate: { count: 0 },
       AlbumsAggregate: { count: 0 },
       AdminOfChannelsAggregate: { count: 0 },
@@ -75,7 +76,15 @@ const isImageDetailPage = computed(() => {
   return path.includes('/images/') && path.split('/').length > 4; // /u/username/images/imageId
 });
 
-const filterableTabs = ['comments', 'discussions', 'downloads', 'events', 'images', 'albums'];
+const filterableTabs = [
+  'comments',
+  'discussions',
+  'downloads',
+  'events',
+  'wiki-edits',
+  'images',
+  'albums',
+];
 const shouldShowProfileChannelFilter = computed(() => {
   return filterableTabs.some((tab) => {
     return normalizedPath.value === `${baseProfilePath.value}/${tab}`;

@@ -23,6 +23,9 @@ type UserProfileCounts = User & {
   AlbumsAggregate?: {
     count?: number | null;
   } | null;
+  AuthoredWikiPageVersionsAggregate?: {
+    count?: number | null;
+  } | null;
 };
 
 const props = defineProps({
@@ -104,6 +107,13 @@ const tabs = computed(() => {
       to: getTabTo(`/u/${usernameInParams.value}/events`),
       current: false,
       count: props.user?.EventsAggregate?.count,
+    },
+    {
+      name: 'Wiki Edits',
+      path: `/u/${usernameInParams.value}/wiki-edits`,
+      to: getTabTo(`/u/${usernameInParams.value}/wiki-edits`),
+      current: false,
+      count: props.user?.AuthoredWikiPageVersionsAggregate?.count,
     },
     {
       name: 'Images',
