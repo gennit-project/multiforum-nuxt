@@ -120,7 +120,7 @@ const eventChannelId = computed(() => {
   <div>
     <button
       v-if="userIsSuspendedFromChannel"
-      class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white"
+      class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white transition"
       :class="{
         'cursor-pointer bg-green-600 hover:bg-green-500': !disabled,
         'cursor-not-allowed bg-gray-500': disabled,
@@ -132,17 +132,15 @@ const eventChannelId = computed(() => {
     </button>
     <button
       v-else
-      class="flex w-full items-start justify-center gap-2 rounded px-4 py-2 text-left text-white"
+      class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white transition"
       :class="{
         'cursor-pointer bg-red-600 hover:bg-red-500': !disabled,
         'cursor-not-allowed bg-gray-500': disabled,
       }"
       @click="openSuspendModal"
     >
-      <span class="flex shrink-0 self-start">
-        <UserMinus />
-      </span>
-      <span>Suspend Author (Includes Archive)</span>
+      <UserMinus />
+      Suspend Author (Includes Archive)
     </button>
     <BrokenRulesModal
       :title="'Suspend Author'"

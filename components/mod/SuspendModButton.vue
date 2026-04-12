@@ -112,7 +112,7 @@ onMounted(() => {
   <div>
     <button
       v-if="modIsSuspendedFromChannel"
-      class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white"
+      class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white transition"
       :class="{
         'cursor-pointer bg-green-600 hover:bg-green-500': !disabled,
         'cursor-not-allowed bg-gray-500': disabled,
@@ -124,17 +124,15 @@ onMounted(() => {
     </button>
     <button
       v-else
-      class="font-semibold flex w-full items-start justify-center gap-2 rounded px-4 py-2 text-left text-sm text-white"
+      class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white transition"
       :class="{
         'cursor-pointer bg-red-600 hover:bg-red-500': !disabled,
         'cursor-not-allowed bg-gray-500': disabled,
       }"
       @click="openSuspendModal"
     >
-      <span class="flex shrink-0 self-start">
-        <UserMinus />
-      </span>
-      <span>Suspend Mod</span>
+      <UserMinus />
+      Suspend Mod
     </button>
     <SuspendModModal
       :title="'Suspend Mod'"
