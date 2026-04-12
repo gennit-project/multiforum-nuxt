@@ -51,19 +51,16 @@ The core image moderation workflow is implemented:
 
 ### Download Labels and UI Fixes
 
-**Current State:** ✅ Download labels feature complete; UI bugs remain
+**Current State:** ✅ Complete
 
 **Completed:**
 - Both OP and channel mods (with `canEditDiscussions` permission) can change labels on downloads
 - When a mod changes labels on someone else's download, a ModerationAction is created
 - The mod action appears in the mod's profile activity feed (no issue required)
-
-**Remaining UI Fixes:**
-
-| Task                                                                                                 | Location | Type |
-| ---------------------------------------------------------------------------------------------------- | -------- | ---- |
-| Mod action button hover state should look consistent                                                 | Frontend | Bug  |
-| When clicking an archived discussion list item, banner doesn't show on detail page until you refresh | Frontend | Bug  |
+- Activity tab on download detail pages shows label change history and title edit history
+- Label changes tracked with `LabelChangeHistory` type linking to actor (User or ModerationProfile)
+- Mod action button hover states are consistent across all buttons
+- Archived discussion banner shows immediately when navigating from list
 
 ---
 
@@ -1701,3 +1698,168 @@ These steps verify the download labels moderation feature implemented in the Dow
   - The type of action (label update)
   - The new labels applied and download title
   - Timestamp of the action
+
+---
+
+## Download Activity Tab Verification
+
+These steps verify the download activity tab feature showing label change history and title edit history.
+
+### Verify Activity Tab Displays on Download Detail Page
+
+**Prerequisites:**
+
+- A download in a channel with filter groups configured (download labels)
+
+**Test Steps:**
+
+1. Navigate to a download detail page (`/forums/[forumId]/downloads/[discussionId]`)
+2. Look for the tab navigation below the download header
+3. Verify there are three tabs: Description, Comments, Activity
+
+**Expected Outcome:**
+
+- Activity tab should appear alongside Description and Comments tabs
+- Clicking Activity tab should navigate to the activity page
+- Tab styling should be consistent with other tabs
+
+### Verify Label Change History in Activity Tab
+
+**Prerequisites:**
+
+- A download where labels have been changed at least once
+- Both OP and mod label changes should be tracked
+
+**Test Steps:**
+
+1. Log in as the download owner
+2. Navigate to the download edit page and change the labels
+3. Save the changes
+4. Navigate to the download detail page and click the Activity tab
+5. Log in as a mod with `canEditDiscussions` permission
+6. Navigate to the same download's edit page and change labels
+7. Return to the Activity tab
+
+**Expected Outcome:**
+
+- Activity tab should show label change history entries
+- Each entry should display:
+  - Actor name (username for owner, mod profile name for mods)
+  - Action type ("added" or "removed")
+  - Label name with colored badge (green for added, red/strikethrough for removed)
+  - Relative timestamp (e.g., "2 minutes ago")
+- Multiple changes should be listed with option to "Show X older changes"
+- Most recent change should appear at the top
+
+### Verify Title Edit History Moved to Activity Tab
+
+**Prerequisites:**
+
+- A download with at least one title edit
+
+**Test Steps:**
+
+1. Navigate to a download that has been edited (title changed)
+2. Click the Description tab
+3. Verify title edit history is NOT shown on the Description tab
+4. Click the Activity tab
+5. Verify title edit history IS shown on the Activity tab
+
+**Expected Outcome:**
+
+- Description tab should only show the description content and edit button
+- Activity tab should show title edit history with:
+  - Author who made the change
+  - Old title (strikethrough) and new title
+  - Timestamp of the change
+- If both title edits and label changes exist, both should appear in the Activity tab
+
+### Verify Empty Activity State
+
+**Prerequisites:**
+
+- A download with no title edits and no label changes
+
+**Test Steps:**
+
+1. Create a new download without changing labels
+2. Navigate to the Activity tab
+
+**Expected Outcome:**
+
+- Activity tab should display "No activity to display yet." message
+- No errors should appear
+
+---
+
+## UI Fixes Verification
+
+These steps verify the UI bug fixes for mod action buttons and archived banner.
+
+### Verify Mod Action Button Hover States
+
+**Prerequisites:**
+
+- Access to an issue detail page with moderation actions available
+
+**Test Steps:**
+
+1. Log in as a mod with appropriate permissions
+2. Navigate to an issue detail page (`/forums/[forumId]/issues/[issueNumber]`)
+3. Hover over each mod action button:
+   - Archive/Unarchive button
+   - Suspend Author/Unsuspend Author button
+   - Suspend Mod/Unsuspend Mod button (if applicable)
+   - Close Issue button
+
+**Expected Outcome:**
+
+- All buttons should have consistent styling:
+  - Same font weight (semibold)
+  - Same padding and alignment (centered)
+  - Smooth hover transition effect
+- Red buttons (Archive, Suspend) should lighten on hover
+- Green buttons (Unsuspend) should lighten on hover
+- Blue buttons (Unarchive, Close Issue) should lighten on hover
+- Disabled buttons should have gray background with no hover effect
+
+### Verify Archived Discussion Banner Shows Immediately
+
+**Prerequisites:**
+
+- An archived discussion in a channel
+- Access to the channel's discussion list
+
+**Test Steps:**
+
+1. Navigate to a channel's discussion list (`/forums/[forumId]/discussions`)
+2. Find an archived discussion (should have "Archived" badge on list item)
+3. Click on the archived discussion to navigate to its detail page
+4. Observe whether the archived banner appears immediately
+
+**Expected Outcome:**
+
+- The archived banner should appear immediately when the page loads
+- No page refresh should be required to see the banner
+- Banner should display: "This discussion has been archived. New comments cannot be added."
+- If linked to an issue, banner should include a link to the issue
+
+### Verify Archived Banner Shows from Multiple Entry Points
+
+**Prerequisites:**
+
+- An archived discussion
+
+**Test Steps:**
+
+1. Navigate to the archived discussion from the channel discussion list
+2. Verify banner appears immediately
+3. Navigate away, then use the browser back button
+4. Verify banner still appears
+5. Navigate to the discussion via direct URL
+6. Verify banner appears immediately
+
+**Expected Outcome:**
+
+- Archived banner should appear consistently regardless of navigation method
+- No flicker or delayed appearance of the banner
