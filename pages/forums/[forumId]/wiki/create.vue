@@ -18,6 +18,7 @@ const forumId = route.params.forumId as string;
 const formValues = ref({
   title: '',
   body: '',
+  editReason: '',
   slug: 'home', // Default slug for the wiki home page
 });
 
@@ -44,6 +45,7 @@ function handleSubmit() {
         node: {
           title: formValues.value.title,
           body: formValues.value.body,
+          editReason: formValues.value.editReason || undefined,
           slug: formValues.value.slug,
           channelUniqueName: forumId,
           VersionAuthor: {
@@ -117,6 +119,19 @@ onDone(() => {
               :value="formValues.slug"
               :disabled="true"
               help-text="This is automatically generated from the title and will be used in the URL."
+            />
+          </div>
+
+          <div>
+            <TextInput
+              id="wiki-edit-reason"
+              :full-width="true"
+              label="Edit reason"
+              placeholder="Briefly describe this change"
+              :test-id="'edit-reason-input'"
+              :value="formValues.editReason"
+              :rows="3"
+              @update="formValues.editReason = $event"
             />
           </div>
 

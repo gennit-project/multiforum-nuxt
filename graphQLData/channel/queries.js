@@ -19,6 +19,7 @@ export const GET_WIKI_PAGE = gql`
       id
       title
       body
+      editReason
       slug
       createdAt
       updatedAt
@@ -28,6 +29,7 @@ export const GET_WIKI_PAGE = gql`
       ChildPages {
         id
         title
+        editReason
         slug
         createdAt
         updatedAt
@@ -75,6 +77,7 @@ export const GET_CHANNEL = gql`
         id
         title
         body
+        editReason
         slug
         createdAt
         updatedAt

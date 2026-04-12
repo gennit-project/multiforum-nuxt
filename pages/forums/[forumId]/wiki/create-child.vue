@@ -31,6 +31,7 @@ const wikiHomePage = computed(() => channel.value?.WikiHomePage);
 const formValues = ref({
   title: '',
   body: '',
+  editReason: '',
   slug: '',
 });
 
@@ -50,6 +51,7 @@ function handleSubmit() {
   const childPageInput = {
     title: formValues.value.title,
     body: formValues.value.body,
+    editReason: formValues.value.editReason || undefined,
     slug: formValues.value.slug,
     channelUniqueName: forumId,
     VersionAuthor: {
@@ -183,6 +185,19 @@ const hasWikiHomePage = computed(() => !!wikiHomePage.value);
             :value="formValues.slug"
             :disabled="true"
             help-text="This is automatically generated from the title and will be used in the URL."
+          />
+        </div>
+
+        <div>
+          <TextInput
+            id="wiki-edit-reason"
+            :full-width="true"
+            label="Edit reason"
+            placeholder="Briefly describe this change"
+            :test-id="'edit-reason-input'"
+            :value="formValues.editReason"
+            :rows="3"
+            @update="formValues.editReason = $event"
           />
         </div>
 

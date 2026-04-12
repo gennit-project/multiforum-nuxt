@@ -73,6 +73,7 @@ const error = computed(() => {
 const formValues = ref({
   title: '',
   body: '',
+  editReason: '',
   slug: '',
 });
 
@@ -85,6 +86,7 @@ watch(
       formValues.value = {
         title: newWikiPage.title || '',
         body: newWikiPage.body || '',
+        editReason: '',
         slug: newWikiPage.slug || '',
       };
       dataLoaded.value = true;
@@ -132,6 +134,7 @@ function handleSubmit() {
           node: {
             title: formValues.value.title,
             body: formValues.value.body,
+            editReason: formValues.value.editReason || null,
             VersionAuthor: {
               connect: {
                 where: {
@@ -157,6 +160,7 @@ function handleSubmit() {
     const updateInput = {
       title: formValues.value.title,
       body: formValues.value.body,
+      editReason: formValues.value.editReason || null,
       VersionAuthor: {
         connect: {
           where: {
@@ -272,6 +276,19 @@ onChannelDone(handleDone);
             :value="formValues.slug"
             :disabled="true"
             help-text="This is automatically generated from the title and will be used in the URL."
+          />
+        </div>
+
+        <div>
+          <TextInput
+            id="wiki-edit-reason"
+            :full-width="true"
+            label="Edit reason"
+            placeholder="Briefly describe this change"
+            :test-id="'edit-reason-input'"
+            :value="formValues.editReason"
+            :rows="3"
+            @update="formValues.editReason = $event"
           />
         </div>
 
