@@ -360,6 +360,7 @@ export const GET_ISSUES = gql`
       relatedDiscussionId
       relatedEventId
       relatedImageId
+      relatedUsername
       flaggedServerRuleViolation
       locked
       lockedAt

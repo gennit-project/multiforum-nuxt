@@ -87,6 +87,7 @@ const COMMENT_FIELDS = gql`
         createdAt
         discussionKarma
         commentKarma
+        isBot
         ChannelRoles {
           showModTag
         }
