@@ -6,39 +6,30 @@ This section tracks the wiki/discussion/comment revision-history work from the c
 
 ### Completed Foundation Work
 
-| Task                                       | Status | Notes                                                                                                                           |
-| ------------------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| Normalize shared revision diff rendering   | Done   | Added shared revision diff content and updated wiki, discussion, and comment revision modals to use it.                         |
-| Share revision pairing primitives          | Done   | Added shared revision history pairing helpers and applied them to comment/wiki edit dropdowns plus wiki revision pages.         |
-| Consolidate wiki revision detail diff view | Done   | Replaced the standalone wiki revision detail `v-code-diff` implementation with the shared revision diff content.                |
-| Use danger-action revision redaction UI    | Done   | Comment, discussion, and wiki revision modals use a neutral primary action and expose redaction as an authorized danger action. |
-| Add wiki revision diff selector            | Done   | Wiki revision diff pages can switch compared revisions without returning to the revision history list.                          |
-| Add wiki edit reasons                      | Done   | Wiki create/edit forms write edit reasons and wiki revision queries/pages display `editReason`.                                 |
-| Gate backend wiki edits for suspensions    | Done   | Backend wiki page create/update, child page creation, and wiki home page update flows use channel permission suspension checks. |
-| Gate frontend wiki edits for suspensions   | Done   | Wiki create/edit entry points and direct forms now surface `SuspensionNotice` and block suspended users before mutation submit. |
-| Add wiki revision report UI                | Done   | Wiki revision diff pages can submit reports through the shared broken-rules modal and `reportWikiEdit` mutation.                |
+| Task                                        | Status | Notes                                                                                                                                 |
+| ------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Normalize shared revision diff rendering    | Done   | Added shared revision diff content and updated wiki, discussion, and comment revision modals to use it.                               |
+| Share revision pairing primitives           | Done   | Added shared revision history pairing helpers and applied them to comment/wiki edit dropdowns plus wiki revision pages.               |
+| Consolidate wiki revision detail diff view  | Done   | Replaced the standalone wiki revision detail `v-code-diff` implementation with the shared revision diff content.                      |
+| Use danger-action revision redaction UI     | Done   | Comment, discussion, and wiki revision modals use a neutral primary action and expose redaction as an authorized danger action.       |
+| Add wiki revision diff selector             | Done   | Wiki revision diff pages can switch compared revisions without returning to the revision history list.                                |
+| Add wiki edit reasons                       | Done   | Wiki create/edit forms write edit reasons and wiki revision queries/pages display `editReason`.                                       |
+| Gate backend wiki edits for suspensions     | Done   | Backend wiki page create/update, child page creation, and wiki home page update flows use channel permission suspension checks.       |
+| Gate frontend wiki edits for suspensions    | Done   | Wiki create/edit entry points and direct forms now surface `SuspensionNotice` and block suspended users before mutation submit.       |
+| Add wiki revision report UI                 | Done   | Wiki revision diff pages can submit reports through the shared broken-rules modal and `reportWikiEdit` mutation.                      |
 | Render wiki report targets in moderation UI | Done   | Issue queries and moderation surfaces now include wiki page/revision target fields and label wiki edit reports in issue lists/detail. |
+| Add wiki delete permission gates            | Done   | Wiki page deletion allows the original page author, server admin, or moderators with the dedicated `canDeleteWiki` permission.        |
+| Add wiki edits to user profiles             | Done   | User profiles include a wiki edits count, tab, and `/u/[username]/wiki-edits` page with channel filtering.                            |
 
 ### Remaining Coding Changes
 
-| Task                                                          | Location           | Type    | Notes                                                                                                                                                                   |
-| ------------------------------------------------------------- | ------------------ | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Add backend permission gates for wiki page deletion           | Backend            | Feature | Wiki page deletion should allow the original wiki page author or a moderator with an explicit delete permission. Revision redaction gates are already implemented.      |
-| Add dedicated wiki delete permissions if schema supports them | Backend            | Feature | Prefer explicit permissions such as `canDeleteWiki` / `canDeleteWikiRevision` over reusing `canEditDiscussions` for destructive wiki actions.                           |
-| Add wiki edits to user profiles                               | Backend + Frontend | Feature | Add wiki edit counts to `GET_USER`, add a "Wiki Edits" profile tab, and add a `/u/[username]/wiki-edits` page modeled after comments.                                   |
-| Add wiki edits to contribution charts                         | Backend + Frontend | Feature | Extend `GET_USER_CONTRIBUTIONS`, backend contribution resolver logic, and `UserContributionChart` so wiki edits appear in contribution history.                         |
+| Task                                                          | Location           | Type    | Notes                                                                                                                                                              |
+| ------------------------------------------------------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Add wiki edits to contribution charts                         | Backend + Frontend | Feature | Extend `GET_USER_CONTRIBUTIONS`, backend contribution resolver logic, and `UserContributionChart` so wiki edits appear in contribution history.                    |
 
 ---
 
 ## Remaining Implementation Work
-
-### Album and Image Moderation
-
-**Completed enhancements:**
-
-- Profile picture reporting (`reportProfilePicture` mutation) - frontend modal and button on user profile page
-- Channel icon/banner reporting (`reportChannelImage` mutation) - frontend modal and buttons on channel About page
-- Dedicated `/admin/image-reports` page - shows all image-related reports with type badges
 
 ### Auto-Moderation Bot Plugin
 
@@ -238,6 +229,54 @@ This section contains detailed step-by-step instructions for manually verifying 
 - The resulting moderation issue should target the wiki page/revision and identify the wiki edit author when available
 - The channel issue list should label the issue as a wiki edit report
 - The issue detail page should show the related content type as a wiki edit and include the related wiki page/revision identifiers
+
+#### Verify Wiki Delete Permission Gates
+
+**Prerequisites:**
+
+- A wiki-enabled channel with a wiki page and at least one revision
+- The wiki page's original author account
+- A moderator account with `canDeleteWiki`
+- A moderator account without `canDeleteWiki`
+
+**Test Steps:**
+
+1. As the original wiki page author, delete a wiki page through the app or GraphQL mutation.
+2. As the moderator with `canDeleteWiki`, delete another wiki page or redact a wiki revision.
+3. As the moderator without `canDeleteWiki`, attempt the same wiki page deletion or wiki revision redaction.
+4. As a server admin, delete a wiki page.
+
+**Expected Outcome:**
+
+- The original author can delete their own wiki page.
+- A moderator with `canDeleteWiki` can delete wiki pages and redact wiki revisions in the channel.
+- A moderator without `canDeleteWiki` is blocked from wiki page deletion and wiki revision redaction.
+- A server admin can delete wiki pages.
+- Wiki revision redaction still replaces the revision body with `[deleted]` instead of hard-deleting the revision.
+
+#### Verify Wiki Edits User Profile Tab
+
+**Prerequisites:**
+
+- A user account that authored at least one wiki revision
+- At least one wiki edit in a channel that can be selected in the profile channel filter
+
+**Test Steps:**
+
+1. Navigate to `/u/[username]`.
+2. Confirm the profile redirects to `/u/[username]/comments`.
+3. Open the "Wiki Edits" tab.
+4. Confirm the count on the tab matches the user's authored wiki revision count.
+5. Use the profile channel filter to select a channel where the user has wiki edits.
+6. Open a wiki page link and a revision link from the wiki edits list.
+
+**Expected Outcome:**
+
+- The "Wiki Edits" tab appears alongside comments, discussions, downloads, events, images, and albums.
+- `/u/[username]/wiki-edits` lists the user's wiki edits with page title, channel, timestamp, and edit reason when present.
+- Channel filtering narrows the wiki edit list to selected channels.
+- Wiki page links route to `/forums/[forumId]/wiki/[slug]`.
+- Revision links route to `/forums/[forumId]/wiki/revisions/diff/[slug]/[revisionId]`.
 
 ### User Suspension Verification
 
