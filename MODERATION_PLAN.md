@@ -77,15 +77,74 @@ The moderation bot should reuse the same moderation-profile-based audit surface 
 **Current State:**
 
 - ❌ Bots do not yet participate in the full suspension workflow used for users and mods
-- Bots use ModerationProfile for comments
-- `channelBotsMiddleware.ts` marks bots as deprecated, not suspended
-- Bot accounts are still real `User` records with moderation profiles, so some human suspension logic may already apply depending on which mutation path a bot uses
+- Bots are `User` records with `isBot: true`, `botProfileId`, and a linked `ModerationProfile`
+- `channelBotsMiddleware.ts` marks bots as `deprecated: true` when removed from a channel, but this doesn't create issues or moderation actions
+- Existing `suspendUser` and `suspendMod` mutations use `createSuspensionResolver` to create `Suspension` nodes linked to issues
 
-| Task                                                                                                                                   | Location | Type    |
-| -------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------- |
-| Reuse the existing report -> issue -> suspend workflow for bots so moderation actions create the same paper trail as human suspensions | Both     | Feature |
-| Extend suspension target resolution and permission checks so bots can be suspended like human accounts                                 | Backend  | Feature |
-| Surface bot suspension state, linked issues, and reason visibility through the existing moderation UI patterns                         | Frontend | Feature |
+#### Implementation Approach
+
+Since bots have both a `User` record and a `ModerationProfile`, bot suspension can follow two paths:
+
+1. **Suspend the bot's User record** - prevents the bot from commenting/acting anywhere
+2. **Suspend the bot's ModerationProfile** - prevents mod-level actions while keeping user-level actions
+
+For automated moderation bots that primarily act through their `ModerationProfile`, suspending the mod profile is appropriate. For bots that act as regular users, suspending the `User` record is appropriate.
+
+#### Backend Tasks
+
+| Task                                                    | Location                                                       | Type    | Notes                                                                                                                                                                  |
+| ------------------------------------------------------- | -------------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Extend `resolveIssueTarget` for bot targets             | `customResolvers/mutations/shared/resolveIssueTarget.ts`       | Feature | Add logic to detect when target user has `isBot: true`. Return a `targetType` indicator distinguishing `"user"`, `"mod"`, and `"bot"`.                                |
+| Verify `suspendUser` works for bot users                | `customResolvers/mutations/suspendUser.ts`                     | Feature | Bots are Users, so `suspendUser` should work. Ensure permission checks allow suspending bot users. No new mutation needed.                                            |
+| Update permission checks for bot suspension state       | `rules/permission/hasChannelPermission.ts`, `hasServerPermission.ts` | Feature | Add check for bot suspension state in `getActiveSuspension()`. Bots should be blocked from acting when their User or ModerationProfile is suspended.                  |
+| Extend `isOriginalPosterSuspended` for bot issues       | `customResolvers/queries/isOriginalPosterSuspended.ts`         | Feature | When an issue targets a bot (`relatedUser.isBot === true`), return suspension state correctly.                                                                         |
+| Block bot actions when suspended                        | `plugins/channelBotsMiddleware.ts` and bot invocation paths    | Feature | Before a bot executes any action, check if the bot's User or ModerationProfile is suspended. If suspended, silently skip execution.                                   |
+
+#### Frontend Tasks
+
+| Task                                              | Location                                                              | Type    | Notes                                                                                                                                                    |
+| ------------------------------------------------- | --------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Extend `SuspendUserButton` for bot targets        | `components/mod/SuspendUserButton.vue`                                | Feature | When issue's `relatedUser` has `isBot: true`, show "Suspend Bot" instead of "Suspend Author". Reuse existing `BrokenRulesModal` and suspension workflow. |
+| Surface bot suspension state in channel settings  | Channel bot settings components                                       | Feature | Show "Suspended" badge if bot is suspended. Display link to related issue.                                                                               |
+| Surface bot suspension state in bot sidebar       | Bot sidebar entries                                                   | Feature | Show "Suspended" indicator for suspended bots.                                                                                                           |
+| Show bot suspension in issue detail page          | Issue detail components                                               | Feature | Query suspension state using `IS_ORIGINAL_POSTER_SUSPENDED`. Display suspension badges consistent with user/mod UI.                                      |
+| Add bot indicator to issue list                   | `IssueListItem.vue` or equivalent                                     | Feature | When issue targets a bot (content authored by a bot), show "Bot" indicator. Enable same moderation actions as human-authored content.                    |
+| Show suspended bots in admin suspended-users page | `/pages/admin/suspended-users/index.vue`                              | Feature | Display bots in existing suspended-users page with a "Bot" badge. Bots are users, so grouping them together makes sense.                                 |
+
+#### Data Model Considerations
+
+No schema changes required. The existing model supports bot suspension:
+
+```
+User (isBot: true)
+  ├── ModerationProfile
+  │     └── Suspension (via SuspendedMods relationship)
+  └── Suspension (via SuspendedUser relationship)
+```
+
+#### Migration/Backward Compatibility
+
+- **Deprecated vs Suspended**: Existing deprecated bots (`deprecated: true`) are not the same as suspended bots. Deprecation means the channel no longer uses the bot; suspension means the bot violated rules.
+- **No migration needed**: Suspension is additive - existing bots without suspensions continue working.
+
+#### Recommended Implementation Order
+
+1. Backend: Extend `resolveIssueTarget` to detect bot targets
+2. Backend: Verify `suspendUser` works for bot users (may already work)
+3. Backend: Add suspension checks to bot action paths
+4. Frontend: Extend `SuspendUserButton` for bot targets
+5. Frontend: Add bot suspension state display in relevant UI
+6. Frontend: Show suspended bots in admin list
+
+#### Testing Considerations
+
+| Test Case                      | Expected Outcome                                                          |
+| ------------------------------ | ------------------------------------------------------------------------- |
+| Report a bot's comment         | Issue is created with `relatedUser.isBot === true`                        |
+| Suspend the bot                | `Suspension` node is created, linked to issue                             |
+| Bot attempts to act            | Action is blocked with suspension check                                   |
+| Unsuspend the bot              | Bot can act again                                                         |
+| Suspension expiration          | Expired bot suspensions are cleaned up like human suspensions             |
 
 ### Auto-Moderation Bot Plugin
 
