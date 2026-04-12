@@ -250,3 +250,22 @@ export const UNLOCK_CHANNEL = gql`
     }
   }
 `;
+
+export const REPORT_CHANNEL_IMAGE = gql`
+  mutation reportChannelImage(
+    $channelUniqueName: String!
+    $imageType: ChannelImageType!
+    $reportText: String!
+    $selectedServerRules: [String!]!
+  ) {
+    reportChannelImage(
+      channelUniqueName: $channelUniqueName
+      imageType: $imageType
+      reportText: $reportText
+      selectedServerRules: $selectedServerRules
+    ) {
+      id
+      issueNumber
+    }
+  }
+`;

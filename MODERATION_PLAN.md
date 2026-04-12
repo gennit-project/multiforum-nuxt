@@ -37,10 +37,10 @@ This section tracks the wiki/discussion/comment revision-history work from the c
 **Completed enhancements:**
 
 - Profile picture reporting (`reportProfilePicture` mutation) - frontend modal and button on user profile page
+- Channel icon/banner reporting (`reportChannelImage` mutation) - frontend modal and buttons on channel About page
 
 **Remaining optional enhancements:**
 
-- Channel icon/banner reporting (`reportChannelImage` mutation)
 - Dedicated `/admin/image-reports` page (currently images appear in main issue list)
 
 ### Auto-Moderation Bot Plugin
@@ -1882,6 +1882,61 @@ These steps verify the image moderation workflow implemented in the Album and Im
 - Report button should appear on other users' profile pictures
 - Report button should NOT appear when viewing a user with no profile picture set
 - Report button should be a small flag icon in the bottom-right corner of the avatar
+
+### Verify Channel Icon/Banner Reporting from About Page
+
+**Prerequisites:**
+
+- A mod profile with reporting permission (server mod or admin)
+- A channel with a custom icon and/or banner set
+
+**Test Steps:**
+
+1. Log in as a server mod or admin
+2. Navigate to the channel's About page (`/forums/[forumId]/about`)
+3. Look for the "Server Moderation" section
+4. Check for "Report Icon" and "Report Banner" buttons
+5. Click "Report Icon" (if available)
+6. Select one or more server rules that were violated
+7. Add optional context text
+8. Submit the report
+9. Repeat for "Report Banner" (if available)
+
+**Expected Outcome:**
+
+- "Report Icon" button should only appear if the channel has a custom icon set
+- "Report Banner" button should only appear if the channel has a custom banner set
+- Both buttons should only be visible to users with `canReport` permission at server level
+- Report modal should open with server rules only (no forum rules)
+- Modal title should indicate whether reporting icon or banner
+- After submission, success notification should appear
+- A new server-scoped issue should be created
+
+### Verify Channel Image Report Button Visibility
+
+**Prerequisites:**
+
+- Multiple user accounts with different permission levels
+- Channels with and without custom icons/banners
+
+**Test Steps:**
+
+1. Log in as a regular user (not a server mod)
+2. Navigate to a channel's About page
+3. Check if "Server Moderation" section is visible (it should not be)
+4. Log in as a server mod
+5. Navigate to a channel WITHOUT a custom icon or banner
+6. Check that "Report Icon" and "Report Banner" buttons are not shown
+7. Navigate to a channel WITH a custom icon
+8. Check that "Report Icon" button is visible
+9. Navigate to a channel WITH a custom banner
+10. Check that "Report Banner" button is visible
+
+**Expected Outcome:**
+
+- Regular users should not see the Server Moderation section
+- Server mods should only see report buttons for images that exist
+- Missing images should not have corresponding report buttons
 
 ### Automated Verification
 
