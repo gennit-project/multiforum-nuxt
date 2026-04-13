@@ -23,6 +23,7 @@ import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { getBotMentionState, filterBotSuggestions, type BotSuggestion } from '@/utils/botMentions';
+import { getModMentionState, filterModSuggestions, type ModSuggestion } from '@/utils/modMentions';
 
 const COMMENT_LIMIT = 50;
 
@@ -43,6 +44,10 @@ const props = defineProps({
   },
   botSuggestions: {
     type: Array as PropType<BotSuggestion[]>,
+    default: () => [],
+  },
+  modSuggestions: {
+    type: Array as PropType<ModSuggestion[]>,
     default: () => [],
   },
 });
@@ -374,6 +379,47 @@ const applyBotSuggestion = (value: string) => {
   cursorIndex.value = nextCursor;
   textarea.focus();
 };
+
+// Mod mention autocomplete
+const modMentionState = computed(() =>
+  getModMentionState(createFormValues.value.text || '', cursorIndex.value)
+);
+const filteredModSuggestions = computed(() => {
+  const state = modMentionState.value;
+  if (!state || props.modSuggestions.length === 0) return [];
+  return filterModSuggestions(props.modSuggestions, state.query);
+});
+
+const hasExactModMatch = computed(() => {
+  const query = modMentionState.value?.query;
+  if (!query) return false;
+  return filteredModSuggestions.value.some(
+    (mod) => mod.value.toLowerCase() === query.toLowerCase()
+  );
+});
+
+const showModSuggestions = computed(
+  () => filteredModSuggestions.value.length > 0 && !hasExactModMatch.value
+);
+
+const applyModSuggestion = (value: string) => {
+  const state = modMentionState.value;
+  const textarea = inlineTextarea.value;
+  if (!state || !textarea) return;
+
+  const before = createFormValues.value.text.slice(0, state.triggerIndex);
+  const after = createFormValues.value.text.slice(cursorIndex.value);
+  const insertion = `/m/${value}`;
+  const needsSpace = after.length > 0 && !after.startsWith(' ');
+  const nextText = `${before}${insertion}${needsSpace ? ' ' : ''}${after}`;
+
+  createFormValues.value.text = nextText;
+  textarea.value = nextText;
+  const nextCursor = before.length + insertion.length + (needsSpace ? 1 : 0);
+  textarea.setSelectionRange(nextCursor, nextCursor);
+  cursorIndex.value = nextCursor;
+  textarea.focus();
+};
 </script>
 
 <template>
@@ -436,6 +482,28 @@ const applyBotSuggestion = (value: string) => {
                 class="text-xs text-gray-500 dark:text-gray-400"
               >
                 {{ suggestion.displayName }}
+              </span>
+            </button>
+          </div>
+          <div
+            v-if="showModSuggestions"
+            class="absolute left-0 top-full z-20 mt-1 min-w-[220px] max-w-sm rounded-md border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800"
+          >
+            <button
+              v-for="suggestion in filteredModSuggestions"
+              :key="suggestion.value"
+              type="button"
+              class="flex w-full cursor-pointer flex-col text-left px-3 py-2 transition hover:bg-gray-100 dark:hover:bg-gray-700"
+              @click.prevent="applyModSuggestion(suggestion.value)"
+            >
+              <span class="text-sm font-semibold text-gray-900 dark:text-white">
+                {{ suggestion.mention }}
+              </span>
+              <span
+                v-if="suggestion.username"
+                class="text-xs text-gray-500 dark:text-gray-400"
+              >
+                @{{ suggestion.username }}
               </span>
             </button>
           </div>

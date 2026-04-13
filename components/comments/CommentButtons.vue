@@ -5,6 +5,7 @@ import type { PropType } from 'vue';
 import type { Comment, ModerationProfile, User } from '@/__generated__/graphql';
 import type { ApolloError } from '@apollo/client/core';
 import type { BotSuggestion } from '@/utils/botMentions';
+import type { ModSuggestion } from '@/utils/modMentions';
 import VoteButtons from './VoteButtons.vue';
 import ReplyButton from './ReplyButton.vue';
 import SaveButton from '@/components/SaveButton.vue';
@@ -70,6 +71,10 @@ const props = defineProps({
   },
   botSuggestions: {
     type: Array as PropType<BotSuggestion[]>,
+    default: () => [],
+  },
+  modSuggestions: {
+    type: Array as PropType<ModSuggestion[]>,
     default: () => [],
   },
   locked: {
@@ -342,6 +347,8 @@ function handleBlockedReaction() {
         :max-chars="MAX_CHARS_IN_COMMENT"
         :enable-bot-autocomplete="true"
         :bot-suggestions="botSuggestions"
+        :enable-mod-autocomplete="true"
+        :mod-suggestions="modSuggestions"
         @update="
           emit('updateNewComment', {
             text: $event,

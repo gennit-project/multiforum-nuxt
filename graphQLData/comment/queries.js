@@ -164,6 +164,12 @@ export const GET_DISCUSSION_COMMENTS = gql`
             botProfileId
             isDeprecated
           }
+          Moderators {
+            displayName
+            User {
+              username
+            }
+          }
         }
         Discussion {
           id

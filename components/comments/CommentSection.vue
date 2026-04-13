@@ -29,6 +29,7 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { hasBotMention, type BotSuggestion } from '@/utils/botMentions';
+import type { ModSuggestion } from '@/utils/modMentions';
 
 // Import new composables
 import { useCommentSectionNotifications } from '@/composables/useCommentSectionNotifications';
@@ -121,6 +122,10 @@ const props = defineProps({
   },
   botUsernames: {
     type: Array as PropType<string[]>,
+    default: () => [],
+  },
+  modSuggestions: {
+    type: Array as PropType<ModSuggestion[]>,
     default: () => [],
   },
 });
@@ -550,6 +555,7 @@ const replyHasBotMention = computed(() => {
         :suspension-indefinitely="suspensionIndefinitely ?? false"
         :bot-suggestions="botSuggestions"
         :bot-usernames="botUsernames"
+        :mod-suggestions="modSuggestions"
         @create-comment="handleClickCreate"
         @delete-comment="handleClickDelete"
         @click-edit-comment="handleClickEdit"
@@ -717,6 +723,7 @@ const replyHasBotMention = computed(() => {
               :reply-has-bot-mention="replyHasBotMention"
               :bot-suggestions="botSuggestions"
               :bot-usernames="botUsernames"
+              :mod-suggestions="modSuggestions"
               :answers="answers"
               @start-comment-save="commentInProcess = true"
               @open-reply-editor="openReplyEditor"
