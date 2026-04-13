@@ -13,7 +13,15 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  superUpvoteActive: {
+    type: Boolean,
+    default: false,
+  },
   upvoteLoading: {
+    type: Boolean,
+    default: false,
+  },
+  superUpvoteLoading: {
     type: Boolean,
     default: false,
   },
@@ -41,6 +49,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  showSuperUpvote: {
+    type: Boolean,
+    default: true,
+  },
   isPermalinked: {
     type: Boolean,
     default: false,
@@ -58,6 +70,7 @@ const emit = defineEmits([
   'viewFeedback',
   'upvote',
   'undoUpvote',
+  'superUpvote',
 ]);
 
 const downvoteButtonClasses = computed(() => {
@@ -148,7 +161,7 @@ function viewFeedback() {
 </script>
 
 <template>
-  <div class="flex flex-row items-center">
+  <div class="flex flex-row items-center gap-1">
     <VoteButton
       v-if="showUpvote"
       :test-id="'upvote-comment-button'"
@@ -168,6 +181,30 @@ function viewFeedback() {
       <span class="text-xs">{{ upvoteActive ? 'Undo' : 'Upvote' }}</span>
       <span class="text-xs">{{ upvoteCount }}</span>
     </VoteButton>
+
+    <!-- Super Upvote button - only visible when user has already upvoted -->
+    <VoteButton
+      v-if="showSuperUpvote && upvoteActive && !superUpvoteActive"
+      :test-id="'super-upvote-comment-button'"
+      :loading="superUpvoteLoading"
+      :active="false"
+      :show-count="false"
+      :tooltip-text="'Super upvote with a thank-you note'"
+      :is-permalinked="isPermalinked"
+      class="super-upvote-button"
+      @vote="emit('superUpvote')"
+    >
+      <i class="fa-solid fa-star text-xs" aria-hidden="true" />
+    </VoteButton>
+
+    <!-- Super Upvoted indicator - shown when user has super upvoted -->
+    <span
+      v-if="superUpvoteActive"
+      class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white"
+      title="You super upvoted this"
+    >
+      <i class="fa-solid fa-star" aria-hidden="true" />
+    </span>
 
     <MenuButton
       v-if="showDownvote"
@@ -192,3 +229,15 @@ function viewFeedback() {
     </MenuButton>
   </div>
 </template>
+
+<style scoped>
+.super-upvote-button :deep(button) {
+  background: linear-gradient(to right, #ec4899, #8b5cf6, #6366f1);
+  border-color: transparent;
+  color: white;
+}
+
+.super-upvote-button :deep(button:hover) {
+  background: linear-gradient(to right, #db2777, #7c3aed, #4f46e5);
+}
+</style>

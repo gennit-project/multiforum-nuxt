@@ -262,6 +262,9 @@ export const UPVOTE_DISCUSSION_CHANNEL = gql`
       UpvotedByUsersAggregate {
         count
       }
+      SuperUpvotedByUsers {
+        username
+      }
     }
   }
 `;
@@ -276,6 +279,9 @@ export const UNDO_UPVOTE_DISCUSSION_CHANNEL = gql`
       }
       UpvotedByUsersAggregate {
         count
+      }
+      SuperUpvotedByUsers {
+        username
       }
     }
   }

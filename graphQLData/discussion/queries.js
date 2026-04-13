@@ -89,6 +89,9 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
         UpvotedByUsersAggregate {
           count
         }
+        SuperUpvotedByUsers {
+          username
+        }
         locked
         archived
         answered
@@ -177,6 +180,9 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
           answered
           locked
           UpvotedByUsers {
+            username
+          }
+          SuperUpvotedByUsers {
             username
           }
           CommentsAggregate {
@@ -279,6 +285,9 @@ export const GET_DISCUSSION = gql`
         answered
         locked
         UpvotedByUsers {
+          username
+        }
+        SuperUpvotedByUsers {
           username
         }
         Channel {

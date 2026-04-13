@@ -47,6 +47,9 @@ export const UPVOTE_COMMENT = gql`
       UpvotedByUsersAggregate {
         count
       }
+      SuperUpvotedByUsers {
+        username
+      }
     }
   }
 `;
@@ -61,6 +64,9 @@ export const UNDO_UPVOTE_COMMENT = gql`
       }
       UpvotedByUsersAggregate {
         count
+      }
+      SuperUpvotedByUsers {
+        username
       }
     }
   }

@@ -10,6 +10,7 @@ import {
 import VoteButtons from '@/components/discussion/vote/VoteButtons.vue';
 import NewEmojiButton from '@/components/comments/NewEmojiButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import SuperUpvoteModal from '@/components/superUpvote/SuperUpvoteModal.vue';
 import { usernameVar, modProfileNameVar } from '@/cache';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
@@ -82,10 +83,34 @@ const {
   loading: undoUpvoteDiscussionChannelLoading,
 } = useMutation(UNDO_UPVOTE_DISCUSSION_CHANNEL);
 
+const showSuperUpvoteModal = ref(false);
+
 const loggedInUserUpvoted = computed(() => {
   if (!usernameVar.value) return false;
   const users = props.discussionChannel?.UpvotedByUsers || [];
   return users.some((user: User) => user.username === usernameVar.value);
+});
+
+const loggedInUserSuperUpvoted = computed(() => {
+  if (!usernameVar.value) return false;
+  const users = props.discussionChannel?.SuperUpvotedByUsers || [];
+  return users.some((user: User) => user.username === usernameVar.value);
+});
+
+const discussionAuthorUsername = computed(() => {
+  const author = props.discussion?.Author;
+  if (author && 'username' in author) {
+    return author.username || '';
+  }
+  return '';
+});
+
+const forumDisplayName = computed(() => {
+  return (
+    props.discussionChannel?.Channel?.displayName ||
+    props.discussionChannel?.channelUniqueName ||
+    ''
+  );
 });
 
 const loggedInUserDownvoted = computed(
@@ -170,6 +195,14 @@ function handleClickViewFeedback() {
 function handleBlockedReaction() {
   showReactionSuspensionNotice.value = true;
 }
+
+function handleSuperUpvoteClick() {
+  showSuperUpvoteModal.value = true;
+}
+
+function handleSuperUpvoteSuccess() {
+  showSuperUpvoteModal.value = false;
+}
 </script>
 
 <template>
@@ -198,6 +231,7 @@ function handleBlockedReaction() {
         :has-mod-profile="!!modProfileNameVar"
         :show-downvote="false"
         :upvote-active="loggedInUserUpvoted"
+        :super-upvote-active="loggedInUserSuperUpvoted"
         :upvote-count="upvoteCount"
         :upvote-icon="upvoteIcon"
         :upvote-loading="
@@ -207,6 +241,7 @@ function handleBlockedReaction() {
         :upvote-tooltip-inactive="upvoteTooltips.inactive"
         :upvote-tooltip-unauthenticated="upvoteTooltips.unauthenticated"
         @click-up="handleClickUp"
+        @super-upvote="handleSuperUpvoteClick"
       />
       <NewEmojiButton
         v-if="showEmojiButton"
@@ -239,6 +274,17 @@ function handleBlockedReaction() {
       />
     </div>
   </div>
+
+  <SuperUpvoteModal
+    :show="showSuperUpvoteModal"
+    :recipient-username="discussionAuthorUsername"
+    source-type="discussion"
+    :source-id="discussionChannelId"
+    :source-channel-unique-name="channelUniqueName"
+    :forum-name="forumDisplayName"
+    @close="showSuperUpvoteModal = false"
+    @success="handleSuperUpvoteSuccess"
+  />
 </template>
 
 <style>
