@@ -225,9 +225,9 @@ You received this because you are subscribed [by default | to this discussion].
 6. [x] Phase 3 Frontend - Notification tabs (NotificationTabs.vue)
 
 ### Sprint 3: Unsubscribe Flow
-7. Phase 5 Frontend - Handle `?action=unsubscribe` param
-8. Phase 5 Backend - Add unsubscribe links to notifications
-9. Phase 6 - Notification footer with subscription status
+7. [x] Phase 5 Frontend - Handle `?action=unsubscribe` param (useAutoUnsubscribe composable)
+8. [x] Phase 5 Backend - Add unsubscribe links to notifications (notificationFooter.ts)
+9. [x] Phase 6 - Notification footer with subscription status (included in Phase 5 Backend)
 
 ### Sprint 4: Issue Notifications
 10. Phase 4 - Issue moderation action notifications
@@ -241,24 +241,25 @@ You received this because you are subscribed [by default | to this discussion].
 - [x] `hooks/modMentionNotificationHook.ts` - Created
 - [x] `hooks/feedbackNotificationHook.ts` - Created
 - [ ] `hooks/issueModerationActionNotificationHook.ts`
-- [ ] `utils/notificationFooter.ts`
+- [x] `utils/notificationFooter.ts` - Created
 
 ### Backend (Modify)
 - [x] `typeDefs.ts` - Added `notificationType` field to Notification
 - [x] `hooks/notificationHelpers.ts` - Updated to accept notificationType
-- [x] `services/commentNotificationService.ts` - Integrated feedback, mod mention, and user mention hooks
-- [ ] All notification-creating hooks - Add unsubscribe footer
+- [x] `services/commentNotificationService.ts` - Integrated feedback, mod mention, user mention hooks, and unsubscribe footer
+- [x] `services/issueNotifications.ts` - Added unsubscribe footer
 
 ### Frontend (New Files)
 - [x] `components/notifications/NotificationTabs.vue` - Created
+- [x] `composables/useAutoUnsubscribe.ts` - Created
 
 ### Frontend (Modify)
 - [x] `pages/notifications/index.vue` - Updated to use NotificationTabs
 - [x] `graphQLData/notification/queries.js` - Added GET_FEEDBACK_NOTIFICATIONS, GET_GENERAL_NOTIFICATIONS
-- [ ] `pages/forums/[forumId]/discussions/[discussionId].vue` - Handle unsubscribe action
-- [ ] `pages/forums/[forumId]/events/[eventId].vue` - Handle unsubscribe action
-- [ ] `pages/forums/[forumId]/issues/[issueId].vue` - Handle unsubscribe action
-- [ ] Text editor components - Add /m autocomplete
+- [x] `components/discussion/detail/DiscussionCommentsWrapper.vue` - Handle unsubscribe action via useAutoUnsubscribe
+- [x] `components/event/detail/EventCommentsWrapper.vue` - Handle unsubscribe action via useAutoUnsubscribe
+- [x] `components/mod/IssueDetail.vue` - Handle unsubscribe action via useAutoUnsubscribe
+- [x] Text editor components - Added /m autocomplete
 
 ---
 
@@ -650,11 +651,12 @@ This section contains detailed step-by-step instructions for manually verifying 
 - [x] Selecting a mod inserts `/m/profileName` syntax
 
 #### Unsubscribe Flow (Sprint 3)
-- [ ] Clicking unsubscribe link navigates to content with `?action=unsubscribe`
-- [ ] Page auto-unsubscribes authenticated user
-- [ ] Toast notification confirms unsubscription
-- [ ] Subscribe button updates to "Subscribe" state
-- [ ] Works for discussions, events, comments, and issues
+
+- [x] Clicking unsubscribe link navigates to content with `?action=unsubscribe`
+- [x] Page auto-unsubscribes authenticated user
+- [x] Toast notification confirms unsubscription
+- [x] Subscribe button updates to "Subscribe" state
+- [x] Works for discussions, events, and issues
 
 #### Issue Moderation Notifications (Sprint 4)
 - [ ] Moderation action on issue triggers notification to all subscribers
