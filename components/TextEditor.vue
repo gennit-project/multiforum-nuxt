@@ -17,6 +17,7 @@ import ErrorBanner from './ErrorBanner.vue';
 import CharCounter from '@/components/CharCounter.vue';
 import TextEditorToolbar from '@/components/text-editor/TextEditorToolbar.vue';
 import BotSuggestionsPopover from '@/components/text-editor/BotSuggestionsPopover.vue';
+import ModSuggestionsPopover from '@/components/text-editor/ModSuggestionsPopover.vue';
 
 // Composables
 import { useImageUpload } from '@/composables/useImageUpload';
@@ -25,12 +26,14 @@ import {
   type EmojiClickEvent,
 } from '@/composables/useEmojiPicker';
 import { useBotAutocomplete } from '@/composables/useBotAutocomplete';
+import { useModAutocomplete } from '@/composables/useModAutocomplete';
 import { useFullScreenEditor } from '@/composables/useFullScreenEditor';
 
 // Utils
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 import { formatText, type FormatType } from '@/utils/textFormatting';
 import type { BotSuggestion } from '@/utils/botMentions';
+import type { ModSuggestion } from '@/utils/modMentions';
 
 // Lazy-loaded components (heavy dependencies)
 const TextEditorFullScreen = defineAsyncComponent(
@@ -96,6 +99,14 @@ const props = defineProps({
   },
   channelConnections: {
     type: Array as () => string[],
+    default: () => [],
+  },
+  enableModAutocomplete: {
+    type: Boolean,
+    default: false,
+  },
+  modSuggestions: {
+    type: Array as () => ModSuggestion[],
     default: () => [],
   },
   ariaLabel: {
@@ -164,6 +175,29 @@ const {
   },
 });
 
+// Mod autocomplete composable with getter functions for proper reactivity
+const {
+  showModSuggestions,
+  showModHelperText,
+  filteredModSuggestions,
+  suggestionPopoverStyle: modSuggestionPopoverStyle,
+  updateCaretCoordinates: updateModCaretCoordinates,
+  applyModSuggestion,
+  activeSuggestionIndex: activeModSuggestionIndex,
+  moveActiveSuggestion: moveActiveModSuggestion,
+} = useModAutocomplete({
+  getText: () => text.value,
+  getCursorIndex: () => cursorIndex.value,
+  isEnabled: () => props.enableModAutocomplete,
+  getModSuggestions: () => props.modSuggestions,
+  getEditorRef: () => editorRef.value,
+  getIsSmallScreen: () => isSmallScreen.value,
+  onUpdate: updateText,
+  onCursorUpdate: (index: number) => {
+    cursorIndex.value = index;
+  },
+});
+
 // Full-screen editor composable
 const { isFullScreen, showFormatted, toggleFullScreen, exitFullScreen } =
   useFullScreenEditor({
@@ -195,6 +229,12 @@ function updateCursorIndex(event: Event) {
       updateCaretCoordinates();
     });
   }
+  // Only update caret coordinates when mod autocomplete is active
+  if (props.enableModAutocomplete && props.modSuggestions.length > 0) {
+    nextTick(() => {
+      updateModCaretCoordinates();
+    });
+  }
 }
 
 function handleEditorInput(event: Event) {
@@ -205,30 +245,56 @@ function handleEditorInput(event: Event) {
 }
 
 function handleEditorKeydown(event: KeyboardEvent) {
-  if (!showBotSuggestions || filteredBotSuggestions.value.length === 0) {
-    return;
-  }
-
-  if (event.key === 'Enter' || event.key === 'Tab') {
-    event.preventDefault();
-    const suggestion =
-      filteredBotSuggestions.value[activeSuggestionIndex.value] ||
-      filteredBotSuggestions.value[0];
-    if (suggestion) {
-      applyBotSuggestion(suggestion);
+  // Handle bot suggestions
+  if (showBotSuggestions.value && filteredBotSuggestions.value.length > 0) {
+    if (event.key === 'Enter' || event.key === 'Tab') {
+      event.preventDefault();
+      const suggestion =
+        filteredBotSuggestions.value[activeSuggestionIndex.value] ||
+        filteredBotSuggestions.value[0];
+      if (suggestion) {
+        applyBotSuggestion(suggestion);
+      }
+      return;
     }
-    return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      moveActiveSuggestion(1);
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      moveActiveSuggestion(-1);
+      return;
+    }
   }
 
-  if (event.key === 'ArrowDown') {
-    event.preventDefault();
-    moveActiveSuggestion(1);
-    return;
-  }
+  // Handle mod suggestions
+  if (showModSuggestions.value && filteredModSuggestions.value.length > 0) {
+    if (event.key === 'Enter' || event.key === 'Tab') {
+      event.preventDefault();
+      const suggestion =
+        filteredModSuggestions.value[activeModSuggestionIndex.value] ||
+        filteredModSuggestions.value[0];
+      if (suggestion) {
+        applyModSuggestion(suggestion);
+      }
+      return;
+    }
 
-  if (event.key === 'ArrowUp') {
-    event.preventDefault();
-    moveActiveSuggestion(-1);
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      moveActiveModSuggestion(1);
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      moveActiveModSuggestion(-1);
+      return;
+    }
   }
 }
 
@@ -452,11 +518,14 @@ onBeforeUnmount(() => {
 
 onMounted(() => {
   window.addEventListener('resize', updateCaretCoordinates);
+  window.addEventListener('resize', updateModCaretCoordinates);
   updateCaretCoordinates();
+  updateModCaretCoordinates();
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateCaretCoordinates);
+  window.removeEventListener('resize', updateModCaretCoordinates);
 });
 
 const markdownDocsLink = 'https://www.markdownguide.org/basic-syntax/';
@@ -568,6 +637,14 @@ const markdownDocsLink = 'https://www.markdownguide.org/basic-syntax/';
               @select="applyBotSuggestion"
             />
 
+            <ModSuggestionsPopover
+              v-if="showModSuggestions"
+              :suggestions="filteredModSuggestions"
+              :style="modSuggestionPopoverStyle"
+              :active-index="activeModSuggestionIndex"
+              @select="applyModSuggestion"
+            />
+
             <div class="mt-2 flex-col divide-gray-400 dark:divide-gray-300">
               <p
                 v-if="showBotHelperText"
@@ -575,6 +652,12 @@ const markdownDocsLink = 'https://www.markdownguide.org/basic-syntax/';
               >
                 Type <span class="font-mono">/bots/</span> or
                 <span class="font-mono">/bot/</span> to see available bots.
+              </p>
+              <p
+                v-if="showModHelperText"
+                class="text-xs text-gray-500 dark:text-gray-300"
+              >
+                Type <span class="font-mono">/m/</span> to mention a moderator.
               </p>
               <a
                 target="_blank"

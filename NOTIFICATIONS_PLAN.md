@@ -221,7 +221,7 @@ You received this because you are subscribed [by default | to this discussion].
 
 ### Sprint 2: Mod Mentions & UI
 4. [x] Phase 2 Backend - Mod mention notifications (modMentionNotificationHook.ts)
-5. [ ] Phase 2 Frontend - Text editor /m autocomplete
+5. [x] Phase 2 Frontend - Text editor /m autocomplete
 6. [x] Phase 3 Frontend - Notification tabs (NotificationTabs.vue)
 
 ### Sprint 3: Unsubscribe Flow
@@ -550,6 +550,56 @@ This section contains detailed step-by-step instructions for manually verifying 
 
 ---
 
+### Mod Mention Autocomplete Verification
+
+#### Verify /m/ Autocomplete in Discussion Comments
+
+**Prerequisites:**
+
+- A channel with at least one moderator configured
+- User logged in with ability to comment
+
+**Test Steps:**
+
+1. Navigate to a discussion in a channel that has moderators
+2. Open the comment form
+3. Type `/m/` in the text editor
+4. Observe the autocomplete dropdown
+
+**Expected Outcome:**
+
+- Autocomplete dropdown appears showing channel moderators
+- Each suggestion shows `/m/profileName` format
+- Username is displayed alongside the mod profile name
+- Clicking a suggestion inserts the full `/m/profileName` syntax
+- Space is added after the mention if needed
+
+#### Run Mod Mentions Unit Tests
+
+**Prerequisites:**
+
+- Frontend repository cloned
+- Node.js and dependencies installed
+
+**Test Steps:**
+
+1. Navigate to `gennit-nuxt/wt-feature-moderation` directory
+2. Run mod mentions tests:
+   ```bash
+   npm run test:unit -- --run utils/modMentions.spec.ts
+   ```
+
+**Expected Outcome:**
+
+- All 24 modMentions tests pass
+- Tests verify:
+  - `hasModMention` detects /m/ patterns
+  - `buildModMentionOptions` creates proper suggestions
+  - `getModMentionState` correctly identifies trigger position
+  - `filterModSuggestions` filters by prefix and limits results
+
+---
+
 ### Quick Start: Testing Notification Tabs
 
 **Prerequisites:**
@@ -595,9 +645,9 @@ This section contains detailed step-by-step instructions for manually verifying 
 ### Pending Verification (Future Sprints)
 
 #### Mod Mention Autocomplete (Sprint 2)
-- [ ] Typing `/m/` shows mod profile autocomplete dropdown
-- [ ] Autocomplete shows only moderators for the current channel
-- [ ] Selecting a mod inserts `/m/profileName` syntax
+- [x] Typing `/m/` shows mod profile autocomplete dropdown
+- [x] Autocomplete shows only moderators for the current channel
+- [x] Selecting a mod inserts `/m/profileName` syntax
 
 #### Unsubscribe Flow (Sprint 3)
 - [ ] Clicking unsubscribe link navigates to content with `?action=unsubscribe`

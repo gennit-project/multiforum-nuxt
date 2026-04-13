@@ -17,6 +17,7 @@ import CommentHeader from './CommentHeader.vue';
 import { usernameVar } from '@/cache';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 import type { BotSuggestion } from '@/utils/botMentions';
+import type { ModSuggestion } from '@/utils/modMentions';
 import ArchivedCommentText from './ArchivedCommentText.vue';
 import { useCommentPermissions } from '@/composables/useCommentPermissions';
 import { useBestAnswerMutations } from '@/composables/useBestAnswerMutations';
@@ -166,6 +167,10 @@ const props = defineProps({
   },
   botSuggestions: {
     type: Array as PropType<BotSuggestion[]>,
+    default: () => [],
+  },
+  modSuggestions: {
+    type: Array as PropType<ModSuggestion[]>,
     default: () => [],
   },
   botUsernames: {
@@ -627,6 +632,7 @@ const label = computed(() => {
                     :length-of-comment-in-progress="lengthOfCommentInProgress"
                     :reply-has-bot-mention="props.replyHasBotMention"
                     :bot-suggestions="props.botSuggestions"
+                    :mod-suggestions="props.modSuggestions"
                     :is-permalinked="isHighlighted"
                     :is-marked-as-answer="isMarkedAsAnswer"
                     @start-comment-save="emit('startCommentSave', $event)"
