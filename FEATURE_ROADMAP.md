@@ -63,19 +63,19 @@ All notification tasks have been implemented. See [NOTIFICATIONS_PLAN.md](./NOTI
 
 ### Misc
 
-| Task                                                                                                                            | Type        |
-| ------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| Adding emoji to comment should not update last updated date; need new field `textLastEdited`                                    | Bug         |
-| In comment section, can search comments by text to find specific comments                                                       | Feature     |
-| Album image and detail page has share button (copy link, crosspost)                                                             | Feature     |
-| Discussion detail page comments have less left side padding at mobile width                                                     | UI          |
-| In comment search results page, each result list item should be a permalink                                                     | Feature     |
-| Well-tested function for making accurate permalink to comment on event, discussion, feedback, issue (both frontend and backend) | Feature     |
-| Reduce API calls on favorites lists - include whether user has favorited each item in fetch-list API call                       | Performance |
-| Auto-save for server settings and channel admin settings (at least for plugins; should not have two save buttons)               | UX          |
-| Activity feed shows title edit history of an event (similar to discussion detail pages)                                         | Feature     |
-| Can see description edits of event                                                                                              | Feature     |
-| Add a way to deprecate a channel - lock for reasons unrelated to sitewide rule violations                                       | Feature     |
+| Task                                                                                                                            | Type        | Status |
+| ------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------ |
+| Adding emoji to comment should not update last updated date; need new field `textLastEdited`                                    | Bug         | ✅     |
+| In comment section, can search comments by text to find specific comments                                                       | Feature     |        |
+| Album image and detail page has share button (copy link, crosspost)                                                             | Feature     |        |
+| Discussion detail page comments have less left side padding at mobile width                                                     | UI          |        |
+| In comment search results page, each result list item should be a permalink                                                     | Feature     |        |
+| Well-tested function for making accurate permalink to comment on event, discussion, feedback, issue (both frontend and backend) | Feature     |        |
+| Reduce API calls on favorites lists - include whether user has favorited each item in fetch-list API call                       | Performance |        |
+| Auto-save for server settings and channel admin settings (at least for plugins; should not have two save buttons)               | UX          |        |
+| Activity feed shows title edit history of an event (similar to discussion detail pages)                                         | Feature     |        |
+| Can see description edits of event                                                                                              | Feature     |        |
+| Add a way to deprecate a channel - lock for reasons unrelated to sitewide rule violations                                       | Feature     |        |
 
 ---
 
@@ -223,3 +223,62 @@ This section contains detailed step-by-step instructions for manually verifying 
 8. **Log out and view User B's scratchpad**
    - Only public entries should be visible
    - No action buttons should appear for non-owners
+
+---
+
+### Comment Text Edit vs Emoji Reaction (textLastEdited Fix)
+
+**Purpose:** Verify that emoji reactions don't show as "Edited" but text changes do.
+
+**Prerequisites:**
+
+- Backend deployed with `textLastEdited` field on Comment type
+- Frontend types regenerated (`npm run compile`)
+- Two test user accounts
+
+**Test: Emoji Reaction Should Not Show "Edited"**
+
+1. Log in as User A
+2. Create a new comment on any discussion
+3. Note the comment header - should show "posted X ago" with no "Edited" indicator
+4. Log in as User B (or use another browser)
+5. Add an emoji reaction to User A's comment
+6. Refresh the page
+7. Verify the comment header still shows "posted X ago" with NO "Edited" indicator
+8. Add more emoji reactions
+9. Verify still no "Edited" indicator appears
+
+**Expected Outcome:**
+
+- Emoji reactions update the `emoji` JSON field and `updatedAt`
+- But since `textLastEdited` is not set, no "Edited" indicator appears
+- The comment appears as if it was never edited
+
+**Test: Text Edit Should Show "Edited"**
+
+1. Log in as User A
+2. Edit the text of the same comment (change the content)
+3. Submit the edit
+4. Observe the comment header
+
+**Expected Outcome:**
+
+- "Edited X ago" indicator appears after the creation timestamp
+- The "Edits" dropdown appears (if revision history exists)
+- Clicking the dropdown shows the edit history
+- `textLastEdited` field is populated with the edit timestamp
+
+**Test: Backward Compatibility**
+
+1. Find a comment that was edited BEFORE this fix was deployed
+2. Verify it still shows "Edited X ago" indicator
+3. This works because the frontend falls back to `updatedAt` if:
+   - `textLastEdited` is not set AND
+   - `PastVersions` array has entries (indicating there was a text edit)
+
+**Files Changed:**
+
+- Backend: `typeDefs.ts` - Added `textLastEdited: DateTime` to Comment type
+- Backend: `hooks/commentVersionHistoryHook.ts` - Sets `textLastEdited` when text changes
+- Frontend: `graphQLData/comment/queries.js` - Added `textLastEdited` to queries
+- Frontend: `components/comments/CommentHeader.vue` - Uses `textLastEdited` for "Edited" display
