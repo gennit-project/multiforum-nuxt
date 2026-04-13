@@ -8,6 +8,7 @@ export const SEARCH_COMMENT_FIELDS = gql`
     text
     createdAt
     updatedAt
+    textLastEdited
     archived
     CommentAuthor {
       ... on ModerationProfile {
@@ -78,6 +79,7 @@ const COMMENT_FIELDS = gql`
     weightedVotesCount
     createdAt
     updatedAt
+    textLastEdited
     archived
     isFavoritedByUser
     CommentAuthor {
@@ -217,6 +219,7 @@ export const GET_DISCUSSION_COMMENTS = gql`
         weightedVotesCount
         createdAt
         updatedAt
+        textLastEdited
         archived
         isFavoritedByUser
         CommentAuthor {
