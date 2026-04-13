@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # Skip all checks if only markdown files are staged
-staged_files=$(git diff --cached --name-only --diff-filter=ACM)
+staged_files=$(git diff --cached --name-only)
 non_md_files=$(echo "$staged_files" | grep -v '\.md$' | grep -v '^$' || true)
 
 if [ -z "$non_md_files" ]; then

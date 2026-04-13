@@ -22,6 +22,7 @@ import ArchivedCommentText from './ArchivedCommentText.vue';
 import { useCommentPermissions } from '@/composables/useCommentPermissions';
 import { useBestAnswerMutations } from '@/composables/useBestAnswerMutations';
 import { useCommentPermalink } from '@/composables/useCommentPermalink';
+import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 import { getCommentMenuItems } from '@/utils/headerPermissionUtils';
 import { getForumRoleBadge } from '@/utils/forumRoleBadges';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
@@ -393,6 +394,23 @@ const { mutate: unsubscribeFromComment } = useMutation(
     },
   }
 );
+
+const isSubscribed = computed(() => {
+  return (
+    props.commentData?.SubscribedToNotifications?.some(
+      (user) => user.username === usernameVar.value
+    ) ?? false
+  );
+});
+
+useAutoUnsubscribe({
+  entityId: commentIdRef,
+  unsubscribeFn: async (id: string) => {
+    await unsubscribeFromComment({ commentId: id });
+  },
+  entityType: 'comment',
+  isSubscribed,
+});
 
 const showReplies = ref(true);
 const highlight = ref(false);

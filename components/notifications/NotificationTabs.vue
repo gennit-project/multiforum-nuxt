@@ -114,6 +114,22 @@ const currentUnreadCount = computed(() => {
     : feedbackUnreadCount.value;
 });
 
+const generalTotalCount = computed(() => {
+  if (!generalResult.value?.users?.[0]) return 0;
+  return generalResult.value.users[0].totalNotificationsAggregate?.count || 0;
+});
+
+const feedbackTotalCount = computed(() => {
+  if (!feedbackResult.value?.users?.[0]) return 0;
+  return feedbackResult.value.users[0].totalNotificationsAggregate?.count || 0;
+});
+
+const currentTotalCount = computed(() => {
+  return activeTab.value === 'general'
+    ? generalTotalCount.value
+    : feedbackTotalCount.value;
+});
+
 const isLoading = computed(() => {
   return activeTab.value === 'general' ? generalLoading.value : feedbackLoading.value;
 });
@@ -169,7 +185,7 @@ const totalNotifications = computed(() => {
 });
 
 const reachedEnd = computed(() => {
-  return currentUnreadCount.value === 0 || totalNotifications.value >= currentUnreadCount.value;
+  return totalNotifications.value >= currentTotalCount.value;
 });
 </script>
 
