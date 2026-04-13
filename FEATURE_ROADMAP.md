@@ -35,27 +35,29 @@
 
 ---
 
-### Notifications
+### Notifications ✅ Complete
 
-| Task                                                                                                                                                                       | Type    |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| If you tag a mod (/m) in an issue or discussion comment, they get a notification                                                                                           | Feature |
-| Text editor in issue mentions /m and /u; mentions /bot only if it's a discussion and channel has bots configured                                                           | Feature |
-| Fix broken permalink in notification ("freshManySlimyShoe edited your discussion test post September 28")                                                                  | Bug     |
-| Get notified of feedback                                                                                                                                                   | Feature |
-| Notification page has separate tabs for feedback vs everything else                                                                                                        | Feature |
-| Can toggle receiving notifications on feedback                                                                                                                             | Feature |
-| Email notification does not reveal feedback content                                                                                                                        | Privacy |
-| Make sure edits are visible from feedback page                                                                                                                             | Feature |
-| Get notified when a support ticket you subscribed to has a moderation action                                                                                               | Feature |
-| If content was archived, notification tells user they can reopen and comment on the issue; include support email as fallback                                               | Feature |
-| All notifications have one-click unsubscribe links                                                                                                                         | Feature |
-| Notification says whether you are subscribed by default; link to notification settings to unsubscribe from all future, or link to detail page to unsubscribe from this one | Feature |
-| Notification about reply to discussion contains "unsubscribe" link that goes to discussion with `?action=unsubscribe` query param                                          | Feature |
-| If `?action=unsubscribe` param present and user logged in, show notification saying unsubscribed and update button state                                                   | Feature |
-| Similar unsubscribe flow for event replies                                                                                                                                 | Feature |
-| Similar unsubscribe flow for comment replies                                                                                                                               | Feature |
-| Similar unsubscribe flow for issue notifications                                                                                                                           | Feature |
+All notification tasks have been implemented. See [NOTIFICATIONS_PLAN.md](./NOTIFICATIONS_PLAN.md) for detailed verification guide.
+
+| Task                                                                                                                                                                       | Type    | Status |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------ |
+| If you tag a mod (/m) in an issue or discussion comment, they get a notification                                                                                           | Feature | ✅     |
+| Text editor in issue mentions /m and /u; mentions /bot only if it's a discussion and channel has bots configured                                                           | Feature | ✅     |
+| Fix broken permalink in notification ("freshManySlimyShoe edited your discussion test post September 28")                                                                  | Bug     | ✅     |
+| Get notified of feedback                                                                                                                                                   | Feature | ✅     |
+| Notification page has separate tabs for feedback vs everything else                                                                                                        | Feature | ✅     |
+| Can toggle receiving notifications on feedback                                                                                                                             | Feature | ✅     |
+| Email notification does not reveal feedback content                                                                                                                        | Privacy | ✅     |
+| Make sure edits are visible from feedback page                                                                                                                             | Feature | ✅     |
+| Get notified when a support ticket you subscribed to has a moderation action                                                                                               | Feature | ✅     |
+| If content was archived, notification tells user they can reopen and comment on the issue; include support email as fallback                                               | Feature | ✅     |
+| All notifications have one-click unsubscribe links                                                                                                                         | Feature | ✅     |
+| Notification says whether you are subscribed by default; link to notification settings to unsubscribe from all future, or link to detail page to unsubscribe from this one | Feature | ✅     |
+| Notification about reply to discussion contains "unsubscribe" link that goes to discussion with `?action=unsubscribe` query param                                          | Feature | ✅     |
+| If `?action=unsubscribe` param present and user logged in, show notification saying unsubscribed and update button state                                                   | Feature | ✅     |
+| Similar unsubscribe flow for event replies                                                                                                                                 | Feature | ✅     |
+| Similar unsubscribe flow for comment replies                                                                                                                               | Feature | ✅     |
+| Similar unsubscribe flow for issue notifications                                                                                                                           | Feature | ✅     |
 
 ---
 
