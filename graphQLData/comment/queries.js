@@ -36,6 +36,9 @@ export const SEARCH_COMMENT_FIELDS = gql`
     Event {
       id
       title
+      EventChannels {
+        channelUniqueName
+      }
     }
   }
 `;

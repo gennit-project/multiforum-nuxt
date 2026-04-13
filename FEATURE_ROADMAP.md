@@ -69,7 +69,7 @@ All notification tasks have been implemented. See [NOTIFICATIONS_PLAN.md](./NOTI
 | In comment section, can search comments by text to find specific comments                                                       | Feature     | ✅     |
 | Album image and detail page has share button (copy link, crosspost)                                                             | Feature     | ✅     |
 | Discussion detail page comments have less left side padding at mobile width                                                     | UI          |        |
-| In comment search results page, each result list item should be a permalink                                                     | Feature     |        |
+| In comment search results page, each result list item should be a permalink                                                     | Feature     | ✅     |
 | Well-tested function for making accurate permalink to comment on event, discussion, feedback, issue (both frontend and backend) | Feature     |        |
 | Reduce API calls on favorites lists - include whether user has favorited each item in fetch-list API call                       | Performance |        |
 | Auto-save for server settings and channel admin settings (at least for plugins; should not have two save buttons)               | UX          |        |
@@ -373,3 +373,40 @@ This section contains detailed step-by-step instructions for manually verifying 
 
 - Frontend: `pages/u/[username]/images/[imageId].vue` - Added share button and copy link functionality
 - Frontend: `pages/u/[username]/albums/[albumId].vue` - Added share button and copy link functionality
+
+---
+
+### Comment Search Result Permalinks
+
+**Purpose:** Comment search result cards should navigate directly to the matched comment, not just the surrounding discussion or event.
+
+**Test: Discussion Comment Result**
+
+1. Navigate to `/comments/search?searchInput={term}` with a search term that matches a discussion comment.
+2. Verify the result card shows a `View comment` link.
+3. Click the result card, outside the author and context links.
+4. Verify navigation goes to `/forums/{forumId}/discussions/{discussionId}/comments/{commentId}`.
+5. Verify the matched comment is highlighted on the permalink page.
+
+**Test: Event Comment Result**
+
+1. Search for a term that matches an event comment.
+2. Verify the context link points to the forum-scoped event page.
+3. Click `View comment`.
+4. Verify navigation goes to `/forums/{forumId}/events/{eventId}/comments/{commentId}`.
+5. Verify the matched comment is highlighted on the permalink page.
+
+**Test: Nested Links**
+
+1. Click the author name on a search result card.
+2. Verify navigation goes to the user profile, not the comment permalink.
+3. Click the discussion/event context link.
+4. Verify navigation goes to the parent discussion/event page, not the comment permalink.
+
+**Files Changed:**
+
+- Frontend: `pages/comments/search.vue` - Made result cards keyboard/click navigable to comment permalinks and added explicit `View comment` links
+- Frontend: `utils/commentPermalink.ts` - Added reusable comment permalink route helper
+- Frontend: `utils/commentPermalink.spec.ts` - Added unit tests for discussion, event, and issue comment permalink routes
+- Frontend: `composables/useCommentPermalink.ts` - Reused the shared helper for existing comment permalink behavior
+- Frontend: `graphQLData/comment/queries.js` - Added event channel context to comment search results
