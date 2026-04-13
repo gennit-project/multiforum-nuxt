@@ -507,7 +507,7 @@ const label = computed(() => {
     <div
       :class="[
         depth > 1
-          ? 'ml-1 border-l border-gray-300 pl-4 pt-2 dark:border-gray-600'
+          ? 'ml-1 border-l border-gray-300 pl-2 pt-2 sm:pl-4 dark:border-gray-600'
           : '',
       ]"
       class="flex w-full"
@@ -538,7 +538,7 @@ const label = computed(() => {
               :forum-role-badge="forumRoleBadge"
             />
             <div
-              class="ml-4 flex-grow border-l border-gray-300 pl-4 dark:border-gray-600"
+              class="ml-2 flex-grow border-l border-gray-300 pl-2 sm:ml-4 sm:pl-4 dark:border-gray-600"
             >
               <div class="w-full dark:text-gray-200">
                 <div class="w-full overflow-auto">
@@ -553,7 +553,7 @@ const label = computed(() => {
                       props.commentData.text &&
                       props.editFormOpenAtCommentID !== props.commentData.id
                     "
-                    class="ml-3"
+                    class="ml-1 sm:ml-3"
                     :class="[
                       props.goToPermalinkOnClick ? 'cursor-pointer' : '',
                     ]"
@@ -783,7 +783,7 @@ const label = computed(() => {
         <div
           v-else-if="replyCount > 0 && showReplies"
           id="childComments"
-          class="ml-3 w-full border-gray-300 dark:border-gray-600"
+          class="ml-1 w-full border-gray-300 sm:ml-3 dark:border-gray-600"
         >
           <ChildComments
             v-slot="slotProps"

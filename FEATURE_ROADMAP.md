@@ -212,32 +212,6 @@
 
 ---
 
-### Notifications ✅ Complete
-
-All notification tasks have been implemented. See [NOTIFICATIONS_PLAN.md](./NOTIFICATIONS_PLAN.md) for detailed verification guide.
-
-| Task                                                                                                                                                                       | Type    | Status |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------ |
-| If you tag a mod (/m) in an issue or discussion comment, they get a notification                                                                                           | Feature | ✅     |
-| Text editor in issue mentions /m and /u; mentions /bot only if it's a discussion and channel has bots configured                                                           | Feature | ✅     |
-| Fix broken permalink in notification ("freshManySlimyShoe edited your discussion test post September 28")                                                                  | Bug     | ✅     |
-| Get notified of feedback                                                                                                                                                   | Feature | ✅     |
-| Notification page has separate tabs for feedback vs everything else                                                                                                        | Feature | ✅     |
-| Can toggle receiving notifications on feedback                                                                                                                             | Feature | ✅     |
-| Email notification does not reveal feedback content                                                                                                                        | Privacy | ✅     |
-| Make sure edits are visible from feedback page                                                                                                                             | Feature | ✅     |
-| Get notified when a support ticket you subscribed to has a moderation action                                                                                               | Feature | ✅     |
-| If content was archived, notification tells user they can reopen and comment on the issue; include support email as fallback                                               | Feature | ✅     |
-| All notifications have one-click unsubscribe links                                                                                                                         | Feature | ✅     |
-| Notification says whether you are subscribed by default; link to notification settings to unsubscribe from all future, or link to detail page to unsubscribe from this one | Feature | ✅     |
-| Notification about reply to discussion contains "unsubscribe" link that goes to discussion with `?action=unsubscribe` query param                                          | Feature | ✅     |
-| If `?action=unsubscribe` param present and user logged in, show notification saying unsubscribed and update button state                                                   | Feature | ✅     |
-| Similar unsubscribe flow for event replies                                                                                                                                 | Feature | ✅     |
-| Similar unsubscribe flow for comment replies                                                                                                                               | Feature | ✅     |
-| Similar unsubscribe flow for issue notifications                                                                                                                           | Feature | ✅     |
-
----
-
 ### Misc
 
 | Task                                                                                                                            | Type        | Status |
@@ -587,3 +561,47 @@ This section contains detailed step-by-step instructions for manually verifying 
 - Frontend: `utils/commentPermalink.spec.ts` - Added unit tests for discussion, event, and issue comment permalink routes
 - Frontend: `composables/useCommentPermalink.ts` - Reused the shared helper for existing comment permalink behavior
 - Frontend: `graphQLData/comment/queries.js` - Added event channel context to comment search results
+
+---
+
+### Mobile Comment Padding
+
+**Purpose:** Reduce left-side padding on discussion/event comments at mobile widths to provide more horizontal space for content.
+
+**Test: Mobile Width Padding Reduction**
+
+1. Navigate to a discussion with nested comments
+2. Open browser developer tools and toggle device toolbar (Cmd+Shift+M or Ctrl+Shift+M)
+3. Select a mobile viewport (e.g., iPhone 12 or 375px width)
+4. Observe the comment layout:
+   - Nested comment indentation should be visibly reduced
+   - Comment text should have more horizontal reading space
+   - Comments should not feel cramped or extend beyond viewport
+5. Toggle to desktop viewport (e.g., 1280px width)
+6. Verify the original larger padding returns at desktop widths
+
+**Expected Behavior:**
+
+| Element               | Mobile (< 640px) | Desktop (≥ 640px) |
+| --------------------- | ---------------- | ----------------- |
+| Nested comment indent | `pl-2`           | `pl-4`            |
+| Comment body margin   | `ml-2`           | `ml-4`            |
+| Comment body padding  | `pl-2`           | `pl-4`            |
+| Comment text margin   | `ml-1`           | `ml-3`            |
+| Child comments margin | `ml-1`           | `ml-3`            |
+
+**Test: Event Comments**
+
+1. Navigate to an event with comments
+2. Repeat the mobile viewport test
+3. Verify the same padding reduction applies to event comments
+
+**Test: Deeply Nested Comments**
+
+1. Find or create a discussion with 3+ levels of nested replies
+2. At mobile width, verify the cumulative indentation is manageable
+3. Comments should remain readable without excessive horizontal scrolling
+
+**Files Changed:**
+
+- Frontend: `components/comments/Comment.vue` - Added responsive Tailwind classes (`sm:` prefix) to reduce left margin and padding at mobile widths
