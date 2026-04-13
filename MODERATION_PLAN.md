@@ -20,12 +20,11 @@ This section tracks the wiki/discussion/comment revision-history work from the c
 | Render wiki report targets in moderation UI | Done   | Issue queries and moderation surfaces now include wiki page/revision target fields and label wiki edit reports in issue lists/detail. |
 | Add wiki delete permission gates            | Done   | Wiki page deletion allows the original page author, server admin, or moderators with the dedicated `canDeleteWiki` permission.        |
 | Add wiki edits to user profiles             | Done   | User profiles include a wiki edits count, tab, and `/u/[username]/wiki-edits` page with channel filtering.                            |
+| Add wiki edits to contribution charts       | Done   | Backend contribution data and the user contribution chart include wiki edit counts, detail rows, and page/revision links.             |
 
 ### Remaining Coding Changes
 
-| Task                                                          | Location           | Type    | Notes                                                                                                                                                              |
-| ------------------------------------------------------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Add wiki edits to contribution charts                         | Backend + Frontend | Feature | Extend `GET_USER_CONTRIBUTIONS`, backend contribution resolver logic, and `UserContributionChart` so wiki edits appear in contribution history.                    |
+No remaining wiki revision moderation roadmap items are currently tracked here. Add new follow-up items as they are discovered.
 
 ---
 
@@ -275,6 +274,29 @@ This section contains detailed step-by-step instructions for manually verifying 
 - The "Wiki Edits" tab appears alongside comments, discussions, downloads, events, images, and albums.
 - `/u/[username]/wiki-edits` lists the user's wiki edits with page title, channel, timestamp, and edit reason when present.
 - Channel filtering narrows the wiki edit list to selected channels.
+- Wiki page links route to `/forums/[forumId]/wiki/[slug]`.
+- Revision links route to `/forums/[forumId]/wiki/revisions/diff/[slug]/[revisionId]`.
+
+#### Verify Wiki Edits Contribution Chart
+
+**Prerequisites:**
+
+- A user account that authored at least one wiki revision
+- At least one wiki edit in the selected contribution chart year
+
+**Test Steps:**
+
+1. Navigate to `/u/[username]`.
+2. Select a contribution chart year that includes a wiki edit.
+3. Click a contribution chart day that includes a wiki edit.
+4. Review the selected day summary and details list.
+5. Open the wiki page link and revision link from the wiki edit detail row.
+
+**Expected Outcome:**
+
+- The selected day summary includes the wiki edit count.
+- The details list includes a "Wiki Edits" section for days with wiki revisions.
+- Each wiki edit row shows the wiki page title, channel, timestamp, and edit reason when present.
 - Wiki page links route to `/forums/[forumId]/wiki/[slug]`.
 - Revision links route to `/forums/[forumId]/wiki/revisions/diff/[slug]/[revisionId]`.
 
