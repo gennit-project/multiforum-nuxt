@@ -86,6 +86,15 @@ export const CREATE_DOWNLOADABLE_FILE = gql`
   }
 `;
 
+export const TRACK_DOWNLOAD = gql`
+  mutation trackDownload($downloadableFileId: ID!, $discussionId: ID!) {
+    trackDownload(
+      downloadableFileId: $downloadableFileId
+      discussionId: $discussionId
+    )
+  }
+`;
+
 export const ADD_EMOJI_TO_DISCUSSION_CHANNEL = gql`
   mutation addEmojiToDiscussionChannel(
     $discussionChannelId: ID!

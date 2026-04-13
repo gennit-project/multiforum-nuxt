@@ -357,6 +357,8 @@ export const GET_DISCUSSION = gql`
         priceModel
         priceCents
         priceCurrency
+        downloadCountTotal
+        downloadCountUnique
         license {
           id
           name
@@ -446,6 +448,8 @@ export const GET_DISCUSSION_FEEDBACK = gql`
         id
         fileName
         url
+        downloadCountTotal
+        downloadCountUnique
       }
       CrosspostedDiscussion {
         ...CrosspostPreviewFields
