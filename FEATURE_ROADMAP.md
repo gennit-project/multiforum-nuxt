@@ -222,11 +222,26 @@
 | Discussion detail page comments have less left side padding at mobile width                                                     | UI          | ✅     |
 | In comment search results page, each result list item should be a permalink                                                     | Feature     | ✅     |
 | Well-tested function for making accurate permalink to comment on event, discussion, feedback, issue (both frontend and backend) | Feature     | ✅     |
-| Reduce API calls on favorites lists - include whether user has favorited each item in fetch-list API call                       | Performance |        |
+| Reduce API calls on favorites lists - include whether user has favorited each item in fetch-list API call (see notes below)     | Performance | ⏳     |
 | Auto-save for server settings and channel admin settings (at least for plugins; should not have two save buttons)               | UX          |        |
 | Activity feed shows title edit history of an event (similar to discussion detail pages)                                         | Feature     |        |
 | Can see description edits of event                                                                                              | Feature     |        |
 | Add a way to deprecate a channel - lock for reasons unrelated to sitewide rule violations                                       | Feature     |        |
+
+#### Notes on Favorites API Optimization
+
+**Current state (April 2026):**
+
+- **Discussions:** Already optimized. `getSiteWideDiscussionList` and `getDiscussionsInChannel` include `isFavorited` in results. `AddToDiscussionFavorites` accepts `initialIsFavorited` prop to skip refetch.
+- **Comments:** Have `isFavoritedByUser` in queries but `AddToCommentFavorites` lacks `initialIsFavorited` prop.
+- **Images:** `AddToImageFavorites` makes separate API call per image. Needs `initialIsFavorited` prop and backend query changes.
+- **Channels:** `AddToChannelFavorites` makes separate API call per channel. Needs similar optimization.
+
+**Work required:**
+
+1. Add `initialIsFavorited` prop to `AddToImageFavorites`, `AddToCommentFavorites`, `AddToChannelFavorites`
+2. Update image/channel list queries to include `isFavorited` computed field
+3. Update parent list components to pass `initialIsFavorited` prop
 
 ---
 
