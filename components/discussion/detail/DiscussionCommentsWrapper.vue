@@ -24,6 +24,7 @@ import InlineCommentForm from '@/components/discussion/form/InlineCommentForm.vu
 import DiscussionRootCommentFormWrapper from '@/components/discussion/form/DiscussionRootCommentFormWrapper.vue';
 import { buildBotMentionOptions } from '@/utils/botMentions';
 import { buildModMentionOptions } from '@/utils/modMentions';
+import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 
 const COMMENT_LIMIT = 50;
 
@@ -503,6 +504,17 @@ const handleSubscriptionToggle = () => {
     });
   }
 };
+
+// Handle ?action=unsubscribe query param for one-click unsubscribe from notifications
+const discussionChannelIdRef = computed(() => props.discussionChannel?.id || null);
+useAutoUnsubscribe({
+  entityId: discussionChannelIdRef,
+  unsubscribeFn: async (id: string) => {
+    await unsubscribeFromDiscussionChannel({ discussionChannelId: id });
+  },
+  entityType: 'discussion',
+  isSubscribed,
+});
 </script>
 
 <template>

@@ -48,6 +48,7 @@ import {
 import NotificationComponent from '@/components/NotificationComponent.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
+import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
 
@@ -737,6 +738,17 @@ const handleDeleteComment = async (commentId: string) => {
 const handleLockReasonUpdate = (value: string) => {
   lockReasonInput.value = value;
 };
+
+// Handle ?action=unsubscribe query param for one-click unsubscribe from notifications
+const issueIdRef = computed(() => activeIssue.value?.id || null);
+useAutoUnsubscribe({
+  entityId: issueIdRef,
+  unsubscribeFn: async (id: string) => {
+    await unsubscribeFromIssue({ issueId: id });
+  },
+  entityType: 'issue',
+  isSubscribed: isIssueSubscribed,
+});
 </script>
 
 <template>
