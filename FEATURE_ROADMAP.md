@@ -67,7 +67,7 @@ All notification tasks have been implemented. See [NOTIFICATIONS_PLAN.md](./NOTI
 | ------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------ |
 | Adding emoji to comment should not update last updated date; need new field `textLastEdited`                                    | Bug         | ✅     |
 | In comment section, can search comments by text to find specific comments                                                       | Feature     | ✅     |
-| Album image and detail page has share button (copy link, crosspost)                                                             | Feature     |        |
+| Album image and detail page has share button (copy link, crosspost)                                                             | Feature     | ✅     |
 | Discussion detail page comments have less left side padding at mobile width                                                     | UI          |        |
 | In comment search results page, each result list item should be a permalink                                                     | Feature     |        |
 | Well-tested function for making accurate permalink to comment on event, discussion, feedback, issue (both frontend and backend) | Feature     |        |
@@ -333,3 +333,43 @@ This section contains detailed step-by-step instructions for manually verifying 
 **Files Changed:**
 
 - Frontend: `components/comments/CommentSection.vue` - Added searchText ref, filteredComments computed, and search input UI
+
+---
+
+### Album and Image Share Button
+
+**Purpose:** Allow users to easily copy a permalink to an image or album page.
+
+**Test: Image Detail Page Share**
+
+1. Navigate to any user's image detail page (`/u/{username}/images/{imageId}`)
+2. Locate the "Share" button next to "Download" in the action buttons
+3. Click the "Share" button
+4. Verify "Link copied!" notification appears briefly
+5. Paste the clipboard contents to verify the correct URL was copied
+
+**Expected Outcome:**
+
+- Share button appears with link icon
+- Clicking copies the full URL (e.g., `https://example.com/u/username/images/abc123`)
+- Success notification shows for 2 seconds
+- Button works in both light and dark mode
+
+**Test: Album Detail Page Share**
+
+1. Navigate to any user's album detail page (`/u/{username}/albums/{albumId}`)
+2. Locate the "Share" button in the header area
+3. Click the "Share" button
+4. Verify "Link copied!" notification appears
+5. Paste to verify the correct album URL was copied
+
+**Expected Outcome:**
+
+- Share button appears on the right side of the header
+- Clicking copies the full album URL
+- Success notification shows for 2 seconds
+
+**Files Changed:**
+
+- Frontend: `pages/u/[username]/images/[imageId].vue` - Added share button and copy link functionality
+- Frontend: `pages/u/[username]/albums/[albumId].vue` - Added share button and copy link functionality
