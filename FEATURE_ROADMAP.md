@@ -66,7 +66,7 @@ All notification tasks have been implemented. See [NOTIFICATIONS_PLAN.md](./NOTI
 | Task                                                                                                                            | Type        | Status |
 | ------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------ |
 | Adding emoji to comment should not update last updated date; need new field `textLastEdited`                                    | Bug         | ✅     |
-| In comment section, can search comments by text to find specific comments                                                       | Feature     |        |
+| In comment section, can search comments by text to find specific comments                                                       | Feature     | ✅     |
 | Album image and detail page has share button (copy link, crosspost)                                                             | Feature     |        |
 | Discussion detail page comments have less left side padding at mobile width                                                     | UI          |        |
 | In comment search results page, each result list item should be a permalink                                                     | Feature     |        |
@@ -282,3 +282,54 @@ This section contains detailed step-by-step instructions for manually verifying 
 - Backend: `hooks/commentVersionHistoryHook.ts` - Sets `textLastEdited` when text changes
 - Frontend: `graphQLData/comment/queries.js` - Added `textLastEdited` to queries
 - Frontend: `components/comments/CommentHeader.vue` - Uses `textLastEdited` for "Edited" display
+
+---
+
+### Comment Search Within Discussion/Event
+
+**Purpose:** Allow users to search through comments within a discussion or event page.
+
+**Implementation:** Client-side filtering of loaded comments (searches only currently loaded comments, not all comments in the database).
+
+**Test: Basic Search Functionality**
+
+1. Navigate to a discussion with multiple comments
+2. Observe the search input below the sort buttons
+3. Type a word that appears in one of the comments
+4. Verify the comment list filters to show only matching comments
+5. Verify "X of Y loaded" indicator appears showing filter results
+
+**Expected Outcome:**
+
+- Search input appears below sort buttons when there are comments
+- Comments filter in real-time as you type
+- Filter count shows "X of Y loaded" when filtering
+- Search is case-insensitive
+
+**Test: Clear Search**
+
+1. Enter search text that filters comments
+2. Click the X button in the search input
+3. Verify search is cleared and all comments reappear
+
+**Test: No Results**
+
+1. Enter search text that doesn't match any loaded comment
+2. Verify message "No comments match [search text]" appears
+3. Clear search to verify comments reappear
+
+**Test: Event Comments**
+
+1. Navigate to an event with comments
+2. Verify search input also appears on event pages
+3. Test that filtering works the same as on discussions
+
+**Limitations:**
+
+- Only searches currently loaded comments (not all comments)
+- If a discussion has 500 comments but only 50 are loaded, search only covers those 50
+- Users can "Load More" then search within the expanded set
+
+**Files Changed:**
+
+- Frontend: `components/comments/CommentSection.vue` - Added searchText ref, filteredComments computed, and search input UI
