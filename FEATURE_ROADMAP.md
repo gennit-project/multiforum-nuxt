@@ -51,35 +51,35 @@ Auto-generated OGM queries support filtering by Recipient and isPublic fields.
 | Add gradient "Send & Super Upvote" button | `SuperUpvoteModal.vue` | Done |
 | Wire modal to `createScratchpadEntry` mutation | `SuperUpvoteModal.vue` | Done |
 
-#### Phase 6: Frontend - Scratchpad Components
+#### Phase 6: Frontend - Scratchpad Components - COMPLETED
 
-| Task | File | Type |
-|------|------|------|
-| Create `ScratchpadEntry.vue` - displays single entry with author avatar, text, source link, timestamp | `ScratchpadEntry.vue` | Feature |
-| Add "Make Public" and "Ignore" buttons for pending entries (recipient only) | `ScratchpadEntry.vue` | Feature |
-| Create `ScratchpadSection.vue` - displays pending (owner only) and public entries | `ScratchpadSection.vue` | Feature |
+| Task | File | Status |
+|------|------|--------|
+| Create `ScratchpadEntry.vue` - displays single entry with author avatar, text, source link, timestamp | `ScratchpadEntry.vue` | Done |
+| Add "Make Public" and "Ignore" buttons for pending entries (recipient only) | `ScratchpadEntry.vue` | Done |
+| Create `ScratchpadSection.vue` - displays pending (owner only) and public entries | `ScratchpadSection.vue` | Done |
 
-#### Phase 7: Frontend - User Profile Integration
+#### Phase 7: Frontend - User Profile Integration - COMPLETED
 
-| Task | File | Type |
-|------|------|------|
-| Add "Scratchpad" tab to user profile page | `[username].vue` | Feature |
-| Create `pages/u/[username]/scratchpad.vue` page | `scratchpad.vue` | Feature |
-| Add "Super Upvotes Received" stat to UserProfileSidebar | `UserProfileSidebar.vue` | Feature |
+| Task | File | Status |
+|------|------|--------|
+| Add "Scratchpad" tab to user profile page | `UserProfileTabs.vue` | Done |
+| Create `pages/u/[username]/scratchpad.vue` page | `scratchpad.vue` | Done |
+| Add "Super Upvotes Received" stat to UserProfileSidebar | `UserProfileSidebar.vue` | Pending |
 
-#### Phase 8: Notifications
+#### Phase 8: Notifications - COMPLETED
 
-| Task | File | Type |
-|------|------|------|
-| Send notification when someone writes on user's scratchpad | `createScratchpadEntry.ts` | Feature |
-| Notification text: "@username wrote on your scratchpad" with link to scratchpad page | Backend | Feature |
+| Task | File | Status |
+|------|------|--------|
+| Send notification when someone writes on user's scratchpad | `createScratchpadEntry.ts` | Done |
+| Notification text: "@username wrote on your scratchpad" with link to scratchpad page | Backend | Done |
 
-#### Phase 9: Karma Integration
+#### Phase 9: Karma Integration - COMPLETED
 
-| Task | File | Type |
-|------|------|------|
-| Update `weightedVotesCount` calculation: regular upvote = 1, super upvote = +1 additional | Backend | Feature |
-| Add `superUpvoteKarma` field to User or calculate from relationships | Backend | Feature |
+| Task | File | Status |
+|------|------|--------|
+| Update `weightedVotesCount` calculation: regular upvote = 1, super upvote = +1 additional | `createScratchpadEntry.ts` | Done |
+| Add `superUpvoteKarma` field to User or calculate from relationships | Backend | Pending (use ScratchpadEntriesAggregate) |
 
 ---
 
@@ -209,3 +209,41 @@ This section contains detailed step-by-step instructions for manually verifying 
 **Test: Notification Sent**
 1. After super upvoting, log in as User B
 2. Check notifications for message: "@UserA wrote on your scratchpad"
+
+### Scratchpad Components (Phases 6-7)
+
+**Test: Scratchpad Page**
+1. Navigate to /u/[username]/scratchpad
+2. Verify page loads without errors
+3. If user has no scratchpad entries, verify empty state message appears
+
+**Test: Pending Entries (Profile Owner)**
+1. Log in as User B (who received super upvotes)
+2. Navigate to your own scratchpad page
+3. Verify "Pending Entries" section appears with yellow background
+4. Verify each entry shows:
+   - Author avatar and name
+   - "super upvoted your comment/post" text with link
+   - Timestamp
+   - The thank-you message
+   - "Make Public" and "Ignore" buttons
+5. Click "Make Public" on an entry
+6. Verify entry moves to "Public Entries" section
+7. Verify entry now shows "Hide" and "Delete" buttons
+
+**Test: Public Entries (All Users)**
+1. Log out and view User B's scratchpad as anonymous
+2. Verify only public entries are visible
+3. Verify no action buttons appear for non-owners
+
+**Test: Delete Entry**
+1. Log in as User B
+2. Click "Delete" on a public entry
+3. Confirm deletion in dialog
+4. Verify entry is removed
+5. Verify super upvote relationship is NOT removed (check database)
+
+**Test: Profile Tab**
+1. Navigate to /u/[username]
+2. Verify "Scratchpad" tab appears in profile tabs
+3. Click tab and verify navigation to scratchpad page
