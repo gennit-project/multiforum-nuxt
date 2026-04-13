@@ -230,8 +230,8 @@ You received this because you are subscribed [by default | to this discussion].
 9. [x] Phase 6 - Notification footer with subscription status (included in Phase 5 Backend)
 
 ### Sprint 4: Issue Notifications
-10. Phase 4 - Issue moderation action notifications
-11. Phase 4 - Enhanced archived content notifications
+10. [x] Phase 4 - Issue moderation action notifications (already implemented via notifyIssueSubscribers)
+11. [x] Phase 4 - Enhanced archived content notifications (archivedContentNotificationHook.ts)
 
 ---
 
@@ -240,7 +240,7 @@ You received this because you are subscribed [by default | to this discussion].
 ### Backend (New Files)
 - [x] `hooks/modMentionNotificationHook.ts` - Created
 - [x] `hooks/feedbackNotificationHook.ts` - Created
-- [ ] `hooks/issueModerationActionNotificationHook.ts`
+- [x] `hooks/archivedContentNotificationHook.ts` - Created (notifies content authors when archived)
 - [x] `utils/notificationFooter.ts` - Created
 
 ### Backend (Modify)
@@ -659,6 +659,7 @@ This section contains detailed step-by-step instructions for manually verifying 
 - [x] Works for discussions, events, and issues
 
 #### Issue Moderation Notifications (Sprint 4)
-- [ ] Moderation action on issue triggers notification to all subscribers
-- [ ] Archived content notification mentions how to reopen/appeal
-- [ ] Notification includes link to the related issue
+
+- [x] Moderation action on issue triggers notification to all subscribers
+- [x] Archived content notification mentions how to reopen/appeal
+- [x] Notification includes link to the related issue
