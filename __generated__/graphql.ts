@@ -32,6 +32,7 @@ export type Activity = {
   Discussions: Array<DiscussionInfo>;
   Downloads: Array<DiscussionInfo>;
   Events: Array<EventInfo>;
+  WikiEdits: Array<WikiEditInfo>;
   description: Scalars['String']['output'];
   id: Scalars['String']['output'];
   type: Scalars['String']['output'];
@@ -10695,6 +10696,9 @@ export type Comment = {
   SubscribedToNotifications: Array<User>;
   SubscribedToNotificationsAggregate?: Maybe<CommentUserSubscribedToNotificationsAggregationSelection>;
   SubscribedToNotificationsConnection: CommentSubscribedToNotificationsConnection;
+  SuperUpvotedByUsers: Array<User>;
+  SuperUpvotedByUsersAggregate?: Maybe<CommentUserSuperUpvotedByUsersAggregationSelection>;
+  SuperUpvotedByUsersConnection: CommentSuperUpvotedByUsersConnection;
   Tags: Array<Tag>;
   TagsAggregate?: Maybe<CommentTagTagsAggregationSelection>;
   TagsConnection: CommentTagsConnection;
@@ -11059,6 +11063,28 @@ export type CommentSubscribedToNotificationsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CommentSubscribedToNotificationsConnectionSort>>;
   where?: InputMaybe<CommentSubscribedToNotificationsConnectionWhere>;
+};
+
+
+export type CommentSuperUpvotedByUsersArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type CommentSuperUpvotedByUsersAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type CommentSuperUpvotedByUsersConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<CommentSuperUpvotedByUsersConnectionSort>>;
+  where?: InputMaybe<CommentSuperUpvotedByUsersConnectionWhere>;
 };
 
 
@@ -11928,6 +11954,7 @@ export type CommentConnectInput = {
   PastVersions?: InputMaybe<Array<CommentPastVersionsConnectFieldInput>>;
   RelatedIssues?: InputMaybe<Array<CommentRelatedIssuesConnectFieldInput>>;
   SubscribedToNotifications?: InputMaybe<Array<CommentSubscribedToNotificationsConnectFieldInput>>;
+  SuperUpvotedByUsers?: InputMaybe<Array<CommentSuperUpvotedByUsersConnectFieldInput>>;
   Tags?: InputMaybe<Array<CommentTagsConnectFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersConnectFieldInput>>;
 };
@@ -11936,6 +11963,7 @@ export type CommentConnectOrCreateInput = {
   Channel?: InputMaybe<CommentChannelConnectOrCreateFieldInput>;
   CommentAuthor?: InputMaybe<CommentCommentAuthorConnectOrCreateInput>;
   SubscribedToNotifications?: InputMaybe<Array<CommentSubscribedToNotificationsConnectOrCreateFieldInput>>;
+  SuperUpvotedByUsers?: InputMaybe<Array<CommentSuperUpvotedByUsersConnectOrCreateFieldInput>>;
   Tags?: InputMaybe<Array<CommentTagsConnectOrCreateFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersConnectOrCreateFieldInput>>;
 };
@@ -11962,6 +11990,7 @@ export type CommentConnectedRelationships = {
   PastVersions?: Maybe<CommentPastVersionsConnectedRelationship>;
   RelatedIssues?: Maybe<CommentRelatedIssuesConnectedRelationship>;
   SubscribedToNotifications?: Maybe<CommentSubscribedToNotificationsConnectedRelationship>;
+  SuperUpvotedByUsers?: Maybe<CommentSuperUpvotedByUsersConnectedRelationship>;
   Tags?: Maybe<CommentTagsConnectedRelationship>;
   UpvotedByUsers?: Maybe<CommentUpvotedByUsersConnectedRelationship>;
 };
@@ -11983,6 +12012,7 @@ export type CommentCreateInput = {
   PastVersions?: InputMaybe<CommentPastVersionsFieldInput>;
   RelatedIssues?: InputMaybe<CommentRelatedIssuesFieldInput>;
   SubscribedToNotifications?: InputMaybe<CommentSubscribedToNotificationsFieldInput>;
+  SuperUpvotedByUsers?: InputMaybe<CommentSuperUpvotedByUsersFieldInput>;
   Tags?: InputMaybe<CommentTagsFieldInput>;
   UpvotedByUsers?: InputMaybe<CommentUpvotedByUsersFieldInput>;
   archived?: InputMaybe<Scalars['Boolean']['input']>;
@@ -12022,6 +12052,7 @@ export type CommentDeleteInput = {
   PastVersions?: InputMaybe<Array<CommentPastVersionsDeleteFieldInput>>;
   RelatedIssues?: InputMaybe<Array<CommentRelatedIssuesDeleteFieldInput>>;
   SubscribedToNotifications?: InputMaybe<Array<CommentSubscribedToNotificationsDeleteFieldInput>>;
+  SuperUpvotedByUsers?: InputMaybe<Array<CommentSuperUpvotedByUsersDeleteFieldInput>>;
   Tags?: InputMaybe<Array<CommentTagsDeleteFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersDeleteFieldInput>>;
 };
@@ -12050,6 +12081,7 @@ export type CommentDisconnectInput = {
   PastVersions?: InputMaybe<Array<CommentPastVersionsDisconnectFieldInput>>;
   RelatedIssues?: InputMaybe<Array<CommentRelatedIssuesDisconnectFieldInput>>;
   SubscribedToNotifications?: InputMaybe<Array<CommentSubscribedToNotificationsDisconnectFieldInput>>;
+  SuperUpvotedByUsers?: InputMaybe<Array<CommentSuperUpvotedByUsersDisconnectFieldInput>>;
   Tags?: InputMaybe<Array<CommentTagsDisconnectFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersDisconnectFieldInput>>;
 };
@@ -14818,6 +14850,7 @@ export type CommentRelationInput = {
   PastVersions?: InputMaybe<Array<CommentPastVersionsCreateFieldInput>>;
   RelatedIssues?: InputMaybe<Array<CommentRelatedIssuesCreateFieldInput>>;
   SubscribedToNotifications?: InputMaybe<Array<CommentSubscribedToNotificationsCreateFieldInput>>;
+  SuperUpvotedByUsers?: InputMaybe<Array<CommentSuperUpvotedByUsersCreateFieldInput>>;
   Tags?: InputMaybe<Array<CommentTagsCreateFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersCreateFieldInput>>;
 };
@@ -14873,6 +14906,7 @@ export type CommentRelationshipsSubscriptionWhere = {
   PastVersions?: InputMaybe<CommentPastVersionsRelationshipSubscriptionWhere>;
   RelatedIssues?: InputMaybe<CommentRelatedIssuesRelationshipSubscriptionWhere>;
   SubscribedToNotifications?: InputMaybe<CommentSubscribedToNotificationsRelationshipSubscriptionWhere>;
+  SuperUpvotedByUsers?: InputMaybe<CommentSuperUpvotedByUsersRelationshipSubscriptionWhere>;
   Tags?: InputMaybe<CommentTagsRelationshipSubscriptionWhere>;
   UpvotedByUsers?: InputMaybe<CommentUpvotedByUsersRelationshipSubscriptionWhere>;
 };
@@ -15455,6 +15489,352 @@ export type CommentSubscriptionWhere = {
   weightedVotesCount_LTE?: InputMaybe<Scalars['Float']['input']>;
 };
 
+export type CommentSuperUpvotedByUsersAggregateInput = {
+  AND?: InputMaybe<Array<CommentSuperUpvotedByUsersAggregateInput>>;
+  NOT?: InputMaybe<CommentSuperUpvotedByUsersAggregateInput>;
+  OR?: InputMaybe<Array<CommentSuperUpvotedByUsersAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<CommentSuperUpvotedByUsersNodeAggregationWhereInput>;
+};
+
+export type CommentSuperUpvotedByUsersConnectFieldInput = {
+  connect?: InputMaybe<Array<UserConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<UserConnectWhere>;
+};
+
+export type CommentSuperUpvotedByUsersConnectOrCreateFieldInput = {
+  onCreate: CommentSuperUpvotedByUsersConnectOrCreateFieldInputOnCreate;
+  where: UserConnectOrCreateWhere;
+};
+
+export type CommentSuperUpvotedByUsersConnectOrCreateFieldInputOnCreate = {
+  node: UserOnCreateInput;
+};
+
+export type CommentSuperUpvotedByUsersConnectedRelationship = {
+  __typename?: 'CommentSuperUpvotedByUsersConnectedRelationship';
+  node: UserEventPayload;
+};
+
+export type CommentSuperUpvotedByUsersConnection = {
+  __typename?: 'CommentSuperUpvotedByUsersConnection';
+  edges: Array<CommentSuperUpvotedByUsersRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type CommentSuperUpvotedByUsersConnectionSort = {
+  node?: InputMaybe<UserSort>;
+};
+
+export type CommentSuperUpvotedByUsersConnectionWhere = {
+  AND?: InputMaybe<Array<CommentSuperUpvotedByUsersConnectionWhere>>;
+  NOT?: InputMaybe<CommentSuperUpvotedByUsersConnectionWhere>;
+  OR?: InputMaybe<Array<CommentSuperUpvotedByUsersConnectionWhere>>;
+  node?: InputMaybe<UserWhere>;
+};
+
+export type CommentSuperUpvotedByUsersCreateFieldInput = {
+  node: UserCreateInput;
+};
+
+export type CommentSuperUpvotedByUsersDeleteFieldInput = {
+  delete?: InputMaybe<UserDeleteInput>;
+  where?: InputMaybe<CommentSuperUpvotedByUsersConnectionWhere>;
+};
+
+export type CommentSuperUpvotedByUsersDisconnectFieldInput = {
+  disconnect?: InputMaybe<UserDisconnectInput>;
+  where?: InputMaybe<CommentSuperUpvotedByUsersConnectionWhere>;
+};
+
+export type CommentSuperUpvotedByUsersFieldInput = {
+  connect?: InputMaybe<Array<CommentSuperUpvotedByUsersConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<CommentSuperUpvotedByUsersConnectOrCreateFieldInput>>;
+  create?: InputMaybe<Array<CommentSuperUpvotedByUsersCreateFieldInput>>;
+};
+
+export type CommentSuperUpvotedByUsersNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<CommentSuperUpvotedByUsersNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<CommentSuperUpvotedByUsersNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<CommentSuperUpvotedByUsersNodeAggregationWhereInput>>;
+  bio_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  location_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  username_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type CommentSuperUpvotedByUsersRelationship = {
+  __typename?: 'CommentSuperUpvotedByUsersRelationship';
+  cursor: Scalars['String']['output'];
+  node: User;
+};
+
+export type CommentSuperUpvotedByUsersRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
+export type CommentSuperUpvotedByUsersUpdateConnectionInput = {
+  node?: InputMaybe<UserUpdateInput>;
+};
+
+export type CommentSuperUpvotedByUsersUpdateFieldInput = {
+  connect?: InputMaybe<Array<CommentSuperUpvotedByUsersConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<CommentSuperUpvotedByUsersConnectOrCreateFieldInput>>;
+  create?: InputMaybe<Array<CommentSuperUpvotedByUsersCreateFieldInput>>;
+  delete?: InputMaybe<Array<CommentSuperUpvotedByUsersDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<CommentSuperUpvotedByUsersDisconnectFieldInput>>;
+  update?: InputMaybe<CommentSuperUpvotedByUsersUpdateConnectionInput>;
+  where?: InputMaybe<CommentSuperUpvotedByUsersConnectionWhere>;
+};
+
 export type CommentTagTagsAggregationSelection = {
   __typename?: 'CommentTagTagsAggregationSelection';
   count: Scalars['Int']['output'];
@@ -15614,6 +15994,7 @@ export type CommentUpdateInput = {
   PastVersions?: InputMaybe<Array<CommentPastVersionsUpdateFieldInput>>;
   RelatedIssues?: InputMaybe<Array<CommentRelatedIssuesUpdateFieldInput>>;
   SubscribedToNotifications?: InputMaybe<Array<CommentSubscribedToNotificationsUpdateFieldInput>>;
+  SuperUpvotedByUsers?: InputMaybe<Array<CommentSuperUpvotedByUsersUpdateFieldInput>>;
   Tags?: InputMaybe<Array<CommentTagsUpdateFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersUpdateFieldInput>>;
   archived?: InputMaybe<Scalars['Boolean']['input']>;
@@ -16013,6 +16394,32 @@ export type CommentUserSubscribedToNotificationsNodeAggregateSelection = {
   username: StringAggregateSelection;
 };
 
+export type CommentUserSuperUpvotedByUsersAggregationSelection = {
+  __typename?: 'CommentUserSuperUpvotedByUsersAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<CommentUserSuperUpvotedByUsersNodeAggregateSelection>;
+};
+
+export type CommentUserSuperUpvotedByUsersNodeAggregateSelection = {
+  __typename?: 'CommentUserSuperUpvotedByUsersNodeAggregateSelection';
+  bio: StringAggregateSelection;
+  botProfileId: StringAggregateSelection;
+  commentKarma: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  defaultEmojiSkinTone: StringAggregateSelection;
+  deprecatedReason: StringAggregateSelection;
+  discussionKarma: IntAggregateSelection;
+  displayName: StringAggregateSelection;
+  location: StringAggregateSelection;
+  notificationBundleContent: StringAggregateSelection;
+  notificationBundleInterval: StringAggregateSelection;
+  preferredTimeZone: StringAggregateSelection;
+  profilePicURL: StringAggregateSelection;
+  pronouns: StringAggregateSelection;
+  stripeAccountId: StringAggregateSelection;
+  username: StringAggregateSelection;
+};
+
 export type CommentUserUpvotedByUsersAggregationSelection = {
   __typename?: 'CommentUserUpvotedByUsersAggregationSelection';
   count: Scalars['Int']['output'];
@@ -16206,6 +16613,23 @@ export type CommentWhere = {
   SubscribedToNotifications_SINGLE?: InputMaybe<UserWhere>;
   /** Return Comments where some of the related Users match this filter */
   SubscribedToNotifications_SOME?: InputMaybe<UserWhere>;
+  SuperUpvotedByUsersAggregate?: InputMaybe<CommentSuperUpvotedByUsersAggregateInput>;
+  /** Return Comments where all of the related CommentSuperUpvotedByUsersConnections match this filter */
+  SuperUpvotedByUsersConnection_ALL?: InputMaybe<CommentSuperUpvotedByUsersConnectionWhere>;
+  /** Return Comments where none of the related CommentSuperUpvotedByUsersConnections match this filter */
+  SuperUpvotedByUsersConnection_NONE?: InputMaybe<CommentSuperUpvotedByUsersConnectionWhere>;
+  /** Return Comments where one of the related CommentSuperUpvotedByUsersConnections match this filter */
+  SuperUpvotedByUsersConnection_SINGLE?: InputMaybe<CommentSuperUpvotedByUsersConnectionWhere>;
+  /** Return Comments where some of the related CommentSuperUpvotedByUsersConnections match this filter */
+  SuperUpvotedByUsersConnection_SOME?: InputMaybe<CommentSuperUpvotedByUsersConnectionWhere>;
+  /** Return Comments where all of the related Users match this filter */
+  SuperUpvotedByUsers_ALL?: InputMaybe<UserWhere>;
+  /** Return Comments where none of the related Users match this filter */
+  SuperUpvotedByUsers_NONE?: InputMaybe<UserWhere>;
+  /** Return Comments where one of the related Users match this filter */
+  SuperUpvotedByUsers_SINGLE?: InputMaybe<UserWhere>;
+  /** Return Comments where some of the related Users match this filter */
+  SuperUpvotedByUsers_SOME?: InputMaybe<UserWhere>;
   TagsAggregate?: InputMaybe<CommentTagsAggregateInput>;
   /** Return Comments where all of the related CommentTagsConnections match this filter */
   TagsConnection_ALL?: InputMaybe<CommentTagsConnectionWhere>;
@@ -17246,6 +17670,12 @@ export type CreateSafetyCheckResponsesMutationResponse = {
   safetyCheckResponses: Array<SafetyCheckResponse>;
 };
 
+export type CreateScratchpadEntriesMutationResponse = {
+  __typename?: 'CreateScratchpadEntriesMutationResponse';
+  info: CreateInfo;
+  scratchpadEntries: Array<ScratchpadEntry>;
+};
+
 export type CreateSeedDataResponsesMutationResponse = {
   __typename?: 'CreateSeedDataResponsesMutationResponse';
   info: CreateInfo;
@@ -17328,6 +17758,18 @@ export type CreateUsersMutationResponse = {
   __typename?: 'CreateUsersMutationResponse';
   info: CreateInfo;
   users: Array<User>;
+};
+
+export type CreateWikiEditInfosMutationResponse = {
+  __typename?: 'CreateWikiEditInfosMutationResponse';
+  info: CreateInfo;
+  wikiEditInfos: Array<WikiEditInfo>;
+};
+
+export type CreateWikiPageInfosMutationResponse = {
+  __typename?: 'CreateWikiPageInfosMutationResponse';
+  info: CreateInfo;
+  wikiPageInfos: Array<WikiPageInfo>;
 };
 
 export type CreateWikiPagesMutationResponse = {
@@ -18611,6 +19053,9 @@ export type DiscussionChannel = {
   SubscribedToNotifications: Array<User>;
   SubscribedToNotificationsAggregate?: Maybe<DiscussionChannelUserSubscribedToNotificationsAggregationSelection>;
   SubscribedToNotificationsConnection: DiscussionChannelSubscribedToNotificationsConnection;
+  SuperUpvotedByUsers: Array<User>;
+  SuperUpvotedByUsersAggregate?: Maybe<DiscussionChannelUserSuperUpvotedByUsersAggregationSelection>;
+  SuperUpvotedByUsersConnection: DiscussionChannelSuperUpvotedByUsersConnection;
   UpvotedByUsers: Array<User>;
   UpvotedByUsersAggregate?: Maybe<DiscussionChannelUserUpvotedByUsersAggregationSelection>;
   UpvotedByUsersConnection: DiscussionChannelUpvotedByUsersConnection;
@@ -18800,6 +19245,28 @@ export type DiscussionChannelSubscribedToNotificationsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DiscussionChannelSubscribedToNotificationsConnectionSort>>;
   where?: InputMaybe<DiscussionChannelSubscribedToNotificationsConnectionWhere>;
+};
+
+
+export type DiscussionChannelSuperUpvotedByUsersArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type DiscussionChannelSuperUpvotedByUsersAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type DiscussionChannelSuperUpvotedByUsersConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersConnectionSort>>;
+  where?: InputMaybe<DiscussionChannelSuperUpvotedByUsersConnectionWhere>;
 };
 
 
@@ -19478,12 +19945,14 @@ export type DiscussionChannelConnectInput = {
   LabelOptions?: InputMaybe<Array<DiscussionChannelLabelOptionsConnectFieldInput>>;
   RelatedIssues?: InputMaybe<Array<DiscussionChannelRelatedIssuesConnectFieldInput>>;
   SubscribedToNotifications?: InputMaybe<Array<DiscussionChannelSubscribedToNotificationsConnectFieldInput>>;
+  SuperUpvotedByUsers?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersConnectFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<DiscussionChannelUpvotedByUsersConnectFieldInput>>;
 };
 
 export type DiscussionChannelConnectOrCreateInput = {
   Channel?: InputMaybe<DiscussionChannelChannelConnectOrCreateFieldInput>;
   SubscribedToNotifications?: InputMaybe<Array<DiscussionChannelSubscribedToNotificationsConnectOrCreateFieldInput>>;
+  SuperUpvotedByUsers?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersConnectOrCreateFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<DiscussionChannelUpvotedByUsersConnectOrCreateFieldInput>>;
 };
 
@@ -19501,6 +19970,7 @@ export type DiscussionChannelConnectedRelationships = {
   LabelOptions?: Maybe<DiscussionChannelLabelOptionsConnectedRelationship>;
   RelatedIssues?: Maybe<DiscussionChannelRelatedIssuesConnectedRelationship>;
   SubscribedToNotifications?: Maybe<DiscussionChannelSubscribedToNotificationsConnectedRelationship>;
+  SuperUpvotedByUsers?: Maybe<DiscussionChannelSuperUpvotedByUsersConnectedRelationship>;
   UpvotedByUsers?: Maybe<DiscussionChannelUpvotedByUsersConnectedRelationship>;
 };
 
@@ -19513,6 +19983,7 @@ export type DiscussionChannelCreateInput = {
   LabelOptions?: InputMaybe<DiscussionChannelLabelOptionsFieldInput>;
   RelatedIssues?: InputMaybe<DiscussionChannelRelatedIssuesFieldInput>;
   SubscribedToNotifications?: InputMaybe<DiscussionChannelSubscribedToNotificationsFieldInput>;
+  SuperUpvotedByUsers?: InputMaybe<DiscussionChannelSuperUpvotedByUsersFieldInput>;
   UpvotedByUsers?: InputMaybe<DiscussionChannelUpvotedByUsersFieldInput>;
   answered?: InputMaybe<Scalars['Boolean']['input']>;
   archived?: InputMaybe<Scalars['Boolean']['input']>;
@@ -19540,6 +20011,7 @@ export type DiscussionChannelDeleteInput = {
   LabelOptions?: InputMaybe<Array<DiscussionChannelLabelOptionsDeleteFieldInput>>;
   RelatedIssues?: InputMaybe<Array<DiscussionChannelRelatedIssuesDeleteFieldInput>>;
   SubscribedToNotifications?: InputMaybe<Array<DiscussionChannelSubscribedToNotificationsDeleteFieldInput>>;
+  SuperUpvotedByUsers?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersDeleteFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<DiscussionChannelUpvotedByUsersDeleteFieldInput>>;
 };
 
@@ -19559,6 +20031,7 @@ export type DiscussionChannelDisconnectInput = {
   LabelOptions?: InputMaybe<Array<DiscussionChannelLabelOptionsDisconnectFieldInput>>;
   RelatedIssues?: InputMaybe<Array<DiscussionChannelRelatedIssuesDisconnectFieldInput>>;
   SubscribedToNotifications?: InputMaybe<Array<DiscussionChannelSubscribedToNotificationsDisconnectFieldInput>>;
+  SuperUpvotedByUsers?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersDisconnectFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<DiscussionChannelUpvotedByUsersDisconnectFieldInput>>;
 };
 
@@ -20834,6 +21307,7 @@ export type DiscussionChannelRelationInput = {
   LabelOptions?: InputMaybe<Array<DiscussionChannelLabelOptionsCreateFieldInput>>;
   RelatedIssues?: InputMaybe<Array<DiscussionChannelRelatedIssuesCreateFieldInput>>;
   SubscribedToNotifications?: InputMaybe<Array<DiscussionChannelSubscribedToNotificationsCreateFieldInput>>;
+  SuperUpvotedByUsers?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersCreateFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<DiscussionChannelUpvotedByUsersCreateFieldInput>>;
 };
 
@@ -20880,6 +21354,7 @@ export type DiscussionChannelRelationshipsSubscriptionWhere = {
   LabelOptions?: InputMaybe<DiscussionChannelLabelOptionsRelationshipSubscriptionWhere>;
   RelatedIssues?: InputMaybe<DiscussionChannelRelatedIssuesRelationshipSubscriptionWhere>;
   SubscribedToNotifications?: InputMaybe<DiscussionChannelSubscribedToNotificationsRelationshipSubscriptionWhere>;
+  SuperUpvotedByUsers?: InputMaybe<DiscussionChannelSuperUpvotedByUsersRelationshipSubscriptionWhere>;
   UpvotedByUsers?: InputMaybe<DiscussionChannelUpvotedByUsersRelationshipSubscriptionWhere>;
 };
 
@@ -21288,6 +21763,352 @@ export type DiscussionChannelSubscriptionWhere = {
   weightedVotesCount_LTE?: InputMaybe<Scalars['Float']['input']>;
 };
 
+export type DiscussionChannelSuperUpvotedByUsersAggregateInput = {
+  AND?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersAggregateInput>>;
+  NOT?: InputMaybe<DiscussionChannelSuperUpvotedByUsersAggregateInput>;
+  OR?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<DiscussionChannelSuperUpvotedByUsersNodeAggregationWhereInput>;
+};
+
+export type DiscussionChannelSuperUpvotedByUsersConnectFieldInput = {
+  connect?: InputMaybe<Array<UserConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<UserConnectWhere>;
+};
+
+export type DiscussionChannelSuperUpvotedByUsersConnectOrCreateFieldInput = {
+  onCreate: DiscussionChannelSuperUpvotedByUsersConnectOrCreateFieldInputOnCreate;
+  where: UserConnectOrCreateWhere;
+};
+
+export type DiscussionChannelSuperUpvotedByUsersConnectOrCreateFieldInputOnCreate = {
+  node: UserOnCreateInput;
+};
+
+export type DiscussionChannelSuperUpvotedByUsersConnectedRelationship = {
+  __typename?: 'DiscussionChannelSuperUpvotedByUsersConnectedRelationship';
+  node: UserEventPayload;
+};
+
+export type DiscussionChannelSuperUpvotedByUsersConnection = {
+  __typename?: 'DiscussionChannelSuperUpvotedByUsersConnection';
+  edges: Array<DiscussionChannelSuperUpvotedByUsersRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type DiscussionChannelSuperUpvotedByUsersConnectionSort = {
+  node?: InputMaybe<UserSort>;
+};
+
+export type DiscussionChannelSuperUpvotedByUsersConnectionWhere = {
+  AND?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersConnectionWhere>>;
+  NOT?: InputMaybe<DiscussionChannelSuperUpvotedByUsersConnectionWhere>;
+  OR?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersConnectionWhere>>;
+  node?: InputMaybe<UserWhere>;
+};
+
+export type DiscussionChannelSuperUpvotedByUsersCreateFieldInput = {
+  node: UserCreateInput;
+};
+
+export type DiscussionChannelSuperUpvotedByUsersDeleteFieldInput = {
+  delete?: InputMaybe<UserDeleteInput>;
+  where?: InputMaybe<DiscussionChannelSuperUpvotedByUsersConnectionWhere>;
+};
+
+export type DiscussionChannelSuperUpvotedByUsersDisconnectFieldInput = {
+  disconnect?: InputMaybe<UserDisconnectInput>;
+  where?: InputMaybe<DiscussionChannelSuperUpvotedByUsersConnectionWhere>;
+};
+
+export type DiscussionChannelSuperUpvotedByUsersFieldInput = {
+  connect?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersConnectOrCreateFieldInput>>;
+  create?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersCreateFieldInput>>;
+};
+
+export type DiscussionChannelSuperUpvotedByUsersNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<DiscussionChannelSuperUpvotedByUsersNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersNodeAggregationWhereInput>>;
+  bio_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  location_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  username_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type DiscussionChannelSuperUpvotedByUsersRelationship = {
+  __typename?: 'DiscussionChannelSuperUpvotedByUsersRelationship';
+  cursor: Scalars['String']['output'];
+  node: User;
+};
+
+export type DiscussionChannelSuperUpvotedByUsersRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
+export type DiscussionChannelSuperUpvotedByUsersUpdateConnectionInput = {
+  node?: InputMaybe<UserUpdateInput>;
+};
+
+export type DiscussionChannelSuperUpvotedByUsersUpdateFieldInput = {
+  connect?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersConnectOrCreateFieldInput>>;
+  create?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersCreateFieldInput>>;
+  delete?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersDisconnectFieldInput>>;
+  update?: InputMaybe<DiscussionChannelSuperUpvotedByUsersUpdateConnectionInput>;
+  where?: InputMaybe<DiscussionChannelSuperUpvotedByUsersConnectionWhere>;
+};
+
 export type DiscussionChannelUpdateInput = {
   Answers?: InputMaybe<Array<DiscussionChannelAnswersUpdateFieldInput>>;
   Channel?: InputMaybe<DiscussionChannelChannelUpdateFieldInput>;
@@ -21297,6 +22118,7 @@ export type DiscussionChannelUpdateInput = {
   LabelOptions?: InputMaybe<Array<DiscussionChannelLabelOptionsUpdateFieldInput>>;
   RelatedIssues?: InputMaybe<Array<DiscussionChannelRelatedIssuesUpdateFieldInput>>;
   SubscribedToNotifications?: InputMaybe<Array<DiscussionChannelSubscribedToNotificationsUpdateFieldInput>>;
+  SuperUpvotedByUsers?: InputMaybe<Array<DiscussionChannelSuperUpvotedByUsersUpdateFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<DiscussionChannelUpvotedByUsersUpdateFieldInput>>;
   answered?: InputMaybe<Scalars['Boolean']['input']>;
   archived?: InputMaybe<Scalars['Boolean']['input']>;
@@ -21693,6 +22515,32 @@ export type DiscussionChannelUserSubscribedToNotificationsNodeAggregateSelection
   username: StringAggregateSelection;
 };
 
+export type DiscussionChannelUserSuperUpvotedByUsersAggregationSelection = {
+  __typename?: 'DiscussionChannelUserSuperUpvotedByUsersAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<DiscussionChannelUserSuperUpvotedByUsersNodeAggregateSelection>;
+};
+
+export type DiscussionChannelUserSuperUpvotedByUsersNodeAggregateSelection = {
+  __typename?: 'DiscussionChannelUserSuperUpvotedByUsersNodeAggregateSelection';
+  bio: StringAggregateSelection;
+  botProfileId: StringAggregateSelection;
+  commentKarma: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  defaultEmojiSkinTone: StringAggregateSelection;
+  deprecatedReason: StringAggregateSelection;
+  discussionKarma: IntAggregateSelection;
+  displayName: StringAggregateSelection;
+  location: StringAggregateSelection;
+  notificationBundleContent: StringAggregateSelection;
+  notificationBundleInterval: StringAggregateSelection;
+  preferredTimeZone: StringAggregateSelection;
+  profilePicURL: StringAggregateSelection;
+  pronouns: StringAggregateSelection;
+  stripeAccountId: StringAggregateSelection;
+  username: StringAggregateSelection;
+};
+
 export type DiscussionChannelUserUpvotedByUsersAggregationSelection = {
   __typename?: 'DiscussionChannelUserUpvotedByUsersAggregationSelection';
   count: Scalars['Int']['output'];
@@ -21835,6 +22683,23 @@ export type DiscussionChannelWhere = {
   SubscribedToNotifications_SINGLE?: InputMaybe<UserWhere>;
   /** Return DiscussionChannels where some of the related Users match this filter */
   SubscribedToNotifications_SOME?: InputMaybe<UserWhere>;
+  SuperUpvotedByUsersAggregate?: InputMaybe<DiscussionChannelSuperUpvotedByUsersAggregateInput>;
+  /** Return DiscussionChannels where all of the related DiscussionChannelSuperUpvotedByUsersConnections match this filter */
+  SuperUpvotedByUsersConnection_ALL?: InputMaybe<DiscussionChannelSuperUpvotedByUsersConnectionWhere>;
+  /** Return DiscussionChannels where none of the related DiscussionChannelSuperUpvotedByUsersConnections match this filter */
+  SuperUpvotedByUsersConnection_NONE?: InputMaybe<DiscussionChannelSuperUpvotedByUsersConnectionWhere>;
+  /** Return DiscussionChannels where one of the related DiscussionChannelSuperUpvotedByUsersConnections match this filter */
+  SuperUpvotedByUsersConnection_SINGLE?: InputMaybe<DiscussionChannelSuperUpvotedByUsersConnectionWhere>;
+  /** Return DiscussionChannels where some of the related DiscussionChannelSuperUpvotedByUsersConnections match this filter */
+  SuperUpvotedByUsersConnection_SOME?: InputMaybe<DiscussionChannelSuperUpvotedByUsersConnectionWhere>;
+  /** Return DiscussionChannels where all of the related Users match this filter */
+  SuperUpvotedByUsers_ALL?: InputMaybe<UserWhere>;
+  /** Return DiscussionChannels where none of the related Users match this filter */
+  SuperUpvotedByUsers_NONE?: InputMaybe<UserWhere>;
+  /** Return DiscussionChannels where one of the related Users match this filter */
+  SuperUpvotedByUsers_SINGLE?: InputMaybe<UserWhere>;
+  /** Return DiscussionChannels where some of the related Users match this filter */
+  SuperUpvotedByUsers_SOME?: InputMaybe<UserWhere>;
   UpvotedByUsersAggregate?: InputMaybe<DiscussionChannelUpvotedByUsersAggregateInput>;
   /** Return DiscussionChannels where all of the related DiscussionChannelUpvotedByUsersConnections match this filter */
   UpvotedByUsersConnection_ALL?: InputMaybe<DiscussionChannelUpvotedByUsersConnectionWhere>;
@@ -44471,6 +45336,8 @@ export type Mutation = {
   createRepeatEnds: CreateRepeatEndsMutationResponse;
   createRepeatEveries: CreateRepeatEveriesMutationResponse;
   createSafetyCheckResponses: CreateSafetyCheckResponsesMutationResponse;
+  createScratchpadEntries: CreateScratchpadEntriesMutationResponse;
+  createScratchpadEntry?: Maybe<ScratchpadEntry>;
   createSeedDataResponses: CreateSeedDataResponsesMutationResponse;
   createServerConfigs: CreateServerConfigsMutationResponse;
   createServerRoles: CreateServerRolesMutationResponse;
@@ -44486,6 +45353,8 @@ export type Mutation = {
   createUserAggregateResults: CreateUserAggregateResultsMutationResponse;
   createUserContributionData: CreateUserContributionDataMutationResponse;
   createUsers: CreateUsersMutationResponse;
+  createWikiEditInfos: CreateWikiEditInfosMutationResponse;
+  createWikiPageInfos: CreateWikiPageInfosMutationResponse;
   createWikiPages: CreateWikiPagesMutationResponse;
   deleteActivities: DeleteInfo;
   deleteAlbums: DeleteInfo;
@@ -44548,6 +45417,8 @@ export type Mutation = {
   deleteRepeatEnds: DeleteInfo;
   deleteRepeatEveries: DeleteInfo;
   deleteSafetyCheckResponses: DeleteInfo;
+  deleteScratchpadEntries: DeleteInfo;
+  deleteScratchpadEntry?: Maybe<Scalars['Boolean']['output']>;
   deleteSeedDataResponses: DeleteInfo;
   deleteServerConfigs: DeleteInfo;
   deleteServerRoles: DeleteInfo;
@@ -44562,6 +45433,8 @@ export type Mutation = {
   deleteUserAggregateResults: DeleteInfo;
   deleteUserContributionData: DeleteInfo;
   deleteUsers: DeleteInfo;
+  deleteWikiEditInfos: DeleteInfo;
+  deleteWikiPageInfos: DeleteInfo;
   deleteWikiPages: DeleteInfo;
   deleteWikiRevision?: Maybe<TextVersion>;
   dropDataForCypressTests?: Maybe<DropDataResponse>;
@@ -44682,6 +45555,8 @@ export type Mutation = {
   updateRepeatEnds: UpdateRepeatEndsMutationResponse;
   updateRepeatEveries: UpdateRepeatEveriesMutationResponse;
   updateSafetyCheckResponses: UpdateSafetyCheckResponsesMutationResponse;
+  updateScratchpadEntries: UpdateScratchpadEntriesMutationResponse;
+  updateScratchpadEntryVisibility?: Maybe<ScratchpadEntry>;
   updateSeedDataResponses: UpdateSeedDataResponsesMutationResponse;
   updateServerConfigs: UpdateServerConfigsMutationResponse;
   updateServerRoles: UpdateServerRolesMutationResponse;
@@ -44696,6 +45571,8 @@ export type Mutation = {
   updateUserAggregateResults: UpdateUserAggregateResultsMutationResponse;
   updateUserContributionData: UpdateUserContributionDataMutationResponse;
   updateUsers: UpdateUsersMutationResponse;
+  updateWikiEditInfos: UpdateWikiEditInfosMutationResponse;
+  updateWikiPageInfos: UpdateWikiPageInfosMutationResponse;
   updateWikiPages: UpdateWikiPagesMutationResponse;
   upvoteComment?: Maybe<Comment>;
   upvoteDiscussionChannel?: Maybe<DiscussionChannel>;
@@ -45139,6 +46016,20 @@ export type MutationCreateSafetyCheckResponsesArgs = {
 };
 
 
+export type MutationCreateScratchpadEntriesArgs = {
+  input: Array<ScratchpadEntryCreateInput>;
+};
+
+
+export type MutationCreateScratchpadEntryArgs = {
+  recipientUsername: Scalars['String']['input'];
+  sourceChannelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  sourceId: Scalars['String']['input'];
+  sourceType: Scalars['String']['input'];
+  text: Scalars['String']['input'];
+};
+
+
 export type MutationCreateSeedDataResponsesArgs = {
   input: Array<SeedDataResponseCreateInput>;
 };
@@ -45213,6 +46104,16 @@ export type MutationCreateUserContributionDataArgs = {
 
 export type MutationCreateUsersArgs = {
   input: Array<UserCreateInput>;
+};
+
+
+export type MutationCreateWikiEditInfosArgs = {
+  input: Array<WikiEditInfoCreateInput>;
+};
+
+
+export type MutationCreateWikiPageInfosArgs = {
+  input: Array<WikiPageInfoCreateInput>;
 };
 
 
@@ -45552,6 +46453,17 @@ export type MutationDeleteSafetyCheckResponsesArgs = {
 };
 
 
+export type MutationDeleteScratchpadEntriesArgs = {
+  delete?: InputMaybe<ScratchpadEntryDeleteInput>;
+  where?: InputMaybe<ScratchpadEntryWhere>;
+};
+
+
+export type MutationDeleteScratchpadEntryArgs = {
+  scratchpadEntryId: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteSeedDataResponsesArgs = {
   where?: InputMaybe<SeedDataResponseWhere>;
 };
@@ -45624,6 +46536,16 @@ export type MutationDeleteUserContributionDataArgs = {
 export type MutationDeleteUsersArgs = {
   delete?: InputMaybe<UserDeleteInput>;
   where?: InputMaybe<UserWhere>;
+};
+
+
+export type MutationDeleteWikiEditInfosArgs = {
+  where?: InputMaybe<WikiEditInfoWhere>;
+};
+
+
+export type MutationDeleteWikiPageInfosArgs = {
+  where?: InputMaybe<WikiPageInfoWhere>;
 };
 
 
@@ -46371,6 +47293,18 @@ export type MutationUpdateSafetyCheckResponsesArgs = {
 };
 
 
+export type MutationUpdateScratchpadEntriesArgs = {
+  update?: InputMaybe<ScratchpadEntryUpdateInput>;
+  where?: InputMaybe<ScratchpadEntryWhere>;
+};
+
+
+export type MutationUpdateScratchpadEntryVisibilityArgs = {
+  isPublic: Scalars['Boolean']['input'];
+  scratchpadEntryId: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateSeedDataResponsesArgs = {
   update?: InputMaybe<SeedDataResponseUpdateInput>;
   where?: InputMaybe<SeedDataResponseWhere>;
@@ -46452,6 +47386,18 @@ export type MutationUpdateUserContributionDataArgs = {
 export type MutationUpdateUsersArgs = {
   update?: InputMaybe<UserUpdateInput>;
   where?: InputMaybe<UserWhere>;
+};
+
+
+export type MutationUpdateWikiEditInfosArgs = {
+  update?: InputMaybe<WikiEditInfoUpdateInput>;
+  where?: InputMaybe<WikiEditInfoWhere>;
+};
+
+
+export type MutationUpdateWikiPageInfosArgs = {
+  update?: InputMaybe<WikiPageInfoUpdateInput>;
+  where?: InputMaybe<WikiPageInfoWhere>;
 };
 
 
@@ -49589,6 +50535,9 @@ export type Query = {
   safetyCheckResponses: Array<SafetyCheckResponse>;
   safetyCheckResponsesAggregate: SafetyCheckResponseAggregateSelection;
   safetyCheckResponsesConnection: SafetyCheckResponsesConnection;
+  scratchpadEntries: Array<ScratchpadEntry>;
+  scratchpadEntriesAggregate: ScratchpadEntryAggregateSelection;
+  scratchpadEntriesConnection: ScratchpadEntriesConnection;
   seedDataResponses: Array<SeedDataResponse>;
   seedDataResponsesAggregate: SeedDataResponseAggregateSelection;
   seedDataResponsesConnection: SeedDataResponsesConnection;
@@ -49631,6 +50580,12 @@ export type Query = {
   users: Array<User>;
   usersAggregate: UserAggregateSelection;
   usersConnection: UsersConnection;
+  wikiEditInfos: Array<WikiEditInfo>;
+  wikiEditInfosAggregate: WikiEditInfoAggregateSelection;
+  wikiEditInfosConnection: WikiEditInfosConnection;
+  wikiPageInfos: Array<WikiPageInfo>;
+  wikiPageInfosAggregate: WikiPageInfoAggregateSelection;
+  wikiPageInfosConnection: WikiPageInfosConnection;
   wikiPages: Array<WikiPage>;
   wikiPagesAggregate: WikiPageAggregateSelection;
   wikiPagesConnection: WikiPagesConnection;
@@ -50896,6 +51851,25 @@ export type QuerySafetyCheckResponsesConnectionArgs = {
 };
 
 
+export type QueryScratchpadEntriesArgs = {
+  options?: InputMaybe<ScratchpadEntryOptions>;
+  where?: InputMaybe<ScratchpadEntryWhere>;
+};
+
+
+export type QueryScratchpadEntriesAggregateArgs = {
+  where?: InputMaybe<ScratchpadEntryWhere>;
+};
+
+
+export type QueryScratchpadEntriesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<ScratchpadEntrySort>>>;
+  where?: InputMaybe<ScratchpadEntryWhere>;
+};
+
+
 export type QuerySeedDataResponsesArgs = {
   options?: InputMaybe<SeedDataResponseOptions>;
   where?: InputMaybe<SeedDataResponseWhere>;
@@ -51159,6 +52133,44 @@ export type QueryUsersConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<UserSort>>>;
   where?: InputMaybe<UserWhere>;
+};
+
+
+export type QueryWikiEditInfosArgs = {
+  options?: InputMaybe<WikiEditInfoOptions>;
+  where?: InputMaybe<WikiEditInfoWhere>;
+};
+
+
+export type QueryWikiEditInfosAggregateArgs = {
+  where?: InputMaybe<WikiEditInfoWhere>;
+};
+
+
+export type QueryWikiEditInfosConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<WikiEditInfoSort>>>;
+  where?: InputMaybe<WikiEditInfoWhere>;
+};
+
+
+export type QueryWikiPageInfosArgs = {
+  options?: InputMaybe<WikiPageInfoOptions>;
+  where?: InputMaybe<WikiPageInfoWhere>;
+};
+
+
+export type QueryWikiPageInfosAggregateArgs = {
+  where?: InputMaybe<WikiPageInfoWhere>;
+};
+
+
+export type QueryWikiPageInfosConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<WikiPageInfoSort>>>;
+  where?: InputMaybe<WikiPageInfoWhere>;
 };
 
 
@@ -52034,6 +53046,1075 @@ export enum ScanStatus {
   Pending = 'PENDING',
   Suspicious = 'SUSPICIOUS'
 }
+
+export type ScratchpadEntriesConnection = {
+  __typename?: 'ScratchpadEntriesConnection';
+  edges: Array<ScratchpadEntryEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ScratchpadEntry = {
+  __typename?: 'ScratchpadEntry';
+  Author: User;
+  AuthorAggregate?: Maybe<ScratchpadEntryUserAuthorAggregationSelection>;
+  AuthorConnection: ScratchpadEntryAuthorConnection;
+  Recipient: User;
+  RecipientAggregate?: Maybe<ScratchpadEntryUserRecipientAggregationSelection>;
+  RecipientConnection: ScratchpadEntryRecipientConnection;
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  isPublic: Scalars['Boolean']['output'];
+  sourceChannelUniqueName?: Maybe<Scalars['String']['output']>;
+  sourceId: Scalars['String']['output'];
+  sourceType: Scalars['String']['output'];
+  text: Scalars['String']['output'];
+};
+
+
+export type ScratchpadEntryAuthorArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type ScratchpadEntryAuthorAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type ScratchpadEntryAuthorConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ScratchpadEntryAuthorConnectionSort>>;
+  where?: InputMaybe<ScratchpadEntryAuthorConnectionWhere>;
+};
+
+
+export type ScratchpadEntryRecipientArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type ScratchpadEntryRecipientAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type ScratchpadEntryRecipientConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ScratchpadEntryRecipientConnectionSort>>;
+  where?: InputMaybe<ScratchpadEntryRecipientConnectionWhere>;
+};
+
+export type ScratchpadEntryAggregateSelection = {
+  __typename?: 'ScratchpadEntryAggregateSelection';
+  count: Scalars['Int']['output'];
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  sourceChannelUniqueName: StringAggregateSelection;
+  sourceId: StringAggregateSelection;
+  sourceType: StringAggregateSelection;
+  text: StringAggregateSelection;
+};
+
+export type ScratchpadEntryAuthorAggregateInput = {
+  AND?: InputMaybe<Array<ScratchpadEntryAuthorAggregateInput>>;
+  NOT?: InputMaybe<ScratchpadEntryAuthorAggregateInput>;
+  OR?: InputMaybe<Array<ScratchpadEntryAuthorAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ScratchpadEntryAuthorNodeAggregationWhereInput>;
+};
+
+export type ScratchpadEntryAuthorConnectFieldInput = {
+  connect?: InputMaybe<UserConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<UserConnectWhere>;
+};
+
+export type ScratchpadEntryAuthorConnectOrCreateFieldInput = {
+  onCreate: ScratchpadEntryAuthorConnectOrCreateFieldInputOnCreate;
+  where: UserConnectOrCreateWhere;
+};
+
+export type ScratchpadEntryAuthorConnectOrCreateFieldInputOnCreate = {
+  node: UserOnCreateInput;
+};
+
+export type ScratchpadEntryAuthorConnectedRelationship = {
+  __typename?: 'ScratchpadEntryAuthorConnectedRelationship';
+  node: UserEventPayload;
+};
+
+export type ScratchpadEntryAuthorConnection = {
+  __typename?: 'ScratchpadEntryAuthorConnection';
+  edges: Array<ScratchpadEntryAuthorRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ScratchpadEntryAuthorConnectionSort = {
+  node?: InputMaybe<UserSort>;
+};
+
+export type ScratchpadEntryAuthorConnectionWhere = {
+  AND?: InputMaybe<Array<ScratchpadEntryAuthorConnectionWhere>>;
+  NOT?: InputMaybe<ScratchpadEntryAuthorConnectionWhere>;
+  OR?: InputMaybe<Array<ScratchpadEntryAuthorConnectionWhere>>;
+  node?: InputMaybe<UserWhere>;
+};
+
+export type ScratchpadEntryAuthorCreateFieldInput = {
+  node: UserCreateInput;
+};
+
+export type ScratchpadEntryAuthorDeleteFieldInput = {
+  delete?: InputMaybe<UserDeleteInput>;
+  where?: InputMaybe<ScratchpadEntryAuthorConnectionWhere>;
+};
+
+export type ScratchpadEntryAuthorDisconnectFieldInput = {
+  disconnect?: InputMaybe<UserDisconnectInput>;
+  where?: InputMaybe<ScratchpadEntryAuthorConnectionWhere>;
+};
+
+export type ScratchpadEntryAuthorFieldInput = {
+  connect?: InputMaybe<ScratchpadEntryAuthorConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ScratchpadEntryAuthorConnectOrCreateFieldInput>;
+  create?: InputMaybe<ScratchpadEntryAuthorCreateFieldInput>;
+};
+
+export type ScratchpadEntryAuthorNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ScratchpadEntryAuthorNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ScratchpadEntryAuthorNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ScratchpadEntryAuthorNodeAggregationWhereInput>>;
+  bio_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  location_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  username_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ScratchpadEntryAuthorRelationship = {
+  __typename?: 'ScratchpadEntryAuthorRelationship';
+  cursor: Scalars['String']['output'];
+  node: User;
+};
+
+export type ScratchpadEntryAuthorRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
+export type ScratchpadEntryAuthorUpdateConnectionInput = {
+  node?: InputMaybe<UserUpdateInput>;
+};
+
+export type ScratchpadEntryAuthorUpdateFieldInput = {
+  connect?: InputMaybe<ScratchpadEntryAuthorConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ScratchpadEntryAuthorConnectOrCreateFieldInput>;
+  create?: InputMaybe<ScratchpadEntryAuthorCreateFieldInput>;
+  delete?: InputMaybe<ScratchpadEntryAuthorDeleteFieldInput>;
+  disconnect?: InputMaybe<ScratchpadEntryAuthorDisconnectFieldInput>;
+  update?: InputMaybe<ScratchpadEntryAuthorUpdateConnectionInput>;
+  where?: InputMaybe<ScratchpadEntryAuthorConnectionWhere>;
+};
+
+export type ScratchpadEntryConnectInput = {
+  Author?: InputMaybe<ScratchpadEntryAuthorConnectFieldInput>;
+  Recipient?: InputMaybe<ScratchpadEntryRecipientConnectFieldInput>;
+};
+
+export type ScratchpadEntryConnectOrCreateInput = {
+  Author?: InputMaybe<ScratchpadEntryAuthorConnectOrCreateFieldInput>;
+  Recipient?: InputMaybe<ScratchpadEntryRecipientConnectOrCreateFieldInput>;
+};
+
+export type ScratchpadEntryConnectWhere = {
+  node: ScratchpadEntryWhere;
+};
+
+export type ScratchpadEntryConnectedRelationships = {
+  __typename?: 'ScratchpadEntryConnectedRelationships';
+  Author?: Maybe<ScratchpadEntryAuthorConnectedRelationship>;
+  Recipient?: Maybe<ScratchpadEntryRecipientConnectedRelationship>;
+};
+
+export type ScratchpadEntryCreateInput = {
+  Author?: InputMaybe<ScratchpadEntryAuthorFieldInput>;
+  Recipient?: InputMaybe<ScratchpadEntryRecipientFieldInput>;
+  isPublic?: Scalars['Boolean']['input'];
+  sourceChannelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  sourceId: Scalars['String']['input'];
+  sourceType: Scalars['String']['input'];
+  text: Scalars['String']['input'];
+};
+
+export type ScratchpadEntryCreatedEvent = {
+  __typename?: 'ScratchpadEntryCreatedEvent';
+  createdScratchpadEntry: ScratchpadEntryEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ScratchpadEntryDeleteInput = {
+  Author?: InputMaybe<ScratchpadEntryAuthorDeleteFieldInput>;
+  Recipient?: InputMaybe<ScratchpadEntryRecipientDeleteFieldInput>;
+};
+
+export type ScratchpadEntryDeletedEvent = {
+  __typename?: 'ScratchpadEntryDeletedEvent';
+  deletedScratchpadEntry: ScratchpadEntryEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ScratchpadEntryDisconnectInput = {
+  Author?: InputMaybe<ScratchpadEntryAuthorDisconnectFieldInput>;
+  Recipient?: InputMaybe<ScratchpadEntryRecipientDisconnectFieldInput>;
+};
+
+export type ScratchpadEntryEdge = {
+  __typename?: 'ScratchpadEntryEdge';
+  cursor: Scalars['String']['output'];
+  node: ScratchpadEntry;
+};
+
+export type ScratchpadEntryEventPayload = {
+  __typename?: 'ScratchpadEntryEventPayload';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  isPublic: Scalars['Boolean']['output'];
+  sourceChannelUniqueName?: Maybe<Scalars['String']['output']>;
+  sourceId: Scalars['String']['output'];
+  sourceType: Scalars['String']['output'];
+  text: Scalars['String']['output'];
+};
+
+export type ScratchpadEntryOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more ScratchpadEntrySort objects to sort ScratchpadEntries by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<ScratchpadEntrySort>>;
+};
+
+export type ScratchpadEntryRecipientAggregateInput = {
+  AND?: InputMaybe<Array<ScratchpadEntryRecipientAggregateInput>>;
+  NOT?: InputMaybe<ScratchpadEntryRecipientAggregateInput>;
+  OR?: InputMaybe<Array<ScratchpadEntryRecipientAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ScratchpadEntryRecipientNodeAggregationWhereInput>;
+};
+
+export type ScratchpadEntryRecipientConnectFieldInput = {
+  connect?: InputMaybe<UserConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<UserConnectWhere>;
+};
+
+export type ScratchpadEntryRecipientConnectOrCreateFieldInput = {
+  onCreate: ScratchpadEntryRecipientConnectOrCreateFieldInputOnCreate;
+  where: UserConnectOrCreateWhere;
+};
+
+export type ScratchpadEntryRecipientConnectOrCreateFieldInputOnCreate = {
+  node: UserOnCreateInput;
+};
+
+export type ScratchpadEntryRecipientConnectedRelationship = {
+  __typename?: 'ScratchpadEntryRecipientConnectedRelationship';
+  node: UserEventPayload;
+};
+
+export type ScratchpadEntryRecipientConnection = {
+  __typename?: 'ScratchpadEntryRecipientConnection';
+  edges: Array<ScratchpadEntryRecipientRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ScratchpadEntryRecipientConnectionSort = {
+  node?: InputMaybe<UserSort>;
+};
+
+export type ScratchpadEntryRecipientConnectionWhere = {
+  AND?: InputMaybe<Array<ScratchpadEntryRecipientConnectionWhere>>;
+  NOT?: InputMaybe<ScratchpadEntryRecipientConnectionWhere>;
+  OR?: InputMaybe<Array<ScratchpadEntryRecipientConnectionWhere>>;
+  node?: InputMaybe<UserWhere>;
+};
+
+export type ScratchpadEntryRecipientCreateFieldInput = {
+  node: UserCreateInput;
+};
+
+export type ScratchpadEntryRecipientDeleteFieldInput = {
+  delete?: InputMaybe<UserDeleteInput>;
+  where?: InputMaybe<ScratchpadEntryRecipientConnectionWhere>;
+};
+
+export type ScratchpadEntryRecipientDisconnectFieldInput = {
+  disconnect?: InputMaybe<UserDisconnectInput>;
+  where?: InputMaybe<ScratchpadEntryRecipientConnectionWhere>;
+};
+
+export type ScratchpadEntryRecipientFieldInput = {
+  connect?: InputMaybe<ScratchpadEntryRecipientConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ScratchpadEntryRecipientConnectOrCreateFieldInput>;
+  create?: InputMaybe<ScratchpadEntryRecipientCreateFieldInput>;
+};
+
+export type ScratchpadEntryRecipientNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ScratchpadEntryRecipientNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ScratchpadEntryRecipientNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ScratchpadEntryRecipientNodeAggregationWhereInput>>;
+  bio_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  location_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  username_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ScratchpadEntryRecipientRelationship = {
+  __typename?: 'ScratchpadEntryRecipientRelationship';
+  cursor: Scalars['String']['output'];
+  node: User;
+};
+
+export type ScratchpadEntryRecipientRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
+export type ScratchpadEntryRecipientUpdateConnectionInput = {
+  node?: InputMaybe<UserUpdateInput>;
+};
+
+export type ScratchpadEntryRecipientUpdateFieldInput = {
+  connect?: InputMaybe<ScratchpadEntryRecipientConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ScratchpadEntryRecipientConnectOrCreateFieldInput>;
+  create?: InputMaybe<ScratchpadEntryRecipientCreateFieldInput>;
+  delete?: InputMaybe<ScratchpadEntryRecipientDeleteFieldInput>;
+  disconnect?: InputMaybe<ScratchpadEntryRecipientDisconnectFieldInput>;
+  update?: InputMaybe<ScratchpadEntryRecipientUpdateConnectionInput>;
+  where?: InputMaybe<ScratchpadEntryRecipientConnectionWhere>;
+};
+
+export type ScratchpadEntryRelationInput = {
+  Author?: InputMaybe<ScratchpadEntryAuthorCreateFieldInput>;
+  Recipient?: InputMaybe<ScratchpadEntryRecipientCreateFieldInput>;
+};
+
+export type ScratchpadEntryRelationshipCreatedEvent = {
+  __typename?: 'ScratchpadEntryRelationshipCreatedEvent';
+  createdRelationship: ScratchpadEntryConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  scratchpadEntry: ScratchpadEntryEventPayload;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ScratchpadEntryRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<ScratchpadEntryRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<ScratchpadEntryRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<ScratchpadEntryRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<ScratchpadEntryRelationshipsSubscriptionWhere>;
+  scratchpadEntry?: InputMaybe<ScratchpadEntrySubscriptionWhere>;
+};
+
+export type ScratchpadEntryRelationshipDeletedEvent = {
+  __typename?: 'ScratchpadEntryRelationshipDeletedEvent';
+  deletedRelationship: ScratchpadEntryConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  scratchpadEntry: ScratchpadEntryEventPayload;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ScratchpadEntryRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<ScratchpadEntryRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<ScratchpadEntryRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<ScratchpadEntryRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<ScratchpadEntryRelationshipsSubscriptionWhere>;
+  scratchpadEntry?: InputMaybe<ScratchpadEntrySubscriptionWhere>;
+};
+
+export type ScratchpadEntryRelationshipsSubscriptionWhere = {
+  Author?: InputMaybe<ScratchpadEntryAuthorRelationshipSubscriptionWhere>;
+  Recipient?: InputMaybe<ScratchpadEntryRecipientRelationshipSubscriptionWhere>;
+};
+
+/** Fields to sort ScratchpadEntries by. The order in which sorts are applied is not guaranteed when specifying many fields in one ScratchpadEntrySort object. */
+export type ScratchpadEntrySort = {
+  createdAt?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  isPublic?: InputMaybe<SortDirection>;
+  sourceChannelUniqueName?: InputMaybe<SortDirection>;
+  sourceId?: InputMaybe<SortDirection>;
+  sourceType?: InputMaybe<SortDirection>;
+  text?: InputMaybe<SortDirection>;
+};
+
+export type ScratchpadEntrySubscriptionWhere = {
+  AND?: InputMaybe<Array<ScratchpadEntrySubscriptionWhere>>;
+  NOT?: InputMaybe<ScratchpadEntrySubscriptionWhere>;
+  OR?: InputMaybe<Array<ScratchpadEntrySubscriptionWhere>>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  isPublic?: InputMaybe<Scalars['Boolean']['input']>;
+  sourceChannelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  sourceChannelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  sourceChannelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  sourceChannelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  sourceChannelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  sourceChannelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  sourceId?: InputMaybe<Scalars['String']['input']>;
+  sourceId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  sourceId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  sourceId_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  sourceId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  sourceId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  sourceType?: InputMaybe<Scalars['String']['input']>;
+  sourceType_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  sourceType_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  sourceType_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  sourceType_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  sourceType_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  text_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  text_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  text_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  text_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  text_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ScratchpadEntryUpdateInput = {
+  Author?: InputMaybe<ScratchpadEntryAuthorUpdateFieldInput>;
+  Recipient?: InputMaybe<ScratchpadEntryRecipientUpdateFieldInput>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  isPublic?: InputMaybe<Scalars['Boolean']['input']>;
+  sourceChannelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  sourceId?: InputMaybe<Scalars['String']['input']>;
+  sourceType?: InputMaybe<Scalars['String']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ScratchpadEntryUpdatedEvent = {
+  __typename?: 'ScratchpadEntryUpdatedEvent';
+  event: EventType;
+  previousState: ScratchpadEntryEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedScratchpadEntry: ScratchpadEntryEventPayload;
+};
+
+export type ScratchpadEntryUserAuthorAggregationSelection = {
+  __typename?: 'ScratchpadEntryUserAuthorAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<ScratchpadEntryUserAuthorNodeAggregateSelection>;
+};
+
+export type ScratchpadEntryUserAuthorNodeAggregateSelection = {
+  __typename?: 'ScratchpadEntryUserAuthorNodeAggregateSelection';
+  bio: StringAggregateSelection;
+  botProfileId: StringAggregateSelection;
+  commentKarma: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  defaultEmojiSkinTone: StringAggregateSelection;
+  deprecatedReason: StringAggregateSelection;
+  discussionKarma: IntAggregateSelection;
+  displayName: StringAggregateSelection;
+  location: StringAggregateSelection;
+  notificationBundleContent: StringAggregateSelection;
+  notificationBundleInterval: StringAggregateSelection;
+  preferredTimeZone: StringAggregateSelection;
+  profilePicURL: StringAggregateSelection;
+  pronouns: StringAggregateSelection;
+  stripeAccountId: StringAggregateSelection;
+  username: StringAggregateSelection;
+};
+
+export type ScratchpadEntryUserRecipientAggregationSelection = {
+  __typename?: 'ScratchpadEntryUserRecipientAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<ScratchpadEntryUserRecipientNodeAggregateSelection>;
+};
+
+export type ScratchpadEntryUserRecipientNodeAggregateSelection = {
+  __typename?: 'ScratchpadEntryUserRecipientNodeAggregateSelection';
+  bio: StringAggregateSelection;
+  botProfileId: StringAggregateSelection;
+  commentKarma: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  defaultEmojiSkinTone: StringAggregateSelection;
+  deprecatedReason: StringAggregateSelection;
+  discussionKarma: IntAggregateSelection;
+  displayName: StringAggregateSelection;
+  location: StringAggregateSelection;
+  notificationBundleContent: StringAggregateSelection;
+  notificationBundleInterval: StringAggregateSelection;
+  preferredTimeZone: StringAggregateSelection;
+  profilePicURL: StringAggregateSelection;
+  pronouns: StringAggregateSelection;
+  stripeAccountId: StringAggregateSelection;
+  username: StringAggregateSelection;
+};
+
+export type ScratchpadEntryWhere = {
+  AND?: InputMaybe<Array<ScratchpadEntryWhere>>;
+  Author?: InputMaybe<UserWhere>;
+  AuthorAggregate?: InputMaybe<ScratchpadEntryAuthorAggregateInput>;
+  AuthorConnection?: InputMaybe<ScratchpadEntryAuthorConnectionWhere>;
+  AuthorConnection_NOT?: InputMaybe<ScratchpadEntryAuthorConnectionWhere>;
+  Author_NOT?: InputMaybe<UserWhere>;
+  NOT?: InputMaybe<ScratchpadEntryWhere>;
+  OR?: InputMaybe<Array<ScratchpadEntryWhere>>;
+  Recipient?: InputMaybe<UserWhere>;
+  RecipientAggregate?: InputMaybe<ScratchpadEntryRecipientAggregateInput>;
+  RecipientConnection?: InputMaybe<ScratchpadEntryRecipientConnectionWhere>;
+  RecipientConnection_NOT?: InputMaybe<ScratchpadEntryRecipientConnectionWhere>;
+  Recipient_NOT?: InputMaybe<UserWhere>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  isPublic?: InputMaybe<Scalars['Boolean']['input']>;
+  sourceChannelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  sourceChannelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  sourceChannelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  sourceChannelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  sourceChannelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  sourceChannelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  sourceId?: InputMaybe<Scalars['String']['input']>;
+  sourceId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  sourceId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  sourceId_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  sourceId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  sourceId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  sourceType?: InputMaybe<Scalars['String']['input']>;
+  sourceType_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  sourceType_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  sourceType_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  sourceType_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  sourceType_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  text_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  text_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  text_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  text_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  text_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
 
 export enum SecretValidationStatus {
   Invalid = 'INVALID',
@@ -56925,6 +59006,11 @@ export type Subscription = {
   safetyCheckResponseCreated: SafetyCheckResponseCreatedEvent;
   safetyCheckResponseDeleted: SafetyCheckResponseDeletedEvent;
   safetyCheckResponseUpdated: SafetyCheckResponseUpdatedEvent;
+  scratchpadEntryCreated: ScratchpadEntryCreatedEvent;
+  scratchpadEntryDeleted: ScratchpadEntryDeletedEvent;
+  scratchpadEntryRelationshipCreated: ScratchpadEntryRelationshipCreatedEvent;
+  scratchpadEntryRelationshipDeleted: ScratchpadEntryRelationshipDeletedEvent;
+  scratchpadEntryUpdated: ScratchpadEntryUpdatedEvent;
   seedDataResponseCreated: SeedDataResponseCreatedEvent;
   seedDataResponseDeleted: SeedDataResponseDeletedEvent;
   seedDataResponseUpdated: SeedDataResponseUpdatedEvent;
@@ -56977,8 +59063,14 @@ export type Subscription = {
   userRelationshipCreated: UserRelationshipCreatedEvent;
   userRelationshipDeleted: UserRelationshipDeletedEvent;
   userUpdated: UserUpdatedEvent;
+  wikiEditInfoCreated: WikiEditInfoCreatedEvent;
+  wikiEditInfoDeleted: WikiEditInfoDeletedEvent;
+  wikiEditInfoUpdated: WikiEditInfoUpdatedEvent;
   wikiPageCreated: WikiPageCreatedEvent;
   wikiPageDeleted: WikiPageDeletedEvent;
+  wikiPageInfoCreated: WikiPageInfoCreatedEvent;
+  wikiPageInfoDeleted: WikiPageInfoDeletedEvent;
+  wikiPageInfoUpdated: WikiPageInfoUpdatedEvent;
   wikiPageRelationshipCreated: WikiPageRelationshipCreatedEvent;
   wikiPageRelationshipDeleted: WikiPageRelationshipDeletedEvent;
   wikiPageUpdated: WikiPageUpdatedEvent;
@@ -58085,6 +60177,31 @@ export type SubscriptionRepeatEveryUpdatedArgs = {
 };
 
 
+export type SubscriptionScratchpadEntryCreatedArgs = {
+  where?: InputMaybe<ScratchpadEntrySubscriptionWhere>;
+};
+
+
+export type SubscriptionScratchpadEntryDeletedArgs = {
+  where?: InputMaybe<ScratchpadEntrySubscriptionWhere>;
+};
+
+
+export type SubscriptionScratchpadEntryRelationshipCreatedArgs = {
+  where?: InputMaybe<ScratchpadEntryRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionScratchpadEntryRelationshipDeletedArgs = {
+  where?: InputMaybe<ScratchpadEntryRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionScratchpadEntryUpdatedArgs = {
+  where?: InputMaybe<ScratchpadEntrySubscriptionWhere>;
+};
+
+
 export type SubscriptionSeedDataResponseCreatedArgs = {
   where?: InputMaybe<SeedDataResponseSubscriptionWhere>;
 };
@@ -58345,6 +60462,21 @@ export type SubscriptionUserUpdatedArgs = {
 };
 
 
+export type SubscriptionWikiEditInfoCreatedArgs = {
+  where?: InputMaybe<WikiEditInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionWikiEditInfoDeletedArgs = {
+  where?: InputMaybe<WikiEditInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionWikiEditInfoUpdatedArgs = {
+  where?: InputMaybe<WikiEditInfoSubscriptionWhere>;
+};
+
+
 export type SubscriptionWikiPageCreatedArgs = {
   where?: InputMaybe<WikiPageSubscriptionWhere>;
 };
@@ -58352,6 +60484,21 @@ export type SubscriptionWikiPageCreatedArgs = {
 
 export type SubscriptionWikiPageDeletedArgs = {
   where?: InputMaybe<WikiPageSubscriptionWhere>;
+};
+
+
+export type SubscriptionWikiPageInfoCreatedArgs = {
+  where?: InputMaybe<WikiPageInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionWikiPageInfoDeletedArgs = {
+  where?: InputMaybe<WikiPageInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionWikiPageInfoUpdatedArgs = {
+  where?: InputMaybe<WikiPageInfoSubscriptionWhere>;
 };
 
 
@@ -61895,6 +64042,12 @@ export type UpdateSafetyCheckResponsesMutationResponse = {
   safetyCheckResponses: Array<SafetyCheckResponse>;
 };
 
+export type UpdateScratchpadEntriesMutationResponse = {
+  __typename?: 'UpdateScratchpadEntriesMutationResponse';
+  info: UpdateInfo;
+  scratchpadEntries: Array<ScratchpadEntry>;
+};
+
 export type UpdateSeedDataResponsesMutationResponse = {
   __typename?: 'UpdateSeedDataResponsesMutationResponse';
   info: UpdateInfo;
@@ -61977,6 +64130,18 @@ export type UpdateUsersMutationResponse = {
   __typename?: 'UpdateUsersMutationResponse';
   info: UpdateInfo;
   users: Array<User>;
+};
+
+export type UpdateWikiEditInfosMutationResponse = {
+  __typename?: 'UpdateWikiEditInfosMutationResponse';
+  info: UpdateInfo;
+  wikiEditInfos: Array<WikiEditInfo>;
+};
+
+export type UpdateWikiPageInfosMutationResponse = {
+  __typename?: 'UpdateWikiPageInfosMutationResponse';
+  info: UpdateInfo;
+  wikiPageInfos: Array<WikiPageInfo>;
 };
 
 export type UpdateWikiPagesMutationResponse = {
@@ -62074,6 +64239,9 @@ export type User = {
   RecentlyVisitedChannels: Array<Channel>;
   RecentlyVisitedChannelsAggregate?: Maybe<UserChannelRecentlyVisitedChannelsAggregationSelection>;
   RecentlyVisitedChannelsConnection: UserRecentlyVisitedChannelsConnection;
+  ScratchpadEntries: Array<ScratchpadEntry>;
+  ScratchpadEntriesAggregate?: Maybe<UserScratchpadEntryScratchpadEntriesAggregationSelection>;
+  ScratchpadEntriesConnection: UserScratchpadEntriesConnection;
   ServerRoles: Array<ServerRole>;
   ServerRolesAggregate?: Maybe<UserServerRoleServerRolesAggregationSelection>;
   ServerRolesConnection: UserServerRolesConnection;
@@ -62086,6 +64254,9 @@ export type User = {
   UpvotedDiscussionChannels: Array<DiscussionChannel>;
   UpvotedDiscussionChannelsAggregate?: Maybe<UserDiscussionChannelUpvotedDiscussionChannelsAggregationSelection>;
   UpvotedDiscussionChannelsConnection: UserUpvotedDiscussionChannelsConnection;
+  WrittenScratchpadEntries: Array<ScratchpadEntry>;
+  WrittenScratchpadEntriesAggregate?: Maybe<UserScratchpadEntryWrittenScratchpadEntriesAggregationSelection>;
+  WrittenScratchpadEntriesConnection: UserWrittenScratchpadEntriesConnection;
   bio?: Maybe<Scalars['String']['output']>;
   botProfileId?: Maybe<Scalars['String']['output']>;
   commentKarma?: Maybe<Scalars['Int']['output']>;
@@ -62764,6 +64935,28 @@ export type UserRecentlyVisitedChannelsConnectionArgs = {
 };
 
 
+export type UserScratchpadEntriesArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ScratchpadEntryOptions>;
+  where?: InputMaybe<ScratchpadEntryWhere>;
+};
+
+
+export type UserScratchpadEntriesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<ScratchpadEntryWhere>;
+};
+
+
+export type UserScratchpadEntriesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<UserScratchpadEntriesConnectionSort>>;
+  where?: InputMaybe<UserScratchpadEntriesConnectionWhere>;
+};
+
+
 export type UserServerRolesArgs = {
   directed?: InputMaybe<Scalars['Boolean']['input']>;
   options?: InputMaybe<ServerRoleOptions>;
@@ -62849,6 +65042,28 @@ export type UserUpvotedDiscussionChannelsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserUpvotedDiscussionChannelsConnectionSort>>;
   where?: InputMaybe<UserUpvotedDiscussionChannelsConnectionWhere>;
+};
+
+
+export type UserWrittenScratchpadEntriesArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ScratchpadEntryOptions>;
+  where?: InputMaybe<ScratchpadEntryWhere>;
+};
+
+
+export type UserWrittenScratchpadEntriesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<ScratchpadEntryWhere>;
+};
+
+
+export type UserWrittenScratchpadEntriesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<UserWrittenScratchpadEntriesConnectionSort>>;
+  where?: InputMaybe<UserWrittenScratchpadEntriesConnectionWhere>;
 };
 
 
@@ -64518,10 +66733,12 @@ export type UserConnectInput = {
   PendingServerAdminInvites?: InputMaybe<Array<UserPendingServerAdminInvitesConnectFieldInput>>;
   PendingServerModInvites?: InputMaybe<Array<UserPendingServerModInvitesConnectFieldInput>>;
   RecentlyVisitedChannels?: InputMaybe<Array<UserRecentlyVisitedChannelsConnectFieldInput>>;
+  ScratchpadEntries?: InputMaybe<Array<UserScratchpadEntriesConnectFieldInput>>;
   ServerRoles?: InputMaybe<Array<UserServerRolesConnectFieldInput>>;
   Suspensions?: InputMaybe<Array<UserSuspensionsConnectFieldInput>>;
   UpvotedComments?: InputMaybe<Array<UserUpvotedCommentsConnectFieldInput>>;
   UpvotedDiscussionChannels?: InputMaybe<Array<UserUpvotedDiscussionChannelsConnectFieldInput>>;
+  WrittenScratchpadEntries?: InputMaybe<Array<UserWrittenScratchpadEntriesConnectFieldInput>>;
   defaultLicense?: InputMaybe<UserDefaultLicenseConnectFieldInput>;
   library?: InputMaybe<Array<UserLibraryConnectFieldInput>>;
   purchases?: InputMaybe<Array<UserPurchasesConnectFieldInput>>;
@@ -64584,10 +66801,12 @@ export type UserConnectedRelationships = {
   PendingServerAdminInvites?: Maybe<UserPendingServerAdminInvitesConnectedRelationship>;
   PendingServerModInvites?: Maybe<UserPendingServerModInvitesConnectedRelationship>;
   RecentlyVisitedChannels?: Maybe<UserRecentlyVisitedChannelsConnectedRelationship>;
+  ScratchpadEntries?: Maybe<UserScratchpadEntriesConnectedRelationship>;
   ServerRoles?: Maybe<UserServerRolesConnectedRelationship>;
   Suspensions?: Maybe<UserSuspensionsConnectedRelationship>;
   UpvotedComments?: Maybe<UserUpvotedCommentsConnectedRelationship>;
   UpvotedDiscussionChannels?: Maybe<UserUpvotedDiscussionChannelsConnectedRelationship>;
+  WrittenScratchpadEntries?: Maybe<UserWrittenScratchpadEntriesConnectedRelationship>;
   defaultLicense?: Maybe<UserDefaultLicenseConnectedRelationship>;
   library?: Maybe<UserLibraryConnectedRelationship>;
   purchases?: Maybe<UserPurchasesConnectedRelationship>;
@@ -64775,10 +66994,12 @@ export type UserCreateInput = {
   PendingServerAdminInvites?: InputMaybe<UserPendingServerAdminInvitesFieldInput>;
   PendingServerModInvites?: InputMaybe<UserPendingServerModInvitesFieldInput>;
   RecentlyVisitedChannels?: InputMaybe<UserRecentlyVisitedChannelsFieldInput>;
+  ScratchpadEntries?: InputMaybe<UserScratchpadEntriesFieldInput>;
   ServerRoles?: InputMaybe<UserServerRolesFieldInput>;
   Suspensions?: InputMaybe<UserSuspensionsFieldInput>;
   UpvotedComments?: InputMaybe<UserUpvotedCommentsFieldInput>;
   UpvotedDiscussionChannels?: InputMaybe<UserUpvotedDiscussionChannelsFieldInput>;
+  WrittenScratchpadEntries?: InputMaybe<UserWrittenScratchpadEntriesFieldInput>;
   bio?: InputMaybe<Scalars['String']['input']>;
   botProfileId?: InputMaybe<Scalars['String']['input']>;
   commentKarma?: InputMaybe<Scalars['Int']['input']>;
@@ -64995,10 +67216,12 @@ export type UserDeleteInput = {
   PendingServerAdminInvites?: InputMaybe<Array<UserPendingServerAdminInvitesDeleteFieldInput>>;
   PendingServerModInvites?: InputMaybe<Array<UserPendingServerModInvitesDeleteFieldInput>>;
   RecentlyVisitedChannels?: InputMaybe<Array<UserRecentlyVisitedChannelsDeleteFieldInput>>;
+  ScratchpadEntries?: InputMaybe<Array<UserScratchpadEntriesDeleteFieldInput>>;
   ServerRoles?: InputMaybe<Array<UserServerRolesDeleteFieldInput>>;
   Suspensions?: InputMaybe<Array<UserSuspensionsDeleteFieldInput>>;
   UpvotedComments?: InputMaybe<Array<UserUpvotedCommentsDeleteFieldInput>>;
   UpvotedDiscussionChannels?: InputMaybe<Array<UserUpvotedDiscussionChannelsDeleteFieldInput>>;
+  WrittenScratchpadEntries?: InputMaybe<Array<UserWrittenScratchpadEntriesDeleteFieldInput>>;
   defaultLicense?: InputMaybe<UserDefaultLicenseDeleteFieldInput>;
   library?: InputMaybe<Array<UserLibraryDeleteFieldInput>>;
   purchases?: InputMaybe<Array<UserPurchasesDeleteFieldInput>>;
@@ -65041,10 +67264,12 @@ export type UserDisconnectInput = {
   PendingServerAdminInvites?: InputMaybe<Array<UserPendingServerAdminInvitesDisconnectFieldInput>>;
   PendingServerModInvites?: InputMaybe<Array<UserPendingServerModInvitesDisconnectFieldInput>>;
   RecentlyVisitedChannels?: InputMaybe<Array<UserRecentlyVisitedChannelsDisconnectFieldInput>>;
+  ScratchpadEntries?: InputMaybe<Array<UserScratchpadEntriesDisconnectFieldInput>>;
   ServerRoles?: InputMaybe<Array<UserServerRolesDisconnectFieldInput>>;
   Suspensions?: InputMaybe<Array<UserSuspensionsDisconnectFieldInput>>;
   UpvotedComments?: InputMaybe<Array<UserUpvotedCommentsDisconnectFieldInput>>;
   UpvotedDiscussionChannels?: InputMaybe<Array<UserUpvotedDiscussionChannelsDisconnectFieldInput>>;
+  WrittenScratchpadEntries?: InputMaybe<Array<UserWrittenScratchpadEntriesDisconnectFieldInput>>;
   defaultLicense?: InputMaybe<UserDefaultLicenseDisconnectFieldInput>;
   library?: InputMaybe<Array<UserLibraryDisconnectFieldInput>>;
   purchases?: InputMaybe<Array<UserPurchasesDisconnectFieldInput>>;
@@ -69564,10 +71789,12 @@ export type UserRelationInput = {
   PendingServerAdminInvites?: InputMaybe<Array<UserPendingServerAdminInvitesCreateFieldInput>>;
   PendingServerModInvites?: InputMaybe<Array<UserPendingServerModInvitesCreateFieldInput>>;
   RecentlyVisitedChannels?: InputMaybe<Array<UserRecentlyVisitedChannelsCreateFieldInput>>;
+  ScratchpadEntries?: InputMaybe<Array<UserScratchpadEntriesCreateFieldInput>>;
   ServerRoles?: InputMaybe<Array<UserServerRolesCreateFieldInput>>;
   Suspensions?: InputMaybe<Array<UserSuspensionsCreateFieldInput>>;
   UpvotedComments?: InputMaybe<Array<UserUpvotedCommentsCreateFieldInput>>;
   UpvotedDiscussionChannels?: InputMaybe<Array<UserUpvotedDiscussionChannelsCreateFieldInput>>;
+  WrittenScratchpadEntries?: InputMaybe<Array<UserWrittenScratchpadEntriesCreateFieldInput>>;
   defaultLicense?: InputMaybe<UserDefaultLicenseCreateFieldInput>;
   library?: InputMaybe<Array<UserLibraryCreateFieldInput>>;
   purchases?: InputMaybe<Array<UserPurchasesCreateFieldInput>>;
@@ -69637,13 +71864,207 @@ export type UserRelationshipsSubscriptionWhere = {
   PendingServerAdminInvites?: InputMaybe<UserPendingServerAdminInvitesRelationshipSubscriptionWhere>;
   PendingServerModInvites?: InputMaybe<UserPendingServerModInvitesRelationshipSubscriptionWhere>;
   RecentlyVisitedChannels?: InputMaybe<UserRecentlyVisitedChannelsRelationshipSubscriptionWhere>;
+  ScratchpadEntries?: InputMaybe<UserScratchpadEntriesRelationshipSubscriptionWhere>;
   ServerRoles?: InputMaybe<UserServerRolesRelationshipSubscriptionWhere>;
   Suspensions?: InputMaybe<UserSuspensionsRelationshipSubscriptionWhere>;
   UpvotedComments?: InputMaybe<UserUpvotedCommentsRelationshipSubscriptionWhere>;
   UpvotedDiscussionChannels?: InputMaybe<UserUpvotedDiscussionChannelsRelationshipSubscriptionWhere>;
+  WrittenScratchpadEntries?: InputMaybe<UserWrittenScratchpadEntriesRelationshipSubscriptionWhere>;
   defaultLicense?: InputMaybe<UserDefaultLicenseRelationshipSubscriptionWhere>;
   library?: InputMaybe<UserLibraryRelationshipSubscriptionWhere>;
   purchases?: InputMaybe<UserPurchasesRelationshipSubscriptionWhere>;
+};
+
+export type UserScratchpadEntriesAggregateInput = {
+  AND?: InputMaybe<Array<UserScratchpadEntriesAggregateInput>>;
+  NOT?: InputMaybe<UserScratchpadEntriesAggregateInput>;
+  OR?: InputMaybe<Array<UserScratchpadEntriesAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<UserScratchpadEntriesNodeAggregationWhereInput>;
+};
+
+export type UserScratchpadEntriesConnectFieldInput = {
+  connect?: InputMaybe<Array<ScratchpadEntryConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<ScratchpadEntryConnectWhere>;
+};
+
+export type UserScratchpadEntriesConnectedRelationship = {
+  __typename?: 'UserScratchpadEntriesConnectedRelationship';
+  node: ScratchpadEntryEventPayload;
+};
+
+export type UserScratchpadEntriesConnection = {
+  __typename?: 'UserScratchpadEntriesConnection';
+  edges: Array<UserScratchpadEntriesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type UserScratchpadEntriesConnectionSort = {
+  node?: InputMaybe<ScratchpadEntrySort>;
+};
+
+export type UserScratchpadEntriesConnectionWhere = {
+  AND?: InputMaybe<Array<UserScratchpadEntriesConnectionWhere>>;
+  NOT?: InputMaybe<UserScratchpadEntriesConnectionWhere>;
+  OR?: InputMaybe<Array<UserScratchpadEntriesConnectionWhere>>;
+  node?: InputMaybe<ScratchpadEntryWhere>;
+};
+
+export type UserScratchpadEntriesCreateFieldInput = {
+  node: ScratchpadEntryCreateInput;
+};
+
+export type UserScratchpadEntriesDeleteFieldInput = {
+  delete?: InputMaybe<ScratchpadEntryDeleteInput>;
+  where?: InputMaybe<UserScratchpadEntriesConnectionWhere>;
+};
+
+export type UserScratchpadEntriesDisconnectFieldInput = {
+  disconnect?: InputMaybe<ScratchpadEntryDisconnectInput>;
+  where?: InputMaybe<UserScratchpadEntriesConnectionWhere>;
+};
+
+export type UserScratchpadEntriesFieldInput = {
+  connect?: InputMaybe<Array<UserScratchpadEntriesConnectFieldInput>>;
+  create?: InputMaybe<Array<UserScratchpadEntriesCreateFieldInput>>;
+};
+
+export type UserScratchpadEntriesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<UserScratchpadEntriesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<UserScratchpadEntriesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<UserScratchpadEntriesNodeAggregationWhereInput>>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  sourceChannelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  sourceChannelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  sourceChannelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  sourceChannelUniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  sourceChannelUniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  sourceChannelUniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  sourceId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  sourceId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  sourceId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  sourceId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  sourceId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  sourceType_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  sourceType_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  sourceType_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  sourceType_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  sourceType_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  text_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UserScratchpadEntriesRelationship = {
+  __typename?: 'UserScratchpadEntriesRelationship';
+  cursor: Scalars['String']['output'];
+  node: ScratchpadEntry;
+};
+
+export type UserScratchpadEntriesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ScratchpadEntrySubscriptionWhere>;
+};
+
+export type UserScratchpadEntriesUpdateConnectionInput = {
+  node?: InputMaybe<ScratchpadEntryUpdateInput>;
+};
+
+export type UserScratchpadEntriesUpdateFieldInput = {
+  connect?: InputMaybe<Array<UserScratchpadEntriesConnectFieldInput>>;
+  create?: InputMaybe<Array<UserScratchpadEntriesCreateFieldInput>>;
+  delete?: InputMaybe<Array<UserScratchpadEntriesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<UserScratchpadEntriesDisconnectFieldInput>>;
+  update?: InputMaybe<UserScratchpadEntriesUpdateConnectionInput>;
+  where?: InputMaybe<UserScratchpadEntriesConnectionWhere>;
+};
+
+export type UserScratchpadEntryScratchpadEntriesAggregationSelection = {
+  __typename?: 'UserScratchpadEntryScratchpadEntriesAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<UserScratchpadEntryScratchpadEntriesNodeAggregateSelection>;
+};
+
+export type UserScratchpadEntryScratchpadEntriesNodeAggregateSelection = {
+  __typename?: 'UserScratchpadEntryScratchpadEntriesNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  sourceChannelUniqueName: StringAggregateSelection;
+  sourceId: StringAggregateSelection;
+  sourceType: StringAggregateSelection;
+  text: StringAggregateSelection;
+};
+
+export type UserScratchpadEntryWrittenScratchpadEntriesAggregationSelection = {
+  __typename?: 'UserScratchpadEntryWrittenScratchpadEntriesAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<UserScratchpadEntryWrittenScratchpadEntriesNodeAggregateSelection>;
+};
+
+export type UserScratchpadEntryWrittenScratchpadEntriesNodeAggregateSelection = {
+  __typename?: 'UserScratchpadEntryWrittenScratchpadEntriesNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  sourceChannelUniqueName: StringAggregateSelection;
+  sourceId: StringAggregateSelection;
+  sourceType: StringAggregateSelection;
+  text: StringAggregateSelection;
 };
 
 export type UserServerConfigAdminOfServersAggregationSelection = {
@@ -70207,10 +72628,12 @@ export type UserUpdateInput = {
   PendingServerAdminInvites?: InputMaybe<Array<UserPendingServerAdminInvitesUpdateFieldInput>>;
   PendingServerModInvites?: InputMaybe<Array<UserPendingServerModInvitesUpdateFieldInput>>;
   RecentlyVisitedChannels?: InputMaybe<Array<UserRecentlyVisitedChannelsUpdateFieldInput>>;
+  ScratchpadEntries?: InputMaybe<Array<UserScratchpadEntriesUpdateFieldInput>>;
   ServerRoles?: InputMaybe<Array<UserServerRolesUpdateFieldInput>>;
   Suspensions?: InputMaybe<Array<UserSuspensionsUpdateFieldInput>>;
   UpvotedComments?: InputMaybe<Array<UserUpvotedCommentsUpdateFieldInput>>;
   UpvotedDiscussionChannels?: InputMaybe<Array<UserUpvotedDiscussionChannelsUpdateFieldInput>>;
+  WrittenScratchpadEntries?: InputMaybe<Array<UserWrittenScratchpadEntriesUpdateFieldInput>>;
   bio?: InputMaybe<Scalars['String']['input']>;
   botProfileId?: InputMaybe<Scalars['String']['input']>;
   commentKarma?: InputMaybe<Scalars['Int']['input']>;
@@ -71054,6 +73477,23 @@ export type UserWhere = {
   RecentlyVisitedChannels_SINGLE?: InputMaybe<ChannelWhere>;
   /** Return Users where some of the related Channels match this filter */
   RecentlyVisitedChannels_SOME?: InputMaybe<ChannelWhere>;
+  ScratchpadEntriesAggregate?: InputMaybe<UserScratchpadEntriesAggregateInput>;
+  /** Return Users where all of the related UserScratchpadEntriesConnections match this filter */
+  ScratchpadEntriesConnection_ALL?: InputMaybe<UserScratchpadEntriesConnectionWhere>;
+  /** Return Users where none of the related UserScratchpadEntriesConnections match this filter */
+  ScratchpadEntriesConnection_NONE?: InputMaybe<UserScratchpadEntriesConnectionWhere>;
+  /** Return Users where one of the related UserScratchpadEntriesConnections match this filter */
+  ScratchpadEntriesConnection_SINGLE?: InputMaybe<UserScratchpadEntriesConnectionWhere>;
+  /** Return Users where some of the related UserScratchpadEntriesConnections match this filter */
+  ScratchpadEntriesConnection_SOME?: InputMaybe<UserScratchpadEntriesConnectionWhere>;
+  /** Return Users where all of the related ScratchpadEntries match this filter */
+  ScratchpadEntries_ALL?: InputMaybe<ScratchpadEntryWhere>;
+  /** Return Users where none of the related ScratchpadEntries match this filter */
+  ScratchpadEntries_NONE?: InputMaybe<ScratchpadEntryWhere>;
+  /** Return Users where one of the related ScratchpadEntries match this filter */
+  ScratchpadEntries_SINGLE?: InputMaybe<ScratchpadEntryWhere>;
+  /** Return Users where some of the related ScratchpadEntries match this filter */
+  ScratchpadEntries_SOME?: InputMaybe<ScratchpadEntryWhere>;
   ServerRolesAggregate?: InputMaybe<UserServerRolesAggregateInput>;
   /** Return Users where all of the related UserServerRolesConnections match this filter */
   ServerRolesConnection_ALL?: InputMaybe<UserServerRolesConnectionWhere>;
@@ -71122,6 +73562,23 @@ export type UserWhere = {
   UpvotedDiscussionChannels_SINGLE?: InputMaybe<DiscussionChannelWhere>;
   /** Return Users where some of the related DiscussionChannels match this filter */
   UpvotedDiscussionChannels_SOME?: InputMaybe<DiscussionChannelWhere>;
+  WrittenScratchpadEntriesAggregate?: InputMaybe<UserWrittenScratchpadEntriesAggregateInput>;
+  /** Return Users where all of the related UserWrittenScratchpadEntriesConnections match this filter */
+  WrittenScratchpadEntriesConnection_ALL?: InputMaybe<UserWrittenScratchpadEntriesConnectionWhere>;
+  /** Return Users where none of the related UserWrittenScratchpadEntriesConnections match this filter */
+  WrittenScratchpadEntriesConnection_NONE?: InputMaybe<UserWrittenScratchpadEntriesConnectionWhere>;
+  /** Return Users where one of the related UserWrittenScratchpadEntriesConnections match this filter */
+  WrittenScratchpadEntriesConnection_SINGLE?: InputMaybe<UserWrittenScratchpadEntriesConnectionWhere>;
+  /** Return Users where some of the related UserWrittenScratchpadEntriesConnections match this filter */
+  WrittenScratchpadEntriesConnection_SOME?: InputMaybe<UserWrittenScratchpadEntriesConnectionWhere>;
+  /** Return Users where all of the related ScratchpadEntries match this filter */
+  WrittenScratchpadEntries_ALL?: InputMaybe<ScratchpadEntryWhere>;
+  /** Return Users where none of the related ScratchpadEntries match this filter */
+  WrittenScratchpadEntries_NONE?: InputMaybe<ScratchpadEntryWhere>;
+  /** Return Users where one of the related ScratchpadEntries match this filter */
+  WrittenScratchpadEntries_SINGLE?: InputMaybe<ScratchpadEntryWhere>;
+  /** Return Users where some of the related ScratchpadEntries match this filter */
+  WrittenScratchpadEntries_SOME?: InputMaybe<ScratchpadEntryWhere>;
   bio?: InputMaybe<Scalars['String']['input']>;
   bio_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   bio_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -71307,9 +73764,318 @@ export type UserWikiPageOriginalWikiPagesNodeAggregateSelection = {
   updatedAt: DateTimeAggregateSelection;
 };
 
+export type UserWrittenScratchpadEntriesAggregateInput = {
+  AND?: InputMaybe<Array<UserWrittenScratchpadEntriesAggregateInput>>;
+  NOT?: InputMaybe<UserWrittenScratchpadEntriesAggregateInput>;
+  OR?: InputMaybe<Array<UserWrittenScratchpadEntriesAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<UserWrittenScratchpadEntriesNodeAggregationWhereInput>;
+};
+
+export type UserWrittenScratchpadEntriesConnectFieldInput = {
+  connect?: InputMaybe<Array<ScratchpadEntryConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<ScratchpadEntryConnectWhere>;
+};
+
+export type UserWrittenScratchpadEntriesConnectedRelationship = {
+  __typename?: 'UserWrittenScratchpadEntriesConnectedRelationship';
+  node: ScratchpadEntryEventPayload;
+};
+
+export type UserWrittenScratchpadEntriesConnection = {
+  __typename?: 'UserWrittenScratchpadEntriesConnection';
+  edges: Array<UserWrittenScratchpadEntriesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type UserWrittenScratchpadEntriesConnectionSort = {
+  node?: InputMaybe<ScratchpadEntrySort>;
+};
+
+export type UserWrittenScratchpadEntriesConnectionWhere = {
+  AND?: InputMaybe<Array<UserWrittenScratchpadEntriesConnectionWhere>>;
+  NOT?: InputMaybe<UserWrittenScratchpadEntriesConnectionWhere>;
+  OR?: InputMaybe<Array<UserWrittenScratchpadEntriesConnectionWhere>>;
+  node?: InputMaybe<ScratchpadEntryWhere>;
+};
+
+export type UserWrittenScratchpadEntriesCreateFieldInput = {
+  node: ScratchpadEntryCreateInput;
+};
+
+export type UserWrittenScratchpadEntriesDeleteFieldInput = {
+  delete?: InputMaybe<ScratchpadEntryDeleteInput>;
+  where?: InputMaybe<UserWrittenScratchpadEntriesConnectionWhere>;
+};
+
+export type UserWrittenScratchpadEntriesDisconnectFieldInput = {
+  disconnect?: InputMaybe<ScratchpadEntryDisconnectInput>;
+  where?: InputMaybe<UserWrittenScratchpadEntriesConnectionWhere>;
+};
+
+export type UserWrittenScratchpadEntriesFieldInput = {
+  connect?: InputMaybe<Array<UserWrittenScratchpadEntriesConnectFieldInput>>;
+  create?: InputMaybe<Array<UserWrittenScratchpadEntriesCreateFieldInput>>;
+};
+
+export type UserWrittenScratchpadEntriesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<UserWrittenScratchpadEntriesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<UserWrittenScratchpadEntriesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<UserWrittenScratchpadEntriesNodeAggregationWhereInput>>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  sourceChannelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  sourceChannelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  sourceChannelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  sourceChannelUniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  sourceChannelUniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  sourceChannelUniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  sourceChannelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  sourceId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  sourceId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  sourceId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  sourceId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  sourceId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  sourceId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  sourceType_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  sourceType_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  sourceType_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  sourceType_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  sourceType_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  sourceType_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  text_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UserWrittenScratchpadEntriesRelationship = {
+  __typename?: 'UserWrittenScratchpadEntriesRelationship';
+  cursor: Scalars['String']['output'];
+  node: ScratchpadEntry;
+};
+
+export type UserWrittenScratchpadEntriesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ScratchpadEntrySubscriptionWhere>;
+};
+
+export type UserWrittenScratchpadEntriesUpdateConnectionInput = {
+  node?: InputMaybe<ScratchpadEntryUpdateInput>;
+};
+
+export type UserWrittenScratchpadEntriesUpdateFieldInput = {
+  connect?: InputMaybe<Array<UserWrittenScratchpadEntriesConnectFieldInput>>;
+  create?: InputMaybe<Array<UserWrittenScratchpadEntriesCreateFieldInput>>;
+  delete?: InputMaybe<Array<UserWrittenScratchpadEntriesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<UserWrittenScratchpadEntriesDisconnectFieldInput>>;
+  update?: InputMaybe<UserWrittenScratchpadEntriesUpdateConnectionInput>;
+  where?: InputMaybe<UserWrittenScratchpadEntriesConnectionWhere>;
+};
+
 export type UsersConnection = {
   __typename?: 'UsersConnection';
   edges: Array<UserEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type WikiEditInfo = {
+  __typename?: 'WikiEditInfo';
+  Author?: Maybe<User>;
+  WikiPage?: Maybe<WikiPageInfo>;
+  body?: Maybe<Scalars['String']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  editReason?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+};
+
+export type WikiEditInfoAggregateSelection = {
+  __typename?: 'WikiEditInfoAggregateSelection';
+  body: StringAggregateSelection;
+  count: Scalars['Int']['output'];
+  createdAt: DateTimeAggregateSelection;
+  editReason: StringAggregateSelection;
+  id: IdAggregateSelection;
+};
+
+export type WikiEditInfoCreateInput = {
+  body?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  editReason?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+};
+
+export type WikiEditInfoCreatedEvent = {
+  __typename?: 'WikiEditInfoCreatedEvent';
+  createdWikiEditInfo: WikiEditInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type WikiEditInfoDeletedEvent = {
+  __typename?: 'WikiEditInfoDeletedEvent';
+  deletedWikiEditInfo: WikiEditInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type WikiEditInfoEdge = {
+  __typename?: 'WikiEditInfoEdge';
+  cursor: Scalars['String']['output'];
+  node: WikiEditInfo;
+};
+
+export type WikiEditInfoEventPayload = {
+  __typename?: 'WikiEditInfoEventPayload';
+  body?: Maybe<Scalars['String']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  editReason?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+};
+
+export type WikiEditInfoOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more WikiEditInfoSort objects to sort WikiEditInfos by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<WikiEditInfoSort>>;
+};
+
+/** Fields to sort WikiEditInfos by. The order in which sorts are applied is not guaranteed when specifying many fields in one WikiEditInfoSort object. */
+export type WikiEditInfoSort = {
+  body?: InputMaybe<SortDirection>;
+  createdAt?: InputMaybe<SortDirection>;
+  editReason?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+};
+
+export type WikiEditInfoSubscriptionWhere = {
+  AND?: InputMaybe<Array<WikiEditInfoSubscriptionWhere>>;
+  NOT?: InputMaybe<WikiEditInfoSubscriptionWhere>;
+  OR?: InputMaybe<Array<WikiEditInfoSubscriptionWhere>>;
+  body?: InputMaybe<Scalars['String']['input']>;
+  body_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  body_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  body_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  body_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  body_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  editReason?: InputMaybe<Scalars['String']['input']>;
+  editReason_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  editReason_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  editReason_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  editReason_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  editReason_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type WikiEditInfoUpdateInput = {
+  body?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  editReason?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type WikiEditInfoUpdatedEvent = {
+  __typename?: 'WikiEditInfoUpdatedEvent';
+  event: EventType;
+  previousState: WikiEditInfoEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedWikiEditInfo: WikiEditInfoEventPayload;
+};
+
+export type WikiEditInfoWhere = {
+  AND?: InputMaybe<Array<WikiEditInfoWhere>>;
+  NOT?: InputMaybe<WikiEditInfoWhere>;
+  OR?: InputMaybe<Array<WikiEditInfoWhere>>;
+  body?: InputMaybe<Scalars['String']['input']>;
+  body_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  body_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  body_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  body_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  body_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  editReason?: InputMaybe<Scalars['String']['input']>;
+  editReason_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  editReason_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  editReason_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  editReason_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  editReason_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type WikiEditInfosConnection = {
+  __typename?: 'WikiEditInfosConnection';
+  edges: Array<WikiEditInfoEdge>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -71740,6 +74506,153 @@ export type WikiPageEventPayload = {
   slug: Scalars['String']['output'];
   title: Scalars['String']['output'];
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type WikiPageInfo = {
+  __typename?: 'WikiPageInfo';
+  channelUniqueName?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  slug?: Maybe<Scalars['String']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+export type WikiPageInfoAggregateSelection = {
+  __typename?: 'WikiPageInfoAggregateSelection';
+  channelUniqueName: StringAggregateSelection;
+  count: Scalars['Int']['output'];
+  id: IdAggregateSelection;
+  slug: StringAggregateSelection;
+  title: StringAggregateSelection;
+};
+
+export type WikiPageInfoCreateInput = {
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  slug?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type WikiPageInfoCreatedEvent = {
+  __typename?: 'WikiPageInfoCreatedEvent';
+  createdWikiPageInfo: WikiPageInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type WikiPageInfoDeletedEvent = {
+  __typename?: 'WikiPageInfoDeletedEvent';
+  deletedWikiPageInfo: WikiPageInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type WikiPageInfoEdge = {
+  __typename?: 'WikiPageInfoEdge';
+  cursor: Scalars['String']['output'];
+  node: WikiPageInfo;
+};
+
+export type WikiPageInfoEventPayload = {
+  __typename?: 'WikiPageInfoEventPayload';
+  channelUniqueName?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  slug?: Maybe<Scalars['String']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+export type WikiPageInfoOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more WikiPageInfoSort objects to sort WikiPageInfos by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<WikiPageInfoSort>>;
+};
+
+/** Fields to sort WikiPageInfos by. The order in which sorts are applied is not guaranteed when specifying many fields in one WikiPageInfoSort object. */
+export type WikiPageInfoSort = {
+  channelUniqueName?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  slug?: InputMaybe<SortDirection>;
+  title?: InputMaybe<SortDirection>;
+};
+
+export type WikiPageInfoSubscriptionWhere = {
+  AND?: InputMaybe<Array<WikiPageInfoSubscriptionWhere>>;
+  NOT?: InputMaybe<WikiPageInfoSubscriptionWhere>;
+  OR?: InputMaybe<Array<WikiPageInfoSubscriptionWhere>>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  slug?: InputMaybe<Scalars['String']['input']>;
+  slug_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  slug_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  slug_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  slug_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  slug_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  title_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type WikiPageInfoUpdateInput = {
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  slug?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type WikiPageInfoUpdatedEvent = {
+  __typename?: 'WikiPageInfoUpdatedEvent';
+  event: EventType;
+  previousState: WikiPageInfoEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedWikiPageInfo: WikiPageInfoEventPayload;
+};
+
+export type WikiPageInfoWhere = {
+  AND?: InputMaybe<Array<WikiPageInfoWhere>>;
+  NOT?: InputMaybe<WikiPageInfoWhere>;
+  OR?: InputMaybe<Array<WikiPageInfoWhere>>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  slug?: InputMaybe<Scalars['String']['input']>;
+  slug_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  slug_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  slug_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  slug_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  slug_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  title_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type WikiPageInfosConnection = {
+  __typename?: 'WikiPageInfosConnection';
+  edges: Array<WikiPageInfoEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type WikiPageOptions = {
