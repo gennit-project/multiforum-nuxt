@@ -75,13 +75,11 @@ const loggedInUserSuperUpvoted = computed(() => {
   if (!usernameVar) {
     return false;
   }
-  // SuperUpvotedByUsers is added to the schema but types need regeneration
-  const superUpvotedByUsers = (props.commentData as any).SuperUpvotedByUsers;
-  if (!superUpvotedByUsers) {
+  if (!props.commentData.SuperUpvotedByUsers) {
     return false;
   }
-  return superUpvotedByUsers.some(
-    (user: { username: string }) => user.username === usernameVar.value
+  return props.commentData.SuperUpvotedByUsers.some(
+    (user) => user.username === usernameVar.value
   );
 });
 
