@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import NotificationList from '@/components/user/NotificationList.vue';
+import NotificationTabs from '@/components/notifications/NotificationTabs.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 </script>
 
@@ -7,7 +7,7 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
   <NuxtLayout>
     <RequireAuth>
       <template #has-auth>
-        <NotificationList />
+        <NotificationTabs />
       </template>
       <template #does-not-have-auth>
         <p>You must be logged in to view your notifications.</p>
