@@ -487,6 +487,22 @@ export const GET_USER_CONTRIBUTIONS = gql`
             eventId
           }
         }
+        WikiEdits {
+          id
+          body
+          editReason
+          createdAt
+          Author {
+            username
+            profilePicURL
+          }
+          WikiPage {
+            id
+            title
+            slug
+            channelUniqueName
+          }
+        }
       }
     }
   }
