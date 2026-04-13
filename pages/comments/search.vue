@@ -13,6 +13,10 @@ import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';
 import { relativeTime } from '@/utils';
 import LoadMore from '@/components/LoadMore.vue';
+import {
+  getCommentForumId,
+  getCommentPermalinkRoute,
+} from '@/utils/commentPermalink';
 
 const route = useRoute();
 const router = useRouter();
@@ -218,6 +222,17 @@ const getAuthorProfilePic = (comment: Comment): string => {
   return '';
 };
 
+const getCommentPermalink = (comment: Comment) => {
+  return getCommentPermalinkRoute(comment);
+};
+
+const openCommentPermalink = (comment: Comment) => {
+  const permalink = getCommentPermalink(comment);
+  if (permalink) {
+    router.push(permalink);
+  }
+};
+
 // Get the context link for the comment (where it was posted)
 const getContextLink = (comment: Comment) => {
   if (comment.DiscussionChannel) {
@@ -230,9 +245,14 @@ const getContextLink = (comment: Comment) => {
     };
   }
   if (comment.Event) {
+    const forumId = getCommentForumId(comment);
+    if (!forumId) {
+      return null;
+    }
     return {
-      name: 'events-eventId',
+      name: 'forums-forumId-events-eventId',
       params: {
+        forumId,
         eventId: comment.Event.id,
       },
     };
@@ -251,10 +271,7 @@ const getContextText = (comment: Comment) => {
 };
 
 const getContextForum = (comment: Comment) => {
-  if (comment.DiscussionChannel) {
-    return comment.DiscussionChannel.channelUniqueName;
-  }
-  return null;
+  return getCommentForumId(comment) || null;
 };
 </script>
 
@@ -336,7 +353,16 @@ const getContextForum = (comment: Comment) => {
             <div
               v-for="comment in comments"
               :key="comment.id"
+              :role="getCommentPermalink(comment) ? 'link' : undefined"
+              :tabindex="getCommentPermalink(comment) ? 0 : undefined"
               class="rounded-md border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
+              :class="{
+                'cursor-pointer hover:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:hover:border-orange-400':
+                  getCommentPermalink(comment),
+              }"
+              @click="openCommentPermalink(comment)"
+              @keydown.enter.prevent="openCommentPermalink(comment)"
+              @keydown.space.prevent="openCommentPermalink(comment)"
             >
               <!-- Comment header -->
               <div class="mb-2 flex items-center gap-2">
@@ -353,6 +379,7 @@ const getContextForum = (comment: Comment) => {
                       params: { username: getAuthorUsername(comment) },
                     }"
                     class="font-medium text-gray-900 hover:underline dark:text-gray-100"
+                    @click.stop
                   >
                     {{ getAuthorDisplayName(comment) }}
                   </router-link>
@@ -374,21 +401,29 @@ const getContextForum = (comment: Comment) => {
                 />
               </div>
 
-              <!-- Context link -->
-              <div
-                v-if="getContextLink(comment)"
-                class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400"
-              >
-                <span>in</span>
+              <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                <!-- Context link -->
+                <template v-if="getContextLink(comment)">
+                  <span>in</span>
+                  <router-link
+                    :to="getContextLink(comment)!"
+                    class="text-orange-600 hover:underline dark:text-orange-400"
+                    @click.stop
+                  >
+                    {{ getContextText(comment) }}
+                  </router-link>
+                  <span v-if="getContextForum(comment)">
+                    ({{ getContextForum(comment) }})
+                  </span>
+                </template>
                 <router-link
-                  :to="getContextLink(comment)!"
-                  class="text-orange-600 hover:underline dark:text-orange-400"
+                  v-if="getCommentPermalink(comment)"
+                  :to="getCommentPermalink(comment)!"
+                  class="font-medium text-orange-600 hover:underline dark:text-orange-400"
+                  @click.stop
                 >
-                  {{ getContextText(comment) }}
+                  View comment
                 </router-link>
-                <span v-if="getContextForum(comment)">
-                  ({{ getContextForum(comment) }})
-                </span>
               </div>
             </div>
           </div>
