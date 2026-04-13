@@ -221,7 +221,7 @@
 | Album image and detail page has share button (copy link, crosspost)                                                             | Feature     | ✅     |
 | Discussion detail page comments have less left side padding at mobile width                                                     | UI          | ✅     |
 | In comment search results page, each result list item should be a permalink                                                     | Feature     | ✅     |
-| Well-tested function for making accurate permalink to comment on event, discussion, feedback, issue (both frontend and backend) | Feature     |        |
+| Well-tested function for making accurate permalink to comment on event, discussion, feedback, issue (both frontend and backend) | Feature     | ✅     |
 | Reduce API calls on favorites lists - include whether user has favorited each item in fetch-list API call                       | Performance |        |
 | Auto-save for server settings and channel admin settings (at least for plugins; should not have two save buttons)               | UX          |        |
 | Activity feed shows title edit history of an event (similar to discussion detail pages)                                         | Feature     |        |
@@ -605,3 +605,72 @@ This section contains detailed step-by-step instructions for manually verifying 
 **Files Changed:**
 
 - Frontend: `components/comments/Comment.vue` - Added responsive Tailwind classes (`sm:` prefix) to reduce left margin and padding at mobile widths
+
+---
+
+### Comment Permalink Utility
+
+**Purpose:** Provide a well-tested, centralized function for generating accurate permalinks to comments across all content types (discussions, events, issues, feedback).
+
+**Implementation Overview:**
+
+The `getCommentPermalinkRoute` function in `utils/commentPermalink.ts` handles all comment permalink generation:
+- Accepts a comment object with optional context (DiscussionChannel, Event, Issue, Channel)
+- Returns a Vue Router route object or null if insufficient context
+- Supports fallback options for missing context fields
+- Used by `useCommentPermalink` composable and search results page
+
+**Test: Run Unit Tests**
+
+```bash
+npm run test:unit -- --run utils/commentPermalink.spec.ts
+```
+
+**Expected Outcome:**
+
+- 6 tests pass covering:
+  - Discussion comment permalinks
+  - Event comment permalinks with channel context
+  - Fallback to provided forum/event context
+  - Issue comment permalinks
+  - Null return when required context is missing
+  - Forum ID resolution priority (Channel > DiscussionChannel > Event > Issue)
+
+**Test: Verify Discussion Comment Permalinks**
+
+1. Navigate to a discussion with comments
+2. Click the "..." menu on any comment
+3. Click "Copy Link"
+4. Paste the URL - should match pattern: `/forums/{forumId}/discussions/{discussionId}/comments/{commentId}`
+5. Navigate to the copied URL
+6. Verify the correct comment is highlighted
+
+**Test: Verify Event Comment Permalinks**
+
+1. Navigate to an event with comments
+2. Copy permalink from any comment
+3. Verify URL matches: `/forums/{forumId}/events/{eventId}/comments/{commentId}`
+4. Navigate to copied URL
+5. Verify correct comment is highlighted
+
+**Test: Verify Issue Comment Permalinks**
+
+1. Navigate to a moderation issue with comments
+2. Copy permalink from a comment
+3. Verify URL matches: `/forums/{forumId}/issues/{issueNumber}/comments/{commentId}`
+4. Navigate to copied URL
+5. Verify correct comment is highlighted
+
+**Test: Backend Email URLs**
+
+1. Post a comment on a discussion that another user is subscribed to
+2. Check the email notification sent to the subscriber
+3. Verify the "View the comment" link points to the correct comment permalink
+4. Click the link and verify it highlights the correct comment
+
+**Files:**
+
+- Frontend: `utils/commentPermalink.ts` - Core permalink generation function
+- Frontend: `utils/commentPermalink.spec.ts` - 6 unit tests
+- Frontend: `composables/useCommentPermalink.ts` - Vue composable wrapper
+- Backend: `customResolvers/mutations/shared/emailUtils.ts` - Uses consistent URL patterns for emails
