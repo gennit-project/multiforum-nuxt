@@ -224,8 +224,8 @@
 | Well-tested function for making accurate permalink to comment on event, discussion, feedback, issue (both frontend and backend) | Feature     | ✅     |
 | Reduce API calls on favorites lists - include whether user has favorited each item in fetch-list API call (see notes below)     | Performance | ⏳     |
 | Auto-save for server settings and channel admin settings (at least for plugins; should not have two save buttons)               | UX          |        |
-| Activity feed shows title edit history of an event (similar to discussion detail pages)                                         | Feature     |        |
-| Can see description edits of event                                                                                              | Feature     |        |
+| Activity feed shows title edit history of an event (similar to discussion detail pages) (see notes below)                       | Feature     | ⏳     |
+| Can see description edits of event (see notes below)                                                                            | Feature     | ⏳     |
 | Add a way to deprecate a channel - lock for reasons unrelated to sitewide rule violations                                       | Feature     |        |
 
 #### Notes on Favorites API Optimization
@@ -242,6 +242,39 @@
 1. Add `initialIsFavorited` prop to `AddToImageFavorites`, `AddToCommentFavorites`, `AddToChannelFavorites`
 2. Update image/channel list queries to include `isFavorited` computed field
 3. Update parent list components to pass `initialIsFavorited` prop
+
+#### Notes on Event Edit History
+
+**Current state:** Events have `editReason` field but NO version history tracking. Discussions already have full version history with `PastTitleVersions`, `PastBodyVersions`, and `BodyLastEditedBy`.
+
+**Backend work required:**
+
+1. **Schema update** (`typeDefs.ts`) - Add to Event type:
+   ```graphql
+   PastTitleVersions: [TextVersion!]! @relationship(type: "HAS_EVENT_TITLE_VERSION", direction: OUT)
+   PastDescriptionVersions: [TextVersion!]! @relationship(type: "HAS_EVENT_DESCRIPTION_VERSION", direction: OUT)
+   DescriptionLastEditedBy: User @relationship(type: "EVENT_DESCRIPTION_LAST_EDITED_BY", direction: OUT)
+   ```
+
+2. **Middleware** - Create `eventVersionHistoryMiddleware.ts`:
+   - Hook into `updateEventWithChannelConnections` mutation
+   - Snapshot old title/description before update
+
+3. **Hook** - Create `eventVersionHistoryHook.ts`:
+   - Mirror `discussionVersionHistoryHook.ts` logic
+   - Create TextVersion records for old title/description
+   - Track `DescriptionLastEditedBy`
+
+**Frontend work required:**
+
+1. **Query update** - Add version fields to `GET_EVENT` query
+2. **Components** - Create `EventEditsDropdown.vue` and `EventTitleVersions.vue` (can reuse `RevisionDiffContent.vue`)
+3. **Mutation** - Add `deleteEventDescriptionRevision` for moderator redaction
+
+**Reference files:**
+- `hooks/discussionVersionHistoryHook.ts` - Pattern to follow
+- `middleware/discussionVersionHistoryMiddleware.ts` - Middleware pattern
+- `components/discussion/detail/activityFeed/EditsDropdown.vue` - UI component to adapt
 
 ---
 
