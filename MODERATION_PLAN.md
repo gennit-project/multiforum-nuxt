@@ -1,33 +1,5 @@
 # Moderation Features: Current State vs Roadmap Plan
 
-## Wiki Revision Moderation Roadmap
-
-This section tracks the wiki/discussion/comment revision-history work from the current roadmap. Most items still need coding changes. Completed items are listed here so follow-up work can build on the right foundation.
-
-### Completed Foundation Work
-
-| Task                                        | Status | Notes                                                                                                                                 |
-| ------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Normalize shared revision diff rendering    | Done   | Added shared revision diff content and updated wiki, discussion, and comment revision modals to use it.                               |
-| Share revision pairing primitives           | Done   | Added shared revision history pairing helpers and applied them to comment/wiki edit dropdowns plus wiki revision pages.               |
-| Consolidate wiki revision detail diff view  | Done   | Replaced the standalone wiki revision detail `v-code-diff` implementation with the shared revision diff content.                      |
-| Use danger-action revision redaction UI     | Done   | Comment, discussion, and wiki revision modals use a neutral primary action and expose redaction as an authorized danger action.       |
-| Add wiki revision diff selector             | Done   | Wiki revision diff pages can switch compared revisions without returning to the revision history list.                                |
-| Add wiki edit reasons                       | Done   | Wiki create/edit forms write edit reasons and wiki revision queries/pages display `editReason`.                                       |
-| Gate backend wiki edits for suspensions     | Done   | Backend wiki page create/update, child page creation, and wiki home page update flows use channel permission suspension checks.       |
-| Gate frontend wiki edits for suspensions    | Done   | Wiki create/edit entry points and direct forms now surface `SuspensionNotice` and block suspended users before mutation submit.       |
-| Add wiki revision report UI                 | Done   | Wiki revision diff pages can submit reports through the shared broken-rules modal and `reportWikiEdit` mutation.                      |
-| Render wiki report targets in moderation UI | Done   | Issue queries and moderation surfaces now include wiki page/revision target fields and label wiki edit reports in issue lists/detail. |
-| Add wiki delete permission gates            | Done   | Wiki page deletion allows the original page author, server admin, or moderators with the dedicated `canDeleteWiki` permission.        |
-| Add wiki edits to user profiles             | Done   | User profiles include a wiki edits count, tab, and `/u/[username]/wiki-edits` page with channel filtering.                            |
-| Add wiki edits to contribution charts       | Done   | Backend contribution data and the user contribution chart include wiki edit counts, detail rows, and page/revision links.             |
-
-### Remaining Coding Changes
-
-No remaining wiki revision moderation roadmap items are currently tracked here. Add new follow-up items as they are discovered.
-
----
-
 ## Remaining Implementation Work
 
 ### Auto-Moderation Bot Plugin
