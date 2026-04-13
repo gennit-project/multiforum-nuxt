@@ -1,39 +1,5 @@
 # Moderation Features: Current State vs Roadmap Plan
 
-## Remaining Implementation Work
-
-### Auto-Moderation Bot Plugin
-
-**Current State:**
-
-- ❌ Not implemented
-- Plugin system exists and is already capable of channel opt-in, bot user provisioning, and pipeline-style execution, so this should be built as a plugin feature rather than a bespoke moderation subsystem
-- First version should only report content and create issues for human review; it should not archive or suspend automatically
-
-#### Backend Tasks
-
-| Task                                                                                                                                                  | Location          | Type    |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------- |
-| Create an experimental moderation bot plugin in `/Users/catherineluse/gennit/gennit-nuxt/multiforum-plugins` with configurable scope mode             | Frontend + Plugin | Feature |
-| Define plugin schema for a report-only moderation bot                                                                                                 | Backend           | Design  |
-| Create `ModerationBotPlugin` type or equivalent report-only plugin model                                                                              | Backend           | Feature |
-| Create bot user for automated moderation                                                                                                              | Backend           | Feature |
-| Ensure the content moderation bot acts through a `ModerationProfile`, so its reports and actions appear on a normal mod profile page for auditability | Backend + Plugin  | Feature |
-| Implement report-only issue creation based on rule violations                                                                                         | Backend           | Feature |
-| Have the bot leave issue-linked/report-linked comments that clearly indicate automated reporting                                                      | Backend           | Feature |
-
-#### Frontend Tasks
-
-| Task                                                                                                                                                             | Location          | Type          |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------- |
-| Add the experimental moderation bot plugin to channel settings with configurable scope mode                                                                      | Frontend          | Feature       |
-| Configure which rules trigger auto-moderation                                                                                                                    | Frontend          | Feature       |
-| Display bot comments with clear "automated" indicator                                                                                                            | Frontend          | Feature       |
-| Add README/docs explaining that this is an experimental proof of concept that only reports for human review today and may later expand to actions like archiving | Frontend + Plugin | Documentation |
-| Support scope configuration in the plugin UI so the same plugin can run in channel-scoped or server-scoped mode                                                  | Frontend          | Feature       |
-
----
-
 ## File Reference
 
 ### Frontend Key Files
@@ -2318,3 +2284,274 @@ These steps verify the UI bug fixes for mod action buttons and archived banner.
 
 - Archived banner should appear consistently regardless of navigation method
 - No flicker or delayed appearance of the banner
+
+---
+
+## Auto-Moderation Bot Plugin Verification
+
+These steps verify the auto-moderation bot plugin that analyzes content for rule violations and creates reports for human review.
+
+### Verify Plugin Installation and API Key Configuration
+
+**Prerequisites:**
+
+- Server admin access
+- An OpenAI API key
+
+**Test Steps:**
+
+1. Log in as a server admin
+2. Navigate to `/admin/settings/plugins`
+3. Find the "Auto-Moderation Bot" plugin in the available plugins list
+4. Allow and install the plugin
+5. Navigate to the plugin detail page
+6. Enter an OpenAI API key in the secrets section
+7. Save the configuration
+8. Verify the secret status indicator shows "Valid" or "Set"
+
+**Expected Outcome:**
+
+- Plugin should appear in the available plugins list
+- Secret field should accept the API key
+- Status indicator should update after validation
+- Key should be stored securely (not visible after save)
+
+### Verify Plugin Settings Configuration
+
+**Prerequisites:**
+
+- Auto-moderation bot plugin installed
+- Server admin access
+
+**Test Steps:**
+
+1. Log in as a server admin
+2. Navigate to `/admin/settings/plugins/auto-moderation-bot`
+3. Review the Bot Behavior settings:
+   - Bot handle (default: "automod")
+   - Model (default: "gpt-4o-mini")
+   - Temperature (default: 0.3)
+   - Max tokens (default: 1000)
+   - Confidence threshold (default: 0.7)
+   - Default profile id (default: "general-moderation")
+4. Modify settings and save
+5. Verify changes persist on page reload
+
+**Expected Outcome:**
+
+- All settings should be editable
+- Temperature should accept values between 0 and 1
+- Confidence threshold should accept values between 0 and 1
+- Changes should save successfully
+
+### Verify Channel-Level Overrides
+
+**Prerequisites:**
+
+- Auto-moderation bot enabled at server level
+- Channel admin access
+
+**Test Steps:**
+
+1. Log in as a channel admin
+2. Navigate to `/forums/[forumId]/edit/plugins/auto-moderation-bot`
+3. Enable the "Override profiles for this channel" option
+4. Modify the confidence threshold for this channel
+5. Save changes
+6. Verify changes persist on page reload
+
+**Expected Outcome:**
+
+- Channel can override server-level confidence threshold
+- Channel can override bot handle and default profile
+- Server-level profiles should appear as read-only references
+- Channel overrides should take precedence when enabled
+
+### Verify Bot Analyzes Comments for Rule Violations
+
+**Prerequisites:**
+
+- Auto-moderation bot enabled in a channel with forum rules defined
+- OpenAI API key configured
+- A test channel with at least one defined rule (e.g., "No spam or self-promotion")
+
+**Test Steps:**
+
+1. Log in as a regular user
+2. Navigate to a discussion in a channel with auto-moderation enabled
+3. Create a comment that clearly violates a forum rule (e.g., spam content)
+4. Wait for the bot to analyze the comment
+5. Check the channel's issue list for a new report
+
+**Expected Outcome:**
+
+- Bot should analyze the comment within a reasonable time
+- If confidence exceeds threshold AND a violation is detected:
+  - A moderation issue should be created
+  - Issue should include confidence percentage
+  - Issue should include violated rules
+  - Issue should include explanation
+- If no violation or confidence below threshold:
+  - No report should be created
+
+### Verify Bot Does Not Report Below Confidence Threshold
+
+**Prerequisites:**
+
+- Auto-moderation bot configured with a high confidence threshold (e.g., 0.9)
+- A channel with forum rules
+
+**Test Steps:**
+
+1. Create a comment that is borderline or ambiguous
+2. Wait for the bot to analyze the comment
+3. Check server logs or plugin run logs
+
+**Expected Outcome:**
+
+- If confidence is below threshold, no report should be created
+- Plugin logs should show: "Content analyzed - no report needed"
+- The analysis result should include the confidence score and threshold
+
+### Verify Bot Ignores Bot-Authored Comments
+
+**Prerequisites:**
+
+- Auto-moderation bot enabled
+- Another bot that creates comments (e.g., ChatGPT bot)
+
+**Test Steps:**
+
+1. Trigger another bot to create a comment
+2. Wait for auto-moderation analysis
+3. Check plugin run logs
+
+**Expected Outcome:**
+
+- Auto-moderation bot should NOT analyze comments from other bots
+- Plugin logs should show: "Ignoring bot-authored comment"
+- No reports should be created for bot comments
+
+### Verify Report Format and Content
+
+**Prerequisites:**
+
+- A report created by the auto-moderation bot
+
+**Test Steps:**
+
+1. Navigate to the channel's issue list
+2. Find an issue created by the auto-moderation bot
+3. Open the issue detail page
+4. Review the report content
+
+**Expected Outcome:**
+
+- Report should be formatted as:
+  ```
+  [Automated Report - General Moderation]
+
+  Confidence: XX%
+
+  [Explanation of why content may violate rules]
+
+  Violated Rules: [list of violated rules]
+
+  ---
+  This report was generated automatically by the auto-moderation bot.
+  A human moderator should review this content before taking action.
+  ```
+- Report should be attributed to the bot's ModerationProfile
+- Report should appear in the issue activity feed
+
+### Verify Bot Can Be Suspended
+
+**Prerequisites:**
+
+- Auto-moderation bot enabled and working
+- Server mod with suspension permissions
+
+**Test Steps:**
+
+1. Log in as a server mod
+2. Find an issue created by the auto-moderation bot
+3. Use the "Suspend Bot" action to suspend the bot
+4. Create a comment that would normally trigger a report
+5. Wait for analysis
+
+**Expected Outcome:**
+
+- Suspend action should succeed
+- After suspension:
+  - Bot should NOT create any reports
+  - Server logs should show: `Bot "bot-{channel}-automod-{profile}" is suspended - action blocked`
+- Bot should appear suspended in the channel sidebar with "Suspended" badge
+
+### Verify Moderation Profiles
+
+**Prerequisites:**
+
+- Auto-moderation bot with multiple profiles configured
+
+**Test Steps:**
+
+1. Check the three default profiles exist:
+   - `general-moderation` - General rule violation detection
+   - `spam-detection` - Focus on spam/promotional content
+   - `harassment-detection` - Focus on harassment/personal attacks
+2. Configure a channel to use a specific profile
+3. Create content that matches that profile's focus
+4. Verify the report references the correct profile
+
+**Expected Outcome:**
+
+- Each profile should have a distinct prompt focusing on different violation types
+- Reports should indicate which profile was used
+- Bot users should be created for each profile: `bot-{channel}-automod-{profileId}`
+
+### Verify Unsuspending Bot Re-Enables Analysis
+
+**Prerequisites:**
+
+- A suspended auto-moderation bot
+- Admin access to unsuspend
+
+**Test Steps:**
+
+1. Log in as an admin
+2. Navigate to the issue that caused the bot suspension
+3. Click "Unsuspend Bot"
+4. Confirm the unsuspension
+5. Create a comment that violates rules
+6. Wait for analysis
+
+**Expected Outcome:**
+
+- Unsuspend action should succeed
+- Bot should resume analyzing comments normally
+- Reports should be created for violations above threshold
+- No suspension block messages in server logs
+
+### Automated Verification
+
+Run these from `/Users/catherineluse/gennit/gennit-nuxt/multiforum-plugins`:
+
+```bash
+cd plugins/auto-moderation-bot
+npm run build
+```
+
+Expected outcome:
+
+- TypeScript compilation succeeds with no errors
+- `dist/index.js` is generated
+
+Run the full build from the plugins root:
+
+```bash
+npm run build:plugin -- --plugin auto-moderation-bot
+```
+
+Expected outcome:
+
+- Plugin builds successfully via the root build script
