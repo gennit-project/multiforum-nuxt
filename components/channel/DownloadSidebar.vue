@@ -62,6 +62,13 @@ const licenseInfo = computed(() => {
   return primaryFile.value?.license?.name || 'No license specified';
 });
 
+const downloadCounts = computed(() => {
+  return {
+    total: primaryFile.value?.downloadCountTotal || 0,
+    unique: primaryFile.value?.downloadCountUnique || 0,
+  };
+});
+
 // Format file size with appropriate units
 const formatFileSize = (sizeInBytes: number | null | undefined): string => {
   if (!sizeInBytes || sizeInBytes === 0) return '0 B';
@@ -163,6 +170,20 @@ const groupedLabels = computed(() => {
         <div class="text-sm font-medium text-green-600 dark:text-green-400">
           Available Instantly
         </div>
+        <dl class="mt-3 grid grid-cols-2 gap-3 text-sm">
+          <div>
+            <dt class="text-gray-500 dark:text-gray-400">Total downloads</dt>
+            <dd class="font-medium text-gray-900 dark:text-white">
+              {{ downloadCounts.total }}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-gray-500 dark:text-gray-400">Unique downloaders</dt>
+            <dd class="font-medium text-gray-900 dark:text-white">
+              {{ downloadCounts.unique }}
+            </dd>
+          </div>
+        </dl>
       </div>
 
       <!-- No File Available -->
@@ -180,6 +201,8 @@ const groupedLabels = computed(() => {
             :disabled="!hasDownloadableFile"
             :url="primaryFile?.url || ''"
             :file-name="primaryFile?.fileName || 'download'"
+            :downloadable-file-id="primaryFile?.id || ''"
+            :discussion-id="discussionId"
             @downloaded="showSuccessPopover = true"
           />
         </template>

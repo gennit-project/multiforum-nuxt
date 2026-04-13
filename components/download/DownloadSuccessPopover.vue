@@ -4,7 +4,6 @@ import type { PropType } from 'vue';
 import type { Discussion } from '@/__generated__/graphql';
 import CloseIcon from '@/components/icons/CloseIcon.vue';
 import DownloadFileIcon from '@/components/icons/DownloadFileIcon.vue';
-import TwitterIcon from '@/components/icons/TwitterIcon.vue';
 import FacebookIcon from '@/components/icons/FacebookIcon.vue';
 import RedditIcon from '@/components/icons/RedditIcon.vue';
 // import DiscordIcon from "@/components/icons/DiscordIcon.vue"; // Unused for now
@@ -67,18 +66,6 @@ const copyAttribution = async () => {
   } catch (err) {
     console.error('Failed to copy attribution:', err);
   }
-};
-
-const shareToTwitter = () => {
-  const text = encodeURIComponent(
-    `Check out this download: ${props.discussion.title}`
-  );
-  const url = encodeURIComponent(shareUrl.value);
-  window.open(
-    `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
-    '_blank',
-    'width=550,height=420'
-  );
 };
 
 const shareToFacebook = () => {
@@ -216,14 +203,6 @@ const copyLink = async () => {
                 Share this download:
               </p>
               <div class="flex flex-wrap gap-2">
-                <button
-                  class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
-                  @click="shareToTwitter"
-                >
-                  <TwitterIcon />
-                  Twitter
-                </button>
-
                 <button
                   class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
                   @click="shareToFacebook"
