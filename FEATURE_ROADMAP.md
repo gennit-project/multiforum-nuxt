@@ -247,3 +247,46 @@ This section contains detailed step-by-step instructions for manually verifying 
 1. Navigate to /u/[username]
 2. Verify "Scratchpad" tab appears in profile tabs
 3. Click tab and verify navigation to scratchpad page
+
+---
+
+## Quick Start: Testing Super Upvotes
+
+### Prerequisites
+- Backend server running with updated schema
+- Frontend running with regenerated types (`npm run compile`)
+- Two test user accounts (User A to give super upvote, User B to receive)
+
+### Steps
+
+1. **Log in as User A** and find content (comment or discussion) authored by User B
+
+2. **Upvote the content** (click the regular upvote arrow)
+   - The arrow should turn orange indicating an active upvote
+
+3. **Look for the rainbow star button** that appears next to the upvote
+   - This only appears after you've already upvoted
+
+4. **Click the rainbow star** to open the Super Upvote modal
+   - You should see a gradient header with a star icon
+   - A textarea with placeholder text mentioning the forum
+   - A character counter (500 max)
+   - A disabled gradient "Send & Super Upvote" button
+
+5. **Write a thank-you note** (e.g., "Great insight, thanks for sharing!")
+   - The button should become active once you type something
+
+6. **Click "Send & Super Upvote"**
+   - Modal should close
+   - The rainbow star button should be replaced by a filled rainbow indicator
+
+7. **Log in as User B** and check:
+   - **Notifications**: Should see "@UserA wrote on your scratchpad"
+   - **Scratchpad page**: Navigate to `/u/[userB]/scratchpad`
+   - **Pending entries**: Should see the entry with yellow background
+   - **Make Public**: Click to move entry to public section
+   - **Public entries**: Entry now shows with white background and "Hide"/"Delete" buttons
+
+8. **Log out and view User B's scratchpad**
+   - Only public entries should be visible
+   - No action buttons should appear for non-owners
