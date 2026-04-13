@@ -215,14 +215,14 @@ You received this because you are subscribed [by default | to this discussion].
 ## Implementation Order
 
 ### Sprint 1: Foundation
-1. Phase 3 Schema Change - Add `type` field to Notification
-2. Phase 1 - Bug fix for broken permalink
-3. Phase 3 Backend - Feedback notifications
+1. [x] Phase 3 Schema Change - Add `notificationType` field to Notification
+2. [x] Phase 1 - Bug fix for broken permalink (verified existing code is correct)
+3. [x] Phase 3 Backend - Feedback notifications (feedbackNotificationHook.ts)
 
 ### Sprint 2: Mod Mentions & UI
-4. Phase 2 Backend - Mod mention notifications
-5. Phase 2 Frontend - Text editor /m autocomplete
-6. Phase 3 Frontend - Notification tabs (feedback vs general)
+4. [x] Phase 2 Backend - Mod mention notifications (modMentionNotificationHook.ts)
+5. [ ] Phase 2 Frontend - Text editor /m autocomplete
+6. [x] Phase 3 Frontend - Notification tabs (NotificationTabs.vue)
 
 ### Sprint 3: Unsubscribe Flow
 7. Phase 5 Frontend - Handle `?action=unsubscribe` param
@@ -238,26 +238,27 @@ You received this because you are subscribed [by default | to this discussion].
 ## Files to Modify/Create
 
 ### Backend (New Files)
-- `hooks/modMentionNotificationHook.ts`
-- `hooks/feedbackNotificationHook.ts`
-- `hooks/issueModerationActionNotificationHook.ts`
-- `utils/notificationFooter.ts`
+- [x] `hooks/modMentionNotificationHook.ts` - Created
+- [x] `hooks/feedbackNotificationHook.ts` - Created
+- [ ] `hooks/issueModerationActionNotificationHook.ts`
+- [ ] `utils/notificationFooter.ts`
 
 ### Backend (Modify)
-- `typeDefs.ts` - Add `type` field to Notification
-- `hooks/commentTrigger.ts` - Register new hooks
-- All notification-creating hooks - Add unsubscribe footer
+- [x] `typeDefs.ts` - Added `notificationType` field to Notification
+- [x] `hooks/notificationHelpers.ts` - Updated to accept notificationType
+- [x] `services/commentNotificationService.ts` - Integrated feedback, mod mention, and user mention hooks
+- [ ] All notification-creating hooks - Add unsubscribe footer
 
 ### Frontend (New Files)
-- `components/notifications/NotificationTabs.vue`
+- [x] `components/notifications/NotificationTabs.vue` - Created
 
 ### Frontend (Modify)
-- `pages/notifications/index.vue` - Add tabs
-- `pages/forums/[forumId]/discussions/[discussionId].vue` - Handle unsubscribe action
-- `pages/forums/[forumId]/events/[eventId].vue` - Handle unsubscribe action
-- `pages/forums/[forumId]/issues/[issueId].vue` - Handle unsubscribe action
-- Text editor components - Add /m autocomplete
-- `graphQLData/notification/queries.js` - Filter by type
+- [x] `pages/notifications/index.vue` - Updated to use NotificationTabs
+- [x] `graphQLData/notification/queries.js` - Added GET_FEEDBACK_NOTIFICATIONS, GET_GENERAL_NOTIFICATIONS
+- [ ] `pages/forums/[forumId]/discussions/[discussionId].vue` - Handle unsubscribe action
+- [ ] `pages/forums/[forumId]/events/[eventId].vue` - Handle unsubscribe action
+- [ ] `pages/forums/[forumId]/issues/[issueId].vue` - Handle unsubscribe action
+- [ ] Text editor components - Add /m autocomplete
 
 ---
 
