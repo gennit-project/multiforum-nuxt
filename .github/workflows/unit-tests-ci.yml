@@ -95,6 +95,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Checkout backend
+        uses: actions/checkout@v4
+        with:
+          repository: catherineluse/gennit-backend
+          path: gennit-backend
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -108,4 +114,6 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run Playwright tests
+        env:
+          PLAYWRIGHT_BACKEND_CWD: ${{ github.workspace }}/gennit-backend
         run: npm run test:playwright
