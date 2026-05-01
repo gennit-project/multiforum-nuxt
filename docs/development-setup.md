@@ -31,10 +31,10 @@ Core commands:
 - `npm run build` - build for production
 - `npm run tsc` - TypeScript type checking
 - `npm run test:unit` - run unit tests
-- `npm run test` - open Cypress runner
+- `npm run test:playwright` - run Playwright tests
 
 For detailed development standards, testing conventions, and workflow guidance, see [CLAUDE.md](../CLAUDE.md).
 
 ## Testing
 
-Integration tests are in the `cypress` directory.
+Integration tests are in the `tests/playwright` directory.

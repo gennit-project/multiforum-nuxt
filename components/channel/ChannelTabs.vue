@@ -213,7 +213,9 @@ const tabs = computed((): Tab[] => {
 
   // Add auth-dependent tabs only if we should show them
   if (shouldShowAuthTabs.value) {
-    const adminList = props.channel.Admins.map((user) => user.username || '');
+    const adminList = (props.channel?.Admins || []).map(
+      (user) => user.username || ''
+    );
     const modList = (props.channel.Moderators ?? []).map(
       (modProfile) => modProfile.displayName
     );

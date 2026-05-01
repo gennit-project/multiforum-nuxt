@@ -7,7 +7,8 @@
   },
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev --host 127.0.0.1",
+    "dev": "nuxt dev --host 127.0.0.1 --port 3000",
+    "dev:mocked": "VITE_E2E_MOCK_MODE=true nuxt dev --host 127.0.0.1 --port 3000",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -17,7 +18,9 @@
     "prepare": "husky install",
     "prettier:check": "prettier --check .",
     "start": "nuxt start",
-    "test": "cypress open",
+    "test:playwright": "playwright test",
+    "test:playwright:mocked": "playwright test tests/playwright/mocked",
+    "test:playwright:stateful": "playwright test tests/playwright/stateful",
     "test:unit": "vitest",
     "test:unit:run": "vitest run",
     "coverage": "vitest run --coverage",
@@ -98,6 +101,7 @@
     "@nuxtjs/google-fonts": "^3.2.0",
     "@nuxtjs/tailwindcss": "^6.13.2",
     "@pinia/testing": "^1.0.1",
+    "@playwright/test": "^1.59.1",
     "@types/crypto-js": "^4.2.2",
     "@types/diff-match-patch": "^1.0.36",
     "@types/google.maps": "^3.58.1",
@@ -112,8 +116,6 @@
     "@vue/test-utils": "^2.4.6",
     "accented": "latest",
     "axe-core": "^4.11.1",
-    "cypress": "^14.3.2",
-    "cypress-axe": "^1.7.0",
     "eslint": "^9.36.0",
     "eslint-plugin-vuejs-accessibility": "^2.4.1",
     "globals": "^15.15.0",
@@ -137,9 +139,6 @@
     ],
     "*.vue": [
       "eslint --fix"
-    ],
-    "tests/**/*.spec.ts": [
-      "npm run test:unit:run -- --run $1"
     ]
   }
 }

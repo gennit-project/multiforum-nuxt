@@ -61,8 +61,6 @@
     "tests/**/*.ts",
     "tests/**/*.tsx",
     "src/main.ts",
-    "cypress/**/*.ts",
-    "cypress/support/e2e.ts",
     "types/**/*.d.ts",
     "components/**/*.vue",
     "composables/**/*.ts",
@@ -82,5 +80,5 @@
     "components/discussion/list/getDiscussionFilterValuesFromParams.spec.ts",
     "components/event/map/Map.spec.ts"
   ],
-  "exclude": ["node_modules", ".nuxt", "dist", "cypress/**/*"]
+  "exclude": ["node_modules", ".nuxt", "dist"]
 }

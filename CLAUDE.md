@@ -4,31 +4,29 @@
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
-- `npm run test` - Open Cypress test runner
+- `npm run test:playwright` - Run Playwright tests
 - `npm run test:unit` - Run unit tests with Vitest
-- `npx cypress run --spec "cypress/e2e/discussions/createEditDeleteDiscussions.spec.cy.ts"` - Run specific test file
-- `npx cypress run --spec "cypress/e2e/discussions/**/*.spec.cy.ts"` - Run all discussions tests
+- `npm run test:playwright:mocked -- tests/playwright/mocked/discussions/createEditDeleteDiscussions.spec.ts` - Run a specific mocked Playwright test
+- `npm run test:playwright:stateful -- tests/playwright/stateful/discussions/**/*.spec.ts` - Run all stateful discussion tests
 - `npm run tsc` - Run TypeScript type checking
 - `npx eslint --fix path/to/file.vue` - Fix linting issues
 
-## Cypress Testing (E2E)
+## Playwright Testing (E2E)
 
-- Use `setupTestData()` from `support/testSetup.ts` to initialize data once per test file
-- Use `loginUser()` to handle authentication for tests that need it
-- Avoid multiple database resets with `beforeEach` - use shared test data when possible
+- Use `resetStatefulBackendData()` to initialize data once per test file
+- Use `installMockAuth()` to handle authentication for tests that need it
+- Prefer shared backend resets and fixtures over repeated per-test setup
 
-### Cypress Test Optimizations
+### Playwright Test Optimizations
 
 - **Replace arbitrary timeouts with network waits**:
 
   ```javascript
   // Before: Fixed timeout that might be too short or too long
-  cy.get('button').contains('Save').click().wait(3000);
+  await page.getByRole('button', { name: 'Save' }).click();
 
   // After: Wait for the actual network request to complete
-  cy.intercept('POST', '**/graphql').as('graphqlRequest');
-  cy.get('button').contains('Save').click();
-  cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+  await page.waitForResponse((response) => response.url().includes('/graphql'));
   ```
 
 - **Validate network responses**: Add status code checks to ensure operations completed successfully
@@ -190,7 +188,7 @@
 - **Apollo useMutation**: Always leverage `useMutation`’s built-in `loading`, `error`, and `onDone` hooks instead of recreating that state yourself. Bind UI disabled/loading states directly to the mutation’s `loading` ref and surface errors via the `error` ref.
 - **Naming**: camelCase for variables/functions, PascalCase for components/interfaces
 - **Imports**: Group imports by type (Vue, libraries, local components, utils)
-- **Testing**: Each feature requires Cypress tests, seed data before tests and clean up after
+- **Testing**: Each feature should have Playwright coverage, with shared seed data and cleanup helpers
 - **CSS**: Use Tailwind utility classes, dark mode compatible with `dark:` prefix
 - **Accessibility**:
   - Ensure color contrast meets minimum thresholds (WCAG AA 4.5:1 for normal text).
@@ -202,74 +200,11 @@
   - When a component needs to react to prop changes, handle this through the component lifecycle or computed properties, not watchers
   - For individual item state that doesn't need to be shared, use local `ref` variables instead of Pinia store state
 
-## Cypress Testing Guidelines
+## Playwright Testing Guidelines
 
-- **Always use URL constants**: Never use relative URLs like `cy.visit('/')` in tests
-  - Use the constants defined in `tests/cypress/e2e/constants.ts` for all URLs
-  - Example: `cy.visit(DISCUSSION_LIST)` instead of `cy.visit('/')`
-- **Use network waiting**: Wait for requests to complete rather than arbitrary timeouts
-  ```typescript
-  // Set up interception
-  cy.intercept('POST', '**/graphql').as('graphqlRequest');
-  // Perform action
-  cy.get('button').click();
-  // Wait for request to complete
-  cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
-  ```
-
-### Programmatic Authentication in Cypress Tests
-
-For tests that need authentication, use this pattern for reliable programmatic authentication:
-
-```typescript
-it('should test authenticated functionality', () => {
-  // Set up GraphQL interceptions first
-  cy.intercept('POST', '**/graphql').as('graphqlRequest');
-
-  // Visit the page first to load auth functions
-  cy.visit(YOUR_PAGE_URL);
-
-  // Set the auth token programmatically
-  cy.loginAsAdmin();
-
-  // Wait for page to fully load and auth functions to be available
-  cy.wait(1000);
-
-  // Manually sync the reactive auth state
-  cy.window().then((win) => {
-    const testWin = win as any;
-    if (testWin.__SET_AUTH_STATE_DIRECT__) {
-      console.log('Setting auth state directly');
-      testWin.__SET_AUTH_STATE_DIRECT__({ username: 'cluse' });
-    } else {
-      console.log('Auth sync functions not available yet');
-    }
-  });
-
-  // Verify authentication is complete
-  cy.window().its('localStorage').invoke('getItem', 'token').should('exist');
-
-  // Continue with your test...
-});
-```
-
-**Key Points:**
-
-- **Do NOT use `cy.loginAsAdminWithUISync()`** - it has timing issues and visits different pages
-- **Visit your target page first** - this loads the `useTestAuth` composable and auth sync functions
-- **Use `cy.loginAsAdmin()` to set the token** - this only sets localStorage, not reactive state
-- **Call `__SET_AUTH_STATE_DIRECT__()` manually** - this updates the reactive state so UI shows authenticated state
-- **Cast window as `any`** - avoids TypeScript errors with Cypress window type
-- **Always verify token exists** - ensures the auth setup worked
-
-**Why this pattern works:**
-
-1. The `useTestAuth` composable is loaded by the default layout on every page
-2. It exposes `__SET_AUTH_STATE_DIRECT__` function on the window object
-3. This function directly updates `isAuthenticatedVar` and other reactive auth state
-4. The UI immediately reflects the authenticated state without needing page refreshes
-
-**Update existing tests:**
+- Prefer explicit URLs and route helpers over hard-coded relative navigation
+- Wait on requests or UI state instead of arbitrary sleeps
+- Use `installMockAuth()` for browser-level auth setup and `resetStatefulBackendData()` for shared test data
 
 - Replace UI-based authentication (`loginUser()`) with this programmatic pattern
 - Replace `cy.loginAsAdminWithUISync()` calls with this manual approach
@@ -295,6 +230,50 @@ Practical reminders:
 - the "Moderation Actions" section should appear for any actor with at least one moderation permission
 - UI components should check specific permission flags rather than inferring from moderator status alone
 - tests should verify that unprivileged users do not see moderation actions and that suspended moderators cannot use them
+
+### Suspension System
+
+The application enforces suspensions at both channel and server levels. Suspensions can be time-limited or indefinite.
+
+#### How Suspensions Work
+
+1. **Suspension Creation**: When a moderator suspends a user (e.g., via "Archive and Suspend" on a discussion), a `Suspension` node is created with:
+   - `suspendedUntil` - Expiration date (for time-limited suspensions)
+   - `suspendedIndefinitely` - Flag for permanent suspensions
+   - Link to the related moderation issue
+
+2. **Suspension Detection**: The backend checks for active suspensions when users attempt actions:
+   - A suspension is active if `suspendedIndefinitely` is true OR `suspendedUntil` is in the future
+   - Expired suspensions are automatically cleaned up (disconnected from channel relationships)
+
+3. **Permission Enforcement**:
+   - **Channel-level**: Suspended users use `SuspendedRole` permissions (typically very restricted)
+   - **Server-level**: Users with any active suspension use `DefaultSuspendedRole` for server actions (e.g., creating new forums)
+
+4. **User Notifications**: When a suspended user is blocked from an action, they receive an in-app notification explaining:
+   - Which channel they're suspended in
+   - What action was blocked
+   - Reference to the related moderation issue
+
+#### Suspension-Related E2E Tests
+
+Tests for suspension functionality are covered in `tests/playwright/stateful/suspensions/`:
+
+- `suspendedUserPermissions.spec.ts` - Tests that suspended users can't create discussions, comments, or events
+- `serverLevelSuspension.spec.ts` - Tests that suspended users can't create new forums
+
+#### Unsuspension
+
+Users can be unsuspended through the moderation issue interface, which removes the suspension relationship from the channel.
+
+### Testing Moderator Permissions
+
+When testing moderator permissions:
+
+- Make sure the test user has the expected permission level
+- Check that appropriate UI elements appear based on permission level
+- Verify that unprivileged users don't see moderation options
+- Test that suspended moderators can't access moderation features
 
 ## SSR and Hydration
 

@@ -23,15 +23,12 @@ cloud_functions
 .env
 .env.*
 !.env.example
-cypress.env.json
 
 # config for docker compose
 config
 
 # Generated files
 /src/__generated__
-cypress/videos
-cypress/screenshots
 cors-config.json
 
 # Coverage reports

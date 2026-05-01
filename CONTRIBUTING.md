@@ -65,8 +65,6 @@ The application requires several environment variables to be set up. Copy `.env.
 | `VITE_AUTH0_PASSWORD`         | Test password for Auth0 in integration tests |
 | `VITE_AUTH0_USERNAME_2`       | Secondary test username for Auth0            |
 | `VITE_AUTH0_PASSWORD_2`       | Secondary test password for Auth0            |
-| `CYPRESS_ADMIN_TEST_EMAIL`    | Admin email for Cypress tests                |
-| `CYPRESS_ADMIN_TEST_USERNAME` | Admin username for Cypress tests             |
 
 ## Getting Started
 
@@ -355,5 +353,4 @@ describe('Discussion CRUD operations', () => {
 
 - [Vitest Documentation](https://vitest.dev/)
 - [Vue Test Utils Documentation](https://test-utils.vuejs.org/)
-- [Cypress Best Practices](https://docs.cypress.io/guides/references/best-practices)
 - Check out existing tests in the codebase for practical examples

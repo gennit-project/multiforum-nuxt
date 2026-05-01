@@ -39,7 +39,11 @@ export function useTestAuthHelpers() {
     }
   };
 
-  // Only expose after mount to prevent SSR/hydration issues
+  // Expose immediately on the client so Cypress can set auth state before
+  // page-specific components finish mounting.
+  exposeToWindow();
+
+  // Re-expose after mount as a safety net for hydration and route transitions.
   onMounted(() => {
     exposeToWindow();
   });

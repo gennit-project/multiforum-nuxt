@@ -4,6 +4,8 @@ import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify';
 import path from 'path';
 import { inMemoryCacheOptions } from './cache';
 
+const isMockedE2E = process.env.VITE_E2E_MOCK_MODE === 'true';
+
 export default defineNuxtConfig({
   srcDir: '.',
   app: {
@@ -320,6 +322,7 @@ export default defineNuxtConfig({
     { src: '@/plugins/performance.client', mode: 'client' },
     { src: '@/plugins/click-outside.client', mode: 'client' },
     { src: '@/plugins/accented.client', mode: 'client' },
+    { src: '@/plugins/test-auth.client', mode: 'client' },
   ],
   runtimeConfig: {
     public: {
@@ -341,7 +344,7 @@ export default defineNuxtConfig({
         process.env.NUXT_PUBLIC_ENABLE_ACCENTED === 'false' ? false : true,
     },
   },
-  ssr: true,
+  ssr: !isMockedE2E,
   typescript: {
     strict: false,
     shim: true,
