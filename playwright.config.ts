@@ -1,7 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const baseURL = 'http://127.0.0.1:3000';
 const skipWebServer = process.env.PW_SKIP_WEBSERVER === 'true';
+const repoRoot = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   testDir: './tests/playwright',
@@ -24,7 +27,7 @@ export default defineConfig({
         {
           name: 'backend',
           command: 'npm run start',
-          cwd: '/Users/catherineluse/gennit/gennit-backend',
+          cwd: resolve(repoRoot, '../gennit-backend'),
           env: {
             PLAYWRIGHT_MOCK_AUTH: 'true',
           },
