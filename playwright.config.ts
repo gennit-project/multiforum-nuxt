@@ -32,7 +32,7 @@ export default defineConfig({
     : [
         {
           name: 'backend',
-          command: 'npm run build && node ./ts_emitted/index.js',
+          command: 'node ./ts_emitted/index.js',
           cwd: backendRoot,
           env: {
             PLAYWRIGHT_MOCK_AUTH: 'true',
