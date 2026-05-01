@@ -21,7 +21,6 @@ export default {
     '**/*.spec.ts',
     '**/*.test.ts',
     'tests/**',
-    'cypress/**',
     'coverage/**',
     '.nuxt/**',
     'dist/**',

@@ -12,7 +12,7 @@ import {
 
 /**
  * Test-only composable for refreshing authentication state
- * This helps Cypress tests sync programmatic authentication with UI state
+ * This helps Playwright and local test flows sync programmatic authentication with UI state
  */
 export const useTestAuth = () => {
   // Expose debug functions when composable is used
@@ -20,8 +20,7 @@ export const useTestAuth = () => {
     // Check if we're in a test environment
     const isTestEnv =
       process.env.NODE_ENV === 'test' ||
-      process.env.NODE_ENV === 'development' ||
-      window.Cypress;
+      process.env.NODE_ENV === 'development';
 
     if (isTestEnv) {
       // Debug function to monitor reactive state

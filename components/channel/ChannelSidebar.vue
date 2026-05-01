@@ -169,7 +169,7 @@ const handleBecomeAdminSuccess = () => {
             :event-channels-aggregate="eventChannelsAggregate"
           />
 
-          <div v-if="channel.Tags.length > 0">
+          <div v-if="channel.Tags?.length > 0">
             <div class="flex justify-between border-gray-300">
               <span
                 class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
@@ -199,7 +199,7 @@ const handleBecomeAdminSuccess = () => {
           </div>
 
           <div
-            v-if="channel.Admins.length > 0"
+            v-if="channel.Admins?.length > 0"
             class="flex-col space-y-2 text-sm font-bold"
           >
             <div v-for="admin in channel.Admins" :key="admin.username">

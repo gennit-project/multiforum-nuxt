@@ -33,7 +33,6 @@ export default defineConfig({
         '.nuxt/',
         'dist/',
         'coverage/',
-        'cypress/',
         'tests/',
         '**/*.spec.ts',
         '**/*.test.ts',

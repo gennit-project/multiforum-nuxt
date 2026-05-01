@@ -6,8 +6,5 @@ npx lint-staged
 # Run TypeScript checking (same as CI)
 npm run tsc
 
-# Run unit tests (same as CI)
-npm run test:unit:run
-
 # Run linting (same as CI)
 npm run lint

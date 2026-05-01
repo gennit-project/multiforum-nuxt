@@ -310,7 +310,7 @@ Displays both server and channel pipeline results in the download sidebar:
   - Troubleshooting common issues
 - Documentation link added to plugin management page
 
-**E2E Tests** (`tests/cypress/e2e/plugins/pluginManagement.spec.cy.ts`):
+**E2E Tests**:
 - Plugin management page loading and navigation
 - Documentation page content verification
 - Pipeline configuration page access
@@ -321,7 +321,7 @@ Displays both server and channel pipeline results in the download sidebar:
 
 **Updated Files**:
 - `pages/admin/settings/plugins/index.vue` - Added "Documentation" link
-- `tests/cypress/e2e/constants.ts` - Added plugin-related URL constants
+- Playwright coverage added for the plugin management flow
 
 ---
 

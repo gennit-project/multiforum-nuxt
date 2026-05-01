@@ -258,9 +258,7 @@ onGetChannelResult((result) => {
   });
 });
 const adminList = computed(() => {
-  return channel.value
-    ? channel.value.Admins.map((user: User) => user?.username)
-    : [];
+  return channel.value?.Admins?.map((user: User) => user?.username) || [];
 });
 if (!channelId.value) {
   if (import.meta.client) {
