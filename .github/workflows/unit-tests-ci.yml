@@ -103,7 +103,7 @@ jobs:
 
       - name: Install backend dependencies
         working-directory: gennit-backend
-        run: npm ci --legacy-peer-deps
+        run: npm install --legacy-peer-deps
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
