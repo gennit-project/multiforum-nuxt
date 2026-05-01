@@ -74,11 +74,6 @@ jobs:
           NEO4J_PLUGINS: '["apoc"]'
           NEO4J_dbms_security_procedures_unrestricted: apoc.*
           NEO4J_dbms_default__database: neo4j
-        options: >-
-          --health-cmd="cypher-shell -u neo4j -p neo4j 'RETURN 1'"
-          --health-interval=15s
-          --health-timeout=10s
-          --health-retries=10
     env:
       GRAPHQL_URL_FOR_TYPES: ${{ secrets.GRAPHQL_URL_FOR_TYPES }}
       VITE_GRAPHQL_URL: ${{ secrets.VITE_GRAPHQL_URL }}
@@ -136,6 +131,18 @@ jobs:
 
       - name: Clean install dependencies
         run: npm ci --legacy-peer-deps
+
+      - name: Wait for Neo4j
+        run: |
+          for attempt in {1..24}; do
+            if curl -fsS http://127.0.0.1:7474 >/dev/null; then
+              exit 0
+            fi
+            echo "Neo4j not ready yet, waiting..."
+            sleep 5
+          done
+          echo "Neo4j did not become ready in time"
+          exit 1
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
