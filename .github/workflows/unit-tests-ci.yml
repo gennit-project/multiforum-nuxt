@@ -105,6 +105,10 @@ jobs:
         working-directory: gennit-backend
         run: npm install --legacy-peer-deps
 
+      - name: Build backend
+        working-directory: gennit-backend
+        run: npm run build
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
