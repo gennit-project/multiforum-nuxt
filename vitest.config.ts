@@ -7,6 +7,14 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
+    include: ['**/*.{spec,test}.ts', '**/*.{spec,test}.tsx'],
+    exclude: [
+      'node_modules/**',
+      '.nuxt/**',
+      'dist/**',
+      'coverage/**',
+      'tests/playwright/**',
+    ],
     deps: {
       optimizer: {
         web: {
@@ -33,7 +41,6 @@ export default defineConfig({
         '.nuxt/',
         'dist/',
         'coverage/',
-        'tests/',
         '**/*.spec.ts',
         '**/*.test.ts',
         '**/*.spec.js',
