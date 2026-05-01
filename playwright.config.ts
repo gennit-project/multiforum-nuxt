@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -6,7 +7,10 @@ const baseURL = 'http://127.0.0.1:3000';
 const skipWebServer = process.env.PW_SKIP_WEBSERVER === 'true';
 const repoRoot = dirname(fileURLToPath(import.meta.url));
 const backendRoot =
-  process.env.PLAYWRIGHT_BACKEND_CWD ?? resolve(repoRoot, '../gennit-backend');
+  process.env.PLAYWRIGHT_BACKEND_CWD ??
+  (existsSync(resolve(repoRoot, 'gennit-backend'))
+    ? resolve(repoRoot, 'gennit-backend')
+    : resolve(repoRoot, '../gennit-backend'));
 
 export default defineConfig({
   testDir: './tests/playwright',
@@ -28,7 +32,7 @@ export default defineConfig({
     : [
         {
           name: 'backend',
-          command: 'npm run start',
+          command: 'npm run build && node ./ts_emitted/index.js',
           cwd: backendRoot,
           env: {
             PLAYWRIGHT_MOCK_AUTH: 'true',
