@@ -35,6 +35,9 @@ export default defineConfig({
           command: 'node ./ts_emitted/index.js',
           cwd: backendRoot,
           env: {
+            NEO4J_PASSWORD: process.env.NEO4J_PASSWORD ?? 'neo4j',
+            NEO4J_URI: process.env.NEO4J_URI ?? 'bolt://127.0.0.1:7687',
+            NEO4J_USER: process.env.NEO4J_USER ?? 'neo4j',
             PLAYWRIGHT_MOCK_AUTH: 'true',
           },
           url: 'http://127.0.0.1:4000',
