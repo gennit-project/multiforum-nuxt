@@ -107,7 +107,7 @@ jobs:
 
       - name: Build backend
         working-directory: gennit-backend
-        run: npm run build
+        run: npx tsc && node build_scripts/copyCypherFiles.js
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
