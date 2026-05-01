@@ -104,6 +104,11 @@ jobs:
           NEO4J_PASSWORD: neo4j
         run: docker compose up -d database
 
+      - name: Inspect Neo4j startup
+        run: |
+          docker compose ps
+          docker compose logs --tail=100 database || true
+
       - name: Checkout backend
         uses: actions/checkout@v4
         with:
@@ -129,14 +134,21 @@ jobs:
 
       - name: Wait for Neo4j
         run: |
-          for attempt in {1..24}; do
+          for attempt in {1..48}; do
+            if docker compose ps --status exited database | grep -q database; then
+              echo "Neo4j container exited during startup"
+              docker compose logs database || true
+              exit 1
+            fi
             if curl -fsS http://127.0.0.1:7474 >/dev/null; then
               exit 0
             fi
             echo "Neo4j not ready yet, waiting..."
+            docker compose ps
             sleep 5
           done
           echo "Neo4j did not become ready in time"
+          docker compose logs database || true
           exit 1
 
       - name: Install Playwright browsers
