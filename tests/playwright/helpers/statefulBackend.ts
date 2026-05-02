@@ -21,9 +21,18 @@ import serverRoles from '../seedData/rbac/seedServerRoles';
 import modServerRoles from '../seedData/rbac/seedModServerRoles';
 import serverConfigs from '../seedData/rbac/seedServerConfig';
 import users from '../seedData/seedUsers';
+import { createMockJwt } from './mockAuth';
 
 const GRAPHQL_URL =
   process.env.VITE_GRAPHQL_URL ?? 'http://127.0.0.1:4000/graphql';
+const STATEFUL_ADMIN_EMAIL =
+  process.env.CYPRESS_ADMIN_TEST_EMAIL ?? 'catherine.luse@gmail.com';
+const STATEFUL_ADMIN_USERNAME =
+  process.env.CYPRESS_ADMIN_TEST_USERNAME ?? 'cluse';
+const STATEFUL_ADMIN_TOKEN = createMockJwt(
+  STATEFUL_ADMIN_EMAIL,
+  STATEFUL_ADMIN_USERNAME
+);
 
 const DROP_DATA_MUTATION = `
   mutation dropDataForCypressTests {
@@ -132,21 +141,26 @@ async function postAuthenticatedGraphQL<
 
 export async function dropStatefulBackendData(
   request: APIRequestContext,
-  token: string
+  _token: string
 ) {
   await postAuthenticatedGraphQL<{
     dropDataForCypressTests: { success: boolean; message: string };
-  }>(request, token, DROP_DATA_MUTATION);
+  }>(request, STATEFUL_ADMIN_TOKEN, DROP_DATA_MUTATION);
 }
 
 export async function seedStatefulBackendData(
   request: APIRequestContext,
-  token: string,
+  _token: string,
   input: StatefulSeedDataInput = defaultStatefulSeedData
 ) {
   await postAuthenticatedGraphQL<{
     seedDataForCypressTests: { success: boolean; message: string };
-  }, StatefulSeedDataInput>(request, token, SEED_DATA_MUTATION, input);
+  }, StatefulSeedDataInput>(
+    request,
+    STATEFUL_ADMIN_TOKEN,
+    SEED_DATA_MUTATION,
+    input
+  );
 }
 
 export async function resetStatefulBackendData(

@@ -112,7 +112,7 @@ jobs:
       - name: Checkout backend
         uses: actions/checkout@v4
         with:
-          repository: gennit-project/multiforum-backend
+          repository: gennitdev/open-forum-backend
           path: gennit-backend
 
       - name: Install backend dependencies
