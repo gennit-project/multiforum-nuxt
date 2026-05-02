@@ -112,8 +112,11 @@ jobs:
       - name: Checkout backend
         uses: actions/checkout@v4
         with:
-          repository: gennitdev/open-forum-backend
+          repository: gennit-project/multiforum-backend
           path: gennit-backend
+
+      - name: Patch backend for Playwright mock auth
+        run: git -C gennit-backend apply "$GITHUB_WORKSPACE/.github/patches/backend-playwright-mock-auth.patch"
 
       - name: Install backend dependencies
         working-directory: gennit-backend
