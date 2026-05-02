@@ -116,7 +116,7 @@ jobs:
           path: gennit-backend
 
       - name: Patch backend for Playwright mock auth
-        run: git -C gennit-backend apply "$GITHUB_WORKSPACE/.github/patches/backend-playwright-mock-auth.patch"
+        run: node .github/scripts/patch-backend-playwright-auth.mjs gennit-backend/rules/permission/userDataHelperFunctions.ts
 
       - name: Install backend dependencies
         working-directory: gennit-backend
