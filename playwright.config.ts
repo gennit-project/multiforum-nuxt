@@ -15,6 +15,7 @@ const backendRoot =
 export default defineConfig({
   testDir: './tests/playwright',
   timeout: 30_000,
+  workers: process.env.CI ? 1 : undefined,
   expect: {
     timeout: 10_000,
   },
@@ -35,6 +36,12 @@ export default defineConfig({
           command: 'node ./ts_emitted/index.js',
           cwd: backendRoot,
           env: {
+            AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID ?? 'playwright-test-client',
+            AUTH0_DOMAIN: process.env.AUTH0_DOMAIN ?? 'example.com',
+            CYPRESS_ADMIN_TEST_EMAIL:
+              process.env.CYPRESS_ADMIN_TEST_EMAIL ?? 'catherine.luse@gmail.com',
+            CYPRESS_ADMIN_TEST_USERNAME:
+              process.env.CYPRESS_ADMIN_TEST_USERNAME ?? 'cluse',
             NEO4J_PASSWORD: process.env.NEO4J_PASSWORD ?? 'neo4j',
             NEO4J_URI: process.env.NEO4J_URI ?? 'bolt://127.0.0.1:7687',
             NEO4J_USER: process.env.NEO4J_USER ?? 'neo4j',
