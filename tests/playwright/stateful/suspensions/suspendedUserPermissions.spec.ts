@@ -104,8 +104,6 @@ const createDiscussion = async (page: Page, title: string) => {
   await expect(page.getByTestId('title-input')).toBeVisible();
   await page.getByTestId('title-input').fill(title);
   await page.getByTestId('body-input').fill('This discussion triggers a suspension.');
-  await page.getByTestId('channel-input').click();
-  await page.getByTestId('forum-picker-cats').click();
   await page.getByRole('button', { name: /create/i }).click();
   await expect(page.getByText(title, { exact: true })).toBeVisible();
 };

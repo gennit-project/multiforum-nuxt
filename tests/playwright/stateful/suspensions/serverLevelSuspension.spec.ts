@@ -84,8 +84,6 @@ const createDiscussion = async (page: Page, title: string) => {
   await page.getByText('Create Discussion', { exact: true }).click();
   await page.getByTestId('title-input').fill(title);
   await page.getByTestId('body-input').fill('This discussion triggers a suspension.');
-  await page.getByTestId('channel-input').click();
-  await page.getByText('cats', { exact: true }).click();
   await page.getByRole('button', { name: 'Create' }).click();
   await expect(page.getByText(title, { exact: true })).toBeVisible();
 };
