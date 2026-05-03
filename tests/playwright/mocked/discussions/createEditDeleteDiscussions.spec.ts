@@ -38,6 +38,7 @@ const buildUser = () => ({
   createdAt: '2024-01-01T00:00:00.000Z',
   discussionKarma: 0,
   commentKarma: 0,
+  notifyOnSuspensionBlocks: true,
   ServerRoles: [],
   ChannelRoles: [],
 });
@@ -294,6 +295,7 @@ test('creates, edits and deletes a discussion', async (
             uniqueName: TEST_CHANNEL,
             displayName: 'cats',
             channelIconURL: '',
+            description: '',
           },
         ],
       },
