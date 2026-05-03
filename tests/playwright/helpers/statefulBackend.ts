@@ -14,6 +14,7 @@ import type {
 } from '@/__generated__/graphql';
 import channels from '../seedData/seedChannels';
 import discussions from '../seedData/seedDiscussions';
+import { events } from '../seedData/seedEvents';
 import tags from '../seedData/seedTags';
 import channelRoles from '../seedData/rbac/seedChannelRoles';
 import modChannelRoles from '../seedData/rbac/seedModChannelRoles';
@@ -94,7 +95,7 @@ export const defaultStatefulSeedData: StatefulSeedDataInput = {
   channels,
   comments: [],
   discussions,
-  events: [],
+  events,
   tags,
   users,
   channelRoles,

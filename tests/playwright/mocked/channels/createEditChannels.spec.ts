@@ -113,6 +113,7 @@ test('creates and edits a channel', async ({
             notifyWhenTagged: true,
             notifyOnSubscribedIssueUpdates: true,
             notifyOnFeedback: true,
+            notifyOnSuspensionBlocks: true,
             notificationBundleInterval: 'daily',
             notificationBundleEnabled: false,
             notificationBundleContent: 'all',
