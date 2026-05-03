@@ -104,8 +104,9 @@ const createDiscussion = async (page: Page, title: string) => {
   await expect(page.getByTestId('title-input')).toBeVisible();
   await page.getByTestId('title-input').fill(title);
   await page.getByTestId('body-input').fill('This discussion triggers a suspension.');
-  await page.getByRole('button', { name: /create/i }).click();
-  await expect(page.getByText(title, { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Save' }).first().click();
+  await expect(page).toHaveURL(/\/forums\/cats\/discussions\/.+/);
+  await expect(page.getByRole('heading', { name: title })).toBeVisible();
 };
 
 const suspendAuthor = async (page: Page, discussionTitle: string) => {
