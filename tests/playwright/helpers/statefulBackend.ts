@@ -25,7 +25,8 @@ import users from '../seedData/seedUsers';
 import { createMockJwt } from './mockAuth';
 
 const GRAPHQL_URL =
-  process.env.VITE_GRAPHQL_URL ?? 'http://127.0.0.1:4000/graphql';
+  process.env.VITE_GRAPHQL_URL ??
+  `http://127.0.0.1:${process.env.PLAYWRIGHT_BACKEND_PORT ?? '4100'}/graphql`;
 const STATEFUL_ADMIN_EMAIL =
   process.env.CYPRESS_ADMIN_TEST_EMAIL ?? 'catherine.luse@gmail.com';
 const STATEFUL_ADMIN_USERNAME =

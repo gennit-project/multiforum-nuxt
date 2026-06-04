@@ -3,6 +3,12 @@ import type {
   ChannelCreateInput,
   ChannelUpdateInput,
 } from '@/__generated__/graphql';
+import {
+  MOCK_DATE,
+  buildBasicUser,
+  buildChannel,
+  buildServerConfig,
+} from '../../helpers/graphqlFixtures';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { installGraphqlMocks } from '../../helpers/mockGraphql';
 
@@ -28,54 +34,13 @@ type UpdateChannelVariables = {
 const buildChannelQueryResponse = (channel: MockChannelState) => ({
   data: {
     channels: [
-      {
+      buildChannel({
         uniqueName: channel.uniqueName,
         displayName: channel.displayName,
         description: channel.description,
-        channelIconURL: '',
-        channelBannerURL: '',
-        rules: '[]',
-        locked: false,
-        wikiEnabled: false,
-        eventsEnabled: true,
-        feedbackEnabled: true,
-        downloadsEnabled: false,
-        allowedFileTypes: [],
-        WikiHomePage: null,
-        Tags: channel.tags.map((text) => ({ text })),
-        Admins: [
-          {
-            username: 'cluse',
-            displayName: 'cluse',
-            profilePicURL: '',
-            commentKarma: 0,
-            discussionKarma: 0,
-            createdAt: '2024-01-01T00:00:00.000Z',
-          },
-        ],
-        Bots: [],
-        Moderators: [],
-        SuspendedMods: [],
-        SuspendedUsers: [],
-        DiscussionChannelsAggregate: { count: 0 },
-        IssuesAggregate: { count: 0 },
-        EventChannelsAggregate: { count: 0 },
-        DefaultModRole: null,
-        ElevatedModRole: null,
-        SuspendedModRole: null,
-        DefaultChannelRole: {
-          canCreateComment: true,
-          canCreateDiscussion: true,
-          canCreateEvent: true,
-          canUpdateChannel: true,
-          canUploadFile: true,
-          canUpvoteComment: true,
-          canUpvoteDiscussion: true,
-          channelUniqueName: channel.uniqueName,
-        },
-        SuspendedRole: null,
-        FilterGroups: [],
-      },
+        tags: channel.tags,
+        discussionChannelsCount: 0,
+      }),
     ],
   },
 });
@@ -96,38 +61,9 @@ test('creates and edits a channel', async ({
     getBasicUserInfo: () => ({
       data: {
         users: [
-          {
-            username: 'cluse',
-            commentKarma: 0,
-            discussionKarma: 0,
-            createdAt: '2024-01-01T00:00:00.000Z',
-            displayName: 'cluse',
-            profilePicURL: '',
-            location: '',
-            pronouns: '',
-            bio: '',
-            Email: { address: 'cluse@example.com' },
-            notifyOnReplyToCommentByDefault: true,
-            notifyOnReplyToDiscussionByDefault: true,
-            notifyOnReplyToEventByDefault: true,
-            notifyWhenTagged: true,
-            notifyOnSubscribedIssueUpdates: true,
-            notifyOnFeedback: true,
-            notifyOnSuspensionBlocks: true,
-            notificationBundleInterval: 'daily',
-            notificationBundleEnabled: false,
-            notificationBundleContent: 'all',
-            enableSensitiveContentByDefault: false,
-            NotificationsAggregate: { count: 0 },
-            CommentsAggregate: { count: 0 },
-            DiscussionsAggregate: { count: 0 },
-            DownloadsAggregate: { count: 0 },
-            EventsAggregate: { count: 0 },
-            ImagesAggregate: { count: 0 },
-            AlbumsAggregate: { count: 0 },
-            ServerRoles: [],
+          buildBasicUser({
             AdminOfChannelsAggregate: { count: 1 },
-          },
+          }),
         ],
       },
     }),
@@ -143,25 +79,7 @@ test('creates and edits a channel', async ({
     }),
     getServerConfig: () => ({
       data: {
-        serverConfigs: [
-          {
-            serverName: 'Gennit',
-            serverIconURL: '',
-            serverDescription: '',
-            Admins: [{ username: 'cluse' }],
-            Moderators: [],
-            DefaultServerRole: null,
-            DefaultModRole: null,
-            DefaultElevatedModRole: null,
-            DefaultSuspendedRole: null,
-            DefaultSuspendedModRole: null,
-            rules: '[]',
-            allowedFileTypes: [],
-            enableDownloads: true,
-            enableEvents: true,
-            pluginRegistries: [],
-          },
-        ],
+        serverConfigs: [buildServerConfig({ serverName: 'Gennit' })],
       },
     }),
     getTags: () => ({
@@ -193,7 +111,7 @@ test('creates and edits a channel', async ({
                 channelIconURL: '',
                 channelBannerURL: '',
                 Admins: [{ username: 'cluse' }],
-                createdAt: '2024-01-01T00:00:00.000Z',
+                createdAt: MOCK_DATE,
                 Tags: [],
               },
             ],
@@ -249,7 +167,7 @@ test('creates and edits a channel', async ({
                 downloadsEnabled: false,
                 allowedFileTypes: [],
                 Admins: [{ username: 'cluse' }],
-                createdAt: '2024-01-01T00:00:00.000Z',
+                createdAt: MOCK_DATE,
                 Tags: channelState.tags.map((text) => ({ text })),
                 WikiHomePage: null,
                 rules: '[]',
