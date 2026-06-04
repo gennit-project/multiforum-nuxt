@@ -93,6 +93,24 @@ const buildUser = () => ({
   ChannelRoles: [],
 });
 
+const buildServerConfig = () => ({
+  serverName: 'Listical',
+  serverIconURL: '',
+  serverDescription: '',
+  Admins: [{ username: 'cluse' }],
+  Moderators: [],
+  DefaultServerRole: null,
+  DefaultModRole: null,
+  DefaultElevatedModRole: null,
+  DefaultSuspendedRole: null,
+  DefaultSuspendedModRole: null,
+  rules: '[]',
+  allowedFileTypes: [],
+  enableDownloads: true,
+  enableEvents: true,
+  pluginRegistries: [],
+});
+
 const buildCommentNode = (
   comment: CommentState,
   comments: CommentState[]
@@ -167,6 +185,7 @@ const buildDiscussionResponse = (comments: CommentState[]) => ({
             emoji: '',
             Channel: {
               uniqueName: CHANNEL_ID,
+              channelIconURL: '',
               displayName: 'cats',
               feedbackEnabled: true,
               Bots: [],
@@ -181,10 +200,15 @@ const buildDiscussionResponse = (comments: CommentState[]) => ({
             UpvotedByUsersAggregate: { count: 1 },
             SubscribedToNotifications: [],
             Answers: [],
+            LabelOptions: [],
           },
         ],
+        DownloadableFiles: [],
+        FeedbackCommentsAggregate: { count: 0 },
+        FeedbackComments: [],
         PastTitleVersions: [],
         PastBodyVersions: [],
+        BodyLastEditedBy: null,
       },
     ],
   },
@@ -250,23 +274,7 @@ test('creates, edits, deletes, and nests comments', async (
     }),
     getServerConfig: () => ({
       data: {
-        serverConfigs: [
-          {
-            serverName: 'Listical',
-            serverIconURL: '',
-            serverDescription: '',
-            DefaultServerRole: null,
-            DefaultModRole: null,
-            DefaultElevatedModRole: null,
-            DefaultSuspendedRole: null,
-            DefaultSuspendedModRole: null,
-            rules: '[]',
-            allowedFileTypes: [],
-            enableDownloads: true,
-            enableEvents: true,
-            pluginRegistries: [],
-          },
-        ],
+        serverConfigs: [buildServerConfig()],
       },
     }),
     getChannel: () => ({
@@ -417,6 +425,8 @@ test('creates, edits, deletes, and nests comments', async (
             answered: false,
             Channel: {
               uniqueName: CHANNEL_ID,
+              channelIconURL: '',
+              displayName: 'cats',
               feedbackEnabled: true,
               Bots: [],
             },
@@ -430,6 +440,7 @@ test('creates, edits, deletes, and nests comments', async (
             UpvotedByUsersAggregate: { count: 1 },
             SubscribedToNotifications: [],
             Answers: [],
+            LabelOptions: [],
           },
           Comments: comments
             .filter((comment) => comment.parentCommentId === null)
@@ -455,6 +466,11 @@ test('creates, edits, deletes, and nests comments', async (
         ],
       },
     }),
+    getUserFavoriteComment: () => ({
+      data: {
+        getUserFavoriteComment: false,
+      },
+    }),
     getCommentWithReplies: ({ body }) => {
       const parentCommentId = body.variables?.commentId as string | undefined;
       const childComments = comments.filter(
@@ -464,6 +480,7 @@ test('creates, edits, deletes, and nests comments', async (
       return {
         data: {
           getCommentReplies: {
+            __typename: 'CommentReplies',
             aggregateChildCommentCount: childComments.length,
             ChildComments: childComments.map((comment) =>
               buildComment(comment, comments)

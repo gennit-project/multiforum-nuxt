@@ -13,6 +13,33 @@ export type GraphQLHandler = (input: {
 
 export type GraphQLHandlers = Record<string, GraphQLHandler>;
 
+function summarizeConsoleError(text: string) {
+  const apolloPrefix = 'An error occurred! For more details, see the full error text at ';
+  if (!text.startsWith(apolloPrefix)) {
+    return text;
+  }
+
+  const [, encoded] = text.split('#');
+  if (!encoded) {
+    return 'Apollo cache warning';
+  }
+
+  try {
+    const payload = JSON.parse(decodeURIComponent(encoded)) as {
+      args?: unknown[];
+      message?: number;
+    };
+    const [fieldName] = payload.args ?? [];
+    if (typeof fieldName === 'string') {
+      return `Apollo cache warning: missing field "${fieldName}" in mocked response`;
+    }
+  } catch {
+    // Fall through to a concise generic message.
+  }
+
+  return 'Apollo cache warning';
+}
+
 function getOperationName(body: GraphQLBody) {
   if (body.operationName) return body.operationName;
 
@@ -40,7 +67,7 @@ export async function installGraphqlMocks(
 
   page.on('console', (message) => {
     if (message.type() === 'error') {
-      const text = message.text();
+      const text = summarizeConsoleError(message.text());
       consoleErrors.push(text);
       console.error(`[playwright:console-error] ${text}`);
     }

@@ -148,6 +148,8 @@ test('creates and edits a channel', async ({
             serverName: 'Gennit',
             serverIconURL: '',
             serverDescription: '',
+            Admins: [{ username: 'cluse' }],
+            Moderators: [],
             DefaultServerRole: null,
             DefaultModRole: null,
             DefaultElevatedModRole: null,
@@ -279,7 +281,7 @@ test('creates and edits a channel', async ({
     await expect(descriptionInput).toBeVisible();
     await descriptionInput.fill(TEST_DESCRIPTION);
 
-    const tagPicker = page.getByTestId('tag-picker');
+    const tagPicker = page.getByTestId('tag-input');
     await tagPicker.click();
     const tagCheckbox = page.getByLabel(`Select ${TEST_TAG}`);
     await page.getByText(TEST_TAG, { exact: true }).click();
