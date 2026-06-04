@@ -87,8 +87,10 @@ test('filters discussions by channel', async ({ context, page, request }, testIn
   const diagnostics = setupDiagnostics(page);
 
   try {
-    await page.goto(DISCUSSION_LIST);
-    await expect(page.getByText(SEARCH_TERM, { exact: true })).toBeVisible();
+    // Wait for network idle since Vite loads many modules in dev mode
+    await page.goto(DISCUSSION_LIST, { waitUntil: 'networkidle' });
+    // Use getByRole('link') to target the visible discussion title link
+    await expect(page.getByRole('link', { name: SEARCH_TERM })).toBeVisible({ timeout: 30_000 });
 
     await page.getByTestId('forum-filter-button').click();
     await page.getByTestId('forum-picker-cats').click();

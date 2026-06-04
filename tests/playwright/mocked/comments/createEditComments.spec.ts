@@ -3,6 +3,15 @@ import type { Locator, Page } from '@playwright/test';
 import type { CommentCreateInput } from '@/__generated__/graphql';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { installGraphqlMocks } from '../../helpers/mockGraphql';
+import {
+  buildBasicUser,
+  buildChannel,
+  buildComment,
+  buildDiscussion,
+  buildDiscussionChannel,
+  buildServerConfig,
+  type MockCommentState,
+} from '../../helpers/graphqlFixtures';
 
 const CHANNEL_ID = 'cats';
 const DISCUSSION_ID = 'discussion-1';
@@ -21,52 +30,6 @@ const clickInlineSave = async (scope: Page | Locator) => {
   await save.click({ force: true });
 };
 
-type CommentState = {
-  id: string;
-  text: string;
-  parentCommentId: string | null;
-  archived?: boolean;
-};
-
-type CommentNode = {
-  __typename: 'Comment';
-  id: string;
-  text: string;
-  emoji: string;
-  weightedVotesCount: number;
-  createdAt: string;
-  updatedAt: string;
-  archived: boolean;
-  isFavoritedByUser: boolean;
-  CommentAuthor: ReturnType<typeof buildUser>;
-  ChildCommentsAggregate: {
-    count: number;
-  };
-  ParentComment: { id: string } | null;
-  ChildComments: CommentNode[];
-  FeedbackComments: Array<{ id: string }>;
-  FeedbackCommentsAggregate: {
-    count: number;
-  };
-  PastVersions: Array<Record<string, unknown>>;
-  SubscribedToNotifications: Array<{ username: string }>;
-  Event: null;
-  DiscussionChannel: {
-    __typename: 'DiscussionChannel';
-    id: string;
-    channelUniqueName: string;
-    discussionId: string;
-  };
-  Channel: {
-    __typename: 'Channel';
-    uniqueName: string;
-  };
-  UpvotedByUsers: Array<{ username: string }>;
-  UpvotedByUsersAggregate: {
-    count: number;
-  };
-};
-
 type CreateCommentVariables = {
   createCommentInput?: CommentCreateInput | CommentCreateInput[];
 };
@@ -80,136 +43,29 @@ type UpdateCommentVariables = {
   };
 };
 
-const buildUser = () => ({
-  __typename: 'User',
-  username: 'cluse',
-  displayName: 'cluse',
-  profilePicURL: '',
-  createdAt: '2024-01-01T00:00:00.000Z',
-  discussionKarma: 0,
-  commentKarma: 0,
-  notifyOnSuspensionBlocks: true,
-  ServerRoles: [],
-  ChannelRoles: [],
-});
-
-const buildServerConfig = () => ({
-  serverName: 'Listical',
-  serverIconURL: '',
-  serverDescription: '',
-  Admins: [{ username: 'cluse' }],
-  Moderators: [],
-  DefaultServerRole: null,
-  DefaultModRole: null,
-  DefaultElevatedModRole: null,
-  DefaultSuspendedRole: null,
-  DefaultSuspendedModRole: null,
-  rules: '[]',
-  allowedFileTypes: [],
-  enableDownloads: true,
-  enableEvents: true,
-  pluginRegistries: [],
-});
-
-const buildCommentNode = (
-  comment: CommentState,
-  comments: CommentState[]
-): CommentNode => ({
-  __typename: 'Comment',
-  id: comment.id,
-  text: comment.text,
-  emoji: '',
-  weightedVotesCount: 1,
-  createdAt: '2024-01-01T00:00:00.000Z',
-  updatedAt: '2024-01-01T00:00:00.000Z',
-  archived: comment.archived ?? false,
-  isFavoritedByUser: false,
-  CommentAuthor: buildUser(),
-  ChildCommentsAggregate: {
-    count: comments.filter((child) => child.parentCommentId === comment.id).length,
-  },
-  ParentComment: comment.parentCommentId ? { id: comment.parentCommentId } : null,
-  ChildComments: comments
-    .filter((child) => child.parentCommentId === comment.id)
-    .map((child) => buildCommentNode(child, comments)),
-  FeedbackComments: [],
-  FeedbackCommentsAggregate: { count: 0 },
-  PastVersions: [],
-  SubscribedToNotifications: [],
-  Event: null,
-  DiscussionChannel: {
-    __typename: 'DiscussionChannel',
-    id: DISCUSSION_CHANNEL_ID,
+const buildCommentFixture = (
+  comment: MockCommentState,
+  comments: MockCommentState[]
+) =>
+  buildComment({
+    comment,
+    comments,
     channelUniqueName: CHANNEL_ID,
     discussionId: DISCUSSION_ID,
-  },
-  Channel: {
-    __typename: 'Channel',
-    uniqueName: CHANNEL_ID,
-  },
-  UpvotedByUsers: [{ username: 'cluse' }],
-  UpvotedByUsersAggregate: { count: 1 },
-});
+    discussionChannelId: DISCUSSION_CHANNEL_ID,
+  });
 
-const buildComment = (comment: CommentState, comments: CommentState[]) => ({
-  ...buildCommentNode(comment, comments),
-});
-
-const buildDiscussionResponse = (comments: CommentState[]) => ({
+const buildDiscussionResponse = (comments: MockCommentState[]) => ({
   data: {
     discussions: [
-      {
+      buildDiscussion({
         id: DISCUSSION_ID,
+        discussionChannelId: DISCUSSION_CHANNEL_ID,
+        channelUniqueName: CHANNEL_ID,
         title: DISCUSSION_TITLE,
         body: 'Example body',
-        editReason: '',
-        createdAt: '2024-01-01T00:00:00.000Z',
-        updatedAt: '2024-01-01T00:00:00.000Z',
-        hasDownload: false,
-        hasSensitiveContent: false,
-        coverImageURL: '',
-        Tags: [],
-        Author: buildUser(),
-        Album: null,
-        CrosspostedDiscussion: null,
-        DiscussionChannels: [
-          {
-            id: DISCUSSION_CHANNEL_ID,
-            discussionId: DISCUSSION_ID,
-            channelUniqueName: CHANNEL_ID,
-            weightedVotesCount: 1,
-            createdAt: '2024-01-01T00:00:00.000Z',
-            archived: false,
-            answered: false,
-            locked: false,
-            emoji: '',
-            Channel: {
-              uniqueName: CHANNEL_ID,
-              channelIconURL: '',
-              displayName: 'cats',
-              feedbackEnabled: true,
-              Bots: [],
-            },
-            Discussion: {
-              id: DISCUSSION_ID,
-              title: DISCUSSION_TITLE,
-              Author: buildUser(),
-            },
-            CommentsAggregate: { count: comments.length },
-            UpvotedByUsers: [{ username: 'cluse' }],
-            UpvotedByUsersAggregate: { count: 1 },
-            SubscribedToNotifications: [],
-            Answers: [],
-            LabelOptions: [],
-          },
-        ],
-        DownloadableFiles: [],
-        FeedbackCommentsAggregate: { count: 0 },
-        FeedbackComments: [],
-        PastTitleVersions: [],
-        PastBodyVersions: [],
-        BodyLastEditedBy: null,
-      },
+        commentsCount: comments.length,
+      }),
     ],
   },
 });
@@ -219,38 +75,17 @@ test('creates, edits, deletes, and nests comments', async (
   testInfo
 ) => {
   let nextCommentId = 1;
-  let comments: CommentState[] = [];
+  let comments: MockCommentState[] = [];
 
   await installMockAuth(context, page);
   const diagnostics = await installGraphqlMocks(page, {
     getBasicUserInfo: () => ({
       data: {
         users: [
-          {
-            ...buildUser(),
-            location: '',
-            pronouns: '',
-            bio: '',
-            Email: { address: 'cluse@example.com' },
-            notifyOnReplyToCommentByDefault: true,
-            notifyOnReplyToDiscussionByDefault: true,
-            notifyOnReplyToEventByDefault: true,
-            notifyWhenTagged: true,
-            notifyOnSubscribedIssueUpdates: true,
-            notifyOnFeedback: true,
-            notificationBundleInterval: 'daily',
-            notificationBundleEnabled: false,
-            notificationBundleContent: 'all',
-            enableSensitiveContentByDefault: false,
-            NotificationsAggregate: { count: 0 },
+          buildBasicUser({
             CommentsAggregate: { count: comments.length },
             DiscussionsAggregate: { count: 1 },
-            DownloadsAggregate: { count: 0 },
-            EventsAggregate: { count: 0 },
-            ImagesAggregate: { count: 0 },
-            AlbumsAggregate: { count: 0 },
-            AdminOfChannelsAggregate: { count: 1 },
-          },
+          }),
         ],
       },
     }),
@@ -274,63 +109,16 @@ test('creates, edits, deletes, and nests comments', async (
     }),
     getServerConfig: () => ({
       data: {
-        serverConfigs: [buildServerConfig()],
+        serverConfigs: [buildServerConfig({ serverName: 'Listical' })],
       },
     }),
     getChannel: () => ({
       data: {
         channels: [
-          {
+          buildChannel({
             uniqueName: CHANNEL_ID,
             displayName: CHANNEL_ID,
-            channelIconURL: '',
-            channelBannerURL: '',
-            description: '',
-            createdAt: '2024-01-01T00:00:00.000Z',
-            feedbackEnabled: true,
-            rules: '[]',
-            locked: false,
-            wikiEnabled: false,
-            eventsEnabled: true,
-            downloadsEnabled: false,
-            allowedFileTypes: [],
-            pluginPipelines: [],
-            WikiHomePage: null,
-            Tags: [],
-            Admins: [
-              {
-                username: 'cluse',
-                displayName: 'cluse',
-                profilePicURL: '',
-                commentKarma: 0,
-                discussionKarma: 0,
-                createdAt: '2024-01-01T00:00:00.000Z',
-              },
-            ],
-            Moderators: [],
-            SuspendedUsers: [],
-            SuspendedMods: [],
-            Bots: [],
-            DefaultModRole: null,
-            ElevatedModRole: null,
-            DefaultElevatedModRole: null,
-            SuspendedRole: null,
-            SuspendedModRole: null,
-            DefaultChannelRole: {
-              canCreateComment: true,
-              canCreateDiscussion: true,
-              canCreateEvent: true,
-              canUpdateChannel: true,
-              canUploadFile: true,
-              canUpvoteComment: true,
-              canUpvoteDiscussion: true,
-              channelUniqueName: CHANNEL_ID,
-            },
-            DiscussionChannelsAggregate: { count: 1 },
-            IssuesAggregate: { count: 0 },
-            EventChannelsAggregate: { count: 0 },
-            FilterGroups: [],
-          },
+          }),
         ],
       },
     }),
@@ -414,37 +202,16 @@ test('creates, edits, deletes, and nests comments', async (
     getCommentSection: () => ({
       data: {
         getCommentSection: {
-          DiscussionChannel: {
+          DiscussionChannel: buildDiscussionChannel({
             id: DISCUSSION_CHANNEL_ID,
-            weightedVotesCount: 1,
             discussionId: DISCUSSION_ID,
             channelUniqueName: CHANNEL_ID,
-            emoji: '',
-            archived: false,
-            locked: false,
-            answered: false,
-            Channel: {
-              uniqueName: CHANNEL_ID,
-              channelIconURL: '',
-              displayName: 'cats',
-              feedbackEnabled: true,
-              Bots: [],
-            },
-            Discussion: {
-              id: DISCUSSION_ID,
-              title: DISCUSSION_TITLE,
-              Author: buildUser(),
-            },
-            CommentsAggregate: { count: comments.length },
-            UpvotedByUsers: [{ username: 'cluse' }],
-            UpvotedByUsersAggregate: { count: 1 },
-            SubscribedToNotifications: [],
-            Answers: [],
-            LabelOptions: [],
-          },
+            title: DISCUSSION_TITLE,
+            commentsCount: comments.length,
+          }),
           Comments: comments
             .filter((comment) => comment.parentCommentId === null)
-            .map((comment) => buildComment(comment, comments)),
+            .map((comment) => buildCommentFixture(comment, comments)),
         },
       },
     }),
@@ -483,7 +250,7 @@ test('creates, edits, deletes, and nests comments', async (
             __typename: 'CommentReplies',
             aggregateChildCommentCount: childComments.length,
             ChildComments: childComments.map((comment) =>
-              buildComment(comment, comments)
+              buildCommentFixture(comment, comments)
             ),
           },
         },
@@ -498,7 +265,7 @@ test('creates, edits, deletes, and nests comments', async (
         throw new Error('Missing createCommentInput in mocked createComment request');
       }
 
-      const newComment: CommentState = {
+      const newComment: MockCommentState = {
         id: `comment-${nextCommentId++}`,
         text: input.text ?? '',
         parentCommentId: input.ParentComment?.connect?.where?.node?.id || null,
@@ -507,7 +274,7 @@ test('creates, edits, deletes, and nests comments', async (
       return {
         data: {
           createComments: {
-            comments: [buildComment(newComment, comments)],
+            comments: [buildCommentFixture(newComment, comments)],
           },
         },
       };
@@ -533,7 +300,7 @@ test('creates, edits, deletes, and nests comments', async (
       return {
         data: {
           updateComments: {
-            comments: [buildComment(updated, comments)],
+            comments: [buildCommentFixture(updated, comments)],
           },
         },
       };

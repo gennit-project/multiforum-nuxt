@@ -93,8 +93,8 @@ test.describe('Filter discussions by tag', () => {
     const diagnostics = setupDiagnostics(page);
 
     try {
-      await page.goto(DISCUSSION_LIST);
-      await expect(page.getByText(NEW_YEARS_TITLE, { exact: true })).toBeVisible();
+      await page.goto(DISCUSSION_LIST, { waitUntil: 'networkidle' });
+      await expect(page.getByRole('link', { name: NEW_YEARS_TITLE })).toBeVisible({ timeout: 30_000 });
 
       await page.getByTestId('discussion-filter-button').click();
       await page.getByTestId('tag-filter-button').click();
@@ -130,8 +130,8 @@ test.describe('Filter discussions by tag', () => {
     const diagnostics = setupDiagnostics(page);
 
     try {
-      await page.goto(CHANNEL_VIEW);
-      await expect(page.getByText(TRIVIA_TITLE, { exact: true })).toBeVisible();
+      await page.goto(CHANNEL_VIEW, { waitUntil: 'networkidle' });
+      await expect(page.getByRole('link', { name: TRIVIA_TITLE })).toBeVisible({ timeout: 30_000 });
 
       await page.getByTestId('discussion-filter-button').click();
       await page.getByTestId('tag-filter-button').click();

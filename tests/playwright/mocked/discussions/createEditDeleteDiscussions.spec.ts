@@ -3,6 +3,15 @@ import type {
   DiscussionCreateInputWithChannels,
   DiscussionUpdateInput,
 } from '@/__generated__/graphql';
+import {
+  MOCK_DATE,
+  buildBasicUser,
+  buildChannel,
+  buildDiscussion,
+  buildDiscussionChannel,
+  buildServerConfig,
+  buildUser,
+} from '../../helpers/graphqlFixtures';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { installGraphqlMocks } from '../../helpers/mockGraphql';
 
@@ -31,121 +40,19 @@ type UpdateDiscussionVariables = {
   updateDiscussionInput?: DiscussionUpdateInput;
 };
 
-const buildUser = () => ({
-  username: 'cluse',
-  displayName: 'cluse',
-  profilePicURL: '',
-  createdAt: '2024-01-01T00:00:00.000Z',
-  discussionKarma: 0,
-  commentKarma: 0,
-  notifyOnSuspensionBlocks: true,
-  ServerRoles: [],
-  ChannelRoles: [],
-});
-
-const buildChannel = (uniqueName: string) => ({
-  uniqueName,
-  displayName: uniqueName,
-  channelIconURL: '',
-  channelBannerURL: '',
-  description: '',
-  createdAt: '2024-01-01T00:00:00.000Z',
-  feedbackEnabled: true,
-  rules: '[]',
-  locked: false,
-  wikiEnabled: false,
-  eventsEnabled: true,
-  downloadsEnabled: false,
-  allowedFileTypes: [],
-  pluginPipelines: [],
-  WikiHomePage: null,
-  Tags: [],
-  Admins: [
-    {
-      username: 'cluse',
-      displayName: 'cluse',
-      profilePicURL: '',
-      commentKarma: 0,
-      discussionKarma: 0,
-      createdAt: '2024-01-01T00:00:00.000Z',
-    },
-  ],
-  Moderators: [],
-  SuspendedUsers: [],
-  SuspendedMods: [],
-  Bots: [],
-  DefaultModRole: null,
-  ElevatedModRole: null,
-  DefaultElevatedModRole: null,
-  SuspendedRole: null,
-  SuspendedModRole: null,
-  DefaultChannelRole: {
-    canCreateComment: true,
-    canCreateDiscussion: true,
-    canCreateEvent: true,
-    canUpdateChannel: true,
-    canUploadFile: true,
-    canUpvoteComment: true,
-    canUpvoteDiscussion: true,
-    channelUniqueName: uniqueName,
-  },
-  DiscussionChannelsAggregate: { count: 1 },
-  IssuesAggregate: { count: 0 },
-  EventChannelsAggregate: { count: 0 },
-  FilterGroups: [],
-});
-
 const buildDiscussionResponse = (state: DiscussionState) => ({
   data: {
     discussions: state.deleted
       ? []
       : [
-          {
+          buildDiscussion({
             id: state.id,
+            discussionChannelId: state.discussionChannelId,
+            channelUniqueName: TEST_CHANNEL,
             title: state.title,
             body: state.body,
-            editReason: '',
-            createdAt: '2024-01-01T00:00:00.000Z',
-            updatedAt: '2024-01-01T00:00:00.000Z',
-            hasDownload: false,
-            hasSensitiveContent: false,
-            coverImageURL: '',
-            Tags: state.tags.map((text) => ({ text })),
-            Author: buildUser(),
-            Album: null,
-            CrosspostedDiscussion: null,
-            DiscussionChannels: [
-              {
-                id: state.discussionChannelId,
-                discussionId: state.id,
-                channelUniqueName: TEST_CHANNEL,
-                weightedVotesCount: 1,
-                createdAt: '2024-01-01T00:00:00.000Z',
-                archived: false,
-                answered: false,
-                locked: false,
-                emoji: '',
-                Channel: {
-                  uniqueName: TEST_CHANNEL,
-                  displayName: 'cats',
-                  feedbackEnabled: true,
-                  Bots: [],
-                },
-                Discussion: {
-                  id: state.id,
-                  title: state.title,
-                  Author: buildUser(),
-                },
-                CommentsAggregate: { count: 0 },
-                UpvotedByUsers: [{ username: 'cluse' }],
-                UpvotedByUsersAggregate: { count: 1 },
-                SubscribedToNotifications: [],
-                Answers: [],
-              },
-            ],
-            PastTitleVersions: [],
-            PastBodyVersions: [],
-          },
+            tags: state.tags,
+          }),
         ],
   },
 });
@@ -164,7 +71,7 @@ const buildDiscussionListResponse = (state: DiscussionState) => ({
               isFavorited: false,
               CommentsAggregate: { count: 0 },
               weightedVotesCount: 1,
-              createdAt: '2024-01-01T00:00:00.000Z',
+              createdAt: MOCK_DATE,
               Channel: { uniqueName: TEST_CHANNEL },
               UpvotedByUsers: [{ username: 'cluse' }],
               UpvotedByUsersAggregate: { count: 1 },
@@ -175,8 +82,8 @@ const buildDiscussionListResponse = (state: DiscussionState) => ({
                 id: state.id,
                 title: state.title,
                 body: state.body,
-                createdAt: '2024-01-01T00:00:00.000Z',
-                updatedAt: '2024-01-01T00:00:00.000Z',
+                createdAt: MOCK_DATE,
+                updatedAt: MOCK_DATE,
                 hasSensitiveContent: false,
                 Author: buildUser(),
                 Album: null,
@@ -206,31 +113,9 @@ test('creates, edits and deletes a discussion', async (
     getBasicUserInfo: () => ({
       data: {
         users: [
-          {
-            ...buildUser(),
-            location: '',
-            pronouns: '',
-            bio: '',
-            Email: { address: 'cluse@example.com' },
-            notifyOnReplyToCommentByDefault: true,
-            notifyOnReplyToDiscussionByDefault: true,
-            notifyOnReplyToEventByDefault: true,
-            notifyWhenTagged: true,
-            notifyOnSubscribedIssueUpdates: true,
-            notifyOnFeedback: true,
-            notificationBundleInterval: 'daily',
-            notificationBundleEnabled: false,
-            notificationBundleContent: 'all',
-            enableSensitiveContentByDefault: false,
-            NotificationsAggregate: { count: 0 },
-            CommentsAggregate: { count: 0 },
+          buildBasicUser({
             DiscussionsAggregate: { count: state.deleted ? 0 : 1 },
-            DownloadsAggregate: { count: 0 },
-            EventsAggregate: { count: 0 },
-            ImagesAggregate: { count: 0 },
-            AlbumsAggregate: { count: 0 },
-            AdminOfChannelsAggregate: { count: 1 },
-          },
+          }),
         ],
       },
     }),
@@ -264,23 +149,7 @@ test('creates, edits and deletes a discussion', async (
     }),
     getServerConfig: () => ({
       data: {
-        serverConfigs: [
-          {
-            serverName: 'Listical',
-            serverIconURL: '',
-            serverDescription: '',
-            DefaultServerRole: null,
-            DefaultModRole: null,
-            DefaultElevatedModRole: null,
-            DefaultSuspendedRole: null,
-            DefaultSuspendedModRole: null,
-            rules: '[]',
-            allowedFileTypes: [],
-            enableDownloads: true,
-            enableEvents: true,
-            pluginRegistries: [],
-          },
-        ],
+        serverConfigs: [buildServerConfig({ serverName: 'Listical' })],
       },
     }),
     getTags: () => ({
@@ -335,7 +204,7 @@ test('creates, edits and deletes a discussion', async (
                   channelUniqueName: TEST_CHANNEL,
                   CommentsAggregate: { count: 0 },
                   weightedVotesCount: 1,
-                  createdAt: '2024-01-01T00:00:00.000Z',
+                  createdAt: MOCK_DATE,
                   Channel: { uniqueName: TEST_CHANNEL },
                   Discussion: { id: state.id },
                   UpvotedByUsers: [{ username: 'cluse' }],
@@ -343,8 +212,8 @@ test('creates, edits and deletes a discussion', async (
                 },
               ],
               Author: { username: 'cluse' },
-              createdAt: '2024-01-01T00:00:00.000Z',
-              updatedAt: '2024-01-01T00:00:00.000Z',
+              createdAt: MOCK_DATE,
+              updatedAt: MOCK_DATE,
               Tags: state.tags.map((text) => ({ text })),
             },
           ],
@@ -357,31 +226,12 @@ test('creates, edits and deletes a discussion', async (
         getCommentSection: {
           DiscussionChannel: state.deleted
             ? null
-            : {
+            : buildDiscussionChannel({
                 id: state.discussionChannelId,
-                weightedVotesCount: 1,
                 discussionId: state.id,
                 channelUniqueName: TEST_CHANNEL,
-                emoji: '',
-                archived: false,
-                locked: false,
-                answered: false,
-                Channel: {
-                  uniqueName: TEST_CHANNEL,
-                  feedbackEnabled: true,
-                  Bots: [],
-                },
-                Discussion: {
-                  id: state.id,
-                  title: state.title,
-                  Author: buildUser(),
-                },
-                CommentsAggregate: { count: 0 },
-                UpvotedByUsers: [{ username: 'cluse' }],
-                UpvotedByUsersAggregate: { count: 1 },
-                SubscribedToNotifications: [],
-                Answers: [],
-              },
+                title: state.title,
+              }),
           Comments: [],
         },
       },
@@ -405,7 +255,7 @@ test('creates, edits and deletes a discussion', async (
     }),
     getChannel: () => ({
       data: {
-        channels: [buildChannel(TEST_CHANNEL)],
+        channels: [buildChannel({ uniqueName: TEST_CHANNEL })],
       },
     }),
     getIssue: () => ({
@@ -522,8 +372,8 @@ test('creates, edits and deletes a discussion', async (
                 locked: false,
               },
             ],
-            createdAt: '2024-01-01T00:00:00.000Z',
-            updatedAt: '2024-01-01T00:00:00.000Z',
+            createdAt: MOCK_DATE,
+            updatedAt: MOCK_DATE,
             Tags: state.tags.map((text) => ({ text })),
           },
         },
