@@ -1,7 +1,13 @@
 import { expect, test } from '@playwright/test';
-import type { Page, TestInfo } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { resetStatefulBackendData } from '../../helpers/statefulBackend';
+import {
+  createDiagnosticsCollector,
+  registerDiagnostics,
+  attachDiagnostics,
+  mergeDiagnostics,
+} from '../../helpers/diagnostics';
 
 const CATS_FORUM = '/forums/cats/discussions';
 const CHANNEL_CREATION_FORM = '/forums/create';
@@ -9,74 +15,6 @@ const MOD_USERNAME = 'alice';
 const MOD_EMAIL = 'the.rinnovator@gmail.com';
 const AUTHOR_USERNAME = 'cluse';
 const AUTHOR_EMAIL = 'catherine.luse@gmail.com';
-
-const attachDiagnostics = async (
-  testInfo: TestInfo,
-  diagnostics: {
-    pageErrors: string[];
-    consoleErrors: string[];
-    graphqlRequests: Array<{
-      operationName: string;
-      variables?: Record<string, unknown>;
-    }>;
-  }
-) => {
-  await testInfo.attach('graphql-operations.json', {
-    body: Buffer.from(JSON.stringify(diagnostics.graphqlRequests, null, 2)),
-    contentType: 'application/json',
-  });
-  await testInfo.attach('page-errors.json', {
-    body: Buffer.from(JSON.stringify(diagnostics.pageErrors, null, 2)),
-    contentType: 'application/json',
-  });
-  await testInfo.attach('console-errors.json', {
-    body: Buffer.from(JSON.stringify(diagnostics.consoleErrors, null, 2)),
-    contentType: 'application/json',
-  });
-};
-
-const registerDiagnostics = (page: Page, diagnostics: ReturnType<typeof createDiagnostics>) => {
-  page.on('pageerror', (error) => {
-    diagnostics.pageErrors.push(error.stack || error.message);
-  });
-
-  page.on('console', (message) => {
-    if (message.type() === 'error') {
-      diagnostics.consoleErrors.push(message.text());
-    }
-  });
-
-  page.on('request', (requestEvent) => {
-    if (!requestEvent.url().includes('/graphql')) {
-      return;
-    }
-
-    const body = requestEvent.postDataJSON?.() as
-      | {
-          operationName?: string;
-          query?: string;
-          variables?: Record<string, unknown>;
-        }
-      | undefined;
-
-    diagnostics.graphqlRequests.push({
-      operationName:
-        body?.operationName ??
-        body?.query?.match(/\b(query|mutation)\s+([A-Za-z0-9_]+)/)?.[2] ??
-        'UnknownOperation',
-      variables: body?.variables,
-    });
-  });
-};
-
-const createDiagnostics = () => ({
-  pageErrors: [] as string[],
-  consoleErrors: [] as string[],
-  graphqlRequests: [] as Array<{
-    operationName: string;
-    variables?: Record<string, unknown>;
-  }>,
-});
 
 const createDiscussion = async (page: Page, title: string) => {
   await page.goto(CATS_FORUM);
@@ -116,8 +54,8 @@ test('suspended user cannot create a forum and can create one after unsuspension
   browser,
   request,
 }, testInfo) => {
-  const authorDiagnostics = createDiagnostics();
-  const modDiagnostics = createDiagnostics();
+  const authorDiagnostics = createDiagnosticsCollector();
+  const modDiagnostics = createDiagnosticsCollector();
 
   const authorContext = await browser.newContext();
   const modContext = await browser.newContext();
@@ -172,16 +110,9 @@ test('suspended user cannot create a forum and can create one after unsuspension
   } finally {
     await authorContext.close();
     await modContext.close();
-    await attachDiagnostics(testInfo, {
-      pageErrors: [...authorDiagnostics.pageErrors, ...modDiagnostics.pageErrors],
-      consoleErrors: [
-        ...authorDiagnostics.consoleErrors,
-        ...modDiagnostics.consoleErrors,
-      ],
-      graphqlRequests: [
-        ...authorDiagnostics.graphqlRequests,
-        ...modDiagnostics.graphqlRequests,
-      ],
-    });
+    await attachDiagnostics(
+      testInfo,
+      mergeDiagnostics(authorDiagnostics, modDiagnostics)
+    );
   }
 });
