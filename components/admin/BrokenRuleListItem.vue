@@ -29,6 +29,7 @@ const toggleExpandDetail = () => {
   <label class="flex cursor-pointer items-start space-x-3 py-2">
     <input
       type="checkbox"
+      :data-testid="`broken-rule-checkbox`"
       :value="rule.summary"
       :checked="selected.includes(rule.summary)"
       :aria-label="`Select rule: ${rule.summary}`"

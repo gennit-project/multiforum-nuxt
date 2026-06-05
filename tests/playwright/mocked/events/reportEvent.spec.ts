@@ -285,9 +285,8 @@ test('reports an event with mocked GraphQL', async (
     await page.getByTestId('event-menu-button-item-Report').click();
     await expect(page.getByText('Report Event')).toBeVisible();
     await page
-      .locator(`h3:has-text("Forum rules for ${TEST_CHANNEL}")`)
-      .locator('xpath=..')
-      .locator('input[type="checkbox"]')
+      .getByTestId('forum-rules-section')
+      .getByTestId('broken-rule-checkbox')
       .first()
       .check();
     await page

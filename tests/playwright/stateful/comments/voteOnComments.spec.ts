@@ -43,9 +43,7 @@ test('User 1 can undo upvote on their own comment', async (
   }
 });
 
-// TODO: This test requires permission setup - default users can't vote across channels
-// Need to update seed data to allow voting permissions for regular users
-test.skip("User 2 can upvote another user's comment", async (
+test("User 2 can upvote another user's comment", async (
   { browser, context, page, request },
   testInfo
 ) => {
