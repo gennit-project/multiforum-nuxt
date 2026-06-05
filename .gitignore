@@ -39,3 +39,6 @@ coverage/
 .env.sentry-build-plugin
 .vercel
 coverage
+
+playwright-report
+test-results
