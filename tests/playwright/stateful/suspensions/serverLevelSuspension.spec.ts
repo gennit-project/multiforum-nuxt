@@ -29,15 +29,15 @@ const createDiscussion = async (page: Page, title: string) => {
 
 const suspendAuthor = async (page: Page, discussionTitle: string) => {
   await page.goto(CATS_FORUM);
-  await expect(page.getByText(discussionTitle, { exact: true })).toBeVisible();
-  await page.getByText(discussionTitle, { exact: true }).click();
+  const discussionLink = page.getByRole('link', { name: discussionTitle });
+  await expect(discussionLink).toBeVisible();
+  await discussionLink.click();
   await page.getByTestId('discussion-menu-button').click();
   await page.getByTestId('discussion-menu-button-item-Archive and Suspend').click();
   await expect(page.getByText('Suspend Author')).toBeVisible();
   await page
-    .locator('h3:has-text("Forum rules")')
-    .locator('xpath=..')
-    .locator('input[type="checkbox"]')
+    .getByTestId('forum-rules-section')
+    .getByTestId('broken-rule-checkbox')
     .first()
     .check();
   await page.locator('select').selectOption({ label: 'Two Weeks' });

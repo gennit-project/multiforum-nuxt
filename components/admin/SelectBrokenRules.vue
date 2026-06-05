@@ -97,7 +97,7 @@ const showServerRuleOptions = ref(forumRuleOptions.value.length === 0);
 
     <template v-else>
       <div class="pl-1">
-        <div v-if="forumRuleOptions.length > 0" class="pt-3">
+        <div v-if="forumRuleOptions.length > 0" data-testid="forum-rules-section" class="pt-3">
           <h3 class="text-sm uppercase text-gray-700 dark:text-gray-300">
             Forum rules for {{ forumId }}
           </h3>
