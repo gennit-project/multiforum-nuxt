@@ -41,9 +41,9 @@ const clickForumRulesCheckbox = async (page: Page) => {
     .check();
 };
 
-// TODO: This test requires multi-user setup where alice creates a comment and cluse (mod) archives it
-// Currently failing because alice may not have permission to create comments in the cats forum
-// Need to verify seed data permissions or use a different test approach
+// TODO: Multi-user test passes user permission check (alice can create comments via DefaultChannelRole)
+// but fails because Archive option doesn't appear in cluse's comment menu even though cluse is admin.
+// This may be a separate UI/permission display bug - Archive should appear for channel admins.
 test.skip('verifies navigation links between archived comment, issue, and original context', async ({
   browser,
   context,

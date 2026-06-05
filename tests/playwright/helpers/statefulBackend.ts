@@ -45,6 +45,71 @@ const DROP_DATA_MUTATION = `
   }
 `;
 
+// This mutation connects default roles to the server config after roles are created
+const CONNECT_DEFAULT_ROLES_MUTATION = `
+  mutation connectDefaultRolesToServerConfig {
+    updateServerConfigs(
+      where: { serverName: "Cypress Test Server" }
+      update: {
+        DefaultServerRole: {
+          connect: {
+            where: { node: { name: "CanCreateAnything" } }
+          }
+        }
+        DefaultSuspendedRole: {
+          connect: {
+            where: { node: { name: "Suspended Role" } }
+          }
+        }
+        DefaultModRole: {
+          connect: {
+            where: { node: { name: "BasicModRole" } }
+          }
+        }
+        DefaultElevatedModRole: {
+          connect: {
+            where: { node: { name: "DefaultElevatedModRole" } }
+          }
+        }
+        DefaultSuspendedModRole: {
+          connect: {
+            where: { node: { name: "DefaultSuspendedModRole" } }
+          }
+        }
+      }
+    ) {
+      serverConfigs {
+        serverName
+      }
+    }
+  }
+`;
+
+// This mutation connects default channel roles after channel roles are created
+const CONNECT_CHANNEL_DEFAULT_ROLES_MUTATION = `
+  mutation connectDefaultRolesToChannels {
+    updateChannels(
+      where: { uniqueName: "cats" }
+      update: {
+        DefaultChannelRole: {
+          connect: {
+            where: { node: { name: "Default user role for /cats" } }
+          }
+        }
+        ElevatedModRole: {
+          connect: {
+            where: { node: { name: "Basic mod role for /cats" } }
+          }
+        }
+      }
+    ) {
+      channels {
+        uniqueName
+      }
+    }
+  }
+`;
+
 const SEED_DATA_MUTATION = `
   mutation seedDataForCypressTests(
     $channels: [ChannelCreateInput!]!
@@ -165,6 +230,24 @@ export async function seedStatefulBackendData(
   );
 }
 
+// Connect default roles to server config after roles have been created
+export async function connectDefaultRolesToServerConfig(
+  request: APIRequestContext
+) {
+  await postAuthenticatedGraphQL<{
+    updateServerConfigs: { serverConfigs: Array<{ serverName: string }> };
+  }>(request, STATEFUL_ADMIN_TOKEN, CONNECT_DEFAULT_ROLES_MUTATION);
+}
+
+// Connect default roles to channels after channel roles have been created
+export async function connectDefaultRolesToChannels(
+  request: APIRequestContext
+) {
+  await postAuthenticatedGraphQL<{
+    updateChannels: { channels: Array<{ uniqueName: string }> };
+  }>(request, STATEFUL_ADMIN_TOKEN, CONNECT_CHANNEL_DEFAULT_ROLES_MUTATION);
+}
+
 export async function resetStatefulBackendData(
   request: APIRequestContext,
   token: string,
@@ -172,4 +255,6 @@ export async function resetStatefulBackendData(
 ) {
   await dropStatefulBackendData(request, token);
   await seedStatefulBackendData(request, token, input);
+  await connectDefaultRolesToServerConfig(request);
+  await connectDefaultRolesToChannels(request);
 }
