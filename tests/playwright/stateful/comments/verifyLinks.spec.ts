@@ -4,15 +4,17 @@ import { installMockAuth } from '../../helpers/mockAuth';
 import { resetStatefulBackendData } from '../../helpers/statefulBackend';
 
 const DISCUSSION_TITLE = 'Example topic 1';
-const DISCUSSION_LIST_URL = '/discussions/';
+const CHANNEL_DISCUSSION_LIST = '/forums/cats/discussions/';
 const CATS_ISSUES_URL = '/forums/cats/issues';
 
 const createCommentText = (prefix: string) => `${prefix} ${Date.now()}`;
 
 const openFirstSeededDiscussion = async (page: Page) => {
-  await page.goto(DISCUSSION_LIST_URL);
-  await expect(page.getByText(DISCUSSION_TITLE, { exact: true })).toBeVisible();
-  await page.getByText(DISCUSSION_TITLE, { exact: true }).click();
+  await page.goto(CHANNEL_DISCUSSION_LIST, { waitUntil: 'networkidle' });
+  const discussionLink = page.getByRole('link', { name: DISCUSSION_TITLE });
+  await expect(discussionLink).toBeVisible({ timeout: 30_000 });
+  await discussionLink.click();
+  await page.waitForLoadState('networkidle');
 };
 
 const createComment = async (page: Page, text: string) => {
