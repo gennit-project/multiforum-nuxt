@@ -36,18 +36,36 @@ const attachDiagnostics = async (
 };
 
 const openSeededDiscussion = async (page: Page) => {
-  await page.goto(CATS_FORUM);
-  await expect(page.getByText(DISCUSSION_TITLE, { exact: true })).toBeVisible();
-  await page.getByText(DISCUSSION_TITLE, { exact: true }).click();
+  await page.goto(CATS_FORUM, { waitUntil: 'networkidle' });
+  // Use getByRole('link') to avoid strict mode violation when title appears in multiple places
+  const discussionLink = page.getByRole('link', { name: DISCUSSION_TITLE });
+  await expect(discussionLink).toBeVisible({ timeout: 30_000 });
+
+  // Get the full discussion URL and navigate directly to avoid split-view issues
+  const href = await discussionLink.getAttribute('href');
+  if (href && href.includes('selectedDiscussionId')) {
+    // Extract discussionId from query param and navigate to full detail page
+    const url = new URL(href, page.url());
+    const discussionId = url.searchParams.get('selectedDiscussionId');
+    await page.goto(`/forums/cats/discussions/${discussionId}`, { waitUntil: 'networkidle' });
+  } else if (href) {
+    await page.goto(href, { waitUntil: 'networkidle' });
+  } else {
+    await discussionLink.click();
+    await page.waitForLoadState('networkidle');
+  }
 };
 
 const clickRuleCheckbox = async (page: Page, headingText: string) => {
-  await page
-    .locator(`h3:has-text("${headingText}")`)
-    .locator('xpath=..')
-    .locator('input[type="checkbox"]')
-    .first()
-    .check();
+  const rulesSection = page.locator(`h3:has-text("${headingText}")`).locator('xpath=..');
+
+  // Check if section is collapsed (has "Show X" button) and expand it
+  const showButton = rulesSection.getByRole('button', { name: `Show ${headingText}` });
+  if (await showButton.isVisible({ timeout: 1000 }).catch(() => false)) {
+    await showButton.click();
+  }
+
+  await rulesSection.locator('input[type="checkbox"]').first().check();
 };
 
 const setupDiagnostics = (page: Page) => {

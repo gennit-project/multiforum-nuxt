@@ -106,6 +106,18 @@ const handleItemClick = (item: MenuItemType) => {
     emitEvent(item.event);
   }
 };
+
+/**
+ * Checks if a menu item's value is a valid route that should render as a nuxt-link.
+ * Valid routes are: route objects or strings starting with '/'.
+ * Plain IDs or other strings should not be treated as routes.
+ */
+const isValidRouteValue = (value: unknown): boolean => {
+  if (!value) return false;
+  if (typeof value === 'object') return true;
+  if (typeof value === 'string' && value.startsWith('/')) return true;
+  return false;
+};
 const isMenuOpen = ref(false);
 const menuStyles = {
   top: shouldOpenUpwards.value ? 'auto' : '100%',
@@ -171,8 +183,9 @@ const menuStyles = {
               }
             "
           >
+            <!-- Only use nuxt-link if value is an actual route (object or path starting with /) -->
             <nuxt-link
-              v-if="item.value"
+              v-if="isValidRouteValue(item.value)"
               :to="item.value"
               class="flex items-center gap-2 text-sm"
               :class="['text-gray-700 dark:text-white']"
@@ -186,7 +199,6 @@ const menuStyles = {
             </nuxt-link>
             <div
               v-else-if="item.event"
-              :data-testid="`${dataTestid}-item-${item.label}`"
               class="flex cursor-pointer items-center gap-2 text-sm"
               :class="['text-gray-700 dark:text-white']"
               @click="emitEvent(item?.event ?? '')"

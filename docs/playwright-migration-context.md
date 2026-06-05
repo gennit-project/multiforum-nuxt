@@ -285,3 +285,111 @@ PLAYWRIGHT_MOCK_AUTH=true E2E_MOCK_AUTH=true
 ```
 
 and make sure `VITE_GRAPHQL_URL` and `PLAYWRIGHT_BACKEND_PORT` agree with that backend.
+
+---
+
+## Session 2026-06-05: Stateful Test Fixes (Continued)
+
+### 1. Neo4j Memory Issues (Fixed)
+
+**Problem**: `dropDataForCypressTests` was causing Neo4j `OutOfMemoryError` by deleting too many node types in one large transaction.
+
+**Fix Applied** to `/Users/catherineluse/gennit/gennit-backend/customResolvers/mutations/dropDataForCypressTests.ts`:
+- Changed from single transaction to individual sessions per delete
+- Added retry logic with exponential backoff for transient errors (deadlocks)
+- Added batched delete support via `CALL IN TRANSACTIONS` with fallback for older Neo4j
+- Added missing node types: Collection, Message, Contact, ScratchpadEntry, LabelChangeHistory, DownloadableFile, FileVersion, Purchase, FilterGroup, FilterOption, Emoji, Feed, RecurringEvent
+
+**Backend was rebuilt**: Run `npm run build` in the backend directory if not already done.
+
+### 2. Test Timeout Issues (Fixed)
+
+**Problem**: Tests were timing out (60s default) during database reset (drop + seed).
+
+**Fix Applied**:
+- `playwright.config.ts` line 24: Dynamic timeout based on `PLAYWRIGHT_STATEFUL` env var (180s for stateful, 60s for mocked)
+- `package.json`: Updated `test:playwright:stateful` script to set `PLAYWRIGHT_STATEFUL=true`
+
+### 3. Permission Issues (IN PROGRESS - Key Blocker)
+
+**Problem**: Report discussion test fails with `"You need to have a moderator role to do that"`.
+
+**Context**:
+- The `canReport` permission is granted via `DefaultModRole` which has `canReport: true`
+- `DefaultModRole` must be connected to `ServerConfig` via `CONNECT_DEFAULT_ROLES_MUTATION`
+- Permission chain: User → ServerConfig → DefaultModRole → canReport:true
+
+**What Works**:
+- Database reset (drop + seed) completes successfully
+- Test navigates to discussion detail page correctly
+- Test clicks Report menu item
+- Report modal opens
+
+**What Fails**:
+- Submitting the report returns permission error from backend
+
+**Files to Investigate**:
+1. `tests/playwright/helpers/statefulBackend.ts` - Lines 49-86 have `CONNECT_DEFAULT_ROLES_MUTATION`
+2. Backend: `rules/permission/canReport.js` - Permission check logic
+3. `tests/playwright/seedData/rbac/seedServerConfig.ts` - Server name "Playwright Test Server"
+4. `tests/playwright/seedData/rbac/seedModServerRoles.ts` - `BasicModRole` has `canReport: true`
+
+**Debugging Next Steps**:
+1. Add logging to `resetStatefulBackendData()` to confirm `connectDefaultRolesToServerConfig()` succeeds
+2. Query Neo4j after seed to verify ServerConfig has DefaultModRole connected:
+   ```bash
+   docker exec -it neo4j-playwright cypher-shell -u neo4j -p playwright-ci-password \
+     "MATCH (sc:ServerConfig {serverName:'Playwright Test Server'})-[:HAS_DEFAULT_MOD_ROLE]->(role) RETURN role.name"
+   ```
+3. Check if `GET_SERVER_CONFIG` query in frontend finds the ServerConfig and its roles
+
+### 4. Neo4j Container Setup
+
+For manual testing, use this container (APOC required):
+```bash
+docker run -d --name neo4j-playwright \
+  -p 7475:7474 -p 7688:7687 \
+  -e NEO4J_AUTH=neo4j/playwright-ci-password \
+  -e 'NEO4J_PLUGINS=["apoc"]' \
+  -e 'NEO4J_dbms_security_procedures_unrestricted=apoc.*' \
+  neo4j:5.1.0
+```
+
+Wait for startup (~45s):
+```bash
+docker logs neo4j-playwright 2>&1 | grep "Started"
+```
+
+### 5. Commands for Next Session
+
+```bash
+# Ensure Neo4j is running
+docker start neo4j-playwright
+sleep 30
+
+# Verify it's ready
+docker logs neo4j-playwright 2>&1 | grep "Started"
+
+# Run the failing test with debug output
+npm run test:playwright:stateful -- tests/playwright/stateful/discussions/reportDiscussion.spec.ts --grep "admin issues"
+
+# Check trace after failure
+npx playwright show-trace test-results/stateful-discussions-repor-ca159-on-to-the-admin-issues-list-chromium/trace.zip
+```
+
+### 6. Files Modified This Session
+
+| File | Change |
+|------|--------|
+| `gennit-backend/customResolvers/mutations/dropDataForCypressTests.ts` | Complete rewrite with batched deletes, retry logic, new node types |
+| `playwright.config.ts` | Dynamic timeout (180s for stateful) |
+| `package.json` | `PLAYWRIGHT_STATEFUL=true` env var in test script |
+
+### 7. Key Insight
+
+The permission system depends on:
+1. **VITE_SERVER_NAME** (frontend) matching **serverName** (in seed data)
+2. **DefaultModRole** being connected to ServerConfig after seeding
+3. The user resolving their permissions via GET_SERVER_CONFIG → DefaultModRole → canReport
+
+If any of these fail, users won't have the `canReport` permission even though the role itself has it.

@@ -49,7 +49,7 @@ const DROP_DATA_MUTATION = `
 const CONNECT_DEFAULT_ROLES_MUTATION = `
   mutation connectDefaultRolesToServerConfig {
     updateServerConfigs(
-      where: { serverName: "Cypress Test Server" }
+      where: { serverName: "Playwright Test Server" }
       update: {
         DefaultServerRole: {
           connect: {
@@ -86,6 +86,7 @@ const CONNECT_DEFAULT_ROLES_MUTATION = `
 `;
 
 // This mutation connects default channel roles after channel roles are created
+// Note: DefaultChannelRole uses ChannelRole, ElevatedModRole uses ModChannelRole
 const CONNECT_CHANNEL_DEFAULT_ROLES_MUTATION = `
   mutation connectDefaultRolesToChannels {
     updateChannels(
@@ -98,13 +99,51 @@ const CONNECT_CHANNEL_DEFAULT_ROLES_MUTATION = `
         }
         ElevatedModRole: {
           connect: {
-            where: { node: { name: "Basic mod role for /cats" } }
+            where: { node: { name: "AdvancedModChannelRole" } }
           }
         }
       }
     ) {
       channels {
         uniqueName
+      }
+    }
+  }
+`;
+
+// Check if a user already has a ModerationProfile
+const GET_USER_MODERATION_PROFILE_QUERY = `
+  query getUserModerationProfile($username: String!) {
+    users(where: { username: $username }) {
+      username
+      ModerationProfile {
+        displayName
+      }
+    }
+  }
+`;
+
+const CONNECT_CATS_MODERATORS_MUTATION = `
+  mutation connectCatsModerators($modProfileNames: [String!]!) {
+    updateChannels(
+      where: { uniqueName: "cats" }
+      update: {
+        Moderators: [
+          {
+            connect: [
+              {
+                where: { node: { displayName_IN: $modProfileNames } }
+              }
+            ]
+          }
+        ]
+      }
+    ) {
+      channels {
+        uniqueName
+        Moderators {
+          displayName
+        }
       }
     }
   }
@@ -248,6 +287,53 @@ export async function connectDefaultRolesToChannels(
   }>(request, STATEFUL_ADMIN_TOKEN, CONNECT_CHANNEL_DEFAULT_ROLES_MUTATION);
 }
 
+// Connect the actual generated moderation profiles to cats so elevated mod
+// permissions do not depend on Cypress-only test profile names.
+export async function connectCatsModerators(request: APIRequestContext) {
+  const usersNeedingModProfiles = ['cluse', 'alice'];
+  const modProfileNames: string[] = [];
+
+  for (const username of usersNeedingModProfiles) {
+    const existingProfile = await postAuthenticatedGraphQL<
+      {
+        users: Array<{
+          username: string;
+          ModerationProfile: { displayName: string } | null;
+        }>;
+      },
+      { username: string }
+    >(request, STATEFUL_ADMIN_TOKEN, GET_USER_MODERATION_PROFILE_QUERY, {
+      username,
+    });
+
+    const profile = existingProfile.users[0]?.ModerationProfile;
+    if (profile) {
+      console.log(`User ${username} has ModerationProfile: ${profile.displayName}`);
+      modProfileNames.push(profile.displayName);
+    } else {
+      console.warn(`WARNING: User ${username} is missing ModerationProfile!`);
+    }
+  }
+
+  if (modProfileNames.length === 0) {
+    return;
+  }
+
+  await postAuthenticatedGraphQL<
+    {
+      updateChannels: {
+        channels: Array<{
+          uniqueName: string;
+          Moderators: Array<{ displayName: string }>;
+        }>;
+      };
+    },
+    { modProfileNames: string[] }
+  >(request, STATEFUL_ADMIN_TOKEN, CONNECT_CATS_MODERATORS_MUTATION, {
+    modProfileNames,
+  });
+}
+
 export async function resetStatefulBackendData(
   request: APIRequestContext,
   token: string,
@@ -257,4 +343,5 @@ export async function resetStatefulBackendData(
   await seedStatefulBackendData(request, token, input);
   await connectDefaultRolesToServerConfig(request);
   await connectDefaultRolesToChannels(request);
+  await connectCatsModerators(request);
 }

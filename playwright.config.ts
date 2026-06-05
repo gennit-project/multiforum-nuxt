@@ -21,7 +21,8 @@ const backendRoot =
 
 export default defineConfig({
   testDir: './tests/playwright',
-  timeout: 60_000,
+  // Increase timeout for stateful tests that need database reset
+  timeout: process.env.PLAYWRIGHT_STATEFUL ? 180_000 : 60_000,
   workers: 1,
   expect: {
     timeout: 10_000,
@@ -56,6 +57,7 @@ export default defineConfig({
             GOOGLE_CREDENTIALS_BASE64: '',
             PLAYWRIGHT_MOCK_AUTH: 'true',
             PORT: backendPort,
+            SERVER_CONFIG_NAME: 'Playwright Test Server',
           },
           url: `http://127.0.0.1:${backendPort}`,
           reuseExistingServer: true,
@@ -67,6 +69,7 @@ export default defineConfig({
           env: {
             VITE_E2E_MOCK_MODE: 'true',
             VITE_GRAPHQL_URL: graphqlURL,
+            VITE_SERVER_NAME: 'Playwright Test Server',
           },
           url: baseURL,
           reuseExistingServer: true,

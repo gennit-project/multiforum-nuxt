@@ -2,7 +2,7 @@ import type { ServerConfigCreateInput } from '../../../../__generated__/graphql'
 
 const serverConfigs: ServerConfigCreateInput[] = [
   {
-    serverName: 'Cypress Test Server',
+    serverName: 'Playwright Test Server',
     serverDescription:
       'Welcome to topical.space! This server exists for the purpose of development and testing Multiforum, an online forum and content aggregator with extra features that can be enabled for each forum, such as an event calendar, a wiki, and the ability to share downloads such as 3D printer files or video game mods (a feature still in development).',
     rules:
