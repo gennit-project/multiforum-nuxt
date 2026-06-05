@@ -3,7 +3,7 @@ import type { Page, TestInfo } from '@playwright/test';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { resetStatefulBackendData } from '../../helpers/statefulBackend';
 
-const DISCUSSION_LIST = '/discussions/';
+const CHANNEL_DISCUSSION_LIST = '/forums/cats/discussions/';
 const DISCUSSION_TITLE = 'Example topic 1';
 const MOD_USERNAME = 'cluse';
 const MOD_EMAIL = 'catherine.luse@gmail.com';
@@ -79,9 +79,11 @@ const setupDiagnostics = (page: Page) => {
 };
 
 const openSeededDiscussion = async (page: Page) => {
-  await page.goto(DISCUSSION_LIST);
-  await expect(page.getByText(DISCUSSION_TITLE, { exact: true })).toBeVisible();
-  await page.getByText(DISCUSSION_TITLE, { exact: true }).click();
+  await page.goto(CHANNEL_DISCUSSION_LIST, { waitUntil: 'networkidle' });
+  const discussionLink = page.getByRole('link', { name: DISCUSSION_TITLE });
+  await expect(discussionLink).toBeVisible({ timeout: 30_000 });
+  await discussionLink.click();
+  await page.waitForLoadState('networkidle');
 };
 
 const createComment = async (page: Page, text: string) => {
