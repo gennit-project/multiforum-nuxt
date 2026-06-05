@@ -24,6 +24,7 @@ const modChannelRoles: ModChannelRoleCreateInput[] = [
     canHideDiscussion: true,
     canHideEvent: true,
     canOpenSupportTickets: true,
+    canSuspendUser: true,
   },
 ];
 
