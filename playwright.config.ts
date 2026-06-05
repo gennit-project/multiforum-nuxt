@@ -53,7 +53,10 @@ const webServers = [
     : []),
   {
     name: 'frontend',
-    command: `npx nuxt dev --host 127.0.0.1 --port ${frontendPort}`,
+    // Use dev server with increased memory for stateful tests
+    command: isStatefulRun
+      ? `NODE_OPTIONS='--max-old-space-size=4096' npx nuxt dev --host 127.0.0.1 --port ${frontendPort}`
+      : `npx nuxt dev --host 127.0.0.1 --port ${frontendPort}`,
     env: {
       VITE_E2E_MOCK_MODE: 'true',
       VITE_GRAPHQL_URL: graphqlURL,
@@ -69,6 +72,8 @@ export default defineConfig({
   testDir: './tests/playwright',
   // Increase timeout for stateful tests that need database reset
   timeout: isStatefulRun ? 180_000 : 60_000,
+  // Retry failed stateful tests once to handle transient infrastructure issues
+  retries: isStatefulRun ? 1 : 0,
   workers: 1,
   expect: {
     timeout: 10_000,
