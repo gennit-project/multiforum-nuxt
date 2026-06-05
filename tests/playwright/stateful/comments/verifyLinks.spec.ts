@@ -41,16 +41,19 @@ const clickForumRulesCheckbox = async (page: Page) => {
     .check();
 };
 
-// TODO: Multi-user test passes user permission check (alice can create comments via DefaultChannelRole)
-// but fails because Archive option doesn't appear in cluse's comment menu even though cluse is admin.
-// This may be a separate UI/permission display bug - Archive should appear for channel admins.
+// Multi-user test: alice creates a comment, cluse (as admin) archives it
+// TODO: Test is flaky - archive mutation works but modal/page state transitions
+// are inconsistent. Backend fixes applied:
+// 1. archiveComment.ts - throws proper error instead of returning false
+// 2. getNextIssueNumber.ts - uses OPTIONAL MATCH to handle channels with no issues
+// 3. archiveComment.ts - passes relatedUsername/relatedModProfileName to getIssueCreateInput
 test.skip('verifies navigation links between archived comment, issue, and original context', async ({
   browser,
   context,
   page,
   request,
 }, testInfo) => {
-  // User 1 (cluse as mod) sets up test data and will do moderation actions
+  // User 1 (cluse as admin) sets up test data and will do moderation actions
   const token = await installMockAuth(context, page, {
     username: 'cluse',
     email: 'catherine.luse@gmail.com',
@@ -120,17 +123,38 @@ test.skip('verifies navigation links between archived comment, issue, and origin
 
     await expect(page.getByText('Archive Comment')).toBeVisible();
     await clickForumRulesCheckbox(page);
-    await page.getByTestId('report-discussion-input').fill(
-      'Testing link verification'
-    );
-    await page.getByRole('button', { name: 'Submit' }).click();
 
-    await expect(page.getByText('This comment has been archived')).toBeVisible();
-    await expect(page.getByText('View related issue')).toBeVisible();
+    // Fill in the report text
+    const reportInput = page.getByTestId('report-comment-input');
+    await expect(reportInput).toBeVisible();
+    await reportInput.fill('Testing link verification');
+
+    // Click Submit within the Archive Comment dialog
+    const archiveDialog = page.getByRole('dialog').filter({ hasText: 'Archive Comment' });
+    const submitButton = archiveDialog.getByRole('button', { name: 'Submit' });
+    await expect(submitButton).toBeEnabled({ timeout: 5000 });
+    await submitButton.click();
+
+    // Wait for the success notification
+    await expect(page.getByText('archived successfully').first()).toBeVisible({ timeout: 30000 });
+
+    // Try to close the modal by pressing Escape if it's still visible
+    if (await archiveDialog.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await page.keyboard.press('Escape');
+      await expect(archiveDialog).not.toBeVisible({ timeout: 10000 });
+    }
+
+    // Wait for the comment to update and show the archived state
+    // The comment area should now show "This comment has been archived."
+    await expect(page.getByText('This comment has been archived')).toBeVisible({ timeout: 30000 });
+
+    // The UI shows "This comment has been archived." with "archived" as a link to the issue
+    const archivedLink = page.locator('a[href*="/issues/"]').filter({ hasText: 'archived' }).first();
+    await expect(archivedLink).toBeVisible({ timeout: 10000 });
 
     const discussionUrl = page.url();
 
-    await page.getByText('View related issue').click();
+    await archivedLink.click();
     await expect(page.getByText('Issue Details')).toBeVisible();
 
     const issueUrl = page.url();

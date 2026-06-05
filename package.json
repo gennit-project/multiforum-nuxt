@@ -20,7 +20,7 @@
     "start": "nuxt start",
     "test:playwright": "playwright test",
     "test:playwright:mocked": "playwright test tests/playwright/mocked",
-    "test:playwright:stateful": "playwright test tests/playwright/stateful",
+    "test:playwright:stateful": "PLAYWRIGHT_STATEFUL=true playwright test tests/playwright/stateful",
     "playwright:neo4j:up": "docker compose -f docker-compose.playwright.yml up -d --wait",
     "playwright:neo4j:down": "docker compose -f docker-compose.playwright.yml down -v",
     "test:unit": "vitest",

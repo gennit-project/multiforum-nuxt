@@ -16,6 +16,7 @@
 - Use `resetStatefulBackendData()` to initialize data once per test file
 - Use `installMockAuth()` to handle authentication for tests that need it
 - Prefer shared backend resets and fixtures over repeated per-test setup
+- **Server config naming**: The `VITE_SERVER_NAME` in `playwright.config.ts` must match the `serverName` in the seed data (`tests/playwright/seedData/rbac/seedServerConfig.ts`). If these don't match, the `GET_SERVER_CONFIG` query returns no results and default mod permissions (like `canReport`) won't be loaded.
 
 ### Playwright Test Optimizations
 
@@ -205,10 +206,43 @@
 - Prefer explicit URLs and route helpers over hard-coded relative navigation
 - Wait on requests or UI state instead of arbitrary sleeps
 - Use `installMockAuth()` for browser-level auth setup and `resetStatefulBackendData()` for shared test data
-
 - Replace UI-based authentication (`loginUser()`) with this programmatic pattern
-- Replace `cy.loginAsAdminWithUISync()` calls with this manual approach
 - This pattern is faster and more reliable than UI-based authentication
+
+### Stateful Test Seed Data
+
+The stateful backend uses a two-phase approach for role connections:
+
+1. **Phase 1**: Create roles (ServerRoles, ModServerRoles, ChannelRoles, ModChannelRoles) via `seedDataForCypressTests`
+2. **Phase 2**: Connect roles to ServerConfig and Channels via separate mutations (`connectDefaultRolesToServerConfig`, `connectDefaultRolesToChannels`)
+
+This is necessary because roles cannot be connected during creation due to circular dependencies.
+
+**Role Type Requirements**:
+- `DefaultChannelRole` connects to a `ChannelRole` (user permissions)
+- `ElevatedModRole` connects to a `ModChannelRole` (moderator permissions)
+- Don't mix these - connecting a ChannelRole to ElevatedModRole will fail silently
+
+**Moderation Action Requirements**:
+- Users performing moderation actions (archive, report, etc.) must have a `ModerationProfile` with `displayName`
+- ModerationProfiles are auto-created by the backend when users are created via `createUsersWithEmails`
+- The displayName is auto-generated (e.g., "brainyBeefyFullRoom")
+- Channel admins bypass user permission checks but still need ModerationProfile for moderator actions
+
+**Known Issue - archiveComment**:
+- The `archiveComment` mutation may fail with "Cannot return null for non-nullable field Issue.id"
+- This happens when `Issue.create` fails silently in the resolver (returns `false` instead of throwing)
+- Root cause appears to be in the backend resolver at `archiveComment.js` lines 142-175
+- Tests for comment archiving are currently skipped until this backend issue is resolved
+
+### Dynamic Test IDs in Modals
+
+Modals like `BrokenRulesModal.vue` use dynamic test IDs based on content type:
+- For comments: `report-comment-input`
+- For discussions: `report-discussion-input`
+- For events: `report-event-input`
+
+Always use the correct testid matching the content type being moderated.
 
 ## Permission System
 

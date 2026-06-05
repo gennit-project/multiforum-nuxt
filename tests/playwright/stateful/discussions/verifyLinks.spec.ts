@@ -72,10 +72,13 @@ test('verifies navigation links between archived discussion, issue, and original
     await channelPicker.click();
     await page.getByText('cats', { exact: true }).click();
     await expect(channelPicker).toContainText('cats');
+    await page.getByTestId('title-input').click();
+    await expect(page.getByLabel('Type to search...')).toHaveCount(0);
 
-    await page.getByTestId('tag-picker').click();
+    const tagPicker = page.getByTestId('tag-picker');
+    await tagPicker.click();
     await page.getByText('trivia', { exact: true }).click();
-    await expect(page.getByTestId('tag-picker')).toContainText('trivia');
+    await expect(tagPicker).toContainText('trivia');
 
     await page.getByRole('button', { name: 'Save' }).first().click();
     await expect(page).toHaveURL(/\/forums\/cats\/discussions\/.+/);
