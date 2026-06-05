@@ -49,8 +49,9 @@ test("user 2 can upvote another user's discussion", async ({ context, page, requ
 
   try {
     await page.goto(CATS_FORUM);
-    await expect(page.getByText('Example topic 1', { exact: true })).toBeVisible();
-    await page.getByText('Example topic 1', { exact: true }).click();
+    const discussionLink = page.getByRole('link', { name: 'Example topic 1' });
+    await expect(discussionLink).toBeVisible();
+    await discussionLink.click();
 
     const upvoteButton = page.getByTestId('upvote-discussion-button');
     await expect(upvoteButton).toContainText('1');
