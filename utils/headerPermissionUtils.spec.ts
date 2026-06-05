@@ -234,6 +234,39 @@ describe('headerPermissionUtils', () => {
       expect(viewFeedbackOption).toBeUndefined();
     });
 
+    it('should include the related issue route when provided', () => {
+      const menuItems = getDiscussionHeaderMenuItems({
+        isOwnDiscussion: false,
+        isArchived: true,
+        userPermissions: basePermissions,
+        isLoggedIn: true,
+        discussionId,
+        relatedIssueLink: {
+          name: 'forums-forumId-issues-issueNumber',
+          params: { forumId: 'cats', issueNumber: 7 },
+        },
+      });
+
+      expect(menuItems.find((item) => item.label === 'View Issue')?.value).toEqual({
+        name: 'forums-forumId-issues-issueNumber',
+        params: { forumId: 'cats', issueNumber: 7 },
+      });
+    });
+
+    it('should not include archive for report-only moderators', () => {
+      const menuItems = getDiscussionHeaderMenuItems({
+        isOwnDiscussion: false,
+        isArchived: false,
+        userPermissions: { ...basePermissions, canReport: true },
+        isLoggedIn: true,
+        discussionId,
+      });
+
+      expect(
+        menuItems.some((item) => item.event === 'handleClickArchive')
+      ).toBe(false);
+    });
+
     it('should include edit and delete options for discussion author', () => {
       const menuItems = getDiscussionHeaderMenuItems({
         isOwnDiscussion: true,

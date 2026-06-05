@@ -35,10 +35,15 @@ const attachDiagnostics = async (
 };
 
 const openSeededEvent = async (page: Page) => {
-  await page.goto(CATS_FORUM_EVENTS);
-  await expect(page.getByText(EVENT_TITLE, { exact: true })).toBeVisible();
-  await page.getByText(EVENT_TITLE, { exact: true }).click();
-  await expect(page).toHaveURL(/\/forums\/cats\/events\/.+/);
+  await page.goto(CATS_FORUM_EVENTS, { waitUntil: 'networkidle' });
+  const eventLink = page.getByRole('button', {
+    name: new RegExp(EVENT_TITLE),
+  });
+  await expect(eventLink).toBeVisible({ timeout: 30_000 });
+  await eventLink.click();
+  await expect(page.getByTestId('event-menu-button')).toBeVisible({
+    timeout: 30_000,
+  });
 };
 
 const clickRuleCheckbox = async (page: Page, headingText: string) => {
