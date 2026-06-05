@@ -1,82 +1,12 @@
 import { expect, test } from '@playwright/test';
-import type { Page, TestInfo } from '@playwright/test';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { resetStatefulBackendData } from '../../helpers/statefulBackend';
+import { setupDiagnostics, attachDiagnostics } from '../../helpers/diagnostics';
 
 const DISCUSSION_LIST = '/discussions/';
 const MOD_USERNAME = 'alice';
 const MOD_EMAIL = 'the.rinnovator@gmail.com';
 const SEARCH_TERM = 'Example topic 1';
-
-const attachDiagnostics = async (
-  testInfo: TestInfo,
-  diagnostics: {
-    pageErrors: string[];
-    consoleErrors: string[];
-    graphqlRequests: Array<{
-      operationName: string;
-      variables?: Record<string, unknown>;
-    }>;
-  }
-) => {
-  await testInfo.attach('graphql-operations.json', {
-    body: Buffer.from(JSON.stringify(diagnostics.graphqlRequests, null, 2)),
-    contentType: 'application/json',
-  });
-  await testInfo.attach('page-errors.json', {
-    body: Buffer.from(JSON.stringify(diagnostics.pageErrors, null, 2)),
-    contentType: 'application/json',
-  });
-  await testInfo.attach('console-errors.json', {
-    body: Buffer.from(JSON.stringify(diagnostics.consoleErrors, null, 2)),
-    contentType: 'application/json',
-  });
-};
-
-const setupDiagnostics = (page: Page) => {
-  const diagnostics = {
-    pageErrors: [] as string[],
-    consoleErrors: [] as string[],
-    graphqlRequests: [] as Array<{
-      operationName: string;
-      variables?: Record<string, unknown>;
-    }>,
-  };
-
-  page.on('pageerror', (error) => {
-    diagnostics.pageErrors.push(error.stack || error.message);
-  });
-
-  page.on('console', (message) => {
-    if (message.type() === 'error') {
-      diagnostics.consoleErrors.push(message.text());
-    }
-  });
-
-  page.on('request', (requestEvent) => {
-    if (!requestEvent.url().includes('/graphql')) {
-      return;
-    }
-
-    const body = requestEvent.postDataJSON?.() as
-      | {
-          operationName?: string;
-          query?: string;
-          variables?: Record<string, unknown>;
-        }
-      | undefined;
-
-    diagnostics.graphqlRequests.push({
-      operationName:
-        body?.operationName ??
-        body?.query?.match(/\b(query|mutation)\s+([A-Za-z0-9_]+)/)?.[2] ??
-        'UnknownOperation',
-      variables: body?.variables,
-    });
-  });
-
-  return diagnostics;
-};
 
 test('filters discussions by channel', async ({ context, page, request }, testInfo) => {
   const token = await installMockAuth(context, page, {
@@ -87,9 +17,7 @@ test('filters discussions by channel', async ({ context, page, request }, testIn
   const diagnostics = setupDiagnostics(page);
 
   try {
-    // Wait for network idle since Vite loads many modules in dev mode
     await page.goto(DISCUSSION_LIST, { waitUntil: 'networkidle' });
-    // Use getByRole('link') to target the visible discussion title link
     await expect(page.getByRole('link', { name: SEARCH_TERM })).toBeVisible({ timeout: 30_000 });
 
     await page.getByTestId('forum-filter-button').click();

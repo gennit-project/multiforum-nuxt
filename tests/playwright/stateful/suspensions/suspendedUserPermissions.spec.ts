@@ -1,7 +1,14 @@
 import { expect, test } from '@playwright/test';
-import type { Browser, Page, TestInfo } from '@playwright/test';
+import type { Browser, Page } from '@playwright/test';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { resetStatefulBackendData } from '../../helpers/statefulBackend';
+import {
+  createDiagnosticsCollector,
+  registerDiagnostics,
+  attachDiagnostics,
+  mergeDiagnostics,
+  type DiagnosticsData,
+} from '../../helpers/diagnostics';
 
 const CATS_DISCUSSIONS = '/forums/cats/discussions';
 const CATS_DISCUSSION_CREATE = '/forums/cats/discussions/create';
@@ -13,81 +20,14 @@ const AUTHOR_EMAIL = 'catherine.luse@gmail.com';
 const MOD_USERNAME = 'alice';
 const MOD_EMAIL = 'the.rinnovator@gmail.com';
 
-type Diagnostics = {
-  pageErrors: string[];
-  consoleErrors: string[];
-  graphqlRequests: Array<{
-    operationName: string;
-    variables?: Record<string, unknown>;
-  }>;
-};
-
-const createDiagnostics = (): Diagnostics => ({
-  pageErrors: [],
-  consoleErrors: [],
-  graphqlRequests: [],
-});
-
-const registerDiagnostics = (page: Page, diagnostics: Diagnostics) => {
-  page.on('pageerror', (error) => {
-    diagnostics.pageErrors.push(error.stack || error.message);
-  });
-
-  page.on('console', (message) => {
-    if (message.type() === 'error') {
-      diagnostics.consoleErrors.push(message.text());
-    }
-  });
-
-  page.on('request', (requestEvent) => {
-    if (!requestEvent.url().includes('/graphql')) {
-      return;
-    }
-
-    const body = requestEvent.postDataJSON?.() as
-      | {
-          operationName?: string;
-          query?: string;
-          variables?: Record<string, unknown>;
-        }
-      | undefined;
-
-    diagnostics.graphqlRequests.push({
-      operationName:
-        body?.operationName ??
-        body?.query?.match(/\b(query|mutation)\s+([A-Za-z0-9_]+)/)?.[2] ??
-        'UnknownOperation',
-      variables: body?.variables,
-    });
-  });
-};
-
-const attachDiagnostics = async (
-  testInfo: TestInfo,
-  diagnostics: Diagnostics
-) => {
-  await testInfo.attach('graphql-operations.json', {
-    body: Buffer.from(JSON.stringify(diagnostics.graphqlRequests, null, 2)),
-    contentType: 'application/json',
-  });
-  await testInfo.attach('page-errors.json', {
-    body: Buffer.from(JSON.stringify(diagnostics.pageErrors, null, 2)),
-    contentType: 'application/json',
-  });
-  await testInfo.attach('console-errors.json', {
-    body: Buffer.from(JSON.stringify(diagnostics.consoleErrors, null, 2)),
-    contentType: 'application/json',
-  });
-};
-
 type SuspensionScenario = {
   authorContext: Awaited<ReturnType<Browser['newContext']>>;
   modContext: Awaited<ReturnType<Browser['newContext']>>;
   authorPage: Page;
   modPage: Page;
   discussionTitle: string;
-  authorDiagnostics: Diagnostics;
-  modDiagnostics: Diagnostics;
+  authorDiagnostics: DiagnosticsData;
+  modDiagnostics: DiagnosticsData;
 };
 
 const clickForumRulesCheckbox = async (page: Page) => {
@@ -136,8 +76,8 @@ const setupSuspensionScenario = async (
   const modContext = await browser.newContext();
   const authorPage = await authorContext.newPage();
   const modPage = await modContext.newPage();
-  const authorDiagnostics = createDiagnostics();
-  const modDiagnostics = createDiagnostics();
+  const authorDiagnostics = createDiagnosticsCollector();
+  const modDiagnostics = createDiagnosticsCollector();
 
   registerDiagnostics(authorPage, authorDiagnostics);
   registerDiagnostics(modPage, modDiagnostics);
@@ -199,20 +139,10 @@ test.describe('Suspended user permissions enforcement', () => {
     } finally {
       await scenario.authorContext.close();
       await scenario.modContext.close();
-      await attachDiagnostics(testInfo, {
-        pageErrors: [
-          ...scenario.authorDiagnostics.pageErrors,
-          ...scenario.modDiagnostics.pageErrors,
-        ],
-        consoleErrors: [
-          ...scenario.authorDiagnostics.consoleErrors,
-          ...scenario.modDiagnostics.consoleErrors,
-        ],
-        graphqlRequests: [
-          ...scenario.authorDiagnostics.graphqlRequests,
-          ...scenario.modDiagnostics.graphqlRequests,
-        ],
-      });
+      await attachDiagnostics(
+        testInfo,
+        mergeDiagnostics(scenario.authorDiagnostics, scenario.modDiagnostics)
+      );
     }
   });
 
@@ -246,20 +176,10 @@ test.describe('Suspended user permissions enforcement', () => {
     } finally {
       await scenario.authorContext.close();
       await scenario.modContext.close();
-      await attachDiagnostics(testInfo, {
-        pageErrors: [
-          ...scenario.authorDiagnostics.pageErrors,
-          ...scenario.modDiagnostics.pageErrors,
-        ],
-        consoleErrors: [
-          ...scenario.authorDiagnostics.consoleErrors,
-          ...scenario.modDiagnostics.consoleErrors,
-        ],
-        graphqlRequests: [
-          ...scenario.authorDiagnostics.graphqlRequests,
-          ...scenario.modDiagnostics.graphqlRequests,
-        ],
-      });
+      await attachDiagnostics(
+        testInfo,
+        mergeDiagnostics(scenario.authorDiagnostics, scenario.modDiagnostics)
+      );
     }
   });
 
@@ -286,20 +206,10 @@ test.describe('Suspended user permissions enforcement', () => {
     } finally {
       await scenario.authorContext.close();
       await scenario.modContext.close();
-      await attachDiagnostics(testInfo, {
-        pageErrors: [
-          ...scenario.authorDiagnostics.pageErrors,
-          ...scenario.modDiagnostics.pageErrors,
-        ],
-        consoleErrors: [
-          ...scenario.authorDiagnostics.consoleErrors,
-          ...scenario.modDiagnostics.consoleErrors,
-        ],
-        graphqlRequests: [
-          ...scenario.authorDiagnostics.graphqlRequests,
-          ...scenario.modDiagnostics.graphqlRequests,
-        ],
-      });
+      await attachDiagnostics(
+        testInfo,
+        mergeDiagnostics(scenario.authorDiagnostics, scenario.modDiagnostics)
+      );
     }
   });
 
@@ -342,20 +252,10 @@ test.describe('Suspended user permissions enforcement', () => {
     } finally {
       await scenario.authorContext.close();
       await scenario.modContext.close();
-      await attachDiagnostics(testInfo, {
-        pageErrors: [
-          ...scenario.authorDiagnostics.pageErrors,
-          ...scenario.modDiagnostics.pageErrors,
-        ],
-        consoleErrors: [
-          ...scenario.authorDiagnostics.consoleErrors,
-          ...scenario.modDiagnostics.consoleErrors,
-        ],
-        graphqlRequests: [
-          ...scenario.authorDiagnostics.graphqlRequests,
-          ...scenario.modDiagnostics.graphqlRequests,
-        ],
-      });
+      await attachDiagnostics(
+        testInfo,
+        mergeDiagnostics(scenario.authorDiagnostics, scenario.modDiagnostics)
+      );
     }
   });
 });
