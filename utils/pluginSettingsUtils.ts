@@ -22,10 +22,10 @@ export function extractSecretKeys(sections: PluginFormSection[]): Set<string> {
  * Returns a new object containing only non-secret settings.
  */
 export function filterOutSecrets(
-  settingsValues: Record<string, any>,
+  settingsValues: Record<string, unknown>,
   secretKeys: Set<string>
-): Record<string, any> {
-  const nonSecretSettings: Record<string, any> = {};
+): Record<string, unknown> {
+  const nonSecretSettings: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(settingsValues)) {
     if (!secretKeys.has(key)) {
       nonSecretSettings[key] = value;
@@ -39,7 +39,7 @@ export function filterOutSecrets(
  * Returns an array of { key, value } pairs for secrets that need to be saved.
  */
 export function getSecretsToSave(
-  settingsValues: Record<string, any>,
+  settingsValues: Record<string, unknown>,
   secretKeys: Set<string>
 ): Array<{ key: string; value: string }> {
   const secretsToSave: Array<{ key: string; value: string }> = [];

@@ -3,7 +3,7 @@ import CheckIcon from '@/components/icons/CheckIcon.vue';
 import XmarkIcon from '@/components/icons/XmarkIcon.vue';
 
 interface Props {
-  permissions: Record<string, any>;
+  permissions: Record<string, boolean | string | null | undefined>;
 }
 
 defineProps<Props>();

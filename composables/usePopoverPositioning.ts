@@ -16,7 +16,7 @@ type UsePopoverPositioningParams = {
   popoverRef: Ref<HTMLElement | null>;
   position: Ref<PopoverPosition>;
   isVisible: Ref<boolean>;
-  contentDependencies?: Ref<any>[];
+  contentDependencies?: Ref<unknown>[];
 };
 
 /**

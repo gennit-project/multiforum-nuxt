@@ -4,7 +4,7 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 import { GET_MOD_CHANNEL_ROLES } from '@/graphQLData/admin/queries';
 import { UPDATE_MOD_CHANNEL_ROLE } from '@/graphQLData/admin/mutations';
 
-type RoleRecord = Record<string, any> & {
+type RoleRecord = Record<string, boolean | string | null | undefined> & {
   name?: string | null;
   description?: string | null;
   channelUniqueName?: string | null;
