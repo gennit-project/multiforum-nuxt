@@ -1,9 +1,5 @@
 import type { LocationFilterTypes } from '@/components/event/list/filters/locationFilterTypes';
-import type {
-  LocationQuery,
-  Router,
-  RouteLocationNormalizedLoaded,
-} from 'vue-router';
+import type { LocationQuery } from 'vue-router';
 import type { Comment, Discussion, Event } from '@/__generated__/graphql';
 
 type FeedbackPermalinkInput = {
@@ -177,8 +173,17 @@ export type UpdateStateInput = {
 
 type UpdateFiltersInput = {
   params: UpdateStateInput;
-  router: Router;
-  route: RouteLocationNormalizedLoaded;
+  router: {
+    replace: (location: {
+      path: string;
+      query: LocationQuery;
+      force: true;
+    }) => unknown;
+  };
+  route: {
+    path: string;
+    query: LocationQuery;
+  };
 };
 
 export const updateFilters = (input: UpdateFiltersInput) => {
