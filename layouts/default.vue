@@ -42,7 +42,7 @@ const { isSessionExpired, loginWithRedirect } = useAuthManager();
 const shouldExposeTestHelpers =
   isDevRuntime ||
   config.environment === 'test' ||
-  (typeof window !== 'undefined' && (window as any).Cypress);
+  (typeof window !== 'undefined' && window.Cypress);
 
 if (shouldExposeTestHelpers) {
   useTestAuthHelpers();

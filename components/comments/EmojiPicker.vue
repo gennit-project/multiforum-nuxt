@@ -62,9 +62,20 @@ const props = defineProps({
   },
 });
 
-// Handle clicking an emoji and sending mutations based on comment or discussion ID
-function handleEmojiClick(event: any) {
+// Emoji data from vuemoji-picker
+interface EmojiData {
+  annotation?: string;
+  char?: string;
+}
 
+// Emoji click event from vuemoji-picker
+interface EmojiClickEvent {
+  unicode?: string;
+  emoji?: EmojiData;
+}
+
+// Handle clicking an emoji and sending mutations based on comment or discussion ID
+function handleEmojiClick(event: EmojiClickEvent) {
   if (!event) {
     console.error('No event data received in handleEmojiClick');
     return;

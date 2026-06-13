@@ -32,7 +32,13 @@ const channelId = computed(() => {
   return route.params.forumId;
 });
 
-const menuItems = [
+interface MenuItem {
+  text: string;
+  testId: string;
+  action: () => void;
+}
+
+const menuItems: MenuItem[] = [
   {
     text: '+ New Discussion',
     testId: 'create-discussion-menu-item',
@@ -95,7 +101,7 @@ const showFooter = computed(() => {
   );
 });
 
-const handleItemClick = (item: any) => {
+const handleItemClick = (item: MenuItem) => {
   item.action();
   isMenuOpen.value = false;
 };

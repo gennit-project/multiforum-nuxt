@@ -15,6 +15,30 @@ import {
 } from '@/graphQLData/mod/queries';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 
+// Cache query result types
+interface PendingOwnerInvite {
+  username?: string;
+}
+
+interface ChannelOwner {
+  username: string;
+  displayName?: string;
+}
+
+interface ChannelData {
+  PendingOwnerInvites?: PendingOwnerInvite[];
+  Admins?: ChannelOwner[];
+  [key: string]: unknown;
+}
+
+interface PendingOwnersQueryResult {
+  channels?: ChannelData[];
+}
+
+interface OwnersQueryResult {
+  channels?: Array<{ Admins?: ChannelOwner[] }>;
+}
+
 const route = useRoute();
 
 const newOwnerUsername = ref('');
@@ -36,15 +60,15 @@ const {
     // update the result of GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL
     // to add the newly invited user
 
-    const existingData: any = cache.readQuery({
+    const existingData = cache.readQuery({
       query: GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
       variables: {
         channelUniqueName: forumId.value,
       },
-    });
+    }) as PendingOwnersQueryResult | null;
 
     const existingInvites =
-      existingData?.channels[0]?.PendingOwnerInvites ?? [];
+      existingData?.channels?.[0]?.PendingOwnerInvites ?? [];
 
     cache.writeQuery({
       query: GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
@@ -54,7 +78,7 @@ const {
       data: {
         channels: [
           {
-            ...existingData.channels[0],
+            ...(existingData?.channels?.[0] ?? {}),
             PendingOwnerInvites: [
               ...existingInvites,
               {
@@ -76,17 +100,17 @@ const {
 } = useMutation(CANCEL_INVITE_FORUM_OWNER, {
   update: (cache) => {
     // update the result of GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL
-    // to add the newly invited user
+    // to remove the cancelled invite
 
-    const existingData: any = cache.readQuery({
+    const existingData = cache.readQuery({
       query: GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
       variables: {
         channelUniqueName: forumId.value,
       },
-    });
+    }) as PendingOwnersQueryResult | null;
 
     const existingInvites =
-      existingData?.channels[0]?.PendingOwnerInvites ?? [];
+      existingData?.channels?.[0]?.PendingOwnerInvites ?? [];
 
     cache.writeQuery({
       query: GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
@@ -98,7 +122,8 @@ const {
           {
             PendingOwnerInvites: [
               ...existingInvites.filter(
-                (invite: any) => invite.username !== newOwnerUsername.value
+                (invite: PendingOwnerInvite) =>
+                  invite.username !== newOwnerUsername.value
               ),
             ],
           },
@@ -118,14 +143,14 @@ const {
     // update the result of GET_CHANNEL_OWNERS_BY_CHANNEL
     // to remove the removed user
 
-    const existingData: any = cache.readQuery({
+    const existingData = cache.readQuery({
       query: GET_CHANNEL_OWNERS_BY_CHANNEL,
       variables: {
         channelUniqueName: forumId.value,
       },
-    });
+    }) as OwnersQueryResult | null;
 
-    const existingOwners = existingData?.channels[0]?.Admins ?? [];
+    const existingOwners = existingData?.channels?.[0]?.Admins ?? [];
 
     cache.writeQuery({
       query: GET_CHANNEL_OWNERS_BY_CHANNEL,
@@ -137,7 +162,7 @@ const {
           {
             Admins: [
               ...existingOwners.filter(
-                (owner: any) => owner.username !== newOwnerUsername.value
+                (owner: ChannelOwner) => owner.username !== newOwnerUsername.value
               ),
             ],
           },

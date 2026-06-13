@@ -50,7 +50,7 @@ const toast = useToast();
 const selectedVersion = ref<string>('');
 const secretValues = ref<Record<string, string>>({});
 const showSecretInputs = ref<Record<string, boolean>>({});
-const settingsValues = ref<Record<string, any>>({});
+const settingsValues = ref<Record<string, unknown>>({});
 const settingsErrors = ref<Record<string, string>>({});
 const savingSettings = ref(false);
 const installError = ref<string | null>(null);
@@ -75,14 +75,23 @@ interface PluginMetadata {
   tags?: string[];
 }
 
+interface PluginManifest {
+  ui?: {
+    forms?: {
+      server?: PluginFormSection[];
+    };
+  };
+  settingsDefaults?: Record<string, unknown>;
+}
+
 interface InstalledPlugin {
   plugin: PluginMetadata;
   version: string;
   scope: string;
   enabled: boolean;
-  settingsJson: any;
+  settingsJson: Record<string, unknown>;
   readmeMarkdown?: string;
-  manifest?: any;
+  manifest?: PluginManifest;
   hasUpdate?: boolean;
   latestVersion?: string;
   availableVersions?: string[];
@@ -119,9 +128,26 @@ const { mutate: enableMutation, loading: enabling } =
 const { mutate: setSecretMutation } = useMutation(SET_SERVER_PLUGIN_SECRET);
 
 // Core computed properties needed for secrets query
-const plugin = computed(() => {
+interface PluginFromQuery {
+  id: string;
+  name?: string;
+  displayName?: string;
+  description?: string;
+  authorName?: string;
+  authorUrl?: string;
+  homepage?: string;
+  license?: string;
+  tags?: string[];
+  Versions?: Array<{
+    version: string;
+    repoUrl?: string;
+    readmeMarkdown?: string;
+  }>;
+}
+
+const plugin = computed((): PluginFromQuery | undefined => {
   const plugins = pluginsResult.value?.plugins || [];
-  return plugins.find((p: any) => p.id === pluginId);
+  return plugins.find((p: PluginFromQuery) => p.id === pluginId);
 });
 
 const installedPlugin = computed((): InstalledPlugin | null => {
@@ -202,7 +228,7 @@ const pluginTags = computed(() => {
 // Get versions with full details from the plugin detail query
 const pluginDetailVersions = computed(() => {
   const plugins = pluginDetailResult.value?.plugins || [];
-  const pluginDetail = plugins.find((p: any) => p.id === pluginId);
+  const pluginDetail = plugins.find((p: PluginFromQuery) => p.id === pluginId);
   return pluginDetail?.Versions || [];
 });
 
@@ -215,7 +241,8 @@ const pluginReadme = computed(() => {
   // If not installed or no readme, try to get from the selected version in detail query
   if (selectedVersion.value && pluginDetailVersions.value.length > 0) {
     const versionDetail = pluginDetailVersions.value.find(
-      (v: any) => v.version === selectedVersion.value
+      (v: { version: string; readmeMarkdown?: string }) =>
+        v.version === selectedVersion.value
     );
     if (versionDetail?.readmeMarkdown) {
       return versionDetail.readmeMarkdown;
@@ -253,7 +280,7 @@ const pluginRepoUrl = computed(() => {
   // Get repo URL from the installed version or manifest
   const versions = plugin.value?.Versions || [];
   const currentVersion = versions.find(
-    (v: any) => v.version === installedVersion.value
+    (v) => v.version === installedVersion.value
   );
   return currentVersion?.repoUrl;
 });
@@ -268,7 +295,7 @@ const canEnable = computed(() => {
 
 const availableVersions = computed(() => {
   const versions = plugin.value?.Versions || [];
-  return [...versions].sort((a: any, b: any) =>
+  return [...versions].sort((a, b) =>
     compareVersionStrings(b.version, a.version)
   );
 });
@@ -284,7 +311,7 @@ const isSelectedVersionInstalled = computed(() => {
 const hasNewerVersions = computed(() => {
   if (!installedVersion.value) return true;
   return availableVersions.value.some(
-    (v: any) => v.version !== installedVersion.value
+    (v) => v.version !== installedVersion.value
   );
 });
 
@@ -321,7 +348,7 @@ watch(
       // If installed, default to installed version, otherwise first available
       else if (installedVersion.value) {
         selectedVersion.value = installedVersion.value;
-      } else {
+      } else if (versions[0]) {
         selectedVersion.value = versions[0].version;
       }
     }
@@ -374,7 +401,9 @@ const handleInstall = async (versionOverride?: string) => {
 
     // Check for GraphQL errors in the result
     if (result?.errors?.length) {
-      const errorMsg = result.errors.map((e: any) => e.message).join(', ');
+      const errorMsg = result.errors
+        .map((e: { message: string }) => e.message)
+        .join(', ');
       installError.value = `Installation failed: ${errorMsg}`;
       return;
     }
@@ -389,9 +418,9 @@ const handleInstall = async (versionOverride?: string) => {
     // Refetch data
     await refetchInstalled();
     await refetchSecrets();
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Install error:', err);
-    const errorMessage = err.message || '';
+    const errorMessage = err instanceof Error ? err.message : '';
 
     if (
       errorMessage.includes('PLUGIN_VERSION_NOT_FOUND') ||
@@ -434,15 +463,14 @@ const handleToggleEnabled = async (enabled: boolean) => {
       `Plugin ${plugin.value?.name} ${enabled ? 'enabled' : 'disabled'} successfully`
     );
     await refetchInstalled();
-  } catch (err: any) {
-    if (err.message.includes('Missing required secrets')) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '';
+    if (message.includes('Missing required secrets')) {
       toast.error('Cannot enable: missing required secrets');
-    } else if (
-      err.message.includes('PLUGIN_MISCONFIGURED_REQUIRED_SECRET_MISSING')
-    ) {
+    } else if (message.includes('PLUGIN_MISCONFIGURED_REQUIRED_SECRET_MISSING')) {
       toast.error('Plugin misconfigured: required secrets missing');
     } else {
-      toast.error(`${enabled ? 'Enable' : 'Disable'} failed: ${err.message}`);
+      toast.error(`${enabled ? 'Enable' : 'Disable'} failed: ${message || 'Unknown error'}`);
     }
   }
 };
@@ -465,8 +493,9 @@ const handleSetSecret = async (key: string, value: string) => {
 
     // Refetch secrets to update status
     await refetchSecrets();
-  } catch (err: any) {
-    toast.error(`Failed to set secret "${key}": ${err.message}`);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    toast.error(`Failed to set secret "${key}": ${message}`);
   }
 };
 
@@ -531,8 +560,9 @@ const handleSaveSettings = async () => {
 
     await refetchInstalled();
     await refetchSecrets();
-  } catch (err: any) {
-    toast.error(`Failed to save settings: ${err.message}`);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    toast.error(`Failed to save settings: ${message}`);
   } finally {
     savingSettings.value = false;
   }

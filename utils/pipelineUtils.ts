@@ -1,4 +1,13 @@
-import type { PipelineConfig, EventPipeline } from './pipelineSchema';
+import type {
+  PipelineConfig,
+  EventPipeline,
+  PipelineCondition,
+} from './pipelineSchema';
+import type {
+  BackendPipeline,
+  BackendPipelineStep,
+  InstalledPlugin,
+} from '@/types/plugin';
 
 /**
  * Plugin option for pipeline editor
@@ -26,28 +35,36 @@ export interface EventPipelineInput {
  * Parse pipelines from backend format to frontend PipelineConfig.
  * Handles JSON string parsing and field name transformation (pluginId → plugin).
  */
-export function parsePipelinesFromBackend(pipelines: any): PipelineConfig | undefined {
+export function parsePipelinesFromBackend(
+  pipelines: string | BackendPipeline[] | null | undefined
+): PipelineConfig | undefined {
+  let parsedPipelines: BackendPipeline[] | null = null;
+
   // Handle JSON string from Neo4j storage
   if (typeof pipelines === 'string') {
     try {
-      pipelines = JSON.parse(pipelines);
+      parsedPipelines = JSON.parse(pipelines) as BackendPipeline[];
     } catch {
       return undefined;
     }
+  } else if (Array.isArray(pipelines)) {
+    parsedPipelines = pipelines;
   }
 
-  if (pipelines && Array.isArray(pipelines)) {
+  if (parsedPipelines && Array.isArray(parsedPipelines)) {
     // Transform from backend format (pluginId) to frontend format (plugin)
-    const transformedPipelines = pipelines.map((pipeline: any) => ({
-      event: pipeline.event,
-      stopOnFirstFailure: pipeline.stopOnFirstFailure,
-      steps: (pipeline.steps || []).map((step: any) => ({
-        plugin: step.pluginId || step.plugin,
-        version: step.version,
-        condition: step.condition,
-        continueOnError: step.continueOnError,
-      })),
-    }));
+    const transformedPipelines: EventPipeline[] = parsedPipelines.map(
+      (pipeline: BackendPipeline) => ({
+        event: pipeline.event,
+        stopOnFirstFailure: pipeline.stopOnFirstFailure ?? false,
+        steps: (pipeline.steps || []).map((step: BackendPipelineStep) => ({
+          plugin: step.pluginId || step.plugin || '',
+          version: step.version,
+          condition: step.condition as PipelineCondition | undefined,
+          continueOnError: step.continueOnError,
+        })),
+      })
+    );
     return { pipelines: transformedPipelines };
   }
 
@@ -75,10 +92,12 @@ export function transformPipelinesForMutation(config: PipelineConfig): EventPipe
  * Extract available plugins from installed plugins list.
  * Filters to only enabled plugins and maps to PluginOption format.
  */
-export function getAvailablePluginsFromInstalled(installedPlugins: any[]): PluginOption[] {
+export function getAvailablePluginsFromInstalled(
+  installedPlugins: InstalledPlugin[]
+): PluginOption[] {
   return installedPlugins
-    .filter((p: any) => p.enabled)
-    .map((p: any) => ({
+    .filter((p: InstalledPlugin) => p.enabled)
+    .map((p: InstalledPlugin) => ({
       id: p.plugin.name,
       name: p.plugin.displayName || p.plugin.name,
     }));

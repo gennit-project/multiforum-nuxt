@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import type { Component } from 'vue';
 import { useRouter } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import type { RouteLocationAsRelativeGeneric } from 'vue-router';
@@ -32,7 +33,7 @@ const DEFAULT_LIMIT = 5;
 type NavigationItem = {
   name: string;
   href: string;
-  icon: any;
+  icon: Component;
   routerName: string;
 };
 

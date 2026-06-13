@@ -34,7 +34,7 @@ export default defineNuxtPlugin(() => {
     import.meta.env.DEV ||
     config.environment === 'test' ||
     import.meta.env.VITE_E2E_MOCK_MODE === 'true' ||
-    (typeof window !== 'undefined' && (window as any).Cypress);
+    (typeof window !== 'undefined' && window.Cypress);
 
   const setAuthStateDirect = (authState: {
     username?: string;
@@ -60,8 +60,8 @@ export default defineNuxtPlugin(() => {
 
   // Only expose debug functions in dev/test environments
   if (shouldExpose) {
-    (window as any).__SET_AUTH_STATE_DIRECT__ = setAuthStateDirect;
-    (window as any).__DEBUG_AUTH_STATE__ = () => ({
+    window.__SET_AUTH_STATE_DIRECT__ = setAuthStateDirect;
+    window.__DEBUG_AUTH_STATE__ = () => ({
       username: usernameVar.value,
       authenticated: isAuthenticatedVar.value,
       hasToken: !!localStorage.getItem('token'),

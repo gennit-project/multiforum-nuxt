@@ -407,7 +407,7 @@ const handleUpdateLocation = (event: UpdateLocationInput) => {
   });
 };
 
-const upload = async (file: any) => {
+const upload = async (file: File) => {
   if (!usernameVar.value) {
     console.error('No username found');
     return;

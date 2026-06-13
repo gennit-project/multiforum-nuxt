@@ -13,6 +13,43 @@ import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
+// Types for favorite downloads
+interface DiscussionChannel {
+  id: string;
+  channelUniqueName?: string;
+}
+
+interface AlbumImage {
+  id: string;
+  url?: string;
+  caption?: string;
+}
+
+interface FavoriteDownload {
+  id: string;
+  title: string;
+  body?: string;
+  createdAt: string;
+  updatedAt?: string;
+  hasDownload?: boolean;
+  hasSensitiveContent?: boolean;
+  Author?: {
+    username?: string;
+    displayName?: string;
+    profilePicURL?: string;
+    commentKarma?: number;
+    discussionKarma?: number;
+    createdAt?: string;
+  };
+  DiscussionChannels?: DiscussionChannel[];
+  Tags?: Array<{ text: string }>;
+  Album?: {
+    id: string;
+    imageOrder?: string[];
+    Images?: AlbumImage[];
+  };
+}
+
 useHead({
   title: 'Favorite Downloads - Library',
 });
@@ -88,8 +125,10 @@ const favoriteDownloads = computed(() => {
 });
 const { serverAdminUsernames } = useServerRoleMembership();
 
-const getDownloadLink = (download: any) => {
-  const firstChannel = safeArrayFirst(download.DiscussionChannels) as any;
+const getDownloadLink = (download: FavoriteDownload) => {
+  const firstChannel = safeArrayFirst(download.DiscussionChannels) as
+    | DiscussionChannel
+    | undefined;
   if (!firstChannel?.channelUniqueName) return '/';
 
   return `/forums/${firstChannel.channelUniqueName}/downloads/${download.id}`;
@@ -100,7 +139,7 @@ const getChannelLink = (channelUniqueName: string | undefined) => {
   return `/forums/${channelUniqueName}`;
 };
 
-const getAuthorInfo = (download: any) => {
+const getAuthorInfo = (download: FavoriteDownload) => {
   const author = download?.Author;
   if (!author) return null;
 
@@ -121,21 +160,21 @@ const getAuthorInfo = (download: any) => {
 };
 
 // Get the first image from the album if available
-const getFirstAlbumImage = (download: any) => {
+const getFirstAlbumImage = (download: FavoriteDownload): string | undefined => {
   const album = download?.Album;
-  if (!album?.Images?.length) return null;
+  if (!album?.Images?.length) return undefined;
 
   // If imageOrder exists and has items, use the first ordered image
   if (album.imageOrder?.length && album.imageOrder.length > 0) {
     const firstImageId = album.imageOrder[0];
     const orderedImage = album.Images.find(
-      (img: any) => img.id === firstImageId
+      (img: AlbumImage) => img.id === firstImageId
     );
-    return orderedImage?.url || null;
+    return orderedImage?.url;
   }
 
   // Fallback to first image in the Images array
-  return album.Images[0]?.url || null;
+  return album.Images[0]?.url;
 };
 </script>
 

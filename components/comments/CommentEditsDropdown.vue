@@ -5,6 +5,7 @@ import type {
   Comment,
   TextVersion,
   CommentAuthor,
+  User,
 } from '@/__generated__/graphql';
 import {
   usePopoverPositioning,
@@ -32,7 +33,7 @@ const popoverPosition = ref<PopoverPosition>({
 type EditItem = {
   id: string;
   author: string;
-  createdAt: any;
+  createdAt: string | null | undefined;
   isCurrent: boolean;
   oldVersionData: TextVersion | undefined;
   newVersionData: TextVersion;
@@ -86,12 +87,17 @@ const allEdits = computed(() => {
 
   if (props.comment?.PastVersions?.length) {
     // Create current version entry (as TextVersion structure)
+    // Note: CommentAuthor is a union type that may not match User exactly,
+    // but for display purposes we extract what we need
+    const commentWithAuthorConnection = props.comment as Comment & {
+      AuthorConnection?: TextVersion['AuthorConnection'];
+    };
     const currentVersion: TextVersion = {
       id: 'current',
       body: props.comment.text, // Current comment text
       createdAt: props.comment.updatedAt || props.comment.createdAt,
-      Author: props.comment.CommentAuthor as any, // Cast to User type which TextVersion expects
-      AuthorConnection: (props.comment as any).AuthorConnection || {
+      Author: props.comment.CommentAuthor as User | null | undefined,
+      AuthorConnection: commentWithAuthorConnection.AuthorConnection || {
         __typename: 'TextVersionAuthorConnection',
         edges: [],
         pageInfo: { hasNextPage: false, hasPreviousPage: false },

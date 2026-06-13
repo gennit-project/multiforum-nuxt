@@ -19,6 +19,15 @@ type Issue = GeneratedIssue & {
   LockedBy?: { displayName?: string };
 };
 
+// Cache query result types
+interface IssuesAggregateData {
+  issuesAggregate?: { count: number };
+}
+
+interface ChannelIssuesData {
+  channels?: Array<{ Issues: Issue[]; [key: string]: unknown }>;
+}
+
 type UseIssueCloseReopenParams = {
   activeIssueId: Ref<string> | ComputedRef<string>;
   activeIssue: Ref<Issue | null> | ComputedRef<Issue | null>;
@@ -57,13 +66,9 @@ export function useIssueCloseReopen({
           variables: { channelUniqueName: channelId.value },
         });
 
-        if (
-          existingClosedIssuesData &&
-          // @ts-ignore
-          existingClosedIssuesData.issuesAggregate
-        ) {
-          // @ts-ignore
-          const existingClosedIssues = existingClosedIssuesData.issuesAggregate;
+        const closedIssuesData = existingClosedIssuesData as IssuesAggregateData | null;
+        if (closedIssuesData?.issuesAggregate) {
+          const existingClosedIssues = closedIssuesData.issuesAggregate;
           const newClosedIssues = {
             count: existingClosedIssues.count + 1,
           };
@@ -84,13 +89,9 @@ export function useIssueCloseReopen({
           variables: { channelUniqueName: channelId.value },
         });
 
-        if (
-          existingOpenIssuesData &&
-          // @ts-ignore
-          existingOpenIssuesData.issuesAggregate
-        ) {
-          // @ts-ignore
-          const existingOpenIssues = existingOpenIssuesData.issuesAggregate;
+        const openIssuesData = existingOpenIssuesData as IssuesAggregateData | null;
+        if (openIssuesData?.issuesAggregate) {
+          const existingOpenIssues = openIssuesData.issuesAggregate;
           const newOpenIssues = {
             count: existingOpenIssues.count - 1,
           };
@@ -106,14 +107,13 @@ export function useIssueCloseReopen({
 
         // Also update the result of GET_ISSUES_BY_CHANNEL
         // to remove this issue from the list of open issues
-        const existingIssuesByChannelData: any = cache.readQuery({
+        const existingIssuesByChannelData = cache.readQuery({
           query: GET_ISSUES_BY_CHANNEL,
           variables: { channelUniqueName: channelId.value, searchInput: '' },
-        });
+        }) as ChannelIssuesData | null;
 
-        if (existingIssuesByChannelData?.channels) {
-          const existingIssuesByChannel =
-            existingIssuesByChannelData.channels[0];
+        if (existingIssuesByChannelData?.channels?.[0]) {
+          const existingIssuesByChannel = existingIssuesByChannelData.channels[0];
           const newIssuesByChannel = {
             ...existingIssuesByChannel,
             Issues: existingIssuesByChannel.Issues.filter(
@@ -132,19 +132,12 @@ export function useIssueCloseReopen({
 
         // Also update the result of GET_CLOSED_ISSUES_BY_CHANNEL
         // to add this issue to the list of closed issues
-        const existingClosedIssuesByChannelData: {
-          channels?: { Issues: Issue[] }[];
-        } | null = cache.readQuery({
+        const existingClosedIssuesByChannelData = cache.readQuery({
           query: GET_CLOSED_ISSUES_BY_CHANNEL,
           variables: { channelUniqueName: channelId.value },
-        });
+        }) as ChannelIssuesData | null;
 
-        if (
-          existingClosedIssuesByChannelData &&
-          // @ts-ignore
-          existingClosedIssuesByChannelData.channels
-        ) {
-          // @ts-ignore
+        if (existingClosedIssuesByChannelData?.channels) {
           const existingClosedIssuesByChannel =
             existingClosedIssuesByChannelData.channels[0];
           const newClosedIssuesByChannel = {
@@ -193,13 +186,9 @@ export function useIssueCloseReopen({
           variables: { channelUniqueName: channelId.value },
         });
 
-        if (
-          existingClosedIssuesData &&
-          // @ts-ignore
-          existingClosedIssuesData.issuesAggregate
-        ) {
-          // @ts-ignore
-          const existingClosedIssues = existingClosedIssuesData.issuesAggregate;
+        const closedIssuesData = existingClosedIssuesData as IssuesAggregateData | null;
+        if (closedIssuesData?.issuesAggregate) {
+          const existingClosedIssues = closedIssuesData.issuesAggregate;
           const newClosedIssues = {
             count: existingClosedIssues.count - 1,
           };
@@ -220,13 +209,9 @@ export function useIssueCloseReopen({
           variables: { channelUniqueName: channelId.value },
         });
 
-        if (
-          existingOpenIssuesData &&
-          // @ts-ignore
-          existingOpenIssuesData.issuesAggregate
-        ) {
-          // @ts-ignore
-          const existingOpenIssues = existingOpenIssuesData.issuesAggregate;
+        const openIssuesData = existingOpenIssuesData as IssuesAggregateData | null;
+        if (openIssuesData?.issuesAggregate) {
+          const existingOpenIssues = openIssuesData.issuesAggregate;
           const newOpenIssues = {
             count: existingOpenIssues.count + 1,
           };
@@ -243,19 +228,12 @@ export function useIssueCloseReopen({
         // Also update the result of GET_CLOSED_ISSUES_BY_CHANNEL
         // so that the newly reopened issue is removed from the list
         // of closed issues.
-        const existingClosedIssuesByChannelData: {
-          channels?: { Issues: Issue[] }[];
-        } | null = cache.readQuery({
+        const existingClosedIssuesByChannelData = cache.readQuery({
           query: GET_CLOSED_ISSUES_BY_CHANNEL,
           variables: { channelUniqueName: channelId.value },
-        });
+        }) as ChannelIssuesData | null;
 
-        if (
-          existingClosedIssuesByChannelData &&
-          // @ts-ignore
-          existingClosedIssuesByChannelData.channels
-        ) {
-          // @ts-ignore
+        if (existingClosedIssuesByChannelData?.channels) {
           const existingClosedIssuesByChannel =
             existingClosedIssuesByChannelData.channels[0];
           const newClosedIssuesByChannel = {
@@ -276,14 +254,13 @@ export function useIssueCloseReopen({
 
         // Also update the result of GET_ISSUES_BY_CHANNEL
         // to add this issue to the list of open issues
-        const existingIssuesByChannelData: any = cache.readQuery({
+        const existingIssuesByChannelData = cache.readQuery({
           query: GET_ISSUES_BY_CHANNEL,
           variables: { channelUniqueName: channelId.value, searchInput: '' },
-        });
+        }) as ChannelIssuesData | null;
 
-        if (existingIssuesByChannelData?.channels) {
-          const existingIssuesByChannel =
-            existingIssuesByChannelData.channels[0];
+        if (existingIssuesByChannelData?.channels?.[0]) {
+          const existingIssuesByChannel = existingIssuesByChannelData.channels[0];
           const newIssuesByChannel = {
             ...existingIssuesByChannel,
             Issues: [...existingIssuesByChannel.Issues, activeIssue.value],

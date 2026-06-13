@@ -4,6 +4,21 @@ import axios from 'axios';
 import LocationIcon from '@/components/icons/LocationIcon.vue';
 import { config } from '@/config';
 
+// OpenCage API location result type
+interface LocationResult {
+  formatted: string;
+  geometry: {
+    lat: number;
+    lng: number;
+  };
+  annotations?: {
+    DMS?: {
+      lat?: string;
+      lng?: string;
+    };
+  };
+}
+
 // Props
 const props = defineProps({
   autoFocus: {
@@ -53,7 +68,7 @@ const props = defineProps({
 });
 
 const searchQuery = ref(props.initialValue);
-const searchResults: any = ref([]);
+const searchResults = ref<LocationResult[]>([]);
 const apiKey = config.openCageApiKey;
 
 const searchLocations = async () => {
@@ -71,7 +86,7 @@ const searchLocations = async () => {
   }
 };
 
-const selectLocation = (location: any) => {
+const selectLocation = (location: LocationResult) => {
   const placeData = {
     formatted_address: location.formatted,
     name: location.formatted.split(',')[0],
@@ -119,7 +134,7 @@ const emit = defineEmits(['updateLocationInput', 'requestUserLocation']);
         >
           <li
             v-for="result in searchResults"
-            :key="result?.annotations?.DMS?.lat + result?.annotations?.DMS?.lng"
+            :key="`${result.geometry.lat}-${result.geometry.lng}`"
             class="cursor-pointer px-4 py-2 hover:bg-gray-100 hover:dark:bg-gray-800"
             @click="selectLocation(result)"
           >

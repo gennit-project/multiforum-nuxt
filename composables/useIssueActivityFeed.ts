@@ -26,16 +26,16 @@ export function useIssueActivityFeed({
   activityFeedLimit,
 }: UseIssueActivityFeedParams) {
   const createCacheUpdater = () => ({
-    // @ts-ignore - Apollo cache update typing is complex
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     update: (cache: any, { data }: any) => {
       if (!data?.updateIssues?.issues) return;
 
       const { issues } = data.updateIssues;
-      const updatedIssue: Issue = issues[0];
+      const updatedIssue = issues[0] as Issue | undefined;
       if (!updatedIssue) return;
 
       // Attempt to read the existing issues from the cache
-      const variables: Record<string, any> = {
+      const variables: Record<string, unknown> = {
         channelUniqueName: updatedIssue.channelUniqueName || channelId.value,
         issueNumber: updatedIssue.issueNumber,
       };

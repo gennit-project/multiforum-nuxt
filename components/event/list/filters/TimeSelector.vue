@@ -27,7 +27,7 @@ const toggleSelectTimeRange = (timeRange: HourRangeData) => {
 };
 
 const flattenHourRanges = () => {
-  const flattenedTimeFilters: any[] = [];
+  const flattenedTimeFilters: Array<{ startTimeHourOfDay: string }> = [];
   for (const timeSlot in workingCopyOfSelectedHourRanges.value) {
     if (workingCopyOfSelectedHourRanges.value[timeSlot]) {
       flattenedTimeFilters.push({

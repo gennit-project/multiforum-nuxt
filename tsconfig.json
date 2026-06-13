@@ -29,7 +29,6 @@
       "@nuxtjs/tailwindcss",
       "@nuxt/types",
       "@types/node",
-      "@nuxt/components",
       "@nuxt/schema"
     ],
     "paths": {

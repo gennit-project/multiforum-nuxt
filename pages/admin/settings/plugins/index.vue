@@ -43,7 +43,7 @@ interface PluginState {
     id: string;
     version: string;
     enabled: boolean;
-    settings: any;
+    settings: Record<string, unknown>;
   };
   availableVersions: PluginVersion[];
   hasUpdate?: boolean;
@@ -59,7 +59,7 @@ interface InstalledPlugin {
   version: string;
   scope: string;
   enabled: boolean;
-  settingsJson: any;
+  settingsJson: Record<string, unknown>;
   hasUpdate?: boolean;
   latestVersion?: string;
   availableVersions?: string[];
@@ -231,8 +231,9 @@ const allowPlugin = async (pluginId: string) => {
     await refetchPluginManagement();
     await refetchInstalledPlugins();
     toast.success('Plugin allowed successfully');
-  } catch (err: any) {
-    toast.error(`Error allowing plugin: ${err.message}`);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    toast.error(`Error allowing plugin: ${message}`);
   } finally {
     allowingPluginIds.value.delete(pluginId);
   }
@@ -249,8 +250,9 @@ const disallowPlugin = async (pluginId: string) => {
     await refetchPluginManagement();
     await refetchInstalledPlugins();
     toast.success('Plugin disallowed successfully');
-  } catch (err: any) {
-    toast.error(`Error disallowing plugin: ${err.message}`);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    toast.error(`Error disallowing plugin: ${message}`);
   } finally {
     disallowingPluginIds.value.delete(pluginId);
   }
