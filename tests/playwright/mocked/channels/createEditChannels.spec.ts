@@ -10,7 +10,10 @@ import {
   buildServerConfig,
 } from '../../helpers/graphqlFixtures';
 import { installMockAuth } from '../../helpers/mockAuth';
-import { installGraphqlMocks } from '../../helpers/mockGraphql';
+import {
+  installGraphqlMocks,
+  waitForGraphqlOperation,
+} from '../../helpers/mockGraphql';
 
 const TEST_CHANNEL = 'testChannel';
 const TEST_DESCRIPTION = 'Test description';
@@ -187,6 +190,7 @@ test('creates and edits a channel', async ({
 
     await page.getByTestId('title-input').fill(TEST_CHANNEL);
     await page.getByRole('button', { name: 'Save' }).first().click();
+    await waitForGraphqlOperation(diagnostics.completedOperations, 'createChannel');
     await expect(page).toHaveURL(`/forums/${TEST_CHANNEL}/discussions`);
     await expect(
       page.getByRole('link', { name: TEST_CHANNEL, exact: true }).first()
@@ -206,6 +210,7 @@ test('creates and edits a channel', async ({
     await expect(tagCheckbox).toBeChecked();
     await expect(tagPicker).toContainText(TEST_TAG);
     await page.getByRole('button', { name: 'Save' }).first().click();
+    await waitForGraphqlOperation(diagnostics.completedOperations, 'updateChannel');
 
     await expect(page.getByText('Your changes have been saved.')).toBeVisible();
     await expect(descriptionInput).toHaveValue(TEST_DESCRIPTION);
