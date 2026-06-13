@@ -7,16 +7,13 @@
 - `npm run test:playwright` - Run Playwright tests
 - `npm run test:unit` - Run unit tests with Vitest
 - `npm run test:playwright:mocked -- tests/playwright/mocked/discussions/createEditDeleteDiscussions.spec.ts` - Run a specific mocked Playwright test
-- `npm run test:playwright:stateful -- tests/playwright/stateful/discussions/**/*.spec.ts` - Run all stateful discussion tests
 - `npm run tsc` - Run TypeScript type checking
 - `npx eslint --fix path/to/file.vue` - Fix linting issues
 
 ## Playwright Testing (E2E)
 
-- Use `resetStatefulBackendData()` to initialize data once per test file
 - Use `installMockAuth()` to handle authentication for tests that need it
-- Prefer shared backend resets and fixtures over repeated per-test setup
-- **Server config naming**: The `VITE_SERVER_NAME` in `playwright.config.ts` must match the `serverName` in the seed data (`tests/playwright/seedData/rbac/seedServerConfig.ts`). If these don't match, the `GET_SERVER_CONFIG` query returns no results and default mod permissions (like `canReport`) won't be loaded.
+- All Playwright tests use mocked GraphQL responses (no backend required)
 
 ### Playwright Test Optimizations
 
@@ -209,32 +206,6 @@
 - Replace UI-based authentication (`loginUser()`) with this programmatic pattern
 - This pattern is faster and more reliable than UI-based authentication
 
-### Stateful Test Seed Data
-
-The stateful backend uses a two-phase approach for role connections:
-
-1. **Phase 1**: Create roles (ServerRoles, ModServerRoles, ChannelRoles, ModChannelRoles) via `seedDataForCypressTests`
-2. **Phase 2**: Connect roles to ServerConfig and Channels via separate mutations (`connectDefaultRolesToServerConfig`, `connectDefaultRolesToChannels`)
-
-This is necessary because roles cannot be connected during creation due to circular dependencies.
-
-**Role Type Requirements**:
-- `DefaultChannelRole` connects to a `ChannelRole` (user permissions)
-- `ElevatedModRole` connects to a `ModChannelRole` (moderator permissions)
-- Don't mix these - connecting a ChannelRole to ElevatedModRole will fail silently
-
-**Moderation Action Requirements**:
-- Users performing moderation actions (archive, report, etc.) must have a `ModerationProfile` with `displayName`
-- ModerationProfiles are auto-created by the backend when users are created via `createUsersWithEmails`
-- The displayName is auto-generated (e.g., "brainyBeefyFullRoom")
-- Channel admins bypass user permission checks but still need ModerationProfile for moderator actions
-
-**Known Issue - archiveComment**:
-- The `archiveComment` mutation may fail with "Cannot return null for non-nullable field Issue.id"
-- This happens when `Issue.create` fails silently in the resolver (returns `false` instead of throwing)
-- Root cause appears to be in the backend resolver at `archiveComment.js` lines 142-175
-- Tests for comment archiving are currently skipped until this backend issue is resolved
-
 ### Dynamic Test IDs in Modals
 
 Modals like `BrokenRulesModal.vue` use dynamic test IDs based on content type:
@@ -288,13 +259,6 @@ The application enforces suspensions at both channel and server levels. Suspensi
    - Which channel they're suspended in
    - What action was blocked
    - Reference to the related moderation issue
-
-#### Suspension-Related E2E Tests
-
-Tests for suspension functionality are covered in `tests/playwright/stateful/suspensions/`:
-
-- `suspendedUserPermissions.spec.ts` - Tests that suspended users can't create discussions, comments, or events
-- `serverLevelSuspension.spec.ts` - Tests that suspended users can't create new forums
 
 #### Unsuspension
 
