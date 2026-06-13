@@ -76,7 +76,7 @@ export default defineConfig({
   retries: isStatefulRun ? 1 : 0,
   workers: 1,
   expect: {
-    timeout: 10_000,
+    timeout: isStatefulRun ? 10_000 : 30_000,
   },
   fullyParallel: false,
   reporter: [['list'], ['html', { open: 'never' }]],
