@@ -1,56 +1,30 @@
-<script>
-import { defineComponent } from 'vue';
-import GenericModal from './GenericModal.vue';
+<script lang="ts" setup>
+import GenericModal from '@/components/GenericModal.vue';
 import ExclamationIcon from '@/components/icons/ExclamationIcon.vue';
 
-export default defineComponent({
-  components: {
-    GenericModal,
-    ExclamationIcon,
-  },
-  props: {
-    title: {
-      type: String,
-      require: true,
-      default: 'Are you sure?',
-    },
-    body: {
-      type: String,
-      require: true,
-      default: '',
-    },
-    open: {
-      type: Boolean,
-      default: false,
-    },
-    primaryButtonText: {
-      type: String,
-      default: 'Delete',
-    },
-    secondaryButtonText: {
-      type: String,
-      default: 'Cancel',
-    },
-    icon: {
-      type: String,
-      default: 'ExclamationIcon',
-    },
-    error: {
-      type: String,
-      default: '',
-    },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
-    dataTestid: {
-      type: String,
-      default: '',
-    },
-  },
-  setup() {},
+withDefaults(defineProps<{
+  title?: string;
+  body?: string;
+  open?: boolean;
+  primaryButtonText?: string;
+  secondaryButtonText?: string;
+  icon?: string;
+  error?: string;
+  loading?: boolean;
+  dataTestid?: string;
+}>(), {
+  title: 'Are you sure?',
+  body: '',
+  open: false,
+  primaryButtonText: 'Delete',
+  secondaryButtonText: 'Cancel',
+  icon: 'ExclamationIcon',
+  error: '',
+  loading: false,
+  dataTestid: '',
 });
 </script>
+
 <template>
   <GenericModal
     :data-testid="dataTestid"

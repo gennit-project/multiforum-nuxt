@@ -1,14 +1,7 @@
-<script>
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
 import SearchIcon from '@/components/icons/SearchIcon.vue';
-
-export default defineComponent({
-  components: {
-    SearchIcon,
-  },
-  setup() {},
-});
 </script>
+
 <template>
   <button
     type="button"
