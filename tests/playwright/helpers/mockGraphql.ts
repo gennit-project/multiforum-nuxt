@@ -1,3 +1,4 @@
+import { expect } from '@playwright/test';
 import type { Page, Route } from '@playwright/test';
 
 type GraphQLBody = {
@@ -12,6 +13,24 @@ export type GraphQLHandler = (input: {
 }) => unknown;
 
 export type GraphQLHandlers = Record<string, GraphQLHandler>;
+
+type CompletedOperation = {
+  operationName: string;
+  variables?: Record<string, unknown>;
+};
+
+export async function waitForGraphqlOperation(
+  operations: CompletedOperation[],
+  operationName: string
+) {
+  await expect
+    .poll(
+      () =>
+        operations.some(operation => operation.operationName === operationName),
+      { timeout: 10000 }
+    )
+    .toBe(true);
+}
 
 function summarizeConsoleError(text: string) {
   const apolloPrefix = 'An error occurred! For more details, see the full error text at ';
@@ -56,10 +75,7 @@ export async function installGraphqlMocks(
     operationName: string;
     variables?: Record<string, unknown>;
   }> = [];
-  const completedOperations: Array<{
-    operationName: string;
-    variables?: Record<string, unknown>;
-  }> = [];
+  const completedOperations: CompletedOperation[] = [];
   const pageErrors: string[] = [];
   const consoleErrors: string[] = [];
 

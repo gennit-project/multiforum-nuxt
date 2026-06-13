@@ -1,6 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { installMockAuth } from '../../helpers/mockAuth';
-import { installGraphqlMocks } from '../../helpers/mockGraphql';
+import {
+  installGraphqlMocks,
+  waitForGraphqlOperation,
+} from '../../helpers/mockGraphql';
 import {
   createCommentState,
   createCommentHandlers,
@@ -29,6 +32,7 @@ test('creates a root comment', async ({ context, page }, testInfo) => {
     await page.getByTestId('addComment').click();
     await page.getByTestId('texteditor-textarea').fill(ROOT_COMMENT_TEXT);
     await page.getByTestId('createCommentButton').click();
+    await waitForGraphqlOperation(diagnostics.completedOperations, 'createComment');
     await page.goto(discussionUrl);
     await expect(page.getByText(ROOT_COMMENT_TEXT)).toBeVisible();
 
