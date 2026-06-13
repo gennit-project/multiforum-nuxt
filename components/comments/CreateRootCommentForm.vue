@@ -41,6 +41,11 @@ const props = defineProps({
     required: false,
     default: true,
   },
+  allowImageUpload: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
   botSuggestions: {
     type: Array as PropType<BotSuggestion[]>,
     required: false,
@@ -158,6 +163,7 @@ const showCreateCommentError = computed(() => {
           :max-chars="MAX_CHARS_IN_COMMENT"
           :enable-bot-autocomplete="allowBotMentions"
           :bot-suggestions="botSuggestions"
+          :allow-image-upload="allowImageUpload"
           @update="emit('handleUpdateComment', $event)"
         />
         <div class="mt-3 flex justify-start">

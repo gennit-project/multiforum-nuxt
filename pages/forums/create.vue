@@ -31,6 +31,8 @@ const createChannelDefaultValues: CreateEditChannelFormValues = {
   downloadFilterGroups: [],
   eventsEnabled: true,
   feedbackEnabled: true,
+  imageUploadsEnabled: true,
+  emojiEnabled: true,
 };
 
 const formValues = ref<CreateEditChannelFormValues>(createChannelDefaultValues);
@@ -62,6 +64,8 @@ const createChannelInput = computed(() => {
       rules: JSON.stringify(formValues.value.rules),
       eventsEnabled: true,
       feedbackEnabled: true,
+      imageUploadsEnabled: true,
+      emojiEnabled: true,
       Tags: {
         connectOrCreate: tagConnections,
       },

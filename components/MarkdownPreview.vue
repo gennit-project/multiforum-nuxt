@@ -98,6 +98,7 @@ interface Props {
   botMentionForumId?: string;
   wordLimit?: number;
   imageMaxHeight?: string;
+  allowImages?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -106,6 +107,7 @@ const props = withDefaults(defineProps<Props>(), {
   botMentionForumId: '',
   wordLimit: 100,
   imageMaxHeight: '350px',
+  allowImages: true,
 });
 
 const uiStore = useUIStore();
@@ -169,6 +171,10 @@ const updateImageDimensions = (src: string) => {
 };
 
 watchEffect(() => {
+  if (!props.allowImages) {
+    embeddedImages.value = [];
+    return;
+  }
   const imageUrls = parseMarkdownForImages(props.text);
   imageUrls.forEach((imageUrl: GalleryItem) => {
     updateImageDimensions(imageUrl.src);
@@ -227,7 +233,7 @@ const handleClick = (event: MouseEvent) => {
 
   // Handle image clicks
   if (target.tagName === 'IMG') {
-    if (props.disableGallery) {
+    if (props.disableGallery || !props.allowImages) {
       return;
     }
     const clickedSrc = target.getAttribute('src');
@@ -276,9 +282,10 @@ const handleModalClose = () => {
   <div class="dark:text-white" @click="handleClick">
     <MarkdownRenderer
       :text="`${shownText}${!showFullText ? '...' : ''}`"
-      :class="[{ clickable: !disableGallery }]"
+      :class="[{ clickable: !disableGallery && allowImages }]"
       :font-size="fontSize"
       :image-max-height="imageMaxHeight"
+      :allow-images="allowImages"
       @click="handleImageClick"
     />
     <button

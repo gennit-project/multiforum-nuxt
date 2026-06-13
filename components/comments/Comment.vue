@@ -102,6 +102,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  enableEmoji: {
+    type: Boolean,
+    default: true,
+  },
   goToPermalinkOnClick: {
     type: Boolean,
     default: false,
@@ -605,6 +609,7 @@ const label = computed(() => {
                     :suspension-until="props.suspensionUntil"
                     :suspension-indefinitely="props.suspensionIndefinitely"
                     :enable-feedback="props.enableFeedback"
+                    :enable-emoji="props.enableEmoji"
                     :depth="props.depth"
                     :locked="props.locked"
                     :parent-comment-id="props.parentCommentId"
@@ -777,6 +782,7 @@ const label = computed(() => {
                 :suspension-until="props.suspensionUntil"
                 :suspension-indefinitely="props.suspensionIndefinitely"
                 :depth="props.depth + 1"
+                :enable-emoji="props.enableEmoji"
                 :locked="props.locked"
                 :parent-comment-id="props.commentData.id"
                 :comment-in-process="props.commentInProcess"

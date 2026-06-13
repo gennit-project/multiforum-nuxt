@@ -71,6 +71,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  enableEmoji: {
+    type: Boolean,
+    default: true,
+  },
   loading: {
     type: Boolean,
     default: false,
@@ -694,6 +698,7 @@ const replyHasBotMention = computed(() => {
               :suspension-until="suspensionUntil ?? undefined"
               :suspension-indefinitely="suspensionIndefinitely ?? false"
               :enable-feedback="enableFeedback"
+              :enable-emoji="enableEmoji"
               :depth="1"
               :locked="locked || archived"
               :comment-in-process="commentInProcess"

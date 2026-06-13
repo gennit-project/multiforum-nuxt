@@ -100,6 +100,11 @@ const props = defineProps({
     required: false,
     default: true,
   },
+  enableEmoji: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
   showNuxtPage: {
     type: Boolean,
     required: false,
@@ -492,6 +497,7 @@ const handleSubscriptionToggle = () => {
     :show-nuxt-page="effectiveShowNuxtPage"
     :answers="answers"
     :enable-feedback="enableFeedback"
+    :enable-emoji="enableEmoji"
     :bot-suggestions="botSuggestions"
     :bot-usernames="botUsernames"
     @decrement-comment-count="decrementCommentCount"

@@ -47,6 +47,8 @@ describe('CreateEditChannelFields', () => {
           downloadFilterGroups: [],
           eventsEnabled: true,
           feedbackEnabled: true,
+          imageUploadsEnabled: true,
+          emojiEnabled: true,
         },
         suspensionIssueNumber: 17,
         suspensionChannelId: 'cats',

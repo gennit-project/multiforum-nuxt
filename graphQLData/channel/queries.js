@@ -59,6 +59,8 @@ export const GET_CHANNEL = gql`
       wikiEnabled
       eventsEnabled
       feedbackEnabled
+      imageUploadsEnabled
+      emojiEnabled
       downloadsEnabled
       allowedFileTypes
       WikiHomePage {

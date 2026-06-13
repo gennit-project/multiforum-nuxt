@@ -17,6 +17,10 @@ const props = defineProps({
     type: Object as PropType<Discussion>,
     required: true,
   },
+  allowImageUpload: {
+    type: Boolean,
+    default: true,
+  },
 });
 const emit = defineEmits(['closeEditor']);
 
@@ -58,6 +62,7 @@ onDone(() => {
         :initial-value="formValues.body || ''"
         :placeholder="'Add details'"
         :rows="8"
+        :allow-image-upload="allowImageUpload"
         @update="formValues.body = $event"
       />
 

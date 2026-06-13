@@ -150,6 +150,18 @@ const tabs = computed(() => {
 
   baseTabs.push(
     {
+      key: 'images',
+      label: 'Images',
+      icon: null,
+      fontAwesome: 'fa-solid fa-image',
+    },
+    {
+      key: 'emoji',
+      label: 'Reactions',
+      icon: null,
+      fontAwesome: 'fa-regular fa-face-smile',
+    },
+    {
       key: 'feedback',
       label: 'Feedback',
       icon: AnnotationIcon,

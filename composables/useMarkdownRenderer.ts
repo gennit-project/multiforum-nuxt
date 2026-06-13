@@ -166,7 +166,10 @@ export function useMarkdownRenderer() {
    * Handles spoiler markup and wraps tables for responsive scrolling.
    * Sanitizes output with DOMPurify to prevent XSS attacks.
    */
-  function renderMarkdown(text: string): string {
+  function renderMarkdown(
+    text: string,
+    options: { allowImages?: boolean } = {}
+  ): string {
     // Preprocess text to handle spoiler markup before markdown processing
     const mentionLinkifiedText = linkifyUserMentions(text);
     const preprocessedText = mentionLinkifiedText.replace(
@@ -190,11 +193,15 @@ export function useMarkdownRenderer() {
     processedHTML = processedHTML.replace(/<\/table>/gi, '</table></div>');
 
     // Sanitize HTML to prevent XSS attacks while preserving safe markup
-    const sanitizedHTML = DOMPurify.sanitize(processedHTML, {
+    let sanitizedHTML = DOMPurify.sanitize(processedHTML, {
       ADD_ATTR: ['target', 'rel', 'data-external'],
       ADD_TAGS: ['iframe'],
       ALLOW_DATA_ATTR: false,
     });
+
+    if (options.allowImages === false) {
+      sanitizedHTML = sanitizedHTML.replace(/<img\b[^>]*>/gi, '');
+    }
 
     return sanitizedHTML;
   }

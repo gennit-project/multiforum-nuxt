@@ -52,6 +52,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  allowImageUpload: {
+    type: Boolean,
+    default: true,
+  },
 });
 const emit = defineEmits<{
   closeEditor: [];
@@ -296,7 +300,7 @@ function handleUpdateAlbum(newVals: AlbumFormData) {
 
       <AlbumEditor
         :form-values="formValues"
-        :allow-image-upload="true"
+        :allow-image-upload="allowImageUpload"
         :discussion-id="discussionIdInParams"
         :existing-album="props.discussion?.Album || undefined"
         @update-form-values="handleUpdateAlbum"

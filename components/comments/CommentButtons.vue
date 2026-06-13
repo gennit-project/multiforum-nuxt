@@ -27,6 +27,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  enableEmoji: {
+    type: Boolean,
+    default: true,
+  },
   depth: {
     type: Number,
     required: true,
@@ -179,7 +183,7 @@ function handleBlockedReaction() {
 <template>
   <div class="-mt-3 mb-4 w-full">
     <EmojiButtons
-      v-if="!locked"
+      v-if="enableEmoji && !locked"
       :key="commentData.emoji"
       class="mb-1"
       :comment-id="commentData.id"
@@ -211,6 +215,7 @@ function handleBlockedReaction() {
         @view-feedback="emit('handleViewFeedback')"
       />
       <NewEmojiButton
+        v-if="enableEmoji"
         :comment-id="commentData.id"
         :is-permalinked="isPermalinked"
         :is-marked-as-answer="isMarkedAsAnswer"

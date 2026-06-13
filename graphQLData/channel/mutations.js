@@ -30,6 +30,10 @@ export const UPDATE_CHANNEL = gql`
         channelIconURL
         channelBannerURL
         wikiEnabled
+        eventsEnabled
+        feedbackEnabled
+        imageUploadsEnabled
+        emojiEnabled
         downloadsEnabled
         allowedFileTypes
         Admins {

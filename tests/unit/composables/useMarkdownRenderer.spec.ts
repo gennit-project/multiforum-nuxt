@@ -29,6 +29,14 @@ describe('useMarkdownRenderer', () => {
       expect(result).toContain('<ul>');
     });
 
+    it('removes image tags when images are disabled', () => {
+      const result = renderMarkdown('![alt](https://example.com/cat.png)', {
+        allowImages: false,
+      });
+
+      expect(result).not.toContain('<img');
+    });
+
     it('renders ordered lists', () => {
       const result = renderMarkdown('1. first\n2. second');
 
