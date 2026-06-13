@@ -213,10 +213,7 @@ async function submitBasicSettings() {
     where: { username: usernameVar.value },
     update: basicUserUpdateInput.value,
   });
-  await refetchUser({
-    // @ts-ignore
-    username: usernameVar.value,
-  });
+  await refetchUser();
 }
 
 async function submitNotificationSettings() {
@@ -224,10 +221,7 @@ async function submitNotificationSettings() {
     where: { username: usernameVar.value },
     update: notificationUserUpdateInput.value,
   });
-  await refetchUser({
-    // @ts-ignore
-    username: usernameVar.value,
-  });
+  await refetchUser();
 }
 
 function updateBasicFormValues(data: Partial<EditAccountSettingsFormValues>) {

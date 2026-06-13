@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
+import type { LocationQuery } from 'vue-router';
 import { LocationFilterTypes } from './locationFilterTypes';
 import { getFilterValuesFromParams } from '@/components/event/list/filters/getEventFilterValuesFromParams';
 import type { SearchEventValues } from '@/types/Event';
@@ -42,14 +43,13 @@ const removeLocationFilter = () => {
   updateFilters({ locationFilter: undefined });
 };
 
-const updateFilters = (params: SearchEventValues) => {
+const updateFilters = (params: Partial<SearchEventValues>) => {
   const existingQuery = route.query;
   router.replace({
-    // @ts-ignore
     query: {
       ...existingQuery,
       ...params,
-    },
+    } as LocationQuery,
   });
 };
 

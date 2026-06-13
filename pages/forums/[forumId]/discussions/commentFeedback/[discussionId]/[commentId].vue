@@ -28,13 +28,12 @@ const {
   loading: getCommentLoading,
   fetchMore,
   onResult: onGetCommentDone,
-} = useQuery(GET_FEEDBACK_ON_COMMENT, {
-  // @ts-ignore
-  commentId: commentId,
+} = useQuery(GET_FEEDBACK_ON_COMMENT, () => ({
+  commentId: commentId.value,
   limit: PAGE_LIMIT,
-  offset: offset,
+  offset: offset.value,
   loggedInModName: modProfileNameVar.value,
-});
+}));
 
 const originalComment = computed<Comment | null>(() => {
   if (!getCommentResult.value || getCommentError.value) {
@@ -156,7 +155,6 @@ const feedbackCommentsAggregate = computed(() => {
 const loadMore = () => {
   fetchMore({
     variables: {
-      // @ts-ignore
       offset: feedbackComments.value.length,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {

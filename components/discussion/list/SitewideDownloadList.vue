@@ -123,9 +123,7 @@ const loadMore = () => {
         limit: DISCUSSION_PAGE_LIMIT,
         offset:
           discussionResult.value.getSiteWideDiscussionList.discussions.length,
-        // @ts-ignore
         sort: activeSort.value,
-        // @ts-ignore
         timeFrame: activeTimeFrame.value,
       },
     },

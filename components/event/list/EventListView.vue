@@ -89,8 +89,11 @@ const previewIsOpen = ref(false);
 const loadMore = () => {
   fetchMore({
     variables: {
-      // @ts-ignore
-      offset: eventResult.value?.events.length || 0,
+      options: {
+        limit: 25,
+        offset: eventResult.value?.events.length || 0,
+        sort: resultsOrder.value,
+      },
     },
     // Prevent cache clearing which causes content shift
     updateQuery: (previousResult, { fetchMoreResult }) => {
