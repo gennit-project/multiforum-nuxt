@@ -13,6 +13,39 @@ import { relativeTime } from '@/utils';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import type {
+  Discussion,
+  DiscussionChannel,
+  User,
+  Tag,
+  Album,
+  Image,
+  Channel,
+} from '@/__generated__/graphql';
+
+// Partial types matching the query shape (using generated types as base)
+type FavoriteDiscussionChannel = Pick<
+  DiscussionChannel,
+  'id' | 'channelUniqueName' | 'archived' | 'answered' | 'locked' | 'weightedVotesCount'
+> & {
+  Channel?: Pick<Channel, 'uniqueName' | 'displayName'> | null;
+  CommentsAggregate?: { count: number };
+};
+
+type FavoriteDiscussion = Pick<
+  Discussion,
+  'id' | 'title' | 'body' | 'createdAt' | 'updatedAt' | 'hasDownload' | 'hasSensitiveContent'
+> & {
+  Author?: Pick<
+    User,
+    'username' | 'displayName' | 'profilePicURL' | 'commentKarma' | 'discussionKarma' | 'createdAt'
+  > | null;
+  DiscussionChannels?: FavoriteDiscussionChannel[];
+  Tags?: Pick<Tag, 'text'>[];
+  Album?: Pick<Album, 'id'> & {
+    Images?: Pick<Image, 'id' | 'url' | 'caption'>[];
+  } | null;
+};
 
 // Lazy load the album component since it's not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(
@@ -102,8 +135,10 @@ const formatCount = (
   return `${value} ${value === 1 ? singular : plural}`;
 };
 
-const getDiscussionLink = (discussion: any) => {
-  const firstChannel = safeArrayFirst(discussion.DiscussionChannels) as any;
+const getDiscussionLink = (discussion: FavoriteDiscussion) => {
+  const firstChannel = safeArrayFirst(discussion.DiscussionChannels) as
+    | FavoriteDiscussionChannel
+    | undefined;
   if (!firstChannel?.channelUniqueName) return '/';
 
   return `/forums/${firstChannel.channelUniqueName}/discussions/${discussion.id}`;
@@ -114,13 +149,13 @@ const getChannelLink = (channelUniqueName: string | undefined) => {
   return `/forums/${channelUniqueName}`;
 };
 
-const getTotalCommentCount = (discussionChannels: any[]) => {
+const getTotalCommentCount = (discussionChannels: FavoriteDiscussionChannel[]) => {
   return discussionChannels.reduce((total, dc) => {
     return total + (dc.CommentsAggregate?.count || 0);
   }, 0);
 };
 
-const getAuthorInfo = (discussion: any) => {
+const getAuthorInfo = (discussion: FavoriteDiscussion) => {
   const author = discussion?.Author;
   if (!author) return null;
 
