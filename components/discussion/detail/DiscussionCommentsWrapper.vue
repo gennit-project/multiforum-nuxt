@@ -4,7 +4,7 @@ import type {
   CommentCreateInput,
   Comment as CommentType,
 } from '@/__generated__/graphql';
-import type { ApolloCache } from '@apollo/client/core';
+import type { ApolloCache, NormalizedCacheObject } from '@apollo/client/core';
 import type { PropType } from 'vue';
 import { computed, defineProps, ref, onMounted } from 'vue';
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
@@ -27,7 +27,7 @@ import { buildBotMentionOptions } from '@/utils/botMentions';
 const COMMENT_LIMIT = 50;
 
 type CommentSectionQueryUpdateInput = {
-  cache: ApolloCache<any>;
+  cache: ApolloCache<NormalizedCacheObject>;
   commentToDeleteId: string;
   commentToAddFeedbackTo?: CommentType;
   newFeedbackComment?: CommentType;

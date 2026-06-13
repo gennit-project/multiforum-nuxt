@@ -12,7 +12,7 @@ import PencilIcon from '@/components/icons/PencilIcon.vue';
 interface RoleNode {
   name?: string | null;
   description?: string | null;
-  [key: string]: any;
+  [key: string]: boolean | string | null | undefined;
 }
 
 interface RoleDefinition {
@@ -29,6 +29,7 @@ type RoleState = {
   values: Record<string, boolean>;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const props = defineProps<{
   serverConfig: Record<string, any> | null;
   title?: string;
