@@ -5,7 +5,7 @@ import GenericButton from '@/components/GenericButton.vue';
 import SaveButton from '@/components/SaveButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import Notification from '@/components/NotificationComponent.vue';
-import { ref, computed, watch, type PropType } from 'vue';
+import { ref, computed, watch, type PropType, type Component } from 'vue';
 import { timeAgo } from '@/utils';
 import type { Discussion, Issue, ModerationAction } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
@@ -31,7 +31,7 @@ import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 import SuspendModButton from '@/components/mod/SuspendModButton.vue';
 
-const actionTypeToIcon: Record<string, any> = {
+const actionTypeToIcon: Record<string, Component> = {
   [ActionType.Close]: XCircleIcon,
   [ActionType.Comment]: ChatBubbleBottomCenter,
   [ActionType.Remove]: XmarkIcon,
@@ -240,11 +240,23 @@ const usePassiveDescription = computed(() => {
   return !!actionPhrase.value;
 });
 
+import type { TextVersion } from '@/__generated__/graphql';
+
+// Version data compatible with RevisionDiffInline component
+interface VersionData {
+  id: string;
+  body?: string;
+  title?: string;
+  createdAt: string;
+  Author?: { username?: string } | null;
+  editReason?: string;
+}
+
 type DiscussionRevisionContent = {
   kind: 'title' | 'body';
   label: string;
-  oldVersion: any;
-  newVersion: any;
+  oldVersion: TextVersion | VersionData;
+  newVersion: TextVersion | VersionData;
 };
 
 const buildDiscussionRevisionContent = (

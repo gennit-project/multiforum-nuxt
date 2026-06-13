@@ -7,6 +7,7 @@ import type {
   DiscussionChannel,
   Tag,
 } from '@/__generated__/graphql';
+import type { DiscussionWithFavorited } from '@/types/Discussion';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import TagComponent from '@/components/TagComponent.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
@@ -344,7 +345,7 @@ const revealSensitiveContent = () => {
                 :allow-add-to-list="true"
                 :discussion-id="discussion.id"
                 :discussion-title="discussion.title"
-                :initial-is-favorited="(discussion as any).isFavorited"
+                :initial-is-favorited="(discussion as Discussion & DiscussionWithFavorited).isFavorited"
                 size="small"
               />
             </div>

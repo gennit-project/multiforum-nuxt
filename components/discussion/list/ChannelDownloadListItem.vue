@@ -13,6 +13,7 @@ import type {
   DiscussionChannel,
   Tag,
 } from '@/__generated__/graphql';
+import type { DiscussionChannelWithFavorited } from '@/types/Discussion';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
@@ -227,7 +228,7 @@ const filteredQuery = computed(() => {
                 :allow-add-to-list="true"
                 :discussion-id="discussion.id"
                 :discussion-title="discussion.title"
-                :initial-is-favorited="(discussionChannel as any).isFavorited"
+                :initial-is-favorited="(discussionChannel as DiscussionChannel & DiscussionChannelWithFavorited).isFavorited"
                 entity-name="Download"
                 size="small"
                 overlay-style

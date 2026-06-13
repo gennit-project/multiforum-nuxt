@@ -7,7 +7,9 @@ import type {
   Comment,
   DiscussionChannel,
   CommentCreateInput,
+  CommentSectionFormat,
 } from '@/__generated__/graphql';
+import type { NormalizedCacheObject } from '@apollo/client/core';
 import type { ApolloCache, FetchResult } from '@apollo/client/core';
 import { CREATE_COMMENT } from '@/graphQLData/comment/mutations';
 import { GET_DISCUSSION_COMMENTS } from '@/graphQLData/comment/queries';
@@ -161,7 +163,7 @@ const {
     createCommentInput: createCommentInput.value,
   },
 
-  update: (cache: ApolloCache<any>, result: FetchResult) => {
+  update: (cache: ApolloCache<NormalizedCacheObject>, result: FetchResult) => {
     // This is the logic for updating the cache
     // after creating a root comment. For the logic for updating
     // the cache after replying to a comment, see the CommentSection
@@ -221,7 +223,7 @@ const {
       const queryResult = cache.readQuery({
         query: GET_DISCUSSION_COMMENTS,
         variables: commentSectionQueryVariables,
-      }) as { getCommentSection: any } | null;
+      }) as { getCommentSection: CommentSectionFormat } | null;
 
       if (queryResult?.getCommentSection) {
         // Update the Comments array within getCommentSection
@@ -253,7 +255,7 @@ const {
               if (!existingSection) return existingSection;
 
               const existingComments =
-                (readField('Comments', existingSection) as any[]) || [];
+                (readField('Comments', existingSection) as Comment[]) || [];
               return {
                 ...existingSection,
                 Comments: [commentRef, ...existingComments],

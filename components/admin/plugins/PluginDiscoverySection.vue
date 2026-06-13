@@ -21,8 +21,9 @@ const refreshPlugins = async () => {
     await refreshPluginsMutation();
     toast.success('Plugins refreshed successfully');
     emit('refreshed');
-  } catch (err: any) {
-    toast.error(`Error refreshing plugins: ${err.message}`);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    toast.error(`Error refreshing plugins: ${message}`);
   }
 };
 </script>

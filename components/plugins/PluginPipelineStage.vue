@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, type Ref } from 'vue';
 import type { PipelineRun } from '@/composables/usePluginPipeline';
 import { usePluginPipeline } from '@/composables/usePluginPipeline';
 
@@ -13,8 +13,8 @@ const emit = defineEmits<{
 }>();
 
 const { formatDuration, getStatusInfo } = usePluginPipeline(
-  { value: null } as any,
-  { value: '' } as any,
+  ref(null) as Ref<string | null>,
+  ref('') as Ref<string>,
   { enabled: false }
 );
 

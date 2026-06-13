@@ -22,6 +22,7 @@ import WarningModal from '@/components/WarningModal.vue';
 import { relativeTime } from '@/utils';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import { usernameVar } from '@/cache';
+import type { Discussion, DiscussionChannel, Comment } from '@/__generated__/graphql';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
@@ -59,8 +60,8 @@ useHead({
   title: computed(() => `${collectionName.value} - Library`),
 });
 
-const getDiscussionLink = (discussion: any) => {
-  const firstChannel = safeArrayFirst(discussion.DiscussionChannels) as any;
+const getDiscussionLink = (discussion: Discussion) => {
+  const firstChannel = safeArrayFirst(discussion.DiscussionChannels) as DiscussionChannel | null;
   if (!firstChannel?.channelUniqueName) return '/';
 
   const isDownload =
@@ -72,23 +73,27 @@ const getDiscussionLink = (discussion: any) => {
   return `/forums/${firstChannel.channelUniqueName}/${basePath}/${discussion.id}`;
 };
 
-const getAuthorInfo = (item: any) => {
+const getAuthorInfo = (item: Discussion | Comment) => {
   // Comments use CommentAuthor, other types use Author
-  const author = item?.CommentAuthor || item?.Author;
+  const author = 'CommentAuthor' in item ? item.CommentAuthor : 'Author' in item ? item.Author : null;
   if (!author) return null;
 
+  // Check if author is a User (has username) vs ModerationProfile (only has displayName)
+  const isUser = 'username' in author && author.username;
+  const username = isUser ? author.username : '';
+
   const serverRoleBadge = getServerRoleBadge({
-    username: author.username,
+    username: username || undefined,
     adminUsernames: serverAdminUsernames.value,
   });
 
   return {
-    username: author.username || '',
+    username: username || '',
     displayName: author.displayName || '',
-    profilePicURL: author.profilePicURL || '',
-    commentKarma: author.commentKarma ?? 0,
-    discussionKarma: author.discussionKarma ?? 0,
-    createdAt: author.createdAt || '',
+    profilePicURL: isUser && 'profilePicURL' in author ? author.profilePicURL || '' : '',
+    commentKarma: isUser && 'commentKarma' in author ? author.commentKarma ?? 0 : 0,
+    discussionKarma: isUser && 'discussionKarma' in author ? author.discussionKarma ?? 0 : 0,
+    createdAt: isUser && 'createdAt' in author ? author.createdAt || '' : '',
     isAdmin: serverRoleBadge === 'serverAdmin',
   };
 };
@@ -195,9 +200,9 @@ const handleToggleVisibility = async () => {
       visibility: nextVisibility,
     });
     await refetchCollection();
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Error updating visibility:', err);
-    visibilityError.value = err?.message || 'Failed to update visibility.';
+    visibilityError.value = err instanceof Error ? err.message : 'Failed to update visibility.';
   } finally {
     visibilityUpdating.value = false;
   }
