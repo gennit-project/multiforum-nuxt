@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
+import type { LocationQuery } from 'vue-router';
 import { timeFilterShortcuts, timeShortcutValues } from './eventSearchOptions';
 import { getFilterValuesFromParams } from '@/components/event/list/filters/getEventFilterValuesFromParams';
 import type { SearchEventValues } from '@/types/Event';
@@ -46,17 +47,16 @@ watch(
 );
 
 // Methods
-const updateFilters = (params: SearchEventValues) => {
+const updateFilters = (params: Partial<SearchEventValues>) => {
   const existingQuery = route.query;
   // Updating the URL params causes the events
   // to be refetched by the EventListView
   // and MapView components
   router.replace({
-    // @ts-ignore
     query: {
       ...existingQuery,
       ...params,
-    },
+    } as LocationQuery,
   });
 };
 

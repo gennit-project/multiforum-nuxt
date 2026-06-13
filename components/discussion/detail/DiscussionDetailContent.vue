@@ -133,7 +133,6 @@ const discussion = computed<Discussion | null>(() => {
 });
 
 watch(commentSort, () =>
-  // @ts-ignore - the sort is correctly typed.
   fetchMoreComments({ variables: { sort: commentSort.value } })
 );
 

@@ -1,4 +1,5 @@
 import type { LocationQuery } from 'vue-router';
+import { SortType, TimeFrame } from '@/__generated__/graphql';
 
 export const availableSortTypes: Record<string, string> = {
   HOT: 'hot',
@@ -30,30 +31,31 @@ export const capitalizeCase = function (str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
-export const getSortFromQuery = function (query: LocationQuery): string {
+const validSortTypes = new Set<string>(Object.values(SortType));
+const validTimeFrames = new Set<string>(Object.values(TimeFrame));
+
+export const getSortFromQuery = function (query: LocationQuery): SortType {
   // Need to re-clean data when route values change
   // Take the default filter values from the query
   // in the URL if the values exist.
-  let sort = commentSortTypes.HOT;
-  if (query) {
-    if (typeof query.sort === 'string') {
-      sort = query.sort;
-      return sort;
+  if (query && typeof query.sort === 'string') {
+    const sortValue = query.sort.toLowerCase();
+    if (validSortTypes.has(sortValue)) {
+      return sortValue as SortType;
     }
   }
-  return commentSortTypes.HOT.toLowerCase();
+  return SortType.Hot;
 };
 
-export const getTimeFrameFromQuery = function (query: LocationQuery): string {
+export const getTimeFrameFromQuery = function (query: LocationQuery): TimeFrame {
   // Need to re-clean data when route values change
   // Take the default filter values from the query
   // in the URL if the values exist.
-  let timeFrame = topSortTypes.TOP_ALL;
-  if (query) {
-    if (typeof query.timeFrame === 'string') {
-      timeFrame = query.timeFrame;
-      return timeFrame;
+  if (query && typeof query.timeFrame === 'string') {
+    const timeFrameValue = query.timeFrame.toLowerCase();
+    if (validTimeFrames.has(timeFrameValue)) {
+      return timeFrameValue as TimeFrame;
     }
   }
-  return topSortTypes.TOP_MONTH.toLowerCase();
+  return TimeFrame.Month;
 };

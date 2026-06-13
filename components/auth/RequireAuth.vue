@@ -303,7 +303,6 @@ if (import.meta.env.SSR === false) {
 
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-      // @ts-ignore
       if (window?.parent?.Cypress || isMobile) {
         // Make sure to return early after redirect to prevent additional actions
         await loginWithRedirect();

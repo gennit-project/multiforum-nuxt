@@ -46,12 +46,11 @@ type FileChangeInput = {
   fieldName: string;
 };
 
-const titleInputRef = ref(null);
+const titleInputRef = ref<HTMLInputElement | null>(null);
 
 nextTick(() => {
   if (titleInputRef.value) {
-    // @ts-ignore - titleInputRef is not null
-    titleInputRef.value?.focus();
+    titleInputRef.value.focus();
   }
 });
 

@@ -109,9 +109,7 @@ const loadMore = () => {
         offset:
           discussionChannelResult.value?.getDiscussionsInChannel
             .discussionChannels.length,
-        // @ts-ignore
         sort: activeSort.value,
-        // @ts-ignore
         timeFrame: activeTimeFrame.value,
       },
     },
