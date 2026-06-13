@@ -63,6 +63,10 @@ const hasAlbum = computed(() => {
 
   return hasImages || hasStlFiles;
 });
+
+const imageUploadsEnabled = computed(
+  () => props.activeDiscussionChannel?.Channel?.imageUploadsEnabled !== false
+);
 </script>
 
 <template>
@@ -80,11 +84,12 @@ const hasAlbum = computed(() => {
         :download-mode="true"
         :emoji-json="activeDiscussionChannel?.emoji"
         :show-emoji-button="false"
+        :allow-images="imageUploadsEnabled"
       >
         <template #album-slot>
           <div class="mt-1 overflow-hidden rounded-lg bg-black text-white">
             <DiscussionAlbum
-              v-if="hasAlbum"
+              v-if="hasAlbum && imageUploadsEnabled"
               :album="discussion?.Album || null"
               :carousel-format="true"
               :expanded-view="true"
@@ -102,7 +107,7 @@ const hasAlbum = computed(() => {
               <div class="flex flex-col items-center space-y-3">
                 <span v-if="!loggedInUserIsAuthor">No images available.</span>
                 <button
-                  v-if="loggedInUserIsAuthor && usernameVar"
+                  v-if="loggedInUserIsAuthor && usernameVar && imageUploadsEnabled"
                   class="flex items-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-blue-700"
                   data-testid="add-album-button"
                   @click="emit('handleClickAddAlbum')"

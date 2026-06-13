@@ -84,6 +84,10 @@ const createCommentDefaultValues = {
 
 const createFormValues = ref(createCommentDefaultValues);
 
+const imageUploadsEnabled = computed(
+  () => props.discussionChannel?.Channel?.imageUploadsEnabled !== false
+);
+
 const createCommentInput = computed((): CommentCreateInput[] => {
   const input: CommentCreateInput = {
     isRootComment: true,
@@ -375,6 +379,7 @@ const handleUpdateComment = (event: string) => {
         :create-comment-loading="createCommentLoading"
         :create-comment-error="createCommentError"
         :bot-suggestions="botSuggestions"
+        :allow-image-upload="imageUploadsEnabled"
         :suspension-issue-number="
           showSuspensionNotice ? suspensionIssueNumber ?? undefined : undefined
         "

@@ -285,6 +285,9 @@ export const GET_DISCUSSION = gql`
           uniqueName
           channelIconURL
           displayName
+          feedbackEnabled
+          imageUploadsEnabled
+          emojiEnabled
         }
         Discussion {
           id

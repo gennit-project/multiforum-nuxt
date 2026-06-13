@@ -79,10 +79,37 @@ describe('CommentButtons', () => {
       },
     });
 
-    expect(wrapper.find('[data-testid="suspension-notice"]').exists()).toBe(false);
-
     await wrapper.find('[data-testid="new-emoji"]').trigger('click');
 
     expect(wrapper.find('[data-testid="suspension-notice"]').exists()).toBe(true);
+  });
+
+  it('hides emoji controls when emoji reactions are disabled', () => {
+    const wrapper = mount(CommentButtons, {
+      props: {
+        ...baseProps,
+        enableEmoji: false,
+      },
+      global: {
+        stubs: {
+          VoteButtons: { template: '<div />' },
+          ReplyButton: { template: '<div />' },
+          SaveButton: { template: '<div />' },
+          TextEditor: { template: '<div />' },
+          CancelButton: { template: '<div />' },
+          AddToCommentFavorites: { template: '<div />' },
+          ErrorBanner: { template: '<div />' },
+          EmojiButtons: {
+            template: '<button data-testid="emoji-chip"></button>',
+          },
+          NewEmojiButton: {
+            template: '<button data-testid="new-emoji"></button>',
+          },
+          SuspensionNotice: { template: '<div />' },
+        },
+      },
+    });
+
+    expect(wrapper.find('[data-testid="new-emoji"]').exists()).toBe(false);
   });
 });

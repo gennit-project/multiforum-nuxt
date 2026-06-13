@@ -278,6 +278,10 @@ const commentCount = computed(
   () => activeDiscussionChannel.value?.CommentsAggregate?.count || 0
 );
 
+const imageUploadsEnabled = computed(
+  () => activeDiscussionChannel.value?.Channel?.imageUploadsEnabled !== false
+);
+
 const aggregateCommentCount = computed(() => {
   return (
     getDiscussionChannelCommentAggregateResult.value?.discussionChannels[0]
@@ -348,10 +352,16 @@ const handleClickEditDiscussionBody = () => {
 };
 
 const handleClickAddAlbum = () => {
+  if (!imageUploadsEnabled.value) {
+    return;
+  }
   albumEditMode.value = true;
 };
 
 const handleEditAlbum = () => {
+  if (!imageUploadsEnabled.value) {
+    return;
+  }
   albumEditMode.value = true;
 };
 </script>
@@ -478,11 +488,13 @@ const handleEditAlbum = () => {
                 <DiscussionBodyEditForm
                   v-if="discussionBodyEditMode"
                   :discussion="discussion"
+                  :allow-image-upload="imageUploadsEnabled"
                   @close-editor="discussionBodyEditMode = false"
                 />
                 <AlbumEditForm
                   v-else-if="albumEditMode"
                   :discussion="discussion"
+                  :allow-image-upload="imageUploadsEnabled"
                   @close-editor="albumEditMode = false"
                 />
                 <DiscussionLayoutManager
@@ -520,6 +532,9 @@ const handleEditAlbum = () => {
               :channel-id="channelId"
               :enable-feedback="
                 activeDiscussionChannel?.Channel?.feedbackEnabled ?? true
+              "
+              :enable-emoji="
+                activeDiscussionChannel?.Channel?.emojiEnabled ?? true
               "
               :loading="getDiscussionChannelLoading"
               :locked="locked"

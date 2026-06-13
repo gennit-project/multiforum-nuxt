@@ -1,0 +1,27 @@
+<script setup lang="ts">
+import CheckBox from '@/components/CheckBox.vue';
+
+defineProps({
+  formValues: {
+    type: Object,
+    required: true,
+  },
+});
+
+const emit = defineEmits(['updateFormValues']);
+
+const updateImageUploadsEnabled = (enabled: boolean) => {
+  emit('updateFormValues', { imageUploadsEnabled: enabled });
+};
+</script>
+
+<template>
+  <div class="space-y-4">
+    <CheckBox
+      id="image-uploads-enabled"
+      :checked="formValues.imageUploadsEnabled !== false"
+      :label="'Enable image uploads and image rendering for this forum'"
+      @update="updateImageUploadsEnabled"
+    />
+  </div>
+</template>

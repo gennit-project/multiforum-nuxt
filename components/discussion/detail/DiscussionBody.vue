@@ -57,6 +57,11 @@ const props = defineProps({
     required: false,
     default: true,
   },
+  allowImages: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
   shaded: {
     type: Boolean,
     required: false,
@@ -188,7 +193,11 @@ function handleBlockedReaction() {
       class="rounded"
       :class="[shaded ? 'bg-gray-100 dark:bg-gray-700' : '']"
     >
-      <MarkdownPreview :text="bodyText" :disable-gallery="false" />
+      <MarkdownPreview
+        :text="bodyText"
+        :disable-gallery="false"
+        :allow-images="allowImages"
+      />
     </div>
 
     <!-- Album slot (hidden when sensitive and not revealed) -->

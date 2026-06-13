@@ -23,11 +23,17 @@ const props = defineProps({
     type: String,
     default: '350px',
   },
+  allowImages: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const { renderMarkdown } = useMarkdownRenderer();
 
-const renderedMarkdown = computed(() => renderMarkdown(props.text));
+const renderedMarkdown = computed(() =>
+  renderMarkdown(props.text, { allowImages: props.allowImages })
+);
 
 const containerStyle = computed(() => {
   return {

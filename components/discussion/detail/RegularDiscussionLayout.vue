@@ -65,6 +65,14 @@ const hasAlbum = computed(() => {
 
   return hasImages || hasStlFiles;
 });
+
+const imageUploadsEnabled = computed(
+  () => props.activeDiscussionChannel?.Channel?.imageUploadsEnabled !== false
+);
+
+const emojiEnabled = computed(
+  () => props.activeDiscussionChannel?.Channel?.emojiEnabled !== false
+);
 </script>
 
 <template>
@@ -80,14 +88,15 @@ const hasAlbum = computed(() => {
       :discussion-channel-id="activeDiscussionChannel?.id"
       :download-mode="false"
       :emoji-json="activeDiscussionChannel?.emoji"
-      :show-emoji-button="true"
+      :show-emoji-button="emojiEnabled"
+      :allow-images="imageUploadsEnabled"
     >
       <template #album-slot>
         <div
           class="mt-1 w-full min-w-0 overflow-hidden rounded-lg bg-black text-white"
         >
           <DiscussionAlbum
-            v-if="hasAlbum"
+            v-if="hasAlbum && imageUploadsEnabled"
             :album="discussion?.Album || null"
             :carousel-format="true"
             :expanded-view="true"
@@ -126,7 +135,7 @@ const hasAlbum = computed(() => {
             v-if="activeDiscussionChannel"
             :discussion="discussion"
             :discussion-channel="activeDiscussionChannel"
-            :show-emoji-button="true"
+            :show-emoji-button="emojiEnabled"
             :show-downvote="
               !loggedInUserIsAuthor &&
               (activeDiscussionChannel?.Channel?.feedbackEnabled ?? true)

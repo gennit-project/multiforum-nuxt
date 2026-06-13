@@ -18,4 +18,6 @@ export type CreateEditChannelFormValues = {
   downloadFilterGroups: Array<FilterGroup>;
   eventsEnabled: boolean;
   feedbackEnabled: boolean;
+  imageUploadsEnabled: boolean;
+  emojiEnabled: boolean;
 };

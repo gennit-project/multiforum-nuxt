@@ -69,7 +69,7 @@ const showChannelTabs = computed(() => {
     routeName.startsWith('forums-forumId-edit') &&
     (routeName === 'forums-forumId-edit' ||
       routeName.match(
-        /^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|events|downloads|feedback|wiki-settings|pipelines|plugins(-pluginId)?)$/
+        /^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|events|downloads|images|emoji|feedback|wiki-settings|pipelines|plugins(-pluginId)?)$/
       ));
 
   // Only hide tabs for content editing (discussions, events, etc), not forum settings

@@ -151,6 +151,8 @@ export const GET_DISCUSSION_COMMENTS = gql`
         Channel {
           uniqueName
           feedbackEnabled
+          imageUploadsEnabled
+          emojiEnabled
           Bots {
             username
             displayName
