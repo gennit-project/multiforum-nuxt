@@ -1,31 +1,16 @@
-<script lang="ts">
-import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import type { Channel as ChannelData } from '@/__generated__/graphql';
 import Tag from '../../TagComponent.vue';
 
-export default defineComponent({
-  name: 'CrosspostList',
-  components: { Tag },
-  props: {
-    channelLinks: {
-      type: Array as PropType<ChannelData[]>,
-      default: () => {
-        return [];
-      },
-    },
-    discussionId: {
-      type: String,
-      required: true,
-    },
-    getCommentCount: {
-      type: Function,
-      default: () => {
-        return 0;
-      },
-    },
-  },
-  setup() {},
+interface Props {
+  channelLinks?: ChannelData[];
+  discussionId: string;
+  getCommentCount?: (channelId: string) => number;
+}
+
+withDefaults(defineProps<Props>(), {
+  channelLinks: () => [],
+  getCommentCount: () => 0,
 });
 </script>
 

@@ -128,7 +128,7 @@ const tabs = computed((): Tab[] => {
         v-for="tab in tabs"
         :key="tab.name"
         :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
-        :to="tabRoutes[tab.name]"
+        :to="tabRoutes[tab.name] || ''"
         :label="tab.label"
         :is-active="route.path.includes(tab.routeSuffix)"
         :vertical="vertical"

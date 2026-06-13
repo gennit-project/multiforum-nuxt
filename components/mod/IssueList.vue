@@ -1,5 +1,5 @@
-<script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue';
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue';
 import type { Issue } from '@/__generated__/graphql';
 import { useUIStore } from '@/stores/uiStore';
 import { GET_ISSUES_BY_CHANNEL } from '@/graphQLData/issue/queries';
@@ -11,99 +11,81 @@ import SearchBar from '@/components/SearchBar.vue';
 import ModIssueListItem from './ModIssueListItem.vue';
 import { storeToRefs } from 'pinia';
 
-export default defineComponent({
-  components: {
-    ModIssueListItem,
-    SearchBar,
-  },
-  setup() {
-    const uiStore = useUIStore();
-    const { selectedIssueNumber } = storeToRefs(uiStore);
-    const route = useRoute();
-    const router = useRouter();
+const uiStore = useUIStore();
+const { selectedIssueNumber } = storeToRefs(uiStore);
+const route = useRoute();
+const router = useRouter();
 
-    const channelId = computed(() => {
-      if (typeof route.params.forumId !== 'string') {
-        return '';
-      }
-      return route.params.forumId;
-    });
-
-    const searchInput = ref(
-      typeof route.query.searchInput === 'string' ? route.query.searchInput : ''
-    );
-
-    const queryVariables = computed(() => ({
-      channelUniqueName: channelId.value,
-      searchInput: createCaseInsensitivePattern(searchInput.value) || '.*',
-    }));
-
-    const {
-      result: getIssuesByChannelResult,
-      error: getIssuesByChannelError,
-      loading: getIssuesByChannelLoading,
-      refetch: refetchIssuesByChannel,
-    } = useQuery(GET_ISSUES_BY_CHANNEL, queryVariables);
-
-    const issues = computed<Issue[]>(() => {
-      if (getIssuesByChannelLoading.value || getIssuesByChannelError.value) {
-        return [];
-      }
-      const channelData = getIssuesByChannelResult.value?.channels?.[0];
-
-      if (!channelData || !channelData.Issues) {
-        return [];
-      }
-      return channelData.Issues;
-    });
-
-    const updateSearchInput = (value: string) => {
-      updateFilters({
-        router,
-        route,
-        params: { searchInput: value },
-      });
-    };
-
-    const handleSelectIssue = (payload: {
-      issueNumber: number;
-      title: string;
-      channelId: string;
-    }) => {
-      uiStore.setSelectedIssueSelection(payload);
-    };
-
-    watch(
-      () => route.query,
-      () => {
-        searchInput.value =
-          typeof route.query.searchInput === 'string'
-            ? route.query.searchInput
-            : '';
-        refetchIssuesByChannel(queryVariables.value);
-      }
-    );
-
-    watch(
-      channelId,
-      (newChannelId, oldChannelId) => {
-        if (newChannelId !== oldChannelId) {
-          uiStore.clearSelectedIssueSelection();
-        }
-      }
-    );
-
-    return {
-      channelId,
-      issues,
-      getIssuesByChannelLoading,
-      searchInput,
-      updateSearchInput,
-      handleSelectIssue,
-      selectedIssueNumber,
-    };
-  },
+const channelId = computed(() => {
+  if (typeof route.params.forumId !== 'string') {
+    return '';
+  }
+  return route.params.forumId;
 });
+
+const searchInput = ref(
+  typeof route.query.searchInput === 'string' ? route.query.searchInput : ''
+);
+
+const queryVariables = computed(() => ({
+  channelUniqueName: channelId.value,
+  searchInput: createCaseInsensitivePattern(searchInput.value) || '.*',
+}));
+
+const {
+  result: getIssuesByChannelResult,
+  error: getIssuesByChannelError,
+  loading: getIssuesByChannelLoading,
+  refetch: refetchIssuesByChannel,
+} = useQuery(GET_ISSUES_BY_CHANNEL, queryVariables);
+
+const issues = computed<Issue[]>(() => {
+  if (getIssuesByChannelLoading.value || getIssuesByChannelError.value) {
+    return [];
+  }
+  const channelData = getIssuesByChannelResult.value?.channels?.[0];
+
+  if (!channelData || !channelData.Issues) {
+    return [];
+  }
+  return channelData.Issues;
+});
+
+const updateSearchInput = (value: string) => {
+  updateFilters({
+    router,
+    route,
+    params: { searchInput: value },
+  });
+};
+
+const handleSelectIssue = (payload: {
+  issueNumber: number;
+  title: string;
+  channelId: string;
+}) => {
+  uiStore.setSelectedIssueSelection(payload);
+};
+
+watch(
+  () => route.query,
+  () => {
+    searchInput.value =
+      typeof route.query.searchInput === 'string'
+        ? route.query.searchInput
+        : '';
+    refetchIssuesByChannel(queryVariables.value);
+  }
+);
+
+watch(
+  channelId,
+  (newChannelId, oldChannelId) => {
+    if (newChannelId !== oldChannelId) {
+      uiStore.clearSelectedIssueSelection();
+    }
+  }
+);
 </script>
 
 <template>

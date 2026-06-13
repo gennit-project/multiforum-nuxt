@@ -1,54 +1,35 @@
-<script lang="ts">
-import { defineComponent, computed } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 
-export default defineComponent({
-  name: 'PhotoAvatar',
-  props: {
-    src: {
-      type: String,
-      required: true,
-    },
-    alt: {
-      type: String,
-      required: true,
-    },
-    isSquare: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    isLarge: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
-  setup() {
-    const GET_THEME = gql`
-      query getTheme {
-        theme @client
-      }
-    `;
+withDefaults(defineProps<{
+  src: string;
+  alt: string;
+  isSquare?: boolean;
+  isLarge?: boolean;
+}>(), {
+  isSquare: false,
+  isLarge: false,
+});
 
-    const {
-      result: themeResult,
-      loading: themeLoading,
-      error: themeError,
-    } = useQuery(GET_THEME);
+const GET_THEME = gql`
+  query getTheme {
+    theme @client
+  }
+`;
 
-    const theme = computed(() => {
-      if (themeLoading.value || themeError.value) {
-        return '';
-      }
-      return themeResult.value?.theme;
-    });
+const {
+  result: themeResult,
+  loading: themeLoading,
+  error: themeError,
+} = useQuery(GET_THEME);
 
-    return {
-      theme,
-    };
-  },
+const _theme = computed(() => {
+  if (themeLoading.value || themeError.value) {
+    return '';
+  }
+  return themeResult.value?.theme;
 });
 </script>
 <template>

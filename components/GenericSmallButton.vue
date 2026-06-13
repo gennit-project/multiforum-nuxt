@@ -1,19 +1,13 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  props: {
-    active: {
-      type: Boolean,
-      default: false,
-    },
-    text: {
-      type: String,
-      required: true,
-    },
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    active?: boolean;
+    text: string;
+  }>(),
+  {
+    active: false,
   },
-  setup() {},
-});
+);
 </script>
 
 <template>

@@ -1,24 +1,14 @@
-<script lang="ts">
-import { defineComponent, computed } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import Breadcrumbs from '@/components/nav/Breadcrumbs.vue';
 
-export default defineComponent({
-  components: {
-    Breadcrumbs,
-  },
-  setup() {
-    const links = computed(() => {
-      return [
-        {
-          label: 'Settings',
-          path: 'settings',
-        },
-      ];
-    });
-    return {
-      links,
-    };
-  },
+const links = computed(() => {
+  return [
+    {
+      label: 'Settings',
+      path: 'settings',
+    },
+  ];
 });
 </script>
 

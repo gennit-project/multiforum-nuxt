@@ -1,12 +1,11 @@
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import TextButtonDropdown from '@/components/TextButtonDropdown.vue';
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,
   availableSortTypes,
-  sortTypeIcons,
   topSortTypes,
   capitalizeCase,
 } from '@/components/comments/getSortFromQuery';
@@ -48,65 +47,47 @@ const sortOptions = [
   },
 ];
 
-export default defineComponent({
-  name: 'SortButtons',
-  components: {
-    TextButtonDropdown,
+withDefaults(
+  defineProps<{
+    showTopOptions?: boolean;
+  }>(),
+  {
+    showTopOptions: true,
   },
-  props: {
-    showTopOptions: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
+);
 
-    const activeSortQuery = computed(() => {
-      return getSortFromQuery(route.query);
-    });
+const route = useRoute();
+const router = useRouter();
 
-    const activeTimeFrameQuery = computed(() => {
-      return getTimeFrameFromQuery(route.query);
-    });
-
-    const activeTimeFrameLabel = computed(() => {
-      return capitalizeCase(activeTimeFrameQuery.value);
-    });
-
-    return {
-      activeSortQuery,
-      activeTimeFrameLabel,
-      activeTimeFrameQuery,
-      availableSortTypes,
-      capitalizeCase,
-      route,
-      router,
-      sortOptions,
-      topOptions,
-      sortTypeIcons,
-    };
-  },
-  methods: {
-    handleSort(value: string) {
-      this.router.push({
-        query: {
-          ...this.route.query,
-          sort: value,
-        },
-      });
-    },
-    handleTopSort(value: string) {
-      this.router.push({
-        query: {
-          ...this.route.query,
-          timeFrame: value,
-        },
-      });
-    },
-  },
+const activeSortQuery = computed(() => {
+  return getSortFromQuery(route.query);
 });
+
+const activeTimeFrameQuery = computed(() => {
+  return getTimeFrameFromQuery(route.query);
+});
+
+const activeTimeFrameLabel = computed(() => {
+  return capitalizeCase(activeTimeFrameQuery.value);
+});
+
+function handleSort(value: string) {
+  router.push({
+    query: {
+      ...route.query,
+      sort: value,
+    },
+  });
+}
+
+function handleTopSort(value: string) {
+  router.push({
+    query: {
+      ...route.query,
+      timeFrame: value,
+    },
+  });
+}
 </script>
 
 <template>

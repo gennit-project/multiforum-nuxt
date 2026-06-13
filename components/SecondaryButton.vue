@@ -1,21 +1,15 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
+<script setup lang="ts">
 // need to get channel id, render differently if clicked within channel
 
-export default defineComponent({
-  props: {
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    label: {
-      type: String,
-      required: true,
-    },
+withDefaults(
+  defineProps<{
+    disabled?: boolean;
+    label: string;
+  }>(),
+  {
+    disabled: false,
   },
-  setup() {},
-});
+);
 </script>
 <template>
   <button

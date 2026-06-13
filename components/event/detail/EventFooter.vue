@@ -1,112 +1,72 @@
-<script lang="ts">
-import type { PropType } from 'vue';
-import { defineComponent, computed } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import type { Event as EventData, EventChannel } from '@/__generated__/graphql';
-import { useRoute } from 'nuxt/app';
 import { DateTime } from 'luxon';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import { stableRelativeTime } from '@/utils';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
-export default defineComponent({
-  components: {
-    UsernameWithTooltip,
-  },
-  props: {
-    eventData: {
-      type: Object as PropType<EventData>,
-      required: true,
-    },
-    compactMode: {
-      type: Boolean,
-      default: false,
-    },
-    channelsExceptCurrent: {
-      type: Array as PropType<EventChannel[]>,
-      default: () => [],
-    },
-    showPoster: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  setup(props) {
-    const route = useRoute();
-    const { serverAdminUsernames } = useServerRoleMembership();
+const props = withDefaults(
+  defineProps<{
+    eventData: EventData;
+    compactMode?: boolean;
+    channelsExceptCurrent?: EventChannel[];
+    showPoster?: boolean;
+  }>(),
+  {
+    compactMode: false,
+    channelsExceptCurrent: () => [],
+    showPoster: true,
+  }
+);
 
-    const eventId = computed(() => {
-      return (
-        props.eventData?.id ||
-        (typeof route.params.eventId === 'string' ? route.params.eventId : '')
-      );
-    });
+const { serverAdminUsernames } = useServerRoleMembership();
 
-    const channelId = computed(() => {
-      if (typeof route.params.forumId === 'string') {
-        return route.params.forumId;
-      }
-      return '';
-    });
-
-    const posterIsAdmin = computed(() => {
-      return (
-        getServerRoleBadge({
-          username: props.eventData.Poster?.username,
-          adminUsernames: serverAdminUsernames.value,
-        }) === 'serverAdmin'
-      );
-    });
-
-    const posterIsMod = computed(() => {
-      const channelRoles = props.eventData.Poster?.ChannelRoles;
-      if (!channelRoles) {
-        return false;
-      }
-      if (channelRoles.length === 0) {
-        return false;
-      }
-      const channelRole = channelRoles[0];
-      if (channelRole?.showModTag) {
-        return true;
-      }
-      return false;
-    });
-
-    const postedText = computed(() => {
-      if (!props.eventData?.createdAt) {
-        return '';
-      }
-      return `posted this event ${stableRelativeTime(
-        '' + props.eventData.createdAt
-      )}`;
-    });
-
-    const editedText = computed(() => {
-      if (!props.eventData?.updatedAt) {
-        return '';
-      }
-      return `Edited ${stableRelativeTime('' + props.eventData.updatedAt)}`;
-    });
-
-    return {
-      channelId,
-      posterIsMod,
-      eventId,
-      posterIsAdmin,
-      postedText,
-      editedText,
-      route,
-    };
-  },
-  methods: {
-    getTimeZone(startTime: string) {
-      const startTimeObj = DateTime.fromISO(startTime);
-
-      return startTimeObj.zoneName;
-    },
-  },
+const posterIsAdmin = computed(() => {
+  return (
+    getServerRoleBadge({
+      username: props.eventData.Poster?.username,
+      adminUsernames: serverAdminUsernames.value,
+    }) === 'serverAdmin'
+  );
 });
+
+const posterIsMod = computed(() => {
+  const channelRoles = props.eventData.Poster?.ChannelRoles;
+  if (!channelRoles) {
+    return false;
+  }
+  if (channelRoles.length === 0) {
+    return false;
+  }
+  const channelRole = channelRoles[0];
+  if (channelRole?.showModTag) {
+    return true;
+  }
+  return false;
+});
+
+const postedText = computed(() => {
+  if (!props.eventData?.createdAt) {
+    return '';
+  }
+  return `posted this event ${stableRelativeTime(
+    '' + props.eventData.createdAt
+  )}`;
+});
+
+const editedText = computed(() => {
+  if (!props.eventData?.updatedAt) {
+    return '';
+  }
+  return `Edited ${stableRelativeTime('' + props.eventData.updatedAt)}`;
+});
+
+function getTimeZone(startTime: string) {
+  const startTimeObj = DateTime.fromISO(startTime);
+  return startTimeObj.zoneName;
+}
 </script>
 <template>
   <div class="mt-4 text-xs text-gray-700 dark:text-gray-200">

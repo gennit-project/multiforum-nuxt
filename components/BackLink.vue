@@ -1,46 +1,33 @@
-<script lang="ts">
-import { computed, defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import LeftArrowIcon from '@/components/icons/LeftArrowIcon.vue';
 
-export default defineComponent({
-  name: 'BackLink',
-  components: {
-    LeftArrowIcon,
+const props = withDefaults(
+  defineProps<{
+    link?: string;
+    dataTestid?: string;
+    text?: string;
+  }>(),
+  {
+    link: '',
+    dataTestid: '',
+    text: 'Back',
   },
-  props: {
-    link: {
-      type: String,
-      default: '',
-    },
-    dataTestid: {
-      type: String,
-      default: '',
-    },
-    text: {
-      type: String,
-      default: 'Back',
-    },
-  },
-  setup(props) {
-    const route = useRoute();
+);
 
-    const channelId = computed(() => {
-      const id = route.params.forumId ?? route.params.channelId;
-      return typeof id === 'string' ? id : '';
-    });
+const route = useRoute();
 
-    const linkText = computed(() => {
-      if (channelId.value) {
-        return `Back to ${channelId.value}`;
-      }
-      return props.text;
-    });
+const channelId = computed(() => {
+  const id = route.params.forumId ?? route.params.channelId;
+  return typeof id === 'string' ? id : '';
+});
 
-    return {
-      linkText,
-    };
-  },
+const linkText = computed(() => {
+  if (channelId.value) {
+    return `Back to ${channelId.value}`;
+  }
+  return props.text;
 });
 </script>
 

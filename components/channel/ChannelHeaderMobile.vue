@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import AddToChannelFavorites from '@/components/favorites/AddToChannelFavorites.vue';
 import { isAuthenticatedVar } from '@/cache';
 

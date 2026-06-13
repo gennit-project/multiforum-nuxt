@@ -1,45 +1,33 @@
-<script lang="ts">
-import { defineComponent, computed } from 'vue';
-// Split on highlight term and divide term into parts, ignore case
-// Used help from https://stackoverflow.com/questions/29652862/highlight-text-using-reactjs
+<script setup lang="ts">
+import { computed } from 'vue';
 
-export default defineComponent({
-  props: {
-    classes: {
-      type: [String, Array],
-      default: '',
-    },
-    text: {
-      type: String,
-      default: '',
-    },
-    searchInput: {
-      type: String,
-      default: '',
-    },
+const props = withDefaults(
+  defineProps<{
+    classes?: string | string[];
+    text?: string;
+    searchInput?: string;
+  }>(),
+  {
+    classes: '',
+    text: '',
+    searchInput: '',
   },
-  setup(props) {
-    const parts = computed(() => {
-      let p = [props.text];
-      if (props.searchInput) {
-        p = props.text.split(new RegExp(`(${props.searchInput})`, 'gi'));
-      }
-      return p;
-    });
+);
 
-    return {
-      parts,
-    };
-  },
-  methods: {
-    match(part: string, searchInput: string) {
-      if (!part) {
-        return false;
-      }
-      return part.toLowerCase() === searchInput.toLowerCase();
-    },
-  },
+const parts = computed(() => {
+  let p = [props.text];
+  if (props.searchInput) {
+    p = props.text.split(new RegExp(`(${props.searchInput})`, 'gi'));
+  }
+  return p;
 });
+
+function match(part: string, searchInput: string) {
+  if (!part) {
+    return false;
+  }
+  return part.toLowerCase() === searchInput.toLowerCase();
+}
 </script>
 <template>
   <span v-for="(part, i) in parts" :key="i" :class="classes">

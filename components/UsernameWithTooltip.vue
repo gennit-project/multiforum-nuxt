@@ -1,108 +1,67 @@
-<script lang="ts">
-import { defineComponent, computed } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import { timeAgo } from '@/utils';
 
-export default defineComponent({
-  name: 'UsernameWithTooltip',
-  props: {
-    username: {
-      type: String,
-      required: true,
-    },
-    displayName: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    src: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    accountCreated: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    commentKarma: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-    discussionKarma: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-    isAdmin: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    isMod: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    isOriginalPoster: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    disableTooltip: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    lightText: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
-  setup(props) {
-    const accountCreatedText = computed(() => {
-      if (!props.accountCreated) return '';
-      try {
-        return `account created ${timeAgo(new Date(props.accountCreated))}`;
-      } catch {
-        return '';
-      }
-    });
-    const tooltipAriaLabel = computed(() => {
-      const name = props.displayName || props.username;
-      return `User info for ${name}`;
-    });
+interface Props {
+  username: string;
+  displayName?: string;
+  src?: string;
+  accountCreated?: string;
+  commentKarma?: number;
+  discussionKarma?: number;
+  isAdmin?: boolean;
+  isMod?: boolean;
+  isOriginalPoster?: boolean;
+  disableTooltip?: boolean;
+  lightText?: boolean;
+}
 
-    const usernameClasses = computed(() => {
-      if (props.lightText) {
-        return 'text-gray-200';
-      }
-      return 'text-gray-500 dark:text-gray-300';
-    });
+const props = withDefaults(defineProps<Props>(), {
+  displayName: '',
+  src: '',
+  accountCreated: '',
+  commentKarma: 0,
+  discussionKarma: 0,
+  isAdmin: false,
+  isMod: false,
+  isOriginalPoster: false,
+  disableTooltip: false,
+  lightText: false,
+});
 
-    const badgeClasses = computed(() => {
-      if (props.lightText) {
-        return 'rounded-md border border-gray-300 px-1 py-0 text-xs text-gray-200';
-      }
-      return 'rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300';
-    });
+const accountCreatedText = computed(() => {
+  if (!props.accountCreated) return '';
+  try {
+    return `account created ${timeAgo(new Date(props.accountCreated))}`;
+  } catch {
+    return '';
+  }
+});
 
-    const modBadgeClasses = computed(() => {
-      if (props.lightText) {
-        return 'rounded-md border border-orange-400 px-1 py-0 text-xs text-orange-300';
-      }
-      return 'rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300';
-    });
+const tooltipAriaLabel = computed(() => {
+  const name = props.displayName || props.username;
+  return `User info for ${name}`;
+});
 
-    return {
-      accountCreatedText,
-      tooltipAriaLabel,
-      usernameClasses,
-      badgeClasses,
-      modBadgeClasses,
-    };
-  },
+const usernameClasses = computed(() => {
+  if (props.lightText) {
+    return 'text-gray-200';
+  }
+  return 'text-gray-500 dark:text-gray-300';
+});
+
+const badgeClasses = computed(() => {
+  if (props.lightText) {
+    return 'rounded-md border border-gray-300 px-1 py-0 text-xs text-gray-200';
+  }
+  return 'rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300';
+});
+
+const modBadgeClasses = computed(() => {
+  if (props.lightText) {
+    return 'rounded-md border border-orange-400 px-1 py-0 text-xs text-orange-300';
+  }
+  return 'rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300';
 });
 </script>
 <template>
@@ -114,11 +73,11 @@ export default defineComponent({
       :aria-label="tooltipAriaLabel"
       :content-props="{ 'aria-label': tooltipAriaLabel }"
     >
-      <template #activator="{ props }">
+      <template #activator="{ props: activatorProps }">
         <slot>
           <div class="flex flex-row items-center gap-1">
             <nuxt-link
-              v-bind="props"
+              v-bind="activatorProps"
               :to="{
                 name: 'u-username',
                 params: { username },

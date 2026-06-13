@@ -1,14 +1,7 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-export default defineComponent({
-  props: {
-    wide: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  setup() {},
-});
+<script setup lang="ts">
+defineProps<{
+  wide?: boolean;
+}>();
 </script>
 <template>
   <svg

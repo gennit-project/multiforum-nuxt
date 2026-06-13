@@ -1,9 +1,5 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  setup() {},
-});
+<script setup lang="ts">
+// NotificationButton component - no props or state needed
 </script>
 <template>
   <button
