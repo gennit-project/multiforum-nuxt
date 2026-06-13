@@ -54,6 +54,11 @@ export default defineComponent({
       required: false,
       default: false,
     },
+    lightText: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   setup(props) {
     const accountCreatedText = computed(() => {
@@ -69,9 +74,33 @@ export default defineComponent({
       return `User info for ${name}`;
     });
 
+    const usernameClasses = computed(() => {
+      if (props.lightText) {
+        return 'text-gray-200';
+      }
+      return 'text-gray-500 dark:text-gray-300';
+    });
+
+    const badgeClasses = computed(() => {
+      if (props.lightText) {
+        return 'rounded-md border border-gray-300 px-1 py-0 text-xs text-gray-200';
+      }
+      return 'rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300';
+    });
+
+    const modBadgeClasses = computed(() => {
+      if (props.lightText) {
+        return 'rounded-md border border-orange-400 px-1 py-0 text-xs text-orange-300';
+      }
+      return 'rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300';
+    });
+
     return {
       accountCreatedText,
       tooltipAriaLabel,
+      usernameClasses,
+      badgeClasses,
+      modBadgeClasses,
     };
   },
 });
@@ -100,24 +129,24 @@ export default defineComponent({
               <span v-if="displayName" class="font-bold">{{ displayName }}</span>
               <span
                 v-if="displayName"
-                class="text-gray-500 dark:text-gray-300"
+                :class="usernameClasses"
                 >{{ `(u/${username})` }}</span
               >
             </nuxt-link>
             <span
               v-if="isAdmin"
-              class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+              :class="badgeClasses"
               >Admin</span
             >
             <span
               v-else-if="isMod"
-              class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+              :class="modBadgeClasses"
             >
               Mod
             </span>
             <span
               v-if="isOriginalPoster"
-              class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+              :class="badgeClasses"
               >OP</span
             >
           </div>
@@ -161,24 +190,24 @@ export default defineComponent({
         >
           <span v-if="!displayName" class="font-bold">{{ username }}</span>
           <span v-if="displayName" class="font-bold">{{ displayName }}</span>
-          <span v-if="displayName" class="text-gray-500 dark:text-gray-300">{{
+          <span v-if="displayName" :class="usernameClasses">{{
             `(u/${username})`
           }}</span>
         </nuxt-link>
         <span
           v-if="isAdmin"
-          class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+          :class="badgeClasses"
           >Admin</span
         >
         <span
           v-else-if="isMod"
-          class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+          :class="modBadgeClasses"
         >
           Mod
         </span>
         <span
           v-if="isOriginalPoster"
-          class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+          :class="badgeClasses"
           >OP</span
         >
       </div>
@@ -196,24 +225,24 @@ export default defineComponent({
         >
           <span v-if="!displayName" class="font-bold">{{ username }}</span>
           <span v-if="displayName" class="font-bold">{{ displayName }}</span>
-          <span v-if="displayName" class="text-gray-500 dark:text-gray-300">{{
+          <span v-if="displayName" :class="usernameClasses">{{
             `(u/${username})`
           }}</span>
         </nuxt-link>
         <span
           v-if="isAdmin"
-          class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+          :class="badgeClasses"
           >Admin</span
         >
         <span
           v-else-if="isMod"
-          class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+          :class="modBadgeClasses"
         >
           Mod
         </span>
         <span
           v-if="isOriginalPoster"
-          class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+          :class="badgeClasses"
           >OP</span
         >
       </div>

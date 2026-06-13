@@ -32,6 +32,11 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  // When true, uses transparent hover styles for overlay contexts (e.g., on image cards)
+  overlayStyle: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits<{
@@ -257,9 +262,11 @@ watch(
           :disabled="isLoading"
           class="add-to-favorites-button rounded-full p-1 transition-all duration-200"
           :class="{
+            'text-white hover:text-orange-300': !isFavorited && overlayStyle,
             'text-gray-400 hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400':
-              !isFavorited,
-            'text-green-500 hover:text-green-600': isFavorited,
+              !isFavorited && !overlayStyle,
+            'text-green-500 hover:text-green-400': isFavorited && overlayStyle,
+            'text-green-500 hover:text-green-600': isFavorited && !overlayStyle,
             'animate-pulse-once': isAnimating,
             'cursor-not-allowed opacity-50': isLoading,
           }"
@@ -336,7 +343,10 @@ watch(
           ref="buttonRef"
           type="button"
           :aria-label="`Add ${displayName || entityType} to favorites`"
-          class="add-to-favorites-button cursor-pointer rounded-full p-1 text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400"
+          class="add-to-favorites-button cursor-pointer rounded-full p-1 transition-all duration-200"
+          :class="overlayStyle
+            ? 'text-white hover:text-orange-300'
+            : 'text-gray-400 hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400'"
           @click="handleClick"
           @mouseenter="handleMouseEnter"
           @mouseleave="handleMouseLeave"

@@ -160,12 +160,12 @@ const handleOpenAlbum = () => {
 
 <template>
   <li
-    class="flex flex-col gap-3 rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900"
+    class="flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900"
   >
     <div class="relative">
       <nuxt-link
         v-if="primaryChannel"
-        class="overflow-hidden rounded-md border border-gray-100 dark:border-gray-700"
+        class="block"
         :to="defaultLink"
       >
         <div class="bg-gray-50 aspect-square w-full dark:bg-gray-800">
@@ -184,11 +184,55 @@ const handleOpenAlbum = () => {
         </div>
       </nuxt-link>
 
+      <!-- Bottom gradient overlay with metadata -->
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/40 to-transparent px-3 pb-2 pt-12">
+        <div class="space-y-1">
+          <nuxt-link
+            v-if="primaryChannel"
+            :to="defaultLink"
+            class="pointer-events-auto line-clamp-2 font-bold text-sm leading-tight text-white drop-shadow-md hover:text-gray-200"
+          >
+            <HighlightedSearchTerms
+              :text="discussion.title || '[Deleted]'"
+              :search-input="searchInput"
+            />
+          </nuxt-link>
+          <span
+            v-if="hasSensitiveContent"
+            class="ml-2 rounded-full border border-orange-400 px-2 text-[10px] text-orange-300"
+          >
+            Sensitive
+          </span>
+        </div>
+
+        <div v-if="showUploader" class="pointer-events-auto mt-1 text-xs text-gray-200">
+          Posted {{ relativeCreated }} by
+          <UsernameWithTooltip
+            v-if="authorUsername"
+            :username="authorUsername"
+            :display-name="authorDisplayName"
+            :src="authorProfilePicURL"
+            :comment-karma="authorCommentKarma"
+            :discussion-karma="authorDiscussionKarma"
+            :account-created="authorAccountCreated"
+            :is-admin="authorIsAdmin"
+            light-text
+          /><template v-if="primaryChannel">
+            in
+            <nuxt-link
+              :to="defaultLink"
+              class="text-orange-300 hover:underline"
+              >{{ primaryChannel.channelUniqueName }}</nuxt-link
+            >
+          </template>
+        </div>
+      </div>
+
       <!-- Top right buttons container -->
       <div class="absolute right-2 top-2 z-10 flex gap-2">
         <!-- Add to Favorites Button -->
         <div
-          class="rounded-md bg-black bg-opacity-50 p-1.5 transition-all duration-200 hover:bg-opacity-70"
+          class="rounded-md bg-black/50 p-1.5 transition-all duration-200 hover:bg-black/70"
           @click.stop
         >
           <AddToDiscussionFavorites
@@ -198,6 +242,7 @@ const handleOpenAlbum = () => {
             :initial-is-favorited="(discussion as any).isFavorited"
             entity-name="Download"
             size="small"
+            overlay-style
           />
         </div>
 
@@ -205,7 +250,7 @@ const handleOpenAlbum = () => {
         <button
           v-if="discussion?.Album?.Images?.length"
           type="button"
-          class="rounded-md bg-black bg-opacity-50 p-2 text-white transition-all duration-200 hover:bg-opacity-70"
+          class="rounded-md bg-black/50 p-2 text-white transition-all duration-200 hover:bg-black/70"
           title="View album"
           aria-label="View album"
           @click.stop="handleOpenAlbum"
@@ -215,52 +260,12 @@ const handleOpenAlbum = () => {
       </div>
     </div>
 
-    <div class="flex flex-col gap-2 p-2">
-      <div class="space-y-1">
-        <nuxt-link
-          v-if="primaryChannel"
-          :to="defaultLink"
-          class="font-semibold text-base leading-tight text-gray-900 hover:text-gray-600 dark:text-white"
-        >
-          <HighlightedSearchTerms
-            :text="discussion.title || '[Deleted]'"
-            :search-input="searchInput"
-          />
-        </nuxt-link>
-        <span
-          v-if="hasSensitiveContent"
-          class="ml-2 rounded-full border border-orange-600 px-2 text-[10px] text-orange-600 dark:border-orange-400 dark:text-orange-300"
-        >
-          Sensitive
-        </span>
-      </div>
-
-      <div v-if="showUploader" class="text-xs text-gray-600 dark:text-gray-300">
-        Posted {{ relativeCreated }} by
-        <UsernameWithTooltip
-          v-if="authorUsername"
-          :username="authorUsername"
-          :display-name="authorDisplayName"
-          :src="authorProfilePicURL"
-          :comment-karma="authorCommentKarma"
-          :discussion-karma="authorDiscussionKarma"
-          :account-created="authorAccountCreated"
-          :is-admin="authorIsAdmin"
-        /><template v-if="primaryChannel">
-          in
-          <nuxt-link
-            :to="defaultLink"
-            class="text-orange-700 hover:underline dark:text-orange-300"
-            >{{ primaryChannel.channelUniqueName }}</nuxt-link
-          >
-        </template>
-      </div>
-
+    <div class="flex flex-col gap-2 px-3 py-2">
       <div class="text-xs text-gray-600 dark:text-gray-300">
         <nuxt-link
           v-if="primaryChannel && !submittedToMultipleChannels"
           :to="defaultLink"
-          class="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+          class="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
         >
           <i class="fa-regular fa-comment text-xs" aria-hidden="true" />
           <span>{{ commentCount }} comments</span>

@@ -44,6 +44,11 @@ const props = defineProps({
     type: [Boolean, null] as unknown as () => boolean | null | undefined,
     default: undefined,
   },
+  // When true, uses transparent hover styles for overlay contexts
+  overlayStyle: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const GET_USER_FAVORITE_DISCUSSION = gql`
@@ -182,6 +187,7 @@ const displayName = computed(() => {
     :entity-type="entityType"
     :size="size"
     :item-id="discussionId"
+    :overlay-style="overlayStyle"
     @toggle="handleToggleFavorite"
   />
 </template>
