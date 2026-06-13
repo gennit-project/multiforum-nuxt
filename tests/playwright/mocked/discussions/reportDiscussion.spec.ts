@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test';
 import {
-  MOCK_DATE,
   buildBasicUser,
   buildChannel,
   buildDiscussion,

@@ -56,6 +56,10 @@ export async function installGraphqlMocks(
     operationName: string;
     variables?: Record<string, unknown>;
   }> = [];
+  const completedOperations: Array<{
+    operationName: string;
+    variables?: Record<string, unknown>;
+  }> = [];
   const pageErrors: string[] = [];
   const consoleErrors: string[] = [];
 
@@ -107,10 +111,15 @@ export async function installGraphqlMocks(
       contentType: 'application/json',
       body: JSON.stringify(payload ?? { data: {} }),
     });
+    completedOperations.push({
+      operationName,
+      variables: body.variables,
+    });
   });
 
   return {
     seenOperations,
+    completedOperations,
     pageErrors,
     consoleErrors,
   };

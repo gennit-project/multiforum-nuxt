@@ -26,9 +26,9 @@ const DISCUSSION_PAGE_LIMIT = 10;
 const route = useRoute();
 const router = useRouter();
 
-const channelId: string = route.params.forumId
-  ? String(route.params.forumId)
-  : '';
+const channelId = computed(() =>
+  route.params.forumId ? String(route.params.forumId) : ''
+);
 
 const crosspostDiscussionId = computed(() => {
   const crosspostParam = route.query.crosspost;
@@ -44,7 +44,7 @@ const crosspostDiscussionId = computed(() => {
 const createDiscussionDefaultValues: CreateEditDiscussionFormValues = {
   title: '',
   body: '',
-  selectedChannels: channelId ? [channelId] : [],
+  selectedChannels: channelId.value ? [channelId.value] : [],
   selectedTags: [],
   author: usernameVar.value,
   album: {
@@ -191,7 +191,7 @@ const {
       result.data?.createDiscussionWithChannelConnections?.DiscussionChannels ||
       [];
     const discussionChannelInCurrentChannel = discussionChannels.filter(
-      (dc: DiscussionChannel) => dc?.Channel?.uniqueName === channelId
+      (dc: DiscussionChannel) => dc?.Channel?.uniqueName === channelId.value
     );
 
     const existingData: {
@@ -202,7 +202,7 @@ const {
     } | null = cache.readQuery({
       query: GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
       variables: {
-        channelUniqueName: channelId,
+        channelUniqueName: channelId.value,
         searchInput: '',
         selectedTags: [],
         options: {
@@ -221,7 +221,7 @@ const {
     cache.writeQuery({
       query: GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
       variables: {
-        channelUniqueName: channelId,
+        channelUniqueName: channelId.value,
         searchInput: '',
         selectedTags: [],
         options: {
@@ -262,7 +262,7 @@ onDone((response) => {
   router.push({
     name: 'forums-forumId-discussions-discussionId',
     params: {
-      forumId: channelId || formValues.value.selectedChannels[0],
+      forumId: channelId.value || formValues.value.selectedChannels[0],
       discussionId: newDiscussionId,
     },
   });

@@ -1,6 +1,39 @@
-import type { InMemoryCacheConfig } from '@apollo/client/core';
+import type {
+  FieldMergeFunction,
+  InMemoryCacheConfig,
+  Reference,
+  StoreObject,
+} from '@apollo/client/core';
 import { ref } from 'vue';
 import { config } from './config';
+
+type CacheEntity = Reference | StoreObject;
+
+const mergeSuspendedUsers: FieldMergeFunction<CacheEntity[]> = (
+  existing = [],
+  incoming = [],
+  { mergeObjects, readField }
+) => {
+  if (!incoming.length) {
+    return incoming;
+  }
+
+  return incoming.map((incomingSuspension) => {
+    const incomingId = readField('id', incomingSuspension);
+    const incomingUsername = readField('username', incomingSuspension);
+    const existingSuspension = existing.find((suspension) => {
+      const existingId = readField('id', suspension);
+      const existingUsername = readField('username', suspension);
+      return incomingId
+        ? existingId === incomingId
+        : existingUsername === incomingUsername;
+    });
+
+    return existingSuspension
+      ? mergeObjects(existingSuspension, incomingSuspension)
+      : incomingSuspension;
+  });
+};
 
 export const usernameVar = ref('');
 export const setUsername = (username: string) => {
@@ -79,6 +112,9 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
         },
         Admins: {
           merge: (_existing = [], incoming) => [...incoming],
+        },
+        SuspendedUsers: {
+          merge: mergeSuspendedUsers,
         },
       },
     },

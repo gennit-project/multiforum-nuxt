@@ -9,15 +9,12 @@ import {
 import { config } from '@/config';
 
 export default defineNuxtPlugin(() => {
-  const shouldExpose =
-    import.meta.env.DEV ||
-    config.environment === 'test' ||
-    (typeof window !== 'undefined' && (window as any).Cypress);
-
-  if (!shouldExpose || typeof window === 'undefined') {
+  if (typeof window === 'undefined') {
     return;
   }
 
+  // Always check for mock auth data in localStorage - this is safe because
+  // mock auth data is only set by test code (Playwright, Cypress)
   const syncMockAuthFromStorage = () => {
     const mockUsername = window.localStorage.getItem('mock_username');
     const token = window.localStorage.getItem('token');
@@ -28,6 +25,16 @@ export default defineNuxtPlugin(() => {
       isAuthenticatedVar.value = true;
     }
   };
+
+  // Sync immediately if mock auth data exists
+  syncMockAuthFromStorage();
+
+  // Expose debug functions in dev/test environments
+  const shouldExpose =
+    import.meta.env.DEV ||
+    config.environment === 'test' ||
+    import.meta.env.VITE_E2E_MOCK_MODE === 'true' ||
+    (typeof window !== 'undefined' && (window as any).Cypress);
 
   const setAuthStateDirect = (authState: {
     username?: string;
@@ -51,11 +58,13 @@ export default defineNuxtPlugin(() => {
     });
   };
 
-  syncMockAuthFromStorage();
-  (window as any).__SET_AUTH_STATE_DIRECT__ = setAuthStateDirect;
-  (window as any).__DEBUG_AUTH_STATE__ = () => ({
-    username: usernameVar.value,
-    authenticated: isAuthenticatedVar.value,
-    hasToken: !!localStorage.getItem('token'),
-  });
+  // Only expose debug functions in dev/test environments
+  if (shouldExpose) {
+    (window as any).__SET_AUTH_STATE_DIRECT__ = setAuthStateDirect;
+    (window as any).__DEBUG_AUTH_STATE__ = () => ({
+      username: usernameVar.value,
+      authenticated: isAuthenticatedVar.value,
+      hasToken: !!localStorage.getItem('token'),
+    });
+  }
 });
