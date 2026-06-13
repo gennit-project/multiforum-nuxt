@@ -2,6 +2,7 @@ import MarkdownIt from 'markdown-it';
 import type Token from 'markdown-it/lib/token.mjs';
 import type Renderer from 'markdown-it/lib/renderer.mjs';
 import hljs from 'highlight.js';
+import DOMPurify from 'isomorphic-dompurify';
 import { generateHeadingId } from '@/utils/markdown';
 import { config } from '@/config';
 
@@ -163,6 +164,7 @@ export function useMarkdownRenderer() {
   /**
    * Render markdown text to HTML with all configured features.
    * Handles spoiler markup and wraps tables for responsive scrolling.
+   * Sanitizes output with DOMPurify to prevent XSS attacks.
    */
   function renderMarkdown(text: string): string {
     // Preprocess text to handle spoiler markup before markdown processing
@@ -187,7 +189,14 @@ export function useMarkdownRenderer() {
     );
     processedHTML = processedHTML.replace(/<\/table>/gi, '</table></div>');
 
-    return processedHTML;
+    // Sanitize HTML to prevent XSS attacks while preserving safe markup
+    const sanitizedHTML = DOMPurify.sanitize(processedHTML, {
+      ADD_ATTR: ['target', 'rel', 'data-external'],
+      ADD_TAGS: ['iframe'],
+      ALLOW_DATA_ATTR: false,
+    });
+
+    return sanitizedHTML;
   }
 
   return { renderMarkdown };
