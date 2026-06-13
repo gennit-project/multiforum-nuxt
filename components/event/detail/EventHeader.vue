@@ -218,7 +218,7 @@ const {
       fields: {
         events(existingEventRefs = [], { readField }) {
           return existingEventRefs.filter(
-            (ref: any) => readField('id', ref) !== eventId.value
+            (ref: { __ref?: string }) => readField('id', ref) !== eventId.value
           );
         },
       },

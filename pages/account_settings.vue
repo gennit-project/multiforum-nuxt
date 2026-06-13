@@ -252,7 +252,8 @@ function handleCheckboxUpdate(
   field: keyof NotificationFormValues,
   value: boolean | string
 ) {
-  (notificationFormValues.value as any)[field] = value;
+  // Type assertion needed for dynamic property assignment
+  (notificationFormValues.value[field] as boolean | string) = value;
   debouncedAutoSave();
 }
 </script>
