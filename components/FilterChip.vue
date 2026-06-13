@@ -56,9 +56,11 @@ export default defineComponent({
           <button
             :data-testid="dataTestid"
             :class="[
-              highlighted ? 'border-orange-500 ring-1 ring-orange-500' : '',
+              highlighted
+                ? 'border-gray-500 ring-1 ring-gray-400 dark:border-gray-400 dark:ring-gray-500'
+                : '',
             ]"
-            class="font-small align-items flex whitespace-nowrap rounded-md border bg-white px-3 py-2 text-xs text-gray-700 hover:bg-gray-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-600"
+            class="font-small align-items flex whitespace-nowrap rounded-md border bg-white px-3 py-2 text-xs text-gray-700 hover:bg-gray-200 focus:border-gray-500 focus:ring-1 focus:ring-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:focus:border-gray-400 dark:focus:ring-gray-400"
             @click="handleClick"
           >
             <slot name="icon" />
@@ -70,7 +72,7 @@ export default defineComponent({
           </button>
         </template>
         <template #content>
-          <div class="rounded-md border bg-white dark:bg-gray-700">
+          <div class="rounded-md border bg-white dark:border-gray-700 dark:bg-gray-900">
             <slot name="content" />
           </div>
         </template>
@@ -79,9 +81,11 @@ export default defineComponent({
         <button
           :data-testid="dataTestid"
           :class="[
-            highlighted ? 'border-orange-500 ring-1 ring-orange-500' : '',
+            highlighted
+              ? 'border-gray-500 ring-1 ring-gray-400 dark:border-gray-400 dark:ring-gray-500'
+              : '',
           ]"
-          class="max-height-3 font-small mr-2 inline-flex whitespace-nowrap rounded-md border bg-white px-3 py-2.5 text-xs text-gray-700 hover:bg-gray-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+          class="max-height-3 font-small mr-2 inline-flex whitespace-nowrap rounded-md border bg-white px-3 py-2.5 text-xs text-gray-700 hover:bg-gray-200 focus:border-gray-500 focus:ring-1 focus:ring-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:focus:border-gray-400 dark:focus:ring-gray-400"
         >
           <slot name="icon" />
           {{ label }}

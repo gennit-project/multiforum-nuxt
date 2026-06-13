@@ -218,7 +218,7 @@ const revealSensitiveContent = () => {
   <li
     class="list-none px-4 py-4"
     :class="{
-      'bg-gray-100 dark:bg-gray-700': isSelected,
+      'bg-gray-100 dark:bg-gray-800': isSelected,
     }"
   >
     <div class="flex w-full justify-between">
@@ -231,8 +231,8 @@ const revealSensitiveContent = () => {
           >
             <div class="flex items-start gap-2">
               <span
-                :class="isSelected ? 'text-black' : ''"
-                class="cursor-pointer text-sm hover:text-gray-500 dark:text-orange-300 dark:hover:text-orange-200"
+                :class="isSelected ? 'text-black dark:text-white' : ''"
+                class="cursor-pointer text-sm text-gray-900 hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
               >
                 <HighlightedSearchTerms
                   :text="title"
@@ -241,7 +241,7 @@ const revealSensitiveContent = () => {
               </span>
               <span
                 v-if="hasSensitiveContent"
-                class="rounded-full border border-orange-600 px-2 text-xs text-orange-600 dark:border-orange-400 dark:text-orange-400"
+                class="rounded-full border border-amber-700 px-2 text-xs text-amber-700 dark:border-orange-400 dark:text-orange-400"
               >
                 Sensitive
               </span>
@@ -254,8 +254,8 @@ const revealSensitiveContent = () => {
           >
             <div class="flex items-start gap-2">
               <span
-                :class="isSelected ? 'text-black' : ''"
-                class="cursor-pointer text-sm hover:text-gray-500 dark:text-orange-300 dark:hover:text-orange-200"
+                :class="isSelected ? 'text-black dark:text-white' : ''"
+                class="cursor-pointer text-sm text-gray-900 hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
               >
                 <HighlightedSearchTerms
                   :text="title"
@@ -264,7 +264,7 @@ const revealSensitiveContent = () => {
               </span>
               <span
                 v-if="hasSensitiveContent"
-                class="rounded-full border border-orange-600 px-2 text-xs text-orange-600 dark:border-orange-400 dark:text-orange-400"
+                class="rounded-full border border-amber-700 px-2 text-xs text-amber-700 dark:border-orange-400 dark:text-orange-400"
               >
                 Sensitive
               </span>
@@ -284,7 +284,7 @@ const revealSensitiveContent = () => {
                   forumId,
                 },
               }"
-              class="inline text-orange-700 hover:underline dark:text-gray-100"
+              class="inline text-gray-800 hover:underline dark:text-gray-100"
             >
               {{ primaryForumName }}
             </nuxt-link>
@@ -369,7 +369,7 @@ const revealSensitiveContent = () => {
           v-if="
             discussion && (discussion.body || discussion.Album) && isExpanded
           "
-          class="my-2 w-full max-w-full overflow-hidden border-l-2 border-gray-300 bg-gray-100 pt-2 dark:bg-black"
+          class="my-2 w-full max-w-full overflow-hidden border-l-2 border-gray-300 bg-gray-100 pt-2 dark:border-gray-700 dark:bg-gray-900"
         >
           <!-- Sensitive content concealment box -->
           <div
