@@ -137,14 +137,12 @@ const filteredQuery = computed(() => {
 </script>
 
 <template>
-  <li class="mb-2 flex border-gray-300 pt-2 dark:bg-gray-800 md:rounded-lg">
-    <div
-      class="flex w-full flex-row justify-start gap-4 overflow-hidden rounded-lg"
-    >
+  <li class="flex overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <div class="flex w-full flex-col">
       <div v-if="discussion" class="w-full flex-col">
-        <div class="relative mb-1">
+        <div class="relative">
           <nuxt-link
-            class="flex w-full items-center gap-2"
+            class="block"
             :to="{
               name: 'forums-forumId-downloads-discussionId',
               params: {
@@ -155,7 +153,7 @@ const filteredQuery = computed(() => {
             }"
           >
             <div
-              class="aspect-square w-full overflow-hidden border bg-gray-100 dark:bg-gray-700"
+              class="aspect-square w-full overflow-hidden bg-gray-100 dark:bg-gray-700"
             >
               <img
                 v-if="firstAlbumImage"
@@ -172,12 +170,61 @@ const filteredQuery = computed(() => {
             </div>
           </nuxt-link>
 
+          <!-- Bottom gradient overlay with metadata -->
+          <div class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/40 to-transparent px-3 pb-2 pt-12">
+            <div class="flex items-start gap-2">
+              <nuxt-link
+                class="pointer-events-auto line-clamp-2 font-bold text-sm leading-tight text-white drop-shadow-md hover:text-gray-200"
+                :to="{
+                  name: 'forums-forumId-downloads-discussionId',
+                  params: {
+                    forumId: defaultUniqueName,
+                    discussionId: discussionChannel.discussionId,
+                  },
+                  query: filteredQuery,
+                }"
+              >
+                <HighlightedSearchTerms
+                  :search-input="searchInput"
+                  :text="title"
+                />
+              </nuxt-link>
+              <span
+                v-if="discussionChannel.archived"
+                class="shrink-0 rounded-full border border-red-400 px-2 text-xs text-red-300"
+                >Archived</span
+              >
+              <span
+                v-if="discussionChannel.answered"
+                aria-label="This discussion has been answered"
+                class="shrink-0 flex items-center gap-1 rounded-full border border-green-400 px-2 py-0.5 text-xs text-green-300"
+              >
+                <CheckCircleIcon class="h-4 w-4" /> Answered
+              </span>
+            </div>
+            <div class="pointer-events-auto mt-1 text-xs text-gray-200">
+              <span>{{ `Posted ${relativeTimeAgo} by` }}</span>
+              <UsernameWithTooltip
+                v-if="authorUsername"
+                :account-created="authorAccountCreated"
+                :comment-karma="authorCommentKarma"
+                :discussion-karma="authorDiscussionKarma"
+                :display-name="authorDisplayName ?? ''"
+                :is-admin="authorIsAdmin"
+                :is-mod="authorIsMod"
+                :src="authorProfilePicURL ?? ''"
+                :username="authorUsername"
+                light-text
+              />
+            </div>
+          </div>
+
           <!-- Top right buttons container -->
           <div class="absolute right-2 top-2 z-10 flex gap-2">
             <!-- Add to Favorites Button -->
             <div
               v-if="discussion"
-              class="rounded-md bg-black bg-opacity-50 p-1.5 transition-all duration-200 hover:bg-opacity-70"
+              class="rounded-md bg-black/50 p-1.5 transition-all duration-200 hover:bg-black/70"
               @click.stop
             >
               <AddToDiscussionFavorites
@@ -187,6 +234,7 @@ const filteredQuery = computed(() => {
                 :initial-is-favorited="(discussionChannel as any).isFavorited"
                 entity-name="Download"
                 size="small"
+                overlay-style
               />
             </div>
 
@@ -197,7 +245,7 @@ const filteredQuery = computed(() => {
                 discussion.Album.Images.length > 0
               "
               type="button"
-              class="rounded-md bg-black bg-opacity-50 p-2 text-white transition-all duration-200 hover:bg-opacity-70"
+              class="rounded-md bg-black/50 p-2 text-white transition-all duration-200 hover:bg-black/70"
               title="View album"
               aria-label="View album"
               @click.stop="
@@ -208,109 +256,44 @@ const filteredQuery = computed(() => {
             </button>
           </div>
         </div>
-        <div class="flex gap-3">
-          <div class="w-full flex-col">
-            <div>
-              <nuxt-link
-                class="mb-1 flex w-full items-center gap-2"
-                :to="{
-                  name: 'forums-forumId-downloads-discussionId',
-                  params: {
-                    forumId: defaultUniqueName,
-                    discussionId: discussionChannel.discussionId,
-                  },
-                  query: filteredQuery,
-                }"
-              >
-                <span
-                  class="cursor-pointer hover:text-gray-500 dark:text-gray-100"
-                >
-                  <HighlightedSearchTerms
-                    :classes="[
-                      'hover:underline dark:text-gray-100 dark:hover:text-gray-300',
-                      fontSize === 'small'
-                        ? 'text-sm'
-                        : fontSize === 'medium'
-                          ? 'text-base'
-                          : 'text-lg',
-                    ]"
-                    :search-input="searchInput"
-                    :text="title"
-                  />
-                </span>
-                <span
-                  v-if="discussionChannel.archived"
-                  class="rounded-full border border-red-500 px-2 text-xs text-red-500 dark:border-red-400 dark:text-red-400"
-                  >Archived</span
-                >
-                <span
-                  v-if="discussionChannel.answered"
-                  aria-label="This discussion has been answered"
-                  class="mr-1 flex items-center gap-1 rounded-full border border-green-500 px-2 py-0.5 text-xs text-green-500 dark:border-green-400 dark:text-green-400"
-                >
-                  <CheckCircleIcon class="h-4 w-4" /> Answered
-                </span>
-              </nuxt-link>
-              <div
-                class="text-xs font-medium text-gray-600 no-underline dark:text-gray-300"
-              >
-                <span class="mr-1 text-xs text-gray-500 dark:text-gray-300">{{
-                  `Posted ${relativeTimeAgo} by`
-                }}</span>
-                <UsernameWithTooltip
-                  v-if="authorUsername"
-                  :account-created="authorAccountCreated"
-                  :comment-karma="authorCommentKarma"
-                  :discussion-karma="authorDiscussionKarma"
-                  :display-name="authorDisplayName ?? ''"
-                  :is-admin="authorIsAdmin"
-                  :is-mod="authorIsMod"
-                  :src="authorProfilePicURL ?? ''"
-                  :username="authorUsername"
-                />
-              </div>
-            </div>
-            <div
-              class="my-1 flex space-x-1 text-xs font-medium text-gray-600 hover:no-underline"
-            >
-              <TagComponent
-                v-for="tag in tags"
-                :key="tag"
-                :active="selectedTags.includes(tag)"
-                class="my-1"
-                :tag="tag"
-                @click="$emit('filterByTag', tag)"
-              />
-            </div>
-            <div
-              class="flex items-center justify-between gap-2 dark:text-white"
-            >
-              <!-- <div class="text-gray-900 dark:text-white"><sup>$</sup>0.<sup>00</sup></div> -->
-              <div class="flex items-center gap-1">
-                <DiscussionVotes
-                  v-if="discussionChannel"
-                  :discussion="discussion"
-                  :discussion-channel="discussionChannel"
-                  :show-downvote="false"
-                  :use-heart-icon="true"
-                />
 
-                <nuxt-link
-                  class="flex items-center gap-2 rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700 dark:hover:bg-gray-600"
-                  :to="{
-                    name: 'forums-forumId-downloads-discussionId',
-                    params: {
-                      forumId: defaultUniqueName,
-                      discussionId: discussionChannel.discussionId,
-                    },
-                    query: filteredQuery,
-                  }"
-                >
-                  <i class="fa-regular fa-comment text-xs" aria-hidden="true" />
-                  <span class="text-sm">{{ commentCount }}</span>
-                </nuxt-link>
-              </div>
-            </div>
+        <!-- Tags and actions below the image -->
+        <div class="flex flex-col gap-2 px-3 py-2">
+          <div
+            v-if="tags.length"
+            class="flex flex-wrap gap-1 text-xs font-medium text-gray-600"
+          >
+            <TagComponent
+              v-for="tag in tags"
+              :key="tag"
+              :active="selectedTags.includes(tag)"
+              :tag="tag"
+              @click="$emit('filterByTag', tag)"
+            />
+          </div>
+          <div class="flex items-center gap-1 dark:text-white">
+            <DiscussionVotes
+              v-if="discussionChannel"
+              :discussion="discussion"
+              :discussion-channel="discussionChannel"
+              :show-downvote="false"
+              :use-heart-icon="true"
+            />
+
+            <nuxt-link
+              class="flex items-center gap-2 rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700 dark:hover:bg-gray-600"
+              :to="{
+                name: 'forums-forumId-downloads-discussionId',
+                params: {
+                  forumId: defaultUniqueName,
+                  discussionId: discussionChannel.discussionId,
+                },
+                query: filteredQuery,
+              }"
+            >
+              <i class="fa-regular fa-comment text-xs" aria-hidden="true" />
+              <span class="text-sm">{{ commentCount }}</span>
+            </nuxt-link>
           </div>
         </div>
       </div>

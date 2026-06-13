@@ -353,7 +353,7 @@ const getUserActionClasses = (isActive: boolean) => {
               <AdminIcon />
             </NuxtLink>
             <span
-              class="w-12 text-center text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
+              class="w-12 text-center text-[10px] leading-[10px] text-gray-600 dark:text-gray-300"
             >
               Admin
             </span>
@@ -370,7 +370,7 @@ const getUserActionClasses = (isActive: boolean) => {
                   <LoginIcon />
                 </div>
                 <span
-                  class="w-12 text-center text-[10px] leading-[10px] text-gray-500 dark:text-gray-400"
+                  class="w-12 text-center text-[10px] leading-[10px] text-gray-600 dark:text-gray-300"
                 >
                   Log in
                 </span>
