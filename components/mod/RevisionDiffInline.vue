@@ -9,6 +9,7 @@ interface VersionData {
   body?: string;
   title?: string;
   createdAt: string;
+  editReason?: string;
   Author?: {
     username?: string;
   } | null;
@@ -39,8 +40,8 @@ const newContent = computed(
 );
 
 const editReason = computed(() => {
-  const newReason = (props.newVersion as Record<string, any>).editReason;
-  const oldReason = (props.oldVersion as Record<string, any>).editReason;
+  const newReason = 'editReason' in props.newVersion ? props.newVersion.editReason : undefined;
+  const oldReason = 'editReason' in props.oldVersion ? props.oldVersion.editReason : undefined;
   return newReason || oldReason || '';
 });
 

@@ -26,7 +26,7 @@ const inputValue = computed({
 });
 
 const validationAttrs = computed(() => {
-  const attrs: Record<string, any> = {};
+  const attrs: Record<string, string | number | boolean> = {};
   if (props.field.validation) {
     if (props.field.validation.min !== undefined) {
       attrs.min = props.field.validation.min;

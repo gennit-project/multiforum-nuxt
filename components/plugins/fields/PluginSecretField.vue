@@ -64,7 +64,7 @@ const statusText = computed(() => {
 });
 
 const validationAttrs = computed(() => {
-  const attrs: Record<string, any> = {};
+  const attrs: Record<string, string | number | boolean> = {};
   if (props.field.validation) {
     if (props.field.validation.minLength !== undefined) {
       attrs.minlength = props.field.validation.minLength;

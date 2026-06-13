@@ -25,7 +25,7 @@ const inputValue = computed({
 });
 
 const validationAttrs = computed(() => {
-  const attrs: Record<string, any> = {};
+  const attrs: Record<string, string | number | boolean> = {};
   if (props.field.validation?.required || props.field.required) {
     attrs.required = true;
   }
