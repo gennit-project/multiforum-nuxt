@@ -36,3 +36,32 @@ export type SearchDiscussionValues = {
   showArchived?: boolean;
   showUnanswered?: boolean;
 };
+
+// Extended types for runtime fields returned by GraphQL queries
+// but not included in the generated schema types
+export interface DiscussionChannelWithFavorited {
+  isFavorited?: boolean;
+}
+
+export interface DiscussionWithFavorited {
+  isFavorited?: boolean;
+}
+
+// Type for downloadable files in forms (simplified from full DownloadableFile)
+export interface DownloadFormFile {
+  id?: string;
+  fileName: string;
+  url: string;
+  kind: string;
+  size: number;
+  license: string;
+  priceModel: string;
+  priceCents: number;
+  priceCurrency: string;
+}
+
+// Stub type for creating temporary Discussion objects in forms
+export interface DiscussionStubForDownload {
+  id: string;
+  DownloadableFiles: DownloadFormFile[];
+}

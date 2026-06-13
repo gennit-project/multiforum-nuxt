@@ -226,9 +226,8 @@ onMounted(() => {
                       ? discussion
                       : ({
                           id: 'temp-id',
-                          DownloadableFiles: (formValues.downloadableFiles ||
-                            []) as any,
-                        } as Discussion)
+                          DownloadableFiles: formValues.downloadableFiles || [],
+                        } as unknown as Discussion)
                   "
                   :channel-data="
                     channelData

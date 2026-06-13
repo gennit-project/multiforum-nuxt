@@ -4,6 +4,7 @@ import { useAuth0 } from '@auth0/auth0-vue';
 import { useRouter } from 'vue-router';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_EMAIL } from '@/graphQLData/email/queries';
+import type { Email } from '@/__generated__/graphql';
 import { usernameVar, userDataLoadingVar } from '@/cache';
 import CreateUsernameForm from '@/components/auth/CreateUsernameForm.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
@@ -45,8 +46,8 @@ if (import.meta.client) {
       emailAddress: user.value?.email,
     });
 
-    onEmailResult((result: any) => {
-      const emailData = result.data?.emails[0];
+    onEmailResult((result: { data?: { emails?: Email[] } }) => {
+      const emailData = result.data?.emails?.[0];
       if (emailData?.User) {
         // User already exists, redirect to home
         router.push('/');

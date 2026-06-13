@@ -9,6 +9,7 @@ import ImageIcon from '@/components/icons/ImageIcon.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import { relativeTime } from '@/utils';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
+import type { DiscussionWithFavorited } from '@/types/Discussion';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
@@ -239,7 +240,7 @@ const handleOpenAlbum = () => {
             :allow-add-to-list="true"
             :discussion-id="discussion.id"
             :discussion-title="discussion.title || ''"
-            :initial-is-favorited="(discussion as any).isFavorited"
+            :initial-is-favorited="(discussion as Discussion & DiscussionWithFavorited).isFavorited"
             entity-name="Download"
             size="small"
             overlay-style

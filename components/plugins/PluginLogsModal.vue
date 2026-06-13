@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, type Ref } from 'vue';
 import {
   Dialog,
   DialogPanel,
@@ -20,8 +20,8 @@ const emit = defineEmits<{
 }>();
 
 const { getStatusInfo, formatDuration } = usePluginPipeline(
-  { value: null } as any,
-  { value: '' } as any,
+  ref(null) as Ref<string | null>,
+  ref('') as Ref<string>,
   { enabled: false }
 );
 

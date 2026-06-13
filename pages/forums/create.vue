@@ -10,13 +10,14 @@ import type {
   ChannelCreateInput,
   ChannelTagsConnectOrCreateFieldInput,
 } from '@/__generated__/graphql';
+import type { CreateEditChannelFormValues } from '@/types/Channel';
 import { usernameVar } from '@/cache';
 import { useRouter } from 'nuxt/app';
 import { useServerSuspensionNotice } from '@/composables/useSuspensionNotice';
 
 const router = useRouter();
 
-const createChannelDefaultValues = {
+const createChannelDefaultValues: CreateEditChannelFormValues = {
   uniqueName: '',
   displayName: '',
   description: '',
@@ -32,7 +33,7 @@ const createChannelDefaultValues = {
   feedbackEnabled: true,
 };
 
-const formValues = ref(createChannelDefaultValues);
+const formValues = ref<CreateEditChannelFormValues>(createChannelDefaultValues);
 
 const createChannelInput = computed(() => {
   const tagConnections: ChannelTagsConnectOrCreateFieldInput[] =
@@ -156,7 +157,7 @@ const submit = async () => {
   });
 };
 
-const updateFormValues = (data: any) => {
+const updateFormValues = (data: Partial<CreateEditChannelFormValues>) => {
   formValues.value = {
     ...formValues.value,
     ...data,

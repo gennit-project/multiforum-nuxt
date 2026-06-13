@@ -197,7 +197,7 @@ const {
     const existingData: {
       getDiscussionsInChannel?: {
         aggregateDiscussionChannelsCount?: number;
-        discussionChannels?: any[];
+        discussionChannels?: DiscussionChannel[];
       };
     } | null = cache.readQuery({
       query: GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,

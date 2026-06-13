@@ -16,6 +16,7 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import WarningModal from '@/components/WarningModal.vue';
 import type { PropType } from 'vue';
 import type { Comment } from '@/__generated__/graphql';
+import type { ApolloCache, NormalizedCacheObject } from '@apollo/client/core';
 import type { MenuItemType } from '@/components/IconButtonDropdown.vue';
 import { timeAgo, ALLOWED_ICONS } from '@/utils';
 import { modProfileNameVar, usernameVar } from '@/cache';
@@ -79,7 +80,7 @@ const {
   mutate: deleteComment,
   onDone: onDoneDeletingComment,
 } = useMutation(DELETE_COMMENT, {
-  update: (cache: any) => {
+  update: (cache: ApolloCache<NormalizedCacheObject>) => {
     cache.evict({
       id: cache.identify({ __typename: 'Comment', id: props.comment.id }),
     });

@@ -103,12 +103,12 @@ onDone(async (response) => {
 const saveDownloadAlbum = async (discussionId: string) => {
   try {
     // Build the album node
-    const albumNode: any = {
+    const albumNode = {
       imageOrder: formValues.value.album?.imageOrder || [],
       Images: {
         // Connect to existing images using their IDs
         connect: (formValues.value.album?.images || [])
-          .filter((img) => Boolean(img.id))
+          .filter((img): img is typeof img & { id: string } => Boolean(img.id))
           .map((img) => ({
             where: { node: { id: img.id } },
           })),
