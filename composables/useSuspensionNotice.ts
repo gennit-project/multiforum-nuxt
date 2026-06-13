@@ -33,7 +33,7 @@ export const useChannelSuspensionNotice = (
     }),
     () => ({
       enabled: !!channelId.value && !!usernameVar.value,
-      fetchPolicy: 'cache-first',
+      fetchPolicy: 'no-cache',
     })
   );
 
