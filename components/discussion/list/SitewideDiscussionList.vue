@@ -238,14 +238,16 @@ const filterByChannel = (channel: string) => {
 </script>
 
 <template>
-  <div class="flex justify-center">
-    <div class="max-w-screen-2xl flex-1 bg-white dark:bg-black dark:text-white">
-      <div class="relative w-full">
+  <div class="flex w-full min-w-0 justify-center overflow-x-hidden">
+    <div
+      class="w-full min-w-0 max-w-screen-2xl flex-1 bg-white dark:bg-black dark:text-white"
+    >
+      <div class="relative w-full min-w-0">
         <div
-          class="flex flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row"
+          class="flex min-w-0 flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row"
         >
           <div
-            class="flex-1 md:px-2 lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto"
+            class="min-w-0 flex-1 md:px-2 lg:h-[calc(100vh-3.5rem)] lg:basis-0 lg:overflow-y-auto"
           >
             <slot />
             <div class="mt-2 flex justify-end lg:pr-2">
@@ -347,7 +349,7 @@ const filterByChannel = (channel: string) => {
           </div>
           <aside
             v-if="serverConfig"
-            class="flex-shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto lg:hidden"
+            class="min-w-0 flex-shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto lg:hidden"
           >
             <SitewideDiscussionSidebar
               :server-config="serverConfig"
@@ -355,23 +357,23 @@ const filterByChannel = (channel: string) => {
             />
           </aside>
           <aside
-            class="hidden flex-shrink-0 lg:flex lg:h-[calc(100vh-3.5rem)] lg:w-1/2 lg:flex-col lg:overflow-y-auto lg:px-6 lg:py-4"
+            class="hidden min-w-0 lg:flex lg:h-[calc(100vh-3.5rem)] lg:basis-[44%] lg:flex-col lg:overflow-x-hidden lg:overflow-y-auto lg:px-4 lg:py-4 xl:basis-1/2 xl:px-6"
           >
             <div
               v-if="selectedDiscussionId"
-              class="flex w-full flex-col justify-center px-2 py-4"
+              class="flex w-full min-w-0 max-w-full flex-col justify-center px-2 py-4"
             >
-              <h2 v-if="selectedDiscussionTitle" class="mb-3">
+              <h2 v-if="selectedDiscussionTitle" class="mb-3 min-w-0">
                 <nuxt-link
                   v-if="selectedDiscussionLink"
                   :to="selectedDiscussionLink"
-                  class="text-lg font-semibold text-gray-900 hover:underline dark:text-gray-100"
+                  class="break-words text-lg font-semibold text-gray-900 hover:underline dark:text-gray-100"
                 >
                   {{ selectedDiscussionTitle }}
                 </nuxt-link>
                 <span
                   v-else
-                  class="text-lg font-semibold text-gray-900 dark:text-gray-100"
+                  class="break-words text-lg font-semibold text-gray-900 dark:text-gray-100"
                 >
                   {{ selectedDiscussionTitle }}
                 </span>
@@ -381,9 +383,11 @@ const filterByChannel = (channel: string) => {
                 :channel-id="selectedChannelId"
                 :horizontal-album-thumbnails="true"
                 :show-comments="false"
-                class="w-full"
+                class="w-full min-w-0 max-w-full"
               />
-              <div class="mt-6 w-full rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+              <div
+                class="mt-6 w-full min-w-0 rounded-lg border border-gray-200 p-4 dark:border-gray-700"
+              >
                 <p class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-200">
                   Select a forum to view comments
                 </p>
@@ -421,7 +425,7 @@ const filterByChannel = (channel: string) => {
             </div>
             <div
               v-else
-              class="h-full px-6 py-4"
+              class="h-full min-w-0 px-2 py-4 xl:px-6"
             >
               <DiscussionDetailEmptyState />
             </div>
