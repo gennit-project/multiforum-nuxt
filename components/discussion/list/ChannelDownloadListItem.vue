@@ -15,8 +15,6 @@ import type {
 } from '@/__generated__/graphql';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
-import { storeToRefs } from 'pinia';
-import { useUIStore } from '@/stores/uiStore';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
@@ -52,8 +50,6 @@ const props = defineProps({
 defineEmits(['filterByTag', 'openAlbum']);
 
 const route = useRoute();
-const uiStore = useUIStore();
-const { fontSize } = storeToRefs(uiStore);
 
 const channelIdInParams = computed(() =>
   typeof route.params.forumId === 'string' ? route.params.forumId : ''

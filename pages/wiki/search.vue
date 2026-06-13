@@ -11,6 +11,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { updateFilters } from '@/utils/routerUtils';
 import { getChannelLabel, relativeTime } from '@/utils';
 import { getFilterValuesFromParams } from '@/components/discussion/list/getDiscussionFilterValuesFromParams';
+import { GET_SITE_WIDE_WIKI_LIST } from '@/graphQLData/wiki/queries';
 
 const formatWordCount = (body: string | null | undefined): string => {
   if (!body) return '0 words';
@@ -20,7 +21,6 @@ const formatWordCount = (body: string | null | undefined): string => {
   }
   return `${words} ${words === 1 ? 'word' : 'words'}`;
 };
-import { GET_SITE_WIDE_WIKI_LIST } from '@/graphQLData/wiki/queries';
 
 const WIKI_PAGE_LIMIT = 25;
 
