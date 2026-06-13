@@ -37,7 +37,7 @@ const colorClasses = computed(() => {
     case 'gray':
       return 'bg-gray-500 hover:bg-gray-600 dark:border dark:border-gray-500 dark:bg-gray-500 dark:text-white dark:hover:bg-gray-600 focus:ring-gray-500';
     default: // orange
-      return 'bg-orange-400 hover:bg-orange-400 dark:border dark:border-orange-500 dark:bg-orange-400 dark:text-black dark:hover:bg-orange-400 focus:ring-orange-500';
+      return 'border border-gray-500 bg-gray-800 text-white hover:bg-gray-700 dark:border-gray-500 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 focus:ring-gray-500 dark:focus:ring-gray-400';
   }
 });
 </script>

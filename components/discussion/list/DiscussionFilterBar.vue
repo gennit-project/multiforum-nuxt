@@ -168,9 +168,9 @@ const isExpanded = computed(() => {
               // base (non‑active) colours
               !isExpanded
                 ? 'bg-gray-50 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
-                : 'bg-orange-300 text-orange-900 dark:bg-orange-700 dark:text-white',
+                : 'bg-gray-800 text-white dark:bg-gray-700 dark:text-white',
               // hover shade (one step darker) – always present
-              'hover:bg-orange-200 hover:text-orange-900 dark:hover:bg-orange-600 dark:hover:text-white',
+              'hover:bg-gray-700 hover:text-white dark:hover:bg-gray-600 dark:hover:text-white',
             ]"
             title="Expand all discussions"
             @click="expandAll"
@@ -184,8 +184,8 @@ const isExpanded = computed(() => {
               'flex h-9 items-center border-l px-2 transition-colors',
               isExpanded
                 ? 'bg-gray-50 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
-                : 'bg-orange-300 text-orange-900 dark:bg-orange-700 dark:text-white',
-              'hover:bg-orange-200 hover:text-orange-900 dark:hover:bg-orange-600 dark:hover:text-white',
+                : 'bg-gray-800 text-white dark:bg-gray-700 dark:text-white',
+              'hover:bg-gray-700 hover:text-white dark:hover:bg-gray-600 dark:hover:text-white',
             ]"
             title="Collapse all discussions"
             @click="collapseAll"
@@ -199,7 +199,7 @@ const isExpanded = computed(() => {
           :title="showFilters ? 'Hide filters' : 'Show filters'"
           :class="
             showFilters
-              ? 'border-orange-500'
+              ? 'border-gray-500 bg-gray-100 text-gray-900 dark:border-gray-400 dark:bg-gray-800 dark:text-white'
               : 'border-gray-300 text-gray-800 dark:border-gray-600 dark:text-gray-300'
           "
           class="flex h-9 items-center gap-1 rounded-md border px-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200"
@@ -218,7 +218,7 @@ const isExpanded = computed(() => {
           :title="showSearch ? 'Hide search' : 'Show search'"
           :class="
             showSearch
-              ? 'border-orange-500'
+              ? 'border-gray-500 bg-gray-100 text-gray-900 dark:border-gray-400 dark:bg-gray-800 dark:text-white'
               : 'border-gray-300 text-gray-800 dark:border-gray-600 dark:text-gray-300'
           "
           class="flex h-9 items-center gap-1 rounded-md border px-1.5 text-gray-800 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200"
@@ -260,7 +260,7 @@ const isExpanded = computed(() => {
     <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" >
     <div
       v-if="showSearch"
-      class="flex flex-col gap-2 bg-gray-100 py-2 dark:bg-gray-700 dark:text-gray-300"
+      class="flex flex-col gap-2 bg-gray-100 py-2 dark:bg-gray-900 dark:text-gray-300"
     >
       <SearchBar
         data-testid="discussion-filter-search-bar"
@@ -275,7 +275,7 @@ const isExpanded = computed(() => {
     </div>
     <div
       v-if="showFilters"
-      class="flex justify-end gap-2 bg-gray-100 py-2 dark:bg-gray-700 dark:text-gray-300"
+      class="flex justify-end gap-2 bg-gray-100 py-2 dark:bg-gray-900 dark:text-gray-300"
     >
       <FilterChip
         class="align-middle"

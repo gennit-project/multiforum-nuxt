@@ -222,10 +222,10 @@ const revealSensitiveContent = () => {
                 <span
                   :class="
                     isSelected
-                      ? 'rounded bg-gray-100 px-1 dark:bg-gray-700'
+                      ? 'rounded bg-gray-100 px-1 dark:bg-gray-800 dark:text-white'
                       : ''
                   "
-                  class="cursor-pointer hover:text-gray-500 dark:text-gray-100"
+                  class="cursor-pointer text-gray-900 hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
                 >
                   <HighlightedSearchTerms
                     :text="title"
@@ -254,7 +254,7 @@ const revealSensitiveContent = () => {
                 </span>
                 <span
                   v-if="hasSensitiveContent"
-                  class="rounded-full border border-orange-600 px-2 text-xs text-orange-600 dark:border-orange-400 dark:text-orange-400"
+                  class="rounded-full border border-amber-700 px-2 text-xs text-amber-700 dark:border-orange-400 dark:text-orange-400"
                 >
                   Sensitive
                 </span>
@@ -266,10 +266,10 @@ const revealSensitiveContent = () => {
                 <span
                   :class="
                     isSelected
-                      ? 'rounded bg-gray-100 px-1 dark:bg-gray-700'
+                      ? 'rounded bg-gray-100 px-1 dark:bg-gray-800 dark:text-white'
                       : ''
                   "
-                  class="cursor-pointer hover:text-gray-500 dark:text-gray-100"
+                  class="cursor-pointer text-gray-900 hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
                 >
                   <HighlightedSearchTerms
                     :text="title"
@@ -298,7 +298,7 @@ const revealSensitiveContent = () => {
                 </span>
                 <span
                   v-if="hasSensitiveContent"
-                  class="rounded-full border border-orange-600 px-2 text-xs text-orange-600 dark:border-orange-400 dark:text-orange-400"
+                  class="rounded-full border border-amber-700 px-2 text-xs text-amber-700 dark:border-orange-400 dark:text-orange-400"
                 >
                   Sensitive
                 </span>
@@ -402,7 +402,7 @@ const revealSensitiveContent = () => {
               <template v-if="shouldShowContent">
                 <div
                   v-if="discussion.body"
-                  class="my-2 border-l bg-gray-100 py-2 pl-4 pr-2 dark:border-gray-600 dark:bg-black"
+                  class="my-2 border-l bg-gray-100 py-2 pl-4 pr-2 dark:border-gray-700 dark:bg-gray-900"
                 >
                   <MarkdownPreview
                     :text="discussion.body"

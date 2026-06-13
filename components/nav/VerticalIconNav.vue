@@ -184,32 +184,32 @@ watch(
 
 const getIconCircleClasses = (isActive: boolean) => {
   const baseClasses =
-    'w-12 h-12 rounded-full bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center transition-all duration-200 cursor-pointer';
+    'w-12 h-12 rounded-full bg-transparent hover:bg-gray-200 dark:hover:bg-gray-800 flex items-center justify-center transition-all duration-200 cursor-pointer';
   return isActive
-    ? `${baseClasses} bg-gray-200 dark:bg-gray-800 ring-1 ring-orange-500 ring-offset-1 ring-offset-gray-100 dark:ring-offset-gray-900 shadow-md`
+    ? `${baseClasses} bg-gray-200 dark:bg-gray-800 ring-1 ring-gray-400 ring-offset-1 ring-offset-gray-100 dark:ring-gray-500 dark:ring-offset-gray-900 shadow-sm`
     : baseClasses;
 };
 
 const getForumIconClasses = (isActive: boolean) => {
   const baseClasses =
-    'w-12 h-12 rounded-full bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center transition-all duration-200 cursor-pointer overflow-hidden';
+    'w-12 h-12 rounded-full bg-transparent hover:bg-gray-200 dark:hover:bg-gray-800 flex items-center justify-center transition-all duration-200 cursor-pointer overflow-hidden';
   return isActive
-    ? `${baseClasses} bg-gray-200 dark:bg-gray-800 ring-2 ring-orange-500 ring-offset-0 shadow-md`
+    ? `${baseClasses} bg-gray-200 dark:bg-gray-800 ring-2 ring-gray-400 dark:ring-gray-500 shadow-sm`
     : baseClasses;
 };
 
 const getUserActionClasses = (isActive: boolean) => {
   const baseClasses =
-    'rounded-full my-2 bg-transparent hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center transition-all duration-200 cursor-pointer';
+    'rounded-full my-2 bg-transparent hover:bg-gray-200 dark:hover:bg-gray-800 flex items-center justify-center transition-all duration-200 cursor-pointer';
   return isActive
-    ? `${baseClasses} bg-gray-200 dark:bg-gray-800 ring-1 ring-orange-500 ring-offset-1 ring-offset-gray-100 dark:ring-offset-gray-900 shadow-md`
+    ? `${baseClasses} bg-gray-200 dark:bg-gray-800 ring-1 ring-gray-400 ring-offset-1 ring-offset-gray-100 dark:ring-gray-500 dark:ring-offset-gray-900 shadow-sm`
     : baseClasses;
 };
 </script>
 
 <template>
   <div
-    class="fixed left-0 top-0 z-[18] hidden h-full w-20 flex-col items-center border-r border-gray-200 bg-gray-100 dark:border-gray-600 dark:bg-gray-900 lg:flex"
+    class="fixed left-0 top-0 z-[18] hidden h-full w-20 flex-col items-center border-r border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-900 lg:flex"
     :class="{ 'py-2': isVerticallyShort, 'py-4': !isVerticallyShort }"
   >
       <!-- Create Button -->

@@ -102,7 +102,7 @@ const handleItemClick = (item: any) => {
 
 const buttonClasses = computed(() => {
   if (createButtonProps.iconOnly) {
-    return 'flex h-12 w-12 items-center justify-center rounded-full bg-orange-400 text-gray-900 font-semibold hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-200 focus:ring-offset-2 focus:ring-offset-gray-900';
+    return 'flex h-12 w-12 items-center justify-center rounded-full bg-gray-800 text-white font-semibold hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-gray-100 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-500 dark:focus:ring-offset-gray-900';
   }
 
   const baseClasses =
