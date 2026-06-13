@@ -5,10 +5,19 @@ import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
+// Simplified image type for lightbox display
+interface LightboxImage {
+  id: string;
+  url?: string | null;
+  alt?: string | null;
+  caption?: string | null;
+  isStlFile?: boolean;
+  fileName?: string;
+}
 
 const props = defineProps({
   currentImage: {
-    type: Object as PropType<any>,
+    type: Object as PropType<LightboxImage>,
     required: true,
   },
   showNavigation: {
