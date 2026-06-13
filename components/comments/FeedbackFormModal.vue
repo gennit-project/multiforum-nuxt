@@ -1,41 +1,22 @@
-<script>
-import { defineComponent } from 'vue';
-import GenericModal from '../GenericModal.vue';
+<script lang="ts" setup>
+import GenericModal from '@/components/GenericModal.vue';
 import ExclamationIcon from '@/components/icons/ExclamationIcon.vue';
 
-export default defineComponent({
-  name: 'FeedbackFormModal',
-  components: {
-    GenericModal,
-    ExclamationIcon,
-  },
-  props: {
-    title: {
-      type: String,
-      require: true,
-      default: 'Are you sure?',
-    },
-    body: {
-      type: String,
-      require: true,
-      default: '',
-    },
-    open: {
-      type: Boolean,
-      default: false,
-    },
-    primaryButtonText: {
-      type: String,
-      default: 'Delete',
-    },
-    secondaryButtonText: {
-      type: String,
-      default: 'Cancel',
-    },
-  },
-  setup() {},
+withDefaults(defineProps<{
+  title?: string;
+  body?: string;
+  open?: boolean;
+  primaryButtonText?: string;
+  secondaryButtonText?: string;
+}>(), {
+  title: 'Are you sure?',
+  body: '',
+  open: false,
+  primaryButtonText: 'Delete',
+  secondaryButtonText: 'Cancel',
 });
 </script>
+
 <template>
   <GenericModal
     :highlight-color="'yellow'"

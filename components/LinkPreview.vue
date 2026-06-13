@@ -1,46 +1,51 @@
-<script>
+<script lang="ts" setup>
+import { ref, onMounted } from 'vue';
 import { config } from '@/config';
-export default {
-  name: 'LinkPreview',
-  props: {
-    url: {
-      type: String,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      title: '',
-      description: '',
-      imageUrl: '',
-      htmlInferredImages: [],
-      apiKey: config.openGraphApiKey,
-      showImage: true,
-    };
-  },
-  mounted() {
-    this.fetchData();
-  },
-  methods: {
-    fetchData() {
-      const endpoint = `https://opengraph.io/api/1.1/site/${encodeURIComponent(
-        this.url
-      )}?app_id=${this.apiKey}`;
-      fetch(endpoint)
-        .then((response) => response.json())
-        .then((data) => {
-          this.title = data.hybridGraph.title || data.hybridGraph.url;
-          this.description = data.hybridGraph.description || '';
-          this.imageUrl = data.hybridGraph.image || '';
 
-          if (data.htmlInferred.images) {
-            this.htmlInferredImages = data.htmlInferred.images;
-          }
-        })
-        .catch((error) => console.error(error));
-    },
-  },
+const props = defineProps<{
+  url: string;
+}>();
+
+const title = ref('');
+const description = ref('');
+const imageUrl = ref('');
+const htmlInferredImages = ref<string[]>([]);
+const showImage = ref(true);
+const apiKey = config.openGraphApiKey;
+
+interface OpenGraphResponse {
+  hybridGraph: {
+    title?: string;
+    url?: string;
+    description?: string;
+    image?: string;
+  };
+  htmlInferred: {
+    images?: string[];
+  };
+}
+
+const fetchData = () => {
+  const endpoint = `https://opengraph.io/api/1.1/site/${encodeURIComponent(
+    props.url
+  )}?app_id=${apiKey}`;
+  fetch(endpoint)
+    .then((response) => response.json())
+    .then((data: OpenGraphResponse) => {
+      title.value = data.hybridGraph.title || data.hybridGraph.url || '';
+      description.value = data.hybridGraph.description || '';
+      imageUrl.value = data.hybridGraph.image || '';
+
+      if (data.htmlInferred.images) {
+        htmlInferredImages.value = data.htmlInferred.images;
+      }
+    })
+    .catch((error) => console.error(error));
 };
+
+onMounted(() => {
+  fetchData();
+});
 </script>
 
 <template>

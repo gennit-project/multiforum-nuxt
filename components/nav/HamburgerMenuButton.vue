@@ -1,11 +1,7 @@
-<script>
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'HamburgerMenuButton',
-  setup() {},
-});
+<script lang="ts" setup>
+// HamburgerMenuButton component - mobile navigation toggle
 </script>
+
 <template>
   <button
     data-testid="hamburger-menu-button"

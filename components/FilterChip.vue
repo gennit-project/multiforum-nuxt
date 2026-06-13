@@ -1,47 +1,30 @@
-<script>
-import { defineComponent, ref, computed, defineAsyncComponent } from 'vue';
+<script lang="ts" setup>
+import { ref, defineAsyncComponent } from 'vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
-import { useUIStore } from '@/stores/uiStore';
+
 // Import Popper dynamically to avoid SSR issues with regeneratorRuntime
 const Popper = defineAsyncComponent(() => import('vue3-popper'));
 
-export default defineComponent({
-  components: {
-    ChevronDownIcon,
-    Popper,
-  },
-  props: {
-    dataTestid: {
-      type: String,
-      default: 'filter-button',
-    },
-    label: {
-      type: String,
-      default: 'No label',
-    },
-    highlighted: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: ['click'],
-  setup(props, { emit }) {
-    const isOpen = ref(false);
-    const uiStore = useUIStore();
-    const theme = computed(() => uiStore.theme);
-
-    const handleClick = () => {
-      isOpen.value = !isOpen.value;
-      emit('click');
-    };
-
-    return {
-      theme,
-      isOpen,
-      handleClick,
-    };
-  },
+const props = withDefaults(defineProps<{
+  dataTestid?: string;
+  label?: string;
+  highlighted?: boolean;
+}>(), {
+  dataTestid: 'filter-button',
+  label: 'No label',
+  highlighted: false,
 });
+
+const emit = defineEmits<{
+  click: [];
+}>();
+
+const isOpen = ref(false);
+
+const handleClick = () => {
+  isOpen.value = !isOpen.value;
+  emit('click');
+};
 </script>
 
 <template>

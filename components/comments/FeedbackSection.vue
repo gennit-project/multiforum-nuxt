@@ -95,6 +95,7 @@ const feedbackId = computed(() =>
 const showConfirmUndoFeedbackModal = ref(false);
 const showEditCommentFeedbackModal = ref(false);
 const showCopiedLinkNotification = ref(false);
+const feedbackText = ref('');
 
 function handleClickGiveFeedback(input: GiveFeedbackInput) {
   const { commentData, parentCommentId } = input;
@@ -115,7 +116,7 @@ function handleClickEditFeedback(input: EditFeedbackInput) {
 }
 
 function updateFeedback(text: string) {
-  this.feedbackText = text;
+  feedbackText.value = text;
 }
 
 function handleSubmitFeedback() {
@@ -129,7 +130,7 @@ function handleSubmitFeedback() {
   }
   const feedbackInput = {
     commentId: props.commentToGiveFeedbackOn?.id,
-    text: this.feedbackText,
+    text: feedbackText.value,
     modProfileName: props.loggedInUserModName,
     channelId: channelId.value,
   };
