@@ -12,7 +12,7 @@ import { UPDATE_CHANNEL_ENABLED_PLUGINS } from '@/graphQLData/channel/mutations'
 
 type PluginState = {
   enabled: boolean;
-  settings: Record<string, any>;
+  settings: Record<string, unknown>;
 };
 
 const route = useRoute();
@@ -64,8 +64,23 @@ const enabledPluginEdges = computed(() => {
   );
 });
 
+interface EnabledPluginEdge {
+  node?: {
+    id?: string;
+    Plugin?: {
+      id?: string;
+      name?: string;
+      displayName?: string;
+    };
+    version?: string;
+  };
+  properties?: {
+    settingsJson?: unknown;
+  };
+}
+
 const enabledPluginsByKey = computed(() => {
-  const map = new Map<string, any>();
+  const map = new Map<string, EnabledPluginEdge>();
   for (const edge of enabledPluginEdges.value) {
     const pluginId = edge?.node?.Plugin?.id;
     const version = edge?.node?.version;
@@ -76,14 +91,32 @@ const enabledPluginsByKey = computed(() => {
   return map;
 });
 
-const serverEnabledPlugins = computed(() => {
+interface ServerPlugin {
+  plugin: {
+    id: string;
+    name?: string;
+    displayName?: string;
+    description?: string;
+  };
+  version: string;
+  enabled: boolean;
+  manifest?: {
+    settingsDefaults?: {
+      channel?: Record<string, unknown>;
+    };
+  };
+  latestVersion?: string;
+  availableVersions?: string[];
+}
+
+const serverEnabledPlugins = computed((): ServerPlugin[] => {
   const installed = installedResult.value?.getInstalledPlugins || [];
-  return installed.filter((plugin: any) => plugin.enabled);
+  return installed.filter((plugin: ServerPlugin) => plugin.enabled);
 });
 
 type ConsolidatedPlugin = {
-  plugin: any;
-  versions: any[];
+  plugin: ServerPlugin['plugin'];
+  versions: ServerPlugin[];
   latestVersion: string;
   availableVersions: string[];
 };
@@ -118,11 +151,11 @@ const consolidatedPlugins = computed<ConsolidatedPlugin[]>(() => {
 const orphanedChannelPlugins = computed(() => {
   const serverKeys = new Set(
     serverEnabledPlugins.value.map(
-      (plugin: any) => `${plugin.plugin.id}:${plugin.version}`
+      (plugin: ServerPlugin) => `${plugin.plugin.id}:${plugin.version}`
     )
   );
   return enabledPluginEdges.value.filter(
-    (edge: any) =>
+    (edge: EnabledPluginEdge) =>
       !serverKeys.has(`${edge?.node?.Plugin?.id}:${edge?.node?.version}`)
   );
 });
@@ -136,7 +169,9 @@ const isLoading = computed(
     (installedLoading.value && !installedResult.value)
 );
 
-function getChannelDefaults(manifest: any): Record<string, any> {
+function getChannelDefaults(
+  manifest: ServerPlugin['manifest']
+): Record<string, unknown> {
   const defaults = manifest?.settingsDefaults?.channel;
   if (!defaults || typeof defaults !== 'object') {
     return {};
@@ -144,7 +179,11 @@ function getChannelDefaults(manifest: any): Record<string, any> {
   return { ...defaults };
 }
 
-function initializePluginState(pluginKey: string, manifest: any, edge?: any) {
+function initializePluginState(
+  pluginKey: string,
+  manifest: ServerPlugin['manifest'],
+  edge?: EnabledPluginEdge
+) {
   const settingsJson = edge?.properties?.settingsJson;
   const defaults = getChannelDefaults(manifest);
   pluginStates.value[pluginKey] = {
@@ -156,7 +195,7 @@ function initializePluginState(pluginKey: string, manifest: any, edge?: any) {
   };
 }
 
-function parseSettingsJson(settingsJson: unknown): Record<string, any> {
+function parseSettingsJson(settingsJson: unknown): Record<string, unknown> {
   if (!settingsJson) {
     return {};
   }
@@ -169,7 +208,7 @@ function parseSettingsJson(settingsJson: unknown): Record<string, any> {
     }
   }
   if (typeof settingsJson === 'object') {
-    return settingsJson as Record<string, any>;
+    return settingsJson as Record<string, unknown>;
   }
   return {};
 }
@@ -198,7 +237,7 @@ watch(
   { immediate: true }
 );
 
-function getPluginKey(plugin: any) {
+function getPluginKey(plugin: ServerPlugin) {
   return `${plugin.plugin.id}:${plugin.version ?? 'unknown'}`;
 }
 
@@ -274,11 +313,11 @@ async function handleConsolidatedToggle(
   }
 }
 
-function isToggling(plugin: any) {
+function isToggling(plugin: ServerPlugin) {
   return togglingPluginIds.value.has(getPluginKey(plugin));
 }
 
-async function handleToggleEnabled(plugin: any, enabled: boolean) {
+async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
   const pluginId = plugin.plugin.id;
   const pluginKey = getPluginKey(plugin);
   const state = pluginStates.value[pluginKey];
@@ -290,7 +329,7 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
     return;
   }
 
-  const enabledPluginsInput: any[] = [];
+  const enabledPluginsInput: Array<Record<string, unknown>> = [];
   const settingsJson = serializeSettingsJson(state?.settings || {});
 
   if (enabled) {
@@ -363,10 +402,11 @@ async function handleToggleEnabled(plugin: any, enabled: boolean) {
         ? 'Plugin enabled for this forum.'
         : 'Plugin disabled for this forum.'
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errMessage = err instanceof Error ? err.message : '';
     const message =
       updateChannelEnabledPluginsError.value?.message ||
-      err?.message ||
+      errMessage ||
       'Failed to update plugin. Please try again.';
     toast.error(`Failed to update plugin: ${message}`);
   } finally {

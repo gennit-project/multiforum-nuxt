@@ -267,8 +267,8 @@ export const distanceUnitOptions: Array<DistanceUnit> = [
   { label: 'mi', value: 'mi' },
 ];
 
-const createWeekdayMap = () => {
-  const weekdayMap = {} as any;
+const createWeekdayMap = (): Record<string, string> => {
+  const weekdayMap: Record<string, string> = {};
   for (let i = 0; i < weekdays.length; i++) {
     const weekdayData = weekdays[i];
     if (weekdayData) {

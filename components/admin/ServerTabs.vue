@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
+import type { Component } from 'vue';
 import TabButton from '@/components/channel/TabButton.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
 import CogIcon from '@/components/icons/CogIcon.vue';
@@ -14,7 +15,7 @@ type Tab = {
   name: string;
   routeSuffix: string;
   label: string;
-  icon: any;
+  icon: Component;
   countProperty: keyof Channel | null;
 };
 

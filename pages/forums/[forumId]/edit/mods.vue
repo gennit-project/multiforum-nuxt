@@ -15,6 +15,25 @@ import {
 } from '@/graphQLData/mod/queries';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 
+// Cache query result types
+interface PendingModInvite {
+  displayName?: string;
+  username?: string;
+}
+
+interface ChannelMod {
+  username: string;
+  displayName?: string;
+}
+
+interface PendingModsQueryResult {
+  channels?: Array<{ PendingModInvites?: PendingModInvite[] }>;
+}
+
+interface ModsQueryResult {
+  channels?: Array<{ Admins?: ChannelMod[] }>;
+}
+
 const route = useRoute();
 
 const newModUsername = ref('');
@@ -36,14 +55,14 @@ const {
     // update the result of GET_PENDING_CHANNEL_MODS_BY_CHANNEL
     // to add the newly invited user
 
-    const existingData: any = cache.readQuery({
+    const existingData = cache.readQuery({
       query: GET_PENDING_CHANNEL_MODS_BY_CHANNEL,
       variables: {
         channelUniqueName: forumId.value,
       },
-    });
+    }) as PendingModsQueryResult | null;
 
-    const existingInvites = existingData?.channels[0]?.PendingModInvites ?? [];
+    const existingInvites = existingData?.channels?.[0]?.PendingModInvites ?? [];
 
     cache.writeQuery({
       query: GET_PENDING_CHANNEL_MODS_BY_CHANNEL,
@@ -74,16 +93,16 @@ const {
 } = useMutation(CANCEL_INVITE_FORUM_MOD, {
   update: (cache) => {
     // update the result of GET_PENDING_CHANNEL_MODS_BY_CHANNEL
-    // to add the newly invited mod
+    // to remove the cancelled invite
 
-    const existingData: any = cache.readQuery({
+    const existingData = cache.readQuery({
       query: GET_PENDING_CHANNEL_MODS_BY_CHANNEL,
       variables: {
         channelUniqueName: forumId.value,
       },
-    });
+    }) as PendingModsQueryResult | null;
 
-    const existingInvites = existingData?.channels[0]?.PendingModInvites ?? [];
+    const existingInvites = existingData?.channels?.[0]?.PendingModInvites ?? [];
 
     cache.writeQuery({
       query: GET_PENDING_CHANNEL_MODS_BY_CHANNEL,
@@ -95,7 +114,8 @@ const {
           {
             PendingModInvites: [
               ...existingInvites.filter(
-                (invite: any) => invite.username !== newModUsername.value
+                (invite: PendingModInvite) =>
+                  invite.username !== newModUsername.value
               ),
             ],
           },
@@ -115,14 +135,14 @@ const {
     // update the result of GET_MODS_BY_CHANNEL
     // to remove the removed user
 
-    const existingData: any = cache.readQuery({
+    const existingData = cache.readQuery({
       query: GET_MODS_BY_CHANNEL,
       variables: {
         channelUniqueName: forumId.value,
       },
-    });
+    }) as ModsQueryResult | null;
 
-    const existingMods = existingData?.channels[0]?.Admins ?? [];
+    const existingMods = existingData?.channels?.[0]?.Admins ?? [];
 
     cache.writeQuery({
       query: GET_MODS_BY_CHANNEL,
@@ -134,7 +154,7 @@ const {
           {
             Admins: [
               ...existingMods.filter(
-                (mod: any) => mod.username !== newModUsername.value
+                (mod: ChannelMod) => mod.username !== newModUsername.value
               ),
             ],
           },

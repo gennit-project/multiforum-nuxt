@@ -54,8 +54,8 @@ function parseYaml(content: string) {
     const parsed = yaml.load(content) as PipelineConfig;
     parseError.value = null;
     emit('parse', parsed, null);
-  } catch (err: any) {
-    parseError.value = err?.message || 'Invalid YAML';
+  } catch (err: unknown) {
+    parseError.value = err instanceof Error ? err.message : 'Invalid YAML';
     emit('parse', null, parseError.value);
   }
 }

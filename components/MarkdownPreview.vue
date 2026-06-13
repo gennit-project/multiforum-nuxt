@@ -213,12 +213,13 @@ export default defineComponent({
       return linkifiedMarkdown.value;
     });
 
-    const handleImageClick = (event: any) => {
+    const handleImageClick = (event: MouseEvent) => {
       if (props.disableGallery) {
         return;
       }
-      if (event.target.tagName === 'IMG') {
-        const clickedSrc = event.target.src;
+      const target = event.target as HTMLElement;
+      if (target.tagName === 'IMG') {
+        const clickedSrc = (target as HTMLImageElement).src;
         const clickedIndex = embeddedImages.value.findIndex(
           (image: GalleryItem) => image.href === clickedSrc
         );

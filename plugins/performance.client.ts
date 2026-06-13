@@ -4,9 +4,7 @@ export default defineNuxtPlugin(() => {
 
   // Detect slow network connections
   const connection =
-    navigator.connection ||
-    (navigator as any).mozConnection ||
-    (navigator as any).webkitConnection;
+    navigator.connection || navigator.mozConnection || navigator.webkitConnection;
 
   const isSlowConnection = connection
     ? connection.effectiveType === '2g' ||

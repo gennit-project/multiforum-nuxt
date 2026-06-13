@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue';
-import type { PropType } from 'vue';
+import type { PropType, Component } from 'vue';
 import type { ApolloError } from '@apollo/client/errors';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
@@ -26,7 +26,7 @@ import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 interface TabItem {
   key: string;
   label: string;
-  icon: any | null;
+  icon: Component | null;
   fontAwesome: string | null;
 }
 

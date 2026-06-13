@@ -3,7 +3,7 @@ import type { PropType } from 'vue';
 import { ref, computed, onMounted } from 'vue';
 import LeftArrowIcon from '@/components/icons/LeftArrowIcon.vue';
 import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
-import type { Album } from '@/__generated__/graphql';
+import type { Album, Image } from '@/__generated__/graphql';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import SaveButton from '@/components/SaveButton.vue';
@@ -88,11 +88,11 @@ const expandedThumbnailDimensions = computed(() => {
 });
 
 const orderedImages = computed(() => {
-  let albumImages: any[] = [];
+  let albumImages: Image[] = [];
 
   if (props.album) {
     if (!props.album.imageOrder || props.album.imageOrder.length === 0) {
-      albumImages = props.album.Images || [];
+      albumImages = (props.album.Images || []) as Image[];
     } else {
       albumImages = props.album.imageOrder
         .map((imageId) => {
@@ -101,7 +101,7 @@ const orderedImages = computed(() => {
           );
           return foundImage;
         })
-        .filter((image) => image !== undefined);
+        .filter((image): image is Image => image !== undefined);
     }
   }
 

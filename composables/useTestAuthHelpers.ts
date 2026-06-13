@@ -7,17 +7,17 @@ export function useTestAuthHelpers() {
   const isDevRuntime = import.meta.env.DEV;
   const isTestEnv =
     config.environment === 'test' ||
-    (typeof window !== 'undefined' && (window as any).Cypress);
+    (typeof window !== 'undefined' && window.Cypress);
   const shouldExpose = isDevRuntime || isTestEnv;
 
   if (!shouldExpose) return;
 
   // Create the auth state setter function
-  const setAuthStateDirect = (authState: {
-    username: string;
+  const setAuthStateDirect = (authState?: {
+    username?: string;
     authenticated?: boolean;
   }) => {
-    if (authState.authenticated !== false) {
+    if (authState?.authenticated !== false && authState?.username) {
       setIsAuthenticated(true);
       setUsername(authState.username);
       isAuthenticatedVar.value = true;
@@ -35,7 +35,7 @@ export function useTestAuthHelpers() {
   // Expose to window immediately
   const exposeToWindow = () => {
     if (typeof window !== 'undefined') {
-      (window as any).__SET_AUTH_STATE_DIRECT__ = setAuthStateDirect;
+      window.__SET_AUTH_STATE_DIRECT__ = setAuthStateDirect;
     }
   };
 

@@ -58,8 +58,9 @@ async function handleSave(config: PipelineConfig) {
     await updatePipelines({ pipelines: pipelinesInput });
     toast.success('Pipeline configuration saved successfully');
     await refetchPipelines();
-  } catch (err: any) {
-    toast.error(`Failed to save pipeline: ${err.message}`);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    toast.error(`Failed to save pipeline: ${message}`);
   }
 }
 </script>

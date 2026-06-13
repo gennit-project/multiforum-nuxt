@@ -28,7 +28,12 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   // ② Expose a helper for code that runs outside Vue's setup()/script setup
   // Access the composable lazily when the function is called
-  (globalThis as any).__auth0_getToken = (options: any = {}) => {
+  // Using globalThis augmentation for custom auth helper
+  (
+    globalThis as typeof globalThis & {
+      __auth0_getToken?: (options?: Record<string, unknown>) => Promise<string>;
+    }
+  ).__auth0_getToken = (options: Record<string, unknown> = {}) => {
     const { getAccessTokenSilently } = useAuth0();
     return getAccessTokenSilently({ detailedResponse: false, ...options });
   };

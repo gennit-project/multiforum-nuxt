@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
+import type { Component } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useDisplay } from 'vuetify';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
@@ -27,7 +28,7 @@ const VERTICAL_NAV_LIMIT = 3;
 type NavigationItem = {
   name: string;
   href: string;
-  icon: any;
+  icon: Component;
   routerName: string;
 };
 

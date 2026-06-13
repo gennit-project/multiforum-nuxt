@@ -118,7 +118,12 @@ const addOption = () => {
     __typename: 'FilterOption' as const,
     group: props.filterGroup,
     groupAggregate: null,
-    groupConnection: {} as any,
+    groupConnection: {
+      __typename: 'FilterOptionGroupConnection',
+      edges: [],
+      pageInfo: { hasNextPage: false, hasPreviousPage: false },
+      totalCount: 0,
+    },
   };
 
   const updatedOptions = [...(props.filterGroup.options || []), newOption];

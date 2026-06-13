@@ -148,7 +148,7 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
     const newImages = formValues.value.album.images;
 
     // Build the album node with Owner if user is logged in
-    const albumNode: any = {
+    const albumNode = {
       imageOrder: formValues.value.album.imageOrder,
       Images: {
         // Connect to existing images using their IDs

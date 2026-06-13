@@ -7,11 +7,35 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import TagComponent from '@/components/TagComponent.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
+import type { Discussion } from '@/__generated__/graphql';
 import { GET_USER_OWNED_DOWNLOADS } from '@/graphQLData/user/queries';
 import { relativeTime } from '@/utils';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+
+// Image type for album images
+interface AlbumImage {
+  id: string;
+  url?: string;
+}
+
+// Partial Discussion type for downloads
+type Download = Pick<Discussion, 'id' | 'title' | 'createdAt' | 'Tags'> & {
+  DiscussionChannels?: Array<{ channelUniqueName?: string }>;
+  Author?: {
+    username?: string;
+    displayName?: string;
+    profilePicURL?: string;
+    commentKarma?: number;
+    discussionKarma?: number;
+    createdAt?: string;
+  };
+  Album?: {
+    Images?: AlbumImage[];
+    imageOrder?: string[];
+  };
+};
 
 useHead({
   title: 'My Downloads - Library',
@@ -32,8 +56,10 @@ const ownedDownloads = computed(() => {
 });
 const { serverAdminUsernames } = useServerRoleMembership();
 
-const getDownloadLink = (download: any) => {
-  const firstChannel = safeArrayFirst(download.DiscussionChannels) as any;
+const getDownloadLink = (download: Download) => {
+  const firstChannel = safeArrayFirst(download.DiscussionChannels) as
+    | { channelUniqueName?: string }
+    | undefined;
   if (!firstChannel?.channelUniqueName) return '/';
 
   return `/forums/${firstChannel.channelUniqueName}/downloads/${download.id}`;
@@ -44,7 +70,7 @@ const getChannelLink = (channelUniqueName: string | undefined) => {
   return `/forums/${channelUniqueName}`;
 };
 
-const getAuthorInfo = (download: any) => {
+const getAuthorInfo = (download: Download) => {
   const author = download?.Author;
   if (!author) return null;
 
@@ -64,19 +90,19 @@ const getAuthorInfo = (download: any) => {
   };
 };
 
-const getFirstAlbumImage = (download: any) => {
+const getFirstAlbumImage = (download: Download): string | undefined => {
   const album = download?.Album;
-  if (!album?.Images?.length) return null;
+  if (!album?.Images?.length) return undefined;
 
   if (album.imageOrder?.length && album.imageOrder.length > 0) {
     const firstImageId = album.imageOrder[0];
     const orderedImage = album.Images.find(
-      (img: any) => img.id === firstImageId
+      (img: AlbumImage) => img.id === firstImageId
     );
-    return orderedImage?.url || null;
+    return orderedImage?.url;
   }
 
-  return album.Images[0]?.url || null;
+  return album.Images[0]?.url;
 };
 </script>
 
