@@ -5,10 +5,20 @@ import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import SaveButton from '@/components/SaveButton.vue';
 import CancelButton from '@/components/CancelButton.vue';
+// Simplified image type for lightbox display
+interface LightboxImage {
+  id: string;
+  url?: string | null;
+  alt?: string | null;
+  caption?: string | null;
+  isStlFile?: boolean;
+  fileName?: string;
+  Uploader?: { username?: string | null } | null;
+}
 
 defineProps({
   currentImage: {
-    type: Object as PropType<any>,
+    type: Object as PropType<LightboxImage | null>,
     default: null,
   },
   isEditing: {

@@ -7,10 +7,20 @@ import LightboxImagePanel from '@/components/discussion/detail/LightboxImagePane
 import LightboxInfoPanel from '@/components/discussion/detail/LightboxInfoPanel.vue';
 import { useMutation } from '@vue/apollo-composable';
 import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
+// Simplified image type for lightbox display
+interface LightboxImage {
+  id: string;
+  url?: string | null;
+  alt?: string | null;
+  caption?: string | null;
+  isStlFile?: boolean;
+  fileName?: string;
+  Uploader?: { username?: string | null } | null;
+}
 
 const props = defineProps({
   orderedImages: {
-    type: Array as PropType<any[]>,
+    type: Array as PropType<LightboxImage[]>,
     required: true,
   },
   initialIndex: {
@@ -31,8 +41,8 @@ const isPanelVisible = ref(true);
 const panelOnSide = ref(true);
 
 // Current image based on ordered images
-const currentImage = computed(() => {
-  return props.orderedImages[lightboxIndex.value] || {};
+const currentImage = computed((): LightboxImage => {
+  return props.orderedImages[lightboxIndex.value] || { id: '', url: '' };
 });
 
 // Caption editing
