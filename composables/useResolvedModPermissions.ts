@@ -6,6 +6,9 @@ import {
 
 type MaybeComputed<T> = Ref<T> | ComputedRef<T>;
 
+// These types accept any because they receive polymorphic GraphQL data
+// from multiple sources (Channel, ServerConfig, etc.) with different shapes
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type UseResolvedModPermissionsParams = {
   channelData: MaybeComputed<any | null>;
   serverConfig: MaybeComputed<any | null>;
@@ -20,6 +23,7 @@ type UseResolvedModPermissionsReturn = {
   resolvedPermissionData: ComputedRef<any | null>;
   userPermissions: ComputedRef<PermissionFlags>;
 };
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export function useResolvedModPermissions(
   params: UseResolvedModPermissionsParams

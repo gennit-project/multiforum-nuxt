@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PropType } from 'vue';
-import type { Discussion } from '@/__generated__/graphql';
+import type { Discussion, FilterOption } from '@/__generated__/graphql';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import DownloadNowButton from '@/components/channel/DownloadNowButton.vue';
 import FunctionalDownloadNow from '@/components/channel/FunctionalDownloadNow.vue';
@@ -107,7 +107,7 @@ const groupedLabels = computed(() => {
     Array<{ key: string; value: string; displayName: string }>
   > = {};
 
-  labelOptions.value.forEach((option: any) => {
+  labelOptions.value.forEach((option: FilterOption) => {
     const groupKey = option.group?.key;
     const groupDisplayName = option.group?.displayName;
 
