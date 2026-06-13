@@ -9,8 +9,17 @@ import SearchableForumList from '@/components/channel/SearchableForumList.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { updateFilters } from '@/utils/routerUtils';
-import { getChannelLabel } from '@/utils';
+import { getChannelLabel, relativeTime } from '@/utils';
 import { getFilterValuesFromParams } from '@/components/discussion/list/getDiscussionFilterValuesFromParams';
+
+const formatWordCount = (body: string | null | undefined): string => {
+  if (!body) return '0 words';
+  const words = body.trim().split(/\s+/).filter(Boolean).length;
+  if (words >= 1000) {
+    return `${(words / 1000).toFixed(1).replace(/\.0$/, '')}k words`;
+  }
+  return `${words} ${words === 1 ? 'word' : 'words'}`;
+};
 import { GET_SITE_WIDE_WIKI_LIST } from '@/graphQLData/wiki/queries';
 
 const WIKI_PAGE_LIMIT = 25;
@@ -105,12 +114,6 @@ const aggregateWikiPageCount = computed(() => {
   return wikiResult.value.getSiteWideWikiList.aggregateWikiPageCount || 0;
 });
 
-const getSnippet = (body: string | null | undefined) => {
-  if (!body) {
-    return '';
-  }
-  return body.length > 180 ? `${body.slice(0, 180)}...` : body;
-};
 
 watch(
   () => route.query,
@@ -198,21 +201,14 @@ watch(
               {{ wikiPage.channelUniqueName }}
             </span>
           </div>
-          <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
-            <HighlightedSearchTerms
-              :text="getSnippet(wikiPage.body)"
-              :search-input="searchInputComputed"
-            />
-          </p>
-          <div
-            v-if="wikiPage.VersionAuthor"
-            class="mt-3 text-xs text-gray-500 dark:text-gray-300"
-          >
-            Updated by
-            {{
-              wikiPage.VersionAuthor.displayName ||
-              wikiPage.VersionAuthor.username
-            }}
+          <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
+            <span>{{ formatWordCount(wikiPage.body) }}</span>
+            <span v-if="wikiPage.updatedAt">
+              Updated {{ relativeTime(wikiPage.updatedAt) }}
+            </span>
+            <span v-if="wikiPage.VersionAuthor">
+              by {{ wikiPage.VersionAuthor.displayName || wikiPage.VersionAuthor.username }}
+            </span>
           </div>
         </li>
       </ul>
