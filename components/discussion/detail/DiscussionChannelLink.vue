@@ -1,38 +1,17 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+interface Props {
+  channelDisplayName?: string;
+  channelIcon?: string;
+  discussionId: string;
+  channelId: string;
+  commentCount: number;
+  upvoteCount?: number;
+}
 
-export default defineComponent({
-  name: 'ChannelLink',
-  props: {
-    channelDisplayName: {
-      type: String,
-      default: '',
-    },
-    channelIcon: {
-      type: String,
-      default: '',
-    },
-    discussionId: {
-      type: String,
-      required: true,
-    },
-    channelId: {
-      type: String,
-      required: true,
-    },
-    commentCount: {
-      type: Number,
-      required: true,
-    },
-    upvoteCount: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-  },
-  setup() {
-    return {};
-  },
+withDefaults(defineProps<Props>(), {
+  channelDisplayName: '',
+  channelIcon: '',
+  upvoteCount: 0,
 });
 </script>
 <template>

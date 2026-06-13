@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useRouter } from 'nuxt/app';
 import { onMounted, ref } from 'vue';
 import { setIsAuthenticated, setUsername } from '@/cache';

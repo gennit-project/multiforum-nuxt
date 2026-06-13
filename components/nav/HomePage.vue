@@ -1,10 +1,5 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'HomePage',
-  setup() {},
-});
+<script setup lang="ts">
+// HomePage component - no props or state needed
 </script>
 
 <template>

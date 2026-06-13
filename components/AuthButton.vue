@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 
 const props = defineProps({

@@ -1,28 +1,22 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import PrimaryButton from '@/components/PrimaryButton.vue';
 
-export default defineComponent({
-  components: {
-    PrimaryButton,
+withDefaults(
+  defineProps<{
+    disabled?: boolean;
+    loading?: boolean;
+    text?: string;
+  }>(),
+  {
+    disabled: false,
+    loading: false,
+    text: 'Save',
   },
-  props: {
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
-    text: {
-      type: String,
-      default: 'Save',
-    },
-  },
-  emits: ['click'],
-  setup() {},
-});
+);
+
+const emit = defineEmits<{
+  click: [event: MouseEvent];
+}>();
 </script>
 <template>
   <PrimaryButton
@@ -31,6 +25,6 @@ export default defineComponent({
     :loading="loading"
     class="border-transparent ml-3 inline-flex justify-center rounded-full border px-4 py-2 text-sm font-medium shadow-sm dark:border-gray-700"
     @keydown.enter.prevent
-    @click="$emit('click', $event)"
+    @click="emit('click', $event)"
   />
 </template>

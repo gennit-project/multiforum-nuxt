@@ -1,19 +1,8 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  props: {
-    to: {
-      type: String,
-      required: true,
-    },
-    label: {
-      type: String,
-      required: true,
-    },
-  },
-  setup() {},
-});
+<script setup lang="ts">
+defineProps<{
+  to: string;
+  label: string;
+}>();
 </script>
 
 <template>

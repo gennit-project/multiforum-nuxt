@@ -1,9 +1,6 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
+<script setup lang="ts">
+defineOptions({
   name: 'TableComponent',
-  setup() {},
 });
 </script>
 <template>

@@ -1,9 +1,5 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  setup() {},
-});
+<script setup lang="ts">
+// TableHead - Styled table header cell
 </script>
 <template>
   <th

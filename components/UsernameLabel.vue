@@ -1,15 +1,9 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+interface Props {
+  text: string;
+}
 
-export default defineComponent({
-  name: 'UsernameLabel',
-  props: {
-    text: {
-      type: String,
-      required: true,
-    },
-  },
-});
+defineProps<Props>();
 </script>
 <template>
   <span

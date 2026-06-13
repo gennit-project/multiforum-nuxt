@@ -1,25 +1,14 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import { LocationFilterTypes } from './filters/locationFilterTypes';
 
-export default defineComponent({
-  name: 'EventResultCount',
-  props: {
-    resultCount: {
-      type: Number,
-      required: true,
-    },
-    filterValues: {
-      type: Object,
-      required: true,
-    },
-  },
-  setup() {
-    return {
-      LocationFilterTypes,
-    };
-  },
-});
+interface FilterValues {
+  locationFilter?: LocationFilterTypes;
+}
+
+defineProps<{
+  resultCount: number;
+  filterValues: FilterValues;
+}>();
 </script>
 
 <template>

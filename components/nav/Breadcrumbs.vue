@@ -1,24 +1,12 @@
-<script lang="ts">
-import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
-
+<script setup lang="ts">
 interface Link {
   path: string;
   label: string;
 }
 
-export default defineComponent({
-  name: 'BreadCrumbs',
-  props: {
-    links: {
-      type: Array as PropType<Link[]>,
-      required: true,
-    },
-  },
-  setup() {
-    return {};
-  },
-});
+defineProps<{
+  links: Link[];
+}>();
 </script>
 
 <template>

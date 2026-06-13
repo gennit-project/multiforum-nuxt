@@ -1,32 +1,20 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import GenericModal from '@/components/GenericModal.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
 import TextEditor from '@/components/TextEditor.vue';
 
-export default defineComponent({
-  name: 'ReportEventModal',
-  components: {
-    GenericModal,
-    FlagIcon,
-    TextEditor,
-  },
-  props: {
-    body: {
-      type: String,
-      require: true,
-      default: '',
-    },
-    open: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  setup() {},
-  methods: {
-    updateFeedback() {},
-  },
-});
+withDefaults(
+  defineProps<{
+    body?: string;
+    open?: boolean;
+  }>(),
+  {
+    body: '',
+    open: false,
+  }
+);
+
+function updateFeedback() {}
 </script>
 <template>
   <GenericModal

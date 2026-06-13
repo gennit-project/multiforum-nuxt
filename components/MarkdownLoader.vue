@@ -1,53 +1,41 @@
-<script lang="ts">
-import { defineComponent, ref, watch, onMounted } from 'vue';
+<script setup lang="ts">
+import { ref, watch, onMounted } from 'vue';
 import { useRoute } from 'nuxt/app';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import axios from 'axios';
 
-export default defineComponent({
-  name: 'MarkdownLoader',
-  components: {
-    MarkdownPreview,
+interface Props {
+  slug: string;
+}
+
+const props = defineProps<Props>();
+
+const route = useRoute();
+const content = ref('');
+
+const loadPost = async (slug: string) => {
+  try {
+    const response = await axios.get(`/${slug}.md`);
+    content.value = response.data;
+  } catch (error) {
+    console.error('Error loading post:', error);
+  }
+};
+
+watch(
+  () => route.params.slug,
+  (newSlug) => {
+    if (newSlug) {
+      loadPost(newSlug as string);
+    }
   },
-  props: {
-    slug: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
-    const route = useRoute();
-    const content = ref('');
+  { immediate: true }
+);
 
-    const loadPost = async (slug: string) => {
-      try {
-        const response = await axios.get(`/${slug}.md`);
-        content.value = response.data;
-      } catch (error) {
-        console.error('Error loading post:', error);
-      }
-    };
-
-    watch(
-      () => route.params.slug,
-      (newSlug) => {
-        if (newSlug) {
-          loadPost(newSlug as string);
-        }
-      },
-      { immediate: true }
-    );
-
-    onMounted(() => {
-      if (props.slug) {
-        loadPost(props.slug as string);
-      }
-    });
-
-    return {
-      content,
-    };
-  },
+onMounted(() => {
+  if (props.slug) {
+    loadPost(props.slug as string);
+  }
 });
 </script>
 

@@ -1,11 +1,4 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  setup() {
-    return {};
-  },
-});
+<script setup lang="ts">
 </script>
 <template>
   <div class="m-8 mx-auto flex justify-center">

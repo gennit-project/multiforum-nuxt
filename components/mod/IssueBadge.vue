@@ -1,20 +1,12 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import type { Issue } from '@/__generated__/graphql';
 
-export default defineComponent({
-  props: {
-    issue: {
-      type: Object as () => Issue,
-      required: true,
-    },
-  },
-  setup(props) {
-    return {
-      isOpen: props.issue.isOpen,
-    };
-  },
-});
+const props = defineProps<{
+  issue: Issue;
+}>();
+
+const isOpen = computed(() => props.issue.isOpen);
 </script>
 
 <template>

@@ -1,84 +1,65 @@
-<script lang="ts">
-import type { PropType } from 'vue';
-import { defineComponent, computed } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import DiscussionChannelLink from './DiscussionChannelLink.vue';
 import { useRoute } from 'nuxt/app';
 import type { DiscussionChannel } from '@/__generated__/graphql';
 
-export default defineComponent({
-  name: 'DiscussionChannelLinks',
-  components: {
-    DiscussionChannelLink,
-  },
-  props: {
-    channelId: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    discussionChannels: {
-      type: Array as PropType<Array<DiscussionChannel>>,
-      required: true,
-    },
-  },
-  setup(props) {
-    const route = useRoute();
+interface Props {
+  channelId?: string;
+  discussionChannels: DiscussionChannel[];
+}
 
-    const getCommentCount = (channelId: string) => {
-      const discussionChannels = props.discussionChannels;
+const props = withDefaults(defineProps<Props>(), {
+  channelId: '',
+});
 
-      const activeDiscussionChannel = discussionChannels.find(
-        (cs: DiscussionChannel) => {
-          return cs.Channel?.uniqueName === channelId;
-        }
-      );
+const route = useRoute();
 
-      if (!activeDiscussionChannel) {
-        return 0;
-      }
-      return activeDiscussionChannel.CommentsAggregate?.count
-        ? activeDiscussionChannel.CommentsAggregate.count
-        : 0;
-    };
+const getCommentCount = (channelId: string) => {
+  const discussionChannels = props.discussionChannels;
 
-    const getVoteCount = (channelId: string) => {
-      const discussionChannels = props.discussionChannels;
+  const activeDiscussionChannel = discussionChannels.find(
+    (cs: DiscussionChannel) => {
+      return cs.Channel?.uniqueName === channelId;
+    }
+  );
 
-      const activeDiscussionChannel = discussionChannels.find(
-        (dc: DiscussionChannel) => {
-          return dc.channelUniqueName === channelId;
-        }
-      );
+  if (!activeDiscussionChannel) {
+    return 0;
+  }
+  return activeDiscussionChannel.CommentsAggregate?.count
+    ? activeDiscussionChannel.CommentsAggregate.count
+    : 0;
+};
 
-      if (
-        !activeDiscussionChannel ||
-        !activeDiscussionChannel.UpvotedByUsersAggregate?.count
-      ) {
-        return 0;
-      }
-      return activeDiscussionChannel.UpvotedByUsersAggregate.count;
-    };
+const getVoteCount = (channelId: string) => {
+  const discussionChannels = props.discussionChannels;
 
-    const activeDiscussionChannel = computed(() => {
-      return props.discussionChannels.filter((dc) => {
-        return dc.channelUniqueName === props.channelId;
-      })[0];
-    });
+  const activeDiscussionChannel = discussionChannels.find(
+    (dc: DiscussionChannel) => {
+      return dc.channelUniqueName === channelId;
+    }
+  );
 
-    const channelsExceptActive = computed(() => {
-      return props.discussionChannels.filter((dc) => {
-        return dc.channelUniqueName !== props.channelId;
-      });
-    });
+  if (
+    !activeDiscussionChannel ||
+    !activeDiscussionChannel.UpvotedByUsersAggregate?.count
+  ) {
+    return 0;
+  }
+  return activeDiscussionChannel.UpvotedByUsersAggregate.count;
+};
 
-    return {
-      activeDiscussionChannel,
-      channelsExceptActive,
-      route,
-      getCommentCount,
-      getVoteCount,
-    };
-  },
+const activeDiscussionChannel = computed(() => {
+  return props.discussionChannels.filter((dc) => {
+    return dc.channelUniqueName === props.channelId;
+  })[0];
+});
+
+const channelsExceptActive = computed(() => {
+  return props.discussionChannels.filter((dc) => {
+    return dc.channelUniqueName !== props.channelId;
+  });
 });
 </script>
 

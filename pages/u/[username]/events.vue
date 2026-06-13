@@ -1,58 +1,42 @@
-<script lang="ts">
-import { defineComponent, computed } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import { GET_USER_EVENTS } from '@/graphQLData/user/queries';
 import { useQuery } from '@vue/apollo-composable';
 import EventListItemInProfile from '@/components/user/EventItemInProfile.vue';
 import { useRoute } from 'nuxt/app';
 import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
 
-export default defineComponent({
-  name: 'DownvotedEvents',
-  components: {
-    EventListItemInProfile,
-  },
+const route = useRoute();
+const { selectedChannels, hasSelectedChannels } = useSelectedChannelsFromQuery();
 
-  setup() {
-    const route = useRoute();
-    const { selectedChannels, hasSelectedChannels } =
-      useSelectedChannelsFromQuery();
-
-    const username = computed(() => {
-      if (typeof route.params.username === 'string') {
-        return route.params.username;
-      }
-      return '';
-    });
-
-    const eventsWhere = computed(() => {
-      if (!hasSelectedChannels.value) {
-        return undefined;
-      }
-      return {
-        EventChannels_SOME: {
-          channelUniqueName_IN: selectedChannels.value,
-        },
-      };
-    });
-
-    const { result, loading, error } = useQuery(
-      GET_USER_EVENTS,
-      () => ({
-        username: username.value,
-        where: eventsWhere.value,
-      }),
-      {
-        fetchPolicy: 'cache-first',
-      }
-    );
-
-    return {
-      loading,
-      error,
-      result,
-    };
-  },
+const username = computed(() => {
+  if (typeof route.params.username === 'string') {
+    return route.params.username;
+  }
+  return '';
 });
+
+const eventsWhere = computed(() => {
+  if (!hasSelectedChannels.value) {
+    return undefined;
+  }
+  return {
+    EventChannels_SOME: {
+      channelUniqueName_IN: selectedChannels.value,
+    },
+  };
+});
+
+const { result, loading, error } = useQuery(
+  GET_USER_EVENTS,
+  () => ({
+    username: username.value,
+    where: eventsWhere.value,
+  }),
+  {
+    fetchPolicy: 'cache-first',
+  }
+);
 </script>
 <template>
   <div class="flex flex-col gap-3 py-3">

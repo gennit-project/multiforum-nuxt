@@ -1,19 +1,12 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 
-export default defineComponent({
-  components: {
-    ChannelIcon,
-  },
-  props: {
-    channelId: {
-      type: String,
-      required: true,
-    },
-  },
-  setup() {},
-});
+withDefaults(
+  defineProps<{
+    channelId: string;
+  }>(),
+  {}
+);
 </script>
 
 <template>

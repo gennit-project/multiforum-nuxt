@@ -1,20 +1,10 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import SelectorIcon from '@/components/icons/ChevronUpDownIcon.vue';
 import { ListboxButton } from '@headlessui/vue';
 
-export default defineComponent({
-  components: {
-    SelectorIcon,
-    ListboxButton,
-  },
-  props: {
-    label: {
-      type: String,
-      required: true,
-    },
-  },
-});
+defineProps<{
+  label: string;
+}>();
 </script>
 
 <template>

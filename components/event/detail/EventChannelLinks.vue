@@ -1,63 +1,22 @@
-<script lang="ts">
-import type { PropType } from 'vue';
-import { defineComponent, computed } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import EventChannelLink from '@/components/event/detail/EventChannelLink.vue';
-import { useRoute } from 'nuxt/app';
 import type { EventChannel } from '@/__generated__/graphql';
 
-export default defineComponent({
-  name: 'EventChannelLinks',
-  components: {
-    EventChannelLink,
-  },
-  props: {
-    channelId: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    eventChannels: {
-      type: Array as PropType<Array<EventChannel>>,
-      required: true,
-    },
-  },
-  setup(props) {
-    const route = useRoute();
+const props = withDefaults(
+  defineProps<{
+    channelId?: string;
+    eventChannels: EventChannel[];
+  }>(),
+  {
+    channelId: '',
+  }
+);
 
-    const getCommentCount = (channelId: string) => {
-      const eventChannels = props.eventChannels;
-
-      const activeEventChannel = eventChannels.find((cs: any) => {
-        return cs.Channel?.uniqueName === channelId;
-      });
-
-      if (!activeEventChannel) {
-        return 0;
-      }
-      return activeEventChannel.CommentsAggregate?.count
-        ? activeEventChannel.CommentsAggregate.count
-        : 0;
-    };
-
-    const activeEventChannel = computed(() => {
-      return props.eventChannels.filter((dc) => {
-        return dc.channelUniqueName === props.channelId;
-      })[0];
-    });
-
-    const channelsExceptActive = computed(() => {
-      return props.eventChannels.filter((dc) => {
-        return dc.channelUniqueName !== props.channelId;
-      });
-    });
-
-    return {
-      activeEventChannel,
-      channelsExceptActive,
-      route,
-      getCommentCount,
-    };
-  },
+const channelsExceptActive = computed(() => {
+  return props.eventChannels.filter((dc) => {
+    return dc.channelUniqueName !== props.channelId;
+  });
 });
 </script>
 

@@ -289,7 +289,7 @@ const tabs = computed((): Tab[] => {
           :is-active="isTabActive(tab)"
           :label="tab.label"
           :show-count="showCounts && !!tab.countProperty"
-          :to="tabRoutes[tab.name]"
+          :to="tabRoutes[tab.name] || ''"
           :vertical="vertical"
         >
           <component :is="tab.icon" :class="iconSize" />
@@ -336,7 +336,7 @@ const tabs = computed((): Tab[] => {
                 <nuxt-link
                   v-for="tab in tabs"
                   :key="tab.name"
-                  :to="tabRoutes[tab.name]"
+                  :to="tabRoutes[tab.name] || ''"
                   :data-testid="`mobile-dropdown-${tab.name}`"
                   class="flex items-center justify-between px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
                   :class="[
@@ -396,7 +396,7 @@ const tabs = computed((): Tab[] => {
             :is-active="isTabActive(tab)"
             :label="tab.label"
             :show-count="showCounts && !!tab.countProperty"
-            :to="tabRoutes[tab.name]"
+            :to="tabRoutes[tab.name] || ''"
             :vertical="vertical"
           >
             <component :is="tab.icon" :class="iconSize" />

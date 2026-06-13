@@ -14,7 +14,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
   onMounted,
   ref,
@@ -23,51 +23,40 @@ import {
   computed,
   nextTick,
 } from 'vue';
+// @ts-expect-error - THREE.js types not installed
 import * as THREE from 'three';
+// @ts-expect-error - THREE.js types not installed
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
+// @ts-expect-error - THREE.js types not installed
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-const props = defineProps({
-  src: {
-    type: String,
-    required: true,
-  },
-  width: {
-    type: [Number, String],
-    default: '100%',
-  },
-  height: {
-    type: [Number, String],
-    default: 400,
-  },
-  maxWidth: {
-    type: [Number, String],
-    default: null,
-  },
-  aspectRatio: {
-    type: Number,
-    default: 1, // 1:1 square by default
-  },
-  modelColor: {
-    type: String,
-    default: '#607d8b',
-  },
-  backgroundColor: {
-    type: String,
-    default: '#f0f0f0',
-  },
-  autoRotate: {
-    type: Boolean,
-    default: false,
-  },
-  showGrid: {
-    type: Boolean,
-    default: false,
-  },
+interface Props {
+  src: string;
+  width?: number | string;
+  height?: number | string;
+  maxWidth?: number | string | null;
+  aspectRatio?: number;
+  modelColor?: string;
+  backgroundColor?: string;
+  autoRotate?: boolean;
+  showGrid?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  width: '100%',
+  height: 400,
+  maxWidth: null,
+  aspectRatio: 1,
+  modelColor: '#607d8b',
+  backgroundColor: '#f0f0f0',
+  autoRotate: false,
+  showGrid: false,
 });
 
-const containerStyle = computed(() => {
-  const style = {};
+import type { CSSProperties } from 'vue';
+
+const containerStyle = computed((): CSSProperties => {
+  const style: CSSProperties = {};
 
   // Handle width
   if (typeof props.width === 'number') {
@@ -95,16 +84,22 @@ const containerStyle = computed(() => {
   return style;
 });
 
-const emit = defineEmits(['load', 'progress', 'error']);
+const emit = defineEmits<{
+  load: [data: { geometry: unknown; mesh: unknown }];
+  progress: [percent: number];
+  error: [error: unknown];
+}>();
 
-const container = ref(null);
+const container = ref<HTMLDivElement | null>(null);
 const loading = ref(true);
-const error = ref(null);
+const error = ref<string | null>(null);
 const isHovered = ref(false);
 const actualWidth = ref(400);
 const actualHeight = ref(400);
 
-let scene, camera, renderer, controls, animationId;
+// THREE.js objects - using any due to missing type declarations
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let scene: any, camera: any, renderer: any, controls: any, animationId: number | undefined;
 
 function updateDimensions() {
   if (!container.value) return;
@@ -124,7 +119,7 @@ function handleResize() {
   updateDimensions();
 }
 
-function initViewer(stlUrl) {
+function initViewer(stlUrl: string) {
   if (!container.value) return;
 
   loading.value = true;
@@ -147,7 +142,7 @@ function initViewer(stlUrl) {
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(actualWidth.value, actualHeight.value);
-    container.value.appendChild(renderer.domElement);
+    container.value!.appendChild(renderer.domElement);
 
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -182,7 +177,8 @@ function initViewer(stlUrl) {
     const loader = new STLLoader();
     loader.load(
       stlUrl,
-      (geometry) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (geometry: any) => {
         const material = new THREE.MeshStandardMaterial({
           color: props.modelColor,
         });
@@ -209,12 +205,12 @@ function initViewer(stlUrl) {
         loading.value = false;
         emit('load', { geometry, mesh });
       },
-      (progress) => {
+      (progress: { loaded: number; total: number }) => {
         const percent =
           progress.total > 0 ? (progress.loaded / progress.total) * 100 : 0;
         emit('progress', percent);
       },
-      (loadError) => {
+      (loadError: Error) => {
         console.error('Error loading STL:', loadError);
         error.value = 'Failed to load 3D model';
         loading.value = false;
@@ -241,8 +237,10 @@ function onMouseLeave() {
 }
 
 function resetCamera() {
-  if (camera && controls && scene.children.find((child) => child.isMesh)) {
-    const mesh = scene.children.find((child) => child.isMesh);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (camera && controls && scene.children.find((child: any) => child.isMesh)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const mesh = scene.children.find((child: any) => child.isMesh);
     const box = new THREE.Box3().setFromObject(mesh);
     const size = box.getSize(new THREE.Vector3());
     const maxDim = Math.max(size.x, size.y, size.z);
@@ -297,7 +295,7 @@ watch(
 // Exposed methods for parent components
 defineExpose({
   resetCamera,
-  setAutoRotate: (value) => {
+  setAutoRotate: (value: boolean) => {
     if (controls) {
       controls.autoRotate = value;
     }

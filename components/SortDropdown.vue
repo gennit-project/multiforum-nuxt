@@ -1,14 +1,7 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue';
 
-export default defineComponent({
-  setup() {},
-  data() {
-    return {
-      isOpen: false,
-    };
-  },
-});
+const isOpen = ref(false);
 </script>
 <template>
   <div class="relative inline-block">

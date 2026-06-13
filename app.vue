@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useUIStore } from '@/stores/uiStore';
 import { onMounted } from 'vue';
 
