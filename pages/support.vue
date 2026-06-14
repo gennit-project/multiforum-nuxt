@@ -9,6 +9,8 @@ import NotificationComponent from '@/components/NotificationComponent.vue';
 import FormComponent from '@/components/FormComponent.vue';
 import FormRow from '@/components/FormRow.vue';
 import { usernameVar } from '@/cache';
+import { useRoute } from 'nuxt/app';
+import { getSupportReportContent } from '@/utils/supportReportMode';
 
 type BugReportFormValues = {
   contactEmail: string;
@@ -21,6 +23,12 @@ const formValues = ref<BugReportFormValues>({
   subject: '',
   text: '',
 });
+const route = useRoute();
+const reportContent = computed(() =>
+  getSupportReportContent(
+    typeof route.query.type === 'string' ? route.query.type : null
+  )
+);
 
 const {
   mutate: sendBugReport,
@@ -78,11 +86,9 @@ const updateText = (value: string) => {
     <div class="min-h-screen bg-white dark:bg-gray-900 dark:text-white">
       <div class="mx-auto max-w-4xl px-6 py-8 lg:px-12">
         <div class="mb-8">
-          <h1 class="mb-4 text-2xl font-bold">Report a Bug</h1>
+          <h1 class="mb-4 text-2xl font-bold">{{ reportContent.heading }}</h1>
           <p class="mb-6 text-gray-600 dark:text-gray-400">
-            Found a bug or have feedback? Let us know! Please provide as much
-            detail as possible, including screenshots if relevant. We'll get
-            back to you at the email address you provide.
+            {{ reportContent.intro }}
           </p>
         </div>
 
@@ -110,7 +116,7 @@ const updateText = (value: string) => {
                   @update="updateContactEmail"
                 />
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  We'll use this email to respond to your bug report.
+                  {{ reportContent.emailHelpText }}
                 </p>
               </template>
             </FormRow>
@@ -122,7 +128,7 @@ const updateText = (value: string) => {
                     test-id="bug-subject"
                     label="Subject"
                     :value="formValues.subject"
-                    placeholder="Brief description of the issue"
+                    :placeholder="reportContent.subjectPlaceholder"
                     required
                     @update="updateSubject"
                   />
@@ -131,11 +137,11 @@ const updateText = (value: string) => {
                     <label
                       class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
-                      Description *
+                      {{ reportContent.descriptionLabel }}
                     </label>
                     <TextEditor
                       test-id="bug-description"
-                      placeholder="Describe the bug in detail. Include steps to reproduce, expected behavior, actual behavior, and any other relevant information. You can attach screenshots by pasting or dropping them here."
+                      :placeholder="reportContent.descriptionPlaceholder"
                       :initial-value="formValues.text"
                       :rows="8"
                       :allow-image-upload="true"
@@ -150,8 +156,8 @@ const updateText = (value: string) => {
 
         <NotificationComponent
           v-if="showSuccessNotification"
-          title="Bug report submitted successfully!"
-          text="Thank you for your feedback. We'll review your report and get back to you soon."
+          :title="reportContent.successTitle"
+          :text="reportContent.successText"
           @close-notification="showSuccessNotification = false"
         />
       </div>
