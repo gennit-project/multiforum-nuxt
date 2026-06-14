@@ -18,6 +18,7 @@
     "prepare": "husky install",
     "prettier:check": "prettier --check .",
     "start": "nuxt start",
+    "test": "playwright test",
     "test:playwright": "playwright test tests/playwright/mocked",
     "test:playwright:mocked": "playwright test tests/playwright/mocked",
     "test:unit": "vitest",
