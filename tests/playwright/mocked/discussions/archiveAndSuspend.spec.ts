@@ -355,8 +355,8 @@ test('archives a discussion and suspends user with mocked GraphQL', async (
       suspendIndefinitely: false,
     });
     // suspendUntil should be a date string (two weeks from now)
-    expect((suspendVariables as SuspendUserVariables).suspendUntil).toBeTruthy();
-    expect(typeof (suspendVariables as SuspendUserVariables).suspendUntil).toBe('string');
+    expect(suspendVariables!.suspendUntil).toBeTruthy();
+    expect(typeof suspendVariables!.suspendUntil).toBe('string');
 
     expect(diagnostics.pageErrors).toEqual([]);
   } finally {
