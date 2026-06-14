@@ -18,8 +18,6 @@ Key differentiators:
 
 It's built with Nuxt/Vue on the frontend and a GraphQL/Neo4j backend.
 
-```
-
 ## Screenshots
 
 - [Screenshots gallery](./docs/screenshots.md)
@@ -44,4 +42,7 @@ It's built with Nuxt/Vue on the frontend and a GraphQL/Neo4j backend.
 ## Status
 
 This project is in active development.
+
+```
+
 ```
