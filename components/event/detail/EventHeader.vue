@@ -204,6 +204,10 @@ const { userPermissions } = useResolvedModPermissions({
   modProfileName: computed(() => modProfileNameVar.value),
 });
 
+const feedbackEnabled = computed(() => {
+  return getChannelResult.value?.channels[0]?.feedbackEnabled !== false;
+});
+
 const permalinkObject = computed(() => {
   if (!eventId.value) return {};
   return {
@@ -413,8 +417,7 @@ const menuItems = computed(() => {
     isLoggedIn: !!usernameVar.value,
     eventId: props.eventData.id,
     isOnFeedbackPage: route.name === 'EventFeedback',
-    feedbackEnabled:
-      getChannelResult.value?.channels[0]?.feedbackEnabled ?? true,
+    feedbackEnabled: feedbackEnabled.value,
     relatedIssueLink: relatedIssueLink.value,
   });
 });
@@ -438,6 +441,10 @@ function getFormattedDateString(startTime: string) {
 const feedbackText = ref('');
 
 function handleSubmitFeedback() {
+  if (!feedbackEnabled.value) {
+    console.error('Feedback is disabled for this forum.');
+    return;
+  }
   if (!feedbackText.value) {
     console.error('Feedback text is required');
     return;
@@ -466,6 +473,13 @@ function handleViewFeedback() {
 
 function handleFeedbackInput(event: string) {
   feedbackText.value = event;
+}
+
+function openFeedbackFormModal() {
+  if (!feedbackEnabled.value) {
+    return;
+  }
+  showFeedbackFormModal.value = true;
 }
 </script>
 
@@ -592,7 +606,7 @@ function handleFeedbackInput(event: string) {
           @handle-delete="handleDeleteClick"
           @handle-cancel="handleCancelClick"
           @handle-report="openReportModal"
-          @handle-feedback="showFeedbackFormModal = true"
+          @handle-feedback="openFeedbackFormModal"
           @handle-view-feedback="handleViewFeedback"
           @handle-click-archive="openArchiveModal"
           @handle-click-archive-and-suspend="openArchiveAndSuspendModal"
