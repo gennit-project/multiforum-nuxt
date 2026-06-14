@@ -275,7 +275,7 @@ test('creates and edits a channel', async ({
     // Click Save and wait for the GraphQL response
     const [response] = await Promise.all([
       page.waitForResponse(
-        (resp) => resp.url().includes('/graphql') && resp.request().postData()?.includes('createChannel'),
+        (resp) => resp.url().includes('/graphql') && (resp.request().postData()?.includes('createChannel') ?? false),
         { timeout: 30000 }
       ),
       page.getByRole('button', { name: 'Save' }).first().click(),
