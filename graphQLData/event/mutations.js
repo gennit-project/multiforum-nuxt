@@ -22,6 +22,62 @@ export const CREATE_EVENT_WITH_CHANNEL_CONNECTIONS = gql`
   ${EVENT_FIELDS}
 `;
 
+export const CREATE_EVENT_SERIES_WITH_CHANNEL_CONNECTIONS = gql`
+  mutation createEventSeries($input: EventSeriesCreateInput!) {
+    createEventSeriesWithChannelConnections(input: $input) {
+      id
+      title
+      description
+      locationName
+      address
+      virtualEventUrl
+      cost
+      free
+      isHostedByOP
+      coverImageURL
+      canceled
+      createdAt
+      updatedAt
+      repeatPattern {
+        type
+        count
+        daysOfWeek
+        endType
+        endCount
+        endDate
+      }
+      Poster {
+        username
+      }
+      Tags {
+        text
+      }
+      Occurrences {
+        id
+        title
+        startTime
+        endTime
+        canceled
+        occurrenceIndex
+        EventChannels {
+          id
+          channelUniqueName
+          Channel {
+            uniqueName
+          }
+        }
+      }
+      EventChannels {
+        id
+        channelUniqueName
+        Channel {
+          uniqueName
+        }
+      }
+    }
+  }
+`;
+
 export const UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS = gql`
   mutation updateEvents(
     $updateEventInput: EventUpdateInput!

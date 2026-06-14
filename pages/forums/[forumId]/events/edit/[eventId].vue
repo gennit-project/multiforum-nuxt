@@ -109,6 +109,11 @@ function getFormValuesFromEventData(
     isHostedByOP: eventData.isHostedByOP || false,
     isAllDay: eventData.isAllDay || false,
     coverImageURL: eventData.coverImageURL || '',
+    // Multi-date / recurring event fields
+    dateMode: 'single',
+    occurrences: [],
+    dateRangeGroups: [],
+    repeatPattern: undefined,
   };
 }
 

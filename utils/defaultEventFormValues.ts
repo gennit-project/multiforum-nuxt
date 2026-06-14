@@ -31,6 +31,11 @@ function getDefaultEventFormValues(
     deleted: false,
     free: false,
     cost: '',
+    // Multi-date / recurring event fields
+    dateMode: 'single',
+    occurrences: [],
+    dateRangeGroups: [],
+    repeatPattern: undefined,
   };
 }
 

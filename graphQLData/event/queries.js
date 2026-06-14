@@ -34,6 +34,25 @@ export const EVENT_FIELDS = gql`
         until
       }
     }
+    occurrenceIndex
+    EventSeries {
+      id
+      title
+      repeatPattern {
+        type
+        count
+        daysOfWeek
+        endType
+        endCount
+        endDate
+      }
+      Occurrences {
+        id
+        startTime
+        endTime
+        canceled
+      }
+    }
     location {
       latitude
       longitude
