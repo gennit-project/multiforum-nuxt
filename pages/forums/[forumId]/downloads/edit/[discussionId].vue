@@ -543,7 +543,7 @@ const {
   mutate: updateDiscussionChannelLabels,
   error: updateLabelsError,
   loading: updateLabelsLoading,
-} = useMutation(UPDATE_DISCUSSION_CHANNEL_LABELS, () => ({
+} = useMutation(UPDATE_DOWNLOAD_LABELS, () => ({
   variables: {
     channelUniqueName: channelId.value,
     discussionId: discussionId.value,
