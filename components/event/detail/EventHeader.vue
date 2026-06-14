@@ -6,8 +6,12 @@ import type { Event } from '@/__generated__/graphql';
 import {
   CANCEL_EVENT,
   DELETE_EVENT,
+  DELETE_EVENT_IN_SERIES,
   ADD_FEEDBACK_COMMENT_TO_EVENT,
+  UPDATE_EVENT_IN_SERIES,
 } from '@/graphQLData/event/mutations';
+import EditScopeModal from '@/components/event/form/EditScopeModal.vue';
+import type { EventEditScope } from '@/components/event/form/EditScopeModal.vue';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import LocationIcon from '@/components/icons/LocationIcon.vue';
@@ -66,6 +70,11 @@ const showFeedbackFormModal = ref(false);
 const showFeedbackSubmittedSuccessfully = ref(false);
 const confirmDeleteIsOpen = ref(false);
 const confirmCancelIsOpen = ref(false);
+
+// Series-related state
+const isPartOfSeries = computed(() => Boolean(props.eventData?.EventSeries?.id));
+const showCancelScopeModal = ref(false);
+const showDeleteScopeModal = ref(false);
 const {
   showReportModal: showReportEventModal,
   showArchiveModal,
@@ -252,6 +261,93 @@ const {
 onDoneCanceling(() => {
   confirmCancelIsOpen.value = false;
 });
+
+// Mutation for canceling events in a series
+const {
+  mutate: cancelEventInSeries,
+  error: cancelEventInSeriesError,
+  loading: cancelEventInSeriesLoading,
+  onDone: onDoneCancelingInSeries,
+} = useMutation(UPDATE_EVENT_IN_SERIES);
+
+onDoneCancelingInSeries(() => {
+  showCancelScopeModal.value = false;
+});
+
+// Combined cancel error
+const combinedCancelError = computed(() => {
+  return cancelEventError.value || cancelEventInSeriesError.value;
+});
+
+// Combined cancel loading
+const combinedCancelLoading = computed(() => {
+  return cancelEventLoading.value || cancelEventInSeriesLoading.value;
+});
+
+// Handle cancel button click - show scope modal if part of series
+function handleCancelClick() {
+  if (isPartOfSeries.value) {
+    showCancelScopeModal.value = true;
+  } else {
+    confirmCancelIsOpen.value = true;
+  }
+}
+
+// Handle cancel scope selection
+function handleCancelScopeConfirm(scope: EventEditScope) {
+  cancelEventInSeries({
+    eventId: eventId.value,
+    scope,
+    eventUpdateInput: { canceled: true },
+    channelConnections: [],
+    channelDisconnections: [],
+  });
+}
+
+// Mutation for deleting events in a series
+const {
+  mutate: deleteEventInSeriesMutation,
+  error: deleteEventInSeriesError,
+  loading: deleteEventInSeriesLoading,
+  onDone: onDoneDeletingInSeries,
+} = useMutation(DELETE_EVENT_IN_SERIES);
+
+onDoneDeletingInSeries(() => {
+  showDeleteScopeModal.value = false;
+  if (channelId.value) {
+    router.push({
+      name: 'forums-forumId-events',
+      params: { forumId: channelId.value },
+    });
+  }
+});
+
+// Combined delete error
+const combinedDeleteError = computed(() => {
+  return deleteEventError.value || deleteEventInSeriesError.value;
+});
+
+// Combined delete loading
+const combinedDeleteLoading = computed(() => {
+  return deleteEventLoading.value || deleteEventInSeriesLoading.value;
+});
+
+// Handle delete button click - show scope modal if part of series
+function handleDeleteClick() {
+  if (isPartOfSeries.value) {
+    showDeleteScopeModal.value = true;
+  } else {
+    confirmDeleteIsOpen.value = true;
+  }
+}
+
+// Handle delete scope selection
+function handleDeleteScopeConfirm(scope: EventEditScope) {
+  deleteEventInSeriesMutation({
+    eventId: eventId.value,
+    scope,
+  });
+}
 
 const {
   mutate: addFeedbackCommentToEvent,
@@ -493,8 +589,8 @@ function handleFeedbackInput(event: string) {
           @handle-edit="
             router.push(`/forums/${channelId}/events/edit/${eventId}`)
           "
-          @handle-delete="confirmDeleteIsOpen = true"
-          @handle-cancel="confirmCancelIsOpen = true"
+          @handle-delete="handleDeleteClick"
+          @handle-cancel="handleCancelClick"
           @handle-report="openReportModal"
           @handle-feedback="showFeedbackFormModal = true"
           @handle-view-feedback="handleViewFeedback"
@@ -525,7 +621,8 @@ function handleFeedbackInput(event: string) {
           :title="'Delete Event'"
           :body="'Are you sure you want to delete this event?'"
           :open="confirmDeleteIsOpen"
-          :loading="deleteEventLoading"
+          :loading="combinedDeleteLoading"
+          :error="combinedDeleteError?.message"
           @close="confirmDeleteIsOpen = false"
           @primary-button-click="deleteEvent"
         />
@@ -536,10 +633,24 @@ function handleFeedbackInput(event: string) {
           :open="confirmCancelIsOpen"
           :primary-button-text="'Yes, cancel the event'"
           :secondary-button-text="'No'"
-          :loading="cancelEventLoading"
-          :error="cancelEventError?.message"
+          :loading="combinedCancelLoading"
+          :error="combinedCancelError?.message"
           @close="confirmCancelIsOpen = false"
           @primary-button-click="cancelEvent"
+        />
+        <!-- Scope modal for canceling series events -->
+        <EditScopeModal
+          :is-open="showCancelScopeModal"
+          :event-title="eventData.title"
+          @confirm="handleCancelScopeConfirm"
+          @close="showCancelScopeModal = false"
+        />
+        <!-- Scope modal for deleting series events -->
+        <EditScopeModal
+          :is-open="showDeleteScopeModal"
+          :event-title="eventData.title"
+          @confirm="handleDeleteScopeConfirm"
+          @close="showDeleteScopeModal = false"
         />
         <GenericFeedbackFormModal
           :open="showFeedbackFormModal"

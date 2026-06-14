@@ -174,6 +174,16 @@ export const DELETE_EVENT = gql`
   }
 `;
 
+export const DELETE_EVENT_IN_SERIES = gql`
+  mutation deleteEventInSeries($eventId: ID!, $scope: EventEditScope!) {
+    deleteEventInSeries(eventId: $eventId, scope: $scope) {
+      success
+      deletedCount
+      message
+    }
+  }
+`;
+
 export const ADD_FEEDBACK_COMMENT_TO_EVENT = gql`
   mutation addFeedbackCommentToEvent(
     $modProfileName: String!
