@@ -6,7 +6,7 @@ import FlagIcon from '@/components/icons/FlagIcon.vue';
 
 type Issue = GeneratedIssue & {
   issueNumber: number;
-  locked?: boolean;
+  locked?: boolean | null;
 };
 
 const props = defineProps({
