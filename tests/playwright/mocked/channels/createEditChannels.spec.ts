@@ -70,6 +70,16 @@ test('creates and edits a channel', async ({
         ],
       },
     }),
+    getUser: () => ({
+      data: {
+        users: [
+          {
+            username: 'cluse',
+            notifyOnReplyToCommentByDefault: true,
+          },
+        ],
+      },
+    }),
     getUserActiveSuspensions: () => ({
       data: {
         users: [{ username: 'cluse', Suspensions: [] }],
@@ -77,7 +87,17 @@ test('creates and edits a channel', async ({
     }),
     getUserFavorites: () => ({
       data: {
+        users: [{ username: 'cluse', FavoriteChannels: [], Collections: [] }],
+      },
+    }),
+    GetUserFavoriteChannels: () => ({
+      data: {
         users: [{ username: 'cluse', FavoriteChannels: [] }],
+      },
+    }),
+    GetUserChannelCollectionsWithChannels: () => ({
+      data: {
+        users: [{ username: 'cluse', Collections: [] }],
       },
     }),
     getServerConfig: () => ({
@@ -88,6 +108,24 @@ test('creates and edits a channel', async ({
     getTags: () => ({
       data: {
         tags: [{ text: 'trivia' }, { text: 'general' }],
+      },
+    }),
+    getChannelNames: () => ({
+      data: {
+        channels: [
+          {
+            uniqueName: TEST_CHANNEL,
+            displayName: TEST_CHANNEL,
+            channelIconURL: '',
+            description: '',
+            eventsEnabled: true,
+          },
+        ],
+      },
+    }),
+    getEvents: () => ({
+      data: {
+        events: [],
       },
     }),
     createChannel: ({ body }) => {
@@ -191,6 +229,16 @@ test('creates and edits a channel', async ({
     await page.getByTestId('title-input').fill(TEST_CHANNEL);
     await page.getByRole('button', { name: 'Save' }).first().click();
     await waitForGraphqlOperation(diagnostics.completedOperations, 'createChannel');
+
+    // Debug: Check if there's an error message displayed
+    const errorText = await page.locator('.text-red-500, [role="alert"]').textContent().catch(() => null);
+    if (errorText) {
+      console.log('Error displayed on page:', errorText);
+    }
+
+    // Debug: Log all seen operations
+    console.log('Completed operations:', diagnostics.completedOperations.map(op => op.operationName));
+
     await expect(page).toHaveURL(`/forums/${TEST_CHANNEL}/discussions`);
     await expect(
       page.getByRole('link', { name: TEST_CHANNEL, exact: true }).first()
