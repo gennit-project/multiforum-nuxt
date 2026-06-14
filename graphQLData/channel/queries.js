@@ -60,6 +60,7 @@ export const GET_CHANNEL = gql`
       eventsEnabled
       feedbackEnabled
       imageUploadsEnabled
+      markdownImagesEnabled
       emojiEnabled
       downloadsEnabled
       allowedFileTypes

@@ -489,6 +489,7 @@ const handleEditAlbum = () => {
                   v-if="discussionBodyEditMode"
                   :discussion="discussion"
                   :allow-image-upload="imageUploadsEnabled"
+                  :channel-connections="[channelId]"
                   @close-editor="discussionBodyEditMode = false"
                 />
                 <AlbumEditForm

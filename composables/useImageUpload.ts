@@ -11,6 +11,10 @@ type UploadResult = {
   error?: string;
 };
 
+type UseImageUploadOptions = {
+  getChannelConnections?: () => string[];
+};
+
 /**
  * Get MIME type from filename extension when browser doesn't provide it
  */
@@ -36,7 +40,7 @@ const getFileTypeFromName = (filename: string): string | null => {
 /**
  * Composable for handling image uploads in the text editor
  */
-export function useImageUpload() {
+export function useImageUpload(options: UseImageUploadOptions = {}) {
   const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
     useMutation(CREATE_SIGNED_STORAGE_URL);
 
@@ -61,7 +65,11 @@ export function useImageUpload() {
         file.type || getFileTypeFromName(file.name) || 'image/jpeg';
 
       const filename = getUploadFileName({ username: usernameVar.value, file });
-      const signedStorageURLInput = { filename, contentType: fileType };
+      const signedStorageURLInput = {
+        filename,
+        contentType: fileType,
+        channelConnections: options.getChannelConnections?.() || [],
+      };
 
       const signedUrlResult = await createSignedStorageUrl(signedStorageURLInput);
       const signedStorageURL = signedUrlResult?.data?.createSignedStorageURL?.url;

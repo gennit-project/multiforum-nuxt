@@ -19,5 +19,6 @@ export type CreateEditChannelFormValues = {
   eventsEnabled: boolean;
   feedbackEnabled: boolean;
   imageUploadsEnabled: boolean;
+  markdownImagesEnabled: boolean;
   emojiEnabled: boolean;
 };

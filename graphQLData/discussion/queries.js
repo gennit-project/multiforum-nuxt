@@ -287,6 +287,7 @@ export const GET_DISCUSSION = gql`
           displayName
           feedbackEnabled
           imageUploadsEnabled
+          markdownImagesEnabled
           emojiEnabled
         }
         Discussion {

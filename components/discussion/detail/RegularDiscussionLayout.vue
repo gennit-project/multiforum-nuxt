@@ -70,6 +70,10 @@ const imageUploadsEnabled = computed(
   () => props.activeDiscussionChannel?.Channel?.imageUploadsEnabled !== false
 );
 
+const markdownImagesEnabled = computed(
+  () => props.activeDiscussionChannel?.Channel?.markdownImagesEnabled !== false
+);
+
 const emojiEnabled = computed(
   () => props.activeDiscussionChannel?.Channel?.emojiEnabled !== false
 );
@@ -89,7 +93,7 @@ const emojiEnabled = computed(
       :download-mode="false"
       :emoji-json="activeDiscussionChannel?.emoji"
       :show-emoji-button="emojiEnabled"
-      :allow-images="imageUploadsEnabled"
+      :allow-images="markdownImagesEnabled"
     >
       <template #album-slot>
         <div

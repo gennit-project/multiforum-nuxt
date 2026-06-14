@@ -13,6 +13,10 @@ const emit = defineEmits(['updateFormValues']);
 const updateImageUploadsEnabled = (enabled: boolean) => {
   emit('updateFormValues', { imageUploadsEnabled: enabled });
 };
+
+const updateMarkdownImagesEnabled = (enabled: boolean) => {
+  emit('updateFormValues', { markdownImagesEnabled: enabled });
+};
 </script>
 
 <template>
@@ -20,8 +24,14 @@ const updateImageUploadsEnabled = (enabled: boolean) => {
     <CheckBox
       id="image-uploads-enabled"
       :checked="formValues.imageUploadsEnabled !== false"
-      :label="'Enable image uploads and image rendering for this forum'"
+      :label="'Enable image uploads for this forum'"
       @update="updateImageUploadsEnabled"
+    />
+    <CheckBox
+      id="markdown-images-enabled"
+      :checked="formValues.markdownImagesEnabled !== false"
+      :label="'Render images embedded in markdown'"
+      @update="updateMarkdownImagesEnabled"
     />
   </div>
 </template>

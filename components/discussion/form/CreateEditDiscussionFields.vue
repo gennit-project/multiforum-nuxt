@@ -266,6 +266,7 @@ onMounted(() => {
                   :initial-value="formValues.body || ''"
                   :placeholder="'Add details'"
                   :rows="7"
+                  :channel-connections="formValues.selectedChannels"
                   @update="$emit('updateFormValues', { body: $event })"
                 />
                 <CharCounter

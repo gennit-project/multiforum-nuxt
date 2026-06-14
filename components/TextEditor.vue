@@ -94,6 +94,10 @@ const props = defineProps({
     type: Array as () => BotSuggestion[],
     default: () => [],
   },
+  channelConnections: {
+    type: Array as () => string[],
+    default: () => [],
+  },
   ariaLabel: {
     type: String,
     default: '',
@@ -125,7 +129,9 @@ const {
   createErrorMarkdown,
   createPlaceholderRegex,
   createSignedStorageUrlError,
-} = useImageUpload();
+} = useImageUpload({
+  getChannelConnections: () => props.channelConnections,
+});
 
 const {
   showEmojiPicker,
