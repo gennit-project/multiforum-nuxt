@@ -2,22 +2,22 @@
 
 [![codecov](https://codecov.io/gh/gennit-project/multiforum-nuxt/branch/main/graph/badge.svg)](https://codecov.io/gh/gennit-project/multiforum-nuxt)
 
-Multiforum is an online platform for communities to run forums with discussions, events, and shared knowledge.
+Multiforum is a community platform that lets people create and manage topic-based forums with multiple content types:
 
-## What It Includes
+- Discussions — upvotable posts with threaded comments
+- Events — with calendar views and map-based discovery
+- Wikis — collaborative docs with revision history
+- Downloads — file sharing with custom filters per forum
 
-- **Discussions**: upvotable community posts and comment threads
-- **Calendar**: event posting and discovery
-- **Wikis**: collaborative docs with revision history and diff views
-- **Cross-posting**: events and discussions can be shared to multiple forums
-- **Map-based discovery**: browse/filter events by location, tags, time, and forum
-- **Responsive UI**: desktop and mobile support
+Key differentiators:
 
-## Quick Start
+- Cross-posting lets content be shared across multiple forums
+- Map integration for location-based event discovery
+- Personal libraries for organizing favorites and collections
+- Granular moderation at both channel and server levels
 
-```bash
-npm install
-npm run dev
+It's built with Nuxt/Vue on the frontend and a GraphQL/Neo4j backend.
+
 ```
 
 ## Screenshots
@@ -44,3 +44,4 @@ npm run dev
 ## Status
 
 This project is in active development.
+```
