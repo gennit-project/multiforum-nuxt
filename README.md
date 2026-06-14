@@ -1,4 +1,4 @@
-# Multiforum
+![Multiforum Logo](./docs/multiforum-header.png)
 
 [![codecov](https://codecov.io/gh/gennit-project/multiforum-nuxt/branch/main/graph/badge.svg)](https://codecov.io/gh/gennit-project/multiforum-nuxt)
 
