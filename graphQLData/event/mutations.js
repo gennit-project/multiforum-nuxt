@@ -111,6 +111,41 @@ export const UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS = gql`
   ${EVENT_FIELDS}
 `;
 
+export const UPDATE_EVENT_IN_SERIES = gql`
+  mutation updateEventInSeries(
+    $eventId: ID!
+    $scope: EventEditScope!
+    $eventUpdateInput: EventUpdateInput!
+    $channelConnections: [String!]!
+    $channelDisconnections: [String!]!
+  ) {
+    updateEventInSeries(
+      eventId: $eventId
+      scope: $scope
+      eventUpdateInput: $eventUpdateInput
+      channelConnections: $channelConnections
+      channelDisconnections: $channelDisconnections
+    ) {
+      ...EventFields
+      EventChannels {
+        id
+        channelUniqueName
+        eventId
+        Channel {
+          uniqueName
+        }
+      }
+      Poster {
+        username
+      }
+      Tags {
+        text
+      }
+    }
+  }
+  ${EVENT_FIELDS}
+`;
+
 export const CANCEL_EVENT = gql`
   mutation cancelEvent(
     $updateEventInput: EventUpdateInput!
