@@ -5,6 +5,7 @@ import { getDatePieces } from '@/utils';
 import Tag from '@/components/TagComponent.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
+import SeriesOccurrenceButtons from './SeriesOccurrenceButtons.vue';
 import type { PropType } from 'vue';
 import type { Event } from '@/__generated__/graphql';
 import type { SearchEventValues } from '@/types/Event';
@@ -188,6 +189,19 @@ const eventSpansMultipleDates = computed(() => {
 
 const commentCount = computed(() => props.event?.CommentsAggregate?.count || 0);
 const channelCount = computed(() => props.event?.EventChannels.length || 0);
+
+// Series-related computed properties
+const isPartOfSeries = computed(() => Boolean(props.event?.EventSeries?.id));
+
+const seriesOccurrences = computed(() => {
+  if (!props.event?.EventSeries?.Occurrences) {
+    return [];
+  }
+  return props.event.EventSeries.Occurrences.map((occ) => ({
+    id: occ.id,
+    startTime: occ.startTime,
+  }));
+});
 </script>
 
 <template>
@@ -225,6 +239,15 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
           class="ml-2 mt-2 rounded-full px-2 py-1 text-xs text-gray-500 dark:text-gray-200"
         >
           <span>Multiple Days</span>
+        </div>
+        <!-- Series indicator -->
+        <div
+          v-if="isPartOfSeries"
+          class="mt-2 flex items-center gap-1 text-xs text-orange-600 dark:text-orange-400"
+          title="Part of a series"
+        >
+          <i class="fa-solid fa-repeat" aria-hidden="true" />
+          <span class="sr-only">Part of a series</span>
         </div>
       </div>
     </div>
@@ -422,6 +445,15 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
           </p>
         </div>
       </div>
+
+      <!-- Series occurrence buttons -->
+      <SeriesOccurrenceButtons
+        v-if="isPartOfSeries && seriesOccurrences.length > 1"
+        :occurrences="seriesOccurrences"
+        :current-event-id="event.id"
+        :channel-unique-name="defaultUniqueName"
+        class="mt-2"
+      />
     </div>
   </li>
 </template>
