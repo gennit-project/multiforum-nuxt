@@ -21,7 +21,7 @@ defineProps({
 <template>
   <div
     :data-testid="testId"
-    class="rounded-md border-l bg-orange-100 px-4 pt-4 dark:border-orange-400 dark:bg-orange-950 dark:text-orange-200"
+    class="dark:border-blue-950 my-2 rounded-md border bg-blue-100 px-4 pt-4 dark:bg-blue-900 dark:text-blue-200"
   >
     <div class="flex">
       <div class="shrink-0">
@@ -30,8 +30,8 @@ defineProps({
         </slot>
       </div>
       <div class="ml-3 flex-1">
-        <p v-if="headerText" class="font-bold">{{ headerText }}</p>
-        <MarkdownRenderer :text="text" />
+        <p v-if="headerText" class="text-sm font-bold">{{ headerText }}</p>
+        <MarkdownRenderer :text="text" :font-size="'small'" />
       </div>
     </div>
   </div>
