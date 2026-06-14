@@ -11,13 +11,14 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import DateTimePickersRow from './DateTimePickersRow.vue';
 import OccurrencesList from './OccurrencesList.vue';
-import DateRangeGroup from './DateRangeGroup.vue';
+import RepeatPatternPicker from './RepeatPatternPicker.vue';
 import type {
   CreateEditEventFormValues,
   DateMode,
   DateOccurrence,
-  DateRangeGroup as DateRangeGroupType,
+  RepeatPattern,
 } from '@/types/Event';
+import { generateOccurrences } from '@/utils/generateOccurrences';
 import { DateTime } from 'luxon';
 import {
   getDuration,
@@ -161,18 +162,16 @@ const updateDateMode = (mode: DateMode) => {
     emit('updateFormValues', { occurrences: [defaultOccurrence] });
   }
 
-  // Initialize date range groups if switching to recurring mode
-  if (mode === 'recurring' && props.formValues.dateRangeGroups.length === 0) {
-    const startDateTime = DateTime.fromISO(props.formValues.startTime);
-    const defaultGroup: DateRangeGroupType = {
-      startDate: startDateTime.toFormat('yyyy-MM-dd'),
-      endDate: startDateTime.toFormat('yyyy-MM-dd'),
-      startTimeOfDay: startDateTime.toFormat('HH:mm'),
-      endTimeOfDay: DateTime.fromISO(props.formValues.endTime).toFormat(
-        'HH:mm'
-      ),
+  // Initialize repeat pattern if switching to recurring mode
+  if (mode === 'recurring' && !props.formValues.repeatPattern) {
+    const defaultPattern: RepeatPattern = {
+      type: 'WEEKLY',
+      count: 1,
+      daysOfWeek: [],
+      endType: 'AFTER_COUNT',
+      endCount: 10,
     };
-    emit('updateFormValues', { dateRangeGroups: [defaultGroup] });
+    emit('updateFormValues', { repeatPattern: defaultPattern });
   }
 };
 
@@ -195,26 +194,36 @@ const handleOccurrenceRemove = (index: number) => {
   emit('updateFormValues', { occurrences: newOccurrences });
 };
 
-// Handlers for DateRangeGroup
-const handleDateRangeGroupUpdate = (
-  index: number,
-  group: DateRangeGroupType
-) => {
-  const newGroups = [...props.formValues.dateRangeGroups];
-  newGroups[index] = group;
-  emit('updateFormValues', { dateRangeGroups: newGroups });
+// Handler for RepeatPatternPicker
+const handleRepeatPatternUpdate = (pattern: RepeatPattern) => {
+  emit('updateFormValues', { repeatPattern: pattern });
 };
 
-const handleDateRangeGroupAdd = (group: DateRangeGroupType) => {
-  const newGroups = [...props.formValues.dateRangeGroups, group];
-  emit('updateFormValues', { dateRangeGroups: newGroups });
-};
+// Computed: Generate preview of occurrences from repeat pattern
+const generatedOccurrencesPreview = computed(() => {
+  if (currentDateMode.value !== 'recurring' || !props.formValues.repeatPattern) {
+    return [];
+  }
 
-const handleDateRangeGroupRemove = (index: number) => {
-  const newGroups = props.formValues.dateRangeGroups.filter(
-    (_, i) => i !== index
-  );
-  emit('updateFormValues', { dateRangeGroups: newGroups });
+  const pattern = props.formValues.repeatPattern;
+  if (pattern.type === 'MANUAL') {
+    return [];
+  }
+
+  const occurrences = generateOccurrences({
+    pattern,
+    startTime: props.formValues.startTime,
+    endTime: props.formValues.endTime,
+    maxOccurrences: 10, // Limit preview to first 10
+  });
+
+  return occurrences;
+});
+
+// Format a date for display in the preview
+const formatOccurrenceDate = (isoString: string): string => {
+  const dt = DateTime.fromISO(isoString);
+  return dt.toFormat('EEE, MMM d, yyyy h:mm a');
 };
 
 // Track if the event spans multiple days
@@ -702,15 +711,50 @@ const touched = ref(false);
                 </div>
               </div>
 
-              <!-- Recurring mode: DateRangeGroup -->
+              <!-- Recurring mode: RepeatPatternPicker -->
               <div v-else-if="currentDateMode === 'recurring'">
-                <DateRangeGroup
-                  :groups="formValues.dateRangeGroups"
-                  :is-all-day="formValues.isAllDay"
-                  @update="handleDateRangeGroupUpdate"
-                  @add="handleDateRangeGroupAdd"
-                  @remove="handleDateRangeGroupRemove"
+                <!-- Base date/time for pattern -->
+                <div class="mb-4">
+                  <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Starting from
+                  </label>
+                  <DateTimePickersRow
+                    :is-all-day="formValues.isAllDay"
+                    :is-multi-day="false"
+                    :start-time="startTime"
+                    :end-time="endTime"
+                    @update-start-date="handleStartTimeDateChange"
+                    @update-start-time="handleStartTimeTimeChange"
+                    @update-end-date="handleEndTimeDateChange"
+                    @update-end-time="handleEndTimeTimeChange"
+                  />
+                </div>
+
+                <!-- Repeat pattern picker -->
+                <RepeatPatternPicker
+                  :pattern="formValues.repeatPattern"
+                  @update="handleRepeatPatternUpdate"
                 />
+
+                <!-- Preview of generated occurrences -->
+                <div
+                  v-if="generatedOccurrencesPreview.length > 0"
+                  class="mt-4 rounded-md border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800"
+                >
+                  <p class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Upcoming dates (first {{ generatedOccurrencesPreview.length }})
+                  </p>
+                  <ul class="space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                    <li
+                      v-for="(occurrence, index) in generatedOccurrencesPreview"
+                      :key="index"
+                      class="flex items-center gap-2"
+                    >
+                      <span class="text-orange-500">•</span>
+                      {{ formatOccurrenceDate(occurrence.startTime) }}
+                    </li>
+                  </ul>
+                </div>
 
                 <!-- All-day checkbox for recurring -->
                 <div class="mt-3">
