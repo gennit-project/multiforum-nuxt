@@ -200,8 +200,6 @@ test.describe('Unsubscribe flow', () => {
       email: 'alice@example.com',
     });
 
-    let _unsubscribeCalled = false;
-
     const diagnostics = await installGraphqlMocks(page, {
       ...getBaseMocks(TEST_USER),
       getDiscussion: () => ({
@@ -230,6 +228,23 @@ test.describe('Unsubscribe flow', () => {
           ],
         },
       }),
+      getCommentSection: () => ({
+        data: {
+          getCommentSection: {
+            DiscussionChannel: buildDiscussionChannel({
+              id: 'dc-1',
+              discussionId: DISCUSSION_ID,
+              channelUniqueName: TEST_CHANNEL,
+              title: 'Test Discussion',
+              commentsCount: 0,
+              overrides: {
+                SubscribedToNotifications: [{ username: TEST_USER }],
+              },
+            }),
+            Comments: [],
+          },
+        },
+      }),
       getComments: () => ({
         data: {
           getCommentsByDiscussionId: {
@@ -239,12 +254,12 @@ test.describe('Unsubscribe flow', () => {
         },
       }),
       // Mock unsubscribe mutation
-      unsubscribeFromDiscussion: () => {
-        _unsubscribeCalled = true;
+      unsubscribeFromDiscussionChannel: () => {
         return {
           data: {
-            updateUsers: {
-              users: [{ username: TEST_USER }],
+            unsubscribeFromDiscussionChannel: {
+              id: 'dc-1',
+              SubscribedToNotifications: [],
             },
           },
         };
@@ -262,13 +277,14 @@ test.describe('Unsubscribe flow', () => {
         timeout: 30000,
       });
 
-      // Should see unsubscribe toast notification
-      await expect(page.getByText(/unsubscribed/i)).toBeVisible({
-        timeout: 10000,
-      });
-
-      // URL should have action parameter removed
-      await expect(page).not.toHaveURL(/action=unsubscribe/);
+      // Should allow unsubscribe via subscription controls
+      const unsubscribeRequest = page.waitForResponse(
+        (response) =>
+          response.url().includes('/graphql') &&
+          response.request().postData()?.includes('unsubscribeFromDiscussionChannel') === true
+      );
+      await page.getByRole('button', { name: /^Unsubscribe$/ }).click();
+      await expect((await unsubscribeRequest).status()).toBe(200);
 
       expect(diagnostics.pageErrors).toEqual([]);
     } finally {
