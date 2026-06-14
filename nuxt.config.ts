@@ -292,6 +292,16 @@ export default defineNuxtConfig({
     preset: 'vercel',
     // Enable CDN caching
     cdn: true,
+    // Fix ESM/CommonJS compatibility for packages like whatwg-url and @exodus/bytes
+    esbuild: {
+      options: {
+        target: 'esnext',
+      },
+    },
+    // Externalize problematic ESM packages to avoid require() issues
+    externals: {
+      inline: ['whatwg-url', '@exodus/bytes', 'isomorphic-dompurify'],
+    },
     // Enable server-side caching
     routeRules: {
       // Cache API routes
