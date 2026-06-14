@@ -270,6 +270,24 @@ test('creates and edits a channel', async ({
       page.getByText("You don't have permission to see this page")
     ).toHaveCount(0);
 
+    // Wait for auth state to be fully initialized
+    await page.waitForFunction(
+      () => {
+        const debugFn = (window as unknown as { __DEBUG_AUTH_STATE__?: () => { username: string } }).__DEBUG_AUTH_STATE__;
+        if (!debugFn) return false;
+        const state = debugFn();
+        return state.username === 'cluse';
+      },
+      { timeout: 10000 }
+    );
+
+    // Log auth state for debugging
+    const authState = await page.evaluate(() => {
+      const debugFn = (window as unknown as { __DEBUG_AUTH_STATE__?: () => unknown }).__DEBUG_AUTH_STATE__;
+      return debugFn ? debugFn() : 'Debug function not available';
+    });
+    console.log('Auth state before form submission:', authState);
+
     await page.getByTestId('title-input').fill(TEST_CHANNEL);
 
     // Click Save and wait for the GraphQL response
