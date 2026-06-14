@@ -63,7 +63,13 @@ type UseCommentSectionModalsReturn = {
  *
  * @returns Object with modal visibility refs, data refs, and handler functions
  */
-export function useCommentSectionModals(): UseCommentSectionModalsReturn {
+type UseCommentSectionModalsOptions = {
+  feedbackEnabled?: Ref<boolean>;
+};
+
+export function useCommentSectionModals(
+  options: UseCommentSectionModalsOptions = {}
+): UseCommentSectionModalsReturn {
   // Delete modal state
   const showDeleteModal = ref(false);
   const commentToDeleteId = ref('');
@@ -112,6 +118,9 @@ export function useCommentSectionModals(): UseCommentSectionModalsReturn {
 
   // Feedback handlers
   function handleClickGiveFeedback(input: GiveFeedbackInput) {
+    if (options.feedbackEnabled?.value === false) {
+      return;
+    }
     const { commentData, parentCommentId } = input;
     showFeedbackFormModal.value = true;
     parentIdOfCommentToGiveFeedbackOn.value = parentCommentId;
@@ -119,6 +128,9 @@ export function useCommentSectionModals(): UseCommentSectionModalsReturn {
   }
 
   function handleClickUndoFeedback(input: GiveFeedbackInput) {
+    if (options.feedbackEnabled?.value === false) {
+      return;
+    }
     const { commentData, parentCommentId } = input;
     showConfirmUndoFeedbackModal.value = true;
     parentIdOfCommentToGiveFeedbackOn.value = parentCommentId;
@@ -126,6 +138,9 @@ export function useCommentSectionModals(): UseCommentSectionModalsReturn {
   }
 
   function handleClickEditFeedback(input: EditFeedbackInput) {
+    if (options.feedbackEnabled?.value === false) {
+      return;
+    }
     const { commentData } = input;
     commentToGiveFeedbackOn.value = commentData;
     showEditCommentFeedbackModal.value = true;

@@ -198,7 +198,9 @@ const {
   closeArchiveModal,
   closeArchiveAndSuspendModal,
   closeUnarchiveModal,
-} = useCommentSectionModals();
+} = useCommentSectionModals({
+  feedbackEnabled: computed(() => props.enableFeedback),
+});
 
 // Comment form state
 const commentToEdit = ref<CommentType | null>(null);
@@ -444,6 +446,10 @@ function hideEditCommentEditor() {
 }
 
 function handleSubmitFeedback() {
+  if (!props.enableFeedback) {
+    console.error('Feedback is disabled for this forum.');
+    return;
+  }
   if (!commentToGiveFeedbackOn.value?.id) {
     console.error('commentId is required to submit feedback');
     return;
