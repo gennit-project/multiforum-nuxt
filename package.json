@@ -140,5 +140,8 @@
     "*.vue": [
       "eslint --fix"
     ]
+  },
+  "overrides": {
+    "html-encoding-sniffer": "4.0.0"
   }
 }
