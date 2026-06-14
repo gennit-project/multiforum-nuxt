@@ -16,6 +16,10 @@ const links = [
     text: 'Report a Bug',
     to: '/support',
   },
+  {
+    text: 'Report Harmful or Illegal Content',
+    to: '/support?type=content-report',
+  },
 ];
 </script>
 <template>
