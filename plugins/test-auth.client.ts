@@ -30,11 +30,14 @@ export default defineNuxtPlugin(() => {
   syncMockAuthFromStorage();
 
   // Expose debug functions in dev/test environments
+  // Also expose if mock_username is in localStorage (indicates Playwright tests)
+  const hasMockAuth = !!window.localStorage.getItem('mock_username');
   const shouldExpose =
     import.meta.env.DEV ||
     config.environment === 'test' ||
     import.meta.env.VITE_E2E_MOCK_MODE === 'true' ||
-    (typeof window !== 'undefined' && window.Cypress);
+    (typeof window !== 'undefined' && window.Cypress) ||
+    hasMockAuth;
 
   const setAuthStateDirect = (authState: {
     username?: string;

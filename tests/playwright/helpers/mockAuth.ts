@@ -36,7 +36,7 @@ export async function installMockAuth(
     {
       name: 'auth-hint',
       value: 'true',
-      url: 'http://127.0.0.1:3000',
+      url: 'http://127.0.0.1:3100',
       httpOnly: false,
       sameSite: 'Lax',
       secure: false,
@@ -44,7 +44,7 @@ export async function installMockAuth(
     {
       name: 'username-hint',
       value: username,
-      url: 'http://127.0.0.1:3000',
+      url: 'http://127.0.0.1:3100',
       httpOnly: false,
       sameSite: 'Lax',
       secure: false,

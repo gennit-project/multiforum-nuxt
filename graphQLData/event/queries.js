@@ -46,7 +46,7 @@ export const EVENT_FIELDS = gql`
         endCount
         endDate
       }
-      Occurrences {
+      Occurrences(options: { sort: [{ startTime: ASC }], limit: 20 }) {
         id
         startTime
         endTime

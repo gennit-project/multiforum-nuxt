@@ -101,12 +101,14 @@ function getFormValuesFromEventData(
   return {
     title: eventData.title,
     description: eventData.description || '',
-    selectedTags: eventData.Tags.map((tag: TagData) => {
+    selectedTags: (eventData.Tags || []).map((tag: TagData) => {
       return tag.text;
     }),
-    selectedChannels: eventData.EventChannels.map((ec: EventChannel) => {
-      return ec.channelUniqueName;
-    }),
+    selectedChannels: (eventData.EventChannels || []).map(
+      (ec: EventChannel) => {
+        return ec.channelUniqueName;
+      }
+    ),
     address: eventData.address || '',
     locationName: eventData.locationName || '',
     isInPrivateResidence: eventData.isInPrivateResidence || false,
