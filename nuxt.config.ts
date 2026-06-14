@@ -393,6 +393,13 @@ export default defineNuxtConfig({
       },
     },
     optimizeDeps: {
+      // Scan all pages so Vite discovers and pre-bundles every third-party
+      // dependency upfront. Without this, the first client-side navigation to a
+      // route whose components import a new (not yet pre-bundled) package causes
+      // Vite to return 504 "Outdated Optimize Dep" responses, aborting the
+      // router.push navigation (visible in CI as the createEditChannels test
+      // timing out at the toHaveURL assertion).
+      entries: ['./pages/**/*.vue'],
       include: [
         'vue',
         'vue-router',
