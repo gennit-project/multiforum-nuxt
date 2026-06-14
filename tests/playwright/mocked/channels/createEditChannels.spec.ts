@@ -297,10 +297,6 @@ test('creates and edits a channel', async ({
         (resp.request().postData()?.includes('createChannel') ?? false),
       { timeout: 30000 }
     );
-    const navigationPromise = page.waitForURL(
-      `/forums/${TEST_CHANNEL}/discussions`,
-      { timeout: 30000 }
-    );
     await page.getByRole('button', { name: 'Save' }).first().click();
     const response = await createChannelResponsePromise;
 
@@ -324,8 +320,9 @@ test('creates and edits a channel', async ({
     // Log current URL for debugging
     console.log('Current URL before assertion:', page.url());
 
-    await navigationPromise;
-    await expect(page).toHaveURL(`/forums/${TEST_CHANNEL}/discussions`);
+    await expect(page).toHaveURL(`/forums/${TEST_CHANNEL}/discussions`, {
+      timeout: 30000,
+    });
     await expect(
       page.getByRole('link', { name: TEST_CHANNEL, exact: true }).first()
     ).toBeVisible();

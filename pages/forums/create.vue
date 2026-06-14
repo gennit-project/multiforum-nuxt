@@ -87,7 +87,6 @@ const createChannelInput = computed(() => {
   return result;
 });
 
-const createChannelLoading = ref(false);
 const submitError = ref<string | null>(null);
 const submitAttempted = ref(false);
 
@@ -105,18 +104,31 @@ const showSuspensionNotice = computed(() => {
 const {
   mutate: createChannel,
   error: createChannelError,
+  loading: createChannelLoading,
   onDone,
+  onError,
 } = useMutation(CREATE_CHANNEL, () => ({
   update: (cache, result) => {
     const newChannel: Channel = result.data?.createChannels?.channels[0];
+    if (!newChannel?.uniqueName) {
+      return;
+    }
 
     cache.modify({
       fields: {
         channels(existingChannels = []) {
           const newChannelRef = cache.writeFragment({
-            data: newChannel,
+            id: cache.identify({
+              __typename: 'Channel',
+              uniqueName: newChannel.uniqueName,
+            }),
+            data: {
+              ...newChannel,
+              __typename: 'Channel',
+            },
             fragment: gql`
               fragment NewChannel on Channel {
+                __typename
                 uniqueName
                 description
                 channelIconURL
@@ -126,6 +138,9 @@ const {
               }
             `,
           });
+          if (!newChannelRef) {
+            return existingChannels;
+          }
           return [...existingChannels, newChannelRef];
         },
       },
@@ -135,7 +150,6 @@ const {
 
 onDone((response) => {
   const newChannelId = response.data.createChannels.channels[0]?.uniqueName;
-  createChannelLoading.value = false;
   if (!newChannelId) {
     submitError.value =
       'Unable to create forum. Please check your permissions or try again.';
@@ -150,8 +164,11 @@ onDone((response) => {
   });
 });
 
+onError(() => {
+  submitError.value = null;
+});
+
 const submit = async () => {
-  createChannelLoading.value = true;
   submitAttempted.value = true;
   submitError.value = null;
   if (!usernameVar.value) {
