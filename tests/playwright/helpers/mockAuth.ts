@@ -28,15 +28,18 @@ export async function installMockAuth(
   {
     username = 'cluse',
     email = 'catherine.luse@gmail.com',
-  }: { username?: string; email?: string } = {}
+    modProfileName = '',
+  }: { username?: string; email?: string; modProfileName?: string } = {}
 ) {
   const token = createMockJwt(email, username);
+  const frontendPort = process.env.PLAYWRIGHT_FRONTEND_PORT ?? '3100';
+  const cookieURL = `http://127.0.0.1:${frontendPort}`;
 
   await context.addCookies([
     {
       name: 'auth-hint',
       value: 'true',
-      url: 'http://127.0.0.1:3100',
+      url: cookieURL,
       httpOnly: false,
       sameSite: 'Lax',
       secure: false,
@@ -44,7 +47,15 @@ export async function installMockAuth(
     {
       name: 'username-hint',
       value: username,
-      url: 'http://127.0.0.1:3100',
+      url: cookieURL,
+      httpOnly: false,
+      sameSite: 'Lax',
+      secure: false,
+    },
+    {
+      name: 'mod-profile-name-hint',
+      value: modProfileName,
+      url: cookieURL,
       httpOnly: false,
       sameSite: 'Lax',
       secure: false,
@@ -52,9 +63,12 @@ export async function installMockAuth(
   ]);
 
   await page.addInitScript(
-    ({ token, username }) => {
+    ({ token, username, modProfileName }) => {
       window.localStorage.setItem('token', token);
       window.localStorage.setItem('mock_username', username);
+      if (modProfileName) {
+        window.localStorage.setItem('mock_mod_profile_name', modProfileName);
+      }
       window.localStorage.setItem(
         'auth_token_cache',
         JSON.stringify({
@@ -63,7 +77,7 @@ export async function installMockAuth(
         })
       );
     },
-    { token, username }
+    { token, username, modProfileName }
   );
 
   return token;

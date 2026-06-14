@@ -71,6 +71,10 @@ const props = defineProps({
   },
 });
 
+defineEmits<{
+  (e: 'filterByTag', tag: string): void;
+}>();
+
 const route = useRoute();
 const uiStore = useUIStore();
 const { fontSize } = storeToRefs(uiStore);

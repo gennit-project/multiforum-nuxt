@@ -2,9 +2,11 @@ import { defineNuxtPlugin } from 'nuxt/app';
 import { nextTick } from 'vue';
 import {
   setUsername,
+  setModProfileName,
   setIsAuthenticated,
   isAuthenticatedVar,
   usernameVar,
+  modProfileNameVar,
 } from '@/cache';
 import { config } from '@/config';
 
@@ -17,11 +19,15 @@ export default defineNuxtPlugin(() => {
   // mock auth data is only set by test code (Playwright, Cypress)
   const syncMockAuthFromStorage = () => {
     const mockUsername = window.localStorage.getItem('mock_username');
+    const mockModProfileName = window.localStorage.getItem(
+      'mock_mod_profile_name'
+    );
     const token = window.localStorage.getItem('token');
 
     if (mockUsername && token) {
       setIsAuthenticated(true);
       setUsername(mockUsername);
+      setModProfileName(mockModProfileName || '');
       isAuthenticatedVar.value = true;
     }
   };
@@ -41,20 +47,30 @@ export default defineNuxtPlugin(() => {
 
   const setAuthStateDirect = (authState: {
     username?: string;
+    modProfileName?: string;
     authenticated?: boolean;
   }) => {
     if (authState.authenticated !== false) {
       setIsAuthenticated(true);
       setUsername(authState.username || '');
+      setModProfileName(authState.modProfileName || '');
       isAuthenticatedVar.value = true;
       if (authState.username) {
         window.localStorage.setItem('mock_username', authState.username);
       }
+      if (authState.modProfileName) {
+        window.localStorage.setItem(
+          'mock_mod_profile_name',
+          authState.modProfileName
+        );
+      }
     } else {
       setIsAuthenticated(false);
       setUsername('');
+      setModProfileName('');
       isAuthenticatedVar.value = false;
       window.localStorage.removeItem('mock_username');
+      window.localStorage.removeItem('mock_mod_profile_name');
     }
 
     nextTick(() => {
@@ -66,6 +82,7 @@ export default defineNuxtPlugin(() => {
     window.__SET_AUTH_STATE_DIRECT__ = setAuthStateDirect;
     window.__DEBUG_AUTH_STATE__ = () => ({
       username: usernameVar.value,
+      modProfileName: modProfileNameVar.value,
       authenticated: isAuthenticatedVar.value,
       hasToken: !!localStorage.getItem('token'),
     });
