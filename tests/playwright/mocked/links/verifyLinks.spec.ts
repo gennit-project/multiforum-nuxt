@@ -238,6 +238,17 @@ const getCommonMocks = (username: string) => ({
       users: [{ username, FavoriteDiscussions: [] }],
     },
   }),
+  getModsByChannel: () => ({
+    data: {
+      channels: [
+        {
+          uniqueName: TEST_CHANNEL,
+          Admins: [],
+          Moderators: [],
+        },
+      ],
+    },
+  }),
   userIsModInChannel: () => ({
     data: {
       channels: [

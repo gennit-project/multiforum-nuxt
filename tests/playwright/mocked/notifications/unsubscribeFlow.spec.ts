@@ -71,6 +71,16 @@ const getBaseMocks = (username: string) => ({
       ],
     },
   }),
+  getChannelDownloadCount: () => ({
+    data: {
+      channels: [
+        {
+          uniqueName: TEST_CHANNEL,
+          DiscussionChannelsAggregate: { count: 1 },
+        },
+      ],
+    },
+  }),
   getChannelTags: () => ({
     data: {
       channels: [{ uniqueName: TEST_CHANNEL, Tags: [] }],
@@ -88,6 +98,92 @@ const getBaseMocks = (username: string) => ({
           SuspendedUsers: [],
           Moderators: [],
           SuspendedMods: [],
+        },
+      ],
+    },
+  }),
+  getModsByChannel: () => ({
+    data: {
+      channels: [
+        {
+          uniqueName: TEST_CHANNEL,
+          Admins: [],
+          Moderators: [],
+        },
+      ],
+    },
+  }),
+  getIssue: () => ({
+    data: {
+      issues: [],
+    },
+  }),
+  getDiscussionCommentIssue: () => ({
+    data: {
+      discussionChannels: [],
+    },
+  }),
+  getDiscussionChannelRootCommentAggregate: () => ({
+    data: {
+      discussionChannels: [
+        {
+          id: 'dc-1',
+          discussionId: DISCUSSION_ID,
+          channelUniqueName: TEST_CHANNEL,
+          archived: false,
+          answered: false,
+          locked: false,
+          CommentsAggregate: { count: 0 },
+        },
+      ],
+    },
+  }),
+  isDiscussionAnswered: () => ({
+    data: {
+      discussionChannels: [
+        {
+          id: 'dc-1',
+          discussionId: DISCUSSION_ID,
+          channelUniqueName: TEST_CHANNEL,
+          weightedVotesCount: 1,
+          archived: false,
+          answered: false,
+          locked: false,
+          Channel: { uniqueName: TEST_CHANNEL },
+        },
+      ],
+    },
+  }),
+  getCommentSection: () => ({
+    data: {
+      getCommentSection: {
+        DiscussionChannel: buildDiscussionChannel({
+          id: 'dc-1',
+          discussionId: DISCUSSION_ID,
+          channelUniqueName: TEST_CHANNEL,
+          title: 'Test Discussion',
+          commentsCount: 0,
+        }),
+        Comments: [],
+      },
+    },
+  }),
+  getEvents: () => ({
+    data: {
+      events: [],
+    },
+  }),
+  getUserFavoriteDiscussion: () => ({
+    data: {
+      users: [{ username, FavoriteDiscussions: [] }],
+    },
+  }),
+  getUserSuspensionInChannel: () => ({
+    data: {
+      channels: [
+        {
+          uniqueName: TEST_CHANNEL,
+          SuspendedUsers: [],
         },
       ],
     },
@@ -162,7 +258,7 @@ test.describe('Unsubscribe flow', () => {
       );
 
       // Wait for page to load
-      await expect(page.getByText('Test Discussion')).toBeVisible({
+      await expect(page.getByRole('heading', { name: 'Test Discussion' })).toBeVisible({
         timeout: 30000,
       });
 

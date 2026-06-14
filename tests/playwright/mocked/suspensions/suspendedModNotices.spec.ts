@@ -122,6 +122,92 @@ const getBaseMocks = (username: string) => ({
   getTags: () => ({
     data: { tags: [] },
   }),
+  getIssue: () => ({
+    data: {
+      issues: [],
+    },
+  }),
+  getDiscussionCommentIssue: () => ({
+    data: {
+      discussionChannels: [],
+    },
+  }),
+  getDiscussionChannelRootCommentAggregate: () => ({
+    data: {
+      discussionChannels: [
+        {
+          id: 'discussion-channel-1',
+          discussionId: 'disc-1',
+          channelUniqueName: TEST_CHANNEL,
+          archived: false,
+          answered: false,
+          locked: false,
+          CommentsAggregate: { count: 0 },
+        },
+      ],
+    },
+  }),
+  isDiscussionAnswered: () => ({
+    data: {
+      discussionChannels: [
+        {
+          id: 'discussion-channel-1',
+          discussionId: 'disc-1',
+          channelUniqueName: TEST_CHANNEL,
+          weightedVotesCount: 1,
+          archived: false,
+          answered: false,
+          locked: false,
+          Channel: { uniqueName: TEST_CHANNEL },
+        },
+      ],
+    },
+  }),
+  getCommentSection: () => ({
+    data: {
+      getCommentSection: {
+        DiscussionChannel: {
+          id: 'discussion-channel-1',
+          discussionId: 'disc-1',
+          channelUniqueName: TEST_CHANNEL,
+          title: 'Test Discussion',
+          commentsCount: 0,
+        },
+        Comments: [],
+      },
+    },
+  }),
+  getEvents: () => ({
+    data: {
+      events: [],
+    },
+  }),
+  getUserFavoriteDiscussion: () => ({
+    data: {
+      users: [{ username, FavoriteDiscussions: [] }],
+    },
+  }),
+  getUserSuspensionInChannel: () => ({
+    data: {
+      channels: [
+        {
+          uniqueName: TEST_CHANNEL,
+          SuspendedUsers: [],
+        },
+      ],
+    },
+  }),
+  getModsByChannel: () => ({
+    data: {
+      channels: [
+        {
+          uniqueName: TEST_CHANNEL,
+          Admins: [],
+          Moderators: [],
+        },
+      ],
+    },
+  }),
 });
 
 test.describe('Mod suspension notices', () => {
@@ -201,7 +287,7 @@ test.describe('Mod suspension notices', () => {
       await page.goto(`/forums/${TEST_CHANNEL}/discussions/disc-1`);
 
       // Wait for page to load
-      await expect(page.getByText('Test Discussion')).toBeVisible({
+      await expect(page.getByRole('heading', { name: 'Test Discussion' })).toBeVisible({
         timeout: 30000,
       });
 
@@ -303,7 +389,7 @@ test.describe('Mod suspension notices', () => {
       await page.goto(`/forums/${TEST_CHANNEL}/discussions/disc-1`);
 
       // Wait for page to load
-      await expect(page.getByText('Test Discussion')).toBeVisible({
+      await expect(page.getByRole('heading', { name: 'Test Discussion' })).toBeVisible({
         timeout: 30000,
       });
 
