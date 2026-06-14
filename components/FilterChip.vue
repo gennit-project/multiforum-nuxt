@@ -5,7 +5,7 @@ import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 // Import Popper dynamically to avoid SSR issues with regeneratorRuntime
 const Popper = defineAsyncComponent(() => import('vue3-popper'));
 
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
   dataTestid?: string;
   label?: string;
   highlighted?: boolean;

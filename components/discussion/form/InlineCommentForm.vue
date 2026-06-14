@@ -8,8 +8,7 @@ import type {
   CommentCreateInput,
   CommentSectionFormat,
 } from '@/__generated__/graphql';
-import type { NormalizedCacheObject } from '@apollo/client/core';
-import type { ApolloCache, FetchResult } from '@apollo/client/core';
+import type { NormalizedCacheObject, ApolloCache, FetchResult  } from '@apollo/client/core';
 import { CREATE_COMMENT } from '@/graphQLData/comment/mutations';
 import { GET_DISCUSSION_COMMENTS } from '@/graphQLData/comment/queries';
 import { GET_USER } from '@/graphQLData/user/queries';

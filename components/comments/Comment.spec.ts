@@ -339,7 +339,7 @@ const SimplifiedCommentComponent = {
         await navigator.clipboard.writeText('/test-link');
         this.$emit('showCopiedLinkNotification', true);
       } catch (e: unknown) {
-        throw new Error(String(e));
+        throw new Error(String(e), { cause: e });
       }
       setTimeout(() => {
         this.$emit('showCopiedLinkNotification', false);

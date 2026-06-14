@@ -29,7 +29,7 @@ type RoleState = {
   values: Record<string, boolean>;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const props = defineProps<{
   serverConfig: Record<string, any> | null;
   title?: string;

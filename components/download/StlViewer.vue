@@ -30,6 +30,8 @@ import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 // @ts-expect-error - THREE.js types not installed
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
+import type { CSSProperties } from 'vue';
+
 interface Props {
   src: string;
   width?: number | string;
@@ -52,8 +54,6 @@ const props = withDefaults(defineProps<Props>(), {
   autoRotate: false,
   showGrid: false,
 });
-
-import type { CSSProperties } from 'vue';
 
 const containerStyle = computed((): CSSProperties => {
   const style: CSSProperties = {};
