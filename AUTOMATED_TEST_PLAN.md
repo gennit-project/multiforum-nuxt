@@ -2,211 +2,15 @@
 
 This document outlines the automated test plan for the new functionality introduced in the `feature-moderation` branch. The plan follows a 10% integration tests (Playwright with mocked backend) / 90% unit tests (Vitest frontend, Node test runner backend) distribution.
 
-## Overview
-
-### Feature Categories
-
-Based on the manual verification guides in `MODERATION_PLAN.md`, `NOTIFICATIONS_PLAN.md`, and `FEATURE_ROADMAP.md`, the new functionality spans these areas:
-
-1. **User Suspension System** - Server and channel-level suspensions
-2. **Moderator Suspension System** - Mod profile suspensions separate from user accounts
-3. **Bot Suspension System** - Suspending automated bot accounts
-4. **Server Admin/Mod Invites** - Invite workflow with pending/accept states
-5. **Wiki Moderation** - Wiki revision redaction, reporting, edit history
-6. **Image Moderation** - Album/profile/channel image reporting and archiving
-7. **Channel Reporting & Locking** - Server-scoped channel reports and lock workflow
-8. **Notification System** - Feedback tabs, mod mentions, unsubscribe links
-9. **Download Labels Moderation** - Mod-editable download labels with audit trail
-10. **Auto-Moderation Bot Plugin** - AI-powered content analysis
-
 ---
 
-## Test Distribution Summary
+## Remaining Work
 
-| Category | Playwright (Integration) | Frontend Unit | Backend Unit | Total |
-|----------|-------------------------|---------------|--------------|-------|
-| User Suspension | 2 | 8 | 6 | 16 |
-| Mod Suspension | 2 | 6 | 4 | 12 |
-| Bot Suspension | 1 | 4 | 3 | 8 |
-| Server Invites | 1 | 5 | 3 | 9 |
-| Wiki Moderation | 2 | 8 | 5 | 15 |
-| Image Moderation | 2 | 6 | 4 | 12 |
-| Channel Lock | 2 | 6 | 4 | 12 |
-| Notifications | 2 | 10 | 8 | 20 |
-| Download Labels | 1 | 4 | 3 | 8 |
-| Auto-Mod Bot | 1 | 3 | 4 | 8 |
-| **Total** | **16** | **60** | **44** | **120** |
+### Phase 3: Content Moderation (Current)
 
----
+#### 5. Wiki Moderation
 
-## 1. User Suspension System
-
-### Playwright Integration Tests
-
-**File:** `tests/playwright/mocked/suspensions/userSuspension.spec.ts`
-
-| Test | Description |
-|------|-------------|
-| `suspended user sees blocked action notification` | Mock suspended user state, attempt to create discussion, verify suspension notice appears with issue link |
-| `suspension expiry re-enables actions` | Mock expired suspension, verify user can create content without refresh |
-
-### Frontend Unit Tests
-
-**File:** `components/mod/SuspensionNotice.spec.ts`
-
-| Test | Description |
-|------|-------------|
-| `renders channel suspension message with issue link` | |
-| `renders server suspension message` | |
-| `shows expiration date for time-limited suspensions` | |
-| `shows indefinite text for permanent suspensions` | |
-
-**File:** `composables/useUserSuspension.spec.ts`
-
-| Test | Description |
-|------|-------------|
-| `returns active suspension when suspendedUntil is in future` | |
-| `returns active suspension when suspendedIndefinitely is true` | |
-| `returns null for expired suspensions` | |
-| `computes isSuspended correctly` | |
-
-### Backend Unit Tests
-
-**File:** `hooks/suspensionCleanupHook.test.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `disconnectExpiredSuspensions removes expired user suspensions` | |
-| `disconnectExpiredSuspensions ignores indefinite suspensions` | |
-| `disconnectExpiredSuspensions handles mixed expired/active` | |
-
-**File:** `utils/suspensionUtils.test.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `isExpiredSuspension returns true for past dates` | |
-| `isExpiredSuspension returns false for future dates` | |
-| `isExpiredSuspension returns false for indefinite suspensions` | |
-
----
-
-## 2. Moderator Suspension System
-
-### Playwright Integration Tests
-
-**File:** `tests/playwright/mocked/suspensions/modSuspension.spec.ts`
-
-| Test | Description |
-|------|-------------|
-| `suspended mod sees no mod UI elements on discussions` | Mock suspended mod profile, verify archive/report buttons hidden |
-| `suspended mod can still post as regular user` | Verify comment creation works despite mod suspension |
-
-### Frontend Unit Tests
-
-**File:** `composables/useModSuspension.spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `returns suspension when mod profile is suspended` | |
-| `returns null for unsuspended mod profiles` | |
-| `separates mod suspension from user suspension` | |
-
-**File:** `components/mod/SuspendModButton.spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `renders suspend button when mod is not suspended` | |
-| `renders unsuspend button when mod is suspended` | |
-| `disables button when user lacks permission` | |
-
-### Backend Unit Tests
-
-**File:** `resolvers/modSuspension.test.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `suspendMod creates suspension linked to issue` | |
-| `unsuspendMod removes active suspension` | |
-| `mod suspension does not affect user permissions` | |
-| `getActiveSuspension returns correct mod suspension state` | |
-
----
-
-## 3. Bot Suspension System
-
-### Playwright Integration Tests
-
-**File:** `tests/playwright/mocked/suspensions/botSuspension.spec.ts`
-
-| Test | Description |
-|------|-------------|
-| `suspended bot shows suspended badge in channel sidebar` | Mock suspended bot, verify red "Suspended" badge |
-
-### Frontend Unit Tests
-
-**File:** `components/channel/BotListItem.spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `renders active indicator for non-suspended bots` | |
-| `renders suspended badge for suspended bots` | |
-| `renders bot icon for bot users` | |
-| `shows deprecated badge alongside suspended badge` | |
-
-### Backend Unit Tests
-
-**File:** `hooks/botSuspensionHook.test.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `blocks bot comment creation when suspended` | |
-| `blocks bot report creation when suspended` | |
-| `allows bot actions when not suspended` | |
-
----
-
-## 4. Server Admin/Mod Invite Workflow
-
-### Playwright Integration Tests
-
-**File:** `tests/playwright/mocked/admin/serverInvites.spec.ts`
-
-| Test | Description |
-|------|-------------|
-| `admin invite workflow creates pending state and shows accept page` | Mock invite, verify pending badge, navigate to accept page |
-
-### Frontend Unit Tests
-
-**File:** `pages/admin/accept-admin-invite.spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `shows sign in required when not authenticated` | |
-| `shows no invitation found when no pending invite` | |
-| `shows accept button when invite exists` | |
-
-**File:** `pages/admin/accept-mod-invite.spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `shows mod profile required message when user has no mod profile` | |
-| `shows accept button when mod profile and invite exist` | |
-
-### Backend Unit Tests
-
-**File:** `resolvers/serverInvites.test.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `inviteServerAdmin creates pending invite` | |
-| `acceptServerAdminInvite promotes user to admin` | |
-| `cancelServerAdminInvite removes pending state` | |
-
----
-
-## 5. Wiki Moderation
-
-### Playwright Integration Tests
+**Playwright Integration Tests**
 
 **File:** `tests/playwright/mocked/wiki/wikiModeration.spec.ts`
 
@@ -215,7 +19,7 @@ Based on the manual verification guides in `MODERATION_PLAN.md`, `NOTIFICATIONS_
 | `suspended user cannot edit wiki pages` | Mock suspended user, verify wiki edit buttons disabled |
 | `wiki revision report creates issue` | Click report edit, submit form, verify success toast |
 
-### Frontend Unit Tests
+**Frontend Unit Tests**
 
 **File:** `components/wiki/WikiRevisionDiffModal.spec.ts` (existing, extend)
 
@@ -241,7 +45,7 @@ Based on the manual verification guides in `MODERATION_PLAN.md`, `NOTIFICATIONS_
 | `displays user wiki edits with page links` | |
 | `filters by channel when selected` | |
 
-### Backend Unit Tests
+**Backend Unit Tests**
 
 **File:** `resolvers/wikiModeration.test.ts` (new)
 
@@ -255,9 +59,9 @@ Based on the manual verification guides in `MODERATION_PLAN.md`, `NOTIFICATIONS_
 
 ---
 
-## 6. Image Moderation
+#### 6. Image Moderation
 
-### Playwright Integration Tests
+**Playwright Integration Tests**
 
 **File:** `tests/playwright/mocked/images/imageModeration.spec.ts`
 
@@ -266,7 +70,7 @@ Based on the manual verification guides in `MODERATION_PLAN.md`, `NOTIFICATIONS_
 | `report image from lightbox creates issue` | Open lightbox, click report, submit form, verify toast |
 | `archived image hidden from album view` | Mock archived image, verify not displayed |
 
-### Frontend Unit Tests
+**Frontend Unit Tests**
 
 **File:** `components/image/ImageLightbox.spec.ts` (extend)
 
@@ -291,7 +95,7 @@ Based on the manual verification guides in `MODERATION_PLAN.md`, `NOTIFICATIONS_
 | `displays image reports with type badges` | |
 | `filters by open/closed status` | |
 
-### Backend Unit Tests
+**Backend Unit Tests**
 
 **File:** `resolvers/imageModeration.test.ts` (new)
 
@@ -304,9 +108,9 @@ Based on the manual verification guides in `MODERATION_PLAN.md`, `NOTIFICATIONS_
 
 ---
 
-## 7. Channel Reporting & Locking
+#### 7. Channel Reporting & Locking
 
-### Playwright Integration Tests
+**Playwright Integration Tests**
 
 **File:** `tests/playwright/mocked/channels/channelLocking.spec.ts`
 
@@ -315,7 +119,7 @@ Based on the manual verification guides in `MODERATION_PLAN.md`, `NOTIFICATIONS_
 | `locked channel shows banner and blocks content creation` | Mock locked channel, verify banner, attempt create discussion |
 | `channel report creates server-scoped issue` | Navigate to about page, report channel, verify issue created |
 
-### Frontend Unit Tests
+**Frontend Unit Tests**
 
 **File:** `components/channel/LockedChannelBanner.spec.ts` (new)
 
@@ -333,7 +137,7 @@ Based on the manual verification guides in `MODERATION_PLAN.md`, `NOTIFICATIONS_
 | `shows lock/unlock buttons based on state` | |
 | `filters by open/closed status` | |
 
-### Backend Unit Tests
+**Backend Unit Tests**
 
 **File:** `resolvers/channelLocking.test.ts` (new)
 
@@ -346,82 +150,44 @@ Based on the manual verification guides in `MODERATION_PLAN.md`, `NOTIFICATIONS_
 
 ---
 
-## 8. Notification System
+### Phase 4: Downloads & Plugins
 
-### Playwright Integration Tests
+#### 3. Bot Suspension System
 
-**File:** `tests/playwright/mocked/notifications/notificationTabs.spec.ts`
+**Playwright Integration Tests**
 
-| Test | Description |
-|------|-------------|
-| `feedback notifications appear in separate tab` | Mock feedback notification, verify tab separation |
-| `unsubscribe link auto-unsubscribes and shows toast` | Navigate with ?action=unsubscribe, verify toast |
-
-### Frontend Unit Tests
-
-**File:** `components/notifications/NotificationTabs.spec.ts` (existing, extend)
+**File:** `tests/playwright/mocked/suspensions/botSuspension.spec.ts`
 
 | Test | Description |
 |------|-------------|
-| `renders general and feedback tabs` | |
-| `shows unread count badges` | |
-| `switches active tab on click` | |
-| `mark all as read updates correct tab` | |
+| `suspended bot shows suspended badge in channel sidebar` | Mock suspended bot, verify red "Suspended" badge |
 
-**File:** `utils/modMentions.spec.ts` (existing, ensure coverage)
+**Frontend Unit Tests**
 
-| Test | Description |
-|------|-------------|
-| `hasModMention detects /m/ patterns` | |
-| `buildModMentionOptions creates proper suggestions` | |
-| `getModMentionState identifies trigger position` | |
-| `filterModSuggestions filters by prefix` | |
-
-**File:** `composables/useAutoUnsubscribe.spec.ts` (new)
+**File:** `components/channel/BotListItem.spec.ts` (new)
 
 | Test | Description |
 |------|-------------|
-| `triggers unsubscribe mutation when action param present` | |
-| `removes action param from URL after unsubscribe` | |
-| `does not trigger on page refresh` | |
+| `renders active indicator for non-suspended bots` | |
+| `renders suspended badge for suspended bots` | |
+| `renders bot icon for bot users` | |
+| `shows deprecated badge alongside suspended badge` | |
 
-### Backend Unit Tests
+**Backend Unit Tests**
 
-**File:** `hooks/feedbackNotificationHook.test.ts` (existing, ensure coverage)
-
-| Test | Description |
-|------|-------------|
-| `creates notification with privacy-preserving text` | |
-| `respects notifyOnFeedback preference` | |
-
-**File:** `hooks/modMentionNotificationHook.test.ts` (existing, ensure coverage)
+**File:** `hooks/botSuspensionHook.test.ts` (new)
 
 | Test | Description |
 |------|-------------|
-| `creates notification for /m/ mention` | |
-| `skips self-mentions` | |
-| `avoids duplicate notifications on edit` | |
-
-**File:** `hooks/archivedContentNotificationHook.test.ts` (existing, extend)
-
-| Test | Description |
-|------|-------------|
-| `notifies author when content is archived` | |
-| `skips notification for self-archival` | |
-| `includes issue link in notification` | |
-
-**File:** `utils/notificationFooter.test.ts` (existing, ensure coverage)
-
-| Test | Description |
-|------|-------------|
-| `builds unsubscribe URL correctly` | |
-| `generates appropriate reason text` | |
+| `blocks bot comment creation when suspended` | |
+| `blocks bot report creation when suspended` | |
+| `allows bot actions when not suspended` | |
 
 ---
 
-## 9. Download Labels Moderation
+#### 9. Download Labels Moderation
 
-### Playwright Integration Tests
+**Playwright Integration Tests**
 
 **File:** `tests/playwright/mocked/downloads/downloadLabels.spec.ts`
 
@@ -429,7 +195,7 @@ Based on the manual verification guides in `MODERATION_PLAN.md`, `NOTIFICATIONS_
 |------|-------------|
 | `mod can update download labels and see audit trail` | Navigate to download edit, change labels, verify activity tab |
 
-### Frontend Unit Tests
+**Frontend Unit Tests**
 
 **File:** `components/download/DownloadActivityTab.spec.ts` (new)
 
@@ -447,7 +213,7 @@ Based on the manual verification guides in `MODERATION_PLAN.md`, `NOTIFICATIONS_
 | `loads existing labels into form` | |
 | `submits label changes via mutation` | |
 
-### Backend Unit Tests
+**Backend Unit Tests**
 
 **File:** `resolvers/downloadLabels.test.ts` (new)
 
@@ -459,9 +225,9 @@ Based on the manual verification guides in `MODERATION_PLAN.md`, `NOTIFICATIONS_
 
 ---
 
-## 10. Auto-Moderation Bot Plugin
+#### 10. Auto-Moderation Bot Plugin
 
-### Playwright Integration Tests
+**Playwright Integration Tests**
 
 **File:** `tests/playwright/mocked/plugins/autoModerationBot.spec.ts`
 
@@ -469,7 +235,7 @@ Based on the manual verification guides in `MODERATION_PLAN.md`, `NOTIFICATIONS_
 |------|-------------|
 | `plugin settings page displays all configurable options` | Navigate to plugin settings, verify form fields |
 
-### Frontend Unit Tests
+**Frontend Unit Tests**
 
 **File:** `components/admin/plugins/AutoModBotSettings.spec.ts` (new)
 
@@ -479,7 +245,7 @@ Based on the manual verification guides in `MODERATION_PLAN.md`, `NOTIFICATIONS_
 | `validates temperature range 0-1` | |
 | `shows profile selection dropdown` | |
 
-### Backend Unit Tests
+**Backend Unit Tests**
 
 **File:** `plugins/auto-moderation-bot/analyzeContent.test.ts` (new, in plugins repo)
 
@@ -492,40 +258,44 @@ Based on the manual verification guides in `MODERATION_PLAN.md`, `NOTIFICATIONS_
 
 ---
 
-## Implementation Priority
+### Phase 5: Admin Features
 
-### Phase 1: Core Suspension System (High Priority)
+#### 4. Server Admin/Mod Invite Workflow
 
-1. User suspension unit tests (frontend + backend)
-2. Mod suspension unit tests (frontend + backend)
-3. Suspension Playwright tests
+**Playwright Integration Tests**
 
-### Phase 2: Notification System (High Priority)
+**File:** `tests/playwright/mocked/admin/serverInvites.spec.ts`
 
-1. Notification tab unit tests
-2. Mod mention unit tests
-3. Unsubscribe flow tests
-4. Notification Playwright tests
+| Test | Description |
+|------|-------------|
+| `admin invite workflow creates pending state and shows accept page` | Mock invite, verify pending badge, navigate to accept page |
 
-### Phase 3: Content Moderation (Medium Priority)
+**Frontend Unit Tests**
 
-1. Wiki moderation unit tests
-2. Image moderation unit tests
-3. Channel locking unit tests
-4. Moderation Playwright tests
+**File:** `pages/admin/accept-admin-invite.spec.ts` (new)
 
-### Phase 4: Downloads & Plugins (Medium Priority)
+| Test | Description |
+|------|-------------|
+| `shows sign in required when not authenticated` | |
+| `shows no invitation found when no pending invite` | |
+| `shows accept button when invite exists` | |
 
-1. Download labels unit tests
-2. Bot suspension tests
-3. Auto-mod plugin tests
-4. Downloads Playwright tests
+**File:** `pages/admin/accept-mod-invite.spec.ts` (new)
 
-### Phase 5: Admin Features (Lower Priority)
+| Test | Description |
+|------|-------------|
+| `shows mod profile required message when user has no mod profile` | |
+| `shows accept button when mod profile and invite exist` | |
 
-1. Server invite unit tests
-2. Admin page unit tests
-3. Admin Playwright tests
+**Backend Unit Tests**
+
+**File:** `resolvers/serverInvites.test.ts` (new)
+
+| Test | Description |
+|------|-------------|
+| `inviteServerAdmin creates pending invite` | |
+| `acceptServerAdminInvite promotes user to admin` | |
+| `cancelServerAdminInvite removes pending state` | |
 
 ---
 
@@ -568,23 +338,6 @@ node --test --experimental-strip-types hooks/suspensionCleanupHook.test.ts
 
 ---
 
-## Mock Data Requirements
-
-### Playwright Mock Fixtures
-
-Each Playwright test requires mock GraphQL responses. Create fixtures in `tests/playwright/mocked/fixtures/`:
-
-- `suspendedUser.json` - User with active channel/server suspension
-- `suspendedMod.json` - Mod profile with active suspension
-- `suspendedBot.json` - Bot user with active suspension
-- `lockedChannel.json` - Channel with isLocked=true
-- `pendingInvite.json` - Server admin/mod pending invite
-- `wikiWithRevisions.json` - Wiki page with revision history
-- `reportedImage.json` - Image with active report/issue
-- `downloadWithLabels.json` - Download with filter group labels
-
----
-
 ## Coverage Goals
 
 | Category | Target Coverage |
@@ -604,3 +357,98 @@ Each Playwright test requires mock GraphQL responses. Create fixtures in `tests/
 - Backend tests use the Node test runner with ts-node
 - Focus on testing business logic and user flows, not implementation details
 - Each test should be independent and not rely on test ordering
+
+---
+
+---
+
+# Completed Phases
+
+## Phase 1: Core Suspension System ✅
+
+**Completed:** All suspension system tests are in place.
+
+### 1. User Suspension System
+
+**Existing Tests:**
+
+| File | Tests | Status |
+|------|-------|--------|
+| `tests/playwright/mocked/suspensions/suspendedUserNotices.spec.ts` | 3 | ✅ Existed |
+| `components/SuspensionNotice.spec.ts` | 2 | ✅ Existed |
+| `composables/useSuspensionNotice.spec.ts` | 2 | ✅ Existed |
+| `composables/useSuspensionActionUI.spec.ts` | 4 | ✅ Existed |
+| `components/comments/CommentSection.suspension.spec.ts` | 1 | ✅ Existed |
+
+**Backend Tests (Already Existed):**
+
+| File | Tests |
+|------|-------|
+| `rules/permission/getActiveSuspension.test.ts` | 15 |
+| `rules/permission/disconnectExpiredSuspensions.test.ts` | 4 |
+| `rules/permission/getActiveServerSuspension.test.ts` | ~5 |
+| `rules/permission/suspensionNotification.test.ts` | ~3 |
+
+### 2. Moderator Suspension System
+
+**New Tests Created:**
+
+| File | Tests | Status |
+|------|-------|--------|
+| `components/mod/SuspendModButton.spec.ts` | 4 | ✅ New |
+| `tests/playwright/mocked/suspensions/suspendedModNotices.spec.ts` | 2 | ✅ New |
+
+---
+
+## Phase 2: Notification System ✅
+
+**Completed:** All notification system tests are in place.
+
+### Existing Frontend Tests
+
+| File | Tests | Status |
+|------|-------|--------|
+| `components/notifications/NotificationTabs.spec.ts` | 10 | ✅ Existed |
+| `utils/modMentions.spec.ts` | 24 | ✅ Existed |
+| `composables/useAutoUnsubscribe.spec.ts` | 7 | ✅ Existed |
+
+### New Playwright Tests
+
+| File | Tests | Status |
+|------|-------|--------|
+| `tests/playwright/mocked/notifications/notificationTabs.spec.ts` | 1 | ✅ New |
+| `tests/playwright/mocked/notifications/unsubscribeFlow.spec.ts` | 1 | ✅ New |
+
+### Backend Tests (Already Existed)
+
+| File | Status |
+|------|--------|
+| `hooks/feedbackNotificationHook.test.ts` | ✅ |
+| `hooks/modMentionNotificationHook.test.ts` | ✅ |
+| `hooks/userMentionNotificationHook.test.ts` | ✅ |
+| `hooks/archivedContentNotificationHook.test.ts` | ✅ |
+| `utils/notificationFooter.test.ts` | ✅ |
+| `services/commentNotificationRecipients.test.ts` | ✅ |
+| `services/commentNotificationService.test.ts` | ✅ |
+| `services/eventUpdateNotifications.test.ts` | ✅ |
+| `services/issueNotifications.test.ts` | ✅ |
+| `middleware/issueSubscriptionNotificationMiddleware.test.ts` | ✅ |
+| `tests/editNotifications.test.ts` | ✅ |
+| `rules/permission/suspensionNotification.test.ts` | ✅ |
+
+---
+
+## Test Distribution Summary
+
+| Category | Playwright | Frontend Unit | Backend Unit | Status |
+|----------|-----------|---------------|--------------|--------|
+| User Suspension | 3 | 9 | ~27 | ✅ Complete |
+| Mod Suspension | 2 | 4 | (included above) | ✅ Complete |
+| Notifications | 2 | 41 | 12 files | ✅ Complete |
+| Wiki Moderation | 0 | 0 | 0 | 🔲 Phase 3 |
+| Image Moderation | 0 | 0 | 0 | 🔲 Phase 3 |
+| Channel Lock | 0 | 0 | 0 | 🔲 Phase 3 |
+| Bot Suspension | 0 | 0 | 0 | 🔲 Phase 4 |
+| Download Labels | 0 | 0 | 0 | 🔲 Phase 4 |
+| Auto-Mod Bot | 0 | 0 | 0 | 🔲 Phase 4 |
+| Server Invites | 0 | 0 | 0 | 🔲 Phase 5 |
