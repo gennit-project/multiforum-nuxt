@@ -12,6 +12,7 @@ import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
 import type { FilterGroup, FilterOption } from '@/__generated__/graphql';
 import { usernameVar } from '@/cache';
+import ErrorBanner from '@/components/ErrorBanner.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -45,6 +46,7 @@ const formValues = ref<CreateEditDiscussionFormValues>({
   },
   crosspostId: null,
 });
+const submitError = ref('');
 
 const {
   mutate: createDownload,
@@ -183,6 +185,12 @@ const updateFormValues = (
 
 const submitForm = async () => {
   try {
+    if (channelData.value?.downloadsEnabled === false) {
+      submitError.value = 'Downloads are disabled in this channel.';
+      return;
+    }
+
+    submitError.value = '';
     const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
       onCreate: {
         node: { text: tag },
@@ -241,6 +249,8 @@ const submitForm = async () => {
     // Navigation is now handled in the onDone hook
   } catch (error) {
     console.error('Error creating download:', error);
+    submitError.value =
+      error instanceof Error ? error.message : 'Error creating download';
   }
 };
 
@@ -257,16 +267,22 @@ watch(
 <template>
   <div class="mx-auto max-w-4xl px-4 py-6">
     <div v-if="channelLoading">Loading channel data...</div>
-    <CreateEditDiscussionFields
-      v-else
-      :edit-mode="false"
-      :form-values="formValues"
-      :create-discussion-error="createDownloadError"
-      :create-discussion-loading="createDownloadLoading"
-      :download-mode="true"
-      :channel-data="channelData"
-      @submit="submitForm"
-      @update-form-values="updateFormValues"
-    />
+    <template v-else>
+      <ErrorBanner
+        v-if="submitError"
+        :text="submitError"
+        class="mb-4"
+      />
+      <CreateEditDiscussionFields
+        :edit-mode="false"
+        :form-values="formValues"
+        :create-discussion-error="createDownloadError"
+        :create-discussion-loading="createDownloadLoading"
+        :download-mode="true"
+        :channel-data="channelData"
+        @submit="submitForm"
+        @update-form-values="updateFormValues"
+      />
+    </template>
   </div>
 </template>
