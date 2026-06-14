@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { GET_EVENT } from '@/graphQLData/event/queries';
-import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/event/mutations';
+import {
+  UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS,
+  UPDATE_EVENT_IN_SERIES,
+} from '@/graphQLData/event/mutations';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
 import type { CreateEditEventFormValues } from '@/types/Event';
 import { DateTime } from 'luxon';
 import getDefaultEventFormValues from '@/utils/defaultEventFormValues';
+import EditScopeModal from '@/components/event/form/EditScopeModal.vue';
+import type { EventEditScope } from '@/components/event/form/EditScopeModal.vue';
 import type {
   EventChannel,
   EventUpdateInput,
@@ -81,6 +86,14 @@ const existingChannels = computed(() => {
     return ec.channelUniqueName;
   });
 });
+
+// Check if the event is part of a series
+const isPartOfSeries = computed(() => {
+  return Boolean((event.value as any)?.EventSeries?.id);
+});
+
+// Edit scope modal state
+const showEditScopeModal = ref(false);
 
 function getFormValuesFromEventData(
   eventData: Event
@@ -245,23 +258,53 @@ const {
   onDone,
 } = useMutation(UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS);
 
+const {
+  mutate: updateEventInSeries,
+  error: updateEventInSeriesError,
+  loading: updateEventInSeriesLoading,
+  onDone: onUpdateEventInSeriesDone,
+} = useMutation(UPDATE_EVENT_IN_SERIES);
+
+// Combined error for display
+const combinedUpdateError = computed(() => {
+  return updateEventError.value || updateEventInSeriesError.value;
+});
+
+// Combined loading state
+const combinedUpdateLoading = computed(() => {
+  return updateEventLoading.value || updateEventInSeriesLoading.value;
+});
+
+const redirectToEventDetail = () => {
+  router.push({
+    name: 'forums-forumId-events-eventId',
+    params: {
+      forumId: formValues.value.selectedChannels[0],
+      eventId,
+    },
+  });
+};
+
 onDone(() => {
-  /*
-    Redirect to the event detail page in the first
-    channel that the event was submitted to.
-  */
   if (!updateEventError.value) {
-    router.push({
-      name: 'forums-forumId-events-eventId',
-      params: {
-        forumId: formValues.value.selectedChannels[0],
-        eventId,
-      },
-    });
+    redirectToEventDetail();
   }
 });
 
-async function submit() {
+onUpdateEventInSeriesDone(() => {
+  if (!updateEventInSeriesError.value) {
+    redirectToEventDetail();
+  }
+});
+
+function submit() {
+  // If the event is part of a series, show the scope modal
+  if (isPartOfSeries.value) {
+    showEditScopeModal.value = true;
+    return;
+  }
+
+  // Otherwise, update the single event directly
   const variables = {
     updateEventInput: updateEventInput.value,
     channelConnections: channelConnections.value,
@@ -271,6 +314,24 @@ async function submit() {
     },
   };
   updateEvent(variables);
+}
+
+function handleEditScopeConfirm(scope: EventEditScope) {
+  showEditScopeModal.value = false;
+
+  const variables = {
+    eventId,
+    scope,
+    eventUpdateInput: updateEventInput.value,
+    channelConnections: channelConnections.value,
+    channelDisconnections: channelDisconnections.value,
+  };
+
+  updateEventInSeries(variables);
+}
+
+function handleEditScopeClose() {
+  showEditScopeModal.value = false;
 }
 
 function updateFormValues(data: CreateEditEventFormValues) {
@@ -295,12 +356,20 @@ function updateFormValues(data: CreateEditEventFormValues) {
         :key="dataLoaded.toString()"
         :edit-mode="true"
         :event-loading="getEventLoading"
-        :update-event-loading="updateEventLoading"
+        :update-event-loading="combinedUpdateLoading"
         :get-event-error="getEventError"
-        :update-event-error="updateEventError"
+        :update-event-error="combinedUpdateError"
         :form-values="formValues"
         @submit="submit"
         @update-form-values="updateFormValues"
+      />
+
+      <!-- Edit scope modal for series events -->
+      <EditScopeModal
+        :is-open="showEditScopeModal"
+        :event-title="formValues.title"
+        @confirm="handleEditScopeConfirm"
+        @close="handleEditScopeClose"
       />
     </template>
     <template #does-not-have-auth>
