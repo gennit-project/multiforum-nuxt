@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { ref } from 'vue';
 import { useCommentSectionModals } from './useCommentSectionModals';
 import type { Comment } from '@/__generated__/graphql';
 
@@ -252,6 +253,54 @@ describe('useCommentSectionModals', () => {
       handleClickEditFeedback({ commentData: mockComment });
 
       expect(commentToGiveFeedbackOn.value).toStrictEqual(mockComment);
+    });
+  });
+
+  describe('disabled feedback', () => {
+    const mockComment = { id: 'comment-123', text: 'Test' } as Comment;
+
+    it.each([
+      {
+        label: 'give feedback',
+        openModal: () => {
+          const { showFeedbackFormModal, handleClickGiveFeedback } =
+            useCommentSectionModals({ feedbackEnabled: ref(false) });
+
+          handleClickGiveFeedback({
+            commentData: mockComment,
+            parentCommentId: 'parent-456',
+          });
+
+          return showFeedbackFormModal.value;
+        },
+      },
+      {
+        label: 'undo feedback',
+        openModal: () => {
+          const { showConfirmUndoFeedbackModal, handleClickUndoFeedback } =
+            useCommentSectionModals({ feedbackEnabled: ref(false) });
+
+          handleClickUndoFeedback({
+            commentData: mockComment,
+            parentCommentId: 'parent-456',
+          });
+
+          return showConfirmUndoFeedbackModal.value;
+        },
+      },
+      {
+        label: 'edit feedback',
+        openModal: () => {
+          const { showEditCommentFeedbackModal, handleClickEditFeedback } =
+            useCommentSectionModals({ feedbackEnabled: ref(false) });
+
+          handleClickEditFeedback({ commentData: mockComment });
+
+          return showEditCommentFeedbackModal.value;
+        },
+      },
+    ])('does not open $label modal when feedback is disabled', ({ openModal }) => {
+      expect(openModal()).toBe(false);
     });
   });
 
