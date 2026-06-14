@@ -1,87 +1,7 @@
-# Notifications Implementation Plan
-
-This plan addresses all notification-related requirements from FEATURE_ROADMAP.md.
-
-**Status: ✅ All phases complete**
-
 ---
-
-## Requirements Implemented
-
-| # | Requirement | Status |
-|---|-------------|--------|
-| 1 | Mod mentions (/m) in issues/discussions trigger notifications | ✅ |
-| 2 | Text editor shows /m, /u, /bot mentions appropriately | ✅ |
-| 3 | Fix broken permalink in notification | ✅ |
-| 4 | Get notified of feedback | ✅ |
-| 5 | Notification page has separate tabs (feedback vs other) | ✅ |
-| 6 | Toggle notifications for feedback | ✅ |
-| 7 | Email notification does not reveal feedback content | ✅ |
-| 8 | Edits visible from feedback page | ✅ |
-| 9 | Notification when subscribed issue has moderation action | ✅ |
-| 10 | Archived content notification mentions reopening issue | ✅ |
-| 11 | One-click unsubscribe links in notifications | ✅ |
-| 12 | Notification shows subscription status with links | ✅ |
-| 13 | Unsubscribe via `?action=unsubscribe` query param | ✅ |
-| 14-17 | Unsubscribe flow for discussions, events, comments, issues | ✅ |
-
----
-
-## Implementation Order
-
-### Sprint 1: Foundation
-1. [x] Phase 3 Schema Change - Add `notificationType` field to Notification
-2. [x] Phase 1 - Bug fix for broken permalink (verified existing code is correct)
-3. [x] Phase 3 Backend - Feedback notifications (feedbackNotificationHook.ts)
-
-### Sprint 2: Mod Mentions & UI
-4. [x] Phase 2 Backend - Mod mention notifications (modMentionNotificationHook.ts)
-5. [x] Phase 2 Frontend - Text editor /m autocomplete
-6. [x] Phase 3 Frontend - Notification tabs (NotificationTabs.vue)
-
-### Sprint 3: Unsubscribe Flow
-7. [x] Phase 5 Frontend - Handle `?action=unsubscribe` param (useAutoUnsubscribe composable)
-8. [x] Phase 5 Backend - Add unsubscribe links to notifications (notificationFooter.ts)
-9. [x] Phase 6 - Notification footer with subscription status (included in Phase 5 Backend)
-
-### Sprint 4: Issue Notifications
-10. [x] Phase 4 - Issue moderation action notifications (already implemented via notifyIssueSubscribers)
-11. [x] Phase 4 - Enhanced archived content notifications (archivedContentNotificationHook.ts)
-
----
-
-## Files to Modify/Create
-
-### Backend (New Files)
-- [x] `hooks/modMentionNotificationHook.ts` - Created
-- [x] `hooks/feedbackNotificationHook.ts` - Created
-- [x] `hooks/archivedContentNotificationHook.ts` - Created (notifies content authors when archived)
-- [x] `utils/notificationFooter.ts` - Created
-
-### Backend (Modify)
-- [x] `typeDefs.ts` - Added `notificationType` field to Notification
-- [x] `hooks/notificationHelpers.ts` - Updated to accept notificationType
-- [x] `services/commentNotificationService.ts` - Integrated feedback, mod mention, user mention hooks, and unsubscribe footer
-- [x] `services/issueNotifications.ts` - Added unsubscribe footer
-
-### Frontend (New Files)
-- [x] `components/notifications/NotificationTabs.vue` - Created
-- [x] `composables/useAutoUnsubscribe.ts` - Created
-
-### Frontend (Modify)
-- [x] `pages/notifications/index.vue` - Updated to use NotificationTabs
-- [x] `graphQLData/notification/queries.js` - Added GET_FEEDBACK_NOTIFICATIONS, GET_GENERAL_NOTIFICATIONS
-- [x] `components/discussion/detail/DiscussionCommentsWrapper.vue` - Handle unsubscribe action via useAutoUnsubscribe
-- [x] `components/event/detail/EventCommentsWrapper.vue` - Handle unsubscribe action via useAutoUnsubscribe
-- [x] `components/mod/IssueDetail.vue` - Handle unsubscribe action via useAutoUnsubscribe
-- [x] Text editor components - Added /m autocomplete
-
----
-
 ## Verification Guide
 
 This section contains detailed step-by-step instructions for manually verifying notification features. Each item includes prerequisites, test steps, and expected outcomes.
-
 ---
 
 ### Notification Tabs Verification
@@ -150,7 +70,7 @@ This section contains detailed step-by-step instructions for manually verifying 
 
 1. Log in as User B
 2. Navigate to User A's content
-3. Give detailed feedback (e.g., "This post contains misinformation about X and Y")
+3. Give detailed feedback (e.g., "This post violates rules X and Y")
 4. Log in as User A
 5. Check the notification in the Feedback tab
 6. Also check any email notification sent
@@ -158,7 +78,7 @@ This section contains detailed step-by-step instructions for manually verifying 
 **Expected Outcome:**
 
 - In-app notification says "You received feedback on your [post/comment]" with a link
-- The actual feedback text ("This post contains misinformation...") is NOT visible
+- The actual feedback text ("This post violates rules...") is NOT visible
 - Email notification (if sent) uses generic subject like "You received feedback"
 - Email body does NOT include the feedback content
 - User must click the link to view the actual feedback
@@ -463,16 +383,19 @@ This section contains detailed step-by-step instructions for manually verifying 
 #### Verify Notification Contains Unsubscribe Footer
 
 **Prerequisites:**
+
 - User A subscribed to a discussion
 - User B who can comment on that discussion
 
 **Test Steps:**
+
 1. Log in as User B
 2. Post a comment on the discussion
 3. Log in as User A
 4. Check the notification in `/notifications`
 
 **Expected Outcome:**
+
 - Notification includes footer with:
   - "You received this because you are subscribed to this discussion"
   - Link to notification settings (`/account_settings#notifications`)
@@ -481,14 +404,17 @@ This section contains detailed step-by-step instructions for manually verifying 
 #### Verify Auto-Unsubscribe via URL Parameter
 
 **Prerequisites:**
+
 - User logged in
 - Subscribed to a discussion
 
 **Test Steps:**
+
 1. Navigate directly to `/forums/channel/discussions/id?action=unsubscribe`
 2. Observe the page behavior
 
 **Expected Outcome:**
+
 - Toast notification appears: "You have been unsubscribed from this discussion"
 - Subscribe button shows "Subscribe" state (not "Subscribed")
 - URL parameter is removed from the address bar
@@ -497,15 +423,18 @@ This section contains detailed step-by-step instructions for manually verifying 
 #### Verify Unsubscribe Works for Events and Issues
 
 **Prerequisites:**
+
 - User subscribed to an event and an issue
 
 **Test Steps:**
+
 1. Navigate to `/forums/channel/events/id?action=unsubscribe`
 2. Verify toast and button state change
 3. Navigate to `/forums/channel/issues/123?action=unsubscribe`
 4. Verify toast and button state change
 
 **Expected Outcome:**
+
 - Both events and issues support the auto-unsubscribe flow
 - Toast messages are appropriate for each content type
 
@@ -516,10 +445,12 @@ This section contains detailed step-by-step instructions for manually verifying 
 #### Verify Content Author is Notified When Content is Archived
 
 **Prerequisites:**
+
 - User A who authored a comment
 - User B who is a moderator with archive permissions
 
 **Test Steps:**
+
 1. Log in as User B (moderator)
 2. Navigate to User A's comment
 3. Archive the comment (select rule violations, submit)
@@ -527,6 +458,7 @@ This section contains detailed step-by-step instructions for manually verifying 
 5. Check notifications in `/notifications`
 
 **Expected Outcome:**
+
 - User A receives a notification
 - Notification text includes:
   - "Your comment was archived for violating community guidelines"
@@ -537,28 +469,34 @@ This section contains detailed step-by-step instructions for manually verifying 
 #### Verify Self-Archive Does NOT Notify
 
 **Prerequisites:**
+
 - Moderator who authored content
 
 **Test Steps:**
+
 1. Log in as moderator
 2. Archive your own content
 3. Check notifications
 
 **Expected Outcome:**
+
 - No notification is created when archiving your own content
 
 #### Verify Archived Content Notification for All Content Types
 
 **Prerequisites:**
+
 - Test content of each type (comment, discussion, event, image) by different authors
 
 **Test Steps:**
+
 1. Archive a comment - verify author is notified
 2. Archive a discussion - verify author is notified
 3. Archive an event - verify poster is notified
 4. Archive an image - verify uploader is notified
 
 **Expected Outcome:**
+
 - Each content type generates appropriate notification
 - Notification text correctly identifies the content type
 - Links are correctly formatted for each content type
@@ -566,15 +504,18 @@ This section contains detailed step-by-step instructions for manually verifying 
 #### Run Archived Content Notification Unit Tests
 
 **Prerequisites:**
+
 - Backend repository with tests
 
 **Test Steps:**
+
 ```bash
 cd gennit-backend
 node --test --experimental-strip-types hooks/archivedContentNotificationHook.test.ts
 ```
 
 **Expected Outcome:**
+
 - All 5 tests pass:
   - Calls createInAppNotification with correct parameters
   - Builds correct notification text with all information
@@ -587,51 +528,21 @@ node --test --experimental-strip-types hooks/archivedContentNotificationHook.tes
 ### Notification Footer Unit Tests
 
 **Prerequisites:**
+
 - Backend repository with tests
 
 **Test Steps:**
+
 ```bash
 cd gennit-backend
 node --test --experimental-strip-types utils/notificationFooter.test.ts
 ```
 
 **Expected Outcome:**
+
 - All 9 tests pass covering:
   - Default reason text generation
   - Subscription-based reason text
   - Author-based reason text
   - URL building with query parameters
   - Footer formatting with all components
-
----
-
-### Completed Feature Verification
-
-All sprints have been implemented and verified:
-
-#### Mod Mention Autocomplete (Sprint 2) ✅
-- [x] Typing `/m/` shows mod profile autocomplete dropdown
-- [x] Autocomplete shows only moderators for the current channel
-- [x] Selecting a mod inserts `/m/profileName` syntax
-
-#### Unsubscribe Flow (Sprint 3) ✅
-- [x] Clicking unsubscribe link navigates to content with `?action=unsubscribe`
-- [x] Page auto-unsubscribes authenticated user
-- [x] Toast notification confirms unsubscription
-- [x] Subscribe button updates to "Subscribe" state
-- [x] Works for discussions, events, and issues
-
-#### Issue Moderation Notifications (Sprint 4) ✅
-- [x] Moderation action on issue triggers notification to all subscribers
-- [x] Archived content notification mentions how to reopen/appeal
-- [x] Notification includes link to the related issue
-
-#### Feedback Notifications (Sprint 1) ✅
-- [x] Users with `notifyOnFeedback` enabled receive notifications when feedback is given
-- [x] Notification text does NOT reveal feedback content (privacy)
-- [x] Feedback tab separates feedback from general notifications
-
-#### Mod Mention Notifications (Sprint 2) ✅
-- [x] `/m/modProfileName` in comments triggers notification to that moderator
-- [x] Notification links to the specific comment
-- [x] Self-mentions do not create notifications

@@ -359,6 +359,11 @@ export const GET_DISCUSSION = gql`
         priceCurrency
         downloadCountTotal
         downloadCountUnique
+        attributionOverride
+        supportPatreonUrl
+        supportBuyMeACoffeeUrl
+        supportKoFiUrl
+        supportPayPalMeUrl
         license {
           id
           name
@@ -450,6 +455,11 @@ export const GET_DISCUSSION_FEEDBACK = gql`
         url
         downloadCountTotal
         downloadCountUnique
+        attributionOverride
+        supportPatreonUrl
+        supportBuyMeACoffeeUrl
+        supportKoFiUrl
+        supportPayPalMeUrl
       }
       CrosspostedDiscussion {
         ...CrosspostPreviewFields
