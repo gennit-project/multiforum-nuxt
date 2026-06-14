@@ -80,7 +80,10 @@ function handleClick() {
           :is-marked-as-answer="isMarkedAsAnswer"
           @vote="handleClick"
         >
-          <i class="fa-regular fa-face-smile" />
+          <span class="flex items-center gap-1">
+            <i class="fa-regular fa-face-smile" aria-hidden="true" />
+            <span class="text-xs">React</span>
+          </span>
         </VoteButton>
       </template>
       <template #content>

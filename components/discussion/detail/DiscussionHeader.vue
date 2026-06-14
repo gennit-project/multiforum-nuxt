@@ -399,7 +399,7 @@ const warningModalBody = computed(() => {
 
 <template>
   <div>
-    <div class="mt-2 flex justify-between">
+    <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:justify-between">
       <div
         class="flex flex-wrap items-center space-x-2 text-xs dark:text-white"
       >

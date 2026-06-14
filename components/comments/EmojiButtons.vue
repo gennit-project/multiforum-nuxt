@@ -166,12 +166,16 @@ function getDefaultVariant(emojiLabel: string) {
           }
         "
       >
-        <span
-          v-for="unicode in Object.keys(getVariants(emojiLabel))"
-          :key="unicode"
-          class="text-lg"
-        >
-          {{ unicode }}
+        <span class="flex items-center gap-1">
+          <span
+            v-for="unicode in Object.keys(getVariants(emojiLabel))"
+            :key="unicode"
+            class="text-lg"
+            aria-hidden="true"
+          >
+            {{ unicode }}
+          </span>
+          <span class="text-xs">{{ isActive(emojiLabel) ? 'Undo' : 'React' }}</span>
         </span>
       </VoteButton>
     </div>
