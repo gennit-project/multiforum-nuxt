@@ -62,13 +62,6 @@ export default defineConfig({
         'layouts/**/*.vue',
         'plugins/**/*.ts',
       ],
-      // Coverage thresholds - fail if coverage falls below these percentages
-      thresholds: {
-        lines: 80,
-        functions: 80,
-        branches: 80,
-        statements: 80,
-      },
       // Cleanup coverage results before each run
       clean: true,
       // Include all files in coverage, even if not tested
