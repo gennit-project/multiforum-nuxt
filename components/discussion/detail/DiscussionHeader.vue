@@ -552,7 +552,7 @@ const warningModalBody = computed(() => {
       @report-submitted-successfully="handleReportedSuccessfully"
     />
     <BrokenRulesModal
-      :v-if="discussion"
+      v-if="discussion"
       :open="showArchiveModal"
       :discussion-title="discussion?.title"
       :discussion-id="discussion?.id"

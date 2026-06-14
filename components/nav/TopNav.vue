@@ -165,12 +165,13 @@ const isOnMapPage = computed(() => {
           <nuxt-link
             data-testid="notification-bell"
             to="/notifications"
-            aria-label="Notifications"
+            :aria-label="notificationCountVar > 0 ? `${notificationCountVar} new notifications` : 'Notifications'"
             class="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-600 hover:text-gray-900 focus:outline-none dark:text-gray-300 dark:hover:text-white"
           >
             <i class="fas fa-bell text-lg" aria-hidden="true" />
             <span
               v-if="notificationCountVar > 0"
+              aria-hidden="true"
               class="font-semibold absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-xs leading-none text-white"
             >
               {{ notificationCountVar }}

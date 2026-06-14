@@ -94,6 +94,7 @@ const handleBecomeAdminSuccess = () => {
   <div
     :class="[useScrollbar ? 'max-h-screen overflow-auto' : '']"
     :tabindex="useScrollbar ? 0 : undefined"
+    :role="useScrollbar ? 'region' : undefined"
     :aria-label="useScrollbar ? 'Forum sidebar content' : undefined"
     class="pb-8 pt-4"
   >
@@ -122,7 +123,7 @@ const handleBecomeAdminSuccess = () => {
         <div v-if="channelId" class="flex items-center">
           <div class="mb-1 mt-3 flex-1">
             <span
-              class="flex space-y-2 rounded-full border-gray-700 text-xl leading-6 text-black dark:bg-gray-900 dark:text-gray-200"
+              class="flex space-y-2 rounded-full border-gray-700 text-xl leading-6 text-black dark:text-gray-200"
             >
               {{ channel?.displayName ? channel.displayName : channelId }}
             </span>
@@ -208,14 +209,14 @@ const handleBecomeAdminSuccess = () => {
                   name: 'u-username',
                   params: { username: admin.username },
                 }"
-                class="flex items-center dark:text-white"
+                class="flex items-start dark:text-white"
               >
                 <AvatarComponent
                   :text="admin.username"
                   :src="admin.profilePicURL ?? ''"
-                  class="mr-2 h-6 w-6"
+                  class="mr-2 h-6 w-6 flex-shrink-0"
                 />
-                <span class="flex flex-row items-center gap-1">
+                <span class="flex flex-wrap items-baseline gap-1">
                   <span v-if="!admin.displayName" class="font-bold">{{
                     admin.username
                   }}</span>
