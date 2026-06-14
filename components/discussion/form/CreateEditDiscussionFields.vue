@@ -232,6 +232,9 @@ onMounted(() => {
                   :channel-data="
                     channelData
                       ? {
+                          uniqueName: channelData.uniqueName || '',
+                          downloadsEnabled:
+                            channelData.downloadsEnabled ?? undefined,
                           allowedFileTypes:
                             channelData.allowedFileTypes?.filter(
                               (type): type is string => type !== null

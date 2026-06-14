@@ -35,6 +35,8 @@ const props = defineProps({
   // Channel data to get allowed file types and filter groups
   channelData: {
     type: Object as PropType<{
+      uniqueName?: string;
+      downloadsEnabled?: boolean;
       allowedFileTypes?: string[];
       FilterGroups?: FilterGroup[];
     }>,
@@ -145,6 +147,14 @@ const acceptAttribute = computed(() => {
   return extensions.join(',');
 });
 
+const downloadsDisabled = computed(() => {
+  return props.channelData?.downloadsEnabled === false;
+});
+
+const currentChannelConnections = computed(() => {
+  return props.channelData?.uniqueName ? [props.channelData.uniqueName] : [];
+});
+
 // Initialize form values after component is mounted
 onMounted(() => {
 
@@ -157,6 +167,13 @@ onMounted(() => {
 
 // File validation
 const validateFileType = (file: File): { valid: boolean; message: string } => {
+  if (downloadsDisabled.value) {
+    return {
+      valid: false,
+      message: 'Downloads are disabled in this channel.',
+    };
+  }
+
   const allowedTypes = props.channelData?.allowedFileTypes || [];
 
   if (allowedTypes.length === 0) {
@@ -256,7 +273,11 @@ const uploadFile = async (file: File): Promise<boolean> => {
     const filename = getUploadFileName({ username: usernameVar.value, file });
     const fileType =
       file.type || getFileTypeFromName(file.name) || 'application/octet-stream';
-    const signedStorageURLInput = { filename, contentType: fileType };
+    const signedStorageURLInput = {
+      filename,
+      contentType: fileType,
+      channelConnections: currentChannelConnections.value,
+    };
 
     // Ask the server for a signed storage URL
     const signedUrlResult = await createSignedStorageUrl(signedStorageURLInput);
@@ -493,19 +514,28 @@ function handleSave() {
                 type="file"
                 class="hidden"
                 :accept="acceptAttribute"
-                :disabled="uploadingFile"
+                :disabled="uploadingFile || downloadsDisabled"
                 @change="handleFileUpload"
               >
               <label
                 for="downloadable-file-input"
                 class="hover:bg-gray-50 focus:ring-indigo-500 inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                :class="{ 'cursor-not-allowed opacity-50': uploadingFile }"
+                :class="{
+                  'cursor-not-allowed opacity-50':
+                    uploadingFile || downloadsDisabled,
+                }"
               >
                 <span v-if="uploadingFile">Uploading...</span>
+                <span v-else-if="downloadsDisabled">Downloads Disabled</span>
                 <span v-else>Choose File</span>
               </label>
               <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                Maximum file size: {{ MAX_DOWNLOAD_FILE_SIZE_MB }}MB
+                <span v-if="downloadsDisabled">
+                  Downloads are disabled in this channel.
+                </span>
+                <span v-else>
+                  Maximum file size: {{ MAX_DOWNLOAD_FILE_SIZE_MB }}MB
+                </span>
                 <br >
                 <span v-if="channelData?.allowedFileTypes?.length">
                   Allowed file types:
@@ -604,15 +634,19 @@ function handleSave() {
                   type="file"
                   class="hidden"
                   :accept="acceptAttribute"
-                  :disabled="uploadingFile"
+                  :disabled="uploadingFile || downloadsDisabled"
                   @change="handleFileUpload"
                 >
                 <label
                   for="additional-file-input"
                   class="hover:bg-gray-50 inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                  :class="{ 'cursor-not-allowed opacity-50': uploadingFile }"
+                  :class="{
+                    'cursor-not-allowed opacity-50':
+                      uploadingFile || downloadsDisabled,
+                  }"
                 >
                   <span v-if="uploadingFile">Uploading...</span>
+                  <span v-else-if="downloadsDisabled">Downloads Disabled</span>
                   <span v-else>+ Add Another File</span>
                 </label>
               </div>

@@ -1,8 +1,16 @@
 import { gql } from '@apollo/client/core';
 
 export const CREATE_SIGNED_STORAGE_URL = gql`
-  mutation createSignedURL($filename: String!, $contentType: String!) {
-    createSignedStorageURL(filename: $filename, contentType: $contentType) {
+  mutation createSignedURL(
+    $filename: String!
+    $contentType: String!
+    $channelConnections: [String!]
+  ) {
+    createSignedStorageURL(
+      filename: $filename
+      contentType: $contentType
+      channelConnections: $channelConnections
+    ) {
       url
     }
   }
