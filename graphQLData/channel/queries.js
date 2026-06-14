@@ -8,6 +8,7 @@ export const GET_CHANNEL_NAMES = gql`
       displayName
       channelIconURL
       description
+      eventsEnabled
     }
   }
 `;
@@ -445,6 +446,7 @@ export const GET_USER_FAVORITE_CHANNELS = gql`
         displayName
         uniqueName
         channelIconURL
+        eventsEnabled
       }
     }
   }
