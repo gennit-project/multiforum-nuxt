@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { ADD_FEEDBACK_COMMENT_TO_DISCUSSION } from '@/graphQLData/discussion/mutations';
 import type { DiscussionChannel } from '@/__generated__/graphql';
@@ -40,6 +40,10 @@ const showConfirmUndoFeedbackModal = ref(false);
 const showFeedbackSubmittedSuccessfully = ref(false);
 const feedbackText = ref('');
 
+const feedbackEnabled = computed(() => {
+  return props.activeDiscussionChannel?.Channel?.feedbackEnabled !== false;
+});
+
 onAddFeedbackCommentToDiscussionDone(() => {
   showFeedbackFormModal.value = false;
   showFeedbackSubmittedSuccessfully.value = true;
@@ -47,10 +51,17 @@ onAddFeedbackCommentToDiscussionDone(() => {
 });
 
 const handleClickGiveFeedback = () => {
+  if (!feedbackEnabled.value) {
+    return;
+  }
   showFeedbackFormModal.value = true;
 };
 
 const handleSubmitFeedback = async () => {
+  if (!feedbackEnabled.value) {
+    console.error('Feedback is disabled for this forum.');
+    return;
+  }
   if (!feedbackText.value) {
     console.error('No feedback text found.');
     return;
