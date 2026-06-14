@@ -4,6 +4,7 @@ import {
   buildChannel,
   buildServerConfig,
   buildDiscussion,
+  buildDiscussionChannel,
   buildUser,
 } from '../../helpers/graphqlFixtures';
 import { installMockAuth } from '../../helpers/mockAuth';
@@ -103,7 +104,7 @@ test.describe('Unsubscribe flow', () => {
       email: 'alice@example.com',
     });
 
-    let unsubscribeCalled = false;
+    let _unsubscribeCalled = false;
 
     const diagnostics = await installGraphqlMocks(page, {
       ...getBaseMocks(TEST_USER),
@@ -117,8 +118,17 @@ test.describe('Unsubscribe flow', () => {
               channelUniqueName: TEST_CHANNEL,
               overrides: {
                 Author: buildUser({ username: 'bob', displayName: 'Bob' }),
-                // User is currently subscribed
-                SubscribedToNotifications: [{ username: TEST_USER }],
+                DiscussionChannels: [
+                  buildDiscussionChannel({
+                    id: 'dc-1',
+                    discussionId: DISCUSSION_ID,
+                    channelUniqueName: TEST_CHANNEL,
+                    overrides: {
+                      // User is currently subscribed
+                      SubscribedToNotifications: [{ username: TEST_USER }],
+                    },
+                  }),
+                ],
               },
             }),
           ],
@@ -134,7 +144,7 @@ test.describe('Unsubscribe flow', () => {
       }),
       // Mock unsubscribe mutation
       unsubscribeFromDiscussion: () => {
-        unsubscribeCalled = true;
+        _unsubscribeCalled = true;
         return {
           data: {
             updateUsers: {
@@ -147,7 +157,9 @@ test.describe('Unsubscribe flow', () => {
 
     try {
       // Navigate with unsubscribe action parameter
-      await page.goto(`/forums/${TEST_CHANNEL}/discussions/${DISCUSSION_ID}?action=unsubscribe`);
+      await page.goto(
+        `/forums/${TEST_CHANNEL}/discussions/${DISCUSSION_ID}?action=unsubscribe`
+      );
 
       // Wait for page to load
       await expect(page.getByText('Test Discussion')).toBeVisible({
@@ -155,9 +167,9 @@ test.describe('Unsubscribe flow', () => {
       });
 
       // Should see unsubscribe toast notification
-      await expect(
-        page.getByText(/unsubscribed/i)
-      ).toBeVisible({ timeout: 10000 });
+      await expect(page.getByText(/unsubscribed/i)).toBeVisible({
+        timeout: 10000,
+      });
 
       // URL should have action parameter removed
       await expect(page).not.toHaveURL(/action=unsubscribe/);
