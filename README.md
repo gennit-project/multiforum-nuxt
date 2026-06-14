@@ -2,6 +2,8 @@
 
 [![codecov](https://codecov.io/gh/gennit-project/multiforum-nuxt/branch/main/graph/badge.svg)](https://codecov.io/gh/gennit-project/multiforum-nuxt)
 
+> Multiforum is under active development; test coverage is being expanded as core features stabilize.
+
 Multiforum is a community platform that lets people create and manage topic-based forums with multiple content types:
 
 - Discussions — upvotable posts with threaded comments
