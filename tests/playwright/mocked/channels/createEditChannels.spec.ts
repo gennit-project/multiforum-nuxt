@@ -290,19 +290,26 @@ test('creates and edits a channel', async ({
 
     await page.getByTestId('title-input').fill(TEST_CHANNEL);
 
-    // Click Save and wait for the GraphQL response
-    const [response] = await Promise.all([
-      page.waitForResponse(
-        (resp) => resp.url().includes('/graphql') && (resp.request().postData()?.includes('createChannel') ?? false),
-        { timeout: 30000 }
-      ),
-      page.getByRole('button', { name: 'Save' }).first().click(),
-    ]);
+    // Click Save and wait for the create mutation before checking navigation.
+    const createChannelResponsePromise = page.waitForResponse(
+      (resp) =>
+        resp.url().includes('/graphql') &&
+        (resp.request().postData()?.includes('createChannel') ?? false),
+      { timeout: 30000 }
+    );
+    const navigationPromise = page.waitForURL(
+      `/forums/${TEST_CHANNEL}/discussions`,
+      { timeout: 30000 }
+    );
+    await page.getByRole('button', { name: 'Save' }).first().click();
+    const response = await createChannelResponsePromise;
 
     // Verify the response was successful and log details for CI debugging
     const responseJson = await response.json().catch(() => null);
     console.log('createChannel response status:', response.status());
     console.log('createChannel response data:', JSON.stringify(responseJson?.data?.createChannels?.channels?.[0]));
+    expect(response.status()).toBe(200);
+    expect(responseJson?.data?.createChannels?.channels?.[0]?.uniqueName).toBe(TEST_CHANNEL);
 
     // Wait for the createChannel operation to be recorded
     await waitForGraphqlOperation(diagnostics.completedOperations, 'createChannel');
@@ -314,16 +321,11 @@ test('creates and edits a channel', async ({
       console.log('Console errors:', diagnostics.consoleErrors.slice(0, 5));
     }
 
-    // Wait for any pending network requests to complete
-    await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {
-      console.log('Network did not become idle within timeout');
-    });
-
     // Log current URL for debugging
     console.log('Current URL before assertion:', page.url());
 
-    // Wait for navigation to complete - give more time in CI
-    await expect(page).toHaveURL(`/forums/${TEST_CHANNEL}/discussions`, { timeout: 30000 });
+    await navigationPromise;
+    await expect(page).toHaveURL(`/forums/${TEST_CHANNEL}/discussions`);
     await expect(
       page.getByRole('link', { name: TEST_CHANNEL, exact: true }).first()
     ).toBeVisible();
