@@ -122,6 +122,9 @@ const {
   id: eventId,
   channelUniqueName: channelId.value,
   loggedInModName: loggedInUserModName.value,
+}, {
+  fetchPolicy: 'cache-and-network',
+  nextFetchPolicy: 'cache-first',
 });
 
 onEventResult(({ data }) => {
@@ -133,7 +136,20 @@ onEventResult(({ data }) => {
   }
 });
 
-const event = computed<EventData>(() => eventResult.value?.events?.[0] || null);
+const event = computed<EventData | null>(() => {
+  const loadedEvent = eventResult.value?.events?.[0];
+  if (eventLoading.value && !loadedEvent?.title) {
+    return (
+      (getEventCommentsResult.value?.getEventComments?.Event as EventData) ||
+      null
+    );
+  }
+  return (
+    loadedEvent ||
+    (getEventCommentsResult.value?.getEventComments?.Event as EventData) ||
+    null
+  );
+});
 
 const commentSort = computed(() => getSortFromQuery(route.query));
 

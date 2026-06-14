@@ -285,6 +285,34 @@ export const GET_EVENT_COMMENTS = gql`
           longitude
         }
         cost
+        Tags {
+          text
+        }
+        EventChannels {
+          id
+          eventId
+          channelUniqueName
+          Channel {
+            uniqueName
+            displayName
+            channelIconURL
+          }
+        }
+        SubscribedToNotifications {
+          username
+        }
+        SubscribedToEventUpdates {
+          username
+        }
+        Poster {
+          username
+          createdAt
+          discussionKarma
+          commentKarma
+          ChannelRoles {
+            showModTag
+          }
+        }
       }
       Comments {
         ...CommentFields

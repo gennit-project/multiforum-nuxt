@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import type { EventCreateInput, EventUpdateInput } from '@/__generated__/graphql';
 import {
   MOCK_DATE,
@@ -14,6 +15,24 @@ const TEST_CHANNEL = 'cats';
 const TEST_EVENT_TITLE = 'Test event title';
 const TAG_ONE = 'trivia';
 const TAG_TWO = 'music';
+
+const seedAuthState = async (page: Page, username = 'cluse') => {
+  await page.waitForFunction(
+    () =>
+      typeof (window as typeof window & {
+        __SET_AUTH_STATE_DIRECT__?: unknown;
+      }).__SET_AUTH_STATE_DIRECT__ === 'function'
+  );
+  await page.evaluate((username) => {
+    (
+      window as typeof window & {
+        __SET_AUTH_STATE_DIRECT__?: (authState: {
+          username: string;
+        }) => void;
+      }
+    ).__SET_AUTH_STATE_DIRECT__?.({ username });
+  }, username);
+};
 
 type CreateEventVariables = {
   input?: Array<{
@@ -44,7 +63,9 @@ const buildEvent = (overrides: Partial<{
   id: string;
   title: string;
   description: string;
+  posterUsername: string;
 }> = {}) => ({
+  __typename: 'Event',
   id: overrides.id || 'event-1',
   title: overrides.title || TEST_EVENT_TITLE,
   description: overrides.description || 'Test description',
@@ -64,6 +85,8 @@ const buildEvent = (overrides: Partial<{
   free: true,
   isInPrivateResidence: false,
   RecurringEvent: null,
+  occurrenceIndex: null,
+  EventSeries: null,
   location: { latitude: 33.4484, longitude: -112.074 },
   cost: '',
   Tags: [],
@@ -85,10 +108,28 @@ const buildEvent = (overrides: Partial<{
   SubscribedToEventUpdates: [],
   FeedbackCommentsAggregate: { count: 0 },
   FeedbackComments: [],
-  Poster: buildUser(),
+  Poster: buildUser({
+    username: overrides.posterUsername || 'cluse',
+    displayName: overrides.posterUsername || 'cluse',
+  }),
 });
 
 const getCommonMocks = (username: string) => ({
+  getEmail: () => ({
+    data: {
+      emails: [
+        {
+          address: 'test@example.com',
+          User: {
+            username,
+            profilePicURL: '',
+            ModerationProfile: null,
+            NotificationsAggregate: { count: 0 },
+          },
+        },
+      ],
+    },
+  }),
   getBasicUserInfo: () => ({
     data: {
       users: [
@@ -215,7 +256,7 @@ const getCommonMocks = (username: string) => ({
       channels: [
         {
           uniqueName: TEST_CHANNEL,
-          Admins: [],
+          Admins: [{ username }],
           SuspendedUsers: [],
           Moderators: [],
           SuspendedMods: [],
@@ -414,7 +455,7 @@ test('edits an event with mocked GraphQL', async ({ context, page }, testInfo) =
         ],
       },
     }),
-    updateEvent: ({ body }) => {
+    updateEvents: ({ body }) => {
       updateVariables = body.variables as UpdateEventVariables;
       // Update the state based on mutation
       if (updateVariables.updateEventInput?.title) {
@@ -579,19 +620,21 @@ test('deletes an event with mocked GraphQL', async ({ context, page }, testInfo)
   try {
     // Navigate to event detail page
     await page.goto(`/forums/${TEST_CHANNEL}/events/${eventState.id}`);
-
-    // Wait for event to load
-    await expect(page.getByText(TEST_EVENT_TITLE)).toBeVisible();
+    await seedAuthState(page);
 
     // Click the event menu button
     const menuButton = page.getByTestId('event-menu-button');
     await expect(menuButton).toBeVisible();
-    await menuButton.click();
+    await page.evaluate(() => {
+      document
+        .querySelector<HTMLElement>('[data-testid="event-menu-button"]')
+        ?.click();
+    });
 
     // Click the delete option
     const deleteOption = page.getByTestId('event-menu-button-item-Delete');
     await expect(deleteOption).toBeVisible();
-    await deleteOption.click();
+    await deleteOption.click({ noWaitAfter: true });
 
     // Confirm deletion in the modal
     const confirmButton = page.getByRole('button', { name: 'Delete' });

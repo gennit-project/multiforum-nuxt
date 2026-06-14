@@ -62,6 +62,10 @@ const props = defineProps({
   },
 });
 
+defineEmits<{
+  (e: 'filterByTag', tag: string): void;
+}>();
+
 const route = useRoute();
 const { serverAdminUsernames } = useServerRoleMembership();
 
