@@ -704,7 +704,7 @@ function openFeedbackFormModal() {
           @report-submitted-successfully="handleReportedSuccessfully"
         />
         <BrokenRulesModal
-          :v-if="eventData && eventData.id"
+          v-if="eventData && eventData.id"
           :open="showArchiveModal"
           :event-title="eventData?.title"
           :event-id="eventData?.id"

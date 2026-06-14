@@ -527,6 +527,7 @@ definePageMeta({
                 v-if="showChannelSidebarOnIssueDetail"
                 class="hidden md:flex md:w-1/3 md:flex-col md:overflow-y-auto"
                 tabindex="0"
+                role="region"
                 aria-label="Forum sidebar"
               >
                 <ChannelSidebar
@@ -540,6 +541,7 @@ definePageMeta({
                 v-if="showChannelSidebarOnDetail"
                 class="hidden md:flex md:w-1/3 md:flex-col md:overflow-y-auto"
                 tabindex="0"
+                role="region"
                 aria-label="Forum sidebar"
               >
                 <ChannelSidebar
