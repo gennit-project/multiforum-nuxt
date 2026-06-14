@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { ref } from 'vue';
 import * as issueMutations from '@/graphQLData/issue/mutations';
 import * as modMutations from '@/graphQLData/mod/mutations';
 
