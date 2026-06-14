@@ -95,6 +95,7 @@ export type ChannelFixture = Pick<
   | 'createdAt'
   | 'feedbackEnabled'
   | 'imageUploadsEnabled'
+  | 'markdownImagesEnabled'
   | 'emojiEnabled'
   | 'rules'
   | 'locked'
@@ -145,6 +146,7 @@ export type DiscussionChannelFixture = Pick<
     | 'displayName'
     | 'feedbackEnabled'
     | 'imageUploadsEnabled'
+    | 'markdownImagesEnabled'
     | 'emojiEnabled'
   > & { Bots: unknown[] };
   Discussion: Pick<Discussion, 'id' | 'title'> & { Author: UserFixture };
@@ -298,6 +300,7 @@ export const buildChannel = ({
   createdAt: MOCK_DATE,
   feedbackEnabled: true,
   imageUploadsEnabled: true,
+  markdownImagesEnabled: true,
   emojiEnabled: true,
   rules: '[]',
   locked: false,
@@ -366,6 +369,7 @@ export const buildDiscussionChannel = ({
     displayName: channelUniqueName,
     feedbackEnabled: true,
     imageUploadsEnabled: true,
+    markdownImagesEnabled: true,
     emojiEnabled: true,
     Bots: [],
   },

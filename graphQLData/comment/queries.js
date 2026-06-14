@@ -152,6 +152,7 @@ export const GET_DISCUSSION_COMMENTS = gql`
           uniqueName
           feedbackEnabled
           imageUploadsEnabled
+          markdownImagesEnabled
           emojiEnabled
           Bots {
             username

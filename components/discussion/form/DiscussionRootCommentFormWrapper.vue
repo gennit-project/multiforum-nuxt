@@ -88,6 +88,12 @@ const imageUploadsEnabled = computed(
   () => props.discussionChannel?.Channel?.imageUploadsEnabled !== false
 );
 
+const channelConnections = computed(() =>
+  props.discussionChannel?.channelUniqueName
+    ? [props.discussionChannel.channelUniqueName]
+    : []
+);
+
 const createCommentInput = computed((): CommentCreateInput[] => {
   const input: CommentCreateInput = {
     isRootComment: true,
@@ -380,6 +386,7 @@ const handleUpdateComment = (event: string) => {
         :create-comment-error="createCommentError"
         :bot-suggestions="botSuggestions"
         :allow-image-upload="imageUploadsEnabled"
+        :channel-connections="channelConnections"
         :suspension-issue-number="
           showSuspensionNotice ? suspensionIssueNumber ?? undefined : undefined
         "

@@ -67,6 +67,10 @@ const hasAlbum = computed(() => {
 const imageUploadsEnabled = computed(
   () => props.activeDiscussionChannel?.Channel?.imageUploadsEnabled !== false
 );
+
+const markdownImagesEnabled = computed(
+  () => props.activeDiscussionChannel?.Channel?.markdownImagesEnabled !== false
+);
 </script>
 
 <template>
@@ -84,7 +88,7 @@ const imageUploadsEnabled = computed(
         :download-mode="true"
         :emoji-json="activeDiscussionChannel?.emoji"
         :show-emoji-button="false"
-        :allow-images="imageUploadsEnabled"
+        :allow-images="markdownImagesEnabled"
       >
         <template #album-slot>
           <div class="mt-1 overflow-hidden rounded-lg bg-black text-white">

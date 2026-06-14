@@ -21,6 +21,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  channelConnections: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  },
 });
 const emit = defineEmits(['closeEditor']);
 
@@ -63,6 +67,7 @@ onDone(() => {
         :placeholder="'Add details'"
         :rows="8"
         :allow-image-upload="allowImageUpload"
+        :channel-connections="channelConnections"
         @update="formValues.body = $event"
       />
 

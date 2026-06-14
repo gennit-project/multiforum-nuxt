@@ -32,6 +32,7 @@ const createChannelDefaultValues: CreateEditChannelFormValues = {
   eventsEnabled: true,
   feedbackEnabled: true,
   imageUploadsEnabled: true,
+  markdownImagesEnabled: true,
   emojiEnabled: true,
 };
 
@@ -62,10 +63,11 @@ const createChannelInput = computed(() => {
       channelIconURL: formValues.value.channelIconURL,
       channelBannerURL: formValues.value.channelBannerURL,
       rules: JSON.stringify(formValues.value.rules),
-      eventsEnabled: true,
-      feedbackEnabled: true,
-      imageUploadsEnabled: true,
-      emojiEnabled: true,
+      eventsEnabled: formValues.value.eventsEnabled,
+      feedbackEnabled: formValues.value.feedbackEnabled,
+      imageUploadsEnabled: formValues.value.imageUploadsEnabled,
+      markdownImagesEnabled: formValues.value.markdownImagesEnabled,
+      emojiEnabled: formValues.value.emojiEnabled,
       Tags: {
         connectOrCreate: tagConnections,
       },

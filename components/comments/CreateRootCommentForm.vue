@@ -46,6 +46,11 @@ const props = defineProps({
     required: false,
     default: true,
   },
+  channelConnections: {
+    type: Array as PropType<string[]>,
+    required: false,
+    default: () => [],
+  },
   botSuggestions: {
     type: Array as PropType<BotSuggestion[]>,
     required: false,
@@ -164,6 +169,7 @@ const showCreateCommentError = computed(() => {
           :enable-bot-autocomplete="allowBotMentions"
           :bot-suggestions="botSuggestions"
           :allow-image-upload="allowImageUpload"
+          :channel-connections="channelConnections"
           @update="emit('handleUpdateComment', $event)"
         />
         <div class="mt-3 flex justify-start">

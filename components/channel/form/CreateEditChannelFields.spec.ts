@@ -48,6 +48,7 @@ describe('CreateEditChannelFields', () => {
           eventsEnabled: true,
           feedbackEnabled: true,
           imageUploadsEnabled: true,
+          markdownImagesEnabled: true,
           emojiEnabled: true,
         },
         suspensionIssueNumber: 17,

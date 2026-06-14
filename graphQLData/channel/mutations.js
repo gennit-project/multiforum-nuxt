@@ -33,6 +33,7 @@ export const UPDATE_CHANNEL = gql`
         eventsEnabled
         feedbackEnabled
         imageUploadsEnabled
+        markdownImagesEnabled
         emojiEnabled
         downloadsEnabled
         allowedFileTypes
