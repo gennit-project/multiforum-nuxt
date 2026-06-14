@@ -46,6 +46,7 @@ withDefaults(defineProps<Props>(), {
             :src="channelIcon ?? ''"
             :is-small="true"
             :is-square="false"
+            :is-decorative="true"
           />
           <div class="flex flex-col text-xs">
             <div v-if="channelDisplayName" class="font-bold">

@@ -307,7 +307,7 @@ const contextLinkObject = computed(() => {
           </span>
           <span
             v-if="label"
-            class="rounded-lg border border-orange-500 bg-orange-100 px-2 py-1 text-orange-600 dark:bg-orange-900 dark:text-orange-400"
+            class="rounded-lg border border-orange-500 bg-orange-100 px-2 py-1 text-orange-600 dark:bg-orange-900 dark:text-orange-300"
           >
             {{ label }}
           </span>

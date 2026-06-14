@@ -75,7 +75,6 @@ const buttonClasses = computed(() => {
 });
 
 const mergedButtonProps = computed(() => ({
-  'aria-label': properties.ariaLabel || properties.tooltipText || undefined,
   ...properties.buttonProps,
 }));
 </script>
@@ -111,6 +110,18 @@ const mergedButtonProps = computed(() => ({
           />
         </template>
       </v-tooltip>
+      <template #fallback>
+        <AuthButton
+          :test-id="testId"
+          :button-classes="buttonClasses"
+          :props="mergedButtonProps"
+          :loading="loading"
+          :show-count="showCount"
+          :count="count"
+        >
+          <slot />
+        </AuthButton>
+      </template>
     </client-only>
   </div>
   <template v-else>

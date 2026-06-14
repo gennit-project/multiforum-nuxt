@@ -469,7 +469,7 @@ const handleEditAlbum = () => {
         />
         <div v-if="discussion" class="w-full">
           <div class="w-full px-2">
-            <div class="w-full rounded-lg py-2 dark:border-gray-700">
+            <div class="w-full space-y-3 rounded-lg py-2 dark:border-gray-700">
               <DiscussionHeader
                 :channel-id="channelId"
                 :compact-mode="compactMode"

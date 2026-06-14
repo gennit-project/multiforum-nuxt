@@ -371,7 +371,12 @@ const cellCount = computed(() => {
     </div>
 
     <!-- Main chart grid -->
-    <div class="overflow-x-auto">
+    <div
+      class="overflow-x-auto"
+      tabindex="0"
+      role="region"
+      aria-label="Contribution chart"
+    >
       <!-- Loading state is handled within the component -->
       <div v-if="loading">
         <ContributionChartSkeleton :dark-mode="darkMode" />
