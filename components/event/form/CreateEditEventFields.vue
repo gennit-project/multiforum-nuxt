@@ -10,7 +10,14 @@ import LocationSearchBar from '@/components/event/list/filters/LocationSearchBar
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import DateTimePickersRow from './DateTimePickersRow.vue';
-import type { CreateEditEventFormValues } from '@/types/Event';
+import OccurrencesList from './OccurrencesList.vue';
+import DateRangeGroup from './DateRangeGroup.vue';
+import type {
+  CreateEditEventFormValues,
+  DateMode,
+  DateOccurrence,
+  DateRangeGroup as DateRangeGroupType,
+} from '@/types/Event';
 import { DateTime } from 'luxon';
 import {
   getDuration,
@@ -121,6 +128,93 @@ const showCreateEventError = computed(() => {
 // Function to update event type selection
 const updateEventType = (type: string) => {
   selectedEventType.value = type;
+};
+
+// Date mode options for single, multiple, or recurring events
+const dateModeOptions = [
+  { label: 'Single', value: 'single' as DateMode, description: 'One date' },
+  {
+    label: 'Multiple',
+    value: 'multiple' as DateMode,
+    description: 'Multiple dates',
+  },
+  {
+    label: 'Recurring',
+    value: 'recurring' as DateMode,
+    description: 'Repeat pattern',
+  },
+];
+
+// Current date mode from form values
+const currentDateMode = computed(() => props.formValues.dateMode || 'single');
+
+// Function to update date mode
+const updateDateMode = (mode: DateMode) => {
+  emit('updateFormValues', { dateMode: mode });
+
+  // Initialize occurrences array if switching to multiple dates mode
+  if (mode === 'multiple' && props.formValues.occurrences.length === 0) {
+    const defaultOccurrence: DateOccurrence = {
+      startTime: props.formValues.startTime,
+      endTime: props.formValues.endTime,
+    };
+    emit('updateFormValues', { occurrences: [defaultOccurrence] });
+  }
+
+  // Initialize date range groups if switching to recurring mode
+  if (mode === 'recurring' && props.formValues.dateRangeGroups.length === 0) {
+    const startDateTime = DateTime.fromISO(props.formValues.startTime);
+    const defaultGroup: DateRangeGroupType = {
+      startDate: startDateTime.toFormat('yyyy-MM-dd'),
+      endDate: startDateTime.toFormat('yyyy-MM-dd'),
+      startTimeOfDay: startDateTime.toFormat('HH:mm'),
+      endTimeOfDay: DateTime.fromISO(props.formValues.endTime).toFormat(
+        'HH:mm'
+      ),
+    };
+    emit('updateFormValues', { dateRangeGroups: [defaultGroup] });
+  }
+};
+
+// Handlers for OccurrencesList
+const handleOccurrenceUpdate = (index: number, occurrence: DateOccurrence) => {
+  const newOccurrences = [...props.formValues.occurrences];
+  newOccurrences[index] = occurrence;
+  emit('updateFormValues', { occurrences: newOccurrences });
+};
+
+const handleOccurrenceAdd = (occurrence: DateOccurrence) => {
+  const newOccurrences = [...props.formValues.occurrences, occurrence];
+  emit('updateFormValues', { occurrences: newOccurrences });
+};
+
+const handleOccurrenceRemove = (index: number) => {
+  const newOccurrences = props.formValues.occurrences.filter(
+    (_, i) => i !== index
+  );
+  emit('updateFormValues', { occurrences: newOccurrences });
+};
+
+// Handlers for DateRangeGroup
+const handleDateRangeGroupUpdate = (
+  index: number,
+  group: DateRangeGroupType
+) => {
+  const newGroups = [...props.formValues.dateRangeGroups];
+  newGroups[index] = group;
+  emit('updateFormValues', { dateRangeGroups: newGroups });
+};
+
+const handleDateRangeGroupAdd = (group: DateRangeGroupType) => {
+  const newGroups = [...props.formValues.dateRangeGroups, group];
+  emit('updateFormValues', { dateRangeGroups: newGroups });
+};
+
+const handleDateRangeGroupRemove = (index: number) => {
+  const newGroups = props.formValues.dateRangeGroups.filter(
+    (_, i) => i !== index
+  );
+  emit('updateFormValues', { dateRangeGroups: newGroups });
 };
 
 // Track if the event spans multiple days
@@ -510,42 +604,124 @@ const touched = ref(false);
         <FormRow>
           <template #content>
             <div class="flex flex-col dark:text-white">
-              <DateTimePickersRow
-                :is-all-day="formValues.isAllDay"
-                :is-multi-day="isMultiDayEvent"
-                :start-time="startTime"
-                :end-time="endTime"
-                @update-start-date="handleStartTimeDateChange"
-                @update-start-time="handleStartTimeTimeChange"
-                @update-end-date="handleEndTimeDateChange"
-                @update-end-time="handleEndTimeTimeChange"
-              />
+              <!-- Date Mode Selector -->
+              <fieldset class="mb-4">
+                <legend class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Event Schedule
+                </legend>
+                <div
+                  class="flex flex-wrap gap-2"
+                  role="radiogroup"
+                  aria-label="Date mode"
+                >
+                  <label
+                    v-for="option in dateModeOptions"
+                    :key="option.value"
+                    :class="[
+                      'cursor-pointer rounded-md border px-3 py-2 text-sm transition-colors',
+                      currentDateMode === option.value
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'
+                        : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:border-gray-600',
+                    ]"
+                    :data-testid="`date-mode-${option.value}`"
+                  >
+                    <input
+                      type="radio"
+                      name="date-mode"
+                      :value="option.value"
+                      :checked="currentDateMode === option.value"
+                      class="sr-only"
+                      @change="updateDateMode(option.value)"
+                    >
+                    <span class="font-medium">{{ option.label }}</span>
+                    <span class="ml-1 text-xs text-gray-500 dark:text-gray-400">
+                      ({{ option.description }})
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
 
-              <!-- Duration Display -->
-              <div class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                Duration: {{ duration }}
-              </div>
-
-              <!-- Checkboxes for event options -->
-              <div class="mt-3 flex flex-wrap gap-x-6 gap-y-2">
-                <!-- All-day checkbox -->
-                <CheckBox
-                  test-id="all-day-input"
-                  :checked="formValues.isAllDay"
-                  label="All day"
-                  @update="toggleIsAllDayField"
+              <!-- Single date mode: Original date/time pickers -->
+              <div v-if="currentDateMode === 'single'">
+                <DateTimePickersRow
+                  :is-all-day="formValues.isAllDay"
+                  :is-multi-day="isMultiDayEvent"
+                  :start-time="startTime"
+                  :end-time="endTime"
+                  @update-start-date="handleStartTimeDateChange"
+                  @update-start-time="handleStartTimeTimeChange"
+                  @update-end-date="handleEndTimeDateChange"
+                  @update-end-time="handleEndTimeTimeChange"
                 />
 
-                <!-- Multi-day checkbox -->
-                <CheckBox
-                  test-id="multi-day-input"
-                  :checked="isMultiDayEvent"
-                  label="Multi-day event"
-                  @update="toggleMultiDayEvent"
-                />
+                <!-- Duration Display -->
+                <div class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                  Duration: {{ duration }}
+                </div>
+
+                <!-- Checkboxes for event options -->
+                <div class="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+                  <!-- All-day checkbox -->
+                  <CheckBox
+                    test-id="all-day-input"
+                    :checked="formValues.isAllDay"
+                    label="All day"
+                    @update="toggleIsAllDayField"
+                  />
+
+                  <!-- Multi-day checkbox -->
+                  <CheckBox
+                    test-id="multi-day-input"
+                    :checked="isMultiDayEvent"
+                    label="Multi-day event"
+                    @update="toggleMultiDayEvent"
+                  />
+                </div>
+
+                <ErrorMessage :text="datePickerErrorMessage" class="mt-1" />
               </div>
 
-              <ErrorMessage :text="datePickerErrorMessage" class="mt-1" />
+              <!-- Multiple dates mode: OccurrencesList -->
+              <div v-else-if="currentDateMode === 'multiple'">
+                <OccurrencesList
+                  :occurrences="formValues.occurrences"
+                  :is-all-day="formValues.isAllDay"
+                  @update="handleOccurrenceUpdate"
+                  @add="handleOccurrenceAdd"
+                  @remove="handleOccurrenceRemove"
+                />
+
+                <!-- All-day checkbox for multiple dates -->
+                <div class="mt-3">
+                  <CheckBox
+                    test-id="all-day-input-multiple"
+                    :checked="formValues.isAllDay"
+                    label="All day events"
+                    @update="toggleIsAllDayField"
+                  />
+                </div>
+              </div>
+
+              <!-- Recurring mode: DateRangeGroup -->
+              <div v-else-if="currentDateMode === 'recurring'">
+                <DateRangeGroup
+                  :groups="formValues.dateRangeGroups"
+                  :is-all-day="formValues.isAllDay"
+                  @update="handleDateRangeGroupUpdate"
+                  @add="handleDateRangeGroupAdd"
+                  @remove="handleDateRangeGroupRemove"
+                />
+
+                <!-- All-day checkbox for recurring -->
+                <div class="mt-3">
+                  <CheckBox
+                    test-id="all-day-input-recurring"
+                    :checked="formValues.isAllDay"
+                    label="All day events"
+                    @update="toggleIsAllDayField"
+                  />
+                </div>
+              </div>
             </div>
           </template>
         </FormRow>

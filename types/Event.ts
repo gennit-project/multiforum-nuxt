@@ -1,5 +1,31 @@
 import type { EventSort } from '@/__generated__/graphql';
 
+export type DateMode = 'single' | 'multiple' | 'recurring';
+
+export interface DateOccurrence {
+  startTime: string;
+  endTime: string;
+}
+
+export interface DateRangeGroup {
+  startDate: string; // "2024-12-12"
+  endDate: string; // "2024-12-14"
+  startTimeOfDay: string; // "09:00"
+  endTimeOfDay: string; // "17:00"
+}
+
+export type RepeatPatternType = 'MANUAL' | 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
+export type RepeatEndType = 'NEVER' | 'AFTER_COUNT' | 'ON_DATE';
+
+export interface RepeatPattern {
+  type: RepeatPatternType;
+  count?: number; // Every N days/weeks/months
+  daysOfWeek?: number[]; // [0, 6] for weekends (0 = Sunday)
+  endType: RepeatEndType;
+  endCount?: number; // Number of occurrences
+  endDate?: string; // End date ISO string
+}
+
 export interface CreateEditEventFormValues {
   title: string;
   description: string;
@@ -23,6 +49,11 @@ export interface CreateEditEventFormValues {
   isAllDay: boolean;
   coverImageURL?: string;
   eventType?: string;
+  // Multi-date / recurring event fields
+  dateMode: DateMode;
+  occurrences: DateOccurrence[];
+  dateRangeGroups: DateRangeGroup[];
+  repeatPattern?: RepeatPattern;
 }
 
 export type WeekdayData = {
