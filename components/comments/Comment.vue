@@ -17,10 +17,12 @@ import CommentHeader from './CommentHeader.vue';
 import { usernameVar } from '@/cache';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 import type { BotSuggestion } from '@/utils/botMentions';
+import type { ModSuggestion } from '@/utils/modMentions';
 import ArchivedCommentText from './ArchivedCommentText.vue';
 import { useCommentPermissions } from '@/composables/useCommentPermissions';
 import { useBestAnswerMutations } from '@/composables/useBestAnswerMutations';
 import { useCommentPermalink } from '@/composables/useCommentPermalink';
+import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 import { getCommentMenuItems } from '@/utils/headerPermissionUtils';
 import { getForumRoleBadge } from '@/utils/forumRoleBadges';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
@@ -166,6 +168,10 @@ const props = defineProps({
   },
   botSuggestions: {
     type: Array as PropType<BotSuggestion[]>,
+    default: () => [],
+  },
+  modSuggestions: {
+    type: Array as PropType<ModSuggestion[]>,
     default: () => [],
   },
   botUsernames: {
@@ -389,6 +395,23 @@ const { mutate: unsubscribeFromComment } = useMutation(
   }
 );
 
+const isSubscribed = computed(() => {
+  return (
+    props.commentData?.SubscribedToNotifications?.some(
+      (user) => user.username === usernameVar.value
+    ) ?? false
+  );
+});
+
+useAutoUnsubscribe({
+  entityId: commentIdRef,
+  unsubscribeFn: async (id: string) => {
+    await unsubscribeFromComment({ commentId: id });
+  },
+  entityType: 'comment',
+  isSubscribed,
+});
+
 const showReplies = ref(true);
 const highlight = ref(false);
 const editorId = 'texteditor';
@@ -484,7 +507,7 @@ const label = computed(() => {
     <div
       :class="[
         depth > 1
-          ? 'ml-1 border-l border-gray-300 pl-4 pt-2 dark:border-gray-600'
+          ? 'ml-1 border-l border-gray-300 pl-2 pt-2 sm:pl-4 dark:border-gray-600'
           : '',
       ]"
       class="flex w-full"
@@ -515,7 +538,7 @@ const label = computed(() => {
               :forum-role-badge="forumRoleBadge"
             />
             <div
-              class="ml-4 flex-grow border-l border-gray-300 pl-4 dark:border-gray-600"
+              class="ml-2 flex-grow border-l border-gray-300 pl-2 sm:ml-4 sm:pl-4 dark:border-gray-600"
             >
               <div class="w-full dark:text-gray-200">
                 <div class="w-full overflow-auto">
@@ -530,7 +553,7 @@ const label = computed(() => {
                       props.commentData.text &&
                       props.editFormOpenAtCommentID !== props.commentData.id
                     "
-                    class="ml-3"
+                    class="ml-1 sm:ml-3"
                     :class="[
                       props.goToPermalinkOnClick ? 'cursor-pointer' : '',
                     ]"
@@ -627,6 +650,7 @@ const label = computed(() => {
                     :length-of-comment-in-progress="lengthOfCommentInProgress"
                     :reply-has-bot-mention="props.replyHasBotMention"
                     :bot-suggestions="props.botSuggestions"
+                    :mod-suggestions="props.modSuggestions"
                     :is-permalinked="isHighlighted"
                     :is-marked-as-answer="isMarkedAsAnswer"
                     @start-comment-save="emit('startCommentSave', $event)"
@@ -759,7 +783,7 @@ const label = computed(() => {
         <div
           v-else-if="replyCount > 0 && showReplies"
           id="childComments"
-          class="ml-3 w-full border-gray-300 dark:border-gray-600"
+          class="ml-1 w-full border-gray-300 sm:ml-3 dark:border-gray-600"
         >
           <ChildComments
             v-slot="slotProps"

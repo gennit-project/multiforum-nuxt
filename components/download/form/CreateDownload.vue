@@ -5,8 +5,9 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 import {
   CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
-  UPDATE_DISCUSSION_CHANNEL_LABELS,
+  UPDATE_DOWNLOAD_LABELS,
   UPDATE_DISCUSSION,
+  UPDATE_DOWNLOADABLE_FILE_SUPPORT_SETTINGS,
 } from '@/graphQLData/discussion/mutations';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
@@ -59,13 +60,17 @@ const {
   mutate: updateDiscussionChannelLabels,
   loading: _updateLabelsLoading,
   error: _updateLabelsError,
-} = useMutation(UPDATE_DISCUSSION_CHANNEL_LABELS);
+} = useMutation(UPDATE_DOWNLOAD_LABELS);
 
 const {
   mutate: updateDiscussion,
   loading: _updateDiscussionLoading,
   error: _updateDiscussionError,
 } = useMutation(UPDATE_DISCUSSION);
+
+const { mutate: updateDownloadableFileSupportSettings } = useMutation(
+  UPDATE_DOWNLOADABLE_FILE_SUPPORT_SETTINGS
+);
 
 onDone(async (response) => {
   // Try both possible response structures
@@ -89,6 +94,9 @@ onDone(async (response) => {
     ) {
       await saveDownloadLabels(newDiscussionId);
     }
+
+    await saveDownloadSupportSettings(newDiscussionId);
+
     router.push({
       name: 'forums-forumId-downloads-discussionId',
       params: {
@@ -135,6 +143,26 @@ const saveDownloadAlbum = async (discussionId: string) => {
   }
 };
 
+const saveDownloadSupportSettings = async (discussionId: string) => {
+  await Promise.all(
+    (formValues.value.downloadableFiles || [])
+      .filter((file) => Boolean(file.id))
+      .map((file) =>
+        updateDownloadableFileSupportSettings({
+          downloadableFileId: file.id,
+          discussionId,
+          input: {
+            attributionOverride: file.attributionOverride || null,
+            supportPatreonUrl: file.supportPatreonUrl || null,
+            supportBuyMeACoffeeUrl: file.supportBuyMeACoffeeUrl || null,
+            supportKoFiUrl: file.supportKoFiUrl || null,
+            supportPayPalMeUrl: file.supportPayPalMeUrl || null,
+          },
+        })
+      )
+  );
+};
+
 // Helper function to save download labels after discussion creation
 const saveDownloadLabels = async (discussionId: string) => {
   try {
@@ -167,8 +195,8 @@ const saveDownloadLabels = async (discussionId: string) => {
 
     if (labelOptionIds.length > 0) {
       await updateDiscussionChannelLabels({
-        channelUniqueName: channelId.value,
         discussionId: discussionId,
+        channelUniqueName: channelId.value,
         labelOptionIds: labelOptionIds,
       });
     }

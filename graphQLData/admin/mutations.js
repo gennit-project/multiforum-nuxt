@@ -236,6 +236,44 @@ export const REMOVE_SERVER_MODERATOR = gql`
   }
 `;
 
+// Server admin invite workflow
+export const INVITE_SERVER_ADMIN = gql`
+  mutation InviteServerAdmin($serverName: String!, $inviteeUsername: String!) {
+    inviteServerAdmin(serverName: $serverName, inviteeUsername: $inviteeUsername)
+  }
+`;
+
+export const CANCEL_INVITE_SERVER_ADMIN = gql`
+  mutation CancelInviteServerAdmin($serverName: String!, $inviteeUsername: String!) {
+    cancelInviteServerAdmin(serverName: $serverName, inviteeUsername: $inviteeUsername)
+  }
+`;
+
+export const ACCEPT_SERVER_ADMIN_INVITE = gql`
+  mutation AcceptServerAdminInvite($serverName: String!) {
+    acceptServerAdminInvite(serverName: $serverName)
+  }
+`;
+
+// Server mod invite workflow
+export const INVITE_SERVER_MOD = gql`
+  mutation InviteServerMod($serverName: String!, $inviteeUsername: String!) {
+    inviteServerMod(serverName: $serverName, inviteeUsername: $inviteeUsername)
+  }
+`;
+
+export const CANCEL_INVITE_SERVER_MOD = gql`
+  mutation CancelInviteServerMod($serverName: String!, $inviteeUsername: String!) {
+    cancelInviteServerMod(serverName: $serverName, inviteeUsername: $inviteeUsername)
+  }
+`;
+
+export const ACCEPT_SERVER_MOD_INVITE = gql`
+  mutation AcceptServerModInvite($serverName: String!) {
+    acceptServerModInvite(serverName: $serverName)
+  }
+`;
+
 export const UPDATE_MOD_SERVER_ROLE = gql`
   mutation UpdateModServerRole(
     $name: String!

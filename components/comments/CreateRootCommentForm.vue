@@ -12,6 +12,7 @@ import { usernameVar } from '@/cache';
 import LoggedInUserAvatar from './LoggedInUserAvatar.vue';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 import { hasBotMention, type BotSuggestion } from '@/utils/botMentions';
+import type { ModSuggestion } from '@/utils/modMentions';
 
 // Lazy-load TextEditor to defer loading until user clicks "Write a comment"
 const TextEditor = defineAsyncComponent(
@@ -53,6 +54,11 @@ const props = defineProps({
   },
   botSuggestions: {
     type: Array as PropType<BotSuggestion[]>,
+    required: false,
+    default: () => [],
+  },
+  modSuggestions: {
+    type: Array as PropType<ModSuggestion[]>,
     required: false,
     default: () => [],
   },
@@ -170,6 +176,8 @@ const showCreateCommentError = computed(() => {
           :bot-suggestions="botSuggestions"
           :allow-image-upload="allowImageUpload"
           :channel-connections="channelConnections"
+          :enable-mod-autocomplete="true"
+          :mod-suggestions="modSuggestions"
           @update="emit('handleUpdateComment', $event)"
         />
         <div class="mt-3 flex justify-start">

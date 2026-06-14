@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import type { Component } from 'vue';
 import TabButton from '@/components/channel/TabButton.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
+import LockClosedIcon from '@/components/icons/LockClosedIcon.vue';
 import CogIcon from '@/components/icons/CogIcon.vue';
 import IdentificationIcon from '../icons/IdentificationIcon.vue';
 import PlugIcon from '@/components/icons/PlugIcon.vue';
@@ -43,6 +44,7 @@ const route = useRoute();
 const tabRoutes = computed(() => {
   const routes: TabRoutes = {
     issues: `/admin/issues`,
+    channelReports: `/admin/channel-reports`,
     settings: `/admin/settings`,
     roles: `/admin/roles`,
     suspendedUsers: `/admin/suspended-users`,
@@ -65,6 +67,13 @@ const tabs = computed((): Tab[] => {
       label: 'Issues',
       icon: FlagIcon,
       countProperty: 'IssuesAggregate',
+    },
+    {
+      name: 'channelReports',
+      routeSuffix: 'channel-reports',
+      label: 'Channel Reports',
+      icon: LockClosedIcon,
+      countProperty: null,
     },
     {
       name: 'settings',

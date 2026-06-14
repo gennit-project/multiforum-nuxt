@@ -23,6 +23,12 @@ type UserProfileCounts = User & {
   AlbumsAggregate?: {
     count?: number | null;
   } | null;
+  AuthoredWikiPageVersionsAggregate?: {
+    count?: number | null;
+  } | null;
+  ScratchpadEntriesAggregate?: {
+    count?: number | null;
+  } | null;
 };
 
 const props = defineProps({
@@ -106,6 +112,13 @@ const tabs = computed(() => {
       count: props.user?.EventsAggregate?.count,
     },
     {
+      name: 'Wiki Edits',
+      path: `/u/${usernameInParams.value}/wiki-edits`,
+      to: getTabTo(`/u/${usernameInParams.value}/wiki-edits`),
+      current: false,
+      count: props.user?.AuthoredWikiPageVersionsAggregate?.count,
+    },
+    {
       name: 'Images',
       path: `/u/${usernameInParams.value}/images`,
       to: getTabTo(`/u/${usernameInParams.value}/images`),
@@ -118,6 +131,13 @@ const tabs = computed(() => {
       to: getTabTo(`/u/${usernameInParams.value}/albums`),
       current: false,
       count: props.user?.AlbumsAggregate?.count,
+    },
+    {
+      name: 'Scratchpad',
+      path: `/u/${usernameInParams.value}/scratchpad`,
+      to: getTabTo(`/u/${usernameInParams.value}/scratchpad`),
+      current: false,
+      count: props.user?.ScratchpadEntriesAggregate?.count,
     },
     {
       name: 'Owned Forums',

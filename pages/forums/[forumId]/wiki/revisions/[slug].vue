@@ -6,16 +6,14 @@ import { useQuery } from '@vue/apollo-composable';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { timeAgo } from '@/utils';
 import type { WikiPage, TextVersion } from '@/__generated__/graphql';
+import {
+  buildSequentialRevisionPairs,
+  getRevisionAuthorName,
+  type RevisionPair,
+} from '@/utils/revisionHistory';
 
-// Define type for revision data
-interface WikiRevisionData {
-  id: string;
-  author: string;
-  createdAt: string;
-  isCurrent: boolean;
-  oldVersionData?: TextVersion;
-  newVersionData?: TextVersion;
-}
+type WikiRevisionData = RevisionPair<TextVersion>;
+type WikiPageWithEditReason = WikiPage & { editReason?: string | null };
 
 const route = useRoute();
 const router = useRouter();
@@ -51,64 +49,36 @@ const hasEdits = computed(() => {
 
 // Process all versions and sort by timestamp (newest first)
 const allEdits = computed(() => {
-  const edits: WikiRevisionData[] = [];
-
-  if (wikiPage.value?.PastVersions?.length) {
-    // Create current version entry (as TextVersion structure)
-    const currentVersion: TextVersion = {
-      id: 'current',
-      body: wikiPage.value.body,
-      createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
-      Author: wikiPage.value.VersionAuthor,
-      AuthorConnection: {
-        edges: [],
-        pageInfo: { hasNextPage: false, hasPreviousPage: false },
-        totalCount: 0,
-      },
-    };
-
-    // Add an entry for the most recent edit only if content actually changed
-    if (wikiPage.value.PastVersions.length > 0) {
-      const mostRecentPastVersion = wikiPage.value.PastVersions[0];
-      if (!mostRecentPastVersion) return edits;
-      const currentContent = wikiPage.value.body ?? undefined;
-      const pastContent = mostRecentPastVersion.body ?? undefined;
-
-      // Only add the most recent edit if content actually changed
-      if (currentContent !== pastContent) {
-        edits.push({
-          id: 'most-recent-edit',
-          author: wikiPage.value.VersionAuthor?.username || '[Deleted]',
-          createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
-          isCurrent: true,
-          // Show what changed in the most recent edit
-          oldVersionData: mostRecentPastVersion,
-          newVersionData: currentVersion,
-        });
-      }
-    }
-
-    // Process each past version - show what changed in that specific edit
-    wikiPage.value.PastVersions.forEach((version, index) => {
-      // Skip the most recent past version since we handled it above
-      if (index === 0) return;
-
-      const previousVersion = wikiPage.value.PastVersions[index + 1];
-
-      edits.push({
-        id: version.id,
-        author: version.Author?.username || '[Deleted]',
-        createdAt: version.createdAt,
-        isCurrent: false,
-        // Show what changed in this specific edit
-        oldVersionData: previousVersion, // Version before this edit
-        newVersionData: version, // This version (result of the edit)
-      });
-    });
+  if (!wikiPage.value) {
+    return [];
   }
 
-  return edits;
+  const currentVersion: TextVersion = {
+    id: 'current',
+    body: wikiPage.value.body,
+    editReason: (wikiPage.value as WikiPageWithEditReason).editReason,
+    createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
+    Author: wikiPage.value.VersionAuthor,
+    AuthorConnection: {
+      edges: [],
+      pageInfo: { hasNextPage: false, hasPreviousPage: false },
+      totalCount: 0,
+    },
+  };
+
+  return buildSequentialRevisionPairs({
+    pastVersions: wikiPage.value.PastVersions,
+    currentVersion,
+    currentAuthor: wikiPage.value.VersionAuthor,
+    skipUnchangedCurrent: true,
+    getHistoricalPairAuthor: ({ oldVersion }) =>
+      getRevisionAuthorName(oldVersion.Author),
+  });
 });
+
+const getRevisionReason = (edit: WikiRevisionData) => {
+  return edit.newVersionData.editReason || edit.oldVersionData.editReason || '';
+};
 
 // Navigate to revision detail page
 const viewRevisionDiff = (revision: WikiRevisionData) => {
@@ -241,6 +211,15 @@ useHead({
                     minute: 'numeric',
                   })
                 }}
+              </div>
+              <div
+                v-if="getRevisionReason(edit)"
+                class="mt-1 text-xs text-gray-600 dark:text-gray-400"
+              >
+                <span class="font-semibold text-gray-700 dark:text-gray-200"
+                  >Edit reason:</span
+                >
+                {{ getRevisionReason(edit) }}
               </div>
             </div>
             <div

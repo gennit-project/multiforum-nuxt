@@ -376,6 +376,29 @@ export const REPORT_COMMENT = gql`
   }
 `;
 
+export const REPORT_WIKI_EDIT = gql`
+  mutation reportWikiEdit(
+    $wikiPageId: ID!
+    $wikiRevisionId: ID
+    $reportText: String!
+    $selectedForumRules: [String!]!
+    $selectedServerRules: [String!]!
+    $channelUniqueName: String!
+  ) {
+    reportWikiEdit(
+      wikiPageId: $wikiPageId
+      wikiRevisionId: $wikiRevisionId
+      reportText: $reportText
+      selectedForumRules: $selectedForumRules
+      selectedServerRules: $selectedServerRules
+      channelUniqueName: $channelUniqueName
+    ) {
+      id
+      issueNumber
+    }
+  }
+`;
+
 export const ARCHIVE_COMMENT = gql`
   mutation archiveComment(
     $commentId: ID!
@@ -418,6 +441,82 @@ export const UNLOCK_ISSUE = gql`
   mutation unlockIssue($issueId: ID!, $reason: String) {
     unlockIssue(issueId: $issueId, reason: $reason) {
       ...IssueFields
+    }
+  }
+`;
+
+export const REPORT_IMAGE = gql`
+  mutation reportImage(
+    $imageId: ID!
+    $reportText: String!
+    $selectedForumRules: [String!]!
+    $selectedServerRules: [String!]!
+    $channelUniqueName: String
+  ) {
+    reportImage(
+      imageId: $imageId
+      reportText: $reportText
+      selectedForumRules: $selectedForumRules
+      selectedServerRules: $selectedServerRules
+      channelUniqueName: $channelUniqueName
+    ) {
+      id
+      issueNumber
+    }
+  }
+`;
+
+export const REPORT_PROFILE_PICTURE = gql`
+  mutation reportProfilePicture(
+    $username: String!
+    $reportText: String!
+    $selectedServerRules: [String!]!
+  ) {
+    reportProfilePicture(
+      username: $username
+      reportText: $reportText
+      selectedServerRules: $selectedServerRules
+    ) {
+      id
+      issueNumber
+    }
+  }
+`;
+
+export const ARCHIVE_IMAGE = gql`
+  mutation archiveImage(
+    $imageId: ID!
+    $selectedForumRules: [String!]!
+    $selectedServerRules: [String!]!
+    $reportText: String!
+    $channelUniqueName: String
+  ) {
+    archiveImage(
+      imageId: $imageId
+      reportText: $reportText
+      selectedForumRules: $selectedForumRules
+      selectedServerRules: $selectedServerRules
+      channelUniqueName: $channelUniqueName
+    ) {
+      id
+      issueNumber
+    }
+  }
+`;
+
+export const UNARCHIVE_IMAGE = gql`
+  mutation unarchiveImage(
+    $imageId: ID!
+    $explanation: String
+    $channelUniqueName: String
+  ) {
+    unarchiveImage(
+      imageId: $imageId
+      explanation: $explanation
+      channelUniqueName: $channelUniqueName
+    ) {
+      id
+      issueNumber
     }
   }
 `;

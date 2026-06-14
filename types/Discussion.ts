@@ -21,10 +21,15 @@ export interface CreateEditDiscussionFormValues {
     kind: string;
     size: number;
     license: string;
-    priceModel: string;
-    priceCents: number;
-    priceCurrency: string;
-  }[];
+      priceModel: string;
+      priceCents: number;
+      priceCurrency: string;
+      attributionOverride?: string | null;
+      supportPatreonUrl?: string | null;
+      supportBuyMeACoffeeUrl?: string | null;
+      supportKoFiUrl?: string | null;
+      supportPayPalMeUrl?: string | null;
+    }[];
   downloadLabels?: Record<string, string[]>; // filterGroupKey -> selected option values
   crosspostId?: string | null;
 }

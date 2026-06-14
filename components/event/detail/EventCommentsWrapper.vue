@@ -22,6 +22,7 @@ import {
 } from '@/graphQLData/event/mutations';
 import Notification from '@/components/NotificationComponent.vue';
 import EventNotificationsMenu from './EventNotificationsMenu.vue';
+import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 
 const COMMENT_LIMIT = 50;
 
@@ -478,6 +479,17 @@ const handleEventUpdateSubscriptionToggle = () => {
     });
   }
 };
+
+// Handle ?action=unsubscribe query param for one-click unsubscribe from notifications
+const eventIdRef = computed(() => props.event?.id || null);
+useAutoUnsubscribe({
+  entityId: eventIdRef,
+  unsubscribeFn: async (id: string) => {
+    await unsubscribeFromEvent({ eventId: id });
+  },
+  entityType: 'event',
+  isSubscribed,
+});
 </script>
 
 <template>

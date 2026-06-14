@@ -3,10 +3,12 @@ import { computed, ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { config } from '@/config';
 import {
-  ADD_SERVER_ADMIN,
   REMOVE_SERVER_ADMIN,
-  ADD_SERVER_MODERATOR,
   REMOVE_SERVER_MODERATOR,
+  INVITE_SERVER_ADMIN,
+  CANCEL_INVITE_SERVER_ADMIN,
+  INVITE_SERVER_MOD,
+  CANCEL_INVITE_SERVER_MOD,
 } from '@/graphQLData/admin/mutations';
 
 type ServerUser = {
@@ -23,32 +25,53 @@ type ServerModerator = {
   User?: ServerUser | null;
 };
 
+type PendingInvite = {
+  username?: string | null;
+  displayName?: string | null;
+  profilePicURL?: string | null;
+};
+
 const props = defineProps<{
   serverConfig: {
     Admins?: ServerUser[] | null;
     Moderators?: ServerModerator[] | null;
+    PendingAdminInvites?: PendingInvite[] | null;
+    PendingModInvites?: PendingInvite[] | null;
   } | null;
   onUpdated?: () => void;
 }>();
 
 const newAdminUsername = ref('');
-const newModeratorDisplayName = ref('');
+const newModeratorUsername = ref('');
 
+// Invite mutations
 const {
-  mutate: addServerAdmin,
-  loading: addServerAdminLoading,
-  error: addServerAdminError,
-} = useMutation(ADD_SERVER_ADMIN);
+  mutate: inviteServerAdmin,
+  loading: inviteServerAdminLoading,
+  error: inviteServerAdminError,
+} = useMutation(INVITE_SERVER_ADMIN);
+const {
+  mutate: cancelInviteServerAdmin,
+  loading: cancelInviteServerAdminLoading,
+  error: cancelInviteServerAdminError,
+} = useMutation(CANCEL_INVITE_SERVER_ADMIN);
+const {
+  mutate: inviteServerMod,
+  loading: inviteServerModLoading,
+  error: inviteServerModError,
+} = useMutation(INVITE_SERVER_MOD);
+const {
+  mutate: cancelInviteServerMod,
+  loading: cancelInviteServerModLoading,
+  error: cancelInviteServerModError,
+} = useMutation(CANCEL_INVITE_SERVER_MOD);
+
+// Remove mutations (for existing members)
 const {
   mutate: removeServerAdmin,
   loading: removeServerAdminLoading,
   error: removeServerAdminError,
 } = useMutation(REMOVE_SERVER_ADMIN);
-const {
-  mutate: addServerModerator,
-  loading: addServerModeratorLoading,
-  error: addServerModeratorError,
-} = useMutation(ADD_SERVER_MODERATOR);
 const {
   mutate: removeServerModerator,
   loading: removeServerModeratorLoading,
@@ -57,22 +80,49 @@ const {
 
 const admins = computed(() => props.serverConfig?.Admins || []);
 const moderators = computed(() => props.serverConfig?.Moderators || []);
+const pendingAdminInvites = computed(() => props.serverConfig?.PendingAdminInvites || []);
+const pendingModInvites = computed(() => props.serverConfig?.PendingModInvites || []);
+
 const loading = computed(
   () =>
-    addServerAdminLoading.value ||
+    inviteServerAdminLoading.value ||
+    cancelInviteServerAdminLoading.value ||
+    inviteServerModLoading.value ||
+    cancelInviteServerModLoading.value ||
     removeServerAdminLoading.value ||
-    addServerModeratorLoading.value ||
     removeServerModeratorLoading.value
 );
 
-const addAdmin = async () => {
+const adminError = computed(
+  () =>
+    inviteServerAdminError.value ||
+    cancelInviteServerAdminError.value ||
+    removeServerAdminError.value
+);
+
+const modError = computed(
+  () =>
+    inviteServerModError.value ||
+    cancelInviteServerModError.value ||
+    removeServerModeratorError.value
+);
+
+const sendAdminInvite = async () => {
   const username = newAdminUsername.value.trim();
   if (!username) return;
-  await addServerAdmin({
+  await inviteServerAdmin({
     serverName: config.serverName,
-    username,
+    inviteeUsername: username,
   });
   newAdminUsername.value = '';
+  props.onUpdated?.();
+};
+
+const cancelAdminInvite = async (username: string) => {
+  await cancelInviteServerAdmin({
+    serverName: config.serverName,
+    inviteeUsername: username,
+  });
   props.onUpdated?.();
 };
 
@@ -84,14 +134,22 @@ const removeAdmin = async (username: string) => {
   props.onUpdated?.();
 };
 
-const addModerator = async () => {
-  const displayName = newModeratorDisplayName.value.trim();
-  if (!displayName) return;
-  await addServerModerator({
+const sendModInvite = async () => {
+  const username = newModeratorUsername.value.trim();
+  if (!username) return;
+  await inviteServerMod({
     serverName: config.serverName,
-    displayName,
+    inviteeUsername: username,
   });
-  newModeratorDisplayName.value = '';
+  newModeratorUsername.value = '';
+  props.onUpdated?.();
+};
+
+const cancelModInvite = async (username: string) => {
+  await cancelInviteServerMod({
+    serverName: config.serverName,
+    inviteeUsername: username,
+  });
   props.onUpdated?.();
 };
 
@@ -111,108 +169,189 @@ const removeModerator = async (displayName: string) => {
         Server Membership
       </h2>
       <p class="text-sm text-gray-600 dark:text-gray-300">
-        Manage server-scoped admins and moderators directly on the server configuration.
+        Invite users to become server admins or moderators. They will receive an invitation that they must accept.
       </p>
     </div>
 
     <div class="grid gap-6 lg:grid-cols-2">
+      <!-- Server Admins Column -->
       <div class="space-y-3">
         <h3 class="font-medium text-gray-900 dark:text-gray-100">Server Admins</h3>
         <div class="flex gap-2">
           <input
             v-model="newAdminUsername"
             type="text"
-            placeholder="Username"
+            placeholder="Username to invite"
             class="w-full rounded border px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+            @keyup.enter="sendAdminInvite"
           >
           <button
             type="button"
             class="rounded bg-orange-500 px-3 py-2 text-white disabled:opacity-60"
-            :disabled="loading"
-            @click="addAdmin"
+            :disabled="loading || !newAdminUsername.trim()"
+            @click="sendAdminInvite"
           >
-            Add
+            Invite
           </button>
         </div>
-        <p v-if="addServerAdminError || removeServerAdminError" class="text-sm text-red-600 dark:text-red-400">
-          {{ addServerAdminError?.message || removeServerAdminError?.message }}
+        <p v-if="adminError" class="text-sm text-red-600 dark:text-red-400">
+          {{ adminError?.message }}
         </p>
-        <div v-if="admins.length === 0" class="text-sm text-gray-600 dark:text-gray-300">
+
+        <!-- Pending Admin Invites -->
+        <div v-if="pendingAdminInvites.length > 0" class="space-y-2">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Pending Invites</h4>
+          <div
+            v-for="invite in pendingAdminInvites"
+            :key="invite.username || ''"
+            class="flex items-center justify-between rounded bg-yellow-50 p-2 dark:bg-yellow-900/20"
+          >
+            <div class="flex items-center gap-2">
+              <AvatarComponent
+                :text="invite.username || ''"
+                :src="invite.profilePicURL ?? ''"
+                class="h-6 w-6"
+              />
+              <span class="text-sm text-gray-900 dark:text-gray-100">
+                {{ invite.username }}
+              </span>
+              <span class="text-xs text-yellow-600 dark:text-yellow-400">(pending)</span>
+            </div>
+            <button
+              type="button"
+              class="rounded border border-gray-400 px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              :disabled="loading"
+              @click="invite.username && cancelAdminInvite(invite.username)"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+
+        <!-- Current Admins -->
+        <div v-if="admins.length === 0 && pendingAdminInvites.length === 0" class="text-sm text-gray-600 dark:text-gray-300">
           No server admins configured.
         </div>
-        <div v-for="admin in admins" :key="admin.username || ''" class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700">
-          <div class="flex items-center gap-2">
-            <AvatarComponent
-              :text="admin.username || ''"
-              :src="admin.profilePicURL ?? ''"
-              class="h-6 w-6"
-            />
-            <UsernameWithTooltip
-              v-if="admin.username"
-              :username="admin.username"
-              :src="admin.profilePicURL ?? ''"
-              :display-name="admin.displayName ?? ''"
-              :comment-karma="admin.commentKarma ?? 0"
-              :discussion-karma="admin.discussionKarma ?? 0"
-              :account-created="admin.createdAt ?? ''"
-            />
-          </div>
-          <button
-            type="button"
-            class="rounded border border-orange-500 px-2 py-1 text-sm text-orange-500"
-            :disabled="loading"
-            @click="admin.username && removeAdmin(admin.username)"
+        <div v-if="admins.length > 0" class="space-y-2">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Current Admins</h4>
+          <div
+            v-for="admin in admins"
+            :key="admin.username || ''"
+            class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
-            Remove
-          </button>
+            <div class="flex items-center gap-2">
+              <AvatarComponent
+                :text="admin.username || ''"
+                :src="admin.profilePicURL ?? ''"
+                class="h-6 w-6"
+              />
+              <UsernameWithTooltip
+                v-if="admin.username"
+                :username="admin.username"
+                :src="admin.profilePicURL ?? ''"
+                :display-name="admin.displayName ?? ''"
+                :comment-karma="admin.commentKarma ?? 0"
+                :discussion-karma="admin.discussionKarma ?? 0"
+                :account-created="admin.createdAt ?? ''"
+              />
+            </div>
+            <button
+              type="button"
+              class="rounded border border-orange-500 px-2 py-1 text-sm text-orange-500"
+              :disabled="loading"
+              @click="admin.username && removeAdmin(admin.username)"
+            >
+              Remove
+            </button>
+          </div>
         </div>
       </div>
 
+      <!-- Server Moderators Column -->
       <div class="space-y-3">
         <h3 class="font-medium text-gray-900 dark:text-gray-100">Server Moderators</h3>
         <div class="flex gap-2">
           <input
-            v-model="newModeratorDisplayName"
+            v-model="newModeratorUsername"
             type="text"
-            placeholder="Mod profile display name"
+            placeholder="Username to invite"
             class="w-full rounded border px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+            @keyup.enter="sendModInvite"
           >
           <button
             type="button"
             class="rounded bg-orange-500 px-3 py-2 text-white disabled:opacity-60"
-            :disabled="loading"
-            @click="addModerator"
+            :disabled="loading || !newModeratorUsername.trim()"
+            @click="sendModInvite"
           >
-            Add
+            Invite
           </button>
         </div>
-        <p v-if="addServerModeratorError || removeServerModeratorError" class="text-sm text-red-600 dark:text-red-400">
-          {{ addServerModeratorError?.message || removeServerModeratorError?.message }}
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          The invited user must have a moderation profile to accept.
         </p>
-        <div v-if="moderators.length === 0" class="text-sm text-gray-600 dark:text-gray-300">
+        <p v-if="modError" class="text-sm text-red-600 dark:text-red-400">
+          {{ modError?.message }}
+        </p>
+
+        <!-- Pending Mod Invites -->
+        <div v-if="pendingModInvites.length > 0" class="space-y-2">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Pending Invites</h4>
+          <div
+            v-for="invite in pendingModInvites"
+            :key="invite.username || ''"
+            class="flex items-center justify-between rounded bg-yellow-50 p-2 dark:bg-yellow-900/20"
+          >
+            <div class="flex items-center gap-2">
+              <AvatarComponent
+                :text="invite.username || ''"
+                :src="invite.profilePicURL ?? ''"
+                class="h-6 w-6"
+              />
+              <span class="text-sm text-gray-900 dark:text-gray-100">
+                {{ invite.username }}
+              </span>
+              <span class="text-xs text-yellow-600 dark:text-yellow-400">(pending)</span>
+            </div>
+            <button
+              type="button"
+              class="rounded border border-gray-400 px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              :disabled="loading"
+              @click="invite.username && cancelModInvite(invite.username)"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+
+        <!-- Current Moderators -->
+        <div v-if="moderators.length === 0 && pendingModInvites.length === 0" class="text-sm text-gray-600 dark:text-gray-300">
           No server moderators configured.
         </div>
-        <div
-          v-for="moderator in moderators"
-          :key="moderator.displayName || ''"
-          class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-        >
-          <div class="flex flex-col">
-            <span class="font-medium text-gray-900 dark:text-gray-100">
-              {{ moderator.displayName }}
-            </span>
-            <span class="text-sm text-gray-600 dark:text-gray-300">
-              {{ moderator.User?.username ? `u/${moderator.User.username}` : 'No linked user' }}
-            </span>
-          </div>
-          <button
-            type="button"
-            class="rounded border border-orange-500 px-2 py-1 text-sm text-orange-500"
-            :disabled="loading"
-            @click="moderator.displayName && removeModerator(moderator.displayName)"
+        <div v-if="moderators.length > 0" class="space-y-2">
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Current Moderators</h4>
+          <div
+            v-for="moderator in moderators"
+            :key="moderator.displayName || ''"
+            class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
-            Remove
-          </button>
+            <div class="flex flex-col">
+              <span class="font-medium text-gray-900 dark:text-gray-100">
+                {{ moderator.displayName }}
+              </span>
+              <span class="text-sm text-gray-600 dark:text-gray-300">
+                {{ moderator.User?.username ? `u/${moderator.User.username}` : 'No linked user' }}
+              </span>
+            </div>
+            <button
+              type="button"
+              class="rounded border border-orange-500 px-2 py-1 text-sm text-orange-500"
+              :disabled="loading"
+              @click="moderator.displayName && removeModerator(moderator.displayName)"
+            >
+              Remove
+            </button>
+          </div>
         </div>
       </div>
     </div>

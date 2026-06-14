@@ -19,6 +19,7 @@ import { useRoute } from 'nuxt/app';
 import { gql } from '@apollo/client/core';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import type { BotSuggestion } from '@/utils/botMentions';
+import type { ModSuggestion } from '@/utils/modMentions';
 
 defineOptions({ inheritAttrs: false });
 
@@ -48,6 +49,10 @@ const props = defineProps({
   },
   botSuggestions: {
     type: Array as PropType<BotSuggestion[]>,
+    default: () => [],
+  },
+  modSuggestions: {
+    type: Array as PropType<ModSuggestion[]>,
     default: () => [],
   },
 });
@@ -386,6 +391,7 @@ const handleUpdateComment = (event: string) => {
         :bot-suggestions="botSuggestions"
         :allow-image-upload="imageUploadsEnabled"
         :channel-connections="channelConnections"
+        :mod-suggestions="modSuggestions"
         :suspension-issue-number="
           showSuspensionNotice ? suspensionIssueNumber ?? undefined : undefined
         "

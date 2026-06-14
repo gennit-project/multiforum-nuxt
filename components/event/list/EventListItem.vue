@@ -191,13 +191,15 @@ const commentCount = computed(() => props.event?.CommentsAggregate?.count || 0);
 const channelCount = computed(() => props.event?.EventChannels.length || 0);
 
 // Series-related computed properties
-const isPartOfSeries = computed(() => Boolean(props.event?.EventSeries?.id));
+// Note: EventSeries is a new field that may not be in generated types yet
+const eventWithSeries = computed(() => props.event as Event & { EventSeries?: { id?: string; Occurrences?: Array<{ id: string; startTime: string }> } });
+const isPartOfSeries = computed(() => Boolean(eventWithSeries.value?.EventSeries?.id));
 
 const seriesOccurrences = computed(() => {
-  if (!props.event?.EventSeries?.Occurrences) {
+  if (!eventWithSeries.value?.EventSeries?.Occurrences) {
     return [];
   }
-  return props.event.EventSeries.Occurrences.map((occ) => ({
+  return eventWithSeries.value.EventSeries.Occurrences.map((occ) => ({
     id: occ.id,
     startTime: occ.startTime,
   }));

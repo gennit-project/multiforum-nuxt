@@ -11,9 +11,12 @@ import {
   REPORT_DISCUSSION,
   REPORT_EVENT,
   REPORT_COMMENT,
+  REPORT_IMAGE,
+  REPORT_WIKI_EDIT,
   ARCHIVE_DISCUSSION,
   ARCHIVE_EVENT,
   ARCHIVE_COMMENT,
+  ARCHIVE_IMAGE,
 } from '@/graphQLData/issue/mutations';
 import { GET_ISSUE } from '@/graphQLData/issue/queries';
 import { SUSPEND_USER } from '@/graphQLData/mod/mutations';
@@ -59,6 +62,21 @@ const props = defineProps({
     required: false,
     default: '',
   },
+  imageId: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  wikiPageId: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  wikiRevisionId: {
+    type: String,
+    required: false,
+    default: '',
+  },
   comment: {
     type: Object as PropType<Comment | null | undefined>,
     required: false,
@@ -82,6 +100,13 @@ const props = defineProps({
     required: false,
     default: '',
   },
+  // Optional channel override - if provided, uses this instead of route params
+  // Useful when reporting from contexts without channel in the URL (e.g., user profile)
+  channelUniqueNameOverride: {
+    type: String,
+    required: false,
+    default: '',
+  },
   suspendUserEnabled: {
     type: Boolean,
     default: false,
@@ -101,6 +126,10 @@ const { client } = useApolloClient();
 const route = useRoute();
 
 const channelId = computed(() => {
+  // Use override if provided, otherwise get from route
+  if (props.channelUniqueNameOverride) {
+    return props.channelUniqueNameOverride;
+  }
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
@@ -170,6 +199,20 @@ const {
   error: reportCommentError,
   onDone: reportCommentDone,
 } = useMutation(REPORT_COMMENT);
+
+const {
+  mutate: reportImage,
+  loading: reportImageLoading,
+  error: reportImageError,
+  onDone: reportImageDone,
+} = useMutation(REPORT_IMAGE);
+
+const {
+  mutate: reportWikiEdit,
+  loading: reportWikiEditLoading,
+  error: reportWikiEditError,
+  onDone: reportWikiEditDone,
+} = useMutation(REPORT_WIKI_EDIT);
 
 const {
   mutate: archiveDiscussion,
@@ -242,6 +285,27 @@ const {
   },
 });
 
+const {
+  mutate: archiveImage,
+  loading: archiveImageLoading,
+  error: archiveImageError,
+  onDone: archiveImageDone,
+} = useMutation(ARCHIVE_IMAGE, {
+  update: (cache) => {
+    cache.modify({
+      id: cache.identify({
+        __typename: 'Image',
+        id: props.imageId,
+      }),
+      fields: {
+        archived() {
+          return true;
+        },
+      },
+    });
+  },
+});
+
 reportDiscussionDone(() => {
   reportText.value = '';
   emit('reportSubmittedSuccessfully');
@@ -253,6 +317,16 @@ reportEventDone(() => {
 });
 
 reportCommentDone(() => {
+  reportText.value = '';
+  emit('reportSubmittedSuccessfully');
+});
+
+reportImageDone(() => {
+  reportText.value = '';
+  emit('reportSubmittedSuccessfully');
+});
+
+reportWikiEditDone(() => {
   reportText.value = '';
   emit('reportSubmittedSuccessfully');
 });
@@ -278,6 +352,13 @@ archiveCommentDone(() => {
   emit('reportedAndArchivedSuccessfully');
 });
 
+archiveImageDone(() => {
+  client.refetchQueries({
+    include: [GET_ISSUE],
+  });
+  emit('reportedAndArchivedSuccessfully');
+});
+
 suspendUserDone(() => {
   client.refetchQueries({
     include: [GET_ISSUE],
@@ -293,6 +374,8 @@ const modalTitle = computed(() => {
       return 'Archive Discussion';
     } else if (props.eventId) {
       return 'Archive Event';
+    } else if (props.imageId) {
+      return 'Archive Image';
     }
   } else {
     if (props.commentId) {
@@ -301,6 +384,10 @@ const modalTitle = computed(() => {
       return 'Report Discussion';
     } else if (props.eventId) {
       return 'Report Event';
+    } else if (props.imageId) {
+      return 'Report Image';
+    } else if (props.wikiPageId) {
+      return 'Report Wiki Edit';
     }
   }
   return 'Report Content';
@@ -313,6 +400,10 @@ const contentType = computed(() => {
     return 'discussion';
   } else if (props.eventId) {
     return 'event';
+  } else if (props.imageId) {
+    return 'image';
+  } else if (props.wikiPageId) {
+    return 'wiki edit';
   }
   return '';
 });
@@ -322,13 +413,17 @@ const modalBody = computed(() => {
 });
 
 const modalPlaceholder = computed(() => {
-  let contentType = 'discussion';
+  let type = 'discussion';
   if (props.commentId) {
-    contentType = 'comment';
+    type = 'comment';
   } else if (props.eventId) {
-    contentType = 'event';
+    type = 'event';
+  } else if (props.imageId) {
+    type = 'image';
+  } else if (props.wikiPageId) {
+    type = 'wiki edit';
   }
-  return `Explain why this ${contentType} should be removed`;
+  return `Explain why this ${type} should be removed`;
 });
 
 const getFinalCommentText = (input: FinalCommentTextInput) => {
@@ -366,8 +461,14 @@ ${reportText}
 `;
 };
 const submit = async () => {
-  if (!props.discussionId && !props.eventId && !props.commentId) {
-    console.error('No discussion, event, or comment ID provided.');
+  if (
+    !props.discussionId &&
+    !props.eventId &&
+    !props.commentId &&
+    !props.imageId &&
+    !props.wikiPageId
+  ) {
+    console.error('No discussion, event, comment, image, or wiki page ID provided.');
     return;
   }
 
@@ -411,6 +512,15 @@ const submit = async () => {
         selectedServerRules: selectedServerRules.value,
       });
       issueId = issue?.data?.archiveComment?.id;
+    } else if (props.imageId) {
+      const issue = await archiveImage({
+        imageId: props.imageId,
+        reportText: reportText.value,
+        selectedForumRules: selectedForumRules.value,
+        selectedServerRules: selectedServerRules.value,
+        channelUniqueName: channelId.value || null,
+      });
+      issueId = issue?.data?.archiveImage?.id;
     }
 
     if (!issueId) {
@@ -470,6 +580,23 @@ const submit = async () => {
         selectedServerRules: selectedServerRules.value,
         channelUniqueName: channelId.value,
       });
+    } else if (props.imageId) {
+      reportImage({
+        imageId: props.imageId,
+        reportText: reportText.value,
+        selectedForumRules: selectedForumRules.value,
+        selectedServerRules: selectedServerRules.value,
+        channelUniqueName: channelId.value || null,
+      });
+    } else if (props.wikiPageId) {
+      reportWikiEdit({
+        wikiPageId: props.wikiPageId,
+        wikiRevisionId: props.wikiRevisionId || null,
+        reportText: reportText.value,
+        selectedForumRules: selectedForumRules.value,
+        selectedServerRules: selectedServerRules.value,
+        channelUniqueName: channelId.value,
+      });
     }
   } else {
     // "archive" flow (also includes a report)
@@ -496,6 +623,14 @@ const submit = async () => {
         selectedForumRules: selectedForumRules.value,
         selectedServerRules: selectedServerRules.value,
       });
+    } else if (props.imageId) {
+      archiveImage({
+        imageId: props.imageId,
+        reportText: reportText.value,
+        selectedForumRules: selectedForumRules.value,
+        selectedServerRules: selectedServerRules.value,
+        channelUniqueName: channelId.value || null,
+      });
     }
   }
 };
@@ -511,7 +646,7 @@ const close = () => {
 
 <template>
   <GenericModal
-    :data-testid="`report-${props.commentId ? 'comment' : props.discussionId ? 'discussion' : 'event'}-modal`"
+    :data-testid="`report-${props.commentId ? 'comment' : props.discussionId ? 'discussion' : props.imageId ? 'image' : 'event'}-modal`"
     :highlight-color="'red'"
     :title="modalTitle"
     :body="'Please select at least one broken rule:'"
@@ -522,9 +657,12 @@ const close = () => {
       reportDiscussionLoading ||
       reportEventLoading ||
       reportCommentLoading ||
+      reportImageLoading ||
+      reportWikiEditLoading ||
       archiveDiscussionLoading ||
       archiveEventLoading ||
       archiveCommentLoading ||
+      archiveImageLoading ||
       suspendUserLoading
     "
     :primary-button-disabled="
@@ -534,9 +672,12 @@ const close = () => {
       reportDiscussionError?.message ||
       reportEventError?.message ||
       reportCommentError?.message ||
+      reportImageError?.message ||
+      reportWikiEditError?.message ||
       archiveDiscussionError?.message ||
       archiveEventError?.message ||
       archiveCommentError?.message ||
+      archiveImageError?.message ||
       suspendUserError?.message
     "
     @primary-button-click="submit"

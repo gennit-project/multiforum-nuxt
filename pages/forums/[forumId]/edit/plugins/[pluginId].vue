@@ -39,7 +39,10 @@ const {
   refetch: refetchChannel,
 } = useQuery(
   GET_CHANNEL_PLUGIN_SETTINGS,
-  () => ({ channelUniqueName: channelUniqueName.value }),
+  () => ({
+    channelUniqueName: channelUniqueName.value,
+    now: new Date().toISOString(),
+  }),
   { enabled: computed(() => !!channelUniqueName.value) }
 );
 

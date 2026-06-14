@@ -9,6 +9,8 @@ import TextInput from '@/components/TextInput.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import GoBack from '@/components/GoBack.vue';
+import SuspensionNotice from '@/components/SuspensionNotice.vue';
+import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { usernameVar } from '@/cache';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 
@@ -27,10 +29,30 @@ const {
 const channel = computed(() => channelResult.value?.channels[0]);
 const wikiHomePage = computed(() => channel.value?.WikiHomePage);
 
+const {
+  activeSuspension,
+  issueNumber: suspensionIssueNumber,
+  suspendedUntil,
+  suspendedIndefinitely,
+  channelId: suspensionChannelId,
+} = useChannelSuspensionNotice(forumId);
+
+const wikiEditBlockedBySuspension = computed(() => {
+  return !!usernameVar.value && !!activeSuspension.value;
+});
+
+const showWikiEditSuspensionNotice = computed(() => {
+  return wikiEditBlockedBySuspension.value && !!suspensionIssueNumber.value;
+});
+
+const wikiEditSuspensionMessage =
+  'You are suspended in this forum and cannot create wiki pages.';
+
 // Form data
 const formValues = ref({
   title: '',
   body: '',
+  editReason: '',
   slug: '',
 });
 
@@ -44,12 +66,14 @@ const {
 
 // Handle form submission
 function handleSubmit() {
+  if (wikiEditBlockedBySuspension.value) return;
   if (!formValues.value.title || !formValues.value.body || !wikiHomePage.value)
     return;
 
   const childPageInput = {
     title: formValues.value.title,
     body: formValues.value.body,
+    editReason: formValues.value.editReason || undefined,
     slug: formValues.value.slug,
     channelUniqueName: forumId,
     VersionAuthor: {
@@ -155,8 +179,21 @@ const hasWikiHomePage = computed(() => !!wikiHomePage.value);
       </div>
 
       <ErrorBanner v-if="createError" :text="createError.message" />
+      <SuspensionNotice
+        v-if="showWikiEditSuspensionNotice"
+        class="mb-4"
+        :message="wikiEditSuspensionMessage"
+        :issue-number="suspensionIssueNumber ?? 0"
+        :channel-id="suspensionChannelId"
+        :suspended-until="suspendedUntil ?? undefined"
+        :suspended-indefinitely="suspendedIndefinitely"
+      />
 
-      <form class="space-y-6" @submit.prevent="handleSubmit">
+      <form
+        v-if="!wikiEditBlockedBySuspension"
+        class="space-y-6"
+        @submit.prevent="handleSubmit"
+      >
         <div>
           <TextInput
             id="wiki-title"
@@ -183,6 +220,19 @@ const hasWikiHomePage = computed(() => !!wikiHomePage.value);
             :value="formValues.slug"
             :disabled="true"
             help-text="This is automatically generated from the title and will be used in the URL."
+          />
+        </div>
+
+        <div>
+          <TextInput
+            id="wiki-edit-reason"
+            :full-width="true"
+            label="Edit reason"
+            placeholder="Briefly describe this change"
+            :test-id="'edit-reason-input'"
+            :value="formValues.editReason"
+            :rows="3"
+            @update="formValues.editReason = $event"
           />
         </div>
 

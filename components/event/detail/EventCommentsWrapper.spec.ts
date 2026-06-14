@@ -20,10 +20,23 @@ vi.mock('nuxt/app', () => ({
     },
     query: {},
   }),
+  useRouter: () => ({
+    replace: vi.fn(),
+  }),
+}));
+
+vi.mock('@/composables/useToast', () => ({
+  useToast: () => ({
+    success: vi.fn(),
+    info: vi.fn(),
+    error: vi.fn(),
+    warning: vi.fn(),
+  }),
 }));
 
 vi.mock('@/cache', () => ({
   usernameVar: { value: 'alice' },
+  isAuthenticatedVar: { value: true },
 }));
 
 vi.mock('@/components/comments/getSortFromQuery', async (importOriginal) => {

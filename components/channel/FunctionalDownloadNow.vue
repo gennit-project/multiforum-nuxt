@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import DownloadNowButton from '@/components/channel/DownloadNowButton.vue';
+import { TRACK_DOWNLOAD } from '@/graphQLData/discussion/mutations';
+import { useMutation } from '@vue/apollo-composable';
 
 const props = defineProps({
   disabled: {
@@ -14,9 +16,19 @@ const props = defineProps({
     type: String,
     default: 'download',
   },
+  downloadableFileId: {
+    type: String,
+    default: '',
+  },
+  discussionId: {
+    type: String,
+    default: '',
+  },
 });
 
 const emit = defineEmits(['downloaded']);
+
+const { mutate: trackDownload } = useMutation(TRACK_DOWNLOAD);
 
 const handleDownload = () => {
   if (props.disabled || !props.url) {
@@ -31,6 +43,15 @@ const handleDownload = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  }
+
+  if (props.downloadableFileId && props.discussionId) {
+    trackDownload({
+      downloadableFileId: props.downloadableFileId,
+      discussionId: props.discussionId,
+    }).catch((error) => {
+      console.error('Failed to track download', error);
+    });
   }
 
   setTimeout(() => {

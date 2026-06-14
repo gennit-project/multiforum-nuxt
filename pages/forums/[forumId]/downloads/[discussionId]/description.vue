@@ -10,7 +10,6 @@ import TextEditor from '@/components/TextEditor.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import CharCounter from '@/components/CharCounter.vue';
-import DiscussionTitleVersions from '@/components/discussion/detail/activityFeed/DiscussionTitleVersions.vue';
 import { MAX_CHARS_IN_DISCUSSION_BODY } from '@/utils/constants';
 import type {
   Discussion,
@@ -98,16 +97,6 @@ const handleCancel = () => {
         <div v-else class="py-8 text-center text-gray-500 dark:text-gray-400">
           No description available for this download.
         </div>
-
-        <!-- Title Edit History -->
-        <DiscussionTitleVersions
-          v-if="
-            props.discussion?.PastTitleVersions &&
-            props.discussion.PastTitleVersions.length > 0
-          "
-          :discussion="props.discussion"
-          class="mt-6"
-        />
       </div>
 
       <button

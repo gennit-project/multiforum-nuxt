@@ -8,6 +8,7 @@ export const SEARCH_COMMENT_FIELDS = gql`
     text
     createdAt
     updatedAt
+    textLastEdited
     archived
     CommentAuthor {
       ... on ModerationProfile {
@@ -35,6 +36,9 @@ export const SEARCH_COMMENT_FIELDS = gql`
     Event {
       id
       title
+      EventChannels {
+        channelUniqueName
+      }
     }
   }
 `;
@@ -63,6 +67,9 @@ export const COMMENT_VOTE_FIELDS = gql`
     UpvotedByUsersAggregate {
       count
     }
+    SuperUpvotedByUsers {
+      username
+    }
   }
 `;
 
@@ -75,6 +82,7 @@ const COMMENT_FIELDS = gql`
     weightedVotesCount
     createdAt
     updatedAt
+    textLastEdited
     archived
     isFavoritedByUser
     CommentAuthor {
@@ -87,6 +95,7 @@ const COMMENT_FIELDS = gql`
         createdAt
         discussionKarma
         commentKarma
+        isBot
         ChannelRoles {
           showModTag
         }
@@ -160,6 +169,12 @@ export const GET_DISCUSSION_COMMENTS = gql`
             botProfileId
             isDeprecated
           }
+          Moderators {
+            displayName
+            User {
+              username
+            }
+          }
         }
         Discussion {
           id
@@ -207,6 +222,7 @@ export const GET_DISCUSSION_COMMENTS = gql`
         weightedVotesCount
         createdAt
         updatedAt
+        textLastEdited
         archived
         isFavoritedByUser
         CommentAuthor {

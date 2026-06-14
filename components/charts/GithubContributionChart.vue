@@ -6,6 +6,7 @@ import CommentComponent from '@/components/comments/Comment.vue';
 import DiscussionItemInProfile from '@/components/user/DiscussionItemInProfile.vue';
 import EventListItemInProfile from '@/components/user/EventItemInProfile.vue';
 import ContributionChartSkeleton from './ContributionChartSkeleton.vue';
+import { timeAgo } from '@/utils';
 
 // Props definition with sparse data input
 const props = defineProps({
@@ -76,6 +77,20 @@ interface DayInfo extends DayData {
 const selectedDay = ref<null | DayInfo>(null);
 const selectedYearValue = ref(props.year);
 const gridData = ref<DayData[][]>([]);
+
+const getWikiPagePath = (edit: NonNullable<DayData['activities'][number]['WikiEdits']>[number]) => {
+  if (!edit.WikiPage?.channelUniqueName || !edit.WikiPage?.slug) {
+    return '';
+  }
+  return `/forums/${edit.WikiPage.channelUniqueName}/wiki/${edit.WikiPage.slug}`;
+};
+
+const getWikiRevisionPath = (edit: NonNullable<DayData['activities'][number]['WikiEdits']>[number]) => {
+  if (!edit.WikiPage?.channelUniqueName || !edit.WikiPage?.slug) {
+    return '';
+  }
+  return `/forums/${edit.WikiPage.channelUniqueName}/wiki/revisions/diff/${edit.WikiPage.slug}/${edit.id}`;
+};
 
 // Transform sparse contribution data into grid structure
 const buildGridDataFromContributions = () => {
@@ -537,6 +552,24 @@ const cellCount = computed(() => {
                   {{ activity.Events.length }}
                   {{ activity.Events.length === 1 ? 'event' : 'events' }}
                 </template>
+                <template
+                  v-if="activity.WikiEdits && activity.WikiEdits.length > 0"
+                >
+                  <template
+                    v-if="
+                      (activity.Comments && activity.Comments.length > 0) ||
+                      (activity.Discussions && activity.Discussions.length > 0) ||
+                      (activity.Events && activity.Events.length > 0)
+                    "
+                    >•</template
+                  >
+                  {{ activity.WikiEdits.length }}
+                  {{
+                    activity.WikiEdits.length === 1
+                      ? 'wiki edit'
+                      : 'wiki edits'
+                  }}
+                </template>
                 <template v-if="idx < selectedDay.activities.length - 1">
                   and
                 </template>
@@ -638,6 +671,62 @@ const cellCount = computed(() => {
                     :current-channel-id="''"
                     :event="event"
                   />
+                </div>
+
+                <!-- Wiki Edits Section -->
+                <div
+                  v-if="activity.WikiEdits && activity.WikiEdits.length > 0"
+                  class="py-2"
+                >
+                  <h4
+                    class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Wiki Edits
+                  </h4>
+                  <div
+                    v-for="edit in activity.WikiEdits"
+                    :key="edit.id"
+                    class="mb-2 rounded-md border border-gray-200 p-3 dark:border-gray-700"
+                  >
+                    <div class="flex flex-col gap-1">
+                      <div
+                        class="flex flex-wrap items-center gap-x-2 gap-y-1"
+                      >
+                        <NuxtLink
+                          v-if="getWikiPagePath(edit)"
+                          :to="getWikiPagePath(edit)"
+                          class="font-medium text-orange-600 hover:underline dark:text-orange-400"
+                        >
+                          {{ edit.WikiPage?.title || 'Wiki page' }}
+                        </NuxtLink>
+                        <span v-else class="font-medium">
+                          {{ edit.WikiPage?.title || 'Wiki page' }}
+                        </span>
+                        <span
+                          v-if="edit.WikiPage?.channelUniqueName"
+                          class="text-gray-500 dark:text-gray-400"
+                        >
+                          in {{ edit.WikiPage.channelUniqueName }}
+                        </span>
+                        <span class="text-gray-500 dark:text-gray-400">
+                          {{ timeAgo(new Date(edit.createdAt)) }}
+                        </span>
+                      </div>
+                      <div
+                        v-if="edit.editReason"
+                        class="text-gray-700 dark:text-gray-300"
+                      >
+                        {{ edit.editReason }}
+                      </div>
+                      <NuxtLink
+                        v-if="getWikiRevisionPath(edit)"
+                        :to="getWikiRevisionPath(edit)"
+                        class="text-orange-600 hover:underline dark:text-orange-400"
+                      >
+                        View revision
+                      </NuxtLink>
+                    </div>
+                  </div>
                 </div>
               </li>
             </ul>

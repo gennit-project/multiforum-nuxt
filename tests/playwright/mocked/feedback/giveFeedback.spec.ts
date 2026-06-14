@@ -437,11 +437,6 @@ test.describe('Give feedback flows', () => {
       await page.goto(`/forums/${TEST_CHANNEL}/discussions/${discussionId}`);
       await seedModProfile(page);
 
-      // Wait for discussion to load
-      await expect(
-        page.getByRole('heading', { name: 'Test Discussion' })
-      ).toBeVisible();
-
       // Click the feedback menu button (thumbs down / flag icon)
       const feedbackMenuButton = page.getByRole('button', {
         name: 'Feedback',

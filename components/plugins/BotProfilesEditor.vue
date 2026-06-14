@@ -11,6 +11,9 @@ export interface ExistingBot {
   username: string;
   botProfileId?: string | null;
   isDeprecated?: boolean | null;
+  SuspensionsAggregate?: {
+    count: number;
+  } | null;
 }
 
 const props = defineProps<{
@@ -91,6 +94,7 @@ type BotPreviewEntry = {
   profileId: string | null;
   invokeHandle: string;
   label: string | null;
+  isSuspended: boolean;
 };
 
 // Normalize ID helper (matches backend logic)
@@ -135,14 +139,18 @@ const botStatusPreview = computed(() => {
     const username = buildBotUsername(profile.id);
     desiredUsernames.add(username);
 
+    const existingBot = existingBotMap.get(username);
+    const isSuspended = (existingBot?.SuspensionsAggregate?.count ?? 0) > 0;
+
     const entry: BotPreviewEntry = {
       username,
       profileId: profile.id,
       invokeHandle: buildInvokeHandle(profile.id),
       label: profile.label || null,
+      isSuspended,
     };
 
-    if (existingBotMap.has(username)) {
+    if (existingBot) {
       existing.push(entry);
     } else {
       newBots.push(entry);
@@ -153,11 +161,13 @@ const botStatusPreview = computed(() => {
   // Only check bots belonging to this plugin (already filtered in relevantBots)
   for (const bot of relevantBots) {
     if (!desiredUsernames.has(bot.username)) {
+      const isSuspended = (bot.SuspensionsAggregate?.count ?? 0) > 0;
       deprecated.push({
         username: bot.username,
         profileId: bot.botProfileId || null,
         invokeHandle: '', // Can't determine for deprecated bots
         label: null,
+        isSuspended,
       });
     }
   }
@@ -400,14 +410,25 @@ function getIdValidationError(id: string): string {
           :key="bot.username"
           class="flex items-start gap-2"
         >
-          <span class="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
-            <i class="fa-solid fa-check text-xs" />
+          <span
+            class="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full"
+            :class="bot.isSuspended
+              ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
+              : 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'"
+          >
+            <i :class="bot.isSuspended ? 'fa-solid fa-ban text-xs' : 'fa-solid fa-check text-xs'" />
           </span>
           <div>
             <span class="flex flex-wrap items-center gap-x-2">
               <span class="font-mono text-gray-700 dark:text-gray-300">{{ bot.username }}</span>
               <span v-if="bot.label" class="text-gray-500 dark:text-gray-400">({{ bot.label }})</span>
-              <span class="text-green-600 dark:text-green-400">(active)</span>
+              <span
+                v-if="bot.isSuspended"
+                class="rounded-full bg-red-200 px-2 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-900/70 dark:text-red-100"
+              >
+                Suspended
+              </span>
+              <span v-else class="text-green-600 dark:text-green-400">(active)</span>
             </span>
             <div class="text-xs text-gray-500 dark:text-gray-400">
               Invoke with /bot/{{ bot.invokeHandle }}
@@ -448,6 +469,12 @@ function getIdValidationError(id: string): string {
           <div>
             <span class="flex flex-wrap items-center gap-x-2">
               <span class="font-mono text-gray-700 dark:text-gray-300">{{ bot.username }}</span>
+              <span
+                v-if="bot.isSuspended"
+                class="rounded-full bg-red-200 px-2 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-900/70 dark:text-red-100"
+              >
+                Suspended
+              </span>
               <span class="text-amber-600 dark:text-yellow-300">(will be deprecated)</span>
             </span>
           </div>

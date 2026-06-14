@@ -11,9 +11,12 @@ import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import OnThisPage from '@/components/wiki/OnThisPage.vue';
 import FontSizeControl from '@/components/channel/FontSizeControl.vue';
+import SuspensionNotice from '@/components/SuspensionNotice.vue';
+import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import { timeAgo } from '@/utils';
+import { usernameVar } from '@/cache';
 
 const route = useRoute();
 const router = useRouter();
@@ -40,9 +43,39 @@ const wikiHomePage = computed(() => channel.value?.WikiHomePage);
 // Check if we have a wiki home page already
 const hasWikiHomePage = computed(() => !!wikiHomePage.value);
 
+const {
+  activeSuspension,
+  issueNumber: suspensionIssueNumber,
+  suspendedUntil,
+  suspendedIndefinitely,
+  channelId: suspensionChannelId,
+} = useChannelSuspensionNotice(forumId);
+
+const wikiEditBlockedBySuspension = computed(() => {
+  return !!usernameVar.value && !!activeSuspension.value;
+});
+
+const showWikiEditSuspensionNotice = computed(() => {
+  return wikiEditBlockedBySuspension.value && !!suspensionIssueNumber.value;
+});
+
+const wikiEditSuspensionMessage =
+  'You are suspended in this forum and cannot edit wiki pages.';
+
 // Navigate to create wiki page
 function createWikiPage() {
+  if (wikiEditBlockedBySuspension.value) return;
   router.push(`/forums/${forumId}/wiki/create`);
+}
+
+function createChildWikiPage() {
+  if (wikiEditBlockedBySuspension.value) return;
+  router.push(`/forums/${forumId}/wiki/create-child`);
+}
+
+function editWikiPage(slug: string) {
+  if (wikiEditBlockedBySuspension.value) return;
+  router.push(`/forums/${forumId}/wiki/edit/${slug}`);
 }
 
 // SEO metadata setup
@@ -237,15 +270,24 @@ onGetChannelResult((result) => {
         <p class="text-lg">
           You don't have any wiki pages yet.
           <span
-            class="cursor-pointer text-orange-600 hover:underline dark:text-orange-400"
+            class="text-orange-600 dark:text-orange-400"
+            :class="{
+              'cursor-pointer hover:underline': !wikiEditBlockedBySuspension,
+              'cursor-default opacity-60': wikiEditBlockedBySuspension,
+            }"
             @click="createWikiPage"
-            >Add one?</span
           >
+            Add one?
+          </span>
         </p>
       </div>
       <RequireAuth>
         <template #has-auth>
-          <GenericButton :text="'Create Wiki Page'" @click="createWikiPage">
+          <GenericButton
+            :text="'Create Wiki Page'"
+            :disabled="wikiEditBlockedBySuspension"
+            @click="createWikiPage"
+          >
             <DocumentIcon class="mr-2 h-5 w-5" />
           </GenericButton>
         </template>
@@ -255,6 +297,15 @@ onGetChannelResult((result) => {
           </GenericButton>
         </template>
       </RequireAuth>
+      <SuspensionNotice
+        v-if="showWikiEditSuspensionNotice"
+        class="mt-4"
+        :message="wikiEditSuspensionMessage"
+        :issue-number="suspensionIssueNumber ?? 0"
+        :channel-id="suspensionChannelId"
+        :suspended-until="suspendedUntil ?? undefined"
+        :suspended-indefinitely="suspendedIndefinitely"
+      />
     </div>
 
     <div v-else class="mx-auto max-w-full p-4">
@@ -269,7 +320,8 @@ onGetChannelResult((result) => {
               <template #has-auth>
                 <GenericButton
                   :text="'Add Page'"
-                  @click="router.push(`/forums/${forumId}/wiki/create-child`)"
+                  :disabled="wikiEditBlockedBySuspension"
+                  @click="createChildWikiPage"
                 >
                   <DocumentIcon class="mr-2 h-5 w-5" />
                 </GenericButton>
@@ -284,11 +336,8 @@ onGetChannelResult((result) => {
               <template #has-auth>
                 <GenericButton
                   :text="'Edit Wiki'"
-                  @click="
-                    router.push(
-                      `/forums/${forumId}/wiki/edit/${wikiHomePage.slug}`
-                    )
-                  "
+                  :disabled="wikiEditBlockedBySuspension"
+                  @click="editWikiPage(wikiHomePage.slug)"
                 >
                   <PencilIcon class="mr-2 h-5 w-5" />
                 </GenericButton>
@@ -301,6 +350,15 @@ onGetChannelResult((result) => {
             </RequireAuth>
           </div>
         </div>
+        <SuspensionNotice
+          v-if="showWikiEditSuspensionNotice"
+          class="mt-4"
+          :message="wikiEditSuspensionMessage"
+          :issue-number="suspensionIssueNumber ?? 0"
+          :channel-id="suspensionChannelId"
+          :suspended-until="suspendedUntil ?? undefined"
+          :suspended-indefinitely="suspendedIndefinitely"
+        />
         <div
           class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400"
         >
@@ -350,9 +408,12 @@ onGetChannelResult((result) => {
           <div class="mt-8 border-t border-gray-200 pt-6 dark:border-gray-700">
             <button
               class="flex items-center text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
-              @click="
-                router.push(`/forums/${forumId}/wiki/edit/${wikiHomePage.slug}`)
-              "
+              :disabled="wikiEditBlockedBySuspension"
+              :class="{
+                'cursor-default opacity-60 hover:text-gray-600 dark:hover:text-gray-400':
+                  wikiEditBlockedBySuspension,
+              }"
+              @click="editWikiPage(wikiHomePage.slug)"
             >
               <PencilIcon class="mr-2 h-4 w-4" />
               Edit this page

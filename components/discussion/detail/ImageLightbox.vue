@@ -5,6 +5,8 @@ import { useImageZoom } from '@/composables/useImageZoom';
 import LightboxControls from '@/components/discussion/detail/LightboxControls.vue';
 import LightboxImagePanel from '@/components/discussion/detail/LightboxImagePanel.vue';
 import LightboxInfoPanel from '@/components/discussion/detail/LightboxInfoPanel.vue';
+import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
+import Notification from '@/components/NotificationComponent.vue';
 import { useMutation } from '@vue/apollo-composable';
 import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
 // Simplified image type for lightbox display
@@ -31,6 +33,11 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  // Optional channel context for reporting - if not provided, report goes to server-level moderation
+  channelUniqueName: {
+    type: String,
+    default: '',
+  },
 });
 
 const emit = defineEmits(['close', 'album-updated']);
@@ -48,6 +55,27 @@ const currentImage = computed((): LightboxImage => {
 // Caption editing
 const editingCaptionIndex = ref(-1);
 const editingCaption = ref('');
+
+// Report modal state
+const showReportModal = ref(false);
+const showReportSuccess = ref(false);
+
+const openReportModal = () => {
+  showReportModal.value = true;
+};
+
+const closeReportModal = () => {
+  showReportModal.value = false;
+};
+
+const handleReportSuccess = () => {
+  showReportModal.value = false;
+  showReportSuccess.value = true;
+};
+
+const dismissReportSuccess = () => {
+  showReportSuccess.value = false;
+};
 
 // Mutation to update image caption
 const { mutate: updateImage, loading: updateLoading } =
@@ -332,6 +360,7 @@ onUnmounted(() => {
         @reset-zoom="resetZoom"
         @toggle-panel="togglePanel"
         @toggle-panel-position="togglePanelPosition"
+        @report-image="openReportModal"
       />
 
       <LightboxImagePanel
@@ -377,5 +406,21 @@ onUnmounted(() => {
         @cancel-editing="cancelEditingCaption"
       />
     </div>
+
+    <!-- Report Modal -->
+    <BrokenRulesModal
+      :open="showReportModal"
+      :image-id="currentImage.id || ''"
+      :channel-unique-name-override="channelUniqueName"
+      @close="closeReportModal"
+      @report-submitted-successfully="handleReportSuccess"
+    />
+
+    <!-- Success Notification -->
+    <Notification
+      :show="showReportSuccess"
+      :title="'Your report was submitted successfully.'"
+      @close-notification="dismissReportSuccess"
+    />
   </div>
 </template>

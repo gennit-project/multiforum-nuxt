@@ -19,6 +19,7 @@ export const GET_WIKI_PAGE = gql`
       id
       title
       body
+      editReason
       slug
       createdAt
       updatedAt
@@ -28,6 +29,7 @@ export const GET_WIKI_PAGE = gql`
       ChildPages {
         id
         title
+        editReason
         slug
         createdAt
         updatedAt
@@ -38,6 +40,7 @@ export const GET_WIKI_PAGE = gql`
       PastVersions(options: { sort: [{ createdAt: DESC }] }) {
         id
         body
+        editReason
         createdAt
         Author {
           username
@@ -57,6 +60,11 @@ export const GET_CHANNEL = gql`
       channelBannerURL
       rules
       locked
+      lockedAt
+      lockReason
+      LockedBy {
+        displayName
+      }
       wikiEnabled
       eventsEnabled
       feedbackEnabled
@@ -69,6 +77,7 @@ export const GET_CHANNEL = gql`
         id
         title
         body
+        editReason
         slug
         createdAt
         updatedAt
@@ -78,6 +87,7 @@ export const GET_CHANNEL = gql`
         PastVersions(options: { sort: [{ createdAt: DESC }] }) {
           id
           body
+          editReason
           createdAt
           Author {
             username
@@ -110,6 +120,16 @@ export const GET_CHANNEL = gql`
         displayName
         botProfileId
         isDeprecated
+        SuspensionsAggregate(
+          where: {
+            OR: [
+              { suspendedIndefinitely: true }
+              { suspendedUntil_GT: $now }
+            ]
+          }
+        ) {
+          count
+        }
       }
       Moderators {
         displayName
@@ -466,7 +486,7 @@ export const GET_CHANNEL_PLUGIN_PIPELINES = gql`
 `;
 
 export const GET_CHANNEL_PLUGIN_SETTINGS = gql`
-  query GetChannelPluginSettings($channelUniqueName: String!) {
+  query GetChannelPluginSettings($channelUniqueName: String!, $now: DateTime) {
     channels(where: { uniqueName: $channelUniqueName }) {
       uniqueName
       displayName
@@ -475,6 +495,16 @@ export const GET_CHANNEL_PLUGIN_SETTINGS = gql`
         displayName
         botProfileId
         isDeprecated
+        SuspensionsAggregate(
+          where: {
+            OR: [
+              { suspendedIndefinitely: true }
+              { suspendedUntil_GT: $now }
+            ]
+          }
+        ) {
+          count
+        }
       }
       EnabledPluginsConnection {
         edges {

@@ -16,6 +16,7 @@ import DiscussionDetailEmptyState from '@/components/discussion/list/DiscussionD
 import EventDetail from '@/components/event/detail/EventDetail.vue';
 import ChannelSidebar from '@/components/channel/ChannelSidebar.vue';
 import IssueDetail from '@/components/mod/IssueDetail.vue';
+import ChannelLockedBanner from '@/components/channel/ChannelLockedBanner.vue';
 import { useRoute, useRouter, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon';
@@ -309,6 +310,12 @@ definePageMeta({
         class="hidden md:block"
         :route="route"
         :show-create-button="true"
+      />
+      <ChannelLockedBanner
+        v-if="channel.locked"
+        :locked-at="channel.lockedAt"
+        :lock-reason="channel.lockReason"
+        :locked-by-display-name="channel.LockedBy?.displayName"
       />
       <div class="flex w-full justify-center">
         <article

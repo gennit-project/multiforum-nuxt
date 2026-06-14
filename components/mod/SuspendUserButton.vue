@@ -49,8 +49,38 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  isBot: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 defineEmits(['suspended-successfully', 'unsuspended-successfully']);
+
+// Bot-aware labels
+const suspendButtonLabel = computed(() =>
+  props.isBot ? 'Suspend Bot' : 'Suspend Author (Includes Archive)'
+);
+const unsuspendButtonLabel = computed(() =>
+  props.isBot ? 'Unsuspend Bot' : 'Unsuspend Author'
+);
+const suspendModalTitle = computed(() =>
+  props.isBot ? 'Suspend Bot' : 'Suspend Author'
+);
+const unsuspendModalTitle = computed(() =>
+  props.isBot ? 'Unsuspend Bot' : 'Unsuspend Author'
+);
+const suspendTextBoxLabel = computed(() =>
+  props.isBot
+    ? '(Optional) Explain why you are suspending this bot:'
+    : '(Optional) Explain why you are suspending this author:'
+);
+const suspendedNotificationTitle = computed(() =>
+  props.isBot ? 'The bot was suspended.' : 'The author was suspended.'
+);
+const unsuspendedNotificationTitle = computed(() =>
+  props.isBot ? 'The bot was unsuspended.' : 'The author was unsuspended.'
+);
 
 const {
   result: getUserSuspensionResult,
@@ -120,7 +150,7 @@ const eventChannelId = computed(() => {
   <div>
     <button
       v-if="userIsSuspendedFromChannel"
-      class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white"
+      class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white transition"
       :class="{
         'cursor-pointer bg-green-600 hover:bg-green-500': !disabled,
         'cursor-not-allowed bg-gray-500': disabled,
@@ -128,24 +158,22 @@ const eventChannelId = computed(() => {
       @click="openUnsuspendModal"
     >
       <UserPlus class="h-6 w-6" />
-      Unsuspend Author
+      {{ unsuspendButtonLabel }}
     </button>
     <button
       v-else
-      class="flex w-full items-start justify-center gap-2 rounded px-4 py-2 text-left text-white"
+      class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white transition"
       :class="{
         'cursor-pointer bg-red-600 hover:bg-red-500': !disabled,
         'cursor-not-allowed bg-gray-500': disabled,
       }"
       @click="openSuspendModal"
     >
-      <span class="flex shrink-0 self-start">
-        <UserMinus />
-      </span>
-      <span>Suspend Author (Includes Archive)</span>
+      <UserMinus />
+      {{ suspendButtonLabel }}
     </button>
     <BrokenRulesModal
-      :title="'Suspend Author'"
+      :title="suspendModalTitle"
       :open="showSuspendModal"
       :discussion-title="discussionTitle"
       :discussion-id="issue.relatedDiscussionId ?? ''"
@@ -155,7 +183,7 @@ const eventChannelId = computed(() => {
       :event-channel-id="eventChannelId"
       :comment-id="issue.relatedCommentId ?? ''"
       :suspend-user-enabled="true"
-      :text-box-label="'(Optional) Explain why you are suspending this author:'"
+      :text-box-label="suspendTextBoxLabel"
       :issue-id="issue.id"
       @close="closeSuspendModal"
       @suspended-user-successfully="
@@ -166,7 +194,7 @@ const eventChannelId = computed(() => {
       "
     />
     <UnsuspendUserModal
-      :title="'Unsuspend Author'"
+      :title="unsuspendModalTitle"
       :open="showUnsuspendModal"
       :issue-id="issue.id"
       @close="closeUnsuspendModal"
@@ -179,12 +207,12 @@ const eventChannelId = computed(() => {
     />
     <Notification
       :show="showSuccessfullySuspended"
-      :title="'The author was suspended.'"
+      :title="suspendedNotificationTitle"
       @close-notification="dismissSuspendedNotification"
     />
     <Notification
       :show="showSuccessfullyUnsuspended"
-      :title="'The author was unsuspended.'"
+      :title="unsuspendedNotificationTitle"
       @close-notification="dismissUnsuspendedNotification"
     />
   </div>
