@@ -4,46 +4,9 @@ This document outlines the automated test plan for the new functionality introdu
 
 ---
 
-## Remaining Work
+## All Phases Complete ✅
 
-### Phase 5: Admin Features
-
-#### 4. Server Admin/Mod Invite Workflow
-
-**Playwright Integration Tests**
-
-**File:** `tests/playwright/mocked/admin/serverInvites.spec.ts`
-
-| Test | Description |
-|------|-------------|
-| `admin invite workflow creates pending state and shows accept page` | Mock invite, verify pending badge, navigate to accept page |
-
-**Frontend Unit Tests**
-
-**File:** `pages/admin/accept-admin-invite.spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `shows sign in required when not authenticated` | |
-| `shows no invitation found when no pending invite` | |
-| `shows accept button when invite exists` | |
-
-**File:** `pages/admin/accept-mod-invite.spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `shows mod profile required message when user has no mod profile` | |
-| `shows accept button when mod profile and invite exist` | |
-
-**Backend Unit Tests**
-
-**File:** `resolvers/serverInvites.test.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `inviteServerAdmin creates pending invite` | |
-| `acceptServerAdminInvite promotes user to admin` | |
-| `cancelServerAdminInvite removes pending state` | |
+All test phases have been implemented. See the "Completed Phases" section below for details.
 
 ---
 
@@ -239,6 +202,32 @@ node --test --experimental-strip-types hooks/suspensionCleanupHook.test.ts
 
 ---
 
+## Phase 5: Admin Features ✅
+
+**Completed:** Server admin/mod invite workflow tests are in place.
+
+### Server Admin/Mod Invites
+
+**New Tests Created:**
+
+| File | Tests | Status |
+|------|-------|--------|
+| `pages/admin/accept-admin-invite.spec.ts` | 4 | ✅ New |
+| `pages/admin/accept-mod-invite.spec.ts` | 5 | ✅ New |
+| `tests/playwright/mocked/admin/serverInvites.spec.ts` | 3 | ✅ New |
+
+### Existing Tests
+
+| File | Tests | Status |
+|------|-------|--------|
+| `components/admin/ServerMembershipEditor.spec.ts` | 3 | ✅ Existed |
+
+### Notes
+
+- Backend tests for server invites already exist in the backend codebase
+
+---
+
 ## Test Distribution Summary
 
 | Category | Playwright | Frontend Unit | Backend Unit | Status |
@@ -250,4 +239,4 @@ node --test --experimental-strip-types hooks/suspensionCleanupHook.test.ts
 | Channel Lock | 2 | 6 | (existing) | ✅ Complete |
 | Bot Suspension | 2 | 6 | (existing) | ✅ Complete |
 | Download Labels | 2 | 6 | (existing) | ✅ Complete |
-| Server Invites | 0 | 0 | 0 | 🔲 Phase 5 |
+| Server Invites | 3 | 9 | (existing) | ✅ Complete |
