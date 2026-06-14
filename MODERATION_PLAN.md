@@ -1,31 +1,4 @@
-# Moderation Features: Current State vs Roadmap Plan
-
-## File Reference
-
-### Frontend Key Files
-
-- `/utils/permissionUtils.ts` - Core permission logic
-- `/utils/headerPermissionUtils.ts` - UI menu permission logic
-- `/components/mod/` - All moderation components
-- `/graphQLData/mod/` - Moderation GraphQL operations
-- `/tests/cypress/e2e/suspensions/` - Suspension tests
-
-### Backend Key Files
-
-- `/rules/rules.ts` - GraphQL Shield rules including `canCreateChannel`
-- `/rules/permission/hasChannelPermission.ts` - User permission enforcement
-- `/rules/permission/hasChannelModPermission.ts` - Mod permission enforcement
-- `/rules/permission/hasServerPermission.ts` - Server permission enforcement
-- `/rules/permission/getActiveSuspension.ts` - Suspension detection
-- `/rules/permission/disconnectExpiredSuspensions.ts` - Expiration cleanup
-- `/rules/permission/suspensionNotification.ts` - Notification creation
-- `/customResolvers/mutations/suspendUser.ts` - Suspension mutation
-- `/customResolvers/mutations/unsuspendUser.ts` - Unsuspension mutation
-- `/customResolvers/mutations/shared/createSuspensionResolver.ts` - Shared suspend mutation logic
-- `/customResolvers/mutations/shared/createUnsuspendResolver.ts` - Shared unsuspend mutation logic
-- `/customResolvers/queries/isOriginalPosterSuspended.ts` - Issue-linked suspension state query
-
----
+# Moderation
 
 ## Verification Guide
 
@@ -2448,6 +2421,7 @@ These steps verify the auto-moderation bot plugin that analyzes content for rule
 **Expected Outcome:**
 
 - Report should be formatted as:
+
   ```
   [Automated Report - General Moderation]
 
@@ -2461,6 +2435,7 @@ These steps verify the auto-moderation bot plugin that analyzes content for rule
   This report was generated automatically by the auto-moderation bot.
   A human moderator should review this content before taking action.
   ```
+
 - Report should be attributed to the bot's ModerationProfile
 - Report should appear in the issue activity feed
 
