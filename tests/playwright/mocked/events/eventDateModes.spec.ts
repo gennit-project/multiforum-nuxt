@@ -159,7 +159,7 @@ test.describe('Event Date Modes', () => {
     });
 
     await page.goto(`/forums/${TEST_CHANNEL}/events/create`);
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByTestId('event-form')).toBeVisible();
 
     // Check that all three date mode options are visible
     const singleModeButton = page.getByTestId('date-mode-single');
@@ -188,7 +188,7 @@ test.describe('Event Date Modes', () => {
     });
 
     await page.goto(`/forums/${TEST_CHANNEL}/events/create`);
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByTestId('event-form')).toBeVisible();
 
     // Click on Multiple dates mode
     await page.getByTestId('date-mode-multiple').click();
@@ -202,7 +202,7 @@ test.describe('Event Date Modes', () => {
     await expect(firstOccurrenceStartDate).toBeVisible();
   });
 
-  test('shows DateRangeGroup when recurring mode is selected', async ({
+  test('shows RepeatPatternPicker when recurring mode is selected', async ({
     context,
     page,
   }) => {
@@ -216,18 +216,73 @@ test.describe('Event Date Modes', () => {
     });
 
     await page.goto(`/forums/${TEST_CHANNEL}/events/create`);
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByTestId('event-form')).toBeVisible();
 
     // Click on Recurring mode
     await page.getByTestId('date-mode-recurring').click();
 
-    // Add date range button should be visible
-    const addDateRangeButton = page.getByTestId('add-date-range-button');
-    await expect(addDateRangeButton).toBeVisible();
+    // Repeat pattern type options should be visible
+    const dailyOption = page.getByTestId('repeat-type-daily');
+    const weeklyOption = page.getByTestId('repeat-type-weekly');
+    const monthlyOption = page.getByTestId('repeat-type-monthly');
 
-    // There should be at least one date range group
-    const firstGroupStartDate = page.getByTestId('group-0-start-date');
-    await expect(firstGroupStartDate).toBeVisible();
+    await expect(dailyOption).toBeVisible();
+    await expect(weeklyOption).toBeVisible();
+    await expect(monthlyOption).toBeVisible();
+
+    // Weekly should be selected by default
+    await expect(weeklyOption).toHaveClass(/border-orange-500/);
+
+    // Interval count should be visible
+    const intervalCount = page.getByTestId('interval-count');
+    await expect(intervalCount).toBeVisible();
+
+    // Day of week buttons should be visible (for weekly pattern)
+    const mondayButton = page.getByTestId('day-of-week-1');
+    await expect(mondayButton).toBeVisible();
+  });
+
+  test('can configure repeat pattern in recurring mode', async ({
+    context,
+    page,
+  }) => {
+    await installMockAuth(context, page, {
+      username: TEST_USERNAME,
+      email: 'test@example.com',
+    });
+
+    await installGraphqlMocks(page, {
+      ...getCommonMocks(TEST_USERNAME),
+    });
+
+    await page.goto(`/forums/${TEST_CHANNEL}/events/create`);
+    await expect(page.getByTestId('event-form')).toBeVisible();
+
+    // Click on Recurring mode
+    await page.getByTestId('date-mode-recurring').click();
+
+    // Change to Daily pattern
+    await page.getByTestId('repeat-type-daily').click();
+    await expect(page.getByTestId('repeat-type-daily')).toHaveClass(/border-orange-500/);
+
+    // Day of week buttons should not be visible for daily pattern
+    await expect(page.getByTestId('day-of-week-1')).not.toBeVisible();
+
+    // Change back to Weekly pattern
+    await page.getByTestId('repeat-type-weekly').click();
+
+    // Select Monday and Wednesday
+    await page.getByTestId('day-of-week-1').click(); // Monday
+    await page.getByTestId('day-of-week-3').click(); // Wednesday
+
+    // Both should now be selected (have orange background)
+    await expect(page.getByTestId('day-of-week-1')).toHaveClass(/bg-orange-500/);
+    await expect(page.getByTestId('day-of-week-3')).toHaveClass(/bg-orange-500/);
+
+    // Change end type to AFTER_COUNT
+    await page.getByTestId('end-type-after_count').click();
+    const endCountInput = page.getByTestId('end-count');
+    await expect(endCountInput).toBeVisible();
   });
 
   test('can add and remove occurrences in multiple dates mode', async ({
@@ -244,7 +299,7 @@ test.describe('Event Date Modes', () => {
     });
 
     await page.goto(`/forums/${TEST_CHANNEL}/events/create`);
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByTestId('event-form')).toBeVisible();
 
     // Click on Multiple dates mode
     await page.getByTestId('date-mode-multiple').click();
