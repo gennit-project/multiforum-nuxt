@@ -128,6 +128,45 @@ test('creates and edits a channel', async ({
         events: [],
       },
     }),
+    getModsByChannel: () => ({
+      data: {
+        channels: [
+          {
+            uniqueName: TEST_CHANNEL,
+            Admins: [{ username: 'cluse' }],
+            Moderators: [],
+          },
+        ],
+      },
+    }),
+    userIsModInChannel: () => ({
+      data: {
+        channels: [
+          {
+            uniqueName: TEST_CHANNEL,
+            Admins: [{ username: 'cluse' }],
+            SuspendedUsers: [],
+            Moderators: [],
+            SuspendedMods: [],
+          },
+        ],
+      },
+    }),
+    getUserSuspensionInChannel: () => ({
+      data: {
+        channels: [
+          {
+            uniqueName: TEST_CHANNEL,
+            SuspendedUsers: [],
+          },
+        ],
+      },
+    }),
+    getIssue: () => ({
+      data: {
+        issues: [],
+      },
+    }),
     createChannel: ({ body }) => {
       const variables = body.variables as CreateChannelVariables | undefined;
       const input = variables?.createChannelInput?.[0];
@@ -151,6 +190,11 @@ test('creates and edits a channel', async ({
                 description: channelState.description,
                 channelIconURL: '',
                 channelBannerURL: '',
+                eventsEnabled: true,
+                feedbackEnabled: true,
+                imageUploadsEnabled: true,
+                markdownImagesEnabled: true,
+                emojiEnabled: true,
                 Admins: [{ username: 'cluse' }],
                 createdAt: MOCK_DATE,
                 Tags: [],
@@ -230,14 +274,8 @@ test('creates and edits a channel', async ({
     await page.getByRole('button', { name: 'Save' }).first().click();
     await waitForGraphqlOperation(diagnostics.completedOperations, 'createChannel');
 
-    // Debug: Check if there's an error message displayed
-    const errorText = await page.locator('.text-red-500, [role="alert"]').textContent().catch(() => null);
-    if (errorText) {
-      console.log('Error displayed on page:', errorText);
-    }
-
-    // Debug: Log all seen operations
-    console.log('Completed operations:', diagnostics.completedOperations.map(op => op.operationName));
+    // Wait for navigation to complete after channel creation
+    await page.waitForURL(`**/forums/${TEST_CHANNEL}/discussions`, { timeout: 30000 });
 
     await expect(page).toHaveURL(`/forums/${TEST_CHANNEL}/discussions`);
     await expect(
