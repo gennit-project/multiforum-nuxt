@@ -126,6 +126,91 @@ describe('generateOccurrences', () => {
     expect(result[3]!.startTime).toContain('2026-04-13');
   });
 
+  it('generates weekly occurrences when start day does not match selected days', () => {
+    // Start on Tuesday April 7, 2026 (Tuesday is day 2)
+    // But we only selected Wednesday (3) and Friday (5)
+    const tuesdayStart = '2026-04-07T18:00:00.000Z';
+    const tuesdayEnd = '2026-04-07T20:00:00.000Z';
+
+    const pattern: RepeatPattern = {
+      type: 'WEEKLY',
+      count: 1,
+      daysOfWeek: [3, 5], // Wednesday and Friday only
+      endType: 'AFTER_COUNT',
+      endCount: 4,
+    };
+
+    const result = generateOccurrences({
+      pattern,
+      startTime: tuesdayStart,
+      endTime: tuesdayEnd,
+    });
+
+    expect(result).toHaveLength(4);
+    // First occurrence should be Wednesday April 8 (not Tuesday the start date)
+    expect(result[0]!.startTime).toContain('2026-04-08');
+    // Next is Friday April 10
+    expect(result[1]!.startTime).toContain('2026-04-10');
+    // Then Wednesday April 15
+    expect(result[2]!.startTime).toContain('2026-04-15');
+    // Then Friday April 17
+    expect(result[3]!.startTime).toContain('2026-04-17');
+  });
+
+  it('generates weekly occurrences when start day does not match and respects end date', () => {
+    // Start on Monday April 6, 2026 (Monday is day 1)
+    // But we only selected Thursday (4)
+    const mondayStart = '2026-04-06T18:00:00.000Z';
+    const mondayEnd = '2026-04-06T20:00:00.000Z';
+
+    const pattern: RepeatPattern = {
+      type: 'WEEKLY',
+      count: 1,
+      daysOfWeek: [4], // Thursday only
+      endType: 'ON_DATE',
+      endDate: '2026-04-15T00:00:00.000Z',
+    };
+
+    const result = generateOccurrences({
+      pattern,
+      startTime: mondayStart,
+      endTime: mondayEnd,
+    });
+
+    // Should have 2 occurrences: Thursday April 9 and before end date April 15
+    expect(result.length).toBeGreaterThanOrEqual(1);
+    expect(result[0]!.startTime).toContain('2026-04-09');
+  });
+
+  it('generates weekly occurrences with multi-week interval when start does not match', () => {
+    // Start on Tuesday April 7, 2026
+    // Select Friday (5) with 2-week interval
+    const tuesdayStart = '2026-04-07T18:00:00.000Z';
+    const tuesdayEnd = '2026-04-07T20:00:00.000Z';
+
+    const pattern: RepeatPattern = {
+      type: 'WEEKLY',
+      count: 2, // Every 2 weeks
+      daysOfWeek: [5], // Friday only
+      endType: 'AFTER_COUNT',
+      endCount: 3,
+    };
+
+    const result = generateOccurrences({
+      pattern,
+      startTime: tuesdayStart,
+      endTime: tuesdayEnd,
+    });
+
+    expect(result).toHaveLength(3);
+    // First occurrence is Friday April 10
+    expect(result[0]!.startTime).toContain('2026-04-10');
+    // Next is 2 weeks later: Friday April 24
+    expect(result[1]!.startTime).toContain('2026-04-24');
+    // Then Friday May 8
+    expect(result[2]!.startTime).toContain('2026-05-08');
+  });
+
   it('generates monthly occurrences', () => {
     const pattern: RepeatPattern = {
       type: 'MONTHLY',

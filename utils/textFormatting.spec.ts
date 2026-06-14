@@ -8,6 +8,7 @@ import {
   formatHeader2,
   formatHeader3,
   formatQuote,
+  formatSpoiler,
   insertEmoji,
   insertTextAtPosition,
   calculateRemainingChars,
@@ -30,6 +31,7 @@ describe('Text Formatting Utilities', () => {
         { format: 'header2', input: 'test', expected: '## test' },
         { format: 'header3', input: 'test', expected: '### test' },
         { format: 'quote', input: 'test', expected: '> test' },
+        { format: 'spoiler', input: 'test', expected: '>!test!<' },
       ];
 
       testCases.forEach(({ format, input, expected }) => {
@@ -125,6 +127,29 @@ describe('Text Formatting Utilities', () => {
         const input = 'line 1\n\nline 3';
         const expected = '> line 1\n> \n> line 3';
         expect(formatQuote({ text: input })).toBe(expected);
+      });
+    });
+
+    // Spoiler formatting
+    describe('formatSpoiler', () => {
+      it('adds spoiler markers to text', () => {
+        expect(formatSpoiler({ text: 'secret' })).toBe('>!secret!<');
+      });
+
+      it('handles empty string', () => {
+        expect(formatSpoiler({ text: '' })).toBe('>!!<');
+      });
+
+      it('handles text with special characters', () => {
+        expect(formatSpoiler({ text: 'spoiler: plot twist!' })).toBe(
+          '>!spoiler: plot twist!!<'
+        );
+      });
+
+      it('handles multiline text', () => {
+        expect(formatSpoiler({ text: 'line 1\nline 2' })).toBe(
+          '>!line 1\nline 2!<'
+        );
       });
     });
   });
