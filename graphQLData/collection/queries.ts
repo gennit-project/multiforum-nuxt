@@ -512,6 +512,7 @@ export const GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS = gql`
           uniqueName
           displayName
           channelIconURL
+          eventsEnabled
         }
       }
     }

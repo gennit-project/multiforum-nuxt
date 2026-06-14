@@ -12,9 +12,16 @@ import type {
   MultiSelectOption,
   MultiSelectSection,
 } from '@/components/MultiSelect.vue';
-import type { Channel, Collection } from '@/__generated__/graphql';
+import type { Channel, ChannelWhere, Collection } from '@/__generated__/graphql';
 import { usernameVar, isAuthenticatedVar } from '@/cache';
 import { createCaseInsensitivePattern } from '@/utils/searchUtils';
+
+type ChannelFlag = 'eventsEnabled';
+type ChannelOptionSource = Pick<
+  Channel,
+  'uniqueName' | 'displayName' | 'channelIconURL'
+> &
+  Partial<Record<ChannelFlag, boolean | null>>;
 
 // Props definition - used in template
 const props = defineProps({
@@ -30,6 +37,14 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  channelWhere: {
+    type: Object as PropType<ChannelWhere>,
+    default: null,
+  },
+  requiredEnabledChannelFlags: {
+    type: Array as PropType<ChannelFlag[]>,
+    default: () => [],
+  },
 });
 
 // Emits definition
@@ -40,9 +55,20 @@ const searchQuery = ref('');
 const { loading: channelsLoading, result: channelsResult } = useQuery(
   GET_CHANNEL_NAMES,
   computed(() => ({
-    channelWhere: {
-      uniqueName_MATCHES: createCaseInsensitivePattern(searchQuery.value) || '.*',
-    },
+    channelWhere: props.channelWhere
+      ? {
+          AND: [
+            props.channelWhere,
+            {
+              uniqueName_MATCHES:
+                createCaseInsensitivePattern(searchQuery.value) || '.*',
+            },
+          ],
+        }
+      : {
+          uniqueName_MATCHES:
+            createCaseInsensitivePattern(searchQuery.value) || '.*',
+        },
   })),
   {
     fetchPolicy: 'cache-first',
@@ -73,13 +99,21 @@ const { result: collectionsResult } = useQuery(
   }
 );
 
+const channelHasRequiredFlags = (channel: ChannelOptionSource) => {
+  return props.requiredEnabledChannelFlags.every(
+    (flag) => channel[flag] !== false
+  );
+};
+
 const channelOptions = computed<MultiSelectOption[]>(() => {
   const channels = channelsResult.value?.channels || [];
-  const mappedChannels = channels.map((channel: Channel) => ({
-    value: channel.uniqueName,
-    label: channel.displayName || channel.uniqueName,
-    avatar: channel.channelIconURL || '',
-  }));
+  const mappedChannels = channels
+    .filter((channel: ChannelOptionSource) => channelHasRequiredFlags(channel))
+    .map((channel: ChannelOptionSource) => ({
+      value: channel.uniqueName,
+      label: channel.displayName || channel.uniqueName,
+      avatar: channel.channelIconURL || '',
+    }));
 
   // Always include selected channels in options, even if they don't match current search
   // This ensures selected chips can always be displayed
@@ -116,10 +150,12 @@ const channelSections = computed<MultiSelectSection[]>(() => {
       "Can't show favorite forums because you are not logged in.";
   }
 
-  const favoriteOptions = favoriteChannels.map((channel: Pick<Channel, 'uniqueName' | 'displayName'>) => ({
-    value: channel.uniqueName,
-    label: channel.displayName || channel.uniqueName,
-  }));
+  const favoriteOptions = favoriteChannels
+    .filter((channel: ChannelOptionSource) => channelHasRequiredFlags(channel))
+    .map((channel: ChannelOptionSource) => ({
+      value: channel.uniqueName,
+      label: channel.displayName || channel.uniqueName,
+    }));
 
   sections.push({
     title: 'Favorite Forums',
@@ -137,20 +173,28 @@ const channelSections = computed<MultiSelectSection[]>(() => {
 
   if (collectionsWithChannels.length > 0) {
     // Create options for each collection (for select all functionality)
-    const collectionOptions = collectionsWithChannels.map(
-      (collection: Pick<Collection, 'id' | 'name' | 'Channels'>) => ({
+    const collectionOptions = collectionsWithChannels
+      .map((collection: Pick<Collection, 'id' | 'name' | 'Channels'>) => ({
         value: collection.id,
         label: collection.name,
         // Store the channel uniqueNames for select all functionality
-        channels: (collection.Channels || []).map((ch: Pick<Channel, 'uniqueName'>) => ch.uniqueName),
-      })
-    );
+        channels: (collection.Channels || [])
+          .filter((channel: ChannelOptionSource) =>
+            channelHasRequiredFlags(channel)
+          )
+          .map((ch: Pick<Channel, 'uniqueName'>) => ch.uniqueName),
+      }))
+      .filter((collection: { channels: string[] }) => {
+        return collection.channels.length > 0;
+      });
 
-    sections.push({
-      title: 'Forum Lists From Your Collections',
-      options: collectionOptions,
-      isCollectionSection: true, // Custom flag to render differently
-    } as MultiSelectSection & { isCollectionSection?: boolean });
+    if (collectionOptions.length > 0) {
+      sections.push({
+        title: 'Forum Lists From Your Collections',
+        options: collectionOptions,
+        isCollectionSection: true, // Custom flag to render differently
+      } as MultiSelectSection & { isCollectionSection?: boolean });
+    }
   }
 
   // All Forums section

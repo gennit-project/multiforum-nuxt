@@ -42,8 +42,13 @@ const mockComponents = {
     props: ['current', 'max'],
   },
   ForumPicker: {
+    name: 'ForumPicker',
     template: '<div data-testid="forum-picker"></div>',
-    props: ['selectedChannels'],
+    props: [
+      'selectedChannels',
+      'channelWhere',
+      'requiredEnabledChannelFlags',
+    ],
     emits: ['setSelectedChannels'],
   },
   ErrorMessage: {
@@ -199,6 +204,19 @@ describe('CreateEditEventFields Component', () => {
   };
 
   describe('Form validation', () => {
+    it('limits channel selection to forums with events enabled', () => {
+      const wrapper = mountComponent();
+
+      const forumPicker = wrapper.findComponent({ name: 'ForumPicker' });
+      expect({
+        channelWhere: forumPicker.props('channelWhere'),
+        requiredFlags: forumPicker.props('requiredEnabledChannelFlags'),
+      }).toEqual({
+        channelWhere: { eventsEnabled: true },
+        requiredFlags: ['eventsEnabled'],
+      });
+    });
+
     it('validates that title is required', async () => {
       const wrapper = mountComponent({
         ...defaultFormValues,

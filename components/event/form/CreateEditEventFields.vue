@@ -775,6 +775,8 @@ const touched = ref(false);
               :test-id="'channel-input'"
               :selected-channels="formValues.selectedChannels"
               :description="'Select forums to submit to'"
+              :channel-where="{ eventsEnabled: true }"
+              :required-enabled-channel-flags="['eventsEnabled']"
               @set-selected-channels="
                 emit('updateFormValues', { selectedChannels: $event })
               "
