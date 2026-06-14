@@ -2,6 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 
+// Import component after mocks are set up
+import AcceptModInvite from './accept-mod-invite.vue';
+
 // Mock definePageMeta globally before importing the component
 vi.stubGlobal('definePageMeta', vi.fn());
 
@@ -15,9 +18,6 @@ vi.mock('nuxt/app', () => ({
   }),
   useHead: vi.fn(),
 }));
-
-// Import component after mocks are set up
-import AcceptModInvite from './accept-mod-invite.vue';
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: () => ({
@@ -69,7 +69,9 @@ describe('accept-mod-invite', () => {
     });
 
     expect(wrapper.text()).toContain('Sign In Required');
-    expect(wrapper.text()).toContain('Please sign in to accept your server moderator invitation');
+    expect(wrapper.text()).toContain(
+      'Please sign in to accept your server moderator invitation'
+    );
   });
 
   it('shows mod profile required message when user has no mod profile', () => {
@@ -140,7 +142,9 @@ describe('accept-mod-invite', () => {
       },
     });
 
-    const acceptButton = wrapper.findAll('button').find(b => b.text().includes('Accept'));
+    const acceptButton = wrapper
+      .findAll('button')
+      .find((b) => b.text().includes('Accept'));
     await acceptButton?.trigger('click');
 
     expect(mockMutate).toHaveBeenCalledWith({

@@ -9,9 +9,24 @@ const mockFilterGroups: FilterGroup[] = [
     key: 'category',
     displayName: 'Category',
     options: [
-      { id: 'opt-1', value: 'tools', displayName: 'Tools', group: { key: 'category' } },
-      { id: 'opt-2', value: 'models', displayName: 'Models', group: { key: 'category' } },
-      { id: 'opt-3', value: 'textures', displayName: 'Textures', group: { key: 'category' } },
+      {
+        id: 'opt-1',
+        value: 'tools',
+        displayName: 'Tools',
+        group: { key: 'category' },
+      },
+      {
+        id: 'opt-2',
+        value: 'models',
+        displayName: 'Models',
+        group: { key: 'category' },
+      },
+      {
+        id: 'opt-3',
+        value: 'textures',
+        displayName: 'Textures',
+        group: { key: 'category' },
+      },
     ],
   },
   {
@@ -19,8 +34,18 @@ const mockFilterGroups: FilterGroup[] = [
     key: 'license',
     displayName: 'License Type',
     options: [
-      { id: 'opt-4', value: 'free', displayName: 'Free', group: { key: 'license' } },
-      { id: 'opt-5', value: 'commercial', displayName: 'Commercial', group: { key: 'license' } },
+      {
+        id: 'opt-4',
+        value: 'free',
+        displayName: 'Free',
+        group: { key: 'license' },
+      },
+      {
+        id: 'opt-5',
+        value: 'commercial',
+        displayName: 'Commercial',
+        group: { key: 'license' },
+      },
     ],
   },
 ] as FilterGroup[];
@@ -36,7 +61,8 @@ describe('DownloadLabelPicker', () => {
         stubs: {
           MultiSelect: { template: '<div class="multi-select" />' },
           CheckBox: {
-            template: '<div class="checkbox"><input type="checkbox" :checked="checked" /><span>{{ label }}</span></div>',
+            template:
+              '<div class="checkbox"><input type="checkbox" :checked="checked" /><span>{{ label }}</span></div>',
             props: ['checked', 'label'],
           },
         },
@@ -136,7 +162,9 @@ describe('DownloadLabelPicker', () => {
       },
     });
 
-    expect(wrapper.text()).toContain('No label categories configured for this forum');
+    expect(wrapper.text()).toContain(
+      'No label categories configured for this forum'
+    );
   });
 
   it('shows header and description', () => {
@@ -148,12 +176,17 @@ describe('DownloadLabelPicker', () => {
       global: {
         stubs: {
           MultiSelect: { template: '<div class="multi-select" />' },
-          CheckBox: { template: '<div class="checkbox" />', props: ['checked', 'label'] },
+          CheckBox: {
+            template: '<div class="checkbox" />',
+            props: ['checked', 'label'],
+          },
         },
       },
     });
 
     expect(wrapper.text()).toContain('Download Labels');
-    expect(wrapper.text()).toContain('Select labels to help users find your download');
+    expect(wrapper.text()).toContain(
+      'Select labels to help users find your download'
+    );
   });
 });
