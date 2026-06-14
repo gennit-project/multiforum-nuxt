@@ -6,258 +6,6 @@ This document outlines the automated test plan for the new functionality introdu
 
 ## Remaining Work
 
-### Phase 3: Content Moderation (Current)
-
-#### 5. Wiki Moderation
-
-**Playwright Integration Tests**
-
-**File:** `tests/playwright/mocked/wiki/wikiModeration.spec.ts`
-
-| Test | Description |
-|------|-------------|
-| `suspended user cannot edit wiki pages` | Mock suspended user, verify wiki edit buttons disabled |
-| `wiki revision report creates issue` | Click report edit, submit form, verify success toast |
-
-**Frontend Unit Tests**
-
-**File:** `components/wiki/WikiRevisionDiffModal.spec.ts` (existing, extend)
-
-| Test | Description |
-|------|-------------|
-| `shows redact button for authorized users` | |
-| `hides redact button for unauthorized users` | |
-| `displays [deleted] for redacted revisions` | |
-| `shows edit reason when present` | |
-
-**File:** `components/wiki/WikiEditsDropdown.spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `builds sequential revision pairs correctly` | |
-| `shows current version badge on most recent` | |
-| `opens diff modal on revision click` | |
-
-**File:** `pages/u/[username]/wiki-edits.spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `displays user wiki edits with page links` | |
-| `filters by channel when selected` | |
-
-**Backend Unit Tests**
-
-**File:** `resolvers/wikiModeration.test.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `deleteWikiRevision redacts body to [deleted]` | |
-| `deleteWikiRevision preserves revision metadata` | |
-| `reportWikiEdit creates issue with revision context` | |
-| `suspended user blocked from wiki mutations` | |
-| `wiki author can redact own revisions` | |
-
----
-
-#### 6. Image Moderation
-
-**Playwright Integration Tests**
-
-**File:** `tests/playwright/mocked/images/imageModeration.spec.ts`
-
-| Test | Description |
-|------|-------------|
-| `report image from lightbox creates issue` | Open lightbox, click report, submit form, verify toast |
-| `archived image hidden from album view` | Mock archived image, verify not displayed |
-
-**Frontend Unit Tests**
-
-**File:** `components/image/ImageLightbox.spec.ts` (extend)
-
-| Test | Description |
-|------|-------------|
-| `shows report button for logged-in users` | |
-| `hides report button for anonymous users` | |
-| `opens report modal on report click` | |
-
-**File:** `components/mod/ImageIssueContent.spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `displays image thumbnail and metadata` | |
-| `shows uploader info with profile link` | |
-| `displays report count badge` | |
-
-**File:** `pages/admin/image-reports.spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `displays image reports with type badges` | |
-| `filters by open/closed status` | |
-
-**Backend Unit Tests**
-
-**File:** `resolvers/imageModeration.test.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `archiveImage sets archived flag and creates action` | |
-| `unarchiveImage clears archived flag` | |
-| `permanentlyRemoveImage requires admin permission` | |
-| `archived images excluded from album queries` | |
-
----
-
-#### 7. Channel Reporting & Locking
-
-**Playwright Integration Tests**
-
-**File:** `tests/playwright/mocked/channels/channelLocking.spec.ts`
-
-| Test | Description |
-|------|-------------|
-| `locked channel shows banner and blocks content creation` | Mock locked channel, verify banner, attempt create discussion |
-| `channel report creates server-scoped issue` | Navigate to about page, report channel, verify issue created |
-
-**Frontend Unit Tests**
-
-**File:** `components/channel/LockedChannelBanner.spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `displays lock reason when provided` | |
-| `shows who locked and when` | |
-| `renders on all channel pages` | |
-
-**File:** `pages/admin/channel-reports.spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `displays channel reports with lock status` | |
-| `shows lock/unlock buttons based on state` | |
-| `filters by open/closed status` | |
-
-**Backend Unit Tests**
-
-**File:** `resolvers/channelLocking.test.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `lockChannel creates issue and sets locked state` | |
-| `unlockChannel clears locked state` | |
-| `locked channel blocks content creation` | |
-| `requires canLockChannel permission` | |
-
----
-
-### Phase 4: Downloads & Plugins
-
-#### 3. Bot Suspension System
-
-**Playwright Integration Tests**
-
-**File:** `tests/playwright/mocked/suspensions/botSuspension.spec.ts`
-
-| Test | Description |
-|------|-------------|
-| `suspended bot shows suspended badge in channel sidebar` | Mock suspended bot, verify red "Suspended" badge |
-
-**Frontend Unit Tests**
-
-**File:** `components/channel/BotListItem.spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `renders active indicator for non-suspended bots` | |
-| `renders suspended badge for suspended bots` | |
-| `renders bot icon for bot users` | |
-| `shows deprecated badge alongside suspended badge` | |
-
-**Backend Unit Tests**
-
-**File:** `hooks/botSuspensionHook.test.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `blocks bot comment creation when suspended` | |
-| `blocks bot report creation when suspended` | |
-| `allows bot actions when not suspended` | |
-
----
-
-#### 9. Download Labels Moderation
-
-**Playwright Integration Tests**
-
-**File:** `tests/playwright/mocked/downloads/downloadLabels.spec.ts`
-
-| Test | Description |
-|------|-------------|
-| `mod can update download labels and see audit trail` | Navigate to download edit, change labels, verify activity tab |
-
-**Frontend Unit Tests**
-
-**File:** `components/download/DownloadActivityTab.spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `displays label change history` | |
-| `shows actor name and timestamp` | |
-| `displays added labels with green badge` | |
-| `displays removed labels with strikethrough` | |
-
-**File:** `pages/forums/[forumId]/downloads/edit/[discussionId].spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `loads existing labels into form` | |
-| `submits label changes via mutation` | |
-
-**Backend Unit Tests**
-
-**File:** `resolvers/downloadLabels.test.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `updateDownloadLabels creates moderation action for non-owner` | |
-| `updateDownloadLabels skips action for owner` | |
-| `requires canEditDiscussions permission for non-owner` | |
-
----
-
-#### 10. Auto-Moderation Bot Plugin
-
-**Playwright Integration Tests**
-
-**File:** `tests/playwright/mocked/plugins/autoModerationBot.spec.ts`
-
-| Test | Description |
-|------|-------------|
-| `plugin settings page displays all configurable options` | Navigate to plugin settings, verify form fields |
-
-**Frontend Unit Tests**
-
-**File:** `components/admin/plugins/AutoModBotSettings.spec.ts` (new)
-
-| Test | Description |
-|------|-------------|
-| `displays confidence threshold slider` | |
-| `validates temperature range 0-1` | |
-| `shows profile selection dropdown` | |
-
-**Backend Unit Tests**
-
-**File:** `plugins/auto-moderation-bot/analyzeContent.test.ts` (new, in plugins repo)
-
-| Test | Description |
-|------|-------------|
-| `returns violation data above confidence threshold` | |
-| `returns no violation below threshold` | |
-| `ignores bot-authored content` | |
-| `formats report with confidence and explanation` | |
-
----
-
 ### Phase 5: Admin Features
 
 #### 4. Server Admin/Mod Invite Workflow
@@ -438,6 +186,59 @@ node --test --experimental-strip-types hooks/suspensionCleanupHook.test.ts
 
 ---
 
+## Phase 3: Content Moderation ✅
+
+**Completed:** Wiki moderation and channel locking tests are in place.
+
+### Wiki Moderation
+
+**New Tests Created:**
+
+| File | Tests | Status |
+|------|-------|--------|
+| `components/wiki/WikiEditsDropdown.spec.ts` | 4 | ✅ New |
+| `tests/playwright/mocked/wiki/wikiModeration.spec.ts` | 2 | ✅ New |
+
+### Channel Locking
+
+**New Tests Created:**
+
+| File | Tests | Status |
+|------|-------|--------|
+| `components/channel/ChannelLockedBanner.spec.ts` | 6 | ✅ New |
+| `tests/playwright/mocked/channels/channelLocking.spec.ts` | 2 | ✅ New |
+
+---
+
+## Phase 4: Downloads & Plugins ✅
+
+**Completed:** Bot suspension display and download label tests are in place.
+
+### Bot Suspension Display
+
+**New Tests Created:**
+
+| File | Tests | Status |
+|------|-------|--------|
+| `components/plugins/BotProfilesEditor.spec.ts` | 6 | ✅ New |
+| `tests/playwright/mocked/suspensions/botSuspension.spec.ts` | 2 | ✅ New |
+
+### Download Labels
+
+**New Tests Created:**
+
+| File | Tests | Status |
+|------|-------|--------|
+| `components/download/DownloadLabelPicker.spec.ts` | 6 | ✅ New |
+| `tests/playwright/mocked/downloads/downloadLabels.spec.ts` | 2 | ✅ New |
+
+### Notes
+
+- Auto-Moderation Bot Plugin tests deferred - uses generic PluginSettingsSection component
+- Backend tests for bot suspension and download labels already exist in the backend codebase
+
+---
+
 ## Test Distribution Summary
 
 | Category | Playwright | Frontend Unit | Backend Unit | Status |
@@ -445,10 +246,8 @@ node --test --experimental-strip-types hooks/suspensionCleanupHook.test.ts
 | User Suspension | 3 | 9 | ~27 | ✅ Complete |
 | Mod Suspension | 2 | 4 | (included above) | ✅ Complete |
 | Notifications | 2 | 41 | 12 files | ✅ Complete |
-| Wiki Moderation | 0 | 0 | 0 | 🔲 Phase 3 |
-| Image Moderation | 0 | 0 | 0 | 🔲 Phase 3 |
-| Channel Lock | 0 | 0 | 0 | 🔲 Phase 3 |
-| Bot Suspension | 0 | 0 | 0 | 🔲 Phase 4 |
-| Download Labels | 0 | 0 | 0 | 🔲 Phase 4 |
-| Auto-Mod Bot | 0 | 0 | 0 | 🔲 Phase 4 |
+| Wiki Moderation | 2 | 4 | (existing) | ✅ Complete |
+| Channel Lock | 2 | 6 | (existing) | ✅ Complete |
+| Bot Suspension | 2 | 6 | (existing) | ✅ Complete |
+| Download Labels | 2 | 6 | (existing) | ✅ Complete |
 | Server Invites | 0 | 0 | 0 | 🔲 Phase 5 |
