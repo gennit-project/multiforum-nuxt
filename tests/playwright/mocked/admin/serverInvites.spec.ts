@@ -55,6 +55,16 @@ const getBaseMocks = (username: string) => ({
       ],
     },
   }),
+  getChannelDownloadCount: () => ({
+    data: {
+      channels: [
+        {
+          uniqueName: 'cats',
+          DiscussionChannelsAggregate: { count: 1 },
+        },
+      ],
+    },
+  }),
 });
 
 test.describe('Server admin/mod invites', () => {
