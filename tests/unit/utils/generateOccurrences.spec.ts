@@ -50,10 +50,10 @@ describe('generateOccurrences', () => {
     });
 
     expect(result).toHaveLength(3);
-    expect(result[0].startTime).toBe(baseStartTime);
+    expect(result[0]!.startTime).toBe(baseStartTime);
     // Check the dates are correct (1 day apart)
-    expect(result[1].startTime).toContain('2026-04-02');
-    expect(result[2].startTime).toContain('2026-04-03');
+    expect(result[1]!.startTime).toContain('2026-04-02');
+    expect(result[2]!.startTime).toContain('2026-04-03');
   });
 
   it('generates daily occurrences with interval', () => {
@@ -71,10 +71,10 @@ describe('generateOccurrences', () => {
     });
 
     expect(result).toHaveLength(3);
-    expect(result[0].startTime).toBe(baseStartTime);
+    expect(result[0]!.startTime).toBe(baseStartTime);
     // Check the dates are correct (2 days apart)
-    expect(result[1].startTime).toContain('2026-04-03');
-    expect(result[2].startTime).toContain('2026-04-05');
+    expect(result[1]!.startTime).toContain('2026-04-03');
+    expect(result[2]!.startTime).toContain('2026-04-05');
   });
 
   it('generates weekly occurrences', () => {
@@ -92,10 +92,10 @@ describe('generateOccurrences', () => {
     });
 
     expect(result).toHaveLength(3);
-    expect(result[0].startTime).toBe(baseStartTime);
+    expect(result[0]!.startTime).toBe(baseStartTime);
     // Check the dates are correct (7 days apart)
-    expect(result[1].startTime).toContain('2026-04-08');
-    expect(result[2].startTime).toContain('2026-04-15');
+    expect(result[1]!.startTime).toContain('2026-04-08');
+    expect(result[2]!.startTime).toContain('2026-04-15');
   });
 
   it('generates weekly occurrences on specific days of week', () => {
@@ -117,13 +117,13 @@ describe('generateOccurrences', () => {
 
     expect(result).toHaveLength(4);
     // First occurrence is the start date (Wednesday)
-    expect(result[0].startTime).toBe(baseStartTime);
+    expect(result[0]!.startTime).toBe(baseStartTime);
     // Next is Monday April 6
-    expect(result[1].startTime).toContain('2026-04-06');
+    expect(result[1]!.startTime).toContain('2026-04-06');
     // Then Wednesday April 8
-    expect(result[2].startTime).toContain('2026-04-08');
+    expect(result[2]!.startTime).toContain('2026-04-08');
     // Then Monday April 13
-    expect(result[3].startTime).toContain('2026-04-13');
+    expect(result[3]!.startTime).toContain('2026-04-13');
   });
 
   it('generates monthly occurrences', () => {
@@ -141,10 +141,10 @@ describe('generateOccurrences', () => {
     });
 
     expect(result).toHaveLength(3);
-    expect(result[0].startTime).toBe(baseStartTime);
+    expect(result[0]!.startTime).toBe(baseStartTime);
     // Check the months are correct
-    expect(result[1].startTime).toContain('2026-05-01');
-    expect(result[2].startTime).toContain('2026-06-01');
+    expect(result[1]!.startTime).toContain('2026-05-01');
+    expect(result[2]!.startTime).toContain('2026-06-01');
   });
 
   it('generates yearly occurrences', () => {
@@ -162,10 +162,10 @@ describe('generateOccurrences', () => {
     });
 
     expect(result).toHaveLength(3);
-    expect(result[0].startTime).toBe(baseStartTime);
+    expect(result[0]!.startTime).toBe(baseStartTime);
     // Check the years are correct
-    expect(result[1].startTime).toContain('2027-04-01');
-    expect(result[2].startTime).toContain('2028-04-01');
+    expect(result[1]!.startTime).toContain('2027-04-01');
+    expect(result[2]!.startTime).toContain('2028-04-01');
   });
 
   it('respects ON_DATE end condition', () => {
@@ -184,7 +184,7 @@ describe('generateOccurrences', () => {
 
     expect(result).toHaveLength(4);
     // Last occurrence should be April 4 (before end date of April 5)
-    expect(result[result.length - 1].startTime).toContain('2026-04-04');
+    expect(result[result.length - 1]!.startTime).toContain('2026-04-04');
   });
 
   it('respects maxOccurrences parameter', () => {
@@ -219,8 +219,8 @@ describe('generateOccurrences', () => {
       endTime: baseEndTime, // 20:00
     });
 
-    const start1 = new Date(result[1].startTime);
-    const end1 = new Date(result[1].endTime);
+    const start1 = new Date(result[1]!.startTime);
+    const end1 = new Date(result[1]!.endTime);
     const durationMs = end1.getTime() - start1.getTime();
     const durationHours = durationMs / (1000 * 60 * 60);
 
