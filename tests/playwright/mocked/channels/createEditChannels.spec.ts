@@ -265,6 +265,13 @@ test('creates and edits a channel', async ({
   });
 
   try {
+    // Pre-load the [forumId] layout page so Vite has the route modules cached
+    // before the post-create router.push navigation runs. Without this warmup,
+    // Vite's cold-start "Outdated Optimize Dep" 504 errors abort the client-side
+    // navigation when this test (the first alphabetically) triggers a dynamic
+    // import of pages/forums/[forumId].vue for the first time.
+    await page.goto(`/forums/${TEST_CHANNEL}/discussions`);
+
     await page.goto('/forums/create');
     await expect(
       page.getByText("You don't have permission to see this page")
