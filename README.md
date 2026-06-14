@@ -1,5 +1,7 @@
 # Multiforum
 
+[![codecov](https://codecov.io/gh/gennit-project/multiforum-nuxt/branch/main/graph/badge.svg)](https://codecov.io/gh/gennit-project/multiforum-nuxt)
+
 Multiforum is an online platform for communities to run forums with discussions, events, and shared knowledge.
 
 ## What It Includes
