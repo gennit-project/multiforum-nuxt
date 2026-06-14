@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import { useMutation } from '@vue/apollo-composable';
+import { useMutation, useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
 import { DateTime } from 'luxon';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import CreateEditEventFields from '@/components/event/form/CreateEditEventFields.vue';
 import { CREATE_EVENT_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/event/mutations';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { getTimePieces } from '@/utils';
 import getDefaultEventFormValues from '@/utils/defaultEventFormValues';
 import type { CreateEditEventFormValues } from '@/types/Event';
@@ -76,6 +77,38 @@ const createEventLoading = ref(false);
 const submitError = ref<string | null>(null);
 const submitAttempted = ref(false);
 
+const { result: channelResult } = useQuery(
+  GET_CHANNEL,
+  computed(() => ({
+    uniqueName: channelId.value,
+    now: DateTime.local().startOf('hour').toISO(),
+  })),
+  {
+    fetchPolicy: 'cache-first',
+    enabled: computed(() => !!channelId.value),
+  }
+);
+
+const channelEventsEnabled = computed(() => {
+  if (!channelId.value) {
+    return true;
+  }
+
+  return channelResult.value?.channels?.[0]?.eventsEnabled !== false;
+});
+
+const channelPreferenceError = computed(() => {
+  if (channelEventsEnabled.value) {
+    return null;
+  }
+
+  return 'Cannot create an event because events are not enabled for this forum.';
+});
+
+const formSubmitError = computed(() => {
+  return submitError.value ?? channelPreferenceError.value ?? undefined;
+});
+
 const {
   issueNumber: suspensionIssueNumber,
   suspendedUntil: suspensionUntil,
@@ -121,9 +154,12 @@ onDone((response) => {
 });
 
 function submit() {
-  createEventLoading.value = true;
   submitAttempted.value = true;
   submitError.value = null;
+  if (channelPreferenceError.value) {
+    submitError.value = channelPreferenceError.value;
+    return;
+  }
   if (!eventCreateInput.value?.title) {
     console.error('Title is required');
     return;
@@ -137,6 +173,7 @@ function submit() {
     return;
   }
 
+  createEventLoading.value = true;
   createEvent({
     input: [
       {
@@ -160,7 +197,7 @@ function updateFormValues(data: CreateEditEventFormValues) {
         :edit-mode="false"
         :form-values="formValues"
         :create-event-loading="createEventLoading"
-        :submit-error="submitError ?? undefined"
+        :submit-error="formSubmitError"
         :suspension-issue-number="
           showSuspensionNotice ? suspensionIssueNumber ?? undefined : undefined
         "
