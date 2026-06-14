@@ -47,10 +47,8 @@ vi.mock('highlight.js', () => ({
   },
 }));
 
-vi.mock('dompurify', () => ({
-  default: {
-    sanitize: vi.fn((content) => content),
-  },
+vi.mock('sanitize-html', () => ({
+  default: vi.fn((content) => content),
 }));
 
 // Mock the MarkdownRenderer component - this needs to reference the factory function above

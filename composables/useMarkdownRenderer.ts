@@ -2,7 +2,7 @@ import MarkdownIt from 'markdown-it';
 import type Token from 'markdown-it/lib/token.mjs';
 import type Renderer from 'markdown-it/lib/renderer.mjs';
 import hljs from 'highlight.js';
-import DOMPurify from 'isomorphic-dompurify';
+import sanitizeHtml from 'sanitize-html';
 import { generateHeadingId } from '@/utils/markdown';
 import { config } from '@/config';
 
@@ -193,10 +193,37 @@ export function useMarkdownRenderer() {
     processedHTML = processedHTML.replace(/<\/table>/gi, '</table></div>');
 
     // Sanitize HTML to prevent XSS attacks while preserving safe markup
-    let sanitizedHTML = DOMPurify.sanitize(processedHTML, {
-      ADD_ATTR: ['target', 'rel', 'data-external'],
-      ADD_TAGS: ['iframe'],
-      ALLOW_DATA_ATTR: false,
+    let sanitizedHTML = sanitizeHtml(processedHTML, {
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+        'img',
+        'iframe',
+        'span',
+        'div',
+        'pre',
+        'code',
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+        'svg',
+        'path',
+        'polyline',
+        'line',
+      ]),
+      allowedAttributes: {
+        ...sanitizeHtml.defaults.allowedAttributes,
+        '*': ['class', 'id'],
+        a: ['href', 'target', 'rel', 'data-external'],
+        img: ['src', 'alt', 'title', 'width', 'height'],
+        iframe: ['src', 'width', 'height', 'frameborder', 'allowfullscreen'],
+        svg: ['xmlns', 'width', 'height', 'viewBox', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin'],
+        path: ['d'],
+        polyline: ['points'],
+        line: ['x1', 'y1', 'x2', 'y2'],
+      },
+      allowedSchemes: ['http', 'https', 'mailto'],
     });
 
     if (options.allowImages === false) {
