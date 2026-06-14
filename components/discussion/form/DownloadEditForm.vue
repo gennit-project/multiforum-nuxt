@@ -27,6 +27,17 @@ import DownloadLabelPicker from '@/components/download/DownloadLabelPicker.vue';
 const MAX_DOWNLOAD_FILE_SIZE_MB = 50;
 const MAX_DOWNLOAD_FILE_SIZE_BYTES = MAX_DOWNLOAD_FILE_SIZE_MB * 1024 * 1024;
 
+type DownloadableFileSupportFields = {
+  attributionOverride?: string | null;
+  supportPatreonUrl?: string | null;
+  supportBuyMeACoffeeUrl?: string | null;
+  supportKoFiUrl?: string | null;
+  supportPayPalMeUrl?: string | null;
+};
+
+type DownloadableFileWithSupport = DownloadableFile &
+  DownloadableFileSupportFields;
+
 const props = defineProps({
   discussion: {
     type: Object as PropType<Discussion>,
@@ -53,17 +64,23 @@ const emit = defineEmits(['closeEditor', 'updateFormValues']);
 
 const downloadableFiles = computed(() => {
   if (!props.discussion?.DownloadableFiles) return [];
-  return props.discussion.DownloadableFiles.map((file: DownloadableFile) => {
+  return props.discussion.DownloadableFiles.map((file) => {
+    const supportFile = file as DownloadableFileWithSupport;
     return {
-      id: file.id || '',
-      fileName: file.fileName || '',
-      url: file.url || '',
-      kind: file.kind || 'OTHER',
-      size: file.size || 0,
-      license: file.license?.id || '',
-      priceModel: file.priceModel || 'FREE',
-      priceCents: file.priceCents || 0,
-      priceCurrency: file.priceCurrency || 'USD',
+      id: supportFile.id || '',
+      fileName: supportFile.fileName || '',
+      url: supportFile.url || '',
+      kind: supportFile.kind || 'OTHER',
+      size: supportFile.size || 0,
+      license: supportFile.license?.id || '',
+      priceModel: supportFile.priceModel || 'FREE',
+      priceCents: supportFile.priceCents || 0,
+      priceCurrency: supportFile.priceCurrency || 'USD',
+      attributionOverride: supportFile.attributionOverride || '',
+      supportPatreonUrl: supportFile.supportPatreonUrl || '',
+      supportBuyMeACoffeeUrl: supportFile.supportBuyMeACoffeeUrl || '',
+      supportKoFiUrl: supportFile.supportKoFiUrl || '',
+      supportPayPalMeUrl: supportFile.supportPayPalMeUrl || '',
     };
   });
 });
@@ -79,7 +96,47 @@ type DownloadFormFile = {
   priceModel: string;
   priceCents: number;
   priceCurrency: string;
+  attributionOverride?: string | null;
+  supportPatreonUrl?: string | null;
+  supportBuyMeACoffeeUrl?: string | null;
+  supportKoFiUrl?: string | null;
+  supportPayPalMeUrl?: string | null;
 };
+
+type DownloadSupportLinkField = {
+  key: keyof Pick<
+    DownloadFormFile,
+    | 'supportPatreonUrl'
+    | 'supportBuyMeACoffeeUrl'
+    | 'supportKoFiUrl'
+    | 'supportPayPalMeUrl'
+  >;
+  label: string;
+  placeholder: string;
+};
+
+const supportLinkFields: DownloadSupportLinkField[] = [
+  {
+    key: 'supportPatreonUrl',
+    label: 'Patreon URL',
+    placeholder: 'https://patreon.com/yourname',
+  },
+  {
+    key: 'supportBuyMeACoffeeUrl',
+    label: 'Buy Me a Coffee URL',
+    placeholder: 'https://buymeacoffee.com/yourname',
+  },
+  {
+    key: 'supportKoFiUrl',
+    label: 'Ko-fi URL',
+    placeholder: 'https://ko-fi.com/yourname',
+  },
+  {
+    key: 'supportPayPalMeUrl',
+    label: 'PayPal.me URL',
+    placeholder: 'https://paypal.me/yourname',
+  },
+];
 
 const formValues = ref({
   downloadableFiles: [] as DownloadFormFile[],
@@ -329,6 +386,11 @@ const uploadFile = async (file: File): Promise<boolean> => {
       priceModel: createdFile.priceModel || 'FREE',
       priceCents: createdFile.priceCents || 0,
       priceCurrency: createdFile.priceCurrency || 'USD',
+      attributionOverride: '',
+      supportPatreonUrl: '',
+      supportBuyMeACoffeeUrl: '',
+      supportKoFiUrl: '',
+      supportPayPalMeUrl: '',
     });
 
     // Auto-save after successful file upload
@@ -401,6 +463,25 @@ const removeFile = (index: number) => {
 const updateLicense = (fileIndex: number, licenseId: string) => {
   if (formValues.value.downloadableFiles[fileIndex]) {
     formValues.value.downloadableFiles[fileIndex].license = licenseId;
+    handleSave();
+  }
+};
+
+const updateFileSupportField = (
+  fileIndex: number,
+  field: keyof Pick<
+    DownloadFormFile,
+    | 'attributionOverride'
+    | 'supportPatreonUrl'
+    | 'supportBuyMeACoffeeUrl'
+    | 'supportKoFiUrl'
+    | 'supportPayPalMeUrl'
+  >,
+  value: string
+) => {
+  if (formValues.value.downloadableFiles[fileIndex]) {
+    formValues.value.downloadableFiles[fileIndex][field] = value;
+    handleSave();
   }
 };
 
@@ -623,6 +704,62 @@ function handleSave() {
                         {{ license.name }}
                       </option>
                     </select>
+                  </template>
+                </FormRow>
+
+                <FormRow section-title="Attribution and support links">
+                  <template #content>
+                    <div class="space-y-3">
+                      <label class="block">
+                        <span
+                          class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                          Custom attribution
+                        </span>
+                        <textarea
+                          :value="file.attributionOverride || ''"
+                          rows="2"
+                          class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          placeholder="Optional text shown after someone downloads this file"
+                          @input="
+                            updateFileSupportField(
+                              index,
+                              'attributionOverride',
+                              ($event.target as HTMLTextAreaElement).value
+                            )
+                          "
+                        />
+                      </label>
+
+                      <div class="grid gap-3 sm:grid-cols-2">
+                        <label
+                          v-for="supportField in supportLinkFields"
+                          :key="supportField.key"
+                          class="block"
+                        >
+                          <span
+                            class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                          >
+                            {{ supportField.label }}
+                          </span>
+                          <input
+                            :value="
+                              file[supportField.key] || ''
+                            "
+                            type="url"
+                            class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                            :placeholder="supportField.placeholder"
+                            @input="
+                              updateFileSupportField(
+                                index,
+                                supportField.key,
+                                ($event.target as HTMLInputElement).value
+                              )
+                            "
+                          >
+                        </label>
+                      </div>
+                    </div>
                   </template>
                 </FormRow>
               </div>

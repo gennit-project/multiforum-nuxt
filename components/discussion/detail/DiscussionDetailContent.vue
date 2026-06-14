@@ -223,7 +223,13 @@ const answers = computed(() => {
 });
 
 const isArchived = computed(() => {
-  return activeDiscussionChannel.value?.archived;
+  // Check both sources for archived state - the comment section query and the discussion query
+  // This ensures the banner shows immediately when navigating from the list
+  return (
+    activeDiscussionChannel.value?.archived ||
+    formDiscussionChannel.value?.archived ||
+    false
+  );
 });
 
 const locked = computed(() => {

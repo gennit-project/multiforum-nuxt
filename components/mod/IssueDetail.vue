@@ -26,6 +26,7 @@ import IssueLockDialog from '@/components/mod/IssueLockDialog.vue';
 import IssueCommentForm from '@/components/mod/IssueCommentForm.vue';
 import IssueBodyEditor from '@/components/mod/IssueBodyEditor.vue';
 import IssueRelatedContent from '@/components/mod/IssueRelatedContent.vue';
+import IssueRelatedChannel from '@/components/mod/IssueRelatedChannel.vue';
 import { modProfileNameVar, usernameVar } from '@/cache';
 import { useRoute, useRouter } from 'nuxt/app';
 import { config } from '@/config';
@@ -47,6 +48,7 @@ import {
 import NotificationComponent from '@/components/NotificationComponent.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
+import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
 
@@ -153,6 +155,9 @@ const issueChannelUniqueName = computed(
 const relatedEventId = computed(() => activeIssue.value?.relatedEventId || '');
 const relatedCommentId = computed(
   () => activeIssue.value?.relatedCommentId || ''
+);
+const relatedChannelUniqueName = computed(
+  () => (activeIssue.value as any)?.relatedChannelUniqueName || ''
 );
 const isIssueSubscribed = computed(() => {
   if (!usernameVar.value) return false;
@@ -427,7 +432,9 @@ const hasRelatedContent = computed(() => {
   return (
     !!activeIssue.value?.relatedDiscussionId ||
     !!activeIssue.value?.relatedEventId ||
-    !!activeIssue.value?.relatedCommentId
+    !!activeIssue.value?.relatedCommentId ||
+    !!activeIssue.value?.relatedWikiPageId ||
+    !!activeIssue.value?.relatedWikiRevisionId
   );
 });
 
@@ -458,6 +465,15 @@ const derivedOriginalPoster = computed(() => {
   }
 
   return { username: '', modProfileName: '' };
+});
+
+// Check if the original author is a bot
+const isAuthorBot = computed(() => {
+  const commentAuthor = relatedComment.value?.CommentAuthor;
+  if (commentAuthor && commentAuthor.__typename === 'User') {
+    return (commentAuthor as any).isBot === true;
+  }
+  return false;
 });
 
 const resolvedOriginalAuthorUsername = computed(() => {
@@ -722,6 +738,17 @@ const handleDeleteComment = async (commentId: string) => {
 const handleLockReasonUpdate = (value: string) => {
   lockReasonInput.value = value;
 };
+
+// Handle ?action=unsubscribe query param for one-click unsubscribe from notifications
+const issueIdRef = computed(() => activeIssue.value?.id || null);
+useAutoUnsubscribe({
+  entityId: issueIdRef,
+  unsubscribeFn: async (id: string) => {
+    await unsubscribeFromIssue({ issueId: id });
+  },
+  entityType: 'issue',
+  isSubscribed: isIssueSubscribed,
+});
 </script>
 
 <template>
@@ -744,6 +771,11 @@ const handleLockReasonUpdate = (value: string) => {
       :locked-at="activeIssue?.lockedAt"
     />
 
+    <!-- Related Channel (for server-scoped channel reports) -->
+    <div v-if="relatedChannelUniqueName" class="px-4 pt-2">
+      <IssueRelatedChannel :related-channel-unique-name="relatedChannelUniqueName" />
+    </div>
+
     <div v-if="activeIssue" class="mt-2 flex flex-col gap-2 px-4">
       <!-- Related Content Section -->
       <IssueRelatedContent
@@ -752,6 +784,10 @@ const handleLockReasonUpdate = (value: string) => {
         :report-count="reportCount"
         :report-count-label="reportCountLabel"
         :channel-id="channelId"
+        :is-author-mod="authorType === 'mod'"
+        :suspend-mod-disabled="isSuspendedMod || !issueActionVisibility.modActionsEnabled"
+        @suspended-mod-successfully="resetActivityFeed"
+        @unsuspended-mod-successfully="resetActivityFeed"
       >
         <template #issue-body>
           <IssueBodyEditor
@@ -903,6 +939,7 @@ const handleLockReasonUpdate = (value: string) => {
             :can-edit-discussions="modPermissions.canEditDiscussions"
             :can-edit-events="modPermissions.canEditEvents"
             :report-count="reportCount ?? undefined"
+            :is-author-bot="isAuthorBot"
             @archived-successfully="resetActivityFeed"
             @unarchived-successfully="resetActivityFeed"
             @suspended-user-successfully="resetActivityFeed"

@@ -49,6 +49,9 @@ export const GET_USER = gql`
       AlbumsAggregate {
         count
       }
+      AuthoredWikiPageVersionsAggregate {
+        count
+      }
       AdminOfChannelsAggregate {
         count
       }
@@ -317,6 +320,34 @@ export const GET_USER_EVENTS = gql`
   }
 `;
 
+export const GET_USER_WIKI_EDITS = gql`
+  query getUserWikiEdits(
+    $where: WikiPageWhere
+    $versionWhere: TextVersionWhere
+  ) {
+    wikiPages(where: $where, options: { sort: [{ updatedAt: DESC }] }) {
+      id
+      title
+      slug
+      channelUniqueName
+      PastVersions(
+        where: $versionWhere
+        options: { sort: [{ createdAt: DESC }] }
+      ) {
+        id
+        body
+        editReason
+        createdAt
+        Author {
+          username
+          displayName
+          profilePicURL
+        }
+      }
+    }
+  }
+`;
+
 export const DOES_USER_EXIST = gql`
   query doesUserExist($username: String!) {
     users(where: { username: $username }) {
@@ -454,6 +485,22 @@ export const GET_USER_CONTRIBUTIONS = gql`
             id
             channelUniqueName
             eventId
+          }
+        }
+        WikiEdits {
+          id
+          body
+          editReason
+          createdAt
+          Author {
+            username
+            profilePicURL
+          }
+          WikiPage {
+            id
+            title
+            slug
+            channelUniqueName
           }
         }
       }

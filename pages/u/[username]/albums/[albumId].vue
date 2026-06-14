@@ -1,10 +1,12 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { useRoute, useHead } from 'nuxt/app';
+import { useRoute, useHead, useRouter } from 'nuxt/app';
 import { GET_ALBUM_DETAILS } from '@/graphQLData/image/queries';
 import type { Album, Image } from '@/__generated__/graphql';
 import AlbumThumbnailGrid from '@/components/album/AlbumThumbnailGrid.vue';
+import LinkIcon from '@/components/icons/LinkIcon.vue';
+import Notification from '@/components/NotificationComponent.vue';
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
@@ -12,6 +14,29 @@ definePageMeta({
 });
 
 const route = useRoute();
+const router = useRouter();
+
+// Share functionality
+const showCopiedLinkNotification = ref(false);
+
+const copyAlbumLink = async () => {
+  try {
+    let basePath = '';
+    if (import.meta.client) {
+      basePath = window.location.origin;
+    } else {
+      basePath = process.env.BASE_URL || '';
+    }
+    const permalink = `${basePath}${router.resolve(route).href}`;
+    await navigator.clipboard.writeText(permalink);
+    showCopiedLinkNotification.value = true;
+    setTimeout(() => {
+      showCopiedLinkNotification.value = false;
+    }, 2000);
+  } catch (e) {
+    console.error('Failed to copy link:', e);
+  }
+};
 
 const username = computed(() => {
   return typeof route.params.username === 'string' ? route.params.username : '';
@@ -140,6 +165,11 @@ useHead({
 
       <!-- Main content -->
       <div v-else class="space-y-6">
+        <!-- Copied link notification -->
+        <Notification
+          :show="showCopiedLinkNotification"
+          title="Link copied!"
+        />
         <h1 class="text-2xl font-bold dark:text-white">
           Album by {{ owner?.displayName || owner?.username || username }}
           <span v-if="owner?.displayName && owner?.username" class="text-gray-500 dark:text-gray-400">
@@ -155,6 +185,16 @@ useHead({
           >
             &larr; Back to {{ username }}'s Images
           </NuxtLink>
+
+          <button
+            type="button"
+            class="flex items-center gap-2 rounded border border-gray-300 bg-white px-4 py-2 text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            title="Copy link to clipboard"
+            @click="copyAlbumLink"
+          >
+            <LinkIcon class="h-5 w-5" />
+            Share
+          </button>
         </div>
 
         <!-- Related discussion -->

@@ -25,7 +25,7 @@ export const GET_IMAGE_DETAILS = gql`
           username
           displayName
         }
-        Images {
+        Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
           id
           url
           alt
@@ -61,7 +61,7 @@ export const GET_ALBUM_DETAILS = gql`
         username
         displayName
       }
-      Images {
+      Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
         id
         url
         alt
@@ -98,7 +98,10 @@ export const GET_USER_ALBUMS = gql`
         username
         displayName
       }
-      Images(options: { limit: 4, sort: { createdAt: DESC } }) {
+      Images(
+        where: { archived_NOT: true, permanentlyRemoved_NOT: true }
+        options: { limit: 4, sort: { createdAt: DESC } }
+      ) {
         id
         url
         alt
@@ -108,7 +111,7 @@ export const GET_USER_ALBUMS = gql`
           username
         }
       }
-      ImagesAggregate {
+      ImagesAggregate(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
         count
       }
       Discussions(options: { sort: { createdAt: DESC } }) {

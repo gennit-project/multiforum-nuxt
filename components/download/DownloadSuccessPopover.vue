@@ -4,7 +4,6 @@ import type { PropType } from 'vue';
 import type { Discussion } from '@/__generated__/graphql';
 import CloseIcon from '@/components/icons/CloseIcon.vue';
 import DownloadFileIcon from '@/components/icons/DownloadFileIcon.vue';
-import TwitterIcon from '@/components/icons/TwitterIcon.vue';
 import FacebookIcon from '@/components/icons/FacebookIcon.vue';
 import RedditIcon from '@/components/icons/RedditIcon.vue';
 // import DiscordIcon from "@/components/icons/DiscordIcon.vue"; // Unused for now
@@ -13,6 +12,14 @@ import PinterestIcon from '@/components/icons/PinterestIcon.vue';
 import TumblrIcon from '@/components/icons/TumblrIcon.vue';
 import CopyIcon from '@/components/icons/CopyIcon.vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
+
+type DownloadableFileSupportFields = {
+  attributionOverride?: string | null;
+  supportPatreonUrl?: string | null;
+  supportBuyMeACoffeeUrl?: string | null;
+  supportKoFiUrl?: string | null;
+  supportPayPalMeUrl?: string | null;
+};
 
 const props = defineProps({
   discussion: {
@@ -36,11 +43,17 @@ const discordCopied = ref(false);
 
 // Get the primary downloadable file for display
 const primaryFile = computed(() => {
-  return props.discussion?.DownloadableFiles?.[0] || null;
+  return (props.discussion?.DownloadableFiles?.[0] ||
+    null) as (Discussion['DownloadableFiles'][number] &
+    DownloadableFileSupportFields) | null;
 });
 
 // Generate attribution text
 const attributionText = computed(() => {
+  if (primaryFile.value?.attributionOverride) {
+    return primaryFile.value.attributionOverride;
+  }
+
   const title = props.discussion.title || 'Untitled';
   const username = props.discussion.Author?.username || 'Unknown';
   const displayName = props.discussion.Author?.displayName;
@@ -51,6 +64,20 @@ const attributionText = computed(() => {
   const url = typeof window !== 'undefined' ? window.location.href : '';
   return `"${title}" by ${author} - ${url}`;
 });
+
+const supportLinks = computed(() =>
+  [
+    { label: 'Patreon', url: primaryFile.value?.supportPatreonUrl },
+    {
+      label: 'Buy Me a Coffee',
+      url: primaryFile.value?.supportBuyMeACoffeeUrl,
+    },
+    { label: 'Ko-fi', url: primaryFile.value?.supportKoFiUrl },
+    { label: 'PayPal.me', url: primaryFile.value?.supportPayPalMeUrl },
+  ].filter((link): link is { label: string; url: string } =>
+    Boolean(link.url)
+  )
+);
 
 // Generate share URL (current page)
 const shareUrl = computed(() => {
@@ -67,18 +94,6 @@ const copyAttribution = async () => {
   } catch (err) {
     console.error('Failed to copy attribution:', err);
   }
-};
-
-const shareToTwitter = () => {
-  const text = encodeURIComponent(
-    `Check out this download: ${props.discussion.title}`
-  );
-  const url = encodeURIComponent(shareUrl.value);
-  window.open(
-    `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
-    '_blank',
-    'width=550,height=420'
-  );
 };
 
 const shareToFacebook = () => {
@@ -218,14 +233,6 @@ const copyLink = async () => {
               <div class="flex flex-wrap gap-2">
                 <button
                   class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
-                  @click="shareToTwitter"
-                >
-                  <TwitterIcon />
-                  Twitter
-                </button>
-
-                <button
-                  class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
                   @click="shareToFacebook"
                 >
                   <FacebookIcon />
@@ -304,6 +311,24 @@ const copyLink = async () => {
                   <CheckIcon v-else />
                   {{ attributionCopied ? 'Copied!' : 'Copy' }}
                 </button>
+              </div>
+            </div>
+
+            <div v-if="supportLinks.length > 0">
+              <p class="mb-2 text-sm text-gray-600 dark:text-gray-300">
+                Support the uploader:
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <a
+                  v-for="link in supportLinks"
+                  :key="link.label"
+                  :href="link.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
+                >
+                  {{ link.label }}
+                </a>
               </div>
             </div>
           </div>

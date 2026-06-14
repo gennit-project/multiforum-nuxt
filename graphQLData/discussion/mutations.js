@@ -86,6 +86,29 @@ export const CREATE_DOWNLOADABLE_FILE = gql`
   }
 `;
 
+export const TRACK_DOWNLOAD = gql`
+  mutation trackDownload($downloadableFileId: ID!, $discussionId: ID!) {
+    trackDownload(
+      downloadableFileId: $downloadableFileId
+      discussionId: $discussionId
+    )
+  }
+`;
+
+export const UPDATE_DOWNLOADABLE_FILE_SUPPORT_SETTINGS = gql`
+  mutation updateDownloadableFileSupportSettings(
+    $downloadableFileId: ID!
+    $discussionId: ID!
+    $input: DownloadSupportSettingsInput!
+  ) {
+    updateDownloadableFileSupportSettings(
+      downloadableFileId: $downloadableFileId
+      discussionId: $discussionId
+      input: $input
+    )
+  }
+`;
+
 export const ADD_EMOJI_TO_DISCUSSION_CHANNEL = gql`
   mutation addEmojiToDiscussionChannel(
     $discussionChannelId: ID!
@@ -179,7 +202,7 @@ export const UPDATE_DISCUSSION = gql`
         Album {
           id
           imageOrder
-          Images {
+          Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
             id
             url
             caption
@@ -262,6 +285,9 @@ export const UPVOTE_DISCUSSION_CHANNEL = gql`
       UpvotedByUsersAggregate {
         count
       }
+      SuperUpvotedByUsers {
+        username
+      }
     }
   }
 `;
@@ -276,6 +302,9 @@ export const UNDO_UPVOTE_DISCUSSION_CHANNEL = gql`
       }
       UpvotedByUsersAggregate {
         count
+      }
+      SuperUpvotedByUsers {
+        username
       }
     }
   }
@@ -463,10 +492,32 @@ export const UPDATE_IMAGE = gql`
   }
 `;
 
-export const DELETE_TEXT_VERSION = gql`
-  mutation deleteTextVersion($id: ID!) {
-    deleteTextVersions(where: { id: $id }) {
-      nodesDeleted
+export const DELETE_DISCUSSION_BODY_REVISION = gql`
+  mutation deleteDiscussionBodyRevision($textVersionId: ID!) {
+    deleteDiscussionBodyRevision(textVersionId: $textVersionId) {
+      id
+      body
+      editReason
+      createdAt
+      updatedAt
+      Author {
+        username
+      }
+    }
+  }
+`;
+
+export const DELETE_WIKI_REVISION = gql`
+  mutation deleteWikiRevision($textVersionId: ID!) {
+    deleteWikiRevision(textVersionId: $textVersionId) {
+      id
+      body
+      editReason
+      createdAt
+      updatedAt
+      Author {
+        username
+      }
     }
   }
 `;
@@ -542,6 +593,33 @@ export const UPDATE_DISCUSSION_CHANNEL_LABELS = gql`
             key
             displayName
           }
+        }
+      }
+    }
+  }
+`;
+
+export const UPDATE_DOWNLOAD_LABELS = gql`
+  mutation updateDownloadLabels(
+    $discussionId: ID!
+    $channelUniqueName: String!
+    $labelOptionIds: [ID!]!
+  ) {
+    updateDownloadLabels(
+      discussionId: $discussionId
+      channelUniqueName: $channelUniqueName
+      labelOptionIds: $labelOptionIds
+    ) {
+      id
+      LabelOptions {
+        id
+        value
+        displayName
+        order
+        group {
+          id
+          key
+          displayName
         }
       }
     }

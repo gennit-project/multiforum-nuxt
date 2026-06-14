@@ -1,11 +1,19 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import type { User } from '@/__generated__/graphql';
 import ChannelSidebar from '@/components/channel/ChannelSidebar.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import ReportChannelModal from '@/components/mod/ReportChannelModal.vue';
+import ReportChannelImageModal from '@/components/mod/ReportChannelImageModal.vue';
+import LockChannelDialog from '@/components/mod/LockChannelDialog.vue';
+import UnlockChannelDialog from '@/components/mod/UnlockChannelDialog.vue';
 import { useRoute } from 'nuxt/app';
+import { config } from '@/config';
+import { usernameVar, modProfileNameVar } from '@/cache';
+import { checkPermission } from '@/utils/permissionUtils';
 
 const route = useRoute();
 const channelId = computed(() => {
@@ -38,6 +46,106 @@ const ownerList = computed(() =>
 );
 
 const handleRefetchChannelData = () => {
+  refetchChannel();
+};
+
+// Server config for permissions
+const { result: serverConfigResult } = useQuery(
+  GET_SERVER_CONFIG,
+  { serverName: config.serverName },
+  { fetchPolicy: 'cache-first' }
+);
+
+const serverConfig = computed(() => {
+  return serverConfigResult.value?.serverConfigs?.[0] ?? null;
+});
+
+// Check if current user has canReport permission at server level
+const canReportChannel = computed(() => {
+  if (!serverConfig.value) return false;
+
+  return checkPermission({
+    permissionData: {
+      Admins: serverConfig.value.Admins || [],
+      Moderators: serverConfig.value.Moderators || [],
+      SuspendedMods: [],
+      SuspendedUsers: [],
+    },
+    standardModRole: serverConfig.value.DefaultModRole,
+    elevatedModRole: serverConfig.value.DefaultElevatedModRole,
+    username: usernameVar.value || '',
+    modProfileName: modProfileNameVar.value || '',
+    action: 'canReport',
+  });
+});
+
+// Check if current user has canLockChannel permission at server level
+const canLockChannel = computed(() => {
+  if (!serverConfig.value) return false;
+
+  // Server admins can always lock
+  const isServerAdmin = serverConfig.value.Admins?.some(
+    (admin: { username: string }) => admin.username === usernameVar.value
+  );
+  if (isServerAdmin) return true;
+
+  return checkPermission({
+    permissionData: {
+      Admins: serverConfig.value.Admins || [],
+      Moderators: serverConfig.value.Moderators || [],
+      SuspendedMods: [],
+      SuspendedUsers: [],
+    },
+    standardModRole: serverConfig.value.DefaultModRole,
+    elevatedModRole: serverConfig.value.DefaultElevatedModRole,
+    username: usernameVar.value || '',
+    modProfileName: modProfileNameVar.value || '',
+    action: 'canLockChannel',
+  });
+});
+
+// Dialog states
+const showReportModal = ref(false);
+const showReportIconModal = ref(false);
+const showReportBannerModal = ref(false);
+const showLockDialog = ref(false);
+const showUnlockDialog = ref(false);
+
+// Channel image availability
+const hasChannelIcon = computed(() => !!channel.value?.channelIconURL);
+const hasChannelBanner = computed(() => !!channel.value?.channelBannerURL);
+
+const openReportModal = () => {
+  showReportModal.value = true;
+};
+
+const openLockDialog = () => {
+  showLockDialog.value = true;
+};
+
+const openUnlockDialog = () => {
+  showUnlockDialog.value = true;
+};
+
+const handleReported = () => {
+  showReportModal.value = false;
+};
+
+const handleIconReported = () => {
+  showReportIconModal.value = false;
+};
+
+const handleBannerReported = () => {
+  showReportBannerModal.value = false;
+};
+
+const handleLocked = () => {
+  showLockDialog.value = false;
+  refetchChannel();
+};
+
+const handleUnlocked = () => {
+  showUnlockDialog.value = false;
   refetchChannel();
 };
 </script>
@@ -76,7 +184,105 @@ const handleRefetchChannelData = () => {
           </nuxt-link>
         </template>
       </RequireAuth>
+
+      <!-- Server Moderation Actions -->
+      <ClientOnly>
+        <div v-if="canReportChannel || canLockChannel" class="mt-6">
+          <div class="flex w-full justify-between border-b border-gray-300">
+            <span
+              class="my-2 mb-2 w-full text-sm font-bold leading-6 text-gray-600 dark:text-gray-100"
+            >
+              Server Moderation
+            </span>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-3">
+            <button
+              v-if="canReportChannel"
+              class="rounded-md border border-red-300 bg-red-50 px-3 py-1.5 text-sm text-red-700 hover:bg-red-100 dark:border-red-600 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50"
+              @click="openReportModal"
+            >
+              Report Forum
+            </button>
+            <button
+              v-if="canReportChannel && hasChannelIcon"
+              class="rounded-md border border-red-300 bg-red-50 px-3 py-1.5 text-sm text-red-700 hover:bg-red-100 dark:border-red-600 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50"
+              @click="showReportIconModal = true"
+            >
+              Report Icon
+            </button>
+            <button
+              v-if="canReportChannel && hasChannelBanner"
+              class="rounded-md border border-red-300 bg-red-50 px-3 py-1.5 text-sm text-red-700 hover:bg-red-100 dark:border-red-600 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50"
+              @click="showReportBannerModal = true"
+            >
+              Report Banner
+            </button>
+            <button
+              v-if="canLockChannel && channel && !channel.locked"
+              class="rounded-md border border-yellow-300 bg-yellow-50 px-3 py-1.5 text-sm text-yellow-700 hover:bg-yellow-100 dark:border-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-300 dark:hover:bg-yellow-900/50"
+              @click="openLockDialog"
+            >
+              Lock Forum
+            </button>
+            <button
+              v-if="canLockChannel && channel && channel.locked"
+              class="rounded-md border border-blue-300 bg-blue-50 px-3 py-1.5 text-sm text-blue-700 hover:bg-blue-100 dark:border-blue-600 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
+              @click="openUnlockDialog"
+            >
+              Unlock Forum
+            </button>
+          </div>
+        </div>
+      </ClientOnly>
     </div>
+
+    <!-- Moderation Dialogs -->
+    <ReportChannelModal
+      v-if="channel"
+      :channel-unique-name="channelId"
+      :channel-display-name="channel.displayName || channelId"
+      :open="showReportModal"
+      @close="showReportModal = false"
+      @reported="handleReported"
+    />
+
+    <ReportChannelImageModal
+      v-if="channel && hasChannelIcon"
+      :channel-unique-name="channelId"
+      :channel-display-name="channel.displayName || channelId"
+      image-type="ICON"
+      :open="showReportIconModal"
+      @close="showReportIconModal = false"
+      @report-submitted-successfully="handleIconReported"
+    />
+
+    <ReportChannelImageModal
+      v-if="channel && hasChannelBanner"
+      :channel-unique-name="channelId"
+      :channel-display-name="channel.displayName || channelId"
+      image-type="BANNER"
+      :open="showReportBannerModal"
+      @close="showReportBannerModal = false"
+      @report-submitted-successfully="handleBannerReported"
+    />
+
+    <LockChannelDialog
+      v-if="channel"
+      :channel-unique-name="channelId"
+      :channel-display-name="channel.displayName || channelId"
+      :open="showLockDialog"
+      @close="showLockDialog = false"
+      @locked="handleLocked"
+    />
+
+    <UnlockChannelDialog
+      v-if="channel"
+      :channel-unique-name="channelId"
+      :channel-display-name="channel.displayName || channelId"
+      :open="showUnlockDialog"
+      @close="showUnlockDialog = false"
+      @unlocked="handleUnlocked"
+    />
   </div>
 </template>
 

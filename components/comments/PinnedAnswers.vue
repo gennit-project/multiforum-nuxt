@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import type { PropType } from 'vue';
 import type { Comment as CommentType } from '@/__generated__/graphql';
 import type { BotSuggestion } from '@/utils/botMentions';
+import type { ModSuggestion } from '@/utils/modMentions';
 import type { ApolloError } from '@apollo/client/core';
 import Comment from './Comment.vue';
 
@@ -58,6 +59,10 @@ const props = defineProps({
   },
   botSuggestions: {
     type: Array as PropType<BotSuggestion[]>,
+    default: () => [],
+  },
+  modSuggestions: {
+    type: Array as PropType<ModSuggestion[]>,
     default: () => [],
   },
   botUsernames: {
@@ -134,6 +139,7 @@ const hasAnswers = computed(() => {
           :suspension-indefinitely="suspensionIndefinitely"
           :bot-suggestions="botSuggestions"
           :bot-usernames="botUsernames"
+          :mod-suggestions="modSuggestions"
           :show-comment-buttons="true"
           :show-header="true"
           @create-comment="emit('createComment', $event)"

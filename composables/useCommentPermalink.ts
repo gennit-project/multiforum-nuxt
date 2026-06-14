@@ -3,6 +3,7 @@ import { useRoute, useRouter } from 'nuxt/app';
 import type { Comment } from '@/__generated__/graphql';
 import type { RouteLocationRaw } from 'vue-router';
 import { getFeedbackPermalinkObject } from '@/utils/routerUtils';
+import { getCommentPermalinkRoute } from '@/utils/commentPermalink';
 
 type UseCommentPermalinkParams = {
   commentData: Ref<Comment> | ComputedRef<Comment>;
@@ -115,51 +116,14 @@ export function useCommentPermalink(
       );
     }
 
-    // Default comment permalink object
-    let result: RouteLocationRaw = {};
-
-    // Permalink for comment on a discussion
-    const discussionIdInLink =
-      discussionId.value || comment.DiscussionChannel?.discussionId;
-    if (discussionIdInLink && (channelUniqueName || forumId.value)) {
-      result = {
-        name: 'forums-forumId-discussions-discussionId-comments-commentId',
-        params: {
-          discussionId: discussionIdInLink,
-          commentId: comment.id,
-          forumId: channelUniqueName || forumId.value,
-        },
-      };
-    }
-
-    // Permalink for comment on an event
-    const eventIdInLink = eventId.value || comment.Event?.id;
-    if (eventIdInLink && (channelUniqueName || forumId.value)) {
-      result = {
-        name: 'forums-forumId-events-eventId-comments-commentId',
-        params: {
-          eventId: comment.Event?.id,
-          forumId: channelUniqueName || forumId.value,
-          commentId: comment.id,
-        },
-      };
-    }
-
-    // Permalink for comment on an issue
-    const issueNumberInLink =
-      issueNumber.value || comment.Issue?.issueNumber;
-    if (issueNumberInLink && channelUniqueName) {
-      result = {
-        name: 'forums-forumId-issues-issueNumber-comments-commentId',
-        params: {
-          issueNumber: issueNumberInLink,
-          forumId: channelUniqueName,
-          commentId: comment.id,
-        },
-      };
-    }
-
-    return result;
+    return (
+      getCommentPermalinkRoute(comment, {
+        fallbackForumId: forumId.value,
+        fallbackDiscussionId: discussionId.value,
+        fallbackEventId: eventId.value,
+        fallbackIssueNumber: issueNumber.value,
+      }) || {}
+    );
   });
 
   // Compute the base path for the permalink URL

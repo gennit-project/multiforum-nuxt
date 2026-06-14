@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, watch, onMounted } from 'vue';
 import type { PropType } from 'vue';
 import UserPlus from '../icons/UserPlus.vue';
 import UserMinus from '../icons/UserMinus.vue';
@@ -21,9 +21,18 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  autoOpen: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
-defineEmits(['suspended-successfully', 'unsuspended-successfully']);
+const emit = defineEmits([
+  'suspended-successfully',
+  'unsuspended-successfully',
+  'modal-closed',
+]);
 
 const {
   result: getModSuspensionResult,
@@ -66,13 +75,44 @@ const {
 } = useSuspensionActionUI({
   isDisabled: () => props.disabled,
 });
+
+// Handle closing modal and emitting event
+const handleCloseSuspendModal = () => {
+  closeSuspendModal();
+  emit('modal-closed');
+};
+
+const handleCloseUnsuspendModal = () => {
+  closeUnsuspendModal();
+  emit('modal-closed');
+};
+
+// Auto-open modal on mount if autoOpen is true
+onMounted(() => {
+  if (props.autoOpen && !props.disabled) {
+    // Wait for suspension status query to load
+    watch(
+      () => getModSuspensionLoading.value,
+      (loading) => {
+        if (!loading) {
+          if (modIsSuspendedFromChannel.value) {
+            openUnsuspendModal();
+          } else {
+            openSuspendModal();
+          }
+        }
+      },
+      { immediate: true }
+    );
+  }
+});
 </script>
 
 <template>
   <div>
     <button
       v-if="modIsSuspendedFromChannel"
-      class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white"
+      class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white transition"
       :class="{
         'cursor-pointer bg-green-600 hover:bg-green-500': !disabled,
         'cursor-not-allowed bg-gray-500': disabled,
@@ -84,27 +124,25 @@ const {
     </button>
     <button
       v-else
-      class="font-semibold flex w-full items-start justify-center gap-2 rounded px-4 py-2 text-left text-sm text-white"
+      class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white transition"
       :class="{
         'cursor-pointer bg-red-600 hover:bg-red-500': !disabled,
         'cursor-not-allowed bg-gray-500': disabled,
       }"
       @click="openSuspendModal"
     >
-      <span class="flex shrink-0 self-start">
-        <UserMinus />
-      </span>
-      <span>Suspend Mod</span>
+      <UserMinus />
+      Suspend Mod
     </button>
     <SuspendModModal
       :title="'Suspend Mod'"
       :open="showSuspendModal"
       :issue-id="issue.id"
-      @close="closeSuspendModal"
+      @close="handleCloseSuspendModal"
       @suspended-successfully="
         () => {
           handleSuspendedSuccessfully();
-          $emit('suspended-successfully');
+          emit('suspended-successfully');
         }
       "
     />
@@ -112,11 +150,11 @@ const {
       :title="'Unsuspend Mod'"
       :open="showUnsuspendModal"
       :issue-id="issue.id"
-      @close="closeUnsuspendModal"
+      @close="handleCloseUnsuspendModal"
       @unsuspended-successfully="
         () => {
           handleUnsuspendedSuccessfully();
-          $emit('unsuspended-successfully');
+          emit('unsuspended-successfully');
         }
       "
     />

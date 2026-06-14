@@ -4,6 +4,7 @@ import { defineComponent, nextTick, ref } from 'vue';
 import DownloadSidebar from '@/components/channel/DownloadSidebar.vue';
 
 const authState = ref(false);
+const trackDownloadMock = vi.hoisted(() => vi.fn(() => Promise.resolve()));
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(() => ({
@@ -18,6 +19,9 @@ vi.mock('@vue/apollo-composable', () => ({
         },
       ],
     }),
+  })),
+  useMutation: vi.fn(() => ({
+    mutate: trackDownloadMock,
   })),
 }));
 
@@ -69,6 +73,8 @@ const discussionWithFile = {
       size: 1024,
       priceModel: 'FREE',
       priceCents: 0,
+      downloadCountTotal: 12,
+      downloadCountUnique: 4,
       license: {
         id: 'license-1',
         name: 'CC BY',
@@ -80,6 +86,7 @@ const discussionWithFile = {
 describe('DownloadSidebar', () => {
   beforeEach(() => {
     authState.value = false;
+    trackDownloadMock.mockClear();
     vi.useFakeTimers();
   });
 
@@ -107,6 +114,7 @@ describe('DownloadSidebar', () => {
     vi.runAllTimers();
 
     expect(appendSpy).not.toHaveBeenCalled();
+    expect(trackDownloadMock).not.toHaveBeenCalled();
     expect(wrapper.text()).not.toContain('Download success');
   });
 
@@ -125,7 +133,26 @@ describe('DownloadSidebar', () => {
     vi.advanceTimersByTime(500);
     await nextTick();
 
+    expect(trackDownloadMock).toHaveBeenCalledWith({
+      downloadableFileId: 'file-1',
+      discussionId: 'discussion-1',
+    });
     expect(wrapper.text()).toContain('Download success');
+  });
+
+  it('shows total and unique download counts', () => {
+    const wrapper = mount(DownloadSidebar, {
+      props: {
+        discussion: discussionWithFile as any,
+        discussionId: 'discussion-1',
+        channelUniqueName: 'test-forum',
+      },
+    });
+
+    expect(wrapper.text()).toContain('Total downloads');
+    expect(wrapper.text()).toContain('12');
+    expect(wrapper.text()).toContain('Unique downloaders');
+    expect(wrapper.text()).toContain('4');
   });
 
   it('shows the unavailable message without rendering license details when no files exist', () => {

@@ -91,10 +91,18 @@ const createdAtFormatted = computed(() => {
 });
 
 const editedAtFormatted = computed(() => {
-  if (!props.commentData.updatedAt) {
-    return '';
+  // Prefer textLastEdited (only set when text content changes, not emoji reactions)
+  // Cast to any to access textLastEdited until types are regenerated
+  const textLastEdited = (props.commentData as any).textLastEdited;
+  if (textLastEdited) {
+    return `Edited ${stableRelativeTime(textLastEdited)}`;
   }
-  return `Edited ${stableRelativeTime(props.commentData.updatedAt)}`;
+  // Fall back to updatedAt for backward compatibility with older edited comments
+  // that have revision history but no textLastEdited field yet
+  if (props.commentData.updatedAt && props.commentData.PastVersions?.length) {
+    return `Edited ${stableRelativeTime(props.commentData.updatedAt)}`;
+  }
+  return '';
 });
 
 // Check if the comment has past versions
@@ -290,8 +298,8 @@ const contextLinkObject = computed(() => {
           </span>
           <span class="mx-2">&middot;</span>
           <span>{{ createdAtFormatted }}</span>
-          <span v-if="commentData.updatedAt" class="mx-2">&middot;</span>
-          <span class="flex items-center">
+          <span v-if="editedAtFormatted" class="mx-2">&middot;</span>
+          <span v-if="editedAtFormatted" class="flex items-center">
             {{ editedAtFormatted }}
             <CommentEditsDropdown
               v-if="hasRevisionHistory"

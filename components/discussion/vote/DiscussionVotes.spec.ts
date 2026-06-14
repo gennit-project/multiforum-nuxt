@@ -17,6 +17,8 @@ vi.mock('@vue/apollo-composable', () => ({
     mutate: vi.fn(),
     error: ref(null),
     loading: ref(false),
+    onDone: vi.fn(),
+    onError: vi.fn(),
   }),
 }));
 
@@ -54,6 +56,7 @@ describe('DiscussionVotes', () => {
         stubs: {
           VoteButtons: { template: '<div />' },
           ErrorBanner: { template: '<div />' },
+          SuperUpvoteModal: { template: '<div />' },
           NewEmojiButton: {
             template:
               '<button data-testid="emoji-button" @click="$emit(\'blocked-action\')"></button>',

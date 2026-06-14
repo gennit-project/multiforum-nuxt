@@ -1,5 +1,14 @@
 #!/usr/bin/env sh
 
+# Skip all checks if only markdown files are staged
+staged_files=$(git diff --cached --name-only)
+non_md_files=$(echo "$staged_files" | grep -v '\.md$' | grep -v '^$' || true)
+
+if [ -z "$non_md_files" ]; then
+  echo "Only markdown files staged, skipping pre-commit checks."
+  exit 0
+fi
+
 # Run lint-staged first to fix and check specific files that changed
 npx lint-staged
 

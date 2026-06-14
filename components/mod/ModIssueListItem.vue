@@ -66,6 +66,16 @@ const handleSelect = () => {
 const isSelected = computed(() => {
   return props.selectedIssueNumber === props.issue?.issueNumber;
 });
+
+// Check if the related content is from a bot (based on username prefix convention)
+const isRelatedToBot = computed(() => {
+  const username = (props.issue as any)?.relatedUsername;
+  return typeof username === 'string' && username.startsWith('bot-');
+});
+
+const isRelatedToWiki = computed(() => {
+  return !!props.issue.relatedWikiPageId || !!props.issue.relatedWikiRevisionId;
+});
 </script>
 
 <template>
@@ -139,6 +149,18 @@ const isSelected = computed(() => {
           >
             <FlagIcon class="h-3 w-3" aria-hidden="true" />
             {{ reportCountLabel }}
+          </span>
+          <span
+            v-if="isRelatedToBot"
+            class="rounded-full bg-blue-200 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/70 dark:text-blue-100"
+          >
+            🤖 Bot
+          </span>
+          <span
+            v-if="isRelatedToWiki"
+            class="rounded-full bg-emerald-200 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-900/70 dark:text-emerald-100"
+          >
+            Wiki Edit
           </span>
         </span>
         <div v-else class="dark:text-gray-200">{{ issue.title }}</div>

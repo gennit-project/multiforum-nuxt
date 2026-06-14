@@ -72,7 +72,9 @@ const confirmDeleteIsOpen = ref(false);
 const confirmCancelIsOpen = ref(false);
 
 // Series-related state
-const isPartOfSeries = computed(() => Boolean(props.eventData?.EventSeries?.id));
+// Note: EventSeries is a new field that may not be in generated types yet
+const eventDataWithSeries = computed(() => props.eventData as Event & { EventSeries?: { id?: string } });
+const isPartOfSeries = computed(() => Boolean(eventDataWithSeries.value?.EventSeries?.id));
 const showCancelScopeModal = ref(false);
 const showDeleteScopeModal = ref(false);
 const {

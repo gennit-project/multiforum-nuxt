@@ -47,6 +47,9 @@ export const UPVOTE_COMMENT = gql`
       UpvotedByUsersAggregate {
         count
       }
+      SuperUpvotedByUsers {
+        username
+      }
     }
   }
 `;
@@ -61,6 +64,9 @@ export const UNDO_UPVOTE_COMMENT = gql`
       }
       UpvotedByUsersAggregate {
         count
+      }
+      SuperUpvotedByUsers {
+        username
       }
     }
   }
@@ -314,10 +320,17 @@ export const ADD_FEEDBACK_COMMENT_TO_COMMENT = gql`
   }
 `;
 
-export const DELETE_TEXT_VERSION = gql`
-  mutation deleteTextVersion($id: ID!) {
-    deleteTextVersions(where: { id: $id }) {
-      nodesDeleted
+export const DELETE_COMMENT_REVISION = gql`
+  mutation deleteCommentRevision($textVersionId: ID!) {
+    deleteCommentRevision(textVersionId: $textVersionId) {
+      id
+      body
+      editReason
+      createdAt
+      updatedAt
+      Author {
+        username
+      }
     }
   }
 `;

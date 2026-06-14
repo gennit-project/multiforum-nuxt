@@ -3,7 +3,7 @@ import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import {
   UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
-  UPDATE_DISCUSSION_CHANNEL_LABELS,
+  UPDATE_DOWNLOAD_LABELS,
 } from '@/graphQLData/discussion/mutations';
 import { computed, ref } from 'vue';
 import { useRouter, useRoute, useHead } from 'nuxt/app';
@@ -543,7 +543,7 @@ const {
   mutate: updateDiscussionChannelLabels,
   error: updateLabelsError,
   loading: updateLabelsLoading,
-} = useMutation(UPDATE_DISCUSSION_CHANNEL_LABELS, () => ({
+} = useMutation(UPDATE_DOWNLOAD_LABELS, () => ({
   variables: {
     channelUniqueName: channelId.value,
     discussionId: discussionId.value,

@@ -29,6 +29,7 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { hasBotMention, type BotSuggestion } from '@/utils/botMentions';
+import type { ModSuggestion } from '@/utils/modMentions';
 
 // Import new composables
 import { useCommentSectionNotifications } from '@/composables/useCommentSectionNotifications';
@@ -123,6 +124,10 @@ const props = defineProps({
     type: Array as PropType<string[]>,
     default: () => [],
   },
+  modSuggestions: {
+    type: Array as PropType<ModSuggestion[]>,
+    default: () => [],
+  },
 });
 
 // Emits
@@ -208,6 +213,20 @@ const commentInProcess = ref(false);
 const submitAttempted = ref(false);
 const replyFormOpenAtCommentID = ref('');
 const editFormOpenAtCommentID = ref('');
+
+// Comment search state
+const searchText = ref('');
+
+// Filter comments by search text (client-side filtering)
+const filteredComments = computed(() => {
+  if (!searchText.value.trim()) {
+    return props.comments || [];
+  }
+  const searchLower = searchText.value.toLowerCase().trim();
+  return (props.comments || []).filter((comment) =>
+    comment?.text?.toLowerCase().includes(searchLower)
+  );
+});
 const locked = ref(props.locked);
 const showModProfileModal = ref(false);
 
@@ -534,6 +553,49 @@ const replyHasBotMention = computed(() => {
           :show-top-options="false"
         />
       </div>
+      <!-- Comment search input -->
+      <div
+        v-if="aggregateCommentCount > 0"
+        class="mt-2 flex items-center"
+      >
+        <div class="relative w-full max-w-xs">
+          <input
+            v-model="searchText"
+            type="text"
+            placeholder="Search comments..."
+            class="w-full rounded-md border border-gray-300 py-1.5 pl-8 pr-8 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+          >
+          <svg
+            class="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          <button
+            v-if="searchText"
+            type="button"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            @click="searchText = ''"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <span
+          v-if="searchText && filteredComments.length !== (comments?.length || 0)"
+          class="ml-2 text-sm text-gray-500 dark:text-gray-400"
+        >
+          {{ filteredComments.length }} of {{ comments?.length || 0 }} loaded
+        </span>
+      </div>
       <slot />
       <PinnedAnswers
         v-if="answers?.length > 0"
@@ -550,6 +612,7 @@ const replyHasBotMention = computed(() => {
         :suspension-indefinitely="suspensionIndefinitely ?? false"
         :bot-suggestions="botSuggestions"
         :bot-usernames="botUsernames"
+        :mod-suggestions="modSuggestions"
         @create-comment="handleClickCreate"
         @delete-comment="handleClickDelete"
         @click-edit-comment="handleClickEdit"
@@ -688,9 +751,15 @@ const replyHasBotMention = computed(() => {
         >
           There are no comments yet.
         </div>
+        <div
+          v-else-if="!loading && searchText && filteredComments.length === 0"
+          class="ml-1 text-sm dark:text-gray-400"
+        >
+          No comments match "{{ searchText }}"
+        </div>
         <div :key="activeSort">
           <div
-            v-for="(comment, index) in comments || []"
+            v-for="(comment, index) in filteredComments"
             :key="comment?.id || index"
           >
             <Comment
@@ -717,6 +786,7 @@ const replyHasBotMention = computed(() => {
               :reply-has-bot-mention="replyHasBotMention"
               :bot-suggestions="botSuggestions"
               :bot-usernames="botUsernames"
+              :mod-suggestions="modSuggestions"
               :answers="answers"
               @start-comment-save="commentInProcess = true"
               @open-reply-editor="openReplyEditor"

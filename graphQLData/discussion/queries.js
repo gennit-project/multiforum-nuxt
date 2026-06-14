@@ -20,7 +20,7 @@ const CROSSPOST_PREVIEW_FIELDS = gql`
     Album {
       id
       imageOrder
-      Images {
+      Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
         id
         url
         alt
@@ -89,6 +89,9 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
         UpvotedByUsersAggregate {
           count
         }
+        SuperUpvotedByUsers {
+          username
+        }
         locked
         archived
         answered
@@ -115,7 +118,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
           Album {
             id
             imageOrder
-            Images {
+            Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
               id
               url
               alt
@@ -179,6 +182,9 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
           UpvotedByUsers {
             username
           }
+          SuperUpvotedByUsers {
+            username
+          }
           CommentsAggregate {
             count
           }
@@ -190,7 +196,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
         Album {
           id
           imageOrder
-          Images {
+          Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
             id
             url
             alt
@@ -258,7 +264,7 @@ export const GET_DISCUSSION = gql`
       Album {
         id
         imageOrder
-        Images {
+        Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
           id
           url
           alt
@@ -279,6 +285,9 @@ export const GET_DISCUSSION = gql`
         answered
         locked
         UpvotedByUsers {
+          username
+        }
+        SuperUpvotedByUsers {
           username
         }
         Channel {
@@ -321,6 +330,20 @@ export const GET_DISCUSSION = gql`
             displayName
           }
         }
+        LabelChangeHistory(options: { sort: [{ createdAt: DESC }] }) {
+          id
+          createdAt
+          actionType
+          labelDisplayName
+          labelValue
+          ActorUser {
+            username
+            displayName
+          }
+          ActorMod {
+            displayName
+          }
+        }
       }
       Tags {
         text
@@ -334,6 +357,13 @@ export const GET_DISCUSSION = gql`
         priceModel
         priceCents
         priceCurrency
+        downloadCountTotal
+        downloadCountUnique
+        attributionOverride
+        supportPatreonUrl
+        supportBuyMeACoffeeUrl
+        supportKoFiUrl
+        supportPayPalMeUrl
         license {
           id
           name
@@ -407,7 +437,7 @@ export const GET_DISCUSSION_FEEDBACK = gql`
       Album {
         id
         imageOrder
-        Images {
+        Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
           id
           url
           alt
@@ -423,6 +453,13 @@ export const GET_DISCUSSION_FEEDBACK = gql`
         id
         fileName
         url
+        downloadCountTotal
+        downloadCountUnique
+        attributionOverride
+        supportPatreonUrl
+        supportBuyMeACoffeeUrl
+        supportKoFiUrl
+        supportPayPalMeUrl
       }
       CrosspostedDiscussion {
         ...CrosspostPreviewFields

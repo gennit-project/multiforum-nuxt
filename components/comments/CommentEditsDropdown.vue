@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import type { PropType } from 'vue';
-import type {
-  Comment,
-  TextVersion,
-  CommentAuthor,
-  User,
-} from '@/__generated__/graphql';
+import type { Comment, TextVersion } from '@/__generated__/graphql';
 import {
   usePopoverPositioning,
   type PopoverPosition,
 } from '@/composables/usePopoverPositioning';
 import { timeAgo } from '@/utils';
+import {
+  buildSequentialRevisionPairs,
+  getRevisionAuthorName,
+  type RevisionPair,
+} from '@/utils/revisionHistory';
 import CommentRevisionDiffModal from './CommentRevisionDiffModal.vue';
 
 const props = defineProps({
@@ -29,47 +29,9 @@ const popoverPosition = ref<PopoverPosition>({
   left: 0,
   placement: 'below',
 });
-// Define a type for the edit object
-type EditItem = {
-  id: string;
-  author: string;
-  createdAt: string | null | undefined;
-  isCurrent: boolean;
-  oldVersionData: TextVersion | undefined;
-  newVersionData: TextVersion;
-};
+type EditItem = RevisionPair<TextVersion>;
 
 const activeRevision = ref<EditItem | null>(null);
-
-// Helper function to get display name from CommentAuthor union type
-const getAuthorDisplayName = (
-  commentAuthor: CommentAuthor | null | undefined
-): string => {
-  if (!commentAuthor) return '[Deleted]';
-
-  // Check if it's a User type (has username property)
-  if ('username' in commentAuthor && commentAuthor.username) {
-    return commentAuthor.username;
-  }
-
-  // Check if it's a ModerationProfile type
-  if ('displayName' in commentAuthor) {
-    if (commentAuthor.displayName) {
-      return commentAuthor.displayName;
-    }
-    // If no displayName, try to get username from nested User
-    if (
-      'User' in commentAuthor &&
-      commentAuthor.User &&
-      'username' in commentAuthor.User &&
-      commentAuthor.User.username
-    ) {
-      return commentAuthor.User.username;
-    }
-  }
-
-  return '[Deleted]';
-};
 
 // Total number of edits
 const totalEdits = computed(() => {
@@ -83,60 +45,26 @@ const hasEdits = computed(() => {
 
 // Process all versions and sort by timestamp (newest first)
 const allEdits = computed(() => {
-  const edits = [];
+  const currentVersion: TextVersion = {
+    id: 'current',
+    body: props.comment.text,
+    createdAt: props.comment.updatedAt || props.comment.createdAt,
+    Author: props.comment.CommentAuthor as any,
+    AuthorConnection: (props.comment as any).AuthorConnection || {
+      __typename: 'TextVersionAuthorConnection',
+      edges: [],
+      pageInfo: { hasNextPage: false, hasPreviousPage: false },
+      totalCount: 0,
+    },
+  };
 
-  if (props.comment?.PastVersions?.length) {
-    // Create current version entry (as TextVersion structure)
-    // Note: CommentAuthor is a union type that may not match User exactly,
-    // but for display purposes we extract what we need
-    const commentWithAuthorConnection = props.comment as Comment & {
-      AuthorConnection?: TextVersion['AuthorConnection'];
-    };
-    const currentVersion: TextVersion = {
-      id: 'current',
-      body: props.comment.text, // Current comment text
-      createdAt: props.comment.updatedAt || props.comment.createdAt,
-      Author: props.comment.CommentAuthor as User | null | undefined,
-      AuthorConnection: commentWithAuthorConnection.AuthorConnection || {
-        __typename: 'TextVersionAuthorConnection',
-        edges: [],
-        pageInfo: { hasNextPage: false, hasPreviousPage: false },
-        totalCount: 0,
-      },
-    };
-
-    // First item: most recent edit (current vs most recent past version)
-    edits.push({
-      id: 'most-recent-edit',
-      author: getAuthorDisplayName(props.comment.CommentAuthor),
-      createdAt: props.comment.updatedAt || props.comment.createdAt,
-      isCurrent: true,
-      oldVersionData: props.comment.PastVersions[0], // Most recent past version
-      newVersionData: currentVersion, // Current version
-    });
-
-    // Subsequent items: compare each past version with the next one
-    props.comment.PastVersions.forEach((version, index) => {
-      // Skip the most recent past version since it's already handled above
-      if (index === 0) return;
-
-      const nextVersion = props.comment.PastVersions[index - 1]; // Next version (more recent)
-
-      edits.push({
-        id: version.id,
-        author: version.Author?.username || '[Deleted]',
-        createdAt: version.createdAt,
-        isCurrent: false,
-        oldVersionData: version,
-        newVersionData: nextVersion,
-      });
-    });
-  }
-
-  // Sort by date (newest first)
-  return edits.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
+  return buildSequentialRevisionPairs({
+    pastVersions: props.comment?.PastVersions,
+    currentVersion,
+    currentAuthor: props.comment.CommentAuthor as any,
+    getHistoricalPairAuthor: ({ oldVersion }) =>
+      getRevisionAuthorName(oldVersion.Author),
+  });
 });
 
 const isVisibleRef = computed(() => isOpen.value);
@@ -208,7 +136,10 @@ const handleRevisionDeleted = (deletedId: string) => {
 
 const handleDocumentClick = (event: MouseEvent) => {
   const target = event.target as Node;
-  if (triggerRef.value?.contains(target) || popoverRef.value?.contains(target)) {
+  if (
+    triggerRef.value?.contains(target) ||
+    popoverRef.value?.contains(target)
+  ) {
     return;
   }
   closeDropdown();

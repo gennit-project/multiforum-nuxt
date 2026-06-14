@@ -238,6 +238,17 @@ const getCommonMocks = (username: string) => ({
       users: [{ username, FavoriteDiscussions: [] }],
     },
   }),
+  getModsByChannel: () => ({
+    data: {
+      channels: [
+        {
+          uniqueName: TEST_CHANNEL,
+          Admins: [],
+          Moderators: [],
+        },
+      ],
+    },
+  }),
   userIsModInChannel: () => ({
     data: {
       channels: [
@@ -295,6 +306,20 @@ test.describe('Link verification - pages resolve correctly', () => {
           ],
         },
       }),
+      getCommentSection: () => ({
+        data: {
+          getCommentSection: {
+            DiscussionChannel: buildDiscussionChannel({
+              id: discussionChannelId,
+              discussionId,
+              channelUniqueName: TEST_CHANNEL,
+              title: 'Test Discussion Title',
+              commentsCount: 0,
+            }),
+            Comments: [],
+          },
+        },
+      }),
       getDiscussionComments: () => ({
         data: {
           getDiscussionComments: {
@@ -330,7 +355,7 @@ test.describe('Link verification - pages resolve correctly', () => {
 
       // Verify the page loads with correct content
       await expect(
-        page.getByRole('heading', { name: 'Test Discussion Title' })
+        page.getByRole('button', { name: 'Add "Test Discussion Title" to favorites' })
       ).toBeVisible();
       await expect(page.getByText('Test discussion body content')).toBeVisible();
 

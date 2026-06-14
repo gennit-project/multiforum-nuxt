@@ -2,7 +2,9 @@
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import SwitchHorizontalIcon from '@/components/icons/SwitchHorizontalIcon.vue';
 import RefreshIcon from '@/components/icons/RefreshIcon.vue';
+import FlagIcon from '@/components/icons/FlagIcon.vue';
 import AddImageToFavorites from '@/components/favorites/AddImageToFavorites.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
 
 defineProps({
   lightboxIndex: {
@@ -63,6 +65,7 @@ const emit = defineEmits([
   'toggle-panel',
   'toggle-panel-position',
   'download-image',
+  'report-image',
 ]);
 
 const downloadImage = (imageUrl: string) => {
@@ -223,6 +226,25 @@ const downloadImage = (imageUrl: string) => {
           :class="{ 'h-4 w-4': panelOnSide, 'h-6 w-6': !panelOnSide }"
         />
       </button>
+      <!-- Report button -->
+      <RequireAuth>
+        <template #authenticated>
+          <button
+            v-if="currentImageId && !isStlFile"
+            type="button"
+            class="flex cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white hover:bg-opacity-20"
+            :class="{ 'h-6 w-6': panelOnSide, 'h-8 w-8': !panelOnSide }"
+            aria-label="Report image"
+            title="Report image"
+            @click="emit('report-image')"
+          >
+            <FlagIcon
+              :class="{ 'h-4 w-4': panelOnSide, 'h-5 w-5': !panelOnSide }"
+            />
+          </button>
+        </template>
+        <template #unauthenticated />
+      </RequireAuth>
       <!-- Download button -->
       <button
         type="button"

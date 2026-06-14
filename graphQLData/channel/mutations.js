@@ -48,6 +48,7 @@ export const UPDATE_CHANNEL = gql`
           id
           title
           body
+          editReason
           slug
           createdAt
           updatedAt
@@ -57,6 +58,7 @@ export const UPDATE_CHANNEL = gql`
           PastVersions(options: { sort: [{ createdAt: DESC }] }) {
             id
             body
+            editReason
             createdAt
             Author {
               username
@@ -80,6 +82,7 @@ export const CREATE_WIKI_PAGE = gql`
           id
           title
           body
+          editReason
           slug
           createdAt
           updatedAt
@@ -89,6 +92,7 @@ export const CREATE_WIKI_PAGE = gql`
           PastVersions(options: { sort: [{ createdAt: DESC }] }) {
             id
             body
+            editReason
             createdAt
             Author {
               username
@@ -110,6 +114,7 @@ export const UPDATE_WIKI_PAGE = gql`
         id
         title
         body
+        editReason
         slug
         channelUniqueName
         createdAt
@@ -143,6 +148,7 @@ export const CREATE_CHILD_WIKI_PAGE = gql`
           id
           title
           body
+          editReason
           slug
           createdAt
           updatedAt
@@ -185,6 +191,81 @@ export const UPDATE_CHANNEL_ENABLED_PLUGINS = gql`
       channels {
         uniqueName
       }
+    }
+  }
+`;
+
+export const REPORT_CHANNEL = gql`
+  mutation reportChannel(
+    $channelUniqueName: String!
+    $reportText: String!
+    $selectedServerRules: [String!]!
+  ) {
+    reportChannel(
+      channelUniqueName: $channelUniqueName
+      reportText: $reportText
+      selectedServerRules: $selectedServerRules
+    ) {
+      id
+      issueNumber
+      relatedChannelUniqueName
+    }
+  }
+`;
+
+export const LOCK_CHANNEL = gql`
+  mutation lockChannel(
+    $channelUniqueName: String!
+    $reason: String!
+    $issueId: ID
+  ) {
+    lockChannel(
+      channelUniqueName: $channelUniqueName
+      reason: $reason
+      issueId: $issueId
+    ) {
+      uniqueName
+      displayName
+      locked
+      lockedAt
+      lockReason
+      LockedBy {
+        displayName
+      }
+    }
+  }
+`;
+
+export const UNLOCK_CHANNEL = gql`
+  mutation unlockChannel($channelUniqueName: String!, $reason: String) {
+    unlockChannel(channelUniqueName: $channelUniqueName, reason: $reason) {
+      uniqueName
+      displayName
+      locked
+      lockedAt
+      lockReason
+      LockedBy {
+        displayName
+      }
+    }
+  }
+`;
+
+export const REPORT_CHANNEL_IMAGE = gql`
+  mutation reportChannelImage(
+    $channelUniqueName: String!
+    $imageType: ChannelImageType!
+    $reportText: String!
+    $selectedServerRules: [String!]!
+  ) {
+    reportChannelImage(
+      channelUniqueName: $channelUniqueName
+      imageType: $imageType
+      reportText: $reportText
+      selectedServerRules: $selectedServerRules
+    ) {
+      id
+      issueNumber
     }
   }
 `;

@@ -23,6 +23,8 @@ import SubscribeButton from '@/components/SubscribeButton.vue';
 import InlineCommentForm from '@/components/discussion/form/InlineCommentForm.vue';
 import DiscussionRootCommentFormWrapper from '@/components/discussion/form/DiscussionRootCommentFormWrapper.vue';
 import { buildBotMentionOptions } from '@/utils/botMentions';
+import { buildModMentionOptions } from '@/utils/modMentions';
+import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 
 const COMMENT_LIMIT = 50;
 
@@ -179,6 +181,29 @@ const botSuggestions = computed(() => {
     channelUniqueName:
       channel?.Channel?.uniqueName || formDiscussionChannel.value?.channelUniqueName,
     bots: channel?.Channel?.Bots || [],
+  });
+});
+
+const modSuggestions = computed(() => {
+  const channel = formDiscussionChannel.value as DiscussionChannel & {
+    Channel?: {
+      Moderators?: Array<{
+        displayName?: string | null;
+        User?: {
+          username?: string | null;
+        } | null;
+      }>;
+    };
+  };
+
+  return buildModMentionOptions({
+    mods: (channel?.Channel?.Moderators || [])
+      .filter((mod): mod is typeof mod & { displayName: string } =>
+        typeof mod.displayName === 'string' && mod.displayName.length > 0)
+      .map((mod) => ({
+        displayName: mod.displayName,
+        username: mod.User?.username || null,
+      })),
   });
 });
 
@@ -479,6 +504,17 @@ const handleSubscriptionToggle = () => {
     });
   }
 };
+
+// Handle ?action=unsubscribe query param for one-click unsubscribe from notifications
+const discussionChannelIdRef = computed(() => props.discussionChannel?.id || null);
+useAutoUnsubscribe({
+  entityId: discussionChannelIdRef,
+  unsubscribeFn: async (id: string) => {
+    await unsubscribeFromDiscussionChannel({ discussionChannelId: id });
+  },
+  entityType: 'discussion',
+  isSubscribed,
+});
 </script>
 
 <template>
@@ -500,6 +536,7 @@ const handleSubscriptionToggle = () => {
     :enable-emoji="enableEmoji"
     :bot-suggestions="botSuggestions"
     :bot-usernames="botUsernames"
+    :mod-suggestions="modSuggestions"
     @decrement-comment-count="decrementCommentCount"
     @increment-comment-count="incrementCommentCount"
     @update-comment-section-query-result="updateCommentSectionQueryResult"
@@ -513,6 +550,7 @@ const handleSubscriptionToggle = () => {
           :mod-name="modName"
           :previous-offset="previousOffset"
           :bot-suggestions="botSuggestions"
+          :mod-suggestions="modSuggestions"
         />
       </div>
     </template>
@@ -533,6 +571,7 @@ const handleSubscriptionToggle = () => {
         :mod-name="modName"
         :previous-offset="previousOffset"
         :bot-suggestions="botSuggestions"
+        :mod-suggestions="modSuggestions"
       />
     </template>
   </CommentSection>
