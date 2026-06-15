@@ -30,6 +30,9 @@ export const CREATE_SCRATCHPAD_ENTRY = gql`
       Recipient {
         username
       }
+      superUpvotedByUsers {
+        username
+      }
     }
   }
 `;
@@ -65,5 +68,19 @@ export const UPDATE_SCRATCHPAD_ENTRY_VISIBILITY = gql`
 export const DELETE_SCRATCHPAD_ENTRY = gql`
   mutation deleteScratchpadEntry($scratchpadEntryId: ID!) {
     deleteScratchpadEntry(scratchpadEntryId: $scratchpadEntryId)
+  }
+`;
+
+export const UNDO_SUPER_UPVOTE = gql`
+  mutation undoSuperUpvote($sourceType: String!, $sourceId: String!) {
+    undoSuperUpvote(sourceType: $sourceType, sourceId: $sourceId) {
+      success
+      message
+      sourceId
+      sourceType
+      superUpvotedByUsers {
+        username
+      }
+    }
   }
 `;

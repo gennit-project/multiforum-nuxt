@@ -43,6 +43,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  isOwnContent: {
+    type: Boolean,
+    default: false,
+  },
   upvoteLoading: {
     type: Boolean,
     default: false,
@@ -83,6 +87,7 @@ const emit = defineEmits([
   'viewFeedback',
   'clickUp',
   'superUpvote',
+  'undoSuperUpvote',
 ]);
 
 const thumbsDownMenuItems = computed(() => {
@@ -146,6 +151,10 @@ const clickUp = () => {
 const clickSuperUpvote = () => {
   emit('superUpvote');
 };
+
+const clickUndoSuperUpvote = () => {
+  emit('undoSuperUpvote');
+};
 </script>
 
 <template>
@@ -171,31 +180,23 @@ const clickSuperUpvote = () => {
           </span>
         </VoteButton>
 
-        <!-- Super Upvote button - only visible when user has already upvoted -->
+        <!-- Super Upvote button - visible when user has upvoted and not own content -->
         <VoteButton
-          v-if="showSuperUpvote && upvoteActive && !superUpvoteActive"
-          :active="false"
+          v-if="showSuperUpvote && upvoteActive && !isOwnContent"
+          :active="superUpvoteActive"
           :is-permalinked="isPermalinked"
           :loading="superUpvoteLoading"
           :show-count="false"
           :test-id="'super-upvote-discussion-button'"
-          :tooltip-text="'Super upvote with a thank-you note'"
-          class="super-upvote-button"
-          @vote="clickSuperUpvote"
+          :tooltip-text="superUpvoteActive ? 'Undo super upvote' : 'Super upvote with a thank-you note'"
+          :class="superUpvoteActive ? '' : 'super-upvote-button'"
+          @vote="superUpvoteActive ? clickUndoSuperUpvote() : clickSuperUpvote()"
         >
-          <span class="flex items-center gap-1 text-xs font-medium">
-            <i class="fa-solid fa-star" />
+          <span class="flex items-center gap-1 text-xs font-medium" :class="superUpvoteActive ? '' : 'rainbow-star'">
+            <i :class="superUpvoteActive ? 'fa-solid fa-star' : 'fa-regular fa-star'" />
+            <span v-if="superUpvoteActive">Undo</span>
           </span>
         </VoteButton>
-
-        <!-- Super Upvoted indicator - shown when user has super upvoted -->
-        <span
-          v-if="superUpvoteActive"
-          class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white"
-          title="You super upvoted this"
-        >
-          <i class="fa-solid fa-star" />
-        </span>
 
         <MenuButton
           v-if="showDownvote"
@@ -271,13 +272,43 @@ const clickSuperUpvote = () => {
 </template>
 
 <style scoped>
+/* Super upvote button - outlined with rainbow gradient border */
 .super-upvote-button :deep(button) {
-  background: linear-gradient(to right, #ec4899, #8b5cf6, #6366f1);
-  border-color: transparent;
-  color: white;
+  position: relative;
+  background: white;
+  border: none;
+  max-height: 1.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  box-sizing: border-box;
 }
 
-.super-upvote-button :deep(button:hover) {
+.super-upvote-button :deep(button)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  padding: 1.5px;
+  background: linear-gradient(to right, #ec4899, #8b5cf6, #6366f1);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.super-upvote-button :deep(button:hover)::before {
   background: linear-gradient(to right, #db2777, #7c3aed, #4f46e5);
+}
+
+/* Dark mode support for the button background */
+:root.dark .super-upvote-button :deep(button) {
+  background: #374151;
+}
+
+/* Rainbow gradient for outlined star */
+.rainbow-star {
+  background: linear-gradient(to right, #ec4899, #8b5cf6, #6366f1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 </style>

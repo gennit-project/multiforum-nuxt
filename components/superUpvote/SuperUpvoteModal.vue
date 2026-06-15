@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import {
   Dialog,
@@ -43,6 +43,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'success']);
 
 const text = ref('');
+const textareaRef = ref<HTMLTextAreaElement | null>(null);
 
 const placeholderText = computed(() => {
   if (props.forumName) {
@@ -55,12 +56,15 @@ const charactersRemaining = computed(() => MAX_TEXT_LENGTH - text.value.length);
 const isOverLimit = computed(() => charactersRemaining.value < 0);
 const isValid = computed(() => text.value.trim().length > 0 && !isOverLimit.value);
 
-// Reset text when modal opens
+// Reset text and focus textarea when modal opens
 watch(
   () => props.show,
   (newVal) => {
     if (newVal) {
       text.value = '';
+      nextTick(() => {
+        textareaRef.value?.focus();
+      });
     }
   }
 );
@@ -70,7 +74,19 @@ const {
   loading,
   error,
   onDone,
-} = useMutation(CREATE_SCRATCHPAD_ENTRY);
+} = useMutation(CREATE_SCRATCHPAD_ENTRY, {
+  update: (cache, { data }) => {
+    if (data?.createScratchpadEntry?.superUpvotedByUsers) {
+      const typename = props.sourceType === 'comment' ? 'Comment' : 'DiscussionChannel';
+      cache.modify({
+        id: cache.identify({ __typename: typename, id: props.sourceId }),
+        fields: {
+          SuperUpvotedByUsers: () => data.createScratchpadEntry.superUpvotedByUsers,
+        },
+      });
+    }
+  },
+});
 
 onDone(() => {
   emit('success');
@@ -125,7 +141,7 @@ const handleSubmit = () => {
                 class="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
               >
                 <div>
-                  <!-- Rainbow sparkle icon -->
+                  <!-- Rainbow star icon -->
                   <div
                     class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"
                   >
@@ -157,6 +173,7 @@ const handleSubmit = () => {
 
                     <div class="mt-4">
                       <textarea
+                        ref="textareaRef"
                         v-model="text"
                         :placeholder="placeholderText"
                         rows="4"
@@ -191,11 +208,11 @@ const handleSubmit = () => {
                   <button
                     type="button"
                     :disabled="!isValid || loading"
-                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-full px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:cursor-not-allowed"
                     :class="{
-                      'bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600':
+                      'bg-purple-500 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 text-white':
                         isValid && !loading,
-                      'bg-gray-400': !isValid || loading,
+                      'bg-gray-200 text-gray-400 dark:bg-gray-600 dark:text-gray-400': !isValid || loading,
                     }"
                     @click="handleSubmit"
                   >

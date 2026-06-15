@@ -553,9 +553,9 @@ const replyHasBotMention = computed(() => {
           :show-top-options="false"
         />
       </div>
-      <!-- Comment search input -->
+      <!-- Comment search input - hidden until feature is complete -->
       <div
-        v-if="aggregateCommentCount > 0"
+        v-if="false && aggregateCommentCount > 0"
         class="mt-2 flex items-center"
       >
         <div class="relative w-full max-w-xs">

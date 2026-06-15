@@ -157,6 +157,15 @@ export const GET_DISCUSSION_COMMENTS = gql`
         archived
         locked
         answered
+        UpvotedByUsers {
+          username
+        }
+        UpvotedByUsersAggregate {
+          count
+        }
+        SuperUpvotedByUsers {
+          username
+        }
         Channel {
           uniqueName
           feedbackEnabled
