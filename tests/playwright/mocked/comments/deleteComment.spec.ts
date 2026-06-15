@@ -42,7 +42,7 @@ test('deletes a comment', async ({ context, page }, testInfo) => {
       hasText: ROOT_COMMENT_TEXT,
     });
     await comment.getByRole('button', { name: 'Comment actions' }).click();
-    await page.locator('.v-list-item').filter({ hasText: 'Delete' }).click();
+    await page.getByTestId('commentMenu-item-Delete').click();
     await page.getByRole('button', { name: 'Delete' }).click();
     await waitForGraphqlOperation(diagnostics.completedOperations, 'deleteComment');
     await page.goto(discussionUrl);

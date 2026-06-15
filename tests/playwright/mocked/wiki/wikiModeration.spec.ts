@@ -5,7 +5,7 @@ import {
   buildServerConfig,
 } from '../../helpers/graphqlFixtures';
 import { installMockAuth } from '../../helpers/mockAuth';
-import { installGraphqlMocks } from '../../helpers/mockGraphql';
+import { installGraphqlMocks, waitForGraphqlOperation } from '../../helpers/mockGraphql';
 
 const TEST_CHANNEL = 'cats';
 const TEST_USER = 'alice';
@@ -146,8 +146,8 @@ test.describe('Wiki moderation', () => {
     try {
       await page.goto(`/forums/${TEST_CHANNEL}/wiki/${WIKI_PAGE_ID}`);
 
-      // Wait for page to load
-      await page.waitForLoadState('networkidle');
+      // Wait for wiki page data to load
+      await waitForGraphqlOperation(diagnostics.completedOperations, 'getWikiPage');
 
       // Page should load without JavaScript errors
       expect(diagnostics.pageErrors).toEqual([]);
