@@ -23,6 +23,11 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // When provided, skip making a separate API call for favorite status
+  initialIsFavorited: {
+    type: Boolean,
+    default: undefined,
+  },
 });
 
 const getImageAlt = (image: Image) => {
@@ -88,6 +93,7 @@ const getImageAlt = (image: Image) => {
         :allow-add-to-list="allowAddToList"
         :image-id="props.image.id"
         :image-caption="props.image.caption || ''"
+        :initial-is-favorited="initialIsFavorited"
         size="small"
       />
     </div>

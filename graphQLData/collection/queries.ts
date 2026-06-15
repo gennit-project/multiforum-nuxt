@@ -128,7 +128,7 @@ export const GET_USER_COLLECTIONS_DOWNLOADS = gql`
 `;
 
 export const GET_COLLECTION_ITEMS = gql`
-  query GetCollectionItems($collectionId: ID!) {
+  query GetCollectionItems($collectionId: ID!, $loggedInUsername: String) {
     collections(where: { id: $collectionId }) {
       id
       name
@@ -144,6 +144,7 @@ export const GET_COLLECTION_ITEMS = gql`
         createdAt
         hasDownload
         hasSensitiveContent
+        isFavorited(username: $loggedInUsername)
         Author {
           username
           displayName
@@ -207,6 +208,7 @@ export const GET_COLLECTION_ITEMS = gql`
         createdAt
         hasDownload
         hasSensitiveContent
+        isFavorited(username: $loggedInUsername)
         Author {
           username
           displayName
