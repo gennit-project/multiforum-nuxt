@@ -11,6 +11,7 @@ import VoteButtons from '@/components/discussion/vote/VoteButtons.vue';
 import NewEmojiButton from '@/components/comments/NewEmojiButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import SuperUpvoteModal from '@/components/superUpvote/SuperUpvoteModal.vue';
+import { UNDO_SUPER_UPVOTE } from '@/graphQLData/scratchpad/mutations';
 import { usernameVar, modProfileNameVar } from '@/cache';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
@@ -83,6 +84,23 @@ const {
   loading: undoUpvoteDiscussionChannelLoading,
 } = useMutation(UNDO_UPVOTE_DISCUSSION_CHANNEL);
 
+const {
+  mutate: undoSuperUpvote,
+  error: undoSuperUpvoteError,
+  loading: undoSuperUpvoteLoading,
+} = useMutation(UNDO_SUPER_UPVOTE, {
+  update: (cache, { data }) => {
+    if (data?.undoSuperUpvote?.success) {
+      cache.modify({
+        id: cache.identify({ __typename: 'DiscussionChannel', id: discussionChannelId.value }),
+        fields: {
+          SuperUpvotedByUsers: () => data.undoSuperUpvote.superUpvotedByUsers || [],
+        },
+      });
+    }
+  },
+});
+
 const showSuperUpvoteModal = ref(false);
 
 const loggedInUserUpvoted = computed(() => {
@@ -111,6 +129,11 @@ const forumDisplayName = computed(() => {
     props.discussionChannel?.channelUniqueName ||
     ''
   );
+});
+
+const isOwnContent = computed(() => {
+  if (!usernameVar.value) return false;
+  return discussionAuthorUsername.value === usernameVar.value;
 });
 
 const loggedInUserDownvoted = computed(
@@ -203,14 +226,22 @@ function handleSuperUpvoteClick() {
 function handleSuperUpvoteSuccess() {
   showSuperUpvoteModal.value = false;
 }
+
+async function handleUndoSuperUpvote() {
+  await undoSuperUpvote({
+    sourceType: 'discussion',
+    sourceId: discussionChannelId.value,
+  });
+}
 </script>
 
 <template>
   <ErrorBanner
-    v-if="upvoteDiscussionChannelError || undoUpvoteDiscussionChannelError"
+    v-if="upvoteDiscussionChannelError || undoUpvoteDiscussionChannelError || undoSuperUpvoteError"
     :text="
       upvoteDiscussionChannelError?.message ||
       undoUpvoteDiscussionChannelError?.message ||
+      undoSuperUpvoteError?.message ||
       ''
     "
   />
@@ -237,11 +268,14 @@ function handleSuperUpvoteSuccess() {
         :upvote-loading="
           upvoteDiscussionChannelLoading || undoUpvoteDiscussionChannelLoading
         "
+        :super-upvote-loading="undoSuperUpvoteLoading"
         :upvote-tooltip-active="upvoteTooltips.active"
         :upvote-tooltip-inactive="upvoteTooltips.inactive"
         :upvote-tooltip-unauthenticated="upvoteTooltips.unauthenticated"
+        :is-own-content="isOwnContent"
         @click-up="handleClickUp"
         @super-upvote="handleSuperUpvoteClick"
+        @undo-super-upvote="handleUndoSuperUpvote"
       />
       <NewEmojiButton
         v-if="showEmojiButton"
@@ -258,6 +292,7 @@ function handleSuperUpvoteSuccess() {
         :has-mod-profile="!!modProfileNameVar"
         :show-downvote="showDownvote"
         :show-upvote="false"
+        :show-super-upvote="false"
         :upvote-active="loggedInUserUpvoted"
         :upvote-count="upvoteCount"
         :upvote-icon="upvoteIcon"

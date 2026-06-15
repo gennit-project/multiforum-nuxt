@@ -10,6 +10,7 @@ import type { PropType } from 'vue';
 import type { Comment } from '@/__generated__/graphql';
 import VotesComponent from './Votes.vue';
 import SuperUpvoteModal from '@/components/superUpvote/SuperUpvoteModal.vue';
+import { UNDO_SUPER_UPVOTE } from '@/graphQLData/scratchpad/mutations';
 import { modProfileNameVar, usernameVar } from '@/cache';
 
 const props = defineProps({
@@ -91,6 +92,11 @@ const commentAuthorUsername = computed(() => {
   return '';
 });
 
+const isOwnContent = computed(() => {
+  if (!usernameVar.value) return false;
+  return commentAuthorUsername.value === usernameVar.value;
+});
+
 const handleSuperUpvoteClick = () => {
   showSuperUpvoteModal.value = true;
 };
@@ -136,13 +142,37 @@ const {
     username: usernameVar.value,
   },
 }));
+
+const {
+  mutate: undoSuperUpvote,
+  error: undoSuperUpvoteError,
+  loading: undoSuperUpvoteLoading,
+} = useMutation(UNDO_SUPER_UPVOTE, {
+  update: (cache, { data }) => {
+    if (data?.undoSuperUpvote?.success) {
+      cache.modify({
+        id: cache.identify({ __typename: 'Comment', id: props.commentData.id }),
+        fields: {
+          SuperUpvotedByUsers: () => data.undoSuperUpvote.superUpvotedByUsers || [],
+        },
+      });
+    }
+  },
+});
+
+const handleUndoSuperUpvote = async () => {
+  await undoSuperUpvote({
+    sourceType: 'comment',
+    sourceId: props.commentData.id,
+  });
+};
 </script>
 
 <template>
   <div class="flex items-center">
     <ErrorBanner
-      v-if="upvoteCommentError || undoUpvoteError"
-      :text="upvoteCommentError?.message || undoUpvoteError?.message || ''"
+      v-if="upvoteCommentError || undoUpvoteError || undoSuperUpvoteError"
+      :text="upvoteCommentError?.message || undoUpvoteError?.message || undoSuperUpvoteError?.message || ''"
     />
     <VotesComponent
       :show-downvote-count="false"
@@ -152,14 +182,17 @@ const {
       :downvote-active="loggedInUserDownvoted"
       :has-mod-profile="!!modProfileNameVar"
       :upvote-loading="upvoteCommentLoading || undoUpvoteLoading"
+      :super-upvote-loading="undoSuperUpvoteLoading"
       :show-downvote="showDownvote"
       :show-upvote="showUpvote"
       :show-super-upvote="showSuperUpvote"
       :is-permalinked="isPermalinked"
       :is-marked-as-answer="isMarkedAsAnswer"
+      :is-own-content="isOwnContent"
       @upvote="upvoteComment"
       @undo-upvote="undoUpvoteComment"
       @super-upvote="handleSuperUpvoteClick"
+      @undo-super-upvote="handleUndoSuperUpvote"
       @undo-downvote="emit('clickUndoFeedback')"
       @open-mod-profile="emit('openModProfile')"
       @edit-feedback="emit('clickEditFeedback')"

@@ -43,14 +43,14 @@ const closedCount = computed(() => {
     class="border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-900 dark:text-white"
   >
     <nav
-      class="flex items-center justify-between gap-4 py-3 pl-4 pr-4 shadow-sm"
+      class="flex flex-wrap items-center justify-between gap-4 py-3 pl-4 pr-4 shadow-sm"
     >
-      <div class="flex items-center gap-4">
+      <div class="flex flex-wrap items-center gap-4">
         <nuxt-link
           :to="{
             name: 'admin-issues',
           }"
-          class="border-b-2 px-4 py-2"
+          class="border-b-2 px-4 py-2 whitespace-nowrap"
           :class="{
             'border-black text-black dark:border-white dark:text-white':
               route.name === 'admin-issues',
@@ -64,7 +64,7 @@ const closedCount = computed(() => {
           :to="{
             name: 'admin-issues-closed',
           }"
-          class="border-b-2 px-4 py-2"
+          class="border-b-2 px-4 py-2 whitespace-nowrap"
           :class="{
             'border-black text-black dark:border-white dark:text-white':
               route.name === 'admin-issues-closed',
