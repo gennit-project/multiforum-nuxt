@@ -50,7 +50,7 @@ test('edits a comment', async ({ context, page }, testInfo) => {
       hasText: ROOT_COMMENT_TEXT,
     });
     await comment.getByRole('button', { name: 'Comment actions' }).click();
-    await page.locator('.v-list-item').filter({ hasText: 'Edit' }).click();
+    await page.getByTestId('commentMenu-item-Edit').click();
     await page.getByTestId('texteditor-textarea').fill(UPDATED_COMMENT_TEXT);
     await clickInlineSave(page);
     await waitForGraphqlOperation(diagnostics.completedOperations, 'updateComment');

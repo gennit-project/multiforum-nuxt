@@ -5,7 +5,7 @@ import {
   buildServerConfig,
 } from '../../helpers/graphqlFixtures';
 import { installMockAuth } from '../../helpers/mockAuth';
-import { installGraphqlMocks } from '../../helpers/mockGraphql';
+import { installGraphqlMocks, waitForGraphqlOperation } from '../../helpers/mockGraphql';
 
 const TEST_CHANNEL = 'downloads-forum';
 const TEST_USER = 'alice';
@@ -171,8 +171,8 @@ test.describe('Download labels moderation', () => {
     try {
       await page.goto(`/forums/${TEST_CHANNEL}/downloads/${DISCUSSION_ID}`);
 
-      // Wait for page to load
-      await page.waitForLoadState('networkidle');
+      // Wait for discussion data to load
+      await waitForGraphqlOperation(diagnostics.completedOperations, 'getDiscussion');
 
       // Page should load without JavaScript errors
       expect(diagnostics.pageErrors).toEqual([]);
