@@ -425,8 +425,8 @@ test.describe('Server-level suspension notices', () => {
       // Verify user is authenticated
       await expect(page.getByRole('button', { name: 'Log Out' })).toBeVisible({ timeout: 5000 });
 
-      // Wait for network to settle and suspension query to complete
-      await page.waitForLoadState('networkidle');
+      // Wait for suspension query to complete
+      await waitForGraphqlOperation(diagnostics.completedOperations, 'getUserActiveSuspensions');
 
       await page.getByTestId('title-input').fill('test_blocked_forum');
 

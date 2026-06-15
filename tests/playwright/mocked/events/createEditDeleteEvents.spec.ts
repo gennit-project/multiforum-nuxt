@@ -625,11 +625,7 @@ test('deletes an event with mocked GraphQL', async ({ context, page }, testInfo)
     // Click the event menu button
     const menuButton = page.getByTestId('event-menu-button');
     await expect(menuButton).toBeVisible();
-    await page.evaluate(() => {
-      document
-        .querySelector<HTMLElement>('[data-testid="event-menu-button"]')
-        ?.click();
-    });
+    await menuButton.click();
 
     // Click the delete option
     const deleteOption = page.getByTestId('event-menu-button-item-Delete');
