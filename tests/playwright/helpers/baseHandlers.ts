@@ -1,6 +1,7 @@
 import {
   buildBasicUser,
   buildChannel,
+  buildDiscussionChannel,
   buildServerConfig,
   DEFAULT_USERNAME,
   type BasicUserFixture,
@@ -11,6 +12,9 @@ import {
 export type BaseHandlerConfig = {
   username?: string;
   channelId?: string;
+  discussionId?: string;
+  discussionChannelId?: string;
+  discussionTitle?: string;
   discussionsCount?: number;
   commentsCount?: number;
   serverConfigOverrides?: Partial<ServerConfigFixture>;
@@ -33,6 +37,9 @@ export const createBaseHandlers = (
   const {
     username = DEFAULT_USERNAME,
     channelId = 'cats',
+    discussionId = 'discussion-1',
+    discussionChannelId = 'discussion-channel-1',
+    discussionTitle = 'Test Discussion',
     discussionsCount = 0,
     commentsCount = 0,
     serverConfigOverrides = {},
@@ -127,6 +134,21 @@ export const createBaseHandlers = (
     }),
     getEvents: () => ({ data: { events: [] } }),
     getIssue: () => ({ data: { issues: [] } }),
+    // getCommentSection is commonly needed for discussion pages
+    getCommentSection: () => ({
+      data: {
+        getCommentSection: {
+          DiscussionChannel: buildDiscussionChannel({
+            id: discussionChannelId,
+            discussionId,
+            channelUniqueName: channelId,
+            title: discussionTitle,
+            commentsCount,
+          }),
+          Comments: [],
+        },
+      },
+    }),
     getChannelDownloadCount: () => ({
       data: {
         channels: [
