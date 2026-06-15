@@ -328,6 +328,7 @@ const getFirstAlbumImage = (download: FavoriteDownload): string | undefined => {
                         :allow-add-to-list="false"
                         :discussion-id="download.id"
                         :discussion-title="download.title"
+                        :initial-is-favorited="true"
                         entity-name="Download"
                         size="small"
                       />

@@ -36,12 +36,9 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-  // When provided from parent query, skip making a separate API call
-  // undefined = field not in response, need to fetch
-  // null = field in response but user not logged in, don't fetch
-  // true/false = field in response with value, don't fetch
+  // When provided, skip making a separate API call
   initialIsFavorited: {
-    type: [Boolean, null] as unknown as () => boolean | null | undefined,
+    type: Boolean,
     default: undefined,
   },
   // When true, uses transparent hover styles for overlay contexts
@@ -63,14 +60,13 @@ const GET_USER_FAVORITE_DISCUSSION = gql`
   }
 `;
 
-// Treat null (user not logged in) and false the same way
-const isFavorited = ref(props.initialIsFavorited === true);
+// Use initial value if provided, otherwise default to false
+const isFavorited = ref(props.initialIsFavorited ?? false);
 const isLoading = ref(false);
 const toastStore = useToastStore();
 const addToListModalStore = useAddToListModalStore();
 
-// Only query if initialIsFavorited was not provided (undefined means field not in response)
-// null means the field was returned but user is not logged in - don't fetch
+// Only fetch if initialIsFavorited was not provided
 const shouldFetchFavorite = computed(() =>
   props.initialIsFavorited === undefined && !!usernameVar.value && !!props.discussionId
 );
@@ -90,10 +86,8 @@ const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
 watch(
   () => props.initialIsFavorited,
   (newValue) => {
-    // Update when we get a definitive value from parent
-    // null means user not logged in, treat as false
     if (newValue !== undefined) {
-      isFavorited.value = newValue === true;
+      isFavorited.value = newValue;
     }
   }
 );

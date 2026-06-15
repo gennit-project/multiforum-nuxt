@@ -136,6 +136,7 @@ const user = computed(() => {
                   :image="image"
                   :username="user?.username || ''"
                   :show-favorite-button="true"
+                  :initial-is-favorited="true"
                 />
               </div>
             </div>

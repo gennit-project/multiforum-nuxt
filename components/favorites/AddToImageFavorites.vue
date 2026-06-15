@@ -32,6 +32,11 @@ const props = defineProps({
     type: String,
     default: 'Image',
   },
+  // When provided, skip making a separate API call
+  initialIsFavorited: {
+    type: Boolean,
+    default: undefined,
+  },
 });
 
 const GET_USER_FAVORITE_IMAGE = gql`
@@ -46,10 +51,16 @@ const GET_USER_FAVORITE_IMAGE = gql`
   }
 `;
 
-const isFavorited = ref(false);
+// Use initial value if provided, otherwise default to false
+const isFavorited = ref(props.initialIsFavorited ?? false);
 const isLoading = ref(false);
 const toastStore = useToastStore();
 const addToListModalStore = useAddToListModalStore();
+
+// Only fetch if initialIsFavorited was not provided
+const shouldFetchFavorite = computed(() =>
+  props.initialIsFavorited === undefined && !!usernameVar.value && !!props.imageId
+);
 
 const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
   GET_USER_FAVORITE_IMAGE,
@@ -58,14 +69,25 @@ const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
     imageId: props.imageId,
   }),
   () => ({
-    enabled: !!usernameVar.value && !!props.imageId,
+    enabled: shouldFetchFavorite.value,
   })
 );
 
+// Watch for changes to initialIsFavorited prop (e.g., when parent refetches)
+watch(
+  () => props.initialIsFavorited,
+  (newValue) => {
+    if (newValue !== undefined) {
+      isFavorited.value = newValue;
+    }
+  }
+);
+
+// Watch query result only when we're fetching
 watch(
   favoritesResult,
   (newResult) => {
-    if (newResult?.users?.[0]?.FavoriteImages) {
+    if (shouldFetchFavorite.value && newResult?.users?.[0]?.FavoriteImages) {
       isFavorited.value = newResult.users[0].FavoriteImages.some(
         (image: { id: string }) => image.id === props.imageId
       );
@@ -119,7 +141,10 @@ const handleToggleFavorite = async () => {
       });
       showAddedToast();
     }
-    refetchFavorites();
+    // Only refetch if we're managing our own query
+    if (shouldFetchFavorite.value) {
+      refetchFavorites();
+    }
   } catch (error) {
     console.error('Error toggling favorite:', error);
     // Revert optimistic update on error
