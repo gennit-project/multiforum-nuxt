@@ -4,6 +4,8 @@
 
 > Multiforum is under active development; test coverage is being expanded as core features stabilize.
 
+## About
+
 Multiforum is a community platform that lets people create and manage topic-based forums with multiple content types:
 
 - Discussions — upvotable posts with threaded comments
@@ -20,16 +22,15 @@ Key differentiators:
 
 It's built with Nuxt/Vue on the frontend and a GraphQL/Neo4j backend.
 
-## Screenshots
+## Docs
 
-- [Screenshots gallery](./docs/screenshots.md)
+Documentation is hosted at [docs.multiforum.net](https://docs.multiforum.net).
 
-## Documentation
+## Developer Docs
 
 - [Development setup](./docs/development-setup.md)
 - [Architecture and authentication](./docs/architecture-and-auth.md)
 - [Moderation architecture](./docs/moderation-architecture.md)
-- [Feature updates (2025)](./docs/feature-updates.md)
 - [Contributing guide](./CONTRIBUTING.md)
 - [Performance details](./PERFORMANCE.md)
 - [Developer workflow and standards](./CLAUDE.md)
@@ -40,6 +41,11 @@ It's built with Nuxt/Vue on the frontend and a GraphQL/Neo4j backend.
 - **Backend**: Apollo Server + Neo4j
 - **Authentication**: Auth0 + SSR auth hint cookies
 - **Maps**: Google Maps
+
+## Screenshots
+
+- [Screenshots gallery](./docs/screenshots.md)
+- [Feature updates (2025)](./docs/feature-updates.md)
 
 ## Status
 
