@@ -219,6 +219,28 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
     ChannelRole: {
       merge: true,
     },
+    Album: {
+      keyFields: ['id'],
+      merge: true,
+      fields: {
+        Images: {
+          merge: (_existing = [], incoming) => {
+            // Handle case where incoming is an empty object instead of array
+            if (incoming && typeof incoming === 'object' && !Array.isArray(incoming)) {
+              const keys = Object.keys(incoming);
+              if (keys.length === 0) {
+                return [];
+              }
+              // Convert object with numeric keys to array
+              if (keys.every(k => !isNaN(Number(k)))) {
+                return keys.sort((a, b) => Number(a) - Number(b)).map(k => incoming[k]);
+              }
+            }
+            return Array.isArray(incoming) ? [...incoming] : [];
+          },
+        },
+      },
+    },
     Query: {},
   },
 };
