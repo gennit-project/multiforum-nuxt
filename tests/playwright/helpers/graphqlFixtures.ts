@@ -493,3 +493,113 @@ export const buildComment = ({
   UpvotedByUsers: [{ username: DEFAULT_USERNAME }],
   UpvotedByUsersAggregate: { count: 1 },
 });
+
+export type EventFixture = {
+  id: string;
+  title: string;
+  description: string;
+  startTime: string;
+  endTime: string;
+  locationName: string;
+  address: string;
+  virtualEventUrl: string;
+  startTimeDayOfWeek: number;
+  startTimeHourOfDay: number;
+  canceled: boolean;
+  isHostedByOP: boolean;
+  isAllDay: boolean;
+  coverImageURL: string;
+  createdAt: string;
+  updatedAt: string;
+  free: boolean;
+  isInPrivateResidence: boolean;
+  RecurringEvent: null;
+  occurrenceIndex: null;
+  EventSeries: null;
+  location: { latitude: number; longitude: number } | null;
+  cost: string;
+  Tags: Array<{ text: string }>;
+  CommentsAggregate: { count: number };
+  EventChannels: Array<{
+    id: string;
+    eventId: string;
+    channelUniqueName: string;
+    archived: boolean;
+    Channel: {
+      uniqueName: string;
+      displayName: string;
+      channelIconURL: string;
+    };
+  }>;
+  SubscribedToNotifications: unknown[];
+  SubscribedToEventUpdates: unknown[];
+  FeedbackCommentsAggregate: { count: number };
+  FeedbackComments: unknown[];
+  Poster: UserFixture;
+};
+
+export const buildEvent = ({
+  id = 'event-1',
+  eventChannelId = 'event-channel-1',
+  channelUniqueName = 'cats',
+  title = 'Test Event',
+  description = 'Test event description',
+  posterUsername = DEFAULT_USERNAME,
+  overrides = {},
+}: {
+  id?: string;
+  eventChannelId?: string;
+  channelUniqueName?: string;
+  title?: string;
+  description?: string;
+  posterUsername?: string;
+  overrides?: Partial<EventFixture>;
+} = {}): EventFixture => ({
+  id,
+  title,
+  description,
+  startTime: '2030-01-01T18:00:00.000Z',
+  endTime: '2030-01-01T20:00:00.000Z',
+  locationName: 'Test Location',
+  address: '123 Test St',
+  virtualEventUrl: '',
+  startTimeDayOfWeek: 2,
+  startTimeHourOfDay: 18,
+  canceled: false,
+  isHostedByOP: true,
+  isAllDay: false,
+  coverImageURL: '',
+  createdAt: MOCK_DATE,
+  updatedAt: MOCK_DATE,
+  free: true,
+  isInPrivateResidence: false,
+  RecurringEvent: null,
+  occurrenceIndex: null,
+  EventSeries: null,
+  location: null,
+  cost: '',
+  Tags: [],
+  CommentsAggregate: { count: 0 },
+  EventChannels: [
+    {
+      id: eventChannelId,
+      eventId: id,
+      channelUniqueName,
+      archived: false,
+      Channel: {
+        uniqueName: channelUniqueName,
+        displayName: channelUniqueName,
+        channelIconURL: '',
+      },
+    },
+  ],
+  SubscribedToNotifications: [],
+  SubscribedToEventUpdates: [],
+  FeedbackCommentsAggregate: { count: 0 },
+  FeedbackComments: [],
+  Poster: buildUser({
+    username: posterUsername,
+    displayName: posterUsername,
+  }),
+  ...overrides,
+});
