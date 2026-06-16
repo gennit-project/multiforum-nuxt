@@ -21,9 +21,10 @@ import type {
   DiscussionUpdateInput,
   Image,
   FilterOption,
-  FilterGroup,
 } from '@/__generated__/graphql';
 import { modProfileNameVar } from '@/cache';
+import { resolveSelectedLabelOptionIds } from '@/utils/downloadLabelUtils';
+import { buildAlbumUpdateInput } from '@/utils/albumUpdateInput';
 
 const route = useRoute();
 const router = useRouter();
@@ -325,112 +326,12 @@ const existingTags = computed(() => {
 });
 
 // Function to get album update input
-const getAlbumUpdateInput = () => {
-  const albumData = formValues.value.album;
-  if (
-    !albumData ||
-    (!albumData.images?.length && !albumData.imageOrder?.length)
-  ) {
-    return {}; // No album data to update
-  }
-
-  const albumId = discussion.value?.Album?.id;
-
-  // If the album doesn't exist yet, CREATE it and connect to existing images
-  if (!albumId) {
-    const newImages = albumData.images || [];
-
-    // Filter out images without IDs (shouldn't happen with our new flow)
-    const validImages = newImages.filter(
-      (img): img is (typeof img & { id: string }) => Boolean(img.id)
-    );
-
-    if (validImages.length === 0) {
-      return {}; // No valid images to connect
-    }
-
-    const albumNode: {
-      imageOrder: string[];
-      Images: {
-        connect: { where: { node: { id: string } } }[];
-      };
-    } = {
-      imageOrder: albumData.imageOrder || [],
-      Images: {
-        connect: validImages.map((img) => ({
-          where: { node: { id: img.id } },
-        })),
-      },
-    };
-
-    return {
-      Album: {
-        create: {
-          node: albumNode,
-        },
-      },
-    };
-  }
-
-  // If the album already exists, build the connect/update/delete arrays
-  const oldImages = discussion.value?.Album?.Images ?? [];
-  const newImages = albumData.images || [];
-
-  // CONNECT array: new images that need to be connected to this album
-  const connectImageArray = newImages
-    .filter((img) => img.id && !oldImages.some((old) => old.id === img.id))
-    .map((img) => ({
-      connect: [
-        {
-          where: { node: { id: img.id } },
-        },
-      ],
-    }));
-
-  // UPDATE array: existing images that need updates
-  const updateImageArray = newImages
-    .filter((img) => img.id && oldImages.some((old) => old.id === img.id))
-    .map((img) => ({
-      where: { node: { id: img.id } },
-      update: {
-        node: {
-          url: img.url,
-          alt: img.alt,
-          caption: img.caption,
-          copyright: img.copyright,
-        },
-      },
-    }));
-
-  // DISCONNECT array: old images that are no longer present
-  const disconnectImageArray = oldImages
-    .filter((old) => !newImages.some((img) => img.id === old.id))
-    .map((old) => ({
-      disconnect: [
-        {
-          where: { node: { id: old.id } },
-        },
-      ],
-    }));
-
-  // Combine all operations into a single array. Each object is one "Images" operation.
-  const imagesOps = [
-    ...connectImageArray,
-    ...updateImageArray,
-    ...disconnectImageArray,
-  ];
-
-  return {
-    Album: {
-      update: {
-        node: {
-          imageOrder: albumData.imageOrder || [],
-          Images: imagesOps,
-        },
-      },
-    },
-  };
-};
+const getAlbumUpdateInput = () =>
+  buildAlbumUpdateInput({
+    albumData: formValues.value.album,
+    existingAlbumId: discussion.value?.Album?.id,
+    existingImages: discussion.value?.Album?.Images ?? [],
+  });
 
 const updateDiscussionInput = computed<DiscussionUpdateInput>(() => {
   const tagConnections: DiscussionTagsConnectOrCreateFieldInput[] =
@@ -510,34 +411,11 @@ const {
 }));
 
 // Helper function to convert downloadLabels to label option IDs
-const getSelectedLabelOptionIds = (): string[] => {
-  const selectedIds: string[] = [];
-  const downloadLabels = formValues.value.downloadLabels || {};
-
-  // Get all filter groups from channel data
-  const filterGroups = channelData.value?.FilterGroups || [];
-
-  Object.entries(downloadLabels).forEach(([groupKey, selectedValues]) => {
-    // Find the filter group
-    const group = filterGroups.find(
-      (fg: FilterGroup) => fg.key === groupKey
-    );
-
-    if (group?.options) {
-      // For each selected value, find the corresponding option ID
-      selectedValues.forEach((value) => {
-        const option = group.options?.find(
-          (opt: FilterOption) => opt.value === value
-        );
-        if (option?.id) {
-          selectedIds.push(option.id);
-        }
-      });
-    }
+const getSelectedLabelOptionIds = (): string[] =>
+  resolveSelectedLabelOptionIds({
+    downloadLabels: formValues.value.downloadLabels,
+    filterGroups: channelData.value?.FilterGroups,
   });
-
-  return selectedIds;
-};
 
 const {
   mutate: updateDiscussionChannelLabels,
