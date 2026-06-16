@@ -29,6 +29,10 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { hasBotMention, type BotSuggestion } from '@/utils/botMentions';
+import {
+  filterCommentsBySearch,
+  resolveChannelUniqueName,
+} from '@/utils/commentSection';
 import type { ModSuggestion } from '@/utils/modMentions';
 
 // Import new composables
@@ -218,15 +222,12 @@ const editFormOpenAtCommentID = ref('');
 const searchText = ref('');
 
 // Filter comments by search text (client-side filtering)
-const filteredComments = computed(() => {
-  if (!searchText.value.trim()) {
-    return props.comments || [];
-  }
-  const searchLower = searchText.value.toLowerCase().trim();
-  return (props.comments || []).filter((comment) =>
-    comment?.text?.toLowerCase().includes(searchLower)
-  );
-});
+const filteredComments = computed(() =>
+  filterCommentsBySearch({
+    comments: props.comments,
+    searchText: searchText.value,
+  })
+);
 const locked = ref(props.locked);
 const showModProfileModal = ref(false);
 
@@ -339,24 +340,13 @@ onDoneUpdatingComment(() => {
   };
 });
 
-const fallbackChannelUniqueName = computed(() => {
-  const firstComment = (props.comments || []).find(
-    (comment) => !!comment?.id
-  );
-  return (
-    firstComment?.DiscussionChannel?.channelUniqueName ||
-    firstComment?.Channel?.uniqueName ||
-    ''
-  );
-});
-
-const effectiveChannelUniqueName = computed(() => {
-  return (
-    props.commentSectionQueryVariables.channelUniqueName ||
-    fallbackChannelUniqueName.value ||
-    ''
-  );
-});
+const effectiveChannelUniqueName = computed(() =>
+  resolveChannelUniqueName({
+    comments: props.comments,
+    explicitChannelUniqueName:
+      props.commentSectionQueryVariables.channelUniqueName,
+  })
+);
 
 const {
   issueNumber: suspensionIssueNumber,

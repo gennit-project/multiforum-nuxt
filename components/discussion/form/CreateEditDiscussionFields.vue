@@ -14,6 +14,10 @@ import {
   MAX_CHARS_IN_DISCUSSION_BODY,
   DISCUSSION_TITLE_CHAR_LIMIT,
 } from '@/utils/constants';
+import {
+  discussionFormNeedsChanges,
+  getDiscussionFormValidationMessage,
+} from '@/utils/discussionFormValidation';
 import AlbumEditForm from '../detail/AlbumEditForm.vue';
 import DownloadEditForm from './DownloadEditForm.vue';
 import type { Channel, Discussion } from '@/__generated__/graphql';
@@ -60,15 +64,15 @@ const formTitle = computed(() => {
 const touched = ref(false);
 const titleInputRef = ref<HTMLElement | null>(null);
 
-const needsChanges = computed(() => {
-  return !(
-    props.formValues?.selectedChannels &&
-    props.formValues.selectedChannels.length > 0 &&
-    props.formValues?.title &&
-    props.formValues?.body?.length <= MAX_CHARS_IN_DISCUSSION_BODY &&
-    props.formValues?.title.length <= DISCUSSION_TITLE_CHAR_LIMIT
-  );
-});
+const discussionFormValidationInput = computed(() => ({
+  selectedChannelsCount: props.formValues?.selectedChannels?.length || 0,
+  title: props.formValues?.title || '',
+  body: props.formValues?.body || '',
+}));
+
+const needsChanges = computed(() =>
+  discussionFormNeedsChanges(discussionFormValidationInput.value)
+);
 
 const embeddedCrosspost = computed<Discussion | null>(() => {
   return (
@@ -86,18 +90,9 @@ const showCrosspostSection = computed(() => {
   );
 });
 
-const changesRequiredMessage = computed(() => {
-  if (!props.formValues?.title) {
-    return 'A title is required.';
-  } else if (props.formValues?.selectedChannels?.length === 0) {
-    return 'Must select at least one forum.';
-  } else if (props.formValues?.body?.length > MAX_CHARS_IN_DISCUSSION_BODY) {
-    return `Body cannot exceed ${MAX_CHARS_IN_DISCUSSION_BODY} characters.`;
-  } else if (props.formValues?.title.length > DISCUSSION_TITLE_CHAR_LIMIT) {
-    return `Title cannot exceed ${DISCUSSION_TITLE_CHAR_LIMIT} characters.`;
-  }
-  return '';
-});
+const changesRequiredMessage = computed(() =>
+  getDiscussionFormValidationMessage(discussionFormValidationInput.value)
+);
 
 const showCreateDiscussionError = computed(() => {
   return !(

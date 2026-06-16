@@ -13,8 +13,13 @@ import type {
   EventChannel,
   Event as EventData,
 } from '@/__generated__/graphql';
-import { DateTime } from 'luxon';
 import { stableRelativeTime } from '@/utils';
+import { isEventInThePast, hasEventStarted } from '@/utils/eventTiming';
+import {
+  formatEventDate,
+  buildEventSeoMeta,
+  buildEventStructuredData,
+} from '@/utils/eventSeo';
 import 'md-editor-v3/lib/style.css';
 import EventFooter from '@/components/event/detail/EventFooter.vue';
 import EventHeader from '@/components/event/detail/EventHeader.vue';
@@ -30,9 +35,7 @@ import AddToCalendarButton from '../AddToCalendarButton.vue';
 import ArchivedEventInfoBanner from './ArchivedEventInfoBanner.vue';
 import { getOriginalPoster } from '@/utils/originalPoster';
 
-const formatDate = (date: string) => {
-  return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);
-};
+const formatDate = formatEventDate;
 
 const COMMENT_LIMIT = 50;
 
@@ -274,18 +277,9 @@ const channelsExceptCurrent = computed(() => {
   );
 });
 
-const eventIsInThePast = computed(() => {
-  if (!event.value) return false;
-  return DateTime.fromISO(event.value.endTime) < DateTime.now();
-});
+const eventIsInThePast = computed(() => isEventInThePast(event.value));
 
-const eventHasStarted = computed(() => {
-  if (!event.value) return false;
-  return (
-    DateTime.fromISO(event.value.startTime) < DateTime.now() &&
-    !eventIsInThePast.value
-  );
-});
+const eventHasStarted = computed(() => hasEventStarted(event.value));
 
 const originalPoster = computed(() => event.value?.Poster?.username || '');
 
@@ -302,79 +296,32 @@ const handleClickEditEventDescription = () => {
 
 // Add SEO metadata for the event
 watchEffect(() => {
-  if (!event.value) {
-    useHead({
-      title: `Event Not Found${channelId.value ? ` | ${channelId.value}` : ''}`,
-      description: 'The requested event could not be found.',
-    });
-    return;
-  }
-
-  const title = event.value.title || 'Event';
   const forumName =
     activeEventChannel.value?.Channel?.displayName || channelId.value || '';
-  const description = event.value.description
-    ? event.value.description.substring(0, 160) +
-      (event.value.description.length > 160 ? '...' : '')
-    : `${title} - Event on ${formatDate(event.value.startTime)}`;
-  const baseUrl = import.meta.env.VITE_BASE_URL;
   const serverDisplayName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
-  const imageUrl = event.value.coverImageURL || '';
 
-  // Set basic SEO meta tags
-  useHead({
-    title: forumName
-      ? `${title} | ${forumName} | ${serverDisplayName}`
-      : `${title} | ${serverDisplayName}`,
-    description: description,
-    image: imageUrl,
-    type: 'event',
-  });
+  useHead(
+    buildEventSeoMeta({
+      event: event.value,
+      channelId: channelId.value,
+      forumName,
+      serverDisplayName,
+    })
+  );
+
+  if (!event.value) return;
 
   // Add structured data for rich results
   useHead({
     script: [
       {
         type: 'application/ld+json',
-        children: JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'Event',
-          name: title,
-          description: description,
-          startDate: event.value.startTime,
-          endDate: event.value.endTime,
-          image: imageUrl,
-          location: event.value.address
-            ? {
-                '@type': 'Place',
-                name: event.value.address,
-                address: {
-                  '@type': 'PostalAddress',
-                  streetAddress: event.value.address,
-                },
-              }
-            : {
-                '@type': 'VirtualLocation',
-                url:
-                  event.value.virtualEventUrl ??
-                  `${baseUrl}/events/list/search/${event.value.id}`,
-              },
-          organizer: {
-            '@type': 'Person',
-            name:
-              event.value.Poster?.displayName ||
-              event.value.Poster?.username ||
-              'Anonymous',
-          },
-          eventStatus: event.value.canceled
-            ? 'https://schema.org/EventCancelled'
-            : eventIsInThePast.value
-              ? 'https://schema.org/EventScheduled'
-              : 'https://schema.org/EventScheduled',
-          eventAttendanceMode: event.value.virtualEventUrl
-            ? 'https://schema.org/OnlineEventAttendanceMode'
-            : 'https://schema.org/OfflineEventAttendanceMode',
-        }),
+        children: JSON.stringify(
+          buildEventStructuredData({
+            event: event.value,
+            baseUrl: import.meta.env.VITE_BASE_URL,
+          })
+        ),
       },
     ],
   });

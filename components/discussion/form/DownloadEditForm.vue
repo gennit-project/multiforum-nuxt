@@ -23,9 +23,11 @@ import Notification from '@/components/NotificationComponent.vue';
 import { uploadAndGetEmbeddedLink, getUploadFileName } from '@/utils';
 import { usernameVar } from '@/cache';
 import DownloadLabelPicker from '@/components/download/DownloadLabelPicker.vue';
-
-const MAX_DOWNLOAD_FILE_SIZE_MB = 50;
-const MAX_DOWNLOAD_FILE_SIZE_BYTES = MAX_DOWNLOAD_FILE_SIZE_MB * 1024 * 1024;
+import {
+  validateDownloadFileType,
+  validateDownloadFileSize,
+  MAX_DOWNLOAD_FILE_SIZE_MB,
+} from '@/utils/downloadFileValidation';
 
 type DownloadableFileSupportFields = {
   attributionOverride?: string | null;
@@ -223,46 +225,15 @@ onMounted(() => {
 });
 
 // File validation
-const validateFileType = (file: File): { valid: boolean; message: string } => {
-  if (downloadsDisabled.value) {
-    return {
-      valid: false,
-      message: 'Downloads are disabled in this channel.',
-    };
-  }
+const validateFileType = (file: File) =>
+  validateDownloadFileType({
+    fileName: file.name,
+    fileType: file.type,
+    allowedFileTypes: props.channelData?.allowedFileTypes || [],
+    downloadsDisabled: downloadsDisabled.value,
+  });
 
-  const allowedTypes = props.channelData?.allowedFileTypes || [];
-
-  if (allowedTypes.length === 0) {
-    return { valid: true, message: '' };
-  }
-
-  const fileExtension = file.name.toLowerCase().split('.').pop();
-  const isAllowed = allowedTypes.some(
-    (type) =>
-      type.toLowerCase().includes(fileExtension || '') ||
-      file.type.toLowerCase().includes(type.toLowerCase())
-  );
-
-  if (!isAllowed) {
-    return {
-      valid: false,
-      message: `File type not allowed. Allowed types: ${allowedTypes.join(', ')}`,
-    };
-  }
-
-  return { valid: true, message: '' };
-};
-
-const validateFileSize = (file: File): { valid: boolean; message: string } => {
-  if (file.size > MAX_DOWNLOAD_FILE_SIZE_BYTES) {
-    return {
-      valid: false,
-      message: `File size must be less than ${MAX_DOWNLOAD_FILE_SIZE_MB}MB. Current file is ${(file.size / (1024 * 1024)).toFixed(1)}MB.`,
-    };
-  }
-  return { valid: true, message: '' };
-};
+const validateFileSize = (file: File) => validateDownloadFileSize(file.size);
 
 // File upload handling
 const handleFileUpload = async (event: Event) => {
