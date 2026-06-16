@@ -8,12 +8,12 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { makeDiscussion } from '@/tests/utils/factories';
 import type { Discussion } from '@/__generated__/graphql';
 
+import SitewideDiscussionListItem from '@/components/discussion/list/SitewideDiscussionListItem.vue';
+
 vi.mock('@vue/apollo-composable', () => ({ useQuery: vi.fn() }));
 vi.mock('nuxt/app', () => ({ useRoute: () => createMockRoute() }));
 vi.mock('@/cache', () => createCacheMock({ username: 'alice' }));
 vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
-
-import SitewideDiscussionListItem from '@/components/discussion/list/SitewideDiscussionListItem.vue';
 
 const mountItem = (discussion: Discussion) => {
   asMock(useQuery).mockReturnValue(createQueryMock({ users: [] }));

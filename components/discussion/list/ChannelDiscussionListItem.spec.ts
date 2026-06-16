@@ -12,6 +12,8 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { makeDiscussion } from '@/tests/utils/factories';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 
+import ChannelDiscussionListItem from '@/components/discussion/list/ChannelDiscussionListItem.vue';
+
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
   useMutation: () => createMutationMock(),
@@ -34,8 +36,6 @@ vi.mock('nuxt/app', () => ({
 }));
 vi.mock('@/cache', () => createCacheMock({ username: 'alice' }));
 vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
-
-import ChannelDiscussionListItem from '@/components/discussion/list/ChannelDiscussionListItem.vue';
 
 const mountItem = (title: string) => {
   asMock(useQuery).mockReturnValue(createQueryMock({ users: [] }));

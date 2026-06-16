@@ -3,6 +3,8 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createMockRoute, createMockRouter } from '@/tests/utils/mockRouter';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
+
 // uiStore (pulled in by MarkdownPreview) imports useCookie/useRoute/useRouter
 // from nuxt/app at module load.
 vi.mock('nuxt/app', () => ({
@@ -10,8 +12,6 @@ vi.mock('nuxt/app', () => ({
   useRoute: () => createMockRoute(),
   useRouter: () => createMockRouter(),
 }));
-
-import MarkdownPreview from '@/components/MarkdownPreview.vue';
 
 const mountPreview = (props: Record<string, unknown>) =>
   mountWithDefaults(MarkdownPreview, {
