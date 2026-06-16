@@ -125,9 +125,6 @@ test.describe('Library page', () => {
 
     await page.goto('/library');
 
-    // Wait for page to be stable
-    await page.waitForLoadState('networkidle');
-
     // Check that the Library header is visible
     await expect(page.getByRole('heading', { name: 'Library' })).toBeVisible({ timeout: 10000 });
 
@@ -145,9 +142,6 @@ test.describe('Library page', () => {
     });
 
     await page.goto('/library');
-
-    // Wait for page to be stable
-    await page.waitForLoadState('networkidle');
 
     // Check that filter buttons are present
     await expect(page.getByRole('button', { name: 'All' })).toBeVisible({ timeout: 10000 });
@@ -169,9 +163,6 @@ test.describe('Library page', () => {
 
     await page.goto('/library');
 
-    // Wait for page to be stable
-    await page.waitForLoadState('networkidle');
-
     // Check My Downloads section - use the link locator which is more specific
     await expect(page.getByRole('link', { name: /My Downloads/i })).toBeVisible({ timeout: 10000 });
   });
@@ -186,9 +177,6 @@ test.describe('Library page', () => {
     });
 
     await page.goto('/library');
-
-    // Wait for page to be stable
-    await page.waitForLoadState('networkidle');
 
     // Check that favorite sections are displayed (the sidebar "Favorites"
     // heading specifically — use exact match so it doesn't also match the
@@ -208,9 +196,6 @@ test.describe('Library page', () => {
     });
 
     await page.goto('/library');
-
-    // Wait for page to be stable
-    await page.waitForLoadState('networkidle');
 
     // Check that Your Collections header is displayed
     await expect(page.getByText('Your Collections')).toBeVisible({ timeout: 10000 });
