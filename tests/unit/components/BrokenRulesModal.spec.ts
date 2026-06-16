@@ -1,10 +1,12 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import * as issueMutations from '@/graphQLData/issue/mutations';
 import * as modMutations from '@/graphQLData/mod/mutations';
 
 // Track mutations and their onDone callbacks
 type MutationTracker = {
-  mutate: ReturnType<typeof vi.fn>;
+  // vitest 4 types bare `vi.fn()` as the non-callable union
+  // `Mock<Procedure | Constructable>`; give mutate an explicit callable shape.
+  mutate: Mock<(variables?: any) => Promise<any>>;
   onDone: (callback: () => void) => void;
   loading: { value: boolean };
   error: { value: null | Error };
@@ -18,7 +20,7 @@ vi.mock('@vue/apollo-composable', () => ({
   useMutation: (doc: unknown) => {
     if (!mutationsByDoc.has(doc)) {
       const tracker: MutationTracker = {
-        mutate: vi.fn().mockResolvedValue({
+        mutate: vi.fn<(variables?: any) => Promise<any>>().mockResolvedValue({
           data: {
             reportDiscussion: { id: 'issue-1', issueNumber: 1 },
             reportEvent: { id: 'issue-1', issueNumber: 1 },
@@ -93,7 +95,7 @@ describe('BrokenRulesModal mutation invocations', () => {
       const reportDiscussionMutation = mutationsByDoc.get(issueMutations.REPORT_DISCUSSION) ||
         (() => {
           const tracker: MutationTracker = {
-            mutate: vi.fn().mockResolvedValue({ data: { reportDiscussion: { id: 'issue-1' } } }),
+            mutate: vi.fn<(variables?: any) => Promise<any>>().mockResolvedValue({ data: { reportDiscussion: { id: 'issue-1' } } }),
             onDone: vi.fn(),
             loading: { value: false },
             error: { value: null },
@@ -118,7 +120,7 @@ describe('BrokenRulesModal mutation invocations', () => {
     it('reportEvent is called with correct variables when eventId is provided', async () => {
       const reportEventMutation = (() => {
         const tracker: MutationTracker = {
-          mutate: vi.fn().mockResolvedValue({ data: { reportEvent: { id: 'issue-1' } } }),
+          mutate: vi.fn<(variables?: any) => Promise<any>>().mockResolvedValue({ data: { reportEvent: { id: 'issue-1' } } }),
           onDone: vi.fn(),
           loading: { value: false },
           error: { value: null },
@@ -143,7 +145,7 @@ describe('BrokenRulesModal mutation invocations', () => {
     it('reportComment is called with correct variables when commentId is provided', async () => {
       const reportCommentMutation = (() => {
         const tracker: MutationTracker = {
-          mutate: vi.fn().mockResolvedValue({ data: { reportComment: { id: 'issue-1' } } }),
+          mutate: vi.fn<(variables?: any) => Promise<any>>().mockResolvedValue({ data: { reportComment: { id: 'issue-1' } } }),
           onDone: vi.fn(),
           loading: { value: false },
           error: { value: null },
@@ -170,7 +172,7 @@ describe('BrokenRulesModal mutation invocations', () => {
     it('archiveDiscussion is called with correct variables', async () => {
       const archiveDiscussionMutation = (() => {
         const tracker: MutationTracker = {
-          mutate: vi.fn().mockResolvedValue({ data: { archiveDiscussion: { id: 'issue-1' } } }),
+          mutate: vi.fn<(variables?: any) => Promise<any>>().mockResolvedValue({ data: { archiveDiscussion: { id: 'issue-1' } } }),
           onDone: vi.fn(),
           loading: { value: false },
           error: { value: null },
@@ -195,7 +197,7 @@ describe('BrokenRulesModal mutation invocations', () => {
     it('archiveEvent is called with correct variables', async () => {
       const archiveEventMutation = (() => {
         const tracker: MutationTracker = {
-          mutate: vi.fn().mockResolvedValue({ data: { archiveEvent: { id: 'issue-1' } } }),
+          mutate: vi.fn<(variables?: any) => Promise<any>>().mockResolvedValue({ data: { archiveEvent: { id: 'issue-1' } } }),
           onDone: vi.fn(),
           loading: { value: false },
           error: { value: null },
@@ -220,7 +222,7 @@ describe('BrokenRulesModal mutation invocations', () => {
     it('archiveComment is called with correct variables (no channelUniqueName)', async () => {
       const archiveCommentMutation = (() => {
         const tracker: MutationTracker = {
-          mutate: vi.fn().mockResolvedValue({ data: { archiveComment: { id: 'issue-1' } } }),
+          mutate: vi.fn<(variables?: any) => Promise<any>>().mockResolvedValue({ data: { archiveComment: { id: 'issue-1' } } }),
           onDone: vi.fn(),
           loading: { value: false },
           error: { value: null },
@@ -247,7 +249,7 @@ describe('BrokenRulesModal mutation invocations', () => {
     it('archiveDiscussion is called first, then suspendUser with issueId from archive response', async () => {
       const archiveDiscussionMutation = (() => {
         const tracker: MutationTracker = {
-          mutate: vi.fn().mockResolvedValue({ data: { archiveDiscussion: { id: 'issue-from-archive' } } }),
+          mutate: vi.fn<(variables?: any) => Promise<any>>().mockResolvedValue({ data: { archiveDiscussion: { id: 'issue-from-archive' } } }),
           onDone: vi.fn(),
           loading: { value: false },
           error: { value: null },
@@ -258,7 +260,7 @@ describe('BrokenRulesModal mutation invocations', () => {
 
       const suspendUserMutation = (() => {
         const tracker: MutationTracker = {
-          mutate: vi.fn().mockResolvedValue({ data: { suspendUser: { success: true } } }),
+          mutate: vi.fn<(variables?: any) => Promise<any>>().mockResolvedValue({ data: { suspendUser: { success: true } } }),
           onDone: vi.fn(),
           loading: { value: false },
           error: { value: null },
@@ -298,7 +300,7 @@ describe('BrokenRulesModal mutation invocations', () => {
     it('suspendUser receives indefinite=true when suspension length is indefinite', async () => {
       const suspendUserMutation = (() => {
         const tracker: MutationTracker = {
-          mutate: vi.fn().mockResolvedValue({ data: { suspendUser: { success: true } } }),
+          mutate: vi.fn<(variables?: any) => Promise<any>>().mockResolvedValue({ data: { suspendUser: { success: true } } }),
           onDone: vi.fn(),
           loading: { value: false },
           error: { value: null },
@@ -327,7 +329,7 @@ describe('BrokenRulesModal mutation invocations', () => {
     it('archiveEvent is called before suspendUser when eventId is provided', async () => {
       const archiveEventMutation = (() => {
         const tracker: MutationTracker = {
-          mutate: vi.fn().mockResolvedValue({ data: { archiveEvent: { id: 'event-issue-id' } } }),
+          mutate: vi.fn<(variables?: any) => Promise<any>>().mockResolvedValue({ data: { archiveEvent: { id: 'event-issue-id' } } }),
           onDone: vi.fn(),
           loading: { value: false },
           error: { value: null },
@@ -338,7 +340,7 @@ describe('BrokenRulesModal mutation invocations', () => {
 
       const suspendUserMutation = (() => {
         const tracker: MutationTracker = {
-          mutate: vi.fn().mockResolvedValue({ data: { suspendUser: { success: true } } }),
+          mutate: vi.fn<(variables?: any) => Promise<any>>().mockResolvedValue({ data: { suspendUser: { success: true } } }),
           onDone: vi.fn(),
           loading: { value: false },
           error: { value: null },
@@ -376,7 +378,7 @@ describe('BrokenRulesModal mutation invocations', () => {
     it('archiveComment is called before suspendUser when commentId is provided', async () => {
       const archiveCommentMutation = (() => {
         const tracker: MutationTracker = {
-          mutate: vi.fn().mockResolvedValue({ data: { archiveComment: { id: 'comment-issue-id' } } }),
+          mutate: vi.fn<(variables?: any) => Promise<any>>().mockResolvedValue({ data: { archiveComment: { id: 'comment-issue-id' } } }),
           onDone: vi.fn(),
           loading: { value: false },
           error: { value: null },
@@ -387,7 +389,7 @@ describe('BrokenRulesModal mutation invocations', () => {
 
       const suspendUserMutation = (() => {
         const tracker: MutationTracker = {
-          mutate: vi.fn().mockResolvedValue({ data: { suspendUser: { success: true } } }),
+          mutate: vi.fn<(variables?: any) => Promise<any>>().mockResolvedValue({ data: { suspendUser: { success: true } } }),
           onDone: vi.fn(),
           loading: { value: false },
           error: { value: null },
