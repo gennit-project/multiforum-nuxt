@@ -3,6 +3,8 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createMockRoute } from '@/tests/utils/mockRouter';
 import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 
+import LoginButton from '@/components/nav/LoginButton.vue';
+
 const route = createMockRoute();
 
 vi.mock('nuxt/app', () => ({ useRoute: () => route }));
@@ -10,8 +12,6 @@ vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
 vi.mock('@auth0/auth0-vue', () => ({
   useAuth0: () => ({ logout: vi.fn() }),
 }));
-
-import LoginButton from '@/components/nav/LoginButton.vue';
 
 // Stub that renders the unauthenticated slot instead of the harness default.
 const unauthStub = {

@@ -3,10 +3,10 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 import { makeComment } from '@/tests/utils/factories';
 
+import ReplyButton from '@/components/comments/ReplyButton.vue';
+
 // RequireAuth (stubbed at render) imports useSSRAuth → nuxt/app; mock it.
 vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
-
-import ReplyButton from '@/components/comments/ReplyButton.vue';
 
 const mountButton = (props: Record<string, unknown> = {}) =>
   mountWithDefaults(ReplyButton, {

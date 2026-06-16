@@ -3,6 +3,8 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createMockRoute, createMockRouter } from '@/tests/utils/mockRouter';
 import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 
+import DownloadFilterBar from '@/components/download/DownloadFilterBar.vue';
+
 const route = createMockRoute({ name: 'DownloadList' });
 const router = createMockRouter();
 vi.mock('nuxt/app', () => ({
@@ -10,8 +12,6 @@ vi.mock('nuxt/app', () => ({
   useRouter: () => router,
 }));
 vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
-
-import DownloadFilterBar from '@/components/download/DownloadFilterBar.vue';
 
 const heavyStubs = {
   SearchBar: true,

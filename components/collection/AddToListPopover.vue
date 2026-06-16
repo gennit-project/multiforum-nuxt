@@ -19,9 +19,6 @@ import {
 // Type for item types that can be added to collections
 type ItemType = 'discussion' | 'comment' | 'image' | 'channel' | 'download';
 
-// Type for items that can be in a collection (union of possible types)
-type CollectionItem = { id?: string; uniqueName?: string };
-
 // Type for collection objects used in this component
 type CollectionListItem = Pick<Collection, 'id' | 'name'>;
 // Shape consumed by the list template (adds the derived itemCount).
