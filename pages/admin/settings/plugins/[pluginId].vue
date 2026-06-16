@@ -13,7 +13,10 @@ import PluginSettingsSection from '@/components/admin/plugins/PluginSettingsSect
 import PluginManifestSection from '@/components/admin/plugins/PluginManifestSection.vue';
 import PluginReadmeSection from '@/components/admin/plugins/PluginReadmeSection.vue';
 import { useToast } from '@/composables/useToast';
-import { compareVersionStrings } from '@/utils/versionUtils';
+import {
+  compareVersionStrings,
+  resolveDefaultVersion,
+} from '@/utils/versionUtils';
 import {
   extractSecretKeys,
   filterOutSecrets,
@@ -340,22 +343,13 @@ const manifestJson = computed(() => {
 watch(
   [availableVersions, () => latestVersion.value, () => shouldAutoUpdate.value],
   ([versions, latest, autoUpdate]) => {
-    if (versions.length > 0 && !selectedVersion.value) {
-      // If auto-update is requested and we have a latest version, select it
-      if (autoUpdate && latest) {
-        selectedVersion.value = latest;
-      }
-      // If installed, default to installed version, otherwise first available
-      else if (installedVersion.value) {
-        selectedVersion.value = installedVersion.value;
-      } else if (versions[0]) {
-        selectedVersion.value = versions[0].version;
-      }
-    }
-    // If auto-update param is set and we have a newer version, switch to it
-    else if (autoUpdate && latest && selectedVersion.value !== latest) {
-      selectedVersion.value = latest;
-    }
+    selectedVersion.value = resolveDefaultVersion({
+      availableVersions: versions.map((v) => v.version),
+      installedVersion: installedVersion.value,
+      latestVersion: latest,
+      shouldAutoUpdate: autoUpdate,
+      currentSelected: selectedVersion.value,
+    });
   },
   { immediate: true }
 );
