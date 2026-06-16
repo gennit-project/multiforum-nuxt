@@ -6,6 +6,8 @@ import {
   createQueryMock,
   configureApolloMocks,
 } from '@/tests/utils/mockApollo';
+import { makeEvent } from '@/tests/utils/factories';
+import type { Event, EventChannel } from '@/__generated__/graphql';
 
 import { useQuery } from '@vue/apollo-composable';
 
@@ -21,29 +23,13 @@ vi.mock('@/cache', () => ({
   usernameVar: { value: '' },
 }));
 
-const makeEvent = (overrides: Record<string, unknown> = {}) => ({
-  id: 'e1',
-  title: 'Test Event',
-  description: 'An event',
-  startTime: '2099-01-01T10:00:00.000Z',
-  endTime: '2099-01-01T12:00:00.000Z',
-  updatedAt: null,
-  Poster: { username: 'alice', __typename: 'User' },
-  EventChannels: [
-    { id: 'ec1', channelUniqueName: 'cats', __typename: 'EventChannel' },
-  ],
-  Tags: [],
-  __typename: 'Event',
-  ...overrides,
-});
-
 const eventChannel = {
   id: 'ec1',
   channelUniqueName: 'cats',
   archived: false,
   Channel: { uniqueName: 'cats', displayName: 'Cats', __typename: 'Channel' },
   __typename: 'EventChannel',
-};
+} as unknown as EventChannel;
 
 const stubs = {
   ErrorBanner: { props: ['text'], template: '<div class="error-stub">{{ text }}</div>' },
@@ -60,7 +46,7 @@ const stubs = {
 };
 
 const setup = (params: {
-  event?: ReturnType<typeof makeEvent> | null;
+  event?: Event | null;
   eventLoading?: boolean;
   eventError?: Error | null;
 } = {}) => {
