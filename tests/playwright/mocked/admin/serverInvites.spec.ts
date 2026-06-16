@@ -82,7 +82,13 @@ test.describe('Server admin/mod invites', () => {
     });
 
     try {
-      await page.goto('/admin/accept-admin-invite');
+      // Wait only for the DOM, not the full `load` event: the `auth`
+      // middleware can trigger a client-side redirect that detaches the
+      // frame and aborts a `load`-gated navigation (ERR_ABORTED). The
+      // networkidle wait below still lets the page settle.
+      await page.goto('/admin/accept-admin-invite', {
+        waitUntil: 'domcontentloaded',
+      });
 
       // Wait for page to load
       await page.waitForLoadState('networkidle');
@@ -111,7 +117,11 @@ test.describe('Server admin/mod invites', () => {
     });
 
     try {
-      await page.goto('/admin/accept-mod-invite');
+      // See note in the admin invite test above: wait for DOM rather than
+      // the full `load` event to avoid an ERR_ABORTED from an auth redirect.
+      await page.goto('/admin/accept-mod-invite', {
+        waitUntil: 'domcontentloaded',
+      });
 
       // Wait for page to load
       await page.waitForLoadState('networkidle');

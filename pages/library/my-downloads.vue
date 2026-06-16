@@ -22,6 +22,7 @@ interface AlbumImage {
 
 // Partial Discussion type for downloads
 type Download = Pick<Discussion, 'id' | 'title' | 'createdAt' | 'Tags'> & {
+  isFavorited?: boolean;
   DiscussionChannels?: Array<{ channelUniqueName?: string }>;
   Author?: {
     username?: string;
@@ -248,6 +249,7 @@ const getFirstAlbumImage = (download: Download): string | undefined => {
                         :allow-add-to-list="false"
                         :discussion-id="download.id"
                         :discussion-title="download.title"
+                        :initial-is-favorited="download.isFavorited"
                         entity-name="Download"
                         size="small"
                       />
