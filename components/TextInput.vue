@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, defineExpose, computed } from 'vue';
+import { ref, watch, computed } from 'vue';
 import ExclamationTriangleIcon from '@/components/icons/ExclamationIcon.vue';
 
 const props = defineProps({

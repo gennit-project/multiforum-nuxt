@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, defineProps, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
 import { GET_USER_IMAGES } from '@/graphQLData/image/queries';
