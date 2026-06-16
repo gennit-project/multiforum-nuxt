@@ -190,8 +190,12 @@ test.describe('Library page', () => {
     // Wait for page to be stable
     await page.waitForLoadState('networkidle');
 
-    // Check that favorite sections are displayed
-    await expect(page.getByText('Favorites')).toBeVisible({ timeout: 10000 });
+    // Check that favorite sections are displayed (the sidebar "Favorites"
+    // heading specifically — use exact match so it doesn't also match the
+    // "...your favorites..." copy in the /library placeholder).
+    await expect(
+      page.getByText('Favorites', { exact: true })
+    ).toBeVisible({ timeout: 10000 });
   });
 
   test('displays Your Collections section', async ({
