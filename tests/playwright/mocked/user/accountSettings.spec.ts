@@ -103,14 +103,17 @@ test.describe('Account settings page', () => {
 
     await page.goto('/account_settings');
 
-    // Wait for page to be stable
-    await page.waitForLoadState('networkidle');
+    // Wait for the page shell to render. This is the first navigation to this
+    // route, so allow extra time for dev-mode on-demand route compilation
+    // instead of relying on a networkidle wait.
+    await expect(
+      page.getByRole('heading', { name: 'Account', exact: true })
+    ).toBeVisible({ timeout: 30000 });
 
     // Check that the email is displayed
     await expect(page.getByText(TEST_EMAIL)).toBeVisible({ timeout: 10000 });
 
     // Check that basic account sections are visible
-    await expect(page.getByRole('heading', { name: 'Account', exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Preferences' })).toBeVisible();
 
     // Page should load without JavaScript errors
@@ -129,11 +132,9 @@ test.describe('Account settings page', () => {
 
     await page.goto('/account_settings');
 
-    // Wait for page to be stable
-    await page.waitForLoadState('networkidle');
-
-    // Check that notification checkboxes are visible
-    await expect(page.getByTestId('notify-comment-reply')).toBeVisible({ timeout: 10000 });
+    // Check that notification checkboxes are visible (generous timeout to
+    // cover dev-mode route compilation if this test runs first)
+    await expect(page.getByTestId('notify-comment-reply')).toBeVisible({ timeout: 30000 });
     await expect(page.getByTestId('notify-discussion-reply')).toBeVisible();
     await expect(page.getByTestId('notify-event-reply')).toBeVisible();
     await expect(page.getByTestId('notify-tagged')).toBeVisible();
@@ -152,11 +153,9 @@ test.describe('Account settings page', () => {
 
     await page.goto('/account_settings');
 
-    // Wait for page to be stable
-    await page.waitForLoadState('networkidle');
-
-    // Check that content preferences section is visible
-    await expect(page.getByText('Content Preferences')).toBeVisible({ timeout: 10000 });
+    // Check that content preferences section is visible (generous timeout to
+    // cover dev-mode route compilation if this test runs first)
+    await expect(page.getByText('Content Preferences')).toBeVisible({ timeout: 30000 });
     await expect(page.getByTestId('enable-sensitive-content')).toBeVisible();
   });
 });
