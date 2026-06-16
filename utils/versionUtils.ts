@@ -50,3 +50,56 @@ export const compareVersionStrings = (versionA: string, versionB: string) => {
 
   return 0;
 };
+
+export type ResolveDefaultVersionParams = {
+  /** Available version strings, newest first. */
+  availableVersions: string[];
+  /** Currently installed version, if any. */
+  installedVersion?: string;
+  /** Latest version reported by the registry, if any. */
+  latestVersion?: string;
+  /** Whether the `?update=true` auto-update flow is active. */
+  shouldAutoUpdate: boolean;
+  /** The version currently selected in the UI. */
+  currentSelected: string;
+};
+
+/**
+ * Decide which plugin version should be selected by default. Mirrors the
+ * priority used on the admin plugin page:
+ * - nothing selected yet: prefer latest (when auto-updating), else the
+ *   installed version, else the newest available;
+ * - already selected: switch to latest only when auto-updating and it differs.
+ * Returns `currentSelected` unchanged when no rule applies.
+ */
+export function resolveDefaultVersion(
+  params: ResolveDefaultVersionParams
+): string {
+  const {
+    availableVersions,
+    installedVersion,
+    latestVersion,
+    shouldAutoUpdate,
+    currentSelected,
+  } = params;
+
+  if (availableVersions.length > 0 && !currentSelected) {
+    if (shouldAutoUpdate && latestVersion) {
+      return latestVersion;
+    }
+    if (installedVersion) {
+      return installedVersion;
+    }
+    return availableVersions[0] ?? currentSelected;
+  }
+
+  if (
+    shouldAutoUpdate &&
+    latestVersion &&
+    currentSelected !== latestVersion
+  ) {
+    return latestVersion;
+  }
+
+  return currentSelected;
+}
