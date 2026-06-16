@@ -40,14 +40,17 @@ vi.mock('@/utils/index', () => ({
 }));
 
 describe('useAlbumImageUpload', () => {
-  let onImageUploaded: ReturnType<typeof vi.fn>;
+  let onImageUploaded: (image: unknown) => void;
   let currentImageCount: () => number;
 
   beforeEach(() => {
     mockCreateSignedStorageUrl.mockClear();
     mockCreateImage.mockClear();
-    onImageUploaded = vi.fn();
+    onImageUploaded = vi.fn(() => {});
     currentImageCount = () => 0;
+    // happy-dom does not implement window.alert, and vitest 4's vi.spyOn
+    // throws when spying on a non-function. Provide a stub to spy on.
+    window.alert = () => {};
   });
 
   afterEach(() => {

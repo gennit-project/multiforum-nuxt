@@ -32,11 +32,23 @@ const mockMarkerClusterer = {
 // Mock Google Maps
 global.google = {
   maps: {
-    Map: vi.fn().mockImplementation(() => mockMap),
-    Marker: vi.fn().mockImplementation(() => mockMarker),
-    LatLngBounds: vi.fn().mockImplementation(() => mockBounds),
-    LatLng: vi.fn().mockImplementation((lat, lng) => ({ lat, lng })),
-    InfoWindow: vi.fn().mockImplementation(() => mockInfoWindow),
+    // Regular functions so each mock can be invoked with `new` (vitest 4
+    // throws "is not a constructor" for arrow-function implementations).
+    Map: vi.fn().mockImplementation(function () {
+      return mockMap;
+    }),
+    Marker: vi.fn().mockImplementation(function () {
+      return mockMarker;
+    }),
+    LatLngBounds: vi.fn().mockImplementation(function () {
+      return mockBounds;
+    }),
+    LatLng: vi.fn().mockImplementation(function (lat, lng) {
+      return { lat, lng };
+    }),
+    InfoWindow: vi.fn().mockImplementation(function () {
+      return mockInfoWindow;
+    }),
     event: {
       clearInstanceListeners: vi.fn(),
     },
@@ -48,14 +60,20 @@ global.google = {
 
 // Mock MarkerClusterer
 vi.mock('@googlemaps/markerclusterer', () => ({
-  MarkerClusterer: vi.fn().mockImplementation(() => mockMarkerClusterer),
+  // Use a regular function so the mock can be invoked with `new` (vitest 4
+  // throws "is not a constructor" for arrow-function implementations).
+  MarkerClusterer: vi.fn().mockImplementation(function () {
+    return mockMarkerClusterer;
+  }),
 }));
 
 // Mock the loader
 vi.mock('@googlemaps/js-api-loader', () => ({
-  Loader: vi.fn().mockImplementation(() => ({
-    load: vi.fn().mockResolvedValue({}),
-  })),
+  Loader: vi.fn().mockImplementation(function () {
+    return {
+      load: vi.fn().mockResolvedValue({}),
+    };
+  }),
 }));
 
 // Mock config
@@ -122,11 +140,13 @@ describe('Map with Clustering', () => {
       value: 1024,
     });
 
-    // Mock MutationObserver
-    global.MutationObserver = vi.fn().mockImplementation(() => ({
-      observe: vi.fn(),
-      disconnect: vi.fn(),
-    }));
+    // Mock MutationObserver (regular function so it works with `new`)
+    global.MutationObserver = vi.fn().mockImplementation(function () {
+      return {
+        observe: vi.fn(),
+        disconnect: vi.fn(),
+      };
+    }) as unknown as typeof MutationObserver;
 
     // Mock document
     Object.defineProperty(document, 'documentElement', {
