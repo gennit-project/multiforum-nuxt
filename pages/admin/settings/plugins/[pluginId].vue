@@ -13,15 +13,25 @@ import PluginSettingsSection from '@/components/admin/plugins/PluginSettingsSect
 import PluginManifestSection from '@/components/admin/plugins/PluginManifestSection.vue';
 import PluginReadmeSection from '@/components/admin/plugins/PluginReadmeSection.vue';
 import { useToast } from '@/composables/useToast';
-import {
-  compareVersionStrings,
-  resolveDefaultVersion,
-} from '@/utils/versionUtils';
+import { resolveDefaultVersion } from '@/utils/versionUtils';
 import {
   extractSecretKeys,
   filterOutSecrets,
   getSecretsToSave,
 } from '@/utils/pluginSettingsUtils';
+import {
+  resolvePluginMetadata,
+  resolvePluginReadme,
+  canEnablePlugin,
+  sortVersionsDescending,
+  hasNewerVersions as hasNewerVersionsUtil,
+  mapInstallErrorMessage,
+  validateRequiredSettings,
+} from '@/utils/pluginVersionUtils';
+import {
+  getPluginFormSections,
+  stringifyManifest,
+} from '@/utils/pluginManifestUtils';
 import type {
   PluginFormSection,
   PluginSecretStatus as PluginSecretStatusType,
@@ -192,41 +202,22 @@ const isInitialLoading = computed(
   () => (pluginsLoading.value || installedLoading.value) && !pluginsResult.value
 );
 
-// Plugin metadata computed properties
-const pluginDisplayName = computed(() => {
-  return (
-    installedPlugin.value?.plugin?.displayName ||
-    plugin.value?.displayName ||
-    plugin.value?.name ||
-    pluginId
-  );
-});
+// Plugin metadata, resolved with the installed-then-registry fallback chain.
+const pluginMeta = computed(() =>
+  resolvePluginMetadata({
+    installed: installedPlugin.value?.plugin,
+    registry: plugin.value,
+    pluginId,
+  })
+);
 
-const pluginDescription = computed(() => {
-  return (
-    installedPlugin.value?.plugin?.description || plugin.value?.description
-  );
-});
-
-const pluginAuthorName = computed(() => {
-  return installedPlugin.value?.plugin?.authorName || plugin.value?.authorName;
-});
-
-const pluginAuthorUrl = computed(() => {
-  return installedPlugin.value?.plugin?.authorUrl || plugin.value?.authorUrl;
-});
-
-const pluginHomepage = computed(() => {
-  return installedPlugin.value?.plugin?.homepage || plugin.value?.homepage;
-});
-
-const pluginLicense = computed(() => {
-  return installedPlugin.value?.plugin?.license || plugin.value?.license;
-});
-
-const pluginTags = computed(() => {
-  return installedPlugin.value?.plugin?.tags || plugin.value?.tags || [];
-});
+const pluginDisplayName = computed(() => pluginMeta.value.displayName);
+const pluginDescription = computed(() => pluginMeta.value.description);
+const pluginAuthorName = computed(() => pluginMeta.value.authorName);
+const pluginAuthorUrl = computed(() => pluginMeta.value.authorUrl);
+const pluginHomepage = computed(() => pluginMeta.value.homepage);
+const pluginLicense = computed(() => pluginMeta.value.license);
+const pluginTags = computed(() => pluginMeta.value.tags);
 
 // Get versions with full details from the plugin detail query
 const pluginDetailVersions = computed(() => {
@@ -235,39 +226,18 @@ const pluginDetailVersions = computed(() => {
   return pluginDetail?.Versions || [];
 });
 
-const pluginReadme = computed(() => {
-  // First, try installed plugin's readme
-  if (installedPlugin.value?.readmeMarkdown) {
-    return installedPlugin.value.readmeMarkdown;
-  }
-
-  // If not installed or no readme, try to get from the selected version in detail query
-  if (selectedVersion.value && pluginDetailVersions.value.length > 0) {
-    const versionDetail = pluginDetailVersions.value.find(
-      (v: { version: string; readmeMarkdown?: string }) =>
-        v.version === selectedVersion.value
-    );
-    if (versionDetail?.readmeMarkdown) {
-      return versionDetail.readmeMarkdown;
-    }
-  }
-
-  // Fallback: try first version with a readme
-  for (const v of pluginDetailVersions.value) {
-    if (v.readmeMarkdown) {
-      return v.readmeMarkdown;
-    }
-  }
-
-  return null;
-});
+const pluginReadme = computed(() =>
+  resolvePluginReadme({
+    installedReadme: installedPlugin.value?.readmeMarkdown,
+    selectedVersion: selectedVersion.value,
+    detailVersions: pluginDetailVersions.value,
+  })
+);
 
 // Extract server settings form sections from the plugin manifest
-const serverSettingsSections = computed((): PluginFormSection[] => {
-  const manifest = installedPlugin.value?.manifest;
-  if (!manifest?.ui?.forms?.server) return [];
-  return manifest.ui.forms.server;
-});
+const serverSettingsSections = computed((): PluginFormSection[] =>
+  getPluginFormSections(installedPlugin.value?.manifest, 'server')
+);
 
 // Convert secrets array to the format expected by PluginSecretField
 const secretStatusesForForm = computed((): PluginSecretStatusType[] => {
@@ -288,20 +258,13 @@ const pluginRepoUrl = computed(() => {
   return currentVersion?.repoUrl;
 });
 
-const canEnable = computed(() => {
-  if (!isInstalled.value) return false;
-  // Check if all secrets are valid or set (untested)
-  return secrets.value.every(
-    (s) => s.status === 'VALID' || s.status === 'SET_UNTESTED'
-  );
-});
+const canEnable = computed(() =>
+  canEnablePlugin({ isInstalled: isInstalled.value, secrets: secrets.value })
+);
 
-const availableVersions = computed(() => {
-  const versions = plugin.value?.Versions || [];
-  return [...versions].sort((a, b) =>
-    compareVersionStrings(b.version, a.version)
-  );
-});
+const availableVersions = computed(() =>
+  sortVersionsDescending(plugin.value?.Versions || [])
+);
 
 const installedVersion = computed(() => {
   return installedPlugin.value?.version;
@@ -311,12 +274,9 @@ const isSelectedVersionInstalled = computed(() => {
   return installedVersion.value === selectedVersion.value;
 });
 
-const hasNewerVersions = computed(() => {
-  if (!installedVersion.value) return true;
-  return availableVersions.value.some(
-    (v) => v.version !== installedVersion.value
-  );
-});
+const hasNewerVersions = computed(() =>
+  hasNewerVersionsUtil(installedVersion.value, availableVersions.value)
+);
 
 // Version update info from backend
 const hasUpdate = computed(() => installedPlugin.value?.hasUpdate ?? false);
@@ -333,11 +293,9 @@ const canInstall = computed(() => {
 });
 
 // Get full manifest JSON for display
-const manifestJson = computed(() => {
-  const manifest = installedPlugin.value?.manifest;
-  if (!manifest) return null;
-  return JSON.stringify(manifest, null, 2);
-});
+const manifestJson = computed(() =>
+  stringifyManifest(installedPlugin.value?.manifest)
+);
 
 // Set default version when plugin loads
 watch(
@@ -415,29 +373,7 @@ const handleInstall = async (versionOverride?: string) => {
   } catch (err: unknown) {
     console.error('Install error:', err);
     const errorMessage = err instanceof Error ? err.message : '';
-
-    if (
-      errorMessage.includes('PLUGIN_VERSION_NOT_FOUND') ||
-      errorMessage.includes('not found in registry')
-    ) {
-      installError.value =
-        'Plugin version not found in registry. Please check that this version exists in the configured plugin registry.';
-    } else if (
-      errorMessage.includes('INTEGRITY_MISMATCH') ||
-      errorMessage.includes('SHA-256 mismatch') ||
-      errorMessage.includes('integrity verification failed')
-    ) {
-      installError.value =
-        'Plugin tarball integrity check failed. The SHA-256 hash of the downloaded tarball does not match the hash in the registry. The registry may need to be updated with the correct hash.';
-    } else if (errorMessage.includes('Failed to fetch plugin registry')) {
-      installError.value =
-        'Could not connect to the plugin registry. Please check that the registry URL is correct and accessible.';
-    } else if (errorMessage.includes('Failed to download tarball')) {
-      installError.value =
-        'Could not download the plugin tarball. Please check that the tarball URL in the registry is correct and accessible.';
-    } else {
-      installError.value = `Installation failed: ${errorMessage || 'Unknown error'}`;
-    }
+    installError.value = mapInstallErrorMessage(errorMessage);
   }
 };
 
@@ -502,16 +438,10 @@ const handleSaveSettings = async () => {
 
   try {
     // Validate required fields
-    for (const section of serverSettingsSections.value) {
-      for (const field of section.fields) {
-        if (field.validation?.required) {
-          const value = settingsValues.value[field.key];
-          if (value === undefined || value === null || value === '') {
-            settingsErrors.value[field.key] = `${field.label} is required`;
-          }
-        }
-      }
-    }
+    settingsErrors.value = validateRequiredSettings(
+      serverSettingsSections.value,
+      settingsValues.value
+    );
 
     // If there are validation errors, don't save
     if (Object.keys(settingsErrors.value).length > 0) {
