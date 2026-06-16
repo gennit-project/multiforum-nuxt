@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { defineProps, computed } from 'vue';
+import { computed } from 'vue';
 import type { PropType } from 'vue';
 import UserPlus from '../icons/UserPlus.vue';
 import UserMinus from '../icons/UserMinus.vue';

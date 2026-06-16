@@ -134,7 +134,7 @@
     "typescript": "^5.8.2",
     "vite": "^6.4.3",
     "vitest": "^4.1.9",
-    "vue-tsc": "^2.2.8"
+    "vue-tsc": "^3.3.5"
   },
   "lint-staged": {
     "*.ts": [
