@@ -71,6 +71,11 @@ jobs:
 
   playwright-tests:
     runs-on: ubuntu-latest
+    # The mocked Playwright suite intercepts every GraphQL call per-page and in
+    # mock mode the app is a client-only SPA, so this job needs neither Neo4j
+    # nor the backend. It builds the SPA once and runs the suite fully parallel
+    # against the production build (see playwright.build.config.ts and
+    # docs/playwright-parallel-build-prototype.md).
     env:
       GRAPHQL_URL_FOR_TYPES: ${{ secrets.GRAPHQL_URL_FOR_TYPES }}
       VITE_GRAPHQL_URL: ${{ secrets.VITE_GRAPHQL_URL }}
@@ -92,47 +97,14 @@ jobs:
       VITE_AUTH0_CLIENT_SECRET: ${{ secrets.VITE_AUTH0_CLIENT_SECRET }}
       VITE_AUTH0_CALLBACK_URL: ${{ secrets.VITE_AUTH0_CALLBACK_URL }}
       VITE_GOOGLE_CLOUD_STORAGE_BUCKET: ${{ secrets.VITE_GOOGLE_CLOUD_STORAGE_BUCKET }}
-      VITE_SENTRY_AUTH_TOKEN: ${{ secrets.VITE_SENTRY_AUTH_TOKEN }}
       VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
       VITE_LIGHTGALLERY_LICENSE_KEY: ${{ secrets.VITE_LIGHTGALLERY_LICENSE_KEY }}
-      NITRO_PRESET: ${{ secrets.NITRO_PRESET }}
-      NEO4J_PASSWORD: playwright-ci-password
-      NEO4J_URI: bolt://127.0.0.1:7687
-      NEO4J_USER: neo4j
       VITE_SERVER_NAME: ${{ secrets.VITE_SERVER_NAME }}
       VITE_ENVIRONMENT: ${{ secrets.VITE_ENVIRONMENT }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Start Neo4j
-        env:
-          NEO4J_AUTH: neo4j/playwright-ci-password
-          NEO4J_PASSWORD: playwright-ci-password
-        run: docker compose up -d database
-
-      - name: Inspect Neo4j startup
-        run: |
-          docker compose ps
-          docker compose logs --tail=100 database || true
-
-      - name: Checkout backend
-        uses: actions/checkout@v4
-        with:
-          repository: gennit-project/multiforum-backend
-          path: gennit-backend
-
-      - name: Patch backend for Playwright mock auth
-        run: node .github/scripts/patch-backend-playwright-auth.mjs gennit-backend/rules/permission/userDataHelperFunctions.ts
-
-      - name: Install backend dependencies
-        working-directory: gennit-backend
-        run: npm install --legacy-peer-deps
-
-      - name: Build backend
-        working-directory: gennit-backend
-        run: npx tsc && node build_scripts/copyCypherFiles.js
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -143,37 +115,30 @@ jobs:
       - name: Clean install dependencies
         run: npm ci --legacy-peer-deps
 
-      - name: Wait for Neo4j
-        run: |
-          for attempt in {1..48}; do
-            if docker compose ps --status exited database | grep -q database; then
-              echo "Neo4j container exited during startup"
-              docker compose logs database || true
-              exit 1
-            fi
-            if curl -fsS http://127.0.0.1:7474 >/dev/null; then
-              exit 0
-            fi
-            echo "Neo4j not ready yet, waiting..."
-            docker compose ps
-            sleep 5
-          done
-          echo "Neo4j did not become ready in time"
-          docker compose logs database || true
-          exit 1
-
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Run Playwright tests
+      - name: Build app (mock mode, standalone Nitro server)
         env:
-          PLAYWRIGHT_BACKEND_CWD: ${{ github.workspace }}/gennit-backend
-        run: npm run test:playwright
+          # node-server preset produces a runnable .output/server/index.mjs;
+          # mock mode disables SSR (client-only SPA) and enables mock auth.
+          NITRO_PRESET: node-server
+          VITE_E2E_MOCK_MODE: 'true'
+          VITE_GRAPHQL_URL: http://127.0.0.1:4100/graphql
+          VITE_SERVER_NAME: Playwright Test Server
+          # Skip Sentry source-map upload / release creation for the test build.
+          VITE_SENTRY_AUTH_TOKEN: ''
+        run: npm run build
 
-      - name: Print Neo4j logs on failure
+      - name: Run Playwright tests (parallel, against the build)
+        env:
+          PLAYWRIGHT_WORKERS: '4'
+        run: npx playwright test --config playwright.build.config.ts
+
+      - name: Upload Playwright report on failure
         if: failure()
-        run: docker compose logs database
-
-      - name: Stop Neo4j
-        if: always()
-        run: docker compose down
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
