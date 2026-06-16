@@ -3,6 +3,8 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createMockRoute, createMockRouter } from '@/tests/utils/mockRouter';
 import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 
+import EventFilterBar from '@/components/event/list/filters/EventFilterBar.vue';
+
 const route = createMockRoute({ name: 'EventList' });
 const router = createMockRouter();
 vi.mock('nuxt/app', () => ({
@@ -10,8 +12,6 @@ vi.mock('nuxt/app', () => ({
   useRouter: () => router,
 }));
 vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
-
-import EventFilterBar from '@/components/event/list/filters/EventFilterBar.vue';
 
 const heavyStubs = {
   LocationSearchBar: true,

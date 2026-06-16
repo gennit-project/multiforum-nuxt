@@ -5,6 +5,8 @@ import { makeComment } from '@/tests/utils/factories';
 import VotesComponent from '@/components/comments/Votes.vue';
 import type { Comment } from '@/__generated__/graphql';
 
+import VoteButtons from '@/components/comments/VoteButtons.vue';
+
 // The four vote mutations just need to be callable; a minimal stub avoids
 // pulling the real Apollo composable.
 vi.mock('@vue/apollo-composable', () => ({
@@ -16,8 +18,6 @@ vi.mock('@vue/apollo-composable', () => ({
 }));
 
 vi.mock('@/cache', () => createCacheMock({ username: 'alice' }));
-
-import VoteButtons from '@/components/comments/VoteButtons.vue';
 
 const comment = (overrides: Record<string, unknown>): Comment =>
   makeComment(overrides as Partial<Comment>);

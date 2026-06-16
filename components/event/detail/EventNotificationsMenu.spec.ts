@@ -2,6 +2,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 
+import EventNotificationsMenu from '@/components/event/detail/EventNotificationsMenu.vue';
+
 vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
 
 // The global setup only mocks the Tab family of @headlessui/vue; provide the
@@ -12,8 +14,6 @@ vi.mock('@headlessui/vue', () => ({
   MenuItems: { template: '<div><slot /></div>' },
   MenuItem: { template: '<div><slot :active="false" /></div>' },
 }));
-
-import EventNotificationsMenu from '@/components/event/detail/EventNotificationsMenu.vue';
 
 const mountMenu = (props: Record<string, unknown> = {}) =>
   mountWithDefaults(EventNotificationsMenu, {

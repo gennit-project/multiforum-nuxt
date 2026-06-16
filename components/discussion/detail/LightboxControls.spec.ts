@@ -2,10 +2,10 @@ import { describe, it, expect, vi } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 
+import LightboxControls from '@/components/discussion/detail/LightboxControls.vue';
+
 // LightboxControls and its AddImageToFavorites child both import RequireAuth.
 vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
-
-import LightboxControls from '@/components/discussion/detail/LightboxControls.vue';
 
 const mountControls = (props: Record<string, unknown> = {}) =>
   mountWithDefaults(LightboxControls, {

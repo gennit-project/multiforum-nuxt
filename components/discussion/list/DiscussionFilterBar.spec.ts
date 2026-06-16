@@ -3,6 +3,8 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createMockRoute, createMockRouter } from '@/tests/utils/mockRouter';
 import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 
+import DiscussionFilterBar from '@/components/discussion/list/DiscussionFilterBar.vue';
+
 // Let the real useFilterBar run against a mocked route/router.
 const route = createMockRoute({ name: 'DiscussionList' });
 const router = createMockRouter();
@@ -11,8 +13,6 @@ vi.mock('nuxt/app', () => ({
   useRouter: () => router,
 }));
 vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
-
-import DiscussionFilterBar from '@/components/discussion/list/DiscussionFilterBar.vue';
 
 const heavyStubs = {
   SearchableForumList: true,

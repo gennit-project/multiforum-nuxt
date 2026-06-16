@@ -5,10 +5,10 @@ import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 import WarningModal from '@/components/WarningModal.vue';
 import type { Issue } from '@/__generated__/graphql';
 
+import OriginalPosterActions from '@/components/mod/OriginalPosterActions.vue';
+
 vi.mock('nuxt/app', () => ({ useRouter: () => createMockRouter() }));
 vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
-
-import OriginalPosterActions from '@/components/mod/OriginalPosterActions.vue';
 
 const mountActions = (props: Record<string, unknown> = {}) =>
   mountWithDefaults(OriginalPosterActions, {

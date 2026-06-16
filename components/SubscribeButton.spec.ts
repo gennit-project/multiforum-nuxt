@@ -2,11 +2,11 @@ import { describe, it, expect, vi } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 
+import SubscribeButton from '@/components/SubscribeButton.vue';
+
 // RequireAuth (stubbed at render by the harness) imports useSSRAuth, which
 // pulls nuxt/app at load — mock it so the component imports cleanly.
 vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
-
-import SubscribeButton from '@/components/SubscribeButton.vue';
 
 const mountButton = (props: Record<string, unknown> = {}) =>
   mountWithDefaults(SubscribeButton, {
