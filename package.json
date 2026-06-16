@@ -47,7 +47,7 @@
     "@headlessui/vue": "^1.7.23",
     "@mdi/font": "^7.4.47",
     "@monaco-editor/loader": "^1.7.0",
-    "@nuxtjs/color-mode": "^3.5.2",
+    "@nuxtjs/color-mode": "^4.0.1",
     "@nuxtjs/i18n": "^10.4.0",
     "@sentry/nuxt": "^10.57.0",
     "@tailwindcss/forms": "^0.5.10",
