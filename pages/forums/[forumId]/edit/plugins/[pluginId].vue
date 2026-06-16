@@ -14,6 +14,19 @@ import {
 } from '@/graphQLData/channel/queries';
 import { UPDATE_CHANNEL_ENABLED_PLUGINS } from '@/graphQLData/channel/mutations';
 import type { PluginFormSection } from '@/types/pluginForms';
+import {
+  getPluginFormSections,
+  getSettingsDefaults,
+  parseSettingsJson,
+  serializeSettingsJson,
+  stringifyManifest,
+  isBotPlugin as detectBotPlugin,
+  parseBotProfiles,
+  resolveServerBotName,
+  resolveServerProfiles,
+  filterChannelSectionsForBot,
+  buildEnabledPluginsInput,
+} from '@/utils/pluginManifestUtils';
 
 type PluginState = {
   enabled: boolean;
@@ -109,52 +122,12 @@ const isLoading = computed(
 
 const isEnabled = computed(() => pluginState.value.enabled);
 
-function getChannelDefaults(manifest: any): Record<string, any> {
-  const defaults = manifest?.settingsDefaults?.channel;
-  if (!defaults || typeof defaults !== 'object') {
-    return {};
-  }
-  return { ...defaults };
-}
-
-function getChannelSections(manifest: any): PluginFormSection[] {
-  if (!manifest?.ui?.forms?.channel) {
-    return [];
-  }
-  return manifest.ui.forms.channel;
-}
-
-function parseSettingsJson(settingsJson: unknown): Record<string, any> {
-  if (!settingsJson) {
-    return {};
-  }
-  if (typeof settingsJson === 'string') {
-    try {
-      const parsed = JSON.parse(settingsJson);
-      return parsed && typeof parsed === 'object' ? parsed : {};
-    } catch {
-      return {};
-    }
-  }
-  if (typeof settingsJson === 'object') {
-    return settingsJson as Record<string, any>;
-  }
-  return {};
-}
-
-function serializeSettingsJson(settings: unknown) {
-  if (typeof settings === 'string') {
-    return settings;
-  }
-  return JSON.stringify(settings ?? {});
-}
-
 function initializePluginState() {
   if (!plugin.value) return;
   const edge = enabledPluginsById.value.get(pluginId.value);
   const manifest = plugin.value.manifest;
   const settingsJson = edge?.properties?.settingsJson;
-  const defaults = getChannelDefaults(manifest);
+  const defaults = getSettingsDefaults(manifest, 'channel');
   pluginState.value = {
     enabled: !!edge,
     settings: {
@@ -199,58 +172,15 @@ async function handleToggleEnabled(enabled: boolean) {
     return;
   }
 
-  const enabledPluginsInput: any[] = [];
   const settingsJson = serializeSettingsJson(pluginState.value.settings);
-
-  if (enabled) {
-    if (edge) {
-      enabledPluginsInput.push({
-        where: {
-          node: {
-            Plugin: { id: pluginId.value },
-            version,
-          },
-        },
-        update: {
-          edge: {
-            settingsJson,
-          },
-        },
-      });
-    } else {
-      enabledPluginsInput.push({
-        connect: [
-          {
-            where: {
-              node: {
-                Plugin: { id: pluginId.value },
-                version,
-              },
-            },
-            edge: {
-              enabled: true,
-              settingsJson,
-            },
-          },
-        ],
-      });
-    }
-  } else if (edge) {
-    enabledPluginsInput.push({
-      disconnect: [
-        {
-          where: {
-            node: {
-              Plugin: { id: pluginId.value },
-              version,
-            },
-          },
-        },
-      ],
-    });
-  } else {
-    return;
-  }
+  const enabledPluginsInput = buildEnabledPluginsInput({
+    enabled,
+    hasEdge: !!edge,
+    pluginId: pluginId.value,
+    version,
+    settingsJson,
+  });
+  if (enabledPluginsInput.length === 0) return;
 
   try {
     await updateChannelEnabledPlugins({
@@ -281,58 +211,15 @@ async function handleSave() {
     return;
   }
 
-  const enabledPluginsInput: any[] = [];
   const settingsJson = serializeSettingsJson(pluginState.value.settings);
-
-  if (pluginState.value.enabled) {
-    if (edge) {
-      enabledPluginsInput.push({
-        where: {
-          node: {
-            Plugin: { id: pluginId.value },
-            version,
-          },
-        },
-        update: {
-          edge: {
-            settingsJson,
-          },
-        },
-      });
-    } else {
-      enabledPluginsInput.push({
-        connect: [
-          {
-            where: {
-              node: {
-                Plugin: { id: pluginId.value },
-                version,
-              },
-            },
-            edge: {
-              enabled: true,
-              settingsJson,
-            },
-          },
-        ],
-      });
-    }
-  } else if (edge) {
-    enabledPluginsInput.push({
-      disconnect: [
-        {
-          where: {
-            node: {
-              Plugin: { id: pluginId.value },
-              version,
-            },
-          },
-        },
-      ],
-    });
-  } else {
-    return;
-  }
+  const enabledPluginsInput = buildEnabledPluginsInput({
+    enabled: pluginState.value.enabled,
+    hasEdge: !!edge,
+    pluginId: pluginId.value,
+    version,
+    settingsJson,
+  });
+  if (enabledPluginsInput.length === 0) return;
 
   saving.value = true;
   try {
@@ -355,36 +242,18 @@ async function handleSave() {
   }
 }
 
-const manifestJson = computed(() => {
-  const manifest = plugin.value?.manifest;
-  if (!manifest) return null;
-  return JSON.stringify(manifest, null, 2);
-});
+const manifestJson = computed(() => stringifyManifest(plugin.value?.manifest));
 
 // Bot plugin detection and handling
-const BOT_TAGS = ['bot', 'bots'];
-
-const isBotPlugin = computed(() => {
-  const tags = plugin.value?.plugin?.tags || [];
-  return tags.some((tag: string) => BOT_TAGS.includes(tag.toLowerCase()));
-});
+const isBotPlugin = computed(() => detectBotPlugin(plugin.value?.plugin?.tags));
 
 // Get bot name from server-level settings or manifest defaults
-const serverBotName = computed(() => {
-  // First check user-set server settings
-  if (plugin.value?.settingsJson) {
-    const settings = parseSettingsJson(plugin.value.settingsJson);
-    if (settings?.botName) {
-      return settings.botName;
-    }
-  }
-  // Fall back to manifest defaults
-  const manifest = plugin.value?.manifest;
-  if (manifest?.settingsDefaults?.server?.botName) {
-    return manifest.settingsDefaults.server.botName;
-  }
-  return '';
-});
+const serverBotName = computed(() =>
+  resolveServerBotName({
+    settingsJson: plugin.value?.settingsJson,
+    manifest: plugin.value?.manifest,
+  })
+);
 
 // Get existing bots for this channel
 const existingBots = computed<ExistingBot[]>(() => {
@@ -397,67 +266,17 @@ const existingBots = computed<ExistingBot[]>(() => {
 });
 
 // Get server-level profiles from settings or manifest defaults
-const serverProfiles = computed<BotProfile[]>(() => {
-  // First check user-set server settings
-  if (plugin.value?.settingsJson) {
-    const settings = parseSettingsJson(plugin.value.settingsJson);
-    // Check profilesJson first (user-configured)
-    if (settings?.profilesJson) {
-      try {
-        const parsed = typeof settings.profilesJson === 'string'
-          ? JSON.parse(settings.profilesJson)
-          : settings.profilesJson;
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map((p: any) => ({
-            id: p.id || '',
-            label: p.label || p.displayName || '',
-            prompt: p.prompt || '',
-          }));
-        }
-      } catch {
-        // Fall through to other sources
-      }
-    }
-    // Check profiles array
-    if (Array.isArray(settings?.profiles) && settings.profiles.length > 0) {
-      return settings.profiles.map((p: any) => ({
-        id: p.id || '',
-        label: p.label || p.displayName || '',
-        prompt: p.prompt || '',
-      }));
-    }
-  }
-  // Fall back to manifest defaults
-  const manifest = plugin.value?.manifest;
-  if (manifest?.settingsDefaults?.server?.profiles) {
-    const profiles = manifest.settingsDefaults.server.profiles;
-    if (Array.isArray(profiles) && profiles.length > 0) {
-      return profiles.map((p: any) => ({
-        id: p.id || '',
-        label: p.label || p.displayName || '',
-        prompt: p.prompt || '',
-      }));
-    }
-  }
-  return [];
-});
+const serverProfiles = computed<BotProfile[]>(() =>
+  resolveServerProfiles({
+    settingsJson: plugin.value?.settingsJson,
+    manifest: plugin.value?.manifest,
+  })
+);
 
 // Parse channel-level profiles from settings
-const botProfiles = computed<BotProfile[]>(() => {
-  const profilesJson = pluginState.value.settings?.profilesJson;
-  if (!profilesJson) return [];
-  try {
-    const parsed = typeof profilesJson === 'string' ? JSON.parse(profilesJson) : profilesJson;
-    if (!Array.isArray(parsed)) return [];
-    return parsed.map((p: any) => ({
-      id: p.id || '',
-      label: p.label || '',
-      prompt: p.prompt || '',
-    }));
-  } catch {
-    return [];
-  }
-});
+const botProfiles = computed<BotProfile[]>(() =>
+  parseBotProfiles(pluginState.value.settings?.profilesJson)
+);
 
 function updateBotProfiles(profiles: BotProfile[]) {
   pluginState.value.settings = {
@@ -471,15 +290,8 @@ function updateBotProfiles(profiles: BotProfile[]) {
 // since we handle it with the custom editor
 const filteredChannelSections = computed<PluginFormSection[]>(() => {
   if (!plugin.value?.manifest) return [];
-  const sections = getChannelSections(plugin.value.manifest);
-
-  if (!isBotPlugin.value) return sections;
-
-  // Filter out profilesJson field from sections
-  return sections.map((section) => ({
-    ...section,
-    fields: section.fields.filter((field) => field.key !== 'profilesJson'),
-  })).filter((section) => section.fields.length > 0);
+  const sections = getPluginFormSections(plugin.value.manifest, 'channel');
+  return filterChannelSectionsForBot(sections, isBotPlugin.value);
 });
 
 const hasFilteredChannelSettings = computed(() => {
