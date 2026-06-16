@@ -9,6 +9,7 @@ them via the `@/tests/utils/...` alias.
 | `mockApollo.ts` | mock `@vue/apollo-composable` queries/mutations |
 | `mockRouter.ts` | mock `nuxt/app` `useRoute` / `useRouter` |
 | `mockAuth.ts` | mock the `@/cache` reactive auth vars |
+| `mockSSRAuth.ts` | mock `@/composables/useSSRAuth` (needed for auth-gated components) |
 | `mountWithDefaults.ts` | mount a component with Pinia + stubs + `$t` preset |
 
 ## Fixtures — `factories.ts`
@@ -67,6 +68,21 @@ import { createCacheMock } from '@/tests/utils/mockAuth';
 
 vi.mock('@/cache', () => createCacheMock({ username: 'alice' })); // authenticated
 vi.mock('@/cache', () => createCacheMock());                      // logged out
+```
+
+## SSR auth — `mockSSRAuth.ts`
+
+Any component that imports `RequireAuth` (directly or transitively) needs this,
+even when `RequireAuth` is stubbed: the import still runs, and `useSSRAuth`
+calls `useCookie` from `nuxt/app`, which crashes under Vitest.
+
+```ts
+import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
+
+vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
+// or seed the hints:
+vi.mock('@/composables/useSSRAuth', () =>
+  createSSRAuthMock({ hasAuthHint: true, usernameHint: 'alice' }));
 ```
 
 ## Mounting — `mountWithDefaults.ts`
