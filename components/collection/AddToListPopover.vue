@@ -11,6 +11,10 @@ import {
   usePopoverPositioning,
   type PopoverPosition,
 } from '@/composables/usePopoverPositioning';
+import {
+  isItemFavorited,
+  filterCollectionsBySearch,
+} from '@/utils/collectionFilters';
 
 // Type for item types that can be added to collections
 type ItemType = 'discussion' | 'comment' | 'image' | 'channel' | 'download';
@@ -20,6 +24,8 @@ type CollectionItem = { id?: string; uniqueName?: string };
 
 // Type for collection objects used in this component
 type CollectionListItem = Pick<Collection, 'id' | 'name'>;
+// Shape consumed by the list template (adds the derived itemCount).
+type CollectionDisplayItem = CollectionListItem & { itemCount?: number };
 
 const props = defineProps({
   itemId: {
@@ -106,7 +112,7 @@ const { result: itemInCollectionsResult, refetch: refetchItemInCollections } =
     })
   );
 
-const collections = computed(() => {
+const collections = computed<CollectionDisplayItem[]>(() => {
   return collectionsResult.value?.users?.[0]?.Collections || [];
 });
 
@@ -160,34 +166,21 @@ const itemInCollections = computed(() => {
   return itemInCollectionsResult.value?.users?.[0]?.Collections || [];
 });
 
-const isItemInFavorites = computed(() => {
-  // If it's already favorited (from the button state), show it as checked
-  if (props.isAlreadyFavorite) return true;
+const isItemInFavorites = computed(() =>
+  isItemFavorited({
+    itemType: props.itemType,
+    itemId: props.itemId,
+    isAlreadyFavorite: props.isAlreadyFavorite,
+    favoriteItems: favoritesList.value?.items,
+  })
+);
 
-  // Otherwise check if it's in the favorites list from the query
-  if (props.itemType === 'channel') {
-    // Channels use uniqueName instead of id
-    return (
-      favoritesList.value?.items?.some(
-        (item: CollectionItem) => item.uniqueName === props.itemId
-      ) || false
-    );
-  } else {
-    // Other item types use id
-    return (
-      favoritesList.value?.items?.some(
-        (item: CollectionItem) => item.id === props.itemId
-      ) || false
-    );
-  }
-});
-
-const filteredCollections = computed(() => {
-  if (!searchTerm.value) return collections.value;
-  return collections.value.filter((collection: Pick<Collection, 'name'>) =>
-    collection.name.toLowerCase().includes(searchTerm.value.toLowerCase())
-  );
-});
+const filteredCollections = computed(() =>
+  filterCollectionsBySearch({
+    collections: collections.value,
+    searchTerm: searchTerm.value,
+  })
+);
 
 // Use positioning composable
 const positionRef = computed(() => props.position);
