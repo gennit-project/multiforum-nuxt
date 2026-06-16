@@ -179,6 +179,7 @@ const favoriteChannels = computed(() => {
                       :allow-add-to-list="false"
                       :channel-unique-name="channel.uniqueName"
                       :channel-display-name="channel.displayName || ''"
+                      :initial-is-favorited="true"
                       size="medium"
                     />
                   </div>

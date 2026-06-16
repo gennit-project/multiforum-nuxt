@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { gql } from '@apollo/client/core';
 import {
@@ -28,6 +28,11 @@ const props = defineProps({
     type: String,
     default: 'medium',
   },
+  // When provided, skip making a separate API call
+  initialIsFavorited: {
+    type: Boolean,
+    default: undefined,
+  },
 });
 
 const GET_USER_FAVORITES = gql`
@@ -41,10 +46,16 @@ const GET_USER_FAVORITES = gql`
   }
 `;
 
-const isFavorited = ref(false);
+// Use initial value if provided, otherwise default to false
+const isFavorited = ref(props.initialIsFavorited ?? false);
 const isLoading = ref(false);
 const toastStore = useToastStore();
 const addToListModalStore = useAddToListModalStore();
+
+// Only fetch if initialIsFavorited was not provided
+const shouldFetchFavorite = computed(() =>
+  props.initialIsFavorited === undefined && !!usernameVar.value && !!props.channelUniqueName
+);
 
 const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
   GET_USER_FAVORITES,
@@ -53,14 +64,25 @@ const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
     channelUniqueName: props.channelUniqueName,
   }),
   () => ({
-    enabled: !!usernameVar.value,
+    enabled: shouldFetchFavorite.value,
   })
 );
 
+// Watch for changes to initialIsFavorited prop (e.g., when parent refetches)
+watch(
+  () => props.initialIsFavorited,
+  (newValue) => {
+    if (newValue !== undefined) {
+      isFavorited.value = newValue;
+    }
+  }
+);
+
+// Watch query result only when we're fetching
 watch(
   favoritesResult,
   (newResult) => {
-    if (newResult?.users?.[0]?.FavoriteChannels) {
+    if (shouldFetchFavorite.value && newResult?.users?.[0]?.FavoriteChannels) {
       isFavorited.value = newResult.users[0].FavoriteChannels.some(
         (channel: { uniqueName: string }) => channel.uniqueName === props.channelUniqueName
       );
@@ -134,7 +156,10 @@ const handleToggleFavorite = async () => {
       });
       showAddedToast();
     }
-    refetchFavorites();
+    // Only refetch if we're managing our own query
+    if (shouldFetchFavorite.value) {
+      refetchFavorites();
+    }
   } catch (error) {
     console.error('Error toggling favorite:', error);
     // Revert optimistic update on error

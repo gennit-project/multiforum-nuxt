@@ -231,6 +231,7 @@ export const GET_USER_OWNED_DOWNLOADS = gql`
         createdAt
         updatedAt
         hasDownload
+        isFavorited(username: $username)
         Author {
           username
           displayName

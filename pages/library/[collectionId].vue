@@ -44,6 +44,7 @@ const {
   GET_COLLECTION_ITEMS,
   () => ({
     collectionId: collectionId.value,
+    loggedInUsername: usernameVar.value,
   }),
   () => ({
     enabled: !!collectionId.value,
@@ -478,6 +479,7 @@ const handleDelete = async () => {
                         :allow-add-to-list="true"
                         :discussion-id="discussion.id"
                         :discussion-title="discussion.title"
+                        :initial-is-favorited="discussion.isFavorited"
                         size="medium"
                       />
                     </div>

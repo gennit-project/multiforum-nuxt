@@ -310,6 +310,7 @@ const getAuthorInfo = (discussion: FavoriteDiscussion) => {
                       :allow-add-to-list="false"
                       :discussion-id="discussion.id"
                       :discussion-title="discussion.title"
+                      :initial-is-favorited="true"
                       size="medium"
                     />
                   </div>
