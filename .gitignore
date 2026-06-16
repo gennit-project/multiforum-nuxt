@@ -6,6 +6,9 @@
 .cache
 dist
 
+# Claude Code per-user local settings (skills are committed; local settings are not)
+.claude/settings.local.json
+
 # Node dependencies
 node_modules
 
