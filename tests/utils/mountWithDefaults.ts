@@ -23,10 +23,30 @@ const slotPassthrough = (slotName = 'default') =>
     },
   });
 
+/** Renders an <a> so NuxtLink content stays visible and href is assertable. */
+const linkPassthrough = defineComponent({
+  name: 'NuxtLinkStub',
+  props: { to: { type: [String, Object], default: '' } },
+  setup(props, { slots }) {
+    return () =>
+      h(
+        'a',
+        { href: typeof props.to === 'string' ? props.to : undefined },
+        slots.default?.()
+      );
+  },
+});
+
 export const defaultStubs: Record<string, Component> = {
   NuxtLayout: slotPassthrough(),
   // RequireAuth exposes a `has-auth` slot for the authenticated branch.
   RequireAuth: slotPassthrough('has-auth'),
+  // ClientOnly should render its content in unit tests.
+  ClientOnly: slotPassthrough(),
+  // Routing links render as transparent anchors.
+  NuxtLink: linkPassthrough,
+  'nuxt-link': linkPassthrough,
+  'router-link': linkPassthrough,
 };
 
 export const defaultMocks: Record<string, unknown> = {
