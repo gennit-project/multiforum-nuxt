@@ -121,6 +121,10 @@ const renderMap = async () => {
     zoom: 7,
     mapTypeId: 'terrain',
     mapId: config.googleMapId,
+    colorScheme:
+      currentTheme.value === 'dark'
+        ? google.maps.ColorScheme.DARK
+        : google.maps.ColorScheme.LIGHT,
     zoomControl: true,
     zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_TOP },
   };
