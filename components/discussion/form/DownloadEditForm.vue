@@ -5,9 +5,6 @@ import type {
   Discussion,
   DownloadableFile,
   DiscussionUpdateInput,
-  DiscussionDownloadableFilesConnectFieldInput,
-  DiscussionDownloadableFilesDisconnectFieldInput,
-  DiscussionDownloadableFilesUpdateFieldInput,
   FilterGroup,
 } from '@/__generated__/graphql';
 // Using string literals instead of importing enums from massive generated file
@@ -28,6 +25,12 @@ import {
   validateDownloadFileSize,
   MAX_DOWNLOAD_FILE_SIZE_MB,
 } from '@/utils/downloadFileValidation';
+import {
+  getDownloadFileMimeType,
+  getDownloadFileKind,
+  buildDownloadAcceptAttribute,
+  buildDownloadableFilesUpdateInput,
+} from '@/utils/downloadFileHelpers';
 
 type DownloadableFileSupportFields = {
   attributionOverride?: string | null;
@@ -186,25 +189,9 @@ onDone(() => {
 });
 
 // Generate accept attribute from channel allowed file types
-const acceptAttribute = computed(() => {
-  const allowedTypes = props.channelData?.allowedFileTypes || [];
-  if (allowedTypes.length === 0) {
-    return undefined; // No restriction if no types specified
-  }
-
-  // Convert file types to file extensions for accept attribute
-  const extensions = allowedTypes.map((type) => {
-    const lowerType = type.toLowerCase();
-    // If it's already an extension (starts with .), use as-is
-    if (lowerType.startsWith('.')) {
-      return lowerType;
-    }
-    // Otherwise add a dot prefix
-    return `.${lowerType}`;
-  });
-
-  return extensions.join(',');
-});
+const acceptAttribute = computed(() =>
+  buildDownloadAcceptAttribute(props.channelData?.allowedFileTypes)
+);
 
 const downloadsDisabled = computed(() => {
   return props.channelData?.downloadsEnabled === false;
@@ -375,53 +362,10 @@ const uploadFile = async (file: File): Promise<boolean> => {
   }
 };
 
-const getFileTypeFromName = (filename: string): string | null => {
-  if (!filename) return null;
+const getFileTypeFromName = (filename: string): string | null =>
+  getDownloadFileMimeType(filename);
 
-  const extension = filename.toLowerCase().split('.').pop();
-  if (!extension) return null;
-
-  const mimeTypes: Record<string, string> = {
-    zip: 'application/zip',
-    rar: 'application/x-rar-compressed',
-    '7z': 'application/x-7z-compressed',
-    tar: 'application/x-tar',
-    gz: 'application/gzip',
-    pdf: 'application/pdf',
-    doc: 'application/msword',
-    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    exe: 'application/x-msdownload',
-    dmg: 'application/x-apple-diskimage',
-    pkg: 'application/x-newton-compatible-pkg',
-    deb: 'application/vnd.debian.binary-package',
-    rpm: 'application/x-rpm',
-  };
-
-  return mimeTypes[extension] || 'application/octet-stream';
-};
-
-const getFileKind = (file: File): string => {
-  const extension = file.name.toLowerCase().split('.').pop();
-
-  // Map to actual FileKind enum values: ZIP, RAR, PNG, JPG, BLEND, STL, GLB, OTHER
-  if (extension === 'zip') {
-    return 'ZIP';
-  } else if (extension === 'rar') {
-    return 'RAR';
-  } else if (['png'].includes(extension || '')) {
-    return 'PNG';
-  } else if (['jpg', 'jpeg'].includes(extension || '')) {
-    return 'JPG';
-  } else if (extension === 'blend') {
-    return 'BLEND';
-  } else if (extension === 'stl') {
-    return 'STL';
-  } else if (extension === 'glb') {
-    return 'GLB';
-  }
-
-  return 'OTHER';
-};
+const getFileKind = (file: File): string => getDownloadFileKind(file.name);
 
 // Remove file
 const removeFile = (index: number) => {
@@ -457,68 +401,10 @@ const updateFileSupportField = (
 };
 
 function getUpdateDiscussionInputForDownloadableFiles(): DiscussionUpdateInput {
-  // 1) If no downloadable files exist yet in the original discussion, CREATE connections
-  if (
-    !props.discussion?.DownloadableFiles ||
-    props.discussion.DownloadableFiles?.length === 0
-  ) {
-    const newFiles = formValues.value.downloadableFiles || [];
-
-    // Build connect array for new files
-    const connectArray: DiscussionDownloadableFilesConnectFieldInput[] =
-      newFiles
-        .filter((file) => file.id) // Only connect files that have database IDs
-        .map((file) => ({
-          where: { node: { id: file.id } },
-        }));
-
-    return {
-      hasDownload: newFiles.length > 0,
-      DownloadableFiles:
-        connectArray.length > 0
-          ? [
-              {
-                connect: connectArray,
-              },
-            ]
-          : undefined,
-    };
-  }
-
-  // 2) If downloadable files already exist, we build the connect/disconnect arrays
-  const oldFiles = props.discussion.DownloadableFiles ?? [];
-  const newFiles = formValues.value.downloadableFiles;
-
-  // CONNECT array: any new file in `newFiles` that has NO matching ID in `oldFiles`
-  const connectArray: DiscussionDownloadableFilesConnectFieldInput[] = newFiles
-    .filter((file) => file.id && !oldFiles.some((old) => old.id === file.id))
-    .map((file) => ({
-      where: { node: { id: file.id } },
-    }));
-
-  // DISCONNECT array: any old file that is no longer present in `newFiles`
-  const disconnectArray: DiscussionDownloadableFilesDisconnectFieldInput[] =
-    oldFiles
-      .filter((old) => !newFiles.some((file) => file.id === old.id))
-      .map((old) => ({
-        where: { node: { id: old.id } },
-      }));
-
-  // Build the update field input object
-  const updateFieldInput: DiscussionDownloadableFilesUpdateFieldInput = {};
-  if (connectArray.length > 0) {
-    updateFieldInput.connect = connectArray;
-  }
-  if (disconnectArray.length > 0) {
-    updateFieldInput.disconnect = disconnectArray;
-  }
-
-  // Return the update input
-  return {
-    hasDownload: newFiles.length > 0,
-    DownloadableFiles:
-      Object.keys(updateFieldInput).length > 0 ? [updateFieldInput] : undefined,
-  };
+  return buildDownloadableFilesUpdateInput({
+    originalFiles: props.discussion?.DownloadableFiles,
+    currentFiles: formValues.value.downloadableFiles,
+  });
 }
 
 // For handling save
