@@ -10,7 +10,7 @@ import AddImage from '@/components/AddImage.vue';
 import RemoveOwnerModal from '@/components/channel/RemoveOwnerModal.vue';
 import { getUploadFileName, uploadAndGetEmbeddedLink } from '@/utils';
 import { usernameVar } from '@/cache';
-import { ref, nextTick, defineProps, defineEmits, computed } from 'vue';
+import { ref, nextTick, computed } from 'vue';
 import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
 import { REMOVE_FORUM_OWNER } from '@/graphQLData/mod/mutations';
 import { useMutation } from '@vue/apollo-composable';

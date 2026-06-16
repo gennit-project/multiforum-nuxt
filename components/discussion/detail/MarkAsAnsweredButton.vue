@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { defineProps } from 'vue';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import { useMutation } from '@vue/apollo-composable';
 import {
