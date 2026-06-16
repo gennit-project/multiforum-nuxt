@@ -24,6 +24,7 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import { getDuration } from '@/utils';
 import { getEventHeaderMenuItems } from '@/utils/headerPermissionUtils';
+import { formatEventDateString } from '@/utils/eventDateFormat';
 import GenericFeedbackFormModal from '@/components/GenericFeedbackFormModal.vue';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import { modProfileNameVar, usernameVar } from '@/cache';
@@ -425,19 +426,11 @@ const menuItems = computed(() => {
 });
 
 function getFormattedDateString(startTime: string) {
-  // if the event is all day and spans multiple days,
-  // include start and end date but not time
-  if (props.eventData.isAllDay && props.eventData.endTime) {
-    const start = DateTime.fromISO(startTime);
-    const end = DateTime.fromISO(props.eventData.endTime);
-    if (start.hasSame(end, 'day')) {
-      return start.toFormat('cccc LLLL d yyyy');
-    }
-    return `${start.toFormat('cccc LLLL d yyyy')} - ${end.toFormat(
-      'cccc LLLL d yyyy'
-    )}`;
-  }
-  return DateTime.fromISO(startTime).toFormat('cccc LLLL d yyyy h:mm a');
+  return formatEventDateString({
+    startTime,
+    isAllDay: props.eventData.isAllDay,
+    endTime: props.eventData.endTime,
+  });
 }
 
 const feedbackText = ref('');
