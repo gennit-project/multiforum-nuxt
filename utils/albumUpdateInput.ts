@@ -1,8 +1,17 @@
+import type {
+  DiscussionUpdateInput,
+  AlbumImagesConnectFieldInput,
+  AlbumImagesUpdateFieldInput,
+} from '@/__generated__/graphql';
+
 /**
  * Pure builder extracted from the download edit page
  * (pages/forums/[forumId]/downloads/edit/[discussionId].vue). Produces the
  * `Album` portion of a discussion update input, choosing between creating a new
  * album and updating an existing one (connect/update/disconnect images).
+ *
+ * The return type is `Pick<DiscussionUpdateInput, 'Album'>`, so the generated
+ * GraphQL schema validates the produced shape at compile time.
  */
 
 export type AlbumFormImage = {
@@ -20,11 +29,13 @@ export type AlbumFormData = {
 
 export type ExistingAlbumImage = { id?: string | null };
 
+export type AlbumUpdatePortion = Pick<DiscussionUpdateInput, 'Album'>;
+
 export function buildAlbumUpdateInput(params: {
   albumData: AlbumFormData;
   existingAlbumId?: string | null;
   existingImages?: ExistingAlbumImage[];
-}) {
+}): AlbumUpdatePortion {
   const { albumData, existingAlbumId, existingImages = [] } = params;
 
   if (
@@ -45,30 +56,31 @@ export function buildAlbumUpdateInput(params: {
       return {}; // No valid images to connect
     }
 
-    const albumNode: {
-      imageOrder: string[];
-      Images: { connect: { where: { node: { id: string } } }[] };
-    } = {
-      imageOrder: albumData.imageOrder || [],
-      Images: {
-        connect: validImages.map((img) => ({
-          where: { node: { id: img.id } },
-        })),
+    const connect: AlbumImagesConnectFieldInput[] = validImages.map((img) => ({
+      where: { node: { id: img.id } },
+    }));
+
+    return {
+      Album: {
+        create: {
+          node: {
+            imageOrder: albumData.imageOrder || [],
+            Images: { connect },
+          },
+        },
       },
     };
-
-    return { Album: { create: { node: albumNode } } };
   }
 
-  // Existing album: build connect/update/disconnect arrays.
+  // Existing album: build connect/update/disconnect operations.
   const oldImages = existingImages;
   const newImages = albumData.images || [];
 
-  const connectImageArray = newImages
+  const connectImageArray: AlbumImagesUpdateFieldInput[] = newImages
     .filter((img) => img.id && !oldImages.some((old) => old.id === img.id))
     .map((img) => ({ connect: [{ where: { node: { id: img.id } } }] }));
 
-  const updateImageArray = newImages
+  const updateImageArray: AlbumImagesUpdateFieldInput[] = newImages
     .filter((img) => img.id && oldImages.some((old) => old.id === img.id))
     .map((img) => ({
       where: { node: { id: img.id } },
@@ -82,11 +94,11 @@ export function buildAlbumUpdateInput(params: {
       },
     }));
 
-  const disconnectImageArray = oldImages
+  const disconnectImageArray: AlbumImagesUpdateFieldInput[] = oldImages
     .filter((old) => !newImages.some((img) => img.id === old.id))
     .map((old) => ({ disconnect: [{ where: { node: { id: old.id } } }] }));
 
-  const imagesOps = [
+  const imagesOps: AlbumImagesUpdateFieldInput[] = [
     ...connectImageArray,
     ...updateImageArray,
     ...disconnectImageArray,
