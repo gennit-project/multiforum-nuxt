@@ -1,4 +1,8 @@
 import type { PluginFormSection } from '@/types/pluginForms';
+import type {
+  ChannelEnabledPluginsUpdateFieldInput,
+  PluginVersionWhere,
+} from '@/__generated__/graphql';
 
 /**
  * Pure helpers shared by the server- and channel-scoped plugin configuration
@@ -214,19 +218,23 @@ export interface EnabledPluginsInputParams {
 /**
  * Build the `enabledPlugins` mutation input for connecting, updating, or
  * disconnecting a plugin on a channel. Returns `[]` when there is nothing to
- * do (disabling a plugin that has no edge).
+ * do (disabling a plugin that has no edge). The return type is tied to the
+ * generated `ChannelEnabledPluginsUpdateFieldInput`, so the schema validates
+ * the produced shape at compile time.
  */
 export function buildEnabledPluginsInput(
   params: EnabledPluginsInputParams
-): unknown[] {
+): ChannelEnabledPluginsUpdateFieldInput[] {
   const { enabled, hasEdge, pluginId, version, settingsJson } = params;
-  const node = { Plugin: { id: pluginId }, version };
+  const node: PluginVersionWhere = { Plugin: { id: pluginId }, version };
 
   if (enabled) {
     if (hasEdge) {
       return [{ where: { node }, update: { edge: { settingsJson } } }];
     }
-    return [{ connect: [{ where: { node }, edge: { enabled: true, settingsJson } }] }];
+    return [
+      { connect: [{ where: { node }, edge: { enabled: true, settingsJson } }] },
+    ];
   }
   if (hasEdge) {
     return [{ disconnect: [{ where: { node } }] }];
