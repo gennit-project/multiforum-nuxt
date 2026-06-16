@@ -19,6 +19,7 @@ import SaveButton from '@/components/SaveButton.vue';
 import CancelButton from '@/components/CancelButton.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import AlbumThumbnailGrid from '@/components/album/AlbumThumbnailGrid.vue';
+import { useImageZoomPan } from '@/composables/useImageZoomPan';
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
@@ -184,102 +185,30 @@ const albumImages = computed(() => {
   return orderedImages.filter((img) => img.id !== image.value?.id);
 });
 
-// Custom lightbox state
-const isLightboxOpen = ref(false);
-
-// Zoom functionality
-const zoomLevel = ref(1);
-const isZoomed = computed(() => zoomLevel.value > 1);
-
-// Image panning
-const isDragging = ref(false);
-const startX = ref(0);
-const startY = ref(0);
-const translateX = ref(0);
-const translateY = ref(0);
-
-const startDrag = (event: MouseEvent) => {
-  if (!isZoomed.value) return;
-
-  if (event.button !== 0) return;
-
-  event.preventDefault();
-  isDragging.value = true;
-  startX.value = event.clientX - translateX.value;
-  startY.value = event.clientY - translateY.value;
-};
-
-const onDrag = (event: MouseEvent) => {
-  if (!isDragging.value) return;
-
-  event.preventDefault();
-  translateX.value = event.clientX - startX.value;
-  translateY.value = event.clientY - startY.value;
-};
-
-const stopDrag = () => {
-  isDragging.value = false;
-};
-
-// Reset translation when changing zoom
-const resetTranslation = () => {
-  translateX.value = 0;
-  translateY.value = 0;
-};
-
-// Lightbox functions
-const openLightbox = () => {
-  if (
-    image.value?.url &&
-    !hasGlbExtension(image.value.url) &&
-    !hasStlExtension(image.value.url)
-  ) {
-    isLightboxOpen.value = true;
-    zoomLevel.value = 1;
-    resetTranslation();
-    document.body.style.overflow = 'hidden';
-  }
-};
-
-const closeLightbox = () => {
-  isLightboxOpen.value = false;
-  zoomLevel.value = 1;
-  resetTranslation();
-  document.body.style.overflow = '';
-};
-
-// Zoom functions
-const zoomIn = () => {
-  if (zoomLevel.value < 3) {
-    zoomLevel.value += 0.5;
-  }
-};
-
-const zoomOut = () => {
-  if (zoomLevel.value > 1) {
-    zoomLevel.value -= 0.5;
-  }
-};
-
-const resetZoom = () => {
-  zoomLevel.value = 1;
-  resetTranslation();
-};
-
-// Keyboard navigation
-const handleKeyDown = (e: KeyboardEvent) => {
-  if (isLightboxOpen.value) {
-    if (e.key === 'Escape') {
-      closeLightbox();
-    } else if (e.key === '+') {
-      zoomIn();
-    } else if (e.key === '-') {
-      zoomOut();
-    } else if (e.key === '0') {
-      resetZoom();
-    }
-  }
-};
+// Lightbox zoom + pan state (extracted to a composable). The open guard keeps
+// the component's url/format checks.
+const {
+  isLightboxOpen,
+  zoomLevel,
+  isZoomed,
+  isDragging,
+  translateX,
+  translateY,
+  startDrag,
+  onDrag,
+  stopDrag,
+  openLightbox,
+  closeLightbox,
+  zoomIn,
+  zoomOut,
+  resetZoom,
+  handleKeyDown,
+} = useImageZoomPan({
+  canOpenLightbox: () =>
+    image.value?.url
+      ? !hasGlbExtension(image.value.url) && !hasStlExtension(image.value.url)
+      : false,
+});
 
 const downloadImage = (imageUrl: string) => {
   fetch(imageUrl)
