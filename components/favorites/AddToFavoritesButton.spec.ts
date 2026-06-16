@@ -1,15 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
+import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 
 // RequireAuth (stubbed at render) imports useSSRAuth, which pulls nuxt/app at
 // module load; mock it so importing the component doesn't crash.
-vi.mock('@/composables/useSSRAuth', () => ({
-  useSSRAuth: () => ({
-    setAuthHint: vi.fn(),
-    setUsernameHint: vi.fn(),
-    clearAuthHints: vi.fn(),
-  }),
-}));
+vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
 
 import AddToFavoritesButton from '@/components/favorites/AddToFavoritesButton.vue';
 
