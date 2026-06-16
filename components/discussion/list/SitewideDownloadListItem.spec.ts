@@ -6,14 +6,14 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { makeDiscussion } from '@/tests/utils/factories';
 import type { Discussion } from '@/__generated__/graphql';
 
+import SitewideDownloadListItem from '@/components/discussion/list/SitewideDownloadListItem.vue';
+
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: () => createQueryMock({}),
   useMutation: () => createMutationMock(),
 }));
 vi.mock('nuxt/app', () => ({ useRoute: () => createMockRoute() }));
 vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
-
-import SitewideDownloadListItem from '@/components/discussion/list/SitewideDownloadListItem.vue';
 
 const mountItem = (title: string) =>
   mountWithDefaults(SitewideDownloadListItem, {
