@@ -8,6 +8,12 @@ import AlbumDropZone from './AlbumDropZone.vue';
 import AlbumUrlInputForm from './AlbumUrlInputForm.vue';
 import { useAlbumImageUpload } from '@/composables/useAlbumImageUpload';
 import { useAlbumAutoSave } from '@/composables/useAlbumAutoSave';
+import {
+  orderImagesByOrder,
+  getImageIdOrder,
+  moveImageOrderUp,
+  moveImageOrderDown,
+} from '@/utils/albumImageOrder';
 import type { Album } from '@/__generated__/graphql';
 
 const MAX_IMAGES = 25;
@@ -40,31 +46,16 @@ const isImageLimitReached = computed(() => {
 });
 
 // Ordered images based on imageOrder field
-const orderedImages = computed(() => {
-  if (!props.formValues.album?.images) {
-    return [];
-  }
-
-  if (
-    !props.formValues.album.imageOrder ||
-    props.formValues.album.imageOrder.length === 0
-  ) {
-    return props.formValues.album.images;
-  }
-
-  return props.formValues.album.imageOrder
-    .map((imageId) => {
-      return props.formValues.album.images?.find(
-        (image) => image.id === imageId
-      );
-    })
-    .filter((image) => image !== undefined);
-});
+const orderedImages = computed(() =>
+  orderImagesByOrder({
+    images: props.formValues.album?.images,
+    imageOrder: props.formValues.album?.imageOrder,
+  })
+);
 
 // Helper to update imageOrder after changes
-const updateImageOrderAfterChange = (images: ImageInput[]) => {
-  return images.map((img) => img.id).filter((id) => id !== undefined);
-};
+const updateImageOrderAfterChange = (images: ImageInput[]) =>
+  getImageIdOrder(images);
 
 // Helper to add a new image to the album
 const addNewImage = (input: Partial<ImageInput>) => {
@@ -196,21 +187,10 @@ const deleteImage = (index: number) => {
 const moveImageUp = (index: number) => {
   if (index <= 0) return;
 
-  const updatedImageOrder = [...props.formValues.album.imageOrder];
-  const currentItem = updatedImageOrder[index];
-  const previousItem = updatedImageOrder[index - 1];
-
-  if (currentItem && previousItem) {
-    [updatedImageOrder[index], updatedImageOrder[index - 1]] = [
-      previousItem,
-      currentItem,
-    ];
-  }
-
   emit('updateFormValues', {
     album: {
       images: props.formValues.album.images,
-      imageOrder: updatedImageOrder,
+      imageOrder: moveImageOrderUp(props.formValues.album.imageOrder, index),
     },
   });
 
@@ -222,21 +202,10 @@ const moveImageDown = (index: number) => {
   const imageOrder = props.formValues.album.imageOrder;
   if (index >= imageOrder.length - 1) return;
 
-  const updatedImageOrder = [...imageOrder];
-  const currentItem = updatedImageOrder[index];
-  const nextItem = updatedImageOrder[index + 1];
-
-  if (currentItem && nextItem) {
-    [updatedImageOrder[index], updatedImageOrder[index + 1]] = [
-      nextItem,
-      currentItem,
-    ];
-  }
-
   emit('updateFormValues', {
     album: {
       images: props.formValues.album.images,
-      imageOrder: updatedImageOrder,
+      imageOrder: moveImageOrderDown(imageOrder, index),
     },
   });
 

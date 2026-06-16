@@ -16,6 +16,13 @@ import {
   setIsLoadingAuth,
 } from '@/cache';
 import { MAX_CHARS_IN_USERNAME } from '@/utils/constants';
+import {
+  isValidUsername,
+  getUsernameValidationMessage,
+  calculateAge,
+  getBirthdayValidationMessage,
+  MIN_SIGNUP_AGE,
+} from '@/utils/usernameValidation';
 
 const props = defineProps({
   email: {
@@ -63,45 +70,17 @@ const usernameIsEmpty = computed(() => {
   return newUsername.value.length === 0;
 });
 
-const isValidUsername = (username: string) => {
-  return /^[a-zA-Z0-9_]+$/.test(username);
-};
-
-const validationErrorMessage = computed(() => {
-  if (usernameIsEmpty.value) {
-    return 'Username cannot be empty.';
-  }
-  if (usernameIsTaken.value) {
-    return 'The username is already taken.';
-  }
-  if (usernameIsInvalid.value) {
-    return 'Username can only contain letters, numbers, and underscores.';
-  }
-  if (newUsername.value && newUsername.value.length > MAX_CHARS_IN_USERNAME) {
-    return `Username must be less than ${MAX_CHARS_IN_USERNAME} characters.`;
-  }
-  return '';
-});
+const validationErrorMessage = computed(() =>
+  getUsernameValidationMessage({
+    username: newUsername.value || '',
+    isEmpty: usernameIsEmpty.value,
+    isTaken: usernameIsTaken.value,
+  })
+);
 
 const usernameIsInvalid = computed(
   () => !isValidUsername(newUsername.value || '')
 );
-
-// Age validation logic
-const calculateAge = (birthDate: string): number => {
-  if (!birthDate) return 0;
-
-  const today = new Date();
-  const birth = new Date(birthDate);
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDiff = today.getMonth() - birth.getMonth();
-
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-    age--;
-  }
-
-  return age;
-};
 
 const userAge = computed(() => calculateAge(birthday.value));
 
@@ -111,18 +90,12 @@ const birthdayIsEmpty = computed(
 
 const isUnderAge = computed(() => {
   if (birthdayIsEmpty.value) return false;
-  return userAge.value < 13;
+  return userAge.value < MIN_SIGNUP_AGE;
 });
 
-const birthdayValidationMessage = computed(() => {
-  if (birthdayIsEmpty.value) {
-    return 'Birthday is required.';
-  }
-  if (isUnderAge.value) {
-    return 'You must be at least 13 years old to create an account.';
-  }
-  return '';
-});
+const birthdayValidationMessage = computed(() =>
+  getBirthdayValidationMessage({ birthday: birthday.value })
+);
 
 const confirmedAvailable = computed(
   () =>

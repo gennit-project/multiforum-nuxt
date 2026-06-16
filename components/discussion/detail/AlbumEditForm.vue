@@ -3,9 +3,12 @@ import { ref, computed, onMounted } from 'vue';
 import type { PropType } from 'vue';
 import type {
   Discussion,
-  Image,
   DiscussionUpdateInput,
 } from '@/__generated__/graphql';
+import {
+  mapAlbumImagesToForm,
+  getInitialImageOrder,
+} from '@/utils/albumImages';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import { useMutation } from '@vue/apollo-composable';
@@ -93,41 +96,16 @@ const albumId = computed(() => {
   return props.discussion?.Album?.id || '';
 });
 
-const images = computed(() => {
-  if (!props.discussion?.Album?.Images) return [];
-  return props.discussion.Album.Images.map((image: Image) => {
-    return {
-      id: image.id || '',
-      url: image.url || '',
-      alt: image.alt || '',
-      caption: image.caption || '',
-      isCoverImage: false,
-      hasSensitiveContent: false,
-      hasSpoiler: false,
-      copyright: image.copyright || '',
-    };
-  });
-});
+const images = computed(() =>
+  mapAlbumImagesToForm(props.discussion?.Album?.Images)
+);
 
-const initialImageOrder = computed<string[]>(() => {
-  // If there's an existing order, use it
-  if (props.discussion?.Album?.imageOrder?.length) {
-    // Filter out any null or undefined values to ensure string[]
-    return props.discussion.Album.imageOrder.filter(
-      (id): id is string => typeof id === 'string'
-    );
-  }
-
-  // If no order exists, create one from the images array
-  if (images.value.length > 0) {
-    // Create an order from the image IDs
-    return images.value
-      .filter((img): img is (typeof images.value)[number] => Boolean(img.id))
-      .map((img) => img.id);
-  }
-
-  return [];
-});
+const initialImageOrder = computed<string[]>(() =>
+  getInitialImageOrder({
+    albumImageOrder: props.discussion?.Album?.imageOrder,
+    images: images.value,
+  })
+);
 
 // Create reactive form values based on the computed props
 const formValues = ref<AlbumFormData>({

@@ -36,6 +36,10 @@ import {
   EVENT_TITLE_CHAR_LIMIT,
   MAX_CHARS_IN_EVENT_DESCRIPTION,
 } from '@/utils/constants';
+import {
+  eventFormNeedsChanges,
+  getEventFormValidationMessage,
+} from '@/utils/eventFormValidation';
 import type { PropType } from 'vue';
 import { isFileSizeValid } from '@/utils/index';
 
@@ -278,40 +282,22 @@ const duration = computed(() => {
   );
 });
 
-const needsChanges = computed(() => {
-  const hasValidVirtualEventUrl = props.formValues.virtualEventUrl
-    ? urlIsValid.value && !!props.formValues.virtualEventUrl
-    : true;
+const eventFormValidationInput = computed(() => ({
+  selectedChannelsCount: props.formValues.selectedChannels.length,
+  title: props.formValues.title,
+  description: props.formValues.description,
+  virtualEventUrl: props.formValues.virtualEventUrl,
+  urlIsValid: urlIsValid.value,
+  startBeforeEnd: startTime.value < endTime.value,
+}));
 
-  return !(
-    props.formValues.selectedChannels.length > 0 &&
-    props.formValues.title.length > 0 &&
-    startTime.value < endTime.value &&
-    props.formValues.title.length <= EVENT_TITLE_CHAR_LIMIT &&
-    props.formValues.description.length <= MAX_CHARS_IN_EVENT_DESCRIPTION &&
-    (urlIsValid.value || !props.formValues.virtualEventUrl) &&
-    hasValidVirtualEventUrl
-  );
-});
+const needsChanges = computed(() =>
+  eventFormNeedsChanges(eventFormValidationInput.value)
+);
 
-const changesRequiredMessage = computed(() => {
-  if (props.formValues.selectedChannels.length === 0) {
-    return 'At least one channel must be selected.';
-  }
-  if (!props.formValues.title) {
-    return 'A title is required.';
-  }
-  if (props.formValues.title.length > EVENT_TITLE_CHAR_LIMIT) {
-    return `Title cannot exceed ${EVENT_TITLE_CHAR_LIMIT} characters.`;
-  }
-  if (props.formValues.description.length > MAX_CHARS_IN_EVENT_DESCRIPTION) {
-    return `Description cannot exceed ${MAX_CHARS_IN_EVENT_DESCRIPTION} characters.`;
-  }
-  if (props.formValues.virtualEventUrl && !urlIsValid.value) {
-    return 'Virtual event URL must be valid.';
-  }
-  return '';
-});
+const changesRequiredMessage = computed(() =>
+  getEventFormValidationMessage(eventFormValidationInput.value)
+);
 
 const urlIsValid = computed(() => {
   return checkUrl(props.formValues.virtualEventUrl || '');

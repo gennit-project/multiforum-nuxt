@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import yaml from 'js-yaml';
+import {
+  serializeFilterGroupsToYaml,
+  parseFilterGroupsYaml,
+} from '@/utils/filterGroupYaml';
 import type {
   FilterGroup,
   Channel,
@@ -54,105 +57,45 @@ const filterModeOptions = [
   },
 ];
 
-// YAML conversion utilities
-type YamlFilterGroup = {
-  key: string;
-  displayName: string;
-  mode: 'INCLUDE' | 'EXCLUDE';
-  order: number;
-  options: {
-    value: string;
-    displayName: string;
-    order: number;
-  }[];
-};
-
-const convertFilterGroupsToYaml = (filterGroups: FilterGroup[]): string => {
-  const cleanGroups: YamlFilterGroup[] = filterGroups.map((group) => ({
-    key: group.key,
-    displayName: group.displayName,
-    mode: group.mode,
-    order: group.order,
-    options: (group.options || []).map((option) => ({
-      value: option.value,
-      displayName: option.displayName,
-      order: option.order,
-    })),
-  }));
-
-  try {
-    return yaml.dump(cleanGroups, {
-      indent: 2,
-      lineWidth: -1,
-      noRefs: true,
-      sortKeys: false,
-    });
-  } catch (error) {
-    console.error('Error converting to YAML:', error);
-    return '';
-  }
-};
+const convertFilterGroupsToYaml = (filterGroups: FilterGroup[]): string =>
+  serializeFilterGroupsToYaml(filterGroups);
 
 const convertYamlToFilterGroups = (
   yamlString: string
 ): { success: boolean; filterGroups?: FilterGroup[]; error?: string } => {
-  try {
-    const parsed = yaml.load(yamlString) as YamlFilterGroup[];
-
-    if (!Array.isArray(parsed)) {
-      return {
-        success: false,
-        error: 'YAML must contain an array of filter groups',
-      };
-    }
-
-    const filterGroups: FilterGroup[] = parsed.map((group, index) => {
-      if (!group.key || !group.displayName) {
-        throw new Error(
-          `Group at index ${index} is missing required fields (key, displayName)`
-        );
-      }
-
-      if (!['INCLUDE', 'EXCLUDE'].includes(group.mode)) {
-        throw new Error(
-          `Group "${group.key}" has invalid mode. Must be INCLUDE or EXCLUDE`
-        );
-      }
-
-      return {
-        id: '', // Empty ID for new/edited groups - server will handle
-        key: group.key,
-        displayName: group.displayName,
-        mode: group.mode as FilterMode,
-        order: group.order ?? index,
-        options: (group.options || []).map((option, optionIndex) => ({
-          id: '', // Empty ID for new/edited options - server will handle
-          value: option.value,
-          displayName: option.displayName,
-          order: option.order ?? optionIndex,
-          // Required GraphQL fields
-          __typename: 'FilterOption' as const,
-          group: emptyFilterGroup, // Will be populated by parent
-          groupAggregate: null,
-          groupConnection: emptyGroupConnection,
-        })),
-        // Required GraphQL fields
-        __typename: 'FilterGroup' as const,
-        channel: emptyChannel,
-        channelAggregate: null,
-        channelConnection: emptyChannelConnection,
-        optionsAggregate: null,
-        optionsConnection: emptyOptionsConnection,
-      };
-    });
-
-    return { success: true, filterGroups };
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Invalid YAML format',
-    };
+  const result = parseFilterGroupsYaml(yamlString);
+  if (!result.success || !result.groups) {
+    return { success: false, error: result.error };
   }
+
+  // Map the validated plain groups onto full GraphQL FilterGroup objects.
+  const filterGroups: FilterGroup[] = result.groups.map((group, index) => ({
+    id: '', // Empty ID for new/edited groups - server will handle
+    key: group.key,
+    displayName: group.displayName,
+    mode: group.mode as FilterMode,
+    order: group.order ?? index,
+    options: (group.options || []).map((option, optionIndex) => ({
+      id: '', // Empty ID for new/edited options - server will handle
+      value: option.value,
+      displayName: option.displayName,
+      order: option.order ?? optionIndex,
+      // Required GraphQL fields
+      __typename: 'FilterOption' as const,
+      group: emptyFilterGroup, // Will be populated by parent
+      groupAggregate: null,
+      groupConnection: emptyGroupConnection,
+    })),
+    // Required GraphQL fields
+    __typename: 'FilterGroup' as const,
+    channel: emptyChannel,
+    channelAggregate: null,
+    channelConnection: emptyChannelConnection,
+    optionsAggregate: null,
+    optionsConnection: emptyOptionsConnection,
+  }));
+
+  return { success: true, filterGroups };
 };
 
 const addNewGroup = () => {
