@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, defineProps } from 'vue';
+import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_EVENT_ISSUE } from '@/graphQLData/mod/queries';
 import ArchiveBox from '@/components/icons/ArchiveBox.vue';
