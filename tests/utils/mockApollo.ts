@@ -99,3 +99,47 @@ export function mockByDocument<T>(
     return fallback;
   };
 }
+
+/**
+ * Wire a component's mocked `useQuery`/`useMutation` in one call, dispatching by
+ * GraphQL document substring. This collapses the per-spec boilerplate of
+ * `asMock(useQuery).mockImplementation(mockByDocument({...}, createQueryMock({})))`.
+ *
+ * Pass the *mocked imports* (from a `vi.mock('@vue/apollo-composable', ...)`
+ * block) plus name→mock maps. Query values are full `QueryMock`s (build with
+ * `createQueryMock`); mutation values are `MutationMock`s.
+ *
+ *   vi.mock('@vue/apollo-composable', () => ({ useQuery: vi.fn(), useMutation: vi.fn() }));
+ *   import { useQuery, useMutation } from '@vue/apollo-composable';
+ *   configureApolloMocks({
+ *     useQuery, useMutation,
+ *     queries: { getEvent: createQueryMock({ events: [event] }) },
+ *     mutations: { DeleteEvent: createMutationMock() },
+ *   });
+ */
+export function configureApolloMocks(params: {
+  useQuery?: unknown;
+  useMutation?: unknown;
+  queries?: Record<string, QueryMock>;
+  mutations?: Record<string, MutationMock>;
+  fallbackQuery?: QueryMock;
+  fallbackMutation?: MutationMock;
+}): void {
+  const {
+    useQuery,
+    useMutation,
+    queries = {},
+    mutations = {},
+    fallbackQuery = createQueryMock({}),
+    fallbackMutation = createMutationMock(),
+  } = params;
+
+  if (useQuery) {
+    asMock(useQuery).mockImplementation(mockByDocument(queries, fallbackQuery));
+  }
+  if (useMutation) {
+    asMock(useMutation).mockImplementation(
+      mockByDocument(mutations, fallbackMutation)
+    );
+  }
+}
