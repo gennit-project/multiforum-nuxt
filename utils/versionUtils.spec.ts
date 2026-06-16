@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { compareVersionStrings } from '@/utils/versionUtils';
+import {
+  compareVersionStrings,
+  resolveDefaultVersion,
+} from '@/utils/versionUtils';
 
 type CompareCase = {
   name: string;
@@ -104,5 +107,58 @@ const cases: CompareCase[] = [
 describe('compareVersionStrings', () => {
   it.each(cases)('$name', ({ left, right, expected }) => {
     expect(compareVersionStrings(left, right)).toBe(expected);
+  });
+});
+
+describe('resolveDefaultVersion', () => {
+  const base = {
+    availableVersions: ['2.0.0', '1.0.0'],
+    installedVersion: undefined,
+    latestVersion: undefined,
+    shouldAutoUpdate: false,
+    currentSelected: '',
+  };
+
+  it('selects the latest version when auto-updating and none is selected', () => {
+    expect(
+      resolveDefaultVersion({
+        ...base,
+        latestVersion: '2.0.0',
+        shouldAutoUpdate: true,
+      })
+    ).toBe('2.0.0');
+  });
+
+  it('defaults to the installed version when one exists', () => {
+    expect(
+      resolveDefaultVersion({ ...base, installedVersion: '1.0.0' })
+    ).toBe('1.0.0');
+  });
+
+  it('falls back to the newest available version', () => {
+    expect(resolveDefaultVersion(base)).toBe('2.0.0');
+  });
+
+  it('keeps the current selection when one is already set', () => {
+    expect(
+      resolveDefaultVersion({ ...base, currentSelected: '1.0.0' })
+    ).toBe('1.0.0');
+  });
+
+  it('switches an existing selection to latest when auto-updating', () => {
+    expect(
+      resolveDefaultVersion({
+        ...base,
+        currentSelected: '1.0.0',
+        latestVersion: '2.0.0',
+        shouldAutoUpdate: true,
+      })
+    ).toBe('2.0.0');
+  });
+
+  it('returns the current (empty) selection when nothing is available', () => {
+    expect(
+      resolveDefaultVersion({ ...base, availableVersions: [] })
+    ).toBe('');
   });
 });

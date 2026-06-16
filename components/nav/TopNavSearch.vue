@@ -8,30 +8,14 @@ import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import SearchIcon from '@/components/icons/SearchIcon.vue';
 import { getChannelLabel } from '@/utils';
 import {
-  getLocalStorageItem,
-  setLocalStorageItem,
-} from '@/utils/localStorageUtils';
-
-type SearchType =
-  | 'discussions'
-  | 'comments'
-  | 'downloads'
-  | 'forums'
-  | 'wiki'
-  | 'eventsOnline'
-  | 'eventsInPerson';
-type ModifiedRange = 'all' | 'last7' | 'last30' | 'thisYear' | 'lastYear';
-
-type RecentSearch = {
-  query: string;
-  type: SearchType;
-  modified: ModifiedRange;
-  forums: string[];
-  timestamp: number;
-};
-
-const SEARCH_RECENTS_KEY = 'sitewideSearchRecents';
-const MAX_RECENTS = 6;
+  buildSearchQuery,
+  toggleInArray,
+  SEARCH_ROUTES,
+  type SearchType,
+  type ModifiedRange,
+  type RecentSearch,
+} from '@/utils/searchQueryBuilder';
+import { useRecentSearches } from '@/composables/useRecentSearches';
 
 const props = withDefaults(
   defineProps<{
@@ -54,7 +38,8 @@ const selectedType = ref<SearchType>('discussions');
 const selectedModified = ref<ModifiedRange>('all');
 const selectedForums = ref<string[]>([]);
 const showPopover = ref(false);
-const recentSearches = ref<RecentSearch[]>([]);
+const { recentSearches, load: loadRecentSearches, record: recordRecent } =
+  useRecentSearches();
 
 const typeOptions: Array<{ value: SearchType; label: string }> = [
   { value: 'discussions', label: 'Discussions' },
@@ -118,56 +103,29 @@ const handleSearchInput = (value: string) => {
 };
 
 const toggleSelectedForum = (forum: string) => {
-  const index = selectedForums.value.indexOf(forum);
-  if (index === -1) {
-    selectedForums.value.push(forum);
-  } else {
-    selectedForums.value.splice(index, 1);
-  }
+  selectedForums.value = toggleInArray(selectedForums.value, forum);
 };
 
-const buildQuery = () => {
-  const trimmedInput = searchInput.value.trim();
-  const query: Record<string, string | string[] | undefined> = {
-    searchInput: trimmedInput || undefined,
-    type: selectedType.value,
-    searchOpen: 'true',
-    modified:
-      selectedModified.value === 'all' ? undefined : selectedModified.value,
-    channels: selectedForums.value.length
-      ? [...selectedForums.value]
-      : undefined,
-  };
-
-  return query;
-};
+const buildQuery = () =>
+  buildSearchQuery({
+    searchInput: searchInput.value,
+    selectedType: selectedType.value,
+    selectedModified: selectedModified.value,
+    selectedForums: selectedForums.value,
+  });
 
 const recordRecentSearch = () => {
   if (!searchInput.value.trim()) {
     return;
   }
 
-  const recent: RecentSearch = {
+  recordRecent({
     query: searchInput.value.trim(),
     type: selectedType.value,
     modified: selectedModified.value,
     forums: [...selectedForums.value],
     timestamp: Date.now(),
-  };
-
-  const next = [recent, ...recentSearches.value].filter((item, index, self) => {
-    const matchIndex = self.findIndex(
-      (other) =>
-        other.query === item.query &&
-        other.type === item.type &&
-        other.modified === item.modified &&
-        other.forums.join('|') === item.forums.join('|')
-    );
-    return matchIndex === index;
   });
-
-  recentSearches.value = next.slice(0, MAX_RECENTS);
-  setLocalStorageItem(SEARCH_RECENTS_KEY, recentSearches.value);
 };
 
 const executeSearch = (value?: string | Event) => {
@@ -184,18 +142,8 @@ const executeSearch = (value?: string | Event) => {
   recordRecentSearch();
   const query = buildQuery();
 
-  const routes: Record<SearchType, string> = {
-    discussions: '/discussions',
-    comments: '/comments/search',
-    downloads: '/downloads',
-    forums: '/forums',
-    wiki: '/wiki/search',
-    eventsOnline: '/events/list/search',
-    eventsInPerson: '/map/search',
-  };
-
   router.push({
-    path: routes[selectedType.value],
+    path: SEARCH_ROUTES[selectedType.value],
     query,
   });
   closePopover();
@@ -249,10 +197,7 @@ const handleDocumentClick = (event: MouseEvent) => {
 };
 
 onMounted(() => {
-  recentSearches.value = getLocalStorageItem<RecentSearch[]>(
-    SEARCH_RECENTS_KEY,
-    []
-  );
+  loadRecentSearches();
   document.addEventListener('keydown', handleGlobalKeydown);
   document.addEventListener('mousedown', handleDocumentClick);
 });

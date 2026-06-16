@@ -11,6 +11,11 @@ import SearchBar from '@/components/SearchBar.vue';
 import type { PropType } from 'vue';
 import SearchableForumListItem from './SearchableForumListItem.vue';
 import { usernameVar, isAuthenticatedVar } from '@/cache';
+import {
+  areAllChannelsSelected,
+  getChannelsToToggle,
+  filterChannelsBySearch,
+} from '@/utils/channelSelection';
 
 // Define props
 const props = defineProps({
@@ -125,17 +130,10 @@ const channelCollections = computed(() => {
       }));
 
       // Filter by search if there's a search query
-      const filteredChannels = searchInput.value
-        ? channels.filter(
-            (channel: CollectionChannelOption) =>
-              channel.uniqueName
-                .toLowerCase()
-                .includes(searchInput.value.toLowerCase()) ||
-              channel.displayName
-                .toLowerCase()
-                .includes(searchInput.value.toLowerCase())
-          )
-        : channels;
+      const filteredChannels = filterChannelsBySearch({
+        channels,
+        searchTerm: searchInput.value,
+      });
 
       return {
         id: collection.id,
@@ -166,66 +164,41 @@ const toggleSelectAllCollection = (collection: {
   const collectionValues = collection.allChannels.map(
     (ch: ChannelOption) => ch.uniqueName
   );
-  const currentSelected = props.selectedChannels || [];
-
-  const shouldDeselect = collectionValues.every((val: string) =>
-    currentSelected.includes(val)
-  );
-
-  if (shouldDeselect) {
-    collectionValues.forEach((uniqueName: string) => {
-      if (currentSelected.includes(uniqueName)) {
-        emit('toggleSelection', uniqueName);
-      }
-    });
-  } else {
-    collectionValues.forEach((uniqueName: string) => {
-      if (!currentSelected.includes(uniqueName)) {
-        emit('toggleSelection', uniqueName);
-      }
-    });
-  }
+  getChannelsToToggle({
+    channelNames: collectionValues,
+    selectedChannels: props.selectedChannels || [],
+  }).forEach((uniqueName) => emit('toggleSelection', uniqueName));
 };
 
 const isCollectionFullySelected = (collection: {
   allChannels: ChannelOption[];
-}) => {
-  const collectionValues = collection.allChannels.map(
-    (ch: ChannelOption) => ch.uniqueName
-  );
-  const currentSelected = props.selectedChannels || [];
-  return (
-    collectionValues.length > 0 &&
-    collectionValues.every((val: string) => currentSelected.includes(val))
-  );
-};
+}) =>
+  areAllChannelsSelected({
+    channelNames: collection.allChannels.map(
+      (ch: ChannelOption) => ch.uniqueName
+    ),
+    selectedChannels: props.selectedChannels || [],
+  });
 
 // Get favorite channels
 const favoriteChannels = computed(() => {
   const favorites = favoritesResult.value?.users?.[0]?.FavoriteChannels || [];
 
   // Map to ChannelOption format
-  const mappedFavorites = favorites.map((channel: RawChannelData) => ({
-    uniqueName: channel.uniqueName,
-    displayName: channel.displayName || channel.uniqueName,
-    icon: channel.channelIconURL || '',
-    description: '',
-  }));
+  const mappedFavorites: ChannelOption[] = favorites.map(
+    (channel: RawChannelData) => ({
+      uniqueName: channel.uniqueName,
+      displayName: channel.displayName || channel.uniqueName,
+      icon: channel.channelIconURL || '',
+      description: '',
+    })
+  );
 
   // Filter by search if there's a search query
-  if (searchInput.value) {
-    return mappedFavorites.filter(
-      (channel: ChannelOption) =>
-        channel.uniqueName
-          .toLowerCase()
-          .includes(searchInput.value.toLowerCase()) ||
-        channel.displayName
-          .toLowerCase()
-          .includes(searchInput.value.toLowerCase())
-    );
-  }
-
-  return mappedFavorites;
+  return filterChannelsBySearch({
+    channels: mappedFavorites,
+    searchTerm: searchInput.value,
+  });
 });
 
 // Separate featured and regular channels
@@ -286,42 +259,22 @@ const toggleSelectAllFavorites = () => {
   const favoriteValues = favoriteChannels.value.map(
     (ch: ChannelOption) => ch.uniqueName
   );
-  // Use props.selectedChannels directly to avoid stale state issues
-  const currentSelected = props.selectedChannels || [];
-
-  // Check if we're currently in "all selected" state
-  // We need to check this BEFORE any toggles happen
-  const shouldDeselect = favoriteValues.every((val: string) =>
-    currentSelected.includes(val)
-  );
-
-  if (shouldDeselect) {
-    // Deselect all favorites (only toggle ones that are currently selected)
-    favoriteValues.forEach((uniqueName: string) => {
-      if (currentSelected.includes(uniqueName)) {
-        emit('toggleSelection', uniqueName);
-      }
-    });
-  } else {
-    // Select all favorites that aren't already selected
-    favoriteValues.forEach((uniqueName: string) => {
-      if (!currentSelected.includes(uniqueName)) {
-        emit('toggleSelection', uniqueName);
-      }
-    });
-  }
+  // Use props.selectedChannels directly to avoid stale state issues, and
+  // resolve which channels to toggle before emitting any events.
+  getChannelsToToggle({
+    channelNames: favoriteValues,
+    selectedChannels: props.selectedChannels || [],
+  }).forEach((uniqueName) => emit('toggleSelection', uniqueName));
 };
 
-const areAllFavoritesSelected = computed(() => {
-  const favoriteValues = favoriteChannels.value.map(
-    (ch: ChannelOption) => ch.uniqueName
-  );
-  const currentSelected = props.selectedChannels || [];
-  return (
-    favoriteValues.length > 0 &&
-    favoriteValues.every((val: string) => currentSelected.includes(val))
-  );
-});
+const areAllFavoritesSelected = computed(() =>
+  areAllChannelsSelected({
+    channelNames: favoriteChannels.value.map(
+      (ch: ChannelOption) => ch.uniqueName
+    ),
+    selectedChannels: props.selectedChannels || [],
+  })
+);
 </script>
 
 <template>

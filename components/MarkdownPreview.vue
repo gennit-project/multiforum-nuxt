@@ -1,95 +1,19 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from 'vue';
 import VueEasyLightbox from 'vue-easy-lightbox';
-import MarkdownIt from 'markdown-it';
 import { config } from '@/config';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
-
-function linkifyChannelNames(markdownString: string) {
-  const regex = /(?<!https?:\/\/(?:[\w.-]+))\bc\/([a-zA-Z0-9_-]+)/g;
-  return markdownString.replace(regex, (match, channelName) => {
-    return `[${match}](${config.baseUrl}channels/f/${channelName}/discussions)`;
-  });
-}
-
-function linkifyBotMentions(markdownString: string, forumId: string) {
-  const forum = forumId.trim().toLowerCase();
-  if (!forum) {
-    return markdownString;
-  }
-
-  const regex = /(^|[\s([{"'])(\/bot\/([a-z0-9-]+)(?::[a-z0-9-]+)?)/g;
-  return markdownString.replace(regex, (match, leading, mention, botName) => {
-    const profileUsername = `bot-${forum}-${botName}`;
-    return `${leading}[${mention}](/u/${profileUsername})`;
-  });
-}
-
-function linkifyUrls(text: string) {
-  const urlRegex = /(?:https?:\/\/|www\.)[^\s/$.?#].[^\s)]+[^\s)]+/g;
-  const markdownLinkRegex =
-    /\[([^\]]+)\]\((https?:\/\/|www\.)[^\s/$.?#].[^\s)]*\)/g;
-  const emailRegex = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
-  const markdownLinks: string[] = [];
-  let match;
-  while ((match = markdownLinkRegex.exec(text)) !== null) {
-    markdownLinks.push(match[0]);
-  }
-  return text.replace(urlRegex, (url) => {
-    let href = url;
-    if (!url.startsWith('http')) {
-      href = 'http://' + url;
-    }
-    if (
-      markdownLinks.some((link) => link.includes(url)) ||
-      emailRegex.test(url)
-    ) {
-      return url;
-    }
-    return `[${url}](${href})`;
-  });
-}
-
-type GalleryItem = {
-  href: string;
-  src: string;
-  thumbnail: string;
-  width: number;
-  height: number;
-};
-
-function calculateAspectRatioFit(
-  srcWidth: number,
-  srcHeight: number,
-  maxWidth: number,
-  maxHeight: number
-) {
-  const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
-  return { width: srcWidth * ratio, height: srcHeight * ratio };
-}
-
-function parseMarkdownForImages(text: string) {
-  const md = new MarkdownIt();
-  const renderedText = md.render(text);
-  const regex = /src="([^"]*)"/g;
-  const images: GalleryItem[] = [];
-  let match;
-  while ((match = regex.exec(renderedText)) !== null) {
-    const src = match[1];
-    if (!src) continue;
-    const galleryItem: GalleryItem = {
-      href: src,
-      src: src,
-      thumbnail: src,
-      width: import.meta.client ? window.innerWidth : 0,
-      height: import.meta.client ? window.innerHeight : 0,
-    };
-    images.push(galleryItem);
-  }
-  return images;
-}
+import {
+  linkifyChannelNames,
+  linkifyBotMentions,
+  linkifyUrls,
+  calculateAspectRatioFit,
+  extractImageUrlsFromMarkdown,
+  countWords,
+  type GalleryItem,
+} from '@/utils/markdownLinkify';
 
 interface Props {
   disableGallery?: boolean;
@@ -116,10 +40,6 @@ const visibleRef = ref(false);
 const indexRef = ref(0);
 const { fontSize } = storeToRefs(uiStore);
 
-const countWords = (str: string) => {
-  return str.trim().split(/\s+/).length;
-};
-
 const showFullText = ref(
   !props.showShowMore || countWords(props.text) < props.wordLimit
 );
@@ -143,12 +63,12 @@ const updateImageDimensions = (src: string) => {
   if (import.meta.client) {
     const img = new Image();
     img.onload = function () {
-      const { width, height } = calculateAspectRatioFit(
-        img.width,
-        img.height,
-        window.innerWidth,
-        window.innerHeight
-      );
+      const { width, height } = calculateAspectRatioFit({
+        srcWidth: img.width,
+        srcHeight: img.height,
+        maxWidth: window.innerWidth,
+        maxHeight: window.innerHeight,
+      });
 
       const imageItem = embeddedImages.value.find(
         (item) => item.src === src
@@ -175,17 +95,17 @@ watchEffect(() => {
     embeddedImages.value = [];
     return;
   }
-  const imageUrls = parseMarkdownForImages(props.text);
+  const imageUrls = extractImageUrlsFromMarkdown(props.text);
   imageUrls.forEach((imageUrl: GalleryItem) => {
     updateImageDimensions(imageUrl.src);
   });
 });
 
 const linkifiedMarkdown = computed(() => {
-  const botMentionsLinkified = linkifyBotMentions(
-    props.text,
-    props.botMentionForumId
-  );
+  const botMentionsLinkified = linkifyBotMentions({
+    markdownString: props.text,
+    forumId: props.botMentionForumId,
+  });
   const channelNamesLinkified = linkifyChannelNames(botMentionsLinkified);
   return linkifyUrls(channelNamesLinkified);
 });
