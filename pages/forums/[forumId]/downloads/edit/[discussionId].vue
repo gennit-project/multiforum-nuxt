@@ -21,9 +21,9 @@ import type {
   DiscussionUpdateInput,
   Image,
   FilterOption,
-  FilterGroup,
 } from '@/__generated__/graphql';
 import { modProfileNameVar } from '@/cache';
+import { resolveSelectedLabelOptionIds } from '@/utils/downloadLabelUtils';
 
 const route = useRoute();
 const router = useRouter();
@@ -510,34 +510,11 @@ const {
 }));
 
 // Helper function to convert downloadLabels to label option IDs
-const getSelectedLabelOptionIds = (): string[] => {
-  const selectedIds: string[] = [];
-  const downloadLabels = formValues.value.downloadLabels || {};
-
-  // Get all filter groups from channel data
-  const filterGroups = channelData.value?.FilterGroups || [];
-
-  Object.entries(downloadLabels).forEach(([groupKey, selectedValues]) => {
-    // Find the filter group
-    const group = filterGroups.find(
-      (fg: FilterGroup) => fg.key === groupKey
-    );
-
-    if (group?.options) {
-      // For each selected value, find the corresponding option ID
-      selectedValues.forEach((value) => {
-        const option = group.options?.find(
-          (opt: FilterOption) => opt.value === value
-        );
-        if (option?.id) {
-          selectedIds.push(option.id);
-        }
-      });
-    }
+const getSelectedLabelOptionIds = (): string[] =>
+  resolveSelectedLabelOptionIds({
+    downloadLabels: formValues.value.downloadLabels,
+    filterGroups: channelData.value?.FilterGroups,
   });
-
-  return selectedIds;
-};
 
 const {
   mutate: updateDiscussionChannelLabels,
