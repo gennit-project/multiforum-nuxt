@@ -55,6 +55,11 @@ global.google = {
     ControlPosition: {
       RIGHT_TOP: 1,
     },
+    ColorScheme: {
+      LIGHT: 'LIGHT',
+      DARK: 'DARK',
+      FOLLOW_SYSTEM: 'FOLLOW_SYSTEM',
+    },
   },
 } as any;
 
