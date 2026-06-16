@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useQuery } from '@vue/apollo-composable';
 import { asMock, createQueryMock } from '@/tests/utils/mockApollo';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
+import { createCacheMock } from '@/tests/utils/mockAuth';
 import SearchableForumListItem from '@/components/channel/SearchableForumListItem.vue';
 // vi.mock is hoisted above imports, so the component (imported below) picks up
 // the mocked modules.
@@ -11,10 +12,7 @@ vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
 }));
 
-vi.mock('@/cache', () => ({
-  usernameVar: { value: '' },
-  isAuthenticatedVar: { value: false },
-}));
+vi.mock('@/cache', () => createCacheMock());
 
 const makeChannel = (uniqueName: string) => ({
   uniqueName,

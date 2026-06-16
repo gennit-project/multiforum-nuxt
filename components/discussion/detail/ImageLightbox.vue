@@ -2,6 +2,8 @@
 import type { PropType } from 'vue';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useImageZoom } from '@/composables/useImageZoom';
+import { useLightboxNavigation } from '@/composables/useLightboxNavigation';
+import { useSwipeDetection } from '@/composables/useSwipeDetection';
 import LightboxControls from '@/components/discussion/detail/LightboxControls.vue';
 import LightboxImagePanel from '@/components/discussion/detail/LightboxImagePanel.vue';
 import LightboxInfoPanel from '@/components/discussion/detail/LightboxInfoPanel.vue';
@@ -43,14 +45,8 @@ const props = defineProps({
 const emit = defineEmits(['close', 'album-updated']);
 
 // Lightbox state
-const lightboxIndex = ref(props.initialIndex);
 const isPanelVisible = ref(true);
 const panelOnSide = ref(true);
-
-// Current image based on ordered images
-const currentImage = computed((): LightboxImage => {
-  return props.orderedImages[lightboxIndex.value] || { id: '', url: '' };
-});
 
 // Caption editing
 const editingCaptionIndex = ref(-1);
@@ -99,6 +95,25 @@ const {
   resetZoom,
 } = useImageZoom();
 
+// Navigation (wrap-around index + zoom reset on change)
+const {
+  currentIndex: lightboxIndex,
+  next: nextImage,
+  prev: prevImage,
+} = useLightboxNavigation({
+  getCount: () => props.orderedImages.length,
+  initialIndex: props.initialIndex,
+  onNavigate: () => {
+    zoomLevel.value = 1;
+    resetTranslation();
+  },
+});
+
+// Current image based on ordered images
+const currentImage = computed((): LightboxImage => {
+  return props.orderedImages[lightboxIndex.value] || { id: '', url: '' };
+});
+
 const startEditingCaption = (index: number) => {
   editingCaptionIndex.value = index;
   editingCaption.value = props.orderedImages[index]?.caption || '';
@@ -127,26 +142,6 @@ const saveCaption = async () => {
     console.error('Error updating caption:', error);
     alert('Error saving caption. Please try again.');
   }
-};
-
-const nextImage = () => {
-  if (lightboxIndex.value === props.orderedImages.length - 1) {
-    lightboxIndex.value = 0;
-  } else {
-    lightboxIndex.value++;
-  }
-  zoomLevel.value = 1;
-  resetTranslation();
-};
-
-const prevImage = () => {
-  if (lightboxIndex.value === 0) {
-    lightboxIndex.value = props.orderedImages.length - 1;
-  } else {
-    lightboxIndex.value--;
-  }
-  zoomLevel.value = 1;
-  resetTranslation();
 };
 
 const togglePanel = () => {
@@ -211,14 +206,16 @@ const handleTouchStop = (event: TouchEvent) => {
   stopDrag(event);
 };
 
-// Touch swipe handling
-const touchStartX = ref(0);
-const touchEndX = ref(0);
+// Touch swipe handling (right = previous, left = next)
+const { start: startSwipe, end: endSwipe } = useSwipeDetection({
+  onSwipeRight: prevImage,
+  onSwipeLeft: nextImage,
+});
 
 const handleTouchStart = (event: TouchEvent) => {
   const touch = event.touches[0];
   if (!touch) return;
-  touchStartX.value = touch.clientX;
+  startSwipe(touch.clientX);
 
   if (isZoomed.value) {
     return;
@@ -258,16 +255,7 @@ const handleTouchEnd = (event: TouchEvent) => {
 
   const touch = event.changedTouches[0];
   if (!touch) return;
-  touchEndX.value = touch.clientX;
-  const swipeDistance = touchEndX.value - touchStartX.value;
-
-  if (Math.abs(swipeDistance) > 50) {
-    if (swipeDistance > 0) {
-      prevImage();
-    } else {
-      nextImage();
-    }
-  }
+  endSwipe(touch.clientX);
 };
 
 const handleImageMouseDown = (event: MouseEvent) => {
