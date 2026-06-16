@@ -118,8 +118,10 @@ test.describe('User profile page', () => {
     // Navigate to the profile page - /u/[username] redirects to /u/[username]/comments
     await page.goto(`/u/${PROFILE_USERNAME}/comments`);
 
-    // Wait for the page to be stable
-    await page.waitForLoadState('networkidle');
+    // Wait for the profile to render before checking for errors
+    await expect(
+      page.getByRole('link', { name: 'Comments' })
+    ).toBeVisible({ timeout: 10000 });
 
     // Page should load without JavaScript errors
     expect(diagnostics.pageErrors).toEqual([]);
@@ -135,9 +137,6 @@ test.describe('User profile page', () => {
     });
 
     await page.goto(`/u/${PROFILE_USERNAME}/comments`);
-
-    // Wait for the page to be stable
-    await page.waitForLoadState('networkidle');
 
     // Check that profile tabs are present
     await expect(page.getByRole('link', { name: 'Comments' })).toBeVisible({ timeout: 10000 });
@@ -156,9 +155,6 @@ test.describe('User profile page', () => {
 
     await page.goto(`/u/${PROFILE_USERNAME}/comments`);
 
-    // Wait for the page to be stable
-    await page.waitForLoadState('networkidle');
-
     // Check that contribution chart is present
     await expect(page.getByRole('region', { name: 'Contribution chart' })).toBeVisible({ timeout: 10000 });
   });
@@ -173,9 +169,6 @@ test.describe('User profile page', () => {
     });
 
     await page.goto(`/u/${PROFILE_USERNAME}/comments`);
-
-    // Wait for the page to be stable
-    await page.waitForLoadState('networkidle');
 
     // Check that year selector is present
     await expect(page.getByRole('combobox', { name: /Year/i })).toBeVisible({ timeout: 10000 });
