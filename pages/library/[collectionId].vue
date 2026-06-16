@@ -20,11 +20,15 @@ import AvatarComponent from '@/components/AvatarComponent.vue';
 import GenericModal from '@/components/GenericModal.vue';
 import WarningModal from '@/components/WarningModal.vue';
 import { relativeTime } from '@/utils';
-import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import { usernameVar } from '@/cache';
-import type { Discussion, DiscussionChannel, Comment } from '@/__generated__/graphql';
+import type { Discussion, Comment } from '@/__generated__/graphql';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
-import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import {
+  getCollectionTypeLabel,
+  getCollectionItems,
+  buildCollectionDiscussionLink,
+  resolveCollectionItemAuthor,
+} from '@/utils/collectionItemUtils';
 
 // Lazy load the album component since it's not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(
@@ -61,81 +65,24 @@ useHead({
   title: computed(() => `${collectionName.value} - Library`),
 });
 
-const getDiscussionLink = (discussion: Discussion) => {
-  const firstChannel = safeArrayFirst(discussion.DiscussionChannels) as DiscussionChannel | null;
-  if (!firstChannel?.channelUniqueName) return '/';
+const getDiscussionLink = (discussion: Discussion) =>
+  buildCollectionDiscussionLink({
+    discussion,
+    isDownloadsCollection: collection.value?.collectionType === 'DOWNLOADS',
+  });
 
-  const isDownload =
-    discussion?.hasDownload === true ||
-    collection.value?.collectionType === 'DOWNLOADS';
-
-  const basePath = isDownload ? 'downloads' : 'discussions';
-
-  return `/forums/${firstChannel.channelUniqueName}/${basePath}/${discussion.id}`;
-};
-
-const getAuthorInfo = (item: Discussion | Comment) => {
-  // Comments use CommentAuthor, other types use Author
-  const author = 'CommentAuthor' in item ? item.CommentAuthor : 'Author' in item ? item.Author : null;
-  if (!author) return null;
-
-  // Check if author is a User (has username) vs ModerationProfile (only has displayName)
-  const isUser = 'username' in author && author.username;
-  const username = isUser ? author.username : '';
-
-  const serverRoleBadge = getServerRoleBadge({
-    username: username || undefined,
+const getAuthorInfo = (item: Discussion | Comment) =>
+  resolveCollectionItemAuthor({
+    item,
     adminUsernames: serverAdminUsernames.value,
   });
 
-  return {
-    username: username || '',
-    displayName: author.displayName || '',
-    profilePicURL: isUser && 'profilePicURL' in author ? author.profilePicURL || '' : '',
-    commentKarma: isUser && 'commentKarma' in author ? author.commentKarma ?? 0 : 0,
-    discussionKarma: isUser && 'discussionKarma' in author ? author.discussionKarma ?? 0 : 0,
-    createdAt: isUser && 'createdAt' in author ? author.createdAt || '' : '',
-    isAdmin: serverRoleBadge === 'serverAdmin',
-  };
-};
-
 // Get items based on collection type
-const items = computed(() => {
-  if (!collection.value) return [];
+const items = computed(() => getCollectionItems(collection.value));
 
-  switch (collection.value.collectionType) {
-    case 'DISCUSSIONS':
-      return collection.value.Discussions || [];
-    case 'COMMENTS':
-      return collection.value.Comments || [];
-    case 'IMAGES':
-      return collection.value.Images || [];
-    case 'CHANNELS':
-      return collection.value.Channels || [];
-    case 'DOWNLOADS':
-      return collection.value.Downloads || [];
-    default:
-      return [];
-  }
-});
-
-const collectionTypeLabel = computed(() => {
-  const type = collection.value?.collectionType;
-  switch (type) {
-    case 'DISCUSSIONS':
-      return 'Discussions';
-    case 'COMMENTS':
-      return 'Comments';
-    case 'IMAGES':
-      return 'Images';
-    case 'CHANNELS':
-      return 'Forums';
-    case 'DOWNLOADS':
-      return 'Downloads';
-    default:
-      return 'Items';
-  }
-});
+const collectionTypeLabel = computed(() =>
+  getCollectionTypeLabel(collection.value?.collectionType)
+);
 
 // Rename modal state
 const showRenameModal = ref(false);
