@@ -16,6 +16,20 @@ coverage:
         # Set to informational initially while building coverage
         informational: true
 
+# Flag management.
+# - unit: uploaded on every PR/push by the Tests CI workflow.
+# - e2e:  uploaded only by the opt-in "Combined Coverage" workflow.
+#         carryforward reuses the most recent e2e report on commits where it
+#         isn't uploaded, so the combined number/badge doesn't drop back to
+#         unit-only between e2e runs. (Re-run / schedule that workflow to keep
+#         the e2e portion fresh.)
+flag_management:
+  individual_flags:
+    - name: unit
+      carryforward: false
+    - name: e2e
+      carryforward: true
+
 # Comment settings for PR coverage reports
 comment:
   layout: "reach,diff,flags,files"
