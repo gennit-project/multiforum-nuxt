@@ -122,4 +122,31 @@ describe('DiscussionCommentsWrapper', () => {
     await wrapper.find('.subscribe-stub').trigger('click');
     expect(subscribeMock.mutate).not.toHaveBeenCalled();
   });
+
+  // Regression: the user query result may lack a `users` array; the notify
+  // computed must not throw on it (was `?.users[0]`, now `?.users?.[0]`).
+  it('does not crash when the user query result has no users array', () => {
+    configureApolloMocks({
+      useQuery,
+      useMutation,
+      fallbackQuery: createQueryMock({}),
+      mutations: {
+        subscribeToDiscussionChannel: subscribeMock,
+        unsubscribeFromDiscussionChannel: unsubscribeMock,
+      },
+    });
+    expect(() =>
+      mountWithDefaults(DiscussionCommentsWrapper, {
+        props: {
+          aggregateCommentCount: 0,
+          discussionAuthor: 'bob',
+          reachedEndOfResults: false,
+          previousOffset: 0,
+          discussionChannel: makeChannel(),
+          comments: [],
+        },
+        global: { stubs },
+      })
+    ).not.toThrow();
+  });
 });
