@@ -53,14 +53,22 @@ export default defineConfig({
         '.eslintrc.*',
         'cache.ts',
         'config.ts',
+        // Presentational-only: icons are pure <svg> markup with no logic.
+        'components/icons/**',
+        // Test scaffolding (E2E mock auth), not production behavior.
+        'composables/useTestAuth.ts',
+        'composables/useTestAuthHelpers.ts',
+        // Test helpers should not count as covered source.
+        'tests/**',
       ],
+      // Coverage targets app logic. layouts/ and plugins/ are framework
+      // integration glue (Nuxt registration, layout shells) that is exercised
+      // by the E2E suite rather than unit tests, so they are not included here.
       include: [
         'components/**/*.vue',
         'composables/**/*.ts',
         'utils/**/*.ts',
         'pages/**/*.vue',
-        'layouts/**/*.vue',
-        'plugins/**/*.ts',
       ],
       // Cleanup coverage results before each run
       clean: true,
