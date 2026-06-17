@@ -45,3 +45,8 @@ coverage
 
 playwright-report
 test-results
+# E2E coverage spike: keep the collector source, ignore generated artifacts.
+# (The `coverage` rules above otherwise ignore tests/playwright/coverage.)
+!tests/playwright/coverage/
+tests/playwright/coverage/.v8/
+coverage-e2e/
