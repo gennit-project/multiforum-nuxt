@@ -23,10 +23,10 @@ const { result, loading, error } = useQuery(
   }
 );
 const suspensions = computed(
-  () => result.value?.channels[0]?.SuspendedMods ?? []
+  () => result.value?.channels?.[0]?.SuspendedMods ?? []
 );
 const aggregateCount = computed(
-  () => result.value?.channels[0]?.SuspendedModsAggregate?.count ?? 0
+  () => result.value?.channels?.[0]?.SuspendedModsAggregate?.count ?? 0
 );
 
 const humanReadableDate = (dateISO: string): string => {

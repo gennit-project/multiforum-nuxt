@@ -50,7 +50,7 @@ const {
 );
 
 // Computed property for the wiki page data
-const wikiPage = computed(() => wikiPageResult.value?.wikiPages[0] as WikiPage);
+const wikiPage = computed(() => wikiPageResult.value?.wikiPages?.[0] as WikiPage);
 
 // Process all versions to find the specific revision
 const allEdits = computed(() => {

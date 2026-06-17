@@ -39,7 +39,7 @@ const originalComment = computed<Comment | null>(() => {
   if (!getCommentResult.value || getCommentError.value) {
     return null;
   }
-  return getCommentResult.value?.comments[0] || null;
+  return getCommentResult.value?.comments?.[0] || null;
 });
 
 const contextOfFeedbackComment = computed(() => {

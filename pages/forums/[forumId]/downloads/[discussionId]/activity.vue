@@ -40,7 +40,7 @@ const { result: getDiscussionResult } = useQuery(
 );
 
 const discussion = computed<Discussion | null>(() => {
-  return props.discussion || getDiscussionResult.value?.discussions[0] || null;
+  return props.discussion || getDiscussionResult.value?.discussions?.[0] || null;
 });
 
 // Get the active discussion channel for this forum

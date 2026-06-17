@@ -204,7 +204,7 @@ const addForumToLocalStorage = (channel: Channel) => {
   setLocalStorageItem('recentForums', recentForums);
 };
 onGetChannelResult((result) => {
-  const loadedChannel = result.data?.channels[0];
+  const loadedChannel = result.data?.channels?.[0];
   if (!loadedChannel) {
     return;
   }

@@ -127,7 +127,7 @@ const albumEditMode = ref(false);
 const feedbackModalManager = ref();
 
 const discussion = computed<Discussion | null>(() => {
-  const currentDiscussion = getDiscussionResult.value?.discussions[0];
+  const currentDiscussion = getDiscussionResult.value?.discussions?.[0];
 
   return currentDiscussion || lastValidDiscussion.value;
 });
@@ -290,14 +290,14 @@ const imageUploadsEnabled = computed(
 
 const aggregateCommentCount = computed(() => {
   return (
-    getDiscussionChannelCommentAggregateResult.value?.discussionChannels[0]
+    getDiscussionChannelCommentAggregateResult.value?.discussionChannels?.[0]
       ?.CommentsAggregate?.count || 0
   );
 });
 
 const aggregateRootCommentCount = computed(() => {
   return (
-    getDiscussionChannelRootCommentAggregateResult.value?.discussionChannels[0]
+    getDiscussionChannelRootCommentAggregateResult.value?.discussionChannels?.[0]
       ?.CommentsAggregate?.count || 0
   );
 });

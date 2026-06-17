@@ -109,7 +109,7 @@ const {
   onError,
 } = useMutation(CREATE_CHANNEL, () => ({
   update: (cache, result) => {
-    const newChannel: Channel = result.data?.createChannels?.channels[0];
+    const newChannel: Channel = result.data?.createChannels?.channels?.[0];
     if (!newChannel?.uniqueName) {
       return;
     }

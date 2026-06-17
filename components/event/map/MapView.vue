@@ -272,10 +272,10 @@ const highlightEventOnMap = (input: HighlightEventInput) => {
   if (markerMap.markers[eventLocationId]) {
     const openSpecificInfowindow = () => {
       const eventTitle =
-        markerMap.markers[eventLocationId]?.events[highlightedEventId.value]
+        markerMap.markers[eventLocationId]?.events?.[highlightedEventId.value]
           ?.title;
       const eventLocation =
-        markerMap.markers[eventLocationId]?.events[highlightedEventId.value]
+        markerMap.markers[eventLocationId]?.events?.[highlightedEventId.value]
           ?.locationName;
 
       let infowindowContent = `<b>${eventTitle}</b>`;

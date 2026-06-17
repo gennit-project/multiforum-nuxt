@@ -22,7 +22,7 @@ const { result, loading, error } = useQuery(
   }
 );
 const invites = computed(
-  () => result.value?.channels[0]?.PendingOwnerInvites ?? []
+  () => result.value?.channels?.[0]?.PendingOwnerInvites ?? []
 );
 
 defineEmits(['click-cancel-invite']);

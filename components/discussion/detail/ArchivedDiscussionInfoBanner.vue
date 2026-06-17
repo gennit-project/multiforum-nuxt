@@ -19,7 +19,7 @@ const { result: getDiscussionIssueResult } = useQuery(GET_DISCUSSION_ISSUE, {
 });
 
 const issueNumber = computed(() => {
-  return getDiscussionIssueResult.value?.discussionChannels[0]?.RelatedIssues[0]
+  return getDiscussionIssueResult.value?.discussionChannels?.[0]?.RelatedIssues?.[0]
     ?.issueNumber;
 });
 

@@ -140,7 +140,7 @@ const {
 });
 onDone((response) => {
   createEventLoading.value = false;
-  const newEventId = response.data?.createEventWithChannelConnections[0]?.id;
+  const newEventId = response.data?.createEventWithChannelConnections?.[0]?.id;
   const redirectChannelId = formValues.value.selectedChannels[0];
   if (!newEventId) {
     submitError.value =

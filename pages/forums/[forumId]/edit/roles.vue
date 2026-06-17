@@ -19,7 +19,7 @@ const serverConfig = computed(() => {
   if (getServerError.value || !getServerResult.value?.serverConfigs) {
     return null;
   }
-  return getServerResult.value?.serverConfigs[0] || null;
+  return getServerResult.value?.serverConfigs?.[0] || null;
 });
 </script>
 

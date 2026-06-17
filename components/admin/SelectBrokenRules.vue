@@ -60,7 +60,7 @@ const getRules = (rulesJSON: string): RuleOption[] => {
 };
 
 const forumRuleOptions = computed<RuleOption[]>(() => {
-  const channel = channelRulesResult.value?.channels[0];
+  const channel = channelRulesResult.value?.channels?.[0];
   if (!channel) {
     return [];
   }
@@ -68,7 +68,7 @@ const forumRuleOptions = computed<RuleOption[]>(() => {
 });
 
 const serverRuleOptions = computed<RuleOption[]>(() => {
-  const serverConfig = serverRulesResult.value?.serverConfigs[0];
+  const serverConfig = serverRulesResult.value?.serverConfigs?.[0];
   if (!serverConfig) {
     return [];
   }

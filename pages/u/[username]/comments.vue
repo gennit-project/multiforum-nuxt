@@ -112,7 +112,7 @@ const isCommentOnDeletedEvent = (comment: CommentType) => {
     <div
       v-else-if="
         commentResult?.users?.length === 0 ||
-        commentResult?.users[0]?.Comments.length === 0
+        commentResult?.users?.[0]?.Comments.length === 0
       "
     >
       No comments yet
@@ -152,7 +152,7 @@ const isCommentOnDeletedEvent = (comment: CommentType) => {
       </div>
     </div>
     <div v-if="loading">Loading...</div>
-    <div v-if="commentResult?.users[0]?.Comments.length > 0">
+    <div v-if="commentResult?.users?.[0]?.Comments.length > 0">
       <LoadMore
         class="justify-self-center"
         :reached-end-of-results="

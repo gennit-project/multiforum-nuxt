@@ -40,7 +40,7 @@ const { result: getDiscussionResult } = useQuery(GET_DISCUSSION, {
 });
 
 const discussion = computed(
-  () => getDiscussionResult.value?.discussions[0] || null
+  () => getDiscussionResult.value?.discussions?.[0] || null
 );
 const activeDiscussionChannel = computed(() => {
   return discussion.value?.DiscussionChannels?.find(
@@ -137,14 +137,14 @@ const commentCount = computed(
 
 const aggregateCommentCount = computed(() => {
   return (
-    getDiscussionChannelCommentAggregateResult.value?.discussionChannels[0]
+    getDiscussionChannelCommentAggregateResult.value?.discussionChannels?.[0]
       ?.CommentsAggregate?.count || 0
   );
 });
 
 const aggregateRootCommentCount = computed(() => {
   return (
-    getDiscussionChannelRootCommentAggregateResult.value?.discussionChannels[0]
+    getDiscussionChannelRootCommentAggregateResult.value?.discussionChannels?.[0]
       ?.CommentsAggregate?.count || 0
   );
 });

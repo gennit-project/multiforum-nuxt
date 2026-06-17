@@ -362,7 +362,7 @@ const menuItems = computed(() => {
     discussionId: props.discussion.id,
     hasAlbum: !!props.discussion?.Album?.Images?.length,
     feedbackEnabled:
-      getChannelResult.value?.channels[0]?.feedbackEnabled ?? true,
+      getChannelResult.value?.channels?.[0]?.feedbackEnabled ?? true,
     hasSensitiveContent: !!props.discussion?.hasSensitiveContent,
     relatedIssueLink: relatedIssueLink.value,
   });

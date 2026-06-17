@@ -43,7 +43,7 @@ const event = computed<Event>(() => {
   if (getEventError.value) {
     return null;
   }
-  return getEventResult.value?.events[0] || null;
+  return getEventResult.value?.events?.[0] || null;
 });
 
 const feedbackComments = computed(() => {

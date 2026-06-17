@@ -32,7 +32,7 @@ const { result, error: getModError } = useQuery(GET_MOD, () => ({
 }));
 
 const mod = computed(() => {
-  return result.value?.moderationProfiles[0] || null;
+  return result.value?.moderationProfiles?.[0] || null;
 });
 </script>
 
