@@ -37,33 +37,53 @@ percentages aren't directly additive to the unit number — see "Productionize".
    `.output/public/_nuxt` into the entry's source as a data URI** before mapping
    — this was the one non-obvious step that made source mapping work.
 
-## Run it
-```bash
-# 1. build with source maps
-E2E_COVERAGE=true NITRO_PRESET=node-server VITE_E2E_MOCK_MODE=true \
-  VITE_GRAPHQL_URL=http://127.0.0.1:4100/graphql \
-  VITE_SERVER_NAME='Playwright Test Server' VITE_SENTRY_AUTH_TOKEN='' \
-  npm run build
+## Productionized
 
-# 2. collect raw V8 coverage
-npx playwright test --config playwright.coverage.config.ts
+The three steps from the original spike are now implemented:
 
-# 3. produce the source-mapped report (coverage-e2e/lcov.info + console summary)
-node tests/playwright/coverage/report.mjs
+**1. Collect across the whole mocked suite — done.** The suite's shared `test`
+(`tests/playwright/helpers/testFixture.ts`) now has an auto `page` fixture that
+runs `startJSCoverage`/`stopJSCoverage` per test when `E2E_COVERAGE=true` (inert
+otherwise) and writes raw V8 per test. The 20 specs that imported `test` from
+`@playwright/test` were migrated to import it from `testFixture`, so **every**
+mocked spec contributes — no per-test code. Validated: a 12-test slice
+(channel/library/comment/profile specs) maps to:
+
+```
+=== E2E coverage by layer (app source) ===
+  components    25.4%  2860/11267
+  pages         55.0%  387/704      <- vs ~5% from unit tests
+  composables   32.2%  1209/3752
+  utils         23.2%  686/2951
+  TOTAL         27.5%  5142/18674   (622 files)
 ```
 
-## Productionize (next steps)
-This spike collects from a single dedicated spec. To turn it into a real
-combined report:
+The full 64-test suite covers more still.
 
-1. **Collect across the whole mocked suite.** Wrap the suite's `test` (in
-   `tests/playwright/helpers/testFixture.ts`) with an auto fixture that runs
-   `startJSCoverage`/`stopJSCoverage` per test and appends to the raw-V8 dir, so
-   every existing E2E test contributes coverage. (No per-spec changes needed.)
-2. **Merge with unit coverage.** Monocart can ingest both raw V8 (E2E) and
-   Vitest's Istanbul `coverage-final.json` in one `CoverageReport`, producing a
-   single merged lcov/HTML and one honest combined percentage.
-3. **Wire into CI** behind a flag (the coverage build is slower and emits source
-   maps), and upload the merged lcov to Codecov instead of the unit-only one.
+**2. Merge with unit coverage — via Codecov flags.** Monocart's converter
+*cannot* reliably merge V8+source-maps with Vitest's Istanbul output (it throws
+in its CSS-AST path on Vue SFC sources). Rather than fight it, the two reports
+stay side by side and **Codecov merges them**: the unit lcov is uploaded with
+flag `unit` and the E2E lcov (`coverage-e2e/lcov.info`) with flag `e2e`; the
+combined number is computed on Codecov. Both lcovs use repo-relative paths so
+the same file lines up across them.
+
+**3. CI — opt-in.** `.github/workflows/e2e-coverage.yml`
+(`workflow_dispatch`/optional schedule) runs unit + E2E coverage and uploads
+both flags. It's not on the per-PR path because the source-map build is slower.
+
+## Run it locally
+```bash
+npm run coverage              # unit -> coverage/lcov.info
+npm run coverage:e2e:build    # sourcemap build (mock mode)
+npm run coverage:e2e:collect  # run mocked suite with E2E_COVERAGE=true
+npm run coverage:e2e:report   # source-mapped E2E report -> coverage-e2e/lcov.info
+```
+
+## Known limitation
+The Monocart V8↔Istanbul merge bug (above) is why we merge at the Codecov layer
+instead of producing one local combined lcov. If a single local artifact is
+needed later, an lcov-level merge (e.g. `lcov-result-merger`) over the two
+repo-relative lcovs is the fallback.
 
 [monocart-coverage-reports]: https://github.com/cenfun/monocart-coverage-reports
