@@ -72,8 +72,13 @@ describe('DiscussionAlbum', () => {
     expect(cells(mountAlbum({ album: makeAlbum([]) }))).toHaveLength(0);
   });
 
-  it('falls back to Images order when imageOrder is empty', () => {
-    expect(cells(mountAlbum({ album: makeAlbum(['a', 'b'], []) }))).toHaveLength(2);
+  it('falls back to the Images array (in order) when imageOrder is empty', () => {
+    const wrapper = mountAlbum({ album: makeAlbum(['a', 'b'], []) });
+    const srcs = cells(wrapper).map((cell) => cell.find('img').attributes('src'));
+    expect(srcs).toEqual([
+      'https://example.com/a.jpg',
+      'https://example.com/b.jpg',
+    ]);
   });
 
   it('orders the cells according to imageOrder', () => {
