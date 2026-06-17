@@ -76,7 +76,7 @@ const { result: getUserResult } = useQuery(
 // Get user's notification preference for comment replies
 const notifyOnReplyToCommentByDefault = computed(() => {
   return (
-    getUserResult.value?.users[0]?.notifyOnReplyToCommentByDefault ?? false
+    getUserResult.value?.users?.[0]?.notifyOnReplyToCommentByDefault ?? false
   );
 });
 
@@ -183,7 +183,7 @@ const {
     // the cache after replying to a comment, see the CommentSection
     // component.
     try {
-      const newComment: Comment = result.data?.createComments?.comments[0];
+      const newComment: Comment = result.data?.createComments?.comments?.[0];
       if (!newComment) {
         console.error('No new comment returned from createComments mutation');
         return;

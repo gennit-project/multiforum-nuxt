@@ -48,7 +48,7 @@ const formValues = ref<CreateEditChannelFormValues>({
 
 const dataLoaded = ref(false);
 
-const channel = computed(() => getChannelResult.value?.channels[0]);
+const channel = computed(() => getChannelResult.value?.channels?.[0]);
 
 watch(
   getChannelResult,

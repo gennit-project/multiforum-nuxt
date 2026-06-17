@@ -26,7 +26,7 @@ const {
 } = useQuery(GET_CHANNEL, { uniqueName: forumId }, { errorPolicy: 'all' });
 
 // Computed property for the channel data
-const channel = computed(() => channelResult.value?.channels[0]);
+const channel = computed(() => channelResult.value?.channels?.[0]);
 const wikiHomePage = computed(() => channel.value?.WikiHomePage);
 
 const {

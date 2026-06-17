@@ -56,9 +56,9 @@ const {
 // Computed property for the wiki page data
 const wikiPage = computed(() => {
   if (isHomePage.value) {
-    return channelResult.value?.channels[0]?.WikiHomePage;
+    return channelResult.value?.channels?.[0]?.WikiHomePage;
   } else {
-    return wikiPageResult.value?.wikiPages[0];
+    return wikiPageResult.value?.wikiPages?.[0];
   }
 });
 

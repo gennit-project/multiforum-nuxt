@@ -19,7 +19,7 @@ const {
 
 const moderationAction = computed(() => {
   if (!commentResult.value?.comments) return null;
-  return commentResult.value?.comments[0]?.ModerationAction;
+  return commentResult.value?.comments?.[0]?.ModerationAction;
 });
 </script>
 

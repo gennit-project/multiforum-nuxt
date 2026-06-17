@@ -115,7 +115,7 @@ const handleProfilePicChange = async (input: FileChangeInput) => {
 nextTick(() => {
   if (titleInputRef.value) {
     (
-      titleInputRef.value?.$el?.children[0].childNodes[0] as HTMLElement
+      titleInputRef.value?.$el?.children?.[0].childNodes[0] as HTMLElement
     ).focus();
   }
 });

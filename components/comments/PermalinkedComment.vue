@@ -15,7 +15,7 @@ const {
 });
 
 const comment = computed(() => {
-  return commentResult.value?.comments[0];
+  return commentResult.value?.comments?.[0];
 });
 
 const parentCommentId = computed(() => {

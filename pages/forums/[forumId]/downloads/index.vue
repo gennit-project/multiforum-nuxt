@@ -49,7 +49,7 @@ const {
   }
 );
 
-const channel = computed(() => channelResult.value?.channels[0]);
+const channel = computed(() => channelResult.value?.channels?.[0]);
 
 const serverConfig = computed(() => {
   return serverConfigResult.value?.serverConfigs?.[0] || null;

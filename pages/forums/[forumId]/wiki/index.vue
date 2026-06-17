@@ -32,7 +32,7 @@ const {
 } = useQuery(GET_CHANNEL, { uniqueName: forumId }, { errorPolicy: 'all' });
 
 // Computed property for the channel data
-const channel = computed(() => channelResult.value?.channels[0]);
+const channel = computed(() => channelResult.value?.channels?.[0]);
 
 // Check if wiki is enabled
 const wikiEnabled = computed(() => channel.value?.wikiEnabled);

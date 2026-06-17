@@ -208,7 +208,7 @@ const { userPermissions } = useResolvedModPermissions({
 });
 
 const feedbackEnabled = computed(() => {
-  return getChannelResult.value?.channels[0]?.feedbackEnabled !== false;
+  return getChannelResult.value?.channels?.[0]?.feedbackEnabled !== false;
 });
 
 const permalinkObject = computed(() => {

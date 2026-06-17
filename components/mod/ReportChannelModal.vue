@@ -60,7 +60,7 @@ const getRules = (rulesJSON: string): RuleOption[] => {
 };
 
 const serverRuleOptions = computed<RuleOption[]>(() => {
-  const serverConfig = serverRulesResult.value?.serverConfigs[0];
+  const serverConfig = serverRulesResult.value?.serverConfigs?.[0];
   if (!serverConfig) {
     return [];
   }

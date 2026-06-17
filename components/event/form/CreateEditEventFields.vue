@@ -308,7 +308,7 @@ const titleInputRef = ref<InstanceType<typeof TextInput> | null>(null);
 nextTick(() => {
   if (titleInputRef.value) {
     (
-      titleInputRef.value?.$el?.children[0].childNodes[0] as HTMLInputElement
+      titleInputRef.value?.$el?.children?.[0].childNodes[0] as HTMLInputElement
     ).focus();
   }
 });

@@ -21,7 +21,7 @@ const { result, loading, error } = useQuery(
     fetchPolicy: 'cache-first',
   }
 );
-const mods = computed(() => result.value?.channels[0]?.Moderators);
+const mods = computed(() => result.value?.channels?.[0]?.Moderators);
 
 defineEmits(['click-remove-mod']);
 </script>
