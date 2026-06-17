@@ -1,11 +1,12 @@
 name: Combined Coverage (unit + E2E)
 
 # Opt-in: the coverage build emits source maps and is slower than the normal
-# suite, so this runs on demand (or on a schedule) rather than on every PR.
+# suite, so this runs on demand or weekly (not on every PR). The weekly run
+# refreshes the carried-forward `e2e` flag so the combined badge stays current.
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: '0 6 * * 1' # weekly, Mondays 06:00 UTC
+  schedule:
+    - cron: '0 6 * * 1' # weekly, Mondays 06:00 UTC
 
 jobs:
   combined-coverage:
@@ -46,8 +47,12 @@ jobs:
       - name: Build app (mock mode + source maps)
         run: npm run coverage:e2e:build
 
+      # Coverage is the goal, not pass/fail: collecting V8 adds overhead that can
+      # push a couple of interaction-heavy specs past their timeout. Those tests
+      # still write their coverage in teardown, so don't fail the job on them.
       - name: Collect E2E coverage
         run: npm run coverage:e2e:collect
+        continue-on-error: true
 
       - name: Build E2E coverage report
         run: npm run coverage:e2e:report

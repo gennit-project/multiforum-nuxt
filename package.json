@@ -28,7 +28,7 @@
     "coverage:open": "npm run coverage && open coverage/index.html",
     "coverage:e2e:build": "E2E_COVERAGE=true NITRO_PRESET=node-server VITE_E2E_MOCK_MODE=true VITE_GRAPHQL_URL=http://127.0.0.1:4100/graphql VITE_SERVER_NAME='Playwright Test Server' VITE_SENTRY_AUTH_TOKEN='' nuxt build",
     "coverage:e2e:collect": "E2E_COVERAGE=true playwright test --config playwright.build.config.ts",
-    "coverage:e2e:report": "node tests/playwright/coverage/report.mjs",
+    "coverage:e2e:report": "node --max-old-space-size=6144 tests/playwright/coverage/report.mjs",
     "knip": "knip",
     "tsc": "vue-tsc --noEmit",
     "verify": "npm run tsc && npm run test:unit:run",
