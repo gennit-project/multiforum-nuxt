@@ -52,7 +52,7 @@ const originalComment = computed(() => {
     return null;
   }
 
-  return commentResult.value?.comments && commentResult.value?.comments[0];
+  return commentResult.value?.comments && commentResult.value?.comments?.[0];
 });
 
 const forumRoleBadge = computed(() => {

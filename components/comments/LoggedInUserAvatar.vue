@@ -16,7 +16,7 @@ const { result: getUserResult } = useQuery(
 );
 
 const profilePicURL = computed(() => {
-  return getUserResult.value?.users[0]?.profilePicURL || '';
+  return getUserResult.value?.users?.[0]?.profilePicURL || '';
 });
 </script>
 

@@ -44,7 +44,7 @@ const { result, loading, error } = useQuery(
     <div v-else-if="error">Error</div>
     <div
       v-else-if="
-        result?.users?.length === 0 || result?.users[0]?.Events.length === 0
+        result?.users?.length === 0 || result?.users?.[0]?.Events.length === 0
       "
     >
       No events yet

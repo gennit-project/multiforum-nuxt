@@ -118,7 +118,7 @@ const { result: getUserResult } = useQuery(
 // Get user's notification preference for comment replies
 const notifyOnReplyToCommentByDefault = computed(() => {
   return (
-    getUserResult.value?.users[0]?.notifyOnReplyToCommentByDefault ?? false
+    getUserResult.value?.users?.[0]?.notifyOnReplyToCommentByDefault ?? false
   );
 });
 

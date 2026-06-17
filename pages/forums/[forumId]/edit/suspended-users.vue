@@ -23,12 +23,12 @@ const {
 });
 
 const suspendedUsers = computed(() => {
-  return suspendedUsersResult.value?.channels[0]?.SuspendedUsers ?? [];
+  return suspendedUsersResult.value?.channels?.[0]?.SuspendedUsers ?? [];
 });
 
 const aggregateCount = computed(() => {
   return (
-    suspendedUsersResult.value?.channels[0]?.SuspendedUsersAggregate?.count ?? 0
+    suspendedUsersResult.value?.channels?.[0]?.SuspendedUsersAggregate?.count ?? 0
   );
 });
 

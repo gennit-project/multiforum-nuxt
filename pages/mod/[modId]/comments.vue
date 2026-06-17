@@ -75,12 +75,12 @@ const loadMore = () => {
 
 const commentCount = computed(() => {
   return (
-    commentResult.value?.moderationProfiles[0]?.AuthoredComments?.length || 0
+    commentResult.value?.moderationProfiles?.[0]?.AuthoredComments?.length || 0
   );
 });
 
 const comments = computed(() => {
-  return commentResult.value?.moderationProfiles[0]?.AuthoredComments || [];
+  return commentResult.value?.moderationProfiles?.[0]?.AuthoredComments || [];
 });
 
 const {

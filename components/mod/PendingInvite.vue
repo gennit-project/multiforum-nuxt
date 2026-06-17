@@ -57,11 +57,11 @@ const {
 } = useMutation(ACCEPT_FORUM_MOD_INVITE);
 
 const pendingOwnerInviteExists = computed(() => {
-  const channelData = pendingOwnerInviteResult.value?.channels[0];
+  const channelData = pendingOwnerInviteResult.value?.channels?.[0];
   if (!channelData) {
     return false;
   }
-  const pendingInvite = channelData?.PendingOwnerInvites[0];
+  const pendingInvite = channelData?.PendingOwnerInvites?.[0];
   if (usernameVar.value === pendingInvite?.username) {
     return true;
   }
@@ -69,11 +69,11 @@ const pendingOwnerInviteExists = computed(() => {
 });
 
 const pendingModInviteExists = computed(() => {
-  const channelData = pendingModInviteResult.value?.channels[0];
+  const channelData = pendingModInviteResult.value?.channels?.[0];
   if (!channelData) {
     return false;
   }
-  const pendingInvite = channelData?.PendingModInvites[0];
+  const pendingInvite = channelData?.PendingModInvites?.[0];
   if (usernameVar.value === pendingInvite?.username) {
     return true;
   }

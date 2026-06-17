@@ -16,11 +16,11 @@ const { result, loading, error } = useQuery(
 );
 
 const suspendedUsers = computed(() => {
-  return result.value?.serverConfigs[0]?.SuspendedUsers ?? [];
+  return result.value?.serverConfigs?.[0]?.SuspendedUsers ?? [];
 });
 
 const aggregateCount = computed(() => {
-  return result.value?.serverConfigs[0]?.SuspendedUsersAggregate?.count ?? 0;
+  return result.value?.serverConfigs?.[0]?.SuspendedUsersAggregate?.count ?? 0;
 });
 
 const humanReadableDate = (dateISO?: string | null): string => {

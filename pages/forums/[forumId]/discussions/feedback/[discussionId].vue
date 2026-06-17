@@ -60,7 +60,7 @@ const commentToRemoveFeedbackFrom = ref(null);
 const commentToGiveFeedbackOn = ref<Comment | null>(null);
 
 const discussion = computed(() => {
-  return getDiscussionResult.value?.discussions[0] || null;
+  return getDiscussionResult.value?.discussions?.[0] || null;
 });
 
 const stlFiles = computed(() => {
@@ -128,7 +128,7 @@ const {
 
 const originalComment = computed(() => {
   if (getCommentError.value) return null;
-  return getCommentResult.value?.comments[0] || null;
+  return getCommentResult.value?.comments?.[0] || null;
 });
 
 const contextOfFeedbackComment = computed(() => {
@@ -215,7 +215,7 @@ const {
           FeedbackComments: [...prevFeedbackComments, newFeedbackComment],
           FeedbackCommentsAggregate: {
             count:
-              (prevQueryResult?.discussions[0]?.FeedbackCommentsAggregate
+              (prevQueryResult?.discussions?.[0]?.FeedbackCommentsAggregate
                 ?.count || 0) + 1,
             __typename: 'FeedbackCommentsAggregate',
           },

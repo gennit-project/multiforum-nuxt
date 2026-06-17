@@ -21,7 +21,7 @@ const { result, loading, error } = useQuery(
     fetchPolicy: 'cache-first',
   }
 );
-const admins = computed(() => result.value?.channels[0]?.Admins);
+const admins = computed(() => result.value?.channels?.[0]?.Admins);
 
 defineEmits(['click-remove-owner']);
 </script>

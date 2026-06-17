@@ -44,7 +44,7 @@ const answered = computed(() => {
   if (isDiscussionAnsweredLoading.value) return false;
   if (isDiscussionAnsweredError.value) return false;
   return (
-    isDiscussionAnsweredResult.value?.discussionChannels[0]?.answered || false
+    isDiscussionAnsweredResult.value?.discussionChannels?.[0]?.answered || false
   );
 });
 
@@ -60,7 +60,7 @@ const {
 });
 
 const discussion = computed<Discussion | null>(() => {
-  const discussion = getDiscussionResult.value?.discussions[0];
+  const discussion = getDiscussionResult.value?.discussions?.[0];
   if (getDiscussionLoading.value && !discussion) {
     return null;
   }
@@ -79,7 +79,7 @@ const formValues = ref({
 });
 onGetDiscussionResult(
   (result) =>
-    (formValues.value.title = result?.data?.discussions[0]?.title || '')
+    (formValues.value.title = result?.data?.discussions?.[0]?.title || '')
 );
 
 const {
