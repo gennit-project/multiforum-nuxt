@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../../helpers/testFixture';
 import type { Page } from '@playwright/test';
 import type { EventCreateInput, EventUpdateInput } from '@/__generated__/graphql';
 import {

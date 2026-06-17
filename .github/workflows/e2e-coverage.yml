@@ -1,0 +1,70 @@
+name: Combined Coverage (unit + E2E)
+
+# Opt-in: the coverage build emits source maps and is slower than the normal
+# suite, so this runs on demand (or on a schedule) rather than on every PR.
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: '0 6 * * 1' # weekly, Mondays 06:00 UTC
+
+jobs:
+  combined-coverage:
+    runs-on: ubuntu-latest
+    env:
+      VITE_GRAPHQL_URL: ${{ secrets.VITE_GRAPHQL_URL }}
+      VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
+      VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
+      VITE_GOOGLE_MAP_ID: ${{ secrets.VITE_GOOGLE_MAP_ID }}
+      VITE_OPEN_CAGE_API_KEY: ${{ secrets.VITE_OPEN_CAGE_API_KEY }}
+      VITE_AUTH0_DOMAIN: ${{ secrets.VITE_AUTH0_DOMAIN }}
+      VITE_AUTH0_CLIENT_ID: ${{ secrets.VITE_AUTH0_CLIENT_ID }}
+      VITE_AUTH0_AUDIENCE: ${{ secrets.VITE_AUTH0_AUDIENCE }}
+      VITE_AUTH0_CALLBACK_URL: ${{ secrets.VITE_AUTH0_CALLBACK_URL }}
+      VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+      VITE_LIGHTGALLERY_LICENSE_KEY: ${{ secrets.VITE_LIGHTGALLERY_LICENSE_KEY }}
+      VITE_SERVER_NAME: ${{ secrets.VITE_SERVER_NAME }}
+      VITE_ENVIRONMENT: ${{ secrets.VITE_ENVIRONMENT }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - run: npm ci --legacy-peer-deps
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      # Unit coverage (Istanbul lcov) -> coverage/lcov.info
+      - name: Unit coverage
+        run: npm run coverage
+
+      # E2E coverage: sourcemap build, collect browser V8, map to source -> lcov
+      - name: Build app (mock mode + source maps)
+        run: npm run coverage:e2e:build
+
+      - name: Collect E2E coverage
+        run: npm run coverage:e2e:collect
+
+      - name: Build E2E coverage report
+        run: npm run coverage:e2e:report
+
+      # Upload both as separate flags; Codecov merges them into one number.
+      - name: Upload unit coverage
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: unit
+          fail_ci_if_error: false
+
+      - name: Upload E2E coverage
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage-e2e/lcov.info
+          flags: e2e
+          fail_ci_if_error: false
