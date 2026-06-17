@@ -1,4 +1,6 @@
 import { test as base, type TestInfo } from '@playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
 import { installMockAuth } from './mockAuth';
 import {
   installGraphqlMocks,
@@ -51,7 +53,31 @@ type MockedTestFixtures = {
   setupMockedPage: (options: MockedPageOptions) => Promise<MockedPageResult>;
 };
 
+const E2E_COVERAGE_DIR = path.resolve('tests/playwright/coverage/.v8');
+
 export const test = base.extend<MockedTestFixtures>({
+  // Auto-collect browser V8 coverage per test when E2E_COVERAGE=true. Inert
+  // (zero overhead) in normal runs. Every spec that imports this `test`
+  // contributes; the raw V8 is merged with unit coverage by
+  // tests/playwright/coverage/report.mjs.
+  page: async ({ page }, use, testInfo) => {
+    const collect = process.env.E2E_COVERAGE === 'true' && !!page.coverage;
+    if (collect) {
+      await page.coverage.startJSCoverage({ resetOnNavigation: false });
+    }
+
+    await use(page);
+
+    if (collect) {
+      const coverage = await page.coverage.stopJSCoverage();
+      fs.mkdirSync(E2E_COVERAGE_DIR, { recursive: true });
+      const safeId = testInfo.testId.replace(/[^a-zA-Z0-9]/g, '_');
+      fs.writeFileSync(
+        path.join(E2E_COVERAGE_DIR, `${safeId}.json`),
+        JSON.stringify(coverage)
+      );
+    }
+  },
   setupMockedPage: async ({ context, page }, use, testInfo) => {
     let diagnostics: MockedTestDiagnostics | null = null;
 
