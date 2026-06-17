@@ -345,6 +345,11 @@ export default defineNuxtConfig({
     },
   },
   ssr: !isMockedE2E,
+  // Emit client source maps for the E2E coverage build so browser V8 coverage
+  // can be mapped back to original source (spike: E2E_COVERAGE=true).
+  sourcemap: {
+    client: process.env.E2E_COVERAGE === 'true',
+  },
   typescript: {
     strict: false,
     shim: true,
