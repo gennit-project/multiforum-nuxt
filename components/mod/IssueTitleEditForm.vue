@@ -47,7 +47,7 @@ const {
 );
 
 const issue = computed<Issue | null>(() => {
-  const issue = getIssueResult.value?.issues[0];
+  const issue = getIssueResult.value?.issues?.[0];
   if (getIssueLoading.value && !issue) {
     return null;
   }
@@ -65,7 +65,7 @@ const formValues = ref({
   title: getIssueResult.value?.issue?.title || '',
 });
 onGetIssueResult(
-  (result) => (formValues.value.title = result?.data?.issues[0]?.title || '')
+  (result) => (formValues.value.title = result?.data?.issues?.[0]?.title || '')
 );
 
 const {

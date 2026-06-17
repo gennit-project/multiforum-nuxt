@@ -35,7 +35,7 @@ const {
 );
 
 // Computed property for the wiki page data
-const wikiPage = computed(() => wikiPageResult.value?.wikiPages[0]);
+const wikiPage = computed(() => wikiPageResult.value?.wikiPages?.[0]);
 
 // Query channel to check if wiki is enabled
 const {
@@ -45,7 +45,7 @@ const {
 } = useQuery(GET_CHANNEL, { uniqueName: forumId }, { errorPolicy: 'all' });
 
 // Computed property for the channel data
-const channel = computed(() => channelResult.value?.channels[0]);
+const channel = computed(() => channelResult.value?.channels?.[0]);
 
 // Check if wiki is enabled
 const wikiEnabled = computed(() => channel.value?.wikiEnabled);

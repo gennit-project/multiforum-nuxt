@@ -47,7 +47,7 @@ const user = computed(() => {
   if (getUserLoading.value || getUserError.value) {
     return null;
   }
-  return result.value?.users[0] || null;
+  return result.value?.users?.[0] || null;
 });
 
 // Use a computed property that prioritizes our global reactive state for profilePicURL

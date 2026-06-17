@@ -111,7 +111,7 @@ const { result: getUserResult } = useQuery(
   }
 );
 
-const user = computed(() => getUserResult.value?.users[0] || null);
+const user = computed(() => getUserResult.value?.users?.[0] || null);
 
 const profilePicURL = computed(() => user.value?.profilePicURL || '');
 

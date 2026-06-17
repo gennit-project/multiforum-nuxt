@@ -35,7 +35,7 @@ const {
 );
 
 // Computed property for the wiki page data
-const wikiPage = computed(() => wikiPageResult.value?.wikiPages[0] as WikiPage);
+const wikiPage = computed(() => wikiPageResult.value?.wikiPages?.[0] as WikiPage);
 
 // Total number of edits
 const totalEdits = computed(() => {

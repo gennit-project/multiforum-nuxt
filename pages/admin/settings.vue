@@ -42,7 +42,7 @@ const formValues = ref<ServerConfigUpdateInput>({
 
 onGetServerResult((result) => {
   dataLoaded.value = true;
-  const serverConfig = result.data?.serverConfigs[0];
+  const serverConfig = result.data?.serverConfigs?.[0];
   if (!serverConfig) return;
 
   let rules = [];
