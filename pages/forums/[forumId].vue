@@ -218,26 +218,58 @@ onGetChannelResult((result) => {
       },
     });
   }
+});
+
+// Derive SEO meta tags reactively from the query result so useHead is
+// registered during setup (not inside the async onResult callback, which
+// runs outside the Nuxt instance context during SSR).
+const metaData = computed(() => {
+  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME || 'Multiforum';
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+  const loadedChannel = channel.value;
+
+  if (!loadedChannel) {
+    return {
+      title: serverName,
+      meta: [
+        {
+          name: 'description',
+          content: `Community forum on ${serverName}`,
+        },
+      ],
+    };
+  }
+
   const forumName = loadedChannel.displayName || loadedChannel.uniqueName;
   const forumDescription = loadedChannel.description
     ? loadedChannel.description.substring(0, 160) +
       (loadedChannel.description.length > 160 ? '...' : '')
     : `${forumName} - Community Forum`;
-  const baseUrl = import.meta.env.VITE_BASE_URL;
-  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME || 'Multiforum';
   const imageUrl =
     loadedChannel.channelIconURL || loadedChannel.channelBannerURL || '';
 
-  // Set basic SEO meta tags
-  useHead({
+  return {
     title: `${forumName} | ${serverName}`,
-    description: forumDescription,
-    image: imageUrl,
-    type: 'website',
-  });
+    meta: [
+      { name: 'description', content: forumDescription },
 
-  // Add structured data for rich results
-  useHead({
+      // OpenGraph tags
+      { property: 'og:title', content: forumName },
+      { property: 'og:description', content: forumDescription },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:url', content: `${baseUrl}/forums/${channelId.value}` },
+      { property: 'og:site_name', content: serverName },
+      ...(imageUrl ? [{ property: 'og:image', content: imageUrl }] : []),
+
+      // Twitter Card tags
+      {
+        name: 'twitter:card',
+        content: imageUrl ? 'summary_large_image' : 'summary',
+      },
+      { name: 'twitter:title', content: forumName },
+      { name: 'twitter:description', content: forumDescription },
+      ...(imageUrl ? [{ name: 'twitter:image', content: imageUrl }] : []),
+    ],
     script: [
       {
         type: 'application/ld+json',
@@ -256,8 +288,11 @@ onGetChannelResult((result) => {
         }),
       },
     ],
-  });
+  };
 });
+
+// Set meta tags reactively
+useHead(metaData);
 const adminList = computed(() => {
   return channel.value?.Admins?.map((user: User) => user?.username) || [];
 });
