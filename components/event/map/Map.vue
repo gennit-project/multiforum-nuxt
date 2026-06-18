@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, markRaw } from 'vue';
 import { Loader } from '@googlemaps/js-api-loader';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { useRouter } from 'nuxt/app';
@@ -113,6 +113,10 @@ const clearMarkers = () => {
 
 const renderMap = async () => {
   await loader.load();
+  // AdvancedMarkerElement/PinElement live in the 'marker' library, which must
+  // be imported explicitly before use.
+  const { AdvancedMarkerElement, PinElement } =
+    (await google.maps.importLibrary('marker')) as google.maps.MarkerLibrary;
   clearMarkers();
   if (map.value) map.value = null;
 
@@ -135,14 +139,19 @@ const renderMap = async () => {
     zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
   };
 
-  map.value = new google.maps.Map(
-    props.useMobileStyles ? mobileMapDiv.value! : desktopMapDiv.value!,
-    mapConfig
+  // markRaw so Vue does not wrap the map in a reactive Proxy. A proxied map
+  // breaks AdvancedMarkerElement / MarkerClusterer rendering (they can't attach
+  // to the map's internal panes through the Proxy).
+  map.value = markRaw(
+    new google.maps.Map(
+      props.useMobileStyles ? mobileMapDiv.value! : desktopMapDiv.value!,
+      mapConfig
+    )
   );
 
   const bounds = new google.maps.LatLngBounds();
   const infowindow = new google.maps.InfoWindow();
-  const markers: google.maps.Marker[] = [];
+  const markers: google.maps.marker.AdvancedMarkerElement[] = [];
 
   // First pass: group events by location and build markerMap
   props.events.forEach((event) => {
@@ -182,18 +191,25 @@ const renderMap = async () => {
         ? `Click to view event: ${firstEvent?.title || 'Untitled Event'}`
         : `Click to view ${markerData.numberOfEvents} events at this location`;
 
-    // Create marker with map set - needed for event listeners to work properly
-    const marker = new google.maps.Marker({
+    // Use an AdvancedMarkerElement. On a vector (mapId-based) map these render
+    // as real DOM elements, so we can attach native hover listeners to the
+    // marker content. Legacy google.maps.Marker did not fire mouseover/mouseout
+    // reliably on a vector map, which is why hover tooltips stopped working.
+    const pin = new PinElement();
+    const markerEl = pin.element;
+    const marker = new AdvancedMarkerElement({
       position,
       title,
-      map: map.value, // Set map so event listeners attach properly
+      map: map.value,
+      content: markerEl,
+      gmpClickable: true,
     });
 
     bounds.extend(new google.maps.LatLng(position.lat, position.lng));
 
     // Set up click handlers at the marker/location level
     if (props.useMobileStyles) {
-      marker.addListener('click', () => {
+      marker.addListener('gmp-click', () => {
         if (markerData.numberOfEvents === 1 && firstEvent) {
           // Single event - open preview directly
           emit(
@@ -214,7 +230,7 @@ const renderMap = async () => {
       });
 
       // Add hover functionality for mobile too
-      marker.addListener('mouseover', () => {
+      markerEl.addEventListener('mouseenter', () => {
         if (!props.colorLocked) {
           // Get current marker data from markerMap
           const currentMarkerData = markerMap.markers[eventLocationId];
@@ -247,7 +263,7 @@ const renderMap = async () => {
         }
       });
 
-      marker.addListener('mouseout', () => {
+      markerEl.addEventListener('mouseleave', () => {
         if (!props.colorLocked) {
           if (router.currentRoute.value.fullPath.includes(eventLocationId)) {
             emit('unHighlight');
@@ -256,7 +272,7 @@ const renderMap = async () => {
         }
       });
     } else {
-      marker.addListener('click', () => {
+      marker.addListener('gmp-click', () => {
         if (markerData.numberOfEvents === 1 && firstEvent) {
           // Single event - open preview directly
           emit(
@@ -276,7 +292,7 @@ const renderMap = async () => {
         emit('lockColors');
       });
 
-      marker.addListener('mouseover', () => {
+      markerEl.addEventListener('mouseenter', () => {
         if (!props.colorLocked) {
           // Get current marker data from markerMap
           const currentMarkerData = markerMap.markers[eventLocationId];
@@ -309,7 +325,7 @@ const renderMap = async () => {
         }
       });
 
-      marker.addListener('mouseout', () => {
+      markerEl.addEventListener('mouseleave', () => {
         if (!props.colorLocked) {
           if (router.currentRoute.value.fullPath.includes(eventLocationId)) {
             emit('unHighlight');
@@ -327,34 +343,55 @@ const renderMap = async () => {
   });
 
   // First remove markers from map so clusterer can manage them properly
-  markers.forEach((marker) => marker.setMap(null));
-
-  // Cluster AFTER building markers. Pass map here.
-  markerClusterer.value = new MarkerClusterer({
-    markers,
-    map: map.value!,
-    onClusterClick: (event, cluster, clustererMap) => {
-      const b = cluster.bounds;
-      if (b) {
-        clustererMap.fitBounds(b);
-        const currentZoom = clustererMap.getZoom() || 0;
-        const maxZoom = Math.min(currentZoom + 1, 18);
-        setTimeout(() => clustererMap.setZoom(maxZoom), 200);
-      }
-    },
+  markers.forEach((marker) => {
+    marker.map = null;
   });
+
+  // Render cluster bubbles as AdvancedMarkerElements too, so the map uses no
+  // deprecated legacy markers at all.
+  const clusterRenderer = {
+    render: (cluster: { count: number; position: google.maps.LatLng }) => {
+      const { count, position } = cluster;
+      const color = count > 10 ? '#ef4444' : '#3b82f6';
+      const div = document.createElement('div');
+      div.textContent = String(count);
+      div.style.cssText = [
+        'display:flex',
+        'align-items:center',
+        'justify-content:center',
+        'width:40px',
+        'height:40px',
+        'border-radius:9999px',
+        `background:${color}`,
+        'color:#ffffff',
+        'font-size:13px',
+        'font-weight:600',
+        'border:2px solid rgba(255,255,255,0.75)',
+        'box-shadow:0 1px 4px rgba(0,0,0,0.3)',
+      ].join(';');
+      return new AdvancedMarkerElement({ position, content: div });
+    },
+  };
+
+  // Cluster AFTER building markers. markRaw so Vue doesn't proxy the clusterer.
+  markerClusterer.value = markRaw(
+    new MarkerClusterer({
+      markers,
+      map: map.value!,
+      renderer: clusterRenderer,
+      onClusterClick: (event, cluster, clustererMap) => {
+        const b = cluster.bounds;
+        if (b) {
+          clustererMap.fitBounds(b);
+          const currentZoom = clustererMap.getZoom() || 0;
+          const maxZoom = Math.min(currentZoom + 1, 18);
+          setTimeout(() => clustererMap.setZoom(maxZoom), 200);
+        }
+      },
+    })
+  );
 
   markerMap.infowindow = infowindow;
-
-  // Test marker - create a simple test marker to see if events work
-  const testMarker = new google.maps.Marker({
-    position: { lat: 33.4255, lng: -111.94 },
-    map: map.value,
-    title: 'Test marker - should show console log on hover',
-  });
-
-  testMarker.addListener('mouseover', () => {
-  });
 
   // fit and cap zoom
   if (!bounds.isEmpty()) {
