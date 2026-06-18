@@ -13,6 +13,7 @@ import {
   MilesOrKm,
 } from '@/components/event/list/filters/eventSearchOptions';
 import { LocationFilterTypes } from './locationFilterTypes';
+import { getLocationSelectFilterParams } from './locationSelectFilterParams';
 import { getFilterValuesFromParams } from '@/components/event/list/filters/getEventFilterValuesFromParams';
 import GenericButton from '@/components/GenericButton.vue';
 import FilterChip from '@/components/FilterChip.vue';
@@ -143,15 +144,12 @@ const radiusLabel = computed(() => {
 // Note: Route query watching is handled by useFilterBar composable
 
 const updateLocationInput = (placeData: UpdateLocationInput) => {
+  // Picking a place from the autocomplete activates the within-radius filter
+  // with a default 50-mile distance so the results update for that location.
   updateFilters({
     router,
     route,
-    params: {
-      latitude: placeData.lat,
-      longitude: placeData.lng,
-      placeName: placeData.name,
-      placeAddress: placeData.formatted_address,
-    },
+    params: getLocationSelectFilterParams(placeData),
   });
 };
 
