@@ -97,6 +97,13 @@ const errorMessage = computed(() => {
 </script>
 <template>
   <div>
+    <!-- Mounted immediately (v-show, not v-if) so its GET_EVENTS query fires in
+         parallel with the channel/server-config checks instead of waiting for
+         them to resolve first. That removes a query wave on channel-scoped
+         navigation. Visibility is still gated so the list is hidden while
+         loading or when events are disabled for the forum/server. -->
+    <EventListView v-show="shouldShowEvents" />
+
     <!-- Loading State -->
     <div v-if="bothLoading" class="flex justify-center py-8">
       <div class="text-center">
@@ -142,8 +149,5 @@ const errorMessage = computed(() => {
         </div>
       </div>
     </div>
-
-    <!-- Events List -->
-    <EventListView v-else />
   </div>
 </template>

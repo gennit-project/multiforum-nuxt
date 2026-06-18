@@ -19,15 +19,12 @@ import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavo
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
-import {
-  CHECK_DISCUSSION_ISSUE_EXISTENCE,
-  CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
-} from '@/graphQLData/issue/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import EditsDropdown from './activityFeed/EditsDropdown.vue';
 import type { Discussion } from '@/__generated__/graphql';
+import type { RouteLocationRaw } from 'vue-router';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
@@ -42,6 +39,7 @@ const props = defineProps<{
   discussionBodyEditMode?: boolean;
   discussionIsArchived?: boolean | undefined | null;
   downloadMode?: boolean;
+  relatedIssueLink?: RouteLocationRaw | null;
 }>();
 
 const emit = defineEmits([
@@ -121,10 +119,10 @@ const handleToggleSensitiveContent = async () => {
   }
 };
 
+// Derive the channel from the route first so channel-scoped queries can fire
+// immediately on mount, rather than waiting for the parent's GET_DISCUSSION
+// result to populate `props.discussion` (which created a query waterfall).
 const defaultChannel = computed(() => {
-  if (!props.discussion) {
-    return '';
-  }
   const channelInRoute = Array.isArray(route.params.forumId)
     ? route.params.forumId[0]
     : typeof route.params.forumId === 'string'
@@ -132,7 +130,8 @@ const defaultChannel = computed(() => {
       : '';
   return (
     channelInRoute ||
-    props.discussion?.DiscussionChannels?.[0]?.channelUniqueName
+    props.discussion?.DiscussionChannels?.[0]?.channelUniqueName ||
+    ''
   );
 });
 
@@ -150,57 +149,6 @@ const { result: getChannelResult } = useQuery(
     enabled: computed(() => !!props.channelId || !!defaultChannel.value),
   }
 );
-
-const { result: getDiscussionIssueResult } = useQuery(
-  CHECK_DISCUSSION_ISSUE_EXISTENCE,
-  () => ({
-    discussionId: props.discussion?.id,
-    channelUniqueName: defaultChannel.value,
-  }),
-  {
-    fetchPolicy: 'cache-first',
-    enabled: computed(() => !!props.discussion?.id && !!defaultChannel.value),
-  }
-);
-
-const { result: getDiscussionCommentIssueResult } = useQuery(
-  CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
-  () => ({
-    discussionId: props.discussion?.id,
-    channelUniqueName: defaultChannel.value,
-  }),
-  {
-    fetchPolicy: 'cache-first',
-    enabled: computed(() => !!props.discussion?.id && !!defaultChannel.value),
-  }
-);
-
-const relatedIssueNumber = computed(() => {
-  const directIssueNumber =
-    getDiscussionIssueResult.value?.issues?.[0]?.issueNumber;
-  if (directIssueNumber != null) {
-    return directIssueNumber;
-  }
-
-  return (
-    getDiscussionCommentIssueResult.value?.discussionChannels?.[0]
-      ?.Comments?.[0]?.RelatedIssues?.[0]?.issueNumber ?? null
-  );
-});
-
-const relatedIssueLink = computed(() => {
-  if (relatedIssueNumber.value == null || !defaultChannel.value) {
-    return null;
-  }
-
-  return {
-    name: 'forums-forumId-issues-issueNumber',
-    params: {
-      forumId: defaultChannel.value,
-      issueNumber: relatedIssueNumber.value,
-    },
-  };
-});
 
 // Query server config to get default roles
 const { result: getServerResult } = useQuery(
@@ -364,7 +312,7 @@ const menuItems = computed(() => {
     feedbackEnabled:
       getChannelResult.value?.channels?.[0]?.feedbackEnabled ?? true,
     hasSensitiveContent: !!props.discussion?.hasSensitiveContent,
-    relatedIssueLink: relatedIssueLink.value,
+    relatedIssueLink: props.relatedIssueLink ?? null,
   });
 });
 
