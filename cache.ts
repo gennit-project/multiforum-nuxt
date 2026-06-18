@@ -35,6 +35,56 @@ const mergeSuspendedUsers: FieldMergeFunction<CacheEntity[]> = (
   });
 };
 
+// Channel.Moderators and Channel.Admins are each written by several queries with
+// DIFFERENT sub-selections (e.g. some include `User { username }`, others only
+// `displayName`). Without a merge function Apollo replaces the array
+// last-writer-wins and logs "Cache data may be lost when replacing the <field>
+// field". Because those writers resolve in a different order during SSR vs. client
+// hydration, the restored list could differ from the server-rendered one, flipping
+// the "Forum Mod"/"Forum Admin" badge and producing a hydration mismatch.
+//
+// Merge by the entity's keyField so the result is a union that is independent of
+// write order and accumulates fields. This is strictly safer than a `[...incoming]`
+// replace because it never drops an entry that a partial/filtered write omits.
+const mergeByKeyField = (
+  keyField: string
+): FieldMergeFunction<CacheEntity[]> => {
+  return (existing = [], incoming = [], { mergeObjects, readField }) => {
+    const merged: CacheEntity[] = existing.slice();
+    const indexByKey = new Map<string, number>();
+    existing.forEach((entity, index) => {
+      const key = readField(keyField, entity);
+      if (typeof key === 'string') {
+        indexByKey.set(key, index);
+      }
+    });
+
+    incoming.forEach((incomingEntity) => {
+      const key = readField(keyField, incomingEntity);
+      const existingIndex =
+        typeof key === 'string' ? indexByKey.get(key) : undefined;
+
+      const existingEntity =
+        existingIndex === undefined ? undefined : merged[existingIndex];
+
+      if (existingIndex === undefined || existingEntity === undefined) {
+        if (typeof key === 'string') {
+          indexByKey.set(key, merged.length);
+        }
+        merged.push(incomingEntity);
+      } else {
+        merged[existingIndex] = mergeObjects(existingEntity, incomingEntity);
+      }
+    });
+
+    return merged;
+  };
+};
+
+// ModerationProfile is keyed by displayName; User (Admins) is keyed by username.
+const mergeModerators = mergeByKeyField('displayName');
+const mergeAdmins = mergeByKeyField('username');
+
 export const usernameVar = ref('');
 export const setUsername = (username: string) => {
   usernameVar.value = username;
@@ -111,7 +161,10 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
           merge: (_existing = [], incoming) => [...incoming],
         },
         Admins: {
-          merge: (_existing = [], incoming) => [...incoming],
+          merge: mergeAdmins,
+        },
+        Moderators: {
+          merge: mergeModerators,
         },
         SuspendedUsers: {
           merge: mergeSuspendedUsers,
