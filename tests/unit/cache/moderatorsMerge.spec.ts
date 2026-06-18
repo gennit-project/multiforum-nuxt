@@ -133,3 +133,76 @@ describe('Channel.Moderators cache merge', () => {
     ]);
   });
 });
+
+// Channel.Admins is written by queries with different sub-selections too (e.g. the
+// filtered `Admins(where: { username })` permission check writes a single-element
+// list). The same union-by-username merge keeps the badge data order-independent.
+
+const ADMINS_FULL = gql`
+  query getChannelOwners($channelUniqueName: String!) {
+    channels(where: { uniqueName: $channelUniqueName }) {
+      uniqueName
+      Admins {
+        username
+        displayName
+      }
+    }
+  }
+`;
+
+const ADMINS_USERNAME_ONLY = gql`
+  query getChannelPermissions($channelUniqueName: String!) {
+    channels(where: { uniqueName: $channelUniqueName }) {
+      uniqueName
+      Admins {
+        username
+      }
+    }
+  }
+`;
+
+const readAdmins = (cache: InMemoryCache) =>
+  cache.readQuery<{
+    channels: Array<{
+      Admins: Array<{ username: string; displayName?: string }>;
+    }>;
+  }>({ query: ADMINS_FULL, variables })?.channels?.[0]?.Admins ?? [];
+
+describe('Channel.Admins cache merge', () => {
+  it('does not drop an admin that a later partial write omits', () => {
+    const cache = new InMemoryCache(inMemoryCacheOptions);
+    cache.writeQuery({
+      query: ADMINS_FULL,
+      variables,
+      data: {
+        channels: [
+          {
+            __typename: 'Channel',
+            uniqueName: 'cats',
+            Admins: [
+              { __typename: 'User', username: 'alice', displayName: 'Alice' },
+              { __typename: 'User', username: 'bob', displayName: 'Bob' },
+            ],
+          },
+        ],
+      },
+    });
+    cache.writeQuery({
+      query: ADMINS_USERNAME_ONLY,
+      variables,
+      data: {
+        channels: [
+          {
+            __typename: 'Channel',
+            uniqueName: 'cats',
+            Admins: [{ __typename: 'User', username: 'alice' }],
+          },
+        ],
+      },
+    });
+    expect(readAdmins(cache).map((admin) => admin.username)).toEqual([
+      'alice',
+      'bob',
+    ]);
+  });
+});
