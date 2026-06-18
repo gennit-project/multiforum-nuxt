@@ -35,6 +35,51 @@ const mergeSuspendedUsers: FieldMergeFunction<CacheEntity[]> = (
   });
 };
 
+// Channel.Moderators is written by several queries with DIFFERENT sub-selections
+// (some include `User { username }`, others only `displayName`). Without a merge
+// function Apollo replaces the array last-writer-wins and logs "Cache data may be
+// lost when replacing the Moderators field". Because those writers resolve in a
+// different order during SSR vs. client hydration, the restored list could differ
+// from the server-rendered one, flipping the "Forum Mod" badge and producing a
+// hydration mismatch. Merge by displayName (the ModerationProfile keyField) so the
+// result is a union that is independent of write order and accumulates fields.
+const mergeModerators: FieldMergeFunction<CacheEntity[]> = (
+  existing = [],
+  incoming = [],
+  { mergeObjects, readField }
+) => {
+  const merged: CacheEntity[] = existing.slice();
+  const indexByDisplayName = new Map<string, number>();
+  existing.forEach((moderator, index) => {
+    const displayName = readField('displayName', moderator);
+    if (typeof displayName === 'string') {
+      indexByDisplayName.set(displayName, index);
+    }
+  });
+
+  incoming.forEach((incomingModerator) => {
+    const displayName = readField('displayName', incomingModerator);
+    const existingIndex =
+      typeof displayName === 'string'
+        ? indexByDisplayName.get(displayName)
+        : undefined;
+
+    const existingModerator =
+      existingIndex === undefined ? undefined : merged[existingIndex];
+
+    if (existingIndex === undefined || existingModerator === undefined) {
+      if (typeof displayName === 'string') {
+        indexByDisplayName.set(displayName, merged.length);
+      }
+      merged.push(incomingModerator);
+    } else {
+      merged[existingIndex] = mergeObjects(existingModerator, incomingModerator);
+    }
+  });
+
+  return merged;
+};
+
 export const usernameVar = ref('');
 export const setUsername = (username: string) => {
   usernameVar.value = username;
@@ -112,6 +157,9 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
         },
         Admins: {
           merge: (_existing = [], incoming) => [...incoming],
+        },
+        Moderators: {
+          merge: mergeModerators,
         },
         SuspendedUsers: {
           merge: mergeSuspendedUsers,
