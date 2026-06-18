@@ -29,6 +29,18 @@ const mockMarkerClusterer = {
   clearMarkers: vi.fn(),
 };
 
+// Mock AdvancedMarkerElement / PinElement, which the component pulls from
+// google.maps.importLibrary('marker').
+const mockMarkerEl = { addEventListener: vi.fn() };
+const mockPin = { element: mockMarkerEl };
+const mockAdvancedMarker = { addListener: vi.fn(), map: null };
+const AdvancedMarkerElement = vi.fn().mockImplementation(function () {
+  return mockAdvancedMarker;
+});
+const PinElement = vi.fn().mockImplementation(function () {
+  return mockPin;
+});
+
 // Mock Google Maps
 global.google = {
   maps: {
@@ -60,6 +72,9 @@ global.google = {
       DARK: 'DARK',
       FOLLOW_SYSTEM: 'FOLLOW_SYSTEM',
     },
+    importLibrary: vi
+      .fn()
+      .mockResolvedValue({ AdvancedMarkerElement, PinElement }),
   },
 } as any;
 
@@ -187,10 +202,8 @@ describe('Map with Clustering', () => {
     // Verify map was created
     expect(global.google.maps.Map).toHaveBeenCalled();
 
-    // Verify markers were created for each event + 1 test marker
-    expect(global.google.maps.Marker).toHaveBeenCalledTimes(
-      mockEvents.length + 1
-    );
+    // Verify one advanced marker was created per event
+    expect(AdvancedMarkerElement).toHaveBeenCalledTimes(mockEvents.length);
   });
 
   it('should create MarkerClusterer with correct configuration', async () => {
