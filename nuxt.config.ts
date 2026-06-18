@@ -294,6 +294,21 @@ export default defineNuxtConfig({
     cdn: true,
     // Enable server-side caching
     routeRules: {
+      // Cache server-rendered discussion pages. The SSR output is anonymous
+      // (auth runs client-side only, so the server never personalizes the
+      // HTML), which makes it identical for every visitor and safe to cache.
+      // On Vercel this becomes ISR: the page renders on demand, is served
+      // from the edge (~5ms vs ~2s SSR), and revalidates in the background
+      // every 300s. Note: the single-segment glob is required — a mid-path
+      // `**` (e.g. /forums/**/discussions/**) corrupts Nitro's route matcher
+      // and 404s the route.
+      '/forums/*/discussions/*': { isr: 300 },
+      // Event and download detail pages render the same way: public, anonymous
+      // SSR (auth is client-side), so they cache identically for every visitor.
+      // Downloads are discussions with hasDownload=true and reuse the same
+      // components, so they also inherit the flattened query waves.
+      '/forums/*/events/*': { isr: 300 },
+      '/forums/*/downloads/*': { isr: 300 },
       // Cache API routes
       '/api/**': {
         cache: {

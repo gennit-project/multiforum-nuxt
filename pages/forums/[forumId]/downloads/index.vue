@@ -149,8 +149,14 @@ const filterGroups = computed<FilterGroup[]>(() => {
       </div>
     </div>
 
-    <!-- Downloads Content -->
-    <div v-else>
+    <!-- Downloads Content. Rendered with v-show (not v-else) so DownloadList
+         mounts immediately and its list query fires in parallel with the
+         channel/server-config checks instead of waiting for them — removing a
+         query wave on channel-scoped navigation. It stays hidden while loading
+         or when downloads are disabled. filterGroups (filter UI only) populate
+         once the channel query resolves; the list query doesn't depend on
+         them. -->
+    <div v-show="shouldShowDownloads">
       <DownloadFilterBar :filter-groups="filterGroups" />
 
       <!-- Desktop Layout with Sidebar -->
