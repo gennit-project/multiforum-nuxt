@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch, onMounted, ref } from 'vue';
+import { computed, watch, onMounted } from 'vue';
 import { useAuth0 } from '@auth0/auth0-vue';
 import {
   isAuthenticatedVar,
@@ -7,7 +7,6 @@ import {
   usernameVar,
   setIsAuthenticated,
 } from '@/cache';
-import { useSSRAuth } from '@/composables/useSSRAuth';
 
 // Type for Auth0 error objects
 interface Auth0Error {
@@ -27,20 +26,19 @@ function isAuth0Error(error: unknown): error is Auth0Error {
 
 /*
 This component is a wrapper around content that requires authentication.
-It shows the content if the user is authenticated, and a login button 
+It shows the content if the user is authenticated, and a login button
 if they're not.
 
-It also has logic to prevent hydration errors and content shift.
-It works like this:
+SPIKE Phase 3 — server session is the source of truth:
+Auth state (isAuthenticatedVar / usernameVar) is now seeded from the encrypted
+server session by plugins/auth-session.ts. That seeding is identical on the
+server and on the client's first hydration render (it travels through the Nuxt
+payload), so we can read it directly here — no hydration mismatch, and none of
+the old "pretend logged-out, then flip after mount" dance or the auth-hint
+cookie shim (useSSRAuth) is needed anymore.
 
-SSR: We cannot know if the user is logged in. So we pretend they're not.
-
-Client Initial Hydration: We also pretend they're not logged in, 
-matching the SSR output. (No mismatch!)
-
-Client After Mount: We check usernameVar.value. If it's non-empty,
- we flip to the "has-auth" content. That causes a normal Vue re-render, 
- not a hydration mismatch.
+(Pre-spike behavior, for reference: SSR couldn't know the user, so we rendered
+logged-out and used an auth-hint cookie + isMounted to flip after mount.)
 */
 const props = defineProps({
   requireOwnership: Boolean,
@@ -55,55 +53,23 @@ const props = defineProps({
 
 let handleLogin = () => {};
 
-const isMounted = ref(false);
-const { hasAuthHint, usernameHint, setAuthHint } = useSSRAuth();
-
-// Remove loading state - we'll render immediately for SEO
-// const isCheckingAuth = ref(true);
-
 const isOwner = computed(() => {
   if (!usernameVar.value) return false;
   return props.owners?.includes(usernameVar.value);
 });
 
 const showAuthContent = computed(() => {
-  // During SSR, use the auth hint cookie
-  if (import.meta.env.SSR) {
-    // If we have an auth hint, show authenticated content
-    if (hasAuthHint.value) {
-      // For ownership checks during SSR, use the username hint
-      if (props.requireOwnership && usernameHint.value) {
-        return props.owners?.includes(usernameHint.value);
-      }
-      return !props.requireOwnership; // Show auth content for non-ownership cases
-    }
-    return false; // No auth hint means not authenticated
+  // isAuthenticatedVar / usernameVar are seeded from the server session and are
+  // SSR-consistent (server render === first client render), so this branch is
+  // safe to evaluate identically everywhere — no SSR special-case, no isMounted.
+  if (!isAuthenticatedVar.value) {
+    return false;
   }
-
-  // During initial client mount, check auth hint to match SSR
-  if (!isMounted.value) {
-    return (
-      hasAuthHint.value &&
-      (!props.requireOwnership || props.owners?.includes(usernameHint.value))
-    );
+  // Ownership-gated content additionally requires the username to match.
+  if (props.requireOwnership) {
+    return isOwner.value;
   }
-
-  // If we have a username, the user is fully authenticated
-  if (usernameVar.value) {
-    // If ownership is required, check that too
-    if (props.requireOwnership) {
-      return isOwner.value;
-    }
-    return true;
-  }
-
-  // If no username but authenticated, allow access to non-ownership content
-  if (isAuthenticatedVar.value && !props.requireOwnership) {
-    return true;
-  }
-
-  // Default: not authenticated or doesn't meet requirements
-  return false;
+  return true;
 });
 
 // Helper function to clear auth state safely
@@ -125,22 +91,22 @@ const clearAuthState = () => {
 
 // Only run client-side auth logic
 if (import.meta.env.SSR === false) {
-  const {
-    loginWithPopup,
-    idTokenClaims,
-    isLoading,
-    loginWithRedirect,
-    isAuthenticated,
-    getAccessTokenSilently,
-  } = useAuth0();
+  const { idTokenClaims, isLoading, isAuthenticated, getAccessTokenSilently } =
+    useAuth0();
 
   setIsLoadingAuth(isLoading.value);
 
-  // Sync Auth0's authentication state with our local state
+  // Sync Auth0's authentication state with our local state.
+  // SPIKE Phase 3: only UPGRADE — never let the SPA's transient/absent auth
+  // (false while its silent check loads, or because this user logged in via the
+  // server session rather than the SPA) clobber the server-seeded session.
+  // Logout clears state explicitly via useServerLogout / clearAuthState.
   watch(
     isAuthenticated,
     (newValue) => {
-      setIsAuthenticated(newValue);
+      if (newValue) {
+        setIsAuthenticated(true);
+      }
     },
     { immediate: true }
   );
@@ -219,9 +185,6 @@ if (import.meta.env.SSR === false) {
   });
 
   onMounted(async () => {
-    // Set mounted first to prevent reactivity issues
-    isMounted.value = true;
-
     // Wrap all auth logic in try-catch to prevent app crashes
     try {
       // Use a flag to prevent multiple refreshes on the same page load
@@ -291,37 +254,13 @@ if (import.meta.env.SSR === false) {
     }
   });
 
-  handleLogin = async () => {
-    try {
-      // Check if we had an auth failure this session
-      const hadAuthFailure = sessionStorage.getItem('authFailure');
-      if (hadAuthFailure) {
-        // Clear the failure flag and try fresh
-        sessionStorage.removeItem('authFailure');
-        clearAuthState();
-      }
-
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-      if (window?.parent?.Cypress || isMobile) {
-        // Make sure to return early after redirect to prevent additional actions
-        await loginWithRedirect();
-        return;
-      }
-
-      await loginWithPopup();
-
-      // Ensure state is updated
-      if (isAuthenticated.value) {
-        setIsAuthenticated(true);
-        setAuthHint(true); // Set auth hint cookie after successful login
-      }
-
-      await storeToken();
-    } catch (error) {
-      console.error('Login error:', error);
-      // Don't let login errors crash the app
-    }
+  // SPIKE Phase 3: log in through the server-session SDK route instead of the
+  // SPA popup/redirect. /auth/login establishes the encrypted server session
+  // (and, via the shared Auth0 SSO cookie, the SPA silently authenticates too,
+  // so the localStorage token Apollo still uses gets populated until Phase 2).
+  handleLogin = () => {
+    const returnTo = window.location.pathname + window.location.search;
+    window.location.href = `/auth/login?returnTo=${encodeURIComponent(returnTo)}`;
   };
 }
 </script>

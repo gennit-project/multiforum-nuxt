@@ -196,11 +196,14 @@ export function useAuthManager() {
 
     const { user, isAuthenticated } = auth0;
 
-    // Set initial authentication state
-    isAuthenticatedVar.value = isAuthenticated.value === true;
-
-    // Set auth hint cookie on initial auth
+    // SPIKE Phase 3: the server session (seeded into isAuthenticatedVar by
+    // plugins/auth-session.ts) is the source of truth. The SPA SDK may report
+    // isAuthenticated=false transiently while its silent check is still loading;
+    // never downgrade on that — only ever UPGRADE to authenticated here. Logout
+    // clears the state explicitly via clearAuthState(). This prevents a
+    // logged-in→out→in blink in components that read isAuthenticatedVar.
     if (isAuthenticated.value === true) {
+      setIsAuthenticated(true);
       setAuthHint(true);
     }
 
@@ -216,14 +219,18 @@ export function useAuthManager() {
       { immediate: true }
     );
 
-    // Watch for authentication state changes
+    // Watch for authentication state changes. As above (SPIKE Phase 3), only
+    // upgrade — don't let a transient SPA "false" clobber the server-seeded
+    // session. Logout clears state explicitly via clearAuthState().
     watch(
       isAuthenticated,
       (newIsAuthenticated) => {
-        setIsAuthenticated(newIsAuthenticated);
-        if (newIsAuthenticated && user.value?.email) {
-          userEmail.value = user.value.email;
-          loadUserData();
+        if (newIsAuthenticated) {
+          setIsAuthenticated(true);
+          if (user.value?.email) {
+            userEmail.value = user.value.email;
+            loadUserData();
+          }
         }
       },
       { immediate: true }

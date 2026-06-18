@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { useAuth0 } from '@auth0/auth0-vue';
 import { usernameVar } from '@/cache';
-import { config } from '@/config';
-import { useRouter, useRoute } from 'nuxt/app';
+import { useRouter } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
+import { useServerLogout } from '@/composables/useServerLogout';
 
 const props = defineProps({
   modName: {
@@ -17,14 +16,8 @@ const props = defineProps({
     required: true,
   },
 });
-// SPIKE (auth0-nuxt migration): now that SSR can be authenticated, this nav
-// component renders on the server too — but @auth0/auth0-vue's useAuth0() is
-// client-only and is undefined during SSR. Guard it the same way LoginButton
-// already does. (Phase 3 replaces this SPA logout with a /auth/logout navigation.)
-let logout: ReturnType<typeof useAuth0>['logout'] = () => Promise.resolve();
-if (import.meta.env.SSR === false) {
-  logout = useAuth0().logout;
-}
+// SPIKE Phase 3: logout goes through the server-session route, not the SPA SDK.
+const { logout: handleLogout } = useServerLogout();
 
 const { result: getUserResult } = useQuery(
   GET_USER,
@@ -60,19 +53,6 @@ const menuItems = [
     icon: '',
   },
 ];
-
-const route = useRoute();
-
-const handleLogout = () => {
-  // Store the current path in local storage
-  localStorage.setItem('postLogoutRedirect', route.fullPath);
-  // Redirect to the fixed logout route
-  logout({
-    logoutParams: {
-      returnTo: `${config.baseUrl}/logout`,
-    },
-  });
-};
 
 const goToModProfile = () => {
   router.push(`/mod/${props.modName}`);

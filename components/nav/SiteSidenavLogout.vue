@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { useAuth0 } from '@auth0/auth0-vue';
-import { config } from '@/config';
 import { isAuthenticatedVar } from '@/cache';
-import { useRoute } from 'nuxt/app';
+import { useServerLogout } from '@/composables/useServerLogout';
 
 defineProps({
   navLinkClasses: {
@@ -15,25 +13,8 @@ defineProps({
   },
 });
 
-// SPIKE (auth0-nuxt migration): SSR can now be authenticated, so this renders
-// server-side where @auth0/auth0-vue's useAuth0() is undefined. Guard it like
-// LoginButton. (Phase 3 replaces this with a /auth/logout navigation.)
-let logout: ReturnType<typeof useAuth0>['logout'] = () => Promise.resolve();
-if (import.meta.env.SSR === false) {
-  logout = useAuth0().logout;
-}
-const route = useRoute();
-
-const handleLogout = () => {
-  // Store the current path in local storage
-  localStorage.setItem('postLogoutRedirect', route.fullPath);
-  // Redirect to the fixed logout route
-  logout({
-    logoutParams: {
-      returnTo: `${config.baseUrl}/logout`,
-    },
-  });
-};
+// SPIKE Phase 3: logout goes through the server-session route, not the SPA SDK.
+const { logout: handleLogout } = useServerLogout();
 </script>
 
 <template>

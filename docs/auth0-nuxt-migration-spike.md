@@ -1,9 +1,48 @@
 # Spike: migrate Auth0 to the server-session SDK (`@auth0/auth0-nuxt`)
 
-**Status:** Phase 0/1 verified locally against a real Auth0 Regular Web App.
-Core hypothesis confirmed — see "Spike results" below. The full
-authenticated-on-first-paint payoff still needs the follow-ups noted there
-(server-side username resolution + Phase 3 `RequireAuth` unification).
+**Status:** Phases 0/1/3 verified locally against a real Auth0 Regular Web App.
+Core hypothesis confirmed and the app now renders authenticated on first paint
+(nav + ownership-gated UI), with login/logout going through the server session.
+Phase 2 (Apollo token from the server session) and Phase 4 (delete the SPA SDK +
+remaining shims, rework tests) are the remaining work.
+
+## Phase 3 results (verified locally)
+
+Login via `/auth/login`, logout via the nav, and hard-refresh all behave
+correctly: the nav shows authenticated and the discussion Edit button renders on
+first paint, with no auth-driven hydration mismatch.
+
+What Phase 3 changed:
+- `RequireAuth` decides auth from the SSR-seeded `isAuthenticatedVar` /
+  `usernameVar` (server session is the source of truth). Removed the `isMounted`
+  dance and the `useSSRAuth` auth-hint cookie dependency. Login →
+  `/auth/login?returnTo=…`.
+- New `composables/useServerLogout.ts`: clears the SPA token + hint cookies, then
+  redirects to `/auth/logout` (server session + federated Auth0 logout). The 4
+  nav components use it and no longer import the SPA `useAuth0()`.
+- **Anti-clobber:** both `useAuthManager` and `RequireAuth` watched the SPA's
+  `isAuthenticated` and called `setIsAuthenticated(newValue)` — which set `false`
+  on mount for a server-session user (the SPA reports not-authenticated), wiping
+  the seeded session. Both now only ever UPGRADE; logout clears state explicitly.
+- **Deleted `plugins/auth0.server.ts`** — it ran after the new `auth-session`
+  plugin (alphabetical order) and reset `isAuthenticated` to `false` on the
+  server, clobbering the seeded session during SSR.
+- **Deleted `plugins/username-cache.client.ts`** — the synchronous localStorage
+  username restore is obsolete now that the server session seeds `usernameVar`,
+  and it conflicted with that seeding.
+
+### Known remaining mismatch (PRE-EXISTING, not auth-related)
+
+Comment headers can still log a hydration mismatch on the forum-mod badge
+("Forum Mod"/"Forum Admin"). It is driven by `forumRoleBadge`, computed from the
+channel's mod/admin lists (`GET_MODS_BY_CHANNEL` via `useForumRoleMembership`) —
+entirely viewer-independent, so unrelated to the auth migration. Root cause is an
+Apollo cache-normalization issue: multiple queries write `Channel.Moderators`
+(`ModerationProfile`, keyed by `displayName`) with different sub-selections,
+producing the long-standing "cache data may be lost when replacing the Moderators
+field" warning, so the client reads the mod list differently than SSR rendered
+it. Fix is a cache `merge`/typePolicy for `Channel.Moderators` (or aligning the
+query selections) — tracked separately.
 
 ## Spike results (verified locally)
 
