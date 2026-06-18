@@ -17,17 +17,19 @@ loaded a discussion detail page:
   made the logged-in nav render server-side and surface a separate bug (below).
 - ⚠️ **Not authenticated on first paint yet**, for two expected reasons while
   both auth systems coexist:
-  1. **Username is wrong server-side** (`catherine.luse`, the email/nickname
-     fallback, instead of the real app username `cluse`). The real username
-     lives in the GraphQL backend keyed by email; it is NOT reliably in the
-     Auth0 token (the PostLogin Action sets it on the *access* token from
-     `event.request.body.username`, which `getSession()` can't read and which
-     is absent on session resume). Because the discussion Edit button is gated
-     on `usernameVar === author.username`, the wrong SSR username makes the
-     ownership check fail server-side, so the button only appears after the
-     client fetches the real username. **Fix:** resolve username server-side
-     from the backend by email in the Nitro middleware (Phase 1 completion;
-     touches Phase 2 server-side token use).
+  1. ~~**Username is wrong server-side**~~ ✅ **FIXED (Phase 1 complete).** The
+     real username lives in the GraphQL backend keyed by email; it is NOT
+     reliably in the Auth0 token (the PostLogin Action sets it on the *access*
+     token from `event.request.body.username`, which `getSession()` can't read
+     and which is absent on session resume). The Nitro middleware now resolves
+     it server-side: `getAccessToken()` mints an API token from the session
+     (using the refresh token + `NUXT_AUTH0_AUDIENCE` — no re-login needed),
+     and it queries the backend by email (the GET_EMAIL query `useAuthManager`
+     uses). Verified: `catherine.luse@gmail.com → resolvedUsername=cluse`
+     server-side, so the Edit button's ownership check passes during SSR and it
+     renders on first paint. Falls back to the token claim / email if the token
+     or lookup is unavailable (display-only degradation; auth state stays
+     correct). **Requires `NUXT_AUTH0_AUDIENCE`** = the GraphQL API audience.
   2. **Nav still keys off the old `auth-hint` cookie.** `RequireAuth` decides
      SSR auth from the `auth-hint` cookie set by the SPA login flow, which the
      new `/auth/login` never sets — so the nav renders logged-out until the SPA
@@ -110,7 +112,9 @@ NUXT_AUTH0_CLIENT_SECRET=
 NUXT_AUTH0_SESSION_SECRET=
 # Public base URL of THIS app. Local: http://localhost:3000 | Prod: https://www.topical.space
 NUXT_AUTH0_APP_BASE_URL=http://localhost:3000
-# Optional: API audience — the access token Apollo will eventually send (Phase 2).
+# GraphQL API audience — same value as VITE_AUTH0_AUDIENCE. REQUIRED for Phase 1
+# server-side username resolution (getAccessToken() needs it to mint an API
+# token); also what Apollo will send in Phase 2.
 NUXT_AUTH0_AUDIENCE=
 ```
 
