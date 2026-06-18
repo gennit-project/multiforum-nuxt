@@ -1,6 +1,6 @@
 // plugins/auth-session.ts
 //
-// SPIKE (auth0-nuxt server-session migration) — Phase 1 core.
+// SPIKE (auth0-nuxt server-session migration) — Phase 1, app half.
 //
 // This is the change that makes SSR auth-aware and eliminates the whole class
 // of auth hydration mismatches. With the server-session SDK, the server knows
@@ -10,11 +10,15 @@
 //   2. transfer that exact state to the client via the Nuxt payload (useState),
 //      so the client's first hydration render matches the server (no mismatch).
 //
-// This is a UNIVERSAL plugin on purpose: the server branch reads the session
-// and writes the payload; the (no-op-on-server) tail runs on BOTH sides and
-// seeds the reactive vars — on the client it reads the value back out of the
-// payload before the first render. A `.server.ts` plugin would not run on the
-// client, so the client would never re-seed and we'd be back to a mismatch.
+// The session itself is read in Nitro (server/middleware/2.auth-session.ts),
+// because useAuth0(event) is a server-only auto-import. That middleware leaves
+// the result on `event.context.authSession`; here we pick it up during SSR.
+//
+// This is a UNIVERSAL plugin on purpose: the server branch reads the context
+// and writes the payload; the tail runs on BOTH sides and seeds the reactive
+// vars — on the client it reads the value back out of the payload before the
+// first render. A `.server.ts` plugin would not run on the client, so the
+// client would never re-seed and we'd be back to a mismatch.
 //
 // It replaces the guesswork in plugins/auth0.server.ts (which decodes a cookie
 // the localStorage SPA SDK never sets) and removes the need for the auth-hint
@@ -32,7 +36,7 @@ type SeededAuth = {
   isAuthenticated: boolean;
 };
 
-export default defineNuxtPlugin(async (nuxtApp) => {
+export default defineNuxtPlugin((nuxtApp) => {
   // useState is SSR-serialized: written on the server, read on the client from
   // the payload — the transport that keeps both sides in sync.
   const seeded = useState<SeededAuth>('auth-session', () => ({
@@ -41,30 +45,9 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   }));
 
   if (import.meta.server) {
-    const event = nuxtApp.ssrContext?.event;
-    if (event) {
-      try {
-        // @ts-expect-error useAuth0 is auto-imported by @auth0/auth0-nuxt in
-        // the Nitro/server context; types resolve once the module's types are
-        // generated (post-`nuxi prepare`).
-        const session = await useAuth0(event).getSession();
-        const user = session?.user;
-        if (user) {
-          // The app keys auth UI off `username`. Auth0 stores the app username
-          // in a custom claim; adjust the claim name to match the Auth0 Action
-          // that sets it (see spike doc). Fall back to standard claims for the
-          // spike so something renders.
-          const username =
-            (user['https://multiforum/username'] as string) ||
-            (user.nickname as string) ||
-            (user.preferred_username as string) ||
-            '';
-          seeded.value = { username, isAuthenticated: true };
-        }
-      } catch (err) {
-        // Never let an auth read crash SSR — fall back to logged-out.
-        console.error('[auth-session] getSession failed:', err);
-      }
+    const ctx = nuxtApp.ssrContext?.event?.context?.authSession;
+    if (ctx?.isAuthenticated) {
+      seeded.value = { username: ctx.username, isAuthenticated: true };
     }
   }
 

@@ -1,7 +1,55 @@
 # Spike: migrate Auth0 to the server-session SDK (`@auth0/auth0-nuxt`)
 
-**Status:** Phase 0/1 scaffold. Not wired into the live auth flow yet. Cannot be
-end-to-end verified without Auth0 dashboard config + secrets (see below).
+**Status:** Phase 0/1 verified locally against a real Auth0 Regular Web App.
+Core hypothesis confirmed — see "Spike results" below. The full
+authenticated-on-first-paint payoff still needs the follow-ups noted there
+(server-side username resolution + Phase 3 `RequireAuth` unification).
+
+## Spike results (verified locally)
+
+Logged in via `/auth/login` against the `gennit.us.auth0.com` tenant, then
+loaded a discussion detail page:
+
+- ✅ **`Hydration completed but contains mismatches` is gone.** The core reason
+  for the migration is validated: a server-resolved session removes this class
+  of mismatch.
+- ✅ SSR is genuinely auth-aware — proven when seeding the authenticated state
+  made the logged-in nav render server-side and surface a separate bug (below).
+- ⚠️ **Not authenticated on first paint yet**, for two expected reasons while
+  both auth systems coexist:
+  1. **Username is wrong server-side** (`catherine.luse`, the email/nickname
+     fallback, instead of the real app username `cluse`). The real username
+     lives in the GraphQL backend keyed by email; it is NOT reliably in the
+     Auth0 token (the PostLogin Action sets it on the *access* token from
+     `event.request.body.username`, which `getSession()` can't read and which
+     is absent on session resume). Because the discussion Edit button is gated
+     on `usernameVar === author.username`, the wrong SSR username makes the
+     ownership check fail server-side, so the button only appears after the
+     client fetches the real username. **Fix:** resolve username server-side
+     from the backend by email in the Nitro middleware (Phase 1 completion;
+     touches Phase 2 server-side token use).
+  2. **Nav still keys off the old `auth-hint` cookie.** `RequireAuth` decides
+     SSR auth from the `auth-hint` cookie set by the SPA login flow, which the
+     new `/auth/login` never sets — so the nav renders logged-out until the SPA
+     auth resolves client-side. **Fix:** move `RequireAuth` onto the SSR-seeded
+     state (Phase 3).
+
+### Coexistence finding: SPA `useAuth0()` in the SSR path
+
+Flipping SSR to authenticated makes auth-gated components render server-side,
+where `@auth0/auth0-vue`'s **client-only** `useAuth0()` is `undefined`. The
+consumers are 9 files; 3 nav components rendered unguarded and crashed SSR
+(`UserProfileDropdownMenu`, `SiteSidenavLogout`, `SiteSidenavLogin`). They were
+guarded with `import.meta.env.SSR === false` (the pattern `LoginButton` /
+`RequireAuth` already use). Phase 3 replaces these SPA logout calls with
+`/auth/logout` navigation and removes the SPA SDK entirely.
+
+---
+
+## Original goal & remaining setup
+
+Cannot be re-run from a clean machine without Auth0 dashboard config + secrets
+(see below).
 
 **Why:** SSR is currently always logged-out for real users. The app uses
 `@auth0/auth0-vue` (a SPA SDK) with the token in `localStorage`, which the
@@ -86,10 +134,15 @@ Then visit `/auth/login`, complete login, and confirm:
   (mounts `/auth/login`, `/auth/logout`, `/auth/callback`,
   `/auth/backchannel-logout`) + a private `runtimeConfig.auth0` block fed by
   `NUXT_AUTH0_*` envs.
-- `plugins/auth-session.ts`: **Phase 1 core.** Universal plugin that reads
-  `useAuth0(event).getSession()` on the server, transfers the result through
-  `useState('auth-session')`, and seeds `usernameVar`/`isAuthenticatedVar` on
-  both sides so SSR and the first client render agree.
+- **Phase 1 core (two files, because `useAuth0(event)` is a Nitro-only
+  auto-import — not callable from a Nuxt app plugin):**
+  - `server/middleware/2.auth-session.ts`: reads
+    `useAuth0(event).getSession()` in the Nitro context and stashes
+    `{ isAuthenticated, username }` on `event.context.authSession`.
+  - `plugins/auth-session.ts`: universal app plugin that reads that context
+    during SSR, transfers it through `useState('auth-session')`, and seeds
+    `usernameVar`/`isAuthenticatedVar` on both sides so SSR and the first
+    client render agree.
 - Required env vars: listed under "Local setup" above.
 
 The existing `@auth0/auth0-vue` flow is left fully intact — the mounted routes

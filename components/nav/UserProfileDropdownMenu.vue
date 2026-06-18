@@ -17,7 +17,14 @@ const props = defineProps({
     required: true,
   },
 });
-const { logout } = useAuth0();
+// SPIKE (auth0-nuxt migration): now that SSR can be authenticated, this nav
+// component renders on the server too — but @auth0/auth0-vue's useAuth0() is
+// client-only and is undefined during SSR. Guard it the same way LoginButton
+// already does. (Phase 3 replaces this SPA logout with a /auth/logout navigation.)
+let logout: ReturnType<typeof useAuth0>['logout'] = () => Promise.resolve();
+if (import.meta.env.SSR === false) {
+  logout = useAuth0().logout;
+}
 
 const { result: getUserResult } = useQuery(
   GET_USER,
