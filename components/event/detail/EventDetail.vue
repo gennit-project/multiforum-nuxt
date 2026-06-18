@@ -8,6 +8,10 @@ import {
   GET_EVENT_ROOT_COMMENT_AGGREGATE,
 } from '@/graphQLData/comment/queries';
 import { GET_EVENT_CHANNEL } from '@/graphQLData/mod/queries';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import { DateTime } from 'luxon';
+import { config } from '@/config';
 import type {
   Comment,
   EventChannel,
@@ -222,6 +226,35 @@ const {
 } = useQuery(GET_EVENT_ROOT_COMMENT_AGGREGATE, {
   eventId: eventId,
 });
+
+// Prefetch channel + server config in this first query wave. EventHeader issues
+// these same queries, but it only mounts after the event loads (it sits behind
+// v-if="event"), so on client-side navigation they would otherwise start a
+// second request wave once the header appears. Firing them here (cache-first,
+// identical variables) warms the Apollo cache so the header reads them
+// instantly. Results are intentionally unused here — this is a cache-priming
+// prefetch.
+useQuery(
+  GET_CHANNEL,
+  {
+    uniqueName: channelId.value,
+    now: DateTime.local().startOf('hour').toISO(),
+  },
+  {
+    fetchPolicy: 'cache-first',
+    enabled: computed(() => !!channelId.value),
+  }
+);
+
+useQuery(
+  GET_SERVER_CONFIG,
+  {
+    serverName: config.serverName,
+  },
+  {
+    fetchPolicy: 'cache-first',
+  }
+);
 
 watch([eventId, channelId], ([newEventId, newChannelId]) => {
   if (newEventId && newChannelId !== undefined) {

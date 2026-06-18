@@ -7,6 +7,15 @@ import {
   GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
   GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
 } from '@/graphQLData/comment/queries';
+import {
+  CHECK_DISCUSSION_ISSUE_EXISTENCE,
+  CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
+} from '@/graphQLData/issue/queries';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import { DateTime } from 'luxon';
+import { config } from '@/config';
+import type { RouteLocationRaw } from 'vue-router';
 import type {
   Discussion,
   DiscussionChannel,
@@ -280,6 +289,90 @@ const { result: getDiscussionChannelRootCommentAggregateResult } = useQuery(
   }
 );
 
+// Issue-existence checks are hoisted to this always-mounted parent so they fire
+// on mount (keyed off the route's discussionId + channelId) in parallel with
+// GET_DISCUSSION, rather than waiting for the discussion to load and the gated
+// DiscussionHeader to mount. The resolved link is passed down to the header.
+const { result: getDiscussionIssueResult } = useQuery(
+  CHECK_DISCUSSION_ISSUE_EXISTENCE,
+  () => ({
+    discussionId: props.discussionId,
+    channelUniqueName: channelId.value,
+  }),
+  {
+    fetchPolicy: 'cache-first',
+    enabled: computed(() => !!props.discussionId && !!channelId.value),
+  }
+);
+
+const { result: getDiscussionCommentIssueResult } = useQuery(
+  CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
+  () => ({
+    discussionId: props.discussionId,
+    channelUniqueName: channelId.value,
+  }),
+  {
+    fetchPolicy: 'cache-first',
+    enabled: computed(() => !!props.discussionId && !!channelId.value),
+  }
+);
+
+// Prefetch the channel + server config in this first query wave. The
+// DiscussionHeader issues these same queries, but it only mounts after the
+// discussion loads (it sits behind v-if="discussion"), so on client-side
+// navigation they would otherwise start a second request wave once the header
+// appears. Firing them here (cache-first, identical variables) warms the
+// Apollo cache so the header reads them instantly when it mounts. Results are
+// intentionally unused here — this is a cache-priming prefetch.
+useQuery(
+  GET_CHANNEL,
+  {
+    uniqueName: channelId.value,
+    now: DateTime.local().startOf('hour').toISO(),
+  },
+  {
+    fetchPolicy: 'cache-first',
+    enabled: computed(() => !!channelId.value),
+  }
+);
+
+useQuery(
+  GET_SERVER_CONFIG,
+  {
+    serverName: config.serverName,
+  },
+  {
+    fetchPolicy: 'cache-first',
+  }
+);
+
+const relatedIssueNumber = computed(() => {
+  const directIssueNumber =
+    getDiscussionIssueResult.value?.issues?.[0]?.issueNumber;
+  if (directIssueNumber != null) {
+    return directIssueNumber;
+  }
+
+  return (
+    getDiscussionCommentIssueResult.value?.discussionChannels?.[0]
+      ?.Comments?.[0]?.RelatedIssues?.[0]?.issueNumber ?? null
+  );
+});
+
+const relatedIssueLink = computed<RouteLocationRaw | null>(() => {
+  if (relatedIssueNumber.value == null || !channelId.value) {
+    return null;
+  }
+
+  return {
+    name: 'forums-forumId-issues-issueNumber',
+    params: {
+      forumId: channelId.value,
+      issueNumber: relatedIssueNumber.value,
+    },
+  };
+});
+
 const commentCount = computed(
   () => activeDiscussionChannel.value?.CommentsAggregate?.count || 0
 );
@@ -484,6 +577,7 @@ const handleEditAlbum = () => {
                 :discussion-channel-id="activeDiscussionChannel?.id"
                 :discussion-is-archived="isArchived || false"
                 :download-mode="downloadMode"
+                :related-issue-link="relatedIssueLink"
                 :show-action-menu="true"
                 @cancel-edit-discussion-body="discussionBodyEditMode = false"
                 @handle-click-add-album="handleClickAddAlbum"
