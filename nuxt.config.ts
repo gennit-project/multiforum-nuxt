@@ -51,6 +51,12 @@ export default defineNuxtConfig({
   },
   modules: [
     '@sentry/nuxt/module',
+    // SPIKE (auth0-nuxt server-session migration): registers /auth/login,
+    // /auth/logout, /auth/callback, /auth/backchannel-logout. Config is read
+    // from the private `runtimeConfig.auth0` block below (NUXT_AUTH0_* envs).
+    // The mounted routes only require valid config when actually hit, so the
+    // existing @auth0/auth0-vue SPA flow keeps working until this is wired in.
+    ['@auth0/auth0-nuxt', { mountRoutes: true }],
     [
       '@nuxtjs/apollo',
       {
@@ -340,6 +346,20 @@ export default defineNuxtConfig({
     { src: '@/plugins/test-auth.client', mode: 'client' },
   ],
   runtimeConfig: {
+    // SPIKE (auth0-nuxt server-session migration): server-only Auth0 config.
+    // These are overridden by NUXT_AUTH0_* env vars at runtime (see
+    // .env.auth0-nuxt.example). clientSecret + sessionSecret mean this is a
+    // CONFIDENTIAL "Regular Web Application" in Auth0 — a different app type
+    // than the current SPA. Empty defaults are intentional: the module only
+    // needs them when an /auth/* route is hit, so dev still boots without them.
+    auth0: {
+      domain: '',
+      clientId: '',
+      clientSecret: '',
+      sessionSecret: '',
+      appBaseUrl: 'http://localhost:3000',
+      audience: '',
+    },
     public: {
       apollo: {
         clients: {
