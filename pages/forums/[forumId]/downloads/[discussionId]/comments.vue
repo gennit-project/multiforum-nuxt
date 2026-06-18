@@ -14,9 +14,15 @@ import DiscussionRootCommentFormWrapper from '@/components/discussion/form/Discu
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
-import type { Comment } from '@/__generated__/graphql';
+import type { Comment, Discussion } from '@/__generated__/graphql';
 
 const COMMENT_LIMIT = 50;
+
+// The parent download page passes the already-loaded discussion via <NuxtPage>,
+// so skip the redundant GET_DISCUSSION fetch when switching to this tab.
+const props = defineProps<{
+  discussion?: Discussion;
+}>();
 
 const route = useRoute();
 const offset = ref(0);
@@ -33,14 +39,20 @@ const channelId = computed(() => {
 
 const loggedInUserModName = computed(() => modProfileNameVar.value);
 
-const { result: getDiscussionResult } = useQuery(GET_DISCUSSION, {
-  id: discussionId,
-  loggedInModName: loggedInUserModName,
-  channelUniqueName: channelId.value,
-});
+const { result: getDiscussionResult } = useQuery(
+  GET_DISCUSSION,
+  () => ({
+    id: discussionId.value,
+    loggedInModName: loggedInUserModName.value,
+    channelUniqueName: channelId.value,
+  }),
+  {
+    enabled: !props.discussion,
+  }
+);
 
 const discussion = computed(
-  () => getDiscussionResult.value?.discussions?.[0] || null
+  () => props.discussion || getDiscussionResult.value?.discussions?.[0] || null
 );
 const activeDiscussionChannel = computed(() => {
   return discussion.value?.DiscussionChannels?.find(
