@@ -15,6 +15,7 @@ import {
   setProfilePicURL,
 } from '@/cache';
 import { useSSRAuth } from '@/composables/useSSRAuth';
+import { persistUsername, clearPersistedAuth } from '@/utils/authUtils';
 
 // Type for Auth0 error objects
 interface Auth0Error {
@@ -123,6 +124,9 @@ export function useAuthManager() {
     setModProfileName('');
     setNotificationCount(0);
     setProfilePicURL('');
+    // Clear persisted auth so a stale username can't be restored on the next
+    // load and produce a "ghost login" (username present, but no valid token).
+    clearPersistedAuth();
     // Clear auth hint cookies
     clearAuthHints();
   };
@@ -142,6 +146,9 @@ export function useAuthManager() {
     if (userData && !userData.loading) {
       // User found, set all data
       setUsername(userData.username);
+      // Persist the username so it can be restored on the next load alongside
+      // the session token (the token is written separately by RequireAuth).
+      persistUsername(userData.username);
       setIsLoadingAuth(false);
       setIsAuthenticated(true);
       setModProfileName(modProfileData?.displayName || '');
