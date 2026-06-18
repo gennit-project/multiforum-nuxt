@@ -125,8 +125,14 @@ const renderMap = async () => {
       currentTheme.value === 'dark'
         ? google.maps.ColorScheme.DARK
         : google.maps.ColorScheme.LIGHT,
+    // 'greedy' so a plain mouse wheel zooms the map. The default ('auto')
+    // resolves to 'cooperative' for a map that doesn't fill the viewport,
+    // which ignores the wheel unless ctrl/cmd is held (and on macOS the
+    // browser captures ctrl/cmd+wheel as page zoom before the map sees it).
+    gestureHandling: 'greedy',
+    disableDefaultUI: false,
     zoomControl: true,
-    zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_TOP },
+    zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
   };
 
   map.value = new google.maps.Map(
@@ -394,7 +400,7 @@ watch(
       <div
         v-else-if="!useMobileStyles"
         ref="desktopMapDiv"
-        style="position: fixed; width: 50vw; height: 82vh; top: 170px; right: 0"
+        style="position: fixed; top: 200px; left: 0; width: calc(100% - 14px); height: calc(100vh - 214px)"
       />
     </div>
   </client-only>
