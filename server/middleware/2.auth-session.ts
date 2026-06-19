@@ -24,6 +24,11 @@
 // gracefully and we fall back to the token claim / email (degraded display
 // only — auth state is still correct).
 //
+// Performance: the STABLE profile fields (username / mod name / avatar) are
+// cached per email in the 'authProfileCache' store with a TTL, so we don't
+// re-run the full backend join on every authenticated request. Only the
+// volatile unread-notification count is fetched fresh each request.
+//
 // Numeric filename prefix controls middleware order (runs after
 // 1.cache-control.ts), matching the existing convention in this directory.
 
@@ -74,6 +79,44 @@ type EmailLookupResponse = {
     } | null> | null;
   };
 };
+
+// Lightweight, count-only variant used on a profile-cache hit: the stable
+// fields come from the cache, so only the volatile unread-notification count
+// needs to be fetched fresh per request.
+const GET_NOTIFICATION_COUNT = /* GraphQL */ `
+  query getNotificationCount($emailAddress: String!) {
+    emails(where: { address: $emailAddress }) {
+      User {
+        NotificationsAggregate(where: { read: false }) {
+          count
+        }
+      }
+    }
+  }
+`;
+
+type NotificationCountResponse = {
+  data?: {
+    emails?: Array<{
+      User?: {
+        NotificationsAggregate?: { count?: number | null } | null;
+      } | null;
+    } | null> | null;
+  };
+};
+
+// The slice of the profile that is stable enough to cache between requests.
+// notificationCount is deliberately excluded — it is always fetched fresh.
+type StableProfile = {
+  username: string;
+  modProfileName: string;
+  profilePicURL: string;
+};
+
+// How long a resolved stable profile is trusted before re-resolving from the
+// backend. Username/mod-name/avatar change rarely, so an hour bounds staleness
+// (e.g. an avatar change) without re-querying on every authenticated request.
+const PROFILE_CACHE_TTL_SECONDS = 60 * 60;
 
 // Test-only: in mocked Playwright runs there is no real Auth0 session, so the
 // test fixture (tests/playwright/helpers/mockAuth.ts) sets a `mock-auth` cookie
@@ -130,9 +173,11 @@ export default defineEventHandler(async (event) => {
     let notificationCount = 0;
     let profilePicURL = '';
 
-    // Resolve the full app profile from the GraphQL backend by email,
-    // authenticated with an API access token from the session. This replaces
-    // what the (now-removed) SPA useAuthManager fetched client-side.
+    // Resolve the app profile from the GraphQL backend by email, authenticated
+    // with an API access token from the session (replaces the removed SPA
+    // useAuthManager fetch). The STABLE fields (username/mod-name/avatar) are
+    // cached per email so we don't re-run the full join on every request; only
+    // the volatile unread-notification count is fetched fresh each time.
     if (email) {
       try {
         const tokenSet = await auth0.getAccessToken();
@@ -142,22 +187,52 @@ export default defineEventHandler(async (event) => {
             ?.httpEndpoint;
 
         if (accessToken && graphqlUrl) {
-          const res = await $fetch<EmailLookupResponse>(graphqlUrl, {
-            method: 'POST',
-            headers: {
-              'content-type': 'application/json',
-              authorization: `Bearer ${accessToken}`,
-            },
-            body: {
-              query: GET_EMAIL,
-              variables: { emailAddress: email },
-            },
-          });
-          const u = res?.data?.emails?.[0]?.User;
-          username = u?.username || '';
-          modProfileName = u?.ModerationProfile?.displayName || '';
-          notificationCount = u?.NotificationsAggregate?.count || 0;
-          profilePicURL = u?.profilePicURL || '';
+          const queryBackend = <T>(query: string) =>
+            $fetch<T>(graphqlUrl, {
+              method: 'POST',
+              headers: {
+                'content-type': 'application/json',
+                authorization: `Bearer ${accessToken}`,
+              },
+              body: { query, variables: { emailAddress: email } },
+            });
+
+          const cache = useStorage<StableProfile>('authProfileCache');
+          const cacheKey = `profile:${email}`;
+          const cached = await cache.getItem(cacheKey);
+
+          if (cached) {
+            // Stable fields from cache; fetch only the fresh count.
+            username = cached.username;
+            modProfileName = cached.modProfileName;
+            profilePicURL = cached.profilePicURL;
+            const countRes =
+              await queryBackend<NotificationCountResponse>(
+                GET_NOTIFICATION_COUNT
+              );
+            notificationCount =
+              countRes?.data?.emails?.[0]?.User?.NotificationsAggregate
+                ?.count || 0;
+          } else {
+            const res = await queryBackend<EmailLookupResponse>(GET_EMAIL);
+            const u = res?.data?.emails?.[0]?.User;
+            username = u?.username || '';
+            modProfileName = u?.ModerationProfile?.displayName || '';
+            notificationCount = u?.NotificationsAggregate?.count || 0;
+            profilePicURL = u?.profilePicURL || '';
+
+            // Cache only a resolved user. An empty username means "no app
+            // account yet" (pre-create-username); leaving it uncached makes the
+            // next request pick up the new username immediately after creation
+            // instead of waiting out the TTL.
+            if (username) {
+              await cache.setItem(
+                cacheKey,
+                { username, modProfileName, profilePicURL },
+                { ttl: PROFILE_CACHE_TTL_SECONDS }
+              );
+            }
+          }
         }
       } catch {
         // Token/lookup unavailable — leave profile empty. The user is still

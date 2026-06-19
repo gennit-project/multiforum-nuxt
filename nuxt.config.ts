@@ -248,14 +248,27 @@ export default defineNuxtConfig({
         base: 'auth0Sessions',
         ttl: 60 * 60 * 24 * 30, // 30 days
       },
+      // Per-email cache of the stable auth profile (username / mod name /
+      // avatar), so server/middleware/2.auth-session.ts doesn't re-run the full
+      // backend lookup on every authenticated request. Entries are written with
+      // a per-item TTL (PROFILE_CACHE_TTL_SECONDS); the unread-notification
+      // count is never cached here (fetched fresh per request).
+      authProfileCache: {
+        driver: 'upstash',
+        base: 'authProfileCache',
+      },
     },
-    // Local dev keeps a filesystem-backed mount (no Upstash creds needed) that
-    // still survives `nuxt dev` restarts. devStorage overrides the production
-    // mount above only during development.
+    // Local dev keeps filesystem-backed mounts (no Upstash creds needed) that
+    // still survive `nuxt dev` restarts. devStorage overrides the production
+    // mounts above only during development.
     devStorage: {
       auth0Sessions: {
         driver: 'fs',
         base: './.auth0-sessions',
+      },
+      authProfileCache: {
+        driver: 'fs',
+        base: './.auth0-profile-cache',
       },
     },
     // Enable server-side caching
