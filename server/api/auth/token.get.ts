@@ -13,18 +13,11 @@
 // Same-origin + session-cookie means only the session owner can read their own
 // token. (A stricter end-state — Phase 2b — proxies GraphQL through a Nitro
 // route so the token never reaches the client at all; see the spike doc.)
-// KNOWN BLOCKER (alpha SDK): getAccessToken() currently throws "access token
-// has expired and a refresh token was not provided" even when the session was
-// just written with a FRESH access token (24h) AND a refresh token. The session
-// is stored correctly (verified) but the SDK misreads it on the way back
-// (refresh token stored at the StateData top level, but read from inside the
-// token set; and the fresh token is judged expired — likely a seconds-vs-ms
-// expiry comparison). Tracked as an upstream @auth0/auth0-nuxt bug. Until it is
-// fixed, this endpoint returns null and Apollo falls back to no token.
 export default defineEventHandler(async (event) => {
   // Per-session + sensitive: never cache (defense in depth alongside the
   // cache-control middleware's /api/auth/ exclusion).
   setResponseHeader(event, 'Cache-Control', 'no-store');
+
   try {
     const tokenSet = await useAuth0(event).getAccessToken();
     return { accessToken: tokenSet?.accessToken ?? null };

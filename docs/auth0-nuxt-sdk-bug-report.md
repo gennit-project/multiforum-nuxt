@@ -1,62 +1,59 @@
-# auth0-nuxt Phase 2 — investigation notes (do NOT file as-is)
+# auth0-nuxt Phase 2 — investigation log (final)
 
-> ⚠️ An earlier version of this file claimed a specific root cause
-> (seconds-vs-ms expiry + refresh-token read from the wrong field). **That was
-> wrong** — reading the actual `@auth0/auth0-server-js` source disproved both.
-> This file now records what we actually observed. Don't file it as a bug report
-> until the root cause is confirmed in an isolated reproduction.
+The SDK is NOT the blocker. A minimal reproduction (`/Users/catherineluse/gennit/
+auth0-nuxt-repro`, or rebuild from the spike) shows `@auth0/auth0-nuxt` 1.1.0 +
+a server-side session store + a protected client fetch working **flawlessly**
+against the same Auth0 setup. The failures are integration issues in this app.
 
-## Versions
-- `@auth0/auth0-nuxt` 1.1.0, `@auth0/auth0-server-js` 1.6.1 (both latest)
-- Nuxt 4.4.8 / Nitro 2.13.4, Node 22 runtime
-- Regular Web App, Authorization Code flow, dedicated API audience with offline
-  access, server-side session store (`sessionStoreFactoryPath`) over Nitro
-  `useStorage()`.
+## Two distinct integration problems were found
 
-## What we proved (by instrumenting the installed SDK in node_modules)
+### 1. The `apollo:auth` hook ran during SSR → cookieless token fetches (FIXED)
+`@nuxtjs/apollo` invokes the `apollo:auth` hook during SSR too. Our hook did
+`fetch('/api/auth/token')` — a *relative* URL, which on the server is an internal
+Nitro call with **no cookies**, so it could never read the session. Proven by
+tagging the URL (`?src=apolloHook`) and seeing cookieless, null-header requests.
 
-1. **The core works when the session cookie is present.** On any request that
-   carries the `__a0_session` cookie, `StatefulStateStore.get()` hits the store,
-   `getSession()` returns the full session, and `getAccessToken()` finds the
-   token set, sees it's fresh, and returns it. Example trace:
-   ```
-   getCookie __a0_session found=true  allCookieNames=[…,'__a0_session']
-   StatefulStore.get sessionId=<id> storeHit=true
-   getAccessToken tokenSetFound=true expiresAt=<now+24h> hasTopLevelRefresh=true  → returns token
-   ```
-2. **Disproven root causes:** expiry is compared correctly (`expiresAt > Date.now()/1e3`, both seconds); the refresh token is read from `stateData.refreshToken` (top level, where it is stored); the client is NOT in resolver mode (`domain` is a string). None of these is the bug.
-3. **Not the `secure` flag, not the aggressive delete.** Patching the session
-   cookie to `secure:false` (we test over http://localhost) and suppressing the
-   "delete cookie on store miss" (server-client `StatefulStateStore.get`) did
-   NOT fix it.
+**Fix applied:** `plugins/apollo-auth.client.ts` no longer uses the hook. It syncs
+the server-session token into `localStorage['token']` (a real browser fetch that
+carries the cookie), and `@nuxtjs/apollo`'s native `tokenStorage: 'localStorage'`
+(client-only, `import.meta.client`-guarded) attaches it. SSR stays anonymous; no
+cookieless requests.
 
-## The actual symptom
+### 2. The session is intermittently destroyed (OPEN — the real remaining blocker)
+Even with a real cookie-bearing client fetch, `/api/auth/token` returns a token on
+one call and `null` on the next. Instrumentation showed `getSession()` returning
+`false` intermittently, then permanently. Root cause:
 
-Some requests to `/api/auth/token` arrive with **zero cookies**
-(`allCookieNames=[]` — not even unrelated cookies like `theme`). Those are
-server-internal `$fetch`-style calls (no cookie forwarding), so there is no
-session and `getAccessToken()` correctly returns nothing. During a page load /
-mutation there is a **burst** of these cookieless internal calls interleaved
-with the real browser calls that succeed. Net effect in the app: authenticated
-GraphQL mutations (e.g. upvote) still fail with "You must be logged in to do
-that," even though direct browser requests to `/api/auth/token` succeed.
+- `StatefulStateStore.get()` (in `@auth0/auth0-server-js`) **deletes the session
+  cookie on ANY store miss**. So a single transient miss permanently logs the user
+  out for the rest of the session.
+- Misses are induced by this app's environment (the repro has none of it):
+  - **in-memory session store** wiped on every dev restart → the browser keeps a
+    stale `__a0_session` cookie whose id is no longer in the store → miss → delete;
+  - the **auth-session middleware calls `getAccessToken()` on every request**
+    (extra load + refresh/rotation risk) alongside the route handler's call;
+  - **many concurrent requests** (Apollo) racing the same session;
+  - **SPA coexistence** still writing its own token/cookies.
 
-## Open questions (what to chase next, in isolation)
-
-- **Who issues the cookieless internal `/api/auth/token` requests?** Candidates:
-  SSR/Nitro internal `$fetch`, route prefetch, or the `apollo:auth` hook running
-  in a server context. The Apollo token hook (`plugins/apollo-auth.client.ts`)
-  is client-only by name, so if it runs server-side that itself is suspicious.
-- **Why does the client mutation's token attach fail** even though a concurrent
-  browser `/api/auth/token` call returns a valid token? Possible race between
-  `@nuxtjs/apollo`'s `apollo:auth` hook resolution and the operation, or the
-  in-hook token cache returning stale state.
-- Reproduce in a **minimal** Nuxt + auth0-nuxt app (no app complexity) to decide
-  whether this is an SDK bug or an integration issue (cookie forwarding on
-  SSR/internal fetch).
+## Go-forward plan (to finish Phase 2)
+1. **Use a persistent session store** (filesystem in dev, Redis/KV in prod) instead
+   of in-memory — eliminates the restart→stale-cookie→miss→delete cascade. Biggest
+   single win; most of the "intermittent" failures are an artifact of in-memory +
+   restarts during testing.
+2. **Stop calling `getAccessToken()` in the auth-session middleware on every
+   request** — resolve the username once and cache it (e.g. in the session/user),
+   not per request.
+3. **Reduce concurrent token fetches** — the localStorage sync already does this
+   (periodic, not per-operation); make sure nothing else hammers `/api/auth/token`.
+4. **Worth raising upstream:** `StatefulStateStore.get()` deleting the cookie on a
+   single (possibly transient/concurrent) store miss is fragile. A bare repro that
+   forces one miss and shows the session is then permanently gone would make a
+   clean, legitimate issue — distinct from the (incorrect) earlier theory.
+5. Complete **Phase 4** (remove the SPA) to end the coexistence races.
 
 ## Status
-Phase 2 plumbing is committed and correct; the token round-trip works whenever
-the session cookie is present. Landing it fully needs the cookieless-internal-
-request question answered first. Recommend an isolated-repro session before
-filing anything upstream.
+- SDK: works (proven). Auth0 config: correct.
+- Phase 2 plumbing: correct; SSR cookieless-hook bug fixed.
+- Blocker: intermittent session loss from in-memory store + delete-on-miss under
+  the app's concurrency. Start with a persistent store (item 1) — likely resolves
+  the bulk of it.
