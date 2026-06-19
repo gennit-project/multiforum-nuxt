@@ -339,7 +339,13 @@ export default defineNuxtConfig({
       // components, so they also inherit the flattened query waves.
       '/forums/*/events/*': { isr: 300 },
       '/forums/*/downloads/*': { isr: 300 },
-      // Cache API routes
+      // SPIKE Phase 2: auth endpoints must NOT be route-cached. Nitro's route
+      // cache serves shared, cookie-independent responses, so /api/auth/token
+      // was reaching its handler with NO cookies (no session → null token →
+      // "You must be logged in"). A more specific rule wins in Nitro, so this
+      // disables caching for the auth routes only.
+      '/api/auth/**': { cache: false },
+      // Cache other API routes
       '/api/**': {
         cache: {
           // Let middleware handle specific cache times
