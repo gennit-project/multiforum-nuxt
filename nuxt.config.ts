@@ -228,15 +228,31 @@ export default defineNuxtConfig({
     preset: 'vercel',
     // Enable CDN caching
     cdn: true,
-    // SPIKE Phase 2: persistent store for @auth0/auth0-nuxt server sessions
+    // Persistent store for @auth0/auth0-nuxt server sessions
     // (server/utils/session-store-factory.ts uses useStorage('auth0Sessions')).
     // The default in-memory store is wiped on every server restart, leaving the
     // browser with a stale session-id cookie whose id is no longer in the store;
     // StatefulStateStore then DELETES the cookie on that miss and the user is
-    // silently logged out. A persistent store survives restarts and avoids that
-    // cascade. Filesystem is for local dev — production (Vercel) has a read-only
-    // FS, so swap this for a shared driver (Vercel KV / Upstash Redis) there.
+    // silently logged out. A persistent, shared store survives restarts and (on
+    // serverless) is shared across function instances, avoiding that cascade.
+    //
+    // Production (Vercel) uses Upstash Redis over its REST API — no persistent
+    // TCP connections, so it fits the serverless model. The driver reads
+    // UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN from the environment at
+    // runtime (set these in the Vercel project). `ttl` (seconds) bounds orphaned
+    // entries: each session refresh re-`set`s the key and resets its TTL, so
+    // active sessions stay alive while abandoned ones expire after 30 days.
     storage: {
+      auth0Sessions: {
+        driver: 'upstash',
+        base: 'auth0Sessions',
+        ttl: 60 * 60 * 24 * 30, // 30 days
+      },
+    },
+    // Local dev keeps a filesystem-backed mount (no Upstash creds needed) that
+    // still survives `nuxt dev` restarts. devStorage overrides the production
+    // mount above only during development.
+    devStorage: {
       auth0Sessions: {
         driver: 'fs',
         base: './.auth0-sessions',
