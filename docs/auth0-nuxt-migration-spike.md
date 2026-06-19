@@ -3,8 +3,67 @@
 **Status:** Phases 0/1/3 verified locally against a real Auth0 Regular Web App.
 Core hypothesis confirmed and the app now renders authenticated on first paint
 (nav + ownership-gated UI), with login/logout going through the server session.
-Phase 2 (Apollo token from the server session) and Phase 4 (delete the SPA SDK +
-remaining shims, rework tests) are the remaining work.
+**Phase 2 is implemented but BLOCKED on an upstream alpha-SDK bug** (see "Phase 2"
+below). Phase 4 (delete the SPA SDK + remaining shims, rework tests) is the
+remaining work.
+
+## Phase 2 — Apollo token from the server session (implemented, blocked)
+
+**Goal:** Apollo authenticates GraphQL from the server session instead of a
+localStorage token written by the SPA SDK.
+
+What was built (all correct and verified working up to the SDK boundary):
+- `server/api/auth/token.get.ts`: returns the session's access token to the
+  authenticated browser (same-origin + session cookie).
+- `plugins/apollo-auth.client.ts`: feeds that token to Apollo via @nuxtjs/apollo's
+  `apollo:auth` hook. (The `apolloLink` option in nuxt.config is NOT consumed by
+  @nuxtjs/apollo v5-alpha — the module builds its own link and resolves the token
+  via this hook or `tokenStorage`. This cost real debugging; don't edit
+  `apolloLink` expecting it to run.)
+- `server/middleware/2.auth-session.ts`: also resolves the app username from the
+  GraphQL backend by email (Auth0 is trusted ONLY for the verified email; the
+  username is our data, never an Auth0 claim).
+- `server/utils/session-store-factory.ts` + `sessionStoreFactoryPath` in
+  nuxt.config: a **server-side** session store. Required because the SDK's default
+  **stateless** store serializes the whole session (id+access+refresh tokens) into
+  the cookie, which overflows the ~4KB browser limit once a refresh token exists,
+  so the cookie is dropped and `getSession()` returns nothing.
+- `server/middleware/1.cache-control.ts`: excludes `/api/auth/` from the blanket
+  API caching (it authenticates via cookie, not an Authorization header, so the
+  generic rule would cache one user's token).
+
+Backend (separate repo `gennit-backend`): `setUserDataOnContext` only recognized
+two token audiences (the SPA client id and the Management API). Added a branch for
+`process.env.AUTH0_AUDIENCE` (set to `https://api.c0nduit.app`) that resolves the
+email via `/userinfo`, so the backend accepts the new dedicated-API token.
+
+### Auth0 setup this required (for the record)
+- A **dedicated API** (`https://api.c0nduit.app`) — NOT the Management API, which
+  can't issue refresh tokens and forces a consent prompt every login.
+- API → **Allow Offline Access ON**.
+- The Regular Web App → **User delegated access** authorized for that API (the
+  "Client is not authorized to access resource server" error means this is
+  missing; Client/M2M access is NOT needed).
+- App grant types include **Refresh Token** (default).
+
+### ⛔ The blocker (upstream alpha-SDK bug)
+With everything above correct, login succeeds and stores a session containing a
+**fresh** access token (24h) **and** a refresh token, correct audience, and the
+`offline_access` scope (verified by logging the stored `StateData`). But
+`getSession()` / `getAccessToken()` then **reject their own just-written session**:
+- the refresh token is stored at the StateData **top level** but read from inside
+  the **token set** (so the SDK reports "no refresh token"), and
+- the fresh token is judged **expired** — the stored `expiresAt` is a **seconds**
+  timestamp, consistent with a seconds-vs-milliseconds comparison bug.
+
+Net: `getAccessToken()` throws "access token has expired and a refresh token was
+not provided," `/api/auth/token` returns null, and authenticated mutations fail
+with "You must be logged in to do that." This is in `@auth0/auth0-nuxt` /
+`@auth0/auth0-server-js` (alpha), not in this app's config or code.
+
+**Next steps:** file an issue upstream with the evidence above; retry on the next
+SDK release / patch bump; until then Apollo has no token from the session (the SPA
+localStorage path still works, so the app is not regressed for logged-in SPA users).
 
 ## Phase 3 results (verified locally)
 

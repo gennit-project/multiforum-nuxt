@@ -56,7 +56,17 @@ export default defineNuxtConfig({
     // from the private `runtimeConfig.auth0` block below (NUXT_AUTH0_* envs).
     // The mounted routes only require valid config when actually hit, so the
     // existing @auth0/auth0-vue SPA flow keeps working until this is wired in.
-    ['@auth0/auth0-nuxt', { mountRoutes: true }],
+    [
+      '@auth0/auth0-nuxt',
+      {
+        mountRoutes: true,
+        // SPIKE Phase 2: use a server-side session store (small cookie holds
+        // only a session id). The default stateless cookie store overflows the
+        // ~4KB browser limit once a refresh token is in the session. See the
+        // factory for the dev (in-memory) vs prod (persistent) note.
+        sessionStoreFactoryPath: '~/server/utils/session-store-factory.ts',
+      },
+    ],
     [
       '@nuxtjs/apollo',
       {

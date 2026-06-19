@@ -30,6 +30,7 @@
 type AuthSessionContext = {
   isAuthenticated: boolean;
   username: string;
+  email: string;
 };
 
 declare module 'h3' {
@@ -67,11 +68,14 @@ export default defineEventHandler(async (event) => {
       return;
     }
 
+    // Auth0 is only trusted for the (verified) email. The app username is OUR
+    // data, not Auth0's — it must be resolved from the email via the backend,
+    // never read from an Auth0 token claim (which can't be trusted to know it).
     const email = (user.email as string) || '';
     let username = '';
 
-    // Preferred: resolve the real app username from the GraphQL backend by
-    // email, authenticated with an API access token from the session.
+    // Resolve the real app username from the GraphQL backend by email,
+    // authenticated with an API access token from the session.
     if (email) {
       try {
         const tokenSet = await auth0.getAccessToken();
@@ -95,22 +99,15 @@ export default defineEventHandler(async (event) => {
           username = res?.data?.emails?.[0]?.User?.username || '';
         }
       } catch {
-        // Token unavailable (e.g. NUXT_AUTH0_AUDIENCE unset) or lookup failed —
-        // fall back below. Never block the request on the username lookup.
+        // Token/lookup unavailable — leave username empty. The user is still
+        // authenticated (we have a valid session + email); username just isn't
+        // resolved yet (or they haven't created one). No Auth0-claim fallback.
       }
     }
 
-    // Fallback: token claim, then nickname, then email. Display-only degradation
-    // — isAuthenticated is still correct even if the username is approximate.
-    if (!username) {
-      username =
-        (user['https://gennit.net/username'] as string) ||
-        (user.nickname as string) ||
-        email ||
-        '';
-    }
-
-    event.context.authSession = { isAuthenticated: true, username };
+    // Authenticated as soon as there is a valid session with an email; username
+    // may be empty (resolves once the API token works, or via create-username).
+    event.context.authSession = { isAuthenticated: true, username, email };
   } catch {
     // Never block a request on the auth read.
   }
