@@ -9,11 +9,12 @@
 // getSession() returns nothing. Switching to a server-side SessionStore keeps
 // only a small session id in the cookie and stores the tokens server-side.
 //
-// For local dev we use Nitro's default in-memory storage (no Redis needed).
-// NOTE: in-memory means sessions are lost on a dev-server restart (re-login
-// required) and won't work across multiple server instances — for staging/prod
-// swap `useStorage('auth0Sessions')` for a persistent driver (Redis/KV) via
-// nitro.storage, exactly like the SDK's example.
+// The 'auth0Sessions' storage mount is configured in nuxt.config (nitro.storage)
+// as a PERSISTENT filesystem driver for local dev — so sessions survive server
+// restarts. With in-memory storage, every restart orphaned the browser's
+// session cookie (its id no longer in the store), which the SDK then deleted on
+// the resulting store miss, silently logging the user out. For production
+// (Vercel = read-only FS) swap the mount for a shared driver (Vercel KV / Redis).
 import type {
   SessionStore,
   StateData,

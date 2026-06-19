@@ -50,3 +50,6 @@ test-results
 !tests/playwright/coverage/
 tests/playwright/coverage/.v8/
 coverage-e2e/
+
+# auth0-nuxt local filesystem session store (Phase 2 spike)
+.auth0-sessions/
