@@ -8,17 +8,13 @@
 // federated Auth0 logout, so the Auth0 SSO cookie is gone too and the SPA can't
 // silently re-authenticate on the next load.
 //
-// We still clear the SPA's localStorage token + auth-hint cookies first, since
-// Apollo currently reads that token (until Phase 2) and the cookie shim is
-// still present (until Phase 4). This is the one place that knows about both
-// systems during the transition.
+// We still clear the SPA's localStorage token first, since Apollo reads that
+// token (plugins/apollo-auth.client.ts) until it is wired directly to the
+// server session. This is the one place that knows about both systems.
 import { setIsAuthenticated, setUsername } from '@/cache';
-import { useSSRAuth } from '@/composables/useSSRAuth';
 import { clearPersistedAuth } from '@/utils/authUtils';
 
 export const useServerLogout = () => {
-  const { clearAuthHints } = useSSRAuth();
-
   const logout = () => {
     if (typeof window === 'undefined') {
       return;
@@ -32,13 +28,11 @@ export const useServerLogout = () => {
     } catch {
       // ignore storage failures
     }
-    // Clear the SPA side (localStorage token + persisted username) and the
-    // auth-hint cookies, then hand off to the server route for the session +
-    // federated Auth0 logout.
+    // Clear the SPA side (localStorage token + persisted username), then hand
+    // off to the server route for the session + federated Auth0 logout.
     setIsAuthenticated(false);
     setUsername('');
     clearPersistedAuth();
-    clearAuthHints();
     window.location.href = '/auth/logout';
   };
 

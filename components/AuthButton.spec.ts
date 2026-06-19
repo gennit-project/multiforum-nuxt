@@ -1,10 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
-import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 
 import AuthButton from '@/components/AuthButton.vue';
 
-vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
 
 const mountButton = (props: Record<string, unknown> = {}) =>
   mountWithDefaults(AuthButton, {

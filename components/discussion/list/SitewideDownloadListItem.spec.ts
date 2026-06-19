@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createMockRoute } from '@/tests/utils/mockRouter';
-import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 import { createQueryMock, createMutationMock } from '@/tests/utils/mockApollo';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { makeDiscussion } from '@/tests/utils/factories';
@@ -13,7 +12,6 @@ vi.mock('@vue/apollo-composable', () => ({
   useMutation: () => createMutationMock(),
 }));
 vi.mock('nuxt/app', () => ({ useRoute: () => createMockRoute() }));
-vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
 
 const mountItem = (title: string) =>
   mountWithDefaults(SitewideDownloadListItem, {

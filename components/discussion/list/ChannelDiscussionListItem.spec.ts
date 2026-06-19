@@ -7,7 +7,6 @@ import {
 } from '@/tests/utils/mockApollo';
 import { createMockRoute, createMockRouter } from '@/tests/utils/mockRouter';
 import { createCacheMock } from '@/tests/utils/mockAuth';
-import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { makeDiscussion } from '@/tests/utils/factories';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
@@ -35,7 +34,6 @@ vi.mock('nuxt/app', () => ({
   useRouter: () => createMockRouter(),
 }));
 vi.mock('@/cache', () => createCacheMock({ username: 'alice' }));
-vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
 
 const mountItem = (title: string) => {
   asMock(useQuery).mockReturnValue(createQueryMock({ users: [] }));

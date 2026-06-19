@@ -3,445 +3,114 @@ import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 
-// Mock composables
-vi.mock('@/composables/useSSRAuth', () => ({
-  useSSRAuth: vi.fn(),
-}));
-
+// RequireAuth now reads auth state straight from the cache vars, which are
+// seeded from the server session (plugins/auth-session.ts) and are identical on
+// server and client. No auth-hint cookie shim, no @auth0/auth0-vue, no SSR vs
+// client branching — so the test just drives the two reactive vars.
 vi.mock('@/cache', () => ({
   usernameVar: ref(''),
   isAuthenticatedVar: ref(false),
-  setIsLoadingAuth: vi.fn(),
-  setIsAuthenticated: vi.fn(),
 }));
 
-vi.mock('@auth0/auth0-vue', () => ({
-  useAuth0: vi.fn(() => ({
-    loginWithPopup: vi.fn(),
-    loginWithRedirect: vi.fn(),
-    isAuthenticated: ref(false),
-    isLoading: ref(false),
-    idTokenClaims: ref(null),
-    user: ref(null),
-    getAccessTokenSilently: vi.fn(),
-  })),
-}));
-
-// Mock import.meta.env
-const mockImportMeta = {
-  env: { SSR: false },
+const slots = {
+  'has-auth': '<div data-testid="auth-content">Auth Content</div>',
+  'does-not-have-auth':
+    '<div data-testid="no-auth-content">No Auth Content</div>',
 };
 
-vi.stubGlobal('import.meta', mockImportMeta);
+const setAuthState = async ({
+  authenticated,
+  username,
+}: {
+  authenticated: boolean;
+  username: string;
+}) => {
+  const { usernameVar, isAuthenticatedVar } = await vi.importMock('@/cache');
+  isAuthenticatedVar.value = authenticated;
+  usernameVar.value = username;
+};
 
 describe('RequireAuth', () => {
-  let mockSSRAuthReturn: any;
-  let mockUseSSRAuth: any;
-  let mockUsernameVar: any;
-  let mockIsAuthenticatedVar: any;
-
   beforeEach(async () => {
-    vi.clearAllMocks();
-
-    // Get mocks from mocked modules
-    const { useSSRAuth } = await vi.importMock('@/composables/useSSRAuth');
-    const { usernameVar, isAuthenticatedVar } = await vi.importMock('@/cache');
-
-    mockUseSSRAuth = useSSRAuth;
-    mockUsernameVar = usernameVar;
-    mockIsAuthenticatedVar = isAuthenticatedVar;
-
-    // Reset reactive vars
-    mockUsernameVar.value = '';
-    mockIsAuthenticatedVar.value = false;
-
-    // Default mock return for useSSRAuth
-    mockSSRAuthReturn = {
-      hasAuthHint: ref(false),
-      usernameHint: ref(''),
-      setAuthHint: vi.fn(),
-      setUsernameHint: vi.fn(),
-      clearAuthHints: vi.fn(),
-    };
-
-    mockUseSSRAuth.mockReturnValue(mockSSRAuthReturn);
+    await setAuthState({ authenticated: false, username: '' });
   });
 
-  describe('SSR behavior', () => {
-    beforeEach(() => {
-      // Set SSR mode
-      mockImportMeta.env.SSR = true;
-    });
-
-    it('should show auth content when auth hint is present and no ownership required', () => {
-      mockSSRAuthReturn.hasAuthHint.value = true;
-
-      const wrapper = mount(RequireAuth, {
+  describe('auth resolution', () => {
+    it.each([
+      {
+        name: 'not authenticated',
+        authenticated: false,
+        username: '',
         props: { requireOwnership: false },
-        slots: {
-          'has-auth': '<div data-testid="auth-content">Auth Content</div>',
-          'does-not-have-auth':
-            '<div data-testid="no-auth-content">No Auth Content</div>',
-        },
-      });
-
-      expect(wrapper.find('[data-testid="auth-content"]').exists()).toBe(true);
-      expect(wrapper.find('[data-testid="no-auth-content"]').exists()).toBe(
-        false
-      );
-    });
-
-    it('should show no-auth content when auth hint is absent', () => {
-      mockSSRAuthReturn.hasAuthHint.value = false;
-
-      const wrapper = mount(RequireAuth, {
+        expected: 'unauthenticated',
+      },
+      {
+        name: 'authenticated, no ownership required',
+        authenticated: true,
+        username: 'testuser',
         props: { requireOwnership: false },
-        slots: {
-          'has-auth': '<div data-testid="auth-content">Auth Content</div>',
-          'does-not-have-auth':
-            '<div data-testid="no-auth-content">No Auth Content</div>',
-        },
-      });
-
-      expect(wrapper.find('[data-testid="auth-content"]').exists()).toBe(false);
-      expect(wrapper.find('[data-testid="no-auth-content"]').exists()).toBe(
-        true
-      );
-    });
-
-    it('should show auth content when ownership required and username hint matches owner', () => {
-      mockSSRAuthReturn.hasAuthHint.value = true;
-      mockSSRAuthReturn.usernameHint.value = 'testowner';
-
-      const wrapper = mount(RequireAuth, {
-        props: {
-          requireOwnership: true,
-          owners: ['testowner', 'otherowner'],
-        },
-        slots: {
-          'has-auth': '<div data-testid="auth-content">Auth Content</div>',
-          'does-not-have-auth':
-            '<div data-testid="no-auth-content">No Auth Content</div>',
-        },
-      });
-
-      expect(wrapper.find('[data-testid="auth-content"]').exists()).toBe(true);
-      expect(wrapper.find('[data-testid="no-auth-content"]').exists()).toBe(
-        false
-      );
-    });
-
-    it('should show no-auth content when ownership required but username hint does not match', () => {
-      mockSSRAuthReturn.hasAuthHint.value = true;
-      mockSSRAuthReturn.usernameHint.value = 'notowner';
-
-      const wrapper = mount(RequireAuth, {
-        props: {
-          requireOwnership: true,
-          owners: ['testowner', 'otherowner'],
-        },
-        slots: {
-          'has-auth': '<div data-testid="auth-content">Auth Content</div>',
-          'does-not-have-auth':
-            '<div data-testid="no-auth-content">No Auth Content</div>',
-        },
-      });
-
-      expect(wrapper.find('[data-testid="auth-content"]').exists()).toBe(false);
-      expect(wrapper.find('[data-testid="no-auth-content"]').exists()).toBe(
-        true
-      );
-    });
-
-    it('should show no-auth content when ownership required but no username hint', () => {
-      mockSSRAuthReturn.hasAuthHint.value = true;
-      mockSSRAuthReturn.usernameHint.value = '';
-
-      const wrapper = mount(RequireAuth, {
-        props: {
-          requireOwnership: true,
-          owners: ['testowner'],
-        },
-        slots: {
-          'has-auth': '<div data-testid="auth-content">Auth Content</div>',
-          'does-not-have-auth':
-            '<div data-testid="no-auth-content">No Auth Content</div>',
-        },
-      });
-
-      expect(wrapper.find('[data-testid="auth-content"]').exists()).toBe(false);
-      expect(wrapper.find('[data-testid="no-auth-content"]').exists()).toBe(
-        true
-      );
-    });
-
-    it('should show no-auth content when ownership required but no owners provided', () => {
-      mockSSRAuthReturn.hasAuthHint.value = true;
-      mockSSRAuthReturn.usernameHint.value = 'testuser';
-
-      const wrapper = mount(RequireAuth, {
-        props: {
-          requireOwnership: true,
-          owners: [],
-        },
-        slots: {
-          'has-auth': '<div data-testid="auth-content">Auth Content</div>',
-          'does-not-have-auth':
-            '<div data-testid="no-auth-content">No Auth Content</div>',
-        },
-      });
-
-      expect(wrapper.find('[data-testid="auth-content"]').exists()).toBe(false);
-      expect(wrapper.find('[data-testid="no-auth-content"]').exists()).toBe(
-        true
-      );
-    });
+        expected: 'authenticated',
+      },
+      {
+        name: 'authenticated, ownership required, is owner',
+        authenticated: true,
+        username: 'testowner',
+        props: { requireOwnership: true, owners: ['testowner', 'otherowner'] },
+        expected: 'authenticated',
+      },
+      {
+        name: 'authenticated, ownership required, not owner',
+        authenticated: true,
+        username: 'notowner',
+        props: { requireOwnership: true, owners: ['testowner'] },
+        expected: 'unauthenticated',
+      },
+      {
+        name: 'authenticated, ownership required, no username',
+        authenticated: true,
+        username: '',
+        props: { requireOwnership: true, owners: ['testowner'] },
+        expected: 'unauthenticated',
+      },
+      {
+        name: 'authenticated, ownership required, no owners provided',
+        authenticated: true,
+        username: 'testuser',
+        props: { requireOwnership: true, owners: [] },
+        expected: 'unauthenticated',
+      },
+    ])(
+      'renders the $expected slot when $name',
+      async ({ authenticated, username, props, expected }) => {
+        await setAuthState({ authenticated, username });
+        const wrapper = mount(RequireAuth, { props, slots });
+        expect(wrapper.find('[data-auth-state]').attributes('data-auth-state')).toBe(
+          expected
+        );
+      }
+    );
   });
 
-  describe('Client-side initial hydration behavior', () => {
-    beforeEach(() => {
-      // Set client-side mode
-      mockImportMeta.env.SSR = false;
-    });
-
-    it('should match SSR output during initial hydration with auth hint', () => {
-      mockSSRAuthReturn.hasAuthHint.value = true;
-
+  describe('component styling props', () => {
+    it('applies justify-start and w-full when justifyLeft and fullWidth are true', () => {
       const wrapper = mount(RequireAuth, {
-        props: { requireOwnership: false },
-        slots: {
-          'has-auth': '<div data-testid="auth-content">Auth Content</div>',
-          'does-not-have-auth':
-            '<div data-testid="no-auth-content">No Auth Content</div>',
-        },
+        props: { justifyLeft: true, fullWidth: true },
+        slots,
       });
-
-      // Should show auth content based on hint, not actual auth state
-      expect(wrapper.find('[data-testid="auth-content"]').exists()).toBe(true);
-      expect(wrapper.find('[data-testid="no-auth-content"]').exists()).toBe(
-        false
+      expect(wrapper.find('div').classes()).toEqual(
+        expect.arrayContaining(['justify-start', 'w-full'])
       );
     });
 
-    it('should match SSR output during initial hydration without auth hint', () => {
-      mockSSRAuthReturn.hasAuthHint.value = false;
-
+    it('applies justify-center and omits w-full when styling props are false', () => {
       const wrapper = mount(RequireAuth, {
-        props: { requireOwnership: false },
-        slots: {
-          'has-auth': '<div data-testid="auth-content">Auth Content</div>',
-          'does-not-have-auth':
-            '<div data-testid="no-auth-content">No Auth Content</div>',
-        },
+        props: { justifyLeft: false, fullWidth: false },
+        slots,
       });
-
-      // Should show no-auth content based on hint, not actual auth state
-      expect(wrapper.find('[data-testid="auth-content"]').exists()).toBe(false);
-      expect(wrapper.find('[data-testid="no-auth-content"]').exists()).toBe(
-        true
-      );
-    });
-
-    it('should match SSR output for ownership checks during initial hydration', () => {
-      mockSSRAuthReturn.hasAuthHint.value = true;
-      mockSSRAuthReturn.usernameHint.value = 'testowner';
-
-      const wrapper = mount(RequireAuth, {
-        props: {
-          requireOwnership: true,
-          owners: ['testowner'],
-        },
-        slots: {
-          'has-auth': '<div data-testid="auth-content">Auth Content</div>',
-          'does-not-have-auth':
-            '<div data-testid="no-auth-content">No Auth Content</div>',
-        },
-      });
-
-      // Should show auth content based on username hint, not actual auth state
-      expect(wrapper.find('[data-testid="auth-content"]').exists()).toBe(true);
-      expect(wrapper.find('[data-testid="no-auth-content"]').exists()).toBe(
-        false
-      );
-    });
-  });
-
-  describe('Client-side post-mount behavior', () => {
-    beforeEach(() => {
-      // Set client-side mode
-      mockImportMeta.env.SSR = false;
-    });
-
-    it('should show auth content when user is authenticated with username', async () => {
-      mockUsernameVar.value = 'testuser';
-      mockIsAuthenticatedVar.value = true;
-
-      const wrapper = mount(RequireAuth, {
-        props: { requireOwnership: false },
-        slots: {
-          'has-auth': '<div data-testid="auth-content">Auth Content</div>',
-          'does-not-have-auth':
-            '<div data-testid="no-auth-content">No Auth Content</div>',
-        },
-      });
-
-      // Simulate component mounted
-      await wrapper.vm.$nextTick();
-
-      expect(wrapper.find('[data-testid="auth-content"]').exists()).toBe(true);
-      expect(wrapper.find('[data-testid="no-auth-content"]').exists()).toBe(
-        false
-      );
-    });
-
-    it('should show auth content when authenticated but no username and no ownership required', async () => {
-      mockUsernameVar.value = '';
-      mockIsAuthenticatedVar.value = true;
-
-      const wrapper = mount(RequireAuth, {
-        props: { requireOwnership: false },
-        slots: {
-          'has-auth': '<div data-testid="auth-content">Auth Content</div>',
-          'does-not-have-auth':
-            '<div data-testid="no-auth-content">No Auth Content</div>',
-        },
-      });
-
-      await wrapper.vm.$nextTick();
-
-      expect(wrapper.find('[data-testid="auth-content"]').exists()).toBe(true);
-      expect(wrapper.find('[data-testid="no-auth-content"]').exists()).toBe(
-        false
-      );
-    });
-
-    it('should show no-auth content when authenticated but no username and ownership required', async () => {
-      mockUsernameVar.value = '';
-      mockIsAuthenticatedVar.value = true;
-
-      const wrapper = mount(RequireAuth, {
-        props: {
-          requireOwnership: true,
-          owners: ['testowner'],
-        },
-        slots: {
-          'has-auth': '<div data-testid="auth-content">Auth Content</div>',
-          'does-not-have-auth':
-            '<div data-testid="no-auth-content">No Auth Content</div>',
-        },
-      });
-
-      await wrapper.vm.$nextTick();
-
-      expect(wrapper.find('[data-testid="auth-content"]').exists()).toBe(false);
-      expect(wrapper.find('[data-testid="no-auth-content"]').exists()).toBe(
-        true
-      );
-    });
-
-    it('should show auth content when user is owner', async () => {
-      mockUsernameVar.value = 'testowner';
-      mockIsAuthenticatedVar.value = true;
-
-      const wrapper = mount(RequireAuth, {
-        props: {
-          requireOwnership: true,
-          owners: ['testowner', 'otherowner'],
-        },
-        slots: {
-          'has-auth': '<div data-testid="auth-content">Auth Content</div>',
-          'does-not-have-auth':
-            '<div data-testid="no-auth-content">No Auth Content</div>',
-        },
-      });
-
-      await wrapper.vm.$nextTick();
-
-      expect(wrapper.find('[data-testid="auth-content"]').exists()).toBe(true);
-      expect(wrapper.find('[data-testid="no-auth-content"]').exists()).toBe(
-        false
-      );
-    });
-
-    it('should show no-auth content when user is not owner', async () => {
-      mockUsernameVar.value = 'notowner';
-      mockIsAuthenticatedVar.value = true;
-
-      const wrapper = mount(RequireAuth, {
-        props: {
-          requireOwnership: true,
-          owners: ['testowner', 'otherowner'],
-        },
-        slots: {
-          'has-auth': '<div data-testid="auth-content">Auth Content</div>',
-          'does-not-have-auth':
-            '<div data-testid="no-auth-content">No Auth Content</div>',
-        },
-      });
-
-      await wrapper.vm.$nextTick();
-
-      expect(wrapper.find('[data-testid="auth-content"]').exists()).toBe(false);
-      expect(wrapper.find('[data-testid="no-auth-content"]').exists()).toBe(
-        true
-      );
-    });
-
-    it('should show no-auth content when not authenticated', async () => {
-      mockUsernameVar.value = '';
-      mockIsAuthenticatedVar.value = false;
-
-      const wrapper = mount(RequireAuth, {
-        props: { requireOwnership: false },
-        slots: {
-          'has-auth': '<div data-testid="auth-content">Auth Content</div>',
-          'does-not-have-auth':
-            '<div data-testid="no-auth-content">No Auth Content</div>',
-        },
-      });
-
-      await wrapper.vm.$nextTick();
-
-      expect(wrapper.find('[data-testid="auth-content"]').exists()).toBe(false);
-      expect(wrapper.find('[data-testid="no-auth-content"]').exists()).toBe(
-        true
-      );
-    });
-  });
-
-  describe('Component styling props', () => {
-    it('should apply correct CSS classes based on props', () => {
-      const wrapper = mount(RequireAuth, {
-        props: {
-          justifyLeft: true,
-          fullWidth: true,
-        },
-        slots: {
-          'has-auth': '<div>Auth Content</div>',
-          'does-not-have-auth': '<div>No Auth Content</div>',
-        },
-      });
-
-      const rootDiv = wrapper.find('div');
-      expect(rootDiv.classes()).toContain('justify-start');
-      expect(rootDiv.classes()).toContain('w-full');
-    });
-
-    it('should apply default CSS classes when styling props are false', () => {
-      const wrapper = mount(RequireAuth, {
-        props: {
-          justifyLeft: false,
-          fullWidth: false,
-        },
-        slots: {
-          'has-auth': '<div>Auth Content</div>',
-          'does-not-have-auth': '<div>No Auth Content</div>',
-        },
-      });
-
-      const rootDiv = wrapper.find('div');
-      expect(rootDiv.classes()).toContain('justify-center');
-      expect(rootDiv.classes()).not.toContain('w-full');
+      const classes = wrapper.find('div').classes();
+      expect(
+        classes.includes('justify-center') && !classes.includes('w-full')
+      ).toBe(true);
     });
   });
 });

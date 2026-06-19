@@ -20,34 +20,56 @@
 // first render. A `.server.ts` plugin would not run on the client, so the
 // client would never re-seed and we'd be back to a mismatch.
 //
-// It replaces the guesswork in plugins/auth0.server.ts (which decodes a cookie
-// the localStorage SPA SDK never sets) and removes the need for the auth-hint
-// cookie shim (useSSRAuth) and the username-cache.client.ts plugin.
+// This is the mechanism that replaced the old SPA auth flow: the deleted
+// auth-hint cookie shim, the username-cache.client.ts plugin, and the
+// client-side useAuthManager fetch.
 //
-// NOTE: modProfileName still comes from the GraphQL user fetch (useAuthManager)
-// and remains async/post-mount — it is '' on both server and client at initial
-// render, so it does not cause a mismatch. Only username/isAuthenticated need
-// to be SSR-consistent, which is what this plugin guarantees.
+// The full profile (username, email, modProfileName, notificationCount,
+// profilePicURL) is now resolved server-side in the middleware, so every
+// auth-dependent field is SSR-consistent — there is no async post-mount fetch
+// left to cause a mismatch.
 import { defineNuxtPlugin, useState } from 'nuxt/app';
-import { setUsername, setIsAuthenticated } from '@/cache';
+import {
+  setUsername,
+  setEmail,
+  setIsAuthenticated,
+  setModProfileName,
+  setNotificationCount,
+  setProfilePicURL,
+} from '@/cache';
 
 type SeededAuth = {
-  username: string;
   isAuthenticated: boolean;
+  username: string;
+  email: string;
+  modProfileName: string;
+  notificationCount: number;
+  profilePicURL: string;
 };
 
 export default defineNuxtPlugin((nuxtApp) => {
   // useState is SSR-serialized: written on the server, read on the client from
   // the payload — the transport that keeps both sides in sync.
   const seeded = useState<SeededAuth>('auth-session', () => ({
-    username: '',
     isAuthenticated: false,
+    username: '',
+    email: '',
+    modProfileName: '',
+    notificationCount: 0,
+    profilePicURL: '',
   }));
 
   if (import.meta.server) {
     const ctx = nuxtApp.ssrContext?.event?.context?.authSession;
     if (ctx?.isAuthenticated) {
-      seeded.value = { username: ctx.username, isAuthenticated: true };
+      seeded.value = {
+        isAuthenticated: true,
+        username: ctx.username,
+        email: ctx.email,
+        modProfileName: ctx.modProfileName,
+        notificationCount: ctx.notificationCount,
+        profilePicURL: ctx.profilePicURL,
+      };
     }
   }
 
@@ -56,5 +78,9 @@ export default defineNuxtPlugin((nuxtApp) => {
   if (seeded.value.isAuthenticated) {
     setIsAuthenticated(true);
     setUsername(seeded.value.username);
+    setEmail(seeded.value.email);
+    setModProfileName(seeded.value.modProfileName);
+    setNotificationCount(seeded.value.notificationCount);
+    setProfilePicURL(seeded.value.profilePicURL);
   }
 });

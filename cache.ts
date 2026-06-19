@@ -39,6 +39,12 @@ export const usernameVar = ref('');
 export const setUsername = (username: string) => {
   usernameVar.value = username;
 };
+// The verified email from the server session. Seeded by plugins/auth-session.ts.
+// Used by the create-username flow (which keys the new User node off the email).
+export const emailVar = ref('');
+export const setEmail = (email: string) => {
+  emailVar.value = email;
+};
 export const profilePicURLVar = ref('');
 export const setProfilePicURL = (url: string) => {
   profilePicURLVar.value = url;

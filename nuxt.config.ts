@@ -51,11 +51,9 @@ export default defineNuxtConfig({
   },
   modules: [
     '@sentry/nuxt/module',
-    // SPIKE (auth0-nuxt server-session migration): registers /auth/login,
-    // /auth/logout, /auth/callback, /auth/backchannel-logout. Config is read
-    // from the private `runtimeConfig.auth0` block below (NUXT_AUTH0_* envs).
-    // The mounted routes only require valid config when actually hit, so the
-    // existing @auth0/auth0-vue SPA flow keeps working until this is wired in.
+    // Server-session auth: registers /auth/login, /auth/logout,
+    // /auth/callback, /auth/backchannel-logout. Config is read from the private
+    // `runtimeConfig.auth0` block below (NUXT_AUTH0_* envs).
     [
       '@auth0/auth0-nuxt',
       {
@@ -73,92 +71,14 @@ export default defineNuxtConfig({
         clients: {
           default: {
             httpEndpoint: config?.graphqlUrl || '',
+            // @nuxtjs/apollo attaches localStorage['token'] as the Bearer
+            // (tokenStorage: 'localStorage'). plugins/apollo-auth.client.ts keeps
+            // that key in sync with the server-session access token. (The old
+            // custom `apolloLink` here was dead config — this module version
+            // builds its own link and ignored it — so it was removed.)
             tokenName: 'token',
             tokenStorage: 'localStorage',
             inMemoryCacheOptions,
-            // Always get fresh token from localStorage on each request
-            apolloLink: ({ uri }) => {
-              // SSR path: build an HttpLink instead of `{ uri }`
-              if (import.meta.client) {
-                return import('@apollo/client/core').then(
-                  async ({ HttpLink, from }) => {
-                    const { setContext } =
-                      await import('@apollo/client/link/context');
-                    const { onError } =
-                      await import('@apollo/client/link/error');
-
-                    /* helper that returns a token or null */
-                    const getToken = async (
-                      force = false
-                    ): Promise<string | null> => {
-                      const fn = (globalThis as any).__auth0_getToken;
-                      if (!fn) return null;
-                      try {
-                        return await fn(force ? { cacheMode: 'off' } : {});
-                      } catch {
-                        return null;
-                      }
-                    };
-
-                    /* ---- authLink: attach a (fresh) token to every request ---- */
-                    const authLink = setContext(async (_, { headers }) => {
-                      const token =
-                        (await getToken()) || localStorage.getItem('token');
-                      return {
-                        headers: {
-                          ...headers,
-                          ...(token && { Authorization: `Bearer ${token}` }),
-                        },
-                      };
-                    });
-
-                    /* ---- errorLink: retry once on 401/UNAUTHENTICATED ---- */
-                    const { fromPromise } =
-                      await import('@apollo/client/link/utils');
-                    const errorLink = onError(
-                      ({ graphQLErrors, networkError, forward, operation }) => {
-                        const unauth =
-                          (networkError &&
-                            (networkError as any).statusCode === 401) ||
-                          graphQLErrors?.some(
-                            (e) => e.extensions?.code === 'UNAUTHENTICATED'
-                          );
-
-                        if (!unauth) return;
-
-                        // Force‑refresh, bypassing the SDK cache
-                        return fromPromise(
-                          getToken(true)
-                            .then((newToken) => {
-                              if (!newToken)
-                                throw new Error('silent refresh failed');
-                              localStorage.setItem('token', newToken);
-
-                              operation.setContext(({ headers = {} }) => ({
-                                headers: {
-                                  ...headers,
-                                  Authorization: `Bearer ${newToken}`,
-                                },
-                              }));
-                            })
-                            .catch(() => {
-                              // SSO cookie is gone → just reload; user either comes back in
-                              // silently or is sent to /authorize.
-                              window.location.reload();
-                            })
-                        ).flatMap(() => forward(operation));
-                      }
-                    );
-
-                    const httpLink = new HttpLink({ uri });
-                    return from([errorLink, authLink, httpLink]);
-                  }
-                );
-              }
-
-              // SSR path: plain link, no token
-              return { uri };
-            },
 
             devtools: { enabled: process.env.NODE_ENV === 'development' },
             defaultOptions: {

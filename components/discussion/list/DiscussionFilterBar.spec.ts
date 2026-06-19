@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createMockRoute, createMockRouter } from '@/tests/utils/mockRouter';
-import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 
 import DiscussionFilterBar from '@/components/discussion/list/DiscussionFilterBar.vue';
 
@@ -12,7 +11,6 @@ vi.mock('nuxt/app', () => ({
   useRoute: () => route,
   useRouter: () => router,
 }));
-vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
 
 const heavyStubs = {
   SearchableForumList: true,

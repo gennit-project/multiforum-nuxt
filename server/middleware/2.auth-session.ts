@@ -31,6 +31,9 @@ type AuthSessionContext = {
   isAuthenticated: boolean;
   username: string;
   email: string;
+  modProfileName: string;
+  notificationCount: number;
+  profilePicURL: string;
 };
 
 declare module 'h3' {
@@ -39,13 +42,21 @@ declare module 'h3' {
   }
 }
 
-// Minimal version of GET_EMAIL (graphQLData/email/queries.js) — only the
-// username is needed to seed SSR auth state.
-const GET_USERNAME_BY_EMAIL = /* GraphQL */ `
-  query getUsernameByEmail($emailAddress: String!) {
+// Mirror of GET_EMAIL (graphQLData/email/queries.js): everything useAuthManager
+// used to fetch client-side via the SPA. Resolving it here (server-side, from
+// the session) is what lets the SPA auth manager be removed entirely.
+const GET_EMAIL = /* GraphQL */ `
+  query getEmail($emailAddress: String!) {
     emails(where: { address: $emailAddress }) {
       User {
         username
+        profilePicURL
+        ModerationProfile {
+          displayName
+        }
+        NotificationsAggregate(where: { read: false }) {
+          count
+        }
       }
     }
   }
@@ -53,11 +64,53 @@ const GET_USERNAME_BY_EMAIL = /* GraphQL */ `
 
 type EmailLookupResponse = {
   data?: {
-    emails?: Array<{ User?: { username?: string | null } | null } | null> | null;
+    emails?: Array<{
+      User?: {
+        username?: string | null;
+        profilePicURL?: string | null;
+        ModerationProfile?: { displayName?: string | null } | null;
+        NotificationsAggregate?: { count?: number | null } | null;
+      } | null;
+    } | null> | null;
   };
 };
 
+// Test-only: in mocked Playwright runs there is no real Auth0 session, so the
+// test fixture (tests/playwright/helpers/mockAuth.ts) sets a `mock-auth` cookie
+// holding the seeded profile. We honor it ONLY when VITE_E2E_MOCK_MODE is set
+// (the frontend dev server flag from playwright.config.ts), so it can never be
+// trusted in production. This lets mocked tests exercise the SAME SSR seeding
+// path as production (server middleware -> event.context -> auth-session.ts
+// payload -> client), instead of a separate client-only auth shim.
+const readMockSession = (event: Parameters<typeof getCookie>[0]) => {
+  if (process.env.VITE_E2E_MOCK_MODE !== 'true') return null;
+  const raw = getCookie(event, 'mock-auth');
+  if (!raw) return null;
+  try {
+    const decoded = JSON.parse(
+      Buffer.from(raw, 'base64').toString('utf-8')
+    ) as Partial<AuthSessionContext>;
+    return {
+      isAuthenticated: true,
+      username: decoded.username || '',
+      email: decoded.email || '',
+      modProfileName: decoded.modProfileName || '',
+      notificationCount: decoded.notificationCount || 0,
+      profilePicURL: decoded.profilePicURL || '',
+    } satisfies AuthSessionContext;
+  } catch {
+    return null;
+  }
+};
+
 export default defineEventHandler(async (event) => {
+  // Mocked-test bypass: seed straight from the cookie, no real Auth0 involved.
+  const mockSession = readMockSession(event);
+  if (mockSession) {
+    event.context.authSession = mockSession;
+    return;
+  }
+
   try {
     // useAuth0 is auto-imported by @auth0/auth0-nuxt in the Nitro context.
     const auth0 = useAuth0(event);
@@ -73,9 +126,13 @@ export default defineEventHandler(async (event) => {
     // never read from an Auth0 token claim (which can't be trusted to know it).
     const email = (user.email as string) || '';
     let username = '';
+    let modProfileName = '';
+    let notificationCount = 0;
+    let profilePicURL = '';
 
-    // Resolve the real app username from the GraphQL backend by email,
-    // authenticated with an API access token from the session.
+    // Resolve the full app profile from the GraphQL backend by email,
+    // authenticated with an API access token from the session. This replaces
+    // what the (now-removed) SPA useAuthManager fetched client-side.
     if (email) {
       try {
         const tokenSet = await auth0.getAccessToken();
@@ -92,22 +149,33 @@ export default defineEventHandler(async (event) => {
               authorization: `Bearer ${accessToken}`,
             },
             body: {
-              query: GET_USERNAME_BY_EMAIL,
+              query: GET_EMAIL,
               variables: { emailAddress: email },
             },
           });
-          username = res?.data?.emails?.[0]?.User?.username || '';
+          const u = res?.data?.emails?.[0]?.User;
+          username = u?.username || '';
+          modProfileName = u?.ModerationProfile?.displayName || '';
+          notificationCount = u?.NotificationsAggregate?.count || 0;
+          profilePicURL = u?.profilePicURL || '';
         }
       } catch {
-        // Token/lookup unavailable — leave username empty. The user is still
-        // authenticated (we have a valid session + email); username just isn't
-        // resolved yet (or they haven't created one). No Auth0-claim fallback.
+        // Token/lookup unavailable — leave profile empty. The user is still
+        // authenticated (valid session + email); the profile resolves once the
+        // API token works (or they create a username). No Auth0-claim fallback.
       }
     }
 
-    // Authenticated as soon as there is a valid session with an email; username
-    // may be empty (resolves once the API token works, or via create-username).
-    event.context.authSession = { isAuthenticated: true, username, email };
+    // Authenticated as soon as there is a valid session with an email; profile
+    // fields may be empty (resolve once the API token works / create-username).
+    event.context.authSession = {
+      isAuthenticated: true,
+      username,
+      email,
+      modProfileName,
+      notificationCount,
+      profilePicURL,
+    };
   } catch {
     // Never block a request on the auth read.
   }

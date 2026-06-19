@@ -10,13 +10,12 @@ import InfoIcon from '@/components/icons/InfoIcon.vue';
 import BookIcon from '@/components/icons/BookIcon.vue';
 import UserIcon from '@/components/icons/UserIcon.vue';
 import type { Channel } from '@/__generated__/graphql';
-import { modProfileNameVar, usernameVar, isLoadingAuthVar } from '@/cache';
+import { modProfileNameVar, usernameVar, isAuthenticatedVar } from '@/cache';
 import { useRoute } from 'nuxt/app';
 import { useDisplay } from 'vuetify';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
-import { useSSRAuth } from '@/composables/useSSRAuth';
 // Import Popper dynamically to avoid SSR issues with regeneratorRuntime
 import { defineAsyncComponent } from 'vue';
 const Popper = defineAsyncComponent(() => import('vue3-popper'));
@@ -93,18 +92,9 @@ const loggedInUsername = computed(() => {
   return usernameVar.value || '';
 });
 
-const { hasAuthHint, usernameHint } = useSSRAuth();
-
-// Check if auth is still loading or if we should show auth-dependent tabs
-const shouldShowAuthTabs = computed(() => {
-  // In SSR, we can use auth hints to show tabs if user was previously logged in
-  if (!import.meta.client) {
-    return hasAuthHint.value;
-  }
-
-  // On client-side, show auth tabs if not loading and user is authenticated
-  return !isLoadingAuthVar.value && (usernameVar.value || hasAuthHint.value);
-});
+// Auth state is seeded from the server session and is SSR-consistent, so no
+// auth-hint cookie bridge or SSR/client special-casing is needed.
+const shouldShowAuthTabs = computed(() => isAuthenticatedVar.value);
 
 const tabRoutes = computed(() => {
   const routes: TabRoutes = {
@@ -220,11 +210,9 @@ const tabs = computed((): Tab[] => {
       (modProfile) => modProfile.displayName
     );
 
-    // For SSR, use auth hints; for client, use current auth state
-    const currentUsername = !import.meta.client
-      ? usernameHint.value
-      : loggedInUsername.value;
-    const currentModName = !import.meta.client ? '' : modProfileNameVar.value; // Mod name not stored in hints for security
+    // Seeded from the server session, consistent on SSR and client.
+    const currentUsername = loggedInUsername.value;
+    const currentModName = modProfileNameVar.value;
 
     const isAdmin = adminList.includes(currentUsername);
     const isMod = currentModName ? modList.includes(currentModName) : false;

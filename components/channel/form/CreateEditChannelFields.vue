@@ -9,7 +9,6 @@ import TailwindForm from '@/components/FormComponent.vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { MAX_CHARS_IN_CHANNEL_NAME } from '@/utils/constants';
 import { isAuthenticatedVar, isLoadingAuthVar, usernameVar } from '@/cache';
-import { useSSRAuth } from '@/composables/useSSRAuth';
 // Server config query removed since individual settings pages handle validation
 
 // Import icons
@@ -244,7 +243,6 @@ onMounted(() => {
 });
 
 const isDropdownOpen = ref(false);
-const { hasAuthHint } = useSSRAuth();
 
 const getCurrentTabLabel = computed(() => {
   const currentTab = tabs.value.find(
@@ -263,7 +261,7 @@ const isPermissionCheckPending = computed(() => {
     return true;
   }
 
-  return (isAuthenticatedVar.value || hasAuthHint.value) && !usernameVar.value;
+  return isAuthenticatedVar.value && !usernameVar.value;
 });
 
 const showCreateChannelError = computed(() => {
