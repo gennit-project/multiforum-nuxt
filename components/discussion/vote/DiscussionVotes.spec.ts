@@ -1,7 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import DiscussionVotes from '@/components/discussion/vote/DiscussionVotes.vue';
+import { usernameVar } from '@/cache';
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({
@@ -37,6 +38,53 @@ vi.mock('@/composables/useSuspensionNotice', () => ({
 }));
 
 describe('DiscussionVotes', () => {
+  afterEach(() => {
+    // Restore the default mocked username after tests that clear it.
+    usernameVar.value = 'alice';
+  });
+
+  it('surfaces the auth error in the banner (not a throw) when upvoting without a username', async () => {
+    usernameVar.value = '';
+
+    const wrapper = mount(DiscussionVotes, {
+      props: {
+        discussionChannel: {
+          id: 'dc-1',
+          channelUniqueName: 'cats',
+          UpvotedByUsers: [],
+          UpvotedByUsersAggregate: { count: 0 },
+        },
+        discussion: {
+          FeedbackComments: [],
+          FeedbackCommentsAggregate: { count: 0 },
+        },
+      },
+      global: {
+        stubs: {
+          VoteButtons: {
+            template:
+              '<button data-testid="vote-up" @click="$emit(\'click-up\')"></button>',
+            emits: ['click-up'],
+          },
+          ErrorBanner: {
+            template: '<div data-testid="error-banner">{{ text }}</div>',
+            props: ['text'],
+          },
+          SuperUpvoteModal: { template: '<div />' },
+          NewEmojiButton: { template: '<div />' },
+          SuspensionNotice: { template: '<div />' },
+        },
+      },
+    });
+
+    await wrapper.find('[data-testid="vote-up"]').trigger('click');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('[data-testid="error-banner"]').text()).toContain(
+      'logged in'
+    );
+  });
+
   it('shows suspension notice when emoji interaction is blocked', async () => {
     const wrapper = mount(DiscussionVotes, {
       props: {
