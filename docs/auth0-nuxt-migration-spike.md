@@ -1,18 +1,29 @@
 # Spike: migrate Auth0 to the server-session SDK (`@auth0/auth0-nuxt`)
 
-**Status:** Phases 0/1/3 verified locally against a real Auth0 Regular Web App.
-Core hypothesis confirmed and the app now renders authenticated on first paint
-(nav + ownership-gated UI), with login/logout going through the server session.
-**Phase 2 is implemented but BLOCKED on an upstream alpha-SDK bug** (see "Phase 2"
-below). Phase 4 (delete the SPA SDK + remaining shims, rework tests) is the
-remaining work.
+**Status: COMPLETE.** All phases (0–4) are done and verified. The app resolves
+auth on the server, renders authenticated on first paint (nav + ownership-gated
+UI), authenticates GraphQL from the server session, and the SPA SDK
+(`@auth0/auth0-vue`) plus all its shims have been removed. Production sessions
+are backed by Upstash Redis. The backend audience-token change is in
+[multiforum-backend#15](https://github.com/gennit-project/multiforum-backend/pull/15).
 
-## Phase 2 — Apollo token from the server session (implemented, blocked)
+> **Note on the "Phase 2 blocker" recorded below.** An earlier revision of this
+> doc diagnosed an upstream `@auth0/auth0-server-js` bug (a seconds-vs-ms expiry
+> comparison and a misread refresh-token location). **That diagnosis was wrong**
+> — a minimal repro proved the SDK works in isolation. The real cause was the
+> `/api/**` Nitro route cache stripping cookies from `/api/auth/token`. The
+> full, correct resolution is in [`auth0-nuxt-sdk-bug-report.md`](./auth0-nuxt-sdk-bug-report.md)
+> (titled "RESOLVED"). The original Phase 2 narrative is kept below only as a
+> record of the investigation; do not treat its SDK-bug claims as accurate.
+
+## Phase 2 — Apollo token from the server session (RESOLVED)
 
 **Goal:** Apollo authenticates GraphQL from the server session instead of a
-localStorage token written by the SPA SDK.
+localStorage token written by the SPA SDK. **Outcome:** working end-to-end; see
+the resolution doc linked above for the actual fix (the `/api/auth/**` route
+must opt out of the route cache).
 
-What was built (all correct and verified working up to the SDK boundary):
+What was built (all correct and verified):
 - `server/api/auth/token.get.ts`: returns the session's access token to the
   authenticated browser (same-origin + session cookie).
 - `plugins/apollo-auth.client.ts`: feeds that token to Apollo via @nuxtjs/apollo's
@@ -46,24 +57,23 @@ email via `/userinfo`, so the backend accepts the new dedicated-API token.
   missing; Client/M2M access is NOT needed).
 - App grant types include **Refresh Token** (default).
 
-### ⛔ The blocker (upstream alpha-SDK bug)
-With everything above correct, login succeeds and stores a session containing a
-**fresh** access token (24h) **and** a refresh token, correct audience, and the
-`offline_access` scope (verified by logging the stored `StateData`). But
-`getSession()` / `getAccessToken()` then **reject their own just-written session**:
-- the refresh token is stored at the StateData **top level** but read from inside
-  the **token set** (so the SDK reports "no refresh token"), and
-- the fresh token is judged **expired** — the stored `expiresAt` is a **seconds**
-  timestamp, consistent with a seconds-vs-milliseconds comparison bug.
+### ✅ The actual resolution (NOT an SDK bug)
+The symptom — `getAccessToken()` returning null and mutations failing with "You
+must be logged in to do that" — was **not** an SDK bug. A minimal reproduction
+proved `@auth0/auth0-nuxt` / `@auth0/auth0-server-js` work correctly in
+isolation. The root cause was in this app's config: the `'/api/**': { cache }`
+route rule wrapped `/api/auth/token` in Nitro's route cache, whose responses are
+**cookie-independent and shared**, so the token handler ran without the session
+cookie and returned null. Fix: a more specific `'/api/auth/**': { cache: false }`
+rule (Nitro: most specific wins). See
+[`auth0-nuxt-sdk-bug-report.md`](./auth0-nuxt-sdk-bug-report.md) for the full
+chain of integration fixes (route cache, persistent store, dev cookie `secure`,
+client-side token sync, backend audience). Verified: an upvote went 2→3 with no
+auth error.
 
-Net: `getAccessToken()` throws "access token has expired and a refresh token was
-not provided," `/api/auth/token` returns null, and authenticated mutations fail
-with "You must be logged in to do that." This is in `@auth0/auth0-nuxt` /
-`@auth0/auth0-server-js` (alpha), not in this app's config or code.
-
-**Next steps:** file an issue upstream with the evidence above; retry on the next
-SDK release / patch bump; until then Apollo has no token from the session (the SPA
-localStorage path still works, so the app is not regressed for logged-in SPA users).
+> The earlier "seconds-vs-ms expiry" and "refresh token read from the wrong
+> place" claims were a misdiagnosis from reading symptoms before reading the
+> SDK source; both were disproven. No upstream issue was filed.
 
 ## Phase 3 results (verified locally)
 
@@ -252,25 +262,28 @@ only need config when hit, so `npm run dev` still boots without the envs.
 
 ---
 
-## Remaining work (tracked in the migration issue)
+## Remaining work
 
-- **Phase 2 — Apollo auth (highest risk):** replace the `localStorage.token` +
-  `__auth0_getToken` logic in `nuxt.config.ts` with a token sourced from the
-  server session (audience access token). Either expose it via a server route
-  the client link reads, or proxy GraphQL through a Nitro route that attaches
-  the token server-side (preferred; keeps the token off the client). The
-  `errorLink` 401-refresh path is replaced by the SDK's server-side refresh.
-- **Phase 3 — flows:** `RequireAuth.vue` login → navigate to
-  `/auth/login?returnTo=…`; drop `useSSRAuth`, the cookie hints, and the
-  `isMounted` dance. `pages/logout.vue` → redirect to `/auth/logout`.
-- **Phase 4 — tests + cleanup:** rework `installMockAuth()` and
-  `plugins/test-auth.client.ts` to mint a mock server session instead of
-  seeding `localStorage` (touches many Playwright specs). Then delete
-  `plugins/auth0.server.ts`, `plugins/username-cache.client.ts`,
-  `composables/useSSRAuth.ts`, and remove `@auth0/auth0-vue`.
+All migration phases are done. What's left is operational / follow-up:
 
-## Files that get retired at the end
+- **Manual real-auth sanity pass** against the live backend (login → upvote →
+  edit-own-post → logout) — not in CI.
+- **Per-request lookup optimization:** the auth-session middleware runs
+  `getAccessToken()` + a GraphQL `GET_EMAIL` on every authenticated request.
+  The stable fields (username / modProfileName / profilePicURL) could be cached
+  in the session; the volatile `notificationCount` should still be fetched
+  fresh. Not done yet (a design decision, not a blocker).
+- **Vercel env:** set `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` (and
+  the `NUXT_AUTH0_*` vars) in the project; a preview deploy is the definitive
+  test of the Upstash-backed session store.
+- **Pre-existing forum-mod-badge hydration mismatch** (see Phase 3 note above) —
+  unrelated to auth; tracked separately.
 
-`plugins/auth0.client.ts` · `plugins/auth0.server.ts` ·
+## Completed cleanup (Phase 4)
+
+Retired: `plugins/auth0.client.ts` · `plugins/auth0.server.ts` ·
 `plugins/username-cache.client.ts` · `composables/useSSRAuth.ts` ·
-(most of) `components/auth/RequireAuth.vue` auth logic.
+`composables/useAuthManager.ts` · `composables/useTestAuth.ts` · the
+`auth-hint`/`username-hint` cookie shim · `@auth0/auth0-vue`. `RequireAuth.vue`
+is now purely presentational off the SSR-seeded auth vars; mocked tests seed a
+server session via a `mock-auth` cookie (gated on `VITE_E2E_MOCK_MODE`).
