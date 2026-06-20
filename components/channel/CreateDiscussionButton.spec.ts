@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createMockRoute } from '@/tests/utils/mockRouter';
-import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 import CreateButton from '@/components/CreateButton.vue';
 
 import CreateDiscussionButton from '@/components/channel/CreateDiscussionButton.vue';
@@ -12,7 +11,6 @@ const route = createMockRoute({
 });
 
 vi.mock('nuxt/app', () => ({ useRoute: () => route }));
-vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
 
 const mountButton = () =>
   mountWithDefaults(CreateDiscussionButton, {

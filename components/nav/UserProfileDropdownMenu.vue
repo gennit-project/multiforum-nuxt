@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { useAuth0 } from '@auth0/auth0-vue';
 import { usernameVar } from '@/cache';
-import { config } from '@/config';
-import { useRouter, useRoute } from 'nuxt/app';
+import { useRouter } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
+import { useServerLogout } from '@/composables/useServerLogout';
 
 const props = defineProps({
   modName: {
@@ -17,7 +16,8 @@ const props = defineProps({
     required: true,
   },
 });
-const { logout } = useAuth0();
+// SPIKE Phase 3: logout goes through the server-session route, not the SPA SDK.
+const { logout: handleLogout } = useServerLogout();
 
 const { result: getUserResult } = useQuery(
   GET_USER,
@@ -53,19 +53,6 @@ const menuItems = [
     icon: '',
   },
 ];
-
-const route = useRoute();
-
-const handleLogout = () => {
-  // Store the current path in local storage
-  localStorage.setItem('postLogoutRedirect', route.fullPath);
-  // Redirect to the fixed logout route
-  logout({
-    logoutParams: {
-      returnTo: `${config.baseUrl}/logout`,
-    },
-  });
-};
 
 const goToModProfile = () => {
   router.push(`/mod/${props.modName}`);

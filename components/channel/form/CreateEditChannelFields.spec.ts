@@ -12,12 +12,6 @@ vi.mock('nuxt/app', () => ({
   }),
 }));
 
-vi.mock('@/composables/useSSRAuth', () => ({
-  useSSRAuth: () => ({
-    hasAuthHint: { value: false },
-  }),
-}));
-
 vi.mock('@/cache', () => ({
   isAuthenticatedVar: { value: true },
   isLoadingAuthVar: { value: false },

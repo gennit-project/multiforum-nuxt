@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
-import { useAuth0 } from '@auth0/auth0-vue';
 import { useRouter } from 'vue-router';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_EMAIL } from '@/graphQLData/email/queries';
 import type { Email } from '@/__generated__/graphql';
-import { usernameVar, userDataLoadingVar } from '@/cache';
+import {
+  usernameVar,
+  userDataLoadingVar,
+  isAuthenticatedVar,
+  emailVar,
+} from '@/cache';
 import CreateUsernameForm from '@/components/auth/CreateUsernameForm.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 
-const { user, isAuthenticated } = useAuth0();
+// Auth state + verified email come from the server session (cache vars seeded by
+// plugins/auth-session.ts), not the SPA.
 const router = useRouter();
 const emailNotInSystem = ref(false);
 const initialCheckComplete = ref(false);
@@ -22,7 +27,7 @@ if (import.meta.client) {
     const storedUsername = localStorage.getItem('username');
 
     // Redirect unauthenticated users to home page
-    if (!isAuthenticated.value) {
+    if (!isAuthenticatedVar.value) {
       router.push('/');
     }
     // If we already have a username in state or storage, redirect back to previous page or home
@@ -41,9 +46,9 @@ if (import.meta.client) {
   });
 
   // Only check email if we're authenticated and on the client side
-  if (isAuthenticated.value) {
+  if (isAuthenticatedVar.value) {
     const { onResult: onEmailResult } = useQuery(GET_EMAIL, {
-      emailAddress: user.value?.email,
+      emailAddress: emailVar.value,
     });
 
     onEmailResult((result: { data?: { emails?: Email[] } }) => {
@@ -76,7 +81,7 @@ if (import.meta.client) {
         <div
           v-if="
             !loading &&
-            user?.email &&
+            emailVar &&
             !usernameVar &&
             !userDataLoadingVar &&
             emailNotInSystem &&
@@ -84,7 +89,7 @@ if (import.meta.client) {
           "
         >
           <CreateUsernameForm
-            :email="user.email"
+            :email="emailVar"
             @email-and-user-created="router.push('/')"
           />
         </div>

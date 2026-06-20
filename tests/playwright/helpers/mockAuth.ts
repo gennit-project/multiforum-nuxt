@@ -35,26 +35,19 @@ export async function installMockAuth(
   const frontendPort = process.env.PLAYWRIGHT_FRONTEND_PORT ?? '3100';
   const cookieURL = `http://127.0.0.1:${frontendPort}`;
 
+  // The server-session model resolves auth on the server. There is no real
+  // Auth0 session in mocked runs, so we hand the seeded profile to the server
+  // via a `mock-auth` cookie that server/middleware/2.auth-session.ts decodes
+  // (gated on VITE_E2E_MOCK_MODE). This drives the SAME SSR seeding path as
+  // production, so SSR and client hydrate to the same authenticated state.
+  const mockAuth = Buffer.from(
+    JSON.stringify({ username, email, modProfileName })
+  ).toString('base64');
+
   await context.addCookies([
     {
-      name: 'auth-hint',
-      value: 'true',
-      url: cookieURL,
-      httpOnly: false,
-      sameSite: 'Lax',
-      secure: false,
-    },
-    {
-      name: 'username-hint',
-      value: username,
-      url: cookieURL,
-      httpOnly: false,
-      sameSite: 'Lax',
-      secure: false,
-    },
-    {
-      name: 'mod-profile-name-hint',
-      value: modProfileName,
+      name: 'mock-auth',
+      value: mockAuth,
       url: cookieURL,
       httpOnly: false,
       sameSite: 'Lax',
