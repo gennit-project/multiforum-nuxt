@@ -46,44 +46,62 @@ const mergeSuspendedUsers: FieldMergeFunction<CacheEntity[]> = (
 // Merge by the entity's keyField so the result is a union that is independent of
 // write order and accumulates fields. This is strictly safer than a `[...incoming]`
 // replace because it never drops an entry that a partial/filtered write omits.
-const mergeByKeyField = (
-  keyField: string
-): FieldMergeFunction<CacheEntity[]> => {
-  return (existing = [], incoming = [], { mergeObjects, readField }) => {
-    const merged: CacheEntity[] = existing.slice();
-    const indexByKey = new Map<string, number>();
-    existing.forEach((entity, index) => {
-      const key = readField(keyField, entity);
-      if (typeof key === 'string') {
-        indexByKey.set(key, index);
-      }
-    });
-
-    incoming.forEach((incomingEntity) => {
-      const key = readField(keyField, incomingEntity);
-      const existingIndex =
-        typeof key === 'string' ? indexByKey.get(key) : undefined;
-
-      const existingEntity =
-        existingIndex === undefined ? undefined : merged[existingIndex];
-
-      if (existingIndex === undefined || existingEntity === undefined) {
-        if (typeof key === 'string') {
-          indexByKey.set(key, merged.length);
-        }
-        merged.push(incomingEntity);
-      } else {
-        merged[existingIndex] = mergeObjects(existingEntity, incomingEntity);
-      }
-    });
-
-    return merged;
+// IMPORTANT: this must be SELF-CONTAINED — no closure variables, no references
+// to other module-level identifiers. @nuxtjs/apollo serializes
+// inMemoryCacheOptions (including these merge functions) into its build-time
+// runtime config, which DROPS closures. The previous factory form
+// (`mergeByKeyField(keyField)`) compiled to a body referencing a now-undefined
+// `keyField`, throwing "keyField is not defined" and crashing SSR on every
+// /forums/* page (which merge Channel.Moderators / Channel.Admins). Keeping the
+// whole implementation inline avoids that.
+//
+// Works for both Channel.Moderators (ModerationProfile, keyed by displayName)
+// and Channel.Admins (User, keyed by username): the key is resolved by trying
+// displayName, then username, then id.
+const mergeByEntityKey: FieldMergeFunction<CacheEntity[]> = (
+  existing = [],
+  incoming = [],
+  { mergeObjects, readField }
+) => {
+  const keyOf = (entity: CacheEntity): string | undefined => {
+    const displayName = readField('displayName', entity);
+    if (typeof displayName === 'string') return displayName;
+    const username = readField('username', entity);
+    if (typeof username === 'string') return username;
+    const id = readField('id', entity);
+    return typeof id === 'string' ? id : undefined;
   };
+
+  const merged: CacheEntity[] = existing.slice();
+  const indexByKey = new Map<string, number>();
+  existing.forEach((entity, index) => {
+    const key = keyOf(entity);
+    if (key !== undefined) {
+      indexByKey.set(key, index);
+    }
+  });
+
+  incoming.forEach((incomingEntity) => {
+    const key = keyOf(incomingEntity);
+    const existingIndex = key !== undefined ? indexByKey.get(key) : undefined;
+    const existingEntity =
+      existingIndex === undefined ? undefined : merged[existingIndex];
+
+    if (existingIndex === undefined || existingEntity === undefined) {
+      if (key !== undefined) {
+        indexByKey.set(key, merged.length);
+      }
+      merged.push(incomingEntity);
+    } else {
+      merged[existingIndex] = mergeObjects(existingEntity, incomingEntity);
+    }
+  });
+
+  return merged;
 };
 
-// ModerationProfile is keyed by displayName; User (Admins) is keyed by username.
-const mergeModerators = mergeByKeyField('displayName');
-const mergeAdmins = mergeByKeyField('username');
+const mergeModerators = mergeByEntityKey;
+const mergeAdmins = mergeByEntityKey;
 
 export const usernameVar = ref('');
 export const setUsername = (username: string) => {
