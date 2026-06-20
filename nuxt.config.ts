@@ -273,21 +273,19 @@ export default defineNuxtConfig({
     },
     // Enable server-side caching
     routeRules: {
-      // Cache server-rendered discussion pages. The SSR output is anonymous
-      // (auth runs client-side only, so the server never personalizes the
-      // HTML), which makes it identical for every visitor and safe to cache.
-      // On Vercel this becomes ISR: the page renders on demand, is served
-      // from the edge (~5ms vs ~2s SSR), and revalidates in the background
-      // every 300s. Note: the single-segment glob is required — a mid-path
-      // `**` (e.g. /forums/**/discussions/**) corrupts Nitro's route matcher
-      // and 404s the route.
-      '/forums/*/discussions/*': { isr: 300 },
-      // Event and download detail pages render the same way: public, anonymous
-      // SSR (auth is client-side), so they cache identically for every visitor.
-      // Downloads are discussions with hasDownload=true and reuse the same
-      // components, so they also inherit the flattened query waves.
-      '/forums/*/events/*': { isr: 300 },
-      '/forums/*/downloads/*': { isr: 300 },
+      // Forum detail pages (discussions / events / downloads) are NOT cached.
+      // Since the server-session migration, SSR is AUTH-AWARE: the server
+      // personalizes the HTML from the user's session (edit/owner controls,
+      // vote state, nav). A shared ISR/edge cache would capture ONE user's
+      // personalized render and serve it to everyone — producing hydration
+      // mismatches (cached auth state != the visitor's real auth state, causing
+      // the page to blank and re-render) and leaking that user's auth state to
+      // others. These must render on demand per request.
+      //
+      // (Before the migration SSR was anonymous, so ISR was safe; that premise
+      // no longer holds. If per-page caching is wanted back, it would need to be
+      // anonymous-only — e.g. bypass the cache whenever a session cookie is
+      // present — not a blanket ISR rule.)
       // SPIKE Phase 2: auth endpoints must NOT be route-cached. Nitro's route
       // cache serves shared, cookie-independent responses, so /api/auth/token
       // was reaching its handler with NO cookies (no session → null token →
