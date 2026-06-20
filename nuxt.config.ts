@@ -357,11 +357,6 @@ export default defineNuxtConfig({
         },
       },
       googleMapsApiKey: config?.googleMapsApiKey,
-      auth0Domain: config?.domain,
-      auth0ClientId: config?.clientId,
-      auth0CallbackUrl: config?.callbackUrl,
-      auth0Url: config?.auth0Url,
-      auth0Audience: config?.auth0Audience,
       enableLanguagePicker: config?.enableLanguagePicker || false,
       enableAccented:
         process.env.NUXT_PUBLIC_ENABLE_ACCENTED === 'false' ? false : true,
