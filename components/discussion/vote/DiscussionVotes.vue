@@ -169,16 +169,32 @@ const upvoteTooltips = computed(() => {
   };
 });
 
+// Client-side vote errors (e.g. the username guard below) that aren't carried
+// by a useMutation error ref. Surfaced in the ErrorBanner alongside the
+// mutation errors so an auth failure is always visible, never just an uncaught
+// console rejection.
+const voteError = ref('');
+
 async function handleClickUp() {
-  if (loggedInUserUpvoted.value) {
-    await undoUpvote();
-  } else {
-    await upvote();
+  voteError.value = '';
+  try {
+    if (loggedInUserUpvoted.value) {
+      await undoUpvote();
+    } else {
+      await upvote();
+    }
+  } catch {
+    // Mutation failures are already surfaced via the useMutation error refs
+    // shown in the ErrorBanner. Catching here only prevents the awaited
+    // rejection from escaping the click handler as an unhandled rejection.
   }
 }
 
 async function upvote() {
-  if (!usernameVar.value) throw new Error('Username is required to upvote');
+  if (!usernameVar.value) {
+    voteError.value = 'You must be logged in to upvote.';
+    return;
+  }
   await upvoteDiscussionChannel({
     id: discussionChannelId.value,
     username: usernameVar.value,
@@ -228,17 +244,24 @@ function handleSuperUpvoteSuccess() {
 }
 
 async function handleUndoSuperUpvote() {
-  await undoSuperUpvote({
-    sourceType: 'discussion',
-    sourceId: discussionChannelId.value,
-  });
+  voteError.value = '';
+  try {
+    await undoSuperUpvote({
+      sourceType: 'discussion',
+      sourceId: discussionChannelId.value,
+    });
+  } catch {
+    // Surfaced via undoSuperUpvoteError in the ErrorBanner; catch prevents an
+    // unhandled rejection.
+  }
 }
 </script>
 
 <template>
   <ErrorBanner
-    v-if="upvoteDiscussionChannelError || undoUpvoteDiscussionChannelError || undoSuperUpvoteError"
+    v-if="voteError || upvoteDiscussionChannelError || undoUpvoteDiscussionChannelError || undoSuperUpvoteError"
     :text="
+      voteError ||
       upvoteDiscussionChannelError?.message ||
       undoUpvoteDiscussionChannelError?.message ||
       undoSuperUpvoteError?.message ||

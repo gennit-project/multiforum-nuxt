@@ -1,10 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
-import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 
 import EventNotificationsMenu from '@/components/event/detail/EventNotificationsMenu.vue';
 
-vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
 
 // The global setup only mocks the Tab family of @headlessui/vue; provide the
 // Menu family here, rendering their contents inline so the items are present.

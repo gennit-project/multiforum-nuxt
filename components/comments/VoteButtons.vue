@@ -160,11 +160,34 @@ const {
   },
 });
 
+// Wrap the vote mutations so a failure (e.g. an auth error from the backend) is
+// surfaced via the useMutation error refs in the ErrorBanner rather than
+// escaping the event handler as an unhandled console rejection.
+const handleUpvote = async () => {
+  try {
+    await upvoteComment();
+  } catch {
+    // Surfaced via upvoteCommentError in the ErrorBanner.
+  }
+};
+
+const handleUndoUpvote = async () => {
+  try {
+    await undoUpvoteComment();
+  } catch {
+    // Surfaced via undoUpvoteError in the ErrorBanner.
+  }
+};
+
 const handleUndoSuperUpvote = async () => {
-  await undoSuperUpvote({
-    sourceType: 'comment',
-    sourceId: props.commentData.id,
-  });
+  try {
+    await undoSuperUpvote({
+      sourceType: 'comment',
+      sourceId: props.commentData.id,
+    });
+  } catch {
+    // Surfaced via undoSuperUpvoteError in the ErrorBanner.
+  }
 };
 </script>
 
@@ -189,8 +212,8 @@ const handleUndoSuperUpvote = async () => {
       :is-permalinked="isPermalinked"
       :is-marked-as-answer="isMarkedAsAnswer"
       :is-own-content="isOwnContent"
-      @upvote="upvoteComment"
-      @undo-upvote="undoUpvoteComment"
+      @upvote="handleUpvote"
+      @undo-upvote="handleUndoUpvote"
       @super-upvote="handleSuperUpvoteClick"
       @undo-super-upvote="handleUndoSuperUpvote"
       @undo-downvote="emit('clickUndoFeedback')"

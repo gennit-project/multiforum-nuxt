@@ -12,6 +12,11 @@ export default defineEventHandler((event: H3Event) => {
 
   const path = event.path;
 
+  // Never cache auth endpoints — they are per-session and authenticate via the
+  // session cookie (not an Authorization header), so the generic check below
+  // would otherwise cache them and leak/stale one user's token. (SPIKE Phase 2)
+  if (path.startsWith('/api/auth/') || path.startsWith('/auth/')) return;
+
   // Skip caching for authenticated requests
   const authHeader = getRequestHeader(event, 'Authorization');
   if (authHeader) return;

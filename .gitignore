@@ -50,3 +50,7 @@ test-results
 !tests/playwright/coverage/
 tests/playwright/coverage/.v8/
 coverage-e2e/
+
+# auth0-nuxt local filesystem session store + profile cache (dev only)
+.auth0-sessions/
+.auth0-profile-cache/

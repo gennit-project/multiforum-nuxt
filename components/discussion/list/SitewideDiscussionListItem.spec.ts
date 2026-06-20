@@ -3,7 +3,6 @@ import { useQuery } from '@vue/apollo-composable';
 import { asMock, createQueryMock } from '@/tests/utils/mockApollo';
 import { createMockRoute } from '@/tests/utils/mockRouter';
 import { createCacheMock } from '@/tests/utils/mockAuth';
-import { createSSRAuthMock } from '@/tests/utils/mockSSRAuth';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { makeDiscussion } from '@/tests/utils/factories';
 import type { Discussion } from '@/__generated__/graphql';
@@ -13,7 +12,6 @@ import SitewideDiscussionListItem from '@/components/discussion/list/SitewideDis
 vi.mock('@vue/apollo-composable', () => ({ useQuery: vi.fn() }));
 vi.mock('nuxt/app', () => ({ useRoute: () => createMockRoute() }));
 vi.mock('@/cache', () => createCacheMock({ username: 'alice' }));
-vi.mock('@/composables/useSSRAuth', () => createSSRAuthMock());
 
 const mountItem = (discussion: Discussion) => {
   asMock(useQuery).mockReturnValue(createQueryMock({ users: [] }));

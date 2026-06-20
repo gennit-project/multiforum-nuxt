@@ -51,98 +51,34 @@ export default defineNuxtConfig({
   },
   modules: [
     '@sentry/nuxt/module',
+    // Server-session auth: registers /auth/login, /auth/logout,
+    // /auth/callback, /auth/backchannel-logout. Config is read from the private
+    // `runtimeConfig.auth0` block below (NUXT_AUTH0_* envs).
+    [
+      '@auth0/auth0-nuxt',
+      {
+        mountRoutes: true,
+        // SPIKE Phase 2: use a server-side session store (small cookie holds
+        // only a session id). The default stateless cookie store overflows the
+        // ~4KB browser limit once a refresh token is in the session. See the
+        // factory for the dev (in-memory) vs prod (persistent) note.
+        sessionStoreFactoryPath: '~/server/utils/session-store-factory.ts',
+      },
+    ],
     [
       '@nuxtjs/apollo',
       {
         clients: {
           default: {
             httpEndpoint: config?.graphqlUrl || '',
+            // @nuxtjs/apollo attaches localStorage['token'] as the Bearer
+            // (tokenStorage: 'localStorage'). plugins/apollo-auth.client.ts keeps
+            // that key in sync with the server-session access token. (The old
+            // custom `apolloLink` here was dead config — this module version
+            // builds its own link and ignored it — so it was removed.)
             tokenName: 'token',
             tokenStorage: 'localStorage',
             inMemoryCacheOptions,
-            // Always get fresh token from localStorage on each request
-            apolloLink: ({ uri }) => {
-              // SSR path: build an HttpLink instead of `{ uri }`
-              if (import.meta.client) {
-                return import('@apollo/client/core').then(
-                  async ({ HttpLink, from }) => {
-                    const { setContext } =
-                      await import('@apollo/client/link/context');
-                    const { onError } =
-                      await import('@apollo/client/link/error');
-
-                    /* helper that returns a token or null */
-                    const getToken = async (
-                      force = false
-                    ): Promise<string | null> => {
-                      const fn = (globalThis as any).__auth0_getToken;
-                      if (!fn) return null;
-                      try {
-                        return await fn(force ? { cacheMode: 'off' } : {});
-                      } catch {
-                        return null;
-                      }
-                    };
-
-                    /* ---- authLink: attach a (fresh) token to every request ---- */
-                    const authLink = setContext(async (_, { headers }) => {
-                      const token =
-                        (await getToken()) || localStorage.getItem('token');
-                      return {
-                        headers: {
-                          ...headers,
-                          ...(token && { Authorization: `Bearer ${token}` }),
-                        },
-                      };
-                    });
-
-                    /* ---- errorLink: retry once on 401/UNAUTHENTICATED ---- */
-                    const { fromPromise } =
-                      await import('@apollo/client/link/utils');
-                    const errorLink = onError(
-                      ({ graphQLErrors, networkError, forward, operation }) => {
-                        const unauth =
-                          (networkError &&
-                            (networkError as any).statusCode === 401) ||
-                          graphQLErrors?.some(
-                            (e) => e.extensions?.code === 'UNAUTHENTICATED'
-                          );
-
-                        if (!unauth) return;
-
-                        // Force‑refresh, bypassing the SDK cache
-                        return fromPromise(
-                          getToken(true)
-                            .then((newToken) => {
-                              if (!newToken)
-                                throw new Error('silent refresh failed');
-                              localStorage.setItem('token', newToken);
-
-                              operation.setContext(({ headers = {} }) => ({
-                                headers: {
-                                  ...headers,
-                                  Authorization: `Bearer ${newToken}`,
-                                },
-                              }));
-                            })
-                            .catch(() => {
-                              // SSO cookie is gone → just reload; user either comes back in
-                              // silently or is sent to /authorize.
-                              window.location.reload();
-                            })
-                        ).flatMap(() => forward(operation));
-                      }
-                    );
-
-                    const httpLink = new HttpLink({ uri });
-                    return from([errorLink, authLink, httpLink]);
-                  }
-                );
-              }
-
-              // SSR path: plain link, no token
-              return { uri };
-            },
 
             devtools: { enabled: process.env.NODE_ENV === 'development' },
             defaultOptions: {
@@ -292,6 +228,49 @@ export default defineNuxtConfig({
     preset: 'vercel',
     // Enable CDN caching
     cdn: true,
+    // Persistent store for @auth0/auth0-nuxt server sessions
+    // (server/utils/session-store-factory.ts uses useStorage('auth0Sessions')).
+    // The default in-memory store is wiped on every server restart, leaving the
+    // browser with a stale session-id cookie whose id is no longer in the store;
+    // StatefulStateStore then DELETES the cookie on that miss and the user is
+    // silently logged out. A persistent, shared store survives restarts and (on
+    // serverless) is shared across function instances, avoiding that cascade.
+    //
+    // Production (Vercel) uses Upstash Redis over its REST API — no persistent
+    // TCP connections, so it fits the serverless model. The driver reads
+    // UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN from the environment at
+    // runtime (set these in the Vercel project). `ttl` (seconds) bounds orphaned
+    // entries: each session refresh re-`set`s the key and resets its TTL, so
+    // active sessions stay alive while abandoned ones expire after 30 days.
+    storage: {
+      auth0Sessions: {
+        driver: 'upstash',
+        base: 'auth0Sessions',
+        ttl: 60 * 60 * 24 * 30, // 30 days
+      },
+      // Per-email cache of the stable auth profile (username / mod name /
+      // avatar), so server/middleware/2.auth-session.ts doesn't re-run the full
+      // backend lookup on every authenticated request. Entries are written with
+      // a per-item TTL (PROFILE_CACHE_TTL_SECONDS); the unread-notification
+      // count is never cached here (fetched fresh per request).
+      authProfileCache: {
+        driver: 'upstash',
+        base: 'authProfileCache',
+      },
+    },
+    // Local dev keeps filesystem-backed mounts (no Upstash creds needed) that
+    // still survive `nuxt dev` restarts. devStorage overrides the production
+    // mounts above only during development.
+    devStorage: {
+      auth0Sessions: {
+        driver: 'fs',
+        base: './.auth0-sessions',
+      },
+      authProfileCache: {
+        driver: 'fs',
+        base: './.auth0-profile-cache',
+      },
+    },
     // Enable server-side caching
     routeRules: {
       // Cache server-rendered discussion pages. The SSR output is anonymous
@@ -309,7 +288,13 @@ export default defineNuxtConfig({
       // components, so they also inherit the flattened query waves.
       '/forums/*/events/*': { isr: 300 },
       '/forums/*/downloads/*': { isr: 300 },
-      // Cache API routes
+      // SPIKE Phase 2: auth endpoints must NOT be route-cached. Nitro's route
+      // cache serves shared, cookie-independent responses, so /api/auth/token
+      // was reaching its handler with NO cookies (no session → null token →
+      // "You must be logged in"). A more specific rule wins in Nitro, so this
+      // disables caching for the auth routes only.
+      '/api/auth/**': { cache: false },
+      // Cache other API routes
       '/api/**': {
         cache: {
           // Let middleware handle specific cache times
@@ -340,6 +325,29 @@ export default defineNuxtConfig({
     { src: '@/plugins/test-auth.client', mode: 'client' },
   ],
   runtimeConfig: {
+    // SPIKE (auth0-nuxt server-session migration): server-only Auth0 config.
+    // These are overridden by NUXT_AUTH0_* env vars at runtime (see
+    // .env.auth0-nuxt.example). clientSecret + sessionSecret mean this is a
+    // CONFIDENTIAL "Regular Web Application" in Auth0 — a different app type
+    // than the current SPA. Empty defaults are intentional: the module only
+    // needs them when an /auth/* route is hit, so dev still boots without them.
+    auth0: {
+      domain: '',
+      clientId: '',
+      clientSecret: '',
+      sessionSecret: '',
+      appBaseUrl: 'http://localhost:3000',
+      audience: '',
+      // Spread by the SDK into the session store's cookie options. The session
+      // cookie defaults to Secure, which browsers don't reliably send over
+      // http://localhost — so the session looked intermittently "lost" in dev.
+      // Disable Secure in dev only; production (https) keeps Secure cookies.
+      sessionConfiguration: {
+        cookie: {
+          secure: process.env.NODE_ENV === 'production',
+        },
+      },
+    },
     public: {
       apollo: {
         clients: {
@@ -349,11 +357,6 @@ export default defineNuxtConfig({
         },
       },
       googleMapsApiKey: config?.googleMapsApiKey,
-      auth0Domain: config?.domain,
-      auth0ClientId: config?.clientId,
-      auth0CallbackUrl: config?.callbackUrl,
-      auth0Url: config?.auth0Url,
-      auth0Audience: config?.auth0Audience,
       enableLanguagePicker: config?.enableLanguagePicker || false,
       enableAccented:
         process.env.NUXT_PUBLIC_ENABLE_ACCENTED === 'false' ? false : true,
