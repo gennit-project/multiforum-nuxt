@@ -12,9 +12,9 @@ vi.mock('nuxt/app', () => ({
   }),
 }));
 
-vi.mock('@/cache', () => ({
-  usernameVar: { value: 'alice' },
-  modProfileNameVar: { value: '' },
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => ({ value: 'alice' }),
+  useModProfileName: () => ({ value: '' }),
 }));
 
 describe('CommentButtons', () => {

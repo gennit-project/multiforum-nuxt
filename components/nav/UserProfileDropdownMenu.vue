@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { useRouter } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
 import { useServerLogout } from '@/composables/useServerLogout';
+
+const usernameVar = useUsername();
 
 const props = defineProps({
   modName: {

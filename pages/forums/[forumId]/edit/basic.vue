@@ -9,7 +9,7 @@ import TextEditor from '@/components/TextEditor.vue';
 import AddImage from '@/components/AddImage.vue';
 import RemoveOwnerModal from '@/components/channel/RemoveOwnerModal.vue';
 import { getUploadFileName, uploadAndGetEmbeddedLink } from '@/utils';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { ref, nextTick, computed } from 'vue';
 import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
 import { REMOVE_FORUM_OWNER } from '@/graphQLData/mod/mutations';
@@ -39,6 +39,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+const usernameVar = useUsername();
 
 type FileChangeInput = {
   // event of HTMLInputElement;

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { isAuthenticatedVar, usernameVar } from '@/cache';
+import { useIsAuthenticated, useUsername } from '@/composables/useAuthState';
+
+const isAuthenticatedVar = useIsAuthenticated();
+const usernameVar = useUsername();
 
 /*
 Wrapper around content that requires authentication: renders the `has-auth`

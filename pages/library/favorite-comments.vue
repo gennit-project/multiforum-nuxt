@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { gql } from '@apollo/client/core';
 import { useHead } from 'nuxt/app';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import AddToCommentFavorites from '@/components/favorites/AddToCommentFavorites.vue';
@@ -17,6 +17,8 @@ import {
   getCommentAuthorInfo,
 } from '@/utils/commentUtils';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
+
+const usernameVar = useUsername();
 
 useHead({
   title: 'Favorite Comments - Library',

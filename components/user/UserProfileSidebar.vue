@@ -9,7 +9,10 @@ import ReportProfilePictureModal from '@/components/mod/ReportProfilePictureModa
 import FlagIcon from '@/components/icons/FlagIcon.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { useRoute } from 'nuxt/app';
-import { usernameVar, profilePicURLVar } from '@/cache';
+import { useUsername, useProfilePicURL } from '@/composables/useAuthState';
+
+const usernameVar = useUsername();
+const profilePicURLVar = useProfilePicURL();
 
 // Define props
 defineProps({

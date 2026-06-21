@@ -7,7 +7,7 @@ import {
   MARK_AS_ANSWERED_BY_COMMENT,
   UNMARK_COMMENT_AS_ANSWER,
 } from '@/graphQLData/discussion/mutations';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 
 type UseBestAnswerMutationsParams = {
   commentId: Ref<string> | ComputedRef<string>;
@@ -72,6 +72,8 @@ export function useBestAnswerMutations(
     onMarked,
     onUnmarked,
   } = params;
+
+  const usernameVar = useUsername();
 
   // Mutation for marking a comment as best answer
   const { mutate: markAsAnsweredByComment } = useMutation(

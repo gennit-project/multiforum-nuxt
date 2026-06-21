@@ -10,7 +10,9 @@ import { useRouter, useRoute } from 'nuxt/app';
 import FontSizeControl from '@/components/channel/FontSizeControl.vue';
 import BecomeAdminModal from '@/components/channel/BecomeAdminModal.vue';
 import AddToChannelFavorites from '@/components/favorites/AddToChannelFavorites.vue';
-import { isAuthenticatedVar } from '@/cache';
+import { useIsAuthenticated } from '@/composables/useAuthState';
+
+const isAuthenticatedVar = useIsAuthenticated();
 
 type BotSummary = {
   username: string;

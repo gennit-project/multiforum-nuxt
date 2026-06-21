@@ -15,7 +15,10 @@ import {
   COUNT_OPEN_ISSUES,
   SERVER_SCOPED_ISSUE_COUNT,
 } from '@/graphQLData/mod/queries';
-import { modProfileNameVar, usernameVar } from '@/cache';
+import { useModProfileName, useUsername } from '@/composables/useAuthState';
+
+const modProfileNameVar = useModProfileName();
+const usernameVar = useUsername();
 
 const props = defineProps({
   defaultChannelId: {

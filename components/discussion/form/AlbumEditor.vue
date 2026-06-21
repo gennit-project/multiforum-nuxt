@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import AlbumImageItem from './AlbumImageItem.vue';
@@ -15,6 +15,8 @@ import {
   moveImageOrderDown,
 } from '@/utils/albumImageOrder';
 import type { Album } from '@/__generated__/graphql';
+
+const usernameVar = useUsername();
 
 const MAX_IMAGES = 25;
 

@@ -12,8 +12,10 @@ import {
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
 import type { FilterGroup, FilterOption } from '@/__generated__/graphql';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+
+const usernameVar = useUsername();
 
 const router = useRouter();
 const route = useRoute();

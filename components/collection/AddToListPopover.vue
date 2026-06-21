@@ -2,7 +2,7 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import type { PropType } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { useToastStore } from '@/stores/toastStore';
 import type { CollectionVisibility, Collection } from '@/__generated__/graphql';
 import { useCollectionMutations } from '@/composables/useCollectionMutations';
@@ -15,6 +15,8 @@ import {
   isItemFavorited,
   filterCollectionsBySearch,
 } from '@/utils/collectionFilters';
+
+const usernameVar = useUsername();
 
 // Type for item types that can be added to collections
 type ItemType = 'discussion' | 'comment' | 'image' | 'channel' | 'download';

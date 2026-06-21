@@ -41,10 +41,15 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 
-vi.mock('@/cache', () => ({
-  usernameVar: { value: 'viewer' },
-  modProfileNameVar: { value: '' },
-}));
+vi.mock('@/composables/useAuthState', () => {
+  const { ref } = require('vue');
+  return {
+    useUsername: () => ref('viewer'),
+    useModProfileName: () => ref(''),
+    setUsername: vi.fn(),
+    setModProfileName: vi.fn(),
+  };
+});
 
 vi.mock('@/composables/useServerRoleMembership', () => ({
   useServerRoleMembership: () => ({

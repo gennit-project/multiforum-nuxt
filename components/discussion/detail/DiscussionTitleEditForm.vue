@@ -14,10 +14,13 @@ import {
   IS_DISCUSSION_ANSWERED,
 } from '@/graphQLData/discussion/queries';
 import { DISCUSSION_TITLE_CHAR_LIMIT } from '@/utils/constants';
-import { modProfileNameVar, usernameVar } from '@/cache';
 import { useAppTheme } from '@/composables/useTheme';
 import { useRoute } from 'nuxt/app';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
+import { useModProfileName, useUsername } from '@/composables/useAuthState';
+
+const modProfileNameVar = useModProfileName();
+const usernameVar = useUsername();
 
 const { theme } = useAppTheme();
 

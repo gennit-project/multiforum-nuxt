@@ -14,7 +14,7 @@ import EllipsisHorizontal from '@/components/icons/EllipsisHorizontal.vue';
 import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import CommentHeader from './CommentHeader.vue';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 import type { BotSuggestion } from '@/utils/botMentions';
 import type { ModSuggestion } from '@/utils/modMentions';
@@ -30,6 +30,8 @@ import {
   SUBSCRIBE_TO_COMMENT,
   UNSUBSCRIBE_FROM_COMMENT,
 } from '@/graphQLData/comment/mutations';
+
+const usernameVar = useUsername();
 
 const MAX_COMMENT_DEPTH = 5;
 const SHOW_MORE_THRESHOLD = 1000;

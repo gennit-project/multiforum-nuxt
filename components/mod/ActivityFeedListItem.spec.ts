@@ -21,10 +21,15 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 
-vi.mock('@/cache', () => ({
-  modProfileNameVar: { value: 'mod-alice' },
-  usernameVar: { value: 'alice' },
-}));
+vi.mock('@/composables/useAuthState', () => {
+  const { ref } = require('vue');
+  return {
+    useModProfileName: () => ref('mod-alice'),
+    useUsername: () => ref('alice'),
+    setModProfileName: vi.fn(),
+    setUsername: vi.fn(),
+  };
+});
 
 vi.mock('@/composables/useForumRoleMembership', () => ({
   useForumRoleMembership: () => ({

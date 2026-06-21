@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import { usernameVar } from '@/cache';
 import { useBestAnswerMutations } from './useBestAnswerMutations';
 import type { Comment } from '@/__generated__/graphql';
 
@@ -9,8 +8,13 @@ vi.mock('@vue/apollo-composable', () => ({
   useMutation: vi.fn(),
 }));
 
-vi.mock('@/cache', () => ({
-  usernameVar: { value: 'testuser' },
+const { mockUsername } = vi.hoisted(() => ({
+  mockUsername: { value: 'testuser' },
+}));
+const usernameVar = mockUsername;
+
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => mockUsername,
 }));
 
 describe('useBestAnswerMutations', () => {

@@ -3,10 +3,12 @@ import { computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
-import { modProfileNameVar } from '@/cache';
+import { useModProfileName } from '@/composables/useAuthState';
 import DiscussionTitleVersions from '@/components/discussion/detail/activityFeed/DiscussionTitleVersions.vue';
 import LabelChangeHistory from '@/components/discussion/detail/activityFeed/LabelChangeHistory.vue';
 import type { Discussion } from '@/__generated__/graphql';
+
+const modProfileNameVar = useModProfileName();
 
 const props = defineProps<{
   discussion?: Discussion;

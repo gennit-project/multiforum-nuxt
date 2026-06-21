@@ -1,9 +1,14 @@
 // composables/useTestAuthHelpers.ts
 import { nextTick, onMounted } from 'vue';
-import { setUsername, setIsAuthenticated, isAuthenticatedVar } from '@/cache';
+import {
+  setUsername,
+  setIsAuthenticated,
+  useIsAuthenticated,
+} from '@/composables/useAuthState';
 import { config } from '@/config';
 
 export function useTestAuthHelpers() {
+  const isAuthenticatedVar = useIsAuthenticated();
   const isDevRuntime = import.meta.env.DEV;
   const isTestEnv =
     config.environment === 'test' ||

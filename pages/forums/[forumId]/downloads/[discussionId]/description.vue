@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useMutation } from '@vue/apollo-composable';
 import { UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TextEditor from '@/components/TextEditor.vue';
@@ -15,6 +15,8 @@ import type {
   Discussion,
   DiscussionUpdateInput,
 } from '@/__generated__/graphql';
+
+const usernameVar = useUsername();
 
 const props = defineProps<{
   discussion: Discussion;

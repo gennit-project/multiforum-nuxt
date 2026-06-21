@@ -2,8 +2,10 @@
 import type { PropType } from 'vue';
 import { computed } from 'vue';
 import type { Event } from '@/__generated__/graphql';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import EventDescriptionEditForm from './EventDescriptionEditForm.vue';
+
+const usernameVar = useUsername();
 
 const props = defineProps({
   event: {

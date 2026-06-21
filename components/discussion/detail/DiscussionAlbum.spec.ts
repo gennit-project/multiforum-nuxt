@@ -11,7 +11,9 @@ vi.mock('@vue/apollo-composable', () => ({ useMutation: vi.fn() }));
 vi.mock('nuxt/app', () => ({
   useRoute: vi.fn(() => ({ params: { forumId: 'cats' } })),
 }));
-vi.mock('@/cache', () => ({ usernameVar: { value: 'alice' } }));
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => ({ value: 'alice' }),
+}));
 
 const stubs = {
   ModelViewer: { template: '<div class="model-viewer-stub" />' },

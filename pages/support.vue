@@ -8,9 +8,11 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import NotificationComponent from '@/components/NotificationComponent.vue';
 import FormComponent from '@/components/FormComponent.vue';
 import FormRow from '@/components/FormRow.vue';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
 import { getSupportReportContent } from '@/utils/supportReportMode';
+
+const usernameVar = useUsername();
 
 type BugReportFormValues = {
   contactEmail: string;

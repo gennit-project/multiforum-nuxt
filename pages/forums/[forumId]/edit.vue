@@ -6,13 +6,15 @@ import { UPDATE_CHANNEL } from '@/graphQLData/channel/mutations';
 import type { CreateEditChannelFormValues } from '@/types/Channel';
 import CreateEditChannelFields from '@/components/channel/form/CreateEditChannelFields.vue';
 import Notification from '@/components/NotificationComponent.vue';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import type {
   ChannelUpdateInput,
   Tag as TagData,
 } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
 import { useQuery, useMutation } from '@vue/apollo-composable';
+
+const usernameVar = useUsername();
 
 const route = useRoute();
 const channelId = route.params.forumId as string;

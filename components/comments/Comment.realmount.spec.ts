@@ -7,7 +7,9 @@ import type { Comment } from '@/__generated__/graphql';
 import Comment from '@/components/comments/Comment.vue';
 
 vi.mock('nuxt/app', () => ({ useRoute: () => ({ params: {} }) }));
-vi.mock('@/cache', () => ({ usernameVar: { value: 'alice' } }));
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => ({ value: 'alice' }),
+}));
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: () => ({
     mutate: vi.fn(),

@@ -21,8 +21,10 @@ import { storeToRefs } from 'pinia';
 import { config } from '@/config';
 import { useAppTheme } from '@/composables/useTheme';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
+
+const usernameVar = useUsername();
 
 const { theme } = useAppTheme();
 

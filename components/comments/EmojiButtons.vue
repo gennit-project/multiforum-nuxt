@@ -9,8 +9,10 @@ import {
   ADD_EMOJI_TO_DISCUSSION_CHANNEL,
   REMOVE_EMOJI_FROM_DISCUSSION_CHANNEL,
 } from '@/graphQLData/discussion/mutations';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { ref } from 'vue';
+
+const usernameVar = useUsername();
 
 // Props
 const props = defineProps({

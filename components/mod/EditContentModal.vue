@@ -19,7 +19,9 @@ import {
   ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD,
   UPDATE_ISSUE,
 } from '@/graphQLData/issue/mutations';
-import { modProfileNameVar } from '@/cache';
+import { useModProfileName } from '@/composables/useAuthState';
+
+const modProfileNameVar = useModProfileName();
 
 type TargetType = 'comment' | 'discussion' | 'download' | 'event';
 

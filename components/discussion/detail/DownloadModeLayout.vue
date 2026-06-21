@@ -6,8 +6,10 @@ import DiscussionVotes from '@/components/discussion/vote/DiscussionVotes.vue';
 import MarkAsAnsweredButton from '@/components/discussion/detail/MarkAsAnsweredButton.vue';
 import DownloadSidebar from '@/components/channel/DownloadSidebar.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
-import { usernameVar } from '@/cache';
 import CrosspostedDiscussionEmbed from '@/components/discussion/detail/CrosspostedDiscussionEmbed.vue';
+import { useUsername } from '@/composables/useAuthState';
+
+const usernameVar = useUsername();
 
 const DiscussionAlbum = defineAsyncComponent(
   () => import('@/components/discussion/detail/DiscussionAlbum.vue')

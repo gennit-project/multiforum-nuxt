@@ -4,7 +4,7 @@ import {
   CREATE_SIGNED_STORAGE_URL,
   CREATE_IMAGE,
 } from '@/graphQLData/discussion/mutations';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { getUploadFileName, uploadAndGetEmbeddedLink } from '@/utils';
 import { isFileSizeValid } from '@/utils/index';
 
@@ -36,6 +36,8 @@ type UseAlbumImageUploadParams = {
  */
 export function useAlbumImageUpload(params: UseAlbumImageUploadParams) {
   const { maxImages, currentImageCount, onImageUploaded } = params;
+
+  const usernameVar = useUsername();
 
   // GraphQL Mutations
   const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =

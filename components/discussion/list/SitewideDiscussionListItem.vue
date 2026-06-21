@@ -19,9 +19,12 @@ import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavo
 import { relativeTime } from '@/utils';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
-import { usernameVar, isAuthenticatedVar } from '@/cache';
+import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+
+const usernameVar = useUsername();
+const isAuthenticatedVar = useIsAuthenticated();
 // Lazy load the album component since it's not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(
   () => import('@/components/discussion/detail/DiscussionAlbum.vue')

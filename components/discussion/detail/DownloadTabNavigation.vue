@@ -4,10 +4,12 @@ import { useRouter } from 'nuxt/app';
 import type { Discussion } from '@/__generated__/graphql';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
-import { usernameVar } from '@/cache';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD } from '@/graphQLData/collection/queries';
 import PublicCollectionListItem from '@/components/collection/PublicCollectionListItem.vue';
+import { useUsername } from '@/composables/useAuthState';
+
+const usernameVar = useUsername();
 
 const props = defineProps({
   discussionId: {

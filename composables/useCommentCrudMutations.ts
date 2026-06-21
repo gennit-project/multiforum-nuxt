@@ -10,7 +10,7 @@ import {
 } from '@/graphQLData/comment/mutations';
 import { GET_COMMENT_REPLIES } from '@/graphQLData/comment/queries';
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
-import { modProfileNameVar } from '@/cache';
+import { useModProfileName } from '@/composables/useAuthState';
 
 type UseCommentCrudMutationsParams = {
   discussionId: Ref<string | undefined>;
@@ -45,6 +45,7 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
   } = params;
 
   const route = useRoute();
+  const modProfileNameVar = useModProfileName();
 
   // CREATE COMMENT mutation
   const {

@@ -13,8 +13,8 @@ vi.mock('nuxt/app', () => ({
   }),
 }));
 
-vi.mock('@/cache', () => ({
-  modProfileNameVar: { value: 'testmod' },
+vi.mock('@/composables/useAuthState', () => ({
+  useModProfileName: () => ({ value: 'testmod' }),
 }));
 
 describe('useCommentCrudMutations', () => {

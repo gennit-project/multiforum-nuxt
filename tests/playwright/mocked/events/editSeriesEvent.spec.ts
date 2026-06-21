@@ -154,7 +154,7 @@ const getCommonMocks = (username: string) => ({
 
 // NOTE: Edit tests are currently skipped because they require complex auth setup
 // with ownership verification. The mock auth system needs enhancement to properly
-// set usernameVar on page load for RequireAuth ownership checks to work.
+// set the auth username on page load for RequireAuth ownership checks to work.
 // TODO: Fix test-auth.client.ts plugin to properly sync auth state for ownership checks.
 
 test.describe.skip('Edit Series Event', () => {

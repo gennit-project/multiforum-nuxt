@@ -11,12 +11,14 @@ import SaveButton from '@/components/SaveButton.vue';
 import CancelButton from '@/components/CancelButton.vue';
 import { useMutation } from '@vue/apollo-composable';
 import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
 import CarouselThumbnail from '@/components/discussion/detail/CarouselThumbnail.vue';
 import ImageLightbox from '@/components/discussion/detail/ImageLightbox.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
+
+const usernameVar = useUsername();
 
 const route = useRoute();
 

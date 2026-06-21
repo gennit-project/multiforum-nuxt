@@ -8,7 +8,8 @@ import type { CreateEditChannelFormValues } from '@/types/Channel';
 import TailwindForm from '@/components/FormComponent.vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { MAX_CHARS_IN_CHANNEL_NAME } from '@/utils/constants';
-import { isAuthenticatedVar, isLoadingAuthVar, usernameVar } from '@/cache';
+import { isLoadingAuthVar } from '@/cache';
+import { useIsAuthenticated, useUsername } from '@/composables/useAuthState';
 // Server config query removed since individual settings pages handle validation
 
 // Import icons
@@ -21,6 +22,9 @@ import PencilIcon from '@/components/icons/PencilIcon.vue';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import AnnotationIcon from '@/components/icons/AnnotationIcon.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
+
+const isAuthenticatedVar = useIsAuthenticated();
+const usernameVar = useUsername();
 
 interface TabItem {
   key: string;

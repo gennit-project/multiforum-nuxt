@@ -4,16 +4,20 @@ import {
   setUsername,
   setModProfileName,
   setIsAuthenticated,
-  isAuthenticatedVar,
-  usernameVar,
-  modProfileNameVar,
-} from '@/cache';
+  useIsAuthenticated,
+  useUsername,
+  useModProfileName,
+} from '@/composables/useAuthState';
 import { config } from '@/config';
 
 export default defineNuxtPlugin(() => {
   if (typeof window === 'undefined') {
     return;
   }
+
+  const isAuthenticatedVar = useIsAuthenticated();
+  const usernameVar = useUsername();
+  const modProfileNameVar = useModProfileName();
 
   // Always check for mock auth data in localStorage - this is safe because
   // mock auth data is only set by test code (Playwright, Cypress)

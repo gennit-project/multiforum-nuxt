@@ -17,9 +17,11 @@ import {
   getTimeFrameFromQuery,
 } from '@/components/comments/getSortFromQuery';
 import { config } from '@/config';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import type { SearchDiscussionValues } from '@/types/Discussion';
 import type { Album, Discussion } from '@/__generated__/graphql';
+
+const usernameVar = useUsername();
 
 const DISCUSSION_PAGE_LIMIT = 15;
 
