@@ -381,11 +381,6 @@ export default defineNuxtConfig({
     },
     define: {
       global: 'globalThis',
-      // TEMP DIAGNOSTIC: surface the exact mismatching DOM node in the prod
-      // "Hydration completed but contains mismatches" warning so the remaining
-      // hydration mismatch can be pinpointed on the Vercel runtime (it does not
-      // reproduce on a local Node build). Remove once diagnosed.
-      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'true',
     },
     vue: {
       template: {
