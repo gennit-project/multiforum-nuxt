@@ -34,12 +34,10 @@ vi.mock('@/config', () => ({
   },
 }));
 
-// Mock the cache module
+// Mock the auth state module
 const mockUsernameVar = ref<string | null>(null);
-vi.mock('@/cache', () => ({
-  get usernameVar() {
-    return mockUsernameVar.value;
-  },
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => mockUsernameVar,
 }));
 
 describe('accept-admin-invite', () => {

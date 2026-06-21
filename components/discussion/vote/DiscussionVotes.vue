@@ -12,9 +12,12 @@ import NewEmojiButton from '@/components/comments/NewEmojiButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import SuperUpvoteModal from '@/components/superUpvote/SuperUpvoteModal.vue';
 import { UNDO_SUPER_UPVOTE } from '@/graphQLData/scratchpad/mutations';
-import { usernameVar, modProfileNameVar } from '@/cache';
+import { useUsername, useModProfileName } from '@/composables/useAuthState';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
+
+const usernameVar = useUsername();
+const modProfileNameVar = useModProfileName();
 
 const props = defineProps({
   discussionChannel: {

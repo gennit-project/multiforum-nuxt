@@ -16,9 +16,9 @@ vi.mock('nuxt/app', () => ({
   }),
 }));
 
-// Mock the cache for authentication
-vi.mock('@/cache', () => ({
-  isAuthenticatedVar: { value: true },
+// Mock the auth state for authentication
+vi.mock('@/composables/useAuthState', () => ({
+  useIsAuthenticated: () => ({ value: true }),
 }));
 
 // Mock the toast composable

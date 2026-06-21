@@ -19,7 +19,7 @@ import type {
   CreateReplyInputData,
 } from '@/types/Comment';
 import type { PropType } from 'vue';
-import { modProfileNameVar } from '@/cache';
+import { useModProfileName } from '@/composables/useAuthState';
 import { useRouter, useRoute } from 'nuxt/app';
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
 import LockIcon from '@/components/icons/LockIcon.vue';
@@ -40,6 +40,8 @@ import { useCommentSectionNotifications } from '@/composables/useCommentSectionN
 import { useCommentSectionModals } from '@/composables/useCommentSectionModals';
 import { useCommentFeedbackMutation } from '@/composables/useCommentFeedbackMutation';
 import { useCommentCrudMutations } from '@/composables/useCommentCrudMutations';
+
+const modProfileNameVar = useModProfileName();
 
 type CommentSectionQueryVariablesType = {
   discussionId?: string;

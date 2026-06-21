@@ -10,12 +10,16 @@ import TopNavSearch from '@/components/nav/TopNavSearch.vue';
 // import LogoIcon from "@/components/icons/LogoIcon.vue"; // Unused for now
 import { useRoute } from 'nuxt/app';
 import LoginButton from './LoginButton.vue';
+import { sideNavIsOpenVar } from '@/cache';
 import {
-  modProfileNameVar,
-  usernameVar,
-  sideNavIsOpenVar,
-  notificationCountVar,
-} from '@/cache';
+  useModProfileName,
+  useUsername,
+  useNotificationCount,
+} from '@/composables/useAuthState';
+
+const modProfileNameVar = useModProfileName();
+const usernameVar = useUsername();
+const notificationCountVar = useNotificationCount();
 
 defineEmits(['toggleDropdown']);
 

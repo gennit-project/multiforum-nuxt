@@ -2,13 +2,15 @@
 import { computed } from 'vue';
 import { GET_NOTIFICATIONS } from '@/graphQLData/notification/queries';
 import { useQuery, useMutation } from '@vue/apollo-composable';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { timeAgo } from '@/utils';
 import type { Notification } from '@/__generated__/graphql';
 import MarkdownRenderer from '../MarkdownRenderer.vue';
 import { MARK_NOTIFICATIONS_AS_READ } from '@/graphQLData/user/mutations';
 
 const NOTIFICATION_PAGE_LIMIT = 15;
+
+const usernameVar = useUsername();
 
 // Use computed for username to ensure reactivity
 const username = computed(() => usernameVar.value);

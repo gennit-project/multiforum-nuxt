@@ -13,9 +13,12 @@ vi.mock('nuxt/app', () => ({
 }));
 
 vi.mock('@/cache', () => ({
-  isAuthenticatedVar: { value: true },
   isLoadingAuthVar: { value: false },
-  usernameVar: { value: 'alice' },
+}));
+
+vi.mock('@/composables/useAuthState', () => ({
+  useIsAuthenticated: () => ({ value: true }),
+  useUsername: () => ({ value: 'alice' }),
 }));
 
 describe('CreateEditChannelFields', () => {

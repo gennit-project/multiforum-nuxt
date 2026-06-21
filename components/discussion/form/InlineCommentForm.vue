@@ -12,7 +12,7 @@ import type { NormalizedCacheObject, ApolloCache, FetchResult  } from '@apollo/c
 import { CREATE_COMMENT } from '@/graphQLData/comment/mutations';
 import { GET_DISCUSSION_COMMENTS } from '@/graphQLData/comment/queries';
 import { GET_USER } from '@/graphQLData/user/queries';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import { useRoute } from 'nuxt/app';
 import { gql } from '@apollo/client/core';
@@ -24,6 +24,8 @@ import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { getBotMentionState, filterBotSuggestions, type BotSuggestion } from '@/utils/botMentions';
 import { getModMentionState, filterModSuggestions, type ModSuggestion } from '@/utils/modMentions';
+
+const usernameVar = useUsername();
 
 const COMMENT_LIMIT = 50;
 

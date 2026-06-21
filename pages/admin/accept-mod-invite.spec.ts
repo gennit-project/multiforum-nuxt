@@ -34,17 +34,13 @@ vi.mock('@/config', () => ({
   },
 }));
 
-// Mock the cache module with reactive values
+// Mock the auth state module with reactive values
 const mockUsernameVar = ref<string | null>(null);
 const mockModProfileNameVar = ref<string | null>(null);
 
-vi.mock('@/cache', () => ({
-  get usernameVar() {
-    return mockUsernameVar.value;
-  },
-  get modProfileNameVar() {
-    return mockModProfileNameVar.value;
-  },
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => mockUsernameVar,
+  useModProfileName: () => mockModProfileNameVar,
 }));
 
 describe('accept-mod-invite', () => {

@@ -1,4 +1,21 @@
-import { vi } from 'vitest';
+import { vi, beforeEach } from 'vitest';
+import { ref } from 'vue';
+
+// Minimal request-scoped-ish useState shim for unit tests (happy-dom has no
+// Nuxt runtime). Keyed ref store, cleared between tests so auth state from one
+// test can't leak into the next. Composables in composables/useAuthState.ts call
+// useState from '#imports'; this backs them. Tests that need specific auth state
+// should mock '@/composables/useAuthState' directly.
+const __useStateStore = new Map<string, ReturnType<typeof ref>>();
+beforeEach(() => {
+  __useStateStore.clear();
+});
+const useStateShim = <T>(key: string, init?: () => T) => {
+  if (!__useStateStore.has(key)) {
+    __useStateStore.set(key, ref(init ? init() : undefined));
+  }
+  return __useStateStore.get(key) as ReturnType<typeof ref>;
+};
 
 // Suppress Vue compiler warnings
 const originalConsoleWarn = console.warn;
@@ -64,4 +81,23 @@ vi.mock('#imports', () => ({
     push: vi.fn(),
   }),
   navigateTo: vi.fn(),
+  useState: useStateShim,
+}));
+
+// composables/useAuthState.ts imports useState from 'nuxt/app'. Back it with the
+// same shim so components that exercise the real auth composables (rather than
+// mocking '@/composables/useAuthState') don't crash in happy-dom. Spec files that
+// declare their own vi.mock('nuxt/app', ...) override this for that file.
+vi.mock('nuxt/app', () => ({
+  useState: useStateShim,
+  useNuxtApp: () => ({
+    $apollo: {
+      default: { query: vi.fn().mockResolvedValue({ data: {} }) },
+    },
+  }),
+  useRoute: () => ({ params: {}, query: {} }),
+  useRouter: () => ({ push: vi.fn() }),
+  navigateTo: vi.fn(),
+  defineNuxtPlugin: (fn: unknown) => fn,
+  useRuntimeConfig: () => ({ public: {} }),
 }));

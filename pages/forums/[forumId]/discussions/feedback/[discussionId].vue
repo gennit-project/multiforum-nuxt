@@ -10,10 +10,12 @@ import FeedbackSection from '@/components/comments/FeedbackSection.vue';
 import { GET_DISCUSSION_FEEDBACK } from '@/graphQLData/discussion/queries';
 import { ADD_FEEDBACK_COMMENT_TO_COMMENT } from '@/graphQLData/comment/mutations';
 import { GET_FEEDBACK_ON_COMMENT } from '@/graphQLData/comment/queries';
-import { modProfileNameVar } from '@/cache';
+import { useModProfileName } from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
 import type { Comment, DownloadableFile } from '@/__generated__/graphql';
 import CrosspostedDiscussionEmbed from '@/components/discussion/detail/CrosspostedDiscussionEmbed.vue';
+
+const modProfileNameVar = useModProfileName();
 
 const PAGE_LIMIT = 10;
 

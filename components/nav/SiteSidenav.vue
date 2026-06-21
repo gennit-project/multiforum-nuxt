@@ -14,10 +14,14 @@ import BookmarkIcon from '@/components/icons/BookmarkIcon.vue';
 import XIcon from '@/components/icons/XmarkIcon.vue';
 import SearchIcon from '@/components/icons/SearchIcon.vue';
 import { GET_USER } from '@/graphQLData/user/queries';
-import { usernameVar, isAuthenticatedVar, setSideNavIsOpenVar } from '@/cache';
+import { setSideNavIsOpenVar } from '@/cache';
+import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
 import SiteSidenavLogout from './SiteSidenavLogout.vue';
 import { getLocalStorageItem } from '@/utils/localStorageUtils';
 import type { ForumItem } from '@/types/forum';
+
+const usernameVar = useUsername();
+const isAuthenticatedVar = useIsAuthenticated();
 
 type SearchType =
   | 'discussions'

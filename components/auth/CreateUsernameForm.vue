@@ -13,8 +13,8 @@ import {
   setUsername,
   setModProfileName,
   setIsAuthenticated,
-  setIsLoadingAuth,
-} from '@/cache';
+} from '@/composables/useAuthState';
+import { setIsLoadingAuth } from '@/cache';
 import { MAX_CHARS_IN_USERNAME } from '@/utils/constants';
 import {
   isValidUsername,

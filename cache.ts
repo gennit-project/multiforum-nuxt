@@ -103,41 +103,19 @@ const mergeByEntityKey: FieldMergeFunction<CacheEntity[]> = (
 const mergeModerators = mergeByEntityKey;
 const mergeAdmins = mergeByEntityKey;
 
-export const usernameVar = ref('');
-export const setUsername = (username: string) => {
-  usernameVar.value = username;
-};
-// The verified email from the server session. Seeded by plugins/auth-session.ts.
-// Used by the create-username flow (which keys the new User node off the email).
-export const emailVar = ref('');
-export const setEmail = (email: string) => {
-  emailVar.value = email;
-};
-export const profilePicURLVar = ref('');
-export const setProfilePicURL = (url: string) => {
-  profilePicURLVar.value = url;
-};
+// NOTE: the session-seeded auth state (isAuthenticatedVar, usernameVar,
+// emailVar, profilePicURLVar, modProfileNameVar, notificationCountVar) used to
+// live here as module-level refs. Module-level refs are SHARED across every
+// request on a server instance, so they leaked one user's auth state into
+// another user's SSR render (a privacy bug + hydration mismatch). They now live
+// in `composables/useAuthState.ts` as request-scoped `useState` values. Read
+// them with `const usernameVar = useUsername()` etc.
+
 export const userDataLoadingVar = ref(false);
-export const modProfileNameVar = ref('');
-export const setModProfileName = (modProfileName: string) => {
-  modProfileNameVar.value = modProfileName;
-};
-export const isAuthenticatedVar = ref(false);
-export const setIsAuthenticated = (status: boolean) => {
-  if (status === isAuthenticatedVar.value) {
-    return; // No change in authentication status, skip update
-  }
-  isAuthenticatedVar.value = status;
-};
 
 export const isLoadingAuthVar = ref(false);
 export const setIsLoadingAuth = (status: boolean) => {
   isLoadingAuthVar.value = status;
-};
-
-export const notificationCountVar = ref(0);
-export const setNotificationCount = (count: number) => {
-  notificationCountVar.value = count;
 };
 
 export const sideNavIsOpenVar = ref(false);

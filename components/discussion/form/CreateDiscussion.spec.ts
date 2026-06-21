@@ -2,7 +2,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import CreateDiscussion from '@/components/discussion/form/CreateDiscussion.vue';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
+
+const { mockUsername } = vi.hoisted(() => {
+  const { ref } = require('vue');
+  return { mockUsername: ref('alice') };
+});
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => mockUsername,
+  setUsername: vi.fn(),
+}));
 
 const mockPush = vi.fn();
 const onDoneCallbacks: Array<(data: any) => void> = [];
@@ -45,7 +54,7 @@ describe('CreateDiscussion', () => {
   beforeEach(() => {
     onDoneCallbacks.length = 0;
     mockPush.mockReset();
-    usernameVar.value = 'alice';
+    useUsername().value = 'alice';
   });
 
   it('only shows suspension info after submit attempt', async () => {

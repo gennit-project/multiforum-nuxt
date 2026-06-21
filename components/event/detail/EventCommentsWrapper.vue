@@ -9,7 +9,7 @@ import type {
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import CommentSection from '@/components/comments/CommentSection.vue';
 import type { CreateEditCommentFormValues } from '@/types/Comment';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import type { ApolloCache } from '@apollo/client/core';
@@ -23,6 +23,8 @@ import {
 import Notification from '@/components/NotificationComponent.vue';
 import EventNotificationsMenu from './EventNotificationsMenu.vue';
 import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
+
+const usernameVar = useUsername();
 
 const COMMENT_LIMIT = 50;
 

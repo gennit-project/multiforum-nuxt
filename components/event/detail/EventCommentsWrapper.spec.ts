@@ -34,10 +34,15 @@ vi.mock('@/composables/useToast', () => ({
   }),
 }));
 
-vi.mock('@/cache', () => ({
-  usernameVar: { value: 'alice' },
-  isAuthenticatedVar: { value: true },
-}));
+vi.mock('@/composables/useAuthState', () => {
+  const { ref } = require('vue');
+  return {
+    useUsername: () => ref('alice'),
+    useIsAuthenticated: () => ref(true),
+    setUsername: vi.fn(),
+    setIsAuthenticated: vi.fn(),
+  };
+});
 
 vi.mock('@/components/comments/getSortFromQuery', async (importOriginal) => {
   const actual = await importOriginal();

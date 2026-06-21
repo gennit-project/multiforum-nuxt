@@ -11,8 +11,10 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import type { Event, CommentCreateInput } from '@/__generated__/graphql';
 import type { CreateEditCommentFormValues } from '@/types/Comment';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
+
+const usernameVar = useUsername();
 
 const COMMENT_LIMIT = 50;
 const props = defineProps({

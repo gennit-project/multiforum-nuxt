@@ -15,8 +15,10 @@ import type {
   EventTagsConnectOrCreateFieldInput,
   Event,
 } from '@/__generated__/graphql';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
+
+const usernameVar = useUsername();
 
 const now = DateTime.now();
 const route = useRoute();

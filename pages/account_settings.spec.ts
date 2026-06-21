@@ -40,8 +40,8 @@ vi.mock('vue-i18n', () => ({
 
 vi.mock('nuxt/app', () => ({}));
 
-vi.mock('@/cache', () => ({
-  usernameVar: { value: 'alice' },
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => ({ value: 'alice' }),
 }));
 
 vi.mock('@/config', () => ({

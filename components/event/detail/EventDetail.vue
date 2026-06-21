@@ -34,10 +34,13 @@ import EventRootCommentFormWrapper from '@/components/event/detail/EventRootComm
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import EventChannelLinks from '@/components/event/detail/EventChannelLinks.vue';
 import { useRoute, useHead } from 'nuxt/app';
-import { modProfileNameVar, usernameVar } from '@/cache';
+import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import AddToCalendarButton from '../AddToCalendarButton.vue';
 import ArchivedEventInfoBanner from './ArchivedEventInfoBanner.vue';
 import { getOriginalPoster } from '@/utils/originalPoster';
+
+const modProfileNameVar = useModProfileName();
+const usernameVar = useUsername();
 
 const formatDate = formatEventDate;
 

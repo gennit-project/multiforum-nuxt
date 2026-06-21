@@ -10,7 +10,9 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import GoBack from '@/components/GoBack.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
+
+const usernameVar = useUsername();
 
 const route = useRoute();
 const router = useRouter();

@@ -11,7 +11,10 @@ import type { Comment } from '@/__generated__/graphql';
 import VotesComponent from './Votes.vue';
 import SuperUpvoteModal from '@/components/superUpvote/SuperUpvoteModal.vue';
 import { UNDO_SUPER_UPVOTE } from '@/graphQLData/scratchpad/mutations';
-import { modProfileNameVar, usernameVar } from '@/cache';
+import { useModProfileName, useUsername } from '@/composables/useAuthState';
+
+const modProfileNameVar = useModProfileName();
+const usernameVar = useUsername();
 
 const props = defineProps({
   commentData: {

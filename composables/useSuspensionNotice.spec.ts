@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { usernameVar } from '@/cache';
 import {
   useChannelSuspensionNotice,
   useServerSuspensionNotice,
@@ -9,6 +8,15 @@ import {
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
+}));
+
+const { mockUsername } = vi.hoisted(() => ({
+  mockUsername: { value: 'alice' },
+}));
+const usernameVar = mockUsername;
+
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => mockUsername,
 }));
 
 describe('useSuspensionNotice', () => {

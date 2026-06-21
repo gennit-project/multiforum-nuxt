@@ -1,3 +1,4 @@
+import { ref } from 'vue';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import EditContentModal from './EditContentModal.vue';
@@ -48,6 +49,7 @@ vi.mock('@vue/apollo-composable', () => ({
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({ params: { forumId: 'test-channel' } }),
+  useState: (_k, init) => ref(init ? init() : undefined),
 }));
 
 vi.mock('@headlessui/vue', () => ({

@@ -10,7 +10,6 @@ import { computed, ref, onMounted } from 'vue';
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import type { CreateEditCommentFormValues } from '@/types/Comment';
 import CommentSection from '@/components/comments/CommentSection.vue';
-import { usernameVar } from '@/cache';
 import { useRoute } from 'nuxt/app';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import {
@@ -25,6 +24,9 @@ import DiscussionRootCommentFormWrapper from '@/components/discussion/form/Discu
 import { buildBotMentionOptions } from '@/utils/botMentions';
 import { buildModMentionOptions } from '@/utils/modMentions';
 import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
+import { useUsername } from '@/composables/useAuthState';
+
+const usernameVar = useUsername();
 
 const COMMENT_LIMIT = 50;
 

@@ -13,10 +13,8 @@ vi.mock('@vue/apollo-composable', () => ({
   useMutation: vi.fn(),
 }));
 
-vi.mock('@/cache', () => ({
-  modProfileNameVar: {
-    value: 'testmod',
-  },
+vi.mock('@/composables/useAuthState', () => ({
+  useModProfileName: () => ({ value: 'testmod' }),
 }));
 
 vi.mock('@/components/comments/getSortFromQuery', () => ({

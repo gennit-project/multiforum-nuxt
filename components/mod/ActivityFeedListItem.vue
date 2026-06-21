@@ -23,7 +23,7 @@ import TrashIcon from '../icons/TrashIcon.vue';
 import { ActionType } from '@/types/Comment';
 import { useMutation } from '@vue/apollo-composable';
 import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
-import { modProfileNameVar, usernameVar } from '@/cache';
+import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import RevisionDiffInline from '@/components/mod/RevisionDiffInline.vue';
 import { getForumRoleBadge } from '@/utils/forumRoleBadges';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
@@ -33,6 +33,9 @@ import SuspendModButton from '@/components/mod/SuspendModButton.vue';
 import MenuButton from '@/components/MenuButton.vue';
 import type { MenuItemType } from '@/components/IconButtonDropdown.vue';
 import EllipsisHorizontal from '@/components/icons/EllipsisHorizontal.vue';
+
+const modProfileNameVar = useModProfileName();
+const usernameVar = useUsername();
 
 
 const actionTypeToIcon: Record<string, Component> = {

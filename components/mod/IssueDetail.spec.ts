@@ -55,10 +55,17 @@ vi.mock('nuxt/app', () => ({
   }),
 }));
 
-vi.mock('@/cache', () => ({
-  usernameVar: { value: 'alice' },
-  modProfileNameVar: { value: 'mod-alice' },
-}));
+vi.mock('@/composables/useAuthState', () => {
+  const { ref } = require('vue');
+  return {
+    useUsername: () => ref('alice'),
+    useModProfileName: () => ref('mod-alice'),
+    useIsAuthenticated: () => ref(true),
+    setUsername: vi.fn(),
+    setModProfileName: vi.fn(),
+    setIsAuthenticated: vi.fn(),
+  };
+});
 
 vi.mock('@/utils/permissionUtils', () => ({
   getAllPermissions: () => ({

@@ -7,7 +7,9 @@ import {
 } from '@/graphQLData/scratchpad/queries';
 import ScratchpadEntry from './ScratchpadEntry.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
+
+const usernameVar = useUsername();
 
 const props = defineProps({
   username: {

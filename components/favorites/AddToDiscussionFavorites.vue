@@ -6,10 +6,12 @@ import {
   ADD_FAVORITE_DISCUSSION,
   REMOVE_FAVORITE_DISCUSSION,
 } from '@/graphQLData/user/mutations';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { useToastStore } from '@/stores/toastStore';
 import { useAddToListModalStore, type AllowedItemType } from '@/stores/addToListModalStore';
 import AddToFavoritesButton from '@/components/favorites/AddToFavoritesButton.vue';
+
+const usernameVar = useUsername();
 
 const props = defineProps({
   discussionId: {
