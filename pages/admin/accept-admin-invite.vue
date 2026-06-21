@@ -4,12 +4,14 @@ import { useMutation } from '@vue/apollo-composable';
 import { useRouter } from 'nuxt/app';
 import { config } from '@/config';
 import { ACCEPT_SERVER_ADMIN_INVITE } from '@/graphQLData/admin/mutations';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
   middleware: 'auth',
 });
+
+const usernameVar = useUsername();
 
 const router = useRouter();
 const accepted = ref(false);

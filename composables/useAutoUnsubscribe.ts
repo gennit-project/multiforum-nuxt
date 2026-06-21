@@ -1,7 +1,7 @@
 import { ref, watch, type Ref } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useToast } from './useToast';
-import { isAuthenticatedVar } from '@/cache';
+import { useIsAuthenticated } from '@/composables/useAuthState';
 
 type UseAutoUnsubscribeParams = {
   /** The entity ID (discussion channel ID, event channel ID, etc.) */
@@ -24,6 +24,8 @@ export function useAutoUnsubscribe(params: UseAutoUnsubscribeParams) {
   const route = useRoute();
   const router = useRouter();
   const { success, info } = useToast();
+
+  const isAuthenticatedVar = useIsAuthenticated();
 
   const hasHandledUnsubscribe = ref(false);
   const isProcessing = ref(false);

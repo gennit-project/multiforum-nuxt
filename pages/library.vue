@@ -9,7 +9,10 @@ import {
   GET_USER_OWNED_DOWNLOADS_COUNT,
 } from '@/graphQLData/user/queries';
 import { GET_ALL_USER_COLLECTIONS } from '@/graphQLData/collection/queries';
-import { usernameVar, isAuthenticatedVar } from '@/cache';
+import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
+
+const usernameVar = useUsername();
+const isAuthenticatedVar = useIsAuthenticated();
 
 useHead({
   title: 'Library',

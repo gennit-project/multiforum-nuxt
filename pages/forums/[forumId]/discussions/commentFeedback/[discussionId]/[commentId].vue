@@ -10,8 +10,10 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
 import CommentHeader from '@/components/comments/CommentHeader.vue';
 import FeedbackSection from '@/components/comments/FeedbackSection.vue';
-import { modProfileNameVar } from '@/cache';
+import { useModProfileName } from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
+
+const modProfileNameVar = useModProfileName();
 
 const PAGE_LIMIT = 10;
 

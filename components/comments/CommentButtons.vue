@@ -16,8 +16,11 @@ import NewEmojiButton from './NewEmojiButton.vue';
 import AddToCommentFavorites from '@/components/favorites/AddToCommentFavorites.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
-import { usernameVar, modProfileNameVar } from '@/cache';
+import { useUsername, useModProfileName } from '@/composables/useAuthState';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
+
+const usernameVar = useUsername();
+const modProfileNameVar = useModProfileName();
 
 const props = defineProps({
   commentData: {

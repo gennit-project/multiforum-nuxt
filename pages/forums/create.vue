@@ -11,9 +11,11 @@ import type {
   ChannelTagsConnectOrCreateFieldInput,
 } from '@/__generated__/graphql';
 import type { CreateEditChannelFormValues } from '@/types/Channel';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { useRouter } from 'nuxt/app';
 import { useServerSuspensionNotice } from '@/composables/useSuspensionNotice';
+
+const usernameVar = useUsername();
 
 const router = useRouter();
 

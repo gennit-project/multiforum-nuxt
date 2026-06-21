@@ -9,7 +9,7 @@ import LoadMore from '../../LoadMore.vue';
 import ErrorBanner from '../../ErrorBanner.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/graphQLData/discussion/queries';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { getFilterValuesFromParams } from '@/components/discussion/list/getDiscussionFilterValuesFromParams';
 import {
   getSortFromQuery,
@@ -17,6 +17,8 @@ import {
 } from '@/components/comments/getSortFromQuery';
 import { useAppTheme } from '@/composables/useTheme';
 import type { DiscussionChannel } from '@/__generated__/graphql';
+
+const usernameVar = useUsername();
 
 const { theme } = useAppTheme();
 

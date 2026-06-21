@@ -4,7 +4,10 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
 import AlbumEditor from '@/components/discussion/form/AlbumEditor.vue';
 
-vi.mock('@/cache', () => ({ usernameVar: { value: 'alice' } }));
+vi.mock('@/composables/useAuthState', () => {
+  const { ref } = require('vue');
+  return { useUsername: () => ref('alice'), setUsername: vi.fn() };
+});
 vi.mock('@/composables/useAlbumImageUpload', () => ({
   useAlbumImageUpload: () => ({
     loadingStates: ref({}),

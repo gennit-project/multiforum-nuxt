@@ -10,12 +10,15 @@ import { GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS } from '@/graphQLData/collec
 import SearchBar from '@/components/SearchBar.vue';
 import type { PropType } from 'vue';
 import SearchableForumListItem from './SearchableForumListItem.vue';
-import { usernameVar, isAuthenticatedVar } from '@/cache';
+import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
 import {
   areAllChannelsSelected,
   getChannelsToToggle,
   filterChannelsBySearch,
 } from '@/utils/channelSelection';
+
+const usernameVar = useUsername();
+const isAuthenticatedVar = useIsAuthenticated();
 
 // Define props
 const props = defineProps({

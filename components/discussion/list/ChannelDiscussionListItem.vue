@@ -22,9 +22,12 @@ import { storeToRefs } from 'pinia';
 import { useUIStore } from '@/stores/uiStore';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
-import { usernameVar, isAuthenticatedVar } from '@/cache';
+import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+
+const usernameVar = useUsername();
+const isAuthenticatedVar = useIsAuthenticated();
 // UI state is now handled via props
 // Lazy load the album component since it's not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(

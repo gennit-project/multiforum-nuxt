@@ -11,8 +11,10 @@ import FormRow from '@/components/FormRow.vue';
 import CheckBox from '@/components/CheckBox.vue';
 import type { UserUpdateInput } from '@/__generated__/graphql';
 import type { EditAccountSettingsFormValues } from '@/types/User';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { config } from '@/config';
+
+const usernameVar = useUsername();
 
 const enableLanguagePicker = config.enableLanguagePicker;
 

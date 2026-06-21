@@ -41,8 +41,8 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 
-vi.mock('@/cache', () => ({
-  usernameVar: { value: 'alice' },
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => ({ value: 'alice' }),
 }));
 
 vi.mock('@/composables/useCommentPermissions', () => ({

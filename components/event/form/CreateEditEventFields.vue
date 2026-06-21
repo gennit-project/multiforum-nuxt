@@ -31,7 +31,7 @@ import { useMutation } from '@vue/apollo-composable';
 import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
 import ForumPicker from '@/components/channel/ForumPicker.vue';
 import TagPicker from '@/components/TagPicker.vue';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import {
   EVENT_TITLE_CHAR_LIMIT,
   MAX_CHARS_IN_EVENT_DESCRIPTION,
@@ -42,6 +42,8 @@ import {
 } from '@/utils/eventFormValidation';
 import type { PropType } from 'vue';
 import { isFileSizeValid } from '@/utils/index';
+
+const usernameVar = useUsername();
 
 type FileChangeInput = {
   // event of HTMLInputElement;

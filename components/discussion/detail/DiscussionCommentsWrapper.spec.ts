@@ -17,7 +17,9 @@ vi.mock('@vue/apollo-composable', () => ({
   useMutation: vi.fn(),
 }));
 vi.mock('nuxt/app', () => ({ useRoute: vi.fn(() => ({ params: {}, query: {} })) }));
-vi.mock('@/cache', () => ({ usernameVar: { value: 'alice' } }));
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => ({ value: 'alice' }),
+}));
 vi.mock('@/composables/useAutoUnsubscribe', () => ({ useAutoUnsubscribe: vi.fn() }));
 
 const CommentSectionStub = {

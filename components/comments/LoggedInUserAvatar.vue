@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { GET_USER } from '@/graphQLData/user/queries';
 import AvatarComponent from '../AvatarComponent.vue';
-import { usernameVar } from '@/cache';
 import { useQuery } from '@vue/apollo-composable';
 import { computed } from 'vue';
+import { useUsername } from '@/composables/useAuthState';
+
+const usernameVar = useUsername();
 
 const { result: getUserResult } = useQuery(
   GET_USER,

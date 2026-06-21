@@ -13,13 +13,15 @@ import type { NormalizedCacheObject, ApolloCache, FetchResult  } from '@apollo/c
 import { CREATE_COMMENT } from '@/graphQLData/comment/mutations';
 import { GET_DISCUSSION_COMMENTS } from '@/graphQLData/comment/queries';
 import { GET_USER } from '@/graphQLData/user/queries';
-import { usernameVar } from '@/cache';
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import { useRoute } from 'nuxt/app';
 import { gql } from '@apollo/client/core';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import type { BotSuggestion } from '@/utils/botMentions';
 import type { ModSuggestion } from '@/utils/modMentions';
+import { useUsername } from '@/composables/useAuthState';
+
+const usernameVar = useUsername();
 
 defineOptions({ inheritAttrs: false });
 

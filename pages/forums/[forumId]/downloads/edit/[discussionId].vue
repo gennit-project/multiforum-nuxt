@@ -22,9 +22,11 @@ import type {
   Image,
   FilterOption,
 } from '@/__generated__/graphql';
-import { modProfileNameVar } from '@/cache';
+import { useModProfileName } from '@/composables/useAuthState';
 import { resolveSelectedLabelOptionIds } from '@/utils/downloadLabelUtils';
 import { buildAlbumUpdateInput } from '@/utils/albumUpdateInput';
+
+const modProfileNameVar = useModProfileName();
 
 const route = useRoute();
 const router = useRouter();

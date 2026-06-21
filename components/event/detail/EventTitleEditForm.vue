@@ -9,10 +9,13 @@ import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/event/mutat
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import { GET_EVENT } from '@/graphQLData/event/queries';
-import { modProfileNameVar, usernameVar } from '@/cache';
+import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { EVENT_TITLE_CHAR_LIMIT } from '@/utils/constants';
 import { useAppTheme } from '@/composables/useTheme';
 import { useRoute } from 'nuxt/app';
+
+const modProfileNameVar = useModProfileName();
+const usernameVar = useUsername();
 
 const route = useRoute();
 const titleEditMode = ref(false);

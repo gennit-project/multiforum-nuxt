@@ -10,10 +10,12 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import { GET_ISSUE } from '@/graphQLData/issue/queries';
 import { DISCUSSION_TITLE_CHAR_LIMIT } from '@/utils/constants';
-import { modProfileNameVar } from '@/cache';
+import { useModProfileName } from '@/composables/useAuthState';
 import { useAppTheme } from '@/composables/useTheme';
 import { useRoute } from 'nuxt/app';
 import IssueBadge from '@/components/mod/IssueBadge.vue';
+
+const modProfileNameVar = useModProfileName();
 
 const { theme } = useAppTheme();
 

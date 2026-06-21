@@ -27,7 +27,6 @@ import DiscussionCommentsWrapper from '@/components/discussion/detail/Discussion
 import DiscussionChannelLinks from '@/components/discussion/detail/DiscussionChannelLinks.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
-import { isAuthenticatedVar, modProfileNameVar, usernameVar } from '@/cache';
 import { useRoute } from 'nuxt/app';
 import DiscussionBodyEditForm from './DiscussionBodyEditForm.vue';
 import AlbumEditForm from './AlbumEditForm.vue';
@@ -35,6 +34,15 @@ import ArchivedDiscussionInfoBanner from './ArchivedDiscussionInfoBanner.vue';
 import DiscussionLayoutManager from './DiscussionLayoutManager.vue';
 import FeedbackModalManager from './FeedbackModalManager.vue';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
+import {
+  useIsAuthenticated,
+  useModProfileName,
+  useUsername,
+} from '@/composables/useAuthState';
+
+const isAuthenticatedVar = useIsAuthenticated();
+const modProfileNameVar = useModProfileName();
+const usernameVar = useUsername();
 
 const COMMENT_LIMIT = 50;
 

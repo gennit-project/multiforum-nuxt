@@ -7,10 +7,12 @@ import {
   ADD_FAVORITE_COMMENT,
   REMOVE_FAVORITE_COMMENT,
 } from '@/graphQLData/user/mutations';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { useToastStore } from '@/stores/toastStore';
 import { useAddToListModalStore } from '@/stores/addToListModalStore';
 import AddToFavoritesButton from '@/components/favorites/AddToFavoritesButton.vue';
+
+const usernameVar = useUsername();
 
 const props = defineProps({
   allowAddToList: {

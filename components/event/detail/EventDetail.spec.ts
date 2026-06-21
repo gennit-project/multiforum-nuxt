@@ -18,10 +18,15 @@ vi.mock('nuxt/app', () => ({
   useRoute: vi.fn(() => ({ params: {}, query: {} })),
   useHead: vi.fn(),
 }));
-vi.mock('@/cache', () => ({
-  modProfileNameVar: { value: '' },
-  usernameVar: { value: '' },
-}));
+vi.mock('@/composables/useAuthState', () => {
+  const { ref } = require('vue');
+  return {
+    useModProfileName: () => ref(''),
+    useUsername: () => ref(''),
+    setModProfileName: vi.fn(),
+    setUsername: vi.fn(),
+  };
+});
 
 const eventChannel = {
   id: 'ec1',

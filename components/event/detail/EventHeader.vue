@@ -27,7 +27,7 @@ import { getEventHeaderMenuItems } from '@/utils/headerPermissionUtils';
 import { formatEventDateString } from '@/utils/eventDateFormat';
 import GenericFeedbackFormModal from '@/components/GenericFeedbackFormModal.vue';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
-import { modProfileNameVar, usernameVar } from '@/cache';
+import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { useRoute, useRouter } from 'nuxt/app';
 import InfoBanner from '@/components/InfoBanner.vue';
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
@@ -40,6 +40,9 @@ import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
+
+const modProfileNameVar = useModProfileName();
+const usernameVar = useUsername();
 
 const props = defineProps({
   eventData: {

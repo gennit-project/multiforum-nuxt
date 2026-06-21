@@ -27,7 +27,7 @@ import IssueCommentForm from '@/components/mod/IssueCommentForm.vue';
 import IssueBodyEditor from '@/components/mod/IssueBodyEditor.vue';
 import IssueRelatedContent from '@/components/mod/IssueRelatedContent.vue';
 import IssueRelatedChannel from '@/components/mod/IssueRelatedChannel.vue';
-import { modProfileNameVar, usernameVar } from '@/cache';
+import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { useRoute, useRouter } from 'nuxt/app';
 import { config } from '@/config';
 import {
@@ -51,6 +51,9 @@ import GenericButton from '@/components/GenericButton.vue';
 import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
+
+const modProfileNameVar = useModProfileName();
+const usernameVar = useUsername();
 
 type Issue = GeneratedIssue & {
   issueNumber: number;

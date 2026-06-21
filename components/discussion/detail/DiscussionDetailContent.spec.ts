@@ -13,10 +13,10 @@ import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDe
 
 vi.mock('@vue/apollo-composable', () => ({ useQuery: vi.fn() }));
 vi.mock('nuxt/app', () => ({ useRoute: vi.fn(() => ({ params: {}, query: {} })) }));
-vi.mock('@/cache', () => ({
-  isAuthenticatedVar: { value: false },
-  modProfileNameVar: { value: '' },
-  usernameVar: { value: '' },
+vi.mock('@/composables/useAuthState', () => ({
+  useIsAuthenticated: () => ({ value: false }),
+  useModProfileName: () => ({ value: '' }),
+  useUsername: () => ({ value: '' }),
 }));
 vi.mock('@/composables/useForumRoleMembership', () => ({
   provideForumRoleMembership: vi.fn(),

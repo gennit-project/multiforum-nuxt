@@ -12,8 +12,11 @@ import LockChannelDialog from '@/components/mod/LockChannelDialog.vue';
 import UnlockChannelDialog from '@/components/mod/UnlockChannelDialog.vue';
 import { useRoute } from 'nuxt/app';
 import { config } from '@/config';
-import { usernameVar, modProfileNameVar } from '@/cache';
+import { useUsername, useModProfileName } from '@/composables/useAuthState';
 import { checkPermission } from '@/utils/permissionUtils';
+
+const usernameVar = useUsername();
+const modProfileNameVar = useModProfileName();
 
 const route = useRoute();
 const channelId = computed(() => {

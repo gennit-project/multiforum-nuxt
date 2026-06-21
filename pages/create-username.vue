@@ -4,14 +4,18 @@ import { useRouter } from 'vue-router';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_EMAIL } from '@/graphQLData/email/queries';
 import type { Email } from '@/__generated__/graphql';
+import { userDataLoadingVar } from '@/cache';
 import {
-  usernameVar,
-  userDataLoadingVar,
-  isAuthenticatedVar,
-  emailVar,
-} from '@/cache';
+  useUsername,
+  useIsAuthenticated,
+  useEmail,
+} from '@/composables/useAuthState';
 import CreateUsernameForm from '@/components/auth/CreateUsernameForm.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
+
+const usernameVar = useUsername();
+const isAuthenticatedVar = useIsAuthenticated();
+const emailVar = useEmail();
 
 // Auth state + verified email come from the server session (cache vars seeded by
 // plugins/auth-session.ts), not the SPA.

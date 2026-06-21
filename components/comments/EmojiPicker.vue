@@ -5,7 +5,9 @@ import { useMutation } from '@vue/apollo-composable';
 import { ADD_EMOJI_TO_COMMENT } from '@/graphQLData/comment/mutations';
 import { ADD_EMOJI_TO_DISCUSSION_CHANNEL } from '@/graphQLData/discussion/mutations';
 
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
+
+const usernameVar = useUsername();
 // Mutation to add emoji to comment
 const { mutate: addEmojiToComment } = useMutation(ADD_EMOJI_TO_COMMENT);
 

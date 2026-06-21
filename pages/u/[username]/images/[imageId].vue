@@ -13,13 +13,15 @@ import LinkIcon from '@/components/icons/LinkIcon.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import AddImageToFavorites from '@/components/favorites/AddImageToFavorites.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import TextEditor from '@/components/TextEditor.vue';
 import SaveButton from '@/components/SaveButton.vue';
 import CancelButton from '@/components/CancelButton.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import AlbumThumbnailGrid from '@/components/album/AlbumThumbnailGrid.vue';
 import { useImageZoomPan } from '@/composables/useImageZoomPan';
+
+const usernameVar = useUsername();
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({

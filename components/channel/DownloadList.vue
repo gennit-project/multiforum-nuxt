@@ -11,7 +11,7 @@ import ErrorBanner from '../ErrorBanner.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import DiscussionAlbum from '@/components/discussion/detail/DiscussionAlbum.vue';
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/graphQLData/discussion/queries';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { getFilterValuesFromParams } from '@/components/event/list/filters/getEventFilterValuesFromParams';
 import {
   getSortFromQuery,
@@ -19,6 +19,8 @@ import {
 } from '@/components/comments/getSortFromQuery';
 import { convertUrlParamsToLabelFilters } from '@/utils/downloadFilters';
 import type { Discussion, Album, FilterGroup } from '@/__generated__/graphql';
+
+const usernameVar = useUsername();
 
 const DOWNLOAD_PAGE_LIMIT = 25;
 

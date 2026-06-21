@@ -2,13 +2,15 @@
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useHead } from 'nuxt/app';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { GET_USER_FAVORITE_CHANNELS } from '@/graphQLData/user/queries';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';
 import ExpandableImage from '@/components/ExpandableImage.vue';
 import Tag from '@/components/TagComponent.vue';
 import AddToChannelFavorites from '@/components/favorites/AddToChannelFavorites.vue';
+
+const usernameVar = useUsername();
 
 useHead({
   title: 'Favorite Forums - Library',

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import AddToChannelFavorites from '@/components/favorites/AddToChannelFavorites.vue';
-import { isAuthenticatedVar } from '@/cache';
+import { useIsAuthenticated } from '@/composables/useAuthState';
+
+const isAuthenticatedVar = useIsAuthenticated();
 
 defineProps({
   channelId: {

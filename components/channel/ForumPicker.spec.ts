@@ -17,10 +17,10 @@ vi.mock('@/graphQLData/channel/queries', () => ({
   GET_USER_FAVORITE_CHANNELS: {},
 }));
 
-// Mock cache
-vi.mock('@/cache', () => ({
-  usernameVar: ref(''),
-  isAuthenticatedVar: ref(false),
+// Mock auth state
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => ref(''),
+  useIsAuthenticated: () => ref(false),
 }));
 
 // Use real MultiSelect component

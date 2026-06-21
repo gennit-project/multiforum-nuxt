@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useHead } from 'nuxt/app';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { gql } from '@apollo/client/core';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
@@ -12,6 +12,8 @@ import { relativeTime } from '@/utils';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+
+const usernameVar = useUsername();
 
 // Types for favorite downloads
 interface DiscussionChannel {

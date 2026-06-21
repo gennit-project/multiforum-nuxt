@@ -3,7 +3,7 @@ import { computed, defineAsyncComponent } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { gql } from '@apollo/client/core';
 import { useHead } from 'nuxt/app';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import TagComponent from '@/components/TagComponent.vue';
@@ -22,6 +22,8 @@ import type {
   Image,
   Channel,
 } from '@/__generated__/graphql';
+
+const usernameVar = useUsername();
 
 // Partial types matching the query shape (using generated types as base)
 type FavoriteDiscussionChannel = Pick<

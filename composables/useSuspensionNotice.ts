@@ -4,7 +4,7 @@ import {
   GET_USER_ACTIVE_SUSPENSIONS,
   GET_USER_SUSPENSION_IN_CHANNEL,
 } from '@/graphQLData/user/queries';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 
 type ChannelSuspension = {
   suspendedUntil?: string | null;
@@ -19,6 +19,7 @@ type ServerSuspension = ChannelSuspension & {
 export const useChannelSuspensionNotice = (
   channelUniqueName: Ref<string> | string
 ) => {
+  const usernameVar = useUsername();
   const channelId = computed(() =>
     typeof channelUniqueName === 'string'
       ? channelUniqueName
@@ -57,6 +58,7 @@ export const useChannelSuspensionNotice = (
 };
 
 export const useServerSuspensionNotice = () => {
+  const usernameVar = useUsername();
   const nowIso = new Date().toISOString();
 
   const { result } = useQuery(

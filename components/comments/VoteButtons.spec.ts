@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
-import { createCacheMock } from '@/tests/utils/mockAuth';
+import { createAuthStateMock } from '@/tests/utils/mockAuth';
 import { makeComment } from '@/tests/utils/factories';
 import VotesComponent from '@/components/comments/Votes.vue';
 import type { Comment } from '@/__generated__/graphql';
@@ -17,7 +17,9 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 
-vi.mock('@/cache', () => createCacheMock({ username: 'alice' }));
+vi.mock('@/composables/useAuthState', () =>
+  createAuthStateMock({ username: 'alice' })
+);
 
 const comment = (overrides: Record<string, unknown>): Comment =>
   makeComment(overrides as Partial<Comment>);
