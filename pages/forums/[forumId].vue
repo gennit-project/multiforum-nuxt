@@ -124,6 +124,8 @@ const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
+const currentHour = () => DateTime.utc().startOf('hour').toISO();
+
 const {
   result: getChannelResult,
   onResult: onGetChannelResult,
@@ -131,15 +133,15 @@ const {
   refetch: refetchChannel,
 } = useQuery(
   GET_CHANNEL,
-  {
-    uniqueName: channelId,
-    // Using luxon, round down to the nearest hour
-    now: DateTime.local().startOf('hour').toISO(),
-  },
+  () => ({
+    uniqueName: channelId.value,
+    // Keep SSR/client Apollo variables identical during hydration.
+    now: currentHour(),
+  }),
   {
     fetchPolicy: 'cache-first',
     nextFetchPolicy: 'cache-first',
-    enabled: !!channelId.value,
+    enabled: computed(() => !!channelId.value),
   }
 );
 
@@ -150,13 +152,13 @@ const channel = computed(() => {
 // Get download count separately since we can't query the same field twice
 const { result: downloadCountResult } = useQuery(
   GET_CHANNEL_DOWNLOAD_COUNT,
-  {
-    uniqueName: channelId,
-  },
+  () => ({
+    uniqueName: channelId.value,
+  }),
   {
     fetchPolicy: 'cache-first',
     nextFetchPolicy: 'cache-first',
-    enabled: !!channelId.value,
+    enabled: computed(() => !!channelId.value),
   }
 );
 
