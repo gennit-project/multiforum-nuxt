@@ -177,13 +177,15 @@ const isDownloadDetailPage = computed(() => {
           class="ml-1 mt-1 flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
         >
           <slot />
-          <span
-            v-if="answered"
-            class="mr-1 flex items-center gap-1 rounded-full border border-green-500 px-2 py-1 text-xs text-green-500 dark:border-green-400 dark:text-green-400"
-            aria-label="This discussion has been answered"
-          >
-            <CheckCircleIcon class="h-4 w-4" /> Answered
-          </span>
+          <ClientOnly>
+            <span
+              v-if="answered"
+              class="mr-1 flex items-center gap-1 rounded-full border border-green-500 px-2 py-1 text-xs text-green-500 dark:border-green-400 dark:text-green-400"
+              aria-label="This discussion has been answered"
+            >
+              <CheckCircleIcon class="h-4 w-4" /> Answered
+            </span>
+          </ClientOnly>
         </p>
       </div>
       <RequireAuth class="hidden md:block" :full-width="false">
