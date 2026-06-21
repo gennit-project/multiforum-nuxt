@@ -381,11 +381,6 @@ export default defineNuxtConfig({
     },
     define: {
       global: 'globalThis',
-      // TEMPORARY (debugging): make the production build log DETAILED hydration
-      // mismatch info (which element + server-vs-client values) instead of the
-      // generic "Hydration completed but contains mismatches". Remove once the
-      // forum-detail-page mismatch is diagnosed.
-      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'true',
     },
     vue: {
       template: {
