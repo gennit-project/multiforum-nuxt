@@ -18,8 +18,8 @@ vi.mock('nuxt/app', () => ({
   useRoute: vi.fn(() => ({ params: {}, query: {} })),
   useHead: vi.fn(),
 }));
-vi.mock('@/composables/useAuthState', () => {
-  const { ref } = require('vue');
+vi.mock('@/composables/useAuthState', async () => {
+  const { ref } = await import('vue');
   return {
     useModProfileName: () => ref(''),
     useUsername: () => ref(''),
