@@ -1,30 +1,26 @@
-// TEMP DIAGNOSTIC (remove after): capture the hydration mismatch + the client's
-// first-render of the content wrapper on the Vercel runtime, where the mismatch
-// reproduces (it does not on a local Node build). Read window.__hyd /
-// window.__firstRender / window.__authVars off the live page.
+// TEMP DIAGNOSTIC (remove after): pinpoint the residual hydration mismatch on
+// the Vercel runtime. Captures (a) the Vue warnings, and (b) the DOM mutations
+// Vue makes to lg:pl-20 right after hydration — the nodes it REMOVES are the
+// "server more children" extras (the mismatch). Read window.__hyd / __mut.
 import { defineNuxtPlugin } from 'nuxt/app';
-import {
-  useUsername,
-  useModProfileName,
-  useIsAuthenticated,
-} from '@/composables/useAuthState';
 
 export default defineNuxtPlugin((nuxtApp) => {
   if (typeof window === 'undefined') return;
   const w = window as any;
   w.__hyd = [];
+  w.__mut = [];
   const ow = console.warn;
   const oe = console.error;
-  const ser = (a: any) =>
-    a && a.nodeType === 1
-      ? 'EL<' + a.tagName.toLowerCase() + ' class="' + (a.getAttribute('class') || '') + '">'
-      : String(a);
   const cap = (kind: string, orig: any) => (...args: any[]) => {
     try {
-      const s = args.map(String).join(' ');
-      if (/hydrat|mismatch|children|vdom/i.test(s)) {
-        w.__hyd.push(kind + ' :: ' + args.map(ser).join(' | ').slice(0, 500));
-      }
+      const s = args
+        .map((a) =>
+          a && a.nodeType === 1
+            ? 'EL<' + a.tagName.toLowerCase() + ' class="' + (a.getAttribute('class') || '') + '">'
+            : String(a)
+        )
+        .join(' ');
+      if (/hydrat|mismatch|children|vdom/i.test(s)) w.__hyd.push(kind + ' :: ' + s.slice(0, 400));
     } catch {
       /* ignore */
     }
@@ -33,16 +29,58 @@ export default defineNuxtPlugin((nuxtApp) => {
   console.warn = cap('warn', ow);
   console.error = cap('error', oe);
 
-  const uName = useUsername();
-  const uMod = useModProfileName();
-  const uAuth = useIsAuthenticated();
-  nuxtApp.hook('app:mounted', () => {
-    w.__authVars = {
-      username: uName.value,
-      modProfileName: uMod.value,
-      isAuthenticated: uAuth.value,
-    };
-    const el = document.querySelector('div.lg\\:pl-20');
-    w.__firstRender = el ? el.outerHTML : 'none';
+  const desc = (n: Node): string => {
+    if (n.nodeType === 8) return 'COMMENT<!--' + ((n as Comment).data || '').slice(0, 18) + '-->';
+    if (n.nodeType === 3) return 'TEXT"' + (n.textContent || '').trim().slice(0, 20) + '"';
+    if (n.nodeType === 1) {
+      const e = n as Element;
+      return (
+        'EL<' +
+        e.tagName.toLowerCase() +
+        ' class="' +
+        (e.getAttribute('class') || '').slice(0, 40) +
+        '"' +
+        (e.getAttribute('data-testid') ? ' testid=' + e.getAttribute('data-testid') : '') +
+        '>'
+      );
+    }
+    return '#' + n.nodeType;
+  };
+  const pathOf = (el: Element | null): string => {
+    const p: string[] = [];
+    let n: Element | null = el;
+    let d = 0;
+    while (n && d < 8) {
+      p.unshift(
+        n.tagName.toLowerCase() +
+          '.' +
+          (n.getAttribute('class') || '').split(/\s+/).filter(Boolean).slice(0, 2).join('.')
+      );
+      n = n.parentElement;
+      d++;
+    }
+    return p.join('>');
+  };
+
+  nuxtApp.hook('app:beforeMount', () => {
+    const root = document.querySelector('div.lg\\:pl-20') || document.body;
+    const obs = new MutationObserver((records) => {
+      for (const r of records) {
+        if (r.type !== 'childList') continue;
+        const removed = Array.from(r.removedNodes);
+        const added = Array.from(r.addedNodes);
+        if (!removed.length && !added.length) continue;
+        if (w.__mut.length < 30) {
+          w.__mut.push({
+            at: pathOf(r.target as Element),
+            removed: removed.map(desc),
+            added: added.map(desc),
+          });
+        }
+      }
+    });
+    obs.observe(root, { childList: true, subtree: true });
+    // stop after the post-hydration settle so we only capture the re-render burst
+    setTimeout(() => obs.disconnect(), 3000);
   });
 });
