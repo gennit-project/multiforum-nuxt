@@ -8,13 +8,16 @@ import {
   GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
   GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
 } from '@/graphQLData/comment/queries';
-import { modProfileNameVar, usernameVar } from '@/cache';
+import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import DiscussionCommentsWrapper from '@/components/discussion/detail/DiscussionCommentsWrapper.vue';
 import DiscussionRootCommentFormWrapper from '@/components/discussion/form/DiscussionRootCommentFormWrapper.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
 import type { Comment, Discussion } from '@/__generated__/graphql';
+
+const modProfileNameVar = useModProfileName();
+const usernameVar = useUsername();
 
 const COMMENT_LIMIT = 50;
 

@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
 import { uploadAndGetEmbeddedLink, getUploadFileName } from '@/utils';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { isFileSizeValid } from '@/utils/index';
 
 type UploadResult = {
@@ -41,6 +41,8 @@ const getFileTypeFromName = (filename: string): string | null => {
  * Composable for handling image uploads in the text editor
  */
 export function useImageUpload(options: UseImageUploadOptions = {}) {
+  const usernameVar = useUsername();
+
   const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
     useMutation(CREATE_SIGNED_STORAGE_URL);
 

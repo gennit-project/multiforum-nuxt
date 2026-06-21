@@ -18,6 +18,7 @@ vi.mock('@vue/apollo-composable', () => ({
 }));
 vi.mock('nuxt/app', () => ({
   useRoute: vi.fn(),
+  useState: (_k, init) => ref(init ? init() : undefined),
 }));
 vi.mock('@/composables/useTheme', () => ({
   useAppTheme: () => ({ theme: ref('light') }),

@@ -1,15 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { ref } from 'vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 
-// RequireAuth now reads auth state straight from the cache vars, which are
-// seeded from the server session (plugins/auth-session.ts) and are identical on
-// server and client. No auth-hint cookie shim, no @auth0/auth0-vue, no SSR vs
-// client branching — so the test just drives the two reactive vars.
-vi.mock('@/cache', () => ({
-  usernameVar: ref(''),
-  isAuthenticatedVar: ref(false),
+// RequireAuth now reads auth state straight from the useAuthState composables,
+// which are seeded from the server session (plugins/auth-session.ts) and are
+// identical on server and client. No auth-hint cookie shim, no @auth0/auth0-vue,
+// no SSR vs client branching — so the test just drives the two reactive refs.
+const { mockUsername, mockIsAuthenticated } = vi.hoisted(() => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { ref } = require('vue');
+  return { mockUsername: ref(''), mockIsAuthenticated: ref(false) };
+});
+
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => mockUsername,
+  useIsAuthenticated: () => mockIsAuthenticated,
 }));
 
 const slots = {
@@ -25,9 +30,8 @@ const setAuthState = async ({
   authenticated: boolean;
   username: string;
 }) => {
-  const { usernameVar, isAuthenticatedVar } = await vi.importMock('@/cache');
-  isAuthenticatedVar.value = authenticated;
-  usernameVar.value = username;
+  mockIsAuthenticated.value = authenticated;
+  mockUsername.value = username;
 };
 
 describe('RequireAuth', () => {

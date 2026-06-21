@@ -8,9 +8,9 @@ import {
   GET_GENERAL_NOTIFICATIONS,
 } from '@/graphQLData/notification/queries';
 
-// Mock usernameVar
-vi.mock('@/cache', () => ({
-  usernameVar: { value: 'testuser' },
+// Mock useUsername
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => ({ value: 'testuser' }),
 }));
 
 // Mock Apollo composables

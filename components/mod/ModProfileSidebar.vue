@@ -5,7 +5,9 @@ import 'md-editor-v3/lib/style.css';
 import { GET_MOD } from '@/graphQLData/mod/queries';
 import { relativeTime } from '@/utils';
 import { useRoute } from 'nuxt/app';
-import { modProfileNameVar } from '@/cache';
+import { useModProfileName } from '@/composables/useAuthState';
+
+const modProfileNameVar = useModProfileName();
 
 defineProps({
   isAdmin: {

@@ -48,10 +48,8 @@ vi.mock('@/composables/useSuspensionNotice', () => ({
   }),
 }));
 
-vi.mock('@/cache', () => ({
-  modProfileNameVar: {
-    value: 'mod-one',
-  },
+vi.mock('@/composables/useAuthState', () => ({
+  useModProfileName: () => ({ value: 'mod-one' }),
 }));
 
 vi.mock('@/components/comments/getSortFromQuery', async (importOriginal) => {

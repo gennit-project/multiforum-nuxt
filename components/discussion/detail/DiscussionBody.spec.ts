@@ -9,9 +9,15 @@ vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
 }));
 
-vi.mock('@/cache', () => ({
-  usernameVar: ref(''),
-  isAuthenticatedVar: ref(false),
+const { mockUsername, mockIsAuthenticated } = vi.hoisted(() => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { ref } = require('vue');
+  return { mockUsername: ref(''), mockIsAuthenticated: ref(false) };
+});
+
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => mockUsername,
+  useIsAuthenticated: () => mockIsAuthenticated,
 }));
 
 vi.mock('nuxt/app', () => ({
@@ -94,13 +100,12 @@ describe('DiscussionBody Sensitive Content', () => {
 
     // Get mocked modules
     const apolloComposable = await vi.importMock('@vue/apollo-composable');
-    const cache = await vi.importMock('@/cache');
 
     mockUseQuery = apolloComposable.useQuery;
-    mockUsernameVar = cache.usernameVar;
-    mockIsAuthenticatedVar = cache.isAuthenticatedVar;
+    mockUsernameVar = mockUsername;
+    mockIsAuthenticatedVar = mockIsAuthenticated;
 
-    // Reset cache values
+    // Reset auth state values
     mockUsernameVar.value = '';
     mockIsAuthenticatedVar.value = false;
   });

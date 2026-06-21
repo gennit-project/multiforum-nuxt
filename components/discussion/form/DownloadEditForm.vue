@@ -18,7 +18,6 @@ import {
 } from '@/graphQLData/discussion/mutations';
 import Notification from '@/components/NotificationComponent.vue';
 import { uploadAndGetEmbeddedLink, getUploadFileName } from '@/utils';
-import { usernameVar } from '@/cache';
 import DownloadLabelPicker from '@/components/download/DownloadLabelPicker.vue';
 import {
   validateDownloadFileType,
@@ -31,6 +30,9 @@ import {
   buildDownloadAcceptAttribute,
   buildDownloadableFilesUpdateInput,
 } from '@/utils/downloadFileHelpers';
+import { useUsername } from '@/composables/useAuthState';
+
+const usernameVar = useUsername();
 
 type DownloadableFileSupportFields = {
   attributionOverride?: string | null;

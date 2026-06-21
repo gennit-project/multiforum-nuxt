@@ -14,7 +14,7 @@ import Notification from '@/components/NotificationComponent.vue';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import EllipsisHorizontal from '@/components/icons/EllipsisHorizontal.vue';
 import { getDiscussionHeaderMenuItems } from '@/utils/headerPermissionUtils';
-import { usernameVar, modProfileNameVar } from '@/cache';
+import { useUsername, useModProfileName } from '@/composables/useAuthState';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
@@ -29,6 +29,9 @@ import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
+
+const usernameVar = useUsername();
+const modProfileNameVar = useModProfileName();
 
 const props = defineProps<{
   discussion: Discussion | null;

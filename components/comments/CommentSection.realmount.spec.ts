@@ -23,7 +23,10 @@ vi.mock('nuxt/app', () => ({
   useRoute: vi.fn(() => ({ params: {}, query: {} })),
   useRouter: vi.fn(() => ({ push: vi.fn(), replace: vi.fn() })),
 }));
-vi.mock('@/cache', () => ({ modProfileNameVar: { value: '' } }));
+vi.mock('@/composables/useAuthState', () => ({
+  useModProfileName: () => ({ value: '' }),
+  useUsername: () => ({ value: '' }),
+}));
 
 const CommentStub = {
   name: 'Comment',

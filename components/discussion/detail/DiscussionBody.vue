@@ -10,9 +10,12 @@ import type { Discussion } from '@/__generated__/graphql';
 import { useRouter } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
-import { usernameVar, isAuthenticatedVar } from '@/cache';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
+import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
+
+const usernameVar = useUsername();
+const isAuthenticatedVar = useIsAuthenticated();
 
 const router = useRouter();
 

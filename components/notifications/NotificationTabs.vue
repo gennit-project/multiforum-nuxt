@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { timeAgo } from '@/utils';
 import type { Notification } from '@/__generated__/graphql';
 import MarkdownRenderer from '../MarkdownRenderer.vue';
@@ -18,6 +18,8 @@ type NotificationTab = 'general' | 'feedback';
 const activeTab = defineModel<NotificationTab>('activeTab', {
   default: 'general',
 });
+
+const usernameVar = useUsername();
 
 const username = computed(() => usernameVar.value);
 

@@ -19,13 +19,16 @@ import type { Comment } from '@/__generated__/graphql';
 import type { ApolloCache, NormalizedCacheObject } from '@apollo/client/core';
 import type { MenuItemType } from '@/components/IconButtonDropdown.vue';
 import { timeAgo, ALLOWED_ICONS } from '@/utils';
-import { modProfileNameVar, usernameVar } from '@/cache';
+import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { getFeedbackPermalinkObject } from '@/utils/routerUtils';
 import ArchivedCommentText from '@/components/comments/ArchivedCommentText.vue';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
+
+const modProfileNameVar = useModProfileName();
+const usernameVar = useUsername();
 
 const props = defineProps({
   comment: {

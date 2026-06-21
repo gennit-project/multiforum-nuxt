@@ -18,6 +18,7 @@ vi.mock('@vue/apollo-composable', () => ({
 vi.mock('nuxt/app', () => ({
   useRoute: vi.fn(),
   useRouter: vi.fn(),
+  useState: (_k, init) => ref(init ? init() : undefined),
 }));
 
 const SERVER_CONFIG = { serverConfigs: [{ serverName: 'Test', __typename: 'ServerConfig' }] };

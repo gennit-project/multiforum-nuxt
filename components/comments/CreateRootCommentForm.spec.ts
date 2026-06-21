@@ -1,3 +1,4 @@
+import { ref } from 'vue';
 import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import CreateRootCommentForm from '@/components/comments/CreateRootCommentForm.vue';
@@ -7,6 +8,7 @@ vi.mock('nuxt/app', () => ({
     params: { forumId: 'cats' },
     query: {},
   }),
+  useState: (_k, init) => ref(init ? init() : undefined),
 }));
 
 describe('CreateRootCommentForm', () => {

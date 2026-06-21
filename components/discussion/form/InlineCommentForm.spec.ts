@@ -24,9 +24,10 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 
-vi.mock('@/cache', () => ({
-  usernameVar: { value: 'alice' },
-}));
+vi.mock('@/composables/useAuthState', () => {
+  const { ref } = require('vue');
+  return { useUsername: () => ref('alice'), setUsername: vi.fn() };
+});
 
 vi.mock('@/composables/useSuspensionNotice', () => ({
   useChannelSuspensionNotice: () => ({

@@ -8,7 +8,7 @@ import ErrorBanner from '../ErrorBanner.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import type { ApolloError } from '@apollo/client/errors';
 import type { CreateEditCommentFormValues } from '@/types/Comment';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import LoggedInUserAvatar from './LoggedInUserAvatar.vue';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 import { hasBotMention, type BotSuggestion } from '@/utils/botMentions';
@@ -18,6 +18,8 @@ import type { ModSuggestion } from '@/utils/modMentions';
 const TextEditor = defineAsyncComponent(
   () => import('@/components/TextEditor.vue')
 );
+
+const usernameVar = useUsername();
 
 const props = defineProps({
   createCommentError: {

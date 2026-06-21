@@ -18,9 +18,11 @@ import {
   getSortFromQuery,
   getTimeFrameFromQuery,
 } from '@/components/comments/getSortFromQuery';
-import { usernameVar } from '@/cache';
 import { useRouter, useRoute } from 'nuxt/app';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
+import { useUsername } from '@/composables/useAuthState';
+
+const usernameVar = useUsername();
 
 const DISCUSSION_PAGE_LIMIT = 10;
 const route = useRoute();

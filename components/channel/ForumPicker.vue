@@ -13,8 +13,11 @@ import type {
   MultiSelectSection,
 } from '@/components/MultiSelect.vue';
 import type { Channel, ChannelWhere, Collection } from '@/__generated__/graphql';
-import { usernameVar, isAuthenticatedVar } from '@/cache';
+import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
 import { createCaseInsensitivePattern } from '@/utils/searchUtils';
+
+const usernameVar = useUsername();
+const isAuthenticatedVar = useIsAuthenticated();
 
 type ChannelFlag = 'eventsEnabled';
 type ChannelOptionSource = Pick<

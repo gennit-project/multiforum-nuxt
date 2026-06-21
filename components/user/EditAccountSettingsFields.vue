@@ -8,7 +8,7 @@ import FormRow from '@/components/FormRow.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import AddImage from '@/components/AddImage.vue';
 import { getUploadFileName, uploadAndGetEmbeddedLink } from '@/utils';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import type { EditAccountSettingsFormValues } from '@/types/User';
 import FormComponent from '../FormComponent.vue';
 import { MAX_CHARS_IN_USER_BIO } from '@/utils/constants';
@@ -49,6 +49,8 @@ const emit = defineEmits<{
   updateFormValues: [formData: Partial<EditAccountSettingsFormValues>];
   submit: [];
 }>();
+
+const usernameVar = useUsername();
 
 // Data and Setup
 const titleInputRef = ref<InstanceType<typeof TextInput> | null>(null);

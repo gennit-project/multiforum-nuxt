@@ -26,8 +26,8 @@ vi.mock('@/graphQLData/discussion/mutations', () => ({
   CREATE_IMAGE: Symbol('CREATE_IMAGE'),
 }));
 
-vi.mock('@/cache', () => ({
-  usernameVar: { value: 'testuser' },
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => ({ value: 'testuser' }),
 }));
 
 vi.mock('@/utils', () => ({

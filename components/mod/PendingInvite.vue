@@ -9,10 +9,12 @@ import {
   ACCEPT_FORUM_MOD_INVITE,
 } from '@/graphQLData/mod/mutations';
 import { useQuery, useMutation } from '@vue/apollo-composable';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import ErrorBanner from '../ErrorBanner.vue';
+
+const usernameVar = useUsername();
 
 const route = useRoute();
 

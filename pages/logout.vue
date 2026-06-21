@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'nuxt/app';
 import { onMounted, ref } from 'vue';
-import { setIsAuthenticated, setUsername } from '@/cache';
+import { setIsAuthenticated, setUsername } from '@/composables/useAuthState';
 
 const router = useRouter();
 const error = ref(false);

@@ -9,7 +9,7 @@ import SuspendModButton from './SuspendModButton.vue';
 import AdminIcon from '../icons/AdminIcon.vue';
 import ScalesIcon from '../icons/ScalesIcon.vue';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
-import { modProfileNameVar } from '@/cache';
+import { useModProfileName } from '@/composables/useAuthState';
 import PencilIcon from '../icons/PencilIcon.vue';
 import EditContentModal from './EditContentModal.vue';
 import CloseIssueAction from './CloseIssueAction.vue';
@@ -19,6 +19,8 @@ import {
   IS_ORIGINAL_POSTER_SUSPENDED,
 } from '@/graphQLData/mod/queries';
 import { GET_COMMENT_ARCHIVED } from '@/graphQLData/comment/queries';
+
+const modProfileNameVar = useModProfileName();
 
 const props = defineProps({
   issue: {

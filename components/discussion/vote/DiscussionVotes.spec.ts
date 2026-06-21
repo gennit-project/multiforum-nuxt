@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import DiscussionVotes from '@/components/discussion/vote/DiscussionVotes.vue';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({
@@ -23,9 +23,15 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 
-vi.mock('@/cache', () => ({
-  usernameVar: { value: 'alice' },
-  modProfileNameVar: { value: '' },
+const { mockUsername, mockModProfileName } = vi.hoisted(() => {
+  const { ref } = require('vue');
+  return { mockUsername: ref('alice'), mockModProfileName: ref('') };
+});
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => mockUsername,
+  useModProfileName: () => mockModProfileName,
+  setUsername: vi.fn(),
+  setModProfileName: vi.fn(),
 }));
 
 vi.mock('@/composables/useSuspensionNotice', () => ({
@@ -40,11 +46,11 @@ vi.mock('@/composables/useSuspensionNotice', () => ({
 describe('DiscussionVotes', () => {
   afterEach(() => {
     // Restore the default mocked username after tests that clear it.
-    usernameVar.value = 'alice';
+    useUsername().value = 'alice';
   });
 
   it('surfaces the auth error in the banner (not a throw) when upvoting without a username', async () => {
-    usernameVar.value = '';
+    useUsername().value = '';
 
     const wrapper = mount(DiscussionVotes, {
       props: {

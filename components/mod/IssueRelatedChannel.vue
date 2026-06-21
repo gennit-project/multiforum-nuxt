@@ -9,8 +9,11 @@ import LockClosedIcon from '@/components/icons/LockClosedIcon.vue';
 import LockOpenIcon from '@/components/icons/LockOpenIcon.vue';
 import { DateTime } from 'luxon';
 import { config } from '@/config';
-import { usernameVar, modProfileNameVar } from '@/cache';
+import { useUsername, useModProfileName } from '@/composables/useAuthState';
 import { checkPermission } from '@/utils/permissionUtils';
+
+const usernameVar = useUsername();
+const modProfileNameVar = useModProfileName();
 
 const props = defineProps<{
   relatedChannelUniqueName: string;

@@ -11,7 +11,7 @@
 // We still clear the SPA's localStorage token first, since Apollo reads that
 // token (plugins/apollo-auth.client.ts) until it is wired directly to the
 // server session. This is the one place that knows about both systems.
-import { setIsAuthenticated, setUsername } from '@/cache';
+import { setIsAuthenticated, setUsername } from '@/composables/useAuthState';
 import { clearPersistedAuth } from '@/utils/authUtils';
 
 export const useServerLogout = () => {

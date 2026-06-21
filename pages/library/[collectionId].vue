@@ -20,7 +20,7 @@ import AvatarComponent from '@/components/AvatarComponent.vue';
 import GenericModal from '@/components/GenericModal.vue';
 import WarningModal from '@/components/WarningModal.vue';
 import { relativeTime } from '@/utils';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import type { Discussion, Comment } from '@/__generated__/graphql';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import {
@@ -29,6 +29,8 @@ import {
   buildCollectionDiscussionLink,
   resolveCollectionItemAuthor,
 } from '@/utils/collectionItemUtils';
+
+const usernameVar = useUsername();
 
 // Lazy load the album component since it's not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(

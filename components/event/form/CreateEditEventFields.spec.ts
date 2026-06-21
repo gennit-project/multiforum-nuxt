@@ -140,10 +140,11 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 
-// Mock cache
-vi.mock('@/cache', () => ({
-  usernameVar: { value: 'testuser' },
-}));
+// Mock auth state
+vi.mock('@/composables/useAuthState', () => {
+  const { ref } = require('vue');
+  return { useUsername: () => ref('testuser'), setUsername: vi.fn() };
+});
 
 describe('CreateEditEventFields Component', () => {
   // Default form values for testing

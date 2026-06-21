@@ -25,9 +25,10 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 
-vi.mock('@/cache', () => ({
-  modProfileNameVar: { value: 'mod-alice' },
-}));
+vi.mock('@/composables/useAuthState', () => {
+  const { ref } = require('vue');
+  return { useModProfileName: () => ref('mod-alice'), setModProfileName: vi.fn() };
+});
 
 describe('ModerationWizard', () => {
   const mountWrapper = () =>

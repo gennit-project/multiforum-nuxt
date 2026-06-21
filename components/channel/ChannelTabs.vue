@@ -10,7 +10,11 @@ import InfoIcon from '@/components/icons/InfoIcon.vue';
 import BookIcon from '@/components/icons/BookIcon.vue';
 import UserIcon from '@/components/icons/UserIcon.vue';
 import type { Channel } from '@/__generated__/graphql';
-import { modProfileNameVar, usernameVar, isAuthenticatedVar } from '@/cache';
+import {
+  useModProfileName,
+  useUsername,
+  useIsAuthenticated,
+} from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
 import { useDisplay } from 'vuetify';
 import { useQuery } from '@vue/apollo-composable';
@@ -19,6 +23,10 @@ import { config } from '@/config';
 // Import Popper dynamically to avoid SSR issues with regeneratorRuntime
 import { defineAsyncComponent } from 'vue';
 const Popper = defineAsyncComponent(() => import('vue3-popper'));
+
+const modProfileNameVar = useModProfileName();
+const usernameVar = useUsername();
+const isAuthenticatedVar = useIsAuthenticated();
 
 type Tab = {
   name: string;

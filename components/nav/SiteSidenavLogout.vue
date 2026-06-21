@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { isAuthenticatedVar } from '@/cache';
+import { useIsAuthenticated } from '@/composables/useAuthState';
 import { useServerLogout } from '@/composables/useServerLogout';
+
+const isAuthenticatedVar = useIsAuthenticated();
 
 defineProps({
   navLinkClasses: {

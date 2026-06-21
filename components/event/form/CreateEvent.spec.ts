@@ -2,7 +2,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import CreateEvent from '@/components/event/form/CreateEvent.vue';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
+
+const { mockUsername } = vi.hoisted(() => {
+  const { ref } = require('vue');
+  return { mockUsername: ref('alice') };
+});
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => mockUsername,
+  setUsername: vi.fn(),
+}));
 
 const mockPush = vi.fn();
 const mockMutate = vi.fn();
@@ -62,7 +71,7 @@ describe('CreateEvent', () => {
         },
       ],
     };
-    usernameVar.value = 'alice';
+    useUsername().value = 'alice';
   });
 
   function mountCreateEvent() {

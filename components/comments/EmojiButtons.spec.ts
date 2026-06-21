@@ -20,8 +20,8 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 
-vi.mock('@/cache', () => ({
-  usernameVar: ref('alice'),
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => ref('alice'),
 }));
 
 describe('EmojiButtons', () => {

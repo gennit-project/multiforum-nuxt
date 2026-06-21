@@ -16,7 +16,9 @@ import type {
   DiscussionUpdateInput,
   Image,
 } from '@/__generated__/graphql';
-import { modProfileNameVar } from '@/cache';
+import { useModProfileName } from '@/composables/useAuthState';
+
+const modProfileNameVar = useModProfileName();
 
 const route = useRoute();
 const router = useRouter();

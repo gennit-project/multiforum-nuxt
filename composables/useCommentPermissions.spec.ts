@@ -1,16 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { usernameVar, modProfileNameVar } from '@/cache';
 import { useCommentPermissions } from './useCommentPermissions';
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
 }));
 
-vi.mock('@/cache', () => ({
-  usernameVar: { value: 'testuser' },
-  modProfileNameVar: { value: 'testmod' },
+const { mockUsername, mockModProfileName } = vi.hoisted(() => ({
+  mockUsername: { value: 'testuser' },
+  mockModProfileName: { value: 'testmod' },
+}));
+const usernameVar = mockUsername;
+const modProfileNameVar = mockModProfileName;
+
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => mockUsername,
+  useModProfileName: () => mockModProfileName,
 }));
 
 vi.mock('@/config', () => ({

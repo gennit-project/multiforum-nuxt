@@ -3,9 +3,11 @@ import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { gql } from '@apollo/client/core';
 import { useHead } from 'nuxt/app';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import ImageListItem from '@/components/image/ImageListItem.vue';
+
+const usernameVar = useUsername();
 
 useHead({
   title: 'Favorite Images - Library',

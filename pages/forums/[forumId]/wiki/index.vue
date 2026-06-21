@@ -16,7 +16,9 @@ import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import { timeAgo } from '@/utils';
-import { usernameVar } from '@/cache';
+import { useUsername } from '@/composables/useAuthState';
+
+const usernameVar = useUsername();
 
 const route = useRoute();
 const router = useRouter();

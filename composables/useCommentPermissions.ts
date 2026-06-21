@@ -4,7 +4,7 @@ import { DateTime } from 'luxon';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
-import { usernameVar, modProfileNameVar } from '@/cache';
+import { useUsername, useModProfileName } from '@/composables/useAuthState';
 import type { PermissionFlags } from '@/utils/permissionUtils';
 import { config } from '@/config';
 import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
@@ -24,6 +24,9 @@ type UseCommentPermissionsReturn = {
 export function useCommentPermissions(
   forumId: Ref<string> | ComputedRef<string>
 ): UseCommentPermissionsReturn {
+  const usernameVar = useUsername();
+  const modProfileNameVar = useModProfileName();
+
   // Fetch channel data for mod roles
   const { result: getChannelResult, loading: channelLoading } = useQuery(
     GET_CHANNEL,

@@ -4,7 +4,7 @@ import { useQuery } from '@vue/apollo-composable';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { DateTime } from 'luxon';
 import { useRoute } from 'nuxt/app';
-import { modProfileNameVar } from '@/cache';
+import { useModProfileName } from '@/composables/useAuthState';
 import { stableRelativeTime } from '@/utils';
 import type { Issue } from '@/__generated__/graphql';
 
@@ -16,6 +16,8 @@ import MarkdownPreview from '../MarkdownPreview.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import { getOriginalPoster } from '@/utils/originalPoster';
+
+const modProfileNameVar = useModProfileName();
 
 const props = defineProps<{
   activeIssue: Issue;
