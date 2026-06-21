@@ -6,9 +6,8 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 // which are seeded from the server session (plugins/auth-session.ts) and are
 // identical on server and client. No auth-hint cookie shim, no @auth0/auth0-vue,
 // no SSR vs client branching — so the test just drives the two reactive refs.
-const { mockUsername, mockIsAuthenticated } = vi.hoisted(() => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { ref } = require('vue');
+const { mockUsername, mockIsAuthenticated } = await vi.hoisted(async () => {
+  const { ref } = await import('vue');
   return { mockUsername: ref(''), mockIsAuthenticated: ref(false) };
 });
 
