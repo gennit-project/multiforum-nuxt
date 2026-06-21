@@ -4,8 +4,8 @@ import { ref } from 'vue';
 import CreateDiscussion from '@/components/discussion/form/CreateDiscussion.vue';
 import { useUsername } from '@/composables/useAuthState';
 
-const { mockUsername } = vi.hoisted(() => {
-  const { ref } = require('vue');
+const { mockUsername } = await vi.hoisted(async () => {
+  const { ref } = await import('vue');
   return { mockUsername: ref('alice') };
 });
 vi.mock('@/composables/useAuthState', () => ({

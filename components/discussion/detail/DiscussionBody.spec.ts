@@ -9,9 +9,8 @@ vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
 }));
 
-const { mockUsername, mockIsAuthenticated } = vi.hoisted(() => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { ref } = require('vue');
+const { mockUsername, mockIsAuthenticated } = await vi.hoisted(async () => {
+  const { ref } = await import('vue');
   return { mockUsername: ref(''), mockIsAuthenticated: ref(false) };
 });
 
