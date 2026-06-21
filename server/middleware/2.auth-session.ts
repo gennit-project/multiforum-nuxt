@@ -44,6 +44,9 @@ type AuthSessionContext = {
 declare module 'h3' {
   interface H3EventContext {
     authSession?: AuthSessionContext;
+    // API access token from the session, used to authenticate SSR Apollo
+    // queries (see plugins/apollo-ssr-auth.ts).
+    accessToken?: string;
   }
 }
 
@@ -182,6 +185,17 @@ export default defineEventHandler(async (event) => {
       try {
         const tokenSet = await auth0.getAccessToken();
         const accessToken = tokenSet?.accessToken;
+        // Expose the API access token to the SSR Apollo client (read back in
+        // plugins/apollo-ssr-auth.ts via the `apollo:auth` hook) so server-side
+        // GraphQL queries run AUTHENTICATED, exactly like the client's queries.
+        // Without this the SSR is anonymous (the token lives only in client
+        // localStorage), so permission-gated data renders differently on the
+        // server than on the client's first hydration render — a hydration
+        // mismatch. Safe per-request because forum detail pages are not
+        // route-cached (no shared SSR), so one user's token never serves another.
+        if (accessToken) {
+          event.context.accessToken = accessToken;
+        }
         const graphqlUrl =
           useRuntimeConfig(event).public?.apollo?.clients?.default
             ?.httpEndpoint;
