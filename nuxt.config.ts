@@ -267,8 +267,8 @@ export default defineNuxtConfig({
         base: './.auth0-sessions',
       },
       authProfileCache: {
-        driver: 'fs',
-        base: './.auth0-profile-cache',
+        driver: 'upstash',
+        base: 'authProfileCache',
       },
     },
     // Enable server-side caching
