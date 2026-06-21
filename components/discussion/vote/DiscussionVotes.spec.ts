@@ -23,8 +23,8 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 
-const { mockUsername, mockModProfileName } = vi.hoisted(() => {
-  const { ref } = require('vue');
+const { mockUsername, mockModProfileName } = await vi.hoisted(async () => {
+  const { ref } = await import('vue');
   return { mockUsername: ref('alice'), mockModProfileName: ref('') };
 });
 vi.mock('@/composables/useAuthState', () => ({
