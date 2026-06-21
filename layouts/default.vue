@@ -92,7 +92,15 @@ onMounted(() => {
             <VerticalIconNav />
           </nav>
 
-          <!-- Mobile/Tablet Side Navigation -->
+          <!-- Mobile/Tablet Side Navigation.
+               Intentionally NO #fallback slot. A ClientOnly #fallback renders its
+               content wrapped in Vue fragment-boundary comment markers on the
+               server that the client hydration vdom does not reproduce, causing a
+               "server rendered more child nodes than client vdom" mismatch. That
+               makes Vue re-render this whole layout column and remove/re-add the
+               page content element below (the discussion-page flash). With no
+               fallback, ClientOnly renders one placeholder element that matches on
+               both sides. -->
           <ClientOnly>
             <nav v-if="!lgAndUp" aria-label="Mobile navigation">
               <SiteSidenav
@@ -101,9 +109,6 @@ onMounted(() => {
                 @close="setSideNavIsOpenVar(false)"
               />
             </nav>
-            <template #fallback>
-              <div aria-hidden="true" />
-            </template>
           </ClientOnly>
 
           <div
@@ -111,6 +116,9 @@ onMounted(() => {
           >
             <slot />
           </div>
+          <!-- Intentionally NO #fallback slot (see the mobile-nav note above):
+               a ClientOnly #fallback's fragment-boundary markers cause a
+               hydration mismatch that re-renders the page content. -->
           <ClientOnly>
             <footer>
               <SiteFooter
@@ -119,11 +127,6 @@ onMounted(() => {
                 :class="{ 'pl-16': mdAndUp }"
               />
             </footer>
-            <template #fallback>
-              <footer>
-                <SiteFooter v-if="showFooter" class="mt-auto" />
-              </footer>
-            </template>
           </ClientOnly>
         </div>
       </div>
