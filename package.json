@@ -126,7 +126,7 @@
     "axe-core": "^4.12.1",
     "eslint": "^10.5.0",
     "eslint-plugin-vuejs-accessibility": "^2.5.0",
-    "globals": "^15.15.0",
+    "globals": "^17.7.0",
     "happy-dom": "^20.10.4",
     "husky": "^9.1.7",
     "jsdom": "^26.1.0",
