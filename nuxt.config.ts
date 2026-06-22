@@ -211,18 +211,13 @@ export default defineNuxtConfig({
     ],
   ],
   sentry: {
-    dsn: process.env.VITE_SENTRY_DSN,
+    // Build-time module options ONLY (source maps upload). Runtime options such
+    // as `dsn`, `environment`, `integrations`, and sample rates belong in
+    // `Sentry.init()` inside sentry.client.config.ts / sentry.server.config.ts —
+    // they are ignored if placed here.
+    org: 'none-y1x',
+    project: 'javascript-nuxt',
     authToken: process.env.VITE_SENTRY_AUTH_TOKEN,
-    environment: process.env.VITE_ENVIRONMENT || 'development',
-    integrations: ['replayIntegration'],
-    tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
-    replaysSessionSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
-    replaysOnErrorSampleRate: 1.0,
-    sourceMapsUploadOptions: {
-      org: 'none-y1x',
-      project: 'javascript-nuxt',
-      authToken: process.env.VITE_SENTRY_AUTH_TOKEN,
-    },
   },
   nitro: {
     preset: 'vercel',
