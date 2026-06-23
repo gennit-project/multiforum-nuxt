@@ -20,7 +20,9 @@ Key differentiators:
 - Personal libraries for organizing favorites and collections
 - Granular moderation at both channel and server levels
 
-It's built with Nuxt/Vue on the frontend and a GraphQL/Neo4j backend.
+It's built with Nuxt/Vue on the frontend and a GraphQL/Neo4j backend. The
+backend lives in a separate repository:
+[gennit-project/multiforum-backend](https://github.com/gennit-project/multiforum-backend).
 
 ## Docs
 
