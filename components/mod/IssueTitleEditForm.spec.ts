@@ -52,7 +52,15 @@ const mountForm = () =>
     global: {
       stubs: {
         RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
-        TextInput: { name: 'TextInput', props: ['value'], emits: ['update'], template: '<input />' },
+        TextInput: {
+          name: 'TextInput',
+          props: ['value'],
+          emits: ['update'],
+          // onClickEdit focuses the ref in nextTick; expose focus so it
+          // doesn't throw an unhandled rejection.
+          methods: { focus() {} },
+          template: '<input />',
+        },
         PrimaryButton: {
           name: 'PrimaryButton',
           props: ['disabled', 'loading', 'label'],

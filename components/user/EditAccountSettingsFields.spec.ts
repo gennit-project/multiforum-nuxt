@@ -41,7 +41,14 @@ const mountFields = (props: Record<string, unknown> = {}) =>
       stubs: {
         FormComponent: stub('FormComponent', ['needsChanges', 'loading'], ['input', 'submit']),
         FormRow: { template: '<div><slot name="content" /></div>' },
-        TextInput: stub('TextInput', ['value', 'disabled'], ['update']),
+        TextInput: {
+          name: 'TextInput',
+          props: ['value', 'disabled'],
+          emits: ['update'],
+          // The component focuses $el.children[0].childNodes[0] in a nextTick on
+          // create; give the stub that nested structure so it doesn't throw.
+          template: '<div><span><input /></span></div>',
+        },
         TextEditor: stub('TextEditor', ['initialValue'], ['update']),
         AddImage: stub('AddImage', ['fieldName'], ['file-change']),
         CharCounter: stub('CharCounter', ['current', 'max']),
