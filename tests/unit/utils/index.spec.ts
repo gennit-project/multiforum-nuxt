@@ -14,8 +14,21 @@ import {
   formatDuration,
   formatAbbreviatedDuration,
   uploadAndGetEmbeddedLink,
+  durationHoursAndMinutes,
+  getDurationObj,
+  compareDate,
+  getReadableTimeFromISO,
+  convertTimeToReadableFormat,
+  relativeTimeHoursAndMinutes,
+  updateTagsInCache,
+  getTimePieces,
+  getDatePieces,
+  relativeTime,
 } from '@/utils/index';
+import { DateTime } from 'luxon';
 import type { Duration } from 'luxon';
+import type { ApolloCache } from '@apollo/client/core';
+import type { Event, Tag as TagData } from '@/__generated__/graphql';
 
 describe('isFileSizeValid', () => {
   it('returns valid for file under 5MB', () => {
@@ -679,5 +692,172 @@ describe('uploadAndGetEmbeddedLink', () => {
 
     expect(result).toContain('my%20file.jpg');
     expect(result).not.toContain('my file.jpg');
+  });
+});
+
+describe('durationHoursAndMinutes', () => {
+  // start/end use UTC instants, so the resulting duration is timezone-independent.
+  it.each([
+    ['2024-01-01T10:00:00Z', '2024-01-01T10:30:00Z', 'for 30 minutes'],
+    ['2024-01-01T10:00:00Z', '2024-01-01T11:00:00Z', 'for 1 hour'],
+    ['2024-01-01T10:00:00Z', '2024-01-01T12:00:00Z', 'for 2 hours'],
+    ['2024-01-01T10:00:00Z', '2024-01-01T11:30:00Z', 'for 1 hour and 30 minutes'],
+    ['2024-01-01T10:00:00Z', '2024-01-01T12:15:00Z', 'for 2 hours and 15 minutes'],
+  ])('formats %s -> %s as "%s"', (start, end, expected) => {
+    expect(durationHoursAndMinutes(start, end)).toBe(expected);
+  });
+
+  it('reports zero-length intervals as "for 0 minutes"', () => {
+    expect(
+      durationHoursAndMinutes('2024-01-01T10:00:00Z', '2024-01-01T10:00:00Z')
+    ).toBe('for 0 minutes');
+  });
+});
+
+describe('getDurationObj', () => {
+  it('returns the interval as an { hours, minutes } object', () => {
+    expect(
+      getDurationObj('2024-01-01T10:00:00Z', '2024-01-01T12:30:00Z')
+    ).toEqual({ hours: 2, minutes: 30 });
+  });
+});
+
+describe('compareDate', () => {
+  const eventAt = (startTime: string) =>
+    ({ startTime }) as unknown as Event;
+
+  it.each([
+    ['2024-01-01T10:00:00Z', '2024-01-02T10:00:00Z', -1],
+    ['2024-01-02T10:00:00Z', '2024-01-01T10:00:00Z', 1],
+    ['2024-01-01T10:00:00Z', '2024-01-01T10:00:00Z', 0],
+  ])('compares %s vs %s -> %i', (a, b, expected) => {
+    expect(compareDate(eventAt(a), eventAt(b))).toBe(expected);
+  });
+});
+
+describe('getReadableTimeFromISO', () => {
+  it('renders an ISO timestamp as a simple clock time', () => {
+    expect(getReadableTimeFromISO('2024-01-01T13:30:00Z')).toMatch(
+      /\d{1,2}:\d{2}/
+    );
+  });
+});
+
+describe('convertTimeToReadableFormat', () => {
+  it('renders an ISO timestamp as a simple clock time', () => {
+    expect(convertTimeToReadableFormat('2024-01-01T09:05:00Z')).toMatch(
+      /\d{1,2}:\d{2}/
+    );
+  });
+});
+
+describe('relativeTimeHoursAndMinutes', () => {
+  it('returns a past date as a relative "ago" string', () => {
+    expect(relativeTimeHoursAndMinutes('2000-01-01T00:00:00Z')).toContain(
+      'ago'
+    );
+  });
+});
+
+describe('updateTagsInCache', () => {
+  type FieldRef = { __ref: string; text: string };
+
+  // Builds a minimal Apollo cache stub that captures the value returned by the
+  // `tags` field policy so we can assert the merge/de-dup behavior directly.
+  const buildCache = (existingRefs: FieldRef[]) => {
+    const writeFragment = vi.fn(
+      ({ data }: { data: TagData }) =>
+        ({ __ref: `Tags:${data.text}`, text: data.text }) as FieldRef
+    );
+    let merged: FieldRef[] | undefined;
+    const cache = {
+      writeFragment,
+      modify: ({
+        fields,
+      }: {
+        fields: {
+          tags: (
+            existing: FieldRef[] | undefined,
+            helpers: { readField: (f: string, ref: FieldRef) => unknown }
+          ) => FieldRef[];
+        };
+      }) => {
+        merged = fields.tags(existingRefs, {
+          readField: (field, ref) => ref[field as keyof FieldRef],
+        });
+      },
+    } as unknown as ApolloCache<unknown>;
+    return { cache, writeFragment, getMerged: () => merged };
+  };
+
+  it('appends a new tag ahead of the existing refs', () => {
+    const existing: FieldRef[] = [{ __ref: 'Tags:old', text: 'old' }];
+    const { cache, getMerged } = buildCache(existing);
+
+    updateTagsInCache(cache, [{ text: 'new' }] as TagData[]);
+
+    expect(getMerged()).toEqual([
+      { __ref: 'Tags:new', text: 'new' },
+      { __ref: 'Tags:old', text: 'old' },
+    ]);
+  });
+
+  it('does not duplicate a tag that already exists in the cache', () => {
+    const existing: FieldRef[] = [{ __ref: 'Tags:dup', text: 'dup' }];
+    const { cache, getMerged } = buildCache(existing);
+
+    updateTagsInCache(cache, [{ text: 'dup' }] as TagData[]);
+
+    expect(getMerged()).toEqual([{ __ref: 'Tags:dup', text: 'dup' }]);
+  });
+
+  it('writes a fragment for every updated tag', () => {
+    const { cache, writeFragment } = buildCache([]);
+
+    updateTagsInCache(cache, [{ text: 'a' }, { text: 'b' }] as TagData[]);
+
+    expect(writeFragment).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('getTimePieces', () => {
+  it('breaks a DateTime into stringified calendar/clock pieces', () => {
+    const dt = DateTime.fromObject(
+      { year: 2024, month: 3, day: 5, hour: 14 },
+      { zone: 'utc' }
+    );
+
+    expect(getTimePieces(dt)).toEqual({
+      startTimeYear: '2024',
+      startTimeMonth: '3',
+      startTimeDayOfMonth: '5',
+      startTimeDayOfWeek: '2', // Tuesday
+      startTimeHourOfDay: 14,
+    });
+  });
+});
+
+describe('getDatePieces', () => {
+  const dt = DateTime.fromObject(
+    { year: 2024, month: 3, day: 5, hour: 14 },
+    { zone: 'utc' }
+  );
+
+  it('uses "all day" for the time of day when isAllDay is true', () => {
+    expect(getDatePieces(dt, true).timeOfDay).toBe('all day');
+  });
+
+  it('renders a clock time for the time of day when not all day', () => {
+    expect(getDatePieces(dt, false).timeOfDay).toMatch(/\d{1,2}:\d{2}/);
+  });
+
+  it('exposes the long weekday name', () => {
+    expect(getDatePieces(dt).weekday).toBe('Tuesday');
+  });
+});
+
+describe('relativeTime', () => {
+  it('returns a past date as a relative "ago" string', () => {
+    expect(relativeTime('2000-01-01T00:00:00Z')).toContain('ago');
   });
 });
