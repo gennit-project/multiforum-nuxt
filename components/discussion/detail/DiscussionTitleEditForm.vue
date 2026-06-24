@@ -4,6 +4,7 @@ import type { Discussion } from '@/__generated__/graphql';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
+import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import TextInput from '@/components/TextInput.vue';
 import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
 import { useMutation, useQuery } from '@vue/apollo-composable';
@@ -186,61 +187,73 @@ const isDownloadDetailPage = computed(() => {
           </span>
         </p>
       </div>
-      <RequireAuth class="hidden md:block" :full-width="false">
-        <template #has-auth>
-          <GenericButton
-            v-if="!titleEditMode && authorIsLoggedInUser"
-            :text="'Edit'"
-            @click="onClickEdit"
+      <div class="hidden items-center gap-2 md:flex">
+        <div v-if="discussion" class="title-favorite-button flex items-center">
+          <AddToDiscussionFavorites
+            :allow-add-to-list="true"
+            :discussion-id="discussion.id"
+            :discussion-title="discussion.title"
+            :entity-name="isDownloadDetailPage ? 'Download' : 'Discussion'"
+            :entity-type="isDownloadDetailPage ? 'download' : 'discussion'"
+            size="large"
           />
-          <nuxt-link
-            v-if="!titleEditMode && !isDownloadDetailPage"
-            :to="`/forums/${channelId}/discussions/create`"
-            class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-          >
-            New Discussion
-          </nuxt-link>
-          <nuxt-link
-            v-if="!titleEditMode && isDownloadDetailPage"
-            :to="`/forums/${channelId}/downloads/create`"
-            class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-          >
-            New Upload
-          </nuxt-link>
-          <PrimaryButton
-            v-if="titleEditMode"
-            :disabled="
-              formValues.title.length === 0 ||
-              formValues.title.length > DISCUSSION_TITLE_CHAR_LIMIT
-            "
-            :label="'Save'"
-            :loading="updateDiscussionLoading"
-            @click="updateDiscussion"
-          />
-          <GenericButton
-            v-if="titleEditMode"
-            :text="'Cancel'"
-            class="ml-2"
-            @click="titleEditMode = false"
-          />
-        </template>
-        <template #does-not-have-auth>
-          <button
-            v-if="!isDownloadDetailPage"
-            type="button"
-            class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-          >
-            New Discussion
-          </button>
-          <button
-            v-else
-            type="button"
-            class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-          >
-            New Upload
-          </button>
-        </template>
-      </RequireAuth>
+        </div>
+        <RequireAuth :full-width="false">
+          <template #has-auth>
+            <GenericButton
+              v-if="!titleEditMode && authorIsLoggedInUser"
+              :text="'Edit'"
+              @click="onClickEdit"
+            />
+            <nuxt-link
+              v-if="!titleEditMode && !isDownloadDetailPage"
+              :to="`/forums/${channelId}/discussions/create`"
+              class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            >
+              New Discussion
+            </nuxt-link>
+            <nuxt-link
+              v-if="!titleEditMode && isDownloadDetailPage"
+              :to="`/forums/${channelId}/downloads/create`"
+              class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            >
+              New Upload
+            </nuxt-link>
+            <PrimaryButton
+              v-if="titleEditMode"
+              :disabled="
+                formValues.title.length === 0 ||
+                formValues.title.length > DISCUSSION_TITLE_CHAR_LIMIT
+              "
+              :label="'Save'"
+              :loading="updateDiscussionLoading"
+              @click="updateDiscussion"
+            />
+            <GenericButton
+              v-if="titleEditMode"
+              :text="'Cancel'"
+              class="ml-2"
+              @click="titleEditMode = false"
+            />
+          </template>
+          <template #does-not-have-auth>
+            <button
+              v-if="!isDownloadDetailPage"
+              type="button"
+              class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            >
+              New Discussion
+            </button>
+            <button
+              v-else
+              type="button"
+              class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            >
+              New Upload
+            </button>
+          </template>
+        </RequireAuth>
+      </div>
     </div>
 
     <ErrorBanner
@@ -260,3 +273,12 @@ const isDownloadDetailPage = computed(() => {
     />
   </div>
 </template>
+
+<style scoped>
+/* Match the favorites button height to the adjacent Edit / New Discussion buttons */
+.title-favorite-button :deep(.add-to-favorites-button) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>

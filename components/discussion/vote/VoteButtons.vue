@@ -174,8 +174,8 @@ const clickUndoSuperUpvote = () => {
           @vote="clickUp"
         >
           <span class="flex items-center gap-1">
-            <span class="text-sm">{{ upvoteCount }}</span>
             <i :class="upvoteIcon" aria-hidden="true" />
+            <span class="text-sm">{{ upvoteCount }}</span>
             <span class="text-xs">{{ upvoteActive ? 'Undo' : 'Upvote' }}</span>
           </span>
         </VoteButton>
@@ -238,8 +238,8 @@ const clickUndoSuperUpvote = () => {
         >
           <span class="flex items-center gap-1">
             <i :class="upvoteIcon" aria-hidden="true" />
-            <span class="text-sm">Upvote</span>
             <span class="text-sm">{{ upvoteCount }}</span>
+            <span class="text-sm">Upvote</span>
           </span>
         </VoteButton>
 

@@ -86,7 +86,7 @@ const isOnMapPage = computed(() => {
           @click="$emit('toggleDropdown')"
         />
 
-        <div class="ml-2 flex min-w-0 items-center space-x-1 text-sm">
+        <div class="ml-2 flex min-w-0 items-baseline space-x-1 text-sm">
           <nuxt-link to="/" class="flex items-center gap-1">
             <h1
               class="logo-font text-lg font-bold text-gray-900 dark:text-white"

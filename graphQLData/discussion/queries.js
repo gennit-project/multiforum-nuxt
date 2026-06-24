@@ -185,7 +185,9 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
           SuperUpvotedByUsers {
             username
           }
-          CommentsAggregate {
+          CommentsAggregate(
+            where: { OR: [{ isFeedbackComment: null }, { isFeedbackComment: false }] }
+          ) {
             count
           }
           Channel {

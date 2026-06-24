@@ -367,7 +367,7 @@ const filterByChannel = (channel: string) => {
                 <nuxt-link
                   v-if="selectedDiscussionLink"
                   :to="selectedDiscussionLink"
-                  class="break-words text-lg font-semibold text-gray-900 hover:underline dark:text-gray-100"
+                  class="break-words text-lg font-semibold text-gray-900 underline dark:text-gray-100"
                 >
                   {{ selectedDiscussionTitle }}
                 </nuxt-link>

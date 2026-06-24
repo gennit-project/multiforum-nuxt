@@ -260,7 +260,7 @@ watch(
           type="button"
           :aria-label="buttonLabel"
           :disabled="isLoading"
-          class="add-to-favorites-button rounded-full p-1 transition-all duration-200"
+          class="add-to-favorites-button rounded-full transition-all duration-200"
           :class="{
             'text-white hover:text-orange-300': !isFavorited && overlayStyle,
             'text-gray-400 hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400':
@@ -338,15 +338,17 @@ watch(
       </div>
     </template>
     <template #does-not-have-auth>
-      <div class="relative inline-block">
+      <div class="align-center relative flex justify-end">
         <button
           ref="buttonRef"
           type="button"
           :aria-label="`Add ${displayName || entityType} to favorites`"
           class="add-to-favorites-button cursor-pointer rounded-full p-1 transition-all duration-200"
-          :class="overlayStyle
-            ? 'text-white hover:text-orange-300'
-            : 'text-gray-400 hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400'"
+          :class="
+            overlayStyle
+              ? 'text-white hover:text-orange-300'
+              : 'text-gray-400 hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400'
+          "
           @click="handleClick"
           @mouseenter="handleMouseEnter"
           @mouseleave="handleMouseLeave"
