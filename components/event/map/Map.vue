@@ -6,6 +6,13 @@ import { useRouter } from 'nuxt/app';
 import { config } from '@/config';
 import { useAppTheme } from '@/composables/useTheme';
 import type { Event } from '@/__generated__/graphql';
+import {
+  groupEventsByLocation,
+  buildMarkerTitle,
+  buildMarkerHoverContent,
+  buildClusterColor,
+  calculateClusterZoom,
+} from '@/utils/mapMarkerLogic';
 
 // Type for Google Maps markers - can be legacy or advanced markers
 type GoogleMapMarker = google.maps.Marker | google.maps.marker.AdvancedMarkerElement;
@@ -153,23 +160,9 @@ const renderMap = async () => {
   const infowindow = new google.maps.InfoWindow();
   const markers: google.maps.marker.AdvancedMarkerElement[] = [];
 
-  // First pass: group events by location and build markerMap
-  props.events.forEach((event) => {
-    if (!event.location) return;
-
-    const eventLocationId = `${event.location.latitude}${event.location.longitude}`;
-
-    if (markerMap.markers[eventLocationId]) {
-      markerMap.markers[eventLocationId].events[event.id] = event;
-      markerMap.markers[eventLocationId].numberOfEvents += 1;
-    } else {
-      markerMap.markers[eventLocationId] = {
-        marker: null, // Will be created in second pass
-        events: { [event.id]: event },
-        numberOfEvents: 1,
-      };
-    }
-  });
+  // First pass: group events by location and build markerMap. Markers are
+  // created in the second pass below.
+  markerMap.markers = groupEventsByLocation(props.events);
 
   // Second pass: create one marker per location with proper click handlers
   Object.keys(markerMap.markers).forEach((eventLocationId) => {
@@ -186,10 +179,7 @@ const renderMap = async () => {
     };
 
     // Create marker title based on number of events
-    const title =
-      markerData.numberOfEvents === 1
-        ? `Click to view event: ${firstEvent?.title || 'Untitled Event'}`
-        : `Click to view ${markerData.numberOfEvents} events at this location`;
+    const title = buildMarkerTitle(markerData.numberOfEvents, firstEvent?.title);
 
     // Use an AdvancedMarkerElement. On a vector (mapId-based) map these render
     // as real DOM elements, so we can attach native hover listeners to the
@@ -236,10 +226,11 @@ const renderMap = async () => {
           const currentMarkerData = markerMap.markers[eventLocationId];
           if (currentMarkerData) {
             // Show tooltip with event info on hover
-            const content =
-              currentMarkerData.numberOfEvents === 1
-                ? `<div style="text-align:center"><b>${firstEvent?.title || 'Untitled Event'}</b>${firstEvent?.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`
-                : `<div style="text-align:center"><b>${currentMarkerData.numberOfEvents} events</b>${firstEvent?.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`;
+            const content = buildMarkerHoverContent(
+              currentMarkerData.numberOfEvents,
+              firstEvent?.title,
+              firstEvent?.locationName
+            );
 
             infowindow.setContent(content);
             infowindow.open({
@@ -298,10 +289,11 @@ const renderMap = async () => {
           const currentMarkerData = markerMap.markers[eventLocationId];
           if (currentMarkerData) {
             // Show tooltip with event info on hover
-            const content =
-              currentMarkerData.numberOfEvents === 1
-                ? `<div style="text-align:center"><b>${firstEvent?.title || 'Untitled Event'}</b>${firstEvent?.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`
-                : `<div style="text-align:center"><b>${currentMarkerData.numberOfEvents} events</b>${firstEvent?.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`;
+            const content = buildMarkerHoverContent(
+              currentMarkerData.numberOfEvents,
+              firstEvent?.title,
+              firstEvent?.locationName
+            );
 
             infowindow.setContent(content);
             infowindow.open({
@@ -352,7 +344,7 @@ const renderMap = async () => {
   const clusterRenderer = {
     render: (cluster: { count: number; position: google.maps.LatLng }) => {
       const { count, position } = cluster;
-      const color = count > 10 ? '#ef4444' : '#3b82f6';
+      const color = buildClusterColor(count);
       const div = document.createElement('div');
       div.textContent = String(count);
       div.style.cssText = [
@@ -384,7 +376,7 @@ const renderMap = async () => {
         if (b) {
           clustererMap.fitBounds(b);
           const currentZoom = clustererMap.getZoom() || 0;
-          const maxZoom = Math.min(currentZoom + 1, 18);
+          const maxZoom = calculateClusterZoom(currentZoom);
           setTimeout(() => clustererMap.setZoom(maxZoom), 200);
         }
       },

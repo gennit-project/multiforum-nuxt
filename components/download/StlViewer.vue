@@ -31,6 +31,11 @@ import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import type { CSSProperties } from 'vue';
+import {
+  buildContainerStyle,
+  calculateCameraDistance,
+  computeLoadProgressPercent,
+} from '@/utils/stlViewer';
 
 interface Props {
   src: string;
@@ -55,34 +60,9 @@ const props = withDefaults(defineProps<Props>(), {
   showGrid: false,
 });
 
-const containerStyle = computed((): CSSProperties => {
-  const style: CSSProperties = {};
-
-  // Handle width
-  if (typeof props.width === 'number') {
-    style.width = props.width + 'px';
-  } else {
-    style.width = props.width;
-  }
-
-  // Handle height
-  if (typeof props.height === 'number') {
-    style.height = props.height + 'px';
-  } else {
-    style.height = props.height;
-  }
-
-  // Handle max-width for responsive behavior
-  if (props.maxWidth) {
-    if (typeof props.maxWidth === 'number') {
-      style.maxWidth = props.maxWidth + 'px';
-    } else {
-      style.maxWidth = props.maxWidth;
-    }
-  }
-
-  return style;
-});
+const containerStyle = computed((): CSSProperties =>
+  buildContainerStyle(props.width, props.height, props.maxWidth)
+);
 
 const emit = defineEmits<{
   load: [data: { geometry: unknown; mesh: unknown }];
@@ -195,8 +175,7 @@ function initViewer(stlUrl: string) {
         const box = new THREE.Box3().setFromObject(mesh);
         const size = box.getSize(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z);
-        const fov = camera.fov * (Math.PI / 180);
-        const distance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5;
+        const distance = calculateCameraDistance(maxDim, camera.fov);
 
         camera.position.set(distance, distance, distance);
         camera.lookAt(0, 0, 0);
@@ -206,8 +185,10 @@ function initViewer(stlUrl: string) {
         emit('load', { geometry, mesh });
       },
       (progress: { loaded: number; total: number }) => {
-        const percent =
-          progress.total > 0 ? (progress.loaded / progress.total) * 100 : 0;
+        const percent = computeLoadProgressPercent(
+          progress.loaded,
+          progress.total
+        );
         emit('progress', percent);
       },
       (loadError: Error) => {
@@ -244,8 +225,7 @@ function resetCamera() {
     const box = new THREE.Box3().setFromObject(mesh);
     const size = box.getSize(new THREE.Vector3());
     const maxDim = Math.max(size.x, size.y, size.z);
-    const fov = camera.fov * (Math.PI / 180);
-    const distance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5;
+    const distance = calculateCameraDistance(maxDim, camera.fov);
 
     camera.position.set(distance, distance, distance);
     camera.lookAt(0, 0, 0);

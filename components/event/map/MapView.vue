@@ -20,6 +20,11 @@ import {
   reverseChronologicalOrder,
 } from '../list/filters/filterStrings';
 import { timeShortcutValues } from '../list/filters/eventSearchOptions';
+import {
+  toggleArrayItem,
+  cleanQueryParams,
+  buildInfowindowContent,
+} from '@/utils/eventMap';
 import type { Event as EventData } from '@/__generated__/graphql';
 import type { SearchEventValues } from '@/types/Event';
 import type { Ref, PropType } from 'vue';
@@ -153,14 +158,7 @@ const selectedEvents = ref<EventData[]>([]);
 
 const updateFilters = (params: SearchEventValues) => {
   const existingQuery = route.query;
-  const cleanedParams: Record<string, string> = {};
-
-  for (const key in params) {
-    const value = params[key as keyof SearchEventValues];
-    if (value) {
-      cleanedParams[key] = value as string;
-    }
-  }
+  const cleanedParams = cleanQueryParams(params);
   router.replace({
     query: {
       ...existingQuery,
@@ -177,40 +175,18 @@ const goToOnlineList = () => {
 };
 
 const filterByChannel = (channel: string) => {
-  const alreadySelected = filterValues.value.channels?.includes(channel);
-  if (alreadySelected) {
-    if (!filterValues.value.channels) {
-      // I know we already checked this in the if-statement above, but this
-      // is just to fix a TypeScript error.
-      return;
-    }
-    filterValues.value.channels = filterValues.value.channels.filter(
-      (c) => c !== channel
-    );
-  } else {
-    if (!filterValues.value.channels) {
-      filterValues.value.channels = [];
-    }
-    filterValues.value.channels.push(channel);
-  }
+  filterValues.value.channels = toggleArrayItem(
+    filterValues.value.channels ?? [],
+    channel
+  );
   updateFilters({ channels: [channel] });
 };
 
 const filterByTag = (tag: string) => {
-  const alreadySelected = filterValues.value.tags?.includes(tag);
-  if (alreadySelected) {
-    if (!filterValues.value.tags) {
-      // I know we already checked this in the if-statement above, but this
-      // is just to fix a TypeScript error.
-      return;
-    }
-    filterValues.value.tags = filterValues.value.tags.filter((t) => t !== tag);
-  } else {
-    if (!filterValues.value.tags) {
-      filterValues.value.tags = [];
-    }
-    filterValues.value.tags.push(tag);
-  }
+  filterValues.value.tags = toggleArrayItem(
+    filterValues.value.tags ?? [],
+    tag
+  );
   updateFilters({ tags: [tag] });
 };
 
@@ -278,11 +254,7 @@ const highlightEventOnMap = (input: HighlightEventInput) => {
         markerMap.markers[eventLocationId]?.events?.[highlightedEventId.value]
           ?.locationName;
 
-      let infowindowContent = `<b>${eventTitle}</b>`;
-
-      if (eventLocation) {
-        infowindowContent = `<div data-testid="infowindow" style="text-align:center"><b>${eventTitle}</b></div></div><div style="text-align:center">at ${eventLocation}</div>`;
-      }
+      const infowindowContent = buildInfowindowContent(eventTitle, eventLocation);
       markerMap.infowindow?.setContent(infowindowContent);
       markerMap.infowindow?.open({
         anchor: markerMap.markers[eventLocationId]?.marker,
