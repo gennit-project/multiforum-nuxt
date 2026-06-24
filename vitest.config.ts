@@ -3,7 +3,18 @@ import Vue from '@vitejs/plugin-vue';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [Vue()],
+  // `model-viewer` is a web component (registered at runtime via
+  // @google/model-viewer); tell the template compiler it is a custom element
+  // so it renders as a native tag in tests instead of an unresolved component.
+  plugins: [
+    Vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => tag === 'model-viewer',
+        },
+      },
+    }),
+  ],
   test: {
     globals: true,
     environment: 'happy-dom',
