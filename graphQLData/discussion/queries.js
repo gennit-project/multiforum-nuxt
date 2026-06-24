@@ -193,6 +193,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
           Channel {
             uniqueName
             displayName
+            channelIconURL
           }
         }
         Album {

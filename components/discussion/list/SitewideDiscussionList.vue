@@ -308,7 +308,7 @@ const filterByChannel = (channel: string) => {
             </p>
             <div v-if="discussions && discussions.length > 0" class="p-0">
               <ul
-                class="m-0 flex flex-col divide-y divide-gray-200 bg-white p-0 shadow dark:divide-gray-700 dark:bg-black sm:rounded-lg"
+                class="m-0 flex flex-col p-0 lg:divide-y lg:divide-gray-200 lg:rounded-lg lg:bg-white lg:shadow lg:dark:divide-gray-700 lg:dark:bg-black"
                 data-testid="sitewide-discussion-list"
                 role="list"
               >
