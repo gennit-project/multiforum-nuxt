@@ -7,6 +7,14 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
+    // The default 5s per-test timeout is too tight under full-suite parallel
+    // load: the first test in each file pays a one-time Vue SFC compile +
+    // happy-dom warmup cost, and when many worker processes saturate the CPU
+    // that first mount can be starved past 5s and flake as a timeout (the
+    // tests themselves run in <500ms in isolation). Give generous headroom so
+    // contention can't trip a false timeout; a genuine hang is still caught.
+    testTimeout: 20000,
+    hookTimeout: 20000,
     include: ['**/*.{spec,test}.ts', '**/*.{spec,test}.tsx'],
     exclude: [
       'node_modules/**',
