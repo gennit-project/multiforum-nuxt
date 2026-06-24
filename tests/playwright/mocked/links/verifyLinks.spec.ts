@@ -353,9 +353,15 @@ test.describe('Link verification - pages resolve correctly', () => {
       // Navigate to discussion permalink
       await page.goto(`/forums/${TEST_CHANNEL}/discussions/${discussionId}`);
 
-      // Verify the page loads with correct content
+      // Verify the page loads with correct content. The detail page shows two
+      // "Add to favorites" buttons (header + title-edit form), so scope to the
+      // first to avoid a strict-mode match on both.
       await expect(
-        page.getByRole('button', { name: 'Add "Test Discussion Title" to favorites' })
+        page
+          .getByRole('button', {
+            name: 'Add "Test Discussion Title" to favorites',
+          })
+          .first()
       ).toBeVisible();
       await expect(page.getByText('Test discussion body content')).toBeVisible();
 

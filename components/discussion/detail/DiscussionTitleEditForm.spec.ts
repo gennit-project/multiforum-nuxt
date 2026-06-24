@@ -66,6 +66,8 @@ const mountForm = () =>
     global: {
       stubs: {
         RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
+        // Apollo/Pinia-backed; not relevant to the title-form behavior here.
+        AddToDiscussionFavorites: true,
         TextInput: {
           name: 'TextInput',
           props: ['value'],
