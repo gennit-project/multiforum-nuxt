@@ -10,6 +10,7 @@ import type {
 import type { DiscussionWithFavorited } from '@/types/Discussion';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import TagComponent from '@/components/TagComponent.vue';
+import AvatarComponent from '@/components/AvatarComponent.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
@@ -125,15 +126,6 @@ const discussionDetailOptions = computed(() => {
   }).sort((a, b) => b.label.localeCompare(a.label));
 });
 
-const primaryForumName = computed(() => {
-  const firstChannel = safeArrayFirst(
-    props.discussion?.DiscussionChannels || []
-  );
-  return (
-    firstChannel?.Channel?.displayName || firstChannel?.channelUniqueName || ''
-  );
-});
-
 const authorIsAdmin = computed(() => {
   return (
     getServerRoleBadge({
@@ -199,6 +191,44 @@ const relative = computed(() =>
   props.discussion ? relativeTime(props.discussion.createdAt) : ''
 );
 
+// Thumbnail for the mobile card layout. Prefers the first album image
+// (respecting imageOrder), then falls back to the first image embedded in the
+// discussion body markdown so image posts without an album still show one.
+const thumbnailUrl = computed(() => {
+  const album = props.discussion?.Album;
+  const images = album?.Images || [];
+  if (images.length) {
+    const order = album?.imageOrder || [];
+    if (order.length) {
+      const firstOrdered = images.find((img) => img?.id === order[0]);
+      if (firstOrdered?.url) return firstOrdered.url;
+    }
+    if (images[0]?.url) return images[0].url;
+  }
+
+  const body = props.discussion?.body || '';
+  const markdownImage = body.match(/!\[[^\]]*\]\(([^)\s]+)\)/);
+  if (markdownImage?.[1]) return markdownImage[1];
+  const htmlImage = body.match(/<img[^>]+src=["']([^"']+)["']/i);
+  if (htmlImage?.[1]) return htmlImage[1];
+
+  return '';
+});
+
+// Channel icons for the mobile card. A discussion can be posted to multiple
+// forums; we show up to three overlapping channel icons and an "and N more"
+// label for the remainder.
+const channelIcons = computed(() =>
+  (props.discussion?.DiscussionChannels || []).map((dc: DiscussionChannel) => ({
+    uniqueName: dc.channelUniqueName,
+    iconURL: dc.Channel?.channelIconURL || '',
+  }))
+);
+const displayChannelIcons = computed(() => channelIcons.value.slice(0, 3));
+const extraChannelCount = computed(() =>
+  Math.max(0, channelIcons.value.length - 3)
+);
+
 // Sensitive content logic
 const sensitiveContentRevealed = ref(false);
 const hasSensitiveContent = computed(
@@ -223,24 +253,62 @@ const revealSensitiveContent = () => {
 </script>
 
 <template>
-  <li
-    class="list-none px-4 py-4"
-    :class="{
-      'bg-gray-100 dark:bg-gray-800': isSelected,
-    }"
-  >
-    <div class="flex w-full justify-between">
-      <div class="w-full">
-        <div class="flex items-center">
+  <li class="list-none">
+    <div
+      class="m-2 flex flex-col gap-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900 lg:m-0 lg:block lg:gap-0 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-4 lg:dark:bg-transparent"
+      :class="{
+        'ring-2 ring-orange-400 dark:ring-orange-500 lg:bg-gray-100 lg:ring-0 dark:lg:bg-gray-800':
+          isSelected,
+      }"
+    >
+      <!-- Discussion row -->
+      <div class="flex items-start gap-3">
+        <div class="flex flex-shrink-0 flex-col items-center gap-1">
+          <div v-if="displayChannelIcons.length" class="flex -space-x-2">
+            <div
+              v-for="channel in displayChannelIcons"
+              :key="channel.uniqueName"
+              class="group/chicon relative"
+            >
+              <AvatarComponent
+                class="h-8 w-8 shrink-0 rounded-full ring-2 ring-white dark:ring-gray-900"
+                :text="channel.uniqueName"
+                :src="channel.iconURL"
+                :is-small="true"
+                :is-square="false"
+                :is-decorative="true"
+              />
+              <span
+                class="pointer-events-none absolute -top-8 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover/chicon:opacity-100 dark:bg-gray-700"
+              >
+                {{ channel.uniqueName }}
+              </span>
+            </div>
+          </div>
+          <span
+            v-if="extraChannelCount > 0"
+            class="text-center text-[10px] leading-tight text-gray-500 dark:text-gray-400"
+          >
+            and {{ extraChannelCount }} more
+          </span>
+          <AddToDiscussionFavorites
+            v-if="discussion"
+            :allow-add-to-list="true"
+            :discussion-id="discussion.id"
+            :discussion-title="discussion.title"
+            :initial-is-favorited="(discussion as Discussion & DiscussionWithFavorited).isFavorited"
+            size="small"
+          />
+        </div>
+        <div class="min-w-0 flex-1">
           <nuxt-link
             v-if="discussion"
             :to="getDetailLink()"
-            class="w-full text-left lg:hidden"
+            class="block lg:hidden"
           >
             <div class="flex items-start gap-2">
               <span
-                :class="isSelected ? 'text-black dark:text-white' : ''"
-                class="cursor-pointer text-sm text-gray-900 hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
+                class="text-base font-semibold leading-snug text-gray-900 dark:text-gray-100"
               >
                 <HighlightedSearchTerms
                   :text="title"
@@ -249,7 +317,7 @@ const revealSensitiveContent = () => {
               </span>
               <span
                 v-if="hasSensitiveContent"
-                class="rounded-full border border-amber-700 px-2 text-xs text-amber-700 dark:border-orange-400 dark:text-orange-400"
+                class="mt-1 flex-shrink-0 rounded-full border border-amber-700 px-2 text-xs text-amber-700 dark:border-orange-400 dark:text-orange-400"
               >
                 Sensitive
               </span>
@@ -257,13 +325,12 @@ const revealSensitiveContent = () => {
           </nuxt-link>
           <nuxt-link
             v-if="discussion"
-            class="hidden w-full text-left lg:block"
             :to="getDesktopSelectionLink()"
+            class="hidden lg:block"
           >
             <div class="flex items-start gap-2">
               <span
-                :class="isSelected ? 'text-black dark:text-white' : ''"
-                class="cursor-pointer text-sm text-gray-900 hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
+                class="text-base font-semibold leading-snug text-gray-900 dark:text-gray-100"
               >
                 <HighlightedSearchTerms
                   :text="title"
@@ -272,107 +339,113 @@ const revealSensitiveContent = () => {
               </span>
               <span
                 v-if="hasSensitiveContent"
-                class="rounded-full border border-amber-700 px-2 text-xs text-amber-700 dark:border-orange-400 dark:text-orange-400"
+                class="mt-1 flex-shrink-0 rounded-full border border-amber-700 px-2 text-xs text-amber-700 dark:border-orange-400 dark:text-orange-400"
               >
                 Sensitive
               </span>
             </div>
           </nuxt-link>
-        </div>
-        <div
-          class="-mt-1 text-xs text-gray-600 no-underline dark:text-gray-200"
-        >
-          <div>
-            <span class="inline">Posted {{ relative }} in </span>
+          <div
+            class="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-gray-500 dark:text-gray-400"
+          >
             <nuxt-link
               v-if="discussion"
               :to="{
                 name: 'forums-forumId-discussions',
-                params: {
-                  forumId,
-                },
+                params: { forumId },
               }"
-              class="inline text-gray-800 hover:underline dark:text-gray-100"
+              class="rounded bg-gray-100 px-1.5 py-0.5 font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200"
             >
-              {{ primaryForumName }}
+              {{ forumId }}
             </nuxt-link>
             <span
               v-if="submittedToMultipleChannels"
-              class="inline text-gray-500 dark:text-gray-400"
+              class="text-gray-400 dark:text-gray-500"
             >
-              and {{ channelCount - 1 }} more
+              +{{ channelCount - 1 }}
             </span>
-            <span class="inline"> by</span>
-            <div class="inline-flex">
-              <UsernameWithTooltip
-                v-if="authorUsername"
-                :is-admin="authorIsAdmin"
-                :username="authorUsername"
-                :src="discussion?.Author?.profilePicURL || ''"
-                :display-name="discussion?.Author?.displayName || ''"
-                :comment-karma="discussion?.Author?.commentKarma ?? 0"
-                :discussion-karma="discussion?.Author?.discussionKarma ?? 0"
-                :account-created="discussion?.Author?.createdAt"
-              />
-            </div>
-
-            <!-- Comment count -->
-            <span class="mx-1 inline">•</span>
+            <span aria-hidden="true">•</span>
+            <span>{{ relative }}</span>
+            <span aria-hidden="true">•</span>
+            <UsernameWithTooltip
+              v-if="authorUsername"
+              :is-admin="authorIsAdmin"
+              :username="authorUsername"
+              :src="discussion?.Author?.profilePicURL || ''"
+              :display-name="discussion?.Author?.displayName || ''"
+              :comment-karma="discussion?.Author?.commentKarma ?? 0"
+              :discussion-karma="discussion?.Author?.discussionKarma ?? 0"
+              :account-created="discussion?.Author?.createdAt"
+            />
+            <span aria-hidden="true">•</span>
             <template v-if="discussion && !submittedToMultipleChannels">
-              <nuxt-link :to="getDetailLink()" class="inline">
+              <nuxt-link
+                :to="getDetailLink()"
+                class="flex items-center gap-1 hover:underline"
+              >
+                <i class="fa-regular fa-comment" aria-hidden="true" />
                 {{ commentCount }}
-                {{ commentCount === 1 ? 'comment' : 'comments' }}
               </nuxt-link>
             </template>
-
             <template v-else-if="discussion">
-              <span class="inline-flex">
-                <MenuButton :items="discussionDetailOptions">
-                  <span class="inline cursor-pointer">
-                    <i
-                      class="fa-regular fa-comment mr-1 h-4 w-4"
-                      aria-hidden="true"
-                    />
-                    {{ commentCount }}
-                    {{ commentCount === 1 ? 'comment' : 'comments' }} in
-                    {{ channelCount }}
-                    {{ channelCount === 1 ? 'forum' : 'forums' }}
-                    <ChevronDownIcon
-                      class="ml-1 inline h-4 w-4"
-                      aria-hidden="true"
-                    />
-                  </span>
-                </MenuButton>
-              </span>
+              <MenuButton :items="discussionDetailOptions">
+                <span class="flex cursor-pointer items-center gap-1">
+                  <i class="fa-regular fa-comment" aria-hidden="true" />
+                  {{ commentCount }} in {{ channelCount }}
+                  <ChevronDownIcon class="h-3 w-3" aria-hidden="true" />
+                </span>
+              </MenuButton>
             </template>
-
-            <div class="inline-flex">
-              <AddToDiscussionFavorites
-                v-if="discussion"
-                :allow-add-to-list="true"
-                :discussion-id="discussion.id"
-                :discussion-title="discussion.title"
-                :initial-is-favorited="(discussion as Discussion & DiscussionWithFavorited).isFavorited"
-                size="small"
-              />
-            </div>
+            <template v-if="discussion && (discussion.body || discussion.Album)">
+              <span aria-hidden="true">•</span>
+              <button
+                type="button"
+                class="flex items-center gap-1 hover:underline"
+                :aria-expanded="isExpanded"
+                @click="isExpanded = !isExpanded"
+              >
+                <i
+                  :class="isExpanded ? 'fa-solid fa-xmark' : 'fa-solid fa-expand'"
+                  class="text-[10px]"
+                  aria-hidden="true"
+                />
+                {{ isExpanded ? 'Collapse' : 'Expand' }}
+              </button>
+            </template>
           </div>
         </div>
-        <button
-          v-if="discussion && (discussion.body || discussion.Album)"
-          type="button"
-          class="text-xs text-gray-600 hover:underline dark:text-gray-300"
-          :aria-expanded="isExpanded"
-          @click="isExpanded = !isExpanded"
+        <nuxt-link
+          v-if="thumbnailUrl && discussion"
+          :to="getDetailLink()"
+          class="flex-shrink-0 lg:hidden"
         >
-          <i
-            v-if="!isExpanded"
-            class="fa-solid fa-expand mr-1 text-xs"
-            aria-hidden="true"
-          />
-          <i v-else class="fa-solid fa-x mr-1 text-xs" aria-hidden="true" />
-          {{ isExpanded ? 'Collapse' : 'Expand' }}
-        </button>
+          <img
+            :src="thumbnailUrl"
+            :alt="title"
+            class="h-16 w-16 rounded-lg object-cover sm:h-20 sm:w-20"
+          >
+        </nuxt-link>
+        <nuxt-link
+          v-if="thumbnailUrl && discussion"
+          :to="getDesktopSelectionLink()"
+          class="hidden flex-shrink-0 lg:block"
+        >
+          <img
+            :src="thumbnailUrl"
+            :alt="title"
+            class="h-16 w-16 rounded-lg object-cover sm:h-20 sm:w-20"
+          >
+        </nuxt-link>
+        <nuxt-link
+          v-if="discussion"
+          :to="getDetailLink()"
+          class="flex items-center self-center text-gray-300 dark:text-gray-600 lg:hidden"
+          aria-label="Open discussion"
+        >
+          <i class="fa-solid fa-chevron-right" aria-hidden="true" />
+        </nuxt-link>
+      </div>
+
         <div
           v-if="
             discussion && (discussion.body || discussion.Album) && isExpanded
@@ -451,7 +524,6 @@ const revealSensitiveContent = () => {
             @click="$emit('filterByTag', tag)"
           />
         </div>
-      </div>
     </div>
   </li>
 </template>

@@ -183,8 +183,8 @@ function viewFeedback() {
       @vote="clickUpvote"
     >
       <i class="fa-solid fa-arrow-up" aria-hidden="true" />
-      <span class="text-xs">{{ upvoteActive ? 'Undo' : 'Upvote' }}</span>
       <span class="text-xs">{{ upvoteCount }}</span>
+      <span class="text-xs">{{ upvoteActive ? 'Undo' : 'Upvote' }}</span>
     </VoteButton>
 
     <!-- Super Upvote button - visible when user has upvoted and not own content -->

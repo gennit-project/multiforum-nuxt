@@ -280,7 +280,7 @@ async function handleUndoSuperUpvote() {
     :suspended-indefinitely="suspensionIndefinitely ?? false"
     :message="'You are suspended in this forum and cannot react.'"
   />
-  <div class="flex items-center justify-between">
+  <div class="flex items-center gap-2">
     <div class="flex items-center gap-2">
       <VoteButtons
         :downvote-active="loggedInUserDownvoted"

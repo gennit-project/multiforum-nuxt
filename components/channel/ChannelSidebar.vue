@@ -129,23 +129,13 @@ const handleBecomeAdminSuccess = () => {
           :is-square="false"
         />
       </div>
-      <div class="flex w-full items-center gap-4">
-        <div v-if="channelId" class="flex items-center">
-          <div class="mb-1 mt-3 flex-1">
-            <span
-              class="flex space-y-2 rounded-full border-gray-700 text-xl leading-6 text-black dark:text-gray-200"
-            >
-              {{ channel?.displayName ? channel.displayName : channelId }}
-            </span>
-            <span
-              v-if="channel?.uniqueName && channel?.displayName"
-              class="rounded-full bg-white font-mono text-sm text-gray-500 dark:bg-gray-900 dark:text-gray-300"
-            >
-              {{ `${channel.uniqueName}` }}
-            </span>
-          </div>
-        </div>
-        <div class="flex items-center">
+      <div v-if="channelId" class="mb-1 mt-3 flex w-full flex-col">
+        <div class="flex items-center gap-4">
+          <span
+            class="flex space-y-2 rounded-full border-gray-700 text-xl leading-6 text-black dark:text-gray-200"
+          >
+            {{ channel?.displayName ? channel.displayName : channelId }}
+          </span>
           <AddToChannelFavorites
             :allow-add-to-list="true"
             :channel-unique-name="channelId"
@@ -153,6 +143,12 @@ const handleBecomeAdminSuccess = () => {
             size="medium"
           />
         </div>
+        <span
+          v-if="channel?.uniqueName && channel?.displayName"
+          class="font-mono text-sm text-gray-500 dark:text-gray-300"
+        >
+          {{ `${channel.uniqueName}` }}
+        </span>
       </div>
       <MarkdownPreview
         v-if="channel?.description"
