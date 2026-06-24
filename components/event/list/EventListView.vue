@@ -351,6 +351,7 @@ watch(isSearchListRoute, (isSearchRoute) => {
           :channel-unique-name="selectedSearchEventChannelId"
           :show-comments="false"
           :show-title="true"
+          :link-title="true"
         />
       </div>
       <div

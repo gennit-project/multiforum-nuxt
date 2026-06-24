@@ -88,6 +88,13 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // When the title is shown in a preview (e.g. the search right pane), render
+  // it as an underlined link to the event detail page so it's clear that
+  // clicking it navigates away.
+  linkTitle: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(['fetchedOriginalPosterUsername']);
@@ -459,6 +466,20 @@ watchEffect(() => {
                       }"
                       class="text-orange-500 dark:text-orange-400"
                       rel="noopener noreferrer"
+                    >
+                      {{ event.title }}
+                    </nuxt-link>
+                  </template>
+                  <template v-else-if="linkTitle && channelId && event">
+                    <nuxt-link
+                      :to="{
+                        name: 'forums-forumId-events-eventId',
+                        params: {
+                          forumId: channelId,
+                          eventId: event.id,
+                        },
+                      }"
+                      class="underline"
                     >
                       {{ event.title }}
                     </nuxt-link>
