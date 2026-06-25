@@ -10,6 +10,7 @@ import { useRoute, useRouter } from 'nuxt/app';
 import type { CreateEditEventFormValues } from '@/types/Event';
 import { DateTime } from 'luxon';
 import getDefaultEventFormValues from '@/utils/defaultEventFormValues';
+import { buildEventEditFormValues } from '@/utils/eventEditForm';
 import EditScopeModal from '@/components/event/form/EditScopeModal.vue';
 import CreateEditEventFields from '@/components/event/form/CreateEditEventFields.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
@@ -99,42 +100,10 @@ const isPartOfSeries = computed(() => {
 // Edit scope modal state
 const showEditScopeModal = ref(false);
 
-function getFormValuesFromEventData(
+// Field mapping lives in utils/eventEditForm.ts (unit-tested).
+const getFormValuesFromEventData = (
   eventData: Event
-): CreateEditEventFormValues {
-  return {
-    title: eventData.title,
-    description: eventData.description || '',
-    selectedTags: (eventData.Tags || []).map((tag: TagData) => {
-      return tag.text;
-    }),
-    selectedChannels: (eventData.EventChannels || []).map(
-      (ec: EventChannel) => {
-        return ec.channelUniqueName;
-      }
-    ),
-    address: eventData.address || '',
-    locationName: eventData.locationName || '',
-    isInPrivateResidence: eventData.isInPrivateResidence || false,
-    virtualEventUrl: eventData.virtualEventUrl || '',
-    startTime: eventData.startTime,
-    startTimeDayOfWeek: eventData.startTimeDayOfWeek || '',
-    startTimeHourOfDay: eventData.startTimeHourOfDay || 0,
-    endTime: eventData.endTime,
-    canceled: eventData.canceled,
-    deleted: eventData.deleted || false,
-    cost: eventData.cost || '',
-    free: eventData.free || false,
-    isHostedByOP: eventData.isHostedByOP || false,
-    isAllDay: eventData.isAllDay || false,
-    coverImageURL: eventData.coverImageURL || '',
-    // Multi-date / recurring event fields
-    dateMode: 'single',
-    occurrences: [],
-    dateRangeGroups: [],
-    repeatPattern: undefined,
-  };
-}
+): CreateEditEventFormValues => buildEventEditFormValues(eventData);
 
 function getDefaultFormValues(): CreateEditEventFormValues {
   // If the event data is already loaded, start with

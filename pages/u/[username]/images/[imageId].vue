@@ -13,6 +13,7 @@ import LinkIcon from '@/components/icons/LinkIcon.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import AddImageToFavorites from '@/components/favorites/AddImageToFavorites.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
+import { orderImagesByOrder } from '@/utils/albumImageOrder';
 import { useUsername } from '@/composables/useAuthState';
 import TextEditor from '@/components/TextEditor.vue';
 import SaveButton from '@/components/SaveButton.vue';
@@ -164,27 +165,16 @@ const albumDiscussions = computed(() => {
   return image.value?.Album?.Discussions || [];
 });
 
-// Album images - ordered according to imageOrder, excluding current image
+// Album images - ordered according to imageOrder (utils/albumImageOrder),
+// excluding the current image.
 const albumImages = computed(() => {
   const album = image.value?.Album;
   if (!album?.Images) return [];
 
-  const images = album.Images;
-  const imageOrder = album.imageOrder;
-
-  // Order images according to imageOrder if available
-  let orderedImages;
-  if (imageOrder && imageOrder.length > 0) {
-    orderedImages = imageOrder
-      .filter((imgId): imgId is string => imgId !== null && imgId !== undefined)
-      .map((imgId) => images.find((img) => img.id === imgId))
-      .filter((img): img is NonNullable<typeof img> => img !== undefined);
-  } else {
-    orderedImages = images;
-  }
-
-  // Exclude the current image from the list
-  return orderedImages.filter((img) => img.id !== image.value?.id);
+  return orderImagesByOrder({
+    images: album.Images,
+    imageOrder: album.imageOrder,
+  }).filter((img) => img.id !== image.value?.id);
 });
 
 // Lightbox zoom + pan state (extracted to a composable). The open guard keeps

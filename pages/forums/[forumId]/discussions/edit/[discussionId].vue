@@ -17,6 +17,7 @@ import type {
   Image,
 } from '@/__generated__/graphql';
 import { useModProfileName } from '@/composables/useAuthState';
+import { buildDiscussionEditFormValues } from '@/utils/discussionEditForm';
 
 const modProfileNameVar = useModProfileName();
 
@@ -156,52 +157,9 @@ onGetDiscussionResult((value) => {
     ],
   });
 
-  // Create a map of valid images with their IDs
-  const validImages = (discussion.Album?.Images ?? [])
-    .filter((image: Image) => image.id && image.url) // Only include images with valid IDs and URLs
-    .map((image: Image) => ({
-      id: image.id,
-      url: image.url,
-      alt: image.alt || '',
-      caption: image.caption || '',
-      copyright: image.copyright || '',
-    }));
-
-  // Filter out any null or undefined values from imageOrder and ensure they exist in images
-  const validImageOrder = (discussion.Album?.imageOrder ?? []).filter(
-    (id: string | null | undefined): id is string =>
-      typeof id === 'string' &&
-      id.length > 0 &&
-      validImages.some(
-        (img: {
-          id: string;
-          url: string;
-          alt: string;
-          caption: string;
-          copyright: string;
-        }) => img.id === id
-      )
-  );
-
-  const formFields: CreateEditDiscussionFormValues = {
-    title: discussion.title,
-    body: discussion.body,
-    selectedTags: discussion.Tags.map((tag: TagData) => {
-      return tag.text;
-    }),
-    selectedChannels: discussion.DiscussionChannels.map(
-      (discussionChannel: DiscussionChannel) => {
-        return discussionChannel?.Channel?.uniqueName;
-      }
-    ),
-    author: discussion.Author.username,
-    album: {
-      images: validImages,
-      imageOrder: validImageOrder, // Add the validated imageOrder
-    },
-    crosspostId: discussion.CrosspostedDiscussion?.id || null,
-  };
-  formValues.value = formFields;
+  // Field mapping (incl. the validImageOrder cross-check) lives in
+  // utils/discussionEditForm.ts (unit-tested).
+  formValues.value = buildDiscussionEditFormValues(discussion);
   dataLoaded.value = true;
 });
 

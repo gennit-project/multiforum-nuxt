@@ -15,6 +15,11 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { getTagLabel } from '@/utils';
+import {
+  buildChannelCountMap,
+  mergeChannelCounts,
+  toggleSelectedTag,
+} from '@/utils/forumListChannels';
 import type { LocationQueryValue } from 'vue-router';
 import type { Channel } from '@/__generated__/graphql';
 
@@ -41,14 +46,7 @@ const setSearchInput = (input: string) => {
 };
 
 const setSelectedTags = (tag: string) => {
-  // Check if the tag is already selected
-  if (selectedTags.value.includes(tag)) {
-    // If it is, remove it (deselect)
-    selectedTags.value = selectedTags.value.filter((t) => t !== tag);
-  } else {
-    // If it's not, add it (select)
-    selectedTags.value.push(tag);
-  }
+  selectedTags.value = toggleSelectedTag(selectedTags.value, tag);
 
   // Update query params in URL to reflect selected tags
   router.push({
@@ -116,58 +114,22 @@ const { result: downloadCountsResult, fetchMore: fetchMoreDownloadCounts } =
     }
   );
 
-// Create map of channel name -> discussion count from the discussions query
-const discussionCountMap = computed(() => {
-  const map = new Map<string, number>();
-  const discussionChannels =
-    channelResult.value?.getSortedChannels?.channels || [];
+// Channel count maps + merge logic live in utils/forumListChannels.ts (tested).
+const discussionCountMap = computed(() =>
+  buildChannelCountMap(channelResult.value?.getSortedChannels?.channels)
+);
 
-  discussionChannels.forEach((channel: Channel) => {
-    if (channel.uniqueName) {
-      const discussionCount = channel.DiscussionChannelsAggregate?.count || 0;
-      map.set(channel.uniqueName, discussionCount);
-    }
-  });
+const downloadCountMap = computed(() =>
+  buildChannelCountMap(downloadCountsResult.value?.getSortedChannels?.channels)
+);
 
-  return map;
-});
-
-// Create map of channel name -> download count from the downloads query
-const downloadCountMap = computed(() => {
-  const map = new Map<string, number>();
-  const downloadChannels =
-    downloadCountsResult.value?.getSortedChannels?.channels || [];
-
-  downloadChannels.forEach((channel: Channel) => {
-    if (channel.uniqueName) {
-      const downloadCount = channel.DiscussionChannelsAggregate?.count || 0;
-      map.set(channel.uniqueName, downloadCount);
-    }
-  });
-
-  return map;
-});
-
-// Merge channels by injecting both counts from the maps
-const mergedChannels = computed(() => {
-  const baseChannels = channelResult.value?.getSortedChannels?.channels || [];
-
-  return baseChannels.map((channel: Channel) => {
-    const discussionCount =
-      discussionCountMap.value.get(channel.uniqueName) || 0;
-    const downloadCount = downloadCountMap.value.get(channel.uniqueName) || 0;
-
-    // Create new channel object with corrected discussion count and added download count
-    return {
-      ...channel,
-      DiscussionChannelsAggregate: {
-        ...channel.DiscussionChannelsAggregate,
-        count: discussionCount,
-      },
-      downloadCount,
-    };
-  });
-});
+const mergedChannels = computed(() =>
+  mergeChannelCounts<Channel>({
+    baseChannels: channelResult.value?.getSortedChannels?.channels,
+    discussionCountMap: discussionCountMap.value,
+    downloadCountMap: downloadCountMap.value,
+  })
+);
 
 // Function to load more channels
 const loadMore = () => {

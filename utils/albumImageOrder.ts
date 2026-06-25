@@ -8,7 +8,8 @@ export type OrderableImage = { id?: string | null };
 
 export type OrderImagesParams<T> = {
   images: T[] | null | undefined;
-  imageOrder: string[] | null | undefined;
+  // Accepts GraphQL `Maybe<string>[]`; null/undefined ids simply match nothing.
+  imageOrder: (string | null | undefined)[] | null | undefined;
 };
 
 /**
