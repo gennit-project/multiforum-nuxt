@@ -3,7 +3,7 @@
 // Client-side fallback for the app username.
 //
 // The app identity username (e.g. "cluse") is resolved server-side during SSR
-// in server/middleware/2.auth-session.ts (Auth0 email -> backend GET_EMAIL ->
+// in server/middleware/2.auth-session.ts (Auth0 email -> backend getOwnEmail ->
 // username) and travels to the client through the Nuxt payload. There is no
 // client-side resolver anymore — the SPA `useAuthManager` was removed when the
 // server-session migration landed.
@@ -18,7 +18,7 @@
 //
 // This plugin restores a minimal client fallback: when the session is
 // authenticated (we have a verified email) but username is still empty, resolve
-// it from the backend by email and seed the auth state. It mirrors GET_EMAIL
+// it from the backend by token and seed the auth state. It mirrors GET_OWN_EMAIL
 // (graphQLData/email/queries.js) and the SSR middleware. It is fire-and-forget
 // so it never delays app startup; the reactive `username` update lets the
 // favorite-status query and ownership-gated UI come to life once it lands.
@@ -34,37 +34,31 @@ import {
   setNotificationCount,
 } from '@/composables/useAuthState';
 
-const GET_EMAIL_QUERY = /* GraphQL */ `
-  query getEmail($emailAddress: String!) {
-    emails(where: { address: $emailAddress }) {
-      User {
-        username
-        profilePicURL
-        ModerationProfile {
-          displayName
-        }
-        NotificationsAggregate(where: { read: false }) {
-          count
-        }
-      }
+// Self-scoped: getOwnEmail resolves the caller's email from the verified token
+// on the backend, so it takes no arguments and can't look up anyone else.
+const GET_OWN_EMAIL_QUERY = /* GraphQL */ `
+  query getOwnEmail {
+    getOwnEmail {
+      username
+      profilePicURL
+      modProfileName
+      unreadNotificationCount
     }
   }
 `;
 
-type EmailLookupResponse = {
+type OwnEmailResponse = {
   data?: {
-    emails?: Array<{
-      User?: {
-        username?: string | null;
-        profilePicURL?: string | null;
-        ModerationProfile?: { displayName?: string | null } | null;
-        NotificationsAggregate?: { count?: number | null } | null;
-      } | null;
-    } | null> | null;
+    getOwnEmail?: {
+      username?: string | null;
+      profilePicURL?: string | null;
+      modProfileName?: string | null;
+      unreadNotificationCount?: number | null;
+    } | null;
   };
 };
 
-const resolveUsername = async (emailAddress: string) => {
+const resolveUsername = async () => {
   const endpoint = config?.graphqlUrl;
   if (!endpoint) return;
 
@@ -77,29 +71,28 @@ const resolveUsername = async (emailAddress: string) => {
         ...(token ? { authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify({
-        query: GET_EMAIL_QUERY,
-        variables: { emailAddress },
+        query: GET_OWN_EMAIL_QUERY,
       }),
     });
     if (!res.ok) return;
 
-    const json = (await res.json()) as EmailLookupResponse;
-    const user = json?.data?.emails?.[0]?.User;
-    if (!user?.username) return;
+    const json = (await res.json()) as OwnEmailResponse;
+    const ownEmail = json?.data?.getOwnEmail;
+    if (!ownEmail?.username) return;
 
     // Only seed if SSR still hasn't filled it in (avoid clobbering a value that
     // arrived between scheduling and resolving).
     if (!useUsername().value) {
-      setUsername(user.username);
+      setUsername(ownEmail.username);
     }
-    if (user.ModerationProfile?.displayName) {
-      setModProfileName(user.ModerationProfile.displayName);
+    if (ownEmail.modProfileName) {
+      setModProfileName(ownEmail.modProfileName);
     }
-    if (user.profilePicURL) {
-      setProfilePicURL(user.profilePicURL);
+    if (ownEmail.profilePicURL) {
+      setProfilePicURL(ownEmail.profilePicURL);
     }
-    if (typeof user.NotificationsAggregate?.count === 'number') {
-      setNotificationCount(user.NotificationsAggregate.count);
+    if (typeof ownEmail.unreadNotificationCount === 'number') {
+      setNotificationCount(ownEmail.unreadNotificationCount);
     }
   } catch {
     // Ignore — username stays empty and will be retried on the next load.
@@ -117,6 +110,8 @@ export default defineNuxtPlugin(() => {
   // SSR already resolved the username.
   if (!isAuthenticated.value || !email.value || username.value) return;
 
-  // Fire-and-forget: never block app startup on this network round-trip.
-  void resolveUsername(email.value);
+  // Fire-and-forget: never block app startup on this network round-trip. The
+  // backend resolves identity from the bearer token; email.value is just the
+  // "are we even signed in" gate.
+  void resolveUsername();
 });

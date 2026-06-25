@@ -39,14 +39,14 @@ const run = async () => {
 
 const resolvedUser = (user: Record<string, unknown> | null) => ({
   ok: true,
-  json: async () => ({ data: { emails: [{ User: user }] } }),
+  json: async () => ({ data: { getOwnEmail: user } }),
 });
 
 const fullUser = {
   username: 'cluse',
   profilePicURL: 'https://pics/cluse.png',
-  ModerationProfile: { displayName: 'mod-cluse' },
-  NotificationsAggregate: { count: 4 },
+  modProfileName: 'mod-cluse',
+  unreadNotificationCount: 4,
 };
 
 beforeEach(() => {
@@ -79,10 +79,12 @@ describe('auth-username-fallback plugin: resolves when authenticated but usernam
     expect(h.setNotificationCount).toHaveBeenCalledWith(4);
   });
 
-  it('looks the user up by their email address', async () => {
+  it('looks the user up via the self-scoped getOwnEmail query (no email variable)', async () => {
     await run();
     const body = JSON.parse(h.fetch.mock.calls[0][1].body as string);
-    expect(body.variables.emailAddress).toBe('cat@example.com');
+    expect(body.query).toContain('getOwnEmail');
+    // Identity now comes from the bearer token, not a client-supplied address.
+    expect(body.variables?.emailAddress).toBeUndefined();
   });
 });
 
