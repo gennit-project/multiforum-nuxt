@@ -4,11 +4,34 @@ import { mount } from '@vue/test-utils';
 // Define mock functions for the router
 const routerGoMock = vi.fn();
 
-// Mock modules before tests
+// Mock modules before tests. These are hoisted to the top of the module by
+// Vitest, so they must live at the top level (not inside a hook) to reflect
+// their real execution order.
 vi.mock('nuxt/app', () => ({
   useRouter: () => ({
     go: routerGoMock,
   }),
+}));
+
+vi.mock('@/components/CancelButton.vue', () => ({
+  default: {
+    name: 'CancelButton',
+    template: '<button class="mock-cancel-button">Cancel</button>',
+  },
+}));
+
+vi.mock('@/components/SaveButton.vue', () => ({
+  default: {
+    name: 'SaveButton',
+    template: '<button class="mock-save-button">Save</button>',
+  },
+}));
+
+vi.mock('@/components/FormRow.vue', () => ({
+  default: {
+    name: 'FormRow',
+    template: '<div class="mock-form-row"><slot name="content"></slot></div>',
+  },
 }));
 
 describe('FormComponent', () => {
@@ -17,29 +40,6 @@ describe('FormComponent', () => {
 
     // Reset mock functions
     routerGoMock.mockReset();
-
-    // Mock child components
-    vi.mock('@/components/CancelButton.vue', () => ({
-      default: {
-        name: 'CancelButton',
-        template: '<button class="mock-cancel-button">Cancel</button>',
-      },
-    }));
-
-    vi.mock('@/components/SaveButton.vue', () => ({
-      default: {
-        name: 'SaveButton',
-        template: '<button class="mock-save-button">Save</button>',
-      },
-    }));
-
-    vi.mock('@/components/FormRow.vue', () => ({
-      default: {
-        name: 'FormRow',
-        template:
-          '<div class="mock-form-row"><slot name="content"></slot></div>',
-      },
-    }));
   });
 
   it('renders with default props', async () => {

@@ -3,17 +3,18 @@ import { mount } from '@vue/test-utils';
 
 // Focus on testing the core button functionality without relying
 // on specific class names or DOM structure
+
+// Hoisted to the top of the module by Vitest, so it must live at the top level.
+vi.mock('@/components/LoadingSpinner.vue', () => ({
+  default: {
+    name: 'LoadingSpinner',
+    template: '<div class="mock-spinner">Loading...</div>',
+  },
+}));
+
 describe('GenericButton Component - Minimal Tests', () => {
   beforeEach(() => {
     vi.resetModules();
-
-    // Mock LoadingSpinner component correctly
-    vi.mock('@/components/LoadingSpinner.vue', () => ({
-      default: {
-        name: 'LoadingSpinner',
-        template: '<div class="mock-spinner">Loading...</div>',
-      },
-    }));
   });
 
   it('should render with text prop', async () => {
