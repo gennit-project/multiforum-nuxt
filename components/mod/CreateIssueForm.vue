@@ -8,7 +8,11 @@ import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import type { IssueCreateInput } from '@/__generated__/graphql';
+import type {
+  Channel,
+  IssueAggregateSelection,
+  IssueCreateInput,
+} from '@/__generated__/graphql';
 import { CREATE_ISSUE } from '@/graphQLData/issue/mutations';
 import { GET_ISSUES_BY_CHANNEL } from '@/graphQLData/issue/queries';
 import {
@@ -116,7 +120,9 @@ const {
 
     if (selectedChannelId.value) {
       try {
-        const existingIssuesByChannel = cache.readQuery<any>({
+        const existingIssuesByChannel = cache.readQuery<{
+          channels: Channel[];
+        }>({
           query: GET_ISSUES_BY_CHANNEL,
           variables: {
             channelUniqueName: selectedChannelId.value,
@@ -147,7 +153,9 @@ const {
       }
 
       try {
-        const openCount = cache.readQuery<any>({
+        const openCount = cache.readQuery<{
+          issuesAggregate: IssueAggregateSelection;
+        }>({
           query: COUNT_OPEN_ISSUES,
           variables: { channelUniqueName: selectedChannelId.value },
         });
@@ -165,7 +173,9 @@ const {
     }
 
     try {
-      const serverCount = cache.readQuery<any>({
+      const serverCount = cache.readQuery<{
+        issuesAggregate: IssueAggregateSelection;
+      }>({
         query: SERVER_SCOPED_ISSUE_COUNT,
       });
       const currentServerCount = serverCount?.issuesAggregate?.count;

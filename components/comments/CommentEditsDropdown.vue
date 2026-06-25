@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import type { PropType } from 'vue';
-import type { Comment, TextVersion } from '@/__generated__/graphql';
+import type { Comment, TextVersion, User } from '@/__generated__/graphql';
 import {
   usePopoverPositioning,
   type PopoverPosition,
@@ -11,6 +11,7 @@ import {
   buildSequentialRevisionPairs,
   getRevisionAuthorName,
   type RevisionPair,
+  type RevisionAuthorLike,
 } from '@/utils/revisionHistory';
 import CommentRevisionDiffModal from './CommentRevisionDiffModal.vue';
 
@@ -49,8 +50,8 @@ const allEdits = computed(() => {
     id: 'current',
     body: props.comment.text,
     createdAt: props.comment.updatedAt || props.comment.createdAt,
-    Author: props.comment.CommentAuthor as any,
-    AuthorConnection: (props.comment as any).AuthorConnection || {
+    Author: props.comment.CommentAuthor as User,
+    AuthorConnection: {
       __typename: 'TextVersionAuthorConnection',
       edges: [],
       pageInfo: { hasNextPage: false, hasPreviousPage: false },
@@ -61,7 +62,7 @@ const allEdits = computed(() => {
   return buildSequentialRevisionPairs({
     pastVersions: props.comment?.PastVersions,
     currentVersion,
-    currentAuthor: props.comment.CommentAuthor as any,
+    currentAuthor: props.comment.CommentAuthor as RevisionAuthorLike,
     getHistoricalPairAuthor: ({ oldVersion }) =>
       getRevisionAuthorName(oldVersion.Author),
   });

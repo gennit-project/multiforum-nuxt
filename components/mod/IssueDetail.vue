@@ -160,7 +160,7 @@ const relatedCommentId = computed(
   () => activeIssue.value?.relatedCommentId || ''
 );
 const relatedChannelUniqueName = computed(
-  () => (activeIssue.value as any)?.relatedChannelUniqueName || ''
+  () => activeIssue.value?.relatedChannelUniqueName || ''
 );
 const isIssueSubscribed = computed(() => {
   if (!usernameVar.value) return false;
@@ -474,7 +474,7 @@ const derivedOriginalPoster = computed(() => {
 const isAuthorBot = computed(() => {
   const commentAuthor = relatedComment.value?.CommentAuthor;
   if (commentAuthor && commentAuthor.__typename === 'User') {
-    return (commentAuthor as any).isBot === true;
+    return commentAuthor.isBot === true;
   }
   return false;
 });

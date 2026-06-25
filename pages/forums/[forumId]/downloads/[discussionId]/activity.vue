@@ -53,10 +53,8 @@ const activeDiscussionChannel = computed(() => {
 });
 
 // Get label change history from the discussion channel
-// Using any type until GraphQL types are regenerated
 const labelChangeHistory = computed(() => {
-  const dc = activeDiscussionChannel.value as any;
-  return dc?.LabelChangeHistory || [];
+  return activeDiscussionChannel.value?.LabelChangeHistory || [];
 });
 
 // Check if there's any activity to show

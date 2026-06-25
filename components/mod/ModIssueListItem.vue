@@ -69,7 +69,7 @@ const isSelected = computed(() => {
 
 // Check if the related content is from a bot (based on username prefix convention)
 const isRelatedToBot = computed(() => {
-  const username = (props.issue as any)?.relatedUsername;
+  const username = props.issue?.relatedUsername;
   return typeof username === 'string' && username.startsWith('bot-');
 });
 

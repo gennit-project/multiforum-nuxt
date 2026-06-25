@@ -14,7 +14,11 @@ import DiscussionRootCommentFormWrapper from '@/components/discussion/form/Discu
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
-import type { Comment, Discussion } from '@/__generated__/graphql';
+import type {
+  Comment,
+  Discussion,
+  DiscussionChannel,
+} from '@/__generated__/graphql';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
@@ -59,7 +63,7 @@ const discussion = computed(
 );
 const activeDiscussionChannel = computed(() => {
   return discussion.value?.DiscussionChannels?.find(
-    (dc: any) => dc.channelUniqueName === channelId.value
+    (dc: DiscussionChannel) => dc.channelUniqueName === channelId.value
   );
 });
 

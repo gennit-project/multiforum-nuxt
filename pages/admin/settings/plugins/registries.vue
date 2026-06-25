@@ -72,8 +72,9 @@ const saveRegistries = async () => {
     });
     originalRegistries.value = [...pluginRegistries.value];
     toast.success('Plugin registries updated.');
-  } catch (err: any) {
-    toast.error(`Failed to update registries: ${err.message}`);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    toast.error(`Failed to update registries: ${message}`);
   }
 };
 </script>

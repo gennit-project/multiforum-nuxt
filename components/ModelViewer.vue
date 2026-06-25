@@ -101,7 +101,7 @@ const props = defineProps<{
   width?: string;
   showFullscreenButton?: boolean;
   class?: string;
-  style?: Record<string, any>;
+  style?: Record<string, string | number>;
 }>();
 
 const isFullscreen = ref(false);

@@ -198,7 +198,7 @@ const {
     const newFeedbackComment = result.data.createComments.comments[0];
 
     if (commentToGiveFeedbackOn.value) {
-      const prevQueryResult: any = cache.readQuery({
+      const prevQueryResult = cache.readQuery<{ comments: Comment[] }>({
         query: GET_FEEDBACK_ON_COMMENT,
         variables: {
           commentId: commentId.value,
@@ -224,9 +224,8 @@ const {
             FeedbackComments: [...prevFeedbackComments, newFeedbackComment],
             FeedbackCommentsAggregate: {
               count:
-                (prevQueryResult.comments
-                  ? prevQueryResult.comments[0].FeedbackCommentsAggregate.count
-                  : 0) + 1,
+                (prevQueryResult?.comments?.[0]?.FeedbackCommentsAggregate
+                  ?.count ?? 0) + 1,
               __typename: 'FeedbackCommentsAggregate',
             },
           },
@@ -292,11 +291,6 @@ onAddFeedbackCommentToCommentDone(() => {
           >
             Feedback
           </h1>
-          <ErrorBanner
-            v-if="getCommentError"
-            class="mt-2 px-4"
-            :text="(getCommentError as any)?.message || 'Error loading comment'"
-          />
           <PageNotFound
             v-if="!getCommentLoading && !getCommentError && !originalComment"
           />
