@@ -10,9 +10,12 @@ import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavo
 import type { Discussion } from '@/__generated__/graphql';
 import { GET_USER_OWNED_DOWNLOADS } from '@/graphQLData/user/queries';
 import { relativeTime } from '@/utils';
-import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
-import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import {
+  getDownloadLink,
+  getChannelLink,
+  buildFavoriteAuthorInfo,
+} from '@/utils/favoriteDiscussionDisplay';
 
 const usernameVar = useUsername();
 
@@ -59,39 +62,12 @@ const ownedDownloads = computed(() => {
 });
 const { serverAdminUsernames } = useServerRoleMembership();
 
-const getDownloadLink = (download: Download) => {
-  const firstChannel = safeArrayFirst(download.DiscussionChannels) as
-    | { channelUniqueName?: string }
-    | undefined;
-  if (!firstChannel?.channelUniqueName) return '/';
-
-  return `/forums/${firstChannel.channelUniqueName}/downloads/${download.id}`;
-};
-
-const getChannelLink = (channelUniqueName: string | undefined) => {
-  if (!channelUniqueName) return '/';
-  return `/forums/${channelUniqueName}`;
-};
-
-const getAuthorInfo = (download: Download) => {
-  const author = download?.Author;
-  if (!author) return null;
-
-  const serverRoleBadge = getServerRoleBadge({
-    username: author.username,
+// Link / author helpers live in utils/favoriteDiscussionDisplay.ts (tested).
+const getAuthorInfo = (download: Download) =>
+  buildFavoriteAuthorInfo({
+    author: download?.Author,
     adminUsernames: serverAdminUsernames.value,
   });
-
-  return {
-    username: author.username || '',
-    displayName: author.displayName || '',
-    profilePicURL: author.profilePicURL || '',
-    commentKarma: author.commentKarma ?? 0,
-    discussionKarma: author.discussionKarma ?? 0,
-    createdAt: author.createdAt || '',
-    isAdmin: serverRoleBadge === 'serverAdmin',
-  };
-};
 
 const getFirstAlbumImage = (download: Download): string | undefined => {
   const album = download?.Album;
