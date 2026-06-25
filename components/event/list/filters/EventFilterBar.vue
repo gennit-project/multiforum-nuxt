@@ -295,17 +295,9 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
       "
       class="mb-2 border border-t-gray-500 dark:border-t-gray-600"
     >
-    <div
-      v-if="showMainFilters"
-      class="flex flex-col gap-2 rounded-lg p-2 dark:bg-gray-800"
-      :class="[
-        allowHidingMainFilters
-          ? 'border border-gray-400 dark:border-gray-600'
-          : '',
-      ]"
-    >
+    <div v-if="showMainFilters" class="flex flex-col gap-2 p-2">
       <div v-if="route.name !== 'EventDetail'" class="mb-2 w-full">
-        <div class="flex items-center space-x-1">
+        <div class="flex items-center gap-2">
           <div
             class="align-items flex hidden justify-center space-x-2 md:block"
           >
@@ -342,6 +334,7 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
             :initial-value="filterValues.searchInput"
             :right-side-is-rounded="!showLocationSearchBarAndDistanceButtons"
             :search-placeholder="'Search'"
+            :small="true"
             :test-id="'event-search-bar'"
             @update-search-input="updateSearchInput"
           >
@@ -480,14 +473,14 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
           <RequireAuth v-if="showNewEventNextToSearchBar" :full-width="false">
             <template #has-auth>
               <PrimaryButton
-                class="ml-2 whitespace-nowrap"
+                class="h-9 whitespace-nowrap"
                 :label="'New Event'"
                 @click="$router.push(createEventLink)"
               />
             </template>
             <template #does-not-have-auth>
               <PrimaryButton
-                class="ml-2 whitespace-nowrap"
+                class="h-9 whitespace-nowrap"
                 :label="'New Event'"
               />
             </template>

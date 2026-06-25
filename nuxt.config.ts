@@ -22,7 +22,10 @@ export default defineNuxtConfig({
       ],
       htmlAttrs: {
         lang: 'en',
-        class: 'dark dark-mode-ready', // Default to dark mode for initial SSR
+        // The `dark` class is applied per-request by the uiStore (from the
+        // `theme` cookie) during SSR, so it is NOT hardcoded here — otherwise
+        // light-mode users would get a dark server render and a flash on load.
+        class: 'dark-mode-ready',
       },
     },
   },
@@ -159,8 +162,11 @@ export default defineNuxtConfig({
         },
       },
     ],
-    // Light/dark mode support
-    '@nuxtjs/color-mode',
+    // Light/dark mode is handled by the uiStore (single source of truth):
+    // it reads the `theme` cookie on the server to set the initial <html> class
+    // and toggles it on the client. @nuxtjs/color-mode was unused (Tailwind uses
+    // darkMode: 'class', and nothing referenced color-mode's API), so it was
+    // removed to eliminate a competing theme system.
     // The order matters in this list. Tailwind must come last
     // to avoid its styles being overridden by other styles.
     [

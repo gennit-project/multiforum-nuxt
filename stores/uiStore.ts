@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import { config } from '@/config';
-import { useCookie, useRoute, useRouter } from 'nuxt/app';
+import { useCookie, useRoute, useRouter, useHead } from 'nuxt/app';
 
 export type FontSize = 'small' | 'medium' | 'large';
 type ThemeMode = 'light' | 'dark';
@@ -25,37 +25,45 @@ export const useUIStore = defineStore('ui', () => {
   const selectedIssueTitle = ref('');
   const selectedIssueChannelId = ref('');
 
-  // Theme state
+  // Theme state — this store is the single source of truth for the app's theme.
   const themeMode = ref<ThemeMode>('dark');
   const systemThemeIsDark = ref(false); // Kept for backward compatibility
 
-  // Initialize theme from cookie/localStorage on client side - default to dark mode
-  if (import.meta.client) {
-    const themeCookie = useCookie('theme', { default: () => 'dark' });
-    const localTheme = localStorage.getItem('theme');
+  // Server: read the persisted theme from the cookie so server-rendered markup
+  // matches the user's preference (no light-mode flash on load). useCookie is
+  // only called inside the server/client guards so plain unit tests — which run
+  // without a Nuxt context — fall back to the default instead of throwing.
+  if (import.meta.server) {
+    const themeCookie = useCookie<string>('theme', { default: () => 'dark' });
+    if (themeCookie.value === 'light' || themeCookie.value === 'dark') {
+      themeMode.value = themeCookie.value;
+    }
+  }
 
-    // Set initial theme preference - default to dark
-    if (localTheme && ['light', 'dark'].includes(localTheme)) {
-      themeMode.value = localTheme as ThemeMode;
+  // Client: localStorage takes precedence and is reconciled into the cookie;
+  // also track the OS preference for backward compatibility.
+  if (import.meta.client) {
+    const themeCookie = useCookie<string>('theme', { default: () => 'dark' });
+    const localTheme = localStorage.getItem('theme');
+    if (localTheme === 'light' || localTheme === 'dark') {
+      themeMode.value = localTheme;
       themeCookie.value = localTheme;
     } else if (
-      themeCookie.value &&
-      ['light', 'dark'].includes(themeCookie.value)
+      themeCookie.value === 'light' ||
+      themeCookie.value === 'dark'
     ) {
-      themeMode.value = themeCookie.value as ThemeMode;
+      themeMode.value = themeCookie.value;
+      localStorage.setItem('theme', themeMode.value);
     } else {
-      // Default to dark mode if nothing is set
-      themeMode.value = 'dark';
-      themeCookie.value = 'dark';
-      localStorage.setItem('theme', 'dark');
+      // Nothing stored yet — seed cookie + localStorage so it persists.
+      themeCookie.value = themeMode.value;
+      localStorage.setItem('theme', themeMode.value);
     }
 
-    // Check if system prefers dark mode - for backward compatibility
     systemThemeIsDark.value = window.matchMedia(
       '(prefers-color-scheme: dark)'
     ).matches;
 
-    // Listen for system preference changes
     window
       .matchMedia('(prefers-color-scheme: dark)')
       .addEventListener('change', (e) => {
@@ -66,16 +74,22 @@ export const useUIStore = defineStore('ui', () => {
   // Computed theme value (light or dark)
   const theme = computed(() => themeMode.value);
 
-  // Apply theme class to HTML element
+  // Server: emit the initial <html> class so server-rendered markup already
+  // matches the user's theme (eliminates the hydration flash).
+  if (import.meta.server) {
+    useHead({
+      htmlAttrs: {
+        class: theme.value === 'dark' ? 'dark' : '',
+      },
+    });
+  }
+
+  // Client: keep the <html> class in sync as the theme changes at runtime.
   if (import.meta.client) {
     watch(
       theme,
       (newTheme) => {
-        if (newTheme === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
+        document.documentElement.classList.toggle('dark', newTheme === 'dark');
       },
       { immediate: true }
     );
