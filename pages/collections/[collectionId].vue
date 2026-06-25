@@ -4,6 +4,7 @@ import { useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import type { Discussion } from '@/__generated__/graphql';
 import { GET_PUBLIC_COLLECTION_BY_ID } from '@/graphQLData/collection/queries';
+import { mergeUniqueById } from '@/utils/mergeUniqueById';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import CollectionDownloadListItem from '@/components/collection/CollectionDownloadListItem.vue';
@@ -44,15 +45,10 @@ watch(
 
     totalDownloads.value = collectionData.DownloadsAggregate?.count || 0;
 
-    const newDownloads = collectionData.Downloads || [];
-    const existingIds = new Set(downloads.value.map((d) => d.id));
-    const merged = [...downloads.value];
-    newDownloads.forEach((d: Discussion) => {
-      if (d && !existingIds.has(d.id)) {
-        merged.push(d);
-      }
-    });
-    downloads.value = merged;
+    downloads.value = mergeUniqueById<Discussion>(
+      downloads.value,
+      collectionData.Downloads
+    );
   },
   { immediate: true }
 );
