@@ -35,6 +35,13 @@ import {
   getIssueActionVisibility,
   getOriginalPoster,
 } from '@/utils/originalPoster';
+import {
+  getReportCount,
+  formatReportCountLabel,
+  hasRelatedContent as checkHasRelatedContent,
+  isRelatedCommentAuthorBot,
+  resolveAuthorType,
+} from '@/utils/issueDetailDisplay';
 
 // Composables
 import { useIssueCloseReopen } from '@/composables/useIssueCloseReopen';
@@ -361,11 +368,12 @@ const isSuspendedMod = computed(() => {
   return modPermissions.value.isSuspendedMod ?? false;
 });
 
-const authorType = computed(() => {
-  if (resolvedOriginalModProfileName.value) return 'mod';
-  if (resolvedOriginalAuthorUsername.value) return 'user';
-  return 'user';
-});
+const authorType = computed(() =>
+  resolveAuthorType({
+    modProfileName: resolvedOriginalModProfileName.value,
+    username: resolvedOriginalAuthorUsername.value,
+  })
+);
 
 // Use composables
 const { closeIssue, closeIssueLoading, reopenIssue, reopenIssueLoading } =
@@ -431,25 +439,15 @@ const deleteReasonError = ref('');
 
 const issue = computed<Issue | null>(() => activeIssue.value || null);
 
-const hasRelatedContent = computed(() => {
-  return (
-    !!activeIssue.value?.relatedDiscussionId ||
-    !!activeIssue.value?.relatedEventId ||
-    !!activeIssue.value?.relatedCommentId ||
-    !!activeIssue.value?.relatedWikiPageId ||
-    !!activeIssue.value?.relatedWikiRevisionId
-  );
-});
+const hasRelatedContent = computed(() =>
+  checkHasRelatedContent(activeIssue.value)
+);
 
-const reportCount = computed(() => {
-  const count = activeIssue.value?.ActivityFeedAggregate?.count;
-  return typeof count === 'number' ? count : null;
-});
+const reportCount = computed(() => getReportCount(activeIssue.value));
 
-const reportCountLabel = computed(() => {
-  if (reportCount.value === null) return '';
-  return `${reportCount.value} ${reportCount.value === 1 ? 'report' : 'reports'}`;
-});
+const reportCountLabel = computed(() =>
+  formatReportCountLabel(reportCount.value)
+);
 
 const shouldShowIssueDetailsSection = computed(() => {
   return (
@@ -471,13 +469,9 @@ const derivedOriginalPoster = computed(() => {
 });
 
 // Check if the original author is a bot
-const isAuthorBot = computed(() => {
-  const commentAuthor = relatedComment.value?.CommentAuthor;
-  if (commentAuthor && commentAuthor.__typename === 'User') {
-    return commentAuthor.isBot === true;
-  }
-  return false;
-});
+const isAuthorBot = computed(() =>
+  isRelatedCommentAuthorBot(relatedComment.value)
+);
 
 const resolvedOriginalAuthorUsername = computed(() => {
   return derivedOriginalPoster.value.username || '';
