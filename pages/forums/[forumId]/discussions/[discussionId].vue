@@ -7,6 +7,7 @@ import { useModProfileName } from '@/composables/useAuthState';
 import { useRoute, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
+import { buildDiscussionHead } from '@/utils/discussionSeo';
 
 const modProfileNameVar = useModProfileName();
 
@@ -37,88 +38,17 @@ const { result: discussionResult } = useQuery(GET_DISCUSSION, {
   channelUniqueName: channelId.value,
 });
 
-// Reactive meta data that updates when discussion data changes
+// Reactive meta data that updates when discussion data changes. The pure
+// tag-building logic lives in utils/discussionSeo.ts (unit-tested).
 const metaData = computed(() => {
   try {
-    if (!discussionResult.value?.discussions) {
-      return {
-        title: `Discussion | ${channelId.value}`,
-        description: `View this discussion on ${import.meta.env.VITE_SERVER_DISPLAY_NAME}`,
-      };
-    }
-
-    if (discussionResult.value.discussions.length === 0) {
-      return {
-        title: `Discussion Not Found${channelId.value ? ` | ${channelId.value}` : ''}`,
-        description: 'The requested discussion could not be found.',
-      };
-    }
-
-    const discussion = discussionResult.value.discussions[0];
-    const title = discussion.title || 'Discussion';
-    const description = discussion.body
-      ? discussion.body.substring(0, 160) +
-        (discussion.body.length > 160 ? '...' : '')
-      : `View this discussion on ${import.meta.env.VITE_SERVER_DISPLAY_NAME}`;
-    const baseUrl = import.meta.env.VITE_BASE_URL;
-    const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
-    const imageUrl = discussion.coverImageURL || '';
-
-    return {
-      title: `${title} | ${channelId.value} | ${serverName}`,
-      meta: [
-        { name: 'description', content: description },
-
-        // OpenGraph tags
-        { property: 'og:title', content: title },
-        { property: 'og:description', content: description },
-        { property: 'og:type', content: 'article' },
-        {
-          property: 'og:url',
-          content: `${baseUrl}/forums/${channelId.value}/discussions/${discussionId.value}`,
-        },
-        { property: 'og:site_name', content: serverName },
-        ...(imageUrl ? [{ property: 'og:image', content: imageUrl }] : []),
-
-        // Twitter Card tags
-        {
-          name: 'twitter:card',
-          content: imageUrl ? 'summary_large_image' : 'summary',
-        },
-        { name: 'twitter:title', content: title },
-        { name: 'twitter:description', content: description },
-        ...(imageUrl ? [{ name: 'twitter:image', content: imageUrl }] : []),
-      ],
-      script: [
-        {
-          type: 'application/ld+json',
-          children: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'DiscussionForumPosting',
-            headline: title,
-            description: description,
-            author: {
-              '@type': 'Person',
-              name:
-                discussion.Author?.displayName ||
-                discussion.Author?.username ||
-                'Anonymous',
-            },
-            datePublished: discussion.createdAt,
-            dateModified: discussion.updatedAt || discussion.createdAt,
-            publisher: {
-              '@type': 'Organization',
-              name: serverName,
-              url: baseUrl,
-            },
-            mainEntityOfPage: {
-              '@type': 'WebPage',
-              '@id': `${baseUrl}/forums/${channelId.value}/discussions/${discussionId.value}`,
-            },
-          }),
-        },
-      ],
-    };
+    return buildDiscussionHead({
+      discussions: discussionResult.value?.discussions,
+      channelId: channelId.value,
+      discussionId: discussionId.value,
+      serverDisplayName: import.meta.env.VITE_SERVER_DISPLAY_NAME,
+      baseUrl: import.meta.env.VITE_BASE_URL,
+    });
   } catch (error) {
     console.error('Error setting meta tags:', error);
     return {
