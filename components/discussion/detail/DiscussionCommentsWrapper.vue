@@ -354,7 +354,7 @@ const updateCommentSectionQueryResult = (
   }
 };
 
-const incrementCommentCount = (cache: ApolloCache<any>) => {
+const incrementCommentCount = (cache: ApolloCache<NormalizedCacheObject>) => {
   try {
     if (!props.discussionChannel?.id) {
       console.error('No discussion channel ID found');
@@ -382,7 +382,7 @@ const incrementCommentCount = (cache: ApolloCache<any>) => {
   }
 };
 
-const decrementCommentCount = (cache: ApolloCache<any>) => {
+const decrementCommentCount = (cache: ApolloCache<NormalizedCacheObject>) => {
   try {
     if (!props.discussionChannel?.id) {
       console.error('No discussion channel ID found');

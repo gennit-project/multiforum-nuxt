@@ -92,8 +92,7 @@ const createdAtFormatted = computed(() => {
 
 const editedAtFormatted = computed(() => {
   // Prefer textLastEdited (only set when text content changes, not emoji reactions)
-  // Cast to any to access textLastEdited until types are regenerated
-  const textLastEdited = (props.commentData as any).textLastEdited;
+  const textLastEdited = props.commentData.textLastEdited;
   if (textLastEdited) {
     return `Edited ${stableRelativeTime(textLastEdited)}`;
   }

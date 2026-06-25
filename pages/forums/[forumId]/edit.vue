@@ -9,6 +9,7 @@ import Notification from '@/components/NotificationComponent.vue';
 import { useUsername } from '@/composables/useAuthState';
 import type {
   ChannelUpdateInput,
+  FilterGroup,
   Tag as TagData,
 } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
@@ -121,15 +122,15 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
 
   // Handle FilterGroups using connect/create/disconnect pattern (like Tags)
   const existingFilterGroupIds = existingFilterGroups.value.map(
-    (group: any) => group.id
+    (group: FilterGroup) => group.id
   );
   const currentFilterGroupIds = formValues.value.downloadFilterGroups
-    .map((group: any) => group.id)
+    .map((group: FilterGroup) => group.id)
     .filter(Boolean); // Only existing groups have IDs
 
   // Connect to existing groups that are still selected
   const filterGroupConnections = formValues.value.downloadFilterGroups
-    .filter((group: any) => group.id) // Only existing groups
+    .filter((group: FilterGroup) => group.id) // Only existing groups
     .map((group, _index) => ({
       where: { node: { id: group.id } },
       // Note: We might need to handle updates here if group properties changed
@@ -137,7 +138,7 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
 
   // Create new groups (those without IDs)
   const filterGroupCreations = formValues.value.downloadFilterGroups
-    .filter((group: any) => !group.id) // Only new groups
+    .filter((group: FilterGroup) => !group.id) // Only new groups
     .map((group, _index) => ({
       node: {
         id: '', // Empty ID for new groups - server will generate

@@ -93,7 +93,7 @@ const existingChannels = computed(() => {
 
 // Check if the event is part of a series
 const isPartOfSeries = computed(() => {
-  return Boolean((event.value as any)?.EventSeries?.id);
+  return Boolean(event.value?.EventSeries?.id);
 });
 
 // Edit scope modal state

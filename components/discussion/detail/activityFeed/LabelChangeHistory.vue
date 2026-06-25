@@ -1,23 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
+import type { LabelChangeHistory as LabelChangeHistoryItem } from '@/__generated__/graphql';
 import { timeAgo } from '@/utils';
-
-// Define local type for LabelChangeHistory until types are regenerated
-interface LabelChangeHistoryItem {
-  id: string;
-  createdAt: string;
-  actionType: string;
-  labelDisplayName: string;
-  labelValue: string;
-  ActorUser?: {
-    username: string;
-    displayName?: string;
-  } | null;
-  ActorMod?: {
-    displayName: string;
-  } | null;
-}
 
 interface LabelChange {
   id: string;
