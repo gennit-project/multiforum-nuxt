@@ -47,3 +47,7 @@ ignore:
   - "node_modules/**"
   - "coverage/**"
   - "**/*.d.ts"
+  # Presentational-only: icons are pure <svg> markup with no logic. Also
+  # excluded from the vitest coverage report; ignored here so the combined
+  # (unit + e2e) report drops them regardless of which tool produced it.
+  - "components/icons/**"
