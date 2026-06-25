@@ -7,6 +7,7 @@ import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { useRoute } from 'nuxt/app';
 import { config } from '@/config';
 import { DateTime } from 'luxon';
+import { evaluateForumFeatureGate } from '@/utils/forumFeatureGate';
 
 const route = useRoute();
 
@@ -70,30 +71,25 @@ const anyError = computed(() => {
   return channelError.value || serverConfigError.value;
 });
 
-const shouldShowEvents = computed(() => {
-  return (
-    !bothLoading.value &&
-    !anyError.value &&
-    serverEventsEnabled.value &&
-    channelEventsEnabled.value
-  );
-});
+const eventsGate = computed(() =>
+  evaluateForumFeatureGate({
+    loading: bothLoading.value,
+    hasError: Boolean(anyError.value),
+    serverEnabled: serverEventsEnabled.value,
+    channelEnabled: channelEventsEnabled.value,
+    messages: {
+      error: 'Unable to load forum or server configuration.',
+      serverDisabled:
+        'Cannot show the calendar because events are disabled at the server level.',
+      channelDisabled:
+        'Cannot show the calendar because it is not enabled for this forum.',
+    },
+  })
+);
 
-const errorMessage = computed(() => {
-  if (anyError.value) {
-    return 'Unable to load forum or server configuration.';
-  }
+const shouldShowEvents = computed(() => eventsGate.value.shouldShow);
 
-  if (!serverEventsEnabled.value) {
-    return 'Cannot show the calendar because events are disabled at the server level.';
-  }
-
-  if (!channelEventsEnabled.value) {
-    return 'Cannot show the calendar because it is not enabled for this forum.';
-  }
-
-  return '';
-});
+const errorMessage = computed(() => eventsGate.value.errorMessage);
 </script>
 <template>
   <div>

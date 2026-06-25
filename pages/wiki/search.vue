@@ -12,15 +12,7 @@ import { updateFilters } from '@/utils/routerUtils';
 import { getChannelLabel, relativeTime } from '@/utils';
 import { getFilterValuesFromParams } from '@/components/discussion/list/getDiscussionFilterValuesFromParams';
 import { GET_SITE_WIDE_WIKI_LIST } from '@/graphQLData/wiki/queries';
-
-const formatWordCount = (body: string | null | undefined): string => {
-  if (!body) return '0 words';
-  const words = body.trim().split(/\s+/).filter(Boolean).length;
-  if (words >= 1000) {
-    return `${(words / 1000).toFixed(1).replace(/\.0$/, '')}k words`;
-  }
-  return `${words} ${words === 1 ? 'word' : 'words'}`;
-};
+import { formatWordCount } from '@/utils/wikiSearchDisplay';
 
 const WIKI_PAGE_LIMIT = 25;
 
