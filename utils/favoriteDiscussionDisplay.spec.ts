@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   formatCount,
   getDiscussionLink,
+  getDownloadLink,
   getChannelLink,
   getTotalCommentCount,
   buildFavoriteAuthorInfo,
@@ -33,6 +34,21 @@ describe('getDiscussionLink', () => {
 
   it('falls back to root when there is no forum channel', () => {
     expect(getDiscussionLink({ id: 'd1', DiscussionChannels: [] })).toBe('/');
+  });
+});
+
+describe('getDownloadLink', () => {
+  it('links to the download under its first forum', () => {
+    expect(
+      getDownloadLink({
+        id: 'd1',
+        DiscussionChannels: [{ channelUniqueName: 'cats' }],
+      })
+    ).toBe('/forums/cats/downloads/d1');
+  });
+
+  it('falls back to root when there is no forum channel', () => {
+    expect(getDownloadLink({ id: 'd1', DiscussionChannels: [] })).toBe('/');
   });
 });
 

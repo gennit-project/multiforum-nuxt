@@ -44,6 +44,18 @@ export function getDiscussionLink(discussion: {
   return `/forums/${firstChannel.channelUniqueName}/discussions/${discussion.id}`;
 }
 
+/** Link to a download under its first forum, or '/' when none is available. */
+export function getDownloadLink(download: {
+  id: string;
+  DiscussionChannels?: FavoriteChannel[];
+}): string {
+  const firstChannel = safeArrayFirst(download.DiscussionChannels) as
+    | FavoriteChannel
+    | undefined;
+  if (!firstChannel?.channelUniqueName) return '/';
+  return `/forums/${firstChannel.channelUniqueName}/downloads/${download.id}`;
+}
+
 /** Link to a forum, or '/' when no channel name is given. */
 export function getChannelLink(channelUniqueName: string | undefined | null): string {
   if (!channelUniqueName) return '/';
