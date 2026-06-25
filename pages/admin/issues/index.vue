@@ -7,7 +7,10 @@ import { useRoute, useRouter } from 'nuxt/app';
 import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
 import SearchBar from '@/components/SearchBar.vue';
 import { updateFilters } from '@/utils/routerUtils';
-import { createCaseInsensitivePattern } from '@/utils/searchUtils';
+import {
+  getDefaultServerRuleViolationsFilter,
+  buildServerIssuesWhere,
+} from '@/utils/serverIssueFilters';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 
@@ -23,47 +26,19 @@ const channelId = computed(() => {
   return route.params.forumId;
 });
 
-const getDefaultFilter = () => {
-  // If there is no query param at all, the default should be true.
-  // If the query param is given as false, that overrides that.
-
-  if (route.query.showOnlyServerRuleViolations === 'false') {
-    return false;
-  }
-  return true;
-};
-const showOnlyServerRuleViolations = ref(getDefaultFilter());
+const showOnlyServerRuleViolations = ref(
+  getDefaultServerRuleViolationsFilter(route.query.showOnlyServerRuleViolations)
+);
 const searchInput = ref(
   typeof route.query.searchInput === 'string' ? route.query.searchInput : ''
 );
 
-const variables = computed(() => {
-  const searchPattern = createCaseInsensitivePattern(searchInput.value);
-  const searchFilter = searchPattern
-    ? {
-        OR: [
-          { title_MATCHES: searchPattern },
-          { body_MATCHES: searchPattern },
-        ],
-      }
-    : {};
-
-  if (showOnlyServerRuleViolations.value) {
-    return {
-      issueWhere: {
-        isOpen: true,
-        flaggedServerRuleViolation: true,
-        ...searchFilter,
-      },
-    };
-  }
-  return {
-    issueWhere: {
-      isOpen: true,
-      ...searchFilter,
-    },
-  };
-});
+const variables = computed(() =>
+  buildServerIssuesWhere({
+    searchInput: searchInput.value,
+    showOnlyServerRuleViolations: showOnlyServerRuleViolations.value,
+  })
+);
 
 const {
   result: getIssuesResult,
