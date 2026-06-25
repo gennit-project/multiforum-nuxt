@@ -2,8 +2,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_EMAIL } from '@/graphQLData/email/queries';
-import type { Email } from '@/__generated__/graphql';
+import { GET_OWN_EMAIL } from '@/graphQLData/email/queries';
 import { userDataLoadingVar } from '@/cache';
 import {
   useUsername,
@@ -49,24 +48,27 @@ if (import.meta.client) {
     }
   });
 
-  // Only check email if we're authenticated and on the client side
+  // Only check email if we're authenticated and on the client side.
+  // getOwnEmail is self-scoped (resolves the caller's email from the token),
+  // so it needs no variables. A returned `username` means the account already
+  // exists; its absence means this verified email still needs a username.
   if (isAuthenticatedVar.value) {
-    const { onResult: onEmailResult } = useQuery(GET_EMAIL, {
-      emailAddress: emailVar.value,
-    });
+    const { onResult: onEmailResult } = useQuery(GET_OWN_EMAIL);
 
-    onEmailResult((result: { data?: { emails?: Email[] } }) => {
-      const emailData = result.data?.emails?.[0];
-      if (emailData?.User) {
-        // User already exists, redirect to home
-        router.push('/');
-      } else {
-        // User doesn't exist, show the create username form
-        emailNotInSystem.value = true;
+    onEmailResult(
+      (result: { data?: { getOwnEmail?: { username?: string | null } | null } }) => {
+        const ownEmail = result.data?.getOwnEmail;
+        if (ownEmail?.username) {
+          // User already exists, redirect to home
+          router.push('/');
+        } else {
+          // User doesn't exist, show the create username form
+          emailNotInSystem.value = true;
+        }
+        initialCheckComplete.value = true;
+        loading.value = false;
       }
-      initialCheckComplete.value = true;
-      loading.value = false;
-    });
+    );
   }
 }
 </script>

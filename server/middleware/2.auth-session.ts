@@ -50,36 +50,31 @@ declare module 'h3' {
   }
 }
 
-// Mirror of GET_EMAIL (graphQLData/email/queries.js): everything useAuthManager
-// used to fetch client-side via the SPA. Resolving it here (server-side, from
-// the session) is what lets the SPA auth manager be removed entirely.
-const GET_EMAIL = /* GraphQL */ `
-  query getEmail($emailAddress: String!) {
-    emails(where: { address: $emailAddress }) {
-      User {
-        username
-        profilePicURL
-        ModerationProfile {
-          displayName
-        }
-        NotificationsAggregate(where: { read: false }) {
-          count
-        }
-      }
+// Mirror of GET_OWN_EMAIL (graphQLData/email/queries.js): everything
+// useAuthManager used to fetch client-side via the SPA. Resolving it here
+// (server-side, from the session) is what lets the SPA auth manager be removed
+// entirely. getOwnEmail is self-scoped — the backend resolves the caller's
+// email from the bearer token, so no $emailAddress variable is sent and the
+// top-level `emails` enumeration query (now admin-only) is never used.
+const GET_OWN_EMAIL = /* GraphQL */ `
+  query getOwnEmail {
+    getOwnEmail {
+      username
+      profilePicURL
+      modProfileName
+      unreadNotificationCount
     }
   }
 `;
 
-type EmailLookupResponse = {
+type OwnEmailResponse = {
   data?: {
-    emails?: Array<{
-      User?: {
-        username?: string | null;
-        profilePicURL?: string | null;
-        ModerationProfile?: { displayName?: string | null } | null;
-        NotificationsAggregate?: { count?: number | null } | null;
-      } | null;
-    } | null> | null;
+    getOwnEmail?: {
+      username?: string | null;
+      profilePicURL?: string | null;
+      modProfileName?: string | null;
+      unreadNotificationCount?: number | null;
+    } | null;
   };
 };
 
@@ -87,24 +82,18 @@ type EmailLookupResponse = {
 // fields come from the cache, so only the volatile unread-notification count
 // needs to be fetched fresh per request.
 const GET_NOTIFICATION_COUNT = /* GraphQL */ `
-  query getNotificationCount($emailAddress: String!) {
-    emails(where: { address: $emailAddress }) {
-      User {
-        NotificationsAggregate(where: { read: false }) {
-          count
-        }
-      }
+  query getOwnEmailNotificationCount {
+    getOwnEmail {
+      unreadNotificationCount
     }
   }
 `;
 
 type NotificationCountResponse = {
   data?: {
-    emails?: Array<{
-      User?: {
-        NotificationsAggregate?: { count?: number | null } | null;
-      } | null;
-    } | null> | null;
+    getOwnEmail?: {
+      unreadNotificationCount?: number | null;
+    } | null;
   };
 };
 
@@ -225,14 +214,13 @@ export default defineEventHandler(async (event) => {
                 GET_NOTIFICATION_COUNT
               );
             notificationCount =
-              countRes?.data?.emails?.[0]?.User?.NotificationsAggregate
-                ?.count || 0;
+              countRes?.data?.getOwnEmail?.unreadNotificationCount || 0;
           } else {
-            const res = await queryBackend<EmailLookupResponse>(GET_EMAIL);
-            const u = res?.data?.emails?.[0]?.User;
+            const res = await queryBackend<OwnEmailResponse>(GET_OWN_EMAIL);
+            const u = res?.data?.getOwnEmail;
             username = u?.username || '';
-            modProfileName = u?.ModerationProfile?.displayName || '';
-            notificationCount = u?.NotificationsAggregate?.count || 0;
+            modProfileName = u?.modProfileName || '';
+            notificationCount = u?.unreadNotificationCount || 0;
             profilePicURL = u?.profilePicURL || '';
 
             // Cache only a resolved user. An empty username means "no app
