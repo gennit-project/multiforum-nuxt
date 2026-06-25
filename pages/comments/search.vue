@@ -17,6 +17,13 @@ import {
   getCommentForumId,
   getCommentPermalinkRoute,
 } from '@/utils/commentPermalink';
+import {
+  getChannelsFromQuery,
+  buildCommentSearchWhere,
+  getCommentAuthorUsername as getAuthorUsername,
+  getCommentAuthorDisplayName as getAuthorDisplayName,
+  getCommentAuthorProfilePic as getAuthorProfilePic,
+} from '@/utils/commentSearch';
 
 const route = useRoute();
 const router = useRouter();
@@ -27,28 +34,16 @@ const searchInput = computed(() =>
   typeof route.query.searchInput === 'string' ? route.query.searchInput : ''
 );
 
-// Parse channels from route query
-const getChannelsFromRoute = (): string[] => {
-  const channels = route.query.channels;
-  if (typeof channels === 'string') {
-    return [channels];
-  }
-  if (Array.isArray(channels)) {
-    return channels.filter(
-      (value): value is string => typeof value === 'string'
-    );
-  }
-  return [];
-};
-
 // Use local ref for selected channels to handle rapid toggles properly
-const selectedChannels = ref<string[]>(getChannelsFromRoute());
+const selectedChannels = ref<string[]>(
+  getChannelsFromQuery(route.query.channels)
+);
 
 // Sync local state when route changes (e.g., browser back/forward)
 watch(
   () => route.query.channels,
   () => {
-    selectedChannels.value = getChannelsFromRoute();
+    selectedChannels.value = getChannelsFromQuery(route.query.channels);
   }
 );
 
@@ -98,41 +93,13 @@ const toggleSelectedChannel = (channelUniqueName: string) => {
   });
 };
 
-// Build the where clause for the GraphQL query
-const commentWhere = computed(() => {
-  const where: Record<string, unknown> = {
-    // Exclude feedback comments and issue comments from search
-    isFeedbackComment_NOT: true,
-    Issue: null,
-  };
-
-  // Text search (case-insensitive using regex)
-  if (searchInput.value.trim()) {
-    // Escape special regex characters and use (?i) for case-insensitive matching
-    const escapedSearch = searchInput.value.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    where.text_MATCHES = `(?i).*${escapedSearch}.*`;
-  }
-
-  // Channel filter - comments can be on discussions via DiscussionChannel or on events via Event
-  if (selectedChannels.value.length > 0) {
-    where.OR = [
-      {
-        DiscussionChannel: {
-          channelUniqueName_IN: selectedChannels.value,
-        },
-      },
-      {
-        Event: {
-          EventChannels_SOME: {
-            channelUniqueName_IN: selectedChannels.value,
-          },
-        },
-      },
-    ];
-  }
-
-  return where;
-});
+// Build the where clause for the GraphQL query (pure logic in utils/commentSearch).
+const commentWhere = computed(() =>
+  buildCommentSearchWhere({
+    searchInput: searchInput.value,
+    selectedChannels: selectedChannels.value,
+  })
+);
 
 const commentOptions = computed(() => ({
   limit: RESULTS_PER_PAGE,
@@ -192,34 +159,6 @@ const loadMore = async () => {
   } finally {
     loadingMore.value = false;
   }
-};
-
-// Get author info from comment
-const getAuthorUsername = (comment: Comment): string => {
-  if (comment.CommentAuthor?.__typename === 'User') {
-    return comment.CommentAuthor.username ?? 'Unknown';
-  }
-  if (comment.CommentAuthor?.__typename === 'ModerationProfile') {
-    return comment.CommentAuthor.displayName ?? 'Unknown';
-  }
-  return 'Unknown';
-};
-
-const getAuthorDisplayName = (comment: Comment): string => {
-  if (comment.CommentAuthor?.__typename === 'User') {
-    return comment.CommentAuthor.displayName || comment.CommentAuthor.username || 'Unknown';
-  }
-  if (comment.CommentAuthor?.__typename === 'ModerationProfile') {
-    return comment.CommentAuthor.displayName ?? 'Unknown';
-  }
-  return 'Unknown';
-};
-
-const getAuthorProfilePic = (comment: Comment): string => {
-  if (comment.CommentAuthor?.__typename === 'User') {
-    return comment.CommentAuthor.profilePicURL ?? '';
-  }
-  return '';
 };
 
 const getCommentPermalink = (comment: Comment) => {
