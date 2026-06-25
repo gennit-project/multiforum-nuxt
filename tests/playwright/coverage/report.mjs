@@ -18,6 +18,11 @@ const CWD = process.cwd();
 
 // App-source scope, matching the unit-coverage include (skip Vue <style>/CSS).
 const APP_RE = /(^|\/)(components|pages|composables|utils)\//;
+// Presentational-only: icon components are pure <svg> markup with no logic.
+// Excluded from the unit coverage report (vitest.config.ts) and ignored by
+// Codecov (codecov.yml); drop them from the E2E lcov too so both flags agree
+// and icons never enter the coverage denominator.
+const ICONS_RE = /(^|\/)components\/icons\//;
 const layerOf = (p) => {
   const m = String(p).match(/(?:^|\/)(components|pages|composables|utils)\//);
   return m ? m[1] : null;
@@ -30,6 +35,7 @@ const mcr = new CoverageReport({
   entryFilter: (entry) => !!entry.url && /\/_nuxt\/.*\.js$/.test(entry.url),
   sourceFilter: (sourcePath) =>
     APP_RE.test(sourcePath) &&
+    !ICONS_RE.test(sourcePath) &&
     !sourcePath.includes('type=style') &&
     !/\.css(\?|$)/.test(sourcePath),
   // Relative paths so this lcov lines up with the unit lcov for Codecov.
