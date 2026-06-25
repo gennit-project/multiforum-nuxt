@@ -164,7 +164,7 @@ export function useMarkdownRenderer() {
   /**
    * Render markdown text to HTML with all configured features.
    * Handles spoiler markup and wraps tables for responsive scrolling.
-   * Sanitizes output with DOMPurify to prevent XSS attacks.
+   * Sanitizes output with sanitize-html to prevent XSS attacks.
    */
   function renderMarkdown(
     text: string,

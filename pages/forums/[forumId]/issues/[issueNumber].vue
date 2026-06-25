@@ -3,7 +3,7 @@ import IssueDetail from '@/components/mod/IssueDetail.vue';
 </script>
 
 <template>
-  <IssueDetail :is-forum-scoped="false" />
+  <IssueDetail />
 </template>
 
 <style scoped></style>

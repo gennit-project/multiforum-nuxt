@@ -25,6 +25,12 @@ import { useCommentPermalink } from '@/composables/useCommentPermalink';
 import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 import { getCommentMenuItems } from '@/utils/headerPermissionUtils';
 import { getForumRoleBadge } from '@/utils/forumRoleBadges';
+import {
+  getCommentReplyCount,
+  isCommentSubscribedByUser,
+  isCommentOwnedByUser,
+  getCommentFeedbackLabel,
+} from '@/utils/commentDisplay';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
 import {
   SUBSCRIBE_TO_COMMENT,
@@ -308,12 +314,7 @@ const isHighlighted = computed(() => {
   return props.isPermalinked || permalinkedCommentId === props.commentData.id;
 });
 
-const replyCount = computed(() => {
-  if (props.commentData.ChildCommentsAggregate) {
-    return props.commentData.ChildCommentsAggregate.count;
-  }
-  return 0;
-});
+const replyCount = computed(() => getCommentReplyCount(props.commentData));
 
 const textCopy = computed(() => props.commentData.text);
 const forumRoleBadge = computed(() => {
@@ -333,13 +334,14 @@ const forumRoleBadge = computed(() => {
 
 // Compute menu items using the utility function
 const commentMenuItems = computed(() => {
-  const isOwnComment =
-    props.commentData?.CommentAuthor?.__typename === 'User' &&
-    props.commentData?.CommentAuthor?.username === usernameVar.value;
-  const isWatchingReplies =
-    props.commentData?.SubscribedToNotifications?.some(
-      (user) => user.username === usernameVar.value
-    ) ?? false;
+  const isOwnComment = isCommentOwnedByUser(
+    props.commentData,
+    usernameVar.value
+  );
+  const isWatchingReplies = isCommentSubscribedByUser(
+    props.commentData,
+    usernameVar.value
+  );
 
   return getCommentMenuItems({
     isOwnComment,
@@ -397,13 +399,9 @@ const { mutate: unsubscribeFromComment } = useMutation(
   }
 );
 
-const isSubscribed = computed(() => {
-  return (
-    props.commentData?.SubscribedToNotifications?.some(
-      (user) => user.username === usernameVar.value
-    ) ?? false
-  );
-});
+const isSubscribed = computed(() =>
+  isCommentSubscribedByUser(props.commentData, usernameVar.value)
+);
 
 useAutoUnsubscribe({
   entityId: commentIdRef,
@@ -487,21 +485,12 @@ const saveDisabled = computed(() => {
     props.lengthOfCommentInProgress > MAX_CHARS_IN_COMMENT
   );
 });
-const label = computed(() => {
-  let label = '';
-  if (props.showLabel) {
-    if (props.commentData.GivesFeedbackOnDiscussion) {
-      label = 'Feedback on Discussion';
-    } else if (props.commentData.GivesFeedbackOnEvent) {
-      label = 'Feedback on Event';
-    } else if (props.commentData.GivesFeedbackOnComment) {
-      label = 'Feedback on Comment';
-    } else if (props.commentData.Issue) {
-      label = 'Comment on Issue';
-    }
-  }
-  return label;
-});
+const label = computed(() =>
+  getCommentFeedbackLabel({
+    showLabel: props.showLabel,
+    comment: props.commentData,
+  })
+);
 </script>
 
 <template>
