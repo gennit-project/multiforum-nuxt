@@ -14,7 +14,6 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import type {
   Discussion,
   DiscussionChannel,
-  DownloadableFile,
   Tag as TagData,
   DiscussionTagsConnectOrCreateFieldInput,
   DiscussionTagsDisconnectFieldInput,
@@ -25,6 +24,11 @@ import type {
 import { useModProfileName } from '@/composables/useAuthState';
 import { resolveSelectedLabelOptionIds } from '@/utils/downloadLabelUtils';
 import { buildAlbumUpdateInput } from '@/utils/albumUpdateInput';
+import { buildDiscussionEditFormValues } from '@/utils/discussionEditForm';
+import {
+  extractDownloadLabels,
+  mapDownloadableFiles,
+} from '@/utils/downloadEditForm';
 
 const modProfileNameVar = useModProfileName();
 
@@ -217,95 +221,23 @@ onGetDiscussionResult((value) => {
     ],
   });
 
-  // Create a map of valid images with their IDs
-  const validImages = (discussion.Album?.Images ?? [])
-    .filter((image: Image): image is Image & { id: string; url: string } =>
-      Boolean(image.id && image.url)
-    )
-    .map((image: Image) => ({
-      id: image.id,
-      url: image.url,
-      alt: image.alt || '',
-      caption: image.caption || '',
-      copyright: image.copyright || '',
-    }));
-
-  // Filter out any null or undefined values from imageOrder and ensure they exist in images
-  const validImageOrder = (discussion.Album?.imageOrder ?? []).filter(
-    (id: string | null | undefined): id is string =>
-      typeof id === 'string' &&
-      id.length > 0 &&
-      validImages.some(
-        (img: {
-          id: string;
-          url: string;
-          alt: string;
-          caption: string;
-          copyright: string;
-        }) => img.id === id
-      )
-  );
-
-  // Extract existing download labels from DiscussionChannel
-  const downloadLabels: Record<string, string[]> = {};
-  const primaryDiscussionChannel = discussion.DiscussionChannels.find(
-    (dc: DiscussionChannel) => dc.Channel?.uniqueName === channelId.value
-  );
-
-  if (primaryDiscussionChannel?.LabelOptions) {
-    // Group labels by their filter group key
-    primaryDiscussionChannel.LabelOptions.forEach(
-      (option: FilterOption) => {
-        const groupKey = option.group?.key;
-        if (groupKey) {
-          if (!downloadLabels[groupKey]) {
-            downloadLabels[groupKey] = [];
-          }
-          downloadLabels[groupKey].push(option.value);
-        }
-      }
-    );
-  }
-
-  // Preserve any existing downloadLabels that the user might have changed
+  // Preserve any existing downloadLabels the user might have changed; otherwise
+  // derive them from the discussion's primary channel (utils/downloadEditForm).
   const existingDownloadLabels = formValues.value.downloadLabels || {};
   const hasExistingLabels = Object.keys(existingDownloadLabels).length > 0;
 
-  const formFields: CreateEditDiscussionFormValues = {
-    title: discussion.title,
-    body: discussion.body,
-    selectedTags: discussion.Tags.map((tag: TagData) => {
-      return tag.text;
-    }),
-    selectedChannels: discussion.DiscussionChannels.map(
-      (discussionChannel: DiscussionChannel) => {
-        return discussionChannel?.Channel?.uniqueName;
-      }
-    ),
-    author: discussion.Author.username,
-    album: {
-      images: validImages,
-      imageOrder: validImageOrder,
-    },
-    crosspostId: discussion.CrosspostedDiscussion?.id || null,
-    downloadableFiles:
-      discussion.DownloadableFiles?.map((file: DownloadableFile) => ({
-        id: file.id || '',
-        fileName: file.fileName || '',
-        url: file.url || '',
-        kind: file.kind || 'OTHER',
-        size: file.size || 0,
-        license: file.license?.id || '',
-        priceModel: file.priceModel || 'FREE',
-        priceCents: file.priceCents || 0,
-        priceCurrency: file.priceCurrency || 'USD',
-      })) || [],
-    // Use existing labels if the user has made changes, otherwise use labels from discussion data
+  // Base field mapping is shared with the discussion edit page; the download
+  // extras (files + labels) come from utils/downloadEditForm.
+  formValues.value = {
+    ...buildDiscussionEditFormValues(discussion),
+    downloadableFiles: mapDownloadableFiles(discussion.DownloadableFiles),
     downloadLabels: hasExistingLabels
       ? existingDownloadLabels
-      : downloadLabels,
+      : extractDownloadLabels({
+          discussionChannels: discussion.DiscussionChannels,
+          channelUniqueName: channelId.value,
+        }),
   };
-  formValues.value = formFields;
   dataLoaded.value = true;
 });
 
