@@ -4,6 +4,6 @@ import IssueDetail from '@/components/mod/IssueDetail.vue';
 
 <template>
   <NuxtLayout>
-    <IssueDetail :is-forum-scoped="false" />
+    <IssueDetail />
   </NuxtLayout>
 </template>
