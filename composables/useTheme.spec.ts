@@ -4,22 +4,23 @@ import { mount } from '@vue/test-utils';
 
 // This is a simplified version that focuses on observable behavior
 // rather than implementation details
+
+// Hoisted to the top of the module by Vitest, so it must live at the top level.
+vi.mock('nuxt/app', () => ({
+  useCookie: () => ({
+    value: null,
+  }),
+  useRoute: () => ({
+    query: {},
+  }),
+  useRouter: () => ({
+    replace: vi.fn(),
+  }),
+}));
+
 describe('useTheme composable - Core functionality', () => {
   beforeEach(() => {
     vi.resetModules();
-
-    // Mock Nuxt composables
-    vi.mock('nuxt/app', () => ({
-      useCookie: () => ({
-        value: null,
-      }),
-      useRoute: () => ({
-        query: {},
-      }),
-      useRouter: () => ({
-        replace: vi.fn(),
-      }),
-    }));
 
     // Mock localStorage
     vi.stubGlobal('localStorage', {

@@ -3,17 +3,25 @@ import { setActivePinia, createPinia } from 'pinia';
 
 // Simplified tests that focus on core Pinia store functionality
 // without testing browser APIs that are difficult to mock
+
+// Hoisted to the top of the module by Vitest, so they must live at the top
+// level (not inside a hook) to reflect their real execution order.
+vi.mock('@/config', () => ({
+  config: { environment: 'test' },
+}));
+
+vi.mock('nuxt/app', () => ({
+  useCookie: () => ({ value: null }),
+  useRoute: () => ({ query: {} }),
+  useRouter: () => ({ replace: vi.fn() }),
+}));
+
 describe('uiStore - Core Functionality', () => {
   beforeEach(() => {
     vi.resetModules();
 
     // Setup a fresh Pinia instance
     setActivePinia(createPinia());
-
-    // Mock config
-    vi.mock('@/config', () => ({
-      config: { environment: 'test' },
-    }));
 
     // Simple mock of browser APIs without expectations on them
     vi.stubGlobal('localStorage', {
@@ -36,13 +44,6 @@ describe('uiStore - Core Functionality', () => {
     vi.stubGlobal('import', {
       meta: { client: true },
     });
-
-    // Mock Nuxt composables
-    vi.mock('nuxt/app', () => ({
-      useCookie: () => ({ value: null }),
-      useRoute: () => ({ query: {} }),
-      useRouter: () => ({ replace: vi.fn() }),
-    }));
   });
 
   it('should initialize with default values', async () => {
