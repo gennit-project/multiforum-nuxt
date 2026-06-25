@@ -28,6 +28,7 @@ import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from '@/utils/localStorageUtils';
+import { getForumShellVisibility } from '@/utils/forumShellVisibility';
 import type { ForumItem } from '@/types/forum';
 
 const route = useRoute();
@@ -48,77 +49,45 @@ const selectedChannelDiscussionId = computed(() => {
     : '';
 });
 
-const showDiscussionTitle = computed(() =>
-  route.name?.toString().includes('forums-forumId-discussions-discussionId')
-);
-const showDownloadTitle = computed(() =>
-  route.name?.toString().includes('forums-forumId-downloads-discussionId')
-);
-const showEventTitle = computed(() =>
-  route.name?.toString().includes('forums-forumId-events-eventId')
-);
-const showIssueTitle = computed(() =>
-  route.name?.toString().includes('forums-forumId-issues-issueNumber')
+// Which title bar / panel / sidebar / split-scroll to show is a pure function
+// of the route name; the logic lives in utils/forumShellVisibility.ts (tested).
+const shellVisibility = computed(() =>
+  getForumShellVisibility(route.name?.toString())
 );
 
-const showChannelTabs = computed(() => {
-  const routeName = String(route.name);
-  const isCreatePage = routeName.includes('create');
-
-  // Forum settings pages where we want to show channel tabs
-  const isForumSettingsPage =
-    routeName.startsWith('forums-forumId-edit') &&
-    (routeName === 'forums-forumId-edit' ||
-      routeName.match(
-        /^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|events|downloads|images|emoji|feedback|wiki-settings|pipelines|plugins(-pluginId)?)$/
-      ));
-
-  // Only hide tabs for content editing (discussions, events, etc), not forum settings
-  const isContentEditPage = routeName.includes('edit') && !isForumSettingsPage;
-
-  return (
-    !showDiscussionTitle.value &&
-    !showDownloadTitle.value &&
-    !showEventTitle.value &&
-    !showIssueTitle.value &&
-    !isCreatePage &&
-    !isContentEditPage
-  );
-});
-
-const showChannelDiscussionPanel = computed(() => {
-  return route.name === 'forums-forumId-discussions';
-});
-
-const showChannelEventPanel = computed(() => {
-  return route.name === 'forums-forumId-events';
-});
-
-const enableDiscussionSplitScroll = computed(() => {
-  return route.name === 'forums-forumId-discussions';
-});
-
-const enableEventSplitScroll = computed(() => {
-  return route.name === 'forums-forumId-events';
-});
-
-const showChannelSidebarOnDetail = computed(() => {
-  return showDiscussionTitle.value || showEventTitle.value;
-});
-
-const showChannelSidebarOnIssueDetail = computed(() => {
-  return route.name
-    ?.toString()
-    .includes('forums-forumId-issues-issueNumber');
-});
-
-const enableIssueSplitScroll = computed(() => {
-  return route.name === 'forums-forumId-issues';
-});
-
-const showChannelIssuePanel = computed(() => {
-  return route.name === 'forums-forumId-issues';
-});
+const showDiscussionTitle = computed(
+  () => shellVisibility.value.showDiscussionTitle
+);
+const showDownloadTitle = computed(
+  () => shellVisibility.value.showDownloadTitle
+);
+const showEventTitle = computed(() => shellVisibility.value.showEventTitle);
+const showIssueTitle = computed(() => shellVisibility.value.showIssueTitle);
+const showChannelTabs = computed(() => shellVisibility.value.showChannelTabs);
+const showChannelDiscussionPanel = computed(
+  () => shellVisibility.value.showChannelDiscussionPanel
+);
+const showChannelEventPanel = computed(
+  () => shellVisibility.value.showChannelEventPanel
+);
+const enableDiscussionSplitScroll = computed(
+  () => shellVisibility.value.enableDiscussionSplitScroll
+);
+const enableEventSplitScroll = computed(
+  () => shellVisibility.value.enableEventSplitScroll
+);
+const showChannelSidebarOnDetail = computed(
+  () => shellVisibility.value.showChannelSidebarOnDetail
+);
+const showChannelSidebarOnIssueDetail = computed(
+  () => shellVisibility.value.showChannelSidebarOnIssueDetail
+);
+const enableIssueSplitScroll = computed(
+  () => shellVisibility.value.enableIssueSplitScroll
+);
+const showChannelIssuePanel = computed(
+  () => shellVisibility.value.showChannelIssuePanel
+);
 
 const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';

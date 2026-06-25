@@ -12,6 +12,7 @@ import { ADD_FEEDBACK_COMMENT_TO_COMMENT } from '@/graphQLData/comment/mutations
 import { GET_FEEDBACK_ON_COMMENT } from '@/graphQLData/comment/queries';
 import { useModProfileName } from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
+import { buildFeedbackContextLink } from '@/utils/feedbackContextLink';
 import type { Comment, DownloadableFile } from '@/__generated__/graphql';
 import CrosspostedDiscussionEmbed from '@/components/discussion/detail/CrosspostedDiscussionEmbed.vue';
 
@@ -142,42 +143,15 @@ const contextOfFeedbackComment = computed(() => {
   );
 });
 
-const updateContextLink = () => {
-  if (discussion.value) {
-    if (route.name === 'forums-forumId-discussions-feedback-discussionId') {
-      // If we are on the page that collects feedback on a discussion, go to the
-      // discussion page for the original context.
-      return {
-        name: 'forums-forumId-discussions-discussionId',
-        params: {
-          discussionId: route.params.discussionId,
-          forumId: route.params.forumId,
-        },
-      };
-    }
-    if (
-      route.name ===
-      'forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId'
-    ) {
-      // If we are on a page that collects feedback on a feedback comment,
-      // go to the original feedback comment's permalink.
-      // (It's the same route with different params.)
-      if (!contextOfFeedbackComment.value) {
-        console.warn('No context of feedback comment found');
-        return '';
-      }
-      return {
-        name: 'forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId',
-        params: {
-          discussionId: route.params.discussionId,
-          forumId: route.params.forumId,
-          feedbackId: contextOfFeedbackComment.value.id,
-        },
-      };
-    }
-  }
-  return '';
-};
+// Route-driven "back to context" link; logic lives in utils/feedbackContextLink.
+const updateContextLink = () =>
+  buildFeedbackContextLink({
+    routeName: route.name?.toString(),
+    discussionId: route.params.discussionId,
+    forumId: route.params.forumId,
+    hasDiscussion: !!discussion.value,
+    contextFeedbackId: contextOfFeedbackComment.value?.id,
+  });
 
 const reachedEndOfResults = computed(() => {
   if (getDiscussionLoading.value || getDiscussionError.value) return false;

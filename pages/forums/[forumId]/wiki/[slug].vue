@@ -12,6 +12,7 @@ import FontSizeControl from '@/components/channel/FontSizeControl.vue';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import { timeAgo } from '@/utils';
+import { buildWikiPageHead } from '@/utils/wikiSeo';
 
 const route = useRoute();
 const router = useRouter();
@@ -67,87 +68,15 @@ const { onResult: onGetWikiPageResult } = useQuery(
 
 onGetWikiPageResult((result) => {
   try {
-    if (!result?.data?.wikiPages) {
-      return;
-    }
-    if (result.data.wikiPages.length === 0) {
-      // Handle the case where the wiki page is not found
-      useHead({
-        title: `Wiki Page Not Found${forumId ? ` | ${forumId}` : ''}`,
-        meta: [
-          {
-            name: 'description',
-            content: 'The requested wiki page could not be found.',
-          },
-          { name: 'robots', content: 'noindex' },
-        ],
-      });
-      return;
-    } else {
-      const wikiPage = result.data.wikiPages[0];
-      const title = wikiPage.title || 'Wiki Page';
-      const description = wikiPage.body
-        ? wikiPage.body.substring(0, 160) +
-          (wikiPage.body.length > 160 ? '...' : '')
-        : `View this wiki page on ${import.meta.env.VITE_SERVER_DISPLAY_NAME}`;
-      const baseUrl = import.meta.env.VITE_BASE_URL;
-      const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
-      const pageUrl = `${baseUrl}/forums/${forumId}/wiki/${slug}`;
-
-      // Set all meta tags using useHead
-      useHead({
-        title: `${title} | ${forumId} Wiki | ${serverName}`,
-        meta: [
-          { name: 'description', content: description },
-
-          // OpenGraph tags
-          { property: 'og:title', content: title },
-          { property: 'og:description', content: description },
-          { property: 'og:type', content: 'article' },
-          { property: 'og:url', content: pageUrl },
-          { property: 'og:site_name', content: serverName },
-
-          // Twitter Card tags
-          { name: 'twitter:card', content: 'summary' },
-          { name: 'twitter:title', content: title },
-          { name: 'twitter:description', content: description },
-
-          // Additional meta tags for wiki pages
-          { name: 'article:section', content: 'Wiki' },
-          { name: 'article:tag', content: 'wiki' },
-        ],
-        script: [
-          {
-            type: 'application/ld+json',
-            children: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Article',
-              headline: title,
-              description: description,
-              author: {
-                '@type': 'Person',
-                name:
-                  wikiPage.VersionAuthor?.displayName ||
-                  wikiPage.VersionAuthor?.username ||
-                  'Anonymous',
-              },
-              datePublished: wikiPage.createdAt,
-              dateModified: wikiPage.updatedAt || wikiPage.createdAt,
-              publisher: {
-                '@type': 'Organization',
-                name: serverName,
-              },
-              mainEntityOfPage: {
-                '@type': 'WebPage',
-                '@id': pageUrl,
-              },
-              articleSection: 'Wiki',
-              keywords: ['wiki', forumId, title],
-            }),
-          },
-        ],
-      });
-    }
+    // The pure head-building logic lives in utils/wikiSeo.ts (unit-tested).
+    const head = buildWikiPageHead({
+      wikiPages: result?.data?.wikiPages,
+      forumId,
+      slug,
+      serverDisplayName: import.meta.env.VITE_SERVER_DISPLAY_NAME,
+      baseUrl: import.meta.env.VITE_BASE_URL,
+    });
+    if (head) useHead(head);
   } catch (error) {
     console.error('Error setting wiki page SEO metadata:', error);
   }
