@@ -10,9 +10,14 @@ import TagComponent from '@/components/TagComponent.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import { relativeTime } from '@/utils';
-import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
-import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import {
+  formatCount,
+  getDiscussionLink,
+  getChannelLink,
+  getTotalCommentCount,
+  buildFavoriteAuthorInfo,
+} from '@/utils/favoriteDiscussionDisplay';
 import type {
   Discussion,
   DiscussionChannel,
@@ -128,54 +133,12 @@ const favoriteDiscussions = computed(() => {
 });
 const { serverAdminUsernames } = useServerRoleMembership();
 
-const formatCount = (
-  count: number | undefined,
-  singular: string,
-  plural: string
-) => {
-  const value = count || 0;
-  return `${value} ${value === 1 ? singular : plural}`;
-};
-
-const getDiscussionLink = (discussion: FavoriteDiscussion) => {
-  const firstChannel = safeArrayFirst(discussion.DiscussionChannels) as
-    | FavoriteDiscussionChannel
-    | undefined;
-  if (!firstChannel?.channelUniqueName) return '/';
-
-  return `/forums/${firstChannel.channelUniqueName}/discussions/${discussion.id}`;
-};
-
-const getChannelLink = (channelUniqueName: string | undefined) => {
-  if (!channelUniqueName) return '/';
-  return `/forums/${channelUniqueName}`;
-};
-
-const getTotalCommentCount = (discussionChannels: FavoriteDiscussionChannel[]) => {
-  return discussionChannels.reduce((total, dc) => {
-    return total + (dc.CommentsAggregate?.count || 0);
-  }, 0);
-};
-
-const getAuthorInfo = (discussion: FavoriteDiscussion) => {
-  const author = discussion?.Author;
-  if (!author) return null;
-
-  const serverRoleBadge = getServerRoleBadge({
-    username: author.username,
+// Display helpers live in utils/favoriteDiscussionDisplay.ts (unit-tested).
+const getAuthorInfo = (discussion: FavoriteDiscussion) =>
+  buildFavoriteAuthorInfo({
+    author: discussion?.Author,
     adminUsernames: serverAdminUsernames.value,
   });
-
-  return {
-    username: author.username || '',
-    displayName: author.displayName || '',
-    profilePicURL: author.profilePicURL || '',
-    commentKarma: author.commentKarma ?? 0,
-    discussionKarma: author.discussionKarma ?? 0,
-    createdAt: author.createdAt || '',
-    isAdmin: serverRoleBadge === 'serverAdmin',
-  };
-};
 </script>
 
 <template>
