@@ -115,19 +115,15 @@ const buildEvent = (overrides: Partial<{
 });
 
 const getCommonMocks = (username: string) => ({
-  getEmail: () => ({
+  getOwnEmail: () => ({
     data: {
-      emails: [
-        {
-          address: 'test@example.com',
-          User: {
-            username,
-            profilePicURL: '',
-            ModerationProfile: null,
-            NotificationsAggregate: { count: 0 },
-          },
-        },
-      ],
+      getOwnEmail: {
+        address: 'test@example.com',
+        username,
+        profilePicURL: '',
+        modProfileName: null,
+        unreadNotificationCount: 0,
+      },
     },
   }),
   getBasicUserInfo: () => ({

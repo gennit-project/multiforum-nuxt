@@ -65,21 +65,15 @@ const getFeedbackHandlers = (username: string, modProfileName: string) => ({
       ElevatedModRole: FEEDBACK_MOD_ROLE,
     },
   }),
-  getEmail: () => ({
+  getOwnEmail: () => ({
     data: {
-      emails: [
-        {
-          address: 'test@example.com',
-          User: {
-            username,
-            profilePicURL: '',
-            ModerationProfile: {
-              displayName: modProfileName,
-            },
-            NotificationsAggregate: { count: 0 },
-          },
-        },
-      ],
+      getOwnEmail: {
+        address: 'test@example.com',
+        username,
+        profilePicURL: '',
+        modProfileName,
+        unreadNotificationCount: 0,
+      },
     },
   }),
   getChannel: () => ({
