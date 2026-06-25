@@ -1,5 +1,12 @@
 # Moderation Architecture
 
+> **Backend architecture lives elsewhere.** This document is the source of truth
+> for how the **frontend** models and enforces moderation. The underlying data
+> model, permission resolvers, suspension storage, and expiry cleanup are
+> implemented in the backend: see
+> [gennit-project/multiforum-backend](https://github.com/gennit-project/multiforum-backend)
+> and the in-depth architecture docs linked from its README.
+
 ## Overview
 
 Moderation in Multiforum spans both frontend and backend concerns:

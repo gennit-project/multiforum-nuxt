@@ -2,6 +2,16 @@
 
 This guide will help you contribute to the Multiforum codebase, with a focus on testing practices.
 
+This guide is for the **frontend** ([multiforum-nuxt](https://github.com/gennit-project/multiforum-nuxt)). The backend lives in [multiforum-backend](https://github.com/gennit-project/multiforum-backend); see its README for backend setup and architecture.
+
+## Prerequisites
+
+- **Node.js ≥ 24.13.0** (see the `engines` field in `package.json`). Older
+  majors are not supported — Node 20, for example, crashes ESLint on
+  `Object.groupBy`. If you use `nvm`, run `nvm use 24` before installing or
+  running scripts.
+- **npm** (bundled with Node).
+
 ## Environment Variables
 
 The application requires several environment variables to be set up. Copy `.env.example` to `.env` and update the values.
@@ -69,10 +79,12 @@ The application requires several environment variables to be set up. Copy `.env.
 ## Getting Started
 
 1. Clone the repository
-2. Copy `.env.example` to `.env` and update the values
-3. Install dependencies with `npm install`
-4. Start the development server with `npm run dev`
-5. Run tests with `npm run test` (Cypress) or `npm run test:unit` (Vitest)
+2. Ensure you are on Node ≥ 24.13.0 (`nvm use 24`)
+3. Copy `.env.example` to `.env` and update the values
+4. Install dependencies with `npm install`
+5. Start the development server with `npm run dev`
+6. Run unit tests with `npm run test:unit` (Vitest) and end-to-end tests with `npm run test:playwright` (Playwright, mocked GraphQL)
+7. Before committing, run `npm run verify` (type-check + unit tests); the pre-commit hook runs this plus ESLint automatically
 
 ## Testing Guidelines
 
@@ -128,50 +140,49 @@ describe('YourComponent', () => {
 });
 ```
 
-#### Integration Tests (Cypress)
+#### End-to-End Tests (Playwright)
 
-Integration tests use Cypress to test full user flows. Tests should:
+End-to-end tests use Playwright with **mocked GraphQL responses** (no backend
+required). Tests should:
 
 - Focus on user-centric workflows
 - Test feature interactions
-- Use real API calls (selectively mocked when needed)
-- Leverage data-testid attributes for stable selectors
+- Use `installMockAuth()` for programmatic authentication (faster and more
+  reliable than driving the login UI)
+- Leverage `data-testid` attributes for stable selectors
+- Wait on network responses or UI state instead of arbitrary sleeps
 
-**Integration Test Structure:**
+**End-to-End Test Structure:**
 
 ```typescript
-import { setupTestData, loginUser } from '../../support/testSetup';
+import { test, expect } from '@playwright/test';
+import { installMockAuth } from '../support/auth';
 
-describe('Feature workflow', () => {
-  // Set up data once for the entire test file
-  setupTestData();
+test('completes a user workflow successfully', async ({ page }) => {
+  await installMockAuth(page);
 
-  // Authenticate before each test
-  loginUser('loginWithCreateEventButton');
+  await page.goto('/forums/cats');
 
-  it('completes a user workflow successfully', () => {
-    // Set up request interception for GraphQL calls
-    cy.intercept('POST', '**/graphql').as('graphqlRequest');
+  await page.getByTestId('create-discussion-button').click();
+  await page.getByTestId('title-input').fill('Test Discussion');
+  await page.getByTestId('body-input').fill('Test Body');
 
-    // Navigate to the starting point
-    cy.visit('/forums/cats');
+  // Wait for the actual GraphQL request to complete instead of a fixed timeout
+  await Promise.all([
+    page.waitForResponse((res) => res.url().includes('/graphql')),
+    page.getByTestId('save-button').click(),
+  ]);
 
-    // Interact with the UI
-    cy.get('[data-testid="create-discussion-button"]').click();
-    cy.get('[data-testid="title-input"]').type('Test Discussion');
-    cy.get('[data-testid="body-input"]').type('Test Body');
-
-    // Submit the form and wait for network request
-    cy.get('[data-testid="save-button"]').click();
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
-
-    // Verify the expected outcome
-    cy.get('[data-testid="discussion-title"]').should(
-      'contain',
-      'Test Discussion'
-    );
-  });
+  await expect(page.getByTestId('discussion-title')).toContainText(
+    'Test Discussion'
+  );
 });
+```
+
+Run a single mocked spec with:
+
+```bash
+npm run test:playwright:mocked -- tests/playwright/mocked/discussions/createEditDeleteDiscussions.spec.ts
 ```
 
 ### Best Practices
@@ -242,93 +253,74 @@ describe('FormComponent', () => {
 });
 ```
 
-#### Example: Testing a Complex Workflow (Cypress)
+#### Example: Testing a Complex Workflow (Playwright)
 
 ```typescript
-// createEditDeleteDiscussions.spec.cy.ts
-import { setupTestData, loginUser } from '../../support/testSetup';
-import { DISCUSSION_CREATION_FORM } from '../constants';
+// tests/playwright/mocked/discussions/createEditDeleteDiscussions.spec.ts
+import { test, expect } from '@playwright/test';
+import { installMockAuth } from '../../support/auth';
 
-describe('Discussion CRUD operations', () => {
-  setupTestData();
-  loginUser('loginWithCreateEventButton');
+test('creates, edits, and deletes a discussion', async ({ page }) => {
+  await installMockAuth(page);
 
-  it('creates, edits, and deletes a discussion', () => {
-    // Set up GraphQL interception
-    cy.intercept('POST', '**/graphql', (req) => {
-      if (req.body.query.includes('createDiscussion')) {
-        req.alias = 'createDiscussionRequest';
-      } else if (req.body.query.includes('updateDiscussion')) {
-        req.alias = 'updateDiscussionRequest';
-      } else if (req.body.query.includes('deleteDiscussion')) {
-        req.alias = 'deleteDiscussionRequest';
-      }
-    });
+  // Create
+  await page.goto('/forums/cats/discussions/create');
+  await page.getByTestId('title-input').fill('Test Discussion');
+  await page.getByTestId('body-input').fill('Initial content');
+  await Promise.all([
+    page.waitForResponse((res) => res.url().includes('/graphql')),
+    page.getByTestId('save-button').click(),
+  ]);
+  await expect(page.getByTestId('discussion-title')).toContainText(
+    'Test Discussion'
+  );
 
-    // Create discussion
-    cy.visit(DISCUSSION_CREATION_FORM);
-    cy.get('[data-testid="title-input"]').type('Test Discussion');
-    cy.get('[data-testid="body-input"]').type('Initial content');
-    cy.get('[data-testid="channel-input"]').type('cats{enter}');
-    cy.get('[data-testid="save-button"]').click();
-    cy.wait('@createDiscussionRequest')
-      .its('response.statusCode')
-      .should('eq', 200);
-    cy.get('[data-testid="discussion-title"]').should(
-      'contain',
-      'Test Discussion'
-    );
+  // Edit
+  await page.getByTestId('discussion-menu-button').click();
+  await page.getByTestId('discussion-menu-button-item-Edit').click();
+  await page.getByTestId('body-input').fill('Updated content');
+  await Promise.all([
+    page.waitForResponse((res) => res.url().includes('/graphql')),
+    page.getByTestId('save-button').click(),
+  ]);
+  await expect(page.getByTestId('discussion-body')).toContainText(
+    'Updated content'
+  );
 
-    // Edit discussion
-    cy.get('[data-testid="discussion-menu-button"]').click();
-    cy.get('[data-testid="discussion-menu-button-item-Edit"]').click();
-    cy.get('[data-testid="body-input"]').clear().type('Updated content');
-    cy.get('[data-testid="save-button"]').click();
-    cy.wait('@updateDiscussionRequest')
-      .its('response.statusCode')
-      .should('eq', 200);
-    cy.get('[data-testid="discussion-body"]').should(
-      'contain',
-      'Updated content'
-    );
-
-    // Delete discussion
-    cy.get('[data-testid="discussion-menu-button"]').click();
-    cy.get('[data-testid="discussion-menu-button-item-Delete"]').click();
-    cy.get('[data-testid="confirm-delete-button"]').click();
-    cy.wait('@deleteDiscussionRequest')
-      .its('response.statusCode')
-      .should('eq', 200);
-    cy.url().should('include', '/forums/cats/discussions');
-  });
+  // Delete
+  await page.getByTestId('discussion-menu-button').click();
+  await page.getByTestId('discussion-menu-button-item-Delete').click();
+  await page.getByTestId('confirm-delete-button').click();
+  await expect(page).toHaveURL(/\/forums\/cats\/discussions/);
 });
 ```
 
 ### Common Testing Pitfalls to Avoid
 
 1. **Flaky Tests**
-   - ❌ Don't use arbitrary timeouts: `cy.wait(3000)`
-   - ✅ Do wait for specific network requests or UI elements: `cy.wait('@graphqlRequest')`, `cy.get('.element').should('be.visible')`
+   - ❌ Don't use arbitrary timeouts: `await page.waitForTimeout(3000)`
+   - ✅ Do wait for the actual network response or UI state: `page.waitForResponse(...)`, `await expect(locator).toBeVisible()`
 
 2. **Brittle Selectors**
-   - ❌ Don't use CSS classes that might change: `cy.get('.button-primary')`
-   - ✅ Do use data-testid attributes: `cy.get('[data-testid="save-button"]')`
+   - ❌ Don't use CSS classes that might change: `page.locator('.button-primary')`
+   - ✅ Do use test ids: `page.getByTestId('save-button')`
 
 3. **Testing Implementation Details**
    - ❌ Don't test internal component state: `expect(wrapper.vm.internalValue).toBe(true)`
    - ✅ Do test observable behavior: `expect(wrapper.text()).toContain('Error message')`
 
-4. **Inefficient Test Setup**
-   - ❌ Don't reset database for each test
-   - ✅ Do use `setupTestData()` to initialize once per file
+4. **Brittle Authentication Setup**
+   - ❌ Don't drive the login UI in every test
+   - ✅ Do authenticate programmatically with `installMockAuth(page)`
 
 5. **Missing Network Request Handling**
    - ❌ Don't assume requests complete instantly
-   - ✅ Do intercept and wait for network requests to complete:
+   - ✅ Do wait for the GraphQL response alongside the action that triggers it:
      ```typescript
-     cy.intercept('POST', '**/graphql').as('graphqlRequest');
-     cy.get('button').click();
-     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+     await Promise.all([
+       page.waitForResponse((res) => res.url().includes('/graphql')),
+       page.getByTestId('save-button').click(),
+     ]);
      ```
 
 6. **Overly Coupled Tests**
@@ -349,8 +341,44 @@ describe('Discussion CRUD operations', () => {
    - ❌ Don't partially mock dependencies
    - ✅ Do completely mock external dependencies or use real implementations
 
+### Frontend testing patterns
+
+These conventions keep tests fast, meaningful, and consistent with the rest of
+the suite.
+
+- **Colocate specs.** Put a unit spec next to the file it tests
+  (`Foo.vue` → `Foo.spec.ts`, `foo.ts` → `foo.spec.ts`). Specs under `tests/unit`
+  are also picked up.
+- **Test real logic, not reimplementations.** When a component holds non-trivial
+  logic (formatting, validation, derivation), extract it into a `utils/` function
+  and unit-test that function directly. This is how the large components
+  (`CreateEditEventFields`, `IssueDetail`, `CommentSection`, `Comment`) are
+  tested — the pure rules live in tested utils and the component just calls them.
+- **Test pages through their child components.** Most pages are thin wrappers.
+  Use `shallowMount` + `findComponent(Child)` and assert the props the page
+  passes down (or the events it forwards), rather than rendering the whole tree:
+
+  ```typescript
+  const search = shallowMount(DiscussionsIndexPage, {
+    global: { stubs: { NuxtLayout: SlotRenderingStub } },
+  }).findComponent(SearchDiscussions);
+  expect(search.props('isForumScoped')).toBe(false);
+  ```
+
+  - Stub layout/slot wrappers (`NuxtLayout`, `FormRow`) with a component that
+    renders the relevant slot, otherwise `shallowMount` swallows slot content.
+  - For pages that call `definePageMeta`, add `vi.stubGlobal('definePageMeta', vi.fn())`.
+- **Keep `vi.mock` at the module top level.** Vitest hoists `vi.mock` to the top
+  of the file, so calling it inside `beforeEach`/`describe` is misleading and now
+  triggers a deprecation warning. If the mock factory references local variables,
+  prefix their names with `mock` (e.g. `mockThemeRef`) so Vitest allows the
+  hoisted reference.
+- **One assertion per `it`.** Prefer multiple focused `it` blocks or a single
+  structured `expect` over several assertions in one test.
+
 ## Additional Resources
 
 - [Vitest Documentation](https://vitest.dev/)
 - [Vue Test Utils Documentation](https://test-utils.vuejs.org/)
+- [Playwright Documentation](https://playwright.dev/)
 - Check out existing tests in the codebase for practical examples
