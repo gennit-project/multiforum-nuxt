@@ -3,6 +3,7 @@ import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import CommentHeader from '@/components/comments/CommentHeader.vue';
+import PageNotFound from '@/components/PageNotFound.vue';
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({
@@ -51,8 +52,8 @@ describe('comment feedback page', () => {
     expect(wrapper.findComponent(CommentHeader).exists()).toBe(true);
   });
 
-  it('does not render the comment header when the comment is missing', async () => {
+  it('shows the not-found page when the comment is missing', async () => {
     const wrapper = await mountWith(null);
-    expect(wrapper.findComponent(CommentHeader).exists()).toBe(false);
+    expect(wrapper.findComponent(PageNotFound).exists()).toBe(true);
   });
 });

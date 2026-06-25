@@ -10,6 +10,7 @@ import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import type { FilterGroup } from '@/__generated__/graphql';
 import { config } from '@/config';
 import { DateTime } from 'luxon';
+import { evaluateForumFeatureGate } from '@/utils/forumFeatureGate';
 
 const route = useRoute();
 
@@ -71,30 +72,25 @@ const anyError = computed(() => {
   return channelError.value || serverConfigError.value;
 });
 
-const shouldShowDownloads = computed(() => {
-  return (
-    !bothLoading.value &&
-    !anyError.value &&
-    serverDownloadsEnabled.value &&
-    channelDownloadsEnabled.value
-  );
-});
+const downloadsGate = computed(() =>
+  evaluateForumFeatureGate({
+    loading: bothLoading.value,
+    hasError: Boolean(anyError.value),
+    serverEnabled: serverDownloadsEnabled.value,
+    channelEnabled: channelDownloadsEnabled.value,
+    messages: {
+      error: 'Unable to load forum or server configuration.',
+      serverDisabled:
+        'Cannot show downloads because they are disabled at the server level.',
+      channelDisabled:
+        'Cannot show downloads because they are not enabled for this forum.',
+    },
+  })
+);
 
-const errorMessage = computed(() => {
-  if (anyError.value) {
-    return 'Unable to load forum or server configuration.';
-  }
+const shouldShowDownloads = computed(() => downloadsGate.value.shouldShow);
 
-  if (!serverDownloadsEnabled.value) {
-    return 'Cannot show downloads because they are disabled at the server level.';
-  }
-
-  if (!channelDownloadsEnabled.value) {
-    return 'Cannot show downloads because they are not enabled for this forum.';
-  }
-
-  return '';
-});
+const errorMessage = computed(() => downloadsGate.value.errorMessage);
 
 const filterGroups = computed<FilterGroup[]>(() => {
   return channel.value?.FilterGroups || [];

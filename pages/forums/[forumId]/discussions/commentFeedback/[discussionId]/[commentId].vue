@@ -291,9 +291,6 @@ onAddFeedbackCommentToCommentDone(() => {
           >
             Feedback
           </h1>
-          <PageNotFound
-            v-if="!getCommentLoading && !getCommentError && !originalComment"
-          />
           <p class="mb-4 px-2 dark:text-white">
             This page collects feedback on this comment:
           </p>
@@ -314,6 +311,7 @@ onAddFeedbackCommentToCommentDone(() => {
             View original context
           </nuxt-link>
         </div>
+        <PageNotFound v-else-if="!getCommentLoading" />
         <FeedbackSection
           :add-feedback-comment-to-comment-error="
             addFeedbackCommentToCommentError?.message || ''
