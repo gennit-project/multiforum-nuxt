@@ -39,7 +39,7 @@ function handleClick(item: MenuItemType) {
       <div>
         <MenuButton
           :data-testid="`text-dropdown-${label}`"
-          class="inline-flex w-full items-center justify-center gap-x-1.5 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-4 text-xs text-gray-700 transition-colors duration-200 hover:bg-gray-100 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white hover:dark:bg-gray-700"
+          class="inline-flex w-full items-center justify-center gap-x-1.5 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-4 text-xs text-gray-700 transition-colors duration-200 hover:bg-gray-100 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white hover:dark:bg-gray-800"
         >
           <SortIcon v-if="showSortIcon" class="h-4 w-4" aria-hidden="true" />
           {{ label }}
@@ -87,7 +87,7 @@ function handleClick(item: MenuItemType) {
     <template #fallback>
       <button
         :data-testid="`text-dropdown-${label}`"
-        class="inline-flex w-full items-center justify-center gap-x-1.5 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-4 text-xs text-gray-700 transition-colors duration-200 hover:bg-gray-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white hover:dark:bg-gray-600"
+        class="inline-flex w-full items-center justify-center gap-x-1.5 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-4 text-xs text-gray-700 transition-colors duration-200 hover:bg-gray-200 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white hover:dark:bg-gray-800"
       >
         <SortIcon v-if="showSortIcon" class="h-4 w-4" aria-hidden="true" />
         {{ label }}

@@ -183,29 +183,40 @@ watch(
   { immediate: true }
 );
 
+// Active treatment: a tinted fill + an INSET accent ring so the highlight stays
+// within the circle and never crowds the label sitting just below it.
+const ACTIVE_CIRCLE =
+  'bg-orange-100 ring-1 ring-inset ring-orange-300 dark:bg-orange-500/20 dark:ring-orange-500/40';
+
 const getIconCircleClasses = (isActive: boolean) => {
   const baseClasses =
     'w-12 h-12 rounded-full bg-transparent hover:bg-gray-200 dark:hover:bg-gray-800 flex items-center justify-center transition-all duration-200 cursor-pointer';
-  return isActive
-    ? `${baseClasses} bg-gray-200 dark:bg-gray-800 ring-1 ring-gray-400 ring-offset-1 ring-offset-gray-100 dark:ring-gray-500 dark:ring-offset-gray-900 shadow-sm`
-    : baseClasses;
+  return isActive ? `${baseClasses} ${ACTIVE_CIRCLE}` : baseClasses;
 };
 
 const getForumIconClasses = (isActive: boolean) => {
   const baseClasses =
     'w-12 h-12 rounded-full bg-transparent hover:bg-gray-200 dark:hover:bg-gray-800 flex items-center justify-center transition-all duration-200 cursor-pointer overflow-hidden';
-  return isActive
-    ? `${baseClasses} bg-gray-200 dark:bg-gray-800 ring-2 ring-gray-400 dark:ring-gray-500 shadow-sm`
-    : baseClasses;
+  return isActive ? `${baseClasses} ${ACTIVE_CIRCLE}` : baseClasses;
 };
 
 const getUserActionClasses = (isActive: boolean) => {
   const baseClasses =
     'rounded-full my-2 bg-transparent hover:bg-gray-200 dark:hover:bg-gray-800 flex items-center justify-center transition-all duration-200 cursor-pointer';
-  return isActive
-    ? `${baseClasses} bg-gray-200 dark:bg-gray-800 ring-1 ring-gray-400 ring-offset-1 ring-offset-gray-100 dark:ring-gray-500 dark:ring-offset-gray-900 shadow-sm`
-    : baseClasses;
+  return isActive ? `${baseClasses} ${ACTIVE_CIRCLE}` : baseClasses;
 };
+
+// Icon + label pick up the accent colour when active so the highlight reads
+// clearly even at this small size.
+const getNavIconClasses = (isActive: boolean) =>
+  isActive
+    ? 'h-6 w-6 text-orange-600 dark:text-orange-400'
+    : 'h-6 w-6 text-gray-500 dark:text-gray-300';
+
+const getNavLabelClasses = (isActive: boolean) =>
+  isActive
+    ? 'mt-1 w-12 text-center text-[10px] leading-[10px] font-medium text-orange-600 dark:text-orange-400'
+    : 'mt-1 w-12 text-center text-[10px] leading-[10px] text-gray-600 dark:text-gray-300';
 </script>
 
 <template>
@@ -247,13 +258,11 @@ const getUserActionClasses = (isActive: boolean) => {
             >
               <component
                 :is="item.icon"
-                class="h-6 w-6 text-gray-500 dark:text-gray-300"
+                :class="getNavIconClasses(isActiveNavItem(item.routerName))"
                 aria-hidden="true"
               />
             </NuxtLink>
-            <span
-              class="w-12 text-center text-[10px] leading-[10px] text-gray-600 dark:text-gray-300"
-            >
+            <span :class="getNavLabelClasses(isActiveNavItem(item.routerName))">
               {{ item.name }}
             </span>
           </div>
@@ -300,7 +309,10 @@ const getUserActionClasses = (isActive: boolean) => {
                 />
               </NuxtLink>
               <span
-                class="w-12 truncate text-center text-[10px] leading-[10px] text-gray-600 dark:text-gray-300"
+                :class="[
+                  getNavLabelClasses(currentForumId === forum.uniqueName),
+                  'truncate',
+                ]"
               >
                 {{ forum.uniqueName }}
               </span>
@@ -321,7 +333,7 @@ const getUserActionClasses = (isActive: boolean) => {
               </button>
             </IconTooltip>
             <span
-              class="text-[10px] leading-[10px] text-gray-600 dark:text-gray-300"
+              class="mt-1 text-[10px] leading-[10px] text-gray-600 dark:text-gray-300"
               >More</span
             >
           </div>
@@ -353,9 +365,7 @@ const getUserActionClasses = (isActive: boolean) => {
             >
               <AdminIcon />
             </NuxtLink>
-            <span
-              class="w-12 text-center text-[10px] leading-[10px] text-gray-600 dark:text-gray-300"
-            >
+            <span :class="getNavLabelClasses(isActiveUserAction('admin-issues'))">
               Admin
             </span>
           </div>
@@ -370,9 +380,7 @@ const getUserActionClasses = (isActive: boolean) => {
                 <div :class="getUserActionClasses(false)">
                   <LoginIcon />
                 </div>
-                <span
-                  class="w-12 text-center text-[10px] leading-[10px] text-gray-600 dark:text-gray-300"
-                >
+                <span :class="getNavLabelClasses(false)">
                   Log in
                 </span>
               </div>

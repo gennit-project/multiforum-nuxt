@@ -19,6 +19,8 @@ import {
 import EventFilterBar from './filters/EventFilterBar.vue';
 import TimeShortcuts from './filters/TimeShortcuts.vue';
 import OnlineInPersonShortcuts from './filters/OnlineInPersonShortcuts.vue';
+import FilterIcon from '@/components/icons/FilterIcon.vue';
+import MapIcon from '@/components/icons/MapIcon.vue';
 import { LocationFilterTypes } from './filters/locationFilterTypes';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
@@ -269,7 +271,7 @@ watch(isSearchListRoute, (isSearchRoute) => {
     >
       <div
         v-if="isSearchListRoute"
-        class="flex items-center justify-between px-4 pt-1"
+        class="flex items-center justify-between px-4 py-2"
       >
         <h1
           class="font-semibold text-sm tracking-wide text-gray-900 dark:text-gray-100"
@@ -278,23 +280,33 @@ watch(isSearchListRoute, (isSearchRoute) => {
         </h1>
         <div class="flex items-center gap-2">
           <button
-            class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-300 dark:text-gray-300 dark:hover:bg-gray-700"
-            :class="[showMainFilters ? 'bg-gray-200 dark:bg-gray-700' : '']"
+            class="inline-flex h-8 items-center gap-1.5 rounded-md border border-gray-300 px-2.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+            :class="[
+              showMainFilters
+                ? 'border-gray-400 bg-gray-100 text-gray-900 dark:border-gray-500 dark:bg-gray-800 dark:text-white'
+                : '',
+            ]"
             data-testid="toggle-main-filters-button"
             type="button"
             @click="toggleShowMainFilters"
           >
+            <FilterIcon class="h-3.5 w-3.5" aria-hidden="true" />
             {{ showMainFilters ? 'Hide filters' : 'Show filters' }}
           </button>
           <button
-            class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-300 dark:text-gray-300 dark:hover:bg-gray-700"
+            class="inline-flex h-8 items-center gap-1.5 rounded-md border border-gray-300 px-2.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
             type="button"
             @click="goToInPersonMap"
           >
+            <MapIcon class="h-3.5 w-3.5" aria-hidden="true" />
             In-person map
           </button>
         </div>
       </div>
+      <hr
+        v-if="isSearchListRoute"
+        class="mx-4 -mt-2 border-t border-gray-200 dark:border-gray-700"
+      >
       <EventFilterBar
         :show-distance-filters="false"
         :allow-hiding-main-filters="true"

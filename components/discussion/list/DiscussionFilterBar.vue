@@ -202,7 +202,7 @@ const isExpanded = computed(() => {
               ? 'border-gray-500 bg-gray-100 text-gray-900 dark:border-gray-400 dark:bg-gray-800 dark:text-white'
               : 'border-gray-300 text-gray-800 dark:border-gray-600 dark:text-gray-300'
           "
-          class="flex h-9 items-center gap-1 rounded-md border px-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+          class="flex h-9 items-center gap-1 rounded-md border px-2 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:hover:bg-gray-700 dark:hover:text-gray-200"
           @click="
             (event) => {
               event.preventDefault();
@@ -221,7 +221,7 @@ const isExpanded = computed(() => {
               ? 'border-gray-500 bg-gray-100 text-gray-900 dark:border-gray-400 dark:bg-gray-800 dark:text-white'
               : 'border-gray-300 text-gray-800 dark:border-gray-600 dark:text-gray-300'
           "
-          class="flex h-9 items-center gap-1 rounded-md border px-1.5 text-gray-800 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+          class="flex h-9 items-center gap-1 rounded-md border px-2 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:hover:bg-gray-700 dark:hover:text-gray-200"
           @click="
             (event) => {
               event.preventDefault();
