@@ -1,5 +1,8 @@
 # Multiforum Development Guide
 
+> Requires **Node.js ≥ 24.13.0** (`engines` in `package.json`). Run `nvm use 24`
+> first — older majors break tooling (Node 20 crashes ESLint on `Object.groupBy`).
+
 ## Build & Run Commands
 
 - `npm run dev` - Start development server
@@ -49,12 +52,14 @@
 
 ## Vitest Testing (Unit)
 
-- Unit tests are located in `tests/unit` directory
+- Unit tests live in `tests/unit` or colocated next to the file under test (`Foo.vue` → `Foo.spec.ts`)
 - Run all unit tests with `npm run test:unit`
 - Run specific tests with `npm run test:unit -- --run tests/unit/path/to/test.spec.ts`
 - Use exactly one `expect(...)` assertion per `it(...)` test case
 - If you need multiple checks, split into multiple `it(...)` blocks or combine into a single structured `expect(...)`
 - Prefer `it.each(...)` tables when it helps keep tests DRY
+- Keep `vi.mock(...)` at the module top level — Vitest hoists it, so calling it inside `beforeEach`/`describe` is deprecated. If the factory references a local variable, prefix its name with `mock` (e.g. `mockThemeRef`)
+- Test thin page wrappers via `shallowMount` + `findComponent(Child).props(...)`; stub slot wrappers (`NuxtLayout`, `FormRow`) to render their slot, and `vi.stubGlobal('definePageMeta', vi.fn())` for pages that call it. See [CONTRIBUTING.md](./CONTRIBUTING.md#frontend-testing-patterns)
 
 ### Unit Test Best Practices
 

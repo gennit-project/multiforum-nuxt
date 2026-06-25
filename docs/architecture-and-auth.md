@@ -1,5 +1,12 @@
 # Architecture and Authentication
 
+> **Looking for the backend architecture?** This document covers the frontend
+> and the auth flow that spans both tiers. The data model, GraphQL schema,
+> resolver design, and Neo4j/Cypher details live in the backend repository:
+> [gennit-project/multiforum-backend](https://github.com/gennit-project/multiforum-backend) —
+> see its README for in-depth architecture docs and the further references
+> linked from it.
+
 ## Technology Stack
 
 The backend ([multiforum-backend](https://github.com/gennit-project/multiforum-backend)) uses Apollo Server with Neo4j.
@@ -86,7 +93,7 @@ Common issues:
 
 ## Performance
 
-Performance optimizations are documented in [PERFORMANCE.md](../PERFORMANCE.md), including:
+Performance optimizations are documented in [PERFORMANCE.md](./PERFORMANCE.md), including:
 - Code splitting and lazy loading
 - Compression and caching
 - JS/CSS minification

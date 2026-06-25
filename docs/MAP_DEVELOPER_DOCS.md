@@ -172,4 +172,4 @@ const mapConfig = {
 ## Related Documentation
 
 - [Map Clustering Implementation Guide](./MAP_CLUSTERING_GUIDE.md) - Detailed clustering implementation
-- [CLAUDE.md](./CLAUDE.md) - General development guidelines and testing patterns
+- [CLAUDE.md](../CLAUDE.md) - General development guidelines and testing patterns
