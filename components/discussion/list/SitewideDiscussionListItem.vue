@@ -364,39 +364,48 @@ const revealSensitiveContent = () => {
             >
               +{{ channelCount - 1 }}
             </span>
-            <span aria-hidden="true">•</span>
-            <span>{{ relative }}</span>
-            <span aria-hidden="true">•</span>
-            <UsernameWithTooltip
-              v-if="authorUsername"
-              :is-admin="authorIsAdmin"
-              :username="authorUsername"
-              :src="discussion?.Author?.profilePicURL || ''"
-              :display-name="discussion?.Author?.displayName || ''"
-              :comment-karma="discussion?.Author?.commentKarma ?? 0"
-              :discussion-karma="discussion?.Author?.discussionKarma ?? 0"
-              :account-created="discussion?.Author?.createdAt"
-            />
-            <span aria-hidden="true">•</span>
-            <template v-if="discussion && !submittedToMultipleChannels">
+            <span class="inline-flex items-center gap-x-1.5 whitespace-nowrap">
+              <span aria-hidden="true">•</span>
+              <span>{{ relative }}</span>
+            </span>
+            <span class="inline-flex items-center gap-x-1.5 whitespace-nowrap">
+              <span aria-hidden="true">•</span>
+              <UsernameWithTooltip
+                v-if="authorUsername"
+                :is-admin="authorIsAdmin"
+                :username="authorUsername"
+                :src="discussion?.Author?.profilePicURL || ''"
+                :display-name="discussion?.Author?.displayName || ''"
+                :comment-karma="discussion?.Author?.commentKarma ?? 0"
+                :discussion-karma="discussion?.Author?.discussionKarma ?? 0"
+                :account-created="discussion?.Author?.createdAt"
+              />
+            </span>
+            <span
+              v-if="discussion"
+              class="inline-flex items-center gap-x-1.5 whitespace-nowrap"
+            >
+              <span aria-hidden="true">•</span>
               <nuxt-link
+                v-if="!submittedToMultipleChannels"
                 :to="getDetailLink()"
                 class="flex items-center gap-1 hover:underline"
               >
                 <i class="fa-regular fa-comment" aria-hidden="true" />
                 {{ commentCount }}
               </nuxt-link>
-            </template>
-            <template v-else-if="discussion">
-              <MenuButton :items="discussionDetailOptions">
+              <MenuButton v-else :items="discussionDetailOptions">
                 <span class="flex cursor-pointer items-center gap-1">
                   <i class="fa-regular fa-comment" aria-hidden="true" />
                   {{ commentCount }} in {{ channelCount }}
                   <ChevronDownIcon class="h-3 w-3" aria-hidden="true" />
                 </span>
               </MenuButton>
-            </template>
-            <template v-if="discussion && (discussion.body || discussion.Album)">
+            </span>
+            <span
+              v-if="discussion && (discussion.body || discussion.Album)"
+              class="inline-flex items-center gap-x-1.5 whitespace-nowrap"
+            >
               <span aria-hidden="true">•</span>
               <button
                 type="button"
@@ -411,7 +420,7 @@ const revealSensitiveContent = () => {
                 />
                 {{ isExpanded ? 'Collapse' : 'Expand' }}
               </button>
-            </template>
+            </span>
           </div>
         </div>
         <nuxt-link
