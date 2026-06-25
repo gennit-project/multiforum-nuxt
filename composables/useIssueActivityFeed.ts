@@ -1,5 +1,6 @@
 import { useMutation } from '@vue/apollo-composable';
 import type { Ref } from 'vue';
+import type { ApolloCache, NormalizedCacheObject } from '@apollo/client/core';
 import { GET_ISSUE } from '@/graphQLData/issue/queries';
 import {
   ADD_ISSUE_ACTIVITY_FEED_ITEM,
@@ -26,8 +27,10 @@ export function useIssueActivityFeed({
   activityFeedLimit,
 }: UseIssueActivityFeedParams) {
   const createCacheUpdater = () => ({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    update: (cache: any, { data }: any) => {
+    update: (
+      cache: ApolloCache<NormalizedCacheObject>,
+      { data }: { data?: { updateIssues?: { issues: Issue[] } } | null }
+    ) => {
       if (!data?.updateIssues?.issues) return;
 
       const { issues } = data.updateIssues;
@@ -45,12 +48,12 @@ export function useIssueActivityFeed({
         variables.activityFeedOffset = 0;
       }
 
-      const existingIssueData = cache.readQuery({
+      const existingIssueData = cache.readQuery<{ issues: Issue[] }>({
         query: GET_ISSUE,
         variables,
       });
 
-      if (existingIssueData?.issues?.length > 0) {
+      if (existingIssueData?.issues && existingIssueData.issues.length > 0) {
         const existingIssues: Issue[] = existingIssueData.issues;
 
         const newIssues = existingIssues.map((issue) =>

@@ -70,8 +70,9 @@ async function handleSave(config: PipelineConfig) {
     });
     toast.success('Channel pipeline configuration saved successfully');
     await refetchPipelines();
-  } catch (err: any) {
-    toast.error(`Failed to save pipeline: ${err.message}`);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    toast.error(`Failed to save pipeline: ${message}`);
   }
 }
 </script>

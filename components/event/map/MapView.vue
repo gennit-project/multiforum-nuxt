@@ -146,8 +146,8 @@ const sendToPreview = async (eventId: string, eventLocationId: string) => {
 // const highlightedMarker = ref(null);
 const mobileMarkerMap = ref<MarkerMap>({ markers: {} });
 const desktopMarkerMap = ref<MarkerMap>({ markers: {} });
-const mobileMap = ref<any>({});
-const desktopMap = ref<any>({});
+const mobileMap = ref<google.maps.Map | null>(null);
+const desktopMap = ref<google.maps.Map | null>(null);
 const colorLocked = ref(false);
 const eventPreviewIsOpen = ref(false);
 const highlightedEventId = ref('');

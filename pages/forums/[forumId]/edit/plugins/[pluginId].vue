@@ -14,6 +14,7 @@ import {
 } from '@/graphQLData/channel/queries';
 import { UPDATE_CHANNEL_ENABLED_PLUGINS } from '@/graphQLData/channel/mutations';
 import type { PluginFormSection } from '@/types/pluginForms';
+import type { InstalledPlugin, User } from '@/__generated__/graphql';
 import {
   getPluginFormSections,
   getSettingsDefaults,
@@ -91,7 +92,7 @@ const enabledPluginEdges = computed(() => {
 });
 
 const enabledPluginsById = computed(() => {
-  const map = new Map<string, any>();
+  const map = new Map<string, (typeof enabledPluginEdges.value)[number]>();
   for (const edge of enabledPluginEdges.value) {
     const pid = edge?.node?.Plugin?.id;
     if (pid) {
@@ -103,12 +104,12 @@ const enabledPluginsById = computed(() => {
 
 const serverEnabledPlugins = computed(() => {
   const installed = installedResult.value?.getInstalledPlugins || [];
-  return installed.filter((plugin: any) => plugin.enabled);
+  return installed.filter((plugin: InstalledPlugin) => plugin.enabled);
 });
 
 const plugin = computed(() => {
   return serverEnabledPlugins.value.find(
-    (p: any) => p.plugin.id === pluginId.value
+    (p: InstalledPlugin) => p.plugin.id === pluginId.value
   );
 });
 
@@ -191,10 +192,10 @@ async function handleToggleEnabled(enabled: boolean) {
     await refetchChannel();
     await client.refetchQueries({ include: [GET_CHANNEL] });
     toast.success(enabled ? 'Plugin enabled for this forum.' : 'Plugin disabled for this forum.');
-  } catch (err: any) {
+  } catch (err: unknown) {
     const message =
       updateChannelEnabledPluginsError.value?.message ||
-      err?.message ||
+      (err instanceof Error ? err.message : undefined) ||
       'Failed to update plugin. Please try again.';
     toast.error(`Failed to update plugin: ${message}`);
   }
@@ -231,10 +232,10 @@ async function handleSave() {
     await refetchChannel();
     await client.refetchQueries({ include: [GET_CHANNEL] });
     toast.success('Plugin settings saved for this forum.');
-  } catch (err: any) {
+  } catch (err: unknown) {
     const message =
       updateChannelEnabledPluginsError.value?.message ||
-      err?.message ||
+      (err instanceof Error ? err.message : undefined) ||
       'Failed to save plugin settings. Please try again.';
     toast.error(`Failed to save plugin settings: ${message}`);
   } finally {
@@ -258,7 +259,7 @@ const serverBotName = computed(() =>
 // Get existing bots for this channel
 const existingBots = computed<ExistingBot[]>(() => {
   const bots = channelResult.value?.channels?.[0]?.Bots || [];
-  return bots.map((bot: any) => ({
+  return bots.map((bot: User) => ({
     username: bot.username,
     botProfileId: bot.botProfileId,
     isDeprecated: bot.isDeprecated,

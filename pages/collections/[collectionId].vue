@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
+import type { Discussion } from '@/__generated__/graphql';
 import { GET_PUBLIC_COLLECTION_BY_ID } from '@/graphQLData/collection/queries';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
@@ -16,7 +17,7 @@ const collectionId = computed(() => {
 });
 
 const DOWNLOAD_LIMIT = 20;
-const downloads = ref<any[]>([]);
+const downloads = ref<Discussion[]>([]);
 const totalDownloads = ref<number>(0);
 const downloadOffset = ref(0);
 
@@ -46,7 +47,7 @@ watch(
     const newDownloads = collectionData.Downloads || [];
     const existingIds = new Set(downloads.value.map((d) => d.id));
     const merged = [...downloads.value];
-    newDownloads.forEach((d: any) => {
+    newDownloads.forEach((d: Discussion) => {
       if (d && !existingIds.has(d.id)) {
         merged.push(d);
       }

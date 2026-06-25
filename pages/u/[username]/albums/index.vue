@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
+import type { Album, Image } from '@/__generated__/graphql';
 import { GET_USER_ALBUMS } from '@/graphQLData/image/queries';
 import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
 
@@ -54,7 +55,7 @@ const {
 );
 
 // Helper to get album date for sorting (use discussion createdAt or first image createdAt)
-const getAlbumDate = (album: any): Date => {
+const getAlbumDate = (album: Album): Date => {
   const discussionDate = album.Discussions?.[0]?.createdAt;
   const imageDate = album.Images?.[0]?.createdAt;
   const dateStr = discussionDate || imageDate;
@@ -62,7 +63,7 @@ const getAlbumDate = (album: any): Date => {
 };
 
 // Sort albums by newest first
-const sortByNewest = (albums: any[]) => {
+const sortByNewest = (albums: Album[]) => {
   return [...albums].sort((a, b) => {
     return getAlbumDate(b).getTime() - getAlbumDate(a).getTime();
   });
@@ -76,7 +77,7 @@ const allAlbums = computed(() => {
 // Albums where the user is the Owner (sorted newest first)
 const ownedAlbums = computed(() => {
   const owned = allAlbums.value.filter(
-    (album: any) => album.Owner?.username === username.value
+    (album: Album) => album.Owner?.username === username.value
   );
   return sortByNewest(owned);
 });
@@ -84,16 +85,16 @@ const ownedAlbums = computed(() => {
 // Albums where user uploaded images but is not the owner (sorted newest first)
 const otherAlbums = computed(() => {
   const other = allAlbums.value.filter(
-    (album: any) => album.Owner?.username !== username.value
+    (album: Album) => album.Owner?.username !== username.value
   );
   return sortByNewest(other);
 });
 
 // Get first image from album for thumbnail
-const getAlbumThumbnail = (album: any) => {
+const getAlbumThumbnail = (album: Album) => {
   if (album.imageOrder && album.imageOrder.length > 0 && album.Images) {
     const firstImageId = album.imageOrder[0];
-    const firstImage = album.Images.find((img: any) => img.id === firstImageId);
+    const firstImage = album.Images.find((img: Image) => img.id === firstImageId);
     return firstImage?.url || album.Images[0]?.url || '';
   }
   return album.Images?.[0]?.url || '';
