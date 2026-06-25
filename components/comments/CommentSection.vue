@@ -32,6 +32,9 @@ import { hasBotMention, type BotSuggestion } from '@/utils/botMentions';
 import {
   filterCommentsBySearch,
   resolveChannelUniqueName,
+  shouldSoftDeleteComment,
+  getCommentInProgressLength,
+  buildReplyCommentInput,
 } from '@/utils/commentSection';
 import type { ModSuggestion } from '@/utils/modMentions';
 
@@ -375,16 +378,7 @@ function handleClickCreate() {
 }
 
 function updateCreateInputValuesForReply(input: CreateReplyInputData) {
-  const { text, parentCommentId, depth } = input;
-  if (!parentCommentId) {
-    throw new Error('parentCommentId is required to reply to a comment');
-  }
-  emit('updateCreateReplyCommentInput', {
-    text,
-    isRootComment: false,
-    parentCommentId,
-    depth,
-  });
+  emit('updateCreateReplyCommentInput', buildReplyCommentInput(input));
 }
 
 function handleClickEdit(commentData: CommentType) {
@@ -426,7 +420,7 @@ function handleDeleteComment() {
   if (!commentToDeleteId.value) {
     throw new Error('commentId is required to delete a comment');
   }
-  if (commentToDeleteReplyCount.value > 0) {
+  if (shouldSoftDeleteComment(commentToDeleteReplyCount.value)) {
     softDeleteComment({ id: commentToDeleteId.value });
   } else {
     deleteComment({ id: commentToDeleteId.value });
@@ -493,16 +487,14 @@ function handleViewFeedback(commentId: string) {
   });
 }
 
-// Update the lengthOfCommentInProgress computed to be more defensive
-const lengthOfCommentInProgress = computed(() => {
-  if (editFormOpenAtCommentID.value) {
-    return editFormValues.value.text.length;
-  }
-  if (replyFormOpenAtCommentID.value && props.createFormValues?.text) {
-    return props.createFormValues.text.length;
-  }
-  return 0;
-});
+const lengthOfCommentInProgress = computed(() =>
+  getCommentInProgressLength({
+    editFormOpen: !!editFormOpenAtCommentID.value,
+    editText: editFormValues.value.text,
+    replyFormOpen: !!replyFormOpenAtCommentID.value,
+    createText: props.createFormValues?.text,
+  })
+);
 
 const replyHasBotMention = computed(() => {
   return (
