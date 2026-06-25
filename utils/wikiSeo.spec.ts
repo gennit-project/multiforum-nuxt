@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildWikiPageHead } from './wikiSeo';
+import { buildWikiPageHead, buildWikiHomeHead } from './wikiSeo';
 
 const BASE = {
   forumId: 'cats',
@@ -64,5 +64,57 @@ describe('buildWikiPageHead', () => {
     });
     const data = JSON.parse(head!.script![0].children);
     expect(data.author.name).toBe('Anonymous');
+  });
+});
+
+describe('buildWikiHomeHead', () => {
+  const HOME = {
+    forumId: 'cats',
+    serverDisplayName: 'Topical',
+    baseUrl: 'https://example.test',
+  };
+
+  it('returns null while the query has not resolved', () => {
+    expect(buildWikiHomeHead({ ...HOME, channels: undefined })).toBeNull();
+  });
+
+  it('returns a not-found head for an empty channel result', () => {
+    const head = buildWikiHomeHead({ ...HOME, channels: [] });
+    expect(head?.title).toBe('Wiki Not Found | cats');
+  });
+
+  it('returns a noindex disabled head when the wiki is off', () => {
+    const head = buildWikiHomeHead({
+      ...HOME,
+      channels: [{ wikiEnabled: false }],
+    });
+    expect(head?.title).toBe('Wiki Disabled | cats | Topical');
+  });
+
+  it('marks the disabled head noindex', () => {
+    const head = buildWikiHomeHead({
+      ...HOME,
+      channels: [{ wikiEnabled: false }],
+    });
+    expect(head?.meta).toContainEqual({ name: 'robots', content: 'noindex' });
+  });
+
+  it('returns a WebSite landing head when there is no home page', () => {
+    const head = buildWikiHomeHead({
+      ...HOME,
+      channels: [{ wikiEnabled: true, WikiHomePage: null }],
+    });
+    const data = JSON.parse(head!.script![0].children);
+    expect(data['@type']).toBe('WebSite');
+  });
+
+  it('returns an Article head built from the home page', () => {
+    const head = buildWikiHomeHead({
+      ...HOME,
+      channels: [
+        { wikiEnabled: true, WikiHomePage: { title: 'Home', body: 'Hi' } },
+      ],
+    });
+    expect(head?.title).toBe('Home | cats Wiki | Topical');
   });
 });
