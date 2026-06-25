@@ -40,6 +40,11 @@ import {
   eventFormNeedsChanges,
   getEventFormValidationMessage,
 } from '@/utils/eventFormValidation';
+import {
+  applyTimeToTimestamp,
+  computeStartDateChange,
+  computeEndDateChange,
+} from '@/utils/eventDateTimeEditing';
 import type { PropType } from 'vue';
 import { isFileSizeValid } from '@/utils/index';
 
@@ -315,116 +320,38 @@ nextTick(() => {
   }
 });
 
-const handleStartTimeTimeChange = (dateTimeValue: string) => {
-  if (!dateTimeValue) return;
-
-  try {
-    // Create DateTime object directly from the time string
-    const currentDate = DateTime.fromJSDate(startTime.value);
-    const startTimeObject = DateTime.fromFormat(dateTimeValue, 'HH:mm', {
-      zone: currentDate.zone,
-    }).set({
-      year: currentDate.year,
-      month: currentDate.month,
-      day: currentDate.day,
-    });
-
-    if (startTimeObject.isValid) {
-      emit('updateFormValues', { startTime: startTimeObject.toISO() });
-    }
-  } catch (error) {
-    console.warn('Invalid time input:', dateTimeValue, error);
-  }
+// The pure date math lives in utils/eventDateTimeEditing.ts (unit-tested).
+// Each picker edits one axis (time-of-day or calendar date) of the timestamp.
+const handleStartTimeTimeChange = (timeValue: string) => {
+  const startTime = applyTimeToTimestamp(props.formValues.startTime, timeValue);
+  if (startTime) emit('updateFormValues', { startTime });
 };
 
-const handleEndTimeTimeChange = (dateTimeValue: string) => {
-  if (!dateTimeValue) return;
-
-  try {
-    const currentDate = DateTime.fromJSDate(endTime.value);
-    const endTimeObject = DateTime.fromFormat(dateTimeValue, 'HH:mm', {
-      zone: currentDate.zone,
-    }).set({
-      year: currentDate.year,
-      month: currentDate.month,
-      day: currentDate.day,
-    });
-
-    if (endTimeObject.isValid) {
-      emit('updateFormValues', { endTime: endTimeObject.toISO() });
-    }
-  } catch (error) {
-    console.warn('Invalid time input:', dateTimeValue, error);
-  }
+const handleEndTimeTimeChange = (timeValue: string) => {
+  const endTime = applyTimeToTimestamp(props.formValues.endTime, timeValue);
+  if (endTime) emit('updateFormValues', { endTime });
 };
 
-const handleStartTimeDateChange = (dateTimeValue: string) => {
-  if (!dateTimeValue) return;
-
-  try {
-    const currentDate = DateTime.fromJSDate(startTime.value);
-    const inputDateTime = DateTime.fromISO(dateTimeValue);
-
-    if (!inputDateTime.isValid) return;
-
-    const startTimeObject = currentDate.set({
-      year: inputDateTime.year,
-      month: inputDateTime.month,
-      day: inputDateTime.day,
-    });
-
-    if (startTimeObject.isValid) {
-      // Update start time
-      const updates: Partial<CreateEditEventFormValues> = {
-        startTime: startTimeObject.toISO(),
-      };
-
-      // If not a multi-day event, also update the end date to match the start date
-      if (!isMultiDayEvent.value) {
-        const currentEndTime = DateTime.fromJSDate(endTime.value);
-        const newEndTime = currentEndTime.set({
-          year: inputDateTime.year,
-          month: inputDateTime.month,
-          day: inputDateTime.day,
-        });
-
-        if (newEndTime.isValid) {
-          updates.endTime = newEndTime.toISO();
-        }
-      }
-
-      emit('updateFormValues', updates);
-    }
-  } catch (error) {
-    console.warn('Invalid date input:', dateTimeValue, error);
-  }
+const handleStartTimeDateChange = (dateValue: string) => {
+  const updates = computeStartDateChange({
+    startISO: props.formValues.startTime,
+    endISO: props.formValues.endTime,
+    dateValue,
+    isMultiDay: isMultiDayEvent.value,
+  });
+  if (updates) emit('updateFormValues', updates);
 };
 
-const handleEndTimeDateChange = (dateTimeValue: string) => {
-  if (!dateTimeValue) return;
-
-  try {
-    const currentDate = DateTime.fromJSDate(endTime.value);
-    const inputDateTime = DateTime.fromISO(dateTimeValue);
-
-    if (!inputDateTime.isValid) return;
-
-    const endTimeObject = currentDate.set({
-      year: inputDateTime.year,
-      month: inputDateTime.month,
-      day: inputDateTime.day,
-    });
-
-    if (endTimeObject.isValid) {
-      const startDateTime = DateTime.fromJSDate(startTime.value);
-
-      // If end date is different from start date, update multi-day status
-      isMultiDayEvent.value = !startDateTime.hasSame(endTimeObject, 'day');
-
-      emit('updateFormValues', { endTime: endTimeObject.toISO() });
-    }
-  } catch (error) {
-    console.warn('Invalid date input:', dateTimeValue, error);
+const handleEndTimeDateChange = (dateValue: string) => {
+  const result = computeEndDateChange({
+    startISO: props.formValues.startTime,
+    endISO: props.formValues.endTime,
+    dateValue,
+  });
+  if (result) {
+    // End date differing from the start date flips the event to multi-day.
+    isMultiDayEvent.value = result.isMultiDay;
+    emit('updateFormValues', { endTime: result.endTime });
   }
 };
 

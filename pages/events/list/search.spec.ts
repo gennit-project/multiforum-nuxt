@@ -1,0 +1,36 @@
+import { describe, it, expect, vi } from 'vitest';
+import { shallowMount } from '@vue/test-utils';
+import { defineComponent, h } from 'vue';
+
+const useHead = vi.fn();
+
+vi.mock('nuxt/app', () => ({
+  useHead,
+}));
+
+const NuxtLayoutStub = defineComponent({
+  setup(_props, { slots }) {
+    return () => h('div', slots.default?.());
+  },
+});
+
+describe('online events list search page', () => {
+  it('renders the event list view', async () => {
+    const Page = (await import('./search.vue')).default;
+    const EventListView = (
+      await import('@/components/event/list/EventListView.vue')
+    ).default;
+    const wrapper = shallowMount(Page, {
+      global: { stubs: { NuxtLayout: NuxtLayoutStub } },
+    });
+    expect(wrapper.findComponent(EventListView).exists()).toBe(true);
+  });
+
+  it('sets the page title to "Online Events"', async () => {
+    const Page = (await import('./search.vue')).default;
+    shallowMount(Page, {
+      global: { stubs: { NuxtLayout: NuxtLayoutStub } },
+    });
+    expect(useHead).toHaveBeenCalledWith({ title: 'Online Events' });
+  });
+});

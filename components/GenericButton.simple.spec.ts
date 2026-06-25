@@ -2,17 +2,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 
 // This simple test focuses on just the core functionality of the button
+
+// Hoisted to the top of the module by Vitest, so it must live at the top level.
+vi.mock('@/components/LoadingSpinner.vue', () => ({
+  default: {
+    name: 'LoadingSpinner',
+    template: '<div class="mock-spinner">Loading...</div>',
+  },
+}));
+
 describe('GenericButton Component', () => {
   beforeEach(() => {
     vi.resetModules();
-
-    // Stub LoadingSpinner component globally
-    vi.mock('@/components/LoadingSpinner.vue', () => ({
-      default: {
-        name: 'LoadingSpinner',
-        template: '<div class="mock-spinner">Loading...</div>',
-      },
-    }));
   });
 
   it('should render text and handle click events', async () => {
