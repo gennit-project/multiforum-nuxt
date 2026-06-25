@@ -7,11 +7,11 @@ import ChannelContributionChart from '@/components/charts/ChannelContributionCha
 import IconButtonDropdown from '@/components/IconButtonDropdown.vue';
 import type { MenuItemType } from '@/components/IconButtonDropdown.vue';
 import { DateTime } from 'luxon';
-import type {
-  Activity,
-  DayData,
-  UserContributionData,
-} from '@/__generated__/graphql';
+import type { UserContributionData } from '@/__generated__/graphql';
+import {
+  getMaxDayCount,
+  buildContributorStats,
+} from '@/utils/contributorStats';
 
 const route = useRoute();
 const forumId = computed(() => route.params.forumId as string);
@@ -89,41 +89,12 @@ const contributors = computed<UserContributionData[]>(() => {
 });
 
 // Calculate max Y-axis value across all contributors
-const maxYValue = computed(() => {
-  if (!contributors.value.length) return 0;
-
-  let max = 0;
-  contributors.value.forEach((contributor: UserContributionData) => {
-    contributor.dayData.forEach((day: DayData) => {
-      if (day.count > max) {
-        max = day.count;
-      }
-    });
-  });
-
-  return max;
-});
+const maxYValue = computed(() => getMaxDayCount(contributors.value));
 
 // Calculate discussion and comment counts for each contributor
-const contributorStats = computed(() => {
-  return contributors.value.map((contributor) => {
-    let discussionCount = 0;
-    let commentCount = 0;
-
-    contributor.dayData.forEach((day: DayData) => {
-      day.activities.forEach((activity: Activity) => {
-        discussionCount += (activity.Discussions || []).length;
-        commentCount += (activity.Comments || []).length;
-      });
-    });
-
-    return {
-      username: contributor.username,
-      discussionCount,
-      commentCount,
-    };
-  });
-});
+const contributorStats = computed(() =>
+  buildContributorStats(contributors.value)
+);
 </script>
 
 <template>
