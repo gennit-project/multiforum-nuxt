@@ -159,7 +159,6 @@ const discussionCreateInput = computed<DiscussionCreateInput>(() => {
 });
 
 const channelConnections = computed(() => formValues.value.selectedChannels);
-const createDiscussionLoading = ref(false);
 const submitError = ref<string | null>(null);
 const submitAttempted = ref(false);
 
@@ -176,6 +175,7 @@ const showSuspensionNotice = computed(() => {
 
 const {
   mutate: createDiscussion,
+  loading: createDiscussionLoading,
   error: createDiscussionError,
   onDone,
 } = useMutation(CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
@@ -253,7 +253,6 @@ onDone((response) => {
     response.data?.createDiscussionWithChannelConnections;
   const newDiscussion = newDiscussionArray?.[0]?.DiscussionChannels?.[0];
   const newDiscussionId = newDiscussion?.Discussion?.id;
-  createDiscussionLoading.value = false;
 
   if (!newDiscussionId) {
     submitError.value =
@@ -277,7 +276,6 @@ function submit() {
   }
   submitAttempted.value = true;
   submitError.value = null;
-  createDiscussionLoading.value = true;
   createDiscussion();
 }
 

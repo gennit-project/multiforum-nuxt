@@ -141,7 +141,6 @@ const createCommentInput = computed((): CommentCreateInput[] => {
   return [input];
 });
 
-const createCommentLoading = ref(false);
 const showSavedNotice = ref(false);
 const submitAttempted = ref(false);
 let savedNoticeTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -150,6 +149,7 @@ const inlineTextarea = ref<HTMLTextAreaElement | null>(null);
 
 const {
   mutate: createComment,
+  loading: createCommentLoading,
   error: createCommentError,
   onDone,
 } = useMutation(CREATE_COMMENT, () => ({
@@ -278,7 +278,6 @@ const {
 }));
 
 onDone((result) => {
-  createCommentLoading.value = false;
   if (result?.errors?.length) {
     return;
   }
@@ -325,7 +324,6 @@ const handleCreateComment = async () => {
     return;
   }
   submitAttempted.value = true;
-  createCommentLoading.value = true;
   createComment();
 };
 
