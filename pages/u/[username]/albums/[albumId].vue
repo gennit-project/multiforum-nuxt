@@ -1,12 +1,13 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { useRoute, useHead, useRouter } from 'nuxt/app';
+import { useRoute, useHead } from 'nuxt/app';
 import { GET_ALBUM_DETAILS } from '@/graphQLData/image/queries';
 import type { Album, Image } from '@/__generated__/graphql';
 import AlbumThumbnailGrid from '@/components/album/AlbumThumbnailGrid.vue';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import Notification from '@/components/NotificationComponent.vue';
+import { useCopyCurrentUrl } from '@/composables/useCopyCurrentUrl';
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
@@ -14,29 +15,12 @@ definePageMeta({
 });
 
 const route = useRoute();
-const router = useRouter();
 
 // Share functionality
-const showCopiedLinkNotification = ref(false);
-
-const copyAlbumLink = async () => {
-  try {
-    let basePath = '';
-    if (import.meta.client) {
-      basePath = window.location.origin;
-    } else {
-      basePath = process.env.BASE_URL || '';
-    }
-    const permalink = `${basePath}${router.resolve(route).href}`;
-    await navigator.clipboard.writeText(permalink);
-    showCopiedLinkNotification.value = true;
-    setTimeout(() => {
-      showCopiedLinkNotification.value = false;
-    }, 2000);
-  } catch (e) {
-    console.error('Failed to copy link:', e);
-  }
-};
+const {
+  showCopiedNotification: showCopiedLinkNotification,
+  copyCurrentUrl: copyAlbumLink,
+} = useCopyCurrentUrl();
 
 const username = computed(() => {
   return typeof route.params.username === 'string' ? route.params.username : '';
