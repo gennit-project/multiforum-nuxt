@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client/core';
-import { AUTHOR_FIELDS } from '../discussion/queries';
+import { AUTHOR_FIELDS } from '../fragments';
 
 // Fragment for comment search results with context links
 export const SEARCH_COMMENT_FIELDS = gql`

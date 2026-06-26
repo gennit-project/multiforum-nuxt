@@ -381,19 +381,6 @@ export const getTagLabel = (selectedTags: Array<string>) => {
   return `Tags (${selectedTags.length})`;
 };
 
-export const getLinksInText = (text: string) => {
-  if (!text) {
-    return [];
-  }
-  const matches = text.match(
-    /https?:\/\/(?!(?:.*\.(?:jpe?g|gif|png)))[^\s]+/g
-  ) as string[];
-  if (matches) {
-    return matches;
-  }
-  return [];
-};
-
 export const getChannelLabel = (selectedChannels: Array<string>) => {
   if (selectedChannels.length === 0) {
     return 'All Forums';

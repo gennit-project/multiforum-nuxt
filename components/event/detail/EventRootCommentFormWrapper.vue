@@ -118,7 +118,6 @@ const createCommentInput = computed(() => {
   return [baseInput];
 });
 
-const createCommentLoading = ref(false);
 const commentEditorOpen = ref(false);
 const createCommentPermissionError = ref('');
 const submitAttempted = ref(false);
@@ -126,6 +125,7 @@ const submitAttempted = ref(false);
 // Mutation for creating a comment
 const {
   mutate: createComment,
+  loading: createCommentLoading,
   error: createCommentError,
   onDone,
 } = useMutation(CREATE_COMMENT, {
@@ -150,12 +150,10 @@ onDone((result) => {
     console.error('Error creating comment:', result.errors);
     createCommentPermissionError.value =
       result.errors[0]?.message || 'Unknown error';
-    createCommentLoading.value = false;
     return;
   }
   submitAttempted.value = false;
   createFormValues.value = createCommentDefaultValues;
-  createCommentLoading.value = false;
   commentEditorOpen.value = false;
 });
 
@@ -187,7 +185,6 @@ function handleCreateComment() {
     return;
   }
   submitAttempted.value = true;
-  createCommentLoading.value = true;
   createComment({ createCommentInput: createCommentInput.value });
 }
 

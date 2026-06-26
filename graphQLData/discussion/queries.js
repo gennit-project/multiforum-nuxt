@@ -1,15 +1,9 @@
 import { gql } from '@apollo/client/core';
+import { AUTHOR_FIELDS } from '../fragments';
 
-export const AUTHOR_FIELDS = gql`
-  fragment AuthorFields on User {
-    username
-    displayName
-    profilePicURL
-    createdAt
-    discussionKarma
-    commentKarma
-  }
-`;
+// Re-exported for backward compatibility; the canonical definition now lives in
+// graphQLData/fragments.js.
+export { AUTHOR_FIELDS };
 
 const CROSSPOST_PREVIEW_FIELDS = gql`
   fragment CrosspostPreviewFields on Discussion {

@@ -75,7 +75,6 @@ const eventCreateInput = computed<EventCreateInput>(() => {
 
 const channelConnections = computed(() => formValues.value.selectedChannels);
 
-const createEventLoading = ref(false);
 const submitError = ref<string | null>(null);
 const submitAttempted = ref(false);
 
@@ -124,6 +123,7 @@ const showSuspensionNotice = computed(() => {
 
 const {
   mutate: createEvent,
+  loading: createEventLoading,
   error: createEventError,
   onDone,
 } = useMutation(CREATE_EVENT_WITH_CHANNEL_CONNECTIONS, {
@@ -141,7 +141,6 @@ const {
   },
 });
 onDone((response) => {
-  createEventLoading.value = false;
   const newEventId = response.data?.createEventWithChannelConnections?.[0]?.id;
   const redirectChannelId = formValues.value.selectedChannels[0];
   if (!newEventId) {
@@ -175,7 +174,6 @@ function submit() {
     return;
   }
 
-  createEventLoading.value = true;
   createEvent({
     input: [
       {

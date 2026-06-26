@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { computed, watchEffect, ref, onMounted, onUnmounted } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
-import { useRoute, useHead, useRouter } from 'nuxt/app';
+import { useRoute, useHead } from 'nuxt/app';
 import { GET_IMAGE_DETAILS } from '@/graphQLData/image/queries';
 import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
 import type { Image } from '@/__generated__/graphql';
+import { useCopyCurrentUrl } from '@/composables/useCopyCurrentUrl';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
@@ -30,29 +31,12 @@ definePageMeta({
 });
 
 const route = useRoute();
-const router = useRouter();
 
 // Share functionality
-const showCopiedLinkNotification = ref(false);
-
-const copyImageLink = async () => {
-  try {
-    let basePath = '';
-    if (import.meta.client) {
-      basePath = window.location.origin;
-    } else {
-      basePath = process.env.BASE_URL || '';
-    }
-    const permalink = `${basePath}${router.resolve(route).href}`;
-    await navigator.clipboard.writeText(permalink);
-    showCopiedLinkNotification.value = true;
-    setTimeout(() => {
-      showCopiedLinkNotification.value = false;
-    }, 2000);
-  } catch (e) {
-    console.error('Failed to copy link:', e);
-  }
-};
+const {
+  showCopiedNotification: showCopiedLinkNotification,
+  copyCurrentUrl: copyImageLink,
+} = useCopyCurrentUrl();
 
 const username = computed(() => {
   return typeof route.params.username === 'string' ? route.params.username : '';

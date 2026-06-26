@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon';
+import { truncateDescription } from '@/utils/discussionSeo';
 
 /**
  * Pure builders for EventDetail's SEO metadata and schema.org structured data,
@@ -19,17 +20,8 @@ export type EventSeoData = {
   Poster?: { username?: string | null; displayName?: string | null } | null;
 };
 
-export const DESCRIPTION_MAX_LENGTH = 160;
-
 export function formatEventDate(iso: string): string {
   return DateTime.fromISO(iso).toLocaleString(DateTime.DATE_FULL);
-}
-
-export function truncateDescription(
-  text: string,
-  max: number = DESCRIPTION_MAX_LENGTH
-): string {
-  return text.length > max ? `${text.substring(0, max)}...` : text;
 }
 
 const eventTitle = (event: EventSeoData): string => event.title || 'Event';

@@ -7,8 +7,7 @@ import {
   REMOVE_FAVORITE_IMAGE,
 } from '@/graphQLData/user/mutations';
 import { useUsername } from '@/composables/useAuthState';
-import { useToastStore } from '@/stores/toastStore';
-import { useAddToListModalStore } from '@/stores/addToListModalStore';
+import { useFavoriteToggle } from '@/composables/useFavoriteToggle';
 import AddToFavoritesButton from '@/components/favorites/AddToFavoritesButton.vue';
 
 const usernameVar = useUsername();
@@ -55,9 +54,6 @@ const GET_USER_FAVORITE_IMAGE = gql`
 
 // Use initial value if provided, otherwise default to false
 const isFavorited = ref(props.initialIsFavorited ?? false);
-const isLoading = ref(false);
-const toastStore = useToastStore();
-const addToListModalStore = useAddToListModalStore();
 
 // Only fetch if initialIsFavorited was not provided
 const shouldFetchFavorite = computed(() =>
@@ -101,64 +97,23 @@ watch(
 const { mutate: addFavorite } = useMutation(ADD_FAVORITE_IMAGE);
 const { mutate: removeFavorite } = useMutation(REMOVE_FAVORITE_IMAGE);
 
-const showAddedToast = () => {
-  const message = `${props.entityName} added to Favorites.`;
-
-  if (!props.allowAddToList) {
-    toastStore.showToast(message);
-    return;
-  }
-
-  toastStore.showToast(message, 'success', {
-    label: 'Organize',
-    onClick: () =>
-      addToListModalStore.open({
-        itemId: props.imageId,
-        itemType: 'image',
-        isAlreadyFavorite: true,
-      }),
-  });
-};
-
-const handleToggleFavorite = async () => {
-  if (!usernameVar.value) return;
-
-  // Optimistic update - toggle immediately
-  isFavorited.value = !isFavorited.value;
-  isLoading.value = true;
-
-  try {
-    if (!isFavorited.value) {
-      // We're removing from favorites
-      await removeFavorite({
-        imageId: props.imageId,
-        username: usernameVar.value,
-      });
-      toastStore.showToast(`${props.entityName} removed from favorites.`);
-    } else {
-      // We're adding to favorites
-      await addFavorite({
-        imageId: props.imageId,
-        username: usernameVar.value,
-      });
-      showAddedToast();
-    }
-    // Only refetch if we're managing our own query
+const { isLoading, handleToggleFavorite } = useFavoriteToggle({
+  isFavorited,
+  itemId: () => props.imageId,
+  entityType: () => 'image',
+  allowAddToList: () => props.allowAddToList,
+  addedMessage: () => `${props.entityName} added to Favorites.`,
+  removedMessage: () => `${props.entityName} removed from favorites.`,
+  addFavorite,
+  removeFavorite,
+  mutationItemKey: 'imageId',
+  // Only refetch if we're managing our own query
+  onAfterToggle: () => {
     if (shouldFetchFavorite.value) {
       refetchFavorites();
     }
-  } catch (error) {
-    console.error('Error toggling favorite:', error);
-    // Revert optimistic update on error
-    isFavorited.value = !isFavorited.value;
-    toastStore.showToast(
-      'Error updating favorites. Please try again.',
-      'error'
-    );
-  } finally {
-    isLoading.value = false;
-  }
-};
+  },
+});
 
 const displayName = computed(() => {
   return props.imageCaption ? `"${props.imageCaption}"` : 'image';

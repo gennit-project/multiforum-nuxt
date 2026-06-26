@@ -4,11 +4,7 @@
  */
 
 /** Toggle an item in an array: remove it if present, otherwise append it. */
-export function toggleArrayItem(items: string[], item: string): string[] {
-  return items.includes(item)
-    ? items.filter((existing) => existing !== item)
-    : [...items, item];
-}
+export { toggleInArray as toggleArrayItem } from '@/utils/arrayHelpers';
 
 /** Drop falsy values from a params object, returning string-valued entries. */
 export function cleanQueryParams(

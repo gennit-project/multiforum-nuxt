@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import {
-  truncateDescription,
   buildEventSeoMeta,
   buildEventStructuredData,
   type EventSeoData,
@@ -15,18 +14,6 @@ const baseEvent: EventSeoData = {
   coverImageURL: 'https://img/x.png',
   Poster: { username: 'alice', displayName: 'Alice' },
 };
-
-describe('truncateDescription', () => {
-  it('leaves short text unchanged', () => {
-    expect(truncateDescription('short', 160)).toBe('short');
-  });
-
-  it('truncates long text and appends an ellipsis', () => {
-    expect(truncateDescription('a'.repeat(200), 160)).toBe(
-      `${'a'.repeat(160)}...`
-    );
-  });
-});
 
 describe('buildEventSeoMeta', () => {
   it('returns not-found meta when there is no event', () => {
