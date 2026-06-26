@@ -99,7 +99,7 @@ const getBaseMocks = (username: string) => ({
 });
 
 test.describe('Moderation issue detail', () => {
-  test('renders an open issue with its activity feed', async ({
+  test('renders an open issue with a varied activity feed', async ({
     context,
     page,
   }, testInfo) => {
@@ -108,6 +108,7 @@ test.describe('Moderation issue detail', () => {
       email: 'alice@example.com',
     });
 
+    // Mixed action types exercise the activity-feed label branches.
     const issue = buildIssue({
       issueNumber: ISSUE_NUMBER,
       channelUniqueName: TEST_CHANNEL,
@@ -119,6 +120,19 @@ test.describe('Moderation issue detail', () => {
           id: 'action-report',
           actionType: 'report',
           actionDescription: 'reported this discussion',
+          moderatorDisplayName: 'mod-alice',
+        }),
+        buildModerationAction({
+          id: 'action-close',
+          actionType: 'close',
+          actionDescription: 'closed the issue',
+          moderatorDisplayName: 'mod-bob',
+        }),
+        buildModerationAction({
+          id: 'action-suspend',
+          actionType: 'suspension',
+          actionDescription: 'suspended the user',
+          moderatorDisplayName: 'mod-carol',
         }),
       ],
     });
@@ -131,15 +145,16 @@ test.describe('Moderation issue detail', () => {
     try {
       await page.goto(`/forums/${TEST_CHANNEL}/issues/${ISSUE_NUMBER}`);
 
-      // Issue body/title render once the issue query resolves.
       await expect(
         page.getByText('Reported discussion about spam')
       ).toBeVisible();
       await expect(
         page.getByText('This discussion violates the no-spam rule.')
       ).toBeVisible();
-      // The moderation activity feed renders the report action label.
-      await expect(page.getByText(/reported by/i).first()).toBeVisible();
+      // ActivityFeedListItem renders a distinct passive label per action type.
+      await expect(page.getByText(/was reported by/i).first()).toBeVisible();
+      await expect(page.getByText(/the issue was closed by/i)).toBeVisible();
+      await expect(page.getByText(/the user was suspended by/i)).toBeVisible();
 
       await waitForGraphqlOperation(diagnostics.completedOperations, 'getIssue');
     } finally {
@@ -176,6 +191,62 @@ test.describe('Moderation issue detail', () => {
       await page.goto(`/forums/${TEST_CHANNEL}/issues/${ISSUE_NUMBER}`);
 
       await expect(page.getByText('Locked for review')).toBeVisible();
+    } finally {
+      await testInfo.attach('graphql-operations.json', {
+        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
+        contentType: 'application/json',
+      });
+    }
+  });
+
+  test('renders the moderation wizard and opens the broken-rules modal', async ({
+    context,
+    page,
+  }, testInfo) => {
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
+
+    // An issue tied to a related discussion renders the ModerationWizard
+    // (mod actions) because the current user is a moderator, not the OP.
+    const issue = buildIssue({
+      issueNumber: ISSUE_NUMBER,
+      channelUniqueName: TEST_CHANNEL,
+      title: 'Reported discussion needing review',
+      isOpen: true,
+      overrides: { relatedDiscussionId: 'discussion-1' },
+    });
+
+    const diagnostics = await installGraphqlMocks(page, {
+      ...getBaseMocks(TEST_USER),
+      getIssue: () => ({ data: { issues: [issue] } }),
+      // Related content lookup — empty list keeps IssueRelatedContent inert
+      // while the wizard renders from the issue's relatedDiscussionId.
+      getDiscussion: () => ({ data: { discussions: [] } }),
+      // Drives the wizard's "is archived" check (false → Archive action shown).
+      getDiscussionChannelID: () => ({
+        data: { discussionChannels: [{ archived: false }] },
+      }),
+      // Author suspension check for the wizard.
+      getSuspension: () => ({ data: { isOriginalPosterSuspended: false } }),
+    });
+
+    try {
+      await page.goto(`/forums/${TEST_CHANNEL}/issues/${ISSUE_NUMBER}`);
+
+      // ModerationWizard renders an Archive action for the related discussion.
+      const archiveButton = page
+        .getByRole('button', { name: /Archive Discussion/i })
+        .first();
+      await expect(archiveButton).toBeVisible();
+
+      // Opening it surfaces the BrokenRulesModal.
+      await archiveButton.click();
+      await expect(page.getByText('Archive Content')).toBeVisible();
+      await expect(
+        page.getByText('Please select at least one broken rule')
+      ).toBeVisible();
     } finally {
       await testInfo.attach('graphql-operations.json', {
         body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
