@@ -53,10 +53,11 @@ describe('UsernameWithTooltip badges', () => {
     expect(wrapper.text()).toContain('Mod');
   });
 
-  it('prefers the Admin badge over Mod', () => {
+  it('shows both Admin and Mod when the user is a server admin and a channel mod', () => {
     const wrapper = mountUsername({ isAdmin: true, isMod: true });
 
-    expect(wrapper.text()).not.toContain('Mod');
+    expect(wrapper.text()).toContain('Admin');
+    expect(wrapper.text()).toContain('Mod');
   });
 
   it('shows an OP badge', () => {
