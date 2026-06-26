@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client/core';
-import { AUTHOR_FIELDS } from '../discussion/queries';
+import { AUTHOR_FIELDS } from '../fragments';
 
 // Fragment for shared event fields
 export const EVENT_FIELDS = gql`
