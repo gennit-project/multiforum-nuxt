@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { config } from '@/config';
 import { computed, watchEffect } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
@@ -103,7 +104,7 @@ watchEffect(() => {
 
   const userName = user.value.displayName || user.value.username;
   const baseUrl = import.meta.env.VITE_BASE_URL;
-  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME || 'Multiforum';
+  const serverName = config.serverDisplayName;
   const profilePic = user.value.profilePicURL || '';
   const userBio = user.value.bio || `${userName}'s profile`;
 

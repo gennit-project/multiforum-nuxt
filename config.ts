@@ -25,7 +25,14 @@ const config: ConfigType = {
   openCageApiKey: import.meta.env.VITE_OPEN_CAGE_API_KEY,
   openGraphApiKey: import.meta.env.VITE_OPEN_GRAPH_API_KEY,
   serverName: import.meta.env.VITE_SERVER_NAME,
-  serverDisplayName: import.meta.env.VITE_SERVER_DISPLAY_NAME,
+  // Human-facing site name used in the nav, page titles and SEO. Falls back to
+  // the server identifier and finally 'Untitled' so a missing
+  // VITE_SERVER_DISPLAY_NAME never renders as "undefined". Set
+  // VITE_SERVER_DISPLAY_NAME in the deploy for the desired branding.
+  serverDisplayName:
+    import.meta.env.VITE_SERVER_DISPLAY_NAME ||
+    import.meta.env.VITE_SERVER_NAME ||
+    'Untitled',
   enableLanguagePicker: import.meta.env.VITE_ENABLE_LANGUAGE_PICKER === 'true',
 };
 export { config };

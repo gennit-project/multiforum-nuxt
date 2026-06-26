@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { config } from '@/config';
 import { computed, watchEffect } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_MOD } from '@/graphQLData/mod/queries';
@@ -36,7 +37,7 @@ const mod = computed(() => {
 
 // Set page title for mod profile
 watchEffect(() => {
-  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME || 'Multiforum';
+  const serverName = config.serverDisplayName;
   const displayName = mod.value?.displayName || modProfileName.value;
 
   useHead({
