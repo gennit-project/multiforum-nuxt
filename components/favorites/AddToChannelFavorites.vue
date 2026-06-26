@@ -7,8 +7,7 @@ import {
   REMOVE_FAVORITE_CHANNEL,
 } from '@/graphQLData/user/mutations';
 import { useUsername } from '@/composables/useAuthState';
-import { useToastStore } from '@/stores/toastStore';
-import { useAddToListModalStore } from '@/stores/addToListModalStore';
+import { useFavoriteToggle } from '@/composables/useFavoriteToggle';
 import AddToFavoritesButton from '@/components/favorites/AddToFavoritesButton.vue';
 
 const usernameVar = useUsername();
@@ -50,9 +49,6 @@ const GET_USER_FAVORITES = gql`
 
 // Use initial value if provided, otherwise default to false
 const isFavorited = ref(props.initialIsFavorited ?? false);
-const isLoading = ref(false);
-const toastStore = useToastStore();
-const addToListModalStore = useAddToListModalStore();
 
 // Only fetch if initialIsFavorited was not provided
 const shouldFetchFavorite = computed(() =>
@@ -93,87 +89,30 @@ watch(
   { immediate: true }
 );
 
-const {
-  mutate: addFavorite,
-  onDone: onAddFavoriteDone,
-} = useMutation(ADD_FAVORITE_CHANNEL);
-const {
-  mutate: removeFavorite,
-  onDone: onRemoveFavoriteDone,
-} = useMutation(REMOVE_FAVORITE_CHANNEL);
-
-const showAddedToast = () => {
-  const message = 'Added to Favorites.';
-
-  if (!props.allowAddToList) {
-    toastStore.showToast(message);
-    return;
-  }
-
-  toastStore.showToast(message, 'success', {
-    label: 'Organize',
-    onClick: () =>
-      addToListModalStore.open({
-        itemId: props.channelUniqueName,
-        itemType: 'channel',
-        isAlreadyFavorite: true,
-      }),
-  });
-};
-
-onAddFavoriteDone(() => {
-  isFavorited.value = true;
-  isLoading.value = false;
-});
-
-onRemoveFavoriteDone(() => {
-  isFavorited.value = false;
-  isLoading.value = false;
-});
+const { mutate: addFavorite } = useMutation(ADD_FAVORITE_CHANNEL);
+const { mutate: removeFavorite } = useMutation(REMOVE_FAVORITE_CHANNEL);
 
 const handleFavoriteChange = (nextIsFavorited: boolean) => {
   isFavorited.value = nextIsFavorited;
 };
 
-const handleToggleFavorite = async () => {
-  if (!usernameVar.value) return;
-
-  // Optimistic update - toggle immediately
-  isFavorited.value = !isFavorited.value;
-  isLoading.value = true;
-
-  try {
-    if (!isFavorited.value) {
-      // We're removing from favorites
-      await removeFavorite({
-        channel: props.channelUniqueName,
-        username: usernameVar.value,
-      });
-      toastStore.showToast('Removed from favorites.');
-    } else {
-      // We're adding to favorites
-      await addFavorite({
-        channel: props.channelUniqueName,
-        username: usernameVar.value,
-      });
-      showAddedToast();
-    }
-    // Only refetch if we're managing our own query
+const { isLoading, handleToggleFavorite } = useFavoriteToggle({
+  isFavorited,
+  itemId: () => props.channelUniqueName,
+  entityType: () => 'channel',
+  allowAddToList: () => props.allowAddToList,
+  addedMessage: () => 'Added to Favorites.',
+  removedMessage: () => 'Removed from favorites.',
+  addFavorite,
+  removeFavorite,
+  mutationItemKey: 'channel',
+  // Only refetch if we're managing our own query
+  onAfterToggle: () => {
     if (shouldFetchFavorite.value) {
       refetchFavorites();
     }
-  } catch (error) {
-    console.error('Error toggling favorite:', error);
-    // Revert optimistic update on error
-    isFavorited.value = !isFavorited.value;
-    toastStore.showToast(
-      'Error updating favorites. Please try again.',
-      'error'
-    );
-  } finally {
-    isLoading.value = false;
-  }
-};
+  },
+});
 </script>
 
 <template>

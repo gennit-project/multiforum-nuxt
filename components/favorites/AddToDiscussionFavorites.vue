@@ -7,8 +7,7 @@ import {
   REMOVE_FAVORITE_DISCUSSION,
 } from '@/graphQLData/user/mutations';
 import { useUsername } from '@/composables/useAuthState';
-import { useToastStore } from '@/stores/toastStore';
-import { useAddToListModalStore, type AllowedItemType } from '@/stores/addToListModalStore';
+import { useFavoriteToggle } from '@/composables/useFavoriteToggle';
 import AddToFavoritesButton from '@/components/favorites/AddToFavoritesButton.vue';
 
 const usernameVar = useUsername();
@@ -64,9 +63,6 @@ const GET_USER_FAVORITE_DISCUSSION = gql`
 
 // Use initial value if provided, otherwise default to false
 const isFavorited = ref(props.initialIsFavorited ?? false);
-const isLoading = ref(false);
-const toastStore = useToastStore();
-const addToListModalStore = useAddToListModalStore();
 
 // Only fetch if initialIsFavorited was not provided
 const shouldFetchFavorite = computed(() =>
@@ -110,64 +106,23 @@ watch(
 const { mutate: addFavorite } = useMutation(ADD_FAVORITE_DISCUSSION);
 const { mutate: removeFavorite } = useMutation(REMOVE_FAVORITE_DISCUSSION);
 
-const showAddedToast = () => {
-  const message = `${props.entityName} added to Favorites.`;
-
-  if (!props.allowAddToList) {
-    toastStore.showToast(message);
-    return;
-  }
-
-  toastStore.showToast(message, 'success', {
-    label: 'Organize',
-    onClick: () =>
-      addToListModalStore.open({
-        itemId: props.discussionId,
-        itemType: props.entityType as AllowedItemType,
-        isAlreadyFavorite: true,
-      }),
-  });
-};
-
-const handleToggleFavorite = async () => {
-  if (!usernameVar.value) return;
-
-  // Optimistic update - toggle immediately
-  isFavorited.value = !isFavorited.value;
-  isLoading.value = true;
-
-  try {
-    if (!isFavorited.value) {
-      // We're removing from favorites
-      await removeFavorite({
-        discussionId: props.discussionId,
-        username: usernameVar.value,
-      });
-      toastStore.showToast(`${props.entityName} removed from favorites.`);
-    } else {
-      // We're adding to favorites
-      await addFavorite({
-        discussionId: props.discussionId,
-        username: usernameVar.value,
-      });
-      showAddedToast();
-    }
-    // Only refetch if we're managing our own query (parent didn't provide isFavorited)
+const { isLoading, handleToggleFavorite } = useFavoriteToggle({
+  isFavorited,
+  itemId: () => props.discussionId,
+  entityType: () => props.entityType,
+  allowAddToList: () => props.allowAddToList,
+  addedMessage: () => `${props.entityName} added to Favorites.`,
+  removedMessage: () => `${props.entityName} removed from favorites.`,
+  addFavorite,
+  removeFavorite,
+  mutationItemKey: 'discussionId',
+  // Only refetch if we're managing our own query (parent didn't provide isFavorited)
+  onAfterToggle: () => {
     if (shouldFetchFavorite.value) {
       refetchFavorites();
     }
-  } catch (error) {
-    console.error('Error toggling favorite:', error);
-    // Revert optimistic update on error
-    isFavorited.value = !isFavorited.value;
-    toastStore.showToast(
-      'Error updating favorites. Please try again.',
-      'error'
-    );
-  } finally {
-    isLoading.value = false;
-  }
-};
+  },
+});
 
 const displayName = computed(() => {
   return props.discussionTitle ? `"${props.discussionTitle}"` : 'discussion';

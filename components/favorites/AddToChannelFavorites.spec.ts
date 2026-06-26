@@ -170,11 +170,11 @@ describe('AddToChannelFavorites toasts', () => {
 });
 
 describe('AddToChannelFavorites mutation completion', () => {
-  it('clears loading and marks favorited when the add completes', async () => {
+  it('marks favorited after a successful add toggle', async () => {
     const wrapper = mountFav({ initialIsFavorited: false });
 
-    h.addDone?.();
-    await wrapper.vm.$nextTick();
+    await button(wrapper).vm.$emit('toggle');
+    await flushPromises();
 
     expect(button(wrapper).props('isFavorited')).toBe(true);
   });

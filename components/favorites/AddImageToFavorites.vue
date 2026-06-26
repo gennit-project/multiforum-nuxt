@@ -7,7 +7,7 @@ import {
   REMOVE_FAVORITE_IMAGE,
 } from '@/graphQLData/user/mutations';
 import { useUsername } from '@/composables/useAuthState';
-import { useToastStore } from '@/stores/toastStore';
+import { useFavoriteToggle } from '@/composables/useFavoriteToggle';
 import AddToFavoritesButton from '@/components/favorites/AddToFavoritesButton.vue';
 
 const usernameVar = useUsername();
@@ -40,8 +40,6 @@ const GET_USER_FAVORITE_IMAGE = gql`
 `;
 
 const isFavorited = ref(false);
-const isLoading = ref(false);
-const toastStore = useToastStore();
 
 const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
   GET_USER_FAVORITE_IMAGE,
@@ -69,42 +67,21 @@ watch(
 const { mutate: addFavorite } = useMutation(ADD_FAVORITE_IMAGE);
 const { mutate: removeFavorite } = useMutation(REMOVE_FAVORITE_IMAGE);
 
-const handleToggleFavorite = async () => {
-  if (!usernameVar.value) return;
-
-  // Optimistic update - toggle immediately
-  isFavorited.value = !isFavorited.value;
-  isLoading.value = true;
-
-  try {
-    if (!isFavorited.value) {
-      // We're removing from favorites
-      await removeFavorite({
-        imageId: props.imageId,
-        username: usernameVar.value,
-      });
-      toastStore.showToast('Image removed from favorites.');
-    } else {
-      // We're adding to favorites
-      await addFavorite({
-        imageId: props.imageId,
-        username: usernameVar.value,
-      });
-      toastStore.showToast('Image added to favorites.');
-    }
+const { isLoading, handleToggleFavorite } = useFavoriteToggle({
+  isFavorited,
+  itemId: () => props.imageId,
+  entityType: () => 'image',
+  // This variant has no "Organize" affordance, so always show a plain toast.
+  allowAddToList: () => false,
+  addedMessage: () => 'Image added to favorites.',
+  removedMessage: () => 'Image removed from favorites.',
+  addFavorite,
+  removeFavorite,
+  mutationItemKey: 'imageId',
+  onAfterToggle: () => {
     refetchFavorites();
-  } catch (error) {
-    console.error('Error toggling favorite:', error);
-    // Revert optimistic update on error
-    isFavorited.value = !isFavorited.value;
-    toastStore.showToast(
-      'Error updating favorites. Please try again.',
-      'error'
-    );
-  } finally {
-    isLoading.value = false;
-  }
-};
+  },
+});
 
 const displayName = computed(() => {
   return props.imageTitle || 'image';
