@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { config } from '@/config';
 import { useDisplay } from 'vuetify';
 import HamburgerMenuButton from '@/components/nav/HamburgerMenuButton.vue';
 import UserProfileDropdownMenu from '@/components/nav/UserProfileDropdownMenu.vue';
@@ -91,7 +92,7 @@ const isOnMapPage = computed(() => {
             <h1
               class="logo-font text-lg font-bold text-gray-900 dark:text-white"
             >
-              Topical
+              {{ config.serverDisplayName }}
             </h1>
           </nuxt-link>
 

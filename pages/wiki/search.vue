@@ -39,11 +39,7 @@ const channelLabel = computed(() =>
 );
 
 const pageTitle = computed(() => {
-  const serverName =
-    config.serverDisplayName ||
-    import.meta.env.VITE_SERVER_NAME ||
-    'Multiforum';
-  return `Wiki search | ${serverName}`;
+  return `Wiki search | ${config.serverDisplayName}`;
 });
 
 useHead({

@@ -37,7 +37,7 @@ const mod = computed(() => {
 
 // Set page title for mod profile
 watchEffect(() => {
-  const serverName = config.serverDisplayName || 'Multiforum';
+  const serverName = config.serverDisplayName;
   const displayName = mod.value?.displayName || modProfileName.value;
 
   useHead({

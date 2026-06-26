@@ -225,7 +225,7 @@ watchEffect(() => {
 
   const imageCaption = image.value.caption || image.value.alt || 'Image';
   const uploaderName = uploader.value.displayName || uploader.value.username;
-  const serverName = config.serverDisplayName || 'Multiforum';
+  const serverName = config.serverDisplayName;
 
   const description = `Image uploaded by ${uploaderName}: ${imageCaption}${image.value.longDescription ? '. ' + image.value.longDescription : ''}`;
 

@@ -18,6 +18,7 @@ vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => h.username,
   useNotificationCount: () => h.notificationCount,
 }));
+vi.mock('@/config', () => ({ config: { serverDisplayName: 'Test Server' } }));
 
 const mountNav = () =>
   mount(TopNav, {
@@ -45,10 +46,10 @@ beforeEach(() => {
 });
 
 describe('TopNav branding', () => {
-  it('shows the logo', () => {
+  it('shows the server display name as the logo', () => {
     const wrapper = mountNav();
 
-    expect(wrapper.text()).toContain('Topical');
+    expect(wrapper.text()).toContain('Test Server');
   });
 
   it('shows the channel name and favorites when on a forum route', () => {

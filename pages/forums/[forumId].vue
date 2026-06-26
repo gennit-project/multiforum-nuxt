@@ -196,7 +196,7 @@ onGetChannelResult((result) => {
 // registered during setup (not inside the async onResult callback, which
 // runs outside the Nuxt instance context during SSR).
 const metaData = computed(() => {
-  const serverName = config.serverDisplayName || 'Multiforum';
+  const serverName = config.serverDisplayName;
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const loadedChannel = channel.value;
 

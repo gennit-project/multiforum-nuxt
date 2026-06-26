@@ -10,7 +10,7 @@ export default defineNuxtConfig({
   srcDir: '.',
   app: {
     head: {
-      title: config.serverDisplayName || 'Multiforum',
+      title: config.serverDisplayName,
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
