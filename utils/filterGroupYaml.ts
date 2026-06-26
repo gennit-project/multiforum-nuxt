@@ -1,4 +1,4 @@
-import yaml from 'js-yaml';
+import * as yaml from 'js-yaml';
 
 /**
  * Pure YAML serialize/parse for the filter-group editor, extracted from
