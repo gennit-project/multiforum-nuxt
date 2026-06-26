@@ -85,7 +85,7 @@ describe('ScratchpadSection states', () => {
     h.username = ref('bob');
     const wrapper = mountSection();
 
-    expect(wrapper.text()).toContain("hasn't received any public scratchpad entries");
+    expect(wrapper.text()).toContain("hasn't received any public kudos");
   });
 });
 

@@ -55,12 +55,23 @@ const mountEntry = (props: Record<string, unknown> = {}) =>
     props: { entry: entry(), isOwner: true, ...props },
     global: {
       stubs: {
-        NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
+        NuxtLink: {
+          props: ['to'],
+          // Serialize `to` so tests can assert the resolved route/href.
+          template: '<a :data-to="JSON.stringify(to)"><slot /></a>',
+        },
         AvatarComponent: true,
         ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err">{{ text }}</div>' },
       },
     },
   });
+
+const sourceLinkTo = (w: ReturnType<typeof mount>) => {
+  const raw = w
+    .get('[data-testid="scratchpad-source-link"]')
+    .attributes('data-to');
+  return JSON.parse(raw as string);
+};
 
 const buttonByText = (w: ReturnType<typeof mount>, text: string) =>
   w.findAll('button').find((b) => b.text() === text);
@@ -112,6 +123,53 @@ describe('ScratchpadEntry display', () => {
     const wrapper = mountEntry({ isOwner: false });
 
     expect(wrapper.findAll('button')).toHaveLength(0);
+  });
+});
+
+describe('ScratchpadEntry source link', () => {
+  it('links a discussion entry to the discussion using its discussionId', () => {
+    const wrapper = mountEntry({
+      entry: entry({
+        sourceType: 'discussion',
+        sourceId: 'discussion-channel-1',
+        discussionId: 'discussion-1',
+        sourceChannelUniqueName: 'cats',
+      }),
+    });
+
+    expect(sourceLinkTo(wrapper)).toEqual({
+      name: 'forums-forumId-discussions-discussionId',
+      params: { forumId: 'cats', discussionId: 'discussion-1' },
+    });
+  });
+
+  it('links a comment entry to the comment permalink (commentId is sourceId)', () => {
+    const wrapper = mountEntry({
+      entry: entry({
+        sourceType: 'comment',
+        sourceId: 'comment-1',
+        discussionId: 'discussion-1',
+        sourceChannelUniqueName: 'cats',
+      }),
+    });
+
+    expect(sourceLinkTo(wrapper)).toEqual({
+      name: 'forums-forumId-discussions-discussionId-comments-commentId',
+      params: { forumId: 'cats', discussionId: 'discussion-1', commentId: 'comment-1' },
+    });
+  });
+
+  it('falls back to the forum discussion list when discussionId is missing', () => {
+    const wrapper = mountEntry({
+      entry: entry({
+        sourceType: 'discussion',
+        sourceId: 'discussion-channel-1',
+        sourceChannelUniqueName: 'cats',
+        discussionId: undefined,
+      }),
+    });
+
+    expect(sourceLinkTo(wrapper)).toBe('/forums/cats/discussions');
   });
 });
 

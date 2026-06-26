@@ -99,14 +99,14 @@ const handleEntryDeleted = () => {
           />
         </div>
         <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-          No scratchpad entries yet
+          No kudos yet
         </h3>
         <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
           <template v-if="isOwner">
             When someone super upvotes your content, their thank-you note will appear here.
           </template>
           <template v-else>
-            This user hasn't received any public scratchpad entries yet.
+            This user hasn't received any public kudos yet.
           </template>
         </p>
       </div>

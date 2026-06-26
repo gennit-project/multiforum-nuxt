@@ -22,6 +22,7 @@ export const CREATE_SCRATCHPAD_ENTRY = gql`
       sourceType
       sourceId
       sourceChannelUniqueName
+      discussionId
       Author {
         username
         displayName
@@ -52,6 +53,7 @@ export const UPDATE_SCRATCHPAD_ENTRY_VISIBILITY = gql`
       sourceType
       sourceId
       sourceChannelUniqueName
+      discussionId
       createdAt
       Author {
         username

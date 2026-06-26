@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useMutation } from '@vue/apollo-composable';
+import type { Reference, StoreObject } from '@apollo/client/core';
 import type { User } from '@/__generated__/graphql';
 import {
   UPVOTE_DISCUSSION_CHANNEL,
@@ -93,14 +94,27 @@ const {
   loading: undoSuperUpvoteLoading,
 } = useMutation(UNDO_SUPER_UPVOTE, {
   update: (cache, { data }) => {
-    if (data?.undoSuperUpvote?.success) {
-      cache.modify({
-        id: cache.identify({ __typename: 'DiscussionChannel', id: discussionChannelId.value }),
-        fields: {
-          SuperUpvotedByUsers: () => data.undoSuperUpvote.superUpvotedByUsers || [],
-        },
-      });
-    }
+    if (!data?.undoSuperUpvote?.success) return;
+    const cacheId = cache.identify({
+      __typename: 'DiscussionChannel',
+      id: discussionChannelId.value,
+    });
+    if (!cacheId) return;
+    const me = usernameVar.value;
+    // Authoritatively drop the actor from the list rather than trusting the
+    // server's returned list, which can lag behind the just-committed delete.
+    cache.modify({
+      id: cacheId,
+      fields: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        SuperUpvotedByUsers: (existing: any = [], { readField }) =>
+          me
+            ? (existing as ReadonlyArray<Reference | StoreObject>).filter(
+                (user) => readField('username', user) !== me
+              )
+            : existing,
+      },
+    });
   },
 });
 

@@ -14,6 +14,7 @@ export const GET_PUBLIC_SCRATCHPAD_ENTRIES = gql`
       sourceType
       sourceId
       sourceChannelUniqueName
+      discussionId
       Author {
         username
         displayName
@@ -40,6 +41,7 @@ export const GET_PENDING_SCRATCHPAD_ENTRIES = gql`
       sourceType
       sourceId
       sourceChannelUniqueName
+      discussionId
       Author {
         username
         displayName
@@ -66,6 +68,7 @@ export const GET_ALL_SCRATCHPAD_ENTRIES = gql`
       sourceType
       sourceId
       sourceChannelUniqueName
+      discussionId
       Author {
         username
         displayName

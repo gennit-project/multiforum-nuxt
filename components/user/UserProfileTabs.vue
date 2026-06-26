@@ -133,7 +133,7 @@ const tabs = computed(() => {
       count: props.user?.AlbumsAggregate?.count,
     },
     {
-      name: 'Scratchpad',
+      name: 'Kudos',
       path: `/u/${usernameInParams.value}/scratchpad`,
       to: getTabTo(`/u/${usernameInParams.value}/scratchpad`),
       current: false,

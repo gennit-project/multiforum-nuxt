@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
+import type { Reference, StoreObject } from '@apollo/client/core';
 import {
   Dialog,
   DialogPanel,
@@ -10,6 +11,9 @@ import {
 } from '@headlessui/vue';
 import { CREATE_SCRATCHPAD_ENTRY } from '@/graphQLData/scratchpad/mutations';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import { useUsername } from '@/composables/useAuthState';
+
+const usernameVar = useUsername();
 
 const MAX_TEXT_LENGTH = 500;
 
@@ -76,15 +80,31 @@ const {
   onDone,
 } = useMutation(CREATE_SCRATCHPAD_ENTRY, {
   update: (cache, { data }) => {
-    if (data?.createScratchpadEntry?.superUpvotedByUsers) {
-      const typename = props.sourceType === 'comment' ? 'Comment' : 'DiscussionChannel';
-      cache.modify({
-        id: cache.identify({ __typename: typename, id: props.sourceId }),
-        fields: {
-          SuperUpvotedByUsers: () => data.createScratchpadEntry.superUpvotedByUsers,
+    if (!data?.createScratchpadEntry) return;
+    const typename = props.sourceType === 'comment' ? 'Comment' : 'DiscussionChannel';
+    const cacheId = cache.identify({ __typename: typename, id: props.sourceId });
+    if (!cacheId) return;
+    const me = usernameVar.value;
+    // Be authoritative about the actor instead of trusting the server's returned
+    // list: the logged-in user just super upvoted this content, so ensure they
+    // appear in SuperUpvotedByUsers. A server read-after-write lag can return a
+    // stale list that omits them, which would otherwise leave the button looking
+    // inactive (and un-undoable). See tests/playwright/mocked/superUpvote.
+    cache.modify({
+      id: cacheId,
+      fields: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        SuperUpvotedByUsers: (existing: any = [], { readField }) => {
+          if (!me) return existing;
+          const users = existing as ReadonlyArray<Reference | StoreObject>;
+          const alreadyPresent = users.some(
+            (user) => readField('username', user) === me
+          );
+          if (alreadyPresent) return existing;
+          return [...users, { __typename: 'User', username: me }];
         },
-      });
-    }
+      },
+    });
   },
 });
 
@@ -175,6 +195,7 @@ const handleSubmit = () => {
                       <textarea
                         ref="textareaRef"
                         v-model="text"
+                        data-testid="super-upvote-text-input"
                         :placeholder="placeholderText"
                         rows="4"
                         :maxlength="MAX_TEXT_LENGTH + 50"
@@ -207,6 +228,7 @@ const handleSubmit = () => {
                   </button>
                   <button
                     type="button"
+                    data-testid="super-upvote-submit"
                     :disabled="!isValid || loading"
                     class="flex-1 inline-flex justify-center items-center gap-2 rounded-full px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:cursor-not-allowed"
                     :class="{

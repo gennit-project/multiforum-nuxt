@@ -6,6 +6,10 @@ import {
   UPDATE_SCRATCHPAD_ENTRY_VISIBILITY,
   DELETE_SCRATCHPAD_ENTRY,
 } from '@/graphQLData/scratchpad/mutations';
+import {
+  getPermalinkToDiscussion,
+  getPermalinkToDiscussionComment,
+} from '@/utils/routerUtils';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 
 interface ScratchpadEntryData {
@@ -14,8 +18,12 @@ interface ScratchpadEntryData {
   text: string;
   isPublic: boolean;
   sourceType: string;
+  // DiscussionChannel id (discussion) or Comment id (comment).
   sourceId: string;
   sourceChannelUniqueName?: string;
+  // The Discussion id the upvoted content belongs to. Needed to build a working
+  // link, since the discussion route expects the Discussion id, not sourceId.
+  discussionId?: string;
   Author: {
     username: string;
     displayName?: string;
@@ -41,20 +49,32 @@ const authorDisplayName = computed(() => {
 });
 
 const sourceLink = computed(() => {
-  const { sourceType, sourceId, sourceChannelUniqueName } = props.entry;
-  if (sourceType === 'comment') {
-    // Link to the comment - this may need adjustment based on actual routing
-    if (sourceChannelUniqueName) {
-      return `/forums/${sourceChannelUniqueName}/discussions/${sourceId}`;
-    }
-    return '#';
-  } else if (sourceType === 'discussion') {
-    if (sourceChannelUniqueName) {
-      return `/forums/${sourceChannelUniqueName}/discussions/${sourceId}`;
-    }
-    return '#';
+  const { sourceType, sourceId, sourceChannelUniqueName, discussionId } =
+    props.entry;
+
+  // Without the channel we cannot build any forum link.
+  if (!sourceChannelUniqueName) return '#';
+
+  // Without the discussion id (e.g. older entries created before it was
+  // recorded) fall back to the forum's discussion list rather than a wrong link.
+  if (!discussionId) {
+    return `/forums/${sourceChannelUniqueName}/discussions`;
   }
-  return '#';
+
+  if (sourceType === 'comment') {
+    // sourceId is the Comment id; link straight to the comment permalink.
+    return getPermalinkToDiscussionComment({
+      forumId: sourceChannelUniqueName,
+      discussionId,
+      commentId: sourceId,
+    });
+  }
+
+  // discussion: sourceId is the DiscussionChannel id; link to the discussion.
+  return getPermalinkToDiscussion({
+    forumId: sourceChannelUniqueName,
+    discussionId,
+  });
 });
 
 const sourceTypeLabel = computed(() => {
@@ -151,6 +171,7 @@ const isLoading = computed(() => updateLoading.value || deleteLoading.value);
             super upvoted your
             <NuxtLink
               :to="sourceLink"
+              data-testid="scratchpad-source-link"
               class="text-indigo-600 hover:underline dark:text-indigo-400"
             >
               {{ sourceTypeLabel }}

@@ -46,6 +46,30 @@ export const MARK_NOTIFICATIONS_AS_READ = gql`
   }
 `;
 
+// Mark a single notification as read (e.g. when ignoring a super-upvote note).
+// Goes through updateUsers because direct updateNotifications is denied server-side.
+export const MARK_NOTIFICATION_AS_READ = gql`
+  mutation markNotificationAsRead($username: String!, $notificationId: ID!) {
+    updateUsers(
+      where: { username: $username }
+      update: {
+        Notifications: {
+          where: { node: { id: $notificationId } }
+          update: { node: { read: true } }
+        }
+      }
+    ) {
+      users {
+        username
+        Notifications(where: { id: $notificationId }) {
+          id
+          read
+        }
+      }
+    }
+  }
+`;
+
 export const ADD_FAVORITE_CHANNEL = gql`
   mutation addFavoriteChannel($channel: String!, $username: String!) {
     updateUsers(
