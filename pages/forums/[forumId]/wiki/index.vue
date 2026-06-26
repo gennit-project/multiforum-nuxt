@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { config } from '@/config';
 import { computed } from 'vue';
 import { useRoute, useRouter, useHead } from 'nuxt/app';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
@@ -94,7 +95,7 @@ onGetChannelResult((result) => {
     const head = buildWikiHomeHead({
       channels: result?.data?.channels,
       forumId,
-      serverDisplayName: import.meta.env.VITE_SERVER_DISPLAY_NAME,
+      serverDisplayName: config.serverDisplayName,
       baseUrl: import.meta.env.VITE_BASE_URL,
     });
     if (head) useHead(head);

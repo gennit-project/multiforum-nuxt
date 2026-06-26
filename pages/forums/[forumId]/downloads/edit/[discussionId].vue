@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { config } from '@/config';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import {
@@ -210,7 +211,7 @@ onGetDiscussionResult((value) => {
   const discussion = value.data.discussions[0];
 
   // Set page title and meta tags
-  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+  const serverName = config.serverDisplayName;
   useHead({
     title: `Edit Download | ${channelId.value} | ${serverName}`,
     meta: [

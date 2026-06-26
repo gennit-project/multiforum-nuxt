@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { config } from '@/config';
 import ChannelTabs from '@/components/channel/ChannelTabs.vue';
 import ChannelHeaderMobile from '@/components/channel/ChannelHeaderMobile.vue';
 import ChannelHeaderDesktop from '@/components/channel/ChannelHeaderDesktop.vue';
@@ -195,7 +196,7 @@ onGetChannelResult((result) => {
 // registered during setup (not inside the async onResult callback, which
 // runs outside the Nuxt instance context during SSR).
 const metaData = computed(() => {
-  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME || 'Multiforum';
+  const serverName = config.serverDisplayName || 'Multiforum';
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const loadedChannel = channel.value;
 

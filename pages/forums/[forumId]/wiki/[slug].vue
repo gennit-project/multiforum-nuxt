@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { config } from '@/config';
 import { computed } from 'vue';
 import { useRoute, useRouter, useHead } from 'nuxt/app';
 import { GET_CHANNEL, GET_WIKI_PAGE } from '@/graphQLData/channel/queries';
@@ -73,7 +74,7 @@ onGetWikiPageResult((result) => {
       wikiPages: result?.data?.wikiPages,
       forumId,
       slug,
-      serverDisplayName: import.meta.env.VITE_SERVER_DISPLAY_NAME,
+      serverDisplayName: config.serverDisplayName,
       baseUrl: import.meta.env.VITE_BASE_URL,
     });
     if (head) useHead(head);

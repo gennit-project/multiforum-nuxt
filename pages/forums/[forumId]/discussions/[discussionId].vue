@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { config } from '@/config';
 import { ref, watchEffect, computed } from 'vue';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
@@ -46,7 +47,7 @@ const metaData = computed(() => {
       discussions: discussionResult.value?.discussions,
       channelId: channelId.value,
       discussionId: discussionId.value,
-      serverDisplayName: import.meta.env.VITE_SERVER_DISPLAY_NAME,
+      serverDisplayName: config.serverDisplayName,
       baseUrl: import.meta.env.VITE_BASE_URL,
     });
   } catch (error) {
@@ -56,7 +57,7 @@ const metaData = computed(() => {
       meta: [
         {
           name: 'description',
-          content: `View this discussion on ${import.meta.env.VITE_SERVER_DISPLAY_NAME}`,
+          content: `View this discussion on ${config.serverDisplayName}`,
         },
       ],
     };

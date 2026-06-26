@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { config } from '@/config';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
 import { computed, ref } from 'vue';
@@ -146,7 +147,7 @@ onGetDiscussionResult((value) => {
   const discussion = value.data.discussions[0];
 
   // Set page title and meta tags
-  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+  const serverName = config.serverDisplayName;
   useHead({
     title: `Edit Discussion | ${channelId.value} | ${serverName}`,
     meta: [

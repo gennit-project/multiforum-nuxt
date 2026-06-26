@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { config } from '@/config';
 import { computed, watchEffect, ref, onMounted, onUnmounted } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useRoute, useHead } from 'nuxt/app';
@@ -224,7 +225,7 @@ watchEffect(() => {
 
   const imageCaption = image.value.caption || image.value.alt || 'Image';
   const uploaderName = uploader.value.displayName || uploader.value.username;
-  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME || 'Multiforum';
+  const serverName = config.serverDisplayName || 'Multiforum';
 
   const description = `Image uploaded by ${uploaderName}: ${imageCaption}${image.value.longDescription ? '. ' + image.value.longDescription : ''}`;
 

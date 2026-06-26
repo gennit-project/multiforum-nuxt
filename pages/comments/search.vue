@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { config } from '@/config';
 import { ref, computed, watch } from 'vue';
 import { useRoute, useRouter, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
@@ -54,7 +55,7 @@ const channelLabel = computed(() =>
 );
 
 const pageTitle = computed(() => {
-  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+  const serverName = config.serverDisplayName;
   return `Comment search | ${serverName}`;
 });
 

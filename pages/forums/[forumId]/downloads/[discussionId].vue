@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { config } from '@/config';
 import { ref, computed } from 'vue';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
@@ -51,9 +52,9 @@ onGetDownloadResult((result) => {
       const description = download.body
         ? download.body.substring(0, 160) +
           (download.body.length > 160 ? '...' : '')
-        : `View this download on ${import.meta.env.VITE_SERVER_DISPLAY_NAME}`;
+        : `View this download on ${config.serverDisplayName}`;
       const baseUrl = import.meta.env.VITE_BASE_URL;
-      const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+      const serverName = config.serverDisplayName;
       const imageUrl = download.coverImageURL || '';
 
       // Set all meta tags using useHead
@@ -120,7 +121,7 @@ onGetDownloadResult((result) => {
       meta: [
         {
           name: 'description',
-          content: `View this download on ${import.meta.env.VITE_SERVER_DISPLAY_NAME}`,
+          content: `View this download on ${config.serverDisplayName}`,
         },
       ],
     });

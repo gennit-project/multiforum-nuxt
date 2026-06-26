@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { config } from '@/config';
 import { computed } from 'vue';
 import { useRoute, useHead } from 'nuxt/app';
 import SearchDiscussions from '@/components/discussion/list/SearchDiscussions.vue';
@@ -10,7 +11,7 @@ const channelId = computed(() => {
 });
 
 const pageTitle = computed(() => {
-  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+  const serverName = config.serverDisplayName;
   return `Discussions | ${channelId.value} | ${serverName}`;
 });
 

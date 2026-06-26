@@ -341,7 +341,7 @@ const handleClickEditEventDescription = () => {
 watchEffect(() => {
   const forumName =
     activeEventChannel.value?.Channel?.displayName || channelId.value || '';
-  const serverDisplayName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+  const serverDisplayName = config.serverDisplayName;
 
   useHead(
     buildEventSeoMeta({
