@@ -24,8 +24,6 @@ interface Window {
   __SET_AUTH_STATE_DIRECT__?: (userData?: AuthUserData) => void;
   // Debug function to monitor auth state
   __DEBUG_AUTH_STATE__?: () => AuthUserData | null;
-  // Cypress test framework
-  Cypress?: unknown;
 }
 
 interface Navigator {

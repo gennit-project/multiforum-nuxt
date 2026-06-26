@@ -10,9 +10,7 @@ import { config } from '@/config';
 export function useTestAuthHelpers() {
   const isAuthenticatedVar = useIsAuthenticated();
   const isDevRuntime = import.meta.env.DEV;
-  const isTestEnv =
-    config.environment === 'test' ||
-    (typeof window !== 'undefined' && window.Cypress);
+  const isTestEnv = config.environment === 'test';
   const shouldExpose = isDevRuntime || isTestEnv;
 
   if (!shouldExpose) return;
@@ -44,7 +42,7 @@ export function useTestAuthHelpers() {
     }
   };
 
-  // Expose immediately on the client so Cypress can set auth state before
+  // Expose immediately on the client so test code can set auth state before
   // page-specific components finish mounting.
   exposeToWindow();
 

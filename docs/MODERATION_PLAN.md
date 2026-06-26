@@ -1520,7 +1520,7 @@ Expected outcome:
 
 ---
 
-## Cypress Test Backlog
+## E2E Test Backlog
 
 These items should eventually have automated E2E coverage but can be manually verified using the instructions above.
 

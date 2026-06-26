@@ -27,6 +27,9 @@ cloud_functions
 .env.*
 !.env.example
 
+# Cypress env file (contains secrets; must never be committed)
+cypress.env.json
+
 # config for docker compose
 config
 
