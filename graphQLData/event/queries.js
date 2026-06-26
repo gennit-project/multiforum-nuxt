@@ -104,14 +104,12 @@ export const GET_EVENT = gql`
       ) {
         id
       }
+      authorIsChannelModerator(channelUniqueName: $channelUniqueName)
       Poster {
         username
         createdAt
         discussionKarma
         commentKarma
-        ChannelRoles(where: { channelUniqueName: $channelUniqueName }) {
-          showModTag
-        }
       }
     }
   }

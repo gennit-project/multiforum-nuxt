@@ -451,18 +451,6 @@ describe('getCommentAuthorStatus', () => {
     expect(result.isAdmin).toBe(true);
   });
 
-  it('returns isMod true for User with showModTag in ChannelRoles', () => {
-    const result = getCommentAuthorStatus({
-      author: {
-        __typename: 'User',
-        username: 'moduser',
-        ChannelRoles: [{ showModTag: true }],
-      },
-    });
-
-    expect(result.isMod).toBe(true);
-  });
-
   it('returns isMod true for User in serverModUsernames', () => {
     const result = getCommentAuthorStatus({
       author: { __typename: 'User', username: 'servermod' },

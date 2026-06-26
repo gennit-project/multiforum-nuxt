@@ -1239,6 +1239,9 @@ export type Channel = {
   DiscussionChannels: Array<DiscussionChannel>;
   DiscussionChannelsAggregate?: Maybe<ChannelDiscussionChannelDiscussionChannelsAggregationSelection>;
   DiscussionChannelsConnection: ChannelDiscussionChannelsConnection;
+  ElevatedChannelRole?: Maybe<ChannelRole>;
+  ElevatedChannelRoleAggregate?: Maybe<ChannelChannelRoleElevatedChannelRoleAggregationSelection>;
+  ElevatedChannelRoleConnection: ChannelElevatedChannelRoleConnection;
   ElevatedModRole?: Maybe<ModChannelRole>;
   ElevatedModRoleAggregate?: Maybe<ChannelModChannelRoleElevatedModRoleAggregationSelection>;
   ElevatedModRoleConnection: ChannelElevatedModRoleConnection;
@@ -1454,6 +1457,28 @@ export type ChannelDiscussionChannelsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ChannelDiscussionChannelsConnectionSort>>;
   where?: InputMaybe<ChannelDiscussionChannelsConnectionWhere>;
+};
+
+
+export type ChannelElevatedChannelRoleArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ChannelRoleOptions>;
+  where?: InputMaybe<ChannelRoleWhere>;
+};
+
+
+export type ChannelElevatedChannelRoleAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<ChannelRoleWhere>;
+};
+
+
+export type ChannelElevatedChannelRoleConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ChannelElevatedChannelRoleConnectionSort>>;
+  where?: InputMaybe<ChannelElevatedChannelRoleConnectionWhere>;
 };
 
 
@@ -2612,6 +2637,19 @@ export type ChannelChannelRoleDefaultChannelRoleNodeAggregateSelection = {
   name: StringAggregateSelection;
 };
 
+export type ChannelChannelRoleElevatedChannelRoleAggregationSelection = {
+  __typename?: 'ChannelChannelRoleElevatedChannelRoleAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<ChannelChannelRoleElevatedChannelRoleNodeAggregateSelection>;
+};
+
+export type ChannelChannelRoleElevatedChannelRoleNodeAggregateSelection = {
+  __typename?: 'ChannelChannelRoleElevatedChannelRoleNodeAggregateSelection';
+  channelUniqueName: StringAggregateSelection;
+  description: StringAggregateSelection;
+  name: StringAggregateSelection;
+};
+
 export type ChannelChannelRoleSuspendedRoleAggregationSelection = {
   __typename?: 'ChannelChannelRoleSuspendedRoleAggregationSelection';
   count: Scalars['Int']['output'];
@@ -2850,6 +2888,7 @@ export type ChannelConnectInput = {
   DefaultChannelRole?: InputMaybe<ChannelDefaultChannelRoleConnectFieldInput>;
   DefaultModRole?: InputMaybe<ChannelDefaultModRoleConnectFieldInput>;
   DiscussionChannels?: InputMaybe<Array<ChannelDiscussionChannelsConnectFieldInput>>;
+  ElevatedChannelRole?: InputMaybe<ChannelElevatedChannelRoleConnectFieldInput>;
   ElevatedModRole?: InputMaybe<ChannelElevatedModRoleConnectFieldInput>;
   EnabledPlugins?: InputMaybe<Array<ChannelEnabledPluginsConnectFieldInput>>;
   EventChannels?: InputMaybe<Array<ChannelEventChannelsConnectFieldInput>>;
@@ -2876,6 +2915,7 @@ export type ChannelConnectOrCreateInput = {
   Bots?: InputMaybe<Array<ChannelBotsConnectOrCreateFieldInput>>;
   DefaultChannelRole?: InputMaybe<ChannelDefaultChannelRoleConnectOrCreateFieldInput>;
   DefaultModRole?: InputMaybe<ChannelDefaultModRoleConnectOrCreateFieldInput>;
+  ElevatedChannelRole?: InputMaybe<ChannelElevatedChannelRoleConnectOrCreateFieldInput>;
   ElevatedModRole?: InputMaybe<ChannelElevatedModRoleConnectOrCreateFieldInput>;
   LockedBy?: InputMaybe<ChannelLockedByConnectOrCreateFieldInput>;
   Moderators?: InputMaybe<Array<ChannelModeratorsConnectOrCreateFieldInput>>;
@@ -2903,6 +2943,7 @@ export type ChannelConnectedRelationships = {
   DefaultChannelRole?: Maybe<ChannelDefaultChannelRoleConnectedRelationship>;
   DefaultModRole?: Maybe<ChannelDefaultModRoleConnectedRelationship>;
   DiscussionChannels?: Maybe<ChannelDiscussionChannelsConnectedRelationship>;
+  ElevatedChannelRole?: Maybe<ChannelElevatedChannelRoleConnectedRelationship>;
   ElevatedModRole?: Maybe<ChannelElevatedModRoleConnectedRelationship>;
   EnabledPlugins?: Maybe<ChannelEnabledPluginsConnectedRelationship>;
   EventChannels?: Maybe<ChannelEventChannelsConnectedRelationship>;
@@ -2931,6 +2972,7 @@ export type ChannelCreateInput = {
   DefaultChannelRole?: InputMaybe<ChannelDefaultChannelRoleFieldInput>;
   DefaultModRole?: InputMaybe<ChannelDefaultModRoleFieldInput>;
   DiscussionChannels?: InputMaybe<ChannelDiscussionChannelsFieldInput>;
+  ElevatedChannelRole?: InputMaybe<ChannelElevatedChannelRoleFieldInput>;
   ElevatedModRole?: InputMaybe<ChannelElevatedModRoleFieldInput>;
   EnabledPlugins?: InputMaybe<ChannelEnabledPluginsFieldInput>;
   EventChannels?: InputMaybe<ChannelEventChannelsFieldInput>;
@@ -3277,6 +3319,7 @@ export type ChannelDeleteInput = {
   DefaultChannelRole?: InputMaybe<ChannelDefaultChannelRoleDeleteFieldInput>;
   DefaultModRole?: InputMaybe<ChannelDefaultModRoleDeleteFieldInput>;
   DiscussionChannels?: InputMaybe<Array<ChannelDiscussionChannelsDeleteFieldInput>>;
+  ElevatedChannelRole?: InputMaybe<ChannelElevatedChannelRoleDeleteFieldInput>;
   ElevatedModRole?: InputMaybe<ChannelElevatedModRoleDeleteFieldInput>;
   EnabledPlugins?: InputMaybe<Array<ChannelEnabledPluginsDeleteFieldInput>>;
   EventChannels?: InputMaybe<Array<ChannelEventChannelsDeleteFieldInput>>;
@@ -3312,6 +3355,7 @@ export type ChannelDisconnectInput = {
   DefaultChannelRole?: InputMaybe<ChannelDefaultChannelRoleDisconnectFieldInput>;
   DefaultModRole?: InputMaybe<ChannelDefaultModRoleDisconnectFieldInput>;
   DiscussionChannels?: InputMaybe<Array<ChannelDiscussionChannelsDisconnectFieldInput>>;
+  ElevatedChannelRole?: InputMaybe<ChannelElevatedChannelRoleDisconnectFieldInput>;
   ElevatedModRole?: InputMaybe<ChannelElevatedModRoleDisconnectFieldInput>;
   EnabledPlugins?: InputMaybe<Array<ChannelEnabledPluginsDisconnectFieldInput>>;
   EventChannels?: InputMaybe<Array<ChannelEventChannelsDisconnectFieldInput>>;
@@ -3519,6 +3563,149 @@ export type ChannelEdge = {
   __typename?: 'ChannelEdge';
   cursor: Scalars['String']['output'];
   node: Channel;
+};
+
+export type ChannelElevatedChannelRoleAggregateInput = {
+  AND?: InputMaybe<Array<ChannelElevatedChannelRoleAggregateInput>>;
+  NOT?: InputMaybe<ChannelElevatedChannelRoleAggregateInput>;
+  OR?: InputMaybe<Array<ChannelElevatedChannelRoleAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ChannelElevatedChannelRoleNodeAggregationWhereInput>;
+};
+
+export type ChannelElevatedChannelRoleConnectFieldInput = {
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<ChannelRoleConnectWhere>;
+};
+
+export type ChannelElevatedChannelRoleConnectOrCreateFieldInput = {
+  onCreate: ChannelElevatedChannelRoleConnectOrCreateFieldInputOnCreate;
+  where: ChannelRoleConnectOrCreateWhere;
+};
+
+export type ChannelElevatedChannelRoleConnectOrCreateFieldInputOnCreate = {
+  node: ChannelRoleOnCreateInput;
+};
+
+export type ChannelElevatedChannelRoleConnectedRelationship = {
+  __typename?: 'ChannelElevatedChannelRoleConnectedRelationship';
+  node: ChannelRoleEventPayload;
+};
+
+export type ChannelElevatedChannelRoleConnection = {
+  __typename?: 'ChannelElevatedChannelRoleConnection';
+  edges: Array<ChannelElevatedChannelRoleRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ChannelElevatedChannelRoleConnectionSort = {
+  node?: InputMaybe<ChannelRoleSort>;
+};
+
+export type ChannelElevatedChannelRoleConnectionWhere = {
+  AND?: InputMaybe<Array<ChannelElevatedChannelRoleConnectionWhere>>;
+  NOT?: InputMaybe<ChannelElevatedChannelRoleConnectionWhere>;
+  OR?: InputMaybe<Array<ChannelElevatedChannelRoleConnectionWhere>>;
+  node?: InputMaybe<ChannelRoleWhere>;
+};
+
+export type ChannelElevatedChannelRoleCreateFieldInput = {
+  node: ChannelRoleCreateInput;
+};
+
+export type ChannelElevatedChannelRoleDeleteFieldInput = {
+  where?: InputMaybe<ChannelElevatedChannelRoleConnectionWhere>;
+};
+
+export type ChannelElevatedChannelRoleDisconnectFieldInput = {
+  where?: InputMaybe<ChannelElevatedChannelRoleConnectionWhere>;
+};
+
+export type ChannelElevatedChannelRoleFieldInput = {
+  connect?: InputMaybe<ChannelElevatedChannelRoleConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ChannelElevatedChannelRoleConnectOrCreateFieldInput>;
+  create?: InputMaybe<ChannelElevatedChannelRoleCreateFieldInput>;
+};
+
+export type ChannelElevatedChannelRoleNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ChannelElevatedChannelRoleNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ChannelElevatedChannelRoleNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ChannelElevatedChannelRoleNodeAggregationWhereInput>>;
+  channelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  description_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  description_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  name_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  name_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ChannelElevatedChannelRoleRelationship = {
+  __typename?: 'ChannelElevatedChannelRoleRelationship';
+  cursor: Scalars['String']['output'];
+  node: ChannelRole;
+};
+
+export type ChannelElevatedChannelRoleRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ChannelRoleSubscriptionWhere>;
+};
+
+export type ChannelElevatedChannelRoleUpdateConnectionInput = {
+  node?: InputMaybe<ChannelRoleUpdateInput>;
+};
+
+export type ChannelElevatedChannelRoleUpdateFieldInput = {
+  connect?: InputMaybe<ChannelElevatedChannelRoleConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ChannelElevatedChannelRoleConnectOrCreateFieldInput>;
+  create?: InputMaybe<ChannelElevatedChannelRoleCreateFieldInput>;
+  delete?: InputMaybe<ChannelElevatedChannelRoleDeleteFieldInput>;
+  disconnect?: InputMaybe<ChannelElevatedChannelRoleDisconnectFieldInput>;
+  update?: InputMaybe<ChannelElevatedChannelRoleUpdateConnectionInput>;
+  where?: InputMaybe<ChannelElevatedChannelRoleConnectionWhere>;
 };
 
 export type ChannelElevatedModRoleAggregateInput = {
@@ -6474,6 +6661,7 @@ export type ChannelRelationInput = {
   DefaultChannelRole?: InputMaybe<ChannelDefaultChannelRoleCreateFieldInput>;
   DefaultModRole?: InputMaybe<ChannelDefaultModRoleCreateFieldInput>;
   DiscussionChannels?: InputMaybe<Array<ChannelDiscussionChannelsCreateFieldInput>>;
+  ElevatedChannelRole?: InputMaybe<ChannelElevatedChannelRoleCreateFieldInput>;
   ElevatedModRole?: InputMaybe<ChannelElevatedModRoleCreateFieldInput>;
   EnabledPlugins?: InputMaybe<Array<ChannelEnabledPluginsCreateFieldInput>>;
   EventChannels?: InputMaybe<Array<ChannelEventChannelsCreateFieldInput>>;
@@ -6536,6 +6724,7 @@ export type ChannelRelationshipsSubscriptionWhere = {
   DefaultChannelRole?: InputMaybe<ChannelDefaultChannelRoleRelationshipSubscriptionWhere>;
   DefaultModRole?: InputMaybe<ChannelDefaultModRoleRelationshipSubscriptionWhere>;
   DiscussionChannels?: InputMaybe<ChannelDiscussionChannelsRelationshipSubscriptionWhere>;
+  ElevatedChannelRole?: InputMaybe<ChannelElevatedChannelRoleRelationshipSubscriptionWhere>;
   ElevatedModRole?: InputMaybe<ChannelElevatedModRoleRelationshipSubscriptionWhere>;
   EnabledPlugins?: InputMaybe<ChannelEnabledPluginsRelationshipSubscriptionWhere>;
   EventChannels?: InputMaybe<ChannelEventChannelsRelationshipSubscriptionWhere>;
@@ -7677,6 +7866,7 @@ export type ChannelUpdateInput = {
   DefaultChannelRole?: InputMaybe<ChannelDefaultChannelRoleUpdateFieldInput>;
   DefaultModRole?: InputMaybe<ChannelDefaultModRoleUpdateFieldInput>;
   DiscussionChannels?: InputMaybe<Array<ChannelDiscussionChannelsUpdateFieldInput>>;
+  ElevatedChannelRole?: InputMaybe<ChannelElevatedChannelRoleUpdateFieldInput>;
   ElevatedModRole?: InputMaybe<ChannelElevatedModRoleUpdateFieldInput>;
   EnabledPlugins?: InputMaybe<Array<ChannelEnabledPluginsUpdateFieldInput>>;
   EventChannels?: InputMaybe<Array<ChannelEventChannelsUpdateFieldInput>>;
@@ -7920,6 +8110,11 @@ export type ChannelWhere = {
   DiscussionChannels_SINGLE?: InputMaybe<DiscussionChannelWhere>;
   /** Return Channels where some of the related DiscussionChannels match this filter */
   DiscussionChannels_SOME?: InputMaybe<DiscussionChannelWhere>;
+  ElevatedChannelRole?: InputMaybe<ChannelRoleWhere>;
+  ElevatedChannelRoleAggregate?: InputMaybe<ChannelElevatedChannelRoleAggregateInput>;
+  ElevatedChannelRoleConnection?: InputMaybe<ChannelElevatedChannelRoleConnectionWhere>;
+  ElevatedChannelRoleConnection_NOT?: InputMaybe<ChannelElevatedChannelRoleConnectionWhere>;
+  ElevatedChannelRole_NOT?: InputMaybe<ChannelRoleWhere>;
   ElevatedModRole?: InputMaybe<ModChannelRoleWhere>;
   ElevatedModRoleAggregate?: InputMaybe<ChannelElevatedModRoleAggregateInput>;
   ElevatedModRoleConnection?: InputMaybe<ChannelElevatedModRoleConnectionWhere>;
@@ -17748,6 +17943,12 @@ export type CreateNotificationsMutationResponse = {
   notifications: Array<Notification>;
 };
 
+export type CreateOwnEmailsMutationResponse = {
+  __typename?: 'CreateOwnEmailsMutationResponse';
+  info: CreateInfo;
+  ownEmails: Array<OwnEmail>;
+};
+
 export type CreatePipelineStepsMutationResponse = {
   __typename?: 'CreatePipelineStepsMutationResponse';
   info: CreateInfo;
@@ -18223,6 +18424,7 @@ export type Discussion = {
   Tags: Array<Tag>;
   TagsAggregate?: Maybe<DiscussionTagTagsAggregationSelection>;
   TagsConnection: DiscussionTagsConnection;
+  authorIsChannelModerator?: Maybe<Scalars['Boolean']['output']>;
   body?: Maybe<Scalars['String']['output']>;
   bookmarkCount: Scalars['Int']['output'];
   createdAt: Scalars['DateTime']['output'];
@@ -18499,6 +18701,11 @@ export type DiscussionTagsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DiscussionTagsConnectionSort>>;
   where?: InputMaybe<DiscussionTagsConnectionWhere>;
+};
+
+
+export type DiscussionAuthorIsChannelModeratorArgs = {
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -23955,6 +24162,7 @@ export type DiscussionEdge = {
 
 export type DiscussionEventPayload = {
   __typename?: 'DiscussionEventPayload';
+  authorIsChannelModerator?: Maybe<Scalars['Boolean']['output']>;
   body?: Maybe<Scalars['String']['output']>;
   bookmarkCount: Scalars['Int']['output'];
   createdAt: Scalars['DateTime']['output'];
@@ -23967,6 +24175,11 @@ export type DiscussionEventPayload = {
   isFavorited?: Maybe<Scalars['Boolean']['output']>;
   title: Scalars['String']['output'];
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+
+export type DiscussionEventPayloadAuthorIsChannelModeratorArgs = {
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -24930,6 +25143,7 @@ export type DiscussionSharedCollectionUpdateFieldInput = {
 
 /** Fields to sort Discussions by. The order in which sorts are applied is not guaranteed when specifying many fields in one DiscussionSort object. */
 export type DiscussionSort = {
+  authorIsChannelModerator?: InputMaybe<SortDirection>;
   body?: InputMaybe<SortDirection>;
   bookmarkCount?: InputMaybe<SortDirection>;
   createdAt?: InputMaybe<SortDirection>;
@@ -27965,6 +28179,7 @@ export type Event = {
   TagsAggregate?: Maybe<EventTagTagsAggregationSelection>;
   TagsConnection: EventTagsConnection;
   address?: Maybe<Scalars['String']['output']>;
+  authorIsChannelModerator?: Maybe<Scalars['Boolean']['output']>;
   canceled: Scalars['Boolean']['output'];
   cost?: Maybe<Scalars['String']['output']>;
   coverImageURL?: Maybe<Scalars['String']['output']>;
@@ -28213,6 +28428,11 @@ export type EventTagsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<EventTagsConnectionSort>>;
   where?: InputMaybe<EventTagsConnectionWhere>;
+};
+
+
+export type EventAuthorIsChannelModeratorArgs = {
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventAggregateSelection = {
@@ -30434,6 +30654,7 @@ export type EventEventChannelsUpdateFieldInput = {
 export type EventEventPayload = {
   __typename?: 'EventEventPayload';
   address?: Maybe<Scalars['String']['output']>;
+  authorIsChannelModerator?: Maybe<Scalars['Boolean']['output']>;
   canceled: Scalars['Boolean']['output'];
   cost?: Maybe<Scalars['String']['output']>;
   coverImageURL?: Maybe<Scalars['String']['output']>;
@@ -30462,6 +30683,11 @@ export type EventEventPayload = {
   title: Scalars['String']['output'];
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   virtualEventUrl?: Maybe<Scalars['String']['output']>;
+};
+
+
+export type EventEventPayloadAuthorIsChannelModeratorArgs = {
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventEventSeriesAggregateInput = {
@@ -33427,6 +33653,7 @@ export type EventSeriesWhere = {
 /** Fields to sort Events by. The order in which sorts are applied is not guaranteed when specifying many fields in one EventSort object. */
 export type EventSort = {
   address?: InputMaybe<SortDirection>;
+  authorIsChannelModerator?: InputMaybe<SortDirection>;
   canceled?: InputMaybe<SortDirection>;
   cost?: InputMaybe<SortDirection>;
   coverImageURL?: InputMaybe<SortDirection>;
@@ -44084,6 +44311,8 @@ export type ModServerRole = {
   canLockChannel?: Maybe<Scalars['Boolean']['output']>;
   canOpenSupportTickets?: Maybe<Scalars['Boolean']['output']>;
   canPermanentlyRemoveImage?: Maybe<Scalars['Boolean']['output']>;
+  canRemoveDiscussionChannel?: Maybe<Scalars['Boolean']['output']>;
+  canRemoveEventChannel?: Maybe<Scalars['Boolean']['output']>;
   canReport?: Maybe<Scalars['Boolean']['output']>;
   canSuspendUser?: Maybe<Scalars['Boolean']['output']>;
   description?: Maybe<Scalars['String']['output']>;
@@ -44119,6 +44348,8 @@ export type ModServerRoleCreateInput = {
   canLockChannel?: InputMaybe<Scalars['Boolean']['input']>;
   canOpenSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
   canPermanentlyRemoveImage?: InputMaybe<Scalars['Boolean']['input']>;
+  canRemoveDiscussionChannel?: InputMaybe<Scalars['Boolean']['input']>;
+  canRemoveEventChannel?: InputMaybe<Scalars['Boolean']['input']>;
   canReport?: InputMaybe<Scalars['Boolean']['input']>;
   canSuspendUser?: InputMaybe<Scalars['Boolean']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -44160,6 +44391,8 @@ export type ModServerRoleEventPayload = {
   canLockChannel?: Maybe<Scalars['Boolean']['output']>;
   canOpenSupportTickets?: Maybe<Scalars['Boolean']['output']>;
   canPermanentlyRemoveImage?: Maybe<Scalars['Boolean']['output']>;
+  canRemoveDiscussionChannel?: Maybe<Scalars['Boolean']['output']>;
+  canRemoveEventChannel?: Maybe<Scalars['Boolean']['output']>;
   canReport?: Maybe<Scalars['Boolean']['output']>;
   canSuspendUser?: Maybe<Scalars['Boolean']['output']>;
   description?: Maybe<Scalars['String']['output']>;
@@ -44180,6 +44413,8 @@ export type ModServerRoleOnCreateInput = {
   canLockChannel?: InputMaybe<Scalars['Boolean']['input']>;
   canOpenSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
   canPermanentlyRemoveImage?: InputMaybe<Scalars['Boolean']['input']>;
+  canRemoveDiscussionChannel?: InputMaybe<Scalars['Boolean']['input']>;
+  canRemoveEventChannel?: InputMaybe<Scalars['Boolean']['input']>;
   canReport?: InputMaybe<Scalars['Boolean']['input']>;
   canSuspendUser?: InputMaybe<Scalars['Boolean']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -44208,6 +44443,8 @@ export type ModServerRoleSort = {
   canLockChannel?: InputMaybe<SortDirection>;
   canOpenSupportTickets?: InputMaybe<SortDirection>;
   canPermanentlyRemoveImage?: InputMaybe<SortDirection>;
+  canRemoveDiscussionChannel?: InputMaybe<SortDirection>;
+  canRemoveEventChannel?: InputMaybe<SortDirection>;
   canReport?: InputMaybe<SortDirection>;
   canSuspendUser?: InputMaybe<SortDirection>;
   description?: InputMaybe<SortDirection>;
@@ -44231,6 +44468,8 @@ export type ModServerRoleSubscriptionWhere = {
   canLockChannel?: InputMaybe<Scalars['Boolean']['input']>;
   canOpenSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
   canPermanentlyRemoveImage?: InputMaybe<Scalars['Boolean']['input']>;
+  canRemoveDiscussionChannel?: InputMaybe<Scalars['Boolean']['input']>;
+  canRemoveEventChannel?: InputMaybe<Scalars['Boolean']['input']>;
   canReport?: InputMaybe<Scalars['Boolean']['input']>;
   canSuspendUser?: InputMaybe<Scalars['Boolean']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -44265,6 +44504,8 @@ export type ModServerRoleUpdateInput = {
   canLockChannel?: InputMaybe<Scalars['Boolean']['input']>;
   canOpenSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
   canPermanentlyRemoveImage?: InputMaybe<Scalars['Boolean']['input']>;
+  canRemoveDiscussionChannel?: InputMaybe<Scalars['Boolean']['input']>;
+  canRemoveEventChannel?: InputMaybe<Scalars['Boolean']['input']>;
   canReport?: InputMaybe<Scalars['Boolean']['input']>;
   canSuspendUser?: InputMaybe<Scalars['Boolean']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -44296,6 +44537,8 @@ export type ModServerRoleWhere = {
   canLockChannel?: InputMaybe<Scalars['Boolean']['input']>;
   canOpenSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
   canPermanentlyRemoveImage?: InputMaybe<Scalars['Boolean']['input']>;
+  canRemoveDiscussionChannel?: InputMaybe<Scalars['Boolean']['input']>;
+  canRemoveEventChannel?: InputMaybe<Scalars['Boolean']['input']>;
   canReport?: InputMaybe<Scalars['Boolean']['input']>;
   canSuspendUser?: InputMaybe<Scalars['Boolean']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -47882,6 +48125,7 @@ export type Mutation = {
   createModerationActions: CreateModerationActionsMutationResponse;
   createModerationProfiles: CreateModerationProfilesMutationResponse;
   createNotifications: CreateNotificationsMutationResponse;
+  createOwnEmails: CreateOwnEmailsMutationResponse;
   createPipelineSteps: CreatePipelineStepsMutationResponse;
   createPluginRuns: CreatePluginRunsMutationResponse;
   createPluginSecretStatuses: CreatePluginSecretStatusesMutationResponse;
@@ -47968,6 +48212,7 @@ export type Mutation = {
   deleteModerationActions: DeleteInfo;
   deleteModerationProfiles: DeleteInfo;
   deleteNotifications: DeleteInfo;
+  deleteOwnEmails: DeleteInfo;
   deletePipelineSteps: DeleteInfo;
   deletePluginRuns: DeleteInfo;
   deletePluginSecretStatuses: DeleteInfo;
@@ -48113,6 +48358,7 @@ export type Mutation = {
   updateModerationActions: UpdateModerationActionsMutationResponse;
   updateModerationProfiles: UpdateModerationProfilesMutationResponse;
   updateNotifications: UpdateNotificationsMutationResponse;
+  updateOwnEmails: UpdateOwnEmailsMutationResponse;
   updatePipelineSteps: UpdatePipelineStepsMutationResponse;
   updatePluginPipelines: Scalars['JSON']['output'];
   updatePluginRuns: UpdatePluginRunsMutationResponse;
@@ -48549,6 +48795,11 @@ export type MutationCreateModerationProfilesArgs = {
 
 export type MutationCreateNotificationsArgs = {
   input: Array<NotificationCreateInput>;
+};
+
+
+export type MutationCreateOwnEmailsArgs = {
+  input: Array<OwnEmailCreateInput>;
 };
 
 
@@ -49009,6 +49260,11 @@ export type MutationDeleteModerationProfilesArgs = {
 
 export type MutationDeleteNotificationsArgs = {
   where?: InputMaybe<NotificationWhere>;
+};
+
+
+export type MutationDeleteOwnEmailsArgs = {
+  where?: InputMaybe<OwnEmailWhere>;
 };
 
 
@@ -49891,6 +50147,12 @@ export type MutationUpdateNotificationsArgs = {
 };
 
 
+export type MutationUpdateOwnEmailsArgs = {
+  update?: InputMaybe<OwnEmailUpdateInput>;
+  where?: InputMaybe<OwnEmailWhere>;
+};
+
+
 export type MutationUpdatePipelineStepsArgs = {
   update?: InputMaybe<PipelineStepUpdateInput>;
   where?: InputMaybe<PipelineStepWhere>;
@@ -50249,6 +50511,180 @@ export type NotificationWhere = {
 export type NotificationsConnection = {
   __typename?: 'NotificationsConnection';
   edges: Array<NotificationEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/**
+ * Self-scoped account summary for the authenticated caller, returned by the
+ * getOwnEmail query. Plain (non-node) type whose fields are populated entirely
+ * by the custom resolver.
+ */
+export type OwnEmail = {
+  __typename?: 'OwnEmail';
+  address: Scalars['String']['output'];
+  modProfileName?: Maybe<Scalars['String']['output']>;
+  profilePicURL?: Maybe<Scalars['String']['output']>;
+  unreadNotificationCount?: Maybe<Scalars['Int']['output']>;
+  username?: Maybe<Scalars['String']['output']>;
+};
+
+export type OwnEmailAggregateSelection = {
+  __typename?: 'OwnEmailAggregateSelection';
+  address: StringAggregateSelection;
+  count: Scalars['Int']['output'];
+  modProfileName: StringAggregateSelection;
+  profilePicURL: StringAggregateSelection;
+  unreadNotificationCount: IntAggregateSelection;
+  username: StringAggregateSelection;
+};
+
+export type OwnEmailCreateInput = {
+  address: Scalars['String']['input'];
+  modProfileName?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL?: InputMaybe<Scalars['String']['input']>;
+  unreadNotificationCount?: InputMaybe<Scalars['Int']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type OwnEmailCreatedEvent = {
+  __typename?: 'OwnEmailCreatedEvent';
+  createdOwnEmail: OwnEmailEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type OwnEmailDeletedEvent = {
+  __typename?: 'OwnEmailDeletedEvent';
+  deletedOwnEmail: OwnEmailEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type OwnEmailEdge = {
+  __typename?: 'OwnEmailEdge';
+  cursor: Scalars['String']['output'];
+  node: OwnEmail;
+};
+
+export type OwnEmailEventPayload = {
+  __typename?: 'OwnEmailEventPayload';
+  address: Scalars['String']['output'];
+  modProfileName?: Maybe<Scalars['String']['output']>;
+  profilePicURL?: Maybe<Scalars['String']['output']>;
+  unreadNotificationCount?: Maybe<Scalars['Int']['output']>;
+  username?: Maybe<Scalars['String']['output']>;
+};
+
+export type OwnEmailOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more OwnEmailSort objects to sort OwnEmails by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<OwnEmailSort>>;
+};
+
+/** Fields to sort OwnEmails by. The order in which sorts are applied is not guaranteed when specifying many fields in one OwnEmailSort object. */
+export type OwnEmailSort = {
+  address?: InputMaybe<SortDirection>;
+  modProfileName?: InputMaybe<SortDirection>;
+  profilePicURL?: InputMaybe<SortDirection>;
+  unreadNotificationCount?: InputMaybe<SortDirection>;
+  username?: InputMaybe<SortDirection>;
+};
+
+export type OwnEmailSubscriptionWhere = {
+  AND?: InputMaybe<Array<OwnEmailSubscriptionWhere>>;
+  NOT?: InputMaybe<OwnEmailSubscriptionWhere>;
+  OR?: InputMaybe<Array<OwnEmailSubscriptionWhere>>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  address_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  address_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  address_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  address_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  address_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  modProfileName?: InputMaybe<Scalars['String']['input']>;
+  modProfileName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  modProfileName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  modProfileName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  modProfileName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  modProfileName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  profilePicURL_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  unreadNotificationCount?: InputMaybe<Scalars['Int']['input']>;
+  unreadNotificationCount_GT?: InputMaybe<Scalars['Int']['input']>;
+  unreadNotificationCount_GTE?: InputMaybe<Scalars['Int']['input']>;
+  unreadNotificationCount_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  unreadNotificationCount_LT?: InputMaybe<Scalars['Int']['input']>;
+  unreadNotificationCount_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
+  username_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  username_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  username_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  username_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  username_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type OwnEmailUpdateInput = {
+  address?: InputMaybe<Scalars['String']['input']>;
+  modProfileName?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL?: InputMaybe<Scalars['String']['input']>;
+  unreadNotificationCount?: InputMaybe<Scalars['Int']['input']>;
+  unreadNotificationCount_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
+  unreadNotificationCount_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type OwnEmailUpdatedEvent = {
+  __typename?: 'OwnEmailUpdatedEvent';
+  event: EventType;
+  previousState: OwnEmailEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedOwnEmail: OwnEmailEventPayload;
+};
+
+export type OwnEmailWhere = {
+  AND?: InputMaybe<Array<OwnEmailWhere>>;
+  NOT?: InputMaybe<OwnEmailWhere>;
+  OR?: InputMaybe<Array<OwnEmailWhere>>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  address_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  address_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  address_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  address_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  address_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  modProfileName?: InputMaybe<Scalars['String']['input']>;
+  modProfileName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  modProfileName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  modProfileName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  modProfileName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  modProfileName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  profilePicURL_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  unreadNotificationCount?: InputMaybe<Scalars['Int']['input']>;
+  unreadNotificationCount_GT?: InputMaybe<Scalars['Int']['input']>;
+  unreadNotificationCount_GTE?: InputMaybe<Scalars['Int']['input']>;
+  unreadNotificationCount_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  unreadNotificationCount_LT?: InputMaybe<Scalars['Int']['input']>;
+  unreadNotificationCount_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
+  username_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  username_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  username_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  username_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  username_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type OwnEmailsConnection = {
+  __typename?: 'OwnEmailsConnection';
+  edges: Array<OwnEmailEdge>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -53222,6 +53658,14 @@ export type Query = {
   getEventComments?: Maybe<EventCommentsFormat>;
   getInstalledPlugins: Array<InstalledPlugin>;
   getModContributions: Array<ModDayData>;
+  /**
+   * Return the authenticated caller's own account summary, keyed off the
+   * verified token email. Self-scoped (takes no arguments), so it cannot look
+   * up anyone else. Used by onboarding to detect whether the logged-in user
+   * already has an account: returns null when not authenticated, and an object
+   * with username: null when authenticated but no account exists yet.
+   */
+  getOwnEmail?: Maybe<OwnEmail>;
   getPipelineRuns: Array<PluginRun>;
   getPluginRunsForDownloadableFile: Array<PluginRun>;
   getServerPluginSecrets: Array<PluginSecretStatus>;
@@ -53281,6 +53725,9 @@ export type Query = {
   notifications: Array<Notification>;
   notificationsAggregate: NotificationAggregateSelection;
   notificationsConnection: NotificationsConnection;
+  ownEmails: Array<OwnEmail>;
+  ownEmailsAggregate: OwnEmailAggregateSelection;
+  ownEmailsConnection: OwnEmailsConnection;
   pipelineSteps: Array<PipelineStep>;
   pipelineStepsAggregate: PipelineStepAggregateSelection;
   pipelineStepsConnection: PipelineStepsConnection;
@@ -54476,6 +54923,25 @@ export type QueryNotificationsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<NotificationSort>>>;
   where?: InputMaybe<NotificationWhere>;
+};
+
+
+export type QueryOwnEmailsArgs = {
+  options?: InputMaybe<OwnEmailOptions>;
+  where?: InputMaybe<OwnEmailWhere>;
+};
+
+
+export type QueryOwnEmailsAggregateArgs = {
+  where?: InputMaybe<OwnEmailWhere>;
+};
+
+
+export type QueryOwnEmailsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<OwnEmailSort>>>;
+  where?: InputMaybe<OwnEmailWhere>;
 };
 
 
@@ -57301,6 +57767,9 @@ export type ServerConfig = {
   AllowedPlugins: Array<Plugin>;
   AllowedPluginsAggregate?: Maybe<ServerConfigPluginAllowedPluginsAggregationSelection>;
   AllowedPluginsConnection: ServerConfigAllowedPluginsConnection;
+  DefaultAdminRole?: Maybe<ServerRole>;
+  DefaultAdminRoleAggregate?: Maybe<ServerConfigServerRoleDefaultAdminRoleAggregationSelection>;
+  DefaultAdminRoleConnection: ServerConfigDefaultAdminRoleConnection;
   DefaultElevatedModRole?: Maybe<ModServerRole>;
   DefaultElevatedModRoleAggregate?: Maybe<ServerConfigModServerRoleDefaultElevatedModRoleAggregationSelection>;
   DefaultElevatedModRoleConnection: ServerConfigDefaultElevatedModRoleConnection;
@@ -57310,6 +57779,9 @@ export type ServerConfig = {
   DefaultServerRole?: Maybe<ServerRole>;
   DefaultServerRoleAggregate?: Maybe<ServerConfigServerRoleDefaultServerRoleAggregationSelection>;
   DefaultServerRoleConnection: ServerConfigDefaultServerRoleConnection;
+  DefaultSuperAdminRole?: Maybe<ServerRole>;
+  DefaultSuperAdminRoleAggregate?: Maybe<ServerConfigServerRoleDefaultSuperAdminRoleAggregationSelection>;
+  DefaultSuperAdminRoleConnection: ServerConfigDefaultSuperAdminRoleConnection;
   DefaultSuspendedModRole?: Maybe<ModServerRole>;
   DefaultSuspendedModRoleAggregate?: Maybe<ServerConfigModServerRoleDefaultSuspendedModRoleAggregationSelection>;
   DefaultSuspendedModRoleConnection: ServerConfigDefaultSuspendedModRoleConnection;
@@ -57328,6 +57800,9 @@ export type ServerConfig = {
   PendingModInvites: Array<User>;
   PendingModInvitesAggregate?: Maybe<ServerConfigUserPendingModInvitesAggregationSelection>;
   PendingModInvitesConnection: ServerConfigPendingModInvitesConnection;
+  SuperAdmins: Array<User>;
+  SuperAdminsAggregate?: Maybe<ServerConfigUserSuperAdminsAggregationSelection>;
+  SuperAdminsConnection: ServerConfigSuperAdminsConnection;
   SuspendedMods: Array<Suspension>;
   SuspendedModsAggregate?: Maybe<ServerConfigSuspensionSuspendedModsAggregationSelection>;
   SuspendedModsConnection: ServerConfigSuspendedModsConnection;
@@ -57387,6 +57862,28 @@ export type ServerConfigAllowedPluginsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ServerConfigAllowedPluginsConnectionSort>>;
   where?: InputMaybe<ServerConfigAllowedPluginsConnectionWhere>;
+};
+
+
+export type ServerConfigDefaultAdminRoleArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ServerRoleOptions>;
+  where?: InputMaybe<ServerRoleWhere>;
+};
+
+
+export type ServerConfigDefaultAdminRoleAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<ServerRoleWhere>;
+};
+
+
+export type ServerConfigDefaultAdminRoleConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ServerConfigDefaultAdminRoleConnectionSort>>;
+  where?: InputMaybe<ServerConfigDefaultAdminRoleConnectionWhere>;
 };
 
 
@@ -57453,6 +57950,28 @@ export type ServerConfigDefaultServerRoleConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ServerConfigDefaultServerRoleConnectionSort>>;
   where?: InputMaybe<ServerConfigDefaultServerRoleConnectionWhere>;
+};
+
+
+export type ServerConfigDefaultSuperAdminRoleArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ServerRoleOptions>;
+  where?: InputMaybe<ServerRoleWhere>;
+};
+
+
+export type ServerConfigDefaultSuperAdminRoleAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<ServerRoleWhere>;
+};
+
+
+export type ServerConfigDefaultSuperAdminRoleConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ServerConfigDefaultSuperAdminRoleConnectionSort>>;
+  where?: InputMaybe<ServerConfigDefaultSuperAdminRoleConnectionWhere>;
 };
 
 
@@ -57585,6 +58104,28 @@ export type ServerConfigPendingModInvitesConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ServerConfigPendingModInvitesConnectionSort>>;
   where?: InputMaybe<ServerConfigPendingModInvitesConnectionWhere>;
+};
+
+
+export type ServerConfigSuperAdminsArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type ServerConfigSuperAdminsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type ServerConfigSuperAdminsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ServerConfigSuperAdminsConnectionSort>>;
+  where?: InputMaybe<ServerConfigSuperAdminsConnectionWhere>;
 };
 
 
@@ -58183,29 +58724,35 @@ export type ServerConfigAllowedPluginsUpdateFieldInput = {
 export type ServerConfigConnectInput = {
   Admins?: InputMaybe<Array<ServerConfigAdminsConnectFieldInput>>;
   AllowedPlugins?: InputMaybe<Array<ServerConfigAllowedPluginsConnectFieldInput>>;
+  DefaultAdminRole?: InputMaybe<ServerConfigDefaultAdminRoleConnectFieldInput>;
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleConnectFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleConnectFieldInput>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleConnectFieldInput>;
+  DefaultSuperAdminRole?: InputMaybe<ServerConfigDefaultSuperAdminRoleConnectFieldInput>;
   DefaultSuspendedModRole?: InputMaybe<ServerConfigDefaultSuspendedModRoleConnectFieldInput>;
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleConnectFieldInput>;
   InstalledVersions?: InputMaybe<Array<ServerConfigInstalledVersionsConnectFieldInput>>;
   Moderators?: InputMaybe<Array<ServerConfigModeratorsConnectFieldInput>>;
   PendingAdminInvites?: InputMaybe<Array<ServerConfigPendingAdminInvitesConnectFieldInput>>;
   PendingModInvites?: InputMaybe<Array<ServerConfigPendingModInvitesConnectFieldInput>>;
+  SuperAdmins?: InputMaybe<Array<ServerConfigSuperAdminsConnectFieldInput>>;
   SuspendedMods?: InputMaybe<Array<ServerConfigSuspendedModsConnectFieldInput>>;
   SuspendedUsers?: InputMaybe<Array<ServerConfigSuspendedUsersConnectFieldInput>>;
 };
 
 export type ServerConfigConnectOrCreateInput = {
   Admins?: InputMaybe<Array<ServerConfigAdminsConnectOrCreateFieldInput>>;
+  DefaultAdminRole?: InputMaybe<ServerConfigDefaultAdminRoleConnectOrCreateFieldInput>;
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleConnectOrCreateFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleConnectOrCreateFieldInput>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleConnectOrCreateFieldInput>;
+  DefaultSuperAdminRole?: InputMaybe<ServerConfigDefaultSuperAdminRoleConnectOrCreateFieldInput>;
   DefaultSuspendedModRole?: InputMaybe<ServerConfigDefaultSuspendedModRoleConnectOrCreateFieldInput>;
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleConnectOrCreateFieldInput>;
   Moderators?: InputMaybe<Array<ServerConfigModeratorsConnectOrCreateFieldInput>>;
   PendingAdminInvites?: InputMaybe<Array<ServerConfigPendingAdminInvitesConnectOrCreateFieldInput>>;
   PendingModInvites?: InputMaybe<Array<ServerConfigPendingModInvitesConnectOrCreateFieldInput>>;
+  SuperAdmins?: InputMaybe<Array<ServerConfigSuperAdminsConnectOrCreateFieldInput>>;
 };
 
 export type ServerConfigConnectOrCreateWhere = {
@@ -58220,15 +58767,18 @@ export type ServerConfigConnectedRelationships = {
   __typename?: 'ServerConfigConnectedRelationships';
   Admins?: Maybe<ServerConfigAdminsConnectedRelationship>;
   AllowedPlugins?: Maybe<ServerConfigAllowedPluginsConnectedRelationship>;
+  DefaultAdminRole?: Maybe<ServerConfigDefaultAdminRoleConnectedRelationship>;
   DefaultElevatedModRole?: Maybe<ServerConfigDefaultElevatedModRoleConnectedRelationship>;
   DefaultModRole?: Maybe<ServerConfigDefaultModRoleConnectedRelationship>;
   DefaultServerRole?: Maybe<ServerConfigDefaultServerRoleConnectedRelationship>;
+  DefaultSuperAdminRole?: Maybe<ServerConfigDefaultSuperAdminRoleConnectedRelationship>;
   DefaultSuspendedModRole?: Maybe<ServerConfigDefaultSuspendedModRoleConnectedRelationship>;
   DefaultSuspendedRole?: Maybe<ServerConfigDefaultSuspendedRoleConnectedRelationship>;
   InstalledVersions?: Maybe<ServerConfigInstalledVersionsConnectedRelationship>;
   Moderators?: Maybe<ServerConfigModeratorsConnectedRelationship>;
   PendingAdminInvites?: Maybe<ServerConfigPendingAdminInvitesConnectedRelationship>;
   PendingModInvites?: Maybe<ServerConfigPendingModInvitesConnectedRelationship>;
+  SuperAdmins?: Maybe<ServerConfigSuperAdminsConnectedRelationship>;
   SuspendedMods?: Maybe<ServerConfigSuspendedModsConnectedRelationship>;
   SuspendedUsers?: Maybe<ServerConfigSuspendedUsersConnectedRelationship>;
 };
@@ -58236,15 +58786,18 @@ export type ServerConfigConnectedRelationships = {
 export type ServerConfigCreateInput = {
   Admins?: InputMaybe<ServerConfigAdminsFieldInput>;
   AllowedPlugins?: InputMaybe<ServerConfigAllowedPluginsFieldInput>;
+  DefaultAdminRole?: InputMaybe<ServerConfigDefaultAdminRoleFieldInput>;
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleFieldInput>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleFieldInput>;
+  DefaultSuperAdminRole?: InputMaybe<ServerConfigDefaultSuperAdminRoleFieldInput>;
   DefaultSuspendedModRole?: InputMaybe<ServerConfigDefaultSuspendedModRoleFieldInput>;
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleFieldInput>;
   InstalledVersions?: InputMaybe<ServerConfigInstalledVersionsFieldInput>;
   Moderators?: InputMaybe<ServerConfigModeratorsFieldInput>;
   PendingAdminInvites?: InputMaybe<ServerConfigPendingAdminInvitesFieldInput>;
   PendingModInvites?: InputMaybe<ServerConfigPendingModInvitesFieldInput>;
+  SuperAdmins?: InputMaybe<ServerConfigSuperAdminsFieldInput>;
   SuspendedMods?: InputMaybe<ServerConfigSuspendedModsFieldInput>;
   SuspendedUsers?: InputMaybe<ServerConfigSuspendedUsersFieldInput>;
   allowedFileTypes?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -58263,6 +58816,134 @@ export type ServerConfigCreatedEvent = {
   createdServerConfig: ServerConfigEventPayload;
   event: EventType;
   timestamp: Scalars['Float']['output'];
+};
+
+export type ServerConfigDefaultAdminRoleAggregateInput = {
+  AND?: InputMaybe<Array<ServerConfigDefaultAdminRoleAggregateInput>>;
+  NOT?: InputMaybe<ServerConfigDefaultAdminRoleAggregateInput>;
+  OR?: InputMaybe<Array<ServerConfigDefaultAdminRoleAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ServerConfigDefaultAdminRoleNodeAggregationWhereInput>;
+};
+
+export type ServerConfigDefaultAdminRoleConnectFieldInput = {
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<ServerRoleConnectWhere>;
+};
+
+export type ServerConfigDefaultAdminRoleConnectOrCreateFieldInput = {
+  onCreate: ServerConfigDefaultAdminRoleConnectOrCreateFieldInputOnCreate;
+  where: ServerRoleConnectOrCreateWhere;
+};
+
+export type ServerConfigDefaultAdminRoleConnectOrCreateFieldInputOnCreate = {
+  node: ServerRoleOnCreateInput;
+};
+
+export type ServerConfigDefaultAdminRoleConnectedRelationship = {
+  __typename?: 'ServerConfigDefaultAdminRoleConnectedRelationship';
+  node: ServerRoleEventPayload;
+};
+
+export type ServerConfigDefaultAdminRoleConnection = {
+  __typename?: 'ServerConfigDefaultAdminRoleConnection';
+  edges: Array<ServerConfigDefaultAdminRoleRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ServerConfigDefaultAdminRoleConnectionSort = {
+  node?: InputMaybe<ServerRoleSort>;
+};
+
+export type ServerConfigDefaultAdminRoleConnectionWhere = {
+  AND?: InputMaybe<Array<ServerConfigDefaultAdminRoleConnectionWhere>>;
+  NOT?: InputMaybe<ServerConfigDefaultAdminRoleConnectionWhere>;
+  OR?: InputMaybe<Array<ServerConfigDefaultAdminRoleConnectionWhere>>;
+  node?: InputMaybe<ServerRoleWhere>;
+};
+
+export type ServerConfigDefaultAdminRoleCreateFieldInput = {
+  node: ServerRoleCreateInput;
+};
+
+export type ServerConfigDefaultAdminRoleDeleteFieldInput = {
+  where?: InputMaybe<ServerConfigDefaultAdminRoleConnectionWhere>;
+};
+
+export type ServerConfigDefaultAdminRoleDisconnectFieldInput = {
+  where?: InputMaybe<ServerConfigDefaultAdminRoleConnectionWhere>;
+};
+
+export type ServerConfigDefaultAdminRoleFieldInput = {
+  connect?: InputMaybe<ServerConfigDefaultAdminRoleConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ServerConfigDefaultAdminRoleConnectOrCreateFieldInput>;
+  create?: InputMaybe<ServerConfigDefaultAdminRoleCreateFieldInput>;
+};
+
+export type ServerConfigDefaultAdminRoleNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ServerConfigDefaultAdminRoleNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ServerConfigDefaultAdminRoleNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ServerConfigDefaultAdminRoleNodeAggregationWhereInput>>;
+  description_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  description_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  name_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  name_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ServerConfigDefaultAdminRoleRelationship = {
+  __typename?: 'ServerConfigDefaultAdminRoleRelationship';
+  cursor: Scalars['String']['output'];
+  node: ServerRole;
+};
+
+export type ServerConfigDefaultAdminRoleRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ServerRoleSubscriptionWhere>;
+};
+
+export type ServerConfigDefaultAdminRoleUpdateConnectionInput = {
+  node?: InputMaybe<ServerRoleUpdateInput>;
+};
+
+export type ServerConfigDefaultAdminRoleUpdateFieldInput = {
+  connect?: InputMaybe<ServerConfigDefaultAdminRoleConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ServerConfigDefaultAdminRoleConnectOrCreateFieldInput>;
+  create?: InputMaybe<ServerConfigDefaultAdminRoleCreateFieldInput>;
+  delete?: InputMaybe<ServerConfigDefaultAdminRoleDeleteFieldInput>;
+  disconnect?: InputMaybe<ServerConfigDefaultAdminRoleDisconnectFieldInput>;
+  update?: InputMaybe<ServerConfigDefaultAdminRoleUpdateConnectionInput>;
+  where?: InputMaybe<ServerConfigDefaultAdminRoleConnectionWhere>;
 };
 
 export type ServerConfigDefaultElevatedModRoleAggregateInput = {
@@ -58649,6 +59330,134 @@ export type ServerConfigDefaultServerRoleUpdateFieldInput = {
   where?: InputMaybe<ServerConfigDefaultServerRoleConnectionWhere>;
 };
 
+export type ServerConfigDefaultSuperAdminRoleAggregateInput = {
+  AND?: InputMaybe<Array<ServerConfigDefaultSuperAdminRoleAggregateInput>>;
+  NOT?: InputMaybe<ServerConfigDefaultSuperAdminRoleAggregateInput>;
+  OR?: InputMaybe<Array<ServerConfigDefaultSuperAdminRoleAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ServerConfigDefaultSuperAdminRoleNodeAggregationWhereInput>;
+};
+
+export type ServerConfigDefaultSuperAdminRoleConnectFieldInput = {
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<ServerRoleConnectWhere>;
+};
+
+export type ServerConfigDefaultSuperAdminRoleConnectOrCreateFieldInput = {
+  onCreate: ServerConfigDefaultSuperAdminRoleConnectOrCreateFieldInputOnCreate;
+  where: ServerRoleConnectOrCreateWhere;
+};
+
+export type ServerConfigDefaultSuperAdminRoleConnectOrCreateFieldInputOnCreate = {
+  node: ServerRoleOnCreateInput;
+};
+
+export type ServerConfigDefaultSuperAdminRoleConnectedRelationship = {
+  __typename?: 'ServerConfigDefaultSuperAdminRoleConnectedRelationship';
+  node: ServerRoleEventPayload;
+};
+
+export type ServerConfigDefaultSuperAdminRoleConnection = {
+  __typename?: 'ServerConfigDefaultSuperAdminRoleConnection';
+  edges: Array<ServerConfigDefaultSuperAdminRoleRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ServerConfigDefaultSuperAdminRoleConnectionSort = {
+  node?: InputMaybe<ServerRoleSort>;
+};
+
+export type ServerConfigDefaultSuperAdminRoleConnectionWhere = {
+  AND?: InputMaybe<Array<ServerConfigDefaultSuperAdminRoleConnectionWhere>>;
+  NOT?: InputMaybe<ServerConfigDefaultSuperAdminRoleConnectionWhere>;
+  OR?: InputMaybe<Array<ServerConfigDefaultSuperAdminRoleConnectionWhere>>;
+  node?: InputMaybe<ServerRoleWhere>;
+};
+
+export type ServerConfigDefaultSuperAdminRoleCreateFieldInput = {
+  node: ServerRoleCreateInput;
+};
+
+export type ServerConfigDefaultSuperAdminRoleDeleteFieldInput = {
+  where?: InputMaybe<ServerConfigDefaultSuperAdminRoleConnectionWhere>;
+};
+
+export type ServerConfigDefaultSuperAdminRoleDisconnectFieldInput = {
+  where?: InputMaybe<ServerConfigDefaultSuperAdminRoleConnectionWhere>;
+};
+
+export type ServerConfigDefaultSuperAdminRoleFieldInput = {
+  connect?: InputMaybe<ServerConfigDefaultSuperAdminRoleConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ServerConfigDefaultSuperAdminRoleConnectOrCreateFieldInput>;
+  create?: InputMaybe<ServerConfigDefaultSuperAdminRoleCreateFieldInput>;
+};
+
+export type ServerConfigDefaultSuperAdminRoleNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ServerConfigDefaultSuperAdminRoleNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ServerConfigDefaultSuperAdminRoleNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ServerConfigDefaultSuperAdminRoleNodeAggregationWhereInput>>;
+  description_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  description_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  name_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  name_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ServerConfigDefaultSuperAdminRoleRelationship = {
+  __typename?: 'ServerConfigDefaultSuperAdminRoleRelationship';
+  cursor: Scalars['String']['output'];
+  node: ServerRole;
+};
+
+export type ServerConfigDefaultSuperAdminRoleRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ServerRoleSubscriptionWhere>;
+};
+
+export type ServerConfigDefaultSuperAdminRoleUpdateConnectionInput = {
+  node?: InputMaybe<ServerRoleUpdateInput>;
+};
+
+export type ServerConfigDefaultSuperAdminRoleUpdateFieldInput = {
+  connect?: InputMaybe<ServerConfigDefaultSuperAdminRoleConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ServerConfigDefaultSuperAdminRoleConnectOrCreateFieldInput>;
+  create?: InputMaybe<ServerConfigDefaultSuperAdminRoleCreateFieldInput>;
+  delete?: InputMaybe<ServerConfigDefaultSuperAdminRoleDeleteFieldInput>;
+  disconnect?: InputMaybe<ServerConfigDefaultSuperAdminRoleDisconnectFieldInput>;
+  update?: InputMaybe<ServerConfigDefaultSuperAdminRoleUpdateConnectionInput>;
+  where?: InputMaybe<ServerConfigDefaultSuperAdminRoleConnectionWhere>;
+};
+
 export type ServerConfigDefaultSuspendedModRoleAggregateInput = {
   AND?: InputMaybe<Array<ServerConfigDefaultSuspendedModRoleAggregateInput>>;
   NOT?: InputMaybe<ServerConfigDefaultSuspendedModRoleAggregateInput>;
@@ -58908,15 +59717,18 @@ export type ServerConfigDefaultSuspendedRoleUpdateFieldInput = {
 export type ServerConfigDeleteInput = {
   Admins?: InputMaybe<Array<ServerConfigAdminsDeleteFieldInput>>;
   AllowedPlugins?: InputMaybe<Array<ServerConfigAllowedPluginsDeleteFieldInput>>;
+  DefaultAdminRole?: InputMaybe<ServerConfigDefaultAdminRoleDeleteFieldInput>;
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleDeleteFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleDeleteFieldInput>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleDeleteFieldInput>;
+  DefaultSuperAdminRole?: InputMaybe<ServerConfigDefaultSuperAdminRoleDeleteFieldInput>;
   DefaultSuspendedModRole?: InputMaybe<ServerConfigDefaultSuspendedModRoleDeleteFieldInput>;
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleDeleteFieldInput>;
   InstalledVersions?: InputMaybe<Array<ServerConfigInstalledVersionsDeleteFieldInput>>;
   Moderators?: InputMaybe<Array<ServerConfigModeratorsDeleteFieldInput>>;
   PendingAdminInvites?: InputMaybe<Array<ServerConfigPendingAdminInvitesDeleteFieldInput>>;
   PendingModInvites?: InputMaybe<Array<ServerConfigPendingModInvitesDeleteFieldInput>>;
+  SuperAdmins?: InputMaybe<Array<ServerConfigSuperAdminsDeleteFieldInput>>;
   SuspendedMods?: InputMaybe<Array<ServerConfigSuspendedModsDeleteFieldInput>>;
   SuspendedUsers?: InputMaybe<Array<ServerConfigSuspendedUsersDeleteFieldInput>>;
 };
@@ -58931,15 +59743,18 @@ export type ServerConfigDeletedEvent = {
 export type ServerConfigDisconnectInput = {
   Admins?: InputMaybe<Array<ServerConfigAdminsDisconnectFieldInput>>;
   AllowedPlugins?: InputMaybe<Array<ServerConfigAllowedPluginsDisconnectFieldInput>>;
+  DefaultAdminRole?: InputMaybe<ServerConfigDefaultAdminRoleDisconnectFieldInput>;
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleDisconnectFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleDisconnectFieldInput>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleDisconnectFieldInput>;
+  DefaultSuperAdminRole?: InputMaybe<ServerConfigDefaultSuperAdminRoleDisconnectFieldInput>;
   DefaultSuspendedModRole?: InputMaybe<ServerConfigDefaultSuspendedModRoleDisconnectFieldInput>;
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleDisconnectFieldInput>;
   InstalledVersions?: InputMaybe<Array<ServerConfigInstalledVersionsDisconnectFieldInput>>;
   Moderators?: InputMaybe<Array<ServerConfigModeratorsDisconnectFieldInput>>;
   PendingAdminInvites?: InputMaybe<Array<ServerConfigPendingAdminInvitesDisconnectFieldInput>>;
   PendingModInvites?: InputMaybe<Array<ServerConfigPendingModInvitesDisconnectFieldInput>>;
+  SuperAdmins?: InputMaybe<Array<ServerConfigSuperAdminsDisconnectFieldInput>>;
   SuspendedMods?: InputMaybe<Array<ServerConfigSuspendedModsDisconnectFieldInput>>;
   SuspendedUsers?: InputMaybe<Array<ServerConfigSuspendedUsersDisconnectFieldInput>>;
 };
@@ -60091,15 +60906,18 @@ export type ServerConfigPluginVersionInstalledVersionsNodeAggregateSelection = {
 export type ServerConfigRelationInput = {
   Admins?: InputMaybe<Array<ServerConfigAdminsCreateFieldInput>>;
   AllowedPlugins?: InputMaybe<Array<ServerConfigAllowedPluginsCreateFieldInput>>;
+  DefaultAdminRole?: InputMaybe<ServerConfigDefaultAdminRoleCreateFieldInput>;
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleCreateFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleCreateFieldInput>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleCreateFieldInput>;
+  DefaultSuperAdminRole?: InputMaybe<ServerConfigDefaultSuperAdminRoleCreateFieldInput>;
   DefaultSuspendedModRole?: InputMaybe<ServerConfigDefaultSuspendedModRoleCreateFieldInput>;
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleCreateFieldInput>;
   InstalledVersions?: InputMaybe<Array<ServerConfigInstalledVersionsCreateFieldInput>>;
   Moderators?: InputMaybe<Array<ServerConfigModeratorsCreateFieldInput>>;
   PendingAdminInvites?: InputMaybe<Array<ServerConfigPendingAdminInvitesCreateFieldInput>>;
   PendingModInvites?: InputMaybe<Array<ServerConfigPendingModInvitesCreateFieldInput>>;
+  SuperAdmins?: InputMaybe<Array<ServerConfigSuperAdminsCreateFieldInput>>;
   SuspendedMods?: InputMaybe<Array<ServerConfigSuspendedModsCreateFieldInput>>;
   SuspendedUsers?: InputMaybe<Array<ServerConfigSuspendedUsersCreateFieldInput>>;
 };
@@ -60141,17 +60959,32 @@ export type ServerConfigRelationshipDeletedSubscriptionWhere = {
 export type ServerConfigRelationshipsSubscriptionWhere = {
   Admins?: InputMaybe<ServerConfigAdminsRelationshipSubscriptionWhere>;
   AllowedPlugins?: InputMaybe<ServerConfigAllowedPluginsRelationshipSubscriptionWhere>;
+  DefaultAdminRole?: InputMaybe<ServerConfigDefaultAdminRoleRelationshipSubscriptionWhere>;
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleRelationshipSubscriptionWhere>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleRelationshipSubscriptionWhere>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleRelationshipSubscriptionWhere>;
+  DefaultSuperAdminRole?: InputMaybe<ServerConfigDefaultSuperAdminRoleRelationshipSubscriptionWhere>;
   DefaultSuspendedModRole?: InputMaybe<ServerConfigDefaultSuspendedModRoleRelationshipSubscriptionWhere>;
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleRelationshipSubscriptionWhere>;
   InstalledVersions?: InputMaybe<ServerConfigInstalledVersionsRelationshipSubscriptionWhere>;
   Moderators?: InputMaybe<ServerConfigModeratorsRelationshipSubscriptionWhere>;
   PendingAdminInvites?: InputMaybe<ServerConfigPendingAdminInvitesRelationshipSubscriptionWhere>;
   PendingModInvites?: InputMaybe<ServerConfigPendingModInvitesRelationshipSubscriptionWhere>;
+  SuperAdmins?: InputMaybe<ServerConfigSuperAdminsRelationshipSubscriptionWhere>;
   SuspendedMods?: InputMaybe<ServerConfigSuspendedModsRelationshipSubscriptionWhere>;
   SuspendedUsers?: InputMaybe<ServerConfigSuspendedUsersRelationshipSubscriptionWhere>;
+};
+
+export type ServerConfigServerRoleDefaultAdminRoleAggregationSelection = {
+  __typename?: 'ServerConfigServerRoleDefaultAdminRoleAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<ServerConfigServerRoleDefaultAdminRoleNodeAggregateSelection>;
+};
+
+export type ServerConfigServerRoleDefaultAdminRoleNodeAggregateSelection = {
+  __typename?: 'ServerConfigServerRoleDefaultAdminRoleNodeAggregateSelection';
+  description: StringAggregateSelection;
+  name: StringAggregateSelection;
 };
 
 export type ServerConfigServerRoleDefaultServerRoleAggregationSelection = {
@@ -60162,6 +60995,18 @@ export type ServerConfigServerRoleDefaultServerRoleAggregationSelection = {
 
 export type ServerConfigServerRoleDefaultServerRoleNodeAggregateSelection = {
   __typename?: 'ServerConfigServerRoleDefaultServerRoleNodeAggregateSelection';
+  description: StringAggregateSelection;
+  name: StringAggregateSelection;
+};
+
+export type ServerConfigServerRoleDefaultSuperAdminRoleAggregationSelection = {
+  __typename?: 'ServerConfigServerRoleDefaultSuperAdminRoleAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<ServerConfigServerRoleDefaultSuperAdminRoleNodeAggregateSelection>;
+};
+
+export type ServerConfigServerRoleDefaultSuperAdminRoleNodeAggregateSelection = {
+  __typename?: 'ServerConfigServerRoleDefaultSuperAdminRoleNodeAggregateSelection';
   description: StringAggregateSelection;
   name: StringAggregateSelection;
 };
@@ -60221,6 +61066,352 @@ export type ServerConfigSubscriptionWhere = {
   serverName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   serverName_MATCHES?: InputMaybe<Scalars['String']['input']>;
   serverName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ServerConfigSuperAdminsAggregateInput = {
+  AND?: InputMaybe<Array<ServerConfigSuperAdminsAggregateInput>>;
+  NOT?: InputMaybe<ServerConfigSuperAdminsAggregateInput>;
+  OR?: InputMaybe<Array<ServerConfigSuperAdminsAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ServerConfigSuperAdminsNodeAggregationWhereInput>;
+};
+
+export type ServerConfigSuperAdminsConnectFieldInput = {
+  connect?: InputMaybe<Array<UserConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<UserConnectWhere>;
+};
+
+export type ServerConfigSuperAdminsConnectOrCreateFieldInput = {
+  onCreate: ServerConfigSuperAdminsConnectOrCreateFieldInputOnCreate;
+  where: UserConnectOrCreateWhere;
+};
+
+export type ServerConfigSuperAdminsConnectOrCreateFieldInputOnCreate = {
+  node: UserOnCreateInput;
+};
+
+export type ServerConfigSuperAdminsConnectedRelationship = {
+  __typename?: 'ServerConfigSuperAdminsConnectedRelationship';
+  node: UserEventPayload;
+};
+
+export type ServerConfigSuperAdminsConnection = {
+  __typename?: 'ServerConfigSuperAdminsConnection';
+  edges: Array<ServerConfigSuperAdminsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ServerConfigSuperAdminsConnectionSort = {
+  node?: InputMaybe<UserSort>;
+};
+
+export type ServerConfigSuperAdminsConnectionWhere = {
+  AND?: InputMaybe<Array<ServerConfigSuperAdminsConnectionWhere>>;
+  NOT?: InputMaybe<ServerConfigSuperAdminsConnectionWhere>;
+  OR?: InputMaybe<Array<ServerConfigSuperAdminsConnectionWhere>>;
+  node?: InputMaybe<UserWhere>;
+};
+
+export type ServerConfigSuperAdminsCreateFieldInput = {
+  node: UserCreateInput;
+};
+
+export type ServerConfigSuperAdminsDeleteFieldInput = {
+  delete?: InputMaybe<UserDeleteInput>;
+  where?: InputMaybe<ServerConfigSuperAdminsConnectionWhere>;
+};
+
+export type ServerConfigSuperAdminsDisconnectFieldInput = {
+  disconnect?: InputMaybe<UserDisconnectInput>;
+  where?: InputMaybe<ServerConfigSuperAdminsConnectionWhere>;
+};
+
+export type ServerConfigSuperAdminsFieldInput = {
+  connect?: InputMaybe<Array<ServerConfigSuperAdminsConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<ServerConfigSuperAdminsConnectOrCreateFieldInput>>;
+  create?: InputMaybe<Array<ServerConfigSuperAdminsCreateFieldInput>>;
+};
+
+export type ServerConfigSuperAdminsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ServerConfigSuperAdminsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ServerConfigSuperAdminsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ServerConfigSuperAdminsNodeAggregationWhereInput>>;
+  bio_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  botProfileId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  botProfileId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  defaultEmojiSkinTone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  deprecatedReason_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  deprecatedReason_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  location_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleContent_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  notificationBundleInterval_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  preferredTimeZone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  stripeAccountId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  stripeAccountId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  username_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ServerConfigSuperAdminsRelationship = {
+  __typename?: 'ServerConfigSuperAdminsRelationship';
+  cursor: Scalars['String']['output'];
+  node: User;
+};
+
+export type ServerConfigSuperAdminsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
+export type ServerConfigSuperAdminsUpdateConnectionInput = {
+  node?: InputMaybe<UserUpdateInput>;
+};
+
+export type ServerConfigSuperAdminsUpdateFieldInput = {
+  connect?: InputMaybe<Array<ServerConfigSuperAdminsConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<ServerConfigSuperAdminsConnectOrCreateFieldInput>>;
+  create?: InputMaybe<Array<ServerConfigSuperAdminsCreateFieldInput>>;
+  delete?: InputMaybe<Array<ServerConfigSuperAdminsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ServerConfigSuperAdminsDisconnectFieldInput>>;
+  update?: InputMaybe<ServerConfigSuperAdminsUpdateConnectionInput>;
+  where?: InputMaybe<ServerConfigSuperAdminsConnectionWhere>;
 };
 
 export type ServerConfigSuspendedModsAggregateInput = {
@@ -60604,15 +61795,18 @@ export type ServerConfigUniqueWhere = {
 export type ServerConfigUpdateInput = {
   Admins?: InputMaybe<Array<ServerConfigAdminsUpdateFieldInput>>;
   AllowedPlugins?: InputMaybe<Array<ServerConfigAllowedPluginsUpdateFieldInput>>;
+  DefaultAdminRole?: InputMaybe<ServerConfigDefaultAdminRoleUpdateFieldInput>;
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleUpdateFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleUpdateFieldInput>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleUpdateFieldInput>;
+  DefaultSuperAdminRole?: InputMaybe<ServerConfigDefaultSuperAdminRoleUpdateFieldInput>;
   DefaultSuspendedModRole?: InputMaybe<ServerConfigDefaultSuspendedModRoleUpdateFieldInput>;
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleUpdateFieldInput>;
   InstalledVersions?: InputMaybe<Array<ServerConfigInstalledVersionsUpdateFieldInput>>;
   Moderators?: InputMaybe<Array<ServerConfigModeratorsUpdateFieldInput>>;
   PendingAdminInvites?: InputMaybe<Array<ServerConfigPendingAdminInvitesUpdateFieldInput>>;
   PendingModInvites?: InputMaybe<Array<ServerConfigPendingModInvitesUpdateFieldInput>>;
+  SuperAdmins?: InputMaybe<Array<ServerConfigSuperAdminsUpdateFieldInput>>;
   SuspendedMods?: InputMaybe<Array<ServerConfigSuspendedModsUpdateFieldInput>>;
   SuspendedUsers?: InputMaybe<Array<ServerConfigSuspendedUsersUpdateFieldInput>>;
   allowedFileTypes?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -60716,6 +61910,32 @@ export type ServerConfigUserPendingModInvitesNodeAggregateSelection = {
   username: StringAggregateSelection;
 };
 
+export type ServerConfigUserSuperAdminsAggregationSelection = {
+  __typename?: 'ServerConfigUserSuperAdminsAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<ServerConfigUserSuperAdminsNodeAggregateSelection>;
+};
+
+export type ServerConfigUserSuperAdminsNodeAggregateSelection = {
+  __typename?: 'ServerConfigUserSuperAdminsNodeAggregateSelection';
+  bio: StringAggregateSelection;
+  botProfileId: StringAggregateSelection;
+  commentKarma: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  defaultEmojiSkinTone: StringAggregateSelection;
+  deprecatedReason: StringAggregateSelection;
+  discussionKarma: IntAggregateSelection;
+  displayName: StringAggregateSelection;
+  location: StringAggregateSelection;
+  notificationBundleContent: StringAggregateSelection;
+  notificationBundleInterval: StringAggregateSelection;
+  preferredTimeZone: StringAggregateSelection;
+  profilePicURL: StringAggregateSelection;
+  pronouns: StringAggregateSelection;
+  stripeAccountId: StringAggregateSelection;
+  username: StringAggregateSelection;
+};
+
 export type ServerConfigWhere = {
   AND?: InputMaybe<Array<ServerConfigWhere>>;
   AdminsAggregate?: InputMaybe<ServerConfigAdminsAggregateInput>;
@@ -60752,6 +61972,11 @@ export type ServerConfigWhere = {
   AllowedPlugins_SINGLE?: InputMaybe<PluginWhere>;
   /** Return ServerConfigs where some of the related Plugins match this filter */
   AllowedPlugins_SOME?: InputMaybe<PluginWhere>;
+  DefaultAdminRole?: InputMaybe<ServerRoleWhere>;
+  DefaultAdminRoleAggregate?: InputMaybe<ServerConfigDefaultAdminRoleAggregateInput>;
+  DefaultAdminRoleConnection?: InputMaybe<ServerConfigDefaultAdminRoleConnectionWhere>;
+  DefaultAdminRoleConnection_NOT?: InputMaybe<ServerConfigDefaultAdminRoleConnectionWhere>;
+  DefaultAdminRole_NOT?: InputMaybe<ServerRoleWhere>;
   DefaultElevatedModRole?: InputMaybe<ModServerRoleWhere>;
   DefaultElevatedModRoleAggregate?: InputMaybe<ServerConfigDefaultElevatedModRoleAggregateInput>;
   DefaultElevatedModRoleConnection?: InputMaybe<ServerConfigDefaultElevatedModRoleConnectionWhere>;
@@ -60767,6 +61992,11 @@ export type ServerConfigWhere = {
   DefaultServerRoleConnection?: InputMaybe<ServerConfigDefaultServerRoleConnectionWhere>;
   DefaultServerRoleConnection_NOT?: InputMaybe<ServerConfigDefaultServerRoleConnectionWhere>;
   DefaultServerRole_NOT?: InputMaybe<ServerRoleWhere>;
+  DefaultSuperAdminRole?: InputMaybe<ServerRoleWhere>;
+  DefaultSuperAdminRoleAggregate?: InputMaybe<ServerConfigDefaultSuperAdminRoleAggregateInput>;
+  DefaultSuperAdminRoleConnection?: InputMaybe<ServerConfigDefaultSuperAdminRoleConnectionWhere>;
+  DefaultSuperAdminRoleConnection_NOT?: InputMaybe<ServerConfigDefaultSuperAdminRoleConnectionWhere>;
+  DefaultSuperAdminRole_NOT?: InputMaybe<ServerRoleWhere>;
   DefaultSuspendedModRole?: InputMaybe<ModServerRoleWhere>;
   DefaultSuspendedModRoleAggregate?: InputMaybe<ServerConfigDefaultSuspendedModRoleAggregateInput>;
   DefaultSuspendedModRoleConnection?: InputMaybe<ServerConfigDefaultSuspendedModRoleConnectionWhere>;
@@ -60847,6 +62077,23 @@ export type ServerConfigWhere = {
   PendingModInvites_SINGLE?: InputMaybe<UserWhere>;
   /** Return ServerConfigs where some of the related Users match this filter */
   PendingModInvites_SOME?: InputMaybe<UserWhere>;
+  SuperAdminsAggregate?: InputMaybe<ServerConfigSuperAdminsAggregateInput>;
+  /** Return ServerConfigs where all of the related ServerConfigSuperAdminsConnections match this filter */
+  SuperAdminsConnection_ALL?: InputMaybe<ServerConfigSuperAdminsConnectionWhere>;
+  /** Return ServerConfigs where none of the related ServerConfigSuperAdminsConnections match this filter */
+  SuperAdminsConnection_NONE?: InputMaybe<ServerConfigSuperAdminsConnectionWhere>;
+  /** Return ServerConfigs where one of the related ServerConfigSuperAdminsConnections match this filter */
+  SuperAdminsConnection_SINGLE?: InputMaybe<ServerConfigSuperAdminsConnectionWhere>;
+  /** Return ServerConfigs where some of the related ServerConfigSuperAdminsConnections match this filter */
+  SuperAdminsConnection_SOME?: InputMaybe<ServerConfigSuperAdminsConnectionWhere>;
+  /** Return ServerConfigs where all of the related Users match this filter */
+  SuperAdmins_ALL?: InputMaybe<UserWhere>;
+  /** Return ServerConfigs where none of the related Users match this filter */
+  SuperAdmins_NONE?: InputMaybe<UserWhere>;
+  /** Return ServerConfigs where one of the related Users match this filter */
+  SuperAdmins_SINGLE?: InputMaybe<UserWhere>;
+  /** Return ServerConfigs where some of the related Users match this filter */
+  SuperAdmins_SOME?: InputMaybe<UserWhere>;
   SuspendedModsAggregate?: InputMaybe<ServerConfigSuspendedModsAggregateInput>;
   /** Return ServerConfigs where all of the related ServerConfigSuspendedModsConnections match this filter */
   SuspendedModsConnection_ALL?: InputMaybe<ServerConfigSuspendedModsConnectionWhere>;
@@ -60925,6 +62172,12 @@ export type ServerRole = {
   canCreateDiscussion?: Maybe<Scalars['Boolean']['output']>;
   canCreateEvent?: Maybe<Scalars['Boolean']['output']>;
   canGiveFeedback?: Maybe<Scalars['Boolean']['output']>;
+  canManageAdmins?: Maybe<Scalars['Boolean']['output']>;
+  canManageMods?: Maybe<Scalars['Boolean']['output']>;
+  canManagePlugins?: Maybe<Scalars['Boolean']['output']>;
+  canManageRoles?: Maybe<Scalars['Boolean']['output']>;
+  canManageServerSettings?: Maybe<Scalars['Boolean']['output']>;
+  canManageSuperAdmins?: Maybe<Scalars['Boolean']['output']>;
   canUploadFile?: Maybe<Scalars['Boolean']['output']>;
   canUpvoteComment?: Maybe<Scalars['Boolean']['output']>;
   canUpvoteDiscussion?: Maybe<Scalars['Boolean']['output']>;
@@ -60954,6 +62207,12 @@ export type ServerRoleCreateInput = {
   canCreateDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
   canCreateEvent?: InputMaybe<Scalars['Boolean']['input']>;
   canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageAdmins?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageMods?: InputMaybe<Scalars['Boolean']['input']>;
+  canManagePlugins?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageRoles?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageServerSettings?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageSuperAdmins?: InputMaybe<Scalars['Boolean']['input']>;
   canUploadFile?: InputMaybe<Scalars['Boolean']['input']>;
   canUpvoteComment?: InputMaybe<Scalars['Boolean']['input']>;
   canUpvoteDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
@@ -60989,6 +62248,12 @@ export type ServerRoleEventPayload = {
   canCreateDiscussion?: Maybe<Scalars['Boolean']['output']>;
   canCreateEvent?: Maybe<Scalars['Boolean']['output']>;
   canGiveFeedback?: Maybe<Scalars['Boolean']['output']>;
+  canManageAdmins?: Maybe<Scalars['Boolean']['output']>;
+  canManageMods?: Maybe<Scalars['Boolean']['output']>;
+  canManagePlugins?: Maybe<Scalars['Boolean']['output']>;
+  canManageRoles?: Maybe<Scalars['Boolean']['output']>;
+  canManageServerSettings?: Maybe<Scalars['Boolean']['output']>;
+  canManageSuperAdmins?: Maybe<Scalars['Boolean']['output']>;
   canUploadFile?: Maybe<Scalars['Boolean']['output']>;
   canUpvoteComment?: Maybe<Scalars['Boolean']['output']>;
   canUpvoteDiscussion?: Maybe<Scalars['Boolean']['output']>;
@@ -61003,6 +62268,12 @@ export type ServerRoleOnCreateInput = {
   canCreateDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
   canCreateEvent?: InputMaybe<Scalars['Boolean']['input']>;
   canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageAdmins?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageMods?: InputMaybe<Scalars['Boolean']['input']>;
+  canManagePlugins?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageRoles?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageServerSettings?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageSuperAdmins?: InputMaybe<Scalars['Boolean']['input']>;
   canUploadFile?: InputMaybe<Scalars['Boolean']['input']>;
   canUpvoteComment?: InputMaybe<Scalars['Boolean']['input']>;
   canUpvoteDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
@@ -61025,6 +62296,12 @@ export type ServerRoleSort = {
   canCreateDiscussion?: InputMaybe<SortDirection>;
   canCreateEvent?: InputMaybe<SortDirection>;
   canGiveFeedback?: InputMaybe<SortDirection>;
+  canManageAdmins?: InputMaybe<SortDirection>;
+  canManageMods?: InputMaybe<SortDirection>;
+  canManagePlugins?: InputMaybe<SortDirection>;
+  canManageRoles?: InputMaybe<SortDirection>;
+  canManageServerSettings?: InputMaybe<SortDirection>;
+  canManageSuperAdmins?: InputMaybe<SortDirection>;
   canUploadFile?: InputMaybe<SortDirection>;
   canUpvoteComment?: InputMaybe<SortDirection>;
   canUpvoteDiscussion?: InputMaybe<SortDirection>;
@@ -61042,6 +62319,12 @@ export type ServerRoleSubscriptionWhere = {
   canCreateDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
   canCreateEvent?: InputMaybe<Scalars['Boolean']['input']>;
   canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageAdmins?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageMods?: InputMaybe<Scalars['Boolean']['input']>;
+  canManagePlugins?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageRoles?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageServerSettings?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageSuperAdmins?: InputMaybe<Scalars['Boolean']['input']>;
   canUploadFile?: InputMaybe<Scalars['Boolean']['input']>;
   canUpvoteComment?: InputMaybe<Scalars['Boolean']['input']>;
   canUpvoteDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
@@ -61070,6 +62353,12 @@ export type ServerRoleUpdateInput = {
   canCreateDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
   canCreateEvent?: InputMaybe<Scalars['Boolean']['input']>;
   canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageAdmins?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageMods?: InputMaybe<Scalars['Boolean']['input']>;
+  canManagePlugins?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageRoles?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageServerSettings?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageSuperAdmins?: InputMaybe<Scalars['Boolean']['input']>;
   canUploadFile?: InputMaybe<Scalars['Boolean']['input']>;
   canUpvoteComment?: InputMaybe<Scalars['Boolean']['input']>;
   canUpvoteDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
@@ -61095,6 +62384,12 @@ export type ServerRoleWhere = {
   canCreateDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
   canCreateEvent?: InputMaybe<Scalars['Boolean']['input']>;
   canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageAdmins?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageMods?: InputMaybe<Scalars['Boolean']['input']>;
+  canManagePlugins?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageRoles?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageServerSettings?: InputMaybe<Scalars['Boolean']['input']>;
+  canManageSuperAdmins?: InputMaybe<Scalars['Boolean']['input']>;
   canUploadFile?: InputMaybe<Scalars['Boolean']['input']>;
   canUpvoteComment?: InputMaybe<Scalars['Boolean']['input']>;
   canUpvoteDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
@@ -62044,6 +63339,9 @@ export type Subscription = {
   notificationCreated: NotificationCreatedEvent;
   notificationDeleted: NotificationDeletedEvent;
   notificationUpdated: NotificationUpdatedEvent;
+  ownEmailCreated: OwnEmailCreatedEvent;
+  ownEmailDeleted: OwnEmailDeletedEvent;
+  ownEmailUpdated: OwnEmailUpdatedEvent;
   pipelineStepCreated: PipelineStepCreatedEvent;
   pipelineStepDeleted: PipelineStepDeletedEvent;
   pipelineStepUpdated: PipelineStepUpdatedEvent;
@@ -63121,6 +64419,21 @@ export type SubscriptionNotificationDeletedArgs = {
 
 export type SubscriptionNotificationUpdatedArgs = {
   where?: InputMaybe<NotificationSubscriptionWhere>;
+};
+
+
+export type SubscriptionOwnEmailCreatedArgs = {
+  where?: InputMaybe<OwnEmailSubscriptionWhere>;
+};
+
+
+export type SubscriptionOwnEmailDeletedArgs = {
+  where?: InputMaybe<OwnEmailSubscriptionWhere>;
+};
+
+
+export type SubscriptionOwnEmailUpdatedArgs = {
+  where?: InputMaybe<OwnEmailSubscriptionWhere>;
 };
 
 
@@ -67315,6 +68628,12 @@ export type UpdateNotificationsMutationResponse = {
   __typename?: 'UpdateNotificationsMutationResponse';
   info: UpdateInfo;
   notifications: Array<Notification>;
+};
+
+export type UpdateOwnEmailsMutationResponse = {
+  __typename?: 'UpdateOwnEmailsMutationResponse';
+  info: UpdateInfo;
+  ownEmails: Array<OwnEmail>;
 };
 
 export type UpdatePipelineStepsMutationResponse = {

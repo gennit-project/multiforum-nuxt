@@ -32,20 +32,9 @@ const posterIsAdmin = computed(() => {
   );
 });
 
-const posterIsMod = computed(() => {
-  const channelRoles = props.eventData.Poster?.ChannelRoles;
-  if (!channelRoles) {
-    return false;
-  }
-  if (channelRoles.length === 0) {
-    return false;
-  }
-  const channelRole = channelRoles[0];
-  if (channelRole?.showModTag) {
-    return true;
-  }
-  return false;
-});
+const posterIsMod = computed(
+  () => props.eventData?.authorIsChannelModerator || false
+);
 
 const postedText = computed(() => {
   if (!props.eventData?.createdAt) {
