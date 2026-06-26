@@ -32,9 +32,7 @@ const closeUserProfileDropdown = () => (showUserProfileDropdown.value = false);
 
 // Test helpers (only in dev/test environments)
 const shouldExposeTestHelpers =
-  isDevRuntime ||
-  config.environment === 'test' ||
-  (typeof window !== 'undefined' && window.Cypress);
+  isDevRuntime || config.environment === 'test';
 
 if (shouldExposeTestHelpers) {
   useTestAuthHelpers();

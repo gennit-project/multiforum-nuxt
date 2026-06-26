@@ -279,8 +279,10 @@ When testing moderator behavior:
 
 Suspension end-to-end coverage lives in:
 
-- `tests/cypress/e2e/suspensions/suspendedUserPermissions.spec.cy.ts`
-- `tests/cypress/e2e/suspensions/serverLevelSuspension.spec.cy.ts`
+- `tests/playwright/mocked/suspensions/suspendedUserNotices.spec.ts`
+- `tests/playwright/mocked/suspensions/suspendedModNotices.spec.ts`
+- `tests/playwright/mocked/suspensions/botSuspension.spec.ts`
+- `tests/playwright/mocked/discussions/archiveAndSuspend.spec.ts`
 
 ## Design Direction
 

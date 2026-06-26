@@ -20,7 +20,7 @@ export default defineNuxtPlugin(() => {
   const modProfileNameVar = useModProfileName();
 
   // Always check for mock auth data in localStorage - this is safe because
-  // mock auth data is only set by test code (Playwright, Cypress)
+  // mock auth data is only set by test code (Playwright)
   const syncMockAuthFromStorage = () => {
     const mockUsername = window.localStorage.getItem('mock_username');
     const mockModProfileName = window.localStorage.getItem(
@@ -46,7 +46,6 @@ export default defineNuxtPlugin(() => {
     import.meta.env.DEV ||
     config.environment === 'test' ||
     import.meta.env.VITE_E2E_MOCK_MODE === 'true' ||
-    (typeof window !== 'undefined' && window.Cypress) ||
     hasMockAuth;
 
   const setAuthStateDirect = (authState: {
