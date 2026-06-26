@@ -98,7 +98,7 @@ const modBadgeClasses = computed(() => {
               >Admin</span
             >
             <span
-              v-else-if="isMod"
+              v-if="isMod"
               :class="modBadgeClasses"
             >
               Mod
@@ -159,7 +159,7 @@ const modBadgeClasses = computed(() => {
           >Admin</span
         >
         <span
-          v-else-if="isMod"
+          v-if="isMod"
           :class="modBadgeClasses"
         >
           Mod
@@ -194,7 +194,7 @@ const modBadgeClasses = computed(() => {
           >Admin</span
         >
         <span
-          v-else-if="isMod"
+          v-if="isMod"
           :class="modBadgeClasses"
         >
           Mod
