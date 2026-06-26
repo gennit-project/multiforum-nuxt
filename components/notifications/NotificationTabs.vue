@@ -1,15 +1,26 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useUsername } from '@/composables/useAuthState';
 import { timeAgo } from '@/utils';
 import type { Notification } from '@/__generated__/graphql';
 import MarkdownRenderer from '../MarkdownRenderer.vue';
-import { MARK_NOTIFICATIONS_AS_READ } from '@/graphQLData/user/mutations';
+import {
+  MARK_NOTIFICATIONS_AS_READ,
+  MARK_NOTIFICATION_AS_READ,
+} from '@/graphQLData/user/mutations';
+import { UPDATE_SCRATCHPAD_ENTRY_VISIBILITY } from '@/graphQLData/scratchpad/mutations';
 import {
   GET_FEEDBACK_NOTIFICATIONS,
   GET_GENERAL_NOTIFICATIONS,
 } from '@/graphQLData/notification/queries';
+
+// The generated Notification type doesn't yet carry the ScratchpadEntry link
+// (super upvote notifications), so augment it locally.
+type ScratchpadEntryRef = { id: string; isPublic: boolean };
+type NotificationWithEntry = Notification & {
+  ScratchpadEntry?: ScratchpadEntryRef | null;
+};
 
 const NOTIFICATION_PAGE_LIMIT = 15;
 
@@ -84,12 +95,71 @@ markAsReadDone(() => {
   }
 });
 
-const generalNotifications = computed<Notification[]>(() => {
+// Per-notification actions for super-upvote ("scratchpad") notifications:
+// "Show on profile" publishes the thank-you note and marks the notification
+// read; "Ignore" just marks it read.
+const { mutate: markNotificationAsRead } = useMutation(MARK_NOTIFICATION_AS_READ);
+const { mutate: showScratchpadEntry } = useMutation(
+  UPDATE_SCRATCHPAD_ENTRY_VISIBILITY
+);
+
+const pendingNotificationId = ref<string | null>(null);
+const actionError = ref('');
+
+const refetchActive = () =>
+  activeTab.value === 'general' ? refetchGeneral() : refetchFeedback();
+
+const canActOnScratchpadEntry = (notification: NotificationWithEntry) =>
+  notification.notificationType === 'scratchpad' &&
+  !!notification.ScratchpadEntry?.id &&
+  !notification.ScratchpadEntry.isPublic &&
+  !notification.read;
+
+const isPublishedScratchpadEntry = (notification: NotificationWithEntry) =>
+  notification.notificationType === 'scratchpad' &&
+  !!notification.ScratchpadEntry?.isPublic;
+
+const handleIgnore = async (notification: NotificationWithEntry) => {
+  pendingNotificationId.value = notification.id;
+  actionError.value = '';
+  try {
+    await markNotificationAsRead({
+      username: usernameVar.value,
+      notificationId: notification.id,
+    });
+    await refetchActive();
+  } catch (error) {
+    actionError.value = (error as Error).message;
+  } finally {
+    pendingNotificationId.value = null;
+  }
+};
+
+const handleShowOnProfile = async (notification: NotificationWithEntry) => {
+  const entryId = notification.ScratchpadEntry?.id;
+  if (!entryId) return;
+  pendingNotificationId.value = notification.id;
+  actionError.value = '';
+  try {
+    await showScratchpadEntry({ scratchpadEntryId: entryId, isPublic: true });
+    await markNotificationAsRead({
+      username: usernameVar.value,
+      notificationId: notification.id,
+    });
+    await refetchActive();
+  } catch (error) {
+    actionError.value = (error as Error).message;
+  } finally {
+    pendingNotificationId.value = null;
+  }
+};
+
+const generalNotifications = computed<NotificationWithEntry[]>(() => {
   if (!generalResult.value?.users?.[0]) return [];
   return generalResult.value.users[0].Notifications || [];
 });
 
-const feedbackNotifications = computed<Notification[]>(() => {
+const feedbackNotifications = computed<NotificationWithEntry[]>(() => {
   if (!feedbackResult.value?.users?.[0]) return [];
   return feedbackResult.value.users[0].Notifications || [];
 });
@@ -267,6 +337,7 @@ const reachedEnd = computed(() => {
           />
         </div>
         <ErrorBanner v-if="markAsReadError" :text="markAsReadError.message" />
+        <ErrorBanner v-if="actionError" :text="actionError" />
 
         <ul
           role="list"
@@ -287,6 +358,39 @@ const reachedEnd = computed(() => {
               :text="notification.text"
               class="w-full"
             />
+            <div
+              v-if="canActOnScratchpadEntry(notification)"
+              class="mt-3 flex flex-wrap items-center gap-2"
+              :data-testid="`scratchpad-notification-actions-${notification.id}`"
+            >
+              <button
+                type="button"
+                data-testid="notification-show-on-profile"
+                :disabled="pendingNotificationId === notification.id"
+                class="inline-flex items-center gap-1 rounded-full bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+                @click="handleShowOnProfile(notification)"
+              >
+                <i class="fa-solid fa-star" />
+                Show on profile
+              </button>
+              <button
+                type="button"
+                data-testid="notification-ignore"
+                :disabled="pendingNotificationId === notification.id"
+                class="inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                @click="handleIgnore(notification)"
+              >
+                Ignore
+              </button>
+            </div>
+            <p
+              v-else-if="isPublishedScratchpadEntry(notification)"
+              class="mt-2 text-sm text-green-600 dark:text-green-400"
+              data-testid="notification-showing-on-profile"
+            >
+              <i class="fa-solid fa-circle-check mr-1" />
+              Showing on your Kudos page
+            </p>
           </li>
         </ul>
 

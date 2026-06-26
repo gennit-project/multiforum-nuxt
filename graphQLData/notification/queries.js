@@ -11,6 +11,10 @@ export const GET_NOTIFICATIONS = gql`
         read
         text
         notificationType
+        ScratchpadEntry {
+          id
+          isPublic
+        }
       }
       NotificationsAggregate(where: { read: false }) {
         count
@@ -62,6 +66,10 @@ export const GET_GENERAL_NOTIFICATIONS = gql`
         read
         text
         notificationType
+        ScratchpadEntry {
+          id
+          isPublic
+        }
       }
       NotificationsAggregate(
         where: { read: false, NOT: { notificationType: "feedback" } }

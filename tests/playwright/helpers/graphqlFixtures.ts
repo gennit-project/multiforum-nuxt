@@ -153,6 +153,7 @@ export type DiscussionChannelFixture = Pick<
   CommentsAggregate: CountAggregate;
   UpvotedByUsers: Array<Pick<User, 'username'>>;
   UpvotedByUsersAggregate: CountAggregate;
+  SuperUpvotedByUsers: Array<Pick<User, 'username'>>;
   SubscribedToNotifications: Array<Pick<User, 'username'>>;
 };
 
@@ -381,6 +382,7 @@ export const buildDiscussionChannel = ({
   CommentsAggregate: { count: commentsCount },
   UpvotedByUsers: [{ username: DEFAULT_USERNAME }],
   UpvotedByUsersAggregate: { count: 1 },
+  SuperUpvotedByUsers: [],
   SubscribedToNotifications: [],
   Answers: [],
   LabelOptions: [],
