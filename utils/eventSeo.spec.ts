@@ -1,20 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import {
-  truncateDescription,
   buildEventSeoMeta,
   buildEventStructuredData,
   type EventSeoData,
 } from './eventSeo';
-
-describe('truncateDescription', () => {
-  it('leaves a short description unchanged', () => {
-    expect(truncateDescription('short', 160)).toBe('short');
-  });
-
-  it('truncates and appends an ellipsis past the limit', () => {
-    expect(truncateDescription('abcdef', 3)).toBe('abc...');
-  });
-});
 
 describe('buildEventSeoMeta', () => {
   const params = {

@@ -54,6 +54,4 @@ export function mergeChannelCounts<T extends ChannelCountLike>(
 }
 
 /** Toggle a tag in the selected-tags list (pure: returns a new array). */
-export function toggleSelectedTag(tags: string[], tag: string): string[] {
-  return tags.includes(tag) ? tags.filter((t) => t !== tag) : [...tags, tag];
-}
+export { toggleInArray as toggleSelectedTag } from '@/utils/arrayHelpers';

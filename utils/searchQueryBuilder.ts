@@ -65,16 +65,7 @@ export function buildSearchQuery(
   };
 }
 
-/**
- * Return a new array with `value` removed if present, or appended if absent.
- */
-export function toggleInArray<T>(array: T[], value: T): T[] {
-  const index = array.indexOf(value);
-  if (index === -1) {
-    return [...array, value];
-  }
-  return array.filter((_, i) => i !== index);
-}
+export { toggleInArray } from '@/utils/arrayHelpers';
 
 /**
  * Two recent searches are considered the same when query, type, modified

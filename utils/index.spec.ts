@@ -5,7 +5,6 @@ import {
   encodeSpacesInURL,
   getDuration,
   getTagLabel,
-  getLinksInText,
   getChannelLabel,
 } from './index';
 
@@ -80,18 +79,6 @@ describe('getTagLabel', () => {
 
   it('includes the count when tags are selected', () => {
     expect(getTagLabel(['a', 'b'])).toBe('Tags (2)');
-  });
-});
-
-describe('getLinksInText', () => {
-  it('extracts a non-image http link', () => {
-    expect(getLinksInText('see https://example.com/page now')).toEqual([
-      'https://example.com/page',
-    ]);
-  });
-
-  it('returns an empty array for text with no links', () => {
-    expect(getLinksInText('no links here')).toEqual([]);
   });
 });
 

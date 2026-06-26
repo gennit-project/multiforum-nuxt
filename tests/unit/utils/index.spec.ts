@@ -5,7 +5,6 @@ import {
   encodeSpacesInURL,
   getDuration,
   getTagLabel,
-  getLinksInText,
   getChannelLabel,
   checkUrl,
   isAlphaNumeric,
@@ -180,68 +179,6 @@ describe('getTagLabel', () => {
 
   it('returns count of 1 for single tag', () => {
     expect(getTagLabel(['single'])).toBe('Tags (1)');
-  });
-});
-
-describe('getLinksInText', () => {
-  it('extracts http links from text', () => {
-    const text = 'Check out http://example.com for more info';
-
-    const result = getLinksInText(text);
-
-    expect(result).toContain('http://example.com');
-  });
-
-  it('extracts https links from text', () => {
-    const text = 'Visit https://secure.example.com/page';
-
-    const result = getLinksInText(text);
-
-    expect(result).toContain('https://secure.example.com/page');
-  });
-
-  it('extracts multiple links', () => {
-    const text = 'Check https://one.com and https://two.com';
-
-    const result = getLinksInText(text);
-
-    expect(result).toHaveLength(2);
-  });
-
-  it('excludes image URLs', () => {
-    const text = 'Image: https://example.com/photo.jpg';
-
-    const result = getLinksInText(text);
-
-    expect(result).toHaveLength(0);
-  });
-
-  it('excludes png image URLs', () => {
-    const text = 'Image: https://example.com/photo.png';
-
-    const result = getLinksInText(text);
-
-    expect(result).toHaveLength(0);
-  });
-
-  it('excludes gif image URLs', () => {
-    const text = 'Animation: https://example.com/anim.gif';
-
-    const result = getLinksInText(text);
-
-    expect(result).toHaveLength(0);
-  });
-
-  it('returns empty array for text without links', () => {
-    expect(getLinksInText('No links here')).toEqual([]);
-  });
-
-  it('returns empty array for empty string', () => {
-    expect(getLinksInText('')).toEqual([]);
-  });
-
-  it('returns empty array for falsy input', () => {
-    expect(getLinksInText(null as unknown as string)).toEqual([]);
   });
 });
 

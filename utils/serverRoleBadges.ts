@@ -1,35 +1,14 @@
+import { resolveRoleBadge, type RoleBadgeParams } from '@/utils/roleBadges';
+
 export type ServerRoleBadge = 'serverAdmin' | 'serverMod' | null;
 
-type GetServerRoleBadgeParams = {
-  username?: string | null;
-  modProfileName?: string | null;
-  adminUsernames?: string[];
-  modUsernames?: string[];
-  modProfileNames?: string[];
-};
-
-const hasMatch = (value: string | null | undefined, candidates: string[]) => {
-  if (!value) {
-    return false;
-  }
-
-  return candidates.includes(value);
-};
-
-export const getServerRoleBadge = ({
-  username,
-  modProfileName,
-  adminUsernames = [],
-  modUsernames = [],
-  modProfileNames = [],
-}: GetServerRoleBadgeParams): ServerRoleBadge => {
-  if (hasMatch(username, adminUsernames)) {
+export const getServerRoleBadge = (params: RoleBadgeParams): ServerRoleBadge => {
+  const kind = resolveRoleBadge(params);
+  if (kind === 'admin') {
     return 'serverAdmin';
   }
-
-  if (hasMatch(username, modUsernames) || hasMatch(modProfileName, modProfileNames)) {
+  if (kind === 'mod') {
     return 'serverMod';
   }
-
   return null;
 };
