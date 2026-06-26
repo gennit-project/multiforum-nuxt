@@ -12,10 +12,19 @@ import {
   installGraphqlMocks,
   waitForGraphqlOperation,
 } from '../../helpers/mockGraphql';
+import {
+  createRulesJSON,
+  DEFAULT_RULES_JSON,
+} from '../../helpers/moderationFixtures';
 
 const TEST_CHANNEL = 'cats';
 const TEST_USER = 'alice';
 const ISSUE_NUMBER = 1;
+
+// Channel-scoped rule (distinct from the server rule) so the modal shows both.
+const CHANNEL_RULES_JSON = createRulesJSON([
+  { summary: 'No spam', detail: 'Do not post spam.' },
+]);
 
 // Base operations the app shell + channel/issues layout fire on any
 // authenticated channel-issue page. The current user is a channel admin so the
@@ -95,6 +104,17 @@ const getBaseMocks = (username: string) => ({
   countClosedIssues: () => ({ data: { issuesAggregate: { count: 0 } } }),
   getEvents: () => ({
     data: { events: [], eventsAggregate: { count: 0 } },
+  }),
+  // Rules shown in the broken-rules modal: server-wide + channel-scoped.
+  getServerRules: () => ({
+    data: {
+      serverConfigs: [{ serverName: 'Listical', rules: DEFAULT_RULES_JSON }],
+    },
+  }),
+  getChannelRules: () => ({
+    data: {
+      channels: [{ uniqueName: TEST_CHANNEL, rules: CHANNEL_RULES_JSON }],
+    },
   }),
 });
 
@@ -247,6 +267,15 @@ test.describe('Moderation issue detail', () => {
       await expect(
         page.getByText('Please select at least one broken rule')
       ).toBeVisible();
+
+      // The modal is populated with the server config's rules...
+      await expect(page.getByText('Server Rules')).toBeVisible();
+      await expect(page.getByText('Be kind')).toBeVisible();
+
+      // ...and a rule is selectable.
+      const ruleCheckbox = page.locator('input[value="Be kind"]');
+      await ruleCheckbox.check();
+      await expect(ruleCheckbox).toBeChecked();
     } finally {
       await testInfo.attach('graphql-operations.json', {
         body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
