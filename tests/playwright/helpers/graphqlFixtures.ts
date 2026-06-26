@@ -603,3 +603,133 @@ export const buildEvent = ({
   }),
   ...overrides,
 });
+
+// ---------------------------------------------------------------------------
+// Moderation issues
+//
+// Shapes match GET_ISSUE / ISSUE_BASE_FIELDS (graphQLData/issue/queries.js) so
+// the mod issue-detail flow (and future mod flows) can build issue mocks
+// without re-declaring the query shape inline.
+// ---------------------------------------------------------------------------
+
+export type ModerationActionFixture = {
+  __typename: 'ModerationAction';
+  id: string;
+  actionDescription: string;
+  actionType: string;
+  createdAt: string;
+  ModerationProfile: { displayName: string } | null;
+  User: { username: string } | null;
+  Revision: null;
+  Comment: CommentFixture | null;
+};
+
+export const buildModerationAction = ({
+  id = 'mod-action-1',
+  actionType = 'report',
+  actionDescription = 'reported this issue',
+  moderatorDisplayName = 'mod-alice',
+  createdAt = MOCK_DATE,
+  comment = null,
+  overrides = {},
+}: {
+  id?: string;
+  actionType?: string;
+  actionDescription?: string;
+  moderatorDisplayName?: string | null;
+  createdAt?: string;
+  comment?: CommentFixture | null;
+  overrides?: Override<ModerationActionFixture>;
+} = {}): ModerationActionFixture => ({
+  __typename: 'ModerationAction',
+  id,
+  actionDescription,
+  actionType,
+  createdAt,
+  ModerationProfile: moderatorDisplayName
+    ? { displayName: moderatorDisplayName }
+    : null,
+  User: null,
+  Revision: null,
+  Comment: comment,
+  ...overrides,
+});
+
+export type IssueFixture = {
+  __typename: 'Issue';
+  id: string;
+  issueNumber: number;
+  title: string;
+  body: string;
+  isOpen: boolean;
+  createdAt: string;
+  updatedAt: string;
+  relatedCommentId: string | null;
+  relatedDiscussionId: string | null;
+  relatedEventId: string | null;
+  relatedImageId: string | null;
+  relatedWikiPageId: string | null;
+  relatedWikiRevisionId: string | null;
+  relatedChannelUniqueName: string | null;
+  channelUniqueName: string;
+  Author: { __typename: 'User'; username: string };
+  flaggedServerRuleViolation: boolean;
+  SubscribedToNotifications: Array<{ username: string }>;
+  locked: boolean;
+  lockedAt: string | null;
+  lockReason: string | null;
+  LockedBy: { displayName: string } | null;
+  ActivityFeed: ModerationActionFixture[];
+  ActivityFeedAggregate: { count: number };
+};
+
+export const buildIssue = ({
+  issueNumber = 1,
+  channelUniqueName = 'cats',
+  title = 'Reported discussion',
+  body = 'This discussion violates the rules.',
+  isOpen = true,
+  authorUsername = DEFAULT_USERNAME,
+  locked = false,
+  activityFeed = [buildModerationAction()],
+  overrides = {},
+}: {
+  issueNumber?: number;
+  channelUniqueName?: string;
+  title?: string;
+  body?: string;
+  isOpen?: boolean;
+  authorUsername?: string;
+  locked?: boolean;
+  activityFeed?: ModerationActionFixture[];
+  overrides?: Override<IssueFixture>;
+} = {}): IssueFixture => ({
+  __typename: 'Issue',
+  id: `issue-${issueNumber}`,
+  issueNumber,
+  title,
+  body,
+  isOpen,
+  createdAt: MOCK_DATE,
+  updatedAt: MOCK_DATE,
+  relatedCommentId: null,
+  relatedDiscussionId: null,
+  relatedEventId: null,
+  relatedImageId: null,
+  relatedWikiPageId: null,
+  relatedWikiRevisionId: null,
+  relatedChannelUniqueName: null,
+  channelUniqueName,
+  Author: { __typename: 'User', username: authorUsername },
+  flaggedServerRuleViolation: false,
+  SubscribedToNotifications: [],
+  locked,
+  lockedAt: locked ? MOCK_DATE : null,
+  lockReason: locked ? 'Locked for review' : null,
+  LockedBy: locked ? { displayName: 'mod-alice' } : null,
+  ActivityFeed: activityFeed,
+  ActivityFeedAggregate: {
+    count: activityFeed.filter((a) => a.actionType === 'report').length,
+  },
+  ...overrides,
+});
