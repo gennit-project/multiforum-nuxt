@@ -96,9 +96,6 @@ const COMMENT_FIELDS = gql`
         discussionKarma
         commentKarma
         isBot
-        ChannelRoles {
-          showModTag
-        }
       }
     }
     ChildCommentsAggregate {
@@ -190,11 +187,6 @@ export const GET_DISCUSSION_COMMENTS = gql`
           title
           Author {
             ...AuthorFields
-            ... on User {
-              ChannelRoles {
-                showModTag
-              }
-            }
           }
         }
         CommentsAggregate {
@@ -236,11 +228,6 @@ export const GET_DISCUSSION_COMMENTS = gql`
         isFavoritedByUser
         CommentAuthor {
           ...AuthorFields
-          ... on User {
-            ChannelRoles {
-              showModTag
-            }
-          }
         }
         ChildCommentsAggregate {
           count
@@ -334,9 +321,6 @@ export const GET_EVENT_COMMENTS = gql`
           createdAt
           discussionKarma
           commentKarma
-          ChannelRoles {
-            showModTag
-          }
         }
       }
       Comments {

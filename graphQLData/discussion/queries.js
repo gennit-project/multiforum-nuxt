@@ -96,6 +96,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
           createdAt
           updatedAt
           hasSensitiveContent
+          authorIsChannelModerator(channelUniqueName: $channelUniqueName)
           Author {
             ... on User {
               displayName
@@ -104,9 +105,6 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
               commentKarma
               username
               profilePicURL
-            }
-            ChannelRoles(where: { channelUniqueName: $channelUniqueName }) {
-              showModTag
             }
           }
           Album {
@@ -252,11 +250,9 @@ export const GET_DISCUSSION = gql`
       updatedAt
       hasDownload
       hasSensitiveContent
+      authorIsChannelModerator(channelUniqueName: $channelUniqueName)
       Author {
         ...AuthorFields
-        ChannelRoles(where: { channelUniqueName: $channelUniqueName }) {
-          showModTag
-        }
       }
       Album {
         id

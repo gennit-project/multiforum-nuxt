@@ -19,7 +19,6 @@ type AuthorWithRoles =
   | (Pick<User, '__typename'> & {
       username?: string | null;
       displayName?: string | null;
-      ChannelRoles?: Array<{ showModTag?: boolean | null }>;
     })
   | (Pick<ModerationProfile, '__typename'> & {
       displayName?: string | null;
@@ -488,9 +487,9 @@ export const getCommentAuthorStatus = (params: {
 
     isAdmin = isServerAdmin;
 
-    // Check mod status from ChannelRoles
-    isMod =
-      isServerMod || Boolean(author.ChannelRoles?.[0]?.showModTag);
+    // Mod status is membership-derived (server/forum moderator lists); the
+    // legacy ChannelRole.showModTag flag has been removed.
+    isMod = isServerMod;
   } else if (author.__typename === 'ModerationProfile') {
     const serverRoleBadge = getServerRoleBadge({
       modProfileName: author.displayName,

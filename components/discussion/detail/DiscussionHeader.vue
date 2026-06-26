@@ -328,7 +328,7 @@ const authorIsAdmin = computed(() => {
   );
 });
 const authorIsMod = computed(
-  () => props.discussion?.Author?.ChannelRoles?.[0]?.showModTag || false
+  () => props.discussion?.authorIsChannelModerator || false
 );
 
 const warningModalTitle = computed(() => {

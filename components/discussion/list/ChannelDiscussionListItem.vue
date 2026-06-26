@@ -113,10 +113,9 @@ const authorIsAdmin = computed(() => {
   );
 });
 
-const authorIsMod = computed(() => {
-  const author = props.discussion?.Author;
-  return author?.ChannelRoles?.[0]?.showModTag || false;
-});
+const authorIsMod = computed(
+  () => props.discussion?.authorIsChannelModerator || false
+);
 
 const errorMessage = ref('');
 // Local state for this specific discussion item's expanded/collapsed state

@@ -161,11 +161,9 @@ describe('ChannelDownloadListItem author badges', () => {
     expect(author(wrapper).props('isAdmin')).toBe(true);
   });
 
-  it('marks the author as a mod when their channel role flags it', () => {
+  it('marks the author as a mod when the content flags them a channel moderator', () => {
     const wrapper = mountItem(
-      makeDiscussion({
-        Author: { username: 'alice', ChannelRoles: [{ showModTag: true }] },
-      })
+      makeDiscussion({ authorIsChannelModerator: true })
     );
 
     expect(author(wrapper).props('isMod')).toBe(true);
