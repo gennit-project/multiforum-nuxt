@@ -1,6 +1,6 @@
 import type { Ref } from 'vue';
+import type { Reference } from '@apollo/client/core';
 import { useMutation } from '@vue/apollo-composable';
-import { useRoute } from 'nuxt/app';
 import type { Comment as CommentType } from '@/__generated__/graphql';
 import {
   CREATE_COMMENT,
@@ -8,9 +8,6 @@ import {
   DELETE_COMMENT,
   SOFT_DELETE_COMMENT,
 } from '@/graphQLData/comment/mutations';
-import { GET_COMMENT_REPLIES } from '@/graphQLData/comment/queries';
-import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
-import { useModProfileName } from '@/composables/useAuthState';
 
 type UseCommentCrudMutationsParams = {
   discussionId: Ref<string | undefined>;
@@ -43,9 +40,6 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
     onIncrementCommentCount,
     onDecrementCommentCount,
   } = params;
-
-  const route = useRoute();
-  const modProfileNameVar = useModProfileName();
 
   // CREATE COMMENT mutation
   const {
@@ -82,58 +76,52 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
         return;
       }
 
-      // Handle replies - always use GET_COMMENT_REPLIES query
+      // Handle replies. The replies list is served by the getCommentReplies
+      // query field, which is paginated, sorted, and mod-scoped. Reconstructing
+      // the exact variables of the active query to writeQuery into is brittle:
+      // any mismatch (sort/limit/offset/modName) silently writes to a different
+      // cache entry, so the count increments (a "Load more" appears) but the new
+      // reply never shows up in the visible list. Instead, modify every cached
+      // getCommentReplies entry for this parent comment so the reply appears
+      // regardless of the current sort/pagination/mod profile. The created
+      // comment is already normalized in the cache from the mutation result, so
+      // we reference it by id.
       try {
-        const existingData = cache.readQuery({
-          query: GET_COMMENT_REPLIES,
-          variables: {
-            commentId: newCommentParentId,
-            modName: modProfileNameVar.value,
-            limit: 5,
-            offset: 0,
-            sort: getSortFromQuery(route.query),
-          },
-        });
+        const newCommentId = newComment.id;
 
-        const existingReplies =
-          (
-            existingData as {
-              getCommentReplies?: {
-                ChildComments?: CommentType[];
-                aggregateChildCommentCount?: number;
+        cache.modify({
+          fields: {
+            getCommentReplies(
+              existing,
+              { storeFieldName, toReference, readField }
+            ) {
+              if (!existing) return existing;
+              // storeFieldName looks like getCommentReplies({"commentId":"...",...})
+              if (
+                !storeFieldName.includes(`"commentId":"${newCommentParentId}"`)
+              ) {
+                return existing;
+              }
+              const existingChildComments = existing.ChildComments || [];
+              const alreadyPresent = existingChildComments.some(
+                (ref: Reference) => readField('id', ref) === newCommentId
+              );
+              if (alreadyPresent) return existing;
+              return {
+                ...existing,
+                ChildComments: [
+                  toReference({ __typename: 'Comment', id: newCommentId }),
+                  ...existingChildComments,
+                ],
+                aggregateChildCommentCount:
+                  (existing.aggregateChildCommentCount || 0) + 1,
               };
-            }
-          )?.getCommentReplies?.ChildComments || [];
-        const existingCount =
-          (
-            existingData as {
-              getCommentReplies?: {
-                ChildComments?: CommentType[];
-                aggregateChildCommentCount?: number;
-              };
-            }
-          )?.getCommentReplies?.aggregateChildCommentCount || 0;
-
-        // Write the updated data back to the cache
-        cache.writeQuery({
-          query: GET_COMMENT_REPLIES,
-          variables: {
-            commentId: newCommentParentId,
-            modName: modProfileNameVar.value,
-            limit: 5,
-            offset: 0,
-            sort: getSortFromQuery(route.query),
-          },
-          data: {
-            getCommentReplies: {
-              __typename: 'CommentReplies',
-              ChildComments: [newComment, ...existingReplies],
-              aggregateChildCommentCount: existingCount + 1,
             },
           },
         });
 
-        // Update the parent comment's counts
+        // Update the parent comment's counts so the replies section renders
+        // (replyCount > 0) and the "load more" math stays correct.
         cache.modify({
           id: cache.identify({
             __typename: 'Comment',

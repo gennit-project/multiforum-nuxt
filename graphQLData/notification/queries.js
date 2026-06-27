@@ -58,7 +58,12 @@ export const GET_GENERAL_NOTIFICATIONS = gql`
     users(where: { username: $username }) {
       username
       Notifications(
-        where: { NOT: { notificationType: "feedback" } }
+        where: {
+          OR: [
+            { notificationType: null }
+            { NOT: { notificationType: "feedback" } }
+          ]
+        }
         options: $options
       ) {
         id
@@ -72,12 +77,23 @@ export const GET_GENERAL_NOTIFICATIONS = gql`
         }
       }
       NotificationsAggregate(
-        where: { read: false, NOT: { notificationType: "feedback" } }
+        where: {
+          read: false
+          OR: [
+            { notificationType: null }
+            { NOT: { notificationType: "feedback" } }
+          ]
+        }
       ) {
         count
       }
       totalNotificationsAggregate: NotificationsAggregate(
-        where: { NOT: { notificationType: "feedback" } }
+        where: {
+          OR: [
+            { notificationType: null }
+            { NOT: { notificationType: "feedback" } }
+          ]
+        }
       ) {
         count
       }
