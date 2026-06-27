@@ -5,7 +5,8 @@ import { DateTime } from 'luxon';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import { stableRelativeTime } from '@/utils';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
-import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
+import { getAuthorBadges } from '@/utils/roleBadges';
 
 const props = withDefaults(
   defineProps<{
@@ -22,18 +23,17 @@ const props = withDefaults(
 );
 
 const { serverAdminUsernames } = useServerRoleMembership();
+const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
+  useForumRoleMembership();
 
-const posterIsAdmin = computed(() => {
-  return (
-    getServerRoleBadge({
-      username: props.eventData.Poster?.username,
-      adminUsernames: serverAdminUsernames.value,
-    }) === 'serverAdmin'
-  );
-});
-
-const posterIsMod = computed(
-  () => props.eventData?.authorIsChannelModerator || false
+const posterBadges = computed(() =>
+  getAuthorBadges({
+    username: props.eventData.Poster?.username,
+    serverAdminUsernames: serverAdminUsernames.value,
+    forumAdminUsernames: forumAdminUsernames.value,
+    forumModUsernames: forumModUsernames.value,
+    forumModProfileNames: forumModProfileNames.value,
+  })
 );
 
 const postedText = computed(() => {
@@ -62,8 +62,9 @@ function getTimeZone(startTime: string) {
     <div v-if="showPoster" class="organizer flex items-center gap-1">
       <UsernameWithTooltip
         v-if="eventData.Poster?.username"
-        :is-admin="posterIsAdmin"
-        :is-mod="posterIsMod"
+        :is-admin="posterBadges.isAdmin"
+        :is-forum-admin="posterBadges.isForumAdmin"
+        :is-forum-mod="posterBadges.isForumMod"
         :username="eventData.Poster.username"
         :src="eventData.Poster.profilePicURL ?? ''"
         :display-name="eventData.Poster.displayName || ''"

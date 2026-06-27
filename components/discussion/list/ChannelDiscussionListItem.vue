@@ -24,7 +24,8 @@ import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
 import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
-import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
+import { getAuthorBadges } from '@/utils/roleBadges';
 
 const usernameVar = useUsername();
 const isAuthenticatedVar = useIsAuthenticated();
@@ -97,6 +98,8 @@ const channelIdInParams = computed(() =>
   typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
 const { serverAdminUsernames } = useServerRoleMembership();
+const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
+  useForumRoleMembership();
 const defaultUniqueName = computed(
   () => channelIdInParams.value || props.discussionChannel.channelUniqueName
 );
@@ -104,17 +107,14 @@ const commentCount = computed(
   () => props.discussionChannel?.CommentsAggregate?.count || 0
 );
 
-const authorIsAdmin = computed(() => {
-  return (
-    getServerRoleBadge({
-      username: props.discussion?.Author?.username,
-      adminUsernames: serverAdminUsernames.value,
-    }) === 'serverAdmin'
-  );
-});
-
-const authorIsMod = computed(
-  () => props.discussion?.authorIsChannelModerator || false
+const authorBadges = computed(() =>
+  getAuthorBadges({
+    username: props.discussion?.Author?.username,
+    serverAdminUsernames: serverAdminUsernames.value,
+    forumAdminUsernames: forumAdminUsernames.value,
+    forumModUsernames: forumModUsernames.value,
+    forumModProfileNames: forumModProfileNames.value,
+  })
 );
 
 const errorMessage = ref('');
@@ -319,8 +319,9 @@ const revealSensitiveContent = () => {
                   }}</span>
                   <UsernameWithTooltip
                     v-if="authorUsername"
-                    :is-admin="authorIsAdmin"
-                    :is-mod="authorIsMod"
+                    :is-admin="authorBadges.isAdmin"
+                    :is-forum-admin="authorBadges.isForumAdmin"
+                    :is-forum-mod="authorBadges.isForumMod"
                     :username="authorUsername"
                     :src="authorProfilePicURL ?? ''"
                     :display-name="authorDisplayName ?? ''"

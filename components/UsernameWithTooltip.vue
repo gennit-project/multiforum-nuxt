@@ -10,7 +10,8 @@ interface Props {
   commentKarma?: number;
   discussionKarma?: number;
   isAdmin?: boolean;
-  isMod?: boolean;
+  isForumAdmin?: boolean;
+  isForumMod?: boolean;
   isOriginalPoster?: boolean;
   disableTooltip?: boolean;
   lightText?: boolean;
@@ -23,7 +24,8 @@ const props = withDefaults(defineProps<Props>(), {
   commentKarma: 0,
   discussionKarma: 0,
   isAdmin: false,
-  isMod: false,
+  isForumAdmin: false,
+  isForumMod: false,
   isOriginalPoster: false,
   disableTooltip: false,
   lightText: false,
@@ -98,10 +100,15 @@ const modBadgeClasses = computed(() => {
               >Admin</span
             >
             <span
-              v-if="isMod"
+              v-if="isForumAdmin"
+              :class="badgeClasses"
+              >Forum Admin</span
+            >
+            <span
+              v-if="isForumMod"
               :class="modBadgeClasses"
             >
-              Mod
+              Forum Mod
             </span>
             <span
               v-if="isOriginalPoster"
@@ -159,10 +166,15 @@ const modBadgeClasses = computed(() => {
           >Admin</span
         >
         <span
-          v-if="isMod"
+          v-if="isForumAdmin"
+          :class="badgeClasses"
+          >Forum Admin</span
+        >
+        <span
+          v-if="isForumMod"
           :class="modBadgeClasses"
         >
-          Mod
+          Forum Mod
         </span>
         <span
           v-if="isOriginalPoster"
@@ -194,10 +206,15 @@ const modBadgeClasses = computed(() => {
           >Admin</span
         >
         <span
-          v-if="isMod"
+          v-if="isForumAdmin"
+          :class="badgeClasses"
+          >Forum Admin</span
+        >
+        <span
+          v-if="isForumMod"
           :class="modBadgeClasses"
         >
-          Mod
+          Forum Mod
         </span>
         <span
           v-if="isOriginalPoster"
