@@ -25,8 +25,7 @@ import { useMutation } from '@vue/apollo-composable';
 import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import RevisionDiffInline from '@/components/mod/RevisionDiffInline.vue';
-import { getForumRoleBadge } from '@/utils/forumRoleBadges';
-import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import { getAuthorBadges } from '@/utils/roleBadges';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
@@ -372,23 +371,16 @@ const showCommentBody = computed(() => {
   return !isEditAction.value || !hasCommentRevision.value;
 });
 
-const actorForumRoleBadge = computed(() => {
-  return getForumRoleBadge({
+const actorBadges = computed(() => {
+  return getAuthorBadges({
     username: props.activityItem.User?.username,
     modProfileName: props.activityItem.ModerationProfile?.displayName,
-    adminUsernames: forumAdminUsernames.value,
-    modUsernames: forumModUsernames.value,
-    modProfileNames: forumModProfileNames.value,
-  });
-});
-
-const actorServerRoleBadge = computed(() => {
-  return getServerRoleBadge({
-    username: props.activityItem.User?.username,
-    modProfileName: props.activityItem.ModerationProfile?.displayName,
-    adminUsernames: serverAdminUsernames.value,
-    modUsernames: serverModUsernames.value,
-    modProfileNames: serverModProfileNames.value,
+    serverAdminUsernames: serverAdminUsernames.value,
+    serverModUsernames: serverModUsernames.value,
+    serverModProfileNames: serverModProfileNames.value,
+    forumAdminUsernames: forumAdminUsernames.value,
+    forumModUsernames: forumModUsernames.value,
+    forumModProfileNames: forumModProfileNames.value,
   });
 });
 
@@ -612,22 +604,22 @@ const showCommentMenu = computed(() => {
                 <span class="flex flex-row items-center gap-1">
                   {{ activityItem.ModerationProfile?.displayName }}
                   <span
-                    v-if="actorServerRoleBadge === 'serverAdmin'"
+                    v-if="actorBadges.isServerAdmin"
                     class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >Server Admin</span
                   >
                   <span
-                    v-else-if="actorServerRoleBadge === 'serverMod'"
+                    v-if="actorBadges.isServerMod"
                     class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >Server Mod</span
                   >
                   <span
-                    v-if="actorForumRoleBadge === 'forumAdmin'"
+                    v-if="actorBadges.isForumAdmin"
                     class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >Forum Admin</span
                   >
                   <span
-                    v-else-if="actorForumRoleBadge === 'forumMod'"
+                    v-if="actorBadges.isForumMod"
                     class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >Forum Mod</span
                   >
@@ -658,22 +650,22 @@ const showCommentMenu = computed(() => {
                 <span class="flex items-center gap-1">
                   {{ activityItem.User.username }}
                   <span
-                    v-if="actorServerRoleBadge === 'serverAdmin'"
+                    v-if="actorBadges.isServerAdmin"
                     class="rounded-md border border-gray-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >Server Admin</span
                   >
                   <span
-                    v-else-if="actorServerRoleBadge === 'serverMod'"
+                    v-if="actorBadges.isServerMod"
                     class="rounded-md border border-orange-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >Server Mod</span
                   >
                   <span
-                    v-if="actorForumRoleBadge === 'forumAdmin'"
+                    v-if="actorBadges.isForumAdmin"
                     class="rounded-md border border-gray-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >Forum Admin</span
                   >
                   <span
-                    v-else-if="actorForumRoleBadge === 'forumMod'"
+                    v-if="actorBadges.isForumMod"
                     class="rounded-md border border-orange-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >Forum Mod</span
                   >

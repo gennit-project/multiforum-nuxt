@@ -216,7 +216,7 @@ const handleOpenAlbum = () => {
             :comment-karma="authorCommentKarma"
             :discussion-karma="authorDiscussionKarma"
             :account-created="authorAccountCreated"
-            :is-admin="authorIsAdmin"
+            :is-server-admin="authorIsAdmin"
             light-text
           /><template v-if="primaryChannel">
             in

@@ -8,11 +8,27 @@ import ChannelDownloadListItem from '@/components/discussion/list/ChannelDownloa
 const h = vi.hoisted(() => ({
   route: null as unknown,
   adminUsernames: null as unknown,
+  serverModUsernames: null as unknown,
+  serverModProfileNames: null as unknown,
+  forumAdminUsernames: null as unknown,
+  forumModUsernames: null as unknown,
+  forumModProfileNames: null as unknown,
 }));
 
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
 vi.mock('@/composables/useServerRoleMembership', () => ({
-  useServerRoleMembership: () => ({ serverAdminUsernames: h.adminUsernames }),
+  useServerRoleMembership: () => ({
+    serverAdminUsernames: h.adminUsernames,
+    serverModUsernames: h.serverModUsernames,
+    serverModProfileNames: h.serverModProfileNames,
+  }),
+}));
+vi.mock('@/composables/useForumRoleMembership', () => ({
+  useForumRoleMembership: () => ({
+    forumAdminUsernames: h.forumAdminUsernames,
+    forumModUsernames: h.forumModUsernames,
+    forumModProfileNames: h.forumModProfileNames,
+  }),
 }));
 
 const makeChannel = (overrides: Record<string, unknown> = {}) =>
@@ -63,7 +79,7 @@ const mountItem = (
         'nuxt-link': nuxtLinkStub,
         HighlightedSearchTerms: { props: ['text', 'searchInput'], template: '<span>{{ text }}</span>' },
         TagComponent: stub('TagComponent', ['tag', 'active'], ['click']),
-        UsernameWithTooltip: stub('UsernameWithTooltip', ['username', 'isAdmin', 'isMod']),
+        UsernameWithTooltip: stub('UsernameWithTooltip', ['username', 'isServerAdmin', 'isServerMod', 'isForumAdmin', 'isForumMod']),
         AddToDiscussionFavorites: stub('AddToDiscussionFavorites', ['discussionId']),
         DiscussionVotes: true,
         ErrorBanner: true,
@@ -79,6 +95,11 @@ const author = (wrapper: ReturnType<typeof mount>) =>
 beforeEach(() => {
   h.route = { params: { forumId: 'cats' }, query: {} };
   h.adminUsernames = ref<string[]>([]);
+  h.serverModUsernames = ref<string[]>([]);
+  h.serverModProfileNames = ref<string[]>([]);
+  h.forumAdminUsernames = ref<string[]>([]);
+  h.forumModUsernames = ref<string[]>([]);
+  h.forumModProfileNames = ref<string[]>([]);
 });
 
 describe('ChannelDownloadListItem title', () => {
@@ -158,15 +179,38 @@ describe('ChannelDownloadListItem author badges', () => {
     h.adminUsernames = ref(['alice']);
     const wrapper = mountItem(makeDiscussion());
 
-    expect(author(wrapper).props('isAdmin')).toBe(true);
+    expect(author(wrapper).props('isServerAdmin')).toBe(true);
   });
 
-  it('marks the author as a mod when the content flags them a channel moderator', () => {
-    const wrapper = mountItem(
-      makeDiscussion({ authorIsChannelModerator: true })
-    );
+  it('marks the author as a server mod when listed (and not a server admin)', () => {
+    h.serverModUsernames = ref(['alice']);
+    const wrapper = mountItem(makeDiscussion());
 
-    expect(author(wrapper).props('isMod')).toBe(true);
+    expect(author(wrapper).props('isServerMod')).toBe(true);
+  });
+
+  it('marks the author as a Forum Admin when they own the channel', () => {
+    h.forumAdminUsernames = ref(['alice']);
+    const wrapper = mountItem(makeDiscussion());
+
+    expect(author(wrapper).props('isForumAdmin')).toBe(true);
+    expect(author(wrapper).props('isForumMod')).toBe(false);
+  });
+
+  it('marks the author as a Forum Mod when they moderate the channel', () => {
+    h.forumModUsernames = ref(['alice']);
+    const wrapper = mountItem(makeDiscussion());
+
+    expect(author(wrapper).props('isForumMod')).toBe(true);
+  });
+
+  it('suppresses the Forum Mod badge for a channel owner who also moderates', () => {
+    h.forumAdminUsernames = ref(['alice']);
+    h.forumModUsernames = ref(['alice']);
+    const wrapper = mountItem(makeDiscussion());
+
+    expect(author(wrapper).props('isForumAdmin')).toBe(true);
+    expect(author(wrapper).props('isForumMod')).toBe(false);
   });
 });
 

@@ -24,8 +24,7 @@ import { useBestAnswerMutations } from '@/composables/useBestAnswerMutations';
 import { useCommentPermalink } from '@/composables/useCommentPermalink';
 import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 import { getCommentMenuItems } from '@/utils/headerPermissionUtils';
-import { getForumRoleBadge } from '@/utils/forumRoleBadges';
-import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import { getAuthorBadges } from '@/utils/roleBadges';
 import {
   getCommentReplyCount,
   isCommentSubscribedByUser,
@@ -321,33 +320,21 @@ const isHighlighted = computed(() => {
 const replyCount = computed(() => getCommentReplyCount(props.commentData));
 
 const textCopy = computed(() => props.commentData.text);
-const forumRoleBadge = computed(() => {
+const authorBadges = computed(() => {
   const author = props.commentData?.CommentAuthor;
   const username = author?.__typename === 'User' ? author.username : null;
   const modProfileName =
     author?.__typename === 'ModerationProfile' ? author.displayName : null;
 
-  return getForumRoleBadge({
+  return getAuthorBadges({
     username,
     modProfileName,
-    adminUsernames: forumAdminUsernames.value,
-    modUsernames: forumModUsernames.value,
-    modProfileNames: forumModProfileNames.value,
-  });
-});
-
-const serverRoleBadge = computed(() => {
-  const author = props.commentData?.CommentAuthor;
-  const username = author?.__typename === 'User' ? author.username : null;
-  const modProfileName =
-    author?.__typename === 'ModerationProfile' ? author.displayName : null;
-
-  return getServerRoleBadge({
-    username,
-    modProfileName,
-    adminUsernames: serverAdminUsernames.value,
-    modUsernames: serverModUsernames.value,
-    modProfileNames: serverModProfileNames.value,
+    serverAdminUsernames: serverAdminUsernames.value,
+    serverModUsernames: serverModUsernames.value,
+    serverModProfileNames: serverModProfileNames.value,
+    forumAdminUsernames: forumAdminUsernames.value,
+    forumModUsernames: forumModUsernames.value,
+    forumModProfileNames: forumModProfileNames.value,
   });
 });
 
@@ -545,8 +532,10 @@ const label = computed(() =>
               :label="label"
               :is-answer="isMarkedAsAnswer"
               :bot-usernames="props.botUsernames"
-              :forum-role-badge="forumRoleBadge"
-              :server-role-badge="serverRoleBadge"
+              :is-server-admin="authorBadges.isServerAdmin"
+              :is-server-mod="authorBadges.isServerMod"
+              :is-forum-admin="authorBadges.isForumAdmin"
+              :is-forum-mod="authorBadges.isForumMod"
             />
             <div
               class="ml-2 flex-grow border-l border-gray-300 pl-2 sm:ml-4 sm:pl-4 dark:border-gray-600"

@@ -465,7 +465,7 @@ const handleDelete = async () => {
                           :username="getAuthorInfo(discussion)!.username"
                           :display-name="getAuthorInfo(discussion)!.displayName"
                           :src="getAuthorInfo(discussion)!.profilePicURL"
-                          :is-admin="getAuthorInfo(discussion)!.isAdmin"
+                          :is-server-admin="getAuthorInfo(discussion)!.isAdmin"
                           :comment-karma="
                             getAuthorInfo(discussion)!.commentKarma
                           "
@@ -579,7 +579,7 @@ const handleDelete = async () => {
                         :username="getAuthorInfo(comment)!.username"
                         :display-name="getAuthorInfo(comment)!.displayName"
                         :src="getAuthorInfo(comment)!.profilePicURL"
-                        :is-admin="getAuthorInfo(comment)!.isAdmin"
+                        :is-server-admin="getAuthorInfo(comment)!.isAdmin"
                         :comment-karma="getAuthorInfo(comment)!.commentKarma"
                         :discussion-karma="
                           getAuthorInfo(comment)!.discussionKarma

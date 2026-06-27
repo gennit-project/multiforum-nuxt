@@ -10,6 +10,7 @@ import ErrorBanner from '../../ErrorBanner.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/graphQLData/discussion/queries';
 import { useUsername } from '@/composables/useAuthState';
+import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { getFilterValuesFromParams } from '@/components/discussion/list/getDiscussionFilterValuesFromParams';
 import {
   getSortFromQuery,
@@ -33,6 +34,10 @@ const { expandChannelDiscussions } = storeToRefs(uiStore);
 const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
+
+// Provide this channel's owner/moderator lists so the list items can show
+// membership-derived Forum Admin / Forum Mod author badges.
+provideForumRoleMembership(channelId);
 
 const filterValues = ref(
   getFilterValuesFromParams({

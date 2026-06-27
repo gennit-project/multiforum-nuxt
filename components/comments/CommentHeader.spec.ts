@@ -104,34 +104,25 @@ describe('CommentHeader timestamps', () => {
 
 describe('CommentHeader badges', () => {
   it('shows a Forum Admin badge', () => {
-    const wrapper = mountHeader({ forumRoleBadge: 'forumAdmin' });
+    const wrapper = mountHeader({ isForumAdmin: true });
 
     expect(wrapper.text()).toContain('Forum Admin');
   });
 
   it('shows a Forum Mod badge', () => {
-    const wrapper = mountHeader({ forumRoleBadge: 'forumMod' });
+    const wrapper = mountHeader({ isForumMod: true });
 
     expect(wrapper.text()).toContain('Forum Mod');
   });
 
   it('shows a Server Admin badge', () => {
-    const wrapper = mountHeader({ serverRoleBadge: 'serverAdmin' });
+    const wrapper = mountHeader({ isServerAdmin: true });
 
     expect(wrapper.text()).toContain('Server Admin');
   });
 
   it('shows a Server Mod badge', () => {
-    const wrapper = mountHeader({ serverRoleBadge: 'serverMod' });
-
-    expect(wrapper.text()).toContain('Server Mod');
-  });
-
-  it('shows a Server Mod badge for a mod-profile author', () => {
-    const wrapper = mountHeader({
-      commentData: makeComment({ CommentAuthor: { displayName: 'mod-mary' } }),
-      serverRoleBadge: 'serverMod',
-    });
+    const wrapper = mountHeader({ isServerMod: true });
 
     expect(wrapper.text()).toContain('Server Mod');
   });
@@ -144,8 +135,8 @@ describe('CommentHeader badges', () => {
 
   it('renders server and forum badges independently when both apply', () => {
     const wrapper = mountHeader({
-      serverRoleBadge: 'serverAdmin',
-      forumRoleBadge: 'forumMod',
+      isServerAdmin: true,
+      isForumMod: true,
     });
 
     expect([

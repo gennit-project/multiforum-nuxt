@@ -244,7 +244,7 @@ const getFirstAlbumImage = (download: Download): string | undefined => {
                         :username="getAuthorInfo(download)!.username"
                         :display-name="getAuthorInfo(download)!.displayName"
                         :src="getAuthorInfo(download)!.profilePicURL"
-                        :is-admin="getAuthorInfo(download)!.isAdmin"
+                        :is-server-admin="getAuthorInfo(download)!.isAdmin"
                         :comment-karma="getAuthorInfo(download)!.commentKarma"
                         :discussion-karma="
                           getAuthorInfo(download)!.discussionKarma
