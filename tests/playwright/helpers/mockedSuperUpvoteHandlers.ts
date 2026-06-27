@@ -1,4 +1,5 @@
 import {
+  buildComment,
   buildDiscussion,
   buildDiscussionChannel,
   buildUser,
@@ -432,3 +433,221 @@ export const createKudosPageHandlers = (
     },
   }),
 });
+
+// ---------------------------------------------------------------------------
+// Giving a super upvote on a COMMENT (rendered inside a discussion detail page).
+// The comment is authored by `commentAuthor`; the logged-in `actorUsername`
+// upvotes it, then super upvotes it. State tracks the comment's vote arrays.
+// ---------------------------------------------------------------------------
+
+export type CommentSuperUpvoteState = {
+  channelId: string;
+  discussionId: string;
+  discussionChannelId: string;
+  commentId: string;
+  commentAuthor: string;
+  actorUsername: string;
+  upvoters: string[];
+  superUpvoters: string[];
+};
+
+export const createCommentSuperUpvoteState = (
+  config: Partial<CommentSuperUpvoteState> = {}
+): CommentSuperUpvoteState => ({
+  channelId: 'cats',
+  discussionId: 'discussion-1',
+  discussionChannelId: 'discussion-channel-1',
+  commentId: 'comment-1',
+  commentAuthor: 'alice',
+  actorUsername: DEFAULT_USERNAME,
+  upvoters: [],
+  superUpvoters: [],
+  ...config,
+});
+
+const buildStatefulComment = (state: CommentSuperUpvoteState) => ({
+  ...buildComment({
+    comment: { id: state.commentId, text: 'A genuinely helpful comment', parentCommentId: null },
+    comments: [{ id: state.commentId, text: 'A genuinely helpful comment', parentCommentId: null }],
+    channelUniqueName: state.channelId,
+    discussionId: state.discussionId,
+    discussionChannelId: state.discussionChannelId,
+  }),
+  CommentAuthor: buildUser({ username: state.commentAuthor }),
+  UpvotedByUsers: toUsernameList(state.upvoters),
+  UpvotedByUsersAggregate: { count: state.upvoters.length },
+  SuperUpvotedByUsers: toUsernameList(state.superUpvoters),
+});
+
+// Shape returned by upvoteComment / undoUpvoteComment.
+const buildCommentVoteResult = (state: CommentSuperUpvoteState) => ({
+  __typename: 'Comment',
+  id: state.commentId,
+  weightedVotesCount: state.upvoters.length + state.superUpvoters.length,
+  UpvotedByUsers: toUsernameList(state.upvoters),
+  UpvotedByUsersAggregate: { count: state.upvoters.length },
+  SuperUpvotedByUsers: toUsernameList(state.superUpvoters),
+});
+
+export const createCommentSuperUpvoteHandlers = (
+  state: CommentSuperUpvoteState
+): Record<string, GraphQLHandler> => {
+  // The discussion itself is authored by the actor (so its own super-upvote
+  // button never appears), keeping the comment the only super-upvotable target.
+  const discussionChannel = buildDiscussionChannel({
+    id: state.discussionChannelId,
+    discussionId: state.discussionId,
+    channelUniqueName: state.channelId,
+    title: 'Discussion with a comment',
+    overrides: {
+      UpvotedByUsers: [],
+      UpvotedByUsersAggregate: { count: 0 },
+      SuperUpvotedByUsers: [],
+      Discussion: {
+        id: state.discussionId,
+        title: 'Discussion with a comment',
+        Author: buildUser({ username: state.actorUsername }),
+      },
+    },
+  });
+
+  return {
+    ...createBaseHandlers({
+      username: state.actorUsername,
+      channelId: state.channelId,
+      discussionId: state.discussionId,
+      discussionChannelId: state.discussionChannelId,
+      discussionsCount: 1,
+    }),
+
+    getDiscussion: () => ({
+      data: {
+        discussions: [
+          buildDiscussion({
+            id: state.discussionId,
+            discussionChannelId: state.discussionChannelId,
+            channelUniqueName: state.channelId,
+            title: 'Discussion with a comment',
+            overrides: {
+              Author: buildUser({ username: state.actorUsername }),
+              DiscussionChannels: [discussionChannel],
+            },
+          }),
+        ],
+      },
+    }),
+
+    getCommentSection: () => ({
+      data: {
+        getCommentSection: {
+          DiscussionChannel: discussionChannel,
+          Comments: [buildStatefulComment(state)],
+        },
+      },
+    }),
+
+    getDiscussionChannelRootCommentAggregate: () => ({
+      data: {
+        discussionChannels: [
+          {
+            id: state.discussionChannelId,
+            discussionId: state.discussionId,
+            channelUniqueName: state.channelId,
+            archived: false,
+            answered: false,
+            locked: false,
+            CommentsAggregate: { count: 1 },
+          },
+        ],
+      },
+    }),
+
+    getDiscussionCommentIssue: () => ({
+      data: {
+        discussionChannels: [{ id: state.discussionChannelId, Comments: [] }],
+      },
+    }),
+
+    isDiscussionAnswered: () => ({
+      data: {
+        discussionChannels: [
+          {
+            id: state.discussionChannelId,
+            discussionId: state.discussionId,
+            channelUniqueName: state.channelId,
+            weightedVotesCount: 0,
+            archived: false,
+            answered: false,
+            locked: false,
+            Channel: { uniqueName: state.channelId },
+          },
+        ],
+      },
+    }),
+
+    upvoteComment: () => {
+      if (!state.upvoters.includes(state.actorUsername)) {
+        state.upvoters.push(state.actorUsername);
+      }
+      return { data: { upvoteComment: buildCommentVoteResult(state) } };
+    },
+
+    undoUpvoteComment: () => {
+      state.upvoters = state.upvoters.filter((u) => u !== state.actorUsername);
+      state.superUpvoters = state.superUpvoters.filter(
+        (u) => u !== state.actorUsername
+      );
+      return { data: { undoUpvoteComment: buildCommentVoteResult(state) } };
+    },
+
+    createScratchpadEntry: ({ body }) => {
+      const variables = (body.variables ?? {}) as {
+        recipientUsername?: string;
+        text?: string;
+      };
+      if (!state.superUpvoters.includes(state.actorUsername)) {
+        state.superUpvoters.push(state.actorUsername);
+      }
+      return {
+        data: {
+          createScratchpadEntry: {
+            id: 'scratchpad-entry-1',
+            createdAt: MOCK_DATE,
+            text: variables.text ?? '',
+            isPublic: false,
+            sourceType: 'comment',
+            sourceId: state.commentId,
+            sourceChannelUniqueName: state.channelId,
+            discussionId: state.discussionId,
+            Author: {
+              username: state.actorUsername,
+              displayName: state.actorUsername,
+              profilePicURL: '',
+            },
+            Recipient: { username: variables.recipientUsername ?? state.commentAuthor },
+            superUpvotedByUsers: toUsernameList(state.superUpvoters),
+            __typename: 'ScratchpadEntry',
+          },
+        },
+      };
+    },
+
+    undoSuperUpvote: () => {
+      state.superUpvoters = state.superUpvoters.filter(
+        (u) => u !== state.actorUsername
+      );
+      return {
+        data: {
+          undoSuperUpvote: {
+            success: true,
+            message: 'Super upvote removed successfully',
+            sourceId: state.commentId,
+            sourceType: 'comment',
+            superUpvotedByUsers: toUsernameList(state.superUpvoters),
+            __typename: 'UndoSuperUpvoteResult',
+          },
+        },
+      };
+    },
+  };
+};
