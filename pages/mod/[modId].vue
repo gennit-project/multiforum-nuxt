@@ -7,6 +7,8 @@ import ModProfileSidebar from '@/components/mod/ModProfileSidebar.vue';
 import { useHead, useRoute } from 'nuxt/app';
 import ModProfileTabs from '../../components/mod/ModProfileTabs.vue';
 import ModContributionChart from '@/components/charts/ModContributionChart.vue';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
@@ -35,6 +37,14 @@ const mod = computed(() => {
   return null;
 });
 
+const { serverModProfileNames } = useServerRoleMembership();
+const serverRoleBadge = computed(() =>
+  getServerRoleBadge({
+    modProfileName: mod.value?.displayName,
+    modProfileNames: serverModProfileNames.value,
+  })
+);
+
 // Set page title for mod profile
 watchEffect(() => {
   const serverName = config.serverDisplayName;
@@ -51,7 +61,7 @@ watchEffect(() => {
 <template>
   <NuxtLayout>
     <div class="w-full max-w-screen-2xl px-2 dark:bg-black">
-      <ModProfileSidebar :is-admin="false" />
+      <ModProfileSidebar :server-role-badge="serverRoleBadge" />
       <div class="min-w-0 flex-1">
         <client-only>
           <ModContributionChart />

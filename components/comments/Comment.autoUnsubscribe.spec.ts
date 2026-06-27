@@ -76,6 +76,14 @@ vi.mock('@/composables/useForumRoleMembership', () => ({
   }),
 }));
 
+vi.mock('@/composables/useServerRoleMembership', () => ({
+  useServerRoleMembership: () => ({
+    serverAdminUsernames: { value: [] },
+    serverModUsernames: { value: [] },
+    serverModProfileNames: { value: [] },
+  }),
+}));
+
 describe('Comment auto unsubscribe', () => {
   beforeEach(() => {
     vi.clearAllMocks();

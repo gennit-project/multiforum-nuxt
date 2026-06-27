@@ -659,6 +659,54 @@ export const buildModerationAction = ({
   ...overrides,
 });
 
+// A ModerationAction of type "comment" whose Comment is authored by a
+// ModerationProfile (displayName). Shape matches the GET_ISSUE
+// ActivityFeed.Comment selection set (including CommentVoteFields) so the
+// activity-feed report/suspend flows can be exercised end-to-end.
+export const buildModCommentActivityItem = ({
+  id = 'activity-1',
+  commentId = 'activity-comment-1',
+  text = 'A moderation comment in the activity feed.',
+  modDisplayName = 'mod-bob',
+  channelUniqueName = 'cats',
+  issueId = 'issue-1',
+}: {
+  id?: string;
+  commentId?: string;
+  text?: string;
+  modDisplayName?: string;
+  channelUniqueName?: string;
+  issueId?: string;
+} = {}) => ({
+  __typename: 'ModerationAction',
+  id,
+  actionType: 'comment',
+  actionDescription: 'commented on the issue',
+  createdAt: MOCK_DATE,
+  ModerationProfile: { displayName: modDisplayName },
+  User: null,
+  Revision: null,
+  Comment: {
+    __typename: 'Comment',
+    id: commentId,
+    text,
+    emoji: '',
+    weightedVotesCount: 0,
+    createdAt: MOCK_DATE,
+    updatedAt: MOCK_DATE,
+    Issue: { id: issueId },
+    CommentAuthor: { __typename: 'ModerationProfile', displayName: modDisplayName },
+    Channel: { uniqueName: channelUniqueName },
+    ChildCommentsAggregate: { count: 0 },
+    ParentComment: null,
+    editReason: '',
+    PastVersions: [],
+    UpvotedByUsers: [],
+    UpvotedByUsersAggregate: { count: 0 },
+    SuperUpvotedByUsers: [],
+  },
+});
+
 export type IssueFixture = {
   __typename: 'Issue';
   id: string;
@@ -675,6 +723,7 @@ export type IssueFixture = {
   relatedWikiPageId: string | null;
   relatedWikiRevisionId: string | null;
   relatedChannelUniqueName: string | null;
+  relatedModProfileName: string | null;
   channelUniqueName: string;
   Author: { __typename: 'User'; username: string };
   flaggedServerRuleViolation: boolean;
@@ -723,6 +772,7 @@ export const buildIssue = ({
   relatedWikiPageId: null,
   relatedWikiRevisionId: null,
   relatedChannelUniqueName: null,
+  relatedModProfileName: null,
   channelUniqueName,
   Author: { __typename: 'User', username: authorUsername },
   flaggedServerRuleViolation: false,

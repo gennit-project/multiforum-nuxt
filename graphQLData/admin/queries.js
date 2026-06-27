@@ -100,6 +100,86 @@ export const GET_SERVER_CONFIG = gql`
   }
 `;
 
+export const GET_SERVER_HEALTH_DASHBOARD = gql`
+  query getServerHealthDashboard(
+    $startDate: String
+    $endDate: String
+    $channelUniqueNames: [String!]
+    $limit: Int
+  ) {
+    getServerHealthDashboard(
+      startDate: $startDate
+      endDate: $endDate
+      channelUniqueNames: $channelUniqueNames
+      limit: $limit
+    ) {
+      startDate
+      endDate
+      generatedAt
+      summary {
+        activeChannelCount
+        discussionCount
+        commentCount
+        eventCount
+        downloadCount
+        voteCount
+        openIssueCount
+        issueOpenedCount
+        issueClosedCount
+        moderationActionCount
+        archivedContentCount
+        lockedContentCount
+        suspensionCount
+        medianOpenIssueAgeDays
+      }
+      timeSeries {
+        date
+        discussions
+        comments
+        events
+        downloads
+        issuesOpened
+        moderationActions
+      }
+      channelHealth {
+        channelUniqueName
+        displayName
+        channelIconURL
+        discussionCount
+        commentCount
+        eventCount
+        downloadCount
+        voteCount
+        uniqueContributorCount
+        openIssueCount
+        issueOpenedCount
+        moderationActionCount
+        archivedContentCount
+        lockedContentCount
+        oldestOpenIssueAgeDays
+        issuesPerHundredContributions
+        activityScore
+        healthLabel
+      }
+      issueAging {
+        label
+        minDays
+        maxDays
+        count
+      }
+      attentionItems {
+        severity
+        title
+        description
+        channelUniqueName
+        issueNumber
+        metric
+        value
+      }
+    }
+  }
+`;
+
 export const GET_SERVER_PERMISSIONS = gql`
   query getServerConfig($serverName: String!) {
     serverConfigs(where: { serverName: $serverName }) {

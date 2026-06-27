@@ -23,8 +23,9 @@ const mod = (overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 });
 
-const mountSidebar = () =>
+const mountSidebar = (props: Record<string, unknown> = {}) =>
   mount(ModProfileSidebar, {
+    props,
     global: { stubs: { AvatarComponent: true } },
   });
 
@@ -55,6 +56,18 @@ describe('ModProfileSidebar', () => {
     const wrapper = mountSidebar();
 
     expect(wrapper.text()).not.toContain('(You)');
+  });
+
+  it('shows a Server Mod badge for a server-moderator mod profile', () => {
+    const wrapper = mountSidebar({ serverRoleBadge: 'serverMod' });
+
+    expect(wrapper.text()).toContain('Server Mod');
+  });
+
+  it('shows no server badge for a regular mod profile', () => {
+    const wrapper = mountSidebar();
+
+    expect(wrapper.text()).not.toContain('Server');
   });
 
   it('shows the joined date', () => {

@@ -26,7 +26,9 @@ import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import RevisionDiffInline from '@/components/mod/RevisionDiffInline.vue';
 import { getForumRoleBadge } from '@/utils/forumRoleBadges';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 import SuspendModButton from '@/components/mod/SuspendModButton.vue';
@@ -96,6 +98,8 @@ const isPermalinked =
   commentIdInParams && commentIdInParams === props.activityItem.Comment?.id;
 const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
   useForumRoleMembership();
+const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+  useServerRoleMembership();
 
 const isCommentAuthor = computed(() => {
   const author = props.activityItem.Comment?.CommentAuthor;
@@ -378,6 +382,16 @@ const actorForumRoleBadge = computed(() => {
   });
 });
 
+const actorServerRoleBadge = computed(() => {
+  return getServerRoleBadge({
+    username: props.activityItem.User?.username,
+    modProfileName: props.activityItem.ModerationProfile?.displayName,
+    adminUsernames: serverAdminUsernames.value,
+    modUsernames: serverModUsernames.value,
+    modProfileNames: serverModProfileNames.value,
+  });
+});
+
 // Build the comment revision content for the diff
 const commentRevisionContent = computed(() => {
   if (props.commentEditIndex === null) return null;
@@ -598,6 +612,16 @@ const showCommentMenu = computed(() => {
                 <span class="flex flex-row items-center gap-1">
                   {{ activityItem.ModerationProfile?.displayName }}
                   <span
+                    v-if="actorServerRoleBadge === 'serverAdmin'"
+                    class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                    >Server Admin</span
+                  >
+                  <span
+                    v-else-if="actorServerRoleBadge === 'serverMod'"
+                    class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                    >Server Mod</span
+                  >
+                  <span
                     v-if="actorForumRoleBadge === 'forumAdmin'"
                     class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >Forum Admin</span
@@ -633,6 +657,16 @@ const showCommentMenu = computed(() => {
               >
                 <span class="flex items-center gap-1">
                   {{ activityItem.User.username }}
+                  <span
+                    v-if="actorServerRoleBadge === 'serverAdmin'"
+                    class="rounded-md border border-gray-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                    >Server Admin</span
+                  >
+                  <span
+                    v-else-if="actorServerRoleBadge === 'serverMod'"
+                    class="rounded-md border border-orange-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                    >Server Mod</span
+                  >
                   <span
                     v-if="actorForumRoleBadge === 'forumAdmin'"
                     class="rounded-md border border-gray-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"

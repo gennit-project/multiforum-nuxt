@@ -115,6 +115,45 @@ describe('CommentHeader badges', () => {
     expect(wrapper.text()).toContain('Forum Mod');
   });
 
+  it('shows a Server Admin badge', () => {
+    const wrapper = mountHeader({ serverRoleBadge: 'serverAdmin' });
+
+    expect(wrapper.text()).toContain('Server Admin');
+  });
+
+  it('shows a Server Mod badge', () => {
+    const wrapper = mountHeader({ serverRoleBadge: 'serverMod' });
+
+    expect(wrapper.text()).toContain('Server Mod');
+  });
+
+  it('shows a Server Mod badge for a mod-profile author', () => {
+    const wrapper = mountHeader({
+      commentData: makeComment({ CommentAuthor: { displayName: 'mod-mary' } }),
+      serverRoleBadge: 'serverMod',
+    });
+
+    expect(wrapper.text()).toContain('Server Mod');
+  });
+
+  it('does not show a Server Admin badge for a regular author', () => {
+    const wrapper = mountHeader();
+
+    expect(wrapper.text()).not.toContain('Server Admin');
+  });
+
+  it('renders server and forum badges independently when both apply', () => {
+    const wrapper = mountHeader({
+      serverRoleBadge: 'serverAdmin',
+      forumRoleBadge: 'forumMod',
+    });
+
+    expect([
+      wrapper.text().includes('Server Admin'),
+      wrapper.text().includes('Forum Mod'),
+    ]).toEqual([true, true]);
+  });
+
   it('shows an OP badge for the original poster', () => {
     const wrapper = mountHeader({ originalPoster: 'alice' });
 
