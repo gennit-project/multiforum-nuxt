@@ -3,8 +3,6 @@ import { computed } from 'vue';
 import type { PropType } from 'vue';
 import type { Comment, User } from '@/__generated__/graphql';
 import { stableRelativeTime } from '@/utils';
-import type { ForumRoleBadge } from '@/utils/forumRoleBadges';
-import type { ServerRoleBadge } from '@/utils/serverRoleBadges';
 import {
   getPermalinkToDiscussionComment,
   getPermalinkToDiscussion,
@@ -51,13 +49,21 @@ const props = defineProps({
     type: Array as PropType<string[]>,
     default: () => [],
   },
-  forumRoleBadge: {
-    type: String as PropType<ForumRoleBadge>,
-    default: null,
+  isServerAdmin: {
+    type: Boolean,
+    default: false,
   },
-  serverRoleBadge: {
-    type: String as PropType<ServerRoleBadge>,
-    default: null,
+  isServerMod: {
+    type: Boolean,
+    default: false,
+  },
+  isForumAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  isForumMod: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -268,22 +274,22 @@ const contextLinkObject = computed(() => {
                 >Bot</span
               >
               <span
-                v-if="serverRoleBadge === 'serverAdmin'"
+                v-if="isServerAdmin"
                 class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                 >Server Admin</span
               >
               <span
-                v-else-if="serverRoleBadge === 'serverMod'"
+                v-if="isServerMod"
                 class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                 >Server Mod</span
               >
               <span
-                v-if="forumRoleBadge === 'forumAdmin'"
+                v-if="isForumAdmin"
                 class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                 >Forum Admin</span
               >
               <span
-                v-else-if="forumRoleBadge === 'forumMod'"
+                v-if="isForumMod"
                 class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                 >Forum Mod</span
               >
@@ -305,22 +311,22 @@ const contextLinkObject = computed(() => {
             <span class="flex flex-row items-center gap-1">
               {{ commentData.CommentAuthor.displayName }}
               <span
-                v-if="serverRoleBadge === 'serverAdmin'"
+                v-if="isServerAdmin"
                 class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                 >Server Admin</span
               >
               <span
-                v-else-if="serverRoleBadge === 'serverMod'"
+                v-if="isServerMod"
                 class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                 >Server Mod</span
               >
               <span
-                v-if="forumRoleBadge === 'forumAdmin'"
+                v-if="isForumAdmin"
                 class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                 >Forum Admin</span
               >
               <span
-                v-else-if="forumRoleBadge === 'forumMod'"
+                v-if="isForumMod"
                 class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                 >Forum Mod</span
               >

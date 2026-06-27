@@ -372,7 +372,7 @@ const revealSensitiveContent = () => {
               <span aria-hidden="true">•</span>
               <UsernameWithTooltip
                 v-if="authorUsername"
-                :is-admin="authorIsAdmin"
+                :is-server-admin="authorIsAdmin"
                 :username="authorUsername"
                 :src="discussion?.Author?.profilePicURL || ''"
                 :display-name="discussion?.Author?.displayName || ''"

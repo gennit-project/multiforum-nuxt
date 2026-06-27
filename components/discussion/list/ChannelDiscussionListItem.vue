@@ -97,7 +97,8 @@ const { result: getUserResult } = useQuery(
 const channelIdInParams = computed(() =>
   typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
-const { serverAdminUsernames } = useServerRoleMembership();
+const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+  useServerRoleMembership();
 const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
   useForumRoleMembership();
 const defaultUniqueName = computed(
@@ -111,6 +112,8 @@ const authorBadges = computed(() =>
   getAuthorBadges({
     username: props.discussion?.Author?.username,
     serverAdminUsernames: serverAdminUsernames.value,
+    serverModUsernames: serverModUsernames.value,
+    serverModProfileNames: serverModProfileNames.value,
     forumAdminUsernames: forumAdminUsernames.value,
     forumModUsernames: forumModUsernames.value,
     forumModProfileNames: forumModProfileNames.value,
@@ -319,7 +322,8 @@ const revealSensitiveContent = () => {
                   }}</span>
                   <UsernameWithTooltip
                     v-if="authorUsername"
-                    :is-admin="authorBadges.isAdmin"
+                    :is-server-admin="authorBadges.isServerAdmin"
+                    :is-server-mod="authorBadges.isServerMod"
                     :is-forum-admin="authorBadges.isForumAdmin"
                     :is-forum-mod="authorBadges.isForumMod"
                     :username="authorUsername"

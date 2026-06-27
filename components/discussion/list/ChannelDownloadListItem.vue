@@ -59,7 +59,8 @@ const channelIdInParams = computed(() =>
 const defaultUniqueName = computed(
   () => channelIdInParams.value || props.discussionChannel.channelUniqueName
 );
-const { serverAdminUsernames } = useServerRoleMembership();
+const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+  useServerRoleMembership();
 const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
   useForumRoleMembership();
 const commentCount = computed(
@@ -70,6 +71,8 @@ const authorBadges = computed(() =>
   getAuthorBadges({
     username: props.discussion?.Author?.username,
     serverAdminUsernames: serverAdminUsernames.value,
+    serverModUsernames: serverModUsernames.value,
+    serverModProfileNames: serverModProfileNames.value,
     forumAdminUsernames: forumAdminUsernames.value,
     forumModUsernames: forumModUsernames.value,
     forumModProfileNames: forumModProfileNames.value,
@@ -206,7 +209,8 @@ const filteredQuery = computed(() => {
                 :comment-karma="authorCommentKarma"
                 :discussion-karma="authorDiscussionKarma"
                 :display-name="authorDisplayName ?? ''"
-                :is-admin="authorBadges.isAdmin"
+                :is-server-admin="authorBadges.isServerAdmin"
+                :is-server-mod="authorBadges.isServerMod"
                 :is-forum-admin="authorBadges.isForumAdmin"
                 :is-forum-mod="authorBadges.isForumMod"
                 :src="authorProfilePicURL ?? ''"

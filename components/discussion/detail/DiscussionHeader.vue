@@ -55,7 +55,8 @@ const emit = defineEmits([
 
 const route = useRoute();
 const router = useRouter();
-const { serverAdminUsernames } = useServerRoleMembership();
+const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+  useServerRoleMembership();
 const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
   useForumRoleMembership();
 
@@ -326,6 +327,8 @@ const authorBadges = computed(() =>
   getAuthorBadges({
     username: props.discussion?.Author?.username,
     serverAdminUsernames: serverAdminUsernames.value,
+    serverModUsernames: serverModUsernames.value,
+    serverModProfileNames: serverModProfileNames.value,
     forumAdminUsernames: forumAdminUsernames.value,
     forumModUsernames: forumModUsernames.value,
     forumModProfileNames: forumModProfileNames.value,
@@ -382,9 +385,14 @@ const warningModalBody = computed(() => {
             >
 
             <span
-              v-if="authorBadges.isAdmin"
+              v-if="authorBadges.isServerAdmin"
               class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
-              >Admin</span
+              >Server Admin</span
+            >
+            <span
+              v-if="authorBadges.isServerMod"
+              class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+              >Server Mod</span
             >
             <span
               v-if="authorBadges.isForumAdmin"

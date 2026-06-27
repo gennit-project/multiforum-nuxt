@@ -68,7 +68,8 @@ defineEmits(['archived-successfully']);
 
 const route = useRoute();
 const router = useRouter();
-const { serverAdminUsernames } = useServerRoleMembership();
+const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+  useServerRoleMembership();
 const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
   useForumRoleMembership();
 
@@ -407,6 +408,8 @@ const posterBadges = computed(() =>
   getAuthorBadges({
     username: props.eventData.Poster?.username,
     serverAdminUsernames: serverAdminUsernames.value,
+    serverModUsernames: serverModUsernames.value,
+    serverModProfileNames: serverModProfileNames.value,
     forumAdminUsernames: forumAdminUsernames.value,
     forumModUsernames: forumModUsernames.value,
     forumModProfileNames: forumModProfileNames.value,
@@ -584,7 +587,8 @@ function openFeedbackFormModal() {
             Hosted by
             <UsernameWithTooltip
               v-if="eventData.Poster.username"
-              :is-admin="posterBadges.isAdmin"
+              :is-server-admin="posterBadges.isServerAdmin"
+              :is-server-mod="posterBadges.isServerMod"
               :is-forum-admin="posterBadges.isForumAdmin"
               :is-forum-mod="posterBadges.isForumMod"
               :username="eventData.Poster.username"

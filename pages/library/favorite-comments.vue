@@ -234,7 +234,7 @@ const getFavoriteCommentAuthorInfo = (
                           getFavoriteCommentAuthorInfo(comment)!.displayName
                         "
                         :src="getFavoriteCommentAuthorInfo(comment)!.profilePicURL"
-                        :is-admin="getFavoriteCommentAuthorInfo(comment)!.isAdmin"
+                        :is-server-admin="getFavoriteCommentAuthorInfo(comment)!.isAdmin"
                         :comment-karma="
                           getFavoriteCommentAuthorInfo(comment)!.commentKarma
                         "

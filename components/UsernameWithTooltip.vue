@@ -9,7 +9,8 @@ interface Props {
   accountCreated?: string;
   commentKarma?: number;
   discussionKarma?: number;
-  isAdmin?: boolean;
+  isServerAdmin?: boolean;
+  isServerMod?: boolean;
   isForumAdmin?: boolean;
   isForumMod?: boolean;
   isOriginalPoster?: boolean;
@@ -23,7 +24,8 @@ const props = withDefaults(defineProps<Props>(), {
   accountCreated: '',
   commentKarma: 0,
   discussionKarma: 0,
-  isAdmin: false,
+  isServerAdmin: false,
+  isServerMod: false,
   isForumAdmin: false,
   isForumMod: false,
   isOriginalPoster: false,
@@ -95,10 +97,16 @@ const modBadgeClasses = computed(() => {
               >
             </nuxt-link>
             <span
-              v-if="isAdmin"
+              v-if="isServerAdmin"
               :class="badgeClasses"
-              >Admin</span
+              >Server Admin</span
             >
+            <span
+              v-if="isServerMod"
+              :class="modBadgeClasses"
+            >
+              Server Mod
+            </span>
             <span
               v-if="isForumAdmin"
               :class="badgeClasses"
@@ -161,9 +169,14 @@ const modBadgeClasses = computed(() => {
           }}</span>
         </nuxt-link>
         <span
-          v-if="isAdmin"
+          v-if="isServerAdmin"
           :class="badgeClasses"
-          >Admin</span
+          >Server Admin</span
+        >
+        <span
+          v-if="isServerMod"
+          :class="modBadgeClasses"
+          >Server Mod</span
         >
         <span
           v-if="isForumAdmin"
@@ -201,9 +214,14 @@ const modBadgeClasses = computed(() => {
           }}</span>
         </nuxt-link>
         <span
-          v-if="isAdmin"
+          v-if="isServerAdmin"
           :class="badgeClasses"
-          >Admin</span
+          >Server Admin</span
+        >
+        <span
+          v-if="isServerMod"
+          :class="modBadgeClasses"
+          >Server Mod</span
         >
         <span
           v-if="isForumAdmin"

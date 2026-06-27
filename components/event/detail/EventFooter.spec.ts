@@ -17,6 +17,8 @@ vi.mock('nuxt/app', () => ({
 vi.mock('@/composables/useServerRoleMembership', () => ({
   useServerRoleMembership: () => ({
     serverAdminUsernames: computed(() => serverAdminUsernames.value),
+    serverModUsernames: ref([]),
+    serverModProfileNames: ref([]),
   }),
 }));
 
@@ -49,15 +51,15 @@ describe('EventFooter', () => {
       global: {
         stubs: {
           UsernameWithTooltip: {
-            props: ['isAdmin'],
+            props: ['isServerAdmin'],
             template:
-              '<div data-testid="username-with-tooltip">{{ isAdmin }}</div>',
+              '<div data-testid="username-with-tooltip">{{ isServerAdmin }}</div>',
           },
         },
       },
     });
 
-  it('passes isAdmin when poster belongs to server admin membership', () => {
+  it('passes isServerAdmin when poster belongs to server admin membership', () => {
     serverAdminUsernames.value = ['alice'];
 
     const wrapper = buildWrapper();
@@ -67,7 +69,7 @@ describe('EventFooter', () => {
     );
   });
 
-  it('does not pass isAdmin when poster is not in server admin membership', () => {
+  it('does not pass isServerAdmin when poster is not in server admin membership', () => {
     serverAdminUsernames.value = ['bob'];
 
     const wrapper = buildWrapper();

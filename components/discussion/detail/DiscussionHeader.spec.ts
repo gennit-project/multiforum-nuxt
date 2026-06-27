@@ -54,6 +54,8 @@ vi.mock('@/composables/useAuthState', async () => {
 vi.mock('@/composables/useServerRoleMembership', () => ({
   useServerRoleMembership: () => ({
     serverAdminUsernames: computed(() => serverAdminUsernames.value),
+    serverModUsernames: ref([]),
+    serverModProfileNames: ref([]),
   }),
 }));
 
@@ -108,19 +110,19 @@ describe('DiscussionHeader', () => {
       },
     });
 
-  it('shows the Admin label when the discussion author belongs to server admin membership', () => {
+  it('shows the Server Admin label when the discussion author belongs to server admin membership', () => {
     serverAdminUsernames.value = ['alice'];
 
     const wrapper = buildWrapper();
 
-    expect(wrapper.text()).toContain('Admin');
+    expect(wrapper.text()).toContain('Server Admin');
   });
 
-  it('does not show the Admin label when the discussion author is not in server admin membership', () => {
+  it('does not show the Server Admin label when the discussion author is not in server admin membership', () => {
     serverAdminUsernames.value = ['bob'];
 
     const wrapper = buildWrapper();
 
-    expect(wrapper.text().includes('Admin')).toBe(false);
+    expect(wrapper.text().includes('Server Admin')).toBe(false);
   });
 });

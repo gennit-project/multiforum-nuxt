@@ -322,7 +322,7 @@ const getAuthorInfo = (discussion: FavoriteDiscussion) =>
                         :username="getAuthorInfo(discussion)!.username"
                         :display-name="getAuthorInfo(discussion)!.displayName"
                         :src="getAuthorInfo(discussion)!.profilePicURL"
-                        :is-admin="getAuthorInfo(discussion)!.isAdmin"
+                        :is-server-admin="getAuthorInfo(discussion)!.isAdmin"
                         :comment-karma="getAuthorInfo(discussion)!.commentKarma"
                         :discussion-karma="
                           getAuthorInfo(discussion)!.discussionKarma
