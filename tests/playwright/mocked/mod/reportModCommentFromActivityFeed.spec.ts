@@ -80,8 +80,11 @@ test('reports a mod-authored comment from the issue activity feed', async ({
 
   await page.goto(`/forums/${TEST_CHANNEL}/issues/${ISSUE_NUMBER}`);
 
-  // The activity-feed comment renders.
-  await expect(page.getByText(ACTIVITY_COMMENT_TEXT)).toBeVisible();
+  // The activity-feed comment renders. Generous timeout: the issue route can pay
+  // a cold Vite-compile cost on the first navigation of an isolated run.
+  await expect(page.getByText(ACTIVITY_COMMENT_TEXT)).toBeVisible({
+    timeout: 60_000,
+  });
 
   // Open the comment context menu and choose "Report Mod Comment".
   await page.getByRole('button', { name: 'Comment actions' }).click();

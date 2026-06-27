@@ -77,7 +77,9 @@ test('suspends the targeted mod from the activity-feed Suspend Mod button', asyn
 
   await page.goto(`/forums/${TEST_CHANNEL}/issues/${ISSUE_NUMBER}`);
 
-  await expect(page.getByText(COMMENT_TEXT)).toBeVisible();
+  // Generous timeout: the issue route can pay a cold Vite-compile cost on the
+  // first navigation of an isolated run.
+  await expect(page.getByText(COMMENT_TEXT)).toBeVisible({ timeout: 60_000 });
 
   // The activity feed renders a Suspend Mod button because the action's actor
   // matches the issue's related mod profile.
@@ -116,7 +118,9 @@ test('offers Suspend Mod in the activity-feed comment context menu', async ({
 
   await page.goto(`/forums/${TEST_CHANNEL}/issues/${ISSUE_NUMBER}`);
 
-  await expect(page.getByText(COMMENT_TEXT)).toBeVisible();
+  // Generous timeout: the issue route can pay a cold Vite-compile cost on the
+  // first navigation of an isolated run.
+  await expect(page.getByText(COMMENT_TEXT)).toBeVisible({ timeout: 60_000 });
 
   // Open the comment context menu; it must offer a "Suspend Mod" action because
   // the comment's author is the issue's related mod profile.
@@ -125,6 +129,53 @@ test('offers Suspend Mod in the activity-feed comment context menu', async ({
 
   // Choosing it opens the suspend modal pre-filled with the issue context.
   await expect(page.getByRole('button', { name: 'Submit' })).toBeVisible();
+});
+
+test('unsuspends an already-suspended mod from the activity feed', async ({
+  context,
+  page,
+}) => {
+  await installMockAuth(context, page, {
+    username: TEST_USER,
+    email: 'alice@example.com',
+  });
+
+  let unsuspendVariables: { issueId?: string; explanation?: string } | null =
+    null;
+
+  await installGraphqlMocks(page, {
+    ...getIssueDetailBaseMocks({ username: TEST_USER, channel: TEST_CHANNEL }),
+    getIssue: () => ({ data: { issues: [buildModIssue()] } }),
+    // The targeted mod is already suspended -> button flips to "Unsuspend Mod".
+    getSuspension: () => ({ data: { isOriginalPosterSuspended: true } }),
+    unsuspendMod: ({ body }) => {
+      unsuspendVariables = body.variables as {
+        issueId?: string;
+        explanation?: string;
+      };
+      return { data: { unsuspendMod: { id: 'suspension-1' } } };
+    },
+  });
+
+  await page.goto(`/forums/${TEST_CHANNEL}/issues/${ISSUE_NUMBER}`);
+
+  // Generous timeout: the issue route can pay a cold Vite-compile cost on the
+  // first navigation of an isolated run.
+  await expect(page.getByText(COMMENT_TEXT)).toBeVisible({ timeout: 60_000 });
+
+  // Because the mod is suspended, the activity feed offers Unsuspend (not Suspend).
+  await expect(
+    page.getByRole('button', { name: 'Suspend Mod', exact: true })
+  ).toHaveCount(0);
+  await page.getByRole('button', { name: 'Unsuspend Mod' }).click();
+
+  // The UnsuspendModModal opens (it pre-fills an explanation, so Submit is enabled).
+  await expect(page.getByRole('button', { name: 'Submit' })).toBeVisible();
+  await page.getByRole('button', { name: 'Submit' }).click();
+
+  await expect(page.getByText('The mod was unsuspended.')).toBeVisible();
+
+  expect(unsuspendVariables).toMatchObject({ issueId: `issue-${ISSUE_NUMBER}` });
 });
 
 test('does not show suspend UI when the issue has no related mod profile', async ({
@@ -160,7 +211,9 @@ test('does not show suspend UI when the issue has no related mod profile', async
 
   await page.goto(`/forums/${TEST_CHANNEL}/issues/${ISSUE_NUMBER}`);
 
-  await expect(page.getByText(COMMENT_TEXT)).toBeVisible();
+  // Generous timeout: the issue route can pay a cold Vite-compile cost on the
+  // first navigation of an isolated run.
+  await expect(page.getByText(COMMENT_TEXT)).toBeVisible({ timeout: 60_000 });
 
   // No Suspend Mod button in the activity feed.
   await expect(

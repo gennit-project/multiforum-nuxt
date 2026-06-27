@@ -106,7 +106,8 @@ test('reports a comment from a moderation profile comments page', async ({
 
   await page.goto(`/mod/${TARGET_MOD}/comments`);
 
-  await expect(page.getByText(COMMENT_TEXT)).toBeVisible();
+  // Generous timeout for a possible cold Vite-compile on first navigation.
+  await expect(page.getByText(COMMENT_TEXT)).toBeVisible({ timeout: 60_000 });
 
   // Open the comment context menu and choose Report.
   await page.getByTestId('commentMenu').first().click();
