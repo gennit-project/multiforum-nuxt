@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref, defineComponent, h } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
 
 vi.mock('nuxt/app', () => ({ useHead: vi.fn() }));
 
@@ -38,22 +38,46 @@ const mountWith = async (comments: unknown[]) => {
   });
 };
 
+const sampleComment = {
+  id: 'c1',
+  text: 'A memorable comment ![cat](https://example.com/cat.png)',
+  createdAt: '2024-01-01T00:00:00Z',
+  CommentAuthor: { __typename: 'User', username: 'bob' },
+  DiscussionChannel: {
+    channelUniqueName: 'cats',
+    discussionId: 'd1',
+    Discussion: { id: 'd1', title: 'Cats', hasDownload: false },
+  },
+};
+
 describe('favorite comments page', () => {
   it('shows the empty state when there are no favorites', async () => {
     expect((await mountWith([])).text()).toContain('No favorite comments yet');
   });
 
-  it('renders a favorited comment via the markdown renderer', async () => {
-    const wrapper = await mountWith([
-      {
-        id: 'c1',
-        text: 'A memorable comment',
-        createdAt: '2024-01-01T00:00:00Z',
-        CommentAuthor: { __typename: 'User', username: 'bob' },
-      },
-    ]);
-    expect(wrapper.findComponent(MarkdownRenderer).props('text')).toBe(
-      'A memorable comment'
+  // Regression: the comment body must render via MarkdownPreview (which wires up
+  // the inline-image lightbox), not the bare MarkdownRenderer which cannot
+  // expand images.
+  it('renders the comment body via MarkdownPreview', async () => {
+    const wrapper = await mountWith([sampleComment]);
+    expect(wrapper.findComponent(MarkdownPreview).props('text')).toBe(
+      sampleComment.text
     );
+  });
+
+  // Regression: the gallery/lightbox must be enabled so inline images expand.
+  it('enables the image lightbox on the comment body', async () => {
+    const wrapper = await mountWith([sampleComment]);
+    expect(wrapper.findComponent(MarkdownPreview).props('disableGallery')).toBe(
+      false
+    );
+  });
+
+  // Regression: the comment body is no longer wrapped in a permalink link
+  // (which nested anchors and blocked the lightbox); a dedicated permalink link
+  // is rendered instead.
+  it('renders a View Comment permalink link', async () => {
+    const wrapper = await mountWith([sampleComment]);
+    expect(wrapper.text()).toContain('View Comment');
   });
 });
