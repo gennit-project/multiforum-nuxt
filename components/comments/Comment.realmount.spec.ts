@@ -29,6 +29,13 @@ vi.mock('@/composables/useForumRoleMembership', () => ({
     forumModProfileNames: ref([]),
   }),
 }));
+vi.mock('@/composables/useServerRoleMembership', () => ({
+  useServerRoleMembership: () => ({
+    serverAdminUsernames: ref([]),
+    serverModUsernames: ref([]),
+    serverModProfileNames: ref([]),
+  }),
+}));
 vi.mock('@/composables/useBestAnswerMutations', () => ({
   useBestAnswerMutations: () => ({
     isDiscussionAuthor: ref(false),

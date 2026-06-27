@@ -25,6 +25,7 @@ import { useCommentPermalink } from '@/composables/useCommentPermalink';
 import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 import { getCommentMenuItems } from '@/utils/headerPermissionUtils';
 import { getForumRoleBadge } from '@/utils/forumRoleBadges';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 import {
   getCommentReplyCount,
   isCommentSubscribedByUser,
@@ -32,6 +33,7 @@ import {
   getCommentFeedbackLabel,
 } from '@/utils/commentDisplay';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import {
   SUBSCRIBE_TO_COMMENT,
   UNSUBSCRIBE_FROM_COMMENT,
@@ -248,6 +250,8 @@ const forumId = computed(() => {
 const { userPermissions } = useCommentPermissions(forumId);
 const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
   useForumRoleMembership();
+const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+  useServerRoleMembership();
 
 // Reactive refs for the best answer composable
 const commentIdRef = computed(() => props.commentData.id);
@@ -329,6 +333,21 @@ const forumRoleBadge = computed(() => {
     adminUsernames: forumAdminUsernames.value,
     modUsernames: forumModUsernames.value,
     modProfileNames: forumModProfileNames.value,
+  });
+});
+
+const serverRoleBadge = computed(() => {
+  const author = props.commentData?.CommentAuthor;
+  const username = author?.__typename === 'User' ? author.username : null;
+  const modProfileName =
+    author?.__typename === 'ModerationProfile' ? author.displayName : null;
+
+  return getServerRoleBadge({
+    username,
+    modProfileName,
+    adminUsernames: serverAdminUsernames.value,
+    modUsernames: serverModUsernames.value,
+    modProfileNames: serverModProfileNames.value,
   });
 });
 
@@ -527,6 +546,7 @@ const label = computed(() =>
               :is-answer="isMarkedAsAnswer"
               :bot-usernames="props.botUsernames"
               :forum-role-badge="forumRoleBadge"
+              :server-role-badge="serverRoleBadge"
             />
             <div
               class="ml-2 flex-grow border-l border-gray-300 pl-2 sm:ml-4 sm:pl-4 dark:border-gray-600"
