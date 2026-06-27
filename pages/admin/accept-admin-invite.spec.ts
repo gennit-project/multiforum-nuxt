@@ -11,6 +11,7 @@ vi.stubGlobal('definePageMeta', vi.fn());
 const mockPush = vi.fn();
 const mockMutate = vi.fn();
 const mockOnDone = vi.fn();
+const mockError = ref<{ message: string } | null>(null);
 
 vi.mock('nuxt/app', () => ({
   useRouter: () => ({
@@ -23,7 +24,7 @@ vi.mock('@vue/apollo-composable', () => ({
   useMutation: () => ({
     mutate: mockMutate,
     loading: ref(false),
-    error: ref(null),
+    error: mockError,
     onDone: mockOnDone,
   }),
 }));
@@ -46,7 +47,10 @@ describe('accept-admin-invite', () => {
     mockMutate.mockReset();
     mockOnDone.mockReset();
     mockUsernameVar.value = null;
+    mockError.value = null;
   });
+
+  const stubs = { NuxtLink: { template: '<a><slot /></a>' } };
 
   it('shows sign in required when not authenticated', () => {
     mockUsernameVar.value = null;
@@ -119,5 +123,56 @@ describe('accept-admin-invite', () => {
     expect(mockMutate).toHaveBeenCalledWith({
       serverName: 'TestServer',
     });
+  });
+
+  it('shows the accepted state after the invite is accepted', async () => {
+    mockUsernameVar.value = 'alice';
+
+    const wrapper = mount(AcceptAdminInvite, { global: { stubs } });
+
+    // Fire the onDone callback the component registered, simulating a
+    // successful acceptServerAdminInvite mutation.
+    const onDoneCb = mockOnDone.mock.calls[0][0] as (r: unknown) => void;
+    onDoneCb({ data: { acceptServerAdminInvite: true } });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.text()).toContain('Invitation Accepted');
+  });
+
+  it('navigates to the admin panel from the accepted state', async () => {
+    mockUsernameVar.value = 'alice';
+
+    const wrapper = mount(AcceptAdminInvite, { global: { stubs } });
+    const onDoneCb = mockOnDone.mock.calls[0][0] as (r: unknown) => void;
+    onDoneCb({ data: { acceptServerAdminInvite: true } });
+    await wrapper.vm.$nextTick();
+
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text().includes('Go to Admin Panel'))
+      ?.trigger('click');
+
+    expect(mockPush).toHaveBeenCalledWith({ name: 'admin-roles' });
+  });
+
+  it('declines the invitation by navigating home', async () => {
+    mockUsernameVar.value = 'alice';
+
+    const wrapper = mount(AcceptAdminInvite, { global: { stubs } });
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Decline')
+      ?.trigger('click');
+
+    expect(mockPush).toHaveBeenCalledWith({ name: 'index' });
+  });
+
+  it('shows an error message when the mutation errors', () => {
+    mockUsernameVar.value = 'alice';
+    mockError.value = { message: 'No pending admin invite found' };
+
+    const wrapper = mount(AcceptAdminInvite, { global: { stubs } });
+
+    expect(wrapper.text()).toContain('No pending admin invite found');
   });
 });

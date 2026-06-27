@@ -11,6 +11,13 @@ const cancelInviteServerMod = vi.fn();
 const removeServerModerator = vi.fn();
 const onUpdated = vi.fn();
 
+// The component reads config.serverName when calling the invite/cancel/remove
+// mutations. config derives serverName from import.meta.env, which is undefined
+// under Vitest, so mock it to a stable value.
+vi.mock('@/config', () => ({
+  config: { serverName: 'TestServer' },
+}));
+
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (fn: any) => {
     const source = fn?.loc?.source?.body || '';
@@ -116,5 +123,69 @@ describe('ServerMembershipEditor', () => {
       inviteeUsername: 'bob',
     });
     expect(onUpdated).toHaveBeenCalled();
+  });
+
+  const serverConfigWithPending = {
+    ...serverConfig,
+    PendingAdminInvites: [
+      { username: 'bob', displayName: 'Bob', profilePicURL: '' },
+    ],
+    PendingModInvites: [
+      { username: 'carol', displayName: 'Carol', profilePicURL: '' },
+    ],
+  };
+
+  const mountWithPending = () =>
+    mount(ServerMembershipEditor, {
+      props: { serverConfig: serverConfigWithPending, onUpdated },
+      global: { stubs: ['AvatarComponent', 'UsernameWithTooltip'] },
+    });
+
+  it('renders a pending admin invite with a (pending) label', () => {
+    const wrapper = mountWithPending();
+
+    expect(wrapper.text()).toContain('bob');
+  });
+
+  it('marks pending invites with a (pending) badge', () => {
+    const wrapper = mountWithPending();
+
+    expect(wrapper.text()).toContain('(pending)');
+  });
+
+  it('renders a pending mod invite', () => {
+    const wrapper = mountWithPending();
+
+    expect(wrapper.text()).toContain('carol');
+  });
+
+  it('cancels a pending admin invite', async () => {
+    const wrapper = mountWithPending();
+
+    // The first column (Server Admins) lists the pending admin invite "bob".
+    const cancelButtons = wrapper
+      .findAll('button')
+      .filter((button) => button.text() === 'Cancel');
+    await cancelButtons[0].trigger('click');
+
+    expect(cancelInviteServerAdmin).toHaveBeenCalledWith({
+      serverName: 'TestServer',
+      inviteeUsername: 'bob',
+    });
+  });
+
+  it('cancels a pending mod invite', async () => {
+    const wrapper = mountWithPending();
+
+    // Second Cancel button belongs to the Server Moderators column ("carol").
+    const cancelButtons = wrapper
+      .findAll('button')
+      .filter((button) => button.text() === 'Cancel');
+    await cancelButtons[1].trigger('click');
+
+    expect(cancelInviteServerMod).toHaveBeenCalledWith({
+      serverName: 'TestServer',
+      inviteeUsername: 'carol',
+    });
   });
 });

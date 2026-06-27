@@ -11,6 +11,7 @@ vi.stubGlobal('definePageMeta', vi.fn());
 const mockPush = vi.fn();
 const mockMutate = vi.fn();
 const mockOnDone = vi.fn();
+const mockError = ref<{ message: string } | null>(null);
 
 vi.mock('nuxt/app', () => ({
   useRouter: () => ({
@@ -23,7 +24,7 @@ vi.mock('@vue/apollo-composable', () => ({
   useMutation: () => ({
     mutate: mockMutate,
     loading: ref(false),
-    error: ref(null),
+    error: mockError,
     onDone: mockOnDone,
   }),
 }));
@@ -50,7 +51,10 @@ describe('accept-mod-invite', () => {
     mockOnDone.mockReset();
     mockUsernameVar.value = null;
     mockModProfileNameVar.value = null;
+    mockError.value = null;
   });
+
+  const stubs = { NuxtLink: { template: '<a><slot /></a>' } };
 
   it('shows sign in required when not authenticated', () => {
     mockUsernameVar.value = null;
@@ -146,5 +150,40 @@ describe('accept-mod-invite', () => {
     expect(mockMutate).toHaveBeenCalledWith({
       serverName: 'TestServer',
     });
+  });
+
+  it('shows the accepted state after the invite is accepted', async () => {
+    mockUsernameVar.value = 'alice';
+    mockModProfileNameVar.value = 'ModAlice';
+
+    const wrapper = mount(AcceptModInvite, { global: { stubs } });
+
+    const onDoneCb = mockOnDone.mock.calls[0][0] as (r: unknown) => void;
+    onDoneCb({ data: { acceptServerModInvite: true } });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.text()).toContain('Invitation Accepted');
+  });
+
+  it('shows the accepted mod profile name in the success state', async () => {
+    mockUsernameVar.value = 'alice';
+    mockModProfileNameVar.value = 'ModAlice';
+
+    const wrapper = mount(AcceptModInvite, { global: { stubs } });
+    const onDoneCb = mockOnDone.mock.calls[0][0] as (r: unknown) => void;
+    onDoneCb({ data: { acceptServerModInvite: true } });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.text()).toContain('ModAlice');
+  });
+
+  it('shows an error message when the mutation errors', () => {
+    mockUsernameVar.value = 'alice';
+    mockModProfileNameVar.value = 'ModAlice';
+    mockError.value = { message: 'No pending moderator invite found' };
+
+    const wrapper = mount(AcceptModInvite, { global: { stubs } });
+
+    expect(wrapper.text()).toContain('No pending moderator invite found');
   });
 });
