@@ -11,6 +11,12 @@ const cancelInviteServerMod = vi.fn();
 const removeServerModerator = vi.fn();
 const onUpdated = vi.fn();
 
+// config.serverName comes from import.meta.env (unset under vitest), so mock it
+// to a stable value — the component passes config.serverName to the mutations.
+vi.mock('@/config', () => ({
+  config: { serverName: 'TestServer' },
+}));
+
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (fn: any) => {
     const source = fn?.loc?.source?.body || '';

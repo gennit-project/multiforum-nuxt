@@ -210,6 +210,7 @@ export type CommentFixture = Pick<
   Channel: Pick<Channel, '__typename' | 'uniqueName'>;
   UpvotedByUsers: Array<Pick<User, 'username'>>;
   UpvotedByUsersAggregate: CountAggregate;
+  SuperUpvotedByUsers: Array<Pick<User, 'username'>>;
 };
 
 export const buildUser = (
@@ -494,6 +495,7 @@ export const buildComment = ({
   },
   UpvotedByUsers: [{ username: DEFAULT_USERNAME }],
   UpvotedByUsersAggregate: { count: 1 },
+  SuperUpvotedByUsers: [],
 });
 
 export type EventFixture = {
