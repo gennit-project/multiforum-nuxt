@@ -226,7 +226,7 @@ onUnmounted(() => {
       :open="!!activeRevision"
       :old-version="activeRevision.oldVersionData || {}"
       :new-version="activeRevision.newVersionData || {}"
-      :is-most-recent="activeRevision === allEdits[0]"
+      :is-most-recent="!!activeRevision?.isCurrent"
       @close="closeRevisionDiff"
       @deleted="handleRevisionDeleted"
     />
