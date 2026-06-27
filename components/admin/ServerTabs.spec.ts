@@ -27,6 +27,7 @@ const mountTabs = (props: Record<string, unknown> = {}) =>
         PlugIcon: true,
         InfoIcon: true,
         UserIcon: true,
+        LayoutDashboard: true,
       },
     },
   });
@@ -42,32 +43,32 @@ describe('ServerTabs', () => {
   it('renders all admin tabs', () => {
     const wrapper = mountTabs();
 
-    expect(tabs(wrapper)).toHaveLength(8);
+    expect(tabs(wrapper)).toHaveLength(9);
   });
 
-  it('labels the first tab Issues', () => {
+  it('labels the first tab Dashboard', () => {
     const wrapper = mountTabs();
 
-    expect(tabs(wrapper)[0].props('label')).toBe('Issues');
+    expect(tabs(wrapper)[0].props('label')).toBe('Dashboard');
   });
 
   it('points the issues tab at the admin issues route', () => {
     const wrapper = mountTabs();
 
-    expect(tabs(wrapper)[0].props('to')).toBe('/admin/issues');
+    expect(tabs(wrapper)[1].props('to')).toBe('/admin/issues');
   });
 
   it('marks the tab matching the route as active', () => {
     const wrapper = mountTabs();
 
-    expect(tabs(wrapper)[0].props('isActive')).toBe(true);
+    expect(tabs(wrapper)[1].props('isActive')).toBe(true);
   });
 
   it('does not mark a non-matching tab active', () => {
     h.route = { path: '/admin/settings' };
     const wrapper = mountTabs();
 
-    expect(tabs(wrapper)[0].props('isActive')).toBe(false);
+    expect(tabs(wrapper)[1].props('isActive')).toBe(false);
   });
 
   it('passes the vertical flag to the tabs', () => {

@@ -11,6 +11,7 @@ import InfoIcon from '@/components/icons/InfoIcon.vue';
 import UserIcon from '@/components/icons/UserIcon.vue';
 import type { Channel } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
+import { LayoutDashboard } from 'lucide-vue-next';
 
 type Tab = {
   name: string;
@@ -43,6 +44,7 @@ const route = useRoute();
 
 const tabRoutes = computed(() => {
   const routes: TabRoutes = {
+    dashboard: `/admin/dashboard`,
     issues: `/admin/issues`,
     channelReports: `/admin/channel-reports`,
     settings: `/admin/settings`,
@@ -61,6 +63,13 @@ const iconSize = computed(() =>
 
 const tabs = computed((): Tab[] => {
   const baseTabs: Tab[] = [
+    {
+      name: 'dashboard',
+      routeSuffix: 'dashboard',
+      label: 'Dashboard',
+      icon: LayoutDashboard,
+      countProperty: null,
+    },
     {
       name: 'issues',
       routeSuffix: 'issues',
