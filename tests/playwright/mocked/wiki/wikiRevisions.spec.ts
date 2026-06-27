@@ -94,7 +94,8 @@ const buildWikiPage = (overrides = {}) => ({
       body: 'Second version of the page.',
       editReason: 'Clarified wording',
       createdAt: '2024-01-10T00:00:00Z',
-      Author: { username: 'bob' },
+      // Authored by the test user, so they may redact it (author authorization).
+      Author: { username: TEST_USER },
     },
     {
       id: 'rev-1',
@@ -207,7 +208,7 @@ test.describe('Wiki revision history pages', () => {
       await expect(
         page.getByRole('heading', { name: 'Current Version', exact: true })
       ).toBeVisible();
-      await expect(page.getByText('From version by bob')).toBeVisible();
+      await expect(page.getByText('From version by alice')).toBeVisible();
       await expect(page.getByText('To version by carol')).toBeVisible();
       await expect(
         page.getByText('Second version of the page.', { exact: true })
@@ -297,6 +298,71 @@ test.describe('Wiki revision history pages', () => {
       );
       await expect(
         page.getByRole('heading', { name: 'Revision History For Wiki Page' })
+      ).toBeVisible();
+
+      expect(diagnostics.pageErrors).toEqual([]);
+    } finally {
+      await testInfo.attach('graphql-operations.json', {
+        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
+        contentType: 'application/json',
+      });
+    }
+  });
+
+  test('the revision selector updates the comparison and stays in sync on refresh', async ({
+    context,
+    page,
+  }, testInfo) => {
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
+
+    const diagnostics = await installGraphqlMocks(page, {
+      ...getBaseMocks(TEST_USER),
+      getWikiPage: () => ({ data: { wikiPages: [buildWikiPage()] } }),
+    });
+
+    try {
+      await page.goto(
+        `/forums/${TEST_CHANNEL}/wiki/revisions/diff/${SLUG}/most-recent-edit`
+      );
+      await waitForGraphqlOperation(
+        diagnostics.completedOperations,
+        'getWikiPage'
+      );
+
+      // Most-recent comparison: rev-2 vs current.
+      await expect(
+        page.getByText('Current version of the page.', { exact: true })
+      ).toBeVisible();
+      await expect(
+        page.getByText('Original version of the page.', { exact: true })
+      ).toHaveCount(0);
+
+      // Select the older revision; the page updates in place (no return to list).
+      await page.locator('#wiki-revision-select').selectOption('rev-1');
+      await expect(page).toHaveURL(
+        new RegExp(`/wiki/revisions/diff/${SLUG}/rev-1$`)
+      );
+      await expect(
+        page.getByText('Original version of the page.', { exact: true })
+      ).toBeVisible();
+      await expect(
+        page.getByText('Current version of the page.', { exact: true })
+      ).toHaveCount(0);
+
+      // The diff stays in sync with the URL after a refresh.
+      await page.reload();
+      await waitForGraphqlOperation(
+        diagnostics.completedOperations,
+        'getWikiPage'
+      );
+      await expect(page).toHaveURL(
+        new RegExp(`/wiki/revisions/diff/${SLUG}/rev-1$`)
+      );
+      await expect(
+        page.getByText('Original version of the page.', { exact: true })
       ).toBeVisible();
 
       expect(diagnostics.pageErrors).toEqual([]);

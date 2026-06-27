@@ -7,7 +7,14 @@ import {
   emptyContributionData,
   consecutiveDaysContributionData,
   allTypesContributionData,
+  wikiEditsContributionData,
 } from './fixtures/contributionData';
+
+const NuxtLinkStub = {
+  name: 'NuxtLink',
+  props: ['to'],
+  template: '<a><slot /></a>',
+};
 
 // Mock the child components to simplify testing
 vi.mock('@/components/comments/Comment.vue', () => ({
@@ -262,6 +269,36 @@ describe('GithubContributionChart', () => {
     expect(detailsSection.text()).toContain('comment');
     expect(detailsSection.text()).toContain('discussion');
     expect(detailsSection.text()).toContain('event');
+  });
+
+  // Wiki edits in the selected-day details
+  it('shows wiki edits in the selected day details with page and revision links', async () => {
+    const wrapper = mount(GithubContributionChart, {
+      props: {
+        contributionData: wikiEditsContributionData,
+        year: 2023,
+      },
+      global: { stubs: { NuxtLink: NuxtLinkStub } },
+    });
+
+    await flushPromises();
+
+    await wrapper.find('rect[data-count="2"]').trigger('click');
+
+    const detailsSection = wrapper.find('.mt-4.p-4.rounded-lg.border');
+    expect(detailsSection.exists()).toBe(true);
+    expect(detailsSection.text()).toContain('Wiki Edits');
+    expect(detailsSection.text()).toContain('Cat Care');
+    expect(detailsSection.text()).toContain('Fixed a typo');
+    expect(detailsSection.text()).toContain('wiki edit');
+
+    const targets = wrapper
+      .findAllComponents(NuxtLinkStub)
+      .map((l) => l.props('to'));
+    expect(targets).toContain('/forums/cats/wiki/cat-care');
+    expect(targets).toContain(
+      '/forums/cats/wiki/revisions/diff/cat-care/we1'
+    );
   });
 
   // Test deselecting a day

@@ -191,6 +191,17 @@ describe('BrokenRulesModal Component', () => {
     expect((wrapper.vm as any).modalTitle).toBe('Archive Event');
   });
 
+  it('renders the correct title for reporting a wiki edit', async () => {
+    const wrapper = await mountComponent({
+      wikiPageId: 'wiki-1',
+      wikiRevisionId: 'rev-1',
+      discussionId: '',
+      archiveAfterReporting: false,
+    });
+
+    expect((wrapper.vm as any).modalTitle).toBe('Report Wiki Edit');
+  });
+
   it('toggles forum rule selection correctly', async () => {
     const wrapper = await mountComponent();
 
