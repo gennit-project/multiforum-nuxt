@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref, computed } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { useCommentCrudMutations } from './useCommentCrudMutations';
+import { CREATE_COMMENT } from '@/graphQLData/comment/mutations';
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: vi.fn(),
@@ -230,6 +231,119 @@ describe('useCommentCrudMutations', () => {
 
       const deleteMutationCall = (useMutation as any).mock.calls[2];
       expect(deleteMutationCall[1]).toHaveProperty('update');
+    });
+  });
+
+  describe('reply cache update (getCommentReplies)', () => {
+    // Runs the CREATE_COMMENT `update` function for a reply and returns the
+    // captured getCommentReplies field modifier plus a cache spy. This mirrors
+    // the bug where a reply was written with reconstructed query variables that
+    // didn't match the active getCommentReplies query, so the reply never
+    // appeared until refresh.
+    const runReplyUpdate = (parentId = 'parent-1', newId = 'new-1') => {
+      useCommentCrudMutations({
+        discussionId: computed(() => 'discussion-123'),
+        commentToDeleteId: ref(''),
+        parentOfCommentToDelete: ref(''),
+      });
+
+      const update = (useMutation as any).mock.calls[0][1].update;
+      const captured: { getCommentReplies?: any; parentCountFields?: any } = {};
+      const cache = {
+        modify: vi.fn((opts: any) => {
+          if (opts.fields?.getCommentReplies) {
+            captured.getCommentReplies = opts.fields.getCommentReplies;
+          }
+          if (opts.fields?.replyCount) {
+            captured.parentCountFields = opts.fields;
+          }
+        }),
+        identify: (o: any) => `${o.__typename}:${o.id}`,
+      };
+
+      update(cache, {
+        data: {
+          createComments: {
+            comments: [
+              {
+                __typename: 'Comment',
+                id: newId,
+                ParentComment: { id: parentId },
+              },
+            ],
+          },
+        },
+      });
+
+      return { captured, cache };
+    };
+
+    const helpers = (parentId: string) => ({
+      storeFieldName: `getCommentReplies({"commentId":"${parentId}","limit":5,"modName":"testmod","offset":0,"sort":"hot"})`,
+      toReference: (o: any) => ({ __ref: `${o.__typename}:${o.id}` }),
+      readField: (_field: string, ref: any) =>
+        ref?.__ref ? ref.__ref.split(':')[1] : undefined,
+    });
+
+    const existingReplies = () => ({
+      __typename: 'CommentReplies',
+      ChildComments: [{ __ref: 'Comment:old-1' }],
+      aggregateChildCommentCount: 1,
+    });
+
+    it('prepends the new reply to the matching parent getCommentReplies entry', () => {
+      const { captured } = runReplyUpdate('parent-1', 'new-1');
+      const result = captured.getCommentReplies(
+        existingReplies(),
+        helpers('parent-1')
+      );
+      expect(result.ChildComments[0]).toEqual({ __ref: 'Comment:new-1' });
+    });
+
+    it('increments aggregateChildCommentCount for the matching parent', () => {
+      const { captured } = runReplyUpdate('parent-1', 'new-1');
+      const result = captured.getCommentReplies(
+        existingReplies(),
+        helpers('parent-1')
+      );
+      expect(result.aggregateChildCommentCount).toBe(2);
+    });
+
+    it('leaves getCommentReplies entries for other parents unchanged', () => {
+      const { captured } = runReplyUpdate('parent-1', 'new-1');
+      const existing = existingReplies();
+      const result = captured.getCommentReplies(existing, helpers('other-parent'));
+      expect(result).toBe(existing);
+    });
+
+    it('does not duplicate a reply that is already present', () => {
+      const { captured } = runReplyUpdate('parent-1', 'old-1');
+      const existing = existingReplies();
+      const result = captured.getCommentReplies(existing, helpers('parent-1'));
+      expect(result).toBe(existing);
+    });
+
+    it('increments the parent comment replyCount so the replies section renders', () => {
+      const { captured } = runReplyUpdate('parent-1', 'new-1');
+      expect(captured.parentCountFields.replyCount(0)).toBe(1);
+    });
+  });
+
+  // The created comment is written into the cache for the reply/comment display
+  // queries, which read these fields via the CommentFields fragment. If the
+  // mutation omits any of them, Apollo writes an incomplete entry ("Missing
+  // field ... while writing result") and the new reply fails to render.
+  describe('CREATE_COMMENT returns the fields the cache requires', () => {
+    const body = CREATE_COMMENT.loc?.source.body || '';
+
+    it.each([
+      'textLastEdited',
+      'isFavoritedByUser',
+      'SubscribedToNotifications',
+      'SuperUpvotedByUsers',
+      'isBot',
+    ])('includes the %s field', (field) => {
+      expect(body).toContain(field);
     });
   });
 

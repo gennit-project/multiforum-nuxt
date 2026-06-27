@@ -73,7 +73,7 @@ export const COMMENT_VOTE_FIELDS = gql`
   }
 `;
 
-const COMMENT_FIELDS = gql`
+export const COMMENT_FIELDS = gql`
   ${COMMENT_VOTE_FIELDS}
   fragment CommentFields on Comment {
     id

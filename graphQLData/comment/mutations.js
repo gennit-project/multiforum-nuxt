@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client/core';
+import { COMMENT_FIELDS } from './queries';
 
 export const ADD_EMOJI_TO_COMMENT = gql`
   mutation addEmojiToComment(
@@ -72,37 +73,24 @@ export const UNDO_UPVOTE_COMMENT = gql`
   }
 `;
 
+// The created comment is written directly into the Apollo cache for the
+// comment-display queries (GET_COMMENT_REPLIES, GET_DISCUSSION_COMMENTS,
+// GET_COMMENT_AND_REPLIES). It must therefore return every field those queries
+// select via the shared CommentFields fragment — otherwise Apollo writes an
+// incomplete entry ("Missing field ... while writing result") and the new
+// comment fails to render until a refetch. The extra Channel/role/ChildComments
+// selections below cover fields a few consumers read beyond the fragment.
 export const CREATE_COMMENT = gql`
   mutation createComment($createCommentInput: [CommentCreateInput!]!) {
     createComments(input: $createCommentInput) {
       comments {
-        id
-        text
+        ...CommentFields
         Channel {
           uniqueName
         }
-        Event {
-          id
-        }
-        DiscussionChannel {
-          id
-          channelUniqueName
-          discussionId
-        }
-        UpvotedByUsers {
-          username
-        }
-        UpvotedByUsersAggregate {
-          count
-        }
         CommentAuthor {
           ... on User {
-            username
             displayName
-            createdAt
-            discussionKarma
-            profilePicURL
-            commentKarma
             ChannelRoles {
               name
             }
@@ -111,62 +99,20 @@ export const CREATE_COMMENT = gql`
             }
           }
           ... on ModerationProfile {
-            displayName
             createdAt
           }
         }
-        ParentComment {
-          id
-        }
-        weightedVotesCount
-        emoji
-        createdAt
-        updatedAt
-        archived
-        ChildCommentsAggregate {
-          count
-        }
         FeedbackComments {
-          id
-        }
-        PastVersions {
           id
         }
         ChildComments {
           id
           text
-          createdAt
-          emoji
-          weightedVotesCount
-          PastVersions {
-            id
-          }
-          Event {
-            id
-          }
-          DiscussionChannel {
-            id
-            channelUniqueName
-            discussionId
-          }
-          CommentAuthor {
-            ... on User {
-              username
-            }
-            ... on ModerationProfile {
-              displayName
-            }
-          }
-          UpvotedByUsers {
-            username
-          }
-          UpvotedByUsersAggregate {
-            count
-          }
         }
       }
     }
   }
+  ${COMMENT_FIELDS}
 `;
 
 export const UPDATE_COMMENT = gql`
