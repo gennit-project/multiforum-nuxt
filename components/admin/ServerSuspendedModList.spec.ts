@@ -34,8 +34,8 @@ const mountList = () =>
       stubs: {
         AvatarComponent: true,
         ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err">{{ text }}</div>' },
-        NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
-        'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
+        NuxtLink: { name: 'NuxtLink', props: ['to'], template: '<a><slot /></a>' },
+        'nuxt-link': { name: 'NuxtLink', props: ['to'], template: '<a><slot /></a>' },
       },
     },
   });
@@ -102,5 +102,22 @@ describe('ServerSuspendedModList content', () => {
     const wrapper = mountList();
 
     expect(wrapper.text()).toContain('Related Issue');
+  });
+
+  it('points the related-issue link at the correct issue route', () => {
+    h.result = ref(withMods([suspension({ RelatedIssue: { issueNumber: 9 } })]));
+    const wrapper = mountList();
+
+    const issueLink = wrapper
+      .findAllComponents({ name: 'NuxtLink' })
+      .find(
+        (link) =>
+          (link.props('to') as { name?: string })?.name ===
+          'admin-issues-issueNumber'
+      );
+    expect(issueLink?.props('to')).toEqual({
+      name: 'admin-issues-issueNumber',
+      params: { issueNumber: 9 },
+    });
   });
 });
