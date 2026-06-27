@@ -15,7 +15,7 @@ import {
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import TagComponent from '@/components/TagComponent.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
-import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';
 import GenericModal from '@/components/GenericModal.vue';
 import WarningModal from '@/components/WarningModal.vue';
@@ -567,7 +567,7 @@ const handleDelete = async () => {
                   </div>
 
                   <div class="text-sm text-gray-600 dark:text-gray-300">
-                    <MarkdownRenderer :text="comment.text" font-size="small" />
+                    <MarkdownPreview :text="comment.text" :disable-gallery="false" />
                   </div>
                   <div
                     class="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400"
