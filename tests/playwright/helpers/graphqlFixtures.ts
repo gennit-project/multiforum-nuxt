@@ -67,6 +67,7 @@ export type BasicUserFixture = UserFixture &
 
 export type ServerConfigFixture = Pick<
   ServerConfig,
+  | '__typename'
   | 'serverName'
   | 'serverIconURL'
   | 'serverDescription'
@@ -87,6 +88,7 @@ export type ServerConfigFixture = Pick<
 
 export type ChannelFixture = Pick<
   Channel,
+  | '__typename'
   | 'uniqueName'
   | 'displayName'
   | 'channelIconURL'
@@ -261,6 +263,7 @@ export const buildBasicUser = (
 export const buildServerConfig = (
   overrides: Override<ServerConfigFixture> = {}
 ): ServerConfigFixture => ({
+  __typename: 'ServerConfig',
   serverName: 'Listical',
   serverIconURL: '',
   serverDescription: '',
@@ -294,6 +297,7 @@ export const buildChannel = ({
   discussionChannelsCount?: number;
   overrides?: Override<ChannelFixture>;
 } = {}): ChannelFixture => ({
+  __typename: 'Channel',
   uniqueName,
   displayName,
   channelIconURL: '',
