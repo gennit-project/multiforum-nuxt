@@ -10,6 +10,7 @@ import TextEditor from '@/components/TextEditor.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import CharCounter from '@/components/CharCounter.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
 import { MAX_CHARS_IN_DISCUSSION_BODY } from '@/utils/constants';
 import type {
   Discussion,
