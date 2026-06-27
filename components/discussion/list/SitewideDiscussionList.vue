@@ -403,10 +403,8 @@ const filterByChannel = (channel: string) => {
                     <span class="text-gray-700 dark:text-gray-200">
                       {{ channelLink.channelUniqueName }}
                     </span>
-                    <a
-                      :href="channelLink.link"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <nuxt-link
+                      :to="channelLink.link"
                       class="text-orange-600 hover:underline dark:text-orange-400"
                     >
                       {{ channelLink.commentCount }}
@@ -415,7 +413,7 @@ const filterByChannel = (channel: string) => {
                           ? 'comment'
                           : 'comments'
                       }}
-                    </a>
+                    </nuxt-link>
                   </li>
                 </ul>
                 <p v-else class="text-sm text-gray-500 dark:text-gray-400">

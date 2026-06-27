@@ -63,7 +63,7 @@ const stubs = {
   },
   ErrorBanner: { props: ['text'], template: '<div class="error-stub">{{ text }}</div>' },
   'v-skeleton-loader': { template: '<div class="skeleton-stub" />' },
-  NuxtLink: { template: '<a><slot /></a>' },
+  NuxtLink: { name: 'NuxtLink', props: ['to'], template: '<a :href="to"><slot /></a>' },
 };
 
 const setupQueries = (discussionMock: ReturnType<typeof createQueryMock>) => {
@@ -138,5 +138,14 @@ describe('SitewideDiscussionList', () => {
     setupQueries(createQueryMock(listResult([makeDiscussion('1')])));
     const wrapper = mountList({ query: { selectedDiscussionId: '1' } });
     expect(wrapper.text()).toContain('2 comments');
+  });
+
+  it('navigates in place rather than opening a new tab from the comment-section link', () => {
+    setupQueries(createQueryMock(listResult([makeDiscussion('1')])));
+    const wrapper = mountList({ query: { selectedDiscussionId: '1' } });
+    const commentLink = wrapper
+      .findAllComponents({ name: 'NuxtLink' })
+      .find((link) => link.text().includes('2 comments'));
+    expect(commentLink?.props('to')).toBe('/forums/cats/discussions/1');
   });
 });
