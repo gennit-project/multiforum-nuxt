@@ -18,6 +18,7 @@ export const ISSUE_BASE_FIELDS = gql`
     relatedWikiPageId
     relatedWikiRevisionId
     relatedChannelUniqueName
+    relatedModProfileName
     channelUniqueName
     Author {
       __typename
