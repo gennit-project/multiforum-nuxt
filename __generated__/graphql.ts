@@ -6758,7 +6758,6 @@ export type ChannelRole = {
   channelUniqueName?: Maybe<Scalars['String']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
-  showModTag?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type ChannelRoleAggregateSelection = {
@@ -6788,7 +6787,6 @@ export type ChannelRoleCreateInput = {
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-  showModTag?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ChannelRoleCreatedEvent = {
@@ -6823,7 +6821,6 @@ export type ChannelRoleEventPayload = {
   channelUniqueName?: Maybe<Scalars['String']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
-  showModTag?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type ChannelRoleOnCreateInput = {
@@ -6837,7 +6834,6 @@ export type ChannelRoleOnCreateInput = {
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-  showModTag?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ChannelRoleOptions = {
@@ -6859,7 +6855,6 @@ export type ChannelRoleSort = {
   channelUniqueName?: InputMaybe<SortDirection>;
   description?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
-  showModTag?: InputMaybe<SortDirection>;
 };
 
 export type ChannelRoleSubscriptionWhere = {
@@ -6891,7 +6886,6 @@ export type ChannelRoleSubscriptionWhere = {
   name_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   name_MATCHES?: InputMaybe<Scalars['String']['input']>;
   name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  showModTag?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ChannelRoleUniqueWhere = {
@@ -6909,7 +6903,6 @@ export type ChannelRoleUpdateInput = {
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-  showModTag?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ChannelRoleUpdatedEvent = {
@@ -6949,7 +6942,6 @@ export type ChannelRoleWhere = {
   name_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   name_MATCHES?: InputMaybe<Scalars['String']['input']>;
   name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  showModTag?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ChannelRolesConnection = {
@@ -62183,7 +62175,6 @@ export type ServerRole = {
   canUpvoteDiscussion?: Maybe<Scalars['Boolean']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
-  showAdminTag?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type ServerRoleAggregateSelection = {
@@ -62218,7 +62209,6 @@ export type ServerRoleCreateInput = {
   canUpvoteDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-  showAdminTag?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ServerRoleCreatedEvent = {
@@ -62259,7 +62249,6 @@ export type ServerRoleEventPayload = {
   canUpvoteDiscussion?: Maybe<Scalars['Boolean']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
-  showAdminTag?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type ServerRoleOnCreateInput = {
@@ -62279,7 +62268,6 @@ export type ServerRoleOnCreateInput = {
   canUpvoteDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-  showAdminTag?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ServerRoleOptions = {
@@ -62307,7 +62295,6 @@ export type ServerRoleSort = {
   canUpvoteDiscussion?: InputMaybe<SortDirection>;
   description?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
-  showAdminTag?: InputMaybe<SortDirection>;
 };
 
 export type ServerRoleSubscriptionWhere = {
@@ -62340,7 +62327,6 @@ export type ServerRoleSubscriptionWhere = {
   name_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   name_MATCHES?: InputMaybe<Scalars['String']['input']>;
   name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  showAdminTag?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ServerRoleUniqueWhere = {
@@ -62364,7 +62350,6 @@ export type ServerRoleUpdateInput = {
   canUpvoteDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-  showAdminTag?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ServerRoleUpdatedEvent = {
@@ -62405,7 +62390,6 @@ export type ServerRoleWhere = {
   name_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   name_MATCHES?: InputMaybe<Scalars['String']['input']>;
   name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  showAdminTag?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ServerRolesConnection = {

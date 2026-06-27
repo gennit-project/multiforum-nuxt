@@ -2,12 +2,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
+import { useRoute, useRouter } from 'vue-router';
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
 }));
 
+vi.mock('vue-router', () => ({
+  useRoute: vi.fn(),
+  useRouter: vi.fn(),
+}));
+
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
+const mockedUseRoute = useRoute as unknown as ReturnType<typeof vi.fn>;
+const mockedUseRouter = useRouter as unknown as ReturnType<typeof vi.fn>;
 
 const dashboardResult = {
   getServerHealthDashboard: {
@@ -102,6 +110,15 @@ const mountDashboard = async () => {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockedUseRoute.mockReturnValue({
+    query: {
+      startDate: '2026-05-27',
+      endDate: '2026-06-26',
+    },
+  });
+  mockedUseRouter.mockReturnValue({
+    replace: vi.fn(),
+  });
 });
 
 describe('admin dashboard page', () => {
@@ -111,7 +128,7 @@ describe('admin dashboard page', () => {
     expect(wrapper.text()).toContain('Server Dashboard');
     expect(wrapper.text()).toContain('Active Channels');
     expect(wrapper.text()).toContain('2');
-    expect(wrapper.text()).toContain('Open Issues');
+    expect(wrapper.text()).toContain('Admin Open Issues');
     expect(wrapper.text()).toContain('4');
   });
 
@@ -120,6 +137,7 @@ describe('admin dashboard page', () => {
 
     expect(wrapper.text()).toContain('General');
     expect(wrapper.text()).toContain('Needs review');
+    expect(wrapper.text()).toContain('new this period');
     expect(wrapper.text()).toContain('Stale open issues');
   });
 });
