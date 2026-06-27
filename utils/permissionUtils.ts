@@ -56,6 +56,7 @@ export const CORE_PERMISSION_KEYS = [
 
 export const ADDITIONAL_PERMISSION_KEYS = [
   'canEditWiki',
+  'canDeleteWiki',
   'canAddMods',
   'canRemoveMods',
   'canAddOwners',
@@ -86,6 +87,7 @@ type Role = {
 } & {
   // Additional permissions not directly in the schema types
   canEditWiki?: boolean;
+  canDeleteWiki?: boolean;
   canAddMods?: boolean;
   canRemoveMods?: boolean;
   canAddOwners?: boolean;
@@ -251,6 +253,7 @@ export const getAllPermissions = (
       canCloseSupportTickets: false,
       canLockChannel: false,
       canEditWiki: false,
+      canDeleteWiki: false,
       canAddMods: false,
       canRemoveMods: false,
       canAddOwners: false,

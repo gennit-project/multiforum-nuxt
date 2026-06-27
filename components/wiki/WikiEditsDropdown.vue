@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import type { PropType } from 'vue';
+import { useRoute } from 'nuxt/app';
 import type { WikiPage, TextVersion } from '@/__generated__/graphql';
 import {
   usePopoverPositioning,
   type PopoverPosition,
 } from '@/composables/usePopoverPositioning';
+import { useWikiRedactionPermission } from '@/composables/useWikiRedactionPermission';
 import { timeAgo } from '@/utils';
 import {
   buildSequentialRevisionPairs,
@@ -33,6 +35,14 @@ const popoverPosition = ref<PopoverPosition>({
   placement: 'below',
 });
 const activeRevision = ref<WikiRevisionData | null>(null);
+
+// Gate the modal's redact action to the revision author or a mod/admin with
+// canDeleteWiki, matching the backend redaction rule.
+const route = useRoute();
+const { canRedact } = useWikiRedactionPermission(
+  () => route.params.forumId as string,
+  () => activeRevision.value?.oldVersionData?.Author?.username
+);
 
 // Total number of edits
 const totalEdits = computed(() => {
@@ -227,6 +237,7 @@ onUnmounted(() => {
       :old-version="activeRevision.oldVersionData || {}"
       :new-version="activeRevision.newVersionData || {}"
       :is-most-recent="!!activeRevision?.isCurrent"
+      :can-redact="canRedact"
       @close="closeRevisionDiff"
       @deleted="handleRevisionDeleted"
     />

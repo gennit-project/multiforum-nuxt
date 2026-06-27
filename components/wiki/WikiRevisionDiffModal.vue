@@ -22,6 +22,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  canRedact: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const emit = defineEmits(['close', 'deleted']);
@@ -70,7 +74,7 @@ const handleClose = () => {
     title="Wiki Revision History"
     :error="error ? error.message : ''"
     primary-button-text="Close"
-    danger-button-text="Redact revision"
+    :danger-button-text="canRedact ? 'Redact revision' : ''"
     :danger-button-disabled="
       !oldVersion.id || oldVersion.id === 'current' || isDeleting || loading
     "

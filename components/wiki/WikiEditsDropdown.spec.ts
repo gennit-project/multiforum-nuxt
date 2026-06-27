@@ -14,6 +14,18 @@ vi.mock('@/utils', () => ({
   timeAgo: () => '2 hours ago',
 }));
 
+// The dropdown resolves redaction permission via this composable (which runs
+// Apollo queries); stub it with a controllable value.
+const redaction = vi.hoisted(() => ({ canRedact: true }));
+vi.mock('@/composables/useWikiRedactionPermission', async () => {
+  const { computed } = await import('vue');
+  return {
+    useWikiRedactionPermission: () => ({
+      canRedact: computed(() => redaction.canRedact),
+    }),
+  };
+});
+
 const mockWikiPage = {
   id: 'wiki-1',
   title: 'Test Wiki Page',
@@ -133,7 +145,7 @@ describe('WikiEditsDropdown revision pairing', () => {
   // Records the versions the dropdown hands to the modal when an edit is opened.
   const ModalStub = {
     name: 'WikiRevisionDiffModal',
-    props: ['open', 'oldVersion', 'newVersion', 'isMostRecent'],
+    props: ['open', 'oldVersion', 'newVersion', 'isMostRecent', 'canRedact'],
     template: '<div class="modal-stub" />',
   };
 
@@ -195,5 +207,17 @@ describe('WikiEditsDropdown revision pairing', () => {
 
     expect(wrapper.text()).toContain('Edit reason:');
     expect(wrapper.text()).toContain('Fixed typos');
+  });
+
+  it('passes the resolved redaction permission to the modal', async () => {
+    redaction.canRedact = false;
+    try {
+      const wrapper = await mountOpened();
+      await wrapper.findAll('li')[0].trigger('click');
+      await nextTick();
+      expect(wrapper.findComponent(ModalStub).props('canRedact')).toBe(false);
+    } finally {
+      redaction.canRedact = true;
+    }
   });
 });

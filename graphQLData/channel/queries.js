@@ -173,6 +173,7 @@ export const GET_CHANNEL = gql`
         canCloseSupportTickets
         canReport
         canSuspendUser
+        canDeleteWiki
       }
       ElevatedModRole {
         canHideComment
@@ -186,6 +187,7 @@ export const GET_CHANNEL = gql`
         canCloseSupportTickets
         canReport
         canSuspendUser
+        canDeleteWiki
       }
       SuspendedModRole {
         canHideComment
@@ -199,6 +201,7 @@ export const GET_CHANNEL = gql`
         canCloseSupportTickets
         canReport
         canSuspendUser
+        canDeleteWiki
       }
       DefaultChannelRole {
         canCreateComment
