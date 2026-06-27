@@ -4,6 +4,7 @@ import type { PropType } from 'vue';
 import type { Comment, User } from '@/__generated__/graphql';
 import { stableRelativeTime } from '@/utils';
 import type { ForumRoleBadge } from '@/utils/forumRoleBadges';
+import type { ServerRoleBadge } from '@/utils/serverRoleBadges';
 import {
   getPermalinkToDiscussionComment,
   getPermalinkToDiscussion,
@@ -52,6 +53,10 @@ const props = defineProps({
   },
   forumRoleBadge: {
     type: String as PropType<ForumRoleBadge>,
+    default: null,
+  },
+  serverRoleBadge: {
+    type: String as PropType<ServerRoleBadge>,
     default: null,
   },
 });
@@ -263,6 +268,16 @@ const contextLinkObject = computed(() => {
                 >Bot</span
               >
               <span
+                v-if="serverRoleBadge === 'serverAdmin'"
+                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Server Admin</span
+              >
+              <span
+                v-else-if="serverRoleBadge === 'serverMod'"
+                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Server Mod</span
+              >
+              <span
                 v-if="forumRoleBadge === 'forumAdmin'"
                 class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                 >Forum Admin</span
@@ -287,7 +302,29 @@ const contextLinkObject = computed(() => {
               params: { username: commentData.CommentAuthor.displayName },
             }"
           >
-            {{ commentData.CommentAuthor.displayName }}
+            <span class="flex flex-row items-center gap-1">
+              {{ commentData.CommentAuthor.displayName }}
+              <span
+                v-if="serverRoleBadge === 'serverAdmin'"
+                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Server Admin</span
+              >
+              <span
+                v-else-if="serverRoleBadge === 'serverMod'"
+                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Server Mod</span
+              >
+              <span
+                v-if="forumRoleBadge === 'forumAdmin'"
+                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Forum Admin</span
+              >
+              <span
+                v-else-if="forumRoleBadge === 'forumMod'"
+                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Forum Mod</span
+              >
+            </span>
           </NuxtLink>
           <span v-else class="flex items-center font-bold">
             <div

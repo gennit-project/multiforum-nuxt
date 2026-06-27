@@ -14,7 +14,9 @@ import {
 } from '@/utils/routerUtils';
 import { getOriginalPoster } from '@/utils/originalPoster';
 import { getForumRoleBadge } from '@/utils/forumRoleBadges';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 
 const props = defineProps({
   commentId: {
@@ -31,6 +33,8 @@ const emit = defineEmits([
 const route = useRoute();
 const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
   useForumRoleMembership();
+const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+  useServerRoleMembership();
 const channelId = computed(() => {
   if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
@@ -67,6 +71,21 @@ const forumRoleBadge = computed(() => {
     adminUsernames: forumAdminUsernames.value,
     modUsernames: forumModUsernames.value,
     modProfileNames: forumModProfileNames.value,
+  });
+});
+
+const serverRoleBadge = computed(() => {
+  const author = originalComment.value?.CommentAuthor;
+  const username = author?.__typename === 'User' ? author.username : null;
+  const modProfileName =
+    author?.__typename === 'ModerationProfile' ? author.displayName : null;
+
+  return getServerRoleBadge({
+    username,
+    modProfileName,
+    adminUsernames: serverAdminUsernames.value,
+    modUsernames: serverModUsernames.value,
+    modProfileNames: serverModProfileNames.value,
   });
 });
 
@@ -166,6 +185,7 @@ const permalinkObject = computed(() => {
           :show-context-link="true"
           :show-channel="false"
           :forum-role-badge="forumRoleBadge"
+          :server-role-badge="serverRoleBadge"
         />
         <nuxt-link :to="permalinkObject" class="text-orange-500 underline">
           Context

@@ -7,7 +7,7 @@ import { useUsername } from '@/composables/useAuthState';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import AddToCommentFavorites from '@/components/favorites/AddToCommentFavorites.vue';
-import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import { relativeTime } from '@/utils';
 import {
   getCommentPermalink,
@@ -202,16 +202,18 @@ const getFavoriteCommentAuthorInfo = (
                   </div>
                 </div>
 
-                <!-- Comment content -->
+                <!-- Comment content. Not wrapped in a permalink link: that
+                  nests interactive markdown links/images inside an anchor
+                  (invalid HTML that can swallow navigation) and blocks the
+                  inline-image lightbox. Use the "View Comment" link below to
+                  reach the permalink. -->
                 <div class="mb-4">
-                  <NuxtLink :to="getCommentPermalink(comment)" class="block">
-                    <div class="prose prose-sm max-w-none dark:prose-invert">
-                      <MarkdownRenderer
-                        :text="comment.text"
-                        font-size="small"
-                      />
-                    </div>
-                  </NuxtLink>
+                  <div class="prose prose-sm max-w-none dark:prose-invert">
+                    <MarkdownPreview
+                      :text="comment.text"
+                      :disable-gallery="false"
+                    />
+                  </div>
                 </div>
 
                 <!-- Meta information -->

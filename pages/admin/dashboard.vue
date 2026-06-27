@@ -320,12 +320,12 @@ const healthLabelDescription = (row: ChannelHealthRow) => {
 
 const severityClasses = (severity: string) => {
   if (severity === 'CRITICAL') {
-    return 'border-red-200 bg-red-100!text-red-900 dark:border-red-900/60 dark:bg-red-900/30 dark:!text-red-100';
+    return 'border-red-200 bg-red-100 !text-red-900 dark:border-red-900/60 dark:bg-red-900/30 dark:!text-red-100';
   }
   if (severity === 'WARNING') {
-    return 'border-yellow-200 bg-yellow-100!text-yellow-900 dark:border-yellow-900/60 dark:bg-yellow-900/30 dark:!text-yellow-100';
+    return 'border-yellow-200 bg-yellow-100 !text-yellow-900 dark:border-yellow-900/60 dark:bg-yellow-900/30 dark:!text-yellow-100';
   }
-  return 'border-blue-200 bg-blue-100!text-blue-900 dark:border-blue-900/60 dark:bg-blue-900/30 dark:!text-blue-100';
+  return 'border-blue-200 bg-blue-100 !text-blue-900 dark:border-blue-900/60 dark:bg-blue-900/30 dark:!text-blue-100';
 };
 
 const healthLabelClasses = (label: string) => {
@@ -373,7 +373,7 @@ const healthLabelClasses = (label: string) => {
         </label>
         <button
           type="button"
-          class="inline-flex h-10 items-center gap-2 rounded-md border border-gray-300 px-3 text-sm font-medium text-gray-700 hover:bg-gray-100dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-800"
+          class="inline-flex h-10 items-center gap-2 rounded-md border border-gray-300 px-3 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-800"
           @click="refetch(dashboardVariables)"
         >
           <RefreshCw class="h-4 w-4" />
@@ -399,7 +399,7 @@ const healthLabelClasses = (label: string) => {
 
       <div
         v-if="error"
-        class="rounded-md border border-red-200 bg-red-100px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-900/30 dark:text-red-100"
+        class="rounded-md border border-red-200 bg-red-100 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-900/30 dark:text-red-100"
       >
         {{ error.message }}
       </div>
@@ -545,7 +545,7 @@ const healthLabelClasses = (label: string) => {
 
           <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-800">
-              <thead class="bg-gray-100text-left text-xs uppercase text-gray-500 dark:bg-gray-900 dark:text-gray-400">
+              <thead class="bg-gray-100 text-left text-xs uppercase text-gray-500 dark:bg-gray-900 dark:text-gray-400">
                 <tr>
                   <th class="px-4 py-3 font-medium">Channel</th>
                   <th class="px-4 py-3 font-medium">Activity</th>
@@ -686,7 +686,7 @@ const healthLabelClasses = (label: string) => {
             </div>
             <div
               v-else
-              class="flex items-center gap-2 rounded-md border border-green-200 bg-green-100px-3 py-3 text-sm text-green-800 dark:border-green-900/60 dark:bg-green-900/30 dark:text-green-100"
+              class="flex items-center gap-2 rounded-md border border-green-200 bg-green-100 px-3 py-3 text-sm text-green-800 dark:border-green-900/60 dark:bg-green-900/30 dark:text-green-100"
             >
               <CheckCircle2 class="h-4 w-4" />
               No attention items in this range.
