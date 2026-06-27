@@ -16,6 +16,7 @@ import {
   getRevisionAuthorName,
   type RevisionPair,
 } from '@/utils/revisionHistory';
+import { useWikiRedactionPermission } from '@/composables/useWikiRedactionPermission';
 
 type WikiRevisionData = RevisionPair<TextVersion>;
 type WikiPageWithEditReason = WikiPage & { editReason?: string | null };
@@ -85,6 +86,12 @@ const allEdits = computed(() => {
 const currentRevision = computed(() => {
   return allEdits.value.find((edit) => edit.id === revisionId.value);
 });
+
+// Only the revision author or a mod/admin with canDeleteWiki may redact.
+const { canRedact } = useWikiRedactionPermission(
+  () => forumId,
+  () => currentRevision.value?.oldVersionData?.Author?.username
+);
 
 const formatRevisionOptionLabel = (edit: WikiRevisionData) => {
   const formattedDate = new Date(edit.createdAt).toLocaleString('en-US', {
@@ -263,6 +270,7 @@ useHead({
 
             <button
               v-if="
+                canRedact &&
                 currentRevision.oldVersionData?.id &&
                 currentRevision.oldVersionData.id !== 'current'
               "

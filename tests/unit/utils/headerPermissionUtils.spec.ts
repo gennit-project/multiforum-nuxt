@@ -29,6 +29,7 @@ const createBasePermissions = (
   canLockChannel: false,
   // Additional permission keys
   canEditWiki: false,
+  canDeleteWiki: false,
   canAddMods: false,
   canRemoveMods: false,
   canAddOwners: false,

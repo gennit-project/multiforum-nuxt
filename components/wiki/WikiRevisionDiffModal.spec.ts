@@ -62,6 +62,21 @@ describe('WikiRevisionDiffModal', () => {
     });
   });
 
+  it('hides the redact action when the user is not authorized', () => {
+    const wrapper = mount(WikiRevisionDiffModal, {
+      props: {
+        open: true,
+        oldVersion,
+        newVersion,
+        canRedact: false,
+      },
+    });
+
+    const modal = wrapper.findComponent({ name: 'GenericModal' });
+    // GenericModal only renders its danger button when dangerButtonText is set.
+    expect(modal.props('dangerButtonText')).toBe('');
+  });
+
   it('renders revision metadata', () => {
     const wrapper = mount(WikiRevisionDiffModal, {
       props: {

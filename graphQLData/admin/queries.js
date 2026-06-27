@@ -47,6 +47,7 @@ export const GET_SERVER_CONFIG = gql`
         canCloseSupportTickets
         canReport
         canSuspendUser
+        canDeleteWiki
       }
       DefaultElevatedModRole {
         name
@@ -63,6 +64,7 @@ export const GET_SERVER_CONFIG = gql`
         canCloseSupportTickets
         canReport
         canSuspendUser
+        canDeleteWiki
       }
       DefaultSuspendedRole {
         name
@@ -148,6 +150,7 @@ export const GET_SERVER_PERMISSIONS = gql`
         canCloseSupportTickets
         canReport
         canSuspendUser
+        canDeleteWiki
       }
       DefaultElevatedModRole {
         name
@@ -164,6 +167,7 @@ export const GET_SERVER_PERMISSIONS = gql`
         canCloseSupportTickets
         canReport
         canSuspendUser
+        canDeleteWiki
       }
       DefaultSuspendedModRole {
         name

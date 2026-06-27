@@ -10,6 +10,9 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import OnThisPage from '@/components/wiki/OnThisPage.vue';
 import FontSizeControl from '@/components/channel/FontSizeControl.vue';
+import SuspensionNotice from '@/components/SuspensionNotice.vue';
+import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
+import { useUsername } from '@/composables/useAuthState';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import { timeAgo } from '@/utils';
@@ -51,6 +54,31 @@ const channel = computed(() => channelResult.value?.channels?.[0]);
 
 // Check if wiki is enabled
 const wikiEnabled = computed(() => channel.value?.wikiEnabled);
+
+// Suspended users cannot edit wiki pages; gate the edit entry points and show a
+// notice, mirroring the wiki home (index) page.
+const usernameVar = useUsername();
+const {
+  activeSuspension,
+  issueNumber: suspensionIssueNumber,
+  suspendedUntil,
+  suspendedIndefinitely,
+  channelId: suspensionChannelId,
+} = useChannelSuspensionNotice(forumId);
+
+const wikiEditBlockedBySuspension = computed(
+  () => !!usernameVar.value && !!activeSuspension.value
+);
+const showWikiEditSuspensionNotice = computed(
+  () => wikiEditBlockedBySuspension.value && !!suspensionIssueNumber.value
+);
+const wikiEditSuspensionMessage =
+  'You are suspended in this forum and cannot edit wiki pages.';
+
+function editWikiPage() {
+  if (wikiEditBlockedBySuspension.value) return;
+  router.push(`/forums/${forumId}/wiki/edit/${wikiPage.value?.slug}`);
+}
 
 // Navigate to wiki home
 function goToWikiHome() {
@@ -146,13 +174,21 @@ onGetWikiPageResult((result) => {
           </h1>
           <PrimaryButton
             :label="'Edit Page'"
-            @click="
-              router.push(`/forums/${forumId}/wiki/edit/${wikiPage.slug}`)
-            "
+            :disabled="wikiEditBlockedBySuspension"
+            @click="editWikiPage"
           >
             <PencilIcon class="mr-2 h-5 w-5" />
           </PrimaryButton>
         </div>
+        <SuspensionNotice
+          v-if="showWikiEditSuspensionNotice"
+          class="mt-4"
+          :message="wikiEditSuspensionMessage"
+          :issue-number="suspensionIssueNumber ?? 0"
+          :channel-id="suspensionChannelId"
+          :suspended-until="suspendedUntil ?? undefined"
+          :suspended-indefinitely="suspendedIndefinitely"
+        />
         <div
           class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400"
         >
@@ -199,9 +235,12 @@ onGetWikiPageResult((result) => {
           <div class="mt-8 border-t border-gray-200 pt-6 dark:border-gray-700">
             <button
               class="flex items-center text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
-              @click="
-                router.push(`/forums/${forumId}/wiki/edit/${wikiPage.slug}`)
-              "
+              :disabled="wikiEditBlockedBySuspension"
+              :class="{
+                'cursor-default opacity-60 hover:text-gray-600 dark:hover:text-gray-400':
+                  wikiEditBlockedBySuspension,
+              }"
+              @click="editWikiPage"
             >
               <PencilIcon class="mr-2 h-4 w-4" />
               Edit this page
