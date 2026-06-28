@@ -1,13 +1,14 @@
-import { describe, it, expect, vi } from 'vitest';
-import { shallowMount } from '@vue/test-utils';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { shallowMount, mount } from '@vue/test-utils';
 import { ref, defineComponent, h } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 
 const routeQuery: Record<string, unknown> = {};
+const mockRouterPush = vi.fn();
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({ query: routeQuery }),
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: mockRouterPush, resolve: (r: unknown) => r }),
   useHead: vi.fn(),
 }));
 
@@ -44,6 +45,10 @@ const mountWith = async (opts: {
   });
 };
 
+beforeEach(() => {
+  mockRouterPush.mockClear();
+});
+
 describe('comment search page', () => {
   it('prompts for a search term when the input is empty', async () => {
     const wrapper = await mountWith({ searchInput: '' });
@@ -66,5 +71,110 @@ describe('comment search page', () => {
       count: 0,
     });
     expect(wrapper.text()).toContain('No comments match your search.');
+  });
+});
+
+// A search result card is itself a permalink: clicking the card navigates to the
+// matched comment, while the nested author/context/"View comment" links use
+// @click.stop so they reach their own destinations instead of the comment
+// permalink. These tests cover that interaction (previously manual-only).
+describe('comment search result navigation', () => {
+  const discussionComment = {
+    id: 'comment-1',
+    text: 'a matching comment',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    CommentAuthor: {
+      __typename: 'User',
+      username: 'bob',
+      displayName: 'Bob',
+      profilePicURL: '',
+    },
+    DiscussionChannel: {
+      channelUniqueName: 'cats',
+      discussionId: 'discussion-1',
+      Discussion: { title: 'Great topic' },
+    },
+  };
+
+  const RouterLinkStub = { props: ['to'], template: '<a><slot /></a>' };
+  const passthrough = (tag = 'div') => ({ template: `<${tag}><slot /></${tag}>` });
+
+  const mountResults = async () => {
+    routeQuery.searchInput = 'matching';
+    mockedUseQuery.mockReturnValue({
+      result: ref({
+        comments: [discussionComment],
+        commentsAggregate: { count: 1 },
+      }),
+      loading: ref(false),
+      error: ref(null),
+      fetchMore: vi.fn(),
+    });
+    const Page = (await import('./search.vue')).default;
+    return mount(Page, {
+      global: {
+        stubs: {
+          NuxtLayout: NuxtLayoutStub,
+          RouterLink: RouterLinkStub,
+          SearchBar: passthrough(),
+          FilterChip: passthrough(),
+          ChannelIcon: passthrough('span'),
+          SearchableForumList: passthrough(),
+          AvatarComponent: passthrough('span'),
+          MarkdownPreview: passthrough(),
+          LoadMore: passthrough(),
+        },
+      },
+    });
+  };
+
+  it('navigates to the comment permalink when the card is clicked', async () => {
+    const wrapper = await mountResults();
+
+    await wrapper.get('[role="link"]').trigger('click');
+
+    expect(mockRouterPush).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'forums-forumId-discussions-discussionId-comments-commentId',
+        params: expect.objectContaining({
+          forumId: 'cats',
+          discussionId: 'discussion-1',
+          commentId: 'comment-1',
+        }),
+      })
+    );
+  });
+
+  it('does not trigger card navigation when the author link is clicked', async () => {
+    const wrapper = await mountResults();
+    const authorLink = wrapper
+      .findAll('a')
+      .find((a) => a.text().includes('Bob'))!;
+
+    await authorLink.trigger('click');
+
+    expect(mockRouterPush).not.toHaveBeenCalled();
+  });
+
+  it('does not trigger card navigation when the context link is clicked', async () => {
+    const wrapper = await mountResults();
+    const contextLink = wrapper
+      .findAll('a')
+      .find((a) => a.text().includes('Great topic'))!;
+
+    await contextLink.trigger('click');
+
+    expect(mockRouterPush).not.toHaveBeenCalled();
+  });
+
+  it('does not trigger card navigation when the "View comment" link is clicked', async () => {
+    const wrapper = await mountResults();
+    const viewLink = wrapper
+      .findAll('a')
+      .find((a) => a.text().includes('View comment'))!;
+
+    await viewLink.trigger('click');
+
+    expect(mockRouterPush).not.toHaveBeenCalled();
   });
 });
