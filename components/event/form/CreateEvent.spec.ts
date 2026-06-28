@@ -177,4 +177,68 @@ describe('CreateEvent', () => {
 
     expect(mockMutate).not.toHaveBeenCalled();
   });
+
+  // Drives the form into a multi-date / recurring state and submits, exercising
+  // the series-creation path (issue #229).
+  async function submitWithFormValues(
+    overrides: Record<string, unknown>
+  ) {
+    const wrapper = mountCreateEvent();
+    const fields = wrapper.findComponent({ name: 'CreateEditEventFields' });
+    fields.vm.$emit('updateFormValues', {
+      title: 'Weekly meetup',
+      selectedChannels: ['cats'],
+      ...overrides,
+    });
+    await wrapper.vm.$nextTick();
+    await wrapper.find('[data-testid="submit"]').trigger('click');
+    return wrapper;
+  }
+
+  it('submits the manually-entered occurrences as a series for "multiple" date mode', async () => {
+    await submitWithFormValues({
+      dateMode: 'multiple',
+      occurrences: [
+        { startTime: '2030-01-01T18:00:00.000Z', endTime: '2030-01-01T21:00:00.000Z' },
+        { startTime: '2030-01-08T18:00:00.000Z', endTime: '2030-01-08T21:00:00.000Z' },
+      ],
+    });
+
+    expect(mockMutate).toHaveBeenCalledWith({
+      input: expect.objectContaining({
+        title: 'Weekly meetup',
+        channelConnections: ['cats'],
+        occurrences: [
+          { startTime: '2030-01-01T18:00:00.000Z', endTime: '2030-01-01T21:00:00.000Z' },
+          { startTime: '2030-01-08T18:00:00.000Z', endTime: '2030-01-08T21:00:00.000Z' },
+        ],
+      }),
+    });
+  });
+
+  it('generates occurrences from the repeat pattern for "recurring" date mode', async () => {
+    await submitWithFormValues({
+      dateMode: 'recurring',
+      startTime: '2030-01-01T18:00:00.000Z',
+      endTime: '2030-01-01T21:00:00.000Z',
+      repeatPattern: {
+        type: 'WEEKLY',
+        count: 1,
+        endType: 'AFTER_COUNT',
+        endCount: 3,
+      },
+    });
+
+    expect(mockMutate.mock.calls[0][0].input.occurrences).toHaveLength(3);
+  });
+
+  it('uses the single-event mutation (occurrences nested in an array) for "single" date mode', async () => {
+    await submitWithFormValues({
+      dateMode: 'single',
+      startTime: '2030-01-01T18:00:00.000Z',
+      endTime: '2030-01-01T21:00:00.000Z',
+    });
+
+    expect(Array.isArray(mockMutate.mock.calls[0][0].input)).toBe(true);
+  });
 });
