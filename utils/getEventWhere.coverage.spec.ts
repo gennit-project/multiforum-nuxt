@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import getEventWhere from './getEventWhere';
-import { LocationFilterTypes } from './locationFilterTypes';
-import { timeShortcutValues } from './eventSearchOptions';
+import getEventWhere from '@/utils/getEventWhere';
+import { LocationFilterTypes } from '@/components/event/list/filters/locationFilterTypes';
+import { timeShortcutValues } from '@/components/event/list/filters/eventSearchOptions';
 import type { SearchEventValues } from '@/types/Event';
 
 // NOTE: getEventWhere captures `const now = DateTime.now()` at MODULE load, so

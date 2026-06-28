@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   getFilterValuesFromParams,
   defaultPlace,
-} from '@/components/event/list/filters/getEventFilterValuesFromParams';
+} from '@/utils/getEventFilterValuesFromParams';
 import {
   chronologicalOrder,
   reverseChronologicalOrder,

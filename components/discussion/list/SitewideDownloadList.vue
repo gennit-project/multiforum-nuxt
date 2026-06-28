@@ -11,11 +11,11 @@ import DownloadSkeletonCard from '@/components/download/DownloadSkeletonCard.vue
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { GET_SITE_WIDE_DISCUSSION_LIST } from '@/graphQLData/discussion/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
-import { getFilterValuesFromParams } from './getDiscussionFilterValuesFromParams';
+import { getFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,
-} from '@/components/comments/getSortFromQuery';
+} from '@/utils/getSortFromQuery';
 import { config } from '@/config';
 import { useUsername } from '@/composables/useAuthState';
 import type { SearchDiscussionValues } from '@/types/Discussion';

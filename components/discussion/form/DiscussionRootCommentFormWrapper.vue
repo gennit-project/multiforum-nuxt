@@ -13,7 +13,7 @@ import type { NormalizedCacheObject, ApolloCache, FetchResult  } from '@apollo/c
 import { CREATE_COMMENT } from '@/graphQLData/comment/mutations';
 import { GET_DISCUSSION_COMMENTS } from '@/graphQLData/comment/queries';
 import { GET_USER } from '@/graphQLData/user/queries';
-import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
+import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import { useRoute } from 'nuxt/app';
 import { gql } from '@apollo/client/core';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';

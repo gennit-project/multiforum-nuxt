@@ -44,7 +44,7 @@ vi.mock('@/composables/useAuthState', async () => {
   };
 });
 
-vi.mock('@/components/comments/getSortFromQuery', async (importOriginal) => {
+vi.mock('@/utils/getSortFromQuery', async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,

@@ -1,6 +1,6 @@
-import { LocationFilterTypes } from './locationFilterTypes';
+import { LocationFilterTypes } from '@/components/event/list/filters/locationFilterTypes';
 import type { SearchEventValues } from '@/types/Event';
-import { timeShortcutValues } from './eventSearchOptions';
+import { timeShortcutValues } from '@/components/event/list/filters/eventSearchOptions';
 import { DateTime } from 'luxon';
 import type { EventWhere } from '@/__generated__/graphql';
 

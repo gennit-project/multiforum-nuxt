@@ -11,11 +11,11 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/graphQLData/discussion/queries';
 import { useUsername } from '@/composables/useAuthState';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
-import { getFilterValuesFromParams } from '@/components/discussion/list/getDiscussionFilterValuesFromParams';
+import { getFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,
-} from '@/components/comments/getSortFromQuery';
+} from '@/utils/getSortFromQuery';
 import { useAppTheme } from '@/composables/useTheme';
 import type { DiscussionChannel } from '@/__generated__/graphql';
 

@@ -23,7 +23,7 @@ vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => ({ value: 'alice' }),
 }));
 
-vi.mock('@/components/comments/getSortFromQuery', () => ({
+vi.mock('@/utils/getSortFromQuery', () => ({
   getSortFromQuery: () => 'new',
 }));
 

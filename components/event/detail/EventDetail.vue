@@ -31,7 +31,7 @@ import EventBody from '@/components/event/detail/EventBody.vue';
 import ExpandableImage from '@/components/ExpandableImage.vue';
 import EventCommentsWrapper from '@/components/event/detail/EventCommentsWrapper.vue';
 import EventRootCommentFormWrapper from '@/components/event/detail/EventRootCommentFormWrapper.vue';
-import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
+import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import EventChannelLinks from '@/components/event/detail/EventChannelLinks.vue';
 import { useRoute, useHead } from 'nuxt/app';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';

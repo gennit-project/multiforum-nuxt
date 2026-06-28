@@ -17,7 +17,7 @@ import 'md-editor-v3/lib/style.css';
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,
-} from '@/components/comments/getSortFromQuery';
+} from '@/utils/getSortFromQuery';
 import { useRouter, useRoute } from 'nuxt/app';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { useUsername } from '@/composables/useAuthState';

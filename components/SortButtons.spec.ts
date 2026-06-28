@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 
 import SortButtons from '@/components/SortButtons.vue';
-import { availableSortTypes } from '@/components/comments/getSortFromQuery';
+import { availableSortTypes } from '@/utils/getSortFromQuery';
 
 const h = vi.hoisted(() => ({ route: null as unknown, push: vi.fn() }));
 

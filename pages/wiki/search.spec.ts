@@ -13,7 +13,7 @@ vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
 }));
 
-vi.mock('@/components/discussion/list/getDiscussionFilterValuesFromParams', () => ({
+vi.mock('@/utils/getDiscussionFilterValuesFromParams', () => ({
   getFilterValuesFromParams: () => ({ searchInput: '', channels: [] }),
 }));
 
