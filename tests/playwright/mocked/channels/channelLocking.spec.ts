@@ -247,6 +247,34 @@ test.describe('Channel locking', () => {
     }
   });
 
+  test('locked banner is shown on the events tab too (layout-level banner)', async ({
+    context,
+    page,
+  }, testInfo) => {
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
+
+    const diagnostics = await installGraphqlMocks(page, {
+      ...lockedChannelMocks(TEST_USER),
+      getEvents: () => ({ data: { events: [] } }),
+    });
+
+    try {
+      await page.goto(`/forums/${TEST_CHANNEL}/events`);
+
+      await expect(
+        page.getByText(/This forum is locked/i).first()
+      ).toBeVisible();
+    } finally {
+      await testInfo.attach('graphql-operations.json', {
+        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
+        contentType: 'application/json',
+      });
+    }
+  });
+
   test('locked forum blocks discussion creation with an explanation', async ({
     context,
     page,
