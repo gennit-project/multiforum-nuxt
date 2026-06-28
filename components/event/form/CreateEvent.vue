@@ -17,6 +17,7 @@ import type {
 } from '@/__generated__/graphql';
 import { useUsername } from '@/composables/useAuthState';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
+import { FORUM_LOCKED_MESSAGE } from '@/composables/useForumLock';
 
 const usernameVar = useUsername();
 
@@ -106,8 +107,21 @@ const channelPreferenceError = computed(() => {
   return 'Cannot create an event because events are not enabled for this forum.';
 });
 
+// A locked forum blocks all content creation; reuse the channel query above
+// rather than issuing a second one.
+const channelLockError = computed(() =>
+  channelResult.value?.channels?.[0]?.locked === true
+    ? FORUM_LOCKED_MESSAGE
+    : null
+);
+
 const formSubmitError = computed(() => {
-  return submitError.value ?? channelPreferenceError.value ?? undefined;
+  return (
+    submitError.value ??
+    channelLockError.value ??
+    channelPreferenceError.value ??
+    undefined
+  );
 });
 
 const {
@@ -157,6 +171,10 @@ onDone((response) => {
 function submit() {
   submitAttempted.value = true;
   submitError.value = null;
+  if (channelLockError.value) {
+    submitError.value = channelLockError.value;
+    return;
+  }
   if (channelPreferenceError.value) {
     submitError.value = channelPreferenceError.value;
     return;

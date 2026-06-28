@@ -99,6 +99,8 @@ export type ChannelFixture = Pick<
   | 'emojiEnabled'
   | 'rules'
   | 'locked'
+  | 'lockedAt'
+  | 'lockReason'
   | 'wikiEnabled'
   | 'eventsEnabled'
   | 'downloadsEnabled'
@@ -119,6 +121,7 @@ export type ChannelFixture = Pick<
   pluginPipelines: unknown[];
   DefaultElevatedModRole: null;
   Admins: UserFixture[];
+  LockedBy: { displayName: string } | null;
   DiscussionChannelsAggregate: CountAggregate;
   IssuesAggregate: CountAggregate;
   EventChannelsAggregate: CountAggregate;
@@ -305,6 +308,9 @@ export const buildChannel = ({
   emojiEnabled: true,
   rules: '[]',
   locked: false,
+  lockedAt: null,
+  lockReason: null,
+  LockedBy: null,
   wikiEnabled: false,
   eventsEnabled: true,
   downloadsEnabled: false,

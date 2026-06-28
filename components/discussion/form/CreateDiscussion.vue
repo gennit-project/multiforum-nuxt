@@ -20,6 +20,7 @@ import {
 } from '@/components/comments/getSortFromQuery';
 import { useRouter, useRoute } from 'nuxt/app';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
+import { useForumLock } from '@/composables/useForumLock';
 import { useUsername } from '@/composables/useAuthState';
 
 const usernameVar = useUsername();
@@ -162,6 +163,12 @@ const channelConnections = computed(() => formValues.value.selectedChannels);
 const submitError = ref<string | null>(null);
 const submitAttempted = ref(false);
 
+const { lockError } = useForumLock(channelId);
+
+// Surface the lock notice immediately (not just after a submit attempt), mirroring
+// the channel-preference gate in CreateEvent.
+const formSubmitError = computed(() => submitError.value ?? lockError.value);
+
 const {
   issueNumber: suspensionIssueNumber,
   suspendedUntil: suspensionUntil,
@@ -276,6 +283,10 @@ function submit() {
   }
   submitAttempted.value = true;
   submitError.value = null;
+  if (lockError.value) {
+    submitError.value = lockError.value;
+    return;
+  }
   createDiscussion();
 }
 
@@ -321,7 +332,7 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
         :edit-mode="false"
         :form-values="formValues"
         :download-mode="false"
-        :submit-error="submitError"
+        :submit-error="formSubmitError"
         :suspension-issue-number="
           showSuspensionNotice ? suspensionIssueNumber : null
         "
