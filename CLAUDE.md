@@ -80,6 +80,17 @@
   - Group related tests with descriptive names
   - Test both success and failure paths
 
+#### Unit Test Gotchas
+
+Hard-won pitfalls (full detail + code in [CONTRIBUTING.md](./CONTRIBUTING.md#frontend-testing-patterns)):
+
+- **Mount the real component, never a hand-written stand-in.** A spec that defines `const FooTest = { template: '...' }` and mounts that adds **zero** coverage to `Foo.vue`. Mock the component's dependencies instead of reimplementing it.
+- **Mock Apollo at module level.** `mountWithDefaults` does not wire Apollo. Mock `@vue/apollo-composable`; to run a mutation's `onDone` handlers, make `mutate()` synchronously fire the registered `onDone` callbacks, and return an empty `useQuery` result.
+- **Seed hoisted `vi.fn` mocks with the full return shape.** `vi.fn(() => ({ valid: true }))` narrows the type, so a later `mockReturnValue({ valid: false, message })` fails CI's `vue-tsc` even when the test passes locally. Seed `{ valid: true, message: '' }`.
+- **`@/utils` and `@/utils/index` are the same module** — if you mock one, mock both with every needed export.
+- **Teleported UI** (`<Teleport to="body">` tooltips/modals) renders into `document.body`, not the wrapper — query the document.
+- **Mocked GraphQL entities need `__typename`** or Apollo normalization hands the component only the key field.
+
 ## Pre-commit Workflow
 
 - TypeScript type checking and unit tests run automatically before each commit
