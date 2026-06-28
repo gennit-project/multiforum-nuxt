@@ -228,7 +228,7 @@ const downloadImage = (imageUrl: string) => {
       </button>
       <!-- Report button -->
       <RequireAuth>
-        <template #authenticated>
+        <template #has-auth>
           <button
             v-if="currentImageId && !isStlFile"
             type="button"
@@ -243,7 +243,7 @@ const downloadImage = (imageUrl: string) => {
             />
           </button>
         </template>
-        <template #unauthenticated />
+        <template #does-not-have-auth />
       </RequireAuth>
       <!-- Download button -->
       <button

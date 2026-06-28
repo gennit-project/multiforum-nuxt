@@ -62,6 +62,7 @@ export type BasicUserFixture = UserFixture &
     EventsAggregate: CountAggregate;
     ImagesAggregate: CountAggregate;
     AlbumsAggregate: CountAggregate;
+    AuthoredWikiPageVersionsAggregate: CountAggregate;
     AdminOfChannelsAggregate: CountAggregate;
   };
 
@@ -254,6 +255,7 @@ export const buildBasicUser = (
   EventsAggregate: { count: 0 },
   ImagesAggregate: { count: 0 },
   AlbumsAggregate: { count: 0 },
+  AuthoredWikiPageVersionsAggregate: { count: 0 },
   AdminOfChannelsAggregate: { count: 1 },
   ...overrides,
 });
