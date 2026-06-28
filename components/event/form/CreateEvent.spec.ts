@@ -3,6 +3,13 @@ import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import CreateEvent from '@/components/event/form/CreateEvent.vue';
 import { useUsername } from '@/composables/useAuthState';
+import {
+  LAS_NOCHES_AT_DBG,
+  LUMENOUS_AT_HEARD,
+  SVM_HOLIDAY_MARKET,
+  DOWNTOWN_FARMERS_MARKET,
+  type ExampleEvent,
+} from '@/tests/fixtures/exampleEvents';
 
 const { mockUsername } = await vi.hoisted(async () => {
   const { ref } = await import('vue');
@@ -178,66 +185,50 @@ describe('CreateEvent', () => {
     expect(mockMutate).not.toHaveBeenCalled();
   });
 
-  // Drives the form into a multi-date / recurring state and submits, exercising
-  // the series-creation path (issue #229).
-  async function submitWithFormValues(
-    overrides: Record<string, unknown>
-  ) {
+  // Drives the form into the given event's shape and submits, exercising the
+  // series-creation path (issue #229). Uses realistic example events.
+  async function submitExampleEvent(event: ExampleEvent) {
     const wrapper = mountCreateEvent();
     const fields = wrapper.findComponent({ name: 'CreateEditEventFields' });
     fields.vm.$emit('updateFormValues', {
-      title: 'Weekly meetup',
+      title: event.title,
       selectedChannels: ['cats'],
-      ...overrides,
+      dateMode: event.dateMode,
+      ...(event.startTime ? { startTime: event.startTime } : {}),
+      ...(event.endTime ? { endTime: event.endTime } : {}),
+      ...(event.occurrences ? { occurrences: event.occurrences } : {}),
+      ...(event.repeatPattern ? { repeatPattern: event.repeatPattern } : {}),
     });
     await wrapper.vm.$nextTick();
     await wrapper.find('[data-testid="submit"]').trigger('click');
     return wrapper;
   }
 
-  it('submits the manually-entered occurrences as a series for "multiple" date mode', async () => {
-    await submitWithFormValues({
-      dateMode: 'multiple',
-      occurrences: [
-        { startTime: '2030-01-01T18:00:00.000Z', endTime: '2030-01-01T21:00:00.000Z' },
-        { startTime: '2030-01-08T18:00:00.000Z', endTime: '2030-01-08T21:00:00.000Z' },
-      ],
-    });
+  it.each([LUMENOUS_AT_HEARD, SVM_HOLIDAY_MARKET])(
+    'submits the manually-entered occurrences as a series for "$title"',
+    async (event) => {
+      await submitExampleEvent(event);
 
-    expect(mockMutate).toHaveBeenCalledWith({
-      input: expect.objectContaining({
-        title: 'Weekly meetup',
-        channelConnections: ['cats'],
-        occurrences: [
-          { startTime: '2030-01-01T18:00:00.000Z', endTime: '2030-01-01T21:00:00.000Z' },
-          { startTime: '2030-01-08T18:00:00.000Z', endTime: '2030-01-08T21:00:00.000Z' },
-        ],
-      }),
-    });
+      expect(mockMutate).toHaveBeenCalledWith({
+        input: expect.objectContaining({
+          title: event.title,
+          channelConnections: ['cats'],
+          occurrences: event.occurrences,
+        }),
+      });
+    }
+  );
+
+  it('generates a season of occurrences from the repeat pattern (recurring)', async () => {
+    await submitExampleEvent(DOWNTOWN_FARMERS_MARKET);
+
+    expect(mockMutate.mock.calls[0][0].input.occurrences).toHaveLength(
+      DOWNTOWN_FARMERS_MARKET.repeatPattern!.endCount
+    );
   });
 
-  it('generates occurrences from the repeat pattern for "recurring" date mode', async () => {
-    await submitWithFormValues({
-      dateMode: 'recurring',
-      startTime: '2030-01-01T18:00:00.000Z',
-      endTime: '2030-01-01T21:00:00.000Z',
-      repeatPattern: {
-        type: 'WEEKLY',
-        count: 1,
-        endType: 'AFTER_COUNT',
-        endCount: 3,
-      },
-    });
-
-    expect(mockMutate.mock.calls[0][0].input.occurrences).toHaveLength(3);
-  });
-
-  it('uses the single-event mutation (occurrences nested in an array) for "single" date mode', async () => {
-    await submitWithFormValues({
-      dateMode: 'single',
-      startTime: '2030-01-01T18:00:00.000Z',
-      endTime: '2030-01-01T21:00:00.000Z',
-    });
+  it('uses the single-event mutation (occurrences nested in an array) for a single-date event', async () => {
+    await submitExampleEvent(LAS_NOCHES_AT_DBG);
 
     expect(Array.isArray(mockMutate.mock.calls[0][0].input)).toBe(true);
   });
