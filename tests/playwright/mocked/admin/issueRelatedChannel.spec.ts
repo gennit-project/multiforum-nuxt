@@ -58,7 +58,11 @@ const handlersFor = (channelLocked: boolean) => ({
   ...createBaseHandlers({
     channelId: RELATED_CHANNEL,
     channelOverrides: { locked: channelLocked, lockReason: 'Spam wave' },
-    serverConfigOverrides: { DefaultModRole: DEFAULT_MOD_ROLE },
+    // canLockChannel via the role (not the racy username->Admins check), so the
+    // Lock/Unlock controls render deterministically under parallel load.
+    serverConfigOverrides: {
+      DefaultModRole: { ...DEFAULT_MOD_ROLE, canLockChannel: true },
+    },
   }),
   getIssue: issueHandler,
   // Issue-tab count badges in the admin layout.

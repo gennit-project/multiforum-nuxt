@@ -9,12 +9,21 @@ import { DEFAULT_MOD_ROLE } from '../../helpers/moderationFixtures';
 
 // Server-moderation actions on the forum About page (`/forums/[forumId]/about`):
 // reporting the forum, locking/unlocking it, and the permission gating that
-// decides whether those controls appear. The default mock user (`cluse`) is a
-// server admin (buildServerConfig lists them in Admins), which grants
-// canReportChannel + canLockChannel.
+// decides whether those controls appear.
+//
+// We grant the capabilities via DefaultModRole rather than relying on the
+// server-admin username match: canLockChannel falls back to the username->Admins
+// check, which is racy in the browser (useUsername resolves asynchronously), so
+// under parallel load the Lock button can be missing even though canReport (a
+// pure role-fallback permission) renders. A role that grants canLockChannel
+// makes the controls deterministic.
 
 const CHANNEL = 'cats';
 const ABOUT_URL = `/forums/${CHANNEL}/about`;
+
+// A server mod role that can both report and lock — unlike DEFAULT_MOD_ROLE,
+// whose canLockChannel is false.
+const SERVER_MOD_ROLE = { ...DEFAULT_MOD_ROLE, canLockChannel: true };
 
 const serverRulesHandler = () => ({
   data: {
@@ -47,7 +56,7 @@ test.describe('Forum About page – server moderation', () => {
     const diagnostics = await installGraphqlMocks(page, {
       ...createBaseHandlers({
         channelId: CHANNEL,
-        serverConfigOverrides: { DefaultModRole: DEFAULT_MOD_ROLE },
+        serverConfigOverrides: { DefaultModRole: SERVER_MOD_ROLE },
       }),
       getServerRules: serverRulesHandler,
     });
@@ -112,7 +121,7 @@ test.describe('Forum About page – server moderation', () => {
     const diagnostics = await installGraphqlMocks(page, {
       ...createBaseHandlers({
         channelId: CHANNEL,
-        serverConfigOverrides: { DefaultModRole: DEFAULT_MOD_ROLE },
+        serverConfigOverrides: { DefaultModRole: SERVER_MOD_ROLE },
       }),
       getServerRules: serverRulesHandler,
       reportChannel: () => ({
@@ -157,7 +166,10 @@ test.describe('Forum About page – server moderation', () => {
   }, testInfo) => {
     await installMockAuth(context, page);
     const diagnostics = await installGraphqlMocks(page, {
-      ...createBaseHandlers({ channelId: CHANNEL }),
+      ...createBaseHandlers({
+        channelId: CHANNEL,
+        serverConfigOverrides: { DefaultModRole: SERVER_MOD_ROLE },
+      }),
       getServerRules: serverRulesHandler,
       lockChannel: () => ({ data: { lockChannel: lockedChannelResponse(true) } }),
     });
@@ -195,6 +207,7 @@ test.describe('Forum About page – server moderation', () => {
       ...createBaseHandlers({
         channelId: CHANNEL,
         channelOverrides: { locked: true, lockReason: 'Spam wave' },
+        serverConfigOverrides: { DefaultModRole: SERVER_MOD_ROLE },
       }),
       getServerRules: serverRulesHandler,
       unlockChannel: () => ({
