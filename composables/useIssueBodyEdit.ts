@@ -17,6 +17,7 @@ type UseIssueBodyEditParams = {
   activeIssueId: Ref<string> | ComputedRef<string>;
   isIssueAuthor: Ref<boolean> | ComputedRef<boolean>;
   isLocked: Ref<boolean> | ComputedRef<boolean>;
+  isSuspendedMod: Ref<boolean> | ComputedRef<boolean | undefined>;
   refetchIssue: () => Promise<unknown> | undefined;
 };
 
@@ -25,6 +26,7 @@ export function useIssueBodyEdit({
   activeIssueId,
   isIssueAuthor,
   isLocked,
+  isSuspendedMod,
   refetchIssue,
 }: UseIssueBodyEditParams) {
   const isEditingIssueBody = ref(false);
@@ -54,7 +56,9 @@ export function useIssueBodyEdit({
   });
 
   const startIssueBodyEdit = () => {
-    if (!isIssueAuthor.value || isLocked.value) return;
+    // A suspended mod cannot edit the issue, even one they authored — editing is
+    // a moderation action gated by the mod profile, not the user account.
+    if (!isIssueAuthor.value || isLocked.value || isSuspendedMod.value) return;
     editedIssueBody.value = activeIssue.value?.body || '';
     isEditingIssueBody.value = true;
   };
@@ -66,6 +70,8 @@ export function useIssueBodyEdit({
 
   const saveIssueBody = async () => {
     if (!activeIssue.value) return;
+    // Defense in depth: never persist an edit while the mod is suspended.
+    if (isSuspendedMod.value) return;
     if (!editedIssueBody.value.trim()) return;
 
     if (!issueBodyHasChanges.value) {

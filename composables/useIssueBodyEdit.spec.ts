@@ -29,6 +29,7 @@ describe('useIssueBodyEdit', () => {
       activeIssueId: ref('issue-1'),
       isIssueAuthor: ref(true),
       isLocked: ref(false),
+      isSuspendedMod: ref(false),
       refetchIssue,
     });
 
@@ -41,6 +42,7 @@ describe('useIssueBodyEdit', () => {
       activeIssueId: ref('issue-1'),
       isIssueAuthor: ref(true),
       isLocked: ref(false),
+      isSuspendedMod: ref(false),
       refetchIssue,
     });
 
@@ -55,6 +57,7 @@ describe('useIssueBodyEdit', () => {
       activeIssueId: ref('issue-1'),
       isIssueAuthor: ref(true),
       isLocked: ref(true),
+      isSuspendedMod: ref(false),
       refetchIssue,
     });
 
@@ -70,6 +73,7 @@ describe('useIssueBodyEdit', () => {
       activeIssueId: ref('issue-1'),
       isIssueAuthor: ref(true),
       isLocked: ref(false),
+      isSuspendedMod: ref(false),
       refetchIssue,
     });
 
@@ -85,6 +89,7 @@ describe('useIssueBodyEdit', () => {
       activeIssueId: ref('issue-1'),
       isIssueAuthor: ref(true),
       isLocked: ref(false),
+      isSuspendedMod: ref(false),
       refetchIssue,
     });
 
@@ -103,12 +108,44 @@ describe('useIssueBodyEdit', () => {
     });
   });
 
+  it('does not enter edit mode when the moderator is suspended', () => {
+    const bodyEdit = useIssueBodyEdit({
+      activeIssue: ref({ id: 'issue-1', issueNumber: 1, body: 'Original' } as any),
+      activeIssueId: ref('issue-1'),
+      isIssueAuthor: ref(true),
+      isLocked: ref(false),
+      isSuspendedMod: ref(true),
+      refetchIssue,
+    });
+
+    bodyEdit.startIssueBodyEdit();
+
+    expect(bodyEdit.isEditingIssueBody.value).toBe(false);
+  });
+
+  it('does not save the issue body when the moderator is suspended', async () => {
+    const bodyEdit = useIssueBodyEdit({
+      activeIssue: ref({ id: 'issue-1', issueNumber: 1, body: 'Original' } as any),
+      activeIssueId: ref('issue-1'),
+      isIssueAuthor: ref(true),
+      isLocked: ref(false),
+      isSuspendedMod: ref(true),
+      refetchIssue,
+    });
+
+    bodyEdit.editedIssueBody.value = 'Changed';
+    await bodyEdit.saveIssueBody();
+
+    expect(updateIssueBody.mock.calls.length).toBe(0);
+  });
+
   it('exits edit mode without saving when the body is unchanged', async () => {
     const bodyEdit = useIssueBodyEdit({
       activeIssue: ref({ id: 'issue-1', issueNumber: 1, body: 'Original' } as any),
       activeIssueId: ref('issue-1'),
       isIssueAuthor: ref(true),
       isLocked: ref(false),
+      isSuspendedMod: ref(false),
       refetchIssue,
     });
 

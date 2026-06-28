@@ -424,6 +424,7 @@ const {
   activeIssueId,
   isIssueAuthor,
   isLocked,
+  isSuspendedMod,
   refetchIssue: resetActivityFeed,
 });
 
@@ -792,6 +793,7 @@ useAutoUnsubscribe({
             :issue-body="activeIssue?.body"
             :is-issue-author="isIssueAuthor"
             :is-locked="isLocked"
+            :is-suspended-mod="isSuspendedMod"
             :is-editing-issue-body="isEditingIssueBody"
             :edited-issue-body="editedIssueBody"
             :update-issue-body-loading="updateIssueBodyLoading"
@@ -817,6 +819,7 @@ useAutoUnsubscribe({
           :issue-body="activeIssue?.body"
           :is-issue-author="isIssueAuthor"
           :is-locked="isLocked"
+          :is-suspended-mod="isSuspendedMod"
           :is-editing-issue-body="isEditingIssueBody"
           :edited-issue-body="editedIssueBody"
           :update-issue-body-loading="updateIssueBodyLoading"
