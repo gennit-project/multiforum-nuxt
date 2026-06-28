@@ -46,7 +46,7 @@ beforeEach(() => {
     error: { value: null },
   });
   getUploadFileName.mockReturnValue('alice-123.jpg');
-  isFileSizeValid.mockReturnValue({ valid: true });
+  isFileSizeValid.mockReturnValue({ valid: true, message: '' });
 });
 
 describe('useImageUpload.uploadFile', () => {
