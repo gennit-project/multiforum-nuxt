@@ -1,6 +1,6 @@
 import { ref, watch, type Ref } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
-import { useToast } from './useToast';
+import { useToastStore } from '@/stores/toastStore';
 import { useIsAuthenticated } from '@/composables/useAuthState';
 
 type UseAutoUnsubscribeParams = {
@@ -23,7 +23,8 @@ export function useAutoUnsubscribe(params: UseAutoUnsubscribeParams) {
 
   const route = useRoute();
   const router = useRouter();
-  const { success, info } = useToast();
+  // Use the Pinia toast store — it is what <ToastNotification> actually renders.
+  const toastStore = useToastStore();
 
   const isAuthenticatedVar = useIsAuthenticated();
 
@@ -55,9 +56,15 @@ export function useAutoUnsubscribe(params: UseAutoUnsubscribeParams) {
       // Only unsubscribe if currently subscribed
       if (isSubscribed.value) {
         await unsubscribeFn(id);
-        success(`You have been unsubscribed from this ${entityType}.`);
+        toastStore.showToast(
+          `You have been unsubscribed from this ${entityType}.`,
+          'success'
+        );
       } else {
-        info(`You are not subscribed to this ${entityType}.`);
+        toastStore.showToast(
+          `You are not subscribed to this ${entityType}.`,
+          'info'
+        );
       }
     } catch (error) {
       console.error('Error processing unsubscribe action:', error);
