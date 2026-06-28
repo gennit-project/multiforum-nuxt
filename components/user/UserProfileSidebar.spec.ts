@@ -39,7 +39,7 @@ const mountSidebar = (props: Record<string, unknown> = {}) =>
         AvatarComponent: { name: 'AvatarComponent', props: ['src', 'text'], template: '<div class="avatar" />' },
         MarkdownPreview: { name: 'MarkdownPreview', props: ['text'], template: '<div class="bio">{{ text }}</div>' },
         ReportProfilePictureModal: { name: 'ReportProfilePictureModal', props: ['open'], template: '<div class="report-modal" />' },
-        RequireAuth: { template: '<div><slot name="authenticated" /></div>' },
+        RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
         FlagIcon: true,
       },
     },

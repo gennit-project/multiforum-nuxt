@@ -129,4 +129,22 @@ describe('ReportChannelImageModal', () => {
 
     expect(wrapper.emitted('close')).toBeTruthy();
   });
+
+  it('titles the modal for a reported forum icon', () => {
+    const wrapper = mountModal({ imageType: 'ICON', channelDisplayName: 'Cats' });
+
+    expect(modal(wrapper).props('title')).toBe('Report Forum Icon: Cats');
+  });
+
+  it('titles the modal for a reported forum banner', () => {
+    const wrapper = mountModal({ imageType: 'BANNER', channelDisplayName: 'Cats' });
+
+    expect(modal(wrapper).props('title')).toBe('Report Forum Banner: Cats');
+  });
+
+  it('falls back to the channel unique name in the title', () => {
+    const wrapper = mountModal({ imageType: 'ICON', channelUniqueName: 'cats' });
+
+    expect(modal(wrapper).props('title')).toBe('Report Forum Icon: cats');
+  });
 });
