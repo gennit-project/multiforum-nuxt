@@ -31,7 +31,7 @@ vi.mock('@/composables/useAuthState', async () => {
 });
 
 describe('ModerationWizard', () => {
-  const mountWrapper = () =>
+  const mountWrapper = (propOverrides: Record<string, unknown> = {}) =>
     mount(ModerationWizard, {
       props: {
         issue: {
@@ -44,6 +44,7 @@ describe('ModerationWizard', () => {
         isSuspendedMod: true,
         canEditComments: true,
         reportCount: 1,
+        ...propOverrides,
       },
       global: {
         stubs: {
@@ -103,5 +104,13 @@ describe('ModerationWizard', () => {
     const wrapper = mountWrapper();
 
     expect(wrapper.get('[data-test="edit-comment"]').attributes('disabled')).toBeDefined();
+  });
+
+  it('re-enables the archive button once the moderator is no longer suspended', () => {
+    const wrapper = mountWrapper({ isSuspendedMod: false });
+
+    expect(
+      wrapper.get('[data-testid="archive-button"]').attributes('data-disabled')
+    ).toBe('false');
   });
 });
