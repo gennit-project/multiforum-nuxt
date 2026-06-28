@@ -43,9 +43,12 @@ const getMocks = (serverEnableDownloads: boolean) => ({
   getServerConfig: () => ({
     data: {
       serverConfigs: [
+        // buildServerConfig takes the override fields directly (no nested
+        // `overrides` key, unlike buildChannel).
         buildServerConfig({
           serverName: 'Listical',
-          overrides: { enableDownloads: serverEnableDownloads, enableEvents: true },
+          enableDownloads: serverEnableDownloads,
+          enableEvents: true,
         }),
       ],
     },
@@ -129,13 +132,25 @@ test.describe('Downloads tab — server enableDownloads gate', () => {
     }
   });
 
-  // NOTE: the negative case (server downloads disabled → no visible Downloads
-  // tab) is intentionally NOT asserted yet. ChannelTabs renders a `<ClientOnly>`
-  // SSR-fallback nav that iterates the UNFILTERED `baseTabs` (it does not apply
-  // the `serverDownloadsEnabled` filter that the real desktop/mobile navs use)
-  // and gives it the SAME `forum-tab-*` test id, so a Downloads tab stays
-  // visible even when the server disables downloads. That looks like a real
-  // gate hole in the fallback path; it should be fixed in ChannelTabs (and the
-  // fallback given a distinct test id) before the negative case can be asserted.
-  // Tracked in gennit-project/multiforum-nuxt#185.
+  test('hides the Downloads tab when the server has downloads disabled', async ({
+    context,
+    page,
+  }, testInfo) => {
+    await installMockAuth(context, page, { username: TEST_USER, email: 'alice@example.com' });
+    const diagnostics = await installGraphqlMocks(page, getMocks(false));
+
+    try {
+      await page.goto(`/forums/${TEST_CHANNEL}/discussions`);
+      // Wait for the tab bar to render before asserting the Downloads tab is
+      // absent, so the assertion can't pass merely because the page hasn't
+      // booted yet.
+      await expect(visibleTab(page, 'discussions')).not.toHaveCount(0);
+      await expect(visibleTab(page, 'downloads')).toHaveCount(0);
+    } finally {
+      await testInfo.attach('graphql-operations.json', {
+        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
+        contentType: 'application/json',
+      });
+    }
+  });
 });
