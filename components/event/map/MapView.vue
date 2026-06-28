@@ -13,8 +13,8 @@ import LoadingSpinner from '../../LoadingSpinner.vue';
 import EventFilterBar from '../list/filters/EventFilterBar.vue';
 import TimeShortcuts from '../list/filters/TimeShortcuts.vue';
 import { GET_EVENTS } from '@/graphQLData/event/queries';
-import getEventWhere from '../list/filters/getEventWhere';
-import { getFilterValuesFromParams } from '../list/filters/getEventFilterValuesFromParams';
+import getEventWhere from '@/utils/getEventWhere';
+import { getFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
 import {
   chronologicalOrder,
   reverseChronologicalOrder,
@@ -28,7 +28,7 @@ import {
 import type { Event as EventData } from '@/__generated__/graphql';
 import type { SearchEventValues } from '@/types/Event';
 import type { Ref, PropType } from 'vue';
-import { isEventSearchRoute } from '../list/isEventSearchRoute';
+import { isEventSearchRoute } from '@/utils/isEventSearchRoute';
 
 const props = defineProps({
   selectedTags: {

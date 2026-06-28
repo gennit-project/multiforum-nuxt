@@ -1,7 +1,7 @@
 import type { UpdateLocationInput } from '@/components/event/form/CreateEditEventFields.vue';
 import type { UpdateStateInput } from '@/utils/routerUtils';
-import { LocationFilterTypes } from './locationFilterTypes';
-import { distanceOptionsForMiles } from './eventSearchOptions';
+import { LocationFilterTypes } from '@/components/event/list/filters/locationFilterTypes';
+import { distanceOptionsForMiles } from '@/components/event/list/filters/eventSearchOptions';
 
 // Default radius applied when a user picks a place from the location
 // autocomplete: 50 miles. Radius values are stored in kilometers (the value the

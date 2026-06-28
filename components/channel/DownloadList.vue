@@ -13,11 +13,11 @@ import DiscussionAlbum from '@/components/discussion/detail/DiscussionAlbum.vue'
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/graphQLData/discussion/queries';
 import { useUsername } from '@/composables/useAuthState';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
-import { getFilterValuesFromParams } from '@/components/event/list/filters/getEventFilterValuesFromParams';
+import { getFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,
-} from '@/components/comments/getSortFromQuery';
+} from '@/utils/getSortFromQuery';
 import { convertUrlParamsToLabelFilters } from '@/utils/downloadFilters';
 import type { Discussion, Album, FilterGroup } from '@/__generated__/graphql';
 

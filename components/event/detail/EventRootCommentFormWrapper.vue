@@ -8,7 +8,7 @@ import { CREATE_COMMENT } from '@/graphQLData/comment/mutations';
 import { GET_EVENT_COMMENTS } from '@/graphQLData/comment/queries';
 import { GET_USER } from '@/graphQLData/user/queries';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
+import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import type { Event, CommentCreateInput } from '@/__generated__/graphql';
 import type { CreateEditCommentFormValues } from '@/types/Comment';
 import { useUsername } from '@/composables/useAuthState';

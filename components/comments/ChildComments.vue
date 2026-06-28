@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_COMMENT_REPLIES } from '@/graphQLData/comment/queries';
 import LoadMore from '../LoadMore.vue';
-import { getSortFromQuery } from './getSortFromQuery';
+import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import { useRoute } from 'nuxt/app';
 import ErrorBanner from '../ErrorBanner.vue';
 

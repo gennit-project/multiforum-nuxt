@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   getLocationSelectFilterParams,
   DEFAULT_LOCATION_SELECT_RADIUS_KM,
-} from './locationSelectFilterParams';
-import { LocationFilterTypes } from './locationFilterTypes';
+} from '@/utils/locationSelectFilterParams';
+import { LocationFilterTypes } from '@/components/event/list/filters/locationFilterTypes';
 
 const placeData = {
   name: 'Tempe',

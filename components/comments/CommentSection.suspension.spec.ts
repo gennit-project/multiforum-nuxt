@@ -52,7 +52,7 @@ vi.mock('@/composables/useAuthState', () => ({
   useModProfileName: () => ({ value: 'mod-one' }),
 }));
 
-vi.mock('@/components/comments/getSortFromQuery', async (importOriginal) => {
+vi.mock('@/utils/getSortFromQuery', async (importOriginal) => {
   const actual = (await importOriginal()) as Record<string, unknown>;
   return {
     ...actual,

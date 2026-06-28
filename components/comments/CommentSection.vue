@@ -9,7 +9,7 @@ import SortButtons from '@/components/SortButtons.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import ConfirmUndoCommentFeedbackModal from '@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue';
 import EditCommentFeedbackModal from '@/components/comments/EditCommentFeedbackModal.vue';
-import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
+import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import type {
   CommentCreateInput,
   Comment as CommentType,

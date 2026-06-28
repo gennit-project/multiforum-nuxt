@@ -26,7 +26,7 @@ import DiscussionHeader from '@/components/discussion/detail/DiscussionHeader.vu
 import DiscussionCommentsWrapper from '@/components/discussion/detail/DiscussionCommentsWrapper.vue';
 import DiscussionChannelLinks from '@/components/discussion/detail/DiscussionChannelLinks.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
-import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
+import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import { useRoute } from 'nuxt/app';
 import DiscussionBodyEditForm from './DiscussionBodyEditForm.vue';
 import AlbumEditForm from './AlbumEditForm.vue';

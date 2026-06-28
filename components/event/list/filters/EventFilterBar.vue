@@ -13,8 +13,8 @@ import {
   MilesOrKm,
 } from '@/components/event/list/filters/eventSearchOptions';
 import { LocationFilterTypes } from './locationFilterTypes';
-import { getLocationSelectFilterParams } from './locationSelectFilterParams';
-import { getFilterValuesFromParams } from '@/components/event/list/filters/getEventFilterValuesFromParams';
+import { getLocationSelectFilterParams } from '@/utils/locationSelectFilterParams';
+import { getFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
 import GenericButton from '@/components/GenericButton.vue';
 import FilterChip from '@/components/FilterChip.vue';
 import SelectCanceled from './SelectCanceled.vue';

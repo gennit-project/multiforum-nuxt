@@ -10,7 +10,7 @@ import type { PropType } from 'vue';
 import type { Event } from '@/__generated__/graphql';
 import type { SearchEventValues } from '@/types/Event';
 import { useRoute, useRouter } from 'nuxt/app';
-import { isEventSearchRoute } from './isEventSearchRoute';
+import { isEventSearchRoute } from '@/utils/isEventSearchRoute';
 
 const props = defineProps({
   event: {

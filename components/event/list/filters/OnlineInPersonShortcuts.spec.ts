@@ -10,7 +10,7 @@ vi.mock('nuxt/app', () => ({
   useRoute: () => h.route,
   useRouter: () => ({ replace: h.replace }),
 }));
-vi.mock('@/components/event/list/filters/getEventFilterValuesFromParams', () => ({
+vi.mock('@/utils/getEventFilterValuesFromParams', () => ({
   getFilterValuesFromParams: () => ({}),
 }));
 

@@ -7,7 +7,7 @@ import type {
 import type { ApolloCache, NormalizedCacheObject } from '@apollo/client/core';
 import type { PropType } from 'vue';
 import { computed, ref, onMounted } from 'vue';
-import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
+import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import type { CreateEditCommentFormValues } from '@/types/Comment';
 import CommentSection from '@/components/comments/CommentSection.vue';
 import { useRoute } from 'nuxt/app';

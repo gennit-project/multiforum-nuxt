@@ -1,8 +1,8 @@
 import type { SearchEventValues } from '@/types/Event';
-import { chronologicalOrder, reverseChronologicalOrder } from './filterStrings';
-import { LocationFilterTypes } from './locationFilterTypes';
-import { timeShortcutValues, resultOrderTypes } from './eventSearchOptions';
-import { isEventSearchRoute } from '../isEventSearchRoute';
+import { chronologicalOrder, reverseChronologicalOrder } from '@/components/event/list/filters/filterStrings';
+import { LocationFilterTypes } from '@/components/event/list/filters/locationFilterTypes';
+import { timeShortcutValues, resultOrderTypes } from '@/components/event/list/filters/eventSearchOptions';
+import { isEventSearchRoute } from '@/utils/isEventSearchRoute';
 
 // Minimal route type for the fields actually used by this function
 // Uses Record<string, unknown> for query to allow flexible test mocking and vue-router compatibility
