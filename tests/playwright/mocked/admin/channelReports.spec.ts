@@ -156,4 +156,37 @@ test.describe('Admin Channel Reports page', () => {
       });
     }
   });
+
+  test('unchecking "show open reports only" refetches with isOpen null', async ({
+    context,
+    page,
+  }, testInfo) => {
+    await installMockAuth(context, page);
+    const diagnostics = await installGraphqlMocks(page, reportsHandlers());
+
+    try {
+      await page.goto(REPORTS_URL);
+      // The list loads filtered to open reports (isOpen: true) by default.
+      await expect(page.getByRole('link', { name: 'cats' })).toBeVisible();
+
+      await page.getByLabel('Show open reports only').uncheck();
+
+      // Unchecking must flip the query variable to null so closed reports show.
+      // (With the old v-model + @change double-toggle, isOpen never changed.)
+      await expect
+        .poll(() =>
+          diagnostics.completedOperations.some(
+            (o) =>
+              o.operationName === 'getChannelReports' &&
+              o.variables?.isOpen === null
+          )
+        )
+        .toBe(true);
+    } finally {
+      await testInfo.attach('graphql-operations.json', {
+        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
+        contentType: 'application/json',
+      });
+    }
+  });
 });
