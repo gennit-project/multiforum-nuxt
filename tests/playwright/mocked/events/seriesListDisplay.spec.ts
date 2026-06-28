@@ -1,10 +1,9 @@
 import { expect, test } from '../../helpers/testFixture';
 import {
-  MOCK_DATE,
   buildBasicUser,
   buildChannel,
+  buildEvent,
   buildServerConfig,
-  buildUser,
 } from '../../helpers/graphqlFixtures';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { installGraphqlMocks } from '../../helpers/mockGraphql';
@@ -19,79 +18,92 @@ const futureDate = (daysFromNow: number): string => {
   return date.toISOString();
 };
 
+type Occurrence = { id: string; startTime: string; endTime: string; canceled: boolean };
+
+const defaultOccurrences = (): Occurrence[] => [
+  { id: 'event-1', startTime: futureDate(7), endTime: futureDate(7), canceled: false },
+  { id: 'event-2', startTime: futureDate(14), endTime: futureDate(14), canceled: false },
+  { id: 'event-3', startTime: futureDate(21), endTime: futureDate(21), canceled: false },
+  { id: 'event-4', startTime: futureDate(28), endTime: futureDate(28), canceled: false },
+];
+
+const seriesData = (occurrences: Occurrence[]) => ({
+  id: 'series-1',
+  title: 'Weekly Meetup',
+  repeatPattern: {
+    type: 'WEEKLY',
+    count: 1,
+    daysOfWeek: [3],
+    endType: 'AFTER_COUNT',
+    endCount: occurrences.length,
+    endDate: null,
+  },
+  Occurrences: occurrences,
+});
+
+// The GET_EVENTS list query is normalized by Apollo, which needs __typename on
+// each object to key it in the cache. Detail queries (getEvent) render a single
+// object fine without it, but a list whose items lack __typename comes back as
+// empty objects (undefined id/startTime). Stamp __typename onto the event and
+// the nested objects the list query selects.
+const withTypenames = (event: Record<string, any>) => ({
+  ...event,
+  __typename: 'Event',
+  EventChannels: (event.EventChannels ?? []).map((ec: Record<string, any>) => ({
+    ...ec,
+    __typename: 'EventChannel',
+    Channel: ec.Channel ? { ...ec.Channel, __typename: 'Channel' } : ec.Channel,
+  })),
+  Poster: event.Poster ? { ...event.Poster, __typename: 'User' } : event.Poster,
+  EventSeries: event.EventSeries
+    ? {
+        ...event.EventSeries,
+        __typename: 'EventSeries',
+        Occurrences: (event.EventSeries.Occurrences ?? []).map(
+          (occ: Record<string, any>) => ({ ...occ, __typename: 'Event' })
+        ),
+      }
+    : event.EventSeries,
+});
+
+// Build on the shared buildEvent fixture (the shape proven to render in the
+// other event list tests), then layer the series fields on via overrides so the
+// list item resolves a real id/date and shows the series UI.
 const buildSeriesEvent = (overrides: Partial<{
   id: string;
   title: string;
   startTime: string;
-}> = {}) => ({
-  id: overrides.id || 'event-1',
-  title: overrides.title || 'Weekly Meetup',
-  description: 'Test event description',
-  startTime: overrides.startTime || futureDate(7),
-  endTime: futureDate(7),
-  locationName: 'Test Location',
-  address: '123 Test St',
-  virtualEventUrl: '',
-  startTimeDayOfWeek: 2,
-  startTimeHourOfDay: 18,
-  canceled: false,
-  isHostedByOP: true,
-  isAllDay: false,
-  coverImageURL: '',
-  createdAt: MOCK_DATE,
-  updatedAt: MOCK_DATE,
-  free: true,
-  isInPrivateResidence: false,
-  location: { latitude: 33.4484, longitude: -112.074 },
-  cost: '',
-  occurrenceIndex: 0,
-  RecurringEvent: null,
-  EventSeries: {
-    id: 'series-1',
-    title: 'Weekly Meetup',
-    repeatPattern: {
-      type: 'WEEKLY',
-      count: 1,
-      daysOfWeek: [3],
-      endType: 'AFTER_COUNT',
-      endCount: 4,
-      endDate: null,
-    },
-    Occurrences: [
-      { id: 'event-1', startTime: futureDate(7), endTime: futureDate(7), canceled: false },
-      { id: 'event-2', startTime: futureDate(14), endTime: futureDate(14), canceled: false },
-      { id: 'event-3', startTime: futureDate(21), endTime: futureDate(21), canceled: false },
-      { id: 'event-4', startTime: futureDate(28), endTime: futureDate(28), canceled: false },
-    ],
-  },
-  Tags: [],
-  CommentsAggregate: { count: 0 },
-  EventChannels: [
-    {
-      id: 'event-channel-1',
-      eventId: overrides.id || 'event-1',
+  occurrences: Occurrence[];
+}> = {}) =>
+  // Merge the series fields outside buildEvent's typed `overrides` (the shared
+  // EventFixture types occurrenceIndex/EventSeries as null), into the loosely
+  // typed withTypenames input.
+  withTypenames({
+    ...buildEvent({
+      id: overrides.id ?? 'event-1',
+      title: overrides.title ?? 'Weekly Meetup',
       channelUniqueName: TEST_CHANNEL,
-      archived: false,
-      Channel: {
-        uniqueName: TEST_CHANNEL,
-        displayName: TEST_CHANNEL,
-        channelIconURL: '',
-      },
-    },
-  ],
-  SubscribedToNotifications: [],
-  SubscribedToEventUpdates: [],
-  Poster: buildUser({ username: TEST_USERNAME }),
-});
+      posterUsername: TEST_USERNAME,
+    }),
+    occurrenceIndex: 0,
+    EventSeries: seriesData(overrides.occurrences ?? defaultOccurrences()),
+    ...(overrides.startTime
+      ? { startTime: overrides.startTime, endTime: overrides.startTime }
+      : {}),
+  });
 
 const buildSingleEvent = (overrides: Partial<{
   id: string;
   title: string;
-}> = {}) => ({
-  ...buildSeriesEvent(overrides),
-  EventSeries: null,
-  occurrenceIndex: null,
-});
+}> = {}) =>
+  withTypenames(
+    buildEvent({
+      id: overrides.id ?? 'event-1',
+      title: overrides.title ?? 'Single Event',
+      channelUniqueName: TEST_CHANNEL,
+      posterUsername: TEST_USERNAME,
+    })
+  );
 
 const getCommonMocks = (username: string) => ({
   getBasicUserInfo: () => ({
@@ -165,11 +177,20 @@ const getCommonMocks = (username: string) => ({
   }),
 });
 
-// NOTE: List display tests are currently skipped because they require additional
-// GraphQL query mocking for the events list page. The page makes queries that
-// aren't fully mocked, causing 500 errors.
-// TODO: Add missing mock handlers for event list page queries.
-
+// NOTE: Still skipped, but the original blockers are now fixed in this file:
+//   - route corrected to /forums/:forumId/events (the forum events page is
+//     pages/forums/[forumId]/events/index.vue → EventListView → GET_EVENTS)
+//   - list-item selector corrected to the dynamic data-testid="event-list-item-<title>"
+//   - fixtures rebuilt on the shared buildEvent, then stamped with __typename
+//     (the GET_EVENTS result is normalized by Apollo; without __typename the list
+//     items come back as empty objects with undefined id/startTime)
+//   - duplicate-title waits use .first() (the title renders in several spots)
+// With those, the series UI does render (verified: the "Also on:" occurrence
+// buttons appear). What remains is local flakiness: the forum events-list page
+// intermittently fails to hydrate under `nuxt dev` in mocked runs (blank page,
+// no console/page error), so a reliable green pass could not be confirmed in this
+// environment. Re-enable and verify in CI, where the dev server is more stable.
+// TODO: confirm green in CI, then remove .skip.
 test.describe.skip('Series List Display', () => {
   test('shows series icon for events that are part of a series', async ({ context, page }) => {
     await installMockAuth(context, page, {
@@ -190,18 +211,18 @@ test.describe.skip('Series List Display', () => {
       }),
     });
 
-    await page.goto(`/forums/${TEST_CHANNEL}/events/list`);
+    await page.goto(`/forums/${TEST_CHANNEL}/events`);
 
     // Wait for events to load
-    await expect(page.getByText('Series Event')).toBeVisible();
+    await expect(page.getByText('Series Event').first()).toBeVisible();
 
     // Series event should have a series indicator
-    const seriesEventItem = page.locator('[data-testid="event-list-item"]').filter({ hasText: 'Series Event' });
+    const seriesEventItem = page.locator('[data-testid^="event-list-item-"]').filter({ hasText: 'Series Event' });
     const seriesIcon = seriesEventItem.locator('[title="Part of a series"]');
     await expect(seriesIcon).toBeVisible();
 
     // Single event should NOT have a series indicator
-    const singleEventItem = page.locator('[data-testid="event-list-item"]').filter({ hasText: 'Single Event' });
+    const singleEventItem = page.locator('[data-testid^="event-list-item-"]').filter({ hasText: 'Single Event' });
     const noSeriesIcon = singleEventItem.locator('[title="Part of a series"]');
     await expect(noSeriesIcon).not.toBeVisible();
   });
@@ -222,10 +243,10 @@ test.describe.skip('Series List Display', () => {
       }),
     });
 
-    await page.goto(`/forums/${TEST_CHANNEL}/events/list`);
+    await page.goto(`/forums/${TEST_CHANNEL}/events`);
 
     // Wait for event to load
-    await expect(page.getByText('Weekly Meetup')).toBeVisible();
+    await expect(page.getByText('Weekly Meetup').first()).toBeVisible();
 
     // Should show "Also on:" with occurrence buttons
     await expect(page.getByText('Also on:')).toBeVisible();
@@ -266,10 +287,10 @@ test.describe.skip('Series List Display', () => {
       }),
     });
 
-    await page.goto(`/forums/${TEST_CHANNEL}/events/list`);
+    await page.goto(`/forums/${TEST_CHANNEL}/events`);
 
     // Wait for event to load
-    await expect(page.getByText('Weekly Meetup')).toBeVisible();
+    await expect(page.getByText('Weekly Meetup').first()).toBeVisible();
     await expect(page.getByText('Also on:')).toBeVisible();
 
     // Click on the first occurrence button (should be a date like "Jan 14")
@@ -324,10 +345,10 @@ test.describe.skip('Series List Display', () => {
       }),
     });
 
-    await page.goto(`/forums/${TEST_CHANNEL}/events/list`);
+    await page.goto(`/forums/${TEST_CHANNEL}/events`);
 
     // Wait for event to load
-    await expect(page.getByText('Weekly Meetup')).toBeVisible();
+    await expect(page.getByText('Weekly Meetup').first()).toBeVisible();
 
     // Should show "+N more" indicator since there are more than maxVisible (4) occurrences
     await expect(page.getByText(/\+\d+ more/)).toBeVisible();
