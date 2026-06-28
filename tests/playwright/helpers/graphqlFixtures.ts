@@ -282,6 +282,115 @@ export const buildServerConfig = (
   ...overrides,
 });
 
+// ---------------------------------------------------------------------------
+// Roles / permissions fixtures (for admin/roles, edit/roles, GET_SERVER_PERMISSIONS).
+// Returned objects are intentionally loosely typed — they only need the right
+// runtime shape for the mocked GraphQL handler, not to satisfy a generated type.
+// ---------------------------------------------------------------------------
+export const buildServerRole = (overrides: Record<string, unknown> = {}) => ({
+  __typename: 'ServerRole' as const,
+  name: 'Standard User Role',
+  description: 'Default role for a standard signed-in user.',
+  canCreateChannel: true,
+  canCreateDiscussion: true,
+  canCreateEvent: true,
+  canCreateComment: true,
+  canUpvoteDiscussion: true,
+  canUpvoteComment: true,
+  canUploadFile: true,
+  canGiveFeedback: true,
+  canManageServerSettings: false,
+  canManagePlugins: false,
+  canManageRoles: false,
+  canManageMods: false,
+  canManageAdmins: false,
+  canManageSuperAdmins: false,
+  ...overrides,
+});
+
+export const buildModServerRole = (overrides: Record<string, unknown> = {}) => ({
+  __typename: 'ModServerRole' as const,
+  name: 'Basic Server Mod Role',
+  description: 'Baseline server moderator capabilities.',
+  canHideComment: false,
+  canHideEvent: false,
+  canHideDiscussion: false,
+  canLockChannel: false,
+  canEditComments: false,
+  canEditDiscussions: false,
+  canEditEvents: false,
+  canGiveFeedback: true,
+  canOpenSupportTickets: true,
+  canCloseSupportTickets: false,
+  canReport: true,
+  canSuspendUser: false,
+  ...overrides,
+});
+
+// A ServerConfig populated for the roles/permissions management page: role
+// tiers + pending invites resolved (GET_SERVER_PERMISSIONS, op `getServerConfig`).
+export const buildServerPermissionsConfig = (
+  overrides: Record<string, unknown> = {}
+) => ({
+  ...buildServerConfig(),
+  Moderators: [] as unknown[],
+  PendingAdminInvites: [] as unknown[],
+  PendingModInvites: [] as unknown[],
+  DefaultServerRole: buildServerRole(),
+  DefaultModRole: buildModServerRole(),
+  DefaultElevatedModRole: buildModServerRole({
+    name: 'Elevated Server Mod Role',
+    canHideComment: true,
+    canHideDiscussion: true,
+    canSuspendUser: true,
+  }),
+  DefaultSuspendedRole: buildServerRole({
+    name: 'Suspended Server Role',
+    canCreateDiscussion: false,
+    canCreateComment: false,
+  }),
+  DefaultSuspendedModRole: buildModServerRole({
+    name: 'Suspended Server Mod Role',
+    canReport: false,
+    canGiveFeedback: false,
+    canOpenSupportTickets: false,
+  }),
+  ...overrides,
+});
+
+// ---------------------------------------------------------------------------
+// Server health dashboard fixture (admin/dashboard, GET_SERVER_HEALTH_DASHBOARD).
+// ---------------------------------------------------------------------------
+export const buildServerHealthDashboard = (
+  overrides: Record<string, unknown> = {}
+) => ({
+  __typename: 'ServerHealthDashboard' as const,
+  startDate: '2026-06-01',
+  endDate: '2026-06-28',
+  generatedAt: MOCK_DATE,
+  summary: {
+    activeChannelCount: 1,
+    discussionCount: 0,
+    commentCount: 0,
+    eventCount: 0,
+    downloadCount: 0,
+    voteCount: 0,
+    openIssueCount: 0,
+    issueOpenedCount: 0,
+    issueClosedCount: 0,
+    moderationActionCount: 0,
+    archivedContentCount: 0,
+    lockedContentCount: 0,
+    suspensionCount: 0,
+    medianOpenIssueAgeDays: 0,
+  },
+  timeSeries: [] as unknown[],
+  channelHealth: [] as unknown[],
+  issueAging: [] as unknown[],
+  attentionItems: [] as unknown[],
+  ...overrides,
+});
+
 export const buildChannel = ({
   uniqueName = 'cats',
   displayName = uniqueName,
