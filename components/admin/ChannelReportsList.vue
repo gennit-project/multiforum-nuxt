@@ -22,10 +22,6 @@ const channelReports = computed(() => {
   return result.value?.issues || [];
 });
 
-const toggleFilter = () => {
-  showOpenOnly.value = !showOpenOnly.value;
-};
-
 // Lock/Unlock dialog state
 const showLockDialog = ref(false);
 const showUnlockDialog = ref(false);
@@ -61,7 +57,6 @@ const handleUnlocked = () => {
             v-model="showOpenOnly"
             type="checkbox"
             class="mr-2 rounded"
-            @change="toggleFilter"
           >
           Show open reports only
         </label>
