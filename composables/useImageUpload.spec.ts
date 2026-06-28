@@ -17,7 +17,9 @@ const { uploadAndGetEmbeddedLink, getUploadFileName, isFileSizeValid } =
   vi.hoisted(() => ({
     uploadAndGetEmbeddedLink: vi.fn(),
     getUploadFileName: vi.fn(() => 'alice-123.jpg'),
-    isFileSizeValid: vi.fn(() => ({ valid: true })),
+    // Seed the full {valid, message} shape so later mockReturnValue calls that
+    // include `message` stay within the inferred return type.
+    isFileSizeValid: vi.fn(() => ({ valid: true, message: '' })),
   }));
 // `@/utils` and `@/utils/index` resolve to the same module, so both mocks must
 // expose every export this composable imports from either specifier.
