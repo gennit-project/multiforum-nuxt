@@ -5,14 +5,20 @@ import { useRoute, useRouter } from 'nuxt/app';
 import { DateTime } from 'luxon';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import CreateEditEventFields from '@/components/event/form/CreateEditEventFields.vue';
-import { CREATE_EVENT_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/event/mutations';
+import {
+  CREATE_EVENT_WITH_CHANNEL_CONNECTIONS,
+  CREATE_EVENT_SERIES_WITH_CHANNEL_CONNECTIONS,
+} from '@/graphQLData/event/mutations';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { getTimePieces } from '@/utils';
 import getDefaultEventFormValues from '@/utils/defaultEventFormValues';
-import type { CreateEditEventFormValues } from '@/types/Event';
+import { generateOccurrences } from '@/utils/generateOccurrences';
+import type { CreateEditEventFormValues, DateOccurrence } from '@/types/Event';
 import type {
   EventCreateInput,
+  EventSeriesCreateInput,
   EventTagsConnectOrCreateFieldInput,
+  RepeatPatternInput,
   Event,
 } from '@/__generated__/graphql';
 import { useUsername } from '@/composables/useAuthState';
@@ -75,6 +81,60 @@ const eventCreateInput = computed<EventCreateInput>(() => {
 });
 
 const channelConnections = computed(() => formValues.value.selectedChannels);
+
+// A series is created when the user picks more than a single date. The final
+// occurrence list comes from the manual list ("multiple") or is generated from
+// the repeat pattern ("recurring"). "single" uses the single-event mutation.
+const isSeries = computed(() => formValues.value.dateMode !== 'single');
+
+const seriesOccurrences = computed<DateOccurrence[]>(() => {
+  if (formValues.value.dateMode === 'recurring' && formValues.value.repeatPattern) {
+    return generateOccurrences({
+      pattern: formValues.value.repeatPattern,
+      startTime: formValues.value.startTime,
+      endTime: formValues.value.endTime,
+    });
+  }
+  return formValues.value.occurrences ?? [];
+});
+
+const eventSeriesCreateInput = computed<EventSeriesCreateInput>(() => {
+  const fv = formValues.value;
+  const input: EventSeriesCreateInput = {
+    title: fv.title || '',
+    description: fv.description || null,
+    cost: fv.cost || '',
+    free: fv.free || false,
+    virtualEventUrl: fv.virtualEventUrl || null,
+    isInPrivateResidence: fv.isInPrivateResidence || null,
+    isAllDay: fv.isAllDay || false,
+    isHostedByOP: fv.isHostedByOP || false,
+    coverImageURL: fv.coverImageURL || null,
+    tags: fv.selectedTags,
+    channelConnections: fv.selectedChannels,
+    occurrences: seriesOccurrences.value.map((o) => ({
+      startTime: o.startTime,
+      endTime: o.endTime,
+    })),
+    // Only a recurring series carries a repeat pattern; "multiple" is a plain
+    // list of occurrences with no pattern. The form's RepeatPattern uses the
+    // same string values as the generated enum input, so the shapes line up at
+    // runtime.
+    repeatPattern:
+      fv.dateMode === 'recurring' && fv.repeatPattern
+        ? (fv.repeatPattern as unknown as RepeatPatternInput)
+        : null,
+  };
+
+  if (fv.latitude && fv.longitude) {
+    input.locationName = fv.locationName;
+    input.latitude = fv.latitude;
+    input.longitude = fv.longitude;
+    input.address = fv.address;
+  }
+
+  return input;
+});
 
 const submitError = ref<string | null>(null);
 const submitAttempted = ref(false);
@@ -168,6 +228,29 @@ onDone((response) => {
   });
 });
 
+const {
+  mutate: createEventSeries,
+  loading: createEventSeriesLoading,
+  error: createEventSeriesError,
+  onDone: onSeriesDone,
+} = useMutation(CREATE_EVENT_SERIES_WITH_CHANNEL_CONNECTIONS);
+
+onSeriesDone((response) => {
+  const series = response.data?.createEventSeriesWithChannelConnections;
+  // Land the user on the first occurrence of the new series.
+  const firstOccurrenceId = series?.Occurrences?.[0]?.id;
+  const redirectChannelId = formValues.value.selectedChannels[0];
+  if (!firstOccurrenceId) {
+    submitError.value =
+      'Unable to create event series. Please check your permissions or try again.';
+    return;
+  }
+  router.push({
+    name: 'forums-forumId-events-eventId',
+    params: { forumId: redirectChannelId, eventId: firstOccurrenceId },
+  });
+});
+
 function submit() {
   submitAttempted.value = true;
   submitError.value = null;
@@ -192,6 +275,16 @@ function submit() {
     return;
   }
 
+  if (isSeries.value) {
+    if (!seriesOccurrences.value.length) {
+      submitError.value =
+        'Please add at least one date for this event series.';
+      return;
+    }
+    createEventSeries({ input: eventSeriesCreateInput.value });
+    return;
+  }
+
   createEvent({
     input: [
       {
@@ -211,10 +304,10 @@ function updateFormValues(data: CreateEditEventFormValues) {
   <RequireAuth :full-width="true">
     <template #has-auth>
       <CreateEditEventFields
-        :create-event-error="createEventError"
+        :create-event-error="createEventError ?? createEventSeriesError"
         :edit-mode="false"
         :form-values="formValues"
-        :create-event-loading="createEventLoading"
+        :create-event-loading="createEventLoading || createEventSeriesLoading"
         :submit-error="formSubmitError"
         :suspension-issue-number="
           showSuspensionNotice ? suspensionIssueNumber ?? undefined : undefined
