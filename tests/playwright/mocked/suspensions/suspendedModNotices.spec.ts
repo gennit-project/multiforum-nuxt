@@ -5,6 +5,7 @@ import {
   buildChannel,
   buildServerConfig,
   buildDiscussion,
+  buildEvent,
   buildUser,
 } from '../../helpers/graphqlFixtures';
 import { installMockAuth } from '../../helpers/mockAuth';
@@ -396,15 +397,93 @@ test.describe('Mod suspension notices', () => {
       // Verify user is authenticated
       await expect(page.getByRole('button', { name: 'Log Out' })).toBeVisible({ timeout: 5000 });
 
-      // Suspended mod (as user) should still see comment form since their USER account is not suspended
-      // The comment form should be accessible
-      const commentTextarea = page.locator('textarea[placeholder*="comment"], [data-testid="comment-input"]').first();
+      // The suspended mod's USER account is not suspended, so the comment
+      // composer must be available — this is the behavior the test name claims.
+      // (The old version only ran `expect(true).toBe(true)` inside an
+      // `if (visible)` guard, so it passed even when the composer was absent.)
+      await expect(page.getByTestId('addComment')).toBeVisible();
 
-      // If comment form exists and is visible, the test passes
-      // (This verifies mod suspension doesn't affect user commenting ability)
-      if (await commentTextarea.isVisible()) {
-        expect(true).toBe(true);
-      }
+      expect(diagnostics.pageErrors).toEqual([]);
+    } finally {
+      await testInfo.attach('graphql-operations.json', {
+        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
+        contentType: 'application/json',
+      });
+    }
+  });
+
+  test('suspended mod sees no mod actions on event page', async ({
+    context,
+    page,
+  }, testInfo) => {
+    await installMockAuth(context, page, {
+      username: MOD_USER,
+      email: 'mod@example.com',
+    });
+
+    const mockEvent = buildEvent({
+      id: 'event-1',
+      eventChannelId: 'event-channel-1',
+      channelUniqueName: TEST_CHANNEL,
+      title: 'Test Event',
+      posterUsername: 'alice',
+    });
+
+    const diagnostics = await installGraphqlMocks(page, {
+      ...getBaseMocks(MOD_USER),
+      // The user's mod profile is suspended in the channel.
+      userIsModInChannel: () => ({
+        data: {
+          channels: [
+            {
+              uniqueName: TEST_CHANNEL,
+              Admins: [],
+              SuspendedUsers: [],
+              Moderators: [
+                { displayName: MOD_PROFILE_NAME, User: { username: MOD_USER } },
+              ],
+              SuspendedMods: [buildModSuspension()],
+            },
+          ],
+        },
+      }),
+      getModSuspensionStatus: () => ({
+        data: {
+          channels: [
+            { uniqueName: TEST_CHANNEL, SuspendedMods: [buildModSuspension()] },
+          ],
+        },
+      }),
+      getEvent: () => ({ data: { events: [mockEvent] } }),
+      getEventComments: () => ({
+        data: { getEventComments: { Event: mockEvent, Comments: [] } },
+      }),
+      getEventRootCommentAggregate: () => ({
+        data: {
+          events: [{ id: 'event-1', CommentsAggregate: { count: 0 } }],
+        },
+      }),
+      getEventChannelID: () => ({
+        data: { eventChannels: [{ id: 'event-channel-1', archived: false }] },
+      }),
+      getEvents: () => ({
+        data: { eventsAggregate: { count: 1 }, events: [mockEvent] },
+      }),
+    });
+
+    try {
+      await page.goto(`/forums/${TEST_CHANNEL}/events/event-1`);
+
+      await expect(page.getByText('Test Event').first()).toBeVisible({
+        timeout: 30000,
+      });
+      await expect(page.getByRole('button', { name: 'Log Out' })).toBeVisible({
+        timeout: 5000,
+      });
+
+      // Parity with the discussion page: a suspended mod sees no mod actions.
+      await expect(page.getByRole('button', { name: /archive/i })).not.toBeVisible();
+      await expect(page.getByRole('button', { name: /report/i })).not.toBeVisible();
 
       expect(diagnostics.pageErrors).toEqual([]);
     } finally {
