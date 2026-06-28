@@ -34,6 +34,7 @@ import ArchivedDiscussionInfoBanner from './ArchivedDiscussionInfoBanner.vue';
 import DiscussionLayoutManager from './DiscussionLayoutManager.vue';
 import FeedbackModalManager from './FeedbackModalManager.vue';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
+import { useForumLock } from '@/composables/useForumLock';
 import {
   useIsAuthenticated,
   useModProfileName,
@@ -259,6 +260,12 @@ const locked = computed(() => {
   // may not archive it if they think the existing discussion has merit.
   return activeDiscussionChannel.value?.locked || false;
 });
+
+// A locked forum (channel-level lock) also blocks new comments, independent of
+// the per-discussion lock above. Kept separate so the banner can explain which
+// lock is in effect.
+const { locked: forumLocked } = useForumLock(channelId);
+const commentsDisabled = computed(() => locked.value || forumLocked.value);
 
 const comments = computed(() => {
   return (
@@ -574,6 +581,10 @@ const handleEditAlbum = () => {
           v-else-if="locked"
           text="This discussion is locked. New comments cannot be added."
         />
+        <InfoBanner
+          v-else-if="forumLocked"
+          text="This forum is locked. New comments cannot be added until a moderator unlocks it."
+        />
         <div v-if="discussion" class="w-full">
           <div class="w-full px-2">
             <div class="w-full space-y-3 rounded-lg py-2 dark:border-gray-700">
@@ -646,7 +657,7 @@ const handleEditAlbum = () => {
                 activeDiscussionChannel?.Channel?.emojiEnabled ?? true
               "
               :loading="getDiscussionChannelLoading"
-              :locked="locked"
+              :locked="commentsDisabled"
               :mod-name="loggedInUserModName"
               :previous-offset="previousOffset"
               :reached-end-of-results="reachedEndOfResults"
