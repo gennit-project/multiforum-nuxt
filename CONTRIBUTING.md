@@ -375,6 +375,60 @@ the suite.
   hoisted reference.
 - **One assertion per `it`.** Prefer multiple focused `it` blocks or a single
   structured `expect` over several assertions in one test.
+- **Mount the actual component, never a hand-written stand-in.** A spec that
+  defines `const FooTest = { name: 'Foo', template: '...' }` and mounts *that*
+  contributes **zero** coverage to `Foo.vue` and silently drifts from the real
+  component. If a component is hard to mount, mock its dependencies (below) — do
+  not reimplement it in the spec. (`CommentSection.spec.ts` was rewritten for
+  exactly this reason.)
+- **Mock Apollo at the module level for components that use it.** `mountWithDefaults`
+  does not wire Apollo, so mock `@vue/apollo-composable` in the spec. To exercise
+  a component's mutation callbacks, return a `mutate()` that synchronously fires
+  its registered `onDone` handlers; return an empty `useQuery` result so
+  query-backed composables resolve to their default state:
+
+  ```typescript
+  vi.mock('@vue/apollo-composable', async () => {
+    const { ref } = await import('vue');
+    return {
+      useMutation: () => {
+        const done: Array<(p: unknown) => void> = [];
+        return {
+          mutate: vi.fn(() => { done.forEach((cb) => cb({ data: {} })); }),
+          onDone: (cb: (p: unknown) => void) => done.push(cb),
+          onError: vi.fn(),
+          loading: ref(false),
+          error: ref(null),
+        };
+      },
+      useQuery: () => ({ result: ref(null), loading: ref(false), error: ref(null), onResult: vi.fn(), onError: vi.fn() }),
+    };
+  });
+  ```
+
+- **Seed hoisted mock factories with the *full* return shape.** A mock typed by
+  its initial implementation narrows the return type, so a later
+  `mockReturnValue` with extra fields fails the typecheck. CI's `vue-tsc` job
+  catches this even when the test passes locally, so seed every field up front:
+
+  ```typescript
+  // ❌ inferred return type is { valid: boolean } — a later
+  //    mockReturnValue({ valid: false, message }) fails vue-tsc (TS2353)
+  const isFileSizeValid = vi.fn(() => ({ valid: true }));
+  // ✅ seed the full shape
+  const isFileSizeValid = vi.fn(() => ({ valid: true, message: '' }));
+  ```
+
+- **`@/utils` and `@/utils/index` are the same module.** If you `vi.mock` one,
+  mock both with every export the code under test imports — otherwise the second
+  mock silently overrides the first and drops exports.
+- **Teleported UI renders into `document.body`, not the wrapper.** Tooltips and
+  modals using `<Teleport to="body">` are outside the component subtree; assert
+  with `document.body.querySelector(...)` rather than `wrapper.find(...)`.
+- **Mocked GraphQL entities need `__typename`.** Apollo normalizes by
+  `__typename` + key field; a mock entity without `__typename` reaches the
+  component as just its key field (e.g. a channel arrives with only `uniqueName`).
+  This applies to both Apollo unit mocks and the Playwright GraphQL fixtures.
 
 ## Additional Resources
 
