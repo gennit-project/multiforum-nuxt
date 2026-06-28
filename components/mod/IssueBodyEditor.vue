@@ -10,6 +10,7 @@ defineProps<{
   issueBody?: string | null;
   isIssueAuthor: boolean;
   isLocked: boolean;
+  isSuspendedMod?: boolean;
   isEditingIssueBody: boolean;
   editedIssueBody: string;
   updateIssueBodyLoading: boolean;
@@ -27,7 +28,10 @@ const emit = defineEmits<{
   <div class="py-2">
     <div class="mb-2 flex items-center justify-between gap-2">
       <h3 class="text-lg font-semibold">Issue details</h3>
-      <div v-if="isIssueAuthor && !isLocked" class="flex items-center gap-2">
+      <div
+        v-if="isIssueAuthor && !isLocked && !isSuspendedMod"
+        class="flex items-center gap-2"
+      >
         <GenericButton
           v-if="!isEditingIssueBody"
           :text="'Edit'"
@@ -48,6 +52,14 @@ const emit = defineEmits<{
         </template>
       </div>
     </div>
+    <p
+      v-if="isIssueAuthor && isSuspendedMod"
+      class="mb-2 rounded border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200"
+      data-testid="issue-edit-suspension-notice"
+    >
+      Your moderator account is suspended, so you cannot edit this issue. This
+      does not suspend your user account.
+    </p>
     <MarkdownPreview
       v-if="issueBody && !isEditingIssueBody"
       :text="issueBody"

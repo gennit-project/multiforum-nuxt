@@ -65,4 +65,16 @@ describe('IssueBodyEditor', () => {
       mountEditor({ updateIssueBodyError: { message: 'Failed' } }).find('.err').text()
     ).toBe('Failed');
   });
+
+  it('hides the Edit button from a suspended moderator who authored the issue', () => {
+    expect(mountEditor({ isSuspendedMod: true }).text()).not.toContain('Edit');
+  });
+
+  it('shows a suspension notice clarifying the user account stays active', () => {
+    expect(
+      mountEditor({ isSuspendedMod: true })
+        .get('[data-testid="issue-edit-suspension-notice"]')
+        .text()
+    ).toContain('does not suspend your user account');
+  });
 });
