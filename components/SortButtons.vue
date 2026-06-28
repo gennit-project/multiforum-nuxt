@@ -8,7 +8,7 @@ import {
   availableSortTypes,
   topSortTypes,
   capitalizeCase,
-} from '@/components/comments/getSortFromQuery';
+} from '@/utils/getSortFromQuery';
 
 const topOptions = [
   {

@@ -3,7 +3,6 @@ import { computed } from 'vue';
 import type { PropType } from 'vue';
 import type { Comment, User } from '@/__generated__/graphql';
 import { stableRelativeTime } from '@/utils';
-import type { ForumRoleBadge } from '@/utils/forumRoleBadges';
 import {
   getPermalinkToDiscussionComment,
   getPermalinkToDiscussion,
@@ -50,9 +49,21 @@ const props = defineProps({
     type: Array as PropType<string[]>,
     default: () => [],
   },
-  forumRoleBadge: {
-    type: String as PropType<ForumRoleBadge>,
-    default: null,
+  isServerAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  isServerMod: {
+    type: Boolean,
+    default: false,
+  },
+  isForumAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  isForumMod: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -263,12 +274,22 @@ const contextLinkObject = computed(() => {
                 >Bot</span
               >
               <span
-                v-if="forumRoleBadge === 'forumAdmin'"
+                v-if="isServerAdmin"
+                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Server Admin</span
+              >
+              <span
+                v-if="isServerMod"
+                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Server Mod</span
+              >
+              <span
+                v-if="isForumAdmin"
                 class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                 >Forum Admin</span
               >
               <span
-                v-else-if="forumRoleBadge === 'forumMod'"
+                v-if="isForumMod"
                 class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                 >Forum Mod</span
               >
@@ -287,7 +308,29 @@ const contextLinkObject = computed(() => {
               params: { username: commentData.CommentAuthor.displayName },
             }"
           >
-            {{ commentData.CommentAuthor.displayName }}
+            <span class="flex flex-row items-center gap-1">
+              {{ commentData.CommentAuthor.displayName }}
+              <span
+                v-if="isServerAdmin"
+                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Server Admin</span
+              >
+              <span
+                v-if="isServerMod"
+                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Server Mod</span
+              >
+              <span
+                v-if="isForumAdmin"
+                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Forum Admin</span
+              >
+              <span
+                v-if="isForumMod"
+                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Forum Mod</span
+              >
+            </span>
           </NuxtLink>
           <span v-else class="flex items-center font-bold">
             <div

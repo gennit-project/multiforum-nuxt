@@ -35,6 +35,12 @@ const issueResult = ref({
   ],
 });
 
+// The auto-unsubscribe composable is exercised by its own spec and an e2e
+// test; here we stub it so mounting does not pull in the Pinia toast store.
+vi.mock('@/composables/useAutoUnsubscribe', () => ({
+  useAutoUnsubscribe: vi.fn(),
+}));
+
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
   useMutation: vi.fn(),

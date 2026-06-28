@@ -41,23 +41,35 @@ describe('UsernameWithTooltip name', () => {
 });
 
 describe('UsernameWithTooltip badges', () => {
-  it('shows an Admin badge', () => {
-    const wrapper = mountUsername({ isAdmin: true });
+  it('shows a Server Admin badge', () => {
+    const wrapper = mountUsername({ isServerAdmin: true });
 
-    expect(wrapper.text()).toContain('Admin');
+    expect(wrapper.text()).toContain('Server Admin');
   });
 
-  it('shows a Mod badge when not an admin', () => {
-    const wrapper = mountUsername({ isMod: true });
+  it('shows a Server Mod badge', () => {
+    const wrapper = mountUsername({ isServerMod: true });
 
-    expect(wrapper.text()).toContain('Mod');
+    expect(wrapper.text()).toContain('Server Mod');
   });
 
-  it('shows both Admin and Mod when the user is a server admin and a channel mod', () => {
-    const wrapper = mountUsername({ isAdmin: true, isMod: true });
+  it('shows a Forum Admin badge', () => {
+    const wrapper = mountUsername({ isForumAdmin: true });
 
-    expect(wrapper.text()).toContain('Admin');
-    expect(wrapper.text()).toContain('Mod');
+    expect(wrapper.text()).toContain('Forum Admin');
+  });
+
+  it('shows a Forum Mod badge', () => {
+    const wrapper = mountUsername({ isForumMod: true });
+
+    expect(wrapper.text()).toContain('Forum Mod');
+  });
+
+  it('shows both Server Admin and Forum Admin when the user is a server admin who owns the forum', () => {
+    const wrapper = mountUsername({ isServerAdmin: true, isForumAdmin: true });
+
+    expect(wrapper.text()).toContain('Server Admin');
+    expect(wrapper.text()).toContain('Forum Admin');
   });
 
   it('shows an OP badge', () => {

@@ -9,8 +9,10 @@ interface Props {
   accountCreated?: string;
   commentKarma?: number;
   discussionKarma?: number;
-  isAdmin?: boolean;
-  isMod?: boolean;
+  isServerAdmin?: boolean;
+  isServerMod?: boolean;
+  isForumAdmin?: boolean;
+  isForumMod?: boolean;
   isOriginalPoster?: boolean;
   disableTooltip?: boolean;
   lightText?: boolean;
@@ -22,8 +24,10 @@ const props = withDefaults(defineProps<Props>(), {
   accountCreated: '',
   commentKarma: 0,
   discussionKarma: 0,
-  isAdmin: false,
-  isMod: false,
+  isServerAdmin: false,
+  isServerMod: false,
+  isForumAdmin: false,
+  isForumMod: false,
   isOriginalPoster: false,
   disableTooltip: false,
   lightText: false,
@@ -93,15 +97,26 @@ const modBadgeClasses = computed(() => {
               >
             </nuxt-link>
             <span
-              v-if="isAdmin"
+              v-if="isServerAdmin"
               :class="badgeClasses"
-              >Admin</span
+              >Server Admin</span
             >
             <span
-              v-if="isMod"
+              v-if="isServerMod"
               :class="modBadgeClasses"
             >
-              Mod
+              Server Mod
+            </span>
+            <span
+              v-if="isForumAdmin"
+              :class="badgeClasses"
+              >Forum Admin</span
+            >
+            <span
+              v-if="isForumMod"
+              :class="modBadgeClasses"
+            >
+              Forum Mod
             </span>
             <span
               v-if="isOriginalPoster"
@@ -154,15 +169,25 @@ const modBadgeClasses = computed(() => {
           }}</span>
         </nuxt-link>
         <span
-          v-if="isAdmin"
+          v-if="isServerAdmin"
           :class="badgeClasses"
-          >Admin</span
+          >Server Admin</span
         >
         <span
-          v-if="isMod"
+          v-if="isServerMod"
+          :class="modBadgeClasses"
+          >Server Mod</span
+        >
+        <span
+          v-if="isForumAdmin"
+          :class="badgeClasses"
+          >Forum Admin</span
+        >
+        <span
+          v-if="isForumMod"
           :class="modBadgeClasses"
         >
-          Mod
+          Forum Mod
         </span>
         <span
           v-if="isOriginalPoster"
@@ -189,15 +214,25 @@ const modBadgeClasses = computed(() => {
           }}</span>
         </nuxt-link>
         <span
-          v-if="isAdmin"
+          v-if="isServerAdmin"
           :class="badgeClasses"
-          >Admin</span
+          >Server Admin</span
         >
         <span
-          v-if="isMod"
+          v-if="isServerMod"
+          :class="modBadgeClasses"
+          >Server Mod</span
+        >
+        <span
+          v-if="isForumAdmin"
+          :class="badgeClasses"
+          >Forum Admin</span
+        >
+        <span
+          v-if="isForumMod"
           :class="modBadgeClasses"
         >
-          Mod
+          Forum Mod
         </span>
         <span
           v-if="isOriginalPoster"

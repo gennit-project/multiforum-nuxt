@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DateTime } from 'luxon';
-import { LocationFilterTypes } from './locationFilterTypes';
-import { timeShortcutValues } from './eventSearchOptions';
+import { LocationFilterTypes } from '@/components/event/list/filters/locationFilterTypes';
+import { timeShortcutValues } from '@/components/event/list/filters/eventSearchOptions';
 import type { EventWhere } from '@/__generated__/graphql';
 import type { SearchEventValues } from '@/types/Event';
 
@@ -31,7 +31,7 @@ const loadGetEventWhere = async () => {
   vi.setSystemTime(TEST_NOW);
   vi.resetModules();
 
-  const module = await import('./getEventWhere');
+  const module = await import('@/utils/getEventWhere');
   return module.default;
 };
 

@@ -9,10 +9,16 @@ const DISCUSSION_ID = 'discussion-1';
 
 // Regression test for the original bug: after a super upvote the button looked
 // inactive (and could not be undone) because the frontend overwrote its cache
-// with the exact list the server returned. The server can return a stale list
-// (read-after-write lag) that omits the actor. The frontend is now authoritative
-// about the actor, so the button must go active regardless of the returned list.
-test('super upvote goes active even when the backend returns a stale list', async ({
+// with the exact list the *createScratchpadEntry mutation* returned, and that
+// response can lag behind the just-committed write (read-after-write gap),
+// omitting the actor.
+//
+// The mutation response below is deliberately stale (empty superUpvotedByUsers),
+// but the super upvote IS committed to the backing state — so any independent
+// query (e.g. an auth-hydration-driven refetch of the discussion) reflects the
+// actor, exactly as a real backend would once the write has landed. The button
+// must end up active.
+test('super upvote goes active even when the mutation returns a stale list', async ({
   page,
   setupMockedPage,
 }) => {
@@ -25,10 +31,14 @@ test('super upvote goes active even when the backend returns a stale list', asyn
   });
 
   const handlers = createSuperUpvoteHandlers(state);
-  // Simulate the backend read-after-write gap: the create succeeds but the
-  // returned superUpvotedByUsers does NOT include the actor.
+  // The create still commits the super upvote to the backing state (so reads
+  // are eventually consistent), but its OWN returned superUpvotedByUsers is
+  // stale and omits the actor — the read-after-write gap being simulated.
   handlers.createScratchpadEntry = ({ body }) => {
     const v = (body.variables ?? {}) as Record<string, string>;
+    if (!state.superUpvoters.includes(state.actorUsername)) {
+      state.superUpvoters.push(state.actorUsername);
+    }
     return {
       data: {
         createScratchpadEntry: {

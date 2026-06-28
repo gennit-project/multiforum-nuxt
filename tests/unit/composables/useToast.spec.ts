@@ -1,17 +1,19 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { setActivePinia, createPinia } from 'pinia';
+import { useToast } from '@/composables/useToast';
 
 describe('useToast', () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    vi.resetModules();
+    // The composable now delegates to the Pinia toast store.
+    setActivePinia(createPinia());
   });
 
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  it('adds a toast and auto-removes it after duration', async () => {
-    const { useToast } = await import('@/composables/useToast');
+  it('adds a toast and auto-removes it after duration', () => {
     const { showToast, toasts } = useToast();
 
     showToast('Hello', 'info', 1000);
@@ -20,8 +22,7 @@ describe('useToast', () => {
     expect(toasts.value).toEqual([]);
   });
 
-  it('does not remove toast before duration elapses', async () => {
-    const { useToast } = await import('@/composables/useToast');
+  it('does not remove toast before duration elapses', () => {
     const { showToast, toasts } = useToast();
 
     showToast('Hello', 'info', 1000);

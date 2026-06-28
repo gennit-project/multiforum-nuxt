@@ -7,6 +7,12 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 const mutateSpies = [vi.fn(), vi.fn(), vi.fn(), vi.fn()];
 const onDoneCallbacks: Array<(() => void) | undefined> = [];
 
+// The auto-unsubscribe composable is exercised by its own spec and an e2e
+// test; here we stub it so mounting does not pull in the Pinia toast store.
+vi.mock('@/composables/useAutoUnsubscribe', () => ({
+  useAutoUnsubscribe: vi.fn(),
+}));
+
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
   useMutation: vi.fn(),
@@ -44,7 +50,7 @@ vi.mock('@/composables/useAuthState', async () => {
   };
 });
 
-vi.mock('@/components/comments/getSortFromQuery', async (importOriginal) => {
+vi.mock('@/utils/getSortFromQuery', async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,

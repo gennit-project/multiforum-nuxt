@@ -152,3 +152,33 @@ describe('CommentEditsDropdown diff modal', () => {
     ).toBe(false);
   });
 });
+
+describe('CommentEditsDropdown current-version flag', () => {
+  // Regression: the modal's isMostRecent must come from the pair's isCurrent
+  // flag so the "Current version" badge renders for the most-recent edit.
+  it('flags the most recent edit as current', async () => {
+    const wrapper = mountDropdown(makeComment('alice', ['bob', 'carol']));
+    await open(wrapper);
+
+    await wrapper.findAll('li')[0].trigger('click');
+
+    expect(
+      wrapper
+        .findComponent({ name: 'CommentRevisionDiffModal' })
+        .props('isMostRecent')
+    ).toBe(true);
+  });
+
+  it('does not flag an older edit as current', async () => {
+    const wrapper = mountDropdown(makeComment('alice', ['bob', 'carol']));
+    await open(wrapper);
+
+    await wrapper.findAll('li')[1].trigger('click');
+
+    expect(
+      wrapper
+        .findComponent({ name: 'CommentRevisionDiffModal' })
+        .props('isMostRecent')
+    ).toBe(false);
+  });
+});

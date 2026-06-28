@@ -39,7 +39,7 @@ const mountSidebar = (props: Record<string, unknown> = {}) =>
         AvatarComponent: { name: 'AvatarComponent', props: ['src', 'text'], template: '<div class="avatar" />' },
         MarkdownPreview: { name: 'MarkdownPreview', props: ['text'], template: '<div class="bio">{{ text }}</div>' },
         ReportProfilePictureModal: { name: 'ReportProfilePictureModal', props: ['open'], template: '<div class="report-modal" />' },
-        RequireAuth: { template: '<div><slot name="authenticated" /></div>' },
+        RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
         FlagIcon: true,
       },
     },
@@ -74,10 +74,22 @@ describe('UserProfileSidebar identity', () => {
     expect(wrapper.text()).toContain('Alice A');
   });
 
-  it('shows an Admin badge when isAdmin', () => {
-    const wrapper = mountSidebar({ isAdmin: true });
+  it('shows a Server Admin badge for a server admin', () => {
+    const wrapper = mountSidebar({ serverRoleBadge: 'serverAdmin' });
 
-    expect(wrapper.text()).toContain('Admin');
+    expect(wrapper.text()).toContain('Server Admin');
+  });
+
+  it('shows a Server Mod badge for a server moderator', () => {
+    const wrapper = mountSidebar({ serverRoleBadge: 'serverMod' });
+
+    expect(wrapper.text()).toContain('Server Mod');
+  });
+
+  it('shows no server badge for a regular user', () => {
+    const wrapper = mountSidebar();
+
+    expect(wrapper.text()).not.toContain('Server');
   });
 });
 

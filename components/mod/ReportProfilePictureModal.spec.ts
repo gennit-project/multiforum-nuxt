@@ -128,4 +128,22 @@ describe('ReportProfilePictureModal', () => {
 
     expect(wrapper.emitted('close')).toBeTruthy();
   });
+
+  it('titles the modal with the profile owner display name', () => {
+    const wrapper = mountModal({ username: 'alice', displayName: 'Alice A' });
+
+    expect(modal(wrapper).props('title')).toBe('Report Profile Picture: Alice A');
+  });
+
+  it('falls back to the username in the title', () => {
+    const wrapper = mountModal({ username: 'alice' });
+
+    expect(modal(wrapper).props('title')).toBe('Report Profile Picture: alice');
+  });
+
+  it('notes that the report is reviewed by server admins', () => {
+    const wrapper = mountModal();
+
+    expect(wrapper.text()).toMatch(/reviewed by\s+server admins/);
+  });
 });

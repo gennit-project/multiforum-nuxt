@@ -111,6 +111,14 @@ describe('SuperUpvoteModal validation', () => {
     expect(sendButton(wrapper).attributes('disabled')).toBeDefined();
   });
 
+  it('shows the textarea error state when over the character limit', async () => {
+    const wrapper = mountModal();
+
+    await wrapper.get('textarea').setValue('x'.repeat(501));
+
+    expect(wrapper.get('textarea').classes()).toContain('border-red-500');
+  });
+
   it('shows characters remaining', () => {
     const wrapper = mountModal();
 

@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'nuxt/app';
 import ChannelDiscussionList from './ChannelDiscussionList.vue';
 import SitewideDiscussionList from './SitewideDiscussionList.vue';
 import DiscussionFilterBar from '@/components/discussion/list/DiscussionFilterBar.vue';
-import { getFilterValuesFromParams } from './getDiscussionFilterValuesFromParams';
+import { getFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import type { SearchDiscussionValues } from '@/types/Discussion';
 
 // Props and Emits

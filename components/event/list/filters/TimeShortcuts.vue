@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import type { LocationQuery } from 'vue-router';
 import { timeFilterShortcuts, timeShortcutValues } from './eventSearchOptions';
-import { getFilterValuesFromParams } from '@/components/event/list/filters/getEventFilterValuesFromParams';
+import { getFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
 import type { SearchEventValues } from '@/types/Event';
 import Tag from '@/components/TagComponent.vue';
 

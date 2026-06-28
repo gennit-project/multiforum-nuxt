@@ -1,6 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createMockRoute, createMockRouter } from '@/tests/utils/mockRouter';
+import SearchBar from '@/components/SearchBar.vue';
+import CheckBox from '@/components/CheckBox.vue';
 
 import DownloadFilterBar from '@/components/download/DownloadFilterBar.vue';
 
@@ -34,6 +36,10 @@ const mountBar = () =>
   });
 
 describe('DownloadFilterBar', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('renders the filter toggle button', () => {
     const wrapper = mountBar();
     expect(
@@ -61,5 +67,30 @@ describe('DownloadFilterBar', () => {
     expect(
       wrapper.find('[data-testid="show-archived-downloads"]').exists()
     ).toBe(true);
+  });
+
+  it('replaces the route with a search-input filter from the search bar', async () => {
+    const wrapper = mountBar();
+    await wrapper.get('[data-testid="download-search-button"]').trigger('click');
+    await wrapper.findComponent(SearchBar).vm.$emit('update-search-input', 'dogs');
+    expect(router.replace).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: expect.objectContaining({ searchInput: 'dogs' }),
+      })
+    );
+  });
+
+  it('replaces the route with the archived filter when the checkbox toggles', async () => {
+    const wrapper = mountBar();
+    await wrapper.get('[data-testid="download-filter-button"]').trigger('click');
+    // updateShowArchived reads event.target.checked, so emit a synthetic event.
+    await wrapper
+      .findComponent(CheckBox)
+      .vm.$emit('input', { target: { checked: true } });
+    expect(router.replace).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: expect.objectContaining({ showArchived: true }),
+      })
+    );
   });
 });

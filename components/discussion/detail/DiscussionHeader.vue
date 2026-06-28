@@ -26,7 +26,8 @@ import EditsDropdown from './activityFeed/EditsDropdown.vue';
 import type { Discussion } from '@/__generated__/graphql';
 import type { RouteLocationRaw } from 'vue-router';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
-import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
+import { getAuthorBadges } from '@/utils/roleBadges';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
 
@@ -54,7 +55,10 @@ const emit = defineEmits([
 
 const route = useRoute();
 const router = useRouter();
-const { serverAdminUsernames } = useServerRoleMembership();
+const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+  useServerRoleMembership();
+const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
+  useForumRoleMembership();
 
 const editedAt = computed(() => {
   if (!props.discussion?.updatedAt) return '';
@@ -319,16 +323,16 @@ const menuItems = computed(() => {
   });
 });
 
-const authorIsAdmin = computed(() => {
-  return (
-    getServerRoleBadge({
-      username: props.discussion?.Author?.username,
-      adminUsernames: serverAdminUsernames.value,
-    }) === 'serverAdmin'
-  );
-});
-const authorIsMod = computed(
-  () => props.discussion?.authorIsChannelModerator || false
+const authorBadges = computed(() =>
+  getAuthorBadges({
+    username: props.discussion?.Author?.username,
+    serverAdminUsernames: serverAdminUsernames.value,
+    serverModUsernames: serverModUsernames.value,
+    serverModProfileNames: serverModProfileNames.value,
+    forumAdminUsernames: forumAdminUsernames.value,
+    forumModUsernames: forumModUsernames.value,
+    forumModProfileNames: forumModProfileNames.value,
+  })
 );
 
 const warningModalTitle = computed(() => {
@@ -381,14 +385,24 @@ const warningModalBody = computed(() => {
             >
 
             <span
-              v-if="authorIsAdmin"
+              v-if="authorBadges.isServerAdmin"
               class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
-              >Admin</span
+              >Server Admin</span
             >
             <span
-              v-if="authorIsMod"
+              v-if="authorBadges.isServerMod"
               class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
-              >Mod</span
+              >Server Mod</span
+            >
+            <span
+              v-if="authorBadges.isForumAdmin"
+              class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+              >Forum Admin</span
+            >
+            <span
+              v-if="authorBadges.isForumMod"
+              class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+              >Forum Mod</span
             >
           </span>
         </nuxt-link>

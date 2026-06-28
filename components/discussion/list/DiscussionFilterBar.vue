@@ -7,7 +7,7 @@ import TagIcon from '@/components/icons/TagIcon.vue';
 import SearchableForumList from '@/components/channel/SearchableForumList.vue';
 import SearchableTagList from '@/components/SearchableTagList.vue';
 import SortButtons from '@/components/SortButtons.vue';
-import { getFilterValuesFromParams } from './getDiscussionFilterValuesFromParams';
+import { getFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import type { SearchDiscussionValues } from '@/types/Discussion';
 import FilterIcon from '@/components/icons/FilterIcon.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';

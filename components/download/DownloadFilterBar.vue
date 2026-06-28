@@ -6,7 +6,7 @@ import TagIcon from '@/components/icons/TagIcon.vue';
 import SearchableTagList from '@/components/SearchableTagList.vue';
 import SortButtons from '@/components/SortButtons.vue';
 import { getTagLabel } from '@/utils';
-import { getFilterValuesFromParams } from '../discussion/list/getDiscussionFilterValuesFromParams';
+import { getFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import type { SearchDiscussionValues } from '@/types/Discussion';
 import type { FilterGroup } from '@/__generated__/graphql';
 import { updateFilters } from '@/utils/routerUtils';

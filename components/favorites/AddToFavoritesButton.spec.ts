@@ -84,6 +84,51 @@ describe('AddToFavoritesButton', () => {
   });
 });
 
+describe('AddToFavoritesButton sizing', () => {
+  it.each([
+    ['small', 'h-4 w-4'],
+    ['large', 'h-6 w-6'],
+    ['medium', 'h-5 w-5'],
+  ])('renders the %s icon size', (size, expected) => {
+    const wrapper = mountButton({ size });
+    expect(wrapper.get('svg').classes().join(' ')).toContain(expected);
+  });
+
+  it('defaults to the medium icon size', () => {
+    const wrapper = mountButton();
+    expect(wrapper.get('svg').classes().join(' ')).toContain('h-5 w-5');
+  });
+});
+
+describe('AddToFavoritesButton tooltip', () => {
+  it('shows the tooltip on hover and hides it on leave', async () => {
+    // The tooltip is rendered via <Teleport to="body">, so it lands in the
+    // document body rather than the component's own subtree.
+    const wrapper = mountButton({ isFavorited: false });
+    const button = wrapper.get('[aria-label]');
+
+    await button.trigger('mouseenter');
+    const tooltip = document.body.querySelector('.pointer-events-none');
+    expect(tooltip).not.toBeNull();
+    expect(tooltip?.textContent?.trim()).toBe('Add to favorites');
+
+    await button.trigger('mouseleave');
+    expect(document.body.querySelector('.pointer-events-none')).toBeNull();
+    wrapper.unmount();
+  });
+});
+
+describe('AddToFavoritesButton collection changes', () => {
+  it('re-emits favoriteChange from the collection popover', () => {
+    const wrapper = mountWithDefaults(AddToFavoritesButton, {
+      props: { isFavorited: true, allowAddToList: true },
+      global: { stubs: { AddToListPopover: PopoverStub } },
+    });
+    wrapper.getComponent(PopoverStub).vm.$emit('favorite-change', true);
+    expect(wrapper.emitted('favoriteChange')?.[0]).toEqual([true]);
+  });
+});
+
 describe('AddToFavoritesButton (unauthenticated)', () => {
   it('still renders a favorites button labelled to add', () => {
     const wrapper = mountUnauthButton({ displayName: 'Trivia' });

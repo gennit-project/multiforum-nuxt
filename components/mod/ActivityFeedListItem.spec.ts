@@ -39,6 +39,14 @@ vi.mock('@/composables/useForumRoleMembership', () => ({
   }),
 }));
 
+vi.mock('@/composables/useServerRoleMembership', () => ({
+  useServerRoleMembership: () => ({
+    serverAdminUsernames: ref([]),
+    serverModUsernames: ref([]),
+    serverModProfileNames: ref([]),
+  }),
+}));
+
 describe('ActivityFeedListItem', () => {
   const mountWrapper = () =>
     mount(ActivityFeedListItem, {

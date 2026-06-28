@@ -1,6 +1,8 @@
 // Contribution data fixture for testing GithubContributionChart component
-import type { DayData } from '@/types/contribution';
+import type { DayData, Activity } from '@/types/contribution';
 import type { User, Comment, Discussion, Event } from '@/__generated__/graphql';
+
+type WikiEditFixture = NonNullable<Activity['WikiEdits']>[number];
 
 // Create a stable date for testing that won't change with the current date
 const TEST_YEAR = 2023;
@@ -140,6 +142,48 @@ export const contributionDataFixture: DayData[] = [
     date: createDateString(TEST_YEAR, 6, 14),
     count: 0,
     activities: [],
+  },
+];
+
+// Helper to create minimal test wiki-edit data
+const createTestWikiEdit = (
+  id: string,
+  title: string,
+  slug: string,
+  channelUniqueName: string,
+  editReason?: string
+): WikiEditFixture =>
+  ({
+    id,
+    body: 'Wiki edit body',
+    editReason,
+    createdAt: new Date().toISOString(),
+    Author: createTestUser('testuser'),
+    WikiPage: { id: `wp-${id}`, title, slug, channelUniqueName },
+  }) as unknown as WikiEditFixture;
+
+// Data with a day of wiki edits
+export const wikiEditsContributionData: DayData[] = [
+  {
+    date: createDateString(TEST_YEAR, 7, 8),
+    count: 2,
+    activities: [
+      {
+        id: 'activity-wiki',
+        type: 'WikiEdit',
+        description: 'Wiki edits',
+        WikiEdits: [
+          createTestWikiEdit(
+            'we1',
+            'Cat Care',
+            'cat-care',
+            'cats',
+            'Fixed a typo'
+          ),
+          createTestWikiEdit('we2', 'Dog Care', 'dog-care', 'dogs'),
+        ],
+      },
+    ],
   },
 ];
 

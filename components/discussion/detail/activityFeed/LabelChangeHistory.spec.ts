@@ -64,6 +64,22 @@ describe('LabelChangeHistory item', () => {
   });
 });
 
+describe('LabelChangeHistory badge styling', () => {
+  it('styles an added label green without strikethrough', () => {
+    const wrapper = mountHistory([change({ actionType: 'added' })]);
+
+    expect(wrapper.html()).toContain('bg-green-100');
+    expect(wrapper.find('.line-through').exists()).toBe(false);
+  });
+
+  it('styles a removed label red with strikethrough', () => {
+    const wrapper = mountHistory([change({ actionType: 'removed' })]);
+
+    expect(wrapper.html()).toContain('bg-red-100');
+    expect(wrapper.find('.line-through').exists()).toBe(true);
+  });
+});
+
 describe('LabelChangeHistory collapse', () => {
   const three = [
     change({ id: 'c1', labelDisplayName: 'First' }),

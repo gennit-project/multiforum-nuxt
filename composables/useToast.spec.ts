@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { setActivePinia, createPinia } from 'pinia';
 import { useToast } from './useToast';
 
-const drain = () => {
-  const { toasts, removeToast } = useToast();
-  [...toasts.value].forEach((t) => removeToast(t.id));
-};
-
-beforeEach(drain);
+// The composable delegates to the Pinia toast store; a fresh Pinia per test
+// gives each case an empty toast list.
+beforeEach(() => {
+  setActivePinia(createPinia());
+});
 afterEach(() => vi.useRealTimers());
 
 describe('useToast', () => {

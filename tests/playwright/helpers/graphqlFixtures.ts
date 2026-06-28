@@ -67,6 +67,7 @@ export type BasicUserFixture = UserFixture &
 
 export type ServerConfigFixture = Pick<
   ServerConfig,
+  | '__typename'
   | 'serverName'
   | 'serverIconURL'
   | 'serverDescription'
@@ -87,6 +88,7 @@ export type ServerConfigFixture = Pick<
 
 export type ChannelFixture = Pick<
   Channel,
+  | '__typename'
   | 'uniqueName'
   | 'displayName'
   | 'channelIconURL'
@@ -213,6 +215,7 @@ export type CommentFixture = Pick<
   Channel: Pick<Channel, '__typename' | 'uniqueName'>;
   UpvotedByUsers: Array<Pick<User, 'username'>>;
   UpvotedByUsersAggregate: CountAggregate;
+  SuperUpvotedByUsers: Array<Pick<User, 'username'>>;
 };
 
 export const buildUser = (
@@ -263,6 +266,7 @@ export const buildBasicUser = (
 export const buildServerConfig = (
   overrides: Override<ServerConfigFixture> = {}
 ): ServerConfigFixture => ({
+  __typename: 'ServerConfig',
   serverName: 'Listical',
   serverIconURL: '',
   serverDescription: '',
@@ -281,6 +285,115 @@ export const buildServerConfig = (
   ...overrides,
 });
 
+// ---------------------------------------------------------------------------
+// Roles / permissions fixtures (for admin/roles, edit/roles, GET_SERVER_PERMISSIONS).
+// Returned objects are intentionally loosely typed — they only need the right
+// runtime shape for the mocked GraphQL handler, not to satisfy a generated type.
+// ---------------------------------------------------------------------------
+export const buildServerRole = (overrides: Record<string, unknown> = {}) => ({
+  __typename: 'ServerRole' as const,
+  name: 'Standard User Role',
+  description: 'Default role for a standard signed-in user.',
+  canCreateChannel: true,
+  canCreateDiscussion: true,
+  canCreateEvent: true,
+  canCreateComment: true,
+  canUpvoteDiscussion: true,
+  canUpvoteComment: true,
+  canUploadFile: true,
+  canGiveFeedback: true,
+  canManageServerSettings: false,
+  canManagePlugins: false,
+  canManageRoles: false,
+  canManageMods: false,
+  canManageAdmins: false,
+  canManageSuperAdmins: false,
+  ...overrides,
+});
+
+export const buildModServerRole = (overrides: Record<string, unknown> = {}) => ({
+  __typename: 'ModServerRole' as const,
+  name: 'Basic Server Mod Role',
+  description: 'Baseline server moderator capabilities.',
+  canHideComment: false,
+  canHideEvent: false,
+  canHideDiscussion: false,
+  canLockChannel: false,
+  canEditComments: false,
+  canEditDiscussions: false,
+  canEditEvents: false,
+  canGiveFeedback: true,
+  canOpenSupportTickets: true,
+  canCloseSupportTickets: false,
+  canReport: true,
+  canSuspendUser: false,
+  ...overrides,
+});
+
+// A ServerConfig populated for the roles/permissions management page: role
+// tiers + pending invites resolved (GET_SERVER_PERMISSIONS, op `getServerConfig`).
+export const buildServerPermissionsConfig = (
+  overrides: Record<string, unknown> = {}
+) => ({
+  ...buildServerConfig(),
+  Moderators: [] as unknown[],
+  PendingAdminInvites: [] as unknown[],
+  PendingModInvites: [] as unknown[],
+  DefaultServerRole: buildServerRole(),
+  DefaultModRole: buildModServerRole(),
+  DefaultElevatedModRole: buildModServerRole({
+    name: 'Elevated Server Mod Role',
+    canHideComment: true,
+    canHideDiscussion: true,
+    canSuspendUser: true,
+  }),
+  DefaultSuspendedRole: buildServerRole({
+    name: 'Suspended Server Role',
+    canCreateDiscussion: false,
+    canCreateComment: false,
+  }),
+  DefaultSuspendedModRole: buildModServerRole({
+    name: 'Suspended Server Mod Role',
+    canReport: false,
+    canGiveFeedback: false,
+    canOpenSupportTickets: false,
+  }),
+  ...overrides,
+});
+
+// ---------------------------------------------------------------------------
+// Server health dashboard fixture (admin/dashboard, GET_SERVER_HEALTH_DASHBOARD).
+// ---------------------------------------------------------------------------
+export const buildServerHealthDashboard = (
+  overrides: Record<string, unknown> = {}
+) => ({
+  __typename: 'ServerHealthDashboard' as const,
+  startDate: '2026-06-01',
+  endDate: '2026-06-28',
+  generatedAt: MOCK_DATE,
+  summary: {
+    activeChannelCount: 1,
+    discussionCount: 0,
+    commentCount: 0,
+    eventCount: 0,
+    downloadCount: 0,
+    voteCount: 0,
+    openIssueCount: 0,
+    issueOpenedCount: 0,
+    issueClosedCount: 0,
+    moderationActionCount: 0,
+    archivedContentCount: 0,
+    lockedContentCount: 0,
+    suspensionCount: 0,
+    medianOpenIssueAgeDays: 0,
+  },
+  timeSeries: [] as unknown[],
+  channelHealth: [] as unknown[],
+  issueAging: [] as unknown[],
+  attentionItems: [] as unknown[],
+  ...overrides,
+});
+
 export const buildChannel = ({
   uniqueName = 'cats',
   displayName = uniqueName,
@@ -296,6 +409,7 @@ export const buildChannel = ({
   discussionChannelsCount?: number;
   overrides?: Override<ChannelFixture>;
 } = {}): ChannelFixture => ({
+  __typename: 'Channel',
   uniqueName,
   displayName,
   channelIconURL: '',
@@ -500,6 +614,7 @@ export const buildComment = ({
   },
   UpvotedByUsers: [{ username: DEFAULT_USERNAME }],
   UpvotedByUsersAggregate: { count: 1 },
+  SuperUpvotedByUsers: [],
 });
 
 export type EventFixture = {
@@ -663,6 +778,54 @@ export const buildModerationAction = ({
   ...overrides,
 });
 
+// A ModerationAction of type "comment" whose Comment is authored by a
+// ModerationProfile (displayName). Shape matches the GET_ISSUE
+// ActivityFeed.Comment selection set (including CommentVoteFields) so the
+// activity-feed report/suspend flows can be exercised end-to-end.
+export const buildModCommentActivityItem = ({
+  id = 'activity-1',
+  commentId = 'activity-comment-1',
+  text = 'A moderation comment in the activity feed.',
+  modDisplayName = 'mod-bob',
+  channelUniqueName = 'cats',
+  issueId = 'issue-1',
+}: {
+  id?: string;
+  commentId?: string;
+  text?: string;
+  modDisplayName?: string;
+  channelUniqueName?: string;
+  issueId?: string;
+} = {}) => ({
+  __typename: 'ModerationAction',
+  id,
+  actionType: 'comment',
+  actionDescription: 'commented on the issue',
+  createdAt: MOCK_DATE,
+  ModerationProfile: { displayName: modDisplayName },
+  User: null,
+  Revision: null,
+  Comment: {
+    __typename: 'Comment',
+    id: commentId,
+    text,
+    emoji: '',
+    weightedVotesCount: 0,
+    createdAt: MOCK_DATE,
+    updatedAt: MOCK_DATE,
+    Issue: { id: issueId },
+    CommentAuthor: { __typename: 'ModerationProfile', displayName: modDisplayName },
+    Channel: { uniqueName: channelUniqueName },
+    ChildCommentsAggregate: { count: 0 },
+    ParentComment: null,
+    editReason: '',
+    PastVersions: [],
+    UpvotedByUsers: [],
+    UpvotedByUsersAggregate: { count: 0 },
+    SuperUpvotedByUsers: [],
+  },
+});
+
 export type IssueFixture = {
   __typename: 'Issue';
   id: string;
@@ -679,6 +842,7 @@ export type IssueFixture = {
   relatedWikiPageId: string | null;
   relatedWikiRevisionId: string | null;
   relatedChannelUniqueName: string | null;
+  relatedModProfileName: string | null;
   channelUniqueName: string;
   Author: { __typename: 'User'; username: string };
   flaggedServerRuleViolation: boolean;
@@ -727,6 +891,7 @@ export const buildIssue = ({
   relatedWikiPageId: null,
   relatedWikiRevisionId: null,
   relatedChannelUniqueName: null,
+  relatedModProfileName: null,
   channelUniqueName,
   Author: { __typename: 'User', username: authorUsername },
   flaggedServerRuleViolation: false,

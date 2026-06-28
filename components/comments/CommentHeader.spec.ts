@@ -104,15 +104,45 @@ describe('CommentHeader timestamps', () => {
 
 describe('CommentHeader badges', () => {
   it('shows a Forum Admin badge', () => {
-    const wrapper = mountHeader({ forumRoleBadge: 'forumAdmin' });
+    const wrapper = mountHeader({ isForumAdmin: true });
 
     expect(wrapper.text()).toContain('Forum Admin');
   });
 
   it('shows a Forum Mod badge', () => {
-    const wrapper = mountHeader({ forumRoleBadge: 'forumMod' });
+    const wrapper = mountHeader({ isForumMod: true });
 
     expect(wrapper.text()).toContain('Forum Mod');
+  });
+
+  it('shows a Server Admin badge', () => {
+    const wrapper = mountHeader({ isServerAdmin: true });
+
+    expect(wrapper.text()).toContain('Server Admin');
+  });
+
+  it('shows a Server Mod badge', () => {
+    const wrapper = mountHeader({ isServerMod: true });
+
+    expect(wrapper.text()).toContain('Server Mod');
+  });
+
+  it('does not show a Server Admin badge for a regular author', () => {
+    const wrapper = mountHeader();
+
+    expect(wrapper.text()).not.toContain('Server Admin');
+  });
+
+  it('renders server and forum badges independently when both apply', () => {
+    const wrapper = mountHeader({
+      isServerAdmin: true,
+      isForumMod: true,
+    });
+
+    expect([
+      wrapper.text().includes('Server Admin'),
+      wrapper.text().includes('Forum Mod'),
+    ]).toEqual([true, true]);
   });
 
   it('shows an OP badge for the original poster', () => {

@@ -1,419 +1,268 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
-import { useRoute, useRouter } from 'nuxt/app';
-import { useMutation } from '@vue/apollo-composable';
+import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
-// Mock dependencies
-vi.mock('nuxt/app', () => ({
-  useRoute: vi.fn(),
-  useRouter: vi.fn(),
+import CommentSection from '@/components/comments/CommentSection.vue';
+
+// This spec mounts the REAL CommentSection.vue. Apollo is mocked at the module
+// level: useMutation returns a mutate() that synchronously fires its registered
+// onDone callbacks, so exercising createComment also runs the onDone handler in
+// CommentSection (which emits updateCreateFormValues). useQuery returns an empty
+// result, so the suspension-notice composable resolves to "not suspended".
+const { routerPush, routeRef } = vi.hoisted(() => ({
+  routerPush: vi.fn(),
+  routeRef: { value: { params: {} as Record<string, unknown>, query: {} } },
 }));
 
-vi.mock('@vue/apollo-composable', () => ({
-  useMutation: vi.fn(),
+vi.mock('nuxt/app', () => ({
+  useRoute: () => routeRef.value,
+  useRouter: () => ({ push: routerPush }),
 }));
 
 vi.mock('@/composables/useAuthState', () => ({
-  useModProfileName: () => ({ value: 'testmod' }),
+  useModProfileName: () => ({ value: 'mod1' }),
+  useUsername: () => ({ value: 'alice' }),
 }));
 
-vi.mock('@/components/comments/getSortFromQuery', () => ({
-  getSortFromQuery: vi.fn().mockReturnValue('new'),
+vi.mock('@/utils/getSortFromQuery', () => ({
+  getSortFromQuery: () => 'new',
 }));
 
-// Create simplified test component
-const CommentSectionTest = {
-  name: 'CommentSection',
-  props: [
-    'aggregateCommentCount',
-    'commentSectionQueryVariables',
-    'comments',
-    'createCommentInput',
-    'createFormValues',
-    'enableFeedback',
-    'loading',
-    'locked',
-    'archived',
-    'reachedEndOfResults',
-    'previousOffset',
-    'originalPoster',
-    'showCommentSortButtons',
-  ],
-  template: `
-    <div class="comment-section">
-      <h2 id="comments" data-testid="comment-header">{{ \`Comments (\${aggregateCommentCount})\` }}</h2>
-      <div v-if="showCommentSortButtons" data-testid="sort-buttons"></div>
-      <div v-if="locked || archived" data-testid="locked-banner">This comment section is locked.</div>
-      <div v-if="loading" data-testid="loading-spinner"></div>
-      <div data-testid="nuxt-page-outlet"></div>
-      <div v-if="!loading && aggregateCommentCount === 0" data-testid="no-comments">
-        There are no comments yet.
-      </div>
-      <div v-for="(comment, index) in comments" :key="comment?.id || index" data-testid="comment"></div>
-      <div v-if="!reachedEndOfResults" data-testid="load-more" @click="$emit('loadMore')"></div>
-    </div>
-  `,
+vi.mock('@vue/apollo-composable', async () => {
+  const { ref: r } = await import('vue');
+  return {
+    useMutation: () => {
+      const done: Array<(p: unknown) => void> = [];
+      const onErr: Array<(p: unknown) => void> = [];
+      return {
+        mutate: vi.fn(() => {
+          done.forEach((cb) => cb({ data: {} }));
+          return Promise.resolve({ data: {} });
+        }),
+        onDone: (cb: (p: unknown) => void) => done.push(cb),
+        onError: (cb: (p: unknown) => void) => onErr.push(cb),
+        loading: r(false),
+        error: r(null),
+      };
+    },
+    useQuery: () => ({
+      result: r(null),
+      loading: r(false),
+      error: r(null),
+      onResult: vi.fn(),
+      onError: vi.fn(),
+      refetch: vi.fn(),
+    }),
+    provideApolloClient: vi.fn(),
+  };
+});
+
+// A Comment stub that forwards the events CommentSection wires handlers to.
+const CommentStub = {
+  name: 'Comment',
+  props: ['commentData'],
   emits: [
-    'updateCommentSectionQueryResult',
-    'decrementCommentCount',
-    'incrementCommentCount',
-    'updateCreateReplyCommentInput',
-    'updateCreateFormValues',
-    'loadMore',
-    'createComment',
+    'create-comment',
+    'update-create-reply-comment-input',
     'click-edit-comment',
-    'delete-comment',
+    'update-edit-comment-input',
+    'save-edit',
+    'open-reply-editor',
+    'hide-reply-editor',
+    'open-edit-comment-editor',
+    'hide-edit-comment-editor',
+    'scroll-to-top',
+    'handle-view-feedback',
   ],
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
-
-    // Mock useMutation returns
-    const createCommentMutation = {
-      mutate: vi.fn(),
-      onDone: vi.fn(),
-    };
-
-    const editCommentMutation = {
-      mutate: vi.fn(),
-      error: null,
-      onDone: vi.fn(),
-    };
-
-    const deleteCommentMutation = {
-      mutate: vi.fn(),
-      onDone: vi.fn(),
-      loading: false,
-    };
-
-    const softDeleteCommentMutation = {
-      mutate: vi.fn(),
-      onDone: vi.fn(),
-    };
-
-    const addFeedbackCommentMutation = {
-      mutate: vi.fn(),
-      loading: false,
-      error: null,
-      onDone: vi.fn(),
-    };
-
-    (useMutation as any).mockImplementation((mutation: any) => {
-      if (mutation.name && mutation.name.includes('CREATE_COMMENT')) {
-        return createCommentMutation;
-      } else if (mutation.name && mutation.name.includes('UPDATE_COMMENT')) {
-        return editCommentMutation;
-      } else if (mutation.name && mutation.name.includes('DELETE_COMMENT')) {
-        return deleteCommentMutation;
-      } else if (
-        mutation.name &&
-        mutation.name.includes('SOFT_DELETE_COMMENT')
-      ) {
-        return softDeleteCommentMutation;
-      } else {
-        return addFeedbackCommentMutation;
-      }
-    });
-
-    return {
-      route,
-      router,
-      createCommentMutation,
-      editCommentMutation,
-      deleteCommentMutation,
-      softDeleteCommentMutation,
-      addFeedbackCommentMutation,
-    };
-  },
-  methods: {
-    handleClickCreate() {
-      this.$emit('createComment');
-    },
-    updateCreateInputValuesForReply(input: any) {
-      this.$emit('updateCreateReplyCommentInput', input);
-    },
-    handleClickEdit(commentData: any) {
-      this.$emit('click-edit-comment', commentData);
-    },
-    handleClickDelete(input: any) {
-      this.$emit('delete-comment', input);
-    },
-    handleDeleteComment() {
-      this.deleteCommentMutation.mutate();
-    },
-    handleSaveEdit() {
-      this.editCommentMutation.mutate();
-    },
-  },
+  template: '<div class="comment-stub" />',
 };
 
-describe('CommentSection.vue', () => {
-  let mockRoute;
-  let mockRouter;
+const PinnedAnswersStub = {
+  name: 'PinnedAnswers',
+  props: ['answers'],
+  emits: ['create-comment'],
+  template: '<div class="pinned-answers-stub" />',
+};
 
-  const defaultProps = {
-    aggregateCommentCount: 2,
-    commentSectionQueryVariables: {
-      discussionId: 'test-discussion',
-      limit: 10,
-      offset: 0,
-      sort: 'new',
-    },
-    comments: [
-      {
-        id: 'comment-1',
-        text: 'First comment',
-        CommentAuthor: { username: 'user1' },
-        Channel: { uniqueName: 'test-forum' },
-        DiscussionChannel: {
-          channelUniqueName: 'test-forum',
-          discussionId: 'test-discussion',
-        },
-        ChildCommentsAggregate: { count: 0 },
-        FeedbackComments: [],
-        archived: false,
-        createdAt: '2023-01-01T00:00:00Z',
-        updatedAt: null,
-      },
-      {
-        id: 'comment-2',
-        text: 'Second comment',
-        CommentAuthor: { username: 'user2' },
-        Channel: { uniqueName: 'test-forum' },
-        DiscussionChannel: {
-          channelUniqueName: 'test-forum',
-          discussionId: 'test-discussion',
-        },
-        ChildCommentsAggregate: { count: 0 },
-        FeedbackComments: [],
-        archived: false,
-        createdAt: '2023-01-02T00:00:00Z',
-        updatedAt: null,
-      },
-    ],
-    createCommentInput: {
-      discussionId: 'test-discussion',
-      text: 'New comment',
-    },
-    createFormValues: {
-      text: '',
-      isRootComment: true,
-      depth: 1,
-    },
-    enableFeedback: true,
-    loading: false,
-    locked: false,
-    archived: false,
-    reachedEndOfResults: false,
-    previousOffset: 0,
-    originalPoster: 'user1',
-    showCommentSortButtons: true,
-  };
+const inert = (name: string) => ({
+  name,
+  template: `<div data-stub="${name}" />`,
+});
 
-  beforeEach(() => {
-    vi.resetAllMocks();
+const stubs = {
+  Comment: CommentStub,
+  PinnedAnswers: PinnedAnswersStub,
+  SortButtons: inert('SortButtons'),
+  InfoBanner: {
+    name: 'InfoBanner',
+    props: ['text'],
+    template: '<div class="info-banner"><slot />{{ text }}</div>',
+  },
+  ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div />' },
+  SuspensionNotice: inert('SuspensionNotice'),
+  LockIcon: inert('LockIcon'),
+  LoadMore: inert('LoadMore'),
+  Notification: inert('Notification'),
+  WarningModal: inert('WarningModal'),
+  BrokenRulesModal: inert('BrokenRulesModal'),
+  GenericFeedbackFormModal: inert('GenericFeedbackFormModal'),
+  ConfirmUndoCommentFeedbackModal: inert('ConfirmUndoCommentFeedbackModal'),
+  EditCommentFeedbackModal: inert('EditCommentFeedbackModal'),
+  UnarchiveModal: inert('UnarchiveModal'),
+  NuxtPage: inert('NuxtPage'),
+};
 
-    // Mock route and router
-    mockRoute = {
-      params: {
-        forumId: 'test-forum',
-        discussionId: 'test-discussion',
-      },
-      query: {},
-    };
+const makeComment = (id: string, text = `text-${id}`) => ({
+  id,
+  text,
+  CommentAuthor: { __typename: 'User', username: 'bob' },
+  Channel: { uniqueName: 'cats' },
+});
 
-    mockRouter = {
-      push: vi.fn(),
-      go: vi.fn(),
-    };
+const baseProps = () => ({
+  aggregateCommentCount: 2,
+  commentSectionQueryVariables: {
+    discussionId: 'd1',
+    channelUniqueName: 'cats',
+    limit: 10,
+    offset: 0,
+    sort: 'new',
+  },
+  comments: [makeComment('c1'), makeComment('c2')],
+  createCommentInput: { text: '' },
+  createFormValues: { text: '', isRootComment: true, depth: 1 },
+  reachedEndOfResults: false,
+  previousOffset: 0,
+  originalPoster: 'bob',
+});
 
-    (useRoute as any).mockReturnValue(mockRoute);
-    (useRouter as any).mockReturnValue(mockRouter);
+const mountSection = (overrides: Record<string, unknown> = {}) =>
+  mountWithDefaults(CommentSection, {
+    props: { ...baseProps(), ...overrides } as Record<string, unknown>,
+    global: { stubs },
   });
 
-  it('renders the comment section with correct header and comments', async () => {
-    const wrapper = mount(CommentSectionTest, {
-      props: defaultProps,
-    });
+beforeEach(() => {
+  vi.clearAllMocks();
+  routeRef.value = { params: {}, query: {} };
+  // scrollToTop calls window.scrollTo, which happy-dom does not implement.
+  vi.stubGlobal('scrollTo', vi.fn());
+});
 
-    expect(wrapper.find('[data-testid="comment-header"]').text()).toBe(
-      'Comments (2)'
-    );
-    expect(wrapper.findAll('[data-testid="comment"]')).toHaveLength(2);
-    expect(wrapper.find('[data-testid="sort-buttons"]').exists()).toBe(true);
+describe('CommentSection', () => {
+  it('renders the comment count header', () => {
+    const wrapper = mountSection();
+    expect(wrapper.get('#comments').text()).toBe('Comments (2)');
   });
 
-  it('shows loading spinner when loading is true', async () => {
-    const wrapper = mount(CommentSectionTest, {
-      props: {
-        ...defaultProps,
-        loading: true,
-      },
-    });
-
-    expect(wrapper.find('[data-testid="loading-spinner"]').exists()).toBe(true);
+  it('renders a Comment for each loaded comment', () => {
+    const wrapper = mountSection();
+    expect(wrapper.findAllComponents(CommentStub)).toHaveLength(2);
   });
 
-  it('shows "no comments" message when there are no comments', async () => {
-    const wrapper = mount(CommentSectionTest, {
-      props: {
-        ...defaultProps,
-        comments: [],
-        aggregateCommentCount: 0,
-      },
+  it('shows the empty-state message when there are no comments', () => {
+    const wrapper = mountSection({
+      aggregateCommentCount: 0,
+      comments: [],
+      loading: false,
     });
-
-    expect(wrapper.find('[data-testid="no-comments"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="no-comments"]').text()).toContain(
-      'There are no comments yet'
-    );
+    expect(wrapper.text()).toContain('There are no comments yet.');
   });
 
-  it('shows locked banner when the comment section is locked', async () => {
-    const wrapper = mount(CommentSectionTest, {
-      props: {
-        ...defaultProps,
-        locked: true,
-      },
+  it('shows the loading skeleton while loading the first page', () => {
+    const wrapper = mountSection({
+      loading: true,
+      comments: [],
+      aggregateCommentCount: 0,
     });
-
-    expect(wrapper.find('[data-testid="locked-banner"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="locked-banner"]').text()).toContain(
-      'This comment section is locked'
-    );
+    expect(wrapper.find('[aria-busy="true"]').exists()).toBe(true);
   });
 
-  it('shows locked banner when the comment section is archived', async () => {
-    const wrapper = mount(CommentSectionTest, {
-      props: {
-        ...defaultProps,
-        archived: true,
-      },
-    });
-
-    expect(wrapper.find('[data-testid="locked-banner"]').exists()).toBe(true);
+  it('shows the locked banner when the section is locked', () => {
+    const wrapper = mountSection({ locked: true });
+    expect(wrapper.text()).toContain('This comment section is locked.');
   });
 
-  it('hides sort buttons when showCommentSortButtons is false', async () => {
-    const wrapper = mount(CommentSectionTest, {
-      props: {
-        ...defaultProps,
-        showCommentSortButtons: false,
-      },
-    });
-
-    expect(wrapper.find('[data-testid="sort-buttons"]').exists()).toBe(false);
+  it('shows the locked banner when the section is archived', () => {
+    const wrapper = mountSection({ archived: true });
+    expect(wrapper.text()).toContain('This comment section is locked.');
   });
 
-  it('shows load more button when reachedEndOfResults is false', async () => {
-    const wrapper = mount(CommentSectionTest, {
-      props: {
-        ...defaultProps,
-        reachedEndOfResults: false,
-      },
-    });
-
-    expect(wrapper.find('[data-testid="load-more"]').exists()).toBe(true);
+  it('renders sort buttons when there are comments and sorting is enabled', () => {
+    const wrapper = mountSection();
+    expect(wrapper.findComponent({ name: 'SortButtons' }).exists()).toBe(true);
   });
 
-  it('hides load more button when reachedEndOfResults is true', async () => {
-    const wrapper = mount(CommentSectionTest, {
-      props: {
-        ...defaultProps,
-        reachedEndOfResults: true,
-      },
-    });
-
-    expect(wrapper.find('[data-testid="load-more"]').exists()).toBe(false);
+  it('hides sort buttons when sorting is disabled', () => {
+    const wrapper = mountSection({ showCommentSortButtons: false });
+    expect(wrapper.findComponent({ name: 'SortButtons' }).exists()).toBe(false);
   });
 
-  it('emits loadMore event when load more button is clicked', async () => {
-    const wrapper = mount(CommentSectionTest, {
-      props: defaultProps,
-    });
-
-    await wrapper.find('[data-testid="load-more"]').trigger('click');
-
-    expect((wrapper.emitted() as any).loadMore).toBeTruthy();
-    expect((wrapper.emitted() as any).loadMore.length).toBe(1);
+  it('renders pinned answers when answers are present', () => {
+    const wrapper = mountSection({ answers: [makeComment('a1')] });
+    expect(wrapper.findComponent(PinnedAnswersStub).exists()).toBe(true);
   });
 
-  it('emits updateCreateReplyCommentInput event when updateCreateInputValuesForReply is called', async () => {
-    const wrapper = mount(CommentSectionTest, {
-      props: defaultProps,
-    });
-
-    const inputData = {
-      text: 'Reply text',
-      parentCommentId: 'comment-1',
-      depth: 2,
-    };
-
-    await (wrapper.vm as any).updateCreateInputValuesForReply(inputData);
-
-    expect(
-      (wrapper.emitted() as any).updateCreateReplyCommentInput
-    ).toBeTruthy();
-    expect(
-      (wrapper.emitted() as any).updateCreateReplyCommentInput[0][0]
-    ).toEqual(inputData);
+  it('emits updateCreateFormValues after a comment is created', async () => {
+    // create-comment -> handleClickCreate -> createComment(mutate) -> onDone
+    // -> emit('updateCreateFormValues', resetForm).
+    const wrapper = mountSection();
+    await wrapper.findAllComponents(CommentStub)[0].vm.$emit('create-comment');
+    const emitted = wrapper.emitted('updateCreateFormValues');
+    expect(emitted).toBeTruthy();
+    expect(emitted?.[0]?.[0]).toMatchObject({ text: '', isRootComment: true });
   });
 
-  it('emits click-edit-comment event when handleClickEdit is called', async () => {
-    const wrapper = mount(CommentSectionTest, {
-      props: defaultProps,
-    });
+  it('emits a reply-input update when a reply input changes', async () => {
+    const wrapper = mountSection();
+    await wrapper
+      .findAllComponents(CommentStub)[0]
+      .vm.$emit('update-create-reply-comment-input', {
+        text: 'a reply',
+        parentCommentId: 'c1',
+        depth: 2,
+      });
+    expect(wrapper.emitted('updateCreateReplyCommentInput')).toBeTruthy();
+  });
 
-    const commentData = { id: 'comment-1', text: 'Comment text' };
+  it('excludes the permalinked comment from the inline list', () => {
+    routeRef.value = { params: { commentId: 'c1' }, query: {} };
+    const wrapper = mountSection();
+    // c1 is permalinked, so only c2 renders inline.
+    expect(wrapper.findAllComponents(CommentStub)).toHaveLength(1);
+  });
 
-    await (wrapper.vm as any).handleClickEdit(commentData);
-
-    expect((wrapper.emitted() as any)['click-edit-comment']).toBeTruthy();
-    expect((wrapper.emitted() as any)['click-edit-comment'][0][0]).toEqual(
-      commentData
+  it('navigates to the comment-feedback route when viewing feedback', async () => {
+    routeRef.value = { params: { forumId: 'cats', discussionId: 'd1' }, query: {} };
+    const wrapper = mountSection();
+    await wrapper
+      .findAllComponents(CommentStub)[0]
+      .vm.$emit('handle-view-feedback', 'c1');
+    expect(routerPush).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'forums-forumId-discussions-commentFeedback-discussionId-commentId',
+        params: expect.objectContaining({ commentId: 'c1' }),
+      })
     );
   });
 
-  it('emits delete-comment event when handleClickDelete is called', async () => {
-    const wrapper = mount(CommentSectionTest, {
-      props: defaultProps,
-    });
+  it('drives the edit lifecycle through the comment editor events', async () => {
+    // Exercises handleClickEdit -> updateEditInputValues -> handleSaveEdit
+    // (which runs editComment -> onDoneUpdatingComment) and the reply/edit
+    // editor open/close toggles plus scrollToTop, without error.
+    const wrapper = mountSection();
+    const comment = wrapper.findAllComponents(CommentStub)[0];
 
-    const deleteInput = {
-      commentId: 'comment-1',
-      parentCommentId: '',
-      replyCount: 0,
-    };
+    await comment.vm.$emit('open-reply-editor', 'c1');
+    await comment.vm.$emit('hide-reply-editor');
+    await comment.vm.$emit('open-edit-comment-editor', 'c1');
+    await comment.vm.$emit('click-edit-comment', makeComment('c1', 'original'));
+    await comment.vm.$emit('update-edit-comment-input', 'edited text', true);
+    await comment.vm.$emit('save-edit');
+    await comment.vm.$emit('hide-edit-comment-editor');
+    await comment.vm.$emit('scroll-to-top');
 
-    await (wrapper.vm as any).handleClickDelete(deleteInput);
-
-    expect((wrapper.emitted() as any)['delete-comment']).toBeTruthy();
-    expect((wrapper.emitted() as any)['delete-comment'][0][0]).toEqual(
-      deleteInput
-    );
-  });
-
-  it('calls deleteCommentMutation.mutate when handleDeleteComment is called', async () => {
-    const wrapper = mount(CommentSectionTest, {
-      props: defaultProps,
-    });
-
-    const spy = vi.spyOn((wrapper.vm as any).deleteCommentMutation, 'mutate');
-
-    await (wrapper.vm as any).handleDeleteComment();
-
-    expect(spy).toHaveBeenCalled();
-  });
-
-  it('calls editCommentMutation.mutate when handleSaveEdit is called', async () => {
-    const wrapper = mount(CommentSectionTest, {
-      props: defaultProps,
-    });
-
-    const spy = vi.spyOn((wrapper.vm as any).editCommentMutation, 'mutate');
-
-    await (wrapper.vm as any).handleSaveEdit();
-
-    expect(spy).toHaveBeenCalled();
+    // The section is still mounted and the comments still render.
+    expect(wrapper.findAllComponents(CommentStub).length).toBeGreaterThan(0);
+    expect(window.scrollTo).toHaveBeenCalled();
   });
 });

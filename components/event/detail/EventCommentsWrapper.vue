@@ -6,7 +6,7 @@ import type {
   Comment as CommentType,
   CommentCreateInput,
 } from '@/__generated__/graphql';
-import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
+import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import CommentSection from '@/components/comments/CommentSection.vue';
 import type { CreateEditCommentFormValues } from '@/types/Comment';
 import { useUsername } from '@/composables/useAuthState';

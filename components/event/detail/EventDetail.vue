@@ -31,10 +31,11 @@ import EventBody from '@/components/event/detail/EventBody.vue';
 import ExpandableImage from '@/components/ExpandableImage.vue';
 import EventCommentsWrapper from '@/components/event/detail/EventCommentsWrapper.vue';
 import EventRootCommentFormWrapper from '@/components/event/detail/EventRootCommentFormWrapper.vue';
-import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
+import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import EventChannelLinks from '@/components/event/detail/EventChannelLinks.vue';
 import { useRoute, useHead } from 'nuxt/app';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
+import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
 import AddToCalendarButton from '../AddToCalendarButton.vue';
 import ArchivedEventInfoBanner from './ArchivedEventInfoBanner.vue';
 import { getOriginalPoster } from '@/utils/originalPoster';
@@ -126,6 +127,10 @@ const channelId = computed(() => {
   }
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
+
+// Provide this channel's owner/moderator lists so the event header/footer can
+// show membership-derived Forum Admin / Forum Mod author badges.
+provideForumRoleMembership(channelId);
 
 const loggedInUserModName = computed(() => modProfileNameVar.value);
 

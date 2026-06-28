@@ -21,16 +21,14 @@ vi.mock('@/composables/useAuthState', () => ({
   useIsAuthenticated: () => ({ value: true }),
 }));
 
-// Mock the toast composable
-const mockSuccess = vi.fn();
-const mockInfo = vi.fn();
+// Mock the Pinia toast store — the one <ToastNotification> actually renders.
+const mockShowToast = vi.fn();
 
-vi.mock('./useToast', () => ({
-  useToast: () => ({
-    success: mockSuccess,
-    info: mockInfo,
-    error: vi.fn(),
-    warning: vi.fn(),
+vi.mock('@/stores/toastStore', () => ({
+  useToastStore: () => ({
+    showToast: mockShowToast,
+    dismissToast: vi.fn(),
+    clearAllToasts: vi.fn(),
   }),
 }));
 
@@ -76,8 +74,9 @@ describe('useAutoUnsubscribe', () => {
     await nextTick(); // Allow async operations to complete
 
     expect(unsubscribeFn).toHaveBeenCalledWith('test-id');
-    expect(mockSuccess).toHaveBeenCalledWith(
-      'You have been unsubscribed from this discussion.'
+    expect(mockShowToast).toHaveBeenCalledWith(
+      'You have been unsubscribed from this discussion.',
+      'success'
     );
   });
 
@@ -99,7 +98,10 @@ describe('useAutoUnsubscribe', () => {
     await nextTick();
 
     expect(unsubscribeFn).not.toHaveBeenCalled();
-    expect(mockInfo).toHaveBeenCalledWith('You are not subscribed to this event.');
+    expect(mockShowToast).toHaveBeenCalledWith(
+      'You are not subscribed to this event.',
+      'info'
+    );
   });
 
   it('removes action param from URL after processing', async () => {
@@ -179,8 +181,9 @@ describe('useAutoUnsubscribe', () => {
     await nextTick();
     await nextTick();
 
-    expect(mockSuccess).toHaveBeenCalledWith(
-      'You have been unsubscribed from this issue.'
+    expect(mockShowToast).toHaveBeenCalledWith(
+      'You have been unsubscribed from this issue.',
+      'success'
     );
   });
 });

@@ -4,6 +4,13 @@ import { ref } from 'vue';
 import { setActivePinia, createPinia } from 'pinia';
 import { useQuery } from '@vue/apollo-composable';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
+import GenericButton from '@/components/GenericButton.vue';
+import SuspensionNotice from '@/components/SuspensionNotice.vue';
+
+const suspension = vi.hoisted(() => ({
+  active: null as unknown,
+  issueNumber: null as number | null,
+}));
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({ params: { forumId: 'cats' } }),
@@ -19,8 +26,8 @@ vi.mock('@/composables/useAuthState', () => ({
 
 vi.mock('@/composables/useSuspensionNotice', () => ({
   useChannelSuspensionNotice: () => ({
-    activeSuspension: ref(null),
-    issueNumber: ref(null),
+    activeSuspension: ref(suspension.active),
+    issueNumber: ref(suspension.issueNumber),
     suspendedUntil: ref(null),
     suspendedIndefinitely: ref(false),
     channelId: ref('cats'),
@@ -29,7 +36,7 @@ vi.mock('@/composables/useSuspensionNotice', () => ({
 
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 
-const mountWith = async (channel: unknown) => {
+const mountWith = async (channel: unknown, stubs: Record<string, unknown> = {}) => {
   mockedUseQuery
     .mockReturnValueOnce({
       result: ref({ channels: [channel] }),
@@ -38,11 +45,16 @@ const mountWith = async (channel: unknown) => {
     })
     .mockReturnValueOnce({ onResult: vi.fn() });
   const Page = (await import('./index.vue')).default;
-  return shallowMount(Page);
+  return shallowMount(Page, { global: { stubs } });
 };
 
 describe('wiki home page', () => {
-  beforeEach(() => setActivePinia(createPinia()));
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    suspension.active = null;
+    suspension.issueNumber = null;
+    mockedUseQuery.mockReset();
+  });
 
   it('renders the wiki home page body when one exists', async () => {
     const wrapper = await mountWith({
@@ -57,5 +69,20 @@ describe('wiki home page', () => {
   it('shows a create prompt when there is no home page', async () => {
     const wrapper = await mountWith({ wikiEnabled: true, WikiHomePage: null });
     expect(wrapper.findComponent(MarkdownRenderer).exists()).toBe(false);
+  });
+
+  it('disables wiki edit buttons and shows a notice for a suspended user', async () => {
+    suspension.active = { suspendedIndefinitely: true };
+    suspension.issueNumber = 5;
+    const wrapper = await mountWith(
+      { wikiEnabled: true, WikiHomePage: { title: 'Home', body: 'Welcome' } },
+      // Render RequireAuth's has-auth slot so the gated buttons mount.
+      { RequireAuth: { template: '<div><slot name="has-auth" /></div>' } }
+    );
+
+    expect(wrapper.findComponent(SuspensionNotice).exists()).toBe(true);
+    const buttons = wrapper.findAllComponents(GenericButton);
+    expect(buttons.length).toBeGreaterThan(0);
+    expect(buttons.every((b) => b.props('disabled') === true)).toBe(true);
   });
 });

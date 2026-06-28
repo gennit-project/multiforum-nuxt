@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getFilterValuesFromParams } from '@/components/discussion/list/getDiscussionFilterValuesFromParams';
+import { getFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import type { RouteLocationNormalized } from 'vue-router';
 
 const createMockRoute = (

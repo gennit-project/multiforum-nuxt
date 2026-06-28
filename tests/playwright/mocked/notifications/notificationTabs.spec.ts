@@ -163,4 +163,155 @@ test.describe('Notification tabs', () => {
       });
     }
   });
+
+  test('shows per-tab unread count badges', async ({ context, page }, testInfo) => {
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
+
+    const diagnostics = await installGraphqlMocks(page, {
+      ...getBaseMocks(TEST_USER),
+      getGeneralNotifications: () => ({
+        data: {
+          users: [
+            {
+              __typename: 'User',
+              username: TEST_USER,
+              Notifications: [
+                buildGeneralNotification('g-1', 'Someone replied to your comment'),
+                buildGeneralNotification('g-2', 'You were mentioned in a discussion'),
+              ],
+              NotificationsAggregate: { count: 2 },
+              totalNotificationsAggregate: { count: 2 },
+            },
+          ],
+        },
+      }),
+      getFeedbackNotifications: () => ({
+        data: {
+          users: [
+            {
+              __typename: 'User',
+              username: TEST_USER,
+              Notifications: [
+                buildFeedbackNotification('f-1'),
+                buildFeedbackNotification('f-2'),
+                buildFeedbackNotification('f-3'),
+              ],
+              NotificationsAggregate: { count: 3 },
+              totalNotificationsAggregate: { count: 3 },
+            },
+          ],
+        },
+      }),
+    });
+
+    try {
+      await page.goto('/notifications');
+
+      const generalTab = page.getByRole('button', { name: /General/i });
+      await expect(generalTab).toBeVisible({ timeout: 30000 });
+
+      // The General badge reflects its own aggregate count on load.
+      await expect(generalTab.locator('span')).toContainText('2');
+
+      // The Feedback query is only enabled once its tab is active, so its
+      // badge populates after the tab is visited.
+      const feedbackTab = page.getByRole('button', { name: /Feedback/i });
+      await feedbackTab.click();
+      await expect(feedbackTab.locator('span')).toContainText('3');
+
+      expect(diagnostics.pageErrors).toEqual([]);
+    } finally {
+      await testInfo.attach('graphql-operations.json', {
+        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
+        contentType: 'application/json',
+      });
+    }
+  });
+
+  test('marking all as read clears the active tab unread count', async ({
+    context,
+    page,
+  }, testInfo) => {
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
+
+    let markedAsRead = false;
+
+    const diagnostics = await installGraphqlMocks(page, {
+      ...getBaseMocks(TEST_USER),
+      getGeneralNotifications: () => ({
+        data: {
+          users: [
+            {
+              __typename: 'User',
+              username: TEST_USER,
+              Notifications: [
+                buildGeneralNotification(
+                  'g-1',
+                  'Someone replied to your comment',
+                  markedAsRead
+                ),
+                buildGeneralNotification(
+                  'g-2',
+                  'You were mentioned in a discussion',
+                  markedAsRead
+                ),
+              ],
+              // After the mutation, the refetch reports zero unread.
+              NotificationsAggregate: { count: markedAsRead ? 0 : 2 },
+              totalNotificationsAggregate: { count: 2 },
+            },
+          ],
+        },
+      }),
+      markNotificationsAsRead: () => {
+        markedAsRead = true;
+        return {
+          data: {
+            updateUsers: {
+              users: [{ username: TEST_USER, Notifications: [] }],
+            },
+          },
+        };
+      },
+    });
+
+    try {
+      await page.goto('/notifications');
+
+      await expect(
+        page.getByRole('heading', { name: 'Notifications' })
+      ).toBeVisible({ timeout: 30000 });
+
+      await expect(
+        page.getByText('You have 2 unread notifications')
+      ).toBeVisible();
+
+      const markReadResponse = page.waitForResponse(
+        (response) =>
+          response.url().includes('/graphql') &&
+          response.request().postData()?.includes('markNotificationsAsRead') ===
+            true
+      );
+      await page.getByRole('button', { name: 'Mark all as read' }).click();
+      expect((await markReadResponse).status()).toBe(200);
+
+      // The refetched active tab now shows no unread notifications.
+      await expect(
+        page.getByText('You have 0 unread notifications')
+      ).toBeVisible();
+
+      expect(diagnostics.pageErrors).toEqual([]);
+    } finally {
+      await testInfo.attach('graphql-operations.json', {
+        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
+        contentType: 'application/json',
+      });
+    }
+  });
 });

@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
+import type { PropType } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import 'md-editor-v3/lib/style.css';
 import { GET_USER } from '@/graphQLData/user/queries';
 import { relativeTime } from '@/utils';
+import type { ServerRoleBadge } from '@/utils/serverRoleBadges';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import ReportProfilePictureModal from '@/components/mod/ReportProfilePictureModal.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
@@ -16,9 +18,9 @@ const profilePicURLVar = useProfilePicURL();
 
 // Define props
 defineProps({
-  isAdmin: {
-    type: Boolean,
-    default: false,
+  serverRoleBadge: {
+    type: String as PropType<ServerRoleBadge>,
+    default: null,
   },
 });
 
@@ -90,7 +92,7 @@ const handleReportSuccess = () => {
           :is-square="false"
         />
         <RequireAuth v-if="canReportProfilePicture">
-          <template #authenticated>
+          <template #has-auth>
             <button
               class="absolute bottom-2 right-2 rounded-full bg-white/80 p-2 text-gray-600 shadow-md transition-colors hover:bg-red-50 hover:text-red-600 dark:bg-gray-800/80 dark:text-gray-400 dark:hover:bg-red-900/50 dark:hover:text-red-400"
               title="Report profile picture"
@@ -99,7 +101,7 @@ const handleReportSuccess = () => {
               <FlagIcon class="h-4 w-4" />
             </button>
           </template>
-          <template #unauthenticated>
+          <template #does-not-have-auth>
             <span />
           </template>
         </RequireAuth>
@@ -110,9 +112,14 @@ const handleReportSuccess = () => {
       >
         {{ username }}
         <span
-          v-if="isAdmin"
+          v-if="serverRoleBadge === 'serverAdmin'"
           class="rounded-md border border-orange-500 px-2 py-1 text-xs text-orange-500"
-          >Admin</span
+          >Server Admin</span
+        >
+        <span
+          v-else-if="serverRoleBadge === 'serverMod'"
+          class="rounded-md border border-orange-500 px-2 py-1 text-xs text-orange-500"
+          >Server Mod</span
         >
       </h1>
       <h1
@@ -121,9 +128,14 @@ const handleReportSuccess = () => {
       >
         {{ user.displayName }}
         <span
-          v-if="isAdmin"
+          v-if="serverRoleBadge === 'serverAdmin'"
           class="rounded-md border border-orange-600 px-2 py-1 text-sm text-orange-600 dark:border-orange-500 dark:text-orange-500"
-          >Admin</span
+          >Server Admin</span
+        >
+        <span
+          v-else-if="serverRoleBadge === 'serverMod'"
+          class="rounded-md border border-orange-600 px-2 py-1 text-sm text-orange-600 dark:border-orange-500 dark:text-orange-500"
+          >Server Mod</span
         >
       </h1>
       <span v-if="user?.displayName" class="text-gray-600 dark:text-gray-400">

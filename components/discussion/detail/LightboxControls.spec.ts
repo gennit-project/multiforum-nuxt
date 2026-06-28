@@ -20,6 +20,7 @@ const mountControls = (props: Record<string, unknown> = {}) =>
     global: { stubs: { AddImageToFavorites: true } },
   });
 
+
 describe('LightboxControls', () => {
   it.each([
     ['Close lightbox', 'close'],
@@ -42,5 +43,23 @@ describe('LightboxControls', () => {
     const wrapper = mountControls({ panelOnSide: true });
     await wrapper.get('[aria-label="Move panel to side"]').trigger('click');
     expect(wrapper.emitted('toggle-panel-position')).toHaveLength(1);
+  });
+
+  // The report button lives in RequireAuth's #has-auth slot, which the default
+  // test stub renders; currentImageId/isStlFile then govern visibility.
+  it('emits report-image from the report button', async () => {
+    const wrapper = mountControls({ currentImageId: 'img-1' });
+    await wrapper.get('[aria-label="Report image"]').trigger('click');
+    expect(wrapper.emitted('report-image')).toHaveLength(1);
+  });
+
+  it('hides the report button for STL files', () => {
+    const wrapper = mountControls({ currentImageId: 'img-1', isStlFile: true });
+    expect(wrapper.find('[aria-label="Report image"]').exists()).toBe(false);
+  });
+
+  it('hides the report button when there is no image id', () => {
+    const wrapper = mountControls({ currentImageId: '' });
+    expect(wrapper.find('[aria-label="Report image"]').exists()).toBe(false);
   });
 });

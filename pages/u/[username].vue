@@ -9,9 +9,11 @@ import UserContributionChart from '@/components/charts/UserContributionChart.vue
 import UserProfileChannelFilter from '@/components/user/UserProfileChannelFilter.vue';
 import ContributionChartSkeleton from '@/components/charts/ContributionChartSkeleton.vue';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
+import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
 const route = useRoute();
-const { serverAdminUsernames } = useServerRoleMembership();
+const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+  useServerRoleMembership();
 const username = computed(() => {
   return typeof route.params.username === 'string' ? route.params.username : '';
 });
@@ -63,12 +65,17 @@ const user = computed(() => {
   return null;
 });
 
-const isAdmin = computed(() => {
+const serverRoleBadge = computed(() => {
   if (!user.value?.username) {
-    return false;
+    return null;
   }
 
-  return serverAdminUsernames.value.includes(user.value.username);
+  return getServerRoleBadge({
+    username: user.value.username,
+    adminUsernames: serverAdminUsernames.value,
+    modUsernames: serverModUsernames.value,
+    modProfileNames: serverModProfileNames.value,
+  });
 });
 
 // Check if we're on an image detail page
@@ -161,7 +168,7 @@ watchEffect(() => {
       <!-- Regular user profile layout -->
       <div v-else class="flex w-full flex-col lg:flex-row">
         <div class="w-full lg:w-80 lg:shrink-0">
-          <UserProfileSidebar :is-admin="isAdmin" />
+          <UserProfileSidebar :server-role-badge="serverRoleBadge" />
         </div>
 
         <div class="min-w-0 flex-1 flex-col pt-4">

@@ -18,7 +18,8 @@ import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
-import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
+import { getAuthorBadges } from '@/utils/roleBadges';
 
 // Define props
 const props = defineProps({
@@ -58,22 +59,24 @@ const channelIdInParams = computed(() =>
 const defaultUniqueName = computed(
   () => channelIdInParams.value || props.discussionChannel.channelUniqueName
 );
-const { serverAdminUsernames } = useServerRoleMembership();
+const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+  useServerRoleMembership();
+const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
+  useForumRoleMembership();
 const commentCount = computed(
   () => props.discussionChannel?.CommentsAggregate?.count || 0
 );
 
-const authorIsAdmin = computed(() => {
-  return (
-    getServerRoleBadge({
-      username: props.discussion?.Author?.username,
-      adminUsernames: serverAdminUsernames.value,
-    }) === 'serverAdmin'
-  );
-});
-
-const authorIsMod = computed(
-  () => props.discussion?.authorIsChannelModerator || false
+const authorBadges = computed(() =>
+  getAuthorBadges({
+    username: props.discussion?.Author?.username,
+    serverAdminUsernames: serverAdminUsernames.value,
+    serverModUsernames: serverModUsernames.value,
+    serverModProfileNames: serverModProfileNames.value,
+    forumAdminUsernames: forumAdminUsernames.value,
+    forumModUsernames: forumModUsernames.value,
+    forumModProfileNames: forumModProfileNames.value,
+  })
 );
 
 const errorMessage = ref('');
@@ -206,8 +209,10 @@ const filteredQuery = computed(() => {
                 :comment-karma="authorCommentKarma"
                 :discussion-karma="authorDiscussionKarma"
                 :display-name="authorDisplayName ?? ''"
-                :is-admin="authorIsAdmin"
-                :is-mod="authorIsMod"
+                :is-server-admin="authorBadges.isServerAdmin"
+                :is-server-mod="authorBadges.isServerMod"
+                :is-forum-admin="authorBadges.isForumAdmin"
+                :is-forum-mod="authorBadges.isForumMod"
                 :src="authorProfilePicURL ?? ''"
                 :username="authorUsername"
                 light-text

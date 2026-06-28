@@ -1,18 +1,20 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
+import type { PropType } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import 'md-editor-v3/lib/style.css';
 import { GET_MOD } from '@/graphQLData/mod/queries';
 import { relativeTime } from '@/utils';
+import type { ServerRoleBadge } from '@/utils/serverRoleBadges';
 import { useRoute } from 'nuxt/app';
 import { useModProfileName } from '@/composables/useAuthState';
 
 const modProfileNameVar = useModProfileName();
 
 defineProps({
-  isAdmin: {
-    type: Boolean,
-    default: false,
+  serverRoleBadge: {
+    type: String as PropType<ServerRoleBadge>,
+    default: null,
   },
 });
 
@@ -57,12 +59,20 @@ const mod = computed(() => {
           </p>
           <h1
             v-if="mod?.displayName"
-            class="flex break-words text-lg font-bold leading-5 text-gray-600 dark:text-gray-200"
+            class="flex flex-wrap items-center gap-2 break-words text-lg font-bold leading-5 text-gray-600 dark:text-gray-200"
           >
-            {{ mod.displayName
-            }}<span v-if="modProfileIsYourself" class="ml-2 text-sm"
-              >(You)</span
+            {{ mod.displayName }}
+            <span
+              v-if="serverRoleBadge === 'serverAdmin'"
+              class="rounded-md border border-orange-500 px-2 py-1 text-xs text-orange-500"
+              >Server Admin</span
             >
+            <span
+              v-else-if="serverRoleBadge === 'serverMod'"
+              class="rounded-md border border-orange-500 px-2 py-1 text-xs text-orange-500"
+              >Server Mod</span
+            >
+            <span v-if="modProfileIsYourself" class="text-sm">(You)</span>
           </h1>
         </div>
       </div>

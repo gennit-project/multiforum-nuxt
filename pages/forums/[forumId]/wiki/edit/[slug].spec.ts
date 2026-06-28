@@ -1,7 +1,14 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
 import TextInput from '@/components/TextInput.vue';
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import SuspensionNotice from '@/components/SuspensionNotice.vue';
+
+const suspension = vi.hoisted(() => ({
+  active: null as unknown,
+  issueNumber: null as number | null,
+}));
 
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => ref('alice'),
@@ -9,8 +16,8 @@ vi.mock('@/composables/useAuthState', () => ({
 
 vi.mock('@/composables/useSuspensionNotice', () => ({
   useChannelSuspensionNotice: () => ({
-    activeSuspension: ref(null),
-    issueNumber: ref(null),
+    activeSuspension: ref(suspension.active),
+    issueNumber: ref(suspension.issueNumber),
     suspendedUntil: ref(null),
     suspendedIndefinitely: ref(false),
     channelId: ref('cats'),
@@ -45,10 +52,33 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 
+const mountPage = async () => {
+  const Page = (await import('./[slug].vue')).default;
+  return shallowMount(Page);
+};
+
 describe('wiki edit page', () => {
-  it('renders the wiki title input when the page loads', async () => {
-    const Page = (await import('./[slug].vue')).default;
-    const wrapper = shallowMount(Page);
+  beforeEach(() => {
+    suspension.active = null;
+    suspension.issueNumber = null;
+  });
+
+  it('renders the title and edit-reason inputs when the page loads', async () => {
+    const wrapper = await mountPage();
     expect(wrapper.findComponent(TextInput).exists()).toBe(true);
+    expect(
+      wrapper
+        .findAllComponents(TextInput)
+        .some((c) => c.props('testId') === 'edit-reason-input')
+    ).toBe(true);
+  });
+
+  it('hides the form and shows a notice for a suspended user', async () => {
+    suspension.active = { suspendedIndefinitely: true };
+    suspension.issueNumber = 11;
+    const wrapper = await mountPage();
+
+    expect(wrapper.findComponent(PrimaryButton).exists()).toBe(false);
+    expect(wrapper.findComponent(SuspensionNotice).exists()).toBe(true);
   });
 });

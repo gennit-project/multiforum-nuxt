@@ -37,7 +37,8 @@ import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
 import { CHECK_EVENT_ISSUE_EXISTENCE } from '@/graphQLData/issue/queries';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
-import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
+import { getAuthorBadges } from '@/utils/roleBadges';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
 
@@ -67,7 +68,10 @@ defineEmits(['archived-successfully']);
 
 const route = useRoute();
 const router = useRouter();
-const { serverAdminUsernames } = useServerRoleMembership();
+const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+  useServerRoleMembership();
+const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
+  useForumRoleMembership();
 
 const showCopiedLinkNotification = ref(false);
 const showFeedbackFormModal = ref(false);
@@ -400,14 +404,17 @@ const copyLink = async () => {
   }
 };
 
-const isAdmin = computed(() => {
-  return (
-    getServerRoleBadge({
-      username: props.eventData.Poster?.username,
-      adminUsernames: serverAdminUsernames.value,
-    }) === 'serverAdmin'
-  );
-});
+const posterBadges = computed(() =>
+  getAuthorBadges({
+    username: props.eventData.Poster?.username,
+    serverAdminUsernames: serverAdminUsernames.value,
+    serverModUsernames: serverModUsernames.value,
+    serverModProfileNames: serverModProfileNames.value,
+    forumAdminUsernames: forumAdminUsernames.value,
+    forumModUsernames: forumModUsernames.value,
+    forumModProfileNames: forumModProfileNames.value,
+  })
+);
 
 const menuItems = computed(() => {
   if (!props.eventData) {
@@ -580,7 +587,10 @@ function openFeedbackFormModal() {
             Hosted by
             <UsernameWithTooltip
               v-if="eventData.Poster.username"
-              :is-admin="isAdmin || false"
+              :is-server-admin="posterBadges.isServerAdmin"
+              :is-server-mod="posterBadges.isServerMod"
+              :is-forum-admin="posterBadges.isForumAdmin"
+              :is-forum-mod="posterBadges.isForumMod"
               :username="eventData.Poster.username"
               :src="eventData.Poster.profilePicURL ?? ''"
               :display-name="eventData.Poster.displayName || ''"

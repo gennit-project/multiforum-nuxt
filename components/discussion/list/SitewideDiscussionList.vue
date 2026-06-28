@@ -10,11 +10,11 @@ import { GET_SITE_WIDE_DISCUSSION_LIST } from '@/graphQLData/discussion/queries'
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
-import { getFilterValuesFromParams } from '@/components/event/list/filters/getEventFilterValuesFromParams';
+import { getFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,
-} from '@/components/comments/getSortFromQuery';
+} from '@/utils/getSortFromQuery';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';

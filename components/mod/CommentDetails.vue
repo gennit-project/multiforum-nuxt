@@ -13,8 +13,9 @@ import {
   getPermalinkToEventComment,
 } from '@/utils/routerUtils';
 import { getOriginalPoster } from '@/utils/originalPoster';
-import { getForumRoleBadge } from '@/utils/forumRoleBadges';
+import { getAuthorBadges } from '@/utils/roleBadges';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 
 const props = defineProps({
   commentId: {
@@ -31,6 +32,8 @@ const emit = defineEmits([
 const route = useRoute();
 const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
   useForumRoleMembership();
+const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+  useServerRoleMembership();
 const channelId = computed(() => {
   if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
@@ -55,18 +58,21 @@ const originalComment = computed(() => {
   return commentResult.value?.comments && commentResult.value?.comments?.[0];
 });
 
-const forumRoleBadge = computed(() => {
+const authorBadges = computed(() => {
   const author = originalComment.value?.CommentAuthor;
   const username = author?.__typename === 'User' ? author.username : null;
   const modProfileName =
     author?.__typename === 'ModerationProfile' ? author.displayName : null;
 
-  return getForumRoleBadge({
+  return getAuthorBadges({
     username,
     modProfileName,
-    adminUsernames: forumAdminUsernames.value,
-    modUsernames: forumModUsernames.value,
-    modProfileNames: forumModProfileNames.value,
+    serverAdminUsernames: serverAdminUsernames.value,
+    serverModUsernames: serverModUsernames.value,
+    serverModProfileNames: serverModProfileNames.value,
+    forumAdminUsernames: forumAdminUsernames.value,
+    forumModUsernames: forumModUsernames.value,
+    forumModProfileNames: forumModProfileNames.value,
   });
 });
 
@@ -165,7 +171,10 @@ const permalinkObject = computed(() => {
           :parent-comment-id="originalComment?.parentCommentId"
           :show-context-link="true"
           :show-channel="false"
-          :forum-role-badge="forumRoleBadge"
+          :is-server-admin="authorBadges.isServerAdmin"
+          :is-server-mod="authorBadges.isServerMod"
+          :is-forum-admin="authorBadges.isForumAdmin"
+          :is-forum-mod="authorBadges.isForumMod"
         />
         <nuxt-link :to="permalinkObject" class="text-orange-500 underline">
           Context

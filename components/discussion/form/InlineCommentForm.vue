@@ -13,7 +13,7 @@ import { CREATE_COMMENT } from '@/graphQLData/comment/mutations';
 import { GET_DISCUSSION_COMMENTS } from '@/graphQLData/comment/queries';
 import { GET_USER } from '@/graphQLData/user/queries';
 import { useUsername } from '@/composables/useAuthState';
-import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
+import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import { useRoute } from 'nuxt/app';
 import { gql } from '@apollo/client/core';
 import ErrorBanner from '@/components/ErrorBanner.vue';
