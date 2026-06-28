@@ -223,6 +223,12 @@ describe('CommentButtons', () => {
       });
       expect(downvote(wrapper)).toBe(true);
     });
+
+    // Feedback-flag dimension (orthogonal to author): when the channel disables
+    // feedback, the downvote is hidden even for a non-author viewer.
+    it('hides downvoting when feedback is disabled in the channel', () => {
+      expect(downvote(mountButtons({ enableFeedback: false }))).toBe(false);
+    });
   });
 
   describe('edit controls', () => {

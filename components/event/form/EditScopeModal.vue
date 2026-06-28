@@ -56,6 +56,7 @@ const handleClose = () => {
       role="dialog"
       aria-modal="true"
       aria-labelledby="edit-scope-title"
+      data-testid="edit-scope-modal"
     >
       <!-- Backdrop -->
       <div

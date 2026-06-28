@@ -41,7 +41,7 @@ const mountLayout = (props: Record<string, unknown> = {}) =>
       stubs: {
         DiscussionBody: discussionBodyStub,
         DiscussionAlbum: { name: 'DiscussionAlbum', props: ['stlFiles'], template: '<div class="album" />' },
-        DiscussionVotes: { name: 'DiscussionVotes', emits: ['handle-click-give-feedback'], template: '<div class="votes" />' },
+        DiscussionVotes: { name: 'DiscussionVotes', props: ['showDownvote', 'showEmojiButton'], emits: ['handle-click-give-feedback'], template: '<div class="votes" />' },
         MarkAsAnsweredButton: { name: 'MarkAsAnsweredButton', template: '<div class="answered" />' },
         DiscussionTitleVersions: { name: 'DiscussionTitleVersions', template: '<div class="versions" />' },
         CrosspostedDiscussionEmbed: { name: 'CrosspostedDiscussionEmbed', template: '<div class="crosspost" />' },
@@ -136,5 +136,45 @@ describe('RegularDiscussionLayout config', () => {
     await wrapper.getComponent({ name: 'DiscussionVotes' }).vm.$emit('handle-click-give-feedback');
 
     expect(wrapper.emitted('handleClickGiveFeedback')).toBeTruthy();
+  });
+
+  it('disables markdown images on the body when markdownImagesEnabled is false', () => {
+    const wrapper = mountLayout({
+      activeDiscussionChannel: channel({ markdownImagesEnabled: false }),
+    });
+
+    expect(wrapper.getComponent(discussionBodyStub).props('allowImages')).toBe(false);
+  });
+
+  it('allows markdown images on the body by default', () => {
+    const wrapper = mountLayout();
+
+    expect(wrapper.getComponent(discussionBodyStub).props('allowImages')).toBe(true);
+  });
+
+  it('hides the album when image uploads are disabled even if the discussion has images', async () => {
+    const wrapper = mountLayout({
+      discussion: discussion({ Album: { Images: [{ id: 'i1' }] } }),
+      activeDiscussionChannel: channel({ imageUploadsEnabled: false }),
+    });
+    await flushPromises();
+
+    expect(wrapper.find('.album').exists()).toBe(false);
+  });
+
+  it('hides the downvote for a non-author when feedbackEnabled is false', () => {
+    h.username = ref('bob');
+    const wrapper = mountLayout({
+      activeDiscussionChannel: channel({ feedbackEnabled: false }),
+    });
+
+    expect(wrapper.getComponent({ name: 'DiscussionVotes' }).props('showDownvote')).toBe(false);
+  });
+
+  it('shows the downvote for a non-author when feedback is enabled', () => {
+    h.username = ref('bob');
+    const wrapper = mountLayout();
+
+    expect(wrapper.getComponent({ name: 'DiscussionVotes' }).props('showDownvote')).toBe(true);
   });
 });
