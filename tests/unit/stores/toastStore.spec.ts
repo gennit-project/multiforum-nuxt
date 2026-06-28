@@ -15,7 +15,7 @@ describe('toastStore', () => {
 
     expect(store.toasts).toEqual([
       {
-        id: '12345',
+        id: '12345-1',
         message: 'Saved',
         type: 'success',
         action: undefined,
