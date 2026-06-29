@@ -105,6 +105,12 @@ interface InstalledPlugin {
   settingsJson: Record<string, unknown>;
   readmeMarkdown?: string;
   manifest?: PluginManifest;
+  registryUrl?: string | null;
+  releaseNotesUrl?: string | null;
+  sourceRepoUrl?: string | null;
+  sourceCommit?: string | null;
+  minServerVersion?: string | null;
+  apiVersion?: string | null;
   hasUpdate?: boolean;
   latestVersion?: string;
   availableVersions?: string[];
@@ -155,6 +161,12 @@ interface PluginFromQuery {
     version: string;
     repoUrl?: string;
     readmeMarkdown?: string;
+    registryUrl?: string | null;
+    releaseNotesUrl?: string | null;
+    sourceRepoUrl?: string | null;
+    sourceCommit?: string | null;
+    minServerVersion?: string | null;
+    apiVersion?: string | null;
   }>;
 }
 
@@ -250,13 +262,44 @@ const secretStatusesForForm = computed((): PluginSecretStatusType[] => {
 });
 
 const pluginRepoUrl = computed(() => {
-  // Get repo URL from the installed version or manifest
+  if (installedPlugin.value?.sourceRepoUrl) {
+    return installedPlugin.value.sourceRepoUrl;
+  }
+
+  // Get repo URL from the selected/installed version or manifest
   const versions = plugin.value?.Versions || [];
   const currentVersion = versions.find(
-    (v) => v.version === installedVersion.value
+    (v) => v.version === (selectedVersion.value || installedVersion.value)
   );
-  return currentVersion?.repoUrl;
+  return currentVersion?.sourceRepoUrl || currentVersion?.repoUrl;
 });
+
+const selectedVersionMetadata = computed(() => {
+  const versions = plugin.value?.Versions || [];
+  return versions.find(
+    (v) => v.version === (selectedVersion.value || installedVersion.value)
+  );
+});
+
+const pluginRegistryUrl = computed(
+  () => installedPlugin.value?.registryUrl || selectedVersionMetadata.value?.registryUrl
+);
+const pluginReleaseNotesUrl = computed(
+  () =>
+    installedPlugin.value?.releaseNotesUrl ||
+    selectedVersionMetadata.value?.releaseNotesUrl
+);
+const pluginSourceCommit = computed(
+  () => installedPlugin.value?.sourceCommit || selectedVersionMetadata.value?.sourceCommit
+);
+const pluginMinServerVersion = computed(
+  () =>
+    installedPlugin.value?.minServerVersion ||
+    selectedVersionMetadata.value?.minServerVersion
+);
+const pluginApiVersion = computed(
+  () => installedPlugin.value?.apiVersion || selectedVersionMetadata.value?.apiVersion
+);
 
 const canEnable = computed(() =>
   canEnablePlugin({ isInstalled: isInstalled.value, secrets: secrets.value })
@@ -534,6 +577,11 @@ const handleSaveSettings = async () => {
             :plugin-homepage="pluginHomepage"
             :plugin-repo-url="pluginRepoUrl"
             :plugin-tags="pluginTags"
+            :plugin-registry-url="pluginRegistryUrl"
+            :plugin-release-notes-url="pluginReleaseNotesUrl"
+            :plugin-source-commit="pluginSourceCommit"
+            :plugin-min-server-version="pluginMinServerVersion"
+            :plugin-api-version="pluginApiVersion"
           />
 
           <!-- Prominent Status Cards (only shown when installed) -->
