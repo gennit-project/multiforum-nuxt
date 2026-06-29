@@ -52,4 +52,13 @@ describe('PluginUpdateBanner', () => {
 
     expect(wrapper.get('button').attributes('disabled')).toBeDefined();
   });
+
+  it('disables the button when the latest version is incompatible', () => {
+    const wrapper = mountBanner({
+      compatibility: { compatible: false, reason: 'Requires server >= 2.0.0' },
+    });
+
+    expect(wrapper.text()).toContain('Requires server >= 2.0.0');
+    expect(wrapper.get('button').attributes('disabled')).toBeDefined();
+  });
 });

@@ -15,6 +15,7 @@ import {
 } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
 import type { Plugin, PluginVersion } from '@/__generated__/graphql';
+import { getPluginVersionCompatibility } from '@/utils/pluginCompatibility';
 
 // Toast notifications
 const toast = useToast();
@@ -263,9 +264,24 @@ const disallowPlugin = async (pluginId: string) => {
   }
 };
 
+const getLatestVersionCompatibility = (plugin: PluginState) => {
+  const latestVersion = plugin.latestVersion;
+  if (!latestVersion) return { compatible: true };
+  const versionMetadata = plugin.availableVersions.find(
+    (version) => version.version === latestVersion
+  );
+  return getPluginVersionCompatibility(versionMetadata || {});
+};
+
 const upgradePlugin = async (plugin: PluginState) => {
   if (!plugin.latestVersion) {
     toast.error('No upgrade version is available for this plugin.');
+    return;
+  }
+
+  const compatibility = getLatestVersionCompatibility(plugin);
+  if (!compatibility.compatible) {
+    toast.error(compatibility.reason);
     return;
   }
 
@@ -290,6 +306,8 @@ const upgradePlugin = async (plugin: PluginState) => {
 const isAllowingPlugin = (pluginId: string) => allowingPluginIds.value.has(pluginId);
 const isDisallowingPlugin = (pluginId: string) => disallowingPluginIds.value.has(pluginId);
 const isUpgradingPlugin = (pluginId: string) => upgradingPluginIds.value.has(pluginId);
+const canUpgradePlugin = (plugin: PluginState) =>
+  getLatestVersionCompatibility(plugin).compatible;
 
 // Refresh data when component mounts to catch any changes from detail pages
 onMounted(() => {
@@ -570,7 +588,8 @@ const handlePluginsRefreshed = async () => {
                       v-if="plugin.hasUpdate"
                       type="button"
                       class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50"
-                      :disabled="isUpgradingPlugin(plugin.id)"
+                      :disabled="isUpgradingPlugin(plugin.id) || !canUpgradePlugin(plugin)"
+                      :title="getLatestVersionCompatibility(plugin).reason"
                       @click="upgradePlugin(plugin)"
                     >
                       <i

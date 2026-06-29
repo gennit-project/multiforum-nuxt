@@ -29,6 +29,10 @@ import {
   validateRequiredSettings,
 } from '@/utils/pluginVersionUtils';
 import {
+  getPluginVersionCompatibility,
+  type PluginVersionCompatibility,
+} from '@/utils/pluginCompatibility';
+import {
   getPluginFormSections,
   stringifyManifest,
 } from '@/utils/pluginManifestUtils';
@@ -309,6 +313,16 @@ const availableVersions = computed(() =>
   sortVersionsDescending(plugin.value?.Versions || [])
 );
 
+const compatibilityByVersion = computed(() =>
+  availableVersions.value.reduce(
+    (compatibilityMap, version) => {
+      compatibilityMap[version.version] = getPluginVersionCompatibility(version);
+      return compatibilityMap;
+    },
+    {} as Record<string, PluginVersionCompatibility>
+  )
+);
+
 const installedVersion = computed(() => {
   return installedPlugin.value?.version;
 });
@@ -332,8 +346,20 @@ const registryVersions = computed(
 const shouldAutoUpdate = computed(() => route.query.update === 'true');
 
 const canInstall = computed(() => {
-  return !isSelectedVersionInstalled.value && !!selectedVersion.value;
+  const selectedCompatibility =
+    compatibilityByVersion.value[selectedVersion.value];
+  return (
+    !isSelectedVersionInstalled.value &&
+    !!selectedVersion.value &&
+    selectedCompatibility?.compatible !== false
+  );
 });
+
+const latestVersionCompatibility = computed(() =>
+  latestVersion.value
+    ? compatibilityByVersion.value[latestVersion.value]
+    : undefined
+);
 
 // Get full manifest JSON for display
 const manifestJson = computed(() =>
@@ -382,6 +408,12 @@ const handleInstall = async (versionOverride?: string) => {
   const versionToInstall = versionOverride || selectedVersion.value;
   if (!versionToInstall) {
     installError.value = 'No version selected';
+    return;
+  }
+
+  const compatibility = compatibilityByVersion.value[versionToInstall];
+  if (compatibility?.compatible === false) {
+    installError.value = compatibility.reason;
     return;
   }
 
@@ -601,6 +633,7 @@ const handleSaveSettings = async () => {
             :installed-version="installedVersion"
             :registry-versions="registryVersions"
             :installing="installing"
+            :compatibility="latestVersionCompatibility"
             @install-latest="handleInstall(latestVersion!)"
           />
 
@@ -618,6 +651,7 @@ const handleSaveSettings = async () => {
             :can-install="canInstall"
             :is-selected-version-installed="isSelectedVersionInstalled"
             :has-newer-versions="hasNewerVersions"
+            :compatibility-by-version="compatibilityByVersion"
             @install="handleInstall()"
           />
 

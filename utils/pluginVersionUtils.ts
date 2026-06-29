@@ -146,6 +146,14 @@ export function mapInstallErrorMessage(errorMessage: string): string {
   if (errorMessage.includes('Failed to download tarball')) {
     return 'Could not download the plugin tarball. Please check that the tarball URL in the registry is correct and accessible.';
   }
+  if (errorMessage.includes('PLUGIN_VERSION_REQUIRES_NEWER_SERVER')) {
+    const match = errorMessage.match(/Requires server >= [^;]+/);
+    return match?.[0] || 'This plugin version requires a newer server version.';
+  }
+  if (errorMessage.includes('PLUGIN_API_VERSION_UNSUPPORTED')) {
+    const match = errorMessage.match(/Requires plugin API [^;]+/);
+    return match?.[0] || 'This plugin version requires an unsupported plugin API version.';
+  }
   return `Installation failed: ${errorMessage || 'Unknown error'}`;
 }
 

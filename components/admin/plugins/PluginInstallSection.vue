@@ -12,6 +12,7 @@ const props = defineProps<{
   canInstall: boolean;
   isSelectedVersionInstalled: boolean;
   hasNewerVersions: boolean;
+  compatibilityByVersion?: Record<string, { compatible: boolean; reason?: string }>;
 }>();
 
 const emit = defineEmits<{
@@ -23,6 +24,20 @@ const selectedVersion = computed({
   get: () => props.modelValue,
   set: (value: string) => emit('update:modelValue', value),
 });
+
+const selectedCompatibility = computed(
+  () => props.compatibilityByVersion?.[selectedVersion.value]
+);
+
+const selectedCompatibilityReason = computed(() =>
+  selectedCompatibility.value?.compatible === false
+    ? selectedCompatibility.value.reason
+    : ''
+);
+
+const canInstallSelectedVersion = computed(
+  () => !selectedCompatibilityReason.value
+);
 </script>
 
 <template>
@@ -57,6 +72,10 @@ const selectedVersion = computed({
                   version.version !== installedVersion
                     ? ' (Latest)'
                     : ''
+                }}{{
+                  compatibilityByVersion?.[version.version]?.compatible === false
+                    ? ` (${compatibilityByVersion[version.version]?.reason})`
+                    : ''
                 }}
               </option>
             </select>
@@ -65,7 +84,7 @@ const selectedVersion = computed({
               v-if="!isInstalled"
               type="button"
               class="rounded-md bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
-              :disabled="installing || !selectedVersion"
+              :disabled="installing || !selectedVersion || !canInstallSelectedVersion"
               @click="emit('install')"
             >
               <i v-if="installing" class="fa-solid fa-spinner mr-2 animate-spin" />
@@ -76,7 +95,7 @@ const selectedVersion = computed({
               v-else-if="canInstall"
               type="button"
               class="rounded-md bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
-              :disabled="installing || !selectedVersion"
+              :disabled="installing || !selectedVersion || !canInstallSelectedVersion"
               @click="emit('install')"
             >
               <i v-if="installing" class="fa-solid fa-spinner mr-2 animate-spin" />
@@ -95,6 +114,13 @@ const selectedVersion = computed({
               No other versions available
             </div>
           </div>
+
+          <p
+            v-if="selectedCompatibilityReason"
+            class="mt-2 text-xs text-red-600 dark:text-red-400"
+          >
+            {{ selectedCompatibilityReason }}
+          </p>
 
           <div v-if="isInstalled" class="mt-2 text-xs text-gray-500 dark:text-gray-400">
             <p v-if="hasNewerVersions">
