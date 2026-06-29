@@ -11,10 +11,7 @@ import { DELETE_COMMENT } from '@/graphQLData/comment/mutations';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { DateTime } from 'luxon';
-import type {
-  Issue as GeneratedIssue,
-  ModerationAction,
-} from '@/__generated__/graphql';
+import type { Issue as GeneratedIssue } from '@/__generated__/graphql';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import 'md-editor-v3/lib/style.css';
 import PageNotFound from '@/components/PageNotFound.vue';
@@ -39,7 +36,10 @@ import {
 // Composables
 import { useIssueOriginalPoster } from '@/composables/useIssueOriginalPoster';
 import { useIssueCloseReopen } from '@/composables/useIssueCloseReopen';
-import { useIssueActivityFeed } from '@/composables/useIssueActivityFeed';
+import {
+  useIssueActivityFeed,
+  type FetchMoreIssue,
+} from '@/composables/useIssueActivityFeed';
 import { useIssueLock } from '@/composables/useIssueLock';
 import { useIssueBodyEdit } from '@/composables/useIssueBodyEdit';
 import { useIssueSubscription } from '@/composables/useIssueSubscription';
@@ -94,8 +94,6 @@ const issueNumber = computed(() => {
   }
   return null;
 });
-
-const lastActivityFeedBatchSize = ref(ACTIVITY_FEED_PAGE_SIZE);
 
 // Fetch issue data
 const {
@@ -220,67 +218,6 @@ const relatedComment = computed(() => {
   return relatedCommentResult.value?.comments?.[0] ?? null;
 });
 
-const activityFeedItems = computed<ModerationAction[]>(() => {
-  return activeIssue.value?.ActivityFeed ?? [];
-});
-
-onIssueResult((result) => {
-  const issue = result.data?.issues?.[0];
-  if (!issue) {
-    return;
-  }
-  lastActivityFeedBatchSize.value = issue.ActivityFeed?.length ?? 0;
-});
-
-const hasMoreActivityFeed = computed(() => {
-  return lastActivityFeedBatchSize.value === ACTIVITY_FEED_PAGE_SIZE;
-});
-
-const loadMoreActivityFeed = async () => {
-  if (getIssueLoading.value || !hasMoreActivityFeed.value) {
-    return;
-  }
-
-  const previousCount = activityFeedItems.value.length;
-  const result = await fetchMoreIssue({
-    variables: {
-      channelUniqueName: channelId.value,
-      issueNumber: issueNumber.value,
-      activityFeedLimit: ACTIVITY_FEED_PAGE_SIZE,
-      activityFeedOffset: previousCount,
-    },
-    updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult?.issues?.[0]) {
-        return previousResult;
-      }
-
-      const prevIssue = previousResult.issues[0];
-      const nextIssue = fetchMoreResult.issues[0];
-      const prevFeed = prevIssue.ActivityFeed ?? [];
-      const nextFeed = nextIssue.ActivityFeed ?? [];
-
-      return {
-        ...previousResult,
-        issues: [
-          {
-            ...prevIssue,
-            ActivityFeed: [...prevFeed, ...nextFeed],
-          },
-        ],
-      };
-    },
-  });
-
-  const newCount =
-    result?.data?.issues?.[0]?.ActivityFeed?.length ?? previousCount;
-  lastActivityFeedBatchSize.value = Math.max(newCount - previousCount, 0);
-};
-
-const resetActivityFeed = async () => {
-  lastActivityFeedBatchSize.value = ACTIVITY_FEED_PAGE_SIZE;
-  await refetchIssue();
-};
-
 const isIssueAuthor = computed(() => {
   const author = activeIssue.value?.Author;
   if (!author) return false;
@@ -334,7 +271,22 @@ const {
   addIssueActivityFeedItemWithCommentAsUser,
   addIssueActivityFeedItemWithCommentAsUserLoading,
   addIssueActivityFeedItemWithCommentAsUserError,
-} = useIssueActivityFeed({ channelId, activityFeedLimit: ACTIVITY_FEED_PAGE_SIZE });
+  activityFeedItems,
+  hasMoreActivityFeed,
+  loadMoreActivityFeed,
+  resetActivityFeed,
+} = useIssueActivityFeed({
+  channelId,
+  activityFeedLimit: ACTIVITY_FEED_PAGE_SIZE,
+  issueNumber,
+  activeIssue,
+  getIssueLoading,
+  // Apollo's fetchMore is generic over its data/variables; narrow it to the
+  // composable's concrete merge shape (variables + updateQuery are identical).
+  fetchMoreIssue: fetchMoreIssue as unknown as FetchMoreIssue,
+  refetchIssue,
+  onIssueResult,
+});
 
 const {
   lockReasonInput,
