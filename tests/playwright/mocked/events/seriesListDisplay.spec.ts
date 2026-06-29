@@ -177,21 +177,14 @@ const getCommonMocks = (username: string) => ({
   }),
 });
 
-// NOTE: Still skipped, but the original blockers are now fixed in this file:
-//   - route corrected to /forums/:forumId/events (the forum events page is
-//     pages/forums/[forumId]/events/index.vue → EventListView → GET_EVENTS)
-//   - list-item selector corrected to the dynamic data-testid="event-list-item-<title>"
-//   - fixtures rebuilt on the shared buildEvent, then stamped with __typename
-//     (the GET_EVENTS result is normalized by Apollo; without __typename the list
-//     items come back as empty objects with undefined id/startTime)
-//   - duplicate-title waits use .first() (the title renders in several spots)
-// With those, the series UI does render (verified: the "Also on:" occurrence
-// buttons appear). What remains is local flakiness: the forum events-list page
-// intermittently fails to hydrate under `nuxt dev` in mocked runs (blank page,
-// no console/page error), so a reliable green pass could not be confirmed in this
-// environment. Re-enable and verify in CI, where the dev server is more stable.
-// TODO: confirm green in CI, then remove .skip.
-test.describe.skip('Series List Display', () => {
+// Series UI on the forum events list (route /forums/:forumId/events →
+// pages/forums/[forumId]/events/index.vue → EventListView → GET_EVENTS).
+// Fixtures are built on the shared buildEvent and stamped with __typename (the
+// GET_EVENTS result is normalized by Apollo; without __typename the list items
+// come back as empty objects with undefined id/startTime). This previously only
+// flaked under `nuxt dev`; it is verified against the production build (the
+// config CI uses), so it is enabled (#231).
+test.describe('Series List Display', () => {
   test('shows series icon for events that are part of a series', async ({ context, page }) => {
     await installMockAuth(context, page, {
       username: TEST_USERNAME,
@@ -213,18 +206,25 @@ test.describe.skip('Series List Display', () => {
 
     await page.goto(`/forums/${TEST_CHANNEL}/events`);
 
-    // Wait for events to load
-    await expect(page.getByText('Series Event').first()).toBeVisible();
+    // The page renders a hidden mobile copy of the list alongside the visible
+    // desktop one, so always target the visible list items.
+    const seriesEventItem = page
+      .locator('[data-testid^="event-list-item-"]:visible')
+      .filter({ hasText: 'Series Event' });
+    await expect(seriesEventItem).toBeVisible();
 
-    // Series event should have a series indicator
-    const seriesEventItem = page.locator('[data-testid^="event-list-item-"]').filter({ hasText: 'Series Event' });
-    const seriesIcon = seriesEventItem.locator('[title="Part of a series"]');
-    await expect(seriesIcon).toBeVisible();
+    // Series event should have a series indicator.
+    await expect(
+      seriesEventItem.locator('[title="Part of a series"]')
+    ).toBeVisible();
 
-    // Single event should NOT have a series indicator
-    const singleEventItem = page.locator('[data-testid^="event-list-item-"]').filter({ hasText: 'Single Event' });
-    const noSeriesIcon = singleEventItem.locator('[title="Part of a series"]');
-    await expect(noSeriesIcon).not.toBeVisible();
+    // Single event should NOT have a series indicator.
+    const singleEventItem = page
+      .locator('[data-testid^="event-list-item-"]:visible')
+      .filter({ hasText: 'Single Event' });
+    await expect(
+      singleEventItem.locator('[title="Part of a series"]')
+    ).toHaveCount(0);
   });
 
   test('shows occurrence buttons for series events', async ({ context, page }) => {
@@ -245,11 +245,13 @@ test.describe.skip('Series List Display', () => {
 
     await page.goto(`/forums/${TEST_CHANNEL}/events`);
 
-    // Wait for event to load
-    await expect(page.getByText('Weekly Meetup').first()).toBeVisible();
+    const seriesEventItem = page
+      .locator('[data-testid^="event-list-item-"]:visible')
+      .filter({ hasText: 'Weekly Meetup' });
+    await expect(seriesEventItem).toBeVisible();
 
-    // Should show "Also on:" with occurrence buttons
-    await expect(page.getByText('Also on:')).toBeVisible();
+    // Should show "Also on:" with occurrence buttons.
+    await expect(seriesEventItem.getByText('Also on:')).toBeVisible();
   });
 
   test('occurrence buttons navigate to the correct event', async ({ context, page }) => {
@@ -289,19 +291,20 @@ test.describe.skip('Series List Display', () => {
 
     await page.goto(`/forums/${TEST_CHANNEL}/events`);
 
-    // Wait for event to load
-    await expect(page.getByText('Weekly Meetup').first()).toBeVisible();
-    await expect(page.getByText('Also on:')).toBeVisible();
+    const seriesEventItem = page
+      .locator('[data-testid^="event-list-item-"]:visible')
+      .filter({ hasText: 'Weekly Meetup' });
+    await expect(seriesEventItem).toBeVisible();
+    await expect(seriesEventItem.getByText('Also on:')).toBeVisible();
 
-    // Click on the first occurrence button (should be a date like "Jan 14")
-    const occurrenceButtons = page.locator('a').filter({ hasText: /^[A-Z][a-z]{2} \d{1,2}$/ });
-    const firstButton = occurrenceButtons.first();
-
-    if (await firstButton.isVisible()) {
-      // Get the href to verify it points to a different event
-      const href = await firstButton.getAttribute('href');
-      expect(href).toContain('/events/');
-    }
+    // Each occurrence renders as a date pill link (e.g. "Jul 5") that points to
+    // that occurrence's event page.
+    const firstOccurrence = seriesEventItem
+      .locator('a')
+      .filter({ hasText: /^[A-Z][a-z]{2} \d{1,2}$/ })
+      .first();
+    await expect(firstOccurrence).toBeVisible();
+    expect(await firstOccurrence.getAttribute('href')).toContain('/events/');
   });
 
   test('shows +N more indicator when many occurrences exist', async ({ context, page }) => {
@@ -347,10 +350,12 @@ test.describe.skip('Series List Display', () => {
 
     await page.goto(`/forums/${TEST_CHANNEL}/events`);
 
-    // Wait for event to load
-    await expect(page.getByText('Weekly Meetup').first()).toBeVisible();
+    const seriesEventItem = page
+      .locator('[data-testid^="event-list-item-"]:visible')
+      .filter({ hasText: 'Weekly Meetup' });
+    await expect(seriesEventItem).toBeVisible();
 
-    // Should show "+N more" indicator since there are more than maxVisible (4) occurrences
-    await expect(page.getByText(/\+\d+ more/)).toBeVisible();
+    // More than maxVisible (4) occurrences → a "+N more" indicator.
+    await expect(seriesEventItem.getByText(/\+\d+ more/)).toBeVisible();
   });
 });
