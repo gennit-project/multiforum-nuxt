@@ -68,6 +68,13 @@ describe('EventScheduleFields', () => {
     );
   });
 
+  it('renders the date-range mode option', () => {
+    const wrapper = mountFields();
+    expect(wrapper.find('[data-testid="date-mode-dateRange"]').exists()).toBe(
+      true
+    );
+  });
+
   it('emits a date mode change when a different mode is selected', async () => {
     const wrapper = mountFields();
     await wrapper
@@ -119,6 +126,22 @@ describe('EventScheduleFields', () => {
         .trigger('change');
       expect(wrapper.emitted('updateFormValues')?.[1]?.[0]).toMatchObject({
         repeatPattern: expect.objectContaining({ type: 'WEEKLY' }),
+      });
+    });
+
+    it('seeds a date-range group when switching to date-range mode', async () => {
+      const wrapper = mountFields({ dateRangeGroups: [] });
+      await wrapper
+        .get('[data-testid="date-mode-dateRange"]')
+        .find('input')
+        .trigger('change');
+      expect(wrapper.emitted('updateFormValues')?.[1]?.[0]).toMatchObject({
+        dateRangeGroups: [
+          expect.objectContaining({
+            startDate: expect.any(String),
+            startTimeOfDay: expect.any(String),
+          }),
+        ],
       });
     });
   });
