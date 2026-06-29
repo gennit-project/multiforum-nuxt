@@ -31,19 +31,13 @@ import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { useRoute, useRouter } from 'nuxt/app';
 import { config } from '@/config';
 import {
-  isCurrentUserOriginalPoster as isOriginalPoster,
-  getIssueActionVisibility,
-  getOriginalPoster,
-} from '@/utils/originalPoster';
-import {
   getReportCount,
   formatReportCountLabel,
   hasRelatedContent as checkHasRelatedContent,
-  isRelatedCommentAuthorBot,
-  resolveAuthorType,
 } from '@/utils/issueDetailDisplay';
 
 // Composables
+import { useIssueOriginalPoster } from '@/composables/useIssueOriginalPoster';
 import { useIssueCloseReopen } from '@/composables/useIssueCloseReopen';
 import { useIssueActivityFeed } from '@/composables/useIssueActivityFeed';
 import { useIssueLock } from '@/composables/useIssueLock';
@@ -367,13 +361,6 @@ const isSuspendedMod = computed(() => {
   return modPermissions.value.isSuspendedMod ?? false;
 });
 
-const authorType = computed(() =>
-  resolveAuthorType({
-    modProfileName: resolvedOriginalModProfileName.value,
-    username: resolvedOriginalAuthorUsername.value,
-  })
-);
-
 // Use composables
 const { closeIssue, closeIssueLoading, reopenIssue, reopenIssueLoading } =
   useIssueCloseReopen({
@@ -455,62 +442,22 @@ const shouldShowIssueDetailsSection = computed(() => {
   );
 });
 
-const derivedOriginalPoster = computed(() => {
-  const author = getOriginalPoster({
-    Discussion: relatedDiscussion.value,
-    Event: relatedEvent.value,
-    Comment: relatedComment.value,
-  });
-  if (author.username || author.modProfileName) {
-    return author;
-  }
-
-  return { username: '', modProfileName: '' };
-});
-
-// Check if the original author is a bot
-const isAuthorBot = computed(() =>
-  isRelatedCommentAuthorBot(relatedComment.value)
-);
-
-const resolvedOriginalAuthorUsername = computed(() => {
-  return derivedOriginalPoster.value.username || '';
-});
-
-const resolvedOriginalModProfileName = computed(() => {
-  return derivedOriginalPoster.value.modProfileName || '';
-});
-
-// Determine if the current user is the original author via username
-const isOriginalUserAuthor = computed(() => {
-  return (
-    !!usernameVar.value && resolvedOriginalAuthorUsername.value === usernameVar.value
-  );
-});
-
-// Determine if the current user is the original author via mod profile
-const isOriginalModAuthor = computed(() => {
-  return (
-    !!modProfileNameVar.value &&
-    resolvedOriginalModProfileName.value === modProfileNameVar.value
-  );
-});
-
-// Determine if the current user is the original poster (either as user or mod)
-const isCurrentUserOriginalPoster = computed(() => {
-  return isOriginalPoster({
-    originalAuthorUsername: resolvedOriginalAuthorUsername.value,
-    originalModProfileName: resolvedOriginalModProfileName.value,
-    currentUsername: usernameVar.value,
-    currentModProfileName: modProfileNameVar.value,
-  });
-});
-
-const issueActionVisibility = computed(() => {
-  return getIssueActionVisibility({
-    hasRelatedContent: hasRelatedContent.value,
-    isOriginalPoster: isCurrentUserOriginalPoster.value,
-  });
+const {
+  isAuthorBot,
+  resolvedOriginalAuthorUsername,
+  resolvedOriginalModProfileName,
+  isOriginalUserAuthor,
+  isOriginalModAuthor,
+  isCurrentUserOriginalPoster,
+  authorType,
+  issueActionVisibility,
+} = useIssueOriginalPoster({
+  relatedDiscussion,
+  relatedEvent,
+  relatedComment,
+  username: computed(() => usernameVar.value),
+  modProfileName: computed(() => modProfileNameVar.value),
+  hasRelatedContent,
 });
 
 const updateComment = (text: string) => {
@@ -644,10 +591,34 @@ const requireDeleteReasonIfNotOp = () => {
   return true;
 };
 
-// Handle delete actions from Original Poster Actions
-const handleDeleteDiscussion = async (discussionId: string) => {
-  if (!discussionId) return;
+// Handle delete actions from Original Poster Actions. Discussion/event/comment
+// deletion share the same close-issue -> log-action -> delete -> refresh flow;
+// only the mutation and the activity-feed label differ.
+const RELATED_CONTENT_DELETE = {
+  discussion: {
+    mutate: (id: string) => deleteDiscussion({ id }),
+    label: 'deleted the discussion',
+  },
+  event: {
+    mutate: (id: string) => deleteEvent({ id }),
+    label: 'deleted the event',
+  },
+  comment: {
+    mutate: (id: string) => deleteComment({ id }),
+    label: 'deleted the comment',
+  },
+} as const;
+
+type RelatedContentKind = keyof typeof RELATED_CONTENT_DELETE;
+
+const handleDeleteRelatedContent = async (
+  kind: RelatedContentKind,
+  id: string
+) => {
+  if (!id) return;
   if (!requireDeleteReasonIfNotOp()) return;
+
+  const { mutate, label } = RELATED_CONTENT_DELETE[kind];
 
   try {
     if (modProfileNameVar.value && activeIssue.value) {
@@ -658,77 +629,19 @@ const handleDeleteDiscussion = async (discussionId: string) => {
       await addIssueActivityFeedItemWithCommentAsMod({
         issueId: activeIssue.value.id,
         displayName: modProfileNameVar.value,
-        actionDescription: 'deleted the discussion',
+        actionDescription: label,
         actionType: 'delete',
         commentText: resolveDeleteReason(),
         channelUniqueName: channelId.value,
       });
     }
 
-    await deleteDiscussion({ id: discussionId });
+    await mutate(id);
     createFormValues.value.text = '';
     deleteReasonError.value = '';
     await resetActivityFeed();
   } catch (error) {
-    console.error('Error deleting discussion:', error);
-  }
-};
-
-const handleDeleteEvent = async (eventId: string) => {
-  if (!eventId) return;
-  if (!requireDeleteReasonIfNotOp()) return;
-
-  try {
-    if (modProfileNameVar.value && activeIssue.value) {
-      if (activeIssue.value.isOpen) {
-        await closeIssue();
-      }
-
-      await addIssueActivityFeedItemWithCommentAsMod({
-        issueId: activeIssue.value.id,
-        displayName: modProfileNameVar.value,
-        actionDescription: 'deleted the event',
-        actionType: 'delete',
-        commentText: resolveDeleteReason(),
-        channelUniqueName: channelId.value,
-      });
-    }
-
-    await deleteEvent({ id: eventId });
-    createFormValues.value.text = '';
-    deleteReasonError.value = '';
-    await resetActivityFeed();
-  } catch (error) {
-    console.error('Error deleting event:', error);
-  }
-};
-
-const handleDeleteComment = async (commentId: string) => {
-  if (!commentId) return;
-  if (!requireDeleteReasonIfNotOp()) return;
-
-  try {
-    if (modProfileNameVar.value && activeIssue.value) {
-      if (activeIssue.value.isOpen) {
-        await closeIssue();
-      }
-
-      await addIssueActivityFeedItemWithCommentAsMod({
-        issueId: activeIssue.value.id,
-        displayName: modProfileNameVar.value,
-        actionDescription: 'deleted the comment',
-        actionType: 'delete',
-        commentText: resolveDeleteReason(),
-        channelUniqueName: channelId.value,
-      });
-    }
-
-    await deleteComment({ id: commentId });
-    createFormValues.value.text = '';
-    deleteReasonError.value = '';
-    await resetActivityFeed();
-  } catch (error) {
-    console.error('Error deleting comment:', error);
+    console.error(`Error deleting ${kind}:`, error);
   }
 };
 
@@ -927,9 +840,9 @@ useAutoUnsubscribe({
             :actions-disabled="!issueActionVisibility.opActionsEnabled"
             :is-locked="isLocked"
             :is-closed="!activeIssue?.isOpen"
-            @delete-discussion="handleDeleteDiscussion"
-            @delete-event="handleDeleteEvent"
-            @delete-comment="handleDeleteComment"
+            @delete-discussion="(id: string) => handleDeleteRelatedContent('discussion', id)"
+            @delete-event="(id: string) => handleDeleteRelatedContent('event', id)"
+            @delete-comment="(id: string) => handleDeleteRelatedContent('comment', id)"
           />
 
           <IssueCommentForm
