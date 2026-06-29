@@ -40,28 +40,6 @@ type ServerHealthTimeSeriesPoint = {
   moderationActions: number;
 };
 
-type ChannelHealthRow = {
-  id: string;
-  channelUniqueName: string;
-  displayName?: string | null;
-  channelIconURL?: string | null;
-  discussionCount: number;
-  commentCount: number;
-  eventCount: number;
-  downloadCount: number;
-  voteCount: number;
-  uniqueContributorCount: number;
-  openIssueCount: number;
-  issueOpenedCount: number;
-  moderationActionCount: number;
-  archivedContentCount: number;
-  lockedContentCount: number;
-  oldestOpenIssueAgeDays?: number | null;
-  issuesPerHundredContributions: number;
-  activityScore: number;
-  healthLabel: string;
-};
-
 type IssueAgingBucket = {
   label: string;
   minDays: number;
@@ -297,7 +275,7 @@ const updateChannelSort = (sortBy: ChannelHealthSortKey) => {
             v-model="startDate"
             type="date"
             class="rounded-md border-gray-300 text-sm text-gray-900 [color-scheme:light] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:[color-scheme:dark]"
-          />
+          >
         </label>
         <label
           class="flex flex-col gap-1 text-xs font-medium text-gray-600 dark:text-gray-300"
@@ -307,7 +285,7 @@ const updateChannelSort = (sortBy: ChannelHealthSortKey) => {
             v-model="endDate"
             type="date"
             class="rounded-md border-gray-300 text-sm text-gray-900 [color-scheme:light] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:[color-scheme:dark]"
-          />
+          >
         </label>
         <button
           type="button"
