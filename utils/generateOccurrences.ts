@@ -118,7 +118,7 @@ export function generateOccurrences(
     const startDay = startDt.weekday % 7;
     if (!pattern.daysOfWeek.includes(startDay)) {
       // Start doesn't match selected days - find first valid day
-      let currentDt = getNextWeeklyOccurrence(
+      let currentDt: DateTime<boolean> = getNextWeeklyOccurrence(
         startDt.minus({ days: 1 }),
         pattern.daysOfWeek,
         1

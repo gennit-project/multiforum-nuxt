@@ -15,7 +15,10 @@ import {
 } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
 import type { Plugin, PluginVersion } from '@/__generated__/graphql';
-import { getPluginVersionCompatibility } from '@/utils/pluginCompatibility';
+import {
+  getPluginVersionCompatibility,
+  type PluginVersionCompatibility,
+} from '@/utils/pluginCompatibility';
 
 // Toast notifications
 const toast = useToast();
@@ -48,10 +51,15 @@ interface PluginState {
     enabled: boolean;
     settings: Record<string, unknown>;
   };
-  availableVersions: PluginVersion[];
+  availableVersions: PluginVersionMetadata[];
   hasUpdate?: boolean;
   latestVersion?: string;
 }
+
+type PluginVersionMetadata = Pick<PluginVersion, 'version'> & {
+  apiVersion?: string | null;
+  minServerVersion?: string | null;
+};
 
 interface InstalledPlugin {
   plugin: {
@@ -264,7 +272,9 @@ const disallowPlugin = async (pluginId: string) => {
   }
 };
 
-const getLatestVersionCompatibility = (plugin: PluginState) => {
+const getLatestVersionCompatibility = (
+  plugin: PluginState
+): PluginVersionCompatibility => {
   const latestVersion = plugin.latestVersion;
   if (!latestVersion) return { compatible: true };
   const versionMetadata = plugin.availableVersions.find(
