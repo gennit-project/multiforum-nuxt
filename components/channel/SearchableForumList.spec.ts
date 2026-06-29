@@ -12,7 +12,9 @@ vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
 }));
 
-vi.mock('@/composables/useAuthState', () => createAuthStateMock());
+vi.mock('@/composables/useAuthState', () =>
+  createAuthStateMock({ username: 'alice' })
+);
 
 const makeChannel = (uniqueName: string) => ({
   uniqueName,
@@ -49,5 +51,83 @@ describe('SearchableForumList', () => {
       global: { stubs: { SearchBar: true } },
     });
     expect(wrapper.findAllComponents(SearchableForumListItem)).toHaveLength(0);
+  });
+});
+
+describe('SearchableForumList — favorites, collections, featured', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  const setupRich = () => {
+    asMock(useQuery)
+      .mockReturnValueOnce(createQueryMock({ channels: [makeChannel('cats')] }))
+      .mockReturnValueOnce(
+        createQueryMock({
+          users: [
+            {
+              FavoriteChannels: [makeChannel('favforum'), makeChannel('otherfav')],
+            },
+          ],
+        })
+      )
+      .mockReturnValueOnce(
+        createQueryMock({
+          users: [
+            {
+              Collections: [
+                {
+                  id: 'col1',
+                  name: 'My Collection',
+                  Channels: [makeChannel('colforum')],
+                },
+              ],
+            },
+          ],
+        })
+      );
+  };
+
+  const searchBarStub = {
+    SearchBar: {
+      template:
+        '<input class="search-bar" @input="$emit(\'update-search-input\', $event.target.value)" />',
+    },
+  };
+
+  const mountRich = (props: Record<string, unknown> = {}) => {
+    setupRich();
+    return mountWithDefaults(SearchableForumList, {
+      props: {
+        featuredForums: [makeChannel('featuredforum')],
+        selectedChannels: [],
+        ...props,
+      },
+      global: { stubs: searchBarStub },
+    });
+  };
+
+  it('renders the favorite channels', () => {
+    expect(mountRich().text()).toContain('favforum');
+  });
+
+  it('renders the channel collections', () => {
+    expect(mountRich().text()).toContain('My Collection');
+  });
+
+  it('renders the featured channels', () => {
+    expect(mountRich().text()).toContain('featuredforum');
+  });
+
+  it('toggles selection for all favorites', async () => {
+    const wrapper = mountRich();
+    await wrapper.findAll('input[type="checkbox"]')[0].trigger('click');
+
+    expect(wrapper.emitted('toggleSelection')).toBeTruthy();
+  });
+
+  it('filters favorites by the search term', async () => {
+    const wrapper = mountRich();
+    await wrapper.find('.search-bar').setValue('favforum');
+
+    expect(wrapper.text()).not.toContain('otherfav');
   });
 });
