@@ -15,8 +15,8 @@ import getDefaultEventFormValues from '@/utils/defaultEventFormValues';
 import { generateOccurrences } from '@/utils/generateOccurrences';
 import type { CreateEditEventFormValues, DateOccurrence } from '@/types/Event';
 import type {
+  CreateEventSeriesInput,
   EventCreateInput,
-  EventSeriesCreateInput,
   EventTagsConnectOrCreateFieldInput,
   RepeatPatternInput,
   Event,
@@ -98,9 +98,9 @@ const seriesOccurrences = computed<DateOccurrence[]>(() => {
   return formValues.value.occurrences ?? [];
 });
 
-const eventSeriesCreateInput = computed<EventSeriesCreateInput>(() => {
+const eventSeriesCreateInput = computed<CreateEventSeriesInput>(() => {
   const fv = formValues.value;
-  const input: EventSeriesCreateInput = {
+  const input: CreateEventSeriesInput = {
     title: fv.title || '',
     description: fv.description || null,
     cost: fv.cost || '',

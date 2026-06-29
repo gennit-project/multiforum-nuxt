@@ -23,7 +23,7 @@ export const CREATE_EVENT_WITH_CHANNEL_CONNECTIONS = gql`
 `;
 
 export const CREATE_EVENT_SERIES_WITH_CHANNEL_CONNECTIONS = gql`
-  mutation createEventSeries($input: EventSeriesCreateInput!) {
+  mutation createEventSeries($input: CreateEventSeriesInput!) {
     createEventSeriesWithChannelConnections(input: $input) {
       id
       title
