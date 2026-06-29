@@ -63,6 +63,36 @@ describe('MarkdownPreview', () => {
     expect(renderedText(wrapper)).not.toContain('five');
   });
 
+  it('does not show the toggle for empty text', () => {
+    const wrapper = mountPreview({ text: '', wordLimit: 3 });
+
+    expect(wrapper.find('button').exists()).toBe(false);
+  });
+
+  it('passes through equal-limit text without truncation', () => {
+    const wrapper = mountPreview({
+      text: 'one two three',
+      wordLimit: 3,
+      showShowMore: true,
+    });
+
+    expect(renderedText(wrapper)).toContain('one two three');
+  });
+
+  it('disables image click handling when images are not allowed', async () => {
+    const wrapper = mountPreview({ text: 'words', allowImages: false });
+    const img = document.createElement('img');
+    img.src = 'https://example.com/image.png';
+    wrapper.element.appendChild(img);
+
+    img.click();
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.findComponent({ name: 'VueEasyLightbox' }).props('visible')).toBe(
+      false
+    );
+  });
+
   describe('show more / show less', () => {
     const longText = 'one two three four five six';
 

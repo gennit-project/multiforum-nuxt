@@ -153,6 +153,17 @@ describe('Comment — CommentButtons handlers', () => {
     expect(wrapper.emitted('updateCreateReplyCommentInput')).toBeTruthy();
   });
 
+  it('does not emit a reply update when the parent id is missing', async () => {
+    const wrapper = mountComment();
+    await buttons(wrapper).vm.$emit('update-new-comment', {
+      text: 'hi',
+      parentCommentId: '',
+      depth: 2,
+    });
+
+    expect(wrapper.emitted('updateCreateReplyCommentInput')).toBeUndefined();
+  });
+
   it('re-emits clickFeedback when feedback is given', async () => {
     const wrapper = mountComment();
     await buttons(wrapper).vm.$emit('click-feedback');
@@ -230,6 +241,27 @@ describe('Comment — MenuButton handlers', () => {
     await menu(wrapper).vm.$emit('handle-click-archive');
 
     expect(wrapper.emitted('handleClickArchive')).toBeTruthy();
+  });
+
+  it('re-emits archive-and-suspend and unarchive requests to the parent', async () => {
+    const wrapper = mountComment();
+    await menu(wrapper).vm.$emit('handle-click-archive-and-suspend');
+    await menu(wrapper).vm.$emit('handle-click-unarchive');
+
+    expect({
+      archiveAndSuspend: wrapper.emitted('handleClickArchiveAndSuspend'),
+      unarchive: wrapper.emitted('handleClickUnarchive'),
+    }).toEqual({
+      archiveAndSuspend: [['c1']],
+      unarchive: [['c1']],
+    });
+  });
+
+  it('re-emits view feedback from the menu', async () => {
+    const wrapper = mountComment();
+    await menu(wrapper).vm.$emit('handle-view-feedback');
+
+    expect(wrapper.emitted('handleViewFeedback')).toEqual([['c1']]);
   });
 });
 

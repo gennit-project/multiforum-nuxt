@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import NotificationTabs from './NotificationTabs.vue';
@@ -61,6 +61,12 @@ const mockFeedbackResult = ref({
 
 const mockFetchMoreGeneral = vi.fn();
 const mockFetchMoreFeedback = vi.fn();
+const mockRefetchGeneral = vi.fn();
+const mockRefetchFeedback = vi.fn();
+const mockMarkNotificationsAsRead = vi.fn();
+const mockMarkNotificationAsRead = vi.fn();
+const mockShowScratchpadEntry = vi.fn();
+let mockMutationIndex = 0;
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn((query) => {
@@ -72,7 +78,7 @@ vi.mock('@vue/apollo-composable', () => ({
         error: ref(null),
         loading: ref(false),
         fetchMore: mockFetchMoreFeedback,
-        refetch: vi.fn(),
+        refetch: mockRefetchFeedback,
       };
     }
     return {
@@ -80,11 +86,15 @@ vi.mock('@vue/apollo-composable', () => ({
       error: ref(null),
       loading: ref(false),
       fetchMore: mockFetchMoreGeneral,
-      refetch: vi.fn(),
+      refetch: mockRefetchGeneral,
     };
   }),
   useMutation: () => ({
-    mutate: vi.fn(),
+    mutate: [
+      mockMarkNotificationsAsRead,
+      mockMarkNotificationAsRead,
+      mockShowScratchpadEntry,
+    ][mockMutationIndex++] ?? vi.fn(),
     loading: ref(false),
     error: ref(null),
     onDone: vi.fn(),
@@ -99,6 +109,10 @@ vi.mock('@/utils', () => ({
 describe('NotificationTabs', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockMutationIndex = 0;
+    mockMarkNotificationsAsRead.mockResolvedValue({});
+    mockMarkNotificationAsRead.mockResolvedValue({});
+    mockShowScratchpadEntry.mockResolvedValue({});
     mockGeneralResult.value = {
       users: [
         {
@@ -282,6 +296,79 @@ describe('NotificationTabs', () => {
     const wrapper = mountNotificationTabs();
 
     expect(wrapper.find('[data-testid="load-more"]').exists()).toBe(true);
+  });
+
+  it('publishes a scratchpad notification and marks it read', async () => {
+    mockGeneralResult.value.users[0].Notifications = [
+      {
+        id: 'scratch-1',
+        createdAt: '2024-01-17T10:00:00Z',
+        read: false,
+        text: 'Someone thanked you',
+        notificationType: 'scratchpad',
+        ScratchpadEntry: { id: 'entry-1', isPublic: false },
+      },
+    ];
+    const wrapper = mountNotificationTabs();
+
+    await wrapper.get('[data-testid="notification-show-on-profile"]').trigger('click');
+    await flushPromises();
+
+    expect({
+      show: mockShowScratchpadEntry.mock.calls[0]?.[0],
+      markRead: mockMarkNotificationAsRead.mock.calls[0]?.[0],
+      refetchCalls: mockRefetchGeneral.mock.calls.length,
+    }).toEqual({
+      show: { scratchpadEntryId: 'entry-1', isPublic: true },
+      markRead: { username: 'testuser', notificationId: 'scratch-1' },
+      refetchCalls: 1,
+    });
+  });
+
+  it('ignores a scratchpad notification by marking it read', async () => {
+    mockGeneralResult.value.users[0].Notifications = [
+      {
+        id: 'scratch-2',
+        createdAt: '2024-01-17T10:00:00Z',
+        read: false,
+        text: 'Someone thanked you',
+        notificationType: 'scratchpad',
+        ScratchpadEntry: { id: 'entry-2', isPublic: false },
+      },
+    ];
+    const wrapper = mountNotificationTabs();
+
+    await wrapper.get('[data-testid="notification-ignore"]').trigger('click');
+    await flushPromises();
+
+    expect({
+      showCalls: mockShowScratchpadEntry.mock.calls.length,
+      markRead: mockMarkNotificationAsRead.mock.calls[0]?.[0],
+      refetchCalls: mockRefetchGeneral.mock.calls.length,
+    }).toEqual({
+      showCalls: 0,
+      markRead: { username: 'testuser', notificationId: 'scratch-2' },
+      refetchCalls: 1,
+    });
+  });
+
+  it('shows published scratchpad notifications as already visible on profile', () => {
+    mockGeneralResult.value.users[0].Notifications = [
+      {
+        id: 'scratch-3',
+        createdAt: '2024-01-17T10:00:00Z',
+        read: true,
+        text: 'Someone thanked you',
+        notificationType: 'scratchpad',
+        ScratchpadEntry: { id: 'entry-3', isPublic: true },
+      },
+    ];
+
+    const wrapper = mountNotificationTabs();
+
+    expect(wrapper.get('[data-testid="notification-showing-on-profile"]').text()).toContain(
+      'Showing on your Kudos page'
+    );
   });
 
   it('declares pagination options and total aggregates in the tab queries', () => {

@@ -64,6 +64,7 @@ let timeout: ReturnType<typeof setTimeout> | null = null;
 
 const updateSearchInput = (e: Event) => {
   const target = e.target as HTMLInputElement;
+  input.value = target.value;
   const emitValue = () =>
     emit('updateSearchInput', removeQuotationMarks(target.value));
 
@@ -78,6 +79,7 @@ const updateSearchInput = (e: Event) => {
 
 const submit = (e: Event) => {
   const target = e.target as HTMLInputElement;
+  input.value = target.value;
   emit('submit', removeQuotationMarks(target.value));
 };
 
@@ -113,7 +115,7 @@ defineExpose({ focus, getValue });
       </div>
       <input
         ref="searchInputRef"
-        :value="initialValue"
+        :value="input"
         name="search"
         :data-testid="testId"
         :class="[

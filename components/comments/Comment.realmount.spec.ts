@@ -58,9 +58,22 @@ const stubs = {
   CommentButtons: { template: '<div class="comment-buttons-stub" />' },
   MarkdownPreview: { props: ['text'], template: '<div class="md-stub">{{ text }}</div>' },
   ArchivedCommentText: { template: '<div class="archived-stub" />' },
-  TextEditor: { template: '<div />' },
-  ChildComments: { template: '<div />' },
-  ErrorBanner: { template: '<div />' },
+  TextEditor: {
+    name: 'TextEditor',
+    props: ['initialValue'],
+    emits: ['update'],
+    template: '<div class="text-editor-stub">{{ initialValue }}</div>',
+  },
+  ChildComments: {
+    name: 'ChildComments',
+    template:
+      '<div class="child-comments-stub"><slot :comments="[{ id: \'child-1\', text: \'Child body\', CommentAuthor: { __typename: \'User\', username: \'child\' }, Channel: { uniqueName: \'cats\' } }]" /></div>',
+  },
+  ErrorBanner: {
+    name: 'ErrorBanner',
+    props: ['text'],
+    template: '<div class="error-banner-stub">{{ text }}</div>',
+  },
   EllipsisHorizontal: { template: '<i />' },
   RightArrowIcon: { template: '<i />' },
   MenuButton: { template: '<button><slot /></button>' },
@@ -101,6 +114,43 @@ describe('Comment (real mount)', () => {
     expect(wrapper.find('.archived-stub').exists()).toBe(true);
   });
 
+  it('shows the edit form and edit error for the active comment', () => {
+    const wrapper = mountWithDefaults(Comment, {
+      props: {
+        commentData: baseComment({ text: 'Original body' } as Partial<Comment>),
+        depth: 1,
+        editFormOpenAtCommentID: 'c1',
+        editCommentError: { message: 'Could not save' },
+      },
+      global: { stubs },
+    });
+
+    expect({
+      editor: wrapper.get('.text-editor-stub').text(),
+      error: wrapper.get('.error-banner-stub').text(),
+    }).toEqual({
+      editor: 'Original body',
+      error: 'Could not save',
+    });
+  });
+
+  it('emits edit text updates from the active edit form', async () => {
+    const wrapper = mountWithDefaults(Comment, {
+      props: {
+        commentData: baseComment({ text: 'Original body' } as Partial<Comment>),
+        depth: 1,
+        editFormOpenAtCommentID: 'c1',
+      },
+      global: { stubs },
+    });
+
+    await wrapper.findComponent({ name: 'TextEditor' }).vm.$emit('update', 'edited');
+
+    expect(wrapper.emitted('update-edit-comment-input')).toEqual([
+      ['edited', true],
+    ]);
+  });
+
   it('renders comment buttons when a forum id resolves from the channel', () => {
     const wrapper = mountComment(baseComment());
     expect(wrapper.find('.comment-buttons-stub').exists()).toBe(true);
@@ -125,5 +175,50 @@ describe('Comment (real mount)', () => {
       } as unknown as Partial<Comment>)
     );
     expect(wrapper.find('.comment-buttons-stub').exists()).toBe(false);
+  });
+
+  it('hides comment buttons when showCommentButtons is false', () => {
+    const wrapper = mountWithDefaults(Comment, {
+      props: {
+        commentData: baseComment(),
+        depth: 1,
+        showCommentButtons: false,
+      },
+      global: { stubs },
+    });
+
+    expect(wrapper.find('.comment-buttons-stub').exists()).toBe(false);
+  });
+
+  it('renders child comments while replies are visible', () => {
+    const wrapper = mountComment(
+      baseComment({
+        ChildCommentsAggregate: { count: 1 },
+      } as unknown as Partial<Comment>)
+    );
+
+    expect(wrapper.text()).toContain('Child body');
+  });
+
+  it('renders a continue-thread link when reply depth exceeds the inline limit', async () => {
+    const wrapper = mountWithDefaults(Comment, {
+      props: {
+        commentData: baseComment({
+          ChildCommentsAggregate: { count: 1 },
+        } as unknown as Partial<Comment>),
+        depth: 5,
+      },
+      global: { stubs },
+    });
+
+    await wrapper.get('a').trigger('click');
+
+    expect({
+      text: wrapper.text(),
+      scroll: wrapper.emitted('scrollToTop'),
+    }).toEqual({
+      text: expect.stringContaining('Continue thread'),
+      scroll: [[]],
+    });
   });
 });

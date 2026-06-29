@@ -23,9 +23,9 @@ const stubs = {
   ImageLightbox: {
     template: '<button class="lightbox-stub" @click="$emit(\'close\')" />',
   },
-  TextEditor: { template: '<div />' },
-  SaveButton: { template: '<button />' },
-  CancelButton: { template: '<button />' },
+  TextEditor: { name: 'TextEditor', template: '<div />' },
+  SaveButton: { name: 'SaveButton', template: '<button />' },
+  CancelButton: { name: 'CancelButton', template: '<button />' },
   LeftArrowIcon: { template: '<i />' },
   RightArrowIcon: { template: '<i />' },
   PencilIcon: { template: '<i />' },
@@ -98,6 +98,60 @@ describe('DiscussionAlbum', () => {
       stlFiles: [{ id: 's1', url: 'https://example.com/m.stl', fileName: 'm.stl' }],
     });
     expect(cells(wrapper)).toHaveLength(2);
+  });
+
+  it('renders a model viewer for GLB images', () => {
+    const wrapper = mountAlbum({
+      album: {
+        ...makeAlbum(['model']),
+        Images: [
+          {
+            id: 'model',
+            url: 'https://example.com/model.glb',
+            alt: 'alt-model',
+            caption: '',
+            __typename: 'Image',
+          },
+        ],
+      } as Album,
+    });
+
+    expect(wrapper.find('.model-viewer-stub').exists()).toBe(true);
+  });
+
+  it('renders an STL viewer for STL images', () => {
+    const wrapper = mountAlbum({
+      album: makeAlbum([]),
+      stlFiles: [{ id: 's1', url: 'https://example.com/m.stl', fileName: 'm.stl' }],
+    });
+
+    expect(wrapper.find('.stl-viewer-stub').exists()).toBe(true);
+  });
+
+  it('enters caption edit mode and saves the caption', async () => {
+    const wrapper = mountAlbum();
+
+    await wrapper.get('span[role="button"]').trigger('click');
+    await wrapper.vm.$nextTick();
+    expect(wrapper.findComponent({ name: 'TextEditor' }).exists()).toBe(true);
+
+    await wrapper.findComponent({ name: 'TextEditor' }).vm.$emit('update', 'new caption');
+    await wrapper.findComponent({ name: 'SaveButton' }).trigger('click');
+
+    expect(wrapper.emitted('album-updated')).toBeTruthy();
+  });
+
+  it('cancels caption editing', async () => {
+    const wrapper = mountAlbum({
+      album: makeAlbum(['a']),
+      discussionAuthor: 'alice',
+    });
+
+    await wrapper.get('span[role="button"]').trigger('click');
+    await wrapper.vm.$nextTick();
+    await wrapper.findComponent({ name: 'CancelButton' }).trigger('click');
+
+    expect(wrapper.findComponent({ name: 'TextEditor' }).exists()).toBe(false);
   });
 });
 

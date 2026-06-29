@@ -14,11 +14,12 @@ import {
   GET_INSTALLED_PLUGINS,
 } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
-import type { Plugin, PluginVersion } from '@/__generated__/graphql';
 import {
-  getPluginVersionCompatibility,
-  type PluginVersionCompatibility,
-} from '@/utils/pluginCompatibility';
+  buildPluginStates,
+  filterAndSortPluginStates,
+  getLatestVersionCompatibilityForPlugin,
+  type PluginState,
+} from '@/utils/pluginManagement';
 
 // Toast notifications
 const toast = useToast();
@@ -33,48 +34,6 @@ const searchQuery = ref('');
 const statusFilter = ref<'all' | 'available' | 'allowed' | 'installed' | 'enabled'>('all');
 const sortBy = ref<'name' | 'status'>('name');
 const sortDirection = ref<'asc' | 'desc'>('asc');
-
-// Plugin state interface
-interface PluginState {
-  id: string;
-  name: string;
-  description?: string;
-  status:
-    | 'available'
-    | 'allowed'
-    | 'installed'
-    | 'installed_disabled'
-    | 'installed_enabled';
-  installedVersion?: {
-    id: string;
-    version: string;
-    enabled: boolean;
-    settings: Record<string, unknown>;
-  };
-  availableVersions: PluginVersionMetadata[];
-  hasUpdate?: boolean;
-  latestVersion?: string;
-}
-
-type PluginVersionMetadata = Pick<PluginVersion, 'version'> & {
-  apiVersion?: string | null;
-  minServerVersion?: string | null;
-};
-
-interface InstalledPlugin {
-  plugin: {
-    id: string;
-    name: string;
-    description?: string;
-  };
-  version: string;
-  scope: string;
-  enabled: boolean;
-  settingsJson: Record<string, unknown>;
-  hasUpdate?: boolean;
-  latestVersion?: string;
-  availableVersions?: string[];
-}
 
 // Fetch plugin data
 const {
@@ -98,123 +57,22 @@ const { result: installedPluginsResult, refetch: refetchInstalledPlugins } =
     fetchPolicy: 'cache-and-network',
   });
 
-// Computed property to process plugin data into PluginState[]
-const pluginStates = computed((): PluginState[] => {
-  if (!pluginManagementResult.value) return [];
-
-  const data = pluginManagementResult.value;
-  const serverConfig = data.serverConfigs?.[0];
-  if (!serverConfig) return [];
-
-  const allPlugins = data.plugins || [];
-  const allowedPlugins = serverConfig.AllowedPlugins || [];
-  // Use the separate installed plugins query for real-time updates
-  const installedPlugins =
-    installedPluginsResult.value?.getInstalledPlugins || [];
-
-  return allPlugins.map((plugin: Plugin): PluginState => {
-    const isAllowed = allowedPlugins.some((p: Plugin) => p.id === plugin.id);
-
-    // Find installed plugin using the new backend API
-    const installedPlugin = installedPlugins.find(
-      (installed: InstalledPlugin) => {
-        return installed.plugin.id === plugin.id;
-      }
-    );
-
-    // Get available versions from the Plugin.Versions relationship
-    const availableVersions = plugin.Versions || [];
-
-    let status:
-      | 'available'
-      | 'allowed'
-      | 'installed'
-      | 'installed_disabled'
-      | 'installed_enabled';
-
-    if (installedPlugin) {
-      status = installedPlugin.enabled
-        ? 'installed_enabled'
-        : 'installed_disabled';
-    } else if (isAllowed) {
-      status = 'allowed';
-    } else {
-      status = 'available';
-    }
-
-    return {
-      id: plugin.id,
-      name: plugin.name,
-      description: plugin.description || installedPlugin?.plugin?.description,
-      status,
-      installedVersion: installedPlugin
-        ? {
-            id: installedPlugin.plugin.id, // Using plugin ID as fallback
-            version: installedPlugin.version,
-            enabled: installedPlugin.enabled,
-            settings: installedPlugin.settingsJson || {},
-          }
-        : undefined,
-      availableVersions,
-      hasUpdate: installedPlugin?.hasUpdate ?? false,
-      latestVersion: installedPlugin?.latestVersion,
-    };
-  });
-});
+const pluginStates = computed(() =>
+  buildPluginStates({
+    pluginManagementResult: pluginManagementResult.value,
+    installedPlugins: installedPluginsResult.value?.getInstalledPlugins || [],
+  })
+);
 
 // Filtered and sorted plugins
 const filteredAndSortedPlugins = computed((): PluginState[] => {
-  let result = [...pluginStates.value];
-
-  // Apply search filter
-  if (searchQuery.value.trim()) {
-    const query = searchQuery.value.toLowerCase().trim();
-    result = result.filter(
-      (plugin) =>
-        plugin.name.toLowerCase().includes(query) ||
-        plugin.description?.toLowerCase().includes(query) ||
-        plugin.id.toLowerCase().includes(query)
-    );
-  }
-
-  // Apply status filter
-  if (statusFilter.value !== 'all') {
-    result = result.filter((plugin) => {
-      switch (statusFilter.value) {
-        case 'available':
-          return plugin.status === 'available';
-        case 'allowed':
-          return plugin.status === 'allowed';
-        case 'installed':
-          return plugin.status === 'installed_disabled' || plugin.status === 'installed_enabled';
-        case 'enabled':
-          return plugin.status === 'installed_enabled';
-        default:
-          return true;
-      }
-    });
-  }
-
-  // Apply sorting
-  result.sort((a, b) => {
-    let comparison = 0;
-    if (sortBy.value === 'name') {
-      comparison = a.name.localeCompare(b.name);
-    } else if (sortBy.value === 'status') {
-      // Order: enabled > installed > allowed > available
-      const statusOrder: Record<PluginState['status'], number> = {
-        installed_enabled: 0,
-        installed_disabled: 1,
-        installed: 2,
-        allowed: 3,
-        available: 4,
-      };
-      comparison = statusOrder[a.status] - statusOrder[b.status];
-    }
-    return sortDirection.value === 'asc' ? comparison : -comparison;
+  return filterAndSortPluginStates({
+    plugins: pluginStates.value,
+    searchQuery: searchQuery.value,
+    statusFilter: statusFilter.value,
+    sortBy: sortBy.value,
+    sortDirection: sortDirection.value,
   });
-
-  return result;
 });
 
 // Toggle sort direction or change sort field
@@ -272,24 +130,13 @@ const disallowPlugin = async (pluginId: string) => {
   }
 };
 
-const getLatestVersionCompatibility = (
-  plugin: PluginState
-): PluginVersionCompatibility => {
-  const latestVersion = plugin.latestVersion;
-  if (!latestVersion) return { compatible: true };
-  const versionMetadata = plugin.availableVersions.find(
-    (version) => version.version === latestVersion
-  );
-  return getPluginVersionCompatibility(versionMetadata || {});
-};
-
 const upgradePlugin = async (plugin: PluginState) => {
   if (!plugin.latestVersion) {
     toast.error('No upgrade version is available for this plugin.');
     return;
   }
 
-  const compatibility = getLatestVersionCompatibility(plugin);
+  const compatibility = getLatestVersionCompatibilityForPlugin(plugin);
   if (!compatibility.compatible) {
     toast.error(compatibility.reason);
     return;
@@ -317,7 +164,7 @@ const isAllowingPlugin = (pluginId: string) => allowingPluginIds.value.has(plugi
 const isDisallowingPlugin = (pluginId: string) => disallowingPluginIds.value.has(pluginId);
 const isUpgradingPlugin = (pluginId: string) => upgradingPluginIds.value.has(pluginId);
 const canUpgradePlugin = (plugin: PluginState) =>
-  getLatestVersionCompatibility(plugin).compatible;
+  getLatestVersionCompatibilityForPlugin(plugin).compatible;
 
 // Refresh data when component mounts to catch any changes from detail pages
 onMounted(() => {
@@ -599,7 +446,7 @@ const handlePluginsRefreshed = async () => {
                       type="button"
                       class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50"
                       :disabled="isUpgradingPlugin(plugin.id) || !canUpgradePlugin(plugin)"
-                      :title="getLatestVersionCompatibility(plugin).reason"
+                      :title="getLatestVersionCompatibilityForPlugin(plugin).reason"
                       @click="upgradePlugin(plugin)"
                     >
                       <i
