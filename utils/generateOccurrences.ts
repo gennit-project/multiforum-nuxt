@@ -172,8 +172,10 @@ export function generateOccurrences(
   // Add first occurrence
   occurrences.push({ startTime, endTime });
 
-  // Generate subsequent occurrences
-  let currentDt = startDt;
+  // Generate subsequent occurrences. Typed as DateTime<boolean> because
+  // getNextDate returns a DateTime of statically-unknown validity (luxon 3.7+
+  // distinguishes DateTime<boolean> from DateTime<true> | DateTime<false>).
+  let currentDt: DateTime<boolean> = startDt;
 
   while (occurrences.length < maxOccurrences) {
     currentDt = getNextDate(currentDt, pattern);
