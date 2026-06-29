@@ -8,7 +8,10 @@ import ServerDashboardIssueAging from '@/components/admin/ServerDashboardIssueAg
 import ServerDashboardMetricCards from '@/components/admin/ServerDashboardMetricCards.vue';
 import ServerDashboardSecondaryStats from '@/components/admin/ServerDashboardSecondaryStats.vue';
 import { RefreshCw } from 'lucide-vue-next';
-import { GET_SERVER_HEALTH_DASHBOARD } from '@/graphQLData/admin/queries';
+import {
+  GET_SERVER_HEALTH_CHANNEL_HEALTH,
+  GET_SERVER_HEALTH_DASHBOARD_OVERVIEW,
+} from '@/graphQLData/admin/queries';
 
 type ServerHealthSummary = {
   activeChannelCount: number;
@@ -72,7 +75,6 @@ type DashboardData = {
   generatedAt: string;
   summary: ServerHealthSummary;
   timeSeries: ServerHealthTimeSeriesPoint[];
-  channelHealth: ChannelHealthRow[];
   issueAging: IssueAgingBucket[];
 };
 
@@ -152,7 +154,12 @@ const activeSortDirection = computed(() =>
   getSortDirectionFromQuery(route.query.sortDirection)
 );
 
-const dashboardVariables = computed(() => ({
+const dashboardOverviewVariables = computed(() => ({
+  startDate: startDate.value,
+  endDate: endDate.value,
+}));
+
+const channelHealthVariables = computed(() => ({
   startDate: startDate.value,
   endDate: endDate.value,
   limit: channelLimit.value,
@@ -193,9 +200,28 @@ watch([startDate, endDate], ([nextStartDate, nextEndDate]) => {
   });
 });
 
-const { result, loading, error, refetch } = useQuery(
-  GET_SERVER_HEALTH_DASHBOARD,
-  dashboardVariables,
+const {
+  result: overviewResult,
+  loading: overviewLoading,
+  error: overviewError,
+  refetch: refetchOverview,
+} = useQuery(
+  GET_SERVER_HEALTH_DASHBOARD_OVERVIEW,
+  dashboardOverviewVariables,
+  {
+    fetchPolicy: 'cache-and-network',
+    prefetch: false,
+  }
+);
+
+const {
+  result: channelHealthResult,
+  loading: channelHealthLoading,
+  error: channelHealthError,
+  refetch: refetchChannelHealth,
+} = useQuery(
+  GET_SERVER_HEALTH_CHANNEL_HEALTH,
+  channelHealthVariables,
   {
     fetchPolicy: 'cache-and-network',
     prefetch: false,
@@ -203,20 +229,34 @@ const { result, loading, error, refetch } = useQuery(
 );
 
 const dashboard = computed<DashboardData | null>(() => {
-  return result.value?.getServerHealthDashboard || null;
+  return overviewResult.value?.getServerHealthDashboard || null;
 });
 
 const showInitialDashboardSkeleton = computed(() => {
-  return loading.value && !dashboard.value;
+  return overviewLoading.value && !dashboard.value;
 });
 
 const isChannelHealthLoading = computed(() => {
-  return loading.value && !!dashboard.value && channelRows.value.length === 0;
+  return (
+    channelHealthLoading.value &&
+    !!dashboard.value &&
+    channelRows.value.length === 0
+  );
 });
 
-const channelRows = computed(() => dashboard.value?.channelHealth || []);
+const channelRows = computed(
+  () => channelHealthResult.value?.getServerHealthDashboard?.channelHealth || []
+);
 const issueAging = computed(() => dashboard.value?.issueAging || []);
 const timeSeries = computed(() => dashboard.value?.timeSeries || []);
+const dashboardError = computed(
+  () => overviewError.value || channelHealthError.value
+);
+
+const refreshDashboard = () => {
+  refetchOverview(dashboardOverviewVariables.value);
+  refetchChannelHealth(channelHealthVariables.value);
+};
 
 const updateChannelSort = (sortBy: ChannelHealthSortKey) => {
   const nextDirection =
@@ -272,7 +312,7 @@ const updateChannelSort = (sortBy: ChannelHealthSortKey) => {
         <button
           type="button"
           class="inline-flex h-10 items-center gap-2 rounded-md border border-gray-300 px-3 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-800"
-          @click="refetch(dashboardVariables)"
+          @click="refreshDashboard"
         >
           <RefreshCw class="h-4 w-4" />
           Refresh
@@ -302,10 +342,10 @@ const updateChannelSort = (sortBy: ChannelHealthSortKey) => {
       </template>
 
       <div
-        v-if="error"
+        v-if="dashboardError"
         class="rounded-md border border-red-200 bg-red-100 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-900/30 dark:text-red-100"
       >
-        {{ error.message }}
+        {{ dashboardError.message }}
       </div>
 
       <div

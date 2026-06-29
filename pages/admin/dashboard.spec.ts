@@ -93,19 +93,40 @@ const mountDashboard = async (
   options: {
     resultValue?: typeof dashboardResult | null;
     loading?: boolean;
+    overviewResultValue?: typeof dashboardResult | null;
+    channelResultValue?: typeof dashboardResult | null;
+    overviewLoading?: boolean;
+    channelLoading?: boolean;
   } = {}
 ) => {
-  const resultRef = ref(
-    options.resultValue === undefined ? dashboardResult : options.resultValue
+  const getResultValue = (
+    value: typeof dashboardResult | null | undefined
+  ) => {
+    if (value !== undefined) return value;
+    return options.resultValue === undefined ? dashboardResult : options.resultValue;
+  };
+  const overviewResultRef = ref(
+    getResultValue(options.overviewResultValue)
   );
-  const loadingRef = ref(options.loading || false);
-  const refetch = vi.fn();
+  const channelResultRef = ref(
+    getResultValue(options.channelResultValue)
+  );
+  const overviewLoadingRef = ref(options.overviewLoading ?? options.loading ?? false);
+  const channelLoadingRef = ref(options.channelLoading ?? options.loading ?? false);
+  const refetchOverview = vi.fn();
+  const refetchChannelHealth = vi.fn();
 
-  mockedUseQuery.mockReturnValue({
-    result: resultRef,
-    loading: loadingRef,
+  mockedUseQuery.mockReturnValueOnce({
+    result: overviewResultRef,
+    loading: overviewLoadingRef,
     error: ref(null),
-    refetch,
+    refetch: refetchOverview,
+  });
+  mockedUseQuery.mockReturnValueOnce({
+    result: channelResultRef,
+    loading: channelLoadingRef,
+    error: ref(null),
+    refetch: refetchChannelHealth,
   });
   const Page = (await import('./dashboard.vue')).default;
   const wrapper = mount(Page, {
@@ -118,7 +139,15 @@ const mountDashboard = async (
       },
     },
   });
-  return { wrapper, resultRef, loadingRef, refetch };
+  return {
+    wrapper,
+    overviewResultRef,
+    channelResultRef,
+    overviewLoadingRef,
+    channelLoadingRef,
+    refetchOverview,
+    refetchChannelHealth,
+  };
 };
 
 beforeEach(() => {
@@ -206,5 +235,23 @@ describe('admin dashboard page', () => {
     expect(
       wrapper.findAll('[data-testid="channel-health-loading-row"]')
     ).toHaveLength(0);
+  });
+
+  it('keeps overview sections mounted when only sorted channel rows are loading', async () => {
+    const { wrapper } = await mountDashboard({
+      overviewResultValue: dashboardResult,
+      channelResultValue: null,
+      channelLoading: true,
+    });
+
+    expect(wrapper.text()).toContain('Active Channels');
+    expect(wrapper.text()).toContain('Activity');
+    expect(wrapper.text()).toContain('Issue Aging');
+    expect(
+      wrapper.find('[data-testid="dashboard-initial-loading"]').exists()
+    ).toBe(false);
+    expect(
+      wrapper.findAll('[data-testid="channel-health-loading-row"]')
+    ).toHaveLength(5);
   });
 });

@@ -185,6 +185,100 @@ export const GET_SERVER_HEALTH_DASHBOARD = gql`
   }
 `;
 
+export const GET_SERVER_HEALTH_DASHBOARD_OVERVIEW = gql`
+  query getServerHealthDashboardOverview(
+    $startDate: String
+    $endDate: String
+    $channelUniqueNames: [String!]
+  ) {
+    getServerHealthDashboard(
+      startDate: $startDate
+      endDate: $endDate
+      channelUniqueNames: $channelUniqueNames
+    ) {
+      startDate
+      endDate
+      generatedAt
+      summary {
+        activeChannelCount
+        discussionCount
+        commentCount
+        eventCount
+        downloadCount
+        voteCount
+        openIssueCount
+        issueOpenedCount
+        issueClosedCount
+        moderationActionCount
+        archivedContentCount
+        lockedContentCount
+        suspensionCount
+        medianOpenIssueAgeDays
+      }
+      timeSeries {
+        date
+        discussions
+        comments
+        events
+        downloads
+        issuesOpened
+        moderationActions
+      }
+      issueAging {
+        label
+        minDays
+        maxDays
+        count
+      }
+    }
+  }
+`;
+
+export const GET_SERVER_HEALTH_CHANNEL_HEALTH = gql`
+  query getServerHealthChannelHealth(
+    $startDate: String
+    $endDate: String
+    $channelUniqueNames: [String!]
+    $limit: Int
+    $sortBy: String
+    $sortDirection: String
+  ) {
+    getServerHealthDashboard(
+      startDate: $startDate
+      endDate: $endDate
+      channelUniqueNames: $channelUniqueNames
+      limit: $limit
+      sortBy: $sortBy
+      sortDirection: $sortDirection
+    ) {
+      startDate
+      endDate
+      generatedAt
+      channelHealth {
+        id
+        channelUniqueName
+        displayName
+        channelIconURL
+        discussionCount
+        commentCount
+        eventCount
+        downloadCount
+        voteCount
+        uniqueContributorCount
+        openIssueCount
+        issueOpenedCount
+        moderationActionCount
+        archivedContentCount
+        lockedContentCount
+        oldestOpenIssueAgeDays
+        issuesPerHundredContributions
+        activityScore
+        healthLabel
+      }
+    }
+  }
+`;
+
 export const GET_SERVER_PERMISSIONS = gql`
   query getServerConfig($serverName: String!) {
     serverConfigs(where: { serverName: $serverName }) {
