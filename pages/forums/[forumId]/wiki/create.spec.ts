@@ -2,12 +2,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
+import InfoBanner from '@/components/InfoBanner.vue';
 import TextInput from '@/components/TextInput.vue';
 import TextEditor from '@/components/TextEditor.vue';
 
 const suspension = vi.hoisted(() => ({
   active: null as unknown,
   issueNumber: null as number | null,
+}));
+const channel = vi.hoisted(() => ({
+  wikiEnabled: true as boolean | null,
 }));
 const createMutate = vi.hoisted(() => vi.fn());
 
@@ -24,6 +28,13 @@ vi.mock('@vue/apollo-composable', async () => {
       loading: ref(false),
       error: ref(null),
       onDone: vi.fn(),
+    }),
+    useQuery: () => ({
+      result: ref({
+        channels: [{ uniqueName: 'cats', wikiEnabled: channel.wikiEnabled }],
+      }),
+      loading: ref(false),
+      error: ref(null),
     }),
   };
 });
@@ -60,6 +71,7 @@ describe('wiki create page', () => {
   beforeEach(() => {
     suspension.active = null;
     suspension.issueNumber = null;
+    channel.wikiEnabled = true;
     createMutate.mockReset();
   });
 
@@ -79,6 +91,26 @@ describe('wiki create page', () => {
 
     expect(wrapper.find('form').exists()).toBe(false);
     expect(wrapper.findComponent(SuspensionNotice).exists()).toBe(true);
+  });
+
+  it('hides the form when the forum has the wiki disabled', async () => {
+    channel.wikiEnabled = false;
+    const wrapper = await mountPage();
+
+    expect(wrapper.find('form').exists()).toBe(false);
+  });
+
+  it('shows a wiki-disabled notice when the forum has the wiki disabled', async () => {
+    channel.wikiEnabled = false;
+    const wrapper = await mountPage();
+
+    expect(wrapper.findComponent(InfoBanner).exists()).toBe(true);
+  });
+
+  it('does not show the wiki-disabled notice when the wiki is enabled', async () => {
+    const wrapper = await mountPage();
+
+    expect(wrapper.findComponent(InfoBanner).exists()).toBe(false);
   });
 
   it('submits the entered edit reason with the create mutation', async () => {

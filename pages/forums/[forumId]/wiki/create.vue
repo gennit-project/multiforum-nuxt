@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { DateTime } from 'luxon';
 import { useRoute, useRouter } from 'nuxt/app';
-import { useMutation } from '@vue/apollo-composable';
+import { useMutation, useQuery } from '@vue/apollo-composable';
 import { CREATE_WIKI_PAGE } from '@/graphQLData/channel/mutations';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import TextEditor from '@/components/TextEditor.vue';
 import TextInput from '@/components/TextInput.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import InfoBanner from '@/components/InfoBanner.vue';
 import GoBack from '@/components/GoBack.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
@@ -33,6 +36,25 @@ const {
   suspendedIndefinitely,
   channelId: suspensionChannelId,
 } = useChannelSuspensionNotice(forumId);
+
+// A forum can turn its wiki off; the create page should explain that rather
+// than rendering an editor whose submit the backend will reject. Reuse the
+// forum layout's channel query (cache-first) to read the flag.
+const { result: channelResult } = useQuery(
+  GET_CHANNEL,
+  computed(() => ({
+    uniqueName: forumId,
+    now: DateTime.utc().startOf('hour').toISO(),
+  })),
+  {
+    fetchPolicy: 'cache-first',
+    enabled: computed(() => !!forumId),
+  }
+);
+
+const wikiDisabled = computed(
+  () => channelResult.value?.channels?.[0]?.wikiEnabled === false
+);
 
 const wikiEditBlockedBySuspension = computed(() => {
   return !!usernameVar.value && !!activeSuspension.value;
@@ -61,6 +83,7 @@ const {
 
 // Handle form submission
 function handleSubmit() {
+  if (wikiDisabled.value) return;
   if (wikiEditBlockedBySuspension.value) return;
   if (!formValues.value.title || !formValues.value.body) return;
   const channelUpdateInput = {
@@ -115,6 +138,11 @@ onDone(() => {
         </div>
 
         <ErrorBanner v-if="creationError" :text="creationError.message" />
+        <InfoBanner
+          v-if="wikiDisabled"
+          data-testid="wiki-disabled-banner"
+          text="The wiki is disabled in this forum, so wiki pages cannot be created. A forum owner can enable it in the forum's settings."
+        />
         <SuspensionNotice
           v-if="showWikiEditSuspensionNotice"
           class="mb-4"
@@ -126,7 +154,7 @@ onDone(() => {
         />
 
         <form
-          v-if="!wikiEditBlockedBySuspension"
+          v-if="!wikiEditBlockedBySuspension && !wikiDisabled"
           class="space-y-6"
           @submit.prevent="handleSubmit"
         >
