@@ -106,12 +106,16 @@ export const GET_SERVER_HEALTH_DASHBOARD = gql`
     $endDate: String
     $channelUniqueNames: [String!]
     $limit: Int
+    $sortBy: String
+    $sortDirection: String
   ) {
     getServerHealthDashboard(
       startDate: $startDate
       endDate: $endDate
       channelUniqueNames: $channelUniqueNames
       limit: $limit
+      sortBy: $sortBy
+      sortDirection: $sortDirection
     ) {
       startDate
       endDate
@@ -142,6 +146,7 @@ export const GET_SERVER_HEALTH_DASHBOARD = gql`
         moderationActions
       }
       channelHealth {
+        id
         channelUniqueName
         displayName
         channelIconURL
