@@ -4,6 +4,7 @@ defineProps<{
   installedVersion?: string | null;
   registryVersions: string[];
   installing: boolean;
+  compatibility?: { compatible: boolean; reason?: string };
 }>();
 
 const emit = defineEmits<{
@@ -32,13 +33,19 @@ const emit = defineEmits<{
           <p v-if="registryVersions.length > 1" class="mt-1 text-xs">
             {{ registryVersions.length }} versions available in registry
           </p>
+          <p
+            v-if="compatibility?.compatible === false"
+            class="mt-1 text-xs text-blue-800 dark:text-blue-100"
+          >
+            {{ compatibility.reason }}
+          </p>
         </div>
       </div>
       <div class="ml-4">
         <button
           type="button"
           class="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          :disabled="installing"
+          :disabled="installing || compatibility?.compatible === false"
           @click="emit('install-latest')"
         >
           <i v-if="installing" class="fa-solid fa-spinner mr-1 animate-spin" />

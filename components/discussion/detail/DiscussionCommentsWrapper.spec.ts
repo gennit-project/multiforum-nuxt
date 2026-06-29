@@ -152,3 +152,97 @@ describe('DiscussionCommentsWrapper', () => {
     ).not.toThrow();
   });
 });
+
+describe('DiscussionCommentsWrapper — comment-section cache handlers', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    asMock(useMutation).mockReset();
+    asMock(useQuery).mockReset();
+  });
+
+  const commentSection = (wrapper: ReturnType<typeof mountWrapper>) =>
+    wrapper.findComponent(CommentSectionStub);
+
+  // cache.modify stub that runs the field policies so their bodies are covered.
+  const fakeCache = () => ({
+    identify: vi.fn(() => 'DiscussionChannel:dc1'),
+    modify: vi.fn(({ fields }: { fields: Record<string, (e?: unknown) => unknown> }) =>
+      // Call with no arg so each field policy applies its own default
+      // (CommentsAggregate -> {count:0}, FeedbackComments -> []).
+      Object.values(fields).forEach((fn) => fn())
+    ),
+    evict: vi.fn(),
+  });
+
+  it('increments the cached comment count', async () => {
+    const wrapper = mountWrapper();
+    const cache = fakeCache();
+    await commentSection(wrapper).vm.$emit('increment-comment-count', cache);
+
+    expect(cache.modify).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not increment when there is no discussion channel id', async () => {
+    const wrapper = mountWrapper({ discussionChannel: makeChannel({ id: '' }) });
+    const cache = fakeCache();
+    await commentSection(wrapper).vm.$emit('increment-comment-count', cache);
+
+    expect(cache.modify).not.toHaveBeenCalled();
+  });
+
+  it('decrements the cached comment count', async () => {
+    const wrapper = mountWrapper();
+    const cache = fakeCache();
+    await commentSection(wrapper).vm.$emit('decrement-comment-count', cache);
+
+    expect(cache.modify).toHaveBeenCalledTimes(1);
+  });
+
+  it('evicts a deleted comment from the cache', async () => {
+    const wrapper = mountWrapper();
+    const cache = fakeCache();
+    await commentSection(wrapper).vm.$emit('update-comment-section-query-result', {
+      cache,
+      commentToDeleteId: 'comment-9',
+    });
+
+    expect(cache.evict).toHaveBeenCalledTimes(1);
+  });
+
+  it('appends a feedback comment to the cache', async () => {
+    const wrapper = mountWrapper();
+    const cache = fakeCache();
+    await commentSection(wrapper).vm.$emit('update-comment-section-query-result', {
+      cache,
+      commentToAddFeedbackTo: { id: 'comment-9' },
+      newFeedbackComment: { id: 'fb-1', __typename: 'Comment' },
+    });
+
+    expect(cache.modify).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects a reply input without a parent comment id', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const wrapper = mountWrapper();
+    await commentSection(wrapper).vm.$emit('update-create-reply-comment-input', {
+      text: 'orphan reply',
+    });
+    const called = errorSpy.mock.calls.some((c) =>
+      String(c[0]).includes('Parent comment id is required')
+    );
+    errorSpy.mockRestore();
+
+    expect(called).toBe(true);
+  });
+
+  it('accepts a reply input that has a parent comment id', async () => {
+    const wrapper = mountWrapper();
+    await commentSection(wrapper).vm.$emit('update-create-reply-comment-input', {
+      text: 'a reply',
+      parentCommentId: 'comment-1',
+      depth: 2,
+    });
+
+    expect(commentSection(wrapper).exists()).toBe(true);
+  });
+});

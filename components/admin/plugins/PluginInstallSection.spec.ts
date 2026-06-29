@@ -54,6 +54,16 @@ describe('PluginInstallSection version select', () => {
     expect(wrapper.text()).toContain('(Latest)');
   });
 
+  it('marks incompatible versions', () => {
+    const wrapper = mountSection({
+      compatibilityByVersion: {
+        '2.0.0': { compatible: false, reason: 'Requires server >= 2.0.0' },
+      },
+    });
+
+    expect(wrapper.text()).toContain('Requires server >= 2.0.0');
+  });
+
   it('emits update:modelValue when the version changes', async () => {
     const wrapper = mountSection();
 
@@ -103,5 +113,19 @@ describe('PluginInstallSection install actions', () => {
     });
 
     expect(wrapper.text()).toContain('No other versions available');
+  });
+
+  it('disables install for an incompatible selected version', () => {
+    const wrapper = mountSection({
+      modelValue: '2.0.0',
+      isInstalled: true,
+      canInstall: true,
+      compatibilityByVersion: {
+        '2.0.0': { compatible: false, reason: 'Requires plugin API 2' },
+      },
+    });
+
+    expect(installButton(wrapper)?.attributes('disabled')).toBeDefined();
+    expect(wrapper.text()).toContain('Requires plugin API 2');
   });
 });

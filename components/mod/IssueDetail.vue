@@ -1,20 +1,14 @@
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
-import { useQuery, useMutation } from '@vue/apollo-composable';
+import { computed } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
 import { GET_ISSUE } from '@/graphQLData/issue/queries';
-import { DELETE_DISCUSSION } from '@/graphQLData/discussion/mutations';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { GET_EVENT } from '@/graphQLData/event/queries';
 import { GET_COMMENT } from '@/graphQLData/comment/queries';
-import { DELETE_EVENT } from '@/graphQLData/event/mutations';
-import { DELETE_COMMENT } from '@/graphQLData/comment/mutations';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { DateTime } from 'luxon';
-import type {
-  Issue as GeneratedIssue,
-  ModerationAction,
-} from '@/__generated__/graphql';
+import type { Issue as GeneratedIssue } from '@/__generated__/graphql';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import 'md-editor-v3/lib/style.css';
 import PageNotFound from '@/components/PageNotFound.vue';
@@ -28,33 +22,27 @@ import IssueBodyEditor from '@/components/mod/IssueBodyEditor.vue';
 import IssueRelatedContent from '@/components/mod/IssueRelatedContent.vue';
 import IssueRelatedChannel from '@/components/mod/IssueRelatedChannel.vue';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
-import { useRoute, useRouter } from 'nuxt/app';
+import { useRoute } from 'nuxt/app';
 import { config } from '@/config';
-import {
-  isCurrentUserOriginalPoster as isOriginalPoster,
-  getIssueActionVisibility,
-  getOriginalPoster,
-} from '@/utils/originalPoster';
 import {
   getReportCount,
   formatReportCountLabel,
   hasRelatedContent as checkHasRelatedContent,
-  isRelatedCommentAuthorBot,
-  resolveAuthorType,
 } from '@/utils/issueDetailDisplay';
 
 // Composables
+import { useIssueOriginalPoster } from '@/composables/useIssueOriginalPoster';
 import { useIssueCloseReopen } from '@/composables/useIssueCloseReopen';
-import { useIssueActivityFeed } from '@/composables/useIssueActivityFeed';
+import {
+  useIssueActivityFeed,
+  type FetchMoreIssue,
+} from '@/composables/useIssueActivityFeed';
 import { useIssueLock } from '@/composables/useIssueLock';
 import { useIssueBodyEdit } from '@/composables/useIssueBodyEdit';
-import {
-  SUBSCRIBE_TO_ISSUE,
-  UNSUBSCRIBE_FROM_ISSUE,
-} from '@/graphQLData/issue/mutations';
+import { useIssueModerationActions } from '@/composables/useIssueModerationActions';
+import { useIssueSubscription } from '@/composables/useIssueSubscription';
 import NotificationComponent from '@/components/NotificationComponent.vue';
 import IssueSubscriptionPanel from '@/components/mod/IssueSubscriptionPanel.vue';
-import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
 
@@ -86,7 +74,6 @@ const ACTIVITY_FEED_PAGE_SIZE = 10;
 
 // Setup
 const route = useRoute();
-const router = useRouter();
 
 // Route and issueNumber computations
 const channelId = computed(() => {
@@ -105,8 +92,6 @@ const issueNumber = computed(() => {
   }
   return null;
 });
-
-const lastActivityFeedBatchSize = ref(ACTIVITY_FEED_PAGE_SIZE);
 
 // Fetch issue data
 const {
@@ -152,9 +137,22 @@ const activeIssue = computed<Issue | null>(() => {
 });
 
 const activeIssueId = computed(() => activeIssue.value?.id || '');
-const showSubscribeCta = ref(route.query.subscribeCta === '1');
-const showIssueSubscriptionNotification = ref(false);
-const issueSubscriptionNotificationTitle = ref('');
+
+const {
+  isIssueSubscribed,
+  showSubscribeCta,
+  showIssueSubscriptionNotification,
+  issueSubscriptionNotificationTitle,
+  subscribeToIssueLoading,
+  unsubscribeFromIssueLoading,
+  toggleIssueSubscription,
+  dismissSubscribeCta,
+} = useIssueSubscription({
+  activeIssue,
+  username: computed(() => usernameVar.value),
+  refetchIssue,
+});
+
 const relatedDiscussionId = computed(
   () => activeIssue.value?.relatedDiscussionId || ''
 );
@@ -168,14 +166,6 @@ const relatedCommentId = computed(
 const relatedChannelUniqueName = computed(
   () => activeIssue.value?.relatedChannelUniqueName || ''
 );
-const isIssueSubscribed = computed(() => {
-  if (!usernameVar.value) return false;
-  return Boolean(
-    activeIssue.value?.SubscribedToNotifications?.some(
-      (user) => user.username === usernameVar.value
-    )
-  );
-});
 
 const { result: relatedDiscussionResult } = useQuery(
   GET_DISCUSSION,
@@ -226,77 +216,6 @@ const relatedComment = computed(() => {
   return relatedCommentResult.value?.comments?.[0] ?? null;
 });
 
-const activityFeedItems = computed<ModerationAction[]>(() => {
-  return activeIssue.value?.ActivityFeed ?? [];
-});
-
-onIssueResult((result) => {
-  const issue = result.data?.issues?.[0];
-  if (!issue) {
-    return;
-  }
-  lastActivityFeedBatchSize.value = issue.ActivityFeed?.length ?? 0;
-});
-
-const hasMoreActivityFeed = computed(() => {
-  return lastActivityFeedBatchSize.value === ACTIVITY_FEED_PAGE_SIZE;
-});
-
-const loadMoreActivityFeed = async () => {
-  if (getIssueLoading.value || !hasMoreActivityFeed.value) {
-    return;
-  }
-
-  const previousCount = activityFeedItems.value.length;
-  const result = await fetchMoreIssue({
-    variables: {
-      channelUniqueName: channelId.value,
-      issueNumber: issueNumber.value,
-      activityFeedLimit: ACTIVITY_FEED_PAGE_SIZE,
-      activityFeedOffset: previousCount,
-    },
-    updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult?.issues?.[0]) {
-        return previousResult;
-      }
-
-      const prevIssue = previousResult.issues[0];
-      const nextIssue = fetchMoreResult.issues[0];
-      const prevFeed = prevIssue.ActivityFeed ?? [];
-      const nextFeed = nextIssue.ActivityFeed ?? [];
-
-      return {
-        ...previousResult,
-        issues: [
-          {
-            ...prevIssue,
-            ActivityFeed: [...prevFeed, ...nextFeed],
-          },
-        ],
-      };
-    },
-  });
-
-  const newCount =
-    result?.data?.issues?.[0]?.ActivityFeed?.length ?? previousCount;
-  lastActivityFeedBatchSize.value = Math.max(newCount - previousCount, 0);
-};
-
-const resetActivityFeed = async () => {
-  lastActivityFeedBatchSize.value = ACTIVITY_FEED_PAGE_SIZE;
-  await refetchIssue();
-};
-
-const clearSubscribeCtaQuery = async () => {
-  if (route.query.subscribeCta !== '1') {
-    return;
-  }
-
-  const nextQuery = { ...route.query };
-  delete nextQuery.subscribeCta;
-  await router.replace({ query: nextQuery });
-};
-
 const isIssueAuthor = computed(() => {
   const author = activeIssue.value?.Author;
   if (!author) return false;
@@ -314,39 +233,6 @@ const isIssueAuthor = computed(() => {
 
   return false;
 });
-
-const {
-  mutate: subscribeToIssue,
-  loading: subscribeToIssueLoading,
-} = useMutation(SUBSCRIBE_TO_ISSUE);
-
-const {
-  mutate: unsubscribeFromIssue,
-  loading: unsubscribeFromIssueLoading,
-} = useMutation(UNSUBSCRIBE_FROM_ISSUE);
-
-const toggleIssueSubscription = async () => {
-  if (!activeIssue.value?.id || !usernameVar.value) return;
-
-  if (isIssueSubscribed.value) {
-    await unsubscribeFromIssue({ issueId: activeIssue.value.id });
-    issueSubscriptionNotificationTitle.value =
-      'Unsubscribed from issue updates';
-  } else {
-    await subscribeToIssue({ issueId: activeIssue.value.id });
-    issueSubscriptionNotificationTitle.value = 'Subscribed to issue updates';
-  }
-
-  showIssueSubscriptionNotification.value = true;
-  showSubscribeCta.value = false;
-  await clearSubscribeCtaQuery();
-  await refetchIssue();
-};
-
-const dismissSubscribeCta = async () => {
-  showSubscribeCta.value = false;
-  await clearSubscribeCtaQuery();
-};
 
 const isLocked = computed(() => activeIssue.value?.locked === true);
 
@@ -367,13 +253,6 @@ const isSuspendedMod = computed(() => {
   return modPermissions.value.isSuspendedMod ?? false;
 });
 
-const authorType = computed(() =>
-  resolveAuthorType({
-    modProfileName: resolvedOriginalModProfileName.value,
-    username: resolvedOriginalAuthorUsername.value,
-  })
-);
-
 // Use composables
 const { closeIssue, closeIssueLoading, reopenIssue, reopenIssueLoading } =
   useIssueCloseReopen({
@@ -390,7 +269,22 @@ const {
   addIssueActivityFeedItemWithCommentAsUser,
   addIssueActivityFeedItemWithCommentAsUserLoading,
   addIssueActivityFeedItemWithCommentAsUserError,
-} = useIssueActivityFeed({ channelId, activityFeedLimit: ACTIVITY_FEED_PAGE_SIZE });
+  activityFeedItems,
+  hasMoreActivityFeed,
+  loadMoreActivityFeed,
+  resetActivityFeed,
+} = useIssueActivityFeed({
+  channelId,
+  activityFeedLimit: ACTIVITY_FEED_PAGE_SIZE,
+  issueNumber,
+  activeIssue,
+  getIssueLoading,
+  // Apollo's fetchMore is generic over its data/variables; narrow it to the
+  // composable's concrete merge shape (variables + updateQuery are identical).
+  fetchMoreIssue: fetchMoreIssue as unknown as FetchMoreIssue,
+  refetchIssue,
+  onIssueResult,
+});
 
 const {
   lockReasonInput,
@@ -428,15 +322,6 @@ const {
   refetchIssue: resetActivityFeed,
 });
 
-const { mutate: deleteDiscussion } = useMutation(DELETE_DISCUSSION);
-const { mutate: deleteEvent } = useMutation(DELETE_EVENT);
-const { mutate: deleteComment } = useMutation(DELETE_COMMENT);
-
-// Form values for creating comments
-const createCommentDefaultValues = { text: '', isRootComment: true, depth: 1 };
-const createFormValues = ref(createCommentDefaultValues);
-const deleteReasonError = ref('');
-
 const issue = computed<Issue | null>(() => activeIssue.value || null);
 
 const hasRelatedContent = computed(() =>
@@ -455,297 +340,52 @@ const shouldShowIssueDetailsSection = computed(() => {
   );
 });
 
-const derivedOriginalPoster = computed(() => {
-  const author = getOriginalPoster({
-    Discussion: relatedDiscussion.value,
-    Event: relatedEvent.value,
-    Comment: relatedComment.value,
-  });
-  if (author.username || author.modProfileName) {
-    return author;
-  }
-
-  return { username: '', modProfileName: '' };
+const {
+  isAuthorBot,
+  resolvedOriginalAuthorUsername,
+  resolvedOriginalModProfileName,
+  isOriginalUserAuthor,
+  isOriginalModAuthor,
+  isCurrentUserOriginalPoster,
+  authorType,
+  issueActionVisibility,
+} = useIssueOriginalPoster({
+  relatedDiscussion,
+  relatedEvent,
+  relatedComment,
+  username: computed(() => usernameVar.value),
+  modProfileName: computed(() => modProfileNameVar.value),
+  hasRelatedContent,
 });
 
-// Check if the original author is a bot
-const isAuthorBot = computed(() =>
-  isRelatedCommentAuthorBot(relatedComment.value)
-);
-
-const resolvedOriginalAuthorUsername = computed(() => {
-  return derivedOriginalPoster.value.username || '';
+const {
+  createFormValues,
+  deleteReasonError,
+  updateComment,
+  handleCreateComment,
+  toggleCloseOpenIssue,
+  handleDeleteRelatedContent,
+} = useIssueModerationActions({
+  activeIssue,
+  channelId,
+  username: computed(() => usernameVar.value),
+  modProfileName: computed(() => modProfileNameVar.value),
+  isSuspendedMod,
+  isOriginalUserAuthor,
+  isOriginalModAuthor,
+  isCurrentUserOriginalPoster,
+  closeIssue,
+  reopenIssue,
+  addIssueActivityFeedItem,
+  addIssueActivityFeedItemWithCommentAsMod,
+  addIssueActivityFeedItemWithCommentAsUser,
+  resetActivityFeed,
+  refetchChannel,
 });
-
-const resolvedOriginalModProfileName = computed(() => {
-  return derivedOriginalPoster.value.modProfileName || '';
-});
-
-// Determine if the current user is the original author via username
-const isOriginalUserAuthor = computed(() => {
-  return (
-    !!usernameVar.value && resolvedOriginalAuthorUsername.value === usernameVar.value
-  );
-});
-
-// Determine if the current user is the original author via mod profile
-const isOriginalModAuthor = computed(() => {
-  return (
-    !!modProfileNameVar.value &&
-    resolvedOriginalModProfileName.value === modProfileNameVar.value
-  );
-});
-
-// Determine if the current user is the original poster (either as user or mod)
-const isCurrentUserOriginalPoster = computed(() => {
-  return isOriginalPoster({
-    originalAuthorUsername: resolvedOriginalAuthorUsername.value,
-    originalModProfileName: resolvedOriginalModProfileName.value,
-    currentUsername: usernameVar.value,
-    currentModProfileName: modProfileNameVar.value,
-  });
-});
-
-const issueActionVisibility = computed(() => {
-  return getIssueActionVisibility({
-    hasRelatedContent: hasRelatedContent.value,
-    isOriginalPoster: isCurrentUserOriginalPoster.value,
-  });
-});
-
-const updateComment = (text: string) => {
-  createFormValues.value.text = text;
-};
-
-const handleCreateComment = async () => {
-  if (!activeIssue.value) return;
-  if (isSuspendedMod.value && !isOriginalUserAuthor.value) {
-    return;
-  }
-
-  // Case 1: Current user is the original author who posted as a regular user
-  if (isOriginalUserAuthor.value) {
-    await addIssueActivityFeedItemWithCommentAsUser({
-      issueId: activeIssue.value.id,
-      commentText: createFormValues.value.text,
-      username: usernameVar.value,
-      actionDescription: 'commented on the issue',
-      actionType: 'comment',
-      channelUniqueName: channelId.value,
-    });
-  }
-  // Case 2: Current user is the original author who posted as a mod
-  else if (isOriginalModAuthor.value) {
-    if (!modProfileNameVar.value) return;
-    await addIssueActivityFeedItemWithCommentAsMod({
-      issueId: activeIssue.value.id,
-      commentText: createFormValues.value.text,
-      displayName: modProfileNameVar.value,
-      actionDescription: 'commented on the issue',
-      actionType: 'comment',
-      channelUniqueName: channelId.value,
-    });
-  }
-  // Case 3: Current user is not the original author - comment as mod
-  else {
-    if (!modProfileNameVar.value) return;
-    await addIssueActivityFeedItemWithCommentAsMod({
-      issueId: activeIssue.value.id,
-      commentText: createFormValues.value.text,
-      displayName: modProfileNameVar.value,
-      actionDescription: 'commented on the issue',
-      actionType: 'comment',
-      channelUniqueName: channelId.value,
-    });
-  }
-
-  createFormValues.value.text = '';
-  await resetActivityFeed();
-};
-
-const toggleCloseOpenIssue = async () => {
-  if (!activeIssue.value || !modProfileNameVar.value) return;
-  if (isSuspendedMod.value) return;
-
-  try {
-    if (activeIssue.value.isOpen) {
-      // Close the issue
-      await closeIssue();
-
-      if (createFormValues.value.text) {
-        await addIssueActivityFeedItemWithCommentAsMod({
-          issueId: activeIssue.value.id,
-          displayName: modProfileNameVar.value,
-          actionDescription: 'closed the issue',
-          actionType: 'close',
-          commentText: createFormValues.value.text,
-          channelUniqueName: channelId.value,
-        });
-      } else {
-        await addIssueActivityFeedItem({
-          issueId: activeIssue.value.id,
-          displayName: modProfileNameVar.value,
-          actionDescription: 'closed the issue',
-          actionType: 'close',
-        });
-      }
-    } else {
-      // Reopen the issue
-      await reopenIssue();
-
-      if (createFormValues.value.text) {
-        await addIssueActivityFeedItemWithCommentAsMod({
-          issueId: activeIssue.value.id,
-          displayName: modProfileNameVar.value,
-          actionDescription: 'reopened the issue',
-          actionType: 'reopen',
-          commentText: createFormValues.value.text,
-          channelUniqueName: channelId.value,
-        });
-      } else {
-        await addIssueActivityFeedItem({
-          issueId: activeIssue.value.id,
-          displayName: modProfileNameVar.value,
-          actionDescription: 'reopened the issue',
-          actionType: 'reopen',
-        });
-      }
-    }
-
-    // Refetch channel data to update issue counts in the UI
-    try {
-      await refetchChannel();
-    } catch (error) {
-      console.error('Error refetching channel data:', error);
-    }
-
-    // Reset comment form
-    createFormValues.value.text = '';
-    await resetActivityFeed();
-  } catch (error) {
-    console.error('Error toggling issue open/close state:', error);
-  }
-};
-
-const resolveDeleteReason = () => {
-  const trimmedReason = createFormValues.value.text.trim();
-  return trimmedReason || 'No reason provided.';
-};
-
-const requireDeleteReasonIfNotOp = () => {
-  deleteReasonError.value = '';
-  if (isCurrentUserOriginalPoster.value) {
-    return true;
-  }
-  if (!createFormValues.value.text.trim()) {
-    deleteReasonError.value = 'Please provide a reason before deleting.';
-    return false;
-  }
-  return true;
-};
-
-// Handle delete actions from Original Poster Actions
-const handleDeleteDiscussion = async (discussionId: string) => {
-  if (!discussionId) return;
-  if (!requireDeleteReasonIfNotOp()) return;
-
-  try {
-    if (modProfileNameVar.value && activeIssue.value) {
-      if (activeIssue.value.isOpen) {
-        await closeIssue();
-      }
-
-      await addIssueActivityFeedItemWithCommentAsMod({
-        issueId: activeIssue.value.id,
-        displayName: modProfileNameVar.value,
-        actionDescription: 'deleted the discussion',
-        actionType: 'delete',
-        commentText: resolveDeleteReason(),
-        channelUniqueName: channelId.value,
-      });
-    }
-
-    await deleteDiscussion({ id: discussionId });
-    createFormValues.value.text = '';
-    deleteReasonError.value = '';
-    await resetActivityFeed();
-  } catch (error) {
-    console.error('Error deleting discussion:', error);
-  }
-};
-
-const handleDeleteEvent = async (eventId: string) => {
-  if (!eventId) return;
-  if (!requireDeleteReasonIfNotOp()) return;
-
-  try {
-    if (modProfileNameVar.value && activeIssue.value) {
-      if (activeIssue.value.isOpen) {
-        await closeIssue();
-      }
-
-      await addIssueActivityFeedItemWithCommentAsMod({
-        issueId: activeIssue.value.id,
-        displayName: modProfileNameVar.value,
-        actionDescription: 'deleted the event',
-        actionType: 'delete',
-        commentText: resolveDeleteReason(),
-        channelUniqueName: channelId.value,
-      });
-    }
-
-    await deleteEvent({ id: eventId });
-    createFormValues.value.text = '';
-    deleteReasonError.value = '';
-    await resetActivityFeed();
-  } catch (error) {
-    console.error('Error deleting event:', error);
-  }
-};
-
-const handleDeleteComment = async (commentId: string) => {
-  if (!commentId) return;
-  if (!requireDeleteReasonIfNotOp()) return;
-
-  try {
-    if (modProfileNameVar.value && activeIssue.value) {
-      if (activeIssue.value.isOpen) {
-        await closeIssue();
-      }
-
-      await addIssueActivityFeedItemWithCommentAsMod({
-        issueId: activeIssue.value.id,
-        displayName: modProfileNameVar.value,
-        actionDescription: 'deleted the comment',
-        actionType: 'delete',
-        commentText: resolveDeleteReason(),
-        channelUniqueName: channelId.value,
-      });
-    }
-
-    await deleteComment({ id: commentId });
-    createFormValues.value.text = '';
-    deleteReasonError.value = '';
-    await resetActivityFeed();
-  } catch (error) {
-    console.error('Error deleting comment:', error);
-  }
-};
 
 const handleLockReasonUpdate = (value: string) => {
   lockReasonInput.value = value;
 };
-
-// Handle ?action=unsubscribe query param for one-click unsubscribe from notifications
-const issueIdRef = computed(() => activeIssue.value?.id || null);
-useAutoUnsubscribe({
-  entityId: issueIdRef,
-  unsubscribeFn: async (id: string) => {
-    await unsubscribeFromIssue({ issueId: id });
-  },
-  entityType: 'issue',
-  isSubscribed: isIssueSubscribed,
-});
 </script>
 
 <template>
@@ -927,9 +567,9 @@ useAutoUnsubscribe({
             :actions-disabled="!issueActionVisibility.opActionsEnabled"
             :is-locked="isLocked"
             :is-closed="!activeIssue?.isOpen"
-            @delete-discussion="handleDeleteDiscussion"
-            @delete-event="handleDeleteEvent"
-            @delete-comment="handleDeleteComment"
+            @delete-discussion="(id: string) => handleDeleteRelatedContent('discussion', id)"
+            @delete-event="(id: string) => handleDeleteRelatedContent('event', id)"
+            @delete-comment="(id: string) => handleDeleteRelatedContent('comment', id)"
           />
 
           <IssueCommentForm

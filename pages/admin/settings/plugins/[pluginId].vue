@@ -29,6 +29,10 @@ import {
   validateRequiredSettings,
 } from '@/utils/pluginVersionUtils';
 import {
+  getPluginVersionCompatibility,
+  type PluginVersionCompatibility,
+} from '@/utils/pluginCompatibility';
+import {
   getPluginFormSections,
   stringifyManifest,
 } from '@/utils/pluginManifestUtils';
@@ -105,6 +109,12 @@ interface InstalledPlugin {
   settingsJson: Record<string, unknown>;
   readmeMarkdown?: string;
   manifest?: PluginManifest;
+  registryUrl?: string | null;
+  releaseNotesUrl?: string | null;
+  sourceRepoUrl?: string | null;
+  sourceCommit?: string | null;
+  minServerVersion?: string | null;
+  apiVersion?: string | null;
   hasUpdate?: boolean;
   latestVersion?: string;
   availableVersions?: string[];
@@ -155,6 +165,12 @@ interface PluginFromQuery {
     version: string;
     repoUrl?: string;
     readmeMarkdown?: string;
+    registryUrl?: string | null;
+    releaseNotesUrl?: string | null;
+    sourceRepoUrl?: string | null;
+    sourceCommit?: string | null;
+    minServerVersion?: string | null;
+    apiVersion?: string | null;
   }>;
 }
 
@@ -250,13 +266,44 @@ const secretStatusesForForm = computed((): PluginSecretStatusType[] => {
 });
 
 const pluginRepoUrl = computed(() => {
-  // Get repo URL from the installed version or manifest
+  if (installedPlugin.value?.sourceRepoUrl) {
+    return installedPlugin.value.sourceRepoUrl;
+  }
+
+  // Get repo URL from the selected/installed version or manifest
   const versions = plugin.value?.Versions || [];
   const currentVersion = versions.find(
-    (v) => v.version === installedVersion.value
+    (v) => v.version === (selectedVersion.value || installedVersion.value)
   );
-  return currentVersion?.repoUrl;
+  return currentVersion?.sourceRepoUrl || currentVersion?.repoUrl;
 });
+
+const selectedVersionMetadata = computed(() => {
+  const versions = plugin.value?.Versions || [];
+  return versions.find(
+    (v) => v.version === (selectedVersion.value || installedVersion.value)
+  );
+});
+
+const pluginRegistryUrl = computed(
+  () => installedPlugin.value?.registryUrl || selectedVersionMetadata.value?.registryUrl
+);
+const pluginReleaseNotesUrl = computed(
+  () =>
+    installedPlugin.value?.releaseNotesUrl ||
+    selectedVersionMetadata.value?.releaseNotesUrl
+);
+const pluginSourceCommit = computed(
+  () => installedPlugin.value?.sourceCommit || selectedVersionMetadata.value?.sourceCommit
+);
+const pluginMinServerVersion = computed(
+  () =>
+    installedPlugin.value?.minServerVersion ||
+    selectedVersionMetadata.value?.minServerVersion
+);
+const pluginApiVersion = computed(
+  () => installedPlugin.value?.apiVersion || selectedVersionMetadata.value?.apiVersion
+);
 
 const canEnable = computed(() =>
   canEnablePlugin({ isInstalled: isInstalled.value, secrets: secrets.value })
@@ -264,6 +311,16 @@ const canEnable = computed(() =>
 
 const availableVersions = computed(() =>
   sortVersionsDescending(plugin.value?.Versions || [])
+);
+
+const compatibilityByVersion = computed(() =>
+  availableVersions.value.reduce(
+    (compatibilityMap, version) => {
+      compatibilityMap[version.version] = getPluginVersionCompatibility(version);
+      return compatibilityMap;
+    },
+    {} as Record<string, PluginVersionCompatibility>
+  )
 );
 
 const installedVersion = computed(() => {
@@ -289,8 +346,20 @@ const registryVersions = computed(
 const shouldAutoUpdate = computed(() => route.query.update === 'true');
 
 const canInstall = computed(() => {
-  return !isSelectedVersionInstalled.value && !!selectedVersion.value;
+  const selectedCompatibility =
+    compatibilityByVersion.value[selectedVersion.value];
+  return (
+    !isSelectedVersionInstalled.value &&
+    !!selectedVersion.value &&
+    selectedCompatibility?.compatible !== false
+  );
 });
+
+const latestVersionCompatibility = computed(() =>
+  latestVersion.value
+    ? compatibilityByVersion.value[latestVersion.value]
+    : undefined
+);
 
 // Get full manifest JSON for display
 const manifestJson = computed(() =>
@@ -339,6 +408,12 @@ const handleInstall = async (versionOverride?: string) => {
   const versionToInstall = versionOverride || selectedVersion.value;
   if (!versionToInstall) {
     installError.value = 'No version selected';
+    return;
+  }
+
+  const compatibility = compatibilityByVersion.value[versionToInstall];
+  if (compatibility?.compatible === false) {
+    installError.value = compatibility.reason;
     return;
   }
 
@@ -534,6 +609,11 @@ const handleSaveSettings = async () => {
             :plugin-homepage="pluginHomepage"
             :plugin-repo-url="pluginRepoUrl"
             :plugin-tags="pluginTags"
+            :plugin-registry-url="pluginRegistryUrl"
+            :plugin-release-notes-url="pluginReleaseNotesUrl"
+            :plugin-source-commit="pluginSourceCommit"
+            :plugin-min-server-version="pluginMinServerVersion"
+            :plugin-api-version="pluginApiVersion"
           />
 
           <!-- Prominent Status Cards (only shown when installed) -->
@@ -553,6 +633,7 @@ const handleSaveSettings = async () => {
             :installed-version="installedVersion"
             :registry-versions="registryVersions"
             :installing="installing"
+            :compatibility="latestVersionCompatibility"
             @install-latest="handleInstall(latestVersion!)"
           />
 
@@ -570,6 +651,7 @@ const handleSaveSettings = async () => {
             :can-install="canInstall"
             :is-selected-version-installed="isSelectedVersionInstalled"
             :has-newer-versions="hasNewerVersions"
+            :compatibility-by-version="compatibilityByVersion"
             @install="handleInstall()"
           />
 

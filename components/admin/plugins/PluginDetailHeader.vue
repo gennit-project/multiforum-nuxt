@@ -9,6 +9,11 @@ defineProps<{
   pluginHomepage?: string | null;
   pluginRepoUrl?: string | null;
   pluginTags: string[];
+  pluginRegistryUrl?: string | null;
+  pluginReleaseNotesUrl?: string | null;
+  pluginSourceCommit?: string | null;
+  pluginMinServerVersion?: string | null;
+  pluginApiVersion?: string | null;
 }>();
 </script>
 
@@ -93,6 +98,55 @@ defineProps<{
         <i class="fa-solid fa-code mr-1" />
         View Source
       </a>
+      <a
+        v-if="pluginReleaseNotesUrl"
+        :href="pluginReleaseNotesUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex items-center text-orange-600 hover:underline dark:text-orange-400"
+      >
+        <i class="fa-solid fa-scroll mr-1" />
+        Release Notes
+      </a>
+    </div>
+
+    <div
+      v-if="
+        pluginRegistryUrl ||
+          pluginSourceCommit ||
+          pluginMinServerVersion ||
+          pluginApiVersion
+      "
+      class="mt-3 flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-300"
+    >
+      <a
+        v-if="pluginRegistryUrl"
+        :href="pluginRegistryUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="rounded bg-gray-100 px-2 py-1 hover:underline dark:bg-gray-800"
+      >
+        Registry
+      </a>
+      <span
+        v-if="pluginSourceCommit"
+        class="rounded bg-gray-100 px-2 py-1 font-mono dark:bg-gray-800"
+        :title="pluginSourceCommit"
+      >
+        {{ pluginSourceCommit.slice(0, 12) }}
+      </span>
+      <span
+        v-if="pluginApiVersion"
+        class="rounded bg-gray-100 px-2 py-1 dark:bg-gray-800"
+      >
+        API {{ pluginApiVersion }}
+      </span>
+      <span
+        v-if="pluginMinServerVersion"
+        class="rounded bg-gray-100 px-2 py-1 dark:bg-gray-800"
+      >
+        Server >= {{ pluginMinServerVersion }}
+      </span>
     </div>
 
     <div v-if="pluginTags.length > 0" class="mt-3 flex flex-wrap gap-2">

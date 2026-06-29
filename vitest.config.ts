@@ -32,6 +32,7 @@ export default defineConfig({
       '.nuxt/**',
       'dist/**',
       'coverage/**',
+      '.claude/**',
       'tests/playwright/**',
     ],
     deps: {
@@ -60,6 +61,7 @@ export default defineConfig({
         '.nuxt/',
         'dist/',
         'coverage/',
+        '.claude/',
         '**/*.spec.ts',
         '**/*.test.ts',
         '**/*.spec.js',

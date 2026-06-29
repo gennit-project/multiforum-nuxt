@@ -425,6 +425,12 @@ export const GET_AVAILABLE_PLUGINS = gql`
       Versions {
         id
         version
+        registryUrl
+        releaseNotesUrl
+        sourceRepoUrl
+        sourceCommit
+        minServerVersion
+        apiVersion
       }
     }
   }
@@ -449,6 +455,12 @@ export const GET_INSTALLED_PLUGINS = gql`
       enabled
       settingsJson
       readmeMarkdown
+      registryUrl
+      releaseNotesUrl
+      sourceRepoUrl
+      sourceCommit
+      minServerVersion
+      apiVersion
       manifest
       hasUpdate
       latestVersion
@@ -485,6 +497,12 @@ export const GET_PLUGIN_MANAGEMENT_DATA = gql`
         version
         repoUrl
         entryPath
+        registryUrl
+        releaseNotesUrl
+        sourceRepoUrl
+        sourceCommit
+        minServerVersion
+        apiVersion
       }
     }
     serverConfigs(where: { serverName: $serverName }) {
@@ -531,6 +549,12 @@ export const GET_PLUGIN_MANAGEMENT_DATA = gql`
       enabled
       settingsJson
       readmeMarkdown
+      registryUrl
+      releaseNotesUrl
+      sourceRepoUrl
+      sourceCommit
+      minServerVersion
+      apiVersion
       manifest
       hasUpdate
       latestVersion
@@ -557,6 +581,12 @@ export const GET_PLUGIN_DETAIL = gql`
         repoUrl
         entryPath
         readmeMarkdown
+        registryUrl
+        releaseNotesUrl
+        sourceRepoUrl
+        sourceCommit
+        minServerVersion
+        apiVersion
         manifest
       }
     }

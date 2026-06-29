@@ -7,6 +7,7 @@ import { useToast } from '@/composables/useToast';
 import {
   ALLOW_PLUGIN,
   DISALLOW_PLUGIN,
+  INSTALL_PLUGIN_VERSION,
 } from '@/graphQLData/admin/mutations';
 import {
   GET_PLUGIN_MANAGEMENT_DATA,
@@ -14,6 +15,10 @@ import {
 } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
 import type { Plugin, PluginVersion } from '@/__generated__/graphql';
+import {
+  getPluginVersionCompatibility,
+  type PluginVersionCompatibility,
+} from '@/utils/pluginCompatibility';
 
 // Toast notifications
 const toast = useToast();
@@ -21,6 +26,7 @@ const toast = useToast();
 // Per-plugin loading states
 const allowingPluginIds = ref<Set<string>>(new Set());
 const disallowingPluginIds = ref<Set<string>>(new Set());
+const upgradingPluginIds = ref<Set<string>>(new Set());
 
 // Search and filter state
 const searchQuery = ref('');
@@ -45,10 +51,15 @@ interface PluginState {
     enabled: boolean;
     settings: Record<string, unknown>;
   };
-  availableVersions: PluginVersion[];
+  availableVersions: PluginVersionMetadata[];
   hasUpdate?: boolean;
   latestVersion?: string;
 }
+
+type PluginVersionMetadata = Pick<PluginVersion, 'version'> & {
+  apiVersion?: string | null;
+  minServerVersion?: string | null;
+};
 
 interface InstalledPlugin {
   plugin: {
@@ -219,6 +230,9 @@ const toggleSort = (field: 'name' | 'status') => {
 // Plugin management mutations
 const { mutate: allowPluginMutation } = useMutation(ALLOW_PLUGIN);
 const { mutate: disallowPluginMutation } = useMutation(DISALLOW_PLUGIN);
+const { mutate: installPluginVersionMutation } = useMutation(
+  INSTALL_PLUGIN_VERSION
+);
 
 const allowPlugin = async (pluginId: string) => {
   allowingPluginIds.value.add(pluginId);
@@ -258,9 +272,52 @@ const disallowPlugin = async (pluginId: string) => {
   }
 };
 
+const getLatestVersionCompatibility = (
+  plugin: PluginState
+): PluginVersionCompatibility => {
+  const latestVersion = plugin.latestVersion;
+  if (!latestVersion) return { compatible: true };
+  const versionMetadata = plugin.availableVersions.find(
+    (version) => version.version === latestVersion
+  );
+  return getPluginVersionCompatibility(versionMetadata || {});
+};
+
+const upgradePlugin = async (plugin: PluginState) => {
+  if (!plugin.latestVersion) {
+    toast.error('No upgrade version is available for this plugin.');
+    return;
+  }
+
+  const compatibility = getLatestVersionCompatibility(plugin);
+  if (!compatibility.compatible) {
+    toast.error(compatibility.reason);
+    return;
+  }
+
+  upgradingPluginIds.value.add(plugin.id);
+  try {
+    await installPluginVersionMutation({
+      pluginId: plugin.id,
+      version: plugin.latestVersion,
+    });
+    await refetchPluginManagement();
+    await refetchInstalledPlugins();
+    toast.success(`Plugin upgraded to v${plugin.latestVersion}`);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    toast.error(`Error upgrading plugin: ${message}`);
+  } finally {
+    upgradingPluginIds.value.delete(plugin.id);
+  }
+};
+
 // Helper functions to check loading state for a specific plugin
 const isAllowingPlugin = (pluginId: string) => allowingPluginIds.value.has(pluginId);
 const isDisallowingPlugin = (pluginId: string) => disallowingPluginIds.value.has(pluginId);
+const isUpgradingPlugin = (pluginId: string) => upgradingPluginIds.value.has(pluginId);
+const canUpgradePlugin = (plugin: PluginState) =>
+  getLatestVersionCompatibility(plugin).compatible;
 
 // Refresh data when component mounts to catch any changes from detail pages
 onMounted(() => {
@@ -537,14 +594,21 @@ const handlePluginsRefreshed = async () => {
                       plugin.status === 'installed_disabled'
                     "
                   >
-                    <NuxtLink
+                    <button
                       v-if="plugin.hasUpdate"
-                      :to="`/admin/plugins/${plugin.id}?update=true`"
-                      class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                      type="button"
+                      class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50"
+                      :disabled="isUpgradingPlugin(plugin.id) || !canUpgradePlugin(plugin)"
+                      :title="getLatestVersionCompatibility(plugin).reason"
+                      @click="upgradePlugin(plugin)"
                     >
-                      <i class="fa-solid fa-arrow-up mr-1" />
-                      Update
-                    </NuxtLink>
+                      <i
+                        v-if="isUpgradingPlugin(plugin.id)"
+                        class="fa-solid fa-spinner mr-1 animate-spin"
+                      />
+                      <i v-else class="fa-solid fa-arrow-up mr-1" />
+                      Upgrade
+                    </button>
                     <NuxtLink
                       :to="`/admin/plugins/${plugin.id}`"
                       class="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"

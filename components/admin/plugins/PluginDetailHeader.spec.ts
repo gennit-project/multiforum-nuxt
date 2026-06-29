@@ -60,6 +60,26 @@ describe('PluginDetailHeader', () => {
     expect(wrapper.find('a[href="https://x/repo"]').exists()).toBe(true);
   });
 
+  it('shows release and registry metadata', () => {
+    const wrapper = mountHeader({
+      pluginReleaseNotesUrl: 'https://x/releases/v1',
+      pluginRegistryUrl: 'https://x/registry.json',
+      pluginSourceCommit: '1234567890abcdef',
+      pluginApiVersion: '1',
+      pluginMinServerVersion: '0.8.0',
+    });
+
+    expect(wrapper.find('a[href="https://x/releases/v1"]').text()).toContain(
+      'Release Notes'
+    );
+    expect(wrapper.find('a[href="https://x/registry.json"]').text()).toContain(
+      'Registry'
+    );
+    expect(wrapper.text()).toContain('1234567890ab');
+    expect(wrapper.text()).toContain('API 1');
+    expect(wrapper.text()).toContain('Server >= 0.8.0');
+  });
+
   it('renders the tags', () => {
     const wrapper = mountHeader({ pluginTags: ['ai', 'moderation'] });
 

@@ -118,7 +118,7 @@ export function generateOccurrences(
     const startDay = startDt.weekday % 7;
     if (!pattern.daysOfWeek.includes(startDay)) {
       // Start doesn't match selected days - find first valid day
-      let currentDt = getNextWeeklyOccurrence(
+      let currentDt: DateTime<boolean> = getNextWeeklyOccurrence(
         startDt.minus({ days: 1 }),
         pattern.daysOfWeek,
         1
@@ -172,8 +172,10 @@ export function generateOccurrences(
   // Add first occurrence
   occurrences.push({ startTime, endTime });
 
-  // Generate subsequent occurrences
-  let currentDt: DateTime = startDt;
+  // Generate subsequent occurrences. Typed as DateTime<boolean> because
+  // getNextDate returns a DateTime of statically-unknown validity (luxon 3.7+
+  // distinguishes DateTime<boolean> from DateTime<true> | DateTime<false>).
+  let currentDt: DateTime<boolean> = startDt;
 
   while (occurrences.length < maxOccurrences) {
     currentDt = getNextDate(currentDt, pattern);

@@ -71,7 +71,11 @@ describe('ModerationWizard', () => {
               '<div data-testid="suspend-mod-button" :data-disabled="String(disabled)"></div>',
             props: ['disabled'],
           },
-          EditContentModal: true,
+          EditContentModal: {
+            props: ['open'],
+            template:
+              '<div data-testid="edit-modal" :data-open="String(open)" @click="$emit(\'saved\')" />',
+          },
         },
       },
     });
@@ -112,5 +116,73 @@ describe('ModerationWizard', () => {
     expect(
       wrapper.get('[data-testid="archive-button"]').attributes('data-disabled')
     ).toBe('false');
+  });
+
+  const reportedComment = {
+    commentId: 'comment-1',
+    reportCount: 1,
+    isSuspendedMod: false,
+    canEditComments: true,
+  };
+  const reportedDiscussion = {
+    commentId: undefined,
+    discussionId: 'd1',
+    reportCount: 1,
+    isSuspendedMod: false,
+    canEditDiscussions: true,
+  };
+
+  it('offers the edit-comment action for a reported comment', () => {
+    const wrapper = mountWrapper(reportedComment);
+
+    expect(wrapper.find('[data-test="edit-comment"]').exists()).toBe(true);
+  });
+
+  it('offers the edit-discussion action for a reported discussion', () => {
+    const wrapper = mountWrapper(reportedDiscussion);
+
+    expect(wrapper.find('[data-test="edit-discussion"]').exists()).toBe(true);
+  });
+
+  it('hides edit actions for an event', () => {
+    const wrapper = mountWrapper({
+      commentId: undefined,
+      eventId: 'e1',
+      reportCount: 1,
+      isSuspendedMod: false,
+      canEditEvents: true,
+    });
+
+    expect(wrapper.find('[data-test="edit-event"]').exists()).toBe(false);
+  });
+
+  it('hides edit actions when the content has not been reported', () => {
+    const wrapper = mountWrapper({ ...reportedComment, reportCount: 0 });
+
+    expect(wrapper.find('[data-test="edit-comment"]').exists()).toBe(false);
+  });
+
+  it('disables the edit action without edit permission', () => {
+    const wrapper = mountWrapper({ ...reportedComment, canEditComments: false });
+
+    expect(
+      wrapper.get('[data-test="edit-comment"]').attributes('disabled')
+    ).toBeDefined();
+  });
+
+  it('opens the edit modal when the edit action is clicked', async () => {
+    const wrapper = mountWrapper(reportedComment);
+    await wrapper.get('[data-test="edit-comment"]').trigger('click');
+
+    expect(wrapper.get('[data-testid="edit-modal"]').attributes('data-open')).toBe(
+      'true'
+    );
+  });
+
+  it('re-emits archived-successfully when the edit modal saves', async () => {
+    const wrapper = mountWrapper(reportedComment);
+    await wrapper.get('[data-testid="edit-modal"]').trigger('click');
+
+    expect(wrapper.emitted('archived-successfully')).toBeTruthy();
   });
 });

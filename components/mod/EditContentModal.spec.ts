@@ -151,4 +151,73 @@ describe('EditContentModal', () => {
     expect(mockUpdateIssue).toHaveBeenCalled();
     expect(mockAddFeed).not.toHaveBeenCalled();
   });
+
+  const withRule = (wrapper: ReturnType<typeof mountModal>) => {
+    const exposed = (wrapper.vm as any).$?.exposed || {};
+    exposed.selectedForumRules.value = ['Rule 1'];
+    exposed.bodyValue.value = 'updated body';
+    exposed.titleValue.value = 'updated title';
+    return exposed;
+  };
+
+  it('logs an activity-feed item when editing an event', async () => {
+    const wrapper = mountModal({
+      targetType: 'event',
+      eventId: 'event-1',
+      commentId: '',
+    });
+    withRule(wrapper);
+
+    await (wrapper.vm as any).saveEdits();
+    await flushPromises();
+
+    expect(mockAddFeed).toHaveBeenCalled();
+  });
+
+  it('flags the issue (not the feed) when editing a discussion', async () => {
+    const wrapper = mountModal({
+      targetType: 'discussion',
+      discussionId: 'disc-1',
+      commentId: '',
+    });
+    withRule(wrapper);
+
+    await (wrapper.vm as any).saveEdits();
+    await flushPromises();
+
+    expect(mockUpdateIssue).toHaveBeenCalled();
+  });
+
+  it('does not log a feed item when editing a discussion', async () => {
+    const wrapper = mountModal({
+      targetType: 'discussion',
+      discussionId: 'disc-1',
+      commentId: '',
+    });
+    withRule(wrapper);
+
+    await (wrapper.vm as any).saveEdits();
+    await flushPromises();
+
+    expect(mockAddFeed).not.toHaveBeenCalled();
+  });
+
+  it('populates the editor from the existing content when opened', async () => {
+    const wrapper = mountModal({ open: false });
+    await wrapper.setProps({ open: true });
+
+    expect((wrapper.vm as any).$?.exposed?.bodyValue.value).toBe(
+      'original comment body'
+    );
+  });
+
+  it('selects a broken rule from the rule picker', async () => {
+    const wrapper = mountModal();
+    const picker = wrapper.findComponent({ name: 'SelectBrokenRules' });
+    await picker.vm.$emit('toggle-forum-rule-selection', 'Spam');
+
+    expect(
+      (wrapper.vm as any).$?.exposed?.selectedForumRules.value
+    ).toContain('Spam');
+  });
 });

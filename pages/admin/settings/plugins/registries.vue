@@ -97,8 +97,8 @@ const saveRegistries = async () => {
         <template #content>
           <div class="my-3 space-y-4">
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              Configure plugin registries to allow plugins to be installed on your
-              server.
+              Configure plugin registries or GitHub plugin repos to allow plugins
+              to be installed on your server.
             </p>
 
             <div class="space-y-2">
@@ -136,7 +136,7 @@ const saveRegistries = async () => {
                 <input
                   v-model="newRegistry"
                   type="url"
-                  placeholder="https://registry.example.com"
+                  placeholder="https://github.com/org/plugin-repo"
                   class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   @keyup.enter="addRegistry"
                 >
