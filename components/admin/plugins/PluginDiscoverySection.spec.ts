@@ -26,7 +26,16 @@ const mountSection = () =>
 
 beforeEach(() => {
   vi.clearAllMocks();
-  h.refresh = vi.fn(() => Promise.resolve());
+  h.refresh = vi.fn(() =>
+    Promise.resolve({
+      data: {
+        refreshPlugins: [
+          { id: 'alpha', Versions: [{ version: '1.0.0' }, { version: '1.1.0' }] },
+          { id: 'beta', Versions: [{ version: '0.1.0' }] },
+        ],
+      },
+    })
+  );
   h.loading = ref(false);
   h.error = ref(null);
 });
@@ -35,7 +44,7 @@ describe('PluginDiscoverySection', () => {
   it('shows the refresh button', () => {
     const wrapper = mountSection();
 
-    expect(wrapper.text()).toContain('Refresh Plugins');
+    expect(wrapper.text()).toContain('Refresh Library');
   });
 
   it('refreshes plugins on click', async () => {
@@ -53,6 +62,9 @@ describe('PluginDiscoverySection', () => {
     await wrapper.get('button').trigger('click');
     await flushPromises();
 
+    expect(h.toastSuccess).toHaveBeenCalledWith(
+      'Plugin library refreshed: 2 plugins, 3 versions'
+    );
     expect(wrapper.emitted('refreshed')).toBeTruthy();
   });
 

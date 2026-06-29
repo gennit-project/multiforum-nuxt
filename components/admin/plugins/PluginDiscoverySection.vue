@@ -18,8 +18,16 @@ const {
 
 const refreshPlugins = async () => {
   try {
-    await refreshPluginsMutation();
-    toast.success('Plugins refreshed successfully');
+    const result = await refreshPluginsMutation();
+    const refreshedPlugins = result?.data?.refreshPlugins || [];
+    const versionCount = refreshedPlugins.reduce(
+      (count: number, plugin: { Versions?: Array<{ version?: string }> }) =>
+        count + (plugin.Versions?.length || 0),
+      0
+    );
+    toast.success(
+      `Plugin library refreshed: ${refreshedPlugins.length} plugins, ${versionCount} versions`
+    );
     emit('refreshed');
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
@@ -33,7 +41,7 @@ const refreshPlugins = async () => {
     <template #content>
       <div class="my-3 space-y-4">
         <p class="text-sm text-gray-600 dark:text-gray-400">
-          Refresh to discover new plugins from configured registries.
+          Refresh the library to discover new plugins and versions from configured registries.
         </p>
         <button
           type="button"
@@ -45,7 +53,7 @@ const refreshPlugins = async () => {
             class="fa-solid fa-refresh mr-2"
             :class="{ 'animate-spin': refreshPluginsLoading }"
           />
-          {{ refreshPluginsLoading ? 'Refreshing...' : 'Refresh Plugins' }}
+          {{ refreshPluginsLoading ? 'Refreshing...' : 'Refresh Library' }}
         </button>
         <div
           v-if="refreshPluginsError"
