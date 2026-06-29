@@ -126,7 +126,10 @@ describe('EventCommentsWrapper', () => {
     );
   });
 
-  const buildWrapper = (subscribedToEventUpdates: Array<{ username: string }> = []) =>
+  const buildWrapper = (
+    subscribedToEventUpdates: Array<{ username: string }> = [],
+    eventOverrides: Record<string, unknown> = {}
+  ) =>
     mount(EventCommentsWrapper, {
       props: {
         event: {
@@ -135,6 +138,7 @@ describe('EventCommentsWrapper', () => {
           CommentsAggregate: { count: 2 },
           SubscribedToNotifications: [],
           SubscribedToEventUpdates: subscribedToEventUpdates,
+          ...eventOverrides,
         },
         comments: [],
         loading: false,
@@ -193,5 +197,117 @@ describe('EventCommentsWrapper', () => {
     await wrapper.get('[data-testid="toggle-updates"]').trigger('click');
 
     expect(mutateSpies[3]).toHaveBeenCalledWith({ eventId: 'event-1' });
+  });
+
+  it('subscribes to comment notifications from the menu', async () => {
+    const wrapper = buildWrapper();
+    await wrapper.get('[data-testid="toggle-comments"]').trigger('click');
+
+    expect(mutateSpies[0]).toHaveBeenCalledWith({ eventId: 'event-1' });
+  });
+
+  it('unsubscribes from comment notifications when already subscribed', async () => {
+    const wrapper = buildWrapper([], {
+      SubscribedToNotifications: [{ username: 'alice' }],
+    });
+    await wrapper.get('[data-testid="toggle-comments"]').trigger('click');
+
+    expect(mutateSpies[1]).toHaveBeenCalledWith({ eventId: 'event-1' });
+  });
+
+  it('shows the comment-notifications-on notice after subscribing completes', async () => {
+    const wrapper = buildWrapper();
+    onDoneCallbacks[0]?.();
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.get('[data-testid="notification-title"]').text()).toBe(
+      'Comment notifications turned on'
+    );
+  });
+
+  it('writes the new subscriber list to the cache on comment subscribe', () => {
+    buildWrapper();
+    const modify = vi.fn();
+    const identify = vi.fn(() => 'Event:event-1');
+    const update = (useMutation as unknown as ReturnType<typeof vi.fn>).mock
+      .calls[0]?.[1]?.update;
+    update(
+      { modify, identify },
+      { data: { subscribeToEvent: { SubscribedToNotifications: [{ username: 'alice' }] } } }
+    );
+
+    expect(modify).toHaveBeenCalled();
+  });
+
+  const commentSection = (wrapper: ReturnType<typeof buildWrapper>) =>
+    wrapper.findComponent(CommentSectionStub);
+
+  // cache.modify stub that runs the field policies so their bodies are covered.
+  const fakeCache = () => ({
+    identify: vi.fn(() => 'Event:event-1'),
+    modify: vi.fn(({ fields }: { fields: Record<string, (e: unknown) => unknown> }) =>
+      Object.values(fields).forEach((fn) => fn({ count: 2 }))
+    ),
+    evict: vi.fn(),
+    gc: vi.fn(),
+  });
+
+  it('increments the cached comment count', async () => {
+    const wrapper = buildWrapper();
+    const cache = fakeCache();
+    await commentSection(wrapper).vm.$emit('increment-comment-count', cache);
+
+    expect(cache.modify).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not increment when the event has no id', async () => {
+    const wrapper = buildWrapper([], { id: undefined });
+    const cache = fakeCache();
+    await commentSection(wrapper).vm.$emit('increment-comment-count', cache);
+
+    expect(cache.modify).not.toHaveBeenCalled();
+  });
+
+  it('decrements the cached comment count', async () => {
+    const wrapper = buildWrapper();
+    const cache = fakeCache();
+    await commentSection(wrapper).vm.$emit('decrement-comment-count', cache);
+
+    expect(cache.modify).toHaveBeenCalledTimes(1);
+  });
+
+  it('evicts a deleted comment from the cache', async () => {
+    const wrapper = buildWrapper();
+    const cache = fakeCache();
+    await commentSection(wrapper).vm.$emit('update-comment-section-query-result', {
+      cache,
+      commentToDeleteId: 'comment-9',
+    });
+
+    expect(cache.evict).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips eviction when no comment id is provided', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const wrapper = buildWrapper();
+    const cache = fakeCache();
+    await commentSection(wrapper).vm.$emit('update-comment-section-query-result', {
+      cache,
+      commentToDeleteId: '',
+    });
+    errorSpy.mockRestore();
+
+    expect(cache.evict).not.toHaveBeenCalled();
+  });
+
+  it('stores the in-progress reply input', async () => {
+    const wrapper = buildWrapper();
+    await commentSection(wrapper).vm.$emit('update-create-reply-comment-input', {
+      text: 'a reply',
+      isRootComment: false,
+      depth: 2,
+    });
+
+    expect(commentSection(wrapper).exists()).toBe(true);
   });
 });

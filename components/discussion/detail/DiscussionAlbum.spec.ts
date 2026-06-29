@@ -19,7 +19,10 @@ const stubs = {
   ModelViewer: { template: '<div class="model-viewer-stub" />' },
   StlViewer: { template: '<div class="stl-viewer-stub" />' },
   CarouselThumbnail: { template: '<div />' },
-  ImageLightbox: { template: '<div class="lightbox-stub" />' },
+  ClientOnly: { template: '<div><slot /></div>' },
+  ImageLightbox: {
+    template: '<button class="lightbox-stub" @click="$emit(\'close\')" />',
+  },
   TextEditor: { template: '<div />' },
   SaveButton: { template: '<button />' },
   CancelButton: { template: '<button />' },
@@ -95,5 +98,73 @@ describe('DiscussionAlbum', () => {
       stlFiles: [{ id: 's1', url: 'https://example.com/m.stl', fileName: 'm.stl' }],
     });
     expect(cells(wrapper)).toHaveLength(2);
+  });
+});
+
+describe('DiscussionAlbum — lightbox', () => {
+  // The lightbox is teleported to <body>, so query the document, not the wrapper.
+  beforeEach(() => {
+    vi.clearAllMocks();
+    document.body.querySelectorAll('.lightbox-stub').forEach((el) => el.remove());
+  });
+
+  it('opens the lightbox when a grid cell is clicked', async () => {
+    const wrapper = mountAlbum();
+    await wrapper.findAll('.grid-cols-3 > div')[0].trigger('click');
+
+    expect(document.body.querySelector('.lightbox-stub')).not.toBeNull();
+  });
+
+  it('opens the lightbox on mount when startInLightbox is set', async () => {
+    const wrapper = mountAlbum({ startInLightbox: true });
+    await wrapper.vm.$nextTick();
+
+    expect(document.body.querySelector('.lightbox-stub')).not.toBeNull();
+  });
+
+  it('emits close-lightbox when the lightbox is closed', async () => {
+    const wrapper = mountAlbum({ startInLightbox: true });
+    await wrapper.vm.$nextTick();
+    (document.body.querySelector('.lightbox-stub') as HTMLElement).click();
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.emitted('close-lightbox')).toBeTruthy();
+  });
+});
+
+describe('DiscussionAlbum — carousel navigation', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('advances to the next image', async () => {
+    const wrapper = mountAlbum({ carouselFormat: true });
+    await wrapper.get('[aria-label="Next image"]').trigger('click');
+
+    expect(wrapper.text()).toContain('2 of 3');
+  });
+
+  it('wraps to the last image when going left from the first', async () => {
+    const wrapper = mountAlbum({ carouselFormat: true });
+    await wrapper.get('[aria-label="Previous image"]').trigger('click');
+
+    expect(wrapper.text()).toContain('3 of 3');
+  });
+
+  it('navigates by swiping the image container', async () => {
+    const wrapper = mountAlbum({ carouselFormat: true });
+    const container = wrapper.find('.touch-pan-x');
+    await container.trigger('touchstart', { touches: [{ clientX: 200 }] });
+    await container.trigger('touchend', { changedTouches: [{ clientX: 100 }] });
+
+    expect(wrapper.text()).toContain('2 of 3');
+  });
+
+  it('renders the taller main image in download expanded view', () => {
+    const wrapper = mountAlbum({
+      carouselFormat: true,
+      expandedView: true,
+      downloadMode: true,
+    });
+
+    expect(wrapper.find('.touch-pan-x').attributes('style')).toContain('500px');
   });
 });
