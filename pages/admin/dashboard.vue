@@ -2,23 +2,12 @@
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useQuery } from '@vue/apollo-composable';
-import ChannelHealthTableRow from '@/components/admin/ChannelHealthTableRow.vue';
-import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
-  Archive,
-  CalendarDays,
-  Clock3,
-  Download,
-  Flag,
-  Lock,
-  MessageSquare,
-  RefreshCw,
-  ShieldAlert,
-  ThumbsUp,
-  Users,
-} from 'lucide-vue-next';
+import ChannelHealthTable from '@/components/admin/ChannelHealthTable.vue';
+import ServerDashboardActivityChart from '@/components/admin/ServerDashboardActivityChart.vue';
+import ServerDashboardIssueAging from '@/components/admin/ServerDashboardIssueAging.vue';
+import ServerDashboardMetricCards from '@/components/admin/ServerDashboardMetricCards.vue';
+import ServerDashboardSecondaryStats from '@/components/admin/ServerDashboardSecondaryStats.vue';
+import { RefreshCw } from 'lucide-vue-next';
 import { GET_SERVER_HEALTH_DASHBOARD } from '@/graphQLData/admin/queries';
 
 type ServerHealthSummary = {
@@ -77,15 +66,6 @@ type IssueAgingBucket = {
   count: number;
 };
 
-type AttentionItem = {
-  severity: 'INFO' | 'WARNING' | 'CRITICAL' | string;
-  title: string;
-  description: string;
-  channelUniqueName?: string | null;
-  metric?: string | null;
-  value?: number | null;
-};
-
 type DashboardData = {
   startDate: string;
   endDate: string;
@@ -94,7 +74,6 @@ type DashboardData = {
   timeSeries: ServerHealthTimeSeriesPoint[];
   channelHealth: ChannelHealthRow[];
   issueAging: IssueAgingBucket[];
-  attentionItems: AttentionItem[];
 };
 
 type ChannelHealthSortKey =
@@ -109,7 +88,6 @@ type ChannelHealthSortKey =
   | 'healthLabel';
 
 type SortDirection = 'asc' | 'desc';
-type SortAria = 'none' | 'ascending' | 'descending';
 
 const defaultSortBy: ChannelHealthSortKey = 'activityScore';
 const defaultSortDirection: SortDirection = 'desc';
@@ -124,39 +102,6 @@ const channelHealthSortKeys = new Set<ChannelHealthSortKey>([
   'moderationActionCount',
   'healthLabel',
 ]);
-const channelHealthColumnDefinitions: Array<{
-  key: ChannelHealthSortKey;
-  label: string;
-  title?: string;
-}> = [
-  { key: 'channelUniqueName', label: 'Channel' },
-  { key: 'activityScore', label: 'Activity' },
-  { key: 'uniqueContributorCount', label: 'Contributors' },
-  {
-    key: 'openIssueCount',
-    label: 'Open Issues',
-    title:
-      'Open issues only include admin/server-scoped issues: server-rule reports or issues opened without a channel scope.',
-  },
-  {
-    key: 'issueOpenedCount',
-    label: 'New Issues',
-    title:
-      'New issues only include admin/server-scoped issues in the selected date range.',
-  },
-  {
-    key: 'oldestOpenIssueAgeDays',
-    label: 'Stale Open',
-    title: 'Oldest currently open admin/server-scoped issue for this channel.',
-  },
-  {
-    key: 'issuesPerHundredContributions',
-    label: 'Pressure',
-    title:
-      'New admin/server-scoped issues per 100 discussions, comments, and events in the selected date range.',
-  },
-  { key: 'healthLabel', label: 'Status' },
-];
 
 const toDateInputValue = (date: Date) => date.toISOString().split('T')[0] || '';
 
@@ -269,125 +214,9 @@ const isChannelHealthLoading = computed(() => {
   return loading.value && !!dashboard.value && channelRows.value.length === 0;
 });
 
-const summary = computed<ServerHealthSummary | null>(() => {
-  return dashboard.value?.summary || null;
-});
-
-const totalContributions = computed(() => {
-  if (!summary.value) return 0;
-  return (
-    summary.value.discussionCount +
-    summary.value.commentCount +
-    summary.value.eventCount
-  );
-});
-
-const maxActivity = computed(() => {
-  const values =
-    dashboard.value?.timeSeries.map(
-      (point) => point.discussions + point.comments + point.events
-    ) || [];
-  return Math.max(...values, 1);
-});
-
-const maxIssueAgeBucket = computed(() => {
-  const values =
-    dashboard.value?.issueAging.map((bucket) => bucket.count) || [];
-  return Math.max(...values, 1);
-});
-
-const maxChannelActivity = computed(() => {
-  const values =
-    dashboard.value?.channelHealth.map((channel) => channel.activityScore) ||
-    [];
-  return Math.max(...values, 1);
-});
-
-const metricCards = computed(() => {
-  const data = summary.value;
-  if (!data) return [];
-  return [
-    {
-      label: 'Active Channels',
-      value: data.activeChannelCount,
-      detail: `${totalContributions.value} contributions`,
-      icon: Users,
-      tone: 'blue',
-    },
-    {
-      label: 'Admin Open Issues',
-      value: data.openIssueCount,
-      detail: `${data.issueOpenedCount} new this period`,
-      icon: Flag,
-      tone: data.openIssueCount > 0 ? 'yellow' : 'green',
-    },
-    {
-      label: 'Admin Issue Age',
-      value:
-        data.medianOpenIssueAgeDays == null
-          ? '0d'
-          : `${Math.round(data.medianOpenIssueAgeDays)}d`,
-      detail: 'median open admin issue age',
-      icon: Clock3,
-      tone: (data.medianOpenIssueAgeDays || 0) >= 7 ? 'yellow' : 'green',
-    },
-    {
-      label: 'Mod Actions',
-      value: data.moderationActionCount,
-      detail: `${data.issueClosedCount} issues closed`,
-      icon: ShieldAlert,
-      tone: 'slate',
-    },
-    {
-      label: 'Votes',
-      value: data.voteCount,
-      detail: `${data.commentCount} comments`,
-      icon: ThumbsUp,
-      tone: 'blue',
-    },
-    {
-      label: 'Archived',
-      value: data.archivedContentCount,
-      detail: `${data.lockedContentCount} locked`,
-      icon: Archive,
-      tone: data.archivedContentCount > 0 ? 'yellow' : 'slate',
-    },
-  ];
-});
-
 const channelRows = computed(() => dashboard.value?.channelHealth || []);
 const issueAging = computed(() => dashboard.value?.issueAging || []);
 const timeSeries = computed(() => dashboard.value?.timeSeries || []);
-
-const formatNumber = (value: number | string) => {
-  if (typeof value === 'string') return value;
-  return new Intl.NumberFormat().format(value);
-};
-
-const formatDateLabel = (date: string) => {
-  if (!date) return '';
-  return new Date(`${date}T00:00:00`).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-  });
-};
-
-const percent = (value: number, max: number) => {
-  if (max <= 0) return 0;
-  return Math.max(0, Math.min(100, (value / max) * 100));
-};
-
-const barPercent = (value: number, max: number) => {
-  if (value <= 0) return 0;
-  return Math.max(4, percent(value, max));
-};
-
-const maxChannelIssuePressure = computed(() => {
-  const values = channelRows.value.map(
-    (channel) => channel.issuesPerHundredContributions
-  );
-  return Math.max(...values, 1);
-});
 
 const updateChannelSort = (sortBy: ChannelHealthSortKey) => {
   const nextDirection =
@@ -403,29 +232,6 @@ const updateChannelSort = (sortBy: ChannelHealthSortKey) => {
     },
   });
 };
-
-const channelHealthColumns = computed(() => {
-  return channelHealthColumnDefinitions.map((column) => {
-    const isActive = activeSortBy.value === column.key;
-    const ariaSort: SortAria = !isActive
-      ? 'none'
-      : activeSortDirection.value === 'asc'
-        ? 'ascending'
-        : 'descending';
-    return {
-      ...column,
-      ariaSort,
-      sortIcon:
-        isActive && activeSortDirection.value === 'asc'
-          ? ArrowUp
-          : isActive
-            ? ArrowDown
-            : ArrowUpDown,
-      sortIconClass: isActive ? 'h-3.5 w-3.5' : 'h-3.5 w-3.5 opacity-50',
-    };
-  });
-});
-
 </script>
 
 <template>
@@ -515,298 +321,27 @@ const channelHealthColumns = computed(() => {
       </div>
 
       <template v-else-if="dashboard">
-        <section class="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
-          <div
-            v-for="card in metricCards"
-            :key="card.label"
-            class="rounded-lg border border-gray-200 bg-white p-4 !text-gray-900 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:!text-gray-100"
-          >
-            <div class="flex items-start justify-between gap-3">
-              <div>
-                <p
-                  class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400"
-                >
-                  {{ card.label }}
-                </p>
-                <p
-                  class="font-semibold mt-2 text-2xl !text-gray-900 dark:!text-gray-100"
-                >
-                  {{ formatNumber(card.value) }}
-                </p>
-              </div>
-              <component
-                :is="card.icon"
-                class="h-5 w-5"
-                :class="{
-                  'text-blue-600 dark:text-blue-300': card.tone === 'blue',
-                  'text-yellow-600 dark:text-yellow-300':
-                    card.tone === 'yellow',
-                  'text-green-600 dark:text-green-300': card.tone === 'green',
-                  'text-gray-500 dark:text-gray-300': card.tone === 'slate',
-                }"
-              />
-            </div>
-            <p class="mt-3 text-sm text-gray-600 dark:text-gray-300">
-              {{ card.detail }}
-            </p>
-          </div>
-        </section>
+        <ServerDashboardMetricCards :summary="dashboard.summary" />
 
         <section
           class="grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.8fr)]"
         >
-          <div
-            class="rounded-lg border border-gray-200 bg-white p-4 !text-gray-900 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:!text-gray-100"
-          >
-            <div class="mb-4 flex items-center justify-between gap-3">
-              <div>
-                <h2
-                  class="font-semibold text-base !text-gray-900 dark:!text-gray-100"
-                >
-                  Activity
-                </h2>
-                <p class="text-sm text-gray-600 dark:text-gray-300">
-                  Discussions, comments, and events by day.
-                </p>
-              </div>
-              <CalendarDays class="h-5 w-5 text-gray-400" />
-            </div>
-
-            <div
-              class="flex h-64 items-end gap-2 overflow-x-auto overflow-y-visible pb-12"
-            >
-              <div
-                v-for="point in timeSeries"
-                :key="point.date"
-                class="relative flex min-w-6 flex-1 flex-col items-center justify-end gap-1"
-                :title="`${formatDateLabel(point.date)}: ${point.discussions + point.comments + point.events}`"
-              >
-                <div
-                  class="flex h-44 w-full max-w-7 flex-col justify-end overflow-hidden rounded-t bg-gray-100 dark:bg-gray-800"
-                >
-                  <div
-                    class="bg-blue-500"
-                    :style="{
-                      height: `${percent(point.discussions, maxActivity)}%`,
-                    }"
-                  />
-                  <div
-                    class="bg-orange-500"
-                    :style="{
-                      height: `${percent(point.comments, maxActivity)}%`,
-                    }"
-                  />
-                  <div
-                    class="bg-green-500"
-                    :style="{
-                      height: `${percent(point.events, maxActivity)}%`,
-                    }"
-                  />
-                </div>
-                <span
-                  class="absolute -bottom-9 left-1/2 hidden w-14 origin-top-left -translate-x-1 -rotate-45 whitespace-nowrap text-left text-[10px] leading-none text-gray-500 sm:block"
-                >
-                  {{ formatDateLabel(point.date) }}
-                </span>
-              </div>
-            </div>
-
-            <div
-              class="mt-3 flex flex-wrap gap-4 text-xs text-gray-600 dark:text-gray-300"
-            >
-              <span class="inline-flex items-center gap-1"
-                ><span
-                  class="h-2 w-2 rounded-full bg-blue-500"
-                />Discussions</span
-              >
-              <span class="inline-flex items-center gap-1"
-                ><span
-                  class="h-2 w-2 rounded-full bg-orange-500"
-                />Comments</span
-              >
-              <span class="inline-flex items-center gap-1"
-                ><span class="h-2 w-2 rounded-full bg-green-500" />Events</span
-              >
-            </div>
-          </div>
-
-          <div
-            class="rounded-lg border border-gray-200 bg-white p-4 !text-gray-900 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:!text-gray-100"
-          >
-            <div class="mb-4 flex items-center justify-between gap-3">
-              <div>
-                <h2
-                  class="font-semibold text-base !text-gray-900 dark:!text-gray-100"
-                >
-                  Issue Aging
-                </h2>
-                <p class="text-sm text-gray-600 dark:text-gray-300">
-                  Open admin/server-scoped issues by age bucket.
-                </p>
-              </div>
-              <Clock3 class="h-5 w-5 text-gray-400" />
-            </div>
-
-            <div class="space-y-3">
-              <div
-                v-for="bucket in issueAging"
-                :key="bucket.label"
-                class="grid grid-cols-[5rem_minmax(0,1fr)_3rem] items-center gap-3 text-sm"
-              >
-                <span class="font-medium text-gray-700 dark:text-gray-200">
-                  {{ bucket.label }}
-                </span>
-                <div
-                  class="h-3 overflow-hidden rounded-sm bg-gray-100 dark:bg-gray-800"
-                >
-                  <div
-                    class="h-full rounded-sm bg-yellow-500"
-                    :style="{
-                      width: `${barPercent(bucket.count, maxIssueAgeBucket)}%`,
-                    }"
-                  />
-                </div>
-                <span class="text-right text-gray-600 dark:text-gray-300">
-                  {{ bucket.count }}
-                </span>
-              </div>
-            </div>
-          </div>
+          <ServerDashboardActivityChart :time-series="timeSeries" />
+          <ServerDashboardIssueAging :issue-aging="issueAging" />
         </section>
 
-        <section class="space-y-4">
-          <div
-            class="rounded-lg border border-gray-200 bg-white !text-gray-900 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:!text-gray-100"
-          >
-            <div
-              class="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3 dark:border-gray-800"
-            >
-              <div>
-                <h2
-                  class="font-semibold text-base text-gray-900 dark:text-gray-100"
-                >
-                  Channel Health
-                </h2>
-                <p class="text-sm text-gray-600 dark:text-gray-300">
-                  Ranked by activity and moderation load.
-                </p>
-              </div>
-              <MessageSquare class="h-5 w-5 text-gray-400" />
-            </div>
+        <ChannelHealthTable
+          :rows="channelRows"
+          :loading="isChannelHealthLoading"
+          :active-sort-by="activeSortBy"
+          :active-sort-direction="activeSortDirection"
+          @sort="updateChannelSort"
+        />
 
-            <div class="overflow-x-auto">
-              <table
-                class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-800"
-              >
-                <thead
-                  class="bg-gray-100 text-left text-xs uppercase text-gray-500 dark:bg-gray-900 dark:text-gray-400"
-                >
-                  <tr>
-                    <th
-                      v-for="column in channelHealthColumns"
-                      :key="column.key"
-                      class="px-4 py-3 font-medium"
-                      :aria-sort="column.ariaSort"
-                      :title="column.title"
-                    >
-                      <button
-                        type="button"
-                        class="inline-flex items-center gap-1 uppercase hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:text-gray-100"
-                        @click="updateChannelSort(column.key)"
-                      >
-                        {{ column.label }}
-                        <component
-                          :is="column.sortIcon"
-                          :class="column.sortIconClass"
-                        />
-                      </button>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                  <template v-if="isChannelHealthLoading">
-                    <tr
-                      v-for="index in 5"
-                      :key="`loading-${index}`"
-                      data-testid="channel-health-loading-row"
-                    >
-                      <td class="px-4 py-3">
-                        <div class="flex items-center gap-3">
-                          <div
-                            class="h-8 w-8 animate-pulse rounded-md bg-gray-100 dark:bg-gray-800"
-                          />
-                          <div class="space-y-2">
-                            <div
-                              class="h-3 w-28 animate-pulse rounded bg-gray-100 dark:bg-gray-800"
-                            />
-                            <div
-                              class="h-2 w-20 animate-pulse rounded bg-gray-100 dark:bg-gray-800"
-                            />
-                          </div>
-                        </div>
-                      </td>
-                      <td
-                        v-for="columnIndex in 7"
-                        :key="columnIndex"
-                        class="px-4 py-3"
-                      >
-                        <div
-                          class="h-3 w-20 animate-pulse rounded bg-gray-100 dark:bg-gray-800"
-                        />
-                      </td>
-                    </tr>
-                  </template>
-                  <template v-else>
-                    <ChannelHealthTableRow
-                      v-for="row in channelRows"
-                      :key="row.id"
-                      :row="row"
-                      :max-activity="maxChannelActivity"
-                      :max-issue-pressure="maxChannelIssuePressure"
-                    />
-                  </template>
-                  <tr
-                    v-if="!isChannelHealthLoading && channelRows.length === 0"
-                  >
-                    <td
-                      colspan="8"
-                      class="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
-                    >
-                      No channel activity in this range.
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div class="grid gap-3 sm:grid-cols-2">
-            <div
-              class="rounded-lg border border-gray-200 bg-white p-4 !text-gray-900 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:!text-gray-100"
-            >
-              <Download class="mb-3 h-5 w-5 text-gray-400" />
-              <p
-                class="font-semibold text-2xl !text-gray-900 dark:!text-gray-100"
-              >
-                {{ summary?.downloadCount || 0 }}
-              </p>
-              <p class="text-sm text-gray-600 dark:text-gray-300">Downloads</p>
-            </div>
-            <div
-              class="rounded-lg border border-gray-200 bg-white p-4 !text-gray-900 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:!text-gray-100"
-            >
-              <Lock class="mb-3 h-5 w-5 text-gray-400" />
-              <p
-                class="font-semibold text-2xl !text-gray-900 dark:!text-gray-100"
-              >
-                {{ summary?.suspensionCount || 0 }}
-              </p>
-              <p class="text-sm text-gray-600 dark:text-gray-300">
-                Suspensions
-              </p>
-            </div>
-          </div>
-        </section>
+        <ServerDashboardSecondaryStats
+          :download-count="dashboard.summary.downloadCount"
+          :suspension-count="dashboard.summary.suspensionCount"
+        />
       </template>
     </ClientOnly>
   </div>
