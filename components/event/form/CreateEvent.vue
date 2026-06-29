@@ -13,6 +13,7 @@ import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { getTimePieces } from '@/utils';
 import getDefaultEventFormValues from '@/utils/defaultEventFormValues';
 import { generateOccurrences } from '@/utils/generateOccurrences';
+import { expandDateRangeGroups } from '@/utils/expandDateRangeGroups';
 import type { CreateEditEventFormValues, DateOccurrence } from '@/types/Event';
 import type {
   EventCreateInput,
@@ -83,8 +84,9 @@ const eventCreateInput = computed<EventCreateInput>(() => {
 const channelConnections = computed(() => formValues.value.selectedChannels);
 
 // A series is created when the user picks more than a single date. The final
-// occurrence list comes from the manual list ("multiple") or is generated from
-// the repeat pattern ("recurring"). "single" uses the single-event mutation.
+// occurrence list comes from the manual list ("multiple"), is generated from
+// the repeat pattern ("recurring"), or is expanded from date ranges
+// ("dateRange"). "single" uses the single-event mutation.
 const isSeries = computed(() => formValues.value.dateMode !== 'single');
 
 const seriesOccurrences = computed<DateOccurrence[]>(() => {
@@ -94,6 +96,9 @@ const seriesOccurrences = computed<DateOccurrence[]>(() => {
       startTime: formValues.value.startTime,
       endTime: formValues.value.endTime,
     });
+  }
+  if (formValues.value.dateMode === 'dateRange') {
+    return expandDateRangeGroups(formValues.value.dateRangeGroups);
   }
   return formValues.value.occurrences ?? [];
 });
