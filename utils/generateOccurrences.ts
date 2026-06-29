@@ -173,7 +173,7 @@ export function generateOccurrences(
   occurrences.push({ startTime, endTime });
 
   // Generate subsequent occurrences
-  let currentDt = startDt;
+  let currentDt: DateTime = startDt;
 
   while (occurrences.length < maxOccurrences) {
     currentDt = getNextDate(currentDt, pattern);
