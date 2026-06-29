@@ -28,7 +28,7 @@ import IssueBodyEditor from '@/components/mod/IssueBodyEditor.vue';
 import IssueRelatedContent from '@/components/mod/IssueRelatedContent.vue';
 import IssueRelatedChannel from '@/components/mod/IssueRelatedChannel.vue';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
-import { useRoute, useRouter } from 'nuxt/app';
+import { useRoute } from 'nuxt/app';
 import { config } from '@/config';
 import {
   getReportCount,
@@ -42,13 +42,9 @@ import { useIssueCloseReopen } from '@/composables/useIssueCloseReopen';
 import { useIssueActivityFeed } from '@/composables/useIssueActivityFeed';
 import { useIssueLock } from '@/composables/useIssueLock';
 import { useIssueBodyEdit } from '@/composables/useIssueBodyEdit';
-import {
-  SUBSCRIBE_TO_ISSUE,
-  UNSUBSCRIBE_FROM_ISSUE,
-} from '@/graphQLData/issue/mutations';
+import { useIssueSubscription } from '@/composables/useIssueSubscription';
 import NotificationComponent from '@/components/NotificationComponent.vue';
 import IssueSubscriptionPanel from '@/components/mod/IssueSubscriptionPanel.vue';
-import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
 
@@ -80,7 +76,6 @@ const ACTIVITY_FEED_PAGE_SIZE = 10;
 
 // Setup
 const route = useRoute();
-const router = useRouter();
 
 // Route and issueNumber computations
 const channelId = computed(() => {
@@ -146,9 +141,22 @@ const activeIssue = computed<Issue | null>(() => {
 });
 
 const activeIssueId = computed(() => activeIssue.value?.id || '');
-const showSubscribeCta = ref(route.query.subscribeCta === '1');
-const showIssueSubscriptionNotification = ref(false);
-const issueSubscriptionNotificationTitle = ref('');
+
+const {
+  isIssueSubscribed,
+  showSubscribeCta,
+  showIssueSubscriptionNotification,
+  issueSubscriptionNotificationTitle,
+  subscribeToIssueLoading,
+  unsubscribeFromIssueLoading,
+  toggleIssueSubscription,
+  dismissSubscribeCta,
+} = useIssueSubscription({
+  activeIssue,
+  username: computed(() => usernameVar.value),
+  refetchIssue,
+});
+
 const relatedDiscussionId = computed(
   () => activeIssue.value?.relatedDiscussionId || ''
 );
@@ -162,14 +170,6 @@ const relatedCommentId = computed(
 const relatedChannelUniqueName = computed(
   () => activeIssue.value?.relatedChannelUniqueName || ''
 );
-const isIssueSubscribed = computed(() => {
-  if (!usernameVar.value) return false;
-  return Boolean(
-    activeIssue.value?.SubscribedToNotifications?.some(
-      (user) => user.username === usernameVar.value
-    )
-  );
-});
 
 const { result: relatedDiscussionResult } = useQuery(
   GET_DISCUSSION,
@@ -281,16 +281,6 @@ const resetActivityFeed = async () => {
   await refetchIssue();
 };
 
-const clearSubscribeCtaQuery = async () => {
-  if (route.query.subscribeCta !== '1') {
-    return;
-  }
-
-  const nextQuery = { ...route.query };
-  delete nextQuery.subscribeCta;
-  await router.replace({ query: nextQuery });
-};
-
 const isIssueAuthor = computed(() => {
   const author = activeIssue.value?.Author;
   if (!author) return false;
@@ -308,39 +298,6 @@ const isIssueAuthor = computed(() => {
 
   return false;
 });
-
-const {
-  mutate: subscribeToIssue,
-  loading: subscribeToIssueLoading,
-} = useMutation(SUBSCRIBE_TO_ISSUE);
-
-const {
-  mutate: unsubscribeFromIssue,
-  loading: unsubscribeFromIssueLoading,
-} = useMutation(UNSUBSCRIBE_FROM_ISSUE);
-
-const toggleIssueSubscription = async () => {
-  if (!activeIssue.value?.id || !usernameVar.value) return;
-
-  if (isIssueSubscribed.value) {
-    await unsubscribeFromIssue({ issueId: activeIssue.value.id });
-    issueSubscriptionNotificationTitle.value =
-      'Unsubscribed from issue updates';
-  } else {
-    await subscribeToIssue({ issueId: activeIssue.value.id });
-    issueSubscriptionNotificationTitle.value = 'Subscribed to issue updates';
-  }
-
-  showIssueSubscriptionNotification.value = true;
-  showSubscribeCta.value = false;
-  await clearSubscribeCtaQuery();
-  await refetchIssue();
-};
-
-const dismissSubscribeCta = async () => {
-  showSubscribeCta.value = false;
-  await clearSubscribeCtaQuery();
-};
 
 const isLocked = computed(() => activeIssue.value?.locked === true);
 
@@ -648,17 +605,6 @@ const handleDeleteRelatedContent = async (
 const handleLockReasonUpdate = (value: string) => {
   lockReasonInput.value = value;
 };
-
-// Handle ?action=unsubscribe query param for one-click unsubscribe from notifications
-const issueIdRef = computed(() => activeIssue.value?.id || null);
-useAutoUnsubscribe({
-  entityId: issueIdRef,
-  unsubscribeFn: async (id: string) => {
-    await unsubscribeFromIssue({ issueId: id });
-  },
-  entityType: 'issue',
-  isSubscribed: isIssueSubscribed,
-});
 </script>
 
 <template>
