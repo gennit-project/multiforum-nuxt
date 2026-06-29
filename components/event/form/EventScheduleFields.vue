@@ -6,10 +6,12 @@ import type {
   CreateEditEventFormValues,
   DateMode,
   DateOccurrence,
+  DateRangeGroup as DateRangeGroupType,
   RepeatPattern,
 } from '@/types/Event';
 import { getDuration } from '@/utils';
 import { generateOccurrences } from '@/utils/generateOccurrences';
+import { expandDateRangeGroups } from '@/utils/expandDateRangeGroups';
 import {
   applyTimeToTimestamp,
   computeStartDateChange,
@@ -18,6 +20,7 @@ import {
 import DateTimePickersRow from './DateTimePickersRow.vue';
 import OccurrencesList from './OccurrencesList.vue';
 import RepeatPatternPicker from './RepeatPatternPicker.vue';
+import DateRangeGroups from './DateRangeGroup.vue';
 import CheckBox from '@/components/CheckBox.vue';
 import ErrorMessage from '@/components/ErrorMessage.vue';
 
@@ -42,6 +45,11 @@ const dateModeOptions = [
     label: 'Recurring',
     value: 'recurring' as DateMode,
     description: 'Repeat pattern',
+  },
+  {
+    label: 'Date ranges',
+    value: 'dateRange' as DateMode,
+    description: 'Ranges with daily hours',
   },
 ];
 
@@ -72,7 +80,48 @@ const updateDateMode = (mode: DateMode) => {
     };
     emit('updateFormValues', { repeatPattern: defaultPattern });
   }
+
+  // Seed a first date-range group when switching to date-range mode.
+  if (mode === 'dateRange' && props.formValues.dateRangeGroups.length === 0) {
+    const today = DateTime.now().toFormat('yyyy-MM-dd');
+    const defaultGroup: DateRangeGroupType = {
+      startDate: today,
+      endDate: today,
+      startTimeOfDay: '09:00',
+      endTimeOfDay: '17:00',
+    };
+    emit('updateFormValues', { dateRangeGroups: [defaultGroup] });
+  }
 };
+
+// Handlers for the DateRangeGroups editor.
+const handleDateRangeGroupUpdate = (
+  index: number,
+  group: DateRangeGroupType
+) => {
+  const newGroups = [...props.formValues.dateRangeGroups];
+  newGroups[index] = group;
+  emit('updateFormValues', { dateRangeGroups: newGroups });
+};
+
+const handleDateRangeGroupAdd = (group: DateRangeGroupType) => {
+  emit('updateFormValues', {
+    dateRangeGroups: [...props.formValues.dateRangeGroups, group],
+  });
+};
+
+const handleDateRangeGroupRemove = (index: number) => {
+  emit('updateFormValues', {
+    dateRangeGroups: props.formValues.dateRangeGroups.filter(
+      (_, i) => i !== index
+    ),
+  });
+};
+
+// How many individual occurrences the current date-range groups expand to.
+const dateRangeOccurrenceCount = computed(
+  () => expandDateRangeGroups(props.formValues.dateRangeGroups).length
+);
 
 // Handlers for OccurrencesList
 const handleOccurrenceUpdate = (index: number, occurrence: DateOccurrence) => {
@@ -398,6 +447,37 @@ const toggleMultiDayEvent = () => {
       <div class="mt-3">
         <CheckBox
           test-id="all-day-input-recurring"
+          :checked="formValues.isAllDay"
+          label="All day events"
+          @update="toggleIsAllDayField"
+        />
+      </div>
+    </div>
+
+    <!-- Date-range mode: one occurrence per day in each range, at that range's
+         hours (supports "expo hours" via multiple ranges). -->
+    <div v-else-if="currentDateMode === 'dateRange'">
+      <DateRangeGroups
+        :groups="formValues.dateRangeGroups"
+        :is-all-day="formValues.isAllDay"
+        @update="handleDateRangeGroupUpdate"
+        @add="handleDateRangeGroupAdd"
+        @remove="handleDateRangeGroupRemove"
+      />
+
+      <p
+        v-if="dateRangeOccurrenceCount > 0"
+        data-testid="date-range-occurrence-count"
+        class="mt-3 text-sm text-gray-600 dark:text-gray-400"
+      >
+        Creates {{ dateRangeOccurrenceCount }}
+        {{ dateRangeOccurrenceCount === 1 ? 'event' : 'events' }}.
+      </p>
+
+      <!-- All-day checkbox for date ranges -->
+      <div class="mt-3">
+        <CheckBox
+          test-id="all-day-input-daterange"
           :checked="formValues.isAllDay"
           label="All day events"
           @update="toggleIsAllDayField"

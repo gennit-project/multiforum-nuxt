@@ -1,6 +1,6 @@
 import type { EventSort } from '@/__generated__/graphql';
 
-export type DateMode = 'single' | 'multiple' | 'recurring';
+export type DateMode = 'single' | 'multiple' | 'recurring' | 'dateRange';
 
 export interface DateOccurrence {
   startTime: string;

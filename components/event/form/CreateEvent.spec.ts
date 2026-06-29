@@ -241,4 +241,43 @@ describe('CreateEvent', () => {
 
     expect(Array.isArray(mockMutate.mock.calls[0][0].input)).toBe(true);
   });
+
+  // Date-range mode (#232): one occurrence per day in each range, at that
+  // range's hours.
+  it('expands a date range into one occurrence per day for "dateRange" mode', async () => {
+    // Heard Museum "Lumenous": Dec 16–18, 6–9pm (three nights).
+    await submitWithFormValues({
+      dateMode: 'dateRange',
+      dateRangeGroups: [
+        {
+          startDate: '2030-12-16',
+          endDate: '2030-12-18',
+          startTimeOfDay: '18:00',
+          endTimeOfDay: '21:00',
+        },
+      ],
+    });
+
+    expect(mockMutate.mock.calls[0][0].input.occurrences).toHaveLength(3);
+  });
+
+  it('expands multiple date ranges with distinct per-range hours (expo style)', async () => {
+    // Expo hours: day 1 12:00–19:30; days 2–4 09:00–17:00; day 5 09:00–12:00.
+    await submitWithFormValues({
+      dateMode: 'dateRange',
+      dateRangeGroups: [
+        { startDate: '2030-03-06', endDate: '2030-03-06', startTimeOfDay: '12:00', endTimeOfDay: '19:30' },
+        { startDate: '2030-03-07', endDate: '2030-03-09', startTimeOfDay: '09:00', endTimeOfDay: '17:00' },
+        { startDate: '2030-03-10', endDate: '2030-03-10', startTimeOfDay: '09:00', endTimeOfDay: '12:00' },
+      ],
+    });
+
+    const occ = mockMutate.mock.calls[0][0].input.occurrences;
+    // 1 + 3 + 1 = 5 occurrences, sorted, with the first day's distinct hours.
+    expect({
+      count: occ.length,
+      firstStartHour: occ[0].startTime.slice(11, 16),
+      secondStartHour: occ[1].startTime.slice(11, 16),
+    }).toEqual({ count: 5, firstStartHour: '12:00', secondStartHour: '09:00' });
+  });
 });
