@@ -16,17 +16,18 @@ const username = computed(() => {
 });
 
 // Year for the backend query (null by default)
-const queryYear = ref<number | null>(null);
+const currentCalendarYear = new Date().getFullYear();
+const queryYear = ref<number>(currentCalendarYear);
 
 // Year for display in the title (current year by default)
-const displayYear = ref(new Date().getFullYear());
+const displayYear = ref(currentCalendarYear);
 
 // Get user info to determine account age
 const { result: userResult } = useQuery(
   GET_USER,
-  {
-    username: username,
-  },
+  () => ({
+    username: username.value,
+  }),
   {
     fetchPolicy: 'cache-first',
   }
@@ -43,10 +44,10 @@ const minYear = computed(() => {
 
 const { result: contributionsResult, loading } = useQuery(
   GET_USER_CONTRIBUTIONS,
-  {
-    username: username,
-    year: queryYear,
-  },
+  () => ({
+    username: username.value,
+    year: queryYear.value,
+  }),
   {
     fetchPolicy: 'cache-first',
   }
@@ -111,7 +112,7 @@ const setYear = (newYear: number) => {
 };
 
 // Current year for the max range
-const currentYear = computed(() => new Date().getFullYear());
+const currentYear = computed(() => currentCalendarYear);
 </script>
 <template>
   <div class="overflow-hidden rounded-lg">

@@ -8,6 +8,10 @@ defineProps({
 
 // Generate day labels for skeleton
 const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const cellOpacity = (weekIndex: number, dayIndex: number) => {
+  const pattern = (weekIndex + dayIndex) % 5;
+  return 0.25 + pattern * 0.12;
+};
 </script>
 
 <template>
@@ -42,28 +46,22 @@ const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         </div>
       </div>
 
-      <!-- SVG grid skeleton that matches actual size -->
-      <svg :width="`${52 * 14 + 10}`" height="110" class="overflow-visible">
-        <g
+      <!-- Deterministic div grid avoids SVG hydration edge cases -->
+      <div class="flex gap-1 overflow-hidden" aria-hidden="true">
+        <div
           v-for="week in 52"
           :key="'skeleton-week-' + week"
-          :transform="`translate(${(week - 1) * 14}, 0)`"
+          class="flex flex-col gap-1"
         >
-          <rect
+          <div
             v-for="day in 7"
             :key="'skeleton-cell-' + week + '-' + day"
-            x="0"
-            :y="(day - 1) * 14"
-            width="10"
-            height="10"
-            class="rounded-sm"
+            class="h-[10px] w-[10px] rounded-sm"
             :class="darkMode ? 'bg-gray-700' : 'bg-gray-300'"
-            :style="{ opacity: 0.2 + Math.random() * 0.5 }"
-            rx="2"
-            ry="2"
+            :style="{ opacity: cellOpacity(week, day) }"
           />
-        </g>
-      </svg>
+        </div>
+      </div>
     </div>
 
     <!-- Color legend skeleton -->

@@ -5,18 +5,25 @@ import { mount } from '@vue/test-utils';
 import UserProfileSidebar from '@/components/user/UserProfileSidebar.vue';
 
 const h = vi.hoisted(() => ({
-  useQuery: vi.fn(),
   result: null as unknown,
   loading: null as unknown,
   error: null as unknown,
   route: null as unknown,
   username: null as unknown,
   profilePicURL: null as unknown,
+  useQuerySpy: null as unknown as ReturnType<typeof vi.fn>,
 }));
 
-vi.mock('@vue/apollo-composable', () => ({
-  useQuery: h.useQuery,
-}));
+vi.mock('@vue/apollo-composable', () => {
+  h.useQuerySpy = vi.fn(() => ({
+    result: h.result,
+    loading: h.loading,
+    error: h.error,
+  }));
+  return {
+    useQuery: (...args: unknown[]) => h.useQuerySpy(...args),
+  };
+});
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => h.username,
@@ -57,25 +64,22 @@ beforeEach(() => {
   h.route = { params: { username: 'alice' } };
   h.username = ref('bob');
   h.profilePicURL = ref('');
-  h.useQuery.mockImplementation(() => ({
-    result: h.result,
-    loading: h.loading,
-    error: h.error,
-  }));
 });
 
-describe('UserProfileSidebar identity', () => {
-  it('enables the profile query for a logged-out visitor based on the route username', () => {
+describe('UserProfileSidebar query configuration', () => {
+  it('enables the profile query for public profiles even when the viewer is logged out', () => {
     h.username = ref('');
     mountSidebar();
 
-    const queryOptions = h.useQuery.mock.calls[0]?.[2] as
-      | { enabled?: { value: boolean } }
-      | undefined;
+    const queryOptions = h.useQuerySpy.mock.calls[0][2] as {
+      enabled?: { value: boolean };
+    };
 
-    expect(queryOptions?.enabled?.value).toBe(true);
+    expect(queryOptions.enabled?.value).toBe(true);
   });
+});
 
+describe('UserProfileSidebar identity', () => {
   it('shows the username when there is no display name', () => {
     h.route = { params: { username: 'alice' } };
     h.username = ref('alice');
@@ -156,6 +160,12 @@ describe('UserProfileSidebar profile picture', () => {
 });
 
 describe('UserProfileSidebar content', () => {
+  it('shows a stable joined date label', () => {
+    const wrapper = mountSidebar();
+
+    expect(wrapper.text()).toContain('Joined ');
+  });
+
   it('renders the bio', () => {
     h.result = ref({ users: [user({ bio: 'hi there' })] });
     const wrapper = mountSidebar();
