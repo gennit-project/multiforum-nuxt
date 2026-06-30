@@ -55,7 +55,7 @@ describe('ServerTabs', () => {
   it('renders all admin tabs', () => {
     const wrapper = mountTabs();
 
-    expect(tabs(wrapper)).toHaveLength(9);
+    expect(tabs(wrapper)).toHaveLength(8);
   });
 
   it('labels the first tab Dashboard', () => {

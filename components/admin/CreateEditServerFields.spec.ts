@@ -26,6 +26,7 @@ const mountFields = (props: Record<string, unknown> = {}) =>
         BookIcon: true,
         CalendarIcon: true,
         DownloadIcon: true,
+        IdentificationIcon: true,
       },
     },
   });
@@ -90,6 +91,13 @@ describe('CreateEditServerFields current tab label', () => {
     const wrapper = mountFields();
 
     expect(dropdownToggle(wrapper)!.text()).toContain('Rules');
+  });
+
+  it('reflects the roles tab in the dropdown toggle', () => {
+    h.route = { name: 'admin-settings-roles' };
+    const wrapper = mountFields();
+
+    expect(dropdownToggle(wrapper)!.text()).toContain('Roles');
   });
 
   it('falls back to "Settings" when no tab matches', () => {

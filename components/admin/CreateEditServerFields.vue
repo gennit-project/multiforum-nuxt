@@ -12,6 +12,7 @@ import CogIcon from '@/components/icons/CogIcon.vue';
 import BookIcon from '@/components/icons/BookIcon.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
+import IdentificationIcon from '@/components/icons/IdentificationIcon.vue';
 
 const props = defineProps({
   editMode: {
@@ -77,6 +78,12 @@ const tabs = [
     key: 'downloads',
     label: 'Download Settings',
     icon: DownloadIcon,
+    fontAwesome: null,
+  },
+  {
+    key: 'roles',
+    label: 'Roles',
+    icon: IdentificationIcon,
     fontAwesome: null,
   },
 ];
