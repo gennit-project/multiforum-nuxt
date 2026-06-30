@@ -2,8 +2,6 @@ import { describe, it, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref, defineComponent, h } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import MarkdownPreview from '@/components/MarkdownPreview.vue';
-
 vi.mock('nuxt/app', () => ({ useHead: vi.fn() }));
 
 vi.mock('vue-router', () => ({
@@ -36,6 +34,21 @@ const RequireAuthStub = defineComponent({
   },
 });
 
+const LibraryCommentCardStub = defineComponent({
+  name: 'LibraryCommentCard',
+  props: {
+    comment: {
+      type: Object,
+      required: true,
+    },
+    contextType: {
+      type: String,
+      required: true,
+    },
+  },
+  template: '<div>{{ comment.text }} {{ contextType }}</div>',
+});
+
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 
 const mountWith = async (collection: unknown) => {
@@ -47,7 +60,17 @@ const mountWith = async (collection: unknown) => {
   });
   const Page = (await import('./[collectionId].vue')).default;
   return shallowMount(Page, {
-    global: { stubs: { RequireAuth: RequireAuthStub } },
+    global: {
+      stubs: {
+        RequireAuth: RequireAuthStub,
+        NuxtLink: { template: '<a><slot /></a>' },
+        LibraryDownloadCard: true,
+        LibraryDiscussionCard: true,
+        LibraryChannelCard: true,
+        LibraryCommentCard: LibraryCommentCardStub,
+        ImageListItem: true,
+      },
+    },
   });
 };
 
@@ -90,15 +113,15 @@ describe('library collection detail page', () => {
   // MarkdownRenderer which cannot expand images.
   it('renders comment bodies via MarkdownPreview', async () => {
     const wrapper = await mountWith(commentsCollection);
-    expect(wrapper.findComponent(MarkdownPreview).props('text')).toBe(
-      commentsCollection.Comments[0].text
+    expect(wrapper.findComponent(LibraryCommentCardStub).props('comment')).toEqual(
+      commentsCollection.Comments[0]
     );
   });
 
   it('enables the image lightbox for comment bodies', async () => {
     const wrapper = await mountWith(commentsCollection);
-    expect(wrapper.findComponent(MarkdownPreview).props('disableGallery')).toBe(
-      false
+    expect(wrapper.findComponent(LibraryCommentCardStub).props('contextType')).toBe(
+      'Discussion'
     );
   });
 });

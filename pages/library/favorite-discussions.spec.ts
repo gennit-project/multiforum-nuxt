@@ -25,6 +25,17 @@ const RequireAuthStub = defineComponent({
   },
 });
 
+const LibraryDiscussionCardStub = defineComponent({
+  name: 'LibraryDiscussionCard',
+  props: {
+    discussion: {
+      type: Object,
+      required: true,
+    },
+  },
+  template: '<div>{{ discussion.title }}</div>',
+});
+
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 
 const mountWith = async (favorites: unknown[]) => {
@@ -35,7 +46,13 @@ const mountWith = async (favorites: unknown[]) => {
   });
   const Page = (await import('./favorite-discussions.vue')).default;
   return shallowMount(Page, {
-    global: { stubs: { RequireAuth: RequireAuthStub, NuxtLink: { template: '<a><slot /></a>' } } },
+    global: {
+      stubs: {
+        RequireAuth: RequireAuthStub,
+        NuxtLink: { template: '<a><slot /></a>' },
+        LibraryDiscussionCard: LibraryDiscussionCardStub,
+      },
+    },
   });
 };
 

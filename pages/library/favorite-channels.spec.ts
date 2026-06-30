@@ -22,6 +22,17 @@ const RequireAuthStub = defineComponent({
   },
 });
 
+const LibraryChannelCardStub = defineComponent({
+  name: 'LibraryChannelCard',
+  props: {
+    channel: {
+      type: Object,
+      required: true,
+    },
+  },
+  template: '<div>{{ channel.displayName }}</div>',
+});
+
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 
 const mountWith = async (channels: unknown[]) => {
@@ -32,7 +43,13 @@ const mountWith = async (channels: unknown[]) => {
   });
   const Page = (await import('./favorite-channels.vue')).default;
   return shallowMount(Page, {
-    global: { stubs: { RequireAuth: RequireAuthStub } },
+    global: {
+      stubs: {
+        RequireAuth: RequireAuthStub,
+        NuxtLink: { template: '<a><slot /></a>' },
+        LibraryChannelCard: LibraryChannelCardStub,
+      },
+    },
   });
 };
 
@@ -47,8 +64,6 @@ describe('favorite-channels page', () => {
       { uniqueName: 'cats', displayName: 'Cats' },
       { uniqueName: 'dogs', displayName: 'Dogs' },
     ]);
-    expect(wrapper.findAllComponents({ name: 'AddToChannelFavorites' })).toHaveLength(
-      2
-    );
+    expect(wrapper.findAllComponents(LibraryChannelCardStub)).toHaveLength(2);
   });
 });
