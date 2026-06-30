@@ -23,6 +23,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  compact: {
+    type: Boolean,
+    default: false,
+  },
   dataTestid: {
     type: String,
     default: '',
@@ -77,6 +81,12 @@ const classes = computed(() => {
 });
 
 const isHovered = ref(false);
+
+const innerClasses = computed(() => [
+  props.compact ? 'px-2 py-2' : 'px-2 py-4',
+  !props.vertical && isHovered.value ? 'bg-gray-100 dark:bg-gray-700' : '',
+  props.showCount && props.count ? '' : 'pr-4',
+]);
 </script>
 
 <template>
@@ -89,11 +99,7 @@ const isHovered = ref(false);
     @mouseleave="isHovered = false"
   >
     <div
-      :class="[
-        'px-2 py-4',
-        !vertical && isHovered ? 'bg-gray-100 dark:bg-gray-700' : '',
-        showCount && count ? '' : 'pr-4',
-      ]"
+      :class="innerClasses"
       class="flex h-6 items-center space-x-2 rounded-lg sm:my-1 md:my-1"
     >
       <div class="text-black dark:text-gray-400">

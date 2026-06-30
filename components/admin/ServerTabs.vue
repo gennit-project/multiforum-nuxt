@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, defineAsyncComponent } from 'vue';
 import type { Component } from 'vue';
 import TabButton from '@/components/channel/TabButton.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
@@ -12,6 +12,9 @@ import UserIcon from '@/components/icons/UserIcon.vue';
 import type { Channel } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
 import { LayoutDashboard } from 'lucide-vue-next';
+import { useDisplay } from 'vuetify';
+
+const Popper = defineAsyncComponent(() => import('vue3-popper'));
 
 type Tab = {
   name: string;
@@ -41,6 +44,7 @@ const props = defineProps({
 });
 
 const route = useRoute();
+const { mdAndUp } = useDisplay();
 
 const tabRoutes = computed(() => {
   const routes: TabRoutes = {
@@ -60,6 +64,8 @@ const tabRoutes = computed(() => {
 const iconSize = computed(() =>
   props.vertical ? 'h-6 w-6 shrink-0' : 'h-5 w-5 shrink-0'
 );
+
+const isTabActive = (tab: Tab) => route.path.includes(tab.routeSuffix);
 
 const tabs = computed((): Tab[] => {
   const baseTabs: Tab[] = [
@@ -130,30 +136,106 @@ const tabs = computed((): Tab[] => {
 
   return baseTabs;
 });
+
+const activeTab = computed(() => {
+  return tabs.value.find((tab) => isTabActive(tab)) || tabs.value[0];
+});
 </script>
 
 <template>
   <div>
-    <nav
-      :class="
-        vertical
-          ? 'text-md flex flex-col'
-          : 'flex flex-wrap gap-x-2 gap-y-1 pt-1 text-sm sm:flex-nowrap'
-      "
-      aria-label="Tabs"
-    >
-      <TabButton
-        v-for="tab in tabs"
-        :key="tab.name"
-        :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
-        :to="tabRoutes[tab.name] || ''"
-        :label="tab.label"
-        :is-active="route.path.includes(tab.routeSuffix)"
-        :vertical="vertical"
-        :show-count="false"
+    <ClientOnly>
+      <nav
+        v-if="mdAndUp"
+        :class="
+          vertical
+            ? 'text-md flex flex-col'
+            : 'flex flex-wrap gap-x-2 gap-y-1 pt-1 text-sm'
+        "
+        aria-label="Tabs"
       >
-        <component :is="tab.icon" :class="iconSize" />
-      </TabButton>
-    </nav>
+        <TabButton
+          v-for="tab in tabs"
+          :key="tab.name"
+          :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
+          :to="tabRoutes[tab.name] || ''"
+          :label="tab.label"
+          :is-active="isTabActive(tab)"
+          :compact="true"
+          :vertical="vertical"
+          :show-count="false"
+        >
+          <component :is="tab.icon" :class="iconSize" />
+        </TabButton>
+      </nav>
+
+      <div v-else class="relative">
+        <Popper>
+          <template #default>
+            <button
+              class="hover:bg-gray-50 flex w-full items-center justify-between rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+              data-testid="mobile-admin-nav-dropdown"
+            >
+              <div class="flex items-center space-x-2">
+                <component :is="activeTab?.icon" class="h-5 w-5 shrink-0" />
+                <span>{{ activeTab?.label }}</span>
+              </div>
+              <i class="fa-solid fa-chevron-down ml-2 h-4 w-4" />
+            </button>
+          </template>
+
+          <template #content>
+            <div
+              class="mt-1 w-56 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-600"
+            >
+              <div class="py-1">
+                <nuxt-link
+                  v-for="tab in tabs"
+                  :key="tab.name"
+                  :to="tabRoutes[tab.name] || ''"
+                  :data-testid="`mobile-dropdown-${tab.name}`"
+                  class="flex items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                  :class="[
+                    isTabActive(tab)
+                      ? 'bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-300'
+                      : 'text-gray-700 dark:text-gray-200',
+                  ]"
+                >
+                  <div class="flex items-center space-x-2">
+                    <component :is="tab.icon" class="h-5 w-5 shrink-0" />
+                    <span>{{ tab.label }}</span>
+                  </div>
+                </nuxt-link>
+              </div>
+            </div>
+          </template>
+        </Popper>
+      </div>
+
+      <template #fallback>
+        <nav
+          :class="
+            vertical
+              ? 'text-md flex flex-col'
+              : 'flex flex-wrap gap-x-2 gap-y-1 pt-1 text-sm'
+          "
+          aria-label="Tabs"
+        >
+          <TabButton
+            v-for="tab in tabs"
+            :key="tab.name"
+            :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
+            :to="tabRoutes[tab.name] || ''"
+            :label="tab.label"
+            :is-active="isTabActive(tab)"
+            :compact="true"
+            :vertical="vertical"
+            :show-count="false"
+          >
+            <component :is="tab.icon" :class="iconSize" />
+          </TabButton>
+        </nav>
+      </template>
+    </ClientOnly>
   </div>
 </template>
