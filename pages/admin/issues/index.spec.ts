@@ -1,19 +1,55 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
-import { setActivePinia, createPinia } from 'pinia';
 import { useQuery } from '@vue/apollo-composable';
 import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
 
-const query: Record<string, string> = {};
+const h = vi.hoisted(() => ({
+  query: {
+    showOnlyServerRuleViolations: '',
+    searchInput: '',
+    startDate: '2026-05-27',
+    endDate: '2026-06-26',
+  } as Record<string, string>,
+  routerPush: vi.fn(),
+  routerReplace: vi.fn(),
+  refetch: vi.fn(),
+  setSelectedIssueSelection: vi.fn(),
+  selectedIssueNumber: null as unknown as { value: number | null },
+  updateFilters: vi.fn(),
+}));
+
+h.selectedIssueNumber = ref<number | null>(null);
 
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({ params: { forumId: '' }, query }),
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useRoute: () => ({
+    params: { forumId: '' },
+    path: '/admin/issues',
+    query: h.query,
+  }),
+  useRouter: () => ({ push: h.routerPush, replace: h.routerReplace }),
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
+}));
+
+vi.mock('@/utils/routerUtils', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  updateFilters: h.updateFilters,
+}));
+
+vi.mock('@/stores/uiStore', () => ({
+  useUIStore: () => ({
+    setSelectedIssueSelection: h.setSelectedIssueSelection,
+  }),
+}));
+
+vi.mock('pinia', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  storeToRefs: () => ({
+    selectedIssueNumber: h.selectedIssueNumber,
+  }),
 }));
 
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
@@ -24,37 +60,82 @@ const mountWith = async (opts: { loading?: boolean; issues?: unknown[] }) => {
     result: ref({ issues }),
     error: ref(null),
     loading: ref(loading),
-    refetch: vi.fn(),
+    refetch: h.refetch,
   });
   const Page = (await import('./index.vue')).default;
-  return shallowMount(Page);
+  return shallowMount(Page, {
+    global: {
+      stubs: {
+        SearchBar: {
+          name: 'SearchBar',
+          emits: ['update-search-input'],
+          template:
+            '<button class="search-bar" @click="$emit(\'update-search-input\', \'needle\')" />',
+        },
+        ModIssueListItem: {
+          name: 'ModIssueListItem',
+          props: ['issue'],
+          emits: ['select'],
+          template:
+            '<li class="issue-item" @click="$emit(\'select\', { issueNumber: 9, title: \'Issue\', channelId: \'cats\' })" />',
+        },
+      },
+    },
+  });
 };
 
-describe('admin server issues index page', () => {
-  beforeEach(() => {
-    setActivePinia(createPinia());
-    mockedUseQuery.mockReset();
-    query.showOnlyServerRuleViolations = '';
-    query.startDate = '2026-05-27';
-    query.endDate = '2026-06-26';
-    delete query.channels;
-  });
+beforeEach(() => {
+  vi.clearAllMocks();
+  h.query.showOnlyServerRuleViolations = '';
+  h.query.searchInput = '';
+  h.query.startDate = '2026-05-27';
+  h.query.endDate = '2026-06-26';
+  delete h.query.channels;
+  h.selectedIssueNumber.value = null;
+});
 
+describe('admin server issues index page', () => {
   it('defaults the server-rule-violations checkbox to checked', async () => {
     const wrapper = await mountWith({ issues: [] });
     expect(
-      (wrapper.get('[data-testid="show-only-server-rule-violations"]')
-        .element as HTMLInputElement).checked
+      (
+        wrapper.get('[data-testid="show-only-server-rule-violations"]')
+          .element as HTMLInputElement
+      ).checked
     ).toBe(true);
   });
 
   it('unchecks the filter when the query opts out', async () => {
-    query.showOnlyServerRuleViolations = 'false';
+    h.query.showOnlyServerRuleViolations = 'false';
     const wrapper = await mountWith({ issues: [] });
     expect(
-      (wrapper.get('[data-testid="show-only-server-rule-violations"]')
-        .element as HTMLInputElement).checked
+      (
+        wrapper.get('[data-testid="show-only-server-rule-violations"]')
+          .element as HTMLInputElement
+      ).checked
     ).toBe(false);
+  });
+
+  it('updates the filters when the checkbox changes', async () => {
+    const wrapper = await mountWith({ issues: [] });
+    await wrapper
+      .get('[data-testid="show-only-server-rule-violations"]')
+      .setValue(false);
+    expect(h.updateFilters).toHaveBeenCalledWith({
+      router: { push: h.routerPush, replace: h.routerReplace },
+      route: { params: { forumId: '' }, path: '/admin/issues', query: h.query },
+      params: { showOnlyServerRuleViolations: false },
+    });
+  });
+
+  it('updates the filters when the search bar emits a new value', async () => {
+    const wrapper = await mountWith({ issues: [] });
+    await wrapper.get('.search-bar').trigger('click');
+    expect(h.updateFilters).toHaveBeenCalledWith({
+      router: { push: h.routerPush, replace: h.routerReplace },
+      route: { params: { forumId: '' }, path: '/admin/issues', query: h.query },
+      params: { searchInput: 'needle' },
+    });
   });
 
   it('renders an item per issue', async () => {
@@ -67,8 +148,18 @@ describe('admin server issues index page', () => {
     expect(wrapper.findAllComponents(ModIssueListItem)).toHaveLength(0);
   });
 
+  it('stores the selected issue when a list item emits select', async () => {
+    const wrapper = await mountWith({ issues: [{ id: 'i1' }] });
+    await wrapper.get('.issue-item').trigger('click');
+    expect(h.setSelectedIssueSelection).toHaveBeenCalledWith({
+      issueNumber: 9,
+      title: 'Issue',
+      channelId: 'cats',
+    });
+  });
+
   it('passes the selected channel filter into the issues query variables', async () => {
-    query.channels = 'announcements';
+    h.query.channels = 'announcements';
     await mountWith({ issues: [] });
     expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).toMatchObject({
       channelUniqueName_IN: ['announcements'],

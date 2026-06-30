@@ -1,166 +1,105 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mount } from '@vue/test-utils';
+import { nextTick } from 'vue';
 import Map from '@/components/event/map/Map.vue';
 import type { Event } from '@/__generated__/graphql';
+import type { MarkerMap } from '@/components/event/map/Map.vue';
 
-// Mock the Google Maps API and MarkerClusterer
-const mockMap = {
-  fitBounds: vi.fn(),
-  getZoom: vi.fn().mockReturnValue(10),
-  setZoom: vi.fn(),
-};
-
-const mockMarker = {
-  getPosition: vi.fn().mockReturnValue({}),
-  addListener: vi.fn(),
-  setMap: vi.fn(),
-  setIcon: vi.fn(),
-  getMap: vi.fn().mockReturnValue({}), // Mock getMap to return a map object
-};
-
-const mockBounds = {
-  extend: vi.fn(),
-  isEmpty: vi.fn().mockReturnValue(false),
-};
-
-const mockInfoWindow = vi.fn();
-
-const mockMarkerClusterer = {
-  clearMarkers: vi.fn(),
-};
-
-// Mock AdvancedMarkerElement / PinElement, which the component pulls from
-// google.maps.importLibrary('marker').
-const mockMarkerEl = { addEventListener: vi.fn() };
-const mockPin = { element: mockMarkerEl };
-const mockAdvancedMarker = { addListener: vi.fn(), map: null };
-const AdvancedMarkerElement = vi.fn().mockImplementation(function () {
-  return mockAdvancedMarker;
-});
-const PinElement = vi.fn().mockImplementation(function () {
-  return mockPin;
-});
-
-// Mock Google Maps
-global.google = {
-  maps: {
-    // Regular functions so each mock can be invoked with `new` (vitest 4
-    // throws "is not a constructor" for arrow-function implementations).
-    Map: vi.fn().mockImplementation(function () {
-      return mockMap;
-    }),
-    Marker: vi.fn().mockImplementation(function () {
-      return mockMarker;
-    }),
-    LatLngBounds: vi.fn().mockImplementation(function () {
-      return mockBounds;
-    }),
-    LatLng: vi.fn().mockImplementation(function (lat, lng) {
-      return { lat, lng };
-    }),
-    InfoWindow: vi.fn().mockImplementation(function () {
-      return mockInfoWindow;
-    }),
-    event: {
-      clearInstanceListeners: vi.fn(),
-    },
-    ControlPosition: {
-      RIGHT_TOP: 1,
-    },
-    ColorScheme: {
-      LIGHT: 'LIGHT',
-      DARK: 'DARK',
-      FOLLOW_SYSTEM: 'FOLLOW_SYSTEM',
-    },
-    importLibrary: vi
-      .fn()
-      .mockResolvedValue({ AdvancedMarkerElement, PinElement }),
+const h = vi.hoisted(() => ({
+  fullPath: '/map/search',
+  markerInstances: [] as Array<{
+    listeners: Record<string, () => void>;
+    map: unknown;
+    title?: string;
+  }>,
+  markerElements: [] as Array<{
+    listeners: Record<string, () => void>;
+  }>,
+  clusterConfig: null as null | {
+    markers: unknown[];
+    map: {
+      fitBounds: ReturnType<typeof vi.fn>;
+      getZoom: ReturnType<typeof vi.fn>;
+      setZoom: ReturnType<typeof vi.fn>;
+    };
+    onClusterClick: (
+      event: unknown,
+      cluster: { bounds?: unknown },
+      clustererMap: {
+        fitBounds: ReturnType<typeof vi.fn>;
+        getZoom: ReturnType<typeof vi.fn>;
+        setZoom: ReturnType<typeof vi.fn>;
+      }
+    ) => void;
   },
-} as any;
-
-// Mock MarkerClusterer
-vi.mock('@googlemaps/markerclusterer', () => ({
-  // Use a regular function so the mock can be invoked with `new` (vitest 4
-  // throws "is not a constructor" for arrow-function implementations).
-  MarkerClusterer: vi.fn().mockImplementation(function () {
-    return mockMarkerClusterer;
-  }),
+  infoWindow: {
+    setContent: vi.fn(),
+    open: vi.fn(),
+    close: vi.fn(),
+  },
+  map: {
+    fitBounds: vi.fn(),
+    getZoom: vi.fn(() => 16),
+    setZoom: vi.fn(),
+  },
+  bounds: {
+    extend: vi.fn(),
+    isEmpty: vi.fn(() => false),
+  },
 }));
 
-// Mock the loader
 vi.mock('@googlemaps/js-api-loader', () => ({
   Loader: vi.fn().mockImplementation(function () {
-    return {
-      load: vi.fn().mockResolvedValue({}),
-    };
+    return { load: vi.fn().mockResolvedValue(undefined) };
   }),
 }));
 
-// Mock config
+vi.mock('@googlemaps/markerclusterer', () => ({
+  MarkerClusterer: vi.fn().mockImplementation(function (config) {
+    h.clusterConfig = config;
+    return { clearMarkers: vi.fn() };
+  }),
+}));
+
 vi.mock('@/config', () => ({
   config: {
     googleMapsApiKey: 'test-key',
+    googleMapId: 'test-map-id',
   },
 }));
 
-// Mock theme composable
 vi.mock('@/composables/useTheme', () => ({
   useAppTheme: () => ({
     theme: { value: 'light' },
   }),
 }));
 
-// Mock router
-const mockRouter = {
-  currentRoute: {
-    value: {
-      fullPath: '/test',
-    },
-  },
-};
 vi.mock('nuxt/app', () => ({
-  useRouter: () => mockRouter,
+  useRouter: () => ({
+    currentRoute: {
+      value: {
+        get fullPath() {
+          return h.fullPath;
+        },
+      },
+    },
+  }),
 }));
 
-describe('Map with Clustering', () => {
-  const mockEvents: Event[] = [
-    {
-      id: '1',
-      title: 'Event 1',
-      location: {
-        latitude: 33.4255,
-        longitude: -111.94,
-      },
-    } as Event,
-    {
-      id: '2',
-      title: 'Event 2',
-      location: {
-        latitude: 33.4256, // Very close to first event
-        longitude: -111.941,
-      },
-    } as Event,
-    {
-      id: '3',
-      title: 'Event 3',
-      location: {
-        latitude: 34.0522, // Different location
-        longitude: -118.2437,
-      },
-    } as Event,
-  ];
+const waitForMap = async () => {
+  await nextTick();
+  await Promise.resolve();
+  await nextTick();
+};
 
+describe('Map', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    h.fullPath = '/map/search';
+    h.markerInstances = [];
+    h.markerElements = [];
+    h.clusterConfig = null;
 
-    // Mock DOM elements
-    Object.defineProperty(window, 'innerWidth', {
-      writable: true,
-      configurable: true,
-      value: 1024,
-    });
-
-    // Mock MutationObserver (regular function so it works with `new`)
     global.MutationObserver = vi.fn().mockImplementation(function () {
       return {
         observe: vi.fn(),
@@ -168,72 +107,251 @@ describe('Map with Clustering', () => {
       };
     }) as unknown as typeof MutationObserver;
 
-    // Mock document
-    Object.defineProperty(document, 'documentElement', {
-      writable: true,
-      configurable: true,
-      value: {
-        classList: {
-          contains: vi.fn().mockReturnValue(false),
+    global.google = {
+      maps: {
+        Map: vi.fn().mockImplementation(function () {
+          return h.map;
+        }),
+        LatLngBounds: vi.fn().mockImplementation(function () {
+          return h.bounds;
+        }),
+        LatLng: vi.fn().mockImplementation(function (lat, lng) {
+          return { lat, lng };
+        }),
+        InfoWindow: vi.fn().mockImplementation(function () {
+          return h.infoWindow;
+        }),
+        event: {
+          clearInstanceListeners: vi.fn(),
         },
+        ControlPosition: {
+          RIGHT_BOTTOM: 'RIGHT_BOTTOM',
+        },
+        ColorScheme: {
+          LIGHT: 'LIGHT',
+          DARK: 'DARK',
+        },
+        importLibrary: vi.fn().mockResolvedValue({
+          AdvancedMarkerElement: vi.fn().mockImplementation(function (config) {
+            const instance = {
+              ...config,
+              listeners: {} as Record<string, () => void>,
+              addListener: vi.fn((name: string, cb: () => void) => {
+                instance.listeners[name] = cb;
+              }),
+            };
+            h.markerInstances.push(instance);
+            return instance;
+          }),
+          PinElement: vi.fn().mockImplementation(function () {
+            const element = {
+              listeners: {} as Record<string, () => void>,
+              addEventListener: vi.fn((name: string, cb: () => void) => {
+                element.listeners[name] = cb;
+              }),
+            };
+            h.markerElements.push(element);
+            return { element };
+          }),
+        }),
       },
-    });
+    } as any;
+
+    vi.stubGlobal('setTimeout', vi.fn((cb: () => void) => {
+      cb();
+      return 0 as unknown as ReturnType<typeof setTimeout>;
+    }));
   });
 
-  it('should initialize MarkerClusterer with events', async () => {
-    const { MarkerClusterer } = await import('@googlemaps/markerclusterer');
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
+  it('renders the empty-state message when no events are provided', () => {
     const wrapper = mount(Map, {
       props: {
-        events: mockEvents,
+        events: [],
         colorLocked: false,
         previewIsOpen: false,
         useMobileStyles: false,
       },
     });
 
-    // Wait for component to mount and async renderMap to complete
-    await wrapper.vm.$nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    // Verify MarkerClusterer was called
-    expect(MarkerClusterer).toHaveBeenCalled();
-
-    // Verify map was created
-    expect(global.google.maps.Map).toHaveBeenCalled();
-
-    // Verify one advanced marker was created per event
-    expect(AdvancedMarkerElement).toHaveBeenCalledTimes(mockEvents.length);
+    expect(wrapper.text()).toContain('Could not find any events with a location.');
   });
 
-  it('should create MarkerClusterer with correct configuration', async () => {
-    const { MarkerClusterer } = await import('@googlemaps/markerclusterer');
+  it('groups events by location before creating markers and emits the marker data', async () => {
+    const events = [
+      {
+        id: 'e1',
+        title: 'First',
+        locationName: 'Phoenix',
+        location: { latitude: 33.4, longitude: -111.9 },
+      },
+      {
+        id: 'e2',
+        title: 'Second',
+        locationName: 'Phoenix',
+        location: { latitude: 33.4, longitude: -111.9 },
+      },
+      {
+        id: 'e3',
+        title: 'Third',
+        locationName: 'Tempe',
+        location: { latitude: 33.5, longitude: -111.8 },
+      },
+    ] as Event[];
 
     const wrapper = mount(Map, {
       props: {
-        events: mockEvents,
+        events,
         colorLocked: false,
         previewIsOpen: false,
         useMobileStyles: false,
       },
     });
 
-    // Wait for component to mount and async renderMap to complete
-    await wrapper.vm.$nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await waitForMap();
 
-    // Verify MarkerClusterer was called with correct parameters
-    expect(MarkerClusterer).toHaveBeenCalledWith(
-      expect.objectContaining({
-        markers: expect.any(Array),
-        map: expect.any(Object),
-        onClusterClick: expect.any(Function),
-      })
+    const markerDataPayload = wrapper.emitted('setMarkerData')?.[0]?.[0] as
+      | { markerMap: MarkerMap }
+      | undefined;
+    const markerMap = markerDataPayload?.markerMap;
+    expect({
+      markerCount: h.markerInstances.length,
+      groupedLocations: Object.keys(markerMap?.markers ?? {}).length,
+      eventsAtFirstLocation: markerMap?.markers['33.4-111.9']?.numberOfEvents,
+    }).toEqual({
+      markerCount: 2,
+      groupedLocations: 2,
+      eventsAtFirstLocation: 2,
+    });
+  });
+
+  it('emits preview events for a single-event marker click', async () => {
+    const event = {
+      id: 'e1',
+      title: 'First',
+      locationName: 'Phoenix',
+      location: { latitude: 33.4, longitude: -111.9 },
+    } as Event;
+
+    const wrapper = mount(Map, {
+      props: {
+        events: [event],
+        colorLocked: false,
+        previewIsOpen: false,
+        useMobileStyles: false,
+      },
+    });
+
+    await waitForMap();
+    h.markerInstances[0]?.listeners['gmp-click']?.();
+
+    expect({
+      highlighted: wrapper.emitted('highlightEvent')?.[0],
+      previewed: wrapper.emitted('openPreview')?.[0],
+      locked: wrapper.emitted('lockColors')?.length,
+    }).toEqual({
+      highlighted: ['33.4-111.9', 'e1', event, true, true],
+      previewed: [event, true],
+      locked: 1,
+    });
+  });
+
+  it('shows hover info and emits unHighlight on marker leave when the route is pinned to that location', async () => {
+    const event = {
+      id: 'e1',
+      title: 'First',
+      locationName: 'Phoenix',
+      location: { latitude: 33.4, longitude: -111.9 },
+    } as Event;
+    h.fullPath = '/map/search#33.4-111.9';
+
+    const wrapper = mount(Map, {
+      props: {
+        events: [event],
+        colorLocked: false,
+        previewIsOpen: false,
+        useMobileStyles: false,
+      },
+    });
+
+    await waitForMap();
+    h.markerElements[0]?.listeners.mouseenter?.();
+    h.markerElements[0]?.listeners.mouseleave?.();
+
+    expect({
+      hovered: wrapper.emitted('highlightEvent')?.[0],
+      closed: h.infoWindow.close.mock.calls.length,
+      unhighlighted: wrapper.emitted('unHighlight')?.length,
+    }).toEqual({
+      hovered: ['33.4-111.9', 'e1', event, true, false],
+      closed: 1,
+      unhighlighted: 1,
+    });
+  });
+
+  it('fits bounds and caps the zoom after creating the map', async () => {
+    mount(Map, {
+      props: {
+        events: [
+          {
+            id: 'e1',
+            title: 'First',
+            locationName: 'Phoenix',
+            location: { latitude: 33.4, longitude: -111.9 },
+          } as Event,
+        ],
+        colorLocked: false,
+        previewIsOpen: false,
+        useMobileStyles: false,
+      },
+    });
+
+    await waitForMap();
+
+    expect({
+      fitBounds: h.map.fitBounds.mock.calls.length,
+      setZoom: h.map.setZoom.mock.calls[0],
+    }).toEqual({
+      fitBounds: 1,
+      setZoom: [15],
+    });
+  });
+
+  it('zooms into the clicked cluster', async () => {
+    mount(Map, {
+      props: {
+        events: [
+          {
+            id: 'e1',
+            title: 'First',
+            locationName: 'Phoenix',
+            location: { latitude: 33.4, longitude: -111.9 },
+          } as Event,
+        ],
+        colorLocked: false,
+        previewIsOpen: false,
+        useMobileStyles: false,
+      },
+    });
+
+    await waitForMap();
+    h.clusterConfig?.map.fitBounds.mockClear();
+    h.clusterConfig?.map.setZoom.mockClear();
+    h.clusterConfig?.onClusterClick(
+      {},
+      { bounds: { north: 1 } },
+      h.clusterConfig.map
     );
 
-    // Verify the correct number of markers were passed
-    const call = (MarkerClusterer as any).mock.calls[0];
-    const config = call[0];
-    expect(config.markers).toHaveLength(mockEvents.length);
+    expect({
+      fitBounds: h.clusterConfig?.map.fitBounds.mock.calls[0],
+      setZoom: h.clusterConfig?.map.setZoom.mock.calls[0],
+    }).toEqual({
+      fitBounds: [{ north: 1 }],
+      setZoom: [17],
+    });
   });
 });

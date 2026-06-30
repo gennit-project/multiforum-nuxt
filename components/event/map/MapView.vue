@@ -124,8 +124,8 @@ onGetEventResult((value) => {
   if (!value.data || value.data.events.length === 0) {
     return;
   }
-  const defaultSelectedEvent = value.data.events[0].id;
-  sendToPreview(defaultSelectedEvent.id, '');
+  const defaultSelectedEventId = value.data.events[0].id;
+  sendToPreview(defaultSelectedEventId, '');
 });
 
 const sendToPreview = async (eventId: string, eventLocationId: string) => {
