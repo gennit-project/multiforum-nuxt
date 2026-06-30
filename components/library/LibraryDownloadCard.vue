@@ -21,7 +21,7 @@ type DownloadItem = {
   Tags?: Array<{ text?: string | null }> | null;
 };
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     download: DownloadItem;
     downloadLink: string;

@@ -21,7 +21,7 @@ type CommentItem = {
   createdAt: string;
 };
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     comment: CommentItem;
     authorInfo?: AuthorInfo | null;

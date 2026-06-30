@@ -11,7 +11,7 @@ type ChannelItem = {
   Tags?: Array<{ text?: string | null }> | null;
 };
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     channel: ChannelItem;
     showFavoriteButton?: boolean;

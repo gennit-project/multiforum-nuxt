@@ -50,6 +50,7 @@ export default defineNuxtPlugin(() => {
         window.localStorage.setItem(key, value);
       }
     } catch {
+      // Ignore storage write failures in test and embedded browser contexts.
     }
   };
 
@@ -59,6 +60,7 @@ export default defineNuxtPlugin(() => {
         window.localStorage.removeItem(key);
       }
     } catch {
+      // Ignore storage cleanup failures in test and embedded browser contexts.
     }
   };
 
