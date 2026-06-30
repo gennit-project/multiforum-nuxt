@@ -79,7 +79,15 @@ const CommentStub = {
 const PinnedAnswersStub = {
   name: 'PinnedAnswers',
   props: ['answers'],
-  emits: ['create-comment'],
+  emits: [
+    'create-comment',
+    'click-edit-comment',
+    'click-report',
+    'handle-click-archive',
+    'handle-click-archive-and-suspend',
+    'handle-click-unarchive',
+    'update-create-reply-comment-input',
+  ],
   template: '<div class="pinned-answers-stub" />',
 };
 
@@ -100,7 +108,11 @@ const stubs = {
   ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div />' },
   SuspensionNotice: inert('SuspensionNotice'),
   LockIcon: inert('LockIcon'),
-  LoadMore: inert('LoadMore'),
+  LoadMore: {
+    name: 'LoadMore',
+    emits: ['load-more'],
+    template: '<button class="load-more-stub" @click="$emit(\'load-more\')" />',
+  },
   Notification: inert('Notification'),
   WarningModal: inert('WarningModal'),
   BrokenRulesModal: inert('BrokenRulesModal'),
@@ -108,7 +120,19 @@ const stubs = {
   ConfirmUndoCommentFeedbackModal: inert('ConfirmUndoCommentFeedbackModal'),
   EditCommentFeedbackModal: inert('EditCommentFeedbackModal'),
   UnarchiveModal: inert('UnarchiveModal'),
-  NuxtPage: inert('NuxtPage'),
+  NuxtPage: {
+    name: 'NuxtPage',
+    emits: [
+      'open-reply-editor',
+      'hide-reply-editor',
+      'click-edit-comment',
+      'update-edit-comment-input',
+      'save-edit',
+      'scroll-to-top',
+      'handle-view-feedback',
+    ],
+    template: '<div class="nuxt-page-stub" />',
+  },
 };
 
 const makeComment = (id: string, text = `text-${id}`) => ({
@@ -202,6 +226,38 @@ describe('CommentSection', () => {
     expect(wrapper.findComponent(PinnedAnswersStub).exists()).toBe(true);
   });
 
+  it('forwards load-more events', async () => {
+    const wrapper = mountSection({ reachedEndOfResults: false });
+
+    await wrapper.get('.load-more-stub').trigger('click');
+
+    expect(wrapper.emitted('loadMore')).toEqual([[]]);
+  });
+
+  it('hides load-more when the end has been reached', () => {
+    const wrapper = mountSection({ reachedEndOfResults: true });
+
+    expect(wrapper.find('.load-more-stub').exists()).toBe(false);
+  });
+
+  it('wires pinned answer moderation and reply events', async () => {
+    const wrapper = mountSection({ answers: [makeComment('a1')] });
+    const pinned = wrapper.findComponent(PinnedAnswersStub);
+
+    await pinned.vm.$emit('click-edit-comment', makeComment('a1'));
+    await pinned.vm.$emit('update-create-reply-comment-input', {
+      text: 'reply',
+      parentCommentId: 'a1',
+      depth: 2,
+    });
+    await pinned.vm.$emit('click-report', makeComment('a1'));
+    await pinned.vm.$emit('handle-click-archive', 'a1');
+    await pinned.vm.$emit('handle-click-archive-and-suspend', 'a1');
+    await pinned.vm.$emit('handle-click-unarchive', 'a1');
+
+    expect(wrapper.findComponent(PinnedAnswersStub).exists()).toBe(true);
+  });
+
   it('emits updateCreateFormValues after a comment is created', async () => {
     // create-comment -> handleClickCreate -> createComment(mutate) -> onDone
     // -> emit('updateCreateFormValues', resetForm).
@@ -264,5 +320,29 @@ describe('CommentSection', () => {
     // The section is still mounted and the comments still render.
     expect(wrapper.findAllComponents(CommentStub).length).toBeGreaterThan(0);
     expect(window.scrollTo).toHaveBeenCalled();
+  });
+
+  it('forwards NuxtPage editor and navigation events when nested routes are shown', async () => {
+    routeRef.value = { params: { forumId: 'cats', discussionId: 'd1' }, query: {} };
+    const wrapper = mountSection({ showNuxtPage: true });
+    const page = wrapper.findComponent({ name: 'NuxtPage' });
+
+    await page.vm.$emit('open-reply-editor', 'c1');
+    await page.vm.$emit('hide-reply-editor');
+    await page.vm.$emit('click-edit-comment', makeComment('c1', 'original'));
+    await page.vm.$emit('update-edit-comment-input', 'edited via page', true);
+    await page.vm.$emit('save-edit');
+    await page.vm.$emit('scroll-to-top');
+    await page.vm.$emit('handle-view-feedback', 'c1');
+
+    expect({
+      pageExists: page.exists(),
+      scrolled: window.scrollTo,
+      routed: routerPush.mock.calls.length,
+    }).toEqual({
+      pageExists: true,
+      scrolled: expect.any(Function),
+      routed: 1,
+    });
   });
 });

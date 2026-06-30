@@ -11,7 +11,7 @@ vi.mock('nuxt/app', () => ({
   useRouter: () => ({ replace: h.replace }),
 }));
 vi.mock('@/utils/getEventFilterValuesFromParams', () => ({
-  getFilterValuesFromParams: () => ({}),
+  getEventFilterValuesFromParams: () => ({}),
 }));
 
 const tagStub = {

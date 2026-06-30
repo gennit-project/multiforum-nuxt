@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   SEARCH_ROUTES,
   buildSearchQuery,
-  toggleInArray,
+  toggleSearchQuerySelection,
   dedupeRecentSearches,
   type RecentSearch,
 } from './searchQueryBuilder';
@@ -54,13 +54,13 @@ describe('buildSearchQuery', () => {
   });
 });
 
-describe('toggleInArray', () => {
+describe('toggleSearchQuerySelection', () => {
   it('appends a value that is absent', () => {
-    expect(toggleInArray(['a'], 'b')).toEqual(['a', 'b']);
+    expect(toggleSearchQuerySelection(['a'], 'b')).toEqual(['a', 'b']);
   });
 
   it('removes a value that is present', () => {
-    expect(toggleInArray(['a', 'b'], 'a')).toEqual(['b']);
+    expect(toggleSearchQuerySelection(['a', 'b'], 'a')).toEqual(['b']);
   });
 });
 

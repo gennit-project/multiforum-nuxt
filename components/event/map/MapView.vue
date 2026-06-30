@@ -14,7 +14,7 @@ import EventFilterBar from '../list/filters/EventFilterBar.vue';
 import TimeShortcuts from '../list/filters/TimeShortcuts.vue';
 import { GET_EVENTS } from '@/graphQLData/event/queries';
 import getEventWhere from '@/utils/getEventWhere';
-import { getFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
+import { getEventFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
 import {
   chronologicalOrder,
   reverseChronologicalOrder,
@@ -66,7 +66,7 @@ const showInPersonOnly =
 const isMapRoute = computed(() => route.path.startsWith('/map/search'));
 
 const filterValues: Ref<SearchEventValues> = ref(
-  getFilterValuesFromParams({
+  getEventFilterValuesFromParams({
     route: route,
     channelId: props.channelId,
     showOnlineOnly,
@@ -78,7 +78,7 @@ const filterValues: Ref<SearchEventValues> = ref(
 watch(
   () => route.query,
   () => {
-    filterValues.value = getFilterValuesFromParams({
+    filterValues.value = getEventFilterValuesFromParams({
       route,
       channelId: props.channelId,
       showOnlineOnly,

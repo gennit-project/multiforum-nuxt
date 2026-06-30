@@ -63,7 +63,7 @@ export function getChannelLink(channelUniqueName: string | undefined | null): st
 }
 
 /** Sum of comment counts across all of a discussion's forum channels. */
-export function getTotalCommentCount(
+export function getFavoriteDiscussionCommentCount(
   discussionChannels: FavoriteChannel[] | undefined | null
 ): number {
   return (discussionChannels || []).reduce(

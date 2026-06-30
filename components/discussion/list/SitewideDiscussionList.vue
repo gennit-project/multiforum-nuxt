@@ -10,7 +10,7 @@ import { GET_SITE_WIDE_DISCUSSION_LIST } from '@/graphQLData/discussion/queries'
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
-import { getFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
+import { getEventFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,
@@ -43,7 +43,7 @@ const channelId = computed(() => {
 });
 
 const filterValues = ref(
-  getFilterValuesFromParams({ route, channelId: channelId.value })
+  getEventFilterValuesFromParams({ route, channelId: channelId.value })
 );
 const isSitewideSidebarOpen = ref(false);
 
@@ -213,7 +213,7 @@ watch(
   () => route.query,
   () => {
     if (route.query) {
-      filterValues.value = getFilterValuesFromParams({
+      filterValues.value = getEventFilterValuesFromParams({
         route,
         channelId: channelId.value,
       });

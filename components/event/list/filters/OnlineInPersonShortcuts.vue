@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import type { LocationQuery } from 'vue-router';
 import { LocationFilterTypes } from './locationFilterTypes';
-import { getFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
+import { getEventFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
 import type { SearchEventValues } from '@/types/Event';
 import Tag from '@/components/TagComponent.vue';
 import { capitalizeCase } from '@/utils/getSortFromQuery';
@@ -17,7 +17,7 @@ const channelId = computed(() => {
 });
 
 const filterValues = ref<SearchEventValues>(
-  getFilterValuesFromParams({
+  getEventFilterValuesFromParams({
     route,
     channelId: channelId.value,
   })
@@ -61,7 +61,7 @@ const formatLabel = (shortcut: string) => {
 watch(
   () => route.query,
   () => {
-    filterValues.value = getFilterValuesFromParams({
+    filterValues.value = getEventFilterValuesFromParams({
       route,
       channelId: channelId.value,
     });

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
+import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import type { RouteLocationNormalized } from 'vue-router';
 
 const createMockRoute = (
@@ -17,10 +17,10 @@ const createMockRoute = (
     redirectedFrom: undefined,
   }) as RouteLocationNormalized;
 
-describe('getFilterValuesFromParams', () => {
+describe('getDiscussionFilterValuesFromParams', () => {
   describe('default values', () => {
     it('returns empty arrays and defaults when query is empty', () => {
-      const result = getFilterValuesFromParams({
+      const result = getDiscussionFilterValuesFromParams({
         route: createMockRoute(),
         channelId: '',
       });
@@ -35,7 +35,7 @@ describe('getFilterValuesFromParams', () => {
     });
 
     it('includes channelId in channels when provided', () => {
-      const result = getFilterValuesFromParams({
+      const result = getDiscussionFilterValuesFromParams({
         route: createMockRoute(),
         channelId: 'cats',
       });
@@ -46,7 +46,7 @@ describe('getFilterValuesFromParams', () => {
 
   describe('tags parameter', () => {
     it('parses single tag as string', () => {
-      const result = getFilterValuesFromParams({
+      const result = getDiscussionFilterValuesFromParams({
         route: createMockRoute({ tags: 'trivia' }),
         channelId: '',
       });
@@ -55,7 +55,7 @@ describe('getFilterValuesFromParams', () => {
     });
 
     it('parses multiple tags as array', () => {
-      const result = getFilterValuesFromParams({
+      const result = getDiscussionFilterValuesFromParams({
         route: createMockRoute({ tags: ['trivia', 'music'] }),
         channelId: '',
       });
@@ -64,7 +64,7 @@ describe('getFilterValuesFromParams', () => {
     });
 
     it('filters out non-string values from tags array', () => {
-      const result = getFilterValuesFromParams({
+      const result = getDiscussionFilterValuesFromParams({
         route: createMockRoute({
           tags: ['trivia', null, 'music', undefined] as unknown as string[],
         }),
@@ -77,7 +77,7 @@ describe('getFilterValuesFromParams', () => {
 
   describe('channels parameter', () => {
     it('parses single channel as string', () => {
-      const result = getFilterValuesFromParams({
+      const result = getDiscussionFilterValuesFromParams({
         route: createMockRoute({ channels: 'cats' }),
         channelId: '',
       });
@@ -86,7 +86,7 @@ describe('getFilterValuesFromParams', () => {
     });
 
     it('parses multiple channels as array', () => {
-      const result = getFilterValuesFromParams({
+      const result = getDiscussionFilterValuesFromParams({
         route: createMockRoute({ channels: ['cats', 'dogs'] }),
         channelId: '',
       });
@@ -95,7 +95,7 @@ describe('getFilterValuesFromParams', () => {
     });
 
     it('query channels override channelId', () => {
-      const result = getFilterValuesFromParams({
+      const result = getDiscussionFilterValuesFromParams({
         route: createMockRoute({ channels: ['dogs'] }),
         channelId: 'cats',
       });
@@ -106,7 +106,7 @@ describe('getFilterValuesFromParams', () => {
 
   describe('searchInput parameter', () => {
     it('parses searchInput string', () => {
-      const result = getFilterValuesFromParams({
+      const result = getDiscussionFilterValuesFromParams({
         route: createMockRoute({ searchInput: 'test query' }),
         channelId: '',
       });
@@ -115,7 +115,7 @@ describe('getFilterValuesFromParams', () => {
     });
 
     it('ignores non-string searchInput', () => {
-      const result = getFilterValuesFromParams({
+      const result = getDiscussionFilterValuesFromParams({
         route: createMockRoute({
           searchInput: ['array'] as unknown as string,
         }),
@@ -128,7 +128,7 @@ describe('getFilterValuesFromParams', () => {
 
   describe('showArchived parameter', () => {
     it('parses "true" string as true', () => {
-      const result = getFilterValuesFromParams({
+      const result = getDiscussionFilterValuesFromParams({
         route: createMockRoute({ showArchived: 'true' }),
         channelId: '',
       });
@@ -137,7 +137,7 @@ describe('getFilterValuesFromParams', () => {
     });
 
     it('parses "false" string as false', () => {
-      const result = getFilterValuesFromParams({
+      const result = getDiscussionFilterValuesFromParams({
         route: createMockRoute({ showArchived: 'false' }),
         channelId: '',
       });
@@ -146,7 +146,7 @@ describe('getFilterValuesFromParams', () => {
     });
 
     it('defaults to false for other values', () => {
-      const result = getFilterValuesFromParams({
+      const result = getDiscussionFilterValuesFromParams({
         route: createMockRoute({ showArchived: 'yes' }),
         channelId: '',
       });
@@ -157,7 +157,7 @@ describe('getFilterValuesFromParams', () => {
 
   describe('showUnanswered parameter', () => {
     it('parses "true" string as true', () => {
-      const result = getFilterValuesFromParams({
+      const result = getDiscussionFilterValuesFromParams({
         route: createMockRoute({ showUnanswered: 'true' }),
         channelId: '',
       });
@@ -166,7 +166,7 @@ describe('getFilterValuesFromParams', () => {
     });
 
     it('parses "false" string as false', () => {
-      const result = getFilterValuesFromParams({
+      const result = getDiscussionFilterValuesFromParams({
         route: createMockRoute({ showUnanswered: 'false' }),
         channelId: '',
       });
@@ -177,7 +177,7 @@ describe('getFilterValuesFromParams', () => {
 
   describe('combined parameters', () => {
     it('parses all parameters together', () => {
-      const result = getFilterValuesFromParams({
+      const result = getDiscussionFilterValuesFromParams({
         route: createMockRoute({
           tags: ['trivia', 'music'],
           channels: ['cats'],

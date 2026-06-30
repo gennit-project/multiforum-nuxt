@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   buildSearchQuery,
-  toggleInArray,
+  toggleSearchQuerySelection,
   dedupeRecentSearches,
   type RecentSearch,
 } from '@/utils/searchQueryBuilder';
@@ -87,18 +87,18 @@ describe('buildSearchQuery', () => {
   });
 });
 
-describe('toggleInArray', () => {
+describe('toggleSearchQuerySelection', () => {
   it('adds a value that is not present', () => {
-    expect(toggleInArray(['a'], 'b')).toEqual(['a', 'b']);
+    expect(toggleSearchQuerySelection(['a'], 'b')).toEqual(['a', 'b']);
   });
 
   it('removes a value that is present', () => {
-    expect(toggleInArray(['a', 'b'], 'a')).toEqual(['b']);
+    expect(toggleSearchQuerySelection(['a', 'b'], 'a')).toEqual(['b']);
   });
 
   it('does not mutate the original array', () => {
     const original = ['a'];
-    toggleInArray(original, 'b');
+    toggleSearchQuerySelection(original, 'b');
     expect(original).toEqual(['a']);
   });
 });

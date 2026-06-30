@@ -24,22 +24,62 @@ vi.mock('@/composables/useForumRoleMembership', () => ({
 
 const DiscussionCommentsWrapperStub = {
   name: 'DiscussionCommentsWrapper',
-  props: ['comments'],
+  props: ['comments', 'locked', 'reachedEndOfResults'],
+  emits: ['load-more'],
   template: '<div class="comments-wrapper-stub" />',
 };
 
 const stubs = {
-  DiscussionHeader: { template: '<div class="discussion-header-stub" />' },
+  DiscussionHeader: {
+    name: 'DiscussionHeader',
+    props: ['relatedIssueLink'],
+    emits: [
+      'handle-click-edit-body',
+      'handle-click-add-album',
+      'cancel-edit-discussion-body',
+      'handle-click-give-feedback',
+    ],
+    template: '<div class="discussion-header-stub" />',
+  },
   DiscussionCommentsWrapper: DiscussionCommentsWrapperStub,
   DiscussionChannelLinks: { template: '<div />' },
   PageNotFound: { template: '<div class="page-not-found-stub" />' },
-  InfoBanner: { template: '<div />' },
-  ErrorBanner: { template: '<div />' },
-  DiscussionBodyEditForm: { template: '<div />' },
-  AlbumEditForm: { template: '<div />' },
-  ArchivedDiscussionInfoBanner: { template: '<div />' },
-  DiscussionLayoutManager: { template: '<div class="layout-stub"><slot /></div>' },
-  FeedbackModalManager: { template: '<div />' },
+  InfoBanner: { props: ['text'], template: '<div class="info-banner-stub">{{ text }}</div>' },
+  ErrorBanner: { props: ['text'], template: '<div class="error-banner-stub">{{ text }}</div>' },
+  DiscussionBodyEditForm: {
+    name: 'DiscussionBodyEditForm',
+    emits: ['close-editor'],
+    template: '<div class="body-edit-stub" />',
+  },
+  AlbumEditForm: {
+    name: 'AlbumEditForm',
+    emits: ['close-editor'],
+    template: '<div class="album-edit-stub" />',
+  },
+  ArchivedDiscussionInfoBanner: { template: '<div class="archived-banner-stub" />' },
+  DiscussionLayoutManager: {
+    name: 'DiscussionLayoutManager',
+    emits: [
+      'discussion-refetch',
+      'discussion-channel-refetch',
+      'handle-click-add-album',
+      'edit-album',
+      'handle-click-edit-feedback',
+      'handle-click-give-feedback',
+      'handle-click-undo-feedback',
+    ],
+    template: '<div class="layout-stub"><slot /></div>',
+  },
+  FeedbackModalManager: {
+    name: 'FeedbackModalManager',
+    emits: ['feedback-submitted'],
+    template: '<div class="feedback-modal-manager-stub" />',
+    methods: {
+      handleClickGiveFeedback: vi.fn(),
+      handleClickUndoFeedback: vi.fn(),
+      handleClickEditFeedback: vi.fn(),
+    },
+  },
 };
 
 const makeDiscussion = (overrides: Record<string, unknown> = {}): Discussion =>
@@ -48,8 +88,17 @@ const makeDiscussion = (overrides: Record<string, unknown> = {}): Discussion =>
     title: 'Test Discussion',
     body: 'body',
     DiscussionChannels: [
-      { channelUniqueName: 'cats', __typename: 'DiscussionChannel' },
+      {
+        id: 'dc1',
+        channelUniqueName: 'cats',
+        archived: false,
+        locked: false,
+        Answers: [],
+        Channel: { feedbackEnabled: true, emojiEnabled: true },
+        __typename: 'DiscussionChannel',
+      },
     ],
+    Author: { username: 'author' },
     __typename: 'Discussion',
     ...overrides,
   }) as unknown as Discussion;
@@ -63,6 +112,10 @@ const commentSection = (comments: Comment[]) => ({
       id: 'dc1',
       channelUniqueName: 'cats',
       Answers: [],
+      archived: false,
+      locked: false,
+      CommentsAggregate: { count: comments.length },
+      Channel: { feedbackEnabled: true, emojiEnabled: true },
       __typename: 'DiscussionChannel',
     },
     Comments: comments,
@@ -73,24 +126,59 @@ const setup = (params: {
   discussions?: Discussion[];
   comments?: Comment[];
   hasCommentSection?: boolean;
+  discussionChannelOverrides?: Record<string, unknown>;
+  issueResult?: Record<string, unknown>;
 } = {}) => {
-  const { discussions = [makeDiscussion()], comments = [], hasCommentSection = true } = params;
+  const {
+    discussions = [makeDiscussion()],
+    comments = [],
+    hasCommentSection = true,
+    discussionChannelOverrides = {},
+    issueResult = { issues: [] },
+  } = params;
+  const section = commentSection(comments);
+  Object.assign(
+    section.getCommentSection.DiscussionChannel,
+    discussionChannelOverrides
+  );
+  const discussionQuery = createQueryMock({ discussions });
+  const commentSectionQuery = {
+    ...createQueryMock(hasCommentSection ? section : { getCommentSection: null }),
+    fetchMore: vi.fn(),
+  } as ReturnType<typeof createQueryMock> & { fetchMore: ReturnType<typeof vi.fn> };
+  const commentAggregateQuery = createQueryMock({
+    discussionChannels: [{ CommentsAggregate: { count: comments.length } }],
+  });
+  const rootAggregateQuery = createQueryMock({
+    discussionChannels: [{ CommentsAggregate: { count: comments.length } }],
+  });
+  const issueQuery = createQueryMock(issueResult);
+  const commentIssueQuery = createQueryMock({ discussionChannels: [] });
   configureApolloMocks({
     useQuery,
     queries: {
-      'getDiscussion(': createQueryMock({ discussions }),
-      getCommentSection: {
-        ...createQueryMock(hasCommentSection ? commentSection(comments) : { getCommentSection: null }),
-        fetchMore: vi.fn(),
-      } as ReturnType<typeof createQueryMock>,
+      'getDiscussion(': discussionQuery,
+      getCommentSection: commentSectionQuery,
+      GetDiscussionChannelCommentAggregate: commentAggregateQuery,
+      GetDiscussionChannelRootCommentAggregate: rootAggregateQuery,
+      'query getIssue': issueQuery,
+      getDiscussionCommentIssue: commentIssueQuery,
     },
-    // Both comment-aggregate queries read result.discussionChannels[0].
     fallbackQuery: createQueryMock({ discussionChannels: [] }),
   });
-  return mountWithDefaults(DiscussionDetailContent, {
+  const wrapper = mountWithDefaults(DiscussionDetailContent, {
     props: { discussionId: 'd1', channelId: 'cats' },
     global: { stubs },
   });
+  return {
+    wrapper,
+    discussionQuery,
+    commentSectionQuery,
+    commentAggregateQuery,
+    rootAggregateQuery,
+    issueQuery,
+    commentIssueQuery,
+  };
 };
 
 describe('DiscussionDetailContent', () => {
@@ -100,25 +188,128 @@ describe('DiscussionDetailContent', () => {
   });
 
   it('renders the discussion header for a loaded discussion', () => {
-    const wrapper = setup();
+    const { wrapper } = setup();
     expect(wrapper.find('.discussion-header-stub').exists()).toBe(true);
   });
 
   it('does not show page-not-found for a loaded discussion', () => {
-    const wrapper = setup();
+    const { wrapper } = setup();
     expect(wrapper.find('.page-not-found-stub').exists()).toBe(false);
   });
 
   it('shows page-not-found when the discussion and channel are absent', () => {
-    const wrapper = setup({ discussions: [], hasCommentSection: false });
+    const { wrapper } = setup({ discussions: [], hasCommentSection: false });
     expect(wrapper.find('.page-not-found-stub').exists()).toBe(true);
   });
 
   it('passes the comment-section comments through in order', () => {
-    const wrapper = setup({ comments: [makeComment('a'), makeComment('b')] });
+    const { wrapper } = setup({ comments: [makeComment('a'), makeComment('b')] });
     const passed = wrapper
       .findComponent(DiscussionCommentsWrapperStub)
       .props('comments') as Comment[];
     expect(passed.map((c) => c.id)).toEqual(['a', 'b']);
+  });
+
+  it('enters and exits discussion body edit mode from child events', async () => {
+    const { wrapper } = setup();
+
+    await wrapper.findComponent({ name: 'DiscussionHeader' }).vm.$emit('handle-click-edit-body');
+    expect(wrapper.find('.body-edit-stub').exists()).toBe(true);
+
+    await wrapper.findComponent({ name: 'DiscussionBodyEditForm' }).vm.$emit('close-editor');
+    expect(wrapper.find('.body-edit-stub').exists()).toBe(false);
+  });
+
+  it('enters and exits album edit mode when image uploads are enabled', async () => {
+    const { wrapper } = setup();
+
+    await wrapper.findComponent({ name: 'DiscussionHeader' }).vm.$emit('handle-click-add-album');
+    expect(wrapper.find('.album-edit-stub').exists()).toBe(true);
+
+    await wrapper.findComponent({ name: 'AlbumEditForm' }).vm.$emit('close-editor');
+    expect(wrapper.find('.album-edit-stub').exists()).toBe(false);
+  });
+
+  it('does not enter album edit mode when image uploads are disabled', async () => {
+    const { wrapper } = setup({
+      discussionChannelOverrides: {
+        Channel: { imageUploadsEnabled: false },
+      },
+    });
+
+    await wrapper.findComponent({ name: 'DiscussionHeader' }).vm.$emit('handle-click-add-album');
+
+    expect(wrapper.find('.album-edit-stub').exists()).toBe(false);
+  });
+
+  it('shows the archived banner before the locked banner', () => {
+    const { wrapper } = setup({
+      discussions: [
+        makeDiscussion({
+          DiscussionChannels: [
+            {
+              id: 'dc1',
+              channelUniqueName: 'cats',
+              archived: true,
+              locked: true,
+              Answers: [],
+              Channel: {},
+            },
+          ],
+        } as unknown as Record<string, unknown>),
+      ],
+    });
+
+    expect({
+      archived: wrapper.find('.archived-banner-stub').exists(),
+      lockedText: wrapper.text(),
+    }).toEqual({
+      archived: true,
+      lockedText: expect.not.stringContaining('This discussion is locked'),
+    });
+  });
+
+  it('loads more comments from the current comment count', async () => {
+    const { wrapper, commentSectionQuery } = setup({
+      comments: [makeComment('a'), makeComment('b')],
+    });
+
+    await wrapper.findComponent(DiscussionCommentsWrapperStub).vm.$emit('load-more');
+
+    expect(commentSectionQuery.fetchMore).toHaveBeenCalledWith(
+      expect.objectContaining({
+        variables: { offset: 2 },
+      })
+    );
+  });
+
+  it('passes a related issue link from a direct discussion issue', () => {
+    const { wrapper } = setup({
+      issueResult: { issues: [{ issueNumber: 42 }] },
+    });
+
+    const header = wrapper.findComponent({ name: 'DiscussionHeader' });
+
+    expect(header.props('relatedIssueLink')).toEqual({
+      name: 'forums-forumId-issues-issueNumber',
+      params: { forumId: 'cats', issueNumber: 42 },
+    });
+  });
+
+  it('refetches discussion data from layout and feedback events', async () => {
+    const { wrapper, discussionQuery, commentSectionQuery } = setup();
+    const layout = wrapper.findComponent({ name: 'DiscussionLayoutManager' });
+
+    await layout.vm.$emit('discussion-refetch');
+    await layout.vm.$emit('discussion-channel-refetch');
+    await wrapper.findComponent({ name: 'FeedbackModalManager' }).vm.$emit('feedback-submitted');
+
+    expect({
+      discussionRefetches: discussionQuery.refetch.mock.calls.length,
+      channelRefetches: commentSectionQuery.refetch.mock.calls.length,
+    }).toEqual({
+      discussionRefetches: 2,
+      channelRefetches: 1,
+    });
   });
 });

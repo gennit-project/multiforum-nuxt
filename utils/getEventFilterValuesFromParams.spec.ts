@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  getFilterValuesFromParams,
+  getEventFilterValuesFromParams,
   defaultPlace,
 } from '@/utils/getEventFilterValuesFromParams';
 import {
@@ -20,7 +20,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result).toEqual({
       timeShortcut: timeShortcutValues.NONE,
@@ -45,7 +45,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.hasVirtualEventUrl).toBe(true);
   });
@@ -60,7 +60,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.hasVirtualEventUrl).toBe(true);
   });
@@ -72,7 +72,7 @@ describe('getEventFilterValuesFromParams', () => {
       showOnlineOnly: true,
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.locationFilter).toBe(LocationFilterTypes.ONLY_VIRTUAL);
   });
@@ -84,7 +84,7 @@ describe('getEventFilterValuesFromParams', () => {
       showInPersonOnly: true,
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.locationFilter).toBe(LocationFilterTypes.ONLY_WITH_ADDRESS);
   });
@@ -95,7 +95,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.timeShortcut).toBe(timeShortcutValues.THIS_WEEKEND);
   });
@@ -106,7 +106,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.radius).toBe(25);
     expect(result.locationFilter).toBe(LocationFilterTypes.WITHIN_RADIUS);
@@ -123,7 +123,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.placeName).toBe('New York City');
   });
@@ -139,7 +139,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.placeAddress).toBe('123 Main St, New York, NY 10001');
   });
@@ -155,7 +155,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.latitude).toBe(40.7128);
   });
@@ -166,7 +166,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.latitude).toBe(undefined);
   });
@@ -182,7 +182,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.longitude).toBe(-74.006);
   });
@@ -193,7 +193,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.longitude).toBe(undefined);
   });
@@ -204,7 +204,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.tags).toEqual(['music', 'concert', 'live']);
   });
@@ -215,7 +215,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.tags).toEqual(['music', 'concert', 'live']);
   });
@@ -226,7 +226,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.tags).toEqual([]);
   });
@@ -237,7 +237,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.channels).toEqual(['music-events']);
   });
@@ -248,7 +248,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.channels).toEqual(['music-events', 'outdoor-events']);
   });
@@ -259,7 +259,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.searchInput).toBe('jazz concert');
   });
@@ -270,7 +270,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.showCanceledEvents).toBe(true);
   });
@@ -281,7 +281,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.showCanceledEvents).toBe(false);
   });
@@ -292,7 +292,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.free).toBe(true);
   });
@@ -303,7 +303,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.free).toBe(false);
   });
@@ -314,7 +314,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.resultsOrder).toEqual(chronologicalOrder);
   });
@@ -327,7 +327,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.resultsOrder).toEqual(reverseChronologicalOrder);
   });
@@ -338,7 +338,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.locationFilter).toBe(LocationFilterTypes.ONLY_VIRTUAL);
   });
@@ -349,7 +349,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.showArchived).toBe(true);
   });
@@ -364,7 +364,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: 'test-channel',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.radius).toBe(0);
   });
@@ -380,7 +380,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: 'test-channel',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.radius).toBe(25);
   });
@@ -395,7 +395,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.locationFilter).toBe(LocationFilterTypes.WITHIN_RADIUS);
     expect(result.placeName).toBe(defaultPlace.name);
@@ -414,7 +414,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.locationFilter).toBe(LocationFilterTypes.ONLY_VIRTUAL);
     expect(result.placeName).toBeUndefined();
@@ -433,7 +433,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.locationFilter).toBe(LocationFilterTypes.ONLY_WITH_ADDRESS);
     expect(result.placeName).toBeUndefined();
@@ -458,7 +458,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result).toEqual({
       timeShortcut: timeShortcutValues.THIS_WEEKEND,
@@ -485,7 +485,7 @@ describe('getEventFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getEventFilterValuesFromParams(input);
 
     expect(result.tags).toEqual(['music']);
     expect((result as any).invalidParam).toBeUndefined();

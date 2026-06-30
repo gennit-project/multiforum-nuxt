@@ -14,7 +14,7 @@ vi.mock('nuxt/app', () => ({
   useRouter: () => ({ replace: h.replace }),
 }));
 vi.mock('@/utils/getEventFilterValuesFromParams', () => ({
-  getFilterValuesFromParams: () => h.filterValues,
+  getEventFilterValuesFromParams: () => h.filterValues,
 }));
 
 const firstShortcut = timeFilterShortcuts[0];

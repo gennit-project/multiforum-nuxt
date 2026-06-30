@@ -14,7 +14,7 @@ vi.mock('@vue/apollo-composable', () => ({
 }));
 
 vi.mock('@/utils/getDiscussionFilterValuesFromParams', () => ({
-  getFilterValuesFromParams: () => ({ searchInput: '', channels: [] }),
+  getDiscussionFilterValuesFromParams: () => ({ searchInput: '', channels: [] }),
 }));
 
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
