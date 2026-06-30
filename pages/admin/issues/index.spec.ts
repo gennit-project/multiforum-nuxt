@@ -33,7 +33,9 @@ const mountWith = async (opts: { loading?: boolean; issues?: unknown[] }) => {
 describe('admin server issues index page', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    mockedUseQuery.mockReset();
     query.showOnlyServerRuleViolations = '';
+    delete query.channels;
   });
 
   it('defaults the server-rule-violations checkbox to checked', async () => {
@@ -61,5 +63,13 @@ describe('admin server issues index page', () => {
   it('renders no issues while the query is loading', async () => {
     const wrapper = await mountWith({ loading: true, issues: [{ id: 'i1' }] });
     expect(wrapper.findAllComponents(ModIssueListItem)).toHaveLength(0);
+  });
+
+  it('passes the selected channel filter into the issues query variables', async () => {
+    query.channels = 'announcements';
+    await mountWith({ issues: [] });
+    expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).toMatchObject({
+      channelUniqueName_IN: ['announcements'],
+    });
   });
 });

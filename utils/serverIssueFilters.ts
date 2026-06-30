@@ -20,6 +20,7 @@ export function getDefaultServerRuleViolationsFilter(
 
 export type ServerIssuesWhereParams = {
   searchInput: string;
+  selectedChannels: string[];
   showOnlyServerRuleViolations: boolean;
 };
 
@@ -31,11 +32,16 @@ export type ServerIssuesWhereParams = {
 export function buildServerIssuesWhere(
   params: ServerIssuesWhereParams
 ): { issueWhere: Record<string, unknown> } {
-  const { searchInput, showOnlyServerRuleViolations } = params;
+  const { searchInput, selectedChannels, showOnlyServerRuleViolations } =
+    params;
   const searchPattern = createCaseInsensitivePattern(searchInput);
   const searchFilter = searchPattern
     ? { OR: [{ title_MATCHES: searchPattern }, { body_MATCHES: searchPattern }] }
     : {};
+  const channelFilter =
+    selectedChannels.length > 0
+      ? { channelUniqueName_IN: selectedChannels }
+      : {};
 
   return {
     issueWhere: {
@@ -43,6 +49,7 @@ export function buildServerIssuesWhere(
       ...(showOnlyServerRuleViolations
         ? { flaggedServerRuleViolation: true }
         : {}),
+      ...channelFilter,
       ...searchFilter,
     },
   };

@@ -22,6 +22,7 @@ describe('buildServerIssuesWhere', () => {
   it('always filters to open issues', () => {
     const { issueWhere } = buildServerIssuesWhere({
       searchInput: '',
+      selectedChannels: [],
       showOnlyServerRuleViolations: false,
     });
     expect(issueWhere.isOpen).toBe(true);
@@ -30,6 +31,7 @@ describe('buildServerIssuesWhere', () => {
   it('adds the server-rule-violation flag when enabled', () => {
     const { issueWhere } = buildServerIssuesWhere({
       searchInput: '',
+      selectedChannels: [],
       showOnlyServerRuleViolations: true,
     });
     expect(issueWhere.flaggedServerRuleViolation).toBe(true);
@@ -38,14 +40,25 @@ describe('buildServerIssuesWhere', () => {
   it('omits the violation flag when disabled', () => {
     const { issueWhere } = buildServerIssuesWhere({
       searchInput: '',
+      selectedChannels: [],
       showOnlyServerRuleViolations: false,
     });
     expect('flaggedServerRuleViolation' in issueWhere).toBe(false);
   });
 
+  it('adds a channel filter when channels are selected', () => {
+    const { issueWhere } = buildServerIssuesWhere({
+      searchInput: '',
+      selectedChannels: ['announcements', 'meta'],
+      showOnlyServerRuleViolations: false,
+    });
+    expect(issueWhere.channelUniqueName_IN).toEqual(['announcements', 'meta']);
+  });
+
   it('adds a title/body OR search filter when search input is present', () => {
     const { issueWhere } = buildServerIssuesWhere({
       searchInput: 'spam',
+      selectedChannels: [],
       showOnlyServerRuleViolations: false,
     });
     expect(issueWhere.OR).toHaveLength(2);
@@ -54,6 +67,7 @@ describe('buildServerIssuesWhere', () => {
   it('omits the search filter for blank input', () => {
     const { issueWhere } = buildServerIssuesWhere({
       searchInput: '   ',
+      selectedChannels: [],
       showOnlyServerRuleViolations: false,
     });
     expect('OR' in issueWhere).toBe(false);

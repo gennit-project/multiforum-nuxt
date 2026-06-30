@@ -6,11 +6,16 @@ import { useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
 import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
 import SearchBar from '@/components/SearchBar.vue';
+import FilterChip from '@/components/FilterChip.vue';
+import ChannelIcon from '@/components/icons/ChannelIcon.vue';
+import SearchableForumList from '@/components/channel/SearchableForumList.vue';
+import { getChannelLabel } from '@/utils';
 import { updateFilters } from '@/utils/routerUtils';
 import {
   getDefaultServerRuleViolationsFilter,
   buildServerIssuesWhere,
 } from '@/utils/serverIssueFilters';
+import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 
@@ -18,6 +23,7 @@ const route = useRoute();
 const router = useRouter();
 const uiStore = useUIStore();
 const { selectedIssueNumber } = storeToRefs(uiStore);
+const { selectedChannels } = useSelectedChannelsFromQuery();
 
 const channelId = computed(() => {
   if (typeof route.params.forumId !== 'string') {
@@ -32,10 +38,12 @@ const showOnlyServerRuleViolations = ref(
 const searchInput = ref(
   typeof route.query.searchInput === 'string' ? route.query.searchInput : ''
 );
+const channelLabel = computed(() => getChannelLabel(selectedChannels.value));
 
 const variables = computed(() =>
   buildServerIssuesWhere({
     searchInput: searchInput.value,
+    selectedChannels: selectedChannels.value,
     showOnlyServerRuleViolations: showOnlyServerRuleViolations.value,
   })
 );
@@ -75,6 +83,25 @@ const updateSearchInput = (value: string) => {
   });
 };
 
+const toggleSelectedChannel = (channel: string) => {
+  const nextChannels = [...selectedChannels.value];
+  const selectedIndex = nextChannels.indexOf(channel);
+
+  if (selectedIndex >= 0) {
+    nextChannels.splice(selectedIndex, 1);
+  } else {
+    nextChannels.push(channel);
+  }
+
+  updateFilters({
+    router,
+    route,
+    params: {
+      channels: nextChannels,
+    },
+  });
+};
+
 const handleSelectIssue = (payload: {
   issueNumber: number;
   title: string;
@@ -89,7 +116,9 @@ watch(
   () => {
     if (route.query) {
       showOnlyServerRuleViolations.value =
-        route.query.showOnlyServerRuleViolations === 'true';
+        getDefaultServerRuleViolationsFilter(
+          route.query.showOnlyServerRuleViolations
+        );
       searchInput.value =
         typeof route.query.searchInput === 'string'
           ? route.query.searchInput
@@ -110,7 +139,24 @@ watch(
         :debounce-ms="500"
         @update-search-input="updateSearchInput"
       />
-      <div class="flex items-center justify-end">
+      <div class="flex flex-wrap items-center justify-end gap-2">
+        <FilterChip
+          :label="channelLabel"
+          :highlighted="selectedChannels.length > 0"
+          data-testid="admin-issues-channel-filter"
+        >
+          <template #icon>
+            <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />
+          </template>
+          <template #content>
+            <div class="relative w-96">
+              <SearchableForumList
+                :selected-channels="selectedChannels"
+                @toggle-selection="toggleSelectedChannel"
+              />
+            </div>
+          </template>
+        </FilterChip>
         <input
           id="show-only-server-rule-violations"
           type="checkbox"
