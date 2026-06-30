@@ -157,6 +157,8 @@ export type UpdateStateInput = {
   channels?: string[];
   tags?: string[];
   searchInput?: string;
+  startDate?: string;
+  endDate?: string;
   searchOpen?: string;
   latitude?: number;
   longitude?: number;

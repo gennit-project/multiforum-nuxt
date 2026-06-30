@@ -5,7 +5,12 @@ import { useQuery } from '@vue/apollo-composable';
 import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
 
 const h = vi.hoisted(() => ({
-  query: { showOnlyServerRuleViolations: '', searchInput: '' } as Record<string, string>,
+  query: {
+    showOnlyServerRuleViolations: '',
+    searchInput: '',
+    startDate: '2026-05-27',
+    endDate: '2026-06-26',
+  } as Record<string, string>,
   routerPush: vi.fn(),
   routerReplace: vi.fn(),
   refetch: vi.fn(),
@@ -17,7 +22,11 @@ const h = vi.hoisted(() => ({
 h.selectedIssueNumber = ref<number | null>(null);
 
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({ params: { forumId: '' }, path: '/admin/issues', query: h.query }),
+  useRoute: () => ({
+    params: { forumId: '' },
+    path: '/admin/issues',
+    query: h.query,
+  }),
   useRouter: () => ({ push: h.routerPush, replace: h.routerReplace }),
 }));
 
@@ -60,13 +69,15 @@ const mountWith = async (opts: { loading?: boolean; issues?: unknown[] }) => {
         SearchBar: {
           name: 'SearchBar',
           emits: ['update-search-input'],
-          template: '<button class="search-bar" @click="$emit(\'update-search-input\', \'needle\')" />',
+          template:
+            '<button class="search-bar" @click="$emit(\'update-search-input\', \'needle\')" />',
         },
         ModIssueListItem: {
           name: 'ModIssueListItem',
           props: ['issue'],
           emits: ['select'],
-          template: '<li class="issue-item" @click="$emit(\'select\', { issueNumber: 9, title: \'Issue\', channelId: \'cats\' })" />',
+          template:
+            '<li class="issue-item" @click="$emit(\'select\', { issueNumber: 9, title: \'Issue\', channelId: \'cats\' })" />',
         },
       },
     },
@@ -77,24 +88,39 @@ beforeEach(() => {
   vi.clearAllMocks();
   h.query.showOnlyServerRuleViolations = '';
   h.query.searchInput = '';
+  h.query.startDate = '2026-05-27';
+  h.query.endDate = '2026-06-26';
+  delete h.query.channels;
   h.selectedIssueNumber.value = null;
 });
 
 describe('admin server issues index page', () => {
   it('defaults the server-rule-violations checkbox to checked', async () => {
     const wrapper = await mountWith({ issues: [] });
-    expect((wrapper.get('[data-testid="show-only-server-rule-violations"]').element as HTMLInputElement).checked).toBe(true);
+    expect(
+      (
+        wrapper.get('[data-testid="show-only-server-rule-violations"]')
+          .element as HTMLInputElement
+      ).checked
+    ).toBe(true);
   });
 
   it('unchecks the filter when the query opts out', async () => {
     h.query.showOnlyServerRuleViolations = 'false';
     const wrapper = await mountWith({ issues: [] });
-    expect((wrapper.get('[data-testid="show-only-server-rule-violations"]').element as HTMLInputElement).checked).toBe(false);
+    expect(
+      (
+        wrapper.get('[data-testid="show-only-server-rule-violations"]')
+          .element as HTMLInputElement
+      ).checked
+    ).toBe(false);
   });
 
   it('updates the filters when the checkbox changes', async () => {
     const wrapper = await mountWith({ issues: [] });
-    await wrapper.get('[data-testid="show-only-server-rule-violations"]').setValue(false);
+    await wrapper
+      .get('[data-testid="show-only-server-rule-violations"]')
+      .setValue(false);
     expect(h.updateFilters).toHaveBeenCalledWith({
       router: { push: h.routerPush, replace: h.routerReplace },
       route: { params: { forumId: '' }, path: '/admin/issues', query: h.query },
@@ -117,6 +143,11 @@ describe('admin server issues index page', () => {
     expect(wrapper.findAllComponents(ModIssueListItem)).toHaveLength(2);
   });
 
+  it('renders no issues while the query is loading', async () => {
+    const wrapper = await mountWith({ loading: true, issues: [{ id: 'i1' }] });
+    expect(wrapper.findAllComponents(ModIssueListItem)).toHaveLength(0);
+  });
+
   it('stores the selected issue when a list item emits select', async () => {
     const wrapper = await mountWith({ issues: [{ id: 'i1' }] });
     await wrapper.get('.issue-item').trigger('click');
@@ -124,6 +155,22 @@ describe('admin server issues index page', () => {
       issueNumber: 9,
       title: 'Issue',
       channelId: 'cats',
+    });
+  });
+
+  it('passes the selected channel filter into the issues query variables', async () => {
+    h.query.channels = 'announcements';
+    await mountWith({ issues: [] });
+    expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).toMatchObject({
+      channelUniqueName_IN: ['announcements'],
+    });
+  });
+
+  it('passes the selected date range into the issues query variables', async () => {
+    await mountWith({ issues: [] });
+    expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).toMatchObject({
+      createdAt_GTE: '2026-05-27T00:00:00.000Z',
+      createdAt_LTE: '2026-06-26T23:59:59.999Z',
     });
   });
 });

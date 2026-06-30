@@ -1,5 +1,9 @@
 import { expect, test } from '../../helpers/testFixture';
-import { buildBasicUser, buildServerConfig } from '../../helpers/graphqlFixtures';
+import {
+  buildBasicUser,
+  buildServerConfig,
+  buildServerPermissionsConfig,
+} from '../../helpers/graphqlFixtures';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { installGraphqlMocks } from '../../helpers/mockGraphql';
 
@@ -91,4 +95,30 @@ test.describe('Server settings (admin)', () => {
       }
     });
   }
+
+  test('roles tab renders the server roles content', async ({
+    context,
+    page,
+  }, testInfo) => {
+    await installMockAuth(context, page, { username: TEST_USER, email: 'alice@example.com' });
+    const diagnostics = await installGraphqlMocks(page, {
+      ...getMocks(),
+      getServerConfig: () => ({
+        data: {
+          serverConfigs: [buildServerPermissionsConfig()],
+        },
+      }),
+      GetModChannelRoles: () => ({ data: { modChannelRoles: [] } }),
+    });
+
+    try {
+      await page.goto('/admin/settings/roles', { waitUntil: 'domcontentloaded' });
+      await expect(page.getByRole('heading', { name: 'Server Roles' })).toBeVisible();
+    } finally {
+      await testInfo.attach('graphql-operations.json', {
+        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
+        contentType: 'application/json',
+      });
+    }
+  });
 });

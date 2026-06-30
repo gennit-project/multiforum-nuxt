@@ -9,7 +9,7 @@ import SearchIcon from '@/components/icons/SearchIcon.vue';
 import { getChannelLabel } from '@/utils';
 import {
   buildSearchQuery,
-  toggleInArray,
+  toggleSearchQuerySelection,
   SEARCH_ROUTES,
   type SearchType,
   type ModifiedRange,
@@ -103,7 +103,10 @@ const handleSearchInput = (value: string) => {
 };
 
 const toggleSelectedForum = (forum: string) => {
-  selectedForums.value = toggleInArray(selectedForums.value, forum);
+  selectedForums.value = toggleSearchQuerySelection(
+    selectedForums.value,
+    forum
+  );
 };
 
 const buildQuery = () =>

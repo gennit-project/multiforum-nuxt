@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import {
   mapAlbumImagesToForm,
   getInitialImageOrder,
-  type AlbumFormImage,
+  type AlbumEditorImage,
 } from '@/utils/albumImages';
 
-const formImage = (id: string): AlbumFormImage => ({
+const formImage = (id: string): AlbumEditorImage => ({
   id,
   url: '',
   alt: '',

@@ -4,7 +4,7 @@ import {
   getDiscussionLink,
   getDownloadLink,
   getChannelLink,
-  getTotalCommentCount,
+  getFavoriteDiscussionCommentCount,
   buildFavoriteAuthorInfo,
 } from './favoriteDiscussionDisplay';
 
@@ -62,10 +62,10 @@ describe('getChannelLink', () => {
   });
 });
 
-describe('getTotalCommentCount', () => {
+describe('getFavoriteDiscussionCommentCount', () => {
   it('sums comment counts across all channels', () => {
     expect(
-      getTotalCommentCount([
+      getFavoriteDiscussionCommentCount([
         { CommentsAggregate: { count: 2 } },
         { CommentsAggregate: { count: 3 } },
       ])
@@ -73,13 +73,13 @@ describe('getTotalCommentCount', () => {
   });
 
   it('treats missing aggregates as zero', () => {
-    expect(getTotalCommentCount([{}, { CommentsAggregate: { count: 4 } }])).toBe(
+    expect(getFavoriteDiscussionCommentCount([{}, { CommentsAggregate: { count: 4 } }])).toBe(
       4
     );
   });
 
   it('returns 0 for no channels', () => {
-    expect(getTotalCommentCount(null)).toBe(0);
+    expect(getFavoriteDiscussionCommentCount(null)).toBe(0);
   });
 });
 

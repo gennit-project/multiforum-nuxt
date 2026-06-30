@@ -11,7 +11,7 @@ import DownloadSkeletonCard from '@/components/download/DownloadSkeletonCard.vue
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { GET_SITE_WIDE_DISCUSSION_LIST } from '@/graphQLData/discussion/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
-import { getFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
+import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,
@@ -34,7 +34,7 @@ const route = useRoute();
 const router = useRouter();
 
 const filterValues = ref(
-  getFilterValuesFromParams({
+  getDiscussionFilterValuesFromParams({
     route,
     channelId: '',
   })
@@ -224,7 +224,7 @@ watch(
   () => route.query,
   () => {
     if (route.query) {
-      filterValues.value = getFilterValuesFromParams({
+      filterValues.value = getDiscussionFilterValuesFromParams({
         route,
         channelId: '',
       });

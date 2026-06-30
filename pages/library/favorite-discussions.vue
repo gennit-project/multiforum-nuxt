@@ -15,7 +15,7 @@ import {
   formatCount,
   getDiscussionLink,
   getChannelLink,
-  getTotalCommentCount,
+  getFavoriteDiscussionCommentCount,
   buildFavoriteAuthorInfo,
 } from '@/utils/favoriteDiscussionDisplay';
 import type {
@@ -340,7 +340,9 @@ const getAuthorInfo = (discussion: FavoriteDiscussion) =>
                       <i class="fa-regular fa-comment mr-1" />
                       {{
                         formatCount(
-                          getTotalCommentCount(discussion.DiscussionChannels),
+                          getFavoriteDiscussionCommentCount(
+                            discussion.DiscussionChannels
+                          ),
                           'comment',
                           'comments'
                         )

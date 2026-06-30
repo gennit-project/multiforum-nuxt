@@ -14,7 +14,7 @@ import type {
  * GraphQL schema validates the produced shape at compile time.
  */
 
-export type AlbumFormImage = {
+export type AlbumUpdateImageInput = {
   id?: string | null;
   url?: string | null;
   alt?: string | null;
@@ -23,7 +23,7 @@ export type AlbumFormImage = {
 };
 
 export type AlbumFormData = {
-  images?: AlbumFormImage[];
+  images?: AlbumUpdateImageInput[];
   imageOrder?: string[];
 } | null | undefined;
 
@@ -49,7 +49,7 @@ export function buildAlbumUpdateInput(params: {
   if (!existingAlbumId) {
     const newImages = albumData.images || [];
     const validImages = newImages.filter(
-      (img): img is AlbumFormImage & { id: string } => Boolean(img.id)
+      (img): img is AlbumUpdateImageInput & { id: string } => Boolean(img.id)
     );
 
     if (validImages.length === 0) {

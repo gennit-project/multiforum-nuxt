@@ -30,7 +30,7 @@ type GetFilterValuesInput = {
   showInPersonOnly?: boolean;
 };
 
-const getFilterValuesFromParams = function (
+const getEventFilterValuesFromParams = function (
   input: GetFilterValuesInput
 ): SearchEventValues {
   // Need to re-clean data when route values change
@@ -244,4 +244,4 @@ const getFilterValuesFromParams = function (
   }
 };
 
-export { getFilterValuesFromParams, defaultPlace };
+export { getEventFilterValuesFromParams, defaultPlace };
