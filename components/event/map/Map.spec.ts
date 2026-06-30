@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import Map from '@/components/event/map/Map.vue';
 import type { Event } from '@/__generated__/graphql';
+import type { MarkerMap } from '@/components/event/map/Map.vue';
 
 const h = vi.hoisted(() => ({
   fullPath: '/map/search',
@@ -212,11 +213,14 @@ describe('Map', () => {
 
     await waitForMap();
 
-    const markerMap = wrapper.emitted('setMarkerData')?.[0]?.[0]?.markerMap;
+    const markerDataPayload = wrapper.emitted('setMarkerData')?.[0]?.[0] as
+      | { markerMap: MarkerMap }
+      | undefined;
+    const markerMap = markerDataPayload?.markerMap;
     expect({
       markerCount: h.markerInstances.length,
-      groupedLocations: Object.keys(markerMap.markers).length,
-      eventsAtFirstLocation: markerMap.markers['33.4-111.9']?.numberOfEvents,
+      groupedLocations: Object.keys(markerMap?.markers ?? {}).length,
+      eventsAtFirstLocation: markerMap?.markers['33.4-111.9']?.numberOfEvents,
     }).toEqual({
       markerCount: 2,
       groupedLocations: 2,
