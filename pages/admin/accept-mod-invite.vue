@@ -6,11 +6,6 @@ import { config } from '@/config';
 import { ACCEPT_SERVER_MOD_INVITE } from '@/graphQLData/admin/mutations';
 import { useUsername, useModProfileName } from '@/composables/useAuthState';
 
-// @ts-ignore - definePageMeta is auto-imported by Nuxt
-definePageMeta({
-  middleware: 'auth',
-});
-
 const usernameVar = useUsername();
 const modProfileNameVar = useModProfileName();
 

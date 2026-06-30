@@ -6,7 +6,8 @@ import { ref } from 'vue';
 import AcceptAdminInvite from './accept-admin-invite.vue';
 
 // Mock definePageMeta globally before importing the component
-vi.stubGlobal('definePageMeta', vi.fn());
+const definePageMetaMock = vi.fn();
+vi.stubGlobal('definePageMeta', definePageMetaMock);
 
 const mockPush = vi.fn();
 const mockMutate = vi.fn();
@@ -46,6 +47,10 @@ describe('accept-admin-invite', () => {
     mockMutate.mockReset();
     mockOnDone.mockReset();
     mockUsernameVar.value = null;
+  });
+
+  it('does not declare a missing auth route middleware', () => {
+    expect(definePageMetaMock).not.toHaveBeenCalled();
   });
 
   it('shows sign in required when not authenticated', () => {

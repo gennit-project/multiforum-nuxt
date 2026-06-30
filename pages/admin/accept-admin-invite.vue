@@ -6,11 +6,6 @@ import { config } from '@/config';
 import { ACCEPT_SERVER_ADMIN_INVITE } from '@/graphQLData/admin/mutations';
 import { useUsername } from '@/composables/useAuthState';
 
-// @ts-ignore - definePageMeta is auto-imported by Nuxt
-definePageMeta({
-  middleware: 'auth',
-});
-
 const usernameVar = useUsername();
 
 const router = useRouter();
