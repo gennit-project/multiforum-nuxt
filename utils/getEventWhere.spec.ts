@@ -290,7 +290,7 @@ describe('getEventWhere', () => {
       name: 'uses today as the time range',
       timeShortcut: timeShortcutValues.TODAY,
       getExpectedRange: () => {
-        const now = DateTime.now();
+        const now = DateTime.utc();
         return {
           start: now.startOf('day').toISO(),
           end: now.endOf('day').toISO(),
@@ -301,7 +301,7 @@ describe('getEventWhere', () => {
       name: 'uses tomorrow as the time range',
       timeShortcut: timeShortcutValues.TOMORROW,
       getExpectedRange: () => {
-        const now = DateTime.now();
+        const now = DateTime.utc();
         return {
           start: now.startOf('day').plus({ days: 1 }).toISO(),
           end: now.endOf('day').plus({ days: 1 }).toISO(),
@@ -312,7 +312,7 @@ describe('getEventWhere', () => {
       name: 'uses this month as the time range',
       timeShortcut: timeShortcutValues.THIS_MONTH,
       getExpectedRange: () => {
-        const startOfThisMonth = DateTime.now().startOf('month');
+        const startOfThisMonth = DateTime.utc().startOf('month');
         return {
           start: startOfThisMonth.toISO(),
           end: startOfThisMonth.plus({ months: 1 }).toISO(),
@@ -323,7 +323,7 @@ describe('getEventWhere', () => {
       name: 'uses next month as the time range',
       timeShortcut: timeShortcutValues.NEXT_MONTH,
       getExpectedRange: () => {
-        const startOfThisMonth = DateTime.now().startOf('month');
+        const startOfThisMonth = DateTime.utc().startOf('month');
         return {
           start: startOfThisMonth.plus({ months: 1 }).toISO(),
           end: startOfThisMonth.plus({ months: 2 }).toISO(),
@@ -334,9 +334,9 @@ describe('getEventWhere', () => {
       name: 'uses past events as the time range',
       timeShortcut: timeShortcutValues.PAST_EVENTS,
       getExpectedRange: () => {
-        const now = DateTime.now();
+        const now = DateTime.utc();
         return {
-          start: now.minus({ years: 2 }).toISO(),
+          start: now.startOf('day').minus({ years: 2 }).toISO(),
           end: now.startOf('day').toISO(),
         };
       },
