@@ -7,7 +7,6 @@ import plugin from '@/plugins/auth-username-fallback.client';
 // configures per-case.
 const h = vi.hoisted(() => ({
   isAuthenticated: { value: true } as { value: boolean },
-  email: { value: '' } as { value: string },
   username: { value: '' } as { value: string },
   setUsername: vi.fn(),
   setModProfileName: vi.fn(),
@@ -19,12 +18,8 @@ const h = vi.hoisted(() => ({
 vi.mock('nuxt/app', () => ({
   defineNuxtPlugin: (fn: unknown) => fn,
 }));
-vi.mock('@/config', () => ({
-  config: { graphqlUrl: 'http://test.local/graphql' },
-}));
 vi.mock('@/composables/useAuthState', () => ({
   useIsAuthenticated: () => h.isAuthenticated,
-  useEmail: () => h.email,
   useUsername: () => h.username,
   setUsername: h.setUsername,
   setModProfileName: h.setModProfileName,
@@ -39,7 +34,22 @@ const run = async () => {
 
 const resolvedUser = (user: Record<string, unknown> | null) => ({
   ok: true,
-  json: async () => ({ data: { getOwnEmail: user } }),
+  json: async () =>
+    user
+      ? {
+          isAuthenticated: true,
+          username: user.username,
+          profilePicURL: user.profilePicURL,
+          modProfileName: user.modProfileName,
+          notificationCount: user.unreadNotificationCount,
+        }
+      : {
+          isAuthenticated: true,
+          username: '',
+          profilePicURL: '',
+          modProfileName: '',
+          notificationCount: 0,
+        },
 });
 
 const fullUser = {
@@ -52,7 +62,6 @@ const fullUser = {
 beforeEach(() => {
   vi.clearAllMocks();
   h.isAuthenticated.value = true;
-  h.email.value = 'cat@example.com';
   h.username.value = '';
   h.fetch.mockResolvedValue(resolvedUser(fullUser));
   global.fetch = h.fetch as unknown as typeof fetch;
@@ -79,12 +88,9 @@ describe('auth-username-fallback plugin: resolves when authenticated but usernam
     expect(h.setNotificationCount).toHaveBeenCalledWith(4);
   });
 
-  it('looks the user up via the self-scoped getOwnEmail query (no email variable)', async () => {
+  it('looks the user up via the session-backed auth profile endpoint', async () => {
     await run();
-    const body = JSON.parse(h.fetch.mock.calls[0][1].body as string);
-    expect(body.query).toContain('getOwnEmail');
-    // Identity now comes from the bearer token, not a client-supplied address.
-    expect(body.variables?.emailAddress).toBeUndefined();
+    expect(h.fetch.mock.calls[0][0]).toBe('/api/session/profile');
   });
 });
 
@@ -92,7 +98,6 @@ describe('auth-username-fallback plugin: skips resolution when not needed', () =
   it.each([
     ['username is already resolved', () => (h.username.value = 'cluse')],
     ['the session is not authenticated', () => (h.isAuthenticated.value = false)],
-    ['there is no email to look up by', () => (h.email.value = '')],
   ])('does not call the backend when %s', async (_label, setup) => {
     setup();
     await run();

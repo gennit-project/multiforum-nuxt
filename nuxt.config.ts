@@ -293,6 +293,7 @@ export default defineNuxtConfig({
       // "You must be logged in"). A more specific rule wins in Nitro, so this
       // disables caching for the auth routes only.
       '/api/auth/**': { cache: false },
+      '/api/session/**': { cache: false },
       // Cache other API routes
       '/api/**': {
         cache: {
