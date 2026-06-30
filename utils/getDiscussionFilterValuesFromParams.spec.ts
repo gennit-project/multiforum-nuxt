@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
+import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import type { RouteLocationNormalized } from 'vue-router';
 
 // Helper to create mock route objects
@@ -26,7 +26,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getDiscussionFilterValuesFromParams(input);
 
     expect(result).toEqual({
       tags: [],
@@ -43,7 +43,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channelId: 'test-channel',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getDiscussionFilterValuesFromParams(input);
 
     expect(result.channels).toEqual(['test-channel']);
   });
@@ -54,7 +54,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getDiscussionFilterValuesFromParams(input);
 
     expect(result.tags).toEqual(['javascript']);
   });
@@ -65,7 +65,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getDiscussionFilterValuesFromParams(input);
 
     expect(result.tags).toEqual(['javascript', 'react', 'vue']);
   });
@@ -76,7 +76,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getDiscussionFilterValuesFromParams(input);
 
     expect(result.channels).toEqual(['frontend']);
   });
@@ -87,7 +87,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getDiscussionFilterValuesFromParams(input);
 
     expect(result.channels).toEqual(['frontend', 'backend', 'devops']);
   });
@@ -98,7 +98,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getDiscussionFilterValuesFromParams(input);
 
     expect(result.searchInput).toEqual('test query');
   });
@@ -109,7 +109,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getDiscussionFilterValuesFromParams(input);
 
     expect(result.showArchived).toBe(true);
   });
@@ -120,7 +120,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getDiscussionFilterValuesFromParams(input);
 
     expect(result.showArchived).toBe(false);
   });
@@ -131,7 +131,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getDiscussionFilterValuesFromParams(input);
 
     expect(result.showUnanswered).toBe(true);
   });
@@ -142,7 +142,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getDiscussionFilterValuesFromParams(input);
 
     expect(result.showUnanswered).toBe(false);
   });
@@ -158,7 +158,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getDiscussionFilterValuesFromParams(input);
 
     expect(result).toEqual({
       tags: ['javascript', 'react'],
@@ -177,7 +177,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channelId: 'main-channel',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getDiscussionFilterValuesFromParams(input);
 
     // For this function, when both channelId and query channels are provided,
     // the behavior is to keep the query channels, not replace them with channelId
@@ -193,7 +193,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channelId: '',
     };
 
-    const result = getFilterValuesFromParams(input);
+    const result = getDiscussionFilterValuesFromParams(input);
 
     expect(result).toEqual({
       tags: ['javascript'],

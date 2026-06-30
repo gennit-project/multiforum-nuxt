@@ -11,7 +11,7 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/graphQLData/discussion/queries';
 import { useUsername } from '@/composables/useAuthState';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
-import { getFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
+import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,
@@ -40,7 +40,7 @@ const channelId = computed(() => {
 provideForumRoleMembership(channelId);
 
 const filterValues = ref(
-  getFilterValuesFromParams({
+  getDiscussionFilterValuesFromParams({
     route,
     channelId: channelId.value,
   })
@@ -153,7 +153,7 @@ watch(
   () => route.query,
   () => {
     if (route.query) {
-      filterValues.value = getFilterValuesFromParams({
+      filterValues.value = getDiscussionFilterValuesFromParams({
         route,
         channelId: channelId.value,
       });

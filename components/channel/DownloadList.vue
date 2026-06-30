@@ -13,7 +13,7 @@ import DiscussionAlbum from '@/components/discussion/detail/DiscussionAlbum.vue'
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/graphQLData/discussion/queries';
 import { useUsername } from '@/composables/useAuthState';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
-import { getFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
+import { getEventFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,
@@ -48,7 +48,7 @@ const channelId = computed(() => {
 provideForumRoleMembership(channelId);
 
 const filterValues = ref(
-  getFilterValuesFromParams({
+  getEventFilterValuesFromParams({
     route,
     channelId: channelId.value,
   })
@@ -175,7 +175,7 @@ watch(
   () => route.query,
   () => {
     if (route.query) {
-      filterValues.value = getFilterValuesFromParams({
+      filterValues.value = getEventFilterValuesFromParams({
         route,
         channelId: channelId.value,
       });

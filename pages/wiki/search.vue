@@ -11,7 +11,7 @@ import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { updateFilters } from '@/utils/routerUtils';
 import { getChannelLabel, relativeTime } from '@/utils';
-import { getFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
+import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import { GET_SITE_WIDE_WIKI_LIST } from '@/graphQLData/wiki/queries';
 import { formatWordCount } from '@/utils/wikiSearchDisplay';
 
@@ -21,7 +21,7 @@ const route = useRoute();
 const router = useRouter();
 
 const filterValues = ref(
-  getFilterValuesFromParams({
+  getDiscussionFilterValuesFromParams({
     route,
     channelId: '',
   })
@@ -107,7 +107,7 @@ const aggregateWikiPageCount = computed(() => {
 watch(
   () => route.query,
   () => {
-    filterValues.value = getFilterValuesFromParams({
+    filterValues.value = getDiscussionFilterValuesFromParams({
       route,
       channelId: '',
     });

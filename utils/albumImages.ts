@@ -11,7 +11,7 @@ export type AlbumImageSource = {
   copyright?: string | null;
 };
 
-export type AlbumFormImage = {
+export type AlbumEditorImage = {
   id: string;
   url: string;
   alt: string;
@@ -24,7 +24,7 @@ export type AlbumFormImage = {
 
 export function mapAlbumImagesToForm(
   albumImages: AlbumImageSource[] | null | undefined
-): AlbumFormImage[] {
+): AlbumEditorImage[] {
   if (!albumImages) return [];
   return albumImages.map((image) => ({
     id: image.id || '',
@@ -40,7 +40,7 @@ export function mapAlbumImagesToForm(
 
 export type InitialImageOrderParams = {
   albumImageOrder: (string | null | undefined)[] | null | undefined;
-  images: AlbumFormImage[];
+  images: AlbumEditorImage[];
 };
 
 /**

@@ -65,7 +65,7 @@ export function buildSearchQuery(
   };
 }
 
-export { toggleInArray } from '@/utils/arrayHelpers';
+export { toggleInArray as toggleSearchQuerySelection } from '@/utils/arrayHelpers';
 
 /**
  * Two recent searches are considered the same when query, type, modified

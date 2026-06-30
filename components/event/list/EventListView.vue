@@ -8,7 +8,7 @@ import { GET_EVENTS } from '@/graphQLData/event/queries';
 import getEventWhere from '@/utils/getEventWhere';
 import EventDetail from '@/components/event/detail/EventDetail.vue';
 import type { SearchEventValues } from '@/types/Event';
-import { getFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
+import { getEventFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
 import ErrorBanner from '../../ErrorBanner.vue';
 import LoadingSpinner from '../../LoadingSpinner.vue';
 import { timeShortcutValues } from './filters/eventSearchOptions';
@@ -44,7 +44,7 @@ const routeSearchEventId = computed(() => {
 const isSearchListRoute = computed(() => getIsEventSearchRoute(route));
 
 const filterValues = ref(
-  getFilterValuesFromParams({
+  getEventFilterValuesFromParams({
     route,
     channelId: channelId.value,
     showOnlineOnly: channelId.value ? false : true,
@@ -115,7 +115,7 @@ watch(
   () => route.query,
   () => {
     if (route.query) {
-      filterValues.value = getFilterValuesFromParams({
+      filterValues.value = getEventFilterValuesFromParams({
         route,
         channelId: channelId.value,
         showOnlineOnly: false,

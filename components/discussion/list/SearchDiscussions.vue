@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'nuxt/app';
 import ChannelDiscussionList from './ChannelDiscussionList.vue';
 import SitewideDiscussionList from './SitewideDiscussionList.vue';
 import DiscussionFilterBar from '@/components/discussion/list/DiscussionFilterBar.vue';
-import { getFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
+import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import type { SearchDiscussionValues } from '@/types/Discussion';
 
 // Props and Emits
@@ -26,7 +26,7 @@ const channelId = ref(
 );
 
 const filterValues = ref(
-  getFilterValuesFromParams({
+  getDiscussionFilterValuesFromParams({
     route,
     channelId: channelId.value,
   })
@@ -44,7 +44,7 @@ watch(
   () => route.query,
   () => {
     if (route.query) {
-      filterValues.value = getFilterValuesFromParams({
+      filterValues.value = getDiscussionFilterValuesFromParams({
         route,
         channelId: channelId.value,
       });

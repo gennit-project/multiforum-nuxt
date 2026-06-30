@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import type { LocationQuery } from 'vue-router';
 import { timeFilterShortcuts, timeShortcutValues } from './eventSearchOptions';
-import { getFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
+import { getEventFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
 import type { SearchEventValues } from '@/types/Event';
 import Tag from '@/components/TagComponent.vue';
 
@@ -24,7 +24,7 @@ const channelId = computed(() => {
 });
 
 const filterValues = ref<SearchEventValues>(
-  getFilterValuesFromParams({
+  getEventFilterValuesFromParams({
     route,
     channelId: channelId.value,
     showOnlineOnly: props.isListView && !channelId.value,
@@ -37,7 +37,7 @@ const activeDateShortcut = ref(route.query.timeShortcut);
 watch(
   () => route.query,
   () => {
-    filterValues.value = getFilterValuesFromParams({
+    filterValues.value = getEventFilterValuesFromParams({
       route,
       channelId: channelId.value,
       showOnlineOnly: props.isListView && !channelId.value,

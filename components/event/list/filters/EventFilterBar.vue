@@ -14,7 +14,7 @@ import {
 } from '@/components/event/list/filters/eventSearchOptions';
 import { LocationFilterTypes } from './locationFilterTypes';
 import { getLocationSelectFilterParams } from '@/utils/locationSelectFilterParams';
-import { getFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
+import { getEventFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
 import GenericButton from '@/components/GenericButton.vue';
 import FilterChip from '@/components/FilterChip.vue';
 import SelectCanceled from './SelectCanceled.vue';
@@ -91,7 +91,7 @@ const {
       params.route.name.includes('map-search')
         ? true
         : undefined;
-    return getFilterValuesFromParams({
+    return getEventFilterValuesFromParams({
       route: params.route,
       channelId: params.channelId,
       showOnlineOnly,
