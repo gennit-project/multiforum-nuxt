@@ -4,13 +4,12 @@ import { LocationFilterTypes } from '@/components/event/list/filters/locationFil
 import { timeShortcutValues } from '@/components/event/list/filters/eventSearchOptions';
 import type { SearchEventValues } from '@/types/Event';
 
-// NOTE: getEventWhere captures `const now = DateTime.now()` at MODULE load, so
-// the sibling getEventWhere.spec.ts loads it via a dynamic import + vi.resetModules
-// to control the clock for exact-timestamp assertions. That dynamic-import pattern
-// means v8 coverage never attributes those tests to getEventWhere.ts. This spec
-// imports the module statically so its branches register as covered; it asserts
-// the structural filter conditions (which are time-independent) and that each
-// time shortcut produces a date range.
+// NOTE: The sibling getEventWhere.spec.ts uses a dynamic import + fake clock
+// to assert exact timestamps. That import pattern means v8 coverage does not
+// attribute those tests to getEventWhere.ts. This spec imports the module
+// statically so its branches register as covered; it asserts the structural
+// filter conditions (which are time-independent) and that each time shortcut
+// produces a date range.
 
 const defaultFilterValues: SearchEventValues = {
   timeShortcut: timeShortcutValues.NONE,

@@ -4,9 +4,8 @@ import { timeShortcutValues } from '@/components/event/list/filters/eventSearchO
 import { DateTime } from 'luxon';
 import type { EventWhere } from '@/__generated__/graphql';
 
-const now = DateTime.now();
-
 const getStartOfThisWeekend = () => {
+  const now = DateTime.utc();
   const startOfWeek = now.startOf('week');
   return startOfWeek.plus({ days: 5 });
 };
@@ -22,6 +21,7 @@ type GetEventWhereInput = {
 // into the EventWhere input object, exactly as the EventWhere is defined in the auto-generated GraphQL
 // documentation for querying events.
 const getEventWhere = (input: GetEventWhereInput): EventWhere => {
+  const now = DateTime.utc();
   const { filterValues, showMap, channelId, onlineOnly } = input;
   const {
     timeShortcut,

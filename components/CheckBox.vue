@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, useId } from 'vue';
 
 const props = defineProps({
   disabled: {
@@ -30,12 +30,13 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update']);
+const fallbackId = useId();
 
 // Generate a unique ID if not provided
 const checkboxId = computed(() => {
   if (props.id) return props.id;
   if (props.testId) return `checkbox-${props.testId}`;
-  return `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+  return `checkbox-${fallbackId}`;
 });
 
 // Use ariaLabel if provided, otherwise fall back to label
