@@ -336,7 +336,7 @@ describe('getEventWhere', () => {
       getExpectedRange: () => {
         const now = DateTime.utc();
         return {
-          start: now.minus({ years: 2 }).toISO(),
+          start: now.startOf('day').minus({ years: 2 }).toISO(),
           end: now.startOf('day').toISO(),
         };
       },

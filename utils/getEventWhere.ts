@@ -261,7 +261,10 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
       endOfDateRangeISO = startOfNextWeek.plus({ weeks: 1 }).toISO();
       break;
     case timeShortcutValues.PAST_EVENTS:
-      beginningOfDateRangeISO = now.minus({ years: 2 }).toISO();
+      beginningOfDateRangeISO = now
+        .startOf('day')
+        .minus({ years: 2 })
+        .toISO();
       endOfDateRangeISO = now.startOf('day').toISO();
       break;
     case timeShortcutValues.THIS_MONTH:
