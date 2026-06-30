@@ -3,6 +3,8 @@ import { computed } from 'vue';
 import type { Issue as GeneratedIssue } from '@/__generated__/graphql';
 import { DateTime } from 'luxon';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
+import ChannelIconStack from '@/components/channel/ChannelIconStack.vue';
+import TagComponent from '@/components/TagComponent.vue';
 
 type Issue = GeneratedIssue & {
   issueNumber: number;
@@ -21,6 +23,10 @@ const props = defineProps({
   selectedIssueNumber: {
     type: Number,
     default: null,
+  },
+  showStatusIcon: {
+    type: Boolean,
+    default: true,
   },
 });
 
@@ -76,6 +82,23 @@ const isRelatedToBot = computed(() => {
 const isRelatedToWiki = computed(() => {
   return !!props.issue.relatedWikiPageId || !!props.issue.relatedWikiRevisionId;
 });
+
+const relatedChannels = computed(() => {
+  if (props.issue?.Channel?.uniqueName) {
+    return [
+      {
+        uniqueName: props.issue.Channel.uniqueName,
+        iconURL: props.issue.Channel.channelIconURL || '',
+      },
+    ];
+  }
+
+  return [];
+});
+
+const relatedChannelNames = computed(() =>
+  relatedChannels.value.map((channel) => channel.uniqueName)
+);
 </script>
 
 <template>
@@ -83,8 +106,23 @@ const isRelatedToWiki = computed(() => {
     class="border-bottom flex flex-col border-gray-200 p-3 pl-4 dark:border-gray-800"
   >
     <div class="flex space-x-2 text-sm md:text-lg">
-      <i v-if="issue.isOpen" class="far fa-dot-circle list-item-icon mt-1" />
-      <i v-else class="fa-solid fa-circle-check mt-1 text-purple-500" />
+      <i
+        v-if="showStatusIcon && issue.isOpen"
+        class="far fa-dot-circle list-item-icon mt-1"
+      />
+      <i
+        v-else-if="showStatusIcon"
+        class="fa-solid fa-circle-check mt-1 text-purple-500"
+      />
+
+      <ChannelIconStack
+        v-if="relatedChannels.length"
+        :channels="relatedChannels"
+        class="mt-0.5 shrink-0"
+        icon-class="h-6 w-6 shrink-0 rounded-full ring-2 ring-white dark:ring-gray-900"
+        tooltip-position-class="pointer-events-none absolute -top-8 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover/chicon:opacity-100 dark:bg-gray-700"
+        :show-extra-count="false"
+      />
 
       <div class="flex-col">
         <span v-if="issue.Channel" class="flex flex-wrap items-center gap-2">
@@ -164,6 +202,20 @@ const isRelatedToWiki = computed(() => {
           </span>
         </span>
         <div v-else class="dark:text-gray-200">{{ issue.title }}</div>
+        <div
+          v-if="relatedChannelNames.length"
+          class="mt-2 flex flex-wrap gap-1"
+          data-testid="issue-channel-tags"
+        >
+          <TagComponent
+            v-for="channelName in relatedChannelNames"
+            :key="channelName"
+            class="dark:!text-white"
+            :tag="channelName"
+            :hide-icon="true"
+            :channel-mode="true"
+          />
+        </div>
         <div class="text-xs text-gray-500 dark:text-gray-200">
           {{
             `Opened on ${formatDate(issue.createdAt)} by ${issueAuthorName(

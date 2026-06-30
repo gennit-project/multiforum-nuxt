@@ -241,11 +241,15 @@ describe('IssueDetail', () => {
           IssueLockedBanner: true,
           IssueLockDialog: true,
           IssueCommentForm: true,
-          IssueBodyEditor: true,
-          IssueRelatedContent: true,
-          NotificationComponent: NotificationStub,
-          PrimaryButton: PrimaryButtonStub,
-          GenericButton: GenericButtonStub,
+        IssueBodyEditor: true,
+        IssueRelatedContent: true,
+        TagComponent: {
+          props: ['tag'],
+          template: '<span class="tag-chip">{{ tag }}</span>',
+        },
+        NotificationComponent: NotificationStub,
+        PrimaryButton: PrimaryButtonStub,
+        GenericButton: GenericButtonStub,
           'v-row': PassThroughStub,
           'v-col': PassThroughStub,
         },
@@ -285,6 +289,14 @@ describe('IssueDetail', () => {
 
     expect(wrapper.text()).toContain(
       'Your moderator account is suspended. You can still use your user account where normal user permissions allow it, but moderation actions remain disabled until the suspension is reversed or expires.'
+    );
+  });
+
+  it('shows the issue context channel tags', () => {
+    const wrapper = buildWrapper();
+
+    expect(wrapper.get('[data-testid="issue-detail-channel-tags"]').text()).toContain(
+      'toDelete'
     );
   });
 });

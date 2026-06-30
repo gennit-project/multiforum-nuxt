@@ -45,6 +45,7 @@ import NotificationComponent from '@/components/NotificationComponent.vue';
 import IssueSubscriptionPanel from '@/components/mod/IssueSubscriptionPanel.vue';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
+import TagComponent from '@/components/TagComponent.vue';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
@@ -334,6 +335,30 @@ const reportCountLabel = computed(() =>
   formatReportCountLabel(reportCount.value)
 );
 
+const issueContextChannels = computed(() => {
+  const discussionChannels =
+    relatedDiscussion.value?.DiscussionChannels?.map((dc) => dc.channelUniqueName) ?? [];
+  if (discussionChannels.length > 0) {
+    return [...new Set(discussionChannels)];
+  }
+
+  const eventChannels =
+    relatedEvent.value?.EventChannels?.map((ec) => ec.channelUniqueName) ?? [];
+  if (eventChannels.length > 0) {
+    return [...new Set(eventChannels)];
+  }
+
+  if (activeIssue.value?.Channel?.uniqueName) {
+    return [activeIssue.value.Channel.uniqueName];
+  }
+
+  if (activeIssue.value?.channelUniqueName) {
+    return [activeIssue.value.channelUniqueName];
+  }
+
+  return [];
+});
+
 const shouldShowIssueDetailsSection = computed(() => {
   return (
     hasRelatedContent.value || !!activeIssue.value?.body || isIssueAuthor.value
@@ -414,6 +439,21 @@ const handleLockReasonUpdate = (value: string) => {
     </div>
 
     <div v-if="activeIssue" class="mt-2 flex flex-col gap-2 px-4">
+      <div
+        v-if="issueContextChannels.length"
+        class="flex flex-wrap gap-1"
+        data-testid="issue-detail-channel-tags"
+      >
+        <TagComponent
+          v-for="channelName in issueContextChannels"
+          :key="channelName"
+          class="dark:!text-white"
+          :tag="channelName"
+          :hide-icon="true"
+          :channel-mode="true"
+        />
+      </div>
+
       <!-- Related Content Section -->
       <IssueRelatedContent
         v-if="shouldShowIssueDetailsSection && hasRelatedContent"
