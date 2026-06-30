@@ -8,7 +8,11 @@ import { GET_COMMENT } from '@/graphQLData/comment/queries';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { DateTime } from 'luxon';
-import type { Issue as GeneratedIssue } from '@/__generated__/graphql';
+import type {
+  EventChannel,
+  DiscussionChannel,
+  Issue as GeneratedIssue,
+} from '@/__generated__/graphql';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import 'md-editor-v3/lib/style.css';
 import PageNotFound from '@/components/PageNotFound.vue';
@@ -335,15 +339,33 @@ const reportCountLabel = computed(() =>
   formatReportCountLabel(reportCount.value)
 );
 
-const issueContextChannels = computed(() => {
-  const discussionChannels =
-    relatedDiscussion.value?.DiscussionChannels?.map((dc) => dc.channelUniqueName) ?? [];
+const extractChannelUniqueNames = (
+  channels:
+    | Array<Pick<DiscussionChannel, 'channelUniqueName'>>
+    | Array<Pick<EventChannel, 'channelUniqueName'>>
+    | null
+    | undefined
+): string[] => {
+  if (!channels) return [];
+
+  return channels
+    .map((channel) => channel.channelUniqueName)
+    .filter((channelName: string | null | undefined): channelName is string =>
+      Boolean(channelName)
+    );
+};
+
+const issueContextChannels = computed<string[]>(() => {
+  const discussionChannels = extractChannelUniqueNames(
+    relatedDiscussion.value?.DiscussionChannels as DiscussionChannel[] | null | undefined
+  );
   if (discussionChannels.length > 0) {
     return [...new Set(discussionChannels)];
   }
 
-  const eventChannels =
-    relatedEvent.value?.EventChannels?.map((ec) => ec.channelUniqueName) ?? [];
+  const eventChannels = extractChannelUniqueNames(
+    relatedEvent.value?.EventChannels as EventChannel[] | null | undefined
+  );
   if (eventChannels.length > 0) {
     return [...new Set(eventChannels)];
   }
