@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
@@ -15,16 +15,28 @@ vi.mock('@vue/apollo-composable', () => ({
 
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 
-const mountWith = (result: unknown) => {
+const mountWith = (result: unknown, options: { loading?: boolean; error?: unknown } = {}) => {
   mockedUseQuery.mockReturnValue({
     result: ref(result),
-    loading: ref(false),
-    error: ref(null),
+    loading: ref(options.loading ?? false),
+    error: ref(options.error ?? null),
   });
   return shallowMount(OwnedForumsPage);
 };
 
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
 describe('user owned forums page', () => {
+  it('shows the loading state', () => {
+    expect(mountWith(null, { loading: true }).text()).toContain('Loading...');
+  });
+
+  it('shows the error state', () => {
+    expect(mountWith(null, { error: { message: 'boom' } }).text()).toContain('Error');
+  });
+
   it('shows an empty-state message when the user owns no forums', () => {
     const wrapper = mountWith({
       users: [{ AdminOfChannels: [], AdminOfChannelsAggregate: { count: 0 } }],
@@ -32,7 +44,7 @@ describe('user owned forums page', () => {
     expect(wrapper.text()).toContain('This user is not a forum owner.');
   });
 
-  it('renders the channel list when the user owns forums', () => {
+  it('renders the channel list with the aggregate count when the user owns forums', () => {
     const wrapper = mountWith({
       users: [
         {
@@ -41,8 +53,12 @@ describe('user owned forums page', () => {
         },
       ],
     });
-    expect(wrapper.findComponent(ChannelList).props('channels')).toEqual([
-      { uniqueName: 'dogs' },
-    ]);
+    expect(wrapper.findComponent(ChannelList).props()).toEqual({
+      channels: [{ uniqueName: 'dogs' }],
+      resultCount: 1,
+      searchInput: '',
+      selectedTags: [],
+      loading: false,
+    });
   });
 });

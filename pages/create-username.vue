@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_OWN_EMAIL } from '@/graphQLData/email/queries';
@@ -23,8 +23,19 @@ const emailNotInSystem = ref(false);
 const initialCheckComplete = ref(false);
 const loading = ref(true);
 
+const isClient = typeof window !== 'undefined';
+const shouldQueryOwnEmail = computed(
+  () => isClient && isAuthenticatedVar.value && !usernameVar.value
+);
+
+const { onResult: onEmailResult } = useQuery(
+  GET_OWN_EMAIL,
+  null,
+  { enabled: shouldQueryOwnEmail }
+);
+
 // Handle redirects when mounted
-if (import.meta.client) {
+if (isClient) {
   onMounted(() => {
     // Check for stored username
     const storedUsername = localStorage.getItem('username');
@@ -48,28 +59,23 @@ if (import.meta.client) {
     }
   });
 
-  // Only check email if we're authenticated and on the client side.
   // getOwnEmail is self-scoped (resolves the caller's email from the token),
   // so it needs no variables. A returned `username` means the account already
   // exists; its absence means this verified email still needs a username.
-  if (isAuthenticatedVar.value) {
-    const { onResult: onEmailResult } = useQuery(GET_OWN_EMAIL);
-
-    onEmailResult(
-      (result: { data?: { getOwnEmail?: { username?: string | null } | null } }) => {
-        const ownEmail = result.data?.getOwnEmail;
-        if (ownEmail?.username) {
-          // User already exists, redirect to home
-          router.push('/');
-        } else {
-          // User doesn't exist, show the create username form
-          emailNotInSystem.value = true;
-        }
-        initialCheckComplete.value = true;
-        loading.value = false;
+  onEmailResult(
+    (result: { data?: { getOwnEmail?: { username?: string | null } | null } }) => {
+      const ownEmail = result.data?.getOwnEmail;
+      if (ownEmail?.username) {
+        // User already exists, redirect to home
+        router.push('/');
+      } else {
+        // User doesn't exist, show the create username form
+        emailNotInSystem.value = true;
       }
-    );
-  }
+      initialCheckComplete.value = true;
+      loading.value = false;
+    }
+  );
 }
 </script>
 

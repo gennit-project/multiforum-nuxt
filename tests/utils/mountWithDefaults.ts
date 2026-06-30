@@ -43,6 +43,7 @@ export const defaultStubs: Record<string, Component> = {
   RequireAuth: slotPassthrough('has-auth'),
   // ClientOnly should render its content in unit tests.
   ClientOnly: slotPassthrough(),
+  'client-only': slotPassthrough(),
   // Routing links render as transparent anchors.
   NuxtLink: linkPassthrough,
   'nuxt-link': linkPassthrough,
