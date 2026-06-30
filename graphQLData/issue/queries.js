@@ -379,6 +379,7 @@ export const GET_ISSUES = gql`
       }
       Channel {
         uniqueName
+        channelIconURL
       }
       Author {
         __typename
@@ -414,6 +415,7 @@ export const GET_CLOSED_ISSUES = gql`
       relatedWikiRevisionId
       Channel {
         uniqueName
+        channelIconURL
       }
       channelUniqueName
       locked

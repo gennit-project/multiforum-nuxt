@@ -10,7 +10,7 @@ import type {
 import type { DiscussionWithFavorited } from '@/types/Discussion';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import TagComponent from '@/components/TagComponent.vue';
-import AvatarComponent from '@/components/AvatarComponent.vue';
+import ChannelIconStack from '@/components/channel/ChannelIconStack.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
@@ -224,11 +224,6 @@ const channelIcons = computed(() =>
     iconURL: dc.Channel?.channelIconURL || '',
   }))
 );
-const displayChannelIcons = computed(() => channelIcons.value.slice(0, 3));
-const extraChannelCount = computed(() =>
-  Math.max(0, channelIcons.value.length - 3)
-);
-
 // Sensitive content logic
 const sensitiveContentRevealed = ref(false);
 const hasSensitiveContent = computed(
@@ -264,33 +259,7 @@ const revealSensitiveContent = () => {
       <!-- Discussion row -->
       <div class="flex items-start gap-3">
         <div class="flex flex-shrink-0 flex-col items-center gap-1">
-          <div v-if="displayChannelIcons.length" class="flex -space-x-2">
-            <div
-              v-for="channel in displayChannelIcons"
-              :key="channel.uniqueName"
-              class="group/chicon relative"
-            >
-              <AvatarComponent
-                class="h-8 w-8 shrink-0 rounded-full ring-2 ring-white dark:ring-gray-900"
-                :text="channel.uniqueName"
-                :src="channel.iconURL"
-                :is-small="true"
-                :is-square="false"
-                :is-decorative="true"
-              />
-              <span
-                class="pointer-events-none absolute -top-8 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover/chicon:opacity-100 dark:bg-gray-700"
-              >
-                {{ channel.uniqueName }}
-              </span>
-            </div>
-          </div>
-          <span
-            v-if="extraChannelCount > 0"
-            class="text-center text-[10px] leading-tight text-gray-500 dark:text-gray-400"
-          >
-            and {{ extraChannelCount }} more
-          </span>
+          <ChannelIconStack :channels="channelIcons" />
           <AddToDiscussionFavorites
             v-if="discussion"
             :allow-add-to-list="true"

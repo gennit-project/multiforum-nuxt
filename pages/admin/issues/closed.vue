@@ -115,6 +115,7 @@ watch(
           :channel-id="channelId"
           :is-selectable="true"
           :selected-issue-number="selectedIssueNumber ?? undefined"
+          :show-status-icon="false"
           @select="handleSelectIssue"
         />
     </ul>

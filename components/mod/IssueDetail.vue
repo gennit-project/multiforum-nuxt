@@ -8,7 +8,11 @@ import { GET_COMMENT } from '@/graphQLData/comment/queries';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { DateTime } from 'luxon';
-import type { Issue as GeneratedIssue } from '@/__generated__/graphql';
+import type {
+  EventChannel,
+  DiscussionChannel,
+  Issue as GeneratedIssue,
+} from '@/__generated__/graphql';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import 'md-editor-v3/lib/style.css';
 import PageNotFound from '@/components/PageNotFound.vue';
@@ -45,6 +49,7 @@ import NotificationComponent from '@/components/NotificationComponent.vue';
 import IssueSubscriptionPanel from '@/components/mod/IssueSubscriptionPanel.vue';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
+import TagComponent from '@/components/TagComponent.vue';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
@@ -334,6 +339,48 @@ const reportCountLabel = computed(() =>
   formatReportCountLabel(reportCount.value)
 );
 
+const extractChannelUniqueNames = (
+  channels:
+    | Array<Pick<DiscussionChannel, 'channelUniqueName'>>
+    | Array<Pick<EventChannel, 'channelUniqueName'>>
+    | null
+    | undefined
+): string[] => {
+  if (!channels) return [];
+
+  return channels
+    .map((channel) => channel.channelUniqueName)
+    .filter((channelName: string | null | undefined): channelName is string =>
+      Boolean(channelName)
+    );
+};
+
+const issueContextChannels = computed<string[]>(() => {
+  const discussionChannels = extractChannelUniqueNames(
+    relatedDiscussion.value?.DiscussionChannels as DiscussionChannel[] | null | undefined
+  );
+  if (discussionChannels.length > 0) {
+    return [...new Set(discussionChannels)];
+  }
+
+  const eventChannels = extractChannelUniqueNames(
+    relatedEvent.value?.EventChannels as EventChannel[] | null | undefined
+  );
+  if (eventChannels.length > 0) {
+    return [...new Set(eventChannels)];
+  }
+
+  if (activeIssue.value?.Channel?.uniqueName) {
+    return [activeIssue.value.Channel.uniqueName];
+  }
+
+  if (activeIssue.value?.channelUniqueName) {
+    return [activeIssue.value.channelUniqueName];
+  }
+
+  return [];
+});
+
 const shouldShowIssueDetailsSection = computed(() => {
   return (
     hasRelatedContent.value || !!activeIssue.value?.body || isIssueAuthor.value
@@ -414,6 +461,21 @@ const handleLockReasonUpdate = (value: string) => {
     </div>
 
     <div v-if="activeIssue" class="mt-2 flex flex-col gap-2 px-4">
+      <div
+        v-if="issueContextChannels.length"
+        class="flex flex-wrap gap-1"
+        data-testid="issue-detail-channel-tags"
+      >
+        <TagComponent
+          v-for="channelName in issueContextChannels"
+          :key="channelName"
+          class="dark:!text-white"
+          :tag="channelName"
+          :hide-icon="true"
+          :channel-mode="true"
+        />
+      </div>
+
       <!-- Related Content Section -->
       <IssueRelatedContent
         v-if="shouldShowIssueDetailsSection && hasRelatedContent"

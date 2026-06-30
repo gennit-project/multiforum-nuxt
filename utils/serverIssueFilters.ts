@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import { createCaseInsensitivePattern } from '@/utils/searchUtils';
 
 /**
@@ -20,7 +21,45 @@ export function getDefaultServerRuleViolationsFilter(
 
 export type ServerIssuesWhereParams = {
   searchInput: string;
+  selectedChannels: string[];
+  startDate: string;
+  endDate: string;
   showOnlyServerRuleViolations: boolean;
+};
+
+export const isDateInputValue = (value: string | null): value is string => {
+  return !!value && /^\d{4}-\d{2}-\d{2}$/.test(value);
+};
+
+const buildCreatedAtRange = (
+  startDate: string,
+  endDate: string
+): Record<string, string> => {
+  const createdAtRange: Record<string, string> = {};
+
+  if (isDateInputValue(startDate)) {
+    const createdAtGte = DateTime.fromISO(startDate, {
+      zone: 'utc',
+    })
+      .startOf('day')
+      .toISO();
+    if (createdAtGte) {
+      createdAtRange.createdAt_GTE = createdAtGte;
+    }
+  }
+
+  if (isDateInputValue(endDate)) {
+    const createdAtLte = DateTime.fromISO(endDate, {
+      zone: 'utc',
+    })
+      .endOf('day')
+      .toISO();
+    if (createdAtLte) {
+      createdAtRange.createdAt_LTE = createdAtLte;
+    }
+  }
+
+  return createdAtRange;
 };
 
 /**
@@ -31,11 +70,22 @@ export type ServerIssuesWhereParams = {
 export function buildServerIssuesWhere(
   params: ServerIssuesWhereParams
 ): { issueWhere: Record<string, unknown> } {
-  const { searchInput, showOnlyServerRuleViolations } = params;
+  const {
+    searchInput,
+    selectedChannels,
+    startDate,
+    endDate,
+    showOnlyServerRuleViolations,
+  } =
+    params;
   const searchPattern = createCaseInsensitivePattern(searchInput);
   const searchFilter = searchPattern
     ? { OR: [{ title_MATCHES: searchPattern }, { body_MATCHES: searchPattern }] }
     : {};
+  const channelFilter =
+    selectedChannels.length > 0
+      ? { channelUniqueName_IN: selectedChannels }
+      : {};
 
   return {
     issueWhere: {
@@ -43,6 +93,8 @@ export function buildServerIssuesWhere(
       ...(showOnlyServerRuleViolations
         ? { flaggedServerRuleViolation: true }
         : {}),
+      ...buildCreatedAtRange(startDate, endDate),
+      ...channelFilter,
       ...searchFilter,
     },
   };

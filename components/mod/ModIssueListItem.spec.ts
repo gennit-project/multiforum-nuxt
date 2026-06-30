@@ -21,6 +21,21 @@ const mountItem = (props: Record<string, unknown> = {}) =>
     props: { issue: issue(), ...props },
     global: {
       stubs: {
+        ChannelIconStack: {
+          name: 'ChannelIconStack',
+          props: ['channels'],
+          computed: {
+            channelNames() {
+              return this.channels.map((c: { uniqueName: string }) => c.uniqueName).join(',');
+            },
+          },
+          template: '<div class="channel-stack">{{ channelNames }}</div>',
+        },
+        TagComponent: {
+          name: 'TagComponent',
+          props: ['tag'],
+          template: '<span class="tag-chip">{{ tag }}</span>',
+        },
         FlagIcon: true,
         NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
         'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
@@ -101,6 +116,26 @@ describe('ModIssueListItem badges', () => {
 
     expect(wrapper.text()).toContain('Wiki Edit');
   });
+
+  it('passes the issue channel to the channel icon stack', () => {
+    const wrapper = mountItem({
+      issue: issue({
+        Channel: { uniqueName: 'cats', channelIconURL: 'cats.png' },
+      }),
+    });
+
+    expect(wrapper.find('.channel-stack').text()).toContain('cats');
+  });
+
+  it('shows the issue channel as a tag chip', () => {
+    const wrapper = mountItem({
+      issue: issue({
+        Channel: { uniqueName: 'cats', channelIconURL: 'cats.png' },
+      }),
+    });
+
+    expect(wrapper.get('[data-testid="issue-channel-tags"]').text()).toContain('cats');
+  });
 });
 
 describe('ModIssueListItem selection', () => {
@@ -125,5 +160,12 @@ describe('ModIssueListItem selection', () => {
     const wrapper = mountItem({ selectedIssueNumber: 7 });
 
     expect(wrapper.html()).toContain('bg-gray-100');
+  });
+
+  it('hides the status icon when disabled', () => {
+    const wrapper = mountItem({ showStatusIcon: false });
+
+    expect(wrapper.find('.fa-dot-circle').exists()).toBe(false);
+    expect(wrapper.find('.fa-circle-check').exists()).toBe(false);
   });
 });
