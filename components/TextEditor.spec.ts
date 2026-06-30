@@ -77,13 +77,21 @@ const editorStubs = {
     props: ['current', 'max'],
     template: '<div class="char-counter">{{ current }}/{{ max }}</div>',
   },
-  EmojiPickerWrapper: true,
+  EmojiPickerWrapper: {
+    name: 'EmojiPickerWrapper',
+    emits: ['emoji-click', 'close'],
+    template: '<div data-testid="emoji-picker" />',
+  },
   MarkdownRenderer: {
     name: 'MarkdownRenderer',
     props: ['text'],
     template: '<div class="markdown-preview">{{ text }}</div>',
   },
-  TextEditorFullScreen: true,
+  TextEditorFullScreen: {
+    name: 'TextEditorFullScreen',
+    emits: ['exit', 'input', 'click', 'keyup', 'drop', 'format', 'toggle-emoji', 'emoji-click', 'close-emoji', 'file-change'],
+    template: '<div data-testid="fullscreen-editor" />',
+  },
   // headlessui tab primitives — render as transparent click targets.
   Tab: { template: '<button><slot /></button>' },
   TabGroup: { template: '<div><slot /></div>' },
@@ -298,6 +306,51 @@ describe('TextEditor (mounted)', () => {
       .vm.$emit('format', 'bold');
     expect(wrapper.emitted('update')).toBeTruthy();
     expect(String(wrapper.emitted('update')?.at(-1)?.[0])).toContain('**');
+  });
+
+  it('shows the fullscreen editor when the toolbar requests it', async () => {
+    const wrapper = mountEditor({ initialValue: 'full screen' });
+    await wrapper
+      .findComponent({ name: 'TextEditorToolbar' })
+      .vm.$emit('toggle-fullscreen');
+
+    expect(wrapper.find('[data-testid="fullscreen-editor"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="texteditor-textarea"]').exists()).toBe(false);
+  });
+
+  it('shows the emoji picker when the toolbar requests it', async () => {
+    const wrapper = mountEditor();
+    await wrapper
+      .findComponent({ name: 'TextEditorToolbar' })
+      .vm.$emit('toggle-emoji', {
+        currentTarget: {
+          offsetParent: document.body,
+        },
+      } as MouseEvent);
+
+    expect(wrapper.find('[data-testid="emoji-picker"]').exists()).toBe(true);
+  });
+
+  it('hides the image upload control when uploads are disabled', () => {
+    const wrapper = mountEditor({ allowImageUpload: false });
+    expect(wrapper.findComponent({ name: 'AddImage' }).exists()).toBe(false);
+  });
+
+  it('registers and cleans up its window listeners on unmount', () => {
+    const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+
+    const wrapper = mountEditor();
+    wrapper.unmount();
+
+    expect(addEventListenerSpy).toHaveBeenCalledWith(
+      'resize',
+      expect.any(Function)
+    );
+    expect(removeEventListenerSpy).toHaveBeenCalledWith(
+      'resize',
+      expect.any(Function)
+    );
   });
 });
 

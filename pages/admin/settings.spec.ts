@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { defineComponent, h } from 'vue';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
 import ServerSettingsPage from './settings.vue';
@@ -48,6 +49,12 @@ const FieldsStub = {
   emits: ['submit', 'update-form-values'],
   template: '<div class="server-fields" />',
 };
+
+const RequireAuthStub = defineComponent({
+  setup(_props, { slots }) {
+    return () => h('div', slots['does-not-have-auth']?.());
+  },
+});
 
 const mountPage = () =>
   mountWithDefaults(ServerSettingsPage, {
@@ -131,5 +138,18 @@ describe('Admin server settings page', () => {
     h.onDoneCb();
     await wrapper.vm.$nextTick();
     expect(wrapper.findComponent({ name: 'Notification' }).exists()).toBe(true);
+  });
+
+  it('shows the permission denied message when auth is missing', async () => {
+    const Page = (await import('./settings.vue')).default;
+    const wrapper = mountWithDefaults(Page, {
+      global: {
+        stubs: {
+          RequireAuth: RequireAuthStub,
+        },
+      },
+    });
+
+    expect(wrapper.text()).toContain("You don't have permission to see this page.");
   });
 });
