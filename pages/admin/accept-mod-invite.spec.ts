@@ -6,7 +6,8 @@ import { ref } from 'vue';
 import AcceptModInvite from './accept-mod-invite.vue';
 
 // Mock definePageMeta globally before importing the component
-vi.stubGlobal('definePageMeta', vi.fn());
+const definePageMetaMock = vi.fn();
+vi.stubGlobal('definePageMeta', definePageMetaMock);
 
 const mockPush = vi.fn();
 const mockMutate = vi.fn();
@@ -50,6 +51,10 @@ describe('accept-mod-invite', () => {
     mockOnDone.mockReset();
     mockUsernameVar.value = null;
     mockModProfileNameVar.value = null;
+  });
+
+  it('does not declare a missing auth route middleware', () => {
+    expect(definePageMetaMock).not.toHaveBeenCalled();
   });
 
   it('shows sign in required when not authenticated', () => {
