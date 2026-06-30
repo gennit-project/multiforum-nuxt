@@ -5,17 +5,12 @@ import { useHead } from 'nuxt/app';
 import { useUsername } from '@/composables/useAuthState';
 import { gql } from '@apollo/client/core';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
-import TagComponent from '@/components/TagComponent.vue';
-import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
-import { relativeTime } from '@/utils';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
 const usernameVar = useUsername();
 
-// Types for favorite downloads
 interface DiscussionChannel {
   id: string;
   channelUniqueName?: string;
@@ -56,7 +51,6 @@ useHead({
   title: 'Favorite Downloads - Library',
 });
 
-// Query specifically for downloads (hasDownload: true)
 const GET_USER_FAVORITE_DOWNLOADS = gql`
   query getUserFavoriteDownloads($username: String!) {
     users(where: { username: $username }) {
@@ -161,12 +155,10 @@ const getAuthorInfo = (download: FavoriteDownload) => {
   };
 };
 
-// Get the first image from the album if available
 const getFirstAlbumImage = (download: FavoriteDownload): string | undefined => {
   const album = download?.Album;
   if (!album?.Images?.length) return undefined;
 
-  // If imageOrder exists and has items, use the first ordered image
   if (album.imageOrder?.length && album.imageOrder.length > 0) {
     const firstImageId = album.imageOrder[0];
     const orderedImage = album.Images.find(
@@ -175,7 +167,6 @@ const getFirstAlbumImage = (download: FavoriteDownload): string | undefined => {
     return orderedImage?.url;
   }
 
-  // Fallback to first image in the Images array
   return album.Images[0]?.url;
 };
 </script>
@@ -186,7 +177,6 @@ const getFirstAlbumImage = (download: FavoriteDownload): string | undefined => {
       <template #has-auth>
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div class="py-8">
-            <!-- Header with back button -->
             <div class="mb-8">
               <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
                 Favorite Downloads
@@ -196,7 +186,6 @@ const getFirstAlbumImage = (download: FavoriteDownload): string | undefined => {
               </p>
             </div>
 
-            <!-- Loading state -->
             <div v-if="loading" class="py-8 text-center">
               <div
                 class="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-orange-500"
@@ -206,17 +195,15 @@ const getFirstAlbumImage = (download: FavoriteDownload): string | undefined => {
               </p>
             </div>
 
-            <!-- Error state -->
             <div
               v-else-if="error"
-              class="bg-red-50 rounded-lg p-4 dark:bg-red-900/20"
+              class="rounded-lg bg-red-50 p-4 dark:bg-red-900/20"
             >
               <p class="text-red-800 dark:text-red-300">
                 Error loading favorite downloads: {{ error.message }}
               </p>
             </div>
 
-            <!-- Empty state -->
             <div
               v-else-if="favoriteDownloads.length === 0"
               class="py-12 text-center"
@@ -252,135 +239,23 @@ const getFirstAlbumImage = (download: FavoriteDownload): string | undefined => {
               </div>
             </div>
 
-            <!-- Downloads grid -->
             <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <div
+              <LibraryDownloadCard
                 v-for="download in favoriteDownloads"
                 :key="download.id"
-                class="rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
-              >
-                <!-- Download image preview -->
-                <NuxtLink
-                  :to="getDownloadLink(download)"
-                  class="block aspect-video w-full overflow-hidden rounded-t-lg bg-gray-100 dark:bg-gray-700"
-                >
-                  <img
-                    v-if="getFirstAlbumImage(download)"
-                    :src="getFirstAlbumImage(download)"
-                    :alt="download.title"
-                    class="h-full w-full object-cover"
-                  >
-                  <div
-                    v-else
-                    class="flex h-full w-full items-center justify-center text-gray-400"
-                  >
-                    <svg
-                      class="h-12 w-12"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
-                  </div>
-                </NuxtLink>
-
-                <div class="p-4">
-                  <!-- Download header -->
-                  <div class="mb-2 flex items-center justify-between">
-                    <NuxtLink
-                      v-if="download.DiscussionChannels?.[0]"
-                      :to="
-                        getChannelLink(
-                          download.DiscussionChannels[0].channelUniqueName
-                        )
-                      "
-                      class="flex items-center text-xs text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-                    >
-                      <AvatarComponent
-                        :text="download.DiscussionChannels[0].channelUniqueName"
-                        :is-square="true"
-                        class="mr-1 h-4 w-4"
-                      />
-                      <span>{{
-                        download.DiscussionChannels[0].channelUniqueName
-                      }}</span>
-                    </NuxtLink>
-
-                    <span class="text-xs text-gray-500 dark:text-gray-400">
-                      {{ relativeTime(download.createdAt) }}
-                    </span>
-                  </div>
-
-                  <!-- Download title -->
-                  <div class="mb-2 flex items-center justify-between">
-                    <NuxtLink
-                      :to="getDownloadLink(download)"
-                      class="font-semibold min-w-0 flex-1 text-base text-gray-900 hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
-                    >
-                      {{ download.title }}
-                    </NuxtLink>
-                    <div class="ml-2 flex-shrink-0">
-                      <AddToDiscussionFavorites
-                        :allow-add-to-list="false"
-                        :discussion-id="download.id"
-                        :discussion-title="download.title"
-                        :initial-is-favorited="true"
-                        entity-name="Download"
-                        size="small"
-                      />
-                    </div>
-                  </div>
-
-                  <!-- Meta information -->
-                  <div
-                    class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400"
-                  >
-                    <!-- Author -->
-                    <div class="flex items-center">
-                      <span class="mr-1">by</span>
-                      <UsernameWithTooltip
-                        v-if="getAuthorInfo(download)"
-                        :username="getAuthorInfo(download)!.username"
-                        :display-name="getAuthorInfo(download)!.displayName"
-                        :src="getAuthorInfo(download)!.profilePicURL"
-                        :is-server-admin="getAuthorInfo(download)!.isAdmin"
-                        :comment-karma="getAuthorInfo(download)!.commentKarma"
-                        :discussion-karma="
-                          getAuthorInfo(download)!.discussionKarma
-                        "
-                        :account-created="getAuthorInfo(download)!.createdAt"
-                      />
-                      <span v-else>Deleted</span>
-                    </div>
-                  </div>
-
-                  <!-- Tags -->
-                  <div
-                    v-if="download.Tags && download.Tags.length > 0"
-                    class="mt-3 flex flex-wrap gap-1"
-                  >
-                    <TagComponent
-                      v-for="tag in download.Tags.slice(0, 3)"
-                      :key="tag.text"
-                      :tag="tag.text"
-                      class="text-xs"
-                      @click.prevent=""
-                    />
-                    <span
-                      v-if="download.Tags.length > 3"
-                      class="text-xs text-gray-500 dark:text-gray-400"
-                    >
-                      +{{ download.Tags.length - 3 }} more
-                    </span>
-                  </div>
-                </div>
-              </div>
+                :download="download"
+                :download-link="getDownloadLink(download)"
+                :channel-link="
+                  getChannelLink(download.DiscussionChannels?.[0]?.channelUniqueName)
+                "
+                :channel-unique-name="
+                  download.DiscussionChannels?.[0]?.channelUniqueName || ''
+                "
+                :author-info="getAuthorInfo(download)"
+                :preview-image-url="getFirstAlbumImage(download)"
+                :show-favorite-button="true"
+                :is-favorited="true"
+              />
             </div>
           </div>
         </div>

@@ -30,12 +30,62 @@
 import { defineNuxtPlugin } from 'nuxt/app';
 
 export default defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.hook('apollo:auth', ({ token }) => {
-    if (!import.meta.server) {
-      // Client: leave unset so @nuxtjs/apollo reads localStorage[tokenName].
+  let browserToken: string | null = null;
+  let browserTokenPromise: Promise<string | null> | null = null;
+
+  const canUseLocalStorage = () => {
+    if (!import.meta.client) return false;
+    try {
+      return typeof window.localStorage !== 'undefined';
+    } catch {
+      return false;
+    }
+  };
+
+  const getBrowserToken = async () => {
+    if (browserToken) {
+      return browserToken;
+    }
+
+    if (!browserTokenPromise) {
+      browserTokenPromise = fetch('/api/session/token', {
+        credentials: 'include',
+        cache: 'no-store',
+      })
+        .then(async (res) => {
+          if (!res.ok) return null;
+          const payload = (await res.json()) as {
+            accessToken?: string | null;
+          };
+          browserToken = payload.accessToken ?? null;
+          return browserToken;
+        })
+        .catch(() => null)
+        .finally(() => {
+          browserTokenPromise = null;
+        });
+    }
+
+    return browserTokenPromise;
+  };
+
+  nuxtApp.hook('apollo:auth', async ({ token }) => {
+    if (import.meta.server) {
+      const accessToken = nuxtApp.ssrContext?.event?.context?.accessToken;
+      if (accessToken) {
+        token.value = accessToken;
+      }
       return;
     }
-    const accessToken = nuxtApp.ssrContext?.event?.context?.accessToken;
+
+    // Client: prefer the module's native localStorage token path in normal
+    // browsers, but fall back to a session-backed in-memory token when
+    // localStorage is unavailable (embedded browsers / stricter contexts).
+    if (canUseLocalStorage()) {
+      return;
+    }
+
+    const accessToken = await getBrowserToken();
     if (accessToken) {
       token.value = accessToken;
     }

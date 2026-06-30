@@ -33,6 +33,37 @@ export default defineNuxtPlugin(() => {
     return;
   }
 
+  const getStorageItem = (key: string) => {
+    try {
+      if (typeof window.localStorage === 'undefined') {
+        return null;
+      }
+      return window.localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  };
+
+  const setStorageItem = (key: string, value: string) => {
+    try {
+      if (typeof window.localStorage !== 'undefined') {
+        window.localStorage.setItem(key, value);
+      }
+    } catch {
+      // Ignore storage write failures in test and embedded browser contexts.
+    }
+  };
+
+  const removeStorageItem = (key: string) => {
+    try {
+      if (typeof window.localStorage !== 'undefined') {
+        window.localStorage.removeItem(key);
+      }
+    } catch {
+      // Ignore storage cleanup failures in test and embedded browser contexts.
+    }
+  };
+
   const isAuthenticatedVar = useIsAuthenticated();
   const usernameVar = useUsername();
   const emailVar = useEmail();
@@ -41,11 +72,9 @@ export default defineNuxtPlugin(() => {
   // Always check for mock auth data in localStorage - this is safe because
   // mock auth data is only set by test code (Playwright)
   const syncMockAuthFromStorage = () => {
-    const mockUsername = window.localStorage.getItem('mock_username');
-    const mockModProfileName = window.localStorage.getItem(
-      'mock_mod_profile_name'
-    );
-    const token = window.localStorage.getItem('token');
+    const mockUsername = getStorageItem('mock_username');
+    const mockModProfileName = getStorageItem('mock_mod_profile_name');
+    const token = getStorageItem('token');
 
     if (token) {
       const email = readEmailFromToken(token);
@@ -64,8 +93,7 @@ export default defineNuxtPlugin(() => {
   // Expose debug functions in dev/test environments
   // Also expose if mock_username is in localStorage (indicates Playwright tests)
   const hasMockAuth =
-    window.localStorage.getItem('mock_username') !== null ||
-    !!window.localStorage.getItem('token');
+    getStorageItem('mock_username') !== null || !!getStorageItem('token');
   const shouldExpose =
     import.meta.env.DEV ||
     config.environment === 'test' ||
@@ -85,12 +113,9 @@ export default defineNuxtPlugin(() => {
       setModProfileName(authState.modProfileName || '');
       isAuthenticatedVar.value = true;
       emailVar.value = authState.email || '';
-      window.localStorage.setItem('mock_username', authState.username || '');
+      setStorageItem('mock_username', authState.username || '');
       if (authState.modProfileName) {
-        window.localStorage.setItem(
-          'mock_mod_profile_name',
-          authState.modProfileName
-        );
+        setStorageItem('mock_mod_profile_name', authState.modProfileName);
       }
     } else {
       setIsAuthenticated(false);
@@ -99,8 +124,8 @@ export default defineNuxtPlugin(() => {
       setModProfileName('');
       isAuthenticatedVar.value = false;
       emailVar.value = '';
-      window.localStorage.removeItem('mock_username');
-      window.localStorage.removeItem('mock_mod_profile_name');
+      removeStorageItem('mock_username');
+      removeStorageItem('mock_mod_profile_name');
     }
 
     nextTick(() => {
@@ -115,7 +140,7 @@ export default defineNuxtPlugin(() => {
       email: emailVar.value,
       modProfileName: modProfileNameVar.value,
       authenticated: isAuthenticatedVar.value,
-      hasToken: !!localStorage.getItem('token'),
+      hasToken: !!getStorageItem('token'),
     });
   }
 });

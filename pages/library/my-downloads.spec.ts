@@ -21,6 +21,17 @@ const RequireAuthStub = defineComponent({
   },
 });
 
+const LibraryDownloadCardStub = defineComponent({
+  name: 'LibraryDownloadCard',
+  props: {
+    download: {
+      type: Object,
+      required: true,
+    },
+  },
+  template: '<div>{{ download.title }}</div>',
+});
+
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 
 const mountWith = async (downloads: unknown[]) => {
@@ -32,7 +43,11 @@ const mountWith = async (downloads: unknown[]) => {
   const Page = (await import('./my-downloads.vue')).default;
   return shallowMount(Page, {
     global: {
-      stubs: { RequireAuth: RequireAuthStub, NuxtLink: { template: '<a><slot /></a>' } },
+      stubs: {
+        RequireAuth: RequireAuthStub,
+        NuxtLink: { template: '<a><slot /></a>' },
+        LibraryDownloadCard: LibraryDownloadCardStub,
+      },
     },
   });
 };

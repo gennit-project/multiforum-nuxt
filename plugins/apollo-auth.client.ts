@@ -4,7 +4,7 @@
 //
 // Feed the access token from the server session into Apollo. We do NOT use
 // @nuxtjs/apollo's `apollo:auth` hook: that hook runs during SSR too, where a
-// relative fetch('/api/auth/token') is an internal Nitro call with NO cookies,
+// relative fetch('/api/session/token') is an internal Nitro call with NO cookies,
 // so it can never read the session — every SSR token fetch comes back null and
 // authenticated requests fail. (This was the actual root cause of "You must be
 // logged in to do that": the token fetch was happening cookieless on the
@@ -25,10 +25,21 @@ export default defineNuxtPlugin(() => {
   }
 
   const TOKEN_KEY = 'token'; // matches @nuxtjs/apollo `tokenName`
+  const canUseLocalStorage = () => {
+    try {
+      return typeof window.localStorage !== 'undefined';
+    } catch {
+      return false;
+    }
+  };
 
   const syncToken = async () => {
+    if (!canUseLocalStorage()) {
+      return;
+    }
+
     try {
-      const res = await fetch('/api/auth/token', {
+      const res = await fetch('/api/session/token', {
         credentials: 'include',
         cache: 'no-store',
       });

@@ -1,18 +1,12 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent } from 'vue';
+import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { gql } from '@apollo/client/core';
 import { useHead } from 'nuxt/app';
 import { useUsername } from '@/composables/useAuthState';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
-import TagComponent from '@/components/TagComponent.vue';
-import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
-import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
-import { relativeTime } from '@/utils';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import {
-  formatCount,
   getDiscussionLink,
   getChannelLink,
   getFavoriteDiscussionCommentCount,
@@ -30,7 +24,6 @@ import type {
 
 const usernameVar = useUsername();
 
-// Partial types matching the query shape (using generated types as base)
 type FavoriteDiscussionChannel = Pick<
   DiscussionChannel,
   'id' | 'channelUniqueName' | 'archived' | 'answered' | 'locked' | 'weightedVotesCount'
@@ -54,16 +47,10 @@ type FavoriteDiscussion = Pick<
   } | null;
 };
 
-// Lazy load the album component since it's not needed for initial render
-const DiscussionAlbum = defineAsyncComponent(
-  () => import('@/components/discussion/detail/DiscussionAlbum.vue')
-);
-
 useHead({
   title: 'Favorite Discussions - Library',
 });
 
-// We need to create a new query that filters out downloads
 const GET_USER_FAVORITE_DISCUSSIONS_NO_DOWNLOADS = gql`
   query getUserFavoriteDiscussionsNoDownloads($username: String!) {
     users(where: { username: $username }) {
@@ -133,7 +120,6 @@ const favoriteDiscussions = computed(() => {
 });
 const { serverAdminUsernames } = useServerRoleMembership();
 
-// Display helpers live in utils/favoriteDiscussionDisplay.ts (unit-tested).
 const getAuthorInfo = (discussion: FavoriteDiscussion) =>
   buildFavoriteAuthorInfo({
     author: discussion?.Author,
@@ -147,7 +133,6 @@ const getAuthorInfo = (discussion: FavoriteDiscussion) =>
       <template #has-auth>
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div class="py-8">
-            <!-- Header with back button -->
             <div class="mb-8">
               <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
                 Favorite Discussions
@@ -157,7 +142,6 @@ const getAuthorInfo = (discussion: FavoriteDiscussion) =>
               </p>
             </div>
 
-            <!-- Loading state -->
             <div v-if="loading" class="py-8 text-center">
               <div
                 class="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-orange-500"
@@ -167,17 +151,15 @@ const getAuthorInfo = (discussion: FavoriteDiscussion) =>
               </p>
             </div>
 
-            <!-- Error state -->
             <div
               v-else-if="error"
-              class="bg-red-50 rounded-lg p-4 dark:bg-red-900/20"
+              class="rounded-lg bg-red-50 p-4 dark:bg-red-900/20"
             >
               <p class="text-red-800 dark:text-red-300">
                 Error loading favorite discussions: {{ error.message }}
               </p>
             </div>
 
-            <!-- Empty state -->
             <div
               v-else-if="favoriteDiscussions.length === 0"
               class="py-12 text-center"
@@ -213,172 +195,26 @@ const getAuthorInfo = (discussion: FavoriteDiscussion) =>
               </div>
             </div>
 
-            <!-- Discussions list -->
             <div v-else class="space-y-4">
-              <div
+              <LibraryDiscussionCard
                 v-for="discussion in favoriteDiscussions"
                 :key="discussion.id"
-                class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
-              >
-                <!-- Discussion header -->
-                <div class="mb-4">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-2">
-                      <!-- Channel info -->
-                      <NuxtLink
-                        v-if="discussion.DiscussionChannels?.[0]"
-                        :to="
-                          getChannelLink(
-                            discussion.DiscussionChannels[0].channelUniqueName
-                          )
-                        "
-                        class="flex items-center text-sm text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-                      >
-                        <AvatarComponent
-                          :text="
-                            discussion.DiscussionChannels[0].channelUniqueName
-                          "
-                          :is-square="true"
-                          class="mr-2 h-5 w-5"
-                        />
-                        <span>{{
-                          discussion.DiscussionChannels[0].channelUniqueName
-                        }}</span>
-                      </NuxtLink>
-
-                      <!-- Sensitive content indicator -->
-                      <span
-                        v-if="discussion.hasSensitiveContent"
-                        class="rounded-full border border-orange-600 px-2 py-1 text-xs text-orange-600 dark:border-orange-400 dark:text-orange-400"
-                      >
-                        Sensitive
-                      </span>
-                    </div>
-
-                    <!-- Date -->
-                    <span class="text-sm text-gray-500 dark:text-gray-400">
-                      {{ relativeTime(discussion.createdAt) }}
-                    </span>
-                  </div>
-                </div>
-
-                <!-- Discussion title -->
-                <div class="mb-3 flex items-center justify-between">
-                  <NuxtLink
-                    :to="getDiscussionLink(discussion)"
-                    class="font-semibold min-w-0 flex-1 text-lg text-gray-900 hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
-                  >
-                    {{ discussion.title }}
-                  </NuxtLink>
-                  <div class="ml-4 flex-shrink-0">
-                    <AddToDiscussionFavorites
-                      :allow-add-to-list="false"
-                      :discussion-id="discussion.id"
-                      :discussion-title="discussion.title"
-                      :initial-is-favorited="true"
-                      size="medium"
-                    />
-                  </div>
-                </div>
-
-                <!-- Discussion preview -->
-                <div v-if="discussion.body" class="mb-4">
-                  <div
-                    class="line-clamp-3 text-sm text-gray-600 dark:text-gray-300"
-                  >
-                    <MarkdownRenderer
-                      :text="discussion.body"
-                      font-size="small"
-                    />
-                  </div>
-                </div>
-
-                <!-- Album -->
-                <div
-                  v-if="discussion.Album && discussion.Album?.Images.length > 0"
-                  class="mb-4 max-w-full overflow-x-auto bg-black"
-                >
-                  <DiscussionAlbum
-                    :album="discussion.Album"
-                    :discussion-id="discussion.id"
-                    :discussion-author="
-                      getAuthorInfo(discussion)?.username || 'Deleted'
-                    "
-                    :carousel-format="true"
-                    :show-edit-album="false"
-                  />
-                </div>
-
-                <!-- Meta information -->
-                <div class="flex items-center justify-between">
-                  <div
-                    class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400"
-                  >
-                    <!-- Author -->
-                    <div class="flex items-center">
-                      <span class="mr-1">by</span>
-                      <UsernameWithTooltip
-                        v-if="getAuthorInfo(discussion)"
-                        :username="getAuthorInfo(discussion)!.username"
-                        :display-name="getAuthorInfo(discussion)!.displayName"
-                        :src="getAuthorInfo(discussion)!.profilePicURL"
-                        :is-server-admin="getAuthorInfo(discussion)!.isAdmin"
-                        :comment-karma="getAuthorInfo(discussion)!.commentKarma"
-                        :discussion-karma="
-                          getAuthorInfo(discussion)!.discussionKarma
-                        "
-                        :account-created="getAuthorInfo(discussion)!.createdAt"
-                      />
-                      <span v-else>Deleted</span>
-                    </div>
-
-                    <!-- Comment count -->
-                    <NuxtLink
-                      :to="getDiscussionLink(discussion)"
-                      class="flex items-center hover:text-gray-700 dark:hover:text-gray-300"
-                    >
-                      <i class="fa-regular fa-comment mr-1" />
-                      {{
-                        formatCount(
-                          getFavoriteDiscussionCommentCount(
-                            discussion.DiscussionChannels
-                          ),
-                          'comment',
-                          'comments'
-                        )
-                      }}
-                    </NuxtLink>
-
-                    <!-- Multiple channels indicator -->
-                    <span
-                      v-if="discussion.DiscussionChannels.length > 1"
-                      class="text-xs"
-                    >
-                      in {{ discussion.DiscussionChannels.length }} forums
-                    </span>
-                  </div>
-                </div>
-
-                <!-- Tags -->
-                <div
-                  v-if="discussion.Tags && discussion.Tags.length > 0"
-                  class="mt-4 flex flex-wrap gap-2"
-                >
-                  <TagComponent
-                    v-for="tag in discussion.Tags.slice(0, 5)"
-                    :key="tag.text"
-                    :tag="tag.text"
-                    class="text-xs"
-                    @click.prevent=""
-                  />
-                  <span
-                    v-if="discussion.Tags.length > 5"
-                    class="text-xs text-gray-500 dark:text-gray-400"
-                  >
-                    +{{ discussion.Tags.length - 5 }} more
-                  </span>
-                </div>
-              </div>
+                :discussion="discussion"
+                :discussion-link="getDiscussionLink(discussion)"
+                :channel-link="
+                  getChannelLink(discussion.DiscussionChannels?.[0]?.channelUniqueName)
+                "
+                :channel-unique-name="
+                  discussion.DiscussionChannels?.[0]?.channelUniqueName || ''
+                "
+                :author-info="getAuthorInfo(discussion)"
+                :comment-count="
+                  getFavoriteDiscussionCommentCount(discussion.DiscussionChannels)
+                "
+                :forum-count="discussion.DiscussionChannels?.length || 0"
+                :show-favorite-button="true"
+                :is-favorited="true"
+              />
             </div>
           </div>
         </div>
@@ -396,12 +232,3 @@ const getAuthorInfo = (discussion: FavoriteDiscussion) =>
     </RequireAuth>
   </div>
 </template>
-
-<style scoped>
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-</style>

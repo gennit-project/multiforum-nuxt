@@ -18,81 +18,51 @@
 //
 // This plugin restores a minimal client fallback: when the session is
 // authenticated (we have a verified email) but username is still empty, resolve
-// it from the backend by token and seed the auth state. It mirrors GET_OWN_EMAIL
-// (graphQLData/email/queries.js) and the SSR middleware. It is fire-and-forget
-// so it never delays app startup; the reactive `username` update lets the
-// favorite-status query and ownership-gated UI come to life once it lands.
+// it from the server session and seed the auth state. Using a same-origin Nitro
+// endpoint avoids depending on browser token storage, which is brittle in some
+// embedded browser environments.
 import { defineNuxtPlugin } from 'nuxt/app';
-import { config } from '@/config';
 import {
   useIsAuthenticated,
   useUsername,
-  useEmail,
   setUsername,
   setModProfileName,
   setProfilePicURL,
   setNotificationCount,
 } from '@/composables/useAuthState';
 
-// Self-scoped: getOwnEmail resolves the caller's email from the verified token
-// on the backend, so it takes no arguments and can't look up anyone else.
-const GET_OWN_EMAIL_QUERY = /* GraphQL */ `
-  query getOwnEmail {
-    getOwnEmail {
-      username
-      profilePicURL
-      modProfileName
-      unreadNotificationCount
-    }
-  }
-`;
-
-type OwnEmailResponse = {
-  data?: {
-    getOwnEmail?: {
-      username?: string | null;
-      profilePicURL?: string | null;
-      modProfileName?: string | null;
-      unreadNotificationCount?: number | null;
-    } | null;
-  };
+type AuthProfileResponse = {
+  isAuthenticated?: boolean;
+  username?: string | null;
+  profilePicURL?: string | null;
+  modProfileName?: string | null;
+  notificationCount?: number | null;
 };
 
 const resolveUsername = async () => {
-  const endpoint = config?.graphqlUrl;
-  if (!endpoint) return;
-
   try {
-    const token = localStorage.getItem('token');
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        ...(token ? { authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({
-        query: GET_OWN_EMAIL_QUERY,
-      }),
+    const res = await fetch('/api/session/profile', {
+      credentials: 'include',
+      cache: 'no-store',
     });
     if (!res.ok) return;
 
-    const json = (await res.json()) as OwnEmailResponse;
-    const ownEmail = json?.data?.getOwnEmail;
-    if (!ownEmail?.username) return;
+    const profile = (await res.json()) as AuthProfileResponse;
+    if (!profile?.username) return;
 
     // Only seed if SSR still hasn't filled it in (avoid clobbering a value that
     // arrived between scheduling and resolving).
     if (!useUsername().value) {
-      setUsername(ownEmail.username);
+      setUsername(profile.username);
     }
-    if (ownEmail.modProfileName) {
-      setModProfileName(ownEmail.modProfileName);
+    if (profile.modProfileName) {
+      setModProfileName(profile.modProfileName);
     }
-    if (ownEmail.profilePicURL) {
-      setProfilePicURL(ownEmail.profilePicURL);
+    if (profile.profilePicURL) {
+      setProfilePicURL(profile.profilePicURL);
     }
-    if (typeof ownEmail.unreadNotificationCount === 'number') {
-      setNotificationCount(ownEmail.unreadNotificationCount);
+    if (typeof profile.notificationCount === 'number') {
+      setNotificationCount(profile.notificationCount);
     }
   } catch {
     // Ignore — username stays empty and will be retried on the next load.
@@ -103,15 +73,12 @@ export default defineNuxtPlugin(() => {
   if (typeof window === 'undefined') return;
 
   const isAuthenticated = useIsAuthenticated();
-  const email = useEmail();
   const username = useUsername();
 
-  // Nothing to do when anonymous, when we have no email to look up by, or when
-  // SSR already resolved the username.
-  if (!isAuthenticated.value || !email.value || username.value) return;
+  // Nothing to do when anonymous or when SSR already resolved the username.
+  if (!isAuthenticated.value || username.value) return;
 
   // Fire-and-forget: never block app startup on this network round-trip. The
-  // backend resolves identity from the bearer token; email.value is just the
-  // "are we even signed in" gate.
+  // server session resolves identity server-side.
   void resolveUsername();
 });
