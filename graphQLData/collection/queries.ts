@@ -251,7 +251,12 @@ export const GET_COLLECTION_ITEMS = gql`
       Channels {
         displayName
         uniqueName
+        description
+        channelIconURL
         createdAt
+        Tags {
+          text
+        }
       }
     }
   }

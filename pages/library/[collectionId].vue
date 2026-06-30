@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useHead } from 'nuxt/app';
 import { useRoute, useRouter } from 'vue-router';
@@ -12,14 +12,8 @@ import {
   UPDATE_COLLECTION,
   DELETE_COLLECTION,
 } from '@/graphQLData/collection/mutations';
-import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
-import TagComponent from '@/components/TagComponent.vue';
-import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
-import MarkdownPreview from '@/components/MarkdownPreview.vue';
-import AvatarComponent from '@/components/AvatarComponent.vue';
 import GenericModal from '@/components/GenericModal.vue';
 import WarningModal from '@/components/WarningModal.vue';
-import { relativeTime } from '@/utils';
 import { useUsername } from '@/composables/useAuthState';
 import type { Discussion, Comment } from '@/__generated__/graphql';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
@@ -29,13 +23,14 @@ import {
   buildCollectionDiscussionLink,
   resolveCollectionItemAuthor,
 } from '@/utils/collectionItemUtils';
+import {
+  getCommentPermalink,
+  getCommentContextPermalink,
+  getCommentContextTitle,
+  getCommentContextType,
+} from '@/utils/commentUtils';
 
 const usernameVar = useUsername();
-
-// Lazy load the album component since it's not needed for initial render
-const DiscussionAlbum = defineAsyncComponent(
-  () => import('@/components/discussion/detail/DiscussionAlbum.vue')
-);
 
 const route = useRoute();
 const collectionId = computed(() => route.params.collectionId as string);
@@ -78,6 +73,24 @@ const getAuthorInfo = (item: Discussion | Comment) =>
     item,
     adminUsernames: serverAdminUsernames.value,
   });
+
+const getPreviewImage = (item: {
+  Album?: {
+    imageOrder?: string[] | null;
+    Images?: Array<{ id: string; url?: string | null }> | null;
+  } | null;
+}) => {
+  const album = item.Album;
+  if (!album?.Images?.length) return '';
+
+  if (album.imageOrder?.length) {
+    const firstImageId = album.imageOrder[0];
+    const orderedImage = album.Images.find((image) => image.id === firstImageId);
+    return orderedImage?.url || '';
+  }
+
+  return album.Images[0]?.url || '';
+};
 
 // Get items based on collection type
 const items = computed(() => getCollectionItems(collection.value));
@@ -385,7 +398,6 @@ const handleDelete = async () => {
                 </p>
               </div>
 
-              <!-- Discussions list -->
               <div
                 v-else-if="
                   collection.collectionType === 'DISCUSSIONS' ||
@@ -393,264 +405,99 @@ const handleDelete = async () => {
                 "
                 class="space-y-4"
               >
-                <div
+                <template
                   v-for="discussion in items"
                   :key="discussion.id"
-                  class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
                 >
-                  <!-- Discussion header -->
-                  <div class="mb-4">
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center space-x-2">
-                        <span
-                          v-if="discussion.hasSensitiveContent"
-                          class="rounded-full border border-orange-600 px-2 py-1 text-xs text-orange-600 dark:border-orange-400 dark:text-orange-400"
-                        >
-                          Sensitive
-                        </span>
-                      </div>
-                      <span class="text-sm text-gray-500 dark:text-gray-400">
-                        {{ relativeTime(discussion.createdAt) }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- Discussion title -->
-                  <div class="mb-3 flex items-center justify-between">
-                    <NuxtLink
-                      :to="getDiscussionLink(discussion)"
-                      class="font-semibold min-w-0 flex-1 text-lg text-gray-900 hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
-                    >
-                      {{ discussion.title }}
-                    </NuxtLink>
-                    <div class="ml-4 flex-shrink-0">
-                      <AddToDiscussionFavorites
-                        :allow-add-to-list="true"
-                        :discussion-id="discussion.id"
-                        :discussion-title="discussion.title"
-                        :initial-is-favorited="discussion.isFavorited"
-                        size="medium"
-                      />
-                    </div>
-                  </div>
-
-                  <!-- Album -->
-                  <div
-                    v-if="
-                      discussion.Album && discussion.Album?.Images.length > 0
+                  <LibraryDownloadCard
+                    v-if="collection.collectionType === 'DOWNLOADS'"
+                    :download="discussion"
+                    :download-link="getDiscussionLink(discussion)"
+                    :channel-link="
+                      discussion.DiscussionChannels?.[0]?.channelUniqueName
+                        ? `/forums/${discussion.DiscussionChannels[0].channelUniqueName}`
+                        : '/'
                     "
-                    class="mb-4 max-w-full overflow-x-auto bg-black"
-                  >
-                    <DiscussionAlbum
-                      :album="discussion.Album"
-                      :discussion-id="discussion.id"
-                      :discussion-author="
-                        getAuthorInfo(discussion)?.username || 'Deleted'
-                      "
-                      :carousel-format="true"
-                      :show-edit-album="false"
-                    />
-                  </div>
-
-                  <!-- Meta information -->
-                  <div class="flex items-center justify-between">
-                    <div
-                      class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400"
-                    >
-                      <!-- Author -->
-                      <div class="flex items-center">
-                        <span class="mr-1">by</span>
-                        <UsernameWithTooltip
-                          v-if="getAuthorInfo(discussion)"
-                          :username="getAuthorInfo(discussion)!.username"
-                          :display-name="getAuthorInfo(discussion)!.displayName"
-                          :src="getAuthorInfo(discussion)!.profilePicURL"
-                          :is-server-admin="getAuthorInfo(discussion)!.isAdmin"
-                          :comment-karma="
-                            getAuthorInfo(discussion)!.commentKarma
-                          "
-                          :discussion-karma="
-                            getAuthorInfo(discussion)!.discussionKarma
-                          "
-                          :account-created="
-                            getAuthorInfo(discussion)!.createdAt
-                          "
-                        />
-                        <span v-else>Deleted</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Tags -->
-                  <div
-                    v-if="discussion.Tags && discussion.Tags.length > 0"
-                    class="mt-4 flex flex-wrap gap-2"
-                  >
-                    <TagComponent
-                      v-for="tag in discussion.Tags.slice(0, 5)"
-                      :key="tag.text"
-                      :tag="tag.text"
-                      class="text-xs"
-                      @click.prevent=""
-                    />
-                  </div>
-                </div>
+                    :channel-unique-name="
+                      discussion.DiscussionChannels?.[0]?.channelUniqueName || ''
+                    "
+                    :author-info="getAuthorInfo(discussion)"
+                    :preview-image-url="getPreviewImage(discussion)"
+                    :show-favorite-button="true"
+                    :allow-add-to-list="true"
+                    :is-favorited="Boolean(discussion.isFavorited)"
+                  />
+                  <LibraryDiscussionCard
+                    v-else
+                    :discussion="discussion"
+                    :discussion-link="getDiscussionLink(discussion)"
+                    :channel-link="
+                      discussion.DiscussionChannels?.[0]?.channelUniqueName
+                        ? `/forums/${discussion.DiscussionChannels[0].channelUniqueName}`
+                        : '/'
+                    "
+                    :channel-unique-name="
+                      discussion.DiscussionChannels?.[0]?.channelUniqueName || ''
+                    "
+                    :author-info="getAuthorInfo(discussion)"
+                    :comment-count="
+                      discussion.DiscussionChannels?.reduce(
+                        (total, item) => total + (item.CommentsAggregate?.count || 0),
+                        0
+                      ) || 0
+                    "
+                    :show-favorite-button="true"
+                    :allow-add-to-list="true"
+                    :is-favorited="Boolean(discussion.isFavorited)"
+                  />
+                </template>
               </div>
 
-              <!-- Channels list -->
               <div
                 v-else-if="collection.collectionType === 'CHANNELS'"
-                class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+                class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
               >
-                <NuxtLink
+                <LibraryChannelCard
                   v-for="channel in items"
                   :key="channel.uniqueName"
-                  :to="`/forums/${channel.uniqueName}`"
-                  class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
-                >
-                  <div class="flex items-center">
-                    <AvatarComponent
-                      :text="channel.uniqueName"
-                      :is-square="true"
-                      class="mr-3 h-12 w-12"
-                    />
-                    <div class="min-w-0 flex-1">
-                      <h3
-                        class="font-semibold truncate text-gray-900 dark:text-white"
-                      >
-                        {{ channel.displayName }}
-                      </h3>
-                      <p
-                        class="truncate text-sm text-gray-500 dark:text-gray-400"
-                      >
-                        /{{ channel.uniqueName }}
-                      </p>
-                    </div>
-                  </div>
-                </NuxtLink>
+                  :channel="channel"
+                  :show-favorite-button="true"
+                  :allow-add-to-list="true"
+                  :is-favorited="Boolean(channel.isFavorited)"
+                />
               </div>
 
-              <!-- Comments list -->
               <div
                 v-else-if="collection.collectionType === 'COMMENTS'"
                 class="space-y-4"
               >
-                <div
+                <LibraryCommentCard
                   v-for="comment in items"
                   :key="comment.id"
-                  class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-                >
-                  <!-- Forum and discussion context -->
-                  <div
-                    v-if="comment.DiscussionChannel"
-                    class="mb-3 text-sm text-gray-500 dark:text-gray-400"
-                  >
-                    <span>In </span>
-                    <NuxtLink
-                      :to="`/forums/${comment.DiscussionChannel.channelUniqueName}`"
-                      class="font-medium text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-                    >
-                      {{
-                        comment.DiscussionChannel.Channel?.displayName ||
-                        comment.DiscussionChannel.channelUniqueName
-                      }}
-                    </NuxtLink>
-                    <span v-if="comment.DiscussionChannel.Discussion">
-                      on
-                      <NuxtLink
-                        :to="`/forums/${comment.DiscussionChannel.channelUniqueName}/discussions/${comment.DiscussionChannel.Discussion.id}`"
-                        class="font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
-                      >
-                        {{ comment.DiscussionChannel.Discussion.title }}
-                      </NuxtLink>
-                    </span>
-                  </div>
-
-                  <div class="text-sm text-gray-600 dark:text-gray-300">
-                    <MarkdownPreview :text="comment.text" :disable-gallery="false" />
-                  </div>
-                  <div
-                    class="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400"
-                  >
-                    <div class="flex items-center">
-                      <span class="mr-1">by</span>
-                      <UsernameWithTooltip
-                        v-if="getAuthorInfo(comment)"
-                        :username="getAuthorInfo(comment)!.username"
-                        :display-name="getAuthorInfo(comment)!.displayName"
-                        :src="getAuthorInfo(comment)!.profilePicURL"
-                        :is-server-admin="getAuthorInfo(comment)!.isAdmin"
-                        :comment-karma="getAuthorInfo(comment)!.commentKarma"
-                        :discussion-karma="
-                          getAuthorInfo(comment)!.discussionKarma
-                        "
-                        :account-created="getAuthorInfo(comment)!.createdAt"
-                      />
-                      <span v-else>Deleted</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                      <span>{{ relativeTime(comment.createdAt) }}</span>
-                      <NuxtLink
-                        v-if="comment.DiscussionChannel?.Discussion"
-                        :to="{
-                          name: 'forums-forumId-discussions-discussionId-comments-commentId',
-                          params: {
-                            forumId:
-                              comment.DiscussionChannel.channelUniqueName,
-                            discussionId:
-                              comment.DiscussionChannel.Discussion.id,
-                            commentId: comment.id,
-                          },
-                        }"
-                        class="text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-                        title="Permalink to comment"
-                      >
-                        <svg
-                          class="h-4 w-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                          />
-                        </svg>
-                      </NuxtLink>
-                    </div>
-                  </div>
-                </div>
+                  :comment="comment"
+                  :author-info="getAuthorInfo(comment)"
+                  :context-type="getCommentContextType(comment)"
+                  :context-title="getCommentContextTitle(comment)"
+                  :context-permalink="getCommentContextPermalink(comment)"
+                  :permalink="getCommentPermalink(comment)"
+                  :show-favorite-button="true"
+                  :allow-add-to-list="true"
+                  :is-favorited="Boolean(comment.isFavorited)"
+                />
               </div>
 
-              <!-- Images list -->
               <div
                 v-else-if="collection.collectionType === 'IMAGES'"
-                class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+                class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
               >
-                <div
+                <ImageListItem
                   v-for="image in items"
                   :key="image.id"
-                  class="group relative"
-                >
-                  <NuxtLink
-                    :to="`/u/${image.Uploader?.username}/images/${image.id}`"
-                    class="block"
-                  >
-                    <img
-                      :src="image.url"
-                      :alt="image.alt || image.caption || 'Image'"
-                      class="h-48 w-full rounded-lg object-cover shadow-sm transition-transform hover:scale-105"
-                    >
-                  </NuxtLink>
-                  <p
-                    v-if="image.caption"
-                    class="mt-2 text-sm text-gray-600 dark:text-gray-300"
-                  >
-                    {{ image.caption }}
-                  </p>
-                </div>
+                  :image="image"
+                  :username="image.Uploader?.username || ''"
+                  :show-favorite-button="false"
+                  :allow-add-to-list="true"
+                />
               </div>
             </template>
           </div>
@@ -746,12 +593,3 @@ const handleDelete = async () => {
     </RequireAuth>
   </div>
 </template>
-
-<style scoped>
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-</style>

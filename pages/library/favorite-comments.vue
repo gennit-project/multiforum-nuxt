@@ -5,10 +5,6 @@ import { gql } from '@apollo/client/core';
 import { useHead } from 'nuxt/app';
 import { useUsername } from '@/composables/useAuthState';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
-import AddToCommentFavorites from '@/components/favorites/AddToCommentFavorites.vue';
-import MarkdownPreview from '@/components/MarkdownPreview.vue';
-import { relativeTime } from '@/utils';
 import {
   getCommentPermalink,
   getCommentContextPermalink,
@@ -98,8 +94,6 @@ const getFavoriteCommentAuthorInfo = (
     serverAdminUsernames: serverAdminUsernames.value,
   });
 };
-
-// Comment utility functions are imported from utils/commentUtils.ts
 </script>
 
 <template>
@@ -108,7 +102,6 @@ const getFavoriteCommentAuthorInfo = (
       <template #has-auth>
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div class="py-8">
-            <!-- Header with back button -->
             <div class="mb-8">
               <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
                 Favorite Comments
@@ -118,7 +111,6 @@ const getFavoriteCommentAuthorInfo = (
               </p>
             </div>
 
-            <!-- Loading state -->
             <div v-if="loading" class="py-8 text-center">
               <div
                 class="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-orange-500"
@@ -128,17 +120,15 @@ const getFavoriteCommentAuthorInfo = (
               </p>
             </div>
 
-            <!-- Error state -->
             <div
               v-else-if="error"
-              class="bg-red-50 rounded-lg p-4 dark:bg-red-900/20"
+              class="rounded-lg bg-red-50 p-4 dark:bg-red-900/20"
             >
               <p class="text-red-800 dark:text-red-300">
                 Error loading favorite comments: {{ error.message }}
               </p>
             </div>
 
-            <!-- Empty state -->
             <div
               v-else-if="favoriteComments.length === 0"
               class="py-12 text-center"
@@ -174,110 +164,19 @@ const getFavoriteCommentAuthorInfo = (
               </div>
             </div>
 
-            <!-- Comments list -->
             <div v-else class="space-y-4">
-              <div
+              <LibraryCommentCard
                 v-for="comment in favoriteComments"
                 :key="comment.id"
-                class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
-              >
-                <!-- Comment header -->
-                <div class="mb-4">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-2">
-                      <!-- Context info -->
-                      <NuxtLink
-                        :to="getCommentContextPermalink(comment)"
-                        class="text-sm text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-                      >
-                        {{ getCommentContextType(comment) }}:
-                        {{ getCommentContextTitle(comment) }}
-                      </NuxtLink>
-                    </div>
-
-                    <!-- Date -->
-                    <span class="text-sm text-gray-500 dark:text-gray-400">
-                      {{ relativeTime(comment.createdAt) }}
-                    </span>
-                  </div>
-                </div>
-
-                <!-- Comment content. Not wrapped in a permalink link: that
-                  nests interactive markdown links/images inside an anchor
-                  (invalid HTML that can swallow navigation) and blocks the
-                  inline-image lightbox. Use the "View Comment" link below to
-                  reach the permalink. -->
-                <div class="mb-4">
-                  <div class="prose prose-sm max-w-none dark:prose-invert">
-                    <MarkdownPreview
-                      :text="comment.text"
-                      :disable-gallery="false"
-                    />
-                  </div>
-                </div>
-
-                <!-- Meta information -->
-                <div class="flex items-center justify-between">
-                  <div
-                    class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400"
-                  >
-                    <!-- Author -->
-                    <div class="flex items-center">
-                      <span class="mr-1">by</span>
-                      <UsernameWithTooltip
-                        v-if="
-                          getFavoriteCommentAuthorInfo(comment) &&
-                          !getFavoriteCommentAuthorInfo(comment)!.isModerationProfile
-                        "
-                        :username="getFavoriteCommentAuthorInfo(comment)!.username"
-                        :display-name="
-                          getFavoriteCommentAuthorInfo(comment)!.displayName
-                        "
-                        :src="getFavoriteCommentAuthorInfo(comment)!.profilePicURL"
-                        :is-server-admin="getFavoriteCommentAuthorInfo(comment)!.isAdmin"
-                        :comment-karma="
-                          getFavoriteCommentAuthorInfo(comment)!.commentKarma
-                        "
-                        :discussion-karma="
-                          getFavoriteCommentAuthorInfo(comment)!.discussionKarma
-                        "
-                        :account-created="
-                          getFavoriteCommentAuthorInfo(comment)!.createdAt
-                        "
-                      />
-                      <span
-                        v-else-if="
-                          getFavoriteCommentAuthorInfo(comment) &&
-                          getFavoriteCommentAuthorInfo(comment)!.isModerationProfile
-                        "
-                        class="text-orange-600 dark:text-orange-400"
-                      >
-                        {{ getFavoriteCommentAuthorInfo(comment)!.displayName }}
-                        (Moderator)
-                      </span>
-                      <span v-else>Deleted</span>
-                    </div>
-
-                    <!-- Comment link -->
-                    <NuxtLink
-                      :to="getCommentPermalink(comment)"
-                      class="flex items-center hover:text-gray-700 dark:hover:text-gray-300"
-                    >
-                      <i class="fa-regular fa-comment mr-1" />
-                      View Comment
-                    </NuxtLink>
-                  </div>
-
-                  <div class="flex-shrink-0">
-                    <AddToCommentFavorites
-                      :allow-add-to-list="false"
-                      :comment-id="comment.id"
-                      :is-favorited="true"
-                      size="medium"
-                    />
-                  </div>
-                </div>
-              </div>
+                :comment="comment"
+                :author-info="getFavoriteCommentAuthorInfo(comment)"
+                :context-type="getCommentContextType(comment)"
+                :context-title="getCommentContextTitle(comment)"
+                :context-permalink="getCommentContextPermalink(comment)"
+                :permalink="getCommentPermalink(comment)"
+                :show-favorite-button="true"
+                :is-favorited="true"
+              />
             </div>
           </div>
         </div>

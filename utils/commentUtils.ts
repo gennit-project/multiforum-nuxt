@@ -46,6 +46,27 @@ export const getCommentPermalink = (comment: CommentWithContext) => {
     const discussionId = comment.DiscussionChannel.discussionId || '';
     const hasDownload = comment.DiscussionChannel.Discussion?.hasDownload;
 
+    if (!discussionId) {
+      if (comment.Channel?.uniqueName) {
+        return {
+          name: 'forums-forumId-comments-commentId',
+          params: {
+            forumId: comment.Channel.uniqueName,
+            commentId: comment.id || '',
+          },
+        };
+      }
+
+      return channelUniqueName
+        ? {
+            name: 'forums-forumId',
+            params: {
+              forumId: channelUniqueName,
+            },
+          }
+        : { name: 'index' };
+    }
+
     if (hasDownload) {
       return {
         name: 'forums-forumId-downloads-discussionId-comments-commentId',
@@ -90,6 +111,17 @@ export const getCommentContextPermalink = (comment: CommentWithContext) => {
     const channelUniqueName = comment.DiscussionChannel.channelUniqueName || '';
     const discussionId = comment.DiscussionChannel.discussionId || '';
     const hasDownload = comment.DiscussionChannel.Discussion?.hasDownload;
+
+    if (!discussionId) {
+      return channelUniqueName
+        ? {
+            name: 'forums-forumId',
+            params: {
+              forumId: channelUniqueName,
+            },
+          }
+        : { name: 'index' };
+    }
 
     if (hasDownload) {
       return {
