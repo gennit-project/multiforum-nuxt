@@ -2,8 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import RoleSection from '@/components/admin/RoleSection.vue';
-import RolesSettingsPage from './roles.vue';
+import ServerMembershipPanel from './ServerMembershipPanel.vue';
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
@@ -23,7 +22,7 @@ const mountWith = (result: unknown) => {
     refetch: vi.fn(),
   });
 
-  return mount(RolesSettingsPage, {
+  return mount(ServerMembershipPanel, {
     global: {
       stubs: {
         RequireAuth: RequireAuthStub,
@@ -35,26 +34,21 @@ const mountWith = (result: unknown) => {
   });
 };
 
-describe('admin roles settings page', () => {
-  it('renders a role section for each defined default role', () => {
-    const wrapper = mountWith({
-      serverConfigs: [
-        {
-          DefaultServerRole: { name: 'user', description: '' },
-          DefaultModRole: { name: 'mod', description: '' },
-          DefaultSuspendedRole: { name: 'suspended', description: '' },
-        },
-      ],
-    });
-
-    expect(wrapper.findAllComponents(RoleSection)).toHaveLength(3);
-  });
-
-  it('does not render the server membership content', () => {
+describe('ServerMembershipPanel', () => {
+  it('renders the server membership heading', () => {
     const wrapper = mountWith({
       serverConfigs: [{ DefaultServerRole: { name: 'user', description: '' } }],
     });
 
-    expect(wrapper.text()).not.toContain('View Suspended Users');
+    expect(wrapper.text()).toContain('Server Membership');
+  });
+
+  it('links to the nested suspension sub-tabs', () => {
+    const wrapper = mountWith({
+      serverConfigs: [{ DefaultServerRole: { name: 'user', description: '' } }],
+    });
+
+    expect(wrapper.text()).toContain('View Suspended Users');
+    expect(wrapper.text()).toContain('View Suspended Mods');
   });
 });

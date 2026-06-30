@@ -48,10 +48,11 @@ describe('admin server roles page', () => {
     expect(wrapper.findAllComponents(RoleSection)).toHaveLength(3);
   });
 
-  it('shows the server suspensions management section', async () => {
+  it('does not render the server membership content', async () => {
     const wrapper = await mountWith({
       serverConfigs: [{ DefaultServerRole: { name: 'user', description: '' } }],
     });
-    expect(wrapper.text()).toContain('View Suspended Users');
+
+    expect(wrapper.text()).not.toContain('View Suspended Users');
   });
 });

@@ -55,7 +55,7 @@ describe('ServerTabs', () => {
   it('renders all admin tabs', () => {
     const wrapper = mountTabs();
 
-    expect(tabs(wrapper)).toHaveLength(8);
+    expect(tabs(wrapper)).toHaveLength(7);
   });
 
   it('labels the first tab Dashboard', () => {
@@ -68,6 +68,21 @@ describe('ServerTabs', () => {
     const wrapper = mountTabs();
 
     expect(tabs(wrapper)[1].props('to')).toBe('/admin/issues');
+  });
+
+  it('places Suspensions between Settings and Plugins', () => {
+    const wrapper = mountTabs();
+    const labels = tabs(wrapper).map((tab) => tab.props('label'));
+
+    expect(labels).toEqual([
+      'Dashboard',
+      'Issues',
+      'Channel Reports',
+      'Settings',
+      'Suspensions',
+      'Plugins',
+      'About',
+    ]);
   });
 
   it('marks the tab matching the route as active', () => {
