@@ -74,16 +74,17 @@ const {
   fetchMore,
 } = useQuery(
   GET_EVENTS,
-  {
-    where: eventWhere,
+  () => ({
+    where: eventWhere.value,
     options: {
       limit: 25,
       offset: 0,
-      sort: resultsOrder,
+      sort: resultsOrder.value,
     },
-  },
+  }),
   {
     fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
   }
 );
 const previewIsOpen = ref(false);
@@ -93,7 +94,7 @@ const loadMore = () => {
     variables: {
       options: {
         limit: 25,
-        offset: eventResult.value?.events.length || 0,
+        offset: eventResult.value?.events?.length || 0,
         sort: resultsOrder.value,
       },
     },

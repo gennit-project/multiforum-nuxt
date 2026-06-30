@@ -56,12 +56,14 @@ const emit = defineEmits(['openPreview', 'select']);
 
 const route = useRoute();
 const router = useRouter();
-const startTimeObj = DateTime.fromISO(props.event.startTime);
+const startTimeObj = computed(() => DateTime.fromISO(props.event.startTime));
 
-const { timeOfDay } = getDatePieces(
-  startTimeObj,
-  Boolean(props.event.isAllDay)
-);
+const timeOfDay = computed(() => {
+  return getDatePieces(
+    startTimeObj.value,
+    Boolean(props.event.isAllDay)
+  ).timeOfDay;
+});
 
 const defaultUniqueName = computed(() => {
   if (props.currentChannelId) {
@@ -182,7 +184,10 @@ const eventSpansMultipleDates = computed(() => {
   return (
     // If the difference between start time and end time is greater than 24 hours
     Math.abs(
-      startTimeObj.diff(DateTime.fromISO(props.event.endTime), 'hours').hours
+      startTimeObj.value.diff(
+        DateTime.fromISO(props.event.endTime),
+        'hours'
+      ).hours
     ) > 24
   );
 });

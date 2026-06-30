@@ -15,6 +15,8 @@ const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
+const currentHour = () => DateTime.utc().startOf('hour').toISO();
+
 // Get channel data to check if events are enabled for this forum
 const {
   result: getChannelResult,
@@ -22,13 +24,14 @@ const {
   error: channelError,
 } = useQuery(
   GET_CHANNEL,
-  {
-    uniqueName: channelId,
-    now: DateTime.local().startOf('hour').toISO(),
-  },
+  () => ({
+    uniqueName: channelId.value,
+    now: currentHour(),
+  }),
   {
     fetchPolicy: 'cache-first',
-    enabled: !!channelId.value,
+    nextFetchPolicy: 'cache-first',
+    enabled: computed(() => !!channelId.value),
   }
 );
 

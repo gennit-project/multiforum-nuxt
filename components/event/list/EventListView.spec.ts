@@ -118,6 +118,42 @@ describe('EventListView', () => {
     });
     expect(wrapper.get('[data-testid="event-detail"]').text()).toBe('event-2');
   });
+
+  it('passes a reactive variables getter to the events query', () => {
+    mount(EventListView, {
+      global: {
+        stubs: {
+          EventList: EventListStub,
+          EventDetail: EventDetailStub,
+          EventFilterBar: true,
+          TimeShortcuts: true,
+          OnlineInPersonShortcuts: true,
+          ErrorBanner: true,
+          LoadingSpinner: true,
+        },
+      },
+    });
+
+    const eventQueryVariables = (
+      (useQuery as unknown as ReturnType<typeof vi.fn>).mock.calls[0]?.[1] as
+        | (() => {
+            where: unknown;
+            options: { limit: number; offset: number; sort: unknown[] };
+          })
+        | undefined
+    )?.();
+
+    expect(eventQueryVariables).toMatchObject({
+      options: {
+        limit: 25,
+        offset: 0,
+      },
+    });
+    expect(eventQueryVariables?.options.sort).toEqual(
+      expect.objectContaining({ startTime: expect.any(String) })
+    );
+    expect('value' in ((eventQueryVariables?.where as object) ?? {})).toBe(false);
+  });
 });
 
 describe('EventListView — filters and navigation', () => {

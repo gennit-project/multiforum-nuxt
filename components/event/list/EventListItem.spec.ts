@@ -65,6 +65,20 @@ describe('EventListItem', () => {
     expect(wrapper.text()).toContain('Trivia Night');
   });
 
+  it('updates the rendered date when the event prop changes', async () => {
+    const wrapper = mountItem(
+      makeEvent({ startTime: '2026-08-01T18:00:00.000Z' })
+    );
+
+    expect(wrapper.text()).toContain('Aug');
+
+    await wrapper.setProps({
+      event: makeEvent({ startTime: '2026-09-15T18:00:00.000Z' }),
+    });
+
+    expect(wrapper.text()).toContain('Sep');
+  });
+
   it('tags the root element with a per-event test id', () => {
     const wrapper = mountItem(makeEvent({ title: 'Trivia Night' }));
     expect(
