@@ -5,6 +5,7 @@ import { mount } from '@vue/test-utils';
 import UserProfileSidebar from '@/components/user/UserProfileSidebar.vue';
 
 const h = vi.hoisted(() => ({
+  useQuery: vi.fn(),
   result: null as unknown,
   loading: null as unknown,
   error: null as unknown,
@@ -14,7 +15,7 @@ const h = vi.hoisted(() => ({
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => ({ result: h.result, loading: h.loading, error: h.error }),
+  useQuery: h.useQuery,
 }));
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
 vi.mock('@/composables/useAuthState', () => ({
@@ -56,9 +57,25 @@ beforeEach(() => {
   h.route = { params: { username: 'alice' } };
   h.username = ref('bob');
   h.profilePicURL = ref('');
+  h.useQuery.mockImplementation(() => ({
+    result: h.result,
+    loading: h.loading,
+    error: h.error,
+  }));
 });
 
 describe('UserProfileSidebar identity', () => {
+  it('enables the profile query for a logged-out visitor based on the route username', () => {
+    h.username = ref('');
+    mountSidebar();
+
+    const queryOptions = h.useQuery.mock.calls[0]?.[2] as
+      | { enabled?: { value: boolean } }
+      | undefined;
+
+    expect(queryOptions?.enabled?.value).toBe(true);
+  });
+
   it('shows the username when there is no display name', () => {
     h.route = { params: { username: 'alice' } };
     h.username = ref('alice');
@@ -154,9 +171,18 @@ describe('UserProfileSidebar content', () => {
 
   it('shows a loading message', () => {
     h.loading = ref(true);
+    h.result = ref(null);
     const wrapper = mountSidebar();
 
     expect(wrapper.text()).toContain('Loading');
+  });
+
+  it('keeps the last loaded profile data visible during a refetch', () => {
+    h.loading = ref(true);
+    const wrapper = mountSidebar();
+
+    expect(wrapper.text()).toContain('3 comment karma');
+    expect(wrapper.text()).not.toContain('Loading');
   });
 
   it('shows query errors', () => {

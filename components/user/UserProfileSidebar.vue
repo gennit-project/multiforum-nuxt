@@ -44,12 +44,12 @@ const {
     username: username.value,
   }),
   {
-    enabled: !!usernameVar.value,
+    enabled: computed(() => !!username.value),
   }
 );
 
 const user = computed(() => {
-  if (getUserLoading.value || getUserError.value) {
+  if (getUserError.value) {
     return null;
   }
   return result.value?.users?.[0] || null;
@@ -168,7 +168,7 @@ const handleReportSuccess = () => {
   </div>
 
   <div class="w-full">
-    <p v-if="getUserLoading">Loading...</p>
+    <p v-if="getUserLoading && !user">Loading...</p>
     <div v-else-if="getUserError">
       <div v-for="(error, i) of getUserError?.graphQLErrors" :key="i">
         {{ error.message }}
