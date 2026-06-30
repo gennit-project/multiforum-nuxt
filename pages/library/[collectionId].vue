@@ -92,6 +92,12 @@ const getPreviewImage = (item: {
   return album.Images[0]?.url || '';
 };
 
+type CollectionDiscussionChannel = {
+  CommentsAggregate?: {
+    count?: number | null;
+  } | null;
+};
+
 // Get items based on collection type
 const items = computed(() => getCollectionItems(collection.value));
 
@@ -442,7 +448,10 @@ const handleDelete = async () => {
                     :author-info="getAuthorInfo(discussion)"
                     :comment-count="
                       discussion.DiscussionChannels?.reduce(
-                        (total, item) => total + (item.CommentsAggregate?.count || 0),
+                        (
+                          total: number,
+                          item: CollectionDiscussionChannel
+                        ) => total + (item.CommentsAggregate?.count || 0),
                         0
                       ) || 0
                     "

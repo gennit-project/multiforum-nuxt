@@ -136,8 +136,8 @@ const props = withDefaults(
         class="flex flex-wrap gap-2 border-t border-slate-200/80 pt-3 dark:border-gray-700"
       >
         <TagComponent
-          v-for="tag in download.Tags.slice(0, 4)"
-          :key="tag.text"
+          v-for="(tag, index) in download.Tags.slice(0, 4)"
+          :key="tag.text || `download-tag-${index}`"
           :tag="tag.text || ''"
           class="text-xs"
           @click.prevent=""

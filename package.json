@@ -11,7 +11,7 @@
     "dev:mocked": "VITE_E2E_MOCK_MODE=true nuxt dev --host 127.0.0.1 --port 3000",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
+    "postinstall": "node scripts/ensure-vue-router-volar-export.mjs && nuxt prepare",
     "compile": "graphql-codegen",
     "lint": "eslint",
     "lint:a11y": "npx eslint \"components/**/*.vue\" --quiet",

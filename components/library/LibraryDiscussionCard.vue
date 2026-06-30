@@ -4,6 +4,7 @@ import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import TagComponent from '@/components/TagComponent.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
+import type { Album } from '@/__generated__/graphql';
 import { relativeTime } from '@/utils';
 
 type AuthorInfo = {
@@ -62,6 +63,8 @@ const DiscussionAlbum = defineAsyncComponent(
 const visibleTags = computed(() =>
   (props.discussion.Tags || []).filter((tag) => !!tag?.text).slice(0, 5)
 );
+
+const albumForDisplay = computed(() => props.discussion.Album as Album | null);
 </script>
 
 <template>
@@ -130,7 +133,7 @@ const visibleTags = computed(() =>
         class="overflow-hidden rounded-xl border border-slate-200 bg-black dark:border-gray-700"
       >
         <DiscussionAlbum
-          :album="discussion.Album"
+          :album="albumForDisplay"
           :discussion-id="discussion.id"
           :discussion-author="authorInfo?.username || 'Deleted'"
           :carousel-format="true"
@@ -172,8 +175,8 @@ const visibleTags = computed(() =>
         class="flex flex-wrap gap-2 border-t border-slate-200/80 pt-4 dark:border-gray-700"
       >
         <TagComponent
-          v-for="tag in visibleTags"
-          :key="tag.text"
+          v-for="(tag, index) in visibleTags"
+          :key="tag.text || `discussion-tag-${index}`"
           :tag="tag.text || ''"
           class="text-xs"
           @click.prevent=""

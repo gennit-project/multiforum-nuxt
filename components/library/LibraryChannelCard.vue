@@ -86,8 +86,8 @@ const props = withDefaults(
       class="mt-4 flex flex-wrap gap-2 border-t border-slate-200/80 pt-4 dark:border-gray-700"
     >
       <TagComponent
-        v-for="tag in channel.Tags.slice(0, 4)"
-        :key="tag.text"
+        v-for="(tag, index) in channel.Tags.slice(0, 4)"
+        :key="tag.text || `channel-tag-${index}`"
         :tag="tag.text || ''"
         class="text-xs"
         @click.prevent=""
