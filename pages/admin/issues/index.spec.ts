@@ -35,6 +35,8 @@ describe('admin server issues index page', () => {
     setActivePinia(createPinia());
     mockedUseQuery.mockReset();
     query.showOnlyServerRuleViolations = '';
+    query.startDate = '2026-05-27';
+    query.endDate = '2026-06-26';
     delete query.channels;
   });
 
@@ -70,6 +72,14 @@ describe('admin server issues index page', () => {
     await mountWith({ issues: [] });
     expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).toMatchObject({
       channelUniqueName_IN: ['announcements'],
+    });
+  });
+
+  it('passes the selected date range into the issues query variables', async () => {
+    await mountWith({ issues: [] });
+    expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).toMatchObject({
+      createdAt_GTE: '2026-05-27T00:00:00.000Z',
+      createdAt_LTE: '2026-06-26T23:59:59.999Z',
     });
   });
 });

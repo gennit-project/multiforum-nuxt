@@ -14,6 +14,7 @@ import { updateFilters } from '@/utils/routerUtils';
 import {
   getDefaultServerRuleViolationsFilter,
   buildServerIssuesWhere,
+  isDateInputValue,
 } from '@/utils/serverIssueFilters';
 import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
 import { useUIStore } from '@/stores/uiStore';
@@ -24,6 +25,16 @@ const router = useRouter();
 const uiStore = useUIStore();
 const { selectedIssueNumber } = storeToRefs(uiStore);
 const { selectedChannels } = useSelectedChannelsFromQuery();
+const toDateInputValue = (date: Date) =>
+  date.toISOString().split('T')[0] || '';
+const getQueryString = (value: unknown) => {
+  return typeof value === 'string' && value ? value : null;
+};
+const today = new Date();
+const defaultStart = new Date(today);
+defaultStart.setDate(today.getDate() - 30);
+const defaultStartDate = toDateInputValue(defaultStart);
+const defaultEndDate = toDateInputValue(today);
 
 const channelId = computed(() => {
   if (typeof route.params.forumId !== 'string') {
@@ -38,12 +49,24 @@ const showOnlyServerRuleViolations = ref(
 const searchInput = ref(
   typeof route.query.searchInput === 'string' ? route.query.searchInput : ''
 );
+const startDate = ref(
+  isDateInputValue(getQueryString(route.query.startDate))
+    ? getQueryString(route.query.startDate) || defaultStartDate
+    : defaultStartDate
+);
+const endDate = ref(
+  isDateInputValue(getQueryString(route.query.endDate))
+    ? getQueryString(route.query.endDate) || defaultEndDate
+    : defaultEndDate
+);
 const channelLabel = computed(() => getChannelLabel(selectedChannels.value));
 
 const variables = computed(() =>
   buildServerIssuesWhere({
     searchInput: searchInput.value,
     selectedChannels: selectedChannels.value,
+    startDate: startDate.value,
+    endDate: endDate.value,
     showOnlyServerRuleViolations: showOnlyServerRuleViolations.value,
   })
 );
@@ -115,6 +138,9 @@ watch(
   () => route.query,
   () => {
     if (route.query) {
+      const nextStartDate = getQueryString(route.query.startDate);
+      const nextEndDate = getQueryString(route.query.endDate);
+
       showOnlyServerRuleViolations.value =
         getDefaultServerRuleViolationsFilter(
           route.query.showOnlyServerRuleViolations
@@ -123,10 +149,34 @@ watch(
         typeof route.query.searchInput === 'string'
           ? route.query.searchInput
           : '';
+      if (isDateInputValue(nextStartDate) && nextStartDate !== startDate.value) {
+        startDate.value = nextStartDate;
+      }
+      if (isDateInputValue(nextEndDate) && nextEndDate !== endDate.value) {
+        endDate.value = nextEndDate;
+      }
       refetch(variables.value);
     }
   }
 );
+
+watch([startDate, endDate], ([nextStartDate, nextEndDate]) => {
+  if (
+    route.query.startDate === nextStartDate &&
+    route.query.endDate === nextEndDate
+  ) {
+    return;
+  }
+
+  updateFilters({
+    router,
+    route,
+    params: {
+      startDate: nextStartDate,
+      endDate: nextEndDate,
+    },
+  });
+});
 </script>
 
 <template>
@@ -139,6 +189,30 @@ watch(
         :debounce-ms="500"
         @update-search-input="updateSearchInput"
       />
+      <div class="flex flex-wrap items-end gap-3">
+        <label
+          class="flex flex-col gap-1 text-xs font-medium text-gray-600 dark:text-gray-300"
+        >
+          Start
+          <input
+            v-model="startDate"
+            type="date"
+            data-testid="admin-issues-start-date"
+            class="rounded-md border-gray-300 px-2 py-1 text-sm text-gray-900 [color-scheme:light] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:[color-scheme:dark]"
+          >
+        </label>
+        <label
+          class="flex flex-col gap-1 text-xs font-medium text-gray-600 dark:text-gray-300"
+        >
+          End
+          <input
+            v-model="endDate"
+            type="date"
+            data-testid="admin-issues-end-date"
+            class="rounded-md border-gray-300 px-2 py-1 text-sm text-gray-900 [color-scheme:light] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:[color-scheme:dark]"
+          >
+        </label>
+      </div>
       <div class="flex flex-wrap items-center justify-end gap-2">
         <FilterChip
           :label="channelLabel"
