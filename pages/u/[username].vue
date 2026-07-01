@@ -4,12 +4,16 @@ import { computed, watchEffect } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
 import UserProfileSidebar from '@/components/user/UserProfileSidebar.vue';
-import { navigateTo, useHead, useRoute } from 'nuxt/app';
+import { useHead, useRoute } from 'nuxt/app';
 import UserContributionChart from '@/components/charts/UserContributionChart.vue';
 import UserProfileChannelFilter from '@/components/user/UserProfileChannelFilter.vue';
-import ContributionChartSkeleton from '@/components/charts/ContributionChartSkeleton.vue';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+
+// @ts-ignore - definePageMeta is auto-imported by Nuxt
+definePageMeta({
+  middleware: 'user-profile-redirect',
+});
 
 const route = useRoute();
 const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
@@ -19,14 +23,6 @@ const username = computed(() => {
 });
 const baseProfilePath = computed(() => `/u/${username.value}`);
 const normalizedPath = computed(() => route.path.replace(/\/+$/, ''));
-
-if (
-  normalizedPath.value === baseProfilePath.value &&
-  normalizedPath.value &&
-  username.value
-) {
-  await navigateTo(`${baseProfilePath.value}/comments`);
-}
 
 const {
   result: userResult,
@@ -175,21 +171,7 @@ watchEffect(() => {
           <client-only>
             <UserContributionChart />
             <template #fallback>
-              <!-- Skeleton placeholder to prevent content shift -->
-              <div
-                class="mb-4 flex flex-col space-y-4 rounded-lg px-4"
-              >
-                <!-- Header skeleton -->
-                <div class="flex items-center justify-between">
-                  <div class="h-7 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-                  <div class="flex items-center space-x-2">
-                    <div class="h-4 w-10 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-                    <div class="h-8 w-20 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-                  </div>
-                </div>
-                <!-- Chart grid skeleton -->
-                <ContributionChartSkeleton :dark-mode="false" />
-              </div>
+              <div class="mb-4 h-[220px] rounded-lg px-4" aria-hidden="true" />
             </template>
           </client-only>
           <ClientOnly>

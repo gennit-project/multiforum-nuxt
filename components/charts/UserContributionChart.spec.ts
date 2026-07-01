@@ -10,10 +10,12 @@ const h = vi.hoisted(() => ({
   contributionsResult: null as unknown,
   loading: null as unknown,
   index: { n: 0 },
+  useQueryCalls: [] as unknown[],
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => {
+  useQuery: (...args: unknown[]) => {
+    h.useQueryCalls.push(args);
     const i = h.index.n++;
     return i === 0
       ? { result: h.userResult }
@@ -45,12 +47,27 @@ const chart = (w: ReturnType<typeof mount>) =>
 beforeEach(() => {
   vi.clearAllMocks();
   h.index.n = 0;
+  h.useQueryCalls = [];
   h.userResult = ref({ users: [{ createdAt: '2019-06-01T00:00:00Z' }] });
   h.contributionsResult = ref({ getUserContributions: [] });
   h.loading = ref(false);
 });
 
 describe('UserContributionChart data', () => {
+  it('queries only the current year on initial load', () => {
+    mountChart();
+
+    const contributionVariablesFactory = h.useQueryCalls[1][1] as () => {
+      username: string;
+      year: number;
+    };
+
+    expect(contributionVariablesFactory()).toEqual({
+      username: 'alice',
+      year: new Date().getFullYear(),
+    });
+  });
+
   it('passes the minimum year from the account creation date', () => {
     const wrapper = mountChart();
 

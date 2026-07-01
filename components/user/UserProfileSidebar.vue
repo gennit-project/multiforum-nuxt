@@ -4,7 +4,7 @@ import type { PropType } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import 'md-editor-v3/lib/style.css';
 import { GET_USER } from '@/graphQLData/user/queries';
-import { relativeTime } from '@/utils';
+import { stableRelativeTime } from '@/utils';
 import type { ServerRoleBadge } from '@/utils/serverRoleBadges';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import ReportProfilePictureModal from '@/components/mod/ReportProfilePictureModal.vue';
@@ -156,7 +156,7 @@ const handleReportSuccess = () => {
           v-if="user && username"
           class="mt-6 hidden min-w-0 flex-1 text-gray-600 dark:text-gray-400 sm:block 2xl:hidden"
         >
-          {{ `Joined ${relativeTime(user.createdAt)}` }}
+          {{ `Joined ${stableRelativeTime(user.createdAt)}` }}
         </div>
       </div>
 

@@ -8,7 +8,6 @@ import UserProfileContainer from './[username].vue';
 // Controllable route + nuxt helpers.
 const h = vi.hoisted(() => ({
   route: { path: '/u/alice/comments', params: { username: 'alice' } as Record<string, unknown> },
-  navigateTo: null as unknown as ReturnType<typeof vi.fn>,
   useHead: null as unknown as ReturnType<typeof vi.fn>,
   resultRef: null as unknown as { value: unknown },
   loadingRef: null as unknown as { value: boolean },
@@ -18,12 +17,12 @@ const h = vi.hoisted(() => ({
   modProfiles: null as unknown as { value: string[] },
 }));
 
+vi.stubGlobal('definePageMeta', vi.fn());
+
 vi.mock('nuxt/app', () => {
-  h.navigateTo = vi.fn();
   h.useHead = vi.fn();
   return {
     useRoute: () => h.route,
-    navigateTo: (...args: unknown[]) => h.navigateTo(...args),
     useHead: (...args: unknown[]) => h.useHead(...args),
   };
 });
@@ -114,18 +113,6 @@ beforeEach(() => {
 });
 
 describe('User profile container', () => {
-  it('redirects to the comments tab when landing on the base profile path', async () => {
-    h.route = { path: '/u/alice', params: { username: 'alice' } };
-    await mountContainer();
-    expect(h.navigateTo).toHaveBeenCalledWith('/u/alice/comments');
-  });
-
-  it('does not redirect when already on a tab', async () => {
-    h.route = { path: '/u/alice/discussions', params: { username: 'alice' } };
-    await mountContainer();
-    expect(h.navigateTo).not.toHaveBeenCalled();
-  });
-
   it('renders the profile tabs once the user has loaded', async () => {
     const wrapper = await mountContainer();
     expect(wrapper.findComponent({ name: 'UserProfileTabs' }).exists()).toBe(true);
