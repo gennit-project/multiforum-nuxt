@@ -353,6 +353,7 @@ const updateChannelSort = (sortBy: ChannelHealthSortKey) => {
           :loading="isChannelHealthLoading"
           :active-sort-by="activeSortBy"
           :active-sort-direction="activeSortDirection"
+          detail-route-base="/admin/dashboard"
           @sort="updateChannelSort"
         />
 

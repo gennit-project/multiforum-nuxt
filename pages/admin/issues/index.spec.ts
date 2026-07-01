@@ -3,13 +3,14 @@ import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
+import IssueFilterBar from '@/components/admin/IssueFilterBar.vue';
+import { issueSortValues } from '@/utils/issueSortOptions';
 
 const h = vi.hoisted(() => ({
   query: {
     showOnlyServerRuleViolations: '',
     searchInput: '',
-    startDate: '2026-05-27',
-    endDate: '2026-06-26',
+    sort: '',
   } as Record<string, string>,
   routerPush: vi.fn(),
   routerReplace: vi.fn(),
@@ -57,7 +58,7 @@ const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 const mountWith = async (opts: { loading?: boolean; issues?: unknown[] }) => {
   const { loading = false, issues = [] } = opts;
   mockedUseQuery.mockReturnValue({
-    result: ref({ issues }),
+    result: ref({ getSiteWideIssueList: { issues } }),
     error: ref(null),
     loading: ref(loading),
     refetch: h.refetch,
@@ -66,11 +67,27 @@ const mountWith = async (opts: { loading?: boolean; issues?: unknown[] }) => {
   return shallowMount(Page, {
     global: {
       stubs: {
-        SearchBar: {
-          name: 'SearchBar',
-          emits: ['update-search-input'],
-          template:
-            '<button class="search-bar" @click="$emit(\'update-search-input\', \'needle\')" />',
+        IssueFilterBar: {
+          name: 'IssueFilterBar',
+          props: [
+            'searchInput',
+            'selectedChannels',
+            'channelLabel',
+            'startDate',
+            'endDate',
+            'showOnlyServerRuleViolations',
+            'selectedSort',
+            'selectedSortLabel',
+          ],
+          emits: [
+            'update-search-input',
+            'toggle-selected-channel',
+            'update:startDate',
+            'update:endDate',
+            'update:showOnlyServerRuleViolations',
+            'update:sort',
+          ],
+          template: '<div class="issue-filter-bar" />',
         },
         ModIssueListItem: {
           name: 'ModIssueListItem',
@@ -88,39 +105,34 @@ beforeEach(() => {
   vi.clearAllMocks();
   h.query.showOnlyServerRuleViolations = '';
   h.query.searchInput = '';
-  h.query.startDate = '2026-05-27';
-  h.query.endDate = '2026-06-26';
+  h.query.sort = '';
+  delete h.query.startDate;
+  delete h.query.endDate;
   delete h.query.channels;
   h.selectedIssueNumber.value = null;
 });
 
 describe('admin server issues index page', () => {
-  it('defaults the server-rule-violations checkbox to checked', async () => {
+  it('passes the default server-rule-violations state to the filter bar', async () => {
     const wrapper = await mountWith({ issues: [] });
     expect(
-      (
-        wrapper.get('[data-testid="show-only-server-rule-violations"]')
-          .element as HTMLInputElement
-      ).checked
+      wrapper.getComponent(IssueFilterBar).props('showOnlyServerRuleViolations')
     ).toBe(true);
   });
 
-  it('unchecks the filter when the query opts out', async () => {
+  it('passes the opt-out server-rule-violations state to the filter bar', async () => {
     h.query.showOnlyServerRuleViolations = 'false';
     const wrapper = await mountWith({ issues: [] });
     expect(
-      (
-        wrapper.get('[data-testid="show-only-server-rule-violations"]')
-          .element as HTMLInputElement
-      ).checked
+      wrapper.getComponent(IssueFilterBar).props('showOnlyServerRuleViolations')
     ).toBe(false);
   });
 
-  it('updates the filters when the checkbox changes', async () => {
+  it('updates the filters when the checkbox value changes', async () => {
     const wrapper = await mountWith({ issues: [] });
     await wrapper
-      .get('[data-testid="show-only-server-rule-violations"]')
-      .setValue(false);
+      .getComponent(IssueFilterBar)
+      .vm.$emit('update:showOnlyServerRuleViolations', false);
     expect(h.updateFilters).toHaveBeenCalledWith({
       router: { push: h.routerPush, replace: h.routerReplace },
       route: { params: { forumId: '' }, path: '/admin/issues', query: h.query },
@@ -130,11 +142,35 @@ describe('admin server issues index page', () => {
 
   it('updates the filters when the search bar emits a new value', async () => {
     const wrapper = await mountWith({ issues: [] });
-    await wrapper.get('.search-bar').trigger('click');
+    await wrapper
+      .getComponent(IssueFilterBar)
+      .vm.$emit('update-search-input', 'needle');
     expect(h.updateFilters).toHaveBeenCalledWith({
       router: { push: h.routerPush, replace: h.routerReplace },
       route: { params: { forumId: '' }, path: '/admin/issues', query: h.query },
       params: { searchInput: 'needle' },
+    });
+  });
+
+  it('passes the default sort state to the filter bar', async () => {
+    const wrapper = await mountWith({ issues: [] });
+    expect(wrapper.getComponent(IssueFilterBar).props('selectedSort')).toBe(
+      issueSortValues.NEWEST
+    );
+    expect(wrapper.getComponent(IssueFilterBar).props('selectedSortLabel')).toBe(
+      'Newest'
+    );
+  });
+
+  it('updates the route filters when the sort changes', async () => {
+    const wrapper = await mountWith({ issues: [] });
+    await wrapper
+      .getComponent(IssueFilterBar)
+      .vm.$emit('update:sort', issueSortValues.OLDEST);
+    expect(h.updateFilters).toHaveBeenCalledWith({
+      router: { push: h.routerPush, replace: h.routerReplace },
+      route: { params: { forumId: '' }, path: '/admin/issues', query: h.query },
+      params: { sort: issueSortValues.OLDEST },
     });
   });
 
@@ -161,16 +197,59 @@ describe('admin server issues index page', () => {
   it('passes the selected channel filter into the issues query variables', async () => {
     h.query.channels = 'announcements';
     await mountWith({ issues: [] });
-    expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).toMatchObject({
-      channelUniqueName_IN: ['announcements'],
-    });
+    expect(mockedUseQuery.mock.calls[0][1].value.selectedChannels).toEqual([
+      'announcements',
+    ]);
   });
 
   it('passes the selected date range into the issues query variables', async () => {
+    h.query.startDate = '2026-05-27';
+    h.query.endDate = '2026-06-26';
     await mountWith({ issues: [] });
-    expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).toMatchObject({
-      createdAt_GTE: '2026-05-27T00:00:00.000Z',
-      createdAt_LTE: '2026-06-26T23:59:59.999Z',
+    expect(mockedUseQuery.mock.calls[0][1].value.startDate).toBe('2026-05-27');
+    expect(mockedUseQuery.mock.calls[0][1].value.endDate).toBe('2026-06-26');
+  });
+
+  it('passes the selected sort into the issues query variables', async () => {
+    h.query.sort = issueSortValues.OLDEST;
+    await mountWith({ issues: [] });
+    expect(mockedUseQuery.mock.calls[0][1].value.options).toEqual({
+      sort: issueSortValues.OLDEST,
+    });
+  });
+
+  it('omits date bounds when no date filters are set', async () => {
+    await mountWith({ issues: [] });
+    expect(mockedUseQuery.mock.calls[0][1].value.startDate).toBe(null);
+    expect(mockedUseQuery.mock.calls[0][1].value.endDate).toBe(null);
+  });
+
+  it('updates the route filters when the start and end dates change', async () => {
+    const wrapper = await mountWith({ issues: [] });
+
+    await wrapper
+      .getComponent(IssueFilterBar)
+      .vm.$emit('update:startDate', '2026-05-01');
+    await wrapper
+      .getComponent(IssueFilterBar)
+      .vm.$emit('update:endDate', '2026-07-01');
+
+    expect(h.updateFilters).toHaveBeenLastCalledWith({
+      router: { push: h.routerPush, replace: h.routerReplace },
+      route: { params: { forumId: '' }, path: '/admin/issues', query: h.query },
+      params: {
+        startDate: '2026-05-01',
+        endDate: '2026-07-01',
+      },
+    });
+  });
+
+  it('passes most reports through to the backend sort option', async () => {
+    h.query.sort = issueSortValues.MOST_REPORTS;
+    await mountWith({ issues: [] });
+
+    expect(mockedUseQuery.mock.calls[0][1].value.options).toEqual({
+      sort: issueSortValues.MOST_REPORTS,
     });
   });
 });
