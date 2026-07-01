@@ -21,8 +21,14 @@ import {
 } from '@/composables/useFilterBar';
 import { updateFilters } from '@/utils/routerUtils';
 
+const emit = defineEmits(['openAbout']);
+
 defineProps({
   isForumScoped: {
+    type: Boolean,
+    default: false,
+  },
+  showAboutButton: {
     type: Boolean,
     default: false,
   },
@@ -131,6 +137,16 @@ const isExpanded = computed(() => {
       >
         Discuss
       </h1>
+      <div class="flex items-center gap-2">
+        <button
+          v-if="showAboutButton"
+          type="button"
+          class="hidden items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 md:inline-flex lg:hidden"
+          @click="emit('openAbout')"
+        >
+          About
+        </button>
+      </div>
       <div class="flex flex-wrap items-center justify-end gap-1">
         <FilterChip
           v-if="!isForumScoped"

@@ -185,10 +185,15 @@ const handleClickChannel = (uniqueName: string) => {
 <template>
   <SitewideDiscussionList
     v-if="!isForumScoped"
+    v-slot="{ openAbout }"
     @filter-by-tag="handleClickTag"
     @filter-by-channel="handleClickChannel"
   >
-    <DiscussionFilterBar :is-forum-scoped="isForumScoped" />
+    <DiscussionFilterBar
+      :is-forum-scoped="isForumScoped"
+      :show-about-button="true"
+      @open-about="openAbout"
+    />
   </SitewideDiscussionList>
   <ChannelDiscussionList
     v-else

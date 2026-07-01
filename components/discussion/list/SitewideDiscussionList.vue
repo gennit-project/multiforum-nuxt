@@ -249,7 +249,7 @@ const filterByChannel = (channel: string) => {
           <div
             class="min-w-0 flex-1 md:px-2 lg:h-[calc(100vh-3.5rem)] lg:basis-0 lg:overflow-y-auto"
           >
-            <slot />
+            <slot :open-about="() => (isSitewideSidebarOpen = true)" />
             <div class="mt-2 flex justify-end lg:pr-2">
               <button
                 v-if="serverConfig"

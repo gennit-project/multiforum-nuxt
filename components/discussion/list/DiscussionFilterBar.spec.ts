@@ -25,9 +25,9 @@ const heavyStubs = {
   SearchBar: true,
 };
 
-const mountBar = () =>
+const mountBar = (props: Record<string, unknown> = {}) =>
   mountWithDefaults(DiscussionFilterBar, {
-    props: { isForumScoped: true },
+    props: { isForumScoped: true, ...props },
     global: { stubs: heavyStubs },
   });
 
@@ -59,5 +59,13 @@ describe('DiscussionFilterBar', () => {
     expect(
       wrapper.find('[data-testid="show-archived-discussions"]').exists()
     ).toBe(true);
+  });
+
+  it('emits openAbout when the inline about button is clicked', async () => {
+    const wrapper = mountBar({ showAboutButton: true });
+    const aboutButton = wrapper.findAll('button').find((button) => button.text() === 'About');
+    expect(aboutButton).toBeTruthy();
+    await aboutButton!.trigger('click');
+    expect(wrapper.emitted('openAbout')).toBeTruthy();
   });
 });
