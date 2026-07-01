@@ -250,18 +250,6 @@ const filterByChannel = (channel: string) => {
             class="min-w-0 flex-1 md:px-2 lg:h-[calc(100vh-3.5rem)] lg:basis-0 lg:overflow-y-auto"
           >
             <slot :open-about="() => (isSitewideSidebarOpen = true)" />
-            <div class="mt-2 flex justify-end lg:pr-2">
-              <button
-                v-if="serverConfig"
-                type="button"
-                class="hidden items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 lg:inline-flex"
-                :aria-expanded="isSitewideSidebarOpen"
-                aria-controls="sitewide-sidebar-drawer"
-                @click="isSitewideSidebarOpen = true"
-              >
-                About
-              </button>
-            </div>
             <div
               v-if="
                 discussionLoading && (!discussions || discussions.length === 0)

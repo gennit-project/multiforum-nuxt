@@ -141,7 +141,7 @@ const isExpanded = computed(() => {
         <button
           v-if="showAboutButton"
           type="button"
-          class="hidden items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 md:inline-flex lg:hidden"
+          class="hidden items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 md:inline-flex"
           @click="emit('openAbout')"
         >
           About
