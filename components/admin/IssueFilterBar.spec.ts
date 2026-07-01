@@ -22,7 +22,8 @@ const buildWrapper = () => {
           name: 'TextButtonDropdown',
           props: ['label', 'items', 'showSortIcon'],
           emits: ['clicked-item'],
-          template: '<button class="sort-dropdown" @click="$emit(\'clicked-item\', \'oldest\')" />',
+          template:
+            '<button class="text-dropdown" @click="$emit(\'clicked-item\', showSortIcon ? \'oldest\' : \'all\')" />',
         },
         FilterChip: {
           name: 'FilterChip',
@@ -68,12 +69,10 @@ describe('IssueFilterBar', () => {
     expect(wrapper.emitted('toggle-selected-channel')).toEqual([['cats']]);
   });
 
-  it('emits checkbox updates', async () => {
+  it('emits issue scope updates', async () => {
     const wrapper = buildWrapper();
 
-    await wrapper
-      .get('[data-testid="show-only-server-rule-violations"]')
-      .setValue(false);
+    await wrapper.findAll('.text-dropdown')[1].trigger('click');
 
     expect(wrapper.emitted('update:showOnlyServerRuleViolations')).toEqual([
       [false],
@@ -83,7 +82,7 @@ describe('IssueFilterBar', () => {
   it('emits sort updates', async () => {
     const wrapper = buildWrapper();
 
-    await wrapper.get('.sort-dropdown').trigger('click');
+    await wrapper.findAll('.text-dropdown')[0].trigger('click');
 
     expect(wrapper.emitted('update:sort')).toEqual([[issueSortValues.OLDEST]]);
   });
