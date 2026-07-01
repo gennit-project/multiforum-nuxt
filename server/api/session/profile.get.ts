@@ -1,8 +1,7 @@
 // server/api/session/profile.get.ts
 //
-// Alias for the session-backed profile endpoint. The browser client uses this
-// path instead of `/api/auth/*` because some embedded browsers block that
-// pattern.
+// Same-origin session-backed profile fallback for embedded browsers where
+// localStorage-backed token flows are unreliable or unavailable.
 
 type OwnEmailResponse = {
   data?: {

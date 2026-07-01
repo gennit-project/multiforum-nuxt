@@ -16,6 +16,7 @@
 // there are no cookieless requests. We keep that key in sync with the server
 // session here — a real browser fetch that carries the session cookie.
 import { defineNuxtPlugin } from 'nuxt/app';
+import { clearPersistedAuth } from '@/utils/authUtils';
 
 export default defineNuxtPlugin(() => {
   // Client-only by file name, but guard anyway — never touch localStorage / make
@@ -49,19 +50,19 @@ export default defineNuxtPlugin(() => {
       };
       if (accessToken) {
         localStorage.setItem(TOKEN_KEY, accessToken);
+        return;
       }
-      // Note: we intentionally do NOT remove the token when null, to avoid
-      // clobbering the SPA-written token during coexistence (Phase 4 removes the
-      // SPA path and this becomes the sole writer).
+
+      // An explicit null token means the server session is gone. Clear both the
+      // token and the persisted username so the UI cannot restore a ghost login.
+      clearPersistedAuth();
     } catch {
       // ignore — Apollo falls back to whatever is in localStorage
     }
   };
 
-  // Sync once on load, on tab focus, and periodically. Access tokens are
-  // long-lived (24h) and the server refreshes them, so a 10-minute cadence is
-  // plenty to keep localStorage fresh ahead of any request.
+  // Sync once on load so the browser-local Apollo token matches the current
+  // server session without introducing ongoing background polling for normal
+  // browser sessions.
   syncToken();
-  window.addEventListener('focus', syncToken);
-  setInterval(syncToken, 10 * 60 * 1000);
 });

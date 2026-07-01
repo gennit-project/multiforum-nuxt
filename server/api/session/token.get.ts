@@ -1,8 +1,8 @@
 // server/api/session/token.get.ts
 //
 // Alias for the session access token endpoint. Some embedded browsers are more
-// aggressive about blocking `/api/auth/*` paths, so the client uses this
-// neutral path instead.
+// aggressive about blocking `/api/auth/*` paths, so the browser fallback uses
+// this neutral path instead.
 
 export default defineEventHandler(async (event) => {
   setResponseHeader(event, 'Cache-Control', 'no-store');
