@@ -2,7 +2,6 @@
 import { ref, computed } from 'vue';
 import { useUIStore } from '@/stores/uiStore';
 import GithubContributionChart from './GithubContributionChart.vue';
-import ContributionChartSkeleton from './ContributionChartSkeleton.vue';
 import { GET_USER_CONTRIBUTIONS, GET_USER } from '@/graphQLData/user/queries';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
@@ -30,6 +29,7 @@ const { result: userResult } = useQuery(
   }),
   {
     fetchPolicy: 'cache-first',
+    enabled: computed(() => import.meta.client && !!username.value),
   }
 );
 
@@ -50,6 +50,7 @@ const { result: contributionsResult, loading } = useQuery(
   }),
   {
     fetchPolicy: 'cache-first',
+    enabled: computed(() => import.meta.client && !!username.value),
   }
 );
 
@@ -116,21 +117,15 @@ const currentYear = computed(() => currentCalendarYear);
 </script>
 <template>
   <div class="overflow-hidden rounded-lg">
-    <client-only>
-      <GithubContributionChart
-        :dark-mode="isDarkMode"
-        :contribution-data="contributions"
-        :loading="loading"
-        :year="displayYear"
-        :min-year="minYear"
-        :max-year="currentYear"
-        @day-select="logSelected"
-        @year-select="setYear"
-      >
-        <template #fallback>
-          <ContributionChartSkeleton :dark-mode="isDarkMode" />
-        </template>
-      </GithubContributionChart>
-    </client-only>
+    <GithubContributionChart
+      :dark-mode="isDarkMode"
+      :contribution-data="contributions"
+      :loading="loading"
+      :year="displayYear"
+      :min-year="minYear"
+      :max-year="currentYear"
+      @day-select="logSelected"
+      @year-select="setYear"
+    />
   </div>
 </template>
