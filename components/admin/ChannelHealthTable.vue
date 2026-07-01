@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { ArrowDown, ArrowUp, ArrowUpDown, MessageSquare } from 'lucide-vue-next';
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  MessageSquare,
+} from 'lucide-vue-next';
 import ChannelHealthTableRow from '@/components/admin/ChannelHealthTableRow.vue';
 
 type ChannelHealthSortKey =
@@ -37,6 +42,7 @@ const props = defineProps<{
   loading: boolean;
   activeSortBy: ChannelHealthSortKey;
   activeSortDirection: SortDirection;
+  detailRouteBase?: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -108,6 +114,10 @@ const channelHealthColumns = computed(() => {
     };
   });
 });
+
+const tableColumnCount = computed(() => {
+  return channelHealthColumnDefinitions.length + (props.detailRouteBase ? 1 : 0);
+});
 </script>
 
 <template>
@@ -148,6 +158,12 @@ const channelHealthColumns = computed(() => {
                   />
                 </button>
               </th>
+              <th
+                v-if="detailRouteBase"
+                class="px-4 py-3 text-right font-medium"
+              >
+                <span class="sr-only">Details</span>
+              </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
@@ -173,6 +189,12 @@ const channelHealthColumns = computed(() => {
                 >
                   <div class="h-3 w-20 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
                 </td>
+                <td
+                  v-if="detailRouteBase"
+                  class="px-4 py-3"
+                >
+                  <div class="ml-auto h-8 w-20 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
+                </td>
               </tr>
             </template>
             <template v-else>
@@ -182,11 +204,12 @@ const channelHealthColumns = computed(() => {
                 :row="row"
                 :max-activity="maxChannelActivity"
                 :max-issue-pressure="maxChannelIssuePressure"
+                :detail-route-base="detailRouteBase"
               />
             </template>
             <tr v-if="!loading && rows.length === 0">
               <td
-                colspan="8"
+                :colspan="tableColumnCount"
                 class="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
               >
                 No channel activity in this range.
