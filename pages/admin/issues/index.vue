@@ -5,10 +5,7 @@ import { GET_ISSUES } from '@/graphQLData/issue/queries';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
 import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
-import SearchBar from '@/components/SearchBar.vue';
-import FilterChip from '@/components/FilterChip.vue';
-import ChannelIcon from '@/components/icons/ChannelIcon.vue';
-import SearchableForumList from '@/components/channel/SearchableForumList.vue';
+import IssueFilterBar from '@/components/admin/IssueFilterBar.vue';
 import { getChannelLabel } from '@/utils';
 import { updateFilters } from '@/utils/routerUtils';
 import {
@@ -66,13 +63,13 @@ const issues = computed<Issue[]>(() => {
   return getIssuesResult.value?.issues || [];
 });
 
-const toggleShowOnlyServerRuleViolations = () => {
-  showOnlyServerRuleViolations.value = !showOnlyServerRuleViolations.value;
+const updateShowOnlyServerRuleViolations = (value: boolean) => {
+  showOnlyServerRuleViolations.value = value;
   updateFilters({
     router,
     route,
     params: {
-      showOnlyServerRuleViolations: showOnlyServerRuleViolations.value,
+      showOnlyServerRuleViolations: value,
     },
   });
 };
@@ -154,69 +151,21 @@ watch([startDate, endDate], ([nextStartDate, nextEndDate]) => {
 
 <template>
   <div>
-    <div class="flex flex-col gap-3 px-4 pb-4">
-      <SearchBar
-        :initial-value="searchInput"
-        :search-placeholder="'Search issues'"
-        :test-id="'server-issue-search-input'"
-        :debounce-ms="500"
-        @update-search-input="updateSearchInput"
-      />
-      <div class="flex flex-wrap items-end gap-3">
-        <label
-          class="flex flex-col gap-1 text-xs font-medium text-gray-600 dark:text-gray-300"
-        >
-          Start
-          <input
-            v-model="startDate"
-            type="date"
-            data-testid="admin-issues-start-date"
-            class="rounded-md border-gray-300 px-2 py-1 text-sm text-gray-900 [color-scheme:light] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:[color-scheme:dark]"
-          >
-        </label>
-        <label
-          class="flex flex-col gap-1 text-xs font-medium text-gray-600 dark:text-gray-300"
-        >
-          End
-          <input
-            v-model="endDate"
-            type="date"
-            data-testid="admin-issues-end-date"
-            class="rounded-md border-gray-300 px-2 py-1 text-sm text-gray-900 [color-scheme:light] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:[color-scheme:dark]"
-          >
-        </label>
-      </div>
-      <div class="flex flex-wrap items-center justify-end gap-2">
-        <FilterChip
-          :label="channelLabel"
-          :highlighted="selectedChannels.length > 0"
-          data-testid="admin-issues-channel-filter"
-        >
-          <template #icon>
-            <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />
-          </template>
-          <template #content>
-            <div class="relative w-96">
-              <SearchableForumList
-                :selected-channels="selectedChannels"
-                @toggle-selection="toggleSelectedChannel"
-              />
-            </div>
-          </template>
-        </FilterChip>
-        <input
-          id="show-only-server-rule-violations"
-          type="checkbox"
-          :checked="showOnlyServerRuleViolations"
-          class="mr-2"
-          data-testid="show-only-server-rule-violations"
-          @change="toggleShowOnlyServerRuleViolations"
-        >
-        <label for="show-only-server-rule-violations" class="mr-2"
-          >Show only server rule violations</label
-        >
-      </div>
-    </div>
+    <IssueFilterBar
+      :search-input="searchInput"
+      :selected-channels="selectedChannels"
+      :channel-label="channelLabel"
+      :start-date="startDate"
+      :end-date="endDate"
+      :show-only-server-rule-violations="showOnlyServerRuleViolations"
+      @update-search-input="updateSearchInput"
+      @toggle-selected-channel="toggleSelectedChannel"
+      @update:start-date="startDate = $event"
+      @update:end-date="endDate = $event"
+      @update:show-only-server-rule-violations="
+        updateShowOnlyServerRuleViolations
+      "
+    />
     <ul
       class="divide-y border-t border-gray-200 dark:border-gray-800 dark:text-white"
       data-testid="issue-list"

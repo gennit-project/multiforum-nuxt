@@ -3,6 +3,7 @@ import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
+import IssueFilterBar from '@/components/admin/IssueFilterBar.vue';
 
 const h = vi.hoisted(() => ({
   query: {
@@ -64,11 +65,24 @@ const mountWith = async (opts: { loading?: boolean; issues?: unknown[] }) => {
   return shallowMount(Page, {
     global: {
       stubs: {
-        SearchBar: {
-          name: 'SearchBar',
-          emits: ['update-search-input'],
-          template:
-            '<button class="search-bar" @click="$emit(\'update-search-input\', \'needle\')" />',
+        IssueFilterBar: {
+          name: 'IssueFilterBar',
+          props: [
+            'searchInput',
+            'selectedChannels',
+            'channelLabel',
+            'startDate',
+            'endDate',
+            'showOnlyServerRuleViolations',
+          ],
+          emits: [
+            'update-search-input',
+            'toggle-selected-channel',
+            'update:startDate',
+            'update:endDate',
+            'update:showOnlyServerRuleViolations',
+          ],
+          template: '<div class="issue-filter-bar" />',
         },
         ModIssueListItem: {
           name: 'ModIssueListItem',
@@ -93,32 +107,26 @@ beforeEach(() => {
 });
 
 describe('admin server issues index page', () => {
-  it('defaults the server-rule-violations checkbox to checked', async () => {
+  it('passes the default server-rule-violations state to the filter bar', async () => {
     const wrapper = await mountWith({ issues: [] });
     expect(
-      (
-        wrapper.get('[data-testid="show-only-server-rule-violations"]')
-          .element as HTMLInputElement
-      ).checked
+      wrapper.getComponent(IssueFilterBar).props('showOnlyServerRuleViolations')
     ).toBe(true);
   });
 
-  it('unchecks the filter when the query opts out', async () => {
+  it('passes the opt-out server-rule-violations state to the filter bar', async () => {
     h.query.showOnlyServerRuleViolations = 'false';
     const wrapper = await mountWith({ issues: [] });
     expect(
-      (
-        wrapper.get('[data-testid="show-only-server-rule-violations"]')
-          .element as HTMLInputElement
-      ).checked
+      wrapper.getComponent(IssueFilterBar).props('showOnlyServerRuleViolations')
     ).toBe(false);
   });
 
-  it('updates the filters when the checkbox changes', async () => {
+  it('updates the filters when the checkbox value changes', async () => {
     const wrapper = await mountWith({ issues: [] });
     await wrapper
-      .get('[data-testid="show-only-server-rule-violations"]')
-      .setValue(false);
+      .getComponent(IssueFilterBar)
+      .vm.$emit('update:showOnlyServerRuleViolations', false);
     expect(h.updateFilters).toHaveBeenCalledWith({
       router: { push: h.routerPush, replace: h.routerReplace },
       route: { params: { forumId: '' }, path: '/admin/issues', query: h.query },
@@ -128,7 +136,9 @@ describe('admin server issues index page', () => {
 
   it('updates the filters when the search bar emits a new value', async () => {
     const wrapper = await mountWith({ issues: [] });
-    await wrapper.get('.search-bar').trigger('click');
+    await wrapper
+      .getComponent(IssueFilterBar)
+      .vm.$emit('update-search-input', 'needle');
     expect(h.updateFilters).toHaveBeenCalledWith({
       router: { push: h.routerPush, replace: h.routerReplace },
       route: { params: { forumId: '' }, path: '/admin/issues', query: h.query },
@@ -182,5 +192,25 @@ describe('admin server issues index page', () => {
     expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).not.toHaveProperty(
       'createdAt_LTE'
     );
+  });
+
+  it('updates the route filters when the start and end dates change', async () => {
+    const wrapper = await mountWith({ issues: [] });
+
+    await wrapper
+      .getComponent(IssueFilterBar)
+      .vm.$emit('update:startDate', '2026-05-01');
+    await wrapper
+      .getComponent(IssueFilterBar)
+      .vm.$emit('update:endDate', '2026-07-01');
+
+    expect(h.updateFilters).toHaveBeenLastCalledWith({
+      router: { push: h.routerPush, replace: h.routerReplace },
+      route: { params: { forumId: '' }, path: '/admin/issues', query: h.query },
+      params: {
+        startDate: '2026-05-01',
+        endDate: '2026-07-01',
+      },
+    });
   });
 });
