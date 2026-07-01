@@ -6,7 +6,7 @@
   <button
     data-testid="hamburger-menu-button"
     type="button"
-    class="inline-flex items-center justify-center rounded-md border border-gray-700 bg-black p-2 text-gray-300 hover:bg-gray-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-700"
+    class="inline-flex items-center justify-center rounded-md border border-gray-600 bg-gray-800 p-2 text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-600"
     aria-controls="mobile-menu"
     aria-expanded="false"
   >
