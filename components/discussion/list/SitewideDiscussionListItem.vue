@@ -248,12 +248,11 @@ const revealSensitiveContent = () => {
 </script>
 
 <template>
-  <li class="list-none">
+  <li class="list-none border-b border-gray-200 py-3 last:border-b-0 dark:border-gray-800">
     <div
-      class="m-2 flex flex-col gap-2 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900 lg:m-0 lg:block lg:gap-0 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-4 lg:dark:bg-transparent"
+      class="flex flex-col gap-2 px-2 lg:block lg:gap-0 lg:px-0"
       :class="{
-        'ring-2 ring-orange-400 dark:ring-orange-500 lg:bg-gray-100 lg:ring-0 dark:lg:bg-gray-800':
-          isSelected,
+        'bg-gray-50 dark:bg-gray-800/60': isSelected,
       }"
     >
       <!-- Discussion row -->
@@ -277,7 +276,7 @@ const revealSensitiveContent = () => {
           >
             <div class="flex items-start gap-2">
               <span
-                class="text-base font-semibold leading-snug text-gray-900 dark:text-gray-100"
+                class="text-[15px] font-semibold leading-snug text-gray-900 dark:text-gray-100"
               >
                 <HighlightedSearchTerms
                   :text="title"
@@ -299,7 +298,7 @@ const revealSensitiveContent = () => {
           >
             <div class="flex items-start gap-2">
               <span
-                class="text-base font-semibold leading-snug text-gray-900 dark:text-gray-100"
+                class="text-[15px] font-semibold leading-snug text-gray-900 dark:text-gray-100"
               >
                 <HighlightedSearchTerms
                   :text="title"
@@ -428,7 +427,7 @@ const revealSensitiveContent = () => {
           v-if="
             discussion && (discussion.body || discussion.Album) && isExpanded
           "
-          class="my-2 w-full max-w-full overflow-hidden border-l-2 border-gray-300 bg-gray-100 pt-2 dark:border-gray-700 dark:bg-gray-900"
+          class="my-2 w-full max-w-full overflow-hidden border-l-2 border-gray-200 bg-gray-50 pt-2 dark:border-gray-700 dark:bg-gray-900"
         >
           <!-- Sensitive content concealment box -->
           <div
