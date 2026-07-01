@@ -210,9 +210,9 @@ const revealSensitiveContent = () => {
 </script>
 
 <template>
-  <li class="mb-2 flex border-gray-800 pt-2 md:rounded-lg">
+  <li class="flex border-b border-gray-200 py-3 last:border-b-0 dark:border-gray-800">
     <div
-      class="flex w-full min-w-0 flex-row justify-start gap-4 overflow-hidden rounded-lg"
+      class="flex w-full min-w-0 flex-row justify-start gap-4 overflow-hidden"
     >
       <div v-if="discussion" class="w-full min-w-0 flex-col">
         <div class="flex min-w-0 gap-3">
@@ -246,7 +246,7 @@ const revealSensitiveContent = () => {
                         ? 'text-sm'
                         : fontSize === 'medium'
                           ? 'text-base'
-                          : 'text-lg',
+                          : 'text-[15px]',
                     ]"
                   />
                 </span>
@@ -414,7 +414,7 @@ const revealSensitiveContent = () => {
               <template v-if="shouldShowContent">
                 <div
                   v-if="discussion.body"
-                  class="my-2 border-l bg-gray-100 py-2 pl-4 pr-2 dark:border-gray-700 dark:bg-gray-900"
+                  class="my-2 border-l border-gray-200 bg-gray-50 py-2 pl-4 pr-2 dark:border-gray-700 dark:bg-gray-900"
                 >
                   <MarkdownPreview
                     :text="discussion.body"
