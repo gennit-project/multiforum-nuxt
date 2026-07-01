@@ -74,11 +74,11 @@ const isOnMapPage = computed(() => {
 
 <template>
   <nav
-    class="z-20 h-14 border-b border-b-gray-200 bg-gray-100 pr-4 dark:border-b-gray-600 dark:bg-gray-900 lg:ml-20"
+    class="relative z-20 h-16 border-b border-b-gray-200 bg-gray-100 pr-4 dark:border-b-gray-600 dark:bg-gray-900 lg:ml-20"
     :class="[isOnMapPage ? 'fixed w-full lg:w-[calc(100%-5rem)]' : '']"
     aria-label="Top navigation"
   >
-    <div class="flex items-center justify-between py-2 pl-12 pr-2 lg:pl-2">
+    <div class="flex h-full items-center justify-between pl-12 pr-2 lg:pl-2">
       <div class="flex min-w-0 items-center overflow-hidden">
         <HamburgerMenuButton
           v-if="!sideNavIsOpenVar"
@@ -87,10 +87,10 @@ const isOnMapPage = computed(() => {
           @click="$emit('toggleDropdown')"
         />
 
-        <div class="ml-2 flex min-w-0 items-baseline space-x-1 text-sm">
+        <div class="ml-2 flex min-w-0 items-center gap-1 text-sm">
           <nuxt-link to="/" class="flex items-center gap-1">
             <h1
-              class="logo-font text-lg font-bold text-gray-900 dark:text-white"
+              class="logo-font relative top-[2px] text-lg font-bold leading-tight text-gray-900 dark:text-white"
             >
               {{ config.serverDisplayName }}
             </h1>
@@ -201,9 +201,10 @@ const isOnMapPage = computed(() => {
 
 <style scoped>
 .fixed-menu-button {
-  position: fixed; /* Makes the button stay in the same place on the screen */
-  top: 6px; /* Distance from the top of the viewport */
-  left: 10px; /* Distance from the left of the viewport */
-  z-index: 20; /* Ensures the button is above other content */
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  z-index: 20;
+  transform: translateY(-50%);
 }
 </style>

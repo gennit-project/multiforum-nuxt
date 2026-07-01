@@ -227,6 +227,7 @@ function handleBlockedReaction() {
         :comment-id="commentData.id"
         :is-permalinked="isPermalinked"
         :is-marked-as-answer="isMarkedAsAnswer"
+        :transparent-background="isPermalinked"
         :interaction-disabled="hasReactionSuspension"
         @toggle-emoji-picker="toggleEmojiPicker"
         @blocked-action="handleBlockedReaction"

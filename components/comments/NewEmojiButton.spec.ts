@@ -13,10 +13,11 @@ vi.mock('nuxt/app', () => ({
 }));
 
 describe('NewEmojiButton', () => {
-  const mountWrapper = () =>
+  const mountWrapper = (props: Record<string, unknown> = {}) =>
     mount(NewEmojiButton, {
       props: {
         interactionDisabled: true,
+        ...props,
       },
       global: {
         stubs: {
@@ -29,9 +30,10 @@ describe('NewEmojiButton', () => {
             `,
           },
           VoteButton: {
+            name: 'VoteButton',
             template:
-              '<button data-testid="emoji-button" @click="$emit(\'vote\')"></button>',
-            props: ['buttonProps', 'testId', 'showCount', 'tooltipText', 'isPermalinked', 'isMarkedAsAnswer', 'class'],
+              '<button data-testid="emoji-button" :data-classes="$props.class" :data-transparent="String($props.transparentBackground)" @click="$emit(\'vote\')"></button>',
+            props: ['buttonProps', 'testId', 'showCount', 'tooltipText', 'isPermalinked', 'isMarkedAsAnswer', 'transparentBackground', 'class'],
             emits: ['vote'],
           },
           EmojiPicker: { template: '<div data-testid="emoji-picker"></div>' },
@@ -54,5 +56,14 @@ describe('NewEmojiButton', () => {
     await wrapper.get('[data-testid="emoji-button"]').trigger('click');
 
     expect(wrapper.emitted('toggleEmojiPicker')).toBeUndefined();
+  });
+
+  it('uses transparent vote button styling when requested', () => {
+    const wrapper = mountWrapper({
+      interactionDisabled: false,
+      transparentBackground: true,
+    });
+
+    expect(wrapper.get('[data-testid="emoji-button"]').attributes('data-transparent')).toBe('true');
   });
 });

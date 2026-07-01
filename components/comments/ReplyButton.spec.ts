@@ -29,4 +29,11 @@ describe('ReplyButton', () => {
       wrapper.get('[data-testid="reply-comment-button"]').classes().join(' ')
     ).toContain('bg-green-100');
   });
+
+  it('uses transparent styling when the comment is permalinked', () => {
+    const wrapper = mountButton({ isPermalinked: true });
+    expect(
+      wrapper.get('[data-testid="reply-comment-button"]').classes().join(' ')
+    ).toContain('bg-black/5');
+  });
 });
