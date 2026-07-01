@@ -37,6 +37,14 @@ describe('TextButtonDropdown', () => {
     expect(wrapper.find('sort-icon-stub').exists()).toBe(true);
   });
 
+  it('uses the dark hover background variant on the trigger button', () => {
+    const wrapper = mountDropdown({ label: 'Sort' });
+
+    expect(wrapper.find('.menu-button').attributes('class')).toContain(
+      'dark:hover:bg-gray-800'
+    );
+  });
+
   it('emits clickedItem with the value', async () => {
     const wrapper = mountDropdown({ items: [{ value: 'top', label: 'Top' }] });
 
