@@ -1,4 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
+import { defineComponent } from 'vue';
+import { flushPromises } from '@vue/test-utils';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createMockRoute, createMockRouter } from '@/tests/utils/mockRouter';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
@@ -11,6 +13,14 @@ vi.mock('nuxt/app', () => ({
   useCookie: () => ({ value: 'dark' }),
   useRoute: () => createMockRoute(),
   useRouter: () => createMockRouter(),
+}));
+
+vi.mock('vue-easy-lightbox', () => ({
+  default: defineComponent({
+    name: 'VueEasyLightbox',
+    props: ['visible', 'imgs', 'index'],
+    template: '<div data-testid="vue-easy-lightbox-stub" />',
+  }),
 }));
 
 // Stub WarningModal so we can read its `open` prop and emit its events without
@@ -28,7 +38,6 @@ const mountPreview = (props: Record<string, unknown>) =>
     global: {
       stubs: {
         MarkdownRenderer: true,
-        VueEasyLightbox: true,
         WarningModal: WarningModalStub,
       },
     },
@@ -86,11 +95,9 @@ describe('MarkdownPreview', () => {
     wrapper.element.appendChild(img);
 
     img.click();
-    await wrapper.vm.$nextTick();
+    await flushPromises();
 
-    expect(wrapper.findComponent({ name: 'VueEasyLightbox' }).props('visible')).toBe(
-      false
-    );
+    expect(warningModal(wrapper).props('open')).toBe(false);
   });
 
   describe('show more / show less', () => {
