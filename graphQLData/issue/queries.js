@@ -354,8 +354,8 @@ export const GET_CLOSED_ISSUES_BY_CHANNEL = gql`
 `;
 
 export const GET_ISSUES = gql`
-  query getIssues($issueWhere: IssueWhere) {
-    issues(where: $issueWhere, options: { sort: { createdAt: DESC } }) {
+  query getIssues($issueWhere: IssueWhere, $issueSort: [IssueSort!]) {
+    issues(where: $issueWhere, options: { sort: $issueSort }) {
       id
       issueNumber
       title

@@ -4,11 +4,13 @@ import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
 import IssueFilterBar from '@/components/admin/IssueFilterBar.vue';
+import { issueSortValues } from '@/utils/issueSortOptions';
 
 const h = vi.hoisted(() => ({
   query: {
     showOnlyServerRuleViolations: '',
     searchInput: '',
+    sort: '',
   } as Record<string, string>,
   routerPush: vi.fn(),
   routerReplace: vi.fn(),
@@ -74,6 +76,8 @@ const mountWith = async (opts: { loading?: boolean; issues?: unknown[] }) => {
             'startDate',
             'endDate',
             'showOnlyServerRuleViolations',
+            'selectedSort',
+            'selectedSortLabel',
           ],
           emits: [
             'update-search-input',
@@ -81,6 +85,7 @@ const mountWith = async (opts: { loading?: boolean; issues?: unknown[] }) => {
             'update:startDate',
             'update:endDate',
             'update:showOnlyServerRuleViolations',
+            'update:sort',
           ],
           template: '<div class="issue-filter-bar" />',
         },
@@ -100,6 +105,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   h.query.showOnlyServerRuleViolations = '';
   h.query.searchInput = '';
+  h.query.sort = '';
   delete h.query.startDate;
   delete h.query.endDate;
   delete h.query.channels;
@@ -146,6 +152,28 @@ describe('admin server issues index page', () => {
     });
   });
 
+  it('passes the default sort state to the filter bar', async () => {
+    const wrapper = await mountWith({ issues: [] });
+    expect(wrapper.getComponent(IssueFilterBar).props('selectedSort')).toBe(
+      issueSortValues.NEWEST
+    );
+    expect(wrapper.getComponent(IssueFilterBar).props('selectedSortLabel')).toBe(
+      'Newest'
+    );
+  });
+
+  it('updates the route filters when the sort changes', async () => {
+    const wrapper = await mountWith({ issues: [] });
+    await wrapper
+      .getComponent(IssueFilterBar)
+      .vm.$emit('update:sort', issueSortValues.OLDEST);
+    expect(h.updateFilters).toHaveBeenCalledWith({
+      router: { push: h.routerPush, replace: h.routerReplace },
+      route: { params: { forumId: '' }, path: '/admin/issues', query: h.query },
+      params: { sort: issueSortValues.OLDEST },
+    });
+  });
+
   it('renders an item per issue', async () => {
     const wrapper = await mountWith({ issues: [{ id: 'i1' }, { id: 'i2' }] });
     expect(wrapper.findAllComponents(ModIssueListItem)).toHaveLength(2);
@@ -184,6 +212,14 @@ describe('admin server issues index page', () => {
     });
   });
 
+  it('passes the selected sort into the issues query variables', async () => {
+    h.query.sort = issueSortValues.OLDEST;
+    await mountWith({ issues: [] });
+    expect(mockedUseQuery.mock.calls[0][1].value.issueSort).toEqual([
+      { createdAt: 'ASC' },
+    ]);
+  });
+
   it('omits date bounds when no date filters are set', async () => {
     await mountWith({ issues: [] });
     expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).not.toHaveProperty(
@@ -212,5 +248,29 @@ describe('admin server issues index page', () => {
         endDate: '2026-07-01',
       },
     });
+  });
+
+  it('sorts issues by most reports when selected', async () => {
+    h.query.sort = issueSortValues.MOST_REPORTS;
+    const wrapper = await mountWith({
+      issues: [
+        {
+          id: 'a',
+          ActivityFeedAggregate: { count: 1 },
+          createdAt: '2026-06-01T00:00:00.000Z',
+        },
+        {
+          id: 'b',
+          ActivityFeedAggregate: { count: 3 },
+          createdAt: '2026-05-01T00:00:00.000Z',
+        },
+      ],
+    });
+
+    expect(
+      wrapper
+        .findAllComponents(ModIssueListItem)
+        .map((item) => item.props('issue').id)
+    ).toEqual(['b', 'a']);
   });
 });

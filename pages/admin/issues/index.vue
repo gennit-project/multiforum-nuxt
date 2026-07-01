@@ -14,6 +14,11 @@ import {
 import { getServerIssueFilterValuesFromParams } from '@/utils/getServerIssueFilterValuesFromParams';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
+import {
+  getIssueGraphqlSort,
+  getIssueSortLabel,
+  sortIssuesBySelection,
+} from '@/utils/issueSortOptions';
 
 const route = useRoute();
 const router = useRouter();
@@ -35,17 +40,20 @@ const showOnlyServerRuleViolations = ref(
 const searchInput = ref(initialFilterValues.searchInput);
 const startDate = ref(initialFilterValues.startDate);
 const endDate = ref(initialFilterValues.endDate);
+const selectedSort = ref(initialFilterValues.sort);
 const channelLabel = computed(() => getChannelLabel(selectedChannels.value));
+const selectedSortLabel = computed(() => getIssueSortLabel(selectedSort.value));
 
-const variables = computed(() =>
-  buildServerIssuesWhere({
+const variables = computed(() => ({
+  ...buildServerIssuesWhere({
     searchInput: searchInput.value,
     selectedChannels: selectedChannels.value,
     startDate: startDate.value,
     endDate: endDate.value,
     showOnlyServerRuleViolations: showOnlyServerRuleViolations.value,
-  })
-);
+  }),
+  issueSort: getIssueGraphqlSort(selectedSort.value),
+}));
 
 const {
   result: getIssuesResult,
@@ -60,7 +68,10 @@ const issues = computed<Issue[]>(() => {
   if (getIssuesLoading.value || getIssuesError.value) {
     return [];
   }
-  return getIssuesResult.value?.issues || [];
+  return sortIssuesBySelection(
+    getIssuesResult.value?.issues || [],
+    selectedSort.value
+  );
 });
 
 const updateShowOnlyServerRuleViolations = (value: boolean) => {
@@ -79,6 +90,14 @@ const updateSearchInput = (value: string) => {
     router,
     route,
     params: { searchInput: value },
+  });
+};
+
+const updateSort = (value: string) => {
+  updateFilters({
+    router,
+    route,
+    params: { sort: value },
   });
 };
 
@@ -119,6 +138,7 @@ watch(
     showOnlyServerRuleViolations.value =
       nextFilterValues.showOnlyServerRuleViolations;
     searchInput.value = nextFilterValues.searchInput;
+    selectedSort.value = nextFilterValues.sort;
 
     if (nextFilterValues.startDate !== startDate.value) {
       startDate.value = nextFilterValues.startDate;
@@ -158,8 +178,11 @@ watch([startDate, endDate], ([nextStartDate, nextEndDate]) => {
       :start-date="startDate"
       :end-date="endDate"
       :show-only-server-rule-violations="showOnlyServerRuleViolations"
+      :selected-sort="selectedSort"
+      :selected-sort-label="selectedSortLabel"
       @update-search-input="updateSearchInput"
       @toggle-selected-channel="toggleSelectedChannel"
+      @update:sort="updateSort"
       @update:start-date="startDate = $event"
       @update:end-date="endDate = $event"
       @update:show-only-server-rule-violations="

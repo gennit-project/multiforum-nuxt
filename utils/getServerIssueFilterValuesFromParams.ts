@@ -3,6 +3,11 @@ import {
   getDefaultServerRuleViolationsFilter,
   isDateInputValue,
 } from '@/utils/serverIssueFilters';
+import {
+  defaultIssueSort,
+  getIssueSortFromQuery,
+  type IssueSortValue,
+} from '@/utils/issueSortOptions';
 
 type GetServerIssueFilterValuesInput = {
   route: Pick<RouteLocationNormalized, 'query'>;
@@ -14,6 +19,7 @@ export type ServerIssueFilterValues = {
   startDate: string;
   endDate: string;
   showOnlyServerRuleViolations: boolean;
+  sort: IssueSortValue;
 };
 
 const getQueryString = (value: unknown) => {
@@ -29,6 +35,7 @@ export const getServerIssueFilterValuesFromParams = (
     startDate: '',
     endDate: '',
     showOnlyServerRuleViolations: true,
+    sort: defaultIssueSort,
   };
 
   for (const key in input.route?.query || {}) {
@@ -63,6 +70,9 @@ export const getServerIssueFilterValuesFromParams = (
       case 'showOnlyServerRuleViolations':
         cleanedValues.showOnlyServerRuleViolations =
           getDefaultServerRuleViolationsFilter(val);
+        break;
+      case 'sort':
+        cleanedValues.sort = getIssueSortFromQuery(input.route.query);
         break;
     }
   }

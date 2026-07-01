@@ -3,6 +3,8 @@ import SearchBar from '@/components/SearchBar.vue';
 import FilterChip from '@/components/FilterChip.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import SearchableForumList from '@/components/channel/SearchableForumList.vue';
+import TextButtonDropdown from '@/components/TextButtonDropdown.vue';
+import { issueSortOptions, type IssueSortValue } from '@/utils/issueSortOptions';
 
 defineProps<{
   searchInput: string;
@@ -11,6 +13,8 @@ defineProps<{
   startDate: string;
   endDate: string;
   showOnlyServerRuleViolations: boolean;
+  selectedSort: IssueSortValue;
+  selectedSortLabel: string;
 }>();
 
 const emit = defineEmits<{
@@ -19,6 +23,7 @@ const emit = defineEmits<{
   'update:endDate': [value: string];
   'toggle-selected-channel': [channel: string];
   'update:showOnlyServerRuleViolations': [value: boolean];
+  'update:sort': [value: string];
 }>();
 </script>
 
@@ -68,6 +73,12 @@ const emit = defineEmits<{
       </label>
     </div>
     <div class="flex flex-wrap items-center justify-end gap-2">
+      <TextButtonDropdown
+        :label="selectedSortLabel"
+        :items="issueSortOptions"
+        :show-sort-icon="true"
+        @clicked-item="emit('update:sort', $event)"
+      />
       <FilterChip
         :label="channelLabel"
         :highlighted="selectedChannels.length > 0"

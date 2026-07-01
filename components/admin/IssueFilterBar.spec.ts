@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import IssueFilterBar from '@/components/admin/IssueFilterBar.vue';
 import SearchBar from '@/components/SearchBar.vue';
+import { issueSortValues } from '@/utils/issueSortOptions';
 
 const buildWrapper = () => {
   return mount(IssueFilterBar, {
@@ -12,9 +13,17 @@ const buildWrapper = () => {
       startDate: '2026-05-01',
       endDate: '2026-07-01',
       showOnlyServerRuleViolations: true,
+      selectedSort: issueSortValues.NEWEST,
+      selectedSortLabel: 'Newest',
     },
     global: {
       stubs: {
+        TextButtonDropdown: {
+          name: 'TextButtonDropdown',
+          props: ['label', 'items', 'showSortIcon'],
+          emits: ['clicked-item'],
+          template: '<button class="sort-dropdown" @click="$emit(\'clicked-item\', \'oldest\')" />',
+        },
         FilterChip: {
           name: 'FilterChip',
           template: '<div><slot name="icon" /><slot name="content" /></div>',
@@ -69,5 +78,13 @@ describe('IssueFilterBar', () => {
     expect(wrapper.emitted('update:showOnlyServerRuleViolations')).toEqual([
       [false],
     ]);
+  });
+
+  it('emits sort updates', async () => {
+    const wrapper = buildWrapper();
+
+    await wrapper.get('.sort-dropdown').trigger('click');
+
+    expect(wrapper.emitted('update:sort')).toEqual([[issueSortValues.OLDEST]]);
   });
 });

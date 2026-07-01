@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { getServerIssueFilterValuesFromParams } from '@/utils/getServerIssueFilterValuesFromParams';
 import type { RouteLocationNormalized } from 'vue-router';
+import { issueSortValues } from '@/utils/issueSortOptions';
 
 function createMockRoute(
   query: Record<string, unknown> = {}
@@ -20,6 +21,7 @@ describe('getServerIssueFilterValuesFromParams', () => {
       startDate: '',
       endDate: '',
       showOnlyServerRuleViolations: true,
+      sort: issueSortValues.NEWEST,
     });
   });
 
@@ -87,5 +89,15 @@ describe('getServerIssueFilterValuesFromParams', () => {
         }),
       }).showOnlyServerRuleViolations
     ).toBe(true);
+  });
+
+  it('parses the sort value from query params', () => {
+    expect(
+      getServerIssueFilterValuesFromParams({
+        route: createMockRoute({
+          sort: issueSortValues.OLDEST,
+        }),
+      }).sort
+    ).toBe(issueSortValues.OLDEST);
   });
 });
