@@ -12,11 +12,9 @@ import SearchableForumList from '@/components/channel/SearchableForumList.vue';
 import { getChannelLabel } from '@/utils';
 import { updateFilters } from '@/utils/routerUtils';
 import {
-  getDefaultServerRuleViolationsFilter,
   buildServerIssuesWhere,
-  isDateInputValue,
 } from '@/utils/serverIssueFilters';
-import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
+import { getServerIssueFilterValuesFromParams } from '@/utils/getServerIssueFilterValuesFromParams';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 
@@ -24,17 +22,7 @@ const route = useRoute();
 const router = useRouter();
 const uiStore = useUIStore();
 const { selectedIssueNumber } = storeToRefs(uiStore);
-const { selectedChannels } = useSelectedChannelsFromQuery();
-const toDateInputValue = (date: Date) =>
-  date.toISOString().split('T')[0] || '';
-const getQueryString = (value: unknown) => {
-  return typeof value === 'string' && value ? value : null;
-};
-const today = new Date();
-const defaultStart = new Date(today);
-defaultStart.setDate(today.getDate() - 30);
-const defaultStartDate = toDateInputValue(defaultStart);
-const defaultEndDate = toDateInputValue(today);
+const initialFilterValues = getServerIssueFilterValuesFromParams({ route });
 
 const channelId = computed(() => {
   if (typeof route.params.forumId !== 'string') {
@@ -43,22 +31,13 @@ const channelId = computed(() => {
   return route.params.forumId;
 });
 
+const selectedChannels = ref(initialFilterValues.selectedChannels);
 const showOnlyServerRuleViolations = ref(
-  getDefaultServerRuleViolationsFilter(route.query.showOnlyServerRuleViolations)
+  initialFilterValues.showOnlyServerRuleViolations
 );
-const searchInput = ref(
-  typeof route.query.searchInput === 'string' ? route.query.searchInput : ''
-);
-const startDate = ref(
-  isDateInputValue(getQueryString(route.query.startDate))
-    ? getQueryString(route.query.startDate) || defaultStartDate
-    : defaultStartDate
-);
-const endDate = ref(
-  isDateInputValue(getQueryString(route.query.endDate))
-    ? getQueryString(route.query.endDate) || defaultEndDate
-    : defaultEndDate
-);
+const searchInput = ref(initialFilterValues.searchInput);
+const startDate = ref(initialFilterValues.startDate);
+const endDate = ref(initialFilterValues.endDate);
 const channelLabel = computed(() => getChannelLabel(selectedChannels.value));
 
 const variables = computed(() =>
@@ -137,26 +116,20 @@ const handleSelectIssue = (payload: {
 watch(
   () => route.query,
   () => {
-    if (route.query) {
-      const nextStartDate = getQueryString(route.query.startDate);
-      const nextEndDate = getQueryString(route.query.endDate);
+    const nextFilterValues = getServerIssueFilterValuesFromParams({ route });
 
-      showOnlyServerRuleViolations.value =
-        getDefaultServerRuleViolationsFilter(
-          route.query.showOnlyServerRuleViolations
-        );
-      searchInput.value =
-        typeof route.query.searchInput === 'string'
-          ? route.query.searchInput
-          : '';
-      if (isDateInputValue(nextStartDate) && nextStartDate !== startDate.value) {
-        startDate.value = nextStartDate;
-      }
-      if (isDateInputValue(nextEndDate) && nextEndDate !== endDate.value) {
-        endDate.value = nextEndDate;
-      }
-      refetch(variables.value);
+    selectedChannels.value = nextFilterValues.selectedChannels;
+    showOnlyServerRuleViolations.value =
+      nextFilterValues.showOnlyServerRuleViolations;
+    searchInput.value = nextFilterValues.searchInput;
+
+    if (nextFilterValues.startDate !== startDate.value) {
+      startDate.value = nextFilterValues.startDate;
     }
+    if (nextFilterValues.endDate !== endDate.value) {
+      endDate.value = nextFilterValues.endDate;
+    }
+    refetch(variables.value);
   }
 );
 
@@ -181,7 +154,7 @@ watch([startDate, endDate], ([nextStartDate, nextEndDate]) => {
 
 <template>
   <div>
-    <div class="flex flex-col gap-3 pb-4">
+    <div class="flex flex-col gap-3 px-4 pb-4">
       <SearchBar
         :initial-value="searchInput"
         :search-placeholder="'Search issues'"

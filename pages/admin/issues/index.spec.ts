@@ -8,8 +8,6 @@ const h = vi.hoisted(() => ({
   query: {
     showOnlyServerRuleViolations: '',
     searchInput: '',
-    startDate: '2026-05-27',
-    endDate: '2026-06-26',
   } as Record<string, string>,
   routerPush: vi.fn(),
   routerReplace: vi.fn(),
@@ -88,8 +86,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   h.query.showOnlyServerRuleViolations = '';
   h.query.searchInput = '';
-  h.query.startDate = '2026-05-27';
-  h.query.endDate = '2026-06-26';
+  delete h.query.startDate;
+  delete h.query.endDate;
   delete h.query.channels;
   h.selectedIssueNumber.value = null;
 });
@@ -167,10 +165,22 @@ describe('admin server issues index page', () => {
   });
 
   it('passes the selected date range into the issues query variables', async () => {
+    h.query.startDate = '2026-05-27';
+    h.query.endDate = '2026-06-26';
     await mountWith({ issues: [] });
     expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).toMatchObject({
       createdAt_GTE: '2026-05-27T00:00:00.000Z',
       createdAt_LTE: '2026-06-26T23:59:59.999Z',
     });
+  });
+
+  it('omits date bounds when no date filters are set', async () => {
+    await mountWith({ issues: [] });
+    expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).not.toHaveProperty(
+      'createdAt_GTE'
+    );
+    expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).not.toHaveProperty(
+      'createdAt_LTE'
+    );
   });
 });
