@@ -9,6 +9,10 @@ import TagComponent from '@/components/TagComponent.vue';
 type Issue = GeneratedIssue & {
   issueNumber: number;
   locked?: boolean | null;
+  channelUniqueName?: string | null;
+  channelIconURL?: string | null;
+  authorName?: string | null;
+  reportCount?: number | null;
 };
 
 const props = defineProps({
@@ -39,6 +43,10 @@ const formatDate = (date: string) => {
 };
 
 const issueAuthorName = (issue: Issue) => {
+  if (issue.authorName) {
+    return issue.authorName;
+  }
+
   if (issue.Author?.__typename === 'ModerationProfile') {
     return issue.Author.displayName || '[Deleted]';
   }
@@ -51,7 +59,8 @@ const issueAuthorName = (issue: Issue) => {
 };
 
 const reportCount = computed(() => {
-  const count = props.issue?.ActivityFeedAggregate?.count;
+  const count =
+    props.issue?.reportCount ?? props.issue?.ActivityFeedAggregate?.count;
   return typeof count === 'number' ? count : null;
 });
 
@@ -61,11 +70,13 @@ const reportCountLabel = computed(() => {
 });
 
 const handleSelect = () => {
-  if (!props.issue?.issueNumber || !props.issue.Channel?.uniqueName) return;
+  const channelId =
+    props.issue.Channel?.uniqueName || props.issue.channelUniqueName;
+  if (!props.issue?.issueNumber || !channelId) return;
   emit('select', {
     issueNumber: props.issue.issueNumber,
     title: props.issue.title || '',
-    channelId: props.issue.Channel.uniqueName,
+    channelId,
   });
 };
 
@@ -84,11 +95,15 @@ const isRelatedToWiki = computed(() => {
 });
 
 const relatedChannels = computed(() => {
-  if (props.issue?.Channel?.uniqueName) {
+  const uniqueName =
+    props.issue?.Channel?.uniqueName || props.issue?.channelUniqueName;
+
+  if (uniqueName) {
     return [
       {
-        uniqueName: props.issue.Channel.uniqueName,
-        iconURL: props.issue.Channel.channelIconURL || '',
+        uniqueName,
+        iconURL:
+          props.issue.Channel?.channelIconURL || props.issue.channelIconURL || '',
       },
     ];
   }
@@ -125,7 +140,10 @@ const relatedChannelNames = computed(() =>
       />
 
       <div class="flex-col">
-        <span v-if="issue.Channel" class="flex flex-wrap items-center gap-2">
+        <span
+          v-if="issue.Channel || issue.channelUniqueName"
+          class="flex flex-wrap items-center gap-2"
+        >
           <nuxt-link
             v-if="issue.issueNumber"
             class="hover:underline dark:text-gray-200 lg:hidden"
@@ -133,7 +151,7 @@ const relatedChannelNames = computed(() =>
               name: 'forums-forumId-issues-issueNumber',
               params: {
                 issueNumber: issue.issueNumber,
-                forumId: issue.Channel?.uniqueName,
+                forumId: issue.Channel?.uniqueName || issue.channelUniqueName,
               },
             }"
             @click="handleSelect"
@@ -220,7 +238,7 @@ const relatedChannelNames = computed(() =>
           {{
             `Opened on ${formatDate(issue.createdAt)} by ${issueAuthorName(
               issue
-            )} in ${issue.Channel?.uniqueName || '[Deleted]'}`
+            )} in ${issue.Channel?.uniqueName || issue.channelUniqueName || '[Deleted]'}`
           }}
         </div>
       </div>

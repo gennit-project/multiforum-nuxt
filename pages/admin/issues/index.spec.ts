@@ -58,7 +58,7 @@ const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 const mountWith = async (opts: { loading?: boolean; issues?: unknown[] }) => {
   const { loading = false, issues = [] } = opts;
   mockedUseQuery.mockReturnValue({
-    result: ref({ issues }),
+    result: ref({ getSiteWideIssueList: { issues } }),
     error: ref(null),
     loading: ref(loading),
     refetch: h.refetch,
@@ -197,37 +197,31 @@ describe('admin server issues index page', () => {
   it('passes the selected channel filter into the issues query variables', async () => {
     h.query.channels = 'announcements';
     await mountWith({ issues: [] });
-    expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).toMatchObject({
-      channelUniqueName_IN: ['announcements'],
-    });
+    expect(mockedUseQuery.mock.calls[0][1].value.selectedChannels).toEqual([
+      'announcements',
+    ]);
   });
 
   it('passes the selected date range into the issues query variables', async () => {
     h.query.startDate = '2026-05-27';
     h.query.endDate = '2026-06-26';
     await mountWith({ issues: [] });
-    expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).toMatchObject({
-      createdAt_GTE: '2026-05-27T00:00:00.000Z',
-      createdAt_LTE: '2026-06-26T23:59:59.999Z',
-    });
+    expect(mockedUseQuery.mock.calls[0][1].value.startDate).toBe('2026-05-27');
+    expect(mockedUseQuery.mock.calls[0][1].value.endDate).toBe('2026-06-26');
   });
 
   it('passes the selected sort into the issues query variables', async () => {
     h.query.sort = issueSortValues.OLDEST;
     await mountWith({ issues: [] });
-    expect(mockedUseQuery.mock.calls[0][1].value.issueSort).toEqual([
-      { createdAt: 'ASC' },
-    ]);
+    expect(mockedUseQuery.mock.calls[0][1].value.options).toEqual({
+      sort: issueSortValues.OLDEST,
+    });
   });
 
   it('omits date bounds when no date filters are set', async () => {
     await mountWith({ issues: [] });
-    expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).not.toHaveProperty(
-      'createdAt_GTE'
-    );
-    expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).not.toHaveProperty(
-      'createdAt_LTE'
-    );
+    expect(mockedUseQuery.mock.calls[0][1].value.startDate).toBe(null);
+    expect(mockedUseQuery.mock.calls[0][1].value.endDate).toBe(null);
   });
 
   it('updates the route filters when the start and end dates change', async () => {
@@ -250,27 +244,12 @@ describe('admin server issues index page', () => {
     });
   });
 
-  it('sorts issues by most reports when selected', async () => {
+  it('passes most reports through to the backend sort option', async () => {
     h.query.sort = issueSortValues.MOST_REPORTS;
-    const wrapper = await mountWith({
-      issues: [
-        {
-          id: 'a',
-          ActivityFeedAggregate: { count: 1 },
-          createdAt: '2026-06-01T00:00:00.000Z',
-        },
-        {
-          id: 'b',
-          ActivityFeedAggregate: { count: 3 },
-          createdAt: '2026-05-01T00:00:00.000Z',
-        },
-      ],
-    });
+    await mountWith({ issues: [] });
 
-    expect(
-      wrapper
-        .findAllComponents(ModIssueListItem)
-        .map((item) => item.props('issue').id)
-    ).toEqual(['b', 'a']);
+    expect(mockedUseQuery.mock.calls[0][1].value.options).toEqual({
+      sort: issueSortValues.MOST_REPORTS,
+    });
   });
 });

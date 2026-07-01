@@ -1,24 +1,17 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
 import type { Issue } from '@/__generated__/graphql';
-import { GET_ISSUES } from '@/graphQLData/issue/queries';
+import { GET_SITE_WIDE_ISSUE_LIST } from '@/graphQLData/issue/queries';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
 import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
 import IssueFilterBar from '@/components/admin/IssueFilterBar.vue';
 import { getChannelLabel } from '@/utils';
 import { updateFilters } from '@/utils/routerUtils';
-import {
-  buildServerIssuesWhere,
-} from '@/utils/serverIssueFilters';
 import { getServerIssueFilterValuesFromParams } from '@/utils/getServerIssueFilterValuesFromParams';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
-import {
-  getIssueGraphqlSort,
-  getIssueSortLabel,
-  sortIssuesBySelection,
-} from '@/utils/issueSortOptions';
+import { getIssueSortLabel } from '@/utils/issueSortOptions';
 
 const route = useRoute();
 const router = useRouter();
@@ -45,14 +38,15 @@ const channelLabel = computed(() => getChannelLabel(selectedChannels.value));
 const selectedSortLabel = computed(() => getIssueSortLabel(selectedSort.value));
 
 const variables = computed(() => ({
-  ...buildServerIssuesWhere({
-    searchInput: searchInput.value,
-    selectedChannels: selectedChannels.value,
-    startDate: startDate.value,
-    endDate: endDate.value,
-    showOnlyServerRuleViolations: showOnlyServerRuleViolations.value,
-  }),
-  issueSort: getIssueGraphqlSort(selectedSort.value),
+  searchInput: searchInput.value,
+  selectedChannels: selectedChannels.value,
+  startDate: startDate.value || null,
+  endDate: endDate.value || null,
+  showOnlyServerRuleViolations: showOnlyServerRuleViolations.value,
+  isOpen: true,
+  options: {
+    sort: selectedSort.value,
+  },
 }));
 
 const {
@@ -60,18 +54,22 @@ const {
   error: getIssuesError,
   loading: getIssuesLoading,
   refetch,
-} = useQuery(GET_ISSUES, variables, {
+} = useQuery(GET_SITE_WIDE_ISSUE_LIST, variables, {
   fetchPolicy: 'cache-first',
 });
 
-const issues = computed<Issue[]>(() => {
+type SiteWideIssueListItem = Issue & {
+  channelUniqueName?: string | null;
+  channelIconURL?: string | null;
+  authorName?: string | null;
+  reportCount?: number | null;
+};
+
+const issues = computed<SiteWideIssueListItem[]>(() => {
   if (getIssuesLoading.value || getIssuesError.value) {
     return [];
   }
-  return sortIssuesBySelection(
-    getIssuesResult.value?.issues || [],
-    selectedSort.value
-  );
+  return getIssuesResult.value?.getSiteWideIssueList?.issues || [];
 });
 
 const updateShowOnlyServerRuleViolations = (value: boolean) => {

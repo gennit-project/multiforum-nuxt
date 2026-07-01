@@ -354,8 +354,8 @@ export const GET_CLOSED_ISSUES_BY_CHANNEL = gql`
 `;
 
 export const GET_ISSUES = gql`
-  query getIssues($issueWhere: IssueWhere, $issueSort: [IssueSort!]) {
-    issues(where: $issueWhere, options: { sort: $issueSort }) {
+  query getIssues($issueWhere: IssueWhere) {
+    issues(where: $issueWhere, options: { sort: { createdAt: DESC } }) {
       id
       issueNumber
       title
@@ -392,6 +392,53 @@ export const GET_ISSUES = gql`
       }
       ActivityFeedAggregate(where: { actionType: "report" }) {
         count
+      }
+    }
+  }
+`;
+
+export const GET_SITE_WIDE_ISSUE_LIST = gql`
+  query getSiteWideIssueList(
+    $searchInput: String
+    $selectedChannels: [String!]
+    $startDate: String
+    $endDate: String
+    $showOnlyServerRuleViolations: Boolean
+    $isOpen: Boolean!
+    $options: IssueListOptions
+  ) {
+    getSiteWideIssueList(
+      searchInput: $searchInput
+      selectedChannels: $selectedChannels
+      startDate: $startDate
+      endDate: $endDate
+      showOnlyServerRuleViolations: $showOnlyServerRuleViolations
+      isOpen: $isOpen
+      options: $options
+    ) {
+      aggregateIssueCount
+      issues {
+        id
+        issueNumber
+        title
+        body
+        isOpen
+        createdAt
+        updatedAt
+        relatedCommentId
+        relatedDiscussionId
+        relatedEventId
+        relatedImageId
+        relatedWikiPageId
+        relatedWikiRevisionId
+        relatedUsername
+        flaggedServerRuleViolation
+        locked
+        lockReason
+        channelUniqueName
+        channelIconURL
+        authorName
+        reportCount
       }
     }
   }
