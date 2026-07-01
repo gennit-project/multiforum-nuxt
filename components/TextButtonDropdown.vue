@@ -39,12 +39,12 @@ function handleClick(item: MenuItemType) {
       <div>
         <MenuButton
           :data-testid="`text-dropdown-${label}`"
-          class="inline-flex w-full items-center justify-center gap-x-1.5 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-4 text-xs text-gray-700 transition-colors duration-200 hover:bg-gray-100 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white hover:dark:bg-gray-800"
+          class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-gradient-to-b from-white to-gray-50 px-3.5 text-sm font-medium text-gray-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] transition-colors duration-200 hover:border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-300 dark:border-slate-600 dark:bg-none dark:bg-slate-900 dark:text-gray-100 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] dark:hover:border-slate-500 dark:hover:bg-slate-800 dark:focus:ring-slate-500"
         >
           <SortIcon v-if="showSortIcon" class="h-4 w-4" aria-hidden="true" />
           {{ label }}
           <ChevronDownIcon
-            class="-mr-1 ml-1 mt-0.5 h-3 w-3"
+            class="h-3.5 w-3.5 shrink-0"
             aria-hidden="true"
           />
         </MenuButton>
@@ -58,22 +58,22 @@ function handleClick(item: MenuItemType) {
         leave-to-class="transform opacity-0 scale-95"
       >
         <MenuItems
-          class="top absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700 dark:text-gray-200"
+          class="top absolute right-0 mt-2 w-56 origin-top-right rounded-lg border border-gray-200 bg-white/95 shadow-lg shadow-black/10 ring-1 ring-black/5 backdrop-blur-sm focus:outline-none dark:border-slate-600 dark:bg-slate-900/95 dark:text-gray-200 dark:ring-white/10"
         >
           <div class="py-1">
             <MenuItem
               v-for="(item, i) in items"
               :key="i"
               v-slot="{ active }"
-              class="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+              class="cursor-pointer"
               @click="handleClick(item)"
             >
               <span
                 :class="[
                   active
-                    ? 'bg-white text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-500 dark:hover:text-gray-100'
+                    ? 'bg-gray-100 text-gray-900 dark:bg-slate-800 dark:text-gray-100'
                     : 'text-gray-700 dark:text-gray-200',
-                  'block px-4 py-2 text-sm',
+                  'block rounded-md px-4 py-2 text-sm',
                 ]"
               >
                 {{ item.label }}
@@ -84,16 +84,16 @@ function handleClick(item: MenuItemType) {
       </transition>
     </Menu>
 
-    <template #fallback>
-      <button
-        :data-testid="`text-dropdown-${label}`"
-        class="inline-flex w-full items-center justify-center gap-x-1.5 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-4 text-xs text-gray-700 transition-colors duration-200 hover:bg-gray-200 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white hover:dark:bg-gray-800"
-      >
-        <SortIcon v-if="showSortIcon" class="h-4 w-4" aria-hidden="true" />
-        {{ label }}
-        <ChevronDownIcon class="-mr-1 ml-1 mt-0.5 h-3 w-3" aria-hidden="true" />
-      </button>
-    </template>
+      <template #fallback>
+        <button
+          :data-testid="`text-dropdown-${label}`"
+          class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-gradient-to-b from-white to-gray-50 px-3.5 text-sm font-medium text-gray-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] transition-colors duration-200 hover:border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-300 dark:border-slate-600 dark:bg-none dark:bg-slate-900 dark:text-gray-100 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] dark:hover:border-slate-500 dark:hover:bg-slate-800 dark:focus:ring-slate-500"
+        >
+          <SortIcon v-if="showSortIcon" class="h-4 w-4" aria-hidden="true" />
+          {{ label }}
+          <ChevronDownIcon class="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+        </button>
+      </template>
   </client-only>
 </template>
 

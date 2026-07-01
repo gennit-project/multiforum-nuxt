@@ -6,7 +6,7 @@
     viewBox="0 0 20 20"
     fill="none"
     stroke="currentColor"
-    stroke-width="1.2"
+    stroke-width="1.5"
     aria-hidden="true"
   >
     <circle cx="8" cy="8" r="5" />

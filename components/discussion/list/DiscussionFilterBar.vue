@@ -130,8 +130,8 @@ const isExpanded = computed(() => {
 </script>
 
 <template>
-  <div class="pb-2 pt-2">
-    <div class="flex flex-wrap items-center justify-between gap-2">
+  <div class="pb-3 pt-3">
+    <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
       <h1
         class="font-semibold h-9 px-4 text-xl leading-9 dark:text-white lg:px-0"
       >
@@ -147,61 +147,57 @@ const isExpanded = computed(() => {
           About
         </button>
       </div>
-      <div class="flex flex-wrap items-center justify-end gap-1">
-        <FilterChip
-          v-if="!isForumScoped"
-          class="align-middle"
-          :data-testid="'forum-filter-button'"
-          :label="channelLabel"
-          :highlighted="
-            filterValues.channels && filterValues.channels.length > 0
-          "
-        >
-          <template #icon>
-            <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />
-          </template>
-          <template #content>
-            <div class="relative w-96">
-              <SearchableForumList
-                :selected-channels="filterValues.channels"
-                @toggle-selection="toggleSelectedChannel"
-              />
-            </div>
-          </template>
-        </FilterChip>
-        <!-- Expand/Collapse Button Group (hidden in download mode) -->
+      <div class="flex flex-wrap items-center justify-end gap-3">
+        <div v-if="!isForumScoped" class="flex items-center">
+          <FilterChip
+            class="align-middle"
+            :data-testid="'forum-filter-button'"
+            :label="channelLabel"
+            :highlighted="
+              filterValues.channels && filterValues.channels.length > 0
+            "
+          >
+            <template #icon>
+              <ChannelIcon class="h-4 w-4" />
+            </template>
+            <template #content>
+              <div class="relative w-96">
+                <SearchableForumList
+                  :selected-channels="filterValues.channels"
+                  @toggle-selection="toggleSelectedChannel"
+                />
+              </div>
+            </template>
+          </FilterChip>
+        </div>
         <div
           v-if="!isDownloadPage"
-          class="flex overflow-hidden rounded-md border border-gray-300 dark:border-gray-600"
+          class="flex overflow-hidden rounded-lg border border-gray-200 bg-gradient-to-b from-white to-gray-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] dark:border-slate-600 dark:bg-none dark:bg-slate-900 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
         >
           <button
             data-testid="expand-all-button"
             aria-label="Expand all discussions"
             :aria-pressed="isExpanded"
             :class="[
-              // layout
-              'flex h-9 items-center border-l px-2 transition-colors first:border-none',
-              // base (non‑active) colours
-              !isExpanded
-                ? 'bg-gray-50 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
-                : 'bg-gray-800 text-white dark:bg-gray-700 dark:text-white',
-              // hover shade (one step darker) – always present
-              'hover:bg-gray-700 hover:text-white dark:hover:bg-gray-600 dark:hover:text-white',
+              'flex h-10 w-10 items-center justify-center transition-colors',
+              isExpanded
+                ? 'bg-gray-900 text-white dark:bg-slate-700 dark:text-white'
+                : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-800',
             ]"
             title="Expand all discussions"
             @click="expandAll"
           >
             <i class="fa-solid fa-expand text-xs" />
           </button>
+          <div class="w-px bg-gray-200 dark:bg-slate-600" />
           <button
             aria-label="Collapse all discussions"
             :aria-pressed="!isExpanded"
             :class="[
-              'flex h-9 items-center border-l px-2 transition-colors',
-              isExpanded
-                ? 'bg-gray-50 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
-                : 'bg-gray-800 text-white dark:bg-gray-700 dark:text-white',
-              'hover:bg-gray-700 hover:text-white dark:hover:bg-gray-600 dark:hover:text-white',
+              'flex h-10 w-10 items-center justify-center transition-colors',
+              !isExpanded
+                ? 'bg-gray-900 text-white dark:bg-slate-700 dark:text-white'
+                : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-800',
             ]"
             title="Collapse all discussions"
             @click="collapseAll"
@@ -209,49 +205,54 @@ const isExpanded = computed(() => {
             <i class="fa-solid fa-compress text-xs" />
           </button>
         </div>
-        <button
-          data-testid="discussion-filter-button"
-          :aria-label="showFilters ? 'Hide filters' : 'Show filters'"
-          :title="showFilters ? 'Hide filters' : 'Show filters'"
-          :class="
-            showFilters
-              ? 'border-gray-500 bg-gray-100 text-gray-900 dark:border-gray-400 dark:bg-gray-800 dark:text-white'
-              : 'border-gray-300 text-gray-800 dark:border-gray-600 dark:text-gray-300'
-          "
-          class="flex h-9 items-center gap-1 rounded-md border px-2 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:hover:bg-gray-700 dark:hover:text-gray-200"
-          @click="
-            (event) => {
-              event.preventDefault();
-              toggleShowFilters();
-            }
-          "
-        >
-          <FilterIcon />
-        </button>
-        <button
-          data-testid="discussion-search-button"
-          :aria-label="showSearch ? 'Hide search' : 'Show search'"
-          :title="showSearch ? 'Hide search' : 'Show search'"
-          :class="
-            showSearch
-              ? 'border-gray-500 bg-gray-100 text-gray-900 dark:border-gray-400 dark:bg-gray-800 dark:text-white'
-              : 'border-gray-300 text-gray-800 dark:border-gray-600 dark:text-gray-300'
-          "
-          class="flex h-9 items-center gap-1 rounded-md border px-2 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:hover:bg-gray-700 dark:hover:text-gray-200"
-          @click="
-            (event) => {
-              event.preventDefault();
-              toggleShowSearch();
-            }
-          "
-        >
-          <SearchIcon />
-        </button>
-        <SortButtons />
-        <div v-if="!isDownloadPage">
+        <div class="flex items-center gap-2">
+          <button
+            data-testid="discussion-filter-button"
+            :aria-label="showFilters ? 'Hide filters' : 'Show filters'"
+            :title="showFilters ? 'Hide filters' : 'Show filters'"
+            :class="
+              showFilters
+                ? 'border-gray-400 bg-gray-100 text-gray-900 dark:border-slate-500 dark:bg-slate-800 dark:text-white'
+                : 'border-gray-200 text-gray-700 dark:border-slate-600 dark:text-gray-300'
+            "
+            class="flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b from-white to-gray-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] transition-colors hover:border-gray-300 hover:bg-gray-100 hover:text-gray-900 dark:bg-none dark:bg-slate-900 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] dark:hover:border-slate-500 dark:hover:bg-slate-800 dark:hover:text-white"
+            @click="
+              (event) => {
+                event.preventDefault();
+                toggleShowFilters();
+              }
+            "
+          >
+            <FilterIcon class="h-4 w-4" />
+          </button>
+          <button
+            data-testid="discussion-search-button"
+            :aria-label="showSearch ? 'Hide search' : 'Show search'"
+            :title="showSearch ? 'Hide search' : 'Show search'"
+            :class="
+              showSearch
+                ? 'border-gray-400 bg-gray-100 text-gray-900 dark:border-slate-500 dark:bg-slate-800 dark:text-white'
+                : 'border-gray-200 text-gray-700 dark:border-slate-600 dark:text-gray-300'
+            "
+            class="flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b from-white to-gray-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] transition-colors hover:border-gray-300 hover:bg-gray-100 hover:text-gray-900 dark:bg-none dark:bg-slate-900 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] dark:hover:border-slate-500 dark:hover:bg-slate-800 dark:hover:text-white"
+            @click="
+              (event) => {
+                event.preventDefault();
+                toggleShowSearch();
+              }
+            "
+          >
+            <SearchIcon class="h-4 w-4" />
+          </button>
+        </div>
+        <div class="flex items-center">
+          <SortButtons />
+        </div>
+        <div v-if="!isDownloadPage" class="flex items-center">
           <RequireAuth :full-width="false">
             <template #has-auth>
               <PrimaryButton
+                class="h-10 rounded-lg border-gray-400 bg-gradient-to-b from-gray-700 to-gray-800 px-4 font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-gray-600 hover:to-gray-700 dark:border-slate-500 dark:from-slate-700 dark:to-slate-800 dark:hover:from-slate-600 dark:hover:to-slate-700"
                 :label="isDownloadPage ? 'New Upload' : 'New Post'"
                 @click="
                   $router.push(
@@ -266,6 +267,7 @@ const isExpanded = computed(() => {
             </template>
             <template #does-not-have-auth>
               <PrimaryButton
+                class="h-10 rounded-lg border-gray-400 bg-gradient-to-b from-gray-700 to-gray-800 px-4 font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-gray-600 hover:to-gray-700 dark:border-slate-500 dark:from-slate-700 dark:to-slate-800 dark:hover:from-slate-600 dark:hover:to-slate-700"
                 :label="isDownloadPage ? 'New Upload' : 'New Post'"
               />
             </template>
@@ -273,10 +275,10 @@ const isExpanded = computed(() => {
         </div>
       </div>
     </div>
-    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" >
+    <hr class="mt-3 border-t border-gray-200 dark:border-slate-700" >
     <div
       v-if="showSearch"
-      class="flex flex-col gap-2 bg-gray-100 py-2 dark:bg-gray-900 dark:text-gray-300"
+      class="mt-3 flex flex-col gap-2 rounded-xl border border-gray-200 bg-gray-100/80 px-3 py-3 dark:border-slate-700 dark:bg-slate-900/80 dark:text-gray-300"
     >
       <SearchBar
         data-testid="discussion-filter-search-bar"
@@ -291,7 +293,7 @@ const isExpanded = computed(() => {
     </div>
     <div
       v-if="showFilters"
-      class="flex justify-end gap-2 bg-gray-100 py-2 dark:bg-gray-900 dark:text-gray-300"
+      class="mt-3 flex flex-wrap justify-end gap-2 rounded-xl border border-gray-200 bg-gray-100/80 px-3 py-3 dark:border-slate-700 dark:bg-slate-900/80 dark:text-gray-300"
     >
       <FilterChip
         class="align-middle"
@@ -300,7 +302,7 @@ const isExpanded = computed(() => {
         :highlighted="tagLabel !== defaultFilterLabels.tags"
       >
         <template #icon>
-          <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
+          <TagIcon class="h-4 w-4" />
         </template>
         <template #content>
           <div class="relative w-96">

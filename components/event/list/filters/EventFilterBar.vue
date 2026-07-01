@@ -473,14 +473,14 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
           <RequireAuth v-if="showNewEventNextToSearchBar" :full-width="false">
             <template #has-auth>
               <PrimaryButton
-                class="h-9 whitespace-nowrap"
+                class="h-10 whitespace-nowrap rounded-lg border-gray-400 bg-gradient-to-b from-gray-700 to-gray-800 px-4 font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-gray-600 hover:to-gray-700 dark:border-slate-500 dark:from-slate-700 dark:to-slate-800 dark:hover:from-slate-600 dark:hover:to-slate-700"
                 :label="'New Event'"
                 @click="$router.push(createEventLink)"
               />
             </template>
             <template #does-not-have-auth>
               <PrimaryButton
-                class="h-9 whitespace-nowrap"
+                class="h-10 whitespace-nowrap rounded-lg border-gray-400 bg-gradient-to-b from-gray-700 to-gray-800 px-4 font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-gray-600 hover:to-gray-700 dark:border-slate-500 dark:from-slate-700 dark:to-slate-800 dark:hover:from-slate-600 dark:hover:to-slate-700"
                 :label="'New Event'"
               />
             </template>

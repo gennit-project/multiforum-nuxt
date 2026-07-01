@@ -111,7 +111,7 @@ defineExpose({ focus, getValue });
         class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-gray-300"
         aria-hidden="true"
       >
-        <SearchIcon />
+        <SearchIcon class="h-4 w-4" />
       </div>
       <input
         ref="searchInputRef"
@@ -119,25 +119,25 @@ defineExpose({ focus, getValue });
         name="search"
         :data-testid="testId"
         :class="[
-          leftSideIsRounded ? 'rounded-l-md' : '',
-          rightSideIsRounded ? 'rounded-r-md' : '',
-          small ? 'h-9' : 'h-10',
+          leftSideIsRounded ? 'rounded-l-lg' : '',
+          rightSideIsRounded ? 'rounded-r-lg' : '',
+          small ? 'h-10' : 'h-10',
         ]"
-        class="w-full border border-gray-200 pl-10 pr-12 text-sm leading-5 text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+        class="search-bar-input w-full border border-gray-200 bg-gradient-to-b from-white to-gray-50 pl-10 pr-12 text-sm leading-5 text-gray-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] placeholder-gray-400 focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-300 dark:border-slate-600 dark:text-white dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] dark:placeholder-gray-400 dark:focus:border-slate-500 dark:focus:ring-slate-500"
         :placeholder="searchPlaceholder"
         type="text"
         @input="updateSearchInput"
         @keydown.enter.prevent="submit"
       >
       <button
-        v-if="initialValue"
+        v-if="input"
         type="button"
         aria-label="Clear search"
-        class="bg-transparent absolute inset-y-0 right-12 z-10 flex cursor-pointer items-center border-none"
+        class="absolute inset-y-0 right-12 z-10 flex cursor-pointer items-center border-none bg-transparent text-gray-400 transition-colors hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100"
         @click="clear"
       >
         <i
-          class="fa-solid fa-xmark h-4 w-4 text-gray-400 dark:text-gray-300"
+          class="fa-solid fa-xmark h-4 w-4"
           aria-hidden="true"
         />
       </button>
@@ -146,3 +146,10 @@ defineExpose({ focus, getValue });
     </div>
   </div>
 </template>
+
+<style>
+html.dark .search-bar-input {
+  background-color: rgb(15 23 42) !important;
+  background-image: none !important;
+}
+</style>

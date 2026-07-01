@@ -91,7 +91,7 @@ function handleTopSort(value: string) {
 </script>
 
 <template>
-  <div class="flex items-center space-x-2">
+  <div class="flex items-center gap-2">
     <TextButtonDropdown
       :label="capitalizeCase(activeSortQuery)"
       :items="sortOptions"

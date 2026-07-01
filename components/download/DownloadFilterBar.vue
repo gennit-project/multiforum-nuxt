@@ -130,9 +130,9 @@ const hasActiveDownloadFilters = computed(() => {
 </script>
 
 <template>
-  <div class="pb-2 pt-2">
+  <div class="pb-3 pt-3">
     <div>
-      <div class="flex flex-wrap items-center justify-end space-x-2">
+      <div class="flex flex-wrap items-center justify-end gap-3">
         <!-- Download Filters Button (mobile only) -->
         <button
           v-if="filterGroups.length > 0"
@@ -140,15 +140,15 @@ const hasActiveDownloadFilters = computed(() => {
           :aria-label="showFilters ? 'Hide filters' : 'Show filters'"
           :title="showFilters ? 'Hide filters' : 'Show filters'"
           :class="[
-            'flex h-9 items-center gap-1 rounded-md border px-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 lg:hidden',
+            'flex h-10 min-w-10 items-center justify-center gap-1.5 rounded-lg border bg-gradient-to-b from-white to-gray-50 px-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] transition-colors hover:border-gray-300 hover:bg-gray-100 dark:bg-none dark:bg-slate-900 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] dark:hover:border-slate-500 dark:hover:bg-slate-800 lg:hidden',
             hasActiveDownloadFilters || showFilters
-              ? 'border-orange-500 text-orange-600 dark:text-orange-400'
-              : 'border-gray-800 text-gray-800 dark:border-gray-600 dark:text-gray-300',
+              ? 'border-gray-400 bg-gray-100 text-gray-900 dark:border-slate-500 dark:bg-slate-800 dark:text-white'
+              : 'border-gray-200 text-gray-700 dark:border-slate-600 dark:text-gray-300',
           ]"
           @click="toggleShowFilters"
         >
-          <FilterIcon />
-          <span v-if="hasActiveDownloadFilters" class="ml-1 text-xs">
+          <FilterIcon class="h-4 w-4" />
+          <span v-if="hasActiveDownloadFilters" class="text-xs font-medium">
             {{ getActiveDownloadFilterCount }}
           </span>
         </button>
@@ -159,35 +159,38 @@ const hasActiveDownloadFilters = computed(() => {
           :title="showSearch ? 'Hide search' : 'Show search'"
           :class="
             showSearch
-              ? 'border-orange-500'
-              : 'border-gray-800 text-gray-800 dark:border-gray-600 dark:text-gray-300'
+              ? 'border-gray-400 bg-gray-100 text-gray-900 dark:border-slate-500 dark:bg-slate-800 dark:text-white'
+              : 'border-gray-200 text-gray-700 dark:border-slate-600 dark:text-gray-300'
           "
-          class="flex h-9 items-center gap-1 rounded-md border px-1.5 text-gray-800 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+          class="flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b from-white to-gray-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] transition-colors hover:border-gray-300 hover:bg-gray-100 hover:text-gray-900 dark:bg-none dark:bg-slate-900 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] dark:hover:border-slate-500 dark:hover:bg-slate-800 dark:hover:text-white"
           @click="toggleShowSearch"
         >
-          <SearchIcon />
+          <SearchIcon class="h-4 w-4" />
         </button>
         <SortButtons />
         <RequireAuth :full-width="false">
           <template #has-auth>
             <PrimaryButton
-              class="mx-2"
+              class="h-10 rounded-lg border-gray-400 bg-gradient-to-b from-gray-700 to-gray-800 px-4 font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-gray-600 hover:to-gray-700 dark:border-slate-500 dark:from-slate-700 dark:to-slate-800 dark:hover:from-slate-600 dark:hover:to-slate-700"
               label="New Upload"
               @click="$router.push(`/forums/${channelId}/downloads/create`)"
             />
           </template>
           <template #does-not-have-auth>
-            <PrimaryButton class="mx-2" label="New Upload" />
+            <PrimaryButton
+              class="h-10 rounded-lg border-gray-400 bg-gradient-to-b from-gray-700 to-gray-800 px-4 font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] hover:from-gray-600 hover:to-gray-700 dark:border-slate-500 dark:from-slate-700 dark:to-slate-800 dark:hover:from-slate-600 dark:hover:to-slate-700"
+              label="New Upload"
+            />
           </template>
         </RequireAuth>
       </div>
     </div>
-    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" >
+    <hr class="mt-3 border-t border-gray-200 dark:border-slate-700" >
 
     <!-- Search Panel -->
     <div
       v-if="showSearch"
-      class="flex flex-col gap-2 bg-gray-100 py-2 dark:bg-gray-700 dark:text-gray-300"
+      class="mt-3 flex flex-col gap-2 rounded-xl border border-gray-200 bg-gray-100/80 px-3 py-3 dark:border-slate-700 dark:bg-slate-900/80 dark:text-gray-300"
     >
       <SearchBar
         data-testid="download-filter-search-bar"
@@ -204,7 +207,7 @@ const hasActiveDownloadFilters = computed(() => {
     <!-- Mobile Filter Panel -->
     <div
       v-if="showFilters && filterGroups.length > 0"
-      class="flex flex-col gap-4 bg-gray-100 px-2 py-4 dark:bg-gray-800 dark:text-gray-300 lg:hidden"
+      class="mt-3 flex flex-col gap-4 rounded-xl border border-gray-200 bg-gray-100/80 px-3 py-4 dark:border-slate-700 dark:bg-slate-900/80 dark:text-gray-300 lg:hidden"
     >
       <DownloadFilters :filter-groups="filterGroups" />
 
@@ -243,7 +246,7 @@ const hasActiveDownloadFilters = computed(() => {
     <!-- Desktop Filter Panel (for tags/archived only) -->
     <div
       v-if="showFilters && !filterGroups.length"
-      class="hidden justify-end gap-2 bg-gray-100 py-2 dark:bg-gray-700 dark:text-gray-300 lg:flex"
+      class="mt-3 hidden flex-wrap justify-end gap-2 rounded-xl border border-gray-200 bg-gray-100/80 px-3 py-3 dark:border-slate-700 dark:bg-slate-900/80 dark:text-gray-300 lg:flex"
     >
       <FilterChip
         class="align-middle"
@@ -252,7 +255,7 @@ const hasActiveDownloadFilters = computed(() => {
         :highlighted="tagLabel !== 'Tags'"
       >
         <template #icon>
-          <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
+          <TagIcon class="h-4 w-4" />
         </template>
         <template #content>
           <div class="relative w-96">

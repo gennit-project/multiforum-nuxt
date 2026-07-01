@@ -40,22 +40,22 @@ const handleClick = () => {
             :data-testid="dataTestid"
             :class="[
               highlighted
-                ? 'border-gray-500 ring-1 ring-gray-400 dark:border-gray-400 dark:ring-gray-500'
+                ? 'border-gray-400 ring-1 ring-gray-300 dark:border-slate-500 dark:ring-slate-500'
                 : '',
             ]"
-            class="font-small align-items flex whitespace-nowrap rounded-md border bg-white px-3 py-2 text-xs text-gray-700 hover:bg-gray-200 focus:border-gray-500 focus:ring-1 focus:ring-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:focus:border-gray-400 dark:focus:ring-gray-400"
+            class="align-items flex h-10 items-center gap-2 whitespace-nowrap rounded-lg border border-gray-200 bg-gradient-to-b from-white to-gray-50 px-3.5 text-sm font-medium text-gray-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] transition-colors hover:border-gray-300 hover:bg-gray-100 focus:border-gray-300 focus:ring-1 focus:ring-gray-300 dark:border-slate-600 dark:bg-none dark:bg-slate-900 dark:text-gray-200 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] dark:hover:border-slate-500 dark:hover:bg-slate-800 dark:focus:border-slate-500 dark:focus:ring-slate-500"
             @click="handleClick"
           >
             <slot name="icon" />
             {{ label }}
             <ChevronDownIcon
-              class="-mr-1 ml-1 mt-0.5 h-3 w-3"
+              class="h-3.5 w-3.5 shrink-0"
               aria-hidden="true"
             />
           </button>
         </template>
         <template #content>
-          <div class="rounded-md border bg-white dark:border-gray-700 dark:bg-gray-900">
+          <div class="rounded-lg border border-gray-200 bg-white/95 shadow-lg shadow-black/10 backdrop-blur-sm dark:border-slate-600 dark:bg-slate-900/95">
             <slot name="content" />
           </div>
         </template>
@@ -65,15 +65,15 @@ const handleClick = () => {
           :data-testid="dataTestid"
           :class="[
             highlighted
-              ? 'border-gray-500 ring-1 ring-gray-400 dark:border-gray-400 dark:ring-gray-500'
+              ? 'border-gray-400 ring-1 ring-gray-300 dark:border-slate-500 dark:ring-slate-500'
               : '',
           ]"
-          class="max-height-3 font-small mr-2 inline-flex whitespace-nowrap rounded-md border bg-white px-3 py-2.5 text-xs text-gray-700 hover:bg-gray-200 focus:border-gray-500 focus:ring-1 focus:ring-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:focus:border-gray-400 dark:focus:ring-gray-400"
+          class="max-height-3 inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-lg border border-gray-200 bg-gradient-to-b from-white to-gray-50 px-3.5 text-sm font-medium text-gray-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] transition-colors hover:border-gray-300 hover:bg-gray-100 focus:border-gray-300 focus:ring-1 focus:ring-gray-300 dark:border-slate-600 dark:bg-none dark:bg-slate-900 dark:text-gray-200 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] dark:hover:border-slate-500 dark:hover:bg-slate-800 dark:focus:border-slate-500 dark:focus:ring-slate-500"
         >
           <slot name="icon" />
           {{ label }}
           <ChevronDownIcon
-            class="-mr-1 ml-1 mt-0.5 h-3 w-3"
+            class="h-3.5 w-3.5 shrink-0"
             aria-hidden="true"
           />
         </button>
