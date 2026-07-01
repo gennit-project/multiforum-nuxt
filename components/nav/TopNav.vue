@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { Bell } from 'lucide-vue-next';
 import { config } from '@/config';
 import { useDisplay } from 'vuetify';
 import HamburgerMenuButton from '@/components/nav/HamburgerMenuButton.vue';
@@ -74,11 +75,11 @@ const isOnMapPage = computed(() => {
 
 <template>
   <nav
-    class="relative z-20 h-16 border-b border-b-gray-200 bg-gray-100 pr-4 dark:border-b-gray-600 dark:bg-gray-900 lg:ml-20"
+    class="top-nav-shell relative z-20 h-16 border-y border-white/10 bg-gray-100 pr-4 text-white dark:bg-gray-900 lg:ml-20"
     :class="[isOnMapPage ? 'fixed w-full lg:w-[calc(100%-5rem)]' : '']"
     aria-label="Top navigation"
   >
-    <div class="flex h-full items-center justify-between pl-12 pr-2 lg:pl-2">
+    <div class="flex h-full items-center justify-between pl-14 pr-3 lg:px-5">
       <div class="flex min-w-0 items-center overflow-hidden">
         <HamburgerMenuButton
           v-if="!sideNavIsOpenVar"
@@ -87,10 +88,10 @@ const isOnMapPage = computed(() => {
           @click="$emit('toggleDropdown')"
         />
 
-        <div class="ml-2 flex min-w-0 items-center gap-1 text-sm">
-          <nuxt-link to="/" class="flex items-center gap-1">
+        <div class="ml-2 flex h-full min-w-0 items-center gap-2 text-sm lg:gap-3">
+          <nuxt-link to="/" class="flex h-full items-center gap-1.5">
             <h1
-              class="logo-font text-lg font-bold leading-none text-gray-900 dark:text-white"
+              class="logo-font text-[1.45rem] font-semibold leading-tight tracking-[-0.04em] text-white lg:text-[1.55rem]"
             >
               {{ config.serverDisplayName }}
             </h1>
@@ -98,12 +99,12 @@ const isOnMapPage = computed(() => {
 
           <div
             v-if="shouldShowChannelId"
-            class="hidden items-center gap-1 text-gray-600 dark:text-gray-300 sm:flex"
+            class="hidden h-full items-center gap-2 text-base leading-none tracking-[-0.02em] text-gray-300 sm:flex"
           >
-            <span>•</span>
+            <span class="text-lg text-gray-400">•</span>
             <nuxt-link
               :to="`/forums/${channelId}`"
-              class="max-w-[8rem] truncate text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white sm:max-w-[12rem] lg:max-w-[16rem]"
+              class="max-w-[8rem] truncate text-gray-300 transition-colors hover:text-white sm:max-w-[12rem] lg:max-w-[16rem]"
             >
               {{ channelId }}
             </nuxt-link>
@@ -116,14 +117,14 @@ const isOnMapPage = computed(() => {
           </div>
           <div
             v-else-if="routeInfoLabel"
-            class="hidden items-center gap-1 truncate text-gray-600 dark:text-gray-300 sm:flex"
+            class="hidden h-full items-center gap-2 truncate text-base leading-none tracking-[-0.02em] text-gray-300 sm:flex"
           >
-            <span>•</span>
+            <span class="text-lg text-gray-400">•</span>
             {{ routeInfoLabel }}
           </div>
           <div
             v-else
-            class="hidden items-center gap-1 truncate text-gray-600 dark:text-gray-300 sm:flex"
+            class="hidden h-full items-center gap-1 truncate text-base leading-none tracking-[-0.02em] text-gray-300 sm:flex"
           >
             {{ getLabel() }}
           </div>
@@ -146,16 +147,16 @@ const isOnMapPage = computed(() => {
         </template>
       </ClientOnly>
       <div class="flex flex-none items-center gap-2">
-        <div class="hidden items-center justify-end space-x-4 sm:flex">
+        <div class="hidden items-center justify-end gap-7 lg:flex">
           <nuxt-link
             to="/about"
-            class="font-semibold text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+            class="text-base font-medium tracking-[-0.02em] text-gray-300 transition-colors hover:text-white"
           >
             About
           </nuxt-link>
           <LoginButton />
         </div>
-        <div class="flex items-center space-x-2 md:mr-2">
+        <div class="flex items-center gap-2 md:mr-2">
           <ClientOnly>
             <div v-if="smAndDown" class="md:hidden">
               <TopNavSearch icon-only />
@@ -164,6 +165,9 @@ const isOnMapPage = computed(() => {
               <div class="md:hidden" aria-hidden="true" />
             </template>
           </ClientOnly>
+          <div class="hidden lg:block">
+            <CreateAnythingButton :background-color="'dark'" />
+          </div>
           <div class="lg:hidden">
             <CreateAnythingButton :background-color="'light'" />
           </div>
@@ -171,9 +175,9 @@ const isOnMapPage = computed(() => {
             data-testid="notification-bell"
             to="/notifications"
             :aria-label="notificationCountVar > 0 ? `${notificationCountVar} new notifications` : 'Notifications'"
-            class="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-600 hover:text-gray-900 focus:outline-none dark:text-gray-300 dark:hover:text-white"
+            class="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-300 transition-colors hover:bg-white/5 hover:text-white focus:outline-none"
           >
-            <i class="fas fa-bell text-lg" aria-hidden="true" />
+            <Bell class="h-5 w-5 stroke-[1.9]" aria-hidden="true" />
             <span
               v-if="notificationCountVar > 0"
               aria-hidden="true"
@@ -183,9 +187,9 @@ const isOnMapPage = computed(() => {
             </span>
           </nuxt-link>
           <ThemeSwitcher />
-          <div v-if="usernameVar" class="block">
+          <div v-if="usernameVar" class="block shrink-0">
             <div class="flex items-center">
-              <div class="relative flex-shrink-0">
+              <div class="relative shrink-0">
                 <UserProfileDropdownMenu
                   :username="usernameVar"
                   :mod-name="modProfileNameVar"
@@ -200,6 +204,12 @@ const isOnMapPage = computed(() => {
 </template>
 
 <style scoped>
+.top-nav-shell {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+}
+
 .fixed-menu-button {
   position: absolute;
   top: 50%;

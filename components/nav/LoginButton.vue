@@ -11,7 +11,7 @@ const { logout: handleLogout } = useServerLogout();
     <template #has-auth>
       <button
         data-testid="logout-button"
-        class="font-semibold mr-2 inline-flex items-center rounded-full px-3 py-1 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+        class="mr-2 inline-flex items-center rounded-full px-1 py-1 text-[1.05rem] font-medium tracking-[-0.02em] text-gray-300 transition-colors hover:text-white"
         @click="handleLogout"
       >
         Log Out
@@ -20,7 +20,7 @@ const { logout: handleLogout } = useServerLogout();
     <template #does-not-have-auth>
       <button
         data-testid="login-button"
-        class="font-semibold mr-2 inline-flex items-center rounded-full px-3 py-1 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+        class="mr-2 inline-flex items-center rounded-full px-1 py-1 text-[1.05rem] font-medium tracking-[-0.02em] text-gray-300 transition-colors hover:text-white"
       >
         Log In
       </button>
