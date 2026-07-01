@@ -25,6 +25,7 @@ export type ServerIssuesWhereParams = {
   startDate: string;
   endDate: string;
   showOnlyServerRuleViolations: boolean;
+  isOpen?: boolean;
 };
 
 export const isDateInputValue = (value: string | null): value is string => {
@@ -67,15 +68,16 @@ const buildCreatedAtRange = (
  * optionally restricted to flagged server-rule violations, and optionally
  * matched against a case-insensitive title/body search.
  */
-export function buildServerIssuesWhere(
+export function buildServerIssueWhere(
   params: ServerIssuesWhereParams
-): { issueWhere: Record<string, unknown> } {
+): Record<string, unknown> {
   const {
     searchInput,
     selectedChannels,
     startDate,
     endDate,
     showOnlyServerRuleViolations,
+    isOpen = true,
   } =
     params;
   const searchPattern = createCaseInsensitivePattern(searchInput);
@@ -88,14 +90,20 @@ export function buildServerIssuesWhere(
       : {};
 
   return {
-    issueWhere: {
-      isOpen: true,
-      ...(showOnlyServerRuleViolations
-        ? { flaggedServerRuleViolation: true }
-        : {}),
-      ...buildCreatedAtRange(startDate, endDate),
-      ...channelFilter,
-      ...searchFilter,
-    },
+    isOpen,
+    ...(showOnlyServerRuleViolations
+      ? { flaggedServerRuleViolation: true }
+      : {}),
+    ...buildCreatedAtRange(startDate, endDate),
+    ...channelFilter,
+    ...searchFilter,
+  };
+}
+
+export function buildServerIssuesWhere(
+  params: ServerIssuesWhereParams
+): { issueWhere: Record<string, unknown> } {
+  return {
+    issueWhere: buildServerIssueWhere(params),
   };
 }
