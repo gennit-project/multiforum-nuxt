@@ -17,10 +17,10 @@
 // mutations require the username.
 //
 // This plugin restores a minimal client fallback: when the session is
-// authenticated (we have a verified email) but username is still empty, resolve
-// it from the server session and seed the auth state. Using a same-origin Nitro
-// endpoint avoids depending on browser token storage, which is brittle in some
-// embedded browser environments.
+// authenticated but username is still empty, resolve it from the server session
+// and seed the auth state. Using a same-origin Nitro endpoint avoids depending
+// on browser token storage, which is brittle in some embedded browser
+// environments.
 import { defineNuxtPlugin } from 'nuxt/app';
 import {
   useIsAuthenticated,
