@@ -111,6 +111,33 @@ describe('Library page', () => {
     expect(mountLibrary().text()).toContain('My Reading List');
   });
 
+  it('links My Downloads to the auto-saved downloads collection when present', () => {
+    setCounts(0, 0, 0);
+    h.collections.value = {
+      users: [
+        {
+          Collections: [
+            {
+              id: 'downloads-1',
+              name: 'Downloaded Items',
+              description: 'Items appear here automatically when you download them.',
+              collectionType: 'DOWNLOADS',
+              visibility: 'PRIVATE',
+              itemCount: 7,
+            },
+          ],
+        },
+      ],
+    };
+
+    const wrapper = mountLibrary();
+    expect(wrapper.text()).toContain('(7)');
+    expect(wrapper.html()).toContain('/library/downloads-1');
+    expect(wrapper.text()).toContain(
+      'Downloads are added here automatically when you grab a file.'
+    );
+  });
+
   it('filters collections by type', async () => {
     setCounts(3, 1, 2);
     const wrapper = mountLibrary();

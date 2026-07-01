@@ -99,6 +99,14 @@ const getBaseMocks = (username: string) => ({
           username,
           Collections: [
             {
+              id: 'downloads-1',
+              name: 'Downloaded Items',
+              description: 'Items appear here automatically when you download them.',
+              itemCount: 7,
+              visibility: 'PRIVATE',
+              collectionType: 'DOWNLOADS',
+            },
+            {
               id: 'custom-collection-1',
               name: 'My Reading List',
               description: 'Articles to read later',
@@ -165,6 +173,26 @@ test.describe('Library page', () => {
 
     // Check My Downloads section - use the link locator which is more specific
     await expect(page.getByRole('link', { name: /My Downloads/i })).toBeVisible({ timeout: 10000 });
+  });
+
+  test('links My Downloads to the auto-saved downloads collection when it exists', async ({
+    page,
+    setupMockedPage,
+  }) => {
+    await setupMockedPage({
+      username: DEFAULT_USERNAME,
+      handlers: getBaseMocks(DEFAULT_USERNAME),
+    });
+
+    await page.goto('/library');
+
+    await expect(page.getByRole('link', { name: /My Downloads/i })).toHaveAttribute(
+      'href',
+      '/library/downloads-1'
+    );
+    await expect(
+      page.getByText('Downloads are added here automatically when you grab a file.')
+    ).toBeVisible();
   });
 
   test('displays Favorites section', async ({

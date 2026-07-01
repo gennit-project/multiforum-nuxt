@@ -10,6 +10,7 @@ import {
 } from '@/graphQLData/user/queries';
 import { GET_ALL_USER_COLLECTIONS } from '@/graphQLData/collection/queries';
 import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
+import { isAutoSavedDownloadsCollection } from '@/utils/downloadLibraryCollection';
 
 const usernameVar = useUsername();
 const isAuthenticatedVar = useIsAuthenticated();
@@ -191,6 +192,22 @@ const customCollections = computed(() => {
   return customCollectionsResult.value?.users?.[0]?.Collections || [];
 });
 
+const autoSavedDownloadsCollection = computed(() =>
+  customCollections.value.find((collection) =>
+    isAutoSavedDownloadsCollection(collection)
+  )
+);
+
+const myDownloadsCount = computed(() => {
+  return autoSavedDownloadsCollection.value?.itemCount ?? ownedDownloadsCount.value;
+});
+
+const myDownloadsLink = computed(() => {
+  return autoSavedDownloadsCollection.value
+    ? `/library/${autoSavedDownloadsCollection.value.id}`
+    : '/library/my-downloads';
+});
+
 // Combine favorites and custom collections
 const allCollections = computed(() => {
   return [...defaultCollections.value, ...customCollections.value];
@@ -301,17 +318,20 @@ const getCollectionTypeInfo = (collectionType: string) => {
                     My Downloads
                   </div>
                   <NuxtLink
-                    to="/library/my-downloads"
+                    :to="myDownloadsLink"
                     class="block rounded-md py-2 text-sm transition-colors"
                     active-class="bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300 font-semibold"
                   >
                     <div class="flex items-center justify-between">
                       <span class="font-medium">My Downloads</span>
                       <span class="text-gray-500 dark:text-gray-400">
-                        ({{ ownedDownloadsCount }})
+                        ({{ myDownloadsCount }})
                       </span>
                     </div>
                   </NuxtLink>
+                  <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    Downloads are added here automatically when you grab a file.
+                  </p>
                 </div>
 
                 <!-- Collections Section -->
