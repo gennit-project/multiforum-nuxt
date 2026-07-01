@@ -49,7 +49,7 @@ describe('TopNav branding', () => {
   it('uses a centered full-height header row', () => {
     const wrapper = mountNav();
 
-    expect(wrapper.find('nav').classes()).toContain('h-16');
+    expect(wrapper.find('nav').classes()).toContain('h-14');
     expect(wrapper.find('nav').classes()).toContain('relative');
     expect(wrapper.find('nav > div').classes()).toEqual(
       expect.arrayContaining(['h-full', 'items-center'])

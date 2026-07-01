@@ -128,13 +128,13 @@ const mountDashboard = async (
     error: ref(null),
     refetch: refetchChannelHealth,
   });
-  const Page = (await import('./dashboard.vue')).default;
+  const Page = (await import('./dashboard/index.vue')).default;
   const wrapper = mount(Page, {
     global: {
       stubs: {
         NuxtLink: {
           props: ['to'],
-          template: '<a><slot /></a>',
+          template: '<a :href="to"><slot /></a>',
         },
       },
     },
@@ -185,6 +185,7 @@ describe('admin dashboard page', () => {
     expect(wrapper.text()).toContain('Pressure');
     expect(wrapper.text()).toContain('9d');
     expect(wrapper.text()).toContain('26.6');
+    expect(wrapper.html()).toContain('href="/admin/dashboard/general"');
   });
 
   it('updates query params when sorting the channel health table', async () => {
