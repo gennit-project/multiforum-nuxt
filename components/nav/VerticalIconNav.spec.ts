@@ -63,6 +63,15 @@ describe('VerticalIconNav items', () => {
 });
 
 describe('VerticalIconNav active state', () => {
+  it('uses a full-row hover target for navigation items', () => {
+    const wrapper = mountNav();
+
+    expect(navLink(wrapper, 'Discuss').classes()).toEqual(
+      expect.arrayContaining(['w-full', 'rounded-xl', 'hover:bg-gray-200'])
+    );
+    expect(navLink(wrapper, 'Discuss').classes()).not.toContain('rounded-full');
+  });
+
   it('highlights the active nav item', () => {
     h.route = { params: {}, name: 'forums' };
     const wrapper = mountNav();

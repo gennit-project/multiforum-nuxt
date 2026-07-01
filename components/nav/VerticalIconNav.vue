@@ -183,31 +183,15 @@ watch(
   { immediate: true }
 );
 
-// Active treatment: a tinted fill + an INSET accent ring so the highlight stays
-// within the circle and never crowds the label sitting just below it.
-const ACTIVE_CIRCLE =
-  'bg-orange-100 ring-1 ring-inset ring-orange-300 dark:bg-orange-500/20 dark:ring-orange-500/40';
+const ACTIVE_NAV_ITEM =
+  'bg-orange-100 text-orange-600 ring-1 ring-inset ring-orange-300 dark:bg-orange-500/20 dark:text-orange-400 dark:ring-orange-500/40';
 
-const getIconCircleClasses = (isActive: boolean) => {
+const getNavItemClasses = (isActive: boolean) => {
   const baseClasses =
-    'w-12 h-12 rounded-full bg-transparent hover:bg-gray-200 dark:hover:bg-gray-800 flex items-center justify-center transition-all duration-200 cursor-pointer';
-  return isActive ? `${baseClasses} ${ACTIVE_CIRCLE}` : baseClasses;
+    'flex w-full flex-col items-center gap-0.5 rounded-xl px-2 py-2 text-gray-600 transition-colors duration-200 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100';
+  return isActive ? `${baseClasses} ${ACTIVE_NAV_ITEM}` : baseClasses;
 };
 
-const getForumIconClasses = (isActive: boolean) => {
-  const baseClasses =
-    'w-12 h-12 rounded-full bg-transparent hover:bg-gray-200 dark:hover:bg-gray-800 flex items-center justify-center transition-all duration-200 cursor-pointer overflow-hidden';
-  return isActive ? `${baseClasses} ${ACTIVE_CIRCLE}` : baseClasses;
-};
-
-const getUserActionClasses = (isActive: boolean) => {
-  const baseClasses =
-    'rounded-full my-2 bg-transparent hover:bg-gray-200 dark:hover:bg-gray-800 flex items-center justify-center transition-all duration-200 cursor-pointer';
-  return isActive ? `${baseClasses} ${ACTIVE_CIRCLE}` : baseClasses;
-};
-
-// Icon + label pick up the accent colour when active so the highlight reads
-// clearly even at this small size.
 const getNavIconClasses = (isActive: boolean) =>
   isActive
     ? 'h-6 w-6 text-orange-600 dark:text-orange-400'
@@ -215,8 +199,8 @@ const getNavIconClasses = (isActive: boolean) =>
 
 const getNavLabelClasses = (isActive: boolean) =>
   isActive
-    ? 'mt-1 w-12 text-center text-[10px] leading-[10px] font-medium text-orange-600 dark:text-orange-400'
-    : 'mt-1 w-12 text-center text-[10px] leading-[10px] text-gray-600 dark:text-gray-300';
+    ? 'w-full text-center text-[10px] leading-[10px] font-medium text-orange-600 dark:text-orange-400'
+    : 'w-full text-center text-[10px] leading-[10px] text-gray-600 dark:text-gray-300';
 </script>
 
 <template>
@@ -234,7 +218,7 @@ const getNavLabelClasses = (isActive: boolean) =>
 
       <!-- Main Navigation Icons -->
       <div
-        class="flex flex-col"
+        class="flex w-full flex-col px-2"
         :class="{
           'space-y-1': isVerticallyShort,
           'space-y-2': !isVerticallyShort,
@@ -245,7 +229,7 @@ const getNavLabelClasses = (isActive: boolean) =>
           :key="item.name"
           :text="item.name"
         >
-          <div class="flex flex-col items-center">
+          <div class="w-full">
             <NuxtLink
               :to="
                 item.routerName === 'library'
@@ -254,17 +238,17 @@ const getNavLabelClasses = (isActive: boolean) =>
               "
               :aria-label="item.name"
               :title="item.name"
-              :class="getIconCircleClasses(isActiveNavItem(item.routerName))"
+              :class="getNavItemClasses(isActiveNavItem(item.routerName))"
             >
               <component
                 :is="item.icon"
                 :class="getNavIconClasses(isActiveNavItem(item.routerName))"
                 aria-hidden="true"
               />
+              <span :class="getNavLabelClasses(isActiveNavItem(item.routerName))">
+                {{ item.name }}
+              </span>
             </NuxtLink>
-            <span :class="getNavLabelClasses(isActiveNavItem(item.routerName))">
-              {{ item.name }}
-            </span>
           </div>
         </IconTooltip>
       </div>
@@ -288,7 +272,7 @@ const getNavLabelClasses = (isActive: boolean) =>
             :key="forum.uniqueName"
             :text="forum.uniqueName"
           >
-            <div class="flex flex-col items-center">
+            <div class="w-full px-2">
               <NuxtLink
                 :to="{
                   name: 'forums-forumId-discussions',
@@ -296,9 +280,7 @@ const getNavLabelClasses = (isActive: boolean) =>
                 }"
                 :aria-label="forum.uniqueName"
                 :title="forum.uniqueName"
-                :class="
-                  getForumIconClasses(currentForumId === forum.uniqueName)
-                "
+                :class="getNavItemClasses(currentForumId === forum.uniqueName)"
               >
                 <AvatarComponent
                   class="h-8 w-8"
@@ -307,35 +289,35 @@ const getNavLabelClasses = (isActive: boolean) =>
                   :is-small="true"
                   :is-square="false"
                 />
+                <span
+                  :class="[
+                    getNavLabelClasses(currentForumId === forum.uniqueName),
+                    'truncate',
+                  ]"
+                >
+                  {{ forum.uniqueName }}
+                </span>
               </NuxtLink>
-              <span
-                :class="[
-                  getNavLabelClasses(currentForumId === forum.uniqueName),
-                  'truncate',
-                ]"
-              >
-                {{ forum.uniqueName }}
-              </span>
             </div>
           </IconTooltip>
 
           <!-- More Button -->
-          <div v-if="hasMoreForums" class="flex flex-col items-center">
+          <div v-if="hasMoreForums" class="w-full px-2">
             <IconTooltip text="More Forums">
               <button
                 type="button"
-                :class="getUserActionClasses(false)"
+                :class="getNavItemClasses(false)"
                 aria-label="More forums"
                 title="More forums"
                 @click="isDrawerOpen = true"
               >
                 <MoreIcon />
+                <span
+                  class="w-full text-center text-[10px] leading-[10px] text-gray-600 dark:text-gray-300"
+                  >More</span
+                >
               </button>
             </IconTooltip>
-            <span
-              class="mt-1 text-[10px] leading-[10px] text-gray-600 dark:text-gray-300"
-              >More</span
-            >
           </div>
         </div>
       </ClientOnly>
@@ -348,7 +330,7 @@ const getNavLabelClasses = (isActive: boolean) =>
 
       <!-- User Actions -->
       <div
-        class="mt-auto flex flex-col"
+        class="mt-auto flex w-full flex-col px-2"
         :class="{
           'space-y-1': isVerticallyShort,
           'space-y-2': !isVerticallyShort,
@@ -356,18 +338,18 @@ const getNavLabelClasses = (isActive: boolean) =>
       >
         <!-- Admin Dashboard (always shown) -->
         <IconTooltip text="Admin Dashboard">
-          <div class="flex flex-col items-center">
+          <div class="w-full">
             <NuxtLink
               to="/admin/issues"
               aria-label="Admin dashboard"
               title="Admin dashboard"
-              :class="getUserActionClasses(isActiveUserAction('admin-issues'))"
+              :class="getNavItemClasses(isActiveUserAction('admin-issues'))"
             >
               <AdminIcon />
+              <span :class="getNavLabelClasses(isActiveUserAction('admin-issues'))">
+                Admin
+              </span>
             </NuxtLink>
-            <span :class="getNavLabelClasses(isActiveUserAction('admin-issues'))">
-              Admin
-            </span>
           </div>
         </IconTooltip>
 
@@ -376,13 +358,13 @@ const getNavLabelClasses = (isActive: boolean) =>
           <template #fallback>
             <!-- Fallback: Show login icon as default -->
             <IconTooltip text="Log In">
-              <div class="flex flex-col items-center">
-                <div :class="getUserActionClasses(false)">
+              <div class="w-full">
+                <div :class="getNavItemClasses(false)">
                   <LoginIcon />
+                  <span :class="getNavLabelClasses(false)">
+                    Log in
+                  </span>
                 </div>
-                <span :class="getNavLabelClasses(false)">
-                  Log in
-                </span>
               </div>
             </IconTooltip>
           </template>
