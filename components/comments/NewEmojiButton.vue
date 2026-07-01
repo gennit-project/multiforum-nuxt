@@ -66,9 +66,7 @@ function handleClick() {
     <FloatingDropdown v-model="showMenu">
       <template #button="{ activatorProps }">
         <VoteButton
-          :class="[
-            props.interactionDisabled ? 'space-x-3 opacity-60' : 'space-x-3',
-          ]"
+          :class="props.interactionDisabled ? 'space-x-3 opacity-60' : 'space-x-3'"
           :button-props="
             props.interactionDisabled
               ? { ...activatorProps, 'aria-disabled': 'true' }
