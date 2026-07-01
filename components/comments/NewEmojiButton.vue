@@ -30,6 +30,11 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  transparentBackground: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
   interactionDisabled: {
     type: Boolean,
     required: false,
@@ -61,9 +66,9 @@ function handleClick() {
     <FloatingDropdown v-model="showMenu">
       <template #button="{ activatorProps }">
         <VoteButton
-          :class="
-            props.interactionDisabled ? 'space-x-3 opacity-60' : 'space-x-3'
-          "
+          :class="[
+            props.interactionDisabled ? 'space-x-3 opacity-60' : 'space-x-3',
+          ]"
           :button-props="
             props.interactionDisabled
               ? { ...activatorProps, 'aria-disabled': 'true' }
@@ -78,6 +83,7 @@ function handleClick() {
           "
           :is-permalinked="isPermalinked"
           :is-marked-as-answer="isMarkedAsAnswer"
+          :transparent-background="transparentBackground"
           @vote="handleClick"
         >
           <span class="flex items-center gap-1">

@@ -29,6 +29,10 @@ const properties = defineProps({
     type: Boolean,
     default: false,
   },
+  transparentBackground: {
+    type: Boolean,
+    default: false,
+  },
   buttonProps: {
     type: Object,
     default: () => ({}),
@@ -45,6 +49,16 @@ const buttonClasses = computed(() => {
   const baseClasses = [
     'inline-flex max-h-6 cursor-pointer items-center rounded-full px-2 py-1',
   ];
+
+  if (properties.transparentBackground) {
+    const transparentClasses = properties.active
+      ? 'border-orange-400 bg-orange-400 text-black dark:border-orange-500 dark:bg-orange-400 dark:hover:bg-orange-500'
+      : 'border-transparent bg-black/5 text-black hover:border-transparent hover:bg-black/10 dark:text-white dark:bg-white/10 dark:hover:bg-white/15';
+
+    const externalClass = properties.class || '';
+
+    return [...baseClasses, transparentClasses, externalClass].join(' ');
+  }
 
   // Use green styling for best answer comments
   if (properties.isMarkedAsAnswer) {

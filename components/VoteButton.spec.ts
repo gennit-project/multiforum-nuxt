@@ -63,6 +63,12 @@ describe('VoteButton classes', () => {
 
     expect(classes(wrapper)).toContain('my-extra-class');
   });
+
+  it('uses transparent styling when requested', () => {
+    const wrapper = mountButton({ transparentBackground: true });
+
+    expect(classes(wrapper)).toContain('bg-black/5');
+  });
 });
 
 describe('VoteButton rendering', () => {

@@ -46,6 +46,13 @@ const buttonClasses = computed(() => {
     ];
   }
 
+  if (props.isPermalinked) {
+    return [
+      ...baseClasses,
+      'border border-transparent bg-black/5 text-black hover:border-transparent hover:bg-black/10 dark:text-white dark:bg-white/10 dark:hover:bg-white/15',
+    ];
+  }
+
   const defaultClasses =
     'bg-gray-100 text-black hover:border-gray-400 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700';
   return [
