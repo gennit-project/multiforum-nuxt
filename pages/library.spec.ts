@@ -9,10 +9,14 @@ const h = vi.hoisted(() => ({
   downloads: null as unknown as { value: unknown },
   owned: null as unknown as { value: unknown },
   collections: null as unknown as { value: unknown },
+  route: { path: '/library', params: {} as Record<string, unknown> },
   qi: 0,
 }));
 
-vi.mock('nuxt/app', () => ({ useHead: vi.fn() }));
+vi.mock('nuxt/app', () => ({
+  useHead: vi.fn(),
+  useRoute: () => h.route,
+}));
 
 vi.mock('@vue/apollo-composable', async () => {
   const { ref } = await import('vue');
@@ -41,13 +45,24 @@ const RequireAuthUnauth = defineComponent({
   },
 });
 
+const PopperStub = defineComponent({
+  name: 'Popper',
+  setup(_p, { slots }) {
+    return () =>
+      createEl('div', [
+        slots.default?.(),
+        createEl('div', slots.content?.()),
+      ]);
+  },
+});
+
 const mountLibrary = (extraStubs: Record<string, unknown> = {}) =>
   mountWithDefaults(LibraryPage, {
     global: {
       mocks: {
         $route: { query: {}, params: {}, path: '/library', fullPath: '/library' },
       },
-      stubs: { NuxtPage: true, ...extraStubs },
+      stubs: { NuxtPage: true, Popper: PopperStub, ...extraStubs },
     },
   });
 
@@ -70,6 +85,8 @@ const setCounts = (channels: number, discussions: number, images: number) => {
 beforeEach(() => {
   vi.clearAllMocks();
   h.qi = 0;
+  h.route.path = '/library';
+  h.route.params = {};
   h.counts.value = null;
   h.downloads.value = null;
   h.owned.value = null;
@@ -109,6 +126,16 @@ describe('Library page', () => {
       ],
     };
     expect(mountLibrary().text()).toContain('My Reading List');
+  });
+
+  it('renders the collection search input', () => {
+    setCounts(0, 0, 0);
+    const wrapper = mountLibrary();
+    expect(
+      wrapper.get('input[aria-label="Search library collections"]').attributes(
+        'placeholder'
+      )
+    ).toBe('Search collections');
   });
 
   it('links My Downloads to the auto-saved downloads collection when present', () => {
@@ -151,5 +178,107 @@ describe('Library page', () => {
     // Only the images favorite remains; the forums card (3) is filtered out.
     expect(wrapper.text()).toContain('(2)');
     expect(wrapper.text()).not.toContain('(3)');
+  });
+
+  it('filters collections by search term', async () => {
+    setCounts(0, 0, 0);
+    h.collections.value = {
+      users: [
+        {
+          Collections: [
+            {
+              id: 'c1',
+              name: 'My Reading List',
+              description: 'stuff to read',
+              collectionType: 'DISCUSSIONS',
+              visibility: 'PRIVATE',
+              itemCount: 4,
+            },
+          ],
+        },
+      ],
+    };
+
+    const wrapper = mountLibrary();
+    await wrapper
+      .get('input[aria-label="Search library collections"]')
+      .setValue('reading');
+
+    expect(wrapper.text()).toContain('My Reading List');
+    await wrapper
+      .get('input[aria-label="Search library collections"]')
+      .setValue('missing');
+    expect(wrapper.text()).toContain('No collections match "missing".');
+  });
+
+  it('marks a favorite collection route as active in the sidebar', () => {
+    setCounts(3, 1, 2);
+    h.route.path = '/library/favorite-channels';
+
+    const wrapper = mountLibrary();
+    const favoriteForumsLink = wrapper
+      .findAll('a')
+      .find((link) => link.attributes('href') === '/library/favorite-channels');
+
+    expect(favoriteForumsLink?.classes().join(' ')).toContain('bg-orange-100');
+  });
+
+  it('renders the active library item label in the mobile dropdown', () => {
+    setCounts(3, 1, 2);
+    h.route.path = '/library/favorite-discussions';
+
+    const wrapper = mountLibrary();
+    expect(wrapper.get('[data-testid="mobile-library-nav-dropdown"]').text()).toContain(
+      'Favorite Discussions'
+    );
+  });
+
+  it('renders collection links inside the mobile dropdown', async () => {
+    setCounts(3, 1, 2);
+    h.collections.value = {
+      users: [
+        {
+          Collections: [
+            {
+              id: 'c1',
+              name: 'My Reading List',
+              description: 'stuff to read',
+              collectionType: 'DISCUSSIONS',
+              visibility: 'PRIVATE',
+              itemCount: 4,
+            },
+          ],
+        },
+      ],
+    };
+
+    const wrapper = mountLibrary();
+    await wrapper.get('[data-testid="mobile-library-nav-dropdown"]').trigger('click');
+    expect(
+      wrapper.get('[data-testid="mobile-library-item-favorite-channels"]').attributes(
+        'href'
+      )
+    ).toBe('/library/favorite-channels');
+    expect(wrapper.get('[data-testid="mobile-library-item-c1"]').text()).toContain(
+      'My Reading List'
+    );
+  });
+
+  it('opens the mobile library navigation when the dropdown is clicked', async () => {
+    setCounts(3, 1, 2);
+    const wrapper = mountLibrary();
+
+    expect(wrapper.find('[data-testid="mobile-library-item-favorite-channels"]').exists()).toBe(
+      false
+    );
+
+    await wrapper.get('[data-testid="mobile-library-nav-dropdown"]').trigger('click');
+
+    expect(wrapper.get('[data-testid="mobile-library-nav-dropdown"]').attributes('aria-expanded')).toBe(
+      'true'
+    );
+    expect(wrapper.get('[data-testid="mobile-library-item-favorite-channels"]').exists()).toBe(
+      true
+    );
   });
 });

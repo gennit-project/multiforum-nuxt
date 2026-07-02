@@ -90,7 +90,7 @@ const isOnMapPage = computed(() => {
         <div class="ml-2 flex h-full min-w-0 items-center gap-2 text-sm lg:gap-3">
           <nuxt-link to="/" class="flex h-full items-center gap-1.5">
             <h1
-              class="logo-font text-lg font-bold leading-none text-gray-900 dark:text-white"
+              class="logo-font text-[1.2rem] font-semibold leading-none tracking-[-0.04em] text-gray-900 dark:text-white lg:text-[1.3rem]"
             >
               {{ config.serverDisplayName }}
             </h1>
@@ -98,12 +98,12 @@ const isOnMapPage = computed(() => {
 
           <div
             v-if="shouldShowChannelId"
-            class="hidden h-full items-center gap-2 text-base leading-none tracking-[-0.02em] text-gray-300 sm:flex"
+            class="hidden h-full items-center gap-2 text-base leading-none tracking-[-0.02em] text-gray-700 sm:flex dark:text-gray-300"
           >
-            <span class="inline-flex h-5 items-center self-center text-lg leading-none text-gray-400">•</span>
+            <span class="inline-flex h-5 items-center self-center text-lg leading-none text-gray-500 dark:text-gray-400">•</span>
             <nuxt-link
               :to="`/forums/${channelId}`"
-              class="inline-flex h-5 -translate-y-px items-center self-center max-w-[8rem] truncate leading-none text-gray-300 transition-colors hover:text-white sm:max-w-[12rem] lg:max-w-[16rem]"
+              class="inline-flex h-5 -translate-y-px items-center self-center max-w-[8rem] truncate leading-none text-gray-700 transition-colors hover:text-gray-950 sm:max-w-[12rem] lg:max-w-[16rem] dark:text-gray-300 dark:hover:text-white"
             >
               {{ channelId }}
             </nuxt-link>
@@ -116,16 +116,16 @@ const isOnMapPage = computed(() => {
           </div>
           <div
             v-else-if="routeInfoLabel"
-            class="hidden h-full items-center gap-2 truncate text-base leading-none tracking-[-0.02em] text-gray-300 sm:flex"
+            class="hidden h-full items-center gap-2 truncate text-base leading-none tracking-[-0.02em] text-gray-700 sm:flex dark:text-gray-300"
           >
-            <span class="inline-flex h-5 items-center self-center text-lg leading-none text-gray-400">•</span>
+            <span class="inline-flex h-5 items-center self-center text-lg leading-none text-gray-500 dark:text-gray-400">•</span>
             <span class="inline-flex h-5 -translate-y-px items-center self-center leading-none">
               {{ routeInfoLabel }}
             </span>
           </div>
           <div
             v-else
-            class="hidden h-full items-center gap-1 truncate text-base leading-none tracking-[-0.02em] text-gray-300 sm:flex"
+            class="hidden h-full items-center gap-1 truncate text-base leading-none tracking-[-0.02em] text-gray-700 sm:flex dark:text-gray-300"
           >
             <span class="inline-flex h-5 items-center self-center leading-none">
               {{ getLabel() }}
@@ -153,7 +153,7 @@ const isOnMapPage = computed(() => {
         <div class="hidden items-center justify-end gap-7 lg:flex">
           <nuxt-link
             to="/about"
-            class="inline-flex items-center px-1 py-1 text-base leading-none font-medium tracking-[-0.02em] text-gray-300 transition-colors hover:text-white"
+            class="inline-flex items-center px-1 py-1 text-base leading-none font-medium tracking-[-0.02em] text-gray-700 transition-colors hover:text-gray-950 dark:text-gray-300 dark:hover:text-white"
           >
             About
           </nuxt-link>
@@ -178,7 +178,7 @@ const isOnMapPage = computed(() => {
             data-testid="notification-bell"
             to="/notifications"
             :aria-label="notificationCountVar > 0 ? `${notificationCountVar} new notifications` : 'Notifications'"
-            class="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-300 transition-colors hover:bg-white/5 hover:text-white focus:outline-none"
+            class="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-200 hover:text-gray-950 focus:outline-none dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white"
           >
             <i class="fa-regular fa-bell text-lg" aria-hidden="true" />
             <span
@@ -190,7 +190,7 @@ const isOnMapPage = computed(() => {
             </span>
           </nuxt-link>
           <ThemeSwitcher />
-          <div v-if="usernameVar" class="block">
+          <div v-if="usernameVar && !smAndDown" class="hidden md:block">
             <div class="flex items-center">
               <div class="relative flex-shrink-0">
                 <UserProfileDropdownMenu

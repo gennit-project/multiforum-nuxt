@@ -8,9 +8,10 @@ const h = vi.hoisted(() => ({
   route: null as unknown,
   username: null as unknown,
   notificationCount: null as unknown,
+  smAndDown: null as unknown,
 }));
 
-vi.mock('vuetify', () => ({ useDisplay: () => ({ smAndDown: ref(false) }) }));
+vi.mock('vuetify', () => ({ useDisplay: () => ({ smAndDown: h.smAndDown }) }));
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
 vi.mock('@/cache', () => ({ sideNavIsOpenVar: false }));
 vi.mock('@/composables/useAuthState', () => ({
@@ -43,6 +44,7 @@ beforeEach(() => {
   h.route = { params: {}, name: 'home' };
   h.username = ref('');
   h.notificationCount = ref(0);
+  h.smAndDown = ref(false);
 });
 
 describe('TopNav branding', () => {
@@ -120,6 +122,14 @@ describe('TopNav actions', () => {
     const wrapper = mountNav();
 
     expect(wrapper.find('.profile').exists()).toBe(true);
+  });
+
+  it('does not render the profile menu on mobile widths', () => {
+    h.username = ref('alice');
+    h.smAndDown = ref(true);
+    const wrapper = mountNav();
+
+    expect(wrapper.find('.profile').exists()).toBe(false);
   });
 
   it('hides the profile menu when logged out', () => {

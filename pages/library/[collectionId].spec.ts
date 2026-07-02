@@ -69,6 +69,10 @@ const mountWith = async (collection: unknown) => {
         LibraryChannelCard: true,
         LibraryCommentCard: LibraryCommentCardStub,
         ImageListItem: true,
+        Breadcrumbs: {
+          props: ['links'],
+          template: '<nav>{{ links.map((link) => link.label).join(" > ") }}</nav>',
+        },
       },
     },
   });
@@ -84,6 +88,20 @@ describe('library collection detail page', () => {
       Discussions: [],
       itemCount: 0,
     });
+    expect(wrapper.text()).toContain('Cat GIFs');
+  });
+
+  it('renders the library breadcrumb trail', async () => {
+    const wrapper = await mountWith({
+      id: 'col-1',
+      name: 'Cat GIFs',
+      collectionType: 'DISCUSSIONS',
+      visibility: 'PUBLIC',
+      Discussions: [],
+      itemCount: 0,
+    });
+
+    expect(wrapper.text()).toContain('Custom Collections');
     expect(wrapper.text()).toContain('Cat GIFs');
   });
 

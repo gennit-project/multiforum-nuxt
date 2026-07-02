@@ -149,7 +149,7 @@ const getAlbumThumbnail = (album: Album) => {
                 v-if="getAlbumThumbnail(album)"
                 :src="getAlbumThumbnail(album)"
                 alt="Album thumbnail"
-                class="h-full w-full object-cover transition-transform group-hover:scale-105"
+                class="h-full w-full object-cover"
               >
               <div
                 v-else
@@ -197,7 +197,7 @@ const getAlbumThumbnail = (album: Album) => {
                 v-if="getAlbumThumbnail(album)"
                 :src="getAlbumThumbnail(album)"
                 alt="Album thumbnail"
-                class="h-full w-full object-cover transition-transform group-hover:scale-105"
+                class="h-full w-full object-cover"
               >
               <div
                 v-else
