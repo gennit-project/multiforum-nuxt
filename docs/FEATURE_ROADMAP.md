@@ -6,7 +6,6 @@ Status labels:
 - `[complete]` The roadmap item is implemented and covered by targeted tests.
 - `[partial]` Some frontend and/or schema groundwork exists, but the feature is not complete.
 - `[not started]` No meaningful implementation was found in this frontend repo.
-- `[in draft PR]` Work has been implemented in a draft PR but is not merged yet.
 
 ### 1. Downloads: auto-save downloaded items into the user's library `[complete]`
 
@@ -21,14 +20,15 @@ Status labels:
 Notes:
 - Completed by the merged downloads backend and frontend PRs.
 
-### 2. Collections default to private on creation `[partial]`
+### 2. Collections default to private on creation `[complete]`
 
-- [ ] Make newly created user collections private by default unless the user explicitly chooses another visibility.
-- [ ] Audit every collection-creation entry point so they behave consistently.
-- [ ] Add tests covering default-private creation and explicit visibility overrides.
+- [x] Make newly created user collections private by default unless the user explicitly chooses another visibility.
+- [x] Audit every collection-creation entry point so they behave consistently.
+- [x] Add tests covering default-private creation and explicit visibility overrides.
 
 Notes:
-- The add-to-list creation flow currently creates collections as `PUBLIC`.
+- The add-to-list creation flow now defaults to `PRIVATE` and includes an explicit public visibility override.
+- The backend collection-create sanitizer also defaults missing visibility to `PRIVATE` while preserving explicit overrides.
 
 ### 3. Downloadable file permanent delete permission flow `[partial]`
 
@@ -124,7 +124,6 @@ Notes:
 
 ### 10. Permanent media deletion and storage cleanup `[partial]`
 
-- [x] Store backend-verified storage metadata for new image and downloadable-file uploads, including the actual storage URL/object name returned by signed upload creation. `[in draft PR]`
 - [ ] Let authorized users delete album images permanently and remove the backing object from GCP/storage.
 - [ ] Let authorized users delete profile images permanently and remove the backing object from GCP/storage.
 - [ ] Add permanent delete support for forum banners, including storage cleanup.
@@ -134,8 +133,6 @@ Notes:
 
 Notes:
 - The repo has album/image editing and removal-from-local-state flows, but that is not the same as permanent backend deletion plus cloud-storage cleanup.
-- Backend draft PR gennit-project/multiforum-backend#116 adds upload audit/storage fields and verifies `storageObjectName` on image/download creation.
-- Frontend draft PR gennit-project/multiforum-nuxt#266 consumes the new signed-upload payload, uses server-provided `storageUrl`, and passes `storageObjectName` into image/download create mutations.
 
 ### 11. Wiki: pinned sidebar pages `[not started]`
 
