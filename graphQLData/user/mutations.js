@@ -23,6 +23,15 @@ export const UPDATE_USER = gql`
   }
 `;
 
+export const PERMANENTLY_DELETE_PROFILE_IMAGE = gql`
+  mutation permanentlyDeleteProfileImage($username: String!, $imageUrl: String!) {
+    permanentlyDeleteProfileImage(username: $username, imageUrl: $imageUrl) {
+      username
+      profilePicURL
+    }
+  }
+`;
+
 export const MARK_NOTIFICATIONS_AS_READ = gql`
   mutation markNotificationsAsRead($username: String!) {
     updateUsers(
