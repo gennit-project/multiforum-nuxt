@@ -8,6 +8,7 @@ import {
   GET_USER_FAVORITE_COUNTS,
   GET_USER_FAVORITE_DOWNLOADS_COUNT,
   GET_USER_OWNED_DOWNLOADS_COUNT,
+  GET_UPLOADED_DOWNLOADABLE_FILES,
 } from '@/graphQLData/user/queries';
 import { GET_ALL_USER_COLLECTIONS } from '@/graphQLData/collection/queries';
 import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
@@ -77,6 +78,20 @@ const {
   })
 );
 
+const {
+  result: uploadedFilesResult,
+  refetch: refetchUploadedFiles,
+} = useQuery(
+  GET_UPLOADED_DOWNLOADABLE_FILES,
+  () => ({
+    username: username.value,
+  }),
+  () => ({
+    enabled: !!username.value && isAuthenticated.value,
+    fetchPolicy: 'cache-and-network',
+  })
+);
+
 const { result: customCollectionsResult, refetch: refetchCustomCollections } =
   useQuery(
     GET_ALL_USER_COLLECTIONS,
@@ -97,6 +112,7 @@ watch(
       refetchCounts();
       refetchDownloads();
       refetchOwnedDownloads();
+      refetchUploadedFiles();
       refetchCustomCollections();
     }
   }
@@ -115,6 +131,7 @@ const isLoading = computed(() => {
     !favoriteCountsResult.value &&
     !favoriteDownloadsResult.value &&
     !ownedDownloadsCountResult.value &&
+    !uploadedFilesResult.value &&
     !customCollectionsResult.value &&
     isAuthenticated.value &&
     !!username.value
@@ -154,9 +171,22 @@ const ownedDownloadsCount = computed(() => {
   );
 });
 
+const uploadedFilesCount = computed(() => {
+  const groups = uploadedFilesResult.value?.getUploadedDownloadableFiles || [];
+  return groups.reduce(
+    (count: number, group: { files?: unknown[] }) =>
+      count + (group.files?.length || 0),
+    0
+  );
+});
+
 const activeLibraryItemId = computed(() => {
   if (route.path === '/library/my-downloads') {
     return 'my-downloads';
+  }
+
+  if (route.path === '/library/uploads') {
+    return 'uploaded-files';
   }
 
   const matchingDefaultCollection = defaultCollections.value.find(
@@ -289,6 +319,13 @@ const allMobileCollections = computed(() => [
     visibility: 'PRIVATE',
     collectionType: 'DOWNLOADS',
   },
+  {
+    id: 'uploaded-files',
+    name: 'Uploaded Files',
+    itemCount: uploadedFilesCount.value,
+    visibility: 'PRIVATE',
+    collectionType: 'DOWNLOADS',
+  },
   ...filteredFavorites.value,
   ...filteredCustom.value,
 ]);
@@ -310,7 +347,9 @@ const activeLibraryItem = computed(() => {
 const getLibraryItemRoute = (collectionId: string) =>
   collectionId === 'my-downloads'
     ? myDownloadsLink.value
-    : `/library/${collectionId}`;
+    : collectionId === 'uploaded-files'
+      ? '/library/uploads'
+      : `/library/${collectionId}`;
 
 // Get color for collection type
 const getCollectionTypeInfo = (collectionType: string, isActive = false) => {
@@ -364,6 +403,10 @@ const isMyDownloadsActive = computed(
   () =>
     activeLibraryItemId.value === 'my-downloads' ||
     activeLibraryItemId.value === autoSavedDownloadsCollection.value?.id
+);
+
+const isUploadedFilesActive = computed(
+  () => activeLibraryItemId.value === 'uploaded-files'
 );
 </script>
 
@@ -475,6 +518,47 @@ const isMyDownloadsActive = computed(
                   <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
                     Downloads are added here automatically when you grab a file.
                   </p>
+
+                  <NuxtLink
+                    :to="getLibraryItemRoute('uploaded-files')"
+                    data-testid="mobile-library-item-uploaded-files"
+                    :class="[
+                      'mt-3 block rounded-2xl border px-4 py-3 text-sm transition-all',
+                      getSidebarItemClasses(isUploadedFilesActive),
+                    ]"
+                  >
+                    <div class="flex items-center justify-between gap-3">
+                      <div class="min-w-0">
+                        <p
+                          :class="
+                            isUploadedFilesActive
+                              ? 'font-semibold text-gray-900 dark:text-white'
+                              : 'font-semibold'
+                          "
+                        >
+                          Uploaded Files
+                        </p>
+                        <p
+                          :class="
+                            isUploadedFilesActive
+                              ? 'mt-1 text-xs text-gray-700 dark:text-white'
+                              : 'mt-1 text-xs text-gray-500 dark:text-gray-400'
+                          "
+                        >
+                          Manage files you uploaded
+                        </p>
+                      </div>
+                      <span
+                        :class="
+                          isUploadedFilesActive
+                            ? 'text-gray-700 dark:text-white'
+                            : 'text-gray-500 dark:text-gray-400'
+                        "
+                      >
+                        ({{ uploadedFilesCount }})
+                      </span>
+                    </div>
+                  </NuxtLink>
 
                   <NuxtLink
                     v-for="collection in filteredFavorites"
@@ -676,6 +760,44 @@ const isMyDownloadsActive = computed(
                   <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
                     Downloads are added here automatically when you grab a file.
                   </p>
+                  <NuxtLink
+                    :to="getLibraryItemRoute('uploaded-files')"
+                    class="mt-3 block rounded-2xl border px-4 py-3 text-sm transition-all"
+                    :class="getSidebarItemClasses(isUploadedFilesActive)"
+                    data-testid="library-item-uploaded-files"
+                  >
+                    <div class="flex items-center justify-between gap-3">
+                      <div class="min-w-0">
+                        <p
+                          :class="
+                            isUploadedFilesActive
+                              ? 'font-semibold text-gray-900 dark:text-white'
+                              : 'font-semibold'
+                          "
+                        >
+                          Uploaded Files
+                        </p>
+                        <p
+                          :class="
+                            isUploadedFilesActive
+                              ? 'mt-1 text-xs text-gray-700 dark:text-white'
+                              : 'mt-1 text-xs text-gray-500 dark:text-gray-400'
+                          "
+                        >
+                          Manage files you uploaded
+                        </p>
+                      </div>
+                      <span
+                        :class="
+                          isUploadedFilesActive
+                            ? 'text-gray-700 dark:text-white'
+                            : 'text-gray-500 dark:text-gray-400'
+                        "
+                      >
+                        ({{ uploadedFilesCount }})
+                      </span>
+                    </div>
+                  </NuxtLink>
                 </div>
 
                 <!-- Collections Section -->

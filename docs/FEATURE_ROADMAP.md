@@ -41,12 +41,13 @@ Notes:
 - [x] Show the destructive action only to authorized users in the existing download edit surface.
 - [x] Add a confirmation dialog that clearly says the file is permanently removed. `[in draft PR]`
 - [x] Refresh download detail and list views after deletion by filtering permanently removed downloadable files out of discussion queries. `[in draft PR]`
-- [ ] Add uploader-facing file management so users can see their downloadable files grouped by linked discussion on profile/library pages and delete them from there when authorized.
+- [x] Add uploader-facing file management so users can see their downloadable files grouped by linked discussion on profile/library pages and delete them from there when authorized. `[in draft PR]`
 - [ ] Add tests for OP allowed, unrelated user rejected, permitted moderator allowed, and moderator without permission rejected across backend and frontend surfaces.
 
 Notes:
 - Delete confirmation copy exists for individual downloadable files in the edit form in the current frontend draft slice.
 - Backend PR gennit-project/multiforum-backend#118 added `permanentlyDeleteDownloadableFile` on top of the shared storage deletion utility.
+- The current draft slice adds an owner-scoped backend query and `/library/uploads` management page for uploaded downloadable files.
 - Backend draft PR gennit-project/multiforum-backend#116 and frontend draft PR gennit-project/multiforum-nuxt#266 add verified upload storage metadata for new downloadable files, including `storageObjectName` and `storageUrl`.
 
 ### 4. Download filters: review and finish include/exclude semantics `[partial]`
@@ -137,6 +138,7 @@ Notes:
 - [x] Add shared backend storage deletion utility for image/downloadable-file objects.
 - [x] Add backend permanent-delete mutations for uploaded images and downloadable files.
 - [x] Add the first frontend permanent-delete flow for downloadable files in the download edit form. `[in draft PR]`
+- [x] Add an owner-facing uploaded downloadable-file management page with storage-backed permanent delete. `[in draft PR]`
 - [ ] Let authorized users delete profile images permanently and remove the backing object from GCP/storage.
 - [ ] Add permanent delete support for forum banners, including storage cleanup.
 - [ ] Make storage cleanup behavior explicit and tested so database deletion and blob deletion stay in sync.
