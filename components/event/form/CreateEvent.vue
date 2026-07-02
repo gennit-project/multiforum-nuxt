@@ -326,6 +326,10 @@ function updateFormValues(data: CreateEditEventFormValues) {
         :suspension-indefinitely="
           showSuspensionNotice ? suspensionIndefinitely ?? false : false
         "
+        :locked-channel-name="channelId || undefined"
+        :locked-channel-label="
+          channelResult?.channels?.[0]?.displayName || channelId || undefined
+        "
         @submit="submit"
         @update-form-values="updateFormValues"
       />

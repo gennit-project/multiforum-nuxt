@@ -79,6 +79,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  lockedChannelName: {
+    type: String,
+    default: '',
+  },
+  lockedChannelLabel: {
+    type: String,
+    default: '',
+  },
 });
 
 const emit = defineEmits([
@@ -228,8 +236,14 @@ const touched = ref(false);
               :test-id="'channel-input'"
               :selected-channels="formValues.selectedChannels"
               :description="'Select forums to submit to'"
-              :channel-where="{ eventsEnabled: true }"
               :required-enabled-channel-flags="['eventsEnabled']"
+              :locked-channel-name="lockedChannelName"
+              :locked-channel-label="lockedChannelLabel"
+              :locked-description="
+                lockedChannelName
+                  ? 'This event will be posted to the current forum.'
+                  : ''
+              "
               @set-selected-channels="
                 emit('updateFormValues', { selectedChannels: $event })
               "

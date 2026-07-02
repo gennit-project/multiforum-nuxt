@@ -85,15 +85,22 @@ Notes:
 
 ### 7. Submission UI for channels that do not allow the current post type `[partial]`
 
-- [ ] Review every channel/forum picker used for discussions, downloads, events, and similar flows.
-- [ ] Decide whether unsupported channels should remain visible but disabled, or be filtered with clear explanatory copy.
-- [ ] If disabled options are shown, include a reason such as `Does not allow downloads` or `Does not allow events`.
-- [ ] If unsupported channels are filtered out, show explicit helper text explaining that some channels were removed because they do not allow the current post type.
-- [ ] Add tests for both search results and selection behavior so users are not left guessing why a channel is unavailable.
+- [ ] Review every channel/forum picker used for discussions, events, downloads, and similar flows.
+- [ ] On sitewide create flows that actually support forum choice, keep unsupported forums visible in search results but disabled with a clear reason.
+- [ ] Prefer short reason copy such as `Does not allow events`.
+- [ ] Do not flood the default picker view with unavailable forums; show eligible forums first and surface unavailable forums in search results or a clearly separated unavailable section.
+- [ ] On forum-scoped create flows such as `/forums/[forumId]/.../create`, lock the forum control to the current forum instead of presenting a broad picker.
+- [ ] If a forum-scoped flow needs helper copy, explain that posting is limited to the current forum context.
+- [ ] Keep downloads forum-context-specific for now and do not add a sitewide create-download entry point in this slice.
+- [ ] Keep favorites and collection-based picker sections consistent with the same availability rules and reason text.
+- [ ] Add unit tests for picker search results, disabled-option rendering, blocked selection behavior, and disabled-safe bulk actions.
+- [ ] Add Playwright coverage for sitewide create flows to verify unavailable forums remain visible in search and cannot be selected.
+- [ ] Add tests for forum-scoped create flows to verify the current forum is locked and cross-forum selection is not offered.
 
 Notes:
 - Existing picker logic already filters channels by required flags in some flows, especially events.
 - That filtering currently hides unsupported channels instead of clearly explaining why they are unavailable.
+- Downloads remain intentionally forum-specific for now, because forum-specific labels/filter groups and ownership context make multi-forum submission more ambiguous.
 
 ### 8. User profile pinned posts `[not started]`
 
@@ -189,7 +196,6 @@ Notes:
 ## Removed From This Roadmap As Completed
 
 The following items were removed because they appear complete in this frontend repo:
-
 - Download detail page download counts
 - Download share/attribution/support-link UX cleanup
 - `textLastEdited` comment-edit timestamp fix

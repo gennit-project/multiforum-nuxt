@@ -346,6 +346,8 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
         :crossposted-discussion="crosspostPreviewDiscussion"
         :crosspost-error="crosspostPreviewError"
         :crosspost-loading="crosspostPreviewLoading"
+        :locked-channel-name="channelId || undefined"
+        :locked-channel-label="channelId || undefined"
         @submit="submit"
         @update-form-values="updateFormValues"
       />

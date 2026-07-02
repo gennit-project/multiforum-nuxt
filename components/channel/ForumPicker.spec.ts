@@ -1,42 +1,61 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
 import ForumPicker from '@/components/channel/ForumPicker.vue';
 
-// Mock Apollo composables
-vi.mock('@vue/apollo-composable', () => ({
-  useQuery: vi.fn(() => ({
-    loading: ref(false),
-    result: ref({ channels: [] }),
-  })),
+const h = vi.hoisted(() => ({
+  queryCallCount: 0,
+  channelResult: { channels: [] as Array<Record<string, unknown>> },
+  favoritesResult: {
+    users: [{ FavoriteChannels: [] as Array<Record<string, unknown>> }],
+  },
+  collectionsResult: {
+    users: [{ Collections: [] as Array<Record<string, unknown>> }],
+  },
 }));
 
-// Mock GraphQL queries
+vi.mock('@vue/apollo-composable', () => ({
+  useQuery: vi.fn(() => {
+    h.queryCallCount += 1;
+
+    if (h.queryCallCount === 1) {
+      return { loading: ref(false), result: ref(h.channelResult) };
+    }
+
+    if (h.queryCallCount === 2) {
+      return { loading: ref(false), result: ref(h.favoritesResult) };
+    }
+
+    return { loading: ref(false), result: ref(h.collectionsResult) };
+  }),
+}));
+
 vi.mock('@/graphQLData/channel/queries', () => ({
   GET_CHANNEL_NAMES: {},
   GET_USER_FAVORITE_CHANNELS: {},
 }));
 
-// Mock auth state
+vi.mock('@/graphQLData/collection/queries', () => ({
+  GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS: {},
+}));
+
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => ref(''),
   useIsAuthenticated: () => ref(false),
 }));
 
-// Use real MultiSelect component
-
-// Mock v-click-outside directive
 const clickOutsideDirective = {
   mounted: vi.fn(),
   unmounted: vi.fn(),
 };
 
 describe('ForumPicker', () => {
-  let wrapper: any;
-
   beforeEach(() => {
-    // Reset mocks
     vi.clearAllMocks();
+    h.queryCallCount = 0;
+    h.channelResult = { channels: [] };
+    h.favoritesResult = { users: [{ FavoriteChannels: [] }] };
+    h.collectionsResult = { users: [{ Collections: [] }] };
   });
 
   function createWrapper(props = {}) {
@@ -56,98 +75,95 @@ describe('ForumPicker', () => {
   }
 
   it('renders correctly with default props', () => {
-    wrapper = createWrapper();
+    const wrapper = createWrapper();
 
-    // Check for description
     expect(wrapper.text()).toContain('Select forums');
-
-    // Should have MultiSelect component
     expect(wrapper.findComponent({ name: 'MultiSelect' }).exists()).toBe(true);
   });
 
-  it('displays the selected channels as chips', async () => {
-    const selectedChannels = ['forum1', 'forum2'];
-    wrapper = createWrapper({
-      selectedChannels,
-    });
-
-    // Should pass selected values to MultiSelect component
-    const multiSelect = wrapper.findComponent({ name: 'MultiSelect' });
-    expect(multiSelect.props('modelValue')).toEqual(['forum1', 'forum2']);
-  });
-
-  it('toggles dropdown when clicked', async () => {
-    wrapper = createWrapper();
-
-    // Should have MultiSelect component that handles dropdown functionality
-    const multiSelect = wrapper.findComponent({ name: 'MultiSelect' });
-    expect(multiSelect.exists()).toBe(true);
-  });
-
-  it('removes selection when chip close button is clicked', async () => {
-    const selectedChannels = ['forum1', 'forum2'];
-    wrapper = createWrapper({
-      selectedChannels,
-    });
-
-    // Call handleUpdateChannels method directly
-    await wrapper.vm.handleUpdateChannels(['forum2']);
-
-    // Should emit event with updated selection
-    expect(wrapper.emitted('setSelectedChannels')).toBeTruthy();
-    expect(wrapper.emitted('setSelectedChannels')[0][0]).toEqual(['forum2']);
-  });
-
-  it('closes the dropdown when clicked outside', async () => {
-    wrapper = createWrapper();
-
-    // MultiSelect component handles outside clicks internally
-    const multiSelect = wrapper.findComponent({ name: 'MultiSelect' });
-    expect(multiSelect.exists()).toBe(true);
-  });
-
-  it('updates selected channels when prop changes', async () => {
-    wrapper = createWrapper({
-      selectedChannels: ['forum1'],
-    });
-
-    // Verify initial props passed to MultiSelect
-    let multiSelect = wrapper.findComponent({ name: 'MultiSelect' });
-    expect(multiSelect.props('modelValue')).toEqual(['forum1']);
-
-    // Update the prop
-    await wrapper.setProps({
+  it('displays the selected channels as chips', () => {
+    const wrapper = createWrapper({
       selectedChannels: ['forum1', 'forum2'],
     });
 
-    // Should update MultiSelect props
-    multiSelect = wrapper.findComponent({ name: 'MultiSelect' });
+    const multiSelect = wrapper.findComponent({ name: 'MultiSelect' });
     expect(multiSelect.props('modelValue')).toEqual(['forum1', 'forum2']);
   });
 
-  it('handles toggleSelection from MultiSelect', async () => {
-    wrapper = createWrapper();
+  it('emits updated selections from the MultiSelect bridge', async () => {
+    const wrapper = createWrapper();
 
-    // Call handleUpdateChannels method directly
     await wrapper.vm.handleUpdateChannels(['forum1']);
-
-    // Should emit event with updated selection
-    expect(wrapper.emitted('setSelectedChannels')).toBeTruthy();
-    expect(wrapper.emitted('setSelectedChannels')[0][0]).toEqual(['forum1']);
-
-    // Call handleUpdateChannels with empty array for deselection
     await wrapper.vm.handleUpdateChannels([]);
 
-    // Should emit event with empty selection
-    expect(wrapper.emitted('setSelectedChannels')[1][0]).toEqual([]);
+    expect(wrapper.emitted('setSelectedChannels')).toEqual([
+      [['forum1']],
+      [[]],
+    ]);
   });
 
-  it('receives channel options from GraphQL query', async () => {
-    wrapper = createWrapper();
+  it('only shows eligible event forums by default', () => {
+    h.channelResult = {
+      channels: [
+        { uniqueName: 'cats', displayName: 'Cats', channelIconURL: '', eventsEnabled: true },
+        { uniqueName: 'dogs', displayName: 'Dogs', channelIconURL: '', eventsEnabled: false },
+      ],
+    };
 
-    // Should have MultiSelect component with options from GraphQL
+    const wrapper = createWrapper({
+      requiredEnabledChannelFlags: ['eventsEnabled'],
+    });
+
     const multiSelect = wrapper.findComponent({ name: 'MultiSelect' });
-    expect(multiSelect.props('options')).toEqual([]);
-    expect(multiSelect.props('loading')).toBe(false);
+    const allForumsSection = multiSelect
+      .props('sections')
+      .find((section: { title: string }) => section.title === 'Forums (Top 10)');
+
+    expect(allForumsSection.options).toEqual([
+      expect.objectContaining({ value: 'cats', disabled: false }),
+    ]);
+  });
+
+  it('shows unavailable event forums as disabled search results with a reason', async () => {
+    h.channelResult = {
+      channels: [
+        { uniqueName: 'cats', displayName: 'Cats', channelIconURL: '', eventsEnabled: true },
+        { uniqueName: 'dogs', displayName: 'Dogs', channelIconURL: '', eventsEnabled: false },
+      ],
+    };
+
+    const wrapper = createWrapper({
+      requiredEnabledChannelFlags: ['eventsEnabled'],
+    });
+
+    await wrapper.vm.handleSearch('dogs');
+    await nextTick();
+
+    const multiSelect = wrapper.findComponent({ name: 'MultiSelect' });
+    const allForumsSection = multiSelect
+      .props('sections')
+      .find((section: { title: string }) => section.title === 'Forums (Top 10)');
+
+    expect(allForumsSection.options).toContainEqual(
+      expect.objectContaining({
+        value: 'dogs',
+        disabled: true,
+        description: 'Does not allow events',
+      })
+    );
+  });
+
+  it('renders a locked forum instead of an interactive picker', () => {
+    const wrapper = createWrapper({
+      lockedChannelName: 'cats',
+      lockedChannelLabel: 'Cats',
+      lockedDescription: 'This event will be posted to the current forum.',
+    });
+
+    expect(wrapper.findComponent({ name: 'MultiSelect' }).exists()).toBe(false);
+    expect(wrapper.get('[data-testid="forum-picker"]').text()).toContain('cats');
+    expect(wrapper.text()).toContain(
+      'This event will be posted to the current forum.'
+    );
   });
 });

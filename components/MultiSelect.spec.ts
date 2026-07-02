@@ -60,6 +60,27 @@ describe('MultiSelect', () => {
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['a']]);
   });
 
+  it('renders disabled option descriptions and does not emit when clicked', async () => {
+    const wrapper = mountSelect({
+      options: [
+        { value: 'a', label: 'Apple' },
+        {
+          value: 'b',
+          label: 'Banana',
+          disabled: true,
+          description: 'Does not allow events',
+        },
+      ],
+      modelValue: [],
+    });
+
+    await wrapper.get('[data-testid="ms"]').trigger('click');
+    expect(wrapper.text()).toContain('Does not allow events');
+
+    await clickRow(wrapper, 'Banana');
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+  });
+
   const clickRow = async (wrapper: ReturnType<typeof mountSelect>, label: string) => {
     const row = wrapper
       .findAll('[class*="cursor-pointer"]')
@@ -122,6 +143,36 @@ describe('MultiSelect', () => {
       expect((selectAll.element as HTMLInputElement).checked).toBe(true);
       await selectAll.trigger('click');
       expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([[]]);
+    });
+
+    it('select-all skips disabled options in the section', async () => {
+      const wrapper = mountWithDefaults(MultiSelect, {
+        props: {
+          options: [],
+          sections: [
+            {
+              title: 'Fruits',
+              selectAllLabel: 'All fruits',
+              options: [
+                { value: 'a', label: 'Apple' },
+                {
+                  value: 'b',
+                  label: 'Banana',
+                  disabled: true,
+                  description: 'Does not allow events',
+                },
+              ],
+            },
+          ],
+          multiple: true,
+          testId: 'ms',
+          modelValue: [],
+        },
+      });
+
+      await wrapper.get('[data-testid="ms"]').trigger('click');
+      await wrapper.get('input[aria-label="All fruits"]').trigger('click');
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['a']]);
     });
   });
 

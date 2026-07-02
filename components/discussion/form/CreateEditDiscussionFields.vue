@@ -43,6 +43,8 @@ const props = defineProps<{
   crosspostedDiscussion?: Discussion | null;
   crosspostError?: ApolloError | null;
   crosspostLoading?: boolean;
+  lockedChannelName?: string;
+  lockedChannelLabel?: string;
 }>();
 
 defineEmits(['submit', 'updateFormValues', 'cancel']);
@@ -291,6 +293,15 @@ onMounted(() => {
                 <ForumPicker
                   :test-id="'channel-input'"
                   :selected-channels="formValues.selectedChannels"
+                  :locked-channel-name="lockedChannelName"
+                  :locked-channel-label="lockedChannelLabel"
+                  :locked-description="
+                    lockedChannelName
+                      ? downloadMode
+                        ? 'This download will be posted to the current forum.'
+                        : 'This discussion will be posted to the current forum.'
+                      : ''
+                  "
                   @set-selected-channels="
                     $emit('updateFormValues', { selectedChannels: $event })
                   "

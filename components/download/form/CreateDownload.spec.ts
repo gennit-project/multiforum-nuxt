@@ -46,7 +46,13 @@ vi.mock('@/composables/useAuthState', () => ({ useUsername: () => h.username }))
 
 const fieldsStub = {
   name: 'CreateEditDiscussionFields',
-  props: ['formValues', 'channelData', 'createDiscussionLoading', 'downloadMode'],
+  props: [
+    'formValues',
+    'channelData',
+    'createDiscussionLoading',
+    'downloadMode',
+    'lockedChannelName',
+  ],
   emits: ['submit', 'update-form-values'],
   template: '<div />',
 };
@@ -118,6 +124,12 @@ describe('CreateDownload rendering', () => {
       (fields(wrapper).props('formValues') as { selectedChannels: string[] })
         .selectedChannels
     ).toEqual(['cats']);
+  });
+
+  it('locks forum selection to the routed forum', () => {
+    const wrapper = mountCreate();
+
+    expect(fields(wrapper).props('lockedChannelName')).toBe('cats');
   });
 });
 
