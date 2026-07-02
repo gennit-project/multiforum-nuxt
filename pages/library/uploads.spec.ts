@@ -22,7 +22,7 @@ const RequireAuthStub = defineComponent({
 
 const WarningModalStub = defineComponent({
   name: 'WarningModal',
-  props: ['open', 'title'],
+  props: ['open', 'title', 'error'],
   emits: ['close', 'primary-button-click'],
   template: '<div data-testid="warning-modal" :data-open="open" />',
 });
@@ -127,5 +127,33 @@ describe('uploaded files library page', () => {
     await flushPromises();
 
     expect(refetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not refetch uploaded files when delete fails', async () => {
+    deleteMutation.mockRejectedValueOnce(new Error('Not authorized'));
+    const wrapper = await mountPage();
+
+    await wrapper.get('button').trigger('click');
+    await wrapper
+      .getComponent(WarningModalStub)
+      .vm.$emit('primary-button-click');
+    await flushPromises();
+
+    expect(refetch).not.toHaveBeenCalled();
+  });
+
+  it('shows the backend delete error when delete fails', async () => {
+    deleteMutation.mockRejectedValueOnce(new Error('Not authorized'));
+    const wrapper = await mountPage();
+
+    await wrapper.get('button').trigger('click');
+    await wrapper
+      .getComponent(WarningModalStub)
+      .vm.$emit('primary-button-click');
+    await flushPromises();
+
+    expect(wrapper.getComponent(WarningModalStub).props('error')).toBe(
+      'Not authorized'
+    );
   });
 });
