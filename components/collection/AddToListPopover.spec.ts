@@ -61,6 +61,18 @@ const mountPopover = (props: Record<string, unknown> = {}) =>
 const rows = (wrapper: ReturnType<typeof mount>) =>
   wrapper.findAll('.cursor-pointer');
 
+const clickNewListButton = async (wrapper: ReturnType<typeof mount>) => {
+  const newListButton = wrapper
+    .findAll('button')
+    .find((button) => button.text().includes('New List'));
+
+  if (!newListButton) {
+    throw new Error('New List button not found');
+  }
+
+  await newListButton.trigger('click');
+};
+
 beforeEach(() => {
   h.username.value = 'alice';
   h.collectionsResult = ref({
@@ -222,6 +234,53 @@ describe('AddToListPopover collection toggle', () => {
       collectionId: 'c1',
       itemId: 'item-1',
     });
+  });
+});
+
+describe('AddToListPopover collection creation', () => {
+  it('creates new collections as private by default', async () => {
+    (h.createCollection as ReturnType<typeof vi.fn>).mockResolvedValue({
+      data: {
+        createCollections: { collections: [{ id: 'new1', name: 'New List' }] },
+      },
+    });
+
+    const wrapper = mountPopover();
+
+    await clickNewListButton(wrapper);
+    await wrapper.get('input[aria-label="New list name"]').setValue('New List');
+    await wrapper.get('button[class*="bg-blue-600"]').trigger('click');
+    await flushPromises();
+
+    expect(h.createCollection).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'New List',
+        visibility: 'PRIVATE',
+      })
+    );
+  });
+
+  it('lets the user explicitly create a public collection', async () => {
+    (h.createCollection as ReturnType<typeof vi.fn>).mockResolvedValue({
+      data: {
+        createCollections: { collections: [{ id: 'new1', name: 'Shared List' }] },
+      },
+    });
+
+    const wrapper = mountPopover();
+
+    await clickNewListButton(wrapper);
+    await wrapper.get('input[aria-label="New list name"]').setValue('Shared List');
+    await wrapper.get('select[aria-label="New list visibility"]').setValue('PUBLIC');
+    await wrapper.get('button[class*="bg-blue-600"]').trigger('click');
+    await flushPromises();
+
+    expect(h.createCollection).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Shared List',
+        visibility: 'PUBLIC',
+      })
+    );
   });
 });
 
