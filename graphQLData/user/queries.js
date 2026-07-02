@@ -284,6 +284,29 @@ export const GET_USER_OWNED_DOWNLOADS_COUNT = gql`
   }
 `;
 
+export const GET_UPLOADED_DOWNLOADABLE_FILES = gql`
+  query getUploadedDownloadableFiles($username: String!) {
+    getUploadedDownloadableFiles(username: $username) {
+      discussion {
+        id
+        title
+        createdAt
+        updatedAt
+        channelUniqueNames
+      }
+      files {
+        id
+        fileName
+        kind
+        size
+        url
+        uploadedAt
+        createdAt
+      }
+    }
+  }
+`;
+
 export const GET_USER_EVENTS = gql`
   query getUserEvents($username: String!, $where: EventWhere) {
     users(where: { username: $username }) {
