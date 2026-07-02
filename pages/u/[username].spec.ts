@@ -161,4 +161,16 @@ describe('User profile container', () => {
       wrapper.findComponent({ name: 'UserProfileSidebar' }).props('serverRoleBadge')
     ).toBeNull();
   });
+
+  it('passes the dedicated wiki edits count through to the tabs', async () => {
+    h.resultRef.value = {
+      getUserWikiEditsCount: 3,
+      users: [makeUser({ AuthoredWikiPageVersionsAggregate: { count: 11 } })],
+    };
+
+    const wrapper = await mountContainer();
+
+    expect(wrapper.findComponent({ name: 'UserProfileTabs' }).props('user'))
+      .toMatchObject({ wikiEditsCount: 3 });
+  });
 });

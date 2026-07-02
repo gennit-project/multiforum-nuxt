@@ -2,6 +2,7 @@ import { gql } from '@apollo/client/core';
 
 export const GET_USER = gql`
   query getBasicUserInfo($username: String!) {
+    getUserWikiEditsCount(username: $username)
     users(where: { username: $username }) {
       username
       commentKarma
@@ -329,8 +330,17 @@ export const GET_USER_WIKI_EDITS = gql`
     wikiPages(where: $where, options: { sort: [{ updatedAt: DESC }] }) {
       id
       title
+      body
+      editReason
       slug
+      createdAt
+      updatedAt
       channelUniqueName
+      VersionAuthor {
+        username
+        displayName
+        profilePicURL
+      }
       PastVersions(
         where: $versionWhere
         options: { sort: [{ createdAt: DESC }] }

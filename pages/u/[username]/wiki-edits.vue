@@ -9,12 +9,21 @@ import type { TextVersion, WikiPage } from '@/__generated__/graphql';
 
 type WikiEditPage = Pick<
   WikiPage,
-  'id' | 'title' | 'slug' | 'channelUniqueName'
+  | 'id'
+  | 'title'
+  | 'body'
+  | 'editReason'
+  | 'slug'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'channelUniqueName'
+  | 'VersionAuthor'
 > & {
   PastVersions?: TextVersion[] | null;
 };
 
 type WikiEdit = TextVersion & {
+  listKey: string;
   wikiPage: Pick<WikiPage, 'id' | 'title' | 'slug' | 'channelUniqueName'>;
 };
 
@@ -33,7 +42,16 @@ const versionWhere = computed(() => ({
 
 const wikiPagesWhere = computed(() => {
   const baseWhere = {
-    PastVersions_SOME: versionWhere.value,
+    OR: [
+      {
+        PastVersions_SOME: versionWhere.value,
+      },
+      {
+        VersionAuthor: {
+          username: username.value,
+        },
+      },
+    ],
   };
 
   if (!hasSelectedChannels.value) {
@@ -73,10 +91,30 @@ const wikiEdits = computed<WikiEdit[]>(() => {
         channelUniqueName: wikiPage.channelUniqueName,
       };
 
-      return (wikiPage.PastVersions || []).map((version) => ({
+      const edits = (wikiPage.PastVersions || []).map((version) => ({
         ...version,
+        listKey: `${wikiPage.id}:${version.id}`,
         wikiPage: page,
       }));
+
+      if (wikiPage.VersionAuthor?.username === username.value) {
+        edits.push({
+          id: 'current',
+          body: wikiPage.body,
+          editReason: wikiPage.editReason,
+          createdAt: wikiPage.updatedAt || wikiPage.createdAt,
+          Author: wikiPage.VersionAuthor,
+          AuthorConnection: {
+            edges: [],
+            pageInfo: { hasNextPage: false, hasPreviousPage: false },
+            totalCount: 0,
+          },
+          listKey: `${wikiPage.id}:current`,
+          wikiPage: page,
+        });
+      }
+
+      return edits;
     })
     .sort((a, b) => {
       return (
@@ -102,7 +140,7 @@ const getWikiRevisionPath = (edit: WikiEdit) => {
     <ul v-else class="flex flex-col gap-3">
       <li
         v-for="edit in wikiEdits"
-        :key="edit.id"
+        :key="edit.listKey"
         class="rounded-md border border-gray-200 p-3 dark:border-gray-700"
       >
         <div class="flex flex-col gap-1">
