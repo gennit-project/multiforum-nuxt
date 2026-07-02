@@ -190,7 +190,7 @@ const isOnMapPage = computed(() => {
             </span>
           </nuxt-link>
           <ThemeSwitcher />
-          <div v-if="usernameVar" class="block">
+          <div v-if="usernameVar && !smAndDown" class="hidden md:block">
             <div class="flex items-center">
               <div class="relative flex-shrink-0">
                 <UserProfileDropdownMenu

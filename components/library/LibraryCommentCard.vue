@@ -95,14 +95,14 @@ withDefaults(
       </div>
     </div>
 
-    <div class="mt-5 flex items-end justify-between gap-4">
+    <div class="mt-5 flex flex-wrap items-end justify-between gap-4">
       <div class="min-w-0 text-sm text-gray-500 dark:text-gray-400">
         <NuxtLink
           :to="contextPermalink"
-          class="inline-flex min-w-0 items-center gap-1 rounded-full bg-orange-50 px-3 py-1.5 font-medium text-orange-700 transition-colors hover:bg-orange-100 dark:bg-orange-500/10 dark:text-orange-300 dark:hover:bg-orange-500/20"
+          class="flex max-w-full flex-wrap items-center gap-x-1 gap-y-0.5 rounded-2xl bg-orange-50 px-3 py-1.5 font-medium text-orange-700 transition-colors hover:bg-orange-100 dark:bg-orange-500/10 dark:text-orange-300 dark:hover:bg-orange-500/20"
         >
           <span class="opacity-75">Post from</span>
-          <span class="truncate">{{ contextTitle }}</span>
+          <span class="min-w-0 break-words">{{ contextTitle }}</span>
         </NuxtLink>
       </div>
 

@@ -24,12 +24,12 @@ const buildTarget = (link: Link) => {
 
 <template>
   <nav class="mb-1 mt-2 flex" aria-label="Breadcrumb">
-    <ol role="list" class="flex items-center space-x-4">
+    <ol role="list" class="flex flex-wrap items-center gap-x-4 gap-y-2">
       <li
         v-for="(link, i) in props.links"
         :key="`${link.path || 'current'}-${link.label}`"
       >
-        <div class="flex items-center">
+        <div class="flex items-center whitespace-nowrap">
           <!-- Heroicon name: solid/chevron-right -->
           <svg
             v-if="i !== 0"

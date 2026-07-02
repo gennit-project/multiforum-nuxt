@@ -285,7 +285,7 @@ const handleDelete = async () => {
                 </NuxtLink>
 
                 <!-- Title and actions -->
-                <div class="flex items-start justify-between gap-4">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div class="flex-1">
                     <h1
                       class="text-3xl font-semibold tracking-[-0.04em] text-gray-950 dark:text-white md:text-4xl"
@@ -324,15 +324,17 @@ const handleDelete = async () => {
                   </div>
 
                   <!-- Action buttons -->
-                  <div class="ml-4 flex flex-shrink-0 items-center gap-2">
+                  <div
+                    class="flex w-full flex-wrap items-center gap-2 lg:ml-4 lg:w-auto lg:flex-shrink-0 lg:flex-nowrap"
+                  >
                     <button
                       type="button"
-                      class="inline-flex items-center rounded-full border border-gray-300 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-800 shadow-sm transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-70 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                      class="inline-flex items-center rounded-full border border-gray-300 bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-800 shadow-sm transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-70 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 lg:px-3 lg:py-2 lg:text-sm"
                       :disabled="visibilityUpdating || updateLoading"
                       @click="handleToggleVisibility"
                     >
                       <svg
-                        class="mr-1.5 h-4 w-4"
+                        class="mr-1.5 h-3.5 w-3.5 lg:h-4 lg:w-4"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -354,11 +356,11 @@ const handleDelete = async () => {
                       type="button"
                       aria-label="Edit collection"
                       title="Edit collection"
-                      class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-800 shadow-sm transition hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                      class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-800 shadow-sm transition hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 lg:h-11 lg:w-11"
                       @click="openRenameModal"
                     >
                       <svg
-                        class="h-4 w-4"
+                        class="h-3.5 w-3.5 lg:h-4 lg:w-4"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -375,11 +377,11 @@ const handleDelete = async () => {
                       type="button"
                       aria-label="Delete collection"
                       title="Delete collection"
-                      class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-red-300 bg-white text-red-600 shadow-sm transition hover:bg-red-50 dark:border-red-500/40 dark:bg-gray-800 dark:text-red-300 dark:hover:bg-red-500/12"
+                      class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-red-300 bg-white text-red-600 shadow-sm transition hover:bg-red-50 dark:border-red-500/40 dark:bg-gray-800 dark:text-red-300 dark:hover:bg-red-500/12 lg:h-11 lg:w-11"
                       @click="showDeleteModal = true"
                     >
                       <svg
-                        class="h-4 w-4"
+                        class="h-3.5 w-3.5 lg:h-4 lg:w-4"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"

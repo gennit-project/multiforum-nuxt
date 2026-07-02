@@ -126,7 +126,7 @@ const dangerButtonClasses = computed(() => {
 
         <div class="fixed inset-0 z-10 overflow-y-auto">
           <div
-            class="flex min-h-full items-end justify-center text-center sm:items-center sm:p-0 md:p-4"
+            class="flex min-h-full items-start justify-center px-3 pb-6 pt-8 text-center sm:items-center sm:px-0 sm:pb-0 sm:pt-0 md:p-4"
           >
             <TransitionChild
               as="template"
@@ -138,7 +138,7 @@ const dangerButtonClasses = computed(() => {
               leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <DialogPanel
-                class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all dark:bg-gray-800 sm:my-8 sm:w-full sm:p-6"
+                class="relative w-full max-w-lg transform overflow-hidden rounded-2xl bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all dark:bg-gray-800 sm:my-8 sm:p-6"
               >
                 <!-- Header Area with fixed height -->
                 <div class="flex-none px-2 pb-2 pt-5 md:px-4">

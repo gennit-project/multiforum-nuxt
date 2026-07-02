@@ -22,6 +22,7 @@ useHead({
 // Filter state
 const activeFilter = ref('all');
 const searchTerm = ref('');
+const isMobileNavOpen = ref(false);
 
 // Filter options
 const filterOptions = [
@@ -96,6 +97,13 @@ watch(
       refetchOwnedDownloads();
       refetchCustomCollections();
     }
+  }
+);
+
+watch(
+  () => route.path,
+  () => {
+    isMobileNavOpen.value = false;
   }
 );
 
@@ -255,6 +263,31 @@ const filteredCustom = computed(() => {
   return filteredCollections.value.filter((c) => !c.id.startsWith('favorite-'));
 });
 
+const allMobileCollections = computed(() => [
+  {
+    id: 'my-downloads',
+    name: 'My Downloads',
+    itemCount: ownedDownloadsCount.value,
+    visibility: 'PRIVATE',
+    collectionType: 'DOWNLOADS',
+  },
+  ...filteredFavorites.value,
+  ...filteredCustom.value,
+]);
+
+const activeLibraryItem = computed(() => {
+  return (
+    allMobileCollections.value.find(
+      (collection) => collection.id === activeLibraryItemId.value
+    ) ?? null
+  );
+});
+
+const getLibraryItemRoute = (collectionId: string) =>
+  collectionId === 'my-downloads'
+    ? '/library/my-downloads'
+    : `/library/${collectionId}`;
+
 // Get color for collection type
 const getCollectionTypeInfo = (collectionType: string, isActive = false) => {
   if (isActive) {
@@ -314,13 +347,224 @@ const isMyDownloadsActive = computed(
       <RequireAuth>
         <template #has-auth>
           <div class="flex flex-col gap-4 px-3 py-4 md:flex-row md:gap-6 md:px-4">
-            <!-- Sidebar - hidden on mobile when viewing collection detail -->
-            <div
-              :class="[
-                'w-72 md:w-[24rem] md:flex-shrink-0',
-                activeLibraryItemId ? 'hidden md:block' : 'block',
-              ]"
-            >
+            <div class="md:hidden">
+              <button
+                class="flex w-full items-center justify-between rounded-[1.5rem] border border-gray-200 bg-white px-4 py-3 text-left text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-800"
+                data-testid="mobile-library-nav-dropdown"
+                type="button"
+                :aria-expanded="isMobileNavOpen ? 'true' : 'false'"
+                @click="isMobileNavOpen = !isMobileNavOpen"
+              >
+                <div class="min-w-0">
+                  <p class="truncate text-xs font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500">
+                    Library
+                  </p>
+                  <p class="mt-1 truncate text-base font-semibold text-gray-900 dark:text-white">
+                    {{ activeLibraryItem?.name ?? 'Browse collections' }}
+                  </p>
+                </div>
+                <i
+                  class="fa-solid ml-3 h-4 w-4 flex-shrink-0 text-gray-500 transition-transform dark:text-gray-400"
+                  :class="isMobileNavOpen ? 'fa-chevron-up' : 'fa-chevron-down'"
+                />
+              </button>
+
+              <div
+                v-if="isMobileNavOpen"
+                class="mt-2 rounded-[1.5rem] border border-gray-200 bg-white p-4 shadow-xl ring-1 ring-black/5 dark:border-gray-700 dark:bg-gray-900 dark:ring-white/10"
+              >
+                <div class="relative">
+                  <span
+                    class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-gray-500"
+                  >
+                    <i class="fa-solid fa-magnifying-glass text-sm" />
+                  </span>
+                  <input
+                    v-model="searchTerm"
+                    type="search"
+                    placeholder="Search collections"
+                    aria-label="Search library collections"
+                    class="w-full rounded-2xl border border-gray-200 bg-gray-50/90 py-3 pl-10 pr-4 text-sm text-gray-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-orange-400 dark:focus:bg-gray-800 dark:focus:ring-orange-500/20"
+                  >
+                </div>
+
+                <div class="mt-4 flex flex-wrap gap-2">
+                  <button
+                    v-for="filter in filterOptions"
+                    :key="`mobile-${filter.key}`"
+                    type="button"
+                    :class="[
+                      'rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
+                      activeFilter === filter.key
+                        ? 'bg-gray-900 text-white ring-1 ring-inset ring-gray-800 dark:bg-gray-700 dark:text-gray-50 dark:ring-gray-600'
+                        : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white',
+                    ]"
+                    @click="activeFilter = filter.key"
+                  >
+                    {{ filter.label }}
+                  </button>
+                </div>
+
+                <nav class="mt-4 space-y-2">
+                  <NuxtLink
+                    :to="getLibraryItemRoute('my-downloads')"
+                    data-testid="mobile-library-item-my-downloads"
+                    :class="[
+                      'block rounded-2xl border px-4 py-3 text-sm transition-all',
+                      getSidebarItemClasses(isMyDownloadsActive),
+                    ]"
+                  >
+                    <div class="flex items-center justify-between gap-3">
+                      <div class="min-w-0">
+                        <p
+                          :class="
+                            isMyDownloadsActive
+                              ? 'font-semibold text-gray-900 dark:text-white'
+                              : 'font-semibold'
+                          "
+                        >
+                          My Downloads
+                        </p>
+                        <p
+                          :class="
+                            isMyDownloadsActive
+                              ? 'mt-1 text-xs text-gray-700 dark:text-white'
+                              : 'mt-1 text-xs text-gray-500 dark:text-gray-400'
+                          "
+                        >
+                          Files you uploaded across the site
+                        </p>
+                      </div>
+                      <span
+                        :class="
+                          isMyDownloadsActive
+                            ? 'text-gray-700 dark:text-white'
+                            : 'text-gray-500 dark:text-gray-400'
+                        "
+                      >
+                        ({{ ownedDownloadsCount }})
+                      </span>
+                    </div>
+                  </NuxtLink>
+
+                  <NuxtLink
+                    v-for="collection in filteredFavorites"
+                    :key="`mobile-favorite-${collection.id}`"
+                    :to="getLibraryItemRoute(collection.id)"
+                    :data-testid="`mobile-library-item-${collection.id}`"
+                    :class="[
+                      'block rounded-2xl border px-4 py-3 text-sm transition-all',
+                      getSidebarItemClasses(activeLibraryItemId === collection.id),
+                    ]"
+                  >
+                    <div class="flex items-start justify-between gap-3">
+                      <div class="min-w-0">
+                        <p class="font-semibold">
+                          {{ collection.name.replace('Favorite ', '') }}
+                          <span
+                            :class="
+                              activeLibraryItemId === collection.id
+                                ? 'text-gray-700 dark:text-white'
+                                : 'text-gray-500 dark:text-gray-400'
+                            "
+                          >
+                            ({{ collection.itemCount }})</span
+                          >
+                        </p>
+                        <p
+                          :class="
+                            activeLibraryItemId === collection.id
+                              ? 'mt-1 text-xs capitalize text-gray-700 dark:text-white'
+                              : 'mt-1 text-xs capitalize text-gray-500 dark:text-gray-400'
+                          "
+                        >
+                          {{ collection.visibility.toLowerCase() }}
+                        </p>
+                      </div>
+                      <span
+                        :class="
+                          activeLibraryItemId === collection.id
+                            ? 'text-xs font-medium uppercase tracking-[0.18em] text-gray-700 dark:text-white'
+                            : 'text-xs font-medium uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500'
+                        "
+                      >
+                        Fav
+                      </span>
+                    </div>
+                  </NuxtLink>
+
+                  <NuxtLink
+                    v-for="collection in filteredCustom"
+                    :key="`mobile-custom-${collection.id}`"
+                    :to="getLibraryItemRoute(collection.id)"
+                    :data-testid="`mobile-library-item-${collection.id}`"
+                    :class="[
+                      'block rounded-2xl border px-4 py-3 text-sm transition-all',
+                      getSidebarItemClasses(activeLibraryItemId === collection.id),
+                    ]"
+                  >
+                    <div class="flex items-start justify-between gap-3">
+                      <div class="min-w-0">
+                        <p class="font-semibold">
+                          {{ collection.name }}
+                          <span
+                            :class="
+                              activeLibraryItemId === collection.id
+                                ? 'text-gray-700 dark:text-white'
+                                : 'text-gray-500 dark:text-gray-400'
+                            "
+                          >
+                            ({{ collection.itemCount }})</span
+                          >
+                        </p>
+                        <div class="mt-2 flex flex-wrap items-center gap-2">
+                          <span
+                            :class="[
+                              'rounded-full px-2 py-0.5 text-[11px] font-medium',
+                              getCollectionTypeInfo(
+                                collection.collectionType,
+                                activeLibraryItemId === collection.id
+                              ).color,
+                            ]"
+                          >
+                            {{
+                              collection.collectionType
+                                .toLowerCase()
+                                .replace('_', ' ')
+                            }}
+                          </span>
+                          <span
+                            :class="
+                              activeLibraryItemId === collection.id
+                                ? 'text-xs capitalize text-gray-700 dark:text-white'
+                                : 'text-xs capitalize text-gray-500 dark:text-gray-400'
+                            "
+                          >
+                            {{ collection.visibility.toLowerCase() }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </NuxtLink>
+
+                  <div
+                    v-if="
+                      filteredFavorites.length === 0 &&
+                      filteredCustom.length === 0
+                    "
+                    class="rounded-2xl border border-dashed border-gray-300/80 px-3 py-6 text-center text-sm text-gray-500 dark:border-white/10 dark:text-gray-400"
+                  >
+                    {{
+                      searchTerm
+                        ? `No collections match "${searchTerm}".`
+                        : 'No collections yet. Start adding items to create your first collection!'
+                    }}
+                  </div>
+                </nav>
+              </div>
+            </div>
+
+            <div class="hidden w-72 md:block md:w-[24rem] md:flex-shrink-0">
               <div class="rounded-[2rem] border border-gray-200/80 bg-white/95 p-5 shadow-[0_25px_70px_-38px_rgba(38,38,38,0.22)] backdrop-blur dark:border-gray-700 dark:bg-gray-900 dark:shadow-[0_32px_80px_-45px_rgba(0,0,0,0.78)]">
                 <!-- Header -->
                 <h1
