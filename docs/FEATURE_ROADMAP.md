@@ -53,15 +53,18 @@ Notes:
 
 ### 4. Download filters: review and finish include/exclude semantics `[partial]`
 
-- [ ] Confirm current exclude behavior in the actual download-list query path.
+- [x] Confirm current exclude behavior in the actual download-list query path.
 - [ ] Make filter-group create/update/delete operations atomic and validated end-to-end.
-- [ ] Ensure deleting a filter group does not leave stale selected filters in URLs or saved settings.
-- [ ] Add tests for include-only, exclude-only, combined include/exclude, deleted-group cleanup, and invalid filter-group input.
+- [x] Ensure deleting a filter group does not leave stale selected filters in URLs or saved settings.
+- [ ] Add remaining tests for filter-group mutation validation, including invalid filter-group input.
 - [ ] Review UX details: empty-group validation, delete confirmation/reversal, clear "must include" vs "must exclude" labels, and readable/shareable URL state.
 
 Notes:
 - Channel admin UI for filter groups already exists.
 - Include/exclude modes, ordering, YAML editing, and validation are already present in the frontend.
+- This slice fixes channel download-list query semantics so `INCLUDE` groups require selected labels and `EXCLUDE` groups reject selected labels.
+- This slice also ignores stale/deleted filter groups in download queries and removes stale `filter_*` URL params after the channel filter groups load.
+- Focused tests now cover include/exclude query semantics and stale filter cleanup; atomic mutation validation remains.
 
 ### 5. Collection ordering `[partial]`
 

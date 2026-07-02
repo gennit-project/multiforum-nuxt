@@ -25,8 +25,7 @@ const usernameVar = useUsername();
 
 const DOWNLOAD_PAGE_LIMIT = 25;
 
-// Props used in template
-defineProps({
+const props = defineProps({
   filterGroups: {
     type: Array as () => FilterGroup[],
     default: () => [],
@@ -79,7 +78,7 @@ const showArchived = computed(() => {
 });
 
 const labelFilters = computed(() => {
-  return convertUrlParamsToLabelFilters(route);
+  return convertUrlParamsToLabelFilters(route, props.filterGroups);
 });
 
 const {
