@@ -258,7 +258,10 @@ const revealSensitiveContent = () => {
       <!-- Discussion row -->
       <div class="flex items-start gap-3">
         <div class="flex flex-shrink-0 flex-col items-center gap-1">
-          <ChannelIconStack :channels="channelIcons" />
+          <ChannelIconStack
+            :channels="channelIcons"
+            tooltip-position-class="pointer-events-none absolute -top-8 left-0 z-30 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover/chicon:opacity-100 dark:bg-gray-700"
+          />
           <AddToDiscussionFavorites
             v-if="discussion"
             :allow-add-to-list="true"

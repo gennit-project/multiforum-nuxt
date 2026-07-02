@@ -122,6 +122,16 @@ describe('SitewideDiscussionListItem channel icons', () => {
     );
     expect(wrapper.find('[class*="group-hover/chicon"]').text()).toBe('cats');
   });
+
+  it('positions channel icon tooltips away from the left nav rail', () => {
+    const wrapper = mountItem(
+      discussion({ DiscussionChannels: [channel('cats')] })
+    );
+
+    expect(wrapper.find('[class*="group-hover/chicon"]').classes()).toEqual(
+      expect.arrayContaining(['left-0', 'z-30'])
+    );
+  });
 });
 
 describe('SitewideDiscussionListItem thumbnail', () => {
