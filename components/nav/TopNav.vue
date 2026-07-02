@@ -90,7 +90,7 @@ const isOnMapPage = computed(() => {
         <div class="ml-2 flex h-full min-w-0 items-center gap-2 text-sm lg:gap-3">
           <nuxt-link to="/" class="flex h-full items-center gap-1.5">
             <h1
-              class="logo-font text-[1.2rem] font-semibold leading-none tracking-[-0.04em] text-white lg:text-[1.3rem]"
+              class="logo-font text-lg font-bold leading-none text-gray-900 dark:text-white"
             >
               {{ config.serverDisplayName }}
             </h1>

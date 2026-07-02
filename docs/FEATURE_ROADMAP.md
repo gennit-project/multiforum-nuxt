@@ -10,17 +10,17 @@
 
 **Backend work:**
 
-- Confirm the existing download tracking model records both the downloaded file/item and the authenticated user, while still supporting anonymous total counts.
-- Add or reuse a dedicated private system collection/list for each user's downloaded items, for example `Downloaded Items` or `Downloads`.
-- On successful download, upsert the downloaded item into that private collection without duplicating entries when the same user downloads the same item multiple times.
-- Keep download activity separate from collection membership so repeat downloads can increment total counts without creating duplicate library entries.
-- Add tests for anonymous downloads, first authenticated download, repeat authenticated download, and download by a second user.
+- [x] Confirm the existing download tracking model records both the downloaded file/item and the authenticated user, while still supporting anonymous total counts.
+- [x] Add or reuse a dedicated private system collection/list for each user's downloaded items, for example `Downloaded Items` or `Downloads`.
+- [x] On successful download, upsert the downloaded item into that private collection without duplicating entries when the same user downloads the same item multiple times.
+- [x] Keep download activity separate from collection membership so repeat downloads can increment total counts without creating duplicate library entries.
+- [x] Add tests for anonymous downloads, first authenticated download, repeat authenticated download, and download by a second user.
 
 **Frontend work:**
 
-- Show the auto-saved download collection in the user's library.
-- Ensure the collection is private by default and cannot be accidentally shared unless the user explicitly changes visibility, if that is supported.
-- Add copy explaining why a downloaded item appeared there, without treating it as a manually curated collection.
+- [x] Show the auto-saved download collection in the user's library.
+- [x] Ensure the collection is private by default and cannot be accidentally shared unless the user explicitly changes visibility, if that is supported.
+- [x] Add copy explaining why a downloaded item appeared there, without treating it as a manually curated collection.
 
 **Manual validation:**
 
