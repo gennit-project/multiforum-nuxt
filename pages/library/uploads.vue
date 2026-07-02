@@ -30,6 +30,7 @@ type UploadedDownloadGroup = {
 
 const usernameVar = useUsername();
 const pendingDeleteFile = ref<UploadedFile | null>(null);
+const deleteErrorMessage = ref('');
 
 useHead({
   title: 'Uploaded Files - Library',
@@ -84,6 +85,7 @@ const getDiscussionPath = (group: UploadedDownloadGroup) => {
 };
 
 const confirmDelete = (file: UploadedFile) => {
+  deleteErrorMessage.value = '';
   pendingDeleteFile.value = file;
 };
 
@@ -93,12 +95,14 @@ const closeDeleteModal = () => {
   }
 
   pendingDeleteFile.value = null;
+  deleteErrorMessage.value = '';
 };
 
 const deleteSelectedFile = async () => {
   if (!pendingDeleteFile.value) {
     return;
   }
+  deleteErrorMessage.value = '';
 
   try {
     await permanentlyDeleteDownloadableFile({
@@ -108,6 +112,10 @@ const deleteSelectedFile = async () => {
     await refetch();
   } catch (err) {
     console.error('Error permanently deleting uploaded file:', err);
+    deleteErrorMessage.value =
+      err instanceof Error
+        ? err.message
+        : 'Failed to permanently delete this uploaded file.';
   }
 };
 </script>
@@ -200,9 +208,9 @@ const deleteSelectedFile = async () => {
           </div>
 
           <ErrorBanner
-            v-if="deleteError"
+            v-if="deleteErrorMessage || deleteError"
             class="mt-4"
-            :text="deleteError.message"
+            :text="deleteErrorMessage || deleteError?.message || ''"
           />
 
           <WarningModal
@@ -212,6 +220,7 @@ const deleteSelectedFile = async () => {
             icon="trash"
             primary-button-text="Permanently delete"
             :loading="deleteLoading"
+            :error="deleteErrorMessage"
             data-testid="uploaded-file-delete-modal"
             @close="closeDeleteModal"
             @primary-button-click="deleteSelectedFile"

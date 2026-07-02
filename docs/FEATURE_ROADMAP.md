@@ -37,17 +37,18 @@ Notes:
 - [x] Decide whether deletion hard-deletes the blob, detaches it, marks it deleted, or combines those steps.
 - [x] Preserve upload/storage metadata for new downloadable-file uploads so deletion/audit flows do not reconstruct storage paths later. `[in draft PR]`
 - [x] Add backend permanent-delete mutation support for downloadable files that deletes the storage object before marking the database node removed.
-- [ ] Preserve any additional deletion-specific metadata needed for moderation and audit history.
+- [x] Preserve additional deletion-specific metadata needed for moderation and audit history. `[in backend draft PR]`
 - [x] Show the destructive action only to authorized users in the existing download edit surface.
 - [x] Add a confirmation dialog that clearly says the file is permanently removed. `[in draft PR]`
 - [x] Refresh download detail and list views after deletion by filtering permanently removed downloadable files out of discussion queries. `[in draft PR]`
 - [x] Add uploader-facing file management so users can see their downloadable files grouped by linked discussion on profile/library pages and delete them from there when authorized. `[in draft PR]`
-- [ ] Add tests for OP allowed, unrelated user rejected, permitted moderator allowed, and moderator without permission rejected across backend and frontend surfaces.
+- [x] Add tests for OP allowed, unrelated user rejected, permitted moderator allowed, and moderator without permission rejected across backend and frontend surfaces. `[in this slice]`
 
 Notes:
 - Delete confirmation copy exists for individual downloadable files in the edit form in the current frontend draft slice.
 - Backend PR gennit-project/multiforum-backend#118 added `permanentlyDeleteDownloadableFile` on top of the shared storage deletion utility.
 - The current draft slice adds an owner-scoped backend query and `/library/uploads` management page for uploaded downloadable files.
+- This slice adds scalar permanent-removal audit fields and focused authorization/storage-failure tests for downloadable-file deletion.
 - Backend draft PR gennit-project/multiforum-backend#116 and frontend draft PR gennit-project/multiforum-nuxt#266 add verified upload storage metadata for new downloadable files, including `storageObjectName` and `storageUrl`.
 
 ### 4. Download filters: review and finish include/exclude semantics `[partial]`
