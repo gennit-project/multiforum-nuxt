@@ -49,6 +49,17 @@ describe('UserProfileTabs', () => {
     expect(tabs(wrapper)[0].props('count')).toBe(4);
   });
 
+  it('prefers the dedicated wiki edits count for the wiki tab', () => {
+    const wrapper = mountTabs({
+      user: user({
+        wikiEditsCount: 7,
+        AuthoredWikiPageVersionsAggregate: { count: 11 },
+      }),
+    });
+
+    expect(tabs(wrapper)[4].props('count')).toBe(7);
+  });
+
   it('marks the tab matching the route as active', () => {
     const wrapper = mountTabs();
 

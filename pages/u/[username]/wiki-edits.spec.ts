@@ -45,8 +45,13 @@ const SAMPLE = [
   {
     id: 'w1',
     title: 'Cat Care',
+    body: 'Current body',
+    editReason: 'Current revision',
     slug: 'cat-care',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-02-01T00:00:00Z',
     channelUniqueName: 'cats',
+    VersionAuthor: { username: 'alice' },
     PastVersions: [
       { id: 'v1', createdAt: '2024-02-01T00:00:00Z', editReason: 'Tidied up' },
     ],
@@ -69,15 +74,20 @@ describe('user wiki edits page', () => {
       {
         id: 'w1',
         title: 'Page 1',
+        body: 'Current body',
+        editReason: 'Current revision',
         slug: 'page-1',
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-02-02T00:00:00Z',
         channelUniqueName: 'cats',
+        VersionAuthor: { username: 'alice' },
         PastVersions: [
           { id: 'v1', createdAt: '2024-01-01T00:00:00Z' },
           { id: 'v2', createdAt: '2024-02-01T00:00:00Z' },
         ],
       },
     ]);
-    expect(wrapper.findAll('li')).toHaveLength(2);
+    expect(wrapper.findAll('li')).toHaveLength(3);
   });
 
   it('orders edits newest first', async () => {
@@ -85,15 +95,25 @@ describe('user wiki edits page', () => {
       {
         id: 'w1',
         title: 'OLDER',
+        body: 'Older current body',
+        editReason: 'Older current revision',
         slug: 'older',
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
         channelUniqueName: 'cats',
+        VersionAuthor: { username: 'bob' },
         PastVersions: [{ id: 'v1', createdAt: '2024-01-01T00:00:00Z' }],
       },
       {
         id: 'w2',
         title: 'NEWER',
+        body: 'Newer current body',
+        editReason: 'Newer current revision',
         slug: 'newer',
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-02-02T00:00:00Z',
         channelUniqueName: 'cats',
+        VersionAuthor: { username: 'alice' },
         PastVersions: [{ id: 'v2', createdAt: '2024-02-01T00:00:00Z' }],
       },
     ]);
@@ -118,6 +138,9 @@ describe('user wiki edits page', () => {
     expect(targets).toContain(
       '/forums/cats/wiki/revisions/diff/cat-care/v1'
     );
+    expect(targets).toContain(
+      '/forums/cats/wiki/revisions/diff/cat-care/current'
+    );
   });
 
   it('narrows the query to the selected channels when filtering', async () => {
@@ -131,5 +154,24 @@ describe('user wiki edits page', () => {
     };
     const where = variablesGetter().where;
     expect(where.AND?.[1]?.channelUniqueName_IN).toEqual(['cats']);
+  });
+
+  it('includes the current wiki version when the profile user authored it', async () => {
+    const wrapper = await mountWith([
+      {
+        id: 'w1',
+        title: 'Current Only',
+        body: 'Current wiki body',
+        editReason: 'Most recent update',
+        slug: 'current-only',
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-02-01T00:00:00Z',
+        channelUniqueName: 'cats',
+        VersionAuthor: { username: 'alice' },
+        PastVersions: [],
+      },
+    ]);
+
+    expect(wrapper.text()).toContain('Current Only');
   });
 });

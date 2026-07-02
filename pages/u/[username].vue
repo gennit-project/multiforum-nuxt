@@ -41,7 +41,13 @@ const {
 const user = computed(() => {
   if (userError.value) return null;
   if (userResult.value && userResult.value.users.length > 0) {
-    return userResult.value.users[0];
+    return {
+      ...userResult.value.users[0],
+      wikiEditsCount:
+        userResult.value.getUserWikiEditsCount ??
+        userResult.value.users[0].AuthoredWikiPageVersionsAggregate?.count ??
+        0,
+    };
   }
   // Return a placeholder user object while loading so tabs can render
   if (userLoading.value && username.value) {
@@ -51,6 +57,7 @@ const user = computed(() => {
       DiscussionsAggregate: { count: 0 },
       DownloadsAggregate: { count: 0 },
       EventsAggregate: { count: 0 },
+      wikiEditsCount: 0,
       AuthoredWikiPageVersionsAggregate: { count: 0 },
       ImagesAggregate: { count: 0 },
       AlbumsAggregate: { count: 0 },
