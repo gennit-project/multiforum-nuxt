@@ -143,14 +143,15 @@ Notes:
 - [x] Add backend permanent-delete mutations for uploaded images and downloadable files.
 - [x] Add the first frontend permanent-delete flow for downloadable files in the download edit form. `[in draft PR]`
 - [x] Add an owner-facing uploaded downloadable-file management page with storage-backed permanent delete. `[in draft PR]`
-- [ ] Let authorized users delete profile images permanently and remove the backing object from GCP/storage.
-- [ ] Add permanent delete support for forum banners, including storage cleanup.
-- [ ] Make storage cleanup behavior explicit and tested so database deletion and blob deletion stay in sync.
-- [ ] Define permissions separately for uploader/owner actions versus moderator/admin actions across these media types.
-- [ ] Add tests covering successful delete, unauthorized rejection, missing-file cleanup behavior, and stale-reference cleanup.
+- [x] Let authorized users delete profile images permanently and remove the backing object from GCP/storage. `[in this slice]`
+- [x] Add permanent delete support for forum banners, including storage cleanup. `[in this slice]`
+- [x] Make storage cleanup behavior explicit and tested so database deletion and blob deletion stay in sync. `[in this slice]`
+- [x] Define permissions separately for uploader/owner actions versus moderator/admin actions across these media types. `[in this slice]`
+- [x] Add tests covering successful delete, unauthorized rejection, missing-file cleanup behavior, and stale-reference cleanup. `[in this slice]`
 
 Notes:
-- Album edit deletion now confirms and calls the backend permanent-delete mutation before removing the image from the album UI; remaining media deletion work is profile images, forum banners, and broader permission/error coverage.
+- Album edit deletion now confirms and calls the backend permanent-delete mutation before removing the image from the album UI.
+- This slice adds storage-backed permanent delete for URL-backed profile images and forum banners by resolving active URLs through upload audit metadata before clearing the owning profile/forum field.
 
 ### 11. Wiki: pinned sidebar pages `[not started]`
 

@@ -7,6 +7,7 @@ import TextInput from '@/components/TextInput.vue';
 import FormRow from '@/components/FormRow.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import AddImage from '@/components/AddImage.vue';
+import WarningModal from '@/components/WarningModal.vue';
 import {
   getUploadFileName,
   uploadAndGetEmbeddedLink,
@@ -17,6 +18,7 @@ import type { EditAccountSettingsFormValues } from '@/types/User';
 import FormComponent from '../FormComponent.vue';
 import { MAX_CHARS_IN_USER_BIO } from '@/utils/constants';
 import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
+import { PERMANENTLY_DELETE_PROFILE_IMAGE } from '@/graphQLData/user/mutations';
 import { isFileSizeValid } from '@/utils/index';
 
 type FileChangeInput = {
@@ -59,10 +61,18 @@ const usernameVar = useUsername();
 // Data and Setup
 const titleInputRef = ref<InstanceType<typeof TextInput> | null>(null);
 const touched = ref(false);
+const showDeleteProfileImageModal = ref(false);
+const deleteProfileImageError = ref('');
 
 const { mutate: createSignedStorageUrl } = useMutation(
   CREATE_SIGNED_STORAGE_URL
 );
+
+const {
+  mutate: permanentlyDeleteProfileImage,
+  loading: permanentlyDeleteProfileImageLoading,
+  error: permanentlyDeleteProfileImageError,
+} = useMutation(PERMANENTLY_DELETE_PROFILE_IMAGE);
 
 // Methods
 const upload = async (file: File) => {
@@ -117,6 +127,33 @@ const handleProfilePicChange = async (input: FileChangeInput) => {
 
     emit('updateFormValues', { profilePicURL: embeddedLink });
     emit('submit');
+  }
+};
+
+const closeDeleteProfileImageModal = () => {
+  if (permanentlyDeleteProfileImageLoading.value) return;
+  showDeleteProfileImageModal.value = false;
+  deleteProfileImageError.value = '';
+};
+
+const confirmDeleteProfileImage = async () => {
+  if (!usernameVar.value || !props.formValues?.profilePicURL) return;
+
+  deleteProfileImageError.value = '';
+
+  try {
+    await permanentlyDeleteProfileImage({
+      username: usernameVar.value,
+      imageUrl: props.formValues.profilePicURL,
+    });
+    emit('updateFormValues', { profilePicURL: '' });
+    emit('submit');
+    showDeleteProfileImageModal.value = false;
+  } catch (error) {
+    deleteProfileImageError.value =
+      error instanceof Error
+        ? error.message
+        : 'Failed to permanently delete profile image.';
   }
 };
 
@@ -219,6 +256,22 @@ const needsChanges = computed(() => {
                   }
                 "
               />
+              <button
+                v-if="formValues.profilePicURL"
+                type="button"
+                data-testid="delete-profile-image-button"
+                class="mt-3 rounded-md border border-red-300 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-950"
+                :disabled="permanentlyDeleteProfileImageLoading"
+                @click="showDeleteProfileImageModal = true"
+              >
+                Delete profile image
+              </button>
+              <p
+                v-if="permanentlyDeleteProfileImageError"
+                class="mt-2 text-sm text-red-600 dark:text-red-400"
+              >
+                {{ permanentlyDeleteProfileImageError.message }}
+              </p>
             </template>
           </FormRow>
         </div>
@@ -230,5 +283,18 @@ const needsChanges = computed(() => {
     <div v-for="(error, i) of updateUserError?.graphQLErrors" :key="i">
       {{ error.message }}
     </div>
+    <WarningModal
+      :open="showDeleteProfileImageModal"
+      title="Delete profile image?"
+      body="This permanently deletes the stored profile image file and clears it from your profile. This cannot be undone."
+      primary-button-text="Delete Image"
+      secondary-button-text="Cancel"
+      icon="trash"
+      data-testid="permanently-delete-profile-image-modal"
+      :loading="permanentlyDeleteProfileImageLoading"
+      :error="deleteProfileImageError"
+      @primary-button-click="confirmDeleteProfileImage"
+      @close="closeDeleteProfileImageModal"
+    />
   </div>
 </template>
