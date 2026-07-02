@@ -106,12 +106,12 @@ const {
     cache.modify({
       id: cacheId,
       fields: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        SuperUpvotedByUsers: (existing: any = [], { readField }) =>
-          me
-            ? (existing as ReadonlyArray<Reference | StoreObject>).filter(
-                (user) => readField('username', user) !== me
-              )
+        SuperUpvotedByUsers: (
+          existing: Reference | ReadonlyArray<Reference | StoreObject> = [],
+          { readField }
+        ) =>
+          me && Array.isArray(existing)
+            ? existing.filter((user) => readField('username', user) !== me)
             : existing,
       },
     });

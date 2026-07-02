@@ -80,27 +80,32 @@ export type KnownPermissionFlag =
 
 export type PermissionFlags = Record<KnownPermissionFlag, boolean>;
 
-// Role type used in the utility functions
-type Role = {
-  [K in PermissionKey]?: boolean;
-} & {
+/**
+ * A moderation role as consumed by the permission checks. Permission flags are
+ * read dynamically via `role[action]` and only ever coerced with `!!`, so the
+ * generated `ModChannelRole` / `ModServerRole` shapes are accepted directly:
+ * their flags are `Maybe<Boolean>` (`boolean | null`) and they also carry
+ * string metadata (`name`, `description`, `__typename`), which is why the index
+ * signature is intentionally broad.
+ */
+export type Role = {
   // Additional permissions not directly in the schema types
-  canEditWiki?: boolean;
-  canAddMods?: boolean;
-  canRemoveMods?: boolean;
-  canAddOwners?: boolean;
-  canRemoveOwners?: boolean;
-  canChangeSettings?: boolean;
-  [key: string]: boolean | undefined;
+  canEditWiki?: boolean | null;
+  canAddMods?: boolean | null;
+  canRemoveMods?: boolean | null;
+  canAddOwners?: boolean | null;
+  canRemoveOwners?: boolean | null;
+  canChangeSettings?: boolean | null;
+  [key: string]: boolean | string | null | undefined;
 };
 
 // Channel data containing role assignments
-type PermissionData = {
-  Admins?: Array<{ username: string }>;
-  Moderators?: Array<{ displayName: string }>;
-  SuspendedMods?: Array<{ modProfileName: string }>;
-  SuspendedUsers?: Array<{ username: string }>;
-  uniqueName?: string;
+export type PermissionData = {
+  Admins?: Array<{ username: string }> | null;
+  Moderators?: Array<{ displayName: string }> | null;
+  SuspendedMods?: Array<{ modProfileName: string }> | null;
+  SuspendedUsers?: Array<{ username: string }> | null;
+  uniqueName?: string | null;
   [key: string]: unknown;
 };
 

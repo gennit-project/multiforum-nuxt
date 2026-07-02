@@ -172,6 +172,11 @@ export type UpdateStateInput = {
   locationFilter?: LocationFilterTypes;
   showArchived?: boolean;
   showUnanswered?: boolean;
+  // Dynamic per-group facet keys used by filter bars (e.g. `filter_fileType`),
+  // written as comma-joined option strings (or undefined to clear the param).
+  // Typed as `unknown` so generic filter helpers that build param bags with
+  // computed keys remain assignable; the known keys above stay strongly typed.
+  [key: `filter_${string}`]: unknown;
 };
 
 type UpdateFiltersInput = {
