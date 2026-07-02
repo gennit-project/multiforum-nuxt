@@ -1,0 +1,16 @@
+.claude
+.claude/**
+.agents
+.agents/**
+.vercel
+.vercel/**
+.output
+.output/**
+coverage
+coverage/**
+coverage-combined
+coverage-combined/**
+playwright-report
+playwright-report/**
+test-results
+test-results/**
