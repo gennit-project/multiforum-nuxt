@@ -4,7 +4,7 @@ import { useQuery } from '@vue/apollo-composable';
 import { useHead } from 'nuxt/app';
 import { useUsername } from '@/composables/useAuthState';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import type { Discussion } from '@/__generated__/graphql';
+import type { Collection, Discussion } from '@/__generated__/graphql';
 import {
   GET_ALL_USER_COLLECTIONS,
   GET_COLLECTION_ITEMS,
@@ -65,7 +65,9 @@ const {
 
 const downloadsCollection = computed(() => {
   const collections = collectionsResult.value?.users?.[0]?.Collections || [];
-  return collections.find((collection) => isAutoSavedDownloadsCollection(collection));
+  return collections.find((collection: Collection) =>
+    isAutoSavedDownloadsCollection(collection)
+  );
 });
 
 const {

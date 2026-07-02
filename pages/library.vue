@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
+import type { Collection } from '@/__generated__/graphql';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import {
   GET_USER_FAVORITE_COUNTS,
@@ -193,7 +194,7 @@ const customCollections = computed(() => {
 });
 
 const autoSavedDownloadsCollection = computed(() =>
-  customCollections.value.find((collection) =>
+  customCollections.value.find((collection: Collection) =>
     isAutoSavedDownloadsCollection(collection)
   )
 );
