@@ -1,10 +1,21 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 
+const h = vi.hoisted(() => ({
+  route: {
+    params: { forumId: 'cats' },
+    query: {} as Record<string, unknown>,
+  },
+  router: {
+    replace: vi.fn(),
+  },
+}));
+
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({ params: { forumId: 'cats' } }),
+  useRoute: () => h.route,
+  useRouter: () => h.router,
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -17,7 +28,10 @@ const mountWith = async (opts: {
   channelDownloadsEnabled?: boolean;
   serverDownloadsEnabled?: boolean;
 }) => {
-  const channel = { downloadsEnabled: opts.channelDownloadsEnabled ?? true };
+  const channel = {
+    downloadsEnabled: opts.channelDownloadsEnabled ?? true,
+    FilterGroups: [{ key: 'type' }],
+  };
   const serverConfig = { enableDownloads: opts.serverDownloadsEnabled ?? true };
   mockedUseQuery
     .mockReturnValueOnce({
@@ -35,6 +49,11 @@ const mountWith = async (opts: {
 };
 
 describe('downloads index page', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    h.route.query = {};
+  });
+
   it('shows the not-available message when downloads are disabled for the forum', async () => {
     const wrapper = await mountWith({ channelDownloadsEnabled: false });
     expect(wrapper.text()).toContain('Downloads Not Available');
@@ -43,5 +62,15 @@ describe('downloads index page', () => {
   it('hides the not-available message when downloads are enabled', async () => {
     const wrapper = await mountWith({});
     expect(wrapper.text()).not.toContain('Downloads Not Available');
+  });
+
+  it('removes stale download filter params after channel filters load', async () => {
+    h.route.query = { filter_old: 'x', filter_type: 'pdf' };
+    await mountWith({});
+    expect(h.router.replace).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: expect.not.objectContaining({ filter_old: expect.anything() }),
+      })
+    );
   });
 });

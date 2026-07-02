@@ -12,16 +12,20 @@ const h = vi.hoisted(() => ({
   refetch: vi.fn(),
   fetchMore: vi.fn(),
   route: null as unknown,
+  useQueryCalls: [] as Array<{ variables: Record<string, unknown> }>,
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => ({
-    result: h.result,
-    error: h.error,
-    loading: h.loading,
-    refetch: h.refetch,
-    fetchMore: h.fetchMore,
-  }),
+  useQuery: (_query: unknown, variables: Record<string, unknown>) => {
+    h.useQueryCalls.push({ variables });
+    return {
+      result: h.result,
+      error: h.error,
+      loading: h.loading,
+      refetch: h.refetch,
+      fetchMore: h.fetchMore,
+    };
+  },
 }));
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
 vi.mock('@/composables/useAuthState', () => ({ useUsername: () => ref('') }));
@@ -39,8 +43,9 @@ const resultWith = (channels: unknown[], aggregate = channels.length) => ({
   },
 });
 
-const mountList = () =>
+const mountList = (props: Record<string, unknown> = {}) =>
   mount(DownloadList, {
+    props,
     global: {
       plugins: [createTestingPinia({ createSpy: vi.fn })],
       stubs: {
@@ -76,6 +81,7 @@ beforeEach(() => {
   h.error = ref(null);
   h.loading = ref(false);
   h.route = { params: { forumId: 'cats' }, query: {} };
+  h.useQueryCalls = [];
 });
 
 describe('DownloadList states', () => {
@@ -149,6 +155,34 @@ describe('DownloadList filter events', () => {
       .vm.$emit('filter-by-channel', 'cats');
 
     expect(wrapper.emitted('filterByChannel')?.[0]).toEqual(['cats']);
+  });
+});
+
+describe('DownloadList label filters', () => {
+  it('passes only current filter-group values to the query variables', () => {
+    h.route = {
+      params: { forumId: 'cats' },
+      query: { filter_type: 'pdf,stale', filter_old: 'gone' },
+    };
+    mountList({
+      filterGroups: [
+        {
+          key: 'type',
+          options: [{ value: 'pdf', displayName: 'PDF' }],
+        },
+      ],
+    });
+    const downloadListQueryCall = h.useQueryCalls.find(
+      (call) => 'labelFilters' in call.variables
+    );
+
+    expect(
+      (
+        downloadListQueryCall?.variables.labelFilters as {
+          value: Array<{ groupKey: string; values: string[] }>;
+        }
+      ).value
+    ).toEqual([{ groupKey: 'type', values: ['pdf'] }]);
   });
 });
 
