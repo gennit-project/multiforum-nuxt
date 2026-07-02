@@ -32,20 +32,21 @@ Notes:
 
 ### 3. Downloadable file permanent delete permission flow `[partial]`
 
-- [ ] Define the exact moderator permission using the existing moderation permission model.
-- [ ] Decide whether OP/uploader self-delete is allowed and under what product rules.
-- [ ] Decide whether deletion hard-deletes the blob, detaches it, marks it deleted, or combines those steps.
+- [x] Define the exact moderator permission using the existing moderation permission model.
+- [x] Decide whether OP/uploader self-delete is allowed and under what product rules.
+- [x] Decide whether deletion hard-deletes the blob, detaches it, marks it deleted, or combines those steps.
 - [x] Preserve upload/storage metadata for new downloadable-file uploads so deletion/audit flows do not reconstruct storage paths later. `[in draft PR]`
+- [x] Add backend permanent-delete mutation support for downloadable files that deletes the storage object before marking the database node removed.
 - [ ] Preserve any additional deletion-specific metadata needed for moderation and audit history.
-- [ ] Show the destructive action only to authorized users.
-- [ ] Add a confirmation dialog that clearly says the file is permanently removed.
-- [ ] Refresh download detail and list views after deletion.
+- [x] Show the destructive action only to authorized users in the existing download edit surface.
+- [x] Add a confirmation dialog that clearly says the file is permanently removed. `[in draft PR]`
+- [x] Refresh download detail and list views after deletion by filtering permanently removed downloadable files out of discussion queries. `[in draft PR]`
 - [ ] Add uploader-facing file management so users can see their downloadable files grouped by linked discussion on profile/library pages and delete them from there when authorized.
-- [ ] Add tests for OP allowed, unrelated user rejected, permitted moderator allowed, and moderator without permission rejected.
+- [ ] Add tests for OP allowed, unrelated user rejected, permitted moderator allowed, and moderator without permission rejected across backend and frontend surfaces.
 
 Notes:
-- Delete confirmation copy exists in the discussion/download header UI, but the roadmap-level permission flow is not complete.
-- One known permission asymmetry around permanent-remove behavior was documented separately and should be resolved as part of this work rather than preserved indefinitely.
+- Delete confirmation copy exists for individual downloadable files in the edit form in the current frontend draft slice.
+- Backend PR gennit-project/multiforum-backend#118 added `permanentlyDeleteDownloadableFile` on top of the shared storage deletion utility.
 - Backend draft PR gennit-project/multiforum-backend#116 and frontend draft PR gennit-project/multiforum-nuxt#266 add verified upload storage metadata for new downloadable files, including `storageObjectName` and `storageUrl`.
 
 ### 4. Download filters: review and finish include/exclude semantics `[partial]`
@@ -124,6 +125,10 @@ Notes:
 
 ### 10. Permanent media deletion and storage cleanup `[partial]`
 
+- [x] Store backend-verified storage metadata for new image and downloadable-file uploads, including the actual storage URL/object name returned by signed upload creation. `[in draft PR]`
+- [x] Add shared backend storage deletion utility for image/downloadable-file objects.
+- [x] Add backend permanent-delete mutations for uploaded images and downloadable files.
+- [x] Add the first frontend permanent-delete flow for downloadable files in the download edit form. `[in draft PR]`
 - [ ] Let authorized users delete album images permanently and remove the backing object from GCP/storage.
 - [ ] Let authorized users delete profile images permanently and remove the backing object from GCP/storage.
 - [ ] Add permanent delete support for forum banners, including storage cleanup.
