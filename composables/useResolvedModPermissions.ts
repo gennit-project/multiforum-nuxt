@@ -1,29 +1,43 @@
 import { computed, type ComputedRef, type Ref } from 'vue';
 import {
   getAllPermissions,
+  type PermissionData,
   type PermissionFlags,
+  type Role,
 } from '@/utils/permissionUtils';
+import type { ModChannelRole, ModServerRole } from '@/__generated__/graphql';
 
 type MaybeComputed<T> = Ref<T> | ComputedRef<T>;
 
-// These types accept any because they receive polymorphic GraphQL data
-// from multiple sources (Channel, ServerConfig, etc.) with different shapes
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// The composable receives GraphQL query results whose exact shapes vary by
+// query. It reads a channel's own default mod roles plus the role/suspension
+// assignments it inherits as `PermissionData`, so the channel input composes
+// both. All fields are optional to stay assignable from any selection set.
+type ChannelPermissionInput = PermissionData & {
+  DefaultModRole?: ModChannelRole | null;
+  ElevatedModRole?: ModChannelRole | null;
+};
+
+// The server config only contributes fallback mod roles.
+type ServerConfigInput = {
+  DefaultModRole?: ModServerRole | null;
+  DefaultElevatedModRole?: ModServerRole | null;
+};
+
 type UseResolvedModPermissionsParams = {
-  channelData: MaybeComputed<any | null>;
-  serverConfig: MaybeComputed<any | null>;
-  permissionData?: MaybeComputed<any | null>;
+  channelData: MaybeComputed<ChannelPermissionInput | null>;
+  serverConfig: MaybeComputed<ServerConfigInput | null>;
+  permissionData?: MaybeComputed<PermissionData | null>;
   username: MaybeComputed<string>;
   modProfileName: MaybeComputed<string>;
 };
 
 type UseResolvedModPermissionsReturn = {
-  standardModRole: ComputedRef<any | null>;
-  elevatedModRole: ComputedRef<any | null>;
-  resolvedPermissionData: ComputedRef<any | null>;
+  standardModRole: ComputedRef<Role | null>;
+  elevatedModRole: ComputedRef<Role | null>;
+  resolvedPermissionData: ComputedRef<PermissionData | null>;
   userPermissions: ComputedRef<PermissionFlags>;
 };
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export function useResolvedModPermissions(
   params: UseResolvedModPermissionsParams

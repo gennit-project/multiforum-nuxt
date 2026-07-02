@@ -29,9 +29,16 @@ type RoleState = {
   values: Record<string, boolean>;
 };
 
- 
+type ServerConfigRoles = {
+  DefaultServerRole?: RoleNode | null;
+  DefaultModRole?: RoleNode | null;
+  DefaultElevatedModRole?: RoleNode | null;
+  DefaultSuspendedRole?: RoleNode | null;
+  DefaultSuspendedModRole?: RoleNode | null;
+};
+
 const props = defineProps<{
-  serverConfig: Record<string, any> | null;
+  serverConfig: ServerConfigRoles | null;
   title?: string;
   types?: Array<'server' | 'mod'>;
   showTitle?: boolean;

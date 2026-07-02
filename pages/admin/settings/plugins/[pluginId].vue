@@ -39,6 +39,7 @@ import {
 import type {
   PluginFormSection,
   PluginSecretStatus as PluginSecretStatusType,
+  PluginSettings,
 } from '@/types/pluginForms';
 import {
   GET_AVAILABLE_PLUGINS,
@@ -67,7 +68,7 @@ const toast = useToast();
 const selectedVersion = ref<string>('');
 const secretValues = ref<Record<string, string>>({});
 const showSecretInputs = ref<Record<string, boolean>>({});
-const settingsValues = ref<Record<string, unknown>>({});
+const settingsValues = ref<PluginSettings>({});
 const settingsErrors = ref<Record<string, string>>({});
 const savingSettings = ref(false);
 const installError = ref<string | null>(null);

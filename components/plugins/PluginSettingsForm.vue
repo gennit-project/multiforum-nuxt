@@ -3,6 +3,8 @@ import type {
   PluginFormSection,
   PluginField,
   PluginSecretStatus,
+  PluginConfigValue,
+  PluginSettings,
 } from '@/types/pluginForms';
 import PluginTextField from './fields/PluginTextField.vue';
 import PluginNumberField from './fields/PluginNumberField.vue';
@@ -10,18 +12,15 @@ import PluginBooleanField from './fields/PluginBooleanField.vue';
 import PluginSelectField from './fields/PluginSelectField.vue';
 import PluginSecretField from './fields/PluginSecretField.vue';
 
-// Type for plugin configuration values
-type PluginConfigValue = string | number | boolean;
-
 const props = defineProps<{
   sections: PluginFormSection[];
-  modelValue: Record<string, PluginConfigValue>;
+  modelValue: PluginSettings;
   errors?: Record<string, string>;
   secretStatuses?: PluginSecretStatus[];
 }>();
 
 const emit = defineEmits<{
-  'update:modelValue': [value: Record<string, PluginConfigValue>];
+  'update:modelValue': [value: PluginSettings];
 }>();
 
 function updateFieldValue(key: string, value: PluginConfigValue) {
@@ -32,7 +31,15 @@ function updateFieldValue(key: string, value: PluginConfigValue) {
 }
 
 function getFieldValue(key: string): PluginConfigValue | undefined {
-  return props.modelValue[key];
+  const value = props.modelValue[key];
+  if (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
+  ) {
+    return value;
+  }
+  return undefined;
 }
 
 function getFieldError(key: string): string | undefined {

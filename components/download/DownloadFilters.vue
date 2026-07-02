@@ -5,7 +5,7 @@ import type { FilterGroup } from '@/__generated__/graphql';
 import CheckBox from '@/components/CheckBox.vue';
 import MultiSelect from '@/components/MultiSelect.vue';
 import type { MultiSelectOption } from '@/components/MultiSelect.vue';
-import { updateFilters } from '@/utils/routerUtils';
+import { updateFilters, type UpdateStateInput } from '@/utils/routerUtils';
 
 const props = defineProps({
   filterGroups: {
@@ -64,7 +64,7 @@ const toggleFilter = (groupKey: string, optionValue: string) => {
   }
 
   // Update URL with new filter values
-  const filterParams: Record<string, any> = {};
+  const filterParams: UpdateStateInput = {};
 
   // Add all filter groups to params, explicitly setting undefined for empty ones
   props.filterGroups.forEach((group) => {
@@ -89,7 +89,7 @@ const clearAllFilters = () => {
   selectedFilters.value = {};
 
   // Clear URL params
-  const filterParams: Record<string, any> = {};
+  const filterParams: UpdateStateInput = {};
   props.filterGroups.forEach((group) => {
     filterParams[`filter_${group.key}`] = undefined;
   });
@@ -135,7 +135,7 @@ const handleMultiSelectUpdate = (
   selectedFilters.value[groupKey] = selectedValues;
 
   // Update URL with new filter values
-  const filterParams: Record<string, any> = {};
+  const filterParams: UpdateStateInput = {};
 
   // Add all filter groups to params, explicitly setting undefined for empty ones
   props.filterGroups.forEach((group) => {

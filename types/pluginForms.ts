@@ -32,6 +32,17 @@ export interface PluginFormSection {
   fields: PluginField[];
 }
 
+// A single plugin configuration field value.
+export type PluginConfigValue = string | number | boolean;
+
+/**
+ * A plugin's configuration settings map. Values are typed as `unknown` because
+ * they originate from arbitrary settings JSON (see `parseSettingsJson` /
+ * `getSettingsDefaults`); the individual field components narrow each value to
+ * their own primitive type.
+ */
+export type PluginSettings = Record<string, unknown>;
+
 // Secret status from the backend
 export interface PluginSecretStatus {
   key: string;
