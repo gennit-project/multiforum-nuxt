@@ -157,6 +157,7 @@ export type UpdateStateInput = {
   channels?: string[];
   tags?: string[];
   searchInput?: string;
+  sort?: string;
   startDate?: string;
   endDate?: string;
   searchOpen?: string;

@@ -69,7 +69,7 @@ const albumForDisplay = computed(() => props.discussion.Album as Album | null);
 
 <template>
   <article
-    class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_18px_45px_-28px_rgba(15,23,42,0.45)] transition-all hover:-translate-y-0.5 hover:shadow-[0_24px_60px_-30px_rgba(15,23,42,0.55)] dark:border-gray-700 dark:bg-gray-800"
+    class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_18px_45px_-28px_rgba(15,23,42,0.45)] dark:border-gray-700 dark:bg-gray-800"
   >
     <div class="border-b border-slate-200/70 bg-slate-50/85 px-5 py-3 dark:border-gray-700 dark:bg-gray-900/40">
       <div class="flex items-center justify-between gap-3">

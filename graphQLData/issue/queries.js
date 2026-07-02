@@ -397,6 +397,53 @@ export const GET_ISSUES = gql`
   }
 `;
 
+export const GET_SITE_WIDE_ISSUE_LIST = gql`
+  query getSiteWideIssueList(
+    $searchInput: String
+    $selectedChannels: [String!]
+    $startDate: String
+    $endDate: String
+    $showOnlyServerRuleViolations: Boolean
+    $isOpen: Boolean!
+    $options: IssueListOptions
+  ) {
+    getSiteWideIssueList(
+      searchInput: $searchInput
+      selectedChannels: $selectedChannels
+      startDate: $startDate
+      endDate: $endDate
+      showOnlyServerRuleViolations: $showOnlyServerRuleViolations
+      isOpen: $isOpen
+      options: $options
+    ) {
+      aggregateIssueCount
+      issues {
+        id
+        issueNumber
+        title
+        body
+        isOpen
+        createdAt
+        updatedAt
+        relatedCommentId
+        relatedDiscussionId
+        relatedEventId
+        relatedImageId
+        relatedWikiPageId
+        relatedWikiRevisionId
+        relatedUsername
+        flaggedServerRuleViolation
+        locked
+        lockReason
+        channelUniqueName
+        channelIconURL
+        authorName
+        reportCount
+      }
+    }
+  }
+`;
+
 export const GET_CLOSED_ISSUES = gql`
   query getClosedIssues {
     issues(where: { isOpen: false }, options: { sort: { createdAt: DESC } }) {

@@ -3,23 +3,23 @@
 ## Prioritized Checklist
 
 Status labels:
+- `[complete]` The roadmap item is implemented and covered by targeted tests.
 - `[partial]` Some frontend and/or schema groundwork exists, but the feature is not complete.
 - `[not started]` No meaningful implementation was found in this frontend repo.
 - `[in draft PR]` Work has been implemented in a draft PR but is not merged yet.
 
-### 1. Downloads: auto-save downloaded items into the user's library `[partial]`
+### 1. Downloads: auto-save downloaded items into the user's library `[complete]`
 
-- [ ] Confirm the download tracking model records the downloaded file/item and authenticated user while still supporting anonymous total counts.
-- [ ] Add or reuse a dedicated private system collection/list for downloaded items, such as `Downloaded Items` or `Downloads`.
-- [ ] On successful authenticated download, upsert the item into that private collection without duplicates.
-- [ ] Keep download activity separate from collection membership so repeat downloads increase totals without creating duplicate library entries.
-- [ ] Show the auto-saved download collection in the library with copy explaining why items appear there.
-- [ ] Add tests for anonymous download, first authenticated download, repeat authenticated download, and second-user download.
-- [ ] Ensure the special auto-saved downloads collection is private by default and cannot be accidentally exposed.
+- [x] Confirm the download tracking model records the downloaded file/item and authenticated user while still supporting anonymous total counts.
+- [x] Add or reuse a dedicated private system collection/list for downloaded items, such as `Downloaded Items` or `Downloads`.
+- [x] On successful authenticated download, upsert the item into that private collection without duplicates.
+- [x] Keep download activity separate from collection membership so repeat downloads increase totals without creating duplicate library entries.
+- [x] Show the auto-saved download collection in the library with copy explaining why items appear there.
+- [x] Add tests for anonymous download, first authenticated download, repeat authenticated download, and second-user download.
+- [x] Ensure the special auto-saved downloads collection is private by default and cannot be accidentally exposed.
 
 Notes:
-- Download tracking and download-count fields exist.
-- The current `My Downloads` UI appears to represent owned/uploaded downloads, not an auto-saved downloaded-items library.
+- Completed by the merged downloads backend and frontend PRs.
 
 ### 2. Collections default to private on creation `[partial]`
 

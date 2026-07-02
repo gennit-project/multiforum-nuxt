@@ -72,6 +72,14 @@ describe('ModIssueListItem content', () => {
 
     expect(wrapper.text()).toContain('by [Deleted]');
   });
+
+  it('uses top-level authorName when present', () => {
+    const wrapper = mountItem({
+      issue: issue({ Author: null, authorName: 'backend-author' }),
+    });
+
+    expect(wrapper.text()).toContain('by backend-author');
+  });
 });
 
 describe('ModIssueListItem badges', () => {
@@ -97,6 +105,14 @@ describe('ModIssueListItem badges', () => {
     const wrapper = mountItem({ issue: issue({ ActivityFeedAggregate: { count: 3 } }) });
 
     expect(wrapper.text()).toContain('3 reports');
+  });
+
+  it('uses top-level reportCount when present', () => {
+    const wrapper = mountItem({
+      issue: issue({ ActivityFeedAggregate: undefined, reportCount: 4 }),
+    });
+
+    expect(wrapper.text()).toContain('4 reports');
   });
 
   it('hides the report badge when the count is zero', () => {
@@ -136,6 +152,19 @@ describe('ModIssueListItem badges', () => {
 
     expect(wrapper.get('[data-testid="issue-channel-tags"]').text()).toContain('cats');
   });
+
+  it('uses top-level channel fields when Channel is absent', () => {
+    const wrapper = mountItem({
+      issue: issue({
+        Channel: null,
+        channelUniqueName: 'dogs',
+        channelIconURL: 'dogs.png',
+      }),
+    });
+
+    expect(wrapper.find('.channel-stack').text()).toContain('dogs');
+    expect(wrapper.get('[data-testid="issue-channel-tags"]').text()).toContain('dogs');
+  });
 });
 
 describe('ModIssueListItem selection', () => {
@@ -154,6 +183,18 @@ describe('ModIssueListItem selection', () => {
 
     // With no Channel the title renders as plain text, not a button.
     expect(wrapper.findAll('button')).toHaveLength(0);
+  });
+
+  it('emits select using top-level channelUniqueName when Channel is absent', async () => {
+    const wrapper = mountItem({
+      issue: issue({ Channel: null, channelUniqueName: 'dogs' }),
+    });
+
+    await selectButton(wrapper).trigger('click');
+
+    expect(wrapper.emitted('select')?.[0]).toEqual([
+      { issueNumber: 7, title: 'A reported thing', channelId: 'dogs' },
+    ]);
   });
 
   it('highlights the selected issue', () => {
