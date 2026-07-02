@@ -264,7 +264,7 @@ const getNavLabelClasses = (isActive: boolean) =>
       <ClientOnly>
         <div
           v-if="recentForums.length > 0 && !isVerticallyShort"
-          class="flex flex-col space-y-1"
+          class="recent-forums-rail flex w-full flex-col items-center space-y-1"
         >
           <!-- Limited Recent Forums -->
           <IconTooltip
@@ -303,7 +303,7 @@ const getNavLabelClasses = (isActive: boolean) =>
 
           <!-- More Button -->
           <div v-if="hasMoreForums" class="w-full px-2">
-            <IconTooltip text="More Forums">
+            <IconTooltip text="More Forums" class="!block w-full">
               <button
                 type="button"
                 :class="getNavItemClasses(false)"
@@ -311,7 +311,7 @@ const getNavLabelClasses = (isActive: boolean) =>
                 title="More forums"
                 @click="isDrawerOpen = true"
               >
-                <MoreIcon />
+                <MoreIcon :class="getNavIconClasses(false)" />
                 <span
                   class="w-full text-center text-[10px] leading-[10px] text-gray-600 dark:text-gray-300"
                   >More</span
