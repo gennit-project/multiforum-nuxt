@@ -7,14 +7,23 @@ import AlbumEditor from '@/components/discussion/form/AlbumEditor.vue';
 
 // Hoisted, controllable test seams: username (for the no-username branch) and
 // the URL-image creation spy (for the submit success/failure branches).
-const { usernameRef, createImageFromUrl } = vi.hoisted(() => ({
-  usernameRef: { value: 'alice' as string },
-  createImageFromUrl: vi.fn(),
-}));
+const { usernameRef, createImageFromUrl, permanentlyDeleteImage } = vi.hoisted(
+  () => ({
+    usernameRef: { value: 'alice' as string },
+    createImageFromUrl: vi.fn(),
+    permanentlyDeleteImage: vi.fn(),
+  })
+);
 
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => usernameRef,
   setUsername: vi.fn(),
+}));
+vi.mock('@vue/apollo-composable', () => ({
+  useMutation: () => ({
+    mutate: permanentlyDeleteImage,
+    loading: { value: false },
+  }),
 }));
 vi.mock('@/composables/useAlbumImageUpload', () => ({
   useAlbumImageUpload: () => ({
@@ -59,10 +68,18 @@ const AlbumUrlInputFormStub = {
   template: '<div class="url-input-stub" />',
 };
 
+const WarningModalStub = {
+  name: 'WarningModal',
+  props: ['open', 'title', 'body', 'loading', 'error'],
+  emits: ['primary-button-click', 'close'],
+  template: '<div class="warning-modal-stub" />',
+};
+
 const stubs = {
   AlbumImageItem: AlbumImageItemStub,
   AlbumDropZone: AlbumDropZoneStub,
   AlbumUrlInputForm: AlbumUrlInputFormStub,
+  WarningModal: WarningModalStub,
   ErrorBanner: { props: ['text'], template: '<div />' },
   LoadingSpinner: { template: '<div />' },
 };
@@ -89,10 +106,17 @@ const lastEmit = (wrapper: ReturnType<typeof mountEditor>) => {
   return (calls?.[calls.length - 1]?.[0] as { album: { images: { id: string }[]; imageOrder: string[] } }).album;
 };
 
+const warningModal = (wrapper: ReturnType<typeof mountEditor>) =>
+  wrapper.getComponent(WarningModalStub);
+
 describe('AlbumEditor', () => {
   beforeEach(() => {
     usernameRef.value = 'alice';
     createImageFromUrl.mockReset();
+    permanentlyDeleteImage.mockReset();
+    permanentlyDeleteImage.mockResolvedValue({
+      data: { permanentlyDeleteImage: { id: 'a' } },
+    });
   });
 
   it('renders one image item per ordered image', () => {
@@ -103,7 +127,35 @@ describe('AlbumEditor', () => {
   it('emits the album without the deleted image', async () => {
     const wrapper = mountEditor();
     wrapper.findAllComponents(AlbumImageItemStub)[0].vm.$emit('delete');
+    warningModal(wrapper).vm.$emit('primary-button-click');
+    await flushPromises();
     expect(lastEmit(wrapper).images.map((i) => i.id)).toEqual(['b', 'c']);
+  });
+
+  it('opens a confirmation modal before deleting an image', async () => {
+    const wrapper = mountEditor();
+    wrapper.findAllComponents(AlbumImageItemStub)[0].vm.$emit('delete');
+    await wrapper.vm.$nextTick();
+    expect(warningModal(wrapper).props('open')).toBe(true);
+  });
+
+  it('calls the permanent-delete mutation for the selected image', async () => {
+    const wrapper = mountEditor();
+    wrapper.findAllComponents(AlbumImageItemStub)[0].vm.$emit('delete');
+    warningModal(wrapper).vm.$emit('primary-button-click');
+    await flushPromises();
+    expect(permanentlyDeleteImage).toHaveBeenCalledWith({ imageId: 'a' });
+  });
+
+  it('keeps the image in the album when permanent delete fails', async () => {
+    permanentlyDeleteImage.mockRejectedValue(
+      new Error('backend rejected delete')
+    );
+    const wrapper = mountEditor();
+    wrapper.findAllComponents(AlbumImageItemStub)[0].vm.$emit('delete');
+    warningModal(wrapper).vm.$emit('primary-button-click');
+    await flushPromises();
+    expect(wrapper.emitted('updateFormValues')).toBeUndefined();
   });
 
   it('reorders imageOrder when an image moves up', () => {

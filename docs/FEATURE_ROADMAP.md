@@ -131,7 +131,7 @@ Notes:
 
 ### 10. Permanent media deletion and storage cleanup `[partial]`
 
-- [ ] Let authorized users delete album images permanently and remove the backing object from GCP/storage.
+- [x] Let authorized users delete album images permanently and remove the backing object from GCP/storage. `[in this PR]`
 - [ ] Let authorized users delete profile images permanently and remove the backing object from GCP/storage.
 - [ ] Add permanent delete support for forum banners, including storage cleanup.
 - [ ] Make storage cleanup behavior explicit and tested so database deletion and blob deletion stay in sync.
@@ -139,7 +139,7 @@ Notes:
 - [ ] Add tests covering successful delete, unauthorized rejection, missing-file cleanup behavior, and stale-reference cleanup.
 
 Notes:
-- The repo has album/image editing and removal-from-local-state flows, but that is not the same as permanent backend deletion plus cloud-storage cleanup.
+- Album edit deletion now confirms and calls the backend permanent-delete mutation before removing the image from the album UI; remaining media deletion work is profile images, forum banners, and broader permission/error coverage.
 
 ### 11. Wiki: pinned sidebar pages `[not started]`
 
