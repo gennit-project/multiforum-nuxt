@@ -36,6 +36,8 @@ vi.mock('@/utils', () => ({
 }));
 
 vi.mock('@/utils/index', () => ({
+  getUploadFileName: vi.fn(() => 'test-file-123.jpg'),
+  uploadAndGetEmbeddedLink: vi.fn(() => Promise.resolve('https://storage.example.com/test-file-123.jpg')),
   isFileSizeValid: vi.fn(() => ({ valid: true })),
 }));
 
@@ -197,6 +199,43 @@ describe('useAlbumImageUpload', () => {
       );
 
       alertMock.mockRestore();
+    });
+
+    it('passes the signed storage object name when creating uploaded images', async () => {
+      mockCreateSignedStorageUrl.mockResolvedValue({
+        data: {
+          createSignedStorageURL: {
+            url: 'https://signed-url.example.com',
+            storageObjectName: 'users/testuser/images/file1.jpg',
+          },
+        },
+      });
+      mockCreateImage.mockResolvedValue({
+        data: {
+          createImageWithUploader: {
+            id: 'img-1',
+            url: 'https://storage.example.com/test-file-123.jpg',
+            alt: 'file1.jpg',
+            caption: '',
+            copyright: '',
+          },
+        },
+      });
+      const { handleMultipleFiles } = useAlbumImageUpload({
+        maxImages: 25,
+        currentImageCount,
+        onImageUploaded,
+      });
+
+      await handleMultipleFiles([
+        new File(['content1'], 'file1.jpg', { type: 'image/jpeg' }),
+      ]);
+
+      expect(mockCreateImage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          storageObjectName: 'users/testuser/images/file1.jpg',
+        })
+      );
     });
 
     it('alerts when at max capacity', async () => {

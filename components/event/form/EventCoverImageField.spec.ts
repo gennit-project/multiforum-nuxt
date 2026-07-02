@@ -36,7 +36,12 @@ describe('EventCoverImageField', () => {
     vi.clearAllMocks();
     vi.stubGlobal('alert', vi.fn());
     createSignedStorageUrlMock.mockResolvedValue({
-      data: { createSignedStorageURL: { url: 'https://storage.test/upload' } },
+      data: {
+        createSignedStorageURL: {
+          url: 'https://storage.test/upload',
+          storageUrl: 'https://storage.test/files/alice/cover.png',
+        },
+      },
     });
     uploadAndGetEmbeddedLinkMock.mockReturnValue(
       'https://cdn.test/cover.png'
@@ -85,6 +90,7 @@ describe('EventCoverImageField', () => {
         filename: 'alice/cover.png',
         fileType: 'image/png',
         signedStorageURL: 'https://storage.test/upload',
+        storageUrl: 'https://storage.test/files/alice/cover.png',
       },
       emitted: ['https://cdn.test/cover.png'],
     });
