@@ -380,7 +380,7 @@ onUnmounted(() => {
             v-else-if="image.url"
             :src="image.url"
             :alt="image.alt ?? 'Image'"
-            class="h-auto max-w-full cursor-pointer rounded-lg shadow-lg transition-transform hover:scale-105"
+            class="h-auto max-w-full cursor-pointer rounded-lg shadow-lg"
             title="Click to view in lightbox"
             @click="openLightbox"
           >

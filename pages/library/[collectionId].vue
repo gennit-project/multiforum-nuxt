@@ -4,6 +4,7 @@ import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useHead } from 'nuxt/app';
 import { useRoute, useRouter } from 'vue-router';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import Breadcrumbs from '@/components/nav/Breadcrumbs.vue';
 import {
   GET_COLLECTION_ITEMS,
   GET_ALL_USER_COLLECTIONS,
@@ -104,6 +105,13 @@ const items = computed(() => getCollectionItems(collection.value));
 const collectionTypeLabel = computed(() =>
   getCollectionTypeLabel(collection.value?.collectionType)
 );
+
+const breadcrumbLinks = computed(() => [
+  { label: 'Home', path: '/' },
+  { label: 'Library', path: 'library' },
+  { label: 'Custom Collections', path: 'library' },
+  { label: collectionName.value, current: true },
+]);
 
 // Rename modal state
 const showRenameModal = ref(false);
@@ -206,11 +214,13 @@ const handleDelete = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-white dark:bg-black dark:text-white">
+  <div class="min-h-screen bg-transparent dark:text-white">
     <RequireAuth>
       <template #has-auth>
         <div class="w-full px-4 sm:px-6 lg:px-8">
           <div class="py-6 md:py-8">
+            <Breadcrumbs :links="breadcrumbLinks" />
+
             <!-- Loading state -->
             <div v-if="loading" class="py-8 text-center">
               <div
@@ -252,7 +262,7 @@ const handleDelete = async () => {
             <!-- Collection content -->
             <template v-else>
               <!-- Header -->
-              <div class="mb-8">
+              <div class="mb-8 rounded-[1.75rem] border border-gray-200/80 bg-white/82 p-6 shadow-[0_24px_70px_-42px_rgba(38,38,38,0.26)] backdrop-blur dark:border-gray-700 dark:bg-gray-900 dark:shadow-[0_24px_70px_-48px_rgba(0,0,0,0.82)]">
                 <!-- Back button for mobile -->
                 <NuxtLink
                   to="/library"
@@ -275,29 +285,35 @@ const handleDelete = async () => {
                 </NuxtLink>
 
                 <!-- Title and actions -->
-                <div class="flex items-start justify-between">
+                <div class="flex items-start justify-between gap-4">
                   <div class="flex-1">
                     <h1
-                      class="text-2xl font-bold text-gray-900 dark:text-white md:text-3xl"
+                      class="text-3xl font-semibold tracking-[-0.04em] text-gray-950 dark:text-white md:text-4xl"
                     >
                       {{ collection.name }}
+                      <span class="font-semibold text-gray-500 dark:text-gray-300"
+                        >({{ collection.itemCount }})</span
+                      >
                     </h1>
                     <p
                       v-if="collection.description"
-                      class="mt-2 text-gray-600 dark:text-gray-300"
+                      class="mt-3 max-w-3xl text-base leading-7 text-gray-600 dark:text-gray-300"
                     >
                       {{ collection.description }}
                     </p>
                     <div
-                      class="mt-2 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400"
+                      class="mt-4 flex flex-wrap items-center gap-2 text-sm"
                     >
-                      <span class="capitalize">{{
-                        collection.visibility.toLowerCase()
-                      }}</span>
                       <span
-                        >{{ collection.itemCount }}
-                        {{ collectionTypeLabel.toLowerCase() }}</span
+                        class="rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 font-medium text-emerald-700 dark:border-emerald-500/35 dark:bg-emerald-500/12 dark:text-emerald-300"
                       >
+                        {{ collectionTypeLabel.toLowerCase() }}
+                      </span>
+                      <span
+                        class="rounded-full border border-gray-300 bg-gray-100 px-3 py-1 font-medium capitalize text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                      >
+                        {{ collection.visibility.toLowerCase() }}
+                      </span>
                     </div>
                     <p
                       v-if="visibilityError"
@@ -308,10 +324,10 @@ const handleDelete = async () => {
                   </div>
 
                   <!-- Action buttons -->
-                  <div class="ml-4 flex flex-shrink-0 gap-2">
+                  <div class="ml-4 flex flex-shrink-0 items-center gap-2">
                     <button
                       type="button"
-                      class="hover:bg-gray-50 inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm disabled:cursor-not-allowed disabled:opacity-70 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                      class="inline-flex items-center rounded-full border border-gray-300 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-800 shadow-sm transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-70 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
                       :disabled="visibilityUpdating || updateLoading"
                       @click="handleToggleVisibility"
                     >
@@ -336,11 +352,13 @@ const handleDelete = async () => {
                     </button>
                     <button
                       type="button"
-                      class="hover:bg-gray-50 inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                      aria-label="Edit collection"
+                      title="Edit collection"
+                      class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-800 shadow-sm transition hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
                       @click="openRenameModal"
                     >
                       <svg
-                        class="mr-1.5 h-4 w-4"
+                        class="h-4 w-4"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -352,15 +370,16 @@ const handleDelete = async () => {
                           d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                         />
                       </svg>
-                      Rename
                     </button>
                     <button
                       type="button"
-                      class="hover:bg-red-50 inline-flex items-center rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-600 shadow-sm dark:border-red-600 dark:bg-gray-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                      aria-label="Delete collection"
+                      title="Delete collection"
+                      class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-red-300 bg-white text-red-600 shadow-sm transition hover:bg-red-50 dark:border-red-500/40 dark:bg-gray-800 dark:text-red-300 dark:hover:bg-red-500/12"
                       @click="showDeleteModal = true"
                     >
                       <svg
-                        class="mr-1.5 h-4 w-4"
+                        class="h-4 w-4"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -372,10 +391,10 @@ const handleDelete = async () => {
                           d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                         />
                       </svg>
-                      Delete
                     </button>
                   </div>
                 </div>
+
               </div>
 
               <!-- Empty state -->

@@ -31,9 +31,28 @@ describe('Breadcrumbs', () => {
     expect(wrapper.text()).toContain('Forums');
   });
 
+  it('includes dark-mode link styling for breadcrumb links', () => {
+    const wrapper = mountCrumbs([{ path: 'forums', label: 'Forums' }]);
+    expect(wrapper.get('a').attributes('class')).toContain('dark:text-gray-300');
+  });
+
   it('builds the link href from the path', () => {
     const wrapper = mountCrumbs([{ path: 'forums/cats', label: 'Cats' }]);
     expect(wrapper.get('a').attributes('href')).toBe('/forums/cats/');
+  });
+
+  it('renders root links without adding an extra slash', () => {
+    const wrapper = mountCrumbs([{ path: '/', label: 'Home' }]);
+    expect(wrapper.get('a').attributes('href')).toBe('/');
+  });
+
+  it('renders the current crumb as plain text', () => {
+    const wrapper = mountCrumbs([
+      { path: 'library', label: 'Library' },
+      { label: 'Saved Comments', current: true },
+    ]);
+    expect(wrapper.text()).toContain('Saved Comments');
+    expect(wrapper.findAll('a')).toHaveLength(1);
   });
 
   it('does not render a chevron before the first crumb', () => {
