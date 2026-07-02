@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  buildSelectedRevisionPairs,
+  buildSelectedWikiRevisionRouteId,
   buildSequentialRevisionPairs,
   getRevisionAuthorName,
+  parseSelectedWikiRevisionRouteId,
 } from '@/utils/revisionHistory';
 
 describe('revisionHistory utils', () => {
@@ -93,5 +96,61 @@ describe('revisionHistory utils', () => {
     });
 
     expect(pairs.map((pair) => pair.id)).toEqual(['past-2']);
+  });
+
+  it('builds and parses selected revision route ids', () => {
+    const routeId = buildSelectedWikiRevisionRouteId('wiki-v1');
+    expect(routeId).toBe('selected-wiki-v1');
+    expect(parseSelectedWikiRevisionRouteId(routeId)).toBe('wiki-v1');
+  });
+
+  it('creates selected revision pairs from an empty initial state forward', () => {
+    const pairs = buildSelectedRevisionPairs({
+      currentVersion: {
+        id: 'current',
+        body: 'current',
+        createdAt: '2024-01-04T00:00:00.000Z',
+        Author: { username: 'current-author' },
+      },
+      pastVersions: [
+        {
+          id: 'past-1',
+          body: 'past 1',
+          createdAt: '2024-01-03T00:00:00.000Z',
+          Author: { username: 'past-1-author' },
+        },
+        {
+          id: 'past-2',
+          body: 'past 2',
+          createdAt: '2024-01-02T00:00:00.000Z',
+          Author: { username: 'past-2-author' },
+        },
+      ],
+      currentAuthor: { username: 'editor' },
+    });
+
+    expect(
+      pairs.map((pair) => ({
+        id: pair.id,
+        oldId: pair.oldVersionData.id,
+        newId: pair.newVersionData.id,
+      }))
+    ).toEqual([
+      {
+        id: 'selected-past-2',
+        oldId: '__initial__',
+        newId: 'past-2',
+      },
+      {
+        id: 'selected-past-1',
+        oldId: 'past-2',
+        newId: 'past-1',
+      },
+      {
+        id: 'selected-current',
+        oldId: 'past-1',
+        newId: 'current',
+      },
+    ]);
   });
 });

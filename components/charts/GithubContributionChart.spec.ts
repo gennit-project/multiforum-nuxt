@@ -297,7 +297,7 @@ describe('GithubContributionChart', () => {
       .map((l) => l.props('to'));
     expect(targets).toContain('/forums/cats/wiki/cat-care');
     expect(targets).toContain(
-      '/forums/cats/wiki/revisions/diff/cat-care/we1'
+      '/forums/cats/wiki/revisions/diff/cat-care/selected-we1'
     );
   });
 
