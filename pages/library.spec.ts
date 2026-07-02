@@ -163,7 +163,7 @@ describe('Library page', () => {
 
     const wrapper = mountLibrary();
     expect(wrapper.text()).toContain('(7)');
-    expect(wrapper.html()).toContain('/library/downloads-1');
+    expect(wrapper.html()).toContain('/library/my-downloads');
     expect(wrapper.text()).toContain(
       'Downloads are added here automatically when you grab a file.'
     );

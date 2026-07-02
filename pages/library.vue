@@ -263,11 +263,7 @@ const myDownloadsCount = computed(() => {
   return autoSavedDownloadsCollection.value?.itemCount ?? ownedDownloadsCount.value;
 });
 
-const myDownloadsLink = computed(() => {
-  return autoSavedDownloadsCollection.value
-    ? `/library/${autoSavedDownloadsCollection.value.id}`
-    : '/library/my-downloads';
-});
+const myDownloadsLink = computed(() => '/library/my-downloads');
 
 // Combine favorites and custom collections
 const allCollections = computed(() => {
