@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { ArrowRight } from 'lucide-vue-next';
 
 type ChannelHealthRow = {
   id: string;
@@ -20,6 +21,7 @@ const props = defineProps<{
   row: ChannelHealthRow;
   maxActivity: number;
   maxIssuePressure: number;
+  detailRouteBase?: string | null;
 }>();
 
 const percent = (value: number, max: number) => {
@@ -38,6 +40,11 @@ const channelInitials = computed(() => {
 
 const forumHref = computed(() => {
   return `/forums/${props.row.channelUniqueName}`;
+});
+
+const detailHref = computed(() => {
+  if (!props.detailRouteBase) return null;
+  return `${props.detailRouteBase}/${encodeURIComponent(props.row.channelUniqueName)}`;
 });
 
 const activityBarWidth = computed(() => {
@@ -222,6 +229,18 @@ const healthLabelClasses = computed(() => {
       >
         {{ row.healthLabel }}
       </span>
+    </td>
+    <td
+      v-if="detailHref"
+      class="px-4 py-3 text-right"
+    >
+      <NuxtLink
+        :to="detailHref"
+        class="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-800"
+      >
+        Details
+        <ArrowRight class="h-3.5 w-3.5" />
+      </NuxtLink>
     </td>
   </tr>
 </template>

@@ -50,7 +50,7 @@ const createdAgo = computed(() => {
 
 <template>
   <li
-    class="w-48 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+    class="w-48 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
   >
     <nuxt-link :to="linkTarget" class="block">
       <div

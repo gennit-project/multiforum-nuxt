@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref, defineComponent, h } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
@@ -34,12 +34,41 @@ const LibraryDownloadCardStub = defineComponent({
 
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 
-const mountWith = async (downloads: unknown[]) => {
-  mockedUseQuery.mockReturnValue({
-    result: ref({ users: [{ OwnedDownloads: downloads }] }),
-    loading: ref(false),
-    error: ref(null),
-  });
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
+const mountWith = async (input: {
+  collection?: unknown;
+  collectionDownloads?: unknown[];
+  ownedDownloads?: unknown[];
+}) => {
+  mockedUseQuery
+    .mockReturnValueOnce({
+      result: ref({
+        users: [
+          {
+            Collections: input.collection ? [input.collection] : [],
+          },
+        ],
+      }),
+      loading: ref(false),
+      error: ref(null),
+    })
+    .mockReturnValueOnce({
+      result: ref({
+        collections: input.collection
+          ? [{ Downloads: input.collectionDownloads || [] }]
+          : [],
+      }),
+      loading: ref(false),
+      error: ref(null),
+    })
+    .mockReturnValueOnce({
+      result: ref({ users: [{ OwnedDownloads: input.ownedDownloads || [] }] }),
+      loading: ref(false),
+      error: ref(null),
+    });
   const Page = (await import('./my-downloads.vue')).default;
   return shallowMount(Page, {
     global: {
@@ -53,19 +82,54 @@ const mountWith = async (downloads: unknown[]) => {
 };
 
 describe('my downloads page', () => {
-  it('shows the empty state when there are no owned downloads', async () => {
-    expect((await mountWith([])).text()).toContain('No downloads yet');
+  it('shows the empty state when there are no downloads in the auto-saved collection', async () => {
+    expect(
+      (
+        await mountWith({
+          collection: {
+            id: 'downloads-1',
+            name: 'Downloaded Items',
+            collectionType: 'DOWNLOADS',
+          },
+          collectionDownloads: [],
+        })
+      ).text()
+    ).toContain('No downloads yet');
   });
 
-  it('renders an owned download title', async () => {
-    const wrapper = await mountWith([
-      {
-        id: 'd1',
-        title: 'My tileset',
-        DiscussionChannels: [{ channelUniqueName: 'cats' }],
-        Tags: [],
+  it('renders downloads from the auto-saved collection when present', async () => {
+    const wrapper = await mountWith({
+      collection: {
+        id: 'downloads-1',
+        name: 'Downloaded Items',
+        collectionType: 'DOWNLOADS',
       },
-    ]);
+      collectionDownloads: [
+        {
+          id: 'd1',
+          title: 'My tileset',
+          DiscussionChannels: [{ channelUniqueName: 'cats' }],
+          Tags: [],
+        },
+      ],
+      ownedDownloads: [],
+    });
     expect(wrapper.text()).toContain('My tileset');
+    expect(wrapper.text()).toContain('Saved in your private');
+  });
+
+  it('falls back to legacy owned downloads when the auto-saved collection does not exist', async () => {
+    const wrapper = await mountWith({
+      ownedDownloads: [
+        {
+          id: 'd2',
+          title: 'Legacy download',
+          DiscussionChannels: [{ channelUniqueName: 'cats' }],
+          Tags: [],
+        },
+      ],
+    });
+
+    expect(wrapper.text()).toContain('Legacy download');
   });
 });

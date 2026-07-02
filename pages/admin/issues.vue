@@ -8,20 +8,40 @@ import {
 } from '@/graphQLData/mod/queries';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
+import { buildServerIssueWhere } from '@/utils/serverIssueFilters';
+import { getServerIssueFilterValuesFromParams } from '@/utils/getServerIssueFilterValuesFromParams';
 
 const route = useRoute();
 const router = useRouter();
+const filterValues = computed(() =>
+  getServerIssueFilterValuesFromParams({ route })
+);
+
+const openCountVariables = computed(() => ({
+  issueWhere: buildServerIssueWhere({
+    ...filterValues.value,
+    isOpen: true,
+  }),
+}));
+
+const closedCountVariables = computed(() => ({
+  issueWhere: buildServerIssueWhere({
+    ...filterValues.value,
+    isOpen: false,
+  }),
+}));
+
 const {
   result: issuesResult,
   error: issuesError,
   loading: issuesLoading,
-} = useQuery(SERVER_SCOPED_ISSUE_COUNT);
+} = useQuery(SERVER_SCOPED_ISSUE_COUNT, openCountVariables);
 
 const {
   result: closedIssuesResult,
   error: closedIssuesError,
   loading: closedIssuesLoading,
-} = useQuery(SERVER_SCOPED_CLOSED_ISSUE_COUNT);
+} = useQuery(SERVER_SCOPED_CLOSED_ISSUE_COUNT, closedCountVariables);
 
 const openCount = computed(() => {
   if (issuesLoading.value || issuesError.value) {

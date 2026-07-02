@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue';
-import VueEasyLightbox from 'vue-easy-lightbox';
+import { computed, defineAsyncComponent, ref, watchEffect } from 'vue';
 import { config } from '@/config';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import { useUIStore } from '@/stores/uiStore';
@@ -24,6 +23,10 @@ interface Props {
   imageMaxHeight?: string;
   allowImages?: boolean;
 }
+
+const ClientLightbox = import.meta.client
+  ? defineAsyncComponent(() => import('vue-easy-lightbox'))
+  : null;
 
 const props = withDefaults(defineProps<Props>(), {
   disableGallery: false,
@@ -215,12 +218,16 @@ const handleModalClose = () => {
     >
       {{ showFullText ? 'Show Less' : 'Show More' }}
     </button>
-    <vue-easy-lightbox
-      :visible="visibleRef"
-      :imgs="embeddedImages.map((image) => image.src)"
-      :index="indexRef"
-      @hide="onHide"
-    />
+    <ClientOnly>
+      <component
+        :is="ClientLightbox"
+        v-if="ClientLightbox"
+        :visible="visibleRef"
+        :imgs="embeddedImages.map((image) => image.src)"
+        :index="indexRef"
+        @hide="onHide"
+      />
+    </ClientOnly>
     <WarningModal
       data-testid="external-link-warning"
       title="Open External Link"
