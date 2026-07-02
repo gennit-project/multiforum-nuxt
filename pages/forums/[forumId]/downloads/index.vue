@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useRoute } from 'nuxt/app';
+import { computed, watch } from 'vue';
+import { useRoute, useRouter } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import DownloadList from '@/components/channel/DownloadList.vue';
 import DownloadFilterBar from '@/components/download/DownloadFilterBar.vue';
@@ -11,8 +11,11 @@ import type { FilterGroup } from '@/__generated__/graphql';
 import { config } from '@/config';
 import { DateTime } from 'luxon';
 import { evaluateForumFeatureGate } from '@/utils/forumFeatureGate';
+import { getStaleDownloadFilterQueryKeys } from '@/utils/downloadFilters';
+import { updateFilters } from '@/utils/routerUtils';
 
 const route = useRoute();
+const router = useRouter();
 
 const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
@@ -95,6 +98,30 @@ const errorMessage = computed(() => downloadsGate.value.errorMessage);
 const filterGroups = computed<FilterGroup[]>(() => {
   return channel.value?.FilterGroups || [];
 });
+
+const staleDownloadFilterQueryKeys = computed(() => {
+  if (!channel.value) {
+    return [];
+  }
+
+  return getStaleDownloadFilterQueryKeys(route, filterGroups.value);
+});
+
+watch(
+  staleDownloadFilterQueryKeys,
+  (staleKeys) => {
+    if (!staleKeys.length) {
+      return;
+    }
+
+    updateFilters({
+      router,
+      route,
+      params: Object.fromEntries(staleKeys.map((key) => [key, undefined])),
+    });
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
