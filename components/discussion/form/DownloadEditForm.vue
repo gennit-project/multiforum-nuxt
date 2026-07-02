@@ -15,8 +15,10 @@ import {
   UPDATE_DISCUSSION,
   CREATE_SIGNED_STORAGE_URL,
   CREATE_DOWNLOADABLE_FILE,
+  PERMANENTLY_DELETE_DOWNLOADABLE_FILE,
 } from '@/graphQLData/discussion/mutations';
 import Notification from '@/components/NotificationComponent.vue';
+import WarningModal from '@/components/WarningModal.vue';
 import {
   uploadAndGetEmbeddedLink,
   getUploadFileName,
@@ -157,6 +159,7 @@ const formValues = ref({
 // Upload state
 const uploadingFile = ref(false);
 const uploadError = ref('');
+const pendingDeleteFileIndex = ref<number | null>(null);
 
 // Notification state
 const savedSuccessfully = ref(false);
@@ -178,6 +181,12 @@ const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
 
 const { mutate: createDownloadableFile, error: createDownloadableFileError } =
   useMutation(CREATE_DOWNLOADABLE_FILE);
+
+const {
+  mutate: permanentlyDeleteDownloadableFile,
+  loading: permanentlyDeleteDownloadableFileLoading,
+  error: permanentlyDeleteDownloadableFileError,
+} = useMutation(PERMANENTLY_DELETE_DOWNLOADABLE_FILE);
 
 const {
   mutate: _updateDiscussion,
@@ -377,11 +386,54 @@ const getFileTypeFromName = (filename: string): string | null =>
 
 const getFileKind = (file: File): string => getDownloadFileKind(file.name);
 
-// Remove file
-const removeFile = (index: number) => {
+const removeFileFromForm = (index: number) => {
   formValues.value.downloadableFiles.splice(index, 1);
   // Auto-save after file removal
   handleSave();
+};
+
+const requestRemoveFile = (index: number) => {
+  const file = formValues.value.downloadableFiles[index];
+
+  if (!file?.id) {
+    removeFileFromForm(index);
+    return;
+  }
+
+  pendingDeleteFileIndex.value = index;
+};
+
+const closePermanentDeleteModal = () => {
+  if (permanentlyDeleteDownloadableFileLoading.value) {
+    return;
+  }
+
+  pendingDeleteFileIndex.value = null;
+};
+
+const permanentlyDeleteSelectedFile = async () => {
+  if (pendingDeleteFileIndex.value === null) {
+    return;
+  }
+
+  const index = pendingDeleteFileIndex.value;
+  const file = formValues.value.downloadableFiles[index];
+  if (!file?.id) {
+    removeFileFromForm(index);
+    pendingDeleteFileIndex.value = null;
+    return;
+  }
+
+  try {
+    await permanentlyDeleteDownloadableFile({
+      downloadableFileId: file.id,
+    });
+
+    removeFileFromForm(index);
+    pendingDeleteFileIndex.value = null;
+  } catch (error) {
+    console.error('Error permanently deleting downloadable file:', error);
+  }
 };
 
 // Update license
@@ -449,6 +501,12 @@ function handleSave() {
       <ErrorBanner
         v-else-if="createDownloadableFileError"
         :text="createDownloadableFileError.message"
+        class="mb-4"
+      />
+
+      <ErrorBanner
+        v-else-if="permanentlyDeleteDownloadableFileError"
+        :text="permanentlyDeleteDownloadableFileError.message"
         class="mb-4"
       />
 
@@ -531,7 +589,7 @@ function handleSave() {
                           type="button"
                           class="text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                           title="Delete this file"
-                          @click="removeFile(index)"
+                          @click="requestRemoveFile(index)"
                         >
                           Delete
                         </button>
@@ -543,7 +601,7 @@ function handleSave() {
                     v-if="!file.url"
                     type="button"
                     class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                    @click="removeFile(index)"
+                    @click="requestRemoveFile(index)"
                   >
                     Remove
                   </button>
@@ -691,6 +749,18 @@ function handleSave() {
       :show="savedSuccessfully"
       :title="'Download saved successfully'"
       @close-notification="savedSuccessfully = false"
+    />
+
+    <WarningModal
+      :open="pendingDeleteFileIndex !== null"
+      title="Permanently delete this file?"
+      body="This removes the downloadable file from the discussion and permanently deletes the backing file from storage. This cannot be undone."
+      icon="trash"
+      primary-button-text="Permanently delete"
+      :loading="permanentlyDeleteDownloadableFileLoading"
+      data-testid="permanent-download-file-delete-modal"
+      @close="closePermanentDeleteModal"
+      @primary-button-click="permanentlyDeleteSelectedFile"
     />
   </div>
 </template>

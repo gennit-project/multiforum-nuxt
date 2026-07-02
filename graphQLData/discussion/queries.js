@@ -341,7 +341,7 @@ export const GET_DISCUSSION = gql`
       Tags {
         text
       }
-      DownloadableFiles {
+      DownloadableFiles(where: { permanentlyRemoved_NOT: true }) {
         id
         fileName
         url
@@ -442,7 +442,7 @@ export const GET_DISCUSSION_FEEDBACK = gql`
           }
         }
       }
-      DownloadableFiles {
+      DownloadableFiles(where: { permanentlyRemoved_NOT: true }) {
         id
         fileName
         url

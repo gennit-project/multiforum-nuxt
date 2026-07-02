@@ -9,19 +9,30 @@ const h = vi.hoisted(() => ({
   username: { value: 'alice' as string | null },
   createSignedStorageUrl: undefined as unknown,
   createDownloadableFile: undefined as unknown,
+  permanentlyDeleteDownloadableFile: undefined as unknown,
   updateMutate: undefined as unknown,
   uploadLink: undefined as unknown,
   onDoneCb: { fn: undefined as undefined | (() => void) },
-  callIndex: { n: 0 },
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useMutation: () => {
-    h.callIndex.n++;
-    if (h.callIndex.n === 1)
+  useMutation: (document: unknown) => {
+    const operationName = (
+      document as {
+        definitions?: Array<{ name?: { value?: string } }>;
+      }
+    ).definitions?.[0]?.name?.value;
+
+    if (operationName === 'createSignedURL')
       return { mutate: h.createSignedStorageUrl, error: ref(null) };
-    if (h.callIndex.n === 2)
+    if (operationName === 'createDownloadableFile')
       return { mutate: h.createDownloadableFile, error: ref(null) };
+    if (operationName === 'permanentlyDeleteDownloadableFile')
+      return {
+        mutate: h.permanentlyDeleteDownloadableFile,
+        loading: ref(false),
+        error: ref(null),
+      };
     return {
       mutate: h.updateMutate,
       error: ref(null),
@@ -71,6 +82,12 @@ const stubs = {
     emits: ['close-notification'],
     template: '<div />',
   },
+  WarningModal: {
+    name: 'WarningModal',
+    props: ['open', 'title', 'body', 'loading'],
+    emits: ['close', 'primary-button-click'],
+    template: '<div data-testid="warning-modal" :data-open="open" />',
+  },
   DownloadLabelPicker: {
     name: 'DownloadLabelPicker',
     props: ['filterGroups', 'selectedLabels'],
@@ -98,7 +115,6 @@ const setFiles = async (
 
 beforeEach(() => {
   h.username.value = 'alice';
-  h.callIndex.n = 0;
   h.onDoneCb.fn = undefined;
   h.createSignedStorageUrl = vi.fn().mockResolvedValue({
     data: {
@@ -124,6 +140,15 @@ beforeEach(() => {
             priceCurrency: 'USD',
           },
         ],
+      },
+    },
+  });
+  h.permanentlyDeleteDownloadableFile = vi.fn().mockResolvedValue({
+    data: {
+      permanentlyDeleteDownloadableFile: {
+        id: 'f1',
+        permanentlyRemoved: true,
+        permanentlyRemovedAt: '2026-07-01T12:00:00.000Z',
       },
     },
   });
@@ -165,7 +190,7 @@ describe('DownloadEditForm rendering', () => {
 });
 
 describe('DownloadEditForm file editing', () => {
-  it('removes a file and emits the updated form values', async () => {
+  it('opens a confirmation before permanently deleting an existing file', async () => {
     const wrapper = mountForm({
       discussion: makeDiscussion({ DownloadableFiles: [fileRecord()] }),
     });
@@ -174,10 +199,54 @@ describe('DownloadEditForm file editing', () => {
     await wrapper.get('button[title="Delete this file"]').trigger('click');
 
     expect(
+      wrapper.getComponent({ name: 'WarningModal' }).props('open')
+    ).toBe(true);
+  });
+
+  it('does not remove an existing file before confirmation', async () => {
+    const wrapper = mountForm({
+      discussion: makeDiscussion({ DownloadableFiles: [fileRecord()] }),
+    });
+    await flushPromises();
+
+    await wrapper.get('button[title="Delete this file"]').trigger('click');
+
+    expect(wrapper.emitted('updateFormValues')).toBeUndefined();
+  });
+
+  it('permanently deletes a confirmed existing file and emits the updated form values', async () => {
+    const wrapper = mountForm({
+      discussion: makeDiscussion({ DownloadableFiles: [fileRecord()] }),
+    });
+    await flushPromises();
+
+    await wrapper.get('button[title="Delete this file"]').trigger('click');
+    await wrapper
+      .getComponent({ name: 'WarningModal' })
+      .vm.$emit('primary-button-click');
+    await flushPromises();
+
+    expect(
       (wrapper.emitted('updateFormValues')?.at(-1)?.[0] as {
         downloadableFiles: unknown[];
       }).downloadableFiles
     ).toHaveLength(0);
+  });
+
+  it('passes the file id to the permanent delete mutation', async () => {
+    const wrapper = mountForm({
+      discussion: makeDiscussion({ DownloadableFiles: [fileRecord()] }),
+    });
+    await flushPromises();
+
+    await wrapper.get('button[title="Delete this file"]').trigger('click');
+    await wrapper
+      .getComponent({ name: 'WarningModal' })
+      .vm.$emit('primary-button-click');
+
+    expect(h.permanentlyDeleteDownloadableFile).toHaveBeenCalledWith({
+      downloadableFileId: 'f1',
+    });
   });
 
   it('updates a file license and emits the change', async () => {
@@ -292,6 +361,10 @@ describe('DownloadEditForm save side effects', () => {
     await flushPromises();
 
     await wrapper.get('button[title="Delete this file"]').trigger('click');
+    await wrapper
+      .getComponent({ name: 'WarningModal' })
+      .vm.$emit('primary-button-click');
+    await flushPromises();
 
     expect(
       wrapper.getComponent({ name: 'Notification' }).props('show')
