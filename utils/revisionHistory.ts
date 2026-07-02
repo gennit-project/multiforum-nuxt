@@ -74,6 +74,37 @@ export const getRevisionContent = (version: RevisionVersionLike) => {
   return version.body || version.title || '';
 };
 
+export const INITIAL_REVISION_ID = '__initial__';
+export const SELECTED_WIKI_REVISION_PREFIX = 'selected-';
+
+export const buildSelectedWikiRevisionRouteId = (revisionId: string) => {
+  return `${SELECTED_WIKI_REVISION_PREFIX}${revisionId}`;
+};
+
+export const isSelectedWikiRevisionRouteId = (revisionId: string) => {
+  return revisionId.startsWith(SELECTED_WIKI_REVISION_PREFIX);
+};
+
+export const parseSelectedWikiRevisionRouteId = (revisionId: string) => {
+  if (!isSelectedWikiRevisionRouteId(revisionId)) {
+    return null;
+  }
+
+  return revisionId.slice(SELECTED_WIKI_REVISION_PREFIX.length);
+};
+
+const buildInitialRevision = <TVersion extends RevisionVersionLike>(
+  currentVersion: TVersion
+) =>
+  ({
+    id: INITIAL_REVISION_ID,
+    body: '',
+    title: '',
+    createdAt: currentVersion.createdAt,
+    editReason: null,
+    Author: { username: '[Initial]' },
+  }) as TVersion;
+
 export const buildSequentialRevisionPairs = <
   TVersion extends RevisionVersionLike,
 >({
@@ -130,6 +161,50 @@ export const buildSequentialRevisionPairs = <
       oldVersionData: oldVersion,
       newVersionData: newVersion,
     });
+  });
+
+  return pairs;
+};
+
+export const buildSelectedRevisionPairs = <
+  TVersion extends RevisionVersionLike,
+>({
+  pastVersions,
+  currentVersion,
+  currentAuthor,
+}: {
+  pastVersions: readonly TVersion[] | null | undefined;
+  currentVersion: TVersion;
+  currentAuthor?: RevisionAuthorLike;
+}): RevisionPair<TVersion>[] => {
+  const pairs: RevisionPair<TVersion>[] = [];
+  const versions = [...(pastVersions || [])].reverse();
+  let previousVersion = buildInitialRevision(currentVersion);
+
+  versions.forEach((version) => {
+    pairs.push({
+      id: buildSelectedWikiRevisionRouteId(version.id),
+      author: getRevisionAuthorName(version.Author),
+      createdAt: version.createdAt,
+      isCurrent: false,
+      oldVersion: previousVersion,
+      newVersion: version,
+      oldVersionData: previousVersion,
+      newVersionData: version,
+    });
+
+    previousVersion = version;
+  });
+
+  pairs.push({
+    id: buildSelectedWikiRevisionRouteId(currentVersion.id),
+    author: getRevisionAuthorName(currentAuthor || currentVersion.Author),
+    createdAt: currentVersion.createdAt,
+    isCurrent: true,
+    oldVersion: previousVersion,
+    newVersion: currentVersion,
+    oldVersionData: previousVersion,
+    newVersionData: currentVersion,
   });
 
   return pairs;
