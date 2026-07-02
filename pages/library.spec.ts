@@ -8,6 +8,7 @@ const h = vi.hoisted(() => ({
   counts: null as unknown as { value: unknown },
   downloads: null as unknown as { value: unknown },
   owned: null as unknown as { value: unknown },
+  uploaded: null as unknown as { value: unknown },
   collections: null as unknown as { value: unknown },
   route: { path: '/library', params: {} as Record<string, unknown> },
   qi: 0,
@@ -23,8 +24,9 @@ vi.mock('@vue/apollo-composable', async () => {
   h.counts = ref(null);
   h.downloads = ref(null);
   h.owned = ref(null);
+  h.uploaded = ref(null);
   h.collections = ref(null);
-  const order = [h.counts, h.downloads, h.owned, h.collections];
+  const order = [h.counts, h.downloads, h.owned, h.uploaded, h.collections];
   return {
     useQuery: () => ({ result: order[h.qi++] ?? ref(null), refetch: vi.fn() }),
   };
@@ -79,6 +81,7 @@ const setCounts = (channels: number, discussions: number, images: number) => {
   };
   h.downloads.value = { users: [{ FavoriteDiscussionsAggregate: { count: 0 } }] };
   h.owned.value = { users: [{ OwnedDownloadsAggregate: { count: 0 } }] };
+  h.uploaded.value = { getUploadedDownloadableFiles: [] };
   h.collections.value = { users: [{ Collections: [] }] };
 };
 
@@ -90,6 +93,7 @@ beforeEach(() => {
   h.counts.value = null;
   h.downloads.value = null;
   h.owned.value = null;
+  h.uploaded.value = null;
   h.collections.value = null;
 });
 
@@ -261,6 +265,24 @@ describe('Library page', () => {
     ).toBe('/library/favorite-channels');
     expect(wrapper.get('[data-testid="mobile-library-item-c1"]').text()).toContain(
       'My Reading List'
+    );
+  });
+
+  it('links to uploaded files management from the sidebar', () => {
+    setCounts(0, 0, 0);
+    h.uploaded.value = {
+      getUploadedDownloadableFiles: [
+        {
+          discussion: { id: 'd1', title: 'Model' },
+          files: [{ id: 'f1', fileName: 'model.stl' }],
+        },
+      ],
+    };
+
+    const wrapper = mountLibrary();
+
+    expect(wrapper.get('[data-testid="library-item-uploaded-files"]').text()).toContain(
+      '(1)'
     );
   });
 
