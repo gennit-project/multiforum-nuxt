@@ -27,7 +27,7 @@ const creatorLabel = computed(() => {
 
 <template>
   <div
-    class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-400 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-orange-400"
+    class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition hover:border-orange-400 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-orange-400"
   >
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">

@@ -1,19 +1,35 @@
 <script setup lang="ts">
 interface Link {
-  path: string;
+  path?: string;
   label: string;
+  current?: boolean;
 }
 
-defineProps<{
+const props = defineProps<{
   links: Link[];
 }>();
+
+const buildTarget = (link: Link) => {
+  if (!link.path || link.current) {
+    return null;
+  }
+
+  if (link.path === '/') {
+    return '/';
+  }
+
+  return link.path.startsWith('/') ? link.path : `/${link.path}/`;
+};
 </script>
 
 <template>
   <nav class="mb-1 mt-2 flex" aria-label="Breadcrumb">
-    <ol role="list" class="flex items-center space-x-4">
-      <li v-for="(link, i) in links" :key="link.path">
-        <div class="flex items-center">
+    <ol role="list" class="flex flex-wrap items-center gap-x-4 gap-y-2">
+      <li
+        v-for="(link, i) in props.links"
+        :key="`${link.path || 'current'}-${link.label}`"
+      >
+        <div class="flex items-center whitespace-nowrap">
           <!-- Heroicon name: solid/chevron-right -->
           <svg
             v-if="i !== 0"
@@ -30,13 +46,19 @@ defineProps<{
             />
           </svg>
           <nuxt-link
-            v-if="link.path"
-            :to="`/${link.path}/`"
-            class="text-xs text-gray-500 underline hover:text-gray-700"
-            active-class="text-gray-700"
+            v-if="buildTarget(link)"
+            :to="buildTarget(link)"
+            class="text-xs text-gray-500 underline hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+            active-class="text-gray-700 dark:text-white"
           >
             {{ link.label }}
           </nuxt-link>
+          <span
+            v-else
+            class="text-xs font-medium text-gray-700 dark:text-gray-300"
+          >
+            {{ link.label }}
+          </span>
         </div>
       </li>
     </ol>

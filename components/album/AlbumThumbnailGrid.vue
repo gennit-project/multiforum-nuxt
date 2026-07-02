@@ -46,7 +46,7 @@ defineProps({
       <img
         :src="image.url || ''"
         :alt="image.alt || image.caption || 'Album image'"
-        class="h-full w-full object-cover transition-transform group-hover:scale-105"
+        class="h-full w-full object-cover"
       >
       <div
         v-if="showCaptions && image.caption"
