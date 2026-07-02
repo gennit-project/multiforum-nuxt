@@ -7,7 +7,11 @@ import TextInput from '@/components/TextInput.vue';
 import FormRow from '@/components/FormRow.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import AddImage from '@/components/AddImage.vue';
-import { getUploadFileName, uploadAndGetEmbeddedLink } from '@/utils';
+import {
+  getUploadFileName,
+  uploadAndGetEmbeddedLink,
+  type SignedStorageUrlPayload,
+} from '@/utils';
 import { useUsername } from '@/composables/useAuthState';
 import type { EditAccountSettingsFormValues } from '@/types/User';
 import FormComponent from '../FormComponent.vue';
@@ -79,13 +83,16 @@ const upload = async (file: File) => {
       contentType: file.type,
     });
 
-    const signedStorageURL = signedUrlResult?.data?.createSignedStorageURL?.url;
+    const signedUpload = signedUrlResult?.data
+      ?.createSignedStorageURL as SignedStorageUrlPayload | undefined;
+    const signedStorageURL = signedUpload?.url || '';
 
     const embeddedLink = await uploadAndGetEmbeddedLink({
       file,
       filename,
       fileType: file.type,
       signedStorageURL,
+      storageUrl: signedUpload?.storageUrl,
     });
 
     return embeddedLink;

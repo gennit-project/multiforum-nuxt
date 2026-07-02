@@ -17,7 +17,11 @@ import {
   CREATE_DOWNLOADABLE_FILE,
 } from '@/graphQLData/discussion/mutations';
 import Notification from '@/components/NotificationComponent.vue';
-import { uploadAndGetEmbeddedLink, getUploadFileName } from '@/utils';
+import {
+  uploadAndGetEmbeddedLink,
+  getUploadFileName,
+  type SignedStorageUrlPayload,
+} from '@/utils';
 import DownloadLabelPicker from '@/components/download/DownloadLabelPicker.vue';
 import {
   validateDownloadFileType,
@@ -298,7 +302,9 @@ const uploadFile = async (file: File): Promise<boolean> => {
 
     // Ask the server for a signed storage URL
     const signedUrlResult = await createSignedStorageUrl(signedStorageURLInput);
-    const signedStorageURL = signedUrlResult?.data?.createSignedStorageURL?.url;
+    const signedUpload = signedUrlResult?.data
+      ?.createSignedStorageURL as SignedStorageUrlPayload | undefined;
+    const signedStorageURL = signedUpload?.url;
 
     if (!signedStorageURL) {
       throw new Error('No signed storage URL returned');
@@ -310,6 +316,7 @@ const uploadFile = async (file: File): Promise<boolean> => {
       filename,
       fileType,
       signedStorageURL,
+      storageUrl: signedUpload?.storageUrl,
     });
 
     if (!fileUrl) {
@@ -325,6 +332,7 @@ const uploadFile = async (file: File): Promise<boolean> => {
       priceModel: 'FREE',
       priceCents: 0,
       priceCurrency: 'USD',
+      storageObjectName: signedUpload?.storageObjectName,
     });
 
     // Get the created file from the result

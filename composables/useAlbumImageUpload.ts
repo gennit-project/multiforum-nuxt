@@ -5,7 +5,11 @@ import {
   CREATE_IMAGE,
 } from '@/graphQLData/discussion/mutations';
 import { useUsername } from '@/composables/useAuthState';
-import { getUploadFileName, uploadAndGetEmbeddedLink } from '@/utils';
+import {
+  getUploadFileName,
+  uploadAndGetEmbeddedLink,
+  type SignedStorageUrlPayload,
+} from '@/utils';
 import { isFileSizeValid } from '@/utils/index';
 
 export type AlbumImageInput = {
@@ -74,7 +78,9 @@ export function useAlbumImageUpload(params: UseAlbumImageUploadParams) {
 
       // Ask the server for a signed storage URL
       const signedUrlResult = await createSignedStorageUrl(signedStorageURLInput);
-      const signedStorageURL = signedUrlResult?.data?.createSignedStorageURL?.url;
+      const signedUpload = signedUrlResult?.data
+        ?.createSignedStorageURL as SignedStorageUrlPayload | undefined;
+      const signedStorageURL = signedUpload?.url;
 
       if (!signedStorageURL) {
         throw new Error('No signed storage URL returned');
@@ -86,6 +92,7 @@ export function useAlbumImageUpload(params: UseAlbumImageUploadParams) {
         filename,
         fileType: contentType,
         signedStorageURL,
+        storageUrl: signedUpload?.storageUrl,
       });
 
       if (!fileUrl) {
@@ -99,6 +106,7 @@ export function useAlbumImageUpload(params: UseAlbumImageUploadParams) {
         alt: file.name,
         caption: '',
         copyright: '',
+        storageObjectName: signedUpload?.storageObjectName,
       });
 
       const createdImage = createImageResult?.data?.createImageWithUploader;

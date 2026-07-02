@@ -101,7 +101,13 @@ beforeEach(() => {
   h.callIndex.n = 0;
   h.onDoneCb.fn = undefined;
   h.createSignedStorageUrl = vi.fn().mockResolvedValue({
-    data: { createSignedStorageURL: { url: 'https://signed' } },
+    data: {
+      createSignedStorageURL: {
+        url: 'https://signed',
+        storageUrl: 'http://files/new.stl',
+        storageObjectName: 'users/alice/downloads/new.stl',
+      },
+    },
   });
   h.createDownloadableFile = vi.fn().mockResolvedValue({
     data: {
@@ -218,6 +224,34 @@ describe('DownloadEditForm upload', () => {
     ]);
 
     expect(h.createDownloadableFile).toHaveBeenCalled();
+  });
+
+  it('passes the signed storage object name when creating uploaded files', async () => {
+    const wrapper = mountForm();
+
+    await setFiles(wrapper, '#downloadable-file-input', [
+      new File(['x'], 'new.stl'),
+    ]);
+
+    expect(h.createDownloadableFile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        storageObjectName: 'users/alice/downloads/new.stl',
+      })
+    );
+  });
+
+  it('passes the server storageUrl to the storage upload helper', async () => {
+    const wrapper = mountForm();
+
+    await setFiles(wrapper, '#downloadable-file-input', [
+      new File(['x'], 'new.stl'),
+    ]);
+
+    expect(h.uploadLink).toHaveBeenCalledWith(
+      expect.objectContaining({
+        storageUrl: 'http://files/new.stl',
+      })
+    );
   });
 
   it('emits the new file to the parent after upload', async () => {

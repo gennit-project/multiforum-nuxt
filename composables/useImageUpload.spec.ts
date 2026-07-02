@@ -122,6 +122,27 @@ describe('useImageUpload.uploadFile', () => {
     );
   });
 
+  it('passes the server storageUrl to the storage upload helper', async () => {
+    mockMutate.mockResolvedValue({
+      data: {
+        createSignedStorageURL: {
+          url: 'https://signed',
+          storageUrl: 'https://storage.googleapis.com/bucket/users/alice/x.png',
+        },
+      },
+    });
+    uploadAndGetEmbeddedLink.mockResolvedValue('https://cdn/x.png');
+    const { uploadFile } = useImageUpload();
+
+    await uploadFile(makeFile());
+
+    expect(uploadAndGetEmbeddedLink).toHaveBeenCalledWith(
+      expect.objectContaining({
+        storageUrl: 'https://storage.googleapis.com/bucket/users/alice/x.png',
+      })
+    );
+  });
+
   it('returns the error message when the upload throws', async () => {
     mockMutate.mockRejectedValue(new Error('network down'));
     const { uploadFile, isUploading } = useImageUpload();

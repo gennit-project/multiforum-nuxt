@@ -1,7 +1,11 @@
 import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
-import { uploadAndGetEmbeddedLink, getUploadFileName } from '@/utils';
+import {
+  uploadAndGetEmbeddedLink,
+  getUploadFileName,
+  type SignedStorageUrlPayload,
+} from '@/utils';
 import { useUsername } from '@/composables/useAuthState';
 import { isFileSizeValid } from '@/utils/index';
 
@@ -74,7 +78,9 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
       };
 
       const signedUrlResult = await createSignedStorageUrl(signedStorageURLInput);
-      const signedStorageURL = signedUrlResult?.data?.createSignedStorageURL?.url;
+      const signedUpload = signedUrlResult?.data
+        ?.createSignedStorageURL as SignedStorageUrlPayload | undefined;
+      const signedStorageURL = signedUpload?.url;
 
       if (!signedStorageURL) {
         return {
@@ -88,6 +94,7 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
         filename,
         fileType,
         signedStorageURL,
+        storageUrl: signedUpload?.storageUrl,
       });
 
       if (!embeddedLink) {

@@ -12,6 +12,8 @@ export const CREATE_SIGNED_STORAGE_URL = gql`
       channelConnections: $channelConnections
     ) {
       url
+      storageObjectName
+      storageUrl
     }
   }
 `;
@@ -23,6 +25,7 @@ export const CREATE_IMAGE = gql`
     $caption: String
     $copyright: String
     $albumId: ID
+    $storageObjectName: String
   ) {
     createImageWithUploader(
       input: {
@@ -31,6 +34,7 @@ export const CREATE_IMAGE = gql`
         caption: $caption
         copyright: $copyright
         albumId: $albumId
+        storageObjectName: $storageObjectName
       }
     ) {
       id
@@ -54,6 +58,7 @@ export const CREATE_DOWNLOADABLE_FILE = gql`
     $priceModel: PriceModel!
     $priceCents: Int
     $priceCurrency: String
+    $storageObjectName: String
   ) {
     createDownloadableFiles(
       input: [
@@ -65,6 +70,7 @@ export const CREATE_DOWNLOADABLE_FILE = gql`
           priceModel: $priceModel
           priceCents: $priceCents
           priceCurrency: $priceCurrency
+          storageObjectName: $storageObjectName
         }
       ]
     ) {

@@ -458,6 +458,21 @@ describe('uploadAndGetEmbeddedLink', () => {
     );
   });
 
+  it('returns the signed storageUrl after a successful upload when provided', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true });
+
+    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
+    const result = await uploadAndGetEmbeddedLink({
+      signedStorageURL: 'https://storage.example.com/upload',
+      storageUrl: 'https://storage.googleapis.com/bucket/users/alice/test.jpg',
+      filename: 'test.jpg',
+      file,
+      fileType: 'image/jpeg',
+    });
+
+    expect(result).toBe('https://storage.googleapis.com/bucket/users/alice/test.jpg');
+  });
+
   it('throws error when file is too large', async () => {
     const largeFile = new File(['x'.repeat(6 * 1024 * 1024)], 'large.jpg');
 

@@ -8,7 +8,11 @@ import TextInput from '@/components/TextInput.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import AddImage from '@/components/AddImage.vue';
 import RemoveOwnerModal from '@/components/channel/RemoveOwnerModal.vue';
-import { getUploadFileName, uploadAndGetEmbeddedLink } from '@/utils';
+import {
+  getUploadFileName,
+  uploadAndGetEmbeddedLink,
+  type SignedStorageUrlPayload,
+} from '@/utils';
 import { useUsername } from '@/composables/useAuthState';
 import { ref, nextTick, computed } from 'vue';
 import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
@@ -130,13 +134,16 @@ const upload = async (file: File) => {
     const signedUrlResult = await createSignedStorageUrl(
       getSignedStorageURLInput
     );
-    const signedStorageURL = signedUrlResult?.data?.createSignedStorageURL?.url;
+    const signedUpload = signedUrlResult?.data
+      ?.createSignedStorageURL as SignedStorageUrlPayload | undefined;
+    const signedStorageURL = signedUpload?.url || '';
 
     const embeddedLink = uploadAndGetEmbeddedLink({
       file,
       filename,
       signedStorageURL,
       fileType: file.type,
+      storageUrl: signedUpload?.storageUrl,
     });
 
     return embeddedLink;

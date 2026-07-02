@@ -5,6 +5,7 @@ import {
   getUploadFileName,
   uploadAndGetEmbeddedLink,
   isFileSizeValid,
+  type SignedStorageUrlPayload,
 } from '@/utils';
 import { useUsername } from '@/composables/useAuthState';
 import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
@@ -46,13 +47,15 @@ const upload = async (file: File) => {
       contentType: file.type,
     });
 
-    const signedStorageURL =
-      signedUrlResult?.data?.createSignedStorageURL?.url || '';
+    const signedUpload = signedUrlResult?.data
+      ?.createSignedStorageURL as SignedStorageUrlPayload | undefined;
+    const signedStorageURL = signedUpload?.url || '';
     const embeddedLink = uploadAndGetEmbeddedLink({
       file,
       filename,
       fileType: file.type,
       signedStorageURL,
+      storageUrl: signedUpload?.storageUrl,
     });
 
     return embeddedLink;

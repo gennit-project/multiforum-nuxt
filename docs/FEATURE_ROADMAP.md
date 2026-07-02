@@ -35,7 +35,8 @@ Notes:
 - [ ] Define the exact moderator permission using the existing moderation permission model.
 - [ ] Decide whether OP/uploader self-delete is allowed and under what product rules.
 - [ ] Decide whether deletion hard-deletes the blob, detaches it, marks it deleted, or combines those steps.
-- [ ] Preserve enough metadata for moderation and audit history.
+- [x] Preserve upload/storage metadata for new downloadable-file uploads so deletion/audit flows do not reconstruct storage paths later. `[in draft PR]`
+- [ ] Preserve any additional deletion-specific metadata needed for moderation and audit history.
 - [ ] Show the destructive action only to authorized users.
 - [ ] Add a confirmation dialog that clearly says the file is permanently removed.
 - [ ] Refresh download detail and list views after deletion.
@@ -45,6 +46,7 @@ Notes:
 Notes:
 - Delete confirmation copy exists in the discussion/download header UI, but the roadmap-level permission flow is not complete.
 - One known permission asymmetry around permanent-remove behavior was documented separately and should be resolved as part of this work rather than preserved indefinitely.
+- Backend draft PR gennit-project/multiforum-backend#116 and frontend draft PR gennit-project/multiforum-nuxt#266 add verified upload storage metadata for new downloadable files, including `storageObjectName` and `storageUrl`.
 
 ### 4. Download filters: review and finish include/exclude semantics `[partial]`
 

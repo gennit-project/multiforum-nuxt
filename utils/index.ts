@@ -267,9 +267,16 @@ type UploadFileInput = {
 
 type GetEmbeddedLinkInput = {
   signedStorageURL: string;
+  storageUrl?: string | null;
   filename: string;
   file: File;
   fileType: string;
+};
+
+export type SignedStorageUrlPayload = {
+  url?: string | null;
+  storageUrl?: string | null;
+  storageObjectName?: string | null;
 };
 
 export function getUploadFileName(input: UploadFileInput) {
@@ -284,7 +291,7 @@ export function encodeSpacesInURL(url: string) {
 }
 
 export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
-  const { signedStorageURL, filename, file } = input;
+  const { signedStorageURL, storageUrl, filename, file } = input;
 
   // Check validation
   const sizeCheck = isFileSizeValid({ file });
@@ -337,7 +344,7 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
       throw new Error(`Upload failed with status ${response.status}`);
     }
 
-    return embeddedLink;
+    return storageUrl || embeddedLink;
   } catch (error) {
     console.error('Fetch error during upload:', error);
     throw error;
