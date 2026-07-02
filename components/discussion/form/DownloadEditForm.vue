@@ -160,6 +160,7 @@ const formValues = ref({
 const uploadingFile = ref(false);
 const uploadError = ref('');
 const pendingDeleteFileIndex = ref<number | null>(null);
+const permanentDeleteFileError = ref('');
 
 // Notification state
 const savedSuccessfully = ref(false);
@@ -394,6 +395,7 @@ const removeFileFromForm = (index: number) => {
 
 const requestRemoveFile = (index: number) => {
   const file = formValues.value.downloadableFiles[index];
+  permanentDeleteFileError.value = '';
 
   if (!file?.id) {
     removeFileFromForm(index);
@@ -409,12 +411,14 @@ const closePermanentDeleteModal = () => {
   }
 
   pendingDeleteFileIndex.value = null;
+  permanentDeleteFileError.value = '';
 };
 
 const permanentlyDeleteSelectedFile = async () => {
   if (pendingDeleteFileIndex.value === null) {
     return;
   }
+  permanentDeleteFileError.value = '';
 
   const index = pendingDeleteFileIndex.value;
   const file = formValues.value.downloadableFiles[index];
@@ -433,6 +437,10 @@ const permanentlyDeleteSelectedFile = async () => {
     pendingDeleteFileIndex.value = null;
   } catch (error) {
     console.error('Error permanently deleting downloadable file:', error);
+    permanentDeleteFileError.value =
+      error instanceof Error
+        ? error.message
+        : 'Failed to permanently delete this file.';
   }
 };
 
@@ -505,8 +513,12 @@ function handleSave() {
       />
 
       <ErrorBanner
-        v-else-if="permanentlyDeleteDownloadableFileError"
-        :text="permanentlyDeleteDownloadableFileError.message"
+        v-else-if="permanentDeleteFileError || permanentlyDeleteDownloadableFileError"
+        :text="
+          permanentDeleteFileError ||
+          permanentlyDeleteDownloadableFileError?.message ||
+          ''
+        "
         class="mb-4"
       />
 
@@ -758,6 +770,7 @@ function handleSave() {
       icon="trash"
       primary-button-text="Permanently delete"
       :loading="permanentlyDeleteDownloadableFileLoading"
+      :error="permanentDeleteFileError"
       data-testid="permanent-download-file-delete-modal"
       @close="closePermanentDeleteModal"
       @primary-button-click="permanentlyDeleteSelectedFile"

@@ -84,7 +84,7 @@ const stubs = {
   },
   WarningModal: {
     name: 'WarningModal',
-    props: ['open', 'title', 'body', 'loading'],
+    props: ['open', 'title', 'body', 'loading', 'error'],
     emits: ['close', 'primary-button-click'],
     template: '<div data-testid="warning-modal" :data-open="open" />',
   },
@@ -247,6 +247,42 @@ describe('DownloadEditForm file editing', () => {
     expect(h.permanentlyDeleteDownloadableFile).toHaveBeenCalledWith({
       downloadableFileId: 'f1',
     });
+  });
+
+  it('keeps the file in the form when permanent delete fails', async () => {
+    (h.permanentlyDeleteDownloadableFile as ReturnType<typeof vi.fn>)
+      .mockRejectedValueOnce(new Error('Not authorized'));
+    const wrapper = mountForm({
+      discussion: makeDiscussion({ DownloadableFiles: [fileRecord()] }),
+    });
+    await flushPromises();
+
+    await wrapper.get('button[title="Delete this file"]').trigger('click');
+    await wrapper
+      .getComponent({ name: 'WarningModal' })
+      .vm.$emit('primary-button-click');
+    await flushPromises();
+
+    expect(wrapper.emitted('updateFormValues')).toBeUndefined();
+  });
+
+  it('shows the backend delete error when permanent delete fails', async () => {
+    (h.permanentlyDeleteDownloadableFile as ReturnType<typeof vi.fn>)
+      .mockRejectedValueOnce(new Error('Not authorized'));
+    const wrapper = mountForm({
+      discussion: makeDiscussion({ DownloadableFiles: [fileRecord()] }),
+    });
+    await flushPromises();
+
+    await wrapper.get('button[title="Delete this file"]').trigger('click');
+    await wrapper
+      .getComponent({ name: 'WarningModal' })
+      .vm.$emit('primary-button-click');
+    await flushPromises();
+
+    expect(wrapper.getComponent({ name: 'WarningModal' }).props('error')).toBe(
+      'Not authorized'
+    );
   });
 
   it('updates a file license and emits the change', async () => {
