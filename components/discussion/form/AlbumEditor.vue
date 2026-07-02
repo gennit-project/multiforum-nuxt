@@ -8,6 +8,9 @@ import AlbumDropZone from './AlbumDropZone.vue';
 import AlbumUrlInputForm from './AlbumUrlInputForm.vue';
 import { useAlbumImageUpload } from '@/composables/useAlbumImageUpload';
 import { useAlbumAutoSave } from '@/composables/useAlbumAutoSave';
+import { useMutation } from '@vue/apollo-composable';
+import WarningModal from '@/components/WarningModal.vue';
+import { PERMANENTLY_DELETE_IMAGE } from '@/graphQLData/discussion/mutations';
 import {
   orderImagesByOrder,
   getImageIdOrder,
@@ -126,6 +129,11 @@ const {
 const showUrlInput = ref(false);
 const isCreatingImageFromUrl = ref(false);
 const urlInputFormRef = ref<InstanceType<typeof AlbumUrlInputForm> | null>(null);
+const pendingDeleteImageIndex = ref<number | null>(null);
+const permanentDeleteImageError = ref('');
+
+const { mutate: permanentlyDeleteImage, loading: permanentlyDeleteImageLoading } =
+  useMutation(PERMANENTLY_DELETE_IMAGE);
 
 // Image field update handler
 const updateImageField = (
@@ -160,8 +168,7 @@ const updateImageField = (
   debouncedAutoSave();
 };
 
-// Delete image handler
-const deleteImage = (index: number) => {
+const removeImageFromAlbum = (index: number) => {
   const orderedImage = orderedImages.value[index];
   if (!orderedImage || !orderedImage.id) return;
 
@@ -183,6 +190,41 @@ const deleteImage = (index: number) => {
   });
 
   debouncedAutoSave();
+};
+
+// Delete image handler
+const requestDeleteImage = (index: number) => {
+  pendingDeleteImageIndex.value = index;
+  permanentDeleteImageError.value = '';
+};
+
+const closeDeleteImageModal = () => {
+  if (permanentlyDeleteImageLoading.value) return;
+  pendingDeleteImageIndex.value = null;
+  permanentDeleteImageError.value = '';
+};
+
+const confirmDeleteImage = async () => {
+  if (pendingDeleteImageIndex.value === null) return;
+
+  const deleteIndex = pendingDeleteImageIndex.value;
+  const orderedImage = orderedImages.value[deleteIndex];
+  if (!orderedImage?.id) {
+    removeImageFromAlbum(deleteIndex);
+    closeDeleteImageModal();
+    return;
+  }
+
+  permanentDeleteImageError.value = '';
+
+  try {
+    await permanentlyDeleteImage({ imageId: orderedImage.id });
+    removeImageFromAlbum(deleteIndex);
+    pendingDeleteImageIndex.value = null;
+  } catch (error) {
+    permanentDeleteImageError.value =
+      error instanceof Error ? error.message : 'Failed to delete image.';
+  }
 };
 
 // Move image up handler
@@ -319,7 +361,7 @@ const handleUrlCancel = () => {
       :is-last="index === orderedImages.length - 1"
       :is-loading="loadingStates[index] ?? false"
       @update-field="(field, value) => updateImageField(index, field, value)"
-      @delete="deleteImage(index)"
+      @delete="requestDeleteImage(index)"
       @move-up="moveImageUp(index)"
       @move-down="moveImageDown(index)"
     />
@@ -340,6 +382,20 @@ const handleUrlCancel = () => {
       :is-creating="isCreatingImageFromUrl"
       @submit="handleUrlSubmit"
       @cancel="handleUrlCancel"
+    />
+
+    <WarningModal
+      :open="pendingDeleteImageIndex !== null"
+      title="Delete this image?"
+      body="This permanently deletes the image and removes the stored file. This cannot be undone."
+      primary-button-text="Delete Image"
+      secondary-button-text="Cancel"
+      icon="trash"
+      data-testid="permanently-delete-album-image-modal"
+      :loading="permanentlyDeleteImageLoading"
+      :error="permanentDeleteImageError"
+      @primary-button-click="confirmDeleteImage"
+      @close="closeDeleteImageModal"
     />
   </div>
 </template>

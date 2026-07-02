@@ -101,6 +101,16 @@ export const TRACK_DOWNLOAD = gql`
   }
 `;
 
+export const PERMANENTLY_DELETE_IMAGE = gql`
+  mutation permanentlyDeleteImage($imageId: ID!) {
+    permanentlyDeleteImage(imageId: $imageId) {
+      id
+      permanentlyRemoved
+      permanentlyRemovedAt
+    }
+  }
+`;
+
 export const UPDATE_DOWNLOADABLE_FILE_SUPPORT_SETTINGS = gql`
   mutation updateDownloadableFileSupportSettings(
     $downloadableFileId: ID!
