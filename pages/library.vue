@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { useHead, useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
+import type { Collection } from '@/__generated__/graphql';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import {
   GET_USER_FAVORITE_COUNTS,
@@ -10,6 +11,7 @@ import {
 } from '@/graphQLData/user/queries';
 import { GET_ALL_USER_COLLECTIONS } from '@/graphQLData/collection/queries';
 import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
+import { isAutoSavedDownloadsCollection } from '@/utils/downloadLibraryCollection';
 
 const usernameVar = useUsername();
 const isAuthenticatedVar = useIsAuthenticated();
@@ -221,6 +223,22 @@ const customCollections = computed(() => {
   return customCollectionsResult.value?.users?.[0]?.Collections || [];
 });
 
+const autoSavedDownloadsCollection = computed(() =>
+  customCollections.value.find((collection: Collection) =>
+    isAutoSavedDownloadsCollection(collection)
+  )
+);
+
+const myDownloadsCount = computed(() => {
+  return autoSavedDownloadsCollection.value?.itemCount ?? ownedDownloadsCount.value;
+});
+
+const myDownloadsLink = computed(() => {
+  return autoSavedDownloadsCollection.value
+    ? `/library/${autoSavedDownloadsCollection.value.id}`
+    : '/library/my-downloads';
+});
+
 // Combine favorites and custom collections
 const allCollections = computed(() => {
   return [...defaultCollections.value, ...customCollections.value];
@@ -267,7 +285,7 @@ const allMobileCollections = computed(() => [
   {
     id: 'my-downloads',
     name: 'My Downloads',
-    itemCount: ownedDownloadsCount.value,
+    itemCount: myDownloadsCount.value,
     visibility: 'PRIVATE',
     collectionType: 'DOWNLOADS',
   },
@@ -276,6 +294,12 @@ const allMobileCollections = computed(() => [
 ]);
 
 const activeLibraryItem = computed(() => {
+  if (isMyDownloadsActive.value) {
+    return allMobileCollections.value.find(
+      (collection) => collection.id === 'my-downloads'
+    );
+  }
+
   return (
     allMobileCollections.value.find(
       (collection) => collection.id === activeLibraryItemId.value
@@ -285,7 +309,7 @@ const activeLibraryItem = computed(() => {
 
 const getLibraryItemRoute = (collectionId: string) =>
   collectionId === 'my-downloads'
-    ? '/library/my-downloads'
+    ? myDownloadsLink.value
     : `/library/${collectionId}`;
 
 // Get color for collection type
@@ -337,7 +361,9 @@ const getSidebarItemClasses = (isActive: boolean) =>
     : 'border-gray-200/90 bg-white/92 text-gray-700 hover:border-gray-300 hover:bg-white hover:text-gray-950 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white';
 
 const isMyDownloadsActive = computed(
-  () => activeLibraryItemId.value === 'my-downloads'
+  () =>
+    activeLibraryItemId.value === 'my-downloads' ||
+    activeLibraryItemId.value === autoSavedDownloadsCollection.value?.id
 );
 </script>
 
@@ -442,10 +468,13 @@ const isMyDownloadsActive = computed(
                             : 'text-gray-500 dark:text-gray-400'
                         "
                       >
-                        ({{ ownedDownloadsCount }})
+                        ({{ myDownloadsCount }})
                       </span>
                     </div>
                   </NuxtLink>
+                  <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    Downloads are added here automatically when you grab a file.
+                  </p>
 
                   <NuxtLink
                     v-for="collection in filteredFavorites"
@@ -615,7 +644,7 @@ const isMyDownloadsActive = computed(
                     My Downloads
                   </div>
                   <NuxtLink
-                    to="/library/my-downloads"
+                    :to="myDownloadsLink"
                     :class="[
                       'block rounded-2xl border px-4 py-3 text-sm transition-all',
                       getSidebarItemClasses(isMyDownloadsActive),
@@ -632,15 +661,6 @@ const isMyDownloadsActive = computed(
                         >
                           My Downloads
                         </p>
-                        <p
-                          :class="
-                            isMyDownloadsActive
-                              ? 'mt-1 text-xs text-gray-700 dark:text-white'
-                              : 'mt-1 text-xs text-gray-500 dark:text-gray-400'
-                          "
-                        >
-                          Files you uploaded across the site
-                        </p>
                       </div>
                       <span
                         :class="
@@ -649,10 +669,13 @@ const isMyDownloadsActive = computed(
                             : 'text-gray-500 dark:text-gray-400'
                         "
                       >
-                        ({{ ownedDownloadsCount }})
+                        ({{ myDownloadsCount }})
                       </span>
                     </div>
                   </NuxtLink>
+                  <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    Downloads are added here automatically when you grab a file.
+                  </p>
                 </div>
 
                 <!-- Collections Section -->

@@ -30,6 +30,7 @@ import {
   getCommentContextTitle,
   getCommentContextType,
 } from '@/utils/commentUtils';
+import { isAutoSavedDownloadsCollection } from '@/utils/downloadLibraryCollection';
 
 const usernameVar = useUsername();
 
@@ -58,6 +59,9 @@ const collection = computed(() => {
 });
 
 const collectionName = computed(() => collection.value?.name || 'Collection');
+const isAutoSavedDownloads = computed(() =>
+  isAutoSavedDownloadsCollection(collection.value)
+);
 
 useHead({
   title: computed(() => `${collectionName.value} - Library`),
@@ -283,6 +287,14 @@ const handleDelete = async () => {
                   </svg>
                   Back to Library
                 </NuxtLink>
+
+                <div
+                  v-if="isAutoSavedDownloads"
+                  class="mt-4 rounded-lg border border-orange-200 bg-orange-50 p-4 text-sm text-orange-900 dark:border-orange-800 dark:bg-orange-950/40 dark:text-orange-200"
+                >
+                  Downloads are added to this private collection automatically
+                  when you grab a file.
+                </div>
 
                 <!-- Title and actions -->
                 <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

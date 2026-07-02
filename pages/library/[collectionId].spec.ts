@@ -105,6 +105,22 @@ describe('library collection detail page', () => {
     expect(wrapper.text()).toContain('Cat GIFs');
   });
 
+  it('explains that the auto-saved downloads collection is populated automatically', async () => {
+    const wrapper = await mountWith({
+      id: 'col-downloads',
+      name: 'Downloaded Items',
+      description: 'Items appear here automatically when you download them.',
+      collectionType: 'DOWNLOADS',
+      visibility: 'PRIVATE',
+      Downloads: [],
+      itemCount: 0,
+    });
+
+    expect(wrapper.text()).toContain(
+      'Downloads are added to this private collection automatically when you grab a file.'
+    );
+  });
+
   const commentsCollection = {
     id: 'col-2',
     name: 'Saved comments',
