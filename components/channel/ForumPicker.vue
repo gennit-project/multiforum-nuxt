@@ -19,12 +19,17 @@ import { createCaseInsensitivePattern } from '@/utils/searchUtils';
 const usernameVar = useUsername();
 const isAuthenticatedVar = useIsAuthenticated();
 
-type ChannelFlag = 'eventsEnabled';
+type ChannelFlag = 'eventsEnabled' | 'downloadsEnabled';
 type ChannelOptionSource = Pick<
   Channel,
   'uniqueName' | 'displayName' | 'channelIconURL'
 > &
   Partial<Record<ChannelFlag, boolean | null>>;
+
+const UNAVAILABLE_REASON_BY_FLAG: Record<ChannelFlag, string> = {
+  eventsEnabled: 'Does not allow events',
+  downloadsEnabled: 'Does not allow downloads',
+};
 
 // Props definition - used in template
 const props = defineProps({
@@ -48,12 +53,26 @@ const props = defineProps({
     type: Array as PropType<ChannelFlag[]>,
     default: () => [],
   },
+  lockedChannelName: {
+    type: String,
+    default: '',
+  },
+  lockedChannelLabel: {
+    type: String,
+    default: '',
+  },
+  lockedDescription: {
+    type: String,
+    default: '',
+  },
 });
 
 // Emits definition
 const emit = defineEmits(['setSelectedChannels']);
 
 const searchQuery = ref('');
+const isSearchActive = computed(() => searchQuery.value.trim().length > 0);
+const isLocked = computed(() => !!props.lockedChannelName);
 
 const { loading: channelsLoading, result: channelsResult } = useQuery(
   GET_CHANNEL_NAMES,
@@ -108,15 +127,33 @@ const channelHasRequiredFlags = (channel: ChannelOptionSource) => {
   );
 };
 
+const getDisabledReasons = (channel: ChannelOptionSource) => {
+  return props.requiredEnabledChannelFlags
+    .filter((flag) => channel[flag] === false)
+    .map((flag) => UNAVAILABLE_REASON_BY_FLAG[flag]);
+};
+
+const toSelectableOption = (channel: ChannelOptionSource): MultiSelectOption | null => {
+  const reasons = getDisabledReasons(channel);
+
+  if (reasons.length > 0 && !isSearchActive.value) {
+    return null;
+  }
+
+  return {
+    value: channel.uniqueName,
+    label: channel.displayName || channel.uniqueName,
+    avatar: channel.channelIconURL || '',
+    disabled: reasons.length > 0,
+    description: reasons[0],
+  };
+};
+
 const channelOptions = computed<MultiSelectOption[]>(() => {
-  const channels = channelsResult.value?.channels || [];
+  const channels: ChannelOptionSource[] = channelsResult.value?.channels || [];
   const mappedChannels = channels
-    .filter((channel: ChannelOptionSource) => channelHasRequiredFlags(channel))
-    .map((channel: ChannelOptionSource) => ({
-      value: channel.uniqueName,
-      label: channel.displayName || channel.uniqueName,
-      avatar: channel.channelIconURL || '',
-    }));
+    .map((channel: ChannelOptionSource) => toSelectableOption(channel))
+    .filter((channel): channel is MultiSelectOption => Boolean(channel));
 
   // Always include selected channels in options, even if they don't match current search
   // This ensures selected chips can always be displayed
@@ -144,7 +181,7 @@ const channelSections = computed<MultiSelectSection[]>(() => {
   const sections: MultiSelectSection[] = [];
 
   // Favorites section
-  const favoriteChannels =
+  const favoriteChannels: ChannelOptionSource[] =
     favoritesResult.value?.users?.[0]?.FavoriteChannels || [];
 
   let favoritesEmptyMessage = 'You have no favorite forums.';
@@ -154,18 +191,17 @@ const channelSections = computed<MultiSelectSection[]>(() => {
   }
 
   const favoriteOptions = favoriteChannels
-    .filter((channel: ChannelOptionSource) => channelHasRequiredFlags(channel))
-    .map((channel: ChannelOptionSource) => ({
-      value: channel.uniqueName,
-      label: channel.displayName || channel.uniqueName,
-    }));
+    .map((channel: ChannelOptionSource) => toSelectableOption(channel))
+    .filter((channel): channel is MultiSelectOption => Boolean(channel));
 
   sections.push({
     title: 'Favorite Forums',
     options: favoriteOptions,
     emptyMessage: favoritesEmptyMessage,
     selectAllLabel:
-      favoriteOptions.length > 0 ? 'Select all favorite forums' : undefined,
+      favoriteOptions.some((option: MultiSelectOption) => !option.disabled)
+        ? 'Select all favorite forums'
+        : undefined,
   });
 
   // Channel collections - consolidated under single heading
@@ -221,7 +257,36 @@ const handleSearch = (query: string) => {
 </script>
 
 <template>
+  <div v-if="isLocked">
+    <div v-if="props.description" class="py-1 text-sm dark:text-gray-300">
+      {{ props.description }}
+    </div>
+    <div
+      :data-testid="props.testId"
+      class="flex min-h-12 w-full items-center rounded-lg border px-4 py-2 text-left dark:border-gray-700 dark:bg-gray-700"
+    >
+      <span class="font-mono text-gray-900 dark:text-white">
+        {{ props.lockedChannelName }}
+      </span>
+      <span
+        v-if="
+          props.lockedChannelLabel &&
+          props.lockedChannelLabel !== props.lockedChannelName
+        "
+        class="ml-1 text-gray-500 dark:text-gray-400"
+      >
+        ({{ props.lockedChannelLabel }})
+      </span>
+    </div>
+    <div
+      v-if="props.lockedDescription"
+      class="py-1 text-sm text-gray-600 dark:text-gray-400"
+    >
+      {{ props.lockedDescription }}
+    </div>
+  </div>
   <MultiSelect
+    v-else
     :model-value="props.selectedChannels"
     :sections="channelSections"
     :description="props.description"

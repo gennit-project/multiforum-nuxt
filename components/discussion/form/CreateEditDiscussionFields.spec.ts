@@ -51,8 +51,9 @@ const mockComponents = {
     props: ['current', 'max'],
   },
   ForumPicker: {
+    name: 'ForumPicker',
     template: '<div data-testid="forum-picker"></div>',
-    props: ['selectedChannels', 'testId'],
+    props: ['selectedChannels', 'testId', 'lockedChannelName', 'lockedChannelLabel'],
     emits: ['setSelectedChannels'],
   },
   ErrorBanner: {
@@ -159,6 +160,40 @@ describe('CreateEditDiscussionFields Component', () => {
   };
 
   describe('Form validation', () => {
+    it('passes a locked forum through to the picker when provided', () => {
+      const wrapper = mount(CreateEditDiscussionFields, {
+        props: {
+          editMode: false,
+          downloadMode: false,
+          createDiscussionError: null,
+          formValues: defaultFormValues,
+          getDiscussionError: null,
+          updateDiscussionError: null,
+          discussionLoading: false,
+          createDiscussionLoading: false,
+          updateDiscussionLoading: false,
+          lockedChannelName: 'cats',
+          lockedChannelLabel: 'Cats',
+        },
+        global: {
+          stubs: mockComponents,
+          mocks: {
+            useRoute: () => ({ params: {} }),
+            useRouter: () => ({ push: vi.fn(), go: vi.fn() }),
+          },
+        },
+      });
+
+      const forumPicker = wrapper.findComponent({ name: 'ForumPicker' });
+      expect({
+        lockedChannelName: forumPicker.props('lockedChannelName'),
+        lockedChannelLabel: forumPicker.props('lockedChannelLabel'),
+      }).toEqual({
+        lockedChannelName: 'cats',
+        lockedChannelLabel: 'Cats',
+      });
+    });
+
     it('validates that title is required', async () => {
       const wrapper = mountComponent({
         ...defaultFormValues,

@@ -132,7 +132,44 @@
 - Persist the new order through the reorder mutation.
 - Keep keyboard-accessible controls for moving items up/down even if drag-and-drop is added.
 
-#### 7. Share Public Collections to a Forum Discussion
+#### 7. Clarify Forum Availability in Post Submission UI
+
+**Goal:** Users should understand which forums can accept the current post type, and forum-scoped create flows should not imply cross-forum posting when the route forum is authoritative.
+
+**UX direction:**
+
+- On sitewide create flows that actually support forum choice, keep unsupported forums visible in picker search results but disabled with a clear reason.
+- In the current product direction, this primarily applies to discussions/events, with the clearest immediate need on events.
+- Prefer short reason copy such as `Does not allow events`.
+- Do not flood the default picker view with unavailable forums. Show eligible forums first; surface unavailable forums in search results or a clearly separated unavailable section.
+- On forum-scoped create flows such as `/forums/[forumId]/.../create`, lock the forum control to the current forum instead of presenting a broad picker.
+- If a forum-scoped flow needs helper copy, explain that posting is limited to the current forum context.
+- Keep downloads forum-context-specific for now. Do not add a sitewide create-download entry point in this slice.
+
+**Implementation work:**
+
+- Review every forum/channel picker used for discussions, events, downloads, and similar submission flows.
+- Replace silent filtering of unsupported forums with explicit disabled states and reason text on sitewide create flows that allow forum choice.
+- Ensure picker search results still show unavailable forums so users are not left guessing why a forum is missing.
+- Lock forum-scoped create forms to the current forum instead of allowing ambiguous re-selection.
+- Keep favorites and collection-based picker sections consistent with the same availability rules and reason text.
+- For downloads, remove or lock any misleading multi-forum picker UI so the form clearly behaves as a single-forum flow.
+
+**Tests:**
+
+- Add unit tests for picker search results, disabled-option rendering, and blocked selection behavior.
+- Add tests that bulk actions such as section-level or collection-level selection skip disabled forums.
+- Add Playwright coverage for sitewide create flows to verify unavailable forums remain visible in search and cannot be selected.
+- Add tests for forum-scoped create flows to verify the current forum is locked and cross-forum selection is not offered.
+- Do not add sitewide multi-forum download-creation coverage in this slice.
+
+**Notes:**
+
+- Existing picker logic already filters by required flags in some flows, especially events.
+- That behavior currently hides unsupported forums instead of explaining why they are unavailable.
+- Downloads remain intentionally forum-specific for now, because forum-specific labels/filter groups and ownership context make multi-forum submission more ambiguous.
+
+#### 8. Share Public Collections to a Forum Discussion
 
 **Goal:** A public collection can be shared to a forum by attaching it to a new or existing discussion.
 
@@ -149,7 +186,7 @@
 - Let the user choose a forum and create a discussion with the collection attached.
 - Hide or explain the action for private collections.
 
-#### 8. Add User Profile Pinned Posts
+#### 9. Add User Profile Pinned Posts
 
 **Goal:** Users can pin up to four posts on their profile and edit that list themselves.
 
@@ -166,7 +203,7 @@
 - Add edit controls visible only to the profile owner.
 - Provide clear empty states and limit messaging.
 
-#### 9. Allow Images in Multiple Albums and Show Image Usage
+#### 10. Allow Images in Multiple Albums and Show Image Usage
 
 **Goal:** Images should be reusable across albums/collections without re-uploading, preserving original attribution.
 
@@ -192,10 +229,11 @@
 3. Share modal cleanup plus attribution/support links, because it is mostly isolated UI/configuration.
 4. Permanent delete permissions, because it needs careful backend authorization and destructive-action UX.
 5. Download filter group review and exclude semantics.
-6. Collection ordering.
-7. Share public collections to forum discussions.
-8. Profile pinned posts.
-9. Multi-album image reuse and image usage display, because it has the broadest modeling impact.
+6. Clarify forum availability in post submission UI.
+7. Collection ordering.
+8. Share public collections to forum discussions.
+9. Profile pinned posts.
+10. Multi-album image reuse and image usage display, because it has the broadest modeling impact.
 
 ---
 

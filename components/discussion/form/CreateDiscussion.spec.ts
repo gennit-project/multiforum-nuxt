@@ -70,7 +70,7 @@ describe('CreateDiscussion', () => {
           RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
           CreateEditDiscussionFields: {
             name: 'CreateEditDiscussionFields',
-            props: ['suspensionIssueNumber'],
+            props: ['suspensionIssueNumber', 'lockedChannelName'],
             template:
               '<button data-testid="submit" @click="$emit(\'submit\')"></button>',
           },
@@ -85,6 +85,24 @@ describe('CreateDiscussion', () => {
     await wrapper.vm.$nextTick();
 
     expect(stub.props('suspensionIssueNumber')).toBe(55);
+  });
+
+  it('locks forum selection to the routed forum when creating in forum context', () => {
+    const wrapper = mount(CreateDiscussion, {
+      global: {
+        stubs: {
+          RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
+          CreateEditDiscussionFields: {
+            name: 'CreateEditDiscussionFields',
+            props: ['lockedChannelName'],
+            template: '<div />',
+          },
+        },
+      },
+    });
+
+    const stub = wrapper.findComponent({ name: 'CreateEditDiscussionFields' });
+    expect(stub.props('lockedChannelName')).toBe('cats');
   });
 
   it('sets submit error when discussion id is missing', async () => {
@@ -126,7 +144,7 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
 
   const fieldsStub = {
     name: 'CreateEditDiscussionFields',
-    props: ['submitError', 'formValues'],
+    props: ['submitError', 'formValues', 'lockedChannelName'],
     template:
       '<button data-testid="submit" @click="$emit(\'submit\')"></button>',
     emits: ['submit', 'update-form-values'],

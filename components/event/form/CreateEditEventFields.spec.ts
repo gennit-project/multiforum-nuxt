@@ -48,6 +48,8 @@ const mockComponents = {
       'selectedChannels',
       'channelWhere',
       'requiredEnabledChannelFlags',
+      'lockedChannelName',
+      'lockedChannelLabel',
     ],
     emits: ['setSelectedChannels'],
   },
@@ -205,7 +207,7 @@ describe('CreateEditEventFields Component', () => {
   };
 
   describe('Form validation', () => {
-    it('limits channel selection to forums with events enabled', () => {
+    it('shows event forum requirements without hard-filtering the query', () => {
       const wrapper = mountComponent();
 
       const forumPicker = wrapper.findComponent({ name: 'ForumPicker' });
@@ -213,8 +215,42 @@ describe('CreateEditEventFields Component', () => {
         channelWhere: forumPicker.props('channelWhere'),
         requiredFlags: forumPicker.props('requiredEnabledChannelFlags'),
       }).toEqual({
-        channelWhere: { eventsEnabled: true },
+        channelWhere: undefined,
         requiredFlags: ['eventsEnabled'],
+      });
+    });
+
+    it('passes a locked forum through to the picker when provided', () => {
+      const wrapper = mount(CreateEditEventFields, {
+        props: {
+          editMode: false,
+          createEventError: null,
+          createEventLoading: false,
+          formValues: defaultFormValues,
+          getEventError: null,
+          updateEventError: null,
+          eventLoading: false,
+          updateEventLoading: false,
+          lockedChannelName: 'cats',
+          lockedChannelLabel: 'Cats',
+        },
+        global: {
+          stubs: mockComponents,
+          mocks: {
+            $route: {
+              params: {},
+            },
+          },
+        },
+      });
+
+      const forumPicker = wrapper.findComponent({ name: 'ForumPicker' });
+      expect({
+        lockedChannelName: forumPicker.props('lockedChannelName'),
+        lockedChannelLabel: forumPicker.props('lockedChannelLabel'),
+      }).toEqual({
+        lockedChannelName: 'cats',
+        lockedChannelLabel: 'Cats',
       });
     });
 

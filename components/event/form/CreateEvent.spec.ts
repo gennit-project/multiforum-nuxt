@@ -81,7 +81,7 @@ describe('CreateEvent', () => {
           RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
           CreateEditEventFields: {
             name: 'CreateEditEventFields',
-            props: ['suspensionIssueNumber', 'submitError'],
+            props: ['suspensionIssueNumber', 'submitError', 'lockedChannelName'],
             template:
               '<button data-testid="submit" @click="$emit(\'submit\')"></button>',
           },
@@ -117,6 +117,24 @@ describe('CreateEvent', () => {
 
     const stub = wrapper.findComponent({ name: 'CreateEditEventFields' });
     expect(stub.props('suspensionIssueNumber')).toBe(19);
+  });
+
+  it('locks forum selection to the routed forum when creating in forum context', () => {
+    const wrapper = mount(CreateEvent, {
+      global: {
+        stubs: {
+          RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
+          CreateEditEventFields: {
+            name: 'CreateEditEventFields',
+            props: ['lockedChannelName'],
+            template: '<div />',
+          },
+        },
+      },
+    });
+
+    const stub = wrapper.findComponent({ name: 'CreateEditEventFields' });
+    expect(stub.props('lockedChannelName')).toBe('cats');
   });
 
   it('sets submit error when event id is missing', async () => {

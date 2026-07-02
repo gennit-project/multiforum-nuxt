@@ -310,6 +310,10 @@ watch(
         :create-discussion-loading="createDownloadLoading"
         :download-mode="true"
         :channel-data="channelData"
+        :locked-channel-name="channelId || undefined"
+        :locked-channel-label="
+          channelData?.displayName || channelId || undefined
+        "
         @submit="submitForm"
         @update-form-values="updateFormValues"
       />

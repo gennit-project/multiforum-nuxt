@@ -11,6 +11,7 @@ export interface MultiSelectOption {
   icon?: string;
   avatar?: string;
   disabled?: boolean;
+  description?: string;
   channels?: string[]; // For collection options: list of channel uniqueNames
 }
 
@@ -139,8 +140,11 @@ const toggleSelection = (value: MultiSelectValue) => {
   emit('update:modelValue', selected.value);
 };
 
+const selectableOptions = (options: MultiSelectOption[]) =>
+  options.filter((option) => !option.disabled);
+
 const toggleSelectAll = (sectionOptions: MultiSelectOption[]) => {
-  const sectionValues = sectionOptions.map((opt) => opt.value);
+  const sectionValues = selectableOptions(sectionOptions).map((opt) => opt.value);
   const allSelected = sectionValues.every((val) =>
     selected.value.includes(val)
   );
@@ -159,7 +163,7 @@ const toggleSelectAll = (sectionOptions: MultiSelectOption[]) => {
 };
 
 const isSectionFullySelected = (sectionOptions: MultiSelectOption[]) => {
-  const sectionValues = sectionOptions.map((opt) => opt.value);
+  const sectionValues = selectableOptions(sectionOptions).map((opt) => opt.value);
   return (
     sectionValues.length > 0 &&
     sectionValues.every((val) => selected.value.includes(val))
@@ -477,7 +481,7 @@ const selectedOptions = computed(() => {
                 <span
                   class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300"
                 >
-                  {{ section.options.length }}
+                  {{ selectableOptions(section.options).length }}
                 </span>
               </div>
 
@@ -648,15 +652,23 @@ const selectedOptions = computed(() => {
 
                 <!-- Compact label: uniqueName (displayName) -->
                 <div class="flex-1 text-sm">
-                  <span class="font-mono text-gray-900 dark:text-white">
-                    {{ option.value }}
-                  </span>
-                  <span
-                    v-if="option.label && option.label !== option.value"
-                    class="text-gray-500 dark:text-gray-400"
+                  <div>
+                    <span class="font-mono text-gray-900 dark:text-white">
+                      {{ option.value }}
+                    </span>
+                    <span
+                      v-if="option.label && option.label !== option.value"
+                      class="text-gray-500 dark:text-gray-400"
+                    >
+                      ({{ option.label }})
+                    </span>
+                  </div>
+                  <div
+                    v-if="option.description"
+                    class="text-xs text-gray-500 dark:text-gray-400"
                   >
-                    ({{ option.label }})
-                  </span>
+                    {{ option.description }}
+                  </div>
                 </div>
 
                 <!-- Selected indicator for single selection -->
@@ -725,9 +737,17 @@ const selectedOptions = computed(() => {
             />
 
             <!-- Label -->
-            <span class="flex-1 text-sm text-gray-900 dark:text-white">
-              {{ option.label }}
-            </span>
+            <div class="flex-1 text-sm">
+              <div class="text-gray-900 dark:text-white">
+                {{ option.label }}
+              </div>
+              <div
+                v-if="option.description"
+                class="text-xs text-gray-500 dark:text-gray-400"
+              >
+                {{ option.description }}
+              </div>
+            </div>
 
             <!-- Selected indicator for single selection -->
             <i
