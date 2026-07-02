@@ -64,6 +64,7 @@ const popoverRef = ref<HTMLElement | null>(null);
 const searchTerm = ref('');
 const isCreatingNew = ref(false);
 const newCollectionName = ref('');
+const newCollectionVisibility = ref<CollectionVisibility>('PRIVATE' as CollectionVisibility);
 const isLoading = ref(false);
 const toastStore = useToastStore();
 const popoverIdBase = `add-to-list-popover-${props.itemType}-${props.itemId.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
@@ -193,6 +194,12 @@ const { adjustedPosition } = usePopoverPositioning({
 
 const isModal = computed(() => props.variant === 'modal');
 
+const resetCreateCollectionForm = () => {
+  isCreatingNew.value = false;
+  newCollectionName.value = '';
+  newCollectionVisibility.value = 'PRIVATE' as CollectionVisibility;
+};
+
 // Search functionality
 watch(searchTerm, () => {
   if (usernameVar.value && props.isVisible) {
@@ -211,7 +218,7 @@ const handleCreateNewCollection = async () => {
     const result = await createCollection({
       name: newCollectionName.value.trim(),
       collectionType,
-      visibility: 'PUBLIC' as CollectionVisibility,
+      visibility: newCollectionVisibility.value,
       updatedAt: now,
       username: usernameVar.value,
     });
@@ -229,8 +236,7 @@ const handleCreateNewCollection = async () => {
       toastStore.showToast(`Added to "${newCollection.name}"`);
       refetchCollections();
       refetchItemInCollections();
-      newCollectionName.value = '';
-      isCreatingNew.value = false;
+      resetCreateCollectionForm();
     }
   } catch (error) {
     console.error('Error creating collection:', error);
@@ -431,7 +437,7 @@ const popoverStyles = computed(() => {
           <div v-if="!isCreatingNew">
             <button
               class="hover:bg-blue-50 flex w-full items-center rounded-md px-3 py-2 text-sm text-blue-600 transition-colors dark:text-blue-400 dark:hover:bg-blue-900/20"
-              @click="isCreatingNew = true"
+              @click="resetCreateCollectionForm(); isCreatingNew = true"
             >
               <span class="mr-2">+</span>
               New List
@@ -445,8 +451,22 @@ const popoverStyles = computed(() => {
               aria-label="New list name"
               class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
               @keyup.enter="handleCreateNewCollection"
-              @keyup.escape="isCreatingNew = false"
+              @keyup.escape="resetCreateCollectionForm"
             >
+            <label class="block text-xs font-medium text-gray-600 dark:text-gray-300">
+              Visibility
+            </label>
+            <select
+              v-model="newCollectionVisibility"
+              aria-label="New list visibility"
+              class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            >
+              <option value="PRIVATE">Private (default)</option>
+              <option value="PUBLIC">Public</option>
+            </select>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              New lists start private unless you explicitly make them public.
+            </p>
             <div class="flex gap-2">
               <button
                 class="flex-1 rounded-md bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
@@ -457,10 +477,7 @@ const popoverStyles = computed(() => {
               </button>
               <button
                 class="hover:bg-gray-50 flex-1 rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-                @click="
-                  isCreatingNew = false;
-                  newCollectionName = '';
-                "
+                @click="resetCreateCollectionForm"
               >
                 Cancel
               </button>
@@ -612,7 +629,7 @@ const popoverStyles = computed(() => {
         <div v-if="!isCreatingNew">
           <button
             class="hover:bg-blue-50 flex w-full items-center rounded-md px-3 py-2 text-sm text-blue-600 transition-colors dark:text-blue-400 dark:hover:bg-blue-900/20"
-            @click="isCreatingNew = true"
+            @click="resetCreateCollectionForm(); isCreatingNew = true"
           >
             <span class="mr-2">+</span>
             New List
@@ -626,8 +643,22 @@ const popoverStyles = computed(() => {
             aria-label="New list name"
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
             @keyup.enter="handleCreateNewCollection"
-            @keyup.escape="isCreatingNew = false"
+            @keyup.escape="resetCreateCollectionForm"
           >
+          <label class="block text-xs font-medium text-gray-600 dark:text-gray-300">
+            Visibility
+          </label>
+          <select
+            v-model="newCollectionVisibility"
+            aria-label="New list visibility"
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+          >
+            <option value="PRIVATE">Private (default)</option>
+            <option value="PUBLIC">Public</option>
+          </select>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            New lists start private unless you explicitly make them public.
+          </p>
           <div class="flex gap-2">
             <button
               class="flex-1 rounded-md bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
@@ -638,10 +669,7 @@ const popoverStyles = computed(() => {
             </button>
             <button
               class="hover:bg-gray-50 flex-1 rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-              @click="
-                isCreatingNew = false;
-                newCollectionName = '';
-              "
+              @click="resetCreateCollectionForm"
             >
               Cancel
             </button>
