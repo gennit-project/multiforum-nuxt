@@ -74,6 +74,16 @@ describe('ForumPicker', () => {
     });
   }
 
+  function getSection(
+    wrapper: ReturnType<typeof createWrapper>,
+    title: string
+  ) {
+    const multiSelect = wrapper.findComponent({ name: 'MultiSelect' });
+    return multiSelect
+      .props('sections')
+      .find((section: { title: string }) => section.title === title);
+  }
+
   it('renders correctly with default props', () => {
     const wrapper = createWrapper();
 
@@ -114,10 +124,7 @@ describe('ForumPicker', () => {
       requiredEnabledChannelFlags: ['eventsEnabled'],
     });
 
-    const multiSelect = wrapper.findComponent({ name: 'MultiSelect' });
-    const allForumsSection = multiSelect
-      .props('sections')
-      .find((section: { title: string }) => section.title === 'Forums (Top 10)');
+    const allForumsSection = getSection(wrapper, 'Forums (Top 10)');
 
     expect(allForumsSection.options).toEqual([
       expect.objectContaining({ value: 'cats', disabled: false }),
@@ -139,10 +146,7 @@ describe('ForumPicker', () => {
     await wrapper.vm.handleSearch('dogs');
     await nextTick();
 
-    const multiSelect = wrapper.findComponent({ name: 'MultiSelect' });
-    const allForumsSection = multiSelect
-      .props('sections')
-      .find((section: { title: string }) => section.title === 'Forums (Top 10)');
+    const allForumsSection = getSection(wrapper, 'Forums (Top 10)');
 
     expect(allForumsSection.options).toContainEqual(
       expect.objectContaining({
@@ -151,6 +155,118 @@ describe('ForumPicker', () => {
         description: 'Does not allow events',
       })
     );
+  });
+
+  it('keeps unavailable event forums out of favorite forums by default', () => {
+    h.favoritesResult = {
+      users: [
+        {
+          FavoriteChannels: [
+            {
+              uniqueName: 'cats',
+              displayName: 'Cats',
+              channelIconURL: '',
+              eventsEnabled: true,
+            },
+            {
+              uniqueName: 'dogs',
+              displayName: 'Dogs',
+              channelIconURL: '',
+              eventsEnabled: false,
+            },
+          ],
+        },
+      ],
+    };
+
+    const wrapper = createWrapper({
+      requiredEnabledChannelFlags: ['eventsEnabled'],
+    });
+
+    const favoritesSection = getSection(wrapper, 'Favorite Forums');
+
+    expect(favoritesSection.options).toEqual([
+      expect.objectContaining({ value: 'cats', disabled: false }),
+    ]);
+  });
+
+  it('includes unavailable favorite event forums as disabled search results', async () => {
+    h.favoritesResult = {
+      users: [
+        {
+          FavoriteChannels: [
+            {
+              uniqueName: 'dogs',
+              displayName: 'Dogs',
+              channelIconURL: '',
+              eventsEnabled: false,
+            },
+          ],
+        },
+      ],
+    };
+
+    const wrapper = createWrapper({
+      requiredEnabledChannelFlags: ['eventsEnabled'],
+    });
+
+    await wrapper.vm.handleSearch('dogs');
+    await nextTick();
+
+    const favoritesSection = getSection(wrapper, 'Favorite Forums');
+
+    expect(favoritesSection.options).toEqual([
+      expect.objectContaining({
+        value: 'dogs',
+        disabled: true,
+        description: 'Does not allow events',
+      }),
+    ]);
+  });
+
+  it('limits collection bulk-select channel lists to eligible event forums', () => {
+    h.collectionsResult = {
+      users: [
+        {
+          Collections: [
+            {
+              id: 'collection-1',
+              name: 'My forums',
+              Channels: [
+                {
+                  uniqueName: 'cats',
+                  displayName: 'Cats',
+                  channelIconURL: '',
+                  eventsEnabled: true,
+                },
+                {
+                  uniqueName: 'dogs',
+                  displayName: 'Dogs',
+                  channelIconURL: '',
+                  eventsEnabled: false,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    const wrapper = createWrapper({
+      requiredEnabledChannelFlags: ['eventsEnabled'],
+    });
+
+    const collectionsSection = getSection(
+      wrapper,
+      'Forum Lists From Your Collections'
+    );
+
+    expect(collectionsSection.options).toEqual([
+      expect.objectContaining({
+        value: 'collection-1',
+        channels: ['cats'],
+      }),
+    ]);
   });
 
   it('renders a locked forum instead of an interactive picker', () => {

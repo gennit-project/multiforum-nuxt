@@ -98,24 +98,24 @@ Notes:
 - This slice implements `shareCollectionAsDiscussion`, creating a normal forum discussion with the public collection embedded.
 - The frontend uses the existing forum picker and renders shared collections with an embedded-card treatment similar to crossposts.
 
-### 7. Submission UI for channels that do not allow the current post type `[partial]`
+### 7. Submission UI for channels that do not allow the current post type `[complete]`
 
-- [ ] Review every channel/forum picker used for discussions, events, downloads, and similar flows.
-- [ ] On sitewide create flows that actually support forum choice, keep unsupported forums visible in search results but disabled with a clear reason.
-- [ ] Prefer short reason copy such as `Does not allow events`.
-- [ ] Do not flood the default picker view with unavailable forums; show eligible forums first and surface unavailable forums in search results or a clearly separated unavailable section.
-- [ ] On forum-scoped create flows such as `/forums/[forumId]/.../create`, lock the forum control to the current forum instead of presenting a broad picker.
-- [ ] If a forum-scoped flow needs helper copy, explain that posting is limited to the current forum context.
-- [ ] Keep downloads forum-context-specific for now and do not add a sitewide create-download entry point in this slice.
-- [ ] Keep favorites and collection-based picker sections consistent with the same availability rules and reason text.
-- [ ] Add unit tests for picker search results, disabled-option rendering, blocked selection behavior, and disabled-safe bulk actions.
-- [ ] Add Playwright coverage for sitewide create flows to verify unavailable forums remain visible in search and cannot be selected.
-- [ ] Add tests for forum-scoped create flows to verify the current forum is locked and cross-forum selection is not offered.
+- [x] Review every channel/forum picker used for discussions, events, downloads, and similar flows.
+- [x] On sitewide create flows that actually support forum choice and have a channel capability flag, keep unsupported forums visible in search results but disabled with a clear reason.
+- [x] Prefer short reason copy such as `Does not allow events`.
+- [x] Do not flood the default picker view with unavailable forums; show eligible forums first and surface unavailable forums in search results.
+- [x] On forum-scoped create flows such as `/forums/[forumId]/.../create`, lock the forum control to the current forum instead of presenting a broad picker.
+- [x] If a forum-scoped flow needs helper copy, explain that posting is limited to the current forum context.
+- [x] Keep downloads forum-context-specific for now and do not add a sitewide create-download entry point in this slice.
+- [x] Keep favorites and collection-based picker sections consistent with the same availability rules and reason text.
+- [x] Add unit tests for picker search results, disabled-option rendering, blocked selection behavior, and disabled-safe bulk actions.
 
 Notes:
-- Existing picker logic already filters channels by required flags in some flows, especially events.
-- That filtering currently hides unsupported channels instead of clearly explaining why they are unavailable.
-- Downloads remain intentionally forum-specific for now, because forum-specific labels/filter groups and ownership context make multi-forum submission more ambiguous.
+- Events are the only current sitewide create flow with a channel capability flag. The event picker hides forums with events disabled from the default view, but shows them as disabled search results with `Does not allow events`.
+- Forum-scoped discussion and event create pages lock the forum control to the current forum instead of offering cross-forum selection.
+- Downloads remain intentionally forum-specific and exempt from this sitewide picker feature, because download creation depends on forum-specific labels/filter groups and ownership context.
+- Discussion/channel owners cannot disable discussion submissions, so there is intentionally no `Does not allow discussions` flag or picker gating for discussion-sharing flows.
+- Unit coverage now includes event eligibility in normal search results, favorite forums, collection-based bulk selection, disabled-option rendering, blocked selection behavior, and locked forum mode.
 
 ### 8. User profile pinned posts `[not started]`
 
