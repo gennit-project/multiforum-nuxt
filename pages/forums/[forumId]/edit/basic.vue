@@ -8,6 +8,7 @@ import TextInput from '@/components/TextInput.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import AddImage from '@/components/AddImage.vue';
 import RemoveOwnerModal from '@/components/channel/RemoveOwnerModal.vue';
+import WarningModal from '@/components/WarningModal.vue';
 import {
   getUploadFileName,
   uploadAndGetEmbeddedLink,
@@ -16,6 +17,7 @@ import {
 import { useUsername } from '@/composables/useAuthState';
 import { ref, nextTick, computed } from 'vue';
 import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
+import { PERMANENTLY_DELETE_CHANNEL_BANNER } from '@/graphQLData/channel/mutations';
 import { REMOVE_FORUM_OWNER } from '@/graphQLData/mod/mutations';
 import { useMutation } from '@vue/apollo-composable';
 import { isFileSizeValid } from '@/utils/index';
@@ -73,6 +75,8 @@ const forumId = computed(() => {
 });
 
 const showRemoveOwnerModal = ref(false);
+const showDeleteBannerModal = ref(false);
+const deleteBannerError = ref('');
 
 const canRemoveOwner = computed(() => {
   const currentUser = usernameVar.value;
@@ -83,6 +87,12 @@ const canRemoveOwner = computed(() => {
 const { mutate: createSignedStorageUrl } = useMutation(
   CREATE_SIGNED_STORAGE_URL
 );
+
+const {
+  mutate: permanentlyDeleteChannelBanner,
+  loading: permanentlyDeleteChannelBannerLoading,
+  error: permanentlyDeleteChannelBannerError,
+} = useMutation(PERMANENTLY_DELETE_CHANNEL_BANNER);
 
 const {
   mutate: removeForumOwner,
@@ -162,6 +172,34 @@ const handleImageChange = async (input: FileChangeInput) => {
 
     emit('updateFormValues', { [fieldName]: embeddedLink });
     emit('submit');
+  }
+};
+
+const closeDeleteBannerModal = () => {
+  if (permanentlyDeleteChannelBannerLoading.value) return;
+  showDeleteBannerModal.value = false;
+  deleteBannerError.value = '';
+};
+
+const confirmDeleteBanner = async () => {
+  const imageUrl = props.formValues.channelBannerURL;
+  if (!forumId.value || !imageUrl) return;
+
+  deleteBannerError.value = '';
+
+  try {
+    await permanentlyDeleteChannelBanner({
+      channelUniqueName: forumId.value,
+      imageUrl,
+    });
+    emit('updateFormValues', { channelBannerURL: '' });
+    emit('submit');
+    showDeleteBannerModal.value = false;
+  } catch (error) {
+    deleteBannerError.value =
+      error instanceof Error
+        ? error.message
+        : 'Failed to permanently delete forum banner.';
   }
 };
 </script>
@@ -267,6 +305,22 @@ const handleImageChange = async (input: FileChangeInput) => {
               }
             "
           />
+          <button
+            v-if="formValues.channelBannerURL"
+            type="button"
+            data-testid="delete-channel-banner-button"
+            class="mt-3 rounded-md border border-red-300 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-950"
+            :disabled="permanentlyDeleteChannelBannerLoading"
+            @click="showDeleteBannerModal = true"
+          >
+            Delete forum banner
+          </button>
+          <p
+            v-if="permanentlyDeleteChannelBannerError"
+            class="mt-2 text-sm text-red-600 dark:text-red-400"
+          >
+            {{ permanentlyDeleteChannelBannerError.message }}
+          </p>
         </template>
       </FormRow>
       <FormRow>
@@ -317,6 +371,19 @@ const handleImageChange = async (input: FileChangeInput) => {
       :error="removeForumOwnerError?.message || ''"
       @close="showRemoveOwnerModal = false"
       @confirm="handleRemoveOwner"
+    />
+    <WarningModal
+      :open="showDeleteBannerModal"
+      title="Delete forum banner?"
+      body="This permanently deletes the stored forum banner file and clears it from the forum. This cannot be undone."
+      primary-button-text="Delete Banner"
+      secondary-button-text="Cancel"
+      icon="trash"
+      data-testid="permanently-delete-channel-banner-modal"
+      :loading="permanentlyDeleteChannelBannerLoading"
+      :error="deleteBannerError"
+      @primary-button-click="confirmDeleteBanner"
+      @close="closeDeleteBannerModal"
     />
   </div>
 </template>

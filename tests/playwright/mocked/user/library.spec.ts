@@ -188,7 +188,7 @@ test.describe('Library page', () => {
 
     await expect(page.getByRole('link', { name: /My Downloads/i })).toHaveAttribute(
       'href',
-      '/library/downloads-1'
+      '/library/my-downloads'
     );
     await expect(
       page.getByText('Downloads are added here automatically when you grab a file.')

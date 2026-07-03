@@ -1,9 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import {
+  buildSelectedRevisionPairs,
+  buildSelectedWikiRevisionRouteId,
   getRevisionAuthorName,
   getVersionAuthorName,
   getRevisionContent,
   buildSequentialRevisionPairs,
+  parseSelectedWikiRevisionRouteId,
 } from './revisionHistory';
 
 describe('getRevisionAuthorName', () => {
@@ -131,5 +134,51 @@ describe('buildSequentialRevisionPairs', () => {
       getHistoricalPairAuthor: ({ oldVersion }) => oldVersion.Author,
     });
     expect(pairs[1].author).toBe('eve');
+  });
+});
+
+describe('selected wiki revision helpers', () => {
+  it('builds and parses selected revision route ids', () => {
+    const routeId = buildSelectedWikiRevisionRouteId('v1');
+    expect(routeId).toBe('selected-v1');
+    expect(parseSelectedWikiRevisionRouteId(routeId)).toBe('v1');
+  });
+
+  it('builds selected revision diffs from an empty initial state forward', () => {
+    const pairs = buildSelectedRevisionPairs({
+      currentVersion: {
+        id: 'current',
+        body: 'v3',
+        createdAt: '2024-03-01',
+        Author: { username: 'carol' },
+      },
+      currentAuthor: { username: 'carol' },
+      pastVersions: [
+        {
+          id: 'v2',
+          body: 'v2',
+          createdAt: '2024-02-01',
+          Author: { username: 'bob' },
+        },
+        {
+          id: 'v1',
+          body: 'v1',
+          createdAt: '2024-01-01',
+          Author: { username: 'alice' },
+        },
+      ],
+    });
+
+    expect(
+      pairs.map((pair) => ({
+        id: pair.id,
+        oldId: pair.oldVersionData.id,
+        newId: pair.newVersionData.id,
+      }))
+    ).toEqual([
+      { id: 'selected-v1', oldId: '__initial__', newId: 'v1' },
+      { id: 'selected-v2', oldId: 'v1', newId: 'v2' },
+      { id: 'selected-current', oldId: 'v2', newId: 'current' },
+    ]);
   });
 });

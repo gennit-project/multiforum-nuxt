@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import FormRow from '@/components/FormRow.vue';
 import PluginSettingsForm from '@/components/plugins/PluginSettingsForm.vue';
-import type { PluginFormSection, PluginSecretStatus as PluginSecretStatusType } from '@/types/pluginForms';
+import type { PluginFormSection, PluginSecretStatus as PluginSecretStatusType, PluginSettings } from '@/types/pluginForms';
 
 defineProps<{
   sections: PluginFormSection[];
-  modelValue: Record<string, any>;
+  modelValue: PluginSettings;
   errors: Record<string, string>;
   secretStatuses: PluginSecretStatusType[];
   saving: boolean;
 }>();
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: Record<string, any>): void;
+  (e: 'update:modelValue', value: PluginSettings): void;
   (e: 'save'): void;
 }>();
 </script>

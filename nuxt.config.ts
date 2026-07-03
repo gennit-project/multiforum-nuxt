@@ -5,9 +5,38 @@ import path from 'path';
 import { inMemoryCacheOptions } from './cache';
 
 const isMockedE2E = process.env.VITE_E2E_MOCK_MODE === 'true';
+const ignoredDevWatchPatterns = [
+  '**/.claude/**',
+  '**/.agents/**',
+  '**/.vercel/**',
+  '**/.output/**',
+  '**/coverage/**',
+  '**/coverage-combined/**',
+  '**/playwright-report/**',
+  '**/test-results/**',
+];
+const ignoredNuxtPaths = [
+  '.claude',
+  '.claude/**',
+  '.agents',
+  '.agents/**',
+  '.vercel',
+  '.vercel/**',
+  '.output',
+  '.output/**',
+  'coverage',
+  'coverage/**',
+  'coverage-combined',
+  'coverage-combined/**',
+  'playwright-report',
+  'playwright-report/**',
+  'test-results',
+  'test-results/**',
+];
 
 export default defineNuxtConfig({
   srcDir: '.',
+  ignore: ignoredNuxtPaths,
   app: {
     head: {
       title: config.serverDisplayName,
@@ -227,6 +256,11 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: 'vercel',
+    ignore: ignoredDevWatchPatterns,
+    watchOptions: {
+      ignoreInitial: true,
+      ignored: ignoredDevWatchPatterns,
+    },
     // Enable CDN caching
     cdn: true,
     // Persistent store for @auth0/auth0-nuxt server sessions
@@ -392,6 +426,11 @@ export default defineNuxtConfig({
     // Allow connections from ngrok for mobile testing
     server: {
       allowedHosts: ['localhost', '69f8-98-168-53-208.ngrok-free.app'],
+      watch: {
+        // Exclude nested worktrees and generated artifacts from dev watchers
+        // so `nuxt dev` does not exhaust file watchers in the main checkout.
+        ignored: ignoredDevWatchPatterns,
+      },
     },
     build: {
       minify: false,

@@ -136,10 +136,10 @@ describe('user wiki edits page', () => {
       .map((l) => l.props('to'));
     expect(targets).toContain('/forums/cats/wiki/cat-care');
     expect(targets).toContain(
-      '/forums/cats/wiki/revisions/diff/cat-care/v1'
+      '/forums/cats/wiki/revisions/diff/cat-care/selected-v1'
     );
     expect(targets).toContain(
-      '/forums/cats/wiki/revisions/diff/cat-care/current'
+      '/forums/cats/wiki/revisions/diff/cat-care/selected-current'
     );
   });
 

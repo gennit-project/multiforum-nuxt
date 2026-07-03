@@ -7,11 +7,22 @@ import EditAccountSettingsFields from '@/components/user/EditAccountSettingsFiel
 const h = vi.hoisted(() => ({
   username: null as unknown,
   createSignedStorageUrl: vi.fn(),
+  permanentlyDeleteProfileImage: vi.fn(),
   uploadLink: vi.fn(),
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useMutation: () => ({ mutate: h.createSignedStorageUrl }),
+  useMutation: (operation: unknown) => ({
+    mutate:
+      operation === 'PERMANENTLY_DELETE_PROFILE_IMAGE'
+        ? h.permanentlyDeleteProfileImage
+        : h.createSignedStorageUrl,
+    loading: ref(false),
+    error: ref(null),
+  }),
+}));
+vi.mock('@/graphQLData/user/mutations', () => ({
+  PERMANENTLY_DELETE_PROFILE_IMAGE: 'PERMANENTLY_DELETE_PROFILE_IMAGE',
 }));
 vi.mock('@/composables/useAuthState', () => ({ useUsername: () => h.username }));
 vi.mock('@/utils', async (orig) => {
@@ -51,6 +62,11 @@ const mountFields = (props: Record<string, unknown> = {}) =>
         },
         TextEditor: stub('TextEditor', ['initialValue'], ['update']),
         AddImage: stub('AddImage', ['fieldName'], ['file-change']),
+        WarningModal: stub(
+          'WarningModal',
+          ['open', 'loading', 'error'],
+          ['primary-button-click', 'close']
+        ),
         CharCounter: stub('CharCounter', ['current', 'max']),
         AvatarComponent: true,
       },
@@ -72,6 +88,14 @@ beforeEach(() => {
   vi.clearAllMocks();
   h.username = ref('alice');
   vi.stubGlobal('alert', vi.fn());
+  h.permanentlyDeleteProfileImage.mockResolvedValue({
+    data: {
+      permanentlyDeleteProfileImage: {
+        username: 'alice',
+        profilePicURL: null,
+      },
+    },
+  });
   h.createSignedStorageUrl.mockResolvedValue({
     data: { createSignedStorageURL: { url: 'https://signed' } },
   });
@@ -168,5 +192,46 @@ describe('EditAccountSettingsFields profile picture upload', () => {
     await changeProfilePic(wrapper, big);
 
     expect(h.createSignedStorageUrl).not.toHaveBeenCalled();
+  });
+
+  it('permanently deletes the current profile picture URL', async () => {
+    const wrapper = mountFields({
+      formValues: {
+        displayName: 'Alice',
+        bio: 'hi',
+        profilePicURL: 'https://cdn.example.com/pic.png',
+      },
+    });
+
+    await wrapper.get('[data-testid="delete-profile-image-button"]').trigger('click');
+    await wrapper
+      .getComponent({ name: 'WarningModal' })
+      .vm.$emit('primary-button-click');
+    await flushPromises();
+
+    expect(h.permanentlyDeleteProfileImage).toHaveBeenCalledWith({
+      username: 'alice',
+      imageUrl: 'https://cdn.example.com/pic.png',
+    });
+  });
+
+  it('clears the profile picture field after permanent delete succeeds', async () => {
+    const wrapper = mountFields({
+      formValues: {
+        displayName: 'Alice',
+        bio: 'hi',
+        profilePicURL: 'https://cdn.example.com/pic.png',
+      },
+    });
+
+    await wrapper.get('[data-testid="delete-profile-image-button"]').trigger('click');
+    await wrapper
+      .getComponent({ name: 'WarningModal' })
+      .vm.$emit('primary-button-click');
+    await flushPromises();
+
+    expect(wrapper.emitted('updateFormValues')?.at(-1)?.[0]).toEqual({
+      profilePicURL: '',
+    });
   });
 });

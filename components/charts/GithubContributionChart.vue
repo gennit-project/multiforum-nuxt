@@ -7,6 +7,7 @@ import DiscussionItemInProfile from '@/components/user/DiscussionItemInProfile.v
 import EventListItemInProfile from '@/components/user/EventItemInProfile.vue';
 import ContributionChartSkeleton from './ContributionChartSkeleton.vue';
 import { timeAgo } from '@/utils';
+import { buildSelectedWikiRevisionRouteId } from '@/utils/revisionHistory';
 
 // Props definition with sparse data input
 const props = defineProps({
@@ -89,7 +90,7 @@ const getWikiRevisionPath = (edit: NonNullable<DayData['activities'][number]['Wi
   if (!edit.WikiPage?.channelUniqueName || !edit.WikiPage?.slug) {
     return '';
   }
-  return `/forums/${edit.WikiPage.channelUniqueName}/wiki/revisions/diff/${edit.WikiPage.slug}/${edit.id}`;
+  return `/forums/${edit.WikiPage.channelUniqueName}/wiki/revisions/diff/${edit.WikiPage.slug}/${buildSelectedWikiRevisionRouteId(edit.id)}`;
 };
 
 // Transform sparse contribution data into grid structure

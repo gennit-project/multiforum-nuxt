@@ -12,8 +12,12 @@ import Notification from '@/components/NotificationComponent.vue';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 import type { WikiPage, TextVersion } from '@/__generated__/graphql';
 import {
+  buildSelectedRevisionPairs,
+  buildSelectedWikiRevisionRouteId,
   buildSequentialRevisionPairs,
   getRevisionAuthorName,
+  INITIAL_REVISION_ID,
+  isSelectedWikiRevisionRouteId,
   type RevisionPair,
 } from '@/utils/revisionHistory';
 
@@ -52,8 +56,8 @@ const {
 // Computed property for the wiki page data
 const wikiPage = computed(() => wikiPageResult.value?.wikiPages?.[0] as WikiPage);
 
-// Process all versions to find the specific revision
-const allEdits = computed(() => {
+// Process all versions used by the revision-history screen.
+const historyEdits = computed(() => {
   if (!wikiPage.value) {
     return [];
   }
@@ -81,9 +85,55 @@ const allEdits = computed(() => {
   });
 });
 
+// Process diffs keyed by the selected revision itself (used by profile links).
+const selectedRevisionEdits = computed(() => {
+  if (!wikiPage.value) {
+    return [];
+  }
+
+  const currentVersion: TextVersion = {
+    id: 'current',
+    body: wikiPage.value.body,
+    editReason: (wikiPage.value as WikiPageWithEditReason).editReason,
+    createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
+    Author: wikiPage.value.VersionAuthor,
+    AuthorConnection: {
+      edges: [],
+      pageInfo: { hasNextPage: false, hasPreviousPage: false },
+      totalCount: 0,
+    },
+  };
+
+  return buildSelectedRevisionPairs({
+    pastVersions: wikiPage.value.PastVersions,
+    currentVersion,
+    currentAuthor: wikiPage.value.VersionAuthor,
+  });
+});
+
+const revisionMode = computed<'history' | 'selected'>(() => {
+  if (
+    revisionId.value === 'current' ||
+    isSelectedWikiRevisionRouteId(revisionId.value)
+  ) {
+    return 'selected';
+  }
+
+  return 'history';
+});
+
 // Find the specific revision
 const currentRevision = computed(() => {
-  return allEdits.value.find((edit) => edit.id === revisionId.value);
+  if (revisionMode.value === 'selected') {
+    const selectedId =
+      revisionId.value === 'current'
+        ? buildSelectedWikiRevisionRouteId('current')
+        : revisionId.value;
+
+    return selectedRevisionEdits.value.find((edit) => edit.id === selectedId);
+  }
+
+  return historyEdits.value.find((edit) => edit.id === revisionId.value);
 });
 
 const formatRevisionOptionLabel = (edit: WikiRevisionData) => {
@@ -106,9 +156,30 @@ const handleRevisionSelect = (event: Event) => {
   }
 
   router.push(
-    `/forums/${forumId}/wiki/revisions/diff/${slug}/${selectedRevisionId}`
+      `/forums/${forumId}/wiki/revisions/diff/${slug}/${selectedRevisionId}`
   );
 };
+
+const revisionTargetId = computed(() => {
+  if (!currentRevision.value) {
+    return '';
+  }
+
+  const targetId =
+    revisionMode.value === 'selected'
+      ? currentRevision.value.newVersionData?.id
+      : currentRevision.value.oldVersionData?.id;
+
+  if (
+    !targetId ||
+    targetId === 'current' ||
+    targetId === INITIAL_REVISION_ID
+  ) {
+    return '';
+  }
+
+  return targetId;
+});
 
 // Deletion state
 const isDeleting = ref(false);
@@ -128,7 +199,7 @@ onDone(() => {
 });
 
 const handleDelete = async () => {
-  if (!currentRevision.value?.oldVersionData?.id) return;
+  if (!revisionTargetId.value) return;
 
   if (
     confirm(
@@ -138,7 +209,7 @@ const handleDelete = async () => {
     isDeleting.value = true;
     try {
       await deleteTextVersion({
-        textVersionId: currentRevision.value.oldVersionData.id,
+        textVersionId: revisionTargetId.value,
       });
     } catch (err) {
       console.error('Error deleting revision:', err);
@@ -148,8 +219,7 @@ const handleDelete = async () => {
 };
 
 const revisionToReportId = computed(() => {
-  const oldVersionId = currentRevision.value?.oldVersionData?.id;
-  return oldVersionId && oldVersionId !== 'current' ? oldVersionId : '';
+  return revisionTargetId.value;
 });
 
 // Navigation functions
@@ -252,7 +322,7 @@ useHead({
                 @change="handleRevisionSelect"
               >
                 <option
-                  v-for="edit in allEdits"
+                  v-for="edit in historyEdits"
                   :key="edit.id"
                   :value="edit.id"
                 >
@@ -262,10 +332,7 @@ useHead({
             </div>
 
             <button
-              v-if="
-                currentRevision.oldVersionData?.id &&
-                currentRevision.oldVersionData.id !== 'current'
-              "
+              v-if="revisionTargetId"
               class="rounded-md border border-red-300 bg-red-100 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-200 disabled:opacity-50 dark:border-red-600 dark:bg-red-800 dark:text-red-200 dark:hover:bg-red-700"
               :disabled="isDeleting || deleteLoading"
               @click="handleDelete"

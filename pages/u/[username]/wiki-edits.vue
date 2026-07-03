@@ -6,6 +6,7 @@ import { GET_USER_WIKI_EDITS } from '@/graphQLData/user/queries';
 import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
 import { timeAgo } from '@/utils';
 import type { TextVersion, WikiPage } from '@/__generated__/graphql';
+import { buildSelectedWikiRevisionRouteId } from '@/utils/revisionHistory';
 
 type WikiEditPage = Pick<
   WikiPage,
@@ -128,7 +129,7 @@ const getWikiPagePath = (edit: WikiEdit) => {
 };
 
 const getWikiRevisionPath = (edit: WikiEdit) => {
-  return `/forums/${edit.wikiPage.channelUniqueName}/wiki/revisions/diff/${edit.wikiPage.slug}/${edit.id}`;
+  return `/forums/${edit.wikiPage.channelUniqueName}/wiki/revisions/diff/${edit.wikiPage.slug}/${buildSelectedWikiRevisionRouteId(edit.id)}`;
 };
 </script>
 

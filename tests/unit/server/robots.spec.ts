@@ -30,15 +30,13 @@ describe('robots.txt', () => {
     const result = await runHandler();
 
     expect(result).toBe(`User-agent: *
-Allow: /
-
-Disallow: /api/*
-Disallow: /admin/*
-Disallow: /mod/*
-Disallow: /auth/*
-Disallow: /_nuxt/*
-Disallow: /assets/*
-Disallow: /static/*
-Disallow: /issues/*`);
+Disallow: /api/
+Disallow: /admin/
+Disallow: /mod/
+Disallow: /auth/
+Disallow: /_nuxt/
+Disallow: /assets/
+Disallow: /static/
+Disallow: /issues/`);
   });
 });

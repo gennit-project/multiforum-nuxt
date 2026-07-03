@@ -185,7 +185,6 @@ describe('DownloadList label filters', () => {
       ).value
     ).toEqual([{ groupKey: 'type', values: ['pdf'] }]);
   });
-
   it('passes paired Sims pack include and exclude filters to the query variables', () => {
     h.route = {
       params: { forumId: 'sims4_builds' },

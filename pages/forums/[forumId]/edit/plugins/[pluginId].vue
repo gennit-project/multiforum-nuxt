@@ -13,7 +13,7 @@ import {
   GET_CHANNEL_PLUGIN_SETTINGS,
 } from '@/graphQLData/channel/queries';
 import { UPDATE_CHANNEL_ENABLED_PLUGINS } from '@/graphQLData/channel/mutations';
-import type { PluginFormSection } from '@/types/pluginForms';
+import type { PluginFormSection, PluginSettings } from '@/types/pluginForms';
 import type { InstalledPlugin, User } from '@/__generated__/graphql';
 import {
   getPluginFormSections,
@@ -31,7 +31,7 @@ import {
 
 type PluginState = {
   enabled: boolean;
-  settings: Record<string, any>;
+  settings: PluginSettings;
 };
 
 const route = useRoute();
@@ -157,7 +157,7 @@ function getPluginVersion() {
   return plugin.value?.version;
 }
 
-function updateSettings(settings: Record<string, any>) {
+function updateSettings(settings: PluginSettings) {
   pluginState.value.settings = settings;
   isDirty.value = true;
 }
