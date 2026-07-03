@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { mount } from '@vue/test-utils';
 import { createTestingPinia } from '@pinia/testing';
+import { sims4PackPreferenceFilterGroups } from '@/tests/playwright/helpers/sims4DownloadFixtures';
 
 import DownloadList from '@/components/channel/DownloadList.vue';
 
@@ -183,6 +184,31 @@ describe('DownloadList label filters', () => {
         }
       ).value
     ).toEqual([{ groupKey: 'type', values: ['pdf'] }]);
+  });
+
+  it('passes paired Sims pack include and exclude filters to the query variables', () => {
+    h.route = {
+      params: { forumId: 'sims4_builds' },
+      query: {
+        filter_include_game_packs: 'vampires',
+        filter_exclude_game_packs: 'dine_out',
+      },
+    };
+    mountList({ filterGroups: sims4PackPreferenceFilterGroups });
+    const downloadListQueryCall = h.useQueryCalls.find(
+      (call) => 'labelFilters' in call.variables
+    );
+
+    expect(
+      (
+        downloadListQueryCall?.variables.labelFilters as {
+          value: Array<{ groupKey: string; values: string[] }>;
+        }
+      ).value
+    ).toEqual([
+      { groupKey: 'include_game_packs', values: ['vampires'] },
+      { groupKey: 'exclude_game_packs', values: ['dine_out'] },
+    ]);
   });
 });
 

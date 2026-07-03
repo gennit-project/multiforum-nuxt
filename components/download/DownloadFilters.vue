@@ -64,7 +64,7 @@ const toggleFilter = (groupKey: string, optionValue: string) => {
   }
 
   // Update URL with new filter values
-  const filterParams: Record<string, any> = {};
+  const filterParams: Record<string, string | undefined> = {};
 
   // Add all filter groups to params, explicitly setting undefined for empty ones
   props.filterGroups.forEach((group) => {
@@ -89,7 +89,7 @@ const clearAllFilters = () => {
   selectedFilters.value = {};
 
   // Clear URL params
-  const filterParams: Record<string, any> = {};
+  const filterParams: Record<string, string | undefined> = {};
   props.filterGroups.forEach((group) => {
     filterParams[`filter_${group.key}`] = undefined;
   });
@@ -135,7 +135,7 @@ const handleMultiSelectUpdate = (
   selectedFilters.value[groupKey] = selectedValues;
 
   // Update URL with new filter values
-  const filterParams: Record<string, any> = {};
+  const filterParams: Record<string, string | undefined> = {};
 
   // Add all filter groups to params, explicitly setting undefined for empty ones
   props.filterGroups.forEach((group) => {
@@ -173,7 +173,12 @@ const handleMultiSelectUpdate = (
 
     <!-- Filter Groups -->
     <div class="space-y-6">
-      <div v-for="group in filterGroups" :key="group.id" class="space-y-3">
+      <div
+        v-for="group in filterGroups"
+        :key="group.id"
+        class="space-y-3"
+        :data-testid="`download-filter-group-${group.key}`"
+      >
         <h4 class="text-md font-medium text-gray-800 dark:text-gray-200">
           {{ group.displayName }}
         </h4>

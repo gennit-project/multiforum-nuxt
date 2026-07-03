@@ -262,3 +262,54 @@ export const buildSims4BuildsChannel = (
       ...overrides,
     },
   });
+
+const cloneFilterGroup = ({
+  source,
+  key,
+  displayName,
+  mode,
+  order,
+}: {
+  source: Sims4FilterGroupFixture;
+  key: string;
+  displayName: string;
+  mode: FilterMode;
+  order: number;
+}): Sims4FilterGroupFixture => ({
+  ...source,
+  id: `${SIMS4_BUILDS_CHANNEL_ID}_${key}`,
+  key,
+  displayName,
+  mode,
+  order,
+  options: source.options.map((option) => ({
+    ...option,
+    id: `${SIMS4_BUILDS_CHANNEL_ID}_${key}_${option.value}`,
+  })),
+});
+
+export const sims4PackPreferenceFilterGroups: Sims4FilterGroupFixture[] = [
+  cloneFilterGroup({
+    source: sims4BuildsFilterGroups.find((group) => group.key === 'game_packs')!,
+    key: 'include_game_packs',
+    displayName: 'Must include game packs',
+    mode: FilterMode.Include,
+    order: 0,
+  }),
+  cloneFilterGroup({
+    source: sims4BuildsFilterGroups.find((group) => group.key === 'game_packs')!,
+    key: 'exclude_game_packs',
+    displayName: 'Must not include game packs',
+    mode: FilterMode.Exclude,
+    order: 1,
+  }),
+];
+
+export const buildSims4PackPreferenceChannel = (
+  overrides: Partial<ChannelFixture> = {}
+): ChannelFixture =>
+  buildSims4BuildsChannel({
+    FilterGroups:
+      sims4PackPreferenceFilterGroups as ChannelFixture['FilterGroups'],
+    ...overrides,
+  });

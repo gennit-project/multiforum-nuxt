@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { FilterMode } from '@/__generated__/graphql';
 import type { FilterGroup } from '@/__generated__/graphql';
+import { serializeFilterGroupsToYaml } from '@/utils/filterGroupYaml';
+import { sims4BuildsFilterGroups } from '@/tests/playwright/helpers/sims4DownloadFixtures';
 
 import FilterGroupManager from '@/components/filter/FilterGroupManager.vue';
 
@@ -84,6 +86,17 @@ describe('FilterGroupManager', () => {
     expect(wrapper.emitted('updateFilterGroups')?.[0]?.[0]).toHaveLength(1);
   });
 
+  it('can create an exclusion group from the form editor', async () => {
+    const wrapper = mountManager([]);
+    await openNewGroupForm(wrapper);
+    await wrapper.get('select').setValue(FilterMode.Exclude);
+    await wrapper.get('input[placeholder="e.g. lot_size"]').setValue('blocked_packs');
+    await wrapper.get('input[placeholder="e.g. Lot Size"]').setValue('Blocked Packs');
+    await wrapper.findAll('button').find((b) => b.text() === 'Add Group')!.trigger('click');
+    const emitted = wrapper.emitted('updateFilterGroups')?.[0]?.[0] as FilterGroup[];
+    expect(emitted[0].mode).toBe(FilterMode.Exclude);
+  });
+
   it('emits the filtered list when a group is removed', () => {
     const wrapper = mountManager([makeGroup({ id: 'g1' }), makeGroup({ id: 'g2', key: 'color' })]);
     wrapper.findAllComponents(FilterOptionManagerStub)[0].vm.$emit('removeGroup', 'g1');
@@ -109,6 +122,23 @@ describe('FilterGroupManager', () => {
     const wrapper = mountManager([makeGroup({ id: 'g1', key: 'lot_size' })]);
     await wrapper.findAll('button').find((b) => b.text() === 'YAML Editor')!.trigger('click');
     expect(wrapper.get('textarea').element.value).toContain('lot_size');
+  });
+
+  it('applies the full Sims 4 filter set from YAML', async () => {
+    const wrapper = mountManager([]);
+    await wrapper.findAll('button').find((b) => b.text() === 'YAML Editor')!.trigger('click');
+    await wrapper.get('textarea').setValue(serializeFilterGroupsToYaml(sims4BuildsFilterGroups));
+    await wrapper.findAll('button').find((b) => b.text() === 'Apply Changes')!.trigger('click');
+    const emitted = wrapper.emitted('updateFilterGroups')?.[0]?.[0] as FilterGroup[];
+    expect(emitted.map((group) => [group.key, group.options.length])).toEqual([
+      ['size', 10],
+      ['price', 6],
+      ['lot_type', 32],
+      ['expansion_packs', 19],
+      ['game_packs', 12],
+      ['stuff_packs', 16],
+      ['advanced', 1],
+    ]);
   });
 
   it('shows a YAML error when applying invalid YAML', async () => {

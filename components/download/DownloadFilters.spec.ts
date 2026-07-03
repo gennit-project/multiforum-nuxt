@@ -3,6 +3,7 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createMockRoute, createMockRouter } from '@/tests/utils/mockRouter';
 import CheckBox from '@/components/CheckBox.vue';
 import MultiSelect from '@/components/MultiSelect.vue';
+import { sims4PackPreferenceFilterGroups } from '@/tests/playwright/helpers/sims4DownloadFixtures';
 
 import DownloadFilters from '@/components/download/DownloadFilters.vue';
 
@@ -78,6 +79,21 @@ describe('DownloadFilters', () => {
     expect(router.replace).toHaveBeenCalledWith(
       expect.objectContaining({
         query: expect.objectContaining({ filter_type: 'v1,v2' }),
+      })
+    );
+  });
+
+  it('writes paired Sims pack include and exclude selections to the route query', async () => {
+    const wrapper = mountFilters(sims4PackPreferenceFilterGroups);
+    const multiselects = wrapper.findAllComponents(MultiSelect);
+    await multiselects[0].vm.$emit('update:model-value', ['vampires']);
+    await multiselects[1].vm.$emit('update:model-value', ['dine_out']);
+    expect(router.replace).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        query: expect.objectContaining({
+          filter_include_game_packs: 'vampires',
+          filter_exclude_game_packs: 'dine_out',
+        }),
       })
     );
   });
