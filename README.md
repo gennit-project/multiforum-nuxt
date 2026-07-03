@@ -30,10 +30,12 @@ Multiforum is split across two repositories:
 The frontend talks to the backend exclusively through GraphQL.
 
 > **Backend architecture:** the data model, GraphQL schema, and resolver design
-> are documented in depth in the **backend repository's README** and the
-> references linked from it. This README and the [frontend architecture doc](./docs/architecture-and-auth.md)
-> cover the frontend and the cross-tier auth flow; for anything about how data
-> is stored, related, and queried, start with the backend README.
+> are documented in depth in the backend's
+> [architecture overview](https://github.com/gennit-project/multiforum-backend/blob/main/docs/architecture.md)
+> and the references linked from it. This README and the
+> [frontend architecture doc](./docs/architecture-and-auth.md) cover the frontend
+> and the cross-tier auth flow; for anything about how data is stored, related,
+> and queried, start with the backend docs.
 
 ## Technology choices — and why
 
@@ -114,7 +116,7 @@ Architecture:
 - [Frontend architecture and authentication](./docs/architecture-and-auth.md)
 - [Moderation architecture](./docs/moderation-architecture.md)
 - [Performance](./docs/PERFORMANCE.md)
-- **Backend architecture:** see the [multiforum-backend README](https://github.com/gennit-project/multiforum-backend)
+- **Backend architecture:** see the [backend architecture overview](https://github.com/gennit-project/multiforum-backend/blob/main/docs/architecture.md)
 
 Feature areas and plans:
 
