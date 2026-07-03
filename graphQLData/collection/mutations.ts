@@ -173,3 +173,25 @@ export const REORDER_COLLECTION_ITEM = gql`
     )
   }
 `;
+
+export const SHARE_COLLECTION_AS_DISCUSSION = gql`
+  mutation ShareCollectionAsDiscussion(
+    $collectionId: ID!
+    $serverId: ID!
+    $title: String!
+    $shareMessage: String
+  ) {
+    shareCollectionAsDiscussion(
+      collectionId: $collectionId
+      serverId: $serverId
+      title: $title
+      shareMessage: $shareMessage
+    ) {
+      id
+      title
+      DiscussionChannels {
+        channelUniqueName
+      }
+    }
+  }
+`;

@@ -13,9 +13,11 @@ import {
   UPDATE_COLLECTION,
   DELETE_COLLECTION,
   REORDER_COLLECTION_ITEM,
+  SHARE_COLLECTION_AS_DISCUSSION,
 } from '@/graphQLData/collection/mutations';
 import GenericModal from '@/components/GenericModal.vue';
 import WarningModal from '@/components/WarningModal.vue';
+import ForumPicker from '@/components/channel/ForumPicker.vue';
 import { useUsername } from '@/composables/useAuthState';
 import type { Discussion, Comment } from '@/__generated__/graphql';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
@@ -126,6 +128,10 @@ const newCollectionDescription = ref('');
 
 // Delete modal state
 const showDeleteModal = ref(false);
+const showShareModal = ref(false);
+const selectedShareForums = ref<string[]>([]);
+const shareTitle = ref('');
+const shareMessage = ref('');
 
 const router = useRouter();
 
@@ -145,8 +151,18 @@ const {
   loading: reorderLoading,
   error: reorderError,
 } = useMutation(REORDER_COLLECTION_ITEM);
+const {
+  mutate: shareCollectionAsDiscussion,
+  loading: shareLoading,
+  error: shareError,
+} = useMutation(SHARE_COLLECTION_AS_DISCUSSION);
 const visibilityUpdating = ref(false);
 const visibilityError = ref<string | null>(null);
+const shareSubmitError = ref<string | null>(null);
+
+const collectionIsPublic = computed(
+  () => collection.value?.visibility === 'PUBLIC'
+);
 
 const getItemId = (item: unknown) => getCollectionItemStableId(item);
 
@@ -167,6 +183,55 @@ const openRenameModal = () => {
   newCollectionName.value = collection.value?.name || '';
   newCollectionDescription.value = collection.value?.description || '';
   showRenameModal.value = true;
+};
+
+const openShareModal = () => {
+  if (!collectionIsPublic.value) return;
+  shareTitle.value = collection.value?.name
+    ? `Shared collection: ${collection.value.name}`
+    : 'Shared collection';
+  shareMessage.value = '';
+  selectedShareForums.value = [];
+  shareSubmitError.value = null;
+  showShareModal.value = true;
+};
+
+const handleShareCollection = async () => {
+  const targetForum = selectedShareForums.value[0];
+  if (!targetForum || !shareTitle.value.trim()) return;
+
+  shareSubmitError.value = null;
+  try {
+    const result = await shareCollectionAsDiscussion({
+      collectionId: collectionId.value,
+      serverId: targetForum,
+      title: shareTitle.value.trim(),
+      shareMessage: shareMessage.value.trim() || null,
+    });
+    const shareResult = result as {
+      data?: {
+        shareCollectionAsDiscussion?: {
+          id?: string;
+          DiscussionChannels?: Array<{ channelUniqueName?: string | null }>;
+        };
+      };
+    } | null;
+    const sharedDiscussion =
+      shareResult?.data?.shareCollectionAsDiscussion;
+    const discussionId = sharedDiscussion?.id;
+    const forumId =
+      sharedDiscussion?.DiscussionChannels?.[0]?.channelUniqueName ||
+      targetForum;
+
+    showShareModal.value = false;
+    if (discussionId) {
+      router.push(`/forums/${forumId}/discussions/${discussionId}`);
+    }
+  } catch (err: unknown) {
+    console.error('Error sharing collection:', err);
+    shareSubmitError.value =
+      err instanceof Error ? err.message : 'Failed to share collection.';
+  }
 };
 
 // Handle rename
@@ -360,12 +425,32 @@ const handleDelete = async () => {
                     >
                       Could not update collection order: {{ reorderError.message }}
                     </p>
+                    <p
+                      v-if="!collectionIsPublic"
+                      class="mt-3 text-sm text-gray-500 dark:text-gray-300"
+                    >
+                      Make this collection public before sharing it to a forum
+                      discussion.
+                    </p>
                   </div>
 
                   <!-- Action buttons -->
                   <div
                     class="flex w-full flex-wrap items-center gap-2 lg:ml-4 lg:w-auto lg:flex-shrink-0 lg:flex-nowrap"
                   >
+                    <button
+                      type="button"
+                      class="inline-flex items-center rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-800 shadow-sm transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-70 dark:border-emerald-500/35 dark:bg-emerald-500/12 dark:text-emerald-200 dark:hover:bg-emerald-500/20 lg:px-3 lg:py-2 lg:text-sm"
+                      :disabled="!collectionIsPublic"
+                      :title="
+                        collectionIsPublic
+                          ? 'Share this public collection to a forum discussion'
+                          : 'Make this collection public before sharing it to a forum'
+                      "
+                      @click="openShareModal"
+                    >
+                      Share to forum
+                    </button>
                     <button
                       type="button"
                       class="inline-flex items-center rounded-full border border-gray-300 bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-800 shadow-sm transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-70 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 lg:px-3 lg:py-2 lg:text-sm"
@@ -723,6 +808,83 @@ const handleDelete = async () => {
                   rows="3"
                   class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm"
                   placeholder="Enter description"
+                />
+              </div>
+            </div>
+          </template>
+        </GenericModal>
+
+        <!-- Share Modal -->
+        <GenericModal
+          :open="showShareModal"
+          title="Share Collection to Forum"
+          primary-button-text="Share"
+          secondary-button-text="Cancel"
+          :loading="shareLoading"
+          :error="shareSubmitError || shareError?.message || ''"
+          :primary-button-disabled="
+            !selectedShareForums.length || !shareTitle.trim()
+          "
+          @close="showShareModal = false"
+          @primary-button-click="handleShareCollection"
+        >
+          <template #icon>
+            <svg
+              class="h-6 w-6 text-emerald-600 dark:text-emerald-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4m0 0L8 6m4-4v14"
+              />
+            </svg>
+          </template>
+          <template #content>
+            <div class="space-y-4">
+              <p class="text-sm text-gray-600 dark:text-gray-300">
+                This creates a forum discussion with your public collection
+                embedded in the post.
+              </p>
+              <ForumPicker
+                :selected-channels="selectedShareForums"
+                description="Choose one forum for this shared collection."
+                test-id="share-collection-forum-picker"
+                @set-selected-channels="
+                  selectedShareForums = $event.slice(0, 1)
+                "
+              />
+              <div>
+                <label
+                  for="share-collection-title"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Discussion title
+                </label>
+                <input
+                  id="share-collection-title"
+                  v-model="shareTitle"
+                  type="text"
+                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm"
+                  placeholder="Enter discussion title"
+                >
+              </div>
+              <div>
+                <label
+                  for="share-collection-message"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Message (optional)
+                </label>
+                <textarea
+                  id="share-collection-message"
+                  v-model="shareMessage"
+                  rows="3"
+                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm"
+                  placeholder="Add context for readers"
                 />
               </div>
             </div>

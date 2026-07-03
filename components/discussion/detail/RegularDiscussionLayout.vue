@@ -6,6 +6,7 @@ import DiscussionVotes from '@/components/discussion/vote/DiscussionVotes.vue';
 import MarkAsAnsweredButton from '@/components/discussion/detail/MarkAsAnsweredButton.vue';
 import DiscussionTitleVersions from '@/components/discussion/detail/activityFeed/DiscussionTitleVersions.vue';
 import CrosspostedDiscussionEmbed from '@/components/discussion/detail/CrosspostedDiscussionEmbed.vue';
+import SharedCollectionEmbed from '@/components/discussion/detail/SharedCollectionEmbed.vue';
 import { useUsername } from '@/composables/useAuthState';
 
 const usernameVar = useUsername();
@@ -86,6 +87,10 @@ const emojiEnabled = computed(
     <CrosspostedDiscussionEmbed
       v-if="discussion?.CrosspostedDiscussion"
       :discussion="discussion.CrosspostedDiscussion"
+    />
+    <SharedCollectionEmbed
+      v-if="discussion?.SharedCollection"
+      :collection="discussion.SharedCollection"
     />
     <DiscussionBody
       :key="`discussion-body-${discussion?.id}-${discussion?.hasSensitiveContent}`"

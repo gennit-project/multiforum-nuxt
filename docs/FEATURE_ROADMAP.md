@@ -84,15 +84,19 @@ Notes:
 - Collections already have an `itemOrder` field and add-to-collection mutations push into it.
 - Custom add/remove/reorder mutations now keep `itemOrder` deduplicated, prune removed items, normalize stale stored IDs, and append items missing from stored order.
 
-### 6. Share public collections to a forum discussion `[not started]`
+### 6. Share public collections to a forum discussion `[done]`
 
-- [ ] Require collection visibility to be public before it can be shared to a discussion.
-- [ ] Add mutation input / relationships for attaching a collection to a new or existing discussion.
-- [ ] Enforce forum posting permissions plus collection ownership/visibility rules.
-- [ ] Add tests for public allowed, private rejected, non-owner rejected, and missing forum permission rejected.
-- [ ] Add a `Share to forum` action on public collection detail pages.
-- [ ] Let the user choose a forum and create or attach to a discussion.
-- [ ] Hide or explain the action for private collections.
+- [x] Require collection visibility to be public before it can be shared to a discussion.
+- [x] Add mutation input / relationships for attaching a collection to a new or existing discussion.
+- [x] Enforce forum posting permissions plus collection ownership/visibility rules.
+- [x] Add tests for public allowed, private rejected, non-owner rejected, and missing forum permission rejected.
+- [x] Add a `Share to forum` action on public collection detail pages.
+- [x] Let the user choose a forum and create or attach to a discussion.
+- [x] Hide or explain the action for private collections.
+
+Notes:
+- This slice implements `shareCollectionAsDiscussion`, creating a normal forum discussion with the public collection embedded.
+- The frontend uses the existing forum picker and renders shared collections with an embedded-card treatment similar to crossposts.
 
 ### 7. Submission UI for channels that do not allow the current post type `[partial]`
 
@@ -204,11 +208,6 @@ Notes:
 Notes:
 - Discussions already have full version history.
 - The roadmap notes indicate events still do not.
-
-### 18. Channel deprecation flow `[not started]`
-
-- [ ] Add a way to deprecate or lock a channel for reasons other than sitewide-rule enforcement.
-- [ ] Define moderation/admin permissions and user-facing messaging.
 
 ## Removed From This Roadmap As Completed
 
