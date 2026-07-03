@@ -173,7 +173,12 @@ const handleMultiSelectUpdate = (
 
     <!-- Filter Groups -->
     <div class="space-y-6">
-      <div v-for="group in filterGroups" :key="group.id" class="space-y-3">
+      <div
+        v-for="group in filterGroups"
+        :key="group.id"
+        class="space-y-3"
+        :data-testid="`download-filter-group-${group.key}`"
+      >
         <h4 class="text-md font-medium text-gray-800 dark:text-gray-200">
           {{ group.displayName }}
         </h4>
