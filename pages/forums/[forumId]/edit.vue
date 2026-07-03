@@ -10,6 +10,7 @@ import { useUsername } from '@/composables/useAuthState';
 import type {
   ChannelUpdateInput,
   FilterGroup,
+  FilterOption,
   Tag as TagData,
 } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
@@ -108,6 +109,65 @@ const existingFilterGroups = computed(() => {
   return channel.value?.FilterGroups || [];
 });
 
+const isPersistedId = (id: unknown): id is string =>
+  typeof id === 'string' && id.length > 0 && !id.startsWith('local-');
+
+const toFilterOptionCreate = (option: FilterOption, optionIndex: number) => ({
+  node: {
+    id: '',
+    value: option.value,
+    displayName: option.displayName,
+    order: optionIndex,
+  },
+});
+
+const toFilterOptionUpdate = (option: FilterOption, optionIndex: number) => ({
+  where: { node: { id: option.id } },
+  update: {
+    node: {
+      value: option.value,
+      displayName: option.displayName,
+      order: optionIndex,
+    },
+  },
+});
+
+const buildFilterOptionUpdates = (
+  currentGroup: FilterGroup,
+  existingGroup?: FilterGroup
+) => {
+  const currentOptions = currentGroup.options || [];
+  const existingOptions = existingGroup?.options || [];
+  const currentExistingOptionIds = currentOptions
+    .map((option: FilterOption) => option.id)
+    .filter(isPersistedId);
+  const createdOptions = currentOptions
+    .flatMap((option: FilterOption, optionIndex: number) =>
+      !isPersistedId(option.id)
+        ? [toFilterOptionCreate(option, optionIndex)]
+        : []
+    );
+  const updatedOptions = currentOptions
+    .flatMap((option: FilterOption, optionIndex: number) =>
+      isPersistedId(option.id)
+        ? [toFilterOptionUpdate(option, optionIndex)]
+        : []
+    );
+  const deletedOptions = existingOptions
+    .filter((option: FilterOption) =>
+      !currentExistingOptionIds.includes(option.id)
+    )
+    .map((option: FilterOption) => ({
+      where: { node: { id: option.id } },
+    }));
+
+  return [
+    ...(updatedOptions.length > 0 ? updatedOptions : []),
+    ...(createdOptions.length > 0 ? [{ create: createdOptions }] : []),
+    ...(deletedOptions.length > 0 ? [{ delete: deletedOptions }] : []),
+  ];
+};
+
 const channelUpdateInput = computed<ChannelUpdateInput>(() => {
   const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
     onCreate: { node: { text: tag } },
@@ -120,25 +180,39 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
       where: { node: { text: tag } },
     }));
 
-  // Handle FilterGroups using connect/create/disconnect pattern (like Tags)
+  // Keep filter groups atomic inside the channel update: create new groups,
+  // update existing groups/options, and delete removed groups/options.
   const existingFilterGroupIds = existingFilterGroups.value.map(
     (group: FilterGroup) => group.id
   );
   const currentFilterGroupIds = formValues.value.downloadFilterGroups
     .map((group: FilterGroup) => group.id)
-    .filter(Boolean); // Only existing groups have IDs
+    .filter(isPersistedId);
 
-  // Connect to existing groups that are still selected
-  const filterGroupConnections = formValues.value.downloadFilterGroups
-    .filter((group: FilterGroup) => group.id) // Only existing groups
-    .map((group, _index) => ({
-      where: { node: { id: group.id } },
-      // Note: We might need to handle updates here if group properties changed
-    }));
+  const filterGroupUpdates = formValues.value.downloadFilterGroups
+    .filter((group: FilterGroup) => isPersistedId(group.id))
+    .map((group, index) => {
+      const existingGroup = existingFilterGroups.value.find(
+        (existingGroup: FilterGroup) => existingGroup.id === group.id
+      );
+      const optionUpdates = buildFilterOptionUpdates(group, existingGroup);
+      return {
+        where: { node: { id: group.id } },
+        update: {
+          node: {
+            key: group.key,
+            displayName: group.displayName,
+            mode: group.mode,
+            order: index,
+            ...(optionUpdates.length > 0 ? { options: optionUpdates } : {}),
+          },
+        },
+      };
+    });
 
   // Create new groups (those without IDs)
   const filterGroupCreations = formValues.value.downloadFilterGroups
-    .filter((group: FilterGroup) => !group.id) // Only new groups
+    .filter((group: FilterGroup) => !isPersistedId(group.id))
     .map((group, _index) => ({
       node: {
         id: '', // Empty ID for new groups - server will generate
@@ -148,24 +222,18 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
         order: formValues.value.downloadFilterGroups.indexOf(group),
         options: group.options
           ? {
-              create: group.options.map((option, optionIndex) => ({
-                node: {
-                  id: '', // Empty ID for new options - server will generate
-                  value: option.value,
-                  displayName: option.displayName,
-                  order: optionIndex,
-                },
-              })),
+              create: group.options.map(toFilterOptionCreate),
             }
           : undefined,
       },
     }));
 
-  // Disconnect groups that were removed
-  const filterGroupDisconnections = existingFilterGroupIds
+  // Delete groups that were removed from the settings form.
+  const filterGroupDeletions = existingFilterGroupIds
     .filter((id: string) => !currentFilterGroupIds.includes(id))
     .map((id: string) => ({
       where: { node: { id } },
+      delete: { options: [{}] },
     }));
 
   return {
@@ -184,14 +252,14 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
     allowedFileTypes: formValues.value.allowedFileTypes,
     Tags: [{ connectOrCreate: tagConnections, disconnect: tagDisconnections }],
     FilterGroups: [
-      ...(filterGroupConnections.length > 0
-        ? [{ connect: filterGroupConnections }]
+      ...(filterGroupUpdates.length > 0
+        ? filterGroupUpdates
         : []),
       ...(filterGroupCreations.length > 0
         ? [{ create: filterGroupCreations }]
         : []),
-      ...(filterGroupDisconnections.length > 0
-        ? [{ disconnect: filterGroupDisconnections }]
+      ...(filterGroupDeletions.length > 0
+        ? [{ delete: filterGroupDeletions }]
         : []),
     ],
     Admins: [

@@ -51,20 +51,23 @@ Notes:
 - This slice adds scalar permanent-removal audit fields and focused authorization/storage-failure tests for downloadable-file deletion.
 - Backend draft PR gennit-project/multiforum-backend#116 and frontend draft PR gennit-project/multiforum-nuxt#266 add verified upload storage metadata for new downloadable files, including `storageObjectName` and `storageUrl`.
 
-### 4. Download filters: review and finish include/exclude semantics `[partial]`
+### 4. Download filters: review and finish include/exclude semantics `[complete]`
 
 - [x] Confirm current exclude behavior in the actual download-list query path.
-- [ ] Make filter-group create/update/delete operations atomic and validated end-to-end.
+- [x] Make filter-group create/update/delete operations atomic and validated end-to-end.
 - [x] Ensure deleting a filter group does not leave stale selected filters in URLs or saved settings.
-- [ ] Add remaining tests for filter-group mutation validation, including invalid filter-group input.
-- [ ] Review UX details: empty-group validation, delete confirmation/reversal, clear "must include" vs "must exclude" labels, and readable/shareable URL state.
+- [x] Add remaining tests for filter-group mutation validation, including invalid filter-group input.
+- [x] Review UX details: empty-group validation, delete confirmation/reversal, clear "must include" vs "must exclude" labels, and readable/shareable URL state.
 
 Notes:
 - Channel admin UI for filter groups already exists.
 - Include/exclude modes, ordering, YAML editing, and validation are already present in the frontend.
 - This slice fixes channel download-list query semantics so `INCLUDE` groups require selected labels and `EXCLUDE` groups reject selected labels.
 - This slice also ignores stale/deleted filter groups in download queries and removes stale `filter_*` URL params after the channel filter groups load.
-- Focused tests now cover include/exclude query semantics and stale filter cleanup; atomic mutation validation remains.
+- Focused tests now cover include/exclude query semantics, stale filter cleanup, mutation validation, and settings payload persistence.
+- This slice fixes the channel settings save payload so existing filter groups/options are updated, new groups/options are created, and removed groups/options are deleted in the generated channel update mutation.
+- Backend validation middleware now rejects invalid generated filter-group mutation payloads before writes run, including invalid keys/modes, empty new groups, duplicate group keys, and duplicate option values.
+- Frontend form/YAML validation now catches invalid or duplicate filter configuration earlier and uses explicit "must include" / "must exclude" copy with remove confirmations.
 
 ### 5. Collection ordering `[partial]`
 

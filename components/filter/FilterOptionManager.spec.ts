@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { FilterMode } from '@/__generated__/graphql';
 import type { FilterGroup, FilterOption } from '@/__generated__/graphql';
@@ -36,6 +36,14 @@ const byText = (wrapper: ReturnType<typeof mountOM>, text: string) =>
   wrapper.findAll('button').find((b) => b.text() === text)!;
 
 describe('FilterOptionManager', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    Object.defineProperty(window, 'confirm', {
+      configurable: true,
+      value: vi.fn(() => true),
+    });
+  });
+
   it('renders the group index in the header', () => {
     const wrapper = mountOM({ groupIndex: 3 });
     expect(wrapper.text()).toContain('Group #3');
@@ -43,7 +51,7 @@ describe('FilterOptionManager', () => {
 
   it('shows the mode label in read mode', () => {
     const wrapper = mountOM({ filterGroup: makeGroup({ mode: FilterMode.Exclude }) });
-    expect(wrapper.text()).toContain('Exclusion');
+    expect(wrapper.text()).toContain('Must exclude selected labels');
   });
 
   it('emits moveGroup up when Move Up is clicked', async () => {
@@ -61,6 +69,13 @@ describe('FilterOptionManager', () => {
     const wrapper = mountOM();
     await byText(wrapper, 'Remove Group').trigger('click');
     expect(wrapper.emitted('removeGroup')?.[0]).toEqual(['g1']);
+  });
+
+  it('does not emit removeGroup when removal is cancelled', async () => {
+    vi.mocked(window.confirm).mockReturnValueOnce(false);
+    const wrapper = mountOM();
+    await byText(wrapper, 'Remove Group').trigger('click');
+    expect(wrapper.emitted('removeGroup')).toBeUndefined();
   });
 
   it('reveals the edit form when Edit Group Settings is clicked', async () => {
@@ -93,7 +108,7 @@ describe('FilterOptionManager', () => {
 
   it('shows the empty-options state when there are no options', () => {
     const wrapper = mountOM();
-    expect(wrapper.text()).toContain('No options configured. Add an option above.');
+    expect(wrapper.text()).toContain('No options configured. Add at least one option before saving this group.');
   });
 
   it('emits updateGroup with the new option when added', async () => {
@@ -113,6 +128,14 @@ describe('FilterOptionManager', () => {
     expect(wrapper.text()).toContain('This value already exists in this group.');
   });
 
+  it('flags an option value with invalid characters', async () => {
+    const wrapper = mountOM();
+    await byText(wrapper, '+ Add New Option').trigger('click');
+    await wrapper.get('input[placeholder="e.g. 10x20"]').setValue('bad value');
+    expect(wrapper.text()).toContain('Value can only contain letters, numbers, underscores, and hyphens.');
+    expect(byText(wrapper, 'Add Option').attributes('disabled')).toBeDefined();
+  });
+
   it('emits updateGroup with the option removed', async () => {
     const wrapper = mountOM({
       filterGroup: makeGroup({ options: [makeOption({ id: 'o1' }), makeOption({ id: 'o2', value: 'x' })] }),
@@ -120,6 +143,15 @@ describe('FilterOptionManager', () => {
     await byText(wrapper, 'Remove').trigger('click');
     const payload = wrapper.emitted('updateGroup')?.[0]?.[1] as { options: FilterOption[] };
     expect(payload.options.map((o) => o.id)).toEqual(['o2']);
+  });
+
+  it('does not remove an option when removal is cancelled', async () => {
+    vi.mocked(window.confirm).mockReturnValueOnce(false);
+    const wrapper = mountOM({
+      filterGroup: makeGroup({ options: [makeOption({ id: 'o1' })] }),
+    });
+    await byText(wrapper, 'Remove').trigger('click');
+    expect(wrapper.emitted('updateGroup')).toBeUndefined();
   });
 
   it('reorders options when moved down', async () => {

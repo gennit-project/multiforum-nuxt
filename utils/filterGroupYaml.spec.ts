@@ -37,13 +37,19 @@ describe('parseFilterGroupsYaml', () => {
 
   it('fails on an invalid mode', () => {
     expect(
-      parseFilterGroupsYaml('- key: k\n  displayName: D\n  mode: MAYBE').error
+      parseFilterGroupsYaml('- key: k\n  displayName: D\n  mode: MAYBE\n  options:\n    - value: v\n      displayName: V').error
     ).toContain('invalid mode');
   });
 
   it('defaults order to the index when omitted', () => {
-    const result = parseFilterGroupsYaml('- key: k\n  displayName: D\n  mode: INCLUDE');
+    const result = parseFilterGroupsYaml('- key: k\n  displayName: D\n  mode: INCLUDE\n  options:\n    - value: v\n      displayName: V');
     expect(result.groups?.[0].order).toBe(0);
+  });
+
+  it('fails when a group has no options', () => {
+    expect(
+      parseFilterGroupsYaml('- key: k\n  displayName: D\n  mode: INCLUDE\n  options: []').error
+    ).toContain('must include at least one option');
   });
 
   it('returns an error string for malformed YAML', () => {
