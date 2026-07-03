@@ -3,6 +3,8 @@ import type { Discussion, Comment } from '@/__generated__/graphql';
 import {
   getCollectionTypeLabel,
   getCollectionItems,
+  getCollectionItemStableId,
+  orderCollectionItems,
   buildCollectionDiscussionLink,
   resolveCollectionItemAuthor,
 } from './collectionItemUtils';
@@ -28,6 +30,7 @@ describe('getCollectionItems', () => {
     expect(
       getCollectionItems({
         collectionType: 'COMMENTS',
+        itemOrder: ['c1'],
         Comments: [{ id: 'c1' }],
         Discussions: [{ id: 'd1' }],
       })
@@ -40,6 +43,38 @@ describe('getCollectionItems', () => {
 
   it('returns an empty array for an unknown type', () => {
     expect(getCollectionItems({ collectionType: 'WIDGETS' })).toEqual([]);
+  });
+
+  it('sorts collection items by itemOrder and appends missing items', () => {
+    expect(
+      getCollectionItems({
+        collectionType: 'DOWNLOADS',
+        itemOrder: ['d2', 'stale-id'],
+        Downloads: [{ id: 'd1' }, { id: 'd2' }, { id: 'd3' }],
+      }).map((item) => item.id)
+    ).toEqual(['d2', 'd1', 'd3']);
+  });
+});
+
+describe('collection item ordering helpers', () => {
+  it('uses uniqueName as the stable ID for channel items', () => {
+    expect(getCollectionItemStableId({ uniqueName: 'sims4_builds' })).toBe(
+      'sims4_builds'
+    );
+  });
+
+  it('returns the original array when no order is stored', () => {
+    const items = [{ id: 'a' }, { id: 'b' }];
+    expect(orderCollectionItems(items, [])).toBe(items);
+  });
+
+  it('drops stale stored IDs and preserves unordered items', () => {
+    expect(
+      orderCollectionItems(
+        [{ id: 'a' }, { id: 'b' }, { id: 'c' }],
+        ['c', 'missing', 'a']
+      ).map((item) => item.id)
+    ).toEqual(['c', 'a', 'b']);
   });
 });
 

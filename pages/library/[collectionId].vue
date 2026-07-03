@@ -12,6 +12,7 @@ import {
 import {
   UPDATE_COLLECTION,
   DELETE_COLLECTION,
+  REORDER_COLLECTION_ITEM,
 } from '@/graphQLData/collection/mutations';
 import GenericModal from '@/components/GenericModal.vue';
 import WarningModal from '@/components/WarningModal.vue';
@@ -21,6 +22,7 @@ import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import {
   getCollectionTypeLabel,
   getCollectionItems,
+  getCollectionItemStableId,
   buildCollectionDiscussionLink,
   resolveCollectionItemAuthor,
 } from '@/utils/collectionItemUtils';
@@ -138,8 +140,27 @@ const {
   loading: deleteLoading,
   error: deleteError,
 } = useMutation(DELETE_COLLECTION);
+const {
+  mutate: reorderCollectionItem,
+  loading: reorderLoading,
+  error: reorderError,
+} = useMutation(REORDER_COLLECTION_ITEM);
 const visibilityUpdating = ref(false);
 const visibilityError = ref<string | null>(null);
+
+const getItemId = (item: unknown) => getCollectionItemStableId(item);
+
+const moveCollectionItem = async (item: unknown, newPosition: number) => {
+  const itemId = getItemId(item);
+  if (!itemId || newPosition < 0 || newPosition >= items.value.length) return;
+
+  await reorderCollectionItem({
+    collectionId: collectionId.value,
+    itemId,
+    newPosition,
+  });
+  await refetchCollection();
+};
 
 // Open rename modal with current values
 const openRenameModal = () => {
@@ -333,6 +354,12 @@ const handleDelete = async () => {
                     >
                       {{ visibilityError }}
                     </p>
+                    <p
+                      v-if="reorderError"
+                      class="mt-1 text-sm text-red-600 dark:text-red-400"
+                    >
+                      Could not update collection order: {{ reorderError.message }}
+                    </p>
                   </div>
 
                   <!-- Action buttons -->
@@ -445,53 +472,75 @@ const handleDelete = async () => {
                 class="space-y-4"
               >
                 <template
-                  v-for="discussion in items"
-                  :key="discussion.id"
+                  v-for="(discussion, index) in items"
+                  :key="getItemId(discussion)"
                 >
-                  <LibraryDownloadCard
-                    v-if="collection.collectionType === 'DOWNLOADS'"
-                    :download="discussion"
-                    :download-link="getDiscussionLink(discussion)"
-                    :channel-link="
-                      discussion.DiscussionChannels?.[0]?.channelUniqueName
-                        ? `/forums/${discussion.DiscussionChannels[0].channelUniqueName}`
-                        : '/'
-                    "
-                    :channel-unique-name="
-                      discussion.DiscussionChannels?.[0]?.channelUniqueName || ''
-                    "
-                    :author-info="getAuthorInfo(discussion)"
-                    :preview-image-url="getPreviewImage(discussion)"
-                    :show-favorite-button="true"
-                    :allow-add-to-list="true"
-                    :is-favorited="Boolean(discussion.isFavorited)"
-                  />
-                  <LibraryDiscussionCard
-                    v-else
-                    :discussion="discussion"
-                    :discussion-link="getDiscussionLink(discussion)"
-                    :channel-link="
-                      discussion.DiscussionChannels?.[0]?.channelUniqueName
-                        ? `/forums/${discussion.DiscussionChannels[0].channelUniqueName}`
-                        : '/'
-                    "
-                    :channel-unique-name="
-                      discussion.DiscussionChannels?.[0]?.channelUniqueName || ''
-                    "
-                    :author-info="getAuthorInfo(discussion)"
-                    :comment-count="
-                      discussion.DiscussionChannels?.reduce(
-                        (
-                          total: number,
-                          item: CollectionDiscussionChannel
-                        ) => total + (item.CommentsAggregate?.count || 0),
-                        0
-                      ) || 0
-                    "
-                    :show-favorite-button="true"
-                    :allow-add-to-list="true"
-                    :is-favorited="Boolean(discussion.isFavorited)"
-                  />
+                  <div class="grid gap-3 md:grid-cols-[auto,minmax(0,1fr)] md:items-start">
+                    <div class="flex gap-2 md:flex-col">
+                      <button
+                        type="button"
+                        class="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                        :disabled="index === 0 || reorderLoading"
+                        :aria-label="`Move ${discussion.title || 'item'} up`"
+                        @click="moveCollectionItem(discussion, index - 1)"
+                      >
+                        Up
+                      </button>
+                      <button
+                        type="button"
+                        class="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                        :disabled="index === items.length - 1 || reorderLoading"
+                        :aria-label="`Move ${discussion.title || 'item'} down`"
+                        @click="moveCollectionItem(discussion, index + 1)"
+                      >
+                        Down
+                      </button>
+                    </div>
+                    <LibraryDownloadCard
+                      v-if="collection.collectionType === 'DOWNLOADS'"
+                      :download="discussion"
+                      :download-link="getDiscussionLink(discussion)"
+                      :channel-link="
+                        discussion.DiscussionChannels?.[0]?.channelUniqueName
+                          ? `/forums/${discussion.DiscussionChannels[0].channelUniqueName}`
+                          : '/'
+                      "
+                      :channel-unique-name="
+                        discussion.DiscussionChannels?.[0]?.channelUniqueName || ''
+                      "
+                      :author-info="getAuthorInfo(discussion)"
+                      :preview-image-url="getPreviewImage(discussion)"
+                      :show-favorite-button="true"
+                      :allow-add-to-list="true"
+                      :is-favorited="Boolean(discussion.isFavorited)"
+                    />
+                    <LibraryDiscussionCard
+                      v-else
+                      :discussion="discussion"
+                      :discussion-link="getDiscussionLink(discussion)"
+                      :channel-link="
+                        discussion.DiscussionChannels?.[0]?.channelUniqueName
+                          ? `/forums/${discussion.DiscussionChannels[0].channelUniqueName}`
+                          : '/'
+                      "
+                      :channel-unique-name="
+                        discussion.DiscussionChannels?.[0]?.channelUniqueName || ''
+                      "
+                      :author-info="getAuthorInfo(discussion)"
+                      :comment-count="
+                        discussion.DiscussionChannels?.reduce(
+                          (
+                            total: number,
+                            item: CollectionDiscussionChannel
+                          ) => total + (item.CommentsAggregate?.count || 0),
+                          0
+                        ) || 0
+                      "
+                      :show-favorite-button="true"
+                      :allow-add-to-list="true"
+                      :is-favorited="Boolean(discussion.isFavorited)"
+                    />
+                  </div>
                 </template>
               </div>
 
@@ -499,47 +548,119 @@ const handleDelete = async () => {
                 v-else-if="collection.collectionType === 'CHANNELS'"
                 class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
               >
-                <LibraryChannelCard
-                  v-for="channel in items"
-                  :key="channel.uniqueName"
-                  :channel="channel"
-                  :show-favorite-button="true"
-                  :allow-add-to-list="true"
-                  :is-favorited="Boolean(channel.isFavorited)"
-                />
+                <div
+                  v-for="(channel, index) in items"
+                  :key="getItemId(channel)"
+                  class="space-y-2"
+                >
+                  <div class="flex gap-2">
+                    <button
+                      type="button"
+                      class="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                      :disabled="index === 0 || reorderLoading"
+                      :aria-label="`Move ${channel.displayName || channel.uniqueName || 'forum'} up`"
+                      @click="moveCollectionItem(channel, index - 1)"
+                    >
+                      Up
+                    </button>
+                    <button
+                      type="button"
+                      class="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                      :disabled="index === items.length - 1 || reorderLoading"
+                      :aria-label="`Move ${channel.displayName || channel.uniqueName || 'forum'} down`"
+                      @click="moveCollectionItem(channel, index + 1)"
+                    >
+                      Down
+                    </button>
+                  </div>
+                  <LibraryChannelCard
+                    :channel="channel"
+                    :show-favorite-button="true"
+                    :allow-add-to-list="true"
+                    :is-favorited="Boolean(channel.isFavorited)"
+                  />
+                </div>
               </div>
 
               <div
                 v-else-if="collection.collectionType === 'COMMENTS'"
                 class="space-y-4"
               >
-                <LibraryCommentCard
-                  v-for="comment in items"
-                  :key="comment.id"
-                  :comment="comment"
-                  :author-info="getAuthorInfo(comment)"
-                  :context-type="getCommentContextType(comment)"
-                  :context-title="getCommentContextTitle(comment)"
-                  :context-permalink="getCommentContextPermalink(comment)"
-                  :permalink="getCommentPermalink(comment)"
-                  :show-favorite-button="true"
-                  :allow-add-to-list="true"
-                  :is-favorited="Boolean(comment.isFavorited)"
-                />
+                <div
+                  v-for="(comment, index) in items"
+                  :key="getItemId(comment)"
+                  class="grid gap-3 md:grid-cols-[auto,minmax(0,1fr)] md:items-start"
+                >
+                  <div class="flex gap-2 md:flex-col">
+                    <button
+                      type="button"
+                      class="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                      :disabled="index === 0 || reorderLoading"
+                      aria-label="Move comment up"
+                      @click="moveCollectionItem(comment, index - 1)"
+                    >
+                      Up
+                    </button>
+                    <button
+                      type="button"
+                      class="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                      :disabled="index === items.length - 1 || reorderLoading"
+                      aria-label="Move comment down"
+                      @click="moveCollectionItem(comment, index + 1)"
+                    >
+                      Down
+                    </button>
+                  </div>
+                  <LibraryCommentCard
+                    :comment="comment"
+                    :author-info="getAuthorInfo(comment)"
+                    :context-type="getCommentContextType(comment)"
+                    :context-title="getCommentContextTitle(comment)"
+                    :context-permalink="getCommentContextPermalink(comment)"
+                    :permalink="getCommentPermalink(comment)"
+                    :show-favorite-button="true"
+                    :allow-add-to-list="true"
+                    :is-favorited="Boolean(comment.isFavorited)"
+                  />
+                </div>
               </div>
 
               <div
                 v-else-if="collection.collectionType === 'IMAGES'"
                 class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
               >
-                <ImageListItem
-                  v-for="image in items"
-                  :key="image.id"
-                  :image="image"
-                  :username="image.Uploader?.username || ''"
-                  :show-favorite-button="false"
-                  :allow-add-to-list="true"
-                />
+                <div
+                  v-for="(image, index) in items"
+                  :key="getItemId(image)"
+                  class="space-y-2"
+                >
+                  <div class="flex gap-2">
+                    <button
+                      type="button"
+                      class="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                      :disabled="index === 0 || reorderLoading"
+                      :aria-label="`Move ${image.alt || 'image'} up`"
+                      @click="moveCollectionItem(image, index - 1)"
+                    >
+                      Up
+                    </button>
+                    <button
+                      type="button"
+                      class="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                      :disabled="index === items.length - 1 || reorderLoading"
+                      :aria-label="`Move ${image.alt || 'image'} down`"
+                      @click="moveCollectionItem(image, index + 1)"
+                    >
+                      Down
+                    </button>
+                  </div>
+                  <ImageListItem
+                    :image="image"
+                    :username="image.Uploader?.username || ''"
+                    :show-favorite-button="false"
+                    :allow-add-to-list="true"
+                  />
+                </div>
               </div>
             </template>
           </div>
