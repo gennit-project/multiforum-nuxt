@@ -364,7 +364,7 @@ watchEffect(() => {
     script: [
       {
         type: 'application/ld+json',
-        children: JSON.stringify(
+        innerHTML: JSON.stringify(
           buildEventStructuredData({
             event: event.value,
             baseUrl: import.meta.env.VITE_BASE_URL,

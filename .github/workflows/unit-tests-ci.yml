@@ -43,20 +43,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: 'npm'
+          cache: 'pnpm'
 
-      - name: Clean install dependencies
-        run: npm ci --legacy-peer-deps
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Run TypeScript type checking
-        run: npm run tsc
+        run: pnpm run tsc
 
       - name: Run unit tests with coverage
-        run: npm run coverage
+        run: pnpm run coverage
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
@@ -68,7 +71,7 @@ jobs:
           verbose: true
 
       - name: Run linting
-        run: npm run lint
+        run: pnpm run lint
 
   playwright-tests:
     runs-on: ubuntu-latest
@@ -107,17 +110,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: 'npm'
+          cache: 'pnpm'
 
-      - name: Clean install dependencies
-        run: npm ci --legacy-peer-deps
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Build app (mock mode, standalone Nitro server)
         env:
@@ -129,12 +135,12 @@ jobs:
           VITE_SERVER_NAME: Playwright Test Server
           # Skip Sentry source-map upload / release creation for the test build.
           VITE_SENTRY_AUTH_TOKEN: ''
-        run: npm run build
+        run: pnpm run build
 
       - name: Run Playwright tests (parallel, against the build)
         env:
           PLAYWRIGHT_WORKERS: '4'
-        run: npx playwright test --config playwright.build.config.ts
+        run: pnpm exec playwright test --config playwright.build.config.ts
 
       - name: Upload Playwright report on failure
         if: failure()

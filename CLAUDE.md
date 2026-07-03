@@ -5,13 +5,13 @@
 
 ## Build & Run Commands
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run test:playwright` - Run Playwright tests
-- `npm run test:unit` - Run unit tests with Vitest
-- `npm run test:playwright:mocked -- tests/playwright/mocked/discussions/createEditDeleteDiscussions.spec.ts` - Run a specific mocked Playwright test
-- `npm run tsc` - Run TypeScript type checking
-- `npx eslint --fix path/to/file.vue` - Fix linting issues
+- `pnpm run dev` - Start development server
+- `pnpm run build` - Build for production
+- `pnpm run test:playwright` - Run Playwright tests
+- `pnpm run test:unit` - Run unit tests with Vitest
+- `pnpm run test:playwright:mocked -- tests/playwright/mocked/discussions/createEditDeleteDiscussions.spec.ts` - Run a specific mocked Playwright test
+- `pnpm run tsc` - Run TypeScript type checking
+- `pnpm exec eslint --fix path/to/file.vue` - Fix linting issues
 
 ## Playwright Testing (E2E)
 
@@ -53,8 +53,8 @@
 ## Vitest Testing (Unit)
 
 - Unit tests live in `tests/unit` or colocated next to the file under test (`Foo.vue` → `Foo.spec.ts`)
-- Run all unit tests with `npm run test:unit`
-- Run specific tests with `npm run test:unit -- --run tests/unit/path/to/test.spec.ts`
+- Run all unit tests with `pnpm run test:unit`
+- Run specific tests with `pnpm run test:unit -- --run tests/unit/path/to/test.spec.ts`
 - Use exactly one `expect(...)` assertion per `it(...)` test case
 - If you need multiple checks, split into multiple `it(...)` blocks or combine into a single structured `expect(...)`
 - Prefer `it.each(...)` tables when it helps keep tests DRY
@@ -95,8 +95,8 @@ Hard-won pitfalls (full detail + code in [CONTRIBUTING.md](./CONTRIBUTING.md#fro
 
 - TypeScript type checking and unit tests run automatically before each commit
 - The pre-commit hook runs the `verify` command which includes:
-  - TypeScript type checking (`npm run tsc`)
-  - Unit tests (`npm run test:unit:run`)
+  - TypeScript type checking (`pnpm run tsc`)
+  - Unit tests (`pnpm run test:unit:run`)
 - Modified files are checked with lint-staged
   - TS and Vue files: ESLint + unit tests
   - Test files: Run the specific test that changed
@@ -108,7 +108,7 @@ Hard-won pitfalls (full detail + code in [CONTRIBUTING.md](./CONTRIBUTING.md#fro
   - **Import GraphQL Types**: When fixing TypeScript errors, prefer importing proper types from `@/__generated__/graphql` over using `any`
   - **Examples**: Use `User`, `Comment`, `Discussion`, `Event`, `Revision`, `TextVersion` etc. from the generated GraphQL schema
   - **Avoid `any`**: Only use `any` as a last resort when proper types are not available
-  - **Type Checking**: Use `npm run tsc` (which runs `vue-tsc --noEmit`) for proper Vue component type checking
+  - **Type Checking**: Use `pnpm run tsc` (which runs `vue-tsc --noEmit`) for proper Vue component type checking
 
 ### Common TypeScript Patterns and Fixes
 

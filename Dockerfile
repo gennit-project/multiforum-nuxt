@@ -1,15 +1,18 @@
-FROM node:20-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# Enable pnpm via corepack (version pinned by package.json "packageManager")
+RUN corepack enable
 
-RUN npm install
+COPY package.json pnpm-lock.yaml ./
+
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
 # Build the Nuxt application
-RUN npm run build
+RUN pnpm run build
 
 EXPOSE 3000
 

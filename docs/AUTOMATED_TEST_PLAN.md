@@ -16,23 +16,23 @@ All test phases have been implemented. See the "Completed Phases" section below 
 
 ```bash
 # Run all unit tests
-npm run test:unit
+pnpm run test:unit
 
 # Run specific test file
-npm run test:unit -- --run tests/unit/composables/useUserSuspension.spec.ts
+pnpm run test:unit -- --run tests/unit/composables/useUserSuspension.spec.ts
 
 # Run tests matching pattern
-npm run test:unit -- --run suspension
+pnpm run test:unit -- --run suspension
 ```
 
 ### Frontend Playwright Tests
 
 ```bash
 # Run all Playwright tests (mocked backend)
-npm run test:playwright:mocked
+pnpm run test:playwright:mocked
 
 # Run specific test file
-npm run test:playwright:mocked -- tests/playwright/mocked/suspensions/userSuspension.spec.ts
+pnpm run test:playwright:mocked -- tests/playwright/mocked/suspensions/userSuspension.spec.ts
 ```
 
 ### Backend Unit Tests
@@ -41,7 +41,7 @@ npm run test:playwright:mocked -- tests/playwright/mocked/suspensions/userSuspen
 cd /Users/catherineluse/gennit/gennit-backend
 
 # Run all tests
-npm test
+pnpm test
 
 # Run specific test file
 node --test --experimental-strip-types hooks/suspensionCleanupHook.test.ts

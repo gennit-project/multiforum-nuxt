@@ -469,9 +469,9 @@ const warningModalBody = computed(() => {
           :aria-label="'Discussion actions'"
           @handle-edit="
             router.push(
-              discussion.hasDownload
-                ? `/forums/${channelId}/downloads/edit/${discussion.id}`
-                : `/forums/${channelId}/discussions/edit/${discussion.id}`
+              discussion?.hasDownload
+                ? `/forums/${channelId}/downloads/edit/${discussion?.id}`
+                : `/forums/${channelId}/discussions/edit/${discussion?.id}`
             )
           "
           @handle-delete="deleteModalIsOpen = true"
@@ -487,7 +487,7 @@ const warningModalBody = computed(() => {
               name: 'forums-forumId-discussions-feedback-discussionId',
               params: {
                 forumId: defaultChannel,
-                discussionId: discussion.id,
+                discussionId: discussion?.id,
               },
             })
           "

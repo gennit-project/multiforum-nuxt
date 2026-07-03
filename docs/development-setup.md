@@ -27,11 +27,11 @@ When using Docker Compose, variables can be supplied from environment or `.env`.
 
 Core commands:
 
-- `npm run dev` - start development server
-- `npm run build` - build for production
-- `npm run tsc` - TypeScript type checking
-- `npm run test:unit` - run unit tests
-- `npm run test:playwright` - run Playwright tests
+- `pnpm run dev` - start development server
+- `pnpm run build` - build for production
+- `pnpm run tsc` - TypeScript type checking
+- `pnpm run test:unit` - run unit tests
+- `pnpm run test:playwright` - run Playwright tests
 
 For detailed development standards, testing conventions, and workflow guidance, see [CLAUDE.md](../CLAUDE.md).
 

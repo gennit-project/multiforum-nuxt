@@ -111,7 +111,7 @@ bookkeeping.
   [`graphQLData/`](../graphQLData), organized by domain (`discussion/`,
   `comment/`, `channel/`, `event/`, `issue/`, …).
 - **Types** are generated from the backend schema into
-  [`__generated__/`](../__generated__) (`npm run compile`, config in
+  [`__generated__/`](../__generated__) (`pnpm run compile`, config in
   [`codegen.ts`](../codegen.ts)). Components import these generated types
   (`Discussion`, `Comment`, `Event`, …) so the API contract and the UI cannot
   silently drift.
@@ -186,11 +186,11 @@ schema live in the
 
 - **End-to-end types.** TypeScript in strict mode; GraphQL types are generated
   from the schema, so a screen and the API contract can't silently diverge. Type
-  checking runs via `npm run tsc` (`vue-tsc`).
+  checking runs via `pnpm run tsc` (`vue-tsc`).
 - **Tested at two levels.** Unit/component tests run on
-  [Vitest](https://vitest.dev/) + Vue Test Utils (`npm run test:unit`);
+  [Vitest](https://vitest.dev/) + Vue Test Utils (`pnpm run test:unit`);
   end-to-end flows run on [Playwright](https://playwright.dev/) with **mocked
-  GraphQL**, so E2E needs no backend (`npm run test:playwright`). See
+  GraphQL**, so E2E needs no backend (`pnpm run test:playwright`). See
   [AUTOMATED_TEST_PLAN.md](./AUTOMATED_TEST_PLAN.md).
 - **Pre-commit gates.** Husky runs type checking and unit tests, and ESLint
   (with accessibility rules) on staged files, before each commit.

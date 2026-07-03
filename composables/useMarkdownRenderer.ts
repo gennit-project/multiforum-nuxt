@@ -6,6 +6,10 @@ import sanitizeHtml from 'sanitize-html';
 import { generateHeadingId } from '@/utils/markdown';
 import { config } from '@/config';
 
+// markdown-it's `Options` is a namespace member, not a named export; derive it
+// from the Renderer so it resolves under `moduleResolution: bundler`.
+type MarkdownItOptions = Parameters<Renderer['renderToken']>[2];
+
 const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 const USER_MENTION_REGEX =
   /(^|[^A-Za-z0-9_]|(?<!https?:\/\/[\w.-]+))(u\/|@)([a-zA-Z0-9_-]+)/g;
@@ -98,7 +102,7 @@ export function useMarkdownRenderer() {
   md.renderer.rules.link_open = (
     tokens: Token[],
     idx: number,
-    options: MarkdownIt.Options,
+    options: MarkdownItOptions,
     _env: unknown,
     self: Renderer
   ): string => {
@@ -119,7 +123,7 @@ export function useMarkdownRenderer() {
   md.renderer.rules.heading_open = (
     tokens: Token[],
     idx: number,
-    options: MarkdownIt.Options,
+    options: MarkdownItOptions,
     _env: unknown,
     self: Renderer
   ): string => {
@@ -143,7 +147,7 @@ export function useMarkdownRenderer() {
   md.renderer.rules.link_close = (
     tokens: Token[],
     idx: number,
-    options: MarkdownIt.Options,
+    options: MarkdownItOptions,
     _env: unknown,
     self: Renderer
   ) => {

@@ -71,7 +71,12 @@ describe('download detail page wrapper', () => {
     h.onResult?.({ data: { discussions: [] } });
     expect(h.useHead).toHaveBeenCalledWith({
       title: 'Download Not Found | cats',
-      description: 'The requested download could not be found.',
+      meta: [
+        {
+          name: 'description',
+          content: 'The requested download could not be found.',
+        },
+      ],
     });
   });
 

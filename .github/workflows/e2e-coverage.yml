@@ -29,33 +29,35 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: 'npm'
+          cache: 'pnpm'
 
-      - run: npm ci --legacy-peer-deps
+      - run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
 
       # Unit coverage (Istanbul lcov) -> coverage/lcov.info
       - name: Unit coverage
-        run: npm run coverage
+        run: pnpm run coverage
 
       # E2E coverage: sourcemap build, collect browser V8, map to source -> lcov
       - name: Build app (mock mode + source maps)
-        run: npm run coverage:e2e:build
+        run: pnpm run coverage:e2e:build
 
       # Coverage is the goal, not pass/fail: collecting V8 adds overhead that can
       # push a couple of interaction-heavy specs past their timeout. Those tests
       # still write their coverage in teardown, so don't fail the job on them.
       - name: Collect E2E coverage
-        run: npm run coverage:e2e:collect
+        run: pnpm run coverage:e2e:collect
         continue-on-error: true
 
       - name: Build E2E coverage report
-        run: npm run coverage:e2e:report
+        run: pnpm run coverage:e2e:report
 
       # Upload both as separate flags; Codecov merges them into one number.
       - name: Upload unit coverage

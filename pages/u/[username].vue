@@ -107,7 +107,12 @@ watchEffect(() => {
   if (!user.value) {
     useHead({
       title: username.value ? `${username.value} - Profile` : 'User Not Found',
-      description: 'The requested user profile could not be found.',
+      meta: [
+        {
+          name: 'description',
+          content: 'The requested user profile could not be found.',
+        },
+      ],
     });
     return;
   }
@@ -131,9 +136,11 @@ watchEffect(() => {
   // Set basic SEO meta tags
   useHead({
     title: `${userName} | ${serverName}`,
-    description: description,
-    image: profilePic,
-    type: 'profile',
+    meta: [
+      { name: 'description', content: description },
+      { property: 'og:image', content: profilePic },
+      { property: 'og:type', content: 'profile' },
+    ],
   });
 
   // Add structured data for rich results
@@ -141,7 +148,7 @@ watchEffect(() => {
     script: [
       {
         type: 'application/ld+json',
-        children: JSON.stringify({
+        innerHTML: JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'Person',
           name: userName,
