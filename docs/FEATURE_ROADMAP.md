@@ -117,32 +117,22 @@ Notes:
 - That filtering currently hides unsupported channels instead of clearly explaining why they are unavailable.
 - Downloads remain intentionally forum-specific for now, because forum-specific labels/filter groups and ownership context make multi-forum submission more ambiguous.
 
-### 8. User profile pinned posts `[not started]`
+### 8. Images in multiple albums and fuller image-usage display `[partial]`
 
-- [ ] Define eligible pinned content types.
-- [ ] Add a profile-level ordered relationship or ordered ID list with a max of four items.
-- [ ] Add mutations to pin, unpin, and reorder pinned posts with ownership checks.
-- [ ] Add tests for pin limit, owner-only updates, reorder, and deleted/archived content behavior.
-- [ ] Render pinned posts on profile pages.
-- [ ] Show edit controls only to the profile owner.
-- [ ] Add clear empty states and limit messaging.
-
-### 9. Images in multiple albums and fuller image-usage display `[partial]`
-
-- [ ] Change album-image modeling so one image can belong to multiple albums without re-uploading.
-- [ ] Preserve uploader/original attribution on the image node anywhere it is reused.
+- [x] Change album-image modeling so one image can belong to multiple albums without re-uploading. `[in backend PR]`
+- [x] Preserve uploader/original attribution on the image node anywhere it is reused by linking the same image node instead of creating a copy. `[in backend/frontend PRs]`
 - [ ] Define permissions for adding someone else's image to a collection or album.
-- [ ] Add image-detail query support for albums containing the image, grouped into original-poster-owned albums vs other users' albums.
-- [ ] Add tests for multi-album membership, attribution preservation, permission enforcement, and grouped album results.
+- [x] Add image-detail query support for albums containing the image, grouped into original-poster-owned albums vs other users' albums. `[in backend PR]`
+- [x] Add tests for plural album membership during upload creation and grouped album results. `[in backend/frontend PRs]`
+- [ ] Add tests for permission enforcement and existing-image add/remove flows.
 - [ ] Update album add/remove flows to link existing images instead of requiring re-upload.
 - [ ] Let users save permitted images from someone else's album to their own library/collection.
-- [ ] On image detail pages, show grouped image usage by original poster vs others.
+- [x] On image detail pages, show grouped image usage by original poster vs others. `[in frontend PR]`
 
 Notes:
-- The frontend already shows some cross-album/image-usage behavior.
-- The current image detail page still appears centered on a single `Album`, not the full grouped usage model in this roadmap item.
+- The remaining work in this section is the user-facing reuse flow: permissions, adding existing images to albums/collections, and tests around those actions.
 
-### 10. Permanent media deletion and storage cleanup `[partial]`
+### 9. Permanent media deletion and storage cleanup `[partial]`
 
 - [x] Let authorized users delete album images permanently and remove the backing object from GCP/storage. `[in this PR]`
 - [x] Store backend-verified storage metadata for new image and downloadable-file uploads, including the actual storage URL/object name returned by signed upload creation. `[in draft PR]`
@@ -160,28 +150,28 @@ Notes:
 - Album edit deletion now confirms and calls the backend permanent-delete mutation before removing the image from the album UI.
 - This slice adds storage-backed permanent delete for URL-backed profile images and forum banners by resolving active URLs through upload audit metadata before clearing the owning profile/forum field.
 
-### 11. Wiki: pinned sidebar pages `[not started]`
+### 10. Wiki: pinned sidebar pages `[not started]`
 
 - [ ] Add channel-sidebar support for pinned wiki pages.
 - [ ] Let channel owners and authorized moderators pin an existing wiki page from channel UI.
 - [ ] Add a matching action from wiki detail pages.
 
-### 12. Wiki: lock wiki pages to owners `[not started]`
+### 11. Wiki: lock wiki pages to owners `[not started]`
 
 - [ ] Add a lock state for wiki pages.
 - [ ] Restrict editing of locked wiki pages to channel owners per product rules.
 
-### 13. Moderation: sticky comment on discussion or event `[not started]`
+### 12. Moderation: sticky comment on discussion or event `[not started]`
 
 - [ ] Let moderators sticky a comment so it appears at the top of a discussion or event comment list.
 - [ ] Define ordering, permissions, and unsticky behavior.
 
-### 14. Wiki search: featured wiki pages from server settings `[not started]`
+### 13. Wiki search: featured wiki pages from server settings `[not started]`
 
 - [ ] Add server-admin configuration for featured wiki pages.
 - [ ] Surface featured pages in `/wiki/search`.
 
-### 15. Favorites API optimization `[partial]`
+### 14. Favorites API optimization `[partial]`
 
 - [ ] Update image and channel list queries to include computed favorite state where missing.
 - [ ] Pass `initialIsFavorited` from parent list components consistently.
@@ -192,12 +182,12 @@ Notes:
 - Image and channel favorite buttons now accept `initialIsFavorited`.
 - Comments still appear to use a separate lookup path.
 
-### 16. Auto-save for server settings and channel admin settings `[not started]`
+### 15. Auto-save for server settings and channel admin settings `[not started]`
 
 - [ ] Replace explicit save-button flows where appropriate with autosave behavior.
 - [ ] Start with plugins/settings areas called out in the original note.
 
-### 17. Event edit history: title and description revisions `[partial]`
+### 16. Event edit history: title and description revisions `[partial]`
 
 - [ ] Add event version-history schema fields for title and description revisions plus `DescriptionLastEditedBy`.
 - [ ] Add backend middleware/hook logic to snapshot prior values on update.

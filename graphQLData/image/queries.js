@@ -18,7 +18,7 @@ export const GET_IMAGE_DETAILS = gql`
         displayName
         profilePicURL
       }
-      Album {
+      Albums {
         id
         imageOrder
         Owner {
@@ -33,6 +33,57 @@ export const GET_IMAGE_DETAILS = gql`
           Uploader {
             username
           }
+        }
+        Discussions {
+          id
+          title
+          createdAt
+          Author {
+            username
+            displayName
+          }
+          DiscussionChannels {
+            id
+            channelUniqueName
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_IMAGE_ALBUM_USAGE = gql`
+  query GetImageAlbumUsage($imageId: ID!) {
+    getImageAlbumUsage(imageId: $imageId) {
+      imageId
+      uploaderUsername
+      uploaderOwnedAlbums {
+        id
+        imageOrder
+        Owner {
+          username
+          displayName
+        }
+        Discussions {
+          id
+          title
+          createdAt
+          Author {
+            username
+            displayName
+          }
+          DiscussionChannels {
+            id
+            channelUniqueName
+          }
+        }
+      }
+      otherAlbums {
+        id
+        imageOrder
+        Owner {
+          username
+          displayName
         }
         Discussions {
           id

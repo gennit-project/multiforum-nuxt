@@ -3,7 +3,10 @@ import { config } from '@/config';
 import { computed, watchEffect, ref, onMounted, onUnmounted } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useRoute, useHead } from 'nuxt/app';
-import { GET_IMAGE_DETAILS } from '@/graphQLData/image/queries';
+import {
+  GET_IMAGE_ALBUM_USAGE,
+  GET_IMAGE_DETAILS,
+} from '@/graphQLData/image/queries';
 import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
 import type { Image } from '@/__generated__/graphql';
 import { useCopyCurrentUrl } from '@/composables/useCopyCurrentUrl';
@@ -25,6 +28,52 @@ import AlbumThumbnailGrid from '@/components/album/AlbumThumbnailGrid.vue';
 import { useImageZoomPan } from '@/composables/useImageZoomPan';
 
 const usernameVar = useUsername();
+
+type AlbumUsageDiscussion = {
+  id: string;
+  title?: string | null;
+  createdAt?: string | null;
+  Author?: {
+    username?: string | null;
+    displayName?: string | null;
+  } | null;
+  DiscussionChannels?: Array<{
+    id?: string | null;
+    channelUniqueName?: string | null;
+  }> | null;
+};
+
+type AlbumUsageAlbum = {
+  id: string;
+  imageOrder?: string[] | null;
+  Owner?: {
+    username?: string | null;
+    displayName?: string | null;
+  } | null;
+  Images?: Array<{
+    id: string;
+    url?: string | null;
+    alt?: string | null;
+    caption?: string | null;
+    Uploader?: {
+      username?: string | null;
+    } | null;
+  }> | null;
+  Discussions?: AlbumUsageDiscussion[] | null;
+};
+
+type ImageWithAlbums = Image & {
+  Albums?: AlbumUsageAlbum[] | null;
+};
+
+type ImageAlbumUsageResult = {
+  getImageAlbumUsage?: {
+    imageId: string;
+    uploaderUsername?: string | null;
+    uploaderOwnedAlbums?: AlbumUsageAlbum[] | null;
+    otherAlbums?: AlbumUsageAlbum[] | null;
+  } | null;
+};
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
@@ -62,10 +111,21 @@ const {
   })
 );
 
-const image = computed((): Image | null => {
+const { result: albumUsageResult } = useQuery<ImageAlbumUsageResult>(
+  GET_IMAGE_ALBUM_USAGE,
+  () => ({
+    imageId: imageId.value,
+  }),
+  () => ({
+    enabled: !!imageId.value,
+    fetchPolicy: 'network-only',
+  })
+);
+
+const image = computed((): ImageWithAlbums | null => {
   if (imageError.value) return null;
   if (imageResult.value && imageResult.value.images.length > 0) {
-    return imageResult.value.images[0];
+    return imageResult.value.images[0] as ImageWithAlbums;
   }
   return null;
 });
@@ -145,15 +205,51 @@ const saveAlt = async () => {
   }
 };
 
-// Album discussions - discussions that use the album containing this image
+const albumUsage = computed(() => {
+  return albumUsageResult.value?.getImageAlbumUsage || null;
+});
+
+const uploaderOwnedAlbums = computed(() => {
+  return albumUsage.value?.uploaderOwnedAlbums || [];
+});
+
+const otherAlbums = computed(() => {
+  return albumUsage.value?.otherAlbums || [];
+});
+
+const albumUsageSections = computed(() => {
+  return [
+    {
+      title: 'Albums by the uploader',
+      albums: uploaderOwnedAlbums.value,
+    },
+    {
+      title: 'Albums by other users',
+      albums: otherAlbums.value,
+    },
+  ].filter((section) => section.albums.length > 0);
+});
+
+const hasAlbumUsage = computed(() => albumUsageSections.value.length > 0);
+
+const primaryAlbum = computed(() => {
+  const albums = image.value?.Albums || [];
+  return (
+    albums.find((album) => album.Owner?.username === uploader.value?.username) ||
+    albums[0] ||
+    null
+  );
+});
+
+// Album discussions - discussions that use the primary album containing this image
 const albumDiscussions = computed(() => {
-  return image.value?.Album?.Discussions || [];
+  return primaryAlbum.value?.Discussions || [];
 });
 
 // Album images - ordered according to imageOrder (utils/albumImageOrder),
 // excluding the current image.
 const albumImages = computed(() => {
-  const album = image.value?.Album;
+  const album = primaryAlbum.value;
   if (!album?.Images) return [];
 
   return orderImagesByOrder({
@@ -556,38 +652,68 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <!-- Appears in album -->
+          <!-- Appears in albums -->
           <div
-            v-if="image.Album && uploader?.username"
+            v-if="hasAlbumUsage"
             class="rounded-lg border bg-white p-6 dark:bg-gray-900"
           >
             <h2 class="font-semibold mb-3 text-lg dark:text-gray-300">
               Appears in
             </h2>
-            <NuxtLink
-              :to="`/u/${uploader.username}/albums/${image.Album.id}`"
-              class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              Album by {{ uploader.displayName || uploader.username }}
-              <span v-if="uploader.displayName">({{ uploader.username }})</span>
-            </NuxtLink>
+
             <div
-              v-if="albumDiscussions.length > 0 && albumDiscussions[0]"
-              class="mt-3 border-t pt-3 dark:border-gray-700"
+              v-for="section in albumUsageSections"
+              :key="section.title"
+              class="space-y-3"
             >
-              <p class="mb-2 text-sm text-gray-600 dark:text-gray-400">
-                Related discussion:
-              </p>
-              <NuxtLink
-                :to="`/forums/${albumDiscussions[0]?.DiscussionChannels?.[0]?.channelUniqueName}/discussions/${albumDiscussions[0]?.id}`"
-                class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400">
+                {{ section.title }}
+              </h3>
+
+              <div
+                v-for="album in section.albums"
+                :key="album.id"
+                class="rounded-md border border-gray-200 p-3 dark:border-gray-700"
               >
-                {{ albumDiscussions[0]?.title }}
-              </NuxtLink>
+                <NuxtLink
+                  v-if="album.Owner?.username"
+                  :to="`/u/${album.Owner.username}/albums/${album.id}`"
+                  class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  Album by {{ album.Owner.displayName || album.Owner.username }}
+                  <span v-if="album.Owner.displayName">({{ album.Owner.username }})</span>
+                </NuxtLink>
+                <span
+                  v-else
+                  class="font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Album by unknown user
+                </span>
+
+                <div
+                  v-if="album.Discussions?.length && album.Discussions[0]"
+                  class="mt-3 border-t pt-3 dark:border-gray-700"
+                >
+                  <p class="mb-2 text-sm text-gray-600 dark:text-gray-400">
+                    Related discussion:
+                  </p>
+                  <NuxtLink
+                    v-if="album.Discussions[0]?.DiscussionChannels?.[0]?.channelUniqueName"
+                    :to="`/forums/${album.Discussions[0]?.DiscussionChannels?.[0]?.channelUniqueName}/discussions/${album.Discussions[0]?.id}`"
+                    class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                  >
+                    {{ album.Discussions[0]?.title }}
+                  </NuxtLink>
+                  <span v-else class="text-gray-700 dark:text-gray-300">
+                    {{ album.Discussions[0]?.title }}
+                  </span>
+                </div>
+              </div>
             </div>
+
             <!-- Other images in the album -->
             <div
-              v-if="albumImages.length > 0"
+              v-if="primaryAlbum && albumImages.length > 0"
               class="mt-4 border-t pt-4 dark:border-gray-700"
             >
               <p class="mb-3 text-sm text-gray-600 dark:text-gray-400">
@@ -600,8 +726,8 @@ onUnmounted(() => {
                 columns="grid-cols-4 sm:grid-cols-4 md:grid-cols-4"
               />
               <NuxtLink
-                v-if="albumImages.length > 8"
-                :to="`/u/${uploader.username}/albums/${image.Album.id}`"
+                v-if="albumImages.length > 8 && primaryAlbum.Owner?.username"
+                :to="`/u/${primaryAlbum.Owner.username}/albums/${primaryAlbum.id}`"
                 class="mt-3 block text-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
               >
                 View all {{ albumImages.length + 1 }} images in album
