@@ -49,13 +49,16 @@ const yamlError = ref('');
 const filterModeOptions = [
   {
     value: FilterMode.Include,
-    label: 'Inclusion (show downloads with these labels)',
+    label: 'Must include selected labels',
   },
   {
     value: FilterMode.Exclude,
-    label: 'Exclusion (hide downloads with these labels)',
+    label: 'Must exclude selected labels',
   },
 ];
+
+const createLocalId = (kind: 'group' | 'option', index: number) =>
+  `local-filter-${kind}-${Date.now()}-${index}`;
 
 const convertFilterGroupsToYaml = (filterGroups: FilterGroup[]): string =>
   serializeFilterGroupsToYaml(filterGroups);
@@ -70,13 +73,13 @@ const convertYamlToFilterGroups = (
 
   // Map the validated plain groups onto full GraphQL FilterGroup objects.
   const filterGroups: FilterGroup[] = result.groups.map((group, index) => ({
-    id: '', // Empty ID for new/edited groups - server will handle
+    id: createLocalId('group', index),
     key: group.key,
     displayName: group.displayName,
     mode: group.mode as FilterMode,
     order: group.order ?? index,
     options: (group.options || []).map((option, optionIndex) => ({
-      id: '', // Empty ID for new/edited options - server will handle
+      id: createLocalId('option', optionIndex),
       value: option.value,
       displayName: option.displayName,
       order: option.order ?? optionIndex,
@@ -104,7 +107,7 @@ const addNewGroup = () => {
   }
 
   const newGroup: FilterGroup = {
-    id: '', // Empty ID for new groups - server will generate
+    id: createLocalId('group', props.filterGroups.length),
     key: newGroupForm.value.key,
     displayName: newGroupForm.value.displayName,
     mode: newGroupForm.value.mode,
@@ -235,7 +238,8 @@ watch(
           </h3>
           <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
             Configure filter groups that will appear in the downloads sidebar.
-            Users can filter downloads by selecting options within these groups.
+            Include groups require selected labels; exclude groups hide downloads
+            with selected labels.
           </p>
         </div>
 

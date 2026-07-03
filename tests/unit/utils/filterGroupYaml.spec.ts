@@ -56,9 +56,37 @@ describe('parseFilterGroupsYaml', () => {
 
   it('defaults missing order values to the index', () => {
     const result = parseFilterGroupsYaml(
-      '- key: a\n  displayName: A\n  mode: INCLUDE\n- key: b\n  displayName: B\n  mode: EXCLUDE'
+      '- key: a\n  displayName: A\n  mode: INCLUDE\n  options:\n    - value: one\n      displayName: One\n- key: b\n  displayName: B\n  mode: EXCLUDE\n  options:\n    - value: two\n      displayName: Two'
     );
     expect(result.groups?.map((g) => g.order)).toEqual([0, 1]);
+  });
+
+  it('fails when a group key is duplicated', () => {
+    const result = parseFilterGroupsYaml(
+      '- key: packs\n  displayName: Packs\n  mode: INCLUDE\n  options:\n    - value: vampires\n      displayName: Vampires\n- key: PACKS\n  displayName: Packs Again\n  mode: EXCLUDE\n  options:\n    - value: dine_out\n      displayName: Dine Out'
+    );
+    expect(result.error).toContain('Duplicate filter group key');
+  });
+
+  it('fails when a group has no options', () => {
+    const result = parseFilterGroupsYaml(
+      '- key: packs\n  displayName: Packs\n  mode: INCLUDE\n  options: []'
+    );
+    expect(result.error).toContain('must include at least one option');
+  });
+
+  it('fails when an option value is duplicated within a group', () => {
+    const result = parseFilterGroupsYaml(
+      '- key: packs\n  displayName: Packs\n  mode: INCLUDE\n  options:\n    - value: vampires\n      displayName: Vampires\n    - value: VAMPIRES\n      displayName: Vampires Duplicate'
+    );
+    expect(result.error).toContain('duplicate option value');
+  });
+
+  it('fails when an option value has invalid characters', () => {
+    const result = parseFilterGroupsYaml(
+      '- key: packs\n  displayName: Packs\n  mode: INCLUDE\n  options:\n    - value: bad value\n      displayName: Bad Value'
+    );
+    expect(result.error).toContain('invalid value');
   });
 
   it('returns an error for malformed YAML', () => {

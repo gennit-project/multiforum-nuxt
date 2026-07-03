@@ -46,12 +46,24 @@ const newOptionForm = ref({
   displayName: '',
 });
 
+const createLocalOptionId = () =>
+  `local-filter-option-${Date.now()}-${props.filterGroup.options?.length || 0}`;
+
 const filterModeOptions = [
-  { value: FilterMode.Include, label: 'Inclusion' },
-  { value: FilterMode.Exclude, label: 'Exclusion' },
+  {
+    value: FilterMode.Include,
+    label: 'Must include selected labels',
+    description: 'Downloads must have at least one selected option from this group.',
+  },
+  {
+    value: FilterMode.Exclude,
+    label: 'Must exclude selected labels',
+    description: 'Downloads with selected options from this group are hidden.',
+  },
 ];
 
 const isValidKey = (key: string) => /^[a-zA-Z0-9_]+$/.test(key);
+const isValidOptionValue = (value: string) => /^[a-zA-Z0-9_-]+$/.test(value);
 
 const isKeyUnique = (key: string) => {
   return !props.existingKeys.includes(key);
@@ -71,6 +83,7 @@ const canAddOption = computed(() => {
   return (
     newOptionForm.value.value &&
     newOptionForm.value.displayName &&
+    isValidOptionValue(newOptionForm.value.value) &&
     !props.filterGroup.options?.some(
       (option) => option.value === newOptionForm.value.value
     )
@@ -110,7 +123,7 @@ const addOption = () => {
   if (!canAddOption.value) return;
 
   const newOption: FilterOption = {
-    id: '', // Empty ID for new options - server will generate
+    id: createLocalOptionId(),
     value: newOptionForm.value.value,
     displayName: newOptionForm.value.displayName,
     order: props.filterGroup.options?.length || 0,
@@ -138,9 +151,27 @@ const addOption = () => {
 };
 
 const removeOption = (optionId: string) => {
+  if (
+    !window.confirm(
+      'Remove this filter option? Downloads using this option will no longer be matched by it after you save.'
+    )
+  ) {
+    return;
+  }
   const updatedOptions =
     props.filterGroup.options?.filter((option) => option.id !== optionId) || [];
   emit('updateGroup', props.filterGroup.id, { options: updatedOptions });
+};
+
+const removeGroup = () => {
+  if (
+    !window.confirm(
+      'Remove this filter group? Its options will be removed from the download filter settings after you save.'
+    )
+  ) {
+    return;
+  }
+  emit('removeGroup', props.filterGroup.id);
 };
 
 const moveOption = (optionId: string, direction: 'up' | 'down') => {
@@ -195,7 +226,7 @@ const moveOption = (optionId: string, direction: 'up' | 'down') => {
           type="button"
           class="rounded border border-red-300 bg-red-100 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:border-red-700 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800"
           :disabled="disabled"
-          @click="$emit('removeGroup', filterGroup.id)"
+          @click="removeGroup"
         >
           Remove Group
         </button>
@@ -214,6 +245,12 @@ const moveOption = (optionId: string, direction: 'up' | 'down') => {
           {{
             filterModeOptions.find((opt) => opt.value === filterGroup.mode)
               ?.label
+          }}
+        </p>
+        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          {{
+            filterModeOptions.find((opt) => opt.value === filterGroup.mode)
+              ?.description
           }}
         </p>
       </div>
@@ -260,6 +297,12 @@ const moveOption = (optionId: string, direction: 'up' | 'down') => {
               {{ option.label }}
             </option>
           </select>
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            {{
+              filterModeOptions.find((option) => option.value === editForm.mode)
+                ?.description
+            }}
+          </p>
         </div>
         <div>
           <label
@@ -378,14 +421,22 @@ const moveOption = (optionId: string, direction: 'up' | 'down') => {
               :class="{
                 'border-red-500':
                   newOptionForm.value &&
-                  filterGroup.options?.some(
-                    (option) => option.value === newOptionForm.value
-                  ),
+                  (!isValidOptionValue(newOptionForm.value) ||
+                    filterGroup.options?.some(
+                      (option) => option.value === newOptionForm.value
+                    )),
               }"
             >
             <p
+              v-if="newOptionForm.value && !isValidOptionValue(newOptionForm.value)"
+              class="mt-1 text-xs text-red-500"
+            >
+              Value can only contain letters, numbers, underscores, and hyphens.
+            </p>
+            <p
               v-if="
                 newOptionForm.value &&
+                isValidOptionValue(newOptionForm.value) &&
                 filterGroup.options?.some(
                   (option) => option.value === newOptionForm.value
                 )
@@ -495,7 +546,7 @@ const moveOption = (optionId: string, direction: 'up' | 'down') => {
         v-else-if="!showNewOptionForm"
         class="py-4 text-center text-sm text-gray-500 dark:text-gray-400"
       >
-        No options configured. Add an option above.
+        No options configured. Add at least one option before saving this group.
       </div>
     </div>
   </div>
