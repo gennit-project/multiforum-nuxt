@@ -86,18 +86,32 @@ describe('TopNav route label', () => {
     expect(wrapper.text()).toContain(label);
   });
 
-  it('falls back to getLabel for a search preview route', () => {
+  it('labels a search preview route', () => {
     h.route = { params: {}, name: 'SitewideSearchDiscussionPreview' };
     const wrapper = mountNav();
 
-    expect(wrapper.text()).toContain('• discussions');
+    expect(wrapper.text()).toContain('discussions');
   });
 
   it('labels admin routes', () => {
     h.route = { params: {}, name: 'admin-dashboard' };
     const wrapper = mountNav();
 
-    expect(wrapper.text()).toContain('• admin dashboard');
+    expect(wrapper.text()).toContain('admin dashboard');
+  });
+
+  it('separates the label with a geometric dot, not a bullet glyph', () => {
+    h.route = { params: {}, name: 'admin-dashboard' };
+    const wrapper = mountNav();
+
+    expect(wrapper.text()).not.toContain('•');
+  });
+
+  it('renders a rounded-full dot separator before the label', () => {
+    h.route = { params: {}, name: 'discussions' };
+    const wrapper = mountNav();
+
+    expect(wrapper.find('span.rounded-full').exists()).toBe(true);
   });
 });
 

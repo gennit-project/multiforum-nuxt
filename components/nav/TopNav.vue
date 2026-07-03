@@ -33,15 +33,18 @@ const channelId = computed(() =>
 
 const shouldShowChannelId = computed(() => channelId.value);
 
-const routeInfoLabel = computed(() => {
-  if (
-    typeof route.name === 'string' &&
-    route.name.indexOf('map-search') !== -1
-  ) {
+// The text label shown after the site name when we're not inside a channel.
+// Merges the former `routeInfoLabel` computed and `getLabel` function into one
+// source of truth. The separator is rendered as a geometric dot in the
+// template, so labels here are plain text (no baked-in "•").
+const secondaryLabel = computed(() => {
+  const name = route.name;
+
+  if (typeof name === 'string' && name.includes('map-search')) {
     return 'in-person events';
   }
 
-  switch (route.name) {
+  switch (name) {
     case 'discussions':
       return 'discussions';
     case 'downloads':
@@ -50,19 +53,22 @@ const routeInfoLabel = computed(() => {
       return 'online events';
     case 'forums':
       return 'forums';
+    case 'SitewideSearchDiscussionPreview':
+      return 'discussions';
+    case 'SearchEventsList':
+      return 'online events';
+    case 'MapEventPreview':
+      return 'in-person events';
     default:
-      return '';
+      break;
   }
-});
 
-function getLabel() {
-  if (route.name === 'SitewideSearchDiscussionPreview') return '• discussions';
-  if (route.name === 'SearchEventsList') return '• online events';
-  if (route.name === 'MapEventPreview') return '• in-person events';
-  if (typeof route.name === 'string' && route.name.includes('admin'))
-    return '• admin dashboard';
+  if (typeof name === 'string' && name.includes('admin')) {
+    return 'admin dashboard';
+  }
+
   return '';
-}
+});
 
 const isOnMapPage = computed(() => {
   if (route.name && typeof route.name === 'string') {
@@ -87,8 +93,8 @@ const isOnMapPage = computed(() => {
           @click="$emit('toggleDropdown')"
         />
 
-        <div class="ml-2 flex h-full min-w-0 items-center gap-2 text-sm lg:gap-3">
-          <nuxt-link to="/" class="flex h-full items-center gap-1.5">
+        <div class="ml-2 flex min-w-0 items-center gap-2 lg:gap-3">
+          <nuxt-link to="/" class="flex items-center">
             <h1
               class="logo-font text-[1.2rem] font-semibold leading-none tracking-[-0.04em] text-gray-900 dark:text-white lg:text-[1.3rem]"
             >
@@ -96,14 +102,18 @@ const isOnMapPage = computed(() => {
             </h1>
           </nuxt-link>
 
+          <!-- Channel context: separator dot + channel link + favorite star -->
           <div
             v-if="shouldShowChannelId"
-            class="hidden h-full items-center gap-2 text-base leading-none tracking-[-0.02em] text-gray-700 sm:flex dark:text-gray-300"
+            class="hidden min-w-0 items-center gap-2 text-base leading-none tracking-[-0.02em] sm:flex"
           >
-            <span class="inline-flex h-5 items-center self-center text-lg leading-none text-gray-500 dark:text-gray-400">•</span>
+            <span
+              class="h-1.5 w-1.5 shrink-0 rounded-full bg-gray-400 dark:bg-gray-500"
+              aria-hidden="true"
+            />
             <nuxt-link
               :to="`/forums/${channelId}`"
-              class="inline-flex h-5 -translate-y-px items-center self-center max-w-[8rem] truncate leading-none text-gray-700 transition-colors hover:text-gray-950 sm:max-w-[12rem] lg:max-w-[16rem] dark:text-gray-300 dark:hover:text-white"
+              class="max-w-[8rem] truncate text-gray-700 transition-colors hover:text-gray-950 sm:max-w-[12rem] lg:max-w-[16rem] dark:text-gray-300 dark:hover:text-white"
             >
               {{ channelId }}
             </nuxt-link>
@@ -111,25 +121,19 @@ const isOnMapPage = computed(() => {
               :channel-unique-name="channelId"
               :allow-add-to-list="true"
               size="small"
-              class="ml-1"
             />
           </div>
+
+          <!-- Section label: separator dot + label text -->
           <div
-            v-else-if="routeInfoLabel"
-            class="hidden h-full items-center gap-2 truncate text-base leading-none tracking-[-0.02em] text-gray-700 sm:flex dark:text-gray-300"
+            v-else-if="secondaryLabel"
+            class="hidden min-w-0 items-center gap-2 text-base leading-none tracking-[-0.02em] text-gray-700 sm:flex dark:text-gray-300"
           >
-            <span class="inline-flex h-5 items-center self-center text-lg leading-none text-gray-500 dark:text-gray-400">•</span>
-            <span class="inline-flex h-5 -translate-y-px items-center self-center leading-none">
-              {{ routeInfoLabel }}
-            </span>
-          </div>
-          <div
-            v-else
-            class="hidden h-full items-center gap-1 truncate text-base leading-none tracking-[-0.02em] text-gray-700 sm:flex dark:text-gray-300"
-          >
-            <span class="inline-flex h-5 items-center self-center leading-none">
-              {{ getLabel() }}
-            </span>
+            <span
+              class="h-1.5 w-1.5 shrink-0 rounded-full bg-gray-400 dark:bg-gray-500"
+              aria-hidden="true"
+            />
+            <span class="truncate">{{ secondaryLabel }}</span>
           </div>
         </div>
       </div>
