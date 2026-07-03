@@ -15,7 +15,7 @@
     "postinstall": "nuxt prepare",
     "compile": "graphql-codegen",
     "lint": "eslint",
-    "lint:a11y": "npx eslint \"components/**/*.vue\" --quiet",
+    "lint:a11y": "pnpm exec eslint \"components/**/*.vue\" --quiet",
     "prepare": "husky install",
     "prettier:check": "prettier --check .",
     "start": "nuxt start",
@@ -26,15 +26,15 @@
     "test:unit:run": "vitest run",
     "coverage": "vitest run --coverage",
     "coverage:ui": "vitest --coverage --ui",
-    "coverage:open": "npm run coverage && open coverage/index.html",
+    "coverage:open": "pnpm run coverage && open coverage/index.html",
     "coverage:e2e:build": "E2E_COVERAGE=true NITRO_PRESET=node-server VITE_E2E_MOCK_MODE=true VITE_GRAPHQL_URL=http://127.0.0.1:4100/graphql VITE_SERVER_NAME='Playwright Test Server' VITE_SENTRY_AUTH_TOKEN='' nuxt build",
     "coverage:e2e:collect": "E2E_COVERAGE=true playwright test --config playwright.build.config.ts",
     "coverage:e2e:report": "node --max-old-space-size=6144 tests/playwright/coverage/report.mjs",
     "coverage:audit": "node scripts/coverage-audit.mjs",
     "knip": "knip",
     "tsc": "vue-tsc --noEmit",
-    "verify": "npm run tsc && npm run test:unit:run",
-    "lint-verify": "npm run test:unit:run && npm run lint:a11y"
+    "verify": "pnpm run tsc && pnpm run test:unit:run",
+    "lint-verify": "pnpm run test:unit:run && pnpm run lint:a11y"
   },
   "dependencies": {
     "@apollo/client": "^3.13.5",

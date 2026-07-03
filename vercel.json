@@ -1,8 +1,8 @@
 {
   "framework": "nuxtjs",
-  "devCommand": "npm run dev",
-  "buildCommand": "npm run build",
-  "installCommand": "rm -rf package-lock.json node_modules && npm install --legacy-peer-deps",
+  "devCommand": "pnpm run dev",
+  "buildCommand": "pnpm run build",
+  "installCommand": "pnpm install --frozen-lockfile",
   "outputDirectory": ".output",
   "headers": [
     {

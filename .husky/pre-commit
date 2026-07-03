@@ -10,10 +10,10 @@ if [ -z "$non_md_files" ]; then
 fi
 
 # Run lint-staged first to fix and check specific files that changed
-npx lint-staged
+pnpm exec lint-staged
 
 # Run TypeScript checking (same as CI)
-npm run tsc
+pnpm run tsc
 
 # Run linting (same as CI)
-npm run lint
+pnpm run lint

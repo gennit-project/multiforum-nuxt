@@ -80,11 +80,12 @@ The application requires several environment variables to be set up. Copy `.env.
 
 1. Clone the repository
 2. Ensure you are on Node ≥ 24.13.0 (`nvm use 24`)
-3. Copy `.env.example` to `.env` and update the values
-4. Install dependencies with `npm install`
-5. Start the development server with `npm run dev`
-6. Run unit tests with `npm run test:unit` (Vitest) and end-to-end tests with `npm run test:playwright` (Playwright, mocked GraphQL)
-7. Before committing, run `npm run verify` (type-check + unit tests); the pre-commit hook runs this plus ESLint automatically
+3. Enable pnpm (this repo uses pnpm, pinned via the `packageManager` field): `corepack enable`
+4. Copy `.env.example` to `.env` and update the values
+5. Install dependencies with `pnpm install`
+6. Start the development server with `pnpm run dev`
+7. Run unit tests with `pnpm run test:unit` (Vitest) and end-to-end tests with `pnpm run test:playwright` (Playwright, mocked GraphQL)
+8. Before committing, run `pnpm run verify` (type-check + unit tests); the pre-commit hook runs this plus ESLint automatically
 
 ## Testing Guidelines
 
@@ -182,7 +183,7 @@ test('completes a user workflow successfully', async ({ page }) => {
 Run a single mocked spec with:
 
 ```bash
-npm run test:playwright:mocked -- tests/playwright/mocked/discussions/createEditDeleteDiscussions.spec.ts
+pnpm run test:playwright:mocked -- tests/playwright/mocked/discussions/createEditDeleteDiscussions.spec.ts
 ```
 
 ### Best Practices
