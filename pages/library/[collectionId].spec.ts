@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref, defineComponent, h } from 'vue';
-import { useQuery } from '@vue/apollo-composable';
+import { useQuery, useMutation } from '@vue/apollo-composable';
 vi.mock('nuxt/app', () => ({ useHead: vi.fn() }));
 
 vi.mock('vue-router', () => ({
@@ -11,13 +11,7 @@ vi.mock('vue-router', () => ({
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
-  useMutation: () => ({
-    mutate: vi.fn(),
-    loading: ref(false),
-    error: ref(null),
-    onDone: vi.fn(),
-    onError: vi.fn(),
-  }),
+  useMutation: vi.fn(),
 }));
 
 vi.mock('@/composables/useAuthState', () => ({
@@ -49,14 +43,57 @@ const LibraryCommentCardStub = defineComponent({
   template: '<div>{{ comment.text }} {{ contextType }}</div>',
 });
 
+const LibraryDiscussionCardStub = defineComponent({
+  name: 'LibraryDiscussionCard',
+  props: {
+    discussion: {
+      type: Object,
+      required: true,
+    },
+  },
+  template:
+    '<article data-testid="discussion-card">{{ discussion.id }} {{ discussion.title }}</article>',
+});
+
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
+const mockedUseMutation = useMutation as unknown as ReturnType<typeof vi.fn>;
+const mutationMocks = {
+  update: vi.fn(),
+  delete: vi.fn(),
+  reorder: vi.fn(),
+};
+let refetchCollection = vi.fn();
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
 
 const mountWith = async (collection: unknown) => {
+  refetchCollection = vi.fn();
+  mutationMocks.update.mockResolvedValue({});
+  mutationMocks.delete.mockResolvedValue({});
+  mutationMocks.reorder.mockResolvedValue({});
+  mockedUseMutation
+    .mockReturnValueOnce({
+      mutate: mutationMocks.update,
+      loading: ref(false),
+      error: ref(null),
+    })
+    .mockReturnValueOnce({
+      mutate: mutationMocks.delete,
+      loading: ref(false),
+      error: ref(null),
+    })
+    .mockReturnValueOnce({
+      mutate: mutationMocks.reorder,
+      loading: ref(false),
+      error: ref(null),
+    });
   mockedUseQuery.mockReturnValue({
     result: ref({ collections: collection ? [collection] : [] }),
     loading: ref(false),
     error: ref(null),
-    refetch: vi.fn(),
+    refetch: refetchCollection,
   });
   const Page = (await import('./[collectionId].vue')).default;
   return shallowMount(Page, {
@@ -65,7 +102,7 @@ const mountWith = async (collection: unknown) => {
         RequireAuth: RequireAuthStub,
         NuxtLink: { template: '<a><slot /></a>' },
         LibraryDownloadCard: true,
-        LibraryDiscussionCard: true,
+        LibraryDiscussionCard: LibraryDiscussionCardStub,
         LibraryChannelCard: true,
         LibraryCommentCard: LibraryCommentCardStub,
         ImageListItem: true,
@@ -119,6 +156,53 @@ describe('library collection detail page', () => {
     expect(wrapper.text()).toContain(
       'Downloads are added to this private collection automatically when you grab a file.'
     );
+  });
+
+  it('renders discussion collection items in stored order', async () => {
+    const wrapper = await mountWith({
+      id: 'col-1',
+      name: 'Ordered discussions',
+      collectionType: 'DISCUSSIONS',
+      visibility: 'PRIVATE',
+      itemCount: 2,
+      itemOrder: ['d2', 'd1'],
+      Discussions: [
+        { id: 'd1', title: 'First saved', DiscussionChannels: [] },
+        { id: 'd2', title: 'Second saved', DiscussionChannels: [] },
+      ],
+    });
+
+    const cards = wrapper.findAll('[data-testid="discussion-card"]');
+    expect(cards.map((card) => card.text().split(' ')[0])).toEqual([
+      'd2',
+      'd1',
+    ]);
+  });
+
+  it('persists move down through the reorder mutation', async () => {
+    const wrapper = await mountWith({
+      id: 'col-1',
+      name: 'Ordered discussions',
+      collectionType: 'DISCUSSIONS',
+      visibility: 'PRIVATE',
+      itemCount: 2,
+      itemOrder: ['d1', 'd2'],
+      Discussions: [
+        { id: 'd1', title: 'First saved', DiscussionChannels: [] },
+        { id: 'd2', title: 'Second saved', DiscussionChannels: [] },
+      ],
+    });
+
+    await wrapper
+      .find('button[aria-label="Move First saved down"]')
+      .trigger('click');
+
+    expect(mutationMocks.reorder).toHaveBeenCalledWith({
+      collectionId: 'col-1',
+      itemId: 'd1',
+      newPosition: 1,
+    });
+    expect(refetchCollection).toHaveBeenCalled();
   });
 
   const commentsCollection = {

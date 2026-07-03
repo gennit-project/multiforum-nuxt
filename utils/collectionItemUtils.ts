@@ -47,6 +47,7 @@ export interface CollectionLike {
   Images?: unknown[];
   Channels?: unknown[];
   Downloads?: unknown[];
+  itemOrder?: string[] | null;
 }
 
 /**
@@ -59,20 +60,56 @@ export function getCollectionItems(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any[] {
   if (!collection) return [];
+  let items: unknown[];
   switch (collection.collectionType) {
     case 'DISCUSSIONS':
-      return collection.Discussions || [];
+      items = collection.Discussions || [];
+      break;
     case 'COMMENTS':
-      return collection.Comments || [];
+      items = collection.Comments || [];
+      break;
     case 'IMAGES':
-      return collection.Images || [];
+      items = collection.Images || [];
+      break;
     case 'CHANNELS':
-      return collection.Channels || [];
+      items = collection.Channels || [];
+      break;
     case 'DOWNLOADS':
-      return collection.Downloads || [];
+      items = collection.Downloads || [];
+      break;
     default:
       return [];
   }
+
+  return orderCollectionItems(items, collection.itemOrder);
+}
+
+export function getCollectionItemStableId(item: unknown): string {
+  if (!item || typeof item !== 'object') return '';
+  const record = item as { id?: string | null; uniqueName?: string | null };
+  return record.id || record.uniqueName || '';
+}
+
+export function orderCollectionItems<T>(
+  items: T[],
+  itemOrder: string[] | null | undefined
+): T[] {
+  if (!itemOrder?.length) return items;
+
+  const itemById = new Map(
+    items
+      .map((item) => [getCollectionItemStableId(item), item] as const)
+      .filter(([id]) => Boolean(id))
+  );
+  const orderedItems = itemOrder
+    .map((id) => itemById.get(id))
+    .filter((item): item is T => Boolean(item));
+  const orderedIds = new Set(itemOrder);
+  const unorderedItems = items.filter(
+    (item) => !orderedIds.has(getCollectionItemStableId(item))
+  );
+
+  return [...orderedItems, ...unorderedItems];
 }
 
 /**

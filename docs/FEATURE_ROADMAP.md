@@ -69,20 +69,20 @@ Notes:
 - Backend validation middleware now rejects invalid generated filter-group mutation payloads before writes run, including invalid keys/modes, empty new groups, duplicate group keys, and duplicate option values.
 - Frontend form/YAML validation now catches invalid or duplicate filter configuration earlier and uses explicit "must include" / "must exclude" copy with remove confirmations.
 
-### 5. Collection ordering `[partial]`
+### 5. Collection ordering `[done]`
 
-- [ ] Add or confirm the stable ordering model for collection membership.
-- [ ] Preserve order correctly when adding and removing items.
-- [ ] Define behavior when an item in the stored order no longer exists.
-- [ ] Add a reorder mutation with ownership checks.
-- [ ] Add reorder tests for success, non-owner rejection, missing-item behavior, and order preservation after add/remove.
-- [ ] Add reorder controls in the collection UI.
-- [ ] Persist reordering through the new mutation.
-- [ ] Keep keyboard-accessible move up/down controls even if drag-and-drop is added later.
+- [x] Add or confirm the stable ordering model for collection membership.
+- [x] Preserve order correctly when adding and removing items.
+- [x] Define behavior when an item in the stored order no longer exists.
+- [x] Add a reorder mutation with ownership checks.
+- [x] Add reorder tests for success, non-owner rejection, missing-item behavior, and order preservation after add/remove.
+- [x] Add reorder controls in the collection UI.
+- [x] Persist reordering through the new mutation.
+- [x] Keep keyboard-accessible move up/down controls.
 
 Notes:
 - Collections already have an `itemOrder` field and add-to-collection mutations push into it.
-- No reorder mutation or reorder UI was found.
+- Custom add/remove/reorder mutations now keep `itemOrder` deduplicated, prune removed items, normalize stale stored IDs, and append items missing from stored order.
 
 ### 6. Share public collections to a forum discussion `[not started]`
 

@@ -38,181 +38,91 @@ export const CREATE_COLLECTION = gql`
 
 export const ADD_DISCUSSION_TO_COLLECTION = gql`
   mutation AddDiscussionToCollection($collectionId: ID!, $itemId: ID!) {
-    updateCollections(
-      where: { id: $collectionId }
-      update: {
-        itemOrder_PUSH: [$itemId]
-        Discussions: { connect: { where: { node: { id: $itemId } } } }
-      }
-    ) {
-      collections {
-        id
-        name
-        itemCount
-        itemOrder
-      }
-    }
+    addToCollection(
+      input: { collectionId: $collectionId, itemId: $itemId, itemType: DISCUSSION }
+    )
   }
 `;
 
 export const ADD_COMMENT_TO_COLLECTION = gql`
   mutation AddCommentToCollection($collectionId: ID!, $itemId: ID!) {
-    updateCollections(
-      where: { id: $collectionId }
-      update: {
-        itemOrder_PUSH: [$itemId]
-        Comments: { connect: { where: { node: { id: $itemId } } } }
-      }
-    ) {
-      collections {
-        id
-        name
-        itemCount
-        itemOrder
-      }
-    }
+    addToCollection(
+      input: { collectionId: $collectionId, itemId: $itemId, itemType: COMMENT }
+    )
   }
 `;
 
 export const ADD_IMAGE_TO_COLLECTION = gql`
   mutation AddImageToCollection($collectionId: ID!, $itemId: ID!) {
-    updateCollections(
-      where: { id: $collectionId }
-      update: {
-        itemOrder_PUSH: [$itemId]
-        Images: { connect: { where: { node: { id: $itemId } } } }
-      }
-    ) {
-      collections {
-        id
-        name
-        itemCount
-        itemOrder
-      }
-    }
+    addToCollection(
+      input: { collectionId: $collectionId, itemId: $itemId, itemType: IMAGE }
+    )
   }
 `;
 
 export const ADD_CHANNEL_TO_COLLECTION = gql`
-  mutation AddChannelToCollection($collectionId: ID!, $itemId: String!) {
-    updateCollections(
-      where: { id: $collectionId }
-      update: {
-        Channels: { connect: { where: { node: { uniqueName: $itemId } } } }
-      }
-    ) {
-      collections {
-        id
-        name
-        itemCount
-        itemOrder
-      }
-    }
+  mutation AddChannelToCollection($collectionId: ID!, $itemId: ID!) {
+    addToCollection(
+      input: { collectionId: $collectionId, itemId: $itemId, itemType: CHANNEL }
+    )
   }
 `;
 
 export const REMOVE_DISCUSSION_FROM_COLLECTION = gql`
   mutation RemoveDiscussionFromCollection($collectionId: ID!, $itemId: ID!) {
-    updateCollections(
-      where: { id: $collectionId }
-      update: {
-        Discussions: { disconnect: { where: { node: { id: $itemId } } } }
-      }
-    ) {
-      collections {
-        id
-        name
-        itemCount
-        itemOrder
-      }
-    }
+    removeFromCollection(
+      collectionId: $collectionId
+      itemId: $itemId
+      itemType: DISCUSSION
+    )
   }
 `;
 
 export const REMOVE_COMMENT_FROM_COLLECTION = gql`
   mutation RemoveCommentFromCollection($collectionId: ID!, $itemId: ID!) {
-    updateCollections(
-      where: { id: $collectionId }
-      update: { Comments: { disconnect: { where: { node: { id: $itemId } } } } }
-    ) {
-      collections {
-        id
-        name
-        itemCount
-        itemOrder
-      }
-    }
+    removeFromCollection(
+      collectionId: $collectionId
+      itemId: $itemId
+      itemType: COMMENT
+    )
   }
 `;
 
 export const REMOVE_IMAGE_FROM_COLLECTION = gql`
   mutation RemoveImageFromCollection($collectionId: ID!, $itemId: ID!) {
-    updateCollections(
-      where: { id: $collectionId }
-      update: { Images: { disconnect: { where: { node: { id: $itemId } } } } }
-    ) {
-      collections {
-        id
-        name
-        itemCount
-        itemOrder
-      }
-    }
+    removeFromCollection(
+      collectionId: $collectionId
+      itemId: $itemId
+      itemType: IMAGE
+    )
   }
 `;
 
 export const REMOVE_CHANNEL_FROM_COLLECTION = gql`
-  mutation RemoveChannelFromCollection($collectionId: ID!, $itemId: String!) {
-    updateCollections(
-      where: { id: $collectionId }
-      update: {
-        Channels: { disconnect: { where: { node: { uniqueName: $itemId } } } }
-      }
-    ) {
-      collections {
-        id
-        name
-        itemCount
-        itemOrder
-      }
-    }
+  mutation RemoveChannelFromCollection($collectionId: ID!, $itemId: ID!) {
+    removeFromCollection(
+      collectionId: $collectionId
+      itemId: $itemId
+      itemType: CHANNEL
+    )
   }
 `;
 
 export const ADD_DOWNLOAD_TO_COLLECTION = gql`
   mutation AddDownloadToCollection($collectionId: ID!, $itemId: ID!) {
-    updateCollections(
-      where: { id: $collectionId }
-      update: {
-        itemOrder_PUSH: [$itemId]
-        Downloads: { connect: { where: { node: { id: $itemId } } } }
-      }
-    ) {
-      collections {
-        id
-        name
-        itemCount
-        itemOrder
-      }
-    }
+    addToCollection(
+      input: { collectionId: $collectionId, itemId: $itemId, itemType: DOWNLOAD }
+    )
   }
 `;
 
 export const REMOVE_DOWNLOAD_FROM_COLLECTION = gql`
   mutation RemoveDownloadFromCollection($collectionId: ID!, $itemId: ID!) {
-    updateCollections(
-      where: { id: $collectionId }
-      update: {
-        Downloads: { disconnect: { where: { node: { id: $itemId } } } }
-      }
-    ) {
-      collections {
-        id
-        name
-        itemCount
-        itemOrder
-      }
-    }
+    removeFromCollection(
+      collectionId: $collectionId
+      itemId: $itemId
+      itemType: DOWNLOAD
+    )
   }
 `;
 
@@ -247,5 +157,19 @@ export const DELETE_COLLECTION = gql`
     deleteCollections(where: { id: $collectionId }) {
       nodesDeleted
     }
+  }
+`;
+
+export const REORDER_COLLECTION_ITEM = gql`
+  mutation ReorderCollectionItem(
+    $collectionId: ID!
+    $itemId: ID!
+    $newPosition: Int!
+  ) {
+    reorderCollectionItem(
+      collectionId: $collectionId
+      itemId: $itemId
+      newPosition: $newPosition
+    )
   }
 `;
