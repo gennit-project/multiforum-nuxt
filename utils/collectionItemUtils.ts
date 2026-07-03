@@ -54,9 +54,9 @@ export interface CollectionLike {
  * is heterogeneous across collection types, so the return is intentionally
  * loose (matching the page's original inline behavior).
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getCollectionItems(
   collection: CollectionLike | null | undefined
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any[] {
   if (!collection) return [];
   switch (collection.collectionType) {

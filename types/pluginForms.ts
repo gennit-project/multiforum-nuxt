@@ -9,7 +9,7 @@ export interface PluginFieldValidation {
   required?: boolean;
 }
 
-export interface PluginFieldOption {
+interface PluginFieldOption {
   value: string | number | boolean;
   label: string;
 }
