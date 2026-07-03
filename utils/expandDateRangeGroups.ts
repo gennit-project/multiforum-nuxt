@@ -119,5 +119,3 @@ export function validateDateRangeGroup(group: DateRangeGroup): {
 
   return { valid: true };
 }
-
-export default expandDateRangeGroups;

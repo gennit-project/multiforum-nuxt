@@ -64,9 +64,3 @@ export interface DownloadFormFile {
   priceCents: number;
   priceCurrency: string;
 }
-
-// Stub type for creating temporary Discussion objects in forms
-export interface DiscussionStubForDownload {
-  id: string;
-  DownloadableFiles: DownloadFormFile[];
-}
