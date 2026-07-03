@@ -43,7 +43,12 @@ onGetDownloadResult((result) => {
       // Handle the case where the download is not found
       useHead({
         title: `Download Not Found${channelId.value ? ` | ${channelId.value}` : ''}`,
-        description: 'The requested download could not be found.',
+        meta: [
+          {
+            name: 'description',
+            content: 'The requested download could not be found.',
+          },
+        ],
       });
       return;
     } else {
@@ -86,7 +91,7 @@ onGetDownloadResult((result) => {
         script: [
           {
             type: 'application/ld+json',
-            children: JSON.stringify({
+            innerHTML: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'DigitalDocument',
               headline: title,
