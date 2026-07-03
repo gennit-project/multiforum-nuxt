@@ -4,9 +4,13 @@ import { ref, defineComponent, h } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 vi.mock('nuxt/app', () => ({ useHead: vi.fn() }));
 
+const h = vi.hoisted(() => ({
+  routerPush: undefined as unknown as ReturnType<typeof vi.fn>,
+}));
+
 vi.mock('vue-router', () => ({
   useRoute: () => ({ params: { collectionId: 'col-1' } }),
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: h.routerPush }),
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -61,11 +65,13 @@ const mutationMocks = {
   update: vi.fn(),
   delete: vi.fn(),
   reorder: vi.fn(),
+  share: vi.fn(),
 };
 let refetchCollection = vi.fn();
 
 beforeEach(() => {
   vi.clearAllMocks();
+  h.routerPush = vi.fn();
 });
 
 const mountWith = async (collection: unknown) => {
@@ -73,6 +79,14 @@ const mountWith = async (collection: unknown) => {
   mutationMocks.update.mockResolvedValue({});
   mutationMocks.delete.mockResolvedValue({});
   mutationMocks.reorder.mockResolvedValue({});
+  mutationMocks.share.mockResolvedValue({
+    data: {
+      shareCollectionAsDiscussion: {
+        id: 'discussion-1',
+        DiscussionChannels: [{ channelUniqueName: 'sims4_builds' }],
+      },
+    },
+  });
   mockedUseMutation
     .mockReturnValueOnce({
       mutate: mutationMocks.update,
@@ -86,6 +100,11 @@ const mountWith = async (collection: unknown) => {
     })
     .mockReturnValueOnce({
       mutate: mutationMocks.reorder,
+      loading: ref(false),
+      error: ref(null),
+    })
+    .mockReturnValueOnce({
+      mutate: mutationMocks.share,
       loading: ref(false),
       error: ref(null),
     });
@@ -106,6 +125,24 @@ const mountWith = async (collection: unknown) => {
         LibraryChannelCard: true,
         LibraryCommentCard: LibraryCommentCardStub,
         ImageListItem: true,
+        ForumPicker: {
+          name: 'ForumPicker',
+          props: ['selectedChannels'],
+          emits: ['setSelectedChannels'],
+          template:
+            '<button data-testid="forum-picker" @click="$emit(\'setSelectedChannels\', [\'sims4_builds\'])">pick forum</button>',
+        },
+        GenericModal: {
+          name: 'GenericModal',
+          props: [
+            'open',
+            'title',
+            'primaryButtonDisabled',
+          ],
+          emits: ['primary-button-click', 'close'],
+          template:
+            '<section v-if="open" :data-title="title"><slot name="content" /><button data-testid="modal-primary" :disabled="primaryButtonDisabled" @click="$emit(\'primary-button-click\')">primary</button></section>',
+        },
         Breadcrumbs: {
           props: ['links'],
           template: '<nav>{{ links.map((link) => link.label).join(" > ") }}</nav>',
@@ -155,6 +192,51 @@ describe('library collection detail page', () => {
 
     expect(wrapper.text()).toContain(
       'Downloads are added to this private collection automatically when you grab a file.'
+    );
+  });
+
+  it('shows disabled share copy for private collections', async () => {
+    const wrapper = await mountWith({
+      id: 'col-1',
+      name: 'Private list',
+      collectionType: 'DISCUSSIONS',
+      visibility: 'PRIVATE',
+      Discussions: [],
+      itemCount: 0,
+    });
+
+    const shareButton = wrapper.find('button[title="Make this collection public before sharing it to a forum"]');
+    expect(shareButton.exists()).toBe(true);
+    expect(shareButton.attributes('disabled')).toBeDefined();
+    expect(wrapper.text()).toContain(
+      'Make this collection public before sharing it to a forum discussion.'
+    );
+  });
+
+  it('shares a public collection to a selected forum', async () => {
+    const wrapper = await mountWith({
+      id: 'col-1',
+      name: 'Public list',
+      collectionType: 'DISCUSSIONS',
+      visibility: 'PUBLIC',
+      Discussions: [],
+      itemCount: 0,
+    });
+
+    await wrapper
+      .find('button[title="Share this public collection to a forum discussion"]')
+      .trigger('click');
+    await wrapper.find('[data-testid="forum-picker"]').trigger('click');
+    await wrapper.find('[data-testid="modal-primary"]').trigger('click');
+
+    expect(mutationMocks.share).toHaveBeenCalledWith({
+      collectionId: 'col-1',
+      serverId: 'sims4_builds',
+      title: 'Shared collection: Public list',
+      shareMessage: null,
+    });
+    expect(h.routerPush).toHaveBeenCalledWith(
+      '/forums/sims4_builds/discussions/discussion-1'
     );
   });
 

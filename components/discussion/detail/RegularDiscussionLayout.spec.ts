@@ -45,6 +45,7 @@ const mountLayout = (props: Record<string, unknown> = {}) =>
         MarkAsAnsweredButton: { name: 'MarkAsAnsweredButton', template: '<div class="answered" />' },
         DiscussionTitleVersions: { name: 'DiscussionTitleVersions', template: '<div class="versions" />' },
         CrosspostedDiscussionEmbed: { name: 'CrosspostedDiscussionEmbed', template: '<div class="crosspost" />' },
+        SharedCollectionEmbed: { name: 'SharedCollectionEmbed', template: '<div class="shared-collection" />' },
       },
     },
   });
@@ -115,6 +116,14 @@ describe('RegularDiscussionLayout sections', () => {
     });
 
     expect(wrapper.find('.crosspost').exists()).toBe(true);
+  });
+
+  it('renders a shared collection embed when present', () => {
+    const wrapper = mountLayout({
+      discussion: discussion({ SharedCollection: { id: 'col-1' } }),
+    });
+
+    expect(wrapper.find('.shared-collection').exists()).toBe(true);
   });
 });
 

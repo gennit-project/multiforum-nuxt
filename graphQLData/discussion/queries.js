@@ -41,6 +41,22 @@ const CROSSPOST_PREVIEW_FIELDS = gql`
   }
 `;
 
+const SHARED_COLLECTION_PREVIEW_FIELDS = gql`
+  fragment SharedCollectionPreviewFields on Collection {
+    id
+    name
+    description
+    collectionType
+    visibility
+    itemCount
+    CreatedBy {
+      username
+      displayName
+      profilePicURL
+    }
+  }
+`;
+
 // For channel list view
 export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
   query getDiscussionsInChannel(
@@ -236,6 +252,7 @@ export const IS_DISCUSSION_ANSWERED = gql`
 export const GET_DISCUSSION = gql`
   ${AUTHOR_FIELDS}
   ${CROSSPOST_PREVIEW_FIELDS}
+  ${SHARED_COLLECTION_PREVIEW_FIELDS}
   query getDiscussion(
     $id: ID!
     $loggedInModName: String
@@ -397,6 +414,9 @@ export const GET_DISCUSSION = gql`
       }
       CrosspostedDiscussion {
         ...CrosspostPreviewFields
+      }
+      SharedCollection {
+        ...SharedCollectionPreviewFields
       }
     }
   }
