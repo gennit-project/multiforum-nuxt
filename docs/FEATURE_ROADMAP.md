@@ -121,16 +121,17 @@ Notes:
 
 - [x] Change album-image modeling so one image can belong to multiple albums without re-uploading. `[in backend PR]`
 - [x] Preserve uploader/original attribution on the image node anywhere it is reused by linking the same image node instead of creating a copy. `[in backend/frontend PRs]`
-- [ ] Define permissions for adding someone else's image to a collection or album.
+- [x] Define permissions for adding someone else's image to a collection or album: album owner may link active images into their own albums; existing collection ownership rules apply for image collections. `[in this slice]`
 - [x] Add image-detail query support for albums containing the image, grouped into original-poster-owned albums vs other users' albums. `[in backend PR]`
 - [x] Add tests for plural album membership during upload creation and grouped album results. `[in backend/frontend PRs]`
-- [ ] Add tests for permission enforcement and existing-image add/remove flows.
-- [ ] Update album add/remove flows to link existing images instead of requiring re-upload.
-- [ ] Let users save permitted images from someone else's album to their own library/collection.
+- [x] Add tests for permission enforcement and existing-image add/remove flows. `[in this slice]`
+- [x] Add backend album add/remove flows that link existing images instead of requiring re-upload. `[in this slice]`
+- [x] Let users save permitted images from image detail to their own album or image collection. `[in this slice]`
+- [ ] Add existing-image picker/search to album editor flows.
 - [x] On image detail pages, show grouped image usage by original poster vs others. `[in frontend PR]`
 
 Notes:
-- The remaining work in this section is the user-facing reuse flow: permissions, adding existing images to albums/collections, and tests around those actions.
+- The remaining work in this section is a fuller album-editor reuse flow, such as browsing/searching existing images while editing an album.
 
 ### 9. Permanent media deletion and storage cleanup `[partial]`
 

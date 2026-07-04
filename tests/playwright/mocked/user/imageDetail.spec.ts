@@ -70,6 +70,9 @@ const getBaseMocks = (username: string) => ({
   GetUserFavoriteChannels: () => ({
     data: { users: [{ username, FavoriteChannels: [] }] },
   }),
+  getUserFavoriteImage: () => ({
+    data: { users: [{ username, FavoriteImages: [] }] },
+  }),
   GetUserChannelCollectionsWithChannels: () => ({
     data: { users: [{ username, Collections: [] }] },
   }),
@@ -79,6 +82,21 @@ const getBaseMocks = (username: string) => ({
   GetImageDetails: () => ({ data: { images: [buildImage()] } }),
   GetImageAlbumUsage: () => ({
     data: { getImageAlbumUsage: buildImageAlbumUsage() },
+  }),
+  GetUserAlbums: () => ({ data: { albums: [] } }),
+  GetUserCollectionsImages: () => ({
+    data: {
+      users: [
+        {
+          username,
+          Collections: [],
+          FavoriteImages: [],
+        },
+      ],
+    },
+  }),
+  CheckImageInCollections: () => ({
+    data: { users: [{ username, Collections: [] }] },
   }),
 });
 
@@ -170,6 +188,7 @@ test.describe('User image detail', () => {
 
     const uploaderAlbum = buildAlbum({
       id: 'album-uploader',
+      imageOrder: ['image-2'],
       Images: [
         {
           id: 'image-2',
@@ -243,6 +262,130 @@ test.describe('User image detail', () => {
       await expect(page.getByText('Bob remixed this album')).toBeVisible();
       await expect(page.getByText('Other images in this album:')).toBeVisible();
       await expect(page.getByAltText('Another scenic photo')).toBeVisible();
+    } finally {
+      await testInfo.attach('graphql-operations.json', {
+        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
+        contentType: 'application/json',
+      });
+    }
+  });
+
+  test('saves another user image to the logged-in user album', async ({
+    context,
+    page,
+  }, testInfo) => {
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
+
+    let wasSaved = false;
+    const bobImage = buildImage({
+      Uploader: {
+        username: 'bob',
+        displayName: 'Bob',
+        profilePicURL: '',
+      },
+    });
+    const aliceAlbum = buildAlbum({
+      id: 'album-alice',
+      imageOrder: [],
+      Discussions: [
+        {
+          id: 'discussion-alice-album',
+          title: 'Alice inspiration board',
+          createdAt: '2024-01-04T00:00:00.000Z',
+          Author: { username: TEST_USER, displayName: 'Alice' },
+          DiscussionChannels: [
+            { id: 'channel-1', channelUniqueName: 'sims4_builds' },
+          ],
+        },
+      ],
+      ImagesAggregate: { count: 2 },
+    });
+
+    const diagnostics = await installGraphqlMocks(page, {
+      ...getBaseMocks(TEST_USER),
+      GetImageDetails: () => ({ data: { images: [bobImage] } }),
+      GetUserAlbums: () => ({
+        data: { albums: [aliceAlbum] },
+      }),
+      AddImageToAlbum: ({ body }) => {
+        expect(body.variables).toEqual({
+          albumId: 'album-alice',
+          imageId: IMAGE_ID,
+        });
+        wasSaved = true;
+        return { data: { addImageToAlbum: true } };
+      },
+      GetImageAlbumUsage: () => ({
+        data: {
+          getImageAlbumUsage: buildImageAlbumUsage(
+            wasSaved
+              ? {
+                  uploaderUsername: 'bob',
+                  uploaderOwnedAlbums: [],
+                  otherAlbums: [aliceAlbum],
+                }
+              : {
+                  uploaderUsername: 'bob',
+                  uploaderOwnedAlbums: [],
+                  otherAlbums: [],
+                }
+          ),
+        },
+      }),
+    });
+
+    try {
+      await page.goto('/u/bob/images/image-1');
+
+      await page.getByRole('button', { name: 'Save to album' }).click();
+      await expect(
+        page.getByRole('heading', { name: 'Save image to album' })
+      ).toBeVisible();
+      await page.getByRole('button', { name: /Alice inspiration board/ }).click();
+
+      await waitForGraphqlOperation(
+        diagnostics.completedOperations,
+        'AddImageToAlbum'
+      );
+      await expect(page.getByText('Albums by other users')).toBeVisible();
+      await expect(page.getByText('Alice inspiration board')).toBeVisible();
+    } finally {
+      await testInfo.attach('graphql-operations.json', {
+        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
+        contentType: 'application/json',
+      });
+    }
+  });
+
+  test('opens the existing image collection save modal', async ({
+    context,
+    page,
+  }, testInfo) => {
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
+
+    const diagnostics = await installGraphqlMocks(page, getBaseMocks(TEST_USER));
+
+    try {
+      await page.goto(`/u/${TEST_USER}/images/${IMAGE_ID}`);
+
+      await page.getByRole('button', { name: 'Save to collection' }).click();
+      await expect(
+        page.getByRole('dialog', { name: 'Add to List' })
+      ).toBeVisible();
+      await waitForGraphqlOperation(
+        diagnostics.completedOperations,
+        'GetUserCollectionsImages'
+      );
+      await waitForGraphqlOperation(
+        diagnostics.completedOperations,
+        'CheckImageInCollections'
+      );
     } finally {
       await testInfo.attach('graphql-operations.json', {
         body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
