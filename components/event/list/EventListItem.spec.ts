@@ -2,14 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createMockRoute, createMockRouter } from '@/tests/utils/mockRouter';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { makeEvent } from '@/tests/utils/factories';
-import type { Event } from '@/__generated__/graphql';
+import type { Event, EventChannel } from '@/__generated__/graphql';
 
 import EventListItem from '@/components/event/list/EventListItem.vue';
 import Tag from '@/components/TagComponent.vue';
 
 // Minimal EventChannel shape the component reads (channelUniqueName / archived /
 // CommentsAggregate). Typed loosely so test fixtures stay terse.
-const eventChannel = (overrides: Record<string, unknown> = {}): any => ({
+const eventChannel = (overrides: Record<string, unknown> = {}): Partial<EventChannel> => ({
   __typename: 'EventChannel',
   channelUniqueName: 'cats',
   archived: false,

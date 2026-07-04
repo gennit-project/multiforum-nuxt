@@ -2,15 +2,7 @@ import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import type { Ref, ComputedRef } from 'vue';
 import { LOCK_ISSUE, UNLOCK_ISSUE } from '@/graphQLData/issue/mutations';
-import type { Issue as GeneratedIssue } from '@/__generated__/graphql';
-
-type Issue = GeneratedIssue & {
-  issueNumber: number;
-  locked?: boolean;
-  lockedAt?: string;
-  lockReason?: string;
-  LockedBy?: { displayName?: string };
-};
+import type { Issue } from '@/__generated__/graphql';
 
 type UseIssueLockParams = {
   activeIssueId: Ref<string> | ComputedRef<string>;

@@ -9,15 +9,7 @@ import {
   COUNT_CLOSED_ISSUES,
   COUNT_OPEN_ISSUES,
 } from '@/graphQLData/mod/queries';
-import type { Issue as GeneratedIssue } from '@/__generated__/graphql';
-
-type Issue = GeneratedIssue & {
-  issueNumber: number;
-  locked?: boolean;
-  lockedAt?: string;
-  lockReason?: string;
-  LockedBy?: { displayName?: string };
-};
+import type { Issue } from '@/__generated__/graphql';
 
 // Cache query result types
 interface IssuesAggregateData {

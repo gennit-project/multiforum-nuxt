@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useAlbumAutoSave } from '@/composables/useAlbumAutoSave';
+import type { Album } from '@/__generated__/graphql';
 
 const mockMutate = vi.fn();
 
@@ -99,7 +100,7 @@ describe('useAlbumAutoSave', () => {
           { id: 'img-1', url: 'http://example.com/1.jpg', alt: 'existing', caption: '', copyright: '' },
         ],
         imageOrder: ['img-1'],
-      } as any;
+      } as Partial<Album> as Album;
 
       const getAlbumData = () => ({
         images: [
@@ -144,7 +145,7 @@ describe('useAlbumAutoSave', () => {
           { id: 'img-2', url: 'http://example.com/2.jpg', alt: 'second', caption: '', copyright: '' },
         ],
         imageOrder: ['img-1', 'img-2'],
-      } as any;
+      } as Partial<Album> as Album;
 
       const getAlbumData = () => ({
         images: [
@@ -187,7 +188,7 @@ describe('useAlbumAutoSave', () => {
           { id: 'img-1', url: 'http://example.com/1.jpg', alt: 'old alt', caption: 'old caption', copyright: '' },
         ],
         imageOrder: ['img-1'],
-      } as any;
+      } as Partial<Album> as Album;
 
       const getAlbumData = () => ({
         images: [
@@ -238,7 +239,7 @@ describe('useAlbumAutoSave', () => {
           { id: 'img-1', url: 'http://example.com/1.jpg', alt: 'same', caption: '', copyright: '' },
         ],
         imageOrder: ['img-1'],
-      } as any;
+      } as Partial<Album> as Album;
 
       const getAlbumData = () => ({
         images: [
@@ -287,7 +288,7 @@ describe('useAlbumAutoSave', () => {
           id: 'album-1',
           Images: [],
           imageOrder: [],
-        } as any,
+        } as Partial<Album> as Album,
         getAlbumData: () => ({
           images: [{ id: 'img-1', url: 'test.jpg', alt: '', caption: '', copyright: '' }],
           imageOrder: ['img-1'],
@@ -312,7 +313,7 @@ describe('useAlbumAutoSave', () => {
           id: 'album-1',
           Images: [],
           imageOrder: [],
-        } as any,
+        } as Partial<Album> as Album,
         getAlbumData: () => ({
           images: [{ id: 'img-1', url: 'test.jpg', alt: '', caption: '', copyright: '' }],
           imageOrder: ['img-1'],

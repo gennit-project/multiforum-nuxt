@@ -5,7 +5,11 @@ import { createMockRoute } from '@/tests/utils/mockRouter';
 import { createAuthStateMock } from '@/tests/utils/mockAuth';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { makeDiscussion } from '@/tests/utils/factories';
-import type { Discussion } from '@/__generated__/graphql';
+import type {
+  Discussion,
+  DiscussionChannel,
+  Album,
+} from '@/__generated__/graphql';
 
 import SitewideDiscussionListItem from '@/components/discussion/list/SitewideDiscussionListItem.vue';
 
@@ -39,8 +43,10 @@ const discussion = (overrides: Record<string, unknown> = {}): Discussion =>
     ...overrides,
   } as Partial<Discussion>);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const channel = (uniqueName: string, channelIconURL = ''): any => ({
+const channel = (
+  uniqueName: string,
+  channelIconURL = ''
+): Partial<DiscussionChannel> => ({
   channelUniqueName: uniqueName,
   Channel: { uniqueName, displayName: uniqueName, channelIconURL },
   CommentsAggregate: { count: 0 },
@@ -49,8 +55,7 @@ const channel = (uniqueName: string, channelIconURL = ''): any => ({
 const album = (
   images: { id: string; url: string }[],
   imageOrder: string[] = []
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any => ({ id: 'album-1', imageOrder, Images: images });
+): Partial<Album> => ({ id: 'album-1', imageOrder, Images: images });
 
 // The channel-icon wrapper carries the `group/chicon` class; each holds a
 // hover tooltip element carrying `group-hover/chicon`.

@@ -1,7 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
+import type { Issue } from '@/__generated__/graphql';
 import { useIssueLock } from './useIssueLock';
+
+type ActiveIssueRef = Parameters<typeof useIssueLock>[0]['activeIssue'];
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: vi.fn(),
@@ -34,7 +37,7 @@ describe('useIssueLock', () => {
   it('opens and closes the lock dialog while clearing the reason', () => {
     const issueLock = useIssueLock({
       activeIssueId: ref('issue-1'),
-      activeIssue: ref({ id: 'issue-1', issueNumber: 1 } as any),
+      activeIssue: ref({ id: 'issue-1', issueNumber: 1 } as Issue) as ActiveIssueRef,
       isSuspendedMod: ref(false),
       refetchIssue,
     });
@@ -56,7 +59,7 @@ describe('useIssueLock', () => {
   it('locks an active issue and refetches it', async () => {
     const issueLock = useIssueLock({
       activeIssueId: ref('issue-1'),
-      activeIssue: ref({ id: 'issue-1', issueNumber: 1 } as any),
+      activeIssue: ref({ id: 'issue-1', issueNumber: 1 } as Issue) as ActiveIssueRef,
       isSuspendedMod: ref(false),
       refetchIssue,
     });
@@ -81,7 +84,7 @@ describe('useIssueLock', () => {
   it('does not lock when the mod is suspended', async () => {
     const issueLock = useIssueLock({
       activeIssueId: ref('issue-1'),
-      activeIssue: ref({ id: 'issue-1', issueNumber: 1 } as any),
+      activeIssue: ref({ id: 'issue-1', issueNumber: 1 } as Issue) as ActiveIssueRef,
       isSuspendedMod: ref(true),
       refetchIssue,
     });
@@ -95,7 +98,7 @@ describe('useIssueLock', () => {
   it('unlocks an active issue and refetches it', async () => {
     const issueLock = useIssueLock({
       activeIssueId: ref('issue-1'),
-      activeIssue: ref({ id: 'issue-1', issueNumber: 1 } as any),
+      activeIssue: ref({ id: 'issue-1', issueNumber: 1 } as Issue) as ActiveIssueRef,
       isSuspendedMod: ref(false),
       refetchIssue,
     });

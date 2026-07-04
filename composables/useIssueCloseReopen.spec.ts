@@ -1,7 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
+import type { Issue } from '@/__generated__/graphql';
 import { useIssueCloseReopen } from './useIssueCloseReopen';
+
+type ActiveIssueRef = Parameters<typeof useIssueCloseReopen>[0]['activeIssue'];
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: vi.fn(),
@@ -27,7 +30,7 @@ describe('useIssueCloseReopen', () => {
   it('returns close and reopen mutation handlers', () => {
     const issueActions = useIssueCloseReopen({
       activeIssueId: ref('issue-1'),
-      activeIssue: ref({ id: 'issue-1', issueNumber: 1 } as any),
+      activeIssue: ref({ id: 'issue-1', issueNumber: 1 } as Issue) as ActiveIssueRef,
       channelId: ref('general'),
     });
 
@@ -47,7 +50,7 @@ describe('useIssueCloseReopen', () => {
     const activeIssue = { id: 'issue-1', issueNumber: 1, body: 'Issue body' };
     useIssueCloseReopen({
       activeIssueId: ref('issue-1'),
-      activeIssue: ref(activeIssue as any),
+      activeIssue: ref(activeIssue as Issue) as ActiveIssueRef,
       channelId: ref('general'),
     });
     const closeOptionsFactory = (useMutation as unknown as ReturnType<typeof vi.fn>)
@@ -111,7 +114,7 @@ describe('useIssueCloseReopen', () => {
     const activeIssue = { id: 'issue-1', issueNumber: 1, body: 'Issue body' };
     useIssueCloseReopen({
       activeIssueId: ref('issue-1'),
-      activeIssue: ref(activeIssue as any),
+      activeIssue: ref(activeIssue as Issue) as ActiveIssueRef,
       channelId: ref('general'),
     });
     const reopenOptionsFactory = (useMutation as unknown as ReturnType<typeof vi.fn>)

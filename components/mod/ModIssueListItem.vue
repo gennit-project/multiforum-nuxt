@@ -6,12 +6,10 @@ import FlagIcon from '@/components/icons/FlagIcon.vue';
 import ChannelIconStack from '@/components/channel/ChannelIconStack.vue';
 import TagComponent from '@/components/TagComponent.vue';
 
+// Client-only fields the list view denormalizes onto the issue before passing
+// it in; they are not part of the generated GraphQL Issue schema.
 type Issue = GeneratedIssue & {
-  issueNumber: number;
-  locked?: boolean | null;
-  channelUniqueName?: string | null;
   channelIconURL?: string | null;
-  authorName?: string | null;
   reportCount?: number | null;
 };
 
