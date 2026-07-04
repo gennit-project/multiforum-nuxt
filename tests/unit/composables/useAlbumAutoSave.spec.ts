@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useAlbumAutoSave } from '@/composables/useAlbumAutoSave';
-import type { Album } from '@/__generated__/graphql';
+import { makeAlbum } from '@/tests/utils/factories';
 
 const mockMutate = vi.fn();
 
@@ -94,13 +94,13 @@ describe('useAlbumAutoSave', () => {
     });
 
     it('builds connect array for new images added to existing album', async () => {
-      const existingAlbum = {
+      const existingAlbum = makeAlbum({
         id: 'album-1',
         Images: [
           { id: 'img-1', url: 'http://example.com/1.jpg', alt: 'existing', caption: '', copyright: '' },
         ],
         imageOrder: ['img-1'],
-      } as Partial<Album> as Album;
+      });
 
       const getAlbumData = () => ({
         images: [
@@ -138,14 +138,14 @@ describe('useAlbumAutoSave', () => {
     });
 
     it('builds disconnect array for removed images', async () => {
-      const existingAlbum = {
+      const existingAlbum = makeAlbum({
         id: 'album-1',
         Images: [
           { id: 'img-1', url: 'http://example.com/1.jpg', alt: 'first', caption: '', copyright: '' },
           { id: 'img-2', url: 'http://example.com/2.jpg', alt: 'second', caption: '', copyright: '' },
         ],
         imageOrder: ['img-1', 'img-2'],
-      } as Partial<Album> as Album;
+      });
 
       const getAlbumData = () => ({
         images: [
@@ -182,13 +182,13 @@ describe('useAlbumAutoSave', () => {
     });
 
     it('builds update array when image properties change', async () => {
-      const existingAlbum = {
+      const existingAlbum = makeAlbum({
         id: 'album-1',
         Images: [
           { id: 'img-1', url: 'http://example.com/1.jpg', alt: 'old alt', caption: 'old caption', copyright: '' },
         ],
         imageOrder: ['img-1'],
-      } as Partial<Album> as Album;
+      });
 
       const getAlbumData = () => ({
         images: [
@@ -233,13 +233,13 @@ describe('useAlbumAutoSave', () => {
     });
 
     it('does not include update operation when image properties unchanged', async () => {
-      const existingAlbum = {
+      const existingAlbum = makeAlbum({
         id: 'album-1',
         Images: [
           { id: 'img-1', url: 'http://example.com/1.jpg', alt: 'same', caption: '', copyright: '' },
         ],
         imageOrder: ['img-1'],
-      } as Partial<Album> as Album;
+      });
 
       const getAlbumData = () => ({
         images: [
@@ -284,11 +284,11 @@ describe('useAlbumAutoSave', () => {
 
       const { performAutoSave, isAutoSaving } = useAlbumAutoSave({
         discussionId: 'disc-1',
-        existingAlbum: {
+        existingAlbum: makeAlbum({
           id: 'album-1',
           Images: [],
           imageOrder: [],
-        } as Partial<Album> as Album,
+        }),
         getAlbumData: () => ({
           images: [{ id: 'img-1', url: 'test.jpg', alt: '', caption: '', copyright: '' }],
           imageOrder: ['img-1'],
@@ -309,11 +309,11 @@ describe('useAlbumAutoSave', () => {
 
       const { performAutoSave, autoSaveSuccess } = useAlbumAutoSave({
         discussionId: 'disc-1',
-        existingAlbum: {
+        existingAlbum: makeAlbum({
           id: 'album-1',
           Images: [],
           imageOrder: [],
-        } as Partial<Album> as Album,
+        }),
         getAlbumData: () => ({
           images: [{ id: 'img-1', url: 'test.jpg', alt: '', caption: '', copyright: '' }],
           imageOrder: ['img-1'],

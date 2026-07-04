@@ -7,11 +7,8 @@ import {
   isDiscussionDetailPage,
   isDownloadDetailPage,
 } from '@/utils/channelUtils';
-import type {
-  Channel,
-  User,
-  ModerationProfile,
-} from '@/__generated__/graphql';
+import type { Channel } from '@/__generated__/graphql';
+import type { DeepPartial } from '@/tests/utils/factories';
 
 describe('channelUtils', () => {
   describe('getBotInvokeHandle', () => {
@@ -73,7 +70,7 @@ describe('channelUtils', () => {
   });
 
   describe('generateChannelTabs', () => {
-    function createMockChannel(overrides: Partial<Channel> = {}): Channel {
+    function createMockChannel(overrides: DeepPartial<Channel> = {}): Channel {
       return {
         uniqueName: 'test-channel',
         displayName: 'Test Channel',
@@ -168,7 +165,7 @@ describe('channelUtils', () => {
 
     it('includes settings tab for admin users', () => {
       const channel = createMockChannel({
-        Admins: [{ username: 'adminuser' }] as unknown as User[],
+        Admins: [{ username: 'adminuser' }],
       });
       const tabs = generateChannelTabs({
         channel,
@@ -183,7 +180,7 @@ describe('channelUtils', () => {
 
     it('excludes settings tab for non-admin users', () => {
       const channel = createMockChannel({
-        Admins: [{ username: 'adminuser' }] as unknown as User[],
+        Admins: [{ username: 'adminuser' }],
       });
       const tabs = generateChannelTabs({
         channel,
@@ -198,7 +195,7 @@ describe('channelUtils', () => {
 
     it('includes moderation tab for admin users', () => {
       const channel = createMockChannel({
-        Admins: [{ username: 'adminuser' }] as unknown as User[],
+        Admins: [{ username: 'adminuser' }],
       });
       const tabs = generateChannelTabs({
         channel,
@@ -216,7 +213,7 @@ describe('channelUtils', () => {
         Admins: [],
         Moderators: [
           { displayName: 'ModProfile1' },
-        ] as unknown as ModerationProfile[],
+        ],
       });
       const tabs = generateChannelTabs({
         channel,
@@ -231,8 +228,8 @@ describe('channelUtils', () => {
 
     it('excludes moderation tab for regular users', () => {
       const channel = createMockChannel({
-        Admins: [{ username: 'admin' }] as unknown as User[],
-        Moderators: [{ displayName: 'SomeMod' }] as unknown as ModerationProfile[],
+        Admins: [{ username: 'admin' }],
+        Moderators: [{ displayName: 'SomeMod' }],
       });
       const tabs = generateChannelTabs({
         channel,

@@ -4,7 +4,7 @@ import { asMock, createQueryMock } from '@/tests/utils/mockApollo';
 import { createMockRoute } from '@/tests/utils/mockRouter';
 import { createAuthStateMock } from '@/tests/utils/mockAuth';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
-import { makeDiscussion } from '@/tests/utils/factories';
+import { makeDiscussion, type DeepPartial } from '@/tests/utils/factories';
 import type {
   Discussion,
   DiscussionChannel,
@@ -36,12 +36,12 @@ const mountItem = (discussion: Discussion) => {
   });
 };
 
-const discussion = (overrides: Record<string, unknown> = {}): Discussion =>
+const discussion = (overrides: DeepPartial<Discussion> = {}): Discussion =>
   makeDiscussion({
     Author: { username: 'alice' },
     DiscussionChannels: [],
     ...overrides,
-  } as Partial<Discussion>);
+  });
 
 const channel = (
   uniqueName: string,

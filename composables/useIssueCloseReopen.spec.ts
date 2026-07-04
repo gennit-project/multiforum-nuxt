@@ -2,9 +2,8 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import type { Issue } from '@/__generated__/graphql';
+import { makeIssue } from '@/tests/utils/factories';
 import { useIssueCloseReopen } from './useIssueCloseReopen';
-
-type ActiveIssueRef = Parameters<typeof useIssueCloseReopen>[0]['activeIssue'];
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: vi.fn(),
@@ -30,7 +29,7 @@ describe('useIssueCloseReopen', () => {
   it('returns close and reopen mutation handlers', () => {
     const issueActions = useIssueCloseReopen({
       activeIssueId: ref('issue-1'),
-      activeIssue: ref({ id: 'issue-1', issueNumber: 1 } as Issue) as ActiveIssueRef,
+      activeIssue: ref<Issue | null>(makeIssue({ id: 'issue-1', issueNumber: 1 })),
       channelId: ref('general'),
     });
 
@@ -47,10 +46,14 @@ describe('useIssueCloseReopen', () => {
   });
 
   it('close updater moves the issue from open to closed cache data', () => {
-    const activeIssue = { id: 'issue-1', issueNumber: 1, body: 'Issue body' };
+    const activeIssue = makeIssue({
+      id: 'issue-1',
+      issueNumber: 1,
+      body: 'Issue body',
+    });
     useIssueCloseReopen({
       activeIssueId: ref('issue-1'),
-      activeIssue: ref(activeIssue as Issue) as ActiveIssueRef,
+      activeIssue: ref<Issue | null>(activeIssue),
       channelId: ref('general'),
     });
     const closeOptionsFactory = (useMutation as unknown as ReturnType<typeof vi.fn>)
@@ -111,10 +114,14 @@ describe('useIssueCloseReopen', () => {
   });
 
   it('reopen updater moves the issue from closed to open cache data', () => {
-    const activeIssue = { id: 'issue-1', issueNumber: 1, body: 'Issue body' };
+    const activeIssue = makeIssue({
+      id: 'issue-1',
+      issueNumber: 1,
+      body: 'Issue body',
+    });
     useIssueCloseReopen({
       activeIssueId: ref('issue-1'),
-      activeIssue: ref(activeIssue as Issue) as ActiveIssueRef,
+      activeIssue: ref<Issue | null>(activeIssue),
       channelId: ref('general'),
     });
     const reopenOptionsFactory = (useMutation as unknown as ReturnType<typeof vi.fn>)
