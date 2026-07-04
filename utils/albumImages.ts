@@ -9,6 +9,10 @@ export type AlbumImageSource = {
   alt?: string | null;
   caption?: string | null;
   copyright?: string | null;
+  Uploader?: {
+    username?: string | null;
+    displayName?: string | null;
+  } | null;
 };
 
 export type AlbumEditorImage = {
@@ -20,6 +24,10 @@ export type AlbumEditorImage = {
   hasSensitiveContent: boolean;
   hasSpoiler: boolean;
   copyright: string;
+  Uploader?: {
+    username?: string | null;
+    displayName?: string | null;
+  } | null;
 };
 
 export function mapAlbumImagesToForm(
@@ -35,6 +43,7 @@ export function mapAlbumImagesToForm(
     hasSensitiveContent: false,
     hasSpoiler: false,
     copyright: image.copyright || '',
+    Uploader: image.Uploader,
   }));
 }
 

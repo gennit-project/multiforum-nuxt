@@ -15,6 +15,10 @@ type ImageData = {
   alt: string;
   caption: string;
   copyright: string;
+  Uploader?: {
+    username?: string | null;
+    displayName?: string | null;
+  } | null;
 };
 
 defineProps<{
@@ -23,6 +27,7 @@ defineProps<{
   isFirst: boolean;
   isLast: boolean;
   isLoading: boolean;
+  canPermanentlyDelete?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -31,6 +36,14 @@ const emit = defineEmits<{
 }>();
 
 const { mdAndDown } = useDisplay();
+
+const getUploaderLabel = (image: ImageData) => {
+  const uploader = image.Uploader;
+  if (!uploader?.username) return '';
+  return uploader.displayName
+    ? `${uploader.displayName} (${uploader.username})`
+    : uploader.username;
+};
 </script>
 
 <template>
@@ -38,6 +51,12 @@ const { mdAndDown } = useDisplay();
     <div class="mb-2 flex items-center justify-between">
       <div class="flex items-center">
         <span class="font-bold dark:text-white">Image {{ index + 1 }}</span>
+        <span
+          v-if="getUploaderLabel(image)"
+          class="ml-2 text-xs text-gray-500 dark:text-gray-400"
+        >
+          Uploaded by {{ getUploaderLabel(image) }}
+        </span>
       </div>
       <div class="flex items-center gap-2">
         <div class="ml-4 flex gap-1">
@@ -66,7 +85,7 @@ const { mdAndDown } = useDisplay();
           @click="emit('delete')"
         >
           <XmarkIcon class="h-4" />
-          Delete
+          {{ canPermanentlyDelete ? 'Delete' : 'Remove' }}
         </button>
       </div>
     </div>
