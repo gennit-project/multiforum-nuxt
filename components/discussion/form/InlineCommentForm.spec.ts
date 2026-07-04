@@ -2,6 +2,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import InlineCommentForm from './InlineCommentForm.vue';
+import type { Mutation } from '@/__generated__/graphql';
+
+type CreateCommentsResult = { data?: Pick<Mutation, 'createComments'> };
 
 const createCommentError = ref<{ message: string } | null>(null);
 const createCommentLoading = ref(false);
@@ -15,7 +18,7 @@ const mutateMock = vi.fn();
 // Captured at mount time so tests can invoke the real mutation `update` and
 // `onDone` callbacks that a plain vi.fn() mock would never run.
 let capturedMutationOptions: (() => any) | null = null;
-let onDoneCallbacks: ((result: any) => void)[] = [];
+let onDoneCallbacks: ((result: CreateCommentsResult) => void)[] = [];
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({
@@ -33,7 +36,8 @@ vi.mock('@vue/apollo-composable', () => ({
       mutate: mutateMock,
       loading: createCommentLoading,
       error: createCommentError,
-      onDone: (cb: (result: any) => void) => onDoneCallbacks.push(cb),
+      onDone: (cb: (result: CreateCommentsResult) => void) =>
+        onDoneCallbacks.push(cb),
     };
   },
 }));

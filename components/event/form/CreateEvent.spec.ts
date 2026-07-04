@@ -3,6 +3,11 @@ import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import CreateEvent from '@/components/event/form/CreateEvent.vue';
 import { useUsername } from '@/composables/useAuthState';
+import type { Mutation } from '@/__generated__/graphql';
+
+type CreateEventResult = {
+  data?: Pick<Mutation, 'createEventWithChannelConnections'>;
+};
 
 const { mockUsername } = await vi.hoisted(async () => {
   const { ref } = await import('vue');
@@ -15,7 +20,7 @@ vi.mock('@/composables/useAuthState', () => ({
 
 const mockPush = vi.fn();
 const mockMutate = vi.fn();
-const onDoneCallbacks: Array<(data: any) => void> = [];
+const onDoneCallbacks: Array<(result: CreateEventResult) => void> = [];
 const channelResult = ref({
   channels: [
     {
@@ -38,7 +43,7 @@ vi.mock('@vue/apollo-composable', () => ({
   useMutation: vi.fn(() => ({
     mutate: mockMutate,
     error: ref(null),
-    onDone: (cb: any) => {
+    onDone: (cb: (result: CreateEventResult) => void) => {
       onDoneCallbacks.push(cb);
     },
   })),

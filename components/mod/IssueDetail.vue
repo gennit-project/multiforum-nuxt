@@ -11,7 +11,7 @@ import { DateTime } from 'luxon';
 import type {
   EventChannel,
   DiscussionChannel,
-  Issue as GeneratedIssue,
+  Issue,
 } from '@/__generated__/graphql';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import 'md-editor-v3/lib/style.css';
@@ -53,14 +53,6 @@ import TagComponent from '@/components/TagComponent.vue';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
-
-type Issue = GeneratedIssue & {
-  issueNumber: number;
-  locked?: boolean;
-  lockedAt?: string;
-  lockReason?: string;
-  LockedBy?: { displayName?: string };
-};
 
 const props = defineProps({
   channelId: {

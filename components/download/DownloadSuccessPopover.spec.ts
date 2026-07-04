@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
 import DownloadSuccessPopover from '@/components/download/DownloadSuccessPopover.vue';
+import type { Discussion } from '@/__generated__/graphql';
 
 const baseDiscussion = {
   id: 'discussion-1',
@@ -20,7 +21,7 @@ const baseDiscussion = {
       supportPayPalMeUrl: '',
     },
   ],
-};
+} as Partial<Discussion>;
 
 const mountPopover = (discussion: unknown = baseDiscussion) =>
   mount(DownloadSuccessPopover, {
@@ -44,7 +45,7 @@ describe('DownloadSuccessPopover', () => {
   it('does not render the support section when no support links are configured', () => {
     const wrapper = mount(DownloadSuccessPopover, {
       props: {
-        discussion: baseDiscussion as any,
+        discussion: baseDiscussion as Discussion,
         visible: true,
       },
     });
@@ -65,7 +66,7 @@ describe('DownloadSuccessPopover', () => {
               supportKoFiUrl: 'https://ko-fi.com/alice',
             },
           ],
-        } as any,
+        } as Discussion,
         visible: true,
       },
     });

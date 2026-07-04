@@ -3,6 +3,11 @@ import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import CreateDiscussion from '@/components/discussion/form/CreateDiscussion.vue';
 import { useUsername } from '@/composables/useAuthState';
+import type { Mutation } from '@/__generated__/graphql';
+
+type CreateDiscussionResult = {
+  data?: Pick<Mutation, 'createDiscussionWithChannelConnections'>;
+};
 
 const { mockUsername } = await vi.hoisted(async () => {
   const { ref } = await import('vue');
@@ -14,7 +19,7 @@ vi.mock('@/composables/useAuthState', () => ({
 }));
 
 const mockPush = vi.fn();
-const onDoneCallbacks: Array<(data: any) => void> = [];
+const onDoneCallbacks: Array<(result: CreateDiscussionResult) => void> = [];
 const createMutate = vi.fn();
 let capturedCreateOptions: (() => any) | null = null;
 
@@ -35,7 +40,7 @@ vi.mock('@vue/apollo-composable', () => ({
       mutate: createMutate,
       loading: ref(false),
       error: ref(null),
-      onDone: (cb: any) => {
+      onDone: (cb: (result: CreateDiscussionResult) => void) => {
         onDoneCallbacks.push(cb);
       },
     };

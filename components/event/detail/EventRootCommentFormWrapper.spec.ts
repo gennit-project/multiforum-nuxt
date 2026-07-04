@@ -2,8 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import EventRootCommentFormWrapper from './EventRootCommentFormWrapper.vue';
+import type { Mutation } from '@/__generated__/graphql';
 
-const onDoneCallbacks: Array<(result: any) => void> = [];
+type CreateCommentsResult = { data?: Pick<Mutation, 'createComments'> };
+
+const onDoneCallbacks: Array<(result: CreateCommentsResult) => void> = [];
 const suspensionIssueNumber = ref<number | null>(null);
 const suspensionChannelId = ref('');
 
@@ -21,7 +24,7 @@ vi.mock('@vue/apollo-composable', () => ({
   useMutation: () => ({
     mutate: vi.fn(),
     error: ref(null),
-    onDone: (cb: (result: any) => void) => {
+    onDone: (cb: (result: CreateCommentsResult) => void) => {
       onDoneCallbacks.push(cb);
     },
   }),

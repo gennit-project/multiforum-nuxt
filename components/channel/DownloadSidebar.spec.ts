@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { defineComponent, nextTick, ref } from 'vue';
 import DownloadSidebar from '@/components/channel/DownloadSidebar.vue';
+import type { Discussion } from '@/__generated__/graphql';
 
 const authState = ref(false);
 const trackDownloadMock = vi.hoisted(() => vi.fn(() => Promise.resolve()));
@@ -81,7 +82,7 @@ const discussionWithFile = {
       },
     },
   ],
-};
+} as Partial<Discussion>;
 
 describe('DownloadSidebar', () => {
   beforeEach(() => {
@@ -100,7 +101,7 @@ describe('DownloadSidebar', () => {
 
     const wrapper = mount(DownloadSidebar, {
       props: {
-        discussion: discussionWithFile as any,
+        discussion: discussionWithFile as Discussion,
         discussionId: 'discussion-1',
         channelUniqueName: 'test-forum',
       },
@@ -123,7 +124,7 @@ describe('DownloadSidebar', () => {
 
     const wrapper = mount(DownloadSidebar, {
       props: {
-        discussion: discussionWithFile as any,
+        discussion: discussionWithFile as Discussion,
         discussionId: 'discussion-1',
         channelUniqueName: 'test-forum',
       },
@@ -143,7 +144,7 @@ describe('DownloadSidebar', () => {
   it('shows total and unique download counts', () => {
     const wrapper = mount(DownloadSidebar, {
       props: {
-        discussion: discussionWithFile as any,
+        discussion: discussionWithFile as Discussion,
         discussionId: 'discussion-1',
         channelUniqueName: 'test-forum',
       },
@@ -161,7 +162,7 @@ describe('DownloadSidebar', () => {
         discussion: {
           ...discussionWithFile,
           DownloadableFiles: [],
-        } as any,
+        } as Discussion,
         discussionId: 'discussion-1',
         channelUniqueName: 'test-forum',
       },

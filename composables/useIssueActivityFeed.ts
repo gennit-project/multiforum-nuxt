@@ -8,18 +8,7 @@ import {
   ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD,
   ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_USER,
 } from '@/graphQLData/issue/mutations';
-import type {
-  Issue as GeneratedIssue,
-  ModerationAction,
-} from '@/__generated__/graphql';
-
-type Issue = GeneratedIssue & {
-  issueNumber: number;
-  locked?: boolean;
-  lockedAt?: string;
-  lockReason?: string;
-  LockedBy?: { displayName?: string };
-};
+import type { Issue, ModerationAction } from '@/__generated__/graphql';
 
 const DEFAULT_ACTIVITY_FEED_PAGE_SIZE = 10;
 

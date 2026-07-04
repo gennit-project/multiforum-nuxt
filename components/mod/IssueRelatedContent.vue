@@ -6,15 +6,7 @@ import CommentDetails from '@/components/mod/CommentDetails.vue';
 import ImageDetails from '@/components/mod/ImageDetails.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
 import SuspendModButton from '@/components/mod/SuspendModButton.vue';
-import type { Issue as GeneratedIssue } from '@/__generated__/graphql';
-
-type Issue = GeneratedIssue & {
-  issueNumber: number;
-  locked?: boolean;
-  lockedAt?: string;
-  lockReason?: string;
-  LockedBy?: { displayName?: string };
-};
+import type { Issue } from '@/__generated__/graphql';
 
 const props = defineProps<{
   activeIssue: Issue;

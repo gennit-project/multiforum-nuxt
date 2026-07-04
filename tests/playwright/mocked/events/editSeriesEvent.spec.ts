@@ -8,6 +8,7 @@ import {
 } from '../../helpers/graphqlFixtures';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { installGraphqlMocks } from '../../helpers/mockGraphql';
+import type { MutationUpdateEventInSeriesArgs } from '@/__generated__/graphql';
 
 const TEST_CHANNEL = 'cats';
 const TEST_USERNAME = 'testuser';
@@ -207,7 +208,7 @@ test.describe('Edit Series Event', () => {
   });
 
   test('scope modal allows selecting THIS_ONLY', async ({ context, page }) => {
-    let updateVariables: any = null;
+    let updateVariables: MutationUpdateEventInSeriesArgs | null = null;
 
     await installMockAuth(context, page, {
       username: TEST_USERNAME,
@@ -234,7 +235,7 @@ test.describe('Edit Series Event', () => {
         data: { eventChannels: [{ id: 'event-channel-1', archived: false }] },
       }),
       updateEventInSeries: ({ body }) => {
-        updateVariables = body.variables;
+        updateVariables = body.variables as MutationUpdateEventInSeriesArgs;
         return {
           data: {
             updateEventInSeries: buildSeriesEvent({ title: 'Updated Title' }),
@@ -269,11 +270,11 @@ test.describe('Edit Series Event', () => {
     }).toPass({ timeout: 10000 });
 
     // Verify scope was THIS_ONLY
-    expect(updateVariables.scope).toBe('THIS_ONLY');
+    expect(updateVariables!.scope).toBe('THIS_ONLY');
   });
 
   test('scope modal allows selecting ALL_IN_SERIES', async ({ context, page }) => {
-    let updateVariables: any = null;
+    let updateVariables: MutationUpdateEventInSeriesArgs | null = null;
 
     await installMockAuth(context, page, {
       username: TEST_USERNAME,
@@ -300,7 +301,7 @@ test.describe('Edit Series Event', () => {
         data: { eventChannels: [{ id: 'event-channel-1', archived: false }] },
       }),
       updateEventInSeries: ({ body }) => {
-        updateVariables = body.variables;
+        updateVariables = body.variables as MutationUpdateEventInSeriesArgs;
         return {
           data: {
             updateEventInSeries: buildSeriesEvent({ title: 'Updated Title' }),
@@ -335,6 +336,6 @@ test.describe('Edit Series Event', () => {
     }).toPass({ timeout: 10000 });
 
     // Verify scope was ALL_IN_SERIES
-    expect(updateVariables.scope).toBe('ALL_IN_SERIES');
+    expect(updateVariables!.scope).toBe('ALL_IN_SERIES');
   });
 });
