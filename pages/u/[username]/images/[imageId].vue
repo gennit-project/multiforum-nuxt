@@ -354,11 +354,6 @@ const primaryAlbum = computed(() => {
   );
 });
 
-// Album discussions - discussions that use the primary album containing this image
-const albumDiscussions = computed(() => {
-  return primaryAlbum.value?.Discussions || [];
-});
-
 // Album images - ordered according to imageOrder (utils/albumImageOrder),
 // excluding the current image.
 const albumImages = computed(() => {
