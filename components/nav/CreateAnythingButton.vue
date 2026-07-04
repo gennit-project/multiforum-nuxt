@@ -94,12 +94,6 @@ onMounted(() => {
 });
 
 const isMenuOpen = ref(false);
-const showTooltip = ref(false);
-const showFooter = computed(() => {
-  return (
-    route.name && typeof route.name === 'string' && !route.name.includes('map')
-  );
-});
 
 const handleItemClick = (item: MenuItem) => {
   item.action();
@@ -137,7 +131,6 @@ const buttonClasses = computed(() => {
               v-bind="props"
               :class="buttonClasses"
               @click="adjustMenuPosition"
-              @mouseover="showTooltip = true"
             >
               <span
                 v-if="!iconOnly"
@@ -158,15 +151,6 @@ const buttonClasses = computed(() => {
                 class="-mr-1 ml-1 mt-0.5 h-3 w-3"
                 aria-hidden="true"
               />
-              <v-tooltip
-                v-if="showTooltip && !usePrimaryButton && !iconOnly"
-                location="bottom"
-                activator="parent"
-                aria-label="Create new"
-                :content-props="{ 'aria-label': 'Create new' }"
-              >
-                Create new...
-              </v-tooltip>
             </button>
           </template>
 
@@ -233,17 +217,6 @@ const buttonClasses = computed(() => {
           aria-hidden="true"
         />
       </button>
-      <client-only>
-        <v-tooltip
-          v-if="showFooter"
-          activator="parent"
-          location="bottom"
-          aria-label="Create new"
-          :content-props="{ 'aria-label': 'Create new' }"
-        >
-          Create new...
-        </v-tooltip>
-      </client-only>
     </template>
   </RequireAuth>
 </template>

@@ -34,7 +34,6 @@ const vuetifyStubs = {
     inheritAttrs: false,
     template: '<button v-bind="$attrs"><slot /></button>',
   },
-  VTooltip: { name: 'VTooltip', template: '<div><slot /></div>' },
   ChevronDownIcon: true,
 };
 
@@ -127,21 +126,5 @@ describe('CreateAnythingButton menu actions (forum-scoped)', () => {
     await wrapper.get('[data-testid="create-event-menu-item"]').trigger('click');
 
     expect(nuxt.push).toHaveBeenCalledWith('/forums/cats/events/create');
-  });
-});
-
-describe('CreateAnythingButton footer tooltip', () => {
-  it('shows the tooltip when the route is not a map view', () => {
-    nuxt.route = { params: {}, query: {}, name: 'forums-home' };
-    const wrapper = mountButton('does-not-have-auth');
-
-    expect(wrapper.findComponent({ name: 'VTooltip' }).exists()).toBe(true);
-  });
-
-  it('hides the tooltip on map routes', () => {
-    nuxt.route = { params: {}, query: {}, name: 'forums-map' };
-    const wrapper = mountButton('does-not-have-auth');
-
-    expect(wrapper.findComponent({ name: 'VTooltip' }).exists()).toBe(false);
   });
 });
