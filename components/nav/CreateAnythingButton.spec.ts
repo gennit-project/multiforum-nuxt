@@ -72,12 +72,12 @@ describe('CreateAnythingButton classes', () => {
     expect(wrapper.get('button').classes()).toContain('bg-white');
   });
 
-  it('applies the dark background style when backgroundColor is dark', () => {
+  it('applies the dark-mode background style when backgroundColor is dark', () => {
     const wrapper = mountButton('does-not-have-auth', {
       backgroundColor: 'dark',
     });
 
-    expect(wrapper.get('button').classes()).toContain('bg-gray-800');
+    expect(wrapper.get('button').classes()).toContain('dark:bg-gray-800');
   });
 });
 

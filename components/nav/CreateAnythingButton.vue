@@ -102,21 +102,21 @@ const handleItemClick = (item: MenuItem) => {
 
 const buttonClasses = computed(() => {
   if (createButtonProps.iconOnly) {
-    return 'flex h-12 w-12 items-center justify-center rounded-full bg-gray-800 text-white font-semibold hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-gray-100 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-500 dark:focus:ring-offset-gray-900';
+    return 'flex h-12 w-12 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-700 font-semibold hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-500 dark:focus:ring-offset-gray-900';
   }
 
   const baseClasses =
-    'inline-flex items-center gap-1 rounded-md border border-gray-800 px-2 py-2 text-xs focus:outline-none dark:border-gray-600';
+    'inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-2 text-xs focus:outline-none dark:border-gray-600';
 
   if (createButtonProps.usePrimaryButton) {
-    return `${baseClasses} !border !border-gray-800 dark:!border-gray-600`;
+    return `${baseClasses} !border !border-gray-300 dark:!border-gray-600`;
   }
 
   if (createButtonProps.backgroundColor === 'light') {
-    return `${baseClasses} bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-700`;
+    return `${baseClasses} bg-white text-gray-700 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-700`;
   }
 
-  return `${baseClasses} bg-gray-800 text-gray-100 hover:bg-gray-700`;
+  return `${baseClasses} bg-white text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700`;
 });
 </script>
 
