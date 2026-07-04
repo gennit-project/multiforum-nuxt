@@ -2,9 +2,8 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { nextTick, ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import type { Issue } from '@/__generated__/graphql';
+import { makeIssue } from '@/tests/utils/factories';
 import { useIssueBodyEdit } from './useIssueBodyEdit';
-
-type ActiveIssueRef = Parameters<typeof useIssueBodyEdit>[0]['activeIssue'];
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: vi.fn(),
@@ -28,7 +27,9 @@ describe('useIssueBodyEdit', () => {
 
   it('initializes edited body from the active issue', () => {
     const bodyEdit = useIssueBodyEdit({
-      activeIssue: ref({ id: 'issue-1', issueNumber: 1, body: 'Original' } as Issue) as ActiveIssueRef,
+      activeIssue: ref<Issue | null>(
+        makeIssue({ id: 'issue-1', issueNumber: 1, body: 'Original' })
+      ),
       activeIssueId: ref('issue-1'),
       isIssueAuthor: ref(true),
       isLocked: ref(false),
@@ -41,7 +42,9 @@ describe('useIssueBodyEdit', () => {
 
   it('enters edit mode only for an unlocked issue author', () => {
     const bodyEdit = useIssueBodyEdit({
-      activeIssue: ref({ id: 'issue-1', issueNumber: 1, body: 'Original' } as Issue) as ActiveIssueRef,
+      activeIssue: ref<Issue | null>(
+        makeIssue({ id: 'issue-1', issueNumber: 1, body: 'Original' })
+      ),
       activeIssueId: ref('issue-1'),
       isIssueAuthor: ref(true),
       isLocked: ref(false),
@@ -56,7 +59,9 @@ describe('useIssueBodyEdit', () => {
 
   it('does not enter edit mode when the issue is locked', () => {
     const bodyEdit = useIssueBodyEdit({
-      activeIssue: ref({ id: 'issue-1', issueNumber: 1, body: 'Original' } as Issue) as ActiveIssueRef,
+      activeIssue: ref<Issue | null>(
+        makeIssue({ id: 'issue-1', issueNumber: 1, body: 'Original' })
+      ),
       activeIssueId: ref('issue-1'),
       isIssueAuthor: ref(true),
       isLocked: ref(true),
@@ -70,9 +75,11 @@ describe('useIssueBodyEdit', () => {
   });
 
   it('tracks body changes reactively', async () => {
-    const activeIssue = ref<Issue | null>({ id: 'issue-1', issueNumber: 1, body: 'Original' } as Issue);
+    const activeIssue = ref<Issue | null>(
+      makeIssue({ id: 'issue-1', issueNumber: 1, body: 'Original' })
+    );
     const bodyEdit = useIssueBodyEdit({
-      activeIssue: activeIssue as ActiveIssueRef,
+      activeIssue,
       activeIssueId: ref('issue-1'),
       isIssueAuthor: ref(true),
       isLocked: ref(false),
@@ -80,7 +87,7 @@ describe('useIssueBodyEdit', () => {
       refetchIssue,
     });
 
-    activeIssue.value = { id: 'issue-1', issueNumber: 1, body: 'Updated' } as Issue;
+    activeIssue.value = makeIssue({ id: 'issue-1', issueNumber: 1, body: 'Updated' });
     await nextTick();
 
     expect(bodyEdit.editedIssueBody.value).toBe('Updated');
@@ -88,7 +95,9 @@ describe('useIssueBodyEdit', () => {
 
   it('saves changed issue body and exits edit mode', async () => {
     const bodyEdit = useIssueBodyEdit({
-      activeIssue: ref({ id: 'issue-1', issueNumber: 1, body: 'Original' } as Issue) as ActiveIssueRef,
+      activeIssue: ref<Issue | null>(
+        makeIssue({ id: 'issue-1', issueNumber: 1, body: 'Original' })
+      ),
       activeIssueId: ref('issue-1'),
       isIssueAuthor: ref(true),
       isLocked: ref(false),
@@ -113,7 +122,9 @@ describe('useIssueBodyEdit', () => {
 
   it('does not enter edit mode when the moderator is suspended', () => {
     const bodyEdit = useIssueBodyEdit({
-      activeIssue: ref({ id: 'issue-1', issueNumber: 1, body: 'Original' } as Issue) as ActiveIssueRef,
+      activeIssue: ref<Issue | null>(
+        makeIssue({ id: 'issue-1', issueNumber: 1, body: 'Original' })
+      ),
       activeIssueId: ref('issue-1'),
       isIssueAuthor: ref(true),
       isLocked: ref(false),
@@ -128,7 +139,9 @@ describe('useIssueBodyEdit', () => {
 
   it('does not save the issue body when the moderator is suspended', async () => {
     const bodyEdit = useIssueBodyEdit({
-      activeIssue: ref({ id: 'issue-1', issueNumber: 1, body: 'Original' } as Issue) as ActiveIssueRef,
+      activeIssue: ref<Issue | null>(
+        makeIssue({ id: 'issue-1', issueNumber: 1, body: 'Original' })
+      ),
       activeIssueId: ref('issue-1'),
       isIssueAuthor: ref(true),
       isLocked: ref(false),
@@ -144,7 +157,9 @@ describe('useIssueBodyEdit', () => {
 
   it('exits edit mode without saving when the body is unchanged', async () => {
     const bodyEdit = useIssueBodyEdit({
-      activeIssue: ref({ id: 'issue-1', issueNumber: 1, body: 'Original' } as Issue) as ActiveIssueRef,
+      activeIssue: ref<Issue | null>(
+        makeIssue({ id: 'issue-1', issueNumber: 1, body: 'Original' })
+      ),
       activeIssueId: ref('issue-1'),
       isIssueAuthor: ref(true),
       isLocked: ref(false),

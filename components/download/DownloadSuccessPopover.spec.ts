@@ -1,9 +1,9 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
 import DownloadSuccessPopover from '@/components/download/DownloadSuccessPopover.vue';
-import type { Discussion } from '@/__generated__/graphql';
+import { makeDiscussion } from '@/tests/utils/factories';
 
-const baseDiscussion = {
+const baseDiscussion = makeDiscussion({
   id: 'discussion-1',
   title: 'Useful Download',
   Author: {
@@ -21,7 +21,7 @@ const baseDiscussion = {
       supportPayPalMeUrl: '',
     },
   ],
-} as Partial<Discussion>;
+});
 
 const mountPopover = (discussion: unknown = baseDiscussion) =>
   mount(DownloadSuccessPopover, {
@@ -45,7 +45,7 @@ describe('DownloadSuccessPopover', () => {
   it('does not render the support section when no support links are configured', () => {
     const wrapper = mount(DownloadSuccessPopover, {
       props: {
-        discussion: baseDiscussion as Discussion,
+        discussion: baseDiscussion,
         visible: true,
       },
     });
@@ -56,17 +56,17 @@ describe('DownloadSuccessPopover', () => {
   it('renders custom attribution and configured support links', () => {
     const wrapper = mount(DownloadSuccessPopover, {
       props: {
-        discussion: {
+        discussion: makeDiscussion({
           ...baseDiscussion,
           DownloadableFiles: [
             {
-              ...baseDiscussion.DownloadableFiles[0],
+              ...baseDiscussion.DownloadableFiles?.[0],
               attributionOverride: 'Please credit Alice Studio.',
               supportPatreonUrl: 'https://patreon.com/alice',
               supportKoFiUrl: 'https://ko-fi.com/alice',
             },
           ],
-        } as Discussion,
+        }),
         visible: true,
       },
     });
