@@ -117,32 +117,23 @@ Notes:
 - Discussion/channel owners cannot disable discussion submissions, so there is intentionally no `Does not allow discussions` flag or picker gating for discussion-sharing flows.
 - Unit coverage now includes event eligibility in normal search results, favorite forums, collection-based bulk selection, disabled-option rendering, blocked selection behavior, and locked forum mode.
 
-### 8. User profile pinned posts `[not started]`
+### 8. Images in multiple albums and fuller image-usage display `[partial]`
 
-- [ ] Define eligible pinned content types.
-- [ ] Add a profile-level ordered relationship or ordered ID list with a max of four items.
-- [ ] Add mutations to pin, unpin, and reorder pinned posts with ownership checks.
-- [ ] Add tests for pin limit, owner-only updates, reorder, and deleted/archived content behavior.
-- [ ] Render pinned posts on profile pages.
-- [ ] Show edit controls only to the profile owner.
-- [ ] Add clear empty states and limit messaging.
-
-### 9. Images in multiple albums and fuller image-usage display `[partial]`
-
-- [ ] Change album-image modeling so one image can belong to multiple albums without re-uploading.
-- [ ] Preserve uploader/original attribution on the image node anywhere it is reused.
-- [ ] Define permissions for adding someone else's image to a collection or album.
-- [ ] Add image-detail query support for albums containing the image, grouped into original-poster-owned albums vs other users' albums.
-- [ ] Add tests for multi-album membership, attribution preservation, permission enforcement, and grouped album results.
-- [ ] Update album add/remove flows to link existing images instead of requiring re-upload.
-- [ ] Let users save permitted images from someone else's album to their own library/collection.
-- [ ] On image detail pages, show grouped image usage by original poster vs others.
+- [x] Change album-image modeling so one image can belong to multiple albums without re-uploading. `[in backend PR]`
+- [x] Preserve uploader/original attribution on the image node anywhere it is reused by linking the same image node instead of creating a copy. `[in backend/frontend PRs]`
+- [x] Define permissions for adding someone else's image to a collection or album: album owner may link active images into their own albums; existing collection ownership rules apply for image collections. `[in this slice]`
+- [x] Add image-detail query support for albums containing the image, grouped into original-poster-owned albums vs other users' albums. `[in backend PR]`
+- [x] Add tests for plural album membership during upload creation and grouped album results. `[in backend/frontend PRs]`
+- [x] Add tests for permission enforcement and existing-image add/remove flows. `[in this slice]`
+- [x] Add backend album add/remove flows that link existing images instead of requiring re-upload. `[in this slice]`
+- [x] Let users save permitted images from image detail to their own album or image collection. `[in this slice]`
+- [ ] Add existing-image picker/search to album editor flows.
+- [x] On image detail pages, show grouped image usage by original poster vs others. `[in frontend PR]`
 
 Notes:
-- The frontend already shows some cross-album/image-usage behavior.
-- The current image detail page still appears centered on a single `Album`, not the full grouped usage model in this roadmap item.
+- The remaining work in this section is a fuller album-editor reuse flow, such as browsing/searching existing images while editing an album.
 
-### 10. Permanent media deletion and storage cleanup `[partial]`
+### 9. Permanent media deletion and storage cleanup `[partial]`
 
 - [x] Let authorized users delete album images permanently and remove the backing object from GCP/storage. `[in this PR]`
 - [x] Store backend-verified storage metadata for new image and downloadable-file uploads, including the actual storage URL/object name returned by signed upload creation. `[in draft PR]`
@@ -160,28 +151,28 @@ Notes:
 - Album edit deletion now confirms and calls the backend permanent-delete mutation before removing the image from the album UI.
 - This slice adds storage-backed permanent delete for URL-backed profile images and forum banners by resolving active URLs through upload audit metadata before clearing the owning profile/forum field.
 
-### 11. Wiki: pinned sidebar pages `[not started]`
+### 10. Wiki: pinned sidebar pages `[not started]`
 
 - [ ] Add channel-sidebar support for pinned wiki pages.
 - [ ] Let channel owners and authorized moderators pin an existing wiki page from channel UI.
 - [ ] Add a matching action from wiki detail pages.
 
-### 12. Wiki: lock wiki pages to owners `[not started]`
+### 11. Wiki: lock wiki pages to owners `[not started]`
 
 - [ ] Add a lock state for wiki pages.
 - [ ] Restrict editing of locked wiki pages to channel owners per product rules.
 
-### 13. Moderation: sticky comment on discussion or event `[not started]`
+### 12. Moderation: sticky comment on discussion or event `[not started]`
 
 - [ ] Let moderators sticky a comment so it appears at the top of a discussion or event comment list.
 - [ ] Define ordering, permissions, and unsticky behavior.
 
-### 14. Wiki search: featured wiki pages from server settings `[not started]`
+### 13. Wiki search: featured wiki pages from server settings `[not started]`
 
 - [ ] Add server-admin configuration for featured wiki pages.
 - [ ] Surface featured pages in `/wiki/search`.
 
-### 15. Favorites API optimization `[partial]`
+### 14. Favorites API optimization `[partial]`
 
 - [ ] Update image and channel list queries to include computed favorite state where missing.
 - [ ] Pass `initialIsFavorited` from parent list components consistently.
@@ -192,12 +183,12 @@ Notes:
 - Image and channel favorite buttons now accept `initialIsFavorited`.
 - Comments still appear to use a separate lookup path.
 
-### 16. Auto-save for server settings and channel admin settings `[not started]`
+### 15. Auto-save for server settings and channel admin settings `[not started]`
 
 - [ ] Replace explicit save-button flows where appropriate with autosave behavior.
 - [ ] Start with plugins/settings areas called out in the original note.
 
-### 17. Event edit history: title and description revisions `[partial]`
+### 16. Event edit history: title and description revisions `[partial]`
 
 - [ ] Add event version-history schema fields for title and description revisions plus `DescriptionLastEditedBy`.
 - [ ] Add backend middleware/hook logic to snapshot prior values on update.

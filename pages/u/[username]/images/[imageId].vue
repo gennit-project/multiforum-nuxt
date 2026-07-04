@@ -3,7 +3,12 @@ import { config } from '@/config';
 import { computed, watchEffect, ref, onMounted, onUnmounted } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useRoute, useHead } from 'nuxt/app';
-import { GET_IMAGE_DETAILS } from '@/graphQLData/image/queries';
+import {
+  GET_IMAGE_ALBUM_USAGE,
+  GET_IMAGE_DETAILS,
+  GET_USER_ALBUMS,
+} from '@/graphQLData/image/queries';
+import { ADD_IMAGE_TO_ALBUM } from '@/graphQLData/image/mutations';
 import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
 import type { Image } from '@/__generated__/graphql';
 import { useCopyCurrentUrl } from '@/composables/useCopyCurrentUrl';
@@ -23,8 +28,72 @@ import CancelButton from '@/components/CancelButton.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import AlbumThumbnailGrid from '@/components/album/AlbumThumbnailGrid.vue';
 import { useImageZoomPan } from '@/composables/useImageZoomPan';
+import AddToListPopover from '@/components/collection/AddToListPopover.vue';
+import { useToastStore } from '@/stores/toastStore';
 
 const usernameVar = useUsername();
+const toastStore = useToastStore();
+
+type AlbumUsageDiscussion = {
+  id: string;
+  title?: string | null;
+  createdAt?: string | null;
+  Author?: {
+    username?: string | null;
+    displayName?: string | null;
+  } | null;
+  DiscussionChannels?: Array<{
+    id?: string | null;
+    channelUniqueName?: string | null;
+  }> | null;
+};
+
+type AlbumUsageAlbum = {
+  id: string;
+  imageOrder?: string[] | null;
+  Owner?: {
+    username?: string | null;
+    displayName?: string | null;
+  } | null;
+  Images?: Array<{
+    id: string;
+    url?: string | null;
+    alt?: string | null;
+    caption?: string | null;
+    Uploader?: {
+      username?: string | null;
+    } | null;
+  }> | null;
+  Discussions?: AlbumUsageDiscussion[] | null;
+};
+
+type ImageWithAlbums = Image & {
+  Albums?: AlbumUsageAlbum[] | null;
+};
+
+type ImageAlbumUsageResult = {
+  getImageAlbumUsage?: {
+    imageId: string;
+    uploaderUsername?: string | null;
+    uploaderOwnedAlbums?: AlbumUsageAlbum[] | null;
+    otherAlbums?: AlbumUsageAlbum[] | null;
+  } | null;
+};
+
+type UserAlbumListItem = {
+  id: string;
+  imageOrder?: string[] | null;
+  Owner?: {
+    username?: string | null;
+    displayName?: string | null;
+  } | null;
+  ImagesAggregate?: {
+    count?: number | null;
+  } | null;
+  Discussions?: Array<{
+    title?: string | null;
+  }> | null;
+};
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
@@ -62,10 +131,45 @@ const {
   })
 );
 
-const image = computed((): Image | null => {
+const { result: albumUsageResult, refetch: refetchAlbumUsage } =
+  useQuery<ImageAlbumUsageResult>(
+  GET_IMAGE_ALBUM_USAGE,
+  () => ({
+    imageId: imageId.value,
+  }),
+  () => ({
+    enabled: !!imageId.value,
+    fetchPolicy: 'network-only',
+  })
+);
+
+const showAlbumSaveModal = ref(false);
+const showCollectionSaveModal = ref(false);
+const albumSaveError = ref('');
+
+const { mutate: addImageToAlbum, loading: addImageToAlbumLoading } =
+  useMutation(ADD_IMAGE_TO_ALBUM);
+
+const { result: userAlbumsResult, loading: userAlbumsLoading, refetch: refetchUserAlbums } =
+  useQuery(
+    GET_USER_ALBUMS,
+    () => ({
+      where: {
+        Owner: {
+          username: usernameVar.value,
+        },
+      },
+    }),
+    () => ({
+      enabled: showAlbumSaveModal.value && !!usernameVar.value,
+      fetchPolicy: 'network-only',
+    })
+  );
+
+const image = computed((): ImageWithAlbums | null => {
   if (imageError.value) return null;
   if (imageResult.value && imageResult.value.images.length > 0) {
-    return imageResult.value.images[0];
+    return imageResult.value.images[0] as ImageWithAlbums;
   }
   return null;
 });
@@ -145,15 +249,115 @@ const saveAlt = async () => {
   }
 };
 
-// Album discussions - discussions that use the album containing this image
-const albumDiscussions = computed(() => {
-  return image.value?.Album?.Discussions || [];
+const albumUsage = computed(() => {
+  return albumUsageResult.value?.getImageAlbumUsage || null;
+});
+
+const uploaderOwnedAlbums = computed(() => {
+  return albumUsage.value?.uploaderOwnedAlbums || [];
+});
+
+const otherAlbums = computed(() => {
+  return albumUsage.value?.otherAlbums || [];
+});
+
+const currentUserAlbumIdsContainingImage = computed(() => {
+  if (!usernameVar.value) return new Set<string>();
+
+  const allUsageAlbums = [
+    ...uploaderOwnedAlbums.value,
+    ...otherAlbums.value,
+  ];
+
+  return new Set(
+    allUsageAlbums
+      .filter((album) => album.Owner?.username === usernameVar.value)
+      .map((album) => album.id)
+  );
+});
+
+const userAlbums = computed<UserAlbumListItem[]>(() => {
+  return (userAlbumsResult.value?.albums || []) as UserAlbumListItem[];
+});
+
+const openAlbumSaveModal = () => {
+  albumSaveError.value = '';
+  showAlbumSaveModal.value = true;
+  refetchUserAlbums();
+};
+
+const closeAlbumSaveModal = () => {
+  showAlbumSaveModal.value = false;
+  albumSaveError.value = '';
+};
+
+const openCollectionSaveModal = () => {
+  showCollectionSaveModal.value = true;
+};
+
+const closeCollectionSaveModal = () => {
+  showCollectionSaveModal.value = false;
+};
+
+const getAlbumDisplayName = (album: UserAlbumListItem) => {
+  return album.Discussions?.[0]?.title || `Album ${album.id.slice(0, 8)}`;
+};
+
+const saveImageToAlbum = async (album: UserAlbumListItem) => {
+  if (!image.value?.id || !album.id) return;
+
+  if (currentUserAlbumIdsContainingImage.value.has(album.id)) {
+    albumSaveError.value = 'This image is already in that album.';
+    return;
+  }
+
+  albumSaveError.value = '';
+
+  try {
+    await addImageToAlbum({
+      albumId: album.id,
+      imageId: image.value.id,
+    });
+    toastStore.showToast('Image saved to album.');
+    await refetchAlbumUsage();
+    await refetchUserAlbums();
+    closeAlbumSaveModal();
+  } catch (error) {
+    console.error('Error saving image to album:', error);
+    albumSaveError.value =
+      error instanceof Error ? error.message : 'Could not save image to album.';
+    toastStore.showToast('Could not save image to album.', 'error');
+  }
+};
+
+const albumUsageSections = computed(() => {
+  return [
+    {
+      title: 'Albums by the uploader',
+      albums: uploaderOwnedAlbums.value,
+    },
+    {
+      title: 'Albums by other users',
+      albums: otherAlbums.value,
+    },
+  ].filter((section) => section.albums.length > 0);
+});
+
+const hasAlbumUsage = computed(() => albumUsageSections.value.length > 0);
+
+const primaryAlbum = computed(() => {
+  const albums = image.value?.Albums || [];
+  return (
+    albums.find((album) => album.Owner?.username === uploader.value?.username) ||
+    albums[0] ||
+    null
+  );
 });
 
 // Album images - ordered according to imageOrder (utils/albumImageOrder),
 // excluding the current image.
 const albumImages = computed(() => {
-  const album = image.value?.Album;
+  const album = primaryAlbum.value;
   if (!album?.Images) return [];
 
   return orderImagesByOrder({
@@ -334,6 +538,24 @@ onUnmounted(() => {
               :image-title="image.caption || image.alt || 'Image'"
               size="medium"
             />
+
+            <button
+              v-if="usernameVar"
+              type="button"
+              class="flex items-center gap-2 rounded border border-gray-300 bg-white px-4 py-2 text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              @click="openAlbumSaveModal"
+            >
+              Save to album
+            </button>
+
+            <button
+              v-if="usernameVar"
+              type="button"
+              class="flex items-center gap-2 rounded border border-gray-300 bg-white px-4 py-2 text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              @click="openCollectionSaveModal"
+            >
+              Save to collection
+            </button>
 
             <button
               type="button"
@@ -556,38 +778,68 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <!-- Appears in album -->
+          <!-- Appears in albums -->
           <div
-            v-if="image.Album && uploader?.username"
+            v-if="hasAlbumUsage"
             class="rounded-lg border bg-white p-6 dark:bg-gray-900"
           >
             <h2 class="font-semibold mb-3 text-lg dark:text-gray-300">
               Appears in
             </h2>
-            <NuxtLink
-              :to="`/u/${uploader.username}/albums/${image.Album.id}`"
-              class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              Album by {{ uploader.displayName || uploader.username }}
-              <span v-if="uploader.displayName">({{ uploader.username }})</span>
-            </NuxtLink>
+
             <div
-              v-if="albumDiscussions.length > 0 && albumDiscussions[0]"
-              class="mt-3 border-t pt-3 dark:border-gray-700"
+              v-for="section in albumUsageSections"
+              :key="section.title"
+              class="space-y-3"
             >
-              <p class="mb-2 text-sm text-gray-600 dark:text-gray-400">
-                Related discussion:
-              </p>
-              <NuxtLink
-                :to="`/forums/${albumDiscussions[0]?.DiscussionChannels?.[0]?.channelUniqueName}/discussions/${albumDiscussions[0]?.id}`"
-                class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400">
+                {{ section.title }}
+              </h3>
+
+              <div
+                v-for="album in section.albums"
+                :key="album.id"
+                class="rounded-md border border-gray-200 p-3 dark:border-gray-700"
               >
-                {{ albumDiscussions[0]?.title }}
-              </NuxtLink>
+                <NuxtLink
+                  v-if="album.Owner?.username"
+                  :to="`/u/${album.Owner.username}/albums/${album.id}`"
+                  class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  Album by {{ album.Owner.displayName || album.Owner.username }}
+                  <span v-if="album.Owner.displayName">({{ album.Owner.username }})</span>
+                </NuxtLink>
+                <span
+                  v-else
+                  class="font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Album by unknown user
+                </span>
+
+                <div
+                  v-if="album.Discussions?.length && album.Discussions[0]"
+                  class="mt-3 border-t pt-3 dark:border-gray-700"
+                >
+                  <p class="mb-2 text-sm text-gray-600 dark:text-gray-400">
+                    Related discussion:
+                  </p>
+                  <NuxtLink
+                    v-if="album.Discussions[0]?.DiscussionChannels?.[0]?.channelUniqueName"
+                    :to="`/forums/${album.Discussions[0]?.DiscussionChannels?.[0]?.channelUniqueName}/discussions/${album.Discussions[0]?.id}`"
+                    class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                  >
+                    {{ album.Discussions[0]?.title }}
+                  </NuxtLink>
+                  <span v-else class="text-gray-700 dark:text-gray-300">
+                    {{ album.Discussions[0]?.title }}
+                  </span>
+                </div>
+              </div>
             </div>
+
             <!-- Other images in the album -->
             <div
-              v-if="albumImages.length > 0"
+              v-if="primaryAlbum && albumImages.length > 0"
               class="mt-4 border-t pt-4 dark:border-gray-700"
             >
               <p class="mb-3 text-sm text-gray-600 dark:text-gray-400">
@@ -600,8 +852,8 @@ onUnmounted(() => {
                 columns="grid-cols-4 sm:grid-cols-4 md:grid-cols-4"
               />
               <NuxtLink
-                v-if="albumImages.length > 8"
-                :to="`/u/${uploader.username}/albums/${image.Album.id}`"
+                v-if="albumImages.length > 8 && primaryAlbum.Owner?.username"
+                :to="`/u/${primaryAlbum.Owner.username}/albums/${primaryAlbum.id}`"
                 class="mt-3 block text-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
               >
                 View all {{ albumImages.length + 1 }} images in album
@@ -610,6 +862,107 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
+
+      <div
+        v-if="showAlbumSaveModal"
+        class="fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="save-to-album-title"
+      >
+        <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl dark:bg-gray-900">
+          <div class="mb-4 flex items-start justify-between gap-4">
+            <div>
+              <h2
+                id="save-to-album-title"
+                class="text-xl font-semibold dark:text-white"
+              >
+                Save image to album
+              </h2>
+              <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                Add this image to one of your albums without re-uploading it.
+                The original uploader attribution stays with the image.
+              </p>
+            </div>
+            <button
+              type="button"
+              class="text-2xl leading-none text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+              aria-label="Close save to album dialog"
+              @click="closeAlbumSaveModal"
+            >
+              ×
+            </button>
+          </div>
+
+          <p
+            v-if="albumSaveError"
+            class="mb-3 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300"
+          >
+            {{ albumSaveError }}
+          </p>
+
+          <div v-if="userAlbumsLoading" class="py-6 text-center text-gray-600 dark:text-gray-400">
+            Loading your albums...
+          </div>
+
+          <div
+            v-else-if="userAlbums.length === 0"
+            class="rounded border border-dashed border-gray-300 p-6 text-center dark:border-gray-700"
+          >
+            <p class="text-gray-700 dark:text-gray-300">
+              You do not have any albums yet.
+            </p>
+            <NuxtLink
+              :to="`/u/${usernameVar}/albums`"
+              class="mt-3 inline-block text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              @click="closeAlbumSaveModal"
+            >
+              Go to your albums
+            </NuxtLink>
+          </div>
+
+          <div v-else class="max-h-96 space-y-2 overflow-y-auto">
+            <button
+              v-for="album in userAlbums"
+              :key="album.id"
+              type="button"
+              class="flex w-full items-center justify-between gap-3 rounded border border-gray-200 p-3 text-left transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:hover:bg-gray-800"
+              :disabled="
+                addImageToAlbumLoading ||
+                currentUserAlbumIdsContainingImage.has(album.id)
+              "
+              @click="saveImageToAlbum(album)"
+            >
+              <span>
+                <span class="block font-medium text-gray-900 dark:text-gray-100">
+                  {{ getAlbumDisplayName(album) }}
+                </span>
+                <span class="block text-sm text-gray-600 dark:text-gray-400">
+                  {{ album.ImagesAggregate?.count || 0 }} images
+                </span>
+              </span>
+              <span
+                v-if="currentUserAlbumIdsContainingImage.has(album.id)"
+                class="text-sm text-gray-500 dark:text-gray-400"
+              >
+                Already saved
+              </span>
+              <span v-else class="text-sm text-blue-600 dark:text-blue-400">
+                Save
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <AddToListPopover
+        v-if="showCollectionSaveModal && imageId"
+        :item-id="imageId"
+        item-type="image"
+        :is-visible="showCollectionSaveModal"
+        variant="modal"
+        @close="closeCollectionSaveModal"
+      />
 
       <!-- Custom lightbox -->
       <div

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
+import { createPinia, setActivePinia } from 'pinia';
 
 vi.stubGlobal('definePageMeta', vi.fn());
 
@@ -80,6 +81,7 @@ const mountWith = async (
 };
 
 beforeEach(() => {
+  setActivePinia(createPinia());
   vi.clearAllMocks();
   h.username.value = 'alice';
   h.routeParams = { username: 'alice', imageId: 'img1' };
