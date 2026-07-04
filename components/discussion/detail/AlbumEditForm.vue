@@ -28,6 +28,10 @@ type AlbumFormImage = {
   hasSensitiveContent: boolean;
   hasSpoiler: boolean;
   copyright: string;
+  Uploader?: {
+    username?: string | null;
+    displayName?: string | null;
+  } | null;
 };
 
 // Define types for form data

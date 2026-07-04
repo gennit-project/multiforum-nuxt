@@ -212,3 +212,67 @@ export const GET_USER_IMAGES = gql`
     }
   }
 `;
+
+export const GET_REUSABLE_ALBUM_IMAGES = gql`
+  query GetReusableAlbumImages(
+    $username: String!
+    $where: ImageWhere
+    $limit: Int!
+  ) {
+    users(where: { username: $username }) {
+      username
+      Images(
+        where: $where
+        options: { limit: $limit, sort: { createdAt: DESC } }
+      ) {
+        id
+        url
+        alt
+        caption
+        copyright
+        createdAt
+        Uploader {
+          username
+          displayName
+        }
+      }
+      FavoriteImages(
+        where: $where
+        options: { limit: $limit, sort: { createdAt: DESC } }
+      ) {
+        id
+        url
+        alt
+        caption
+        copyright
+        createdAt
+        Uploader {
+          username
+          displayName
+        }
+      }
+      Collections(
+        where: { collectionType: IMAGES }
+        options: { sort: [{ updatedAt: DESC }] }
+      ) {
+        id
+        name
+        Images(
+          where: $where
+          options: { limit: $limit, sort: { createdAt: DESC } }
+        ) {
+          id
+          url
+          alt
+          caption
+          copyright
+          createdAt
+          Uploader {
+            username
+            displayName
+          }
+        }
+      }
+    }
+  }
+`;

@@ -117,7 +117,7 @@ Notes:
 - Discussion/channel owners cannot disable discussion submissions, so there is intentionally no `Does not allow discussions` flag or picker gating for discussion-sharing flows.
 - Unit coverage now includes event eligibility in normal search results, favorite forums, collection-based bulk selection, disabled-option rendering, blocked selection behavior, and locked forum mode.
 
-### 8. Images in multiple albums and fuller image-usage display `[partial]`
+### 8. Images in multiple albums and fuller image-usage display `[complete]`
 
 - [x] Change album-image modeling so one image can belong to multiple albums without re-uploading. `[in backend PR]`
 - [x] Preserve uploader/original attribution on the image node anywhere it is reused by linking the same image node instead of creating a copy. `[in backend/frontend PRs]`
@@ -127,11 +127,11 @@ Notes:
 - [x] Add tests for permission enforcement and existing-image add/remove flows. `[in this slice]`
 - [x] Add backend album add/remove flows that link existing images instead of requiring re-upload. `[in this slice]`
 - [x] Let users save permitted images from image detail to their own album or image collection. `[in this slice]`
-- [ ] Add existing-image picker/search to album editor flows.
+- [x] Add existing-image picker/search to album editor flows. `[in this slice]`
 - [x] On image detail pages, show grouped image usage by original poster vs others. `[in frontend PR]`
 
 Notes:
-- The remaining work in this section is a fuller album-editor reuse flow, such as browsing/searching existing images while editing an album.
+- Album editor flows now include a reusable-image picker for the user's uploads, favorites, and image collections.
 
 ### 9. Permanent media deletion and storage cleanup `[partial]`
 

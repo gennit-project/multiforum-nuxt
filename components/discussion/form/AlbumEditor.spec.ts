@@ -47,7 +47,7 @@ vi.mock('@/composables/useAlbumAutoSave', () => ({
 
 const AlbumImageItemStub = {
   name: 'AlbumImageItem',
-  props: ['image', 'index', 'isFirst', 'isLast'],
+  props: ['image', 'index', 'isFirst', 'isLast', 'canPermanentlyDelete'],
   emits: ['update-field', 'delete', 'move-up', 'move-down'],
   template: '<div class="image-item-stub" />',
 };
@@ -68,6 +68,13 @@ const AlbumUrlInputFormStub = {
   template: '<div class="url-input-stub" />',
 };
 
+const AlbumExistingImagePickerStub = {
+  name: 'AlbumExistingImagePicker',
+  props: ['selectedImageIds', 'isLimitReached'],
+  emits: ['add-image'],
+  template: '<div class="existing-image-picker-stub" />',
+};
+
 const WarningModalStub = {
   name: 'WarningModal',
   props: ['open', 'title', 'body', 'loading', 'error'],
@@ -79,6 +86,7 @@ const stubs = {
   AlbumImageItem: AlbumImageItemStub,
   AlbumDropZone: AlbumDropZoneStub,
   AlbumUrlInputForm: AlbumUrlInputFormStub,
+  AlbumExistingImagePicker: AlbumExistingImagePickerStub,
   WarningModal: WarningModalStub,
   ErrorBanner: { props: ['text'], template: '<div />' },
   LoadingSpinner: { template: '<div />' },
@@ -158,6 +166,26 @@ describe('AlbumEditor', () => {
     expect(wrapper.emitted('updateFormValues')).toBeUndefined();
   });
 
+  it('removes a reused image by another uploader without permanent deletion', async () => {
+    const wrapper = mountEditor([
+      {
+        ...makeImage('a'),
+        Uploader: { username: 'bob', displayName: 'Bob' },
+      },
+    ], ['a']);
+    wrapper.findComponent(AlbumImageItemStub).vm.$emit('delete');
+    await flushPromises();
+    expect({
+      imageIds: lastEmit(wrapper).images.map((i) => i.id),
+      permanentDeleteCalls: permanentlyDeleteImage.mock.calls.length,
+      modalOpen: warningModal(wrapper).props('open'),
+    }).toEqual({
+      imageIds: [],
+      permanentDeleteCalls: 0,
+      modalOpen: false,
+    });
+  });
+
   it('reorders imageOrder when an image moves up', () => {
     const wrapper = mountEditor();
     wrapper.findAllComponents(AlbumImageItemStub)[1].vm.$emit('move-up');
@@ -175,6 +203,20 @@ describe('AlbumEditor', () => {
     wrapper.findAllComponents(AlbumImageItemStub)[0].vm.$emit('update-field', 'alt', 'new alt');
     const updated = lastEmit(wrapper).images.find((i) => i.id === 'a') as { alt: string };
     expect(updated.alt).toBe('new alt');
+  });
+
+  it('adds an existing image from the picker', async () => {
+    const wrapper = mountEditor();
+    wrapper.findComponent(AlbumExistingImagePickerStub).vm.$emit('add-image', makeImage('d'));
+    await flushPromises();
+    expect(lastEmit(wrapper).imageOrder).toEqual(['a', 'b', 'c', 'd']);
+  });
+
+  it('does not add a duplicate existing image from the picker', async () => {
+    const wrapper = mountEditor();
+    wrapper.findComponent(AlbumExistingImagePickerStub).vm.$emit('add-image', makeImage('a'));
+    await flushPromises();
+    expect(wrapper.emitted('updateFormValues')).toBeUndefined();
   });
 
   describe('reorder guards', () => {

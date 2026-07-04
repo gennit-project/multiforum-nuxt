@@ -6,6 +6,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import AlbumImageItem from './AlbumImageItem.vue';
 import AlbumDropZone from './AlbumDropZone.vue';
 import AlbumUrlInputForm from './AlbumUrlInputForm.vue';
+import AlbumExistingImagePicker from './AlbumExistingImagePicker.vue';
 import { useAlbumImageUpload } from '@/composables/useAlbumImageUpload';
 import { useAlbumAutoSave } from '@/composables/useAlbumAutoSave';
 import { useMutation } from '@vue/apollo-composable';
@@ -29,6 +30,17 @@ type ImageInput = {
   alt: string;
   copyright: string;
   caption: string;
+  Uploader?: {
+    username?: string | null;
+    displayName?: string | null;
+  } | null;
+};
+
+type ExistingImageInput = Omit<Partial<ImageInput>, 'alt' | 'caption' | 'copyright' | 'url'> & {
+  url?: string | null;
+  alt?: string | null;
+  caption?: string | null;
+  copyright?: string | null;
 };
 
 const props = defineProps<{
@@ -58,6 +70,12 @@ const orderedImages = computed(() =>
   })
 );
 
+const selectedImageIds = computed(() =>
+  props.formValues.album.images
+    .map((image) => image.id)
+    .filter((id): id is string => Boolean(id))
+);
+
 // Helper to update imageOrder after changes
 const updateImageOrderAfterChange = (images: ImageInput[]) =>
   getImageIdOrder(images);
@@ -69,7 +87,11 @@ const addNewImage = (input: Partial<ImageInput>) => {
     return;
   }
 
-  const { url, alt, caption, copyright, id } = input;
+  const { url, alt, caption, copyright, id, Uploader } = input;
+
+  if (id && selectedImageIds.value.includes(id)) {
+    return;
+  }
 
   const newImage: ImageInput = {
     id,
@@ -77,6 +99,7 @@ const addNewImage = (input: Partial<ImageInput>) => {
     alt: alt || '',
     caption: caption || '',
     copyright: copyright || '',
+    Uploader,
   };
 
   const updatedImages = [...props.formValues.album.images, newImage];
@@ -94,6 +117,17 @@ const addNewImage = (input: Partial<ImageInput>) => {
   });
 
   debouncedAutoSave();
+};
+
+const addExistingImage = (image: ExistingImageInput) => {
+  addNewImage({
+    id: image.id,
+    url: image.url || '',
+    alt: image.alt || '',
+    caption: image.caption || '',
+    copyright: image.copyright || '',
+    Uploader: image.Uploader,
+  });
 };
 
 // Initialize image upload composable
@@ -192,8 +226,19 @@ const removeImageFromAlbum = (index: number) => {
   debouncedAutoSave();
 };
 
+const canPermanentlyDeleteImage = (image: ImageInput | undefined) => {
+  const uploaderUsername = image?.Uploader?.username;
+  return !uploaderUsername || uploaderUsername === usernameVar.value;
+};
+
 // Delete image handler
 const requestDeleteImage = (index: number) => {
+  const orderedImage = orderedImages.value[index];
+  if (!canPermanentlyDeleteImage(orderedImage)) {
+    removeImageFromAlbum(index);
+    return;
+  }
+
   pendingDeleteImageIndex.value = index;
   permanentDeleteImageError.value = '';
 };
@@ -360,10 +405,17 @@ const handleUrlCancel = () => {
       :is-first="index === 0"
       :is-last="index === orderedImages.length - 1"
       :is-loading="loadingStates[index] ?? false"
+      :can-permanently-delete="canPermanentlyDeleteImage(image)"
       @update-field="(field, value) => updateImageField(index, field, value)"
       @delete="requestDeleteImage(index)"
       @move-up="moveImageUp(index)"
       @move-down="moveImageDown(index)"
+    />
+
+    <AlbumExistingImagePicker
+      :selected-image-ids="selectedImageIds"
+      :is-limit-reached="isImageLimitReached"
+      @add-image="addExistingImage"
     />
 
     <!-- Drop zone -->
