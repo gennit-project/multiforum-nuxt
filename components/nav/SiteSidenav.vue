@@ -271,7 +271,7 @@ const selectSearchType = (type: SearchType) => {
             </div>
             <button
               type="button"
-              class="font-semibold h-8 rounded-md bg-orange-500 px-4 text-xs text-white hover:bg-orange-600"
+              class="font-semibold h-8 rounded-md bg-gray-600 px-4 text-xs text-white hover:bg-gray-700 dark:bg-gray-600 dark:hover:bg-gray-500"
               @click="executeSearch"
             >
               Search
