@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { defineComponent, nextTick, ref } from 'vue';
 import DownloadSidebar from '@/components/channel/DownloadSidebar.vue';
-import type { Discussion } from '@/__generated__/graphql';
+import { makeDiscussion } from '@/tests/utils/factories';
 
 const authState = ref(false);
 const trackDownloadMock = vi.hoisted(() => vi.fn(() => Promise.resolve()));
@@ -58,7 +58,7 @@ vi.mock('@/components/download/DownloadSuccessPopover.vue', () => ({
   }),
 }));
 
-const discussionWithFile = {
+const discussionWithFile = makeDiscussion({
   id: 'discussion-1',
   title: 'Test Download',
   Author: {
@@ -82,7 +82,7 @@ const discussionWithFile = {
       },
     },
   ],
-} as Partial<Discussion>;
+});
 
 describe('DownloadSidebar', () => {
   beforeEach(() => {
@@ -101,7 +101,7 @@ describe('DownloadSidebar', () => {
 
     const wrapper = mount(DownloadSidebar, {
       props: {
-        discussion: discussionWithFile as Discussion,
+        discussion: discussionWithFile,
         discussionId: 'discussion-1',
         channelUniqueName: 'test-forum',
       },
@@ -124,7 +124,7 @@ describe('DownloadSidebar', () => {
 
     const wrapper = mount(DownloadSidebar, {
       props: {
-        discussion: discussionWithFile as Discussion,
+        discussion: discussionWithFile,
         discussionId: 'discussion-1',
         channelUniqueName: 'test-forum',
       },
@@ -144,7 +144,7 @@ describe('DownloadSidebar', () => {
   it('shows total and unique download counts', () => {
     const wrapper = mount(DownloadSidebar, {
       props: {
-        discussion: discussionWithFile as Discussion,
+        discussion: discussionWithFile,
         discussionId: 'discussion-1',
         channelUniqueName: 'test-forum',
       },
@@ -162,7 +162,7 @@ describe('DownloadSidebar', () => {
         discussion: {
           ...discussionWithFile,
           DownloadableFiles: [],
-        } as Discussion,
+        },
         discussionId: 'discussion-1',
         channelUniqueName: 'test-forum',
       },
