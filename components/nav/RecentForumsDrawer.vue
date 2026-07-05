@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue';
 import { useRouter } from 'nuxt/app';
 import RecentForumsList from './RecentForumsList.vue';
+import ForumFinder from './ForumFinder.vue';
+import SearchIcon from '@/components/icons/SearchIcon.vue';
 
 type ForumItem = {
   uniqueName: string;
@@ -8,7 +11,7 @@ type ForumItem = {
   timestamp: number;
 };
 
-defineProps<{
+const props = defineProps<{
   forums: ForumItem[];
   isOpen: boolean;
 }>();
@@ -19,12 +22,27 @@ const emit = defineEmits<{
 
 const router = useRouter();
 
+const isFindingForum = ref(false);
+
+// Reset back to the recent-forums view whenever the drawer is reopened.
+watch(
+  () => props.isOpen,
+  (open) => {
+    if (!open) {
+      isFindingForum.value = false;
+    }
+  }
+);
+
 const closeDrawer = () => {
   emit('close');
 };
 
-const navigateToCreateForum = () => {
-  router.push('/forums/create');
+const goToForum = (uniqueName: string) => {
+  router.push({
+    name: 'forums-forumId-discussions',
+    params: { forumId: uniqueName },
+  });
   closeDrawer();
 };
 </script>
@@ -82,35 +100,58 @@ const navigateToCreateForum = () => {
 
         <!-- Forums List -->
         <div class="p-4">
-          <!-- Add Forum Button -->
-          <button
-            type="button"
-            class="font-semibold group mb-2 flex w-full items-center gap-x-3 rounded-md px-2 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
-            @click="navigateToCreateForum"
-          >
-            <span class="font-bold text-green-600 dark:text-green-400">+</span>
-            Add Forum
-          </button>
-
-          <!-- Divider -->
-          <div
-            v-if="forums.length > 0"
-            class="mb-4 border-t border-gray-200 dark:border-gray-600"
-          />
-
-          <RecentForumsList
-            :forums="forums"
-            :show-header="false"
-            :on-navigate="closeDrawer"
-            link-classes="font-semibold group flex items-center gap-x-3 rounded-md py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700 px-2"
-          />
-
-          <div
-            v-if="forums.length === 0"
-            class="py-8 text-center text-gray-500 dark:text-gray-400"
-          >
-            No recent forums yet
+          <!-- Find Forum search -->
+          <div v-if="isFindingForum" class="mb-2">
+            <div class="mb-2 flex items-center justify-between">
+              <span
+                class="text-sm font-semibold text-gray-700 dark:text-gray-300"
+              >
+                Find a forum
+              </span>
+              <button
+                type="button"
+                class="text-xs text-gray-500 hover:text-gray-700 focus:outline-none dark:text-gray-400 dark:hover:text-gray-200"
+                @click="isFindingForum = false"
+              >
+                Cancel
+              </button>
+            </div>
+            <ForumFinder @select="goToForum" />
           </div>
+
+          <!-- Recent forums view -->
+          <template v-else>
+            <!-- Find Forum Button -->
+            <button
+              type="button"
+              data-testid="find-forum-button"
+              class="font-semibold group mb-2 flex w-full items-center gap-x-3 rounded-md px-2 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
+              @click="isFindingForum = true"
+            >
+              <SearchIcon class="text-gray-500 dark:text-gray-400" />
+              Find Forum
+            </button>
+
+            <!-- Divider -->
+            <div
+              v-if="forums.length > 0"
+              class="mb-4 border-t border-gray-200 dark:border-gray-600"
+            />
+
+            <RecentForumsList
+              :forums="forums"
+              :show-header="false"
+              :on-navigate="closeDrawer"
+              link-classes="font-semibold group flex items-center gap-x-3 rounded-md py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700 px-2"
+            />
+
+            <div
+              v-if="forums.length === 0"
+              class="py-8 text-center text-gray-500 dark:text-gray-400"
+            >
+              No recent forums yet
+            </div>
+          </template>
         </div>
       </div>
     </Transition>
