@@ -52,6 +52,22 @@ describe('IssueFilterBar', () => {
     expect(wrapper.emitted('update-search-input')).toEqual([['needle']]);
   });
 
+  it('defaults the search placeholder to "Search issues"', () => {
+    const wrapper = buildWrapper();
+
+    expect(wrapper.getComponent(SearchBar).props('searchPlaceholder')).toBe(
+      'Search issues'
+    );
+  });
+
+  it('uses a custom search placeholder when provided', () => {
+    const wrapper = buildWrapper({ searchPlaceholder: 'Search closed issues' });
+
+    expect(wrapper.getComponent(SearchBar).props('searchPlaceholder')).toBe(
+      'Search closed issues'
+    );
+  });
+
   it('emits date updates', async () => {
     const wrapper = buildWrapper();
 

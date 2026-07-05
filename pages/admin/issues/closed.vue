@@ -1,109 +1,60 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
-import type { Issue } from '@/__generated__/graphql';
-import { GET_ISSUES } from '@/graphQLData/issue/queries';
-import { useQuery } from '@vue/apollo-composable';
-import { useRoute, useRouter } from 'nuxt/app';
 import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
-import SearchBar from '@/components/SearchBar.vue';
-import { updateFilters } from '@/utils/routerUtils';
-import { createCaseInsensitivePattern } from '@/utils/searchUtils';
-import { useUIStore } from '@/stores/uiStore';
-import { storeToRefs } from 'pinia';
-
-const route = useRoute();
-const router = useRouter();
-const uiStore = useUIStore();
-const { selectedIssueNumber } = storeToRefs(uiStore);
-
-const channelId = computed(() => {
-  if (typeof route.params.forumId !== 'string') {
-    return '';
-  }
-  return route.params.forumId;
-});
-
-const searchInput = ref(
-  typeof route.query.searchInput === 'string' ? route.query.searchInput : ''
-);
-
-const variables = computed(() => {
-  const searchPattern = createCaseInsensitivePattern(searchInput.value);
-  const searchFilter = searchPattern
-    ? {
-        OR: [
-          { title_MATCHES: searchPattern },
-          { body_MATCHES: searchPattern },
-        ],
-      }
-    : {};
-
-  return {
-    issueWhere: {
-      isOpen: false,
-      ...searchFilter,
-    },
-  };
-});
+import IssueFilterBar from '@/components/admin/IssueFilterBar.vue';
+import { useServerIssueList } from '@/composables/useServerIssueList';
 
 const {
-  result: getIssuesResult,
-  error: getIssuesError,
-  loading: getIssuesLoading,
-  refetch,
-} = useQuery(GET_ISSUES, variables, {
-  fetchPolicy: 'cache-first',
-});
-
-const issues = computed<Issue[]>(() => {
-  if (getIssuesLoading.value || getIssuesError.value) {
-    return [];
-  }
-  return getIssuesResult.value?.issues || [];
-});
-
-const updateSearchInput = (value: string) => {
-  updateFilters({
-    router,
-    route,
-    params: { searchInput: value },
-  });
-};
-
-const handleSelectIssue = (payload: {
-  issueNumber: number;
-  title: string;
-  channelId: string;
-}) => {
-  uiStore.setSelectedIssueSelection(payload);
-};
-
-// Watch for route change to update searchInput and refetch
-watch(
-  () => route.query,
-  () => {
-    if (route.query) {
-      searchInput.value =
-        typeof route.query.searchInput === 'string'
-          ? route.query.searchInput
-          : '';
-      refetch(variables.value);
-    }
-  }
-);
+  channelId,
+  selectedChannels,
+  showOnlyServerRuleViolations,
+  searchInput,
+  startDate,
+  endDate,
+  selectedSort,
+  filterCreatedByMe,
+  filterIAmOP,
+  filterIReported,
+  isAuthenticated,
+  channelLabel,
+  selectedSortLabel,
+  issues,
+  selectedIssueNumber,
+  updateShowOnlyServerRuleViolations,
+  updateSearchInput,
+  updateSort,
+  updateInvolvementFilter,
+  toggleSelectedChannel,
+  handleSelectIssue,
+} = useServerIssueList({ isOpen: false });
 </script>
 
 <template>
   <div>
-    <div class="flex flex-col gap-3 pb-4">
-      <SearchBar
-        :initial-value="searchInput"
-        :search-placeholder="'Search closed issues'"
-        :test-id="'closed-issue-search-input'"
-        :debounce-ms="500"
-        @update-search-input="updateSearchInput"
-      />
-    </div>
+    <IssueFilterBar
+      :search-input="searchInput"
+      :selected-channels="selectedChannels"
+      :channel-label="channelLabel"
+      :start-date="startDate"
+      :end-date="endDate"
+      :show-only-server-rule-violations="showOnlyServerRuleViolations"
+      :selected-sort="selectedSort"
+      :selected-sort-label="selectedSortLabel"
+      :show-involvement-filters="isAuthenticated"
+      :filter-created-by-me="filterCreatedByMe"
+      :filter-i-am-o-p="filterIAmOP"
+      :filter-i-reported="filterIReported"
+      :search-placeholder="'Search closed issues'"
+      :search-test-id="'closed-issue-search-input'"
+      @update-search-input="updateSearchInput"
+      @toggle-selected-channel="toggleSelectedChannel"
+      @update:sort="updateSort"
+      @update:start-date="startDate = $event"
+      @update:end-date="endDate = $event"
+      @update:show-only-server-rule-violations="
+        updateShowOnlyServerRuleViolations
+      "
+      @update:involvement-filter="updateInvolvementFilter"
+    />
     <ul
       class="divide-y border-t border-gray-200 dark:border-gray-800 dark:text-white"
       data-testid="issue-list"

@@ -25,7 +25,16 @@ const props = defineProps<{
   filterCreatedByMe?: boolean;
   filterIAmOP?: boolean;
   filterIReported?: boolean;
+  searchPlaceholder?: string;
+  searchTestId?: string;
 }>();
+
+const searchPlaceholder = computed(
+  () => props.searchPlaceholder ?? 'Search issues'
+);
+const searchTestId = computed(
+  () => props.searchTestId ?? 'server-issue-search-input'
+);
 
 const emit = defineEmits<{
   'update-search-input': [value: string];
@@ -79,8 +88,8 @@ const issueScopeLabel = computed(() =>
   <div class="flex flex-col gap-3 px-4 pb-4">
     <SearchBar
       :initial-value="searchInput"
-      :search-placeholder="'Search issues'"
-      :test-id="'server-issue-search-input'"
+      :search-placeholder="searchPlaceholder"
+      :test-id="searchTestId"
       :debounce-ms="500"
       @update-search-input="emit('update-search-input', $event)"
     />
