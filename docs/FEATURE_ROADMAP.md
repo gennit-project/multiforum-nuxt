@@ -182,10 +182,15 @@ Notes:
 - Discussion and event comment queries return sticky metadata and sort sticky comments above the selected normal sort order.
 - The frontend shows a `Stickied` badge and exposes sticky/unsticky actions from the comment menu for users with comment-hide permission.
 
-### 13. Wiki search: featured wiki pages from server settings `[not started]`
+### 13. Wiki search: featured wiki pages from server settings `[complete]`
 
-- [ ] Add server-admin configuration for featured wiki pages.
-- [ ] Surface featured pages in `/wiki/search`.
+- [x] Add server-admin configuration for featured wiki pages. `[in backend/frontend PRs]`
+- [x] Surface featured pages in `/wiki/search`. `[in backend/frontend PRs]`
+
+Notes:
+- Server settings now store an ordered list of featured wiki page IDs through a dedicated backend mutation.
+- The admin Wiki Settings tab provides a searchable picker with explicit up/down ordering.
+- `/wiki/search` renders featured wiki pages above normal results and removes duplicates from the regular result list.
 
 ### 14. Favorites API optimization `[partial]`
 

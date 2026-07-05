@@ -19,11 +19,12 @@ vi.mock('@/utils/getDiscussionFilterValuesFromParams', () => ({
 
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 
-const mountWith = async (wikiPages: unknown[]) => {
+const mountWith = async (wikiPages: unknown[], featuredWikiPages: unknown[] = []) => {
   mockedUseQuery.mockReturnValue({
     result: ref({
       getSiteWideWikiList: {
         wikiPages,
+        featuredWikiPages,
         aggregateWikiPageCount: wikiPages.length,
       },
     }),
@@ -50,5 +51,19 @@ describe('wiki search page', () => {
     expect(wrapper.findAll('[data-testid="wiki-search-results"] > li')).toHaveLength(
       2
     );
+  });
+
+  it('renders featured wiki pages above normal results', async () => {
+    const wrapper = await mountWith(
+      [{ id: 'w1', title: 'Cats', slug: 'cats', channelUniqueName: 'cats', body: 'hi' }],
+      [{ id: 'featured', title: 'Start here', slug: 'start', channelUniqueName: 'help', body: 'hello' }]
+    );
+    expect(wrapper.find('[data-testid="featured-wiki-pages"]').exists()).toBe(true);
+  });
+
+  it('does not duplicate featured wiki pages in normal results', async () => {
+    const page = { id: 'w1', title: 'Cats', slug: 'cats', channelUniqueName: 'cats', body: 'hi' };
+    const wrapper = await mountWith([page], [page]);
+    expect(wrapper.findAll('[data-testid="wiki-search-results"] > li')).toHaveLength(0);
   });
 });

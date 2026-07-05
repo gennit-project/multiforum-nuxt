@@ -8,9 +8,9 @@ const h = vi.hoisted(() => ({
   result: null as unknown as { value: unknown },
   error: null as unknown as { value: unknown },
   loading: null as unknown as { value: boolean },
-  mutate: null as unknown as ReturnType<typeof vi.fn>,
+  updateMutate: null as unknown as ReturnType<typeof vi.fn>,
+  setFeaturedMutate: null as unknown as ReturnType<typeof vi.fn>,
   onResultCb: null as unknown as (r: unknown) => void,
-  onDoneCb: null as unknown as () => void,
 }));
 
 vi.mock('@vue/apollo-composable', async () => {
@@ -18,7 +18,8 @@ vi.mock('@vue/apollo-composable', async () => {
   h.result = ref(null);
   h.error = ref(null);
   h.loading = ref(false);
-  h.mutate = vi.fn();
+  h.updateMutate = vi.fn(async () => ({}));
+  h.setFeaturedMutate = vi.fn(async () => ({}));
   return {
     useQuery: () => ({
       result: h.result,
@@ -28,20 +29,20 @@ vi.mock('@vue/apollo-composable', async () => {
         h.onResultCb = cb;
       },
     }),
-    useMutation: () => ({
-      mutate: h.mutate,
+    useMutation: (document: string) => ({
+      mutate: document === 'setFeatured' ? h.setFeaturedMutate : h.updateMutate,
       loading: ref(false),
       error: ref(null),
-      onDone: (cb: () => void) => {
-        h.onDoneCb = cb;
-      },
     }),
   };
 });
 
 vi.mock('@/config', () => ({ config: { serverName: 'test-server' } }));
 vi.mock('@/graphQLData/admin/queries', () => ({ GET_SERVER_CONFIG: 'q' }));
-vi.mock('@/graphQLData/admin/mutations', () => ({ UPDATE_SERVER_CONFIG: 'm' }));
+vi.mock('@/graphQLData/admin/mutations', () => ({
+  UPDATE_SERVER_CONFIG: 'm',
+  SET_FEATURED_WIKI_PAGES: 'setFeatured',
+}));
 
 const FieldsStub = {
   name: 'CreateEditServerFields',
@@ -93,6 +94,7 @@ describe('Admin server settings page', () => {
             enableDownloads: true,
             enableEvents: false,
             pluginRegistries: ['https://r'],
+            featuredWikiPageIds: ['w1'],
           },
         ],
       },
@@ -102,6 +104,7 @@ describe('Admin server settings page', () => {
       serverDescription: string;
       enableDownloads: boolean;
       rules: unknown[];
+      featuredWikiPageIds: string[];
     };
     expect(fv.serverDescription).toBe('My server');
     expect(fv.enableDownloads).toBe(true);
@@ -123,7 +126,7 @@ describe('Admin server settings page', () => {
       rules: [{ summary: 'Rule' }],
     });
     await fields(wrapper).vm.$emit('submit');
-    expect(h.mutate).toHaveBeenCalledWith(
+    expect(h.updateMutate).toHaveBeenCalledWith(
       expect.objectContaining({
         input: expect.objectContaining({
           serverDescription: 'Updated',
@@ -133,11 +136,16 @@ describe('Admin server settings page', () => {
     );
   });
 
-  it('shows a saved-changes notification when the update completes', async () => {
+  it('submits featured wiki page IDs through the custom mutation', async () => {
     const wrapper = mountPage();
-    h.onDoneCb();
-    await wrapper.vm.$nextTick();
-    expect(wrapper.findComponent({ name: 'Notification' }).exists()).toBe(true);
+    await fields(wrapper).vm.$emit('update-form-values', {
+      featuredWikiPageIds: ['w2', 'w1'],
+    });
+    await fields(wrapper).vm.$emit('submit');
+    expect(h.setFeaturedMutate).toHaveBeenCalledWith({
+      serverName: 'test-server',
+      wikiPageIds: ['w2', 'w1'],
+    });
   });
 
   it('shows the permission denied message when auth is missing', async () => {

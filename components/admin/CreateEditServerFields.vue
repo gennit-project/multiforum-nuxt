@@ -81,6 +81,12 @@ const tabs = [
     fontAwesome: null,
   },
   {
+    key: 'wiki',
+    label: 'Wiki Settings',
+    icon: BookIcon,
+    fontAwesome: null,
+  },
+  {
     key: 'roles',
     label: 'Roles',
     icon: IdentificationIcon,

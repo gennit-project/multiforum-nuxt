@@ -1,13 +1,20 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
-import { UPDATE_SERVER_CONFIG } from '@/graphQLData/admin/mutations';
+import {
+  SET_FEATURED_WIKI_PAGES,
+  UPDATE_SERVER_CONFIG,
+} from '@/graphQLData/admin/mutations';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import type { ServerConfigUpdateInput } from '@/__generated__/graphql';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { config } from '@/config';
 import CreateEditServerFields from '@/components/admin/CreateEditServerFields.vue';
+
+type ServerSettingsFormValues = ServerConfigUpdateInput & {
+  featuredWikiPageIds?: string[];
+};
 
 const dataLoaded = ref(false);
 const {
@@ -31,13 +38,14 @@ const serverConfig = computed(() => {
   }
   return getServerResult.value.serverConfigs?.[0] || null;
 });
-const formValues = ref<ServerConfigUpdateInput>({
+const formValues = ref<ServerSettingsFormValues>({
   serverDescription: '',
   rules: [],
   allowedFileTypes: [],
   enableDownloads: false,
   enableEvents: false,
   pluginRegistries: [],
+  featuredWikiPageIds: [],
 });
 
 onGetServerResult((result) => {
@@ -59,6 +67,7 @@ onGetServerResult((result) => {
     enableDownloads: Boolean(serverConfig.enableDownloads),
     enableEvents: Boolean(serverConfig.enableEvents),
     pluginRegistries: serverConfig.pluginRegistries || [],
+    featuredWikiPageIds: serverConfig.featuredWikiPageIds || [],
   };
 });
 
@@ -82,7 +91,6 @@ const {
   mutate: updateServer,
   loading: editServerLoading,
   error: updateServerError,
-  onDone,
 } = useMutation(UPDATE_SERVER_CONFIG, {
   update: (cache, { data }) => {
     const newServerConfig = data?.updateServerConfigs.serverConfigs[0];
@@ -135,18 +143,32 @@ const {
   },
 });
 
-onDone(() => {
-  showSavedChangesNotification.value = true;
-});
+const {
+  mutate: setFeaturedWikiPages,
+  loading: setFeaturedWikiPagesLoading,
+  error: setFeaturedWikiPagesError,
+} = useMutation(SET_FEATURED_WIKI_PAGES);
 
-function submit() {
-  updateServer({
+const isSaving = computed(
+  () => editServerLoading.value || setFeaturedWikiPagesLoading.value
+);
+const combinedUpdateError = computed(
+  () => updateServerError.value || setFeaturedWikiPagesError.value
+);
+
+async function submit() {
+  await updateServer({
     input: serverUpdateInput.value,
     serverName: config.serverName,
   });
+  await setFeaturedWikiPages({
+    serverName: config.serverName,
+    wikiPageIds: formValues.value.featuredWikiPageIds || [],
+  });
+  showSavedChangesNotification.value = true;
 }
 
-function updateFormValues(data: ServerConfigUpdateInput) {
+function updateFormValues(data: ServerSettingsFormValues) {
   formValues.value = { ...formValues.value, ...data };
 }
 </script>
@@ -161,8 +183,8 @@ function updateFormValues(data: ServerConfigUpdateInput) {
             :edit-mode="true"
             :server-loading="getServerLoading"
             :get-server-error="getServerError"
-            :update-server-error="updateServerError"
-            :edit-server-loading="editServerLoading"
+            :update-server-error="combinedUpdateError"
+            :edit-server-loading="isSaving"
             :form-values="formValues"
             @submit="submit"
             @update-form-values="updateFormValues"
