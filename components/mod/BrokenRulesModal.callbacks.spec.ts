@@ -210,6 +210,62 @@ describe('BrokenRulesModal — submit dispatch', () => {
       expect.objectContaining({ wikiPageId: 'w1', wikiRevisionId: 'r1' })
     );
   });
+
+  it.each([
+    ['discussionId', 'reportDiscussion'],
+    ['eventId', 'reportEvent'],
+    ['commentId', 'reportComment'],
+    ['imageId', 'reportImage'],
+  ])('reports the %s in the standard report flow', async (prop, op) => {
+    const wrapper = await mountModal({ [prop]: 'x1' });
+    await (wrapper.vm as unknown as { submit: () => Promise<void> }).submit();
+
+    expect(ops.get(op)!.mutate).toHaveBeenCalledWith(
+      expect.objectContaining({ [prop]: 'x1' })
+    );
+  });
+
+  it.each([
+    ['discussionId', 'archiveDiscussion'],
+    ['eventId', 'archiveEvent'],
+    ['commentId', 'archiveComment'],
+    ['imageId', 'archiveImage'],
+  ])('archives the %s in the archive-after-reporting flow', async (prop, op) => {
+    const wrapper = await mountModal({ [prop]: 'x1', archiveAfterReporting: true });
+    await (wrapper.vm as unknown as { submit: () => Promise<void> }).submit();
+
+    expect(ops.get(op)!.mutate).toHaveBeenCalledWith(
+      expect.objectContaining({ [prop]: 'x1' })
+    );
+  });
+});
+
+describe('BrokenRulesModal — content computeds', () => {
+  it.each([
+    ['commentId', 'comment'],
+    ['discussionId', 'discussion'],
+    ['eventId', 'event'],
+    ['imageId', 'image'],
+    ['wikiPageId', 'wiki edit'],
+  ])('resolves contentType to %s', async (prop, expected) => {
+    const wrapper = await mountModal({ [prop]: 'x1' });
+    expect((wrapper.vm as unknown as { contentType: string }).contentType).toBe(
+      expected
+    );
+  });
+
+  it.each([
+    ['commentId', 'comment'],
+    ['eventId', 'event'],
+    ['imageId', 'image'],
+    ['wikiPageId', 'wiki edit'],
+    ['discussionId', 'discussion'],
+  ])('builds the placeholder text for %s', async (prop, word) => {
+    const wrapper = await mountModal({ [prop]: 'x1' });
+    expect(
+      (wrapper.vm as unknown as { modalPlaceholder: string }).modalPlaceholder
+    ).toContain(word);
+  });
 });
 
 describe('BrokenRulesModal — suspend flow', () => {
@@ -235,6 +291,43 @@ describe('BrokenRulesModal — suspend flow', () => {
 
     expect(ops.get('suspendUser')!.mutate).toHaveBeenCalledWith(
       expect.objectContaining({ issueID: 'issue-9', suspendIndefinitely: false })
+    );
+  });
+
+  it('suspends for a month when the one_month length is selected', async () => {
+    const wrapper = await mountModal({
+      discussionId: 'd1',
+      discussionChannelId: 'dc1',
+      suspendUserEnabled: true,
+    });
+    (wrapper.vm as unknown as Vm).suspensionLength = 'one_month';
+
+    await (wrapper.vm as unknown as Vm).submit();
+
+    expect(ops.get('suspendUser')!.mutate).toHaveBeenCalledWith(
+      expect.objectContaining({ suspendIndefinitely: false })
+    );
+  });
+
+  it.each([
+    ['eventId', 'archiveEvent', 'eventChannelId'],
+    ['commentId', 'archiveComment', ''],
+    ['imageId', 'archiveImage', ''],
+  ])('archives the %s then suspends the author', async (prop, archiveOp, channelProp) => {
+    trackerFor(archiveOp).mutate.mockResolvedValue({
+      data: { [archiveOp]: { id: 'issue-9' } },
+    });
+    const props: Record<string, unknown> = {
+      [prop]: 'x1',
+      suspendUserEnabled: true,
+    };
+    if (channelProp) props[channelProp] = 'chan-1';
+    const wrapper = await mountModal(props);
+
+    await (wrapper.vm as unknown as Vm).submit();
+
+    expect(ops.get('suspendUser')!.mutate).toHaveBeenCalledWith(
+      expect.objectContaining({ issueID: 'issue-9' })
     );
   });
 
