@@ -15,6 +15,9 @@ export type MockCommentState = {
   text: string;
   parentCommentId: string | null;
   archived?: boolean;
+  isSticky?: boolean;
+  stickyAt?: string | null;
+  stickyByUsername?: string | null;
 };
 
 type CountAggregate = { count: number };
@@ -202,6 +205,9 @@ export type CommentFixture = Pick<
   | 'PastVersions'
   | 'Event'
 > & {
+  isSticky: boolean;
+  stickyAt: string | null;
+  stickyByUsername: string | null;
   CommentAuthor: UserFixture;
   ChildCommentsAggregate: CountAggregate;
   ParentComment: Pick<Comment, 'id'> | null;
@@ -580,6 +586,9 @@ export const buildComment = ({
   createdAt: MOCK_DATE,
   updatedAt: MOCK_DATE,
   archived: comment.archived ?? false,
+  isSticky: comment.isSticky ?? false,
+  stickyAt: comment.stickyAt ?? null,
+  stickyByUsername: comment.stickyByUsername ?? null,
   isFavoritedByUser: false,
   CommentAuthor: buildUser(),
   ChildCommentsAggregate: {
