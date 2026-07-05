@@ -275,3 +275,18 @@ export const UNSUBSCRIBE_FROM_EVENT_UPDATES = gql`
     }
   }
 `;
+
+export const DELETE_EVENT_DESCRIPTION_REVISION = gql`
+  mutation deleteEventDescriptionRevision($textVersionId: ID!) {
+    deleteEventDescriptionRevision(textVersionId: $textVersionId) {
+      id
+      body
+      editReason
+      createdAt
+      updatedAt
+      Author {
+        username
+      }
+    }
+  }
+`;

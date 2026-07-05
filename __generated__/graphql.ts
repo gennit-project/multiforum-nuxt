@@ -28283,6 +28283,7 @@ export type Event = {
   Comments: Array<Comment>;
   CommentsAggregate?: Maybe<EventCommentCommentsAggregationSelection>;
   CommentsConnection: EventCommentsConnection;
+  DescriptionLastEditedBy?: Maybe<User>;
   EventChannels: Array<EventChannel>;
   EventChannelsAggregate?: Maybe<EventEventChannelEventChannelsAggregationSelection>;
   EventChannelsConnection: EventEventChannelsConnection;
@@ -28292,6 +28293,8 @@ export type Event = {
   FeedbackComments: Array<Comment>;
   FeedbackCommentsAggregate?: Maybe<EventCommentFeedbackCommentsAggregationSelection>;
   FeedbackCommentsConnection: EventFeedbackCommentsConnection;
+  PastDescriptionVersions: Array<TextVersion>;
+  PastTitleVersions: Array<TextVersion>;
   Poster?: Maybe<User>;
   PosterAggregate?: Maybe<EventUserPosterAggregationSelection>;
   PosterConnection: EventPosterConnection;
@@ -48605,6 +48608,7 @@ export type Mutation = {
   deleteDayData: DeleteInfo;
   deleteDeleteEventInSeriesResults: DeleteInfo;
   deleteDiscussionBodyRevision?: Maybe<TextVersion>;
+  deleteEventDescriptionRevision?: Maybe<TextVersion>;
   deleteDiscussionChannelInfos: DeleteInfo;
   deleteDiscussionChannelListFormats: DeleteInfo;
   deleteDiscussionChannelListItems: DeleteInfo;
@@ -49468,6 +49472,10 @@ export type MutationDeleteDeleteEventInSeriesResultsArgs = {
 
 
 export type MutationDeleteDiscussionBodyRevisionArgs = {
+  textVersionId: Scalars['ID']['input'];
+};
+
+export type MutationDeleteEventDescriptionRevisionArgs = {
   textVersionId: Scalars['ID']['input'];
 };
 

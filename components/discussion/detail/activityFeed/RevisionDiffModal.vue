@@ -5,6 +5,7 @@ import type { TextVersion } from '@/__generated__/graphql';
 import GenericModal from '@/components/GenericModal.vue';
 import RevisionDiffContent from '@/components/revision/RevisionDiffContent.vue';
 import { useMutation } from '@vue/apollo-composable';
+import type { DocumentNode } from 'graphql';
 import { DELETE_DISCUSSION_BODY_REVISION } from '@/graphQLData/discussion/mutations';
 
 interface VersionData {
@@ -35,6 +36,13 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // The redaction mutation to run. Defaults to the discussion body revision
+  // mutation so existing callers are unchanged; event surfaces pass the event
+  // description revision mutation.
+  deleteMutation: {
+    type: Object as PropType<DocumentNode>,
+    default: () => DELETE_DISCUSSION_BODY_REVISION,
+  },
 });
 
 const emit = defineEmits<{
@@ -49,7 +57,7 @@ const {
   loading,
   error,
   onDone,
-} = useMutation(DELETE_DISCUSSION_BODY_REVISION);
+} = useMutation(props.deleteMutation);
 
 const handleDelete = async () => {
   if (
