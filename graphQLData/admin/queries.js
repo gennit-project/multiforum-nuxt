@@ -39,6 +39,7 @@ export const GET_SERVER_CONFIG = gql`
         canHideEvent
         canHideDiscussion
         canLockChannel
+        canDeleteWiki
         canEditComments
         canEditDiscussions
         canEditEvents
@@ -55,6 +56,7 @@ export const GET_SERVER_CONFIG = gql`
         canHideEvent
         canHideDiscussion
         canLockChannel
+        canDeleteWiki
         canEditComments
         canEditDiscussions
         canEditEvents
@@ -82,6 +84,7 @@ export const GET_SERVER_CONFIG = gql`
         canHideEvent
         canHideDiscussion
         canLockChannel
+        canDeleteWiki
         canEditComments
         canEditDiscussions
         canEditEvents

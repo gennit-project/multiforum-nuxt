@@ -319,6 +319,7 @@ export const buildModServerRole = (overrides: Record<string, unknown> = {}) => (
   canHideEvent: false,
   canHideDiscussion: false,
   canLockChannel: false,
+  canDeleteWiki: false,
   canEditComments: false,
   canEditDiscussions: false,
   canEditEvents: false,

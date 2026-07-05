@@ -24,6 +24,7 @@ type ModPermissionKey = keyof Pick<
   | 'canOpenSupportTickets'
   | 'canCloseSupportTickets'
   | 'canLockChannel'
+  | 'canDeleteWiki'
 >;
 
 // User permission keys
@@ -52,6 +53,7 @@ export const CORE_PERMISSION_KEYS = [
   'canOpenSupportTickets',
   'canCloseSupportTickets',
   'canLockChannel',
+  'canDeleteWiki',
 ] as const;
 
 export const ADDITIONAL_PERMISSION_KEYS = [
@@ -255,6 +257,7 @@ export const getAllPermissions = (
       canOpenSupportTickets: false,
       canCloseSupportTickets: false,
       canLockChannel: false,
+      canDeleteWiki: false,
       canEditWiki: false,
       canAddMods: false,
       canRemoveMods: false,

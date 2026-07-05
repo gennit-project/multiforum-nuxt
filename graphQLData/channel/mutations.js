@@ -197,6 +197,41 @@ export const UNPIN_WIKI_PAGE_FROM_CHANNEL = gql`
   }
 `;
 
+export const LOCK_WIKI_PAGE = gql`
+  mutation lockWikiPage(
+    $channelUniqueName: String!
+    $wikiPageId: ID!
+    $reason: String!
+  ) {
+    lockWikiPage(
+      channelUniqueName: $channelUniqueName
+      wikiPageId: $wikiPageId
+      reason: $reason
+    ) {
+      id
+      locked
+      lockedAt
+      lockReason
+      lockedByUsername
+    }
+  }
+`;
+
+export const UNLOCK_WIKI_PAGE = gql`
+  mutation unlockWikiPage($channelUniqueName: String!, $wikiPageId: ID!) {
+    unlockWikiPage(
+      channelUniqueName: $channelUniqueName
+      wikiPageId: $wikiPageId
+    ) {
+      id
+      locked
+      lockedAt
+      lockReason
+      lockedByUsername
+    }
+  }
+`;
+
 export const BECOME_CHANNEL_ADMIN = gql`
   mutation becomeChannelAdmin($channelUniqueName: String!) {
     becomeForumAdmin(channelUniqueName: $channelUniqueName)

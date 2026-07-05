@@ -23,6 +23,10 @@ export const GET_WIKI_PAGE = gql`
       slug
       createdAt
       updatedAt
+      locked
+      lockedAt
+      lockReason
+      lockedByUsername
       VersionAuthor {
         username
       }
@@ -33,6 +37,10 @@ export const GET_WIKI_PAGE = gql`
         slug
         createdAt
         updatedAt
+        locked
+        lockedAt
+        lockReason
+        lockedByUsername
         VersionAuthor {
           username
         }
@@ -171,6 +179,7 @@ export const GET_CHANNEL = gql`
         canHideComment
         canHideEvent
         canHideDiscussion
+        canDeleteWiki
         canEditComments
         canEditDiscussions
         canEditEvents
@@ -184,6 +193,7 @@ export const GET_CHANNEL = gql`
         canHideComment
         canHideEvent
         canHideDiscussion
+        canDeleteWiki
         canEditComments
         canEditDiscussions
         canEditEvents
@@ -197,6 +207,7 @@ export const GET_CHANNEL = gql`
         canHideComment
         canHideEvent
         canHideDiscussion
+        canDeleteWiki
         canEditComments
         canEditDiscussions
         canEditEvents
