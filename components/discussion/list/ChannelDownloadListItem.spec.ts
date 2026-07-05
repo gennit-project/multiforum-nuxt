@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ref } from 'vue';
 import { mount } from '@vue/test-utils';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 
@@ -7,29 +6,9 @@ import ChannelDownloadListItem from '@/components/discussion/list/ChannelDownloa
 
 const h = vi.hoisted(() => ({
   route: null as unknown,
-  adminUsernames: null as unknown,
-  serverModUsernames: null as unknown,
-  serverModProfileNames: null as unknown,
-  forumAdminUsernames: null as unknown,
-  forumModUsernames: null as unknown,
-  forumModProfileNames: null as unknown,
 }));
 
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
-vi.mock('@/composables/useServerRoleMembership', () => ({
-  useServerRoleMembership: () => ({
-    serverAdminUsernames: h.adminUsernames,
-    serverModUsernames: h.serverModUsernames,
-    serverModProfileNames: h.serverModProfileNames,
-  }),
-}));
-vi.mock('@/composables/useForumRoleMembership', () => ({
-  useForumRoleMembership: () => ({
-    forumAdminUsernames: h.forumAdminUsernames,
-    forumModUsernames: h.forumModUsernames,
-    forumModProfileNames: h.forumModProfileNames,
-  }),
-}));
 
 const makeChannel = (overrides: Record<string, unknown> = {}) =>
   ({
@@ -94,12 +73,6 @@ const author = (wrapper: ReturnType<typeof mount>) =>
 
 beforeEach(() => {
   h.route = { params: { forumId: 'cats' }, query: {} };
-  h.adminUsernames = ref<string[]>([]);
-  h.serverModUsernames = ref<string[]>([]);
-  h.serverModProfileNames = ref<string[]>([]);
-  h.forumAdminUsernames = ref<string[]>([]);
-  h.forumModUsernames = ref<string[]>([]);
-  h.forumModProfileNames = ref<string[]>([]);
 });
 
 describe('ChannelDownloadListItem title', () => {
@@ -175,42 +148,15 @@ describe('ChannelDownloadListItem metadata', () => {
 });
 
 describe('ChannelDownloadListItem author badges', () => {
-  it('marks the author as a server admin when listed', () => {
-    h.adminUsernames = ref(['alice']);
+  it.each([
+    'isServerAdmin',
+    'isServerMod',
+    'isForumAdmin',
+    'isForumMod',
+  ])('does not pass the %s role badge to the author', (badgeProp) => {
     const wrapper = mountItem(makeDiscussion());
 
-    expect(author(wrapper).props('isServerAdmin')).toBe(true);
-  });
-
-  it('marks the author as a server mod when listed (and not a server admin)', () => {
-    h.serverModUsernames = ref(['alice']);
-    const wrapper = mountItem(makeDiscussion());
-
-    expect(author(wrapper).props('isServerMod')).toBe(true);
-  });
-
-  it('marks the author as a Forum Admin when they own the channel', () => {
-    h.forumAdminUsernames = ref(['alice']);
-    const wrapper = mountItem(makeDiscussion());
-
-    expect(author(wrapper).props('isForumAdmin')).toBe(true);
-    expect(author(wrapper).props('isForumMod')).toBe(false);
-  });
-
-  it('marks the author as a Forum Mod when they moderate the channel', () => {
-    h.forumModUsernames = ref(['alice']);
-    const wrapper = mountItem(makeDiscussion());
-
-    expect(author(wrapper).props('isForumMod')).toBe(true);
-  });
-
-  it('suppresses the Forum Mod badge for a channel owner who also moderates', () => {
-    h.forumAdminUsernames = ref(['alice']);
-    h.forumModUsernames = ref(['alice']);
-    const wrapper = mountItem(makeDiscussion());
-
-    expect(author(wrapper).props('isForumAdmin')).toBe(true);
-    expect(author(wrapper).props('isForumMod')).toBe(false);
+    expect(author(wrapper).props(badgeProp)).toBeUndefined();
   });
 });
 
