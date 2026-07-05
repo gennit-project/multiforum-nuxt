@@ -9,6 +9,7 @@ import PrimaryButton from '@/components/PrimaryButton.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import OnThisPage from '@/components/wiki/OnThisPage.vue';
+import WikiPagePinButton from '@/components/wiki/WikiPagePinButton.vue';
 import FontSizeControl from '@/components/channel/FontSizeControl.vue';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
@@ -44,6 +45,7 @@ const {
   result: channelResult,
   loading: channelLoading,
   error: channelError,
+  refetch: refetchChannel,
 } = useQuery(GET_CHANNEL, { uniqueName: forumId }, { errorPolicy: 'all' });
 
 // Computed property for the channel data
@@ -140,18 +142,27 @@ onGetWikiPageResult((result) => {
           }}</span>
         </nav>
 
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h1 class="text-2xl font-bold dark:text-white">
             {{ wikiPage.title }}
           </h1>
-          <PrimaryButton
-            :label="'Edit Page'"
-            @click="
-              router.push(`/forums/${forumId}/wiki/edit/${wikiPage.slug}`)
-            "
-          >
-            <PencilIcon class="mr-2 h-5 w-5" />
-          </PrimaryButton>
+          <div class="flex flex-wrap items-center gap-2">
+            <WikiPagePinButton
+              v-if="channel"
+              :channel="channel"
+              :wiki-page="wikiPage"
+              :channel-unique-name="forumId"
+              @pinned-changed="refetchChannel"
+            />
+            <PrimaryButton
+              :label="'Edit Page'"
+              @click="
+                router.push(`/forums/${forumId}/wiki/edit/${wikiPage.slug}`)
+              "
+            >
+              <PencilIcon class="mr-2 h-5 w-5" />
+            </PrimaryButton>
+          </div>
         </div>
         <div
           class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400"

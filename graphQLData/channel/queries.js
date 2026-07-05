@@ -104,6 +104,12 @@ export const GET_CHANNEL = gql`
           }
         }
       }
+      PinnedWikiPages(options: { sort: [{ updatedAt: DESC }] }) {
+        id
+        title
+        slug
+        updatedAt
+      }
       Tags {
         text
       }
@@ -201,6 +207,16 @@ export const GET_CHANNEL = gql`
         canSuspendUser
       }
       DefaultChannelRole {
+        canCreateComment
+        canCreateDiscussion
+        canCreateEvent
+        canUpdateChannel
+        canUploadFile
+        canUpvoteComment
+        canUpvoteDiscussion
+        channelUniqueName
+      }
+      ElevatedChannelRole {
         canCreateComment
         canCreateDiscussion
         canCreateEvent

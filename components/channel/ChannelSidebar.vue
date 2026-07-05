@@ -49,6 +49,7 @@ const channelId = computed(() => {
 });
 
 const channelRules = computed(() => props.channel?.rules ?? '');
+const pinnedWikiPages = computed(() => props.channel?.PinnedWikiPages ?? []);
 const botAccounts = computed(() => {
   const channel = props.channel as Channel & { Bots?: BotSummary[] };
   return channel?.Bots ?? [];
@@ -163,6 +164,27 @@ const handleBecomeAdminSuccess = () => {
     <div class="w-full">
       <div v-if="channel">
         <div class="mt-6 flex w-full flex-col gap-6">
+          <div v-if="pinnedWikiPages.length > 0">
+            <span
+              class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+            >
+              <i class="fa-solid fa-thumbtack mr-2" />Pinned Wiki Pages
+            </span>
+            <div class="flex flex-col gap-2 text-sm">
+              <nuxt-link
+                v-for="page in pinnedWikiPages"
+                :key="page.id"
+                :to="{
+                  name: 'forums-forumId-wiki-slug',
+                  params: { forumId: channelId, slug: page.slug },
+                }"
+                class="rounded-md px-2 py-1 text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-white"
+              >
+                {{ page.title }}
+              </nuxt-link>
+            </div>
+          </div>
+
           <div v-if="channelRules && channelRules !== '[]'" :key="channelRules">
             <span
               class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
