@@ -39,11 +39,14 @@ test('user can give and undo a super upvote on another user\'s comment', async (
   await expect(superUpvoteButton).toHaveCount(0);
 
   // Upvote alice's comment.
-  await upvoteButton.click();
-  await page.waitForResponse(
+  const upvoteResponse = page.waitForResponse(
     (response) =>
-      response.url().includes('/graphql') && response.request().method() === 'POST'
+      response.url().includes('/graphql') &&
+      response.request().method() === 'POST' &&
+      !!response.request().postData()?.includes('upvoteComment')
   );
+  await upvoteButton.click();
+  await upvoteResponse;
 
   // The super upvote button appears, inactive.
   await expect(superUpvoteButton).toBeVisible();

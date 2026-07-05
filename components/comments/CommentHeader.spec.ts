@@ -168,6 +168,14 @@ describe('CommentHeader badges', () => {
 
     expect(wrapper.text()).toContain('Best Answer');
   });
+
+  it('shows a Stickied badge', () => {
+    const wrapper = mountHeader({
+      commentData: makeComment({ isSticky: true }),
+    });
+
+    expect(wrapper.text()).toContain('Stickied');
+  });
 });
 
 describe('CommentHeader context link', () => {

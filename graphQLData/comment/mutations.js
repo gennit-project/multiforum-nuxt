@@ -217,6 +217,28 @@ export const UNSUBSCRIBE_FROM_COMMENT = gql`
   }
 `;
 
+export const STICKY_COMMENT = gql`
+  mutation stickyComment($commentId: ID!) {
+    stickyComment(commentId: $commentId) {
+      id
+      isSticky
+      stickyAt
+      stickyByUsername
+    }
+  }
+`;
+
+export const UNSTICKY_COMMENT = gql`
+  mutation unstickyComment($commentId: ID!) {
+    unstickyComment(commentId: $commentId) {
+      id
+      isSticky
+      stickyAt
+      stickyByUsername
+    }
+  }
+`;
+
 export const ADD_FEEDBACK_COMMENT_TO_COMMENT = gql`
   mutation addFeedbackCommentToComment(
     $modProfileName: String!

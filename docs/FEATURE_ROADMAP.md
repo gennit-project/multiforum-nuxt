@@ -166,10 +166,15 @@ Notes:
 - [ ] Add a lock state for wiki pages.
 - [ ] Restrict editing of locked wiki pages to channel owners per product rules.
 
-### 12. Moderation: sticky comment on discussion or event `[not started]`
+### 12. Moderation: sticky comment on discussion or event `[complete]`
 
-- [ ] Let moderators sticky a comment so it appears at the top of a discussion or event comment list.
-- [ ] Define ordering, permissions, and unsticky behavior.
+- [x] Let moderators sticky a comment so it appears at the top of a discussion or event comment list.
+- [x] Define ordering, permissions, and unsticky behavior.
+
+Notes:
+- Sticky comments use the existing `canHideComment` moderation permission and are limited to root, active, non-feedback comments.
+- Discussion and event comment queries return sticky metadata and sort sticky comments above the selected normal sort order.
+- The frontend shows a `Stickied` badge and exposes sticky/unsticky actions from the comment menu for users with comment-hide permission.
 
 ### 13. Wiki search: featured wiki pages from server settings `[not started]`
 

@@ -2,7 +2,11 @@
 import { ref, computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import type { PropType } from 'vue';
-import type { ApolloError } from '@apollo/client/core';
+import type {
+  ApolloCache,
+  ApolloError,
+  NormalizedCacheObject,
+} from '@apollo/client/core';
 import { useMutation } from '@vue/apollo-composable';
 import type { Comment } from '@/__generated__/graphql';
 import type { CreateReplyInputData } from '@/types/Comment';
@@ -35,7 +39,9 @@ import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import {
   SUBSCRIBE_TO_COMMENT,
+  STICKY_COMMENT,
   UNSUBSCRIBE_FROM_COMMENT,
+  UNSTICKY_COMMENT,
 } from '@/graphQLData/comment/mutations';
 
 const usernameVar = useUsername();
@@ -47,6 +53,12 @@ type DeleteCommentInputData = {
   commentId: string;
   parentCommentId: string;
   replyCount: number;
+};
+
+type StickyCommentFields = Comment & {
+  isSticky?: boolean | null;
+  stickyAt?: string | null;
+  stickyByUsername?: string | null;
 };
 
 export type HandleFeedbackInput = {
@@ -340,6 +352,7 @@ const authorBadges = computed(() => {
 
 // Compute menu items using the utility function
 const commentMenuItems = computed(() => {
+  const commentData = props.commentData as StickyCommentFields;
   const isOwnComment = isCommentOwnedByUser(
     props.commentData,
     usernameVar.value
@@ -353,6 +366,7 @@ const commentMenuItems = computed(() => {
     isOwnComment,
     isWatchingReplies,
     isArchived: !!props.commentData.archived,
+    isSticky: !!commentData.isSticky,
     isDiscussionAuthor: isDiscussionAuthor.value,
     isMarkedAsAnswer: isMarkedAsAnswer.value,
     depth: props.depth,
@@ -404,6 +418,45 @@ const { mutate: unsubscribeFromComment } = useMutation(
     },
   }
 );
+
+const updateStickyCache = (
+  cache: ApolloCache<NormalizedCacheObject>,
+  comment: StickyCommentFields | null | undefined
+) => {
+  if (!comment?.id) {
+    return;
+  }
+
+  cache.modify({
+    id: cache.identify({
+      __typename: 'Comment',
+      id: comment.id,
+    }),
+    fields: {
+      isSticky() {
+        return !!comment.isSticky;
+      },
+      stickyAt() {
+        return comment.stickyAt ?? null;
+      },
+      stickyByUsername() {
+        return comment.stickyByUsername ?? null;
+      },
+    },
+  });
+};
+
+const { mutate: stickyComment } = useMutation(STICKY_COMMENT, {
+  update: (cache, result) => {
+    updateStickyCache(cache, result.data?.stickyComment);
+  },
+});
+
+const { mutate: unstickyComment } = useMutation(UNSTICKY_COMMENT, {
+  update: (cache, result) => {
+    updateStickyCache(cache, result.data?.unstickyComment);
+  },
+});
 
 const isSubscribed = computed(() =>
   isCommentSubscribedByUser(props.commentData, usernameVar.value)
@@ -463,6 +516,18 @@ function handleWatchReplies() {
 
 function handleUnwatchReplies() {
   unsubscribeFromComment({
+    commentId: props.commentData.id,
+  });
+}
+
+function handleStickyComment() {
+  stickyComment({
+    commentId: props.commentData.id,
+  });
+}
+
+function handleUnstickyComment() {
+  unstickyComment({
     commentId: props.commentData.id,
   });
 }
@@ -756,6 +821,8 @@ const label = computed(() =>
                       "
                       @handle-mark-as-best-answer="handleMarkAsBestAnswer"
                       @handle-unmark-as-best-answer="handleUnmarkAsBestAnswer"
+                      @handle-sticky-comment="handleStickyComment"
+                      @handle-unsticky-comment="handleUnstickyComment"
                     >
                       <EllipsisHorizontal
                         class="h-5 w-5 cursor-pointer hover:text-black dark:text-gray-300 dark:hover:text-white"
