@@ -18,6 +18,8 @@ const h = vi.hoisted(() => ({
   }),
   subscribeToComment: vi.fn(),
   unsubscribeFromComment: vi.fn(),
+  stickyComment: vi.fn(),
+  unstickyComment: vi.fn(),
   handleMarkAsBestAnswer: vi.fn(),
   handleUnmarkAsBestAnswer: vi.fn(),
 }));
@@ -31,13 +33,19 @@ vi.mock('@vue/apollo-composable', () => ({
     mutate:
       mutation === 'SUBSCRIBE_TO_COMMENT'
         ? h.subscribeToComment
-        : h.unsubscribeFromComment,
+        : mutation === 'UNSUBSCRIBE_FROM_COMMENT'
+          ? h.unsubscribeFromComment
+          : mutation === 'STICKY_COMMENT'
+            ? h.stickyComment
+            : h.unstickyComment,
   }),
 }));
 
 vi.mock('@/graphQLData/comment/mutations', () => ({
   SUBSCRIBE_TO_COMMENT: 'SUBSCRIBE_TO_COMMENT',
   UNSUBSCRIBE_FROM_COMMENT: 'UNSUBSCRIBE_FROM_COMMENT',
+  STICKY_COMMENT: 'STICKY_COMMENT',
+  UNSTICKY_COMMENT: 'UNSTICKY_COMMENT',
 }));
 
 vi.mock('@/composables/useAuthState', () => ({
