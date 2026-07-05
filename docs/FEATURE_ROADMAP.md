@@ -30,7 +30,7 @@ Notes:
 - The add-to-list creation flow now defaults to `PRIVATE` and includes an explicit public visibility override.
 - The backend collection-create sanitizer also defaults missing visibility to `PRIVATE` while preserving explicit overrides.
 
-### 3. Downloadable file permanent delete permission flow `[partial]`
+### 3. Downloadable file permanent delete permission flow `[complete]`
 
 - [x] Define the exact moderator permission using the existing moderation permission model.
 - [x] Decide whether OP/uploader self-delete is allowed and under what product rules.
@@ -50,6 +50,7 @@ Notes:
 - The current draft slice adds an owner-scoped backend query and `/library/uploads` management page for uploaded downloadable files.
 - This slice adds scalar permanent-removal audit fields and focused authorization/storage-failure tests for downloadable-file deletion.
 - Backend draft PR gennit-project/multiforum-backend#116 and frontend draft PR gennit-project/multiforum-nuxt#266 add verified upload storage metadata for new downloadable files, including `storageObjectName` and `storageUrl`.
+- Status reconciled to `[complete]`: the referenced draft PRs have merged. Backend `main` exposes `permanentlyDeleteDownloadableFile` (and the storage-deletion hardening from multiforum-backend#121); no related PRs remain open.
 
 ### 4. Download filters: review and finish include/exclude semantics `[complete]`
 
@@ -133,7 +134,7 @@ Notes:
 Notes:
 - Album editor flows now include a reusable-image picker for the user's uploads, favorites, and image collections.
 
-### 9. Permanent media deletion and storage cleanup `[partial]`
+### 9. Permanent media deletion and storage cleanup `[complete]`
 
 - [x] Let authorized users delete album images permanently and remove the backing object from GCP/storage. `[in this PR]`
 - [x] Store backend-verified storage metadata for new image and downloadable-file uploads, including the actual storage URL/object name returned by signed upload creation. `[in draft PR]`
@@ -150,6 +151,7 @@ Notes:
 Notes:
 - Album edit deletion now confirms and calls the backend permanent-delete mutation before removing the image from the album UI.
 - This slice adds storage-backed permanent delete for URL-backed profile images and forum banners by resolving active URLs through upload audit metadata before clearing the owning profile/forum field.
+- Status reconciled to `[complete]`: the referenced draft PRs have merged. Backend `main` exposes `permanentlyDeleteImage`, `permanentlyDeleteProfileImage`, and `permanentlyDeleteChannelBanner` (plus the profile/banner storage-cleanup work from multiforum-backend#124); no related PRs remain open.
 
 ### 10. Wiki: pinned sidebar pages `[complete]`
 
@@ -209,17 +211,30 @@ Notes:
 - [ ] Replace explicit save-button flows where appropriate with autosave behavior.
 - [ ] Start with plugins/settings areas called out in the original note.
 
-### 16. Event edit history: title and description revisions `[partial]`
+### 16. Event edit history: title and description revisions `[complete]`
 
-- [ ] Add event version-history schema fields for title and description revisions plus `DescriptionLastEditedBy`.
-- [ ] Add backend middleware/hook logic to snapshot prior values on update.
-- [ ] Add query support for event revision history.
-- [ ] Add frontend activity-feed components similar to discussion edit history.
-- [ ] Add moderator redaction/delete support for event description revisions if required.
+- [x] Add event version-history schema fields for title and description revisions plus `DescriptionLastEditedBy`.
+- [x] Add backend middleware/hook logic to snapshot prior values on update.
+- [x] Add query support for event revision history.
+- [x] Add frontend activity-feed components similar to discussion edit history.
+- [x] Add moderator redaction/delete support for event description revisions if required.
 
 Notes:
-- Discussions already have full version history.
-- The roadmap notes indicate events still do not.
+- Mirrors the discussion version-history pattern. The `Event` type now exposes
+  `PastTitleVersions`, `PastDescriptionVersions`, and `DescriptionLastEditedBy`
+  (reusing `TextVersion`); an `eventVersionHistoryHook` snapshots the prior
+  title/description on update, wired via `eventVersionHistoryMiddleware`
+  (generated `updateEvents`) and the custom `updateEventWithChannelConnections`
+  resolver.
+- Description revisions are redactable via `deleteEventDescriptionRevision`
+  (the shared `redactTextVersionRevision`, `canEditEvents` permission). Titles
+  are non-redactable, consistent with discussions.
+- The frontend `GET_EVENT` query fetches the revision fields; `EventTitleVersions`
+  renders the title feed and `EventDescriptionEditsDropdown` renders description
+  edits, both reusing the shared `RevisionDiffModal`/`RevisionDiffContent`.
+- Series edits (`updateEventInSeries`) are intentionally out of scope; single-event
+  edits are covered. Extending history to series edits is a possible follow-up.
+- Backend PR gennit-project/multiforum-backend#145; frontend PR stacked on top.
 
 ## Removed From This Roadmap As Completed
 

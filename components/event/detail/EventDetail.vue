@@ -28,6 +28,8 @@ import 'md-editor-v3/lib/style.css';
 import EventFooter from '@/components/event/detail/EventFooter.vue';
 import EventHeader from '@/components/event/detail/EventHeader.vue';
 import EventBody from '@/components/event/detail/EventBody.vue';
+import EventTitleVersions from '@/components/event/detail/activityFeed/EventTitleVersions.vue';
+import EventDescriptionEditsDropdown from '@/components/event/detail/activityFeed/EventDescriptionEditsDropdown.vue';
 import ExpandableImage from '@/components/ExpandableImage.vue';
 import EventCommentsWrapper from '@/components/event/detail/EventCommentsWrapper.vue';
 import EventRootCommentFormWrapper from '@/components/event/detail/EventRootCommentFormWrapper.vue';
@@ -496,6 +498,8 @@ watchEffect(() => {
               </div>
             </div>
 
+            <EventTitleVersions v-if="showTitle && event" :event="event" />
+
             <ExpandableImage
               v-if="event.coverImageURL"
               :src="event.coverImageURL"
@@ -520,6 +524,12 @@ watchEffect(() => {
                 "
                 @close-edit-event-description="eventDescriptionEditMode = false"
               />
+              <div
+                v-if="event.PastDescriptionVersions?.length"
+                class="px-1 pt-1"
+              >
+                <EventDescriptionEditsDropdown :event="event" />
+              </div>
             </div>
 
             <div v-if="event.Tags?.length > 0" class="my-2 px-0 sm:px-4">

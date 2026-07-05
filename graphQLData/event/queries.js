@@ -111,6 +111,27 @@ export const GET_EVENT = gql`
         discussionKarma
         commentKarma
       }
+      PastTitleVersions(options: { sort: [{ createdAt: DESC }] }) {
+        id
+        Author {
+          username
+        }
+        body
+        editReason
+        createdAt
+      }
+      PastDescriptionVersions(options: { sort: [{ createdAt: DESC }] }) {
+        id
+        Author {
+          username
+        }
+        body
+        editReason
+        createdAt
+      }
+      DescriptionLastEditedBy {
+        username
+      }
     }
   }
   ${EVENT_FIELDS}
