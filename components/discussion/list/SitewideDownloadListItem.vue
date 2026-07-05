@@ -10,8 +10,6 @@ import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import { relativeTime } from '@/utils';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 import type { DiscussionWithFavorited } from '@/types/Discussion';
-import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
-import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
 type AlbumPayload = {
   discussion: Discussion;
@@ -43,7 +41,6 @@ const emit = defineEmits<{
 }>();
 
 const route = useRoute();
-const { serverAdminUsernames } = useServerRoleMembership();
 
 const filteredQuery = computed(() => {
   const query = { ...route.query };
@@ -122,15 +119,6 @@ const authorDiscussionKarma = computed(
 const authorAccountCreated = computed(
   () => props.discussion?.Author?.createdAt || ''
 );
-
-const authorIsAdmin = computed(() => {
-  return (
-    getServerRoleBadge({
-      username: props.discussion?.Author?.username,
-      adminUsernames: serverAdminUsernames.value,
-    }) === 'serverAdmin'
-  );
-});
 
 const firstAlbumImage = computed(() => {
   const album = props.discussion?.Album;
@@ -216,7 +204,6 @@ const handleOpenAlbum = () => {
             :comment-karma="authorCommentKarma"
             :discussion-karma="authorDiscussionKarma"
             :account-created="authorAccountCreated"
-            :is-server-admin="authorIsAdmin"
             light-text
           /><template v-if="primaryChannel">
             in
