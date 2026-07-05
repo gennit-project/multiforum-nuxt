@@ -192,16 +192,17 @@ Notes:
 - The admin Wiki Settings tab provides a searchable picker with explicit up/down ordering.
 - `/wiki/search` renders featured wiki pages above normal results and removes duplicates from the regular result list.
 
-### 14. Favorites API optimization `[partial]`
+### 14. Favorites API optimization `[complete]`
 
-- [ ] Update image and channel list queries to include computed favorite state where missing.
-- [ ] Pass `initialIsFavorited` from parent list components consistently.
-- [ ] Add an equivalent optimized path for comments instead of relying on a per-item lookup.
+- [x] Update image and channel list queries to include computed favorite state where missing. `[in backend/frontend PRs]`
+- [x] Pass `initialIsFavorited` from parent list components consistently. `[in frontend PR]`
+- [x] Add an equivalent optimized path for comments instead of relying on a per-item lookup.
 
 Notes:
 - Discussions are already optimized.
-- Image and channel favorite buttons now accept `initialIsFavorited`.
-- Comments still appear to use a separate lookup path.
+- Images and channels now expose computed favorite state for generated reads, and sorted channel results include authenticated favorite state.
+- Image grids and channel header/sidebar surfaces pass the computed state into favorite buttons so those buttons skip their fallback lookup.
+- Comment list/reply/event-comment payloads already include `isFavoritedByUser`, and `CommentButtons` passes it into `AddToCommentFavorites`; the per-item lookup remains only as a fallback for callers that do not provide state.
 
 ### 15. Auto-save for server settings and channel admin settings `[not started]`
 

@@ -6,9 +6,15 @@ import { GET_USER_IMAGES } from '@/graphQLData/image/queries';
 import type { Image } from '@/__generated__/graphql';
 import ImageListItem from '@/components/image/ImageListItem.vue';
 import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
+import { useUsername } from '@/composables/useAuthState';
 
 const route = useRoute();
+const loggedInUsername = useUsername();
 const { selectedChannels, hasSelectedChannels } = useSelectedChannelsFromQuery();
+
+type ImageWithFavoriteState = Image & {
+  isFavorited?: boolean | null;
+};
 
 const username = computed(() => {
   return typeof route.params.username === 'string' ? route.params.username : '';
@@ -50,6 +56,7 @@ const {
   GET_USER_IMAGES,
   () => ({
     username: username.value,
+    loggedInUsername: loggedInUsername.value || null,
     offset: 0,
     limit: pageSize,
     where: imagesWhere.value,
@@ -67,7 +74,7 @@ const user = computed(() => {
   return null;
 });
 
-const images = computed((): Image[] => {
+const images = computed((): ImageWithFavoriteState[] => {
   if (!user.value?.Images) return [];
   return user.value.Images;
 });
@@ -101,6 +108,7 @@ const loadMoreImages = async () => {
     await fetchMore({
       variables: {
         username: username.value,
+        loggedInUsername: loggedInUsername.value || null,
         offset: newOffset,
         limit: pageSize,
         where: imagesWhere.value,
@@ -176,6 +184,7 @@ const loadMoreImages = async () => {
           :key="image.id"
           :image="image"
           :username="username"
+          :initial-is-favorited="image.isFavorited ?? undefined"
         />
       </div>
 

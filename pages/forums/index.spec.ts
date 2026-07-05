@@ -8,6 +8,9 @@ vi.mock('nuxt/app', () => ({
   useRoute: () => ({ query: {} }),
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => ref('viewer'),
+}));
 
 vi.mock('@vue/apollo-composable', () => ({ useQuery: vi.fn() }));
 
@@ -64,5 +67,21 @@ describe('forums index page', () => {
       downloadCount: number;
     }>;
     expect(channels[0].downloadCount).toBe(2);
+  });
+
+  it('preserves channel favorite state from the list query', async () => {
+    const wrapper = await mountWith({
+      channels: [
+        {
+          uniqueName: 'cats',
+          isFavorited: true,
+          DiscussionChannelsAggregate: { count: 0 },
+        },
+      ],
+    });
+    const channels = wrapper.findComponent(ChannelList).props('channels') as Array<{
+      isFavorited: boolean;
+    }>;
+    expect(channels[0].isFavorited).toBe(true);
   });
 });

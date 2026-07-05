@@ -181,6 +181,7 @@ export const GET_USER_ALBUMS = gql`
 export const GET_USER_IMAGES = gql`
   query GetUserImages(
     $username: String!
+    $loggedInUsername: String
     $offset: Int!
     $limit: Int!
     $where: ImageWhere
@@ -201,6 +202,7 @@ export const GET_USER_IMAGES = gql`
         hasSensitiveContent
         hasSpoiler
         createdAt
+        isFavorited(username: $loggedInUsername)
         Uploader {
           username
           displayName
@@ -246,6 +248,7 @@ export const GET_REUSABLE_ALBUM_IMAGES = gql`
         caption
         copyright
         createdAt
+        isFavorited(username: $username)
         Uploader {
           username
           displayName
@@ -267,6 +270,7 @@ export const GET_REUSABLE_ALBUM_IMAGES = gql`
           caption
           copyright
           createdAt
+          isFavorited(username: $username)
           Uploader {
             username
             displayName

@@ -1,10 +1,18 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import AddToChannelFavorites from '@/components/favorites/AddToChannelFavorites.vue';
 import { useIsAuthenticated } from '@/composables/useAuthState';
 
 const isAuthenticatedVar = useIsAuthenticated();
 
-defineProps({
+type ChannelWithFavoriteState = {
+  isFavorited?: boolean | null;
+  channelIconURL?: string | null;
+  displayName?: string | null;
+  uniqueName?: string | null;
+};
+
+const props = defineProps({
   channelId: {
     type: String,
     required: true,
@@ -15,6 +23,9 @@ defineProps({
   },
 });
 
+const initialIsFavorited = computed(
+  () => (props.channel as ChannelWithFavoriteState)?.isFavorited ?? undefined
+);
 </script>
 
 <template>
@@ -52,6 +63,7 @@ defineProps({
           :allow-add-to-list="true"
           :channel-unique-name="channelId"
           :channel-display-name="channel?.displayName || ''"
+          :initial-is-favorited="initialIsFavorited"
           size="medium"
         />
       </div>

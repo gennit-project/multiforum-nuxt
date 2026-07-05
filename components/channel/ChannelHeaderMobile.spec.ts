@@ -15,7 +15,11 @@ const mountHeader = (channel: Record<string, unknown>) =>
       stubs: {
         AvatarComponent: true,
         ClientOnly: { template: '<div><slot /></div>' },
-        AddToChannelFavorites: { template: '<div class="fav" />' },
+        AddToChannelFavorites: {
+          name: 'AddToChannelFavorites',
+          props: ['initialIsFavorited'],
+          template: '<div class="fav" />',
+        },
       },
     },
   });
@@ -34,6 +38,19 @@ describe('ChannelHeaderMobile', () => {
     mockIsAuthenticated.value = true;
     expect(
       mountHeader({ displayName: 'Cats', uniqueName: 'cats' }).find('.fav').exists()
+    ).toBe(true);
+  });
+
+  it('passes computed favorite state to the favorite button', () => {
+    mockIsAuthenticated.value = true;
+    const wrapper = mountHeader({
+      displayName: 'Cats',
+      uniqueName: 'cats',
+      isFavorited: true,
+    });
+
+    expect(
+      wrapper.getComponent({ name: 'AddToChannelFavorites' }).props('initialIsFavorited')
     ).toBe(true);
   });
 

@@ -18,6 +18,10 @@ vi.mock('nuxt/app', () => ({
 
 vi.mock('@vue/apollo-composable', () => ({ useQuery: vi.fn() }));
 
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => ref('viewer'),
+}));
+
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 
 const mountWith = async (channels: unknown[]) => {

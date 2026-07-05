@@ -39,7 +39,11 @@ const mountSidebar = (props: Record<string, unknown> = {}) =>
         MarkdownPreview: { name: 'MarkdownPreview', props: ['text'], template: '<div class="md">{{ text }}</div>' },
         FontSizeControl: { name: 'FontSizeControl', template: '<div class="font-control" />' },
         BecomeAdminModal: { name: 'BecomeAdminModal', template: '<div />' },
-        AddToChannelFavorites: true,
+        AddToChannelFavorites: {
+          name: 'AddToChannelFavorites',
+          props: ['initialIsFavorited'],
+          template: '<div class="channel-favorite" />',
+        },
         ExpandableImage: true,
         AvatarComponent: true,
         NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
@@ -58,6 +62,16 @@ describe('ChannelSidebar content', () => {
     const wrapper = mountSidebar();
 
     expect(wrapper.text()).toContain('Cats Forum');
+  });
+
+  it('passes computed favorite state to the favorite button', () => {
+    const wrapper = mountSidebar({
+      channel: channel({ isFavorited: true }),
+    });
+
+    expect(
+      wrapper.getComponent({ name: 'AddToChannelFavorites' }).props('initialIsFavorited')
+    ).toBe(true);
   });
 
   it('renders the description', () => {
