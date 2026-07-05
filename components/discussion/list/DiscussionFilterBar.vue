@@ -11,6 +11,7 @@ import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilter
 import type { SearchDiscussionValues } from '@/types/Discussion';
 import FilterIcon from '@/components/icons/FilterIcon.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
+import SecondaryButton from '@/components/SecondaryButton.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import SearchIcon from '@/components/icons/SearchIcon.vue';
 import { useUIStore } from '@/stores/uiStore';
@@ -23,7 +24,7 @@ import { updateFilters } from '@/utils/routerUtils';
 
 const emit = defineEmits(['openAbout']);
 
-defineProps({
+const props = defineProps({
   isForumScoped: {
     type: Boolean,
     default: false,
@@ -41,6 +42,12 @@ defineProps({
     default: 0,
   },
 });
+
+// The sitewide discussion list uses a lower-emphasis (secondary) New Post
+// button; forum-scoped lists keep the primary button.
+const newPostButton = computed(() =>
+  props.isForumScoped ? PrimaryButton : SecondaryButton
+);
 
 // Use shared filter bar composable
 const {
@@ -251,7 +258,8 @@ const isExpanded = computed(() => {
         <div v-if="!isDownloadPage">
           <RequireAuth :full-width="false">
             <template #has-auth>
-              <PrimaryButton
+              <component
+                :is="newPostButton"
                 :label="isDownloadPage ? 'New Upload' : 'New Post'"
                 @click="
                   $router.push(
@@ -265,7 +273,8 @@ const isExpanded = computed(() => {
               />
             </template>
             <template #does-not-have-auth>
-              <PrimaryButton
+              <component
+                :is="newPostButton"
                 :label="isDownloadPage ? 'New Upload' : 'New Post'"
               />
             </template>

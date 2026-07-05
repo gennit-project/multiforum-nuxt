@@ -3,6 +3,8 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createMockRoute, createMockRouter } from '@/tests/utils/mockRouter';
 
 import DiscussionFilterBar from '@/components/discussion/list/DiscussionFilterBar.vue';
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import SecondaryButton from '@/components/SecondaryButton.vue';
 
 // Let the real useFilterBar run against a mocked route/router.
 const route = createMockRoute({ name: 'DiscussionList' });
@@ -18,6 +20,7 @@ const heavyStubs = {
   SortButtons: true,
   FilterChip: true,
   PrimaryButton: true,
+  SecondaryButton: true,
   ChannelIcon: true,
   TagIcon: true,
   FilterIcon: true,
@@ -67,5 +70,23 @@ describe('DiscussionFilterBar', () => {
     expect(aboutButton).toBeTruthy();
     await aboutButton!.trigger('click');
     expect(wrapper.emitted('openAbout')).toBeTruthy();
+  });
+
+  it('uses the primary New Post button on a forum-scoped list', () => {
+    const wrapper = mountBar({ isForumScoped: true });
+
+    expect(wrapper.findComponent(PrimaryButton).exists()).toBe(true);
+  });
+
+  it('uses the secondary New Post button on the sitewide list', () => {
+    const wrapper = mountBar({ isForumScoped: false });
+
+    expect(wrapper.findComponent(SecondaryButton).exists()).toBe(true);
+  });
+
+  it('does not use the primary New Post button on the sitewide list', () => {
+    const wrapper = mountBar({ isForumScoped: false });
+
+    expect(wrapper.findComponent(PrimaryButton).exists()).toBe(false);
   });
 });
