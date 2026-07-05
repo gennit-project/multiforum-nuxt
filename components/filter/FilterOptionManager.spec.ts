@@ -13,7 +13,7 @@ const makeOption = (overrides: Partial<FilterOption> = {}): FilterOption =>
     order: 0,
     __typename: 'FilterOption',
     ...overrides,
-  } as unknown as FilterOption);
+  }) as unknown as FilterOption;
 
 const makeGroup = (overrides: Partial<FilterGroup> = {}): FilterGroup =>
   ({
@@ -25,7 +25,7 @@ const makeGroup = (overrides: Partial<FilterGroup> = {}): FilterGroup =>
     options: [],
     __typename: 'FilterGroup',
     ...overrides,
-  } as unknown as FilterGroup);
+  }) as unknown as FilterGroup;
 
 const mountOM = (props: Record<string, unknown> = {}) =>
   mountWithDefaults(FilterOptionManager, {
@@ -50,7 +50,9 @@ describe('FilterOptionManager', () => {
   });
 
   it('shows the mode label in read mode', () => {
-    const wrapper = mountOM({ filterGroup: makeGroup({ mode: FilterMode.Exclude }) });
+    const wrapper = mountOM({
+      filterGroup: makeGroup({ mode: FilterMode.Exclude }),
+    });
     expect(wrapper.text()).toContain('Must exclude selected labels');
   });
 
@@ -62,7 +64,9 @@ describe('FilterOptionManager', () => {
 
   it('hides the Move Up button when canMoveUp is false', () => {
     const wrapper = mountOM({ canMoveUp: false });
-    expect(wrapper.findAll('button').some((b) => b.text() === '↑ Move Up')).toBe(false);
+    expect(
+      wrapper.findAll('button').some((b) => b.text() === '↑ Move Up')
+    ).toBe(false);
   });
 
   it('emits removeGroup when Remove Group is clicked', async () => {
@@ -89,14 +93,18 @@ describe('FilterOptionManager', () => {
     await byText(wrapper, 'Edit Group Settings').trigger('click');
     await wrapper.get('input[type="text"]').setValue('new_key');
     await byText(wrapper, 'Save Changes').trigger('click');
-    expect(wrapper.emitted('updateGroup')?.[0]?.[1]).toMatchObject({ key: 'new_key' });
+    expect(wrapper.emitted('updateGroup')?.[0]?.[1]).toMatchObject({
+      key: 'new_key',
+    });
   });
 
   it('disables Save Changes for an invalid key', async () => {
     const wrapper = mountOM();
     await byText(wrapper, 'Edit Group Settings').trigger('click');
     await wrapper.get('input[type="text"]').setValue('bad key!');
-    expect(byText(wrapper, 'Save Changes').attributes('disabled')).toBeDefined();
+    expect(
+      byText(wrapper, 'Save Changes').attributes('disabled')
+    ).toBeDefined();
   });
 
   it('leaves edit mode when cancelled', async () => {
@@ -108,7 +116,9 @@ describe('FilterOptionManager', () => {
 
   it('shows the empty-options state when there are no options', () => {
     const wrapper = mountOM();
-    expect(wrapper.text()).toContain('No options configured. Add at least one option before saving this group.');
+    expect(wrapper.text()).toContain(
+      'No options configured. Add at least one option before saving this group.'
+    );
   });
 
   it('emits updateGroup with the new option when added', async () => {
@@ -117,31 +127,102 @@ describe('FilterOptionManager', () => {
     await wrapper.get('input[placeholder="e.g. 10x20"]').setValue('5x5');
     await wrapper.get('input[placeholder="e.g. 10 × 20"]').setValue('5 by 5');
     await byText(wrapper, 'Add Option').trigger('click');
-    const payload = wrapper.emitted('updateGroup')?.[0]?.[1] as { options: FilterOption[] };
+    const payload = wrapper.emitted('updateGroup')?.[0]?.[1] as {
+      options: FilterOption[];
+    };
     expect(payload.options).toHaveLength(1);
   });
 
+  it('reveals inline fields when editing an existing option', async () => {
+    const wrapper = mountOM({
+      filterGroup: makeGroup({ options: [makeOption({ id: 'o1' })] }),
+    });
+    await byText(wrapper, 'Edit').trigger('click');
+    expect(
+      wrapper
+        .findAll('input')
+        .filter((input) => !input.attributes('placeholder'))
+    ).toHaveLength(2);
+  });
+
+  it('emits updateGroup with edited option fields when saved', async () => {
+    const wrapper = mountOM({
+      filterGroup: makeGroup({ options: [makeOption({ id: 'o1' })] }),
+    });
+    await byText(wrapper, 'Edit').trigger('click');
+    const editInputs = wrapper
+      .findAll('input')
+      .filter((input) => !input.attributes('placeholder'));
+    await editInputs[0]!.setValue('20x20');
+    await editInputs[1]!.setValue('20 x 20');
+    await byText(wrapper, 'Save').trigger('click');
+    const payload = wrapper.emitted('updateGroup')?.[0]?.[1] as {
+      options: FilterOption[];
+    };
+    expect(payload.options[0]).toMatchObject({
+      id: 'o1',
+      value: '20x20',
+      displayName: '20 x 20',
+    });
+  });
+
+  it('blocks saving an edited option when its value duplicates another option', async () => {
+    const wrapper = mountOM({
+      filterGroup: makeGroup({
+        options: [
+          makeOption({ id: 'o1', value: '10x20' }),
+          makeOption({ id: 'o2', value: '5x5' }),
+        ],
+      }),
+    });
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Edit')!
+      .trigger('click');
+    const editInputs = wrapper
+      .findAll('input')
+      .filter((input) => !input.attributes('placeholder'));
+    await editInputs[0]!.setValue('5x5');
+    expect(wrapper.text()).toContain(
+      'This value already exists in this group.'
+    );
+    expect(byText(wrapper, 'Save').attributes('disabled')).toBeDefined();
+  });
+
   it('flags a duplicate option value', async () => {
-    const wrapper = mountOM({ filterGroup: makeGroup({ options: [makeOption({ value: '5x5' })] }) });
+    const wrapper = mountOM({
+      filterGroup: makeGroup({ options: [makeOption({ value: '5x5' })] }),
+    });
     await byText(wrapper, '+ Add New Option').trigger('click');
     await wrapper.get('input[placeholder="e.g. 10x20"]').setValue('5x5');
-    expect(wrapper.text()).toContain('This value already exists in this group.');
+    expect(wrapper.text()).toContain(
+      'This value already exists in this group.'
+    );
   });
 
   it('flags an option value with invalid characters', async () => {
     const wrapper = mountOM();
     await byText(wrapper, '+ Add New Option').trigger('click');
     await wrapper.get('input[placeholder="e.g. 10x20"]').setValue('bad value');
-    expect(wrapper.text()).toContain('Value can only contain letters, numbers, underscores, and hyphens.');
+    expect(wrapper.text()).toContain(
+      'Value can only contain letters, numbers, underscores, and hyphens.'
+    );
     expect(byText(wrapper, 'Add Option').attributes('disabled')).toBeDefined();
   });
 
   it('emits updateGroup with the option removed', async () => {
     const wrapper = mountOM({
-      filterGroup: makeGroup({ options: [makeOption({ id: 'o1' }), makeOption({ id: 'o2', value: 'x' })] }),
+      filterGroup: makeGroup({
+        options: [
+          makeOption({ id: 'o1' }),
+          makeOption({ id: 'o2', value: 'x' }),
+        ],
+      }),
     });
     await byText(wrapper, 'Remove').trigger('click');
-    const payload = wrapper.emitted('updateGroup')?.[0]?.[1] as { options: FilterOption[] };
+    const payload = wrapper.emitted('updateGroup')?.[0]?.[1] as {
+      options: FilterOption[];
+    };
     expect(payload.options.map((o) => o.id)).toEqual(['o2']);
   });
 
@@ -156,10 +237,17 @@ describe('FilterOptionManager', () => {
 
   it('reorders options when moved down', async () => {
     const wrapper = mountOM({
-      filterGroup: makeGroup({ options: [makeOption({ id: 'o1' }), makeOption({ id: 'o2', value: 'x' })] }),
+      filterGroup: makeGroup({
+        options: [
+          makeOption({ id: 'o1' }),
+          makeOption({ id: 'o2', value: 'x' }),
+        ],
+      }),
     });
     await wrapper.get('button[title="Move down"]').trigger('click');
-    const payload = wrapper.emitted('updateGroup')?.[0]?.[1] as { options: FilterOption[] };
+    const payload = wrapper.emitted('updateGroup')?.[0]?.[1] as {
+      options: FilterOption[];
+    };
     expect(payload.options.map((o) => o.id)).toEqual(['o2', 'o1']);
   });
 });
