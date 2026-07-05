@@ -12,6 +12,20 @@ export const GET_SITE_WIDE_WIKI_LIST = gql`
       options: $options
     ) {
       aggregateWikiPageCount
+      featuredWikiPages {
+        id
+        title
+        body
+        slug
+        channelUniqueName
+        createdAt
+        updatedAt
+        VersionAuthor {
+          username
+          displayName
+          profilePicURL
+        }
+      }
       wikiPages {
         id
         title
@@ -25,6 +39,25 @@ export const GET_SITE_WIDE_WIKI_LIST = gql`
           displayName
           profilePicURL
         }
+      }
+    }
+  }
+`;
+
+export const GET_WIKI_PAGES_BY_IDS = gql`
+  query getWikiPagesByIds($ids: [ID!]!) {
+    wikiPages(where: { id_IN: $ids }) {
+      id
+      title
+      body
+      slug
+      channelUniqueName
+      createdAt
+      updatedAt
+      VersionAuthor {
+        username
+        displayName
+        profilePicURL
       }
     }
   }

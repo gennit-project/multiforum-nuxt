@@ -6,6 +6,7 @@ export const GET_SERVER_CONFIG = gql`
       serverName
       serverIconURL
       serverDescription
+      featuredWikiPageIds
       Admins {
         username
       }

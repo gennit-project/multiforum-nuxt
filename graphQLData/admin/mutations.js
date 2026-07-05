@@ -19,6 +19,18 @@ export const UPDATE_SERVER_CONFIG = gql`
   }
 `;
 
+export const SET_FEATURED_WIKI_PAGES = gql`
+  mutation setFeaturedWikiPages($serverName: String!, $wikiPageIds: [ID!]!) {
+    setFeaturedWikiPages(
+      serverName: $serverName
+      wikiPageIds: $wikiPageIds
+    ) {
+      serverName
+      featuredWikiPageIds
+    }
+  }
+`;
+
 export const REFRESH_PLUGINS = gql`
   mutation RefreshPlugins {
     refreshPlugins {

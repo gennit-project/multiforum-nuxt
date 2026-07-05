@@ -17,6 +17,21 @@ import { formatWordCount } from '@/utils/wikiSearchDisplay';
 
 const WIKI_PAGE_LIMIT = 25;
 
+type WikiSearchPage = {
+  id: string;
+  title?: string | null;
+  body?: string | null;
+  slug?: string | null;
+  channelUniqueName?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  VersionAuthor?: {
+    username?: string | null;
+    displayName?: string | null;
+    profilePicURL?: string | null;
+  } | null;
+};
+
 const route = useRoute();
 const router = useRouter();
 
@@ -89,11 +104,27 @@ const {
   },
 });
 
-const wikiPages = computed(() => {
+const wikiPages = computed<WikiSearchPage[]>(() => {
   if (!wikiResult.value?.getSiteWideWikiList) {
     return [];
   }
-  return wikiResult.value.getSiteWideWikiList.wikiPages || [];
+  return (
+    wikiResult.value.getSiteWideWikiList.wikiPages || []
+  ) as WikiSearchPage[];
+});
+
+const featuredWikiPages = computed<WikiSearchPage[]>(() => {
+  if (!wikiResult.value?.getSiteWideWikiList) {
+    return [];
+  }
+  return (
+    wikiResult.value.getSiteWideWikiList.featuredWikiPages || []
+  ) as WikiSearchPage[];
+});
+
+const regularWikiPages = computed<WikiSearchPage[]>(() => {
+  const featuredIds = new Set(featuredWikiPages.value.map((page) => page.id));
+  return wikiPages.value.filter((page) => !featuredIds.has(page.id));
 });
 
 const aggregateWikiPageCount = computed(() => {
@@ -161,46 +192,90 @@ watch(
         {{ wikiError.message }}
       </div>
       <div
-        v-else-if="wikiPages.length === 0"
+        v-else-if="wikiPages.length === 0 && featuredWikiPages.length === 0"
         class="mt-6 text-sm text-gray-500"
       >
         No wiki pages match your search.
       </div>
-      <ul
-        v-else
-        class="mt-6 flex flex-col gap-4"
-        data-testid="wiki-search-results"
-      >
-        <li
-          v-for="wikiPage in wikiPages"
-          :key="wikiPage.id"
-          class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900"
+      <div v-else class="mt-6 space-y-8">
+        <section
+          v-if="featuredWikiPages.length > 0"
+          data-testid="featured-wiki-pages"
         >
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <nuxt-link
-              class="font-semibold text-base text-gray-900 hover:text-orange-600 dark:text-gray-100"
-              :to="`/forums/${wikiPage.channelUniqueName}/wiki/${wikiPage.slug}`"
+          <div class="mb-3">
+            <h2 class="text-sm font-semibold uppercase tracking-wide text-orange-700 dark:text-orange-300">
+              Featured wiki pages
+            </h2>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Curated starting points from the server admins.
+            </p>
+          </div>
+          <ul class="grid gap-4 sm:grid-cols-2">
+            <li
+              v-for="wikiPage in featuredWikiPages"
+              :key="wikiPage.id"
+              class="rounded-xl border border-orange-200 bg-orange-50 p-4 shadow-sm dark:border-orange-800 dark:bg-orange-950/30"
             >
-              <HighlightedSearchTerms
-                :text="wikiPage.title"
-                :search-input="searchInputComputed"
-              />
-            </nuxt-link>
-            <span class="text-xs text-gray-500 dark:text-gray-300">
-              {{ wikiPage.channelUniqueName }}
-            </span>
-          </div>
-          <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
-            <span>{{ formatWordCount(wikiPage.body) }}</span>
-            <span v-if="wikiPage.updatedAt">
-              Updated {{ relativeTime(wikiPage.updatedAt) }}
-            </span>
-            <span v-if="wikiPage.VersionAuthor">
-              by {{ wikiPage.VersionAuthor.displayName || wikiPage.VersionAuthor.username }}
-            </span>
-          </div>
-        </li>
-      </ul>
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <nuxt-link
+                  class="font-semibold text-base text-gray-900 hover:text-orange-700 dark:text-gray-100 dark:hover:text-orange-300"
+                  :to="`/forums/${wikiPage.channelUniqueName}/wiki/${wikiPage.slug}`"
+                >
+                  <HighlightedSearchTerms
+                    :text="wikiPage.title || undefined"
+                    :search-input="searchInputComputed"
+                  />
+                </nuxt-link>
+                <span class="text-xs text-gray-600 dark:text-gray-300">
+                  {{ wikiPage.channelUniqueName }}
+                </span>
+              </div>
+              <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-300">
+                <span>{{ formatWordCount(wikiPage.body) }}</span>
+                <span v-if="wikiPage.updatedAt">
+                  Updated {{ relativeTime(wikiPage.updatedAt) }}
+                </span>
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        <ul
+          v-if="regularWikiPages.length > 0"
+          class="flex flex-col gap-4"
+          data-testid="wiki-search-results"
+        >
+          <li
+            v-for="wikiPage in regularWikiPages"
+            :key="wikiPage.id"
+            class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900"
+          >
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <nuxt-link
+                class="font-semibold text-base text-gray-900 hover:text-orange-600 dark:text-gray-100"
+                :to="`/forums/${wikiPage.channelUniqueName}/wiki/${wikiPage.slug}`"
+              >
+                <HighlightedSearchTerms
+                  :text="wikiPage.title || undefined"
+                  :search-input="searchInputComputed"
+                />
+              </nuxt-link>
+              <span class="text-xs text-gray-500 dark:text-gray-300">
+                {{ wikiPage.channelUniqueName }}
+              </span>
+            </div>
+            <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
+              <span>{{ formatWordCount(wikiPage.body) }}</span>
+              <span v-if="wikiPage.updatedAt">
+                Updated {{ relativeTime(wikiPage.updatedAt) }}
+              </span>
+              <span v-if="wikiPage.VersionAuthor">
+                by {{ wikiPage.VersionAuthor.displayName || wikiPage.VersionAuthor.username }}
+              </span>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
   </NuxtLayout>
 </template>
