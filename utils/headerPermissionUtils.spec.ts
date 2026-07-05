@@ -1034,6 +1034,38 @@ describe('headerPermissionUtils', () => {
 
         expect(menuItems.find((item) => item.event === 'handleClickArchive')).toBeDefined();
       });
+
+      it('should include sticky option for root comments', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          userPermissions: elevatedModPermissions,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'handleStickyComment')).toBeDefined();
+      });
+
+      it('should include unsticky option for stickied comments', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          isSticky: true,
+          userPermissions: elevatedModPermissions,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'handleUnstickyComment')).toBeDefined();
+      });
+
+      it('should not include sticky option for nested comments', () => {
+        const menuItems = getCommentMenuItems({
+          ...defaultParams,
+          depth: 2,
+          userPermissions: elevatedModPermissions,
+          isLoggedIn: true,
+        });
+
+        expect(menuItems.find((item) => item.event === 'handleStickyComment')).toBeUndefined();
+      });
     });
 
     describe('for suspended moderators', () => {

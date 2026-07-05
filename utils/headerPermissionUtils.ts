@@ -529,6 +529,7 @@ export const getCommentMenuItems = (params: {
   isOwnComment: boolean;
   isWatchingReplies: boolean;
   isArchived: boolean;
+  isSticky?: boolean;
   isDiscussionAuthor: boolean;
   isMarkedAsAnswer: boolean;
   depth: number;
@@ -544,6 +545,7 @@ export const getCommentMenuItems = (params: {
     isOwnComment,
     isWatchingReplies,
     isArchived,
+    isSticky = false,
     isDiscussionAuthor,
     isMarkedAsAnswer,
     depth,
@@ -671,6 +673,15 @@ export const getCommentMenuItems = (params: {
         value: '',
         event: 'clickEditFeedback',
         icon: ALLOWED_ICONS.EDIT,
+      });
+    }
+
+    if (depth === 1 && userPermissions.canHideComment && !isArchived) {
+      modActions.push({
+        label: isSticky ? 'Unsticky Comment' : 'Sticky Comment',
+        value: '',
+        event: isSticky ? 'handleUnstickyComment' : 'handleStickyComment',
+        icon: isSticky ? ALLOWED_ICONS.UNDO : ALLOWED_ICONS.MARK_BEST_ANSWER,
       });
     }
 

@@ -84,6 +84,9 @@ export const COMMENT_FIELDS = gql`
     updatedAt
     textLastEdited
     archived
+    isSticky
+    stickyAt
+    stickyByUsername
     isFavoritedByUser
     CommentAuthor {
       ... on ModerationProfile {
@@ -225,6 +228,9 @@ export const GET_DISCUSSION_COMMENTS = gql`
         updatedAt
         textLastEdited
         archived
+        isSticky
+        stickyAt
+        stickyByUsername
         isFavoritedByUser
         CommentAuthor {
           ...AuthorFields

@@ -11,6 +11,10 @@ import {
 } from '@/utils/routerUtils';
 import CommentEditsDropdown from './CommentEditsDropdown.vue';
 
+type StickyCommentFields = Comment & {
+  isSticky?: boolean | null;
+};
+
 // Props definition using defineProps
 const props = defineProps({
   commentData: {
@@ -202,6 +206,10 @@ const contextLinkObject = computed(() => {
     commentId: props.commentData.id,
   });
 });
+
+const isSticky = computed(
+  () => !!(props.commentData as StickyCommentFields).isSticky
+);
 </script>
 
 <template>
@@ -348,6 +356,12 @@ const contextLinkObject = computed(() => {
               class="ml-2"
               :comment="commentData"
             />
+          </span>
+          <span
+            v-if="isSticky"
+            class="rounded-lg border border-amber-500 bg-amber-100 px-2 py-1 text-amber-700 dark:bg-amber-950 dark:text-amber-300"
+          >
+            Stickied
           </span>
           <span
             v-if="isHighlighted"
