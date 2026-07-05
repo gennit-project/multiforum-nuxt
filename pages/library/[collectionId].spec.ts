@@ -68,10 +68,14 @@ const mutationMocks = {
   share: vi.fn(),
 };
 let refetchCollection = vi.fn();
+let queryLoading = false;
+let queryError: Error | null = null;
 
 beforeEach(() => {
   vi.clearAllMocks();
   h.routerPush = vi.fn();
+  queryLoading = false;
+  queryError = null;
 });
 
 const mountWith = async (collection: unknown) => {
@@ -110,8 +114,8 @@ const mountWith = async (collection: unknown) => {
     });
   mockedUseQuery.mockReturnValue({
     result: ref({ collections: collection ? [collection] : [] }),
-    loading: ref(false),
-    error: ref(null),
+    loading: ref(queryLoading),
+    error: ref(queryError),
     refetch: refetchCollection,
   });
   const Page = (await import('./[collectionId].vue')).default;
@@ -138,10 +142,18 @@ const mountWith = async (collection: unknown) => {
             'open',
             'title',
             'primaryButtonDisabled',
+            'error',
           ],
           emits: ['primary-button-click', 'close'],
           template:
-            '<section v-if="open" :data-title="title"><slot name="content" /><button data-testid="modal-primary" :disabled="primaryButtonDisabled" @click="$emit(\'primary-button-click\')">primary</button></section>',
+            '<section v-if="open" :data-title="title"><slot name="content" /><p v-if="error">{{ error }}</p><button data-testid="modal-primary" :disabled="primaryButtonDisabled" @click="$emit(\'primary-button-click\')">primary</button></section>',
+        },
+        WarningModal: {
+          name: 'WarningModal',
+          props: ['open', 'title'],
+          emits: ['primary-button-click', 'close'],
+          template:
+            '<section v-if="open" :data-title="title"><button data-testid="warning-primary" @click="$emit(\'primary-button-click\')">delete</button></section>',
         },
         Breadcrumbs: {
           props: ['links'],
@@ -153,6 +165,26 @@ const mountWith = async (collection: unknown) => {
 };
 
 describe('library collection detail page', () => {
+  it('shows a loading state while the collection query is pending', async () => {
+    queryLoading = true;
+    const wrapper = await mountWith(null);
+
+    expect(wrapper.text()).toContain('Loading collection...');
+  });
+
+  it('shows an error state when the collection query fails', async () => {
+    queryError = new Error('boom');
+    const wrapper = await mountWith(null);
+
+    expect(wrapper.text()).toContain('Error loading collection: boom');
+  });
+
+  it('shows a not found state when the collection is missing', async () => {
+    const wrapper = await mountWith(null);
+
+    expect(wrapper.text()).toContain("This collection doesn't exist or you don't have access to it.");
+  });
+
   it('shows the collection name when it loads', async () => {
     const wrapper = await mountWith({
       id: 'col-1',
@@ -213,6 +245,74 @@ describe('library collection detail page', () => {
     );
   });
 
+  it('renames a collection from the edit modal', async () => {
+    const wrapper = await mountWith({
+      id: 'col-1',
+      name: 'Old Name',
+      description: 'Old description',
+      collectionType: 'DISCUSSIONS',
+      visibility: 'PUBLIC',
+      Discussions: [],
+      itemCount: 0,
+    });
+
+    await wrapper.find('button[title="Edit collection"]').trigger('click');
+    await wrapper.get('#collection-name').setValue('New Name');
+    await wrapper.get('#collection-description').setValue('Fresh description');
+    await wrapper.get('[data-testid="modal-primary"]').trigger('click');
+
+    expect(mutationMocks.update).toHaveBeenCalledWith({
+      collectionId: 'col-1',
+      name: 'New Name',
+      description: 'Fresh description',
+    });
+  });
+
+  it('toggles collection visibility and refetches the collection', async () => {
+    const wrapper = await mountWith({
+      id: 'col-1',
+      name: 'Public list',
+      collectionType: 'DISCUSSIONS',
+      visibility: 'PUBLIC',
+      Discussions: [],
+      itemCount: 0,
+    });
+
+    await wrapper.find('button[title="Share this public collection to a forum discussion"]').element;
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('Make Private'))!
+      .trigger('click');
+
+    expect(mutationMocks.update).toHaveBeenCalledWith({
+      collectionId: 'col-1',
+      visibility: 'PRIVATE',
+    });
+    expect(refetchCollection).toHaveBeenCalled();
+  });
+
+  it('shows a visibility error when updating visibility fails', async () => {
+    mutationMocks.update.mockRejectedValueOnce(new Error('Nope'));
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const wrapper = await mountWith({
+      id: 'col-1',
+      name: 'Public list',
+      collectionType: 'DISCUSSIONS',
+      visibility: 'PUBLIC',
+      Discussions: [],
+      itemCount: 0,
+    });
+
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('Make Private'))!
+      .trigger('click');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.text()).toContain('Nope');
+    spy.mockRestore();
+  });
+
   it('shares a public collection to a selected forum', async () => {
     const wrapper = await mountWith({
       id: 'col-1',
@@ -238,6 +338,59 @@ describe('library collection detail page', () => {
     expect(h.routerPush).toHaveBeenCalledWith(
       '/forums/sims4_builds/discussions/discussion-1'
     );
+  });
+
+  it('shows the share error message when sharing fails', async () => {
+    mutationMocks.share.mockRejectedValueOnce(new Error('Share failed'));
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const wrapper = await mountWith({
+      id: 'col-1',
+      name: 'Public list',
+      collectionType: 'DISCUSSIONS',
+      visibility: 'PUBLIC',
+      Discussions: [],
+      itemCount: 0,
+    });
+
+    await wrapper
+      .find('button[title="Share this public collection to a forum discussion"]')
+      .trigger('click');
+    await wrapper.find('[data-testid="forum-picker"]').trigger('click');
+    await wrapper.find('[data-testid="modal-primary"]').trigger('click');
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.text()).toContain('Share failed');
+    spy.mockRestore();
+  });
+
+  it('deletes the collection and redirects to the library index', async () => {
+    const wrapper = await mountWith({
+      id: 'col-1',
+      name: 'Public list',
+      collectionType: 'DISCUSSIONS',
+      visibility: 'PUBLIC',
+      Discussions: [],
+      itemCount: 0,
+    });
+
+    await wrapper.find('button[title="Delete collection"]').trigger('click');
+    await wrapper.get('[data-testid="warning-primary"]').trigger('click');
+
+    expect(mutationMocks.delete).toHaveBeenCalledWith(
+      { collectionId: 'col-1' },
+      expect.objectContaining({
+        refetchQueries: [
+          expect.objectContaining({
+            variables: {
+              username: 'alice',
+            },
+          }),
+        ],
+        awaitRefetchQueries: true,
+      })
+    );
+    expect(h.routerPush).toHaveBeenCalledWith('/library');
   });
 
   it('renders discussion collection items in stored order', async () => {

@@ -124,16 +124,24 @@ const CommentHeaderStub = {
 
 const CommentButtonsStub = {
   name: 'CommentButtons',
-  emits: ['click-feedback'],
+  emits: ['click-feedback', 'hide-replies', 'show-replies'],
   template:
-    '<div class="comment-buttons"><slot /><button class="feedback-button" @click="$emit(\'click-feedback\')" /></div>',
+    '<div class="comment-buttons"><slot /><button class="feedback-button" @click="$emit(\'click-feedback\')" /><button class="hide-replies-button" @click="$emit(\'hide-replies\')" /><button class="show-replies-button" @click="$emit(\'show-replies\')" /></div>',
 };
 
 const MenuButtonStub = {
   name: 'MenuButton',
   props: ['items'],
-  emits: ['copy-link'],
-  template: '<button class="copy-link-button" @click="$emit(\'copy-link\')" />',
+  emits: [
+    'copy-link',
+    'handle-delete',
+    'handle-watch-replies',
+    'handle-unwatch-replies',
+    'handle-sticky-comment',
+    'handle-unsticky-comment',
+  ],
+  template:
+    '<div><button class="copy-link-button" @click="$emit(\'copy-link\')" /><button class="delete-button" @click="$emit(\'handle-delete\')" /><button class="watch-button" @click="$emit(\'handle-watch-replies\')" /><button class="unwatch-button" @click="$emit(\'handle-unwatch-replies\')" /><button class="sticky-button" @click="$emit(\'handle-sticky-comment\')" /><button class="unsticky-button" @click="$emit(\'handle-unsticky-comment\')" /></div>',
 };
 
 const inert = (name: string) => ({
@@ -164,6 +172,12 @@ const makeComment = (overrides: Record<string, unknown> = {}) =>
     ...overrides,
   });
 
+const ChildCommentsStub = {
+  name: 'ChildComments',
+  template:
+    '<div class="child-comments-stub"><slot :comments="[{ id: \'child-1\', text: \'Child text\', archived: false, replyCount: 0, CommentAuthor: { __typename: \'User\', username: \'bob\', displayName: \'Bob\' }, Channel: { uniqueName: \'cats\' }, DiscussionChannel: { channelUniqueName: \'cats\', discussionId: \'d1\' }, FeedbackComments: [] }]" /></div>',
+};
+
 const mountComment = (props: Record<string, unknown> = {}) =>
   mountWithDefaults(Comment, {
     props: {
@@ -180,7 +194,7 @@ const mountComment = (props: Record<string, unknown> = {}) =>
         MenuButton: MenuButtonStub,
         MarkdownPreview: inert('MarkdownPreview'),
         ArchivedCommentText: inert('ArchivedCommentText'),
-        ChildComments: inert('ChildComments'),
+        ChildComments: ChildCommentsStub,
         TextEditor: textEditorStub,
         ErrorBanner: errorBannerStub,
         EllipsisHorizontal: true,
@@ -260,5 +274,90 @@ describe('Comment', () => {
     });
 
     expect(wrapper.text()).toContain('Continue thread');
+  });
+
+  it('highlights the header when the route permalink matches the comment id', () => {
+    h.route.params.commentId = 'c1';
+    const wrapper = mountComment();
+
+    expect(wrapper.findComponent(CommentHeaderStub).props('isHighlighted')).toBe(
+      true
+    );
+  });
+
+  it('renders the edit error banner while the edit form is open', () => {
+    const wrapper = mountComment({
+      editFormOpenAtCommentID: 'c1',
+      editCommentError: { message: 'Edit failed' },
+    });
+
+    expect(wrapper.text()).toContain('Edit failed');
+  });
+
+  it('emits delete-comment with the computed reply count from the menu action', async () => {
+    const wrapper = mountComment({
+      commentData: makeComment({ replyCount: 3 }),
+    });
+
+    await wrapper.get('.delete-button').trigger('click');
+
+    expect(wrapper.emitted('delete-comment')).toEqual([
+      [
+        {
+          commentId: 'c1',
+          parentCommentId: 'parent-1',
+          replyCount: 3,
+        },
+      ],
+    ]);
+  });
+
+  it('subscribes to comment replies from the menu action', async () => {
+    const wrapper = mountComment();
+
+    await wrapper.get('.watch-button').trigger('click');
+
+    expect(h.subscribeToComment).toHaveBeenCalledWith({ commentId: 'c1' });
+  });
+
+  it('unsubscribes from comment replies from the menu action', async () => {
+    const wrapper = mountComment();
+
+    await wrapper.get('.unwatch-button').trigger('click');
+
+    expect(h.unsubscribeFromComment).toHaveBeenCalledWith({ commentId: 'c1' });
+  });
+
+  it('toggles sticky state from the menu actions', async () => {
+    const wrapper = mountComment();
+
+    await wrapper.get('.sticky-button').trigger('click');
+    await wrapper.get('.unsticky-button').trigger('click');
+
+    expect(h.stickyComment).toHaveBeenCalledWith({ commentId: 'c1' });
+    expect(h.unstickyComment).toHaveBeenCalledWith({ commentId: 'c1' });
+  });
+
+  it('renders child comments when replies are shown within the depth limit', () => {
+    const wrapper = mountComment({
+      commentData: makeComment({ replyCount: 1 }),
+      depth: 1,
+    });
+
+    expect(wrapper.findAll('[data-testid="comment"]')).toHaveLength(2);
+  });
+
+  it('hides and re-shows child comments from the comment buttons', async () => {
+    const wrapper = mountComment({
+      commentData: makeComment({ replyCount: 1 }),
+      depth: 1,
+    });
+
+    expect(wrapper.findAll('[data-testid="comment"]')).toHaveLength(2);
+    await wrapper.get('.hide-replies-button').trigger('click');
+    expect(wrapper.findAll('[data-testid="comment"]')).toHaveLength(1);
+
+    await wrapper.get('.show-replies-button').trigger('click');
+    expect(wrapper.findAll('[data-testid="comment"]')).toHaveLength(2);
   });
 });

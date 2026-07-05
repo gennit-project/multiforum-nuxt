@@ -8,8 +8,13 @@ const routerReplace = vi.fn();
 const refetchIssue = vi.fn();
 const subscribeMutate = vi.fn();
 const unsubscribeMutate = vi.fn();
+const queryError = ref<Error | null>(null);
+const queryLoading = ref(false);
+const hasMoreActivityFeed = ref(false);
+const loadMoreActivityFeed = vi.fn();
+const deleteReasonError = ref('');
 
-const issueResult = ref({
+const buildIssueResult = () => ({
   issues: [
     {
       __typename: 'Issue',
@@ -20,9 +25,11 @@ const issueResult = ref({
       channelUniqueName: 'toDelete',
       isOpen: true,
       locked: false,
+      lockReason: '',
       relatedDiscussionId: '',
       relatedEventId: '',
       relatedCommentId: '',
+      relatedChannelUniqueName: '',
       flaggedServerRuleViolation: false,
       SubscribedToNotifications: [],
       ActivityFeed: [],
@@ -34,6 +41,8 @@ const issueResult = ref({
     },
   ],
 });
+
+const issueResult = ref(buildIssueResult());
 
 // The auto-unsubscribe composable is exercised by its own spec and an e2e
 // test; here we stub it so mounting does not pull in the Pinia toast store.
@@ -109,6 +118,10 @@ vi.mock('@/composables/useIssueActivityFeed', () => ({
     addIssueActivityFeedItemWithCommentAsUser: vi.fn(),
     addIssueActivityFeedItemWithCommentAsUserLoading: ref(false),
     addIssueActivityFeedItemWithCommentAsUserError: ref(null),
+    activityFeedItems: ref([]),
+    hasMoreActivityFeed,
+    loadMoreActivityFeed,
+    resetActivityFeed: vi.fn(),
   }),
 }));
 
@@ -137,6 +150,17 @@ vi.mock('@/composables/useIssueBodyEdit', () => ({
     startIssueBodyEdit: vi.fn(),
     cancelIssueBodyEdit: vi.fn(),
     saveIssueBody: vi.fn(),
+  }),
+}));
+
+vi.mock('@/composables/useIssueModerationActions', () => ({
+  useIssueModerationActions: () => ({
+    createFormValues: ref({ text: '' }),
+    deleteReasonError,
+    updateComment: vi.fn(),
+    handleCreateComment: vi.fn(),
+    toggleCloseOpenIssue: vi.fn(),
+    handleDeleteRelatedContent: vi.fn(),
   }),
 }));
 
@@ -202,14 +226,18 @@ describe('IssueDetail', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockedPermissionFlags.isSuspendedMod = false;
-    issueResult.value.issues[0].SubscribedToNotifications = [];
+    issueResult.value = buildIssueResult();
     refetchIssue.mockResolvedValue(undefined);
+    queryError.value = null;
+    queryLoading.value = false;
+    hasMoreActivityFeed.value = false;
+    deleteReasonError.value = '';
 
     (useQuery as unknown as ReturnType<typeof vi.fn>).mockImplementation(
       (_document, _variables, _options) => ({
         result: issueResult,
-        error: ref(null),
-        loading: ref(false),
+        error: queryError,
+        loading: queryLoading,
         refetch: refetchIssue,
         fetchMore: vi.fn(),
         onResult: vi.fn(),
@@ -233,23 +261,36 @@ describe('IssueDetail', () => {
     mount(IssueDetail, {
       global: {
         stubs: {
-          ErrorBanner: true,
-          PageNotFound: true,
+          ErrorBanner: {
+            props: ['text'],
+            template: '<div class="error-banner">{{ text }}</div>',
+          },
+          PageNotFound: {
+            template: '<div data-testid="page-not-found">not found</div>',
+          },
           ModerationWizard: true,
           OriginalPosterActions: true,
           ActivityFeed: true,
-          IssueLockedBanner: true,
+          IssueLockedBanner: {
+            props: ['lockReason'],
+            template: '<div data-testid="locked-banner">{{ lockReason }}</div>',
+          },
           IssueLockDialog: true,
           IssueCommentForm: true,
-        IssueBodyEditor: true,
-        IssueRelatedContent: true,
-        TagComponent: {
-          props: ['tag'],
-          template: '<span class="tag-chip">{{ tag }}</span>',
-        },
-        NotificationComponent: NotificationStub,
-        PrimaryButton: PrimaryButtonStub,
-        GenericButton: GenericButtonStub,
+          IssueBodyEditor: true,
+          IssueRelatedContent: true,
+          IssueRelatedChannel: {
+            props: ['relatedChannelUniqueName'],
+            template:
+              '<div data-testid="related-channel">{{ relatedChannelUniqueName }}</div>',
+          },
+          TagComponent: {
+            props: ['tag'],
+            template: '<span class="tag-chip">{{ tag }}</span>',
+          },
+          NotificationComponent: NotificationStub,
+          PrimaryButton: PrimaryButtonStub,
+          GenericButton: GenericButtonStub,
           'v-row': PassThroughStub,
           'v-col': PassThroughStub,
         },
@@ -298,5 +339,52 @@ describe('IssueDetail', () => {
     expect(wrapper.get('[data-testid="issue-detail-channel-tags"]').text()).toContain(
       'toDelete'
     );
+  });
+
+  it('shows page not found when no issue is returned', () => {
+    issueResult.value = { issues: [] };
+    const wrapper = buildWrapper();
+
+    expect(wrapper.get('[data-testid="page-not-found"]').text()).toContain('not found');
+  });
+
+  it('falls back to page not found when the issue query errors', () => {
+    queryError.value = new Error('Issue failed');
+    const wrapper = buildWrapper();
+
+    expect(wrapper.get('[data-testid="page-not-found"]').text()).toContain('not found');
+  });
+
+  it('shows the lock banner when the issue is locked', () => {
+    issueResult.value.issues[0].locked = true;
+    issueResult.value.issues[0].lockReason = 'Escalated';
+    const wrapper = buildWrapper();
+
+    expect(wrapper.get('[data-testid="locked-banner"]').text()).toContain('Escalated');
+  });
+
+  it('shows the related channel banner when present', () => {
+    issueResult.value.issues[0].relatedChannelUniqueName = 'announcements';
+    const wrapper = buildWrapper();
+
+    expect(wrapper.get('[data-testid="related-channel"]').text()).toContain(
+      'announcements'
+    );
+  });
+
+  it('loads older posts when more activity feed items are available', async () => {
+    hasMoreActivityFeed.value = true;
+    const wrapper = buildWrapper();
+
+    await wrapper.get('button[type="button"]').trigger('click');
+
+    expect(loadMoreActivityFeed).toHaveBeenCalled();
+  });
+
+  it('shows a delete reason error banner', () => {
+    deleteReasonError.value = 'Cannot delete related content';
+    const wrapper = buildWrapper();
+
+    expect(wrapper.text()).toContain('Cannot delete related content');
   });
 });
