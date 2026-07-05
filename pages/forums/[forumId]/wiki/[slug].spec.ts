@@ -12,22 +12,39 @@ vi.mock('nuxt/app', () => ({
 }));
 
 vi.mock('@vue/apollo-composable', () => ({ useQuery: vi.fn() }));
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => ref('bob'),
+}));
 
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 
-const mountWith = async (wikiPage: unknown) => {
+const mountWith = async (
+  wikiPage: unknown,
+  channelOverrides: Record<string, unknown> = {}
+) => {
   mockedUseQuery
     // wiki page data
     .mockReturnValueOnce({
       result: ref({ wikiPages: wikiPage ? [wikiPage] : [] }),
       loading: ref(false),
       error: ref(null),
+      refetch: vi.fn(),
     })
     // channel (wikiEnabled)
     .mockReturnValueOnce({
-      result: ref({ channels: [{ wikiEnabled: true }] }),
+      result: ref({
+        channels: [
+          {
+            wikiEnabled: true,
+            Admins: [{ username: 'alice' }],
+            ElevatedChannelRole: { canUpdateChannel: true },
+            ...channelOverrides,
+          },
+        ],
+      }),
       loading: ref(false),
       error: ref(null),
+      refetch: vi.fn(),
     })
     // SEO query (onResult callback)
     .mockReturnValueOnce({ onResult: vi.fn() });
@@ -43,5 +60,16 @@ describe('wiki page', () => {
     expect(wrapper.findComponent(MarkdownRenderer).props('text')).toBe(
       'Welcome to the wiki'
     );
+  });
+
+  it('shows a locked notice when the wiki page is locked', async () => {
+    const wrapper = await mountWith({
+      title: 'Intro',
+      body: 'Welcome',
+      locked: true,
+      lockReason: 'Canon settled',
+    });
+
+    expect(wrapper.text()).toContain('Canon settled');
   });
 });
