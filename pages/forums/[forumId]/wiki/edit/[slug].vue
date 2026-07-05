@@ -16,6 +16,13 @@ import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { useUsername } from '@/composables/useAuthState';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import { canEditWikiPage } from '@/utils/wikiPageLockPermissions';
+import type { WikiPage } from '@/__generated__/graphql';
+
+type LockableWikiPage = WikiPage & {
+  locked?: boolean | null;
+  lockReason?: string | null;
+};
 
 const usernameVar = useUsername();
 
@@ -51,18 +58,27 @@ const {
   { uniqueName: forumId },
   {
     errorPolicy: 'all',
-    enabled: isHomePage.value, // Only run this query for home page
   }
 );
 
 // Computed property for the wiki page data
 const wikiPage = computed(() => {
   if (isHomePage.value) {
-    return channelResult.value?.channels?.[0]?.WikiHomePage;
+    return channelResult.value?.channels?.[0]?.WikiHomePage as
+      | LockableWikiPage
+      | undefined;
   } else {
-    return wikiPageResult.value?.wikiPages?.[0];
+    return wikiPageResult.value?.wikiPages?.[0] as LockableWikiPage | undefined;
   }
 });
+const channel = computed(() => channelResult.value?.channels?.[0]);
+const canEditCurrentWikiPage = computed(() =>
+  canEditWikiPage({
+    channel: channel.value,
+    wikiPage: wikiPage.value,
+    username: usernameVar.value,
+  })
+);
 
 // Computed loading and error states
 const loading = computed(() => {
@@ -148,6 +164,7 @@ const updateError = computed(() => {
 // Handle form submission
 function handleSubmit() {
   if (wikiEditBlockedBySuspension.value) return;
+  if (!canEditCurrentWikiPage.value) return;
   if (!formValues.value.title || !formValues.value.body) return;
 
   if (isHomePage.value) {
@@ -281,9 +298,21 @@ onChannelDone(handleDone);
         :suspended-until="suspendedUntil ?? undefined"
         :suspended-indefinitely="suspendedIndefinitely"
       />
+      <div
+        v-else-if="!canEditCurrentWikiPage"
+        class="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-100"
+      >
+        <p class="font-semibold">This wiki page is locked.</p>
+        <p v-if="wikiPage.lockReason" class="mt-1">
+          {{ wikiPage.lockReason }}
+        </p>
+        <p class="mt-1">
+          Only forum owners with wiki update permission can edit it.
+        </p>
+      </div>
 
       <form
-        v-if="!wikiEditBlockedBySuspension"
+        v-if="!wikiEditBlockedBySuspension && canEditCurrentWikiPage"
         class="space-y-6"
         @submit.prevent="handleSubmit"
       >

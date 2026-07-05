@@ -15,12 +15,16 @@ export const GET_CHANNEL_NAMES = gql`
 
 export const GET_WIKI_PAGE = gql`
   query getWikiPage($channelUniqueName: String!, $slug: String!) {
-    wikiPages(where: { channelUniqueName: $channelUniqueName, slug: $slug }) {
+      wikiPages(where: { channelUniqueName: $channelUniqueName, slug: $slug }) {
       id
       title
       body
       editReason
       slug
+      locked
+      lockedAt
+      lockReason
+      lockedByUsername
       createdAt
       updatedAt
       VersionAuthor {
@@ -31,6 +35,10 @@ export const GET_WIKI_PAGE = gql`
         title
         editReason
         slug
+        locked
+        lockedAt
+        lockReason
+        lockedByUsername
         createdAt
         updatedAt
         VersionAuthor {
@@ -79,6 +87,10 @@ export const GET_CHANNEL = gql`
         body
         editReason
         slug
+        locked
+        lockedAt
+        lockReason
+        lockedByUsername
         createdAt
         updatedAt
         VersionAuthor {
