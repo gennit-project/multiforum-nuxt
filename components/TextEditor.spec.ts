@@ -35,9 +35,13 @@ vi.mock('@/composables/useAuthState', () => ({
 
 // Mock the image-upload composable so the upload flow (placeholder insertion,
 // success/failure replacement, size validation) is drivable without Apollo.
-const { uploadFileMock, validateFileSizeMock } = vi.hoisted(() => ({
+const { uploadFileMock, validateFileSizeMock, createSignedStorageUrlErrorRef } = vi.hoisted(() => ({
   uploadFileMock: vi.fn(),
   validateFileSizeMock: vi.fn(() => ({ valid: true, message: '' })),
+  createSignedStorageUrlErrorRef: {
+    value: null as null | { message: string },
+    __v_isRef: true,
+  },
 }));
 vi.mock('@/composables/useImageUpload', () => ({
   useImageUpload: () => ({
@@ -52,7 +56,7 @@ vi.mock('@/composables/useImageUpload', () => ({
       `[upload failed: ${name} — ${err}]`,
     createPlaceholderRegex: (_text: string, id: string) =>
       new RegExp(`!\\[uploading [^\\]]+\\]\\(placeholder-${id}\\)`),
-    createSignedStorageUrlError: ref(null),
+    createSignedStorageUrlError: createSignedStorageUrlErrorRef,
   }),
 }));
 
@@ -358,6 +362,7 @@ describe('TextEditor (image upload)', () => {
   beforeEach(() => {
     uploadFileMock.mockReset();
     validateFileSizeMock.mockReset().mockReturnValue({ valid: true, message: '' });
+    createSignedStorageUrlErrorRef.value = null;
   });
 
   const pngFile = () => new File(['x'], 'pic.png', { type: 'image/png' });
@@ -402,5 +407,82 @@ describe('TextEditor (image upload)', () => {
     expect(alertSpy).toHaveBeenCalledWith('too big');
     expect(uploadFileMock).not.toHaveBeenCalled();
     vi.unstubAllGlobals();
+  });
+
+  it('renders the signed storage url error banner', () => {
+    createSignedStorageUrlErrorRef.value = { message: 'storage failed' };
+    const wrapper = mountEditor();
+
+    expect(wrapper.text()).toContain('storage failed');
+  });
+
+  it('inserts error markdown when the upload throws', async () => {
+    uploadFileMock.mockRejectedValue(new Error('network down'));
+    const wrapper = mountEditor({ initialValue: '' });
+    await wrapper
+      .findComponent({ name: 'AddImage' })
+      .vm.$emit('file-change', fileChange(pngFile()));
+    await flushPromises();
+
+    const last = String(wrapper.emitted('update')?.at(-1)?.[0]);
+    expect(last).toContain('network down');
+  });
+
+  it('uploads a dropped image file', async () => {
+    uploadFileMock.mockResolvedValue({
+      success: true,
+      embeddedLink: 'https://cdn.example.com/drop.png',
+    });
+    const wrapper = mountEditor({ initialValue: '' });
+    const file = pngFile();
+
+    await textarea(wrapper).trigger('drop', {
+      dataTransfer: { files: [file] },
+    });
+    await flushPromises();
+
+    expect(uploadFileMock).toHaveBeenCalledWith(file);
+    expect(String(wrapper.emitted('update')?.at(-1)?.[0])).toContain(
+      'https://cdn.example.com/drop.png'
+    );
+  });
+
+  it('uploads an image pasted into the editor', async () => {
+    uploadFileMock.mockResolvedValue({
+      success: true,
+      embeddedLink: 'https://cdn.example.com/paste.png',
+    });
+    const wrapper = mountEditor({ initialValue: '' });
+    const file = pngFile();
+    const pasteEvent = new Event('paste') as Event & {
+      clipboardData?: { items: Array<{ type: string; getAsFile: () => File }> };
+    };
+    pasteEvent.clipboardData = {
+      items: [
+        {
+          type: 'image/png',
+          getAsFile: () => file,
+        },
+      ],
+    };
+
+    textarea(wrapper).element.dispatchEvent(pasteEvent);
+    await flushPromises();
+
+    expect(uploadFileMock).toHaveBeenCalledWith(file);
+    expect(String(wrapper.emitted('update')?.at(-1)?.[0])).toContain(
+      'https://cdn.example.com/paste.png'
+    );
+  });
+
+  it('ignores dropped files when uploads are disabled', async () => {
+    const wrapper = mountEditor({ initialValue: '', allowImageUpload: false });
+
+    await textarea(wrapper).trigger('drop', {
+      dataTransfer: { files: [pngFile()] },
+    });
+    await flushPromises();
+
+    expect(uploadFileMock).not.toHaveBeenCalled();
   });
 });
