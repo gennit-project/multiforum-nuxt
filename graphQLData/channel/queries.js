@@ -59,13 +59,14 @@ export const GET_WIKI_PAGE = gql`
 `;
 
 export const GET_CHANNEL = gql`
-  query getChannel($uniqueName: String!, $now: DateTime) {
+  query getChannel($uniqueName: String!, $now: DateTime, $loggedInUsername: String) {
     channels(where: { uniqueName: $uniqueName }) {
       uniqueName
       displayName
       description
       channelIconURL
       channelBannerURL
+      isFavorited(username: $loggedInUsername)
       rules
       locked
       lockedAt
@@ -337,6 +338,7 @@ export const GET_CHANNELS_DISCUSSIONS = gql`
     $limit: Int
     $tags: [String]
     $searchInput: String
+    $loggedInUsername: String
     $now: DateTime = "${now}"
   ) {
     getSortedChannels(
@@ -351,6 +353,7 @@ export const GET_CHANNELS_DISCUSSIONS = gql`
         displayName
         channelIconURL
         description
+        isFavorited(username: $loggedInUsername)
         Tags {
           text
         }

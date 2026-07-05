@@ -24,6 +24,10 @@ type BotSummary = {
   } | null;
 };
 
+type ChannelWithFavoriteState = Channel & {
+  isFavorited?: boolean | null;
+};
+
 const props = defineProps({
   channel: {
     type: Object as PropType<Channel>,
@@ -49,6 +53,9 @@ const channelId = computed(() => {
 });
 
 const channelRules = computed(() => props.channel?.rules ?? '');
+const initialIsFavorited = computed(
+  () => (props.channel as ChannelWithFavoriteState)?.isFavorited ?? undefined
+);
 const pinnedWikiPages = computed(() => props.channel?.PinnedWikiPages ?? []);
 const botAccounts = computed(() => {
   const channel = props.channel as Channel & { Bots?: BotSummary[] };
@@ -141,6 +148,7 @@ const handleBecomeAdminSuccess = () => {
             :allow-add-to-list="true"
             :channel-unique-name="channelId"
             :channel-display-name="channel?.displayName || ''"
+            :initial-is-favorited="initialIsFavorited"
             size="medium"
           />
         </div>

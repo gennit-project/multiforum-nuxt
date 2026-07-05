@@ -22,9 +22,11 @@ import {
 } from '@/utils/forumListChannels';
 import type { LocationQueryValue } from 'vue-router';
 import type { Channel } from '@/__generated__/graphql';
+import { useUsername } from '@/composables/useAuthState';
 
 const route = useRoute();
 const router = useRouter();
+const loggedInUsername = useUsername();
 
 const selectedTags = ref<Array<string>>(
   route.query.tag && typeof route.query.tag === 'string'
@@ -93,6 +95,7 @@ const {
     offset: 0,
     tags: selectedTags,
     searchInput: searchInput,
+    loggedInUsername: loggedInUsername.value || null,
   },
   {
     fetchPolicy: 'cache-first',

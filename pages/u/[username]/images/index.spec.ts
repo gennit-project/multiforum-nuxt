@@ -40,9 +40,17 @@ vi.mock('@/composables/useSelectedChannelsFromQuery', async () => {
 });
 
 vi.mock('@/graphQLData/image/queries', () => ({ GET_USER_IMAGES: 'q' }));
+vi.mock('@/composables/useAuthState', async () => {
+  const { ref } = await import('vue');
+  return { useUsername: () => ref('viewer') };
+});
 
 const stubs = {
-  ImageListItem: { name: 'ImageListItem', props: ['image', 'username'], template: '<div class="image-item" />' },
+  ImageListItem: {
+    name: 'ImageListItem',
+    props: ['image', 'username', 'initialIsFavorited'],
+    template: '<div class="image-item" />',
+  },
 };
 
 const mountImages = () => mountWithDefaults(ImagesPage, { global: { stubs } });
@@ -83,6 +91,14 @@ describe('User images page', () => {
     withImages([{ id: 'i1' }, { id: 'i2' }]);
     const wrapper = mountImages();
     expect(wrapper.findAllComponents({ name: 'ImageListItem' })).toHaveLength(2);
+  });
+
+  it('passes computed favorite state to image items', () => {
+    withImages([{ id: 'i1', isFavorited: true }]);
+    const wrapper = mountImages();
+    expect(
+      wrapper.getComponent({ name: 'ImageListItem' }).props('initialIsFavorited')
+    ).toBe(true);
   });
 
   it('shows the load-more button when more images remain', () => {

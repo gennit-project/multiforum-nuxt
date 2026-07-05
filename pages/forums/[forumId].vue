@@ -31,9 +31,11 @@ import {
 } from '@/utils/localStorageUtils';
 import { getForumShellVisibility } from '@/utils/forumShellVisibility';
 import type { ForumItem } from '@/types/forum';
+import { useUsername } from '@/composables/useAuthState';
 
 const route = useRoute();
 const router = useRouter();
+const loggedInUsername = useUsername();
 const uiStore = useUIStore();
 const {
   selectedChannelDiscussionTitle,
@@ -105,6 +107,7 @@ const {
   GET_CHANNEL,
   () => ({
     uniqueName: channelId.value,
+    loggedInUsername: loggedInUsername.value || null,
     // Keep SSR/client Apollo variables identical during hydration.
     now: currentHour(),
   }),
