@@ -17,10 +17,12 @@ const h = vi.hoisted(() => ({
   refetch: vi.fn(),
   setSelectedIssueSelection: vi.fn(),
   selectedIssueNumber: null as unknown as { value: number | null },
+  isAuthenticated: null as unknown as { value: boolean },
   updateFilters: vi.fn(),
 }));
 
 h.selectedIssueNumber = ref<number | null>(null);
+h.isAuthenticated = ref<boolean>(true);
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({
@@ -29,6 +31,10 @@ vi.mock('nuxt/app', () => ({
     query: h.query,
   }),
   useRouter: () => ({ push: h.routerPush, replace: h.routerReplace }),
+}));
+
+vi.mock('@/composables/useAuthState', () => ({
+  useIsAuthenticated: () => h.isAuthenticated,
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -78,6 +84,10 @@ const mountWith = async (opts: { loading?: boolean; issues?: unknown[] }) => {
             'showOnlyServerRuleViolations',
             'selectedSort',
             'selectedSortLabel',
+            'showInvolvementFilters',
+            'filterCreatedByMe',
+            'filterIAmOP',
+            'filterIReported',
           ],
           emits: [
             'update-search-input',
@@ -86,6 +96,7 @@ const mountWith = async (opts: { loading?: boolean; issues?: unknown[] }) => {
             'update:endDate',
             'update:showOnlyServerRuleViolations',
             'update:sort',
+            'update:involvementFilter',
           ],
           template: '<div class="issue-filter-bar" />',
         },
@@ -109,7 +120,11 @@ beforeEach(() => {
   delete h.query.startDate;
   delete h.query.endDate;
   delete h.query.channels;
+  delete h.query.filterCreatedByMe;
+  delete h.query.filterIAmOP;
+  delete h.query.filterIReported;
   h.selectedIssueNumber.value = null;
+  h.isAuthenticated.value = true;
 });
 
 describe('admin server issues index page', () => {
@@ -250,6 +265,50 @@ describe('admin server issues index page', () => {
 
     expect(mockedUseQuery.mock.calls[0][1].value.options).toEqual({
       sort: issueSortValues.MOST_REPORTS,
+    });
+  });
+
+  it('shows the involvement filters in the bar when authenticated', async () => {
+    h.isAuthenticated.value = true;
+    const wrapper = await mountWith({ issues: [] });
+    expect(
+      wrapper.getComponent(IssueFilterBar).props('showInvolvementFilters')
+    ).toBe(true);
+  });
+
+  it('hides the involvement filters in the bar when unauthenticated', async () => {
+    h.isAuthenticated.value = false;
+    const wrapper = await mountWith({ issues: [] });
+    expect(
+      wrapper.getComponent(IssueFilterBar).props('showInvolvementFilters')
+    ).toBe(false);
+  });
+
+  it('passes an active involvement filter into the issues query variables', async () => {
+    h.query.filterIReported = 'true';
+    await mountWith({ issues: [] });
+    expect(mockedUseQuery.mock.calls[0][1].value.filterIReported).toBe(true);
+  });
+
+  it('forces involvement filters off in the query when unauthenticated', async () => {
+    h.isAuthenticated.value = false;
+    h.query.filterCreatedByMe = 'true';
+    await mountWith({ issues: [] });
+    expect(mockedUseQuery.mock.calls[0][1].value.filterCreatedByMe).toBe(false);
+  });
+
+  it('updates the route filters when an involvement filter is toggled', async () => {
+    const wrapper = await mountWith({ issues: [] });
+    await wrapper
+      .getComponent(IssueFilterBar)
+      .vm.$emit('update:involvementFilter', {
+        key: 'filterCreatedByMe',
+        value: true,
+      });
+    expect(h.updateFilters).toHaveBeenCalledWith({
+      router: { push: h.routerPush, replace: h.routerReplace },
+      route: { params: { forumId: '' }, path: '/admin/issues', query: h.query },
+      params: { filterCreatedByMe: true },
     });
   });
 });

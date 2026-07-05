@@ -405,6 +405,9 @@ export const GET_SITE_WIDE_ISSUE_LIST = gql`
     $endDate: String
     $showOnlyServerRuleViolations: Boolean
     $isOpen: Boolean!
+    $filterCreatedByMe: Boolean
+    $filterIAmOP: Boolean
+    $filterIReported: Boolean
     $options: IssueListOptions
   ) {
     getSiteWideIssueList(
@@ -414,6 +417,9 @@ export const GET_SITE_WIDE_ISSUE_LIST = gql`
       endDate: $endDate
       showOnlyServerRuleViolations: $showOnlyServerRuleViolations
       isOpen: $isOpen
+      filterCreatedByMe: $filterCreatedByMe
+      filterIAmOP: $filterIAmOP
+      filterIReported: $filterIReported
       options: $options
     ) {
       aggregateIssueCount

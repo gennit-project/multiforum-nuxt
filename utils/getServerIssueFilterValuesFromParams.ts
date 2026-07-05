@@ -19,6 +19,9 @@ export type ServerIssueFilterValues = {
   startDate: string;
   endDate: string;
   showOnlyServerRuleViolations: boolean;
+  filterCreatedByMe: boolean;
+  filterIAmOP: boolean;
+  filterIReported: boolean;
   sort: IssueSortValue;
 };
 
@@ -35,6 +38,9 @@ export const getServerIssueFilterValuesFromParams = (
     startDate: '',
     endDate: '',
     showOnlyServerRuleViolations: true,
+    filterCreatedByMe: false,
+    filterIAmOP: false,
+    filterIReported: false,
     sort: defaultIssueSort,
   };
 
@@ -70,6 +76,15 @@ export const getServerIssueFilterValuesFromParams = (
       case 'showOnlyServerRuleViolations':
         cleanedValues.showOnlyServerRuleViolations =
           getDefaultServerRuleViolationsFilter(val);
+        break;
+      case 'filterCreatedByMe':
+        cleanedValues.filterCreatedByMe = val === 'true';
+        break;
+      case 'filterIAmOP':
+        cleanedValues.filterIAmOP = val === 'true';
+        break;
+      case 'filterIReported':
+        cleanedValues.filterIReported = val === 'true';
         break;
       case 'sort':
         cleanedValues.sort = getIssueSortFromQuery(input.route.query);
