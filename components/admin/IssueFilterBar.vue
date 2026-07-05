@@ -7,6 +7,11 @@ import SearchableForumList from '@/components/channel/SearchableForumList.vue';
 import TextButtonDropdown from '@/components/TextButtonDropdown.vue';
 import { issueSortOptions, type IssueSortValue } from '@/utils/issueSortOptions';
 
+type InvolvementFilterKey =
+  | 'filterCreatedByMe'
+  | 'filterIAmOP'
+  | 'filterIReported';
+
 const props = defineProps<{
   searchInput: string;
   selectedChannels: string[];
@@ -16,6 +21,10 @@ const props = defineProps<{
   showOnlyServerRuleViolations: boolean;
   selectedSort: IssueSortValue;
   selectedSortLabel: string;
+  showInvolvementFilters?: boolean;
+  filterCreatedByMe?: boolean;
+  filterIAmOP?: boolean;
+  filterIReported?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -25,7 +34,30 @@ const emit = defineEmits<{
   'toggle-selected-channel': [channel: string];
   'update:showOnlyServerRuleViolations': [value: boolean];
   'update:sort': [value: string];
+  'update:involvementFilter': [
+    payload: { key: InvolvementFilterKey; value: boolean },
+  ];
 }>();
+
+const involvementFilters = computed<
+  { key: InvolvementFilterKey; label: string; checked: boolean }[]
+>(() => [
+  {
+    key: 'filterCreatedByMe',
+    label: 'Created by me',
+    checked: Boolean(props.filterCreatedByMe),
+  },
+  {
+    key: 'filterIAmOP',
+    label: 'About my content',
+    checked: Boolean(props.filterIAmOP),
+  },
+  {
+    key: 'filterIReported',
+    label: 'I reported',
+    checked: Boolean(props.filterIReported),
+  },
+]);
 
 const issueScopeOptions = [
   {
@@ -86,6 +118,31 @@ const issueScopeLabel = computed(() =>
             )
           "
         >
+      </label>
+    </div>
+    <div
+      v-if="showInvolvementFilters"
+      class="flex flex-wrap items-center gap-4"
+      data-testid="issue-involvement-filters"
+    >
+      <label
+        v-for="filter in involvementFilters"
+        :key="filter.key"
+        class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200"
+      >
+        <input
+          type="checkbox"
+          :checked="filter.checked"
+          :data-testid="`issue-filter-${filter.key}`"
+          class="rounded border-gray-300 text-orange-600 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-900"
+          @change="
+            emit('update:involvementFilter', {
+              key: filter.key,
+              value: ($event.target as HTMLInputElement).checked,
+            })
+          "
+        >
+        {{ filter.label }}
       </label>
     </div>
     <div class="flex flex-wrap items-center justify-end gap-2">

@@ -9,6 +9,7 @@ import IssueFilterBar from '@/components/admin/IssueFilterBar.vue';
 import { getChannelLabel } from '@/utils';
 import { updateFilters } from '@/utils/routerUtils';
 import { getServerIssueFilterValuesFromParams } from '@/utils/getServerIssueFilterValuesFromParams';
+import { useIsAuthenticated } from '@/composables/useAuthState';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import { getIssueSortLabel } from '@/utils/issueSortOptions';
@@ -34,6 +35,10 @@ const searchInput = ref(initialFilterValues.searchInput);
 const startDate = ref(initialFilterValues.startDate);
 const endDate = ref(initialFilterValues.endDate);
 const selectedSort = ref(initialFilterValues.sort);
+const filterCreatedByMe = ref(initialFilterValues.filterCreatedByMe);
+const filterIAmOP = ref(initialFilterValues.filterIAmOP);
+const filterIReported = ref(initialFilterValues.filterIReported);
+const isAuthenticated = useIsAuthenticated();
 const channelLabel = computed(() => getChannelLabel(selectedChannels.value));
 const selectedSortLabel = computed(() => getIssueSortLabel(selectedSort.value));
 
@@ -44,6 +49,11 @@ const variables = computed(() => ({
   endDate: endDate.value || null,
   showOnlyServerRuleViolations: showOnlyServerRuleViolations.value,
   isOpen: true,
+  // Identity is resolved server-side, so these are only meaningful when the
+  // viewer is authenticated; keep them false otherwise to avoid emptying the list.
+  filterCreatedByMe: isAuthenticated.value && filterCreatedByMe.value,
+  filterIAmOP: isAuthenticated.value && filterIAmOP.value,
+  filterIReported: isAuthenticated.value && filterIReported.value,
   options: {
     sort: selectedSort.value,
   },
@@ -99,6 +109,17 @@ const updateSort = (value: string) => {
   });
 };
 
+const updateInvolvementFilter = (payload: {
+  key: 'filterCreatedByMe' | 'filterIAmOP' | 'filterIReported';
+  value: boolean;
+}) => {
+  updateFilters({
+    router,
+    route,
+    params: { [payload.key]: payload.value },
+  });
+};
+
 const toggleSelectedChannel = (channel: string) => {
   const nextChannels = [...selectedChannels.value];
   const selectedIndex = nextChannels.indexOf(channel);
@@ -137,6 +158,9 @@ watch(
       nextFilterValues.showOnlyServerRuleViolations;
     searchInput.value = nextFilterValues.searchInput;
     selectedSort.value = nextFilterValues.sort;
+    filterCreatedByMe.value = nextFilterValues.filterCreatedByMe;
+    filterIAmOP.value = nextFilterValues.filterIAmOP;
+    filterIReported.value = nextFilterValues.filterIReported;
 
     if (nextFilterValues.startDate !== startDate.value) {
       startDate.value = nextFilterValues.startDate;
@@ -178,6 +202,10 @@ watch([startDate, endDate], ([nextStartDate, nextEndDate]) => {
       :show-only-server-rule-violations="showOnlyServerRuleViolations"
       :selected-sort="selectedSort"
       :selected-sort-label="selectedSortLabel"
+      :show-involvement-filters="isAuthenticated"
+      :filter-created-by-me="filterCreatedByMe"
+      :filter-i-am-o-p="filterIAmOP"
+      :filter-i-reported="filterIReported"
       @update-search-input="updateSearchInput"
       @toggle-selected-channel="toggleSelectedChannel"
       @update:sort="updateSort"
@@ -186,6 +214,7 @@ watch([startDate, endDate], ([nextStartDate, nextEndDate]) => {
       @update:show-only-server-rule-violations="
         updateShowOnlyServerRuleViolations
       "
+      @update:involvement-filter="updateInvolvementFilter"
     />
     <ul
       class="divide-y border-t border-gray-200 dark:border-gray-800 dark:text-white"

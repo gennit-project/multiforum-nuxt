@@ -21,6 +21,9 @@ describe('getServerIssueFilterValuesFromParams', () => {
       startDate: '',
       endDate: '',
       showOnlyServerRuleViolations: true,
+      filterCreatedByMe: false,
+      filterIAmOP: false,
+      filterIReported: false,
       sort: issueSortValues.NEWEST,
     });
   });
@@ -89,6 +92,38 @@ describe('getServerIssueFilterValuesFromParams', () => {
         }),
       }).showOnlyServerRuleViolations
     ).toBe(true);
+  });
+
+  it('parses the involvement filters when set to "true"', () => {
+    expect(
+      getServerIssueFilterValuesFromParams({
+        route: createMockRoute({
+          filterCreatedByMe: 'true',
+          filterIAmOP: 'true',
+          filterIReported: 'true',
+        }),
+      })
+    ).toMatchObject({
+      filterCreatedByMe: true,
+      filterIAmOP: true,
+      filterIReported: true,
+    });
+  });
+
+  it('treats any non-"true" involvement filter value as false', () => {
+    expect(
+      getServerIssueFilterValuesFromParams({
+        route: createMockRoute({
+          filterCreatedByMe: 'false',
+          filterIAmOP: '1',
+          filterIReported: 'yes',
+        }),
+      })
+    ).toMatchObject({
+      filterCreatedByMe: false,
+      filterIAmOP: false,
+      filterIReported: false,
+    });
   });
 
   it('parses the sort value from query params', () => {

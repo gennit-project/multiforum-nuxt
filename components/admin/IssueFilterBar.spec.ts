@@ -4,7 +4,7 @@ import IssueFilterBar from '@/components/admin/IssueFilterBar.vue';
 import SearchBar from '@/components/SearchBar.vue';
 import { issueSortValues } from '@/utils/issueSortOptions';
 
-const buildWrapper = () => {
+const buildWrapper = (props: Record<string, unknown> = {}) => {
   return mount(IssueFilterBar, {
     props: {
       searchInput: 'spam',
@@ -15,6 +15,7 @@ const buildWrapper = () => {
       showOnlyServerRuleViolations: true,
       selectedSort: issueSortValues.NEWEST,
       selectedSortLabel: 'Newest',
+      ...props,
     },
     global: {
       stubs: {
@@ -85,5 +86,47 @@ describe('IssueFilterBar', () => {
     await wrapper.findAll('.text-dropdown')[0].trigger('click');
 
     expect(wrapper.emitted('update:sort')).toEqual([[issueSortValues.OLDEST]]);
+  });
+
+  it('hides the involvement filters when not enabled', () => {
+    const wrapper = buildWrapper();
+
+    expect(
+      wrapper.find('[data-testid="issue-involvement-filters"]').exists()
+    ).toBe(false);
+  });
+
+  it('shows the involvement filters when enabled', () => {
+    const wrapper = buildWrapper({ showInvolvementFilters: true });
+
+    expect(
+      wrapper.find('[data-testid="issue-involvement-filters"]').exists()
+    ).toBe(true);
+  });
+
+  it('reflects the checked state of an involvement filter prop', () => {
+    const wrapper = buildWrapper({
+      showInvolvementFilters: true,
+      filterIReported: true,
+    });
+
+    expect(
+      (
+        wrapper.get('[data-testid="issue-filter-filterIReported"]')
+          .element as HTMLInputElement
+      ).checked
+    ).toBe(true);
+  });
+
+  it('emits an involvement filter update when a checkbox is toggled', async () => {
+    const wrapper = buildWrapper({ showInvolvementFilters: true });
+
+    await wrapper
+      .get('[data-testid="issue-filter-filterCreatedByMe"]')
+      .setValue(true);
+
+    expect(wrapper.emitted('update:involvementFilter')).toEqual([
+      [{ key: 'filterCreatedByMe', value: true }],
+    ]);
   });
 });
