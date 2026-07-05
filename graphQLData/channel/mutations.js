@@ -176,6 +176,27 @@ export const CREATE_CHILD_WIKI_PAGE = gql`
   }
 `;
 
+export const PIN_WIKI_PAGE_TO_CHANNEL = gql`
+  mutation pinWikiPageToChannel($channelUniqueName: String!, $wikiPageId: ID!) {
+    pinWikiPageToChannel(
+      channelUniqueName: $channelUniqueName
+      wikiPageId: $wikiPageId
+    )
+  }
+`;
+
+export const UNPIN_WIKI_PAGE_FROM_CHANNEL = gql`
+  mutation unpinWikiPageFromChannel(
+    $channelUniqueName: String!
+    $wikiPageId: ID!
+  ) {
+    unpinWikiPageFromChannel(
+      channelUniqueName: $channelUniqueName
+      wikiPageId: $wikiPageId
+    )
+  }
+`;
+
 export const BECOME_CHANNEL_ADMIN = gql`
   mutation becomeChannelAdmin($channelUniqueName: String!) {
     becomeForumAdmin(channelUniqueName: $channelUniqueName)

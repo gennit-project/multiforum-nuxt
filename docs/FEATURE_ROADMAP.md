@@ -151,11 +151,15 @@ Notes:
 - Album edit deletion now confirms and calls the backend permanent-delete mutation before removing the image from the album UI.
 - This slice adds storage-backed permanent delete for URL-backed profile images and forum banners by resolving active URLs through upload audit metadata before clearing the owning profile/forum field.
 
-### 10. Wiki: pinned sidebar pages `[not started]`
+### 10. Wiki: pinned sidebar pages `[complete]`
 
-- [ ] Add channel-sidebar support for pinned wiki pages.
-- [ ] Let channel owners and authorized moderators pin an existing wiki page from channel UI.
-- [ ] Add a matching action from wiki detail pages.
+- [x] Add channel-sidebar support for pinned wiki pages.
+- [x] Let users with the effective `canUpdateChannel` role permission pin and unpin existing wiki pages.
+- [x] Add a matching action from wiki detail pages.
+
+Notes:
+- The backend exposes dedicated `pinWikiPageToChannel` and `unpinWikiPageFromChannel` mutations so pinning uses the same channel/default-role permission path as wiki editing instead of a frontend owner-status shortcut.
+- The frontend refetches channel data after pin changes and renders pinned wiki pages in the forum sidebar.
 
 ### 11. Wiki: lock wiki pages to owners `[not started]`
 

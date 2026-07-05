@@ -85,6 +85,24 @@ describe('ChannelSidebar content', () => {
       wrapper.getComponent({ name: 'SidebarEventList' }).props('eventChannelsAggregate')
     ).toBe(7);
   });
+
+  it('renders pinned wiki page links', () => {
+    const wrapper = mountSidebar({
+      channel: channel({
+        PinnedWikiPages: [{ id: 'wiki-1', title: 'Install Guide', slug: 'install' }],
+      }),
+    });
+
+    expect(wrapper.text()).toContain('Install Guide');
+  });
+
+  it('hides the pinned wiki section when no pages are pinned', () => {
+    const wrapper = mountSidebar({
+      channel: channel({ PinnedWikiPages: [] }),
+    });
+
+    expect(wrapper.text()).not.toContain('Pinned Wiki Pages');
+  });
 });
 
 describe('ChannelSidebar rules', () => {
