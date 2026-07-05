@@ -63,6 +63,58 @@ const createLocalId = (kind: 'group' | 'option', index: number) =>
 const convertFilterGroupsToYaml = (filterGroups: FilterGroup[]): string =>
   serializeFilterGroupsToYaml(filterGroups);
 
+const normalizeKey = (value: string) => value.trim().toLowerCase();
+
+const preserveExistingIds = (
+  parsedGroups: ReturnType<typeof parseFilterGroupsYaml>['groups']
+): FilterGroup[] => {
+  const existingGroupsByKey = new Map(
+    props.filterGroups.map((group) => [normalizeKey(group.key), group])
+  );
+
+  return (parsedGroups || []).map((group, index) => {
+    const existingGroup = existingGroupsByKey.get(normalizeKey(group.key));
+    const existingOptionsByValue = new Map(
+      (existingGroup?.options || []).map((option) => [
+        normalizeKey(option.value),
+        option,
+      ])
+    );
+
+    return {
+      id: existingGroup?.id || createLocalId('group', index),
+      key: group.key,
+      displayName: group.displayName,
+      mode: group.mode as FilterMode,
+      order: group.order ?? index,
+      options: (group.options || []).map((option, optionIndex) => {
+        const existingOption = existingOptionsByValue.get(
+          normalizeKey(option.value)
+        );
+
+        return {
+          id: existingOption?.id || createLocalId('option', optionIndex),
+          value: option.value,
+          displayName: option.displayName,
+          order: option.order ?? optionIndex,
+          // Required GraphQL fields
+          __typename: 'FilterOption' as const,
+          group: emptyFilterGroup, // Will be populated by parent
+          groupAggregate: null,
+          groupConnection: emptyGroupConnection,
+        };
+      }),
+      // Required GraphQL fields
+      __typename: 'FilterGroup' as const,
+      channel: emptyChannel,
+      channelAggregate: null,
+      channelConnection: emptyChannelConnection,
+      optionsAggregate: null,
+      optionsConnection: emptyOptionsConnection,
+    };
+  });
+};
+
 const convertYamlToFilterGroups = (
   yamlString: string
 ): { success: boolean; filterGroups?: FilterGroup[]; error?: string } => {
@@ -71,32 +123,9 @@ const convertYamlToFilterGroups = (
     return { success: false, error: result.error };
   }
 
-  // Map the validated plain groups onto full GraphQL FilterGroup objects.
-  const filterGroups: FilterGroup[] = result.groups.map((group, index) => ({
-    id: createLocalId('group', index),
-    key: group.key,
-    displayName: group.displayName,
-    mode: group.mode as FilterMode,
-    order: group.order ?? index,
-    options: (group.options || []).map((option, optionIndex) => ({
-      id: createLocalId('option', optionIndex),
-      value: option.value,
-      displayName: option.displayName,
-      order: option.order ?? optionIndex,
-      // Required GraphQL fields
-      __typename: 'FilterOption' as const,
-      group: emptyFilterGroup, // Will be populated by parent
-      groupAggregate: null,
-      groupConnection: emptyGroupConnection,
-    })),
-    // Required GraphQL fields
-    __typename: 'FilterGroup' as const,
-    channel: emptyChannel,
-    channelAggregate: null,
-    channelConnection: emptyChannelConnection,
-    optionsAggregate: null,
-    optionsConnection: emptyOptionsConnection,
-  }));
+  // Preserve persisted IDs when keys/values still match so bulk YAML edits do
+  // not orphan downloads that reference filter-option IDs.
+  const filterGroups = preserveExistingIds(result.groups);
 
   return { success: true, filterGroups };
 };
@@ -238,8 +267,8 @@ watch(
           </h3>
           <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
             Configure filter groups that will appear in the downloads sidebar.
-            Include groups require selected labels; exclude groups hide downloads
-            with selected labels.
+            Include groups require selected labels; exclude groups hide
+            downloads with selected labels.
           </p>
         </div>
 
@@ -517,6 +546,11 @@ watch(
               <code>order</code>
             </li>
           </ul>
+          <p class="mt-3">
+            Existing group and option IDs are preserved when the YAML keeps the
+            same group keys and option values. Renaming a key or option value is
+            treated as delete plus create.
+          </p>
         </div>
 
         <!-- Action Buttons -->

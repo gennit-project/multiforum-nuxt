@@ -34,6 +34,7 @@ const emit = defineEmits(['updateGroup', 'removeGroup', 'moveGroup']);
 
 const isEditing = ref(false);
 const showNewOptionForm = ref(false);
+const editingOptionId = ref<string | null>(null);
 
 const editForm = ref({
   key: props.filterGroup.key,
@@ -46,6 +47,11 @@ const newOptionForm = ref({
   displayName: '',
 });
 
+const optionEditForm = ref({
+  value: '',
+  displayName: '',
+});
+
 const createLocalOptionId = () =>
   `local-filter-option-${Date.now()}-${props.filterGroup.options?.length || 0}`;
 
@@ -53,7 +59,8 @@ const filterModeOptions = [
   {
     value: FilterMode.Include,
     label: 'Must include selected labels',
-    description: 'Downloads must have at least one selected option from this group.',
+    description:
+      'Downloads must have at least one selected option from this group.',
   },
   {
     value: FilterMode.Exclude,
@@ -67,6 +74,12 @@ const isValidOptionValue = (value: string) => /^[a-zA-Z0-9_-]+$/.test(value);
 
 const isKeyUnique = (key: string) => {
   return !props.existingKeys.includes(key);
+};
+
+const isOptionValueUnique = (value: string, excludeId?: string) => {
+  return !props.filterGroup.options?.some(
+    (option) => option.value === value && option.id !== excludeId
+  );
 };
 
 const canSaveGroup = computed(() => {
@@ -84,9 +97,20 @@ const canAddOption = computed(() => {
     newOptionForm.value.value &&
     newOptionForm.value.displayName &&
     isValidOptionValue(newOptionForm.value.value) &&
-    !props.filterGroup.options?.some(
-      (option) => option.value === newOptionForm.value.value
-    )
+    isOptionValueUnique(newOptionForm.value.value)
+  );
+});
+
+const canSaveOption = computed(() => {
+  if (!editingOptionId.value) {
+    return false;
+  }
+
+  return (
+    optionEditForm.value.value &&
+    optionEditForm.value.displayName &&
+    isValidOptionValue(optionEditForm.value.value) &&
+    isOptionValueUnique(optionEditForm.value.value, editingOptionId.value)
   );
 });
 
@@ -148,6 +172,40 @@ const addOption = () => {
     displayName: '',
   };
   showNewOptionForm.value = false;
+};
+
+const startEditingOption = (option: FilterOption) => {
+  optionEditForm.value = {
+    value: option.value,
+    displayName: option.displayName,
+  };
+  editingOptionId.value = option.id;
+};
+
+const cancelEditingOption = () => {
+  optionEditForm.value = {
+    value: '',
+    displayName: '',
+  };
+  editingOptionId.value = null;
+};
+
+const saveOption = (optionId: string) => {
+  if (!canSaveOption.value) return;
+
+  const updatedOptions =
+    props.filterGroup.options?.map((option) =>
+      option.id === optionId
+        ? {
+            ...option,
+            value: optionEditForm.value.value,
+            displayName: optionEditForm.value.displayName,
+          }
+        : option
+    ) || [];
+
+  emit('updateGroup', props.filterGroup.id, { options: updatedOptions });
+  cancelEditingOption();
 };
 
 const removeOption = (optionId: string) => {
@@ -428,7 +486,9 @@ const moveOption = (optionId: string, direction: 'up' | 'down') => {
               }"
             >
             <p
-              v-if="newOptionForm.value && !isValidOptionValue(newOptionForm.value)"
+              v-if="
+                newOptionForm.value && !isValidOptionValue(newOptionForm.value)
+              "
               class="mt-1 text-xs text-red-500"
             >
               Value can only contain letters, numbers, underscores, and hyphens.
@@ -489,7 +549,10 @@ const moveOption = (optionId: string, direction: 'up' | 'down') => {
           :key="option.id"
           class="flex items-center justify-between rounded border border-gray-200 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
         >
-          <div class="grid flex-1 grid-cols-1 gap-2 md:grid-cols-2">
+          <div
+            v-if="editingOptionId !== option.id"
+            class="grid flex-1 grid-cols-1 gap-2 md:grid-cols-2"
+          >
             <div>
               <span class="text-xs text-gray-500 dark:text-gray-400"
                 >Option Value:</span
@@ -508,9 +571,89 @@ const moveOption = (optionId: string, direction: 'up' | 'down') => {
               }}</span>
             </div>
           </div>
+          <div v-else class="flex-1 space-y-3">
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <div>
+                <label
+                  class="block text-xs font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Option Value
+                </label>
+                <input
+                  v-model="optionEditForm.value"
+                  type="text"
+                  class="mt-1 block w-full rounded border border-gray-300 px-2 py-1 font-mono text-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white"
+                  :class="{
+                    'border-red-500':
+                      optionEditForm.value &&
+                      (!isValidOptionValue(optionEditForm.value) ||
+                        !isOptionValueUnique(optionEditForm.value, option.id)),
+                  }"
+                >
+                <p
+                  v-if="
+                    optionEditForm.value &&
+                    !isValidOptionValue(optionEditForm.value)
+                  "
+                  class="mt-1 text-xs text-red-500"
+                >
+                  Value can only contain letters, numbers, underscores, and
+                  hyphens.
+                </p>
+                <p
+                  v-else-if="
+                    optionEditForm.value &&
+                    !isOptionValueUnique(optionEditForm.value, option.id)
+                  "
+                  class="mt-1 text-xs text-red-500"
+                >
+                  This value already exists in this group.
+                </p>
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Display Name
+                </label>
+                <input
+                  v-model="optionEditForm.displayName"
+                  type="text"
+                  class="mt-1 block w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white"
+                >
+              </div>
+            </div>
+          </div>
           <div class="ml-4 flex space-x-1">
+            <template v-if="editingOptionId === option.id">
+              <button
+                type="button"
+                class="rounded border border-green-300 bg-green-100 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:border-green-700 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800"
+                :disabled="disabled || !canSaveOption"
+                @click="saveOption(option.id)"
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                class="hover:bg-gray-50 rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700"
+                :disabled="disabled"
+                @click="cancelEditingOption"
+              >
+                Cancel
+              </button>
+            </template>
             <button
-              v-if="optionIndex > 0"
+              v-else
+              type="button"
+              class="rounded border border-blue-300 bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-blue-700 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800"
+              :disabled="disabled"
+              @click="startEditingOption(option)"
+            >
+              Edit
+            </button>
+            <button
+              v-if="editingOptionId !== option.id && optionIndex > 0"
               type="button"
               class="px-1 py-1 text-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
               :disabled="disabled"
@@ -520,7 +663,10 @@ const moveOption = (optionId: string, direction: 'up' | 'down') => {
               ↑
             </button>
             <button
-              v-if="optionIndex < (filterGroup.options?.length || 0) - 1"
+              v-if="
+                editingOptionId !== option.id &&
+                optionIndex < (filterGroup.options?.length || 0) - 1
+              "
               type="button"
               class="px-1 py-1 text-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
               :disabled="disabled"
