@@ -209,12 +209,9 @@ const getNavLabelClasses = (isActive: boolean) =>
     :class="{ 'py-2': isVerticallyShort, 'py-4': !isVerticallyShort }"
   >
       <!-- Create Button -->
-      <IconTooltip
-        text="Create new"
-        :class="{ 'mb-2': isVerticallyShort, 'mb-4': !isVerticallyShort }"
-      >
+      <div :class="{ 'mb-2': isVerticallyShort, 'mb-4': !isVerticallyShort }">
         <CreateAnythingButton icon-only />
-      </IconTooltip>
+      </div>
 
       <!-- Main Navigation Icons -->
       <div

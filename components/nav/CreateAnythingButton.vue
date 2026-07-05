@@ -94,12 +94,6 @@ onMounted(() => {
 });
 
 const isMenuOpen = ref(false);
-const showTooltip = ref(false);
-const showFooter = computed(() => {
-  return (
-    route.name && typeof route.name === 'string' && !route.name.includes('map')
-  );
-});
 
 const handleItemClick = (item: MenuItem) => {
   item.action();
@@ -108,21 +102,21 @@ const handleItemClick = (item: MenuItem) => {
 
 const buttonClasses = computed(() => {
   if (createButtonProps.iconOnly) {
-    return 'flex h-12 w-12 items-center justify-center rounded-full bg-gray-800 text-white font-semibold hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-gray-100 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-500 dark:focus:ring-offset-gray-900';
+    return 'flex h-12 w-12 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-700 font-semibold hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-500 dark:focus:ring-offset-gray-900';
   }
 
   const baseClasses =
-    'inline-flex items-center gap-1 rounded-md border border-gray-800 px-2 py-2 text-xs focus:outline-none dark:border-gray-600';
+    'inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-2 text-xs focus:outline-none dark:border-gray-600';
 
   if (createButtonProps.usePrimaryButton) {
-    return `${baseClasses} !border !border-gray-800 dark:!border-gray-600`;
+    return `${baseClasses} !border !border-gray-300 dark:!border-gray-600`;
   }
 
   if (createButtonProps.backgroundColor === 'light') {
-    return `${baseClasses} bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-700`;
+    return `${baseClasses} bg-white text-gray-700 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-700`;
   }
 
-  return `${baseClasses} bg-gray-800 text-gray-100 hover:bg-gray-700`;
+  return `${baseClasses} bg-white text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700`;
 });
 </script>
 
@@ -137,7 +131,6 @@ const buttonClasses = computed(() => {
               v-bind="props"
               :class="buttonClasses"
               @click="adjustMenuPosition"
-              @mouseover="showTooltip = true"
             >
               <span
                 v-if="!iconOnly"
@@ -158,15 +151,6 @@ const buttonClasses = computed(() => {
                 class="-mr-1 ml-1 mt-0.5 h-3 w-3"
                 aria-hidden="true"
               />
-              <v-tooltip
-                v-if="showTooltip && !usePrimaryButton && !iconOnly"
-                location="bottom"
-                activator="parent"
-                aria-label="Create new"
-                :content-props="{ 'aria-label': 'Create new' }"
-              >
-                Create new...
-              </v-tooltip>
             </button>
           </template>
 
@@ -233,17 +217,6 @@ const buttonClasses = computed(() => {
           aria-hidden="true"
         />
       </button>
-      <client-only>
-        <v-tooltip
-          v-if="showFooter"
-          activator="parent"
-          location="bottom"
-          aria-label="Create new"
-          :content-props="{ 'aria-label': 'Create new' }"
-        >
-          Create new...
-        </v-tooltip>
-      </client-only>
     </template>
   </RequireAuth>
 </template>

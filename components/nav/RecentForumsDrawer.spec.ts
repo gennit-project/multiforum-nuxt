@@ -17,12 +17,21 @@ const mountDrawer = (props: Record<string, unknown> = {}) =>
         ClientOnly: { template: '<div><slot /></div>' },
         Transition: { template: '<div><slot /></div>' },
         RecentForumsList: { name: 'RecentForumsList', props: ['forums', 'onNavigate'], template: '<div class="list" />' },
+        // ForumFinder queries GraphQL; stub it and expose a button that emits
+        // the select event so we can assert navigation without wiring Apollo.
+        ForumFinder: {
+          name: 'ForumFinder',
+          emits: ['select'],
+          template:
+            '<button class="finder-select" @click="$emit(\'select\', \'dogs\')" />',
+        },
+        SearchIcon: true,
       },
     },
   });
 
-const addForumButton = (w: ReturnType<typeof mount>) =>
-  w.findAll('button').find((b) => b.text().includes('Add Forum'));
+const findForumButton = (w: ReturnType<typeof mount>) =>
+  w.findAll('button').find((b) => b.text().includes('Find Forum'));
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -63,18 +72,31 @@ describe('RecentForumsDrawer actions', () => {
     expect(wrapper.emitted('close')).toBeTruthy();
   });
 
-  it('navigates to create-forum and closes', async () => {
+  it('reveals the forum finder when Find Forum is clicked', async () => {
     const wrapper = mountDrawer();
 
-    await addForumButton(wrapper)!.trigger('click');
+    await findForumButton(wrapper)!.trigger('click');
 
-    expect(h.push).toHaveBeenCalledWith('/forums/create');
+    expect(wrapper.findComponent({ name: 'ForumFinder' }).exists()).toBe(true);
   });
 
-  it('emits close after navigating to create-forum', async () => {
+  it('navigates to the selected forum and closes', async () => {
     const wrapper = mountDrawer();
+    await findForumButton(wrapper)!.trigger('click');
 
-    await addForumButton(wrapper)!.trigger('click');
+    await wrapper.find('.finder-select').trigger('click');
+
+    expect(h.push).toHaveBeenCalledWith({
+      name: 'forums-forumId-discussions',
+      params: { forumId: 'dogs' },
+    });
+  });
+
+  it('emits close after selecting a forum', async () => {
+    const wrapper = mountDrawer();
+    await findForumButton(wrapper)!.trigger('click');
+
+    await wrapper.find('.finder-select').trigger('click');
 
     expect(wrapper.emitted('close')).toBeTruthy();
   });
