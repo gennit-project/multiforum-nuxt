@@ -300,7 +300,7 @@ const selectSearchType = (type: SearchType) => {
               >
                 <component
                   :is="item.icon"
-                  class="list-item-icon h-6 w-6 shrink-0 dark:text-orange-500"
+                  class="list-item-icon h-6 w-6 shrink-0 dark:text-gray-400"
                   aria-hidden="true"
                 />
                 {{ item.name }}
