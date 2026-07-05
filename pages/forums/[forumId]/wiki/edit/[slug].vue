@@ -16,6 +16,7 @@ import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { useUsername } from '@/composables/useAuthState';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import { useWikiPageLockPermissions } from '@/composables/useWikiPageLockPermissions';
 
 const usernameVar = useUsername();
 
@@ -51,14 +52,15 @@ const {
   { uniqueName: forumId },
   {
     errorPolicy: 'all',
-    enabled: isHomePage.value, // Only run this query for home page
   }
 );
+
+const channel = computed(() => channelResult.value?.channels?.[0] ?? null);
 
 // Computed property for the wiki page data
 const wikiPage = computed(() => {
   if (isHomePage.value) {
-    return channelResult.value?.channels?.[0]?.WikiHomePage;
+    return channel.value?.WikiHomePage;
   } else {
     return wikiPageResult.value?.wikiPages?.[0];
   }
@@ -84,6 +86,11 @@ const {
 const wikiEditBlockedBySuspension = computed(() => {
   return !!usernameVar.value && !!activeSuspension.value;
 });
+
+const { canManageWikiPageLock } = useWikiPageLockPermissions(channel);
+const wikiEditBlockedByLock = computed(
+  () => wikiPage.value?.locked === true && !canManageWikiPageLock.value
+);
 
 const showWikiEditSuspensionNotice = computed(() => {
   return wikiEditBlockedBySuspension.value && !!suspensionIssueNumber.value;
@@ -148,6 +155,7 @@ const updateError = computed(() => {
 // Handle form submission
 function handleSubmit() {
   if (wikiEditBlockedBySuspension.value) return;
+  if (wikiEditBlockedByLock.value) return;
   if (!formValues.value.title || !formValues.value.body) return;
 
   if (isHomePage.value) {
@@ -281,9 +289,22 @@ onChannelDone(handleDone);
         :suspended-until="suspendedUntil ?? undefined"
         :suspended-indefinitely="suspendedIndefinitely"
       />
+      <div
+        v-if="wikiPage.locked"
+        class="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100"
+        data-testid="wiki-edit-locked-banner"
+      >
+        <div class="font-medium">This wiki page is locked.</div>
+        <p v-if="wikiPage.lockReason" class="mt-1">
+          Reason: {{ wikiPage.lockReason }}
+        </p>
+        <p v-if="!canManageWikiPageLock" class="mt-1">
+          You do not have permission to edit locked wiki pages.
+        </p>
+      </div>
 
       <form
-        v-if="!wikiEditBlockedBySuspension"
+        v-if="!wikiEditBlockedBySuspension && !wikiEditBlockedByLock"
         class="space-y-6"
         @submit.prevent="handleSubmit"
       >

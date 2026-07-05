@@ -10,11 +10,13 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import OnThisPage from '@/components/wiki/OnThisPage.vue';
 import WikiPagePinButton from '@/components/wiki/WikiPagePinButton.vue';
+import WikiPageLockButton from '@/components/wiki/WikiPageLockButton.vue';
 import FontSizeControl from '@/components/channel/FontSizeControl.vue';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import { timeAgo } from '@/utils';
 import { buildWikiPageHead } from '@/utils/wikiSeo';
+import { useWikiPageLockPermissions } from '@/composables/useWikiPageLockPermissions';
 
 const route = useRoute();
 const router = useRouter();
@@ -28,6 +30,7 @@ const {
   result: wikiPageResult,
   loading,
   error,
+  refetch: refetchWikiPage,
 } = useQuery(
   GET_WIKI_PAGE,
   {
@@ -50,6 +53,10 @@ const {
 
 // Computed property for the channel data
 const channel = computed(() => channelResult.value?.channels?.[0]);
+const { canManageWikiPageLock } = useWikiPageLockPermissions(channel);
+const canEditCurrentWikiPage = computed(
+  () => !wikiPage.value?.locked || canManageWikiPageLock.value
+);
 
 // Check if wiki is enabled
 const wikiEnabled = computed(() => channel.value?.wikiEnabled);
@@ -154,7 +161,15 @@ onGetWikiPageResult((result) => {
               :channel-unique-name="forumId"
               @pinned-changed="refetchChannel"
             />
+            <WikiPageLockButton
+              v-if="channel"
+              :channel="channel"
+              :wiki-page="wikiPage"
+              :channel-unique-name="forumId"
+              @lock-changed="refetchWikiPage"
+            />
             <PrimaryButton
+              v-if="canEditCurrentWikiPage"
               :label="'Edit Page'"
               @click="
                 router.push(`/forums/${forumId}/wiki/edit/${wikiPage.slug}`)
@@ -185,6 +200,27 @@ onGetWikiPageResult((result) => {
             </router-link>
           </template>
         </div>
+        <div
+          v-if="wikiPage.locked"
+          class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100"
+          data-testid="wiki-page-locked-banner"
+        >
+          <div class="font-medium">This wiki page is locked.</div>
+          <p v-if="wikiPage.lockReason" class="mt-1">
+            Reason: {{ wikiPage.lockReason }}
+          </p>
+          <p v-if="wikiPage.lockedByUsername || wikiPage.lockedAt" class="mt-1 text-xs">
+            <span v-if="wikiPage.lockedByUsername">
+              Locked by {{ wikiPage.lockedByUsername }}
+            </span>
+            <span v-if="wikiPage.lockedByUsername && wikiPage.lockedAt">
+              ·
+            </span>
+            <span v-if="wikiPage.lockedAt">
+              {{ timeAgo(new Date(wikiPage.lockedAt)) }}
+            </span>
+          </p>
+        </div>
       </div>
 
       <!-- Mobile On This Page Dropdown -->
@@ -209,6 +245,7 @@ onGetWikiPageResult((result) => {
           <!-- Bottom edit button - Docusaurus style -->
           <div class="mt-8 border-t border-gray-200 pt-6 dark:border-gray-700">
             <button
+              v-if="canEditCurrentWikiPage"
               class="flex items-center text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
               @click="
                 router.push(`/forums/${forumId}/wiki/edit/${wikiPage.slug}`)

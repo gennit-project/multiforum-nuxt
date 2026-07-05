@@ -161,10 +161,16 @@ Notes:
 - The backend exposes dedicated `pinWikiPageToChannel` and `unpinWikiPageFromChannel` mutations so pinning uses the same channel/default-role permission path as wiki editing instead of a frontend owner-status shortcut.
 - The frontend refetches channel data after pin changes and renders pinned wiki pages in the forum sidebar.
 
-### 11. Wiki: lock wiki pages to owners `[not started]`
+### 11. Wiki: lock wiki pages to owners `[complete]`
 
-- [ ] Add a lock state for wiki pages.
-- [ ] Restrict editing of locked wiki pages to channel owners per product rules.
+- [x] Add a lock state for wiki pages. `[in backend/frontend PRs]`
+- [x] Restrict editing of locked wiki pages to users with the effective wiki moderation permission. `[in backend/frontend PRs]`
+
+Notes:
+- Wiki pages now expose `locked`, `lockedAt`, `lockReason`, and `lockedByUsername` metadata.
+- The backend rejects direct generated lock-field updates and requires the custom `lockWikiPage` / `unlockWikiPage` mutations for lock state changes.
+- Locked wiki-page edits are blocked for ordinary wiki editors; users with the effective `canDeleteWiki` moderation permission can lock, unlock, and edit locked pages.
+- The frontend shows locked-page banners, hides edit affordances for users without lock permission, and exposes lock/unlock controls on wiki detail pages.
 
 ### 12. Moderation: sticky comment on discussion or event `[complete]`
 

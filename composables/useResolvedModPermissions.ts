@@ -5,7 +5,6 @@ import {
   type PermissionFlags,
   type Role,
 } from '@/utils/permissionUtils';
-import type { ModChannelRole, ModServerRole } from '@/__generated__/graphql';
 
 type MaybeComputed<T> = Ref<T> | ComputedRef<T>;
 
@@ -14,14 +13,14 @@ type MaybeComputed<T> = Ref<T> | ComputedRef<T>;
 // assignments it inherits as `PermissionData`, so the channel input composes
 // both. All fields are optional to stay assignable from any selection set.
 type ChannelPermissionInput = PermissionData & {
-  DefaultModRole?: ModChannelRole | null;
-  ElevatedModRole?: ModChannelRole | null;
+  DefaultModRole?: Role | null;
+  ElevatedModRole?: Role | null;
 };
 
 // The server config only contributes fallback mod roles.
 type ServerConfigInput = {
-  DefaultModRole?: ModServerRole | null;
-  DefaultElevatedModRole?: ModServerRole | null;
+  DefaultModRole?: Role | null;
+  DefaultElevatedModRole?: Role | null;
 };
 
 type UseResolvedModPermissionsParams = {

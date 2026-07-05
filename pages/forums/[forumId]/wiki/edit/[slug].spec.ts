@@ -9,9 +9,13 @@ const suspension = vi.hoisted(() => ({
   active: null as unknown,
   issueNumber: null as number | null,
 }));
+const wikiPageState = vi.hoisted(() => ({
+  wikiPage: { id: 'w1', title: 'Intro', body: 'Hi', locked: false },
+}));
 
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => ref('alice'),
+  useModProfileName: () => ref(''),
 }));
 
 vi.mock('@/composables/useSuspensionNotice', () => ({
@@ -37,8 +41,9 @@ vi.mock('nuxt/app', async () => {
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(() => ({
     result: ref({
-      wikiPages: [{ id: 'w1', title: 'Intro', body: 'Hi' }],
+      wikiPages: [wikiPageState.wikiPage],
       channels: [{ wikiEnabled: true }],
+      serverConfigs: [],
     }),
     loading: ref(false),
     error: ref(null),
@@ -61,6 +66,7 @@ describe('wiki edit page', () => {
   beforeEach(() => {
     suspension.active = null;
     suspension.issueNumber = null;
+    wikiPageState.wikiPage = { id: 'w1', title: 'Intro', body: 'Hi', locked: false };
   });
 
   it('renders the title and edit-reason inputs when the page loads', async () => {
@@ -80,5 +86,20 @@ describe('wiki edit page', () => {
 
     expect(wrapper.findComponent(PrimaryButton).exists()).toBe(false);
     expect(wrapper.findComponent(SuspensionNotice).exists()).toBe(true);
+  });
+
+  it('hides the form when the wiki page is locked', async () => {
+    wikiPageState.wikiPage = {
+      id: 'w1',
+      title: 'Intro',
+      body: 'Hi',
+      locked: true,
+      lockReason: 'Vandalism',
+    };
+    const wrapper = await mountPage();
+
+    expect(wrapper.find('[data-testid="wiki-edit-locked-banner"]').exists()).toBe(
+      true
+    );
   });
 });
