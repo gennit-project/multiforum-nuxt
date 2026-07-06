@@ -47,8 +47,8 @@ importers:
         specifier: ^4.3.1
         version: 4.3.1(three@0.183.2)
       '@googlemaps/js-api-loader':
-        specifier: ^1.16.8
-        version: 1.16.10
+        specifier: ^2.1.1
+        version: 2.1.1
       '@googlemaps/markerclusterer':
         specifier: ^2.6.2
         version: 2.6.2
@@ -985,8 +985,8 @@ packages:
     peerDependencies:
       three: ^0.183.0
 
-  '@googlemaps/js-api-loader@1.16.10':
-    resolution: {integrity: sha512-c2erv2k7P2ilYzMmtYcMgAR21AULosQuUHJbStnrvRk2dG93k5cqptDrh9A8p+ZNlyhiqEOgHW7N9PAizdUM7Q==}
+  '@googlemaps/js-api-loader@2.1.1':
+    resolution: {integrity: sha512-yUpAwksbHrlZIWD49JmveNSfBG4oAK0AwMknfSaPMnP5N7UT8oFRVCqwjGb1XQovi//7KLbPQKZpbofiLGzpDw==}
 
   '@googlemaps/markerclusterer@2.6.2':
     resolution: {integrity: sha512-U6uVhq8iWhiIckA89sgRu8OK35mjd6/3CuoZKWakKEf0QmRRWpatlsPb3kqXkoWSmbcZkopRiI4dnW6DQSd7bQ==}
@@ -9008,7 +9008,9 @@ snapshots:
       lit: 3.3.3
       three: 0.183.2
 
-  '@googlemaps/js-api-loader@1.16.10': {}
+  '@googlemaps/js-api-loader@2.1.1':
+    dependencies:
+      '@types/google.maps': 3.65.2
 
   '@googlemaps/markerclusterer@2.6.2':
     dependencies:

@@ -48,7 +48,7 @@
     "@fortawesome/free-solid-svg-icons": "7.3.0",
     "@fortawesome/vue-fontawesome": "^3.3.0",
     "@google/model-viewer": "^4.3.1",
-    "@googlemaps/js-api-loader": "^1.16.8",
+    "@googlemaps/js-api-loader": "^2.1.1",
     "@googlemaps/markerclusterer": "^2.6.2",
     "@headlessui/vue": "^1.7.23",
     "@mdi/font": "^7.4.47",
