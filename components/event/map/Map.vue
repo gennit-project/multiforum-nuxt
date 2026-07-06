@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, markRaw } from 'vue';
-import { Loader } from '@googlemaps/js-api-loader';
+import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { useRouter } from 'nuxt/app';
 import { config } from '@/config';
@@ -76,9 +76,13 @@ const emit = defineEmits([
 ]);
 
 const router = useRouter();
-const loader = new Loader({
-  apiKey: config.googleMapsApiKey,
-  version: 'weekly',
+// js-api-loader v2 replaced the `new Loader({...}).load()` flow with a
+// functional API: configure once with setOptions(), then pull in libraries via
+// importLibrary(). setOptions() only stores config; nothing loads until the
+// first importLibrary() call in renderMap().
+setOptions({
+  key: config.googleMapsApiKey,
+  v: 'weekly',
 });
 
 const mobileMapDiv = ref<HTMLElement | null>(null);
@@ -119,11 +123,12 @@ const clearMarkers = () => {
 };
 
 const renderMap = async () => {
-  await loader.load();
+  // Load the core 'maps' library. importLibrary() populates the global
+  // google.maps namespace, so the google.maps.* references below keep working.
+  await importLibrary('maps');
   // AdvancedMarkerElement/PinElement live in the 'marker' library, which must
   // be imported explicitly before use.
-  const { AdvancedMarkerElement, PinElement } =
-    (await google.maps.importLibrary('marker')) as google.maps.MarkerLibrary;
+  const { AdvancedMarkerElement, PinElement } = await importLibrary('marker');
   clearMarkers();
   if (map.value) map.value = null;
 
