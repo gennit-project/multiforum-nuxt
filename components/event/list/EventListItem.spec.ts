@@ -48,6 +48,8 @@ const mountItem = (event: Event, extraProps: Record<string, unknown> = {}) =>
 describe('EventListItem', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset shared route state so tag-filter tests don't leak query into each other.
+    route.query = {};
     // handleClick (on the <li>) probes matchMedia on desktop; jsdom omits it.
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
@@ -138,14 +140,90 @@ describe('EventListItem', () => {
   });
 
   describe('tag filtering', () => {
+    const eventWithTag = () =>
+      makeEvent({ Tags: [{ __typename: 'Tag', text: 'music' }] as never });
+
     it('adds a tag to the route query when a tag is clicked', async () => {
-      const wrapper = mountItem(
-        makeEvent({ Tags: [{ __typename: 'Tag', text: 'music' }] as never })
-      );
+      const wrapper = mountItem(eventWithTag());
       await wrapper.findComponent(Tag).trigger('click');
       expect(router.replace).toHaveBeenCalledWith({
         query: { tags: 'music' },
       });
+    });
+
+    it('removes the tag when it already matches the single active tag', async () => {
+      route.query = { tags: 'music' };
+      const wrapper = mountItem(eventWithTag());
+      await wrapper.findComponent(Tag).trigger('click');
+      expect(router.replace).toHaveBeenCalledWith({ query: {} });
+    });
+
+    it('removes the tag from a multi-tag query while keeping the others', async () => {
+      route.query = { tags: ['music', 'art'] };
+      const wrapper = mountItem(eventWithTag());
+      await wrapper.findComponent(Tag).trigger('click');
+      expect(router.replace).toHaveBeenCalledWith({ query: { tags: ['art'] } });
+    });
+
+    it('replaces a different active tag with the clicked one', async () => {
+      route.query = { tags: 'art' };
+      const wrapper = mountItem(eventWithTag());
+      await wrapper.findComponent(Tag).trigger('click');
+      expect(router.replace).toHaveBeenCalledWith({
+        query: { tags: 'music' },
+      });
+    });
+  });
+
+  describe('detail link resolution', () => {
+    it('falls back to the first event channel when not scoped to a forum', () => {
+      const wrapper = mountItem(
+        makeEvent({ id: 'e9', EventChannels: [eventChannel({ channelUniqueName: 'dogs' })] }),
+        { currentChannelId: '' }
+      );
+      expect(
+        (wrapper.vm as unknown as { detailLink: string }).detailLink
+      ).toBe('/forums/dogs/events/e9');
+    });
+
+    it('yields an empty detail link with no channel context', () => {
+      const wrapper = mountItem(makeEvent({ EventChannels: [] }), {
+        currentChannelId: '',
+      });
+      expect((wrapper.vm as unknown as { detailLink: string }).detailLink).toBe('');
+    });
+  });
+
+  describe('multi-channel postings', () => {
+    const multiChannelEvent = () =>
+      makeEvent({
+        id: 'e5',
+        EventChannels: [
+          eventChannel({ channelUniqueName: 'cats', CommentsAggregate: { count: 1 } }),
+          eventChannel({ channelUniqueName: 'dogs', CommentsAggregate: { count: 3 } }),
+        ],
+      });
+
+    it('builds a per-channel detail option with a pluralized comment count', () => {
+      const wrapper = mountItem(multiChannelEvent());
+      const options = (
+        wrapper.vm as unknown as {
+          eventDetailOptions: Array<{ label: string; value: string }>;
+        }
+      ).eventDetailOptions;
+      expect(options).toContainEqual({
+        label: '1 comment in cats',
+        value: '/forums/cats/events/e5',
+        event: '',
+      });
+    });
+
+    it('flags an event submitted to more than one channel', () => {
+      const wrapper = mountItem(multiChannelEvent());
+      expect(
+        (wrapper.vm as unknown as { submittedToMultipleChannels: boolean })
+          .submittedToMultipleChannels
+      ).toBe(true);
     });
   });
 });

@@ -201,5 +201,170 @@ describe('MultiSelect', () => {
       await wrapper.get('input[placeholder="Search fruits"]').setValue('Apple');
       expect(wrapper.emitted('search')?.at(-1)).toEqual(['Apple']);
     });
+
+    it('filters legacy options down to the ones matching the query', async () => {
+      const wrapper = mountSelect({
+        modelValue: [],
+        searchable: true,
+        searchPlaceholder: 'Search',
+      });
+      await wrapper.get('[data-testid="ms"]').trigger('click');
+      await wrapper.get('input[placeholder="Search"]').setValue('a');
+      // 'a' matches only the value "a" (Apple); "b" and "c" are filtered out.
+      expect([
+        wrapper.text().includes('Apple'),
+        wrapper.text().includes('Banana'),
+      ]).toEqual([true, false]);
+    });
+  });
+
+  describe('deselecting in multiple mode', () => {
+    it('removes an already-selected option, emitting the rest', async () => {
+      const wrapper = mountSelect({ modelValue: ['a', 'b'] });
+      await wrapper.get('[data-testid="ms"]').trigger('click');
+      await clickRow(wrapper, 'Apple');
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['b']]);
+    });
+  });
+
+  describe('reacting to external modelValue changes', () => {
+    it('syncs the displayed chips when the modelValue prop changes', async () => {
+      const wrapper = mountSelect({ modelValue: ['a'] });
+      await wrapper.setProps({ modelValue: ['a', 'b'] });
+      const chips = wrapper.findAll('span.font-mono').map((s) => s.text());
+      expect(chips).toEqual(['a', 'b']);
+    });
+  });
+
+  describe('comma-separated display when chips are hidden', () => {
+    it('joins the selected labels with commas', () => {
+      const wrapper = mountSelect({ modelValue: ['a', 'b'], showChips: false });
+      expect(wrapper.text()).toContain('Apple, Banana');
+    });
+  });
+
+  describe('plain section options (no select-all, no collection)', () => {
+    const plainSection = [
+      {
+        title: 'Fruits',
+        options: [
+          { value: 'a', label: 'Apple' },
+          { value: 'b', label: 'Banana' },
+        ],
+      },
+    ];
+
+    it('toggles a plain section option on row click', async () => {
+      const wrapper = mountWithDefaults(MultiSelect, {
+        props: { options: [], sections: plainSection, multiple: true, testId: 'ms', modelValue: [] },
+      });
+      await wrapper.get('[data-testid="ms"]').trigger('click');
+      await clickRow(wrapper, 'Apple');
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['a']]);
+    });
+
+    it('shows the empty message for a section with no options', async () => {
+      const wrapper = mountWithDefaults(MultiSelect, {
+        props: {
+          options: [],
+          sections: [{ title: 'Empty', options: [], emptyMessage: 'Nothing here' }],
+          testId: 'ms',
+          modelValue: [],
+        },
+      });
+      await wrapper.get('[data-testid="ms"]').trigger('click');
+      expect(wrapper.text()).toContain('Nothing here');
+    });
+  });
+
+  describe('select-all section preview expansion', () => {
+    const bigSection = [
+      {
+        title: 'Forums',
+        selectAllLabel: 'All forums',
+        options: [
+          { value: 'f1', label: 'F1' },
+          { value: 'f2', label: 'F2' },
+          { value: 'f3', label: 'F3' },
+          { value: 'f4', label: 'F4' },
+        ],
+      },
+    ];
+    const mountBig = () =>
+      mountWithDefaults(MultiSelect, {
+        props: { options: [], sections: bigSection, multiple: true, testId: 'ms', modelValue: [] },
+      });
+
+    it('collapses the preview to the first three values with a "show all" toggle', async () => {
+      const wrapper = mountBig();
+      await wrapper.get('[data-testid="ms"]').trigger('click');
+      const showAll = wrapper.findAll('button').find((b) => b.text().includes('show all'));
+      expect(showAll).toBeTruthy();
+    });
+
+    it('reveals all values and offers "show less" after expanding', async () => {
+      const wrapper = mountBig();
+      await wrapper.get('[data-testid="ms"]').trigger('click');
+      const showAll = wrapper.findAll('button').find((b) => b.text().includes('show all'))!;
+      await showAll.trigger('click');
+      const showLess = wrapper.findAll('button').find((b) => b.text().includes('show less'));
+      expect(showLess).toBeTruthy();
+    });
+
+    it('collapses again when "show less" is clicked', async () => {
+      const wrapper = mountBig();
+      await wrapper.get('[data-testid="ms"]').trigger('click');
+      await wrapper.findAll('button').find((b) => b.text().includes('show all'))!.trigger('click');
+      await wrapper.findAll('button').find((b) => b.text().includes('show less'))!.trigger('click');
+      const showAllAgain = wrapper.findAll('button').find((b) => b.text().includes('show all'));
+      expect(showAllAgain).toBeTruthy();
+    });
+  });
+
+  describe('collection sections', () => {
+    const collectionSection = (channels: string[]) => [
+      {
+        title: 'Collections',
+        isCollectionSection: true,
+        options: [{ value: 'col1', label: 'My Collection', channels }],
+      },
+    ];
+    const mountCollection = (channels: string[], modelValue: string[] = []) =>
+      mountWithDefaults(MultiSelect, {
+        props: {
+          options: [],
+          sections: collectionSection(channels),
+          multiple: true,
+          testId: 'ms',
+          modelValue,
+        },
+      });
+
+    it('selects every channel in the collection on row click', async () => {
+      const wrapper = mountCollection(['x', 'y']);
+      await wrapper.get('[data-testid="ms"]').trigger('click');
+      await clickRow(wrapper, 'My Collection');
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['x', 'y']]);
+    });
+
+    it('deselects every channel when the collection is already fully selected', async () => {
+      const wrapper = mountCollection(['x', 'y'], ['x', 'y']);
+      await wrapper.get('[data-testid="ms"]').trigger('click');
+      const checkbox = wrapper.get('input[aria-label="Select all forums in My Collection"]');
+      expect((checkbox.element as HTMLInputElement).checked).toBe(true);
+      await clickRow(wrapper, 'My Collection');
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([[]]);
+    });
+
+    it('expands a collection with more than three channels and collapses again', async () => {
+      const wrapper = mountCollection(['a', 'b', 'c', 'd']);
+      await wrapper.get('[data-testid="ms"]').trigger('click');
+      const showMore = wrapper.findAll('button').find((b) => b.text().includes('show more'))!;
+      await showMore.trigger('click');
+      const showLess = wrapper.findAll('button').find((b) => b.text().includes('show less'))!;
+      await showLess.trigger('click');
+      const showMoreAgain = wrapper.findAll('button').find((b) => b.text().includes('show more'));
+      expect(showMoreAgain).toBeTruthy();
+    });
   });
 });

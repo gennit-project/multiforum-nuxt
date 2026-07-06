@@ -327,6 +327,14 @@ describe('useCommentCrudMutations', () => {
       const { captured } = runReplyUpdate('parent-1', 'new-1');
       expect(captured.parentCountFields.replyCount(0)).toBe(1);
     });
+
+    it('increments the parent comment ChildCommentsAggregate count', () => {
+      const { captured } = runReplyUpdate('parent-1', 'new-1');
+      expect(captured.parentCountFields.ChildCommentsAggregate({ count: 2 })).toEqual({
+        __typename: 'CommentsAggregate',
+        count: 3,
+      });
+    });
   });
 
   // The created comment is written into the cache for the reply/comment display
@@ -344,6 +352,170 @@ describe('useCommentCrudMutations', () => {
       'isBot',
     ])('includes the %s field', (field) => {
       expect(body).toContain(field);
+    });
+  });
+
+  // Root comments take the `!newCommentParentId` branch of the CREATE update:
+  // they prepend to the DiscussionChannel's Comments list and bump the count.
+  describe('root comment cache update (CREATE_COMMENT)', () => {
+    const runRootUpdate = (onIncrementCommentCount?: (c: unknown) => void) => {
+      useCommentCrudMutations({
+        discussionId: computed(() => 'discussion-123'),
+        commentToDeleteId: ref(''),
+        parentOfCommentToDelete: ref(''),
+        onIncrementCommentCount,
+      });
+
+      const update = (useMutation as any).mock.calls[0][1].update;
+      const captured: { fields?: any } = {};
+      const cache = {
+        modify: vi.fn((opts: any) => {
+          captured.fields = opts.fields;
+        }),
+        identify: (o: any) => `${o.__typename}:${o.id}`,
+      };
+      update(cache, {
+        data: {
+          createComments: {
+            comments: [{ __typename: 'Comment', id: 'root-1', ParentComment: null }],
+          },
+        },
+      });
+      return { captured, cache };
+    };
+
+    it('prepends the new root comment to the Comments list', () => {
+      const { captured } = runRootUpdate();
+      expect(
+        captured.fields.Comments([{ id: 'old' }])
+      ).toEqual([{ __typename: 'Comment', id: 'root-1', ParentComment: null }, { id: 'old' }]);
+    });
+
+    it('increments the CommentsAggregate count', () => {
+      const { captured } = runRootUpdate();
+      expect(captured.fields.CommentsAggregate({ count: 2 })).toEqual({ count: 3 });
+    });
+
+    it('defaults the CommentsAggregate count to 1 when none exists', () => {
+      const { captured } = runRootUpdate();
+      expect(captured.fields.CommentsAggregate(undefined)).toEqual({ count: 1 });
+    });
+
+    it('calls onIncrementCommentCount for root comments', () => {
+      const onIncrementCommentCount = vi.fn();
+      runRootUpdate(onIncrementCommentCount);
+      expect(onIncrementCommentCount).toHaveBeenCalled();
+    });
+
+    it('logs an error when the reply cache update throws', () => {
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+      useCommentCrudMutations({
+        discussionId: computed(() => 'discussion-123'),
+        commentToDeleteId: ref(''),
+        parentOfCommentToDelete: ref(''),
+      });
+      const update = (useMutation as any).mock.calls[0][1].update;
+      const cache = {
+        modify: vi.fn(() => {
+          throw new Error('boom');
+        }),
+        identify: (o: any) => `${o.__typename}:${o.id}`,
+      };
+      update(cache, {
+        data: {
+          createComments: {
+            comments: [
+              { __typename: 'Comment', id: 'reply-1', ParentComment: { id: 'parent-1' } },
+            ],
+          },
+        },
+      });
+      expect(consoleError).toHaveBeenCalledWith('Error updating cache:', expect.any(Error));
+      consoleError.mockRestore();
+    });
+  });
+
+  // The DELETE update evicts the comment, then either filters the parent's
+  // ChildComments (reply) or the DiscussionChannel's Comments (root).
+  describe('delete cache update (DELETE_COMMENT)', () => {
+    const runDeleteUpdate = (opts: {
+      commentToDeleteId: string;
+      parentOfCommentToDelete: string;
+      onDecrementCommentCount?: (c: unknown) => void;
+    }) => {
+      useCommentCrudMutations({
+        discussionId: computed(() => 'discussion-123'),
+        commentToDeleteId: ref(opts.commentToDeleteId),
+        parentOfCommentToDelete: ref(opts.parentOfCommentToDelete),
+        onDecrementCommentCount: opts.onDecrementCommentCount,
+      });
+
+      const update = (useMutation as any).mock.calls[2][1].update;
+      const captured: { fields?: any } = {};
+      const cache = {
+        evict: vi.fn(),
+        gc: vi.fn(),
+        modify: vi.fn((o: any) => {
+          captured.fields = o.fields;
+        }),
+        identify: (o: any) => `${o.__typename}:${o.id}`,
+      };
+      update(cache);
+      return { captured, cache };
+    };
+
+    it('evicts the deleted comment from the cache', () => {
+      const { cache } = runDeleteUpdate({
+        commentToDeleteId: 'c-1',
+        parentOfCommentToDelete: '',
+      });
+      expect(cache.evict).toHaveBeenCalledWith({ id: 'Comment:c-1' });
+    });
+
+    it('filters the deleted reply out of the parent ChildComments', () => {
+      const { captured } = runDeleteUpdate({
+        commentToDeleteId: 'c-1',
+        parentOfCommentToDelete: 'parent-1',
+      });
+      expect(
+        captured.fields.ChildComments([{ id: 'c-1' }, { id: 'c-2' }])
+      ).toEqual([{ id: 'c-2' }]);
+    });
+
+    it('decrements ChildCommentsAggregate but never below zero', () => {
+      const { captured } = runDeleteUpdate({
+        commentToDeleteId: 'c-1',
+        parentOfCommentToDelete: 'parent-1',
+      });
+      expect(captured.fields.ChildCommentsAggregate({ count: 0 })).toEqual({ count: 0 });
+    });
+
+    it('filters the deleted root comment out of the DiscussionChannel Comments', () => {
+      const { captured } = runDeleteUpdate({
+        commentToDeleteId: 'c-1',
+        parentOfCommentToDelete: '',
+      });
+      expect(
+        captured.fields.Comments([{ id: 'c-1' }, { id: 'c-2' }])
+      ).toEqual([{ id: 'c-2' }]);
+    });
+
+    it('decrements the root CommentsAggregate count', () => {
+      const { captured } = runDeleteUpdate({
+        commentToDeleteId: 'c-1',
+        parentOfCommentToDelete: '',
+      });
+      expect(captured.fields.CommentsAggregate({ count: 3 })).toEqual({ count: 2 });
+    });
+
+    it('runs garbage collection and calls onDecrementCommentCount', () => {
+      const onDecrementCommentCount = vi.fn();
+      const { cache } = runDeleteUpdate({
+        commentToDeleteId: 'c-1',
+        parentOfCommentToDelete: '',
+        onDecrementCommentCount,
+      });
+      expect([cache.gc.mock.calls.length, onDecrementCommentCount.mock.calls.length]).toEqual([1, 1]);
     });
   });
 

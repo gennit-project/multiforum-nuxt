@@ -256,5 +256,117 @@ describe('useBestAnswerMutations', () => {
 
       expect(onUnmarked).toHaveBeenCalled();
     });
+
+    it('should not call mutation when discussionId is undefined', async () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const { handleUnmarkAsBestAnswer } = useBestAnswerMutations({
+        commentId: ref('comment1'),
+        forumId: ref('forum1'),
+        discussionId: ref(undefined),
+        originalPoster: ref('testuser'),
+        answers: ref([]),
+      });
+
+      await handleUnmarkAsBestAnswer();
+
+      expect(mockMutate).not.toHaveBeenCalled();
+    });
+
+    it('should log error when unmark mutation fails', async () => {
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      mockMutate.mockRejectedValue(new Error('Mutation failed'));
+
+      const { handleUnmarkAsBestAnswer } = useBestAnswerMutations({
+        commentId: ref('comment1'),
+        forumId: ref('forum1'),
+        discussionId: ref('discussion1'),
+        originalPoster: ref('testuser'),
+        answers: ref([{ id: 'comment1' } as Comment]),
+      });
+
+      await handleUnmarkAsBestAnswer();
+
+      expect(consoleError).toHaveBeenCalledWith(
+        'Error unmarking comment as best answer:',
+        expect.any(Error)
+      );
+
+      consoleError.mockRestore();
+    });
+  });
+
+  // The two mutations share an identical `update` callback that rewrites the
+  // matching DiscussionChannel via a fragment. The mock above ignores the
+  // options object, so these invoke the captured update fn directly against a
+  // fake cache to exercise the writeFragment path.
+  describe('cache update callback', () => {
+    const updatedChannel = { id: 'dc-1', answered: true, Answers: [] };
+    const mutationResult = {
+      data: {
+        updateDiscussionChannels: { discussionChannels: [updatedChannel] },
+      },
+    };
+
+    // callIndex 0 = mark mutation, 1 = unmark mutation
+    const getUpdateFn = (callIndex: number) =>
+      (useMutation as any).mock.calls[callIndex][1].update as (
+        cache: unknown,
+        payload: unknown
+      ) => void;
+
+    const mountAndRunUpdate = (callIndex: number, payload: unknown) => {
+      useBestAnswerMutations({
+        commentId: ref('comment1'),
+        forumId: ref('forum1'),
+        discussionId: ref('discussion1'),
+        originalPoster: ref('testuser'),
+        answers: ref([]),
+      });
+
+      let fieldModifier: (
+        existing: unknown[],
+        helpers: { readField: (f: string, ref: unknown) => unknown }
+      ) => unknown[] = () => [];
+      const cache = {
+        identify: vi.fn((ref: any) => `DiscussionChannel:${ref.__ref}`),
+        writeFragment: vi.fn(),
+        modify: vi.fn((opts: any) => {
+          fieldModifier = opts.fields.discussionChannels;
+        }),
+      };
+      getUpdateFn(callIndex)(cache, payload);
+      return { cache, getFieldModifier: () => fieldModifier };
+    };
+
+    it.each([
+      ['mark', 0],
+      ['unmark', 1],
+    ])('writes the updated channel fragment for the %s mutation', (_label, idx) => {
+      const { cache, getFieldModifier } = mountAndRunUpdate(idx as number, mutationResult);
+      const readField = () => 'dc-1'; // channelId matches updatedChannel.id
+      getFieldModifier()([{ __ref: 'dc-1' }], { readField });
+
+      expect(cache.writeFragment).toHaveBeenCalledWith(
+        expect.objectContaining({ data: updatedChannel })
+      );
+    });
+
+    it('leaves non-matching channels untouched', () => {
+      const { cache, getFieldModifier } = mountAndRunUpdate(0, mutationResult);
+      const readField = () => 'other-channel';
+      const refs = [{ __ref: 'other-channel' }];
+      const result = getFieldModifier()(refs, { readField });
+
+      expect([result, cache.writeFragment.mock.calls.length]).toEqual([refs, 0]);
+    });
+
+    it('does nothing when the mutation returns no discussion channel', () => {
+      const { cache } = mountAndRunUpdate(0, { data: {} });
+
+      expect(cache.modify).not.toHaveBeenCalled();
+    });
   });
 });

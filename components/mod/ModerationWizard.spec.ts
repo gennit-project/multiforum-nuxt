@@ -1,6 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { ref } from 'vue';
 import ModerationWizard from './ModerationWizard.vue';
 
 vi.mock('nuxt/app', () => ({
@@ -13,17 +12,32 @@ vi.mock('nuxt/app', () => ({
   }),
 }));
 
-vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => ({
-    result: ref({
+// A single mutable result object is shared by all five useQuery calls in the
+// component, so tests can flip archived/suspended/download state per case.
+const { mockQueryState } = vi.hoisted(() => ({
+  mockQueryState: {
+    value: {
       discussionChannels: [{ archived: false }],
       eventChannels: [{ archived: false }],
       comments: [{ archived: false }],
       isOriginalPosterSuspended: false,
       discussions: [{ hasDownload: false }],
-    }),
-  }),
+    } as Record<string, unknown>,
+  },
 }));
+
+const setQueryState = (patch: Record<string, unknown>) => {
+  mockQueryState.value = { ...mockQueryState.value, ...patch };
+};
+
+vi.mock('@vue/apollo-composable', async () => {
+  const { computed } = await import('vue');
+  return {
+    useQuery: () => ({
+      result: computed(() => mockQueryState.value),
+    }),
+  };
+});
 
 vi.mock('@/composables/useAuthState', async () => {
   const { ref } = await import('vue');
@@ -31,6 +45,16 @@ vi.mock('@/composables/useAuthState', async () => {
 });
 
 describe('ModerationWizard', () => {
+  beforeEach(() => {
+    mockQueryState.value = {
+      discussionChannels: [{ archived: false }],
+      eventChannels: [{ archived: false }],
+      comments: [{ archived: false }],
+      isOriginalPosterSuspended: false,
+      discussions: [{ hasDownload: false }],
+    };
+  });
+
   const mountWrapper = (propOverrides: Record<string, unknown> = {}) =>
     mount(ModerationWizard, {
       props: {
@@ -184,5 +208,97 @@ describe('ModerationWizard', () => {
     await wrapper.get('[data-testid="edit-modal"]').trigger('click');
 
     expect(wrapper.emitted('archived-successfully')).toBeTruthy();
+  });
+
+  describe('content type resolution', () => {
+    it('treats a discussion flagged as a download as download content', () => {
+      const wrapper = mountWrapper({
+        commentId: undefined,
+        discussionId: 'd1',
+        relatedDiscussionHasDownload: true,
+        canEditDiscussions: true,
+        isSuspendedMod: false,
+      });
+      // editModalTargetType resolves to 'download', so the modal renders with it.
+      expect(wrapper.get('[data-testid="edit-modal"]').exists()).toBe(true);
+    });
+
+    it('renders the edit modal for an event when the user can edit events', () => {
+      const wrapper = mountWrapper({
+        commentId: undefined,
+        eventId: 'e1',
+        canEditEvents: true,
+        isSuspendedMod: false,
+      });
+      expect(wrapper.get('[data-testid="edit-modal"]').exists()).toBe(true);
+    });
+
+    it('renders no edit modal for a wiki-edit issue with no content ids', () => {
+      const wrapper = mountWrapper({
+        commentId: undefined,
+        issue: { id: 'issue-1', isOpen: true, relatedWikiPageId: 'wiki-1' },
+        isSuspendedMod: false,
+      });
+      expect(wrapper.find('[data-testid="edit-modal"]').exists()).toBe(false);
+    });
+  });
+
+  describe('archived content', () => {
+    beforeEach(() => setQueryState({ comments: [{ archived: true }] }));
+
+    it('shows the "already archived" state for archived content', () => {
+      const wrapper = mountWrapper({ isSuspendedMod: false });
+      expect(wrapper.text()).toContain('Archive (Already Archived)');
+    });
+  });
+
+  describe('unauthenticated fallback', () => {
+    it('shows the log-in prompt when RequireAuth renders its no-auth slot', () => {
+      const wrapper = mount(ModerationWizard, {
+        props: {
+          issue: { id: 'issue-1', isOpen: true },
+          commentId: 'comment-1',
+          channelUniqueName: 'cats',
+        },
+        global: {
+          stubs: {
+            RequireAuth: {
+              template:
+                '<div><slot name="has-auth" /><slot name="does-not-have-auth" /></div>',
+            },
+            AdminIcon: true,
+            ScalesIcon: true,
+            PencilIcon: true,
+            CloseIssueAction: true,
+            ArchiveButton: true,
+            SuspendUserButton: true,
+            SuspendModButton: true,
+            EditContentModal: true,
+          },
+        },
+      });
+      expect(wrapper.text()).toContain(
+        'Please log in to access moderation features'
+      );
+    });
+  });
+
+  describe('suspended author', () => {
+    beforeEach(() => setQueryState({ isOriginalPosterSuspended: true }));
+
+    it('offers to unsuspend a suspended mod author', () => {
+      const wrapper = mountWrapper({ authorType: 'mod', isSuspendedMod: false });
+      expect(wrapper.get('[data-testid="suspend-mod-button"]').exists()).toBe(true);
+    });
+
+    it('offers to unsuspend a suspended user author', () => {
+      const wrapper = mountWrapper({ authorType: 'user', isSuspendedMod: false });
+      expect(wrapper.get('[data-testid="suspend-user-button"]').exists()).toBe(true);
+    });
+
+    it('shows the "already suspended" state in the destructive section', () => {
+      const wrapper = mountWrapper({ authorType: 'user', isSuspendedMod: false });
+      expect(wrapper.text()).toContain('Suspend Author (Already Suspended)');
+    });
   });
 });

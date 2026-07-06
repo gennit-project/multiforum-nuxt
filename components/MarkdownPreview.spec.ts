@@ -202,4 +202,49 @@ describe('MarkdownPreview', () => {
       expect(warningModal(wrapper).props('open')).toBe(false);
     });
   });
+
+  describe('image handling', () => {
+    // A markdown image makes the watchEffect walk the extracted URLs, exercising
+    // the updateImageDimensions call path (the client-only Image() load itself is
+    // guarded by import.meta.client and not reachable under vitest).
+    it('processes image URLs extracted from the markdown without throwing', () => {
+      expect(() =>
+        mountPreview({ text: '![alt](https://example.com/pic.png)' })
+      ).not.toThrow();
+    });
+
+    it('ignores a direct image click when the gallery is disabled', () => {
+      const wrapper = mountPreview({ text: 'words', disableGallery: true });
+      const event = { target: { tagName: 'IMG', src: 'x' } } as unknown as MouseEvent;
+      (wrapper.vm as any).handleImageClick(event);
+      // No embedded images and gallery disabled → lightbox stays hidden.
+      expect(wrapper.find('[data-testid="vue-easy-lightbox-stub"]').exists()).toBe(false);
+    });
+
+    it('does not open the lightbox for an image that is not in the gallery', () => {
+      const wrapper = mountPreview({ text: 'words' });
+      const event = {
+        target: { tagName: 'IMG', src: 'https://example.com/missing.png' },
+      } as unknown as MouseEvent;
+      (wrapper.vm as any).handleImageClick(event);
+      expect(wrapper.find('[data-testid="vue-easy-lightbox-stub"]').exists()).toBe(false);
+    });
+
+    it('ignores a container image click that maps to no embedded image', async () => {
+      const wrapper = mountPreview({ text: 'words' });
+      const img = document.createElement('img');
+      img.setAttribute('src', 'https://example.com/unknown.png');
+      wrapper.element.appendChild(img);
+
+      img.click();
+      await wrapper.vm.$nextTick();
+
+      expect(warningModal(wrapper).props('open')).toBe(false);
+    });
+
+    it('hides the lightbox via onHide', () => {
+      const wrapper = mountPreview({ text: 'words' });
+      expect(() => (wrapper.vm as any).onHide()).not.toThrow();
+    });
+  });
 });
