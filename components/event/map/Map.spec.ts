@@ -48,10 +48,18 @@ const h = vi.hoisted(() => ({
   },
 }));
 
+// js-api-loader v2 exposes setOptions()/importLibrary() instead of the old
+// Loader class. setOptions is a no-op here; importLibrary delegates to the
+// global google.maps.importLibrary stub set up in beforeEach so the
+// AdvancedMarkerElement/PinElement mocks (and their instance tracking) are
+// reused for the 'marker' library.
 vi.mock('@googlemaps/js-api-loader', () => ({
-  Loader: vi.fn().mockImplementation(function () {
-    return { load: vi.fn().mockResolvedValue(undefined) };
-  }),
+  setOptions: vi.fn(),
+  importLibrary: vi.fn((name: string) =>
+    globalThis.google?.maps?.importLibrary
+      ? globalThis.google.maps.importLibrary(name)
+      : Promise.resolve({})
+  ),
 }));
 
 vi.mock('@googlemaps/markerclusterer', () => ({
