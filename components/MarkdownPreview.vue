@@ -175,10 +175,12 @@ const handleClick = (event: MouseEvent) => {
   // Handle link clicks
   const link = target.tagName === 'A' ? target : target.closest('a');
   if (link && link instanceof HTMLAnchorElement && link.href) {
-    // Only show warning for external links
+    // Only show warning for external links. Guard against an empty baseUrl:
+    // `''.startsWith` matches every href, which would suppress the warning for
+    // all links whenever VITE_BASE_URL is unset.
     const isExternalLink =
       !link.href.startsWith(window.location.origin) &&
-      !link.href.startsWith(config.baseUrl);
+      (!config.baseUrl || !link.href.startsWith(config.baseUrl));
 
     if (isExternalLink) {
       event.preventDefault();

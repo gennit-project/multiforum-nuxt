@@ -15,6 +15,28 @@ vi.mock('nuxt/app', () => ({
   useRouter: () => createMockRouter(),
 }));
 
+// Force an empty baseUrl to reproduce the environment where VITE_BASE_URL is
+// unset (e.g. CI runs without repo secrets). This guards the external-link
+// warning against the `''.startsWith` bug where an empty baseUrl would
+// otherwise match every href and suppress the warning entirely.
+vi.mock('@/config', () => ({
+  config: {
+    baseUrl: '',
+    environment: 'test',
+    googleCloudStorageBucket: '',
+    googleMapsApiKey: '',
+    googleMapId: '',
+    graphqlUrl: '',
+    lightgalleryLicenseKey: '',
+    logoutUrl: '',
+    openCageApiKey: '',
+    openGraphApiKey: '',
+    serverName: '',
+    serverDisplayName: 'Untitled',
+    enableLanguagePicker: false,
+  },
+}));
+
 vi.mock('vue-easy-lightbox', () => ({
   default: defineComponent({
     name: 'VueEasyLightbox',
