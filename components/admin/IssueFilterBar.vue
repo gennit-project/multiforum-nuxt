@@ -12,28 +12,33 @@ type InvolvementFilterKey =
   | 'filterIAmOP'
   | 'filterIReported';
 
-const props = defineProps<{
-  searchInput: string;
-  selectedChannels: string[];
-  channelLabel: string;
-  startDate: string;
-  endDate: string;
-  showOnlyServerRuleViolations: boolean;
-  selectedSort: IssueSortValue;
-  selectedSortLabel: string;
-  showInvolvementFilters?: boolean;
-  filterCreatedByMe?: boolean;
-  filterIAmOP?: boolean;
-  filterIReported?: boolean;
-  searchPlaceholder?: string;
-  searchTestId?: string;
-}>();
-
-const searchPlaceholder = computed(
-  () => props.searchPlaceholder ?? 'Search issues'
-);
-const searchTestId = computed(
-  () => props.searchTestId ?? 'server-issue-search-input'
+const props = withDefaults(
+  defineProps<{
+    searchInput: string;
+    selectedChannels: string[];
+    channelLabel: string;
+    startDate: string;
+    endDate: string;
+    showOnlyServerRuleViolations: boolean;
+    selectedSort: IssueSortValue;
+    selectedSortLabel: string;
+    showInvolvementFilters?: boolean;
+    filterCreatedByMe?: boolean;
+    filterIAmOP?: boolean;
+    filterIReported?: boolean;
+    searchPlaceholder?: string;
+    searchTestId?: string;
+    showChannelFilter?: boolean;
+    showServerRuleViolationsFilter?: boolean;
+  }>(),
+  {
+    searchPlaceholder: 'Search issues',
+    searchTestId: 'server-issue-search-input',
+    // Channel + server-rule-violations filters show by default (admin scope);
+    // the forum-scoped pages hide them.
+    showChannelFilter: true,
+    showServerRuleViolationsFilter: true,
+  }
 );
 
 const emit = defineEmits<{
@@ -162,6 +167,7 @@ const issueScopeLabel = computed(() =>
         @clicked-item="emit('update:sort', $event)"
       />
       <TextButtonDropdown
+        v-if="showServerRuleViolationsFilter"
         :label="issueScopeLabel"
         :items="issueScopeOptions"
         @clicked-item="
@@ -172,6 +178,7 @@ const issueScopeLabel = computed(() =>
         "
       />
       <FilterChip
+        v-if="showChannelFilter"
         :label="channelLabel"
         :highlighted="selectedChannels.length > 0"
         data-testid="admin-issues-channel-filter"

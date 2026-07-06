@@ -301,6 +301,9 @@ export const GET_ISSUES_BY_CHANNEL = gql`
   }
 `;
 
+// NOTE: The forum-scoped issue lists now render via GET_SITE_WIDE_ISSUE_LIST
+// (scoped to the channel). This query is retained only for the optimistic cache
+// updates in useIssueCloseReopen.ts; no view reads it directly anymore.
 export const GET_CLOSED_ISSUES_BY_CHANNEL = gql`
   query getClosedIssuesByChannel($channelUniqueName: String!, $searchInput: String) {
     channels(where: { uniqueName: $channelUniqueName }) {

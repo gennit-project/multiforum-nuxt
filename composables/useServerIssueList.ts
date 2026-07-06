@@ -28,7 +28,17 @@ export type InvolvementFilterKey =
   | 'filterIAmOP'
   | 'filterIReported';
 
-export function useServerIssueList({ isOpen }: { isOpen: boolean }) {
+export function useServerIssueList({
+  isOpen,
+  scopedToForum = false,
+}: {
+  isOpen: boolean;
+  // When true the list is scoped to the current forum (route.params.forumId):
+  // channel selection is fixed to that forum and the server-rule-violations
+  // filter is dropped (it is a server-admin concept). Used by the forum-scoped
+  // issue pages; the admin pages leave it false.
+  scopedToForum?: boolean;
+}) {
   const route = useRoute();
   const router = useRouter();
   const uiStore = useUIStore();
@@ -59,10 +69,18 @@ export function useServerIssueList({ isOpen }: { isOpen: boolean }) {
 
   const variables = computed(() => ({
     searchInput: searchInput.value,
-    selectedChannels: selectedChannels.value,
+    // In forum scope the channel is fixed to the current forum; otherwise the
+    // channel chip drives a multi-channel filter.
+    selectedChannels: scopedToForum
+      ? [channelId.value]
+      : selectedChannels.value,
     startDate: startDate.value || null,
     endDate: endDate.value || null,
-    showOnlyServerRuleViolations: showOnlyServerRuleViolations.value,
+    // Server-rule-violations filtering is a server-admin concept, so forum scope
+    // always shows every issue in the forum.
+    showOnlyServerRuleViolations: scopedToForum
+      ? false
+      : showOnlyServerRuleViolations.value,
     isOpen,
     // Identity is resolved server-side, so these are only meaningful when the
     // viewer is authenticated; keep them false otherwise to avoid emptying the list.
@@ -80,7 +98,9 @@ export function useServerIssueList({ isOpen }: { isOpen: boolean }) {
     loading: getIssuesLoading,
     refetch,
   } = useQuery(GET_SITE_WIDE_ISSUE_LIST, variables, {
-    fetchPolicy: 'cache-first',
+    // Forum lists refetch on mount so a freshly created issue shows when the
+    // user returns to the list; the admin lists are fine with cache-first.
+    fetchPolicy: scopedToForum ? 'cache-and-network' : 'cache-first',
   });
 
   const issues = computed<SiteWideIssueListItem[]>(() => {
@@ -180,6 +200,17 @@ export function useServerIssueList({ isOpen }: { isOpen: boolean }) {
     }
   );
 
+  // When navigating between forums the previously selected issue no longer
+  // belongs to the current channel, so clear it. Only relevant in forum scope
+  // (the admin channelId is constant, so this never fires there).
+  if (scopedToForum) {
+    watch(channelId, (nextChannelId, previousChannelId) => {
+      if (nextChannelId !== previousChannelId) {
+        uiStore.clearSelectedIssueSelection();
+      }
+    });
+  }
+
   watch([startDate, endDate], ([nextStartDate, nextEndDate]) => {
     if (
       route.query.startDate === nextStartDate &&
@@ -213,6 +244,7 @@ export function useServerIssueList({ isOpen }: { isOpen: boolean }) {
     channelLabel,
     selectedSortLabel,
     issues,
+    loading: getIssuesLoading,
     selectedIssueNumber,
     updateShowOnlyServerRuleViolations,
     updateSearchInput,

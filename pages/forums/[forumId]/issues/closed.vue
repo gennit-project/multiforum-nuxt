@@ -1,98 +1,78 @@
-<script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
-import type { Issue } from '@/__generated__/graphql';
-import { GET_CLOSED_ISSUES_BY_CHANNEL } from '@/graphQLData/issue/queries';
-import { useQuery } from '@vue/apollo-composable';
-import { useRoute, useRouter } from 'nuxt/app';
-import { updateFilters } from '@/utils/routerUtils';
-import { createCaseInsensitivePattern } from '@/utils/searchUtils';
-import SearchBar from '@/components/SearchBar.vue';
+<script setup lang="ts">
 import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
-
-const route = useRoute();
-const router = useRouter();
-
-const channelId = computed(() => {
-  if (typeof route.params.forumId !== 'string') {
-    return '';
-  }
-  return route.params.forumId;
-});
-
-const searchInput = ref(
-  typeof route.query.searchInput === 'string' ? route.query.searchInput : ''
-);
-
-const queryVariables = computed(() => ({
-  channelUniqueName: channelId.value,
-  searchInput: createCaseInsensitivePattern(searchInput.value) || '.*',
-}));
+import IssueFilterBar from '@/components/admin/IssueFilterBar.vue';
+import { useServerIssueList } from '@/composables/useServerIssueList';
 
 const {
-  result: getClosedIssuesByChannelResult,
-  error: getClosedIssuesByChannelError,
-  loading: getClosedIssuesByChannelLoading,
-  refetch: refetchClosedIssues,
-} = useQuery(GET_CLOSED_ISSUES_BY_CHANNEL, queryVariables);
-
-const closedIssues = computed<Issue[]>(() => {
-  if (
-    getClosedIssuesByChannelLoading.value ||
-    getClosedIssuesByChannelError.value
-  ) {
-    return [];
-  }
-  const channelData = getClosedIssuesByChannelResult.value?.channels?.[0];
-
-  if (!channelData || !channelData.Issues) {
-    return [];
-  }
-  return channelData.Issues;
-});
-
-const updateSearchInput = (value: string) => {
-  updateFilters({
-    router,
-    route,
-    params: { searchInput: value },
-  });
-};
-
-watch(
-  () => route.query,
-  () => {
-    searchInput.value =
-      typeof route.query.searchInput === 'string'
-        ? route.query.searchInput
-        : '';
-    refetchClosedIssues(queryVariables.value);
-  }
-);
+  channelId,
+  selectedChannels,
+  searchInput,
+  startDate,
+  endDate,
+  selectedSort,
+  filterCreatedByMe,
+  filterIAmOP,
+  filterIReported,
+  isAuthenticated,
+  channelLabel,
+  selectedSortLabel,
+  issues,
+  loading,
+  selectedIssueNumber,
+  showOnlyServerRuleViolations,
+  updateSearchInput,
+  updateSort,
+  updateInvolvementFilter,
+  toggleSelectedChannel,
+  updateShowOnlyServerRuleViolations,
+  handleSelectIssue,
+} = useServerIssueList({ isOpen: false, scopedToForum: true });
 </script>
 
 <template>
   <div class="border-t border-gray-200 dark:border-gray-800 dark:text-white">
-    <div class="px-4 py-4">
-      <SearchBar
-        :initial-value="searchInput"
-        :search-placeholder="'Search closed issues'"
-        :test-id="'closed-issue-search-input'"
-        :debounce-ms="500"
-        @update-search-input="updateSearchInput"
-      />
-    </div>
+    <IssueFilterBar
+      :search-input="searchInput"
+      :selected-channels="selectedChannels"
+      :channel-label="channelLabel"
+      :start-date="startDate"
+      :end-date="endDate"
+      :show-only-server-rule-violations="showOnlyServerRuleViolations"
+      :selected-sort="selectedSort"
+      :selected-sort-label="selectedSortLabel"
+      :show-involvement-filters="isAuthenticated"
+      :filter-created-by-me="filterCreatedByMe"
+      :filter-i-am-o-p="filterIAmOP"
+      :filter-i-reported="filterIReported"
+      :search-placeholder="'Search closed issues'"
+      :search-test-id="'closed-issue-search-input'"
+      :show-channel-filter="false"
+      :show-server-rule-violations-filter="false"
+      @update-search-input="updateSearchInput"
+      @toggle-selected-channel="toggleSelectedChannel"
+      @update:sort="updateSort"
+      @update:start-date="startDate = $event"
+      @update:end-date="endDate = $event"
+      @update:show-only-server-rule-violations="
+        updateShowOnlyServerRuleViolations
+      "
+      @update:involvement-filter="updateInvolvementFilter"
+    />
     <div
-      v-if="!getClosedIssuesByChannelLoading && closedIssues.length === 0"
+      v-if="!loading && issues.length === 0"
       class="px-4 py-6 text-sm text-gray-600 dark:text-gray-300"
     >
       There are no closed issues.
     </div>
     <ul class="divide-y" data-testid="issue-list">
       <ModIssueListItem
-        v-for="issue in closedIssues"
+        v-for="issue in issues"
         :key="issue.id"
         :issue="issue"
         :channel-id="channelId"
+        :is-selectable="true"
+        :selected-issue-number="selectedIssueNumber ?? undefined"
+        @select="handleSelectIssue"
       />
     </ul>
   </div>

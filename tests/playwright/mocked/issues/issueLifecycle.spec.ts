@@ -25,6 +25,18 @@ const issuesRow = () => ({
   },
 });
 
+// The forum open/closed list pages render via getSiteWideIssueList scoped to
+// the channel.
+const siteWideIssues = () => ({
+  data: {
+    getSiteWideIssueList: {
+      __typename: 'SiteWideIssueListFormat',
+      aggregateIssueCount: 0,
+      issues: [],
+    },
+  },
+});
+
 test.describe('Forum issue lifecycle', () => {
   test('issue create page renders the create-issue form', async ({
     context,
@@ -56,7 +68,7 @@ test.describe('Forum issue lifecycle', () => {
     await installMockAuth(context, page, { username: TEST_USER, email: 'alice@example.com' });
     const diagnostics = await installGraphqlMocks(page, {
       ...base(),
-      getIssuesByChannel: issuesRow,
+      getSiteWideIssueList: siteWideIssues,
     });
 
     try {
@@ -77,7 +89,7 @@ test.describe('Forum issue lifecycle', () => {
     await installMockAuth(context, page, { username: TEST_USER, email: 'alice@example.com' });
     const diagnostics = await installGraphqlMocks(page, {
       ...base(),
-      getClosedIssuesByChannel: issuesRow,
+      getSiteWideIssueList: siteWideIssues,
     });
 
     try {
