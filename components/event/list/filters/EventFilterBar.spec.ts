@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createMockRoute, createMockRouter } from '@/tests/utils/mockRouter';
 
+import { MilesOrKm } from '@/components/event/list/filters/eventSearchOptions';
+
 import EventFilterBar from '@/components/event/list/filters/EventFilterBar.vue';
 
 const route = createMockRoute({ name: 'EventList' });
@@ -177,5 +179,67 @@ describe('EventFilterBar filter handlers', () => {
       }
     );
     expect(router.replace).toHaveBeenCalled();
+  });
+
+  it('clears showOnlyFreeEvents when the free filter is disabled', async () => {
+    const wrapper = mountOpen();
+    await wrapper
+      .findComponent({ name: 'SelectFree' })
+      .vm.$emit('update-show-only-free', false);
+    expect(router.replace).toHaveBeenCalled();
+  });
+});
+
+describe('EventFilterBar computeds', () => {
+  beforeEach(() => {
+    route.params = {};
+    route.query = {};
+    route.name = 'EventList';
+  });
+
+  it('links to the channel-scoped create page when inside a forum', () => {
+    route.params = { forumId: 'cats' };
+    expect((mountBar().vm as unknown as { createEventLink: string }).createEventLink).toBe(
+      '/forums/cats/events/create'
+    );
+  });
+
+  it('links to the global create page outside a forum', () => {
+    expect((mountBar().vm as unknown as { createEventLink: string }).createEventLink).toBe(
+      '/events/create'
+    );
+  });
+
+  it('flags in-person-only on a map-search route', () => {
+    route.name = 'events-map-search';
+    expect(
+      (mountBar().vm as unknown as { showInPersonOnly: boolean | undefined }).showInPersonOnly
+    ).toBe(true);
+  });
+
+  it('honors external filter visibility when provided', () => {
+    expect(
+      (
+        mountBar({ externalShowMainFilters: true }).vm as unknown as {
+          showMainFilters: boolean;
+        }
+      ).showMainFilters
+    ).toBe(true);
+  });
+
+  it('labels the distance as "Any distance" when the radius is zero', () => {
+    route.query = { radius: 0 };
+    expect((mountBar().vm as unknown as { radiusLabel: string }).radiusLabel).toBe(
+      'Any distance'
+    );
+  });
+
+  it('labels the radius in kilometers when the km unit is selected', async () => {
+    route.query = { radius: 80 };
+    const wrapper = mountBar();
+    (wrapper.vm as unknown as { selectedDistanceUnit: string }).selectedDistanceUnit =
+      MilesOrKm.KM;
+    await wrapper.vm.$nextTick();
+    expect((wrapper.vm as unknown as { radiusLabel: string }).radiusLabel).toContain('km');
   });
 });
