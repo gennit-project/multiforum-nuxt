@@ -95,7 +95,7 @@
     "vuetify": "3.7.19"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "5.0.7",
+    "@graphql-codegen/cli": "7.2.0",
     "@graphql-codegen/client-preset": "^4.7.0",
     "@nuxt/eslint-config": "^1.16.0",
     "@nuxt/image": "^1.10.0",
