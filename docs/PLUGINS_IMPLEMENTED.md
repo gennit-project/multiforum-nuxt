@@ -28,6 +28,12 @@ Plugins execute in response to events at two scopes:
 **Channel-Scoped Events** (configured by channel admin):
 - `discussionChannel.created` - When a discussion with download is submitted to a channel
 
+> **Note:** the download-create flow did not actually fire the
+> `downloadableFile.created` trigger until the backend fix in
+> [multiforum-backend#152](https://github.com/gennit-project/multiforum-backend/pull/152)
+> (the event and pipeline config existed, but uploads never invoked download
+> plugins). `discussionChannel.created` was wired up already.
+
 Plugins run in configurable pipelines with ordering, conditions, and error handling.
 
 ---
