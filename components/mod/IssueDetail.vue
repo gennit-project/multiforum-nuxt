@@ -254,7 +254,6 @@ const isSuspendedMod = computed(() => {
 const { closeIssue, closeIssueLoading, reopenIssue, reopenIssueLoading } =
   useIssueCloseReopen({
     activeIssueId,
-    activeIssue,
     channelId,
   });
 

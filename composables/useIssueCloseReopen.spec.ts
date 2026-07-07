@@ -1,13 +1,14 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import type { Issue } from '@/__generated__/graphql';
-import { makeIssue } from '@/tests/utils/factories';
 import { useIssueCloseReopen } from './useIssueCloseReopen';
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: vi.fn(),
 }));
+
+const mockedUseMutation = () =>
+  useMutation as unknown as ReturnType<typeof vi.fn>;
 
 describe('useIssueCloseReopen', () => {
   const closeIssue = vi.fn();
@@ -15,7 +16,7 @@ describe('useIssueCloseReopen', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useMutation as unknown as ReturnType<typeof vi.fn>)
+    mockedUseMutation()
       .mockReturnValueOnce({
         mutate: closeIssue,
         loading: ref(false),
@@ -29,15 +30,13 @@ describe('useIssueCloseReopen', () => {
   it('returns close and reopen mutation handlers', () => {
     const issueActions = useIssueCloseReopen({
       activeIssueId: ref('issue-1'),
-      activeIssue: ref<Issue | null>(makeIssue({ id: 'issue-1', issueNumber: 1 })),
       channelId: ref('general'),
     });
 
     expect({
       closeIssue: issueActions.closeIssue,
       reopenIssue: issueActions.reopenIssue,
-      mutationCalls: (useMutation as unknown as ReturnType<typeof vi.fn>).mock
-        .calls.length,
+      mutationCalls: mockedUseMutation().mock.calls.length,
     }).toEqual({
       closeIssue,
       reopenIssue,
@@ -45,41 +44,19 @@ describe('useIssueCloseReopen', () => {
     });
   });
 
-  it('close updater moves the issue from open to closed cache data', () => {
-    const activeIssue = makeIssue({
-      id: 'issue-1',
-      issueNumber: 1,
-      body: 'Issue body',
-    });
+  it('close updater flips isOpen and adjusts the open/closed counts', () => {
     useIssueCloseReopen({
       activeIssueId: ref('issue-1'),
-      activeIssue: ref<Issue | null>(activeIssue),
       channelId: ref('general'),
     });
-    const closeOptionsFactory = (useMutation as unknown as ReturnType<typeof vi.fn>)
-      .mock.calls[0]![1];
-    const closeOptions = closeOptionsFactory();
+    const closeOptions = mockedUseMutation().mock.calls[0]![1]();
     const cache = {
       identify: vi.fn(() => 'Issue:issue-1'),
       modify: vi.fn(),
       readQuery: vi
         .fn()
         .mockReturnValueOnce({ issuesAggregate: { count: 3 } })
-        .mockReturnValueOnce({ issuesAggregate: { count: 7 } })
-        .mockReturnValueOnce({
-          channels: [
-            {
-              uniqueName: 'general',
-              Issues: [
-                activeIssue,
-                { id: 'issue-2', issueNumber: 2 },
-              ],
-            },
-          ],
-        })
-        .mockReturnValueOnce({
-          channels: [{ uniqueName: 'general', Issues: [] }],
-        }),
+        .mockReturnValueOnce({ issuesAggregate: { count: 7 } }),
       writeQuery: vi.fn(),
     };
 
@@ -87,67 +64,31 @@ describe('useIssueCloseReopen', () => {
 
     expect({
       modifiedId: cache.modify.mock.calls[0]![0].id,
+      isOpenAfter: cache.modify.mock.calls[0]![0].fields.isOpen(),
       writeData: cache.writeQuery.mock.calls.map((call) => call[0].data),
     }).toEqual({
       modifiedId: 'Issue:issue-1',
+      isOpenAfter: false,
       writeData: [
         { issuesAggregate: { count: 4 } },
         { issuesAggregate: { count: 6 } },
-        {
-          channels: [
-            {
-              uniqueName: 'general',
-              Issues: [{ id: 'issue-2', issueNumber: 2 }],
-            },
-          ],
-        },
-        {
-          channels: [
-            {
-              uniqueName: 'general',
-              Issues: [activeIssue],
-            },
-          ],
-        },
       ],
     });
   });
 
-  it('reopen updater moves the issue from closed to open cache data', () => {
-    const activeIssue = makeIssue({
-      id: 'issue-1',
-      issueNumber: 1,
-      body: 'Issue body',
-    });
+  it('reopen updater flips isOpen and adjusts the open/closed counts', () => {
     useIssueCloseReopen({
       activeIssueId: ref('issue-1'),
-      activeIssue: ref<Issue | null>(activeIssue),
       channelId: ref('general'),
     });
-    const reopenOptionsFactory = (useMutation as unknown as ReturnType<typeof vi.fn>)
-      .mock.calls[1]![1];
-    const reopenOptions = reopenOptionsFactory();
+    const reopenOptions = mockedUseMutation().mock.calls[1]![1]();
     const cache = {
       identify: vi.fn(() => 'Issue:issue-1'),
       modify: vi.fn(),
       readQuery: vi
         .fn()
         .mockReturnValueOnce({ issuesAggregate: { count: 3 } })
-        .mockReturnValueOnce({ issuesAggregate: { count: 7 } })
-        .mockReturnValueOnce({
-          channels: [
-            {
-              uniqueName: 'general',
-              Issues: [
-                activeIssue,
-                { id: 'issue-2', issueNumber: 2 },
-              ],
-            },
-          ],
-        })
-        .mockReturnValueOnce({
-          channels: [{ uniqueName: 'general', Issues: [] }],
-        }),
+        .mockReturnValueOnce({ issuesAggregate: { count: 7 } }),
       writeQuery: vi.fn(),
     };
 
@@ -155,28 +96,14 @@ describe('useIssueCloseReopen', () => {
 
     expect({
       modifiedId: cache.modify.mock.calls[0]![0].id,
+      isOpenAfter: cache.modify.mock.calls[0]![0].fields.isOpen(),
       writeData: cache.writeQuery.mock.calls.map((call) => call[0].data),
     }).toEqual({
       modifiedId: 'Issue:issue-1',
+      isOpenAfter: true,
       writeData: [
         { issuesAggregate: { count: 2 } },
         { issuesAggregate: { count: 8 } },
-        {
-          channels: [
-            {
-              uniqueName: 'general',
-              Issues: [{ id: 'issue-2', issueNumber: 2 }],
-            },
-          ],
-        },
-        {
-          channels: [
-            {
-              uniqueName: 'general',
-              Issues: [activeIssue],
-            },
-          ],
-        },
       ],
     });
   });
