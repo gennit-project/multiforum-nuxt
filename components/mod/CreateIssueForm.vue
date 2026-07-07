@@ -9,12 +9,10 @@ import GenericButton from '@/components/GenericButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import type {
-  Channel,
   IssueAggregateSelection,
   IssueCreateInput,
 } from '@/__generated__/graphql';
 import { CREATE_ISSUE } from '@/graphQLData/issue/mutations';
-import { GET_ISSUES_BY_CHANNEL } from '@/graphQLData/issue/queries';
 import {
   COUNT_OPEN_ISSUES,
   SERVER_SCOPED_ISSUE_COUNT,
@@ -119,39 +117,6 @@ const {
     if (!createdIssue) return;
 
     if (selectedChannelId.value) {
-      try {
-        const existingIssuesByChannel = cache.readQuery<{
-          channels: Channel[];
-        }>({
-          query: GET_ISSUES_BY_CHANNEL,
-          variables: {
-            channelUniqueName: selectedChannelId.value,
-            searchInput: '',
-          },
-        });
-
-        if (existingIssuesByChannel?.channels?.[0]) {
-          const existingChannel = existingIssuesByChannel.channels[0];
-          const updatedChannel = {
-            ...existingChannel,
-            Issues: [createdIssue, ...(existingChannel.Issues || [])],
-          };
-
-          cache.writeQuery({
-            query: GET_ISSUES_BY_CHANNEL,
-            variables: {
-              channelUniqueName: selectedChannelId.value,
-              searchInput: '',
-            },
-            data: {
-              channels: [updatedChannel],
-            },
-          });
-        }
-      } catch {
-        // Cache might not have this query yet; ignore.
-      }
-
       try {
         const openCount = cache.readQuery<{
           issuesAggregate: IssueAggregateSelection;

@@ -1,34 +1,27 @@
 import { useMutation } from '@vue/apollo-composable';
 import type { Ref, ComputedRef } from 'vue';
-import {
-  GET_CLOSED_ISSUES_BY_CHANNEL,
-  GET_ISSUES_BY_CHANNEL,
-} from '@/graphQLData/issue/queries';
 import { CLOSE_ISSUE, REOPEN_ISSUE } from '@/graphQLData/issue/mutations';
 import {
   COUNT_CLOSED_ISSUES,
   COUNT_OPEN_ISSUES,
 } from '@/graphQLData/mod/queries';
-import type { Issue } from '@/__generated__/graphql';
 
 // Cache query result types
 interface IssuesAggregateData {
   issuesAggregate?: { count: number };
 }
 
-interface ChannelIssuesData {
-  channels?: Array<{ Issues: Issue[]; [key: string]: unknown }>;
-}
-
 type UseIssueCloseReopenParams = {
   activeIssueId: Ref<string> | ComputedRef<string>;
-  activeIssue: Ref<Issue | null> | ComputedRef<Issue | null>;
   channelId: Ref<string> | ComputedRef<string>;
 };
 
+// The open/closed issue lists render via getSiteWideIssueList with a
+// cache-and-network policy, so closing or reopening only needs to flip the
+// issue entity's isOpen field and adjust the open/closed count badges; the
+// lists refresh on their own when next viewed.
 export function useIssueCloseReopen({
   activeIssueId,
-  activeIssue,
   channelId,
 }: UseIssueCloseReopenParams) {
   const { mutate: closeIssue, loading: closeIssueLoading } = useMutation(
@@ -93,58 +86,6 @@ export function useIssueCloseReopen({
             variables: { channelUniqueName: channelId.value },
             data: {
               issuesAggregate: newOpenIssues,
-            },
-          });
-        }
-
-        // Also update the result of GET_ISSUES_BY_CHANNEL
-        // to remove this issue from the list of open issues
-        const existingIssuesByChannelData = cache.readQuery({
-          query: GET_ISSUES_BY_CHANNEL,
-          variables: { channelUniqueName: channelId.value, searchInput: '' },
-        }) as ChannelIssuesData | null;
-
-        if (existingIssuesByChannelData?.channels?.[0]) {
-          const existingIssuesByChannel = existingIssuesByChannelData.channels[0];
-          const newIssuesByChannel = {
-            ...existingIssuesByChannel,
-            Issues: existingIssuesByChannel.Issues.filter(
-              (issue: Issue) => issue.id !== activeIssueId.value
-            ),
-          };
-
-          cache.writeQuery({
-            query: GET_ISSUES_BY_CHANNEL,
-            variables: { channelUniqueName: channelId.value, searchInput: '' },
-            data: {
-              channels: [newIssuesByChannel],
-            },
-          });
-        }
-
-        // Also update the result of GET_CLOSED_ISSUES_BY_CHANNEL
-        // to add this issue to the list of closed issues
-        const existingClosedIssuesByChannelData = cache.readQuery({
-          query: GET_CLOSED_ISSUES_BY_CHANNEL,
-          variables: { channelUniqueName: channelId.value },
-        }) as ChannelIssuesData | null;
-
-        if (existingClosedIssuesByChannelData?.channels) {
-          const existingClosedIssuesByChannel =
-            existingClosedIssuesByChannelData.channels[0];
-          const newClosedIssuesByChannel = {
-            ...existingClosedIssuesByChannel,
-            Issues: [
-              ...(existingClosedIssuesByChannel?.Issues || []),
-              activeIssue.value,
-            ],
-          };
-
-          cache.writeQuery({
-            query: GET_CLOSED_ISSUES_BY_CHANNEL,
-            variables: { channelUniqueName: channelId.value },
-            data: {
-              channels: [newClosedIssuesByChannel],
             },
           });
         }
@@ -213,56 +154,6 @@ export function useIssueCloseReopen({
             variables: { channelUniqueName: channelId.value },
             data: {
               issuesAggregate: newOpenIssues,
-            },
-          });
-        }
-
-        // Also update the result of GET_CLOSED_ISSUES_BY_CHANNEL
-        // so that the newly reopened issue is removed from the list
-        // of closed issues.
-        const existingClosedIssuesByChannelData = cache.readQuery({
-          query: GET_CLOSED_ISSUES_BY_CHANNEL,
-          variables: { channelUniqueName: channelId.value },
-        }) as ChannelIssuesData | null;
-
-        if (existingClosedIssuesByChannelData?.channels) {
-          const existingClosedIssuesByChannel =
-            existingClosedIssuesByChannelData.channels[0];
-          const newClosedIssuesByChannel = {
-            ...existingClosedIssuesByChannel,
-            Issues: (existingClosedIssuesByChannel?.Issues || []).filter(
-              (issue: Issue) => issue.id !== activeIssueId.value
-            ),
-          };
-
-          cache.writeQuery({
-            query: GET_CLOSED_ISSUES_BY_CHANNEL,
-            variables: { channelUniqueName: channelId.value },
-            data: {
-              channels: [newClosedIssuesByChannel],
-            },
-          });
-        }
-
-        // Also update the result of GET_ISSUES_BY_CHANNEL
-        // to add this issue to the list of open issues
-        const existingIssuesByChannelData = cache.readQuery({
-          query: GET_ISSUES_BY_CHANNEL,
-          variables: { channelUniqueName: channelId.value, searchInput: '' },
-        }) as ChannelIssuesData | null;
-
-        if (existingIssuesByChannelData?.channels?.[0]) {
-          const existingIssuesByChannel = existingIssuesByChannelData.channels[0];
-          const newIssuesByChannel = {
-            ...existingIssuesByChannel,
-            Issues: [...existingIssuesByChannel.Issues, activeIssue.value],
-          };
-
-          cache.writeQuery({
-            query: GET_ISSUES_BY_CHANNEL,
-            variables: { channelUniqueName: channelId.value, searchInput: '' },
-            data: {
-              channels: [newIssuesByChannel],
             },
           });
         }
