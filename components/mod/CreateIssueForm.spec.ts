@@ -231,7 +231,7 @@ describe('CreateIssueForm cache update', () => {
     writeQuery: vi.fn(),
   });
 
-  it('prepends the new issue and bumps counts for a channel issue', () => {
+  it('bumps the open and server counts for a channel issue', () => {
     mountForm({ defaultChannelId: 'cats' });
     const cache = makeCache();
 
