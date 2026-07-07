@@ -2509,24 +2509,17 @@ These steps verify the auto-moderation bot plugin that analyzes content for rule
 
 ### Automated Verification
 
-Run these from `/Users/catherineluse/gennit/gennit-nuxt/multiforum-plugins`:
+Each plugin now lives in its own repository (the old in-repo
+`multiforum-plugins/plugins/<id>/` layout was removed). Clone the plugin's repo
+and build it per its own README:
 
 ```bash
-cd plugins/auto-moderation-bot
-npm run build
+git clone https://github.com/gennit-project/multiforum-plugin-auto-moderation-bot
+cd multiforum-plugin-auto-moderation-bot
+npm install && npm run ci   # validates plugin.json, runs tests, builds, bundles
 ```
 
 Expected outcome:
 
 - TypeScript compilation succeeds with no errors
-- `dist/index.js` is generated
-
-Run the full build from the plugins root:
-
-```bash
-npm run build:plugin -- --plugin auto-moderation-bot
-```
-
-Expected outcome:
-
-- Plugin builds successfully via the root build script
+- `dist/index.js` is generated and a release bundle is produced under `out/`

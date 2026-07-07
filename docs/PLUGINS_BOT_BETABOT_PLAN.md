@@ -147,23 +147,22 @@ This document tracks the end-to-end work to add `/bot/<name>` mentions, forum-sc
 
 ## Phase 5.5 — Demo Plugins (Multiforum Plugins Repo)
 
-### Plugins repo (multiforum-plugins)
+### Standalone plugin repos
+
+Each plugin lives in its own GitHub repo (the `multiforum-plugins` repo is now
+just the registry-source index + generator).
 
 - [x] **Generic ChatGPT Bot Profiles**
   - `id: chatgpt-bot-profiles`
   - Configurable profile array + default profile
   - Uses `/bot/<name>` with profile selection
-  - Files:
-    - `multiforum-plugins/plugins/chatgpt-bot-profiles/plugin.json`
-    - `multiforum-plugins/plugins/chatgpt-bot-profiles/index.ts`
+  - Repo `github.com/gennit-project/multiforum-plugin-chatgpt-bot-profiles`: `plugin.json`, `index.ts`
 
 - [x] **Creative Writing Beta Reader**
   - `id: beta-reader-bot`
   - Ships with 4 default prompts
   - Same bot reply flow, tuned to writing feedback
-  - Files:
-    - `multiforum-plugins/plugins/beta-reader-bot/plugin.json`
-    - `multiforum-plugins/plugins/beta-reader-bot/index.ts`
+  - Repo `github.com/gennit-project/multiforum-plugin-beta-reader-bot`: `plugin.json`, `index.ts`
 
 ---
 
