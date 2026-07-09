@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, h, ref } from 'vue';
 import EventCommentsWrapper from './EventCommentsWrapper.vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
+import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 
 const mutateSpies = [vi.fn(), vi.fn(), vi.fn(), vi.fn()];
 const onDoneCallbacks: Array<(() => void) | undefined> = [];
@@ -309,5 +310,104 @@ describe('EventCommentsWrapper', () => {
     });
 
     expect(commentSection(wrapper).exists()).toBe(true);
+  });
+
+  // Run an update callback through a cache whose modify() executes the field
+  // policies, so the SubscribedToNotifications field bodies are covered too.
+  const runUpdate = (callIndex: number, resultData: unknown) => {
+    const cache = fakeCache();
+    (useMutation as unknown as ReturnType<typeof vi.fn>).mock.calls[callIndex]![1]!.update(
+      cache,
+      { data: resultData }
+    );
+    return cache;
+  };
+
+  it('writes the subscriber list on comment unsubscribe', () => {
+    buildWrapper([], { SubscribedToNotifications: [{ username: 'alice' }] });
+    const cache = runUpdate(1, {
+      unsubscribeFromEvent: { SubscribedToNotifications: [] },
+    });
+    expect(cache.modify).toHaveBeenCalledTimes(1);
+  });
+
+  it('writes the update-subscriber list on event-updates subscribe', () => {
+    buildWrapper();
+    const cache = runUpdate(2, {
+      subscribeToEventUpdates: { SubscribedToEventUpdates: [{ username: 'alice' }] },
+    });
+    expect(cache.modify).toHaveBeenCalledTimes(1);
+  });
+
+  it('writes the update-subscriber list on event-updates unsubscribe', () => {
+    buildWrapper([{ username: 'alice' }]);
+    const cache = runUpdate(3, {
+      unsubscribeFromEventUpdates: { SubscribedToEventUpdates: [] },
+    });
+    expect(cache.modify).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows the comment-notifications-off notice after unsubscribing completes', async () => {
+    const wrapper = buildWrapper([], {
+      SubscribedToNotifications: [{ username: 'alice' }],
+    });
+    onDoneCallbacks[1]?.();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.get('[data-testid="notification"]').attributes('data-show')).toBe(
+      'true'
+    );
+  });
+
+  it('shows a notice after unsubscribing from event updates completes', async () => {
+    const wrapper = buildWrapper([{ username: 'alice' }]);
+    onDoneCallbacks[3]?.();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.get('[data-testid="notification"]').attributes('data-show')).toBe(
+      'true'
+    );
+  });
+
+  it('does not decrement when the event has no id', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const wrapper = buildWrapper([], { id: undefined });
+    const cache = fakeCache();
+    await commentSection(wrapper).vm.$emit('decrement-comment-count', cache);
+    errorSpy.mockRestore();
+    expect(cache.modify).not.toHaveBeenCalled();
+  });
+
+  it('does not toggle comment subscription without an event id', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const wrapper = buildWrapper([], { id: undefined });
+    await wrapper.get('[data-testid="toggle-comments"]').trigger('click');
+    errorSpy.mockRestore();
+    expect(mutateSpies[0]).not.toHaveBeenCalled();
+  });
+
+  it('does not toggle update subscription without an event id', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const wrapper = buildWrapper([], { id: undefined });
+    await wrapper.get('[data-testid="toggle-updates"]').trigger('click');
+    errorSpy.mockRestore();
+    expect(mutateSpies[2]).not.toHaveBeenCalled();
+  });
+
+  it('re-emits loadMore from the comment section', async () => {
+    const wrapper = buildWrapper();
+    await commentSection(wrapper).vm.$emit('load-more');
+    expect(wrapper.emitted('loadMore')).toBeTruthy();
+  });
+
+  it('wires an auto-unsubscribe handler that calls the unsubscribe mutation', async () => {
+    buildWrapper();
+    const params = (useAutoUnsubscribe as unknown as ReturnType<typeof vi.fn>).mock
+      .calls[0]![0] as { unsubscribeFn: (id: string) => Promise<void> };
+    await params.unsubscribeFn('event-1');
+    expect(mutateSpies[1]).toHaveBeenCalledWith({ eventId: 'event-1' });
+  });
+
+  it('treats an event with no subscriber list as not subscribed', () => {
+    const wrapper = buildWrapper([], { SubscribedToNotifications: null });
+    expect(wrapper.get('[data-testid="watch-comments"]').text()).toBe('false');
   });
 });
