@@ -3,14 +3,8 @@ import { shallowMount } from '@vue/test-utils';
 import IndexPage from './index.vue';
 import ServerIssueList from '@/components/mod/ServerIssueList.vue';
 
-// The behavior lives in ServerIssueList (see ServerIssueList.spec.ts); this
-// page is a thin wrapper that renders it in the open-issue configuration.
-describe('admin server issues index page', () => {
-  it('renders the shared issue list', () => {
-    const wrapper = shallowMount(IndexPage);
-    expect(wrapper.findComponent(ServerIssueList).exists()).toBe(true);
-  });
-
+// Public transparency list; behavior lives in ServerIssueList.spec.ts.
+describe('public server issues index page', () => {
   it('renders the list in the open configuration', () => {
     const wrapper = shallowMount(IndexPage);
     expect(wrapper.findComponent(ServerIssueList).props('isOpen')).toBe(true);

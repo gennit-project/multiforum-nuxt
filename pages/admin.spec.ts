@@ -4,6 +4,7 @@ import { ref, defineComponent, h } from 'vue';
 import { setActivePinia, createPinia } from 'pinia';
 import { useQuery } from '@vue/apollo-composable';
 import ServerTabs from '@/components/admin/ServerTabs.vue';
+import ServerIssueSplitView from '@/components/mod/ServerIssueSplitView.vue';
 
 const routeRef: { name: string } = { name: 'admin-issues' };
 
@@ -30,7 +31,20 @@ const mountWith = async (result: unknown) => {
   });
   const Page = (await import('./admin.vue')).default;
   return shallowMount(Page, {
-    global: { stubs: { NuxtLayout: NuxtLayoutStub, NuxtPage: true } },
+    global: {
+      stubs: {
+        NuxtLayout: NuxtLayoutStub,
+        NuxtPage: true,
+        // Render the split view's slot so ServerTabs is reachable, while
+        // keeping its own detail-pane internals stubbed (covered in
+        // ServerIssueSplitView.spec.ts).
+        ServerIssueSplitView: {
+          name: 'ServerIssueSplitView',
+          props: ['showDetailPane'],
+          template: '<div><slot /></div>',
+        },
+      },
+    },
   });
 };
 
@@ -50,14 +64,18 @@ describe('admin layout page', () => {
     expect(wrapper.text()).toContain('Server not found');
   });
 
-  it('shows the issue detail pane on the issues route', async () => {
+  it('enables the issue detail pane on the issues route', async () => {
     const wrapper = await mountWith({ serverConfigs: [{ id: 's1' }] });
-    expect(wrapper.text()).toContain('Select an issue to view details.');
+    expect(
+      wrapper.findComponent(ServerIssueSplitView).props('showDetailPane')
+    ).toBe(true);
   });
 
-  it('hides the issue detail pane on other admin routes', async () => {
+  it('disables the issue detail pane on other admin routes', async () => {
     routeRef.name = 'admin-roles';
     const wrapper = await mountWith({ serverConfigs: [{ id: 's1' }] });
-    expect(wrapper.text()).not.toContain('Select an issue to view details.');
+    expect(
+      wrapper.findComponent(ServerIssueSplitView).props('showDetailPane')
+    ).toBe(false);
   });
 });

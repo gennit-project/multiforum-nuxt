@@ -13,6 +13,10 @@ const links = [
     to: '/about',
   },
   {
+    text: 'Moderation Issues',
+    to: '/server/issues',
+  },
+  {
     text: 'Report a Bug',
     to: '/support',
   },
