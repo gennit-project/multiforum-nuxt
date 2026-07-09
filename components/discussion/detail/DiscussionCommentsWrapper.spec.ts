@@ -9,6 +9,7 @@ import {
 import type { Comment, DiscussionChannel } from '@/__generated__/graphql';
 
 import { useQuery, useMutation } from '@vue/apollo-composable';
+import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 
 import DiscussionCommentsWrapper from '@/components/discussion/detail/DiscussionCommentsWrapper.vue';
 
@@ -36,12 +37,33 @@ const SubscribeButtonStub = {
   template: '<button class="subscribe-stub" @click="$emit(\'toggle\')" />',
 };
 
+const NotificationStub = {
+  name: 'Notification',
+  props: ['show', 'title'],
+  emits: ['close-notification'],
+  template:
+    '<div class="notification-stub" :data-show="String(show)" :data-title="title" />',
+};
+
 const stubs = {
   CommentSection: CommentSectionStub,
   SubscribeButton: SubscribeButtonStub,
   InlineCommentForm: { template: '<div />' },
   DiscussionRootCommentFormWrapper: { template: '<div />' },
-  Notification: { template: '<div />' },
+  Notification: NotificationStub,
+};
+
+// Pull the options object (with the `update` cache callback) the component passed
+// to useMutation for a given operation, matched on its gql source body.
+const mutationOptions = (op: string) => {
+  const call = asMock(useMutation).mock.calls.find((c) =>
+    String(
+      (c[0] as { loc?: { source?: { body?: string } } })?.loc?.source?.body ?? ''
+    ).includes(op)
+  );
+  return call?.[1] as
+    | { update?: (cache: unknown, result: unknown) => void }
+    | undefined;
 };
 
 const makeComment = (id: string): Comment =>
@@ -244,5 +266,139 @@ describe('DiscussionCommentsWrapper — comment-section cache handlers', () => {
     });
 
     expect(commentSection(wrapper).exists()).toBe(true);
+  });
+
+  it('does not decrement when there is no discussion channel id', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const wrapper = mountWrapper({ discussionChannel: makeChannel({ id: '' }) });
+    const cache = fakeCache();
+    await commentSection(wrapper).vm.$emit('decrement-comment-count', cache);
+    errorSpy.mockRestore();
+
+    expect(cache.modify).not.toHaveBeenCalled();
+  });
+
+  it('logs an error when the increment cache update throws', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const wrapper = mountWrapper();
+    const throwingCache = {
+      identify: vi.fn(() => 'DiscussionChannel:dc1'),
+      modify: vi.fn(() => {
+        throw new Error('boom');
+      }),
+      evict: vi.fn(),
+    };
+    await commentSection(wrapper).vm.$emit('increment-comment-count', throwingCache);
+    const logged = errorSpy.mock.calls.some((c) =>
+      String(c[0]).includes('Error incrementing comment count')
+    );
+    errorSpy.mockRestore();
+
+    expect(logged).toBe(true);
+  });
+});
+
+describe('DiscussionCommentsWrapper — subscription effects', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    asMock(useMutation).mockReset();
+    asMock(useQuery).mockReset();
+  });
+
+  const fakeCache = () => ({
+    identify: vi.fn(() => 'DiscussionChannel:dc1'),
+    modify: vi.fn(),
+  });
+
+  it('writes the subscriber list to the cache on a successful subscribe', async () => {
+    const wrapper = mountWrapper();
+    const cache = fakeCache();
+    mutationOptions('subscribeToDiscussionChannel')!.update!(cache, {
+      data: {
+        subscribeToDiscussionChannel: {
+          SubscribedToNotifications: [{ username: 'alice' }],
+        },
+      },
+    });
+    await wrapper.vm.$nextTick();
+
+    expect(cache.modify).toHaveBeenCalledTimes(1);
+  });
+
+  it('writes the subscriber list to the cache on a successful unsubscribe', async () => {
+    const wrapper = mountWrapper({
+      discussionChannel: makeChannel({
+        SubscribedToNotifications: [{ username: 'alice' }],
+      }),
+    });
+    const cache = fakeCache();
+    mutationOptions('unsubscribeFromDiscussionChannel')!.update!(cache, {
+      data: {
+        unsubscribeFromDiscussionChannel: { SubscribedToNotifications: [] },
+      },
+    });
+    await wrapper.vm.$nextTick();
+
+    expect(cache.modify).toHaveBeenCalledTimes(1);
+  });
+
+  const toast = (wrapper: ReturnType<typeof mountWrapper>, needle: string) =>
+    wrapper
+      .findAllComponents(NotificationStub)
+      .find((n) => String(n.props('title')).includes(needle))!;
+
+  it('shows then dismisses the subscribed notification', async () => {
+    const wrapper = mountWrapper();
+    // Fire the onDone callback the component registered on the subscribe mutation.
+    subscribeMock.onDone.mock.calls[0]![0]();
+    await wrapper.vm.$nextTick();
+    const shownAfterDone = toast(wrapper, 'subscribed to').props('show');
+
+    await toast(wrapper, 'subscribed to').vm.$emit('close-notification');
+    expect([shownAfterDone, toast(wrapper, 'subscribed to').props('show')]).toEqual(
+      [true, false]
+    );
+  });
+
+  it('shows then dismisses the unsubscribed notification', async () => {
+    const wrapper = mountWrapper();
+    unsubscribeMock.onDone.mock.calls[0]![0]();
+    await wrapper.vm.$nextTick();
+    const shownAfterDone = toast(wrapper, 'unsubscribed from').props('show');
+
+    await toast(wrapper, 'unsubscribed from').vm.$emit('close-notification');
+    expect([
+      shownAfterDone,
+      toast(wrapper, 'unsubscribed from').props('show'),
+    ]).toEqual([true, false]);
+  });
+
+  it('re-emits loadMore from the comment section', async () => {
+    const wrapper = mountWrapper();
+    await wrapper.findComponent(CommentSectionStub).vm.$emit('load-more');
+
+    expect(wrapper.emitted('loadMore')).toBeTruthy();
+  });
+
+  it('wires an auto-unsubscribe handler that calls the unsubscribe mutation', async () => {
+    mountWrapper();
+    const params = asMock(useAutoUnsubscribe).mock.calls[0]![0] as {
+      unsubscribeFn: (id: string) => Promise<void>;
+    };
+    await params.unsubscribeFn('dc1');
+
+    expect(unsubscribeMock.mutate).toHaveBeenCalledWith({
+      discussionChannelId: 'dc1',
+    });
+  });
+
+  it('treats a channel with no subscriber list as not subscribed', async () => {
+    const wrapper = mountWrapper({
+      discussionChannel: makeChannel({ SubscribedToNotifications: null }),
+    });
+
+    expect(
+      wrapper.findComponent(SubscribeButtonStub).props('isSubscribed')
+    ).toBe(false);
   });
 });
