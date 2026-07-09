@@ -27,6 +27,14 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  // Where to send the user after creating an issue that is not tied to a
+  // specific forum (i.e. the server-wide "New Issue" flow). Defaults to the
+  // admin issue detail route; the public /server/issues create page overrides
+  // this with 'server-issues-issueNumber' so the user stays in the public tree.
+  serverDetailRouteName: {
+    type: String,
+    default: 'admin-issues-issueNumber',
+  },
 });
 
 const router = useRouter();
@@ -173,7 +181,7 @@ onCreateIssueDone((result) => {
     });
   } else {
     router.push({
-      name: 'admin-issues-issueNumber',
+      name: props.serverDetailRouteName,
       params: { issueNumber: newIssue.issueNumber },
       query: { subscribeCta: '1' },
     });

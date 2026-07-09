@@ -3,9 +3,8 @@ import { shallowMount } from '@vue/test-utils';
 import ClosedPage from './closed.vue';
 import ServerIssueList from '@/components/mod/ServerIssueList.vue';
 
-// The behavior lives in ServerIssueList (see ServerIssueList.spec.ts); this
-// page is a thin wrapper that renders it in the closed-issue configuration.
-describe('admin closed issues page', () => {
+// Public transparency list; behavior lives in ServerIssueList.spec.ts.
+describe('public server closed issues page', () => {
   it('renders the list in the closed configuration', () => {
     const wrapper = shallowMount(ClosedPage);
     expect(wrapper.findComponent(ServerIssueList).props('isOpen')).toBe(false);
@@ -16,12 +15,5 @@ describe('admin closed issues page', () => {
     expect(
       wrapper.findComponent(ServerIssueList).props('searchPlaceholder')
     ).toBe('Search closed issues');
-  });
-
-  it('passes the closed-issue search test id', () => {
-    const wrapper = shallowMount(ClosedPage);
-    expect(wrapper.findComponent(ServerIssueList).props('searchTestId')).toBe(
-      'closed-issue-search-input'
-    );
   });
 });

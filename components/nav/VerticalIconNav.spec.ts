@@ -4,13 +4,29 @@ import { mount } from '@vue/test-utils';
 
 import VerticalIconNav from '@/components/nav/VerticalIconNav.vue';
 
-const h = vi.hoisted(() => ({ route: null as unknown }));
+const h = vi.hoisted(() => ({
+  route: null as unknown,
+  isAuthenticated: false,
+  username: '',
+  serverAdminUsernames: [] as string[],
+  serverModUsernames: [] as string[],
+}));
 
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
 vi.mock('vuetify', () => ({ useDisplay: () => ({ height: ref(900) }) }));
 vi.mock('@/utils/localStorageUtils', () => ({
   getLocalStorageItem: () => [],
   setLocalStorageItem: vi.fn(),
+}));
+vi.mock('@/composables/useAuthState', () => ({
+  useIsAuthenticated: () => ref(h.isAuthenticated),
+  useUsername: () => ref(h.username),
+}));
+vi.mock('@/composables/useServerRoleMembership', () => ({
+  useServerRoleMembership: () => ({
+    serverAdminUsernames: ref(h.serverAdminUsernames),
+    serverModUsernames: ref(h.serverModUsernames),
+  }),
 }));
 
 const mountNav = () =>
@@ -43,6 +59,10 @@ const navLink = (w: ReturnType<typeof mount>, label: string) =>
 beforeEach(() => {
   vi.clearAllMocks();
   h.route = { params: {}, name: 'home' };
+  h.isAuthenticated = false;
+  h.username = '';
+  h.serverAdminUsernames = [];
+  h.serverModUsernames = [];
 });
 
 describe('VerticalIconNav items', () => {
@@ -55,10 +75,39 @@ describe('VerticalIconNav items', () => {
     }
   );
 
-  it('renders the admin dashboard item', () => {
+  it('shows the admin dashboard item to a logged-in server admin', () => {
+    h.isAuthenticated = true;
+    h.username = 'alice';
+    h.serverAdminUsernames = ['alice'];
     const wrapper = mountNav();
 
     expect(navLink(wrapper, 'Admin dashboard').exists()).toBe(true);
+  });
+
+  it('shows the admin dashboard item to a logged-in server mod', () => {
+    h.isAuthenticated = true;
+    h.username = 'bob';
+    h.serverModUsernames = ['bob'];
+    const wrapper = mountNav();
+
+    expect(navLink(wrapper, 'Admin dashboard').exists()).toBe(true);
+  });
+
+  it('hides the admin dashboard item from a logged-out visitor', () => {
+    h.serverAdminUsernames = ['alice'];
+    const wrapper = mountNav();
+
+    expect(navLink(wrapper, 'Admin dashboard').exists()).toBe(false);
+  });
+
+  it('hides the admin dashboard item from a logged-in non-mod user', () => {
+    h.isAuthenticated = true;
+    h.username = 'carol';
+    h.serverAdminUsernames = ['alice'];
+    h.serverModUsernames = ['bob'];
+    const wrapper = mountNav();
+
+    expect(navLink(wrapper, 'Admin dashboard').exists()).toBe(false);
   });
 });
 
@@ -88,6 +137,9 @@ describe('VerticalIconNav active state', () => {
 
   it('highlights the admin item on admin routes', () => {
     h.route = { params: {}, name: 'admin-issues' };
+    h.isAuthenticated = true;
+    h.username = 'alice';
+    h.serverAdminUsernames = ['alice'];
     const wrapper = mountNav();
 
     expect(navLink(wrapper, 'Admin dashboard').classes().join(' ')).toContain('ring-1');

@@ -20,6 +20,8 @@ import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from '@/utils/localStorageUtils';
+import { useIsAuthenticated, useUsername } from '@/composables/useAuthState';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import type { ForumItem } from '@/types/forum';
 
 const DEFAULT_LIMIT = 5;
@@ -92,6 +94,24 @@ if (import.meta.client) {
 const route = useRoute();
 const { height } = useDisplay();
 const hasMounted = ref(false);
+
+// Admin dashboard visibility: the dashboard at /admin/issues is the
+// server-scoped moderation queue, so only show its nav link to a logged-in user
+// who is a server admin or server moderator. Server-role membership is the
+// proxy the rest of the app already uses (see useServerRoleMembership and
+// headerPermissionUtils) to decide server admin/mod status — there is no
+// per-user server permission flag beyond membership in these lists.
+const isAuthenticated = useIsAuthenticated();
+const username = useUsername();
+const { serverAdminUsernames, serverModUsernames } = useServerRoleMembership();
+
+const canSeeAdminDashboard = computed(() => {
+  if (!isAuthenticated.value || !username.value) return false;
+  return (
+    serverAdminUsernames.value.includes(username.value) ||
+    serverModUsernames.value.includes(username.value)
+  );
+});
 
 // Keep SSR and client hydration aligned, then apply viewport-height layout after mount.
 onMounted(() => {
@@ -333,22 +353,24 @@ const getNavLabelClasses = (isActive: boolean) =>
           'space-y-2': !isVerticallyShort,
         }"
       >
-        <!-- Admin Dashboard (always shown) -->
-        <IconTooltip text="Admin Dashboard">
-          <div class="w-full">
-            <NuxtLink
-              to="/admin/issues"
-              aria-label="Admin dashboard"
-              title="Admin dashboard"
-              :class="getNavItemClasses(isActiveUserAction('admin-issues'))"
-            >
-              <AdminIcon />
-              <span :class="getNavLabelClasses(isActiveUserAction('admin-issues'))">
-                Admin
-              </span>
-            </NuxtLink>
-          </div>
-        </IconTooltip>
+        <!-- Admin Dashboard (server admins/mods only) -->
+        <ClientOnly>
+          <IconTooltip v-if="canSeeAdminDashboard" text="Admin Dashboard">
+            <div class="w-full">
+              <NuxtLink
+                to="/admin/issues"
+                aria-label="Admin dashboard"
+                title="Admin dashboard"
+                :class="getNavItemClasses(isActiveUserAction('admin-issues'))"
+              >
+                <AdminIcon />
+                <span :class="getNavLabelClasses(isActiveUserAction('admin-issues'))">
+                  Admin
+                </span>
+              </NuxtLink>
+            </div>
+          </IconTooltip>
+        </ClientOnly>
 
         <!-- Authentication-dependent actions -->
         <ClientOnly>
