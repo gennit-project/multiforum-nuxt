@@ -2,7 +2,7 @@
 
 The plugins feature documentation has been split into two documents:
 
-## [PLUGINS_IMPLEMENTED.md](./PLUGINS_IMPLEMENTED.md)
+## [plugins-implemented.md](./plugins-implemented.md)
 
 Documents all completed plugin system functionality:
 - Backend plugin management (CRUD, registry, secrets, execution)
@@ -12,7 +12,7 @@ Documents all completed plugin system functionality:
 - Pipeline configuration UI (YAML/Visual editor)
 - Unit test coverage
 
-## [PLUGINS_ROADMAP.md](./PLUGINS_ROADMAP.md)
+## [plugins-roadmap.md](./plugins-roadmap.md)
 
 Documents remaining work:
 - **Server-Scoped vs Channel-Scoped Pipelines** - Architecture explanation

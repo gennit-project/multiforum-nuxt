@@ -3,7 +3,7 @@ node_modules
 .output
 dist
 coverage
-docs/screenshots
+docs/assets
 .vercel
 .vscode
 .DS_Store

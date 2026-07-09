@@ -1,4 +1,4 @@
-![Multiforum Logo](./docs/multiforum-header.png)
+![Multiforum Logo](./docs/assets/multiforum-header.png)
 
 [![codecov](https://codecov.io/gh/gennit-project/multiforum-nuxt/branch/main/graph/badge.svg)](https://codecov.io/gh/gennit-project/multiforum-nuxt)
 
@@ -115,17 +115,19 @@ Architecture:
 
 - [Frontend architecture and authentication](./docs/architecture-and-auth.md)
 - [Moderation architecture](./docs/moderation-architecture.md)
-- [Performance](./docs/PERFORMANCE.md)
+- [Performance](./docs/performance.md)
 - **Backend architecture:** see the [backend architecture overview](https://github.com/gennit-project/multiforum-backend/blob/main/docs/architecture.md)
 
 Feature areas and plans:
 
-- [Feature roadmap](./docs/FEATURE_ROADMAP.md)
-- [Moderation plan](./docs/MODERATION_PLAN.md)
-- [Notifications plan](./docs/NOTIFICATIONS_PLAN.md)
-- [Plugins: implemented](./docs/PLUGINS_IMPLEMENTED.md) · [roadmap](./docs/PLUGINS_ROADMAP.md) · [implementation plan](./docs/PLUGINS_IMPLEMENTATION_PLAN.md) · [bot/betabot plan](./docs/PLUGINS_BOT_BETABOT_PLAN.md)
-- [Maps: developer docs](./docs/MAP_DEVELOPER_DOCS.md) · [clustering guide](./docs/MAP_CLUSTERING_GUIDE.md)
-- [Automated test plan](./docs/AUTOMATED_TEST_PLAN.md)
+- [Feature roadmap](./docs/feature-roadmap.md)
+- [Moderation plan](./docs/moderation-plan.md)
+- [Notifications plan](./docs/notifications-plan.md)
+- [Plugins: implemented](./docs/plugins-implemented.md) · [roadmap](./docs/plugins-roadmap.md) · [implementation plan](./docs/plugins-implementation-plan.md) · [bot/betabot plan](./docs/plugins-bot-betabot-plan.md)
+- [Maps: developer docs](./docs/map-developer-docs.md) · [clustering guide](./docs/map-clustering-guide.md)
+- [Automated test plan](./docs/automated-test-plan.md)
+
+All developer docs are indexed in [docs/README.md](./docs/README.md).
 
 Hosted documentation: [docs.multiforum.net](https://docs.multiforum.net).
 
