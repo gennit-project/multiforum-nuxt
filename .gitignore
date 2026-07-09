@@ -8,6 +8,8 @@ dist
 
 # Claude Code per-user local settings (skills are committed; local settings are not)
 .claude/settings.local.json
+# Ephemeral agent worktrees (never commit these)
+.claude/worktrees/
 
 # Node dependencies
 node_modules
@@ -20,7 +22,6 @@ logs
 .DS_Store
 .fleet
 .idea
-cloud_functions
 
 # Local env files
 .env
@@ -32,10 +33,6 @@ cypress.env.json
 
 # config for docker compose
 config
-
-# Generated files
-/src/__generated__
-cors-config.json
 
 # Coverage reports
 coverage/
