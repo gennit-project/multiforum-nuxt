@@ -132,4 +132,10 @@ export default createConfigForNuxt({
       },
     ],
   },
+}).append({
+  // cloud_functions/ holds deployed GCP function source. It is kept in the repo
+  // (tracked, not gitignored) so a fresh deployment has what it needs, but it is
+  // not part of the app's lint surface. The Nuxt flat config otherwise picks it
+  // up via .gitignore, so ignore it explicitly here.
+  ignores: ['cloud_functions/**'],
 });
