@@ -191,11 +191,11 @@ schema live in the
   [Vitest](https://vitest.dev/) + Vue Test Utils (`pnpm run test:unit`);
   end-to-end flows run on [Playwright](https://playwright.dev/) with **mocked
   GraphQL**, so E2E needs no backend (`pnpm run test:playwright`). See
-  [AUTOMATED_TEST_PLAN.md](./AUTOMATED_TEST_PLAN.md).
+  [automated-test-plan.md](./automated-test-plan.md).
 - **Pre-commit gates.** Husky runs type checking and unit tests, and ESLint
   (with accessibility rules) on staged files, before each commit.
 - **Performance.** Code splitting, caching, and image optimization are covered
-  in [PERFORMANCE.md](./PERFORMANCE.md).
+  in [performance.md](./performance.md).
 
 ## Repository map
 

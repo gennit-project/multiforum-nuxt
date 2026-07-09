@@ -81,7 +81,7 @@ jobs:
     # mock mode the app is a client-only SPA, so this job needs neither Neo4j
     # nor the backend. It builds the SPA once and runs the suite fully parallel
     # against the production build (see playwright.build.config.ts and
-    # docs/playwright-parallel-build-prototype.md).
+    # docs/archive/playwright-parallel-build-prototype.md).
     env:
       GRAPHQL_URL_FOR_TYPES: ${{ secrets.GRAPHQL_URL_FOR_TYPES }}
       VITE_GRAPHQL_URL: ${{ secrets.VITE_GRAPHQL_URL }}
