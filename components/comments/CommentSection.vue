@@ -43,6 +43,7 @@ import { useCommentSectionNotifications } from '@/composables/useCommentSectionN
 import { useCommentSectionModals } from '@/composables/useCommentSectionModals';
 import { useCommentFeedbackMutation } from '@/composables/useCommentFeedbackMutation';
 import { useCommentCrudMutations } from '@/composables/useCommentCrudMutations';
+import { useCommentFormState } from '@/composables/useCommentFormState';
 
 const modProfileNameVar = useModProfileName();
 
@@ -216,12 +217,26 @@ const {
   feedbackEnabled: computed(() => props.enableFeedback),
 });
 
-// Comment form state
-const commentToEdit = ref<CommentType | null>(null);
-const commentInProcess = ref(false);
-const submitAttempted = ref(false);
-const replyFormOpenAtCommentID = ref('');
-const editFormOpenAtCommentID = ref('');
+// Comment reply/edit editor state: which comment is being edited/replied to,
+// the in-progress edit form values, and the pure open/close transitions. The
+// submit handlers below drive it via the exposed refs + reset helpers.
+const {
+  commentToEdit,
+  commentInProcess,
+  submitAttempted,
+  replyFormOpenAtCommentID,
+  editFormOpenAtCommentID,
+  editFormValues,
+  openReplyEditor,
+  hideReplyEditor,
+  openEditCommentEditor,
+  hideEditCommentEditor,
+  startEditing: handleClickEdit,
+  updateEditInputValues,
+  updateFeedbackText: updateFeedback,
+  resetAfterCreate,
+  resetAfterUpdate,
+} = useCommentFormState();
 
 // Comment search state
 const searchText = ref('');
@@ -261,12 +276,6 @@ watch(
 const shouldShowLoadingSpinner = computed(
   () => props.loading && !hasLoadedComments.value
 );
-
-const editFormValues = ref<CreateEditCommentFormValues>({
-  text: commentToEdit.value?.text || '',
-  isRootComment: true,
-  depth: 1,
-});
 
 // Use feedback mutation composable
 const {
@@ -319,9 +328,7 @@ const {
 });
 
 onDoneCreatingComment(() => {
-  commentInProcess.value = false;
-  submitAttempted.value = false;
-  replyFormOpenAtCommentID.value = '';
+  resetAfterCreate();
   emit('updateCreateFormValues', {
     text: '',
     isRootComment: true,
@@ -335,14 +342,7 @@ onErrorCreatingComment(() => {
 });
 
 onDoneUpdatingComment(() => {
-  commentInProcess.value = false;
-  editFormOpenAtCommentID.value = '';
-  commentToEdit.value = null;
-  editFormValues.value = {
-    text: '',
-    isRootComment: true,
-    depth: 1,
-  };
+  resetAfterUpdate();
 });
 
 const effectiveChannelUniqueName = computed(() =>
@@ -381,24 +381,6 @@ function updateCreateInputValuesForReply(input: CreateReplyInputData) {
   emit('updateCreateReplyCommentInput', buildReplyCommentInput(input));
 }
 
-function handleClickEdit(commentData: CommentType) {
-  commentToEdit.value = commentData;
-  editFormOpenAtCommentID.value = commentData.id;
-  editFormValues.value = {
-    text: commentData.text || '',
-    isRootComment: !commentData.ParentComment,
-    depth: 1,
-  };
-}
-
-function updateEditInputValues(text: string, isRootComment: boolean) {
-  editFormValues.value = {
-    ...editFormValues.value,
-    text,
-    isRootComment,
-  };
-}
-
 function handleSaveEdit() {
   if (!commentToEdit.value?.id) {
     console.error('No comment to edit');
@@ -431,25 +413,6 @@ function scrollToTop() {
   window.scrollTo(0, 0);
 }
 
-function openReplyEditor(commentId: string) {
-  replyFormOpenAtCommentID.value = commentId;
-  editFormOpenAtCommentID.value = ''; // Close edit form if open
-}
-
-function hideReplyEditor() {
-  replyFormOpenAtCommentID.value = '';
-}
-
-function openEditCommentEditor(commentId: string) {
-  editFormOpenAtCommentID.value = commentId;
-  replyFormOpenAtCommentID.value = ''; // Close reply form if open
-}
-
-function hideEditCommentEditor() {
-  editFormOpenAtCommentID.value = '';
-  commentToEdit.value = null; // Clear edited comment data
-}
-
 function handleSubmitFeedback() {
   if (!props.enableFeedback) {
     console.error('Feedback is disabled for this forum.');
@@ -470,10 +433,6 @@ function handleSubmitFeedback() {
     channelId: channelId.value,
   };
   addFeedbackCommentToComment(feedbackInput);
-}
-
-function updateFeedback(text: string) {
-  editFormValues.value.text = text;
 }
 
 function handleViewFeedback(commentId: string) {
