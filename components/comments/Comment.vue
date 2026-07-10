@@ -2,12 +2,7 @@
 import { ref, computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import type { PropType } from 'vue';
-import type {
-  ApolloCache,
-  ApolloError,
-  NormalizedCacheObject,
-} from '@apollo/client/core';
-import { useMutation } from '@vue/apollo-composable';
+import type { ApolloError } from '@apollo/client/core';
 import type { Comment } from '@/__generated__/graphql';
 import type { CreateReplyInputData } from '@/types/Comment';
 import TextEditor from '../TextEditor.vue';
@@ -26,7 +21,8 @@ import ArchivedCommentText from './ArchivedCommentText.vue';
 import { useCommentPermissions } from '@/composables/useCommentPermissions';
 import { useBestAnswerMutations } from '@/composables/useBestAnswerMutations';
 import { useCommentPermalink } from '@/composables/useCommentPermalink';
-import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
+import { useCommentSubscription } from '@/composables/useCommentSubscription';
+import { useCommentStickyMutations } from '@/composables/useCommentStickyMutations';
 import { getCommentMenuItems } from '@/utils/headerPermissionUtils';
 import { getAuthorBadges } from '@/utils/roleBadges';
 import {
@@ -37,12 +33,6 @@ import {
 } from '@/utils/commentDisplay';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
-import {
-  SUBSCRIBE_TO_COMMENT,
-  STICKY_COMMENT,
-  UNSUBSCRIBE_FROM_COMMENT,
-  UNSTICKY_COMMENT,
-} from '@/graphQLData/comment/mutations';
 
 const usernameVar = useUsername();
 
@@ -380,96 +370,17 @@ const commentMenuItems = computed(() => {
   });
 });
 
-const { mutate: subscribeToComment } = useMutation(SUBSCRIBE_TO_COMMENT, {
-  update: (cache, result) => {
-    if (result.data?.subscribeToComment) {
-      cache.modify({
-        id: cache.identify({
-          __typename: 'Comment',
-          id: props.commentData.id,
-        }),
-        fields: {
-          SubscribedToNotifications(_) {
-            return result.data.subscribeToComment.SubscribedToNotifications;
-          },
-        },
-      });
-    }
-  },
-});
+// Reply-notification subscription (subscribe/unsubscribe + one-click
+// unsubscribe) and sticky/unsticky mutations live in dedicated composables.
+const {
+  watchReplies: handleWatchReplies,
+  unwatchReplies: handleUnwatchReplies,
+} = useCommentSubscription(commentDataRef);
 
-const { mutate: unsubscribeFromComment } = useMutation(
-  UNSUBSCRIBE_FROM_COMMENT,
-  {
-    update: (cache, result) => {
-      if (result.data?.unsubscribeFromComment) {
-        cache.modify({
-          id: cache.identify({
-            __typename: 'Comment',
-            id: props.commentData.id,
-          }),
-          fields: {
-            SubscribedToNotifications(_) {
-              return result.data.unsubscribeFromComment.SubscribedToNotifications;
-            },
-          },
-        });
-      }
-    },
-  }
-);
-
-const updateStickyCache = (
-  cache: ApolloCache<NormalizedCacheObject>,
-  comment: StickyCommentFields | null | undefined
-) => {
-  if (!comment?.id) {
-    return;
-  }
-
-  cache.modify({
-    id: cache.identify({
-      __typename: 'Comment',
-      id: comment.id,
-    }),
-    fields: {
-      isSticky() {
-        return !!comment.isSticky;
-      },
-      stickyAt() {
-        return comment.stickyAt ?? null;
-      },
-      stickyByUsername() {
-        return comment.stickyByUsername ?? null;
-      },
-    },
-  });
-};
-
-const { mutate: stickyComment } = useMutation(STICKY_COMMENT, {
-  update: (cache, result) => {
-    updateStickyCache(cache, result.data?.stickyComment);
-  },
-});
-
-const { mutate: unstickyComment } = useMutation(UNSTICKY_COMMENT, {
-  update: (cache, result) => {
-    updateStickyCache(cache, result.data?.unstickyComment);
-  },
-});
-
-const isSubscribed = computed(() =>
-  isCommentSubscribedByUser(props.commentData, usernameVar.value)
-);
-
-useAutoUnsubscribe({
-  entityId: commentIdRef,
-  unsubscribeFn: async (id: string) => {
-    await unsubscribeFromComment({ commentId: id });
-  },
-  entityType: 'comment',
-  isSubscribed,
-});
+const {
+  stickyCurrentComment: handleStickyComment,
+  unstickyCurrentComment: handleUnstickyComment,
+} = useCommentStickyMutations(commentDataRef);
 
 const showReplies = ref(true);
 const highlight = ref(false);
@@ -527,30 +438,6 @@ function updateNewComment(input: CreateReplyInputData) {
 
 function handleReport() {
   emit('clickReport', props.commentData);
-}
-
-function handleWatchReplies() {
-  subscribeToComment({
-    commentId: props.commentData.id,
-  });
-}
-
-function handleUnwatchReplies() {
-  unsubscribeFromComment({
-    commentId: props.commentData.id,
-  });
-}
-
-function handleStickyComment() {
-  stickyComment({
-    commentId: props.commentData.id,
-  });
-}
-
-function handleUnstickyComment() {
-  unstickyComment({
-    commentId: props.commentData.id,
-  });
 }
 
 function handleFeedback(input: HandleFeedbackInput) {
