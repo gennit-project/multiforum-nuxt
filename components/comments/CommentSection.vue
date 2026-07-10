@@ -501,6 +501,28 @@ const replyHasBotMention = computed(() => {
     !props.allowBotMentions && hasBotMention(props.createFormValues?.text || '')
   );
 });
+
+// Context props that the top-level Comment forwards unchanged to every nested
+// reply. Grouped here so the <Comment> below binds them with a single v-bind
+// instead of ~14 repeated lines. Per-instance props (commentData, depth,
+// aggregateCommentCount, the edit-* / feedback / bot-suggestion props) stay
+// explicit on the tag.
+const commentPassThroughProps = computed(() => ({
+  createCommentError: createCommentError.value,
+  suspensionIssueNumber: suspensionIssueNumber.value ?? undefined,
+  suspensionChannelId: suspensionChannelId.value ?? '',
+  suspensionUntil: suspensionUntil.value ?? undefined,
+  suspensionIndefinitely: suspensionIndefinitely.value ?? false,
+  enableEmoji: props.enableEmoji,
+  locked: locked.value || props.archived,
+  commentInProcess: commentInProcess.value,
+  replyFormOpenAtCommentID: replyFormOpenAtCommentID.value,
+  modProfileName: modProfileNameVar.value,
+  originalPoster: props.originalPoster,
+  lengthOfCommentInProgress: lengthOfCommentInProgress.value,
+  answers: props.answers,
+  botUsernames: props.botUsernames,
+}));
 </script>
 
 <template>
@@ -751,27 +773,14 @@ const replyHasBotMention = computed(() => {
               :aggregate-comment-count="aggregateCommentCount"
               :compact="true"
               :comment-data="comment"
-              :create-comment-error="createCommentError"
-              :suspension-issue-number="suspensionIssueNumber ?? undefined"
-              :suspension-channel-id="suspensionChannelId ?? ''"
-              :suspension-until="suspensionUntil ?? undefined"
-              :suspension-indefinitely="suspensionIndefinitely ?? false"
               :enable-feedback="enableFeedback"
-              :enable-emoji="enableEmoji"
               :depth="1"
-              :locked="locked || archived"
-              :comment-in-process="commentInProcess"
-              :reply-form-open-at-comment-i-d="replyFormOpenAtCommentID"
               :edit-form-open-at-comment-i-d="editFormOpenAtCommentID"
               :edit-comment-error="editCommentError"
-              :mod-profile-name="modProfileNameVar"
-              :original-poster="originalPoster"
-              :length-of-comment-in-progress="lengthOfCommentInProgress"
               :reply-has-bot-mention="replyHasBotMention"
               :bot-suggestions="botSuggestions"
-              :bot-usernames="botUsernames"
               :mod-suggestions="modSuggestions"
-              :answers="answers"
+              v-bind="commentPassThroughProps"
               @start-comment-save="commentInProcess = true"
               @open-reply-editor="openReplyEditor"
               @hide-reply-editor="hideReplyEditor"

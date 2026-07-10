@@ -477,6 +477,27 @@ const editorId = 'texteditor';
 
 const maxCommentDepth = MAX_COMMENT_DEPTH;
 
+// Context props forwarded unchanged to every nested reply. Grouped here so the
+// recursive <Comment> below binds them with a single v-bind instead of ~14
+// repeated lines. (Per-instance props — commentData, depth, parentCommentId,
+// the local editFormOpenAtCommentID — stay explicit on the tag.)
+const childPassThroughProps = computed(() => ({
+  createCommentError: props.createCommentError,
+  suspensionIssueNumber: props.suspensionIssueNumber,
+  suspensionChannelId: props.suspensionChannelId,
+  suspensionUntil: props.suspensionUntil,
+  suspensionIndefinitely: props.suspensionIndefinitely,
+  enableEmoji: props.enableEmoji,
+  locked: props.locked,
+  commentInProcess: props.commentInProcess,
+  replyFormOpenAtCommentID: props.replyFormOpenAtCommentID,
+  modProfileName: props.modProfileName,
+  originalPoster: props.originalPoster,
+  lengthOfCommentInProgress: props.lengthOfCommentInProgress,
+  answers: props.answers,
+  botUsernames: props.botUsernames,
+}));
+
 function createComment(parentCommentId: string) {
   emit('createComment', parentCommentId);
 }
@@ -867,23 +888,10 @@ const label = computed(() =>
                 v-if="childComment.id !== permalinkedCommentId"
                 :compact="true"
                 :comment-data="childComment"
-                :create-comment-error="props.createCommentError"
-                :suspension-issue-number="props.suspensionIssueNumber"
-                :suspension-channel-id="props.suspensionChannelId"
-                :suspension-until="props.suspensionUntil"
-                :suspension-indefinitely="props.suspensionIndefinitely"
                 :depth="props.depth + 1"
-                :enable-emoji="props.enableEmoji"
-                :locked="props.locked"
                 :parent-comment-id="props.commentData.id"
-                :comment-in-process="props.commentInProcess"
                 :edit-form-open-at-comment-i-d="editFormOpenAtCommentID"
-                :reply-form-open-at-comment-i-d="props.replyFormOpenAtCommentID"
-                :mod-profile-name="props.modProfileName"
-                :original-poster="props.originalPoster"
-                :length-of-comment-in-progress="props.lengthOfCommentInProgress"
-                :answers="props.answers"
-                :bot-usernames="props.botUsernames"
+                v-bind="childPassThroughProps"
                 @start-comment-save="emit('startCommentSave')"
                 @click-edit-comment="handleEdit"
                 @click-report="emit('clickReport', $event)"
