@@ -11,6 +11,10 @@ import type { ServerConfigUpdateInput } from '@/__generated__/graphql';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { config } from '@/config';
 import CreateEditServerFields from '@/components/admin/CreateEditServerFields.vue';
+import {
+  useSettingAutosave,
+  type AutosaveStatus,
+} from '@/composables/useSettingAutosave';
 
 type ServerSettingsFormValues = ServerConfigUpdateInput & {
   featuredWikiPageIds?: string[];
@@ -69,6 +73,11 @@ onGetServerResult((result) => {
     pluginRegistries: serverConfig.pluginRegistries || [],
     featuredWikiPageIds: serverConfig.featuredWikiPageIds || [],
   };
+
+  // Prime the autosave baselines so the first edit that happens to match the
+  // loaded value does not fire a redundant save.
+  descriptionAutosave.setInitial(serverConfig.serverDescription || '');
+  enableEventsAutosave.setInitial(Boolean(serverConfig.enableEvents));
 });
 
 const serverUpdateInput = computed(() => {
@@ -149,6 +158,37 @@ const {
   error: setFeaturedWikiPagesError,
 } = useMutation(SET_FEATURED_WIKI_PAGES);
 
+// Autosave for the scalar fields on the Basic and Calendar tabs. Each field
+// gets its own debounced instance so an in-flight edit to one can't coalesce
+// with — and drop — a change to the other. Each saves a SCOPED update input,
+// which UPDATE_SERVER_CONFIG applies as a partial update.
+const saveServerField = (input: ServerConfigUpdateInput) =>
+  updateServer({ input, serverName: config.serverName });
+
+const descriptionAutosave = useSettingAutosave<string>({
+  save: (serverDescription) => saveServerField({ serverDescription }),
+});
+const enableEventsAutosave = useSettingAutosave<boolean>({
+  save: (enableEvents) => saveServerField({ enableEvents }),
+});
+
+const autosaveStatus = computed<AutosaveStatus>(() => {
+  const statuses = [
+    descriptionAutosave.status.value,
+    enableEventsAutosave.status.value,
+  ];
+  if (statuses.includes('saving')) return 'saving';
+  if (statuses.includes('error')) return 'error';
+  if (statuses.includes('saved')) return 'saved';
+  return 'idle';
+});
+const autosaveErrorMessage = computed(
+  () =>
+    descriptionAutosave.error.value?.message ||
+    enableEventsAutosave.error.value?.message ||
+    ''
+);
+
 const isSaving = computed(
   () => editServerLoading.value || setFeaturedWikiPagesLoading.value
 );
@@ -170,6 +210,15 @@ async function submit() {
 
 function updateFormValues(data: ServerSettingsFormValues) {
   formValues.value = { ...formValues.value, ...data };
+
+  // The Basic and Calendar tabs autosave their scalar fields on change instead
+  // of waiting for a form-wide Save. Other tabs continue to batch via submit().
+  if ('serverDescription' in data) {
+    descriptionAutosave.trigger(data.serverDescription ?? '');
+  }
+  if ('enableEvents' in data) {
+    enableEventsAutosave.trigger(Boolean(data.enableEvents));
+  }
 }
 </script>
 
@@ -186,6 +235,8 @@ function updateFormValues(data: ServerSettingsFormValues) {
             :update-server-error="combinedUpdateError"
             :edit-server-loading="isSaving"
             :form-values="formValues"
+            :save-status="autosaveStatus"
+            :save-error-message="autosaveErrorMessage"
             @submit="submit"
             @update-form-values="updateFormValues"
           />

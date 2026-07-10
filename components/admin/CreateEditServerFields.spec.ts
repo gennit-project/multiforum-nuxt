@@ -17,7 +17,12 @@ const mountFields = (props: Record<string, unknown> = {}) =>
     props: { editMode: true, formValues: {}, ...props },
     global: {
       stubs: {
-        TailwindForm: { name: 'TailwindForm', emits: ['submit'], template: '<form><slot /></form>' },
+        TailwindForm: {
+          name: 'TailwindForm',
+          props: ['showSaveButton'],
+          emits: ['submit'],
+          template: '<form><slot /></form>',
+        },
         NuxtPage: { name: 'NuxtPage', emits: ['submit', 'update-form-values'], template: '<div />' },
         ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err">{{ text }}</div>' },
         RouterLink: routerLinkStub,
@@ -105,6 +110,40 @@ describe('CreateEditServerFields current tab label', () => {
     const wrapper = mountFields();
 
     expect(dropdownToggle(wrapper)!.text()).toContain('Settings');
+  });
+});
+
+describe('CreateEditServerFields autosave tabs', () => {
+  it('hides the shared Save button on the basic (autosave) tab', () => {
+    h.route = { name: 'admin-settings-basic' };
+    const wrapper = mountFields();
+
+    expect(
+      wrapper.getComponent({ name: 'TailwindForm' }).props('showSaveButton')
+    ).toBe(false);
+  });
+
+  it('shows the save status indicator on an autosave tab', () => {
+    h.route = { name: 'admin-settings-calendar' };
+    const wrapper = mountFields({ saveStatus: 'saving' });
+
+    expect(wrapper.find('[data-testid="save-status"]').exists()).toBe(true);
+  });
+
+  it('keeps the shared Save button on a non-autosave tab', () => {
+    h.route = { name: 'admin-settings-rules' };
+    const wrapper = mountFields();
+
+    expect(
+      wrapper.getComponent({ name: 'TailwindForm' }).props('showSaveButton')
+    ).toBe(true);
+  });
+
+  it('hides the save status indicator on a non-autosave tab', () => {
+    h.route = { name: 'admin-settings-rules' };
+    const wrapper = mountFields();
+
+    expect(wrapper.find('[data-testid="save-status"]').exists()).toBe(false);
   });
 });
 

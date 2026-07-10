@@ -29,6 +29,12 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // Allows a form to hide the Save button entirely, e.g. when its fields
+  // autosave on change and persistence is shown via a status indicator instead.
+  showSaveButton: {
+    type: Boolean,
+    default: true,
+  },
   handleCancelInParent: {
     type: Boolean,
     default: false,
@@ -69,6 +75,7 @@ function handleCancel() {
             @click.prevent="handleCancel"
           />
           <SaveButton
+            v-if="props.showSaveButton"
             :disabled="props.needsChanges"
             :loading="props.loading"
             @click.prevent="emit('submit')"
@@ -91,6 +98,7 @@ function handleCancel() {
                 @click.prevent="handleCancel"
               />
               <SaveButton
+                v-if="props.showSaveButton"
                 :disabled="props.needsChanges"
                 :loading="props.loading"
                 @click.prevent="emit('submit')"
