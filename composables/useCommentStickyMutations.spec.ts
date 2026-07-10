@@ -17,16 +17,17 @@ beforeEach(() => {
   asMock(useMutation).mockImplementation(router.useMutation);
 });
 
-// A cache whose modify() runs the field policies so their bodies are covered.
+// A cache whose modify() runs the field policies so their bodies are covered,
+// and exposes each captured field policy by name for assertions.
 const fakeCache = () => {
-  const fields: Record<string, () => unknown> = {};
+  const captured: Record<string, () => unknown> = {};
   return {
     identify: vi.fn(() => 'Comment:c1'),
-    modify: vi.fn((opts: any) => {
-      Object.assign(fields, opts.fields);
-      Object.values(opts.fields).forEach((fn: any) => fn());
+    modify: vi.fn((opts: { fields: Record<string, () => unknown> }) => {
+      Object.assign(captured, opts.fields);
+      Object.values(opts.fields).forEach((fn) => fn());
     }),
-    fields,
+    field: (name: string): (() => unknown) => captured[name] ?? (() => undefined),
   };
 };
 
@@ -60,7 +61,7 @@ describe('useCommentStickyMutations', () => {
         },
       },
     });
-    expect(cache.fields.isSticky()).toBe(true);
+    expect(cache.field('isSticky')()).toBe(true);
   });
 
   it('writes the sticky fields into the cache on a successful unsticky', () => {
@@ -69,7 +70,7 @@ describe('useCommentStickyMutations', () => {
     router.get('unstickyComment').update!(cache, {
       data: { unstickyComment: { id: 'c1', isSticky: false } },
     });
-    expect(cache.fields.isSticky()).toBe(false);
+    expect(cache.field('isSticky')()).toBe(false);
   });
 
   it('defaults stickyAt and stickyByUsername to null when absent', () => {
@@ -78,10 +79,10 @@ describe('useCommentStickyMutations', () => {
     router.get('stickyComment').update!(cache, {
       data: { stickyComment: { id: 'c1', isSticky: true } },
     });
-    expect([cache.fields.stickyAt(), cache.fields.stickyByUsername()]).toEqual([
-      null,
-      null,
-    ]);
+    expect([
+      cache.field('stickyAt')(),
+      cache.field('stickyByUsername')(),
+    ]).toEqual([null, null]);
   });
 
   it('skips the cache write when the mutation returned no comment id', () => {
