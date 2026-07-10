@@ -6,6 +6,8 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import type { CreateEditChannelFormValues } from '@/types/Channel';
 import TailwindForm from '@/components/FormComponent.vue';
+import SaveStatus from '@/components/settings/SaveStatus.vue';
+import type { AutosaveStatus } from '@/composables/useSettingAutosave';
 import { useRoute, useRouter } from 'nuxt/app';
 import { MAX_CHARS_IN_CHANNEL_NAME } from '@/utils/constants';
 import { isLoadingAuthVar } from '@/cache';
@@ -100,11 +102,30 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // Autosave status for the tabs whose fields persist on change.
+  saveStatus: {
+    type: String as PropType<AutosaveStatus>,
+    default: 'idle',
+  },
+  saveErrorMessage: {
+    type: String,
+    default: '',
+  },
 });
 
 const emit = defineEmits(['submit', 'updateFormValues']);
 
 const CHANNEL_ALREADY_EXISTS_ERROR = 'Constraint validation failed';
+
+// Tabs whose fields are simple toggles that autosave on change; these hide the
+// shared Save button and show a status indicator instead.
+const AUTOSAVE_TAB_KEYS = ['events', 'images', 'emoji', 'feedback'];
+const isAutosaveTab = computed(() =>
+  AUTOSAVE_TAB_KEYS.some(
+    (key) =>
+      typeof route.name === 'string' && route.name.includes(`edit-${key}`)
+  )
+);
 
 const tabs = computed(() => {
   const baseTabs: TabItem[] = [
@@ -356,6 +377,7 @@ const showCreateChannelError = computed(() => {
           :loading="editChannelLoading"
           :needs-changes="titleIsInvalid"
           :show-cancel-button="false"
+          :show-save-button="!isAutosaveTab"
           @input="touched = true"
           @submit="emit('submit')"
         >
@@ -573,6 +595,12 @@ const showCreateChannelError = computed(() => {
                   :owner-list="ownerList"
                   @submit="$emit('submit', $event)"
                   @update-form-values="emit('updateFormValues', $event)"
+                />
+                <SaveStatus
+                  v-if="hasPermission && isAutosaveTab"
+                  class="mt-4"
+                  :status="saveStatus"
+                  :error-message="saveErrorMessage"
                 />
               </div>
             </div>

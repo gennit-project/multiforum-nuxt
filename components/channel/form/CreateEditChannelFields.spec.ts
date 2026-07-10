@@ -125,8 +125,15 @@ const fieldStubs = {
   },
   SuspensionNotice: { template: '<div data-testid="suspension-notice" />' },
   TailwindForm: {
-    template: '<form :data-needs-changes="String(needsChanges)"><slot /></form>',
-    props: ['formTitle', 'loading', 'needsChanges', 'showButtonsInHeader'],
+    template:
+      '<form :data-needs-changes="String(needsChanges)" :data-show-save="String(showSaveButton)"><slot /></form>',
+    props: [
+      'formTitle',
+      'loading',
+      'needsChanges',
+      'showButtonsInHeader',
+      'showSaveButton',
+    ],
   },
   FormRow: { template: '<div><slot name="content" /></div>', props: ['sectionTitle', 'required'] },
   TextInput: { template: '<input />', methods: { focus() {} } },
@@ -256,5 +263,49 @@ describe('CreateEditChannelFields — edit mode', () => {
     });
 
     expect(wrapper.find('form').attributes('data-needs-changes')).toBe('false');
+  });
+});
+
+describe('CreateEditChannelFields — autosave tabs', () => {
+  beforeEach(() => {
+    routeParams = { forumId: 'cats' };
+    routerPush.mockReset();
+  });
+
+  const mountEditTab = (name: string, props: Record<string, unknown> = {}) => {
+    routeName = name;
+    return mountFields({
+      editMode: true,
+      hasPermission: true,
+      dataLoaded: true,
+      formValues: { ...baseFormValues(), uniqueName: 'cats' },
+      ...props,
+    });
+  };
+
+  it('hides the shared Save button on the events (autosave) tab', () => {
+    const wrapper = mountEditTab('forums-forumId-edit-events');
+
+    expect(wrapper.find('form').attributes('data-show-save')).toBe('false');
+  });
+
+  it('shows the save status indicator on an autosave tab', () => {
+    const wrapper = mountEditTab('forums-forumId-edit-feedback', {
+      saveStatus: 'saving',
+    });
+
+    expect(wrapper.find('[data-testid="save-status"]').exists()).toBe(true);
+  });
+
+  it('keeps the shared Save button on a non-autosave tab', () => {
+    const wrapper = mountEditTab('forums-forumId-edit-rules');
+
+    expect(wrapper.find('form').attributes('data-show-save')).toBe('true');
+  });
+
+  it('hides the save status indicator on a non-autosave tab', () => {
+    const wrapper = mountEditTab('forums-forumId-edit-rules');
+
+    expect(wrapper.find('[data-testid="save-status"]').exists()).toBe(false);
   });
 });
