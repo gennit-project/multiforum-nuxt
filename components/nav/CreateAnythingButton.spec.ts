@@ -2,16 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
-// @floating-ui/vue's useFloating + autoUpdate loops under jsdom; stub it (the
-// menu's open/close + navigation logic is what these tests exercise).
-vi.mock('@floating-ui/vue', () => ({
-  useFloating: () => ({ floatingStyles: ref({}) }),
-  offset: () => ({}),
-  flip: () => ({}),
-  shift: () => ({}),
-  autoUpdate: () => () => {},
-}));
-
 import CreateAnythingButton from '@/components/nav/CreateAnythingButton.vue';
 
 // @floating-ui/vue's useFloating + autoUpdate loops under jsdom; stub it (the
