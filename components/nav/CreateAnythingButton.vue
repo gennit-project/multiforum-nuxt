@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, nextTick, computed, onMounted } from 'vue';
+import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { useFloating, offset, flip, shift, autoUpdate } from '@floating-ui/vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import { useRoute, useRouter } from 'nuxt/app';
@@ -66,39 +67,56 @@ const menuItems: MenuItem[] = [
   },
 ];
 
-const uniqueID = ref(Math.random().toString(36).substring(7));
-const shouldOpenUpwards = ref(false);
-const shouldOpenLeftwards = ref(false);
+const isMenuOpen = ref(false);
+const triggerRef = ref<HTMLElement | null>(null);
+const floatingRef = ref<HTMLElement | null>(null);
 
-const adjustMenuPosition = () => {
-  nextTick(() => {
-    const menuButton = document.querySelector(`#menu-button-${uniqueID.value}`);
-    const menuItems = document.querySelector(`#menu-items-${uniqueID.value}`);
-
-    if (menuButton && menuItems) {
-      const menuButtonRect = menuButton.getBoundingClientRect();
-      const menuItemsHeight = menuItems.getBoundingClientRect().height;
-      const menuItemsWidth = menuItems.getBoundingClientRect().width;
-      const spaceBelow = window.innerHeight - menuButtonRect.bottom;
-      shouldOpenUpwards.value = spaceBelow < menuItemsHeight;
-
-      const spaceLeft = menuButtonRect.left;
-      shouldOpenLeftwards.value = spaceLeft > menuItemsWidth;
-    }
-  });
-};
-
-onMounted(() => {
-  adjustMenuPosition();
-  window.addEventListener('resize', adjustMenuPosition);
+const { floatingStyles } = useFloating(triggerRef, floatingRef, {
+  placement: 'bottom-end',
+  strategy: 'fixed',
+  middleware: [offset(4), flip(), shift({ padding: 8 })],
+  whileElementsMounted: autoUpdate,
 });
 
-const isMenuOpen = ref(false);
+function toggle() {
+  isMenuOpen.value = !isMenuOpen.value;
+}
 
 const handleItemClick = (item: MenuItem) => {
   item.action();
   isMenuOpen.value = false;
 };
+
+function onDocumentPointerDown(event: PointerEvent) {
+  const target = event.target as Node;
+  if (
+    triggerRef.value?.contains(target) ||
+    floatingRef.value?.contains(target)
+  ) {
+    return;
+  }
+  isMenuOpen.value = false;
+}
+function onKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') isMenuOpen.value = false;
+}
+
+watch(isMenuOpen, (open) => {
+  if (!import.meta.client) return;
+  if (open) {
+    document.addEventListener('pointerdown', onDocumentPointerDown, true);
+    document.addEventListener('keydown', onKeydown);
+  } else {
+    document.removeEventListener('pointerdown', onDocumentPointerDown, true);
+    document.removeEventListener('keydown', onKeydown);
+  }
+});
+
+onBeforeUnmount(() => {
+  if (!import.meta.client) return;
+  document.removeEventListener('pointerdown', onDocumentPointerDown, true);
+  document.removeEventListener('keydown', onKeydown);
+});
 
 const buttonClasses = computed(() => {
   if (createButtonProps.iconOnly) {
@@ -124,13 +142,14 @@ const buttonClasses = computed(() => {
   <RequireAuth class="align-middle" :full-width="false">
     <template #has-auth>
       <client-only>
-        <v-menu v-model="isMenuOpen" :close-on-content-click="true" offset-y>
-          <template #activator="{ props }">
+        <div class="inline-block align-middle">
+          <div ref="triggerRef" class="inline-block">
             <button
               type="button"
-              v-bind="props"
               :class="buttonClasses"
-              @click="adjustMenuPosition"
+              aria-haspopup="true"
+              :aria-expanded="isMenuOpen"
+              @click="toggle"
             >
               <span
                 v-if="!iconOnly"
@@ -152,32 +171,34 @@ const buttonClasses = computed(() => {
                 aria-hidden="true"
               />
             </button>
-          </template>
+          </div>
 
-          <v-list
-            class="bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700 dark:text-gray-200"
-            :style="{
-              top: shouldOpenUpwards ? 'auto' : '100%',
-              right: shouldOpenLeftwards ? 0 : 'auto',
-              bottom: shouldOpenUpwards ? '100%' : 'auto',
-              zIndex: 10000,
-            }"
-          >
-            <v-list-item
-              v-for="(item, index) in menuItems"
-              :key="index"
-              :data-testid="item.testId"
-              class="hover:bg-gray-100 dark:hover:bg-gray-600"
-              @click="() => handleItemClick(item)"
+          <Teleport to="body">
+            <div
+              v-if="isMenuOpen"
+              ref="floatingRef"
+              :style="floatingStyles"
+              class="z-[10000]"
             >
-              <span
-                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200"
+              <div
+                class="min-w-[12rem] overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700 dark:text-gray-200"
+                role="menu"
               >
-                {{ item.text }}
-              </span>
-            </v-list-item>
-          </v-list>
-        </v-menu>
+                <button
+                  v-for="(item, index) in menuItems"
+                  :key="index"
+                  type="button"
+                  :data-testid="item.testId"
+                  role="menuitem"
+                  class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
+                  @click="handleItemClick(item)"
+                >
+                  {{ item.text }}
+                </button>
+              </div>
+            </div>
+          </Teleport>
+        </div>
         <template #fallback>
           <button
             :class="buttonClasses"
