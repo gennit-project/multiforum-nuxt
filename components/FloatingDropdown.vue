@@ -98,6 +98,7 @@ onBeforeUnmount(() => {
 <template>
   <client-only>
     <div ref="triggerRef" class="inline-block" @focusout="onFocusOut">
+    <div ref="triggerRef" class="inline-block" @focusout="onFocusOut">
       <slot
         name="button"
         v-bind="{ activatorProps, class: $attrs.class, onClose: close }"
