@@ -69,6 +69,16 @@ export default defineNuxtConfig({
   },
   experimental: {
     payloadExtraction: false,
+    defaults: {
+      // Default NuxtLink prefetch triggers on viewport visibility, so list
+      // pages (discussions, events, images) speculatively download the route
+      // chunks of every link on screen. Prefetch on hover/focus instead: links
+      // the user actually aims at still load instantly, but we stop pulling
+      // megabytes of route chunks for links that are merely visible.
+      nuxtLink: {
+        prefetchOn: { visibility: false, interaction: true },
+      },
+    },
   },
   compatibilityDate: '2024-04-03',
   components: true,
