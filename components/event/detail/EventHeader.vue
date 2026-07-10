@@ -3,15 +3,9 @@ import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import type { Event } from '@/__generated__/graphql';
-import {
-  CANCEL_EVENT,
-  DELETE_EVENT,
-  DELETE_EVENT_IN_SERIES,
-  ADD_FEEDBACK_COMMENT_TO_EVENT,
-  UPDATE_EVENT_IN_SERIES,
-} from '@/graphQLData/event/mutations';
+import { ADD_FEEDBACK_COMMENT_TO_EVENT } from '@/graphQLData/event/mutations';
 import EditScopeModal from '@/components/event/form/EditScopeModal.vue';
-import type { EventEditScope } from '@/components/event/form/EditScopeModal.vue';
+import { useEventCancelDelete } from '@/composables/useEventCancelDelete';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import LocationIcon from '@/components/icons/LocationIcon.vue';
@@ -76,15 +70,11 @@ const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
 const showCopiedLinkNotification = ref(false);
 const showFeedbackFormModal = ref(false);
 const showFeedbackSubmittedSuccessfully = ref(false);
-const confirmDeleteIsOpen = ref(false);
-const confirmCancelIsOpen = ref(false);
 
 // Series-related state
 // Note: EventSeries is a new field that may not be in generated types yet
 const eventDataWithSeries = computed(() => props.eventData as Event & { EventSeries?: { id?: string } });
 const isPartOfSeries = computed(() => Boolean(eventDataWithSeries.value?.EventSeries?.id));
-const showCancelScopeModal = ref(false);
-const showDeleteScopeModal = ref(false);
 const {
   showReportModal: showReportEventModal,
   showArchiveModal,
@@ -229,139 +219,27 @@ const permalinkObject = computed(() => {
   };
 });
 
+// Cancel/delete lifecycle (standalone event vs event-series scoping) lives in a
+// composable that owns the confirm/scope modal state, the four mutations, and
+// their post-action navigation/close side effects.
 const {
-  mutate: deleteEvent,
-  error: deleteEventError,
-  loading: deleteEventLoading,
-  onDone: onDoneDeleting,
-} = useMutation(DELETE_EVENT, {
-  variables: { id: eventId.value },
-  update: (cache) => {
-    cache.modify({
-      fields: {
-        events(existingEventRefs = [], { readField }) {
-          return existingEventRefs.filter(
-            (ref: { __ref?: string }) => readField('id', ref) !== eventId.value
-          );
-        },
-      },
-    });
-  },
-});
-
-onDoneDeleting(() => {
-  if (channelId.value) {
-    router.push({
-      name: 'forums-forumId-events',
-      params: { forumId: channelId.value },
-    });
-  }
-});
-
-const {
-  mutate: cancelEvent,
-  error: cancelEventError,
-  loading: cancelEventLoading,
-  onDone: onDoneCanceling,
-} = useMutation(CANCEL_EVENT, {
-  variables: {
-    updateEventInput: { canceled: true },
-    eventWhere: { id: eventId.value },
-    channelConnections: [],
-    channelDisconnections: [],
-  },
-});
-
-onDoneCanceling(() => {
-  confirmCancelIsOpen.value = false;
-});
-
-// Mutation for canceling events in a series
-const {
-  mutate: cancelEventInSeries,
-  error: cancelEventInSeriesError,
-  loading: cancelEventInSeriesLoading,
-  onDone: onDoneCancelingInSeries,
-} = useMutation(UPDATE_EVENT_IN_SERIES);
-
-onDoneCancelingInSeries(() => {
-  showCancelScopeModal.value = false;
-});
-
-// Combined cancel error
-const combinedCancelError = computed(() => {
-  return cancelEventError.value || cancelEventInSeriesError.value;
-});
-
-// Combined cancel loading
-const combinedCancelLoading = computed(() => {
-  return cancelEventLoading.value || cancelEventInSeriesLoading.value;
-});
-
-// Handle cancel button click - show scope modal if part of series
-function handleCancelClick() {
-  if (isPartOfSeries.value) {
-    showCancelScopeModal.value = true;
-  } else {
-    confirmCancelIsOpen.value = true;
-  }
-}
-
-// Handle cancel scope selection
-function handleCancelScopeConfirm(scope: EventEditScope) {
-  cancelEventInSeries({
-    eventId: eventId.value,
-    scope,
-    eventUpdateInput: { canceled: true },
-    channelConnections: [],
-    channelDisconnections: [],
-  });
-}
-
-// Mutation for deleting events in a series
-const {
-  mutate: deleteEventInSeriesMutation,
-  error: deleteEventInSeriesError,
-  loading: deleteEventInSeriesLoading,
-  onDone: onDoneDeletingInSeries,
-} = useMutation(DELETE_EVENT_IN_SERIES);
-
-onDoneDeletingInSeries(() => {
-  showDeleteScopeModal.value = false;
-  if (channelId.value) {
-    router.push({
-      name: 'forums-forumId-events',
-      params: { forumId: channelId.value },
-    });
-  }
-});
-
-// Combined delete error
-const combinedDeleteError = computed(() => {
-  return deleteEventError.value || deleteEventInSeriesError.value;
-});
-
-// Combined delete loading
-const combinedDeleteLoading = computed(() => {
-  return deleteEventLoading.value || deleteEventInSeriesLoading.value;
-});
-
-// Handle delete button click - show scope modal if part of series
-function handleDeleteClick() {
-  if (isPartOfSeries.value) {
-    showDeleteScopeModal.value = true;
-  } else {
-    confirmDeleteIsOpen.value = true;
-  }
-}
-
-// Handle delete scope selection
-function handleDeleteScopeConfirm(scope: EventEditScope) {
-  deleteEventInSeriesMutation({
-    eventId: eventId.value,
-    scope,
-  });
-}
+  confirmDeleteIsOpen,
+  confirmCancelIsOpen,
+  showCancelScopeModal,
+  showDeleteScopeModal,
+  deleteEvent,
+  cancelEvent,
+  deleteEventError,
+  cancelEventError,
+  combinedCancelError,
+  combinedCancelLoading,
+  combinedDeleteError,
+  combinedDeleteLoading,
+  handleCancelClick,
+  handleCancelScopeConfirm,
+  handleDeleteClick,
+  handleDeleteScopeConfirm,
+} = useEventCancelDelete({ eventId, channelId, isPartOfSeries });
 
 const {
   mutate: addFeedbackCommentToEvent,
