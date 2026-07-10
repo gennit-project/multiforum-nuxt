@@ -206,10 +206,35 @@ Notes:
 - Image grids and channel header/sidebar surfaces pass the computed state into favorite buttons so those buttons skip their fallback lookup.
 - Comment list/reply/event-comment payloads already include `isFavoritedByUser`, and `CommentButtons` passes it into `AddToCommentFavorites`; the per-item lookup remains only as a fallback for callers that do not provide state.
 
-### 15. Auto-save for server settings and channel admin settings `[not started]`
+### 15. Auto-save for server settings and channel admin settings `[complete]`
 
-- [ ] Replace explicit save-button flows where appropriate with autosave behavior.
-- [ ] Start with plugins/settings areas called out in the original note.
+- [x] Replace explicit save-button flows where appropriate with autosave behavior.
+- [x] Start with plugins/settings areas called out in the original note.
+
+Notes:
+- Added a shared `useSettingAutosave` composable (per-field debounced save with
+  visible Saving/Saved/error state, no-op skipping, coalescing, and no
+  overlapping saves) plus a `SaveStatus` indicator (`aria-live` / `role=alert`).
+  `FormComponent` gained an opt-in `showSaveButton` prop.
+- Converted the settings tabs whose fields are simple, non-destructive scalars —
+  each sends a SCOPED partial update, and the shared Save button is replaced by
+  the status indicator on those tabs:
+  - Server: Basic (`serverDescription`), Calendar (`enableEvents`).
+  - Channel: Events (`eventsEnabled`), Images (`imageUploadsEnabled`,
+    `markdownImagesEnabled`), Emoji (`emojiEnabled`), Feedback (`feedbackEnabled`).
+- **Intentionally kept on explicit Save** (autosave is not appropriate — the
+  "where appropriate" boundary): roles & permissions, plugins & secrets, rules
+  editors, server/channel download **filter groups** and allowed file types,
+  mods/owners management, suspensions, banner/icon upload & delete, and any
+  drag-to-reorder flow (batched). These involve destructive, secret, permission,
+  or complex nested-CRUD changes that should be deliberate.
+- Mixed tabs (e.g. channel Basic: name/description alongside tags/banner) remain
+  on explicit Save to avoid a half-autosaving form; converting just their scalar
+  text fields is a possible future refinement, not required for this item.
+- Backend needed no changes: `updateServerConfigs`/`updateChannels` already apply
+  the update input as a partial update, so scoped single-field saves are safe.
+- Frontend PRs gennit-project/multiforum-nuxt#323 (pattern + server tabs) and the
+  channel-rollout PR stacked on it.
 
 ### 16. Event edit history: title and description revisions `[complete]`
 

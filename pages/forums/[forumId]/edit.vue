@@ -15,11 +15,60 @@ import type {
 } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
 import { useQuery, useMutation } from '@vue/apollo-composable';
+import {
+  useSettingAutosave,
+  type AutosaveStatus,
+} from '@/composables/useSettingAutosave';
 
 const usernameVar = useUsername();
 
 const route = useRoute();
 const channelId = route.params.forumId as string;
+
+// Autosave for the simple toggle tabs (Events, Images, Emoji, Feedback). Uses a
+// separate UPDATE_CHANNEL instance so a toggle save doesn't trigger the
+// form-wide "changes saved" toast/refetch — the SaveStatus indicator covers it.
+// Each toggle sends a SCOPED partial update (only its own field). Declared
+// before the channel query's immediate watch so the watch can prime baselines.
+const { mutate: updateChannelField } = useMutation(UPDATE_CHANNEL);
+const saveChannelField = (update: ChannelUpdateInput) =>
+  updateChannelField({ where: { uniqueName: channelId }, update });
+
+const eventsAutosave = useSettingAutosave<boolean>({
+  save: (eventsEnabled) => saveChannelField({ eventsEnabled }),
+});
+const imageUploadsAutosave = useSettingAutosave<boolean>({
+  save: (imageUploadsEnabled) => saveChannelField({ imageUploadsEnabled }),
+});
+const markdownImagesAutosave = useSettingAutosave<boolean>({
+  save: (markdownImagesEnabled) => saveChannelField({ markdownImagesEnabled }),
+});
+const feedbackAutosave = useSettingAutosave<boolean>({
+  save: (feedbackEnabled) => saveChannelField({ feedbackEnabled }),
+});
+const emojiAutosave = useSettingAutosave<boolean>({
+  save: (emojiEnabled) => saveChannelField({ emojiEnabled }),
+});
+
+const channelAutosaves = [
+  eventsAutosave,
+  imageUploadsAutosave,
+  markdownImagesAutosave,
+  feedbackAutosave,
+  emojiAutosave,
+];
+
+const autosaveStatus = computed<AutosaveStatus>(() => {
+  const statuses = channelAutosaves.map((a) => a.status.value);
+  if (statuses.includes('saving')) return 'saving';
+  if (statuses.includes('error')) return 'error';
+  if (statuses.includes('saved')) return 'saved';
+  return 'idle';
+});
+const autosaveErrorMessage = computed(
+  () =>
+    channelAutosaves.find((a) => a.error.value)?.error.value?.message || ''
+);
 
 const {
   result: getChannelResult,
@@ -85,6 +134,16 @@ watch(
         downloadFilterGroups: channelData.FilterGroups || [],
         rules,
       };
+
+      // Prime autosave baselines so the first edit matching the loaded value
+      // does not fire a redundant save.
+      eventsAutosave.setInitial(Boolean(channelData.eventsEnabled));
+      imageUploadsAutosave.setInitial(channelData.imageUploadsEnabled !== false);
+      markdownImagesAutosave.setInitial(
+        channelData.markdownImagesEnabled !== false
+      );
+      feedbackAutosave.setInitial(Boolean(channelData.feedbackEnabled));
+      emojiAutosave.setInitial(channelData.emojiEnabled !== false);
 
       dataLoaded.value = true;
     }
@@ -301,6 +360,24 @@ function submit() {
 
 function updateFormValues(data: CreateEditChannelFormValues) {
   formValues.value = { ...formValues.value, ...data };
+
+  // The Events, Images, Emoji, and Feedback tabs autosave their toggles on
+  // change. Other tabs continue to batch through submit().
+  if ('eventsEnabled' in data) {
+    eventsAutosave.trigger(Boolean(data.eventsEnabled));
+  }
+  if ('imageUploadsEnabled' in data) {
+    imageUploadsAutosave.trigger(Boolean(data.imageUploadsEnabled));
+  }
+  if ('markdownImagesEnabled' in data) {
+    markdownImagesAutosave.trigger(Boolean(data.markdownImagesEnabled));
+  }
+  if ('feedbackEnabled' in data) {
+    feedbackAutosave.trigger(Boolean(data.feedbackEnabled));
+  }
+  if ('emojiEnabled' in data) {
+    emojiAutosave.trigger(Boolean(data.emojiEnabled));
+  }
 }
 
 const hasError = computed(() => {
@@ -336,6 +413,8 @@ const hasError = computed(() => {
         :owner-list="ownerList"
         :has-permission="isOwner"
         :data-loaded="dataLoaded"
+        :save-status="autosaveStatus"
+        :save-error-message="autosaveErrorMessage"
         @submit="submit"
         @update-form-values="updateFormValues"
       />
