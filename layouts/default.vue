@@ -66,7 +66,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-app>
+  <div>
     <DevOverlay v-if="isDevelopment" />
     <ToastNotification />
     <AddToListModalHost />
@@ -129,5 +129,5 @@ onMounted(() => {
         </div>
       </div>
     </main>
-  </v-app>
+  </div>
 </template>
