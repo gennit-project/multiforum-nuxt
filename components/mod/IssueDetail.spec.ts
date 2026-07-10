@@ -234,14 +234,21 @@ describe('IssueDetail', () => {
     deleteReasonError.value = '';
 
     (useQuery as unknown as ReturnType<typeof vi.fn>).mockImplementation(
-      (_document, _variables, _options) => ({
-        result: issueResult,
-        error: queryError,
-        loading: queryLoading,
-        refetch: refetchIssue,
-        fetchMore: vi.fn(),
-        onResult: vi.fn(),
-      })
+      (_document, variables, options) => {
+        // Invoke the reactive variables/options factories so their bodies — and
+        // the computeds they read (channelId, issueNumber, relatedDiscussionId,
+        // relatedEventId, relatedCommentId, …) — are exercised.
+        if (typeof variables === 'function') variables();
+        if (typeof options === 'function') options();
+        return {
+          result: issueResult,
+          error: queryError,
+          loading: queryLoading,
+          refetch: refetchIssue,
+          fetchMore: vi.fn(),
+          onResult: vi.fn(),
+        };
+      }
     );
 
     let mutationCallIndex = 0;
