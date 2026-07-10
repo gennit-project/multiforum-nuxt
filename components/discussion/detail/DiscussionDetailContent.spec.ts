@@ -29,6 +29,14 @@ const DiscussionCommentsWrapperStub = {
   template: '<div class="comments-wrapper-stub" />',
 };
 
+// Spies exposed via the FeedbackModalManager stub's template ref, so the
+// parent's delegating handlers can be asserted.
+const feedbackManagerSpies = {
+  handleClickGiveFeedback: vi.fn(),
+  handleClickUndoFeedback: vi.fn(),
+  handleClickEditFeedback: vi.fn(),
+};
+
 const stubs = {
   DiscussionHeader: {
     name: 'DiscussionHeader',
@@ -74,11 +82,7 @@ const stubs = {
     name: 'FeedbackModalManager',
     emits: ['feedback-submitted'],
     template: '<div class="feedback-modal-manager-stub" />',
-    methods: {
-      handleClickGiveFeedback: vi.fn(),
-      handleClickUndoFeedback: vi.fn(),
-      handleClickEditFeedback: vi.fn(),
-    },
+    methods: feedbackManagerSpies,
   },
 };
 
@@ -128,6 +132,7 @@ const setup = (params: {
   hasCommentSection?: boolean;
   discussionChannelOverrides?: Record<string, unknown>;
   issueResult?: Record<string, unknown>;
+  commentIssueResult?: Record<string, unknown>;
 } = {}) => {
   const {
     discussions = [makeDiscussion()],
@@ -135,15 +140,24 @@ const setup = (params: {
     hasCommentSection = true,
     discussionChannelOverrides = {},
     issueResult = { issues: [] },
+    commentIssueResult = { discussionChannels: [] },
   } = params;
   const section = commentSection(comments);
   Object.assign(
     section.getCommentSection.DiscussionChannel,
     discussionChannelOverrides
   );
-  const discussionQuery = createQueryMock({ discussions });
+  // Fire the onResult callbacks the component registers so the
+  // lastValidDiscussion / lastValidCommentSection caching paths are exercised.
+  const discussionQuery = createQueryMock(
+    { discussions },
+    { onResult: (cb: (r: unknown) => void) => cb({ data: { discussions } }) }
+  );
+  const csData = hasCommentSection ? section : { getCommentSection: null };
   const commentSectionQuery = {
-    ...createQueryMock(hasCommentSection ? section : { getCommentSection: null }),
+    ...createQueryMock(csData, {
+      onResult: (cb: (r: unknown) => void) => cb({ data: csData }),
+    }),
     fetchMore: vi.fn(),
   } as ReturnType<typeof createQueryMock> & { fetchMore: ReturnType<typeof vi.fn> };
   const commentAggregateQuery = createQueryMock({
@@ -153,7 +167,7 @@ const setup = (params: {
     discussionChannels: [{ CommentsAggregate: { count: comments.length } }],
   });
   const issueQuery = createQueryMock(issueResult);
-  const commentIssueQuery = createQueryMock({ discussionChannels: [] });
+  const commentIssueQuery = createQueryMock(commentIssueResult);
   configureApolloMocks({
     useQuery,
     queries: {
@@ -311,5 +325,90 @@ describe('DiscussionDetailContent', () => {
       discussionRefetches: 2,
       channelRefetches: 1,
     });
+  });
+
+  describe('feedback delegation to the modal manager', () => {
+    it.each([
+      ['handle-click-give-feedback', 'handleClickGiveFeedback'],
+      ['handle-click-undo-feedback', 'handleClickUndoFeedback'],
+      ['handle-click-edit-feedback', 'handleClickEditFeedback'],
+    ] as const)('forwards %s to the feedback modal manager', async (event, method) => {
+      const { wrapper } = setup();
+      await wrapper
+        .findComponent({ name: 'DiscussionLayoutManager' })
+        .vm.$emit(event);
+
+      expect(feedbackManagerSpies[method]).toHaveBeenCalled();
+    });
+  });
+
+  it('enters album edit mode from the layout edit-album event', async () => {
+    const { wrapper } = setup();
+    await wrapper.findComponent({ name: 'DiscussionLayoutManager' }).vm.$emit('edit-album');
+
+    expect(wrapper.find('.album-edit-stub').exists()).toBe(true);
+  });
+
+  it('does not enter album edit mode from edit-album when uploads are disabled', async () => {
+    const { wrapper } = setup({
+      discussionChannelOverrides: { Channel: { imageUploadsEnabled: false } },
+    });
+    await wrapper.findComponent({ name: 'DiscussionLayoutManager' }).vm.$emit('edit-album');
+
+    expect(wrapper.find('.album-edit-stub').exists()).toBe(false);
+  });
+
+  it('merges the fetched page of comments in loadMore updateQuery', async () => {
+    const { wrapper, commentSectionQuery } = setup({
+      comments: [makeComment('a')],
+    });
+    await wrapper.findComponent(DiscussionCommentsWrapperStub).vm.$emit('load-more');
+
+    const { updateQuery } = commentSectionQuery.fetchMore.mock.calls[0]![0];
+    const merged = updateQuery(
+      { getCommentSection: { Comments: [makeComment('a')] } },
+      { fetchMoreResult: { getCommentSection: { Comments: [makeComment('b')] } } }
+    );
+
+    expect(merged.getCommentSection.Comments.map((c: Comment) => c.id)).toEqual([
+      'a',
+      'b',
+    ]);
+  });
+
+  it('returns the previous result when loadMore has no more comments', async () => {
+    const { wrapper, commentSectionQuery } = setup({ comments: [makeComment('a')] });
+    await wrapper.findComponent(DiscussionCommentsWrapperStub).vm.$emit('load-more');
+
+    const { updateQuery } = commentSectionQuery.fetchMore.mock.calls[0]![0];
+    const previous = { getCommentSection: { Comments: [makeComment('a')] } };
+
+    expect(updateQuery(previous, { fetchMoreResult: null })).toBe(previous);
+  });
+
+  it('falls back to a related issue linked from a comment', () => {
+    const { wrapper } = setup({
+      issueResult: { issues: [] },
+      commentIssueResult: {
+        discussionChannels: [
+          { Comments: [{ RelatedIssues: [{ issueNumber: 7 }] }] },
+        ],
+      },
+    });
+
+    expect(
+      wrapper.findComponent({ name: 'DiscussionHeader' }).props('relatedIssueLink')
+    ).toEqual({
+      name: 'forums-forumId-issues-issueNumber',
+      params: { forumId: 'cats', issueNumber: 7 },
+    });
+  });
+
+  it('passes a null related issue link when there is no issue', () => {
+    const { wrapper } = setup();
+
+    expect(
+      wrapper.findComponent({ name: 'DiscussionHeader' }).props('relatedIssueLink')
+    ).toBeNull();
   });
 });
