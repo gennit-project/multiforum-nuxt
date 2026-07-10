@@ -11,7 +11,7 @@ const h = vi.hoisted(() => ({
 }));
 
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
-vi.mock('vuetify', () => ({ useDisplay: () => ({ mdAndUp: h.mdAndUp }) }));
+vi.mock('@/composables/useDisplay', () => ({ useDisplay: () => ({ mdAndUp: h.mdAndUp }) }));
 
 const tabButtonStub = {
   name: 'TabButton',

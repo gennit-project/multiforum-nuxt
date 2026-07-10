@@ -13,7 +13,7 @@ const h = vi.hoisted(() => ({
 }));
 
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
-vi.mock('vuetify', () => ({ useDisplay: () => ({ height: ref(900) }) }));
+vi.mock('@/composables/useDisplay', () => ({ useDisplay: () => ({ height: ref(900) }) }));
 vi.mock('@/utils/localStorageUtils', () => ({
   getLocalStorageItem: () => [],
   setLocalStorageItem: vi.fn(),

@@ -19,7 +19,7 @@ import { isFileSizeValid } from '@/utils/index';
 
 // --- Mounted-component setup (the existing tests above only exercise the
 // extracted utils; these mount the real TextEditor textarea editor) ---
-vi.mock('vuetify', () => ({ useDisplay: () => ({ width: ref(1024) }) }));
+vi.mock('@/composables/useDisplay', () => ({ useDisplay: () => ({ width: ref(1024) }) }));
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: () => ({
     mutate: vi.fn(),

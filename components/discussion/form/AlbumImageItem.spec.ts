@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import AlbumImageItem from './AlbumImageItem.vue';
 
-vi.mock('vuetify', () => ({ useDisplay: () => ({ mdAndDown: false }) }));
+vi.mock('@/composables/useDisplay', () => ({ useDisplay: () => ({ mdAndDown: false }) }));
 
 const image = { url: 'https://img.test/a.png', alt: 'A', caption: 'C', copyright: '' };
 

@@ -8,7 +8,7 @@ import {
   TransitionRoot,
 } from '@headlessui/vue';
 import XIcon from '@/components/icons/XmarkIcon.vue';
-import { useDisplay } from 'vuetify';
+import { useDisplay } from '@/composables/useDisplay';
 
 const props = defineProps({
   isOpen: {

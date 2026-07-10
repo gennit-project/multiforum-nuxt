@@ -4,7 +4,7 @@ import { mount } from '@vue/test-utils';
 
 import DrawerFlyout from '@/components/DrawerFlyout.vue';
 
-vi.mock('vuetify', () => ({ useDisplay: () => ({ smAndDown: ref(false) }) }));
+vi.mock('@/composables/useDisplay', () => ({ useDisplay: () => ({ smAndDown: ref(false) }) }));
 vi.mock('@headlessui/vue', () => ({
   TransitionRoot: { name: 'TransitionRoot', template: '<div><slot /></div>' },
   TransitionChild: { name: 'TransitionChild', template: '<div><slot /></div>' },

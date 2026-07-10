@@ -16,7 +16,7 @@ import {
   useIsAuthenticated,
 } from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
-import { useDisplay } from 'vuetify';
+import { useDisplay } from '@/composables/useDisplay';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';

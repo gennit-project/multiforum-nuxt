@@ -23,7 +23,7 @@ vi.mock('@headlessui/vue', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
 }));
 
-vi.mock('vuetify', () => ({
+vi.mock('@/composables/useDisplay', () => ({
   useDisplay: () => ({ mdAndUp: h.mdAndUp }),
 }));
 

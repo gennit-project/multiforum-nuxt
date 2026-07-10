@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { config } from '@/config';
-import { useDisplay } from 'vuetify';
+import { useDisplay } from '@/composables/useDisplay';
 import HamburgerMenuButton from '@/components/nav/HamburgerMenuButton.vue';
 import UserProfileDropdownMenu from '@/components/nav/UserProfileDropdownMenu.vue';
 import ThemeSwitcher from '@/components/nav/ThemeSwitcher.vue';
