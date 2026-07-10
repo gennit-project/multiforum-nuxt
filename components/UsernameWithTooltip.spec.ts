@@ -9,8 +9,8 @@ const mountUsername = (props: Record<string, unknown> = {}) =>
     global: {
       stubs: {
         ClientOnly: { template: '<div><slot /></div>' },
-        'v-tooltip': {
-          name: 'VTooltip',
+        Tooltip: {
+          name: 'Tooltip',
           template: '<div><slot name="activator" :props="{}" /><slot /></div>',
         },
         AvatarComponent: true,

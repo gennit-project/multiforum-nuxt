@@ -18,7 +18,7 @@ const mountButton = (props: Record<string, unknown> = {}, slot = 'X') =>
       stubs: {
         AuthButton: authButtonStub,
         ClientOnly: { template: '<div><slot /></div>' },
-        'v-tooltip': { template: '<div><slot name="activator" :props="{}" /><slot /></div>' },
+        Tooltip: { template: '<div><slot name="activator" :props="{}" /><slot /></div>' },
         TooltipContent: true,
       },
     },

@@ -96,12 +96,7 @@ const mergedButtonProps = computed(() => ({
 <template>
   <div v-if="tooltipText">
     <client-only>
-      <v-tooltip
-        location="top"
-        content-class="custom-tooltip"
-        :aria-label="tooltipText"
-        :content-props="{ 'aria-label': tooltipText }"
-      >
+      <Tooltip location="top" :aria-label="tooltipText">
         <template #activator="{ props }">
           <div v-bind="props">
             <AuthButton
@@ -123,7 +118,7 @@ const mergedButtonProps = computed(() => ({
             :tooltip-text="tooltipText"
           />
         </template>
-      </v-tooltip>
+      </Tooltip>
       <template #fallback>
         <AuthButton
           :test-id="testId"
