@@ -69,7 +69,7 @@ const mountList = () => {
         LoadMore: loadMoreStub,
         ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err" />' },
         RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
-        'v-skeleton-loader': { template: '<div class="skeleton" />' },
+        'SkeletonLoader': { template: '<div class="skeleton" />' },
       },
     },
   });

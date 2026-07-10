@@ -15,7 +15,6 @@ import {
   IS_DISCUSSION_ANSWERED,
 } from '@/graphQLData/discussion/queries';
 import { DISCUSSION_TITLE_CHAR_LIMIT } from '@/utils/constants';
-import { useAppTheme } from '@/composables/useTheme';
 import { useRoute } from 'nuxt/app';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
@@ -23,7 +22,6 @@ import { useModProfileName, useUsername } from '@/composables/useAuthState';
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
 
-const { theme } = useAppTheme();
 
 const route = useRoute();
 const titleEditMode = ref(false);
@@ -133,13 +131,13 @@ const isDownloadDetailPage = computed(() => {
     >
       <div v-if="getDiscussionLoading" class="flex-1">
         <div class="flex flex-col gap-2 px-1">
-          <v-skeleton-loader class="w-3/4" type="text" :theme="theme" />
-          <v-skeleton-loader class="w-1/3" type="text" :theme="theme" />
+          <SkeletonLoader class="w-3/4" type="text" />
+          <SkeletonLoader class="w-1/3" type="text" />
         </div>
       </div>
       <!-- Primary button skeleton -->
       <div v-if="getDiscussionLoading" class="hidden md:block">
-        <v-skeleton-loader class="w-28" type="button" :theme="theme" />
+        <SkeletonLoader class="w-28" type="button" />
       </div>
       <div v-else ref="discussionDetail" class="flex-1">
         <h1

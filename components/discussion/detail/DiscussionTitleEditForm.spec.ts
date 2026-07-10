@@ -93,7 +93,7 @@ const mountForm = () =>
         InfoBanner: { name: 'InfoBanner', props: ['text'], template: '<div class="info" />' },
         CharCounter: { props: ['current', 'max'], template: '<div />' },
         CheckCircleIcon: true,
-        'v-skeleton-loader': { template: '<div class="skeleton" />' },
+        'SkeletonLoader': { template: '<div class="skeleton" />' },
         NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
         'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
       },

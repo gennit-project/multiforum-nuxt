@@ -11,13 +11,11 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import { GET_ISSUE } from '@/graphQLData/issue/queries';
 import { DISCUSSION_TITLE_CHAR_LIMIT } from '@/utils/constants';
 import { useModProfileName } from '@/composables/useAuthState';
-import { useAppTheme } from '@/composables/useTheme';
 import { useRoute } from 'nuxt/app';
 import IssueBadge from '@/components/mod/IssueBadge.vue';
 
 const modProfileNameVar = useModProfileName();
 
-const { theme } = useAppTheme();
 
 const route = useRoute();
 const titleEditMode = ref(false);
@@ -119,8 +117,8 @@ const hasReportedContent = computed(
     >
       <div v-if="getIssueLoading" class="flex-1">
         <div class="flex flex-col gap-2 px-1">
-          <v-skeleton-loader class="w-3/4" type="text" :theme="theme" />
-          <v-skeleton-loader class="w-1/3" type="text" :theme="theme" />
+          <SkeletonLoader class="w-3/4" type="text" />
+          <SkeletonLoader class="w-1/3" type="text" />
         </div>
       </div>
       <div v-else ref="issueDetail" class="flex-1">
