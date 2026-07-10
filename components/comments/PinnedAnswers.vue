@@ -102,6 +102,24 @@ const emit = defineEmits([
 const hasAnswers = computed(() => {
   return props.answers && props.answers.length > 0;
 });
+
+// Context props forwarded unchanged to each answer's <Comment>. Grouped here so
+// the tag binds them with a single v-bind instead of ~13 repeated lines.
+const answerPassThroughProps = computed(() => ({
+  enableFeedback: props.enableFeedback,
+  locked: props.locked || props.archived,
+  originalPoster: props.originalPoster,
+  answers: props.answers,
+  replyHasBotMention: props.replyHasBotMention,
+  createCommentError: props.createCommentError,
+  suspensionIssueNumber: props.suspensionIssueNumber,
+  suspensionChannelId: props.suspensionChannelId,
+  suspensionUntil: props.suspensionUntil,
+  suspensionIndefinitely: props.suspensionIndefinitely,
+  botSuggestions: props.botSuggestions,
+  botUsernames: props.botUsernames,
+  modSuggestions: props.modSuggestions,
+}));
 </script>
 
 <template>
@@ -127,21 +145,9 @@ const hasAnswers = computed(() => {
         <Comment
           :comment-data="answer"
           :depth="1"
-          :enable-feedback="enableFeedback"
-          :locked="locked || archived"
-          :original-poster="originalPoster"
-          :answers="answers"
-          :reply-has-bot-mention="replyHasBotMention"
-          :create-comment-error="createCommentError"
-          :suspension-issue-number="suspensionIssueNumber"
-          :suspension-channel-id="suspensionChannelId"
-          :suspension-until="suspensionUntil"
-          :suspension-indefinitely="suspensionIndefinitely"
-          :bot-suggestions="botSuggestions"
-          :bot-usernames="botUsernames"
-          :mod-suggestions="modSuggestions"
           :show-comment-buttons="true"
           :show-header="true"
+          v-bind="answerPassThroughProps"
           @create-comment="emit('createComment', $event)"
           @delete-comment="emit('delete-comment', $event)"
           @click-edit-comment="emit('click-edit-comment', $event)"
