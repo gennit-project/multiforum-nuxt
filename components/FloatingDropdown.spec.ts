@@ -4,24 +4,30 @@ import { mount } from '@vue/test-utils';
 
 import FloatingDropdown from '@/components/FloatingDropdown.vue';
 
-vi.mock('@/composables/useTheme', () => ({ useAppTheme: () => ({ theme: ref('light') }) }));
+// @floating-ui/vue's useFloating + autoUpdate loops under jsdom; stub it.
+vi.mock('@floating-ui/vue', () => ({
+  useFloating: () => ({ floatingStyles: ref({}) }),
+  offset: () => ({}),
+  flip: () => ({}),
+  shift: () => ({}),
+  autoUpdate: () => () => {},
+}));
+
+const stubs = {
+  ClientOnly: { template: '<div><slot /></div>' },
+  Teleport: { template: '<div><slot /></div>' },
+};
 
 const mountDropdown = (props: Record<string, unknown> = {}, slots = {}) =>
   mount(FloatingDropdown, {
     props,
-    slots: { button: '<button class="trigger" />', content: '<div class="panel" />', ...slots },
-    global: {
-      stubs: {
-        ClientOnly: { template: '<div><slot /></div>' },
-        'v-menu': {
-          name: 'VMenu',
-          props: ['modelValue'],
-          emits: ['update:modelValue'],
-          template: '<div><slot name="activator" :props="{}" /><slot /></div>',
-        },
-        'v-card': { template: '<div><slot /></div>' },
-      },
+    slots: {
+      button:
+        '<template #button="{ activatorProps }"><button class="trigger" v-bind="activatorProps" /></template>',
+      content: '<div class="panel" />',
+      ...slots,
     },
+    global: { stubs },
   });
 
 describe('FloatingDropdown', () => {
@@ -31,23 +37,23 @@ describe('FloatingDropdown', () => {
     expect(wrapper.find('.trigger').exists()).toBe(true);
   });
 
-  it('renders the content slot', () => {
-    const wrapper = mountDropdown();
+  it('does not render the content while closed', () => {
+    const wrapper = mountDropdown({ modelValue: false });
+
+    expect(wrapper.find('.panel').exists()).toBe(false);
+  });
+
+  it('renders the content slot when open', () => {
+    const wrapper = mountDropdown({ modelValue: true });
 
     expect(wrapper.find('.panel').exists()).toBe(true);
   });
 
-  it('re-emits update:modelValue from the menu', async () => {
-    const wrapper = mountDropdown({ modelValue: true });
+  it('emits update:modelValue when the trigger is activated', async () => {
+    const wrapper = mountDropdown({ modelValue: false });
 
-    await wrapper.getComponent({ name: 'VMenu' }).vm.$emit('update:modelValue', false);
+    await wrapper.find('.trigger').trigger('click');
 
-    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false]);
-  });
-
-  it('passes the model value to the menu', () => {
-    const wrapper = mountDropdown({ modelValue: true });
-
-    expect(wrapper.getComponent({ name: 'VMenu' }).props('modelValue')).toBe(true);
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([true]);
   });
 });
