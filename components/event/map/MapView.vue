@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, defineAsyncComponent } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRouter, useRoute } from 'nuxt/app';
 import { useDisplay } from 'vuetify';
 import EventPreview from '../list/EventPreview.vue';
 import EventList from '../list/EventList.vue';
-import EventMap, { type MarkerMap } from './Map.vue';
+import type { MarkerMap } from './Map.vue';
 import PreviewContainer from '../list/PreviewContainer.vue';
 import CloseButton from '../../CloseButton.vue';
 import ErrorBanner from '../../ErrorBanner.vue';
@@ -29,6 +29,11 @@ import type { Event as EventData } from '@/__generated__/graphql';
 import type { SearchEventValues } from '@/types/Event';
 import type { Ref, PropType } from 'vue';
 import { isEventSearchRoute } from '@/utils/isEventSearchRoute';
+
+// Map.vue statically imports the Google Maps JS API loader + marker clusterer
+// (~840KB decoded). Load it lazily so that weight is only fetched when the map
+// view actually renders, not prefetched with the event routes.
+const EventMap = defineAsyncComponent(() => import('./Map.vue'));
 
 const props = defineProps({
   selectedTags: {

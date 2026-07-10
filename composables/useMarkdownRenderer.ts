@@ -1,7 +1,12 @@
 import MarkdownIt from 'markdown-it';
 import type Token from 'markdown-it/lib/token.mjs';
 import type Renderer from 'markdown-it/lib/renderer.mjs';
-import hljs from 'highlight.js';
+// Import the "common" bundle (~37 popular languages) instead of the full
+// highlight.js build (~190 languages). The full build adds ~1.5MB (decoded) of
+// language grammars we never render; `common` covers JS/TS, Python, bash, SQL,
+// JSON, GraphQL, etc. Unknown languages fall back to escaped plain text below,
+// which was already the behavior for any language hljs didn't recognize.
+import hljs from 'highlight.js/lib/common';
 import sanitizeHtml from 'sanitize-html';
 import { generateHeadingId } from '@/utils/markdown';
 import { config } from '@/config';

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { defineAsyncComponent } from 'vue';
 import { useDisplay } from 'vuetify';
 import XmarkIcon from '@/components/icons/XmarkIcon.vue';
 import TextInput from '@/components/TextInput.vue';
@@ -6,8 +7,13 @@ import FormRow from '@/components/FormRow.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ExpandableImage from '@/components/ExpandableImage.vue';
 import ModelViewer from '@/components/ModelViewer.vue';
-import StlViewer from '@/components/download/StlViewer.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
+
+// StlViewer statically imports three.js (~2MB decoded). Load it lazily so that
+// weight is only fetched when an STL image actually renders.
+const StlViewer = defineAsyncComponent(
+  () => import('@/components/download/StlViewer.vue')
+);
 
 type ImageData = {
   id?: string;

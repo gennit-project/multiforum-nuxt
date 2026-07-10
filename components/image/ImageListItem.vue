@@ -1,10 +1,17 @@
 <script setup lang="ts">
+import { defineAsyncComponent } from 'vue';
 import type { PropType } from 'vue';
 import type { Image } from '@/__generated__/graphql';
 import ModelViewer from '@/components/ModelViewer.vue';
-import StlViewer from '@/components/download/StlViewer.vue';
 import AddToImageFavorites from '@/components/favorites/AddToImageFavorites.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
+
+// StlViewer statically imports three.js (~2MB decoded). Load it lazily so that
+// weight is only fetched when an STL image actually renders, not on every page
+// that shows an image list.
+const StlViewer = defineAsyncComponent(
+  () => import('@/components/download/StlViewer.vue')
+);
 
 const props = defineProps({
   allowAddToList: {
