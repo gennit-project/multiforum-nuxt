@@ -5,6 +5,8 @@ import type { ApolloError } from '@apollo/client/errors';
 import type { ServerConfigUpdateInput } from '@/__generated__/graphql';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import TailwindForm from '@/components/FormComponent.vue';
+import SaveStatus from '@/components/settings/SaveStatus.vue';
+import type { AutosaveStatus } from '@/composables/useSettingAutosave';
 import { useRoute, useRouter } from 'nuxt/app';
 
 // Import icons
@@ -48,12 +50,32 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // Autosave status for the tabs that persist on change (Basic, Calendar).
+  saveStatus: {
+    type: String as PropType<AutosaveStatus>,
+    default: 'idle',
+  },
+  saveErrorMessage: {
+    type: String,
+    default: '',
+  },
 });
 
 const emit = defineEmits(['submit', 'updateFormValues']);
 
 const route = useRoute();
 const router = useRouter();
+
+// Tabs whose fields autosave on change; these hide the shared Save button and
+// show a status indicator instead.
+const AUTOSAVE_TAB_KEYS = ['basic', 'calendar'];
+const isAutosaveTab = computed(() =>
+  AUTOSAVE_TAB_KEYS.some(
+    (key) =>
+      typeof route.name === 'string' &&
+      route.name.includes(`settings-${key}`)
+  )
+);
 
 const tabs = [
   {
@@ -150,6 +172,7 @@ const getCurrentTabLabel = computed(() => {
         :needs-changes="false"
         :show-cancel-button="false"
         :show-buttons-in-header="false"
+        :show-save-button="!isAutosaveTab"
         @submit="emit('submit')"
       >
         <div class="mt-5 w-full">
@@ -328,6 +351,12 @@ const getCurrentTabLabel = computed(() => {
                 :form-values="formValues"
                 @submit="$emit('submit', $event)"
                 @update-form-values="emit('updateFormValues', $event)"
+              />
+              <SaveStatus
+                v-if="isAutosaveTab"
+                class="mt-4"
+                :status="saveStatus"
+                :error-message="saveErrorMessage"
               />
             </div>
           </div>
