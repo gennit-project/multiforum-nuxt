@@ -2,8 +2,6 @@ import { mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
 
-import MenuButton from '@/components/MenuButton.vue';
-
 // @floating-ui/vue's useFloating + autoUpdate loops under jsdom (no real layout),
 // so stub it — this suite exercises MenuButton's open/close and item logic, not
 // floating-ui's positioning math.
@@ -15,6 +13,7 @@ vi.mock('@floating-ui/vue', () => ({
   autoUpdate: () => () => {},
 }));
 
+import MenuButton from '@/components/MenuButton.vue';
 // The dropdown panel is client-only + teleported to <body>; render both inline
 // so assertions can query the menu items within the wrapper.
 const stubs = {

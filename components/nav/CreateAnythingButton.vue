@@ -159,6 +159,11 @@ const buttonClasses = computed(() => {
               type="button"
               :class="buttonClasses"
               aria-haspopup="menu"
+          <div ref="triggerRef" class="inline-block" @focusout="onFocusOut">
+            <button
+              type="button"
+              :class="buttonClasses"
+              aria-haspopup="menu"
               :aria-expanded="isMenuOpen"
               @click="toggle"
             >
