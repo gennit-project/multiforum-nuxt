@@ -142,7 +142,7 @@ onMounted(() => {
                fallback, ClientOnly renders one placeholder element that matches on
                both sides. -->
           <ClientOnly>
-            <nav v-if="!lgAndUp" aria-label="Mobile navigation">
+            <nav v-if="!lgAndUp" id="mobile-menu" aria-label="Mobile navigation">
               <SiteSidenav
                 :key="`${sideNavIsOpenVar}`"
                 :show-dropdown="sideNavIsOpenVar"

@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, useId } from 'vue';
 import SearchIcon from '@/components/icons/SearchIcon.vue';
 import XmarkIcon from '@/components/icons/XmarkIcon.vue';
+
+// Unique per instance so the label association stays correct when more than one
+// SearchBar renders on a page (the previous hard-coded id="search" collided).
+const inputId = useId();
 
 // Props
 const props = defineProps({
@@ -115,6 +119,7 @@ defineExpose({ focus, getValue });
         <SearchIcon />
       </div>
       <input
+        :id="inputId"
         ref="searchInputRef"
         :value="input"
         name="search"
@@ -143,7 +148,7 @@ defineExpose({ focus, getValue });
         />
       </button>
       <slot />
-      <label for="search" class="sr-only">Search</label>
+      <label :for="inputId" class="sr-only">Search</label>
     </div>
   </div>
 </template>
