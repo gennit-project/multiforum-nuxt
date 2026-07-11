@@ -55,8 +55,10 @@ const emit = defineEmits([
 <template>
   <div class="relative p-5">
     <button
+      type="button"
       class="bg-transparent absolute right-2 top-4 rounded-full border-0 p-1 text-white transition-colors hover:bg-gray-800"
       title="Close panel"
+      aria-label="Close panel"
       @click="emit('close-panel')"
     >
       <XmarkIcon class="h-4 w-4" />

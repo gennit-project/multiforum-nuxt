@@ -1,5 +1,5 @@
 <template>
-  <svg
+  <svg aria-hidden="true"
     class="h-6 w-6 text-gray-300"
     fill="none"
     stroke="currentColor"

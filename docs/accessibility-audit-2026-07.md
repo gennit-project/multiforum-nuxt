@@ -81,11 +81,17 @@ These are the best return on effort: each fixes a primitive used in dozens of pl
    _Also (per user request, same pass):_ added `whitespace-nowrap` to `VoteButton.vue`'s base
    class so the up-arrow icon no longer wraps onto its own line on narrow upvote/vote buttons.
 
-5. **`components/icons/*` (87 icon SVGs) — establish a name/hidden convention.** Only 8 set
-   `aria-hidden`; none provide `role="img"`+`aria-label`/`<title>`. Fix: default decorative
-   icons to `aria-hidden="true"` on the root `<svg>`; for meaningful/standalone use, accept
-   and forward an `aria-label` (with `role="img"`). Then audit call sites where an icon is a
-   button's only content. Moderate but broad.
+5. **`components/icons/*` (87 icon SVGs) — establish a name/hidden convention.** ✅ **DONE (2026-07-11)**
+   Confirmed no call site passes an icon its own `aria-label` (names live on the parent), so
+   icons are decorative everywhere. Added `aria-hidden="true"` to the root element of every icon
+   (79 `<svg>` roots via codemod, plus `UserCircle.vue`'s wrapping `<span>`; the `<i>`/`<span>`
+   Font-Awesome-based icons already had it). `MessageIcon.vue` is a bare `<path>` with no root
+   element — left as a pre-existing oddity. Also fixed the icon-only interactive controls this
+   surfaced (buttons whose only child is an icon, no accessible name): added `aria-label` +
+   `type="button"` to the close buttons in `DownloadSuccessPopover.vue` and
+   `LightboxInfoPanel.vue`, and the report button in `UserProfileSidebar.vue`. Added
+   `icons/icons.a11y.spec.ts` — mounts **every** icon and asserts its root is `aria-hidden`
+   (guards new icons). 86 icon tests + 125 consumer tests pass; type-check clean.
 
 ---
 

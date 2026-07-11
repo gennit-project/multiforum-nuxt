@@ -4,7 +4,7 @@ defineProps<{
 }>();
 </script>
 <template>
-  <svg
+  <svg aria-hidden="true"
     class="-ml-0.5"
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
