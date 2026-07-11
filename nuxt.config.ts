@@ -219,7 +219,10 @@ export default defineNuxtConfig({
           Montserrat: [400, 700],
         },
         display: 'swap',
-        prefetch: true,
+        // Keep font loading non-blocking. `display: swap` + `preconnect` are
+        // enough for first paint here; explicit font prefetch competes with the
+        // route's critical CSS/JS on public pages.
+        prefetch: false,
         preconnect: true,
       },
     ],
