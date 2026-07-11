@@ -7,12 +7,6 @@ export const availableSortTypes: Record<string, string> = {
   TOP: 'top',
 };
 
-export const sortTypeIcons = {
-  hot: 'fa-fire',
-  new: 'fa-burst',
-  top: 'fa-arrow-up',
-};
-
 export const topSortTypes = {
   TOP_DAY: 'day',
   TOP_WEEK: 'week',

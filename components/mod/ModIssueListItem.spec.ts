@@ -206,7 +206,7 @@ describe('ModIssueListItem selection', () => {
   it('hides the status icon when disabled', () => {
     const wrapper = mountItem({ showStatusIcon: false });
 
-    expect(wrapper.find('.fa-dot-circle').exists()).toBe(false);
-    expect(wrapper.find('.fa-circle-check').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="issue-open-status-icon"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="issue-closed-status-icon"]').exists()).toBe(false);
   });
 });

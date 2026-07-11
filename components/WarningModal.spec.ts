@@ -13,6 +13,7 @@ const mountModal = (props: Record<string, unknown> = {}) =>
       stubs: {
         GenericModal: genericModalStub,
         ExclamationIcon: { name: 'ExclamationIcon', template: '<svg class="exclamation-icon" />' },
+        TrashIcon: { name: 'TrashIcon', template: '<svg class="trash-icon" />' },
       },
     },
   });
@@ -59,7 +60,7 @@ describe('WarningModal', () => {
 
   it('renders the trash icon when icon is set to trash', () => {
     const wrapper = mountModal({ icon: 'trash' });
-    expect(wrapper.html()).toContain('fa-trash-alt');
+    expect(wrapper.find('.trash-icon').exists()).toBe(true);
   });
 
   it('renders the exclamation icon for the default icon mode', () => {

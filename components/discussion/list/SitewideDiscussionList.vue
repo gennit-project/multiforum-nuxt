@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import ErrorBanner from '../../ErrorBanner.vue';
 import SitewideDiscussionListItem from './SitewideDiscussionListItem.vue';
-import SitewideDiscussionSidebar from './SitewideDiscussionSidebar.vue';
 import LoadMore from '../../LoadMore.vue';
-import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
 import DiscussionDetailEmptyState from '@/components/discussion/list/DiscussionDetailEmptyState.vue';
 import { GET_SITE_WIDE_DISCUSSION_LIST } from '@/graphQLData/discussion/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
@@ -24,6 +22,12 @@ import { useUsername } from '@/composables/useAuthState';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 
 const usernameVar = useUsername();
+const SitewideDiscussionSidebar = defineAsyncComponent(
+  () => import('./SitewideDiscussionSidebar.vue')
+);
+const DiscussionDetailContent = defineAsyncComponent(
+  () => import('@/components/discussion/detail/DiscussionDetailContent.vue')
+);
 
 
 const DISCUSSION_PAGE_LIMIT = 15;

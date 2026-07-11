@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import FormRow from '@/components/FormRow.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PluginSettingsForm from '@/components/plugins/PluginSettingsForm.vue';
 import type { PluginFormSection, PluginSecretStatus as PluginSecretStatusType, PluginSettings } from '@/types/pluginForms';
 
@@ -45,7 +46,7 @@ const emit = defineEmits<{
             :disabled="saving"
             @click="emit('save')"
           >
-            <i v-if="saving" class="fa-solid fa-spinner mr-2 animate-spin" />
+            <LoadingSpinner v-if="saving" class="mr-2 inline-flex" />
             Save Settings
           </button>
         </div>

@@ -3,6 +3,9 @@ import { computed } from 'vue';
 import VoteButton from '@/components/VoteButton.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
+import HeartIcon from '@/components/icons/HeartIcon.vue';
+import StarIcon from '@/components/icons/StarIcon.vue';
+import UpArrowIcon from '@/components/icons/UpArrowIcon.vue';
 import type { SelectOptionData } from '@/types/GenericFormTypes';
 import { ALLOWED_ICONS } from '@/utils';
 
@@ -65,7 +68,7 @@ const props = defineProps({
   },
   upvoteIcon: {
     type: String,
-    default: 'fa-solid fa-arrow-up',
+    default: 'arrow-up',
   },
   upvoteTooltipActive: {
     type: String,
@@ -155,6 +158,14 @@ const clickSuperUpvote = () => {
 const clickUndoSuperUpvote = () => {
   emit('undoSuperUpvote');
 };
+
+const showArrowUpIcon = computed(() => props.upvoteIcon === 'arrow-up');
+const showHeartOutlineIcon = computed(
+  () => props.upvoteIcon === 'heart-outline'
+);
+const showHeartFilledIcon = computed(
+  () => props.upvoteIcon === 'heart-filled'
+);
 </script>
 
 <template>
@@ -174,7 +185,22 @@ const clickUndoSuperUpvote = () => {
           @vote="clickUp"
         >
           <span class="flex items-center gap-1">
-            <i :class="upvoteIcon" aria-hidden="true" />
+            <UpArrowIcon
+              v-if="showArrowUpIcon"
+              class="h-4 w-4"
+              aria-hidden="true"
+            />
+            <HeartIcon
+              v-else-if="showHeartOutlineIcon"
+              class="h-4 w-4"
+              aria-hidden="true"
+            />
+            <HeartIcon
+              v-else-if="showHeartFilledIcon"
+              class="h-4 w-4 fill-current"
+              filled
+              aria-hidden="true"
+            />
             <span class="text-sm">{{ upvoteCount }}</span>
             <span class="text-xs">{{ upvoteActive ? 'Undo' : 'Upvote' }}</span>
           </span>
@@ -193,7 +219,11 @@ const clickUndoSuperUpvote = () => {
           @vote="superUpvoteActive ? clickUndoSuperUpvote() : clickSuperUpvote()"
         >
           <span class="flex items-center gap-1 text-xs font-medium" :class="superUpvoteActive ? '' : 'rainbow-star'">
-            <i :class="superUpvoteActive ? 'fa-solid fa-star' : 'fa-regular fa-star'" />
+            <StarIcon
+              class="h-4 w-4"
+              :class="superUpvoteActive ? 'fill-current' : ''"
+              :filled="superUpvoteActive"
+            />
             <span v-if="superUpvoteActive">Undo</span>
           </span>
         </VoteButton>
@@ -237,7 +267,22 @@ const clickUndoSuperUpvote = () => {
           :tooltip-text="upvoteTooltipUnauthenticated"
         >
           <span class="flex items-center gap-1">
-            <i :class="upvoteIcon" aria-hidden="true" />
+            <UpArrowIcon
+              v-if="showArrowUpIcon"
+              class="h-4 w-4"
+              aria-hidden="true"
+            />
+            <HeartIcon
+              v-else-if="showHeartOutlineIcon"
+              class="h-4 w-4"
+              aria-hidden="true"
+            />
+            <HeartIcon
+              v-else-if="showHeartFilledIcon"
+              class="h-4 w-4 fill-current"
+              filled
+              aria-hidden="true"
+            />
             <span class="text-sm">{{ upvoteCount }}</span>
             <span class="text-sm">Upvote</span>
           </span>

@@ -79,7 +79,6 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   components: true,
   css: [
-    '@fortawesome/fontawesome-free/css/all.css',
     '@/assets/css/index.css',
   ],
   devtools: { enabled: true },
@@ -214,12 +213,18 @@ export default defineNuxtConfig({
       '@nuxtjs/google-fonts',
       {
         families: {
-          Roboto: true,
-          Inter: [400, 700],
-          Montserrat: [400, 700],
+          // Inter is self-hosted in assets/css/index.css, and the public UI
+          // only uses Montserrat for the wordmark. Limiting the remote font
+          // request keeps first paint from competing with dozens of unused font
+          // variants on public routes.
+          Montserrat: [600],
         },
+        subsets: ['latin'],
         display: 'swap',
-        prefetch: true,
+        // Keep font loading non-blocking. `display: swap` + `preconnect` are
+        // enough for first paint here; explicit font prefetch competes with the
+        // route's critical CSS/JS on public pages.
+        prefetch: false,
         preconnect: true,
       },
     ],

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useRoute } from 'nuxt/app';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useHead, useRoute } from 'nuxt/app';
 import { useDisplay } from '@/composables/useDisplay';
 import TopNav from '@/components/nav/TopNav.vue';
 import SiteSidenav from '@/components/nav/SiteSidenav.vue';
@@ -19,6 +19,42 @@ const isDevRuntime = import.meta.env.DEV;
 const isDevelopment = computed(() => config.environment === 'development');
 const route = useRoute();
 const showFooter = !route.name?.toString().includes('map');
+const fontAwesomeStylesheetHref = ref('');
+const shouldLoadFontAwesome = computed(() => {
+  // Keep the sitewide discussions landing view free of the global Font Awesome
+  // stylesheet. The detail preview still uses legacy FA classes, so we keep
+  // the stylesheet once a discussion is selected.
+  return !(
+    route.name === 'discussions' &&
+    typeof route.query.selectedDiscussionId !== 'string'
+  );
+});
+
+if (import.meta.client) {
+  watch(
+    shouldLoadFontAwesome,
+    async (nextValue) => {
+      if (!nextValue || fontAwesomeStylesheetHref.value) return;
+      const stylesheetModule = await import(
+        '@fortawesome/fontawesome-free/css/all.css?url'
+      );
+      fontAwesomeStylesheetHref.value = stylesheetModule.default;
+    },
+    { immediate: true }
+  );
+}
+
+useHead(() => ({
+  link: shouldLoadFontAwesome.value && fontAwesomeStylesheetHref.value
+    ? [
+        {
+          key: 'fontawesome-stylesheet',
+          rel: 'stylesheet',
+          href: fontAwesomeStylesheetHref.value,
+        },
+      ]
+    : [],
+}));
 
 // Responsive display
 const { lgAndUp, mdAndUp } = useDisplay();

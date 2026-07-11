@@ -320,7 +320,7 @@ describe('DiscussionVotes', () => {
         channel: { UpvotedByUsers: [{ username: 'alice' }] },
         props: { useHeartIcon: true },
       });
-      expect(voteBtns(wrapper)[0]!.props('upvoteIcon')).toBe('fa-solid fa-heart');
+      expect(voteBtns(wrapper)[0]!.props('upvoteIcon')).toBe('heart-filled');
     });
 
     it('marks super-upvote active when the current user has super-upvoted', () => {

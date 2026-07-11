@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 import GenericModal from '@/components/GenericModal.vue';
+import ExclamationIcon from '@/components/icons/ExclamationIcon.vue';
 import TextInput from '@/components/TextInput.vue';
 
 const props = defineProps({
@@ -64,7 +65,7 @@ const body = computed(
     @close="handleClose"
   >
     <template #icon>
-      <i class="fas fa-exclamation-triangle text-red-500 dark:text-red-400" />
+      <ExclamationIcon class="text-red-500 dark:text-red-400" />
     </template>
     <template #content>
       <div class="mt-4 space-y-4">

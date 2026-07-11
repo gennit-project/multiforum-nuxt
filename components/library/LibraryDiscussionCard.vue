@@ -4,6 +4,7 @@ import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import TagComponent from '@/components/TagComponent.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
+import CommentIcon from '@/components/icons/CommentIcon.vue';
 import type { Album } from '@/__generated__/graphql';
 import { relativeTime } from '@/utils';
 
@@ -161,7 +162,7 @@ const albumForDisplay = computed(() => props.discussion.Album as Album | null);
           :to="discussionLink"
           class="inline-flex items-center gap-1 transition-colors hover:text-gray-700 dark:hover:text-gray-300"
         >
-          <i class="fa-regular fa-comment" />
+          <CommentIcon class="h-4 w-4" />
           {{ commentCount }} {{ commentCount === 1 ? 'comment' : 'comments' }}
         </NuxtLink>
 

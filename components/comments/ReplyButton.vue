@@ -3,6 +3,7 @@ import type { PropType } from 'vue';
 import { computed } from 'vue';
 import type { Comment } from '@/__generated__/graphql';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import CommentIcon from '@/components/icons/CommentIcon.vue';
 
 const props = defineProps({
   showReplyEditor: {
@@ -78,7 +79,7 @@ const buttonClasses = computed(() => {
           ]"
           @click="emit('toggleShowReplyEditor')"
         >
-          <i class="fa-regular fa-comment h-3 w-3" aria-hidden="true" /> Reply
+          <CommentIcon class="h-3 w-3" aria-hidden="true" /> Reply
         </button>
       </div>
     </template>
@@ -89,7 +90,7 @@ const buttonClasses = computed(() => {
           data-testid="reply-comment-button"
           :class="[buttonClasses]"
         >
-          <i class="fa-regular fa-comment h-3 w-3" aria-hidden="true" />
+          <CommentIcon class="h-3 w-3" aria-hidden="true" />
           Reply
         </button>
       </div>

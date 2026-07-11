@@ -9,6 +9,7 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import RevisionDiffContent from '@/components/revision/RevisionDiffContent.vue';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import Notification from '@/components/NotificationComponent.vue';
+import FlagIcon from '@/components/icons/FlagIcon.vue';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 import type { WikiPage, TextVersion } from '@/__generated__/graphql';
 import {
@@ -337,9 +338,9 @@ useHead({
               :disabled="isDeleting || deleteLoading"
               @click="handleDelete"
             >
-              <i
+              <LoadingSpinner
                 v-if="isDeleting || deleteLoading"
-                class="fas fa-spinner fa-spin mr-2"
+                class="mr-2 inline-flex"
               />
               Redact Revision
             </button>
@@ -347,7 +348,7 @@ useHead({
               class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
               @click="openReportModal"
             >
-              <i class="fa-solid fa-flag mr-2" />
+              <FlagIcon class="mr-2 inline-flex h-4 w-4" />
               Report Edit
             </button>
           </div>

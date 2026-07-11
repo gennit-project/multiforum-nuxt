@@ -15,6 +15,7 @@ import type {
 } from '@/__generated__/graphql';
 import type { DiscussionChannelWithFavorited } from '@/types/Discussion';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
+import CommentIcon from '@/components/icons/CommentIcon.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 
@@ -269,7 +270,7 @@ const filteredQuery = computed(() => {
                 query: filteredQuery,
               }"
             >
-              <i class="fa-regular fa-comment text-xs" aria-hidden="true" />
+              <CommentIcon class="h-3 w-3" aria-hidden="true" />
               <span class="text-sm">{{ commentCount }}</span>
             </nuxt-link>
           </div>

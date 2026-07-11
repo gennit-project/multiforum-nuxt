@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { defineAsyncComponent, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
-import ChannelDiscussionList from './ChannelDiscussionList.vue';
-import SitewideDiscussionList from './SitewideDiscussionList.vue';
 import DiscussionFilterBar from '@/components/discussion/list/DiscussionFilterBar.vue';
 import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import type { SearchDiscussionValues } from '@/types/Discussion';
+
+const ChannelDiscussionList = defineAsyncComponent(
+  () => import('./ChannelDiscussionList.vue')
+);
+const SitewideDiscussionList = defineAsyncComponent(
+  () => import('./SitewideDiscussionList.vue')
+);
 
 // Props and Emits
 defineEmits(['filterByTag', 'filterByChannel']);

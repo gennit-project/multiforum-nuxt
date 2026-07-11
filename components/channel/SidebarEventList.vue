@@ -5,6 +5,9 @@ import type { Event } from '@/__generated__/graphql';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_SOONEST_EVENTS_IN_CHANNEL } from '@/graphQLData/channel/queries';
 import { useRoute } from 'nuxt/app';
+import ArrowUpRightIcon from '@/components/icons/ArrowUpRightIcon.vue';
+import CalendarIcon from '@/components/icons/CalendarIcon.vue';
+import TicketIcon from '@/components/icons/TicketIcon.vue';
 
 defineProps({
   eventChannelsAggregate: {
@@ -160,7 +163,7 @@ const dateSectionObj = computed(() => {
     <span
       class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
-      <i class="fa-solid fa-circle-play mr-2 text-orange-500" />Happening Now
+      <TicketIcon class="mr-2 h-4 w-4 text-orange-500" />Happening Now
     </span>
     <div
       v-for="event in dateObj.happeningNow"
@@ -188,7 +191,7 @@ const dateSectionObj = computed(() => {
         :to="event?.virtualEventUrl"
       >
         Go to online event
-        <i class="fa-solid fa-arrow-up-right-from-square" />
+        <ArrowUpRightIcon class="ml-1 h-3 w-3" />
       </nuxt-link>
     </div>
   </div>
@@ -200,7 +203,7 @@ const dateSectionObj = computed(() => {
     <span
       class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
-      <i class="fa-solid fa-calendar-day mr-2" />Today
+      <CalendarIcon class="mr-2 h-4 w-4" />Today
     </span>
     <div
       v-for="event in dateObj.happeningToday"
@@ -231,7 +234,7 @@ const dateSectionObj = computed(() => {
     <span
       class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
-      <i class="fa-solid fa-calendar-plus mr-2" />Tomorrow
+      <CalendarIcon class="mr-2 h-4 w-4" />Tomorrow
     </span>
     <div
       v-for="event in dateObj.happeningTomorrow"
@@ -264,7 +267,7 @@ const dateSectionObj = computed(() => {
       <span
         class="my-1 mb-1 flex items-center text-sm leading-6 text-gray-500 dark:text-gray-400"
       >
-        <i class="fa-solid fa-calendar-week mr-2" />{{ date }}
+        <CalendarIcon class="mr-2 h-4 w-4" />{{ date }}
       </span>
       <div
         v-for="event in events"

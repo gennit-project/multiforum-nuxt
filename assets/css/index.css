@@ -17,31 +17,9 @@ body {
 
 @font-face {
   font-family: 'Inter';
-  font-weight: 100;
-  font-style: normal;
-  font-display: auto;
-  unicode-range: U+000-5FF;
-  src:
-    local('Inter Thin'),
-    url(@/assets/fonts/Inter/Inter-Thin.woff) format('woff');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-weight: 200;
-  font-style: normal;
-  font-display: auto;
-  unicode-range: U+000-5FF;
-  src:
-    local('Inter ExtraLight'),
-    url(@/assets/fonts/Inter/Inter-ExtraLight.woff) format('woff');
-}
-
-@font-face {
-  font-family: 'Inter';
   font-weight: 300;
   font-style: normal;
-  font-display: auto;
+  font-display: swap;
   unicode-range: U+000-5FF;
   src:
     local('Inter Light'),
@@ -52,7 +30,7 @@ body {
   font-family: 'Inter';
   font-weight: 400;
   font-style: normal;
-  font-display: auto;
+  font-display: swap;
   unicode-range: U+000-5FF;
   src:
     local('Inter Regular'),
@@ -61,20 +39,9 @@ body {
 
 @font-face {
   font-family: 'Inter';
-  font-weight: 500;
-  font-style: normal;
-  font-display: auto;
-  unicode-range: U+000-5FF;
-  src:
-    local('Inter Medium'),
-    url(@/assets/fonts/Inter/Inter-Medium.woff) format('woff');
-}
-
-@font-face {
-  font-family: 'Inter';
   font-weight: 600;
   font-style: normal;
-  font-display: auto;
+  font-display: swap;
   unicode-range: U+000-5FF;
   src:
     local('Inter SemiBold'),
@@ -85,7 +52,7 @@ body {
   font-family: 'Inter';
   font-weight: 700;
   font-style: normal;
-  font-display: auto;
+  font-display: swap;
   unicode-range: U+000-5FF;
   src:
     local('Inter Bold'),
@@ -96,20 +63,9 @@ body {
   font-family: 'Inter';
   font-weight: 800;
   font-style: normal;
-  font-display: auto;
+  font-display: swap;
   unicode-range: U+000-5FF;
   src:
     local('Inter ExtraBold'),
     url(@/assets/fonts/Inter/Inter-ExtraBold.woff) format('woff');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-weight: 900;
-  font-style: normal;
-  font-display: auto;
-  unicode-range: U+000-5FF;
-  src:
-    local('Inter Black'),
-    url(@/assets/fonts/Inter/Inter-Black.woff) format('woff');
 }

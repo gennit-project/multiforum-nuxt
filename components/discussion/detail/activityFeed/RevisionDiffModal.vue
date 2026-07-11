@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import type { PropType } from 'vue';
 import type { TextVersion } from '@/__generated__/graphql';
 import GenericModal from '@/components/GenericModal.vue';
+import PlusMinusIcon from '@/components/icons/PlusMinusIcon.vue';
 import RevisionDiffContent from '@/components/revision/RevisionDiffContent.vue';
 import { useMutation } from '@vue/apollo-composable';
 import type { DocumentNode } from 'graphql';
@@ -104,9 +105,7 @@ const handleClose = () => {
     @danger-button-click="handleDelete"
   >
     <template #icon>
-      <i
-        class="fa-solid fa-plus-minus text-lg text-orange-600 dark:text-orange-400"
-      />
+      <PlusMinusIcon class="h-5 w-5 text-orange-600 dark:text-orange-400" />
     </template>
     <template #content>
       <RevisionDiffContent

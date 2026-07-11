@@ -6,6 +6,8 @@ import {
   COUNT_CLOSED_ISSUES,
   COUNT_OPEN_ISSUES,
 } from '@/graphQLData/mod/queries';
+import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
+import DotCircleIcon from '@/components/icons/DotCircleIcon.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 
@@ -79,7 +81,7 @@ const closedCount = computed(() => {
               route.name !== 'forums-forumId-issues',
           }"
         >
-          <i class="far fa-dot-circle" /> {{ openCount }} Open
+          <DotCircleIcon class="mr-1 inline h-4 w-4" /> {{ openCount }} Open
         </nuxt-link>
         <nuxt-link
           :to="{
@@ -94,7 +96,7 @@ const closedCount = computed(() => {
               route.name !== 'forums-forumId-issues-closed',
           }"
         >
-          <i class="fa-regular fa-circle-check" /> {{ closedCount }} Closed
+          <CheckCircleIcon class="mr-1 inline h-4 w-4" /> {{ closedCount }} Closed
         </nuxt-link>
       </div>
       <RequireAuth :full-width="false">
@@ -131,10 +133,5 @@ td {
 }
 th {
   background-color: #f4f4f4;
-}
-.list-item-icon {
-  /* Style for the dot circle icon */
-  margin-right: 8px;
-  color: green; /* or any color you prefer */
 }
 </style>

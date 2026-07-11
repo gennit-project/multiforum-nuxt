@@ -8,6 +8,7 @@ import ThemeSwitcher from '@/components/nav/ThemeSwitcher.vue';
 import CreateAnythingButton from '@/components/nav/CreateAnythingButton.vue';
 import AddToChannelFavorites from '@/components/favorites/AddToChannelFavorites.vue';
 import TopNavSearch from '@/components/nav/TopNavSearch.vue';
+import BellIcon from '@/components/icons/BellIcon.vue';
 // import LogoIcon from "@/components/icons/LogoIcon.vue"; // Unused for now
 import { useRoute } from 'nuxt/app';
 import LoginButton from './LoginButton.vue';
@@ -184,7 +185,7 @@ const isOnMapPage = computed(() => {
             :aria-label="notificationCountVar > 0 ? `${notificationCountVar} new notifications` : 'Notifications'"
             class="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-200 hover:text-gray-950 focus:outline-none dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white"
           >
-            <i class="fa-regular fa-bell text-lg" aria-hidden="true" />
+            <BellIcon class="h-[1.05rem] w-[1.05rem]" aria-hidden="true" />
             <span
               v-if="notificationCountVar > 0"
               aria-hidden="true"
