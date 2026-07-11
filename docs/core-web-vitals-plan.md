@@ -215,6 +215,7 @@ The deployed route is clearly preloading and prefetching too much.
 - split discussion list/detail components behind async boundaries
 - disabled explicit Google font prefetching
 - reduced remote font loading to the single wordmark family still used by the public UI
+- narrowed the remaining remote wordmark font to the Latin subset actually used by the public shell
 - switched self-hosted `Inter` faces to `font-display: swap`
 - removed unused self-hosted `Inter` weights from the global stylesheet
 

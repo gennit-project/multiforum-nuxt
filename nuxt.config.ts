@@ -220,6 +220,7 @@ export default defineNuxtConfig({
           // variants on public routes.
           Montserrat: [600],
         },
+        subsets: ['latin'],
         display: 'swap',
         // Keep font loading non-blocking. `display: swap` + `preconnect` are
         // enough for first paint here; explicit font prefetch competes with the
