@@ -103,10 +103,16 @@ onMounted(() => {
 
 <template>
   <div>
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[1000] focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-black focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:bg-gray-800 dark:focus:text-white"
+    >
+      Skip to main content
+    </a>
     <DevOverlay v-if="isDevelopment" />
     <ToastNotification />
     <AddToListModalHost />
-    <main class="flex min-h-screen flex-col">
+    <div class="flex min-h-screen flex-col">
       <div
         class="flex flex-grow list-disc flex-col bg-gray-200 dark:bg-black dark:text-gray-200"
       >
@@ -136,7 +142,7 @@ onMounted(() => {
                fallback, ClientOnly renders one placeholder element that matches on
                both sides. -->
           <ClientOnly>
-            <nav v-if="!lgAndUp" aria-label="Mobile navigation">
+            <nav v-if="!lgAndUp" id="mobile-menu" aria-label="Mobile navigation">
               <SiteSidenav
                 :key="`${sideNavIsOpenVar}`"
                 :show-dropdown="sideNavIsOpenVar"
@@ -145,11 +151,13 @@ onMounted(() => {
             </nav>
           </ClientOnly>
 
-          <div
-            class="flex min-w-0 flex-1 flex-col bg-white dark:bg-black lg:pl-20"
+          <main
+            id="main-content"
+            tabindex="-1"
+            class="flex min-w-0 flex-1 flex-col bg-white outline-none dark:bg-black lg:pl-20"
           >
             <slot />
-          </div>
+          </main>
           <!-- Intentionally NO #fallback slot (see the mobile-nav note above):
                a ClientOnly #fallback's fragment-boundary markers cause a
                hydration mismatch that re-renders the page content. -->
@@ -164,6 +172,6 @@ onMounted(() => {
           </ClientOnly>
         </div>
       </div>
-    </main>
+    </div>
   </div>
 </template>

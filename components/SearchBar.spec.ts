@@ -70,6 +70,26 @@ describe('SearchBar', () => {
     });
   });
 
+  it('associates the visually-hidden label with the input', () => {
+    const wrapper = mount(SearchBar, {
+      props: { autoFocus: false, initialValue: '', testId: 'search' },
+      global: { stubs: { SearchIcon: true } },
+    });
+
+    expect(wrapper.get('label').attributes('for')).toBe(
+      input(wrapper).attributes('id')
+    );
+  });
+
+  it('gives the input a non-empty id for the label association', () => {
+    const wrapper = mount(SearchBar, {
+      props: { autoFocus: false, initialValue: '', testId: 'search' },
+      global: { stubs: { SearchIcon: true } },
+    });
+
+    expect(input(wrapper).attributes('id')).toBeTruthy();
+  });
+
   it('exposes focus and getValue helpers', async () => {
     const wrapper = mount(SearchBar, {
       props: { autoFocus: false, initialValue: 'needle', testId: 'search' },

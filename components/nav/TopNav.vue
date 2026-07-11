@@ -91,6 +91,7 @@ const isOnMapPage = computed(() => {
           v-if="!sideNavIsOpenVar"
           data-testid="menu-button"
           class="fixed-menu-button cursor-pointer md:ml-1 lg:hidden"
+          :expanded="sideNavIsOpenVar"
           @click="$emit('toggleDropdown')"
         />
 

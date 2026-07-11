@@ -1,5 +1,13 @@
 <script lang="ts" setup>
 // HamburgerMenuButton component - mobile navigation toggle
+defineProps({
+  // Open/closed state of the mobile nav this button controls, exposed to
+  // assistive tech via aria-expanded (was previously hard-coded to false).
+  expanded: {
+    type: Boolean,
+    default: false,
+  },
+});
 </script>
 
 <template>
@@ -8,7 +16,7 @@
     type="button"
     class="inline-flex items-center justify-center rounded-md border border-gray-600 bg-gray-800 p-2 text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-600"
     aria-controls="mobile-menu"
-    aria-expanded="false"
+    :aria-expanded="expanded"
   >
     <span class="sr-only">Open site-wide navigation menu</span>
     <svg
