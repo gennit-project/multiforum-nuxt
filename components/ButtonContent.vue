@@ -10,15 +10,21 @@ defineProps({
 </script>
 
 <template>
-  <span v-if="!loading" class="justify-center">
+  <span
+    v-if="!loading"
+    class="inline-flex flex-nowrap items-center justify-center whitespace-nowrap"
+  >
     <slot />
   </span>
-  <span v-if="loading" class="justify-center">
+  <span
+    v-if="loading"
+    class="inline-flex flex-nowrap items-center justify-center whitespace-nowrap"
+  >
     <LoadingSpinner />
   </span>
   <span
     v-if="showCount"
-    class="mx-1 justify-center text-xs"
+    class="mx-1 inline-flex flex-nowrap items-center justify-center whitespace-nowrap text-xs"
     aria-live="polite"
   >
     {{ count }}

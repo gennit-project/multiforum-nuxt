@@ -184,20 +184,20 @@ const showHeartFilledIcon = computed(
           "
           @vote="clickUp"
         >
-          <span class="flex items-center gap-1">
+          <span class="flex flex-nowrap items-center gap-1 whitespace-nowrap">
             <UpArrowIcon
               v-if="showArrowUpIcon"
-              class="h-4 w-4"
+              class="h-4 w-4 shrink-0"
               aria-hidden="true"
             />
             <HeartIcon
               v-else-if="showHeartOutlineIcon"
-              class="h-4 w-4"
+              class="h-4 w-4 shrink-0"
               aria-hidden="true"
             />
             <HeartIcon
               v-else-if="showHeartFilledIcon"
-              class="h-4 w-4 fill-current"
+              class="h-4 w-4 shrink-0 fill-current"
               filled
               aria-hidden="true"
             />
@@ -218,9 +218,12 @@ const showHeartFilledIcon = computed(
           :class="superUpvoteActive ? '' : 'super-upvote-button'"
           @vote="superUpvoteActive ? clickUndoSuperUpvote() : clickSuperUpvote()"
         >
-          <span class="flex items-center gap-1 text-xs font-medium" :class="superUpvoteActive ? '' : 'rainbow-star'">
+          <span
+            class="flex flex-nowrap items-center gap-1 whitespace-nowrap text-xs font-medium"
+            :class="superUpvoteActive ? '' : 'rainbow-star'"
+          >
             <StarIcon
-              class="h-4 w-4"
+              class="h-4 w-4 shrink-0"
               :class="superUpvoteActive ? 'fill-current' : ''"
               :filled="superUpvoteActive"
             />
@@ -246,7 +249,9 @@ const showHeartFilledIcon = computed(
               :test-id="'downvote-discussion-button'"
               :button-props="activatorProps"
             >
-              <span class="flex items-center gap-1 text-xs font-medium">
+              <span
+                class="flex flex-nowrap items-center gap-1 whitespace-nowrap text-xs font-medium"
+              >
                 <FlagIcon class="h-4 w-4" />
                 <span>Feedback</span>
               </span>
@@ -266,20 +271,20 @@ const showHeartFilledIcon = computed(
           :test-id="'upvote-discussion-button'"
           :tooltip-text="upvoteTooltipUnauthenticated"
         >
-          <span class="flex items-center gap-1">
+          <span class="flex flex-nowrap items-center gap-1 whitespace-nowrap">
             <UpArrowIcon
               v-if="showArrowUpIcon"
-              class="h-4 w-4"
+              class="h-4 w-4 shrink-0"
               aria-hidden="true"
             />
             <HeartIcon
               v-else-if="showHeartOutlineIcon"
-              class="h-4 w-4"
+              class="h-4 w-4 shrink-0"
               aria-hidden="true"
             />
             <HeartIcon
               v-else-if="showHeartFilledIcon"
-              class="h-4 w-4 fill-current"
+              class="h-4 w-4 shrink-0 fill-current"
               filled
               aria-hidden="true"
             />
@@ -304,7 +309,9 @@ const showHeartFilledIcon = computed(
               :tooltip-text="'Give semi-anonymous feedback'"
               :button-props="activatorProps"
             >
-              <span class="flex items-center gap-1 text-xs font-medium">
+              <span
+                class="flex flex-nowrap items-center gap-1 whitespace-nowrap text-xs font-medium"
+              >
                 <FlagIcon class="h-4 w-4" />
                 <span>Feedback</span>
               </span>

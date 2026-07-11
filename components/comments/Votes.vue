@@ -192,9 +192,11 @@ function viewFeedback() {
       :transparent-background="isPermalinked"
       @vote="clickUpvote"
     >
-      <UpArrowIcon class="h-4 w-4" aria-hidden="true" />
-      <span class="text-xs">{{ upvoteCount }}</span>
-      <span class="text-xs">{{ upvoteActive ? 'Undo' : 'Upvote' }}</span>
+      <span class="flex flex-nowrap items-center gap-1 whitespace-nowrap">
+        <UpArrowIcon class="h-4 w-4 shrink-0" aria-hidden="true" />
+        <span class="text-xs">{{ upvoteCount }}</span>
+        <span class="text-xs">{{ upvoteActive ? 'Undo' : 'Upvote' }}</span>
+      </span>
     </VoteButton>
 
     <!-- Super Upvote button - visible when user has upvoted and not own content -->
@@ -210,9 +212,12 @@ function viewFeedback() {
       :class="superUpvoteActive ? '' : 'super-upvote-button'"
       @vote="superUpvoteActive ? emit('undoSuperUpvote') : emit('superUpvote')"
     >
-      <span class="flex items-center gap-1 text-xs font-medium" :class="superUpvoteActive ? '' : 'rainbow-star'">
+      <span
+        class="flex flex-nowrap items-center gap-1 whitespace-nowrap text-xs font-medium"
+        :class="superUpvoteActive ? '' : 'rainbow-star'"
+      >
         <StarIcon
-          class="h-4 w-4"
+          class="h-4 w-4 shrink-0"
           :class="superUpvoteActive ? 'fill-current' : ''"
           :filled="superUpvoteActive"
           aria-hidden="true"

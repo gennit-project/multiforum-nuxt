@@ -50,6 +50,16 @@ describe('VoteButtons (authenticated)', () => {
     expect(button(wrapper, 'upvote-discussion-button').text()).toContain('7');
   });
 
+  it('keeps the upvote icon, count, and label on one line', () => {
+    const wrapper = mountButtons({ upvoteCount: 7 });
+
+    expect(
+      button(wrapper, 'upvote-discussion-button').get('button > span').classes()
+    ).toEqual(
+      expect.arrayContaining(['flex-nowrap', 'whitespace-nowrap'])
+    );
+  });
+
   it('hides the upvote button when showUpvote is false', () => {
     const wrapper = mountButtons({ showUpvote: false });
 

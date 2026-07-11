@@ -168,11 +168,11 @@ function getDefaultVariant(emojiLabel: string) {
           }
         "
       >
-        <span class="flex items-center gap-1">
+        <span class="flex flex-nowrap items-center gap-1 whitespace-nowrap">
           <span
             v-for="unicode in Object.keys(getVariants(emojiLabel))"
             :key="unicode"
-            class="text-lg"
+            class="shrink-0 text-lg"
             aria-hidden="true"
           >
             {{ unicode }}
