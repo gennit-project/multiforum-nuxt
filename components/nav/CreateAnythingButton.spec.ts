@@ -55,7 +55,7 @@ const mountButton = (
 
 // The menu panel is v-if the trigger is open; click the trigger first.
 const openMenu = async (wrapper: ReturnType<typeof mountButton>) => {
-  await wrapper.get('[aria-haspopup="true"]').trigger('click');
+  await wrapper.get('button[aria-haspopup="menu"]').trigger('click');
   return wrapper;
 };
 
