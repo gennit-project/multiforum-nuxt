@@ -6,44 +6,62 @@ import {
   ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD,
   UPDATE_ISSUE,
 } from '@/graphQLData/issue/mutations';
+import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
+import { UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
+import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/event/mutations';
 
 const mockMutate = vi.fn(() => Promise.resolve());
 const mockAddFeed = vi.fn(() => Promise.resolve());
 const mockUpdateIssue = vi.fn(() => Promise.resolve());
 
+// Per-mutation error refs and a combined query result, hoisted so the mock
+// factory can close over them and tests can drive the error/early-return
+// branches in saveEdits and the per-content-type computeds.
+const { errors, queryData } = vi.hoisted(() => ({
+  errors: {
+    comment: { value: null as { message: string } | null },
+    discussion: { value: null as { message: string } | null },
+    event: { value: null as { message: string } | null },
+    addFeed: { value: null as { message: string } | null },
+    issue: { value: null as { message: string } | null },
+  },
+  queryData: {
+    value: {
+      comments: [{ text: 'original comment body' }],
+      discussions: [{ title: 'discussion title', body: 'discussion body' }],
+      events: [{ title: 'event title', description: 'event description' }],
+    },
+  },
+}));
+
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: vi.fn(() => ({
-    result: { value: { comments: [{ text: 'original comment body' }] } },
-  })),
+  useQuery: vi.fn((_doc, variables, options) => {
+    // Exercise the reactive variables/options factories (and the computeds they read).
+    if (typeof variables === 'function') variables();
+    if (typeof options === 'function') options();
+    return { result: queryData };
+  }),
   useMutation: vi.fn((mutation) => {
-    if (mutation === ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD) {
-      return {
-        mutate: (...args: any[]) => {
-          mockAddFeed(...args);
-          return Promise.resolve();
-        },
-        loading: { value: false },
-        error: { value: null },
-      };
-    }
-    if (mutation === UPDATE_ISSUE) {
-      return {
-        mutate: (...args: any[]) => {
-          mockUpdateIssue(...args);
-          return Promise.resolve();
-        },
-        loading: { value: false },
-        error: { value: null },
-      };
-    }
-    return {
+    const build = (
+      spy: (...a: any[]) => unknown,
+      error: { value: { message: string } | null }
+    ) => ({
       mutate: (...args: any[]) => {
-        mockMutate(...args);
+        spy(...args);
         return Promise.resolve();
       },
       loading: { value: false },
-      error: { value: null },
-    };
+      error,
+    });
+    if (mutation === ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD)
+      return build(mockAddFeed, errors.addFeed);
+    if (mutation === UPDATE_ISSUE) return build(mockUpdateIssue, errors.issue);
+    if (mutation === UPDATE_COMMENT) return build(mockMutate, errors.comment);
+    if (mutation === UPDATE_DISCUSSION)
+      return build(mockMutate, errors.discussion);
+    if (mutation === UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS)
+      return build(mockMutate, errors.event);
+    return build(mockMutate, { value: null });
   }),
 }));
 
@@ -109,6 +127,11 @@ describe('EditContentModal', () => {
     mockMutate.mockClear();
     mockAddFeed.mockClear();
     mockUpdateIssue.mockClear();
+    errors.comment.value = null;
+    errors.discussion.value = null;
+    errors.event.value = null;
+    errors.addFeed.value = null;
+    errors.issue.value = null;
   });
 
   const mountModal = (props = {}) =>
@@ -219,5 +242,173 @@ describe('EditContentModal', () => {
     expect(
       (wrapper.vm as any).$?.exposed?.selectedForumRules.value
     ).toContain('Spam');
+  });
+
+  it('selects a server broken rule from the rule picker', async () => {
+    const wrapper = mountModal();
+    const picker = wrapper.findComponent({ name: 'SelectBrokenRules' });
+    await picker.vm.$emit('toggle-server-rule-selection', 'Harassment');
+
+    expect(
+      (wrapper.vm as any).$?.exposed?.selectedServerRules.value
+    ).toContain('Harassment');
+  });
+
+  it('deselects a broken rule that was already selected', async () => {
+    const wrapper = mountModal();
+    const picker = wrapper.findComponent({ name: 'SelectBrokenRules' });
+    await picker.vm.$emit('toggle-forum-rule-selection', 'Spam');
+    await picker.vm.$emit('toggle-forum-rule-selection', 'Spam');
+
+    expect(
+      (wrapper.vm as any).$?.exposed?.selectedForumRules.value
+    ).not.toContain('Spam');
+  });
+
+  it('populates the title and body from an event when opened', async () => {
+    const wrapper = mountModal({
+      open: false,
+      targetType: 'event',
+      eventId: 'event-1',
+      commentId: '',
+    });
+    await wrapper.setProps({ open: true });
+
+    const exposed = (wrapper.vm as any).$?.exposed;
+    expect({
+      title: exposed.titleValue.value,
+      body: exposed.bodyValue.value,
+    }).toEqual({ title: 'event title', body: 'event description' });
+  });
+
+  it('populates the title and body from a discussion when opened', async () => {
+    const wrapper = mountModal({
+      open: false,
+      targetType: 'discussion',
+      discussionId: 'disc-1',
+      commentId: '',
+    });
+    await wrapper.setProps({ open: true });
+
+    const exposed = (wrapper.vm as any).$?.exposed;
+    expect({
+      title: exposed.titleValue.value,
+      body: exposed.bodyValue.value,
+    }).toEqual({ title: 'discussion title', body: 'discussion body' });
+  });
+
+  it('updates the edit reason from the reason editor', async () => {
+    const wrapper = mountModal();
+    const editors = wrapper.findAllComponents({ name: 'TextEditor' });
+    await editors[0]!.vm.$emit('update', 'because reasons');
+
+    expect((wrapper.vm as any).$?.exposed?.editReason.value).toBe(
+      'because reasons'
+    );
+  });
+
+  it('updates the body from the body editor', async () => {
+    const wrapper = mountModal();
+    const editors = wrapper.findAllComponents({ name: 'TextEditor' });
+    await editors[editors.length - 1]!.vm.$emit('update', 'new body text');
+
+    expect((wrapper.vm as any).$?.exposed?.bodyValue.value).toBe(
+      'new body text'
+    );
+  });
+
+  it('updates the title from the title editor for non-comment content', async () => {
+    const wrapper = mountModal({
+      targetType: 'discussion',
+      discussionId: 'disc-1',
+      commentId: '',
+    });
+    const editors = wrapper.findAllComponents({ name: 'TextEditor' });
+    await editors[1]!.vm.$emit('update', 'new title text');
+
+    expect((wrapper.vm as any).$?.exposed?.titleValue.value).toBe(
+      'new title text'
+    );
+  });
+
+  it('stops before flagging the issue when the comment update errors', async () => {
+    errors.comment.value = { message: 'comment boom' };
+    const wrapper = mountModal();
+    withRule(wrapper);
+
+    await (wrapper.vm as any).saveEdits();
+    await flushPromises();
+
+    expect(mockUpdateIssue).not.toHaveBeenCalled();
+  });
+
+  it('stops before flagging the issue when the discussion update errors', async () => {
+    errors.discussion.value = { message: 'disc boom' };
+    const wrapper = mountModal({
+      targetType: 'discussion',
+      discussionId: 'disc-1',
+      commentId: '',
+    });
+    withRule(wrapper);
+
+    await (wrapper.vm as any).saveEdits();
+    await flushPromises();
+
+    expect(mockUpdateIssue).not.toHaveBeenCalled();
+  });
+
+  it('stops before logging the feed item when the event update errors', async () => {
+    errors.event.value = { message: 'event boom' };
+    const wrapper = mountModal({
+      targetType: 'event',
+      eventId: 'event-1',
+      commentId: '',
+    });
+    withRule(wrapper);
+
+    await (wrapper.vm as any).saveEdits();
+    await flushPromises();
+
+    expect(mockAddFeed).not.toHaveBeenCalled();
+  });
+
+  it('does not emit saved when the feed-item mutation errors', async () => {
+    errors.addFeed.value = { message: 'feed boom' };
+    const wrapper = mountModal({
+      targetType: 'event',
+      eventId: 'event-1',
+      commentId: '',
+    });
+    withRule(wrapper);
+
+    await (wrapper.vm as any).saveEdits();
+    await flushPromises();
+
+    expect(wrapper.emitted('saved')).toBeUndefined();
+  });
+
+  it('does not emit saved when the issue-flag mutation errors', async () => {
+    errors.issue.value = { message: 'issue boom' };
+    const wrapper = mountModal();
+    withRule(wrapper);
+
+    await (wrapper.vm as any).saveEdits();
+    await flushPromises();
+
+    expect(wrapper.emitted('saved')).toBeUndefined();
+  });
+
+  it('emits close when the cancel button is clicked', async () => {
+    const wrapper = mountModal();
+    await wrapper.findAll('button')[0]!.trigger('click');
+
+    expect(wrapper.emitted('close')).toBeTruthy();
+  });
+
+  it('emits close when the modal requests close', async () => {
+    const wrapper = mountModal();
+    await wrapper.findComponent({ name: 'GenericModal' }).vm.$emit('close');
+
+    expect(wrapper.emitted('close')).toBeTruthy();
   });
 });
