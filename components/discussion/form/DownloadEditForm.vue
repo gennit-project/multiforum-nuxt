@@ -156,6 +156,17 @@ const formValues = ref({
   downloadLabels: {} as Record<string, string[]>,
 });
 
+const shouldShowSupportFields = (file: DownloadFormFile) =>
+  Boolean(
+    file.attributionOverride ||
+      file.supportPatreonUrl ||
+      file.supportBuyMeACoffeeUrl ||
+      file.supportKoFiUrl ||
+      file.supportPayPalMeUrl
+  );
+
+const customSupportFieldsEnabled = ref<boolean[]>([]);
+
 // Upload state
 const uploadingFile = ref(false);
 const uploadError = ref('');
@@ -164,17 +175,6 @@ const permanentDeleteFileError = ref('');
 
 // Notification state
 const savedSuccessfully = ref(false);
-
-// License options (placeholder as requested)
-const licenseOptions = [
-  { id: 'mit', name: 'MIT License' },
-  { id: 'apache-2', name: 'Apache License 2.0' },
-  { id: 'gpl-3', name: 'GNU General Public License v3.0' },
-  { id: 'bsd-3', name: 'BSD 3-Clause License' },
-  { id: 'creative-commons', name: 'Creative Commons' },
-  { id: 'proprietary', name: 'Proprietary' },
-  { id: 'other', name: 'Other' },
-];
 
 // GraphQL mutations
 const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
@@ -219,12 +219,12 @@ const currentChannelConnections = computed(() => {
 
 // Initialize form values after component is mounted
 onMounted(() => {
-
   formValues.value.downloadableFiles = [...downloadableFiles.value];
+  customSupportFieldsEnabled.value =
+    formValues.value.downloadableFiles.map(shouldShowSupportFields);
 
   // Initialize download labels from props
   formValues.value.downloadLabels = { ...props.existingDownloadLabels };
-
 });
 
 // File validation
@@ -279,6 +279,10 @@ const handleFileUpload = async (event: Event) => {
 const addNewFile = (fileData: DownloadFormFile) => {
   const updatedFiles = [...formValues.value.downloadableFiles, fileData];
   formValues.value.downloadableFiles = updatedFiles;
+  customSupportFieldsEnabled.value = [
+    ...customSupportFieldsEnabled.value,
+    shouldShowSupportFields(fileData),
+  ];
 };
 
 /**
@@ -389,6 +393,7 @@ const getFileKind = (file: File): string => getDownloadFileKind(file.name);
 
 const removeFileFromForm = (index: number) => {
   formValues.value.downloadableFiles.splice(index, 1);
+  customSupportFieldsEnabled.value.splice(index, 1);
   // Auto-save after file removal
   handleSave();
 };
@@ -444,14 +449,6 @@ const permanentlyDeleteSelectedFile = async () => {
   }
 };
 
-// Update license
-const updateLicense = (fileIndex: number, licenseId: string) => {
-  if (formValues.value.downloadableFiles[fileIndex]) {
-    formValues.value.downloadableFiles[fileIndex].license = licenseId;
-    handleSave();
-  }
-};
-
 const updateFileSupportField = (
   fileIndex: number,
   field: keyof Pick<
@@ -468,6 +465,17 @@ const updateFileSupportField = (
     formValues.value.downloadableFiles[fileIndex][field] = value;
     handleSave();
   }
+};
+
+const updateCustomSupportFieldsEnabled = (
+  fileIndex: number,
+  enabled: boolean
+) => {
+  if (!formValues.value.downloadableFiles[fileIndex]) {
+    return;
+  }
+
+  customSupportFieldsEnabled.value[fileIndex] = enabled;
 };
 
 function getUpdateDiscussionInputForDownloadableFiles(): DiscussionUpdateInput {
@@ -619,82 +627,79 @@ function handleSave() {
                   </button>
                 </div>
 
-                <!-- License Selection -->
-                <FormRow section-title="License">
-                  <template #content>
-                    <select
-                      :value="file.license"
-                      class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                      @change="
-                        updateLicense(
-                          index,
-                          ($event.target as HTMLSelectElement).value
-                        )
-                      "
-                    >
-                      <option value="">Select a license...</option>
-                      <option
-                        v-for="license in licenseOptions"
-                        :key="license.id"
-                        :value="license.id"
-                      >
-                        {{ license.name }}
-                      </option>
-                    </select>
-                  </template>
-                </FormRow>
-
                 <FormRow section-title="Attribution and support links">
                   <template #content>
                     <div class="space-y-3">
-                      <label class="block">
-                        <span
-                          class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                        >
-                          Custom attribution
-                        </span>
-                        <textarea
-                          :value="file.attributionOverride || ''"
-                          rows="2"
-                          class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                          placeholder="Optional text shown after someone downloads this file"
-                          @input="
-                            updateFileSupportField(
+                      <label class="flex items-start gap-3">
+                        <input
+                          :checked="customSupportFieldsEnabled[index]"
+                          type="checkbox"
+                          class="mt-1 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
+                          @change="
+                            updateCustomSupportFieldsEnabled(
                               index,
-                              'attributionOverride',
-                              ($event.target as HTMLTextAreaElement).value
+                              ($event.target as HTMLInputElement).checked
                             )
                           "
-                        />
+                        >
+                        <span class="text-sm text-gray-700 dark:text-gray-300">
+                          Use custom attribution and/or support links
+                        </span>
                       </label>
 
-                      <div class="grid gap-3 sm:grid-cols-2">
-                        <label
-                          v-for="supportField in supportLinkFields"
-                          :key="supportField.key"
-                          class="block"
-                        >
+                      <div
+                        v-if="customSupportFieldsEnabled[index]"
+                        class="space-y-3"
+                      >
+                        <label class="block">
                           <span
                             class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
                           >
-                            {{ supportField.label }}
+                            Custom attribution
                           </span>
-                          <input
-                            :value="
-                              file[supportField.key] || ''
-                            "
-                            type="url"
+                          <textarea
+                            :value="file.attributionOverride || ''"
+                            rows="2"
                             class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                            :placeholder="supportField.placeholder"
+                            placeholder="Optional text shown after someone downloads this file"
                             @input="
                               updateFileSupportField(
                                 index,
-                                supportField.key,
-                                ($event.target as HTMLInputElement).value
+                                'attributionOverride',
+                                ($event.target as HTMLTextAreaElement).value
                               )
                             "
-                          >
+                          />
                         </label>
+
+                        <div class="grid gap-3 sm:grid-cols-2">
+                          <label
+                            v-for="supportField in supportLinkFields"
+                            :key="supportField.key"
+                            class="block"
+                          >
+                            <span
+                              class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                            >
+                              {{ supportField.label }}
+                            </span>
+                            <input
+                              :value="
+                                file[supportField.key] || ''
+                              "
+                              type="url"
+                              class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              :placeholder="supportField.placeholder"
+                              @input="
+                                updateFileSupportField(
+                                  index,
+                                  supportField.key,
+                                  ($event.target as HTMLInputElement).value
+                                )
+                              "
+                            >
+                          </label>
+                        </div>
                       </div>
                     </div>
                   </template>
