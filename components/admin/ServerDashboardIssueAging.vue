@@ -30,7 +30,7 @@ const barPercent = (value: number, max: number) => {
 </script>
 
 <template>
-  <div class="rounded-lg border border-gray-200 bg-white p-4 !text-gray-900 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:!text-gray-100">
+  <div class="min-w-0 rounded-lg border border-gray-200 bg-white p-4 !text-gray-900 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:!text-gray-100">
     <div class="mb-4 flex items-center justify-between gap-3">
       <div>
         <h2 class="text-base font-semibold !text-gray-900 dark:!text-gray-100">
