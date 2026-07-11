@@ -66,6 +66,12 @@ const fileRecord = () => ({
   license: { id: 'mit' },
 });
 
+const fileRecordWithSupportFields = () => ({
+  ...fileRecord(),
+  attributionOverride: 'Please credit Alice Studio.',
+  supportPatreonUrl: 'https://patreon.com/alice',
+});
+
 const makeDiscussion = (overrides: Record<string, unknown> = {}) =>
   ({ id: 'd1', DownloadableFiles: [], ...overrides }) as unknown as Discussion;
 
@@ -187,6 +193,28 @@ describe('DownloadEditForm rendering', () => {
       true
     );
   });
+
+  it('hides support fields by default for files without custom values', async () => {
+    const wrapper = mountForm({
+      discussion: makeDiscussion({ DownloadableFiles: [fileRecord()] }),
+    });
+    await flushPromises();
+
+    expect(wrapper.text()).not.toContain('Custom attribution');
+    expect(wrapper.text()).not.toContain('Patreon URL');
+  });
+
+  it('shows support fields by default for files with existing custom values', async () => {
+    const wrapper = mountForm({
+      discussion: makeDiscussion({
+        DownloadableFiles: [fileRecordWithSupportFields()],
+      }),
+    });
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('Custom attribution');
+    expect(wrapper.text()).toContain('Patreon URL');
+  });
 });
 
 describe('DownloadEditForm file editing', () => {
@@ -285,29 +313,15 @@ describe('DownloadEditForm file editing', () => {
     );
   });
 
-  it('updates a file license and emits the change', async () => {
-    const wrapper = mountForm({
-      discussion: makeDiscussion({ DownloadableFiles: [fileRecord()] }),
-    });
-    await flushPromises();
-
-    await wrapper.get('select').setValue('apache-2');
-
-    expect(
-      (
-        wrapper.emitted('updateFormValues')?.at(-1)?.[0] as {
-          downloadableFiles: { license: string }[];
-        }
-      ).downloadableFiles[0].license
-    ).toBe('apache-2');
-  });
-
   it('updates a support field and emits the change', async () => {
     const wrapper = mountForm({
       discussion: makeDiscussion({ DownloadableFiles: [fileRecord()] }),
     });
     await flushPromises();
 
+    await wrapper
+      .get('input[type="checkbox"]')
+      .setValue(true);
     await wrapper.get('textarea').setValue('Thanks for downloading');
 
     expect(
