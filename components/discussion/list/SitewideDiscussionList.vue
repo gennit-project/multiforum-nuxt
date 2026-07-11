@@ -8,7 +8,7 @@ import { GET_SITE_WIDE_DISCUSSION_LIST } from '@/graphQLData/discussion/queries'
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
-import { getEventFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
+import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,
@@ -45,7 +45,7 @@ const channelId = computed(() => {
 });
 
 const filterValues = ref(
-  getEventFilterValuesFromParams({ route, channelId: channelId.value })
+  getDiscussionFilterValuesFromParams({ route, channelId: channelId.value })
 );
 const isSitewideSidebarOpen = ref(false);
 
@@ -96,7 +96,10 @@ const {
       sort: activeSort.value,
       timeFrame: activeTimeFrame.value,
     },
-  })
+  }),
+  {
+    keepPreviousResult: true,
+  }
 );
 
 // Refetch when user logs in/out to update isFavorited status
@@ -121,12 +124,11 @@ const serverConfig = computed(() => {
   return getServerResult.value?.serverConfigs?.[0] || null;
 });
 
-// `useQuery` clears `result` to `undefined` while a variable-change refetch is
-// in flight (e.g. the logged-in username resolving client-side after
-// hydration). Rendering the list straight from `result` would blank it to a
-// skeleton and back — the content -> skeleton -> content flash. Hold the last
-// loaded page here so the list stays put and the skeleton stays gated on the
-// genuine first load. (The list query adds a `score` field not on `Discussion`.)
+// Apollo clears `result` during some variable-change refetches. Keep the
+// previous page in place so hydration and logged-in username updates do not
+// collapse the list back to the skeleton. Read directly from Apollo when a
+// result exists so SSR can render the server-fetched page without waiting for
+// a watcher-populated cache.
 type SiteWideDiscussion = Discussion & { score: number };
 
 const loadedDiscussions = ref<SiteWideDiscussion[]>([]);
@@ -143,7 +145,13 @@ watch(
   { immediate: true }
 );
 
-const discussions = computed<SiteWideDiscussion[]>(() => loadedDiscussions.value);
+const discussions = computed<SiteWideDiscussion[]>(() => {
+  const liveDiscussions = discussionResult.value?.getSiteWideDiscussionList?.discussions;
+  if (liveDiscussions) {
+    return liveDiscussions;
+  }
+  return loadedDiscussions.value;
+});
 
 const selectedDiscussion = computed<Discussion | null>(() => {
   if (!selectedDiscussionId.value) return null;
@@ -186,9 +194,17 @@ const selectedDiscussionChannelLinks = computed(() => {
   });
 });
 
-const aggregateDiscussionCount = computed(() => loadedAggregateCount.value);
+const aggregateDiscussionCount = computed(() => {
+  const liveAggregateCount =
+    discussionResult.value?.getSiteWideDiscussionList?.aggregateDiscussionCount;
+  if (liveAggregateCount !== undefined && liveAggregateCount !== null) {
+    return liveAggregateCount;
+  }
+  return loadedAggregateCount.value;
+});
 
 const loadMore = () => {
+  if (!discussionResult.value?.getSiteWideDiscussionList?.discussions) return;
   fetchMore({
     variables: {
       options: {
@@ -222,14 +238,14 @@ watch(
   () => route.query,
   () => {
     if (route.query) {
-      filterValues.value = getEventFilterValuesFromParams({
+      filterValues.value = getDiscussionFilterValuesFromParams({
         route,
         channelId: channelId.value,
       });
     }
     if (
-      discussionResult?.value?.getDiscussionsInChannel?.discussionChannels
-        ?.length === 0
+      discussionResult.value?.getSiteWideDiscussionList?.discussions?.length ===
+      0
     ) {
       refetchDiscussions();
     }
