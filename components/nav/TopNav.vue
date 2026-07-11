@@ -182,7 +182,7 @@ const isOnMapPage = computed(() => {
             data-testid="notification-bell"
             to="/notifications"
             :aria-label="notificationCountVar > 0 ? `${notificationCountVar} new notifications` : 'Notifications'"
-            class="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-200 hover:text-gray-950 focus:outline-none dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white"
+            class="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-200 hover:text-gray-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white"
           >
             <i class="fa-regular fa-bell text-lg" aria-hidden="true" />
             <span

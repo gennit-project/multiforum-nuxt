@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useRoute, useRouter } from 'nuxt/app';
+import { useRouter } from 'nuxt/app';
 import type { PropType } from 'vue';
 import type { Comment, ModerationProfile, User } from '@/__generated__/graphql';
 import type { ApolloError } from '@apollo/client/core';
@@ -139,7 +139,6 @@ const emit = defineEmits([
   'createComment',
 ]);
 
-const route = useRoute();
 const router = useRouter();
 
 const loggedInUserIsAuthor = computed(() => {
@@ -242,18 +241,21 @@ function handleBlockedReaction() {
         :is-marked-as-answer="isMarkedAsAnswer"
         @click="emit('openReplyEditor', commentData.id)"
       />
-      <span
+      <button
         v-if="showEditCommentField"
+        type="button"
         class="cursor-pointer rounded-full bg-gray-700 px-2 py-1 text-white hover:text-black dark:text-gray-100 dark:hover:text-white"
         @click="emit('hideEditCommentEditor')"
       >
         Cancel
-      </span>
-      <span
+      </button>
+      <button
         v-if="showEditCommentField && !commentInProcess"
+        type="button"
+        :disabled="saveDisabled"
         :class="[
           saveDisabled
-            ? 'rounded-lg bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
+            ? 'cursor-default rounded-lg bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
             : 'cursor-pointer rounded-full bg-orange-600 text-white hover:text-black dark:text-gray-100 dark:hover:text-white',
         ]"
         class="px-2 py-1"
@@ -268,17 +270,17 @@ function handleBlockedReaction() {
         "
       >
         Save
-      </span>
+      </button>
       <span
         v-if="showEditCommentField && commentInProcess"
         class="cursor-pointer underline hover:text-black dark:text-gray-100 dark:hover:text-white"
       >
         Saving...
       </span>
-      <span
+      <button
         v-if="commentData.DiscussionChannel"
-        :to="`${route.path}/comments/${commentData.id}`"
-        class="cursor-pointer underline hover:text-black dark:text-gray-100 dark:hover:text-white"
+        type="button"
+        class="cursor-pointer border-0 bg-transparent p-0 text-xs underline hover:text-black dark:text-gray-100 dark:hover:text-white"
         @click="
           router.push({
             name: 'forums-forumId-discussions-discussionId-comments-commentId',
@@ -293,21 +295,25 @@ function handleBlockedReaction() {
         "
       >
         Permalink
-      </span>
-      <span
+      </button>
+      <button
         v-if="showReplies && replyCount > 0"
-        class="cursor-pointer underline hover:text-black dark:text-gray-100 dark:hover:text-white"
+        type="button"
+        aria-expanded="true"
+        class="cursor-pointer border-0 bg-transparent p-0 text-xs underline hover:text-black dark:text-gray-100 dark:hover:text-white"
         @click="emit('hideReplies')"
       >
         {{ `Hide ${replyCount} ${replyCount === 1 ? 'Reply' : 'Replies'}` }}
-      </span>
-      <span
+      </button>
+      <button
         v-if="!showReplies"
-        class="cursor-pointer underline hover:text-black dark:text-gray-100 dark:hover:text-white"
+        type="button"
+        aria-expanded="false"
+        class="cursor-pointer border-0 bg-transparent p-0 text-xs underline hover:text-black dark:text-gray-100 dark:hover:text-white"
         @click="emit('showReplies')"
       >
         {{ `Show ${replyCount} ${replyCount === 1 ? 'Reply' : 'Replies'}` }}
-      </span>
+      </button>
       <AddToCommentFavorites
         v-if="commentData"
         :allow-add-to-list="true"

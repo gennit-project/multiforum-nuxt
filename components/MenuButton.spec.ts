@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
 
@@ -148,5 +148,101 @@ describe('MenuButton', () => {
       hasPopup: 'menu',
       expanded: 'false',
     });
+  });
+});
+
+describe('MenuButton keyboard navigation', () => {
+  const items = [
+    { label: 'One', value: 'one-id', event: 'one', icon: '' },
+    { label: 'Two', value: 'two-id', event: 'two', icon: '' },
+    { label: 'Three', value: 'three-id', event: 'three', icon: '' },
+  ];
+
+  // Focus assertions need the tree attached to the real document so
+  // document.activeElement tracks; caller must unmount to clean up.
+  const mountAttached = (props: Record<string, unknown> = {}) =>
+    mount(MenuButton, {
+      attachTo: document.body,
+      props: {
+        dataTestid: 'actions',
+        ariaLabel: 'Comment actions',
+        items,
+        ...props,
+      },
+      global: { stubs },
+    });
+
+  const item = (
+    wrapper: ReturnType<typeof mountAttached>,
+    label: string
+  ) => wrapper.get(`[data-testid="actions-item-${label}"]`);
+
+  it('keeps menu items out of the tab sequence (roving focus)', async () => {
+    const wrapper = await openMenu(mountMenu({ items }));
+
+    expect(item(wrapper, 'One').attributes('tabindex')).toBe('-1');
+  });
+
+  it('opens the menu when ArrowDown is pressed on the trigger', async () => {
+    const wrapper = mountMenu({ items });
+
+    await wrapper.get('[data-testid="actions"]').trigger('keydown', {
+      key: 'ArrowDown',
+    });
+    await flushPromises();
+
+    expect(wrapper.find('[data-testid="actions-item-One"]').exists()).toBe(true);
+  });
+
+  it('moves focus to the first item when the menu opens', async () => {
+    const wrapper = mountAttached();
+
+    await wrapper.get('[data-testid="actions"]').trigger('click');
+    await flushPromises();
+    const focused = document.activeElement === item(wrapper, 'One').element;
+    wrapper.unmount();
+
+    expect(focused).toBe(true);
+  });
+
+  it('moves focus to the next item on ArrowDown inside the menu', async () => {
+    const wrapper = mountAttached();
+
+    await wrapper.get('[data-testid="actions"]').trigger('click');
+    await flushPromises();
+    await item(wrapper, 'One').trigger('keydown', { key: 'ArrowDown' });
+    const focused = document.activeElement === item(wrapper, 'Two').element;
+    wrapper.unmount();
+
+    expect(focused).toBe(true);
+  });
+
+  it('wraps focus from the first item to the last on ArrowUp', async () => {
+    const wrapper = mountAttached();
+
+    await wrapper.get('[data-testid="actions"]').trigger('click');
+    await flushPromises();
+    await item(wrapper, 'One').trigger('keydown', { key: 'ArrowUp' });
+    const focused = document.activeElement === item(wrapper, 'Three').element;
+    wrapper.unmount();
+
+    expect(focused).toBe(true);
+  });
+
+  it('closes the menu and restores focus to the trigger on Escape', async () => {
+    const wrapper = mountAttached();
+    const trigger = wrapper.get('[data-testid="actions"]');
+
+    await trigger.trigger('click');
+    await flushPromises();
+    await item(wrapper, 'One').trigger('keydown', { key: 'Escape' });
+    await flushPromises();
+    const result = {
+      stillOpen: wrapper.find('[data-testid="actions-item-One"]').exists(),
+      triggerFocused: document.activeElement === trigger.element,
+    };
+    wrapper.unmount();
+
+    expect(result).toEqual({ stillOpen: false, triggerFocused: true });
   });
 });

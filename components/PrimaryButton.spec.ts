@@ -67,4 +67,18 @@ describe('PrimaryButton styling', () => {
 
     expect(classes(wrapper)).toContain('bg-gray-800');
   });
+
+  // Regression: focus:outline-none removes the native outline, so a focus:ring-2
+  // width must be present or keyboard focus becomes invisible (WCAG 2.4.7).
+  it('renders a focus ring width so keyboard focus stays visible', () => {
+    const wrapper = mountButton();
+
+    expect(classes(wrapper)).toContain('focus:ring-2');
+  });
+
+  it('pairs the focus ring width with a ring color', () => {
+    const wrapper = mountButton();
+
+    expect(/focus:ring-(red|green|blue|gray|orange)-\d/.test(classes(wrapper))).toBe(true);
+  });
 });

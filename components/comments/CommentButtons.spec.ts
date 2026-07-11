@@ -74,9 +74,9 @@ const mountButtons = (props: Record<string, unknown> = {}) =>
     global: { stubs: baseStubs },
   });
 
-// Find a clickable <span> action by its visible text.
-const span = (wrapper: ReturnType<typeof mountButtons>, text: string) =>
-  wrapper.findAll('span').find((s) => s.text().includes(text));
+// Find a clickable action <button> by its visible text.
+const action = (wrapper: ReturnType<typeof mountButtons>, text: string) =>
+  wrapper.findAll('button').find((b) => b.text().includes(text));
 
 describe('CommentButtons', () => {
   const baseProps = {
@@ -234,13 +234,18 @@ describe('CommentButtons', () => {
   describe('edit controls', () => {
     it('emits hideEditCommentEditor when Cancel is clicked', async () => {
       const wrapper = mountButtons({ showEditCommentField: true });
-      await span(wrapper, 'Cancel')!.trigger('click');
+      await action(wrapper, 'Cancel')!.trigger('click');
       expect(wrapper.emitted('hideEditCommentEditor')).toBeTruthy();
+    });
+
+    it('renders Cancel as a real button (keyboard-operable)', () => {
+      const wrapper = mountButtons({ showEditCommentField: true });
+      expect(action(wrapper, 'Cancel')!.element.tagName).toBe('BUTTON');
     });
 
     it('emits saveEdit and startCommentSave when Save is clicked', async () => {
       const wrapper = mountButtons({ showEditCommentField: true });
-      await span(wrapper, 'Save')!.trigger('click');
+      await action(wrapper, 'Save')!.trigger('click');
       expect(wrapper.emitted('saveEdit')).toBeTruthy();
       expect(wrapper.emitted('startCommentSave')).toBeTruthy();
     });
@@ -250,28 +255,50 @@ describe('CommentButtons', () => {
         showEditCommentField: true,
         saveDisabled: true,
       });
-      await span(wrapper, 'Save')!.trigger('click');
+      await action(wrapper, 'Save')!.trigger('click');
       expect(wrapper.emitted('saveEdit')).toBeUndefined();
+    });
+
+    it('marks the Save button as disabled when saving is disabled', () => {
+      const wrapper = mountButtons({
+        showEditCommentField: true,
+        saveDisabled: true,
+      });
+      expect(action(wrapper, 'Save')!.attributes('disabled')).toBeDefined();
     });
   });
 
   describe('replies and permalink', () => {
     it('emits hideReplies when the hide link is clicked', async () => {
       const wrapper = mountButtons({ showReplies: true, replyCount: 2 });
-      await span(wrapper, 'Hide 2 Replies')!.trigger('click');
+      await action(wrapper, 'Hide 2 Replies')!.trigger('click');
       expect(wrapper.emitted('hideReplies')).toBeTruthy();
+    });
+
+    it('exposes the expanded state on the hide-replies toggle', () => {
+      const wrapper = mountButtons({ showReplies: true, replyCount: 2 });
+      expect(action(wrapper, 'Hide 2 Replies')!.attributes('aria-expanded')).toBe(
+        'true'
+      );
     });
 
     it('emits showReplies when the show link is clicked', async () => {
       const wrapper = mountButtons({ showReplies: false, replyCount: 1 });
-      await span(wrapper, 'Show 1 Reply')!.trigger('click');
+      await action(wrapper, 'Show 1 Reply')!.trigger('click');
       expect(wrapper.emitted('showReplies')).toBeTruthy();
+    });
+
+    it('exposes the collapsed state on the show-replies toggle', () => {
+      const wrapper = mountButtons({ showReplies: false, replyCount: 1 });
+      expect(action(wrapper, 'Show 1 Reply')!.attributes('aria-expanded')).toBe(
+        'false'
+      );
     });
 
     it('navigates to the comment permalink', async () => {
       routerPush.mockClear();
       const wrapper = mountButtons();
-      await span(wrapper, 'Permalink')!.trigger('click');
+      await action(wrapper, 'Permalink')!.trigger('click');
       expect(routerPush).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'forums-forumId-discussions-discussionId-comments-commentId',

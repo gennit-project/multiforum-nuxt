@@ -48,7 +48,7 @@ const colorClasses = computed(() => {
     :disabled="disabled"
     :class="[
       colorClasses,
-      'max-height-4 inline-flex items-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-offset-2 focus:ring-offset-gray-100',
+      'max-height-4 inline-flex items-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100',
     ]"
   >
     <LoadingSpinner v-if="loading" class="mx-2" /><slot />{{ label }}

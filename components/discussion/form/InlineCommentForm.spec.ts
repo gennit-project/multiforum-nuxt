@@ -412,6 +412,26 @@ describe('InlineCommentForm — mod mention autocomplete', () => {
   });
 });
 
+describe('InlineCommentForm — accessibility', () => {
+  it('gives the comment textarea an accessible name beyond the placeholder', () => {
+    const wrapper = buildWrapper();
+
+    expect(
+      wrapper.get('[data-testid="discussion-inline-comment"]').attributes('aria-label')
+    ).toBe('Add a comment');
+  });
+
+  // Regression: focus:outline-none must be paired with a focus ring width or
+  // keyboard focus on the submit button is invisible (WCAG 2.4.7).
+  it('renders a focus ring width on the submit button', () => {
+    const wrapper = buildWrapper();
+
+    expect(wrapper.get('button[type="submit"]').classes()).toContain(
+      'focus-visible:ring-2'
+    );
+  });
+});
+
 describe('InlineCommentForm — unauthenticated view', () => {
   afterEach(() => {
     document.body.innerHTML = '';

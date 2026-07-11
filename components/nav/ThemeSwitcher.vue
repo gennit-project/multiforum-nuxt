@@ -19,7 +19,7 @@ const toggleTheme = () => {
   <client-only>
     <button
       type="button"
-      class="border-transparent relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-none"
+      class="border-transparent relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
       :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-300'"
       aria-label="Toggle theme"
       role="switch"
@@ -67,7 +67,7 @@ const toggleTheme = () => {
     <template #fallback>
       <button
         type="button"
-        class="border-transparent relative mx-2 inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 bg-gray-300 transition-colors duration-200 ease-in-out focus:outline-none dark:bg-gray-700"
+        class="border-transparent relative mx-2 inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 bg-gray-300 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:bg-gray-700"
         aria-label="Toggle theme"
         role="switch"
         aria-checked="false"

@@ -450,8 +450,9 @@ const applyModSuggestion = (value: string) => {
           <textarea
             ref="inlineTextarea"
             data-testid="discussion-inline-comment"
-            class="min-h-[44px] flex-1 resize-none bg-white text-sm text-gray-900 placeholder-gray-500 outline-none focus:outline-none focus:ring-0 focus-visible:outline-none dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-400"
+            class="min-h-[44px] flex-1 resize-none rounded bg-white text-sm text-gray-900 placeholder-gray-500 outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-400"
             name="discussionInlineComment"
+            aria-label="Add a comment"
             :rows="1"
             placeholder="Join the discussion..."
             :value="createFormValues.text"
@@ -509,7 +510,7 @@ const applyModSuggestion = (value: string) => {
           </div>
           <button
             type="submit"
-            class="font-semibold flex items-center justify-center rounded-md bg-orange-400 px-4 py-2 text-sm text-black hover:bg-orange-500 focus:outline-none focus:ring-0 focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-orange-200 dark:disabled:bg-orange-950 dark:disabled:text-orange-400"
+            class="font-semibold flex items-center justify-center rounded-md bg-orange-400 px-4 py-2 text-sm text-black hover:bg-orange-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-orange-200 dark:disabled:bg-orange-950 dark:disabled:text-orange-400"
             :disabled="
               createCommentLoading ||
               !createFormValues.text.length ||

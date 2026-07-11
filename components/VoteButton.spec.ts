@@ -106,3 +106,32 @@ describe('VoteButton rendering', () => {
     expect(wrapper.emitted('vote')).toBeTruthy();
   });
 });
+
+describe('VoteButton accessibility', () => {
+  const forwardedProps = (w: ReturnType<typeof mount>) =>
+    authButton(w).props('props') as Record<string, unknown>;
+
+  it('exposes the pressed state to assistive tech when active', () => {
+    const wrapper = mountButton({ active: true });
+
+    expect(forwardedProps(wrapper)['aria-pressed']).toBe(true);
+  });
+
+  it('exposes the unpressed state to assistive tech when inactive', () => {
+    const wrapper = mountButton({ active: false });
+
+    expect(forwardedProps(wrapper)['aria-pressed']).toBe(false);
+  });
+
+  it('forwards the ariaLabel prop as the button accessible name', () => {
+    const wrapper = mountButton({ ariaLabel: 'Upvote' });
+
+    expect(forwardedProps(wrapper)['aria-label']).toBe('Upvote');
+  });
+
+  it('omits aria-label when no ariaLabel is provided', () => {
+    const wrapper = mountButton();
+
+    expect(forwardedProps(wrapper)).not.toHaveProperty('aria-label');
+  });
+});

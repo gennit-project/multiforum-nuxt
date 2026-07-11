@@ -135,7 +135,7 @@ const buttonClasses = computed(() => {
   }
 
   const baseClasses =
-    'inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-2 text-xs focus:outline-none dark:border-gray-600';
+    'inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-2 text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-100 dark:border-gray-600 dark:focus-visible:ring-gray-500 dark:focus-visible:ring-offset-gray-900';
 
   if (createButtonProps.usePrimaryButton) {
     return `${baseClasses} !border !border-gray-300 dark:!border-gray-600`;
