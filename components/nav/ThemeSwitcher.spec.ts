@@ -53,4 +53,14 @@ describe('ThemeSwitcher', () => {
 
     expect(h.setTheme).toHaveBeenCalledWith('dark');
   });
+
+  // Regression: focus:outline-none must be paired with a focus ring width,
+  // or keyboard focus on the toggle is invisible (WCAG 2.4.7).
+  it('renders a focus ring width so keyboard focus stays visible', () => {
+    const wrapper = mountWithDefaults(ThemeSwitcher);
+
+    expect(
+      wrapper.get('[data-testid="theme-switcher"]').classes()
+    ).toContain('focus-visible:ring-2');
+  });
 });

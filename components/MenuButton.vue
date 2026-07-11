@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue';
 import type { PropType } from 'vue';
 import { useFloating, offset, flip, shift, autoUpdate } from '@floating-ui/vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
@@ -55,6 +55,10 @@ const buttonClasses = computed(() => {
 const isOpen = ref(false);
 const triggerRef = ref<HTMLElement | null>(null);
 const floatingRef = ref<HTMLElement | null>(null);
+// Index of the menu item that currently holds focus (roving focus), and where
+// focus should land when the menu next opens ('last' when opened via ArrowUp).
+const activeIndex = ref(0);
+const pendingFocusTarget = ref<'first' | 'last'>('first');
 
 const { floatingStyles } = useFloating(triggerRef, floatingRef, {
   placement: 'bottom-end',
@@ -68,6 +72,86 @@ function close() {
 }
 function toggle() {
   isOpen.value = !isOpen.value;
+}
+
+// The focusable menu items currently rendered in the teleported panel.
+function menuItems(): HTMLElement[] {
+  if (!floatingRef.value) return [];
+  return Array.from(
+    floatingRef.value.querySelectorAll<HTMLElement>('[role="menuitem"]')
+  );
+}
+
+// Move roving focus to the item at `index`, wrapping around both ends.
+function focusMenuItem(index: number) {
+  const items = menuItems();
+  if (!items.length) return;
+  const n = items.length;
+  const i = ((index % n) + n) % n;
+  activeIndex.value = i;
+  items[i]?.focus();
+}
+
+// Restore focus to the activator when the menu closes via the keyboard, so the
+// user is not dumped at the top of the page.
+function focusTrigger() {
+  const el = triggerRef.value?.querySelector<HTMLElement>(
+    'button, a, [role="button"], [tabindex]'
+  );
+  el?.focus();
+}
+
+function closeAndRestoreFocus() {
+  close();
+  nextTick(focusTrigger);
+}
+
+// Keyboard handling on the activator: open the menu with the arrow keys,
+// focusing the first (ArrowDown) or last (ArrowUp) item. Enter/Space fall
+// through to the button's native click, which toggles the menu.
+function onTriggerKeydown(event: KeyboardEvent) {
+  if (props.disabled) return;
+  if (event.key === 'ArrowDown') {
+    event.preventDefault();
+    pendingFocusTarget.value = 'first';
+    if (isOpen.value) focusMenuItem(0);
+    else isOpen.value = true;
+  } else if (event.key === 'ArrowUp') {
+    event.preventDefault();
+    pendingFocusTarget.value = 'last';
+    if (isOpen.value) focusMenuItem(menuItems().length - 1);
+    else isOpen.value = true;
+  }
+}
+
+// Keyboard handling inside the open menu: roving focus + Escape to dismiss.
+function onMenuKeydown(event: KeyboardEvent) {
+  switch (event.key) {
+    case 'ArrowDown':
+      event.preventDefault();
+      focusMenuItem(activeIndex.value + 1);
+      break;
+    case 'ArrowUp':
+      event.preventDefault();
+      focusMenuItem(activeIndex.value - 1);
+      break;
+    case 'Home':
+      event.preventDefault();
+      focusMenuItem(0);
+      break;
+    case 'End':
+      event.preventDefault();
+      focusMenuItem(menuItems().length - 1);
+      break;
+    case 'Escape':
+      event.preventDefault();
+      closeAndRestoreFocus();
+      break;
+    case 'Tab':
+      // Let focus leave naturally; the menu closes as focus moves out.
+      close();
+      break;
+  }
 }
 
 // Props applied to the trigger. Passed to the `activator` slot so custom
@@ -84,6 +168,7 @@ const activatorProps = computed(() => {
   }
   return {
     onClick: toggle,
+    onKeydown: onTriggerKeydown,
     'aria-haspopup': 'menu' as const,
     'aria-expanded': isOpen.value,
   };
@@ -119,7 +204,7 @@ function onDocumentPointerDown(event: PointerEvent) {
   close();
 }
 function onKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape') close();
+  if (event.key === 'Escape') closeAndRestoreFocus();
 }
 function onFocusOut(event: FocusEvent) {
   const relatedTarget = event.relatedTarget as Node | null;
@@ -141,7 +226,20 @@ watch(isOpen, (open) => {
   } else {
     document.removeEventListener('pointerdown', onDocumentPointerDown, true);
     document.removeEventListener('keydown', onKeydown);
+    activeIndex.value = 0;
+    pendingFocusTarget.value = 'first';
   }
+});
+
+// Move focus into the menu exactly when the teleported, client-only panel
+// mounts (floatingRef flips from null to the element), which is race-free vs.
+// guessing how many ticks the render takes.
+watch(floatingRef, (el) => {
+  // `el` is null during SSR (no DOM), so this only runs client-side.
+  if (!el || !isOpen.value) return;
+  focusMenuItem(
+    pendingFocusTarget.value === 'last' ? menuItems().length - 1 : 0
+  );
 });
 
 onBeforeUnmount(() => {
@@ -180,6 +278,7 @@ onBeforeUnmount(() => {
           :style="floatingStyles"
           class="z-[10000]"
           @focusout="onFocusOut"
+          @keydown="onMenuKeydown"
         >
           <div
             class="min-w-[10rem] overflow-hidden rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-600 dark:bg-gray-700"
@@ -201,6 +300,7 @@ onBeforeUnmount(() => {
                 :to="item.value"
                 :data-testid="`${dataTestid}-item-${item.label}`"
                 role="menuitem"
+                tabindex="-1"
                 class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
                 @click="close"
               >
@@ -217,6 +317,7 @@ onBeforeUnmount(() => {
                 type="button"
                 :data-testid="`${dataTestid}-item-${item.label}`"
                 role="menuitem"
+                tabindex="-1"
                 class="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
                 @click="handleItemClick(item)"
               >

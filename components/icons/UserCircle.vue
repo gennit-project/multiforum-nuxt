@@ -2,8 +2,9 @@
 <template>
   <span
     class="inline-block overflow-hidden rounded-full bg-gray-100 dark:bg-gray-600"
+    aria-hidden="true"
   >
-    <svg
+    <svg aria-hidden="true"
       class="h-full w-full text-gray-300 dark:text-gray-700"
       fill="currentColor"
       viewBox="0 0 24 24"

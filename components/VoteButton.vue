@@ -47,7 +47,7 @@ const emit = defineEmits(['vote']);
 
 const buttonClasses = computed(() => {
   const baseClasses = [
-    'inline-flex max-h-6 cursor-pointer items-center rounded-full px-2 py-1',
+    'inline-flex max-h-6 cursor-pointer items-center whitespace-nowrap rounded-full px-2 py-1',
   ];
 
   if (properties.transparentBackground) {
@@ -88,9 +88,18 @@ const buttonClasses = computed(() => {
   );
 });
 
-const mergedButtonProps = computed(() => ({
-  ...properties.buttonProps,
-}));
+const mergedButtonProps = computed(() => {
+  const merged: Record<string, unknown> = {
+    ...properties.buttonProps,
+    // Expose the on/off state of the vote/reaction toggle to assistive tech.
+    'aria-pressed': properties.active,
+  };
+  // Forward the explicit accessible name (icon-only variants have no text).
+  if (properties.ariaLabel) {
+    merged['aria-label'] = properties.ariaLabel;
+  }
+  return merged;
+});
 </script>
 
 <template>

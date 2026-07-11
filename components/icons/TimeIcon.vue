@@ -1,6 +1,6 @@
 <script setup lang="ts"></script>
 <template>
-  <svg
+  <svg aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     class="-ml-0.5 mr-2 w-4"
     fill="none"

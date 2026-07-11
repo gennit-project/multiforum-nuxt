@@ -90,6 +90,14 @@ describe('CreateAnythingButton classes', () => {
 
     expect(wrapper.get('button').classes()).toContain('dark:bg-gray-800');
   });
+
+  // Regression: the non-icon variant used focus:outline-none with no ring width,
+  // leaving keyboard focus invisible (WCAG 2.4.7).
+  it('renders a focus ring width on the default (non-icon) variant', () => {
+    const wrapper = mountButton('does-not-have-auth');
+
+    expect(wrapper.get('button').classes()).toContain('focus-visible:ring-2');
+  });
 });
 
 describe('CreateAnythingButton menu actions (sitewide)', () => {
