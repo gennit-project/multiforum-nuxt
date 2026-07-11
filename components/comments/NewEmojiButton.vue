@@ -1,9 +1,14 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, defineAsyncComponent } from 'vue';
 import VoteButton from '@/components/VoteButton.vue';
-import FloatingDropdown from '@/components/FloatingDropdown.vue';
-import EmojiPicker from '@/components/comments/EmojiPicker.vue';
 import FaceSmileIcon from '@/components/icons/FaceSmileIcon.vue';
+
+const FloatingDropdown = defineAsyncComponent(
+  () => import('@/components/FloatingDropdown.vue')
+);
+const EmojiPicker = defineAsyncComponent(
+  () => import('@/components/comments/EmojiPicker.vue')
+);
 
 const props = defineProps({
   commentId: {

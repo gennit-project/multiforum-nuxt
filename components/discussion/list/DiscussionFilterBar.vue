@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, defineAsyncComponent } from 'vue';
 import SearchBar from '@/components/SearchBar.vue';
 import FilterChip from '@/components/FilterChip.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import TagIcon from '@/components/icons/TagIcon.vue';
-import SearchableForumList from '@/components/channel/SearchableForumList.vue';
-import SearchableTagList from '@/components/SearchableTagList.vue';
 import SortButtons from '@/components/SortButtons.vue';
 import CollapseIcon from '@/components/icons/CollapseIcon.vue';
 import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
@@ -23,6 +21,13 @@ import {
   DEFAULT_FILTER_LABELS,
 } from '@/composables/useFilterBar';
 import { updateFilters } from '@/utils/routerUtils';
+
+const SearchableForumList = defineAsyncComponent(
+  () => import('@/components/channel/SearchableForumList.vue')
+);
+const SearchableTagList = defineAsyncComponent(
+  () => import('@/components/SearchableTagList.vue')
+);
 
 const emit = defineEmits(['openAbout']);
 

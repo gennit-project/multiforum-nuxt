@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, watch } from 'vue';
+import {
+  computed,
+  ref,
+  onMounted,
+  watch,
+  defineAsyncComponent,
+} from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { useUIStore } from '@/stores/uiStore';
@@ -9,7 +15,6 @@ import DownloadSkeletonCard from '@/components/download/DownloadSkeletonCard.vue
 import LoadMore from '../LoadMore.vue';
 import ErrorBanner from '../ErrorBanner.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import DiscussionAlbum from '@/components/discussion/detail/DiscussionAlbum.vue';
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/graphQLData/discussion/queries';
 import { useUsername } from '@/composables/useAuthState';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
@@ -20,6 +25,10 @@ import {
 } from '@/utils/getSortFromQuery';
 import { convertUrlParamsToLabelFilters } from '@/utils/downloadFilters';
 import type { Discussion, Album, FilterGroup } from '@/__generated__/graphql';
+
+const DiscussionAlbum = defineAsyncComponent(
+  () => import('@/components/discussion/detail/DiscussionAlbum.vue')
+);
 
 const usernameVar = useUsername();
 

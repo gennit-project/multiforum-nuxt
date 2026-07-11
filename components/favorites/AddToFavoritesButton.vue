@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, nextTick, watch } from 'vue';
+import { ref, computed, nextTick, watch, defineAsyncComponent } from 'vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import AddToListPopover from '@/components/collection/AddToListPopover.vue';
+
+const AddToListPopover = defineAsyncComponent(
+  () => import('@/components/collection/AddToListPopover.vue')
+);
 
 const props = defineProps({
   isFavorited: {

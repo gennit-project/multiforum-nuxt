@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue';
 import { useRoute } from 'nuxt/app';
 import LeftArrowIcon from '@/components/icons/LeftArrowIcon.vue';
 import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
@@ -15,8 +15,11 @@ import { useUsername } from '@/composables/useAuthState';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
 import CarouselThumbnail from '@/components/discussion/detail/CarouselThumbnail.vue';
-import ImageLightbox from '@/components/discussion/detail/ImageLightbox.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
+
+const ImageLightbox = defineAsyncComponent(
+  () => import('@/components/discussion/detail/ImageLightbox.vue')
+);
 
 const usernameVar = useUsername();
 

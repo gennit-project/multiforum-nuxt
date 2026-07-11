@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import AddToListPopover from '@/components/collection/AddToListPopover.vue';
+import { computed, defineAsyncComponent } from 'vue';
 import { useAddToListModalStore } from '@/stores/addToListModalStore';
+
+const AddToListPopover = defineAsyncComponent(
+  () => import('@/components/collection/AddToListPopover.vue')
+);
 
 const modalStore = useAddToListModalStore();
 

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, ref, defineAsyncComponent } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useMutation } from '@vue/apollo-composable';
 import type { Reference, StoreObject } from '@apollo/client/core';
@@ -11,11 +11,14 @@ import {
 import VoteButtons from '@/components/discussion/vote/VoteButtons.vue';
 import NewEmojiButton from '@/components/comments/NewEmojiButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import SuperUpvoteModal from '@/components/superUpvote/SuperUpvoteModal.vue';
 import { UNDO_SUPER_UPVOTE } from '@/graphQLData/scratchpad/mutations';
 import { useUsername, useModProfileName } from '@/composables/useAuthState';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
+
+const SuperUpvoteModal = defineAsyncComponent(
+  () => import('@/components/superUpvote/SuperUpvoteModal.vue')
+);
 
 const usernameVar = useUsername();
 const modProfileNameVar = useModProfileName();

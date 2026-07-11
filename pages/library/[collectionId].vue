@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, defineAsyncComponent } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useHead } from 'nuxt/app';
 import { useRoute, useRouter } from 'vue-router';
@@ -15,9 +15,6 @@ import {
   REORDER_COLLECTION_ITEM,
   SHARE_COLLECTION_AS_DISCUSSION,
 } from '@/graphQLData/collection/mutations';
-import GenericModal from '@/components/GenericModal.vue';
-import WarningModal from '@/components/WarningModal.vue';
-import ForumPicker from '@/components/channel/ForumPicker.vue';
 import { useUsername } from '@/composables/useAuthState';
 import type { Discussion, Comment } from '@/__generated__/graphql';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
@@ -35,6 +32,16 @@ import {
   getCommentContextType,
 } from '@/utils/commentUtils';
 import { isAutoSavedDownloadsCollection } from '@/utils/downloadLibraryCollection';
+
+const GenericModal = defineAsyncComponent(
+  () => import('@/components/GenericModal.vue')
+);
+const WarningModal = defineAsyncComponent(
+  () => import('@/components/WarningModal.vue')
+);
+const ForumPicker = defineAsyncComponent(
+  () => import('@/components/channel/ForumPicker.vue')
+);
 
 const usernameVar = useUsername();
 

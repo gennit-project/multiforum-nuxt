@@ -1,12 +1,20 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, ref, defineAsyncComponent } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { ADD_FEEDBACK_COMMENT_TO_DISCUSSION } from '@/graphQLData/discussion/mutations';
 import type { DiscussionChannel } from '@/__generated__/graphql';
-import GenericFeedbackFormModal from '@/components/GenericFeedbackFormModal.vue';
-import ConfirmUndoDiscussionFeedbackModal from '@/components/discussion/detail/ConfirmUndoDiscussionFeedbackModal.vue';
-import EditFeedbackModal from '@/components/discussion/detail/EditFeedbackModal.vue';
 import Notification from '@/components/NotificationComponent.vue';
+
+const GenericFeedbackFormModal = defineAsyncComponent(
+  () => import('@/components/GenericFeedbackFormModal.vue')
+);
+const ConfirmUndoDiscussionFeedbackModal = defineAsyncComponent(
+  () =>
+    import('@/components/discussion/detail/ConfirmUndoDiscussionFeedbackModal.vue')
+);
+const EditFeedbackModal = defineAsyncComponent(
+  () => import('@/components/discussion/detail/EditFeedbackModal.vue')
+);
 
 const props = defineProps({
   discussionId: {

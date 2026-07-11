@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, defineAsyncComponent } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import ErrorBanner from '../../ErrorBanner.vue';
 import LoadMore from '../../LoadMore.vue';
 import SitewideDiscussionSidebar from './SitewideDiscussionSidebar.vue';
 import SitewideDownloadListItem from './SitewideDownloadListItem.vue';
-import DiscussionAlbum from '@/components/discussion/detail/DiscussionAlbum.vue';
 import DownloadSkeletonCard from '@/components/download/DownloadSkeletonCard.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { GET_SITE_WIDE_DISCUSSION_LIST } from '@/graphQLData/discussion/queries';
@@ -20,6 +19,10 @@ import { config } from '@/config';
 import { useUsername } from '@/composables/useAuthState';
 import type { SearchDiscussionValues } from '@/types/Discussion';
 import type { Album, Discussion } from '@/__generated__/graphql';
+
+const DiscussionAlbum = defineAsyncComponent(
+  () => import('@/components/discussion/detail/DiscussionAlbum.vue')
+);
 
 const usernameVar = useUsername();
 
