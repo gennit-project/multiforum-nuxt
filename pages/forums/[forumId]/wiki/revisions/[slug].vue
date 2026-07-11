@@ -4,6 +4,7 @@ import { useRoute, useRouter, useHead } from 'nuxt/app';
 import { GET_WIKI_PAGE } from '@/graphQLData/channel/queries';
 import { useQuery } from '@vue/apollo-composable';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
 import { timeAgo } from '@/utils';
 import type { WikiPage, TextVersion } from '@/__generated__/graphql';
 import {
@@ -225,7 +226,7 @@ useHead({
             <div
               class="flex items-center text-sm text-gray-400 dark:text-gray-500"
             >
-              <i class="fas fa-chevron-right" />
+              <RightArrowIcon class="h-4 w-4" />
             </div>
           </div>
         </div>

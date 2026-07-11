@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
+
 defineProps<{
   latestVersion: string;
   installedVersion?: string | null;
@@ -48,7 +50,7 @@ const emit = defineEmits<{
           :disabled="installing || compatibility?.compatible === false"
           @click="emit('install-latest')"
         >
-          <i v-if="installing" class="fa-solid fa-spinner mr-1 animate-spin" />
+          <LoadingSpinner v-if="installing" class="mr-1 inline-flex" />
           <i v-else class="fa-solid fa-arrow-up mr-1" />
           Update to v{{ latestVersion }}
         </button>

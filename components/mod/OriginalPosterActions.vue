@@ -4,6 +4,7 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import type { Issue } from '@/__generated__/graphql';
 import EyeIcon from '../icons/EyeIcon.vue';
 import TrashIcon from '../icons/TrashIcon.vue';
+import ArrowUpRightIcon from '@/components/icons/ArrowUpRightIcon.vue';
 import WarningModal from '@/components/WarningModal.vue';
 import { useRouter } from 'nuxt/app';
 
@@ -205,7 +206,7 @@ const cancelDelete = () => {
                   ]"
                   @click="handleEditPost"
                 >
-                  <i class="fa fa-external-link h-4 w-4" aria-hidden="true" />
+                  <ArrowUpRightIcon class="h-4 w-4" aria-hidden="true" />
                   Edit
                   {{
                     contentType === 'discussion'

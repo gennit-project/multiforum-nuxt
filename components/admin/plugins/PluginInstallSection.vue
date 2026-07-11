@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import FormRow from '@/components/FormRow.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 
 const props = defineProps<{
   modelValue: string;
@@ -87,7 +88,7 @@ const canInstallSelectedVersion = computed(
               :disabled="installing || !selectedVersion || !canInstallSelectedVersion"
               @click="emit('install')"
             >
-              <i v-if="installing" class="fa-solid fa-spinner mr-2 animate-spin" />
+              <LoadingSpinner v-if="installing" class="mr-2 inline-flex" />
               Install
             </button>
 
@@ -98,7 +99,7 @@ const canInstallSelectedVersion = computed(
               :disabled="installing || !selectedVersion || !canInstallSelectedVersion"
               @click="emit('install')"
             >
-              <i v-if="installing" class="fa-solid fa-spinner mr-2 animate-spin" />
+              <LoadingSpinner v-if="installing" class="mr-2 inline-flex" />
               Install v{{ selectedVersion }}
             </button>
 
