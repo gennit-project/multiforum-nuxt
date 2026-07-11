@@ -141,11 +141,13 @@ Because settings live on the per-version edge and reset to `null` on upgrade,
 carry them over (reconciled against the new version's schema) instead.
 
 - **Reconcile function** (pure, testable):
-  `reconcileSettings(oldSettings, newManifest) → { settings, carried[], dropped[], reset[] }`
-  1. start from the new version's **defaults** (new keys get sane values),
+  `reconcileSettings(oldSettings, newManifest, scope) → { settings, carried[], dropped[], reset[] }`
+  1. start from the new version's **scope-specific defaults** (new keys get sane values),
   2. carry old keys that still exist in the new schema **and** are type/enum-valid,
   3. **drop** old keys not in the new schema (report; don't silently keep),
   4. **reset** old values that are invalid for the new field (use default; flag).
+  This keeps upgrade carry-over aligned with the same `server` vs `channel`
+  split used everywhere else in the manifest.
 - **`installPluginVersion`** gains a `carrySettings` option that computes the
   reconciled `settingsJson` from the previously-installed version's edge and sets
   it on the new edge (instead of `null`), returning a `carryOverReport`.
@@ -166,7 +168,8 @@ carry them over (reconciled against the new version's schema) instead.
 - Make the resolver scope-aware (`server` first; extendable to `channel`
   without conflating the two settings surfaces).
 - `enableServerPlugin`: validate required settings (not just secrets); structured error.
-- `installPluginVersion`: `carrySettings` option + `reconcileSettings()` (pure, unit-tested) + `carryOverReport`.
+- `installPluginVersion`: `carrySettings` option + scope-aware
+  `reconcileSettings()` (pure, unit-tested) + `carryOverReport`.
 - Optional: honor manifest `renamedFrom` for settings + secrets; manifest lint.
 
 **Frontend (`multiforum-nuxt`)**
