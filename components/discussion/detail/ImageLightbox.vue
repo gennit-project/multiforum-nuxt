@@ -1,16 +1,25 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import {
+  ref,
+  computed,
+  onMounted,
+  onUnmounted,
+  defineAsyncComponent,
+} from 'vue';
 import { useImageZoom } from '@/composables/useImageZoom';
 import { useLightboxNavigation } from '@/composables/useLightboxNavigation';
 import { useSwipeDetection } from '@/composables/useSwipeDetection';
 import LightboxControls from '@/components/discussion/detail/LightboxControls.vue';
 import LightboxImagePanel from '@/components/discussion/detail/LightboxImagePanel.vue';
 import LightboxInfoPanel from '@/components/discussion/detail/LightboxInfoPanel.vue';
-import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { useMutation } from '@vue/apollo-composable';
 import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
+
+const BrokenRulesModal = defineAsyncComponent(
+  () => import('@/components/mod/BrokenRulesModal.vue')
+);
 // Simplified image type for lightbox display
 interface LightboxImage {
   id: string;

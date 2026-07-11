@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import {
+  ref,
+  computed,
+  onMounted,
+  onUnmounted,
+  defineAsyncComponent,
+} from 'vue';
 import type { PropType } from 'vue';
 import type { Discussion, TextVersion, User } from '@/__generated__/graphql';
 import {
@@ -7,7 +13,10 @@ import {
   type PopoverPosition,
 } from '@/composables/usePopoverPositioning';
 import { timeAgo } from '@/utils';
-import RevisionDiffModal from './RevisionDiffModal.vue';
+
+const RevisionDiffModal = defineAsyncComponent(
+  () => import('./RevisionDiffModal.vue')
+);
 
 const props = defineProps({
   discussion: {

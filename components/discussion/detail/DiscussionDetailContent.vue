@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch, defineAsyncComponent } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import {
@@ -28,8 +28,6 @@ import DiscussionChannelLinks from '@/components/discussion/detail/DiscussionCha
 import PageNotFound from '@/components/PageNotFound.vue';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import { useRoute } from 'nuxt/app';
-import DiscussionBodyEditForm from './DiscussionBodyEditForm.vue';
-import AlbumEditForm from './AlbumEditForm.vue';
 import ArchivedDiscussionInfoBanner from './ArchivedDiscussionInfoBanner.vue';
 import DiscussionLayoutManager from './DiscussionLayoutManager.vue';
 import FeedbackModalManager from './FeedbackModalManager.vue';
@@ -40,6 +38,11 @@ import {
   useModProfileName,
   useUsername,
 } from '@/composables/useAuthState';
+
+const DiscussionBodyEditForm = defineAsyncComponent(
+  () => import('./DiscussionBodyEditForm.vue')
+);
+const AlbumEditForm = defineAsyncComponent(() => import('./AlbumEditForm.vue'));
 
 const isAuthenticatedVar = useIsAuthenticated();
 const modProfileNameVar = useModProfileName();
