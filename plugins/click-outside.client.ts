@@ -8,9 +8,17 @@ export default defineNuxtPlugin((nuxtApp) => {
           binding.value(event);
         }
       };
-      document.addEventListener('click', el.clickOutsideEvent);
+      // Defer attaching the listener until after the current event loop tick.
+      // When the element is mounted *by* a click (e.g. the click that opens a
+      // dropdown/emoji picker), that same click keeps propagating to document;
+      // attaching synchronously would let it immediately fire the outside-click
+      // handler and close the thing that just opened.
+      el.clickOutsideTimer = setTimeout(() => {
+        document.addEventListener('click', el.clickOutsideEvent);
+      }, 0);
     },
     unmounted(el) {
+      clearTimeout(el.clickOutsideTimer);
       document.removeEventListener('click', el.clickOutsideEvent);
     },
   });
