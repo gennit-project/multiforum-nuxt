@@ -11,7 +11,7 @@ import UserIcon from '@/components/icons/UserIcon.vue';
 import type { Channel } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
 import { LayoutDashboard } from 'lucide-vue-next';
-import { useDisplay } from 'vuetify';
+import { useDisplay } from '@/composables/useDisplay';
 
 const Popper = defineAsyncComponent(() => import('vue3-popper'));
 

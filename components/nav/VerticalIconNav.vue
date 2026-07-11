@@ -2,7 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import type { Component } from 'vue';
 import { useRoute } from 'nuxt/app';
-import { useDisplay } from 'vuetify';
+import { useDisplay } from '@/composables/useDisplay';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';

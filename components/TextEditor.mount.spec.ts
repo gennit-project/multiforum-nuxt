@@ -6,7 +6,7 @@ import TextEditor from '@/components/TextEditor.vue';
 
 // Vuetify's useDisplay needs the Vuetify plugin context, which we don't install
 // in unit tests. The component only reads `width`, so stub it to a desktop width.
-vi.mock('vuetify', () => ({
+vi.mock('@/composables/useDisplay', () => ({
   useDisplay: () => ({ width: ref(1024) }),
 }));
 

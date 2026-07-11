@@ -70,12 +70,10 @@ const modBadgeClasses = computed(() => {
 </script>
 <template>
   <client-only>
-    <v-tooltip
+    <Tooltip
       v-if="!disableTooltip"
       location="bottom"
-      content-class="custom-tooltip"
       :aria-label="tooltipAriaLabel"
-      :content-props="{ 'aria-label': tooltipAriaLabel }"
     >
       <template #activator="{ props: activatorProps }">
         <slot>
@@ -151,7 +149,7 @@ const modBadgeClasses = computed(() => {
           </ul>
         </div>
       </template>
-    </v-tooltip>
+    </Tooltip>
 
     <template v-else>
       <div class="flex flex-row items-center gap-1">

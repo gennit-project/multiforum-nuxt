@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'nuxt/app';
-import { useDisplay } from 'vuetify';
+import { useDisplay } from '@/composables/useDisplay';
 import TopNav from '@/components/nav/TopNav.vue';
 import SiteSidenav from '@/components/nav/SiteSidenav.vue';
 import VerticalIconNav from '@/components/nav/VerticalIconNav.vue';
@@ -66,7 +66,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-app>
+  <div>
     <DevOverlay v-if="isDevelopment" />
     <ToastNotification />
     <AddToListModalHost />
@@ -129,5 +129,5 @@ onMounted(() => {
         </div>
       </div>
     </main>
-  </v-app>
+  </div>
 </template>

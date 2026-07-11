@@ -209,7 +209,7 @@ describe('DiscussionHeader — delete flow', () => {
       .findComponent('[data-testid="warning-modal"]')
       .vm.$emit('primary-button-click');
 
-    expect(mutateSpies[0]).toHaveBeenCalledTimes(1);
+    expect(mutateSpies[0]).toHaveBeenCalledWith({ id: 'd1' });
   });
 
   it('navigates to the discussions list after delete completes', () => {

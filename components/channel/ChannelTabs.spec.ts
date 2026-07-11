@@ -19,7 +19,7 @@ vi.mock('@/composables/useAuthState', () => ({
   useModProfileName: () => h.modName,
   useIsAuthenticated: () => h.isAuth,
 }));
-vi.mock('vuetify', () => ({ useDisplay: () => ({ mdAndUp: h.mdAndUp }) }));
+vi.mock('@/composables/useDisplay', () => ({ useDisplay: () => ({ mdAndUp: h.mdAndUp }) }));
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: () => ({ result: h.serverConfig }),
 }));

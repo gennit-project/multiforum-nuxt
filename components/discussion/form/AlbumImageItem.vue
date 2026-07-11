@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { defineAsyncComponent } from 'vue';
-import { useDisplay } from 'vuetify';
+import { useDisplay } from '@/composables/useDisplay';
 import XmarkIcon from '@/components/icons/XmarkIcon.vue';
 import TextInput from '@/components/TextInput.vue';
 import FormRow from '@/components/FormRow.vue';

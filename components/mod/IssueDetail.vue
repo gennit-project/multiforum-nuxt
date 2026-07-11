@@ -526,8 +526,8 @@ const handleLockReasonUpdate = (value: string) => {
       </div>
     </div>
 
-    <v-row v-if="issue" class="flex justify-center dark:text-white">
-      <v-col>
+    <div v-if="issue" class="flex justify-center dark:text-white">
+      <div class="flex-1">
         <div class="px-4">
           <IssueSubscriptionPanel
             v-if="usernameVar && activeIssue"
@@ -649,8 +649,8 @@ const handleLockReasonUpdate = (value: string) => {
             @unlock-issue="handleUnlockIssue"
           />
         </div>
-      </v-col>
-    </v-row>
+      </div>
+    </div>
 
     <!-- Lock Issue Dialog -->
     <IssueLockDialog

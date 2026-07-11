@@ -4,6 +4,16 @@ import { mount } from '@vue/test-utils';
 
 import CreateAnythingButton from '@/components/nav/CreateAnythingButton.vue';
 
+// @floating-ui/vue's useFloating + autoUpdate loops under jsdom; stub it (the
+// menu's open/close + navigation logic is what these tests exercise).
+vi.mock('@floating-ui/vue', () => ({
+  useFloating: () => ({ floatingStyles: ref({}) }),
+  offset: () => ({}),
+  flip: () => ({}),
+  shift: () => ({}),
+  autoUpdate: () => () => {},
+}));
+
 // Per-file nuxt/app mock: controllable route + a router.push spy for the menu
 // item actions. The global mock works too but we need to vary route here.
 const nuxt = vi.hoisted(() => ({
@@ -24,16 +34,11 @@ const requireAuthStub = (slot: 'has-auth' | 'does-not-have-auth') => ({
   template: `<div><slot name="${slot}" /></div>`,
 });
 
-// Vuetify + client-only stubs. VMenu renders its default slot (the list) so the
-// menu items mount; VListItem becomes a button that forwards click + data-testid.
-const vuetifyStubs = {
+// Render client-only + teleported content inline so the menu items mount within
+// the wrapper once the menu is opened.
+const componentStubs = {
   ClientOnly: { template: '<div><slot /></div>' },
-  VMenu: { template: '<div><slot /></div>' },
-  VList: { template: '<div><slot /></div>' },
-  VListItem: {
-    inheritAttrs: false,
-    template: '<button v-bind="$attrs"><slot /></button>',
-  },
+  Teleport: { template: '<div><slot /></div>' },
   ChevronDownIcon: true,
 };
 
@@ -44,9 +49,15 @@ const mountButton = (
   mount(CreateAnythingButton, {
     props,
     global: {
-      stubs: { RequireAuth: requireAuthStub(slot), ...vuetifyStubs },
+      stubs: { RequireAuth: requireAuthStub(slot), ...componentStubs },
     },
   });
+
+// The menu panel is v-if the trigger is open; click the trigger first.
+const openMenu = async (wrapper: ReturnType<typeof mountButton>) => {
+  await wrapper.get('button[aria-haspopup="menu"]').trigger('click');
+  return wrapper;
+};
 
 beforeEach(() => {
   nuxt.route = { params: {}, query: {}, name: 'home' };
@@ -85,6 +96,8 @@ describe('CreateAnythingButton menu actions (sitewide)', () => {
   it('navigates to the global discussion create page', async () => {
     const wrapper = mountButton('has-auth');
 
+    await openMenu(wrapper);
+
     await wrapper.get('[data-testid="create-discussion-menu-item"]').trigger('click');
 
     expect(nuxt.push).toHaveBeenCalledWith('/discussions/create');
@@ -93,6 +106,8 @@ describe('CreateAnythingButton menu actions (sitewide)', () => {
   it('navigates to the global event create page', async () => {
     const wrapper = mountButton('has-auth');
 
+    await openMenu(wrapper);
+
     await wrapper.get('[data-testid="create-event-menu-item"]').trigger('click');
 
     expect(nuxt.push).toHaveBeenCalledWith('/events/create');
@@ -100,6 +115,8 @@ describe('CreateAnythingButton menu actions (sitewide)', () => {
 
   it('navigates to the forum create page', async () => {
     const wrapper = mountButton('has-auth');
+
+    await openMenu(wrapper);
 
     await wrapper.get('[data-testid="create-channel-menu-item"]').trigger('click');
 
@@ -115,6 +132,8 @@ describe('CreateAnythingButton menu actions (forum-scoped)', () => {
   it('scopes the discussion create route to the current forum', async () => {
     const wrapper = mountButton('has-auth');
 
+    await openMenu(wrapper);
+
     await wrapper.get('[data-testid="create-discussion-menu-item"]').trigger('click');
 
     expect(nuxt.push).toHaveBeenCalledWith('/forums/cats/discussions/create');
@@ -122,6 +141,8 @@ describe('CreateAnythingButton menu actions (forum-scoped)', () => {
 
   it('scopes the event create route to the current forum', async () => {
     const wrapper = mountButton('has-auth');
+
+    await openMenu(wrapper);
 
     await wrapper.get('[data-testid="create-event-menu-item"]').trigger('click');
 

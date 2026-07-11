@@ -11,7 +11,6 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import { GET_EVENT } from '@/graphQLData/event/queries';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { EVENT_TITLE_CHAR_LIMIT } from '@/utils/constants';
-import { useAppTheme } from '@/composables/useTheme';
 import { useRoute } from 'nuxt/app';
 
 const modProfileNameVar = useModProfileName();
@@ -92,7 +91,6 @@ const formattedDate = computed(() => {
     year: 'numeric',
   });
 });
-const { theme } = useAppTheme();
 </script>
 
 <template>
@@ -100,11 +98,10 @@ const { theme } = useAppTheme();
     <div
       class="flex space-x-0 md:flex-row md:items-center md:justify-between md:space-x-2"
     >
-      <v-skeleton-loader
+      <SkeletonLoader
         v-if="getEventLoading"
-        class="flex-1 dark:bg-gray-800"
+        class="flex-1"
         type="text"
-        :theme="theme"
       />
       <div v-else ref="eventDetail" class="flex-1">
         <h1

@@ -13,6 +13,28 @@ const mountSelect = (props: Record<string, unknown> = {}) =>
     props: { options, multiple: true, testId: 'ms', ...props },
   });
 
+const clickOutsideDirective = {
+  beforeMount(el: HTMLElement, binding: { value: (event: Event) => void }) {
+    const handler = (event: Event) => {
+      if (!(el === event.target || el.contains(event.target as Node))) {
+        binding.value(event);
+      }
+    };
+    el.dataset.testClickOutsideBound = 'true';
+    (el as HTMLElement & { clickOutsideEvent?: (event: Event) => void }).clickOutsideEvent =
+      handler;
+    document.addEventListener('click', handler);
+  },
+  unmounted(el: HTMLElement) {
+    const handler = (
+      el as HTMLElement & { clickOutsideEvent?: (event: Event) => void }
+    ).clickOutsideEvent;
+    if (handler) {
+      document.removeEventListener('click', handler);
+    }
+  },
+};
+
 describe('MultiSelect', () => {
   it('shows the placeholder when nothing is selected', () => {
     const wrapper = mountSelect({ modelValue: [], placeholder: 'Pick some' });
@@ -45,6 +67,25 @@ describe('MultiSelect', () => {
     expect(wrapper.text()).not.toContain('Apple');
     await wrapper.get('[data-testid="ms"]').trigger('click');
     expect(wrapper.text()).toContain('Apple');
+  });
+
+  it('keeps the dropdown open after the same click that opened it when click-outside is active', async () => {
+    const wrapper = mountWithDefaults(MultiSelect, {
+      attachTo: document.body,
+      props: { options, multiple: true, testId: 'ms', modelValue: [] },
+      global: {
+        directives: {
+          clickOutside: clickOutsideDirective,
+          'click-outside': clickOutsideDirective,
+        },
+      },
+    });
+
+    expect(wrapper.text()).not.toContain('Apple');
+    await wrapper.get('[data-testid="ms"]').trigger('click');
+
+    expect(wrapper.text()).toContain('Apple');
+    wrapper.unmount();
   });
 
   it('toggles an option via its checkbox row when opened', async () => {

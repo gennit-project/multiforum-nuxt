@@ -11,7 +11,7 @@ const h = vi.hoisted(() => ({
   smAndDown: null as unknown,
 }));
 
-vi.mock('vuetify', () => ({ useDisplay: () => ({ smAndDown: h.smAndDown }) }));
+vi.mock('@/composables/useDisplay', () => ({ useDisplay: () => ({ smAndDown: h.smAndDown }) }));
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
 vi.mock('@/cache', () => ({ sideNavIsOpenVar: false }));
 vi.mock('@/composables/useAuthState', () => ({

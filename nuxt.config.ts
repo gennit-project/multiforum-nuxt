@@ -1,6 +1,5 @@
 import { defineNuxtConfig } from 'nuxt/config';
 import { config } from './config';
-import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify';
 import path from 'path';
 import { inMemoryCacheOptions } from './cache';
 
@@ -64,9 +63,6 @@ export default defineNuxtConfig({
       isCustomElement: (tag) => tag === 'model-viewer',
     },
   },
-  build: {
-    transpile: ['vuetify'],
-  },
   experimental: {
     payloadExtraction: false,
     defaults: {
@@ -83,7 +79,6 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   components: true,
   css: [
-    'vuetify/styles',
     '@fortawesome/fontawesome-free/css/all.css',
     '@/assets/css/index.css',
   ],
@@ -362,7 +357,6 @@ export default defineNuxtConfig({
   plugins: [
     { src: '@/plugins/pinia', mode: 'all' },
     { src: '@/plugins/google-maps', mode: 'client' },
-    { src: '@/plugins/vuetify', mode: 'all' },
     { src: '@/plugins/performance.client', mode: 'client' },
     { src: '@/plugins/click-outside.client', mode: 'client' },
     { src: '@/plugins/accented.client', mode: 'client' },
@@ -418,7 +412,24 @@ export default defineNuxtConfig({
     typeCheck: false,
   },
   vite: {
-    plugins: [vuetify({ autoImport: true })],
+    // Pre-bundle these deps at startup. Removing Vuetify changed the lockfile,
+    // which forces Vite to re-optimize from scratch; without this list it
+    // discovers some deps (notably ones pulled in by client-only plugins) only
+    // at runtime and issues an HMR full-reload to swap them in. That reload can
+    // interrupt an in-flight Playwright navigation and blank the page (the
+    // create/edit E2E flows were failing for this reason). The list is exactly
+    // what `nuxt dev` reports as "discovered new dependencies at runtime".
+    optimizeDeps: {
+      include: [
+        '@floating-ui/vue',
+        '@google/model-viewer',
+        '@vue/apollo-composable',
+        'accented',
+        'luxon',
+        'three',
+        'vue-google-maps-community-fork',
+      ],
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname),
@@ -427,11 +438,6 @@ export default defineNuxtConfig({
     },
     define: {
       global: 'globalThis',
-    },
-    vue: {
-      template: {
-        transformAssetUrls,
-      },
     },
     // Allow connections from ngrok for mobile testing
     server: {
@@ -455,7 +461,6 @@ export default defineNuxtConfig({
         output: {
           manualChunks: {
             'vue-libs': ['vue', 'vue-router', 'pinia'],
-            'ui-libs': ['vuetify'],
             apollo: ['@apollo/client', '@vue/apollo-composable'],
             'date-libs': ['luxon'],
             'map-libs': ['@googlemaps/js-api-loader'],

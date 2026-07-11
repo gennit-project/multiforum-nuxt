@@ -9,7 +9,7 @@ import {
   defineAsyncComponent,
 } from 'vue';
 import { Tab, TabGroup, TabList } from '@headlessui/vue';
-import { useDisplay } from 'vuetify';
+import { useDisplay } from '@/composables/useDisplay';
 
 // Components
 import AddImage from '@/components/AddImage.vue';

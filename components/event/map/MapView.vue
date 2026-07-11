@@ -2,7 +2,7 @@
 import { ref, computed, watch, defineAsyncComponent } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRouter, useRoute } from 'nuxt/app';
-import { useDisplay } from 'vuetify';
+import { useDisplay } from '@/composables/useDisplay';
 import EventPreview from '../list/EventPreview.vue';
 import EventList from '../list/EventList.vue';
 import type { MarkerMap } from './Map.vue';

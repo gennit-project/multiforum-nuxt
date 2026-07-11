@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { ref, nextTick, onMounted, computed } from 'vue';
+import { ref, computed, watch, onBeforeUnmount } from 'vue';
 import type { PropType } from 'vue';
+import { useFloating, offset, flip, shift, autoUpdate } from '@floating-ui/vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import { actionIconMap } from '@/utils';
 
@@ -51,60 +52,48 @@ const buttonClasses = computed(() => {
   return baseClasses;
 });
 
-// Setup function
-const uniqueID = ref(Math.random().toString(36).substring(7));
-const shouldOpenUpwards = ref(false);
-const shouldOpenLeftwards = ref(false);
+const isOpen = ref(false);
+const triggerRef = ref<HTMLElement | null>(null);
+const floatingRef = ref<HTMLElement | null>(null);
 
-const adjustMenuPosition = () => {
-  nextTick(() => {
-    const menuButton = document.querySelector(`#menu-button-${uniqueID.value}`);
-    const menuItems = document.querySelector(`#menu-items-${uniqueID.value}`);
+const { floatingStyles } = useFloating(triggerRef, floatingRef, {
+  placement: 'bottom-end',
+  strategy: 'fixed',
+  middleware: [offset(4), flip(), shift({ padding: 8 })],
+  whileElementsMounted: autoUpdate,
+});
 
-    if (menuButton && menuItems) {
-      const menuButtonRect = menuButton.getBoundingClientRect();
-      const menuItemsHeight = menuItems.getBoundingClientRect().height;
-      const menuItemsWidth = menuItems.getBoundingClientRect().width;
-      const spaceBelow = window.innerHeight - menuButtonRect.bottom;
-      shouldOpenUpwards.value = spaceBelow < menuItemsHeight;
+function close() {
+  isOpen.value = false;
+}
+function toggle() {
+  isOpen.value = !isOpen.value;
+}
 
-      const spaceLeft = menuButtonRect.left;
-      shouldOpenLeftwards.value = spaceLeft > menuItemsWidth;
-    }
-  });
-};
-
-const buildActivatorProps = (activatorProps: Record<string, unknown>) => {
+// Props applied to the trigger. Passed to the `activator` slot so custom
+// activators (e.g. VoteButton) can bind them to their own element, exactly as
+// the previous v-menu activator did.
+const activatorProps = computed(() => {
   if (props.disabled) {
     return {
       disabled: true,
       'aria-disabled': true,
+      'aria-haspopup': 'menu' as const,
+      'aria-expanded': false,
     };
   }
-
-  const onClick = (activatorProps as { onClick?: (event: Event) => void })
-    .onClick;
-
   return {
-    ...activatorProps,
-    onClick: (event: Event) => {
-      if (typeof onClick === 'function') {
-        onClick(event);
-      }
-      adjustMenuPosition();
-    },
+    onClick: toggle,
+    'aria-haspopup': 'menu' as const,
+    'aria-expanded': isOpen.value,
   };
-};
-
-onMounted(() => {
-  adjustMenuPosition();
-  window.addEventListener('resize', adjustMenuPosition);
 });
 
 const handleItemClick = (item: MenuItemType) => {
   if (item.event) {
     emitEvent(item.event);
   }
+  close();
 };
 
 /**
@@ -118,101 +107,130 @@ const isValidRouteValue = (value: unknown): boolean => {
   if (typeof value === 'string' && value.startsWith('/')) return true;
   return false;
 };
-const isMenuOpen = ref(false);
-const menuStyles = {
-  top: shouldOpenUpwards.value ? 'auto' : '100%',
-  right: shouldOpenLeftwards.value ? 0 : 'auto',
-  bottom: shouldOpenUpwards.value ? '100%' : 'auto',
-  zIndex: 10000,
-};
+
+function onDocumentPointerDown(event: PointerEvent) {
+  const target = event.target as Node;
+  if (
+    triggerRef.value?.contains(target) ||
+    floatingRef.value?.contains(target)
+  ) {
+    return;
+  }
+  close();
+}
+function onKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') close();
+}
+function onFocusOut(event: FocusEvent) {
+  const relatedTarget = event.relatedTarget as Node | null;
+  if (
+    relatedTarget &&
+    (triggerRef.value?.contains(relatedTarget) ||
+      floatingRef.value?.contains(relatedTarget))
+  ) {
+    return;
+  }
+  close();
+}
+
+watch(isOpen, (open) => {
+  if (!import.meta.client) return;
+  if (open) {
+    document.addEventListener('pointerdown', onDocumentPointerDown, true);
+    document.addEventListener('keydown', onKeydown);
+  } else {
+    document.removeEventListener('pointerdown', onDocumentPointerDown, true);
+    document.removeEventListener('keydown', onKeydown);
+  }
+});
+
+onBeforeUnmount(() => {
+  if (!import.meta.client) return;
+  document.removeEventListener('pointerdown', onDocumentPointerDown, true);
+  document.removeEventListener('keydown', onKeydown);
+});
 </script>
 
 <template>
-  <client-only>
-    <v-menu v-model="isMenuOpen" :close-on-content-click="true" offset-y>
-      <template #activator="{ props: activatorProps }">
-        <slot
-          name="activator"
-          :props="buildActivatorProps(activatorProps)"
-          :disabled="disabled"
-        >
-          <button
-            :data-testid="dataTestid"
-            variant="text"
-            v-bind="buildActivatorProps(activatorProps)"
-            :aria-label="ariaLabel || undefined"
-            :disabled="disabled"
-            :class="[
-              buttonClasses,
-              buttonClass,
-              disabled ? 'cursor-not-allowed opacity-60' : '',
-            ]"
-          >
-            <slot>
-              Options
-              <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
-            </slot>
-          </button>
-        </slot>
-      </template>
-
-      <v-list
-        :style="menuStyles"
-        class="dark:bg-gray-700"
-        role="menu"
-        :aria-label="ariaLabel || 'Menu'"
+  <div ref="triggerRef" class="inline-block" @focusout="onFocusOut">
+    <slot name="activator" :props="activatorProps" :disabled="disabled">
+      <button
+        :data-testid="dataTestid"
+        v-bind="activatorProps"
+        :aria-label="ariaLabel || undefined"
+        :disabled="disabled"
+        :class="[
+          buttonClasses,
+          buttonClass,
+          disabled ? 'cursor-not-allowed opacity-60' : '',
+        ]"
       >
-        <template v-for="item in items" :key="item.label">
-          <!-- Divider -->
-          <v-list-subheader
-            v-if="item.isDivider"
-            class="font-semibold cursor-default px-4 py-2 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-200"
-            role="presentation"
+        <slot>
+          Options
+          <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
+        </slot>
+      </button>
+    </slot>
+
+    <client-only>
+      <Teleport to="body">
+        <div
+          v-if="isOpen"
+          ref="floatingRef"
+          :style="floatingStyles"
+          class="z-[10000]"
+          @focusout="onFocusOut"
+        >
+          <div
+            class="min-w-[10rem] overflow-hidden rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-600 dark:bg-gray-700"
+            role="menu"
+            :aria-label="ariaLabel || 'Menu'"
           >
-            {{ item.value }}
-          </v-list-subheader>
-          <v-list-item
-            v-else
-            :data-testid="`${dataTestid}-item-${item.label}`"
-            class="dark:hover:bg-gray-600"
-            role="menuitem"
-            @click="
-              () => {
-                handleItemClick(item);
-                isMenuOpen = false;
-              }
-            "
-          >
-            <!-- Only use nuxt-link if value is an actual route (object or path starting with /) -->
-            <nuxt-link
-              v-if="isValidRouteValue(item.value)"
-              :to="item.value"
-              class="flex items-center gap-2 text-sm"
-              :class="['text-gray-700 dark:text-white']"
-            >
-              <component
-                :is="actionIconMap[item.icon]"
-                v-if="item.icon"
-                class="h-5 w-5"
-              />
-              {{ item.label }}
-            </nuxt-link>
-            <div
-              v-else-if="item.event"
-              class="flex cursor-pointer items-center gap-2 text-sm"
-              :class="['text-gray-700 dark:text-white']"
-              @click="emitEvent(item?.event ?? '')"
-            >
-              <component
-                :is="actionIconMap[item.icon]"
-                v-if="item.icon"
-                class="h-5 w-5"
-              />
-              {{ item.label }}
-            </div>
-          </v-list-item>
-        </template>
-      </v-list>
-    </v-menu>
-  </client-only>
+            <template v-for="item in items" :key="item.label">
+              <!-- Divider / section header -->
+              <div
+                v-if="item.isDivider"
+                class="font-semibold cursor-default px-4 py-2 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-200"
+                role="presentation"
+              >
+                {{ item.value }}
+              </div>
+              <!-- Route item -->
+              <nuxt-link
+                v-else-if="isValidRouteValue(item.value)"
+                :to="item.value"
+                :data-testid="`${dataTestid}-item-${item.label}`"
+                role="menuitem"
+                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
+                @click="close"
+              >
+                <component
+                  :is="actionIconMap[item.icon]"
+                  v-if="item.icon"
+                  class="h-5 w-5"
+                />
+                {{ item.label }}
+              </nuxt-link>
+              <!-- Event item -->
+              <button
+                v-else-if="item.event"
+                type="button"
+                :data-testid="`${dataTestid}-item-${item.label}`"
+                role="menuitem"
+                class="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600"
+                @click="handleItemClick(item)"
+              >
+                <component
+                  :is="actionIconMap[item.icon]"
+                  v-if="item.icon"
+                  class="h-5 w-5"
+                />
+                {{ item.label }}
+              </button>
+            </template>
+          </div>
+        </div>
+      </Teleport>
+    </client-only>
+  </div>
 </template>

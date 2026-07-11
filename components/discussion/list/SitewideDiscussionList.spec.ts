@@ -62,7 +62,7 @@ const stubs = {
     template: '<button class="load-more-stub" @click="$emit(\'loadMore\')" />',
   },
   ErrorBanner: { props: ['text'], template: '<div class="error-stub">{{ text }}</div>' },
-  'v-skeleton-loader': { template: '<div class="skeleton-stub" />' },
+  'SkeletonLoader': { template: '<div class="skeleton-stub" />' },
   NuxtLink: { name: 'NuxtLink', props: ['to'], template: '<a :href="to"><slot /></a>' },
 };
 

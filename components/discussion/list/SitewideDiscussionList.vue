@@ -19,14 +19,12 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import { config } from '@/config';
-import { useAppTheme } from '@/composables/useTheme';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 import { useUsername } from '@/composables/useAuthState';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 
 const usernameVar = useUsername();
 
-const { theme } = useAppTheme();
 
 const DISCUSSION_PAGE_LIMIT = 15;
 
@@ -273,8 +271,8 @@ const filterByChannel = (channel: string) => {
                 :key="n"
                 class="mb-2 flex flex-col gap-2 py-4"
               >
-                <v-skeleton-loader class="w-3/4" type="text" :theme="theme" />
-                <v-skeleton-loader class="w-1/3" type="text" :theme="theme" />
+                <SkeletonLoader class="w-3/4" type="text" />
+                <SkeletonLoader class="w-1/3" type="text" />
               </div>
             </div>
             <ErrorBanner

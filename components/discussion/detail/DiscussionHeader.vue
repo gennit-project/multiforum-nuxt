@@ -71,12 +71,11 @@ const createdAt = computed(() => {
 });
 
 const {
-  mutate: deleteDiscussion,
+  mutate: runDeleteDiscussionMutation,
   loading: deleteDiscussionLoading,
   error: deleteDiscussionError,
   onDone: onDoneDeleting,
 } = useMutation(DELETE_DISCUSSION, {
-  variables: { id: props.discussion?.id },
   update: (cache, { data }) => {
     if (data?.deleteDiscussions?.nodesDeleted > 0) {
       cache.evict({
@@ -94,6 +93,7 @@ const hasDownload = route.name
   : false;
 
 onDoneDeleting(() => {
+  deleteModalIsOpen.value = false;
   if (props.channelId) {
     if (hasDownload) {
       router.push({
@@ -108,6 +108,14 @@ onDoneDeleting(() => {
     });
   }
 });
+
+const deleteDiscussion = async () => {
+  if (!props.discussion?.id) {
+    return;
+  }
+
+  await runDeleteDiscussionMutation({ id: props.discussion.id });
+};
 
 const { mutate: updateSensitiveContent, error: updateSensitiveContentError } =
   useMutation(UPDATE_DISCUSSION_SENSITIVE_CONTENT);
