@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, defineAsyncComponent } from 'vue';
 import { GET_USER_DOWNLOADS } from '@/graphQLData/user/queries';
 import { useQuery } from '@vue/apollo-composable';
 import SitewideDownloadListItem from '@/components/discussion/list/SitewideDownloadListItem.vue';
-import DiscussionAlbum from '@/components/discussion/detail/DiscussionAlbum.vue';
 import { useRoute } from 'nuxt/app';
 import type { Album, Discussion } from '@/__generated__/graphql';
 import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
+
+const DiscussionAlbum = defineAsyncComponent(
+  () => import('@/components/discussion/detail/DiscussionAlbum.vue')
+);
 
 const route = useRoute();
 const { selectedChannels, hasSelectedChannels } = useSelectedChannelsFromQuery();
