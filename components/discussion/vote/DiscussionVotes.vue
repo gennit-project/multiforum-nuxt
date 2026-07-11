@@ -165,10 +165,10 @@ const downvoteCount = computed(
 const upvoteIcon = computed(() => {
   if (props.useHeartIcon) {
     return loggedInUserUpvoted.value
-      ? 'fa-solid fa-heart'
-      : 'fa-regular fa-heart';
+      ? 'heart-filled'
+      : 'heart-outline';
   }
-  return 'fa-solid fa-arrow-up';
+  return 'arrow-up';
 });
 
 const upvoteTooltips = computed(() => {

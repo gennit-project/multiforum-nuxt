@@ -218,6 +218,9 @@ The deployed route is clearly preloading and prefetching too much.
 - narrowed the remaining remote wordmark font to the Latin subset actually used by the public shell
 - switched self-hosted `Inter` faces to `font-display: swap`
 - removed unused self-hosted `Inter` weights from the global stylesheet
+- removed the default sitewide discussions route from the global Font Awesome stylesheet path and migrated its shared shell/list icons to local SVG components
+- migrated the shared discussion/download vote controls, multiselect chrome, event list cards, and image-upload trigger away from Font Awesome so more public list surfaces no longer depend on the global icon stylesheet
+- removed the global Font Awesome stylesheet from the default sitewide discussions landing state and migrated its shared shell/list icons to local SVG components
 
 ## Workstream 3: Cache Public HTML and Public Data Better
 

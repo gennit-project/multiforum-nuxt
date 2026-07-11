@@ -14,9 +14,13 @@ import ChannelIconStack from '@/components/channel/ChannelIconStack.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
+import CommentIcon from '@/components/icons/CommentIcon.vue';
+import ExpandIcon from '@/components/icons/ExpandIcon.vue';
+import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
+import XmarkIcon from '@/components/icons/XmarkIcon.vue';
 import { relativeTime } from '@/utils';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
@@ -362,12 +366,12 @@ const revealSensitiveContent = () => {
                 :to="getDetailLink()"
                 class="flex items-center gap-1 hover:underline"
               >
-                <i class="fa-regular fa-comment" aria-hidden="true" />
+                <CommentIcon class="h-3.5 w-3.5" aria-hidden="true" />
                 {{ commentCount }}
               </nuxt-link>
               <MenuButton v-else :items="discussionDetailOptions">
                 <span class="flex cursor-pointer items-center gap-1">
-                  <i class="fa-regular fa-comment" aria-hidden="true" />
+                  <CommentIcon class="h-3.5 w-3.5" aria-hidden="true" />
                   {{ commentCount }} in {{ channelCount }}
                   <ChevronDownIcon class="h-3 w-3" aria-hidden="true" />
                 </span>
@@ -384,9 +388,14 @@ const revealSensitiveContent = () => {
                 :aria-expanded="isExpanded"
                 @click="isExpanded = !isExpanded"
               >
-                <i
-                  :class="isExpanded ? 'fa-solid fa-xmark' : 'fa-solid fa-expand'"
-                  class="text-[10px]"
+                <XmarkIcon
+                  v-if="isExpanded"
+                  class="h-3 w-3"
+                  aria-hidden="true"
+                />
+                <ExpandIcon
+                  v-else
+                  class="h-3 w-3"
                   aria-hidden="true"
                 />
                 {{ isExpanded ? 'Collapse' : 'Expand' }}
@@ -422,7 +431,7 @@ const revealSensitiveContent = () => {
           class="flex items-center self-center text-gray-300 dark:text-gray-600 lg:hidden"
           aria-label="Open discussion"
         >
-          <i class="fa-solid fa-chevron-right" aria-hidden="true" />
+          <RightArrowIcon class="h-4 w-4" aria-hidden="true" />
         </nuxt-link>
       </div>
 

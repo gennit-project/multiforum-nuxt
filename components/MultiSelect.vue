@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue';
 import type { PropType } from 'vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
+import XmarkIcon from '@/components/icons/XmarkIcon.vue';
 
 // Type for option values
 export type MultiSelectValue = string;
@@ -380,17 +383,14 @@ const selectedOptions = computed(() => {
             :title="'Clear selection'"
             @click.stop="clearSelection"
           >
-            <i class="fa-solid fa-times" aria-hidden="true" />
+            <XmarkIcon class="h-4 w-4" aria-hidden="true" />
           </button>
 
           <!-- Dropdown arrow -->
           <div aria-hidden="true">
-            <i
-              :class="
-                isDropdownOpen
-                  ? 'fa-solid fa-chevron-up'
-                  : 'fa-solid fa-chevron-down'
-              "
+            <ChevronDownIcon
+              class="h-4 w-4 transition-transform"
+              :class="isDropdownOpen ? 'rotate-180' : ''"
             />
           </div>
         </div>
@@ -671,9 +671,9 @@ const selectedOptions = computed(() => {
                 </div>
 
                 <!-- Selected indicator for single selection -->
-                <i
+                <CheckIcon
                   v-if="!multiple && selected.includes(option.value)"
-                  class="fa-solid fa-check text-orange-600"
+                  class="h-4 w-4 text-orange-600"
                   aria-hidden="true"
                 />
               </div>
@@ -749,9 +749,9 @@ const selectedOptions = computed(() => {
             </div>
 
             <!-- Selected indicator for single selection -->
-            <i
+            <CheckIcon
               v-if="!multiple && selected.includes(option.value)"
-              class="fa-solid fa-check text-orange-600"
+              class="h-4 w-4 text-orange-600"
               aria-hidden="true"
             />
           </div>

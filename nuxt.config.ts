@@ -79,7 +79,6 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   components: true,
   css: [
-    '@fortawesome/fontawesome-free/css/all.css',
     '@/assets/css/index.css',
   ],
   devtools: { enabled: true },

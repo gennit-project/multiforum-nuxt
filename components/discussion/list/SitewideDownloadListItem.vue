@@ -7,6 +7,7 @@ import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
+import CommentIcon from '@/components/icons/CommentIcon.vue';
 import { relativeTime } from '@/utils';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 import type { DiscussionWithFavorited } from '@/types/Discussion';
@@ -255,7 +256,7 @@ const handleOpenAlbum = () => {
           :to="defaultLink"
           class="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
         >
-          <i class="fa-regular fa-comment text-xs" aria-hidden="true" />
+          <CommentIcon class="h-3 w-3" aria-hidden="true" />
           <span>{{ commentCount }} comments</span>
         </nuxt-link>
         <MenuButton
@@ -265,7 +266,7 @@ const handleOpenAlbum = () => {
           <span
             class="flex cursor-pointer items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-xs dark:bg-gray-800"
           >
-            <i class="fa-regular fa-comment text-xs" aria-hidden="true" />
+            <CommentIcon class="h-3 w-3" aria-hidden="true" />
             {{ commentCount }}
             {{ commentCount === 1 ? 'comment' : 'comments' }} in
             {{ channelCount }}
