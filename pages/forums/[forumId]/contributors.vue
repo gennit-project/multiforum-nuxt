@@ -4,10 +4,13 @@ import { useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_CHANNEL_CONTRIBUTIONS } from '@/graphQLData/channel/queries';
 import ChannelContributionChart from '@/components/charts/ChannelContributionChart.vue';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import IconButtonDropdown from '@/components/IconButtonDropdown.vue';
 import type { MenuItemType } from '@/components/IconButtonDropdown.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { DateTime } from 'luxon';
 import type { UserContributionData } from '@/__generated__/graphql';
+import UserGroupIcon from '@/components/icons/UserGroupIcon.vue';
 import {
   getMaxDayCount,
   buildContributorStats,
@@ -114,7 +117,7 @@ const contributorStats = computed(() =>
           @select-period="handlePeriodSelect"
         >
           {{ selectedLabel }}
-          <i class="fa-solid fa-chevron-down ml-1"/>
+          <ChevronDownIcon class="ml-1 h-4 w-4" />
         </IconButtonDropdown>
       </div>
     </div>
@@ -122,7 +125,7 @@ const contributorStats = computed(() =>
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-12">
       <div class="text-gray-500 dark:text-gray-400">
-        <i class="fa-solid fa-spinner fa-spin mr-2"/>
+        <LoadingSpinner class="mr-2 inline h-4 w-4" />
         Loading contributors...
       </div>
     </div>
@@ -184,7 +187,7 @@ const contributorStats = computed(() =>
 
     <!-- Empty State -->
     <div v-else class="bg-gray-50 rounded-lg p-12 text-center dark:bg-gray-800">
-      <i class="fa-solid fa-users mb-4 text-4xl text-gray-400"/>
+      <UserGroupIcon class="mx-auto mb-4 h-10 w-10 text-gray-400" />
       <h3 class="mb-2 text-lg font-medium text-gray-900 dark:text-white">
         No results in the selected time period
       </h3>

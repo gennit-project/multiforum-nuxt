@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import DocumentIcon from '@/components/icons/DocumentIcon.vue';
 import RadioButtons from '@/components/RadioButtons.vue';
 import { useUIStore, type FontSize } from '@/stores/uiStore';
 
@@ -32,7 +33,7 @@ const updateFontSize = (option: { label: string; value: string }) => {
       <span
         class="my-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
       >
-        <i class="fa-solid fa-text-height mr-2" aria-hidden="true" />Font Size
+        <DocumentIcon class="mr-2 h-4 w-4" aria-hidden="true" />Font Size
       </span>
     </div>
     <RadioButtons

@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 import type { Event } from '@/__generated__/graphql';
+import PencilIcon from '@/components/icons/PencilIcon.vue';
 import { timeAgo } from '@/utils';
 
 interface TitleTransition {
@@ -121,8 +122,8 @@ const toggleOlderEdits = () => {
             <div
               class="relative z-10 flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 ring-4 ring-white dark:bg-gray-700 dark:ring-gray-800"
             >
-              <i
-                class="fa-solid fa-pencil text-xs text-gray-500 dark:text-gray-300"
+              <PencilIcon
+                class="h-3 w-3 text-gray-500 dark:text-gray-300"
                 aria-hidden="true"
               />
             </div>

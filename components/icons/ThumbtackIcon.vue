@@ -5,17 +5,11 @@
     viewBox="0 0 24 24"
     stroke="currentColor"
     stroke-width="1.5"
-    aria-hidden="true"
   >
     <path
       stroke-linecap="round"
       stroke-linejoin="round"
-      d="M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18Z"
-    />
-    <path
-      fill="currentColor"
-      stroke="none"
-      d="M12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z"
+      d="m15 5.25 3.75 3.75m-7.5-3 6 6m-7.5-3-3 3a2.121 2.121 0 0 0 0 3l2.25 2.25m0 0L12 21m-3.75-3.75 6-6"
     />
   </svg>
 </template>

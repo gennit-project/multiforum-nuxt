@@ -2,6 +2,7 @@
 import { defineAsyncComponent } from 'vue';
 import TextEditorToolbar from './TextEditorToolbar.vue';
 import AddImage from '@/components/AddImage.vue';
+import XmarkIcon from '@/components/icons/XmarkIcon.vue';
 import type { EmojiClickEvent } from '@/composables/useEmojiPicker';
 
 // Lazy-loaded components (heavy dependencies)
@@ -65,7 +66,7 @@ const markdownDocsLink = 'https://www.markdownguide.org/basic-syntax/';
         class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
         @click="emit('exit')"
       >
-        <i class="fas fa-times text-xl" aria-hidden="true" />
+        <XmarkIcon class="h-5 w-5" aria-hidden="true" />
       </button>
     </div>
 

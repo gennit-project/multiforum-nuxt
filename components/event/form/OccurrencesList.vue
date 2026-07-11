@@ -3,6 +3,8 @@ import { computed } from 'vue';
 import { DateTime } from 'luxon';
 import DatePicker from './DatePicker.vue';
 import TimePicker from './TimePicker.vue';
+import CirclePlusIcon from '@/components/icons/CirclePlusIcon.vue';
+import XmarkIcon from '@/components/icons/XmarkIcon.vue';
 import type { DateOccurrence } from '@/types/Event';
 
 const props = defineProps({
@@ -214,7 +216,7 @@ const getOccurrenceLabel = (index: number): string => {
         :data-testid="`remove-occurrence-${index}`"
         @click="removeOccurrence(index)"
       >
-        <i class="fa fa-times" />
+        <XmarkIcon class="h-4 w-4" />
       </button>
     </div>
 
@@ -225,7 +227,7 @@ const getOccurrenceLabel = (index: number): string => {
       data-testid="add-occurrence-button"
       @click="addOccurrence"
     >
-      <i class="fa fa-plus" />
+      <CirclePlusIcon class="h-4 w-4" />
       <span>Add another date</span>
     </button>
   </div>

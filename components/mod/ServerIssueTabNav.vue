@@ -14,6 +14,8 @@ import {
 } from '@/graphQLData/mod/queries';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
+import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
+import DotCircleIcon from '@/components/icons/DotCircleIcon.vue';
 import { buildServerIssueWhere } from '@/utils/serverIssueFilters';
 import { getServerIssueFilterValuesFromParams } from '@/utils/getServerIssueFilterValuesFromParams';
 
@@ -86,7 +88,7 @@ const closedCount = computed(() => {
             route.name !== openRouteName,
         }"
       >
-        <i class="far fa-dot-circle" /> {{ openCount }} Open
+        <DotCircleIcon class="mr-1 inline h-4 w-4" /> {{ openCount }} Open
       </nuxt-link>
       <nuxt-link
         :to="{ name: closedRouteName }"
@@ -98,7 +100,7 @@ const closedCount = computed(() => {
             route.name !== closedRouteName,
         }"
       >
-        <i class="fa-regular fa-circle-check" /> {{ closedCount }} Closed
+        <CheckCircleIcon class="mr-1 inline h-4 w-4" /> {{ closedCount }} Closed
       </nuxt-link>
     </div>
     <RequireAuth :full-width="false">

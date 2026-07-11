@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 
 type Rule = {
@@ -64,15 +65,10 @@ const isOpen = (ruleSummary: string) => {
       >
         <span class="mr-2 dark:text-gray-400">{{ `${i + 1}.` }}</span
         >{{ rule.summary }}
-        <i
+        <ChevronDownIcon
           v-if="rule.detail"
-          :class="[
-            'fa-solid',
-            'h-3',
-            'w-3',
-            isOpen(rule.summary) ? 'fa-chevron-up' : 'fa-chevron-down',
-            'ml-2',
-          ]"
+          class="ml-2 h-3 w-3"
+          :class="isOpen(rule.summary) ? 'rotate-180' : ''"
         />
       </div>
       <div v-if="isOpen(rule.summary)" class="mt-2">

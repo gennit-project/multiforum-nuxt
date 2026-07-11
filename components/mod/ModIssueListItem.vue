@@ -2,6 +2,8 @@
 import { computed } from 'vue';
 import type { Issue as GeneratedIssue } from '@/__generated__/graphql';
 import { DateTime } from 'luxon';
+import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
+import DotCircleIcon from '@/components/icons/DotCircleIcon.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
 import ChannelIconStack from '@/components/channel/ChannelIconStack.vue';
 import TagComponent from '@/components/TagComponent.vue';
@@ -121,11 +123,15 @@ const relatedChannelNames = computed(() =>
     <div class="flex space-x-2 text-sm md:text-lg">
       <i
         v-if="showStatusIcon && issue.isOpen"
-        class="far fa-dot-circle list-item-icon mt-1"
-      />
-      <i
+        data-testid="issue-open-status-icon"
+        class="list-item-icon mt-1 h-4 w-4"
+      >
+        <DotCircleIcon />
+      </i>
+      <CheckCircleIcon
         v-else-if="showStatusIcon"
-        class="fa-solid fa-circle-check mt-1 text-purple-500"
+        data-testid="issue-closed-status-icon"
+        class="mt-1 h-4 w-4 text-purple-500"
       />
 
       <ChannelIconStack
