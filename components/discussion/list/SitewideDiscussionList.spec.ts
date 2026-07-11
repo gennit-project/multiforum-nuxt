@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import {
   asMock,
@@ -112,6 +112,34 @@ describe('SitewideDiscussionList', () => {
     setupQueries(createQueryMock(null, { loading: ref(true) }));
     const wrapper = mountList();
     expect(wrapper.find('.skeleton-stub').exists()).toBe(true);
+  });
+
+  // Regression: a query-variable change after hydration (e.g. the logged-in
+  // username resolving client-side) makes Apollo clear `result` while the
+  // refetch is in flight. The list must stay put instead of collapsing back to
+  // the skeleton — the "content -> skeleton -> content" flash.
+  it('does not flash the skeleton during an in-flight refetch when a page was already loaded', async () => {
+    const discussionMock = createQueryMock(
+      listResult([makeDiscussion('1'), makeDiscussion('2')])
+    );
+    setupQueries(discussionMock);
+    const wrapper = mountList();
+    discussionMock.result.value = null;
+    discussionMock.loading.value = true;
+    await nextTick();
+    expect(wrapper.find('.skeleton-stub').exists()).toBe(false);
+  });
+
+  it('keeps rendering the previously loaded discussions during an in-flight refetch', async () => {
+    const discussionMock = createQueryMock(
+      listResult([makeDiscussion('1'), makeDiscussion('2')])
+    );
+    setupQueries(discussionMock);
+    const wrapper = mountList();
+    discussionMock.result.value = null;
+    discussionMock.loading.value = true;
+    await nextTick();
+    expect(wrapper.findAll('.item-stub')).toHaveLength(2);
   });
 
   it('calls fetchMore when LoadMore emits loadMore', async () => {
