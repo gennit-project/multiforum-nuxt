@@ -121,33 +121,24 @@ const serverConfig = computed(() => {
   return getServerResult.value?.serverConfigs?.[0] || null;
 });
 
-// Retain the most recently loaded page of discussions so an in-flight refetch
-// does not blank the list. `useQuery`'s `result` is cleared to `undefined`
-// while a request with changed variables is in flight; because the rendered
-// list derives solely from `result`, it would collapse to the loading skeleton
-// and then re-expand — the "content -> skeleton -> content" flash. The most
-// common on-load trigger is the logged-in username resolving client-side after
-// hydration (see plugins/auth-username-fallback.client.ts), which changes the
-// `loggedInUsername` query variable; sort/time-frame/filter changes do the same.
-// Keeping the last good result visible during the refetch removes the flash, so
-// the skeleton only shows before the very first result arrives.
-// The site-wide list query augments each discussion with a computed `score`
-// that is not on the base `Discussion` type.
+// `useQuery` clears `result` to `undefined` while a variable-change refetch is
+// in flight (e.g. the logged-in username resolving client-side after
+// hydration). Rendering the list straight from `result` would blank it to a
+// skeleton and back — the content -> skeleton -> content flash. Hold the last
+// loaded page here so the list stays put and the skeleton stays gated on the
+// genuine first load. (The list query adds a `score` field not on `Discussion`.)
 type SiteWideDiscussion = Discussion & { score: number };
 
 const loadedDiscussions = ref<SiteWideDiscussion[]>([]);
 const loadedAggregateCount = ref(0);
-const hasLoadedDiscussions = ref(false);
 
 watch(
   discussionResult,
   (result) => {
     const list = result?.getSiteWideDiscussionList;
-    if (list) {
-      loadedDiscussions.value = list.discussions ?? [];
-      loadedAggregateCount.value = list.aggregateDiscussionCount ?? 0;
-      hasLoadedDiscussions.value = true;
-    }
+    if (!list) return;
+    loadedDiscussions.value = list.discussions ?? [];
+    loadedAggregateCount.value = list.aggregateDiscussionCount ?? 0;
   },
   { immediate: true }
 );
@@ -281,7 +272,7 @@ const filterByChannel = (channel: string) => {
               </button>
             </div>
             <div
-              v-if="discussionLoading && !hasLoadedDiscussions"
+              v-if="discussionLoading && discussions.length === 0"
               class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700"
             >
               <div
@@ -299,7 +290,7 @@ const filterByChannel = (channel: string) => {
               :text="discussionError.message"
             />
             <p
-              v-else-if="hasLoadedDiscussions && discussions.length === 0"
+              v-else-if="discussions.length === 0"
               class="my-6 flex gap-2 px-4"
             >
               <span class="dark:text-white"
