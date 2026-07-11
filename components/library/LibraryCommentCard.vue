@@ -2,6 +2,8 @@
 import AvatarComponent from '@/components/AvatarComponent.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import AddToCommentFavorites from '@/components/favorites/AddToCommentFavorites.vue';
+import ArrowUpRightIcon from '@/components/icons/ArrowUpRightIcon.vue';
+import EllipsisHorizontal from '@/components/icons/EllipsisHorizontal.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import { relativeTime } from '@/utils';
 
@@ -85,7 +87,7 @@ withDefaults(
         aria-label="Open comment"
         class="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
       >
-        <i class="fa-solid fa-ellipsis" />
+        <EllipsisHorizontal class="h-5 w-5" />
       </NuxtLink>
     </div>
 
@@ -112,7 +114,7 @@ withDefaults(
           class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
           aria-label="View comment thread"
         >
-          <i class="fa-solid fa-arrow-up-right-from-square text-sm" />
+          <ArrowUpRightIcon class="h-4 w-4" />
         </NuxtLink>
         <div v-if="showFavoriteButton" class="flex-shrink-0">
           <AddToCommentFavorites

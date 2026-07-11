@@ -4,6 +4,7 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 import { useHead } from 'nuxt/app';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import FolderOpenIcon from '@/components/icons/FolderOpenIcon.vue';
 import WarningModal from '@/components/WarningModal.vue';
 import { useUsername } from '@/composables/useAuthState';
 import { GET_UPLOADED_DOWNLOADABLE_FILES } from '@/graphQLData/user/queries';
@@ -154,7 +155,7 @@ const deleteSelectedFile = async () => {
             v-else-if="totalFiles === 0"
             class="rounded-3xl border border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center dark:border-gray-700 dark:bg-gray-900"
           >
-            <i class="fa-regular fa-folder-open text-4xl text-gray-400" />
+            <FolderOpenIcon class="mx-auto h-10 w-10 text-gray-400" />
             <h2 class="mt-4 text-lg font-semibold text-gray-950 dark:text-white">
               No uploaded files yet
             </h2>

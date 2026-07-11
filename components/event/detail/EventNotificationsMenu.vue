@@ -2,6 +2,7 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import BellIcon from '@/components/icons/BellIcon.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 
 interface Props {
@@ -27,7 +28,7 @@ const baseButtonClasses =
     <template #has-auth>
       <Menu as="div" class="relative inline-block text-left">
         <MenuButton :class="baseButtonClasses">
-          <i class="fas fa-bell text-sm" aria-hidden="true" />
+          <BellIcon class="h-4 w-4" aria-hidden="true" />
           <span>Notifications</span>
           <ChevronDownIcon class="h-4 w-4" aria-hidden="true" />
         </MenuButton>
@@ -117,7 +118,7 @@ const baseButtonClasses =
 
     <template #does-not-have-auth>
       <button type="button" :class="baseButtonClasses">
-        <i class="fas fa-bell text-sm" aria-hidden="true" />
+        <BellIcon class="h-4 w-4" aria-hidden="true" />
         <span>Notifications</span>
         <ChevronDownIcon class="h-4 w-4" aria-hidden="true" />
       </button>

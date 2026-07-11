@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import VoteButton from '@/components/VoteButton.vue';
 import FloatingDropdown from '@/components/FloatingDropdown.vue';
 import EmojiPicker from '@/components/comments/EmojiPicker.vue';
+import FaceSmileIcon from '@/components/icons/FaceSmileIcon.vue';
 
 const props = defineProps({
   commentId: {
@@ -85,7 +86,7 @@ function handleClick() {
           @vote="handleClick"
         >
           <span class="flex items-center gap-1">
-            <i class="fa-regular fa-face-smile" aria-hidden="true" />
+            <FaceSmileIcon class="h-4 w-4" aria-hidden="true" />
             <span class="text-xs">React</span>
           </span>
         </VoteButton>
