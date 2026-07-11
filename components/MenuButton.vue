@@ -153,7 +153,6 @@ onBeforeUnmount(() => {
 
 <template>
   <div ref="triggerRef" class="inline-block" @focusout="onFocusOut">
-  <div ref="triggerRef" class="inline-block" @focusout="onFocusOut">
     <slot name="activator" :props="activatorProps" :disabled="disabled">
       <button
         :data-testid="dataTestid"
@@ -176,12 +175,12 @@ onBeforeUnmount(() => {
     <client-only>
       <Teleport to="body">
         <div
-        v-if="isOpen"
-        ref="floatingRef"
-        :style="floatingStyles"
-        class="z-[10000]"
-        @focusout="onFocusOut"
-      >
+          v-if="isOpen"
+          ref="floatingRef"
+          :style="floatingStyles"
+          class="z-[10000]"
+          @focusout="onFocusOut"
+        >
           <div
             class="min-w-[10rem] overflow-hidden rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-600 dark:bg-gray-700"
             role="menu"
