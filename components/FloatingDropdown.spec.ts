@@ -37,6 +37,19 @@ describe('FloatingDropdown', () => {
     expect(wrapper.find('.trigger').exists()).toBe(true);
   });
 
+  it('passes menu semantics to the trigger slot props', () => {
+    const wrapper = mountDropdown({ modelValue: true });
+    const trigger = wrapper.get('.trigger');
+
+    expect({
+      hasPopup: trigger.attributes('aria-haspopup'),
+      expanded: trigger.attributes('aria-expanded'),
+    }).toEqual({
+      hasPopup: 'menu',
+      expanded: 'true',
+    });
+  });
+
   it('does not render the content while closed', () => {
     const wrapper = mountDropdown({ modelValue: false });
 
@@ -55,5 +68,15 @@ describe('FloatingDropdown', () => {
     await wrapper.find('.trigger').trigger('click');
 
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([true]);
+  });
+
+  it('emits update:modelValue=false when focus leaves the dropdown', async () => {
+    const wrapper = mountDropdown({ modelValue: true });
+
+    await wrapper.find('.trigger').trigger('focusout', {
+      relatedTarget: document.body,
+    });
+
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false]);
   });
 });

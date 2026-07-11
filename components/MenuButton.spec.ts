@@ -128,4 +128,25 @@ describe('MenuButton', () => {
 
     expect(wrapper.get('[data-testid="custom"]').text()).toBe('true');
   });
+
+  it('passes menu semantics to a custom activator slot', () => {
+    const wrapper = mount(MenuButton, {
+      props: {
+        items: [],
+      },
+      slots: {
+        activator:
+          '<template #activator="{ props }"><button data-testid="custom" v-bind="props">Open</button></template>',
+      },
+      global: { stubs },
+    });
+
+    expect({
+      hasPopup: wrapper.get('[data-testid="custom"]').attributes('aria-haspopup'),
+      expanded: wrapper.get('[data-testid="custom"]').attributes('aria-expanded'),
+    }).toEqual({
+      hasPopup: 'menu',
+      expanded: 'false',
+    });
+  });
 });

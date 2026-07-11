@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, useId } from 'vue';
 import { useFloating, offset, flip, shift, autoUpdate } from '@floating-ui/vue';
 import type { Placement } from '@floating-ui/vue';
 
@@ -39,6 +39,7 @@ const LOCATION_TO_PLACEMENT: Record<string, Placement> = {
 const isOpen = ref(false);
 const triggerRef = ref<HTMLElement | null>(null);
 const floatingRef = ref<HTMLElement | null>(null);
+const tooltipId = useId();
 
 const placement = computed<Placement>(
   () => LOCATION_TO_PLACEMENT[props.location] ?? 'top'
@@ -59,12 +60,13 @@ const hide = () => {
 };
 
 // Bound to the trigger element by the activator slot consumer.
-const activatorProps = {
+const activatorProps = computed(() => ({
   onMouseenter: show,
   onMouseleave: hide,
   onFocusin: show,
   onFocusout: hide,
-};
+  'aria-describedby': isOpen.value ? tooltipId : undefined,
+}));
 </script>
 
 <template>
@@ -75,6 +77,7 @@ const activatorProps = {
     <Teleport to="body">
       <div
         v-if="isOpen"
+        :id="tooltipId"
         ref="floatingRef"
         :style="floatingStyles"
         role="tooltip"

@@ -100,6 +100,17 @@ function onDocumentPointerDown(event: PointerEvent) {
 function onKeydown(event: KeyboardEvent) {
   if (event.key === 'Escape') isMenuOpen.value = false;
 }
+function onFocusOut(event: FocusEvent) {
+  const relatedTarget = event.relatedTarget as Node | null;
+  if (
+    relatedTarget &&
+    (triggerRef.value?.contains(relatedTarget) ||
+      floatingRef.value?.contains(relatedTarget))
+  ) {
+    return;
+  }
+  isMenuOpen.value = false;
+}
 
 watch(isMenuOpen, (open) => {
   if (!import.meta.client) return;
@@ -143,11 +154,11 @@ const buttonClasses = computed(() => {
     <template #has-auth>
       <client-only>
         <div class="inline-block align-middle">
-          <div ref="triggerRef" class="inline-block">
+          <div ref="triggerRef" class="inline-block" @focusout="onFocusOut">
             <button
               type="button"
               :class="buttonClasses"
-              aria-haspopup="true"
+              aria-haspopup="menu"
               :aria-expanded="isMenuOpen"
               @click="toggle"
             >
@@ -179,6 +190,7 @@ const buttonClasses = computed(() => {
               ref="floatingRef"
               :style="floatingStyles"
               class="z-[10000]"
+              @focusout="onFocusOut"
             >
               <div
                 class="min-w-[12rem] overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700 dark:text-gray-200"

@@ -75,9 +75,18 @@ function toggle() {
 // the previous v-menu activator did.
 const activatorProps = computed(() => {
   if (props.disabled) {
-    return { disabled: true, 'aria-disabled': true };
+    return {
+      disabled: true,
+      'aria-disabled': true,
+      'aria-haspopup': 'menu' as const,
+      'aria-expanded': false,
+    };
   }
-  return { onClick: toggle };
+  return {
+    onClick: toggle,
+    'aria-haspopup': 'menu' as const,
+    'aria-expanded': isOpen.value,
+  };
 });
 
 const handleItemClick = (item: MenuItemType) => {
@@ -112,6 +121,17 @@ function onDocumentPointerDown(event: PointerEvent) {
 function onKeydown(event: KeyboardEvent) {
   if (event.key === 'Escape') close();
 }
+function onFocusOut(event: FocusEvent) {
+  const relatedTarget = event.relatedTarget as Node | null;
+  if (
+    relatedTarget &&
+    (triggerRef.value?.contains(relatedTarget) ||
+      floatingRef.value?.contains(relatedTarget))
+  ) {
+    return;
+  }
+  close();
+}
 
 watch(isOpen, (open) => {
   if (!import.meta.client) return;
@@ -132,14 +152,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="triggerRef" class="inline-block">
+  <div ref="triggerRef" class="inline-block" @focusout="onFocusOut">
     <slot name="activator" :props="activatorProps" :disabled="disabled">
       <button
         :data-testid="dataTestid"
         v-bind="activatorProps"
         :aria-label="ariaLabel || undefined"
-        :aria-haspopup="true"
-        :aria-expanded="isOpen"
         :disabled="disabled"
         :class="[
           buttonClasses,
@@ -161,6 +179,7 @@ onBeforeUnmount(() => {
           ref="floatingRef"
           :style="floatingStyles"
           class="z-[10000]"
+          @focusout="onFocusOut"
         >
           <div
             class="min-w-[10rem] overflow-hidden rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-600 dark:bg-gray-700"

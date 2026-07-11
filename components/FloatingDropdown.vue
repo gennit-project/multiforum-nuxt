@@ -44,8 +44,13 @@ function toggle() {
   emit('update:modelValue', !props.modelValue);
 }
 
-// Passed to the button slot; the trigger button calls this to toggle the menu.
-const activatorProps = { onClick: toggle };
+// Passed to the button slot; custom activators inherit the same menu semantics
+// as the default trigger.
+const activatorProps = computed(() => ({
+  onClick: toggle,
+  'aria-haspopup': 'menu',
+  'aria-expanded': String(isOpen.value),
+}));
 
 function onDocumentPointerDown(event: PointerEvent) {
   const target = event.target as Node;
@@ -59,6 +64,17 @@ function onDocumentPointerDown(event: PointerEvent) {
 }
 function onKeydown(event: KeyboardEvent) {
   if (event.key === 'Escape') close();
+}
+function onFocusOut(event: FocusEvent) {
+  const relatedTarget = event.relatedTarget as Node | null;
+  if (
+    relatedTarget &&
+    (triggerRef.value?.contains(relatedTarget) ||
+      floatingRef.value?.contains(relatedTarget))
+  ) {
+    return;
+  }
+  close();
 }
 
 watch(isOpen, (open) => {
@@ -81,7 +97,7 @@ onBeforeUnmount(() => {
 
 <template>
   <client-only>
-    <div ref="triggerRef" class="inline-block">
+    <div ref="triggerRef" class="inline-block" @focusout="onFocusOut">
       <slot
         name="button"
         v-bind="{ activatorProps, class: $attrs.class, onClose: close }"
@@ -93,6 +109,7 @@ onBeforeUnmount(() => {
         ref="floatingRef"
         :style="floatingStyles"
         class="z-[10000]"
+        @focusout="onFocusOut"
       >
         <div
           class="overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-700"

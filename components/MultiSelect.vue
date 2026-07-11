@@ -307,7 +307,7 @@ const selectedOptions = computed(() => {
       {{ error }}
     </div>
 
-    <div class="relative">
+    <div v-click-outside="closeDropdown" class="relative">
       <div
         :data-testid="testId"
         :class="[
@@ -399,7 +399,6 @@ const selectedOptions = computed(() => {
       <!-- Dropdown -->
       <div
         v-if="isDropdownOpen"
-        v-click-outside="closeDropdown"
         :class="[
           'absolute z-50 mt-1 w-full rounded-md border bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800',
           dropdownMaxHeight,
