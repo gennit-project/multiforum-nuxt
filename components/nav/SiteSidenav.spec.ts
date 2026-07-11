@@ -177,3 +177,30 @@ describe('SiteSidenav auth links', () => {
     expect(wrapper.text()).toContain('Admin Dashboard');
   });
 });
+
+describe('SiteSidenav dialog semantics', () => {
+  it('marks the open drawer panel as a modal dialog', () => {
+    const wrapper = mountNav();
+
+    expect({
+      role: wrapper.get('[role="dialog"]').attributes('role'),
+      modal: wrapper.get('[role="dialog"]').attributes('aria-modal'),
+      label: wrapper.get('[role="dialog"]').attributes('aria-label'),
+    }).toEqual({ role: 'dialog', modal: 'true', label: 'Site navigation' });
+  });
+
+  // The layout remounts SiteSidenav with showDropdown=true when the drawer
+  // opens, so the focus trap must engage on mount (not only on a prop change).
+  it('emits close when Escape is pressed while open', async () => {
+    const wrapper = mountNav();
+    await Promise.resolve();
+
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+    );
+    const closed = wrapper.emitted('close');
+    wrapper.unmount();
+
+    expect(closed).toBeTruthy();
+  });
+});

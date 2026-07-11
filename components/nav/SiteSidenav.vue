@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, toRef } from 'vue';
 import type { Component } from 'vue';
 import { useRouter } from 'nuxt/app';
+import { useFocusTrap } from '@/composables/useFocusTrap';
 import { useQuery } from '@vue/apollo-composable';
 import type { RouteLocationAsRelativeGeneric } from 'vue-router';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
@@ -82,7 +83,7 @@ const navigation: NavigationItem[] = [
   },
 ];
 
-defineProps({
+const props = defineProps({
   showDropdown: {
     type: Boolean,
     required: true,
@@ -90,6 +91,17 @@ defineProps({
 });
 
 const emit = defineEmits(['close']);
+
+// The drawer is a modal dialog: trap focus inside the panel while open, close
+// on Escape, and restore focus to the trigger (which unmounts while open, so
+// fall back to the hamburger button) on close.
+const panelRef = ref<HTMLElement | null>(null);
+useFocusTrap(panelRef, {
+  active: toRef(props, 'showDropdown'),
+  onEscape: () => emit('close'),
+  fallbackTrigger: () =>
+    document.querySelector<HTMLElement>('[data-testid="hamburger-menu-button"]'),
+});
 
 const showAllForums = ref(false);
 
@@ -199,7 +211,11 @@ const selectSearchType = (type: SearchType) => {
       @click="outside"
     />
     <div
+      ref="panelRef"
       v-click-outside="outside"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Site navigation"
       class="overlay-shade fixed left-0 top-0 flex h-full w-[275px] flex-col justify-between overflow-y-auto border-gray-300 bg-white py-2 dark:border-gray-200 dark:bg-gray-900"
     >
       <div>
