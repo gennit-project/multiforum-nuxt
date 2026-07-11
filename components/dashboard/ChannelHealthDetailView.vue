@@ -364,9 +364,13 @@ const refreshDashboard = () => {
         </section>
 
         <section
-          class="grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.8fr)]"
+          class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.8fr)]"
         >
-          <ServerDashboardActivityChart :time-series="timeSeries" />
+          <ServerDashboardActivityChart
+            :time-series="timeSeries"
+            :start-date="startDate"
+            :end-date="endDate"
+          />
           <ServerDashboardIssueAging :issue-aging="issueAging" />
         </section>
       </template>

@@ -308,7 +308,7 @@ const updateChannelSort = (sortBy: ChannelHealthSortKey) => {
           />
         </div>
         <div
-          class="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.8fr)]"
+          class="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.8fr)]"
         >
           <div
             class="h-72 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-800"
@@ -342,9 +342,13 @@ const updateChannelSort = (sortBy: ChannelHealthSortKey) => {
         <ServerDashboardMetricCards :summary="dashboard.summary" />
 
         <section
-          class="grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.8fr)]"
+          class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.8fr)]"
         >
-          <ServerDashboardActivityChart :time-series="timeSeries" />
+          <ServerDashboardActivityChart
+            :time-series="timeSeries"
+            :start-date="startDate"
+            :end-date="endDate"
+          />
           <ServerDashboardIssueAging :issue-aging="issueAging" />
         </section>
 

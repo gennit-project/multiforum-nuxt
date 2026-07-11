@@ -2,15 +2,23 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ServerDashboardActivityChart from '@/components/admin/ServerDashboardActivityChart.vue';
 
-const mountChart = (timeSeries: Array<Record<string, unknown>>) =>
+const mountChart = (
+  timeSeries: Array<Record<string, unknown>>,
+  range: { startDate?: string; endDate?: string } = {}
+) =>
   mount(ServerDashboardActivityChart, {
-    props: { timeSeries },
+    props: { timeSeries, ...range },
     global: {
       stubs: {
         CalendarDays: { template: '<svg class="calendar" />' },
       },
     },
   });
+
+// Each rendered day-bar column is the `.min-w-6` wrapper (distinct from the
+// legend's coloured dots, which also use the segment colour classes).
+const barCount = (wrapper: ReturnType<typeof mountChart>) =>
+  wrapper.findAll('.min-w-6').length;
 
 describe('ServerDashboardActivityChart', () => {
   beforeEach(() => {
@@ -52,6 +60,48 @@ describe('ServerDashboardActivityChart', () => {
       firstOrange: 'height: 25%;',
       firstGreen: 'height: 25%;',
     });
+  });
+
+  it('renders one bar per day across the selected range even when the series is sparse', () => {
+    const wrapper = mountChart(
+      [{ date: '2024-01-12', discussions: 1, comments: 0, events: 0 }],
+      { startDate: '2024-01-10', endDate: '2024-01-14' }
+    );
+
+    expect(barCount(wrapper)).toBe(5);
+  });
+
+  it('zero-fills days in the range that the series does not cover', () => {
+    const wrapper = mountChart(
+      [{ date: '2024-01-12', discussions: 1, comments: 0, events: 0 }],
+      { startDate: '2024-01-10', endDate: '2024-01-14' }
+    );
+
+    expect(wrapper.get('[title="Jan 10: 0"]').exists()).toBe(true);
+  });
+
+  it('drops series points that fall outside the selected range', () => {
+    const wrapper = mountChart(
+      [
+        { date: '2024-01-12', discussions: 1, comments: 0, events: 0 },
+        { date: '2024-01-20', discussions: 9, comments: 9, events: 9 },
+      ],
+      { startDate: '2024-01-10', endDate: '2024-01-14' }
+    );
+
+    expect(wrapper.text()).not.toContain('Jan 20');
+  });
+
+  it('falls back to the raw series when the range is invalid', () => {
+    const wrapper = mountChart(
+      [
+        { date: '2024-01-12', discussions: 1, comments: 0, events: 0 },
+        { date: '2024-01-13', discussions: 1, comments: 0, events: 0 },
+      ],
+      { startDate: 'not-a-date', endDate: '2024-01-14' }
+    );
+
+    expect(barCount(wrapper)).toBe(2);
   });
 
   it('renders zero-height segments and keeps the legend labels', () => {
