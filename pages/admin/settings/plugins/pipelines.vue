@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PluginPipelineEditor from '@/components/plugins/PluginPipelineEditor.vue';
 import { useToast } from '@/composables/useToast';
 import { GET_PLUGIN_PIPELINES, GET_INSTALLED_PLUGINS } from '@/graphQLData/admin/queries';
@@ -94,7 +95,7 @@ async function handleSave(config: PipelineConfig) {
           class="py-8 text-center"
         >
           <div class="inline-flex items-center">
-            <i class="fa-solid fa-spinner mr-2 animate-spin" />
+            <LoadingSpinner class="mr-2 inline-flex" />
             Loading pipeline configuration...
           </div>
         </div>
