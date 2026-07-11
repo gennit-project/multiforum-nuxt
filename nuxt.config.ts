@@ -214,9 +214,11 @@ export default defineNuxtConfig({
       '@nuxtjs/google-fonts',
       {
         families: {
-          Roboto: true,
-          Inter: [400, 700],
-          Montserrat: [400, 700],
+          // Inter is self-hosted in assets/css/index.css, and the public UI
+          // only uses Montserrat for the wordmark. Limiting the remote font
+          // request keeps first paint from competing with dozens of unused font
+          // variants on public routes.
+          Montserrat: [600],
         },
         display: 'swap',
         // Keep font loading non-blocking. `display: swap` + `preconnect` are

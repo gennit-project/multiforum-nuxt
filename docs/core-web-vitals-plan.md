@@ -208,6 +208,16 @@ The deployed route is clearly preloading and prefetching too much.
 - compare first-load JS bytes for `/discussions`
 - inspect whether editor/detail-only code disappears from the list route payload
 
+### Progress so far
+
+- removed viewport-triggered `NuxtLink` prefetching in favor of interaction-only prefetch
+- restored SSR rendering for the discussions index wrapper
+- split discussion list/detail components behind async boundaries
+- disabled explicit Google font prefetching
+- reduced remote font loading to the single wordmark family still used by the public UI
+- switched self-hosted `Inter` faces to `font-display: swap`
+- removed unused self-hosted `Inter` weights from the global stylesheet
+
 ## Workstream 3: Cache Public HTML and Public Data Better
 
 Public listing pages are strong candidates for edge caching.
