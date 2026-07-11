@@ -3,6 +3,10 @@ import { ref, computed } from 'vue';
 import { useFloating, offset, flip, shift, autoUpdate } from '@floating-ui/vue';
 import type { Placement } from '@floating-ui/vue';
 
+// Registered name satisfies vue/multi-word-component-names (the file is still
+// auto-imported as <Tooltip> by Nuxt). Mirrors the Table.vue convention.
+defineOptions({ name: 'TooltipComponent' });
+
 // Hover/focus tooltip built on @floating-ui/vue (replaces Vuetify's v-tooltip).
 // The trigger goes in the `activator` slot and binds the provided handlers; the
 // default slot is the tooltip content, teleported to <body> and positioned.

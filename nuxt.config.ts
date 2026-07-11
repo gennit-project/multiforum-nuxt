@@ -412,6 +412,24 @@ export default defineNuxtConfig({
     typeCheck: false,
   },
   vite: {
+    // Pre-bundle these deps at startup. Removing Vuetify changed the lockfile,
+    // which forces Vite to re-optimize from scratch; without this list it
+    // discovers some deps (notably ones pulled in by client-only plugins) only
+    // at runtime and issues an HMR full-reload to swap them in. That reload can
+    // interrupt an in-flight Playwright navigation and blank the page (the
+    // create/edit E2E flows were failing for this reason). The list is exactly
+    // what `nuxt dev` reports as "discovered new dependencies at runtime".
+    optimizeDeps: {
+      include: [
+        '@floating-ui/vue',
+        '@google/model-viewer',
+        '@vue/apollo-composable',
+        'accented',
+        'luxon',
+        'three',
+        'vue-google-maps-community-fork',
+      ],
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname),
