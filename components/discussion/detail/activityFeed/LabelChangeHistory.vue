@@ -2,6 +2,8 @@
 import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 import type { LabelChangeHistory as LabelChangeHistoryItem } from '@/__generated__/graphql';
+import MinusIcon from '@/components/icons/MinusIcon.vue';
+import PlusIcon from '@/components/icons/PlusIcon.vue';
 import { timeAgo } from '@/utils';
 
 interface LabelChange {
@@ -123,14 +125,14 @@ const toggleOlderChanges = () => {
                   : 'bg-red-100 dark:bg-red-800'
               "
             >
-              <i
+              <PlusIcon
                 v-if="item.actionType === 'added'"
-                class="fa-solid fa-plus text-xs text-green-600 dark:text-green-300"
+                class="h-3 w-3 text-green-600 dark:text-green-300"
                 aria-hidden="true"
               />
-              <i
+              <MinusIcon
                 v-else
-                class="fa-solid fa-minus text-xs text-red-600 dark:text-red-300"
+                class="h-3 w-3 text-red-600 dark:text-red-300"
                 aria-hidden="true"
               />
             </div>

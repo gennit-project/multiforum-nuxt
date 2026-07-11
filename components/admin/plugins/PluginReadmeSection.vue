@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import FormRow from '@/components/FormRow.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 
 defineProps<{
@@ -16,7 +17,7 @@ defineProps<{
     <template #content>
       <div v-if="pluginDetailLoading && !pluginReadme" class="py-4 text-center">
         <div class="inline-flex items-center text-gray-600 dark:text-gray-400">
-          <i class="fa-solid fa-spinner mr-2 animate-spin" />
+          <LoadingSpinner class="mr-2 inline-flex" />
           Loading documentation...
         </div>
       </div>

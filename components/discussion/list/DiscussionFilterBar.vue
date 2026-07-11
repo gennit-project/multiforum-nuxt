@@ -7,8 +7,10 @@ import TagIcon from '@/components/icons/TagIcon.vue';
 import SearchableForumList from '@/components/channel/SearchableForumList.vue';
 import SearchableTagList from '@/components/SearchableTagList.vue';
 import SortButtons from '@/components/SortButtons.vue';
+import CollapseIcon from '@/components/icons/CollapseIcon.vue';
 import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import type { SearchDiscussionValues } from '@/types/Discussion';
+import ExpandIcon from '@/components/icons/ExpandIcon.vue';
 import FilterIcon from '@/components/icons/FilterIcon.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import SecondaryButton from '@/components/SecondaryButton.vue';
@@ -198,7 +200,7 @@ const isExpanded = computed(() => {
             title="Expand all discussions"
             @click="expandAll"
           >
-            <i class="fa-solid fa-expand text-xs" />
+            <ExpandIcon class="h-3.5 w-3.5" />
           </button>
           <button
             aria-label="Collapse all discussions"
@@ -213,7 +215,7 @@ const isExpanded = computed(() => {
             title="Collapse all discussions"
             @click="collapseAll"
           >
-            <i class="fa-solid fa-compress text-xs" />
+            <CollapseIcon class="h-3.5 w-3.5" />
           </button>
         </div>
         <button

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
 import SearchIcon from '@/components/icons/SearchIcon.vue';
+import XmarkIcon from '@/components/icons/XmarkIcon.vue';
 
 // Props
 const props = defineProps({
@@ -136,8 +137,8 @@ defineExpose({ focus, getValue });
         class="bg-transparent absolute inset-y-0 right-12 z-10 flex cursor-pointer items-center border-none"
         @click="clear"
       >
-        <i
-          class="fa-solid fa-xmark h-4 w-4 text-gray-400 dark:text-gray-300"
+        <XmarkIcon
+          class="h-4 w-4 text-gray-400 dark:text-gray-300"
           aria-hidden="true"
         />
       </button>

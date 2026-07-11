@@ -11,6 +11,8 @@ import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import BookmarkIcon from '@/components/icons/BookmarkIcon.vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import XIcon from '@/components/icons/XmarkIcon.vue';
 import SearchIcon from '@/components/icons/SearchIcon.vue';
 import { GET_USER } from '@/graphQLData/user/queries';
@@ -240,8 +242,8 @@ const selectSearchType = (type: SearchType) => {
                 @click="showSearchTypeDropdown = !showSearchTypeDropdown"
               >
                 <span>{{ selectedSearchTypeLabel }}</span>
-                <i
-                  class="fa-solid fa-chevron-down text-[10px] text-gray-400"
+                <ChevronDownIcon
+                  class="h-3 w-3 text-gray-400 transition-transform"
                   :class="{ 'rotate-180': showSearchTypeDropdown }"
                 />
               </button>
@@ -262,9 +264,9 @@ const selectSearchType = (type: SearchType) => {
                   @click="selectSearchType(option.value)"
                 >
                   <span>{{ option.label }}</span>
-                  <i
+                  <CheckIcon
                     v-if="selectedSearchType === option.value"
-                    class="fa-solid fa-check text-[10px] text-orange-500"
+                    class="h-3 w-3 text-orange-500"
                   />
                 </button>
               </div>

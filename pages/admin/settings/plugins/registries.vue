@@ -2,6 +2,7 @@
 import { ref, computed, watch } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PluginDiscoverySection from '@/components/admin/plugins/PluginDiscoverySection.vue';
 import { useToast } from '@/composables/useToast';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
@@ -83,7 +84,7 @@ const saveRegistries = async () => {
   <div class="space-y-4 sm:space-y-5">
     <div v-if="serverLoading" class="py-8 text-center">
       <div class="inline-flex items-center">
-        <i class="fa-solid fa-spinner mr-2 animate-spin" />
+        <LoadingSpinner class="mr-2 inline-flex" />
         Loading registries...
       </div>
     </div>
@@ -158,9 +159,9 @@ const saveRegistries = async () => {
                 :disabled="!isDirty || savingRegistries"
                 @click="saveRegistries"
               >
-                <i
+                <LoadingSpinner
                   v-if="savingRegistries"
-                  class="fa-solid fa-spinner mr-2 animate-spin"
+                  class="mr-2 inline-flex"
                 />
                 Save Registries
               </button>

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import FlagIcon from '../icons/FlagIcon.vue';
+import StarIcon from '@/components/icons/StarIcon.vue';
+import UpArrowIcon from '@/components/icons/UpArrowIcon.vue';
 import type { SelectOptionData } from '@/types/GenericFormTypes';
 import { ALLOWED_ICONS } from '@/utils';
 
@@ -190,7 +192,7 @@ function viewFeedback() {
       :transparent-background="isPermalinked"
       @vote="clickUpvote"
     >
-      <i class="fa-solid fa-arrow-up" aria-hidden="true" />
+      <UpArrowIcon class="h-4 w-4" aria-hidden="true" />
       <span class="text-xs">{{ upvoteCount }}</span>
       <span class="text-xs">{{ upvoteActive ? 'Undo' : 'Upvote' }}</span>
     </VoteButton>
@@ -209,7 +211,12 @@ function viewFeedback() {
       @vote="superUpvoteActive ? emit('undoSuperUpvote') : emit('superUpvote')"
     >
       <span class="flex items-center gap-1 text-xs font-medium" :class="superUpvoteActive ? '' : 'rainbow-star'">
-        <i :class="superUpvoteActive ? 'fa-solid fa-star' : 'fa-regular fa-star'" aria-hidden="true" />
+        <StarIcon
+          class="h-4 w-4"
+          :class="superUpvoteActive ? 'fill-current' : ''"
+          :filled="superUpvoteActive"
+          aria-hidden="true"
+        />
         <span v-if="superUpvoteActive">Undo</span>
       </span>
     </VoteButton>

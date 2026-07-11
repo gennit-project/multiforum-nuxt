@@ -3,19 +3,17 @@ import { mount, flushPromises } from '@vue/test-utils';
 import { defineComponent, h } from 'vue';
 import DiscussionsIndexPage from './index.vue';
 
-const SearchDiscussionsStub = defineComponent({
-  name: 'SearchDiscussions',
-  props: {
-    isForumScoped: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  template: '<div data-testid="search-discussions-stub" />',
-});
-
 vi.mock('@/components/discussion/list/SearchDiscussions.vue', () => ({
-  default: SearchDiscussionsStub,
+  default: defineComponent({
+    name: 'SearchDiscussions',
+    props: {
+      isForumScoped: {
+        type: Boolean,
+        required: true,
+      },
+    },
+    template: '<div data-testid="search-discussions-stub" />',
+  }),
 }));
 
 const NuxtLayoutStub = defineComponent({
@@ -25,19 +23,16 @@ const NuxtLayoutStub = defineComponent({
 });
 
 describe('sitewide discussions index page', () => {
-  it('renders the server fallback while the client-only discussion search is unavailable', async () => {
+  it('renders the discussion search list on the server route', async () => {
     const wrapper = mount(DiscussionsIndexPage, {
       global: {
         stubs: {
           NuxtLayout: NuxtLayoutStub,
-          ClientOnly: { template: '<div><slot /><slot name="fallback" /></div>' },
         },
       },
     });
     await flushPromises();
 
-    expect(wrapper.findComponent(SearchDiscussionsStub).exists()).toBe(false);
-    expect(wrapper.findAll('.h-24')).toHaveLength(3);
-    expect(wrapper.find('.h-10').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="search-discussions-stub"]').exists()).toBe(true);
   });
 });

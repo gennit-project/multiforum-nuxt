@@ -3,6 +3,8 @@ import { computed } from 'vue';
 import { DateTime } from 'luxon';
 import DatePicker from './DatePicker.vue';
 import TimePicker from './TimePicker.vue';
+import CirclePlusIcon from '@/components/icons/CirclePlusIcon.vue';
+import XmarkIcon from '@/components/icons/XmarkIcon.vue';
 import type { DateRangeGroup } from '@/types/Event';
 
 const props = defineProps({
@@ -121,7 +123,7 @@ const getDayCount = (group: DateRangeGroup): number => {
           :data-testid="`remove-group-${index}`"
           @click="removeGroup(index)"
         >
-          <i class="fa fa-times text-sm" />
+          <XmarkIcon class="h-4 w-4" />
         </button>
       </div>
 
@@ -169,7 +171,7 @@ const getDayCount = (group: DateRangeGroup): number => {
       data-testid="add-date-range-button"
       @click="addGroup"
     >
-      <i class="fa fa-plus" />
+      <CirclePlusIcon class="h-4 w-4" />
       <span>Add date range</span>
     </button>
   </div>

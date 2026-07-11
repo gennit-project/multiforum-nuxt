@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useApolloClient, useMutation, useQuery } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PluginSettingsForm from '@/components/plugins/PluginSettingsForm.vue';
 import BotProfilesEditor from '@/components/plugins/BotProfilesEditor.vue';
 import type { BotProfile, ExistingBot } from '@/components/plugins/BotProfilesEditor.vue';
@@ -305,7 +306,7 @@ const hasFilteredChannelSettings = computed(() => {
     <!-- Loading State -->
     <div v-if="isLoading" class="py-8 text-center">
       <div class="inline-flex items-center">
-        <i class="fa-solid fa-spinner mr-2 animate-spin" />
+        <LoadingSpinner class="mr-2 inline-flex" />
         Loading plugin details...
       </div>
     </div>
@@ -405,13 +406,13 @@ const hasFilteredChannelSettings = computed(() => {
           </div>
           <button
             type="button"
-            class="rounded-lg border border-blue-300 bg-white px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-blue-600 dark:bg-blue-800 dark:text-blue-200 dark:hover:bg-blue-700"
-            :disabled="updating"
-            @click="handleToggleEnabled(false)"
-          >
-            <i v-if="updating" class="fa-solid fa-spinner mr-2 animate-spin" />
-            Disable
-          </button>
+          class="rounded-lg border border-blue-300 bg-white px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-blue-600 dark:bg-blue-800 dark:text-blue-200 dark:hover:bg-blue-700"
+          :disabled="updating"
+          @click="handleToggleEnabled(false)"
+        >
+          <LoadingSpinner v-if="updating" class="mr-2 inline-flex" />
+          Disable
+        </button>
         </div>
 
         <!-- Disabled State - Large CTA -->
@@ -427,14 +428,14 @@ const hasFilteredChannelSettings = computed(() => {
           </p>
           <button
             type="button"
-            class="mt-4 w-full rounded-lg bg-green-700 px-6 py-3 text-lg font-semibold text-white shadow-lg hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            :disabled="updating"
-            @click="handleToggleEnabled(true)"
-          >
-            <i v-if="updating" class="fa-solid fa-spinner mr-2 animate-spin" />
-            <i v-else class="fa-solid fa-power-off mr-2" />
-            Enable Plugin
-          </button>
+          class="mt-4 w-full rounded-lg bg-green-700 px-6 py-3 text-lg font-semibold text-white shadow-lg hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          :disabled="updating"
+          @click="handleToggleEnabled(true)"
+        >
+          <LoadingSpinner v-if="updating" class="mr-2 inline-flex" />
+          <i v-else class="fa-solid fa-power-off mr-2" />
+          Enable Plugin
+        </button>
         </div>
       </div>
 
@@ -463,7 +464,7 @@ const hasFilteredChannelSettings = computed(() => {
                 :disabled="saving || !isDirty"
                 @click="handleSave"
               >
-                <i v-if="saving" class="fa-solid fa-spinner mr-2 animate-spin" />
+                <LoadingSpinner v-if="saving" class="mr-2 inline-flex" />
                 Save Bot Profiles
               </button>
             </div>
@@ -513,7 +514,7 @@ const hasFilteredChannelSettings = computed(() => {
                 :disabled="saving || !isDirty"
                 @click="handleSave"
               >
-                <i v-if="saving" class="fa-solid fa-spinner mr-2 animate-spin" />
+                <LoadingSpinner v-if="saving" class="mr-2 inline-flex" />
                 Save Settings
               </button>
             </div>

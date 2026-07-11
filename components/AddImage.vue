@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import ImageIcon from '@/components/icons/ImageIcon.vue';
 
 const props = defineProps({
   fieldName: {
@@ -56,7 +57,7 @@ const onFileSelected = (event: Event) => {
       ]"
       :for="`file-input-${props.fieldName}`"
     >
-      <i class="fa fa-image mr-2" aria-hidden="true" /> {{ props.label }}
+      <ImageIcon class="mr-2 h-4 w-4" aria-hidden="true" /> {{ props.label }}
       <input
         :id="`file-input-${props.fieldName}`"
         ref="fileInput"

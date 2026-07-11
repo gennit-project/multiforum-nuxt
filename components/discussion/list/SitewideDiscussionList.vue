@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import ErrorBanner from '../../ErrorBanner.vue';
 import SitewideDiscussionListItem from './SitewideDiscussionListItem.vue';
-import SitewideDiscussionSidebar from './SitewideDiscussionSidebar.vue';
 import LoadMore from '../../LoadMore.vue';
-import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
 import DiscussionDetailEmptyState from '@/components/discussion/list/DiscussionDetailEmptyState.vue';
 import { GET_SITE_WIDE_DISCUSSION_LIST } from '@/graphQLData/discussion/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
@@ -24,6 +22,12 @@ import { useUsername } from '@/composables/useAuthState';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 
 const usernameVar = useUsername();
+const SitewideDiscussionSidebar = defineAsyncComponent(
+  () => import('./SitewideDiscussionSidebar.vue')
+);
+const DiscussionDetailContent = defineAsyncComponent(
+  () => import('@/components/discussion/detail/DiscussionDetailContent.vue')
+);
 
 
 const DISCUSSION_PAGE_LIMIT = 15;
@@ -117,16 +121,29 @@ const serverConfig = computed(() => {
   return getServerResult.value?.serverConfigs?.[0] || null;
 });
 
-const discussions = computed<Discussion[]>(() => {
-  if (!discussionResult.value) {
-    return [];
-  }
-  const { getSiteWideDiscussionList } = discussionResult.value;
-  if (!getSiteWideDiscussionList) {
-    return [];
-  }
-  return getSiteWideDiscussionList.discussions;
-});
+// `useQuery` clears `result` to `undefined` while a variable-change refetch is
+// in flight (e.g. the logged-in username resolving client-side after
+// hydration). Rendering the list straight from `result` would blank it to a
+// skeleton and back — the content -> skeleton -> content flash. Hold the last
+// loaded page here so the list stays put and the skeleton stays gated on the
+// genuine first load. (The list query adds a `score` field not on `Discussion`.)
+type SiteWideDiscussion = Discussion & { score: number };
+
+const loadedDiscussions = ref<SiteWideDiscussion[]>([]);
+const loadedAggregateCount = ref(0);
+
+watch(
+  discussionResult,
+  (result) => {
+    const list = result?.getSiteWideDiscussionList;
+    if (!list) return;
+    loadedDiscussions.value = list.discussions ?? [];
+    loadedAggregateCount.value = list.aggregateDiscussionCount ?? 0;
+  },
+  { immediate: true }
+);
+
+const discussions = computed<SiteWideDiscussion[]>(() => loadedDiscussions.value);
 
 const selectedDiscussion = computed<Discussion | null>(() => {
   if (!selectedDiscussionId.value) return null;
@@ -169,13 +186,7 @@ const selectedDiscussionChannelLinks = computed(() => {
   });
 });
 
-const aggregateDiscussionCount = computed(() => {
-  if (!discussionResult.value) {
-    return 0;
-  }
-  return discussionResult.value.getSiteWideDiscussionList
-    .aggregateDiscussionCount;
-});
+const aggregateDiscussionCount = computed(() => loadedAggregateCount.value);
 
 const loadMore = () => {
   fetchMore({
@@ -261,9 +272,7 @@ const filterByChannel = (channel: string) => {
               </button>
             </div>
             <div
-              v-if="
-                discussionLoading && (!discussions || discussions.length === 0)
-              "
+              v-if="discussionLoading && discussions.length === 0"
               class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700"
             >
               <div
@@ -281,7 +290,7 @@ const filterByChannel = (channel: string) => {
               :text="discussionError.message"
             />
             <p
-              v-else-if="discussions && discussions.length === 0"
+              v-else-if="discussions.length === 0"
               class="my-6 flex gap-2 px-4"
             >
               <span class="dark:text-white"
@@ -311,8 +320,7 @@ const filterByChannel = (channel: string) => {
                 role="list"
               >
                 <SitewideDiscussionListItem
-                  v-for="discussion in discussionResult
-                    .getSiteWideDiscussionList.discussions"
+                  v-for="discussion in discussions"
                   :key="`${discussion.id}-${expandSitewideDiscussions}`"
                   :default-expanded="expandSitewideDiscussions"
                   :discussion="discussion"
@@ -326,19 +334,12 @@ const filterByChannel = (channel: string) => {
                   @filter-by-tag="filterByTag"
                 />
               </ul>
-              <div
-                v-if="
-                  discussionResult.getSiteWideDiscussionList.discussions
-                    .length > 0
-                "
-              >
+              <div v-if="discussions.length > 0">
                 <LoadMore
                   class="ml-4 justify-self-center"
                   :loading="discussionLoading"
                   :reached-end-of-results="
-                    aggregateDiscussionCount ===
-                    discussionResult.getSiteWideDiscussionList.discussions
-                      .length
+                    aggregateDiscussionCount === discussions.length
                   "
                   @load-more="loadMore"
                 />

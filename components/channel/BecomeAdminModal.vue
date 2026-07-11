@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import GenericModal from '@/components/GenericModal.vue';
+import AdminIcon from '@/components/icons/AdminIcon.vue';
 import { BECOME_CHANNEL_ADMIN } from '@/graphQLData/channel/mutations';
 
 const props = defineProps({
@@ -60,7 +61,7 @@ const body = computed(
     @secondary-button-click="$emit('close')"
   >
     <template #icon>
-      <i class="fas fa-user-shield dark:text-white" />
+      <AdminIcon class="dark:text-white" />
     </template>
   </GenericModal>
 </template>

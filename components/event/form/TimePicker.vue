@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { DateTime } from 'luxon';
+import ClockIcon from '@/components/icons/ClockIcon.vue';
 
 const props = defineProps({
   value: {
@@ -121,7 +122,7 @@ onUnmounted(() => {
 
       <!-- Time dropdown toggle button -->
       <div class="absolute right-3 top-1/2 -translate-y-1/2 transform">
-        <i class="far fa-clock text-gray-500 dark:text-gray-400" />
+        <ClockIcon class="h-4 w-4 text-gray-500 dark:text-gray-400" />
       </div>
     </div>
 

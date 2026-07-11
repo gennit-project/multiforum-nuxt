@@ -4,7 +4,9 @@ import { DateTime } from 'luxon';
 import { getDatePieces } from '@/utils';
 import Tag from '@/components/TagComponent.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
+import ArrowPath from '@/components/icons/ArrowPath.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
+import CommentIcon from '@/components/icons/CommentIcon.vue';
 import SeriesOccurrenceButtons from './SeriesOccurrenceButtons.vue';
 import type { PropType } from 'vue';
 import type { Event } from '@/__generated__/graphql';
@@ -253,7 +255,7 @@ const seriesOccurrences = computed(() => {
           class="mt-2 flex items-center gap-1 text-xs text-orange-600 dark:text-orange-400"
           title="Part of a series"
         >
-          <i class="fa-solid fa-repeat" aria-hidden="true" />
+          <ArrowPath class="h-4 w-4" aria-hidden="true" />
           <span class="sr-only">Part of a series</span>
         </div>
       </div>
@@ -346,7 +348,7 @@ const seriesOccurrences = computed(() => {
             :to="detailLink"
             class="mt-1 inline-flex items-center justify-start gap-1 rounded-md bg-gray-100 px-4 py-1 text-xs text-black hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
           >
-            <i class="fa-regular fa-comment mr-2 h-4 w-4" aria-hidden="true" />
+            <CommentIcon class="mr-2 h-4 w-4" aria-hidden="true" />
             <span class="text black text-sm dark:text-white">{{
               `${commentCount}`
             }}</span>
@@ -362,10 +364,7 @@ const seriesOccurrences = computed(() => {
             <span
               class="-ml-1 mt-1 inline-flex items-center rounded-md bg-gray-100 px-4 pb-2 pt-2 text-sm text-black hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
             >
-              <i
-                class="fa-regular fa-comment mr-2 h-4 w-4"
-                aria-hidden="true"
-              />
+              <CommentIcon class="mr-2 h-4 w-4" aria-hidden="true" />
               {{
                 `${commentCount} ${
                   commentCount === 1 ? 'comment' : 'comments'

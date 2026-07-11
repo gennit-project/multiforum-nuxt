@@ -4,6 +4,8 @@ import { useHead, useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import type { Collection } from '@/__generated__/graphql';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
+import SearchIcon from '@/components/icons/SearchIcon.vue';
 import {
   GET_USER_FAVORITE_COUNTS,
   GET_USER_FAVORITE_DOWNLOADS_COUNT,
@@ -428,9 +430,9 @@ const isUploadedFilesActive = computed(
                     {{ activeLibraryItem?.name ?? 'Browse collections' }}
                   </p>
                 </div>
-                <i
-                  class="fa-solid ml-3 h-4 w-4 flex-shrink-0 text-gray-500 transition-transform dark:text-gray-400"
-                  :class="isMobileNavOpen ? 'fa-chevron-up' : 'fa-chevron-down'"
+                <ChevronDownIcon
+                  class="ml-3 h-4 w-4 flex-shrink-0 text-gray-500 transition-transform dark:text-gray-400"
+                  :class="isMobileNavOpen ? 'rotate-180' : ''"
                 />
               </button>
 
@@ -442,7 +444,7 @@ const isUploadedFilesActive = computed(
                   <span
                     class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-gray-500"
                   >
-                    <i class="fa-solid fa-magnifying-glass text-sm" />
+                    <SearchIcon class="h-4 w-4" />
                   </span>
                   <input
                     v-model="searchTerm"
@@ -685,7 +687,7 @@ const isUploadedFilesActive = computed(
                   <span
                     class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-gray-500"
                   >
-                    <i class="fa-solid fa-magnifying-glass text-sm" />
+                    <SearchIcon class="h-4 w-4" />
                   </span>
                   <input
                     v-model="searchTerm"

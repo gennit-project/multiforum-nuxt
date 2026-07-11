@@ -2,6 +2,8 @@
 import { computed } from 'vue';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
+import MoonIcon from '@/components/icons/MoonIcon.vue';
+import SunIcon from '@/components/icons/SunIcon.vue';
 
 const uiStore = useUIStore();
 const { theme } = storeToRefs(uiStore);
@@ -45,7 +47,7 @@ const toggleTheme = () => {
           ]"
           aria-hidden="true"
         >
-          <i class="fa-solid fa-sun text-sm text-orange-500" />
+          <SunIcon class="h-3.5 w-3.5 text-orange-500" />
         </span>
 
         <!-- Moon icon in dark mode -->
@@ -58,7 +60,7 @@ const toggleTheme = () => {
           ]"
           aria-hidden="true"
         >
-          <i class="fa-solid fa-moon text-sm text-white" />
+          <MoonIcon class="h-3.5 w-3.5 text-white" />
         </span>
       </span>
     </button>
@@ -83,13 +85,13 @@ const toggleTheme = () => {
             class="absolute inset-0 flex size-full items-center justify-center opacity-100 transition-opacity duration-200 ease-in dark:opacity-0 dark:duration-100 dark:ease-out"
             aria-hidden="true"
           >
-            <i class="fa-solid fa-sun text-sm text-orange-500" />
+            <SunIcon class="h-3.5 w-3.5 text-orange-500" />
           </span>
           <span
             class="absolute inset-0 flex size-full items-center justify-center opacity-0 transition-opacity duration-100 ease-out dark:opacity-100 dark:duration-200 dark:ease-in"
             aria-hidden="true"
           >
-            <i class="fa-solid fa-moon text-sm text-white" />
+            <MoonIcon class="h-3.5 w-3.5 text-white" />
           </span>
         </span>
       </button>

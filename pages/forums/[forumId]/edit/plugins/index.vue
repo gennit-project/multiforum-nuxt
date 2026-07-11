@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useApolloClient, useMutation, useQuery } from '@vue/apollo-composable';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { useToast } from '@/composables/useToast';
 import { GET_INSTALLED_PLUGINS } from '@/graphQLData/admin/queries';
 import {
@@ -442,7 +443,7 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
 
     <div v-if="isLoading" class="py-8 text-center">
       <div class="inline-flex items-center">
-        <i class="fa-solid fa-spinner mr-2 animate-spin" />
+        <LoadingSpinner class="mr-2 inline-flex" />
         Loading plugins...
       </div>
     </div>
@@ -621,9 +622,9 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
                   "
                 >
                 <span class="text-sm text-gray-700 dark:text-gray-300">
-                  <i
+                  <LoadingSpinner
                     v-if="isConsolidatedToggling(consolidated)"
-                    class="fa-solid fa-spinner animate-spin"
+                    class="inline-flex"
                   />
                   <span v-else>Enabled</span>
                 </span>

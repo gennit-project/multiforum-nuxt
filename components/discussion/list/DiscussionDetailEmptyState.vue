@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import CommentIcon from '@/components/icons/CommentIcon.vue';
+
 defineProps({
   message: {
     type: String,
@@ -34,7 +36,7 @@ defineProps({
         class="absolute right-5 top-0 flex h-24 w-28 items-center justify-center rounded-[1.25rem] border border-orange-300/80 bg-orange-100/80 shadow-sm dark:border-orange-500/30 dark:bg-orange-500/10"
       >
         <div class="relative">
-          <i class="fa-regular fa-comments text-3xl text-orange-500 dark:text-orange-300" />
+          <CommentIcon class="h-8 w-8 text-orange-500 dark:text-orange-300" />
           <div class="absolute -right-5 -top-3 h-5 w-5 rounded-full border-2 border-white bg-amber-300 dark:border-gray-900 dark:bg-amber-400" />
         </div>
       </div>

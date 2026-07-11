@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import GenericModal from '@/components/GenericModal.vue';
 import ExclamationIcon from '@/components/icons/ExclamationIcon.vue';
+import TrashIcon from '@/components/icons/TrashIcon.vue';
 
 withDefaults(defineProps<{
   title?: string;
@@ -38,7 +39,7 @@ withDefaults(defineProps<{
     :loading="loading"
   >
     <template #icon>
-      <i v-if="icon === 'trash'" class="fas fa-trash-alt dark:text-gray-100" />
+      <TrashIcon v-if="icon === 'trash'" class="dark:text-gray-100" />
       <ExclamationIcon v-else class="dark:text-gray-100" />
     </template>
   </GenericModal>

@@ -11,6 +11,8 @@ import {
 } from '@headlessui/vue';
 import { CREATE_SCRATCHPAD_ENTRY } from '@/graphQLData/scratchpad/mutations';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import StarIcon from '@/components/icons/StarIcon.vue';
 import { useUsername } from '@/composables/useAuthState';
 
 const usernameVar = useUsername();
@@ -166,8 +168,9 @@ const handleSubmit = () => {
                   <div
                     class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"
                   >
-                    <i
-                      class="fa-solid fa-star text-white text-xl"
+                    <StarIcon
+                      class="h-6 w-6 fill-current text-white"
+                      filled
                       aria-hidden="true"
                     />
                   </div>
@@ -239,14 +242,15 @@ const handleSubmit = () => {
                     }"
                     @click="handleSubmit"
                   >
-                    <i
+                    <LoadingSpinner
                       v-if="loading"
-                      class="fa-solid fa-spinner fa-spin"
+                      class="h-4 w-4"
                       aria-hidden="true"
                     />
-                    <i
+                    <StarIcon
                       v-else
-                      class="fa-solid fa-star"
+                      class="h-4 w-4 fill-current"
+                      filled
                       aria-hidden="true"
                     />
                     {{ loading ? 'Sending...' : 'Send & Super Upvote' }}

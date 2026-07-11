@@ -10,6 +10,9 @@ import {
 import { useUsername } from '@/composables/useAuthState';
 import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
 import AddImage from '@/components/AddImage.vue';
+import ImageIcon from '@/components/icons/ImageIcon.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import TrashIcon from '@/components/icons/TrashIcon.vue';
 
 defineProps<{
   imageUrl?: string | null;
@@ -110,25 +113,7 @@ const removeImage = () => {
         class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50"
       >
         <div class="flex flex-col items-center text-white">
-          <div class="h-8 w-8 text-white">
-            <svg
-              class="h-8 w-8 animate-spin"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle
-                cx="12"
-                cy="12"
-                r="10"
-                stroke-dasharray="42"
-                stroke-dashoffset="12"
-                stroke-linecap="round"
-              />
-            </svg>
-          </div>
+          <LoadingSpinner class="h-8 w-8 text-white" />
           <span class="mt-2">Uploading image...</span>
         </div>
       </div>
@@ -153,7 +138,7 @@ const removeImage = () => {
         }"
         @click="removeImage"
       >
-        <i class="fa fa-trash-can mr-2" /> Remove Image
+        <TrashIcon class="mr-2 h-4 w-4" /> Remove Image
       </button>
     </div>
   </div>
@@ -165,25 +150,7 @@ const removeImage = () => {
     <div
       class="flex flex-col items-center justify-center space-y-2 text-gray-500 dark:text-gray-300"
     >
-      <div class="h-8 w-8">
-        <svg
-          class="h-8 w-8 animate-spin"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <circle
-            cx="12"
-            cy="12"
-            r="10"
-            stroke-dasharray="42"
-            stroke-dashoffset="12"
-            stroke-linecap="round"
-          />
-        </svg>
-      </div>
+      <LoadingSpinner class="h-8 w-8" />
       <span>Uploading image...</span>
     </div>
   </div>
@@ -192,7 +159,7 @@ const removeImage = () => {
     <div
       class="bg-gray-50 rounded-md border border-dashed border-gray-300 p-8 text-center dark:border-gray-600 dark:bg-gray-800"
     >
-      <i class="fa fa-image mb-3 text-3xl text-gray-400 dark:text-gray-500" />
+      <ImageIcon class="mx-auto mb-3 h-8 w-8 text-gray-400 dark:text-gray-500" />
       <span class="mb-3 block text-sm text-gray-500 dark:text-gray-400">
         No cover image uploaded
       </span>

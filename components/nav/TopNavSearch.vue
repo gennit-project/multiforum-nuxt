@@ -5,6 +5,7 @@ import SearchBar from '@/components/SearchBar.vue';
 import FilterChip from '@/components/FilterChip.vue';
 import SearchableForumList from '@/components/channel/SearchableForumList.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
 import SearchIcon from '@/components/icons/SearchIcon.vue';
 import { getChannelLabel } from '@/utils';
 import {
@@ -284,9 +285,9 @@ onBeforeUnmount(() => {
                 @click="selectedType = option.value"
               >
                 <span>{{ option.label }}</span>
-                <i
+                <CheckIcon
                   v-if="selectedType === option.value"
-                  class="fa-solid fa-check text-xs text-orange-500"
+                  class="h-3 w-3 text-orange-500"
                 />
               </button>
             </div>
@@ -308,9 +309,9 @@ onBeforeUnmount(() => {
                 @click="selectedModified = option.value"
               >
                 <span>{{ option.label }}</span>
-                <i
+                <CheckIcon
                   v-if="selectedModified === option.value"
-                  class="fa-solid fa-check text-xs text-orange-500"
+                  class="h-3 w-3 text-orange-500"
                 />
               </button>
             </div>

@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import GenericModal from '@/components/GenericModal.vue';
 import RevisionDiffContent from '@/components/revision/RevisionDiffContent.vue';
+import PlusMinusIcon from '@/components/icons/PlusMinusIcon.vue';
 import { useMutation } from '@vue/apollo-composable';
 import { DELETE_COMMENT_REVISION } from '@/graphQLData/comment/mutations';
 
@@ -81,9 +82,7 @@ onDone(() => {
     @danger-button-click="handleDelete"
   >
     <template #icon>
-      <i
-        class="fa-solid fa-plus-minus text-lg text-orange-600 dark:text-orange-400"
-      />
+      <PlusMinusIcon class="h-5 w-5 text-orange-600 dark:text-orange-400" />
     </template>
     <template #content>
       <RevisionDiffContent

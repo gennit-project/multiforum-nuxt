@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { PropType } from 'vue';
 import type { AutosaveStatus } from '@/composables/useSettingAutosave';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
+import ExclamationIcon from '@/components/icons/ExclamationIcon.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 
 defineProps({
   status: {
@@ -30,7 +33,7 @@ defineProps({
       role="status"
       aria-live="polite"
     >
-      <i class="fa-solid fa-spinner mr-1.5 animate-spin" aria-hidden="true" />
+      <LoadingSpinner class="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
       Saving…
     </span>
     <span
@@ -39,7 +42,7 @@ defineProps({
       role="status"
       aria-live="polite"
     >
-      <i class="fa-solid fa-check mr-1.5" aria-hidden="true" />
+      <CheckIcon class="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
       Saved
     </span>
     <span
@@ -47,10 +50,7 @@ defineProps({
       class="flex items-center text-red-600 dark:text-red-400"
       role="alert"
     >
-      <i
-        class="fa-solid fa-triangle-exclamation mr-1.5"
-        aria-hidden="true"
-      />
+      <ExclamationIcon class="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
       {{ errorMessage || 'Could not save. Retrying on your next change.' }}
     </span>
   </div>

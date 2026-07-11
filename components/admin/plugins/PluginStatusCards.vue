@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
+
 defineProps<{
   isEnabled: boolean;
   installedVersion?: string | null;
@@ -63,7 +65,7 @@ const emit = defineEmits<{
           :disabled="enabling"
           @click="emit('toggle-enabled', false)"
         >
-          <i v-if="enabling" class="fa-solid fa-spinner mr-2 animate-spin" />
+          <LoadingSpinner v-if="enabling" class="mr-2 inline-flex" />
           Disable
         </button>
       </div>
@@ -85,7 +87,7 @@ const emit = defineEmits<{
           :disabled="enabling"
           @click="emit('toggle-enabled', true)"
         >
-          <i v-if="enabling" class="fa-solid fa-spinner mr-2 animate-spin" />
+          <LoadingSpinner v-if="enabling" class="mr-2 inline-flex" />
           <i v-else class="fa-solid fa-power-off mr-2" />
           Enable Plugin
         </button>

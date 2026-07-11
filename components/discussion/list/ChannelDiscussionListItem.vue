@@ -18,6 +18,8 @@ import type {
 } from '@/__generated__/graphql';
 import type { DiscussionChannelWithFavorited } from '@/types/Discussion';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
+import CommentIcon from '@/components/icons/CommentIcon.vue';
+import ExpandIcon from '@/components/icons/ExpandIcon.vue';
 import { storeToRefs } from 'pinia';
 import { useUIStore } from '@/stores/uiStore';
 import { useQuery } from '@vue/apollo-composable';
@@ -26,6 +28,7 @@ import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { getAuthorBadges } from '@/utils/roleBadges';
+import XmarkIcon from '@/components/icons/XmarkIcon.vue';
 
 const usernameVar = useUsername();
 const isAuthenticatedVar = useIsAuthenticated();
@@ -354,14 +357,14 @@ const revealSensitiveContent = () => {
                   :aria-expanded="isExpanded"
                   @click="isExpanded = !isExpanded"
                 >
-                  <i
+                  <ExpandIcon
                     v-if="!isExpanded"
-                    class="fa-solid fa-expand mr-1 text-xs"
+                    class="mr-1 h-3 w-3"
                     aria-hidden="true"
                   />
-                  <i
+                  <XmarkIcon
                     v-else
-                    class="fa-solid fa-x mr-1 text-xs"
+                    class="mr-1 h-3 w-3"
                     aria-hidden="true"
                   />
                   {{ isExpanded ? 'Collapse' : 'Expand' }}
@@ -469,7 +472,7 @@ const revealSensitiveContent = () => {
                   }"
                   class="flex items-center gap-2 rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700 dark:hover:bg-gray-600"
                 >
-                  <i class="fa-regular fa-comment text-xs" aria-hidden="true" />
+                  <CommentIcon class="h-3 w-3" aria-hidden="true" />
                   <span class="text-sm">{{ commentCount }}</span>
                 </nuxt-link>
               </div>

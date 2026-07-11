@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import BellIcon from '@/components/icons/BellIcon.vue';
 import { computed } from 'vue';
 
 interface Props {
@@ -56,7 +57,7 @@ const handleClick = () => {
         :class="buttonClasses"
         @click="handleClick"
       >
-        <i class="fas fa-bell mr-1.5 text-sm" aria-hidden="true" />
+        <BellIcon class="mr-1.5 h-4 w-4" aria-hidden="true" />
         {{ isSubscribed ? 'Unsubscribe' : 'Subscribe' }}
       </button>
       <div v-else class="inline-flex items-center px-3 py-1.5">
@@ -68,7 +69,7 @@ const handleClick = () => {
     </template>
     <template #does-not-have-auth>
       <button type="button" :class="unauthenticatedButtonClasses">
-        <i class="fas fa-bell mr-1.5 text-sm" aria-hidden="true" />
+        <BellIcon class="mr-1.5 h-4 w-4" aria-hidden="true" />
         Subscribe
       </button>
     </template>

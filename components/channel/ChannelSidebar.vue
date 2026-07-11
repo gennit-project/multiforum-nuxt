@@ -3,13 +3,18 @@ import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 import Tag from '@/components/TagComponent.vue';
 import type { Channel } from '@/__generated__/graphql';
+import AdminIcon from '@/components/icons/AdminIcon.vue';
 import ChannelRules from '@/components/channel/Rules.vue';
+import DocumentIcon from '@/components/icons/DocumentIcon.vue';
 import SidebarEventList from '@/components/channel/SidebarEventList.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import { useRouter, useRoute } from 'nuxt/app';
 import FontSizeControl from '@/components/channel/FontSizeControl.vue';
 import BecomeAdminModal from '@/components/channel/BecomeAdminModal.vue';
 import AddToChannelFavorites from '@/components/favorites/AddToChannelFavorites.vue';
+import RobotIcon from '@/components/icons/RobotIcon.vue';
+import TagIcon from '@/components/icons/TagIcon.vue';
+import ThumbtackIcon from '@/components/icons/ThumbtackIcon.vue';
 import { useIsAuthenticated } from '@/composables/useAuthState';
 
 const isAuthenticatedVar = useIsAuthenticated();
@@ -176,7 +181,7 @@ const handleBecomeAdminSuccess = () => {
             <span
               class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
             >
-              <i class="fa-solid fa-thumbtack mr-2" />Pinned Wiki Pages
+              <ThumbtackIcon class="mr-2 h-4 w-4" />Pinned Wiki Pages
             </span>
             <div class="flex flex-col gap-2 text-sm">
               <nuxt-link
@@ -197,7 +202,7 @@ const handleBecomeAdminSuccess = () => {
             <span
               class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
             >
-              <i class="fa-solid fa-scroll mr-2" />Forum Rules
+              <DocumentIcon class="mr-2 h-4 w-4" />Forum Rules
             </span>
             <ChannelRules :rules="channelRules" />
           </div>
@@ -211,7 +216,7 @@ const handleBecomeAdminSuccess = () => {
               <span
                 class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
               >
-                <i class="fa-solid fa-tags mr-2" />Tags
+                <TagIcon class="mr-2 h-4 w-4" />Tags
               </span>
             </div>
             <div class="mb-6 mt-2 flex flex-wrap gap-2">
@@ -231,7 +236,7 @@ const handleBecomeAdminSuccess = () => {
             <span
               class="my-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
             >
-              <i class="fa-solid fa-user-shield mr-2" />Admins
+              <AdminIcon class="mr-2 h-4 w-4" />Admins
             </span>
           </div>
 
@@ -285,7 +290,7 @@ const handleBecomeAdminSuccess = () => {
               <span
                 class="my-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
               >
-                <i class="fa-solid fa-robot mr-2" />Bots
+                <RobotIcon class="mr-2 h-4 w-4" />Bots
               </span>
             </div>
 

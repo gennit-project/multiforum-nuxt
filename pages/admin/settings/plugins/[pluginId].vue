@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PluginDetailHeader from '@/components/admin/plugins/PluginDetailHeader.vue';
 import PluginStatusCards from '@/components/admin/plugins/PluginStatusCards.vue';
 import PluginUpdateBanner from '@/components/admin/plugins/PluginUpdateBanner.vue';
@@ -576,7 +577,7 @@ const handleSaveSettings = async () => {
         <!-- Loading State (only show on initial load, not refetches) -->
         <div v-if="isInitialLoading" class="py-8 text-center">
           <div class="inline-flex items-center">
-            <i class="fa-solid fa-spinner mr-2 animate-spin" />
+            <LoadingSpinner class="mr-2 inline-flex" />
             Loading plugin details...
           </div>
         </div>
@@ -668,7 +669,7 @@ const handleSaveSettings = async () => {
           <!-- Loading State for Secrets -->
           <div v-if="secretsLoading" class="py-4 text-center">
             <div class="inline-flex items-center">
-              <i class="fa-solid fa-spinner mr-2 animate-spin" />
+              <LoadingSpinner class="mr-2 inline-flex" />
               Loading secrets...
             </div>
           </div>
