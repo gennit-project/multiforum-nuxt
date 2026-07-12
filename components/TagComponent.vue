@@ -86,23 +86,35 @@ function getButtonStyles() {
     :class="tagClasses"
     @mouseenter="highlightedByMouse = true"
     @mouseleave="highlightedByMouse = false"
-    @click="handleTagClick(props.tag, props.active)"
   >
-    <AvatarComponent
-      v-if="props.channelMode && !props.hideIcon"
-      :class="[props.clearable ? 'mr-1' : '', 'h-6 w-6']"
-      class="inline-flex"
-      :text="props.tag"
-      :src="props.icon"
-      :is-square="true"
-    />
-    {{ props.tag }}
-    <XmarkIcon
+    <!-- Real button so the tag is keyboard-operable; the click still bubbles to
+         the root span, so consumers listening via @click keep working. -->
+    <button
+      type="button"
+      :aria-pressed="props.active"
+      class="inline-flex items-center gap-1 p-0 text-inherit focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-1"
+      @click="handleTagClick(props.tag, props.active)"
+    >
+      <AvatarComponent
+        v-if="props.channelMode && !props.hideIcon"
+        :class="[props.clearable ? 'mr-1' : '', 'h-6 w-6']"
+        class="inline-flex"
+        :text="props.tag"
+        :src="props.icon"
+        :is-square="true"
+      />
+      {{ props.tag }}
+    </button>
+    <button
       v-if="props.clearable"
+      type="button"
       data-testid="tag-delete"
-      class="mr-1 h-4 w-4 cursor-pointer"
-      @click="emits('delete', props.index)"
-    />
+      :aria-label="`Remove ${props.tag}`"
+      class="inline-flex items-center p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+      @click.stop="emits('delete', props.index)"
+    >
+      <XmarkIcon class="mr-1 h-4 w-4" aria-hidden="true" />
+    </button>
   </span>
 </template>
 
