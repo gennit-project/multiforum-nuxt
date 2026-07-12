@@ -85,6 +85,15 @@ describe('ServerSuspendedUserList content', () => {
     expect(wrapper.text()).toContain('alice');
   });
 
+  it('renders the suspensions as a semantic list', () => {
+    h.result = ref(
+      withUsers([suspension({ id: 'a' }), suspension({ id: 'b' })])
+    );
+    const wrapper = mountList();
+
+    expect(wrapper.findAll('ul[role="list"] > li')).toHaveLength(2);
+  });
+
   it('shows a bot badge for a suspended bot', () => {
     h.result = ref({
       serverConfigs: [

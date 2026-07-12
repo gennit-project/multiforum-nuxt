@@ -67,6 +67,27 @@ describe('LinkPreview', () => {
     expect(wrapper.find('img').exists()).toBe(false);
   });
 
+  it('gives the image a url-based alt when no title is available', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() =>
+        Promise.resolve({
+          json: () =>
+            Promise.resolve({
+              hybridGraph: { image: 'https://x/og.png' },
+              htmlInferred: {},
+            }),
+        })
+      )
+    );
+    const wrapper = mountPreview('https://example.com/page');
+    await flushPromises();
+
+    expect(wrapper.find('img').attributes('alt')).toBe(
+      'Preview image for https://example.com/page'
+    );
+  });
+
   it('falls back to the url as the title when no title is returned', async () => {
     vi.stubGlobal(
       'fetch',
