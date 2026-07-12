@@ -72,14 +72,19 @@ describe('test-auth client plugin', () => {
     });
   });
 
-  it('still exposes the debug auth helpers when only the token is present', () => {
-    localStorage.setItem('token', 'mock-token');
+  it('does not treat a real token without mock markers as test auth', () => {
+    localStorage.setItem('token', 'real-session-token');
 
     run();
 
-    expect(
-      typeof (window as typeof window & { __SET_AUTH_STATE_DIRECT__?: unknown })
-        .__SET_AUTH_STATE_DIRECT__
-    ).toBe('function');
+    expect({
+      authenticatedWrites: h.setIsAuthenticated.mock.calls,
+      usernameWrites: h.setUsername.mock.calls,
+      emailWrites: h.setEmail.mock.calls,
+    }).toEqual({
+      authenticatedWrites: [],
+      usernameWrites: [],
+      emailWrites: [],
+    });
   });
 });
