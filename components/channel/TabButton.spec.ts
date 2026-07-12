@@ -13,8 +13,8 @@ const mountTab = (props: Record<string, unknown> = {}, slot = '') =>
     slots: { default: slot },
     global: {
       stubs: {
-        NuxtLink: { props: ['to'], template: '<a :class="$attrs.class"><slot /></a>' },
-        'nuxt-link': { props: ['to'], template: '<a :class="$attrs.class"><slot /></a>' },
+        NuxtLink: { props: ['to'], template: '<a v-bind="$attrs"><slot /></a>' },
+        'nuxt-link': { props: ['to'], template: '<a v-bind="$attrs"><slot /></a>' },
       },
     },
   });
@@ -74,6 +74,18 @@ describe('TabButton active state', () => {
     const wrapper = mountTab({ isActive: true, vertical: true });
 
     expect(wrapper.find('a').classes()).toContain('bg-gray-100');
+  });
+
+  it('marks the active tab with aria-current="page"', () => {
+    const wrapper = mountTab({ isActive: true });
+
+    expect(wrapper.find('a').attributes('aria-current')).toBe('page');
+  });
+
+  it('omits aria-current on an inactive tab', () => {
+    const wrapper = mountTab({ isActive: false });
+
+    expect(wrapper.find('a').attributes('aria-current')).toBeUndefined();
   });
 });
 

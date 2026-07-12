@@ -93,6 +93,7 @@ const innerClasses = computed(() => [
   <nuxt-link
     :data-testid="dataTestid"
     :to="to"
+    :aria-current="isActive ? 'page' : undefined"
     class="border-transparent link group inline-flex items-center gap-1 pt-2 font-medium hover:text-gray-600 dark:text-gray-400"
     :class="classes"
     @mouseenter="isHovered = true"
