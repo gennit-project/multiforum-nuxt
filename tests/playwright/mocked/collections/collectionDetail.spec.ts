@@ -85,7 +85,9 @@ test.describe('Public collection detail', () => {
     try {
       await page.goto(`/collections/${COLLECTION_ID}`);
 
-      await expect(page.getByText('My Favorite Models')).toBeVisible();
+      await expect(
+        page.getByRole('heading', { name: 'My Favorite Models' })
+      ).toBeVisible();
       await expect(
         page.getByText('A public collection of 3D models.')
       ).toBeVisible();
