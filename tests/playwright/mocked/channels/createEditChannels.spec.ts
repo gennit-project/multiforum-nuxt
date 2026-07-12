@@ -346,13 +346,13 @@ test('creates and edits a channel', async ({
     const tagCheckbox = page.getByLabel(`Select ${TEST_TAG}`);
     await page.getByText(TEST_TAG, { exact: true }).click();
     await expect(tagCheckbox).toBeChecked();
-    await expect(tagPicker).toContainText(TEST_TAG);
+    await expect(tagPicker).toHaveAttribute('aria-label', new RegExp(TEST_TAG));
     await page.getByRole('button', { name: 'Save' }).first().click();
     await waitForGraphqlOperation(diagnostics.completedOperations, 'updateChannel');
 
     await expect(page.getByText('Your changes have been saved.')).toBeVisible();
     await expect(descriptionInput).toHaveValue(TEST_DESCRIPTION);
-    await expect(tagPicker).toContainText(TEST_TAG);
+    await expect(tagPicker).toHaveAttribute('aria-label', new RegExp(TEST_TAG));
 
     expect(diagnostics.pageErrors).toEqual([]);
   } finally {
