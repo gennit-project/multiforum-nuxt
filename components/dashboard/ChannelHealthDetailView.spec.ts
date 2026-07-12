@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { mount } from '@vue/test-utils';
-import { ref } from 'vue';
+import { shallowMount } from '@vue/test-utils';
+import { defineComponent, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -11,6 +11,24 @@ vi.mock('@vue/apollo-composable', () => ({
 vi.mock('vue-router', () => ({
   useRoute: vi.fn(),
   useRouter: vi.fn(),
+}));
+
+const ServerDashboardActivityChartStub = defineComponent({
+  name: 'ServerDashboardActivityChart',
+  template: '<div class="server-dashboard-activity-chart-stub" />',
+});
+
+const ServerDashboardIssueAgingStub = defineComponent({
+  name: 'ServerDashboardIssueAging',
+  template: '<div class="server-dashboard-issue-aging-stub" />',
+});
+
+vi.mock('@/components/admin/ServerDashboardActivityChart.vue', () => ({
+  default: ServerDashboardActivityChartStub,
+}));
+
+vi.mock('@/components/admin/ServerDashboardIssueAging.vue', () => ({
+  default: ServerDashboardIssueAgingStub,
 }));
 
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
@@ -90,7 +108,7 @@ const mountDetail = async () => {
   });
 
   const Component = (await import('./ChannelHealthDetailView.vue')).default;
-  const wrapper = mount(Component, {
+  const wrapper = shallowMount(Component, {
     props: {
       channelUniqueName: 'general',
       audienceLabel: 'Admin dashboard',
@@ -154,7 +172,12 @@ describe('ChannelHealthDetailView', () => {
     expect(wrapper.text()).toContain('Channel health detail for the admin dashboard.');
     expect(wrapper.text()).toContain('Contributions');
     expect(wrapper.text()).toContain('15');
-    expect(wrapper.text()).toContain('Issue Aging');
+    expect(wrapper.findComponent(ServerDashboardActivityChartStub).exists()).toBe(
+      true
+    );
+    expect(wrapper.findComponent(ServerDashboardIssueAgingStub).exists()).toBe(
+      true
+    );
     expect(wrapper.html()).toContain('href="/admin/dashboard"');
     expect(wrapper.html()).toContain('href="/forums/general"');
   });

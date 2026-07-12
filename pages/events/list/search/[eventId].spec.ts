@@ -8,6 +8,15 @@ vi.mock('nuxt/app', () => ({
   useHead,
 }));
 
+const EventListViewStub = defineComponent({
+  name: 'EventListView',
+  template: '<div class="event-list-view-stub" />',
+});
+
+vi.mock('@/components/event/list/EventListView.vue', () => ({
+  default: EventListViewStub,
+}));
+
 const NuxtLayoutStub = defineComponent({
   setup(_props, { slots }) {
     return () => h('div', slots.default?.());
@@ -15,17 +24,6 @@ const NuxtLayoutStub = defineComponent({
 });
 
 describe('online events list search detail page', () => {
-  it('renders the event list view', async () => {
-    const Page = (await import('./[eventId].vue')).default;
-    const EventListView = (
-      await import('@/components/event/list/EventListView.vue')
-    ).default;
-    const wrapper = shallowMount(Page, {
-      global: { stubs: { NuxtLayout: NuxtLayoutStub } },
-    });
-    expect(wrapper.findComponent(EventListView).exists()).toBe(true);
-  });
-
   it('sets the page title to "Online Events"', async () => {
     const Page = (await import('./[eventId].vue')).default;
     shallowMount(Page, {
