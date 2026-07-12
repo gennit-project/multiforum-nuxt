@@ -24,7 +24,6 @@ const emit = defineEmits<{
     :disabled="disabled"
     :loading="loading"
     class="border-transparent ml-3 inline-flex justify-center rounded-full border px-4 py-2 text-sm font-medium shadow-sm dark:border-gray-700"
-    @keydown.enter.prevent
     @click="emit('click', $event)"
   />
 </template>

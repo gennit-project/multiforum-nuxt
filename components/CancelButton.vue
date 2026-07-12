@@ -10,6 +10,5 @@ import GenericButton from '@/components/GenericButton.vue';
       'dark:bg-opacity-60', // class for controlling the background opacity in dark mode
     ]"
     class="hover:bg-gray-50 rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-    @keydown.enter.prevent
   />
 </template>

@@ -81,6 +81,7 @@ const deleteRule = (index: number) => {
       </div>
     </div>
     <button
+      type="button"
       class="mt-2 rounded border border-orange-500 px-2 py-1 text-orange-500"
       @click="addNewRule"
     >
