@@ -27,9 +27,6 @@ type UserProfileCounts = User & {
   AuthoredWikiPageVersionsAggregate?: {
     count?: number | null;
   } | null;
-  ScratchpadEntriesAggregate?: {
-    count?: number | null;
-  } | null;
 };
 
 const props = defineProps({
@@ -134,13 +131,6 @@ const tabs = computed(() => {
       to: getTabTo(`/u/${usernameInParams.value}/albums`),
       current: false,
       count: props.user?.AlbumsAggregate?.count,
-    },
-    {
-      name: 'Kudos',
-      path: `/u/${usernameInParams.value}/scratchpad`,
-      to: getTabTo(`/u/${usernameInParams.value}/scratchpad`),
-      current: false,
-      count: props.user?.ScratchpadEntriesAggregate?.count,
     },
     {
       name: 'Owned Forums',

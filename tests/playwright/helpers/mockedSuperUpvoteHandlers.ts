@@ -298,7 +298,7 @@ export const createReceivedSuperUpvoteState = (
 
 const buildScratchpadNotification = (state: ReceivedSuperUpvoteState) => {
   const postUrl = `/forums/${state.channelId}/discussions/${state.discussionId}`;
-  const kudosUrl = `/u/${state.recipientUsername}/scratchpad`;
+  const kudosUrl = `/u/${state.recipientUsername}/kudos`;
   return {
     __typename: 'Notification' as const,
     id: state.notificationId,
@@ -423,6 +423,9 @@ export const createKudosPageHandlers = (
 
   getPublicScratchpadEntries: () => ({
     data: {
+      scratchpadEntriesAggregate: {
+        count: state.isPublic ? 1 : 0,
+      },
       scratchpadEntries: state.isPublic ? [buildScratchpadEntry(state)] : [],
     },
   }),

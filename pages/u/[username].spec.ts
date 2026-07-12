@@ -72,13 +72,17 @@ const stubs = {
   UserProfileSidebar: {
     name: 'UserProfileSidebar',
     props: ['serverRoleBadge'],
-    template: '<div class="sidebar" />',
+    template: '<div class="sidebar"><slot /></div>',
   },
   UserContributionChart: { template: '<div />' },
   ContributionChartSkeleton: { template: '<div />' },
   UserProfileChannelFilter: {
     name: 'UserProfileChannelFilter',
     template: '<div class="channel-filter" />',
+  },
+  ProfileKudosPreview: {
+    name: 'ProfileKudosPreview',
+    template: '<div class="profile-kudos-preview" />',
   },
   UserProfileTabs: {
     name: 'UserProfileTabs',
@@ -127,11 +131,19 @@ describe('User profile container', () => {
   });
 
   it('hides the channel filter on a non-filterable tab', async () => {
-    h.route = { path: '/u/alice/scratchpad', params: { username: 'alice' } };
+    h.route = { path: '/u/alice/kudos', params: { username: 'alice' } };
     const wrapper = await mountContainer();
     expect(
       wrapper.findComponent({ name: 'UserProfileChannelFilter' }).exists()
     ).toBe(false);
+  });
+
+  it('renders the kudos preview inside the sidebar layout', async () => {
+    const wrapper = await mountContainer();
+
+    expect(
+      wrapper.findComponent({ name: 'ProfileKudosPreview' }).exists()
+    ).toBe(true);
   });
 
   it('uses the full-width image layout on an image detail page', async () => {

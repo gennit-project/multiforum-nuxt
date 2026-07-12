@@ -2,10 +2,19 @@ import { gql } from '@apollo/client/core';
 
 // Get public scratchpad entries for a user profile (visible to everyone)
 export const GET_PUBLIC_SCRATCHPAD_ENTRIES = gql`
-  query getPublicScratchpadEntries($username: String!) {
+  query getPublicScratchpadEntries(
+    $username: String!
+    $limit: Int
+    $offset: Int
+  ) {
+    scratchpadEntriesAggregate(
+      where: { Recipient: { username: $username }, isPublic: true }
+    ) {
+      count
+    }
     scratchpadEntries(
       where: { Recipient: { username: $username }, isPublic: true }
-      options: { sort: [{ createdAt: DESC }] }
+      options: { sort: [{ createdAt: DESC }], limit: $limit, offset: $offset }
     ) {
       id
       createdAt

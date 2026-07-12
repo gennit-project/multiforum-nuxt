@@ -7,7 +7,10 @@ import {
 } from '@/graphQLData/scratchpad/queries';
 import ScratchpadEntry from './ScratchpadEntry.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import LoadMore from '@/components/LoadMore.vue';
 import { useUsername } from '@/composables/useAuthState';
+
+const PUBLIC_KUDOS_PAGE_LIMIT = 10;
 
 const usernameVar = useUsername();
 
@@ -26,8 +29,11 @@ const {
   loading: publicLoading,
   error: publicError,
   refetch: refetchPublic,
+  fetchMore: fetchMorePublic,
 } = useQuery(GET_PUBLIC_SCRATCHPAD_ENTRIES, () => ({
   username: props.username,
+  limit: PUBLIC_KUDOS_PAGE_LIMIT,
+  offset: 0,
 }));
 
 // Fetch pending entries (only for owner)
@@ -47,6 +53,13 @@ const {
 );
 
 const publicEntries = computed(() => publicResult.value?.scratchpadEntries || []);
+const publicEntriesAggregateCount = computed(() => {
+  return (
+    publicResult.value?.scratchpadEntriesAggregate?.count ??
+    publicEntries.value.length ??
+    0
+  );
+});
 const pendingEntries = computed(() => pendingResult.value?.scratchpadEntries || []);
 
 const hasPendingEntries = computed(
@@ -58,6 +71,32 @@ const hasNoEntries = computed(
 );
 
 const loading = computed(() => publicLoading.value || (isOwner.value && pendingLoading.value));
+const showLoadMore = computed(() => {
+  return publicEntriesAggregateCount.value > publicEntries.value.length;
+});
+
+const loadMorePublicEntries = async () => {
+  await fetchMorePublic({
+    variables: {
+      username: props.username,
+      limit: PUBLIC_KUDOS_PAGE_LIMIT,
+      offset: publicEntries.value.length,
+    },
+    updateQuery: (previousResult, { fetchMoreResult }) => {
+      if (!fetchMoreResult) {
+        return previousResult;
+      }
+
+      return {
+        ...fetchMoreResult,
+        scratchpadEntries: [
+          ...(previousResult.scratchpadEntries || []),
+          ...(fetchMoreResult.scratchpadEntries || []),
+        ],
+      };
+    },
+  });
+};
 
 const handleEntryUpdated = () => {
   refetchPublic();
@@ -163,6 +202,13 @@ const handleEntryDeleted = () => {
             @deleted="handleEntryDeleted"
           />
         </div>
+        <LoadMore
+          v-if="showLoadMore"
+          class="mt-4"
+          :loading="publicLoading"
+          :reached-end-of-results="!showLoadMore"
+          @load-more="loadMorePublicEntries"
+        />
       </div>
     </template>
   </div>

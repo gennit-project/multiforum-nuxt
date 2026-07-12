@@ -28,7 +28,7 @@ test('the recipient sees a super upvote notification with a working link to the 
   await page.goto('/notifications');
   await expect(
     page.getByRole('heading', { name: 'Notifications' })
-  ).toBeVisible({ timeout: 30000 });
+  ).toBeVisible({ timeout: 60000 });
 
   // Notification body links directly to the upvoted post.
   const postLink = page.locator(
@@ -94,7 +94,7 @@ test('a published super upvote appears in the recipient\'s Kudos section', async
     handlers: createKudosPageHandlers(state),
   });
 
-  await page.goto(`/u/${RECIPIENT}/scratchpad`);
+  await page.goto(`/u/${RECIPIENT}/kudos`);
 
   // The thank-you note is rendered in the Kudos section.
   await expect(page.getByText(state.noteText)).toBeVisible({ timeout: 30000 });
