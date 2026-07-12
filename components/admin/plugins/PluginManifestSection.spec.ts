@@ -25,14 +25,14 @@ describe('PluginManifestSection', () => {
   });
 
   it('renders the manifest inside a FormRow when present', () => {
-    const wrapper = mountSection({ manifestJson: '{\"name\":\"plugin\"}' });
+    const wrapper = mountSection({ manifestJson: '{"name":"plugin"}' });
 
     expect(wrapper.findComponent({ name: 'FormRow' }).exists()).toBe(true);
     expect(wrapper.text()).toContain('{"name":"plugin"}');
   });
 
   it('renders the manifest region with the expected accessible label', () => {
-    const wrapper = mountSection({ manifestJson: '{\"name\":\"plugin\"}' });
+    const wrapper = mountSection({ manifestJson: '{"name":"plugin"}' });
 
     expect(wrapper.get('[role="region"]').attributes('aria-label')).toBe(
       'Plugin manifest JSON'
