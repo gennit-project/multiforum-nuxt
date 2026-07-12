@@ -93,6 +93,44 @@ describe('FileTypePicker selection', () => {
     expect(wrapper.emitted('setSelectedFileTypes')?.[0]).toEqual([['glb']]);
   });
 
+  it('exposes each chip remove as a labelled button', () => {
+    const wrapper = mountPicker({ selectedFileTypes: ['png'] });
+
+    expect(
+      wrapper.get('button[aria-label="Remove png"]').element.tagName
+    ).toBe('BUTTON');
+  });
+
+  describe('keyboard accessibility', () => {
+    const trigger = (w: ReturnType<typeof mount>) =>
+      w.get('[data-testid="file-type-picker"]');
+
+    it('exposes the trigger as a combobox', () => {
+      const wrapper = mountPicker();
+
+      expect({
+        role: trigger(wrapper).attributes('role'),
+        expanded: trigger(wrapper).attributes('aria-expanded'),
+      }).toEqual({ role: 'combobox', expanded: 'false' });
+    });
+
+    it('opens the list from the trigger with ArrowDown', async () => {
+      const wrapper = mountPicker();
+
+      await trigger(wrapper).trigger('keydown', { key: 'ArrowDown' });
+
+      expect(wrapper.findComponent(listStub).exists()).toBe(true);
+    });
+
+    it('reflects the open state on aria-expanded', async () => {
+      const wrapper = mountPicker();
+
+      await trigger(wrapper).trigger('keydown', { key: 'Enter' });
+
+      expect(trigger(wrapper).attributes('aria-expanded')).toBe('true');
+    });
+  });
+
   it('syncs selection when the prop changes', async () => {
     const wrapper = mountPicker({ selectedFileTypes: ['png'] });
 
