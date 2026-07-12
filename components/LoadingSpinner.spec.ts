@@ -15,4 +15,24 @@ describe('LoadingSpinner', () => {
 
     expect(wrapper.classes()).toContain('dark:text-gray-200');
   });
+
+  it('exposes a status role so it announces when it appears', () => {
+    const wrapper = mountWithDefaults(LoadingSpinner);
+
+    expect(wrapper.attributes('role')).toBe('status');
+  });
+
+  it('renders a visually-hidden default loading label', () => {
+    const wrapper = mountWithDefaults(LoadingSpinner);
+
+    expect(wrapper.get('.sr-only').text()).toBe('Loading…');
+  });
+
+  it('uses a custom label when provided', () => {
+    const wrapper = mountWithDefaults(LoadingSpinner, {
+      props: { label: 'Saving…' },
+    });
+
+    expect(wrapper.get('.sr-only').text()).toBe('Saving…');
+  });
 });
