@@ -130,6 +130,7 @@ const isLoading = computed(() => updateLoading.value || deleteLoading.value);
 
 <template>
   <div
+    data-testid="scratchpad-entry"
     class="rounded-lg border p-4"
     :class="{
       'border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800': entry.isPublic,

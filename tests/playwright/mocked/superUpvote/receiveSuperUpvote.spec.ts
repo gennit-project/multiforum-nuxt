@@ -96,12 +96,13 @@ test('a published super upvote appears in the recipient\'s Kudos section', async
 
   await page.goto(`/u/${RECIPIENT}/kudos`);
 
-  // The thank-you note is rendered in the Kudos section. Scope to the kudos
-  // preview entry: the same note text also appears in the full ScratchpadEntry
-  // below, so an unscoped getByText races between the two and trips Playwright's
-  // strict mode once both have rendered.
+  // The thank-you note is rendered in the Kudos page's entry list. The same
+  // text also appears in the profile sidebar's kudos preview, which loads from
+  // a separate query — so an unscoped getByText races between the two and trips
+  // Playwright's strict mode once both have rendered. Scope to the main
+  // scratchpad entry, which is the page's own content and always present.
   await expect(
-    page.getByTestId('profile-kudos-preview-entry').getByText(state.noteText)
+    page.getByTestId('scratchpad-entry').getByText(state.noteText)
   ).toBeVisible({ timeout: 30000 });
   // It is shown as a public entry, not a pending one.
   await expect(page.getByText('Pending')).toHaveCount(0);
