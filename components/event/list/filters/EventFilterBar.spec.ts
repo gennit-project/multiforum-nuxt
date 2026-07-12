@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { nextTick, reactive } from 'vue';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createMockRoute, createMockRouter } from '@/tests/utils/mockRouter';
 
@@ -6,7 +7,7 @@ import { MilesOrKm } from '@/components/event/list/filters/eventSearchOptions';
 
 import EventFilterBar from '@/components/event/list/filters/EventFilterBar.vue';
 
-const route = createMockRoute({ name: 'EventList' });
+const route = reactive(createMockRoute({ name: 'EventList' }));
 const router = createMockRouter();
 vi.mock('nuxt/app', () => ({
   useRoute: () => route,
@@ -27,6 +28,7 @@ const heavyStubs = {
   TagIcon: true,
   FilterIcon: true,
   Popper: true,
+  CheckBox: true,
 };
 
 // Slot-rendering stubs so the filter controls (which live deep inside
@@ -34,7 +36,6 @@ const heavyStubs = {
 // and can emit the events the bar wires its update handlers to.
 const openStubs = {
   ...heavyStubs,
-  SearchBar: { name: 'SearchBar', template: '<div><slot /></div>' },
   LocationSearchBar: {
     name: 'LocationSearchBar',
     emits: ['update-location-input'],
@@ -56,11 +57,39 @@ const openStubs = {
     emits: ['update-show-only-free'],
     template: '<div />',
   },
+  SearchBar: {
+    name: 'SearchBar',
+    props: ['initialValue'],
+    emits: ['update-search-input'],
+    template: '<div><slot /></div>',
+  },
   GenericButton: {
     name: 'GenericButton',
     inheritAttrs: true,
     props: ['text'],
     template: '<button>{{ text }}</button>',
+  },
+  FilterChip: {
+    name: 'FilterChip',
+    template: '<div><slot /><slot name="content" /></div>',
+  },
+  SearchableForumList: {
+    name: 'SearchableForumList',
+    props: ['selectedChannels', 'featuredForums'],
+    emits: ['toggle-selection'],
+    template: '<div />',
+  },
+  SearchableTagList: {
+    name: 'SearchableTagList',
+    props: ['selectedTags'],
+    emits: ['toggle-selection'],
+    template: '<div />',
+  },
+  CheckBox: {
+    name: 'CheckBox',
+    props: ['checked'],
+    emits: ['input'],
+    template: '<input type="checkbox" />',
   },
 };
 
@@ -74,7 +103,11 @@ const mountBar = (props: Record<string, unknown> = {}) =>
 // controls render).
 const mountOpen = () =>
   mountWithDefaults(EventFilterBar, {
-    props: { allowHidingMainFilters: true, showMainFiltersByDefault: true },
+    props: {
+      allowHidingMainFilters: true,
+      showMainFiltersByDefault: true,
+      toggleShowArchivedEnabled: true,
+    },
     global: { stubs: openStubs },
   });
 
@@ -188,6 +221,39 @@ describe('EventFilterBar filter handlers', () => {
       .vm.$emit('update-show-only-free', false);
     expect(router.replace).toHaveBeenCalled();
   });
+
+  it('writes searchInput when the search bar updates', async () => {
+    const wrapper = mountOpen();
+    await wrapper
+      .findComponent({ name: 'SearchBar' })
+      .vm.$emit('update-search-input', 'phoenix');
+    expect(lastReplaceQuery()).toMatchObject({ searchInput: 'phoenix' });
+  });
+
+  it('writes showArchived when the archived checkbox is checked', async () => {
+    const wrapper = mountOpen();
+    await wrapper.findComponent({ name: 'CheckBox' }).vm.$emit('input', {
+      target: { checked: true },
+    });
+    expect(lastReplaceQuery()).toMatchObject({ showArchived: true });
+  });
+
+  it('writes channels when a forum selection is toggled on', async () => {
+    route.params = {};
+    const wrapper = mountOpen();
+    await wrapper
+      .findComponent({ name: 'SearchableForumList' })
+      .vm.$emit('toggle-selection', 'cats');
+    expect(lastReplaceQuery()).toMatchObject({ channels: ['cats'] });
+  });
+
+  it('writes tags when a tag selection is toggled on', async () => {
+    const wrapper = mountOpen();
+    await wrapper
+      .findComponent({ name: 'SearchableTagList' })
+      .vm.$emit('toggle-selection', 'music');
+    expect(lastReplaceQuery()).toMatchObject({ tags: ['music'] });
+  });
 });
 
 describe('EventFilterBar computeds', () => {
@@ -241,5 +307,46 @@ describe('EventFilterBar computeds', () => {
       MilesOrKm.KM;
     await wrapper.vm.$nextTick();
     expect((wrapper.vm as unknown as { radiusLabel: string }).radiusLabel).toContain('km');
+  });
+});
+
+describe('EventFilterBar route hydration', () => {
+  beforeEach(() => {
+    route.params = {};
+    route.query = {};
+    route.name = 'EventList';
+    route.path = '/events';
+  });
+
+  it('hydrates the search bar from the route query on mount', () => {
+    route.query = { searchInput: 'phoenix' };
+    const wrapper = mountOpen();
+    expect(wrapper.findComponent({ name: 'SearchBar' }).props('initialValue')).toBe(
+      'phoenix'
+    );
+  });
+
+  it('hydrates the archived checkbox from the route query on mount', () => {
+    route.query = { showArchived: 'true' };
+    const wrapper = mountOpen();
+    expect(wrapper.findComponent({ name: 'CheckBox' }).props('checked')).toBe(true);
+  });
+
+  it('updates the selected tags when the route query changes', async () => {
+    const wrapper = mountOpen();
+    route.query = { tags: ['music'] };
+    await nextTick();
+    expect(
+      wrapper.findComponent({ name: 'SearchableTagList' }).props('selectedTags')
+    ).toEqual(['music']);
+  });
+
+  it('shows featured forums on map-search routes', () => {
+    route.name = 'events-map-search';
+    route.path = '/events/map';
+    const wrapper = mountOpen();
+    expect(
+      wrapper.findComponent({ name: 'SearchableForumList' }).props('featuredForums')
+    ).toHaveLength(3);
   });
 });
