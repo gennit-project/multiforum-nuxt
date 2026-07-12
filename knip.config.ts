@@ -18,22 +18,17 @@ export default {
     '@@': ['./'],
   },
   ignore: [
-    '**/*.spec.ts',
-    '**/*.test.ts',
     'tests/**',
-    'coverage/**',
-    '.nuxt/**',
-    'dist/**',
-    'node_modules/**',
     '__generated__/**',
+    // Standalone, separately-deployed cloud functions (each has its own
+    // package.json); not part of the app's dependency graph.
+    'cloud_functions/**',
   ],
   ignoreBinaries: ['open'],
   ignoreDependencies: [
-    '@fortawesome/fontawesome-free',
     '@fortawesome/fontawesome-svg-core',
     '@fortawesome/free-regular-svg-icons',
     '@fortawesome/free-solid-svg-icons',
     '@fortawesome/vue-fontawesome',
-    'globals',
   ],
 };

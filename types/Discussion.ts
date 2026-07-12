@@ -51,16 +51,3 @@ export interface DiscussionChannelWithFavorited {
 export interface DiscussionWithFavorited {
   isFavorited?: boolean;
 }
-
-// Type for downloadable files in forms (simplified from full DownloadableFile)
-export interface DownloadFormFile {
-  id?: string;
-  fileName: string;
-  url: string;
-  kind: string;
-  size: number;
-  license: string;
-  priceModel: string;
-  priceCents: number;
-  priceCurrency: string;
-}

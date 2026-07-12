@@ -27,9 +27,3 @@ export type CreateReplyInputData = {
   text: string;
   depth: number;
 };
-
-export type DeleteCommentInputData = {
-  parentCommentId: string;
-  commentId: string;
-  replyCount: number;
-};
