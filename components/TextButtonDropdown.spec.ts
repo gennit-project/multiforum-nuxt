@@ -5,7 +5,7 @@ import TextButtonDropdown from '@/components/TextButtonDropdown.vue';
 
 vi.mock('@headlessui/vue', () => ({
   Menu: { name: 'Menu', template: '<div><slot /></div>' },
-  MenuButton: { name: 'MenuButton', template: '<button class="menu-button"><slot /></button>' },
+  MenuButton: { name: 'MenuButton', template: '<button class="menu-button" v-bind="$attrs"><slot /></button>' },
   MenuItems: { name: 'MenuItems', template: '<div><slot /></div>' },
   MenuItem: { name: 'MenuItem', template: '<div class="menu-item"><slot :active="false" /></div>' },
 }));
@@ -23,6 +23,16 @@ describe('TextButtonDropdown', () => {
     const wrapper = mountDropdown({ label: 'Sort' });
 
     expect(wrapper.text()).toContain('Sort');
+  });
+
+  // Regression: the trigger paired focus:outline-none with no ring width,
+  // leaving keyboard focus invisible (WCAG 2.4.7).
+  it('renders a focus ring width on the trigger', () => {
+    const wrapper = mountDropdown({ label: 'Sort' });
+
+    expect(wrapper.get('.menu-button').classes()).toContain(
+      'focus-visible:ring-2'
+    );
   });
 
   it('renders the menu items', () => {

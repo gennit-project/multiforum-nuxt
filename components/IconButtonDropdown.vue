@@ -51,7 +51,7 @@ const handleItemClick = (item: MenuItemType) => {
     <Menu as="div" class="relative flex items-center text-left">
       <MenuButton
         :class="[
-          'font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none dark:text-gray-300 dark:hover:text-white',
+          'font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:text-gray-300 dark:hover:text-white',
           darkBackground ? 'text-gray-200 hover:text-white' : '',
         ]"
         :aria-label="props.ariaLabel"
@@ -107,7 +107,7 @@ const handleItemClick = (item: MenuItemType) => {
     </Menu>
     <template #fallback>
       <button
-        class="font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none dark:text-white"
+        class="font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:text-white"
         :aria-label="props.ariaLabel"
       >
         <i v-if="menuButtonIcon" :class="` ${menuButtonIcon} `" aria-hidden="true" />

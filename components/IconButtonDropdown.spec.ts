@@ -8,7 +8,7 @@ const h = vi.hoisted(() => ({ push: vi.fn() }));
 vi.mock('nuxt/app', () => ({ useRouter: () => ({ push: h.push }) }));
 vi.mock('@headlessui/vue', () => ({
   Menu: { name: 'Menu', template: '<div><slot /></div>' },
-  MenuButton: { name: 'MenuButton', template: '<button class="menu-button"><slot /></button>' },
+  MenuButton: { name: 'MenuButton', template: '<button class="menu-button" v-bind="$attrs"><slot /></button>' },
   MenuItems: { name: 'MenuItems', template: '<div><slot /></div>' },
   MenuItem: { name: 'MenuItem', template: '<div class="menu-item"><slot :active="false" /></div>' },
 }));
@@ -31,6 +31,16 @@ describe('IconButtonDropdown rendering', () => {
     const wrapper = mountDropdown({ items: [{ value: '/a', label: 'Item A' }] });
 
     expect(wrapper.text()).toContain('Item A');
+  });
+
+  // Regression: the trigger paired focus:outline-none with no ring width,
+  // leaving keyboard focus invisible (WCAG 2.4.7).
+  it('renders a focus ring width on the trigger', () => {
+    const wrapper = mountDropdown();
+
+    expect(wrapper.get('.menu-button').classes()).toContain(
+      'focus-visible:ring-2'
+    );
   });
 
   it('renders a divider item', () => {
