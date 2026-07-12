@@ -31,8 +31,14 @@ const mountItem = (props: Record<string, unknown> = {}) =>
         HighlightedSearchTerms: highlightStub,
         Tag: tagStub,
         TagComponent: tagStub,
-        NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
-        'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
+        NuxtLink: {
+          props: ['to'],
+          template: `<a :href="typeof to === 'string' ? to : ''"><slot /></a>`,
+        },
+        'nuxt-link': {
+          props: ['to'],
+          template: `<a :href="typeof to === 'string' ? to : ''"><slot /></a>`,
+        },
       },
     },
   });
@@ -76,28 +82,31 @@ describe('DiscussionItemInProfile content', () => {
 });
 
 describe('DiscussionItemInProfile navigation', () => {
-  it('navigates to the discussion on click', async () => {
+  const titleLink = (wrapper: ReturnType<typeof mountItem>) =>
+    wrapper.findAll('a').find((a) => a.text().includes('A discussion'));
+
+  it('links the keyboard-focusable title to the discussion', () => {
     const wrapper = mountItem();
 
-    await wrapper.find('li').trigger('click');
-
-    expect(h.push).toHaveBeenCalledWith('/forums/cats/discussions/d1');
+    expect(titleLink(wrapper)?.attributes('href')).toBe(
+      '/forums/cats/discussions/d1'
+    );
   });
 
-  it('navigates to the download path for a download', async () => {
+  it('links the title to the download path for a download', () => {
     const wrapper = mountItem({ discussion: discussion({ hasDownload: true }) });
 
-    await wrapper.find('li').trigger('click');
-
-    expect(h.push).toHaveBeenCalledWith('/forums/cats/downloads/d1');
+    expect(titleLink(wrapper)?.attributes('href')).toBe(
+      '/forums/cats/downloads/d1'
+    );
   });
 
-  it('does not navigate without a channel', async () => {
-    const wrapper = mountItem({ discussion: discussion({ DiscussionChannels: [] }) });
+  it('renders the title without a link when there is no channel', () => {
+    const wrapper = mountItem({
+      discussion: discussion({ DiscussionChannels: [] }),
+    });
 
-    await wrapper.find('li').trigger('click');
-
-    expect(h.push).not.toHaveBeenCalled();
+    expect(titleLink(wrapper)).toBeUndefined();
   });
 
   it('shows a download view link for downloads', () => {

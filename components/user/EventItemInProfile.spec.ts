@@ -30,8 +30,14 @@ const mountItem = (props: Record<string, unknown> = {}) =>
         HighlightedSearchTerms: highlightStub,
         Tag: tagStub,
         TagComponent: tagStub,
-        NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
-        'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
+        NuxtLink: {
+          props: ['to'],
+          template: `<a :href="typeof to === 'string' ? to : ''"><slot /></a>`,
+        },
+        'nuxt-link': {
+          props: ['to'],
+          template: `<a :href="typeof to === 'string' ? to : ''"><slot /></a>`,
+        },
       },
     },
   });
@@ -81,19 +87,18 @@ describe('EventItemInProfile content', () => {
 });
 
 describe('EventItemInProfile navigation', () => {
-  it('navigates to the event on click', async () => {
+  const titleLink = (wrapper: ReturnType<typeof mountItem>) =>
+    wrapper.findAll('a').find((a) => a.text().includes('An event'));
+
+  it('links the keyboard-focusable title to the event', () => {
     const wrapper = mountItem();
 
-    await wrapper.find('li').trigger('click');
-
-    expect(h.push).toHaveBeenCalledWith('/forums/cats/events/e1');
+    expect(titleLink(wrapper)?.attributes('href')).toBe('/forums/cats/events/e1');
   });
 
-  it('does not navigate without a channel', async () => {
+  it('renders the title without a link when there is no channel', () => {
     const wrapper = mountItem({ event: event({ EventChannels: [] }) });
 
-    await wrapper.find('li').trigger('click');
-
-    expect(h.push).not.toHaveBeenCalled();
+    expect(titleLink(wrapper)).toBeUndefined();
   });
 });

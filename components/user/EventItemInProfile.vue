@@ -5,7 +5,6 @@ import Tag from '@/components/TagComponent.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import type { Event } from '@/__generated__/graphql';
 import type { TagData } from '../../types/Tag';
-import { useRouter } from 'nuxt/app';
 
 const props = defineProps({
   event: {
@@ -28,8 +27,6 @@ const props = defineProps({
 
 defineEmits(['filterByTag']);
 
-const router = useRouter();
-
 // Computed property for defaultUniqueName
 const defaultUniqueName = computed(() => {
   if (!props.event.EventChannels || !props.event.EventChannels[0]) {
@@ -37,6 +34,14 @@ const defaultUniqueName = computed(() => {
   }
   return props.event.EventChannels[0].channelUniqueName;
 });
+
+// Primary link target for the card title, so it is keyboard-reachable instead
+// of relying on a click handler on the whole <li>.
+const titleLink = computed(() =>
+  defaultUniqueName.value
+    ? `/forums/${defaultUniqueName.value}/events/${props.event.id}`
+    : ''
+);
 
 const title = props.event.title;
 const relativeTimeText = relativeTime(props.event.createdAt);
@@ -46,17 +51,21 @@ const tags = (props.event.Tags ?? []).map((tag: TagData) => tag.text);
 
 <template>
   <li
-    class="relative cursor-pointer list-none rounded-lg bg-gray-100 p-4 dark:bg-gray-800 dark:text-white"
-    @click="
-      () => {
-        if (defaultUniqueName) {
-          router.push(`/forums/${defaultUniqueName}/events/${event.id}`);
-        }
-      }
-    "
+    class="relative list-none rounded-lg bg-gray-100 p-4 dark:bg-gray-800 dark:text-white"
   >
     <p class="text-md">
-      <HighlightedSearchTerms :text="title" :search-input="searchInput" />
+      <nuxt-link
+        v-if="titleLink"
+        :to="titleLink"
+        class="font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+      >
+        <HighlightedSearchTerms :text="title" :search-input="searchInput" />
+      </nuxt-link>
+      <HighlightedSearchTerms
+        v-else
+        :text="title"
+        :search-input="searchInput"
+      />
     </p>
 
     <p
