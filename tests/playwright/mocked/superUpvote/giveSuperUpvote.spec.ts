@@ -41,15 +41,23 @@ test('user can give and undo a super upvote on another user\'s discussion', asyn
   await expect(upvoteButton).toBeVisible();
   await expect(superUpvoteButton).toHaveCount(0);
 
-  // Upvote alice's discussion.
-  await upvoteButton.click();
-  await page.waitForResponse(
-    (response) =>
-      response.url().includes('/graphql') && response.request().method() === 'POST'
-  );
+  // Upvote alice's discussion. Register the response listener *before* the
+  // click (Promise.all) so a fast GraphQL POST can't resolve before we start
+  // listening — the "click then waitForResponse" ordering races and, when the
+  // response lands first, waitForResponse waits for a POST that never comes and
+  // times out (the source of this test's flakiness).
+  await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        response.url().includes('/graphql') &&
+        response.request().method() === 'POST'
+    ),
+    upvoteButton.click(),
+  ]);
 
-  // The super upvote button now appears, in its inactive state.
-  await expect(superUpvoteButton).toBeVisible();
+  // The super upvote button now appears, in its inactive state. Give it a
+  // generous timeout for cold-start CI where the mutation round-trip is slow.
+  await expect(superUpvoteButton).toBeVisible({ timeout: 15_000 });
   await expect(superUpvoteButton).not.toContainText('Undo');
 
   // Open the super upvote modal.
