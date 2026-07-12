@@ -34,6 +34,14 @@ describe('FileTypePicker display', () => {
     expect(wrapper.text()).toContain('Select allowed file types');
   });
 
+  // Regression: the combobox input uses focus:outline-none, so the container
+  // must show a focus-within ring or keyboard focus is invisible (WCAG 2.4.7).
+  it('shows a focus-within ring on the combobox container', () => {
+    const wrapper = mountPicker();
+
+    expect(box(wrapper).classes()).toContain('focus-within:ring-2');
+  });
+
   it('shows the disabled hint when disabled', () => {
     const wrapper = mountPicker({ disabled: true });
 
