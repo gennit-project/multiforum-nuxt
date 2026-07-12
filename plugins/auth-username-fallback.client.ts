@@ -69,16 +69,19 @@ const resolveUsername = async () => {
   }
 };
 
-export default defineNuxtPlugin(() => {
+export default defineNuxtPlugin((nuxtApp) => {
   if (typeof window === 'undefined') return;
 
   const isAuthenticated = useIsAuthenticated();
   const username = useUsername();
 
-  // Nothing to do when anonymous or when SSR already resolved the username.
-  if (!isAuthenticated.value || username.value) return;
-
-  // Fire-and-forget: never block app startup on this network round-trip. The
-  // server session resolves identity server-side.
-  void resolveUsername();
+  // Auth state is part of the SSR payload. Mutating it before Vue finishes
+  // hydration can change Apollo variables and auth-gated DOM midway through
+  // hydration, so defer the fallback until the server tree is fully adopted.
+  nuxtApp.hook('app:mounted', () => {
+    // Re-check after mounting because another source may have resolved the
+    // username while the app was starting.
+    if (!isAuthenticated.value || username.value) return;
+    void resolveUsername();
+  });
 });

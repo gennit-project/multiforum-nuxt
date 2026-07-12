@@ -13,6 +13,7 @@ const h = vi.hoisted(() => ({
   setProfilePicURL: vi.fn(),
   setNotificationCount: vi.fn(),
   fetch: vi.fn(),
+  appMounted: undefined as undefined | (() => void),
 }));
 
 vi.mock('nuxt/app', () => ({
@@ -27,8 +28,17 @@ vi.mock('@/composables/useAuthState', () => ({
   setNotificationCount: h.setNotificationCount,
 }));
 
+const start = () => {
+  (plugin as (nuxtApp: { hook: (name: string, callback: () => void) => void }) => void)({
+    hook: (name, callback) => {
+      if (name === 'app:mounted') h.appMounted = callback;
+    },
+  });
+};
+
 const run = async () => {
-  (plugin as () => void)();
+  start();
+  h.appMounted?.();
   await flushPromises();
 };
 
@@ -61,6 +71,7 @@ const fullUser = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  h.appMounted = undefined;
   h.isAuthenticated.value = true;
   h.username.value = '';
   h.fetch.mockResolvedValue(resolvedUser(fullUser));
@@ -68,6 +79,12 @@ beforeEach(() => {
 });
 
 describe('auth-username-fallback plugin: resolves when authenticated but username is empty', () => {
+  it('does not resolve the username before hydration has mounted the app', async () => {
+    start();
+    await flushPromises();
+    expect(h.fetch).not.toHaveBeenCalled();
+  });
+
   it('seeds the username from the backend lookup', async () => {
     await run();
     expect(h.setUsername).toHaveBeenCalledWith('cluse');
