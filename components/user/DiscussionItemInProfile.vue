@@ -4,7 +4,6 @@ import { relativeTime } from '@/utils';
 import Tag from '@/components/TagComponent.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import type { Discussion } from '@/__generated__/graphql';
-import { useRouter } from 'nuxt/app';
 
 const props = defineProps({
   discussion: {
@@ -27,8 +26,6 @@ const props = defineProps({
 
 defineEmits(['filterByTag']);
 
-const router = useRouter();
-
 const defaultUniqueName = computed(() => {
   if (
     !props.discussion.DiscussionChannels ||
@@ -41,6 +38,14 @@ const defaultUniqueName = computed(() => {
 
 const isDownload = computed(() => !!props.discussion.hasDownload);
 
+// Primary link target for the card title, so it is reachable by keyboard
+// instead of relying on a click handler on the whole <li>.
+const titleLink = computed(() => {
+  if (!defaultUniqueName.value) return '';
+  const basePath = isDownload.value ? 'downloads' : 'discussions';
+  return `/forums/${defaultUniqueName.value}/${basePath}/${props.discussion.id}`;
+});
+
 const title = props.discussion.title;
 const relativeTimeText = relativeTime(props.discussion.createdAt);
 const authorUsername = props.discussion.Author
@@ -51,19 +56,16 @@ const tags = (props.discussion.Tags ?? []).map((tag) => tag.text);
 
 <template>
   <li
-    class="relative cursor-pointer list-none rounded-lg bg-gray-100 p-4 dark:bg-gray-800 dark:text-white"
-    @click="
-      () => {
-        if (defaultUniqueName) {
-          const basePath = isDownload ? 'downloads' : 'discussions';
-          router.push(
-            `/forums/${defaultUniqueName}/${basePath}/${discussion.id}`
-          );
-        }
-      }
-    "
+    class="relative list-none rounded-lg bg-gray-100 p-4 dark:bg-gray-800 dark:text-white"
   >
-    <HighlightedSearchTerms :text="title" :search-input="searchInput" />
+    <nuxt-link
+      v-if="titleLink"
+      :to="titleLink"
+      class="font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+    >
+      <HighlightedSearchTerms :text="title" :search-input="searchInput" />
+    </nuxt-link>
+    <HighlightedSearchTerms v-else :text="title" :search-input="searchInput" />
 
     <p
       class="mt-1 flex space-x-1 text-sm font-medium text-gray-600 hover:no-underline"
