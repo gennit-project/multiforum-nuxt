@@ -37,6 +37,7 @@ const updateFontSize = (option: { label: string; value: string }) => {
       </span>
     </div>
     <RadioButtons
+      legend="Font Size"
       :selected-option="selectedOption"
       :options="options"
       @update-selected="updateFontSize"

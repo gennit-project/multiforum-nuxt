@@ -91,6 +91,24 @@ describe('TextInput validation', () => {
 
     expect(wrapper.find('input').attributes('disabled')).toBeDefined();
   });
+
+  it('marks a required input as required for assistive tech', () => {
+    const wrapper = mountInput({ required: true });
+
+    expect(wrapper.find('input').attributes('aria-required')).toBe('true');
+  });
+
+  it('sets the native required attribute when required', () => {
+    const wrapper = mountInput({ required: true });
+
+    expect(wrapper.find('input').attributes('required')).toBeDefined();
+  });
+
+  it('does not mark an optional input as required', () => {
+    const wrapper = mountInput();
+
+    expect(wrapper.find('input').attributes('required')).toBeUndefined();
+  });
 });
 
 describe('TextInput focus', () => {

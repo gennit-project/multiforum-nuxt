@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, useId } from 'vue';
 import ExclamationTriangleIcon from '@/components/icons/ExclamationIcon.vue';
 
 const props = defineProps({
@@ -16,6 +16,10 @@ const props = defineProps({
     default: '',
   },
   invalid: {
+    type: Boolean,
+    default: false,
+  },
+  required: {
     type: Boolean,
     default: false,
   },
@@ -52,11 +56,13 @@ const props = defineProps({
 const emit = defineEmits(['update']);
 const text = ref(props.value);
 
-// Generate a unique ID if not provided
+// Generate a unique ID if not provided. useId() is SSR-stable (Math.random
+// would mismatch between server and client render and break the label/for tie).
+const generatedId = useId();
 const inputId = computed(() => {
   if (props.id) return props.id;
   if (props.testId) return `input-${props.testId}`;
-  return `input-${Math.random().toString(36).substr(2, 9)}`;
+  return `input-${generatedId}`;
 });
 
 // Use ariaLabel if provided, otherwise fall back to label or placeholder
@@ -110,8 +116,10 @@ const handleInput = (value: string) => {
         :data-testid="testId"
         :disabled="disabled"
         :placeholder="placeholder"
+        :required="required || undefined"
         :aria-label="!label ? accessibleLabel : undefined"
         :aria-invalid="invalid || undefined"
+        :aria-required="required || undefined"
         :aria-describedby="errorMessage ? `${inputId}-error` : undefined"
         type="text"
         @input="handleInput(($event.target as HTMLInputElement).value)"
@@ -125,8 +133,10 @@ const handleInput = (value: string) => {
         :placeholder="placeholder"
         :disabled="disabled"
         :rows="rows"
+        :required="required || undefined"
         :aria-label="!label ? accessibleLabel : undefined"
         :aria-invalid="invalid || undefined"
+        :aria-required="required || undefined"
         :aria-describedby="errorMessage ? `${inputId}-error` : undefined"
         type="text"
         :class="[
