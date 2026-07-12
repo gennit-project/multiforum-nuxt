@@ -148,6 +148,22 @@ describe('ServerMembershipEditor', () => {
       global: { stubs },
     });
 
+  it('gives the admin invite input a distinct accessible name', () => {
+    const wrapper = mountEditor(serverConfig);
+
+    expect(wrapper.findAll('input')[0]!.attributes('aria-label')).toBe(
+      'Username to invite as server admin'
+    );
+  });
+
+  it('gives the moderator invite input a distinct accessible name', () => {
+    const wrapper = mountEditor(serverConfig);
+
+    expect(wrapper.findAll('input')[1]!.attributes('aria-label')).toBe(
+      'Username to invite as server moderator'
+    );
+  });
+
   // --- Remove existing members ---
 
   it('removes a server admin', async () => {

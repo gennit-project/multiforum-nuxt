@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, useId } from 'vue';
 import type { PropType } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useApolloClient, useMutation } from '@vue/apollo-composable';
@@ -139,6 +139,7 @@ const reportText = ref('');
 
 // Holds the chosen suspension length if props.suspendUserEnabled is true
 const suspensionLength = ref<'' | 'two_weeks' | 'one_month' | 'indefinite'>('two_weeks');
+const suspensionLengthId = useId();
 
 const toggleForumRuleSelection = (rule: string) => {
   if (selectedForumRules.value.includes(rule)) {
@@ -702,10 +703,12 @@ const close = () => {
       />
       <div v-if="suspendUserEnabled" class="mt-4">
         <label
+          :for="suspensionLengthId"
           class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200"
           >Suspend user for</label
         >
         <select
+          :id="suspensionLengthId"
           v-model="suspensionLength"
           class="block w-60 rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
         >
@@ -715,9 +718,9 @@ const close = () => {
           <option value="indefinite">Indefinite</option>
         </select>
       </div>
-      <h2 class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+      <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
         {{ modalBody }}
-      </h2>
+      </p>
       <TextEditor
         :test-id="`report-${contentType}-input`"
         :initial-value="reportText"

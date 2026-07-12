@@ -124,6 +124,7 @@ const getSecretStatusText = (status: string) => {
               :value="secretValues[secret.key] || ''"
               type="password"
               placeholder="Enter secret value"
+              :aria-label="`Value for ${secret.key}`"
               class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               @input="updateSecretValue(secret.key, ($event.target as HTMLInputElement).value)"
             >

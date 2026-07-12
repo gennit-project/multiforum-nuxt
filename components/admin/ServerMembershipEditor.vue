@@ -182,6 +182,7 @@ const removeModerator = async (displayName: string) => {
             v-model="newAdminUsername"
             type="text"
             placeholder="Username to invite"
+            aria-label="Username to invite as server admin"
             class="w-full rounded border px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
             @keyup.enter="sendAdminInvite"
           >
@@ -275,6 +276,7 @@ const removeModerator = async (displayName: string) => {
             v-model="newModeratorUsername"
             type="text"
             placeholder="Username to invite"
+            aria-label="Username to invite as server moderator"
             class="w-full rounded border px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
             @keyup.enter="sendModInvite"
           >
