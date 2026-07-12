@@ -115,12 +115,12 @@ const handleReportSuccess = () => {
         {{ username }}
         <span
           v-if="serverRoleBadge === 'serverAdmin'"
-          class="rounded-md border border-orange-500 px-2 py-1 text-xs text-orange-500"
+          class="rounded-md border border-orange-500 px-2 py-1 text-xs text-orange-700 dark:text-orange-500"
           >Server Admin</span
         >
         <span
           v-else-if="serverRoleBadge === 'serverMod'"
-          class="rounded-md border border-orange-500 px-2 py-1 text-xs text-orange-500"
+          class="rounded-md border border-orange-500 px-2 py-1 text-xs text-orange-700 dark:text-orange-500"
           >Server Mod</span
         >
       </h1>

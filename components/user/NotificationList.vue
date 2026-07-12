@@ -111,7 +111,7 @@ const markAllAsRead = () => {
 </script>
 
 <template>
-  <div class="dak:text-white flex justify-center">
+  <div class="dark:text-white flex justify-center">
     <div class="w-full max-w-5xl">
       <p v-if="notificationLoading">Loading...</p>
       <ErrorBanner

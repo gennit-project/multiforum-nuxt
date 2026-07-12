@@ -211,7 +211,7 @@ const validationError = computed(() => {
     </p>
     <p
       v-else-if="secretStatus?.lastValidatedAt"
-      class="text-xs text-gray-400 dark:text-gray-500"
+      class="text-xs text-gray-500 dark:text-gray-400"
     >
       Last validated: {{ new Date(secretStatus.lastValidatedAt).toLocaleString() }}
     </p>
