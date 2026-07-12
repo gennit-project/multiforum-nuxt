@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import 'md-editor-v3/lib/style.css';
-import { GET_USER } from '@/graphQLData/user/queries';
+import { GET_PUBLIC_USER_PROFILE } from '@/graphQLData/user/queries';
 import { stableRelativeTime } from '@/utils';
 import type { ServerRoleBadge } from '@/utils/serverRoleBadges';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
@@ -39,7 +39,7 @@ const {
   loading: getUserLoading,
   error: getUserError,
 } = useQuery(
-  GET_USER,
+  GET_PUBLIC_USER_PROFILE,
   () => ({
     username: username.value,
   }),

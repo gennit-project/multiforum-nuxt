@@ -60,6 +60,55 @@ export const GET_USER = gql`
   }
 `;
 
+// Public profile data only. Keep owner-only account fields (email, notification
+// preferences, and content settings) in GET_USER so anonymous visitors and
+// other users can load profile sidebars without triggering authorization errors.
+export const GET_PUBLIC_USER_PROFILE = gql`
+  query getPublicUserProfile($username: String!) {
+    getUserWikiEditsCount(username: $username)
+    users(where: { username: $username }) {
+      username
+      commentKarma
+      discussionKarma
+      createdAt
+      displayName
+      profilePicURL
+      location
+      pronouns
+      bio
+      CommentsAggregate(where: { NOT: { archived: true } }) {
+        count
+      }
+      DiscussionsAggregate(
+        where: { OR: [{ hasDownload: false }, { hasDownload: null }] }
+      ) {
+        count
+      }
+      DownloadsAggregate: DiscussionsAggregate(where: { hasDownload: true }) {
+        count
+      }
+      EventsAggregate {
+        count
+      }
+      ImagesAggregate {
+        count
+      }
+      AlbumsAggregate {
+        count
+      }
+      AuthoredWikiPageVersionsAggregate {
+        count
+      }
+      AdminOfChannelsAggregate {
+        count
+      }
+      ModOfChannelsAggregate {
+        count
+      }
+    }
+  }
+`;
+
 export const GET_USER_COMMENTS = gql`
   query getUserComments(
     $username: String!
