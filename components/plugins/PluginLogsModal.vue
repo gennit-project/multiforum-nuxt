@@ -122,10 +122,11 @@ const formatTimestamp = (isoString: string) => {
                     </div>
                     <button
                       type="button"
+                      aria-label="Close"
                       class="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
                       @click="emit('close')"
                     >
-                      <i class="fa-solid fa-times text-lg" />
+                      <i class="fa-solid fa-times text-lg" aria-hidden="true" />
                     </button>
                   </div>
                 </div>

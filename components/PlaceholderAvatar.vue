@@ -25,6 +25,7 @@ const sizeClasses: Record<string, string> = {
     <User
       class="text-gray-500 dark:text-gray-400"
       :size="size === 'sm' ? 16 : size === 'md' ? 20 : 24"
+      aria-hidden="true"
     />
   </div>
 </template>

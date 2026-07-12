@@ -34,4 +34,23 @@ describe('PluginSecretField', () => {
     const wrapper = mountField({ secretStatus: { status: 'VALID' } });
     expect(wrapper.get('input').attributes('placeholder')).toContain('encrypted');
   });
+
+  it('exposes the reveal toggle as an unpressed labelled button', () => {
+    const wrapper = mountField();
+    expect(
+      wrapper
+        .get('button[aria-label="Show secret value"]')
+        .attributes('aria-pressed')
+    ).toBe('false');
+  });
+
+  it('marks the toggle pressed after revealing the value', async () => {
+    const wrapper = mountField();
+    await wrapper.get('button[aria-label="Show secret value"]').trigger('click');
+    expect(
+      wrapper
+        .get('button[aria-label="Hide secret value"]')
+        .attributes('aria-pressed')
+    ).toBe('true');
+  });
 });

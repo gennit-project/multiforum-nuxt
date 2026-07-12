@@ -55,6 +55,14 @@ describe('Breadcrumbs', () => {
     expect(wrapper.findAll('a')).toHaveLength(1);
   });
 
+  it('marks the current crumb with aria-current="page"', () => {
+    const wrapper = mountCrumbs([
+      { path: 'library', label: 'Library' },
+      { label: 'Saved Comments', current: true },
+    ]);
+    expect(wrapper.get('[aria-current="page"]').text()).toBe('Saved Comments');
+  });
+
   it('does not render a chevron before the first crumb', () => {
     const wrapper = mountCrumbs([{ path: 'forums', label: 'Forums' }]);
     expect(wrapper.find('svg').exists()).toBe(false);

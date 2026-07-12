@@ -243,9 +243,10 @@ const eventDescription = computed(() => {
                 type="button"
                 class="p-2 text-gray-400 hover:text-red-500"
                 title="Remove step"
+                aria-label="Remove step"
                 @click="removeStep(index)"
               >
-                <i class="fa-solid fa-times" />
+                <i class="fa-solid fa-times" aria-hidden="true" />
               </button>
             </div>
           </div>
