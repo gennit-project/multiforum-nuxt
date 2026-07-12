@@ -443,6 +443,10 @@ export default defineNuxtConfig({
     },
     define: {
       global: 'globalThis',
+      // Keep Vue's production hydration warnings actionable. Without this,
+      // production only reports that a mismatch occurred and omits the server
+      // DOM node and expected client vnode needed to locate the source.
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: true,
     },
     // Allow connections from ngrok for mobile testing
     server: {
