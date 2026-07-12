@@ -219,6 +219,16 @@ describe('AddToListPopover collection toggle', () => {
     });
   });
 
+  it('refetches collections and membership after adding the item to a collection', async () => {
+    const wrapper = mountPopover();
+
+    await rows(wrapper)[1].trigger('click');
+    await flushPromises();
+
+    expect(h.refetchCollections).toHaveBeenCalledTimes(1);
+    expect(h.refetchItem).toHaveBeenCalledTimes(1);
+  });
+
   it('removes the item from a collection it is already in', async () => {
     h.itemInResult = ref({ users: [{ Collections: [{ id: 'c1' }] }] }) as never;
     h.useQuery = vi
@@ -234,6 +244,44 @@ describe('AddToListPopover collection toggle', () => {
       collectionId: 'c1',
       itemId: 'item-1',
     });
+  });
+
+  it('shows an error toast when adding to a collection fails', async () => {
+    h.addMutation = vi.fn().mockRejectedValue(new Error('boom'));
+    const wrapper = mountPopover();
+
+    await rows(wrapper)[1].trigger('click');
+    await flushPromises();
+
+    expect(h.showToast).toHaveBeenCalledWith(
+      'Error updating collection',
+      'error'
+    );
+    expect(h.refetchCollections).not.toHaveBeenCalled();
+    expect(h.refetchItem).not.toHaveBeenCalled();
+  });
+
+  it('shows an error toast when removing from a collection fails', async () => {
+    h.itemInResult = ref({ users: [{ Collections: [{ id: 'c1' }] }] }) as never;
+    h.removeMutation = vi.fn().mockRejectedValue(new Error('boom'));
+    h.useQuery = vi
+      .fn()
+      .mockReturnValueOnce({
+        result: h.collectionsResult,
+        refetch: h.refetchCollections,
+      })
+      .mockReturnValueOnce({ result: h.itemInResult, refetch: h.refetchItem });
+    const wrapper = mountPopover();
+
+    await rows(wrapper)[1].trigger('click');
+    await flushPromises();
+
+    expect(h.showToast).toHaveBeenCalledWith(
+      'Error updating collection',
+      'error'
+    );
+    expect(h.refetchCollections).not.toHaveBeenCalled();
+    expect(h.refetchItem).not.toHaveBeenCalled();
   });
 });
 
@@ -302,6 +350,43 @@ describe('AddToListPopover create new collection', () => {
       collectionId: 'new1',
       itemId: 'item-1',
     });
+  });
+
+  it('refetches collections and membership after creating and adding to a collection', async () => {
+    (h.createCollection as ReturnType<typeof vi.fn>).mockResolvedValue({
+      data: {
+        createCollections: { collections: [{ id: 'new1', name: 'New List' }] },
+      },
+    });
+    const wrapper = mountPopover();
+
+    await clickNewListButton(wrapper);
+    await wrapper.get('input[aria-label="New list name"]').setValue('New List');
+    await wrapper.findAll('button').find((b) => b.text() === 'Create')!.trigger('click');
+    await flushPromises();
+
+    expect(h.refetchCollections).toHaveBeenCalledTimes(1);
+    expect(h.refetchItem).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows an error toast when collection creation fails', async () => {
+    (h.createCollection as ReturnType<typeof vi.fn>).mockRejectedValue(
+      new Error('boom')
+    );
+    const wrapper = mountPopover();
+
+    await clickNewListButton(wrapper);
+    await wrapper.get('input[aria-label="New list name"]').setValue('New List');
+    await wrapper.findAll('button').find((b) => b.text() === 'Create')!.trigger('click');
+    await flushPromises();
+
+    expect(h.showToast).toHaveBeenCalledWith(
+      'Error creating collection',
+      'error'
+    );
+    expect(h.addMutation).not.toHaveBeenCalled();
+    expect(h.refetchCollections).not.toHaveBeenCalled();
+    expect(h.refetchItem).not.toHaveBeenCalled();
   });
 });
 
