@@ -131,8 +131,15 @@ const serverConfig = computed(() => {
 // a watcher-populated cache.
 type SiteWideDiscussion = Discussion & { score: number };
 
-const loadedDiscussions = ref<SiteWideDiscussion[]>([]);
-const loadedAggregateCount = ref(0);
+const getLiveDiscussionList = () =>
+  discussionResult.value?.getSiteWideDiscussionList ?? null;
+
+const loadedDiscussions = ref<SiteWideDiscussion[]>(
+  getLiveDiscussionList()?.discussions ?? []
+);
+const loadedAggregateCount = ref(
+  getLiveDiscussionList()?.aggregateDiscussionCount ?? 0
+);
 
 watch(
   discussionResult,
@@ -151,6 +158,10 @@ const discussions = computed<SiteWideDiscussion[]>(() => {
     return liveDiscussions;
   }
   return loadedDiscussions.value;
+});
+
+const shouldShowLoadingSkeleton = computed(() => {
+  return discussionLoading.value && discussions.value.length === 0;
 });
 
 const selectedDiscussion = computed<Discussion | null>(() => {
@@ -288,7 +299,7 @@ const filterByChannel = (channel: string) => {
               </button>
             </div>
             <div
-              v-if="discussionLoading && discussions.length === 0"
+              v-if="shouldShowLoadingSkeleton"
               class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700"
             >
               <div
