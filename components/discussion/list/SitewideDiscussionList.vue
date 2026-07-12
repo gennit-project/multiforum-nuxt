@@ -20,6 +20,7 @@ import { config } from '@/config';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 import { useUsername } from '@/composables/useAuthState';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
+import { useFocusTrap } from '@/composables/useFocusTrap';
 
 const usernameVar = useUsername();
 const SitewideDiscussionSidebar = defineAsyncComponent(
@@ -48,6 +49,16 @@ const filterValues = ref(
   getDiscussionFilterValuesFromParams({ route, channelId: channelId.value })
 );
 const isSitewideSidebarOpen = ref(false);
+const sitewideSidebarRef = ref<HTMLElement | null>(null);
+
+const closeSitewideSidebar = () => {
+  isSitewideSidebarOpen.value = false;
+};
+
+useFocusTrap(sitewideSidebarRef, {
+  active: isSitewideSidebarOpen,
+  onEscape: closeSitewideSidebar,
+});
 
 const selectedDiscussionId = computed(() => {
   return typeof route.query.selectedDiscussionId === 'string'
@@ -462,12 +473,15 @@ const filterByChannel = (channel: string) => {
         >
           <div
             class="absolute inset-0 bg-black/50"
-            @click="isSitewideSidebarOpen = false"
+            aria-hidden="true"
+            @click="closeSitewideSidebar"
           />
           <div
             id="sitewide-sidebar-drawer"
+            ref="sitewideSidebarRef"
             class="absolute right-0 top-0 h-full w-full max-w-sm overflow-y-auto bg-white shadow-xl dark:bg-gray-900"
             role="dialog"
+            aria-modal="true"
             aria-label="About this forum"
           >
             <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700">
@@ -477,7 +491,7 @@ const filterByChannel = (channel: string) => {
               <button
                 type="button"
                 class="rounded-md px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-                @click="isSitewideSidebarOpen = false"
+                @click="closeSitewideSidebar"
               >
                 Close
               </button>

@@ -11,9 +11,12 @@ const h = vi.hoisted(() => ({
   updateImage: vi.fn(),
   useHead: vi.fn(),
   routeParams: { username: 'alice', imageId: 'img1' },
+  isLightboxOpen: null as unknown as { value: boolean },
+  closeLightbox: vi.fn(),
 }));
 
 h.username = ref('alice');
+h.isLightboxOpen = ref(false);
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({ params: h.routeParams }),
@@ -47,7 +50,7 @@ vi.mock('@/composables/useCopyCurrentUrl', () => ({
 
 vi.mock('@/composables/useImageZoomPan', () => ({
   useImageZoomPan: () => ({
-    isLightboxOpen: ref(false),
+    isLightboxOpen: h.isLightboxOpen,
     zoomLevel: ref(1),
     isZoomed: ref(false),
     isDragging: ref(false),
@@ -57,7 +60,7 @@ vi.mock('@/composables/useImageZoomPan', () => ({
     onDrag: vi.fn(),
     stopDrag: vi.fn(),
     openLightbox: vi.fn(),
-    closeLightbox: vi.fn(),
+    closeLightbox: h.closeLightbox,
     zoomIn: vi.fn(),
     zoomOut: vi.fn(),
     resetZoom: vi.fn(),
@@ -85,6 +88,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   h.username.value = 'alice';
   h.routeParams = { username: 'alice', imageId: 'img1' };
+  h.isLightboxOpen = ref(false);
 });
 
 describe('user image detail page', () => {
@@ -134,5 +138,44 @@ describe('user image detail page', () => {
       imageId: 'img1',
       caption: 'New caption',
     });
+  });
+
+  it('exposes the open lightbox as a named modal dialog', async () => {
+    h.isLightboxOpen.value = true;
+    const wrapper = await mountWith({
+      id: 'img1',
+      url: 'https://img.test/photo.jpg',
+      caption: 'A photo',
+      Uploader: { username: 'alice' },
+      Album: { Images: [], imageOrder: [] },
+    });
+    const dialog = wrapper.get('[role="dialog"]');
+
+    expect({
+      modal: dialog.attributes('aria-modal'),
+      label: dialog.attributes('aria-label'),
+      closeControl: wrapper
+        .get('[aria-label="Close image lightbox"]')
+        .element.tagName,
+    }).toEqual({
+      modal: 'true',
+      label: 'Image lightbox',
+      closeControl: 'BUTTON',
+    });
+    wrapper.unmount();
+  });
+
+  it('closes the lightbox on Escape', async () => {
+    h.isLightboxOpen.value = true;
+    await mountWith({
+      id: 'img1',
+      url: 'https://img.test/photo.jpg',
+      Uploader: { username: 'alice' },
+      Album: { Images: [], imageOrder: [] },
+    });
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+    expect(h.closeLightbox).toHaveBeenCalledOnce();
   });
 });

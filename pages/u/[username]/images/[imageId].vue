@@ -30,6 +30,7 @@ import AlbumThumbnailGrid from '@/components/album/AlbumThumbnailGrid.vue';
 import { useImageZoomPan } from '@/composables/useImageZoomPan';
 import AddToListPopover from '@/components/collection/AddToListPopover.vue';
 import { useToastStore } from '@/stores/toastStore';
+import { useFocusTrap } from '@/composables/useFocusTrap';
 
 const usernameVar = useUsername();
 const toastStore = useToastStore();
@@ -146,6 +147,8 @@ const { result: albumUsageResult, refetch: refetchAlbumUsage } =
 const showAlbumSaveModal = ref(false);
 const showCollectionSaveModal = ref(false);
 const albumSaveError = ref('');
+const albumSaveModalRef = ref<HTMLElement | null>(null);
+const lightboxRef = ref<HTMLElement | null>(null);
 
 const { mutate: addImageToAlbum, loading: addImageToAlbumLoading } =
   useMutation(ADD_IMAGE_TO_ALBUM);
@@ -291,6 +294,11 @@ const closeAlbumSaveModal = () => {
   albumSaveError.value = '';
 };
 
+useFocusTrap(albumSaveModalRef, {
+  active: showAlbumSaveModal,
+  onEscape: closeAlbumSaveModal,
+});
+
 const openCollectionSaveModal = () => {
   showCollectionSaveModal.value = true;
 };
@@ -389,6 +397,11 @@ const {
     image.value?.url
       ? !hasGlbExtension(image.value.url) && !hasStlExtension(image.value.url)
       : false,
+});
+
+useFocusTrap(lightboxRef, {
+  active: isLightboxOpen,
+  onEscape: closeLightbox,
 });
 
 const downloadImage = (imageUrl: string) => {
@@ -866,6 +879,7 @@ onUnmounted(() => {
 
       <div
         v-if="showAlbumSaveModal"
+        ref="albumSaveModalRef"
         class="fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-4"
         role="dialog"
         aria-modal="true"
@@ -968,7 +982,11 @@ onUnmounted(() => {
       <!-- Custom lightbox -->
       <div
         v-if="isLightboxOpen"
+        ref="lightboxRef"
         class="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Image lightbox"
       >
         <!-- Header controls -->
         <div
@@ -976,6 +994,8 @@ onUnmounted(() => {
         >
           <div class="flex items-center gap-4">
             <button
+              type="button"
+              aria-label="Close image lightbox"
               class="bg-transparent cursor-pointer border-0 text-3xl text-white"
               @click="closeLightbox"
             >
@@ -987,9 +1007,10 @@ onUnmounted(() => {
             <!-- Zoom controls -->
             <div class="flex items-center rounded bg-opacity-10">
               <button
+                type="button"
                 class="cursor-pointer px-2 py-1 text-white transition-colors hover:bg-opacity-20"
                 :class="{ 'cursor-not-allowed opacity-50': zoomLevel <= 1 }"
-                title="Zoom out"
+                aria-label="Zoom out"
                 :disabled="zoomLevel <= 1"
                 @click="zoomOut"
               >
@@ -999,9 +1020,10 @@ onUnmounted(() => {
                 {{ Math.round(zoomLevel * 100) }}%
               </span>
               <button
+                type="button"
                 class="cursor-pointer px-2 py-1 text-white transition-colors hover:bg-opacity-20"
                 :class="{ 'cursor-not-allowed opacity-50': zoomLevel >= 3 }"
-                title="Zoom in"
+                aria-label="Zoom in"
                 :disabled="zoomLevel >= 3"
                 @click="zoomIn"
               >
@@ -1009,8 +1031,9 @@ onUnmounted(() => {
               </button>
               <button
                 v-if="isZoomed"
+                type="button"
                 class="cursor-pointer px-2 py-1 text-white transition-colors hover:bg-opacity-20"
-                title="Reset zoom"
+                aria-label="Reset zoom"
                 @click="resetZoom"
               >
                 Reset
@@ -1020,6 +1043,7 @@ onUnmounted(() => {
             <!-- Download button -->
             <button
               type="button"
+              aria-label="Download image"
               class="flex h-8 w-8 cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white hover:bg-opacity-20"
               @click="() => downloadImage(image?.url || '')"
             >
