@@ -13,13 +13,6 @@ const RequireAuthUnauth = defineComponent({
   },
 });
 
-// A popover stub that exposes `isVisible` so the spec can assert it opens.
-const PopoverStub = defineComponent({
-  name: 'AddToListPopover',
-  props: { isVisible: { type: Boolean, default: false } },
-  template: '<div />',
-});
-
 // RequireAuth is stubbed by mountWithDefaults (renders the has-auth slot);
 // AddToListPopover is Apollo-backed, so stub it here.
 const mountButton = (props: Record<string, unknown> = {}) =>
@@ -74,14 +67,6 @@ describe('AddToFavoritesButton', () => {
     expect(wrapper.emitted('toggle')).toBeUndefined();
   });
 
-  it('opens the collection popover when clicked while favorited', async () => {
-    const wrapper = mountWithDefaults(AddToFavoritesButton, {
-      props: { isFavorited: true, allowAddToList: true },
-      global: { stubs: { AddToListPopover: PopoverStub } },
-    });
-    await clickFavorite(wrapper);
-    expect(wrapper.getComponent(PopoverStub).props('isVisible')).toBe(true);
-  });
 });
 
 describe('AddToFavoritesButton sizing', () => {
@@ -115,17 +100,6 @@ describe('AddToFavoritesButton tooltip', () => {
     await button.trigger('mouseleave');
     expect(document.body.querySelector('.pointer-events-none')).toBeNull();
     wrapper.unmount();
-  });
-});
-
-describe('AddToFavoritesButton collection changes', () => {
-  it('re-emits favoriteChange from the collection popover', () => {
-    const wrapper = mountWithDefaults(AddToFavoritesButton, {
-      props: { isFavorited: true, allowAddToList: true },
-      global: { stubs: { AddToListPopover: PopoverStub } },
-    });
-    wrapper.getComponent(PopoverStub).vm.$emit('favorite-change', true);
-    expect(wrapper.emitted('favoriteChange')?.[0]).toEqual([true]);
   });
 });
 

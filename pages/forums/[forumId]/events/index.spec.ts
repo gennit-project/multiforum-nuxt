@@ -41,6 +41,10 @@ const EventListViewStub = defineComponent({
   },
 });
 
+vi.mock('@/components/event/list/EventListView.vue', () => ({
+  default: EventListViewStub,
+}));
+
 describe('forum events index page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -59,13 +63,7 @@ describe('forum events index page', () => {
   it('uses a reactive getter with a UTC hour for the channel query', async () => {
     const Page = (await import('./index.vue')).default;
 
-    mount(Page, {
-      global: {
-        stubs: {
-          EventListView: EventListViewStub,
-        },
-      },
-    });
+    mount(Page);
 
     const channelQueryCall = useQuery.mock.calls[0];
     const getVariables = channelQueryCall?.[1] as
@@ -85,13 +83,7 @@ describe('forum events index page', () => {
   it('renders the event list when the events gate allows it', async () => {
     const Page = (await import('./index.vue')).default;
 
-    const wrapper = mount(Page, {
-      global: {
-        stubs: {
-          EventListView: EventListViewStub,
-        },
-      },
-    });
+    const wrapper = mount(Page);
 
     expect(
       wrapper.find('[data-testid="event-list-view"]').exists()
@@ -106,13 +98,7 @@ describe('forum events index page', () => {
     });
     const Page = (await import('./index.vue')).default;
 
-    const wrapper = mount(Page, {
-      global: {
-        stubs: {
-          EventListView: EventListViewStub,
-        },
-      },
-    });
+    const wrapper = mount(Page);
 
     expect(wrapper.text()).toContain('Calendar Not Available');
   });

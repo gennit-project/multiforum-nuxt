@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
-import { ref } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 
 const h = vi.hoisted(() => ({
@@ -20,6 +20,33 @@ vi.mock('nuxt/app', () => ({
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
+}));
+
+const DownloadListStub = defineComponent({
+  name: 'DownloadList',
+  template: '<div class="download-list-stub" />',
+});
+
+const DownloadFilterBarStub = defineComponent({
+  name: 'DownloadFilterBar',
+  template: '<div class="download-filter-bar-stub" />',
+});
+
+const DownloadFiltersStub = defineComponent({
+  name: 'DownloadFilters',
+  template: '<div class="download-filters-stub" />',
+});
+
+vi.mock('@/components/channel/DownloadList.vue', () => ({
+  default: DownloadListStub,
+}));
+
+vi.mock('@/components/download/DownloadFilterBar.vue', () => ({
+  default: DownloadFilterBarStub,
+}));
+
+vi.mock('@/components/download/DownloadFilters.vue', () => ({
+  default: DownloadFiltersStub,
 }));
 
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;

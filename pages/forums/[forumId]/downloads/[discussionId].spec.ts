@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { shallowMount } from '@vue/test-utils';
-import { ref } from 'vue';
+import { mount } from '@vue/test-utils';
+import { defineComponent, ref } from 'vue';
 
 const h = vi.hoisted(() => ({
   route: { params: { forumId: 'cats', discussionId: 'd1' } },
@@ -36,20 +36,19 @@ vi.mock('@/graphQLData/discussion/queries', () => ({
   GET_DISCUSSION: 'GET_DISCUSSION',
 }));
 
+const DiscussionDetailContentStub = defineComponent({
+  name: 'DiscussionDetailContent',
+  props: ['discussionId', 'loggedInUserModName', 'downloadMode'],
+  template: '<div class="detail" />',
+});
+
+vi.mock('@/components/discussion/detail/DiscussionDetailContent.vue', () => ({
+  default: DiscussionDetailContentStub,
+}));
+
 const mountPage = async () => {
   const Page = (await import('./[discussionId].vue')).default;
-  return shallowMount(Page, {
-    global: {
-      stubs: {
-        ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="error">{{ text }}</div>' },
-        DiscussionDetailContent: {
-          name: 'DiscussionDetailContent',
-          props: ['discussionId', 'loggedInUserModName', 'downloadMode'],
-          template: '<div class="detail" />',
-        },
-      },
-    },
-  });
+  return mount(Page);
 };
 
 beforeEach(() => {

@@ -2,7 +2,6 @@ import { describe, it, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref, defineComponent, h } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import ModProfileTabs from '@/components/mod/ModProfileTabs.vue';
 
 vi.stubGlobal('definePageMeta', vi.fn());
 
@@ -15,6 +14,43 @@ vi.mock('nuxt/app', () => ({
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
+}));
+
+vi.mock('@/composables/useServerRoleMembership', () => ({
+  useServerRoleMembership: () => ({
+    serverModProfileNames: ref([]),
+  }),
+}));
+
+vi.mock('@/utils/serverRoleBadges', () => ({
+  getServerRoleBadge: vi.fn(() => null),
+}));
+
+const ModProfileTabsStub = defineComponent({
+  name: 'ModProfileTabs',
+  template: '<div class="mod-profile-tabs-stub" />',
+});
+
+const ModProfileSidebarStub = defineComponent({
+  name: 'ModProfileSidebar',
+  template: '<div class="mod-profile-sidebar-stub" />',
+});
+
+const ModContributionChartStub = defineComponent({
+  name: 'ModContributionChart',
+  template: '<div class="mod-contribution-chart-stub" />',
+});
+
+vi.mock('@/components/mod/ModProfileTabs.vue', () => ({
+  default: ModProfileTabsStub,
+}));
+
+vi.mock('@/components/mod/ModProfileSidebar.vue', () => ({
+  default: ModProfileSidebarStub,
+}));
+
+vi.mock('@/components/charts/ModContributionChart.vue', () => ({
+  default: ModContributionChartStub,
 }));
 
 const SlotStub = defineComponent({
@@ -50,11 +86,11 @@ describe('mod profile layout page', () => {
 
   it('renders the mod profile tabs when the mod loads', async () => {
     const wrapper = await mountPage({ displayName: 'Cool Mod' });
-    expect(wrapper.findComponent(ModProfileTabs).exists()).toBe(true);
+    expect(wrapper.findComponent(ModProfileTabsStub).exists()).toBe(true);
   });
 
   it('hides the tabs when no mod is found', async () => {
     const wrapper = await mountPage(null);
-    expect(wrapper.findComponent(ModProfileTabs).exists()).toBe(false);
+    expect(wrapper.findComponent(ModProfileTabsStub).exists()).toBe(false);
   });
 });
