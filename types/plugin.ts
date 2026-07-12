@@ -38,8 +38,3 @@ export interface InstalledPlugin {
   latestVersion?: string;
   availableVersions?: string[];
 }
-
-/**
- * Plugin settings from JSON storage
- */
-export type PluginSettings = Record<string, unknown>;
