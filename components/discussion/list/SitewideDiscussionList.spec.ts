@@ -13,12 +13,21 @@ import { useRoute } from 'nuxt/app';
 // Import after mocks are declared (hoisted) so the component picks them up.
 import SitewideDiscussionList from '@/components/discussion/list/SitewideDiscussionList.vue';
 
+const { mockNuxtState } = vi.hoisted(() => ({
+  mockNuxtState: new Map<string, ReturnType<typeof ref>>(),
+}));
+
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
 }));
 vi.mock('nuxt/app', () => ({
   useRoute: vi.fn(),
-  useState: (_k, init) => ref(init ? init() : undefined),
+  useState: (key: string, init?: () => unknown) => {
+    if (!mockNuxtState.has(key)) {
+      mockNuxtState.set(key, ref(init ? init() : undefined));
+    }
+    return mockNuxtState.get(key);
+  },
 }));
 vi.mock('@/composables/useTheme', () => ({
   useAppTheme: () => ({ theme: ref('light') }),
@@ -86,6 +95,7 @@ const mountList = (route: Record<string, unknown> = {}) => {
 describe('SitewideDiscussionList', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockNuxtState.clear();
   });
 
   it('renders a list item per discussion', () => {
@@ -112,6 +122,20 @@ describe('SitewideDiscussionList', () => {
     setupQueries(createQueryMock(null, { loading: ref(true) }));
     const wrapper = mountList();
     expect(wrapper.find('.skeleton-stub').exists()).toBe(true);
+  });
+
+  it('hydrates the SSR discussions while Apollo restores its client cache', () => {
+    mockNuxtState.set(
+      'sitewide-discussions:/discussions',
+      ref([makeDiscussion('ssr')])
+    );
+    mockNuxtState.set('sitewide-discussion-count:/discussions', ref(1));
+    setupQueries(createQueryMock(null, { loading: ref(true) }));
+    const wrapper = mountList({ path: '/discussions', fullPath: '/discussions' });
+    expect({
+      items: wrapper.findAll('.item-stub').length,
+      skeleton: wrapper.find('.skeleton-stub').exists(),
+    }).toEqual({ items: 1, skeleton: false });
   });
 
   // Regression: a query-variable change after hydration (e.g. the logged-in
