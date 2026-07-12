@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, toRef, computed } from 'vue';
+import { ref, toRef, computed, useId } from 'vue';
 import { usePluginPipeline, type PipelineRun } from '@/composables/usePluginPipeline';
 import PluginPipelineStage from './PluginPipelineStage.vue';
 import PluginLogsModal from './PluginLogsModal.vue';
@@ -14,6 +14,7 @@ const props = defineProps<{
 const isExpanded = ref(true);
 const selectedRun = ref<PipelineRun | null>(null);
 const showLogsModal = ref(false);
+const pipelineContentId = useId();
 
 // Query server pipelines (file-level)
 const {
@@ -86,9 +87,13 @@ const handleCloseModal = () => {
     class="rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
   >
     <!-- Header -->
-    <div
+    <component
+      :is="collapsible ? 'button' : 'div'"
+      :type="collapsible ? 'button' : undefined"
+      :aria-expanded="collapsible ? isExpanded : undefined"
+      :aria-controls="collapsible ? pipelineContentId : undefined"
       class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700"
-      :class="{ 'cursor-pointer': collapsible }"
+      :class="{ 'w-full cursor-pointer text-left': collapsible }"
       @click="collapsible && (isExpanded = !isExpanded)"
     >
       <div class="flex items-center space-x-2">
@@ -120,20 +125,20 @@ const handleCloseModal = () => {
         >
           <i class="fa-solid fa-sync fa-spin" />
         </span>
-        <button
+        <span
           v-if="collapsible"
-          type="button"
-          :aria-expanded="isExpanded"
-          :aria-label="isExpanded ? 'Collapse pipeline details' : 'Expand pipeline details'"
+          aria-hidden="true"
           class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
         >
           <i
             :class="isExpanded ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"
             aria-hidden="true"
           />
-        </button>
+        </span>
       </div>
-    </div>
+    </component>
+
+    <div :id="pipelineContentId">
 
     <!-- Loading State -->
     <div
@@ -230,6 +235,7 @@ const handleCloseModal = () => {
       class="p-4 text-center text-sm text-gray-500 dark:text-gray-400"
     >
       No plugin activity for this content.
+    </div>
     </div>
   </div>
 

@@ -345,9 +345,13 @@ const filterByChannel = (channel: string) => {
                   </nuxt-link>
                 </template>
                 <template #does-not-have-auth>
-                  <span class="cursor-pointer text-orange-500 underline"
-                    >Create one?</span
+                  <button
+                    type="button"
+                    aria-label="Log in to create a discussion"
+                    class="cursor-pointer text-orange-500 underline"
                   >
+                    Create one?
+                  </button>
                 </template>
               </RequireAuth>
             </p>
