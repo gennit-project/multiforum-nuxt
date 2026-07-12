@@ -12,6 +12,29 @@ import {
 
 const ROOT_COMMENT_TEXT = 'Test comment';
 
+test('opens the root comment editor from the keyboard', async ({
+  context,
+  page,
+}) => {
+  const state = createCommentState();
+
+  await installMockAuth(context, page);
+  const diagnostics = await installGraphqlMocks(
+    page,
+    createCommentHandlers(state, DEFAULT_COMMENT_CONFIG)
+  );
+  const discussionUrl = `/forums/${DEFAULT_COMMENT_CONFIG.channelId}/discussions/${DEFAULT_COMMENT_CONFIG.discussionId}`;
+
+  await page.goto(discussionUrl);
+  const openEditor = page.getByRole('button', { name: 'Write a comment' });
+  await expect(openEditor).toBeVisible();
+
+  await openEditor.press('Enter');
+
+  await expect(page.getByTestId('texteditor-textarea')).toBeFocused();
+  expect(diagnostics.pageErrors).toEqual([]);
+});
+
 test('creates a root comment', async ({ context, page }, testInfo) => {
   const state = createCommentState();
 
