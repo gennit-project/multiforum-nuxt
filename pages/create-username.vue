@@ -80,7 +80,11 @@ if (isClient) {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center">
+  <main
+    id="main-content"
+    tabindex="-1"
+    class="flex min-h-screen items-center justify-center outline-none"
+  >
     <div class="w-full max-w-md">
       <!-- Show loading state while checking email -->
       <div v-if="loading" class="py-8 text-center">
@@ -107,5 +111,5 @@ if (isClient) {
         </div>
       </client-only>
     </div>
-  </div>
+  </main>
 </template>
