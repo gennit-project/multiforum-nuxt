@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { ref, defineComponent, h } from 'vue';
+import { ref, defineComponent, h, nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 import { usePopoverPositioning } from '@/composables/usePopoverPositioning';
 
@@ -22,9 +22,15 @@ const createPopoverRef = (rect: Rect) =>
   } as unknown as HTMLElement);
 
 const mountPopoverComposable = (options: {
-  position: { top: number; left: number; placement?: 'above' | 'below'; triggerRect?: any };
+  position: {
+    top: number;
+    left: number;
+    placement?: 'above' | 'below';
+    triggerRect?: { top: number; bottom: number; height: number; width: number };
+  };
   rect: Rect;
   isVisible?: boolean;
+  contentDependencies?: Array<ReturnType<typeof ref>>;
 }) => {
   const popoverRef = createPopoverRef(options.rect);
   const position = ref(options.position);
@@ -33,7 +39,12 @@ const mountPopoverComposable = (options: {
 
   const wrapper = mount(defineComponent({
     setup() {
-      api = usePopoverPositioning({ popoverRef, position, isVisible });
+      api = usePopoverPositioning({
+        popoverRef,
+        position,
+        isVisible,
+        contentDependencies: options.contentDependencies,
+      });
       return () => h('div');
     },
   }));
@@ -115,5 +126,34 @@ describe('usePopoverPositioning', () => {
     wrapper.unmount();
 
     expect(adjustedPosition.value).toEqual({ top: 122, left: 20 });
+  });
+
+  it('does not reposition when the popover is hidden', async () => {
+    const { wrapper, api } = mountPopoverComposable({
+      position: { top: 190, left: 250 },
+      rect: { width: 200, height: 80 },
+      isVisible: false,
+    });
+    await api.updateAdjustedPosition();
+    const adjustedPosition = api.adjustedPosition;
+    wrapper.unmount();
+
+    expect(adjustedPosition.value).toEqual({ top: 190, left: 250 });
+  });
+
+  it('repositions when a content dependency changes while visible', async () => {
+    const contentSize = ref('small');
+    const { wrapper, api } = mountPopoverComposable({
+      position: { top: 190, left: 250 },
+      rect: { width: 200, height: 80 },
+      contentDependencies: [contentSize],
+    });
+
+    contentSize.value = 'large';
+    await nextTick();
+    const adjustedPosition = api.adjustedPosition;
+    wrapper.unmount();
+
+    expect(adjustedPosition.value).toEqual({ top: 108, left: 88 });
   });
 });
