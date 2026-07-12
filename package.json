@@ -95,6 +95,7 @@
     "vuemoji-picker": "^0.3.2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
     "@graphql-codegen/cli": "7.2.0",
     "@graphql-codegen/client-preset": "^4.7.0",
     "@nuxt/eslint-config": "^1.16.0",
