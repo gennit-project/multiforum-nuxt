@@ -130,6 +130,55 @@ describe('MultiSelect', () => {
     await wrapper.vm.$nextTick();
   };
 
+  describe('keyboard accessibility', () => {
+    const toggleButton = (wrapper: ReturnType<typeof mountSelect>) =>
+      wrapper.get('button[aria-haspopup="true"]');
+
+    it('exposes a keyboard toggle button for the options popup', () => {
+      const wrapper = mountSelect({ modelValue: [] });
+
+      expect(toggleButton(wrapper).attributes('aria-expanded')).toBe('false');
+    });
+
+    it('opens the popup from the toggle button', async () => {
+      const wrapper = mountSelect({ modelValue: [] });
+
+      await toggleButton(wrapper).trigger('click');
+
+      expect({
+        expanded: toggleButton(wrapper).attributes('aria-expanded'),
+        hasApple: wrapper.text().includes('Apple'),
+      }).toEqual({ expanded: 'true', hasApple: true });
+    });
+
+    it('toggles an option from its checkbox change event (keyboard/space)', async () => {
+      const wrapper = mountSelect({ modelValue: [] });
+      await toggleButton(wrapper).trigger('click');
+
+      await wrapper.get('input[aria-label="Select Apple"]').trigger('change');
+
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['a']]);
+    });
+
+    it('gives each selected chip a labelled remove button', () => {
+      const wrapper = mountSelect({ modelValue: ['a'] });
+
+      expect(
+        wrapper.get('button[aria-label="Remove a"]').element.tagName
+      ).toBe('BUTTON');
+    });
+
+    it('closes the popup on Escape', async () => {
+      const wrapper = mountSelect({ modelValue: [] });
+      await toggleButton(wrapper).trigger('click');
+      expect(wrapper.text()).toContain('Apple');
+
+      await wrapper.get('[role="group"]').trigger('keydown.escape');
+
+      expect(wrapper.text()).not.toContain('Apple');
+    });
+  });
+
   describe('single-select mode', () => {
     it('replaces the selection instead of accumulating', async () => {
       const wrapper = mountSelect({ multiple: false, modelValue: ['a'] });
