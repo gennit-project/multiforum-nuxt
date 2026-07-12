@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
+import { nextTick } from 'vue';
 import AddToListModalHost from '@/components/collection/AddToListModalHost.vue';
 import { useAddToListModalStore } from '@/stores/addToListModalStore';
 
@@ -46,6 +47,35 @@ describe('AddToListModalHost', () => {
       isAlreadyFavorite: true,
       variant: 'modal',
     });
+  });
+
+  it('reacts to the store opening after mount', async () => {
+    const wrapper = mountHost();
+    const store = useAddToListModalStore();
+
+    store.open({
+      itemId: 'c1',
+      itemType: 'comment',
+      isAlreadyFavorite: false,
+    });
+    await nextTick();
+
+    expect(wrapper.findComponent(AddToListPopoverStub).props('itemId')).toBe('c1');
+  });
+
+  it('removes the popover when the store closes after mount', async () => {
+    const store = useAddToListModalStore();
+    store.open({
+      itemId: 'd1',
+      itemType: 'discussion',
+      isAlreadyFavorite: true,
+    });
+
+    const wrapper = mountHost();
+    store.close();
+    await nextTick();
+
+    expect(wrapper.findComponent(AddToListPopoverStub).exists()).toBe(false);
   });
 
   it('closes and clears the modal store when the popover emits close', async () => {

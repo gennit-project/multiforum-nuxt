@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
@@ -136,6 +136,9 @@ const mountDashboard = async (
           props: ['to'],
           template: '<a :href="to"><slot /></a>',
         },
+        ClientOnly: {
+          template: '<slot /><slot name="fallback" />',
+        },
       },
     },
   });
@@ -151,6 +154,8 @@ const mountDashboard = async (
 };
 
 beforeEach(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date('2026-06-26T12:00:00Z'));
   vi.clearAllMocks();
   mockedUseRoute.mockReturnValue({
     query: {
@@ -161,6 +166,10 @@ beforeEach(() => {
   mockedUseRouter.mockReturnValue({
     replace: vi.fn(),
   });
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe('admin dashboard page', () => {
@@ -207,6 +216,62 @@ describe('admin dashboard page', () => {
         sort: 'oldestOpenIssueAgeDays',
         sortDirection: 'desc',
       },
+    });
+  });
+
+  it('falls back to default dates and sort values for invalid route query params', async () => {
+    const replace = vi.fn();
+    mockedUseRoute.mockReturnValue({
+      query: {
+        startDate: 'not-a-date',
+        endDate: 'still-not-a-date',
+        sort: 'bogus',
+        sortDirection: 'sideways',
+      },
+    });
+    mockedUseRouter.mockReturnValue({ replace });
+
+    await mountDashboard();
+
+    expect(replace).not.toHaveBeenCalled();
+
+    expect(
+      mockedUseQuery.mock.calls[0]?.[1]?.value
+    ).toEqual({
+      startDate: '2026-05-27',
+      endDate: '2026-06-26',
+    });
+    expect(
+      mockedUseQuery.mock.calls[1]?.[1]?.value
+    ).toEqual({
+      startDate: '2026-05-27',
+      endDate: '2026-06-26',
+      limit: 20,
+      sortBy: 'activityScore',
+      sortDirection: 'desc',
+    });
+  });
+
+  it('uses valid sort query params in the channel health query', async () => {
+    mockedUseRoute.mockReturnValue({
+      query: {
+        startDate: '2026-05-27',
+        endDate: '2026-06-26',
+        sort: 'channelUniqueName',
+        sortDirection: 'asc',
+      },
+    });
+
+    await mountDashboard();
+
+    expect(
+      mockedUseQuery.mock.calls[1]?.[1]?.value
+    ).toEqual({
+      startDate: '2026-05-27',
+      endDate: '2026-06-26',
+      limit: 20,
+      sortBy: 'channelUniqueName',
+      sortDirection: 'asc',
     });
   });
 

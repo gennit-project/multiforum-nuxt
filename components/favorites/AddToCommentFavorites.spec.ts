@@ -131,4 +131,22 @@ describe('AddToCommentFavorites', () => {
 
     expect(button(wrapper).props('isFavorited')).toBe(true);
   });
+
+  it('refetches favorites after a successful toggle when isFavorited is query-driven', async () => {
+    const wrapper = mountFav({ isFavorited: null });
+
+    await button(wrapper).vm.$emit('toggle');
+    await flushPromises();
+
+    expect(h.refetch).toHaveBeenCalled();
+  });
+
+  it('does not refetch favorites when the parent controls isFavorited', async () => {
+    const wrapper = mountFav({ isFavorited: false });
+
+    await button(wrapper).vm.$emit('toggle');
+    await flushPromises();
+
+    expect(h.refetch).not.toHaveBeenCalled();
+  });
 });
