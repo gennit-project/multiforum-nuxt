@@ -142,6 +142,7 @@ const tableColumnCount = computed(() => {
               <th
                 v-for="column in channelHealthColumns"
                 :key="column.key"
+                scope="col"
                 class="px-4 py-3 font-medium"
                 :aria-sort="column.ariaSort"
                 :title="column.title"
@@ -160,6 +161,7 @@ const tableColumnCount = computed(() => {
               </th>
               <th
                 v-if="detailRouteBase"
+                scope="col"
                 class="px-4 py-3 text-right font-medium"
               >
                 <span class="sr-only">Details</span>

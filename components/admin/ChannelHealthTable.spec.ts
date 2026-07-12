@@ -70,6 +70,13 @@ describe('ChannelHealthTable', () => {
     });
   });
 
+  it('marks every column header with scope="col"', () => {
+    const wrapper = mountTable();
+    expect(
+      wrapper.findAll('th').every((th) => th.attributes('scope') === 'col')
+    ).toBe(true);
+  });
+
   it('renders five loading skeleton rows while loading', () => {
     const wrapper = mountTable({ rows: [], loading: true });
     expect(wrapper.findAll('[data-testid="channel-health-loading-row"]')).toHaveLength(5);
