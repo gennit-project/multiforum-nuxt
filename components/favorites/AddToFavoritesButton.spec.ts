@@ -4,6 +4,15 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
 import AddToFavoritesButton from '@/components/favorites/AddToFavoritesButton.vue';
 
+const AddToListPopoverStub = defineComponent({
+  name: 'AddToListPopover',
+  template: '<div class="add-to-list-popover-stub" />',
+});
+
+vi.mock('@/components/collection/AddToListPopover.vue', () => ({
+  default: AddToListPopoverStub,
+}));
+
 // Override the default RequireAuth stub (which renders the has-auth slot) to
 // render the unauthenticated branch instead.
 const RequireAuthUnauth = defineComponent({
@@ -14,17 +23,23 @@ const RequireAuthUnauth = defineComponent({
 });
 
 // RequireAuth is stubbed by mountWithDefaults (renders the has-auth slot);
-// AddToListPopover is Apollo-backed, so stub it here.
+// AddToListPopover is async and Apollo-backed, so keep the global stub aligned
+// with the module mock above.
 const mountButton = (props: Record<string, unknown> = {}) =>
   mountWithDefaults(AddToFavoritesButton, {
     props: { isFavorited: false, ...props },
-    global: { stubs: { AddToListPopover: true } },
+    global: { stubs: { AddToListPopover: AddToListPopoverStub } },
   });
 
 const mountUnauthButton = (props: Record<string, unknown> = {}) =>
   mountWithDefaults(AddToFavoritesButton, {
     props: { isFavorited: false, ...props },
-    global: { stubs: { RequireAuth: RequireAuthUnauth, AddToListPopover: true } },
+    global: {
+      stubs: {
+        RequireAuth: RequireAuthUnauth,
+        AddToListPopover: AddToListPopoverStub,
+      },
+    },
   });
 
 const clickFavorite = (wrapper: ReturnType<typeof mountButton>) =>
