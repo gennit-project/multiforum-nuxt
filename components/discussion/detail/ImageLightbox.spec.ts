@@ -224,10 +224,23 @@ describe('ImageLightbox close', () => {
   it('emits close on the Escape key', async () => {
     const wrapper = mountLightbox();
 
-    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     await wrapper.vm.$nextTick();
 
     expect(wrapper.emitted('close')).toBeTruthy();
+  });
+
+  it('restores focus when the lightbox unmounts', async () => {
+    const trigger = document.createElement('button');
+    document.body.appendChild(trigger);
+    trigger.focus();
+    const wrapper = mountLightbox();
+    await wrapper.vm.$nextTick();
+
+    wrapper.unmount();
+
+    expect(document.activeElement).toBe(trigger);
+    trigger.remove();
   });
 });
 
@@ -290,6 +303,16 @@ describe('ImageLightbox reporting', () => {
     await controls(wrapper).vm.$emit('report-image');
 
     expect(reportModal(wrapper).props('open')).toBe(true);
+  });
+
+  it('leaves Escape handling to the nested report modal', async () => {
+    const wrapper = mountLightbox();
+    await controls(wrapper).vm.$emit('report-image');
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.emitted('close')).toBeUndefined();
   });
 
   it('shows the success notification after a report is submitted', async () => {
