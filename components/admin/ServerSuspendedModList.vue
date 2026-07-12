@@ -50,7 +50,8 @@ const humanReadableDate = (dateISO?: string | null): string => {
       <div class="text-sm font-bold">
         {{ `Active Suspensions (${aggregateCount})` }}
       </div>
-      <div
+      <ul role="list">
+      <li
         v-for="suspension in suspensions"
         :key="suspension.id"
         class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -98,7 +99,8 @@ const humanReadableDate = (dateISO?: string | null): string => {
             }}
           </div>
         </div>
-      </div>
+      </li>
+      </ul>
     </div>
   </div>
 </template>

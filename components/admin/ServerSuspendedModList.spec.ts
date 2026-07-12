@@ -84,6 +84,13 @@ describe('ServerSuspendedModList content', () => {
     expect(wrapper.text()).toContain('mod1 (alice)');
   });
 
+  it('renders the suspensions as a semantic list', () => {
+    h.result = ref(withMods([suspension({ id: 'a' }), suspension({ id: 'b' })]));
+    const wrapper = mountList();
+
+    expect(wrapper.findAll('ul[role="list"] > li')).toHaveLength(2);
+  });
+
   it('shows a suspended-until date for a temporary suspension', () => {
     const wrapper = mountList();
 

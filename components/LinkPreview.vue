@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { config } from '@/config';
 
 const props = defineProps<{
@@ -7,6 +7,9 @@ const props = defineProps<{
 }>();
 
 const title = ref('');
+// The image is the only content of its link, so it must never fall back to
+// alt="" (that would leave the link unnamed while the title loads).
+const imageAlt = computed(() => title.value || `Preview image for ${props.url}`);
 const description = ref('');
 const imageUrl = ref('');
 const htmlInferredImages = ref<string[]>([]);
@@ -55,7 +58,7 @@ onMounted(() => {
         v-if="imageUrl && showImage"
         class="m-4 w-20 object-cover"
         :src="imageUrl"
-        :alt="title"
+        :alt="imageAlt"
         @error="showImage = false"
       >
     </a>
