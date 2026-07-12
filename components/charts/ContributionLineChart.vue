@@ -78,6 +78,32 @@ const chartData = computed(() => {
   };
 });
 
+// Canvas charts are invisible to assistive tech, so we expose the same data
+// two accessible ways (WCAG 1.1.1): a summary via role="img"/aria-label on the
+// chart, and a visually-hidden data table with the exact per-day numbers.
+const tableRows = computed(() => {
+  const labels = chartData.value.labels;
+  const comments = chartData.value.datasets[0]?.data ?? [];
+  const discussions = chartData.value.datasets[1]?.data ?? [];
+  return labels.map((label, i) => ({
+    label,
+    comments: comments[i] ?? 0,
+    discussions: discussions[i] ?? 0,
+  }));
+});
+
+const chartSummary = computed(() => {
+  const rows = tableRows.value;
+  const first = rows[0];
+  const last = rows[rows.length - 1];
+  if (!first || !last) {
+    return 'Line chart of contribution activity. No data yet.';
+  }
+  const totalComments = rows.reduce((sum, r) => sum + r.comments, 0);
+  const totalDiscussions = rows.reduce((sum, r) => sum + r.discussions, 0);
+  return `Line chart of contribution activity from ${first.label} to ${last.label}: ${totalComments} comments and ${totalDiscussions} discussions.`;
+});
+
 const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
@@ -127,7 +153,29 @@ const chartOptions = computed(() => ({
 </script>
 
 <template>
-  <div class="h-64">
-    <Line :data="chartData" :options="chartOptions" />
+  <div>
+    <div class="h-64" role="img" :aria-label="chartSummary">
+      <Line :data="chartData" :options="chartOptions" />
+    </div>
+    <!-- Text alternative for screen readers; visually hidden. -->
+    <table v-if="tableRows.length" class="sr-only">
+      <caption>
+        {{ chartSummary }}
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col">Comments</th>
+          <th scope="col">Discussions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="row in tableRows" :key="row.label">
+          <th scope="row">{{ row.label }}</th>
+          <td>{{ row.comments }}</td>
+          <td>{{ row.discussions }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
