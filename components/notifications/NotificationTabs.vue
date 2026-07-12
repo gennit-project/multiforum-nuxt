@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, useId, nextTick } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useUsername } from '@/composables/useAuthState';
 import { timeAgo } from '@/utils';
@@ -29,6 +29,43 @@ type NotificationTab = 'general' | 'feedback';
 const activeTab = defineModel<NotificationTab>('activeTab', {
   default: 'general',
 });
+
+// ARIA tabs wiring (WAI-ARIA tabs pattern): stable ids tie each tab to the
+// shared panel, and arrow/Home/End keys move between tabs with focus.
+const generalTabId = useId();
+const feedbackTabId = useId();
+const panelId = useId();
+const generalTabRef = ref<HTMLButtonElement | null>(null);
+const feedbackTabRef = ref<HTMLButtonElement | null>(null);
+
+const activeTabId = computed(() =>
+  activeTab.value === 'general' ? generalTabId : feedbackTabId
+);
+
+const selectTab = (tab: NotificationTab) => {
+  activeTab.value = tab;
+  nextTick(() => {
+    (tab === 'general' ? generalTabRef.value : feedbackTabRef.value)?.focus();
+  });
+};
+
+const onTabKeydown = (event: KeyboardEvent) => {
+  switch (event.key) {
+    case 'ArrowRight':
+    case 'ArrowLeft':
+      event.preventDefault();
+      selectTab(activeTab.value === 'general' ? 'feedback' : 'general');
+      break;
+    case 'Home':
+      event.preventDefault();
+      selectTab('general');
+      break;
+    case 'End':
+      event.preventDefault();
+      selectTab('feedback');
+      break;
+  }
+};
 
 const usernameVar = useUsername();
 
@@ -268,8 +305,20 @@ const reachedEnd = computed(() => {
         <h1 class="mb-4 border-b border-gray-500 text-2xl">Notifications</h1>
 
         <!-- Tab navigation -->
-        <div class="mb-4 flex gap-2 border-b border-gray-200 dark:border-gray-700">
+        <div
+          role="tablist"
+          aria-label="Notifications"
+          class="mb-4 flex gap-2 border-b border-gray-200 dark:border-gray-700"
+          @keydown="onTabKeydown"
+        >
           <button
+            :id="generalTabId"
+            ref="generalTabRef"
+            type="button"
+            role="tab"
+            :aria-selected="activeTab === 'general'"
+            :aria-controls="panelId"
+            :tabindex="activeTab === 'general' ? 0 : -1"
             :class="[
               'px-4 py-2 text-sm font-medium',
               activeTab === 'general'
@@ -287,6 +336,13 @@ const reachedEnd = computed(() => {
             </span>
           </button>
           <button
+            :id="feedbackTabId"
+            ref="feedbackTabRef"
+            type="button"
+            role="tab"
+            :aria-selected="activeTab === 'feedback'"
+            :aria-controls="panelId"
+            :tabindex="activeTab === 'feedback' ? 0 : -1"
             :class="[
               'px-4 py-2 text-sm font-medium',
               activeTab === 'feedback'
@@ -306,6 +362,12 @@ const reachedEnd = computed(() => {
         </div>
       </div>
 
+      <div
+        :id="panelId"
+        role="tabpanel"
+        :aria-labelledby="activeTabId"
+        tabindex="0"
+      >
       <p v-if="isLoading" class="px-4">Loading...</p>
 
       <ErrorBanner v-else-if="currentError" :text="currentError.message" />
@@ -402,6 +464,7 @@ const reachedEnd = computed(() => {
             @load-more="loadMore"
           />
         </div>
+      </div>
       </div>
     </div>
   </div>

@@ -200,6 +200,48 @@ describe('NotificationTabs', () => {
     expect(badges.length).toBeGreaterThan(0);
   });
 
+  it('exposes the tabs as an ARIA tablist', () => {
+    const wrapper = mountNotificationTabs();
+
+    expect(wrapper.get('[role="tablist"]').exists()).toBe(true);
+  });
+
+  it('marks the active tab aria-selected and the other not', () => {
+    const wrapper = mountNotificationTabs();
+    const tabs = wrapper.findAll('[role="tab"]');
+
+    expect(tabs.map((t) => t.attributes('aria-selected'))).toEqual([
+      'true',
+      'false',
+    ]);
+  });
+
+  it('gives only the active tab a tabindex of 0 (roving focus)', () => {
+    const wrapper = mountNotificationTabs();
+    const tabs = wrapper.findAll('[role="tab"]');
+
+    expect(tabs.map((t) => t.attributes('tabindex'))).toEqual(['0', '-1']);
+  });
+
+  it('labels the tabpanel with the active tab', () => {
+    const wrapper = mountNotificationTabs();
+    const activeTabId = wrapper.get('[aria-selected="true"]').attributes('id');
+
+    expect(wrapper.get('[role="tabpanel"]').attributes('aria-labelledby')).toBe(
+      activeTabId
+    );
+  });
+
+  it('switches tabs with the ArrowRight key', async () => {
+    const wrapper = mountNotificationTabs();
+
+    await wrapper.get('[role="tablist"]').trigger('keydown', { key: 'ArrowRight' });
+
+    expect(
+      wrapper.findAll('[role="tab"]')[1]!.attributes('aria-selected')
+    ).toBe('true');
+  });
+
   it('renders notification list', () => {
     const wrapper = mountNotificationTabs();
 

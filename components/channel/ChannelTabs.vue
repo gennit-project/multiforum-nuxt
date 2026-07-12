@@ -320,7 +320,7 @@ const tabs = computed((): Tab[] => {
                   }}
                 </span>
               </div>
-              <i class="fa-solid fa-chevron-down ml-2 h-4 w-4" />
+              <i class="fa-solid fa-chevron-down ml-2 h-4 w-4" aria-hidden="true" />
             </button>
           </template>
 
@@ -334,6 +334,7 @@ const tabs = computed((): Tab[] => {
                   :key="tab.name"
                   :to="tabRoutes[tab.name] || ''"
                   :data-testid="`mobile-dropdown-${tab.name}`"
+                  :aria-current="isTabActive(tab) ? 'page' : undefined"
                   class="flex items-center justify-between px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
                   :class="[
                     isTabActive(tab)
