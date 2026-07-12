@@ -81,6 +81,14 @@ describe('PluginSecretsSection input toggle', () => {
     expect(wrapper.find('input[type="password"]').exists()).toBe(true);
   });
 
+  it('names the secret input after its key for assistive tech', () => {
+    const wrapper = mountSection({ showSecretInputs: { API_KEY: true } });
+
+    expect(
+      wrapper.find('input[type="password"]').attributes('aria-label')
+    ).toBe('Value for API_KEY');
+  });
+
   it('emits the updated secret value on input', async () => {
     const wrapper = mountSection({ showSecretInputs: { API_KEY: true } });
 
