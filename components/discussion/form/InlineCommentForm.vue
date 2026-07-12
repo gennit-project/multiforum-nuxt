@@ -529,24 +529,23 @@ const applyModSuggestion = (value: string) => {
         </form>
       </template>
       <template #does-not-have-auth>
-        <div
+        <button
+          type="button"
+          aria-label="Log in to add a comment"
           class="flex w-full items-center gap-3 rounded-lg border border-orange-400 bg-white px-3 py-2 dark:bg-gray-900"
         >
-          <textarea
-            class="min-h-[44px] flex-1 resize-none bg-white text-sm text-gray-500 placeholder-gray-500 outline-none focus:outline-none focus:ring-0 focus-visible:outline-none dark:bg-gray-900 dark:text-gray-400 dark:placeholder-gray-500"
-            name="discussionInlineComment"
-            :rows="1"
-            placeholder="Join the discussion..."
-            disabled
-          />
-          <button
-            type="button"
+          <span
+            class="flex min-h-[44px] flex-1 items-center bg-white text-left text-sm text-gray-500 dark:bg-gray-900 dark:text-gray-400"
+          >
+            Join the discussion...
+          </span>
+          <span
+            aria-hidden="true"
             class="font-semibold rounded-md bg-orange-200 px-4 py-2 text-sm text-black dark:bg-orange-950 dark:text-orange-400"
-            disabled
           >
             Post
-          </button>
-        </div>
+          </span>
+        </button>
       </template>
     </RequireAuth>
   </div>

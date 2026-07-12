@@ -92,4 +92,53 @@ describe('CreateRootCommentForm', () => {
 
     expect(wrapper.find('[data-testid="error-banner"]').exists()).toBe(false);
   });
+
+  it('uses a button to open the authenticated comment editor', async () => {
+    const wrapper = mount(CreateRootCommentForm, {
+      props: {
+        createCommentLoading: false,
+        createFormValues: { text: '', isRootComment: true, depth: 1 },
+        commentEditorOpen: false,
+      },
+      global: {
+        stubs: {
+          RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
+          LoggedInUserAvatar: { template: '<div />' },
+          ErrorBanner: { template: '<div />' },
+          SuspensionNotice: { template: '<div />' },
+        },
+      },
+    });
+
+    await wrapper.get('[data-testid="addComment"]').trigger('click');
+
+    expect({
+      element: wrapper.get('[data-testid="addComment"]').element.tagName,
+      emitted: wrapper.emitted('openCommentEditor')?.length,
+    }).toEqual({ element: 'BUTTON', emitted: 1 });
+  });
+
+  it('uses a named login button for unauthenticated commenters', () => {
+    const wrapper = mount(CreateRootCommentForm, {
+      props: {
+        createCommentLoading: false,
+        createFormValues: { text: '', isRootComment: true, depth: 1 },
+        commentEditorOpen: false,
+      },
+      global: {
+        stubs: {
+          RequireAuth: {
+            template: '<div><slot name="does-not-have-auth" /></div>',
+          },
+          PlaceholderAvatar: { template: '<div />' },
+          ErrorBanner: { template: '<div />' },
+          SuspensionNotice: { template: '<div />' },
+        },
+      },
+    });
+
+    expect(
+      wrapper.get('[aria-label="Log in to write a comment"]').element.tagName
+    ).toBe('BUTTON');
+  });
 });
