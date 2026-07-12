@@ -131,4 +131,22 @@ describe('AddToImageFavorites', () => {
 
     expect(button(wrapper).props('isFavorited')).toBe(true);
   });
+
+  it('refetches favorites after a successful toggle when it owns the lookup query', async () => {
+    const wrapper = mountFav();
+
+    await button(wrapper).vm.$emit('toggle');
+    await flushPromises();
+
+    expect(h.refetch).toHaveBeenCalled();
+  });
+
+  it('does not refetch favorites when the parent provided initialIsFavorited', async () => {
+    const wrapper = mountFav({ initialIsFavorited: false });
+
+    await button(wrapper).vm.$emit('toggle');
+    await flushPromises();
+
+    expect(h.refetch).not.toHaveBeenCalled();
+  });
 });

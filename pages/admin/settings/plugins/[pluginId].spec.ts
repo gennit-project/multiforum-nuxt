@@ -93,6 +93,16 @@ const stubs = {
 
 const mountPage = () => mountWithDefaults(PluginDetailPage, { global: { stubs } });
 
+const deferred = <T = unknown>() => {
+  let resolve!: (value: T) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+};
+
 const setAvailablePlugin = (overrides: Record<string, unknown> = {}) => {
   h.q.AVAILABLE.result.value = {
     plugins: [
@@ -365,5 +375,160 @@ describe('Plugin detail page', () => {
         endpoint: 'https://example.com',
       },
     });
+  });
+
+  it('saves settings and secrets using the installed plugin slug, then refetches and clears secret values', async () => {
+    setInstalledPlugin({
+      plugin: {
+        id: PLUGIN_ID,
+        name: 'plugin-slug',
+        displayName: 'My Plugin',
+      },
+      manifest: {
+        ui: {
+          forms: {
+            server: [
+              {
+                id: 'main',
+                title: 'Main',
+                fields: [
+                  { key: 'endpoint', label: 'Endpoint', type: 'text' },
+                  { key: 'apiKey', label: 'API Key', type: 'secret' },
+                ],
+              },
+            ],
+          },
+        },
+      },
+    });
+    const wrapper = mountPage();
+
+    await wrapper.findComponent({ name: 'PluginSettingsSection' }).vm.$emit(
+      'update:modelValue',
+      {
+        endpoint: 'https://example.com',
+        apiKey: 'secret-value',
+      }
+    );
+    await wrapper.get('[data-test="save-settings"]').trigger('click');
+    await flushPromises();
+
+    expect(h.mutations.SET_SECRET_M?.mutate).toHaveBeenCalledWith({
+      pluginId: 'plugin-slug',
+      key: 'apiKey',
+      value: 'secret-value',
+    });
+    expect(h.mutations.ENABLE_M?.mutate).toHaveBeenCalledWith({
+      pluginId: 'plugin-slug',
+      version: '1.0.0',
+      enabled: true,
+      settingsJson: {
+        endpoint: 'https://example.com',
+      },
+    });
+    expect(toast.success).toHaveBeenCalledWith('Settings saved successfully');
+    expect(h.q.INSTALLED.refetch).toHaveBeenCalled();
+    expect(h.q.SECRETS.refetch).toHaveBeenCalled();
+    expect(
+      wrapper.findComponent({ name: 'PluginSettingsSection' }).props(
+        'modelValue'
+      )
+    ).toEqual({
+      endpoint: 'https://example.com',
+      apiKey: '',
+    });
+  });
+
+  it('stops before saving non-secret settings when saving a secret fails', async () => {
+    setInstalledPlugin({
+      manifest: {
+        ui: {
+          forms: {
+            server: [
+              {
+                id: 'main',
+                title: 'Main',
+                fields: [
+                  { key: 'endpoint', label: 'Endpoint', type: 'text' },
+                  { key: 'apiKey', label: 'API Key', type: 'secret' },
+                ],
+              },
+            ],
+          },
+        },
+      },
+    });
+    h.mutations.SET_SECRET_M = {
+      mutate: vi.fn().mockRejectedValue(new Error('Secret rejected')),
+      loading: { value: false },
+    };
+    const wrapper = mountPage();
+
+    await wrapper.findComponent({ name: 'PluginSettingsSection' }).vm.$emit(
+      'update:modelValue',
+      {
+        endpoint: 'https://example.com',
+        apiKey: 'secret-value',
+      }
+    );
+    await wrapper.get('[data-test="save-settings"]').trigger('click');
+    await flushPromises();
+
+    expect(h.mutations.ENABLE_M?.mutate).not.toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledWith(
+      'Failed to save settings: Secret rejected'
+    );
+    expect(
+      wrapper.findComponent({ name: 'PluginSettingsSection' }).props(
+        'modelValue'
+      )
+    ).toEqual({
+      endpoint: 'https://example.com',
+      apiKey: 'secret-value',
+    });
+  });
+
+  it('keeps the settings section in a saving state while the save is in flight', async () => {
+    setInstalledPlugin({
+      manifest: {
+        ui: {
+          forms: {
+            server: [
+              {
+                id: 'main',
+                title: 'Main',
+                fields: [{ key: 'endpoint', label: 'Endpoint', type: 'text' }],
+              },
+            ],
+          },
+        },
+      },
+    });
+    const enableDeferred = deferred<Record<string, never>>();
+    h.mutations.ENABLE_M = {
+      mutate: vi.fn().mockReturnValue(enableDeferred.promise),
+      loading: { value: false },
+    };
+    const wrapper = mountPage();
+
+    await wrapper.findComponent({ name: 'PluginSettingsSection' }).vm.$emit(
+      'update:modelValue',
+      {
+        endpoint: 'https://example.com',
+      }
+    );
+    await wrapper.get('[data-test="save-settings"]').trigger('click');
+    await flushPromises();
+
+    expect(
+      wrapper.findComponent({ name: 'PluginSettingsSection' }).props('saving')
+    ).toBe(true);
+
+    enableDeferred.resolve({});
+    await flushPromises();
+
+    expect(
+      wrapper.findComponent({ name: 'PluginSettingsSection' }).props('saving')
+    ).toBe(false);
   });
 });
