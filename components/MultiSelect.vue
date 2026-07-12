@@ -108,21 +108,29 @@ const isDropdownOpen = ref(false);
 const searchQuery = ref('');
 const selected = ref<MultiSelectValue[]>([...props.modelValue]);
 const searchInputRef = ref<HTMLInputElement | null>(null);
-// Keyboard-accessible toggle button; also the element focus returns to on close.
 const toggleButtonRef = ref<HTMLButtonElement | null>(null);
-const listboxId = useId();
+const popupRef = ref<HTMLElement | null>(null);
+const popupId = useId();
+const descriptionId = useId();
+const errorId = useId();
 const expandedSections = ref<Set<number>>(new Set());
 const expandedCollections = ref<Set<string>>(new Set());
 
 const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value;
-
-  // Auto-focus the search input when dropdown opens
-  if (isDropdownOpen.value && props.searchable) {
-    nextTick(() => {
-      searchInputRef.value?.focus();
-    });
+  if (isDropdownOpen.value) {
+    closeDropdown();
+    return;
   }
+
+  isDropdownOpen.value = true;
+
+  nextTick(() => {
+    if (props.searchable) {
+      searchInputRef.value?.focus();
+    } else {
+      focusSelectionControl('first');
+    }
+  });
 };
 
 const closeDropdown = () => {
@@ -131,14 +139,28 @@ const closeDropdown = () => {
   searchQuery.value = '';
 };
 
-// Open the dropdown from a keyboard trigger (ArrowDown on the toggle button),
-// then move focus into the search box if there is one.
-const openDropdown = () => {
+const selectionControls = () =>
+  Array.from(
+    popupRef.value?.querySelectorAll<HTMLButtonElement>(
+      '[data-selection-control]:not(:disabled)'
+    ) || []
+  );
+
+const focusSelectionControl = (position: 'first' | 'last') => {
+  const controls = selectionControls();
+  controls[position === 'first' ? 0 : controls.length - 1]?.focus();
+};
+
+const openDropdown = (position: 'first' | 'last' = 'first') => {
   if (isDropdownOpen.value) return;
   isDropdownOpen.value = true;
-  if (props.searchable) {
-    nextTick(() => searchInputRef.value?.focus());
-  }
+  nextTick(() => {
+    if (props.searchable && position === 'first') {
+      searchInputRef.value?.focus();
+    } else {
+      focusSelectionControl(position);
+    }
+  });
 };
 
 // Close the dropdown and return focus to the toggle button (keyboard dismiss).
@@ -147,16 +169,51 @@ const closeAndReturnFocus = () => {
   nextTick(() => toggleButtonRef.value?.focus());
 };
 
-// The search box stops key propagation (so typing doesn't reach parents); make
-// sure Escape still closes the dropdown.
 const onSearchKeydown = (event: KeyboardEvent) => {
-  if (event.key === 'Escape') closeAndReturnFocus();
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    closeAndReturnFocus();
+  } else if (event.key === 'ArrowDown') {
+    event.preventDefault();
+    focusSelectionControl('first');
+  } else if (event.key === 'ArrowUp') {
+    event.preventDefault();
+    focusSelectionControl('last');
+  }
+};
+
+const onPopupKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    closeAndReturnFocus();
+    return;
+  }
+
+  const target = event.target as HTMLElement;
+  if (!target.matches('[data-selection-control]')) return;
+
+  const controls = selectionControls();
+  const currentIndex = controls.indexOf(target as HTMLButtonElement);
+  let nextIndex: number | undefined;
+
+  if (event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % controls.length;
+  if (event.key === 'ArrowUp') {
+    nextIndex = (currentIndex - 1 + controls.length) % controls.length;
+  }
+  if (event.key === 'Home') nextIndex = 0;
+  if (event.key === 'End') nextIndex = controls.length - 1;
+
+  if (nextIndex !== undefined) {
+    event.preventDefault();
+    controls[nextIndex]?.focus();
+  }
 };
 
 const toggleSelection = (value: MultiSelectValue) => {
   if (!props.multiple) {
     selected.value = selected.value.includes(value) ? [] : [value];
     closeDropdown();
+    nextTick(() => toggleButtonRef.value?.focus());
   } else {
     const index = selected.value.indexOf(value);
     if (index === -1) {
@@ -258,6 +315,12 @@ const updateSearch = (query: string) => {
   emit('search', query);
 };
 
+const optionAriaLabel = (option: MultiSelectOption) => {
+  return option.label === option.value
+    ? option.label
+    : `${option.label} (${option.value})`;
+};
+
 // Combine all options from both legacy options and sections
 const allOptions = computed(() => {
   const optionsFromSections = props.sections.flatMap(
@@ -323,28 +386,50 @@ const selectedOptions = computed(() => {
     .map((value) => getOptionByValue(value))
     .filter(Boolean) as MultiSelectOption[];
 });
+
+const toggleAriaLabel = computed(() => {
+  const valueSummary = selectedOptions.value.length
+    ? selectedOptions.value.map((option) => option.label).join(', ')
+    : 'No selection';
+  return `${props.placeholder} Current selection: ${valueSummary}. ${
+    isDropdownOpen.value ? 'Hide options' : 'Show options'
+  }`;
+});
+
+const describedBy = computed(() => {
+  return [props.description && descriptionId, props.error && errorId]
+    .filter(Boolean)
+    .join(' ') || undefined;
+});
 </script>
 
 <template>
   <div>
-    <div v-if="description" class="py-1 text-sm dark:text-gray-300">
+    <div
+      v-if="description"
+      :id="descriptionId"
+      class="py-1 text-sm dark:text-gray-300"
+    >
       {{ description }}
     </div>
 
-    <div v-if="error" class="mb-2 text-sm text-red-500">
+    <div
+      v-if="error"
+      :id="errorId"
+      role="alert"
+      class="mb-2 text-sm text-red-500"
+    >
       {{ error }}
     </div>
 
     <div v-click-outside="closeDropdown" class="relative">
       <div
-        :data-testid="testId"
         :class="[
-          'flex w-full cursor-pointer rounded-lg border px-4 text-left dark:border-gray-700 dark:bg-gray-700',
+          'flex w-full rounded-lg border px-4 text-left dark:border-gray-700 dark:bg-gray-700',
           showChips
             ? 'min-h-10 flex-wrap items-center'
             : 'min-h-12 items-start py-2',
         ]"
-        @click="toggleDropdown"
       >
         <!-- Selected items as chips -->
         <div
@@ -396,7 +481,7 @@ const selectedOptions = computed(() => {
           v-if="selectedOptions.length === 0"
           class="text-gray-500 dark:text-gray-400"
         >
-          {{ placeholder }}
+          <span>{{ placeholder }}</span>
         </div>
 
         <!-- Clear button and dropdown arrow -->
@@ -413,18 +498,18 @@ const selectedOptions = computed(() => {
             <XmarkIcon class="h-4 w-4" aria-hidden="true" />
           </button>
 
-          <!-- Dropdown toggle: the keyboard-accessible control that opens the
-               options popup (the whole field is also clickable for the mouse). -->
           <button
             ref="toggleButtonRef"
             type="button"
-            :aria-label="isDropdownOpen ? 'Hide options' : 'Show options'"
+            :data-testid="testId"
+            :aria-label="toggleAriaLabel"
+            :aria-describedby="describedBy"
             :aria-expanded="isDropdownOpen"
-            aria-haspopup="true"
-            :aria-controls="listboxId"
-            class="flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
-            @click.stop="toggleDropdown"
-            @keydown.down.prevent="openDropdown"
+            :aria-controls="popupId"
+            class="flex min-h-10 min-w-10 items-center justify-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+            @click="toggleDropdown"
+            @keydown.down.prevent="openDropdown('first')"
+            @keydown.up.prevent="openDropdown('last')"
           >
             <ChevronDownIcon
               class="h-4 w-4 transition-transform"
@@ -438,15 +523,16 @@ const selectedOptions = computed(() => {
       <!-- Dropdown -->
       <div
         v-if="isDropdownOpen"
-        :id="listboxId"
-        role="group"
-        :aria-label="placeholder"
+        :id="popupId"
+        ref="popupRef"
+        role="region"
+        :aria-label="`${placeholder} options`"
         :class="[
           'absolute z-50 mt-1 w-full rounded-md border bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800',
           dropdownMaxHeight,
           'overflow-y-auto',
         ]"
-        @keydown.escape="closeAndReturnFocus"
+        @keydown="onPopupKeydown"
       >
         <!-- Search bar for dropdown -->
         <div
@@ -461,7 +547,7 @@ const selectedOptions = computed(() => {
             :aria-label="searchPlaceholder"
             class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             @input="updateSearch(searchQuery)"
-            @keydown.stop="onSearchKeydown"
+            @keydown="onSearchKeydown"
             @keyup.stop
             @click.stop
             @focus.stop
@@ -472,6 +558,7 @@ const selectedOptions = computed(() => {
         <!-- Loading state -->
         <div
           v-if="loading"
+          role="status"
           class="p-4 text-center text-gray-500 dark:text-gray-400"
         >
           Loading...
@@ -483,8 +570,8 @@ const selectedOptions = computed(() => {
             v-for="(section, sectionIndex) in filteredSections"
             :key="sectionIndex"
           >
-            <!-- Section title -->
             <div
+              :id="`${popupId}-section-${sectionIndex}`"
               class="bg-gray-50 font-semibold px-4 py-2 text-xs uppercase text-gray-600 dark:bg-gray-900 dark:text-gray-400"
             >
               {{ section.title }}
@@ -492,9 +579,12 @@ const selectedOptions = computed(() => {
 
             <!-- Select All option (if section has selectAllLabel) -->
             <div v-if="section.selectAllLabel && section.options.length > 0">
-              <div
+              <button
+                type="button"
+                data-selection-control
+                :aria-pressed="isSectionFullySelected(section.options)"
                 :class="[
-                  'flex cursor-pointer items-center border-b px-4 py-2 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700',
+                  'flex w-full items-center border-b px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 dark:border-gray-600 dark:hover:bg-gray-700',
                   isSectionFullySelected(section.options)
                     ? 'bg-orange-50 dark:bg-orange-900/20'
                     : '',
@@ -503,13 +593,20 @@ const selectedOptions = computed(() => {
               >
                 <!-- Checkbox for select all -->
                 <div class="relative mr-3">
-                  <input
-                    type="checkbox"
-                    :checked="isSectionFullySelected(section.options)"
-                    :aria-label="section.selectAllLabel"
-                    class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
-                    @click.stop="toggleSelectAll(section.options)"
+                  <span
+                    aria-hidden="true"
+                    :class="[
+                      'flex h-4 w-4 items-center justify-center rounded border',
+                      isSectionFullySelected(section.options)
+                        ? 'border-orange-600 bg-orange-600 text-white'
+                        : 'border-gray-400 dark:border-gray-500',
+                    ]"
                   >
+                    <CheckIcon
+                      v-if="isSectionFullySelected(section.options)"
+                      class="h-3 w-3"
+                    />
+                  </span>
                 </div>
 
                 <!-- Label -->
@@ -525,7 +622,7 @@ const selectedOptions = computed(() => {
                 >
                   {{ selectableOptions(section.options).length }}
                 </span>
-              </div>
+              </button>
 
               <!-- Preview list of forums -->
               <div class="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
@@ -567,161 +664,188 @@ const selectedOptions = computed(() => {
               <div
                 v-for="collectionOption in section.options"
                 :key="String(collectionOption.value)"
-                :class="[
-                  'flex cursor-pointer items-center border-b px-4 py-2 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700',
-                  isCollectionFullySelected(
-                    collectionOption.channels || []
-                  )
-                    ? 'bg-orange-50 dark:bg-orange-900/20'
-                    : '',
-                ]"
-                @click="
-                  toggleCollectionChannels(
-                    collectionOption.channels || []
-                  )
-                "
+                class="border-b dark:border-gray-600"
               >
-                <!-- Checkbox -->
-                <div class="relative mr-3">
-                  <input
-                    type="checkbox"
-                    :checked="
-                      isCollectionFullySelected(
-                        collectionOption.channels || []
-                      )
-                    "
-                    :aria-label="`Select all forums in ${collectionOption.label}`"
-                    class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
-                    @click.stop="
-                      toggleCollectionChannels(
-                        collectionOption.channels || []
-                      )
+                <button
+                  type="button"
+                  data-selection-control
+                  :aria-pressed="
+                    isCollectionFullySelected(
+                      collectionOption.channels || []
+                    )
+                  "
+                  :aria-label="`Select all forums in ${collectionOption.label}`"
+                  :class="[
+                    'flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 dark:hover:bg-gray-700',
+                    isCollectionFullySelected(
+                      collectionOption.channels || []
+                    )
+                      ? 'bg-orange-50 dark:bg-orange-900/20'
+                      : '',
+                  ]"
+                  @click="
+                    toggleCollectionChannels(
+                      collectionOption.channels || []
+                    )
+                  "
+                >
+                  <div class="relative mr-3">
+                    <span
+                      aria-hidden="true"
+                      :class="[
+                        'flex h-4 w-4 items-center justify-center rounded border',
+                        isCollectionFullySelected(collectionOption.channels || [])
+                          ? 'border-orange-600 bg-orange-600 text-white'
+                          : 'border-gray-400 dark:border-gray-500',
+                      ]"
+                    >
+                      <CheckIcon
+                        v-if="
+                        isCollectionFullySelected(
+                          collectionOption.channels || []
+                        )
+                      "
+                        class="h-3 w-3"
+                      />
+                    </span>
+                  </div>
+
+                  <div class="flex-1 text-sm">
+                    <span class="font-medium text-gray-900 dark:text-white">{{
+                      collectionOption.label
+                    }}</span>
+                  </div>
+
+                  <span
+                    class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300"
+                  >
+                    {{ (collectionOption.channels || []).length }}
+                  </span>
+                </button>
+
+                <div class="px-4 pb-2 text-xs text-gray-500 dark:text-gray-400">
+                  <span class="sr-only">
+                    Forums in {{ collectionOption.label }}:
+                  </span>
+                  <span
+                    v-if="(collectionOption.channels || []).length <= 3"
+                  >
+                    {{ (collectionOption.channels || []).join(', ') }}
+                  </span>
+                  <span
+                    v-else-if="
+                      !expandedCollections.has(String(collectionOption.value))
                     "
                   >
-                </div>
-
-                <!-- Collection name and channel preview -->
-                <div class="flex-1 text-sm">
-                  <span class="font-medium text-gray-900 dark:text-white">{{
-                    collectionOption.label
-                  }}</span>
-                  <span class="ml-1 text-gray-500 dark:text-gray-400">
-                    (<span
-                      v-if="
-                        (collectionOption.channels || []).length <= 3
+                    {{
+                      (collectionOption.channels || [])
+                        .slice(0, 3)
+                        .join(', ')
+                    }}
+                    <button
+                      type="button"
+                      class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                      @click.stop="
+                        toggleCollectionExpansion(
+                          String(collectionOption.value)
+                        )
                       "
-                      >{{
-                        (collectionOption.channels || []).join(', ')
-                      }}</span
-                    ><span
-                      v-else-if="
-                        !expandedCollections.has(String(collectionOption.value))
+                    >
+                      show more
+                    </button>
+                  </span>
+                  <span v-else>
+                    {{ (collectionOption.channels || []).join(', ') }}
+                    <button
+                      type="button"
+                      class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                      @click.stop="
+                        toggleCollectionExpansion(
+                          String(collectionOption.value)
+                        )
                       "
-                      >{{
-                        (collectionOption.channels || [])
-                          .slice(0, 3)
-                          .join(', ')
-                      }}<button
-                        type="button"
-                        class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-                        @click.stop="
-                          toggleCollectionExpansion(
-                            String(collectionOption.value)
-                          )
-                        "
-                      >
-                        show more
-                      </button></span
-                    ><span v-else
-                      >{{ (collectionOption.channels || []).join(', ')
-                      }}<button
-                        type="button"
-                        class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-                        @click.stop="
-                          toggleCollectionExpansion(
-                            String(collectionOption.value)
-                          )
-                        "
-                      >
-                        show less
-                      </button></span
-                    >)
+                    >
+                      show less
+                    </button>
                   </span>
                 </div>
-
-                <!-- Count badge -->
-                <span
-                  class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300"
-                >
-                  {{ (collectionOption.channels || []).length }}
-                </span>
               </div>
             </div>
 
             <!-- Section options (regular items, not for collections or selectAll sections) -->
-            <div
+            <ul
               v-if="
                 section.options.length > 0 &&
                 !section.selectAllLabel &&
                 !section.isCollectionSection
               "
+              :aria-labelledby="`${popupId}-section-${sectionIndex}`"
               class="py-1"
             >
-              <div
+              <li
                 v-for="option in section.options"
                 :key="String(option.value)"
-                :class="[
-                  'flex cursor-pointer items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700',
-                  selected.includes(option.value)
-                    ? 'bg-orange-50 dark:bg-orange-900/20'
-                    : '',
-                  option.disabled ? 'cursor-not-allowed opacity-50' : '',
-                ]"
-                @click="!option.disabled && toggleSelection(option.value)"
               >
-                <!-- Checkbox for multiple selection -->
-                <div class="relative mr-3">
-                  <input
-                    v-if="multiple"
-                    type="checkbox"
-                    :checked="selected.includes(option.value)"
-                    :disabled="option.disabled"
-                    :aria-label="`Select ${option.label}`"
-                    class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
-                    @click.stop
-                    @change="toggleSelection(option.value)"
-                  >
-                </div>
-
-                <!-- Compact label: uniqueName (displayName) -->
-                <div class="flex-1 text-sm">
-                  <div>
-                    <span class="font-mono text-gray-900 dark:text-white">
-                      {{ option.value }}
-                    </span>
+                <button
+                  type="button"
+                  data-selection-control
+                  :aria-pressed="selected.includes(option.value)"
+                  :disabled="option.disabled"
+                  :aria-label="optionAriaLabel(option)"
+                  :class="[
+                    'flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 dark:hover:bg-gray-700',
+                    selected.includes(option.value)
+                      ? 'bg-orange-50 dark:bg-orange-900/20'
+                      : '',
+                    option.disabled ? 'cursor-not-allowed opacity-50' : '',
+                  ]"
+                  @click="toggleSelection(option.value)"
+                >
+                  <div v-if="multiple" class="relative mr-3">
                     <span
-                      v-if="option.label && option.label !== option.value"
-                      class="text-gray-500 dark:text-gray-400"
+                      aria-hidden="true"
+                      :class="[
+                        'flex h-4 w-4 items-center justify-center rounded border',
+                        selected.includes(option.value)
+                          ? 'border-orange-600 bg-orange-600 text-white'
+                          : 'border-gray-400 dark:border-gray-500',
+                      ]"
                     >
-                      ({{ option.label }})
+                      <CheckIcon
+                        v-if="selected.includes(option.value)"
+                        class="h-3 w-3"
+                      />
                     </span>
                   </div>
-                  <div
-                    v-if="option.description"
-                    class="text-xs text-gray-500 dark:text-gray-400"
-                  >
-                    {{ option.description }}
-                  </div>
-                </div>
 
-                <!-- Selected indicator for single selection -->
-                <CheckIcon
-                  v-if="!multiple && selected.includes(option.value)"
-                  class="h-4 w-4 text-orange-600"
-                  aria-hidden="true"
-                />
-              </div>
-            </div>
+                  <div class="flex-1 text-sm">
+                    <div>
+                      <span class="font-mono text-gray-900 dark:text-white">
+                        {{ option.value }}
+                      </span>
+                      <span
+                        v-if="option.label && option.label !== option.value"
+                        class="text-gray-500 dark:text-gray-400"
+                      >
+                        ({{ option.label }})
+                      </span>
+                    </div>
+                    <div
+                      v-if="option.description"
+                      class="text-xs text-gray-500 dark:text-gray-400"
+                    >
+                      {{ option.description }}
+                    </div>
+                  </div>
+
+                  <CheckIcon
+                    v-if="!multiple && selected.includes(option.value)"
+                    class="h-4 w-4 text-orange-600"
+                    aria-hidden="true"
+                  />
+                </button>
+              </li>
+            </ul>
 
             <!-- Empty section message (only shown when section has no options and no selectAllLabel) -->
             <div
@@ -738,72 +862,86 @@ const selectedOptions = computed(() => {
         </div>
 
         <!-- Legacy options view (for backwards compatibility) -->
-        <div v-else-if="filteredOptions.length > 0" class="py-1">
-          <div
+        <ul
+          v-else-if="filteredOptions.length > 0"
+          class="py-1"
+        >
+          <li
             v-for="option in filteredOptions"
             :key="String(option.value)"
-            :class="[
-              'flex cursor-pointer items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700',
-              selected.includes(option.value)
-                ? 'bg-orange-50 dark:bg-orange-900/20'
-                : '',
-              option.disabled ? 'cursor-not-allowed opacity-50' : '',
-            ]"
-            @click="!option.disabled && toggleSelection(option.value)"
           >
-            <!-- Checkbox for multiple selection -->
-            <div class="relative mr-3">
-              <input
-                v-if="multiple"
-                type="checkbox"
-                :checked="selected.includes(option.value)"
-                :disabled="option.disabled"
-                :aria-label="`Select ${option.label}`"
-                class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
-                @click.stop
-                @change="toggleSelection(option.value)"
-              >
-            </div>
-
-            <!-- Avatar -->
-            <img
-              v-if="option.avatar"
-              :src="option.avatar"
-              :alt="option.label"
-              class="mr-3 h-6 w-6 rounded-full"
+            <button
+              type="button"
+              data-selection-control
+              :aria-pressed="selected.includes(option.value)"
+              :disabled="option.disabled"
+              :aria-label="optionAriaLabel(option)"
+              :class="[
+                'flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 dark:hover:bg-gray-700',
+                selected.includes(option.value)
+                  ? 'bg-orange-50 dark:bg-orange-900/20'
+                  : '',
+                option.disabled ? 'cursor-not-allowed opacity-50' : '',
+              ]"
+              @click="toggleSelection(option.value)"
             >
-
-            <!-- Icon -->
-            <i
-              v-else-if="option.icon"
-              :class="[option.icon, 'mr-3']"
-              aria-hidden="true"
-            />
-
-            <!-- Label -->
-            <div class="flex-1 text-sm">
-              <div class="text-gray-900 dark:text-white">
-                {{ option.label }}
+              <div v-if="multiple" class="relative mr-3">
+                <span
+                  aria-hidden="true"
+                  :class="[
+                    'flex h-4 w-4 items-center justify-center rounded border',
+                    selected.includes(option.value)
+                      ? 'border-orange-600 bg-orange-600 text-white'
+                      : 'border-gray-400 dark:border-gray-500',
+                  ]"
+                >
+                  <CheckIcon
+                    v-if="selected.includes(option.value)"
+                    class="h-3 w-3"
+                  />
+                </span>
               </div>
-              <div
-                v-if="option.description"
-                class="text-xs text-gray-500 dark:text-gray-400"
+
+              <img
+                v-if="option.avatar"
+                :src="option.avatar"
+                alt=""
+                class="mr-3 h-6 w-6 rounded-full"
               >
-                {{ option.description }}
-              </div>
-            </div>
 
-            <!-- Selected indicator for single selection -->
-            <CheckIcon
-              v-if="!multiple && selected.includes(option.value)"
-              class="h-4 w-4 text-orange-600"
-              aria-hidden="true"
-            />
-          </div>
-        </div>
+              <i
+                v-else-if="option.icon"
+                :class="[option.icon, 'mr-3']"
+                aria-hidden="true"
+              />
+
+              <div class="flex-1 text-sm">
+                <div class="text-gray-900 dark:text-white">
+                  {{ option.label }}
+                </div>
+                <div
+                  v-if="option.description"
+                  class="text-xs text-gray-500 dark:text-gray-400"
+                >
+                  {{ option.description }}
+                </div>
+              </div>
+
+              <CheckIcon
+                v-if="!multiple && selected.includes(option.value)"
+                class="h-4 w-4 text-orange-600"
+                aria-hidden="true"
+              />
+            </button>
+          </li>
+        </ul>
 
         <!-- No options -->
-        <div v-else class="p-4 text-center text-gray-500 dark:text-gray-400">
+        <div
+          v-else
+          role="status"
+          class="p-4 text-center text-gray-500 dark:text-gray-400"
+        >
           No options available
         </div>
       </div>

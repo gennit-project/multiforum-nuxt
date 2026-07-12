@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, toRef } from 'vue';
+import { useFocusTrap } from '@/composables/useFocusTrap';
 
 export type EventEditScope = 'THIS_ONLY' | 'THIS_AND_FUTURE' | 'ALL_IN_SERIES';
 
-defineProps({
+const props = defineProps({
   isOpen: {
     type: Boolean,
     required: true,
@@ -20,6 +21,7 @@ const emit = defineEmits<{
 }>();
 
 const selectedScope = ref<EventEditScope>('THIS_ONLY');
+const dialogRef = ref<HTMLElement | null>(null);
 
 const scopeOptions = [
   {
@@ -46,12 +48,18 @@ const handleConfirm = () => {
 const handleClose = () => {
   emit('close');
 };
+
+useFocusTrap(dialogRef, {
+  active: toRef(props, 'isOpen'),
+  onEscape: handleClose,
+});
 </script>
 
 <template>
   <Teleport to="body">
     <div
       v-if="isOpen"
+      ref="dialogRef"
       class="fixed inset-0 z-50 flex items-center justify-center"
       role="dialog"
       aria-modal="true"

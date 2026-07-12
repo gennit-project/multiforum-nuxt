@@ -182,6 +182,24 @@ describe('ScopedPipelineView', () => {
     expect(wrapper.text()).not.toContain('Server Pipeline');
   });
 
+  it('exposes the collapsible header as a disclosure button', () => {
+    setPipelineStates({ latestPipeline: ref(pipeline()) }, {});
+    const wrapper = mountView({ collapsible: true });
+    const disclosure = wrapper.get('button.cursor-pointer');
+
+    expect({
+      name: disclosure.text().includes('Plugin Pipelines'),
+      expanded: disclosure.attributes('aria-expanded'),
+      controlsExistingContent: wrapper.find(
+        `#${disclosure.attributes('aria-controls')}`
+      ).exists(),
+    }).toEqual({
+      name: true,
+      expanded: 'true',
+      controlsExistingContent: true,
+    });
+  });
+
   it('opens and closes the logs modal from a stage event', async () => {
     setPipelineStates({ latestPipeline: ref(pipeline()) }, {});
     const wrapper = mountView();

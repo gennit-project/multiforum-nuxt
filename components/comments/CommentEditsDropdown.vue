@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, nextTick, onMounted, onUnmounted, useId } from 'vue';
 import type { PropType } from 'vue';
 import type { Comment, TextVersion, User } from '@/__generated__/graphql';
 import {
@@ -23,8 +23,10 @@ const props = defineProps({
 });
 
 const isOpen = ref(false);
-const triggerRef = ref<HTMLElement | null>(null);
+const triggerRef = ref<HTMLButtonElement | null>(null);
 const popoverRef = ref<HTMLElement | null>(null);
+const triggerId = useId();
+const menuId = useId();
 const popoverPosition = ref<PopoverPosition>({
   top: 0,
   left: 0,
@@ -106,11 +108,47 @@ const toggleDropdown = () => {
 
   isOpen.value = true;
   updateAdjustedPosition();
+  nextTick(() => {
+    popoverRef.value
+      ?.querySelector<HTMLButtonElement>('[role="menuitem"]')
+      ?.focus();
+  });
 };
 
 // Close dropdown when clicking outside
 const closeDropdown = () => {
   isOpen.value = false;
+};
+
+const closeDropdownAndReturnFocus = () => {
+  closeDropdown();
+  nextTick(() => triggerRef.value?.focus());
+};
+
+const handleMenuKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    closeDropdownAndReturnFocus();
+    return;
+  }
+
+  const items = Array.from(
+    popoverRef.value?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') || []
+  );
+  const currentIndex = items.indexOf(event.target as HTMLButtonElement);
+  let nextIndex: number | undefined;
+
+  if (event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % items.length;
+  if (event.key === 'ArrowUp') {
+    nextIndex = (currentIndex - 1 + items.length) % items.length;
+  }
+  if (event.key === 'Home') nextIndex = 0;
+  if (event.key === 'End') nextIndex = items.length - 1;
+
+  if (nextIndex !== undefined) {
+    event.preventDefault();
+    items[nextIndex]?.focus();
+  }
 };
 
 // Close diff modal
@@ -159,7 +197,12 @@ onUnmounted(() => {
   <div v-if="hasEdits" class="relative">
     <!-- Dropdown toggle button -->
     <button
+      :id="triggerId"
       ref="triggerRef"
+      type="button"
+      aria-haspopup="menu"
+      :aria-expanded="isOpen"
+      :aria-controls="menuId"
       class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
       @click="toggleDropdown"
     >
@@ -170,12 +213,14 @@ onUnmounted(() => {
       <!-- Dropdown content -->
       <div
         v-if="isOpen"
+        :id="menuId"
         ref="popoverRef"
         class="fixed z-[100] w-64 max-w-[calc(100vw-1rem)] rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
         :style="{
           top: `${adjustedPosition.top}px`,
           left: `${adjustedPosition.left}px`,
         }"
+        @keydown="handleMenuKeydown"
       >
         <div
           class="border-b border-gray-200 p-2 text-xs font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
@@ -183,14 +228,21 @@ onUnmounted(() => {
           Edited {{ totalEdits }} time{{ totalEdits > 1 ? 's' : '' }}
         </div>
 
-        <ul class="max-h-80 overflow-y-auto py-1">
+        <ul
+          role="menu"
+          :aria-labelledby="triggerId"
+          class="max-h-80 overflow-y-auto py-1"
+        >
           <li
             v-for="edit in allEdits"
             :key="edit.id"
-            class="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-            @click="openRevisionDiff(edit)"
           >
-            <div class="flex flex-col">
+            <button
+              type="button"
+              role="menuitem"
+              class="flex w-full flex-col px-3 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 dark:hover:bg-gray-700"
+              @click="openRevisionDiff(edit)"
+            >
               <div class="flex items-center text-sm">
                 <span class="font-medium text-gray-900 dark:text-gray-200">{{
                   edit.author
@@ -211,7 +263,7 @@ onUnmounted(() => {
                   Most recent
                 </span>
               </div>
-            </div>
+            </button>
           </li>
         </ul>
       </div>

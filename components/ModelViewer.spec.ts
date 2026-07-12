@@ -14,9 +14,9 @@ const mountViewer = (props: Record<string, unknown> = {}) =>
   });
 
 const fullscreenButton = (w: ReturnType<typeof mount>) =>
-  w.find('button[title="View in fullscreen"]');
+  w.find('button[aria-label="View 3D model in fullscreen"]');
 const closeButton = (w: ReturnType<typeof mount>) =>
-  w.find('button[title="Close fullscreen"]');
+  w.find('button[aria-label="Close fullscreen 3D model viewer"]');
 
 beforeEach(() => {
   document.body.style.overflow = '';
@@ -57,6 +57,21 @@ describe('ModelViewer fullscreen', () => {
     expect(closeButton(wrapper).exists()).toBe(true);
   });
 
+  it('exposes the fullscreen viewer as a named modal dialog', async () => {
+    const wrapper = mountViewer();
+
+    await fullscreenButton(wrapper).trigger('click');
+    const dialog = wrapper.get('[role="dialog"]');
+
+    expect({
+      modal: dialog.attributes('aria-modal'),
+      name: wrapper.get(`#${dialog.attributes('aria-labelledby')}`).text(),
+    }).toEqual({
+      modal: 'true',
+      name: 'Fullscreen 3D model viewer',
+    });
+  });
+
   it('locks body scroll while fullscreen', async () => {
     const wrapper = mountViewer();
 
@@ -83,6 +98,16 @@ describe('ModelViewer fullscreen', () => {
     expect(document.body.style.overflow).toBe('');
   });
 
+  it('preserves an existing body overflow value', async () => {
+    document.body.style.overflow = 'clip';
+    const wrapper = mountViewer();
+    await fullscreenButton(wrapper).trigger('click');
+
+    await closeButton(wrapper).trigger('click');
+
+    expect(document.body.style.overflow).toBe('clip');
+  });
+
   it('closes fullscreen on the Escape key', async () => {
     const wrapper = mountViewer();
     await fullscreenButton(wrapper).trigger('click');
@@ -101,5 +126,23 @@ describe('ModelViewer fullscreen', () => {
     await wrapper.vm.$nextTick();
 
     expect(closeButton(wrapper).exists()).toBe(true);
+  });
+
+  it('returns focus to the fullscreen trigger after closing', async () => {
+    const wrapper = mount(ModelViewer, {
+      attachTo: document.body,
+      props: {
+        modelUrl: 'https://x/model.glb',
+        showFullscreenButton: true,
+      },
+    });
+    const trigger = fullscreenButton(wrapper);
+    (trigger.element as HTMLButtonElement).focus();
+    await trigger.trigger('click');
+
+    await closeButton(wrapper).trigger('click');
+
+    expect(document.activeElement).toBe(trigger.element);
+    wrapper.unmount();
   });
 });

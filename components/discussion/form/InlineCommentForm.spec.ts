@@ -437,11 +437,18 @@ describe('InlineCommentForm — unauthenticated view', () => {
     document.body.innerHTML = '';
   });
 
-  it('renders a disabled composer when the user is not authenticated', () => {
+  it('renders a keyboard-accessible login trigger when unauthenticated', () => {
     const wrapper = buildWrapper({ authSlot: 'does-not-have-auth' });
 
-    expect(
-      (wrapper.find('textarea').element as HTMLTextAreaElement).disabled
-    ).toBe(true);
+    expect({
+      element: wrapper.get('[aria-label="Log in to add a comment"]').element
+        .tagName,
+      name: wrapper
+        .get('[aria-label="Log in to add a comment"]')
+        .attributes('aria-label'),
+    }).toEqual({
+      element: 'BUTTON',
+      name: 'Log in to add a comment',
+    });
   });
 });

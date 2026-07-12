@@ -143,27 +143,29 @@ const showCreateCommentError = computed(() => {
         <template #has-auth>
           <div class="align-items flex w-full gap-2">
             <LoggedInUserAvatar v-if="usernameVar" />
-            <textarea
+            <button
+              type="button"
               data-testid="addComment"
-              class="flex-1 overflow-hidden border"
-              name="addComment"
-              :rows="1"
-              placeholder="Write a comment"
+              class="flex-1 overflow-hidden border px-3 text-left text-gray-500 dark:text-gray-400"
               :class="writeReplyStyle"
               @click="emit('openCommentEditor')"
-            />
+            >
+              Write a comment
+            </button>
           </div>
         </template>
         <template #does-not-have-auth>
           <div class="align-items flex w-full gap-2">
             <PlaceholderAvatar />
-            <textarea
+            <button
               id="addCommentLoginPrompt"
-              name="addComment"
-              :rows="1"
-              placeholder="Write a comment"
+              type="button"
+              aria-label="Log in to write a comment"
+              class="flex-1 overflow-hidden border px-3 text-left text-gray-500 dark:text-gray-400"
               :class="writeReplyStyle"
-            />
+            >
+              Write a comment
+            </button>
           </div>
         </template>
       </RequireAuth>

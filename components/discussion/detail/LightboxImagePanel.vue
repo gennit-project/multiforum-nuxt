@@ -98,6 +98,7 @@ const handleClick = (event: MouseEvent) => {
         currentImage && currentImage.url && hasGlbExtension(currentImage.url)
       "
       :model-url="currentImage.url"
+      :model-alt="currentImage.alt || currentImage.caption || 'Interactive 3D model'"
       height="100%"
       width="100%"
       class="h-full w-full object-contain transition-all duration-300 ease-in-out"

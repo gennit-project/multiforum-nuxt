@@ -44,7 +44,10 @@ test('creates, edits and deletes a discussion', async ({
   const channelPicker = page.getByTestId('channel-input');
   await channelPicker.click();
   await page.getByText(TEST_CHANNEL, { exact: true }).click();
-  await expect(channelPicker).toContainText(TEST_CHANNEL);
+  await expect(channelPicker).toHaveAttribute(
+    'aria-label',
+    new RegExp(TEST_CHANNEL)
+  );
   await page.getByTestId('title-input').click();
   await expect(page.getByLabel('Type to search...')).toHaveCount(0);
 
@@ -52,8 +55,8 @@ test('creates, edits and deletes a discussion', async ({
   await tagPicker.click();
   await page.getByText(TAG_ONE, { exact: true }).click();
   await page.getByText(TAG_TWO, { exact: true }).click();
-  await expect(tagPicker).toContainText(TAG_ONE);
-  await expect(tagPicker).toContainText(TAG_TWO);
+  await expect(tagPicker).toHaveAttribute('aria-label', new RegExp(TAG_ONE));
+  await expect(tagPicker).toHaveAttribute('aria-label', new RegExp(TAG_TWO));
 
   await page.getByRole('button', { name: 'Save' }).first().click();
 
@@ -81,9 +84,9 @@ test('creates, edits and deletes a discussion', async ({
   await tagPicker.click();
   await page.getByText(TAG_THREE, { exact: true }).click();
   await page.getByText(TAG_ONE, { exact: true }).click();
-  await expect(tagPicker).toContainText(TAG_TWO);
-  await expect(tagPicker).toContainText(TAG_THREE);
-  await expect(tagPicker).not.toContainText(TAG_ONE);
+  await expect(tagPicker).toHaveAttribute('aria-label', new RegExp(TAG_TWO));
+  await expect(tagPicker).toHaveAttribute('aria-label', new RegExp(TAG_THREE));
+  await expect(tagPicker).not.toHaveAttribute('aria-label', new RegExp(TAG_ONE));
 
   await page.getByRole('button', { name: 'Save' }).first().click();
   await page.goto(`/forums/${TEST_CHANNEL}/discussions/${createdDiscussion.id}`);

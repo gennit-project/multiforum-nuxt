@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 import CommentEditsDropdown from '@/components/comments/CommentEditsDropdown.vue';
@@ -54,6 +54,17 @@ describe('CommentEditsDropdown visibility', () => {
     const wrapper = mountDropdown(makeComment('alice', ['bob']));
 
     expect(wrapper.get('button').text()).toBe('Edits');
+  });
+
+  it('exposes the trigger as a controlled menu button', () => {
+    const wrapper = mountDropdown(makeComment('alice', ['bob']));
+    const trigger = wrapper.get('button');
+
+    expect({
+      popup: trigger.attributes('aria-haspopup'),
+      expanded: trigger.attributes('aria-expanded'),
+      controls: Boolean(trigger.attributes('aria-controls')),
+    }).toEqual({ popup: 'menu', expanded: 'false', controls: true });
   });
 });
 
@@ -117,7 +128,7 @@ describe('CommentEditsDropdown diff modal', () => {
     const wrapper = mountDropdown(makeComment('alice', ['bob']));
     await open(wrapper);
 
-    await wrapper.get('li').trigger('click');
+    await wrapper.get('[role="menuitem"]').trigger('click');
 
     expect(
       wrapper.findComponent({ name: 'CommentRevisionDiffModal' }).exists()
@@ -127,7 +138,7 @@ describe('CommentEditsDropdown diff modal', () => {
   it('closes the diff modal on the close event', async () => {
     const wrapper = mountDropdown(makeComment('alice', ['bob']));
     await open(wrapper);
-    await wrapper.get('li').trigger('click');
+    await wrapper.get('[role="menuitem"]').trigger('click');
 
     await wrapper
       .findComponent({ name: 'CommentRevisionDiffModal' })
@@ -141,7 +152,7 @@ describe('CommentEditsDropdown diff modal', () => {
   it('closes the diff modal when a revision is deleted', async () => {
     const wrapper = mountDropdown(makeComment('alice', ['bob']));
     await open(wrapper);
-    await wrapper.get('li').trigger('click');
+    await wrapper.get('[role="menuitem"]').trigger('click');
 
     await wrapper
       .findComponent({ name: 'CommentRevisionDiffModal' })
@@ -160,7 +171,7 @@ describe('CommentEditsDropdown current-version flag', () => {
     const wrapper = mountDropdown(makeComment('alice', ['bob', 'carol']));
     await open(wrapper);
 
-    await wrapper.findAll('li')[0].trigger('click');
+    await wrapper.findAll('[role="menuitem"]')[0].trigger('click');
 
     expect(
       wrapper
@@ -173,12 +184,45 @@ describe('CommentEditsDropdown current-version flag', () => {
     const wrapper = mountDropdown(makeComment('alice', ['bob', 'carol']));
     await open(wrapper);
 
-    await wrapper.findAll('li')[1].trigger('click');
+    await wrapper.findAll('[role="menuitem"]')[1].trigger('click');
 
     expect(
       wrapper
         .findComponent({ name: 'CommentRevisionDiffModal' })
         .props('isMostRecent')
     ).toBe(false);
+  });
+});
+
+describe('CommentEditsDropdown keyboard navigation', () => {
+  it('moves to the next revision with ArrowDown', async () => {
+    const wrapper = mountDropdown(makeComment('alice', ['bob', 'carol']));
+    await open(wrapper);
+    const items = wrapper.findAll('[role="menuitem"]');
+    const focus = vi.spyOn(items[1].element as HTMLButtonElement, 'focus');
+
+    await items[0].trigger('keydown', { key: 'ArrowDown' });
+
+    expect(focus).toHaveBeenCalledOnce();
+  });
+
+  it('closes the menu on Escape', async () => {
+    const wrapper = mountDropdown(makeComment('alice', ['bob']));
+    await open(wrapper);
+
+    await wrapper.get('[role="menuitem"]').trigger('keydown', { key: 'Escape' });
+
+    expect(wrapper.find('[role="menu"]').exists()).toBe(false);
+  });
+
+  it('returns focus to the trigger on Escape', async () => {
+    const wrapper = mountDropdown(makeComment('alice', ['bob']));
+    const trigger = wrapper.get('button');
+    const focus = vi.spyOn(trigger.element as HTMLButtonElement, 'focus');
+    await open(wrapper);
+
+    await wrapper.get('[role="menuitem"]').trigger('keydown', { key: 'Escape' });
+
+    expect(focus).toHaveBeenCalledOnce();
   });
 });

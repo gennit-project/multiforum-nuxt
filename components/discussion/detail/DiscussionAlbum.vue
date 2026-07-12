@@ -294,6 +294,8 @@ onMounted(() => {
           <ModelViewer
             v-if="image && hasGlbExtension(image.url ?? '')"
             :model-url="image.url || ''"
+            :model-alt="image.alt || image.caption || '3D model thumbnail'"
+            :show-fullscreen-button="false"
             height="200px"
             width="100%"
             class="shadow-sm"
@@ -487,6 +489,7 @@ onMounted(() => {
                     hasGlbExtension(activeImage.url)
                   "
                   :model-url="activeImage.url"
+                  :model-alt="activeImage.alt || activeImage.caption || 'Interactive 3D model'"
                   :height="expandedView ? '400px' : '256px'"
                   class="object-contain shadow-sm"
                   :style="{

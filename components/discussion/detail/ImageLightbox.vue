@@ -10,6 +10,7 @@ import {
 import { useImageZoom } from '@/composables/useImageZoom';
 import { useLightboxNavigation } from '@/composables/useLightboxNavigation';
 import { useSwipeDetection } from '@/composables/useSwipeDetection';
+import { useFocusTrap } from '@/composables/useFocusTrap';
 import LightboxControls from '@/components/discussion/detail/LightboxControls.vue';
 import LightboxImagePanel from '@/components/discussion/detail/LightboxImagePanel.vue';
 import LightboxInfoPanel from '@/components/discussion/detail/LightboxInfoPanel.vue';
@@ -63,6 +64,7 @@ const editingCaption = ref('');
 
 // Report modal state
 const showReportModal = ref(false);
+const lightboxRef = ref<HTMLElement | null>(null);
 const showReportSuccess = ref(false);
 
 const openReportModal = () => {
@@ -168,15 +170,20 @@ const closeLightbox = () => {
   emit('close');
 };
 
+const lightboxFocusActive = computed(() => !showReportModal.value);
+
+useFocusTrap(lightboxRef, {
+  active: lightboxFocusActive,
+  onEscape: closeLightbox,
+});
+
 // Keyboard navigation
 const handleKeyDown = (e: KeyboardEvent) => {
-  if (editingCaptionIndex.value !== -1) {
+  if (editingCaptionIndex.value !== -1 || showReportModal.value) {
     return;
   }
 
-  if (e.key === 'Escape') {
-    closeLightbox();
-  } else if (e.key === 'ArrowRight') {
+  if (e.key === 'ArrowRight') {
     nextImage();
   } else if (e.key === 'ArrowLeft') {
     prevImage();
@@ -317,6 +324,7 @@ onUnmounted(() => {
 
 <template>
   <div
+    ref="lightboxRef"
     class="fixed left-0 top-0 z-[1000] flex h-full w-full bg-black transition-all duration-300 ease-in-out"
     role="dialog"
     aria-modal="true"

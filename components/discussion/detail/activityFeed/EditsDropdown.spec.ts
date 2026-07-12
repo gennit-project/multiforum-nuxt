@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 import EditsDropdown from '@/components/discussion/detail/activityFeed/EditsDropdown.vue';
@@ -57,6 +57,17 @@ describe('EditsDropdown visibility', () => {
     const wrapper = mountDropdown(makeDiscussion(['alice']));
 
     expect(wrapper.get('button').text()).toBe('Edits');
+  });
+
+  it('exposes the trigger as a controlled menu button', () => {
+    const wrapper = mountDropdown(makeDiscussion(['alice']));
+    const trigger = wrapper.get('button');
+
+    expect({
+      popup: trigger.attributes('aria-haspopup'),
+      expanded: trigger.attributes('aria-expanded'),
+      controls: Boolean(trigger.attributes('aria-controls')),
+    }).toEqual({ popup: 'menu', expanded: 'false', controls: true });
   });
 });
 
@@ -120,7 +131,7 @@ describe('EditsDropdown revision modal', () => {
     const wrapper = mountDropdown(makeDiscussion(['alice']));
     await openDropdown(wrapper);
 
-    await wrapper.get('li').trigger('click');
+    await wrapper.get('[role="menuitem"]').trigger('click');
 
     expect(wrapper.findComponent({ name: 'RevisionDiffModal' }).exists()).toBe(
       true
@@ -130,7 +141,7 @@ describe('EditsDropdown revision modal', () => {
   it('closes the diff modal on the modal close event', async () => {
     const wrapper = mountDropdown(makeDiscussion(['alice']));
     await openDropdown(wrapper);
-    await wrapper.get('li').trigger('click');
+    await wrapper.get('[role="menuitem"]').trigger('click');
 
     await wrapper.findComponent({ name: 'RevisionDiffModal' }).vm.$emit('close');
 
@@ -142,7 +153,7 @@ describe('EditsDropdown revision modal', () => {
   it('closes the diff modal when a revision is deleted', async () => {
     const wrapper = mountDropdown(makeDiscussion(['alice']));
     await openDropdown(wrapper);
-    await wrapper.get('li').trigger('click');
+    await wrapper.get('[role="menuitem"]').trigger('click');
 
     await wrapper
       .findComponent({ name: 'RevisionDiffModal' })
@@ -151,5 +162,32 @@ describe('EditsDropdown revision modal', () => {
     expect(wrapper.findComponent({ name: 'RevisionDiffModal' }).exists()).toBe(
       false
     );
+  });
+});
+
+describe('EditsDropdown keyboard navigation', () => {
+  it('moves to the next revision with ArrowDown', async () => {
+    const wrapper = mountDropdown(makeDiscussion(['alice', 'bob']));
+    await openDropdown(wrapper);
+    const items = wrapper.findAll('[role="menuitem"]');
+    const focus = vi.spyOn(items[1].element as HTMLButtonElement, 'focus');
+
+    await items[0].trigger('keydown', { key: 'ArrowDown' });
+
+    expect(focus).toHaveBeenCalledOnce();
+  });
+
+  it('closes and returns focus on Escape', async () => {
+    const wrapper = mountDropdown(makeDiscussion(['alice']));
+    const trigger = wrapper.get('button');
+    const focus = vi.spyOn(trigger.element as HTMLButtonElement, 'focus');
+    await openDropdown(wrapper);
+
+    await wrapper.get('[role="menuitem"]').trigger('keydown', { key: 'Escape' });
+
+    expect({
+      open: wrapper.find('[role="menu"]').exists(),
+      restoredFocus: focus.mock.calls.length,
+    }).toEqual({ open: false, restoredFocus: 1 });
   });
 });

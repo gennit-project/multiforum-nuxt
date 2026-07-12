@@ -13,6 +13,12 @@ const mountSelect = (props: Record<string, unknown> = {}) =>
     props: { options, multiple: true, testId: 'ms', ...props },
   });
 
+const mountAttachedSelect = (props: Record<string, unknown> = {}) =>
+  mountWithDefaults(MultiSelect, {
+    attachTo: document.body,
+    props: { options, multiple: true, testId: 'ms', ...props },
+  });
+
 const clickOutsideDirective = {
   beforeMount(el: HTMLElement, binding: { value: (event: Event) => void }) {
     const handler = (event: Event) => {
@@ -91,13 +97,7 @@ describe('MultiSelect', () => {
   it('toggles an option via its checkbox row when opened', async () => {
     const wrapper = mountSelect({ modelValue: [] });
     await wrapper.get('[data-testid="ms"]').trigger('click');
-    // The row (not the stop-propagating checkbox) carries the click handler.
-    const checkbox = wrapper.get('input[aria-label="Select Apple"]');
-    const row = checkbox.element.closest(
-      '[class*="cursor-pointer"]'
-    ) as HTMLElement;
-    row.click();
-    await wrapper.vm.$nextTick();
+    await clickRow(wrapper, 'Apple');
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['a']]);
   });
 
@@ -124,15 +124,14 @@ describe('MultiSelect', () => {
 
   const clickRow = async (wrapper: ReturnType<typeof mountSelect>, label: string) => {
     const row = wrapper
-      .findAll('[class*="cursor-pointer"]')
+      .findAll('button[data-selection-control]')
       .find((r) => r.text().includes(label));
-    (row!.element as HTMLElement).click();
-    await wrapper.vm.$nextTick();
+    await row!.trigger('click');
   };
 
   describe('keyboard accessibility', () => {
     const toggleButton = (wrapper: ReturnType<typeof mountSelect>) =>
-      wrapper.get('button[aria-haspopup="true"]');
+      wrapper.get('button[aria-controls]');
 
     it('exposes a keyboard toggle button for the options popup', () => {
       const wrapper = mountSelect({ modelValue: [] });
@@ -151,11 +150,47 @@ describe('MultiSelect', () => {
       }).toEqual({ expanded: 'true', hasApple: true });
     });
 
-    it('toggles an option from its checkbox change event (keyboard/space)', async () => {
-      const wrapper = mountSelect({ modelValue: [] });
+    it('moves focus to the first option when a non-searchable popup opens', async () => {
+      const wrapper = mountAttachedSelect({ modelValue: [] });
       await toggleButton(wrapper).trigger('click');
 
-      await wrapper.get('input[aria-label="Select Apple"]').trigger('change');
+      expect(wrapper.get('[data-selection-control]').element).toBe(
+        document.activeElement
+      );
+      wrapper.unmount();
+    });
+
+    it('moves focus through options with arrow keys', async () => {
+      const wrapper = mountAttachedSelect({ modelValue: [] });
+      await toggleButton(wrapper).trigger('click');
+      await wrapper
+        .get('[data-selection-control][aria-label="Apple (a)"]')
+        .trigger('keydown', { key: 'ArrowDown' });
+
+      expect((document.activeElement as HTMLElement).getAttribute('aria-label')).toBe(
+        'Banana (b)'
+      );
+      wrapper.unmount();
+    });
+
+    it('moves focus to the final option with End', async () => {
+      const wrapper = mountAttachedSelect({ modelValue: [] });
+      await toggleButton(wrapper).trigger('click');
+      await wrapper
+        .get('[data-selection-control][aria-label="Apple (a)"]')
+        .trigger('keydown', { key: 'End' });
+
+      expect((document.activeElement as HTMLElement).getAttribute('aria-label')).toBe(
+        'Cherry (c)'
+      );
+      wrapper.unmount();
+    });
+
+    it('toggles an option from its checkbox change event (keyboard/space)', async () => {
+      const wrapper = mountAttachedSelect({ modelValue: [] });
+      await toggleButton(wrapper).trigger('click');
+
+      await wrapper.get('button[data-selection-control][aria-label="Apple (a)"]').trigger('click');
 
       expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['a']]);
     });
@@ -173,9 +208,26 @@ describe('MultiSelect', () => {
       await toggleButton(wrapper).trigger('click');
       expect(wrapper.text()).toContain('Apple');
 
-      await wrapper.get('[role="group"]').trigger('keydown.escape');
+      await wrapper
+        .get(
+          `#${wrapper
+            .get('button[aria-controls]')
+            .attributes('aria-controls')}`
+        )
+        .trigger('keydown', { key: 'Escape' });
 
       expect(wrapper.text()).not.toContain('Apple');
+    });
+
+    it('returns focus to the toggle after Escape', async () => {
+      const wrapper = mountAttachedSelect({ modelValue: [] });
+      await toggleButton(wrapper).trigger('click');
+      await wrapper.get('[data-selection-control]').trigger('keydown', {
+        key: 'Escape',
+      });
+
+      expect(document.activeElement).toBe(toggleButton(wrapper).element);
+      wrapper.unmount();
     });
   });
 
@@ -222,15 +274,14 @@ describe('MultiSelect', () => {
     it('select-all selects every option in the section', async () => {
       const wrapper = mountSections({ modelValue: [] });
       await wrapper.get('[data-testid="ms"]').trigger('click');
-      await wrapper.get('input[aria-label="All fruits"]').trigger('click');
+      await wrapper.get('button[data-selection-control][aria-pressed="false"]').trigger('click');
       expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['a', 'b']]);
     });
 
     it('select-all deselects when the section is already fully selected', async () => {
       const wrapper = mountSections({ modelValue: ['a', 'b'] });
       await wrapper.get('[data-testid="ms"]').trigger('click');
-      const selectAll = wrapper.get('input[aria-label="All fruits"]');
-      expect((selectAll.element as HTMLInputElement).checked).toBe(true);
+      const selectAll = wrapper.get('button[data-selection-control][aria-pressed="true"]');
       await selectAll.trigger('click');
       expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([[]]);
     });
@@ -261,7 +312,7 @@ describe('MultiSelect', () => {
       });
 
       await wrapper.get('[data-testid="ms"]').trigger('click');
-      await wrapper.get('input[aria-label="All fruits"]').trigger('click');
+      await wrapper.get('button[data-selection-control]').trigger('click');
       expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['a']]);
     });
   });
@@ -440,8 +491,10 @@ describe('MultiSelect', () => {
     it('deselects every channel when the collection is already fully selected', async () => {
       const wrapper = mountCollection(['x', 'y'], ['x', 'y']);
       await wrapper.get('[data-testid="ms"]').trigger('click');
-      const checkbox = wrapper.get('input[aria-label="Select all forums in My Collection"]');
-      expect((checkbox.element as HTMLInputElement).checked).toBe(true);
+      const checkbox = wrapper.get(
+        'button[data-selection-control][aria-label="Select all forums in My Collection"]'
+      );
+      expect(checkbox.attributes('aria-pressed')).toBe('true');
       await clickRow(wrapper, 'My Collection');
       expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([[]]);
     });

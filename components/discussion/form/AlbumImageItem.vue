@@ -103,6 +103,7 @@ const getUploaderLabel = (image: ImageData) => {
         <ModelViewer
           v-if="image.url && hasGlbExtension(image.url)"
           :model-url="image.url"
+          :model-alt="image.alt || image.caption || 'Interactive 3D model'"
           height="288px"
           width="288px"
           class="w-72"

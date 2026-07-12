@@ -176,4 +176,39 @@ describe('SitewideDiscussionList', () => {
       .find((link) => link.text().includes('2 comments'));
     expect(commentLink?.props('to')).toBe('/forums/cats/discussions/1');
   });
+
+  it('opens the About overlay as a modal dialog', async () => {
+    setupQueries(createQueryMock(listResult([])));
+    const wrapper = mountList();
+    const aboutButton = wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'About');
+
+    await aboutButton!.trigger('click');
+    const dialog = wrapper.get('#sitewide-sidebar-drawer');
+
+    expect({
+      role: dialog.attributes('role'),
+      modal: dialog.attributes('aria-modal'),
+      label: dialog.attributes('aria-label'),
+    }).toEqual({
+      role: 'dialog',
+      modal: 'true',
+      label: 'About this forum',
+    });
+  });
+
+  it('closes the About overlay on Escape', async () => {
+    setupQueries(createQueryMock(listResult([])));
+    const wrapper = mountList();
+    const aboutButton = wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'About');
+    await aboutButton!.trigger('click');
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await nextTick();
+
+    expect(wrapper.find('#sitewide-sidebar-drawer').exists()).toBe(false);
+  });
 });
