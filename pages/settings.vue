@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import Breadcrumbs from '@/components/nav/Breadcrumbs.vue';
+import { useHead } from 'nuxt/app';
+
+useHead({ title: 'Settings' });
 
 const links = computed(() => {
   return [

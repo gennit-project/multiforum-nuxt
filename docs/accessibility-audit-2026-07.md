@@ -128,10 +128,16 @@ Specific controls that are completely unusable without a mouse, plus global shel
 
 Systemic and mostly sweepable; large screen-reader-orientation impact.
 
-- **Per-route document titles** — 92/150 pages inherit one static title. Add a `titleTemplate`
-  in `nuxt.config.ts` and a per-route `useHead({ title })`. Start with high-traffic pages:
-  `pages/discussions/index.vue`, `pages/downloads/index.vue`, `pages/forums/index.vue`,
-  `pages/settings.vue`, `pages/admin/**`. Serious (WCAG 2.4.2).
+- **Per-route document titles** — ✅ DONE (PR #361). `app.vue` sets a `titleTemplate` that
+  suffixes each page's title with the server name (dedupe guard for title-less pages), and every
+  primary route sets its own `useHead({ title })`. Top-level dynamic detail parents (forum, user,
+  mod, discussion, download, event list) already had titles and cover their nested children;
+  `admin/*` and `server/issues/*` inherit their parent wrapper's baseline title. Collection detail
+  uses a dynamic title from the collection name. Only the event-detail route intentionally keeps its
+  parent forum-name title (a dynamic event title can follow the discussion-detail SEO-head pattern
+  later). Serious (WCAG 2.4.2). Gotcha: `NuxtRouteAnnouncer` now renders each title into a
+  `role="status"` span, so any e2e `getByText('<TitleWord>')` on a titled route can hit a
+  strict-mode double-match — assert by heading role instead.
 - **Exactly one `<h1>` per page** — 104/150 pages render none; several start at `<h2>`
   (`pages/settings.vue:18`, `pages/account_settings.vue`, forum downloads/events index, user
   images index). Meanwhile header/sidebar components each emit their own `<h1>`

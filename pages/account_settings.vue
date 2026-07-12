@@ -13,6 +13,9 @@ import type { UserUpdateInput } from '@/__generated__/graphql';
 import type { EditAccountSettingsFormValues } from '@/types/User';
 import { useUsername } from '@/composables/useAuthState';
 import { config } from '@/config';
+import { useHead } from 'nuxt/app';
+
+useHead({ title: 'Account Settings' });
 
 const usernameVar = useUsername();
 

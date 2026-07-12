@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import CreateEvent from '@/components/event/form/CreateEvent.vue';
+import { useHead } from 'nuxt/app';
+
+useHead({ title: 'New event' });
 </script>
 <template>
   <NuxtLayout>

@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import CreateDiscussion from '@/components/discussion/form/CreateDiscussion.vue';
+import { useHead } from 'nuxt/app';
+
+useHead({ title: 'New discussion' });
 </script>
 <template>
   <NuxtLayout>

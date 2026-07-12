@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { useRoute } from 'nuxt/app';
+import { useRoute, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import type { Discussion } from '@/__generated__/graphql';
 import { GET_PUBLIC_COLLECTION_BY_ID } from '@/graphQLData/collection/queries';
@@ -36,6 +36,10 @@ const { result, loading, error, refetch } = useQuery(
 );
 
 const collection = computed(() => result.value?.collections?.[0] || null);
+
+useHead({
+  title: computed(() => collection.value?.name || 'Collection'),
+});
 
 watch(
   () => result.value,

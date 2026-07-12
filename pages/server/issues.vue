@@ -6,9 +6,11 @@
 // new issue still requires a logged-in account (handled by ServerIssueTabNav's
 // RequireAuth), matching the GitHub issues model.
 import { computed } from 'vue';
-import { useRoute } from 'nuxt/app';
+import { useRoute, useHead } from 'nuxt/app';
 import ServerIssueTabNav from '@/components/mod/ServerIssueTabNav.vue';
 import ServerIssueSplitView from '@/components/mod/ServerIssueSplitView.vue';
+
+useHead({ title: 'Issues' });
 
 const route = useRoute();
 

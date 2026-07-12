@@ -9,8 +9,10 @@ import NotificationComponent from '@/components/NotificationComponent.vue';
 import FormComponent from '@/components/FormComponent.vue';
 import FormRow from '@/components/FormRow.vue';
 import { useUsername } from '@/composables/useAuthState';
-import { useRoute } from 'nuxt/app';
+import { useRoute, useHead } from 'nuxt/app';
 import { getSupportReportContent } from '@/utils/supportReportMode';
+
+useHead({ title: 'Support' });
 
 const usernameVar = useUsername();
 
