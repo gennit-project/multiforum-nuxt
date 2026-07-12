@@ -7,7 +7,7 @@ import DiscussionDetailEmptyState from '@/components/discussion/list/DiscussionD
 import { GET_SITE_WIDE_DISCUSSION_LIST } from '@/graphQLData/discussion/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { useQuery } from '@vue/apollo-composable';
-import { useRoute } from 'nuxt/app';
+import { useRoute, useState } from 'nuxt/app';
 import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import {
   getSortFromQuery,
@@ -134,11 +134,16 @@ type SiteWideDiscussion = Discussion & { score: number };
 const getLiveDiscussionList = () =>
   discussionResult.value?.getSiteWideDiscussionList ?? null;
 
-const loadedDiscussions = ref<SiteWideDiscussion[]>(
-  getLiveDiscussionList()?.discussions ?? []
+// Component refs are recreated during hydration. Nuxt state is serialized in
+// the SSR payload, so it bridges the gap before Apollo restores its cache.
+const routeStateKey = route.fullPath || route.path || '/discussions';
+const loadedDiscussions = useState<SiteWideDiscussion[]>(
+  `sitewide-discussions:${routeStateKey}`,
+  () => getLiveDiscussionList()?.discussions ?? []
 );
-const loadedAggregateCount = ref(
-  getLiveDiscussionList()?.aggregateDiscussionCount ?? 0
+const loadedAggregateCount = useState<number>(
+  `sitewide-discussion-count:${routeStateKey}`,
+  () => getLiveDiscussionList()?.aggregateDiscussionCount ?? 0
 );
 
 watch(
