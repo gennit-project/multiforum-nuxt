@@ -7,6 +7,7 @@ import UserProfileSidebar from '@/components/user/UserProfileSidebar.vue';
 import { useHead, useRoute } from 'nuxt/app';
 import UserContributionChart from '@/components/charts/UserContributionChart.vue';
 import UserProfileChannelFilter from '@/components/user/UserProfileChannelFilter.vue';
+import ProfileKudosPreview from '@/components/scratchpad/ProfileKudosPreview.vue';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
@@ -178,7 +179,12 @@ watchEffect(() => {
       <!-- Regular user profile layout -->
       <div v-else class="flex w-full flex-col lg:flex-row">
         <div class="w-full lg:w-80 lg:shrink-0">
-          <UserProfileSidebar :server-role-badge="serverRoleBadge" />
+          <UserProfileSidebar :server-role-badge="serverRoleBadge">
+            <ProfileKudosPreview
+              v-if="user?.username"
+              :username="user.username"
+            />
+          </UserProfileSidebar>
         </div>
 
         <div class="min-w-0 flex-1 flex-col pt-4">

@@ -10,6 +10,7 @@ const h = vi.hoisted(() => ({
   publicLoading: null as unknown,
   publicError: null as unknown,
   refetchPublic: vi.fn(),
+  fetchMorePublic: vi.fn(),
   pendingResult: null as unknown,
   pendingLoading: null as unknown,
   pendingError: null as unknown,
@@ -21,12 +22,15 @@ const h = vi.hoisted(() => ({
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: () =>
     h.index.n++ === 0
-      ? { result: h.publicResult, loading: h.publicLoading, error: h.publicError, refetch: h.refetchPublic }
+      ? { result: h.publicResult, loading: h.publicLoading, error: h.publicError, refetch: h.refetchPublic, fetchMore: h.fetchMorePublic }
       : { result: h.pendingResult, loading: h.pendingLoading, error: h.pendingError, refetch: h.refetchPending },
 }));
 vi.mock('@/composables/useAuthState', () => ({ useUsername: () => h.username }));
 
-const entries = (ids: string[]) => ({ scratchpadEntries: ids.map((id) => ({ id })) });
+const entries = (ids: string[], count = ids.length) => ({
+  scratchpadEntriesAggregate: { count },
+  scratchpadEntries: ids.map((id) => ({ id })),
+});
 
 const entryStub = {
   name: 'ScratchpadEntry',
@@ -41,6 +45,7 @@ const mountSection = (props: Record<string, unknown> = {}) =>
     global: {
       stubs: {
         ScratchpadEntry: entryStub,
+        LoadMore: { name: 'LoadMore', props: ['loading', 'reachedEndOfResults'], emits: ['load-more'], template: '<button class="load-more" @click="$emit(\'load-more\')" />' },
         ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err">{{ text }}</div>' },
       },
     },
@@ -52,6 +57,7 @@ beforeEach(() => {
   h.publicResult = ref(entries(['p1']));
   h.publicLoading = ref(false);
   h.publicError = ref(null);
+  h.fetchMorePublic = vi.fn();
   h.pendingResult = ref(entries([]));
   h.pendingLoading = ref(false);
   h.pendingError = ref(null);
@@ -116,6 +122,13 @@ describe('ScratchpadSection entries', () => {
 
     expect(wrapper.getComponent(entryStub).props('isOwner')).toBe(true);
   });
+
+  it('shows load more when there are more public kudos than loaded entries', () => {
+    h.publicResult = ref(entries(['p1'], 4));
+    const wrapper = mountSection();
+
+    expect(wrapper.findComponent({ name: 'LoadMore' }).exists()).toBe(true);
+  });
 });
 
 describe('ScratchpadSection refetch', () => {
@@ -141,5 +154,22 @@ describe('ScratchpadSection refetch', () => {
     await wrapper.getComponent(entryStub).vm.$emit('deleted');
 
     expect(h.refetchPublic).toHaveBeenCalled();
+  });
+
+  it('fetches the next page of public kudos', async () => {
+    h.publicResult = ref(entries(['p1'], 4));
+    const wrapper = mountSection();
+
+    await wrapper.getComponent({ name: 'LoadMore' }).vm.$emit('load-more');
+
+    expect(h.fetchMorePublic).toHaveBeenCalledWith(
+      expect.objectContaining({
+        variables: expect.objectContaining({
+          limit: 10,
+          offset: 1,
+          username: 'alice',
+        }),
+      })
+    );
   });
 });

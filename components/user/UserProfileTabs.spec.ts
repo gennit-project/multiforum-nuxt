@@ -34,7 +34,7 @@ describe('UserProfileTabs', () => {
   it('renders all profile tabs', () => {
     const wrapper = mountTabs();
 
-    expect(tabs(wrapper)).toHaveLength(10);
+    expect(tabs(wrapper)).toHaveLength(9);
   });
 
   it('labels the first tab Comments', () => {
@@ -58,6 +58,12 @@ describe('UserProfileTabs', () => {
     });
 
     expect(tabs(wrapper)[4].props('count')).toBe(7);
+  });
+
+  it('does not render a kudos tab', () => {
+    const wrapper = mountTabs();
+
+    expect(tabs(wrapper).map((tab) => tab.props('label'))).not.toContain('Kudos');
   });
 
   it('marks the tab matching the route as active', () => {
