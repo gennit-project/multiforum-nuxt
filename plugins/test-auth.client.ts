@@ -76,6 +76,12 @@ export default defineNuxtPlugin(() => {
     const mockModProfileName = getStorageItem('mock_mod_profile_name');
     const token = getStorageItem('token');
 
+    // A real production session also stores an Apollo token. Only explicit
+    // mock-auth markers authorize this test plugin to overwrite SSR auth state.
+    if (mockUsername === null && mockModProfileName === null) {
+      return;
+    }
+
     if (token) {
       const email = readEmailFromToken(token);
       setIsAuthenticated(true);
@@ -91,9 +97,10 @@ export default defineNuxtPlugin(() => {
   syncMockAuthFromStorage();
 
   // Expose debug functions in dev/test environments
-  // Also expose if mock_username is in localStorage (indicates Playwright tests)
+  // Also expose if an explicit mock-auth marker is in localStorage.
   const hasMockAuth =
-    getStorageItem('mock_username') !== null || !!getStorageItem('token');
+    getStorageItem('mock_username') !== null ||
+    getStorageItem('mock_mod_profile_name') !== null;
   const shouldExpose =
     import.meta.env.DEV ||
     config.environment === 'test' ||
