@@ -73,4 +73,18 @@ describe('ToastNotification', () => {
 
     expect(wrapper.text()).toContain('Two');
   });
+
+  it('marks error toasts as an assertive alert region', () => {
+    h.toasts = [{ id: 't1', message: 'Oops', type: 'error' }];
+    const wrapper = mountToasts();
+
+    expect(wrapper.find('[role="alert"]').exists()).toBe(true);
+  });
+
+  it('marks non-error toasts as a polite status region', () => {
+    h.toasts = [{ id: 't1', message: 'Saved', type: 'info' }];
+    const wrapper = mountToasts();
+
+    expect(wrapper.find('[role="status"]').exists()).toBe(true);
+  });
 });

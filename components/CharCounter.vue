@@ -31,7 +31,7 @@ const showOverLimit = computed(() => charactersRemaining.value < 0);
 </script>
 
 <template>
-  <div :data-testid="testId">
+  <div :data-testid="testId" role="status" aria-live="polite" aria-atomic="true">
     <div
       v-show="showWarning"
       class="mb-4 mt-2 text-right text-sm font-medium text-gray-500 dark:text-gray-300"

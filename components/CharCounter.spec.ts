@@ -41,4 +41,9 @@ describe('CharCounter', () => {
       .find((d) => d.text().includes('Minimum of 5 characters'));
     expect(minWarning && isShown(minWarning.element)).toBe(true);
   });
+
+  it('exposes the counter as a polite live region', () => {
+    const wrapper = mountCounter({ current: 80, max: 100 });
+    expect(wrapper.attributes('aria-live')).toBe('polite');
+  });
 });

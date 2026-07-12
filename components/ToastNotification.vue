@@ -15,9 +15,17 @@ const toastStore = useToastStore();
         leave-from-class="translate-y-0 opacity-100"
         leave-to-class="translate-y-2 opacity-0"
       >
+        <!--
+          Each toast is its own live region so it announces on insertion:
+          role="alert" (assertive) for errors, role="status" (polite)
+          otherwise. Per-toast roles avoid nesting live regions inside a
+          single aria-live container (which double-announces).
+        -->
         <div
           v-for="toast in toastStore.toasts"
           :key="toast.id"
+          :role="toast.type === 'error' ? 'alert' : 'status'"
+          :aria-live="toast.type === 'error' ? 'assertive' : 'polite'"
           class="flex min-w-[200px] max-w-[420px] items-center justify-between gap-3 rounded-lg bg-gray-900 px-4 py-3 text-white shadow-lg"
           :class="{
             'bg-gray-900': toast.type === 'info' || !toast.type,

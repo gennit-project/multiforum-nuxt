@@ -20,4 +20,12 @@ describe('ErrorBanner', () => {
     expect(wrapper.classes()).toContain('bg-red-100');
     expect(wrapper.classes()).toContain('text-red-500');
   });
+
+  it('exposes the error as an assertive alert region', () => {
+    const wrapper = mountWithDefaults(ErrorBanner, {
+      props: { text: 'Something went wrong' },
+    });
+
+    expect(wrapper.attributes('role')).toBe('alert');
+  });
 });
