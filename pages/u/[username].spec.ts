@@ -58,7 +58,9 @@ vi.mock('@/composables/useServerRoleMembership', async () => {
 vi.mock('@/config', () => ({
   config: { serverDisplayName: 'Test Server' },
 }));
-vi.mock('@/graphQLData/user/queries', () => ({ GET_USER: 'GET_USER' }));
+vi.mock('@/graphQLData/user/queries', () => ({
+  GET_PUBLIC_USER_PROFILE: 'GET_PUBLIC_USER_PROFILE',
+}));
 
 const makeUser = (overrides: Record<string, unknown> = {}) => ({
   username: 'alice',

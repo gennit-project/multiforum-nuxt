@@ -87,7 +87,7 @@ const downvoteButtonClasses = computed(() => {
 
   const activeClasses = props.isMarkedAsAnswer
     ? 'border-green-500 bg-green-500 dark:border-green-600 dark:bg-green-600 dark:hover:bg-green-500'
-    : 'border-orange-400 text-black bg-orange-400 dark:border-orange-500 dark:bg-orange-400 dark:hover:bg-orange-500';
+    : 'border border-orange-300 bg-orange-100 text-orange-700 ring-1 ring-inset ring-orange-300 dark:border-orange-700/70 dark:bg-orange-950/70 dark:text-orange-200 dark:ring-orange-700/70';
 
   if (props.isPermalinked && !props.downvoteActive) {
     return [
@@ -100,9 +100,11 @@ const downvoteButtonClasses = computed(() => {
     ? 'border-green-200 bg-green-100 text-green-700 hover:border-green-400 hover:bg-green-200 dark:border-green-600 dark:bg-green-800 dark:text-green-300 dark:hover:bg-green-700'
     : 'border-gray-200 text-black dark:text-white bg-gray-100 hover:border-orange-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600';
 
-  const permalinkClasses = props.isPermalinked
-    ? 'border-orange-500 hover:bg-orange-300 dark:border-orange-600 dark:hover:bg-orange-600'
-    : 'border-gray-200 dark:border-gray-600 hover:bg-gray-200';
+  const permalinkClasses = props.downvoteActive
+    ? ''
+    : props.isPermalinked
+      ? 'border-orange-500 hover:bg-orange-300 dark:border-orange-600 dark:hover:bg-orange-600'
+      : 'border-gray-200 dark:border-gray-600 hover:bg-gray-200';
 
   return [
     ...baseClasses,

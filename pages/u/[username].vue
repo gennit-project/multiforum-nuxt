@@ -2,7 +2,7 @@
 import { config } from '@/config';
 import { computed, watchEffect } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_USER } from '@/graphQLData/user/queries';
+import { GET_PUBLIC_USER_PROFILE } from '@/graphQLData/user/queries';
 import UserProfileSidebar from '@/components/user/UserProfileSidebar.vue';
 import { useHead, useRoute } from 'nuxt/app';
 import UserContributionChart from '@/components/charts/UserContributionChart.vue';
@@ -30,7 +30,7 @@ const {
   loading: userLoading,
   error: userError,
 } = useQuery(
-  GET_USER,
+  GET_PUBLIC_USER_PROFILE,
   () => ({
     username: username.value,
   }),

@@ -33,10 +33,12 @@ const authButton = (w: ReturnType<typeof mount>) => w.getComponent(authButtonStu
 const classes = (w: ReturnType<typeof mount>) => authButton(w).props('buttonClasses') as string;
 
 describe('VoteButton classes', () => {
-  it('uses orange styling when active', () => {
+  it('uses outlined, shaded orange styling when active', () => {
     const wrapper = mountButton({ active: true });
 
-    expect(classes(wrapper)).toContain('bg-orange-400');
+    expect(classes(wrapper)).toEqual(
+      expect.stringContaining('border-orange-300 bg-orange-100')
+    );
   });
 
   it('uses gray styling when inactive', () => {

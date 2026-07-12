@@ -112,10 +112,10 @@ describe('Votes feedback menu', () => {
     expect(labels).toEqual(expect.arrayContaining(['Undo Feedback', 'Edit Feedback']));
   });
 
-  it('uses active styling for the downvote when feedback is given', () => {
+  it('uses outlined, shaded active styling when feedback is given', () => {
     const wrapper = mountVotes({ downvoteActive: true });
 
-    expect(wrapper.html()).toContain('bg-orange-400');
+    expect(wrapper.html()).toContain('border-orange-300 bg-orange-100');
   });
 
   it('uses green styling for a best-answer downvote', () => {
