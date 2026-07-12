@@ -30,7 +30,6 @@ withDefaults(
         disabled,
     }"
     class="inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-    @keydown.enter.prevent
   >
     <LoadingSpinner v-if="loading" />
     <slot />
