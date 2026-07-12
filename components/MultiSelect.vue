@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue';
+import { ref, computed, watch, nextTick, useId } from 'vue';
 import type { PropType } from 'vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
@@ -108,6 +108,9 @@ const isDropdownOpen = ref(false);
 const searchQuery = ref('');
 const selected = ref<MultiSelectValue[]>([...props.modelValue]);
 const searchInputRef = ref<HTMLInputElement | null>(null);
+// Keyboard-accessible toggle button; also the element focus returns to on close.
+const toggleButtonRef = ref<HTMLButtonElement | null>(null);
+const listboxId = useId();
 const expandedSections = ref<Set<number>>(new Set());
 const expandedCollections = ref<Set<string>>(new Set());
 
@@ -126,6 +129,28 @@ const closeDropdown = () => {
   isDropdownOpen.value = false;
   // Clear search when closing dropdown to reset filter
   searchQuery.value = '';
+};
+
+// Open the dropdown from a keyboard trigger (ArrowDown on the toggle button),
+// then move focus into the search box if there is one.
+const openDropdown = () => {
+  if (isDropdownOpen.value) return;
+  isDropdownOpen.value = true;
+  if (props.searchable) {
+    nextTick(() => searchInputRef.value?.focus());
+  }
+};
+
+// Close the dropdown and return focus to the toggle button (keyboard dismiss).
+const closeAndReturnFocus = () => {
+  closeDropdown();
+  nextTick(() => toggleButtonRef.value?.focus());
+};
+
+// The search box stops key propagation (so typing doesn't reach parents); make
+// sure Escape still closes the dropdown.
+const onSearchKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape') closeAndReturnFocus();
 };
 
 const toggleSelection = (value: MultiSelectValue) => {
@@ -332,12 +357,14 @@ const selectedOptions = computed(() => {
             class="mr-2 mt-1 inline-flex items-center rounded-full bg-orange-100 px-2 py-1 text-sm text-orange-700 dark:bg-orange-700 dark:text-orange-100"
           >
             <span class="font-mono">{{ option.value }}</span>
-            <span
-              class="ml-1 cursor-pointer hover:text-red-500"
+            <button
+              type="button"
+              :aria-label="`Remove ${option.value}`"
+              class="ml-1 cursor-pointer rounded hover:text-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
               @click="removeSelection(option.value, $event)"
             >
-              &times;
-            </span>
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
         </div>
 
@@ -386,24 +413,40 @@ const selectedOptions = computed(() => {
             <XmarkIcon class="h-4 w-4" aria-hidden="true" />
           </button>
 
-          <!-- Dropdown arrow -->
-          <div aria-hidden="true">
+          <!-- Dropdown toggle: the keyboard-accessible control that opens the
+               options popup (the whole field is also clickable for the mouse). -->
+          <button
+            ref="toggleButtonRef"
+            type="button"
+            :aria-label="isDropdownOpen ? 'Hide options' : 'Show options'"
+            :aria-expanded="isDropdownOpen"
+            aria-haspopup="true"
+            :aria-controls="listboxId"
+            class="flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+            @click.stop="toggleDropdown"
+            @keydown.down.prevent="openDropdown"
+          >
             <ChevronDownIcon
               class="h-4 w-4 transition-transform"
               :class="isDropdownOpen ? 'rotate-180' : ''"
+              aria-hidden="true"
             />
-          </div>
+          </button>
         </div>
       </div>
 
       <!-- Dropdown -->
       <div
         v-if="isDropdownOpen"
+        :id="listboxId"
+        role="group"
+        :aria-label="placeholder"
         :class="[
           'absolute z-50 mt-1 w-full rounded-md border bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800',
           dropdownMaxHeight,
           'overflow-y-auto',
         ]"
+        @keydown.escape="closeAndReturnFocus"
       >
         <!-- Search bar for dropdown -->
         <div
@@ -418,7 +461,7 @@ const selectedOptions = computed(() => {
             :aria-label="searchPlaceholder"
             class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             @input="updateSearch(searchQuery)"
-            @keydown.stop
+            @keydown.stop="onSearchKeydown"
             @keyup.stop
             @click.stop
             @focus.stop
@@ -646,6 +689,7 @@ const selectedOptions = computed(() => {
                     :aria-label="`Select ${option.label}`"
                     class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                     @click.stop
+                    @change="toggleSelection(option.value)"
                   >
                 </div>
 
@@ -717,6 +761,7 @@ const selectedOptions = computed(() => {
                 :aria-label="`Select ${option.label}`"
                 class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                 @click.stop
+                @change="toggleSelection(option.value)"
               >
             </div>
 
