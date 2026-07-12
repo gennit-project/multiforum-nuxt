@@ -43,6 +43,12 @@ describe('SiteSidenavLogout', () => {
     expect(mountLogout({ showIconOnly: false }).text()).toContain('Sign Out');
   });
 
+  it('gives the icon-only link an accessible name', () => {
+    expect(
+      link(mountLogout({ showIconOnly: true })).attributes('aria-label')
+    ).toBe('Sign Out');
+  });
+
   it('logs out when the link is clicked', async () => {
     const wrapper = mountLogout();
     await link(wrapper).trigger('click');

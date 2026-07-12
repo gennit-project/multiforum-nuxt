@@ -1,7 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import SiteLogo from '@/components/nav/SiteLogo.vue';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
+
+vi.mock('@/config', () => ({
+  config: { serverDisplayName: 'Test Forum' },
+}));
 
 describe('SiteLogo', () => {
   it('renders both mobile and desktop logo images', () => {
@@ -10,12 +14,12 @@ describe('SiteLogo', () => {
     expect(wrapper.findAll('img')).toHaveLength(2);
   });
 
-  it('uses the Workflow alt text on both logos', () => {
+  it('names both logos after the server for assistive tech', () => {
     const wrapper = mountWithDefaults(SiteLogo);
 
-    expect(wrapper.findAll('img').every((img) => img.attributes('alt') === 'Workflow')).toBe(
-      true
-    );
+    expect(
+      wrapper.findAll('img').every((img) => img.attributes('alt') === 'Test Forum logo')
+    ).toBe(true);
   });
 
   it('applies the responsive visibility classes to the two logos', () => {

@@ -658,9 +658,10 @@ const moveOption = (optionId: string, direction: 'up' | 'down') => {
               class="px-1 py-1 text-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
               :disabled="disabled"
               title="Move up"
+              aria-label="Move option up"
               @click="moveOption(option.id, 'up')"
             >
-              ↑
+              <span aria-hidden="true">↑</span>
             </button>
             <button
               v-if="
@@ -671,9 +672,10 @@ const moveOption = (optionId: string, direction: 'up' | 'down') => {
               class="px-1 py-1 text-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
               :disabled="disabled"
               title="Move down"
+              aria-label="Move option down"
               @click="moveOption(option.id, 'down')"
             >
-              ↓
+              <span aria-hidden="true">↓</span>
             </button>
             <button
               type="button"

@@ -163,7 +163,7 @@ const activeTab = computed(() => {
                 <component :is="activeTab?.icon" class="h-5 w-5 shrink-0" />
                 <span>{{ activeTab?.label }}</span>
               </div>
-              <i class="fa-solid fa-chevron-down ml-2 h-4 w-4" />
+              <i class="fa-solid fa-chevron-down ml-2 h-4 w-4" aria-hidden="true" />
             </button>
           </template>
 

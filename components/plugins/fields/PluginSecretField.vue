@@ -154,6 +154,8 @@ const validationError = computed(() => {
           type="button"
           class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
           :title="showValue ? 'Hide' : 'Show'"
+          :aria-label="showValue ? 'Hide secret value' : 'Show secret value'"
+          :aria-pressed="showValue"
           @click="showValue = !showValue"
         >
           <svg
@@ -162,6 +164,7 @@ const validationError = computed(() => {
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             <path
               stroke-linecap="round"
@@ -176,6 +179,7 @@ const validationError = computed(() => {
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             <path
               stroke-linecap="round"

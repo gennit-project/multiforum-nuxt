@@ -55,6 +55,7 @@ const buildTarget = (link: Link) => {
           </nuxt-link>
           <span
             v-else
+            aria-current="page"
             class="text-xs font-medium text-gray-700 dark:text-gray-300"
           >
             {{ link.label }}

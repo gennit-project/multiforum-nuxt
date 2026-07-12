@@ -123,10 +123,13 @@ const handleCloseModal = () => {
         <button
           v-if="collapsible"
           type="button"
+          :aria-expanded="isExpanded"
+          :aria-label="isExpanded ? 'Collapse pipeline details' : 'Expand pipeline details'"
           class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
         >
           <i
             :class="isExpanded ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"
+            aria-hidden="true"
           />
         </button>
       </div>

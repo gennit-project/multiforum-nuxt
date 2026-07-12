@@ -25,6 +25,7 @@ const { logout: handleLogout } = useServerLogout();
     data-testid="sign-out-link"
     to="/"
     :class="navLinkClasses"
+    :aria-label="showIconOnly ? 'Sign Out' : undefined"
     @click="handleLogout"
   >
     <svg
@@ -33,6 +34,7 @@ const { logout: handleLogout } = useServerLogout();
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
+      aria-hidden="true"
     >
       <path
         stroke-linecap="round"
