@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, watchEffect } from 'vue';
-import { useRoute, useRouter } from 'nuxt/app';
+import { useRoute, useRouter, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import ChannelList from '@/components/channel/ChannelList.vue';
 import {
@@ -23,6 +23,8 @@ import {
 import type { LocationQueryValue } from 'vue-router';
 import type { Channel } from '@/__generated__/graphql';
 import { useUsername } from '@/composables/useAuthState';
+
+useHead({ title: 'Forums' });
 
 const route = useRoute();
 const router = useRouter();

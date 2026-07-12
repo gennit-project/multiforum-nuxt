@@ -6,6 +6,7 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({ params: { collectionId: 'col-1' } }),
+  useHead: vi.fn(),
 }));
 
 vi.mock('@vue/apollo-composable', () => ({

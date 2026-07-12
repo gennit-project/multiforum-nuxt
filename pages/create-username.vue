@@ -11,6 +11,9 @@ import {
 } from '@/composables/useAuthState';
 import CreateUsernameForm from '@/components/auth/CreateUsernameForm.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import { useHead } from 'nuxt/app';
+
+useHead({ title: 'Choose a username' });
 
 const usernameVar = useUsername();
 const isAuthenticatedVar = useIsAuthenticated();

@@ -8,7 +8,7 @@ const h = vi.hoisted(() => ({
   mutate: null as unknown as ReturnType<typeof vi.fn>,
 }));
 
-vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
+vi.mock('nuxt/app', () => ({ useRoute: () => h.route, useHead: vi.fn() }));
 
 vi.mock('@vue/apollo-composable', async () => {
   const { ref } = await import('vue');

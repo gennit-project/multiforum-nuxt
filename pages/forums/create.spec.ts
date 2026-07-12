@@ -13,6 +13,7 @@ const h = vi.hoisted(() => ({
 
 vi.mock('nuxt/app', () => ({
   useRouter: () => ({ push: h.push }),
+  useHead: vi.fn(),
 }));
 
 vi.mock('@vue/apollo-composable', async () => {

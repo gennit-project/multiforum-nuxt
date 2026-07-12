@@ -8,6 +8,7 @@ const routeRef: { name: string } = { name: 'server-issues' };
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => routeRef,
+  useHead: vi.fn(),
 }));
 
 const NuxtLayoutStub = defineComponent({

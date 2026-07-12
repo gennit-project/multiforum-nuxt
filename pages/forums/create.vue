@@ -12,8 +12,10 @@ import type {
 } from '@/__generated__/graphql';
 import type { CreateEditChannelFormValues } from '@/types/Channel';
 import { useUsername } from '@/composables/useAuthState';
-import { useRouter } from 'nuxt/app';
+import { useRouter, useHead } from 'nuxt/app';
 import { useServerSuspensionNotice } from '@/composables/useSuspensionNotice';
+
+useHead({ title: 'New forum' });
 
 const usernameVar = useUsername();
 

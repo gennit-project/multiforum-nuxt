@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import NotificationTabs from '@/components/notifications/NotificationTabs.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import { useHead } from 'nuxt/app';
+
+useHead({ title: 'Notifications' });
 </script>
 
 <template>

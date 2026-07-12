@@ -10,6 +10,7 @@ const routeRef: { name: string } = { name: 'admin-issues' };
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => routeRef,
+  useHead: vi.fn(),
 }));
 
 vi.mock('@vue/apollo-composable', () => ({

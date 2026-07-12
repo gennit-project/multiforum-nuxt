@@ -1,8 +1,21 @@
 <script setup lang="ts">
 import { useUIStore } from '@/stores/uiStore';
 import { onMounted } from 'vue';
+import { useHead } from 'nuxt/app';
+import { config } from '@/config';
 
 const uiStore = useUIStore();
+
+// Give every page a descriptive, per-route document title (WCAG 2.4.2).
+// Pages set their own title via useHead({ title }); this suffixes it with the
+// server name, and falls back to just the server name when a page sets none
+// (the dedupe guard avoids "Name · Name").
+useHead({
+  titleTemplate: (titleChunk) =>
+    titleChunk && titleChunk !== config.serverDisplayName
+      ? `${titleChunk} · ${config.serverDisplayName}`
+      : config.serverDisplayName,
+});
 
 // Initialize theme class on application load
 onMounted(() => {

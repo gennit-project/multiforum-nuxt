@@ -8,6 +8,7 @@ const setUsername = vi.fn();
 
 vi.mock('nuxt/app', () => ({
   useRouter: () => ({ push }),
+  useHead: vi.fn(),
 }));
 
 vi.mock('@/composables/useAuthState', () => ({

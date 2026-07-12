@@ -1,11 +1,13 @@
 <script lang="ts" setup>
 import { useQuery } from '@vue/apollo-composable';
 import { computed } from 'vue';
-import { useRoute } from 'nuxt/app';
+import { useRoute, useHead } from 'nuxt/app';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
 import ServerTabs from '@/components/admin/ServerTabs.vue';
 import ServerIssueSplitView from '@/components/mod/ServerIssueSplitView.vue';
+
+useHead({ title: 'Admin' });
 
 const route = useRoute();
 const { result: getServerResult, error: getServerError } = useQuery(

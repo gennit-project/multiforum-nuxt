@@ -7,6 +7,7 @@ import ChannelList from '@/components/channel/ChannelList.vue';
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({ query: {} }),
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useHead: vi.fn(),
 }));
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => ref('viewer'),

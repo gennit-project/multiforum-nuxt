@@ -38,7 +38,7 @@ vi.mock('vue-i18n', () => ({
   }),
 }));
 
-vi.mock('nuxt/app', () => ({}));
+vi.mock('nuxt/app', () => ({ useHead: vi.fn() }));
 
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => ({ value: 'alice' }),

@@ -100,4 +100,5 @@ vi.mock('nuxt/app', () => ({
   navigateTo: vi.fn(),
   defineNuxtPlugin: (fn: unknown) => fn,
   useRuntimeConfig: () => ({ public: {} }),
+  useHead: vi.fn(),
 }));
