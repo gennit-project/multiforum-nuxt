@@ -7,11 +7,14 @@
     <!-- Fullscreen button -->
     <button
       v-if="showFullscreenButton !== false"
+      ref="fullscreenButtonRef"
+      type="button"
+      aria-label="View 3D model in fullscreen"
       class="absolute right-2 top-2 z-10 rounded-md bg-black bg-opacity-50 p-2 text-white transition-all duration-200 hover:bg-opacity-70"
-      title="View in fullscreen"
       @click="openFullscreen"
     >
       <svg
+        aria-hidden="true"
         class="h-5 w-5"
         fill="none"
         stroke="currentColor"
@@ -29,7 +32,7 @@
     <model-viewer
       v-if="props.modelUrl"
       :src="props.modelUrl"
-      alt="3D Model Preview"
+      :alt="modelAlt"
       auto-rotate
       camera-controls
       exposure="0.8"
@@ -46,18 +49,26 @@
     <!-- Fullscreen modal -->
     <div
       v-if="isFullscreen"
+      ref="dialogRef"
+      role="dialog"
+      aria-modal="true"
+      :aria-labelledby="dialogTitleId"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90"
       @click="closeFullscreen"
     >
+      <h2 :id="dialogTitleId" class="sr-only">Fullscreen 3D model viewer</h2>
+
       <!-- Close button -->
       <button
+        type="button"
+        aria-label="Close fullscreen 3D model viewer"
         class="absolute right-4 top-4 z-[100] rounded-md bg-black bg-opacity-50 p-3 text-white transition-all duration-200 hover:bg-opacity-70"
-        title="Close fullscreen"
         @click.stop="closeFullscreen"
         @mousedown.stop
         @touchstart.stop
       >
         <svg
+          aria-hidden="true"
           class="h-6 w-6"
           fill="none"
           stroke="currentColor"
@@ -79,7 +90,7 @@
             props.modelUrl ||
             'https://storage.googleapis.com/listical-dev/models/Tiny_Khopesh_Warrior_Posed_and_Rigged.glb'
           "
-          alt="3D Model Preview - Fullscreen"
+          :alt="`${modelAlt} in fullscreen`"
           camera-controls
           style="width: 100%; height: 95%; border-radius: 8px"
           exposure="0.8"
@@ -93,55 +104,62 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref, useId } from 'vue';
+import { useFocusTrap } from '@/composables/useFocusTrap';
 
-const props = defineProps<{
-  modelUrl?: string;
-  height?: string;
-  width?: string;
-  showFullscreenButton?: boolean;
-  class?: string;
-  style?: Record<string, string | number>;
-}>();
+const props = withDefaults(
+  defineProps<{
+    modelUrl?: string;
+    modelAlt?: string;
+    height?: string;
+    width?: string;
+    showFullscreenButton?: boolean;
+    class?: string;
+    style?: Record<string, string | number>;
+  }>(),
+  {
+    modelUrl: '',
+    modelAlt: 'Interactive 3D model',
+    height: undefined,
+    width: undefined,
+    showFullscreenButton: true,
+    class: undefined,
+    style: undefined,
+  }
+);
 
 const isFullscreen = ref(false);
-const modelViewer = ref();
+const dialogRef = ref<HTMLElement | null>(null);
+const fullscreenButtonRef = ref<HTMLButtonElement | null>(null);
+const dialogTitleId = useId();
+let previousBodyOverflow = '';
 
 const openFullscreen = () => {
+  previousBodyOverflow = document.body.style.overflow;
   isFullscreen.value = true;
-  // Prevent body scroll when fullscreen is open
   document.body.style.overflow = 'hidden';
 };
 
 const closeFullscreen = () => {
   isFullscreen.value = false;
-  // Restore body scroll
-  document.body.style.overflow = '';
+  document.body.style.overflow = previousBodyOverflow;
 };
 
+useFocusTrap(dialogRef, {
+  active: isFullscreen,
+  onEscape: closeFullscreen,
+  fallbackTrigger: () => fullscreenButtonRef.value,
+});
+
 onMounted(async () => {
-  if (import.meta.env) {
+  if (import.meta.client) {
     await import('@google/model-viewer');
   }
 });
 
-// Close fullscreen on escape key
-onMounted(() => {
-  const handleEscape = (event: KeyboardEvent) => {
-    if (event.key === 'Escape' && isFullscreen.value) {
-      closeFullscreen();
-    }
-  };
-
-  document.addEventListener('keydown', handleEscape);
-
-  // Cleanup on unmount
-  onUnmounted(() => {
-    document.removeEventListener('keydown', handleEscape);
-    // Ensure body scroll is restored if component unmounts while fullscreen
-    if (isFullscreen.value) {
-      document.body.style.overflow = '';
-    }
-  });
+onBeforeUnmount(() => {
+  if (isFullscreen.value) {
+    document.body.style.overflow = previousBodyOverflow;
+  }
 });
 </script>

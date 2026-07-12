@@ -50,6 +50,8 @@ const sizeStyle = computed(() => ({
     <ModelViewer
       v-if="image && image.url && hasGlbExtension(image.url)"
       :model-url="image.url"
+      :model-alt="image.alt || image.caption || '3D model thumbnail'"
+      :show-fullscreen-button="false"
       :height="`${thumbnailHeight}px`"
       :width="`${thumbnailWidth}px`"
       class="rounded"

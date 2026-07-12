@@ -52,6 +52,8 @@ const getImageAlt = (image: Image) => {
       <ModelViewer
         v-if="props.image.url && hasGlbExtension(props.image.url)"
         :model-url="props.image.url"
+        :model-alt="getImageAlt(props.image)"
+        :show-fullscreen-button="false"
         height="100%"
         width="100%"
         class="h-full w-full object-cover"

@@ -586,6 +586,7 @@ onUnmounted(() => {
           <ModelViewer
             v-if="image.url && hasGlbExtension(image.url)"
             :model-url="image.url"
+            :model-alt="image.alt || image.caption || 'Interactive 3D model'"
             height="600px"
             width="800px"
             class="h-auto max-w-full"
@@ -1034,6 +1035,7 @@ onUnmounted(() => {
           <ModelViewer
             v-if="image && image.url && hasGlbExtension(image.url)"
             :model-url="image.url"
+            :model-alt="image.alt || image.caption || 'Interactive 3D model'"
             height="100%"
             width="100%"
             class="h-full w-full object-contain transition-all duration-300 ease-in-out"
