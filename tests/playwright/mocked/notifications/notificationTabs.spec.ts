@@ -133,11 +133,11 @@ test.describe('Notification tabs', () => {
       });
 
       // Verify General tab is active by default
-      const generalTab = page.getByRole('button', { name: /General/i });
+      const generalTab = page.getByRole('tab', { name: /General/i });
       await expect(generalTab).toBeVisible();
 
       // Verify Feedback tab exists with unread count
-      const feedbackTab = page.getByRole('button', { name: /Feedback/i });
+      const feedbackTab = page.getByRole('tab', { name: /Feedback/i });
       await expect(feedbackTab).toBeVisible();
 
       // General tab should show general notifications
@@ -210,7 +210,7 @@ test.describe('Notification tabs', () => {
     try {
       await page.goto('/notifications');
 
-      const generalTab = page.getByRole('button', { name: /General/i });
+      const generalTab = page.getByRole('tab', { name: /General/i });
       await expect(generalTab).toBeVisible({ timeout: 30000 });
 
       // The General badge reflects its own aggregate count on load.
@@ -218,7 +218,7 @@ test.describe('Notification tabs', () => {
 
       // The Feedback query is only enabled once its tab is active, so its
       // badge populates after the tab is visited.
-      const feedbackTab = page.getByRole('button', { name: /Feedback/i });
+      const feedbackTab = page.getByRole('tab', { name: /Feedback/i });
       await feedbackTab.click();
       await expect(feedbackTab.locator('span')).toContainText('3');
 
