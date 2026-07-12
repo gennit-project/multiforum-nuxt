@@ -15,6 +15,7 @@ import {
   isItemFavorited,
   filterCollectionsBySearch,
 } from '@/utils/collectionFilters';
+import { useFocusTrap } from '@/composables/useFocusTrap';
 
 const usernameVar = useUsername();
 
@@ -193,6 +194,12 @@ const { adjustedPosition } = usePopoverPositioning({
 });
 
 const isModal = computed(() => props.variant === 'modal');
+const modalFocusActive = computed(() => props.isVisible && isModal.value);
+
+useFocusTrap(popoverRef, {
+  active: modalFocusActive,
+  onEscape: () => emit('close'),
+});
 
 const resetCreateCollectionForm = () => {
   isCreatingNew.value = false;
@@ -346,7 +353,7 @@ const handleClickOutside = (event: MouseEvent) => {
 };
 
 const handleKeydown = (event: KeyboardEvent) => {
-  if (event.key === 'Escape' && props.isVisible) {
+  if (event.key === 'Escape' && props.isVisible && !isModal.value) {
     emit('close');
   }
 };
@@ -491,8 +498,10 @@ const popoverStyles = computed(() => {
         <!-- Lists -->
         <div class="max-h-64 space-y-1 overflow-y-auto">
           <!-- Favorites List (Always shown) -->
-          <div
-            class="hover:bg-gray-50 flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm dark:hover:bg-gray-700"
+          <button
+            type="button"
+            :aria-pressed="isItemInFavorites"
+            class="hover:bg-gray-50 flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-gray-700"
             @click.stop="handleToggleInCollection(favoritesList)"
           >
             <div class="flex items-center">
@@ -501,13 +510,18 @@ const popoverStyles = computed(() => {
                 favoritesList.name
               }}</span>
             </div>
-            <input
-              type="checkbox"
-              :checked="isItemInFavorites"
-              class="rounded text-blue-600 focus:ring-blue-500"
-              readonly
+            <span
+              aria-hidden="true"
+              :class="[
+                'flex h-4 w-4 items-center justify-center rounded border text-xs',
+                isItemInFavorites
+                  ? 'border-blue-600 bg-blue-600 text-white'
+                  : 'border-gray-400 dark:border-gray-500',
+              ]"
             >
-          </div>
+              {{ isItemInFavorites ? '✓' : '' }}
+            </span>
+          </button>
 
           <!-- Divider between Favorites and Collections -->
           <div
@@ -526,10 +540,16 @@ const popoverStyles = computed(() => {
           </div>
 
           <!-- Custom Collections -->
-          <div
+          <button
             v-for="collection in filteredCollections"
             :key="collection.id"
-            class="hover:bg-gray-50 flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm dark:hover:bg-gray-700"
+            type="button"
+            :aria-pressed="
+              itemInCollections.some(
+                (c: CollectionListItem) => c.id === collection.id
+              )
+            "
+            class="hover:bg-gray-50 flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-gray-700"
             @click.stop="handleToggleInCollection(collection)"
           >
             <div class="flex items-center">
@@ -540,17 +560,26 @@ const popoverStyles = computed(() => {
                 >({{ collection.itemCount }})</span
               >
             </div>
-            <input
-              type="checkbox"
-              :checked="
+            <span
+              aria-hidden="true"
+              :class="[
+                'flex h-4 w-4 items-center justify-center rounded border text-xs',
                 itemInCollections.some(
                   (c: CollectionListItem) => c.id === collection.id
                 )
-              "
-              class="rounded text-blue-600 focus:ring-blue-500"
-              readonly
+                  ? 'border-blue-600 bg-blue-600 text-white'
+                  : 'border-gray-400 dark:border-gray-500',
+              ]"
             >
-          </div>
+              {{
+                itemInCollections.some(
+                  (c: CollectionListItem) => c.id === collection.id
+                )
+                  ? '✓'
+                  : ''
+              }}
+            </span>
+          </button>
 
           <!-- No Search Results -->
           <div
@@ -683,8 +712,10 @@ const popoverStyles = computed(() => {
       <!-- Lists -->
       <div class="max-h-64 space-y-1 overflow-y-auto">
         <!-- Favorites List (Always shown) -->
-        <div
-          class="hover:bg-gray-50 flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm dark:hover:bg-gray-700"
+        <button
+          type="button"
+          :aria-pressed="isItemInFavorites"
+          class="hover:bg-gray-50 flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-gray-700"
           @click.stop="handleToggleInCollection(favoritesList)"
         >
           <div class="flex items-center">
@@ -693,14 +724,18 @@ const popoverStyles = computed(() => {
               favoritesList.name
             }}</span>
           </div>
-          <input
-            type="checkbox"
-            :checked="isItemInFavorites"
-            :aria-label="`${isItemInFavorites ? 'Remove from' : 'Add to'} ${favoritesList.name}`"
-            class="rounded text-blue-600 focus:ring-blue-500"
-            readonly
+          <span
+            aria-hidden="true"
+            :class="[
+              'flex h-4 w-4 items-center justify-center rounded border text-xs',
+              isItemInFavorites
+                ? 'border-blue-600 bg-blue-600 text-white'
+                : 'border-gray-400 dark:border-gray-500',
+            ]"
           >
-        </div>
+            {{ isItemInFavorites ? '✓' : '' }}
+          </span>
+        </button>
 
         <!-- Divider between Favorites and Collections -->
         <div
@@ -719,10 +754,16 @@ const popoverStyles = computed(() => {
         </div>
 
         <!-- Custom Collections -->
-        <div
+        <button
           v-for="collection in filteredCollections"
           :key="collection.id"
-          class="hover:bg-gray-50 flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm dark:hover:bg-gray-700"
+          type="button"
+          :aria-pressed="
+            itemInCollections.some(
+              (c: CollectionListItem) => c.id === collection.id
+            )
+          "
+          class="hover:bg-gray-50 flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-gray-700"
           @click.stop="handleToggleInCollection(collection)"
         >
           <div class="flex items-center">
@@ -733,18 +774,26 @@ const popoverStyles = computed(() => {
               >({{ collection.itemCount }})</span
             >
           </div>
-          <input
-            type="checkbox"
-            :checked="
+          <span
+            aria-hidden="true"
+            :class="[
+              'flex h-4 w-4 items-center justify-center rounded border text-xs',
               itemInCollections.some(
                 (c: CollectionListItem) => c.id === collection.id
               )
-            "
-            :aria-label="`${itemInCollections.some((c: CollectionListItem) => c.id === collection.id) ? 'Remove from' : 'Add to'} ${collection.name}`"
-            class="rounded text-blue-600 focus:ring-blue-500"
-            readonly
+                ? 'border-blue-600 bg-blue-600 text-white'
+                : 'border-gray-400 dark:border-gray-500',
+            ]"
           >
-        </div>
+            {{
+              itemInCollections.some(
+                (c: CollectionListItem) => c.id === collection.id
+              )
+                ? '✓'
+                : ''
+            }}
+          </span>
+        </button>
 
         <!-- No Search Results -->
         <div

@@ -128,6 +128,20 @@ describe('AddToListPopover list rendering', () => {
     expect(wrapper.text()).toContain('My List');
   });
 
+  it('renders collection choices as native toggle buttons', () => {
+    const wrapper = mountPopover();
+
+    expect(
+      rows(wrapper).map((row) => ({
+        element: row.element.tagName,
+        pressed: row.attributes('aria-pressed'),
+      }))
+    ).toEqual([
+      { element: 'BUTTON', pressed: 'false' },
+      { element: 'BUTTON', pressed: 'false' },
+    ]);
+  });
+
   it('shows the empty state when there are no collections', () => {
     h.collectionsResult = ref({
       users: [{ Collections: [], FavoriteDiscussions: [] }],
@@ -476,5 +490,28 @@ describe('AddToListPopover modal variant', () => {
     await wrapper.get('.bg-black\\/50').trigger('click');
 
     expect(wrapper.emitted('close')).toBeTruthy();
+  });
+
+  it('emits close when Escape is pressed', async () => {
+    const wrapper = mountPopover({ variant: 'modal' });
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await flushPromises();
+
+    expect(wrapper.emitted('close')?.length).toBe(1);
+  });
+
+  it('restores focus when the modal closes', async () => {
+    const trigger = document.createElement('button');
+    document.body.appendChild(trigger);
+    trigger.focus();
+    const wrapper = mountPopover({ variant: 'modal' });
+    await flushPromises();
+
+    await wrapper.setProps({ isVisible: false });
+
+    expect(document.activeElement).toBe(trigger);
+    wrapper.unmount();
+    trigger.remove();
   });
 });
