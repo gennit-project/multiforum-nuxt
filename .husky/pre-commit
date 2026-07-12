@@ -9,11 +9,5 @@ if [ -z "$non_md_files" ]; then
   exit 0
 fi
 
-# Run lint-staged first to fix and check specific files that changed
+# Keep the local hook fast. CI runs the full-repo lint/typecheck/test suite.
 pnpm exec lint-staged
-
-# Run TypeScript checking (same as CI)
-pnpm run tsc
-
-# Run linting (same as CI)
-pnpm run lint

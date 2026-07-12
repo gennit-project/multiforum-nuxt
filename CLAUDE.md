@@ -8,6 +8,8 @@
 - `pnpm run dev` - Start development server
 - `pnpm run build` - Build for production
 - `pnpm run test:playwright` - Run Playwright tests
+- `pnpm run build:playwright:mocked` - Build the mocked app once for fast parallel Playwright runs
+- `pnpm run test:playwright:mocked:build` - Run the mocked Playwright suite against the prebuilt app
 - `pnpm run test:unit` - Run unit tests with Vitest
 - `pnpm run test:playwright:mocked -- tests/playwright/mocked/discussions/createEditDeleteDiscussions.spec.ts` - Run a specific mocked Playwright test
 - `pnpm run tsc` - Run TypeScript type checking
@@ -93,13 +95,8 @@ Hard-won pitfalls (full detail + code in [CONTRIBUTING.md](./CONTRIBUTING.md#fro
 
 ## Pre-commit Workflow
 
-- TypeScript type checking and unit tests run automatically before each commit
-- The pre-commit hook runs the `verify` command which includes:
-  - TypeScript type checking (`pnpm run tsc`)
-  - Unit tests (`pnpm run test:unit:run`)
-- Modified files are checked with lint-staged
-  - TS and Vue files: ESLint + unit tests
-  - Test files: Run the specific test that changed
+- The pre-commit hook is intentionally fast and runs only `pnpm exec lint-staged`
+- Full linting, type checking, unit tests, and Playwright checks run in CI
 - To skip pre-commit hooks temporarily: `git commit --no-verify`
 
 ## Code Style Guidelines
