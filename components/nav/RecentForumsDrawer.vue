@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, toRef } from 'vue';
 import { useRouter } from 'nuxt/app';
 import RecentForumsList from './RecentForumsList.vue';
 import ForumFinder from './ForumFinder.vue';
 import SearchIcon from '@/components/icons/SearchIcon.vue';
+import { useFocusTrap } from '@/composables/useFocusTrap';
 
 type ForumItem = {
   uniqueName: string;
@@ -23,6 +24,14 @@ const emit = defineEmits<{
 const router = useRouter();
 
 const isFindingForum = ref(false);
+
+// Modal drawer: trap focus inside the panel while open, Escape to close, and
+// restore focus to the trigger on close.
+const panelRef = ref<HTMLElement | null>(null);
+useFocusTrap(panelRef, {
+  active: toRef(props, 'isOpen'),
+  onEscape: () => emit('close'),
+});
 
 // Reset back to the recent-forums view whenever the drawer is reopened.
 watch(
@@ -67,13 +76,20 @@ const goToForum = (uniqueName: string) => {
     >
       <div
         v-if="isOpen"
+        ref="panelRef"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="recent-forums-drawer-title"
         class="fixed left-0 top-0 z-40 h-full w-80 overflow-y-auto border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
       >
         <!-- Header -->
         <div
           class="flex items-center justify-between border-b border-gray-200 p-4 dark:border-gray-600"
         >
-          <h3 class="font-semibold text-lg text-gray-900 dark:text-gray-100">
+          <h3
+            id="recent-forums-drawer-title"
+            class="font-semibold text-lg text-gray-900 dark:text-gray-100"
+          >
             Recent Forums
           </h3>
           <button

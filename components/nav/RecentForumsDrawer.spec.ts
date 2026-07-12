@@ -44,6 +44,22 @@ describe('RecentForumsDrawer visibility', () => {
     expect(wrapper.text()).toContain('Recent Forums');
   });
 
+  it('marks the open drawer as a modal dialog labelled by its heading', () => {
+    const wrapper = mountDrawer({ isOpen: true });
+
+    expect({
+      role: wrapper.get('[role="dialog"]').attributes('role'),
+      modal: wrapper.get('[role="dialog"]').attributes('aria-modal'),
+      labelledby: wrapper.get('[role="dialog"]').attributes('aria-labelledby'),
+      titleId: wrapper.get('h3').attributes('id'),
+    }).toEqual({
+      role: 'dialog',
+      modal: 'true',
+      labelledby: 'recent-forums-drawer-title',
+      titleId: 'recent-forums-drawer-title',
+    });
+  });
+
   it('hides the drawer when closed', () => {
     const wrapper = mountDrawer({ isOpen: false });
 
