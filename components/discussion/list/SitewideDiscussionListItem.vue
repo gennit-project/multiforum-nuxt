@@ -21,7 +21,7 @@ import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import XmarkIcon from '@/components/icons/XmarkIcon.vue';
-import { relativeTime } from '@/utils';
+import { stableRelativeTime } from '@/utils';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
 import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
@@ -192,7 +192,7 @@ const authorUsername = computed(
   () => props.discussion?.Author?.username || 'Deleted'
 );
 const relative = computed(() =>
-  props.discussion ? relativeTime(props.discussion.createdAt) : ''
+  props.discussion ? stableRelativeTime(props.discussion.createdAt) : ''
 );
 
 // Thumbnail for the mobile card layout. Prefers the first album image
