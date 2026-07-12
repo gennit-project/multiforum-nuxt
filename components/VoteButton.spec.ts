@@ -10,7 +10,11 @@ const authButtonStub = {
   template: '<button :data-classes="buttonClasses" @click="$emit(\'click\')"><slot /></button>',
 };
 
-const mountButton = (props: Record<string, unknown> = {}, slot = 'X') =>
+const mountButton = (
+  props: Record<string, unknown> = {},
+  slot = 'X',
+  customStubs: Record<string, unknown> = {}
+) =>
   mount(VoteButton, {
     props,
     slots: { default: slot },
@@ -20,6 +24,7 @@ const mountButton = (props: Record<string, unknown> = {}, slot = 'X') =>
         ClientOnly: { template: '<div><slot /></div>' },
         Tooltip: { template: '<div><slot name="activator" :props="{}" /><slot /></div>' },
         TooltipContent: true,
+        ...customStubs,
       },
     },
   });
@@ -100,6 +105,22 @@ describe('VoteButton rendering', () => {
 
   it('emits vote from the tooltip activator button', async () => {
     const wrapper = mountButton({ tooltipText: 'Upvote this' });
+
+    await authButton(wrapper).trigger('click');
+
+    expect(wrapper.emitted('vote')).toBeTruthy();
+  });
+
+  it('emits vote from the tooltip fallback button', async () => {
+    const wrapper = mountButton(
+      { tooltipText: 'Upvote this' },
+      'Upvote',
+      {
+        ClientOnly: {
+          template: '<div><slot name="fallback" /></div>',
+        },
+      }
+    );
 
     await authButton(wrapper).trigger('click');
 

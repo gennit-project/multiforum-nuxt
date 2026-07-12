@@ -34,6 +34,16 @@ describe('Votes upvote', () => {
     expect(button(wrapper, 'upvote-comment-button').text()).toContain('5');
   });
 
+  it('keeps the upvote icon, count, and label on one line', () => {
+    const wrapper = mountVotes({ upvoteCount: 5 });
+
+    expect(
+      button(wrapper, 'upvote-comment-button').get('button > span').classes()
+    ).toEqual(
+      expect.arrayContaining(['flex-nowrap', 'whitespace-nowrap'])
+    );
+  });
+
   it('hides the upvote button when showUpvote is false', () => {
     const wrapper = mountVotes({ showUpvote: false });
 

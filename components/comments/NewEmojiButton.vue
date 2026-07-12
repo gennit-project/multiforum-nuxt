@@ -90,8 +90,8 @@ function handleClick() {
           :transparent-background="transparentBackground"
           @vote="handleClick"
         >
-          <span class="flex items-center gap-1">
-            <FaceSmileIcon class="h-4 w-4" aria-hidden="true" />
+          <span class="flex flex-nowrap items-center gap-1 whitespace-nowrap">
+            <FaceSmileIcon class="h-4 w-4 shrink-0" aria-hidden="true" />
             <span class="text-xs">React</span>
           </span>
         </VoteButton>

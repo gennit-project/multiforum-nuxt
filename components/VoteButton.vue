@@ -136,6 +136,7 @@ const mergedButtonProps = computed(() => {
           :loading="loading"
           :show-count="showCount"
           :count="count"
+          @click="emit('vote')"
         >
           <slot />
         </AuthButton>
