@@ -32,6 +32,8 @@ Core commands:
 - `pnpm run tsc` - TypeScript type checking
 - `pnpm run test:unit` - run unit tests
 - `pnpm run test:playwright` - run Playwright tests
+- `pnpm run build:playwright:mocked` - build the mocked app for faster parallel Playwright runs
+- `pnpm run test:playwright:mocked:build` - run mocked Playwright against the prebuilt app
 
 For detailed development standards, testing conventions, and workflow guidance, see [CLAUDE.md](../CLAUDE.md).
 
