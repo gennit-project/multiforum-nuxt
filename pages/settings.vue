@@ -13,12 +13,16 @@ const links = computed(() => {
 </script>
 
 <template>
-  <div class="flex-1 px-10 text-xl font-bold">
+  <main
+    id="main-content"
+    tabindex="-1"
+    class="flex-1 px-10 text-xl font-bold outline-none"
+  >
     <Breadcrumbs :links="links" />
     <h2
-      class="font-extrabold mb-2 ml-2 mt-6 inline text-3xl tracking-tight text-gray-900 sm:block sm:text-4xl"
+      class="font-extrabold mb-2 ml-2 mt-6 inline text-3xl tracking-tight text-gray-900 dark:text-gray-100 sm:block sm:text-4xl"
     >
       Settings
     </h2>
-  </div>
+  </main>
 </template>

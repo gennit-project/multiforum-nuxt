@@ -10,4 +10,12 @@ describe('settings page', () => {
       { label: 'Settings', path: 'settings' },
     ]);
   });
+
+  // This standalone page renders without the default layout, so it needs its
+  // own main landmark (also the target for route-change focus).
+  it('exposes a main landmark for the page content', () => {
+    const wrapper = shallowMount(SettingsPage);
+
+    expect(wrapper.find('main#main-content').exists()).toBe(true);
+  });
 });

@@ -104,4 +104,12 @@ describe('create-username page', () => {
 
     expect(h.push).toHaveBeenCalledWith('/');
   });
+
+  // This standalone onboarding page renders without the default layout, so it
+  // needs its own main landmark (also the target for route-change focus).
+  it('exposes a main landmark for the page content', async () => {
+    const wrapper = await mountPage();
+
+    expect(wrapper.find('main#main-content').exists()).toBe(true);
+  });
 });
