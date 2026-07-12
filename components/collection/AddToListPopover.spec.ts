@@ -163,6 +163,16 @@ describe('AddToListPopover favorites toggle', () => {
     });
   });
 
+  it('refetches collections after adding to favorites', async () => {
+    const wrapper = mountPopover();
+
+    await rows(wrapper)[0].trigger('click');
+    await flushPromises();
+
+    expect(h.refetchCollections).toHaveBeenCalledTimes(1);
+    expect(h.refetchItem).not.toHaveBeenCalled();
+  });
+
   it('emits favoriteChange(true) when favoriting', async () => {
     const wrapper = mountPopover();
 
@@ -179,6 +189,36 @@ describe('AddToListPopover favorites toggle', () => {
     await flushPromises();
 
     expect(h.removeFav).toHaveBeenCalled();
+  });
+
+  it('shows an error toast when adding to favorites fails', async () => {
+    h.addFav = vi.fn().mockRejectedValue(new Error('boom'));
+    const wrapper = mountPopover();
+
+    await rows(wrapper)[0].trigger('click');
+    await flushPromises();
+
+    expect(h.showToast).toHaveBeenCalledWith(
+      'Error updating favorites',
+      'error'
+    );
+    expect(wrapper.emitted('favoriteChange')).toBeUndefined();
+    expect(h.refetchCollections).not.toHaveBeenCalled();
+  });
+
+  it('shows an error toast when removing from favorites fails', async () => {
+    h.removeFav = vi.fn().mockRejectedValue(new Error('boom'));
+    const wrapper = mountPopover({ isAlreadyFavorite: true });
+
+    await rows(wrapper)[0].trigger('click');
+    await flushPromises();
+
+    expect(h.showToast).toHaveBeenCalledWith(
+      'Error updating favorites',
+      'error'
+    );
+    expect(wrapper.emitted('favoriteChange')).toBeUndefined();
+    expect(h.refetchCollections).not.toHaveBeenCalled();
   });
 
   it('uses a channel param for channel favorites', async () => {
