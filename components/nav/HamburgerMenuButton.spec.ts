@@ -1,30 +1,33 @@
-import { describe, it, expect } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { describe, expect, it } from 'vitest';
 
 import HamburgerMenuButton from '@/components/nav/HamburgerMenuButton.vue';
+import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
 describe('HamburgerMenuButton', () => {
-  it('has an accessible name for the icon-only control', () => {
-    const wrapper = mount(HamburgerMenuButton);
+  it('renders the mobile-menu control attributes', () => {
+    const wrapper = mountWithDefaults(HamburgerMenuButton);
 
-    expect(wrapper.get('button').text()).toContain('navigation menu');
-  });
-
-  it('reports collapsed state by default', () => {
-    const wrapper = mount(HamburgerMenuButton);
-
+    expect(wrapper.get('button').attributes('aria-controls')).toBe('mobile-menu');
     expect(wrapper.get('button').attributes('aria-expanded')).toBe('false');
   });
 
   it('reflects the expanded prop in aria-expanded', () => {
-    const wrapper = mount(HamburgerMenuButton, { props: { expanded: true } });
+    const wrapper = mountWithDefaults(HamburgerMenuButton, {
+      props: { expanded: true },
+    });
 
     expect(wrapper.get('button').attributes('aria-expanded')).toBe('true');
   });
 
-  it('points aria-controls at the mobile menu region', () => {
-    const wrapper = mount(HamburgerMenuButton);
+  it('includes the accessible sr-only label', () => {
+    const wrapper = mountWithDefaults(HamburgerMenuButton);
 
-    expect(wrapper.get('button').attributes('aria-controls')).toBe('mobile-menu');
+    expect(wrapper.text()).toContain('Open site-wide navigation menu');
+  });
+
+  it('renders both the open and close menu icons', () => {
+    const wrapper = mountWithDefaults(HamburgerMenuButton);
+
+    expect(wrapper.findAll('svg')).toHaveLength(2);
   });
 });
