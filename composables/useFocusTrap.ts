@@ -52,10 +52,10 @@ export function useFocusTrap(
     if (event.key !== 'Tab') return;
 
     const elements = focusableElements();
-    if (!elements.length) return;
-
     const first = elements[0];
     const last = elements[elements.length - 1];
+    if (!first || !last) return;
+
     const active = document.activeElement as HTMLElement | null;
     const insidePanel = !!active && !!panel.value?.contains(active);
 
