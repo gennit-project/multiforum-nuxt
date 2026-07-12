@@ -14,24 +14,38 @@ type MockHandlerInput = {
   };
 };
 
-const getBaseMocks = (loggedInUsername: string) => ({
-  // This query is called with the profile username from route params
-  getBasicUserInfo: ({ body }: MockHandlerInput) => {
-    const username = (body.variables?.username as string) || PROFILE_USERNAME;
-    return {
-      data: {
-        users: [
-          buildBasicUser({
+const getPublicProfile = ({ body }: MockHandlerInput) => {
+  const username = (body.variables?.username as string) || PROFILE_USERNAME;
+  return {
+    data: {
+      users: [
+        {
+          ...buildBasicUser({
             username,
             displayName: username,
             bio: 'Test bio for ' + username,
             commentKarma: 42,
             discussionKarma: 100,
           }),
-        ],
-      },
-    };
-  },
+          AuthoredWikiPageVersionsAggregate: { count: 0 },
+          ModOfChannelsAggregate: { count: 0 },
+        },
+      ],
+      getUserWikiEditsCount: 0,
+    },
+  };
+};
+
+const getBaseMocks = (loggedInUsername: string) => ({
+  // This query is called with the profile username from route params
+  getBasicUserInfo: getPublicProfile,
+  getPublicUserProfile: getPublicProfile,
+  getPublicScratchpadEntries: () => ({
+    data: {
+      scratchpadEntriesAggregate: { count: 0 },
+      scratchpadEntries: [],
+    },
+  }),
   getUser: () => ({
     data: {
       users: [
