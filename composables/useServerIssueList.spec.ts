@@ -144,7 +144,7 @@ describe('useServerIssueList', () => {
       isOpen: true,
       scopedToForum: true,
     });
-    const firstCall = hState.queryCalls[0];
+    const firstCall = hState.queryCalls[0]!;
     wrapper.unmount();
 
     expect({
@@ -176,7 +176,7 @@ describe('useServerIssueList', () => {
     };
 
     const { wrapper } = await mountComposable({ isOpen: false });
-    const firstCall = hState.queryCalls[0];
+    const firstCall = hState.queryCalls[0]!;
     wrapper.unmount();
 
     expect(firstCall.variables.value).toMatchObject({
