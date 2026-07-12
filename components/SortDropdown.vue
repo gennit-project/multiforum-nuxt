@@ -2,15 +2,19 @@
 import { ref } from 'vue';
 
 const isOpen = ref(false);
+
+const closeMenu = () => {
+  isOpen.value = false;
+};
 </script>
 <template>
-  <div class="relative inline-block">
+  <div v-click-outside="closeMenu" class="relative inline-block">
     <div class="flex">
       <button
         id="menu-button"
         type="button"
         class="group inline-flex justify-center py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
-        aria-expanded="false"
+        :aria-expanded="isOpen"
         aria-haspopup="true"
         @click="isOpen = !isOpen"
       >
@@ -49,6 +53,7 @@ const isOpen = ref(false);
       aria-orientation="vertical"
       aria-labelledby="menu-button"
       tabindex="-1"
+      @keydown.escape="closeMenu"
     >
       <div class="py-1" role="none">
         <a
