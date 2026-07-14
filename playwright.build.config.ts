@@ -63,6 +63,17 @@ export default defineConfig({
           VITE_E2E_MOCK_MODE: 'true',
           VITE_GRAPHQL_URL: graphqlURL,
           VITE_SERVER_NAME: 'Playwright Test Server',
+          // Auth is mocked in this suite (VITE_E2E_MOCK_MODE seeds the session
+          // from a cookie, see server/middleware/2.auth-session.ts), but the
+          // @auth0/auth0-nuxt Nitro startup plugin still validates its config
+          // and throws "Auth0 configuration error: Domain is required" on boot
+          // when these are empty. These dummy NUXT_AUTH0_* values only satisfy
+          // that check (runtimeConfig.auth0.*) — they are never used for real
+          // authentication here.
+          NUXT_AUTH0_DOMAIN: 'example.com',
+          NUXT_AUTH0_CLIENT_ID: 'playwright-test-client',
+          NUXT_AUTH0_CLIENT_SECRET: 'playwright-test-secret',
+          NUXT_AUTH0_SESSION_SECRET: 'playwright-test-session-secret',
         },
         url: baseURL,
         reuseExistingServer: !process.env.CI,
