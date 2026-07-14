@@ -39,9 +39,9 @@ const {
   loading: channelRulesLoading,
   error: channelRulesError,
   result: channelRulesResult,
-} = useQuery(GET_CHANNEL_RULES, {
-  uniqueName: forumId,
-});
+} = useQuery(GET_CHANNEL_RULES, () => ({
+  uniqueName: forumId.value,
+}));
 
 const getRules = (rulesJSON: string): RuleOption[] => {
   const rules: RuleOption[] = [];
