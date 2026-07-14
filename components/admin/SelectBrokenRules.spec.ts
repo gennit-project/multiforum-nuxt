@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import SelectBrokenRules from '@/components/admin/SelectBrokenRules.vue';
+import { GET_CHANNEL_RULES } from '@/graphQLData/channel/queries';
 
 const h = vi.hoisted(() => ({
   // useQuery is called twice: [0] server rules, [1] channel rules.
@@ -13,13 +14,16 @@ const h = vi.hoisted(() => ({
   channelError: null as unknown,
   channelLoading: null as unknown,
   index: { n: 0 },
+  calls: [] as Array<{ query: unknown; variables: unknown }>,
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () =>
-    h.index.n++ === 0
+  useQuery: (query: unknown, variables: unknown) => {
+    h.calls.push({ query, variables });
+    return h.index.n++ === 0
       ? { result: h.serverResult, error: h.serverError, loading: h.serverLoading }
-      : { result: h.channelResult, error: h.channelError, loading: h.channelLoading },
+      : { result: h.channelResult, error: h.channelError, loading: h.channelLoading };
+  },
 }));
 vi.mock('nuxt/app', () => ({ useRoute: () => ({ params: { forumId: 'cats' } }) }));
 
@@ -49,6 +53,7 @@ const buttonByText = (w: ReturnType<typeof mount>, text: string) =>
 beforeEach(() => {
   vi.clearAllMocks();
   h.index.n = 0;
+  h.calls = [];
   h.serverResult = ref({ serverConfigs: [{ rules: ruleJSON(['No spam']) }] });
   h.serverError = ref(null);
   h.serverLoading = ref(false);
@@ -70,6 +75,30 @@ describe('SelectBrokenRules states', () => {
     const wrapper = mountRules();
 
     expect(wrapper.find('.err').text()).toContain('boom');
+  });
+});
+
+describe('SelectBrokenRules channel-rules query wiring', () => {
+  const resolveVariables = (variables: unknown) =>
+    typeof variables === 'function' ? variables() : variables;
+
+  it('invokes the channel-rules query with the forumId as a reactive uniqueName variable', () => {
+    mountRules();
+
+    // useQuery call [1] is the channel rules query (see mock ordering).
+    expect({
+      query: h.calls[1]?.query,
+      variables: resolveVariables(h.calls[1]?.variables),
+    }).toEqual({ query: GET_CHANNEL_RULES, variables: { uniqueName: 'cats' } });
+  });
+
+  it('renders both the forum and server rule sections when both queries return rules', () => {
+    const wrapper = mountRules();
+
+    expect({
+      forum: wrapper.find('[data-testid="forum-rules-section"]').exists(),
+      server: wrapper.text().includes('Server Rules'),
+    }).toEqual({ forum: true, server: true });
   });
 });
 
