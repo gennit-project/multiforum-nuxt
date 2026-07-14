@@ -20,6 +20,7 @@ import FlagIcon from '../icons/FlagIcon.vue';
 import XCircleIcon from '../icons/XCircleIcon.vue';
 import PencilIcon from '../icons/PencilIcon.vue';
 import TrashIcon from '../icons/TrashIcon.vue';
+import TagIcon from '../icons/TagIcon.vue';
 import { ActionType } from '@/types/Comment';
 import { useMutation } from '@vue/apollo-composable';
 import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
@@ -52,6 +53,7 @@ const actionTypeToIcon: Record<string, Component> = {
   [ActionType.Edit]: PencilIcon,
   edit_content: PencilIcon,
   [ActionType.Delete]: TrashIcon,
+  label_update: TagIcon,
 };
 
 const props = defineProps({
@@ -235,6 +237,8 @@ const actionPhrase = computed(() => {
       return `the ${contentNoun} was unarchived by`;
     case ActionType.Report:
       return `the ${contentNoun} was reported by`;
+    case 'label_update':
+      return `the ${contentNoun} labels were updated by`;
     case ActionType.Comment:
       return 'a comment was added by';
     case ActionType.Suspension:
