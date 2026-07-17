@@ -14,8 +14,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "compile": "graphql-codegen",
-    "lint": "eslint",
-    "lint:a11y": "pnpm exec eslint \"components/**/*.vue\" --quiet",
+    "lint": "eslint --cache --cache-location node_modules/.cache/eslint/",
+    "lint:a11y": "pnpm exec eslint \"components/**/*.vue\" --quiet --cache --cache-location node_modules/.cache/eslint/",
     "prepare": "husky install",
     "prettier:check": "prettier --check .",
     "start": "nuxt start",
@@ -140,10 +140,10 @@
   },
   "lint-staged": {
     "*.ts": [
-      "eslint --fix"
+      "eslint --fix --cache --cache-location node_modules/.cache/eslint/"
     ],
     "*.vue": [
-      "eslint --fix"
+      "eslint --fix --cache --cache-location node_modules/.cache/eslint/"
     ]
   },
   "pnpm": {
