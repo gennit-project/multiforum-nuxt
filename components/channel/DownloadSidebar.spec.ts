@@ -28,6 +28,9 @@ vi.mock('@vue/apollo-composable', () => ({
   })),
   useMutation: vi.fn(() => ({
     mutate: trackDownloadMock,
+    loading: ref(false),
+    error: ref(null),
+    onDone: vi.fn(),
   })),
 }));
 
@@ -229,7 +232,9 @@ describe('DownloadSidebar', () => {
 
     expect({
       status: wrapper.get('[data-testid="download-scan-status"]').text(),
-      button: wrapper.get('button').text(),
+      button: wrapper.findAll('button').find((button) =>
+        button.text() === 'Download for review'
+      )?.text(),
     }).toEqual({
       status: expect.stringContaining(
         'This upload was blocked by the security scan: Known malware signature.'
@@ -258,6 +263,56 @@ describe('DownloadSidebar', () => {
     });
 
     expect(wrapper.text()).not.toContain('Private scanner detail');
+  });
+
+  it('sends a targeted human-review request for the creator', async () => {
+    mockUsernameRef.value = 'author';
+    const wrapper = mount(DownloadSidebar, {
+      props: {
+        discussion: makeDiscussion({
+          ...discussionWithFile,
+          DownloadableFiles: [
+            {
+              ...discussionWithFile.DownloadableFiles[0],
+              scanStatus: 'SUSPICIOUS',
+            },
+          ],
+        }),
+        discussionId: 'discussion-1',
+        channelUniqueName: 'test-forum',
+      },
+    });
+
+    await wrapper.get('[data-testid="download-scan-status"] button').trigger('click');
+
+    expect(trackDownloadMock).toHaveBeenCalledWith({
+      downloadableFileId: 'file-1',
+      reason: null,
+    });
+  });
+
+  it('shows when human review was already requested', () => {
+    mockUsernameRef.value = 'author';
+    const wrapper = mount(DownloadSidebar, {
+      props: {
+        discussion: makeDiscussion({
+          ...discussionWithFile,
+          DownloadableFiles: [
+            {
+              ...discussionWithFile.DownloadableFiles[0],
+              scanStatus: 'SUSPICIOUS',
+              reviewRequestedAt: '2026-07-19T00:00:00Z',
+            },
+          ],
+        }),
+        discussionId: 'discussion-1',
+        channelUniqueName: 'test-forum',
+      },
+    });
+
+    expect(wrapper.get('[data-testid="download-scan-status"] button').text()).toBe(
+      'Human review requested'
+    );
   });
 
   it('identifies a failed scan as a server-side problem for the creator', () => {

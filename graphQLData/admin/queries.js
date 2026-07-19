@@ -190,6 +190,24 @@ export const GET_SERVER_HEALTH_DASHBOARD = gql`
   }
 `;
 
+export const GET_DOWNLOAD_SCAN_REVIEW_QUEUE = gql`
+  query getDownloadScanReviewQueue($limit: Int) {
+    getDownloadScanReviewQueue(limit: $limit) {
+      downloadableFileId
+      fileName
+      scanStatus
+      scanReason
+      scanCheckedAt
+      reviewRequestedAt
+      reviewRequestReason
+      uploaderUsername
+      discussionId
+      discussionTitle
+      channelUniqueName
+    }
+  }
+`;
+
 export const GET_SERVER_HEALTH_DASHBOARD_OVERVIEW = gql`
   query getServerHealthDashboardOverview(
     $startDate: String

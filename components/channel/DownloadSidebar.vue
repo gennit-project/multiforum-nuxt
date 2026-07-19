@@ -9,7 +9,10 @@ import ScopedPipelineView from '@/components/plugins/ScopedPipelineView.vue';
 import { computed, ref } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { GET_DOWNLOAD_LABELS } from '@/graphQLData/discussion/queries';
-import { RETRY_DOWNLOADABLE_FILE_SCAN } from '@/graphQLData/discussion/mutations';
+import {
+  REQUEST_DOWNLOADABLE_FILE_REVIEW,
+  RETRY_DOWNLOADABLE_FILE_SCAN,
+} from '@/graphQLData/discussion/mutations';
 import { useUsername } from '@/composables/useAuthState';
 
 type DownloadScanStatus =
@@ -27,6 +30,8 @@ type ScannedDownloadableFile = Omit<
   scanReason?: string | null;
   scanCheckedAt?: string | null;
   uploadedByUsername?: string | null;
+  reviewRequestedAt?: string | null;
+  reviewRequestReason?: string | null;
 };
 
 const props = defineProps({
@@ -51,6 +56,16 @@ const retryError = ref('');
 const { mutate: retryDownloadableFileScan } = useMutation(
   RETRY_DOWNLOADABLE_FILE_SCAN
 );
+const reviewRequestedLocally = ref(false);
+const {
+  mutate: requestDownloadableFileReview,
+  loading: requestingReview,
+  error: requestReviewError,
+  onDone: onReviewRequested,
+} = useMutation(REQUEST_DOWNLOADABLE_FILE_REVIEW);
+onReviewRequested(() => {
+  reviewRequestedLocally.value = true;
+});
 
 // Popover state
 const showSuccessPopover = ref(false);
@@ -88,6 +103,20 @@ const creatorIsViewing = computed(
   () => Boolean(username.value) && props.discussion?.Author?.username === username.value
 );
 
+const reviewRequested = computed(
+  () => reviewRequestedLocally.value || Boolean(primaryFile.value?.reviewRequestedAt)
+);
+
+const requestHumanReview = () => {
+  if (!primaryFile.value?.id || requestingReview.value || reviewRequested.value) {
+    return;
+  }
+  requestDownloadableFileReview({
+    downloadableFileId: primaryFile.value.id,
+    reason: null,
+  });
+};
+
 const hasReviewAccess = computed(
   () => scanStatus.value !== 'CLEAN' && Boolean(primaryFile.value?.url)
 );
@@ -104,10 +133,6 @@ const downloadLabel = computed(() =>
 
 const replaceFilePath = computed(
   () => `/forums/${props.channelUniqueName}/downloads/edit/${props.discussionId}`
-);
-
-const requestReviewPath = computed(
-  () => `/forums/${props.channelUniqueName}/issues/create`
 );
 
 // Format price display
@@ -274,10 +299,18 @@ const groupedLabels = computed(() => {
               <NuxtLink class="font-medium underline" :to="replaceFilePath">
                 Replace file
               </NuxtLink>
-              <NuxtLink class="font-medium underline" :to="requestReviewPath">
-                Request human review
-              </NuxtLink>
+              <button
+                type="button"
+                class="font-medium underline disabled:no-underline disabled:opacity-70"
+                :disabled="requestingReview || reviewRequested"
+                @click="requestHumanReview"
+              >
+                {{ reviewRequested ? 'Human review requested' : requestingReview ? 'Requesting review…' : 'Request human review' }}
+              </button>
             </div>
+            <p v-if="requestReviewError" class="mt-2 font-medium">
+              The review request could not be sent. Please try again.
+            </p>
           </template>
           <template v-else>
             <p class="font-medium">
