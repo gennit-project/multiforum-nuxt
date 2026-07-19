@@ -136,6 +136,12 @@ export const SET_SERVER_PLUGIN_SECRET = gql`
   }
 `;
 
+export const DELETE_SERVER_PLUGIN_SECRET = gql`
+  mutation DeleteServerPluginSecret($pluginId: String!, $key: String!) {
+    deleteServerPluginSecret(pluginId: $pluginId, key: $key)
+  }
+`;
+
 export const UPDATE_MOD_CHANNEL_ROLE = gql`
   mutation UpdateModChannelRole(
     $name: String!

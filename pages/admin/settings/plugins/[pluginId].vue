@@ -57,6 +57,7 @@ import {
   INSTALL_PLUGIN_VERSION,
   ENABLE_SERVER_PLUGIN,
   SET_SERVER_PLUGIN_SECRET,
+  DELETE_SERVER_PLUGIN_SECRET,
 } from '@/graphQLData/admin/mutations';
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
@@ -77,6 +78,7 @@ const showSecretInputs = ref<Record<string, boolean>>({});
 const settingsValues = ref<PluginSettings>({});
 const settingsErrors = ref<Record<string, string>>({});
 const savingSettings = ref(false);
+const deletingSecretKey = ref<string | null>(null);
 const installError = ref<string | null>(null);
 const pendingUpgrade = ref<{
   version: string;
@@ -178,6 +180,9 @@ const { mutate: installMutation, loading: installing } = useMutation(
 const { mutate: enableMutation, loading: enabling } =
   useMutation(ENABLE_SERVER_PLUGIN);
 const { mutate: setSecretMutation } = useMutation(SET_SERVER_PLUGIN_SECRET);
+const { mutate: deleteSecretMutation } = useMutation(
+  DELETE_SERVER_PLUGIN_SECRET
+);
 
 // Core computed properties needed for secrets query
 interface PluginFromQuery {
@@ -654,6 +659,31 @@ const handleSetSecret = async (key: string, value: string) => {
   }
 };
 
+const handleDeleteSecret = async (key: string) => {
+  if (!pluginSlug.value) return;
+
+  deletingSecretKey.value = key;
+  try {
+    const result = await deleteSecretMutation({
+      pluginId: pluginSlug.value,
+      key,
+    });
+
+    if (!result?.data?.deleteServerPluginSecret) {
+      throw new Error('Secret was not found');
+    }
+
+    toast.success(`Secret "${key}" deleted successfully`);
+    await refetchSecrets();
+    await refetchConfigStatus();
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    toast.error(`Failed to delete secret "${key}": ${message}`);
+  } finally {
+    deletingSecretKey.value = null;
+  }
+};
+
 const handleSaveSettings = async () => {
   if (!installedPlugin.value) return;
   if (!pluginSlug.value) return;
@@ -814,7 +844,9 @@ const handleSaveSettings = async () => {
             v-model:show-secret-inputs="showSecretInputs"
             :secrets="secrets"
             :orphaned-secrets="orphanedSecrets"
+            :deleting-secret-key="deletingSecretKey"
             @set-secret="handleSetSecret"
+            @delete-secret="handleDeleteSecret"
           />
 
           <!-- Loading State for Secrets -->

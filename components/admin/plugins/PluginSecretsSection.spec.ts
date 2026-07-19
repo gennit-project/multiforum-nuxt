@@ -90,11 +90,11 @@ describe('PluginSecretsSection orphaned secrets', () => {
     }).toEqual({
       hasHeading: true,
       hasExplanation: true,
-      item: 'OLD_API_KEY✓ Set (untested)',
+      item: 'OLD_API_KEY✓ Set (untested)Delete',
     });
   });
 
-  it('does not offer an edit action for an orphaned secret', () => {
+  it('confirms the rollback risk before deleting an orphaned secret', async () => {
     const wrapper = mountSection({
       secrets: [],
       orphanedSecrets: [
@@ -102,7 +102,16 @@ describe('PluginSecretsSection orphaned secrets', () => {
       ],
     });
 
-    expect(wrapper.findAll('button')).toHaveLength(0);
+    await buttonByText(wrapper, 'Delete')!.trigger('click');
+
+    expect(wrapper.text()).toContain(
+      'Older plugin versions may need it after a rollback or downgrade.'
+    );
+    expect(wrapper.emitted('delete-secret')).toBeUndefined();
+
+    await buttonByText(wrapper, 'Delete permanently')!.trigger('click');
+
+    expect(wrapper.emitted('delete-secret')?.[0]).toEqual(['OLD_API_KEY']);
   });
 });
 
