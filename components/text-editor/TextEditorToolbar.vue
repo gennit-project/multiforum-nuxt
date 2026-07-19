@@ -5,6 +5,8 @@ export type FormatButton = {
   label: string;
   format: string;
   class?: string;
+  // Full-word accessible name; falls back to `label` when omitted.
+  ariaLabel?: string;
 };
 
 const props = defineProps<{
@@ -18,16 +20,21 @@ const emit = defineEmits<{
 }>();
 
 const formatButtons: FormatButton[] = [
-  { label: 'B', format: 'bold' },
-  { label: 'I', format: 'italic' },
-  { label: 'U', format: 'underline' },
-  { label: 'H1', format: 'header1' },
-  { label: 'H2', format: 'header2' },
-  { label: 'H3', format: 'header3' },
-  { label: 'Quote', format: 'quote' },
-  { label: 'spoiler', format: 'spoiler', class: 'line-through' },
-  { label: 'Emoji', format: 'emoji' },
-  { label: '⛶', format: 'fullscreen' },
+  { label: 'B', format: 'bold', ariaLabel: 'Bold' },
+  { label: 'I', format: 'italic', ariaLabel: 'Italic' },
+  { label: 'U', format: 'underline', ariaLabel: 'Underline' },
+  { label: 'H1', format: 'header1', ariaLabel: 'Heading 1' },
+  { label: 'H2', format: 'header2', ariaLabel: 'Heading 2' },
+  { label: 'H3', format: 'header3', ariaLabel: 'Heading 3' },
+  { label: 'Quote', format: 'quote', ariaLabel: 'Quote' },
+  {
+    label: 'spoiler',
+    format: 'spoiler',
+    class: 'line-through',
+    ariaLabel: 'Spoiler',
+  },
+  { label: 'Emoji', format: 'emoji', ariaLabel: 'Insert emoji' },
+  { label: '⛶', format: 'fullscreen', ariaLabel: 'Toggle fullscreen' },
 ];
 
 const visibleButtons = props.showFullscreenButton
@@ -51,7 +58,7 @@ const handleButtonClick = (button: FormatButton, event: MouseEvent) => {
       v-for="button in visibleButtons"
       :key="button.label"
       type="button"
-      :aria-label="button.label"
+      :aria-label="button.ariaLabel ?? button.label"
       :class="[
         'border-transparent text-md rounded-md px-2 py-1 font-medium hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700',
         button.class,

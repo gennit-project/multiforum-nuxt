@@ -13,19 +13,31 @@ describe('TextEditorToolbar rendering', () => {
   it('renders the format buttons', () => {
     const wrapper = mountToolbar();
 
-    expect(button(wrapper, 'B').exists()).toBe(true);
+    expect(button(wrapper, 'Bold').exists()).toBe(true);
+  });
+
+  it('gives icon/glyph buttons a full-word accessible name', () => {
+    const wrapper = mountToolbar({ showFullscreenButton: true });
+
+    expect(button(wrapper, 'Toggle fullscreen').exists()).toBe(true);
+  });
+
+  it('keeps the visible glyph on the bold button', () => {
+    const wrapper = mountToolbar();
+
+    expect(button(wrapper, 'Bold').text()).toBe('B');
   });
 
   it('hides the fullscreen button by default', () => {
     const wrapper = mountToolbar();
 
-    expect(button(wrapper, '⛶').exists()).toBe(false);
+    expect(button(wrapper, 'Toggle fullscreen').exists()).toBe(false);
   });
 
   it('shows the fullscreen button when enabled', () => {
     const wrapper = mountToolbar({ showFullscreenButton: true });
 
-    expect(button(wrapper, '⛶').exists()).toBe(true);
+    expect(button(wrapper, 'Toggle fullscreen').exists()).toBe(true);
   });
 });
 
@@ -33,7 +45,7 @@ describe('TextEditorToolbar actions', () => {
   it('emits format for a formatting button', async () => {
     const wrapper = mountToolbar();
 
-    await button(wrapper, 'B').trigger('click');
+    await button(wrapper, 'Bold').trigger('click');
 
     expect(wrapper.emitted('format')?.[0]).toEqual(['bold']);
   });
@@ -41,7 +53,7 @@ describe('TextEditorToolbar actions', () => {
   it('emits toggle-emoji from the emoji button', async () => {
     const wrapper = mountToolbar();
 
-    await button(wrapper, 'Emoji').trigger('click');
+    await button(wrapper, 'Insert emoji').trigger('click');
 
     expect(wrapper.emitted('toggle-emoji')).toBeTruthy();
   });
@@ -49,7 +61,7 @@ describe('TextEditorToolbar actions', () => {
   it('emits toggle-fullscreen from the fullscreen button', async () => {
     const wrapper = mountToolbar({ showFullscreenButton: true });
 
-    await button(wrapper, '⛶').trigger('click');
+    await button(wrapper, 'Toggle fullscreen').trigger('click');
 
     expect(wrapper.emitted('toggle-fullscreen')).toBeTruthy();
   });
@@ -57,7 +69,7 @@ describe('TextEditorToolbar actions', () => {
   it('does not emit format for the emoji button', async () => {
     const wrapper = mountToolbar();
 
-    await button(wrapper, 'Emoji').trigger('click');
+    await button(wrapper, 'Insert emoji').trigger('click');
 
     expect(wrapper.emitted('format')).toBeUndefined();
   });
