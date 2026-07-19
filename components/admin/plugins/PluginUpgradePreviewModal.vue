@@ -1,17 +1,23 @@
 <script setup lang="ts">
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import PluginSettingsForm from '@/components/plugins/PluginSettingsForm.vue';
+import type { PluginFormSection, PluginSettings } from '@/types/pluginForms';
 import type { PluginUpgradeReport } from '@/utils/pluginUpgradeUtils';
 
 defineProps<{
   currentVersion: string;
   targetVersion: string;
   report: PluginUpgradeReport;
+  sections: PluginFormSection[];
+  settings: PluginSettings;
+  errors: Record<string, string>;
   secrets: Array<{ key: string; isSet: boolean }>;
   installing: boolean;
 }>();
 
 const emit = defineEmits<{
   (e: 'carry-over' | 'start-fresh' | 'cancel'): void;
+  (e: 'update:settings', value: PluginSettings): void;
 }>();
 
 const groups = [
@@ -51,6 +57,18 @@ const groups = [
           </ul>
           <p v-else class="mt-2 text-xs text-gray-500 dark:text-gray-400">None</p>
         </div>
+      </div>
+
+      <div v-if="sections.length" class="mt-5 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+        <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+          Edit carried configuration
+        </h3>
+        <PluginSettingsForm
+          :model-value="settings"
+          :sections="sections"
+          :errors="errors"
+          @update:model-value="emit('update:settings', $event)"
+        />
       </div>
 
       <div v-if="secrets.length" class="mt-5 rounded-lg border border-gray-200 p-3 dark:border-gray-700">

@@ -82,7 +82,10 @@ const pendingUpgrade = ref<{
   version: string;
   report: PluginUpgradeReport;
   secrets: Array<{ key: string; isSet: boolean }>;
+  settings: PluginSettings;
+  sections: PluginFormSection[];
 } | null>(null);
+const upgradeSettingsErrors = ref<Record<string, string>>({});
 
 // Types
 interface PluginSecretStatus {
@@ -578,10 +581,26 @@ const handleInstall = async (versionOverride?: string) => {
             stored.key === secret.key && stored.status !== 'NOT_SET'
         ),
       }));
+    const targetSecretKeys = new Set(
+      (targetManifest.secrets || [])
+        .filter((secret) => !secret.scope || secret.scope === 'server')
+        .map((secret) => secret.key)
+    );
+    const targetSections = getPluginFormSections(targetManifest, 'server')
+      .map((section) => ({
+        ...section,
+        fields: section.fields.filter(
+          (field) => !targetSecretKeys.has(field.key)
+        ),
+      }))
+      .filter((section) => section.fields.length > 0);
+    upgradeSettingsErrors.value = {};
     pendingUpgrade.value = {
       version: versionToInstall,
       report: preview.report,
       secrets: targetSecrets,
+      settings: preview.settings,
+      sections: targetSections,
     };
     return;
   }
@@ -591,11 +610,40 @@ const handleInstall = async (versionOverride?: string) => {
 
 const confirmUpgrade = async (carrySettings: boolean) => {
   if (!pendingUpgrade.value) return;
+  if (carrySettings) {
+    upgradeSettingsErrors.value = validateRequiredSettings(
+      pendingUpgrade.value.sections,
+      pendingUpgrade.value.settings
+    );
+    if (Object.keys(upgradeSettingsErrors.value).length > 0) {
+      toast.error('Complete the required upgrade settings before installing');
+      return;
+    }
+  }
+  const upgrade = pendingUpgrade.value;
   const installed = await performInstall(
-    pendingUpgrade.value.version,
+    upgrade.version,
     carrySettings
   );
-  if (installed) pendingUpgrade.value = null;
+  if (!installed) return;
+
+  if (carrySettings) {
+    try {
+      await enableMutation({
+        pluginId: pluginSlug.value,
+        version: upgrade.version,
+        enabled: false,
+        settingsJson: upgrade.settings,
+      });
+      toast.success('Edited upgrade settings saved successfully');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      installError.value = `Plugin installed, but edited settings could not be saved: ${message}`;
+      return;
+    }
+  }
+
+  pendingUpgrade.value = null;
 };
 
 const handleToggleEnabled = async (enabled: boolean) => {
@@ -850,10 +898,14 @@ const handleSaveSettings = async () => {
             :current-version="installedVersion"
             :target-version="pendingUpgrade.version"
             :report="pendingUpgrade.report"
+            :sections="pendingUpgrade.sections"
+            :settings="pendingUpgrade.settings"
+            :errors="upgradeSettingsErrors"
             :secrets="pendingUpgrade.secrets"
             :installing="installing"
             @carry-over="confirmUpgrade(true)"
             @start-fresh="confirmUpgrade(false)"
+            @update:settings="pendingUpgrade.settings = $event"
             @cancel="pendingUpgrade = null"
           />
         </div>

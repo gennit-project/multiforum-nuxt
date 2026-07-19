@@ -72,9 +72,9 @@ const stubs = {
   PluginUpdateBanner: sectionStub('PluginUpdateBanner'),
   PluginUpgradePreviewModal: {
     name: 'PluginUpgradePreviewModal',
-    props: ['currentVersion', 'targetVersion', 'report', 'secrets', 'installing'],
-    emits: ['carry-over', 'start-fresh', 'cancel'],
-    template: '<div data-test="upgrade-preview"><button data-test="carry-upgrade" @click="$emit(\'carry-over\')">Carry</button><button data-test="fresh-upgrade" @click="$emit(\'start-fresh\')">Fresh</button></div>',
+    props: ['currentVersion', 'targetVersion', 'report', 'sections', 'settings', 'errors', 'secrets', 'installing'],
+    emits: ['carry-over', 'start-fresh', 'cancel', 'update:settings'],
+    template: '<div data-test="upgrade-preview"><button data-test="edit-upgrade" @click="$emit(\'update:settings\', { endpoint: \'https://edited.example\', added: true })">Edit</button><button data-test="carry-upgrade" @click="$emit(\'carry-over\')">Carry</button><button data-test="fresh-upgrade" @click="$emit(\'start-fresh\')">Fresh</button></div>',
   },
   PluginInstallSection: {
     name: 'PluginInstallSection',
@@ -332,15 +332,19 @@ describe('Plugin detail page', () => {
     await flushPromises();
     await wrapper.get('[data-test="install"]').trigger('click');
     await flushPromises();
-    const previewProps = wrapper
-      .findComponent({ name: 'PluginUpgradePreviewModal' })
-      .props();
+    const previewProps = JSON.parse(
+      JSON.stringify(
+        wrapper.findComponent({ name: 'PluginUpgradePreviewModal' }).props()
+      )
+    );
+    await wrapper.get('[data-test="edit-upgrade"]').trigger('click');
     await wrapper.get('[data-test="carry-upgrade"]').trigger('click');
     await flushPromises();
 
     expect({
       preview: previewProps,
       installArgs: h.mutations.INSTALL_M?.mutate.mock.calls[0]?.[0],
+      savedSettings: h.mutations.ENABLE_M?.mutate.mock.calls[0]?.[0],
     }).toMatchObject({
       preview: {
         currentVersion: '1.0.0',
@@ -352,11 +356,24 @@ describe('Plugin detail page', () => {
           newDefaults: ['added'],
         },
         secrets: [{ key: 'API_KEY', isSet: true }],
+        settings: {
+          endpoint: 'https://custom.example',
+          added: true,
+        },
       },
       installArgs: {
         pluginId: PLUGIN_ID,
         version: '2.0.0',
         carrySettings: true,
+      },
+      savedSettings: {
+        pluginId: PLUGIN_ID,
+        version: '2.0.0',
+        enabled: false,
+        settingsJson: {
+          endpoint: 'https://edited.example',
+          added: true,
+        },
       },
     });
   });

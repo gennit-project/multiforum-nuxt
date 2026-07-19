@@ -13,13 +13,28 @@ const mountModal = () =>
         reset: ['mode'],
         newDefaults: ['added'],
       },
+      sections: [{
+        title: 'Settings',
+        fields: [{ key: 'endpoint', label: 'Endpoint', type: 'text' }],
+      }],
+      settings: { endpoint: 'https://old.example' },
+      errors: {},
       secrets: [
         { key: 'API_KEY', isSet: true },
         { key: 'NEW_SECRET', isSet: false },
       ],
       installing: false,
     },
-    global: { stubs: { LoadingSpinner: true } },
+    global: {
+      stubs: {
+        LoadingSpinner: true,
+        PluginSettingsForm: {
+          props: ['modelValue'],
+          emits: ['update:modelValue'],
+          template: '<button data-test="edit-setting" @click="$emit(\'update:modelValue\', { endpoint: \'https://edited.example\' })">Edit</button>',
+        },
+      },
+    },
   });
 
 describe('PluginUpgradePreviewModal', () => {
@@ -35,6 +50,7 @@ describe('PluginUpgradePreviewModal', () => {
         'New defaults (1)',
         'Reset to default (1)',
         'Removed (1)',
+        'Edit carried configuration',
         'Required secrets',
       ],
       values: [
@@ -58,5 +74,15 @@ describe('PluginUpgradePreviewModal', () => {
     await wrapper.findAll('button').find((button) => button.text().includes(label))!.trigger('click');
 
     expect(wrapper.emitted(event)).toHaveLength(1);
+  });
+
+  it('emits edited settings from the form', async () => {
+    const wrapper = mountModal();
+
+    await wrapper.get('[data-test="edit-setting"]').trigger('click');
+
+    expect(wrapper.emitted('update:settings')?.[0]).toEqual([
+      { endpoint: 'https://edited.example' },
+    ]);
   });
 });
