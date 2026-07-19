@@ -70,9 +70,17 @@ export function buildPluginUpgradePreview(params: {
 
   for (const [key, value] of Object.entries(oldSettings)) {
     const field = fieldsByKey.get(key);
-    if (!field) {
+    const hasDefault = Object.prototype.hasOwnProperty.call(defaults, key);
+    if (!field && !hasDefault) {
       report.dropped.push(key);
-    } else if (!isCompatibleValue(field, value)) {
+    } else if (
+      field
+        ? !isCompatibleValue(field, value)
+        : defaults[key] !== null &&
+          (Array.isArray(defaults[key])
+            ? !Array.isArray(value)
+            : typeof defaults[key] !== typeof value)
+    ) {
       report.reset.push(key);
     } else {
       settings[key] = value;
