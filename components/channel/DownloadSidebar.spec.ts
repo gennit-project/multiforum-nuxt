@@ -283,4 +283,29 @@ describe('DownloadSidebar', () => {
       "a problem on our end, not your file"
     );
   });
+
+  it('lets the creator retry a failed scan', async () => {
+    mockUsernameRef.value = 'author';
+    const wrapper = mount(DownloadSidebar, {
+      props: {
+        discussion: makeDiscussion({
+          ...discussionWithFile,
+          DownloadableFiles: [
+            {
+              ...discussionWithFile.DownloadableFiles[0],
+              scanStatus: 'FAILED',
+            },
+          ],
+        }),
+        discussionId: 'discussion-1',
+        channelUniqueName: 'test-forum',
+      },
+    });
+
+    await wrapper.get('[data-testid="download-scan-status"] button').trigger('click');
+
+    expect(trackDownloadMock).toHaveBeenCalledWith({
+      downloadableFileId: 'file-1',
+    });
+  });
 });

@@ -7,8 +7,9 @@ import FunctionalDownloadNow from '@/components/channel/FunctionalDownloadNow.vu
 import DownloadSuccessPopover from '@/components/download/DownloadSuccessPopover.vue';
 import ScopedPipelineView from '@/components/plugins/ScopedPipelineView.vue';
 import { computed, ref } from 'vue';
-import { useQuery } from '@vue/apollo-composable';
+import { useMutation, useQuery } from '@vue/apollo-composable';
 import { GET_DOWNLOAD_LABELS } from '@/graphQLData/discussion/queries';
+import { RETRY_DOWNLOADABLE_FILE_SCAN } from '@/graphQLData/discussion/mutations';
 import { useUsername } from '@/composables/useAuthState';
 
 type DownloadScanStatus =
@@ -45,6 +46,11 @@ const props = defineProps({
 });
 
 const username = useUsername();
+const retryingScan = ref(false);
+const retryError = ref('');
+const { mutate: retryDownloadableFileScan } = useMutation(
+  RETRY_DOWNLOADABLE_FILE_SCAN
+);
 
 // Popover state
 const showSuccessPopover = ref(false);
@@ -61,8 +67,22 @@ const hasDownloadableFile = computed(() => {
 });
 
 const scanStatus = computed<DownloadScanStatus>(
-  () => primaryFile.value?.scanStatus || 'PENDING'
+  () => retryingScan.value ? 'PENDING' : primaryFile.value?.scanStatus || 'PENDING'
 );
+
+const retryScan = async () => {
+  if (!primaryFile.value?.id || retryingScan.value) return;
+  retryError.value = '';
+  retryingScan.value = true;
+  try {
+    await retryDownloadableFileScan({
+      downloadableFileId: primaryFile.value.id,
+    });
+  } catch {
+    retryingScan.value = false;
+    retryError.value = 'The retry could not be started. Please open an issue.';
+  }
+};
 
 const creatorIsViewing = computed(
   () => Boolean(username.value) && props.discussion?.Author?.username === username.value
@@ -272,13 +292,25 @@ const groupedLabels = computed(() => {
                 This download is temporarily unavailable because its security scan could not complete.
               </template>
             </p>
-            <NuxtLink
-              v-if="creatorIsViewing"
-              class="mt-2 inline-block font-medium underline"
-              to="/server/issues/create"
-            >
-              Open an issue
-            </NuxtLink>
+            <div v-if="creatorIsViewing" class="mt-2 flex flex-wrap gap-3">
+              <button
+                type="button"
+                class="font-medium underline"
+                :disabled="retryingScan"
+                @click="retryScan"
+              >
+                Retry scan
+              </button>
+              <NuxtLink
+                class="font-medium underline"
+                to="/server/issues/create"
+              >
+                Open an issue
+              </NuxtLink>
+            </div>
+            <p v-if="retryError" class="mt-2 font-medium">
+              {{ retryError }}
+            </p>
           </template>
         </div>
         <dl class="mt-3 grid grid-cols-2 gap-3 text-sm">
