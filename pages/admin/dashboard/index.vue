@@ -27,6 +27,7 @@ type ServerHealthSummary = {
   archivedContentCount: number;
   lockedContentCount: number;
   suspensionCount: number;
+  failedDownloadScanCount: number;
   medianOpenIssueAgeDays?: number | null;
 };
 

@@ -36,6 +36,7 @@ const dashboardResult = {
       archivedContentCount: 1,
       lockedContentCount: 1,
       suspensionCount: 1,
+      failedDownloadScanCount: 2,
       medianOpenIssueAgeDays: 5,
     },
     timeSeries: [

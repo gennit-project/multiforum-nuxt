@@ -5,6 +5,7 @@ import {
   Clock3,
   Flag,
   ShieldAlert,
+  ShieldX,
   ThumbsUp,
   Users,
 } from 'lucide-vue-next';
@@ -21,6 +22,7 @@ type ServerHealthSummary = {
   moderationActionCount: number;
   archivedContentCount: number;
   lockedContentCount: number;
+  failedDownloadScanCount: number;
   medianOpenIssueAgeDays?: number | null;
 };
 
@@ -70,6 +72,13 @@ const metricCards = computed(() => {
       tone: 'slate',
     },
     {
+      label: 'Scan Failures',
+      value: props.summary.failedDownloadScanCount,
+      detail: 'downloads blocked by scanner errors',
+      icon: ShieldX,
+      tone: props.summary.failedDownloadScanCount > 0 ? 'red' : 'green',
+    },
+    {
       label: 'Votes',
       value: props.summary.voteCount,
       detail: `${props.summary.commentCount} comments`,
@@ -93,7 +102,7 @@ const formatNumber = (value: number | string) => {
 </script>
 
 <template>
-  <section class="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
+  <section class="grid gap-3 md:grid-cols-3 xl:grid-cols-7">
     <div
       v-for="card in metricCards"
       :key="card.label"
@@ -115,6 +124,7 @@ const formatNumber = (value: number | string) => {
             'text-blue-600 dark:text-blue-300': card.tone === 'blue',
             'text-yellow-600 dark:text-yellow-300': card.tone === 'yellow',
             'text-green-600 dark:text-green-300': card.tone === 'green',
+            'text-red-600 dark:text-red-300': card.tone === 'red',
             'text-gray-500 dark:text-gray-300': card.tone === 'slate',
           }"
         />
