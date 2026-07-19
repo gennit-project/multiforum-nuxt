@@ -17,6 +17,7 @@ const mountCards = (summary: Record<string, unknown> = {}) =>
         moderationActionCount: 11,
         archivedContentCount: 2,
         lockedContentCount: 1,
+        failedDownloadScanCount: 2,
         medianOpenIssueAgeDays: 8.4,
         ...summary,
       },
@@ -27,6 +28,7 @@ const mountCards = (summary: Record<string, unknown> = {}) =>
         Flag: { template: '<svg class="flag" />' },
         Clock3: { template: '<svg class="clock" />' },
         ShieldAlert: { template: '<svg class="shield" />' },
+        ShieldX: { template: '<svg class="shield-x" />' },
         ThumbsUp: { template: '<svg class="thumbs" />' },
         Archive: { template: '<svg class="archive" />' },
       },
@@ -61,6 +63,7 @@ describe('ServerDashboardMetricCards', () => {
       openIssueCount: 0,
       archivedContentCount: 0,
       medianOpenIssueAgeDays: null,
+      failedDownloadScanCount: 0,
     });
 
     expect({
@@ -68,9 +71,19 @@ describe('ServerDashboardMetricCards', () => {
       yellowCount: wrapper.findAll('.text-yellow-600').length,
       zeroAge: wrapper.text().includes('0d'),
     }).toEqual({
-      greenCount: 2,
+      greenCount: 3,
       yellowCount: 0,
       zeroAge: true,
     });
+  });
+
+  it('highlights failed security scans as an operational alert', () => {
+    const wrapper = mountCards({ failedDownloadScanCount: 2 });
+
+    expect({
+      hasLabel: wrapper.text().includes('Scan Failures'),
+      hasDetail: wrapper.text().includes('downloads blocked by scanner errors'),
+      redCount: wrapper.findAll('.text-red-600').length,
+    }).toEqual({ hasLabel: true, hasDetail: true, redCount: 1 });
   });
 });

@@ -32,4 +32,12 @@ describe('DownloadNowButton', () => {
       classes: expect.arrayContaining(['bg-gray-200']),
     });
   });
+
+  it('renders a review-specific label when provided', () => {
+    const wrapper = mountWithDefaults(DownloadNowButton, {
+      props: { label: 'Download for review' },
+    });
+
+    expect(wrapper.get('button').text()).toBe('Download for review');
+  });
 });

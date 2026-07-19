@@ -101,6 +101,15 @@ export const TRACK_DOWNLOAD = gql`
   }
 `;
 
+export const RETRY_DOWNLOADABLE_FILE_SCAN = gql`
+  mutation retryDownloadableFileScan($downloadableFileId: ID!) {
+    retryDownloadableFileScan(downloadableFileId: $downloadableFileId) {
+      id
+      status
+    }
+  }
+`;
+
 export const PERMANENTLY_DELETE_IMAGE = gql`
   mutation permanentlyDeleteImage($imageId: ID!) {
     permanentlyDeleteImage(imageId: $imageId) {

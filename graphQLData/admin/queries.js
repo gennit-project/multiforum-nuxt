@@ -138,6 +138,7 @@ export const GET_SERVER_HEALTH_DASHBOARD = gql`
         archivedContentCount
         lockedContentCount
         suspensionCount
+        failedDownloadScanCount
         medianOpenIssueAgeDays
       }
       timeSeries {
@@ -217,6 +218,7 @@ export const GET_SERVER_HEALTH_DASHBOARD_OVERVIEW = gql`
         archivedContentCount
         lockedContentCount
         suspensionCount
+        failedDownloadScanCount
         medianOpenIssueAgeDays
       }
       timeSeries {

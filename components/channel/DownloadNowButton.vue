@@ -4,6 +4,10 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  label: {
+    type: String,
+    default: 'Download Now',
+  },
 });
 
 const buttonBaseClasses =
@@ -22,6 +26,6 @@ const disabledDownloadButtonClasses = `${buttonBaseClasses} cursor-default bg-gr
     "
     :disabled="disabled"
   >
-    Download Now
+    {{ label }}
   </button>
 </template>

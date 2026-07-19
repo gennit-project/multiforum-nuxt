@@ -24,6 +24,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  label: {
+    type: String,
+    default: 'Download Now',
+  },
 });
 
 const emit = defineEmits(['downloaded']);
@@ -61,5 +65,9 @@ const handleDownload = () => {
 </script>
 
 <template>
-  <DownloadNowButton :disabled="disabled" @click="handleDownload" />
+  <DownloadNowButton
+    :disabled="disabled"
+    :label="label"
+    @click="handleDownload"
+  />
 </template>
