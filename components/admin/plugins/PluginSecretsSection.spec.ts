@@ -41,14 +41,22 @@ describe('PluginSecretsSection rendering', () => {
   });
 
   it.each([
-    ['VALID', 'Valid'],
+    ['VALID', '✓ Set and valid'],
     ['INVALID', 'Invalid'],
-    ['SET_UNTESTED', 'Set'],
+    ['SET_UNTESTED', '✓ Set (untested)'],
     ['NOT_SET', 'Not set'],
   ])('shows %s status as "%s"', (status, label) => {
     const wrapper = mountSection({ secrets: [secret({ status })] });
 
     expect(wrapper.text()).toContain(label);
+  });
+
+  it('calls out a required secret that has not been set', () => {
+    const wrapper = mountSection({
+      secrets: [secret({ status: 'NOT_SET', required: true })],
+    });
+
+    expect(wrapper.text()).toContain('Required — not set');
   });
 
   it('labels the toggle "Set Secret" when not set', () => {
@@ -82,7 +90,7 @@ describe('PluginSecretsSection orphaned secrets', () => {
     }).toEqual({
       hasHeading: true,
       hasExplanation: true,
-      item: 'OLD_API_KEYSet',
+      item: 'OLD_API_KEY✓ Set (untested)',
     });
   });
 

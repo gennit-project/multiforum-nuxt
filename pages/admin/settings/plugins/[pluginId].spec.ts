@@ -207,7 +207,7 @@ describe('Plugin detail page', () => {
       secrets: wrapper.findComponent({ name: 'PluginSecretsSection' }).props('secrets'),
       fields: wrapper.findComponent({ name: 'PluginSettingsSection' }).props('sections')[0].fields,
     }).toEqual({
-      secrets: [{ key: 'API_KEY', status: 'NOT_SET' }],
+      secrets: [{ key: 'API_KEY', status: 'NOT_SET', required: true }],
       fields: [{ key: 'serviceUrl', label: 'Service URL', type: 'text' }],
     });
   });

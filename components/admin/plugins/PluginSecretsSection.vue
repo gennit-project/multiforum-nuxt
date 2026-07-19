@@ -7,6 +7,7 @@ interface PluginSecretStatus {
   status: 'NOT_SET' | 'SET_UNTESTED' | 'VALID' | 'INVALID';
   lastValidatedAt?: string;
   validationError?: string;
+  required?: boolean;
 }
 
 const props = defineProps<{
@@ -63,22 +64,22 @@ const getSecretStatusColor = (status: string) => {
   }
 };
 
-const getSecretStatusText = (status: string) => {
-  switch (status) {
+const getSecretStatusText = (secret: PluginSecretStatus) => {
+  switch (secret.status) {
     case 'VALID':
-      return 'Valid';
+      return '✓ Set and valid';
     case 'INVALID':
       return 'Invalid';
     case 'SET_UNTESTED':
-      return 'Set';
+      return '✓ Set (untested)';
     default:
-      return 'Not set';
+      return secret.required ? 'Required — not set' : 'Not set';
   }
 };
 </script>
 
 <template>
-  <FormRow v-if="secrets.length > 0" section-title="Required Secrets">
+  <FormRow v-if="secrets.length > 0" section-title="Plugin Secrets">
     <template #content>
       <div class="space-y-4">
         <!-- Security warning banner -->
@@ -93,7 +94,7 @@ const getSecretStatusText = (status: string) => {
         </div>
 
         <p class="text-sm text-gray-600 dark:text-gray-400">
-          Configure server-wide secrets required by this plugin.
+          Configure server-wide secrets declared by this plugin.
         </p>
 
         <div
@@ -115,7 +116,7 @@ const getSecretStatusText = (status: string) => {
                 class="font-semibold rounded-full px-2 py-1 text-xs"
                 :class="getSecretStatusColor(secret.status)"
               >
-                {{ getSecretStatusText(secret.status) }}
+                {{ getSecretStatusText(secret) }}
               </span>
             </div>
           </div>
@@ -229,7 +230,7 @@ const getSecretStatusText = (status: string) => {
               class="rounded-full px-2 py-1 text-xs font-semibold"
               :class="getSecretStatusColor(secret.status)"
             >
-              {{ getSecretStatusText(secret.status) }}
+              {{ getSecretStatusText(secret) }}
             </span>
           </li>
         </ul>

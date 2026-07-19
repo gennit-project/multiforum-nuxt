@@ -88,6 +88,7 @@ const pendingUpgrade = ref<{
 interface PluginSecretStatus {
   key: string;
   status: 'NOT_SET' | 'SET_UNTESTED' | 'VALID' | 'INVALID';
+  required?: boolean;
   lastValidatedAt?: string;
   validationError?: string;
 }
@@ -238,21 +239,26 @@ const storedSecrets = computed((): PluginSecretStatus[] => {
   return secretsResult.value?.getServerPluginSecrets || [];
 });
 
-const declaredServerSecretKeys = computed(() =>
-  new Set(
-    (installedPlugin.value?.manifest?.secrets || [])
-      .filter((secret) => !secret.scope || secret.scope === 'server')
-      .map((secret) => secret.key)
+const declaredServerSecrets = computed(() =>
+  (installedPlugin.value?.manifest?.secrets || []).filter(
+    (secret) => !secret.scope || secret.scope === 'server'
   )
 );
 
+const declaredServerSecretKeys = computed(
+  () => new Set(declaredServerSecrets.value.map((secret) => secret.key))
+);
+
 const secrets = computed((): PluginSecretStatus[] =>
-  [...declaredServerSecretKeys.value].map((key) =>
-    storedSecrets.value.find((secret) => secret.key === key) || {
-      key,
-      status: 'NOT_SET',
-    }
-  )
+  declaredServerSecrets.value.map((declaration) => ({
+    ...(storedSecrets.value.find(
+      (secret) => secret.key === declaration.key
+    ) || {
+      key: declaration.key,
+      status: 'NOT_SET' as const,
+    }),
+    required: declaration.required !== false,
+  }))
 );
 
 const orphanedSecrets = computed((): PluginSecretStatus[] =>
