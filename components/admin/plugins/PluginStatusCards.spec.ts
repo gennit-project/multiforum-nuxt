@@ -56,10 +56,25 @@ describe('PluginStatusCards disabled state', () => {
     expect(wrapper.emitted('toggle-enabled')?.[0]).toEqual([true]);
   });
 
-  it('prompts to configure secrets when it cannot be enabled', () => {
+  it('prompts to complete required configuration when it cannot be enabled', () => {
     const wrapper = mountCards({ isEnabled: false, canEnable: false });
 
-    expect(wrapper.text()).toContain('Configure required secrets first');
+    expect(wrapper.text()).toContain('Complete required configuration first');
+  });
+
+  it('lists every blocking configuration field', () => {
+    const wrapper = mountCards({
+      canEnable: false,
+      blockingConfigFields: [
+        { key: 'url', label: 'Service URL', kind: 'SETTING' },
+        { key: 'key', label: 'API key', kind: 'SECRET' },
+      ],
+    });
+
+    expect(wrapper.findAll('li').map((item) => item.text())).toEqual([
+      'Service URL (setting)',
+      'API key (secret)',
+    ]);
   });
 
   it('hides the Enable button when it cannot be enabled', () => {

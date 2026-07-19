@@ -20,6 +20,7 @@ vi.mock('@/graphQLData/admin/queries', () => ({
   GET_AVAILABLE_PLUGINS: 'AVAILABLE',
   GET_INSTALLED_PLUGINS: 'INSTALLED',
   GET_SERVER_PLUGIN_SECRETS: 'SECRETS',
+  GET_PLUGIN_CONFIG_STATUS: 'CONFIG_STATUS',
   GET_PLUGIN_DETAIL: 'DETAIL',
 }));
 vi.mock('@/graphQLData/admin/mutations', () => ({
@@ -48,6 +49,7 @@ vi.mock('@vue/apollo-composable', async () => {
     INSTALLED: { result: ref(null), loading: ref(false), error: ref(null), refetch: vi.fn() },
     DETAIL: { result: ref(null), loading: ref(false), error: ref(null), refetch: vi.fn() },
     SECRETS: { result: ref(null), loading: ref(false), error: ref(null), refetch: vi.fn() },
+    CONFIG_STATUS: { result: ref(null), loading: ref(false), error: ref(null), refetch: vi.fn() },
   };
   return {
     useQuery: (doc: keyof typeof h.q) => h.q[doc],
@@ -66,7 +68,7 @@ vi.mock('@/composables/useToast', () => ({ useToast: () => toast }));
 const sectionStub = (name: string) => ({ name, template: `<div data-stub="${name}" />` });
 const stubs = {
   PluginDetailHeader: { name: 'PluginDetailHeader', props: ['pluginDisplayName'], template: '<div class="header">{{ pluginDisplayName }}</div>' },
-  PluginStatusCards: { name: 'PluginStatusCards', props: ['isEnabled', 'canEnable', 'enabling'], emits: ['toggle-enabled'], template: '<button type="button" data-test="toggle-enabled" @click="$emit(\'toggle-enabled\', false)" />' },
+  PluginStatusCards: { name: 'PluginStatusCards', props: ['isEnabled', 'canEnable', 'enabling', 'blockingConfigFields'], emits: ['toggle-enabled'], template: '<button type="button" data-test="toggle-enabled" @click="$emit(\'toggle-enabled\', false)" />' },
   PluginUpdateBanner: sectionStub('PluginUpdateBanner'),
   PluginInstallSection: {
     name: 'PluginInstallSection',
@@ -133,6 +135,9 @@ const setInstalledPlugin = (overrides: Record<string, unknown> = {}) => {
     ],
   };
   h.q.SECRETS.result.value = { getServerPluginSecrets: [] };
+  h.q.CONFIG_STATUS.result.value = {
+    getPluginConfigStatus: { isFullyConfigured: true, fields: [] },
+  };
 };
 
 beforeEach(() => {
@@ -171,6 +176,34 @@ describe('Plugin detail page', () => {
     const wrapper = mountPage();
 
     expect(wrapper.findComponent({ name: 'PluginStatusCards' }).exists()).toBe(true);
+  });
+
+  it('renders a declared missing secret once and removes its duplicate form field', () => {
+    setInstalledPlugin({
+      manifest: {
+        secrets: [{ key: 'API_KEY', scope: 'server', required: true }],
+        ui: {
+          forms: {
+            server: [{
+              title: 'Settings',
+              fields: [
+                { key: 'API_KEY', label: 'API key', type: 'secret' },
+                { key: 'serviceUrl', label: 'Service URL', type: 'text' },
+              ],
+            }],
+          },
+        },
+      },
+    });
+    const wrapper = mountPage();
+
+    expect({
+      secrets: wrapper.findComponent({ name: 'PluginSecretsSection' }).props('secrets'),
+      fields: wrapper.findComponent({ name: 'PluginSettingsSection' }).props('sections')[0].fields,
+    }).toEqual({
+      secrets: [{ key: 'API_KEY', status: 'NOT_SET' }],
+      fields: [{ key: 'serviceUrl', label: 'Service URL', type: 'text' }],
+    });
   });
 
   it('hides the installed-only sections for an uninstalled plugin', () => {

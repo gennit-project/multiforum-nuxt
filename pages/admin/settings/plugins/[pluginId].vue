@@ -23,7 +23,6 @@ import {
 import {
   resolvePluginMetadata,
   resolvePluginReadme,
-  canEnablePlugin,
   sortVersionsDescending,
   hasNewerVersions as hasNewerVersionsUtil,
   mapInstallErrorMessage,
@@ -46,6 +45,7 @@ import {
   GET_AVAILABLE_PLUGINS,
   GET_INSTALLED_PLUGINS,
   GET_SERVER_PLUGIN_SECRETS,
+  GET_PLUGIN_CONFIG_STATUS,
   GET_PLUGIN_DETAIL,
 } from '@/graphQLData/admin/queries';
 import {
@@ -82,6 +82,17 @@ interface PluginSecretStatus {
   validationError?: string;
 }
 
+interface PluginConfigFieldStatus {
+  key: string;
+  label: string;
+  scope: string;
+  kind: 'SETTING' | 'SECRET';
+  required: boolean;
+  isSet: boolean;
+  isValid: boolean;
+  message?: string | null;
+}
+
 interface PluginMetadata {
   id: string;
   name: string;
@@ -95,6 +106,11 @@ interface PluginMetadata {
 }
 
 interface PluginManifest {
+  secrets?: Array<{
+    key: string;
+    scope?: string;
+    required?: boolean;
+  }>;
   ui?: {
     forms?: {
       server?: PluginFormSection[];
@@ -207,12 +223,58 @@ const {
   enabled: computed(() => !!pluginSlug.value),
 });
 
-const secrets = computed((): PluginSecretStatus[] => {
+const storedSecrets = computed((): PluginSecretStatus[] => {
   return secretsResult.value?.getServerPluginSecrets || [];
 });
 
+const declaredServerSecretKeys = computed(() =>
+  new Set(
+    (installedPlugin.value?.manifest?.secrets || [])
+      .filter((secret) => !secret.scope || secret.scope === 'server')
+      .map((secret) => secret.key)
+  )
+);
+
+const secrets = computed((): PluginSecretStatus[] =>
+  [...declaredServerSecretKeys.value].map((key) =>
+    storedSecrets.value.find((secret) => secret.key === key) || {
+      key,
+      status: 'NOT_SET',
+    }
+  )
+);
+
 const isInstalled = computed(() => !!installedPlugin.value);
 const isEnabled = computed(() => installedPlugin.value?.enabled ?? false);
+const installedVersion = computed(() => installedPlugin.value?.version);
+
+const configStatusQueryVars = computed(() => ({
+  pluginId: pluginSlug.value,
+  version: installedVersion.value || '',
+  scope: 'server',
+}));
+
+const { result: configStatusResult, refetch: refetchConfigStatus } = useQuery(
+  GET_PLUGIN_CONFIG_STATUS,
+  configStatusQueryVars,
+  {
+    enabled: computed(
+      () => !!pluginSlug.value && !!installedVersion.value
+    ),
+    fetchPolicy: 'cache-and-network',
+  }
+);
+
+const configStatus = computed(() =>
+  configStatusResult.value?.getPluginConfigStatus || null
+);
+
+const blockingConfigFields = computed((): PluginConfigFieldStatus[] =>
+  (configStatus.value?.fields || []).filter(
+    (field: PluginConfigFieldStatus) =>
+      field.required && (!field.isSet || !field.isValid)
+  )
+);
 
 // Only show full-page loading on initial load, not during refetches
 // Check if we're loading AND don't have any data yet
@@ -255,6 +317,13 @@ const pluginReadme = computed(() =>
 // Extract server settings form sections from the plugin manifest
 const serverSettingsSections = computed((): PluginFormSection[] =>
   getPluginFormSections(installedPlugin.value?.manifest, 'server')
+    .map((section) => ({
+      ...section,
+      fields: section.fields.filter(
+        (field) => !declaredServerSecretKeys.value.has(field.key)
+      ),
+    }))
+    .filter((section) => section.fields.length > 0)
 );
 
 // Convert secrets array to the format expected by PluginSecretField
@@ -307,9 +376,9 @@ const pluginApiVersion = computed(
   () => installedPlugin.value?.apiVersion || selectedVersionMetadata.value?.apiVersion
 );
 
-const canEnable = computed(() =>
-  canEnablePlugin({ isInstalled: isInstalled.value, secrets: secrets.value })
-);
+const canEnable = computed(() => {
+  return isInstalled.value && configStatus.value?.isFullyConfigured === true;
+});
 
 const availableVersions = computed(() =>
   sortVersionsDescending(plugin.value?.Versions || [])
@@ -324,10 +393,6 @@ const compatibilityByVersion = computed(() =>
     {} as Record<string, PluginVersionCompatibility>
   )
 );
-
-const installedVersion = computed(() => {
-  return installedPlugin.value?.version;
-});
 
 const isSelectedVersionInstalled = computed(() => {
   return installedVersion.value === selectedVersion.value;
@@ -447,6 +512,7 @@ const handleInstall = async (versionOverride?: string) => {
     // Refetch data
     await refetchInstalled();
     await refetchSecrets();
+    await refetchConfigStatus();
   } catch (err: unknown) {
     console.error('Install error:', err);
     const errorMessage = err instanceof Error ? err.message : '';
@@ -470,12 +536,15 @@ const handleToggleEnabled = async (enabled: boolean) => {
       `Plugin ${plugin.value?.name} ${enabled ? 'enabled' : 'disabled'} successfully`
     );
     await refetchInstalled();
+    await refetchConfigStatus();
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : '';
     if (message.includes('Missing required secrets')) {
       toast.error('Cannot enable: missing required secrets');
     } else if (message.includes('PLUGIN_MISCONFIGURED_REQUIRED_SECRET_MISSING')) {
       toast.error('Plugin misconfigured: required secrets missing');
+    } else if (message.includes('PLUGIN_CONFIG_INCOMPLETE')) {
+      toast.error('Cannot enable: complete all required plugin configuration');
     } else {
       toast.error(`${enabled ? 'Enable' : 'Disable'} failed: ${message || 'Unknown error'}`);
     }
@@ -500,6 +569,7 @@ const handleSetSecret = async (key: string, value: string) => {
 
     // Refetch secrets to update status
     await refetchSecrets();
+    await refetchConfigStatus();
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     toast.error(`Failed to set secret "${key}": ${message}`);
@@ -561,6 +631,7 @@ const handleSaveSettings = async () => {
 
     await refetchInstalled();
     await refetchSecrets();
+    await refetchConfigStatus();
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     toast.error(`Failed to save settings: ${message}`);
@@ -624,6 +695,7 @@ const handleSaveSettings = async () => {
             :is-enabled="isEnabled"
             :installed-version="installedVersion"
             :can-enable="canEnable"
+            :blocking-config-fields="blockingConfigFields"
             :enabling="enabling"
             @toggle-enabled="handleToggleEnabled"
           />
