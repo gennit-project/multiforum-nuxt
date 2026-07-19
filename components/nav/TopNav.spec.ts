@@ -11,7 +11,9 @@ const h = vi.hoisted(() => ({
   smAndDown: null as unknown,
 }));
 
-vi.mock('@/composables/useDisplay', () => ({ useDisplay: () => ({ smAndDown: h.smAndDown }) }));
+vi.mock('@/composables/useDisplay', () => ({
+  useDisplay: () => ({ smAndDown: h.smAndDown }),
+}));
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
 vi.mock('@/cache', () => ({ sideNavIsOpenVar: false }));
 vi.mock('@/composables/useAuthState', () => ({
@@ -25,11 +27,27 @@ const mountNav = () =>
   mount(TopNav, {
     global: {
       stubs: {
-        HamburgerMenuButton: { name: 'HamburgerMenuButton', emits: ['click'], template: '<button class="hamburger" @click="$emit(\'click\')" />' },
-        UserProfileDropdownMenu: { name: 'UserProfileDropdownMenu', template: '<div class="profile" />' },
+        HamburgerMenuButton: {
+          name: 'HamburgerMenuButton',
+          emits: ['click'],
+          template: '<button class="hamburger" @click="$emit(\'click\')" />',
+        },
+        UserProfileDropdownMenu: {
+          name: 'UserProfileDropdownMenu',
+          template: '<div class="profile" />',
+        },
         ThemeSwitcher: true,
         CreateAnythingButton: true,
-        AddToChannelFavorites: { name: 'AddToChannelFavorites', template: '<div class="fav" />' },
+        AddToChannelFavorites: {
+          name: 'AddToChannelFavorites',
+          template: '<div class="fav" />',
+        },
+        ForumQuickSwitcher: {
+          name: 'ForumQuickSwitcher',
+          props: ['currentForumId'],
+          template:
+            '<button class="forum-switcher">{{ currentForumId }}</button>',
+        },
         TopNavSearch: true,
         LoginButton: true,
         ClientOnly: { template: '<div><slot /></div>' },
@@ -69,6 +87,13 @@ describe('TopNav branding', () => {
     const wrapper = mountNav();
 
     expect(wrapper.find('.fav').exists()).toBe(true);
+  });
+
+  it('passes the active forum to the quick switcher', () => {
+    h.route = { params: { forumId: 'cats' }, name: 'forums-forumId' };
+    const wrapper = mountNav();
+
+    expect(wrapper.get('.forum-switcher').text()).toBe('cats');
   });
 });
 
@@ -128,7 +153,9 @@ describe('TopNav actions', () => {
     h.notificationCount = ref(5);
     const wrapper = mountNav();
 
-    expect(wrapper.find('[data-testid="notification-bell"]').text()).toContain('5');
+    expect(wrapper.find('[data-testid="notification-bell"]').text()).toContain(
+      '5'
+    );
   });
 
   it('shows the profile menu when logged in', () => {

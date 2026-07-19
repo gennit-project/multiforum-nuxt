@@ -9,6 +9,7 @@ import CreateAnythingButton from '@/components/nav/CreateAnythingButton.vue';
 import AddToChannelFavorites from '@/components/favorites/AddToChannelFavorites.vue';
 import TopNavSearch from '@/components/nav/TopNavSearch.vue';
 import BellIcon from '@/components/icons/BellIcon.vue';
+import ForumQuickSwitcher from '@/components/nav/ForumQuickSwitcher.vue';
 // import LogoIcon from "@/components/icons/LogoIcon.vue"; // Unused for now
 import { useRoute } from 'nuxt/app';
 import LoginButton from './LoginButton.vue';
@@ -113,12 +114,7 @@ const isOnMapPage = computed(() => {
               class="h-1.5 w-1.5 shrink-0 rounded-full bg-gray-400 dark:bg-gray-500"
               aria-hidden="true"
             />
-            <nuxt-link
-              :to="`/forums/${channelId}`"
-              class="max-w-[8rem] truncate text-gray-700 transition-colors hover:text-gray-950 sm:max-w-[12rem] lg:max-w-[16rem] dark:text-gray-300 dark:hover:text-white"
-            >
-              {{ channelId }}
-            </nuxt-link>
+            <ForumQuickSwitcher :current-forum-id="channelId" />
             <AddToChannelFavorites
               :channel-unique-name="channelId"
               :allow-add-to-list="true"
