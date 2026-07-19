@@ -5,11 +5,13 @@ export const CREATE_SIGNED_STORAGE_URL = gql`
     $filename: String!
     $contentType: String!
     $channelConnections: [String!]
+    $uploadTarget: StorageUploadTarget
   ) {
     createSignedStorageURL(
       filename: $filename
       contentType: $contentType
       channelConnections: $channelConnections
+      uploadTarget: $uploadTarget
     ) {
       url
       storageObjectName

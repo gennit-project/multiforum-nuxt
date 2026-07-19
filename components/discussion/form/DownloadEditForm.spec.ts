@@ -335,6 +335,18 @@ describe('DownloadEditForm file editing', () => {
 });
 
 describe('DownloadEditForm upload', () => {
+  it('requests private storage for downloadable files', async () => {
+    const wrapper = mountForm();
+
+    await setFiles(wrapper, '#downloadable-file-input', [
+      new File(['x'], 'new.stl'),
+    ]);
+
+    expect(h.createSignedStorageUrl).toHaveBeenCalledWith(
+      expect.objectContaining({ uploadTarget: 'PRIVATE_DOWNLOAD' })
+    );
+  });
+
   it('uploads a file and adds it to the form values', async () => {
     const wrapper = mountForm();
 
