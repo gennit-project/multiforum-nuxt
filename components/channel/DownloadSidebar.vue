@@ -9,6 +9,24 @@ import ScopedPipelineView from '@/components/plugins/ScopedPipelineView.vue';
 import { computed, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_DOWNLOAD_LABELS } from '@/graphQLData/discussion/queries';
+import { useUsername } from '@/composables/useAuthState';
+
+type DownloadScanStatus =
+  | 'PENDING'
+  | 'CLEAN'
+  | 'INFECTED'
+  | 'SUSPICIOUS'
+  | 'FAILED';
+
+type ScannedDownloadableFile = Omit<
+  Discussion['DownloadableFiles'][number],
+  'scanStatus' | 'scanCheckedAt'
+> & {
+  scanStatus?: DownloadScanStatus | null;
+  scanReason?: string | null;
+  scanCheckedAt?: string | null;
+  uploadedByUsername?: string | null;
+};
 
 const props = defineProps({
   discussion: {
@@ -26,17 +44,51 @@ const props = defineProps({
   },
 });
 
+const username = useUsername();
+
 // Popover state
 const showSuccessPopover = ref(false);
 
 // Get the primary downloadable file (first one)
 const primaryFile = computed(() => {
-  return props.discussion?.DownloadableFiles?.[0] || null;
+  return (props.discussion?.DownloadableFiles?.[0] as
+    | ScannedDownloadableFile
+    | undefined) || null;
 });
 
 const hasDownloadableFile = computed(() => {
   return (props.discussion?.DownloadableFiles?.length || 0) > 0;
 });
+
+const scanStatus = computed<DownloadScanStatus>(
+  () => primaryFile.value?.scanStatus || 'PENDING'
+);
+
+const creatorIsViewing = computed(
+  () => Boolean(username.value) && props.discussion?.Author?.username === username.value
+);
+
+const hasReviewAccess = computed(
+  () => scanStatus.value !== 'CLEAN' && Boolean(primaryFile.value?.url)
+);
+
+const downloadDisabled = computed(
+  () =>
+    !hasDownloadableFile.value ||
+    (scanStatus.value !== 'CLEAN' && !hasReviewAccess.value)
+);
+
+const downloadLabel = computed(() =>
+  hasReviewAccess.value ? 'Download for review' : 'Download Now'
+);
+
+const replaceFilePath = computed(
+  () => `/forums/${props.channelUniqueName}/downloads/edit/${props.discussionId}`
+);
+
+const requestReviewPath = computed(
+  () => `/forums/${props.channelUniqueName}/issues/create`
+);
 
 // Format price display
 const priceDisplay = computed(() => {
@@ -166,9 +218,68 @@ const groupedLabels = computed(() => {
           </div>
         </div> -->
 
-        <!-- Available Instantly -->
-        <div class="text-sm font-medium text-green-600 dark:text-green-400">
-          Available Instantly
+        <div
+          aria-live="polite"
+          class="rounded-md p-3 text-sm"
+          :class="{
+            'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-200': scanStatus === 'CLEAN',
+            'bg-amber-50 text-amber-900 dark:bg-amber-900/30 dark:text-amber-200': scanStatus === 'PENDING' || scanStatus === 'SUSPICIOUS',
+            'bg-red-50 text-red-900 dark:bg-red-900/30 dark:text-red-200': scanStatus === 'INFECTED',
+            'bg-sky-50 text-sky-900 dark:bg-sky-900/30 dark:text-sky-200': scanStatus === 'FAILED',
+          }"
+          data-testid="download-scan-status"
+        >
+          <p v-if="scanStatus === 'CLEAN'" class="font-medium">
+            <i class="fa-solid fa-circle-check mr-1" />
+            Available to download
+          </p>
+          <p v-else-if="scanStatus === 'PENDING'" class="font-medium">
+            <i class="fa-solid fa-spinner mr-1 animate-spin" />
+            {{ creatorIsViewing ? 'Scanning your upload…' : 'Security scan in progress' }}
+          </p>
+          <template v-else-if="scanStatus === 'INFECTED' || scanStatus === 'SUSPICIOUS'">
+            <p class="font-medium">
+              <i class="fa-solid fa-shield-halved mr-1" />
+              Held for security review
+            </p>
+            <p class="mt-1">
+              <template v-if="creatorIsViewing">
+                This upload was blocked by the security scan<span v-if="primaryFile.scanReason">: {{ primaryFile.scanReason }}</span>.
+              </template>
+              <template v-else>
+                This download is not publicly available while its content is reviewed.
+              </template>
+            </p>
+            <div v-if="creatorIsViewing" class="mt-2 flex flex-wrap gap-3">
+              <NuxtLink class="font-medium underline" :to="replaceFilePath">
+                Replace file
+              </NuxtLink>
+              <NuxtLink class="font-medium underline" :to="requestReviewPath">
+                Request human review
+              </NuxtLink>
+            </div>
+          </template>
+          <template v-else>
+            <p class="font-medium">
+              <i class="fa-solid fa-triangle-exclamation mr-1" />
+              Security scan unavailable
+            </p>
+            <p class="mt-1">
+              <template v-if="creatorIsViewing">
+                We couldn't complete the security scan—a problem on our end, not your file. Try again shortly, or open an issue.
+              </template>
+              <template v-else>
+                This download is temporarily unavailable because its security scan could not complete.
+              </template>
+            </p>
+            <NuxtLink
+              v-if="creatorIsViewing"
+              class="mt-2 inline-block font-medium underline"
+              to="/server/issues/create"
+            >
+              Open an issue
+            </NuxtLink>
+          </template>
         </div>
         <dl class="mt-3 grid grid-cols-2 gap-3 text-sm">
           <div>
@@ -198,16 +309,20 @@ const groupedLabels = computed(() => {
       <RequireAuth :full-width="true">
         <template #has-auth>
           <FunctionalDownloadNow
-            :disabled="!hasDownloadableFile"
+            :disabled="downloadDisabled"
             :url="primaryFile?.url || ''"
             :file-name="primaryFile?.fileName || 'download'"
             :downloadable-file-id="primaryFile?.id || ''"
             :discussion-id="discussionId"
+            :label="downloadLabel"
             @downloaded="showSuccessPopover = true"
           />
         </template>
         <template #does-not-have-auth>
-          <DownloadNowButton :disabled="!hasDownloadableFile" />
+          <DownloadNowButton
+            :disabled="downloadDisabled"
+            :label="downloadLabel"
+          />
         </template>
       </RequireAuth>
       <div

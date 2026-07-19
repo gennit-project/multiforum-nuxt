@@ -374,6 +374,10 @@ export const GET_DISCUSSION = gql`
         supportBuyMeACoffeeUrl
         supportKoFiUrl
         supportPayPalMeUrl
+        scanStatus
+        scanCheckedAt
+        scanReason
+        uploadedByUsername
         license {
           id
           name
@@ -473,6 +477,10 @@ export const GET_DISCUSSION_FEEDBACK = gql`
         supportBuyMeACoffeeUrl
         supportKoFiUrl
         supportPayPalMeUrl
+        scanStatus
+        scanCheckedAt
+        scanReason
+        uploadedByUsername
       }
       CrosspostedDiscussion {
         ...CrosspostPreviewFields
