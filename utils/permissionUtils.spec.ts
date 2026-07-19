@@ -101,6 +101,41 @@ describe('permissionUtils', () => {
     expect(permissions.canReport).toBe(false);
   });
 
+  it('resolves canPermanentlyRemoveImage from the mod role', () => {
+    const permissions = getAllPermissions({
+      permissionData: {
+        Moderators: [],
+      },
+      standardModRole: {
+        canPermanentlyRemoveImage: true,
+      },
+      elevatedModRole: null,
+      username: 'user-one',
+      modProfileName: 'mod-one',
+    });
+
+    expect(permissions.canPermanentlyRemoveImage).toBe(true);
+  });
+
+  it('denies canPermanentlyRemoveImage to a suspended mod', () => {
+    const permissions = getAllPermissions({
+      permissionData: {
+        Moderators: [{ displayName: 'mod-one' }],
+        SuspendedMods: [{ modProfileName: 'mod-one' }],
+      },
+      standardModRole: {
+        canPermanentlyRemoveImage: true,
+      },
+      elevatedModRole: {
+        canPermanentlyRemoveImage: true,
+      },
+      username: 'user-one',
+      modProfileName: 'mod-one',
+    });
+
+    expect(permissions.canPermanentlyRemoveImage).toBe(false);
+  });
+
   it('marks the mod profile as suspended when it appears in SuspendedMods', () => {
     const permissions = getAllPermissions({
       permissionData: {

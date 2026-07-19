@@ -189,6 +189,7 @@ export const GET_CHANNEL = gql`
         canCloseSupportTickets
         canReport
         canSuspendUser
+        canPermanentlyRemoveImage
       }
       ElevatedModRole {
         canHideComment
@@ -203,6 +204,7 @@ export const GET_CHANNEL = gql`
         canCloseSupportTickets
         canReport
         canSuspendUser
+        canPermanentlyRemoveImage
       }
       SuspendedModRole {
         canHideComment

@@ -49,6 +49,7 @@ export const GET_SERVER_CONFIG = gql`
         canCloseSupportTickets
         canReport
         canSuspendUser
+        canPermanentlyRemoveImage
       }
       DefaultElevatedModRole {
         name
@@ -66,6 +67,7 @@ export const GET_SERVER_CONFIG = gql`
         canCloseSupportTickets
         canReport
         canSuspendUser
+        canPermanentlyRemoveImage
       }
       DefaultSuspendedRole {
         name
