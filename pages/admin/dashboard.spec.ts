@@ -140,6 +140,9 @@ const mountDashboard = async (
         ClientOnly: {
           template: '<slot /><slot name="fallback" />',
         },
+        DownloadScanReviewQueue: {
+          template: '<div data-testid="scan-review-queue" />',
+        },
       },
     },
   });

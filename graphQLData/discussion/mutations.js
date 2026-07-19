@@ -110,6 +110,40 @@ export const RETRY_DOWNLOADABLE_FILE_SCAN = gql`
   }
 `;
 
+export const REQUEST_DOWNLOADABLE_FILE_REVIEW = gql`
+  mutation requestDownloadableFileReview(
+    $downloadableFileId: ID!
+    $reason: String
+  ) {
+    requestDownloadableFileReview(
+      downloadableFileId: $downloadableFileId
+      reason: $reason
+    ) {
+      id
+      scanStatus
+      reviewRequestedAt
+      reviewRequestReason
+    }
+  }
+`;
+
+export const CLEAR_DOWNLOADABLE_FILE_SCAN = gql`
+  mutation clearDownloadableFileScan(
+    $downloadableFileId: ID!
+    $reason: String
+  ) {
+    clearDownloadableFileScan(
+      downloadableFileId: $downloadableFileId
+      reason: $reason
+    ) {
+      id
+      scanStatus
+      scanReason
+      scanCheckedAt
+    }
+  }
+`;
+
 export const PERMANENTLY_DELETE_IMAGE = gql`
   mutation permanentlyDeleteImage($imageId: ID!) {
     permanentlyDeleteImage(imageId: $imageId) {

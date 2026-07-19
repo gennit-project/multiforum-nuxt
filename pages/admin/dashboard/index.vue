@@ -7,6 +7,7 @@ import ServerDashboardActivityChart from '@/components/admin/ServerDashboardActi
 import ServerDashboardIssueAging from '@/components/admin/ServerDashboardIssueAging.vue';
 import ServerDashboardMetricCards from '@/components/admin/ServerDashboardMetricCards.vue';
 import ServerDashboardSecondaryStats from '@/components/admin/ServerDashboardSecondaryStats.vue';
+import DownloadScanReviewQueue from '@/components/admin/DownloadScanReviewQueue.vue';
 import { RefreshCw } from 'lucide-vue-next';
 import {
   GET_SERVER_HEALTH_CHANNEL_HEALTH,
@@ -341,6 +342,8 @@ const updateChannelSort = (sortBy: ChannelHealthSortKey) => {
 
       <template v-else-if="dashboard">
         <ServerDashboardMetricCards :summary="dashboard.summary" />
+
+        <DownloadScanReviewQueue />
 
         <section
           class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.8fr)]"
