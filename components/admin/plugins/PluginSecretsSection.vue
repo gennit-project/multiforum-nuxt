@@ -11,6 +11,7 @@ interface PluginSecretStatus {
 
 const props = defineProps<{
   secrets: PluginSecretStatus[];
+  orphanedSecrets?: PluginSecretStatus[];
   secretValues: Record<string, string>;
   showSecretInputs: Record<string, boolean>;
 }>();
@@ -195,6 +196,43 @@ const getSecretStatusText = (status: string) => {
             </button>
           </div>
         </div>
+      </div>
+    </template>
+  </FormRow>
+
+  <FormRow
+    v-if="orphanedSecrets?.length"
+    section-title="Stored Secrets Not Used by This Version"
+  >
+    <template #content>
+      <div class="space-y-3">
+        <div
+          class="rounded-md border border-sky-200 bg-sky-50 p-3 text-sm text-sky-900 dark:border-sky-700 dark:bg-sky-900/30 dark:text-sky-200"
+        >
+          <p class="font-medium">These secrets are retained for rollback compatibility.</p>
+          <p class="mt-1">
+            The installed plugin version no longer declares them. They are not required
+            for enablement and will not be removed automatically.
+          </p>
+        </div>
+
+        <ul class="divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-700 dark:border-gray-700">
+          <li
+            v-for="secret in orphanedSecrets"
+            :key="secret.key"
+            class="flex items-center justify-between gap-4 p-4"
+          >
+            <span class="font-mono text-sm font-medium text-gray-900 dark:text-white">
+              {{ secret.key }}
+            </span>
+            <span
+              class="rounded-full px-2 py-1 text-xs font-semibold"
+              :class="getSecretStatusColor(secret.status)"
+            >
+              {{ getSecretStatusText(secret.status) }}
+            </span>
+          </li>
+        </ul>
       </div>
     </template>
   </FormRow>

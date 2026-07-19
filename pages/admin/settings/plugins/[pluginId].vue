@@ -244,6 +244,12 @@ const secrets = computed((): PluginSecretStatus[] =>
   )
 );
 
+const orphanedSecrets = computed((): PluginSecretStatus[] =>
+  storedSecrets.value.filter(
+    (secret) => !declaredServerSecretKeys.value.has(secret.key)
+  )
+);
+
 const isInstalled = computed(() => !!installedPlugin.value);
 const isEnabled = computed(() => installedPlugin.value?.enabled ?? false);
 const installedVersion = computed(() => installedPlugin.value?.version);
@@ -735,6 +741,7 @@ const handleSaveSettings = async () => {
             v-model:secret-values="secretValues"
             v-model:show-secret-inputs="showSecretInputs"
             :secrets="secrets"
+            :orphaned-secrets="orphanedSecrets"
             @set-secret="handleSetSecret"
           />
 

@@ -78,7 +78,7 @@ const stubs = {
   },
   PluginSecretsSection: {
     name: 'PluginSecretsSection',
-    props: ['secrets', 'secretValues', 'showSecretInputs'],
+    props: ['secrets', 'orphanedSecrets', 'secretValues', 'showSecretInputs'],
     emits: ['set-secret', 'update:secretValues', 'update:showSecretInputs'],
     template: '<button type="button" data-test="set-secret" @click="$emit(\'set-secret\', \'API_KEY\', \'xyz\')">Set secret</button>',
   },
@@ -204,6 +204,20 @@ describe('Plugin detail page', () => {
       secrets: [{ key: 'API_KEY', status: 'NOT_SET' }],
       fields: [{ key: 'serviceUrl', label: 'Service URL', type: 'text' }],
     });
+  });
+
+  it('separates stored secrets that the installed version no longer declares', () => {
+    setInstalledPlugin({ manifest: { secrets: [] } });
+    h.q.SECRETS.result.value = {
+      getServerPluginSecrets: [
+        { key: 'OLD_API_KEY', status: 'SET_UNTESTED' },
+      ],
+    };
+    const wrapper = mountPage();
+
+    expect(
+      wrapper.findComponent({ name: 'PluginSecretsSection' }).props('orphanedSecrets')
+    ).toEqual([{ key: 'OLD_API_KEY', status: 'SET_UNTESTED' }]);
   });
 
   it('hides the installed-only sections for an uninstalled plugin', () => {
