@@ -13,6 +13,9 @@ interface ToastAction {
   onClick: () => void;
 }
 
+type ToastUpdate = Pick<Toast, 'message'> &
+  Partial<Pick<Toast, 'type' | 'action'>>;
+
 export const useToastStore = defineStore('toast', () => {
   const toasts = ref<Toast[]>([]);
 
@@ -38,6 +41,13 @@ export const useToastStore = defineStore('toast', () => {
     }
   }
 
+  function updateToast(id: string, update: ToastUpdate) {
+    const toast = toasts.value.find((item) => item.id === id);
+    if (!toast) return;
+
+    Object.assign(toast, update);
+  }
+
   function clearAllToasts() {
     toasts.value = [];
   }
@@ -45,6 +55,7 @@ export const useToastStore = defineStore('toast', () => {
   return {
     toasts,
     showToast,
+    updateToast,
     dismissToast,
     clearAllToasts,
   };

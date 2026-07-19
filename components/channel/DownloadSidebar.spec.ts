@@ -1,12 +1,29 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { mount } from '@vue/test-utils';
-import { defineComponent, nextTick, ref } from 'vue';
+import { flushPromises, mount } from '@vue/test-utils';
+import { defineComponent, ref } from 'vue';
 import DownloadSidebar from '@/components/channel/DownloadSidebar.vue';
 import { makeDiscussion } from '@/tests/utils/factories';
 
 const authState = ref(false);
 const mockUsernameRef = ref('');
-const trackDownloadMock = vi.hoisted(() => vi.fn(() => Promise.resolve()));
+const trackDownloadMock = vi.hoisted(() => vi.fn(() => Promise.resolve({
+  data: {
+    prepareDownload: {
+      ready: true,
+      url: 'https://signed.example.com/asset.zip',
+      scanStatus: 'CLEAN',
+      reviewAccess: false,
+      message: 'No threats found. Your download is ready.',
+    },
+  },
+})));
+
+vi.mock('@/stores/toastStore', () => ({
+  useToastStore: () => ({
+    showToast: vi.fn(() => 'toast-1'),
+    updateToast: vi.fn(),
+  }),
+}));
 
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => mockUsernameRef,
@@ -99,11 +116,9 @@ describe('DownloadSidebar', () => {
     authState.value = false;
     mockUsernameRef.value = '';
     trackDownloadMock.mockClear();
-    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -123,7 +138,6 @@ describe('DownloadSidebar', () => {
     expect(button.attributes('disabled')).toBeUndefined();
 
     await button.trigger('click');
-    vi.runAllTimers();
 
     expect(appendSpy).not.toHaveBeenCalled();
     expect(trackDownloadMock).not.toHaveBeenCalled();
@@ -142,8 +156,7 @@ describe('DownloadSidebar', () => {
     });
 
     await wrapper.get('button').trigger('click');
-    vi.advanceTimersByTime(500);
-    await nextTick();
+    await flushPromises();
 
     expect(trackDownloadMock).toHaveBeenCalledWith({
       downloadableFileId: 'file-1',

@@ -375,7 +375,6 @@ const groupedLabels = computed(() => {
         <template #has-auth>
           <FunctionalDownloadNow
             :disabled="downloadDisabled"
-            :url="primaryFile?.url || ''"
             :file-name="primaryFile?.fileName || 'download'"
             :downloadable-file-id="primaryFile?.id || ''"
             :discussion-id="discussionId"

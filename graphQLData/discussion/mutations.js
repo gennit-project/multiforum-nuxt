@@ -92,12 +92,20 @@ export const CREATE_DOWNLOADABLE_FILE = gql`
   }
 `;
 
-export const TRACK_DOWNLOAD = gql`
-  mutation trackDownload($downloadableFileId: ID!, $discussionId: ID!) {
-    trackDownload(
+export const PREPARE_DOWNLOAD = gql`
+  mutation prepareDownload($downloadableFileId: ID!, $discussionId: ID!) {
+    prepareDownload(
       downloadableFileId: $downloadableFileId
       discussionId: $discussionId
-    )
+    ) {
+      ready
+      url
+      scanStatus
+      scanReason
+      scanCheckedAt
+      reviewAccess
+      message
+    }
   }
 `;
 

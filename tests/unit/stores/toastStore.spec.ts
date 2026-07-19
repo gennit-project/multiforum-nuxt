@@ -34,6 +34,25 @@ describe('toastStore', () => {
     expect(store.toasts.length).toBe(1);
   });
 
+  it('updates an existing toast in place', () => {
+    const store = useToastStore();
+    const id = store.showToast('Checking…', 'info');
+
+    store.updateToast(id, {
+      message: 'No threats found',
+      type: 'success',
+    });
+
+    expect(store.toasts).toEqual([
+      {
+        id,
+        message: 'No threats found',
+        type: 'success',
+        action: undefined,
+      },
+    ]);
+  });
+
   it('clears all toasts', () => {
     const store = useToastStore();
     store.showToast('First', 'success');
