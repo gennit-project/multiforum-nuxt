@@ -353,6 +353,23 @@ describe('ActivityFeedListItem', () => {
     expect(wrapper.text()).toContain('Server Admin');
   });
 
+  it('renders a dedicated label-update phrase and icon for a label_update action', () => {
+    const wrapper = mountWrapper({
+      activityItem: makeActivityItem({
+        actionType: 'label_update',
+        actionDescription: 'updated the labels on the download',
+        Comment: null,
+        ModerationProfile: { displayName: 'mod-bob' },
+        User: null,
+      }),
+    });
+
+    expect({
+      phrase: wrapper.text().includes('the download labels were updated by'),
+      hasIcon: wrapper.find('svg').exists(),
+    }).toEqual({ phrase: true, hasIcon: true });
+  });
+
   it('shows a suspend button when the activity actor targets the issue mod', () => {
     const wrapper = mountWrapper({
       issue: {
