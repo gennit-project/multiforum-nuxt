@@ -70,6 +70,12 @@ const stubs = {
   PluginDetailHeader: { name: 'PluginDetailHeader', props: ['pluginDisplayName'], template: '<div class="header">{{ pluginDisplayName }}</div>' },
   PluginStatusCards: { name: 'PluginStatusCards', props: ['isEnabled', 'canEnable', 'enabling', 'blockingConfigFields'], emits: ['toggle-enabled'], template: '<button type="button" data-test="toggle-enabled" @click="$emit(\'toggle-enabled\', false)" />' },
   PluginUpdateBanner: sectionStub('PluginUpdateBanner'),
+  PluginUpgradePreviewModal: {
+    name: 'PluginUpgradePreviewModal',
+    props: ['currentVersion', 'targetVersion', 'report', 'secrets', 'installing'],
+    emits: ['carry-over', 'start-fresh', 'cancel'],
+    template: '<div data-test="upgrade-preview"><button data-test="carry-upgrade" @click="$emit(\'carry-over\')">Carry</button><button data-test="fresh-upgrade" @click="$emit(\'start-fresh\')">Fresh</button></div>',
+  },
   PluginInstallSection: {
     name: 'PluginInstallSection',
     props: ['modelValue', 'canInstall', 'compatibilityByVersion'],
@@ -285,6 +291,74 @@ describe('Plugin detail page', () => {
     await flushPromises();
 
     expect(wrapper.text()).toContain('Plugin version not found in registry.');
+  });
+
+  it('previews an upgrade and carries settings only after confirmation', async () => {
+    setInstalledPlugin({
+      version: '1.0.0',
+      settingsJson: { endpoint: 'https://custom.example', removed: true },
+    });
+    setAvailablePlugin({ Versions: [{ version: '1.0.0' }, { version: '2.0.0' }] });
+    h.q.DETAIL.result.value = {
+      plugins: [{
+        id: PLUGIN_ID,
+        Versions: [{
+          version: '2.0.0',
+          manifest: {
+            secrets: [{ key: 'API_KEY', scope: 'server', required: true }],
+            settingsDefaults: { server: { endpoint: 'default', added: true } },
+            ui: {
+              forms: {
+                server: [{
+                  title: 'Settings',
+                  fields: [
+                    { key: 'endpoint', label: 'Endpoint', type: 'text' },
+                    { key: 'added', label: 'Added', type: 'toggle' },
+                  ],
+                }],
+              },
+            },
+          },
+        }],
+      }],
+    };
+    h.q.SECRETS.result.value = {
+      getServerPluginSecrets: [{ key: 'API_KEY', status: 'SET_UNTESTED' }],
+    };
+    const wrapper = mountPage();
+    const installSection = wrapper.findComponent({ name: 'PluginInstallSection' });
+
+    installSection.vm.$emit('update:modelValue', '2.0.0');
+    await flushPromises();
+    await wrapper.get('[data-test="install"]').trigger('click');
+    await flushPromises();
+    const previewProps = wrapper
+      .findComponent({ name: 'PluginUpgradePreviewModal' })
+      .props();
+    await wrapper.get('[data-test="carry-upgrade"]').trigger('click');
+    await flushPromises();
+
+    expect({
+      preview: previewProps,
+      installArgs: h.mutations.INSTALL_M?.mutate.mock.calls[0]?.[0],
+    }).toMatchObject({
+      preview: {
+        currentVersion: '1.0.0',
+        targetVersion: '2.0.0',
+        report: {
+          carried: ['endpoint'],
+          dropped: ['removed'],
+          reset: [],
+          newDefaults: ['added'],
+        },
+        secrets: [{ key: 'API_KEY', isSet: true }],
+      },
+      installArgs: {
+        pluginId: PLUGIN_ID,
+        version: '2.0.0',
+        carrySettings: true,
+      },
+    });
   });
 
   it('toggles enabled state via the status cards', async () => {

@@ -78,8 +78,16 @@ export const DISALLOW_PLUGIN = gql`
 `;
 
 export const INSTALL_PLUGIN_VERSION = gql`
-  mutation InstallPluginVersion($pluginId: String!, $version: String!) {
-    installPluginVersion(pluginId: $pluginId, version: $version) {
+  mutation InstallPluginVersion(
+    $pluginId: String!
+    $version: String!
+    $carrySettings: Boolean
+  ) {
+    installPluginVersion(
+      pluginId: $pluginId
+      version: $version
+      carrySettings: $carrySettings
+    ) {
       plugin {
         id
         name
@@ -88,6 +96,7 @@ export const INSTALL_PLUGIN_VERSION = gql`
       scope
       enabled
       settingsJson
+      carryOverReport
     }
   }
 `;

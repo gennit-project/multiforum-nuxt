@@ -8,6 +8,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PluginDetailHeader from '@/components/admin/plugins/PluginDetailHeader.vue';
 import PluginStatusCards from '@/components/admin/plugins/PluginStatusCards.vue';
 import PluginUpdateBanner from '@/components/admin/plugins/PluginUpdateBanner.vue';
+import PluginUpgradePreviewModal from '@/components/admin/plugins/PluginUpgradePreviewModal.vue';
 import PluginInstallSection from '@/components/admin/plugins/PluginInstallSection.vue';
 import PluginSecretsSection from '@/components/admin/plugins/PluginSecretsSection.vue';
 import PluginSettingsSection from '@/components/admin/plugins/PluginSettingsSection.vue';
@@ -36,6 +37,10 @@ import {
   getPluginFormSections,
   stringifyManifest,
 } from '@/utils/pluginManifestUtils';
+import {
+  buildPluginUpgradePreview,
+  type PluginUpgradeReport,
+} from '@/utils/pluginUpgradeUtils';
 import type {
   PluginFormSection,
   PluginSecretStatus as PluginSecretStatusType,
@@ -73,6 +78,11 @@ const settingsValues = ref<PluginSettings>({});
 const settingsErrors = ref<Record<string, string>>({});
 const savingSettings = ref(false);
 const installError = ref<string | null>(null);
+const pendingUpgrade = ref<{
+  version: string;
+  report: PluginUpgradeReport;
+  secrets: Array<{ key: string; isSet: boolean }>;
+} | null>(null);
 
 // Types
 interface PluginSecretStatus {
@@ -189,6 +199,7 @@ interface PluginFromQuery {
     sourceCommit?: string | null;
     minServerVersion?: string | null;
     apiVersion?: string | null;
+    manifest?: PluginManifest;
   }>;
 }
 
@@ -306,11 +317,13 @@ const pluginLicense = computed(() => pluginMeta.value.license);
 const pluginTags = computed(() => pluginMeta.value.tags);
 
 // Get versions with full details from the plugin detail query
-const pluginDetailVersions = computed(() => {
+const pluginDetailVersions = computed(
+  (): NonNullable<PluginFromQuery['Versions']> => {
   const plugins = pluginDetailResult.value?.plugins || [];
   const pluginDetail = plugins.find((p: PluginFromQuery) => p.id === pluginId);
   return pluginDetail?.Versions || [];
-});
+  }
+);
 
 const pluginReadme = computed(() =>
   resolvePluginReadme({
@@ -477,26 +490,15 @@ watch(
 );
 
 // Methods
-const handleInstall = async (versionOverride?: string) => {
-  const versionToInstall = versionOverride || selectedVersion.value;
-  if (!versionToInstall) {
-    installError.value = 'No version selected';
-    return;
-  }
-
-  const compatibility = compatibilityByVersion.value[versionToInstall];
-  if (compatibility?.compatible === false) {
-    installError.value = compatibility.reason;
-    return;
-  }
-
-  // Clear any previous error
-  installError.value = null;
-
+const performInstall = async (
+  versionToInstall: string,
+  carrySettings: boolean
+): Promise<boolean> => {
   try {
     const result = await installMutation({
       pluginId,
       version: versionToInstall,
+      carrySettings,
     });
 
     // Check for GraphQL errors in the result
@@ -505,7 +507,7 @@ const handleInstall = async (versionOverride?: string) => {
         .map((e: { message: string }) => e.message)
         .join(', ');
       installError.value = `Installation failed: ${errorMsg}`;
-      return;
+      return false;
     }
 
     toast.success(
@@ -519,11 +521,75 @@ const handleInstall = async (versionOverride?: string) => {
     await refetchInstalled();
     await refetchSecrets();
     await refetchConfigStatus();
+    return true;
   } catch (err: unknown) {
     console.error('Install error:', err);
     const errorMessage = err instanceof Error ? err.message : '';
     installError.value = mapInstallErrorMessage(errorMessage);
+    return false;
   }
+};
+
+const handleInstall = async (versionOverride?: string) => {
+  const versionToInstall = versionOverride || selectedVersion.value;
+  if (!versionToInstall) {
+    installError.value = 'No version selected';
+    return;
+  }
+
+  const compatibility = compatibilityByVersion.value[versionToInstall];
+  if (compatibility?.compatible === false) {
+    installError.value = compatibility.reason;
+    return;
+  }
+
+  installError.value = null;
+
+  if (installedPlugin.value && versionToInstall !== installedVersion.value) {
+    const targetManifest = pluginDetailVersions.value.find(
+      (candidate) => candidate.version === versionToInstall
+    )?.manifest;
+    if (!targetManifest) {
+      installError.value =
+        'Upgrade preview is unavailable because the target manifest has not loaded.';
+      return;
+    }
+
+    const preview = buildPluginUpgradePreview({
+      oldSettings: installedPlugin.value.settingsJson || {},
+      newManifest: targetManifest,
+    });
+    const targetSecrets = (targetManifest.secrets || [])
+      .filter(
+        (secret) =>
+          (!secret.scope || secret.scope === 'server') &&
+          secret.required !== false
+      )
+      .map((secret) => ({
+        key: secret.key,
+        isSet: storedSecrets.value.some(
+          (stored) =>
+            stored.key === secret.key && stored.status !== 'NOT_SET'
+        ),
+      }));
+    pendingUpgrade.value = {
+      version: versionToInstall,
+      report: preview.report,
+      secrets: targetSecrets,
+    };
+    return;
+  }
+
+  await performInstall(versionToInstall, false);
+};
+
+const confirmUpgrade = async (carrySettings: boolean) => {
+  if (!pendingUpgrade.value) return;
+  const installed = await performInstall(
+    pendingUpgrade.value.version,
+    carrySettings
+  );
+  if (installed) pendingUpgrade.value = null;
 };
 
 const handleToggleEnabled = async (enabled: boolean) => {
@@ -771,6 +837,18 @@ const handleSaveSettings = async () => {
           <PluginReadmeSection
             :plugin-readme="pluginReadme"
             :plugin-detail-loading="pluginDetailLoading"
+          />
+
+          <PluginUpgradePreviewModal
+            v-if="pendingUpgrade && installedVersion"
+            :current-version="installedVersion"
+            :target-version="pendingUpgrade.version"
+            :report="pendingUpgrade.report"
+            :secrets="pendingUpgrade.secrets"
+            :installing="installing"
+            @carry-over="confirmUpgrade(true)"
+            @start-fresh="confirmUpgrade(false)"
+            @cancel="pendingUpgrade = null"
           />
         </div>
       </template>
