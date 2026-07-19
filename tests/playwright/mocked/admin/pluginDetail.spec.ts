@@ -91,6 +91,9 @@ const getBaseMocks = (username: string) => ({
   GetInstalledPlugins: () => ({ data: { getInstalledPlugins: [] } }),
   GetPluginDetail: () => ({ data: { plugins: [buildPlugin()] } }),
   GetServerPluginSecrets: () => ({ data: { getServerPluginSecrets: [] } }),
+  GetPluginConfigStatus: () => ({
+    data: { getPluginConfigStatus: { isFullyConfigured: true, fields: [] } },
+  }),
 });
 
 test.describe('Server plugin detail', () => {

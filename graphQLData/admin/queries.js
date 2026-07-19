@@ -583,6 +583,32 @@ export const GET_SERVER_PLUGIN_SECRETS = gql`
   }
 `;
 
+export const GET_PLUGIN_CONFIG_STATUS = gql`
+  query GetPluginConfigStatus(
+    $pluginId: String!
+    $version: String!
+    $scope: String
+  ) {
+    getPluginConfigStatus(
+      pluginId: $pluginId
+      version: $version
+      scope: $scope
+    ) {
+      isFullyConfigured
+      fields {
+        key
+        label
+        scope
+        kind
+        required
+        isSet
+        isValid
+        message
+      }
+    }
+  }
+`;
+
 export const GET_PLUGIN_MANAGEMENT_DATA = gql`
   query GetPluginManagementData($serverName: String!) {
     plugins {

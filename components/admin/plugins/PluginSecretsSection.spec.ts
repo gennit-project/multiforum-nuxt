@@ -19,7 +19,7 @@ const mountSection = (props: Record<string, unknown> = {}) =>
     },
     global: {
       stubs: {
-        FormRow: { props: ['sectionTitle'], template: '<div><slot name="content" /></div>' },
+        FormRow: { props: ['sectionTitle'], template: '<div>{{ sectionTitle }}<slot name="content" /></div>' },
       },
     },
   });
@@ -41,14 +41,22 @@ describe('PluginSecretsSection rendering', () => {
   });
 
   it.each([
-    ['VALID', 'Valid'],
+    ['VALID', '✓ Set and valid'],
     ['INVALID', 'Invalid'],
-    ['SET_UNTESTED', 'Set'],
+    ['SET_UNTESTED', '✓ Set (untested)'],
     ['NOT_SET', 'Not set'],
   ])('shows %s status as "%s"', (status, label) => {
     const wrapper = mountSection({ secrets: [secret({ status })] });
 
     expect(wrapper.text()).toContain(label);
+  });
+
+  it('calls out a required secret that has not been set', () => {
+    const wrapper = mountSection({
+      secrets: [secret({ status: 'NOT_SET', required: true })],
+    });
+
+    expect(wrapper.text()).toContain('Required — not set');
   });
 
   it('labels the toggle "Set Secret" when not set', () => {
@@ -61,6 +69,40 @@ describe('PluginSecretsSection rendering', () => {
     const wrapper = mountSection({ secrets: [secret({ status: 'VALID' })] });
 
     expect(buttonByText(wrapper, 'Update Secret')).toBeTruthy();
+  });
+});
+
+describe('PluginSecretsSection orphaned secrets', () => {
+  it('shows stored secrets that are unused by the installed version separately', () => {
+    const wrapper = mountSection({
+      secrets: [],
+      orphanedSecrets: [
+        { key: 'OLD_API_KEY', status: 'SET_UNTESTED' },
+      ],
+    });
+
+    expect({
+      hasHeading: wrapper.text().includes('Stored Secrets Not Used by This Version'),
+      hasExplanation: wrapper.text().includes(
+        'These secrets are retained for rollback compatibility.'
+      ),
+      item: wrapper.get('li').text(),
+    }).toEqual({
+      hasHeading: true,
+      hasExplanation: true,
+      item: 'OLD_API_KEY✓ Set (untested)',
+    });
+  });
+
+  it('does not offer an edit action for an orphaned secret', () => {
+    const wrapper = mountSection({
+      secrets: [],
+      orphanedSecrets: [
+        { key: 'OLD_API_KEY', status: 'SET_UNTESTED' },
+      ],
+    });
+
+    expect(wrapper.findAll('button')).toHaveLength(0);
   });
 });
 

@@ -6,6 +6,12 @@ defineProps<{
   installedVersion?: string | null;
   canEnable: boolean;
   enabling: boolean;
+  blockingConfigFields?: Array<{
+    key: string;
+    label: string;
+    kind: 'SETTING' | 'SECRET';
+    message?: string | null;
+  }>;
 }>();
 
 const emit = defineEmits<{
@@ -78,7 +84,7 @@ const emit = defineEmits<{
           Plugin Disabled
         </p>
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-          {{ canEnable ? 'Ready to enable' : 'Configure required secrets first' }}
+          {{ canEnable ? 'Ready to enable' : 'Complete required configuration first' }}
         </p>
         <button
           v-if="canEnable"
@@ -95,10 +101,22 @@ const emit = defineEmits<{
           <i class="fa-solid fa-info-circle mr-1" />
           After enabling, restart the backend for changes to take effect
         </p>
-        <p v-else class="mt-3 text-xs text-gray-500 dark:text-gray-400">
-          <i class="fa-solid fa-lock mr-1" />
-          Configure secrets below to enable
-        </p>
+        <div
+          v-else
+          class="mt-3 w-full rounded-lg border border-amber-300 bg-amber-50 p-3 text-left text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-200"
+        >
+          <p class="font-medium">
+            <i class="fa-solid fa-lock mr-1" />
+            Required before enabling
+          </p>
+          <ul v-if="blockingConfigFields?.length" class="mt-2 list-disc space-y-1 pl-5">
+            <li v-for="field in blockingConfigFields" :key="`${field.kind}:${field.key}`">
+              {{ field.label }}
+              <span class="text-xs opacity-80">({{ field.kind.toLowerCase() }})</span>
+            </li>
+          </ul>
+          <p v-else class="mt-1 text-xs">Configure the required fields below.</p>
+        </div>
       </div>
     </div>
   </div>

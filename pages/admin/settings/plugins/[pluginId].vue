@@ -8,6 +8,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PluginDetailHeader from '@/components/admin/plugins/PluginDetailHeader.vue';
 import PluginStatusCards from '@/components/admin/plugins/PluginStatusCards.vue';
 import PluginUpdateBanner from '@/components/admin/plugins/PluginUpdateBanner.vue';
+import PluginUpgradePreviewModal from '@/components/admin/plugins/PluginUpgradePreviewModal.vue';
 import PluginInstallSection from '@/components/admin/plugins/PluginInstallSection.vue';
 import PluginSecretsSection from '@/components/admin/plugins/PluginSecretsSection.vue';
 import PluginSettingsSection from '@/components/admin/plugins/PluginSettingsSection.vue';
@@ -23,7 +24,6 @@ import {
 import {
   resolvePluginMetadata,
   resolvePluginReadme,
-  canEnablePlugin,
   sortVersionsDescending,
   hasNewerVersions as hasNewerVersionsUtil,
   mapInstallErrorMessage,
@@ -37,6 +37,10 @@ import {
   getPluginFormSections,
   stringifyManifest,
 } from '@/utils/pluginManifestUtils';
+import {
+  buildPluginUpgradePreview,
+  type PluginUpgradeReport,
+} from '@/utils/pluginUpgradeUtils';
 import type {
   PluginFormSection,
   PluginSecretStatus as PluginSecretStatusType,
@@ -46,6 +50,7 @@ import {
   GET_AVAILABLE_PLUGINS,
   GET_INSTALLED_PLUGINS,
   GET_SERVER_PLUGIN_SECRETS,
+  GET_PLUGIN_CONFIG_STATUS,
   GET_PLUGIN_DETAIL,
 } from '@/graphQLData/admin/queries';
 import {
@@ -73,13 +78,30 @@ const settingsValues = ref<PluginSettings>({});
 const settingsErrors = ref<Record<string, string>>({});
 const savingSettings = ref(false);
 const installError = ref<string | null>(null);
+const pendingUpgrade = ref<{
+  version: string;
+  report: PluginUpgradeReport;
+  secrets: Array<{ key: string; isSet: boolean }>;
+} | null>(null);
 
 // Types
 interface PluginSecretStatus {
   key: string;
   status: 'NOT_SET' | 'SET_UNTESTED' | 'VALID' | 'INVALID';
+  required?: boolean;
   lastValidatedAt?: string;
   validationError?: string;
+}
+
+interface PluginConfigFieldStatus {
+  key: string;
+  label: string;
+  scope: string;
+  kind: 'SETTING' | 'SECRET';
+  required: boolean;
+  isSet: boolean;
+  isValid: boolean;
+  message?: string | null;
 }
 
 interface PluginMetadata {
@@ -95,6 +117,11 @@ interface PluginMetadata {
 }
 
 interface PluginManifest {
+  secrets?: Array<{
+    key: string;
+    scope?: string;
+    required?: boolean;
+  }>;
   ui?: {
     forms?: {
       server?: PluginFormSection[];
@@ -173,6 +200,7 @@ interface PluginFromQuery {
     sourceCommit?: string | null;
     minServerVersion?: string | null;
     apiVersion?: string | null;
+    manifest?: PluginManifest;
   }>;
 }
 
@@ -207,12 +235,69 @@ const {
   enabled: computed(() => !!pluginSlug.value),
 });
 
-const secrets = computed((): PluginSecretStatus[] => {
+const storedSecrets = computed((): PluginSecretStatus[] => {
   return secretsResult.value?.getServerPluginSecrets || [];
 });
 
+const declaredServerSecrets = computed(() =>
+  (installedPlugin.value?.manifest?.secrets || []).filter(
+    (secret) => !secret.scope || secret.scope === 'server'
+  )
+);
+
+const declaredServerSecretKeys = computed(
+  () => new Set(declaredServerSecrets.value.map((secret) => secret.key))
+);
+
+const secrets = computed((): PluginSecretStatus[] =>
+  declaredServerSecrets.value.map((declaration) => ({
+    ...(storedSecrets.value.find(
+      (secret) => secret.key === declaration.key
+    ) || {
+      key: declaration.key,
+      status: 'NOT_SET' as const,
+    }),
+    required: declaration.required !== false,
+  }))
+);
+
+const orphanedSecrets = computed((): PluginSecretStatus[] =>
+  storedSecrets.value.filter(
+    (secret) => !declaredServerSecretKeys.value.has(secret.key)
+  )
+);
+
 const isInstalled = computed(() => !!installedPlugin.value);
 const isEnabled = computed(() => installedPlugin.value?.enabled ?? false);
+const installedVersion = computed(() => installedPlugin.value?.version);
+
+const configStatusQueryVars = computed(() => ({
+  pluginId: pluginSlug.value,
+  version: installedVersion.value || '',
+  scope: 'server',
+}));
+
+const { result: configStatusResult, refetch: refetchConfigStatus } = useQuery(
+  GET_PLUGIN_CONFIG_STATUS,
+  configStatusQueryVars,
+  {
+    enabled: computed(
+      () => !!pluginSlug.value && !!installedVersion.value
+    ),
+    fetchPolicy: 'cache-and-network',
+  }
+);
+
+const configStatus = computed(() =>
+  configStatusResult.value?.getPluginConfigStatus || null
+);
+
+const blockingConfigFields = computed((): PluginConfigFieldStatus[] =>
+  (configStatus.value?.fields || []).filter(
+    (field: PluginConfigFieldStatus) =>
+      field.required && (!field.isSet || !field.isValid)
+  )
+);
 
 // Only show full-page loading on initial load, not during refetches
 // Check if we're loading AND don't have any data yet
@@ -238,11 +323,13 @@ const pluginLicense = computed(() => pluginMeta.value.license);
 const pluginTags = computed(() => pluginMeta.value.tags);
 
 // Get versions with full details from the plugin detail query
-const pluginDetailVersions = computed(() => {
+const pluginDetailVersions = computed(
+  (): NonNullable<PluginFromQuery['Versions']> => {
   const plugins = pluginDetailResult.value?.plugins || [];
   const pluginDetail = plugins.find((p: PluginFromQuery) => p.id === pluginId);
   return pluginDetail?.Versions || [];
-});
+  }
+);
 
 const pluginReadme = computed(() =>
   resolvePluginReadme({
@@ -255,6 +342,13 @@ const pluginReadme = computed(() =>
 // Extract server settings form sections from the plugin manifest
 const serverSettingsSections = computed((): PluginFormSection[] =>
   getPluginFormSections(installedPlugin.value?.manifest, 'server')
+    .map((section) => ({
+      ...section,
+      fields: section.fields.filter(
+        (field) => !declaredServerSecretKeys.value.has(field.key)
+      ),
+    }))
+    .filter((section) => section.fields.length > 0)
 );
 
 // Convert secrets array to the format expected by PluginSecretField
@@ -307,9 +401,9 @@ const pluginApiVersion = computed(
   () => installedPlugin.value?.apiVersion || selectedVersionMetadata.value?.apiVersion
 );
 
-const canEnable = computed(() =>
-  canEnablePlugin({ isInstalled: isInstalled.value, secrets: secrets.value })
-);
+const canEnable = computed(() => {
+  return isInstalled.value && configStatus.value?.isFullyConfigured === true;
+});
 
 const availableVersions = computed(() =>
   sortVersionsDescending(plugin.value?.Versions || [])
@@ -324,10 +418,6 @@ const compatibilityByVersion = computed(() =>
     {} as Record<string, PluginVersionCompatibility>
   )
 );
-
-const installedVersion = computed(() => {
-  return installedPlugin.value?.version;
-});
 
 const isSelectedVersionInstalled = computed(() => {
   return installedVersion.value === selectedVersion.value;
@@ -406,6 +496,46 @@ watch(
 );
 
 // Methods
+const performInstall = async (
+  versionToInstall: string,
+  carrySettings: boolean
+): Promise<boolean> => {
+  try {
+    const result = await installMutation({
+      pluginId,
+      version: versionToInstall,
+      carrySettings,
+    });
+
+    // Check for GraphQL errors in the result
+    if (result?.errors?.length) {
+      const errorMsg = result.errors
+        .map((e: { message: string }) => e.message)
+        .join(', ');
+      installError.value = `Installation failed: ${errorMsg}`;
+      return false;
+    }
+
+    toast.success(
+      `Plugin ${plugin.value?.name} v${versionToInstall} installed successfully`
+    );
+
+    // Update selected version to match installed
+    selectedVersion.value = versionToInstall;
+
+    // Refetch data
+    await refetchInstalled();
+    await refetchSecrets();
+    await refetchConfigStatus();
+    return true;
+  } catch (err: unknown) {
+    console.error('Install error:', err);
+    const errorMessage = err instanceof Error ? err.message : '';
+    installError.value = mapInstallErrorMessage(errorMessage);
+    return false;
+  }
+};
+
 const handleInstall = async (versionOverride?: string) => {
   const versionToInstall = versionOverride || selectedVersion.value;
   if (!versionToInstall) {
@@ -419,39 +549,53 @@ const handleInstall = async (versionOverride?: string) => {
     return;
   }
 
-  // Clear any previous error
   installError.value = null;
 
-  try {
-    const result = await installMutation({
-      pluginId,
-      version: versionToInstall,
-    });
-
-    // Check for GraphQL errors in the result
-    if (result?.errors?.length) {
-      const errorMsg = result.errors
-        .map((e: { message: string }) => e.message)
-        .join(', ');
-      installError.value = `Installation failed: ${errorMsg}`;
+  if (installedPlugin.value && versionToInstall !== installedVersion.value) {
+    const targetManifest = pluginDetailVersions.value.find(
+      (candidate) => candidate.version === versionToInstall
+    )?.manifest;
+    if (!targetManifest) {
+      installError.value =
+        'Upgrade preview is unavailable because the target manifest has not loaded.';
       return;
     }
 
-    toast.success(
-      `Plugin ${plugin.value?.name} v${versionToInstall} installed successfully`
-    );
-
-    // Update selected version to match installed
-    selectedVersion.value = versionToInstall;
-
-    // Refetch data
-    await refetchInstalled();
-    await refetchSecrets();
-  } catch (err: unknown) {
-    console.error('Install error:', err);
-    const errorMessage = err instanceof Error ? err.message : '';
-    installError.value = mapInstallErrorMessage(errorMessage);
+    const preview = buildPluginUpgradePreview({
+      oldSettings: installedPlugin.value.settingsJson || {},
+      newManifest: targetManifest,
+    });
+    const targetSecrets = (targetManifest.secrets || [])
+      .filter(
+        (secret) =>
+          (!secret.scope || secret.scope === 'server') &&
+          secret.required !== false
+      )
+      .map((secret) => ({
+        key: secret.key,
+        isSet: storedSecrets.value.some(
+          (stored) =>
+            stored.key === secret.key && stored.status !== 'NOT_SET'
+        ),
+      }));
+    pendingUpgrade.value = {
+      version: versionToInstall,
+      report: preview.report,
+      secrets: targetSecrets,
+    };
+    return;
   }
+
+  await performInstall(versionToInstall, false);
+};
+
+const confirmUpgrade = async (carrySettings: boolean) => {
+  if (!pendingUpgrade.value) return;
+  const installed = await performInstall(
+    pendingUpgrade.value.version,
+    carrySettings
+  );
+  if (installed) pendingUpgrade.value = null;
 };
 
 const handleToggleEnabled = async (enabled: boolean) => {
@@ -470,12 +614,15 @@ const handleToggleEnabled = async (enabled: boolean) => {
       `Plugin ${plugin.value?.name} ${enabled ? 'enabled' : 'disabled'} successfully`
     );
     await refetchInstalled();
+    await refetchConfigStatus();
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : '';
     if (message.includes('Missing required secrets')) {
       toast.error('Cannot enable: missing required secrets');
     } else if (message.includes('PLUGIN_MISCONFIGURED_REQUIRED_SECRET_MISSING')) {
       toast.error('Plugin misconfigured: required secrets missing');
+    } else if (message.includes('PLUGIN_CONFIG_INCOMPLETE')) {
+      toast.error('Cannot enable: complete all required plugin configuration');
     } else {
       toast.error(`${enabled ? 'Enable' : 'Disable'} failed: ${message || 'Unknown error'}`);
     }
@@ -500,6 +647,7 @@ const handleSetSecret = async (key: string, value: string) => {
 
     // Refetch secrets to update status
     await refetchSecrets();
+    await refetchConfigStatus();
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     toast.error(`Failed to set secret "${key}": ${message}`);
@@ -561,6 +709,7 @@ const handleSaveSettings = async () => {
 
     await refetchInstalled();
     await refetchSecrets();
+    await refetchConfigStatus();
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     toast.error(`Failed to save settings: ${message}`);
@@ -624,6 +773,7 @@ const handleSaveSettings = async () => {
             :is-enabled="isEnabled"
             :installed-version="installedVersion"
             :can-enable="canEnable"
+            :blocking-config-fields="blockingConfigFields"
             :enabling="enabling"
             @toggle-enabled="handleToggleEnabled"
           />
@@ -663,6 +813,7 @@ const handleSaveSettings = async () => {
             v-model:secret-values="secretValues"
             v-model:show-secret-inputs="showSecretInputs"
             :secrets="secrets"
+            :orphaned-secrets="orphanedSecrets"
             @set-secret="handleSetSecret"
           />
 
@@ -692,6 +843,18 @@ const handleSaveSettings = async () => {
           <PluginReadmeSection
             :plugin-readme="pluginReadme"
             :plugin-detail-loading="pluginDetailLoading"
+          />
+
+          <PluginUpgradePreviewModal
+            v-if="pendingUpgrade && installedVersion"
+            :current-version="installedVersion"
+            :target-version="pendingUpgrade.version"
+            :report="pendingUpgrade.report"
+            :secrets="pendingUpgrade.secrets"
+            :installing="installing"
+            @carry-over="confirmUpgrade(true)"
+            @start-fresh="confirmUpgrade(false)"
+            @cancel="pendingUpgrade = null"
           />
         </div>
       </template>

@@ -20,6 +20,7 @@ vi.mock('@/graphQLData/admin/queries', () => ({
   GET_AVAILABLE_PLUGINS: 'AVAILABLE',
   GET_INSTALLED_PLUGINS: 'INSTALLED',
   GET_SERVER_PLUGIN_SECRETS: 'SECRETS',
+  GET_PLUGIN_CONFIG_STATUS: 'CONFIG_STATUS',
   GET_PLUGIN_DETAIL: 'DETAIL',
 }));
 vi.mock('@/graphQLData/admin/mutations', () => ({
@@ -48,6 +49,7 @@ vi.mock('@vue/apollo-composable', async () => {
     INSTALLED: { result: ref(null), loading: ref(false), error: ref(null), refetch: vi.fn() },
     DETAIL: { result: ref(null), loading: ref(false), error: ref(null), refetch: vi.fn() },
     SECRETS: { result: ref(null), loading: ref(false), error: ref(null), refetch: vi.fn() },
+    CONFIG_STATUS: { result: ref(null), loading: ref(false), error: ref(null), refetch: vi.fn() },
   };
   return {
     useQuery: (doc: keyof typeof h.q) => h.q[doc],
@@ -66,8 +68,14 @@ vi.mock('@/composables/useToast', () => ({ useToast: () => toast }));
 const sectionStub = (name: string) => ({ name, template: `<div data-stub="${name}" />` });
 const stubs = {
   PluginDetailHeader: { name: 'PluginDetailHeader', props: ['pluginDisplayName'], template: '<div class="header">{{ pluginDisplayName }}</div>' },
-  PluginStatusCards: { name: 'PluginStatusCards', props: ['isEnabled', 'canEnable', 'enabling'], emits: ['toggle-enabled'], template: '<button type="button" data-test="toggle-enabled" @click="$emit(\'toggle-enabled\', false)" />' },
+  PluginStatusCards: { name: 'PluginStatusCards', props: ['isEnabled', 'canEnable', 'enabling', 'blockingConfigFields'], emits: ['toggle-enabled'], template: '<button type="button" data-test="toggle-enabled" @click="$emit(\'toggle-enabled\', false)" />' },
   PluginUpdateBanner: sectionStub('PluginUpdateBanner'),
+  PluginUpgradePreviewModal: {
+    name: 'PluginUpgradePreviewModal',
+    props: ['currentVersion', 'targetVersion', 'report', 'secrets', 'installing'],
+    emits: ['carry-over', 'start-fresh', 'cancel'],
+    template: '<div data-test="upgrade-preview"><button data-test="carry-upgrade" @click="$emit(\'carry-over\')">Carry</button><button data-test="fresh-upgrade" @click="$emit(\'start-fresh\')">Fresh</button></div>',
+  },
   PluginInstallSection: {
     name: 'PluginInstallSection',
     props: ['modelValue', 'canInstall', 'compatibilityByVersion'],
@@ -76,7 +84,7 @@ const stubs = {
   },
   PluginSecretsSection: {
     name: 'PluginSecretsSection',
-    props: ['secrets', 'secretValues', 'showSecretInputs'],
+    props: ['secrets', 'orphanedSecrets', 'secretValues', 'showSecretInputs'],
     emits: ['set-secret', 'update:secretValues', 'update:showSecretInputs'],
     template: '<button type="button" data-test="set-secret" @click="$emit(\'set-secret\', \'API_KEY\', \'xyz\')">Set secret</button>',
   },
@@ -133,6 +141,9 @@ const setInstalledPlugin = (overrides: Record<string, unknown> = {}) => {
     ],
   };
   h.q.SECRETS.result.value = { getServerPluginSecrets: [] };
+  h.q.CONFIG_STATUS.result.value = {
+    getPluginConfigStatus: { isFullyConfigured: true, fields: [] },
+  };
 };
 
 beforeEach(() => {
@@ -171,6 +182,48 @@ describe('Plugin detail page', () => {
     const wrapper = mountPage();
 
     expect(wrapper.findComponent({ name: 'PluginStatusCards' }).exists()).toBe(true);
+  });
+
+  it('renders a declared missing secret once and removes its duplicate form field', () => {
+    setInstalledPlugin({
+      manifest: {
+        secrets: [{ key: 'API_KEY', scope: 'server', required: true }],
+        ui: {
+          forms: {
+            server: [{
+              title: 'Settings',
+              fields: [
+                { key: 'API_KEY', label: 'API key', type: 'secret' },
+                { key: 'serviceUrl', label: 'Service URL', type: 'text' },
+              ],
+            }],
+          },
+        },
+      },
+    });
+    const wrapper = mountPage();
+
+    expect({
+      secrets: wrapper.findComponent({ name: 'PluginSecretsSection' }).props('secrets'),
+      fields: wrapper.findComponent({ name: 'PluginSettingsSection' }).props('sections')[0].fields,
+    }).toEqual({
+      secrets: [{ key: 'API_KEY', status: 'NOT_SET', required: true }],
+      fields: [{ key: 'serviceUrl', label: 'Service URL', type: 'text' }],
+    });
+  });
+
+  it('separates stored secrets that the installed version no longer declares', () => {
+    setInstalledPlugin({ manifest: { secrets: [] } });
+    h.q.SECRETS.result.value = {
+      getServerPluginSecrets: [
+        { key: 'OLD_API_KEY', status: 'SET_UNTESTED' },
+      ],
+    };
+    const wrapper = mountPage();
+
+    expect(
+      wrapper.findComponent({ name: 'PluginSecretsSection' }).props('orphanedSecrets')
+    ).toEqual([{ key: 'OLD_API_KEY', status: 'SET_UNTESTED' }]);
   });
 
   it('hides the installed-only sections for an uninstalled plugin', () => {
@@ -238,6 +291,74 @@ describe('Plugin detail page', () => {
     await flushPromises();
 
     expect(wrapper.text()).toContain('Plugin version not found in registry.');
+  });
+
+  it('previews an upgrade and carries settings only after confirmation', async () => {
+    setInstalledPlugin({
+      version: '1.0.0',
+      settingsJson: { endpoint: 'https://custom.example', removed: true },
+    });
+    setAvailablePlugin({ Versions: [{ version: '1.0.0' }, { version: '2.0.0' }] });
+    h.q.DETAIL.result.value = {
+      plugins: [{
+        id: PLUGIN_ID,
+        Versions: [{
+          version: '2.0.0',
+          manifest: {
+            secrets: [{ key: 'API_KEY', scope: 'server', required: true }],
+            settingsDefaults: { server: { endpoint: 'default', added: true } },
+            ui: {
+              forms: {
+                server: [{
+                  title: 'Settings',
+                  fields: [
+                    { key: 'endpoint', label: 'Endpoint', type: 'text' },
+                    { key: 'added', label: 'Added', type: 'toggle' },
+                  ],
+                }],
+              },
+            },
+          },
+        }],
+      }],
+    };
+    h.q.SECRETS.result.value = {
+      getServerPluginSecrets: [{ key: 'API_KEY', status: 'SET_UNTESTED' }],
+    };
+    const wrapper = mountPage();
+    const installSection = wrapper.findComponent({ name: 'PluginInstallSection' });
+
+    installSection.vm.$emit('update:modelValue', '2.0.0');
+    await flushPromises();
+    await wrapper.get('[data-test="install"]').trigger('click');
+    await flushPromises();
+    const previewProps = wrapper
+      .findComponent({ name: 'PluginUpgradePreviewModal' })
+      .props();
+    await wrapper.get('[data-test="carry-upgrade"]').trigger('click');
+    await flushPromises();
+
+    expect({
+      preview: previewProps,
+      installArgs: h.mutations.INSTALL_M?.mutate.mock.calls[0]?.[0],
+    }).toMatchObject({
+      preview: {
+        currentVersion: '1.0.0',
+        targetVersion: '2.0.0',
+        report: {
+          carried: ['endpoint'],
+          dropped: ['removed'],
+          reset: [],
+          newDefaults: ['added'],
+        },
+        secrets: [{ key: 'API_KEY', isSet: true }],
+      },
+      installArgs: {
+        pluginId: PLUGIN_ID,
+        version: '2.0.0',
+        carrySettings: true,
+      },
+    });
   });
 
   it('toggles enabled state via the status cards', async () => {
