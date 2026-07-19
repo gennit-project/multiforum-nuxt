@@ -15,16 +15,19 @@ const props = defineProps<{
   orphanedSecrets?: PluginSecretStatus[];
   secretValues: Record<string, string>;
   showSecretInputs: Record<string, boolean>;
+  deletingSecretKey?: string | null;
 }>();
 
 const emit = defineEmits<{
   (e: 'update:secretValues', value: Record<string, string>): void;
   (e: 'update:showSecretInputs', value: Record<string, boolean>): void;
   (e: 'set-secret', key: string, value: string): void;
+  (e: 'delete-secret', key: string): void;
 }>();
 
 // Track which secret is awaiting confirmation
 const confirmingSecret = ref<string | null>(null);
+const confirmingDeletion = ref<string | null>(null);
 
 const updateSecretValue = (key: string, value: string) => {
   emit('update:secretValues', { ...props.secretValues, [key]: value });
@@ -49,6 +52,11 @@ const cancelConfirmation = () => {
 const confirmAndSave = (key: string) => {
   emit('set-secret', key, props.secretValues[key] || '');
   confirmingSecret.value = null;
+};
+
+const confirmDeletion = (key: string) => {
+  emit('delete-secret', key);
+  confirmingDeletion.value = null;
 };
 
 const getSecretStatusColor = (status: string) => {
@@ -221,17 +229,54 @@ const getSecretStatusText = (secret: PluginSecretStatus) => {
           <li
             v-for="secret in orphanedSecrets"
             :key="secret.key"
-            class="flex items-center justify-between gap-4 p-4"
+            class="p-4"
           >
-            <span class="font-mono text-sm font-medium text-gray-900 dark:text-white">
-              {{ secret.key }}
-            </span>
-            <span
-              class="rounded-full px-2 py-1 text-xs font-semibold"
-              :class="getSecretStatusColor(secret.status)"
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-sm font-medium text-gray-900 dark:text-white">
+                  {{ secret.key }}
+                </span>
+                <span
+                  class="rounded-full px-2 py-1 text-xs font-semibold"
+                  :class="getSecretStatusColor(secret.status)"
+                >
+                  {{ getSecretStatusText(secret) }}
+                </span>
+              </div>
+              <button
+                type="button"
+                class="rounded bg-red-50 px-3 py-1 text-sm text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50"
+                :disabled="deletingSecretKey === secret.key"
+                @click="confirmingDeletion = secret.key"
+              >
+                {{ deletingSecretKey === secret.key ? 'Deleting…' : 'Delete' }}
+              </button>
+            </div>
+
+            <div
+              v-if="confirmingDeletion === secret.key"
+              class="mt-3 rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-900/30"
             >
-              {{ getSecretStatusText(secret) }}
-            </span>
+              <p class="text-sm text-red-800 dark:text-red-200">
+                Delete this stored secret permanently? Older plugin versions may need it after a rollback or downgrade.
+              </p>
+              <div class="mt-2 flex gap-2">
+                <button
+                  type="button"
+                  class="rounded bg-red-600 px-3 py-1 text-sm text-white hover:bg-red-700"
+                  @click="confirmDeletion(secret.key)"
+                >
+                  Delete permanently
+                </button>
+                <button
+                  type="button"
+                  class="rounded bg-gray-300 px-3 py-1 text-sm text-gray-700 hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+                  @click="confirmingDeletion = null"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </li>
         </ul>
       </div>

@@ -27,6 +27,7 @@ vi.mock('@/graphQLData/admin/mutations', () => ({
   INSTALL_PLUGIN_VERSION: 'INSTALL_M',
   ENABLE_SERVER_PLUGIN: 'ENABLE_M',
   SET_SERVER_PLUGIN_SECRET: 'SET_SECRET_M',
+  DELETE_SERVER_PLUGIN_SECRET: 'DELETE_SECRET_M',
 }));
 
 const h = vi.hoisted(() => ({
@@ -84,9 +85,9 @@ const stubs = {
   },
   PluginSecretsSection: {
     name: 'PluginSecretsSection',
-    props: ['secrets', 'orphanedSecrets', 'secretValues', 'showSecretInputs'],
-    emits: ['set-secret', 'update:secretValues', 'update:showSecretInputs'],
-    template: '<button type="button" data-test="set-secret" @click="$emit(\'set-secret\', \'API_KEY\', \'xyz\')">Set secret</button>',
+    props: ['secrets', 'orphanedSecrets', 'secretValues', 'showSecretInputs', 'deletingSecretKey'],
+    emits: ['set-secret', 'delete-secret', 'update:secretValues', 'update:showSecretInputs'],
+    template: '<div><button type="button" data-test="set-secret" @click="$emit(\'set-secret\', \'API_KEY\', \'xyz\')">Set secret</button><button type="button" data-test="delete-secret" @click="$emit(\'delete-secret\', \'OLD_API_KEY\')">Delete secret</button></div>',
   },
   PluginSettingsSection: {
     name: 'PluginSettingsSection',
@@ -414,6 +415,30 @@ describe('Plugin detail page', () => {
       key: 'API_KEY',
       value: 'xyz',
     });
+  });
+
+  it('deletes an orphaned secret and refreshes configuration status', async () => {
+    setInstalledPlugin({ manifest: { secrets: [] } });
+    h.mutations.DELETE_SECRET_M = {
+      mutate: vi.fn().mockResolvedValue({
+        data: { deleteServerPluginSecret: true },
+      }),
+      loading: { value: false },
+    };
+    const wrapper = mountPage();
+
+    await wrapper.get('[data-test="delete-secret"]').trigger('click');
+    await flushPromises();
+
+    expect(h.mutations.DELETE_SECRET_M.mutate).toHaveBeenCalledWith({
+      pluginId: PLUGIN_ID,
+      key: 'OLD_API_KEY',
+    });
+    expect(h.q.SECRETS.refetch).toHaveBeenCalled();
+    expect(h.q.CONFIG_STATUS.refetch).toHaveBeenCalled();
+    expect(toast.success).toHaveBeenCalledWith(
+      'Secret "OLD_API_KEY" deleted successfully'
+    );
   });
 
   it('blocks saving when required settings are missing', async () => {
