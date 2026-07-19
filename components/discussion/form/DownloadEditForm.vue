@@ -312,6 +312,7 @@ const uploadFile = async (file: File): Promise<boolean> => {
       filename,
       contentType: fileType,
       channelConnections: currentChannelConnections.value,
+      uploadTarget: 'PRIVATE_DOWNLOAD' as const,
     };
 
     // Ask the server for a signed storage URL
