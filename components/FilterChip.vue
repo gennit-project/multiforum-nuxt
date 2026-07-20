@@ -38,6 +38,9 @@ const handleClick = () => {
         <template #default>
           <button
             :data-testid="dataTestid"
+            type="button"
+            aria-haspopup="true"
+            :aria-expanded="isOpen"
             :class="[
               highlighted
                 ? 'border-gray-500 ring-1 ring-gray-400 dark:border-gray-400 dark:ring-gray-500'
@@ -63,6 +66,9 @@ const handleClick = () => {
       <template #fallback>
         <button
           :data-testid="dataTestid"
+          type="button"
+          aria-haspopup="true"
+          :aria-expanded="false"
           :class="[
             highlighted
               ? 'border-gray-500 ring-1 ring-gray-400 dark:border-gray-400 dark:ring-gray-500'
