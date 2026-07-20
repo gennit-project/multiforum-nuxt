@@ -135,7 +135,9 @@ markAsReadDone(() => {
 // Per-notification actions for super-upvote ("scratchpad") notifications:
 // "Show on profile" publishes the thank-you note and marks the notification
 // read; "Ignore" just marks it read.
-const { mutate: markNotificationAsRead } = useMutation(MARK_NOTIFICATION_AS_READ);
+const { mutate: markNotificationAsRead } = useMutation(
+  MARK_NOTIFICATION_AS_READ
+);
 const { mutate: showScratchpadEntry } = useMutation(
   UPDATE_SCRATCHPAD_ENTRY_VISIBILITY
 );
@@ -240,11 +242,15 @@ const currentTotalCount = computed(() => {
 });
 
 const isLoading = computed(() => {
-  return activeTab.value === 'general' ? generalLoading.value : feedbackLoading.value;
+  return activeTab.value === 'general'
+    ? generalLoading.value
+    : feedbackLoading.value;
 });
 
 const currentError = computed(() => {
-  return activeTab.value === 'general' ? generalError.value : feedbackError.value;
+  return activeTab.value === 'general'
+    ? generalError.value
+    : feedbackError.value;
 });
 
 const loadMore = () => {
@@ -368,103 +374,105 @@ const reachedEnd = computed(() => {
         :aria-labelledby="activeTabId"
         tabindex="0"
       >
-      <p v-if="isLoading" class="px-4">Loading...</p>
+        <StatusMessage :busy="isLoading">
+          <p v-if="isLoading" class="px-4">Loading...</p>
 
-      <ErrorBanner v-else-if="currentError" :text="currentError.message" />
-
-      <p
-        v-else-if="currentNotifications.length === 0"
-        class="my-6 flex gap-2 px-4"
-      >
-        <span class="dark:text-white">
-          {{
-            activeTab === 'general'
-              ? 'No general notifications to show.'
-              : 'No feedback notifications to show.'
-          }}
-        </span>
-      </p>
-
-      <div v-if="currentNotifications.length > 0" class="flex flex-col gap-2">
-        <p class="mx-4 text-sm text-gray-500 dark:text-gray-300">
-          You have {{ currentUnreadCount }} unread
-          {{ activeTab === 'feedback' ? 'feedback ' : '' }}notifications
-        </p>
-        <div>
-          <GenericButton
-            class="mx-4"
-            text="Mark all as read"
-            :loading="markAsReadLoading"
-            @click="markAllAsRead"
-          />
-        </div>
-        <ErrorBanner v-if="markAsReadError" :text="markAsReadError.message" />
-        <ErrorBanner v-if="actionError" :text="actionError" />
-
-        <ul
-          role="list"
-          class="flex-1 flex-col divide-y divide-gray-200 bg-white shadow dark:divide-gray-700 dark:bg-gray-800 dark:text-white sm:rounded-lg"
-          data-testid="notification-list"
-        >
-          <li
-            v-for="notification in currentNotifications"
-            :key="notification.id"
-            class="p-4"
+          <p
+            v-else-if="currentNotifications.length === 0"
+            class="my-6 flex gap-2 px-4"
           >
-            <p class="mb-2 text-sm text-gray-500 dark:text-gray-300">
-              {{ timeAgo(new Date(notification.createdAt)) }} -
-              {{ notification.read ? 'Read' : 'Unread' }}
-            </p>
-            <MarkdownRenderer
-              v-if="notification.text"
-              :text="notification.text"
-              class="w-full"
-            />
-            <div
-              v-if="canActOnScratchpadEntry(notification)"
-              class="mt-3 flex flex-wrap items-center gap-2"
-              :data-testid="`scratchpad-notification-actions-${notification.id}`"
-            >
-              <button
-                type="button"
-                data-testid="notification-show-on-profile"
-                :disabled="pendingNotificationId === notification.id"
-                class="inline-flex items-center gap-1 rounded-full bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
-                @click="handleShowOnProfile(notification)"
-              >
-                <i class="fa-solid fa-star" />
-                Show on profile
-              </button>
-              <button
-                type="button"
-                data-testid="notification-ignore"
-                :disabled="pendingNotificationId === notification.id"
-                class="inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                @click="handleIgnore(notification)"
-              >
-                Ignore
-              </button>
-            </div>
-            <p
-              v-else-if="isPublishedScratchpadEntry(notification)"
-              class="mt-2 text-sm text-green-600 dark:text-green-400"
-              data-testid="notification-showing-on-profile"
-            >
-              <i class="fa-solid fa-circle-check mr-1" />
-              Showing on your Kudos page
-            </p>
-          </li>
-        </ul>
+            <span class="dark:text-white">
+              {{
+                activeTab === 'general'
+                  ? 'No general notifications to show.'
+                  : 'No feedback notifications to show.'
+              }}
+            </span>
+          </p>
+        </StatusMessage>
 
-        <div v-if="!reachedEnd">
-          <LoadMore
-            class="ml-4 justify-self-center"
-            :loading="isLoading"
-            :reached-end-of-results="reachedEnd"
-            @load-more="loadMore"
-          />
+        <ErrorBanner v-if="currentError" :text="currentError.message" />
+
+        <div v-if="currentNotifications.length > 0" class="flex flex-col gap-2">
+          <p class="mx-4 text-sm text-gray-500 dark:text-gray-300">
+            You have {{ currentUnreadCount }} unread
+            {{ activeTab === 'feedback' ? 'feedback ' : '' }}notifications
+          </p>
+          <div>
+            <GenericButton
+              class="mx-4"
+              text="Mark all as read"
+              :loading="markAsReadLoading"
+              @click="markAllAsRead"
+            />
+          </div>
+          <ErrorBanner v-if="markAsReadError" :text="markAsReadError.message" />
+          <ErrorBanner v-if="actionError" :text="actionError" />
+
+          <ul
+            role="list"
+            class="flex-1 flex-col divide-y divide-gray-200 bg-white shadow dark:divide-gray-700 dark:bg-gray-800 dark:text-white sm:rounded-lg"
+            data-testid="notification-list"
+          >
+            <li
+              v-for="notification in currentNotifications"
+              :key="notification.id"
+              class="p-4"
+            >
+              <p class="mb-2 text-sm text-gray-500 dark:text-gray-300">
+                {{ timeAgo(new Date(notification.createdAt)) }} -
+                {{ notification.read ? 'Read' : 'Unread' }}
+              </p>
+              <MarkdownRenderer
+                v-if="notification.text"
+                :text="notification.text"
+                class="w-full"
+              />
+              <div
+                v-if="canActOnScratchpadEntry(notification)"
+                class="mt-3 flex flex-wrap items-center gap-2"
+                :data-testid="`scratchpad-notification-actions-${notification.id}`"
+              >
+                <button
+                  type="button"
+                  data-testid="notification-show-on-profile"
+                  :disabled="pendingNotificationId === notification.id"
+                  class="inline-flex items-center gap-1 rounded-full bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+                  @click="handleShowOnProfile(notification)"
+                >
+                  <i class="fa-solid fa-star" />
+                  Show on profile
+                </button>
+                <button
+                  type="button"
+                  data-testid="notification-ignore"
+                  :disabled="pendingNotificationId === notification.id"
+                  class="hover:bg-gray-50 inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                  @click="handleIgnore(notification)"
+                >
+                  Ignore
+                </button>
+              </div>
+              <p
+                v-else-if="isPublishedScratchpadEntry(notification)"
+                class="mt-2 text-sm text-green-600 dark:text-green-400"
+                data-testid="notification-showing-on-profile"
+              >
+                <i class="fa-solid fa-circle-check mr-1" />
+                Showing on your Kudos page
+              </p>
+            </li>
+          </ul>
+
+          <div v-if="!reachedEnd">
+            <LoadMore
+              class="ml-4 justify-self-center"
+              :loading="isLoading"
+              :reached-end-of-results="reachedEnd"
+              @load-more="loadMore"
+            />
+          </div>
         </div>
-      </div>
       </div>
     </div>
   </div>

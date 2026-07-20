@@ -99,6 +99,8 @@ const handleCloseModal = () => {
     <!-- Loading State -->
     <div
       v-if="loading && !latestPipeline"
+      role="status"
+      aria-busy="true"
       class="p-4 text-center"
     >
       <i class="fa-solid fa-spinner fa-spin mr-2 text-gray-400" />
@@ -110,6 +112,7 @@ const handleCloseModal = () => {
     <!-- Error State -->
     <div
       v-else-if="error"
+      role="alert"
       class="p-4 text-center"
     >
       <i class="fa-solid fa-exclamation-triangle mr-2 text-red-400" />
