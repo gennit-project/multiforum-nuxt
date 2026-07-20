@@ -113,17 +113,21 @@ const markAllAsRead = () => {
 <template>
   <div class="dark:text-white flex justify-center">
     <div class="w-full max-w-5xl">
-      <p v-if="notificationLoading">Loading...</p>
+      <StatusMessage :busy="notificationLoading">
+        <p v-if="notificationLoading">Loading...</p>
+        <p
+          v-else-if="notifications && notifications.length === 0"
+          class="my-6 flex gap-2 px-4"
+        >
+          <span class="dark:text-white"
+            >There are no notifications to show.</span
+          >
+        </p>
+      </StatusMessage>
       <ErrorBanner
-        v-else-if="notificationError"
+        v-if="notificationError"
         :text="notificationError.message"
       />
-      <p
-        v-else-if="notifications && notifications.length === 0"
-        class="my-6 flex gap-2 px-4"
-      >
-        <span class="dark:text-white">There are no notifications to show.</span>
-      </p>
       <div
         v-if="notifications && notifications.length > 0"
         class="flex flex-col gap-2"

@@ -39,4 +39,10 @@ describe('FormRow', () => {
 
     expect(wrapper.get('[data-testid="slot-input"]').exists()).toBe(true);
   });
+
+  it('associates the label with a valid (whitespace-free) generated id', () => {
+    const wrapper = mountRow({ sectionTitle: 'Display Name' });
+
+    expect(wrapper.get('label').attributes('for')).not.toMatch(/\s/);
+  });
 });

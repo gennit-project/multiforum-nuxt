@@ -76,7 +76,7 @@ const removeSelection = (fileType: string) => {
     </div>
     <div class="relative">
       <div
-        class="flex min-h-10 w-full cursor-text flex-wrap items-center rounded-lg border px-4 text-left text-sm focus-within:ring-2 focus-within:ring-orange-500 dark:border-gray-700 dark:bg-gray-700"
+        class="flex min-h-10 w-full cursor-text flex-wrap items-center rounded-lg border px-4 text-left text-sm focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2 dark:border-gray-700 dark:bg-gray-700"
         :class="{
           'cursor-not-allowed opacity-50': disabled,
           'cursor-text': !disabled,

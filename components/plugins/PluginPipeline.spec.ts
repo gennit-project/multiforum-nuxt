@@ -292,6 +292,45 @@ describe('PluginPipeline Component', () => {
     expect(wrapper.find('.fa-chevron-down').exists()).toBe(true);
   });
 
+  it('renders the collapsible header as a real button', async () => {
+    const PluginPipeline = await import('./PluginPipeline.vue').then(
+      (m) => m.default
+    );
+
+    mockLatestPipeline.value = createMockPipelineGroup();
+
+    const wrapper = mount(PluginPipeline, {
+      props: {
+        targetId: 'file-1',
+        targetType: 'DownloadableFile',
+        collapsible: true,
+      },
+    });
+
+    expect(wrapper.find('button.cursor-pointer').exists()).toBe(true);
+  });
+
+  it('reflects the expanded state on the header via aria-expanded', async () => {
+    const PluginPipeline = await import('./PluginPipeline.vue').then(
+      (m) => m.default
+    );
+
+    mockLatestPipeline.value = createMockPipelineGroup();
+
+    const wrapper = mount(PluginPipeline, {
+      props: {
+        targetId: 'file-1',
+        targetType: 'DownloadableFile',
+        collapsible: true,
+      },
+    });
+
+    const header = wrapper.find('button.cursor-pointer');
+    await header.trigger('click');
+
+    expect(header.attributes('aria-expanded')).toBe('false');
+  });
+
   it('should render pipeline stages', async () => {
     const PluginPipeline = await import('./PluginPipeline.vue').then(
       (m) => m.default

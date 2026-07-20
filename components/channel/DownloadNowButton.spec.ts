@@ -18,6 +18,12 @@ describe('DownloadNowButton', () => {
     });
   });
 
+  it('paints a visible focus ring (ring width present, not just offset/color)', () => {
+    const wrapper = mountWithDefaults(DownloadNowButton);
+
+    expect(wrapper.get('button').classes()).toContain('focus:ring-2');
+  });
+
   it('renders a disabled button state when disabled is true', () => {
     const wrapper = mountWithDefaults(DownloadNowButton, {
       props: { disabled: true },

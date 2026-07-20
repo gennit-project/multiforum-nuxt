@@ -108,9 +108,18 @@ Specific controls that are completely unusable without a mouse, plus global shel
 - **`FileTypePicker.vue:65`** — `<div @click>` trigger, mouse-only open; chip-remove `<div>`/`<span>` unfocusable (`:81,88`).
 - **`TagComponent.vue:84,100`** — interactive tag is a `<span @click>`; delete icon has no name/keyboard.
 - **`collection/AddToListPopover.vue:494,529,686,722`** — list rows are `<div @click.stop>` with `readonly` checkbox; toggle is mouse-only.
-- **`plugins/PluginPipeline.vue:47` & `plugins/ScopedPipelineView.vue:89`** — collapse header is a `<div @click>` while the visible chevron `<button>` is inert.
-- **`charts/GithubContributionChart.vue:448-477`** — day `<rect>`s carry `@click` with no `tabindex`/`role`/keydown; whole heatmap is mouse-only.
-- **`user/DiscussionItemInProfile.vue:53`, `user/EventItemInProfile.vue:48`, `event/list/EventListItem.vue:215`** — whole-card `<li @click>` navigation, no keyboard path. Make the title a real `<NuxtLink>`.
+- **`plugins/PluginPipeline.vue` & `plugins/ScopedPipelineView.vue`** — ✅ **DONE.** Both collapse
+  headers render as a real `<button>` when collapsible (aria-expanded + aria-controls) and the
+  chevron is an aria-hidden `<span>`.
+- **`charts/GithubContributionChart.vue`** — ✅ **DONE (2026-07).** Day cells are now
+  `role="button"` with a roving tabindex (one tabbable cell), arrow-key + Home/End
+  navigation, Enter/Space to toggle day details, descriptive per-cell `aria-label`,
+  `aria-pressed` for the selected day, and a visible focus-visible outline. Tests added.
+- **`user/DiscussionItemInProfile.vue`, `user/EventItemInProfile.vue`** — ✅ **DONE.** Titles are
+  real `<nuxt-link>`s and the `<li>` no longer carries `@click`.
+  **`event/list/EventListItem.vue:215`** — title is already a real `<router-link>` (keyboard path
+  exists); the residual whole-card `@click` is a multi-mode mouse convenience (select/preview/
+  navigate) left in place.
 
 ### App shell (global, one edit each)
 - **Skip-to-content link** — none exists. Add a visually-hidden-until-focused link as the first focusable element in `layouts/default.vue`, targeting the main content id. Serious.
@@ -162,28 +171,37 @@ Pervasive: async loading/error/validation states swap silently (near-zero `aria-
 
 - **Toasts** — `ToastNotification.vue:9` container is not a live region. Add `aria-live="polite"`/`role="status"` (assertive for errors). Moderate.
 - **Form errors** — `ErrorBanner.vue:11`, `ErrorMessage.vue:8` lack `role="alert"`; inputs aren't tied to errors via `aria-describedby` + `aria-invalid`. Moderate.
-- **Loading / empty / error text** without `role="status"`/`aria-live`/`aria-busy` across:
-  `user/NotificationList.vue:116`, `notifications/NotificationTabs.vue:309`,
-  `auth/CreateUsernameForm.vue:262`, `user/UserProfileSidebar.vue:171`,
-  `settings/EditAccountSettingsFields.vue:182`, `dashboard/ChannelHealthDetailView.vue:336`,
-  `channel/SearchableForumList.vue:297`, `channel/DownloadList.vue:214`,
-  `plugins/PluginPipeline.vue:93`, `plugins/ScopedPipelineView.vue:136`,
-  `plugins/PipelineVisualEditor.vue:279`, `plugins/PipelineYamlEditor.vue:102`, plus ~45
-  mod/admin components (`admin/ChannelHealthTable.vue:170` skeletons, `admin/ImageReportsList.vue`,
-  `admin/ServerSuspendedModList.vue:37`, `mod/IssueRelatedChannel.vue:112`, etc.). Consider a
-  shared `<StatusRegion>` helper. Moderate. **(Confirmed zero `aria-live`/`role="status"`/`aria-busy` in the mod & admin folders.)**
+- **Loading / empty / error text** without `role="status"`/`aria-live`/`aria-busy`. ✅ **Shared
+  helper + first rollout DONE (2026-07):** added `components/StatusMessage.vue` (a persistent
+  live-region wrapper: role status/alert, aria-live, aria-busy) and rolled it out to
+  `user/NotificationList.vue`, `notifications/NotificationTabs.vue`,
+  `channel/SearchableForumList.vue`, `channel/DownloadList.vue` (skeleton grid), and
+  `plugins/PluginPipeline.vue` (loading/error). **Remaining:** `auth/CreateUsernameForm.vue:262`,
+  `user/UserProfileSidebar.vue:171`, `settings/EditAccountSettingsFields.vue:182`,
+  `dashboard/ChannelHealthDetailView.vue:336`, `plugins/ScopedPipelineView.vue`,
+  `plugins/PipelineVisualEditor.vue`, `plugins/PipelineYamlEditor.vue`, plus ~45 mod/admin
+  components (`admin/ImageReportsList.vue`, `admin/ServerSuspendedModList.vue:37`,
+  `mod/IssueRelatedChannel.vue:112`, etc.) — wrap each with `<StatusMessage>`. Moderate.
 - **`CharCounter.vue:34`** count and **`LoadingSpinner.vue`** state are silent. Add `aria-live` / `role="status"` + sr-only label. Minor.
-- **`settings/SaveStatus.vue:27`** — live region is `v-if`-mounted with text already present (SRs miss it). Render a persistent wrapper, swap inner text. Minor.
+- **`settings/SaveStatus.vue`** — ✅ **DONE.** The polite live region now lives on the persistent
+  outer wrapper (with `aria-atomic`); saving/saved text swaps inside it. Error keeps `role="alert"`
+  (alert-on-insert is correct). Minor.
 
 ---
 
 ## P4 — Remaining widgets, media, forms & polish
 
 ### Custom-widget ARIA
-- `SortDropdown.vue:14` — `aria-expanded` hardcoded `false`; items are placeholder `<a href="#">`; no Escape/click-outside. Serious-ish; consider replacing with Headless `Menu`.
-- `FilterChip.vue:39` — add `aria-haspopup`/`:aria-expanded`.
+- `SortDropdown.vue` — ⚠️ **Dead component** (not imported anywhere; placeholder `<a href="#">`
+  items). Flagged for deletion rather than ARIA-fixing; rebuild with `MenuButton.vue` if sort UI is
+  needed later.
+- `FilterChip.vue` — ✅ **DONE.** Trigger (and SSR fallback) now have `aria-haspopup` +
+  `:aria-expanded` bound to `isOpen`.
 - `nav/SiteSidenav.vue:237` search-type dropdown & `nav/CreateAnythingButton.vue:187` menu — add listbox/menu ARIA + arrow-key nav / focus-into-menu.
-- `notifications/NotificationTabs.vue:272` & `channel/ChannelTabs.vue:299` — add `role="tablist"/"tab"/"tabpanel"` + `aria-selected` (or `aria-current`).
+- `notifications/NotificationTabs.vue` & `channel/ChannelTabs.vue` — ✅ **DONE.** NotificationTabs
+  (in-page) got the full `role="tablist"/"tab"/"tabpanel"` pattern with `aria-selected`, roving
+  tabindex, and arrow-key switching; ChannelTabs (route nav via `TabButton`) got
+  `aria-current="page"` on the active link.
 - `TextEditor.vue` autocomplete — expose combobox/listbox ARIA (`aria-expanded`/`aria-controls`/`aria-activedescendant`) for `BotSuggestionsPopover`/`ModSuggestionsPopover`.
 - `GenericButton.vue:33` (+ `GenericSmallButton:18`, `SaveButton:27`, `CancelButton:13`) — `@keydown.enter.prevent` cancels native Enter activation. Remove `.prevent`.
 
@@ -191,19 +209,23 @@ Pervasive: async loading/error/validation states swap silently (near-zero `aria-
 - `filter/FilterOptionManager.vue` (~6×) & `filter/FilterGroupManager.vue` — `<label>` with no `for`, inputs no `id`. Associate them.
 - `plugins/PipelineVisualEditor.vue:173,201` — unassociated `<select>` labels; remove-step (`:242`) title-only. Also provide keyboard reorder (drag-only today, `:147`).
 - `auth/CreateUsernameForm.vue:177,235` — username/birthday label/id mismatch.
-- `FormRow.vue:24` — `:for` points at a label id no slotted control has.
+- `FormRow.vue` — ✅ **Partially DONE.** The label now uses a valid generated id (was the
+  section-title text, spaces and all) and exposes it to the content slot as `field-id`. Full
+  association still requires each consumer to bind `field-id` to its input.
 - `RadioButtons.vue:25,34` — `<fieldset>` has no `<legend>`; hardcoded `name` breaks two instances per page.
 - `TextInput.vue:63` — name falls back to placeholder; no `required`/`aria-required`.
-- `text-editor/TextEditorToolbar.vue:54` — single-glyph aria-labels ("B","I"); use "Bold","Italic".
-- `RulesEditor.vue:83` — button missing `type="button"` (defaults to submit).
+- `text-editor/TextEditorToolbar.vue` — ✅ **DONE.** Buttons now carry full-word aria-labels
+  (Bold/Italic/Heading 1/…/Toggle fullscreen) while keeping the visible glyph.
+- `RulesEditor.vue` — ✅ **DONE** (both buttons have `type="button"`).
 - **Placeholder-only inputs (no label/aria-label):** `admin/ServerMembershipEditor.vue:181,274` (admin/mod invite), `admin/plugins/PluginSecretsSection.vue:123` (secret value). Serious.
 - `mod/BrokenRulesModal.vue:704` — "Suspend user for" `<label>` not associated with its `<select>` (`:708` has no `id`). Moderate.
 
 ### Media / charts text alternatives
 - `charts/ContributionLineChart.vue:131` (+ `ChannelContributionChart.vue`) — `<canvas>` chart with no `role="img"`/`aria-label`/data-table alternative. Serious.
 - `ModelViewer.vue:29` — hardcoded `alt="3D Model Preview"`; accept + forward a real `alt` from `image/ImageListItem.vue:52`. Fullscreen/close buttons rely on `title` only (`:14,60`).
-- `LinkPreview.vue:54` — `:alt="title"` becomes `alt=""` while loading (link then has no text). Add a stable fallback.
-- `revision/RevisionDiffContent.vue:173` & `Table.vue:7` — tables have no `<caption>`/`aria-label`.
+- `LinkPreview.vue` — ✅ **DONE.** Image alt falls back to "Link preview image" when title is empty.
+- `revision/RevisionDiffContent.vue` & `Table.vue` — ✅ **DONE.** Both diff tables have an sr-only
+  `<caption>`; the generic `Table.vue` gained an optional `caption` prop rendering an sr-only caption.
 
 ### Icon-only buttons relying on `title` (add `aria-label`)
 - `plugins/PluginLogsModal.vue:123` (close), `plugins/PipelineVisualEditor.vue:242` (remove),
@@ -214,12 +236,12 @@ Pervasive: async loading/error/validation states swap silently (near-zero `aria-
 
 ### Contrast (light-mode small text below 4.5:1)
 - `text-gray-400` hints: `plugins/fields/PluginNumberField.vue:114`, `PluginSecretField.vue:210`, `nav/SiteSidenav.vue:317`.
-- `text-orange-500` badge: `user/UserProfileSidebar.vue:116` → use `text-orange-700`.
-- `text-gray-400 dark:text-gray-500` fails both modes: `admin/ImageReportsList.vue:161` → `text-gray-500 dark:text-gray-400`.
-- Typo `dak:text-white` → `dark:text-white` in `user/NotificationList.vue:114`.
+- `text-orange-500` badge: `user/UserProfileSidebar.vue` — ✅ **DONE** (role badges bumped to `text-orange-700` in light mode, `dark:text-orange-500`).
+- `text-gray-400 dark:text-gray-500` fails both modes: `admin/ImageReportsList.vue` — ✅ **DONE** (flipped to `text-gray-500 dark:text-gray-400`).
+- Typo `dak:text-white` → `dark:text-white` in `user/NotificationList.vue` — ✅ **DONE**.
 
 ### Tables / lists (mod & admin)
-- `admin/ChannelHealthTable.vue:142` — column `<th>`s lack `scope="col"`.
+- `admin/ChannelHealthTable.vue` — ✅ **DONE** (`scope="col"` added to header cells).
 - `admin/ServerSuspendedModList.vue:53` & `admin/ServerSuspendedUserList.vue` — `<div v-for>` lists losing semantics → `<ul role="list">`/`<li>`.
 - `admin/ServerTabs.vue:166` — decorative chevron `<i>` needs `aria-hidden="true"`.
 
@@ -256,10 +278,17 @@ _Per CLAUDE.md: implement incrementally, one file at a time, with unit/Playwrigh
 
 Not called out by the original audit's high-leverage list; pick up after P0–P4.
 
-- **Broad `focus:outline-none`-without-replacement sweep.** Beyond the P0 button primitives and
-  the P1 nav components (both done), grep still finds **~18** components that set
-  `outline-none` / `focus:outline-none` without a `focus:ring-*` or `focus-visible:ring-*`
-  replacement, so keyboard focus is invisible on those controls too. Sweep them the same way:
+- **Broad `focus:outline-none`-without-replacement sweep.** ✅ **Interactive controls DONE
+  (2026-07):** added the focus-visible ring convention to the real focus targets —
+  `IconButtonDropdown.vue` (both triggers), `TextButtonDropdown.vue` (both triggers),
+  `nav/RecentForumsDrawer.vue` (Cancel button), `FileTypePicker.vue` (focus-within ring on the
+  combobox pill), and `channel/DownloadNowButton.vue` (was missing the ring *width* so no ring
+  painted — the P0 bug pattern). **Remaining (intentionally left):** non-focusable dropdown
+  *panels* (`SelectComponent`, `IconButtonDropdown`/`TextButtonDropdown` menu containers,
+  `event/detail/EventNotificationsMenu`, `nav/CreateAnythingButton` menu) and programmatically-
+  focused page containers (`pages/admin.vue`, `pages/forums/[forumId].vue`, `pages/server/issues.vue`,
+  the discussion/download detail panels, `pages/settings.vue`, `pages/create-username.vue`) — these
+  are not keyboard focus targets. If any later gains a real `tabindex`, sweep it the same way:
   add `focus-visible:ring-2` + a ring color/offset (use `focus-visible:` for icon/toggle/input
   controls, `focus:ring-2` where the file already uses `focus:ring-*`). Find the current list with:
   ```

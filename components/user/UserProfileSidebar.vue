@@ -115,12 +115,12 @@ const handleReportSuccess = () => {
         {{ username }}
         <span
           v-if="serverRoleBadge === 'serverAdmin'"
-          class="rounded-md border border-orange-500 px-2 py-1 text-xs text-orange-700 dark:text-orange-500"
+          class="rounded-md border border-orange-700 px-2 py-1 text-xs text-orange-700 dark:border-orange-500 dark:text-orange-500"
           >Server Admin</span
         >
         <span
           v-else-if="serverRoleBadge === 'serverMod'"
-          class="rounded-md border border-orange-500 px-2 py-1 text-xs text-orange-700 dark:text-orange-500"
+          class="rounded-md border border-orange-700 px-2 py-1 text-xs text-orange-700 dark:border-orange-500 dark:text-orange-500"
           >Server Mod</span
         >
       </h1>
@@ -131,12 +131,12 @@ const handleReportSuccess = () => {
         {{ user.displayName }}
         <span
           v-if="serverRoleBadge === 'serverAdmin'"
-          class="rounded-md border border-orange-600 px-2 py-1 text-sm text-orange-600 dark:border-orange-500 dark:text-orange-500"
+          class="rounded-md border border-orange-700 px-2 py-1 text-sm text-orange-700 dark:border-orange-500 dark:text-orange-500"
           >Server Admin</span
         >
         <span
           v-else-if="serverRoleBadge === 'serverMod'"
-          class="rounded-md border border-orange-600 px-2 py-1 text-sm text-orange-600 dark:border-orange-500 dark:text-orange-500"
+          class="rounded-md border border-orange-700 px-2 py-1 text-sm text-orange-700 dark:border-orange-500 dark:text-orange-500"
           >Server Mod</span
         >
       </h1>

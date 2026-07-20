@@ -171,6 +171,9 @@ const getLineNumberClass = (kind: SideKind) => {
             class="h-full min-h-[200px] overflow-auto rounded border border-red-300 bg-white dark:border-red-700 dark:bg-gray-800"
           >
             <table class="w-full border-collapse text-xs">
+              <caption class="sr-only">
+                Previous revision, line by line
+              </caption>
               <tbody>
                 <tr
                   v-for="row in renderRows"
@@ -229,6 +232,9 @@ const getLineNumberClass = (kind: SideKind) => {
             class="h-full min-h-[200px] overflow-auto rounded border border-green-300 bg-white dark:border-green-700 dark:bg-gray-800"
           >
             <table class="w-full border-collapse text-xs">
+              <caption class="sr-only">
+                Current revision, line by line
+              </caption>
               <tbody>
                 <tr
                   v-for="row in renderRows"

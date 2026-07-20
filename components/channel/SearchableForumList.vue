@@ -294,14 +294,17 @@ const areAllFavoritesSelected = computed(() =>
       @keydown.enter.prevent
       @update-search-input="updateSearchResult"
     />
-    <div v-if="channelsLoading && regularChannels?.length === 0">
+    <StatusMessage
+      v-if="channelsLoading && regularChannels?.length === 0"
+      busy
+    >
       Loading...
-    </div>
-    <div v-else-if="channelsError">
+    </StatusMessage>
+    <StatusMessage v-else-if="channelsError" assertive>
       <div v-for="(error, i) of channelsError?.graphQLErrors" :key="i">
         {{ error.message }}
       </div>
-    </div>
+    </StatusMessage>
     <template v-else>
       <!-- Favorite Forums Section -->
       <div

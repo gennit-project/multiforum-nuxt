@@ -26,12 +26,13 @@ defineProps({
   <div
     class="flex min-h-[1.25rem] items-center text-xs"
     data-testid="save-status"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
   >
     <span
       v-if="status === 'saving'"
       class="flex items-center text-gray-500 dark:text-gray-400"
-      role="status"
-      aria-live="polite"
     >
       <LoadingSpinner class="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
       Saving…
@@ -39,8 +40,6 @@ defineProps({
     <span
       v-else-if="status === 'saved'"
       class="flex items-center text-green-600 dark:text-green-400"
-      role="status"
-      aria-live="polite"
     >
       <CheckIcon class="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
       Saved

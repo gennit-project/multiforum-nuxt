@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { useId } from 'vue';
+
 defineProps({
   sectionTitle: {
     type: String,
@@ -17,13 +19,19 @@ defineProps({
     default: false,
   },
 });
+
+// The label previously pointed `for` at the section title text (spaces and all),
+// which never matches a real control id. Use a valid generated id instead and
+// expose it to the content slot so callers can bind it to their input for a
+// proper label association.
+const fieldId = useId();
 </script>
 
 <template>
   <div class="mb-2">
     <label
       v-if="sectionTitle"
-      :for="sectionTitle"
+      :for="fieldId"
       :class="dangerous ? 'text-red-400' : 'text-gray-900 dark:text-gray-200'"
       class="block text-sm font-medium leading-6"
     >
@@ -36,7 +44,7 @@ defineProps({
       {{ description }}
     </p>
     <div>
-      <slot name="content" v-bind="$attrs" />
+      <slot name="content" v-bind="$attrs" :field-id="fieldId" />
     </div>
   </div>
 </template>

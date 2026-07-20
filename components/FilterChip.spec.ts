@@ -45,6 +45,26 @@ describe('FilterChip', () => {
     expect(wrapper.emitted('click')).toBeTruthy();
   });
 
+  it('marks the trigger as a popup control', () => {
+    const wrapper = mountChip();
+
+    expect(button(wrapper).attributes('aria-haspopup')).toBe('true');
+  });
+
+  it('starts collapsed', () => {
+    const wrapper = mountChip();
+
+    expect(button(wrapper).attributes('aria-expanded')).toBe('false');
+  });
+
+  it('reflects the expanded state after opening', async () => {
+    const wrapper = mountChip();
+
+    await button(wrapper).trigger('click');
+
+    expect(button(wrapper).attributes('aria-expanded')).toBe('true');
+  });
+
   it('renders the icon slot', () => {
     const wrapper = mountChip({}, { icon: '<span class="icon" />' });
 

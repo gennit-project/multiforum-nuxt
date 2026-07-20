@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, toRef } from 'vue';
+import { ref, toRef, useId } from 'vue';
 import { usePluginPipeline, type PipelineRun } from '@/composables/usePluginPipeline';
 import PluginPipelineStage from './PluginPipelineStage.vue';
 import PluginLogsModal from './PluginLogsModal.vue';
@@ -12,6 +12,7 @@ const props = defineProps<{
 }>();
 
 const isExpanded = ref(true);
+const pipelineContentId = useId();
 const selectedRun = ref<PipelineRun | null>(null);
 const showLogsModal = ref(false);
 
@@ -44,9 +45,13 @@ const handleCloseModal = () => {
     class="rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
   >
     <!-- Header -->
-    <div
+    <component
+      :is="collapsible ? 'button' : 'div'"
+      :type="collapsible ? 'button' : undefined"
+      :aria-expanded="collapsible ? isExpanded : undefined"
+      :aria-controls="collapsible ? pipelineContentId : undefined"
       class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700"
-      :class="{ 'cursor-pointer': collapsible }"
+      :class="{ 'w-full cursor-pointer text-left': collapsible }"
       @click="collapsible && (isExpanded = !isExpanded)"
     >
       <div class="flex items-center space-x-2">
@@ -78,24 +83,24 @@ const handleCloseModal = () => {
         >
           <i class="fa-solid fa-sync fa-spin" />
         </span>
-        <button
+        <span
           v-if="collapsible"
-          type="button"
-          :aria-expanded="isExpanded"
-          :aria-label="isExpanded ? 'Collapse pipeline details' : 'Expand pipeline details'"
+          aria-hidden="true"
           class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
         >
           <i
             :class="isExpanded ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"
             aria-hidden="true"
           />
-        </button>
+        </span>
       </div>
-    </div>
+    </component>
 
     <!-- Loading State -->
     <div
       v-if="loading && !latestPipeline"
+      role="status"
+      aria-busy="true"
       class="p-4 text-center"
     >
       <i class="fa-solid fa-spinner fa-spin mr-2 text-gray-400" />
@@ -107,6 +112,7 @@ const handleCloseModal = () => {
     <!-- Error State -->
     <div
       v-else-if="error"
+      role="alert"
       class="p-4 text-center"
     >
       <i class="fa-solid fa-exclamation-triangle mr-2 text-red-400" />
@@ -118,6 +124,7 @@ const handleCloseModal = () => {
     <!-- Pipeline Content -->
     <div
       v-else-if="latestPipeline && isExpanded"
+      :id="pipelineContentId"
       class="p-4"
     >
       <!-- Pipeline stages -->
