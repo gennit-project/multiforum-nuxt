@@ -155,6 +155,67 @@ describe('GithubContributionChart', () => {
     expect(wrapper.find('.mt-4.p-4.rounded-lg.border').exists()).toBe(true);
   });
 
+  it('gives each day cell a button role', async () => {
+    const wrapper = mount(GithubContributionChart, {
+      props: { contributionData: contributionDataFixture, year: 2023 },
+    });
+
+    await flushPromises();
+
+    expect(wrapper.find('rect').attributes('role')).toBe('button');
+  });
+
+  it('gives each day cell a descriptive accessible name', async () => {
+    const wrapper = mount(GithubContributionChart, {
+      props: { contributionData: contributionDataFixture, year: 2023 },
+    });
+
+    await flushPromises();
+
+    expect(wrapper.find('rect').attributes('aria-label')).toContain(
+      'contributions on'
+    );
+  });
+
+  it('keeps only the focused cell in the tab order (roving tabindex)', async () => {
+    const wrapper = mount(GithubContributionChart, {
+      props: { contributionData: contributionDataFixture, year: 2023 },
+    });
+
+    await flushPromises();
+
+    const tabbable = wrapper
+      .findAll('rect')
+      .filter((r) => r.attributes('tabindex') === '0');
+    expect(tabbable.length).toBe(1);
+  });
+
+  it('selects a day when Enter is pressed on a cell', async () => {
+    const wrapper = mount(GithubContributionChart, {
+      props: { contributionData: contributionDataFixture, year: 2023 },
+    });
+
+    await flushPromises();
+
+    await wrapper.find('rect').trigger('keydown', { key: 'Enter' });
+
+    expect(wrapper.emitted('day-select')).toBeTruthy();
+  });
+
+  it('moves the tab-order cell with ArrowRight', async () => {
+    const wrapper = mount(GithubContributionChart, {
+      props: { contributionData: contributionDataFixture, year: 2023 },
+    });
+
+    await flushPromises();
+
+    await wrapper.find('rect').trigger('keydown', { key: 'ArrowRight' });
+
+    expect(
+      wrapper.find('#contribution-cell-1-0').attributes('tabindex')
+    ).toBe('0');
+  });
+
   // Test color scheme based on contribution count
   it('assigns correct colors based on contribution count', async () => {
     const wrapper = mount(GithubContributionChart, {

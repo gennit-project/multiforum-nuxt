@@ -277,6 +277,64 @@ const selectDay = (weekIndex: number, dayIndex: number) => {
   emit('day-select', dayInfo);
 };
 
+// --- Keyboard navigation (roving tabindex over the day grid) ---
+// Only one cell is in the tab order at a time; arrow keys move focus between
+// cells so the heatmap is fully keyboard-operable without adding hundreds of
+// tab stops.
+const focusedCell = ref<{ week: number; day: number }>({ week: 0, day: 0 });
+
+const cellDomId = (week: number, day: number) =>
+  `contribution-cell-${week}-${day}`;
+
+const isCellFocusable = (week: number, day: number) =>
+  focusedCell.value.week === week && focusedCell.value.day === day;
+
+const focusCell = async (week: number, day: number) => {
+  if (!gridData.value[week] || !gridData.value[week][day]) return;
+  focusedCell.value = { week, day };
+  await nextTick();
+  // Not gated on import.meta.client: keydown only fires client-side, and jsdom
+  // provides document in unit tests.
+  document.getElementById(cellDomId(week, day))?.focus();
+};
+
+const onCellKeydown = (event: KeyboardEvent, week: number, day: number) => {
+  const weekCount = gridData.value.length;
+  switch (event.key) {
+    case 'Enter':
+    case ' ':
+      event.preventDefault();
+      selectDay(week, day);
+      break;
+    case 'ArrowRight':
+      event.preventDefault();
+      focusCell(Math.min(week + 1, weekCount - 1), day);
+      break;
+    case 'ArrowLeft':
+      event.preventDefault();
+      focusCell(Math.max(week - 1, 0), day);
+      break;
+    case 'ArrowDown':
+      event.preventDefault();
+      focusCell(week, Math.min(day + 1, 6));
+      break;
+    case 'ArrowUp':
+      event.preventDefault();
+      focusCell(week, Math.max(day - 1, 0));
+      break;
+    case 'Home':
+      event.preventDefault();
+      focusCell(0, day);
+      break;
+    case 'End':
+      event.preventDefault();
+      focusCell(weekCount - 1, day);
+      break;
+    default:
+      break;
+  }
+};
+
 // Format the date from ISO string or date string
 const formatDate = (dateStr: string) => {
   try {
@@ -447,6 +505,7 @@ const cellCount = computed(() => {
               >
                 <rect
                   v-for="(dayData, dayIndex) in week"
+                  :id="cellDomId(weekIndex, dayIndex)"
                   :key="`day-${weekIndex}-${dayIndex}`"
                   x="0"
                   :y="dayIndex * 14"
@@ -457,7 +516,15 @@ const cellCount = computed(() => {
                   ry="2"
                   :data-date="dayData.date"
                   :data-count="dayData.count"
-                  class="cursor-pointer transition-colors duration-200 hover:stroke-1"
+                  role="button"
+                  :tabindex="isCellFocusable(weekIndex, dayIndex) ? 0 : -1"
+                  :aria-label="`${dayData.count} contributions on ${formatDate(dayData.date)}`"
+                  :aria-pressed="
+                    !!selectedDay &&
+                    selectedDay.week === weekIndex &&
+                    selectedDay.day === dayIndex
+                  "
+                  class="cursor-pointer transition-colors duration-200 focus:outline-none focus-visible:stroke-blue-600 focus-visible:stroke-2 hover:stroke-1"
                   :class="[
                     darkMode
                       ? 'hover:stroke-green-600'
@@ -469,6 +536,8 @@ const cellCount = computed(() => {
                       : '',
                   ]"
                   @click="selectDay(weekIndex, dayIndex)"
+                  @keydown="onCellKeydown($event, weekIndex, dayIndex)"
+                  @focus="focusedCell = { week: weekIndex, day: dayIndex }"
                 >
                   <title>
                     {{ dayData.count }} contributions on
