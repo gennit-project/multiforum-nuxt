@@ -266,6 +266,18 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: 'vercel',
+    // `sanitize-html` (used by composables/useMarkdownRenderer.ts) is CommonJS
+    // and does `require('htmlparser2')`. When Nitro externalizes it, the Vercel
+    // serverless function performs that require at runtime — which crashes with
+    // "require() of ES Module .../htmlparser2/dist/index.js not supported"
+    // whenever the deployed htmlparser2 resolves to its ESM entry (e.g. a stale
+    // copy served by Vercel's build cache). Inlining sanitize-html bundles it
+    // (and htmlparser2) at build time, so there is no runtime require of
+    // htmlparser2 — the server is immune regardless of which htmlparser2 the
+    // dependency install yields.
+    externals: {
+      inline: ['sanitize-html', 'htmlparser2'],
+    },
     ignore: ignoredDevWatchPatterns,
     watchOptions: {
       ignoreInitial: true,
