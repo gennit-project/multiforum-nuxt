@@ -172,7 +172,7 @@ const getLineNumberClass = (kind: SideKind) => {
           >
             <table class="w-full border-collapse text-xs">
               <caption class="sr-only">
-                Previous version, line by line
+                Previous revision, line by line
               </caption>
               <tbody>
                 <tr
@@ -233,7 +233,7 @@ const getLineNumberClass = (kind: SideKind) => {
           >
             <table class="w-full border-collapse text-xs">
               <caption class="sr-only">
-                Current version, line by line
+                Current revision, line by line
               </caption>
               <tbody>
                 <tr
