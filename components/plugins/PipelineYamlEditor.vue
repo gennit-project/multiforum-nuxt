@@ -93,8 +93,17 @@ watch(editorValue, (value) => {
         @ready="handleEditorReady"
       />
       <template #fallback>
-        <div class="h-96 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
-          <span class="text-gray-500">Loading editor...</span>
+        <!--
+          Pre-hydration placeholder. Mirrors the editor's frame and shows the
+          actual YAML so the swap to CodeMirror is near-seamless (bg matches the
+          default light / oneDark themes) instead of flashing a "loading" box.
+        -->
+        <div
+          class="h-96 w-full overflow-auto rounded-md border border-gray-300 bg-white dark:border-gray-600 dark:bg-[#282c34]"
+        >
+          <pre
+            class="m-0 whitespace-pre px-3 py-1 font-mono text-sm leading-normal text-gray-800 dark:text-gray-200"
+          >{{ modelValue }}</pre>
         </div>
       </template>
     </ClientOnly>
