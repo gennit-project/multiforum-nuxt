@@ -99,7 +99,7 @@
     "@graphql-codegen/cli": "7.2.0",
     "@graphql-codegen/client-preset": "^6.1.0",
     "@nuxt/eslint-config": "^1.16.0",
-    "@nuxt/image": "^1.10.0",
+    "@nuxt/image": "^2.0.0",
     "@nuxt/schema": "^4.4.8",
     "@nuxt/types": "^2.18.1",
     "@nuxtjs/apollo": "^5.0.0-alpha.15",
