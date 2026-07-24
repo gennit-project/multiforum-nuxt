@@ -377,8 +377,6 @@ export const GET_DISCUSSION = gql`
         scanStatus
         scanCheckedAt
         scanReason
-        reviewRequestedAt
-        reviewRequestReason
         uploadedByUsername
         license {
           id
@@ -482,8 +480,6 @@ export const GET_DISCUSSION_FEEDBACK = gql`
         scanStatus
         scanCheckedAt
         scanReason
-        reviewRequestedAt
-        reviewRequestReason
         uploadedByUsername
       }
       CrosspostedDiscussion {

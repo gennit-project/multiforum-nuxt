@@ -304,30 +304,6 @@ describe('DownloadSidebar', () => {
     });
   });
 
-  it('shows when human review was already requested', () => {
-    mockUsernameRef.value = 'author';
-    const wrapper = mount(DownloadSidebar, {
-      props: {
-        discussion: makeDiscussion({
-          ...discussionWithFile,
-          DownloadableFiles: [
-            {
-              ...discussionWithFile.DownloadableFiles[0],
-              scanStatus: 'SUSPICIOUS',
-              reviewRequestedAt: '2026-07-19T00:00:00Z',
-            },
-          ],
-        }),
-        discussionId: 'discussion-1',
-        channelUniqueName: 'test-forum',
-      },
-    });
-
-    expect(wrapper.get('[data-testid="download-scan-status"] button').text()).toBe(
-      'Human review requested'
-    );
-  });
-
   it('identifies a failed scan as a server-side problem for the creator', () => {
     mockUsernameRef.value = 'author';
     const wrapper = mount(DownloadSidebar, {

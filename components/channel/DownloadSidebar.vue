@@ -30,8 +30,6 @@ type ScannedDownloadableFile = Omit<
   scanReason?: string | null;
   scanCheckedAt?: string | null;
   uploadedByUsername?: string | null;
-  reviewRequestedAt?: string | null;
-  reviewRequestReason?: string | null;
 };
 
 const props = defineProps({
@@ -104,7 +102,7 @@ const creatorIsViewing = computed(
 );
 
 const reviewRequested = computed(
-  () => reviewRequestedLocally.value || Boolean(primaryFile.value?.reviewRequestedAt)
+  () => reviewRequestedLocally.value
 );
 
 const requestHumanReview = () => {
