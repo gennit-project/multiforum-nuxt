@@ -131,8 +131,6 @@ export const REQUEST_DOWNLOADABLE_FILE_REVIEW = gql`
     ) {
       id
       scanStatus
-      reviewRequestedAt
-      reviewRequestReason
     }
   }
 `;
