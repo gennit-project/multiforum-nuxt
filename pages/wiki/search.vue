@@ -14,6 +14,7 @@ import { getChannelLabel, relativeTime } from '@/utils';
 import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import { GET_SITE_WIDE_WIKI_LIST } from '@/graphQLData/wiki/queries';
 import { formatWordCount } from '@/utils/wikiSearchDisplay';
+import { getPlainWikiTitle } from '@/utils/wikiTitle';
 
 const WIKI_PAGE_LIMIT = 25;
 
@@ -222,7 +223,7 @@ watch(
                   :to="`/forums/${wikiPage.channelUniqueName}/wiki/${wikiPage.slug}`"
                 >
                   <HighlightedSearchTerms
-                    :text="wikiPage.title || undefined"
+                    :text="getPlainWikiTitle(wikiPage.title) || undefined"
                     :search-input="searchInputComputed"
                   />
                 </nuxt-link>
@@ -256,7 +257,7 @@ watch(
                 :to="`/forums/${wikiPage.channelUniqueName}/wiki/${wikiPage.slug}`"
               >
                 <HighlightedSearchTerms
-                  :text="wikiPage.title || undefined"
+                  :text="getPlainWikiTitle(wikiPage.title) || undefined"
                   :search-input="searchInputComputed"
                 />
               </nuxt-link>

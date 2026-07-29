@@ -212,7 +212,6 @@ const selectSearchType = (type: SearchType) => {
     />
     <div
       ref="panelRef"
-      v-click-outside="outside"
       role="dialog"
       aria-modal="true"
       aria-label="Site navigation"
@@ -254,8 +253,12 @@ const selectSearchType = (type: SearchType) => {
             <div class="relative flex-1">
               <button
                 type="button"
+                aria-haspopup="listbox"
+                :aria-expanded="showSearchTypeDropdown"
                 class="hover:bg-gray-50 flex h-8 w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 text-xs text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-                @click="showSearchTypeDropdown = !showSearchTypeDropdown"
+                @click.stop="
+                  showSearchTypeDropdown = !showSearchTypeDropdown
+                "
               >
                 <span>{{ selectedSearchTypeLabel }}</span>
                 <ChevronDownIcon
@@ -265,12 +268,17 @@ const selectSearchType = (type: SearchType) => {
               </button>
               <div
                 v-if="showSearchTypeDropdown"
+                role="listbox"
+                aria-label="Search type"
                 class="absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800"
+                @click.stop
               >
                 <button
                   v-for="option in searchTypeOptions"
                   :key="option.value"
                   type="button"
+                  role="option"
+                  :aria-selected="selectedSearchType === option.value"
                   class="flex w-full items-center justify-between px-3 py-2 text-left text-xs hover:bg-gray-100 dark:hover:bg-gray-700"
                   :class="[
                     selectedSearchType === option.value

@@ -103,7 +103,13 @@ describe('ChannelSidebar content', () => {
   it('renders pinned wiki page links', () => {
     const wrapper = mountSidebar({
       channel: channel({
-        PinnedWikiPages: [{ id: 'wiki-1', title: 'Install Guide', slug: 'install' }],
+        PinnedWikiPages: [
+          {
+            id: 'wiki-1',
+            title: '**Install** [Guide](https://example.com)',
+            slug: 'install',
+          },
+        ],
       }),
     });
 

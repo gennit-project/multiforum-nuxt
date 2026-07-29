@@ -16,6 +16,7 @@ import RobotIcon from '@/components/icons/RobotIcon.vue';
 import TagIcon from '@/components/icons/TagIcon.vue';
 import ThumbtackIcon from '@/components/icons/ThumbtackIcon.vue';
 import { useIsAuthenticated } from '@/composables/useAuthState';
+import { getPlainWikiTitle } from '@/utils/wikiTitle';
 
 const isAuthenticatedVar = useIsAuthenticated();
 
@@ -193,7 +194,7 @@ const handleBecomeAdminSuccess = () => {
                 }"
                 class="rounded-md px-2 py-1 text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-white"
               >
-                {{ page.title }}
+                {{ getPlainWikiTitle(page.title) }}
               </nuxt-link>
             </div>
           </div>

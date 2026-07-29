@@ -12,6 +12,7 @@ const h = vi.hoisted(() => ({
   serverConfig: null as unknown,
   mdAndUp: null as unknown,
   route: null as unknown,
+  closePopper: vi.fn(),
 }));
 
 vi.mock('@/composables/useAuthState', () => ({
@@ -44,7 +45,11 @@ const mountTabs = (props: Record<string, unknown> = {}) =>
     global: {
       stubs: {
         ClientOnly: { template: '<div><slot /></div>' },
-        Popper: { template: '<div><slot /><slot name="content" /></div>' },
+        Popper: {
+          setup: () => ({ close: h.closePopper }),
+          template:
+            '<div><slot /><slot name="content" :close="close" /></div>',
+        },
         TabButton: {
           name: 'TabButton',
           props: ['label', 'isActive', 'count', 'to', 'showCount', 'vertical'],
@@ -74,6 +79,7 @@ beforeEach(() => {
     params: { forumId: 'cats' },
     path: '/forums/cats/discussions',
   });
+  h.closePopper.mockReset();
 });
 
 describe('ChannelTabs base tabs', () => {
@@ -196,5 +202,14 @@ describe('ChannelTabs mobile layout', () => {
     const wrapper = mountTabs();
 
     expect(wrapper.text()).toContain('Discussions');
+  });
+
+  it('closes the mobile dropdown when a channel tab is clicked', async () => {
+    (h.mdAndUp as { value: boolean }).value = false;
+    const wrapper = mountTabs();
+
+    await wrapper.get('[data-testid="mobile-dropdown-about"]').trigger('click');
+
+    expect(h.closePopper).toHaveBeenCalledOnce();
   });
 });

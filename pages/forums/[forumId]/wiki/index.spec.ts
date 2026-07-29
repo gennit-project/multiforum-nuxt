@@ -85,4 +85,50 @@ describe('wiki home page', () => {
     expect(buttons.length).toBeGreaterThan(0);
     expect(buttons.every((b) => b.props('disabled') === true)).toBe(true);
   });
+
+  it('gives the mobile wiki title its own wrapping row', async () => {
+    const wrapper = await mountWith({
+      wikiEnabled: true,
+      WikiHomePage: { title: 'A very long wiki title', body: 'Welcome' },
+    });
+
+    expect(
+      wrapper.get('[data-testid="wiki-page-title"]').classes()
+    ).toEqual(expect.arrayContaining(['min-w-0', 'break-words']));
+  });
+
+  it('places the mobile font-size picker after the wiki body', async () => {
+    const wrapper = await mountWith({
+      wikiEnabled: true,
+      WikiHomePage: { title: 'Home', body: 'Welcome' },
+    });
+    const markdown = wrapper.findComponent(MarkdownRenderer).element;
+    const fontSize = wrapper.get(
+      '[data-testid="mobile-wiki-font-size"]'
+    ).element;
+
+    expect(
+      markdown.compareDocumentPosition(fontSize) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+  });
+
+  it('removes markdown formatting from child-page list titles', async () => {
+    const wrapper = await mountWith({
+      wikiEnabled: true,
+      WikiHomePage: {
+        title: 'Home',
+        body: 'Welcome',
+        ChildPages: [
+          {
+            id: 'child',
+            title: '**Child** [Guide](https://example.com)',
+            slug: 'child',
+          },
+        ],
+      },
+    });
+
+    expect(wrapper.text()).toContain('Child Guide');
+  });
 });
