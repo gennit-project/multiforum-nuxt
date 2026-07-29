@@ -125,4 +125,42 @@ describe('DiscussionHeader', () => {
 
     expect(wrapper.text().includes('Server Admin')).toBe(false);
   });
+
+  it('keeps the avatar and author details in one non-wrapping row', () => {
+    const wrapper = buildWrapper();
+    const classes = wrapper
+      .get('[data-testid="discussion-author-row"]')
+      .classes();
+
+    expect({
+      isFlexRow: classes.includes('flex'),
+      alignsAtTop: classes.includes('items-start'),
+      allowsOuterWrapping: classes.includes('flex-wrap'),
+    }).toEqual({
+      isFlexRow: true,
+      alignsAtTop: true,
+      allowsOuterWrapping: false,
+    });
+  });
+
+  it('allows the author identity and badges to wrap within the details column', () => {
+    const wrapper = buildWrapper();
+
+    expect(
+      wrapper
+        .get('[data-testid="discussion-author-details"] a > span')
+        .classes()
+    ).toContain('flex-wrap');
+  });
+
+  it('keeps timestamps inside the author details column', () => {
+    const wrapper = buildWrapper();
+
+    expect(
+      wrapper
+        .get('[data-testid="discussion-author-details"]')
+        .find('[data-testid="discussion-author-meta"]')
+        .exists()
+    ).toBe(true);
+  });
 });
