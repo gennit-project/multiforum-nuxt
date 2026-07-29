@@ -1,17 +1,13 @@
 <script setup lang="ts">
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import type { PluginConfigFieldStatus } from '@/composables/usePluginConfigStatus';
 
 defineProps<{
   isEnabled: boolean;
   installedVersion?: string | null;
   canEnable: boolean;
   enabling: boolean;
-  blockingConfigFields?: Array<{
-    key: string;
-    label: string;
-    kind: 'SETTING' | 'SECRET';
-    message?: string | null;
-  }>;
+  blockingConfigFields?: PluginConfigFieldStatus[];
 }>();
 
 const emit = defineEmits<{

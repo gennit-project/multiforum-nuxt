@@ -14,6 +14,7 @@ import PluginSecretsSection from '@/components/admin/plugins/PluginSecretsSectio
 import PluginSettingsSection from '@/components/admin/plugins/PluginSettingsSection.vue';
 import PluginManifestSection from '@/components/admin/plugins/PluginManifestSection.vue';
 import PluginReadmeSection from '@/components/admin/plugins/PluginReadmeSection.vue';
+import { usePluginConfigStatus } from '@/composables/usePluginConfigStatus';
 import { useToast } from '@/composables/useToast';
 import { resolveDefaultVersion } from '@/utils/versionUtils';
 import {
@@ -50,7 +51,6 @@ import {
   GET_AVAILABLE_PLUGINS,
   GET_INSTALLED_PLUGINS,
   GET_SERVER_PLUGIN_SECRETS,
-  GET_PLUGIN_CONFIG_STATUS,
   GET_PLUGIN_DETAIL,
 } from '@/graphQLData/admin/queries';
 import {
@@ -91,17 +91,6 @@ interface PluginSecretStatus {
   required?: boolean;
   lastValidatedAt?: string;
   validationError?: string;
-}
-
-interface PluginConfigFieldStatus {
-  key: string;
-  label: string;
-  scope: string;
-  kind: 'SETTING' | 'SECRET';
-  required: boolean;
-  isSet: boolean;
-  isValid: boolean;
-  message?: string | null;
 }
 
 interface PluginMetadata {
@@ -271,33 +260,15 @@ const isInstalled = computed(() => !!installedPlugin.value);
 const isEnabled = computed(() => installedPlugin.value?.enabled ?? false);
 const installedVersion = computed(() => installedPlugin.value?.version);
 
-const configStatusQueryVars = computed(() => ({
-  pluginId: pluginSlug.value,
-  version: installedVersion.value || '',
+const {
+  isFullyConfigured: hasCompleteConfig,
+  blockingFields: blockingConfigFields,
+  refetch: refetchConfigStatus,
+} = usePluginConfigStatus({
+  pluginId: pluginSlug,
+  version: installedVersion,
   scope: 'server',
-}));
-
-const { result: configStatusResult, refetch: refetchConfigStatus } = useQuery(
-  GET_PLUGIN_CONFIG_STATUS,
-  configStatusQueryVars,
-  {
-    enabled: computed(
-      () => !!pluginSlug.value && !!installedVersion.value
-    ),
-    fetchPolicy: 'cache-and-network',
-  }
-);
-
-const configStatus = computed(() =>
-  configStatusResult.value?.getPluginConfigStatus || null
-);
-
-const blockingConfigFields = computed((): PluginConfigFieldStatus[] =>
-  (configStatus.value?.fields || []).filter(
-    (field: PluginConfigFieldStatus) =>
-      field.required && (!field.isSet || !field.isValid)
-  )
-);
+});
 
 // Only show full-page loading on initial load, not during refetches
 // Check if we're loading AND don't have any data yet
@@ -402,7 +373,7 @@ const pluginApiVersion = computed(
 );
 
 const canEnable = computed(() => {
-  return isInstalled.value && configStatus.value?.isFullyConfigured === true;
+  return isInstalled.value && hasCompleteConfig.value;
 });
 
 const availableVersions = computed(() =>
