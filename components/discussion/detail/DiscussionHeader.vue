@@ -206,7 +206,9 @@ const { result: getPermissionResult } = useQuery(
   }
 );
 
-const channelData = computed(() => getChannelResult.value?.channels?.[0] ?? null);
+const channelData = computed(
+  () => getChannelResult.value?.channels?.[0] ?? null
+);
 const serverConfig = computed(
   () => getServerResult.value?.serverConfigs?.[0] ?? null
 );
@@ -373,66 +375,78 @@ const warningModalBody = computed(() => {
   <div>
     <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:justify-between">
       <div
-        class="flex flex-wrap items-center space-x-2 text-xs dark:text-white"
+        data-testid="discussion-author-row"
+        class="flex min-w-0 items-start gap-2 text-xs dark:text-white"
       >
-        <AvatarComponent
-          :text="discussion?.Author?.username ?? '[Deleted]'"
-          :src="discussion?.Author?.profilePicURL ?? ''"
-          :is-small="true"
-        />
-        <nuxt-link
-          v-if="discussion?.Author"
-          class="cursor-pointer font-bold text-black hover:underline dark:text-white"
-          :to="{
-            name: 'u-username',
-            params: { username: discussion.Author.username },
-          }"
-        >
-          <span class="flex flex-row items-center gap-1">
-            <span v-if="!discussion.Author.displayName" class="font-bold">{{
-              discussion.Author.username
-            }}</span>
-            <span v-else class="font-bold">{{
-              discussion.Author.displayName
-            }}</span>
-            <span
-              v-if="discussion.Author.displayName"
-              class="text-gray-500 dark:text-gray-300"
-              >{{ `(u/${discussion.Author.username})` }}</span
-            >
-
-            <span
-              v-if="authorBadges.isServerAdmin"
-              class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
-              >Server Admin</span
-            >
-            <span
-              v-if="authorBadges.isServerMod"
-              class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
-              >Server Mod</span
-            >
-            <span
-              v-if="authorBadges.isForumAdmin"
-              class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
-              >Forum Admin</span
-            >
-            <span
-              v-if="authorBadges.isForumMod"
-              class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
-              >Forum Mod</span
-            >
-          </span>
-        </nuxt-link>
-        <span v-else>[Deleted]</span>
-        <div>{{ createdAt }}</div>
-        <span v-if="discussion?.updatedAt" class="mx-2">&#8226;</span>
-        <div class="flex items-center">
-          <span>{{ editedAt }}</span>
-          <EditsDropdown
-            v-if="discussion && (discussion.PastBodyVersions?.length ?? 0) > 0"
-            class="ml-2"
-            :discussion="discussion"
+        <div data-testid="discussion-author-avatar" class="shrink-0">
+          <AvatarComponent
+            :text="discussion?.Author?.username ?? '[Deleted]'"
+            :src="discussion?.Author?.profilePicURL ?? ''"
+            :is-small="true"
           />
+        </div>
+        <div data-testid="discussion-author-details" class="min-w-0">
+          <nuxt-link
+            v-if="discussion?.Author"
+            class="cursor-pointer font-bold text-black hover:underline dark:text-white"
+            :to="{
+              name: 'u-username',
+              params: { username: discussion.Author.username },
+            }"
+          >
+            <span class="flex flex-wrap items-center gap-1">
+              <span v-if="!discussion.Author.displayName" class="font-bold">{{
+                discussion.Author.username
+              }}</span>
+              <span v-else class="font-bold">{{
+                discussion.Author.displayName
+              }}</span>
+              <span
+                v-if="discussion.Author.displayName"
+                class="text-gray-500 dark:text-gray-300"
+                >{{ `(u/${discussion.Author.username})` }}</span
+              >
+
+              <span
+                v-if="authorBadges.isServerAdmin"
+                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Server Admin</span
+              >
+              <span
+                v-if="authorBadges.isServerMod"
+                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Server Mod</span
+              >
+              <span
+                v-if="authorBadges.isForumAdmin"
+                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Forum Admin</span
+              >
+              <span
+                v-if="authorBadges.isForumMod"
+                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Forum Mod</span
+              >
+            </span>
+          </nuxt-link>
+          <span v-else>[Deleted]</span>
+          <div
+            data-testid="discussion-author-meta"
+            class="mt-0.5 flex flex-wrap items-center gap-x-2"
+          >
+            <div>{{ createdAt }}</div>
+            <span v-if="discussion?.updatedAt">&#8226;</span>
+            <div class="flex items-center">
+              <span>{{ editedAt }}</span>
+              <EditsDropdown
+                v-if="
+                  discussion && (discussion.PastBodyVersions?.length ?? 0) > 0
+                "
+                class="ml-2"
+                :discussion="discussion"
+              />
+            </div>
+          </div>
         </div>
       </div>
       <div class="flex items-center gap-2">
