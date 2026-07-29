@@ -87,13 +87,20 @@ onUnmounted(() => {
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
 };
+
+const closeDropdown = () => {
+  isDropdownOpen.value = false;
+};
 </script>
 
 <template>
   <div v-if="filteredHeadings.length > 0">
     <!-- Mobile Dropdown -->
-    <div v-if="isMobile" class="relative">
+    <div v-if="isMobile" v-click-outside="closeDropdown" class="relative">
       <button
+        type="button"
+        aria-haspopup="menu"
+        :aria-expanded="isDropdownOpen"
         :class="[
           'hover:bg-gray-50 flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700',
         ]"
@@ -105,6 +112,7 @@ const toggleDropdown = () => {
             'h-4 w-4 transition-transform duration-200',
             { 'rotate-180': isDropdownOpen },
           ]"
+          aria-hidden="true"
         />
       </button>
 

@@ -19,7 +19,33 @@ vi.mock('@/composables/useMarkdownHeadings', () => ({
 const mountToc = (props: Record<string, unknown> = {}) =>
   mount(OnThisPage, {
     props: { markdownContent: '# hi', ...props },
-    global: { stubs: { ChevronDownIcon: true } },
+    global: {
+      directives: {
+        'click-outside': {
+          beforeMount(
+            el: HTMLElement & {
+              clickOutsideEvent?: (event: Event) => void;
+            },
+            binding: { value: (event: Event) => void }
+          ) {
+            el.clickOutsideEvent = (event: Event) => {
+              if (!el.contains(event.target as Node)) binding.value(event);
+            };
+            document.addEventListener('click', el.clickOutsideEvent);
+          },
+          unmounted(
+            el: HTMLElement & {
+              clickOutsideEvent?: (event: Event) => void;
+            }
+          ) {
+            if (el.clickOutsideEvent) {
+              document.removeEventListener('click', el.clickOutsideEvent);
+            }
+          },
+        },
+      },
+      stubs: { ChevronDownIcon: true },
+    },
   });
 
 beforeEach(() => {
@@ -127,6 +153,16 @@ describe('OnThisPage mobile', () => {
     await wrapper.get('button').trigger('click');
 
     await wrapper.findAll('nav button')[0].trigger('click');
+
+    expect(wrapper.find('nav').exists()).toBe(false);
+  });
+
+  it('closes the dropdown after clicking outside', async () => {
+    const wrapper = mountToc({ isMobile: true });
+    await wrapper.get('button').trigger('click');
+
+    document.body.click();
+    await wrapper.vm.$nextTick();
 
     expect(wrapper.find('nav').exists()).toBe(false);
   });

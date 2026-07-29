@@ -324,7 +324,7 @@ const tabs = computed((): Tab[] => {
             </button>
           </template>
 
-          <template #content>
+          <template #content="{ close }">
             <div
               class="mt-1 w-56 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-600"
             >
@@ -341,6 +341,7 @@ const tabs = computed((): Tab[] => {
                       ? 'bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-300'
                       : 'text-gray-700 dark:text-gray-200',
                   ]"
+                  @click="close"
                 >
                   <div class="flex items-center space-x-2">
                     <component :is="tab.icon" class="h-5 w-5 shrink-0" />

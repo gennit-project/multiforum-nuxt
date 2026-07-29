@@ -9,6 +9,7 @@ import {
   GET_SITE_WIDE_WIKI_LIST,
   GET_WIKI_PAGES_BY_IDS,
 } from '@/graphQLData/wiki/queries';
+import { getPlainWikiTitle } from '@/utils/wikiTitle';
 
 type WikiPageOption = {
   id: string;
@@ -137,7 +138,7 @@ const movePage = (pageId: string, direction: -1 | 1) => {
               type="search"
               class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
               placeholder="Search by title or body"
-            />
+            >
           </div>
 
           <div v-if="selectedPages.length" class="space-y-2">
@@ -152,7 +153,8 @@ const movePage = (pageId: string, direction: -1 | 1) => {
               >
                 <div>
                   <div class="font-medium text-gray-900 dark:text-gray-100">
-                    {{ index + 1 }}. {{ page.title || page.id }}
+                    {{ index + 1 }}.
+                    {{ getPlainWikiTitle(page.title, page.id) }}
                   </div>
                   <div class="text-xs text-gray-500 dark:text-gray-400">
                     {{ page.channelUniqueName }}/{{ page.slug }}
@@ -209,7 +211,7 @@ const movePage = (pageId: string, direction: -1 | 1) => {
               >
                 <div>
                   <div class="font-medium text-gray-900 dark:text-gray-100">
-                    {{ page.title || page.id }}
+                    {{ getPlainWikiTitle(page.title, page.id) }}
                   </div>
                   <div class="text-xs text-gray-500 dark:text-gray-400">
                     {{ page.channelUniqueName }}/{{ page.slug }}

@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
+import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({ query: {}, params: {} }),
@@ -65,5 +66,21 @@ describe('wiki search page', () => {
     const page = { id: 'w1', title: 'Cats', slug: 'cats', channelUniqueName: 'cats', body: 'hi' };
     const wrapper = await mountWith([page], [page]);
     expect(wrapper.findAll('[data-testid="wiki-search-results"] > li')).toHaveLength(0);
+  });
+
+  it('passes plain-text wiki titles to search result highlighting', async () => {
+    const wrapper = await mountWith([
+      {
+        id: 'w1',
+        title: '**Cat** [Care](https://example.com)',
+        slug: 'cats',
+        channelUniqueName: 'cats',
+        body: 'hi',
+      },
+    ]);
+
+    expect(
+      wrapper.findComponent(HighlightedSearchTerms).props('text')
+    ).toBe('Cat Care');
   });
 });

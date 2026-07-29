@@ -149,11 +149,16 @@ onGetWikiPageResult((result) => {
           }}</span>
         </nav>
 
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h1 class="text-2xl font-bold dark:text-white">
+        <div class="sm:flex sm:items-start sm:justify-between sm:gap-4">
+          <h1
+            data-testid="wiki-page-title"
+            class="min-w-0 break-words text-2xl font-bold [overflow-wrap:anywhere] dark:text-white"
+          >
             {{ wikiPage.title }}
           </h1>
-          <div class="flex flex-wrap items-center gap-2">
+          <div
+            class="mt-3 flex w-full flex-wrap items-center gap-2 sm:mt-0 sm:w-auto sm:shrink-0"
+          >
             <WikiPagePinButton
               v-if="channel"
               :channel="channel"
@@ -180,7 +185,7 @@ onGetWikiPageResult((result) => {
           </div>
         </div>
         <div
-          class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400"
+          class="mt-1 flex flex-wrap items-center text-sm text-gray-500 dark:text-gray-400"
         >
           <span>
             Last updated by {{ wikiPage.VersionAuthor?.username || 'Unknown' }}
@@ -228,16 +233,11 @@ onGetWikiPageResult((result) => {
         <OnThisPage :markdown-content="wikiPage.body" :is-mobile="true" />
       </div>
 
-      <!-- Mobile font size control -->
-      <div class="mb-4 block xl:hidden">
-        <FontSizeControl />
-      </div>
-
       <div class="flex flex-col gap-6 xl:flex-row">
         <!-- Main content - first on mobile/tablet, middle on desktop -->
         <div class="min-w-0 flex-1 xl:order-2">
           <div class="flex w-full justify-center">
-            <div>
+            <div class="min-w-0 w-full max-w-[70ch]">
               <MarkdownRenderer :text="wikiPage.body" :font-size="fontSize" />
             </div>
           </div>
@@ -254,6 +254,13 @@ onGetWikiPageResult((result) => {
               <PencilIcon class="mr-2 h-4 w-4" />
               Edit this page
             </button>
+          </div>
+
+          <div
+            data-testid="mobile-wiki-font-size"
+            class="mt-8 border-t border-gray-200 pt-6 dark:border-gray-700 xl:hidden"
+          >
+            <FontSizeControl />
           </div>
         </div>
 

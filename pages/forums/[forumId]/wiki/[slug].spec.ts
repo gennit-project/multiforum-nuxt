@@ -77,4 +77,41 @@ describe('wiki page', () => {
         .some((button) => button.props('label') === 'Edit Page')
     ).toBe(false);
   });
+
+  it('gives the mobile wiki title its own wrapping row', async () => {
+    const wrapper = await mountWith({
+      title: 'A very long wiki page title',
+      body: 'Body',
+    });
+
+    expect(
+      wrapper.get('[data-testid="wiki-page-title"]').classes()
+    ).toEqual(expect.arrayContaining(['min-w-0', 'break-words']));
+  });
+
+  it('keeps the wiki body in a shrinkable full-width container', async () => {
+    const wrapper = await mountWith({ title: 'Intro', body: 'Body' });
+    const container =
+      wrapper.findComponent(MarkdownRenderer).element.parentElement;
+
+    expect(
+      {
+        minWidth: container?.classList.contains('min-w-0'),
+        fullWidth: container?.classList.contains('w-full'),
+      }
+    ).toEqual({ minWidth: true, fullWidth: true });
+  });
+
+  it('places the mobile font-size picker after the wiki body', async () => {
+    const wrapper = await mountWith({ title: 'Intro', body: 'Body' });
+    const markdown = wrapper.findComponent(MarkdownRenderer).element;
+    const fontSize = wrapper.get(
+      '[data-testid="mobile-wiki-font-size"]'
+    ).element;
+
+    expect(
+      markdown.compareDocumentPosition(fontSize) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+  });
 });

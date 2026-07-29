@@ -146,6 +146,31 @@ describe('SiteSidenav search', () => {
       expect.objectContaining({ path: '/comments/search' })
     );
   });
+
+  it('keeps the site drawer open while selecting the Forums search type', async () => {
+    const wrapper = mountNav();
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Discussions')!
+      .trigger('click');
+
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Forums')!
+      .trigger('click');
+
+    expect({
+      selectedType: wrapper
+        .findAll('button')
+        .some((button) => button.text() === 'Forums'),
+      closed: wrapper.emitted('close'),
+      drawerVisible: wrapper.find('[role="dialog"]').exists(),
+    }).toEqual({
+      selectedType: true,
+      closed: undefined,
+      drawerVisible: true,
+    });
+  });
 });
 
 describe('SiteSidenav auth links', () => {

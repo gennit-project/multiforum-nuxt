@@ -19,6 +19,7 @@ import { storeToRefs } from 'pinia';
 import { timeAgo } from '@/utils';
 import { useUsername } from '@/composables/useAuthState';
 import { buildWikiHomeHead } from '@/utils/wikiSeo';
+import { getPlainWikiTitle } from '@/utils/wikiTitle';
 
 const usernameVar = useUsername();
 
@@ -175,11 +176,16 @@ onGetChannelResult((result) => {
     <div v-else class="mx-auto max-w-full p-4">
       <!-- Wiki Home Page Content -->
       <div class="mb-4">
-        <div class="flex items-center justify-between">
-          <h1 class="text-2xl font-bold dark:text-white">
+        <div class="sm:flex sm:items-start sm:justify-between sm:gap-4">
+          <h1
+            data-testid="wiki-page-title"
+            class="min-w-0 break-words text-2xl font-bold [overflow-wrap:anywhere] dark:text-white"
+          >
             {{ wikiHomePage.title }}
           </h1>
-          <div class="flex space-x-3">
+          <div
+            class="mt-3 flex w-full flex-wrap gap-3 sm:mt-0 sm:w-auto sm:shrink-0"
+          >
             <RequireAuth>
               <template #has-auth>
                 <GenericButton
@@ -224,7 +230,7 @@ onGetChannelResult((result) => {
           :suspended-indefinitely="suspendedIndefinitely"
         />
         <div
-          class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400"
+          class="mt-1 flex flex-wrap items-center text-sm text-gray-500 dark:text-gray-400"
         >
           <span>
             Last updated by
@@ -258,11 +264,6 @@ onGetChannelResult((result) => {
         <OnThisPage :markdown-content="wikiHomePage.body" :is-mobile="true" />
       </div>
 
-      <!-- Mobile font size control -->
-      <div class="mb-4 block xl:hidden">
-        <FontSizeControl />
-      </div>
-
       <div class="flex flex-col gap-6 xl:flex-row">
         <!-- Main content - first on mobile/tablet, middle on desktop -->
         <div class="min-w-0 flex-1 xl:order-2">
@@ -282,6 +283,13 @@ onGetChannelResult((result) => {
               <PencilIcon class="mr-2 h-4 w-4" />
               Edit this page
             </button>
+          </div>
+
+          <div
+            data-testid="mobile-wiki-font-size"
+            class="mt-8 border-t border-gray-200 pt-6 dark:border-gray-700 xl:hidden"
+          >
+            <FontSizeControl />
           </div>
         </div>
 
@@ -328,7 +336,7 @@ onGetChannelResult((result) => {
                       router.push(`/forums/${forumId}/wiki/${childPage.slug}`)
                     "
                   >
-                    {{ childPage.title }}
+                    {{ getPlainWikiTitle(childPage.title) }}
                   </a>
                   <p class="ml-1 text-xs text-gray-500 dark:text-gray-400">
                     Updated
@@ -369,7 +377,7 @@ onGetChannelResult((result) => {
                   router.push(`/forums/${forumId}/wiki/${childPage.slug}`)
                 "
               >
-                {{ childPage.title }}
+                {{ getPlainWikiTitle(childPage.title) }}
               </a>
               <p class="ml-3 text-xs text-gray-500 dark:text-gray-400">
                 Updated
