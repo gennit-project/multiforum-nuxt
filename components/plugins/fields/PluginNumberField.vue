@@ -6,6 +6,7 @@ const props = defineProps<{
   field: PluginField;
   modelValue: number | undefined;
   error?: string;
+  inputId?: string;
 }>();
 
 const emit = defineEmits<{
@@ -13,6 +14,7 @@ const emit = defineEmits<{
 }>();
 
 const touched = ref(false);
+const controlId = computed(() => props.inputId || props.field.key);
 
 const inputValue = computed({
   get: () => props.modelValue ?? (props.field.default as number),
@@ -80,12 +82,25 @@ const validationError = computed(() => {
   }
   return '';
 });
+
+const descriptionId = computed(() => `${controlId.value}-description`);
+const hintId = computed(() => `${controlId.value}-hint`);
+const errorId = computed(() => `${controlId.value}-error`);
+const describedBy = computed(() => {
+  const ids = [];
+  if (props.field.description) ids.push(descriptionId.value);
+  if (rangeHint.value && !props.error && !validationError.value) {
+    ids.push(hintId.value);
+  }
+  if (props.error || validationError.value) ids.push(errorId.value);
+  return ids.join(' ') || undefined;
+});
 </script>
 
 <template>
   <div class="space-y-1">
     <label
-      :for="field.key"
+      :for="controlId"
       class="block text-sm font-medium text-gray-700 dark:text-gray-300"
     >
       {{ field.label }}
@@ -96,27 +111,32 @@ const validationError = computed(() => {
     </label>
     <p
       v-if="field.description"
+      :id="descriptionId"
       class="text-xs text-gray-500 dark:text-gray-400"
     >
       {{ field.description }}
     </p>
     <input
-      :id="field.key"
+      :id="controlId"
       v-model.number="inputValue"
       type="number"
       :placeholder="field.placeholder"
       v-bind="validationAttrs"
+      :aria-describedby="describedBy"
+      :aria-invalid="!!(error || validationError)"
       class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
       :class="{ 'border-red-500': error || validationError }"
     >
     <p
       v-if="rangeHint && !error && !validationError"
+      :id="hintId"
       class="text-xs text-gray-500 dark:text-gray-400"
     >
       {{ rangeHint }}
     </p>
     <p
       v-if="error || validationError"
+      :id="errorId"
       class="text-xs text-red-600 dark:text-red-400"
     >
       {{ error || validationError }}

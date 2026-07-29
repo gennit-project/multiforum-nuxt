@@ -6,6 +6,7 @@ const props = defineProps<{
   field: PluginField;
   modelValue: boolean | undefined;
   error?: string;
+  inputId?: string;
 }>();
 
 const emit = defineEmits<{
@@ -13,6 +14,7 @@ const emit = defineEmits<{
 }>();
 
 const touched = ref(false);
+const controlId = computed(() => props.inputId || props.field.key);
 
 const inputValue = computed({
   get: () => props.modelValue ?? (props.field.default as boolean) ?? false,
@@ -28,6 +30,15 @@ const validationError = computed(() => {
   return '';
 });
 
+const descriptionId = computed(() => `${controlId.value}-description`);
+const errorId = computed(() => `${controlId.value}-error`);
+const describedBy = computed(() => {
+  const ids = [];
+  if (props.field.description) ids.push(descriptionId.value);
+  if (props.error || validationError.value) ids.push(errorId.value);
+  return ids.join(' ') || undefined;
+});
+
 const toggleValue = () => {
   if (!touched.value) {
     touched.value = true;
@@ -40,11 +51,13 @@ const toggleValue = () => {
   <div class="space-y-1">
     <div class="flex items-center gap-3">
       <button
-        :id="field.key"
+        :id="controlId"
         type="button"
         role="switch"
         :aria-checked="inputValue"
         :aria-label="field.label"
+        :aria-describedby="describedBy"
+        :aria-invalid="!!(error || validationError)"
         class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
         :class="inputValue ? 'bg-orange-500' : 'bg-gray-200 dark:bg-gray-600'"
         @click="toggleValue"
@@ -55,7 +68,7 @@ const toggleValue = () => {
         />
       </button>
       <label
-        :for="field.key"
+        :for="controlId"
         class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer"
         @click="toggleValue"
       >
@@ -68,12 +81,14 @@ const toggleValue = () => {
     </div>
     <p
       v-if="field.description"
+      :id="descriptionId"
       class="text-xs text-gray-500 dark:text-gray-400 ml-14"
     >
       {{ field.description }}
     </p>
     <p
       v-if="error || validationError"
+      :id="errorId"
       class="text-xs text-red-600 dark:text-red-400 ml-14"
     >
       {{ error || validationError }}

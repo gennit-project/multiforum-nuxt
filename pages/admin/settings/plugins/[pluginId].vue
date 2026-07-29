@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, nextTick, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
@@ -14,9 +14,13 @@ import PluginSecretsSection from '@/components/admin/plugins/PluginSecretsSectio
 import PluginSettingsSection from '@/components/admin/plugins/PluginSettingsSection.vue';
 import PluginManifestSection from '@/components/admin/plugins/PluginManifestSection.vue';
 import PluginReadmeSection from '@/components/admin/plugins/PluginReadmeSection.vue';
-import { usePluginConfigStatus } from '@/composables/usePluginConfigStatus';
+import {
+  usePluginConfigStatus,
+  type PluginConfigFieldStatus,
+} from '@/composables/usePluginConfigStatus';
 import { useToast } from '@/composables/useToast';
 import { resolveDefaultVersion } from '@/utils/versionUtils';
+import { getPluginConfigFieldId } from '@/utils/pluginConfigFieldIds';
 import {
   extractSecretKeys,
   filterOutSecrets,
@@ -625,6 +629,17 @@ const handleSetSecret = async (key: string, value: string) => {
   }
 };
 
+const handleFocusConfigField = async (field: PluginConfigFieldStatus) => {
+  await nextTick();
+  const control = document.getElementById(
+    getPluginConfigFieldId({ kind: field.kind, key: field.key })
+  );
+  if (!control) return;
+
+  control.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  control.focus({ preventScroll: true });
+};
+
 const handleSaveSettings = async () => {
   if (!installedPlugin.value) return;
   if (!pluginSlug.value) return;
@@ -747,6 +762,7 @@ const handleSaveSettings = async () => {
             :blocking-config-fields="blockingConfigFields"
             :enabling="enabling"
             @toggle-enabled="handleToggleEnabled"
+            @focus-config-field="handleFocusConfigField"
           />
 
           <!-- Update Available Banner -->

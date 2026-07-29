@@ -5,7 +5,7 @@ import PluginSettingsForm from '@/components/plugins/PluginSettingsForm.vue';
 
 const fieldStub = (name: string) => ({
   name,
-  props: ['field', 'modelValue', 'error', 'secretStatus'],
+  props: ['field', 'modelValue', 'error', 'secretStatus', 'inputId'],
   emits: ['update:model-value'],
   template: `<div class="${name}" />`,
 });
@@ -105,5 +105,35 @@ describe('PluginSettingsForm values', () => {
     expect(
       wrapper.getComponent({ name: 'PluginSecretField' }).props('secretStatus')
     ).toEqual({ key: 'apiKey', status: 'SET' });
+  });
+
+  it('passes a DOM-safe canonical ID for an unusual setting key', () => {
+    const wrapper = mountForm({
+      sections: [section([{ key: 'api/key 🔑', type: 'text' }])],
+    });
+
+    expect(
+      wrapper.getComponent({ name: 'PluginTextField' }).props('inputId')
+    ).toBe('plugin-config-setting-61-70-69-2f-6b-65-79-20-1f511');
+  });
+
+  it('gives duplicate setting keys unique IDs', () => {
+    const wrapper = mountForm({
+      sections: [
+        section([
+          { key: 'endpoint', type: 'text' },
+          { key: 'endpoint', type: 'text' },
+        ]),
+      ],
+    });
+
+    expect(
+      wrapper
+        .findAllComponents({ name: 'PluginTextField' })
+        .map((component) => component.props('inputId'))
+    ).toEqual([
+      'plugin-config-setting-65-6e-64-70-6f-69-6e-74',
+      'plugin-config-setting-65-6e-64-70-6f-69-6e-74--2',
+    ]);
   });
 });

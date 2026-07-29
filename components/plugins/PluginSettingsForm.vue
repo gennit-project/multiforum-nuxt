@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import type {
   PluginFormSection,
   PluginField,
@@ -6,6 +7,7 @@ import type {
   PluginConfigValue,
   PluginSettings,
 } from '@/types/pluginForms';
+import { getPluginConfigFieldId } from '@/utils/pluginConfigFieldIds';
 import PluginTextField from './fields/PluginTextField.vue';
 import PluginNumberField from './fields/PluginNumberField.vue';
 import PluginBooleanField from './fields/PluginBooleanField.vue';
@@ -68,12 +70,35 @@ function getFieldComponent(field: PluginField) {
       return PluginTextField;
   }
 }
+
+const renderedSections = computed(() => {
+  const occurrences = new Map<string, number>();
+
+  return props.sections.map((section) => ({
+    ...section,
+    fields: section.fields.map((field) => {
+      const kind = field.type === 'secret' ? 'SECRET' : 'SETTING';
+      const occurrenceKey = `${kind}:${field.key}`;
+      const occurrence = occurrences.get(occurrenceKey) || 0;
+      occurrences.set(occurrenceKey, occurrence + 1);
+
+      return {
+        field,
+        inputId: getPluginConfigFieldId({
+          kind,
+          key: field.key,
+          occurrence,
+        }),
+      };
+    }),
+  }));
+});
 </script>
 
 <template>
   <div class="space-y-6">
     <div
-      v-for="section in sections"
+      v-for="section in renderedSections"
       :key="section.title"
       class="space-y-4"
     >
@@ -91,12 +116,13 @@ function getFieldComponent(field: PluginField) {
 
       <div class="space-y-4">
         <template
-          v-for="field in section.fields"
-          :key="field.key"
+          v-for="{ field, inputId } in section.fields"
+          :key="inputId"
         >
           <component
             :is="getFieldComponent(field)"
             :field="field"
+            :input-id="inputId"
             :model-value="getFieldValue(field.key)"
             :error="getFieldError(field.key)"
             :secret-status="field.type === 'secret' ? getSecretStatus(field.key) : undefined"

@@ -7,6 +7,7 @@ const props = defineProps<{
   modelValue: string | undefined;
   error?: string;
   secretStatus?: PluginSecretStatus;
+  inputId?: string;
 }>();
 
 const emit = defineEmits<{
@@ -15,6 +16,7 @@ const emit = defineEmits<{
 
 const showValue = ref(false);
 const touched = ref(false);
+const controlId = computed(() => props.inputId || props.field.key);
 
 const inputValue = computed({
   get: () => props.modelValue ?? '',
@@ -102,13 +104,30 @@ const validationError = computed(() => {
   // Skip pattern validation for secrets - they are validated by the backend when used
   return '';
 });
+
+const descriptionId = computed(() => `${controlId.value}-description`);
+const statusId = computed(() => `${controlId.value}-status`);
+const errorId = computed(() => `${controlId.value}-error`);
+const describedBy = computed(() => {
+  const ids = [];
+  if (props.field.description) ids.push(descriptionId.value);
+  if (props.secretStatus) ids.push(statusId.value);
+  if (
+    props.secretStatus?.validationError ||
+    props.error ||
+    validationError.value
+  ) {
+    ids.push(errorId.value);
+  }
+  return ids.join(' ') || undefined;
+});
 </script>
 
 <template>
   <div class="space-y-1">
     <div class="flex items-center justify-between">
       <label
-        :for="field.key"
+        :for="controlId"
         class="block text-sm font-medium text-gray-700 dark:text-gray-300"
       >
         {{ field.label }}
@@ -119,6 +138,7 @@ const validationError = computed(() => {
       </label>
       <span
         v-if="secretStatus"
+        :id="statusId"
         class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
         :class="statusColor"
       >
@@ -127,6 +147,7 @@ const validationError = computed(() => {
     </div>
     <p
       v-if="field.description"
+      :id="descriptionId"
       class="text-xs text-gray-500 dark:text-gray-400"
     >
       {{ field.description }}
@@ -141,11 +162,15 @@ const validationError = computed(() => {
     </p>
     <div class="relative">
       <input
-        :id="field.key"
+        :id="controlId"
         v-model="inputValue"
         :type="showValue ? 'text' : 'password'"
         :placeholder="hasValue ? '[encrypted - cannot be viewed]' : field.placeholder"
         v-bind="validationAttrs"
+        :aria-describedby="describedBy"
+        :aria-invalid="
+          !!(secretStatus?.validationError || error || validationError)
+        "
         class="w-full rounded-md border border-gray-300 px-3 py-2 pr-20 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
         :class="{ 'border-red-500': error }"
       >
@@ -199,12 +224,14 @@ const validationError = computed(() => {
     </div>
     <p
       v-if="secretStatus?.validationError"
+      :id="errorId"
       class="text-xs text-red-600 dark:text-red-400"
     >
       {{ secretStatus.validationError }}
     </p>
     <p
       v-else-if="error || validationError"
+      :id="errorId"
       class="text-xs text-red-600 dark:text-red-400"
     >
       {{ error || validationError }}
