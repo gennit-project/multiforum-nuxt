@@ -780,6 +780,163 @@ export const GET_PLUGIN_PIPELINE_SUMMARY = gql`
   }
 `;
 
+export const GET_DOWNLOAD_PIPELINE_OVERVIEW = gql`
+  query GetDownloadPipelineOverview(
+    $downloadableFileId: ID!
+    $discussionId: ID!
+    $channelUniqueName: String!
+  ) {
+    serverApplicable: getApplicablePluginPipeline(
+      downloadableFileId: $downloadableFileId
+      eventType: "downloadableFile.created"
+      scope: "SERVER"
+    ) {
+      targetId
+      targetType
+      eventType
+      scope
+      channelId
+      configured
+      applicability
+      effectiveAt
+      required
+      reason
+      expectedJobs {
+        pluginId
+        pluginName
+        version
+        order
+        condition
+        continueOnError
+      }
+    }
+    channelApplicable: getApplicablePluginPipeline(
+      downloadableFileId: $downloadableFileId
+      discussionId: $discussionId
+      channelUniqueName: $channelUniqueName
+      eventType: "discussionChannel.created"
+      scope: "CHANNEL"
+    ) {
+      targetId
+      targetType
+      eventType
+      scope
+      channelId
+      configured
+      applicability
+      effectiveAt
+      required
+      reason
+      expectedJobs {
+        pluginId
+        pluginName
+        version
+        order
+        condition
+        continueOnError
+      }
+    }
+    serverSummary: getPipelineSummary(
+      targetId: $downloadableFileId
+      targetType: "DownloadableFile"
+    ) {
+      attempts {
+        id
+        pipelineId
+        targetId
+        targetType
+        eventType
+        scope
+        channelId
+        status
+        trigger
+        initiatedByUsername
+        retryOfPipelineRunId
+        attemptNumber
+        applicability
+        policyEffectiveAt
+        queuedAt
+        startedAt
+        finishedAt
+        createdAt
+        updatedAt
+        jobs {
+          id
+          pluginId
+          pluginName
+          version
+          scope
+          channelId
+          eventType
+          status
+          message
+          durationMs
+          executionOrder
+          skippedReason
+          diagnostics {
+            level
+            code
+            message
+            details
+            helpUrl
+          }
+          createdAt
+          updatedAt
+        }
+      }
+    }
+    channelSummary: getPipelineSummary(
+      targetId: $discussionId
+      targetType: "Discussion"
+    ) {
+      attempts {
+        id
+        pipelineId
+        targetId
+        targetType
+        eventType
+        scope
+        channelId
+        status
+        trigger
+        initiatedByUsername
+        retryOfPipelineRunId
+        attemptNumber
+        applicability
+        policyEffectiveAt
+        queuedAt
+        startedAt
+        finishedAt
+        createdAt
+        updatedAt
+        jobs {
+          id
+          pluginId
+          pluginName
+          version
+          scope
+          channelId
+          eventType
+          status
+          message
+          durationMs
+          executionOrder
+          skippedReason
+          diagnostics {
+            level
+            code
+            message
+            details
+            helpUrl
+          }
+          createdAt
+          updatedAt
+        }
+      }
+    }
+  }
+`;
+
 export const GET_PLUGIN_PIPELINES = gql`
   query GetPluginPipelines($serverName: String!) {
     serverConfigs(where: { serverName: $serverName }) {

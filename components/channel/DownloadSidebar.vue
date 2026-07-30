@@ -5,7 +5,7 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import DownloadNowButton from '@/components/channel/DownloadNowButton.vue';
 import FunctionalDownloadNow from '@/components/channel/FunctionalDownloadNow.vue';
 import DownloadSuccessPopover from '@/components/download/DownloadSuccessPopover.vue';
-import ScopedPipelineView from '@/components/plugins/ScopedPipelineView.vue';
+import DownloadPipelineStatusSummary from '@/components/plugins/DownloadPipelineStatusSummary.vue';
 import { computed, ref } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { GET_DOWNLOAD_LABELS } from '@/graphQLData/discussion/queries';
@@ -387,6 +387,12 @@ const groupedLabels = computed(() => {
           />
         </template>
       </RequireAuth>
+      <DownloadPipelineStatusSummary
+        v-if="primaryFile?.id"
+        :file-id="primaryFile.id"
+        :discussion-id="discussionId"
+        :channel-name="channelUniqueName"
+      />
       <div
         v-if="primaryFile && priceDisplay.label === 'Free Download'"
         class="mt-2 text-xs text-gray-500 dark:text-gray-400"
@@ -442,18 +448,6 @@ const groupedLabels = computed(() => {
         </div>
       </div>
 
-      <!-- Plugin Pipeline Section -->
-      <div
-        v-if="primaryFile?.id || discussionId"
-        class="border-t border-gray-200 pt-4 dark:border-gray-700"
-      >
-        <ScopedPipelineView
-          :file-id="primaryFile?.id"
-          :discussion-id="discussionId"
-          :channel-name="channelUniqueName"
-          :collapsible="true"
-        />
-      </div>
     </div>
   </div>
 
