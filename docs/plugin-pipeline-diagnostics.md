@@ -14,7 +14,11 @@ Once published, a code keeps the same meaning. Plugins may add fields to
 | Code | Meaning | Typical next step |
 | --- | --- | --- |
 | `SCAN_COMPLETE` | The provider completed its scan. | No action is needed. |
+| `SCAN_NOT_APPLICABLE` | The event contained no attachments to scan. | No action is needed. |
+| `SCAN_SUSPICIOUS` | The scan found content that needs review. | Inspect the diagnostic and adjust the archive if needed. |
+| `SCAN_MALWARE_DETECTED` | The scan detected a threat. | Remove the affected file before retrying. |
 | `SCAN_PROVIDER_ERROR` | The scan provider could not complete the request. | Retry later; ask an administrator if it repeats. |
+| `SCAN_CONFIGURATION_REQUIRED` | Required scan configuration is missing. | Ask an administrator to configure the scan plugin. |
 | `ARCHIVE_CONTAINS_EXECUTABLE` | An archive contains an executable file. | Remove the executable or explain why it is required. |
 | `PLUGIN_VERSION_REQUIRES_NEWER_SERVER` | The installed plugin requires a newer server. | Ask an administrator to update the server. |
 | `PLUGIN_API_VERSION_UNSUPPORTED` | The plugin uses an unsupported API contract. | Install a compatible plugin version. |
