@@ -144,6 +144,17 @@ export default async function(context) {
   // settings: User-configured settings
 
   // Do your processing here...
+  context.diagnostics.public({
+    level: "INFO",
+    code: "PROCESSING_COMPLETE",
+    message: "The public check completed successfully.",
+    details: { filesChecked: 1 },
+    helpUrl: "https://example.com/docs/checks"
+  });
+
+  // Internal logs are visible only to authorized administrators. Never use a
+  // public diagnostic for credentials or provider-debug information.
+  context.log.internal("Provider request completed");
 
   return {
     success: true,
@@ -232,17 +243,24 @@ const troubleshootingContent = `
 - Verify the channel has a pipeline configured
 - Check that the discussion has a downloadable file
 
-### Viewing Pipeline Logs
+### Public diagnostics and internal logs
 
-After a pipeline runs, you can view detailed logs:
+Plugins must publish community-safe results through
+\`context.diagnostics.public(...)\`. Diagnostic codes use uppercase letters,
+numbers, and underscores and should remain stable so documentation and support
+threads can link to them. The server bounds and redacts public output.
+
+Legacy \`context.log(...)\` calls and \`context.log.internal(...)\` are internal
+operational telemetry. They are never returned by public pipeline APIs.
+
+After a pipeline runs, public viewers can see:
 1. Navigate to a download's detail page
 2. Find the "Plugin Pipelines" section in the sidebar
-3. Click on a pipeline stage to view logs
+3. Click on a pipeline stage to view public diagnostics
 
-Logs include:
+Public details include:
 - Execution timestamps
-- Input payload sent to the plugin
-- Plugin output and error messages
+- Sanitized diagnostic codes, messages, and remediation links
 - Duration of each step
 `;
 </script>

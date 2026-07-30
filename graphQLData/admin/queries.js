@@ -742,25 +742,40 @@ export const GET_PLUGIN_DETAIL = gql`
   }
 `;
 
-export const GET_PIPELINE_RUNS = gql`
-  query GetPipelineRuns($targetId: ID!, $targetType: String!) {
-    getPipelineRuns(targetId: $targetId, targetType: $targetType) {
-      id
-      pipelineId
-      pluginId
-      pluginName
-      version
-      scope
-      channelId
-      eventType
-      status
-      message
-      durationMs
-      executionOrder
-      skippedReason
-      payload
-      createdAt
-      updatedAt
+export const GET_PLUGIN_PIPELINE_SUMMARY = gql`
+  query GetPipelineSummary($targetId: ID!, $targetType: String!) {
+    getPipelineSummary(targetId: $targetId, targetType: $targetType) {
+      targetId
+      targetType
+      attempts {
+        id
+        pipelineId
+        status
+        createdAt
+        jobs {
+          id
+          pluginId
+          pluginName
+          version
+          scope
+          channelId
+          eventType
+          status
+          message
+          durationMs
+          executionOrder
+          skippedReason
+          diagnostics {
+            level
+            code
+            message
+            details
+            helpUrl
+          }
+          createdAt
+          updatedAt
+        }
+      }
     }
   }
 `;
