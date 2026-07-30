@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
@@ -68,7 +68,7 @@ vi.mock('@/composables/useToast', () => ({ useToast: () => toast }));
 const sectionStub = (name: string) => ({ name, template: `<div data-stub="${name}" />` });
 const stubs = {
   PluginDetailHeader: { name: 'PluginDetailHeader', props: ['pluginDisplayName'], template: '<div class="header">{{ pluginDisplayName }}</div>' },
-  PluginStatusCards: { name: 'PluginStatusCards', props: ['isEnabled', 'canEnable', 'enabling', 'blockingConfigFields'], emits: ['toggle-enabled'], template: '<button type="button" data-test="toggle-enabled" @click="$emit(\'toggle-enabled\', false)" />' },
+  PluginStatusCards: { name: 'PluginStatusCards', props: ['isEnabled', 'canEnable', 'enabling', 'blockingConfigFields'], emits: ['toggle-enabled', 'focus-config-field'], template: '<button type="button" data-test="toggle-enabled" @click="$emit(\'toggle-enabled\', false)" />' },
   PluginUpdateBanner: sectionStub('PluginUpdateBanner'),
   PluginUpgradePreviewModal: {
     name: 'PluginUpgradePreviewModal',
@@ -157,6 +157,10 @@ beforeEach(() => {
   h.mutations = {};
 });
 
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
 describe('Plugin detail page', () => {
   it('shows the initial loading state', () => {
     h.q.AVAILABLE.loading.value = true;
@@ -183,6 +187,45 @@ describe('Plugin detail page', () => {
 
     expect(wrapper.findComponent({ name: 'PluginStatusCards' }).exists()).toBe(true);
   });
+
+  it.each([
+    {
+      field: { key: 'service/url', kind: 'SETTING' },
+      expectedId: 'plugin-config-setting-73-65-72-76-69-63-65-2f-75-72-6c',
+    },
+    {
+      field: { key: 'API_KEY', kind: 'SECRET' },
+      expectedId: 'plugin-config-secret-41-50-49-5f-4b-45-59',
+    },
+  ])(
+    'scrolls to and focuses a $field.kind blocker control',
+    async ({ field, expectedId }) => {
+      setInstalledPlugin();
+      const control = {
+        scrollIntoView: vi.fn(),
+        focus: vi.fn(),
+      };
+      const getElementById = vi
+        .spyOn(document, 'getElementById')
+        .mockReturnValue(control as unknown as HTMLElement);
+      const wrapper = mountPage();
+
+      wrapper
+        .findComponent({ name: 'PluginStatusCards' })
+        .vm.$emit('focus-config-field', field);
+      await flushPromises();
+
+      expect({
+        target: getElementById.mock.calls[0],
+        scroll: control.scrollIntoView.mock.calls[0],
+        focus: control.focus.mock.calls[0],
+      }).toEqual({
+        target: [expectedId],
+        scroll: [{ behavior: 'smooth', block: 'center' }],
+        focus: [{ preventScroll: true }],
+      });
+    }
+  );
 
   it('renders a declared missing secret once and removes its duplicate form field', () => {
     setInstalledPlugin({

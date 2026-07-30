@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import FormRow from '@/components/FormRow.vue';
+import { getPluginConfigFieldId } from '@/utils/pluginConfigFieldIds';
 
 interface PluginSecretStatus {
   key: string;
@@ -76,6 +77,20 @@ const getSecretStatusText = (secret: PluginSecretStatus) => {
       return secret.required ? 'Required — not set' : 'Not set';
   }
 };
+
+const getSecretControlId = (
+  secret: PluginSecretStatus,
+  index: number
+): string => {
+  const occurrence = props.secrets
+    .slice(0, index)
+    .filter((candidate) => candidate.key === secret.key).length;
+  return getPluginConfigFieldId({
+    kind: 'SECRET',
+    key: secret.key,
+    occurrence,
+  });
+};
 </script>
 
 <template>
@@ -98,8 +113,8 @@ const getSecretStatusText = (secret: PluginSecretStatus) => {
         </p>
 
         <div
-          v-for="secret in secrets"
-          :key="secret.key"
+          v-for="(secret, index) in secrets"
+          :key="getSecretControlId(secret, index)"
           class="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
         >
           <div class="mb-3 flex items-center justify-between">
@@ -113,6 +128,7 @@ const getSecretStatusText = (secret: PluginSecretStatus) => {
                 Server
               </span>
               <span
+                :id="`${getSecretControlId(secret, index)}-status`"
                 class="font-semibold rounded-full px-2 py-1 text-xs"
                 :class="getSecretStatusColor(secret.status)"
               >
@@ -123,10 +139,13 @@ const getSecretStatusText = (secret: PluginSecretStatus) => {
 
           <div v-if="showSecretInputs[secret.key]" class="space-y-3">
             <input
+              :id="getSecretControlId(secret, index)"
               :value="secretValues[secret.key] || ''"
               type="password"
               placeholder="Enter secret value"
               :aria-label="`Value for ${secret.key}`"
+              :aria-describedby="`${getSecretControlId(secret, index)}-status`"
+              :aria-invalid="secret.status === 'INVALID'"
               class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               @input="updateSecretValue(secret.key, ($event.target as HTMLInputElement).value)"
             >
@@ -185,8 +204,10 @@ const getSecretStatusText = (secret: PluginSecretStatus) => {
 
           <div v-else class="flex space-x-2">
             <button
+              :id="getSecretControlId(secret, index)"
               type="button"
-              class="rounded bg-gray-100 px-3 py-1 text-sm text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+              :aria-describedby="`${getSecretControlId(secret, index)}-status`"
+              class="rounded bg-gray-100 px-3 py-1 text-sm text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
               @click="updateShowSecretInput(secret.key, true)"
             >
               {{

@@ -131,6 +131,35 @@ describe('PluginSecretsSection input toggle', () => {
     ).toBe('Value for API_KEY');
   });
 
+  it('gives a closed secret control its canonical configuration ID', () => {
+    const wrapper = mountSection();
+
+    expect(buttonByText(wrapper, 'Set Secret')!.attributes('id')).toBe(
+      'plugin-config-secret-41-50-49-5f-4b-45-59'
+    );
+  });
+
+  it('keeps the canonical configuration ID when the secret input opens', () => {
+    const wrapper = mountSection({ showSecretInputs: { API_KEY: true } });
+
+    expect(wrapper.find('input[type="password"]').attributes('id')).toBe(
+      'plugin-config-secret-41-50-49-5f-4b-45-59'
+    );
+  });
+
+  it('gives duplicate secret keys unique control IDs', () => {
+    const wrapper = mountSection({
+      secrets: [secret(), secret()],
+    });
+
+    expect(
+      wrapper.findAll('button').map((button) => button.attributes('id'))
+    ).toEqual([
+      'plugin-config-secret-41-50-49-5f-4b-45-59',
+      'plugin-config-secret-41-50-49-5f-4b-45-59--2',
+    ]);
+  });
+
   it('emits the updated secret value on input', async () => {
     const wrapper = mountSection({ showSecretInputs: { API_KEY: true } });
 

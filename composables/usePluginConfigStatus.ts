@@ -5,6 +5,7 @@ import {
 } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_PLUGIN_CONFIG_STATUS } from '@/graphQLData/admin/queries';
+import type { PluginConfigFieldKind } from '@/types/pluginForms';
 
 export type PluginConfigScope = 'server' | 'channel';
 
@@ -12,7 +13,7 @@ export interface PluginConfigFieldStatus {
   key: string;
   label: string;
   scope: PluginConfigScope;
-  kind: 'SETTING' | 'SECRET';
+  kind: PluginConfigFieldKind;
   required: boolean;
   isSet: boolean;
   isValid: boolean;

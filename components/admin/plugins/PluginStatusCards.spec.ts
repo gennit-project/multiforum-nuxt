@@ -77,6 +77,39 @@ describe('PluginStatusCards disabled state', () => {
     ]);
   });
 
+  it.each([
+    {
+      kind: 'SETTING',
+      key: 'url',
+      label: 'Service URL',
+    },
+    {
+      kind: 'SECRET',
+      key: 'key',
+      label: 'API key',
+    },
+  ])('emits $kind blockers for focus when activated', async (field) => {
+    const wrapper = mountCards({
+      canEnable: false,
+      blockingConfigFields: [field],
+    });
+
+    await wrapper.get('li button').trigger('click');
+
+    expect(wrapper.emitted('focus-config-field')?.[0]).toEqual([field]);
+  });
+
+  it('uses native buttons for keyboard-accessible blocker activation', () => {
+    const wrapper = mountCards({
+      canEnable: false,
+      blockingConfigFields: [
+        { key: 'url', label: 'Service URL', kind: 'SETTING' },
+      ],
+    });
+
+    expect(wrapper.get('li button').attributes('type')).toBe('button');
+  });
+
   it('hides the Enable button when it cannot be enabled', () => {
     const wrapper = mountCards({ isEnabled: false, canEnable: false });
 

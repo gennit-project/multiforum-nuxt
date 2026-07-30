@@ -34,6 +34,7 @@ export interface PluginFormSection {
 
 // A single plugin configuration field value.
 export type PluginConfigValue = string | number | boolean;
+export type PluginConfigFieldKind = 'SETTING' | 'SECRET';
 
 /**
  * A plugin's configuration settings map. Values are typed as `unknown` because

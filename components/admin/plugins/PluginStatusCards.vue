@@ -12,6 +12,7 @@ defineProps<{
 
 const emit = defineEmits<{
   (e: 'toggle-enabled', enabled: boolean): void;
+  (e: 'focus-config-field', field: PluginConfigFieldStatus): void;
 }>();
 </script>
 
@@ -106,9 +107,18 @@ const emit = defineEmits<{
             Required before enabling
           </p>
           <ul v-if="blockingConfigFields?.length" class="mt-2 list-disc space-y-1 pl-5">
-            <li v-for="field in blockingConfigFields" :key="`${field.kind}:${field.key}`">
-              {{ field.label }}
-              <span class="text-xs opacity-80">({{ field.kind.toLowerCase() }})</span>
+            <li
+              v-for="(field, index) in blockingConfigFields"
+              :key="`${field.kind}:${field.key}:${index}`"
+            >
+              <button
+                type="button"
+                class="rounded-sm text-left underline decoration-amber-600/60 underline-offset-2 hover:decoration-current focus:outline-none focus:ring-2 focus:ring-amber-700 focus:ring-offset-2 focus:ring-offset-amber-50 dark:focus:ring-amber-300 dark:focus:ring-offset-amber-950"
+                @click="emit('focus-config-field', field)"
+              >
+                {{ field.label }}
+                <span class="text-xs opacity-80">({{ field.kind.toLowerCase() }})</span>
+              </button>
             </li>
           </ul>
           <p v-else class="mt-1 text-xs">Configure the required fields below.</p>
