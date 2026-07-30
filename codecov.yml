@@ -12,9 +12,11 @@ coverage:
     # Per-PR coverage change check
     patch:
       default:
-        # Require new code in PRs to have some coverage
-        # Set to informational initially while building coverage
-        informational: true
+        # Ratchet quality upward even while the legacy project total is below
+        # the long-term target. Changed executable lines must be well tested.
+        target: 80%
+        threshold: 0%
+        informational: false
 
 # Flag management.
 # - unit: uploaded on every PR/push by the Tests CI workflow.
@@ -32,7 +34,7 @@ flag_management:
 
 # Comment settings for PR coverage reports
 comment:
-  layout: "reach,diff,flags,files"
+  layout: 'reach,diff,flags,files'
   behavior: default
   require_changes: false
   require_base: false
@@ -40,14 +42,14 @@ comment:
 
 # Ignore these paths in coverage calculations
 ignore:
-  - "**/*.spec.ts"
-  - "**/*.test.ts"
-  - "tests/**"
-  - ".nuxt/**"
-  - "node_modules/**"
-  - "coverage/**"
-  - "**/*.d.ts"
+  - '**/*.spec.ts'
+  - '**/*.test.ts'
+  - 'tests/**'
+  - '.nuxt/**'
+  - 'node_modules/**'
+  - 'coverage/**'
+  - '**/*.d.ts'
   # Presentational-only: icons are pure <svg> markup with no logic. Also
   # excluded from the vitest coverage report; ignored here so the combined
   # (unit + e2e) report drops them regardless of which tool produced it.
-  - "components/icons/**"
+  - 'components/icons/**'
