@@ -16,6 +16,7 @@ export interface BackendPipelineStep {
  */
 export interface BackendPipeline {
   event: string;
+  policyId?: string;
   stopOnFirstFailure?: boolean;
   effectiveAt?: string;
   applicability?:

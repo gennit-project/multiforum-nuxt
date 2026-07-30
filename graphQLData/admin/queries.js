@@ -807,6 +807,7 @@ export const GET_DOWNLOAD_PIPELINE_OVERVIEW = gql`
       configured
       applicability
       effectiveAt
+      policyId
       required
       reason
       expectedJobs {
@@ -863,6 +864,8 @@ export const GET_DOWNLOAD_PIPELINE_OVERVIEW = gql`
         attemptNumber
         applicability
         policyEffectiveAt
+        policyId
+        campaignId
         queuedAt
         startedAt
         heartbeatAt
@@ -919,6 +922,8 @@ export const GET_DOWNLOAD_PIPELINE_OVERVIEW = gql`
         attemptNumber
         applicability
         policyEffectiveAt
+        policyId
+        campaignId
         queuedAt
         startedAt
         heartbeatAt
@@ -955,6 +960,63 @@ export const GET_DOWNLOAD_PIPELINE_OVERVIEW = gql`
           updatedAt
         }
       }
+    }
+  }
+`;
+
+export const GET_PLUGIN_PIPELINE_CAMPAIGNS = gql`
+  query GetPluginPipelineCampaigns {
+    getPluginPipelineCampaigns {
+      id
+      policyId
+      eventType
+      scope
+      applicability
+      enforcementBehavior
+      status
+      concurrency
+      rateLimitPerMinute
+      affectedFileCount
+      accessibleFileCount
+      unavailableFileCount
+      estimatedProviderRuns
+      completedCount
+      runningCount
+      failedCount
+      timedOutCount
+      createdByUsername
+      createdAt
+      startedAt
+      pausedAt
+      finishedAt
+    }
+  }
+`;
+
+export const PREVIEW_PLUGIN_PIPELINE_CAMPAIGN = gql`
+  query PreviewPluginPipelineCampaign($policyId: ID!) {
+    previewPluginPipelineCampaign(policyId: $policyId) {
+      policyId
+      eventType
+      applicability
+      enforcementBehavior
+      affectedFileCount
+      accessibleFileCount
+      unavailableFileCount
+      estimatedProviderRuns
+    }
+  }
+`;
+
+export const GET_PLUGIN_PIPELINE_CAMPAIGN_FAILURES = gql`
+  query GetPluginPipelineCampaignFailures($campaignId: ID!) {
+    getPluginPipelineCampaignFailures(campaignId: $campaignId) {
+      pipelineId
+      targetId
+      discussionId
+      channelId
+      status
+      attemptNumber
     }
   }
 `;

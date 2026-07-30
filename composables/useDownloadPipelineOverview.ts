@@ -55,6 +55,7 @@ export interface ApplicablePublicPipeline {
     | 'ALL_FILES_GRADUAL'
     | 'ALL_FILES_IMMEDIATE';
   effectiveAt?: string | null;
+  policyId?: string | null;
   required: boolean;
   reason:
     | 'APPLICABLE'
@@ -83,12 +84,15 @@ export interface PublicPipelineAttempt {
     | 'MODERATOR_START'
     | 'OWNER_RETRY'
     | 'MODERATOR_RETRY'
-    | 'AUTOMATIC_RETRY';
+    | 'AUTOMATIC_RETRY'
+    | 'CAMPAIGN';
   initiatedByUsername?: string | null;
   retryOfPipelineRunId?: string | null;
   attemptNumber: number;
   applicability?: string | null;
   policyEffectiveAt?: string | null;
+  policyId?: string | null;
+  campaignId?: string | null;
   queuedAt: string;
   startedAt?: string | null;
   heartbeatAt?: string | null;

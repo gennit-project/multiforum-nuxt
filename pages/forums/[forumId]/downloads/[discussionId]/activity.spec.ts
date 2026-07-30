@@ -1,11 +1,13 @@
-import { describe, it, expect, vi } from 'vitest';
-import { shallowMount } from '@vue/test-utils';
+import { describe, expect, it, vi } from 'vitest';
+import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
-import DiscussionTitleVersions from '@/components/discussion/detail/activityFeed/DiscussionTitleVersions.vue';
-import LabelChangeHistory from '@/components/discussion/detail/activityFeed/LabelChangeHistory.vue';
+import type { Discussion } from '@/__generated__/graphql';
+import ActivityPage from './activity.vue';
 
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({ params: { discussionId: 'd1', forumId: 'cats' } }),
+  useRoute: () => ({
+    params: { forumId: 'cats', discussionId: 'discussion-1' },
+  }),
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -13,60 +15,56 @@ vi.mock('@vue/apollo-composable', () => ({
 }));
 
 vi.mock('@/composables/useAuthState', () => ({
-  useModProfileName: () => ref('mod-1'),
+  useModProfileName: () => ref(''),
 }));
 
-const mountWith = async (discussion: Record<string, unknown>) => {
-  const Page = (await import('./activity.vue')).default;
-  return shallowMount(Page, { props: { discussion } });
-};
+vi.mock('@/composables/useDownloadPipelineOverview', () => ({
+  useDownloadPipelineOverview: () => ({
+    attempts: ref([
+      {
+        pipelineId: 'pipeline-1',
+        scope: 'SERVER',
+        status: 'TIMED_OUT',
+        finishedAt: '2026-07-30T12:00:00.000Z',
+        updatedAt: '2026-07-30T12:00:00.000Z',
+      },
+      {
+        pipelineId: 'pipeline-active',
+        scope: 'SERVER',
+        status: 'RUNNING',
+        updatedAt: '2026-07-30T12:00:00.000Z',
+      },
+    ]),
+  }),
+}));
 
-describe('download activity page', () => {
-  it('shows an empty-state message when there is no activity', async () => {
-    const wrapper = await mountWith({
-      PastTitleVersions: [],
+describe('download activity', () => {
+  it('shows terminal pipeline events with stable attempt links', () => {
+    const discussion = {
+      id: 'discussion-1',
+      DownloadableFiles: [{ id: 'file-1' }],
       DiscussionChannels: [],
-    });
-    expect(wrapper.text()).toContain('No activity to display yet.');
-  });
-
-  it('renders the title-version history when the download has title edits', async () => {
-    const wrapper = await mountWith({
-      PastTitleVersions: [{ id: 't1' }],
-      DiscussionChannels: [],
-    });
-    expect(wrapper.findComponent(DiscussionTitleVersions).exists()).toBe(true);
-  });
-
-  it('renders label-change history when the download has label changes', async () => {
-    const wrapper = await mountWith({
       PastTitleVersions: [],
-      DiscussionChannels: [
-        {
-          channelUniqueName: 'cats',
-          LabelChangeHistory: [
-            { id: 'l1', actionType: 'added', labelDisplayName: 'Bug' },
-          ],
+    } as unknown as Discussion;
+    const wrapper = mount(ActivityPage, {
+      props: { discussion },
+      global: {
+        stubs: {
+          NuxtLink: {
+            props: ['to'],
+            template: '<a :href="to"><slot /></a>',
+          },
+          DiscussionTitleVersions: true,
+          LabelChangeHistory: true,
         },
-      ],
+      },
     });
-    expect(wrapper.findComponent(LabelChangeHistory).exists()).toBe(true);
-    expect(wrapper.text()).not.toContain('No activity to display yet.');
-  });
 
-  it('renders both title and label history when both exist', async () => {
-    const wrapper = await mountWith({
-      PastTitleVersions: [{ id: 't1' }],
-      DiscussionChannels: [
-        {
-          channelUniqueName: 'cats',
-          LabelChangeHistory: [
-            { id: 'l1', actionType: 'removed', labelDisplayName: 'Bug' },
-          ],
-        },
-      ],
-    });
-    expect(wrapper.findComponent(DiscussionTitleVersions).exists()).toBe(true);
-    expect(wrapper.findComponent(LabelChangeHistory).exists()).toBe(true);
+    expect(wrapper.text()).toContain('Pipeline activity');
+    expect(wrapper.text()).toContain('timed out');
+    expect(wrapper.text()).not.toContain('pipeline-active');
+    expect(wrapper.get('a').attributes('href')).toContain(
+      '?attempt=pipeline-1#attempt-pipeline-1'
+    );
   });
 });

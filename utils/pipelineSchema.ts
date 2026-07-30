@@ -16,6 +16,7 @@ export interface PipelineStep {
 
 export interface EventPipeline {
   event: string;
+  policyId?: string;
   stopOnFirstFailure?: boolean;
   effectiveAt?: string;
   applicability?: PipelineApplicability;
@@ -131,6 +132,10 @@ const createPipelineJsonSchema = (scope: PipelineConfigScope) => {
                     format: 'date-time',
                     description:
                       'When this pipeline policy became effective',
+                  },
+                  policyId: {
+                    type: 'string',
+                    description: 'Stable identifier assigned to this rollout policy',
                   },
                   applicability: {
                     type: 'string',

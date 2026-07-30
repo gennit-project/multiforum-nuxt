@@ -2,8 +2,7 @@
 
 ## Status
 
-Approved direction. Phases 1–6 were implemented on 2026-07-30; Phase 7 remains
-planned.
+Approved direction. Phases 1–7 were implemented on 2026-07-30.
 
 ## Product intent
 

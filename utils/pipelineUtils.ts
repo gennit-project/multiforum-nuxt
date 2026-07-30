@@ -23,6 +23,7 @@ export interface PluginOption {
  */
 export interface EventPipelineInput {
   event: string;
+  policyId?: string;
   stopOnFirstFailure: boolean;
   effectiveAt?: string;
   applicability?: PipelineApplicability;
@@ -59,6 +60,7 @@ export function parsePipelinesFromBackend(
     const transformedPipelines: EventPipeline[] = parsedPipelines.map(
       (pipeline: BackendPipeline) => ({
         event: pipeline.event,
+        policyId: pipeline.policyId,
         stopOnFirstFailure: pipeline.stopOnFirstFailure ?? false,
         effectiveAt: pipeline.effectiveAt,
         applicability: pipeline.applicability,
@@ -83,6 +85,7 @@ export function parsePipelinesFromBackend(
 export function transformPipelinesForMutation(config: PipelineConfig): EventPipelineInput[] {
   return config.pipelines.map((pipeline: EventPipeline) => ({
     event: pipeline.event,
+    policyId: pipeline.policyId,
     stopOnFirstFailure: pipeline.stopOnFirstFailure || false,
     effectiveAt: pipeline.effectiveAt,
     applicability: pipeline.applicability,

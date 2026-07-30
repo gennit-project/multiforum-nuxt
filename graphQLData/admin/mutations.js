@@ -136,6 +136,43 @@ export const SET_SERVER_PLUGIN_SECRET = gql`
   }
 `;
 
+export const CREATE_PLUGIN_PIPELINE_CAMPAIGN = gql`
+  mutation CreatePluginPipelineCampaign(
+    $policyId: ID!
+    $concurrency: Int!
+    $rateLimitPerMinute: Int!
+  ) {
+    createPluginPipelineCampaign(
+      policyId: $policyId
+      concurrency: $concurrency
+      rateLimitPerMinute: $rateLimitPerMinute
+    ) {
+      id
+      status
+    }
+  }
+`;
+
+export const PAUSE_PLUGIN_PIPELINE_CAMPAIGN = gql`
+  mutation PausePluginPipelineCampaign($campaignId: ID!) {
+    pausePluginPipelineCampaign(campaignId: $campaignId) {
+      id
+      status
+      pausedAt
+    }
+  }
+`;
+
+export const RESUME_PLUGIN_PIPELINE_CAMPAIGN = gql`
+  mutation ResumePluginPipelineCampaign($campaignId: ID!) {
+    resumePluginPipelineCampaign(campaignId: $campaignId) {
+      id
+      status
+      pausedAt
+    }
+  }
+`;
+
 export const UPDATE_MOD_CHANNEL_ROLE = gql`
   mutation UpdateModChannelRole(
     $name: String!

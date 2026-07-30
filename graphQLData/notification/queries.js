@@ -11,6 +11,7 @@ export const GET_NOTIFICATIONS = gql`
         read
         text
         notificationType
+        link
         ScratchpadEntry {
           id
           isPublic
@@ -37,6 +38,7 @@ export const GET_FEEDBACK_NOTIFICATIONS = gql`
         read
         text
         notificationType
+        link
       }
       NotificationsAggregate(
         where: { read: false, notificationType: "feedback" }
@@ -71,6 +73,7 @@ export const GET_GENERAL_NOTIFICATIONS = gql`
         read
         text
         notificationType
+        link
         ScratchpadEntry {
           id
           isPublic

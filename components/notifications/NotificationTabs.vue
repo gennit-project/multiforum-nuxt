@@ -20,6 +20,7 @@ import {
 type ScratchpadEntryRef = { id: string; isPublic: boolean };
 type NotificationWithEntry = Notification & {
   ScratchpadEntry?: ScratchpadEntryRef | null;
+  link?: string | null;
 };
 
 const NOTIFICATION_PAGE_LIMIT = 15;
@@ -428,6 +429,13 @@ const reachedEnd = computed(() => {
                 :text="notification.text"
                 class="w-full"
               />
+              <NuxtLink
+                v-if="notification.link"
+                :to="notification.link"
+                class="mt-2 inline-block text-sm text-orange-700 underline dark:text-orange-300"
+              >
+                View pipeline attempt
+              </NuxtLink>
               <div
                 v-if="canActOnScratchpadEntry(notification)"
                 class="mt-3 flex flex-wrap items-center gap-2"

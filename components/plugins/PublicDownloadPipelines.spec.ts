@@ -255,7 +255,7 @@ describe('PublicDownloadPipelines', () => {
       details: true,
       documentation: 'https://example.test/checks/scan-clean',
       permalink:
-        '/forums/cats/downloads/discussion-1/pipelines#attempt-passed',
+        '/forums/cats/downloads/discussion-1/pipelines?attempt=pipeline-1#attempt-pipeline-1',
     });
   });
 
@@ -314,7 +314,10 @@ describe('PublicDownloadPipelines', () => {
     ];
     const wrapper = mountView('discussion-author', 'alice');
 
-    await wrapper.get('button').trigger('click');
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('Run checks'))!
+      .trigger('click');
 
     expect({
       mutation: mockStartPipeline.mock.calls[0]?.[0],
@@ -350,7 +353,10 @@ describe('PublicDownloadPipelines', () => {
     ];
     const wrapper = mountView('alice');
 
-    await wrapper.get('button').trigger('click');
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('Run checks'))!
+      .trigger('click');
 
     expect(mockStartPipeline).toHaveBeenCalledWith({
       targetId: 'discussion-1',
@@ -372,7 +378,10 @@ describe('PublicDownloadPipelines', () => {
     ];
     const wrapper = mountView('discussion-author', 'alice');
 
-    await wrapper.get('button').trigger('click');
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('Run checks again'))!
+      .trigger('click');
 
     expect({
       mutation: mockRerunPipeline.mock.calls[0]?.[0],
@@ -397,6 +406,51 @@ describe('PublicDownloadPipelines', () => {
       }),
     ];
 
-    expect(mountView('alice').find('button').exists()).toBe(false);
+    expect(mountView('alice').text()).not.toContain('Run checks again');
+  });
+
+  it('filters failed attempts and copies public diagnostics', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', {
+      clipboard: { writeText },
+    });
+    mockOverview.hasPipelineContent = true;
+    mockOverview.attempts = [
+      baseAttempt({ pipelineId: 'passed-pipeline' }),
+      baseAttempt({
+        id: 'failed',
+        pipelineId: 'failed-pipeline',
+        attemptNumber: 2,
+        status: 'FAILED',
+        jobs: [{
+          id: 'job-1',
+          pluginName: 'Security scan',
+          status: 'FAILED',
+          diagnostics: [{
+            code: 'SCAN_PROVIDER_ERROR',
+            message: 'Provider unavailable',
+            details: { retryable: true },
+          }],
+          executionOrder: 0,
+          version: '1.0.0',
+        }],
+      }),
+    ];
+    const wrapper = mountView();
+
+    await wrapper
+      .get('[data-testid="pipeline-attempt-filter"]')
+      .setValue('FAILED');
+    expect(wrapper.text()).not.toContain('Attempt 1');
+    expect(wrapper.text()).toContain('Attempt 2');
+
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Copy diagnostics')!
+      .trigger('click');
+    expect(writeText).toHaveBeenCalledWith(
+      expect.stringContaining('SCAN_PROVIDER_ERROR')
+    );
+    expect(wrapper.text()).toContain('Copied diagnostics for attempt 2');
   });
 });

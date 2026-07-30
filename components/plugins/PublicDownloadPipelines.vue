@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, toRef } from 'vue';
+import { computed, nextTick, ref, toRef, watch } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import {
   getApplicablePipelineStatus,
@@ -215,10 +215,95 @@ const formatDetails = (details: unknown) => {
     : JSON.stringify(details, null, 2);
 };
 
-const attemptPermalink = (attemptId: string) =>
+type AttemptFilter = 'ALL' | 'ACTIVE' | 'PASSED' | 'FAILED';
+const attemptFilter = ref<AttemptFilter>('ALL');
+const shareFeedback = ref('');
+const filteredAttempts = computed(() =>
+  attempts.value.filter((attempt) => {
+    if (attemptFilter.value === 'ACTIVE') {
+      return ['QUEUED', 'RUNNING'].includes(attempt.status);
+    }
+    if (attemptFilter.value === 'PASSED') {
+      return attempt.status === 'SUCCEEDED';
+    }
+    if (attemptFilter.value === 'FAILED') {
+      return ['FAILED', 'TIMED_OUT', 'CANCELLED'].includes(attempt.status);
+    }
+    return true;
+  })
+);
+
+const attemptPermalink = (pipelineId: string) =>
   `/forums/${encodeURIComponent(props.channelName)}/downloads/${encodeURIComponent(
     props.discussionId
-  )}/pipelines#attempt-${encodeURIComponent(attemptId)}`;
+  )}/pipelines?attempt=${encodeURIComponent(
+    pipelineId
+  )}#attempt-${encodeURIComponent(pipelineId)}`;
+
+const absoluteAttemptUrl = (attempt: PublicPipelineAttempt) => {
+  const path = attemptPermalink(attempt.pipelineId);
+  return typeof window === 'undefined'
+    ? path
+    : new URL(path, window.location.origin).toString();
+};
+
+const diagnosticsText = (attempt: PublicPipelineAttempt) => {
+  const lines = [
+    `Pipeline attempt ${attempt.attemptNumber}`,
+    `Status: ${attemptStatus(attempt)}`,
+    `URL: ${absoluteAttemptUrl(attempt)}`,
+  ];
+  for (const job of attempt.jobs) {
+    lines.push(`${job.pluginName} (${job.status})`);
+    for (const diagnostic of job.diagnostics) {
+      lines.push(`[${diagnostic.code}] ${diagnostic.message}`);
+      const details = formatDetails(diagnostic.details);
+      if (details) lines.push(details);
+    }
+  }
+  return lines.join('\n');
+};
+
+const copyDiagnostics = async (attempt: PublicPipelineAttempt) => {
+  await navigator.clipboard.writeText(diagnosticsText(attempt));
+  shareFeedback.value = `Copied diagnostics for attempt ${attempt.attemptNumber}.`;
+};
+
+const shareAttempt = async (attempt: PublicPipelineAttempt) => {
+  const url = absoluteAttemptUrl(attempt);
+  if (navigator.share) {
+    await navigator.share({
+      title: `Pipeline attempt ${attempt.attemptNumber}`,
+      text: `Public pipeline diagnostics: ${attemptStatus(attempt)}`,
+      url,
+    });
+  } else {
+    await navigator.clipboard.writeText(url);
+  }
+  shareFeedback.value = `Shared link for attempt ${attempt.attemptNumber}.`;
+};
+
+const supportDiscussionUrl = (
+  attempt: PublicPipelineAttempt,
+  code: string
+) =>
+  `/forums/${encodeURIComponent(
+    props.channelName
+  )}/discussions/create?pipelineAttempt=${encodeURIComponent(
+    attempt.pipelineId
+  )}&diagnosticCode=${encodeURIComponent(code)}`;
+
+watch(
+  attempts,
+  async () => {
+    if (typeof window === 'undefined' || !window.location.hash) return;
+    await nextTick();
+    document
+      .getElementById(decodeURIComponent(window.location.hash.slice(1)))
+      ?.scrollIntoView();
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
@@ -346,22 +431,40 @@ const attemptPermalink = (attemptId: string) =>
       </section>
 
       <section aria-labelledby="attempt-history-heading">
-        <h3
-          id="attempt-history-heading"
-          class="mb-3 text-base font-semibold text-gray-900 dark:text-white"
-        >
-          Attempt history
-        </h3>
+        <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <h3
+            id="attempt-history-heading"
+            class="text-base font-semibold text-gray-900 dark:text-white"
+          >
+            Attempt history
+          </h3>
+          <label v-if="attempts.length" class="text-sm text-gray-600 dark:text-gray-300">
+            Show
+            <select
+              v-model="attemptFilter"
+              data-testid="pipeline-attempt-filter"
+              class="ml-2 rounded-md border border-gray-300 bg-white px-2 py-1 dark:border-gray-600 dark:bg-gray-800"
+            >
+              <option value="ALL">All attempts</option>
+              <option value="ACTIVE">Active</option>
+              <option value="PASSED">Passed</option>
+              <option value="FAILED">Failed or timed out</option>
+            </select>
+          </label>
+        </div>
+        <p v-if="shareFeedback" role="status" class="mb-3 text-sm text-green-700 dark:text-green-300">
+          {{ shareFeedback }}
+        </p>
         <p
           v-if="attempts.length === 0"
           class="rounded-lg border border-dashed border-gray-300 p-5 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-300"
         >
           No attempts have run yet.
         </p>
-        <div v-else class="space-y-4">
+        <div v-else-if="filteredAttempts.length" class="space-y-4">
           <article
-            v-for="attempt in attempts"
-            :id="`attempt-${attempt.id}`"
+            v-for="attempt in filteredAttempts"
+            :id="`attempt-${attempt.pipelineId}`"
             :key="attempt.id"
             class="scroll-mt-4 rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
           >
@@ -400,12 +503,26 @@ const attemptPermalink = (attemptId: string) =>
                   {{ statusInfo[attemptStatus(attempt)].label }}
                 </span>
                 <a
-                  :href="attemptPermalink(attempt.id)"
+                  :href="attemptPermalink(attempt.pipelineId)"
                   class="text-sm text-orange-700 underline dark:text-orange-300"
                   :aria-label="`Permalink to attempt ${attempt.attemptNumber}`"
                 >
                   Permalink
                 </a>
+                <button
+                  type="button"
+                  class="text-sm text-orange-700 underline dark:text-orange-300"
+                  @click="copyDiagnostics(attempt)"
+                >
+                  Copy diagnostics
+                </button>
+                <button
+                  type="button"
+                  class="text-sm text-orange-700 underline dark:text-orange-300"
+                  @click="shareAttempt(attempt)"
+                >
+                  Share this attempt
+                </button>
                 <div v-if="canRerunAttempt(attempt)" class="text-right">
                   <button
                     type="button"
@@ -481,12 +598,24 @@ const attemptPermalink = (attemptId: string) =>
                     >
                       Documentation
                     </a>
+                    <NuxtLink
+                      :to="supportDiscussionUrl(attempt, diagnostic.code)"
+                      class="ml-3 mt-2 inline-block text-orange-700 underline dark:text-orange-300"
+                    >
+                      Ask the community
+                    </NuxtLink>
                   </li>
                 </ul>
               </li>
             </ol>
           </article>
         </div>
+        <p
+          v-else
+          class="rounded-lg border border-dashed border-gray-300 p-5 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-300"
+        >
+          No attempts match this filter.
+        </p>
       </section>
     </template>
   </section>
