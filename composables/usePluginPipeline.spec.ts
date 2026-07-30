@@ -182,7 +182,7 @@ describe('usePluginPipeline composable', () => {
         loading: ref(false),
         error: ref(null),
         refetch: vi.fn(),
-      } as any);
+      } as unknown as ReturnType<typeof useQuery>);
 
       const { pipelineRuns } = usePluginPipeline(
         ref('file-1'),
@@ -232,7 +232,7 @@ describe('usePluginPipeline composable', () => {
         loading: ref(false),
         error: ref(null),
         refetch: vi.fn(),
-      } as any);
+      } as unknown as ReturnType<typeof useQuery>);
 
       const { pipelineGroups } = usePluginPipeline(
         ref('test-id'),
@@ -284,7 +284,7 @@ describe('usePluginPipeline composable', () => {
         loading: ref(false),
         error: ref(null),
         refetch: vi.fn(),
-      } as any);
+      } as unknown as ReturnType<typeof useQuery>);
 
       const { pipelineGroups } = usePluginPipeline(
         ref('test-id'),
@@ -328,7 +328,7 @@ describe('usePluginPipeline composable', () => {
         loading: ref(false),
         error: ref(null),
         refetch: vi.fn(),
-      } as any);
+      } as unknown as ReturnType<typeof useQuery>);
 
       const { pipelineGroups } = usePluginPipeline(
         ref('test-id'),
@@ -361,7 +361,7 @@ describe('usePluginPipeline composable', () => {
         loading: ref(false),
         error: ref(null),
         refetch: vi.fn(),
-      } as any);
+      } as unknown as ReturnType<typeof useQuery>);
 
       const { pipelineGroups } = usePluginPipeline(
         ref('test-id'),
@@ -382,7 +382,7 @@ describe('usePluginPipeline composable', () => {
         loading: ref(false),
         error: ref(null),
         refetch: vi.fn(),
-      } as any);
+      } as unknown as ReturnType<typeof useQuery>);
 
       const { latestPipeline } = usePluginPipeline(
         ref('test-id'),
@@ -423,7 +423,7 @@ describe('usePluginPipeline composable', () => {
         loading: ref(false),
         error: ref(null),
         refetch: vi.fn(),
-      } as any);
+      } as unknown as ReturnType<typeof useQuery>);
 
       const { latestPipeline } = usePluginPipeline(
         ref('test-id'),
@@ -454,7 +454,7 @@ describe('usePluginPipeline composable', () => {
         loading: ref(false),
         error: ref(null),
         refetch: vi.fn(),
-      } as any);
+      } as unknown as ReturnType<typeof useQuery>);
 
       const { hasActivePipeline } = usePluginPipeline(
         ref('test-id'),
@@ -483,7 +483,7 @@ describe('usePluginPipeline composable', () => {
         loading: ref(false),
         error: ref(null),
         refetch: vi.fn(),
-      } as any);
+      } as unknown as ReturnType<typeof useQuery>);
 
       const { hasActivePipeline } = usePluginPipeline(
         ref('test-id'),
@@ -512,7 +512,7 @@ describe('usePluginPipeline composable', () => {
         loading: ref(false),
         error: ref(null),
         refetch: vi.fn(),
-      } as any);
+      } as unknown as ReturnType<typeof useQuery>);
 
       const { hasActivePipeline } = usePluginPipeline(
         ref('test-id'),
