@@ -2,6 +2,7 @@ import type {
   PipelineConfig,
   EventPipeline,
   PipelineCondition,
+  PipelineApplicability,
 } from './pipelineSchema';
 import type {
   BackendPipeline,
@@ -23,6 +24,8 @@ export interface PluginOption {
 export interface EventPipelineInput {
   event: string;
   stopOnFirstFailure: boolean;
+  effectiveAt?: string;
+  applicability?: PipelineApplicability;
   steps: Array<{
     pluginId: string;
     version?: string;
@@ -57,6 +60,8 @@ export function parsePipelinesFromBackend(
       (pipeline: BackendPipeline) => ({
         event: pipeline.event,
         stopOnFirstFailure: pipeline.stopOnFirstFailure ?? false,
+        effectiveAt: pipeline.effectiveAt,
+        applicability: pipeline.applicability,
         steps: (pipeline.steps || []).map((step: BackendPipelineStep) => ({
           plugin: step.pluginId || step.plugin || '',
           version: step.version,
@@ -79,6 +84,8 @@ export function transformPipelinesForMutation(config: PipelineConfig): EventPipe
   return config.pipelines.map((pipeline: EventPipeline) => ({
     event: pipeline.event,
     stopOnFirstFailure: pipeline.stopOnFirstFailure || false,
+    effectiveAt: pipeline.effectiveAt,
+    applicability: pipeline.applicability,
     steps: pipeline.steps.map((step) => ({
       pluginId: step.plugin,
       version: step.version,

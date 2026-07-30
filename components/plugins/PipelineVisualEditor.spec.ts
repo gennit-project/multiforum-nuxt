@@ -49,6 +49,26 @@ describe('PipelineVisualEditor header', () => {
 
     expect(lastUpdate(wrapper).stopOnFirstFailure).toBe(true);
   });
+
+  it('updates the download rollout applicability', async () => {
+    const wrapper = mountEditor();
+
+    await wrapper
+      .get('[data-testid="pipeline-applicability-select"]')
+      .setValue('ALL_FILES_GRADUAL');
+
+    expect(lastUpdate(wrapper).applicability).toBe('ALL_FILES_GRADUAL');
+  });
+
+  it('hides the rollout choice for non-download events', () => {
+    const wrapper = mountEditor({
+      pipeline: pipeline({ event: 'comment.created' }),
+    });
+
+    expect(
+      wrapper.find('[data-testid="pipeline-applicability-select"]').exists()
+    ).toBe(false);
+  });
 });
 
 describe('PipelineVisualEditor steps', () => {
@@ -90,7 +110,9 @@ describe('PipelineVisualEditor steps', () => {
   it('updates a step plugin', async () => {
     const wrapper = mountEditor();
 
-    await wrapper.findAll('select')[0].setValue('p2');
+    await wrapper
+      .get('[data-testid="pipeline-step-plugin"]')
+      .setValue('p2');
 
     expect(lastUpdate(wrapper).steps[0].plugin).toBe('p2');
   });
@@ -98,7 +120,9 @@ describe('PipelineVisualEditor steps', () => {
   it('updates a step condition', async () => {
     const wrapper = mountEditor();
 
-    await wrapper.findAll('select')[1].setValue('PREVIOUS_SUCCEEDED');
+    await wrapper
+      .get('[data-testid="pipeline-step-condition"]')
+      .setValue('PREVIOUS_SUCCEEDED');
 
     expect(lastUpdate(wrapper).steps[0].condition).toBe('PREVIOUS_SUCCEEDED');
   });

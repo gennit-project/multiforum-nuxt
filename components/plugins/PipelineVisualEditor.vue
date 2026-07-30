@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, useId } from 'vue';
 import draggable from 'vuedraggable';
 import type {
   EventPipeline,
   PipelineStep,
   PipelineCondition,
+  PipelineApplicability,
 } from '@/utils/pipelineSchema';
 import { PIPELINE_EVENTS, PIPELINE_CONDITIONS } from '@/utils/pipelineSchema';
 
@@ -32,6 +33,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   'update:pipeline': [pipeline: EventPipeline];
 }>();
+const applicabilityInputId = useId();
 
 // Local steps array for draggable
 const steps = computed({
@@ -48,6 +50,13 @@ function updateStopOnFirstFailure(value: boolean) {
   emit('update:pipeline', {
     ...props.pipeline,
     stopOnFirstFailure: value,
+  });
+}
+
+function updateApplicability(value: PipelineApplicability) {
+  emit('update:pipeline', {
+    ...props.pipeline,
+    applicability: value,
   });
 }
 
@@ -95,6 +104,10 @@ const eventDescription = computed(() => {
   const event = props.events.find((e) => e.value === props.pipeline.event);
   return event?.description || '';
 });
+
+const supportsRolloutPolicy = computed(() =>
+  props.pipeline.event.startsWith('downloadableFile.')
+);
 </script>
 
 <template>
@@ -126,6 +139,42 @@ const eventDescription = computed(() => {
             >Stop on first failure</span
           >
         </label>
+      </div>
+
+      <div
+        v-if="supportsRolloutPolicy"
+        class="mt-4 border-t border-gray-200 pt-4 dark:border-gray-700"
+      >
+        <label
+          class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+          :for="applicabilityInputId"
+        >
+          Apply this pipeline to
+        </label>
+        <select
+          :id="applicabilityInputId"
+          data-testid="pipeline-applicability-select"
+          :value="pipeline.applicability || 'NEW_FILES_ONLY'"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+          @change="
+            updateApplicability(
+              ($event.target as HTMLSelectElement)
+                .value as PipelineApplicability
+            )
+          "
+        >
+          <option value="NEW_FILES_ONLY">New and replaced files only</option>
+          <option value="ALL_FILES_GRADUAL">
+            New files now; existing files gradually
+          </option>
+          <option value="ALL_FILES_IMMEDIATE">
+            All files immediately
+          </option>
+        </select>
+        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          Existing files excluded by this policy are shown as not required,
+          rather than passed.
+        </p>
       </div>
     </div>
 
@@ -172,6 +221,7 @@ const eventDescription = computed(() => {
                   </label>
                   <select
                     :value="step.plugin"
+                    data-testid="pipeline-step-plugin"
                     class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     @change="
                       updateStep(index, {
@@ -200,6 +250,7 @@ const eventDescription = computed(() => {
                     </label>
                     <select
                       :value="step.condition || 'ALWAYS'"
+                      data-testid="pipeline-step-condition"
                       class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                       @change="
                         updateStep(index, {
