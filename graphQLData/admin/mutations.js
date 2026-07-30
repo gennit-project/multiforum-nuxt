@@ -352,6 +352,8 @@ export const START_PLUGIN_PIPELINE = gql`
       attemptNumber
       queuedAt
       startedAt
+      heartbeatAt
+      timeoutAt
       finishedAt
       createdAt
       updatedAt
@@ -375,6 +377,8 @@ export const RERUN_PLUGIN_PIPELINE = gql`
       attemptNumber
       queuedAt
       startedAt
+      heartbeatAt
+      timeoutAt
       finishedAt
       createdAt
       updatedAt

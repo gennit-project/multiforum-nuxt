@@ -139,6 +139,14 @@ export const GET_SERVER_HEALTH_DASHBOARD = gql`
         lockedContentCount
         suspensionCount
         failedDownloadScanCount
+        queuedPluginJobCount
+        runningPluginJobCount
+        pluginTimeoutCount24h
+        pluginTimeoutRate24h
+        repeatedPluginFailureCount24h
+        pluginRetryAttemptCount1h
+        pluginRetryStormCount1h
+        oldestQueuedPluginJobAgeSeconds
         medianOpenIssueAgeDays
       }
       timeSeries {
@@ -857,6 +865,8 @@ export const GET_DOWNLOAD_PIPELINE_OVERVIEW = gql`
         policyEffectiveAt
         queuedAt
         startedAt
+        heartbeatAt
+        timeoutAt
         finishedAt
         createdAt
         updatedAt
@@ -873,6 +883,11 @@ export const GET_DOWNLOAD_PIPELINE_OVERVIEW = gql`
           durationMs
           executionOrder
           skippedReason
+          queuedAt
+          startedAt
+          heartbeatAt
+          timeoutAt
+          finishedAt
           diagnostics {
             level
             code
@@ -906,6 +921,8 @@ export const GET_DOWNLOAD_PIPELINE_OVERVIEW = gql`
         policyEffectiveAt
         queuedAt
         startedAt
+        heartbeatAt
+        timeoutAt
         finishedAt
         createdAt
         updatedAt
@@ -922,6 +939,11 @@ export const GET_DOWNLOAD_PIPELINE_OVERVIEW = gql`
           durationMs
           executionOrder
           skippedReason
+          queuedAt
+          startedAt
+          heartbeatAt
+          timeoutAt
+          finishedAt
           diagnostics {
             level
             code

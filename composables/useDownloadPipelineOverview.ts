@@ -91,6 +91,8 @@ export interface PublicPipelineAttempt {
   policyEffectiveAt?: string | null;
   queuedAt: string;
   startedAt?: string | null;
+  heartbeatAt?: string | null;
+  timeoutAt?: string | null;
   finishedAt?: string | null;
   createdAt: string;
   updatedAt: string;

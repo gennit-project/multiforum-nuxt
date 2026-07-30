@@ -34,6 +34,11 @@ export interface PipelineRun {
   executionOrder: number;
   skippedReason?: string;
   diagnostics?: PublicPipelineDiagnostic[];
+  queuedAt?: string;
+  startedAt?: string | null;
+  heartbeatAt?: string | null;
+  timeoutAt?: string | null;
+  finishedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }

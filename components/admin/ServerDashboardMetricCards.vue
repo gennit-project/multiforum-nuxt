@@ -4,6 +4,8 @@ import {
   Archive,
   Clock3,
   Flag,
+  Hourglass,
+  RotateCcw,
   ShieldAlert,
   ShieldX,
   ThumbsUp,
@@ -23,6 +25,14 @@ type ServerHealthSummary = {
   archivedContentCount: number;
   lockedContentCount: number;
   failedDownloadScanCount: number;
+  queuedPluginJobCount: number;
+  runningPluginJobCount: number;
+  pluginTimeoutCount24h: number;
+  pluginTimeoutRate24h: number;
+  repeatedPluginFailureCount24h: number;
+  pluginRetryAttemptCount1h: number;
+  pluginRetryStormCount1h: number;
+  oldestQueuedPluginJobAgeSeconds: number;
   medianOpenIssueAgeDays?: number | null;
 };
 
@@ -79,6 +89,33 @@ const metricCards = computed(() => {
       tone: props.summary.failedDownloadScanCount > 0 ? 'red' : 'green',
     },
     {
+      label: 'Pipeline Timeouts',
+      value: props.summary.pluginTimeoutCount24h,
+      detail: `${(props.summary.pluginTimeoutRate24h * 100).toFixed(1)}% rate · ${props.summary.repeatedPluginFailureCount24h} repeated failures`,
+      icon: ShieldX,
+      tone: props.summary.pluginTimeoutCount24h > 0 ? 'red' : 'green',
+    },
+    {
+      label: 'Pipeline Queue',
+      value:
+        props.summary.queuedPluginJobCount +
+        props.summary.runningPluginJobCount,
+      detail: `${props.summary.queuedPluginJobCount} queued · ${props.summary.runningPluginJobCount} running · ${props.summary.oldestQueuedPluginJobAgeSeconds}s oldest`,
+      icon: Hourglass,
+      tone:
+        props.summary.queuedPluginJobCount > 0 ||
+        props.summary.runningPluginJobCount > 0
+          ? 'yellow'
+          : 'green',
+    },
+    {
+      label: 'Retry Storms',
+      value: props.summary.pluginRetryStormCount1h,
+      detail: `${props.summary.pluginRetryAttemptCount1h} retries in the last hour`,
+      icon: RotateCcw,
+      tone: props.summary.pluginRetryStormCount1h > 0 ? 'red' : 'green',
+    },
+    {
       label: 'Votes',
       value: props.summary.voteCount,
       detail: `${props.summary.commentCount} comments`,
@@ -102,7 +139,7 @@ const formatNumber = (value: number | string) => {
 </script>
 
 <template>
-  <section class="grid gap-3 md:grid-cols-3 xl:grid-cols-7">
+  <section class="grid gap-3 md:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-10">
     <div
       v-for="card in metricCards"
       :key="card.label"
