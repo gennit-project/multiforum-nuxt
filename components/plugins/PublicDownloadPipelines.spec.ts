@@ -16,24 +16,39 @@ const mockOverview = vi.hoisted(() => ({
 const mockUsername = vi.hoisted(() => ({ value: '' }));
 const mockModProfileName = vi.hoisted(() => ({ value: '' }));
 const mockStartPipeline = vi.hoisted(() => vi.fn());
+const mockRerunPipeline = vi.hoisted(() => vi.fn());
 const mockStartDoneCallbacks = vi.hoisted(
+  () => [] as Array<() => void>
+);
+const mockRerunDoneCallbacks = vi.hoisted(
   () => [] as Array<() => void>
 );
 
 vi.mock('@vue/apollo-composable', async () => {
   const { ref } = await import('vue');
   return {
-    useMutation: () => ({
-      mutate: (...args: unknown[]) => {
-        mockStartPipeline(...args);
-        mockStartDoneCallbacks.forEach((callback) => callback());
-      },
-      loading: ref(false),
-      error: ref(null),
-      onDone: (callback: () => void) => {
-        mockStartDoneCallbacks.push(callback);
-      },
-    }),
+    useMutation: (document: {
+      loc?: { source?: { body?: string } };
+    }) => {
+      const isRerun = document.loc?.source?.body?.includes(
+        'RerunPluginPipeline'
+      );
+      const mutate = isRerun ? mockRerunPipeline : mockStartPipeline;
+      const callbacks = isRerun
+        ? mockRerunDoneCallbacks
+        : mockStartDoneCallbacks;
+      return {
+        mutate: (...args: unknown[]) => {
+          mutate(...args);
+          callbacks.forEach((callback) => callback());
+        },
+        loading: ref(false),
+        error: ref(null),
+        onDone: (callback: () => void) => {
+          callbacks.push(callback);
+        },
+      };
+    },
   };
 });
 
@@ -103,7 +118,9 @@ describe('PublicDownloadPipelines', () => {
     mockUsername.value = '';
     mockModProfileName.value = '';
     mockStartPipeline.mockReset();
+    mockRerunPipeline.mockReset();
     mockStartDoneCallbacks.length = 0;
+    mockRerunDoneCallbacks.length = 0;
   });
 
   it('shows policy-excluded and not-executed configured checks', () => {
@@ -341,5 +358,45 @@ describe('PublicDownloadPipelines', () => {
       eventType: 'discussionChannel.created',
       channelId: 'cats',
     });
+  });
+
+  it('lets the uploader rerun the latest failed pipeline with current configuration', async () => {
+    mockUsername.value = 'alice';
+    mockOverview.hasPipelineContent = true;
+    mockOverview.attempts = [
+      baseAttempt({
+        id: 'failed',
+        pipelineId: 'failed-pipeline',
+        status: 'FAILED',
+      }),
+    ];
+    const wrapper = mountView('discussion-author', 'alice');
+
+    await wrapper.get('button').trigger('click');
+
+    expect({
+      mutation: mockRerunPipeline.mock.calls[0]?.[0],
+      explanation: wrapper.text().includes(
+        'current configuration'
+      ),
+      refetched: mockOverview.refetch.mock.calls.length,
+    }).toEqual({
+      mutation: { pipelineRunId: 'failed-pipeline' },
+      explanation: true,
+      refetched: 1,
+    });
+  });
+
+  it('does not offer retry controls to a visitor', () => {
+    mockOverview.hasPipelineContent = true;
+    mockOverview.attempts = [
+      baseAttempt({
+        id: 'failed',
+        pipelineId: 'failed-pipeline',
+        status: 'FAILED',
+      }),
+    ];
+
+    expect(mountView('alice').find('button').exists()).toBe(false);
   });
 });

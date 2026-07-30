@@ -358,3 +358,26 @@ export const START_PLUGIN_PIPELINE = gql`
     }
   }
 `;
+
+export const RERUN_PLUGIN_PIPELINE = gql`
+  mutation RerunPluginPipeline($pipelineRunId: ID!) {
+    rerunPluginPipeline(pipelineRunId: $pipelineRunId) {
+      pipelineId
+      targetId
+      targetType
+      eventType
+      scope
+      channelId
+      status
+      trigger
+      initiatedByUsername
+      retryOfPipelineRunId
+      attemptNumber
+      queuedAt
+      startedAt
+      finishedAt
+      createdAt
+      updatedAt
+    }
+  }
+`;

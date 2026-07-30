@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved direction. Phases 1–4 were implemented on 2026-07-30; Phases 5–7
+Approved direction. Phases 1–5 were implemented on 2026-07-30; Phases 6–7
 remain planned.
 
 ## Product intent
@@ -293,6 +293,12 @@ Initial behavior reruns the complete applicable pipeline with the current
 enabled configuration. The new attempt links to the previous one and preserves
 the previous attempt unchanged. The UI labels this **Run checks again** and
 states that current configuration is used.
+
+The initial guardrails use a one-minute cooldown between retry attempts and
+allow at most three retry attempts per target pipeline in a rolling hour. Only
+the latest failed, timed-out, or cancelled attempt is eligible. Attempts
+snapshot the file upload timestamp as `targetVersion`, preventing a retry from
+running an old attempt against replacement bytes.
 
 Guards:
 

@@ -9,7 +9,10 @@ import {
   type PublicPipelineDisplayStatus,
 } from '@/composables/useDownloadPipelineOverview';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
-import { START_PLUGIN_PIPELINE } from '@/graphQLData/admin/mutations';
+import {
+  RERUN_PLUGIN_PIPELINE,
+  START_PLUGIN_PIPELINE,
+} from '@/graphQLData/admin/mutations';
 
 const props = defineProps<{
   fileId: string;
@@ -51,6 +54,15 @@ const {
 onPipelineStarted(() => {
   refetch();
 });
+const {
+  mutate: rerunPluginPipeline,
+  loading: rerunningPipeline,
+  error: rerunPipelineError,
+  onDone: onPipelineRerun,
+} = useMutation(RERUN_PLUGIN_PIPELINE);
+onPipelineRerun(() => {
+  refetch();
+});
 
 const canStartPipeline = (pipeline: ApplicablePublicPipeline) =>
   canStartPipelines.value &&
@@ -66,6 +78,28 @@ const startPipeline = (pipeline: ApplicablePublicPipeline) => {
     eventType: pipeline.eventType,
     channelId: pipeline.channelId || null,
   });
+};
+
+const retryableStatuses = new Set([
+  'FAILED',
+  'TIMED_OUT',
+  'CANCELLED',
+]);
+const isLatestPipelineAttempt = (attempt: PublicPipelineAttempt) =>
+  attempts.value.find(
+    candidate =>
+      candidate.scope === attempt.scope &&
+      candidate.eventType === attempt.eventType &&
+      (candidate.channelId || null) === (attempt.channelId || null)
+  )?.pipelineId === attempt.pipelineId;
+const canRerunAttempt = (attempt: PublicPipelineAttempt) =>
+  canStartPipelines.value &&
+  retryableStatuses.has(attempt.status) &&
+  isLatestPipelineAttempt(attempt) &&
+  !hasActiveAttempt.value;
+const rerunAttempt = (attempt: PublicPipelineAttempt) => {
+  if (!canRerunAttempt(attempt) || rerunningPipeline.value) return;
+  rerunPluginPipeline({ pipelineRunId: attempt.pipelineId });
 };
 
 const statusInfo: Record<
@@ -234,11 +268,11 @@ const attemptPermalink = (attemptId: string) =>
 
     <template v-else>
       <div
-        v-if="startPipelineError"
+        v-if="startPipelineError || rerunPipelineError"
         class="mb-5 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200"
         role="alert"
       >
-        The checks could not be started. Please try again.
+        The checks could not be started. Please try again later.
       </div>
       <section
         v-if="applicablePipelines.length"
@@ -372,6 +406,23 @@ const attemptPermalink = (attemptId: string) =>
                 >
                   Permalink
                 </a>
+                <div v-if="canRerunAttempt(attempt)" class="text-right">
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-md bg-orange-700 px-3 py-2 text-sm font-medium text-white hover:bg-orange-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-orange-600 dark:hover:bg-orange-500"
+                    :disabled="rerunningPipeline"
+                    @click="rerunAttempt(attempt)"
+                  >
+                    <i
+                      :class="rerunningPipeline ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-rotate-right'"
+                      aria-hidden="true"
+                    />
+                    {{ rerunningPipeline ? 'Starting…' : 'Run checks again' }}
+                  </button>
+                  <p class="mt-1 max-w-48 text-xs text-gray-500 dark:text-gray-400">
+                    Runs the full pipeline using its current configuration.
+                  </p>
+                </div>
               </div>
             </header>
 
