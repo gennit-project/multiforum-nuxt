@@ -20,6 +20,14 @@ const channelName = computed(() =>
 const fileId = computed(
   () => props.discussion?.DownloadableFiles?.[0]?.id || ''
 );
+const uploaderUsername = computed(
+  () =>
+    (
+      props.discussion?.DownloadableFiles?.[0] as
+        | { uploadedByUsername?: string | null }
+        | undefined
+    )?.uploadedByUsername || ''
+);
 </script>
 
 <template>
@@ -28,6 +36,8 @@ const fileId = computed(
     :file-id="fileId"
     :discussion-id="discussionId"
     :channel-name="channelName"
+    :owner-username="discussion?.Author?.username || ''"
+    :uploader-username="uploaderUsername"
   />
   <div v-else class="px-2 py-8 text-center text-gray-500 dark:text-gray-400">
     Pipeline information is unavailable for this download.

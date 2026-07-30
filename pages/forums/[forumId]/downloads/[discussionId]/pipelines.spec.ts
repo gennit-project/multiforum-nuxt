@@ -9,7 +9,13 @@ vi.mock('nuxt/app', () => ({
 
 const PipelineViewStub = {
   name: 'PublicDownloadPipelines',
-  props: ['fileId', 'discussionId', 'channelName'],
+  props: [
+    'fileId',
+    'discussionId',
+    'channelName',
+    'ownerUsername',
+    'uploaderUsername',
+  ],
   template: '<div data-testid="pipeline-page" />',
 };
 
@@ -26,13 +32,18 @@ const mountPage = async (discussion: Record<string, unknown>) => {
 describe('download pipelines tab', () => {
   it('passes the download route and file identity to the public pipeline view', async () => {
     const wrapper = await mountPage({
-      DownloadableFiles: [{ id: 'file-1' }],
+      DownloadableFiles: [
+        { id: 'file-1', uploadedByUsername: 'file-uploader' },
+      ],
+      Author: { username: 'alice' },
     });
 
     expect(wrapper.getComponent(PipelineViewStub).props()).toEqual({
       fileId: 'file-1',
       discussionId: 'discussion-1',
       channelName: 'cats',
+      ownerUsername: 'alice',
+      uploaderUsername: 'file-uploader',
     });
   });
 

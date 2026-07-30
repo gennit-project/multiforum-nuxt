@@ -11,6 +11,35 @@ const mockOverview = vi.hoisted(() => ({
   isPolling: false,
   loading: false,
   error: null as Error | null,
+  refetch: vi.fn(),
+}));
+const mockUsername = vi.hoisted(() => ({ value: '' }));
+const mockModProfileName = vi.hoisted(() => ({ value: '' }));
+const mockStartPipeline = vi.hoisted(() => vi.fn());
+const mockStartDoneCallbacks = vi.hoisted(
+  () => [] as Array<() => void>
+);
+
+vi.mock('@vue/apollo-composable', async () => {
+  const { ref } = await import('vue');
+  return {
+    useMutation: () => ({
+      mutate: (...args: unknown[]) => {
+        mockStartPipeline(...args);
+        mockStartDoneCallbacks.forEach((callback) => callback());
+      },
+      loading: ref(false),
+      error: ref(null),
+      onDone: (callback: () => void) => {
+        mockStartDoneCallbacks.push(callback);
+      },
+    }),
+  };
+});
+
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => mockUsername,
+  useModProfileName: () => mockModProfileName,
 }));
 
 vi.mock('@/composables/useDownloadPipelineOverview', async () => {
@@ -28,16 +57,19 @@ vi.mock('@/composables/useDownloadPipelineOverview', async () => {
       isPolling: ref(mockOverview.isPolling),
       loading: ref(mockOverview.loading),
       error: ref(mockOverview.error),
+      refetch: mockOverview.refetch,
     }),
   };
 });
 
-const mountView = () =>
+const mountView = (ownerUsername = '', uploaderUsername = '') =>
   mount(PublicDownloadPipelines, {
     props: {
       fileId: 'file-1',
       discussionId: 'discussion-1',
       channelName: 'cats',
+      ownerUsername,
+      uploaderUsername,
     },
   });
 
@@ -67,6 +99,11 @@ describe('PublicDownloadPipelines', () => {
     mockOverview.isPolling = false;
     mockOverview.loading = false;
     mockOverview.error = null;
+    mockOverview.refetch.mockReset();
+    mockUsername.value = '';
+    mockModProfileName.value = '';
+    mockStartPipeline.mockReset();
+    mockStartDoneCallbacks.length = 0;
   });
 
   it('shows policy-excluded and not-executed configured checks', () => {
@@ -214,5 +251,95 @@ describe('PublicDownloadPipelines', () => {
     ];
 
     expect(mountView().text()).toContain('Updating');
+  });
+
+  it('tells a visitor that the uploader must run a missing check', () => {
+    mockOverview.hasPipelineContent = true;
+    mockOverview.applicablePipelines = [
+      {
+        targetId: 'file-1',
+        targetType: 'DownloadableFile',
+        eventType: 'downloadableFile.created',
+        scope: 'SERVER',
+        configured: true,
+        applicability: 'ALL_FILES_IMMEDIATE',
+        required: true,
+        reason: 'APPLICABLE',
+        expectedJobs: [],
+      },
+    ];
+
+    const wrapper = mountView('discussion-author', 'alice');
+
+    expect({
+      explanation: wrapper.text().includes(
+        'The uploader must run this check.'
+      ),
+      hasButton: wrapper.find('button').exists(),
+    }).toEqual({ explanation: true, hasButton: false });
+  });
+
+  it('lets the uploader start a missing required check', async () => {
+    mockUsername.value = 'alice';
+    mockOverview.hasPipelineContent = true;
+    mockOverview.applicablePipelines = [
+      {
+        targetId: 'file-1',
+        targetType: 'DownloadableFile',
+        eventType: 'downloadableFile.created',
+        scope: 'SERVER',
+        configured: true,
+        applicability: 'ALL_FILES_IMMEDIATE',
+        required: true,
+        reason: 'APPLICABLE',
+        expectedJobs: [],
+      },
+    ];
+    const wrapper = mountView('discussion-author', 'alice');
+
+    await wrapper.get('button').trigger('click');
+
+    expect({
+      mutation: mockStartPipeline.mock.calls[0]?.[0],
+      refetched: mockOverview.refetch.mock.calls.length,
+    }).toEqual({
+      mutation: {
+        targetId: 'file-1',
+        targetType: 'DownloadableFile',
+        eventType: 'downloadableFile.created',
+        channelId: null,
+      },
+      refetched: 1,
+    });
+  });
+
+  it('lets a moderator start a missing channel check', async () => {
+    mockUsername.value = 'moderator-user';
+    mockModProfileName.value = 'Helpful Mod';
+    mockOverview.hasPipelineContent = true;
+    mockOverview.applicablePipelines = [
+      {
+        targetId: 'discussion-1',
+        targetType: 'Discussion',
+        eventType: 'discussionChannel.created',
+        scope: 'CHANNEL',
+        channelId: 'cats',
+        configured: true,
+        applicability: 'ALL_FILES_IMMEDIATE',
+        required: true,
+        reason: 'APPLICABLE',
+        expectedJobs: [],
+      },
+    ];
+    const wrapper = mountView('alice');
+
+    await wrapper.get('button').trigger('click');
+
+    expect(mockStartPipeline).toHaveBeenCalledWith({
+      targetId: 'discussion-1',
+      targetType: 'Discussion',
+      eventType: 'discussionChannel.created',
+      channelId: 'cats',
+    });
   });
 });

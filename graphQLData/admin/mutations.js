@@ -326,3 +326,35 @@ export const UPDATE_PLUGIN_PIPELINES = gql`
     updatePluginPipelines(pipelines: $pipelines)
   }
 `;
+
+export const START_PLUGIN_PIPELINE = gql`
+  mutation StartPluginPipeline(
+    $targetId: ID!
+    $targetType: String!
+    $eventType: String!
+    $channelId: String
+  ) {
+    startPluginPipeline(
+      targetId: $targetId
+      targetType: $targetType
+      eventType: $eventType
+      channelId: $channelId
+    ) {
+      pipelineId
+      targetId
+      targetType
+      eventType
+      scope
+      channelId
+      status
+      trigger
+      initiatedByUsername
+      attemptNumber
+      queuedAt
+      startedAt
+      finishedAt
+      createdAt
+      updatedAt
+    }
+  }
+`;

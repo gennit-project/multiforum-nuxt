@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { toRef } from 'vue';
+import { computed, toRef } from 'vue';
+import { useMutation } from '@vue/apollo-composable';
 import {
   getApplicablePipelineStatus,
   useDownloadPipelineOverview,
@@ -7,11 +8,15 @@ import {
   type PublicPipelineAttempt,
   type PublicPipelineDisplayStatus,
 } from '@/composables/useDownloadPipelineOverview';
+import { useModProfileName, useUsername } from '@/composables/useAuthState';
+import { START_PLUGIN_PIPELINE } from '@/graphQLData/admin/mutations';
 
 const props = defineProps<{
   fileId: string;
   discussionId: string;
   channelName: string;
+  ownerUsername?: string;
+  uploaderUsername?: string;
 }>();
 
 const {
@@ -22,11 +27,46 @@ const {
   isPolling,
   loading,
   error,
+  refetch,
 } = useDownloadPipelineOverview(
   toRef(props, 'fileId'),
   toRef(props, 'discussionId'),
   toRef(props, 'channelName')
 );
+
+const username = useUsername();
+const modProfileName = useModProfileName();
+const canStartPipelines = computed(
+  () =>
+    (Boolean(username.value) &&
+      [props.ownerUsername, props.uploaderUsername].includes(username.value)) ||
+    Boolean(modProfileName.value)
+);
+const {
+  mutate: startPluginPipeline,
+  loading: startingPipeline,
+  error: startPipelineError,
+  onDone: onPipelineStarted,
+} = useMutation(START_PLUGIN_PIPELINE);
+onPipelineStarted(() => {
+  refetch();
+});
+
+const canStartPipeline = (pipeline: ApplicablePublicPipeline) =>
+  canStartPipelines.value &&
+  ['DownloadableFile', 'Discussion'].includes(pipeline.targetType) &&
+  pipeline.required &&
+  applicabilityStatus(pipeline) === 'NOT_EXECUTED';
+
+const startPipeline = (pipeline: ApplicablePublicPipeline) => {
+  if (!canStartPipeline(pipeline) || startingPipeline.value) return;
+  startPluginPipeline({
+    targetId: pipeline.targetId,
+    targetType: pipeline.targetType,
+    eventType: pipeline.eventType,
+    channelId: pipeline.channelId || null,
+  });
+};
 
 const statusInfo: Record<
   PublicPipelineDisplayStatus,
@@ -110,7 +150,9 @@ const policyExplanation = (pipeline: ApplicablePublicPipeline) => {
     return 'No currently enabled plugin applies to this check.';
   }
   if (applicabilityStatus(pipeline) === 'NOT_EXECUTED') {
-    return 'This required check has not been run.';
+    return canStartPipelines.value
+      ? 'This required check has not been run.'
+      : 'The uploader must run this check.';
   }
   return pipeline.required
     ? 'This check is required for this download.'
@@ -191,6 +233,13 @@ const attemptPermalink = (attemptId: string) =>
     </div>
 
     <template v-else>
+      <div
+        v-if="startPipelineError"
+        class="mb-5 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200"
+        role="alert"
+      >
+        The checks could not be started. Please try again.
+      </div>
       <section
         v-if="applicablePipelines.length"
         aria-labelledby="required-checks-heading"
@@ -245,6 +294,19 @@ const attemptPermalink = (attemptId: string) =>
                 </span>
               </li>
             </ol>
+            <button
+              v-if="canStartPipeline(pipeline)"
+              type="button"
+              class="mt-4 inline-flex items-center gap-2 rounded-md bg-orange-700 px-4 py-2 text-sm font-medium text-white hover:bg-orange-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-orange-600 dark:hover:bg-orange-500"
+              :disabled="startingPipeline"
+              @click="startPipeline(pipeline)"
+            >
+              <i
+                :class="startingPipeline ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-play'"
+                aria-hidden="true"
+              />
+              {{ startingPipeline ? 'Starting…' : 'Run checks' }}
+            </button>
           </article>
         </div>
       </section>

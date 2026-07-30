@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved direction. Phases 1–3 were implemented on 2026-07-30; Phases 4–7
+Approved direction. Phases 1–4 were implemented on 2026-07-30; Phases 5–7
 remain planned.
 
 ## Product intent
@@ -254,8 +254,12 @@ startPluginPipeline(
   targetId: ID!
   targetType: String!
   eventType: String!
+  channelId: String
 ): PluginPipelineRun!
 ```
+
+`channelId` is omitted for server pipelines and required for channel pipelines
+so a cross-posted discussion resolves the intended channel unambiguously.
 
 It:
 
