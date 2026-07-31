@@ -1,5 +1,16 @@
+// Registered universally (server + client). During SSR only `getSSRProps` is
+// invoked; the lifecycle hooks below run client-side. Registering this as a
+// `.client`-only plugin left the directive undefined during SSR, so
+// @vue/server-renderer crashed reading `.getSSRProps` off it whenever an
+// SSR-rendered page used `v-click-outside` (e.g. the discussion create form and
+// forum wiki pages, via MultiSelect / EmojiPicker / SiteSidenav).
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.directive('click-outside', {
+    // The directive attaches no attributes/props to the element itself, so
+    // there is nothing to serialize during SSR.
+    getSSRProps() {
+      return {};
+    },
     beforeMount(el, binding) {
       el.clickOutsideEvent = function (event: Event) {
         // Check if the clicked element is outside the bound element
