@@ -10,7 +10,7 @@ const DISCUSSION_ID = 'discussion-1';
 // Regression: the emoji "React" button opens a FloatingDropdown containing the
 // emoji picker. The picker's own v-click-outside handler used to fire on the
 // very click that opened the dropdown, closing it again immediately, so the
-// picker never appeared. See plugins/click-outside.client.ts.
+// picker never appeared. See plugins/click-outside.ts.
 test('clicking the React button opens the emoji picker', async ({
   page,
   setupMockedPage,

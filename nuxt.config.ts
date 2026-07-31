@@ -375,7 +375,7 @@ export default defineNuxtConfig({
     { src: '@/plugins/pinia', mode: 'all' },
     { src: '@/plugins/google-maps', mode: 'client' },
     { src: '@/plugins/performance.client', mode: 'client' },
-    { src: '@/plugins/click-outside.client', mode: 'client' },
+    { src: '@/plugins/click-outside', mode: 'all' },
     { src: '@/plugins/accented.client', mode: 'client' },
     { src: '@/plugins/test-auth.client', mode: 'client' },
   ],
