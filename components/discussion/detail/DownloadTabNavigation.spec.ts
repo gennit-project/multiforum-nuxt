@@ -2,6 +2,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
 
+const mockHasPipelineContent = ref(true);
+
 vi.mock('nuxt/app', () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
@@ -18,6 +20,12 @@ vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => ref(''),
 }));
 
+vi.mock('@/composables/useDownloadPipelineOverview', () => ({
+  useDownloadPipelineOverview: () => ({
+    hasPipelineContent: mockHasPipelineContent,
+  }),
+}));
+
 const NuxtLinkStub = {
   name: 'NuxtLink',
   props: ['to'],
@@ -27,7 +35,12 @@ const NuxtLinkStub = {
 const mountNav = async (routeName: string) => {
   const Component = (await import('./DownloadTabNavigation.vue')).default;
   return shallowMount(Component, {
-    props: { discussionId: 'd1', channelId: 'cats', aggregateCommentCount: 5 },
+    props: {
+      discussionId: 'd1',
+      channelId: 'cats',
+      aggregateCommentCount: 5,
+      discussion: { DownloadableFiles: [{ id: 'file-1' }] },
+    },
     global: {
       mocks: { $route: { name: routeName } },
       stubs: {
@@ -42,26 +55,34 @@ const mountNav = async (routeName: string) => {
 };
 
 describe('DownloadTabNavigation', () => {
-  it('renders Description, Comments, and Activity tabs routed to the nested pages', async () => {
+  it('renders the Pipelines tab when checks are applicable or have history', async () => {
+    mockHasPipelineContent.value = true;
     const wrapper = await mountNav('forums-forumId-downloads-discussionId');
     const links = wrapper.findAllComponents(NuxtLinkStub);
 
-    expect(links).toHaveLength(3);
-
-    expect(links[0].text()).toBe('Description');
-    expect(links[0].props('to').name).toBe(
-      'forums-forumId-downloads-discussionId'
-    );
-
-    expect(links[1].text()).toContain('Comments (5)');
-    expect(links[1].props('to').name).toBe(
-      'forums-forumId-downloads-discussionId-comments'
-    );
-
-    expect(links[2].text()).toBe('Activity');
-    expect(links[2].props('to').name).toBe(
-      'forums-forumId-downloads-discussionId-activity'
-    );
+    expect(
+      links.map((link) => ({
+        text: link.text(),
+        route: link.props('to').name,
+      }))
+    ).toEqual([
+      {
+        text: 'Description',
+        route: 'forums-forumId-downloads-discussionId',
+      },
+      {
+        text: 'Comments (5)',
+        route: 'forums-forumId-downloads-discussionId-comments',
+      },
+      {
+        text: 'Activity',
+        route: 'forums-forumId-downloads-discussionId-activity',
+      },
+      {
+        text: 'Pipelines',
+        route: 'forums-forumId-downloads-discussionId-pipelines',
+      },
+    ]);
   });
 
   it('applies the active style to the Activity tab when on the activity route', async () => {
@@ -73,5 +94,12 @@ describe('DownloadTabNavigation', () => {
     expect(links[2].classes()).toContain('border-orange-500');
     // Description is inactive while on the activity route.
     expect(links[0].classes()).toContain('border-transparent');
+  });
+
+  it('hides the Pipelines tab without applicable checks or history', async () => {
+    mockHasPipelineContent.value = false;
+    const wrapper = await mountNav('forums-forumId-downloads-discussionId');
+
+    expect(wrapper.text()).not.toContain('Pipelines');
   });
 });

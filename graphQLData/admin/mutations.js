@@ -136,6 +136,43 @@ export const SET_SERVER_PLUGIN_SECRET = gql`
   }
 `;
 
+export const CREATE_PLUGIN_PIPELINE_CAMPAIGN = gql`
+  mutation CreatePluginPipelineCampaign(
+    $policyId: ID!
+    $concurrency: Int!
+    $rateLimitPerMinute: Int!
+  ) {
+    createPluginPipelineCampaign(
+      policyId: $policyId
+      concurrency: $concurrency
+      rateLimitPerMinute: $rateLimitPerMinute
+    ) {
+      id
+      status
+    }
+  }
+`;
+
+export const PAUSE_PLUGIN_PIPELINE_CAMPAIGN = gql`
+  mutation PausePluginPipelineCampaign($campaignId: ID!) {
+    pausePluginPipelineCampaign(campaignId: $campaignId) {
+      id
+      status
+      pausedAt
+    }
+  }
+`;
+
+export const RESUME_PLUGIN_PIPELINE_CAMPAIGN = gql`
+  mutation ResumePluginPipelineCampaign($campaignId: ID!) {
+    resumePluginPipelineCampaign(campaignId: $campaignId) {
+      id
+      status
+      pausedAt
+    }
+  }
+`;
+
 export const UPDATE_MOD_CHANNEL_ROLE = gql`
   mutation UpdateModChannelRole(
     $name: String!
@@ -324,5 +361,64 @@ export const UPDATE_MOD_SERVER_ROLE = gql`
 export const UPDATE_PLUGIN_PIPELINES = gql`
   mutation UpdatePluginPipelines($pipelines: [EventPipelineInput!]!) {
     updatePluginPipelines(pipelines: $pipelines)
+  }
+`;
+
+export const START_PLUGIN_PIPELINE = gql`
+  mutation StartPluginPipeline(
+    $targetId: ID!
+    $targetType: String!
+    $eventType: String!
+    $channelId: String
+  ) {
+    startPluginPipeline(
+      targetId: $targetId
+      targetType: $targetType
+      eventType: $eventType
+      channelId: $channelId
+    ) {
+      pipelineId
+      targetId
+      targetType
+      eventType
+      scope
+      channelId
+      status
+      trigger
+      initiatedByUsername
+      attemptNumber
+      queuedAt
+      startedAt
+      heartbeatAt
+      timeoutAt
+      finishedAt
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const RERUN_PLUGIN_PIPELINE = gql`
+  mutation RerunPluginPipeline($pipelineRunId: ID!) {
+    rerunPluginPipeline(pipelineRunId: $pipelineRunId) {
+      pipelineId
+      targetId
+      targetType
+      eventType
+      scope
+      channelId
+      status
+      trigger
+      initiatedByUsername
+      retryOfPipelineRunId
+      attemptNumber
+      queuedAt
+      startedAt
+      heartbeatAt
+      timeoutAt
+      finishedAt
+      createdAt
+      updatedAt
+    }
   }
 `;

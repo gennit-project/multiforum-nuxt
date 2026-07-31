@@ -68,9 +68,9 @@ vi.mock('@/components/auth/RequireAuth.vue', () => ({
   }),
 }));
 
-vi.mock('@/components/plugins/ScopedPipelineView.vue', () => ({
+vi.mock('@/components/plugins/DownloadPipelineStatusSummary.vue', () => ({
   default: defineComponent({
-    template: '<div data-testid="pipeline-view" />',
+    template: '<div data-testid="pipeline-status-summary">View checks</div>',
   }),
 }));
 

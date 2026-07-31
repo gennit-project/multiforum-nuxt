@@ -139,6 +139,14 @@ export const GET_SERVER_HEALTH_DASHBOARD = gql`
         lockedContentCount
         suspensionCount
         failedDownloadScanCount
+        queuedPluginJobCount
+        runningPluginJobCount
+        pluginTimeoutCount24h
+        pluginTimeoutRate24h
+        repeatedPluginFailureCount24h
+        pluginRetryAttemptCount1h
+        pluginRetryStormCount1h
+        oldestQueuedPluginJobAgeSeconds
         medianOpenIssueAgeDays
       }
       timeSeries {
@@ -742,25 +750,273 @@ export const GET_PLUGIN_DETAIL = gql`
   }
 `;
 
-export const GET_PIPELINE_RUNS = gql`
-  query GetPipelineRuns($targetId: ID!, $targetType: String!) {
-    getPipelineRuns(targetId: $targetId, targetType: $targetType) {
-      id
-      pipelineId
-      pluginId
-      pluginName
-      version
+export const GET_PLUGIN_PIPELINE_SUMMARY = gql`
+  query GetPipelineSummary($targetId: ID!, $targetType: String!) {
+    getPipelineSummary(targetId: $targetId, targetType: $targetType) {
+      targetId
+      targetType
+      attempts {
+        id
+        pipelineId
+        status
+        createdAt
+        jobs {
+          id
+          pluginId
+          pluginName
+          version
+          scope
+          channelId
+          eventType
+          status
+          message
+          durationMs
+          executionOrder
+          skippedReason
+          diagnostics {
+            level
+            code
+            message
+            details
+            helpUrl
+          }
+          createdAt
+          updatedAt
+        }
+      }
+    }
+  }
+`;
+
+export const GET_DOWNLOAD_PIPELINE_OVERVIEW = gql`
+  query GetDownloadPipelineOverview(
+    $downloadableFileId: ID!
+    $discussionId: ID!
+    $channelUniqueName: String!
+  ) {
+    serverApplicable: getApplicablePluginPipeline(
+      downloadableFileId: $downloadableFileId
+      eventType: "downloadableFile.created"
+      scope: "SERVER"
+    ) {
+      targetId
+      targetType
+      eventType
       scope
       channelId
+      configured
+      applicability
+      effectiveAt
+      policyId
+      required
+      reason
+      expectedJobs {
+        pluginId
+        pluginName
+        version
+        order
+        condition
+        continueOnError
+      }
+    }
+    channelApplicable: getApplicablePluginPipeline(
+      downloadableFileId: $downloadableFileId
+      discussionId: $discussionId
+      channelUniqueName: $channelUniqueName
+      eventType: "discussionChannel.created"
+      scope: "CHANNEL"
+    ) {
+      targetId
+      targetType
       eventType
+      scope
+      channelId
+      configured
+      applicability
+      effectiveAt
+      required
+      reason
+      expectedJobs {
+        pluginId
+        pluginName
+        version
+        order
+        condition
+        continueOnError
+      }
+    }
+    serverSummary: getPipelineSummary(
+      targetId: $downloadableFileId
+      targetType: "DownloadableFile"
+    ) {
+      attempts {
+        id
+        pipelineId
+        targetId
+        targetType
+        eventType
+        scope
+        channelId
+        status
+        trigger
+        initiatedByUsername
+        retryOfPipelineRunId
+        attemptNumber
+        applicability
+        policyEffectiveAt
+        policyId
+        campaignId
+        queuedAt
+        startedAt
+        heartbeatAt
+        timeoutAt
+        finishedAt
+        createdAt
+        updatedAt
+        jobs {
+          id
+          pluginId
+          pluginName
+          version
+          scope
+          channelId
+          eventType
+          status
+          message
+          durationMs
+          executionOrder
+          skippedReason
+          queuedAt
+          startedAt
+          heartbeatAt
+          timeoutAt
+          finishedAt
+          diagnostics {
+            level
+            code
+            message
+            details
+            helpUrl
+          }
+          createdAt
+          updatedAt
+        }
+      }
+    }
+    channelSummary: getPipelineSummary(
+      targetId: $discussionId
+      targetType: "Discussion"
+    ) {
+      attempts {
+        id
+        pipelineId
+        targetId
+        targetType
+        eventType
+        scope
+        channelId
+        status
+        trigger
+        initiatedByUsername
+        retryOfPipelineRunId
+        attemptNumber
+        applicability
+        policyEffectiveAt
+        policyId
+        campaignId
+        queuedAt
+        startedAt
+        heartbeatAt
+        timeoutAt
+        finishedAt
+        createdAt
+        updatedAt
+        jobs {
+          id
+          pluginId
+          pluginName
+          version
+          scope
+          channelId
+          eventType
+          status
+          message
+          durationMs
+          executionOrder
+          skippedReason
+          queuedAt
+          startedAt
+          heartbeatAt
+          timeoutAt
+          finishedAt
+          diagnostics {
+            level
+            code
+            message
+            details
+            helpUrl
+          }
+          createdAt
+          updatedAt
+        }
+      }
+    }
+  }
+`;
+
+export const GET_PLUGIN_PIPELINE_CAMPAIGNS = gql`
+  query GetPluginPipelineCampaigns {
+    getPluginPipelineCampaigns {
+      id
+      policyId
+      eventType
+      scope
+      applicability
+      enforcementBehavior
       status
-      message
-      durationMs
-      executionOrder
-      skippedReason
-      payload
+      concurrency
+      rateLimitPerMinute
+      affectedFileCount
+      accessibleFileCount
+      unavailableFileCount
+      estimatedProviderRuns
+      completedCount
+      runningCount
+      failedCount
+      timedOutCount
+      createdByUsername
       createdAt
-      updatedAt
+      startedAt
+      pausedAt
+      finishedAt
+    }
+  }
+`;
+
+export const PREVIEW_PLUGIN_PIPELINE_CAMPAIGN = gql`
+  query PreviewPluginPipelineCampaign($policyId: ID!) {
+    previewPluginPipelineCampaign(policyId: $policyId) {
+      policyId
+      eventType
+      applicability
+      enforcementBehavior
+      affectedFileCount
+      accessibleFileCount
+      unavailableFileCount
+      estimatedProviderRuns
+    }
+  }
+`;
+
+export const GET_PLUGIN_PIPELINE_CAMPAIGN_FAILURES = gql`
+  query GetPluginPipelineCampaignFailures($campaignId: ID!) {
+    getPluginPipelineCampaignFailures(campaignId: $campaignId) {
+      pipelineId
+      targetId
+      discussionId
+      channelId
+      status
+      attemptNumber
     }
   }
 `;

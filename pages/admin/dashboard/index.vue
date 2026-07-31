@@ -29,6 +29,14 @@ type ServerHealthSummary = {
   lockedContentCount: number;
   suspensionCount: number;
   failedDownloadScanCount: number;
+  queuedPluginJobCount: number;
+  runningPluginJobCount: number;
+  pluginTimeoutCount24h: number;
+  pluginTimeoutRate24h: number;
+  repeatedPluginFailureCount24h: number;
+  pluginRetryAttemptCount1h: number;
+  pluginRetryStormCount1h: number;
+  oldestQueuedPluginJobAgeSeconds: number;
   medianOpenIssueAgeDays?: number | null;
 };
 

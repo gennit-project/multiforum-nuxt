@@ -54,6 +54,11 @@ const stubs = {
     emits: ['save'],
     template: '<div class="pipeline-editor" />',
   },
+  PluginPipelineCampaigns: {
+    name: 'PluginPipelineCampaigns',
+    props: ['pipelines'],
+    template: '<div class="pipeline-campaigns" />',
+  },
 };
 
 const mountPage = () => mountWithDefaults(PipelinesPage, { global: { stubs } });

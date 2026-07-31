@@ -1,6 +1,6 @@
 import { ref, computed, watch, onUnmounted, type Ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_PIPELINE_RUNS } from '@/graphQLData/admin/queries';
+import { GET_PLUGIN_PIPELINE_SUMMARY } from '@/graphQLData/admin/queries';
 
 export type PipelineStatus =
   | 'PENDING'
@@ -10,6 +10,14 @@ export type PipelineStatus =
   | 'SKIPPED';
 
 export type PipelineScope = 'SERVER' | 'CHANNEL';
+
+export interface PublicPipelineDiagnostic {
+  level: 'INFO' | 'WARNING' | 'ERROR';
+  code: string;
+  message: string;
+  details?: unknown;
+  helpUrl?: string;
+}
 
 export interface PipelineRun {
   id: string;
@@ -25,7 +33,12 @@ export interface PipelineRun {
   durationMs?: number;
   executionOrder: number;
   skippedReason?: string;
-  payload?: Record<string, unknown>;
+  diagnostics?: PublicPipelineDiagnostic[];
+  queuedAt?: string;
+  startedAt?: string | null;
+  heartbeatAt?: string | null;
+  timeoutAt?: string | null;
+  finishedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -62,7 +75,7 @@ export function usePluginPipeline(
     error,
     refetch,
   } = useQuery(
-    GET_PIPELINE_RUNS,
+    GET_PLUGIN_PIPELINE_SUMMARY,
     () => ({
       targetId: targetId.value,
       targetType: targetType.value,
@@ -78,6 +91,18 @@ export function usePluginPipeline(
 
   // Get all pipeline runs
   const pipelineRuns = computed((): PipelineRun[] => {
+    const attempts = result.value?.getPipelineSummary?.attempts;
+    if (Array.isArray(attempts)) {
+      return attempts.flatMap(
+        (attempt: { pipelineId: string; jobs?: PipelineRun[] }) =>
+          (attempt.jobs || []).map((job) => ({
+            ...job,
+            pipelineId: attempt.pipelineId,
+          }))
+      );
+    }
+    // Compatibility for cached results during the query migration and for
+    // existing composable tests. Production requests use the safe summary API.
     return result.value?.getPipelineRuns || [];
   });
 

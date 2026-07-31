@@ -9,6 +9,7 @@ import MarkdownRenderer from '../MarkdownRenderer.vue';
 import { MARK_NOTIFICATIONS_AS_READ } from '@/graphQLData/user/mutations';
 
 const NOTIFICATION_PAGE_LIMIT = 15;
+type NotificationWithLink = Notification & { link?: string | null };
 
 const usernameVar = useUsername();
 
@@ -51,7 +52,7 @@ markNotificationsAsReadDone(() => {
   refetch();
 });
 
-const notifications = computed<Notification[]>(() => {
+const notifications = computed<NotificationWithLink[]>(() => {
   if (!notificationResult.value) {
     return [];
   }
@@ -169,6 +170,13 @@ const markAllAsRead = () => {
               :text="notification.text"
               class="w-full"
             />
+            <NuxtLink
+              v-if="notification.link"
+              :to="notification.link"
+              class="mt-2 inline-block text-sm text-orange-700 underline dark:text-orange-300"
+            >
+              View pipeline attempt
+            </NuxtLink>
           </li>
         </ul>
         <div

@@ -27,23 +27,22 @@ const { getStatusInfo, formatDuration } = usePluginPipeline(
 
 const statusInfo = computed(() => getStatusInfo(props.run.status));
 
-// Format the payload for display
-const formattedPayload = computed(() => {
-  if (!props.run.payload) return null;
+// Diagnostics are the plugin's explicitly public, server-sanitized output.
+const formattedDiagnostics = computed(() => {
+  if (!props.run.diagnostics?.length) return null;
   try {
-    return JSON.stringify(props.run.payload, null, 2);
+    return JSON.stringify(props.run.diagnostics, null, 2);
   } catch {
-    return String(props.run.payload);
+    return String(props.run.diagnostics);
   }
 });
 
-// Copy payload to clipboard
 const copied = ref(false);
 const copyToClipboard = async () => {
-  if (!formattedPayload.value) return;
+  if (!formattedDiagnostics.value) return;
 
   try {
-    await navigator.clipboard.writeText(formattedPayload.value);
+    await navigator.clipboard.writeText(formattedDiagnostics.value);
     copied.value = true;
     setTimeout(() => {
       copied.value = false;
@@ -184,11 +183,11 @@ const formatTimestamp = (isoString: string) => {
                     </div>
                   </div>
 
-                  <!-- Payload / Logs -->
-                  <div v-if="formattedPayload">
+                  <!-- Public diagnostics -->
+                  <div v-if="formattedDiagnostics">
                     <div class="mb-2 flex items-center justify-between">
                       <h4 class="text-sm font-medium text-gray-900 dark:text-white">
-                        Output / Logs
+                        Public diagnostics
                       </h4>
                       <button
                         type="button"
@@ -196,15 +195,15 @@ const formatTimestamp = (isoString: string) => {
                         @click="copyToClipboard"
                       >
                         <i :class="copied ? 'fa-solid fa-check' : 'fa-solid fa-copy'" />
-                        <span>{{ copied ? 'Copied!' : 'Copy' }}</span>
+                        <span>{{ copied ? 'Copied!' : 'Copy diagnostics' }}</span>
                       </button>
                     </div>
-                    <pre class="max-h-48 overflow-auto rounded-md bg-gray-900 p-3 text-xs text-gray-100"><code>{{ formattedPayload }}</code></pre>
+                    <pre class="max-h-48 overflow-auto rounded-md bg-gray-900 p-3 text-xs text-gray-100"><code>{{ formattedDiagnostics }}</code></pre>
                   </div>
 
                   <!-- No additional info -->
                   <div
-                    v-if="!run.message && !run.skippedReason && !formattedPayload"
+                    v-if="!run.message && !run.skippedReason && !formattedDiagnostics"
                     class="text-center text-sm text-gray-500 dark:text-gray-400"
                   >
                     No additional details available for this plugin run.

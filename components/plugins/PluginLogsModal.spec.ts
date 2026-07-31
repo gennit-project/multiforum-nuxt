@@ -302,13 +302,20 @@ describe('PluginLogsModal Component', () => {
     expect(wrapper.text()).toContain('Condition PREVIOUS_SUCCEEDED not met');
   });
 
-  it('should display JSON payload when provided', async () => {
+  it('should display public diagnostics when provided', async () => {
     const PluginLogsModal = await import('./PluginLogsModal.vue').then(
       (m) => m.default
     );
 
     const mockRun = createMockRun({
-      payload: { result: 'clean', scanTime: 1200 },
+      diagnostics: [
+        {
+          level: 'INFO',
+          code: 'SCAN_CLEAN',
+          message: 'The scan passed.',
+          details: { result: 'clean', scanTime: 1200 },
+        },
+      ],
     });
 
     const wrapper = mount(PluginLogsModal, {
@@ -395,13 +402,20 @@ describe('PluginLogsModal Component', () => {
     }
   });
 
-  it('should show copy button for payload', async () => {
+  it('should show copy button for diagnostics', async () => {
     const PluginLogsModal = await import('./PluginLogsModal.vue').then(
       (m) => m.default
     );
 
     const mockRun = createMockRun({
-      payload: { test: 'data' },
+      diagnostics: [
+        {
+          level: 'INFO',
+          code: 'TEST_RESULT',
+          message: 'Test result',
+          details: { test: 'data' },
+        },
+      ],
     });
 
     const wrapper = mount(PluginLogsModal, {
@@ -421,7 +435,7 @@ describe('PluginLogsModal Component', () => {
     expect(wrapper.text()).toContain('Copy');
   });
 
-  it('should show "No additional details" when no message, reason, or payload', async () => {
+  it('should show "No additional details" without public diagnostics', async () => {
     const PluginLogsModal = await import('./PluginLogsModal.vue').then(
       (m) => m.default
     );
@@ -429,7 +443,7 @@ describe('PluginLogsModal Component', () => {
     const mockRun = createMockRun({
       message: undefined,
       skippedReason: undefined,
-      payload: undefined,
+      diagnostics: undefined,
     });
 
     const wrapper = mount(PluginLogsModal, {

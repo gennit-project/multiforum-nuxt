@@ -28,7 +28,11 @@ const durationDisplay = computed(() => {
 });
 
 const hasDetails = computed(() => {
-  return props.run.message || props.run.skippedReason || props.run.payload;
+  return (
+    props.run.message ||
+    props.run.skippedReason ||
+    (props.run.diagnostics?.length || 0) > 0
+  );
 });
 </script>
 

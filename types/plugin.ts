@@ -16,7 +16,13 @@ export interface BackendPipelineStep {
  */
 export interface BackendPipeline {
   event: string;
+  policyId?: string;
   stopOnFirstFailure?: boolean;
+  effectiveAt?: string;
+  applicability?:
+    | 'NEW_FILES_ONLY'
+    | 'ALL_FILES_GRADUAL'
+    | 'ALL_FILES_IMMEDIATE';
   steps: BackendPipelineStep[];
 }
 

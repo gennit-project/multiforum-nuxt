@@ -236,22 +236,26 @@ Plugins run in configurable pipelines with ordering, conditions, and error handl
 - `PluginPipelineEditor.vue` - Added `scope` prop, uses scoped events/defaults
 - `PipelineVisualEditor.vue` - Added `events` prop for scope-filtered display
 
-### Channel Pipeline View (Phase 9.7)
+### Public Pipeline View
 
-**New Component**: `ScopedPipelineView.vue`
+Pipeline history now lives in the public **Pipelines** tab on download detail
+pages.
 
-Displays both server and channel pipeline results in the download sidebar:
-- Queries server pipelines (file-level) and channel pipelines (discussion-level)
-- Shows pipelines in separate sections with scope indicators
-- Server pipelines show with server icon
-- Channel pipelines show with hashtag icon and channel name
-- Combined status indicator in header
-- Auto-polling while any pipeline is active
+The view:
+- shows configured server and channel checks before they run;
+- distinguishes `NOT_REQUIRED`, `NOT_EXECUTED`, active, and terminal states;
+- displays newest-first attempt history and ordered jobs;
+- displays bounded public diagnostics and documentation links;
+- provides stable attempt permalinks;
+- auto-polls while any attempt is active.
+
+The download sidebar retains only a compact status and **View checks** link.
 
 **Updated Files:**
-- `composables/usePluginPipeline.ts` - Added `scope`, `channelId`, `eventType` to PipelineRun and PipelineGroup interfaces
-- `graphQLData/admin/queries.js` - Added `scope`, `channelId`, `eventType` to GET_PIPELINE_RUNS query
-- `components/channel/DownloadSidebar.vue` - Uses ScopedPipelineView instead of PluginPipeline
+- `composables/useDownloadPipelineOverview.ts`
+- `components/plugins/PublicDownloadPipelines.vue`
+- `components/plugins/DownloadPipelineStatusSummary.vue`
+- `pages/forums/[forumId]/downloads/[discussionId]/pipelines.vue`
 
 ### Plugin Version Management (Phase 5)
 

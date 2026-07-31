@@ -5,6 +5,7 @@ import FormRow from '@/components/FormRow.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PluginPipelineEditor from '@/components/plugins/PluginPipelineEditor.vue';
+import PluginPipelineCampaigns from '@/components/plugins/PluginPipelineCampaigns.vue';
 import { useToast } from '@/composables/useToast';
 import { GET_PLUGIN_PIPELINES, GET_INSTALLED_PLUGINS } from '@/graphQLData/admin/queries';
 import { UPDATE_PLUGIN_PIPELINES } from '@/graphQLData/admin/mutations';
@@ -177,6 +178,13 @@ async function handleSave(config: PipelineConfig) {
                 :available-plugins="availablePlugins"
                 :saving="saving"
                 @save="handleSave"
+              />
+            </template>
+          </FormRow>
+          <FormRow section-title="Existing-file campaigns">
+            <template #content>
+              <PluginPipelineCampaigns
+                :pipelines="currentPipelines?.pipelines"
               />
             </template>
           </FormRow>

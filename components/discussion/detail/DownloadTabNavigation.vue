@@ -8,6 +8,7 @@ import { useQuery } from '@vue/apollo-composable';
 import { GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD } from '@/graphQLData/collection/queries';
 import PublicCollectionListItem from '@/components/collection/PublicCollectionListItem.vue';
 import { useUsername } from '@/composables/useAuthState';
+import { useDownloadPipelineOverview } from '@/composables/useDownloadPipelineOverview';
 
 const usernameVar = useUsername();
 
@@ -53,6 +54,18 @@ const {
 const publicCollections = computed(() => {
   return publicCollectionsResult.value?.publicCollectionsContaining || [];
 });
+
+const primaryFileId = computed(
+  () => props.discussion?.DownloadableFiles?.[0]?.id || ''
+);
+const {
+  hasPipelineContent,
+} = useDownloadPipelineOverview(
+  primaryFileId,
+  computed(() => props.discussionId),
+  computed(() => props.channelId),
+  { pollWhileActive: false }
+);
 </script>
 
 <template>
@@ -112,6 +125,24 @@ const publicCollections = computed(() => {
           "
         >
           Activity
+        </nuxt-link>
+        <nuxt-link
+          v-if="hasPipelineContent"
+          :to="{
+            name: 'forums-forumId-downloads-discussionId-pipelines',
+            params: {
+              forumId: channelId,
+              discussionId: discussionId,
+            },
+          }"
+          class="border-b-2 px-1 py-2 text-sm font-medium"
+          :class="
+            typeof $route.name === 'string' && $route.name.includes('pipelines')
+              ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+              : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+          "
+        >
+          Pipelines
         </nuxt-link>
       </nav>
     </div>

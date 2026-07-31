@@ -131,6 +131,25 @@ describe('pipelineUtils', () => {
       expect(step?.condition).toBe('PREVIOUS_SUCCEEDED');
       expect(step?.continueOnError).toBe(true);
     });
+
+    it('preserves rollout metadata', () => {
+      const result = parsePipelinesFromBackend([
+        {
+          event: 'downloadableFile.created',
+          applicability: 'NEW_FILES_ONLY',
+          effectiveAt: '2026-07-30T12:00:00.000Z',
+          steps: [{ pluginId: 'scanner' }],
+        },
+      ]);
+
+      expect({
+        applicability: result?.pipelines[0].applicability,
+        effectiveAt: result?.pipelines[0].effectiveAt,
+      }).toEqual({
+        applicability: 'NEW_FILES_ONLY',
+        effectiveAt: '2026-07-30T12:00:00.000Z',
+      });
+    });
   });
 
   describe('transformPipelinesForMutation', () => {
@@ -226,6 +245,29 @@ describe('pipelineUtils', () => {
       const result = transformPipelinesForMutation(config);
 
       expect(result[0].steps[0].version).toBe('3.2.1');
+    });
+
+    it('preserves rollout metadata', () => {
+      const config: PipelineConfig = {
+        pipelines: [
+          {
+            event: 'downloadableFile.created',
+            applicability: 'ALL_FILES_GRADUAL',
+            effectiveAt: '2026-07-30T12:00:00.000Z',
+            steps: [{ plugin: 'scanner' }],
+          },
+        ],
+      };
+
+      const result = transformPipelinesForMutation(config);
+
+      expect({
+        applicability: result[0].applicability,
+        effectiveAt: result[0].effectiveAt,
+      }).toEqual({
+        applicability: 'ALL_FILES_GRADUAL',
+        effectiveAt: '2026-07-30T12:00:00.000Z',
+      });
     });
 
     it('handles multiple pipelines with multiple steps', () => {

@@ -60,6 +60,7 @@ const mountList = () =>
         GenericButton: { name: 'GenericButton', props: ['text', 'loading'], emits: ['click'], template: '<button @click="$emit(\'click\')">{{ text }}</button>' },
         MarkdownRenderer: { name: 'MarkdownRenderer', props: ['text'], template: '<div class="md">{{ text }}</div>' },
         LoadMore: { name: 'LoadMore', props: ['loading', 'reachedEndOfResults'], emits: ['load-more'], template: '<div class="load" />' },
+        NuxtLink: { name: 'NuxtLink', props: ['to'], template: '<a :href="to"><slot /></a>' },
       },
     },
   });
@@ -122,6 +123,22 @@ describe('NotificationList content', () => {
     const wrapper = mountList();
 
     expect(wrapper.text()).toContain('You have 4 unread notifications');
+  });
+
+  it('links pipeline notifications to their public attempt', () => {
+    h.result = ref(
+      userData([
+        notification({
+          notificationType: 'plugin_pipeline',
+          link: '/forums/cats/downloads/one/pipelines?attempt=pipeline-1',
+        }),
+      ])
+    );
+    const wrapper = mountList();
+
+    expect(wrapper.get('a').attributes('href')).toContain(
+      'attempt=pipeline-1'
+    );
   });
 });
 

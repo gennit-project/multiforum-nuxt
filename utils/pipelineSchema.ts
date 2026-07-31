@@ -2,6 +2,10 @@
 
 // TypeScript types matching the backend schema
 export type PipelineCondition = 'ALWAYS' | 'PREVIOUS_SUCCEEDED' | 'PREVIOUS_FAILED';
+export type PipelineApplicability =
+  | 'NEW_FILES_ONLY'
+  | 'ALL_FILES_GRADUAL'
+  | 'ALL_FILES_IMMEDIATE';
 
 export interface PipelineStep {
   plugin: string;
@@ -12,7 +16,10 @@ export interface PipelineStep {
 
 export interface EventPipeline {
   event: string;
+  policyId?: string;
   stopOnFirstFailure?: boolean;
+  effectiveAt?: string;
+  applicability?: PipelineApplicability;
   steps: PipelineStep[];
 }
 
@@ -118,6 +125,31 @@ const createPipelineJsonSchema = (scope: PipelineConfigScope) => {
               description: 'Stop pipeline execution if any step fails',
               default: false,
             },
+            ...(scope === 'server'
+              ? {
+                  effectiveAt: {
+                    type: 'string',
+                    format: 'date-time',
+                    description:
+                      'When this pipeline policy became effective',
+                  },
+                  policyId: {
+                    type: 'string',
+                    description: 'Stable identifier assigned to this rollout policy',
+                  },
+                  applicability: {
+                    type: 'string',
+                    description:
+                      'Whether this pipeline applies to existing downloadable files',
+                    enum: [
+                      'NEW_FILES_ONLY',
+                      'ALL_FILES_GRADUAL',
+                      'ALL_FILES_IMMEDIATE',
+                    ],
+                    default: 'NEW_FILES_ONLY',
+                  },
+                }
+              : {}),
             steps: {
               type: 'array',
               description: 'Ordered list of plugin steps to execute',
@@ -170,6 +202,7 @@ export const DEFAULT_PIPELINE_YAML = `# Server Plugin Pipeline Configuration
 
 pipelines:
   - event: downloadableFile.created
+    applicability: NEW_FILES_ONLY
     stopOnFirstFailure: false
     steps:
       # Add your plugin steps here
@@ -261,6 +294,26 @@ export function validatePipelineConfig(
           errors.push(`${stepPrefix}: Invalid condition "${step.condition}"`);
         }
       }
+    }
+
+    if (
+      pipeline.applicability &&
+      ![
+        'NEW_FILES_ONLY',
+        'ALL_FILES_GRADUAL',
+        'ALL_FILES_IMMEDIATE',
+      ].includes(pipeline.applicability)
+    ) {
+      errors.push(
+        `${pipelinePrefix}: Invalid applicability "${pipeline.applicability}"`
+      );
+    }
+
+    if (
+      pipeline.effectiveAt &&
+      Number.isNaN(Date.parse(pipeline.effectiveAt))
+    ) {
+      errors.push(`${pipelinePrefix}: Invalid "effectiveAt" timestamp`);
     }
   }
 

@@ -7,6 +7,7 @@ import { useModProfileName } from '@/composables/useAuthState';
 import DiscussionTitleVersions from '@/components/discussion/detail/activityFeed/DiscussionTitleVersions.vue';
 import LabelChangeHistory from '@/components/discussion/detail/activityFeed/LabelChangeHistory.vue';
 import type { Discussion } from '@/__generated__/graphql';
+import { useDownloadPipelineOverview } from '@/composables/useDownloadPipelineOverview';
 
 const modProfileNameVar = useModProfileName();
 
@@ -45,6 +46,32 @@ const discussion = computed<Discussion | null>(() => {
   return props.discussion || getDiscussionResult.value?.discussions?.[0] || null;
 });
 
+const downloadableFileId = computed(
+  () => discussion.value?.DownloadableFiles?.[0]?.id || ''
+);
+const { attempts: pipelineAttempts } = useDownloadPipelineOverview(
+  downloadableFileId,
+  discussionId,
+  channelId,
+  { pollWhileActive: false }
+);
+const significantPipelineAttempts = computed(() =>
+  pipelineAttempts.value.filter((attempt) =>
+    ['SUCCEEDED', 'FAILED', 'TIMED_OUT', 'CANCELLED'].includes(attempt.status)
+  )
+);
+const formatPipelineTime = (value: string) =>
+  new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(new Date(value));
+const pipelineAttemptUrl = (pipelineId: string) =>
+  `/forums/${encodeURIComponent(channelId.value)}/downloads/${encodeURIComponent(
+    discussionId.value
+  )}/pipelines?attempt=${encodeURIComponent(
+    pipelineId
+  )}#attempt-${encodeURIComponent(pipelineId)}`;
+
 // Get the active discussion channel for this forum
 const activeDiscussionChannel = computed(() => {
   return discussion.value?.DiscussionChannels?.find(
@@ -70,7 +97,11 @@ const hasLabelChanges = computed(() => {
 });
 
 const hasAnyActivity = computed(() => {
-  return hasTitleEdits.value || hasLabelChanges.value;
+  return (
+    hasTitleEdits.value ||
+    hasLabelChanges.value ||
+    significantPipelineAttempts.value.length > 0
+  );
 });
 </script>
 
@@ -91,6 +122,34 @@ const hasAnyActivity = computed(() => {
         v-if="hasLabelChanges"
         :label-change-history="labelChangeHistory"
       />
+
+      <section
+        v-if="significantPipelineAttempts.length"
+        aria-labelledby="pipeline-activity-heading"
+        class="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
+      >
+        <h2 id="pipeline-activity-heading" class="font-semibold dark:text-white">
+          Pipeline activity
+        </h2>
+        <ol class="mt-3 divide-y divide-gray-200 dark:divide-gray-700">
+          <li
+            v-for="attempt in significantPipelineAttempts"
+            :key="attempt.pipelineId"
+            class="py-3 text-sm"
+          >
+            <NuxtLink
+              :to="pipelineAttemptUrl(attempt.pipelineId)"
+              class="font-medium text-orange-700 underline dark:text-orange-300"
+            >
+              {{ attempt.scope === 'SERVER' ? 'Server' : 'Channel' }} checks
+              {{ attempt.status === 'SUCCEEDED' ? 'passed' : attempt.status.toLowerCase().replace('_', ' ') }}
+            </NuxtLink>
+            <span class="ml-2 text-gray-500 dark:text-gray-400">
+              {{ formatPipelineTime(attempt.finishedAt || attempt.updatedAt) }}
+            </span>
+          </li>
+        </ol>
+      </section>
     </div>
   </div>
 </template>
