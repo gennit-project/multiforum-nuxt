@@ -121,6 +121,7 @@ const searchPlaceholder = computed(() =>
       <div class="max-h-96 overflow-y-auto">
         <AlbumReusableUserImagesTab
           v-if="activeTab === 'uploads'"
+          key="uploads"
           source="uploads"
           :search-term="searchTerm"
           :selected-image-ids="props.selectedImageIds"
@@ -129,6 +130,7 @@ const searchPlaceholder = computed(() =>
         />
         <AlbumReusableUserImagesTab
           v-else-if="activeTab === 'favorites'"
+          key="favorites"
           source="favorites"
           :search-term="searchTerm"
           :selected-image-ids="props.selectedImageIds"

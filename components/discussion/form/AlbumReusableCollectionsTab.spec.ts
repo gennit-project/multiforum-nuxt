@@ -8,6 +8,7 @@ const {
   collectionImagesResult,
   falseRef,
   nullRef,
+  fetchMore,
 } = vi.hoisted(() => ({
   usernameRef: { value: 'alice' as string },
   collectionsResult: {
@@ -32,13 +33,14 @@ const {
             { id: 'ci-1', url: 'https://img.test/ci1.jpg' },
             { id: 'ci-2', url: 'https://img.test/ci2.jpg' },
           ],
-          ImagesAggregate: { count: 2 },
+          ImagesAggregate: { count: 30 },
         },
       ],
     } as Record<string, unknown>,
   },
   falseRef: { value: false },
   nullRef: { value: null as Error | null },
+  fetchMore: vi.fn(() => Promise.resolve()),
 }));
 
 vi.mock('@/composables/useAuthState', () => ({
@@ -51,7 +53,12 @@ vi.mock('@vue/apollo-composable', () => ({
     if (opName === 'GetReusableImageCollections') {
       return { result: collectionsResult, loading: falseRef, error: nullRef };
     }
-    return { result: collectionImagesResult, loading: falseRef, error: nullRef };
+    return {
+      result: collectionImagesResult,
+      loading: falseRef,
+      error: nullRef,
+      fetchMore,
+    };
   }),
 }));
 
@@ -81,8 +88,12 @@ const mountTab = (searchTerm = '') =>
 const collectionButtons = (wrapper: ReturnType<typeof mountTab>) =>
   wrapper.findAll('[data-testid="reuse-image-collection-button"]');
 
+const loadMoreButton = (wrapper: ReturnType<typeof mountTab>) =>
+  wrapper.findAll('button').find((b) => b.text() === 'Load more');
+
 beforeEach(() => {
   usernameRef.value = 'alice';
+  fetchMore.mockClear();
 });
 
 describe('AlbumReusableCollectionsTab', () => {
@@ -121,5 +132,16 @@ describe('AlbumReusableCollectionsTab', () => {
     await collectionButtons(wrapper)[0].trigger('click');
     wrapper.findComponent(GridStub).vm.$emit('add-image', { id: 'ci-1' });
     expect(wrapper.emitted('addImage')?.[0]?.[0]).toMatchObject({ id: 'ci-1' });
+  });
+
+  it('requests the next page of collection images when Load more is clicked', async () => {
+    const wrapper = mountTab();
+    await collectionButtons(wrapper)[0].trigger('click');
+    await loadMoreButton(wrapper)!.trigger('click');
+    expect(fetchMore).toHaveBeenCalledWith(
+      expect.objectContaining({
+        variables: expect.objectContaining({ offset: 24 }),
+      })
+    );
   });
 });

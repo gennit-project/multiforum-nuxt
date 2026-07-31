@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useUsername } from '@/composables/useAuthState';
 import {
@@ -9,6 +9,7 @@ import {
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import AlbumReusableImageGrid from './AlbumReusableImageGrid.vue';
+import LoadMore from '@/components/LoadMore.vue';
 import { buildReusableImageWhere } from './reusableImageTypes';
 import type { ReusableImage } from './reusableImageTypes';
 
@@ -47,6 +48,15 @@ const emit = defineEmits<{
 
 const usernameVar = useUsername();
 const selectedCollectionId = ref<string | null>(null);
+const currentOffset = ref(0);
+const isLoadingMore = ref(false);
+
+const buildImageVariables = (offset: number) => ({
+  collectionId: selectedCollectionId.value,
+  where: buildReusableImageWhere(props.searchTerm),
+  offset,
+  limit: PAGE_SIZE,
+});
 
 const {
   result: collectionsResult,
@@ -74,14 +84,10 @@ const {
   result: collectionImagesResult,
   loading: collectionImagesLoading,
   error: collectionImagesError,
+  fetchMore,
 } = useQuery<CollectionImagesResult>(
   GET_REUSABLE_COLLECTION_IMAGES,
-  () => ({
-    collectionId: selectedCollectionId.value,
-    where: buildReusableImageWhere(props.searchTerm),
-    offset: 0,
-    limit: PAGE_SIZE,
-  }),
+  () => buildImageVariables(0),
   () => ({
     enabled: Boolean(selectedCollectionId.value),
     fetchPolicy: 'cache-and-network',
@@ -102,6 +108,57 @@ const selectedCollection = computed(
 const collectionImages = computed<ReusableImage[]>(
   () => selectedCollection.value?.Images || []
 );
+
+const collectionImagesTotal = computed(
+  () => selectedCollection.value?.ImagesAggregate?.count ?? 0
+);
+
+const hasMoreCollectionImages = computed(
+  () => collectionImages.value.length < collectionImagesTotal.value
+);
+
+// Restart image paging whenever the chosen collection or the search changes;
+// the base query refetches at offset 0, so keep our cursor in sync.
+watch([selectedCollectionId, () => props.searchTerm], () => {
+  currentOffset.value = 0;
+});
+
+const loadMoreCollectionImages = async () => {
+  if (!hasMoreCollectionImages.value || isLoadingMore.value) return;
+
+  const newOffset = currentOffset.value + PAGE_SIZE;
+  isLoadingMore.value = true;
+
+  try {
+    await fetchMore({
+      variables: buildImageVariables(newOffset),
+      updateQuery: (previous: CollectionImagesResult, { fetchMoreResult }) => {
+        if (!fetchMoreResult) return previous;
+        const prevCollection = previous.collections?.[0];
+        const nextCollection = fetchMoreResult.collections?.[0];
+        if (!prevCollection || !nextCollection) return previous;
+
+        return {
+          ...previous,
+          collections: [
+            {
+              ...prevCollection,
+              Images: [
+                ...(prevCollection.Images || []),
+                ...(nextCollection.Images || []),
+              ],
+              ImagesAggregate: nextCollection.ImagesAggregate,
+            },
+          ],
+        };
+      },
+    });
+
+    currentOffset.value = newOffset;
+  } finally {
+    isLoadingMore.value = false;
+  }
+};
 
 const selectedCollectionName = computed(() => {
   if (selectedCollection.value?.name) return selectedCollection.value.name;
@@ -191,6 +248,14 @@ const backToCollections = () => {
         :error="collectionImagesErrorMessage"
         empty-message="This collection has no images."
         @add-image="emit('addImage', $event)"
+      />
+
+      <LoadMore
+        v-if="collectionImages.length > 0"
+        class="mt-2"
+        :loading="isLoadingMore"
+        :reached-end-of-results="!hasMoreCollectionImages"
+        @load-more="loadMoreCollectionImages"
       />
     </div>
   </div>

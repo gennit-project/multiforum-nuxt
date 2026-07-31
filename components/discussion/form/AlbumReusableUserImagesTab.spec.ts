@@ -2,15 +2,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import AlbumReusableUserImagesTab from '@/components/discussion/form/AlbumReusableUserImagesTab.vue';
 
-const { usernameRef, queryResult, queryLoading, queryError } = vi.hoisted(
-  () => ({
+const { usernameRef, queryResult, queryLoading, queryError, fetchMore } =
+  vi.hoisted(() => ({
     usernameRef: { value: 'alice' as string },
     queryResult: {
       value: {
         users: [
           {
             Images: [{ id: 'upload-1', url: 'https://img.test/u1.jpg' }],
-            ImagesAggregate: { count: 1 },
+            ImagesAggregate: { count: 30 },
             FavoriteImages: [
               { id: 'fav-1', url: 'https://img.test/f1.jpg' },
               { id: 'fav-2', url: 'https://img.test/f2.jpg' },
@@ -22,8 +22,8 @@ const { usernameRef, queryResult, queryLoading, queryError } = vi.hoisted(
     },
     queryLoading: { value: false },
     queryError: { value: null as Error | null },
-  })
-);
+    fetchMore: vi.fn(() => Promise.resolve()),
+  }));
 
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => usernameRef,
@@ -34,6 +34,7 @@ vi.mock('@vue/apollo-composable', () => ({
     result: queryResult,
     loading: queryLoading,
     error: queryError,
+    fetchMore,
   })),
 }));
 
@@ -58,10 +59,14 @@ const mountTab = (source: 'uploads' | 'favorites') =>
 const grid = (wrapper: ReturnType<typeof mountTab>) =>
   wrapper.findComponent(GridStub);
 
+const loadMoreButton = (wrapper: ReturnType<typeof mountTab>) =>
+  wrapper.findAll('button').find((b) => b.text() === 'Load more');
+
 beforeEach(() => {
   usernameRef.value = 'alice';
   queryLoading.value = false;
   queryError.value = null;
+  fetchMore.mockClear();
 });
 
 describe('AlbumReusableUserImagesTab', () => {
@@ -94,5 +99,25 @@ describe('AlbumReusableUserImagesTab', () => {
     queryError.value = new Error('kaboom');
     const wrapper = mountTab('uploads');
     expect(grid(wrapper).props('error')).toBe('kaboom');
+  });
+
+  it('offers a Load more control while more images remain than are loaded', () => {
+    const wrapper = mountTab('uploads');
+    expect(loadMoreButton(wrapper)).toBeTruthy();
+  });
+
+  it('does not offer Load more once every image is loaded', () => {
+    const wrapper = mountTab('favorites');
+    expect(loadMoreButton(wrapper)).toBeUndefined();
+  });
+
+  it('requests the next page offset when Load more is clicked', async () => {
+    const wrapper = mountTab('uploads');
+    await loadMoreButton(wrapper)!.trigger('click');
+    expect(fetchMore).toHaveBeenCalledWith(
+      expect.objectContaining({
+        variables: expect.objectContaining({ offset: 24 }),
+      })
+    );
   });
 });
