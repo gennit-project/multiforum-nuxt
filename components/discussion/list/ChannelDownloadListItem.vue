@@ -260,7 +260,7 @@ const filteredQuery = computed(() => {
             />
 
             <nuxt-link
-              class="flex items-center gap-2 rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700 dark:hover:bg-gray-600"
+              class="flex items-center gap-2 rounded-full bg-gray-100 px-2 py-0.5 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
               :to="{
                 name: 'forums-forumId-downloads-discussionId',
                 params: {
