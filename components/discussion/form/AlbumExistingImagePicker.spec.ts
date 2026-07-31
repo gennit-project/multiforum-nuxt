@@ -108,7 +108,7 @@ describe('AlbumExistingImagePicker', () => {
 
   it('emits the selected image when adding it to the album', async () => {
     const wrapper = mountPicker();
-    await wrapper.findAll('button')[2].trigger('click');
+    await wrapper.findAll('article button')[2].trigger('click');
     expect(wrapper.emitted('addImage')?.[0]?.[0]).toMatchObject({
       id: 'img-3',
       Uploader: { username: 'carol' },
@@ -117,7 +117,7 @@ describe('AlbumExistingImagePicker', () => {
 
   it('disables images already selected in the album', () => {
     const wrapper = mountPicker(['img-1']);
-    const firstButton = wrapper.find('button');
+    const firstButton = wrapper.find('article button');
     expect({
       disabled: firstButton.attributes('disabled'),
       text: firstButton.text(),
@@ -125,5 +125,17 @@ describe('AlbumExistingImagePicker', () => {
       disabled: '',
       text: 'Already in album',
     });
+  });
+
+  it('emits close when the close button is clicked', async () => {
+    const wrapper = mountPicker();
+    await wrapper.get('button[aria-label="Close reusable image picker"]').trigger('click');
+    expect(wrapper.emitted('close')).toHaveLength(1);
+  });
+
+  it('prompts to sign in instead of spinning when there is no username', () => {
+    usernameRef.value = '';
+    const wrapper = mountPicker();
+    expect(wrapper.text()).toContain('Sign in to reuse images');
   });
 });

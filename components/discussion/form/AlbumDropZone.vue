@@ -9,7 +9,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'files-selected', files: FileList): void;
   (e: 'drop', event: DragEvent): void;
-  (e: 'show-url-input'): void;
+  (e: 'show-url-input' | 'show-existing-picker'): void;
 }>();
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
@@ -56,6 +56,18 @@ const handleShowUrlInput = () => {
   }
   emit('show-url-input');
 };
+
+const handleShowExistingPicker = (event?: Event) => {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  if (props.isLimitReached) {
+    alert(`You've reached the maximum limit of ${props.maxImages} images.`);
+    return;
+  }
+  emit('show-existing-picker');
+};
 </script>
 
 <template>
@@ -70,9 +82,10 @@ const handleShowUrlInput = () => {
       class="flex h-full w-full cursor-pointer flex-col items-center justify-center"
     >
       <p class="mb-3 text-sm text-gray-500 dark:text-gray-300">
-        Drag and drop, tap to add files, or paste a link to an image
+        Drag and drop, tap to add files, paste a link, or reuse an image you
+        already have
       </p>
-      <div class="flex items-center gap-4 text-black">
+      <div class="flex flex-wrap items-center justify-center gap-4 text-black">
         <button
           type="button"
           class="rounded bg-orange-500 px-4 py-2 transition-colors hover:bg-orange-600"
@@ -80,13 +93,21 @@ const handleShowUrlInput = () => {
         >
           Choose Files
         </button>
-        <div class="h-6 w-px bg-gray-300 dark:bg-gray-600" />
+        <div class="hidden h-6 w-px bg-gray-300 sm:block dark:bg-gray-600" />
         <button
           type="button"
           class="rounded bg-blue-500 px-4 py-2 transition-colors hover:bg-blue-600"
           @click="handleShowUrlInput"
         >
           Link to Image
+        </button>
+        <div class="hidden h-6 w-px bg-gray-300 sm:block dark:bg-gray-600" />
+        <button
+          type="button"
+          class="rounded border border-gray-300 bg-white px-4 py-2 text-gray-800 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+          @click="handleShowExistingPicker"
+        >
+          Reuse an Image
         </button>
       </div>
     </label>

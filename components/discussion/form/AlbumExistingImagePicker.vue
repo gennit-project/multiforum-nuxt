@@ -43,11 +43,14 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   addImage: [image: ReusableImage];
+  close: [];
 }>();
 
 const usernameVar = useUsername();
 const searchTerm = ref('');
 const limit = 30;
+
+const hasUsername = computed(() => Boolean(usernameVar.value));
 
 const selectedImageIdsSet = computed(() => new Set(props.selectedImageIds));
 
@@ -151,17 +154,36 @@ const getUploaderLabel = (image: ReusableImage) => {
     class="mt-4 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-3 dark:border-gray-600 dark:bg-gray-900/40"
     aria-labelledby="existing-image-picker-heading"
   >
-    <div class="mb-3">
-      <h4
-        id="existing-image-picker-heading"
-        class="text-sm font-semibold text-gray-900 dark:text-white"
+    <div class="mb-3 flex items-start justify-between gap-3">
+      <div>
+        <h4
+          id="existing-image-picker-heading"
+          class="text-sm font-semibold text-gray-900 dark:text-white"
+        >
+          Add an existing image
+        </h4>
+        <p class="mt-1 text-xs text-gray-600 dark:text-gray-300">
+          Reuse images from your uploads, favorites, or image collections without
+          re-uploading. Original uploader attribution is preserved.
+        </p>
+      </div>
+      <button
+        type="button"
+        class="shrink-0 rounded-md p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500/40 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+        aria-label="Close reusable image picker"
+        @click="emit('close')"
       >
-        Add an existing image
-      </h4>
-      <p class="mt-1 text-xs text-gray-600 dark:text-gray-300">
-        Reuse images from your uploads, favorites, or image collections without
-        re-uploading. Original uploader attribution is preserved.
-      </p>
+        <svg
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
 
     <label
@@ -184,8 +206,15 @@ const getUploaderLabel = (image: ReusableImage) => {
       :text="error.message"
     />
 
+    <p
+      v-if="!hasUsername"
+      class="mt-3 text-sm text-gray-600 dark:text-gray-300"
+    >
+      Sign in to reuse images from your uploads, favorites, and collections.
+    </p>
+
     <div
-      v-if="loading && images.length === 0"
+      v-else-if="loading && images.length === 0"
       class="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300"
     >
       <LoadingSpinner class="h-4 w-4" />

@@ -161,6 +161,9 @@ const {
 
 // URL input form state
 const showUrlInput = ref(false);
+// Existing-image picker is hidden until the user asks to reuse an image, so we
+// don't fire its query on every form load.
+const showExistingImagePicker = ref(false);
 const isCreatingImageFromUrl = ref(false);
 const urlInputFormRef = ref<InstanceType<typeof AlbumUrlInputForm> | null>(null);
 const pendingDeleteImageIndex = ref<number | null>(null);
@@ -319,6 +322,11 @@ const handleShowUrlInput = () => {
   urlInputFormRef.value?.focusInput();
 };
 
+// Reveal the reusable-image picker (and the query it runs) on demand
+const handleShowExistingPicker = () => {
+  showExistingImagePicker.value = true;
+};
+
 // Handle URL submission
 const handleUrlSubmit = async (url: string) => {
   if (!usernameVar.value) {
@@ -413,9 +421,11 @@ const handleUrlCancel = () => {
     />
 
     <AlbumExistingImagePicker
+      v-if="showExistingImagePicker"
       :selected-image-ids="selectedImageIds"
       :is-limit-reached="isImageLimitReached"
       @add-image="addExistingImage"
+      @close="showExistingImagePicker = false"
     />
 
     <!-- Drop zone -->
@@ -425,6 +435,7 @@ const handleUrlCancel = () => {
       @files-selected="handleFilesSelected"
       @drop="handleDropEvent"
       @show-url-input="handleShowUrlInput"
+      @show-existing-picker="handleShowExistingPicker"
     />
 
     <!-- URL input form -->
