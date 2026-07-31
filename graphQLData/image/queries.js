@@ -215,17 +215,24 @@ export const GET_USER_IMAGES = gql`
   }
 `;
 
-export const GET_REUSABLE_ALBUM_IMAGES = gql`
-  query GetReusableAlbumImages(
+// Reusable-image picker queries. Each source (uploads, favorites, a chosen
+// collection) is fetched separately and paginated with offset/limit so the
+// album editor's "Reuse an image" picker can page through large libraries.
+// isFavorited is intentionally omitted here: the picker never displays favorite
+// status and the field is resolver-backed, so selecting it adds cost for nothing.
+
+export const GET_REUSABLE_USER_IMAGES = gql`
+  query GetReusableUserImages(
     $username: String!
     $where: ImageWhere
+    $offset: Int!
     $limit: Int!
   ) {
     users(where: { username: $username }) {
       username
       Images(
         where: $where
-        options: { limit: $limit, sort: { createdAt: DESC } }
+        options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
       ) {
         id
         url
@@ -238,9 +245,25 @@ export const GET_REUSABLE_ALBUM_IMAGES = gql`
           displayName
         }
       }
+      ImagesAggregate(where: $where) {
+        count
+      }
+    }
+  }
+`;
+
+export const GET_REUSABLE_FAVORITE_IMAGES = gql`
+  query GetReusableFavoriteImages(
+    $username: String!
+    $where: ImageWhere
+    $offset: Int!
+    $limit: Int!
+  ) {
+    users(where: { username: $username }) {
+      username
       FavoriteImages(
         where: $where
-        options: { limit: $limit, sort: { createdAt: DESC } }
+        options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
       ) {
         id
         url
@@ -248,34 +271,61 @@ export const GET_REUSABLE_ALBUM_IMAGES = gql`
         caption
         copyright
         createdAt
-        isFavorited(username: $username)
         Uploader {
           username
           displayName
         }
       }
+      FavoriteImagesAggregate(where: $where) {
+        count
+      }
+    }
+  }
+`;
+
+export const GET_REUSABLE_IMAGE_COLLECTIONS = gql`
+  query GetReusableImageCollections($username: String!) {
+    users(where: { username: $username }) {
+      username
       Collections(
         where: { collectionType: IMAGES }
         options: { sort: [{ updatedAt: DESC }] }
       ) {
         id
         name
-        Images(
-          where: $where
-          options: { limit: $limit, sort: { createdAt: DESC } }
-        ) {
-          id
-          url
-          alt
-          caption
-          copyright
-          createdAt
-          isFavorited(username: $username)
-          Uploader {
-            username
-            displayName
-          }
+        itemCount
+      }
+    }
+  }
+`;
+
+export const GET_REUSABLE_COLLECTION_IMAGES = gql`
+  query GetReusableCollectionImages(
+    $collectionId: ID!
+    $where: ImageWhere
+    $offset: Int!
+    $limit: Int!
+  ) {
+    collections(where: { id: $collectionId }) {
+      id
+      name
+      Images(
+        where: $where
+        options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
+      ) {
+        id
+        url
+        alt
+        caption
+        copyright
+        createdAt
+        Uploader {
+          username
+          displayName
         }
+      }
+      ImagesAggregate(where: $where) {
+        count
       }
     }
   }

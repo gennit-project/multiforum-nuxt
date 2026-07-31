@@ -54,7 +54,7 @@ const AlbumImageItemStub = {
 
 const AlbumDropZoneStub = {
   name: 'AlbumDropZone',
-  emits: ['files-selected', 'drop', 'show-url-input'],
+  emits: ['files-selected', 'drop', 'show-url-input', 'show-existing-picker'],
   template: '<div class="drop-zone-stub" />',
 };
 
@@ -71,8 +71,17 @@ const AlbumUrlInputFormStub = {
 const AlbumExistingImagePickerStub = {
   name: 'AlbumExistingImagePicker',
   props: ['selectedImageIds', 'isLimitReached'],
-  emits: ['add-image'],
+  emits: ['add-image', 'close'],
   template: '<div class="existing-image-picker-stub" />',
+};
+
+// The reusable-image picker is hidden until the user asks to reuse an image, so
+// tests must first reveal it via the drop zone before it exists in the tree.
+const revealExistingPicker = async (
+  wrapper: ReturnType<typeof mountEditor>
+) => {
+  wrapper.getComponent(AlbumDropZoneStub).vm.$emit('show-existing-picker');
+  await wrapper.vm.$nextTick();
 };
 
 const WarningModalStub = {
@@ -207,6 +216,7 @@ describe('AlbumEditor', () => {
 
   it('adds an existing image from the picker', async () => {
     const wrapper = mountEditor();
+    await revealExistingPicker(wrapper);
     wrapper.findComponent(AlbumExistingImagePickerStub).vm.$emit('add-image', makeImage('d'));
     await flushPromises();
     expect(lastEmit(wrapper).imageOrder).toEqual(['a', 'b', 'c', 'd']);
@@ -214,6 +224,7 @@ describe('AlbumEditor', () => {
 
   it('does not add a duplicate existing image from the picker', async () => {
     const wrapper = mountEditor();
+    await revealExistingPicker(wrapper);
     wrapper.findComponent(AlbumExistingImagePickerStub).vm.$emit('add-image', makeImage('a'));
     await flushPromises();
     expect(wrapper.emitted('updateFormValues')).toBeUndefined();
@@ -291,6 +302,33 @@ describe('AlbumEditor', () => {
 
       expect(wrapper.emitted('updateFormValues')).toBeUndefined();
       expect(wrapper.findComponent(AlbumUrlInputFormStub).exists()).toBe(true);
+    });
+  });
+
+  describe('existing-image picker flow', () => {
+    it('hides the reusable-image picker until the user requests it', () => {
+      const wrapper = mountEditor();
+      expect(wrapper.findComponent(AlbumExistingImagePickerStub).exists()).toBe(
+        false
+      );
+    });
+
+    it('reveals the reusable-image picker when the drop zone requests it', async () => {
+      const wrapper = mountEditor();
+      await revealExistingPicker(wrapper);
+      expect(wrapper.findComponent(AlbumExistingImagePickerStub).exists()).toBe(
+        true
+      );
+    });
+
+    it('hides the reusable-image picker again on close', async () => {
+      const wrapper = mountEditor();
+      await revealExistingPicker(wrapper);
+      wrapper.getComponent(AlbumExistingImagePickerStub).vm.$emit('close');
+      await wrapper.vm.$nextTick();
+      expect(wrapper.findComponent(AlbumExistingImagePickerStub).exists()).toBe(
+        false
+      );
     });
   });
 });

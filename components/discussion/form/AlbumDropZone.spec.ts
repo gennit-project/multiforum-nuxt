@@ -78,6 +78,14 @@ describe('AlbumDropZone actions', () => {
     expect(wrapper.emitted('show-url-input')).toBeTruthy();
   });
 
+  it('emits show-existing-picker from Reuse an Image', async () => {
+    const wrapper = mountZone();
+
+    await buttonByText(wrapper, 'Reuse an Image')!.trigger('click');
+
+    expect(wrapper.emitted('show-existing-picker')).toBeTruthy();
+  });
+
   it('emits drop when files are dropped', async () => {
     const wrapper = mountZone();
 

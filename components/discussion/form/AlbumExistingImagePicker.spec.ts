@@ -2,77 +2,28 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import AlbumExistingImagePicker from '@/components/discussion/form/AlbumExistingImagePicker.vue';
 
-const { usernameRef, queryResult, queryLoading, queryError } = vi.hoisted(
-  () => ({
-    usernameRef: { value: 'alice' as string },
-    queryResult: {
-      value: {
-        users: [
-          {
-            Images: [
-              {
-                id: 'img-1',
-                url: 'https://img.test/one.jpg',
-                alt: 'One',
-                caption: 'First image',
-                copyright: '',
-                Uploader: { username: 'alice', displayName: 'Alice' },
-              },
-            ],
-            FavoriteImages: [
-              {
-                id: 'img-1',
-                url: 'https://img.test/one.jpg',
-                alt: 'One',
-                caption: 'First image',
-                copyright: '',
-                Uploader: { username: 'alice', displayName: 'Alice' },
-              },
-              {
-                id: 'img-2',
-                url: 'https://img.test/two.jpg',
-                alt: 'Two',
-                caption: 'Second image',
-                copyright: '',
-                Uploader: { username: 'bob', displayName: 'Bob' },
-              },
-            ],
-            Collections: [
-              {
-                id: 'collection-1',
-                name: 'Inspiration',
-                Images: [
-                  {
-                    id: 'img-3',
-                    url: 'https://img.test/three.jpg',
-                    alt: 'Three',
-                    caption: 'Third image',
-                    copyright: '',
-                    Uploader: { username: 'carol', displayName: 'Carol' },
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    },
-    queryLoading: { value: false },
-    queryError: { value: null as Error | null },
-  })
-);
+const { usernameRef } = vi.hoisted(() => ({
+  usernameRef: { value: 'alice' as string },
+}));
 
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => usernameRef,
 }));
 
-vi.mock('@vue/apollo-composable', () => ({
-  useQuery: vi.fn(() => ({
-    result: queryResult,
-    loading: queryLoading,
-    error: queryError,
-  })),
-}));
+const UserImagesTabStub = {
+  name: 'AlbumReusableUserImagesTab',
+  props: ['source', 'searchTerm', 'selectedImageIds', 'isLimitReached'],
+  emits: ['add-image'],
+  template:
+    '<div class="user-images-tab" :data-source="source" :data-search="searchTerm" />',
+};
+
+const CollectionsTabStub = {
+  name: 'AlbumReusableCollectionsTab',
+  props: ['searchTerm', 'selectedImageIds', 'isLimitReached'],
+  emits: ['add-image'],
+  template: '<div class="collections-tab" :data-search="searchTerm" />',
+};
 
 const mountPicker = (selectedImageIds: string[] = []) =>
   mountWithDefaults(AlbumExistingImagePicker, {
@@ -82,48 +33,84 @@ const mountPicker = (selectedImageIds: string[] = []) =>
     },
     global: {
       stubs: {
-        LoadingSpinner: { template: '<div />' },
-        ErrorBanner: { props: ['text'], template: '<div class="error" />' },
+        AlbumReusableUserImagesTab: UserImagesTabStub,
+        AlbumReusableCollectionsTab: CollectionsTabStub,
       },
     },
   });
 
+const tabButton = (
+  wrapper: ReturnType<typeof mountPicker>,
+  label: string
+) => wrapper.findAll('[role="tab"]').find((b) => b.text() === label);
+
 beforeEach(() => {
   usernameRef.value = 'alice';
-  queryLoading.value = false;
-  queryError.value = null;
 });
 
 describe('AlbumExistingImagePicker', () => {
-  it('dedupes images across uploads, favorites, and image collections', () => {
+  it('renders a tab for each reusable image source', () => {
     const wrapper = mountPicker();
-    expect({
-      cardCount: wrapper.findAll('article').length,
-      sourceCopy: wrapper.text(),
-    }).toMatchObject({
-      cardCount: 3,
-      sourceCopy: expect.stringContaining('Your uploads · Favorites'),
-    });
+    expect(wrapper.findAll('[role="tab"]').map((b) => b.text())).toEqual([
+      'Your uploads',
+      'Favorites',
+      'Collections',
+    ]);
   });
 
-  it('emits the selected image when adding it to the album', async () => {
+  it('shows the uploads tab by default', () => {
     const wrapper = mountPicker();
-    await wrapper.findAll('button')[2].trigger('click');
+    expect(wrapper.findComponent(UserImagesTabStub).props('source')).toBe(
+      'uploads'
+    );
+  });
+
+  it('switches the user-images tab to favorites when Favorites is selected', async () => {
+    const wrapper = mountPicker();
+    await tabButton(wrapper, 'Favorites')!.trigger('click');
+    expect(wrapper.findComponent(UserImagesTabStub).props('source')).toBe(
+      'favorites'
+    );
+  });
+
+  it('shows the collections tab when Collections is selected', async () => {
+    const wrapper = mountPicker();
+    await tabButton(wrapper, 'Collections')!.trigger('click');
+    expect(wrapper.findComponent(CollectionsTabStub).exists()).toBe(true);
+  });
+
+  it('passes the search term down to the active tab', async () => {
+    const wrapper = mountPicker();
+    await wrapper.find('#existing-image-search').setValue('sunset');
+    expect(wrapper.findComponent(UserImagesTabStub).props('searchTerm')).toBe(
+      'sunset'
+    );
+  });
+
+  it('forwards addImage from the active tab', () => {
+    const wrapper = mountPicker();
+    wrapper
+      .findComponent(UserImagesTabStub)
+      .vm.$emit('add-image', { id: 'img-9', url: 'https://img.test/9.jpg' });
     expect(wrapper.emitted('addImage')?.[0]?.[0]).toMatchObject({
-      id: 'img-3',
-      Uploader: { username: 'carol' },
+      id: 'img-9',
     });
   });
 
-  it('disables images already selected in the album', () => {
-    const wrapper = mountPicker(['img-1']);
-    const firstButton = wrapper.find('button');
+  it('emits close when the close button is clicked', async () => {
+    const wrapper = mountPicker();
+    await wrapper
+      .get('button[aria-label="Close reusable image picker"]')
+      .trigger('click');
+    expect(wrapper.emitted('close')).toHaveLength(1);
+  });
+
+  it('prompts to sign in instead of showing tabs when there is no username', () => {
+    usernameRef.value = '';
+    const wrapper = mountPicker();
     expect({
-      disabled: firstButton.attributes('disabled'),
-      text: firstButton.text(),
-    }).toEqual({
-      disabled: '',
-      text: 'Already in album',
-    });
+      signInText: wrapper.text().includes('Sign in to reuse images'),
+      tabCount: wrapper.findAll('[role="tab"]').length,
+    }).toEqual({ signInText: true, tabCount: 0 });
   });
 });
