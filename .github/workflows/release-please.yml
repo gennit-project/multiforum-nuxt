@@ -1,0 +1,27 @@
+name: Release
+
+# Conventional-commit-driven releases, on demand (NOT one release per commit).
+#
+# On each push to `main`, release-please opens/updates a single "release PR"
+# that accumulates changes and computes the next SemVer version from the
+# conventional commit subjects (which the squash-merge PR-title check keeps
+# valid). Nothing is released until a maintainer merges that release PR — which
+# then tags the version, updates package.json + CHANGELOG.md, and cuts a
+# GitHub Release.
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      # Config lives in release-please-config.json + .release-please-manifest.json
+      - uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
