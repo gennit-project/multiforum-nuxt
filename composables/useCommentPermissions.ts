@@ -97,3 +97,7 @@ export function useCommentPermissions(
     loading,
   };
 }
+
+// The resolver is shared by non-comment channel features as well. Keep the
+// original export for existing callers while offering a domain-neutral name.
+export const useChannelPermissions = useCommentPermissions;

@@ -15,6 +15,9 @@ const mockOverview = vi.hoisted(() => ({
 }));
 const mockUsername = vi.hoisted(() => ({ value: '' }));
 const mockModProfileName = vi.hoisted(() => ({ value: '' }));
+const mockUserPermissions = vi.hoisted(() => ({
+  value: { canEditDiscussions: false },
+}));
 const mockStartPipeline = vi.hoisted(() => vi.fn());
 const mockRerunPipeline = vi.hoisted(() => vi.fn());
 const mockStartDoneCallbacks = vi.hoisted(
@@ -55,6 +58,13 @@ vi.mock('@vue/apollo-composable', async () => {
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => mockUsername,
   useModProfileName: () => mockModProfileName,
+}));
+
+vi.mock('@/composables/useCommentPermissions', () => ({
+  useChannelPermissions: () => ({
+    userPermissions: mockUserPermissions,
+    loading: { value: false },
+  }),
 }));
 
 vi.mock('@/composables/useDownloadPipelineOverview', async () => {
@@ -117,6 +127,7 @@ describe('PublicDownloadPipelines', () => {
     mockOverview.refetch.mockReset();
     mockUsername.value = '';
     mockModProfileName.value = '';
+    mockUserPermissions.value.canEditDiscussions = false;
     mockStartPipeline.mockReset();
     mockRerunPipeline.mockReset();
     mockStartDoneCallbacks.length = 0;
@@ -290,7 +301,7 @@ describe('PublicDownloadPipelines', () => {
 
     expect({
       explanation: wrapper.text().includes(
-        'The uploader must run this check.'
+        'The uploader or an authorized channel moderator must run this check.'
       ),
       hasButton: wrapper.find('button').exists(),
     }).toEqual({ explanation: true, hasButton: false });
@@ -336,6 +347,7 @@ describe('PublicDownloadPipelines', () => {
   it('lets a moderator start a missing channel check', async () => {
     mockUsername.value = 'moderator-user';
     mockModProfileName.value = 'Helpful Mod';
+    mockUserPermissions.value.canEditDiscussions = true;
     mockOverview.hasPipelineContent = true;
     mockOverview.applicablePipelines = [
       {
@@ -363,6 +375,52 @@ describe('PublicDownloadPipelines', () => {
       targetType: 'Discussion',
       eventType: 'discussionChannel.created',
       channelId: 'cats',
+    });
+  });
+
+  it('does not offer start controls to a moderator without permission', () => {
+    mockUsername.value = 'moderator-user';
+    mockModProfileName.value = 'Helpful Mod';
+    mockOverview.hasPipelineContent = true;
+    mockOverview.applicablePipelines = [
+      {
+        targetId: 'discussion-1',
+        targetType: 'Discussion',
+        eventType: 'discussionChannel.created',
+        scope: 'CHANNEL',
+        channelId: 'cats',
+        configured: true,
+        applicability: 'ALL_FILES_IMMEDIATE',
+        required: true,
+        reason: 'APPLICABLE',
+        expectedJobs: [],
+      },
+    ];
+
+    expect(mountView('alice').text()).not.toContain('Run checks');
+  });
+
+  it('lets an authorized moderator rerun the latest failed pipeline', async () => {
+    mockUsername.value = 'moderator-user';
+    mockModProfileName.value = 'Helpful Mod';
+    mockUserPermissions.value.canEditDiscussions = true;
+    mockOverview.hasPipelineContent = true;
+    mockOverview.attempts = [
+      baseAttempt({
+        id: 'failed',
+        pipelineId: 'failed-pipeline',
+        status: 'FAILED',
+      }),
+    ];
+    const wrapper = mountView('alice');
+
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('Run checks again'))!
+      .trigger('click');
+
+    expect(mockRerunPipeline).toHaveBeenCalledWith({
+      pipelineRunId: 'failed-pipeline',
     });
   });
 
