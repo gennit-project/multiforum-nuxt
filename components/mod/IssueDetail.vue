@@ -476,8 +476,14 @@ const handleLockReasonUpdate = (value: string) => {
         :channel-id="channelId"
         :is-author-mod="authorType === 'mod'"
         :suspend-mod-disabled="isSuspendedMod || !issueActionVisibility.modActionsEnabled"
+        :can-permanently-remove-image="
+          modPermissions.canPermanentlyRemoveImage &&
+          !isSuspendedMod &&
+          issueActionVisibility.modActionsEnabled
+        "
         @suspended-mod-successfully="resetActivityFeed"
         @unsuspended-mod-successfully="resetActivityFeed"
+        @image-permanently-removed="resetActivityFeed"
       >
         <template #issue-body>
           <IssueBodyEditor

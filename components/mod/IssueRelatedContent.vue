@@ -6,6 +6,7 @@ import CommentDetails from '@/components/mod/CommentDetails.vue';
 import ImageDetails from '@/components/mod/ImageDetails.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
 import SuspendModButton from '@/components/mod/SuspendModButton.vue';
+import PermanentlyRemoveImageButton from '@/components/mod/PermanentlyRemoveImageButton.vue';
 import type { Issue } from '@/__generated__/graphql';
 
 const props = defineProps<{
@@ -15,6 +16,7 @@ const props = defineProps<{
   channelId?: string;
   isAuthorMod?: boolean;
   suspendModDisabled?: boolean;
+  canPermanentlyRemoveImage?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -22,7 +24,12 @@ const emit = defineEmits<{
     e: 'fetchedOriginalAuthorUsername' | 'fetchedOriginalModProfileName',
     value: string
   ): void;
-  (e: 'suspendedModSuccessfully' | 'unsuspendedModSuccessfully'): void;
+  (
+    e:
+      | 'suspendedModSuccessfully'
+      | 'unsuspendedModSuccessfully'
+      | 'imagePermanentlyRemoved'
+  ): void;
 }>();
 
 const getContentTypeLabel = (issue: Issue) => {
@@ -53,6 +60,12 @@ const showSuspendModButton = computed(() => {
         :disabled="suspendModDisabled"
         @suspended-successfully="emit('suspendedModSuccessfully')"
         @unsuspended-successfully="emit('unsuspendedModSuccessfully')"
+      />
+      <!-- Permanently remove image (admin/mod action) for image issues -->
+      <PermanentlyRemoveImageButton
+        v-if="activeIssue?.relatedImageId && canPermanentlyRemoveImage"
+        :image-id="activeIssue.relatedImageId"
+        @removed-successfully="emit('imagePermanentlyRemoved')"
       />
       <div
         v-if="reportCount !== null"

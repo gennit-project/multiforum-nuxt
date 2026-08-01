@@ -28,6 +28,7 @@ const createBasePermissions = (
   canCloseSupportTickets: false,
   canLockChannel: false,
   canDeleteWiki: false,
+  canPermanentlyRemoveImage: false,
   // Additional permission keys
   canEditWiki: false,
   canAddMods: false,

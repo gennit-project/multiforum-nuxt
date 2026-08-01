@@ -520,3 +520,12 @@ export const UNARCHIVE_IMAGE = gql`
     }
   }
 `;
+
+export const PERMANENTLY_REMOVE_IMAGE = gql`
+  mutation permanentlyRemoveImage($imageId: ID!, $explanation: String) {
+    permanentlyRemoveImage(imageId: $imageId, explanation: $explanation) {
+      id
+      issueNumber
+    }
+  }
+`;
