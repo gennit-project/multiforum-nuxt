@@ -7,6 +7,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PluginPipelineEditor from '@/components/plugins/PluginPipelineEditor.vue';
 import PluginPipelineCampaigns from '@/components/plugins/PluginPipelineCampaigns.vue';
 import { useToast } from '@/composables/useToast';
+import { config } from '@/config';
 import { GET_PLUGIN_PIPELINES, GET_INSTALLED_PLUGINS } from '@/graphQLData/admin/queries';
 import { UPDATE_PLUGIN_PIPELINES } from '@/graphQLData/admin/mutations';
 import type { PipelineConfig } from '@/utils/pipelineSchema';
@@ -21,7 +22,6 @@ definePageMeta({
   layout: 'default',
 });
 
-const serverName = 'default'; // TODO: Get from config
 const toast = useToast();
 
 // Queries
@@ -30,7 +30,7 @@ const {
   loading: pipelinesLoading,
   error: pipelinesError,
   refetch: refetchPipelines,
-} = useQuery(GET_PLUGIN_PIPELINES, { serverName });
+} = useQuery(GET_PLUGIN_PIPELINES, { serverName: config.serverName });
 
 const {
   result: installedResult,

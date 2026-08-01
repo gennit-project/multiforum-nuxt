@@ -12,7 +12,10 @@ const h = vi.hoisted(() => ({
   refetch: null as unknown as ReturnType<typeof vi.fn>,
   mutate: null as unknown as ReturnType<typeof vi.fn>,
   available: [] as unknown[],
+  queryCalls: [] as Array<[unknown, unknown?]>,
 }));
+
+vi.mock('@/config', () => ({ config: { serverName: 'test-server' } }));
 
 vi.mock('@vue/apollo-composable', async () => {
   const { ref } = await import('vue');
@@ -22,12 +25,15 @@ vi.mock('@vue/apollo-composable', async () => {
   h.refetch = vi.fn();
   h.mutate = vi.fn();
   return {
-    useQuery: () => ({
-      result: h.resultRef,
-      loading: h.loadingRef,
-      error: h.errorRef,
-      refetch: h.refetch,
-    }),
+    useQuery: (document: unknown, variables?: unknown) => {
+      h.queryCalls.push([document, variables]);
+      return {
+        result: h.resultRef,
+        loading: h.loadingRef,
+        error: h.errorRef,
+        refetch: h.refetch,
+      };
+    },
     useMutation: () => ({ mutate: h.mutate, loading: ref(false) }),
   };
 });
@@ -69,9 +75,15 @@ beforeEach(() => {
   h.errorRef.value = null;
   h.resultRef.value = null;
   h.available = [];
+  h.queryCalls = [];
 });
 
 describe('Plugin pipelines page', () => {
+  it('queries pipelines for the configured server name', () => {
+    mountPage();
+    expect(h.queryCalls).toContainEqual(['q1', { serverName: 'test-server' }]);
+  });
+
   it('shows the loading state', () => {
     h.loadingRef.value = true;
     expect(mountPage().text()).toContain('Loading pipeline configuration');
