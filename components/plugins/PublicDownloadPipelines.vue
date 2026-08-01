@@ -9,6 +9,7 @@ import {
   type PublicPipelineDisplayStatus,
 } from '@/composables/useDownloadPipelineOverview';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
+import { useChannelPermissions } from '@/composables/useCommentPermissions';
 import {
   RERUN_PLUGIN_PIPELINE,
   START_PLUGIN_PIPELINE,
@@ -39,11 +40,13 @@ const {
 
 const username = useUsername();
 const modProfileName = useModProfileName();
+const { userPermissions } = useChannelPermissions(toRef(props, 'channelName'));
 const canStartPipelines = computed(
   () =>
     (Boolean(username.value) &&
       [props.ownerUsername, props.uploaderUsername].includes(username.value)) ||
-    Boolean(modProfileName.value)
+    (Boolean(modProfileName.value) &&
+      userPermissions.value.canEditDiscussions)
 );
 const {
   mutate: startPluginPipeline,
@@ -186,7 +189,7 @@ const policyExplanation = (pipeline: ApplicablePublicPipeline) => {
   if (applicabilityStatus(pipeline) === 'NOT_EXECUTED') {
     return canStartPipelines.value
       ? 'This required check has not been run.'
-      : 'The uploader must run this check.';
+      : 'The uploader or an authorized channel moderator must run this check.';
   }
   return pipeline.required
     ? 'This check is required for this download.'
