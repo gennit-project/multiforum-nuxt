@@ -56,6 +56,19 @@ const mockComponents = {
     props: ['selectedChannels', 'testId', 'lockedChannelName', 'lockedChannelLabel'],
     emits: ['setSelectedChannels'],
   },
+  DiscussionFlairPicker: {
+    name: 'DiscussionFlairPicker',
+    template: '<button data-testid="flair-picker" />',
+    props: [
+      'channelUniqueName',
+      'flairs',
+      'modelValue',
+      'required',
+      'loading',
+      'errorMessage',
+    ],
+    emits: ['update:modelValue'],
+  },
   ErrorBanner: {
     template:
       '<div class="error-banner" data-testid="error-banner">{{ text }}</div>',
@@ -191,6 +204,38 @@ describe('CreateEditDiscussionFields Component', () => {
       }).toEqual({
         lockedChannelName: 'cats',
         lockedChannelLabel: 'Cats',
+      });
+    });
+
+    it('maps the routed forum flair selection into form values', async () => {
+      const wrapper = mount(CreateEditDiscussionFields, {
+        props: {
+          editMode: false,
+          downloadMode: false,
+          formValues: {
+            ...defaultFormValues,
+            title: 'Question about cats',
+            selectedChannels: ['cats'],
+            selectedFlairIdsByChannel: { cats: [] },
+          },
+          lockedChannelName: 'cats',
+          discussionFlairs: [
+            { id: 'question', displayName: 'Question', color: '#2563EB' },
+          ],
+          discussionFlairRequired: true,
+        },
+        global: { stubs: mockComponents },
+      });
+      const picker = wrapper.findComponent({ name: 'DiscussionFlairPicker' });
+      picker.vm.$emit('update:modelValue', ['question']);
+      await nextTick();
+
+      expect({
+        pickerRequired: picker.props('required'),
+        update: wrapper.emitted('updateFormValues')?.[0],
+      }).toEqual({
+        pickerRequired: true,
+        update: [{ selectedFlairIdsByChannel: { cats: ['question'] } }],
       });
     });
 

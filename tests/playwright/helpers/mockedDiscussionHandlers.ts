@@ -34,11 +34,16 @@ export type MockDiscussionState = {
 export type DiscussionState = {
   discussions: MockDiscussionState[];
   nextDiscussionId: number;
+  lastChannelFlairSelections: Array<{
+    channelUniqueName: string;
+    flairIds: string[];
+  }>;
 };
 
 export const createDiscussionState = (): DiscussionState => ({
   discussions: [],
   nextDiscussionId: 1,
+  lastChannelFlairSelections: [],
 });
 
 type CreateDiscussionVariables = {
@@ -229,13 +234,24 @@ export const createDiscussionHandlers = (
     },
 
     createDiscussion: ({ body }: { body: { variables?: CreateDiscussionVariables } }) => {
-      const input = body.variables?.input?.[0]?.discussionCreateInput;
+      const requestInput = body.variables?.input?.[0] as
+        | (DiscussionCreateInputWithChannels & {
+            channelFlairSelections?: Array<{
+              channelUniqueName: string;
+              flairIds: string[];
+            }>;
+          })
+        | undefined;
+      const input = requestInput?.discussionCreateInput;
 
       if (!input) {
         throw new Error(
           'Missing discussionCreateInput in mocked createDiscussion request'
         );
       }
+
+      state.lastChannelFlairSelections =
+        requestInput?.channelFlairSelections ?? [];
 
       const id = `discussion-${state.nextDiscussionId++}`;
       const discussionChannelId = `discussion-channel-${id}`;
@@ -367,6 +383,16 @@ export const createDiscussionHandlers = (
     getChannel: () => ({
       data: {
         channels: [buildChannel({ uniqueName: config.channelId })],
+      },
+    }),
+
+    getChannelDiscussionFlairConfig: () => ({
+      data: {
+        getChannelDiscussionFlairConfig: {
+          channelUniqueName: config.channelId,
+          flairRequired: false,
+          flairs: [],
+        },
       },
     }),
   };
