@@ -22,6 +22,8 @@ import AlbumEditForm from '../detail/AlbumEditForm.vue';
 import DownloadEditForm from './DownloadEditForm.vue';
 import type { Channel, Discussion } from '@/__generated__/graphql';
 import CrosspostedDiscussionEmbed from '@/components/discussion/detail/CrosspostedDiscussionEmbed.vue';
+import DiscussionFlairPicker from '@/components/discussion/form/DiscussionFlairPicker.vue';
+import type { DiscussionFlairOption } from '@/components/discussion/form/DiscussionFlairPicker.vue';
 
 const props = defineProps<{
   editMode: boolean;
@@ -45,6 +47,10 @@ const props = defineProps<{
   crosspostLoading?: boolean;
   lockedChannelName?: string;
   lockedChannelLabel?: string;
+  discussionFlairs?: DiscussionFlairOption[];
+  discussionFlairRequired?: boolean;
+  discussionFlairsLoading?: boolean;
+  discussionFlairsError?: string;
 }>();
 
 defineEmits(['submit', 'updateFormValues', 'cancel']);
@@ -70,7 +76,31 @@ const discussionFormValidationInput = computed(() => ({
   selectedChannelsCount: props.formValues?.selectedChannels?.length || 0,
   title: props.formValues?.title || '',
   body: props.formValues?.body || '',
+  flairSelectionPending: props.discussionFlairsLoading,
+  flairSelectionUnavailable: Boolean(props.discussionFlairsError),
+  missingRequiredFlair:
+    props.discussionFlairRequired === true &&
+    (props.formValues?.selectedFlairIdsByChannel?.[
+      props.lockedChannelName || ''
+    ]?.length || 0) === 0,
+  requiredFlairChannelName: props.lockedChannelLabel || props.lockedChannelName,
 }));
+
+const selectedFlairIds = computed(
+  () =>
+    props.formValues?.selectedFlairIdsByChannel?.[
+      props.lockedChannelName || ''
+    ] || []
+);
+
+const showDiscussionFlairs = computed(
+  () =>
+    Boolean(props.lockedChannelName) &&
+    (props.discussionFlairsLoading ||
+      props.discussionFlairsError ||
+      props.discussionFlairRequired ||
+      (props.discussionFlairs?.length || 0) > 0)
+);
 
 const needsChanges = computed(() =>
   discussionFormNeedsChanges(discussionFormValidationInput.value)
@@ -304,6 +334,30 @@ onMounted(() => {
                   "
                   @set-selected-channels="
                     $emit('updateFormValues', { selectedChannels: $event })
+                  "
+                />
+              </template>
+            </FormRow>
+
+            <FormRow
+              v-if="showDiscussionFlairs"
+              :required="discussionFlairRequired"
+            >
+              <template #content>
+                <DiscussionFlairPicker
+                  :channel-unique-name="lockedChannelLabel || lockedChannelName || ''"
+                  :flairs="discussionFlairs || []"
+                  :model-value="selectedFlairIds"
+                  :required="discussionFlairRequired"
+                  :loading="discussionFlairsLoading"
+                  :error-message="discussionFlairsError"
+                  @update:model-value="
+                    $emit('updateFormValues', {
+                      selectedFlairIdsByChannel: {
+                        ...(formValues.selectedFlairIdsByChannel || {}),
+                        [lockedChannelName || '']: $event,
+                      },
+                    })
                   "
                 />
               </template>

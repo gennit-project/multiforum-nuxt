@@ -22,6 +22,8 @@ import { useRouter, useRoute } from 'nuxt/app';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { useForumLock } from '@/composables/useForumLock';
 import { useUsername } from '@/composables/useAuthState';
+import { GET_CHANNEL_DISCUSSION_FLAIR_CONFIG } from '@/graphQLData/channel/queries';
+import type { DiscussionFlairOption } from '@/components/discussion/form/DiscussionFlairPicker.vue';
 
 const usernameVar = useUsername();
 
@@ -48,6 +50,7 @@ const createDiscussionDefaultValues: CreateEditDiscussionFormValues = {
   title: '',
   body: '',
   selectedChannels: channelId.value ? [channelId.value] : [],
+  selectedFlairIdsByChannel: {},
   selectedTags: [],
   author: usernameVar.value,
   album: {
@@ -58,6 +61,37 @@ const createDiscussionDefaultValues: CreateEditDiscussionFormValues = {
 };
 
 const formValues = ref(createDiscussionDefaultValues);
+
+type ChannelDiscussionFlairConfig = {
+  channelUniqueName: string;
+  flairRequired: boolean;
+  flairs: DiscussionFlairOption[];
+};
+
+const {
+  result: flairConfigResult,
+  loading: discussionFlairsLoading,
+  error: discussionFlairsQueryError,
+} = useQuery(
+  GET_CHANNEL_DISCUSSION_FLAIR_CONFIG,
+  () => ({
+    channelUniqueName: channelId.value,
+    includeArchived: false,
+  }),
+  { enabled: computed(() => Boolean(channelId.value)) }
+);
+
+const flairConfig = computed<ChannelDiscussionFlairConfig | null>(
+  () => flairConfigResult.value?.getChannelDiscussionFlairConfig || null
+);
+
+const channelFlairSelections = computed(() => {
+  const flairIds =
+    formValues.value.selectedFlairIdsByChannel?.[channelId.value] || [];
+  return flairIds.length > 0
+    ? [{ channelUniqueName: channelId.value, flairIds }]
+    : [];
+});
 
 watch(
   () => crosspostDiscussionId.value,
@@ -192,6 +226,7 @@ const {
       {
         discussionCreateInput: discussionCreateInput.value,
         channelConnections: channelConnections.value,
+        channelFlairSelections: channelFlairSelections.value,
       },
     ],
   },
@@ -287,6 +322,22 @@ function submit() {
     submitError.value = lockError.value;
     return;
   }
+  if (discussionFlairsLoading.value) {
+    submitError.value = 'Wait for the forum flair options to finish loading.';
+    return;
+  }
+  if (discussionFlairsQueryError.value) {
+    submitError.value =
+      'Unable to load the forum flair options. Please try again.';
+    return;
+  }
+  if (
+    flairConfig.value?.flairRequired &&
+    channelFlairSelections.value.length === 0
+  ) {
+    submitError.value = `Select at least one flair for ${channelId.value}.`;
+    return;
+  }
   createDiscussion();
 }
 
@@ -348,6 +399,10 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
         :crosspost-loading="crosspostPreviewLoading"
         :locked-channel-name="channelId || undefined"
         :locked-channel-label="channelId || undefined"
+        :discussion-flairs="flairConfig?.flairs || []"
+        :discussion-flair-required="flairConfig?.flairRequired || false"
+        :discussion-flairs-loading="discussionFlairsLoading"
+        :discussion-flairs-error="discussionFlairsQueryError?.message"
         @submit="submit"
         @update-form-values="updateFormValues"
       />
