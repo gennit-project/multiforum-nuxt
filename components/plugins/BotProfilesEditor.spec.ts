@@ -152,4 +152,100 @@ describe('BotProfilesEditor', () => {
     // Should show invoke command
     expect(wrapper.text()).toContain('Invoke with /bot/assistant-helper');
   });
+
+  it('combines server profiles with channel overrides', () => {
+    const wrapper = mount(BotProfilesEditor, {
+      props: {
+        profiles: [
+          { id: 'shared', label: 'Channel Override', prompt: 'channel' },
+        ],
+        serverProfiles: [
+          { id: 'shared', label: 'Server Shared', prompt: 'server' },
+          { id: 'server-only', label: 'Server Only', prompt: 'server only' },
+        ],
+        scope: 'channel',
+        channelUniqueName: 'Test Channel',
+        botName: 'Assistant Bot',
+        existingBots: [],
+      },
+      global: { stubs: { MarkdownPreview: true } },
+    });
+    expect(wrapper.text()).toEqual(
+      expect.stringMatching(
+        /Server-configured Profiles.*Server Only.*Channel Override/s
+      )
+    );
+  });
+
+  it('emits immutable profile updates from every editor field', async () => {
+    const wrapper = mount(BotProfilesEditor, {
+      props: {
+        profiles: mockProfiles,
+        channelUniqueName: 'testchannel',
+        botName: 'assistant',
+      },
+      global: { stubs: { MarkdownPreview: true } },
+    });
+    await wrapper.get('#profile-id-0').setValue('reviewer');
+    await wrapper.get('#profile-label-0').setValue('Reviewer');
+    await wrapper.get('#profile-prompt-0').setValue('Review code');
+    expect(
+      wrapper.emitted('update:profiles')?.map((event) => event[0])
+    ).toEqual([
+      [{ ...mockProfiles[0], id: 'reviewer' }],
+      [{ ...mockProfiles[0], label: 'Reviewer' }],
+      [{ ...mockProfiles[0], prompt: 'Review code' }],
+    ]);
+  });
+
+  it('adds and removes editable profiles', async () => {
+    const wrapper = mount(BotProfilesEditor, {
+      props: {
+        profiles: mockProfiles,
+        channelUniqueName: 'testchannel',
+        botName: 'assistant',
+      },
+      global: { stubs: { MarkdownPreview: true } },
+    });
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('Add'))!
+      .trigger('click');
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('Remove'))!
+      .trigger('click');
+    expect(
+      wrapper.emitted('update:profiles')?.map((event) => event[0])
+    ).toEqual([[...mockProfiles, { id: '', label: '', prompt: '' }], []]);
+  });
+
+  it('shows validation feedback when an ID normalizes to empty', () => {
+    const wrapper = mount(BotProfilesEditor, {
+      props: {
+        profiles: [{ id: '!!!', label: '', prompt: '' }],
+        channelUniqueName: 'testchannel',
+        botName: 'assistant',
+      },
+      global: { stubs: { MarkdownPreview: true } },
+    });
+    expect(wrapper.text()).toContain(
+      'Profile ID must contain only lowercase letters, numbers, hyphens, and underscores'
+    );
+  });
+
+  it('ignores existing bots belonging to a different plugin prefix', () => {
+    const wrapper = mount(BotProfilesEditor, {
+      props: {
+        profiles: [],
+        channelUniqueName: 'testchannel',
+        botName: 'assistant',
+        existingBots: [
+          { username: 'bot-other-plugin-helper', botProfileId: null },
+        ],
+      },
+      global: { stubs: { MarkdownPreview: true } },
+    });
+    expect(wrapper.text()).toContain('No bot users to preview');
+  });
 });

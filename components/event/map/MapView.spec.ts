@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { ref } from 'vue';
+import { nextTick, reactive, ref } from 'vue';
 import MapView from '@/components/event/map/MapView.vue';
 
 const h = vi.hoisted(() => ({
@@ -12,11 +12,18 @@ const h = vi.hoisted(() => ({
   },
   push: vi.fn(),
   replace: vi.fn(),
-  result: null as unknown as { value: { events: unknown[]; eventsAggregate: { count: number } } },
+  result: null as unknown as {
+    value: { events: unknown[]; eventsAggregate: { count: number } };
+  },
   loading: null as unknown as { value: boolean },
   error: null as unknown as { value: null | { message: string } },
-  onResultCb: null as null | ((value: { data?: { events: Array<{ id: string }> } }) => void),
+  onResultCb: null as
+    null | ((value: { data?: { events: Array<{ id: string }> } }) => void),
   mdAndUp: null as unknown as { value: boolean },
+  queryVariables: null as null | {
+    where: { value: unknown };
+    resultsOrder: { value: unknown };
+  },
 }));
 
 vi.mock('@headlessui/vue', async (importOriginal) => ({
@@ -33,45 +40,86 @@ vi.mock('nuxt/app', () => ({
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => ({
-    result: h.result,
-    loading: h.loading,
-    error: h.error,
-    onResult: (cb: typeof h.onResultCb) => {
-      h.onResultCb = cb;
-    },
-  }),
+  useQuery: (
+    _query: unknown,
+    variables: NonNullable<typeof h.queryVariables>
+  ) => {
+    h.queryVariables = variables;
+    void variables.where.value;
+    void variables.resultsOrder.value;
+    return {
+      result: h.result,
+      loading: h.loading,
+      error: h.error,
+      onResult: (cb: typeof h.onResultCb) => {
+        h.onResultCb = cb;
+      },
+    };
+  },
 }));
 
 h.result = ref({ events: [] as unknown[], eventsAggregate: { count: 0 } });
 h.loading = ref(false);
 h.error = ref(null);
 h.mdAndUp = ref(true);
+h.route = reactive(h.route);
 
 const EventFilterBar = {
   name: 'EventFilterBar',
   template: '<div class="event-filter-bar"><slot /></div>',
 };
-const TimeShortcuts = { name: 'TimeShortcuts', template: '<div class="time-shortcuts" />' };
-const LoadingSpinner = { name: 'LoadingSpinner', template: '<div class="spinner" />' };
-const ErrorBanner = { name: 'ErrorBanner', props: ['text'], template: '<div class="error">{{ text }}</div>' };
-const EventPreview = { name: 'EventPreview', props: ['isOpen'], template: '<div class="preview" :data-open="isOpen" />' };
+const TimeShortcuts = {
+  name: 'TimeShortcuts',
+  template: '<div class="time-shortcuts" />',
+};
+const LoadingSpinner = {
+  name: 'LoadingSpinner',
+  template: '<div class="spinner" />',
+};
+const ErrorBanner = {
+  name: 'ErrorBanner',
+  props: ['text'],
+  template: '<div class="error">{{ text }}</div>',
+};
+const EventPreview = {
+  name: 'EventPreview',
+  props: ['isOpen'],
+  emits: ['close-preview'],
+  template: '<div class="preview" :data-open="isOpen" />',
+};
 const PreviewContainer = {
   name: 'PreviewContainer',
   props: ['isOpen', 'header', 'topLayer'],
+  emits: ['close-preview'],
   template:
     '<div class="preview-container" :data-open="isOpen" :data-header="header"><slot /></div>',
 };
-const CloseButton = { name: 'CloseButton', emits: ['click'], template: '<button class="close-button" @click="$emit(\'click\')" />' };
+const CloseButton = {
+  name: 'CloseButton',
+  emits: ['click'],
+  template: '<button class="close-button" @click="$emit(\'click\')" />',
+};
 const EventList = {
   name: 'EventList',
-  props: ['events'],
-  emits: ['filter-by-tag', 'filter-by-channel', 'highlight-event', 'open-preview', 'unhighlight'],
+  props: [
+    'events',
+    'selectedTags',
+    'selectedChannels',
+    'highlightedEventId',
+    'highlightedEventLocationId',
+  ],
+  emits: [
+    'filter-by-tag',
+    'filter-by-channel',
+    'highlight-event',
+    'open-preview',
+    'unhighlight',
+  ],
   template: '<div class="event-list" />',
 };
 const EventMap = {
   name: 'EventMap',
-  props: ['events'],
+  props: ['events', 'colorLocked', 'previewIsOpen', 'useMobileStyles'],
   emits: ['highlight-event', 'open-preview', 'lock-colors', 'set-marker-data'],
   template: '<div class="event-map" />',
 };
@@ -98,6 +146,33 @@ const event = (id: string, title = `Event ${id}`) => ({
   location: { latitude: 33.4, longitude: -111.9 },
 });
 
+const markerData = (numberOfEvents = 1) => {
+  const infowindow = {
+    setContent: vi.fn(),
+    open: vi.fn(),
+    close: vi.fn(),
+  };
+  return {
+    infowindow,
+    data: {
+      map: { id: 'map' },
+      markerMap: {
+        markers: {
+          loc1: {
+            marker: { id: 'marker' },
+            numberOfEvents,
+            events: {
+              '1': event('1', 'First'),
+              ...(numberOfEvents > 1 ? { '2': event('2', 'Second') } : {}),
+            },
+          },
+        },
+        infowindow,
+      },
+    },
+  };
+};
+
 const mountView = () =>
   mount(MapView, {
     props: {},
@@ -106,11 +181,17 @@ const mountView = () =>
 
 beforeEach(() => {
   vi.clearAllMocks();
-  h.route = { path: '/map/search', name: 'map-search', query: {}, params: {} };
+  Object.assign(h.route, {
+    path: '/map/search',
+    name: 'map-search',
+    query: {},
+    params: {},
+  });
   h.result.value = { events: [], eventsAggregate: { count: 0 } };
   h.loading.value = false;
   h.error.value = null;
   h.onResultCb = null;
+  h.queryVariables = null;
   h.mdAndUp.value = true;
   vi.stubGlobal('CSS', { escape: (value: string) => value });
 });
@@ -145,7 +226,9 @@ describe('MapView', () => {
   it('updates the route query when filtering by channel', async () => {
     h.result.value = { events: [event('1')], eventsAggregate: { count: 1 } };
     const wrapper = mountView();
-    await wrapper.findComponent(EventList).vm.$emit('filter-by-channel', 'cats');
+    await wrapper
+      .findComponent(EventList)
+      .vm.$emit('filter-by-channel', 'cats');
     expect(h.replace).toHaveBeenCalled();
   });
 
@@ -161,8 +244,38 @@ describe('MapView', () => {
     });
   });
 
+  it.each([{ data: undefined }, { data: { events: [] } }])(
+    'does not navigate when the query callback has no event',
+    async (queryResult) => {
+      mountView();
+      h.onResultCb?.(queryResult);
+      await Promise.resolve();
+      expect(h.push).not.toHaveBeenCalled();
+    }
+  );
+
+  it('recomputes filters when the route query changes', async () => {
+    const wrapper = mountView();
+    h.route.query = { tags: ['music'] };
+    await nextTick();
+    expect(wrapper.findComponent(EventList).props('selectedTags')).toEqual([
+      'music',
+    ]);
+  });
+
+  it('uses reverse chronological order for past events', () => {
+    h.route.query = { timeShortcut: 'PAST_EVENTS' };
+    mountView();
+    expect(h.queryVariables?.resultsOrder.value).toEqual({
+      startTime: 'DESC',
+    });
+  });
+
   it('opens the multiple-event preview when a map marker represents more than one event', async () => {
-    h.result.value = { events: [event('1'), event('2')], eventsAggregate: { count: 2 } };
+    h.result.value = {
+      events: [event('1'), event('2')],
+      eventsAggregate: { count: 2 },
+    };
     const wrapper = mountView();
 
     await wrapper.findComponent(EventMap).vm.$emit('set-marker-data', {
@@ -185,19 +298,19 @@ describe('MapView', () => {
         },
       },
     });
-    await wrapper.findComponent(EventMap).vm.$emit(
-      'highlight-event',
-      'loc1',
-      '',
-      event('1', 'First'),
-      true,
-      false
-    );
-    await wrapper.findComponent(EventMap).vm.$emit(
-      'open-preview',
-      event('1', 'First'),
-      true
-    );
+    await wrapper
+      .findComponent(EventMap)
+      .vm.$emit(
+        'highlight-event',
+        'loc1',
+        '',
+        event('1', 'First'),
+        true,
+        false
+      );
+    await wrapper
+      .findComponent(EventMap)
+      .vm.$emit('open-preview', event('1', 'First'), true);
 
     expect(
       wrapper
@@ -206,10 +319,93 @@ describe('MapView', () => {
     ).toBe(true);
   });
 
+  it('opens a specific info window and navigates when a single marker is clicked', async () => {
+    h.result.value = { events: [event('1')], eventsAggregate: { count: 1 } };
+    const wrapper = mountView();
+    const marker = markerData();
+    const map = wrapper.findComponent(EventMap);
+    await map.vm.$emit('set-marker-data', marker.data);
+    await map.vm.$emit('highlight-event', 'loc1', '1', event('1'), true, true);
+    expect({
+      contentCalls: marker.infowindow.setContent.mock.calls.length,
+      openCalls: marker.infowindow.open.mock.calls.length,
+      route: h.push.mock.calls.at(-1)?.[0],
+    }).toEqual({
+      contentCalls: 2,
+      openCalls: 2,
+      route: {
+        name: 'map-search-eventId',
+        params: { eventId: '1' },
+        hash: '#loc1',
+        query: {},
+      },
+    });
+  });
+
+  it('uses supplied event data when a marker does not contain the event', async () => {
+    h.result.value = { events: [event('1')], eventsAggregate: { count: 1 } };
+    const wrapper = mountView();
+    const marker = markerData();
+    const suppliedEvent = event('missing', 'Supplied');
+    const map = wrapper.findComponent(EventMap);
+    await map.vm.$emit('set-marker-data', marker.data);
+    await map.vm.$emit(
+      'highlight-event',
+      'loc1',
+      'missing',
+      suppliedEvent,
+      false,
+      false
+    );
+    await wrapper
+      .findComponent(EventList)
+      .vm.$emit('open-preview', suppliedEvent);
+    expect(wrapper.findComponent(EventPreview).attributes('data-open')).toBe(
+      'true'
+    );
+  });
+
+  it('locks marker colors while a preview is open and unlocks them when it closes', async () => {
+    h.result.value = { events: [event('1')], eventsAggregate: { count: 1 } };
+    const wrapper = mountView();
+    const map = wrapper.findComponent(EventMap);
+    await map.vm.$emit('lock-colors');
+    await map.vm.$emit('open-preview', event('1'), true);
+    await wrapper.findComponent(EventPreview).vm.$emit('close-preview');
+    expect(map.props('colorLocked')).toBe(false);
+  });
+
+  it('closes the multiple-event preview and its marker info window', async () => {
+    h.result.value = {
+      events: [event('1'), event('2')],
+      eventsAggregate: { count: 2 },
+    };
+    const wrapper = mountView();
+    const marker = markerData(2);
+    const map = wrapper.findComponent(EventMap);
+    await map.vm.$emit('set-marker-data', marker.data);
+    await map.vm.$emit('highlight-event', 'loc1', '', event('1'), true, false);
+    await map.vm.$emit('open-preview', event('1'), true);
+    await wrapper.findComponent(CloseButton).vm.$emit('click');
+    expect({
+      previewOpen: wrapper.findComponent(PreviewContainer).props('isOpen'),
+      closeCalls: marker.infowindow.close.mock.calls.length,
+    }).toEqual({ previewOpen: false, closeCalls: 2 });
+  });
+
   it('renders the mobile map when the viewport is below md', () => {
     h.mdAndUp.value = false;
     h.result.value = { events: [event('1')], eventsAggregate: { count: 1 } };
     const wrapper = mountView();
     expect(wrapper.findAllComponents(EventMap)).toHaveLength(1);
+  });
+
+  it('locks marker colors from the mobile map', async () => {
+    h.mdAndUp.value = false;
+    h.result.value = { events: [event('1')], eventsAggregate: { count: 1 } };
+    const wrapper = mountView();
+    const map = wrapper.findComponent(EventMap);
+    await map.vm.$emit('lock-colors');
+    expect(map.props('colorLocked')).toBe(true);
   });
 });

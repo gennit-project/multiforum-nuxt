@@ -9,6 +9,11 @@ let routeParams: Record<string, unknown> = {};
 const copyLinkSpy = vi.fn((cb?: (v: boolean) => void) => cb?.(true));
 const handleMarkAsBestAnswer = vi.fn();
 const handleUnmarkAsBestAnswer = vi.fn();
+let bestAnswerOptions: {
+  discussionId: { value: unknown };
+  onMarked: () => void;
+  onUnmarked: () => void;
+};
 // useMutation is called for SUBSCRIBE_TO_COMMENT then UNSUBSCRIBE_FROM_COMMENT.
 const mutateSpies: ReturnType<typeof vi.fn>[] = [];
 let useMutationCall = 0;
@@ -32,19 +37,18 @@ vi.mock('@vue/apollo-composable', () => ({
   },
 }));
 vi.mock('@/composables/useCommentPermissions', () => ({
-  useCommentPermissions: () =>
-    ({
-      userPermissions: ref({
-        canReport: true,
-        canGiveFeedback: true,
-        canHideComment: true,
-        canSuspendUser: true,
-        isChannelOwner: true,
-        isElevatedMod: true,
-        isSuspendedMod: false,
-        isSuspendedUser: false,
-      }),
+  useCommentPermissions: () => ({
+    userPermissions: ref({
+      canReport: true,
+      canGiveFeedback: true,
+      canHideComment: true,
+      canSuspendUser: true,
+      isChannelOwner: true,
+      isElevatedMod: true,
+      isSuspendedMod: false,
+      isSuspendedUser: false,
     }),
+  }),
 }));
 vi.mock('@/composables/useForumRoleMembership', () => ({
   useForumRoleMembership: () => ({
@@ -61,12 +65,16 @@ vi.mock('@/composables/useServerRoleMembership', () => ({
   }),
 }));
 vi.mock('@/composables/useBestAnswerMutations', () => ({
-  useBestAnswerMutations: () => ({
-    isDiscussionAuthor: ref(true),
-    isMarkedAsAnswer: ref(false),
-    handleMarkAsBestAnswer,
-    handleUnmarkAsBestAnswer,
-  }),
+  useBestAnswerMutations: (options: typeof bestAnswerOptions) => {
+    bestAnswerOptions = options;
+    void options.discussionId.value;
+    return {
+      isDiscussionAuthor: ref(true),
+      isMarkedAsAnswer: ref(false),
+      handleMarkAsBestAnswer,
+      handleUnmarkAsBestAnswer,
+    };
+  },
 }));
 vi.mock('@/composables/useCommentPermalink', () => ({
   useCommentPermalink: () => ({
@@ -82,8 +90,18 @@ vi.mock('@/composables/useAutoUnsubscribe', () => ({
 const stubs = {
   CommentHeader: { template: '<div />' },
   CommentButtons: {
-    template:
-      '<div class="comment-buttons-stub"><slot /></div>',
+    name: 'CommentButtons',
+    emits: [
+      'start-comment-save',
+      'open-reply-editor',
+      'hide-reply-editor',
+      'open-edit-comment-editor',
+      'hide-edit-comment-editor',
+      'open-mod-profile',
+      'save-edit',
+      'handle-view-feedback',
+    ],
+    template: '<div class="comment-buttons-stub"><slot /></div>',
   },
   MarkdownPreview: { props: ['text'], template: '<div>{{ text }}</div>' },
   ArchivedCommentText: { template: '<div />' },
@@ -94,6 +112,12 @@ const stubs = {
   RightArrowIcon: { template: '<i />' },
   MenuButton: {
     props: ['items'],
+    emits: [
+      'handle-edit',
+      'click-feedback',
+      'click-undo-feedback',
+      'click-edit-feedback',
+    ],
     template: '<button data-testid="commentMenu"><slot /></button>',
   },
 };
@@ -109,7 +133,12 @@ const baseComment = (overrides: Partial<Comment> = {}): Comment =>
 
 const mountComment = (commentData: Comment = baseComment()) =>
   mountWithDefaults(CommentComponent, {
-    props: { commentData, depth: 1, parentCommentId: 'parent-1', enableFeedback: true },
+    props: {
+      commentData,
+      depth: 1,
+      parentCommentId: 'parent-1',
+      enableFeedback: true,
+    },
     global: { stubs },
   });
 
@@ -183,6 +212,38 @@ describe('Comment — CommentButtons handlers', () => {
     await buttons(wrapper).vm.$emit('click-edit-feedback');
 
     expect(wrapper.emitted('clickEditFeedback')).toBeTruthy();
+  });
+
+  it('re-emits editor and save lifecycle events', async () => {
+    const wrapper = mountComment();
+    const commentButtons = buttons(wrapper);
+    await commentButtons.vm.$emit('start-comment-save', 'saving');
+    await commentButtons.vm.$emit('open-reply-editor', 'c1');
+    await commentButtons.vm.$emit('hide-reply-editor');
+    await commentButtons.vm.$emit('open-edit-comment-editor');
+    await commentButtons.vm.$emit('hide-edit-comment-editor');
+    await commentButtons.vm.$emit('open-mod-profile');
+    await commentButtons.vm.$emit('save-edit');
+    await commentButtons.vm.$emit('handle-view-feedback');
+    expect({
+      saving: wrapper.emitted('startCommentSave'),
+      openReply: wrapper.emitted('openReplyEditor'),
+      hideReply: wrapper.emitted('hideReplyEditor'),
+      openEdit: wrapper.emitted('openEditCommentEditor'),
+      hideEdit: wrapper.emitted('hideEditCommentEditor'),
+      mod: wrapper.emitted('openModProfile'),
+      save: wrapper.emitted('saveEdit'),
+      feedback: wrapper.emitted('handleViewFeedback'),
+    }).toEqual({
+      saving: [['saving']],
+      openReply: [['c1']],
+      hideReply: [[]],
+      openEdit: [['c1']],
+      hideEdit: [[]],
+      mod: [[]],
+      save: [[]],
+      feedback: [['c1']],
+    });
   });
 });
 
@@ -263,6 +324,46 @@ describe('Comment — MenuButton handlers', () => {
 
     expect(wrapper.emitted('handleViewFeedback')).toEqual([['c1']]);
   });
+
+  it('routes edit and feedback actions from the menu', async () => {
+    const wrapper = mountComment();
+    const commentMenu = menu(wrapper);
+    await commentMenu.vm.$emit('handle-edit');
+    await commentMenu.vm.$emit('click-feedback');
+    await commentMenu.vm.$emit('click-undo-feedback');
+    await commentMenu.vm.$emit('click-edit-feedback');
+    expect({
+      edit: wrapper.emitted('click-edit-comment'),
+      feedback: wrapper.emitted('clickFeedback'),
+      undo: wrapper.emitted('clickUndoFeedback'),
+      editFeedback: wrapper.emitted('clickEditFeedback'),
+    }).toEqual({
+      edit: [[expect.objectContaining({ id: 'c1' })]],
+      feedback: [[expect.objectContaining({ parentCommentId: 'parent-1' })]],
+      undo: [[expect.objectContaining({ parentCommentId: 'parent-1' })]],
+      editFeedback: [
+        [
+          expect.objectContaining({
+            commentData: expect.objectContaining({ id: 'c1' }),
+          }),
+        ],
+      ],
+    });
+  });
+});
+
+describe('Comment — best answer notifications', () => {
+  it.each([
+    ['onMarked', 'showMarkedAsBestAnswerNotification'],
+    ['onUnmarked', 'showUnmarkedAsBestAnswerNotification'],
+  ] as const)('shows and clears the %s notification', (callback, eventName) => {
+    vi.useFakeTimers();
+    const wrapper = mountComment();
+    bestAnswerOptions[callback]();
+    vi.advanceTimersByTime(3000);
+    expect(wrapper.emitted(eventName)).toEqual([[true], [false]]);
+    vi.useRealTimers();
+  });
 });
 
 describe('Comment — forum id resolution', () => {
@@ -289,5 +390,16 @@ describe('Comment — forum id resolution', () => {
     );
 
     expect(wrapper.find('.comment-buttons-stub').exists()).toBe(true);
+  });
+
+  it.each([
+    ['discussion-1', 'discussion-1'],
+    [['discussion-2'], 'discussion-2'],
+  ])('normalizes the route discussion id %j', (discussionId) => {
+    routeParams = { discussionId };
+    mountComment();
+    expect(bestAnswerOptions.discussionId.value).toBe(
+      Array.isArray(discussionId) ? discussionId[0] : discussionId
+    );
   });
 });

@@ -26,8 +26,7 @@ const stubs = {
   },
   NuxtLink: {
     props: ['to'],
-    template:
-      '<a :href="typeof to === \'string\' ? to : to.path"><slot /></a>',
+    template: '<a :href="typeof to === \'string\' ? to : to.path"><slot /></a>',
   },
   ChevronDownIcon: true,
 };
@@ -142,8 +141,12 @@ describe('MenuButton', () => {
     });
 
     expect({
-      hasPopup: wrapper.get('[data-testid="custom"]').attributes('aria-haspopup'),
-      expanded: wrapper.get('[data-testid="custom"]').attributes('aria-expanded'),
+      hasPopup: wrapper
+        .get('[data-testid="custom"]')
+        .attributes('aria-haspopup'),
+      expanded: wrapper
+        .get('[data-testid="custom"]')
+        .attributes('aria-expanded'),
     }).toEqual({
       hasPopup: 'menu',
       expanded: 'false',
@@ -172,10 +175,8 @@ describe('MenuButton keyboard navigation', () => {
       global: { stubs },
     });
 
-  const item = (
-    wrapper: ReturnType<typeof mountAttached>,
-    label: string
-  ) => wrapper.get(`[data-testid="actions-item-${label}"]`);
+  const item = (wrapper: ReturnType<typeof mountAttached>, label: string) =>
+    wrapper.get(`[data-testid="actions-item-${label}"]`);
 
   it('keeps menu items out of the tab sequence (roving focus)', async () => {
     const wrapper = await openMenu(mountMenu({ items }));
@@ -191,7 +192,30 @@ describe('MenuButton keyboard navigation', () => {
     });
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="actions-item-One"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="actions-item-One"]').exists()).toBe(
+      true
+    );
+  });
+
+  it('opens the menu at the last item with ArrowUp', async () => {
+    const wrapper = mountAttached();
+    await wrapper.get('[data-testid="actions"]').trigger('keydown', {
+      key: 'ArrowUp',
+    });
+    await flushPromises();
+    const focused = document.activeElement === item(wrapper, 'Three').element;
+    wrapper.unmount();
+    expect(focused).toBe(true);
+  });
+
+  it('ignores trigger arrow keys when disabled', async () => {
+    const wrapper = mountMenu({ items, disabled: true });
+    await wrapper.get('[data-testid="actions"]').trigger('keydown', {
+      key: 'ArrowDown',
+    });
+    expect(wrapper.find('[data-testid="actions-item-One"]').exists()).toBe(
+      false
+    );
   });
 
   it('moves focus to the first item when the menu opens', async () => {
@@ -244,5 +268,31 @@ describe('MenuButton keyboard navigation', () => {
     wrapper.unmount();
 
     expect(result).toEqual({ stillOpen: false, triggerFocused: true });
+  });
+
+  it('supports Home, End, and Tab inside the menu', async () => {
+    const wrapper = mountAttached();
+    await wrapper.get('[data-testid="actions"]').trigger('click');
+    await flushPromises();
+    await item(wrapper, 'One').trigger('keydown', { key: 'End' });
+    await item(wrapper, 'Three').trigger('keydown', { key: 'Home' });
+    const homeFocused = document.activeElement === item(wrapper, 'One').element;
+    await item(wrapper, 'One').trigger('keydown', { key: 'Tab' });
+    const closed = !wrapper.find('[data-testid="actions-item-One"]').exists();
+    wrapper.unmount();
+    expect({ homeFocused, closed }).toEqual({
+      homeFocused: true,
+      closed: true,
+    });
+  });
+
+  it('closes when focus leaves the trigger and menu', async () => {
+    const wrapper = await openMenu(mountMenu({ items }));
+    await wrapper.get('.inline-block').trigger('focusout', {
+      relatedTarget: document.body,
+    });
+    expect(wrapper.find('[data-testid="actions-item-One"]').exists()).toBe(
+      false
+    );
   });
 });

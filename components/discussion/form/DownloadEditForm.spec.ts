@@ -189,9 +189,9 @@ describe('DownloadEditForm rendering', () => {
       channelData: { FilterGroups: [{ id: 'g1' }] },
     });
 
-    expect(wrapper.findComponent({ name: 'DownloadLabelPicker' }).exists()).toBe(
-      true
-    );
+    expect(
+      wrapper.findComponent({ name: 'DownloadLabelPicker' }).exists()
+    ).toBe(true);
   });
 
   it('hides support fields by default for files without custom values', async () => {
@@ -226,9 +226,9 @@ describe('DownloadEditForm file editing', () => {
 
     await wrapper.get('button[title="Delete this file"]').trigger('click');
 
-    expect(
-      wrapper.getComponent({ name: 'WarningModal' }).props('open')
-    ).toBe(true);
+    expect(wrapper.getComponent({ name: 'WarningModal' }).props('open')).toBe(
+      true
+    );
   });
 
   it('does not remove an existing file before confirmation', async () => {
@@ -255,9 +255,11 @@ describe('DownloadEditForm file editing', () => {
     await flushPromises();
 
     expect(
-      (wrapper.emitted('updateFormValues')?.at(-1)?.[0] as {
-        downloadableFiles: unknown[];
-      }).downloadableFiles
+      (
+        wrapper.emitted('updateFormValues')?.at(-1)?.[0] as {
+          downloadableFiles: unknown[];
+        }
+      ).downloadableFiles
     ).toHaveLength(0);
   });
 
@@ -278,8 +280,9 @@ describe('DownloadEditForm file editing', () => {
   });
 
   it('keeps the file in the form when permanent delete fails', async () => {
-    (h.permanentlyDeleteDownloadableFile as ReturnType<typeof vi.fn>)
-      .mockRejectedValueOnce(new Error('Not authorized'));
+    (
+      h.permanentlyDeleteDownloadableFile as ReturnType<typeof vi.fn>
+    ).mockRejectedValueOnce(new Error('Not authorized'));
     const wrapper = mountForm({
       discussion: makeDiscussion({ DownloadableFiles: [fileRecord()] }),
     });
@@ -295,8 +298,9 @@ describe('DownloadEditForm file editing', () => {
   });
 
   it('shows the backend delete error when permanent delete fails', async () => {
-    (h.permanentlyDeleteDownloadableFile as ReturnType<typeof vi.fn>)
-      .mockRejectedValueOnce(new Error('Not authorized'));
+    (
+      h.permanentlyDeleteDownloadableFile as ReturnType<typeof vi.fn>
+    ).mockRejectedValueOnce(new Error('Not authorized'));
     const wrapper = mountForm({
       discussion: makeDiscussion({ DownloadableFiles: [fileRecord()] }),
     });
@@ -319,9 +323,7 @@ describe('DownloadEditForm file editing', () => {
     });
     await flushPromises();
 
-    await wrapper
-      .get('input[type="checkbox"]')
-      .setValue(true);
+    await wrapper.get('input[type="checkbox"]').setValue(true);
     await wrapper.get('textarea').setValue('Thanks for downloading');
 
     expect(
@@ -410,6 +412,99 @@ describe('DownloadEditForm upload', () => {
 
     expect(wrapper.find('.error-banner').exists()).toBe(true);
   });
+
+  it('rejects a file type not allowed by the forum', async () => {
+    const wrapper = mountForm({
+      channelData: { allowedFileTypes: ['application/zip'] },
+    });
+    await setFiles(wrapper, '#downloadable-file-input', [
+      new File(['x'], 'installer.exe', {
+        type: 'application/x-msdownload',
+      }),
+    ]);
+    expect(wrapper.find('.error-banner').exists()).toBe(true);
+  });
+
+  it('does not upload when no username is available', async () => {
+    h.username.value = null;
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const wrapper = mountForm();
+    await setFiles(wrapper, '#downloadable-file-input', [
+      new File(['x'], 'new.stl'),
+    ]);
+    error.mockRestore();
+    expect(h.createSignedStorageUrl).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [
+      'signed URL',
+      () => {
+        h.createSignedStorageUrl = vi.fn().mockResolvedValue({ data: {} });
+      },
+    ],
+    [
+      'embedded file URL',
+      () => {
+        h.uploadLink = vi.fn().mockResolvedValue(null);
+      },
+    ],
+    [
+      'database file record',
+      () => {
+        h.createDownloadableFile = vi.fn().mockResolvedValue({
+          data: { createDownloadableFiles: { downloadableFiles: [] } },
+        });
+      },
+    ],
+  ])('surfaces a missing %s response', async (_label, arrange) => {
+    arrange();
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const wrapper = mountForm();
+    await setFiles(wrapper, '#downloadable-file-input', [
+      new File(['x'], 'new.stl'),
+    ]);
+    error.mockRestore();
+    expect(wrapper.find('.error-banner').exists()).toBe(true);
+  });
+});
+
+describe('DownloadEditForm removal controls', () => {
+  it('removes a temporary file without opening confirmation', async () => {
+    const wrapper = mountForm({
+      discussion: makeDiscussion({
+        DownloadableFiles: [{ ...fileRecord(), id: '', url: '' }],
+      }),
+    });
+    await flushPromises();
+    await wrapper.get('button').trigger('click');
+    expect(
+      (
+        wrapper.emitted('updateFormValues')?.at(-1)?.[0] as {
+          downloadableFiles: unknown[];
+        }
+      ).downloadableFiles
+    ).toHaveLength(0);
+  });
+
+  it('closes an open permanent-delete confirmation', async () => {
+    const wrapper = mountForm({
+      discussion: makeDiscussion({ DownloadableFiles: [fileRecord()] }),
+    });
+    await flushPromises();
+    await wrapper.get('button[title="Delete this file"]').trigger('click');
+    const modal = wrapper.getComponent({ name: 'WarningModal' });
+    await modal.vm.$emit('close');
+    expect(modal.props('open')).toBe(false);
+  });
+
+  it('ignores permanent delete confirmation when no file is pending', async () => {
+    const wrapper = mountForm();
+    await wrapper
+      .getComponent({ name: 'WarningModal' })
+      .vm.$emit('primary-button-click');
+    expect(h.permanentlyDeleteDownloadableFile).not.toHaveBeenCalled();
+  });
 });
 
 describe('DownloadEditForm save side effects', () => {
@@ -428,9 +523,9 @@ describe('DownloadEditForm save side effects', () => {
       .vm.$emit('primary-button-click');
     await flushPromises();
 
-    expect(
-      wrapper.getComponent({ name: 'Notification' }).props('show')
-    ).toBe(true);
+    expect(wrapper.getComponent({ name: 'Notification' }).props('show')).toBe(
+      true
+    );
   });
 
   it('closes the editor when the update mutation completes', () => {
@@ -457,5 +552,26 @@ describe('DownloadEditForm save side effects', () => {
         }
       ).downloadLabels
     ).toEqual({ g1: ['a'] });
+  });
+
+  it('dismisses the temporary saved notification after three seconds', async () => {
+    vi.useFakeTimers();
+    const wrapper = mountForm({
+      discussion: makeDiscussion({
+        id: 'temp-id',
+        DownloadableFiles: [fileRecord()],
+      }),
+    });
+    await flushPromises();
+    await wrapper.get('button[title="Delete this file"]').trigger('click');
+    await wrapper
+      .getComponent({ name: 'WarningModal' })
+      .vm.$emit('primary-button-click');
+    await flushPromises();
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(wrapper.getComponent({ name: 'Notification' }).props('show')).toBe(
+      false
+    );
+    vi.useRealTimers();
   });
 });

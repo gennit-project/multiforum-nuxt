@@ -33,15 +33,26 @@ const setQueryState = (patch: Record<string, unknown>) => {
 vi.mock('@vue/apollo-composable', async () => {
   const { computed } = await import('vue');
   return {
-    useQuery: () => ({
-      result: computed(() => mockQueryState.value),
-    }),
+    useQuery: (
+      _query: unknown,
+      variables?: () => unknown,
+      options?: () => unknown
+    ) => {
+      variables?.();
+      options?.();
+      return {
+        result: computed(() => mockQueryState.value),
+      };
+    },
   };
 });
 
 vi.mock('@/composables/useAuthState', async () => {
   const { ref } = await import('vue');
-  return { useModProfileName: () => ref('mod-alice'), setModProfileName: vi.fn() };
+  return {
+    useModProfileName: () => ref('mod-alice'),
+    setModProfileName: vi.fn(),
+  };
 });
 
 describe('ModerationWizard', () => {
@@ -77,26 +88,36 @@ describe('ModerationWizard', () => {
           ScalesIcon: true,
           PencilIcon: true,
           CloseIssueAction: {
+            name: 'CloseIssueAction',
+            emits: ['close-issue'],
             template:
               '<button data-testid="close-issue-action" :disabled="false">Close</button>',
           },
           ArchiveButton: {
+            name: 'ArchiveButton',
+            emits: ['archived-successfully', 'unarchived-successfully'],
             template:
               '<div data-testid="archive-button" :data-disabled="String(disabled)"></div>',
             props: ['disabled'],
           },
           SuspendUserButton: {
+            name: 'SuspendUserButton',
+            emits: ['suspended-successfully', 'unsuspended-successfully'],
             template:
               '<div data-testid="suspend-user-button" :data-disabled="String(disabled)"></div>',
             props: ['disabled'],
           },
           SuspendModButton: {
+            name: 'SuspendModButton',
+            emits: ['suspended-successfully', 'unsuspended-successfully'],
             template:
               '<div data-testid="suspend-mod-button" :data-disabled="String(disabled)"></div>',
             props: ['disabled'],
           },
           EditContentModal: {
+            name: 'EditContentModal',
             props: ['open'],
+            emits: ['saved', 'close'],
             template:
               '<div data-testid="edit-modal" :data-open="String(open)" @click="$emit(\'saved\')" />',
           },
@@ -115,23 +136,27 @@ describe('ModerationWizard', () => {
   it('disables the archive button when the moderator is suspended', () => {
     const wrapper = mountWrapper();
 
-    expect(wrapper.get('[data-testid="archive-button"]').attributes('data-disabled')).toBe(
-      'true'
-    );
+    expect(
+      wrapper.get('[data-testid="archive-button"]').attributes('data-disabled')
+    ).toBe('true');
   });
 
   it('disables the suspend-user button when the moderator is suspended', () => {
     const wrapper = mountWrapper();
 
-    expect(wrapper.get('[data-testid="suspend-user-button"]').attributes('data-disabled')).toBe(
-      'true'
-    );
+    expect(
+      wrapper
+        .get('[data-testid="suspend-user-button"]')
+        .attributes('data-disabled')
+    ).toBe('true');
   });
 
   it('disables the edit action when the moderator is suspended', () => {
     const wrapper = mountWrapper();
 
-    expect(wrapper.get('[data-test="edit-comment"]').attributes('disabled')).toBeDefined();
+    expect(
+      wrapper.get('[data-test="edit-comment"]').attributes('disabled')
+    ).toBeDefined();
   });
 
   it('re-enables the archive button once the moderator is no longer suspended', () => {
@@ -187,7 +212,10 @@ describe('ModerationWizard', () => {
   });
 
   it('disables the edit action without edit permission', () => {
-    const wrapper = mountWrapper({ ...reportedComment, canEditComments: false });
+    const wrapper = mountWrapper({
+      ...reportedComment,
+      canEditComments: false,
+    });
 
     expect(
       wrapper.get('[data-test="edit-comment"]').attributes('disabled')
@@ -198,9 +226,9 @@ describe('ModerationWizard', () => {
     const wrapper = mountWrapper(reportedComment);
     await wrapper.get('[data-test="edit-comment"]').trigger('click');
 
-    expect(wrapper.get('[data-testid="edit-modal"]').attributes('data-open')).toBe(
-      'true'
-    );
+    expect(
+      wrapper.get('[data-testid="edit-modal"]').attributes('data-open')
+    ).toBe('true');
   });
 
   it('re-emits archived-successfully when the edit modal saves', async () => {
@@ -252,6 +280,103 @@ describe('ModerationWizard', () => {
     });
   });
 
+  it.each([
+    [
+      { commentId: undefined, discussionId: 'd1' },
+      { discussionChannels: [{ archived: true }] },
+    ],
+    [
+      { commentId: undefined, eventId: 'e1' },
+      { eventChannels: [{ archived: true }] },
+    ],
+  ])('resolves archived state for related content', (props, queryState) => {
+    setQueryState(queryState);
+    const wrapper = mountWrapper({ ...props, isSuspendedMod: false });
+    expect(wrapper.text()).toContain('Archive (Already Archived)');
+  });
+
+  it('forwards content and user moderation outcomes', async () => {
+    const wrapper = mountWrapper({ isSuspendedMod: false });
+    await wrapper
+      .findComponent({ name: 'CloseIssueAction' })
+      .vm.$emit('close-issue');
+    await wrapper
+      .findComponent({ name: 'ArchiveButton' })
+      .vm.$emit('archived-successfully');
+    await wrapper
+      .findComponent({ name: 'ArchiveButton' })
+      .vm.$emit('unarchived-successfully');
+    await wrapper
+      .findComponent({ name: 'SuspendUserButton' })
+      .vm.$emit('suspended-successfully');
+    await wrapper
+      .findComponent({ name: 'SuspendUserButton' })
+      .vm.$emit('unsuspended-successfully');
+    expect({
+      close: wrapper.emitted('close-issue'),
+      archived: wrapper.emitted('archived-successfully'),
+      unarchived: wrapper.emitted('unarchived-successfully'),
+      suspended: wrapper.emitted('suspended-user-successfully'),
+      unsuspended: wrapper.emitted('unsuspended-user-successfully'),
+    }).toEqual({
+      close: [[]],
+      archived: [[]],
+      unarchived: [[]],
+      suspended: [[]],
+      unsuspended: [[]],
+    });
+  });
+
+  it('forwards moderator suspension outcomes', async () => {
+    const wrapper = mountWrapper({
+      authorType: 'mod',
+      isSuspendedMod: false,
+    });
+    const button = wrapper.findComponent({ name: 'SuspendModButton' });
+    await button.vm.$emit('suspended-successfully');
+    await button.vm.$emit('unsuspended-successfully');
+    expect({
+      suspended: wrapper.emitted('suspended-mod-successfully'),
+      unsuspended: wrapper.emitted('unsuspended-mod-successfully'),
+    }).toEqual({ suspended: [[]], unsuspended: [[]] });
+  });
+
+  it('forwards outcomes from the archived-content restoration path', async () => {
+    setQueryState({ comments: [{ archived: true }] });
+    const wrapper = mountWrapper({ isSuspendedMod: false });
+    const archive = wrapper.findComponent({ name: 'ArchiveButton' });
+    await archive.vm.$emit('archived-successfully');
+    await archive.vm.$emit('unarchived-successfully');
+    await wrapper
+      .findComponent({ name: 'CloseIssueAction' })
+      .vm.$emit('close-issue');
+    expect({
+      archived: wrapper.emitted('archived-successfully'),
+      unarchived: wrapper.emitted('unarchived-successfully'),
+      close: wrapper.emitted('close-issue'),
+    }).toEqual({ archived: [[]], unarchived: [[]], close: [[]] });
+  });
+
+  it('forwards outcomes from the suspended-author restoration path', async () => {
+    setQueryState({ isOriginalPosterSuspended: true });
+    const wrapper = mountWrapper({ authorType: 'mod', isSuspendedMod: false });
+    const button = wrapper.findComponent({ name: 'SuspendModButton' });
+    await button.vm.$emit('suspended-successfully');
+    await button.vm.$emit('unsuspended-successfully');
+    expect({
+      suspended: wrapper.emitted('suspended-mod-successfully'),
+      unsuspended: wrapper.emitted('unsuspended-mod-successfully'),
+    }).toEqual({ suspended: [[]], unsuspended: [[]] });
+  });
+
+  it('closes the edit modal from the modal event', async () => {
+    const wrapper = mountWrapper(reportedComment);
+    await wrapper.get('[data-test="edit-comment"]').trigger('click');
+    const modal = wrapper.findComponent({ name: 'EditContentModal' });
+    await modal.vm.$emit('close');
+    expect(modal.props('open')).toBe(false);
+  });
+
   describe('unauthenticated fallback', () => {
     it('shows the log-in prompt when RequireAuth renders its no-auth slot', () => {
       const wrapper = mount(ModerationWizard, {
@@ -287,17 +412,30 @@ describe('ModerationWizard', () => {
     beforeEach(() => setQueryState({ isOriginalPosterSuspended: true }));
 
     it('offers to unsuspend a suspended mod author', () => {
-      const wrapper = mountWrapper({ authorType: 'mod', isSuspendedMod: false });
-      expect(wrapper.get('[data-testid="suspend-mod-button"]').exists()).toBe(true);
+      const wrapper = mountWrapper({
+        authorType: 'mod',
+        isSuspendedMod: false,
+      });
+      expect(wrapper.get('[data-testid="suspend-mod-button"]').exists()).toBe(
+        true
+      );
     });
 
     it('offers to unsuspend a suspended user author', () => {
-      const wrapper = mountWrapper({ authorType: 'user', isSuspendedMod: false });
-      expect(wrapper.get('[data-testid="suspend-user-button"]').exists()).toBe(true);
+      const wrapper = mountWrapper({
+        authorType: 'user',
+        isSuspendedMod: false,
+      });
+      expect(wrapper.get('[data-testid="suspend-user-button"]').exists()).toBe(
+        true
+      );
     });
 
     it('shows the "already suspended" state in the destructive section', () => {
-      const wrapper = mountWrapper({ authorType: 'user', isSuspendedMod: false });
+      const wrapper = mountWrapper({
+        authorType: 'user',
+        isSuspendedMod: false,
+      });
       expect(wrapper.text()).toContain('Suspend Author (Already Suspended)');
     });
   });

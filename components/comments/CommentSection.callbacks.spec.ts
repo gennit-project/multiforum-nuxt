@@ -26,7 +26,10 @@ vi.mock('@vue/apollo-composable', () => ({
   useMutation: vi.fn(),
 }));
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({ params: { discussionId: 'd1', forumId: 'cats' }, query: {} }),
+  useRoute: () => ({
+    params: { discussionId: 'd1', forumId: 'cats' },
+    query: {},
+  }),
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
 vi.mock('@/composables/useAuthState', () => ({
@@ -37,17 +40,30 @@ vi.mock('@/composables/useAuthState', () => ({
 const NotificationStub = {
   name: 'Notification',
   props: ['show', 'title'],
-  template: '<div class="notification-stub" :data-show="String(show)" :data-title="title" />',
+  template:
+    '<div class="notification-stub" :data-show="String(show)" :data-title="title" />',
 };
 
 const stubs = {
-  Comment: { name: 'Comment', props: ['commentData'], template: '<div class="comment-stub" />' },
+  Comment: {
+    name: 'Comment',
+    props: ['commentData', 'commentInProcess'],
+    template: '<div class="comment-stub" />',
+  },
   LoadMore: { template: '<div />' },
   SortButtons: { template: '<div />' },
-  PinnedAnswers: { name: 'PinnedAnswers', props: ['answers'], template: '<div />' },
-  WarningModal: { template: '<div />' },
+  PinnedAnswers: {
+    name: 'PinnedAnswers',
+    props: ['answers'],
+    template: '<div />',
+  },
+  WarningModal: { name: 'WarningModal', props: ['open'], template: '<div />' },
   BrokenRulesModal: { template: '<div />' },
-  GenericFeedbackFormModal: { name: 'GenericFeedbackFormModal', props: ['open'], template: '<div class="feedback-modal-stub" />' },
+  GenericFeedbackFormModal: {
+    name: 'GenericFeedbackFormModal',
+    props: ['open'],
+    template: '<div class="feedback-modal-stub" />',
+  },
   Notification: NotificationStub,
   ConfirmUndoCommentFeedbackModal: { template: '<div />' },
   EditCommentFeedbackModal: { template: '<div />' },
@@ -108,7 +124,9 @@ describe('CommentSection — mutation callbacks', () => {
     router.get('createComment').update!(fakeCache(), {
       data: {
         createComments: {
-          comments: [{ __typename: 'Comment', id: 'new-1', ParentComment: null }],
+          comments: [
+            { __typename: 'Comment', id: 'new-1', ParentComment: null },
+          ],
         },
       },
     });
@@ -127,6 +145,37 @@ describe('CommentSection — mutation callbacks', () => {
     await wrapper.vm.$nextTick();
     expect(feedbackToast(wrapper).attributes('data-show')).toBe('true');
   });
+
+  it('clears the delete modal state after deletion completes', () => {
+    const wrapper = mountSection();
+    router.get('deleteComment').fireDone();
+    expect(wrapper.findComponent({ name: 'WarningModal' }).props('open')).toBe(
+      false
+    );
+  });
+
+  it('emits the feedback cache update to the parent', () => {
+    const wrapper = mountSection();
+    router.get('addFeedbackCommentToComment').update?.(fakeCache(), {
+      data: {
+        createComments: {
+          comments: [makeComment({ id: 'feedback-1', text: 'Feedback' })],
+        },
+      },
+    });
+    expect(wrapper.emitted('updateCommentSectionQueryResult')).toBeTruthy();
+  });
+
+  it('clears the in-process state when comment creation errors', () => {
+    const wrapper = mountSection();
+    const create = router.get('createComment');
+    const onError = create.onError.mock.calls[0]?.[0] as
+      (() => void) | undefined;
+    onError?.();
+    expect(
+      wrapper.findComponent({ name: 'Comment' }).props('commentInProcess')
+    ).toBe(false);
+  });
 });
 
 describe('CommentSection — loaded-state watchers', () => {
@@ -134,7 +183,10 @@ describe('CommentSection — loaded-state watchers', () => {
     const wrapper = mountSection({ comments: [], loading: true });
     const before = wrapper.find('[aria-busy="true"]').exists();
     await wrapper.setProps({ comments: [makeComment({ id: 'x1' })] });
-    expect([before, wrapper.find('[aria-busy="true"]').exists()]).toEqual([true, false]);
+    expect([before, wrapper.find('[aria-busy="true"]').exists()]).toEqual([
+      true,
+      false,
+    ]);
   });
 
   it('hides the loading spinner once loading finishes', async () => {

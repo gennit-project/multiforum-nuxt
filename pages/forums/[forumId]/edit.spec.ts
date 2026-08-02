@@ -7,7 +7,25 @@ import { FilterMode } from '@/__generated__/graphql';
 
 const h = vi.hoisted(() => ({
   mutate: vi.fn(),
+  doneCallbacks: [] as Array<() => void>,
+  errorCallbacks: [] as Array<(error: Error) => void>,
+  autosaves: [] as Array<{ save: (value: boolean) => unknown }>,
 }));
+
+vi.mock('@/composables/useSettingAutosave', async () => {
+  const { ref } = await import('vue');
+  return {
+    useSettingAutosave: (options: { save: (value: boolean) => unknown }) => {
+      h.autosaves.push(options);
+      return {
+        status: ref('idle'),
+        error: ref(null),
+        trigger: vi.fn(),
+        setInitial: vi.fn(),
+      };
+    },
+  };
+});
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({
@@ -24,8 +42,9 @@ vi.mock('@vue/apollo-composable', () => ({
     mutate: h.mutate,
     loading: ref(false),
     error: ref(null),
-    onDone: vi.fn(),
-    onError: vi.fn(),
+    onDone: (callback: () => void) => h.doneCallbacks.push(callback),
+    onError: (callback: (error: Error) => void) =>
+      h.errorCallbacks.push(callback),
   }),
 }));
 
@@ -124,29 +143,31 @@ describe('forum settings edit page', () => {
       global: { mocks: { $route: { fullPath: '/forums/cats/edit' } } },
     });
 
-    wrapper.findComponent(CreateEditChannelFields).vm.$emit('updateFormValues', {
-      downloadFilterGroups: [
-        {
-          ...channelData.FilterGroups[0],
-          displayName: 'Required Game Packs',
-          mode: FilterMode.Exclude,
-          options: [
-            {
-              id: 'option-1',
-              value: 'vampires',
-              displayName: 'Vampires Updated',
-              order: 0,
-            },
-            {
-              id: 'local-filter-option-1',
-              value: 'werewolves',
-              displayName: 'Werewolves',
-              order: 1,
-            },
-          ],
-        },
-      ],
-    });
+    wrapper
+      .findComponent(CreateEditChannelFields)
+      .vm.$emit('updateFormValues', {
+        downloadFilterGroups: [
+          {
+            ...channelData.FilterGroups[0],
+            displayName: 'Required Game Packs',
+            mode: FilterMode.Exclude,
+            options: [
+              {
+                id: 'option-1',
+                value: 'vampires',
+                displayName: 'Vampires Updated',
+                order: 0,
+              },
+              {
+                id: 'local-filter-option-1',
+                value: 'werewolves',
+                displayName: 'Werewolves',
+                order: 1,
+              },
+            ],
+          },
+        ],
+      });
     wrapper.findComponent(CreateEditChannelFields).vm.$emit('submit');
 
     const update = h.mutate.mock.calls[0][0].update;
@@ -198,5 +219,134 @@ describe('forum settings edit page', () => {
         },
       ])
     );
+  });
+
+  it('autosaves each toggle as a scoped channel update', async () => {
+    h.mutate.mockClear();
+    await Promise.all([
+      h.autosaves[0].save(false),
+      h.autosaves[1].save(false),
+      h.autosaves[2].save(false),
+      h.autosaves[3].save(false),
+      h.autosaves[4].save(false),
+    ]);
+    expect(h.mutate.mock.calls.map((call) => call[0].update)).toEqual([
+      { eventsEnabled: false },
+      { imageUploadsEnabled: false },
+      { markdownImagesEnabled: false },
+      { feedbackEnabled: false },
+      { emojiEnabled: false },
+    ]);
+  });
+
+  it('falls back to empty rules when the channel stores malformed JSON', async () => {
+    mockedUseQuery.mockReturnValue({
+      result: ref({ channels: [{ ...channelData, rules: '{invalid' }] }),
+      loading: ref(false),
+      error: ref(null),
+      refetch: vi.fn(),
+    });
+    const Page = (await import('./edit.vue')).default;
+    const wrapper = shallowMount(Page, {
+      global: { mocks: { $route: { fullPath: '/forums/cats/edit' } } },
+    });
+    expect(
+      wrapper.findComponent(CreateEditChannelFields).props('formValues').rules
+    ).toEqual([]);
+  });
+
+  it('creates new filter groups and their options', async () => {
+    h.mutate.mockClear();
+    mockedUseQuery.mockReturnValue({
+      result: ref({ channels: [channelData] }),
+      loading: ref(false),
+      error: ref(null),
+      refetch: vi.fn(),
+    });
+    const Page = (await import('./edit.vue')).default;
+    const wrapper = shallowMount(Page, {
+      global: { mocks: { $route: { fullPath: '/forums/cats/edit' } } },
+    });
+    wrapper
+      .findComponent(CreateEditChannelFields)
+      .vm.$emit('updateFormValues', {
+        downloadFilterGroups: [
+          {
+            id: 'local-group-1',
+            key: 'style',
+            displayName: 'Style',
+            mode: FilterMode.Include,
+            order: 0,
+            options: [
+              {
+                id: 'local-option-1',
+                value: 'modern',
+                displayName: 'Modern',
+                order: 0,
+              },
+            ],
+          },
+        ],
+      });
+    wrapper.findComponent(CreateEditChannelFields).vm.$emit('submit');
+    expect(h.mutate.mock.calls[0][0].update.FilterGroups).toEqual(
+      expect.arrayContaining([
+        {
+          create: [
+            expect.objectContaining({
+              node: expect.objectContaining({
+                key: 'style',
+                options: {
+                  create: [
+                    expect.objectContaining({ node: expect.any(Object) }),
+                  ],
+                },
+              }),
+            }),
+          ],
+        },
+      ])
+    );
+  });
+
+  it('shows the saved state and refetches after the update completes', async () => {
+    const refetch = vi.fn();
+    mockedUseQuery.mockReturnValue({
+      result: ref({ channels: [channelData] }),
+      loading: ref(false),
+      error: ref(null),
+      refetch,
+    });
+    const Page = (await import('./edit.vue')).default;
+    const wrapper = shallowMount(Page, {
+      global: {
+        mocks: { $route: { fullPath: '/forums/cats/edit' } },
+        stubs: {
+          Notification: {
+            name: 'Notification',
+            props: ['show'],
+            template: '<div />',
+          },
+        },
+      },
+    });
+    h.doneCallbacks.at(-1)?.();
+    await wrapper.vm.$nextTick();
+    expect(refetch).toHaveBeenCalledOnce();
+  });
+
+  it('handles update mutation errors', async () => {
+    mockedUseQuery.mockReturnValue({
+      result: ref({ channels: [channelData] }),
+      loading: ref(false),
+      error: ref(null),
+      refetch: vi.fn(),
+    });
+    const Page = (await import('./edit.vue')).default;
+    shallowMount(Page, {
+      global: { mocks: { $route: { fullPath: '/forums/cats/edit' } } },
+    });
+    h.errorCallbacks.at(-1)?.(new Error('update failed'));
+    expect(h.errorCallbacks).not.toHaveLength(0);
   });
 });

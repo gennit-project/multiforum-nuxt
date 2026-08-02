@@ -61,6 +61,7 @@ const CommentStub = {
   name: 'Comment',
   props: ['commentData'],
   emits: [
+    'start-comment-save',
     'create-comment',
     'update-create-reply-comment-input',
     'click-edit-comment',
@@ -72,6 +73,19 @@ const CommentStub = {
     'hide-edit-comment-editor',
     'scroll-to-top',
     'handle-view-feedback',
+    'show-copied-link-notification',
+    'show-marked-as-best-answer-notification',
+    'show-unmarked-as-best-answer-notification',
+    'open-mod-profile-modal',
+    'click-report',
+    'click-feedback',
+    'click-undo-feedback',
+    'click-edit-feedback',
+    'update-feedback',
+    'delete-comment',
+    'handle-click-archive',
+    'handle-click-archive-and-suspend',
+    'handle-click-unarchive',
   ],
   template: '<div class="comment-stub" />',
 };
@@ -80,6 +94,7 @@ const PinnedAnswersStub = {
   name: 'PinnedAnswers',
   props: ['answers'],
   emits: [
+    'start-comment-save',
     'create-comment',
     'click-edit-comment',
     'click-report',
@@ -87,6 +102,11 @@ const PinnedAnswersStub = {
     'handle-click-archive-and-suspend',
     'handle-click-unarchive',
     'update-create-reply-comment-input',
+    'show-copied-link-notification',
+    'show-marked-as-best-answer-notification',
+    'show-unmarked-as-best-answer-notification',
+    'open-mod-profile',
+    'scroll-to-top',
   ],
   template: '<div class="pinned-answers-stub" />',
 };
@@ -113,12 +133,34 @@ const stubs = {
     emits: ['load-more'],
     template: '<button class="load-more-stub" @click="$emit(\'load-more\')" />',
   },
-  Notification: inert('Notification'),
-  WarningModal: inert('WarningModal'),
+  Notification: {
+    name: 'Notification',
+    props: ['show', 'title'],
+    emits: ['close-notification'],
+    template: '<div class="notification-stub" />',
+  },
+  WarningModal: {
+    name: 'WarningModal',
+    props: ['open'],
+    emits: ['close', 'primary-button-click'],
+    template: '<div class="warning-modal-stub" />',
+  },
   BrokenRulesModal: inert('BrokenRulesModal'),
-  GenericFeedbackFormModal: inert('GenericFeedbackFormModal'),
-  ConfirmUndoCommentFeedbackModal: inert('ConfirmUndoCommentFeedbackModal'),
-  EditCommentFeedbackModal: inert('EditCommentFeedbackModal'),
+  GenericFeedbackFormModal: {
+    name: 'GenericFeedbackFormModal',
+    emits: ['close', 'update-feedback', 'primary-button-click'],
+    template: '<div class="feedback-modal-stub" />',
+  },
+  ConfirmUndoCommentFeedbackModal: {
+    name: 'ConfirmUndoCommentFeedbackModal',
+    emits: ['close'],
+    template: '<div class="undo-feedback-modal-stub" />',
+  },
+  EditCommentFeedbackModal: {
+    name: 'EditCommentFeedbackModal',
+    emits: ['close'],
+    template: '<div class="edit-feedback-modal-stub" />',
+  },
   UnarchiveModal: inert('UnarchiveModal'),
   NuxtPage: {
     name: 'NuxtPage',
@@ -130,6 +172,10 @@ const stubs = {
       'save-edit',
       'scroll-to-top',
       'handle-view-feedback',
+      'start-comment-save',
+      'show-copied-link-notification',
+      'show-marked-as-best-answer-notification',
+      'show-unmarked-as-best-answer-notification',
     ],
     template: '<div class="nuxt-page-stub" />',
   },
@@ -288,7 +334,10 @@ describe('CommentSection', () => {
   });
 
   it('navigates to the comment-feedback route when viewing feedback', async () => {
-    routeRef.value = { params: { forumId: 'cats', discussionId: 'd1' }, query: {} };
+    routeRef.value = {
+      params: { forumId: 'cats', discussionId: 'd1' },
+      query: {},
+    };
     const wrapper = mountSection();
     await wrapper
       .findAllComponents(CommentStub)[0]
@@ -323,7 +372,10 @@ describe('CommentSection', () => {
   });
 
   it('forwards NuxtPage editor and navigation events when nested routes are shown', async () => {
-    routeRef.value = { params: { forumId: 'cats', discussionId: 'd1' }, query: {} };
+    routeRef.value = {
+      params: { forumId: 'cats', discussionId: 'd1' },
+      query: {},
+    };
     const wrapper = mountSection({ showNuxtPage: true });
     const page = wrapper.findComponent({ name: 'NuxtPage' });
 
@@ -344,5 +396,81 @@ describe('CommentSection', () => {
       scrolled: expect.any(Function),
       routed: 1,
     });
+  });
+
+  it.each([0, 2])('deletes a comment with %i replies', async (replyCount) => {
+    const wrapper = mountSection();
+    await wrapper.findAllComponents(CommentStub)[0].vm.$emit('delete-comment', {
+      commentId: 'c1',
+      parentCommentId: '',
+      replyCount,
+    });
+    await wrapper
+      .findComponent({ name: 'WarningModal' })
+      .vm.$emit('primary-button-click');
+    expect(wrapper.findComponent({ name: 'WarningModal' }).props('open')).toBe(
+      false
+    );
+  });
+
+  it('submits feedback selected from a comment', async () => {
+    const wrapper = mountSection({ enableFeedback: true });
+    const comment = wrapper.findAllComponents(CommentStub)[0];
+    await comment.vm.$emit('click-feedback', {
+      commentData: makeComment('c1'),
+      parentCommentId: '',
+    });
+    const modal = wrapper.findComponent({ name: 'GenericFeedbackFormModal' });
+    await modal.vm.$emit('update-feedback', 'Helpful note');
+    await modal.vm.$emit('primary-button-click');
+    expect(modal.exists()).toBe(true);
+  });
+
+  it('updates notification and profile state from pinned answers', async () => {
+    const wrapper = mountSection({ answers: [makeComment('a1')] });
+    const pinned = wrapper.findComponent(PinnedAnswersStub);
+    await pinned.vm.$emit('start-comment-save');
+    await pinned.vm.$emit('show-copied-link-notification', true);
+    await pinned.vm.$emit('show-marked-as-best-answer-notification', true);
+    await pinned.vm.$emit('show-unmarked-as-best-answer-notification', true);
+    await pinned.vm.$emit('open-mod-profile');
+    await pinned.vm.$emit('scroll-to-top');
+    expect(window.scrollTo).toHaveBeenCalledWith(0, 0);
+  });
+
+  it('updates notification and profile state from an inline comment', async () => {
+    const wrapper = mountSection();
+    const comment = wrapper.findAllComponents(CommentStub)[0];
+    await comment.vm.$emit('start-comment-save');
+    await comment.vm.$emit('show-copied-link-notification', true);
+    await comment.vm.$emit('show-marked-as-best-answer-notification', true);
+    await comment.vm.$emit('show-unmarked-as-best-answer-notification', true);
+    await comment.vm.$emit('open-mod-profile-modal');
+    expect(wrapper.findAllComponents({ name: 'Notification' })).toHaveLength(8);
+  });
+
+  it('updates notification state from a nested Nuxt page', async () => {
+    const wrapper = mountSection({ showNuxtPage: true });
+    const page = wrapper.findComponent({ name: 'NuxtPage' });
+    await page.vm.$emit('start-comment-save');
+    await page.vm.$emit('show-copied-link-notification', true);
+    await page.vm.$emit('show-marked-as-best-answer-notification', true);
+    await page.vm.$emit('show-unmarked-as-best-answer-notification', true);
+    expect(page.exists()).toBe(true);
+  });
+
+  it('closes comment-section notifications and feedback modals', async () => {
+    const wrapper = mountSection();
+    for (const notification of wrapper.findAllComponents({
+      name: 'Notification',
+    })) {
+      await notification.vm.$emit('close-notification');
+    }
+    await wrapper
+      .findComponent({ name: 'GenericFeedbackFormModal' })
+      .vm.$emit('close');
+    expect(
+      wrapper.findComponent({ name: 'GenericFeedbackFormModal' }).exists()
+    ).toBe(true);
   });
 });

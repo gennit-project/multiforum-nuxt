@@ -12,12 +12,17 @@ const h = vi.hoisted(() => ({
   collections: null as unknown as { value: unknown },
   route: { path: '/library', params: {} as Record<string, unknown> },
   qi: 0,
+  username: null as unknown as { value: string },
+  authenticated: null as unknown as { value: boolean },
+  refetches: [] as ReturnType<typeof vi.fn>[],
+  queryInputs: [] as unknown[],
 }));
 
-vi.mock('nuxt/app', () => ({
-  useHead: vi.fn(),
-  useRoute: () => h.route,
-}));
+vi.mock('nuxt/app', async () => {
+  const { reactive } = await import('vue');
+  h.route = reactive(h.route);
+  return { useHead: vi.fn(), useRoute: () => h.route };
+});
 
 vi.mock('@vue/apollo-composable', async () => {
   const { ref } = await import('vue');
@@ -28,15 +33,26 @@ vi.mock('@vue/apollo-composable', async () => {
   h.collections = ref(null);
   const order = [h.counts, h.downloads, h.owned, h.uploaded, h.collections];
   return {
-    useQuery: () => ({ result: order[h.qi++] ?? ref(null), refetch: vi.fn() }),
+    useQuery: (
+      _document: unknown,
+      variables?: () => unknown,
+      options?: () => unknown
+    ) => {
+      h.queryInputs.push([variables?.(), options?.()]);
+      const refetch = vi.fn();
+      h.refetches.push(refetch);
+      return { result: order[h.qi++] ?? ref(null), refetch };
+    },
   };
 });
 
 vi.mock('@/composables/useAuthState', async () => {
   const { ref } = await import('vue');
+  h.username = ref('alice');
+  h.authenticated = ref(true);
   return {
-    useUsername: () => ref('alice'),
-    useIsAuthenticated: () => ref(true),
+    useUsername: () => h.username,
+    useIsAuthenticated: () => h.authenticated,
   };
 });
 
@@ -51,10 +67,7 @@ const PopperStub = defineComponent({
   name: 'Popper',
   setup(_p, { slots }) {
     return () =>
-      createEl('div', [
-        slots.default?.(),
-        createEl('div', slots.content?.()),
-      ]);
+      createEl('div', [slots.default?.(), createEl('div', slots.content?.())]);
   },
 });
 
@@ -62,7 +75,12 @@ const mountLibrary = (extraStubs: Record<string, unknown> = {}) =>
   mountWithDefaults(LibraryPage, {
     global: {
       mocks: {
-        $route: { query: {}, params: {}, path: '/library', fullPath: '/library' },
+        $route: {
+          query: {},
+          params: {},
+          path: '/library',
+          fullPath: '/library',
+        },
       },
       stubs: { NuxtPage: true, Popper: PopperStub, ...extraStubs },
     },
@@ -79,7 +97,9 @@ const setCounts = (channels: number, discussions: number, images: number) => {
       },
     ],
   };
-  h.downloads.value = { users: [{ FavoriteDiscussionsAggregate: { count: 0 } }] };
+  h.downloads.value = {
+    users: [{ FavoriteDiscussionsAggregate: { count: 0 } }],
+  };
   h.owned.value = { users: [{ OwnedDownloadsAggregate: { count: 0 } }] };
   h.uploaded.value = { getUploadedDownloadableFiles: [] };
   h.collections.value = { users: [{ Collections: [] }] };
@@ -88,6 +108,8 @@ const setCounts = (channels: number, discussions: number, images: number) => {
 beforeEach(() => {
   vi.clearAllMocks();
   h.qi = 0;
+  h.refetches = [];
+  h.queryInputs = [];
   h.route.path = '/library';
   h.route.params = {};
   h.counts.value = null;
@@ -95,6 +117,8 @@ beforeEach(() => {
   h.owned.value = null;
   h.uploaded.value = null;
   h.collections.value = null;
+  h.username.value = 'alice';
+  h.authenticated.value = true;
 });
 
 describe('Library page', () => {
@@ -136,9 +160,9 @@ describe('Library page', () => {
     setCounts(0, 0, 0);
     const wrapper = mountLibrary();
     expect(
-      wrapper.get('input[aria-label="Search library collections"]').attributes(
-        'placeholder'
-      )
+      wrapper
+        .get('input[aria-label="Search library collections"]')
+        .attributes('placeholder')
     ).toBe('Search collections');
   });
 
@@ -151,7 +175,8 @@ describe('Library page', () => {
             {
               id: 'downloads-1',
               name: 'Downloaded Items',
-              description: 'Items appear here automatically when you download them.',
+              description:
+                'Items appear here automatically when you download them.',
               collectionType: 'DOWNLOADS',
               visibility: 'PRIVATE',
               itemCount: 7,
@@ -232,9 +257,9 @@ describe('Library page', () => {
     h.route.path = '/library/favorite-discussions';
 
     const wrapper = mountLibrary();
-    expect(wrapper.get('[data-testid="mobile-library-nav-dropdown"]').text()).toContain(
-      'Favorite Discussions'
-    );
+    expect(
+      wrapper.get('[data-testid="mobile-library-nav-dropdown"]').text()
+    ).toContain('Favorite Discussions');
   });
 
   it('renders collection links inside the mobile dropdown', async () => {
@@ -257,15 +282,17 @@ describe('Library page', () => {
     };
 
     const wrapper = mountLibrary();
-    await wrapper.get('[data-testid="mobile-library-nav-dropdown"]').trigger('click');
+    await wrapper
+      .get('[data-testid="mobile-library-nav-dropdown"]')
+      .trigger('click');
     expect(
-      wrapper.get('[data-testid="mobile-library-item-favorite-channels"]').attributes(
-        'href'
-      )
+      wrapper
+        .get('[data-testid="mobile-library-item-favorite-channels"]')
+        .attributes('href')
     ).toBe('/library/favorite-channels');
-    expect(wrapper.get('[data-testid="mobile-library-item-c1"]').text()).toContain(
-      'My Reading List'
-    );
+    expect(
+      wrapper.get('[data-testid="mobile-library-item-c1"]').text()
+    ).toContain('My Reading List');
   });
 
   it('links to uploaded files management from the sidebar', () => {
@@ -281,26 +308,95 @@ describe('Library page', () => {
 
     const wrapper = mountLibrary();
 
-    expect(wrapper.get('[data-testid="library-item-uploaded-files"]').text()).toContain(
-      '(1)'
-    );
+    expect(
+      wrapper.get('[data-testid="library-item-uploaded-files"]').text()
+    ).toContain('(1)');
   });
 
   it('opens the mobile library navigation when the dropdown is clicked', async () => {
     setCounts(3, 1, 2);
     const wrapper = mountLibrary();
 
-    expect(wrapper.find('[data-testid="mobile-library-item-favorite-channels"]').exists()).toBe(
-      false
-    );
+    expect(
+      wrapper
+        .find('[data-testid="mobile-library-item-favorite-channels"]')
+        .exists()
+    ).toBe(false);
 
-    await wrapper.get('[data-testid="mobile-library-nav-dropdown"]').trigger('click');
+    await wrapper
+      .get('[data-testid="mobile-library-nav-dropdown"]')
+      .trigger('click');
 
-    expect(wrapper.get('[data-testid="mobile-library-nav-dropdown"]').attributes('aria-expanded')).toBe(
-      'true'
+    expect(
+      wrapper
+        .get('[data-testid="mobile-library-nav-dropdown"]')
+        .attributes('aria-expanded')
+    ).toBe('true');
+    expect(
+      wrapper
+        .get('[data-testid="mobile-library-item-favorite-channels"]')
+        .exists()
+    ).toBe(true);
+  });
+
+  it('enables each library query for the signed-in username', () => {
+    setCounts(0, 0, 0);
+    mountLibrary();
+    expect(h.queryInputs).toEqual(
+      Array.from({ length: 5 }, () => [
+        { username: 'alice' },
+        { enabled: true, fetchPolicy: 'cache-and-network' },
+      ])
     );
-    expect(wrapper.get('[data-testid="mobile-library-item-favorite-channels"]').exists()).toBe(
-      true
-    );
+  });
+
+  it('refetches every library query when the username changes', async () => {
+    setCounts(0, 0, 0);
+    const wrapper = mountLibrary();
+    h.username.value = 'bob';
+    await wrapper.vm.$nextTick();
+    expect(h.refetches.map((refetch) => refetch.mock.calls.length)).toEqual([
+      1, 1, 1, 1, 1,
+    ]);
+  });
+
+  it.each([
+    ['/library/my-downloads', 'My Downloads'],
+    ['/library/uploads', 'Uploaded Files'],
+  ])('shows the active mobile label for %s', (path, label) => {
+    setCounts(0, 0, 0);
+    h.route.path = path;
+    expect(
+      mountLibrary().get('[data-testid="mobile-library-nav-dropdown"]').text()
+    ).toContain(label);
+  });
+
+  it('closes the mobile menu when the route changes', async () => {
+    setCounts(0, 0, 0);
+    const wrapper = mountLibrary();
+    await wrapper
+      .get('[data-testid="mobile-library-nav-dropdown"]')
+      .trigger('click');
+    h.route.path = '/library/uploads';
+    await wrapper.vm.$nextTick();
+    expect(
+      wrapper
+        .get('[data-testid="mobile-library-nav-dropdown"]')
+        .attributes('aria-expanded')
+    ).toBe('false');
+  });
+
+  it('counts every uploaded file across discussion groups', () => {
+    setCounts(0, 0, 0);
+    h.uploaded.value = {
+      getUploadedDownloadableFiles: [
+        { files: [{ id: 'one' }, { id: 'two' }] },
+        { files: [{ id: 'three' }] },
+        {},
+      ],
+    };
+    expect(
+      mountLibrary().get('[data-testid="library-item-uploaded-files"]').text()
+    ).toContain('(3)');
   });
 });

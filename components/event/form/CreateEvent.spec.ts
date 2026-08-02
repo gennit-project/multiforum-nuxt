@@ -21,6 +21,12 @@ vi.mock('@/composables/useAuthState', () => ({
 const mockPush = vi.fn();
 const mockMutate = vi.fn();
 const onDoneCallbacks: Array<(result: CreateEventResult) => void> = [];
+const mutationOptions: Array<{
+  update?: (
+    cache: { modify: ReturnType<typeof vi.fn> },
+    result: unknown
+  ) => void;
+}> = [];
 const channelResult = ref({
   channels: [
     {
@@ -40,18 +46,31 @@ vi.mock('nuxt/app', () => ({
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useMutation: vi.fn(() => ({
-    mutate: mockMutate,
-    error: ref(null),
-    onDone: (cb: (result: CreateEventResult) => void) => {
-      onDoneCallbacks.push(cb);
-    },
-  })),
-  useQuery: vi.fn(() => ({
-    result: channelResult,
-    loading: ref(false),
-    error: ref(null),
-  })),
+  useMutation: vi.fn((_query: unknown, options = {}) => {
+    mutationOptions.push(options);
+    return {
+      mutate: mockMutate,
+      error: ref(null),
+      onDone: (cb: (result: CreateEventResult) => void) => {
+        onDoneCallbacks.push(cb);
+      },
+    };
+  }),
+  useQuery: vi.fn(
+    (
+      _query: unknown,
+      variables: { value: unknown },
+      options: { enabled: { value: unknown } }
+    ) => {
+      void variables.value;
+      void options.enabled.value;
+      return {
+        result: channelResult,
+        loading: ref(false),
+        error: ref(null),
+      };
+    }
+  ),
 }));
 
 vi.mock('@/composables/useSuspensionNotice', () => ({
@@ -66,6 +85,7 @@ vi.mock('@/composables/useSuspensionNotice', () => ({
 describe('CreateEvent', () => {
   beforeEach(() => {
     onDoneCallbacks.length = 0;
+    mutationOptions.length = 0;
     mockPush.mockReset();
     mockMutate.mockReset();
     channelResult.value = {
@@ -86,7 +106,11 @@ describe('CreateEvent', () => {
           RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
           CreateEditEventFields: {
             name: 'CreateEditEventFields',
-            props: ['suspensionIssueNumber', 'submitError', 'lockedChannelName'],
+            props: [
+              'suspensionIssueNumber',
+              'submitError',
+              'lockedChannelName',
+            ],
             template:
               '<button data-testid="submit" @click="$emit(\'submit\')"></button>',
           },
@@ -169,6 +193,35 @@ describe('CreateEvent', () => {
     expect(stub.props('submitError')).toContain('Unable to create event');
   });
 
+  it('redirects after a single event is created', async () => {
+    const wrapper = await submitWithFormValues({
+      dateMode: 'single',
+      startTime: '2030-01-01T18:00:00.000Z',
+      endTime: '2030-01-01T21:00:00.000Z',
+    });
+    onDoneCallbacks[0]({
+      data: {
+        createEventWithChannelConnections: [{ id: 'event-1' }],
+      },
+    });
+    await wrapper.vm.$nextTick();
+    expect(mockPush).toHaveBeenCalledWith({
+      name: 'forums-forumId-events-eventId',
+      params: { forumId: 'cats', eventId: 'event-1' },
+    });
+  });
+
+  it('updates the Apollo event list when creation returns an event', () => {
+    mountCreateEvent();
+    const cache = { modify: vi.fn() };
+    const created = { id: 'event-1' };
+    mutationOptions[0].update?.(cache, {
+      data: { createEventWithChannelConnections: created },
+    });
+    const fields = cache.modify.mock.calls[0][0].fields;
+    expect(fields.events([{ id: 'old' }])).toEqual([created, { id: 'old' }]);
+  });
+
   it('shows a submit error when routed forum events are disabled', () => {
     channelResult.value = {
       channels: [
@@ -183,6 +236,21 @@ describe('CreateEvent', () => {
 
     const stub = wrapper.findComponent({ name: 'CreateEditEventFields' });
     expect(stub.props('submitError')).toContain('events are not enabled');
+  });
+
+  it('does not submit when the routed forum is locked', async () => {
+    channelResult.value = {
+      channels: [
+        {
+          uniqueName: 'cats',
+          eventsEnabled: true,
+          locked: true,
+        },
+      ],
+    };
+    const wrapper = mountCreateEvent();
+    await wrapper.find('[data-testid="submit"]').trigger('click');
+    expect(mockMutate).not.toHaveBeenCalled();
   });
 
   it('does not submit when routed forum events are disabled', async () => {
@@ -203,9 +271,7 @@ describe('CreateEvent', () => {
 
   // Drives the form into a multi-date / recurring state and submits, exercising
   // the series-creation path (issue #229).
-  async function submitWithFormValues(
-    overrides: Record<string, unknown>
-  ) {
+  async function submitWithFormValues(overrides: Record<string, unknown>) {
     const wrapper = mountCreateEvent();
     const fields = wrapper.findComponent({ name: 'CreateEditEventFields' });
     fields.vm.$emit('updateFormValues', {
@@ -222,8 +288,14 @@ describe('CreateEvent', () => {
     await submitWithFormValues({
       dateMode: 'multiple',
       occurrences: [
-        { startTime: '2030-01-01T18:00:00.000Z', endTime: '2030-01-01T21:00:00.000Z' },
-        { startTime: '2030-01-08T18:00:00.000Z', endTime: '2030-01-08T21:00:00.000Z' },
+        {
+          startTime: '2030-01-01T18:00:00.000Z',
+          endTime: '2030-01-01T21:00:00.000Z',
+        },
+        {
+          startTime: '2030-01-08T18:00:00.000Z',
+          endTime: '2030-01-08T21:00:00.000Z',
+        },
       ],
     });
 
@@ -232,8 +304,14 @@ describe('CreateEvent', () => {
         title: 'Weekly meetup',
         channelConnections: ['cats'],
         occurrences: [
-          { startTime: '2030-01-01T18:00:00.000Z', endTime: '2030-01-01T21:00:00.000Z' },
-          { startTime: '2030-01-08T18:00:00.000Z', endTime: '2030-01-08T21:00:00.000Z' },
+          {
+            startTime: '2030-01-01T18:00:00.000Z',
+            endTime: '2030-01-01T21:00:00.000Z',
+          },
+          {
+            startTime: '2030-01-08T18:00:00.000Z',
+            endTime: '2030-01-08T21:00:00.000Z',
+          },
         ],
       }),
     });
@@ -253,6 +331,106 @@ describe('CreateEvent', () => {
     });
 
     expect(mockMutate.mock.calls[0][0].input.occurrences).toHaveLength(3);
+  });
+
+  it('includes location fields in a created event series', async () => {
+    await submitWithFormValues({
+      dateMode: 'multiple',
+      latitude: 33.4,
+      longitude: -111.9,
+      locationName: 'Phoenix',
+      address: '1 Main St',
+      occurrences: [
+        {
+          startTime: '2030-01-01T18:00:00.000Z',
+          endTime: '2030-01-01T21:00:00.000Z',
+        },
+      ],
+    });
+    expect(mockMutate).toHaveBeenCalledWith({
+      input: expect.objectContaining({
+        locationName: 'Phoenix',
+        latitude: 33.4,
+        longitude: -111.9,
+        address: '1 Main St',
+      }),
+    });
+  });
+
+  it('shows an error when a created event series has no occurrence id', async () => {
+    const wrapper = await submitWithFormValues({
+      dateMode: 'multiple',
+      occurrences: [
+        {
+          startTime: '2030-01-01T18:00:00.000Z',
+          endTime: '2030-01-01T21:00:00.000Z',
+        },
+      ],
+    });
+    onDoneCallbacks[1]({ data: {} });
+    await wrapper.vm.$nextTick();
+    expect(
+      wrapper
+        .findComponent({ name: 'CreateEditEventFields' })
+        .props('submitError')
+    ).toContain('Unable to create event series');
+  });
+
+  it('redirects to the first event in a created series', async () => {
+    await submitWithFormValues({
+      dateMode: 'multiple',
+      occurrences: [
+        {
+          startTime: '2030-01-01T18:00:00.000Z',
+          endTime: '2030-01-01T21:00:00.000Z',
+        },
+      ],
+    });
+    onDoneCallbacks[1]({
+      data: {
+        createEventSeriesWithChannelConnections: {
+          Occurrences: [{ id: 'occurrence-1' }],
+        },
+      },
+    } as CreateEventResult);
+    expect(mockPush).toHaveBeenCalledWith({
+      name: 'forums-forumId-events-eventId',
+      params: { forumId: 'cats', eventId: 'occurrence-1' },
+    });
+  });
+
+  it.each([
+    [{ title: '', selectedChannels: ['cats'] }, 'Title is required'],
+    [{ title: 'Event', selectedChannels: [] }, 'Channel is required'],
+  ])('guards invalid event form values', async (values, message) => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await submitWithFormValues({ dateMode: 'single', ...values });
+    const called = error.mock.calls.some((call) => call[0] === message);
+    error.mockRestore();
+    expect(called).toBe(true);
+  });
+
+  it('requires a signed-in username', async () => {
+    useUsername().value = '';
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await submitWithFormValues({ dateMode: 'single' });
+    const called = error.mock.calls.some(
+      (call) => call[0] === 'Username is required'
+    );
+    error.mockRestore();
+    expect(called).toBe(true);
+  });
+
+  it('requires at least one occurrence for a series', async () => {
+    const wrapper = await submitWithFormValues({
+      dateMode: 'multiple',
+      occurrences: [],
+    });
+    expect(
+      wrapper
+        .findComponent({ name: 'CreateEditEventFields' })
+        .props('submitError')
+    ).toContain('Please add at least one date');
   });
 
   it('uses the single-event mutation (occurrences nested in an array) for "single" date mode', async () => {
@@ -289,9 +467,24 @@ describe('CreateEvent', () => {
     await submitWithFormValues({
       dateMode: 'dateRange',
       dateRangeGroups: [
-        { startDate: '2030-03-06', endDate: '2030-03-06', startTimeOfDay: '12:00', endTimeOfDay: '19:30' },
-        { startDate: '2030-03-07', endDate: '2030-03-09', startTimeOfDay: '09:00', endTimeOfDay: '17:00' },
-        { startDate: '2030-03-10', endDate: '2030-03-10', startTimeOfDay: '09:00', endTimeOfDay: '12:00' },
+        {
+          startDate: '2030-03-06',
+          endDate: '2030-03-06',
+          startTimeOfDay: '12:00',
+          endTimeOfDay: '19:30',
+        },
+        {
+          startDate: '2030-03-07',
+          endDate: '2030-03-09',
+          startTimeOfDay: '09:00',
+          endTimeOfDay: '17:00',
+        },
+        {
+          startDate: '2030-03-10',
+          endDate: '2030-03-10',
+          startTimeOfDay: '09:00',
+          endTimeOfDay: '12:00',
+        },
       ],
     });
 

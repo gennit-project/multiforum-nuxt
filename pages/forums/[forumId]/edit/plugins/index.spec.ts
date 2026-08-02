@@ -15,6 +15,7 @@ const h = vi.hoisted(() => ({
   refetchQueries: vi.fn(),
   toastSuccess: vi.fn(),
   toastError: vi.fn(),
+  onDone: null as null | (() => void),
 }));
 
 h.channelResult = ref(null);
@@ -24,17 +25,22 @@ h.installedResult = ref(null);
 h.installedLoading = ref(false);
 h.mutationError = ref(null);
 
-vi.mock('nuxt/app', () => ({ useRoute: () => ({ params: { forumId: 'cats' } }) }));
+vi.mock('nuxt/app', () => ({
+  useRoute: () => ({ params: { forumId: 'cats' } }),
+}));
 
 vi.mock('@vue/apollo-composable', () => ({
   useApolloClient: () => ({ client: { refetchQueries: h.refetchQueries } }),
   useMutation: () => ({
     mutate: h.mutate,
     error: h.mutationError,
-    onDone: vi.fn(),
+    onDone: (callback: () => void) => {
+      h.onDone = callback;
+    },
   }),
-  useQuery: (doc: string) =>
-    doc === 'CHANNEL_SETTINGS'
+  useQuery: (doc: string, variables?: null | (() => unknown)) => {
+    variables?.();
+    return doc === 'CHANNEL_SETTINGS'
       ? {
           result: h.channelResult,
           loading: h.channelLoading,
@@ -45,18 +51,23 @@ vi.mock('@vue/apollo-composable', () => ({
           result: h.installedResult,
           loading: h.installedLoading,
           error: ref(null),
-        },
+        };
+  },
 }));
 
 vi.mock('@/composables/useToast', () => ({
   useToast: () => ({ success: h.toastSuccess, error: h.toastError }),
 }));
-vi.mock('@/graphQLData/admin/queries', () => ({ GET_INSTALLED_PLUGINS: 'INSTALLED' }));
+vi.mock('@/graphQLData/admin/queries', () => ({
+  GET_INSTALLED_PLUGINS: 'INSTALLED',
+}));
 vi.mock('@/graphQLData/channel/queries', () => ({
   GET_CHANNEL: 'CHANNEL',
   GET_CHANNEL_PLUGIN_SETTINGS: 'CHANNEL_SETTINGS',
 }));
-vi.mock('@/graphQLData/channel/mutations', () => ({ UPDATE_CHANNEL_ENABLED_PLUGINS: 'UPDATE' }));
+vi.mock('@/graphQLData/channel/mutations', () => ({
+  UPDATE_CHANNEL_ENABLED_PLUGINS: 'UPDATE',
+}));
 
 const mountPage = () => mountWithDefaults(ForumPluginsPage);
 
@@ -79,6 +90,7 @@ beforeEach(() => {
   h.installedResult.value = null;
   h.installedLoading.value = false;
   h.mutationError.value = null;
+  h.onDone = null;
 });
 
 describe('Forum plugins page', () => {
@@ -109,7 +121,9 @@ describe('Forum plugins page', () => {
       },
     ]);
     h.installedResult.value = { getInstalledPlugins: [] };
-    expect(mountPage().text()).toContain('Some plugins are enabled for this forum');
+    expect(mountPage().text()).toContain(
+      'Some plugins are enabled for this forum'
+    );
   });
 
   it('lists a consolidated plugin card and enables the plugin when the checkbox is checked', async () => {
@@ -165,5 +179,127 @@ describe('Forum plugins page', () => {
       },
       success: 'Plugin enabled for this forum.',
     });
+  });
+
+  it('disables a plugin already enabled for the forum', async () => {
+    setChannel([
+      {
+        node: {
+          version: '1.0.0',
+          Plugin: { id: 'scanner', displayName: 'Scanner' },
+        },
+        properties: { settingsJson: '{"strict":false}' },
+      },
+    ]);
+    h.installedResult.value = {
+      getInstalledPlugins: [
+        {
+          plugin: { id: 'scanner', displayName: 'Scanner' },
+          version: '1.0.0',
+          enabled: true,
+          manifest: { settingsDefaults: { channel: { strict: true } } },
+        },
+      ],
+    };
+    const wrapper = mountPage();
+    await wrapper.get('input[type="checkbox"]').setValue(false);
+    expect(h.mutate).toHaveBeenCalledWith({
+      channelUniqueName: 'cats',
+      enabledPlugins: [
+        {
+          disconnect: [
+            {
+              where: {
+                node: { Plugin: { id: 'scanner' }, version: '1.0.0' },
+              },
+            },
+          ],
+        },
+      ],
+    });
+  });
+
+  it('switches from the enabled plugin version to a newer version', async () => {
+    setChannel([
+      {
+        node: {
+          version: '1.0.0',
+          Plugin: { id: 'scanner', displayName: 'Scanner' },
+        },
+      },
+    ]);
+    h.installedResult.value = {
+      getInstalledPlugins: [
+        {
+          plugin: { id: 'scanner', displayName: 'Scanner' },
+          version: '1.0.0',
+          enabled: true,
+          latestVersion: '2.0.0',
+          availableVersions: ['1.0.0', '2.0.0'],
+        },
+        {
+          plugin: { id: 'scanner', displayName: 'Scanner' },
+          version: '2.0.0',
+          enabled: true,
+          latestVersion: '2.0.0',
+          availableVersions: ['1.0.0', '2.0.0'],
+        },
+      ],
+    };
+    const wrapper = mountPage();
+    await nextTick();
+    await wrapper.get('select').setValue('2.0.0');
+    expect(h.mutate).toHaveBeenCalled();
+  });
+
+  it('shows an error toast when updating a plugin fails', async () => {
+    setChannel();
+    h.installedResult.value = {
+      getInstalledPlugins: [
+        {
+          plugin: { id: 'scanner', displayName: 'Scanner' },
+          version: '1.0.0',
+          enabled: true,
+        },
+      ],
+    };
+    h.mutate.mockRejectedValueOnce(new Error('network down'));
+    const wrapper = mountPage();
+    await wrapper.get('input[type="checkbox"]').setValue(true);
+    expect(h.toastError).toHaveBeenCalledWith(
+      'Failed to update plugin: network down'
+    );
+  });
+
+  it.each(['not-json', 42, { strict: false }])(
+    'tolerates plugin settings stored as %j',
+    (settingsJson) => {
+      setChannel([
+        {
+          node: {
+            version: '1.0.0',
+            Plugin: { id: 'scanner', displayName: 'Scanner' },
+          },
+          properties: { settingsJson },
+        },
+      ]);
+      h.installedResult.value = {
+        getInstalledPlugins: [
+          {
+            plugin: { id: 'scanner', displayName: 'Scanner' },
+            version: '1.0.0',
+            enabled: true,
+          },
+        ],
+      };
+      expect(mountPage().text()).toContain('Scanner');
+    }
+  );
+
+  it('clears the mutation error after the mutation completes', () => {
+    h.mutationError.value = { message: 'old error' };
+    mountPage();
+    h.onDone?.();
+    expect(h.mutationError.value).toBeNull();
   });
 });

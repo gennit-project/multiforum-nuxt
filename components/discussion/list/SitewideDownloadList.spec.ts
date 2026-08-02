@@ -21,7 +21,9 @@ vi.mock('nuxt/app', () => ({
   useState: (_k, init) => ref(init ? init() : undefined),
 }));
 
-const SERVER_CONFIG = { serverConfigs: [{ serverName: 'Test', __typename: 'ServerConfig' }] };
+const SERVER_CONFIG = {
+  serverConfigs: [{ serverName: 'Test', __typename: 'ServerConfig' }],
+};
 
 const makeDownload = (id: string) => ({
   id,
@@ -30,7 +32,10 @@ const makeDownload = (id: string) => ({
   __typename: 'Discussion',
 });
 
-const listResult = (discussions: ReturnType<typeof makeDownload>[], aggregate?: number) => ({
+const listResult = (
+  discussions: ReturnType<typeof makeDownload>[],
+  aggregate?: number
+) => ({
   getSiteWideDiscussionList: {
     discussions,
     aggregateDiscussionCount: aggregate ?? discussions.length,
@@ -54,7 +59,10 @@ const stubs = {
     emits: ['loadMore'],
     template: '<button class="load-more-stub" @click="$emit(\'loadMore\')" />',
   },
-  ErrorBanner: { props: ['text'], template: '<div class="error-stub">{{ text }}</div>' },
+  ErrorBanner: {
+    props: ['text'],
+    template: '<div class="error-stub">{{ text }}</div>',
+  },
   NuxtLink: { template: '<a><slot /></a>' },
 };
 
@@ -84,7 +92,9 @@ describe('SitewideDownloadList', () => {
   });
 
   it('renders a card per download', () => {
-    setupQueries(createQueryMock(listResult([makeDownload('1'), makeDownload('2')])));
+    setupQueries(
+      createQueryMock(listResult([makeDownload('1'), makeDownload('2')]))
+    );
     const wrapper = mountList();
     expect(wrapper.findAll('.item-stub')).toHaveLength(2);
   });
@@ -96,7 +106,9 @@ describe('SitewideDownloadList', () => {
   });
 
   it('renders the error banner when the query errors', () => {
-    setupQueries(createQueryMock(listResult([]), { error: ref(new Error('kaboom')) }));
+    setupQueries(
+      createQueryMock(listResult([]), { error: ref(new Error('kaboom')) })
+    );
     const wrapper = mountList();
     expect(wrapper.find('.error-stub').text()).toContain('kaboom');
   });
@@ -109,35 +121,109 @@ describe('SitewideDownloadList', () => {
 
   it('calls fetchMore when LoadMore emits', async () => {
     const fetchMore = vi.fn();
-    setupQueries(createQueryMock(listResult([makeDownload('1')], 5), { ...({ fetchMore } as object) }));
+    setupQueries(
+      createQueryMock(listResult([makeDownload('1')], 5), {
+        ...({ fetchMore } as object),
+      })
+    );
     const wrapper = mountList();
     await wrapper.find('.load-more-stub').trigger('click');
     expect(fetchMore).toHaveBeenCalledTimes(1);
   });
 
+  it('merges the next download page into the existing query result', async () => {
+    const fetchMore = vi.fn();
+    setupQueries(
+      createQueryMock(listResult([makeDownload('1')], 3), {
+        ...({ fetchMore } as object),
+      })
+    );
+    const wrapper = mountList({ query: { sort: 'new' } });
+    await wrapper.find('.load-more-stub').trigger('click');
+    const options = fetchMore.mock.calls[0][0];
+    const merged = options.updateQuery(listResult([makeDownload('1')], 3), {
+      fetchMoreResult: listResult([makeDownload('2'), makeDownload('3')], 3),
+    });
+    expect(merged.getSiteWideDiscussionList.discussions).toHaveLength(3);
+  });
+
+  it('keeps the current result when fetchMore returns nothing', async () => {
+    const fetchMore = vi.fn();
+    const previous = listResult([makeDownload('1')], 3);
+    setupQueries(createQueryMock(previous, { ...({ fetchMore } as object) }));
+    const wrapper = mountList();
+    await wrapper.find('.load-more-stub').trigger('click');
+    const options = fetchMore.mock.calls[0][0];
+    expect(options.updateQuery(previous, { fetchMoreResult: null })).toBe(
+      previous
+    );
+  });
+
   it('adds the tag to the query when filtering by a new tag', () => {
     setupQueries(createQueryMock(listResult([makeDownload('1')])));
     const wrapper = mountList({ query: {} });
-    wrapper.findComponent(stubs.SitewideDownloadListItem).vm.$emit('filterByTag', 'vue');
+    wrapper
+      .findComponent(stubs.SitewideDownloadListItem)
+      .vm.$emit('filterByTag', 'vue');
     expect(replace).toHaveBeenCalledWith({ query: { tags: ['vue'] } });
   });
 
   it('clears the tag when already filtering by only that tag', () => {
     setupQueries(createQueryMock(listResult([makeDownload('1')])));
     const wrapper = mountList({ query: { tags: 'vue' } });
-    wrapper.findComponent(stubs.SitewideDownloadListItem).vm.$emit('filterByTag', 'vue');
+    wrapper
+      .findComponent(stubs.SitewideDownloadListItem)
+      .vm.$emit('filterByTag', 'vue');
     const lastCall = replace.mock.calls.at(-1)?.[0];
     expect(lastCall.query.tags).toBeUndefined();
+  });
+
+  it('removes a selected tag from a multi-tag query', () => {
+    setupQueries(createQueryMock(listResult([makeDownload('1')])));
+    const wrapper = mountList({ query: { tags: ['vue', 'nuxt'] } });
+    wrapper
+      .findComponent(stubs.SitewideDownloadListItem)
+      .vm.$emit('filterByTag', 'vue');
+    expect(replace).toHaveBeenCalledWith({ query: { tags: ['nuxt'] } });
+  });
+
+  it('adds a different tag while preserving the rest of the route query', () => {
+    setupQueries(createQueryMock(listResult([makeDownload('1')])));
+    const wrapper = mountList({ query: { sort: 'top', tags: 'vue' } });
+    wrapper
+      .findComponent(stubs.SitewideDownloadListItem)
+      .vm.$emit('filterByTag', 'nuxt');
+    expect(replace).toHaveBeenCalledWith({
+      query: { sort: 'top', tags: ['nuxt'] },
+    });
   });
 
   it('opens the album lightbox when a child requests it', async () => {
     setupQueries(createQueryMock(listResult([makeDownload('1')])));
     const wrapper = mountList();
-    wrapper.findComponent(stubs.SitewideDownloadListItem).vm.$emit('openAlbum', {
-      discussion: makeDownload('1'),
-      album: { id: 'a1', __typename: 'Album' },
-    });
+    wrapper
+      .findComponent(stubs.SitewideDownloadListItem)
+      .vm.$emit('openAlbum', {
+        discussion: makeDownload('1'),
+        album: { id: 'a1', __typename: 'Album' },
+      });
     await wrapper.vm.$nextTick();
     expect(wrapper.find('.album-stub').exists()).toBe(true);
+  });
+
+  it('closes the album lightbox from the album component', async () => {
+    setupQueries(createQueryMock(listResult([makeDownload('1')])));
+    const wrapper = mountList();
+    wrapper
+      .findComponent(stubs.SitewideDownloadListItem)
+      .vm.$emit('openAlbum', {
+        discussion: makeDownload('1'),
+        album: { id: 'a1', __typename: 'Album' },
+      });
+    await wrapper.vm.$nextTick();
+    await wrapper
+      .findComponent(stubs.DiscussionAlbum)
+      .vm.$emit('close-lightbox');
+    expect(wrapper.find('.album-stub').exists()).toBe(false);
   });
 });

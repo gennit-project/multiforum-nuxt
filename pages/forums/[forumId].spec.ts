@@ -3,21 +3,36 @@ import { shallowMount } from '@vue/test-utils';
 import { defineComponent, ref } from 'vue';
 import { setActivePinia, createPinia } from 'pinia';
 import { useQuery } from '@vue/apollo-composable';
+import { useUIStore } from '@/stores/uiStore';
 
 vi.stubGlobal('definePageMeta', vi.fn());
 
-const routeRef = { params: { forumId: 'cats' }, name: 'forums-forumId', query: {} };
+const mockState = vi.hoisted(() => ({
+  route: {
+    params: { forumId: 'cats' as unknown },
+    name: 'forums-forumId' as unknown,
+    query: {} as Record<string, unknown>,
+  },
+  routerPush: vi.fn(),
+  useHead: vi.fn(),
+  queryResultCallback: null as null | ((result: unknown) => void),
+  refetchChannel: vi.fn(),
+}));
 
 vi.mock('nuxt/app', () => ({
-  useRoute: () => routeRef,
-  useRouter: () => ({ push: vi.fn() }),
-  useHead: vi.fn(),
+  useRoute: () => mockState.route,
+  useRouter: () => ({ push: mockState.routerPush }),
+  useHead: mockState.useHead,
 }));
 
 vi.mock('@vue/apollo-composable', () => ({ useQuery: vi.fn() }));
 
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => ref('viewer'),
+}));
+
+vi.mock('@/config', () => ({
+  config: { serverDisplayName: 'Multiforum', environment: 'test' },
 }));
 
 vi.mock('@/utils/localStorageUtils', () => ({
@@ -32,6 +47,7 @@ const ChannelHeaderMobileStub = defineComponent({
 
 const ChannelHeaderDesktopStub = defineComponent({
   name: 'ChannelHeaderDesktop',
+  props: { adminList: Array },
   template: '<div class="channel-header-desktop-stub" />',
 });
 
@@ -52,6 +68,7 @@ const IssueTitleEditFormStub = defineComponent({
 
 const DiscussionDetailContentStub = defineComponent({
   name: 'DiscussionDetailContent',
+  props: { discussionId: String },
   template: '<div class="discussion-detail-content-stub" />',
 });
 
@@ -62,6 +79,7 @@ const DiscussionDetailEmptyStateStub = defineComponent({
 
 const EventDetailStub = defineComponent({
   name: 'EventDetail',
+  props: { eventId: String },
   template: '<div class="event-detail-stub" />',
 });
 
@@ -72,11 +90,13 @@ const ChannelSidebarStub = defineComponent({
 
 const IssueDetailStub = defineComponent({
   name: 'IssueDetail',
+  props: { issueNumber: Number },
   template: '<div class="issue-detail-stub" />',
 });
 
 const ChannelLockedBannerStub = defineComponent({
   name: 'ChannelLockedBanner',
+  props: { lockReason: String },
   template: '<div class="channel-locked-banner-stub" />',
 });
 
@@ -92,6 +112,7 @@ const PageNotFoundStub = defineComponent({
 
 const ChannelTabsStub = defineComponent({
   name: 'ChannelTabs',
+  props: { downloadCount: Number },
   template: '<div class="channel-tabs-stub" />',
 });
 
@@ -153,15 +174,28 @@ vi.mock('@/components/BackLink.vue', () => ({
 
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 
-const mountWith = async (channels: unknown[]) => {
+const mountWith = async (
+  channels: unknown[],
+  options: { loading?: boolean; downloadCount?: number } = {}
+) => {
   mockedUseQuery
     .mockReturnValueOnce({
       result: ref({ channels }),
-      onResult: vi.fn(),
-      loading: ref(false),
-      refetch: vi.fn(),
+      onResult: (callback: (result: unknown) => void) => {
+        mockState.queryResultCallback = callback;
+      },
+      loading: ref(options.loading ?? false),
+      refetch: mockState.refetchChannel,
     })
-    .mockReturnValueOnce({ result: ref(null) });
+    .mockReturnValueOnce({
+      result: ref({
+        channels: [
+          {
+            DiscussionChannelsAggregate: { count: options.downloadCount ?? 0 },
+          },
+        ],
+      }),
+    });
   const Page = (await import('./[forumId].vue')).default;
   return shallowMount(Page);
 };
@@ -169,7 +203,11 @@ const mountWith = async (channels: unknown[]) => {
 describe('forum shell page', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
-    routeRef.name = 'forums-forumId';
+    vi.clearAllMocks();
+    mockState.route.params = { forumId: 'cats' };
+    mockState.route.name = 'forums-forumId';
+    mockState.route.query = {};
+    mockState.queryResultCallback = null;
   });
 
   it('shows the not-found page when the channel does not exist', async () => {
@@ -178,7 +216,182 @@ describe('forum shell page', () => {
   });
 
   it('renders the channel tabs on the plain forum route', async () => {
-    const wrapper = await mountWith([{ uniqueName: 'cats', displayName: 'Cats' }]);
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
     expect(wrapper.findComponent(ChannelTabsStub).exists()).toBe(true);
+  });
+
+  it('redirects the channel root after the query returns a channel', async () => {
+    await mountWith([{ uniqueName: 'cats', displayName: 'Cats' }]);
+
+    mockState.queryResultCallback?.({
+      data: { channels: [{ uniqueName: 'cats', displayName: 'Cats' }] },
+    });
+
+    expect(mockState.routerPush).toHaveBeenCalledWith({
+      name: 'forums-forumId-discussions',
+      params: { forumId: 'cats' },
+    });
+  });
+
+  it('does not redirect when the query returns no channel', async () => {
+    await mountWith([]);
+
+    mockState.queryResultCallback?.({ data: { channels: [] } });
+
+    expect(mockState.routerPush).not.toHaveBeenCalled();
+  });
+
+  it('renders channel chrome and counts', async () => {
+    const wrapper = await mountWith(
+      [
+        {
+          uniqueName: 'cats',
+          displayName: 'Cats',
+          channelBannerURL: 'https://img.test/banner.jpg',
+          locked: true,
+          lockedAt: '2026-01-01',
+          lockReason: 'Maintenance',
+          LockedBy: { displayName: 'Moderator' },
+          Admins: [{ username: 'alice' }],
+        },
+      ],
+      { downloadCount: 7 }
+    );
+
+    expect({
+      mobile: wrapper.findComponent(ChannelHeaderMobileStub).exists(),
+      desktopAdmins: wrapper
+        .findComponent(ChannelHeaderDesktopStub)
+        .props('adminList'),
+      locked: wrapper
+        .findComponent(ChannelLockedBannerStub)
+        .props('lockReason'),
+      downloadCount: wrapper
+        .findComponent(ChannelTabsStub)
+        .props('downloadCount'),
+    }).toEqual({
+      mobile: true,
+      desktopAdmins: ['alice'],
+      locked: 'Maintenance',
+      downloadCount: 7,
+    });
+  });
+
+  it.each([
+    ['forums-forumId-discussions-discussionId', DiscussionTitleEditFormStub],
+    ['forums-forumId-downloads-discussionId', DiscussionTitleEditFormStub],
+    ['forums-forumId-events-eventId', EventTitleEditFormStub],
+    ['forums-forumId-issues-issueNumber', IssueTitleEditFormStub],
+  ])(
+    'renders the correct title bar on %s',
+    async (routeName, titleComponent) => {
+      mockState.route.name = routeName;
+      const wrapper = await mountWith([
+        { uniqueName: 'cats', displayName: 'Cats' },
+      ]);
+
+      expect(wrapper.findComponent(titleComponent).exists()).toBe(true);
+    }
+  );
+
+  it('renders a selected discussion in the split panel', async () => {
+    mockState.route.name = 'forums-forumId-discussions';
+    mockState.route.query = { selectedDiscussionId: 'discussion-1' };
+    useUIStore().setSelectedChannelDiscussionSelection({
+      discussionId: 'discussion-1',
+      title: 'A discussion',
+    });
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+
+    expect({
+      title: wrapper.text().includes('A discussion'),
+      id: wrapper
+        .findComponent(DiscussionDetailContentStub)
+        .props('discussionId'),
+    }).toEqual({ title: true, id: 'discussion-1' });
+  });
+
+  it('renders the empty discussion selection state', async () => {
+    mockState.route.name = 'forums-forumId-discussions';
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+
+    expect(wrapper.findComponent(DiscussionDetailEmptyStateStub).exists()).toBe(
+      true
+    );
+  });
+
+  it('renders a selected event in the split panel', async () => {
+    mockState.route.name = 'forums-forumId-events';
+    useUIStore().setSelectedChannelEventSelection({
+      eventId: 'event-1',
+      title: 'Launch',
+    });
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+
+    expect({
+      title: wrapper.text().includes('Launch'),
+      id: wrapper.findComponent(EventDetailStub).props('eventId'),
+    }).toEqual({ title: true, id: 'event-1' });
+  });
+
+  it('renders a selected issue in the split panel', async () => {
+    mockState.route.name = 'forums-forumId-issues';
+    useUIStore().setSelectedIssueSelection({
+      issueNumber: 42,
+      title: 'Broken link',
+      channelId: 'cats',
+    });
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+
+    expect({
+      title: wrapper.text().includes('Broken link'),
+      number: wrapper.findComponent(IssueDetailStub).props('issueNumber'),
+    }).toEqual({ title: true, number: 42 });
+  });
+
+  it('refetches channel data from a detail sidebar', async () => {
+    mockState.route.name = 'forums-forumId-events-eventId';
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+
+    wrapper.findComponent(ChannelSidebarStub).vm.$emit('refetch-channel-data');
+
+    expect(mockState.refetchChannel).toHaveBeenCalledOnce();
+  });
+
+  it('builds SEO metadata from the loaded channel', async () => {
+    const description = 'x'.repeat(170);
+    await mountWith([
+      {
+        uniqueName: 'cats',
+        displayName: 'Cat Forum',
+        description,
+        channelIconURL: 'https://img.test/icon.jpg',
+      },
+    ]);
+    const head = mockState.useHead.mock.calls[0]?.[0];
+
+    expect({
+      title: head.value.title,
+      description: head.value.meta[0].content,
+      twitterCard: head.value.meta.find(
+        (item: { name?: string }) => item.name === 'twitter:card'
+      ).content,
+    }).toEqual({
+      title: 'Cat Forum | Multiforum',
+      description: `${'x'.repeat(160)}...`,
+      twitterCard: 'summary_large_image',
+    });
   });
 });

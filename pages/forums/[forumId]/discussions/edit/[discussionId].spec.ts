@@ -10,6 +10,8 @@ const hState = vi.hoisted(() => ({
   onResultCb: null as unknown as (value: unknown) => void,
   onDoneCb: null as unknown as () => void,
   mutate: vi.fn(),
+  queryResult: null as unknown as { value: unknown },
+  mutationOptions: null as null | (() => { variables: unknown }),
 }));
 
 vi.mock('nuxt/app', () => ({
@@ -41,8 +43,9 @@ vi.mock('@/utils/discussionEditForm', () => ({
     body: discussion.body || '',
     selectedTags: discussion.Tags?.map((tag) => tag.text) || [],
     selectedChannels:
-      discussion.DiscussionChannels?.map((dc) => dc.Channel?.uniqueName || '') ||
-      [],
+      discussion.DiscussionChannels?.map(
+        (dc) => dc.Channel?.uniqueName || ''
+      ) || [],
     author: discussion.Author?.username || '',
     album: {
       images: [],
@@ -53,6 +56,7 @@ vi.mock('@/utils/discussionEditForm', () => ({
 }));
 
 const RequireAuthStub = defineComponent({
+  props: ['owners'],
   setup(_props, { slots }) {
     return () => h('div', slots.hasAuth?.() || slots['has-auth']?.());
   },
@@ -92,31 +96,44 @@ const DiscussionFieldsStub = defineComponent({
 
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 const mockedUseMutation = useMutation as unknown as ReturnType<typeof vi.fn>;
+hState.queryResult = ref(null);
 
 beforeEach(() => {
   vi.clearAllMocks();
   hState.push.mockReset();
   hState.useHead.mockReset();
-  hState.mutate.mockReset();
+  hState.mutate.mockReset().mockImplementation(() => {
+    hState.mutationOptions?.();
+  });
+  hState.queryResult.value = null;
+  hState.mutationOptions = null;
   hState.onResultCb = null as unknown as (value: unknown) => void;
   hState.onDoneCb = null as unknown as () => void;
   mockedUseQuery.mockReturnValue({
-    result: ref(null),
+    result: hState.queryResult,
     onResult: (cb: (value: unknown) => void) => {
-      hState.onResultCb = cb;
+      hState.onResultCb = (value: unknown) => {
+        hState.queryResult.value = (value as { data?: unknown }).data ?? null;
+        cb(value);
+      };
     },
     loading: ref(false),
     error: ref(null),
   });
-  mockedUseMutation.mockReturnValue({
-    mutate: hState.mutate,
-    loading: ref(false),
-    error: ref(null),
-    onDone: (cb: () => void) => {
-      hState.onDoneCb = cb;
-    },
-    onError: vi.fn(),
-  });
+  mockedUseMutation.mockImplementation(
+    (_query: unknown, options: () => { variables: unknown }) => {
+      hState.mutationOptions = options;
+      return {
+        mutate: hState.mutate,
+        loading: ref(false),
+        error: ref(null),
+        onDone: (cb: () => void) => {
+          hState.onDoneCb = cb;
+        },
+        onError: vi.fn(),
+      };
+    }
+  );
 });
 
 describe('discussion edit page', () => {
@@ -154,7 +171,9 @@ describe('discussion edit page', () => {
     });
     await nextTick();
 
-    expect(wrapper.findComponent(CreateEditDiscussionFields).props('formValues')).toEqual(
+    expect(
+      wrapper.findComponent(CreateEditDiscussionFields).props('formValues')
+    ).toEqual(
       expect.objectContaining({
         title: 'Hello',
         selectedChannels: ['cats'],
@@ -251,6 +270,90 @@ describe('discussion edit page', () => {
       },
     });
 
-    expect(wrapper.text()).toContain("You don't have permission to see this page.");
+    expect(wrapper.text()).toContain(
+      "You don't have permission to see this page."
+    );
+  });
+
+  it('ignores query callback updates while the discussion is loading', async () => {
+    const wrapper = await mountPage();
+    hState.onResultCb({ loading: true, data: { discussions: [] } });
+    await nextTick();
+    expect(
+      wrapper.findComponent(CreateEditDiscussionFields).props('formValues')
+    ).toEqual(expect.objectContaining({ title: '' }));
+  });
+
+  it('builds tag and channel connection changes for the mutation', async () => {
+    const wrapper = await mountPage();
+    hState.onResultCb({
+      loading: false,
+      data: {
+        discussions: [
+          {
+            id: 'd1',
+            title: 'Hello',
+            body: 'Body',
+            Tags: [{ text: 'old-tag' }],
+            DiscussionChannels: [
+              { Channel: { uniqueName: 'cats' } },
+              { Channel: { uniqueName: 'dogs' } },
+            ],
+            Author: { username: 'alice' },
+            Album: { Images: [], imageOrder: [] },
+          },
+        ],
+      },
+    });
+    await nextTick();
+    await wrapper
+      .findComponent(CreateEditDiscussionFields)
+      .vm.$emit('update-form-values', {
+        selectedTags: ['new-tag'],
+        selectedChannels: ['cats'],
+      });
+    await wrapper.findComponent(CreateEditDiscussionFields).vm.$emit('submit');
+    expect(hState.mutationOptions?.().variables).toEqual({
+      where: { id: 'd1' },
+      updateDiscussionInput: {
+        title: 'Hello',
+        body: 'Body',
+        Tags: [
+          {
+            connectOrCreate: [
+              {
+                onCreate: { node: { text: 'new-tag' } },
+                where: { node: { text: 'new-tag' } },
+              },
+            ],
+            disconnect: [{ where: { node: { text: 'old-tag' } } }],
+          },
+        ],
+      },
+      channelConnections: ['cats'],
+      channelDisconnections: ['dogs'],
+    });
+  });
+
+  it('provides the discussion owner to the authorization wrapper', async () => {
+    const wrapper = await mountPage();
+    hState.onResultCb({
+      loading: false,
+      data: {
+        discussions: [
+          {
+            id: 'd1',
+            title: 'Hello',
+            Tags: [],
+            DiscussionChannels: [],
+            Author: { username: 'alice' },
+          },
+        ],
+      },
+    });
+    await nextTick();
+    expect(wrapper.findComponent(RequireAuthStub).props('owners')).toEqual([
+      'alice',
+    ]);
   });
 });

@@ -27,11 +27,73 @@ vi.mock('@/composables/useImageUpload', () => ({
       placeholderText: `uploading ${file.name}`,
     }),
     createImageMarkdown: (name: string, link: string) => `![${name}](${link})`,
-    createErrorMarkdown: (name: string, err: string) => `[upload error: ${name} ${err}]`,
+    createErrorMarkdown: (name: string, err: string) =>
+      `[upload error: ${name} ${err}]`,
     createPlaceholderRegex: (placeholderText: string, id: string) =>
       new RegExp(`!\\[${placeholderText} \\(id:${id}\\)\\]\\(\\)`),
     createSignedStorageUrlError: ref(null),
   }),
+}));
+
+const autocomplete = vi.hoisted(() => ({
+  botVisible: { value: false, __v_isRef: true },
+  botSuggestions: { value: [{ name: 'helper' }], __v_isRef: true },
+  botActiveIndex: { value: 0, __v_isRef: true },
+  botCaret: vi.fn(),
+  applyBot: vi.fn(),
+  moveBot: vi.fn(),
+  modVisible: { value: false, __v_isRef: true },
+  modSuggestions: { value: [{ username: 'moderator' }], __v_isRef: true },
+  modActiveIndex: { value: 0, __v_isRef: true },
+  modCaret: vi.fn(),
+  applyMod: vi.fn(),
+  moveMod: vi.fn(),
+  emojiVisible: { value: false, __v_isRef: true },
+  insertEmoji: vi.fn(),
+}));
+
+vi.mock('@/composables/useBotAutocomplete', () => ({
+  useBotAutocomplete: () => ({
+    showBotSuggestions: autocomplete.botVisible,
+    showBotHelperText: { value: false, __v_isRef: true },
+    filteredBotSuggestions: autocomplete.botSuggestions,
+    suggestionPopoverStyle: { value: {}, __v_isRef: true },
+    updateCaretCoordinates: autocomplete.botCaret,
+    applyBotSuggestion: autocomplete.applyBot,
+    activeSuggestionIndex: autocomplete.botActiveIndex,
+    moveActiveSuggestion: autocomplete.moveBot,
+  }),
+}));
+
+vi.mock('@/composables/useModAutocomplete', () => ({
+  useModAutocomplete: () => ({
+    showModSuggestions: autocomplete.modVisible,
+    showModHelperText: { value: false, __v_isRef: true },
+    filteredModSuggestions: autocomplete.modSuggestions,
+    suggestionPopoverStyle: { value: {}, __v_isRef: true },
+    updateCaretCoordinates: autocomplete.modCaret,
+    applyModSuggestion: autocomplete.applyMod,
+    activeSuggestionIndex: autocomplete.modActiveIndex,
+    moveActiveSuggestion: autocomplete.moveMod,
+  }),
+}));
+
+vi.mock('@/composables/useEmojiPicker', () => ({
+  useEmojiPicker: () => ({
+    showEmojiPicker: autocomplete.emojiVisible,
+    emojiPickerPosition: { value: {}, __v_isRef: true },
+    toggleEmojiPicker: vi.fn(),
+    closeEmojiPicker: vi.fn(),
+    insertEmoji: autocomplete.insertEmoji,
+  }),
+}));
+
+vi.mock('@/components/text-editor/EmojiPickerWrapper.vue', () => ({
+  default: {
+    name: 'EmojiPickerWrapper',
+    emits: ['emoji-click', 'close'],
+    template: '<div class="emoji-picker" />',
+  },
 }));
 
 // Mount the REAL component (not a mock). Child components are stubbed so we
@@ -56,12 +118,27 @@ const mountEditor = (props: Record<string, unknown> = {}) =>
   });
 
 describe('TextEditor (real mount)', () => {
+  beforeEach(() => {
+    autocomplete.botVisible.value = false;
+    autocomplete.modVisible.value = false;
+    autocomplete.emojiVisible.value = false;
+    autocomplete.botCaret.mockClear();
+    autocomplete.modCaret.mockClear();
+    autocomplete.applyBot.mockClear();
+    autocomplete.applyMod.mockClear();
+    autocomplete.moveBot.mockClear();
+    autocomplete.moveMod.mockClear();
+    autocomplete.insertEmoji.mockClear();
+  });
+
   it('renders the textarea seeded with initialValue', () => {
     const wrapper = mountEditor({ initialValue: 'hello world' });
 
     expect(
-      (wrapper.get('[data-testid="texteditor-textarea"]').element as HTMLTextAreaElement)
-        .value
+      (
+        wrapper.get('[data-testid="texteditor-textarea"]')
+          .element as HTMLTextAreaElement
+      ).value
     ).toBe('hello world');
   });
 
@@ -159,6 +236,77 @@ describe('TextEditor (real mount)', () => {
       expect(wrapper.emitted('update')).toBeTruthy();
     });
   });
+
+  it('updates both autocomplete caret positions when the cursor moves', async () => {
+    const wrapper = mountEditor({
+      enableBotAutocomplete: true,
+      botSuggestions: [{ name: 'helper' }],
+      enableModAutocomplete: true,
+      modSuggestions: [{ username: 'moderator' }],
+    });
+    autocomplete.botCaret.mockClear();
+    autocomplete.modCaret.mockClear();
+    await wrapper.get('textarea').trigger('keyup');
+    await flushPromises();
+    expect({
+      bot: autocomplete.botCaret.mock.calls.length,
+      mod: autocomplete.modCaret.mock.calls.length,
+    }).toEqual({ bot: 1, mod: 1 });
+  });
+
+  it.each([
+    ['Enter', autocomplete.applyBot, undefined],
+    ['ArrowDown', autocomplete.moveBot, 1],
+    ['ArrowUp', autocomplete.moveBot, -1],
+  ])('handles %s for bot autocomplete', async (key, callback, argument) => {
+    autocomplete.botVisible.value = true;
+    const wrapper = mountEditor();
+    await wrapper.get('textarea').trigger('keydown', { key });
+    expect(callback).toHaveBeenCalledWith(
+      argument === undefined ? autocomplete.botSuggestions.value[0] : argument
+    );
+  });
+
+  it.each([
+    ['Tab', autocomplete.applyMod, undefined],
+    ['ArrowDown', autocomplete.moveMod, 1],
+    ['ArrowUp', autocomplete.moveMod, -1],
+  ])(
+    'handles %s for moderator autocomplete',
+    async (key, callback, argument) => {
+      autocomplete.modVisible.value = true;
+      const wrapper = mountEditor();
+      await wrapper.get('textarea').trigger('keydown', { key });
+      expect(callback).toHaveBeenCalledWith(
+        argument === undefined ? autocomplete.modSuggestions.value[0] : argument
+      );
+    }
+  );
+
+  it('passes emoji selections to the picker composable', async () => {
+    autocomplete.emojiVisible.value = true;
+    const wrapper = mountEditor();
+    const emoji = { unicode: '🎉' };
+    await wrapper
+      .findComponent({ name: 'EmojiPickerWrapper' })
+      .vm.$emit('emoji-click', emoji);
+    expect(autocomplete.insertEmoji).toHaveBeenCalledWith(
+      expect.objectContaining({ event: emoji })
+    );
+  });
+
+  it('returns focus to the textarea when switching back to Write', async () => {
+    const focus = vi.spyOn(HTMLTextAreaElement.prototype, 'focus');
+    const wrapper = mountEditor();
+    focus.mockClear();
+    const buttons = wrapper.findAll('button');
+    await buttons
+      .find((button) => button.text() === 'Preview')
+      ?.trigger('click');
+    await buttons.find((button) => button.text() === 'Write')?.trigger('click');
+    await flushPromises();
+    expect(focus).toHaveBeenCalledOnce();
+  });
 });
 
 describe('TextEditor image upload', () => {
@@ -234,5 +382,41 @@ describe('TextEditor image upload', () => {
     await emitFileChange(wrapper, bigFile);
 
     expect(uploadFileMock).not.toHaveBeenCalled();
+  });
+
+  it('appends the image when the upload placeholder was removed while uploading', async () => {
+    let finishUpload:
+      ((value: { success: boolean; embeddedLink: string }) => void) | undefined;
+    uploadFileMock.mockReturnValue(
+      new Promise((resolve) => {
+        finishUpload = resolve;
+      })
+    );
+    const wrapper = mountEditor();
+    const upload = emitFileChange(wrapper, new File(['x'], 'pic.png'));
+    await Promise.resolve();
+    await wrapper.get('textarea').setValue('placeholder removed');
+    finishUpload?.({
+      success: true,
+      embeddedLink: 'https://cdn.example.com/late.png',
+    });
+    await upload;
+    expect(wrapper.emitted('update')?.at(-1)?.[0]).toContain('late.png');
+  });
+
+  it('inserts an error at the original range when the placeholder was removed', async () => {
+    let failUpload: ((reason: Error) => void) | undefined;
+    uploadFileMock.mockReturnValue(
+      new Promise((_resolve, reject) => {
+        failUpload = reject;
+      })
+    );
+    const wrapper = mountEditor();
+    const upload = emitFileChange(wrapper, new File(['x'], 'pic.png'));
+    await Promise.resolve();
+    await wrapper.get('textarea').setValue('placeholder removed');
+    failUpload?.(new Error('late failure'));
+    await upload;
+    expect(wrapper.emitted('update')?.at(-1)?.[0]).toContain('late failure');
   });
 });

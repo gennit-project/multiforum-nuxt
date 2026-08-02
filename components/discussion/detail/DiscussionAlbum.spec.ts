@@ -18,7 +18,7 @@ vi.mock('@/composables/useAuthState', () => ({
 const stubs = {
   ModelViewer: { template: '<div class="model-viewer-stub" />' },
   StlViewer: { template: '<div class="stl-viewer-stub" />' },
-  CarouselThumbnail: { template: '<div />' },
+  CarouselThumbnail: { name: 'CarouselThumbnail', template: '<div />' },
   ClientOnly: { template: '<div><slot /></div>' },
   ImageLightbox: {
     template: '<button class="lightbox-stub" @click="$emit(\'close\')" />',
@@ -79,7 +79,9 @@ describe('DiscussionAlbum', () => {
 
   it('falls back to the Images array (in order) when imageOrder is empty', () => {
     const wrapper = mountAlbum({ album: makeAlbum(['a', 'b'], []) });
-    const srcs = cells(wrapper).map((cell) => cell.find('img').attributes('src'));
+    const srcs = cells(wrapper).map((cell) =>
+      cell.find('img').attributes('src')
+    );
     expect(srcs).toEqual([
       'https://example.com/a.jpg',
       'https://example.com/b.jpg',
@@ -87,7 +89,9 @@ describe('DiscussionAlbum', () => {
   });
 
   it('orders the cells according to imageOrder', () => {
-    const wrapper = mountAlbum({ album: makeAlbum(['a', 'b', 'c'], ['c', 'a', 'b']) });
+    const wrapper = mountAlbum({
+      album: makeAlbum(['a', 'b', 'c'], ['c', 'a', 'b']),
+    });
     const firstImg = cells(wrapper)[0].find('img');
     expect(firstImg.attributes('src')).toContain('/c.jpg');
   });
@@ -95,7 +99,9 @@ describe('DiscussionAlbum', () => {
   it('appends a synthetic cell for STL files', () => {
     const wrapper = mountAlbum({
       album: makeAlbum(['a']),
-      stlFiles: [{ id: 's1', url: 'https://example.com/m.stl', fileName: 'm.stl' }],
+      stlFiles: [
+        { id: 's1', url: 'https://example.com/m.stl', fileName: 'm.stl' },
+      ],
     });
     expect(cells(wrapper)).toHaveLength(2);
   });
@@ -122,7 +128,9 @@ describe('DiscussionAlbum', () => {
   it('renders an STL viewer for STL images', () => {
     const wrapper = mountAlbum({
       album: makeAlbum([]),
-      stlFiles: [{ id: 's1', url: 'https://example.com/m.stl', fileName: 'm.stl' }],
+      stlFiles: [
+        { id: 's1', url: 'https://example.com/m.stl', fileName: 'm.stl' },
+      ],
     });
 
     expect(wrapper.find('.stl-viewer-stub').exists()).toBe(true);
@@ -135,7 +143,9 @@ describe('DiscussionAlbum', () => {
     await wrapper.vm.$nextTick();
     expect(wrapper.findComponent({ name: 'TextEditor' }).exists()).toBe(true);
 
-    await wrapper.findComponent({ name: 'TextEditor' }).vm.$emit('update', 'new caption');
+    await wrapper
+      .findComponent({ name: 'TextEditor' })
+      .vm.$emit('update', 'new caption');
     await wrapper.findComponent({ name: 'SaveButton' }).trigger('click');
 
     expect(wrapper.emitted('album-updated')).toBeTruthy();
@@ -153,13 +163,29 @@ describe('DiscussionAlbum', () => {
 
     expect(wrapper.findComponent({ name: 'TextEditor' }).exists()).toBe(false);
   });
+
+  it.each(['enter', 'space'])(
+    'enters caption editing with the %s key',
+    async (key) => {
+      const wrapper = mountAlbum({
+        album: {
+          ...makeAlbum(['a']),
+          Images: [{ ...makeImage('a'), caption: 'Existing caption' }],
+        } as Album,
+      });
+      await wrapper.get('span[role="button"]').trigger(`keydown.${key}`);
+      expect(wrapper.findComponent({ name: 'TextEditor' }).exists()).toBe(true);
+    }
+  );
 });
 
 describe('DiscussionAlbum — lightbox', () => {
   // The lightbox is teleported to <body>, so query the document, not the wrapper.
   beforeEach(() => {
     vi.clearAllMocks();
-    document.body.querySelectorAll('.lightbox-stub').forEach((el) => el.remove());
+    document.body
+      .querySelectorAll('.lightbox-stub')
+      .forEach((el) => el.remove());
   });
 
   it('opens the lightbox when a grid cell is clicked', async () => {
@@ -203,6 +229,22 @@ describe('DiscussionAlbum — carousel navigation', () => {
     expect(wrapper.text()).toContain('3 of 3');
   });
 
+  it('moves left without wrapping from a later image', async () => {
+    const wrapper = mountAlbum({ carouselFormat: true });
+    await wrapper.get('[aria-label="Next image"]').trigger('click');
+    await wrapper.get('[aria-label="Previous image"]').trigger('click');
+    expect(wrapper.text()).toContain('1 of 3');
+  });
+
+  it('wraps to the first image after advancing past the end', async () => {
+    const wrapper = mountAlbum({ carouselFormat: true });
+    const next = wrapper.get('[aria-label="Next image"]');
+    await next.trigger('click');
+    await next.trigger('click');
+    await next.trigger('click');
+    expect(wrapper.text()).toContain('1 of 3');
+  });
+
   it('navigates by swiping the image container', async () => {
     const wrapper = mountAlbum({ carouselFormat: true });
     const container = wrapper.find('.touch-pan-x');
@@ -210,6 +252,35 @@ describe('DiscussionAlbum — carousel navigation', () => {
     await container.trigger('touchend', { changedTouches: [{ clientX: 100 }] });
 
     expect(wrapper.text()).toContain('2 of 3');
+  });
+
+  it('navigates backward on a right swipe', async () => {
+    const wrapper = mountAlbum({ carouselFormat: true });
+    const container = wrapper.find('.touch-pan-x');
+    await container.trigger('touchstart', { touches: [{ clientX: 100 }] });
+    await container.trigger('touchend', { changedTouches: [{ clientX: 200 }] });
+    expect(wrapper.text()).toContain('3 of 3');
+  });
+
+  it('selects carousel images from both thumbnail layouts', async () => {
+    const compact = mountAlbum({ carouselFormat: true, showThumbnails: true });
+    await compact
+      .findAllComponents({ name: 'CarouselThumbnail' })[1]
+      .vm.$emit('click');
+    const expanded = mountAlbum({ carouselFormat: true, expandedView: true });
+    await expanded
+      .findAllComponents({ name: 'CarouselThumbnail' })[2]
+      .vm.$emit('click');
+    expect([compact.text(), expanded.text()]).toEqual([
+      expect.stringContaining('2 of 3'),
+      expect.stringContaining('3 of 3'),
+    ]);
+  });
+
+  it('opens the lightbox from the active carousel image', async () => {
+    const wrapper = mountAlbum({ carouselFormat: true });
+    await wrapper.get('.touch-pan-x > div.h-full').trigger('click');
+    expect(document.body.querySelector('.lightbox-stub')).not.toBeNull();
   });
 
   it('renders the taller main image in download expanded view', () => {

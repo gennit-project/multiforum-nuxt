@@ -79,7 +79,11 @@ const actualHeight = ref(400);
 
 // THREE.js objects - using any due to missing type declarations
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let scene: any, camera: any, renderer: any, controls: any, animationId: number | undefined;
+let scene: any,
+  camera: any,
+  renderer: any,
+  controls: any,
+  animationId: number | undefined;
 
 function updateDimensions() {
   if (!container.value) return;
@@ -234,6 +238,7 @@ function resetCamera() {
 }
 
 function cleanup() {
+  const containerElement = container.value;
   if (animationId) {
     cancelAnimationFrame(animationId);
   }
@@ -243,8 +248,12 @@ function cleanup() {
   if (controls) {
     controls.dispose();
   }
-  while (container.value?.firstChild) {
-    container.value.removeChild(container.value.firstChild);
+  if (
+    renderer?.domElement &&
+    renderer.domElement.parentNode === containerElement &&
+    containerElement
+  ) {
+    containerElement.removeChild(renderer.domElement);
   }
 }
 

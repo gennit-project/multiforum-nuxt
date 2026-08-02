@@ -163,6 +163,14 @@ describe('ForumQuickSwitcher lazy loading', () => {
 });
 
 describe('ForumQuickSwitcher content', () => {
+  it('builds account query variables from the signed-in username', () => {
+    mountSwitcher();
+    expect(h.variables.slice(1).map((variables) => variables.value)).toEqual([
+      { username: 'alice' },
+      { username: 'alice' },
+    ]);
+  });
+
   it('shows recent, favorite, collection, and top-forum sections', async () => {
     h.getRecentForums.mockReturnValue([
       { uniqueName: 'recent', displayName: 'Recent Forum', timestamp: 2 },
@@ -313,5 +321,68 @@ describe('ForumQuickSwitcher content', () => {
       name: 'forums-forumId-discussions',
       params: { forumId: 'dogs' },
     });
+  });
+
+  it('sorts, validates, and limits recently visited forums', async () => {
+    h.getRecentForums.mockReturnValue([
+      null,
+      { uniqueName: 'old', displayName: '', timestamp: 1 },
+      { uniqueName: 'new', displayName: null, timestamp: 5 },
+      { uniqueName: 'three', timestamp: 4 },
+      { uniqueName: 'four', timestamp: 3 },
+      { uniqueName: 'five', timestamp: 2 },
+      { uniqueName: 'six', timestamp: 0 },
+    ]);
+    const wrapper = mountSwitcher();
+    await wrapper
+      .get('[data-testid="forum-quick-switcher-trigger"]')
+      .trigger('click');
+    expect(document.body.textContent).toEqual(
+      expect.stringMatching(/new.*three.*four.*five.*old/s)
+    );
+  });
+
+  it('closes and clears search when the trigger is clicked again', async () => {
+    const wrapper = mountSwitcher();
+    const trigger = wrapper.get('[data-testid="forum-quick-switcher-trigger"]');
+    await trigger.trigger('click');
+    const input = document.querySelector(
+      '[data-testid="search-stub"]'
+    ) as HTMLInputElement;
+    input.value = 'dogs';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    await trigger.trigger('click');
+    expect([trigger.attributes('aria-expanded'), h.variables[0].value]).toEqual(
+      ['false', { channelWhere: { uniqueName_MATCHES: '.*' } }]
+    );
+  });
+
+  it('collapses an expanded forum collection on a second click', async () => {
+    h.collectionsResult.value = {
+      users: [
+        {
+          Collections: [
+            {
+              id: 'list-1',
+              name: 'My Forums',
+              Channels: [{ uniqueName: 'listed', displayName: 'Listed Forum' }],
+            },
+          ],
+        },
+      ],
+    };
+    const wrapper = mountSwitcher();
+    await wrapper
+      .get('[data-testid="forum-quick-switcher-trigger"]')
+      .trigger('click');
+    const collectionButton = Array.from(
+      document.querySelectorAll('button')
+    ).find((button) =>
+      button.textContent?.includes('My Forums')
+    ) as HTMLButtonElement;
+    collectionButton.click();
+    collectionButton.click();
+    await nextTick();
+    expect(document.body.textContent).not.toContain('Listed Forum');
   });
 });

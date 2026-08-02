@@ -58,9 +58,16 @@ const stubs = {
     template: '<div class="info-stub">{{ text }}</div>',
   },
   EventHeader: {
-    template: '<button class="event-header-stub" @click="$emit(\'archived-successfully\')" />',
+    template:
+      '<button class="event-header-stub" @click="$emit(\'archived-successfully\')" />',
   },
   EventBody: {
+    name: 'EventBody',
+    props: ['eventDescriptionEditMode'],
+    emits: [
+      'handle-click-edit-event-description',
+      'close-edit-event-description',
+    ],
     template:
       '<button class="event-body-stub" @click="$emit(\'handle-click-edit-event-description\')" />',
   },
@@ -85,25 +92,27 @@ const stubs = {
   Tag: { template: '<span class="tag-stub" />' },
 };
 
-const setup = (params: {
-  event?: Event | null;
-  eventLoading?: boolean;
-  eventError?: Error | null;
-  comments?: Array<Record<string, unknown>>;
-  routeName?: string;
-  routeQuery?: Record<string, unknown>;
-  username?: string;
-  modProfileName?: string;
-  eventChannels?: EventChannel[] | null;
-  rootCommentCount?: number;
-  rootAggregateLoading?: boolean;
-  rootAggregateError?: Error | null;
-  showComments?: boolean;
-  showTitle?: boolean;
-  linkTitle?: boolean;
-  usernameOnTop?: boolean;
-  issueEventId?: string;
-} = {}) => {
+const setup = (
+  params: {
+    event?: Event | null;
+    eventLoading?: boolean;
+    eventError?: Error | null;
+    comments?: Array<Record<string, unknown>>;
+    routeName?: string;
+    routeQuery?: Record<string, unknown>;
+    username?: string;
+    modProfileName?: string;
+    eventChannels?: EventChannel[] | null;
+    rootCommentCount?: number;
+    rootAggregateLoading?: boolean;
+    rootAggregateError?: Error | null;
+    showComments?: boolean;
+    showTitle?: boolean;
+    linkTitle?: boolean;
+    usernameOnTop?: boolean;
+    issueEventId?: string;
+  } = {}
+) => {
   const {
     event = makeEvent(),
     eventLoading = false,
@@ -219,7 +228,9 @@ describe('EventDetail', () => {
   it('shows the not-found message when the event is missing', () => {
     const { wrapper } = setup({ event: null, eventLoading: false });
 
-    expect(wrapper.text()).toContain("Can't find the content that was reported");
+    expect(wrapper.text()).toContain(
+      "Can't find the content that was reported"
+    );
   });
 
   it('emits the original poster username from the event query result', () => {
@@ -368,5 +379,70 @@ describe('EventDetail', () => {
     });
 
     expect(wrapper.find('.expandable-image-stub').exists()).toBe(true);
+  });
+
+  it('reloads comments when a username becomes available', async () => {
+    const { wrapper, commentsQuery } = setup();
+    h.username.value = 'alice';
+    await wrapper.vm.$nextTick();
+    expect(commentsQuery.refetch).toHaveBeenCalledOnce();
+  });
+
+  it('reloads comments on mount for an already signed-in user', () => {
+    const { commentsQuery } = setup({ username: 'alice' });
+    expect(commentsQuery.refetch).toHaveBeenCalledOnce();
+  });
+
+  it('reloads event data after its ID changes', async () => {
+    const { wrapper, eventQuery, commentsQuery, aggregateQuery } = setup();
+    await wrapper.setProps({ eventId: 'e2' });
+    expect([
+      eventQuery.refetch.mock.calls.length,
+      commentsQuery.refetch.mock.calls.length,
+      aggregateQuery.refetch.mock.calls.length,
+    ]).toEqual([1, 1, 1]);
+  });
+
+  it('merges a fetched page of event comments', async () => {
+    const { wrapper, commentsQuery } = setup({ comments: [{ id: 'one' }] });
+    await wrapper.find('.load-more-stub').trigger('click');
+    const options = commentsQuery.fetchMore.mock.calls[0][0];
+    const merged = options.updateQuery(
+      { getEventComments: { Comments: [{ id: 'one' }] } },
+      { fetchMoreResult: { getEventComments: { Comments: [{ id: 'two' }] } } }
+    );
+    expect([options.variables, merged.getEventComments.Comments]).toEqual([
+      { offset: 1 },
+      [{ id: 'one' }, { id: 'two' }],
+    ]);
+  });
+
+  it('keeps the prior event comments when fetchMore returns nothing', async () => {
+    const { wrapper, commentsQuery } = setup({ comments: [{ id: 'one' }] });
+    await wrapper.find('.load-more-stub').trigger('click');
+    const previous = { getEventComments: { Comments: [{ id: 'one' }] } };
+    expect(
+      commentsQuery.fetchMore.mock.calls[0][0].updateQuery(previous, {})
+    ).toBe(previous);
+  });
+
+  it('enters and exits description editing from EventBody events', async () => {
+    const { wrapper } = setup();
+    const body = wrapper.findComponent({ name: 'EventBody' });
+    await body.vm.$emit('handle-click-edit-event-description');
+    const editing = body.props('eventDescriptionEditMode');
+    await body.vm.$emit('close-edit-event-description');
+    expect([editing, body.props('eventDescriptionEditMode')]).toEqual([
+      true,
+      false,
+    ]);
+  });
+
+  it('renders the edited timestamp when the event has an update time', () => {
+    const { wrapper } = setup({
+      event: makeEvent({ updatedAt: '2025-01-01T00:00:00.000Z' }),
+      usernameOnTop: true,
+    });
+    expect(wrapper.text()).toContain('Edited');
   });
 });

@@ -155,8 +155,7 @@ const buildWrapper = (eventData: Record<string, unknown> = baseEvent()) =>
         NuxtLink: { template: '<a><slot /></a>' },
         ClientOnly: { template: '<div><slot /></div>' },
         MenuButton: {
-          template:
-            '<button data-testid="event-menu-button"><slot /></button>',
+          template: '<button data-testid="event-menu-button"><slot /></button>',
           props: ['items'],
         },
         WarningModal: {
@@ -224,6 +223,51 @@ describe('EventHeader — copy actions', () => {
 
     expect(wrapper.text()).toContain('Copied!');
   });
+
+  it('clears the copied-address confirmation after two seconds', async () => {
+    vi.useFakeTimers();
+    const wrapper = buildWrapper();
+    await wrapper
+      .get('button[aria-label="Copy address to clipboard"]')
+      .trigger('click');
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(wrapper.text()).not.toContain('Copied!');
+  });
+
+  it('handles clipboard rejection for addresses and permalinks', async () => {
+    clipboardWriteText.mockRejectedValue(new Error('clipboard denied'));
+    const wrapper = buildWrapper();
+    await wrapper
+      .get('button[aria-label="Copy address to clipboard"]')
+      .trigger('click');
+    await menu(wrapper).vm.$emit('copy-link');
+    expect(clipboardWriteText).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('EventHeader — direct menu actions', () => {
+  it('navigates to the event editor', async () => {
+    const wrapper = buildWrapper();
+    await menu(wrapper).vm.$emit('handle-edit');
+    expect(routerPush).toHaveBeenCalledWith('/forums/cats/events/edit/event-1');
+  });
+
+  it('closes cancel and scope modals from their close events', async () => {
+    const wrapper = buildWrapper({ ...baseEvent(), EventSeries: { id: 's1' } });
+    await menu(wrapper).vm.$emit('handle-cancel');
+    await wrapper
+      .findAllComponents('[data-testid="scope-modal"]')[0]
+      .vm.$emit('close');
+    await menu(wrapper).vm.$emit('handle-delete');
+    await wrapper
+      .findAllComponents('[data-testid="scope-modal"]')[1]
+      .vm.$emit('close');
+    expect(
+      wrapper
+        .findAll('[data-testid="scope-modal"]')
+        .map((modal) => modal.attributes('data-open'))
+    ).toEqual(['false', 'false']);
+  });
 });
 
 describe('EventHeader — cancel flow', () => {
@@ -246,7 +290,9 @@ describe('EventHeader — cancel flow', () => {
 
   it('cancels a series event when a scope is confirmed', async () => {
     const wrapper = buildWrapper({ ...baseEvent(), EventSeries: { id: 's1' } });
-    const scopeModal = wrapper.findAllComponents('[data-testid="scope-modal"]')[0]!;
+    const scopeModal = wrapper.findAllComponents(
+      '[data-testid="scope-modal"]'
+    )[0]!;
     await scopeModal.vm.$emit('confirm', 'thisEvent');
 
     expect(mutateSpies[2]).toHaveBeenCalledTimes(1);
@@ -273,7 +319,9 @@ describe('EventHeader — delete flow', () => {
 
   it('deletes a series event when a scope is confirmed', async () => {
     const wrapper = buildWrapper({ ...baseEvent(), EventSeries: { id: 's1' } });
-    const scopeModal = wrapper.findAllComponents('[data-testid="scope-modal"]')[1]!;
+    const scopeModal = wrapper.findAllComponents(
+      '[data-testid="scope-modal"]'
+    )[1]!;
     await scopeModal.vm.$emit('confirm', 'thisEvent');
 
     expect(mutateSpies[3]).toHaveBeenCalledWith({
@@ -324,7 +372,9 @@ describe('EventHeader — feedback flow', () => {
 
   it('submits feedback when text and a mod profile are present', async () => {
     const wrapper = buildWrapper();
-    const feedbackModal = wrapper.findComponent('[data-testid="feedback-modal"]');
+    const feedbackModal = wrapper.findComponent(
+      '[data-testid="feedback-modal"]'
+    );
     await feedbackModal.vm.$emit('update-feedback', 'Great event');
     await feedbackModal.vm.$emit('primary-button-click');
 
@@ -333,16 +383,41 @@ describe('EventHeader — feedback flow', () => {
 
   it('does not submit feedback without any text', async () => {
     const wrapper = buildWrapper();
-    const feedbackModal = wrapper.findComponent('[data-testid="feedback-modal"]');
+    const feedbackModal = wrapper.findComponent(
+      '[data-testid="feedback-modal"]'
+    );
     await feedbackModal.vm.$emit('primary-button-click');
 
     expect(mutateSpies[4]).not.toHaveBeenCalled();
   });
 
+  it('does not submit feedback when forum feedback is disabled', async () => {
+    feedbackEnabledFlag.value = false;
+    const wrapper = buildWrapper();
+    const feedbackModal = wrapper.findComponent(
+      '[data-testid="feedback-modal"]'
+    );
+    await feedbackModal.vm.$emit('update-feedback', 'Great event');
+    await feedbackModal.vm.$emit('primary-button-click');
+    expect(mutateSpies[4]).not.toHaveBeenCalled();
+  });
+
+  it('closes the feedback form from the modal close event', async () => {
+    const wrapper = buildWrapper();
+    const feedbackModal = wrapper.findComponent(
+      '[data-testid="feedback-modal"]'
+    );
+    await menu(wrapper).vm.$emit('handle-feedback');
+    await feedbackModal.vm.$emit('close');
+    expect(feedbackModal.attributes('data-open')).toBe('false');
+  });
+
   it('does not submit feedback without a mod profile name', async () => {
     modProfileName.value = '';
     const wrapper = buildWrapper();
-    const feedbackModal = wrapper.findComponent('[data-testid="feedback-modal"]');
+    const feedbackModal = wrapper.findComponent(
+      '[data-testid="feedback-modal"]'
+    );
     await feedbackModal.vm.$emit('update-feedback', 'Great event');
     await feedbackModal.vm.$emit('primary-button-click');
 
@@ -353,7 +428,9 @@ describe('EventHeader — feedback flow', () => {
     const wrapper = buildWrapper();
     onDoneCallbacks[4]!();
     await wrapper.vm.$nextTick();
-    const feedbackModal = wrapper.findComponent('[data-testid="feedback-modal"]');
+    const feedbackModal = wrapper.findComponent(
+      '[data-testid="feedback-modal"]'
+    );
 
     expect(feedbackModal.attributes('data-open')).toBe('false');
   });

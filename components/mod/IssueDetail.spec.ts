@@ -3,6 +3,12 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, h, ref, nextTick } from 'vue';
 import IssueDetail from './IssueDetail.vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
+import { GET_ISSUE } from '@/graphQLData/issue/queries';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
+import { GET_EVENT } from '@/graphQLData/event/queries';
+import { GET_COMMENT } from '@/graphQLData/comment/queries';
 
 const routerReplace = vi.fn();
 const refetchIssue = vi.fn();
@@ -43,6 +49,13 @@ const buildIssueResult = () => ({
 });
 
 const issueResult = ref(buildIssueResult());
+const channelResult = ref({ channels: [] });
+const serverResult = ref({ serverConfigs: [] });
+const relatedDiscussionResult = ref({
+  discussions: [] as Record<string, unknown>[],
+});
+const relatedEventResult = ref({ events: [] as Record<string, unknown>[] });
+const relatedCommentResult = ref({ comments: [] as Record<string, unknown>[] });
 
 // The auto-unsubscribe composable is exercised by its own spec and an e2e
 // test; here we stub it so mounting does not pull in the Pinia toast store.
@@ -233,15 +246,24 @@ describe('IssueDetail', () => {
     hasMoreActivityFeed.value = false;
     deleteReasonError.value = '';
 
+    const queryResults = new Map<unknown, unknown>([
+      [GET_ISSUE, issueResult],
+      [GET_CHANNEL, channelResult],
+      [GET_SERVER_CONFIG, serverResult],
+      [GET_DISCUSSION, relatedDiscussionResult],
+      [GET_EVENT, relatedEventResult],
+      [GET_COMMENT, relatedCommentResult],
+    ]);
     (useQuery as unknown as ReturnType<typeof vi.fn>).mockImplementation(
-      (_document, variables, options) => {
+      (document, variables, options) => {
         // Invoke the reactive variables/options factories so their bodies — and
         // the computeds they read (channelId, issueNumber, relatedDiscussionId,
         // relatedEventId, relatedCommentId, …) — are exercised.
         if (typeof variables === 'function') variables();
         if (typeof options === 'function') options();
+        const result = queryResults.get(document) ?? ref(null);
         return {
-          result: issueResult,
+          result,
           error: queryError,
           loading: queryLoading,
           refetch: refetchIssue,
@@ -251,17 +273,23 @@ describe('IssueDetail', () => {
       }
     );
 
+    relatedDiscussionResult.value = { discussions: [] };
+    relatedEventResult.value = { events: [] };
+    relatedCommentResult.value = { comments: [] };
+
     let mutationCallIndex = 0;
-    (useMutation as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => {
-      mutationCallIndex += 1;
-      if (mutationCallIndex === 1) {
-        return { mutate: subscribeMutate, loading: ref(false) };
+    (useMutation as unknown as ReturnType<typeof vi.fn>).mockImplementation(
+      () => {
+        mutationCallIndex += 1;
+        if (mutationCallIndex === 1) {
+          return { mutate: subscribeMutate, loading: ref(false) };
+        }
+        if (mutationCallIndex === 2) {
+          return { mutate: unsubscribeMutate, loading: ref(false) };
+        }
+        return { mutate: vi.fn(), loading: ref(false) };
       }
-      if (mutationCallIndex === 2) {
-        return { mutate: unsubscribeMutate, loading: ref(false) };
-      }
-      return { mutate: vi.fn(), loading: ref(false) };
-    });
+    );
   });
 
   const buildWrapper = () =>
@@ -307,7 +335,9 @@ describe('IssueDetail', () => {
   it('subscribes from the issue CTA and clears the route query', async () => {
     const wrapper = buildWrapper();
 
-    await wrapper.get('[data-testid="toggle-issue-subscription"]').trigger('click');
+    await wrapper
+      .get('[data-testid="toggle-issue-subscription"]')
+      .trigger('click');
 
     expect(subscribeMutate).toHaveBeenCalledWith({ issueId: 'issue-1' });
     expect(routerReplace).toHaveBeenCalledWith({ query: {} });
@@ -343,23 +373,27 @@ describe('IssueDetail', () => {
   it('shows the issue context channel tags', () => {
     const wrapper = buildWrapper();
 
-    expect(wrapper.get('[data-testid="issue-detail-channel-tags"]').text()).toContain(
-      'toDelete'
-    );
+    expect(
+      wrapper.get('[data-testid="issue-detail-channel-tags"]').text()
+    ).toContain('toDelete');
   });
 
   it('shows page not found when no issue is returned', () => {
     issueResult.value = { issues: [] };
     const wrapper = buildWrapper();
 
-    expect(wrapper.get('[data-testid="page-not-found"]').text()).toContain('not found');
+    expect(wrapper.get('[data-testid="page-not-found"]').text()).toContain(
+      'not found'
+    );
   });
 
   it('falls back to page not found when the issue query errors', () => {
     queryError.value = new Error('Issue failed');
     const wrapper = buildWrapper();
 
-    expect(wrapper.get('[data-testid="page-not-found"]').text()).toContain('not found');
+    expect(wrapper.get('[data-testid="page-not-found"]').text()).toContain(
+      'not found'
+    );
   });
 
   it('shows the lock banner when the issue is locked', () => {
@@ -367,7 +401,9 @@ describe('IssueDetail', () => {
     issueResult.value.issues[0].lockReason = 'Escalated';
     const wrapper = buildWrapper();
 
-    expect(wrapper.get('[data-testid="locked-banner"]').text()).toContain('Escalated');
+    expect(wrapper.get('[data-testid="locked-banner"]').text()).toContain(
+      'Escalated'
+    );
   });
 
   it('shows the related channel banner when present', () => {
@@ -393,5 +429,48 @@ describe('IssueDetail', () => {
     const wrapper = buildWrapper();
 
     expect(wrapper.text()).toContain('Cannot delete related content');
+  });
+
+  it('uses unique related-discussion channels as issue context', () => {
+    issueResult.value.issues[0].relatedDiscussionId = 'discussion-1';
+    relatedDiscussionResult.value = {
+      discussions: [
+        {
+          DiscussionChannels: [
+            { channelUniqueName: 'cats' },
+            { channelUniqueName: null },
+            { channelUniqueName: 'cats' },
+            { channelUniqueName: 'dogs' },
+          ],
+        },
+      ],
+    };
+    const wrapper = buildWrapper();
+    expect(
+      wrapper.get('[data-testid="issue-detail-channel-tags"]').text()
+    ).toBe('catsdogs');
+  });
+
+  it('falls back to related-event channels for issue context', () => {
+    issueResult.value.issues[0].relatedEventId = 'event-1';
+    relatedEventResult.value = {
+      events: [{ EventChannels: [{ channelUniqueName: 'events' }] }],
+    };
+    const wrapper = buildWrapper();
+    expect(
+      wrapper.get('[data-testid="issue-detail-channel-tags"]').text()
+    ).toBe('events');
+  });
+
+  it('renders an issue body written by the current moderation profile', () => {
+    issueResult.value.issues[0].body = 'Moderator note';
+    issueResult.value.issues[0].Author = {
+      __typename: 'ModerationProfile',
+      displayName: 'mod-alice',
+    } as never;
+    const wrapper = buildWrapper();
+    expect(wrapper.findComponent({ name: 'IssueBodyEditor' }).exists()).toBe(
+      true
+    );
   });
 });

@@ -180,7 +180,9 @@ const NotificationStub = defineComponent({
   props: ['show', 'title'],
   setup(props) {
     return () =>
-      props.show ? h('div', { 'data-testid': 'notification-title' }, props.title) : null;
+      props.show
+        ? h('div', { 'data-testid': 'notification-title' }, props.title)
+        : null;
   },
 });
 
@@ -241,6 +243,7 @@ const mountWrapper = (overrides: Record<string, unknown> = {}) =>
         SuspendModButton: {
           name: 'SuspendModButton',
           props: ['issue', 'disabled', 'autoOpen'],
+          emits: ['modal-closed'],
           template: '<div data-testid="suspend-mod-button" />',
         },
         GenericButton: GenericButtonStub,
@@ -279,7 +282,9 @@ describe('ActivityFeedListItem', () => {
   it('shows a report action in the context menu for reportable mod comments', () => {
     const wrapper = mountWrapper();
 
-    expect(wrapper.find('[data-testid="Report Mod Comment"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="Report Mod Comment"]').exists()).toBe(
+      true
+    );
     expect(wrapper.find('[data-testid="Suspend Mod"]').exists()).toBe(true);
   });
 
@@ -294,7 +299,9 @@ describe('ActivityFeedListItem', () => {
     await wrapper.get('[data-testid="Suspend Mod"]').trigger('click');
     await nextTick();
 
-    expect(wrapper.find('[data-testid="suspend-mod-button"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="suspend-mod-button"]').exists()).toBe(
+      true
+    );
   });
 
   it('opens edit mode for the comment author and saves a change', async () => {
@@ -349,7 +356,9 @@ describe('ActivityFeedListItem', () => {
 
     expect(wrapper.find('li').classes()).toContain('border-orange-500');
     expect(wrapper.find('[data-testid="revision-diff"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="markdown-preview"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="markdown-preview"]').exists()).toBe(
+      false
+    );
     expect(wrapper.text()).toContain('Server Admin');
   });
 
@@ -383,6 +392,102 @@ describe('ActivityFeedListItem', () => {
       }),
     });
 
-    expect(wrapper.find('[data-testid="suspend-mod-button"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="suspend-mod-button"]').exists()).toBe(
+      true
+    );
+  });
+
+  it('hides report actions when no user or moderation profile is active', () => {
+    authState.username = '';
+    authState.modProfileName = '';
+    const wrapper = mountWrapper();
+    expect(wrapper.find('[data-testid="Report Mod Comment"]').exists()).toBe(
+      false
+    );
+  });
+
+  it('renders paired discussion title and body revision diffs in order', () => {
+    const wrapper = mountWrapper({
+      relatedDiscussion: {
+        id: 'd1',
+        title: 'New title',
+        body: 'New body',
+        updatedAt: '2024-01-03T00:00:00.000Z',
+        Author: { username: 'alice' },
+      },
+      nextRevisionBody: 'Intermediate body',
+      pairedNextRevisionBody: null,
+      activityItem: makeActivityItem({
+        actionType: 'edit',
+        actionDescription: 'edited discussion body',
+        Comment: null,
+        Revision: {
+          id: 'body-old',
+          body: 'Old body',
+          createdAt: '2024-01-01T00:00:00.000Z',
+        },
+      }),
+      pairedActivityItem: makeActivityItem({
+        actionType: 'edit',
+        actionDescription: 'edited discussion title',
+        Comment: null,
+        Revision: {
+          id: 'title-old',
+          body: 'Old title',
+          createdAt: '2024-01-01T00:00:00.000Z',
+        },
+      }),
+    });
+    expect(wrapper.findAll('[data-testid="revision-diff"]')).toHaveLength(2);
+  });
+
+  it('ignores discussion revisions without a title or body description', () => {
+    const wrapper = mountWrapper({
+      relatedDiscussion: { id: 'd1', title: 'Title', body: 'Body' },
+      activityItem: makeActivityItem({
+        actionType: 'edit',
+        actionDescription: 'edited metadata',
+        Comment: null,
+        Revision: { id: 'old', body: 'Old', createdAt: '2024-01-01T00:00:00Z' },
+      }),
+    });
+    expect(wrapper.find('[data-testid="revision-diff"]').exists()).toBe(false);
+  });
+
+  it('uses the next newer past version for an older comment edit', () => {
+    const wrapper = mountWrapper({
+      activityItem: makeActivityItem({
+        actionType: 'edit',
+        actionDescription: 'edited the comment',
+        Comment: {
+          id: 'comment-1',
+          text: 'Current',
+          CommentAuthor: { displayName: 'mod-bob' },
+          PastVersions: [
+            { id: 'newer', body: 'Newer', createdAt: '2024-01-02T00:00:00Z' },
+            { id: 'older', body: 'Older', createdAt: '2024-01-01T00:00:00Z' },
+          ],
+        },
+      }),
+      commentEditIndex: 1,
+    });
+    expect(
+      wrapper.getComponent({ name: 'RevisionDiffInline' }).props('newVersion')
+    ).toMatchObject({ body: 'Newer', createdAt: '2024-01-02T00:00:00Z' });
+  });
+
+  it('closes the suspend-mod trigger after its modal closes', async () => {
+    const wrapper = mountWrapper();
+    await wrapper.get('[data-testid="Suspend Mod"]').trigger('click');
+    const suspendButtons = wrapper.findAllComponents({
+      name: 'SuspendModButton',
+    });
+    const openCount = suspendButtons.length;
+    await suspendButtons
+      .find((button) => button.props('autoOpen'))!
+      .vm.$emit('modal-closed');
+    expect(
+      wrapper.findAllComponents({ name: 'SuspendModButton' }).length
+    ).toBeLessThan(openCount);
   });
 });
