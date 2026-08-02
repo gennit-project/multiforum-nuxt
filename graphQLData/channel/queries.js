@@ -13,6 +13,29 @@ export const GET_CHANNEL_NAMES = gql`
   }
 `;
 
+export const GET_CHANNEL_DISCUSSION_FLAIR_CONFIG = gql`
+  query getChannelDiscussionFlairConfig(
+    $channelUniqueName: String!
+    $includeArchived: Boolean = false
+  ) {
+    getChannelDiscussionFlairConfig(
+      channelUniqueName: $channelUniqueName
+      includeArchived: $includeArchived
+    ) {
+      channelUniqueName
+      flairRequired
+      flairs {
+        id
+        channelUniqueName
+        displayName
+        color
+        order
+        archived
+      }
+    }
+  }
+`;
+
 export const GET_WIKI_PAGE = gql`
   query getWikiPage($channelUniqueName: String!, $slug: String!) {
     wikiPages(where: { channelUniqueName: $channelUniqueName, slug: $slug }) {

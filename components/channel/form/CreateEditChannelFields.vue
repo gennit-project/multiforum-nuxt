@@ -120,11 +120,20 @@ const CHANNEL_ALREADY_EXISTS_ERROR = 'Constraint validation failed';
 // Tabs whose fields are simple toggles that autosave on change; these hide the
 // shared Save button and show a status indicator instead.
 const AUTOSAVE_TAB_KEYS = ['events', 'images', 'emoji', 'feedback'];
+const SELF_SAVING_TAB_KEYS = ['flairs'];
 const isAutosaveTab = computed(() =>
   AUTOSAVE_TAB_KEYS.some(
     (key) =>
       typeof route.name === 'string' && route.name.includes(`edit-${key}`)
   )
+);
+const hidesSharedSaveButton = computed(
+  () =>
+    isAutosaveTab.value ||
+    SELF_SAVING_TAB_KEYS.some(
+      (key) =>
+        typeof route.name === 'string' && route.name.includes(`edit-${key}`)
+    )
 );
 
 const tabs = computed(() => {
@@ -156,6 +165,13 @@ const tabs = computed(() => {
     label: 'Downloads',
     icon: DownloadIcon,
     fontAwesome: null,
+  });
+
+  baseTabs.push({
+    key: 'flairs',
+    label: 'Post Flairs',
+    icon: null,
+    fontAwesome: 'fa-solid fa-tags',
   });
 
   baseTabs.push({
@@ -377,7 +393,7 @@ const showCreateChannelError = computed(() => {
           :loading="editChannelLoading"
           :needs-changes="titleIsInvalid"
           :show-cancel-button="false"
-          :show-save-button="!isAutosaveTab"
+          :show-save-button="!hidesSharedSaveButton"
           @input="touched = true"
           @submit="emit('submit')"
         >
