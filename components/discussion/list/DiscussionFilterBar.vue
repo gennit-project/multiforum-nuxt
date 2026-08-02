@@ -5,10 +5,10 @@ import FilterChip from '@/components/FilterChip.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import TagIcon from '@/components/icons/TagIcon.vue';
 import SortButtons from '@/components/SortButtons.vue';
-import CollapseIcon from '@/components/icons/CollapseIcon.vue';
+import ListIcon from '@/components/icons/ListIcon.vue';
 import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import type { SearchDiscussionValues } from '@/types/Discussion';
-import ExpandIcon from '@/components/icons/ExpandIcon.vue';
+import ExpandRowsIcon from '@/components/icons/ExpandRowsIcon.vue';
 import FilterIcon from '@/components/icons/FilterIcon.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import SecondaryButton from '@/components/SecondaryButton.vue';
@@ -55,6 +55,21 @@ const props = defineProps({
 const newPostButton = computed(() =>
   props.isForumScoped ? PrimaryButton : SecondaryButton
 );
+
+// The sitewide (SecondaryButton) variant has no border of its own; add one so it
+// matches the bordered filter/search controls. PrimaryButton already has a border.
+const newPostButtonClass = computed(() =>
+  props.isForumScoped ? '' : 'border border-gray-300 dark:border-gray-600'
+);
+
+// Shared styling for the icon toggle buttons (filter, search) so every control in
+// the bar has the same height, text size/weight, and border weight/color.
+const barButtonBase =
+  'flex h-9 items-center gap-1 rounded-md border px-2 text-xs font-medium transition-colors hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:hover:bg-gray-700 dark:hover:text-gray-200';
+const barButtonInactive =
+  'border-gray-300 text-gray-800 dark:border-gray-600 dark:text-gray-300';
+const barButtonActive =
+  'border-gray-500 bg-gray-100 text-gray-900 dark:border-gray-400 dark:bg-gray-800 dark:text-white';
 
 // Use shared filter bar composable
 const {
@@ -186,7 +201,7 @@ const isExpanded = computed(() => {
         <!-- Expand/Collapse Button Group (hidden in download mode) -->
         <div
           v-if="!isDownloadPage"
-          class="flex overflow-hidden rounded-md border border-gray-300 dark:border-gray-600"
+          class="flex h-9 overflow-hidden rounded-md border border-gray-300 dark:border-gray-600"
         >
           <button
             data-testid="expand-all-button"
@@ -194,45 +209,40 @@ const isExpanded = computed(() => {
             :aria-pressed="isExpanded"
             :class="[
               // layout
-              'flex h-9 items-center border-l px-2 transition-colors first:border-none',
-              // base (non‑active) colours
-              !isExpanded
-                ? 'bg-gray-50 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
-                : 'bg-gray-800 text-white dark:bg-gray-700 dark:text-white',
-              // hover shade (one step darker) – always present
-              'hover:bg-gray-700 hover:text-white dark:hover:bg-gray-600 dark:hover:text-white',
+              'flex h-full items-center border-l px-2 transition-colors first:border-none',
+              // selected state gets a light tint; unselected stays low-emphasis
+              isExpanded
+                ? 'bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300'
+                : 'bg-transparent text-gray-400 dark:text-gray-500',
+              // hover
+              'hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200',
             ]"
             title="Expand all discussions"
             @click="expandAll"
           >
-            <ExpandIcon class="h-3.5 w-3.5" />
+            <ExpandRowsIcon class="h-3.5 w-3.5" />
           </button>
           <button
             aria-label="Collapse all discussions"
             :aria-pressed="!isExpanded"
             :class="[
-              'flex h-9 items-center border-l px-2 transition-colors',
-              isExpanded
-                ? 'bg-gray-50 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
-                : 'bg-gray-800 text-white dark:bg-gray-700 dark:text-white',
-              'hover:bg-gray-700 hover:text-white dark:hover:bg-gray-600 dark:hover:text-white',
+              'flex h-full items-center border-l px-2 transition-colors',
+              !isExpanded
+                ? 'bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300'
+                : 'bg-transparent text-gray-400 dark:text-gray-500',
+              'hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200',
             ]"
             title="Collapse all discussions"
             @click="collapseAll"
           >
-            <CollapseIcon class="h-3.5 w-3.5" />
+            <ListIcon class="h-3.5 w-3.5" />
           </button>
         </div>
         <button
           data-testid="discussion-filter-button"
           :aria-label="showFilters ? 'Hide filters' : 'Show filters'"
           :title="showFilters ? 'Hide filters' : 'Show filters'"
-          :class="
-            showFilters
-              ? 'border-gray-500 bg-gray-100 text-gray-900 dark:border-gray-400 dark:bg-gray-800 dark:text-white'
-              : 'border-gray-300 text-gray-800 dark:border-gray-600 dark:text-gray-300'
-          "
-          class="flex h-9 items-center gap-1 rounded-md border px-2 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+          :class="[barButtonBase, showFilters ? barButtonActive : barButtonInactive]"
           @click="
             (event) => {
               event.preventDefault();
@@ -246,12 +256,7 @@ const isExpanded = computed(() => {
           data-testid="discussion-search-button"
           :aria-label="showSearch ? 'Hide search' : 'Show search'"
           :title="showSearch ? 'Hide search' : 'Show search'"
-          :class="
-            showSearch
-              ? 'border-gray-500 bg-gray-100 text-gray-900 dark:border-gray-400 dark:bg-gray-800 dark:text-white'
-              : 'border-gray-300 text-gray-800 dark:border-gray-600 dark:text-gray-300'
-          "
-          class="flex h-9 items-center gap-1 rounded-md border px-2 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+          :class="[barButtonBase, showSearch ? barButtonActive : barButtonInactive]"
           @click="
             (event) => {
               event.preventDefault();
@@ -267,6 +272,8 @@ const isExpanded = computed(() => {
             <template #has-auth>
               <component
                 :is="newPostButton"
+                size="sm"
+                :class="newPostButtonClass"
                 :label="isDownloadPage ? 'New Upload' : 'New Post'"
                 @click="
                   $router.push(
@@ -282,6 +289,8 @@ const isExpanded = computed(() => {
             <template #does-not-have-auth>
               <component
                 :is="newPostButton"
+                size="sm"
+                :class="newPostButtonClass"
                 :label="isDownloadPage ? 'New Upload' : 'New Post'"
               />
             </template>

@@ -353,18 +353,18 @@ const revealSensitiveContent = () => {
                 <button
                   v-if="discussion && (discussion.body || discussion.Album)"
                   type="button"
-                  class="text-xs text-gray-600 hover:underline dark:text-gray-300"
+                  class="inline-flex items-center gap-1 whitespace-nowrap text-xs text-gray-600 hover:underline dark:text-gray-300"
                   :aria-expanded="isExpanded"
                   @click="isExpanded = !isExpanded"
                 >
                   <ExpandIcon
                     v-if="!isExpanded"
-                    class="mr-1 h-3 w-3"
+                    class="h-3 w-3"
                     aria-hidden="true"
                   />
                   <XmarkIcon
                     v-else
-                    class="mr-1 h-3 w-3"
+                    class="h-3 w-3"
                     aria-hidden="true"
                   />
                   {{ isExpanded ? 'Collapse' : 'Expand' }}

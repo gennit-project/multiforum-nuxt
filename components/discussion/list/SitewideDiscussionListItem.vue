@@ -384,7 +384,7 @@ const revealSensitiveContent = () => {
               <span aria-hidden="true">•</span>
               <button
                 type="button"
-                class="flex items-center gap-1 hover:underline"
+                class="inline-flex items-center gap-1 whitespace-nowrap hover:underline"
                 :aria-expanded="isExpanded"
                 @click="isExpanded = !isExpanded"
               >

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { computed } from 'vue';
+import type { PropType } from 'vue';
 
 const props = defineProps({
   disabled: {
@@ -20,7 +21,17 @@ const props = defineProps({
     type: String,
     default: 'orange',
   },
+  // 'md' is the default button size; 'sm' matches compact toolbar controls
+  // (fixed h-9 height, smaller text) so it lines up with filter-bar buttons.
+  size: {
+    type: String as PropType<'md' | 'sm'>,
+    default: 'md',
+  },
 });
+
+const sizeClasses = computed(() =>
+  props.size === 'sm' ? 'h-9 px-4 text-xs' : 'px-4 py-2 text-sm'
+);
 
 const colorClasses = computed(() => {
   if (props.disabled) {
@@ -48,7 +59,8 @@ const colorClasses = computed(() => {
     :disabled="disabled"
     :class="[
       colorClasses,
-      'max-height-4 inline-flex items-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100',
+      sizeClasses,
+      'max-height-4 inline-flex items-center whitespace-nowrap rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100',
     ]"
   >
     <LoadingSpinner v-if="loading" class="mx-2" /><slot />{{ label }}
