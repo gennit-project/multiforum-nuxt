@@ -1,5 +1,30 @@
 import { gql } from '@apollo/client/core';
 
+export const SET_CHANNEL_DISCUSSION_FLAIR_CONFIG = gql`
+  mutation setChannelDiscussionFlairConfig(
+    $channelUniqueName: String!
+    $flairRequired: Boolean!
+    $flairs: [DiscussionFlairConfigInput!]!
+  ) {
+    setChannelDiscussionFlairConfig(
+      channelUniqueName: $channelUniqueName
+      flairRequired: $flairRequired
+      flairs: $flairs
+    ) {
+      channelUniqueName
+      flairRequired
+      flairs {
+        id
+        channelUniqueName
+        displayName
+        color
+        order
+        archived
+      }
+    }
+  }
+`;
+
 export const CREATE_CHANNEL = gql`
   mutation createChannel($createChannelInput: [ChannelCreateInput!]!) {
     createChannels(input: $createChannelInput) {
