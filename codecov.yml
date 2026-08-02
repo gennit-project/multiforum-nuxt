@@ -6,9 +6,10 @@ coverage:
     # Overall project coverage check
     project:
       default:
-        # Don't fail the check based on absolute coverage
-        # Just report the coverage level
-        informational: true
+        # Keep combined unit + E2E coverage at or above the project floor.
+        target: 90%
+        threshold: 0%
+        informational: false
     # Per-PR coverage change check
     patch:
       default:
