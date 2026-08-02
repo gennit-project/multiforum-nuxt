@@ -11,7 +11,8 @@ const PermalinkedStub = defineComponent({
   name: 'PermalinkedComment',
   props: ['commentId'],
   setup(_props, { slots }) {
-    return () => h('div', slots.comment?.({ commentData: { id: 'comment-1' } }));
+    return () =>
+      h('div', slots.comment?.({ commentData: { id: 'comment-1' } }));
   },
 });
 
@@ -39,5 +40,26 @@ describe('event comment permalink page', () => {
   it('disables feedback for event comments', async () => {
     const wrapper = await mountPage();
     expect(wrapper.findComponent(Comment).props('enableFeedback')).toBe(false);
+  });
+
+  it.each([
+    'startCommentSave',
+    'openReplyEditor',
+    'hideReplyEditor',
+    'openEditCommentEditor',
+    'hideEditCommentEditor',
+    'clickEditComment',
+    'deleteComment',
+    'createComment',
+    'updateCreateReplyCommentInput',
+    'updateEditCommentInput',
+    'saveEdit',
+    'scrollToTop',
+    'clickReport',
+  ])('forwards the %s event', async (eventName) => {
+    const wrapper = await mountPage();
+    wrapper.findComponent(Comment).vm.$emit(eventName, 'payload');
+
+    expect(wrapper.emitted(eventName)?.[0]).toEqual(['payload']);
   });
 });

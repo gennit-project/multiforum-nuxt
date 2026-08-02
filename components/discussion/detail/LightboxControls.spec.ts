@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, it, expect, vi } from 'vitest';
+import { flushPromises } from '@vue/test-utils';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
 import LightboxControls from '@/components/discussion/detail/LightboxControls.vue';
@@ -20,6 +21,11 @@ const mountControls = (props: Record<string, unknown> = {}) =>
     global: { stubs: { AddImageToFavorites: true } },
   });
 
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
 
 describe('LightboxControls', () => {
   it.each([
@@ -61,5 +67,62 @@ describe('LightboxControls', () => {
   it('hides the report button when there is no image id', () => {
     const wrapper = mountControls({ currentImageId: '' });
     expect(wrapper.find('[aria-label="Report image"]').exists()).toBe(false);
+  });
+
+  it('downloads the current image and releases its blob URL', async () => {
+    vi.useFakeTimers();
+    const blob = new Blob(['image']);
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ blob: () => Promise.resolve(blob) });
+    const createObjectURL = vi.fn().mockReturnValue('blob:test-image');
+    const revokeObjectURL = vi.fn();
+    const click = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => {});
+    vi.stubGlobal('fetch', fetchMock);
+    Object.defineProperty(URL, 'createObjectURL', {
+      configurable: true,
+      value: createObjectURL,
+    });
+    Object.defineProperty(URL, 'revokeObjectURL', {
+      configurable: true,
+      value: revokeObjectURL,
+    });
+    const wrapper = mountControls({
+      currentImageUrl: 'https://example.com/files/cat.png',
+    });
+
+    await wrapper.get('[aria-label="Download image"]').trigger('click');
+    await flushPromises();
+    vi.advanceTimersByTime(100);
+
+    expect({
+      requestedUrl: fetchMock.mock.calls[0],
+      createdFrom: createObjectURL.mock.calls[0],
+      releasedUrl: revokeObjectURL.mock.calls[0],
+      clickCount: click.mock.calls.length,
+      remainingLinks: document.body.querySelectorAll('a[download]').length,
+    }).toEqual({
+      requestedUrl: ['https://example.com/files/cat.png'],
+      createdFrom: [blob],
+      releasedUrl: ['blob:test-image'],
+      clickCount: 1,
+      remainingLinks: 0,
+    });
+  });
+
+  it('reports download failures without leaving a link behind', async () => {
+    const failure = new Error('network unavailable');
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(failure));
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    const wrapper = mountControls();
+
+    await wrapper.get('[aria-label="Download image"]').trigger('click');
+    await flushPromises();
+
+    expect(consoleError).toHaveBeenCalledWith('Download failed:', failure);
   });
 });

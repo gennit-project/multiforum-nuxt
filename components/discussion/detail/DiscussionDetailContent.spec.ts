@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { ref } from 'vue';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import {
   asMock,
@@ -12,12 +13,25 @@ import { useQuery } from '@vue/apollo-composable';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
 
 vi.mock('@vue/apollo-composable', () => ({ useQuery: vi.fn() }));
-vi.mock('nuxt/app', () => ({ useRoute: vi.fn(() => ({ params: {}, query: {} })) }));
-vi.mock('@/composables/useAuthState', () => ({
-  useIsAuthenticated: () => ({ value: false }),
-  useModProfileName: () => ({ value: '' }),
-  useUsername: () => ({ value: '' }),
+vi.mock('nuxt/app', () => ({
+  useRoute: vi.fn(() => ({ params: {}, query: {} })),
 }));
+const auth = vi.hoisted(() => ({
+  isAuthenticated: null as unknown as ReturnType<typeof ref<boolean>>,
+  modProfileName: null as unknown as ReturnType<typeof ref<string>>,
+  username: null as unknown as ReturnType<typeof ref<string>>,
+}));
+vi.mock('@/composables/useAuthState', async () => {
+  const { ref: vref } = await import('vue');
+  auth.isAuthenticated = vref(false);
+  auth.modProfileName = vref('');
+  auth.username = vref('');
+  return {
+    useIsAuthenticated: () => auth.isAuthenticated,
+    useModProfileName: () => auth.modProfileName,
+    useUsername: () => auth.username,
+  };
+});
 vi.mock('@/composables/useForumRoleMembership', () => ({
   provideForumRoleMembership: vi.fn(),
 }));
@@ -52,8 +66,14 @@ const stubs = {
   DiscussionCommentsWrapper: DiscussionCommentsWrapperStub,
   DiscussionChannelLinks: { template: '<div />' },
   PageNotFound: { template: '<div class="page-not-found-stub" />' },
-  InfoBanner: { props: ['text'], template: '<div class="info-banner-stub">{{ text }}</div>' },
-  ErrorBanner: { props: ['text'], template: '<div class="error-banner-stub">{{ text }}</div>' },
+  InfoBanner: {
+    props: ['text'],
+    template: '<div class="info-banner-stub">{{ text }}</div>',
+  },
+  ErrorBanner: {
+    props: ['text'],
+    template: '<div class="error-banner-stub">{{ text }}</div>',
+  },
   DiscussionBodyEditForm: {
     name: 'DiscussionBodyEditForm',
     emits: ['close-editor'],
@@ -64,7 +84,9 @@ const stubs = {
     emits: ['close-editor'],
     template: '<div class="album-edit-stub" />',
   },
-  ArchivedDiscussionInfoBanner: { template: '<div class="archived-banner-stub" />' },
+  ArchivedDiscussionInfoBanner: {
+    template: '<div class="archived-banner-stub" />',
+  },
   DiscussionLayoutManager: {
     name: 'DiscussionLayoutManager',
     emits: [
@@ -126,14 +148,16 @@ const commentSection = (comments: Comment[]) => ({
   },
 });
 
-const setup = (params: {
-  discussions?: Discussion[];
-  comments?: Comment[];
-  hasCommentSection?: boolean;
-  discussionChannelOverrides?: Record<string, unknown>;
-  issueResult?: Record<string, unknown>;
-  commentIssueResult?: Record<string, unknown>;
-} = {}) => {
+const setup = (
+  params: {
+    discussions?: Discussion[];
+    comments?: Comment[];
+    hasCommentSection?: boolean;
+    discussionChannelOverrides?: Record<string, unknown>;
+    issueResult?: Record<string, unknown>;
+    commentIssueResult?: Record<string, unknown>;
+  } = {}
+) => {
   const {
     discussions = [makeDiscussion()],
     comments = [],
@@ -159,7 +183,9 @@ const setup = (params: {
       onResult: (cb: (r: unknown) => void) => cb({ data: csData }),
     }),
     fetchMore: vi.fn(),
-  } as ReturnType<typeof createQueryMock> & { fetchMore: ReturnType<typeof vi.fn> };
+  } as ReturnType<typeof createQueryMock> & {
+    fetchMore: ReturnType<typeof vi.fn>;
+  };
   const commentAggregateQuery = createQueryMock({
     discussionChannels: [{ CommentsAggregate: { count: comments.length } }],
   });
@@ -199,6 +225,9 @@ describe('DiscussionDetailContent', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     asMock(useQuery).mockReset();
+    auth.isAuthenticated.value = false;
+    auth.modProfileName.value = '';
+    auth.username.value = '';
   });
 
   it('renders the discussion header for a loaded discussion', () => {
@@ -217,7 +246,9 @@ describe('DiscussionDetailContent', () => {
   });
 
   it('passes the comment-section comments through in order', () => {
-    const { wrapper } = setup({ comments: [makeComment('a'), makeComment('b')] });
+    const { wrapper } = setup({
+      comments: [makeComment('a'), makeComment('b')],
+    });
     const passed = wrapper
       .findComponent(DiscussionCommentsWrapperStub)
       .props('comments') as Comment[];
@@ -227,20 +258,28 @@ describe('DiscussionDetailContent', () => {
   it('enters and exits discussion body edit mode from child events', async () => {
     const { wrapper } = setup();
 
-    await wrapper.findComponent({ name: 'DiscussionHeader' }).vm.$emit('handle-click-edit-body');
+    await wrapper
+      .findComponent({ name: 'DiscussionHeader' })
+      .vm.$emit('handle-click-edit-body');
     expect(wrapper.find('.body-edit-stub').exists()).toBe(true);
 
-    await wrapper.findComponent({ name: 'DiscussionBodyEditForm' }).vm.$emit('close-editor');
+    await wrapper
+      .findComponent({ name: 'DiscussionBodyEditForm' })
+      .vm.$emit('close-editor');
     expect(wrapper.find('.body-edit-stub').exists()).toBe(false);
   });
 
   it('enters and exits album edit mode when image uploads are enabled', async () => {
     const { wrapper } = setup();
 
-    await wrapper.findComponent({ name: 'DiscussionHeader' }).vm.$emit('handle-click-add-album');
+    await wrapper
+      .findComponent({ name: 'DiscussionHeader' })
+      .vm.$emit('handle-click-add-album');
     expect(wrapper.find('.album-edit-stub').exists()).toBe(true);
 
-    await wrapper.findComponent({ name: 'AlbumEditForm' }).vm.$emit('close-editor');
+    await wrapper
+      .findComponent({ name: 'AlbumEditForm' })
+      .vm.$emit('close-editor');
     expect(wrapper.find('.album-edit-stub').exists()).toBe(false);
   });
 
@@ -251,7 +290,9 @@ describe('DiscussionDetailContent', () => {
       },
     });
 
-    await wrapper.findComponent({ name: 'DiscussionHeader' }).vm.$emit('handle-click-add-album');
+    await wrapper
+      .findComponent({ name: 'DiscussionHeader' })
+      .vm.$emit('handle-click-add-album');
 
     expect(wrapper.find('.album-edit-stub').exists()).toBe(false);
   });
@@ -288,7 +329,9 @@ describe('DiscussionDetailContent', () => {
       comments: [makeComment('a'), makeComment('b')],
     });
 
-    await wrapper.findComponent(DiscussionCommentsWrapperStub).vm.$emit('load-more');
+    await wrapper
+      .findComponent(DiscussionCommentsWrapperStub)
+      .vm.$emit('load-more');
 
     expect(commentSectionQuery.fetchMore).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -316,7 +359,9 @@ describe('DiscussionDetailContent', () => {
 
     await layout.vm.$emit('discussion-refetch');
     await layout.vm.$emit('discussion-channel-refetch');
-    await wrapper.findComponent({ name: 'FeedbackModalManager' }).vm.$emit('feedback-submitted');
+    await wrapper
+      .findComponent({ name: 'FeedbackModalManager' })
+      .vm.$emit('feedback-submitted');
 
     expect({
       discussionRefetches: discussionQuery.refetch.mock.calls.length,
@@ -332,19 +377,24 @@ describe('DiscussionDetailContent', () => {
       ['handle-click-give-feedback', 'handleClickGiveFeedback'],
       ['handle-click-undo-feedback', 'handleClickUndoFeedback'],
       ['handle-click-edit-feedback', 'handleClickEditFeedback'],
-    ] as const)('forwards %s to the feedback modal manager', async (event, method) => {
-      const { wrapper } = setup();
-      await wrapper
-        .findComponent({ name: 'DiscussionLayoutManager' })
-        .vm.$emit(event);
+    ] as const)(
+      'forwards %s to the feedback modal manager',
+      async (event, method) => {
+        const { wrapper } = setup();
+        await wrapper
+          .findComponent({ name: 'DiscussionLayoutManager' })
+          .vm.$emit(event);
 
-      expect(feedbackManagerSpies[method]).toHaveBeenCalled();
-    });
+        expect(feedbackManagerSpies[method]).toHaveBeenCalled();
+      }
+    );
   });
 
   it('enters album edit mode from the layout edit-album event', async () => {
     const { wrapper } = setup();
-    await wrapper.findComponent({ name: 'DiscussionLayoutManager' }).vm.$emit('edit-album');
+    await wrapper
+      .findComponent({ name: 'DiscussionLayoutManager' })
+      .vm.$emit('edit-album');
 
     expect(wrapper.find('.album-edit-stub').exists()).toBe(true);
   });
@@ -353,7 +403,9 @@ describe('DiscussionDetailContent', () => {
     const { wrapper } = setup({
       discussionChannelOverrides: { Channel: { imageUploadsEnabled: false } },
     });
-    await wrapper.findComponent({ name: 'DiscussionLayoutManager' }).vm.$emit('edit-album');
+    await wrapper
+      .findComponent({ name: 'DiscussionLayoutManager' })
+      .vm.$emit('edit-album');
 
     expect(wrapper.find('.album-edit-stub').exists()).toBe(false);
   });
@@ -362,23 +414,32 @@ describe('DiscussionDetailContent', () => {
     const { wrapper, commentSectionQuery } = setup({
       comments: [makeComment('a')],
     });
-    await wrapper.findComponent(DiscussionCommentsWrapperStub).vm.$emit('load-more');
+    await wrapper
+      .findComponent(DiscussionCommentsWrapperStub)
+      .vm.$emit('load-more');
 
     const { updateQuery } = commentSectionQuery.fetchMore.mock.calls[0]![0];
     const merged = updateQuery(
       { getCommentSection: { Comments: [makeComment('a')] } },
-      { fetchMoreResult: { getCommentSection: { Comments: [makeComment('b')] } } }
+      {
+        fetchMoreResult: {
+          getCommentSection: { Comments: [makeComment('b')] },
+        },
+      }
     );
 
-    expect(merged.getCommentSection.Comments.map((c: Comment) => c.id)).toEqual([
-      'a',
-      'b',
-    ]);
+    expect(merged.getCommentSection.Comments.map((c: Comment) => c.id)).toEqual(
+      ['a', 'b']
+    );
   });
 
   it('returns the previous result when loadMore has no more comments', async () => {
-    const { wrapper, commentSectionQuery } = setup({ comments: [makeComment('a')] });
-    await wrapper.findComponent(DiscussionCommentsWrapperStub).vm.$emit('load-more');
+    const { wrapper, commentSectionQuery } = setup({
+      comments: [makeComment('a')],
+    });
+    await wrapper
+      .findComponent(DiscussionCommentsWrapperStub)
+      .vm.$emit('load-more');
 
     const { updateQuery } = commentSectionQuery.fetchMore.mock.calls[0]![0];
     const previous = { getCommentSection: { Comments: [makeComment('a')] } };
@@ -397,7 +458,9 @@ describe('DiscussionDetailContent', () => {
     });
 
     expect(
-      wrapper.findComponent({ name: 'DiscussionHeader' }).props('relatedIssueLink')
+      wrapper
+        .findComponent({ name: 'DiscussionHeader' })
+        .props('relatedIssueLink')
     ).toEqual({
       name: 'forums-forumId-issues-issueNumber',
       params: { forumId: 'cats', issueNumber: 7 },
@@ -408,7 +471,41 @@ describe('DiscussionDetailContent', () => {
     const { wrapper } = setup();
 
     expect(
-      wrapper.findComponent({ name: 'DiscussionHeader' }).props('relatedIssueLink')
+      wrapper
+        .findComponent({ name: 'DiscussionHeader' })
+        .props('relatedIssueLink')
     ).toBeNull();
+  });
+
+  it('refetches both discussion queries when a username becomes available', async () => {
+    const { wrapper, discussionQuery, commentSectionQuery } = setup();
+    auth.username.value = 'alice';
+    await wrapper.vm.$nextTick();
+    expect([
+      discussionQuery.refetch.mock.calls.length,
+      commentSectionQuery.refetch.mock.calls.length,
+    ]).toEqual([1, 1]);
+  });
+
+  it('refetches the discussion when authentication becomes active', async () => {
+    const { wrapper, discussionQuery } = setup();
+    auth.isAuthenticated.value = true;
+    await wrapper.vm.$nextTick();
+    expect(discussionQuery.refetch).toHaveBeenCalledOnce();
+  });
+
+  it('refetches on mount for an already authenticated user', () => {
+    auth.isAuthenticated.value = true;
+    const { discussionQuery, commentSectionQuery } = setup();
+    expect([
+      discussionQuery.refetch.mock.calls.length,
+      commentSectionQuery.refetch.mock.calls.length,
+    ]).toEqual([1, 1]);
+  });
+
+  it('clears cached comment-section state when the discussion ID changes', async () => {
+    const { wrapper } = setup({ comments: [makeComment('a')] });
+    await wrapper.setProps({ discussionId: 'd2' });
+    expect(wrapper.props('discussionId')).toBe('d2');
   });
 });

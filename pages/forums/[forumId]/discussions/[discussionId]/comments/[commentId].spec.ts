@@ -11,7 +11,8 @@ const PermalinkedStub = defineComponent({
   name: 'PermalinkedComment',
   props: ['commentId'],
   setup(_props, { slots }) {
-    return () => h('div', slots.comment?.({ commentData: { id: 'comment-1' } }));
+    return () =>
+      h('div', slots.comment?.({ commentData: { id: 'comment-1' } }));
   },
 });
 
@@ -48,5 +49,38 @@ describe('discussion comment permalink page', () => {
   it('forwards the enableFeedback prop to the comment', async () => {
     const wrapper = await mountPage({ ...baseProps, enableFeedback: true });
     expect(wrapper.findComponent(Comment).props('enableFeedback')).toBe(true);
+  });
+
+  it.each([
+    'startCommentSave',
+    'openReplyEditor',
+    'hideReplyEditor',
+    'openEditCommentEditor',
+    'hideEditCommentEditor',
+    'clickEditComment',
+    'deleteComment',
+    'createComment',
+    'updateCreateReplyCommentInput',
+    'updateEditCommentInput',
+    'saveEdit',
+    'clickReport',
+    'clickFeedback',
+    'clickUndoFeedback',
+    'clickEditFeedback',
+    'updateFeedback',
+    'handleViewFeedback',
+    'showCopiedLinkNotification',
+  ])('forwards the %s event', async (eventName) => {
+    const wrapper = await mountPage(baseProps);
+    wrapper.findComponent(Comment).vm.$emit(eventName, 'payload');
+
+    expect(wrapper.emitted(eventName)?.[0]).toEqual(['payload']);
+  });
+
+  it('forwards scrollToTop without adding a payload', async () => {
+    const wrapper = await mountPage(baseProps);
+    wrapper.findComponent(Comment).vm.$emit('scrollToTop', 'ignored');
+
+    expect(wrapper.emitted('scrollToTop')?.[0]).toEqual([]);
   });
 });

@@ -1,14 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount, mount } from '@vue/test-utils';
-import { ref, defineComponent, h } from 'vue';
+import { ref, defineComponent, h, reactive } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 
-const routeQuery: Record<string, unknown> = {};
+const routeQuery: Record<string, unknown> = reactive({});
 const mockRouterPush = vi.fn();
+const mockRouterReplace = vi.fn();
+let fetchMore = vi.fn();
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({ query: routeQuery }),
-  useRouter: () => ({ push: mockRouterPush, resolve: (r: unknown) => r }),
+  useRouter: () => ({
+    push: mockRouterPush,
+    replace: mockRouterReplace,
+    resolve: (r: unknown) => r,
+  }),
   useHead: vi.fn(),
 }));
 
@@ -28,6 +34,8 @@ const mountWith = async (opts: {
   searchInput?: string;
   comments?: unknown[];
   count?: number;
+  loading?: boolean;
+  error?: Error | null;
 }) => {
   routeQuery.searchInput = opts.searchInput;
   mockedUseQuery.mockReturnValue({
@@ -35,18 +43,46 @@ const mountWith = async (opts: {
       comments: opts.comments ?? [],
       commentsAggregate: { count: opts.count ?? 0 },
     }),
-    loading: ref(false),
-    error: ref(null),
-    fetchMore: vi.fn(),
+    loading: ref(opts.loading ?? false),
+    error: ref(opts.error ?? null),
+    fetchMore,
   });
   const Page = (await import('./search.vue')).default;
   return shallowMount(Page, {
-    global: { stubs: { NuxtLayout: NuxtLayoutStub } },
+    global: {
+      stubs: {
+        NuxtLayout: NuxtLayoutStub,
+        SearchBar: {
+          name: 'SearchBar',
+          emits: ['update-search-input'],
+          template: '<div />',
+        },
+        FilterChip: {
+          name: 'FilterChip',
+          template: '<div><slot name="content" /></div>',
+        },
+        SearchableForumList: {
+          name: 'SearchableForumList',
+          emits: ['toggle-selection'],
+          template: '<div />',
+        },
+        LoadMore: {
+          name: 'LoadMore',
+          emits: ['load-more'],
+          template: '<div />',
+        },
+      },
+    },
   });
 };
 
 beforeEach(() => {
   mockRouterPush.mockClear();
+  mockRouterReplace.mockClear();
+  fetchMore = vi.fn();
+  for (const key of Object.keys(routeQuery)) {
+    Reflect.deleteProperty(routeQuery, key);
+  }
 });
 
 describe('comment search page', () => {
@@ -71,6 +107,69 @@ describe('comment search page', () => {
       count: 0,
     });
     expect(wrapper.text()).toContain('No comments match your search.');
+  });
+
+  it('shows loading and error query states', async () => {
+    const loading = await mountWith({ searchInput: 'hello', loading: true });
+    const error = await mountWith({
+      searchInput: 'hello',
+      error: new Error('search failed'),
+    });
+    expect({ loading: loading.text(), error: error.text() }).toEqual({
+      loading: expect.stringContaining('Searching...'),
+      error: expect.stringContaining('search failed'),
+    });
+  });
+
+  it('updates search and channel filters from their controls', async () => {
+    const wrapper = await mountWith({ searchInput: 'hello' });
+    await wrapper
+      .findComponent({ name: 'SearchBar' })
+      .vm.$emit('update-search-input', 'updated');
+    await wrapper
+      .findComponent({ name: 'SearchableForumList' })
+      .vm.$emit('toggle-selection', 'cats');
+    expect(mockRouterReplace.mock.calls.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('adds and removes a selected forum filter', async () => {
+    routeQuery.channels = ['cats'];
+    const wrapper = await mountWith({ searchInput: 'hello' });
+    const forums = wrapper.findComponent({ name: 'SearchableForumList' });
+    await forums.vm.$emit('toggle-selection', 'cats');
+    await forums.vm.$emit('toggle-selection', 'dogs');
+    expect(mockRouterReplace).toHaveBeenCalled();
+  });
+
+  it('loads and merges the next page of comments', async () => {
+    const wrapper = await mountWith({
+      searchInput: 'hello',
+      comments: [{ id: 'c1' }],
+      count: 2,
+    });
+    await wrapper.findComponent({ name: 'LoadMore' }).vm.$emit('load-more');
+    const options = fetchMore.mock.calls[0][0];
+    expect(
+      options.updateQuery(
+        { comments: [{ id: 'c1' }] },
+        { fetchMoreResult: { comments: [{ id: 'c2' }] } }
+      ).comments
+    ).toEqual([{ id: 'c1' }, { id: 'c2' }]);
+  });
+
+  it('keeps the current page when loading more returns no result', async () => {
+    const previous = { comments: [{ id: 'c1' }] };
+    const wrapper = await mountWith({
+      searchInput: 'hello',
+      comments: previous.comments,
+      count: 2,
+    });
+    await wrapper.findComponent({ name: 'LoadMore' }).vm.$emit('load-more');
+    expect(
+      fetchMore.mock.calls[0][0].updateQuery(previous, {
+        fetchMoreResult: null,
+      })
+    ).toBe(previous);
   });
 });
 
@@ -97,7 +196,9 @@ describe('comment search result navigation', () => {
   };
 
   const RouterLinkStub = { props: ['to'], template: '<a><slot /></a>' };
-  const passthrough = (tag = 'div') => ({ template: `<${tag}><slot /></${tag}>` });
+  const passthrough = (tag = 'div') => ({
+    template: `<${tag}><slot /></${tag}>`,
+  });
 
   const mountResults = async () => {
     routeQuery.searchInput = 'matching';
@@ -177,4 +278,13 @@ describe('comment search result navigation', () => {
 
     expect(mockRouterPush).not.toHaveBeenCalled();
   });
+
+  it.each(['enter', 'space'])(
+    'opens the result with the %s key',
+    async (key) => {
+      const wrapper = await mountResults();
+      await wrapper.get('[role="link"]').trigger(`keydown.${key}`);
+      expect(mockRouterPush).toHaveBeenCalled();
+    }
+  );
 });

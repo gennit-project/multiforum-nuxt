@@ -8,9 +8,11 @@ import {
 } from '@/graphQLData/discussion/mutations';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 
+const routeHarness = vi.hoisted(() => ({ routerPush: vi.fn() }));
+
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({ params: { forumId: 'cats', discussionId: 'd1' } }),
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: routeHarness.routerPush }),
   useHead: vi.fn(),
 }));
 
@@ -24,7 +26,7 @@ vi.mock('@vue/apollo-composable', async () => {
   const { ref: r } = await import('vue');
   return {
     useQuery: vi.fn(),
-    useMutation: (doc: unknown) => {
+    useMutation: (doc: unknown, options?: unknown) => {
       if (!mutationTrackers.has(doc)) {
         const tracker: Record<string, unknown> = {
           mutate: vi.fn(),
@@ -32,6 +34,7 @@ vi.mock('@vue/apollo-composable', async () => {
           error: r(null),
           onError: vi.fn(),
           onDoneCb: null,
+          options,
         };
         tracker.onDone = (cb: () => void) => {
           tracker.onDoneCb = cb;
@@ -96,7 +99,9 @@ const populatedDiscussion = () => ({
 // Captures the onResult callback the page registers, so we can fire it.
 let capturedOnResult: ((value: unknown) => void) | null = null;
 
-const setupQueries = (discussion: Record<string, unknown> = emptyDiscussion()) => {
+const setupQueries = (
+  discussion: Record<string, unknown> = emptyDiscussion()
+) => {
   capturedOnResult = null;
   mockedUseQuery
     .mockReturnValueOnce({
@@ -129,6 +134,7 @@ describe('download edit page', () => {
   beforeEach(() => {
     mutationTrackers.clear();
     mockedUseQuery.mockReset();
+    routeHarness.routerPush.mockReset();
   });
 
   it('renders the download edit form for authorized users', async () => {
@@ -151,9 +157,7 @@ describe('download edit page', () => {
   it('updates labels after the discussion update succeeds', async () => {
     const wrapper = await loadPage(RequireAuthStub);
 
-    await wrapper
-      .findComponent(CreateEditDiscussionFields)
-      .vm.$emit('submit');
+    await wrapper.findComponent(CreateEditDiscussionFields).vm.$emit('submit');
 
     const discussionUpdate = mutationTrackers.get(
       UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS
@@ -213,10 +217,111 @@ describe('download edit page', () => {
       .vm.$emit('update-form-values', { title: 'Renamed download' });
     expect(
       (
-        wrapper.findComponent(CreateEditDiscussionFields).props('formValues') as {
+        wrapper
+          .findComponent(CreateEditDiscussionFields)
+          .props('formValues') as {
           title: string;
         }
       ).title
     ).toBe('Renamed download');
+  });
+
+  it('builds update variables for changed tags, channels, and album data', async () => {
+    const discussion = populatedDiscussion();
+    discussion.Album = { ...discussion.Album, id: 'album-1' };
+    const wrapper = await loadPage(RequireAuthStub, discussion);
+    await wrapper
+      .findComponent(CreateEditDiscussionFields)
+      .vm.$emit('update-form-values', {
+        selectedTags: ['new-tag'],
+        selectedChannels: ['dogs'],
+      });
+    const tracker = mutationTrackers.get(
+      UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS
+    ) as {
+      options: () => { variables: Record<string, unknown> };
+    };
+    expect(tracker.options().variables).toMatchObject({
+      where: { id: 'd1' },
+      channelConnections: ['dogs'],
+      channelDisconnections: ['cats'],
+      updateDiscussionInput: {
+        title: 'Cool model',
+        Tags: [
+          {
+            connectOrCreate: [
+              {
+                onCreate: { node: { text: 'new-tag' } },
+                where: { node: { text: 'new-tag' } },
+              },
+            ],
+            disconnect: [
+              { where: { node: { text: 'art' } } },
+              { where: { node: { text: '3d' } } },
+            ],
+          },
+        ],
+      },
+    });
+  });
+
+  it('builds label update variables from the channel filter groups', async () => {
+    setupQueries(populatedDiscussion());
+    mockedUseQuery.mockReset();
+    capturedOnResult = null;
+    mockedUseQuery
+      .mockReturnValueOnce({
+        result: ref({ discussions: [populatedDiscussion()] }),
+        onResult: (cb: (value: unknown) => void) => {
+          capturedOnResult = cb;
+        },
+        loading: ref(false),
+        error: ref(null),
+      })
+      .mockReturnValueOnce({
+        result: ref({
+          channels: [
+            {
+              FilterGroups: [
+                { key: 'type', options: [{ id: 'pdf-id', value: 'pdf' }] },
+              ],
+            },
+          ],
+        }),
+        loading: ref(false),
+        error: ref(null),
+      });
+    const Page = (await import('./[discussionId].vue')).default;
+    shallowMount(Page, { global: { stubs: { RequireAuth: RequireAuthStub } } });
+    const tracker = mutationTrackers.get(UPDATE_DOWNLOAD_LABELS) as {
+      options: () => { variables: Record<string, unknown> };
+    };
+    expect(tracker.options().variables).toEqual({
+      channelUniqueName: 'cats',
+      discussionId: 'd1',
+      labelOptionIds: ['pdf-id'],
+    });
+  });
+
+  it('navigates back to the download when editing is cancelled', async () => {
+    const wrapper = await loadPage(RequireAuthStub, populatedDiscussion());
+    await wrapper.findComponent(CreateEditDiscussionFields).vm.$emit('cancel');
+    expect(routeHarness.routerPush).toHaveBeenCalledWith({
+      name: 'forums-forumId-downloads-discussionId',
+      params: { forumId: 'cats', discussionId: 'd1' },
+    });
+  });
+
+  it('still redirects when the chained label update fails', async () => {
+    await loadPage(RequireAuthStub, populatedDiscussion());
+    const discussionUpdate = mutationTrackers.get(
+      UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS
+    ) as { onDoneCb: () => Promise<void> };
+    const labelUpdate = mutationTrackers.get(UPDATE_DOWNLOAD_LABELS) as {
+      mutate: ReturnType<typeof vi.fn>;
+    };
+    labelUpdate.mutate.mockRejectedValueOnce(new Error('labels unavailable'));
+    await discussionUpdate.onDoneCb();
+    expect(routeHarness.routerPush).toHaveBeenCalledOnce();
   });
 });

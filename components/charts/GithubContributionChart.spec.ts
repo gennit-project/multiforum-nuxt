@@ -211,9 +211,51 @@ describe('GithubContributionChart', () => {
 
     await wrapper.find('rect').trigger('keydown', { key: 'ArrowRight' });
 
-    expect(
-      wrapper.find('#contribution-cell-1-0').attributes('tabindex')
-    ).toBe('0');
+    expect(wrapper.find('#contribution-cell-1-0').attributes('tabindex')).toBe(
+      '0'
+    );
+  });
+
+  it('supports the remaining keyboard navigation commands', async () => {
+    const wrapper = mount(GithubContributionChart, {
+      props: { contributionData: contributionDataFixture, year: 2023 },
+    });
+    await flushPromises();
+    const cell = wrapper.find('rect');
+    for (const key of [
+      'ArrowLeft',
+      'ArrowDown',
+      'ArrowUp',
+      'Home',
+      'End',
+      ' ',
+    ]) {
+      await cell.trigger('keydown', { key });
+    }
+    expect(wrapper.emitted('day-select')).toBeTruthy();
+  });
+
+  it('emits the year selected in the dropdown', async () => {
+    const wrapper = mount(GithubContributionChart, {
+      props: {
+        contributionData: contributionDataFixture,
+        year: 2023,
+        minYear: 2022,
+        maxYear: 2024,
+      },
+    });
+    await wrapper.get('#year-select').setValue('2024');
+    expect(wrapper.emitted('year-select')).toEqual([[2024]]);
+  });
+
+  it('updates the roving tab stop when a cell receives focus', async () => {
+    const wrapper = mount(GithubContributionChart, {
+      props: { contributionData: contributionDataFixture, year: 2023 },
+    });
+    await flushPromises();
+    const cell = wrapper.find('#contribution-cell-1-0');
+    await cell.trigger('focus');
+    expect(cell.attributes('tabindex')).toBe('0');
   });
 
   // Test color scheme based on contribution count
@@ -360,6 +402,23 @@ describe('GithubContributionChart', () => {
     expect(targets).toContain(
       '/forums/cats/wiki/revisions/diff/cat-care/selected-we1'
     );
+  });
+
+  it('omits links for wiki edits without page routing data', async () => {
+    const invalidWikiData = structuredClone(wikiEditsContributionData);
+    invalidWikiData[0].activities[0].WikiEdits![0].WikiPage = undefined;
+    const wrapper = mount(GithubContributionChart, {
+      props: { contributionData: invalidWikiData, year: 2023 },
+      global: { stubs: { NuxtLink: NuxtLinkStub } },
+    });
+    await flushPromises();
+    await wrapper.find('rect[data-count="2"]').trigger('click');
+    expect(
+      wrapper.findAllComponents(NuxtLinkStub).map((link) => link.props('to'))
+    ).toEqual([
+      '/forums/dogs/wiki/dog-care',
+      '/forums/dogs/wiki/revisions/diff/dog-care/selected-we2',
+    ]);
   });
 
   // Test deselecting a day

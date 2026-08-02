@@ -5,8 +5,10 @@ import { useQuery } from '@vue/apollo-composable';
 import OwnedForumsPage from './ownedForums.vue';
 import ChannelList from '@/components/channel/ChannelList.vue';
 
+const routeState = vi.hoisted(() => ({ username: 'alice' as unknown }));
+
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({ params: { username: 'alice' } }),
+  useRoute: () => ({ params: { username: routeState.username } }),
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -15,7 +17,10 @@ vi.mock('@vue/apollo-composable', () => ({
 
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 
-const mountWith = (result: unknown, options: { loading?: boolean; error?: unknown } = {}) => {
+const mountWith = (
+  result: unknown,
+  options: { loading?: boolean; error?: unknown } = {}
+) => {
   mockedUseQuery.mockReturnValue({
     result: ref(result),
     loading: ref(options.loading ?? false),
@@ -34,7 +39,9 @@ describe('user owned forums page', () => {
   });
 
   it('shows the error state', () => {
-    expect(mountWith(null, { error: { message: 'boom' } }).text()).toContain('Error');
+    expect(mountWith(null, { error: { message: 'boom' } }).text()).toContain(
+      'Error'
+    );
   });
 
   it('shows an empty-state message when the user owns no forums', () => {
@@ -59,6 +66,18 @@ describe('user owned forums page', () => {
       searchInput: '',
       selectedTags: [],
       loading: false,
+    });
+  });
+
+  it.each([
+    ['alice', 'alice'],
+    [['alice'], ''],
+  ])('uses %j as the query username', (routeUsername, expected) => {
+    routeState.username = routeUsername;
+    mountWith({ users: [] });
+
+    expect(mockedUseQuery.mock.calls.at(-1)?.[1]()).toEqual({
+      username: expected,
     });
   });
 });

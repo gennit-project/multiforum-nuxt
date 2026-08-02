@@ -1,6 +1,22 @@
-import { describe, it, expect } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
+import { flushPromises, mount } from '@vue/test-utils';
 import CommentRevisionDiffModal from './CommentRevisionDiffModal.vue';
+
+const mutation = vi.hoisted(() => ({
+  mutate: vi.fn(),
+  done: undefined as undefined | (() => void),
+}));
+
+vi.mock('@vue/apollo-composable', () => ({
+  useMutation: () => ({
+    mutate: mutation.mutate,
+    loading: false,
+    error: null,
+    onDone: (callback: () => void) => {
+      mutation.done = callback;
+    },
+  }),
+}));
 
 vi.mock('@headlessui/vue', () => ({
   TransitionRoot: { name: 'TransitionRoot', template: '<div><slot /></div>' },
@@ -42,6 +58,12 @@ const newVersion = {
   createdAt: new Date().toISOString(),
   Author: { username: 'new' },
 };
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  mutation.done = undefined;
+  mutation.mutate.mockResolvedValue({});
+});
 
 describe('CommentRevisionDiffModal', () => {
   it('uses a neutral primary action and a danger redaction action', () => {
@@ -127,5 +149,60 @@ describe('CommentRevisionDiffModal', () => {
       hasOldLine: true,
       hasNewLine: true,
     });
+  });
+
+  it('redacts the older revision after confirmation', async () => {
+    vi.stubGlobal('confirm', vi.fn().mockReturnValue(true));
+    const wrapper = mount(CommentRevisionDiffModal, {
+      props: { open: true, oldVersion, newVersion },
+    });
+
+    wrapper
+      .findComponent({ name: 'GenericModal' })
+      .vm.$emit('danger-button-click');
+    await flushPromises();
+
+    expect(mutation.mutate).toHaveBeenCalledWith({ textVersionId: 'c1' });
+  });
+
+  it('emits deletion and closure after the mutation completes', () => {
+    const wrapper = mount(CommentRevisionDiffModal, {
+      props: { open: true, oldVersion, newVersion },
+    });
+
+    mutation.done?.();
+
+    expect(wrapper.emitted()).toMatchObject({ deleted: [['c1']], close: [[]] });
+  });
+
+  it('restores the redaction action after a failed mutation', async () => {
+    vi.stubGlobal('confirm', vi.fn().mockReturnValue(true));
+    mutation.mutate.mockRejectedValue(new Error('denied'));
+    const wrapper = mount(CommentRevisionDiffModal, {
+      props: { open: true, oldVersion, newVersion },
+    });
+
+    wrapper
+      .findComponent({ name: 'GenericModal' })
+      .vm.$emit('danger-button-click');
+    await flushPromises();
+
+    expect(
+      wrapper
+        .findComponent({ name: 'GenericModal' })
+        .props('dangerButtonLoading')
+    ).toBe(false);
+  });
+
+  it('closes from the primary action', () => {
+    const wrapper = mount(CommentRevisionDiffModal, {
+      props: { open: true, oldVersion, newVersion },
+    });
+
+    wrapper
+      .findComponent({ name: 'GenericModal' })
+      .vm.$emit('primary-button-click');
+
+    expect(wrapper.emitted('close')).toEqual([[]]);
   });
 });

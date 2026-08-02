@@ -10,12 +10,15 @@ import SuspensionNotice from '@/components/SuspensionNotice.vue';
 const suspension = vi.hoisted(() => ({
   active: null as unknown,
   issueNumber: null as number | null,
+  routerPush: vi.fn(),
+  useHead: vi.fn(),
+  onResult: null as null | ((result: unknown) => void),
 }));
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({ params: { forumId: 'cats' } }),
-  useRouter: () => ({ push: vi.fn() }),
-  useHead: vi.fn(),
+  useRouter: () => ({ push: suspension.routerPush }),
+  useHead: suspension.useHead,
 }));
 
 vi.mock('@vue/apollo-composable', () => ({ useQuery: vi.fn() }));
@@ -36,14 +39,22 @@ vi.mock('@/composables/useSuspensionNotice', () => ({
 
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 
-const mountWith = async (channel: unknown, stubs: Record<string, unknown> = {}) => {
+const mountWith = async (
+  channel: unknown,
+  stubs: Record<string, unknown> = {},
+  queryState: { loading?: boolean; error?: unknown } = {}
+) => {
   mockedUseQuery
     .mockReturnValueOnce({
       result: ref({ channels: [channel] }),
-      loading: ref(false),
-      error: ref(null),
+      loading: ref(queryState.loading ?? false),
+      error: ref(queryState.error ?? null),
     })
-    .mockReturnValueOnce({ onResult: vi.fn() });
+    .mockReturnValueOnce({
+      onResult: (callback: (result: unknown) => void) => {
+        suspension.onResult = callback;
+      },
+    });
   const Page = (await import('./index.vue')).default;
   return shallowMount(Page, { global: { stubs } });
 };
@@ -51,8 +62,10 @@ const mountWith = async (channel: unknown, stubs: Record<string, unknown> = {}) 
 describe('wiki home page', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    vi.clearAllMocks();
     suspension.active = null;
     suspension.issueNumber = null;
+    suspension.onResult = null;
     mockedUseQuery.mockReset();
   });
 
@@ -80,10 +93,12 @@ describe('wiki home page', () => {
       { RequireAuth: { template: '<div><slot name="has-auth" /></div>' } }
     );
 
-    expect(wrapper.findComponent(SuspensionNotice).exists()).toBe(true);
     const buttons = wrapper.findAllComponents(GenericButton);
-    expect(buttons.length).toBeGreaterThan(0);
-    expect(buttons.every((b) => b.props('disabled') === true)).toBe(true);
+    expect({
+      notice: wrapper.findComponent(SuspensionNotice).exists(),
+      buttonCount: buttons.length,
+      disabled: buttons.every((button) => button.props('disabled') === true),
+    }).toEqual({ notice: true, buttonCount: 2, disabled: true });
   });
 
   it('gives the mobile wiki title its own wrapping row', async () => {
@@ -92,9 +107,9 @@ describe('wiki home page', () => {
       WikiHomePage: { title: 'A very long wiki title', body: 'Welcome' },
     });
 
-    expect(
-      wrapper.get('[data-testid="wiki-page-title"]').classes()
-    ).toEqual(expect.arrayContaining(['min-w-0', 'break-words']));
+    expect(wrapper.get('[data-testid="wiki-page-title"]').classes()).toEqual(
+      expect.arrayContaining(['min-w-0', 'break-words'])
+    );
   });
 
   it('places the mobile font-size picker after the wiki body', async () => {
@@ -130,5 +145,80 @@ describe('wiki home page', () => {
     });
 
     expect(wrapper.text()).toContain('Child Guide');
+  });
+
+  it('shows the loading state', async () => {
+    const wrapper = await mountWith(null, {}, { loading: true });
+
+    expect(wrapper.findComponent({ name: 'LoadingSpinner' }).exists()).toBe(
+      true
+    );
+  });
+
+  it('shows the query error', async () => {
+    const wrapper = await mountWith(
+      null,
+      {},
+      { error: { message: 'Offline' } }
+    );
+
+    expect(wrapper.text()).toContain('Offline');
+  });
+
+  it('shows the disabled state when the forum wiki is unavailable', async () => {
+    const wrapper = await mountWith({ wikiEnabled: false });
+
+    expect(wrapper.text()).toContain(
+      'The wiki feature is not enabled for this forum.'
+    );
+  });
+
+  it.each([
+    ['Create Wiki Page', '/forums/cats/wiki/create'],
+    ['Add Page', '/forums/cats/wiki/create-child'],
+    ['Edit Wiki', '/forums/cats/wiki/edit/home'],
+  ])('routes the %s action', async (buttonText, expectedRoute) => {
+    const wrapper = await mountWith(
+      {
+        wikiEnabled: true,
+        WikiHomePage:
+          buttonText === 'Create Wiki Page'
+            ? null
+            : { title: 'Home', slug: 'home', body: 'Welcome' },
+      },
+      { RequireAuth: { template: '<div><slot name="has-auth" /></div>' } }
+    );
+    await wrapper
+      .findAllComponents(GenericButton)
+      .find((button) => button.props('text') === buttonText)
+      ?.vm.$emit('click');
+
+    expect(suspension.routerPush).toHaveBeenCalledWith(expectedRoute);
+  });
+
+  it('does not route an edit action while the user is suspended', async () => {
+    suspension.active = { suspendedIndefinitely: true };
+    const wrapper = await mountWith(
+      {
+        wikiEnabled: true,
+        WikiHomePage: { title: 'Home', slug: 'home', body: 'Welcome' },
+      },
+      { RequireAuth: { template: '<div><slot name="has-auth" /></div>' } }
+    );
+    await wrapper
+      .findAllComponents(GenericButton)
+      .find((button) => button.props('text') === 'Edit Wiki')
+      ?.vm.$emit('click');
+
+    expect(suspension.routerPush).not.toHaveBeenCalled();
+  });
+
+  it('applies SEO metadata when the channel query completes', async () => {
+    await mountWith({ wikiEnabled: true, WikiHomePage: null });
+    suspension.onResult?.({
+      data: { channels: [{ WikiHomePage: { title: 'Home' } }] },
+    });
+
+    expect(suspension.useHead).toHaveBeenCalledOnce();
   });
 });

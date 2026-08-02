@@ -13,7 +13,10 @@ const routeState = vi.hoisted(() => ({
 }));
 
 vi.mock('vue-router', () => ({
-  useRoute: () => ({ params: { pluginId: PLUGIN_ID }, query: routeState.query }),
+  useRoute: () => ({
+    params: { pluginId: PLUGIN_ID },
+    query: routeState.query,
+  }),
 }));
 
 vi.mock('@/graphQLData/admin/queries', () => ({
@@ -39,17 +42,45 @@ const h = vi.hoisted(() => ({
       refetch: ReturnType<typeof vi.fn>;
     }
   >,
-  mutations: {} as Record<string, { mutate: ReturnType<typeof vi.fn>; loading: { value: boolean } }>,
+  mutations: {} as Record<
+    string,
+    { mutate: ReturnType<typeof vi.fn>; loading: { value: boolean } }
+  >,
 }));
 
 vi.mock('@vue/apollo-composable', async () => {
   const { ref } = await import('vue');
   h.q = {
-    AVAILABLE: { result: ref(null), loading: ref(false), error: ref(null), refetch: vi.fn() },
-    INSTALLED: { result: ref(null), loading: ref(false), error: ref(null), refetch: vi.fn() },
-    DETAIL: { result: ref(null), loading: ref(false), error: ref(null), refetch: vi.fn() },
-    SECRETS: { result: ref(null), loading: ref(false), error: ref(null), refetch: vi.fn() },
-    CONFIG_STATUS: { result: ref(null), loading: ref(false), error: ref(null), refetch: vi.fn() },
+    AVAILABLE: {
+      result: ref(null),
+      loading: ref(false),
+      error: ref(null),
+      refetch: vi.fn(),
+    },
+    INSTALLED: {
+      result: ref(null),
+      loading: ref(false),
+      error: ref(null),
+      refetch: vi.fn(),
+    },
+    DETAIL: {
+      result: ref(null),
+      loading: ref(false),
+      error: ref(null),
+      refetch: vi.fn(),
+    },
+    SECRETS: {
+      result: ref(null),
+      loading: ref(false),
+      error: ref(null),
+      refetch: vi.fn(),
+    },
+    CONFIG_STATUS: {
+      result: ref(null),
+      loading: ref(false),
+      error: ref(null),
+      refetch: vi.fn(),
+    },
   };
   return {
     useQuery: (doc: keyof typeof h.q) => h.q[doc],
@@ -65,41 +96,75 @@ vi.mock('@vue/apollo-composable', async () => {
 const toast = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn() }));
 vi.mock('@/composables/useToast', () => ({ useToast: () => toast }));
 
-const sectionStub = (name: string) => ({ name, template: `<div data-stub="${name}" />` });
+const sectionStub = (name: string) => ({
+  name,
+  template: `<div data-stub="${name}" />`,
+});
 const stubs = {
-  PluginDetailHeader: { name: 'PluginDetailHeader', props: ['pluginDisplayName'], template: '<div class="header">{{ pluginDisplayName }}</div>' },
-  PluginStatusCards: { name: 'PluginStatusCards', props: ['isEnabled', 'canEnable', 'enabling', 'blockingConfigFields'], emits: ['toggle-enabled', 'focus-config-field'], template: '<button type="button" data-test="toggle-enabled" @click="$emit(\'toggle-enabled\', false)" />' },
-  PluginUpdateBanner: sectionStub('PluginUpdateBanner'),
+  PluginDetailHeader: {
+    name: 'PluginDetailHeader',
+    props: ['pluginDisplayName'],
+    template: '<div class="header">{{ pluginDisplayName }}</div>',
+  },
+  PluginStatusCards: {
+    name: 'PluginStatusCards',
+    props: ['isEnabled', 'canEnable', 'enabling', 'blockingConfigFields'],
+    emits: ['toggle-enabled', 'focus-config-field'],
+    template:
+      '<button type="button" data-test="toggle-enabled" @click="$emit(\'toggle-enabled\', false)" />',
+  },
+  PluginUpdateBanner: {
+    name: 'PluginUpdateBanner',
+    props: ['latestVersion', 'registryVersions', 'compatibility'],
+    emits: ['install-latest'],
+    template:
+      '<button type="button" data-test="install-latest" @click="$emit(\'install-latest\')">Update</button>',
+  },
   PluginUpgradePreviewModal: {
     name: 'PluginUpgradePreviewModal',
-    props: ['currentVersion', 'targetVersion', 'report', 'secrets', 'installing'],
+    props: [
+      'currentVersion',
+      'targetVersion',
+      'report',
+      'secrets',
+      'installing',
+    ],
     emits: ['carry-over', 'start-fresh', 'cancel'],
-    template: '<div data-test="upgrade-preview"><button data-test="carry-upgrade" @click="$emit(\'carry-over\')">Carry</button><button data-test="fresh-upgrade" @click="$emit(\'start-fresh\')">Fresh</button></div>',
+    template:
+      '<div data-test="upgrade-preview"><button data-test="carry-upgrade" @click="$emit(\'carry-over\')">Carry</button><button data-test="fresh-upgrade" @click="$emit(\'start-fresh\')">Fresh</button><button data-test="cancel-upgrade" @click="$emit(\'cancel\')">Cancel</button></div>',
   },
   PluginInstallSection: {
     name: 'PluginInstallSection',
     props: ['modelValue', 'canInstall', 'compatibilityByVersion'],
     emits: ['install', 'update:modelValue'],
-    template: '<button type="button" data-test="install" @click="$emit(\'install\')">Install</button>',
+    template:
+      '<button type="button" data-test="install" @click="$emit(\'install\')">Install</button>',
   },
   PluginSecretsSection: {
     name: 'PluginSecretsSection',
     props: ['secrets', 'orphanedSecrets', 'secretValues', 'showSecretInputs'],
     emits: ['set-secret', 'update:secretValues', 'update:showSecretInputs'],
-    template: '<button type="button" data-test="set-secret" @click="$emit(\'set-secret\', \'API_KEY\', \'xyz\')">Set secret</button>',
+    template:
+      '<div><button type="button" data-test="set-secret" @click="$emit(\'set-secret\', \'API_KEY\', \'xyz\')">Set secret</button><button type="button" data-test="edit-secret" @click="$emit(\'update:secretValues\', { API_KEY: \'edited\' }); $emit(\'update:showSecretInputs\', { API_KEY: true })">Edit secret</button></div>',
   },
   PluginSettingsSection: {
     name: 'PluginSettingsSection',
     props: ['modelValue', 'errors', 'saving', 'sections', 'secretStatuses'],
     emits: ['save', 'update:modelValue'],
-    template: '<button type="button" data-test="save-settings" @click="$emit(\'save\')">Save settings</button>',
+    template:
+      '<button type="button" data-test="save-settings" @click="$emit(\'save\')">Save settings</button>',
   },
   PluginManifestSection: sectionStub('PluginManifestSection'),
   PluginReadmeSection: sectionStub('PluginReadmeSection'),
-  ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="error-banner">{{ text }}</div>' },
+  ErrorBanner: {
+    name: 'ErrorBanner',
+    props: ['text'],
+    template: '<div class="error-banner">{{ text }}</div>',
+  },
 };
 
-const mountPage = () => mountWithDefaults(PluginDetailPage, { global: { stubs } });
+const mountPage = () =>
+  mountWithDefaults(PluginDetailPage, { global: { stubs } });
 
 const deferred = <T = unknown>() => {
   let resolve!: (value: T) => void;
@@ -185,7 +250,9 @@ describe('Plugin detail page', () => {
     setInstalledPlugin();
     const wrapper = mountPage();
 
-    expect(wrapper.findComponent({ name: 'PluginStatusCards' }).exists()).toBe(true);
+    expect(wrapper.findComponent({ name: 'PluginStatusCards' }).exists()).toBe(
+      true
+    );
   });
 
   it.each([
@@ -233,13 +300,15 @@ describe('Plugin detail page', () => {
         secrets: [{ key: 'API_KEY', scope: 'server', required: true }],
         ui: {
           forms: {
-            server: [{
-              title: 'Settings',
-              fields: [
-                { key: 'API_KEY', label: 'API key', type: 'secret' },
-                { key: 'serviceUrl', label: 'Service URL', type: 'text' },
-              ],
-            }],
+            server: [
+              {
+                title: 'Settings',
+                fields: [
+                  { key: 'API_KEY', label: 'API key', type: 'secret' },
+                  { key: 'serviceUrl', label: 'Service URL', type: 'text' },
+                ],
+              },
+            ],
           },
         },
       },
@@ -247,8 +316,12 @@ describe('Plugin detail page', () => {
     const wrapper = mountPage();
 
     expect({
-      secrets: wrapper.findComponent({ name: 'PluginSecretsSection' }).props('secrets'),
-      fields: wrapper.findComponent({ name: 'PluginSettingsSection' }).props('sections')[0].fields,
+      secrets: wrapper
+        .findComponent({ name: 'PluginSecretsSection' })
+        .props('secrets'),
+      fields: wrapper
+        .findComponent({ name: 'PluginSettingsSection' })
+        .props('sections')[0].fields,
     }).toEqual({
       secrets: [{ key: 'API_KEY', status: 'NOT_SET', required: true }],
       fields: [{ key: 'serviceUrl', label: 'Service URL', type: 'text' }],
@@ -258,14 +331,14 @@ describe('Plugin detail page', () => {
   it('separates stored secrets that the installed version no longer declares', () => {
     setInstalledPlugin({ manifest: { secrets: [] } });
     h.q.SECRETS.result.value = {
-      getServerPluginSecrets: [
-        { key: 'OLD_API_KEY', status: 'SET_UNTESTED' },
-      ],
+      getServerPluginSecrets: [{ key: 'OLD_API_KEY', status: 'SET_UNTESTED' }],
     };
     const wrapper = mountPage();
 
     expect(
-      wrapper.findComponent({ name: 'PluginSecretsSection' }).props('orphanedSecrets')
+      wrapper
+        .findComponent({ name: 'PluginSecretsSection' })
+        .props('orphanedSecrets')
     ).toEqual([{ key: 'OLD_API_KEY', status: 'SET_UNTESTED' }]);
   });
 
@@ -274,7 +347,9 @@ describe('Plugin detail page', () => {
     h.q.INSTALLED.result.value = { getInstalledPlugins: [] };
     const wrapper = mountPage();
 
-    expect(wrapper.findComponent({ name: 'PluginStatusCards' }).exists()).toBe(false);
+    expect(wrapper.findComponent({ name: 'PluginStatusCards' }).exists()).toBe(
+      false
+    );
   });
 
   it('shows a missing-version install error', async () => {
@@ -289,9 +364,16 @@ describe('Plugin detail page', () => {
   });
 
   it('shows a compatibility install error', async () => {
-    setAvailablePlugin({ Versions: [{ version: '2.0.0', minServerVersion: '2.0.0' }] });
+    setAvailablePlugin({
+      Versions: [{ version: '2.0.0', minServerVersion: '2.0.0' }],
+    });
     h.q.DETAIL.result.value = {
-      plugins: [{ id: PLUGIN_ID, Versions: [{ version: '2.0.0', minServerVersion: '2.0.0' }] }],
+      plugins: [
+        {
+          id: PLUGIN_ID,
+          Versions: [{ version: '2.0.0', minServerVersion: '2.0.0' }],
+        },
+      ],
     };
     const wrapper = mountPage();
 
@@ -304,7 +386,12 @@ describe('Plugin detail page', () => {
   it('shows GraphQL install errors returned from the mutation', async () => {
     setAvailablePlugin();
     h.q.DETAIL.result.value = {
-      plugins: [{ id: PLUGIN_ID, Versions: [{ version: '1.0.0', readmeMarkdown: '# Readme' }] }],
+      plugins: [
+        {
+          id: PLUGIN_ID,
+          Versions: [{ version: '1.0.0', readmeMarkdown: '# Readme' }],
+        },
+      ],
     };
     h.mutations.INSTALL_M = {
       mutate: vi.fn().mockResolvedValue({ errors: [{ message: 'boom' }] }),
@@ -341,35 +428,47 @@ describe('Plugin detail page', () => {
       version: '1.0.0',
       settingsJson: { endpoint: 'https://custom.example', removed: true },
     });
-    setAvailablePlugin({ Versions: [{ version: '1.0.0' }, { version: '2.0.0' }] });
+    setAvailablePlugin({
+      Versions: [{ version: '1.0.0' }, { version: '2.0.0' }],
+    });
     h.q.DETAIL.result.value = {
-      plugins: [{
-        id: PLUGIN_ID,
-        Versions: [{
-          version: '2.0.0',
-          manifest: {
-            secrets: [{ key: 'API_KEY', scope: 'server', required: true }],
-            settingsDefaults: { server: { endpoint: 'default', added: true } },
-            ui: {
-              forms: {
-                server: [{
-                  title: 'Settings',
-                  fields: [
-                    { key: 'endpoint', label: 'Endpoint', type: 'text' },
-                    { key: 'added', label: 'Added', type: 'toggle' },
-                  ],
-                }],
+      plugins: [
+        {
+          id: PLUGIN_ID,
+          Versions: [
+            {
+              version: '2.0.0',
+              manifest: {
+                secrets: [{ key: 'API_KEY', scope: 'server', required: true }],
+                settingsDefaults: {
+                  server: { endpoint: 'default', added: true },
+                },
+                ui: {
+                  forms: {
+                    server: [
+                      {
+                        title: 'Settings',
+                        fields: [
+                          { key: 'endpoint', label: 'Endpoint', type: 'text' },
+                          { key: 'added', label: 'Added', type: 'toggle' },
+                        ],
+                      },
+                    ],
+                  },
+                },
               },
             },
-          },
-        }],
-      }],
+          ],
+        },
+      ],
     };
     h.q.SECRETS.result.value = {
       getServerPluginSecrets: [{ key: 'API_KEY', status: 'SET_UNTESTED' }],
     };
     const wrapper = mountPage();
-    const installSection = wrapper.findComponent({ name: 'PluginInstallSection' });
+    const installSection = wrapper.findComponent({
+      name: 'PluginInstallSection',
+    });
 
     installSection.vm.$emit('update:modelValue', '2.0.0');
     await flushPromises();
@@ -425,7 +524,9 @@ describe('Plugin detail page', () => {
     await wrapper.get('[data-test="toggle-enabled"]').trigger('click');
     await flushPromises();
 
-    expect(toast.error).toHaveBeenCalledWith('Cannot enable: missing required secrets');
+    expect(toast.error).toHaveBeenCalledWith(
+      'Cannot enable: missing required secrets'
+    );
   });
 
   it('sets a secret via the secrets section', async () => {
@@ -451,7 +552,14 @@ describe('Plugin detail page', () => {
               {
                 id: 'main',
                 title: 'Main',
-                fields: [{ key: 'endpoint', label: 'Endpoint', type: 'text', validation: { required: true } }],
+                fields: [
+                  {
+                    key: 'endpoint',
+                    label: 'Endpoint',
+                    type: 'text',
+                    validation: { required: true },
+                  },
+                ],
               },
             ],
           },
@@ -463,7 +571,9 @@ describe('Plugin detail page', () => {
     await wrapper.get('[data-test="save-settings"]').trigger('click');
     await flushPromises();
 
-    expect(wrapper.findComponent({ name: 'PluginSettingsSection' }).props('errors')).toEqual({
+    expect(
+      wrapper.findComponent({ name: 'PluginSettingsSection' }).props('errors')
+    ).toEqual({
       endpoint: 'Endpoint is required',
     });
   });
@@ -489,10 +599,12 @@ describe('Plugin detail page', () => {
     });
     const wrapper = mountPage();
 
-    await wrapper.findComponent({ name: 'PluginSettingsSection' }).vm.$emit('update:modelValue', {
-      endpoint: 'https://example.com',
-      apiKey: 'secret-value',
-    });
+    await wrapper
+      .findComponent({ name: 'PluginSettingsSection' })
+      .vm.$emit('update:modelValue', {
+        endpoint: 'https://example.com',
+        apiKey: 'secret-value',
+      });
     await wrapper.get('[data-test="save-settings"]').trigger('click');
     await flushPromises();
 
@@ -524,10 +636,12 @@ describe('Plugin detail page', () => {
     });
     const wrapper = mountPage();
 
-    await wrapper.findComponent({ name: 'PluginSettingsSection' }).vm.$emit('update:modelValue', {
-      endpoint: 'https://example.com',
-      apiKey: 'secret-value',
-    });
+    await wrapper
+      .findComponent({ name: 'PluginSettingsSection' })
+      .vm.$emit('update:modelValue', {
+        endpoint: 'https://example.com',
+        apiKey: 'secret-value',
+      });
     await wrapper.get('[data-test="save-settings"]').trigger('click');
     await flushPromises();
 
@@ -567,13 +681,12 @@ describe('Plugin detail page', () => {
     });
     const wrapper = mountPage();
 
-    await wrapper.findComponent({ name: 'PluginSettingsSection' }).vm.$emit(
-      'update:modelValue',
-      {
+    await wrapper
+      .findComponent({ name: 'PluginSettingsSection' })
+      .vm.$emit('update:modelValue', {
         endpoint: 'https://example.com',
         apiKey: 'secret-value',
-      }
-    );
+      });
     await wrapper.get('[data-test="save-settings"]').trigger('click');
     await flushPromises();
 
@@ -594,9 +707,9 @@ describe('Plugin detail page', () => {
     expect(h.q.INSTALLED.refetch).toHaveBeenCalled();
     expect(h.q.SECRETS.refetch).toHaveBeenCalled();
     expect(
-      wrapper.findComponent({ name: 'PluginSettingsSection' }).props(
-        'modelValue'
-      )
+      wrapper
+        .findComponent({ name: 'PluginSettingsSection' })
+        .props('modelValue')
     ).toEqual({
       endpoint: 'https://example.com',
       apiKey: '',
@@ -628,13 +741,12 @@ describe('Plugin detail page', () => {
     };
     const wrapper = mountPage();
 
-    await wrapper.findComponent({ name: 'PluginSettingsSection' }).vm.$emit(
-      'update:modelValue',
-      {
+    await wrapper
+      .findComponent({ name: 'PluginSettingsSection' })
+      .vm.$emit('update:modelValue', {
         endpoint: 'https://example.com',
         apiKey: 'secret-value',
-      }
-    );
+      });
     await wrapper.get('[data-test="save-settings"]').trigger('click');
     await flushPromises();
 
@@ -643,9 +755,9 @@ describe('Plugin detail page', () => {
       'Failed to save settings: Secret rejected'
     );
     expect(
-      wrapper.findComponent({ name: 'PluginSettingsSection' }).props(
-        'modelValue'
-      )
+      wrapper
+        .findComponent({ name: 'PluginSettingsSection' })
+        .props('modelValue')
     ).toEqual({
       endpoint: 'https://example.com',
       apiKey: 'secret-value',
@@ -675,12 +787,11 @@ describe('Plugin detail page', () => {
     };
     const wrapper = mountPage();
 
-    await wrapper.findComponent({ name: 'PluginSettingsSection' }).vm.$emit(
-      'update:modelValue',
-      {
+    await wrapper
+      .findComponent({ name: 'PluginSettingsSection' })
+      .vm.$emit('update:modelValue', {
         endpoint: 'https://example.com',
-      }
-    );
+      });
     await wrapper.get('[data-test="save-settings"]').trigger('click');
     await flushPromises();
 
@@ -694,5 +805,207 @@ describe('Plugin detail page', () => {
     expect(
       wrapper.findComponent({ name: 'PluginSettingsSection' }).props('saving')
     ).toBe(false);
+  });
+
+  it('uses the stored status for a declared secret', () => {
+    setInstalledPlugin({
+      manifest: {
+        secrets: [{ key: 'API_KEY', scope: 'server', required: false }],
+      },
+    });
+    h.q.SECRETS.result.value = {
+      getServerPluginSecrets: [
+        { key: 'API_KEY', status: 'SET_VALID', lastValidatedAt: 'today' },
+      ],
+    };
+
+    expect(
+      mountPage()
+        .findComponent({ name: 'PluginSecretsSection' })
+        .props('secrets')
+    ).toEqual([
+      {
+        key: 'API_KEY',
+        status: 'SET_VALID',
+        lastValidatedAt: 'today',
+        required: false,
+      },
+    ]);
+  });
+
+  it('shows an error when an upgrade manifest has not loaded', async () => {
+    setInstalledPlugin();
+    setAvailablePlugin({
+      Versions: [{ version: '1.0.0' }, { version: '2.0.0' }],
+    });
+    h.q.DETAIL.result.value = {
+      plugins: [{ id: PLUGIN_ID, Versions: [{ version: '2.0.0' }] }],
+    };
+    const wrapper = mountPage();
+
+    wrapper
+      .findComponent({ name: 'PluginInstallSection' })
+      .vm.$emit('update:modelValue', '2.0.0');
+    await flushPromises();
+    await wrapper.get('[data-test="install"]').trigger('click');
+
+    expect(wrapper.text()).toContain(
+      'Upgrade preview is unavailable because the target manifest has not loaded.'
+    );
+  });
+
+  it.each([
+    [
+      'PLUGIN_MISCONFIGURED_REQUIRED_SECRET_MISSING',
+      'Plugin misconfigured: required secrets missing',
+    ],
+    [
+      'PLUGIN_CONFIG_INCOMPLETE',
+      'Cannot enable: complete all required plugin configuration',
+    ],
+    ['unexpected failure', 'Disable failed: unexpected failure'],
+    [null, 'Disable failed: Unknown error'],
+  ])('maps enable failure %s to a useful toast', async (failure, message) => {
+    setInstalledPlugin();
+    h.mutations.ENABLE_M = {
+      mutate: vi.fn().mockRejectedValue(failure ? new Error(failure) : failure),
+      loading: { value: false },
+    };
+    const wrapper = mountPage();
+
+    await wrapper.get('[data-test="toggle-enabled"]').trigger('click');
+    await flushPromises();
+
+    expect(toast.error).toHaveBeenCalledWith(message);
+  });
+
+  it('reports failures while setting an individual secret', async () => {
+    setInstalledPlugin();
+    h.mutations.SET_SECRET_M = {
+      mutate: vi.fn().mockRejectedValue(new Error('Vault unavailable')),
+      loading: { value: false },
+    };
+    const wrapper = mountPage();
+
+    await wrapper.get('[data-test="set-secret"]').trigger('click');
+    await flushPromises();
+
+    expect(toast.error).toHaveBeenCalledWith(
+      'Failed to set secret "API_KEY": Vault unavailable'
+    );
+  });
+
+  it('accepts both secrets section v-model updates', async () => {
+    setInstalledPlugin();
+    const wrapper = mountPage();
+
+    await wrapper.get('[data-test="edit-secret"]').trigger('click');
+
+    expect(
+      wrapper.findComponent({ name: 'PluginSecretsSection' }).props()
+    ).toMatchObject({
+      secretValues: { API_KEY: 'edited' },
+      showSecretInputs: { API_KEY: true },
+    });
+  });
+
+  it('starts an upgrade without carrying settings', async () => {
+    setInstalledPlugin();
+    setAvailablePlugin({
+      Versions: [{ version: '1.0.0' }, { version: '2.0.0' }],
+    });
+    h.q.DETAIL.result.value = {
+      plugins: [
+        {
+          id: PLUGIN_ID,
+          Versions: [
+            {
+              version: '2.0.0',
+              manifest: { settingsDefaults: { server: {} } },
+            },
+          ],
+        },
+      ],
+    };
+    const wrapper = mountPage();
+
+    wrapper
+      .findComponent({ name: 'PluginInstallSection' })
+      .vm.$emit('update:modelValue', '2.0.0');
+    await flushPromises();
+    await wrapper.get('[data-test="install"]').trigger('click');
+    await wrapper.get('[data-test="fresh-upgrade"]').trigger('click');
+    await flushPromises();
+
+    expect(h.mutations.INSTALL_M?.mutate).toHaveBeenCalledWith({
+      pluginId: PLUGIN_ID,
+      version: '2.0.0',
+      carrySettings: false,
+    });
+  });
+
+  it('cancels an upgrade preview', async () => {
+    setInstalledPlugin();
+    setAvailablePlugin({
+      Versions: [{ version: '1.0.0' }, { version: '2.0.0' }],
+    });
+    h.q.DETAIL.result.value = {
+      plugins: [
+        { id: PLUGIN_ID, Versions: [{ version: '2.0.0', manifest: {} }] },
+      ],
+    };
+    const wrapper = mountPage();
+
+    wrapper
+      .findComponent({ name: 'PluginInstallSection' })
+      .vm.$emit('update:modelValue', '2.0.0');
+    await flushPromises();
+    await wrapper.get('[data-test="install"]').trigger('click');
+    await wrapper.get('[data-test="cancel-upgrade"]').trigger('click');
+
+    expect(wrapper.find('[data-test="upgrade-preview"]').exists()).toBe(false);
+  });
+
+  it('installs the latest compatible version from the update banner', async () => {
+    setInstalledPlugin({
+      hasUpdate: true,
+      latestVersion: '2.0.0',
+      availableVersions: ['1.0.0', '2.0.0'],
+    });
+    setAvailablePlugin({
+      Versions: [{ version: '1.0.0' }, { version: '2.0.0' }],
+    });
+    h.q.DETAIL.result.value = {
+      plugins: [
+        { id: PLUGIN_ID, Versions: [{ version: '2.0.0', manifest: {} }] },
+      ],
+    };
+    const wrapper = mountPage();
+
+    await wrapper.get('[data-test="install-latest"]').trigger('click');
+
+    expect(
+      wrapper
+        .findComponent({ name: 'PluginUpgradePreviewModal' })
+        .props('targetVersion')
+    ).toBe('2.0.0');
+  });
+
+  it('shows the permission message when authorization is denied', () => {
+    setAvailablePlugin();
+    const wrapper = mountWithDefaults(PluginDetailPage, {
+      global: {
+        stubs: {
+          ...stubs,
+          RequireAuth: {
+            template: '<div><slot name="does-not-have-auth" /></div>',
+          },
+        },
+      },
+    });
+
+    expect(wrapper.text()).toContain(
+      "You don't have permission to see this page."
+    );
   });
 });

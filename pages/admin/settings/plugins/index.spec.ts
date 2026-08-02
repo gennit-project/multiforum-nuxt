@@ -64,7 +64,8 @@ vi.mock('@vue/apollo-composable', async () => {
     },
   };
   return {
-    useQuery: (doc: keyof typeof apolloState.queries) => apolloState.queries[doc],
+    useQuery: (doc: keyof typeof apolloState.queries) =>
+      apolloState.queries[doc],
     useMutation: (doc: keyof typeof apolloState.mutations) => ({
       mutate: apolloState.mutations[doc],
     }),
@@ -115,7 +116,10 @@ const setPluginData = () => {
         id: 'incompatible-plugin',
         name: 'Incompatible Plugin',
         description: 'Needs a newer server',
-        Versions: [{ version: '1.0.0' }, { version: '2.0.0', minServerVersion: '2.0.0' }],
+        Versions: [
+          { version: '1.0.0' },
+          { version: '2.0.0', minServerVersion: '2.0.0' },
+        ],
       },
     ],
   };
@@ -178,7 +182,9 @@ describe('Plugins settings page', () => {
   });
 
   it('renders the error state', () => {
-    apolloState.queries.GET_PLUGIN_MANAGEMENT_DATA.error.value = new Error('boom');
+    apolloState.queries.GET_PLUGIN_MANAGEMENT_DATA.error.value = new Error(
+      'boom'
+    );
 
     expect(mountPage().text()).toContain('Error loading plugins: boom');
   });
@@ -204,7 +210,9 @@ describe('Plugins settings page', () => {
     setPluginData();
     const wrapper = mountPage();
 
-    await wrapper.get('input[placeholder="Search plugins..."]').setValue('missing');
+    await wrapper
+      .get('input[placeholder="Search plugins..."]')
+      .setValue('missing');
     const clearButton = wrapper
       .findAll('button')
       .find((button) => button.text() === 'Clear filters');
@@ -219,7 +227,9 @@ describe('Plugins settings page', () => {
     setPluginData();
     mountPage();
 
-    expect(apolloState.queries.GET_INSTALLED_PLUGINS.refetch).toHaveBeenCalled();
+    expect(
+      apolloState.queries.GET_INSTALLED_PLUGINS.refetch
+    ).toHaveBeenCalled();
   });
 
   it('allows an available plugin', async () => {
@@ -258,7 +268,11 @@ describe('Plugins settings page', () => {
 
     const upgradeButton = wrapper
       .findAll('button')
-      .find((button) => button.text().includes('Upgrade') && button.attributes('disabled') === undefined);
+      .find(
+        (button) =>
+          button.text().includes('Upgrade') &&
+          button.attributes('disabled') === undefined
+      );
 
     await upgradeButton!.trigger('click');
     await flushPromises();
@@ -275,7 +289,11 @@ describe('Plugins settings page', () => {
 
     const upgradeButton = wrapper
       .findAll('button')
-      .find((button) => button.text().includes('Upgrade') && button.attributes('title') === 'Requires server >= 2.0.0');
+      .find(
+        (button) =>
+          button.text().includes('Upgrade') &&
+          button.attributes('title') === 'Requires server >= 2.0.0'
+      );
 
     expect(upgradeButton?.attributes('disabled')).toBeDefined();
   });
@@ -287,6 +305,65 @@ describe('Plugins settings page', () => {
     await wrapper.get('[data-test="refresh-discovery"]').trigger('click');
     await flushPromises();
 
-    expect(apolloState.queries.GET_PLUGIN_MANAGEMENT_DATA.refetch).toHaveBeenCalledTimes(1);
+    expect(
+      apolloState.queries.GET_PLUGIN_MANAGEMENT_DATA.refetch
+    ).toHaveBeenCalledTimes(1);
   });
+
+  it('filters plugins by status', async () => {
+    setPluginData();
+    const wrapper = mountPage();
+    await wrapper
+      .get('select[aria-label="Filter plugins by status"]')
+      .setValue('enabled');
+    expect(wrapper.text()).toContain('Showing 1 of 4 plugins');
+  });
+
+  it('changes sort fields and reverses the active sort direction', async () => {
+    setPluginData();
+    const wrapper = mountPage();
+    const name = wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('Name'))!;
+    const status = wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('Status'))!;
+    await name.trigger('click');
+    await status.trigger('click');
+    await status.trigger('click');
+    expect(status.find('i').classes()).toContain('fa-arrow-down');
+  });
+
+  it.each([
+    ['ALLOW_PLUGIN', 'Allow', 'Error allowing plugin: allow failed'],
+    [
+      'DISALLOW_PLUGIN',
+      'Disallow',
+      'Error disallowing plugin: disallow failed',
+    ],
+    [
+      'INSTALL_PLUGIN_VERSION',
+      'Upgrade',
+      'Error upgrading plugin: upgrade failed',
+    ],
+  ] as const)(
+    'shows an error toast when %s fails',
+    async (mutation, buttonText, expectedMessage) => {
+      setPluginData();
+      apolloState.mutations[mutation].mockRejectedValueOnce(
+        new Error(expectedMessage.split(': ').at(-1))
+      );
+      const wrapper = mountPage();
+      const button = wrapper
+        .findAll('button')
+        .find(
+          (candidate) =>
+            candidate.text().includes(buttonText) &&
+            candidate.attributes('disabled') === undefined
+        )!;
+      await button.trigger('click');
+      await flushPromises();
+      expect(mockToast.error).toHaveBeenCalledWith(expectedMessage);
+    }
+  );
 });

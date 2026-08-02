@@ -51,12 +51,17 @@ vi.mock('@/composables/useCommentPermalink', () => ({
     copyLink: vi.fn(),
   }),
 }));
-vi.mock('@/composables/useAutoUnsubscribe', () => ({ useAutoUnsubscribe: vi.fn() }));
+vi.mock('@/composables/useAutoUnsubscribe', () => ({
+  useAutoUnsubscribe: vi.fn(),
+}));
 
 const stubs = {
   CommentHeader: { template: '<div class="comment-header-stub" />' },
   CommentButtons: { template: '<div class="comment-buttons-stub" />' },
-  MarkdownPreview: { props: ['text'], template: '<div class="md-stub">{{ text }}</div>' },
+  MarkdownPreview: {
+    props: ['text'],
+    template: '<div class="md-stub">{{ text }}</div>',
+  },
   ArchivedCommentText: { template: '<div class="archived-stub" />' },
   TextEditor: {
     name: 'TextEditor',
@@ -67,7 +72,7 @@ const stubs = {
   ChildComments: {
     name: 'ChildComments',
     template:
-      '<div class="child-comments-stub"><slot :comments="[{ id: \'child-1\', text: \'Child body\', CommentAuthor: { __typename: \'User\', username: \'child\' }, Channel: { uniqueName: \'cats\' } }]" /></div>',
+      "<div class=\"child-comments-stub\"><slot :comments=\"[{ id: 'child-1', text: 'Child body', CommentAuthor: { __typename: 'User', username: 'child' }, Channel: { uniqueName: 'cats' } }]\" /></div>",
   },
   ErrorBanner: {
     name: 'ErrorBanner',
@@ -105,12 +110,16 @@ describe('Comment (real mount)', () => {
   });
 
   it('renders the comment text via the markdown preview', () => {
-    const wrapper = mountComment(baseComment({ text: 'A unique body' } as Partial<Comment>));
+    const wrapper = mountComment(
+      baseComment({ text: 'A unique body' } as Partial<Comment>)
+    );
     expect(wrapper.text()).toContain('A unique body');
   });
 
   it('shows the archived text for an archived comment', () => {
-    const wrapper = mountComment(baseComment({ archived: true } as Partial<Comment>));
+    const wrapper = mountComment(
+      baseComment({ archived: true } as Partial<Comment>)
+    );
     expect(wrapper.find('.archived-stub').exists()).toBe(true);
   });
 
@@ -144,7 +153,9 @@ describe('Comment (real mount)', () => {
       global: { stubs },
     });
 
-    await wrapper.findComponent({ name: 'TextEditor' }).vm.$emit('update', 'edited');
+    await wrapper
+      .findComponent({ name: 'TextEditor' })
+      .vm.$emit('update', 'edited');
 
     expect(wrapper.emitted('update-edit-comment-input')).toEqual([
       ['edited', true],
@@ -198,6 +209,81 @@ describe('Comment (real mount)', () => {
     );
 
     expect(wrapper.text()).toContain('Child body');
+  });
+
+  it('forwards events emitted by an inline child comment', async () => {
+    const wrapper = mountComment(
+      baseComment({
+        ChildCommentsAggregate: { count: 1 },
+      } as unknown as Partial<Comment>)
+    );
+    const child = wrapper.findAllComponents(Comment)[0];
+    await child.vm.$emit('start-comment-save');
+    await child.vm.$emit('click-report', { id: 'child-1' });
+    await child.vm.$emit('delete-comment', { commentId: 'child-1' });
+    await child.vm.$emit('create-comment');
+    await child.vm.$emit('save-edit');
+    await child.vm.$emit('update-edit-comment-input', 'edited', 1);
+    await child.vm.$emit('show-copied-link-notification', true);
+    await child.vm.$emit('open-mod-profile');
+    await child.vm.$emit('scroll-to-top');
+    await child.vm.$emit('open-reply-editor', 'child-1');
+    await child.vm.$emit('hide-reply-editor');
+    await child.vm.$emit('open-edit-comment-editor');
+    await child.vm.$emit('hide-edit-comment-editor');
+    await child.vm.$emit('handle-view-feedback', 'child-1');
+    await child.vm.$emit('handle-click-archive', 'child-1');
+    await child.vm.$emit('handle-click-archive-and-suspend', 'child-1');
+    await child.vm.$emit('handle-click-unarchive', 'child-1');
+    expect({
+      saveStart: wrapper.emitted('startCommentSave'),
+      report: wrapper.emitted('clickReport'),
+      remove: wrapper.emitted('delete-comment'),
+      create: wrapper.emitted('createComment'),
+      save: wrapper.emitted('saveEdit'),
+      edit: wrapper.emitted('update-edit-comment-input'),
+      copied: wrapper.emitted('showCopiedLinkNotification'),
+      mod: wrapper.emitted('openModProfile'),
+      scroll: wrapper.emitted('scrollToTop'),
+      openReply: wrapper.emitted('openReplyEditor'),
+      hideReply: wrapper.emitted('hideReplyEditor'),
+      openEdit: wrapper.emitted('openEditCommentEditor'),
+      hideEdit: wrapper.emitted('hideEditCommentEditor'),
+      viewFeedback: wrapper.emitted('handleViewFeedback'),
+      archive: wrapper.emitted('handleClickArchive'),
+      archiveSuspend: wrapper.emitted('handleClickArchiveAndSuspend'),
+      unarchive: wrapper.emitted('handleClickUnarchive'),
+    }).toEqual({
+      saveStart: [[]],
+      report: [[{ id: 'child-1' }]],
+      remove: [[{ commentId: 'child-1' }]],
+      create: [[]],
+      save: [[]],
+      edit: [['edited', true]],
+      copied: [[true]],
+      mod: [[]],
+      scroll: [[]],
+      openReply: [['child-1']],
+      hideReply: [[]],
+      openEdit: [['child-1']],
+      hideEdit: [[]],
+      viewFeedback: [['child-1']],
+      archive: [['child-1']],
+      archiveSuspend: [['child-1']],
+      unarchive: [['child-1']],
+    });
+  });
+
+  it('handles hover state on the child comment list', async () => {
+    const wrapper = mountComment(
+      baseComment({
+        ChildCommentsAggregate: { count: 1 },
+      } as unknown as Partial<Comment>)
+    );
+    const children = wrapper.findComponent({ name: 'ChildComments' });
+    await children.trigger('mouseenter');
+    await children.trigger('mouseleave');
+    expect(children.exists()).toBe(true);
   });
 
   it('renders a continue-thread link when reply depth exceeds the inline limit', async () => {

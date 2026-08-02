@@ -1,8 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { flushPromises } from '@vue/test-utils';
 import { useAlbumImageUpload } from '@/composables/useAlbumImageUpload';
 
 const mockCreateSignedStorageUrl = vi.fn();
 const mockCreateImage = vi.fn();
+const { mockUploadAndGetEmbeddedLink, mockIsFileSizeValid, mockUsername } =
+  vi.hoisted(() => ({
+    mockUploadAndGetEmbeddedLink: vi.fn(),
+    mockIsFileSizeValid: vi.fn(),
+    mockUsername: { value: 'testuser' },
+  }));
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (doc: unknown) => {
@@ -27,18 +34,18 @@ vi.mock('@/graphQLData/discussion/mutations', () => ({
 }));
 
 vi.mock('@/composables/useAuthState', () => ({
-  useUsername: () => ({ value: 'testuser' }),
+  useUsername: () => mockUsername,
 }));
 
 vi.mock('@/utils', () => ({
   getUploadFileName: vi.fn(() => 'test-file-123.jpg'),
-  uploadAndGetEmbeddedLink: vi.fn(() => Promise.resolve('https://storage.example.com/test-file-123.jpg')),
+  uploadAndGetEmbeddedLink: mockUploadAndGetEmbeddedLink,
 }));
 
 vi.mock('@/utils/index', () => ({
   getUploadFileName: vi.fn(() => 'test-file-123.jpg'),
-  uploadAndGetEmbeddedLink: vi.fn(() => Promise.resolve('https://storage.example.com/test-file-123.jpg')),
-  isFileSizeValid: vi.fn(() => ({ valid: true })),
+  uploadAndGetEmbeddedLink: mockUploadAndGetEmbeddedLink,
+  isFileSizeValid: mockIsFileSizeValid,
 }));
 
 describe('useAlbumImageUpload', () => {
@@ -48,6 +55,13 @@ describe('useAlbumImageUpload', () => {
   beforeEach(() => {
     mockCreateSignedStorageUrl.mockClear();
     mockCreateImage.mockClear();
+    mockUploadAndGetEmbeddedLink.mockReset();
+    mockUploadAndGetEmbeddedLink.mockResolvedValue(
+      'https://storage.example.com/test-file-123.jpg'
+    );
+    mockIsFileSizeValid.mockReset();
+    mockIsFileSizeValid.mockReturnValue({ valid: true, message: '' });
+    mockUsername.value = 'testuser';
     onImageUploaded = vi.fn(() => {});
     currentImageCount = () => 0;
     // happy-dom does not implement window.alert, and vitest 4's vi.spyOn
@@ -177,7 +191,9 @@ describe('useAlbumImageUpload', () => {
 
       // Mock successful upload flow
       mockCreateSignedStorageUrl.mockResolvedValue({
-        data: { createSignedStorageURL: { url: 'https://signed-url.example.com' } },
+        data: {
+          createSignedStorageURL: { url: 'https://signed-url.example.com' },
+        },
       });
       mockCreateImage.mockResolvedValue({
         data: {
@@ -260,6 +276,140 @@ describe('useAlbumImageUpload', () => {
 
       alertMock.mockRestore();
     });
+  });
+
+  describe('uploadFile failures', () => {
+    const file = new File(['content'], 'file.jpg', { type: 'image/jpeg' });
+
+    it('stops when no user is logged in', async () => {
+      mockUsername.value = '';
+      const { uploadFile } = useAlbumImageUpload({
+        maxImages: 25,
+        currentImageCount,
+        onImageUploaded,
+      });
+
+      expect(await uploadFile(file)).toBe(false);
+    });
+
+    it('stops when the file is too large', async () => {
+      mockIsFileSizeValid.mockReturnValue({
+        valid: false,
+        message: 'File is too large',
+      });
+      const alertMock = vi.spyOn(window, 'alert').mockImplementation(() => {});
+      const { uploadFile } = useAlbumImageUpload({
+        maxImages: 25,
+        currentImageCount,
+        onImageUploaded,
+      });
+      await uploadFile(file);
+
+      expect(alertMock).toHaveBeenCalledWith('File is too large');
+    });
+
+    it('fails when no signed upload URL is returned', async () => {
+      mockCreateSignedStorageUrl.mockResolvedValue({ data: {} });
+      const { uploadFile } = useAlbumImageUpload({
+        maxImages: 25,
+        currentImageCount,
+        onImageUploaded,
+      });
+
+      expect(await uploadFile(file)).toBe(false);
+    });
+
+    it('fails when storage does not return a file URL', async () => {
+      mockCreateSignedStorageUrl.mockResolvedValue({
+        data: { createSignedStorageURL: { url: 'https://signed.test' } },
+      });
+      mockUploadAndGetEmbeddedLink.mockResolvedValue('');
+      const { uploadFile } = useAlbumImageUpload({
+        maxImages: 25,
+        currentImageCount,
+        onImageUploaded,
+      });
+
+      expect(await uploadFile(file)).toBe(false);
+    });
+
+    it('fails when the image record is missing', async () => {
+      mockCreateSignedStorageUrl.mockResolvedValue({
+        data: { createSignedStorageURL: { url: 'https://signed.test' } },
+      });
+      mockCreateImage.mockResolvedValue({ data: {} });
+      const { uploadFile } = useAlbumImageUpload({
+        maxImages: 25,
+        currentImageCount,
+        onImageUploaded,
+      });
+
+      expect(await uploadFile(file)).toBe(false);
+    });
+  });
+
+  describe('file input handling', () => {
+    it('ignores file selection when uploads are disabled', () => {
+      const { handleFileInputChange } = useAlbumImageUpload({
+        maxImages: 25,
+        currentImageCount,
+        onImageUploaded,
+      });
+      handleFileInputChange({ target: {} } as Event, false);
+
+      expect(mockCreateSignedStorageUrl).not.toHaveBeenCalled();
+    });
+
+    it('ignores a file input without files', () => {
+      const { handleFileInputChange } = useAlbumImageUpload({
+        maxImages: 25,
+        currentImageCount,
+        onImageUploaded,
+      });
+      handleFileInputChange({ target: {} } as Event, true);
+
+      expect(mockCreateSignedStorageUrl).not.toHaveBeenCalled();
+    });
+
+    it('clears a populated input after starting its upload', async () => {
+      mockCreateSignedStorageUrl.mockResolvedValue({
+        data: { createSignedStorageURL: { url: 'https://signed.test' } },
+      });
+      mockCreateImage.mockResolvedValue({
+        data: {
+          createImageWithUploader: {
+            id: 'image-1',
+            url: 'https://storage.example.com/test-file-123.jpg',
+          },
+        },
+      });
+      const input = {
+        files: [new File(['content'], 'file.jpg', { type: 'image/jpeg' })],
+        value: 'selected',
+      };
+      const { handleFileInputChange } = useAlbumImageUpload({
+        maxImages: 25,
+        currentImageCount,
+        onImageUploaded,
+      });
+      handleFileInputChange({ target: input } as unknown as Event, true);
+      await flushPromises();
+
+      expect(input.value).toBe('');
+    });
+  });
+
+  it('returns null when creating a URL image without a user', async () => {
+    mockUsername.value = '';
+    const { createImageFromUrl } = useAlbumImageUpload({
+      maxImages: 25,
+      currentImageCount,
+      onImageUploaded,
+    });
+
+    expect(
+      await createImageFromUrl('https://example.com/image.jpg')
+    ).toBeNull();
   });
 
   describe('handleDrop', () => {

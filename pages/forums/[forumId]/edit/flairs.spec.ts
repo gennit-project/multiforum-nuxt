@@ -8,6 +8,8 @@ const harness = vi.hoisted(() => ({
   mutationDone: undefined as undefined | ((result: unknown) => void),
   mutate: vi.fn().mockResolvedValue(undefined),
   toastSuccess: vi.fn(),
+  queryVariables: undefined as undefined | Record<string, unknown>,
+  queryEnabled: undefined as undefined | boolean,
 }));
 
 vi.mock('nuxt/app', () => ({
@@ -19,13 +21,21 @@ vi.mock('@/composables/useToast', () => ({
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => ({
-    loading: ref(false),
-    error: ref(null),
-    onResult: (callback: (result: unknown) => void) => {
-      harness.queryResult = callback;
-    },
-  }),
+  useQuery: (
+    _operation: unknown,
+    variables: () => Record<string, unknown>,
+    options: { enabled: { value: boolean } }
+  ) => {
+    harness.queryVariables = variables();
+    harness.queryEnabled = options.enabled.value;
+    return {
+      loading: ref(false),
+      error: ref(null),
+      onResult: (callback: (result: unknown) => void) => {
+        harness.queryResult = callback;
+      },
+    };
+  },
   useMutation: () => ({
     mutate: harness.mutate,
     loading: ref(false),
@@ -67,6 +77,14 @@ const buttonNamed = (wrapper: ReturnType<typeof mount>, name: string) => {
 };
 
 describe('forum post flair settings', () => {
+  it('queries the current forum including archived flairs', async () => {
+    await mountPage();
+    expect([harness.queryVariables, harness.queryEnabled]).toEqual([
+      { channelUniqueName: 'cats', includeArchived: true },
+      true,
+    ]);
+  });
+
   it('loads active and archived flairs from the management query', async () => {
     const wrapper = await mountPage([
       {
@@ -151,5 +169,141 @@ describe('forum post flair settings', () => {
       mutationCalls: 0,
       message: 'Add at least one active flair before requiring flairs.',
     });
+  });
+
+  it.each([
+    ['', 'Each active flair needs a name.'],
+    ['x'.repeat(41), 'Flair names must be 40 characters or fewer.'],
+  ])('rejects the invalid flair name %j', async (name, message) => {
+    const wrapper = await mountPage([
+      {
+        id: 'flair-1',
+        displayName: name,
+        color: '#2563EB',
+        order: 0,
+        archived: false,
+      },
+    ]);
+    await buttonNamed(wrapper, 'Save flair settings').trigger('click');
+    expect(wrapper.get('[data-testid="error-banner"]').text()).toBe(message);
+  });
+
+  it('rejects malformed flair colors', async () => {
+    const wrapper = await mountPage([
+      {
+        id: 'flair-1',
+        displayName: 'Question',
+        color: 'blue',
+        order: 0,
+        archived: false,
+      },
+    ]);
+    await buttonNamed(wrapper, 'Save flair settings').trigger('click');
+    expect(wrapper.get('[data-testid="error-banner"]').text()).toBe(
+      'Flair colors must use six-digit hex values such as #F97316.'
+    );
+  });
+
+  it('rejects duplicate active flair names case-insensitively', async () => {
+    const wrapper = await mountPage([
+      {
+        id: 'flair-1',
+        displayName: 'Question',
+        color: '#2563EB',
+        order: 0,
+        archived: false,
+      },
+      {
+        id: 'flair-2',
+        displayName: ' question ',
+        color: '#16A34A',
+        order: 1,
+        archived: false,
+      },
+    ]);
+    await buttonNamed(wrapper, 'Save flair settings').trigger('click');
+    expect(wrapper.get('[data-testid="error-banner"]').text()).toBe(
+      'Active flair names must be unique.'
+    );
+  });
+
+  it('adds and removes an unsaved flair', async () => {
+    const wrapper = await mountPage();
+    await buttonNamed(wrapper, 'Add flair').trigger('click');
+    await buttonNamed(wrapper, 'Archive').trigger('click');
+    expect(wrapper.findAll('[data-testid="active-flair-row"]')).toHaveLength(0);
+  });
+
+  it('moves active flairs and restores archived flairs', async () => {
+    const wrapper = await mountPage([
+      {
+        id: 'flair-1',
+        displayName: 'Question',
+        color: '#2563EB',
+        order: 0,
+        archived: false,
+      },
+      {
+        id: 'flair-2',
+        displayName: 'Guide',
+        color: '#16A34A',
+        order: 1,
+        archived: false,
+      },
+      {
+        id: 'flair-3',
+        displayName: 'Old',
+        color: null,
+        order: 2,
+        archived: true,
+      },
+    ]);
+    await wrapper
+      .get('button[aria-label="Move Question down"]')
+      .trigger('click');
+    await buttonNamed(wrapper, 'Restore').trigger('click');
+    expect(
+      wrapper
+        .findAll('[data-testid="active-flair-row"] input[type="text"]')
+        .filter((input) =>
+          input.attributes('aria-label')?.startsWith('Flair name')
+        )
+        .map((input) => input.element.value)
+    ).toEqual(['Guide', 'Question', 'Old']);
+  });
+
+  it('applies the saved response and announces success', async () => {
+    const wrapper = await mountPage();
+    harness.mutationDone?.(
+      configResult([
+        {
+          id: 'flair-1',
+          displayName: 'Saved',
+          color: '#2563EB',
+          order: 0,
+          archived: false,
+        },
+      ])
+    );
+    await nextTick();
+    expect([
+      wrapper.get('input[aria-label="Flair name 1"]').element.value,
+      harness.toastSuccess.mock.calls,
+    ]).toEqual(['Saved', [['Post flair settings saved']]]);
+  });
+
+  it('handles a rejected save through the Apollo mutation error state', async () => {
+    harness.mutate.mockRejectedValueOnce(new Error('network'));
+    const wrapper = await mountPage([
+      {
+        id: 'flair-1',
+        displayName: 'Question',
+        color: '',
+        order: 0,
+        archived: false,
+      },
+    ]);
+    await buttonNamed(wrapper, 'Save flair settings').trigger('click');
+    expect(harness.mutate).toHaveBeenCalledOnce();
   });
 });

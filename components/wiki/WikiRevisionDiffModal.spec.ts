@@ -1,6 +1,22 @@
-import { describe, it, expect } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
+import { flushPromises, mount } from '@vue/test-utils';
 import WikiRevisionDiffModal from './WikiRevisionDiffModal.vue';
+
+const mutation = vi.hoisted(() => ({
+  mutate: vi.fn(),
+  done: undefined as undefined | (() => void),
+}));
+
+vi.mock('@vue/apollo-composable', () => ({
+  useMutation: () => ({
+    mutate: mutation.mutate,
+    loading: false,
+    error: null,
+    onDone: (callback: () => void) => {
+      mutation.done = callback;
+    },
+  }),
+}));
 
 vi.mock('@headlessui/vue', () => ({
   TransitionRoot: { name: 'TransitionRoot', template: '<div><slot /></div>' },
@@ -42,6 +58,12 @@ const newVersion = {
   createdAt: new Date().toISOString(),
   Author: { username: 'new-wiki-user' },
 };
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  mutation.done = undefined;
+  mutation.mutate.mockResolvedValue({});
+});
 
 describe('WikiRevisionDiffModal', () => {
   it('uses a neutral primary action and a danger redaction action', () => {
@@ -129,5 +151,68 @@ describe('WikiRevisionDiffModal', () => {
       hasOldLine: true,
       hasNewLine: true,
     });
+  });
+
+  it('redacts the older revision after confirmation', async () => {
+    vi.stubGlobal('confirm', vi.fn().mockReturnValue(true));
+    const wrapper = mount(WikiRevisionDiffModal, {
+      props: { open: true, oldVersion, newVersion },
+    });
+
+    wrapper
+      .findComponent({ name: 'GenericModal' })
+      .vm.$emit('danger-button-click');
+    await flushPromises();
+
+    expect(mutation.mutate).toHaveBeenCalledWith({ textVersionId: 'w1' });
+  });
+
+  it('emits deletion and closure after the mutation completes', () => {
+    const wrapper = mount(WikiRevisionDiffModal, {
+      props: { open: true, oldVersion, newVersion },
+    });
+
+    mutation.done?.();
+
+    expect(wrapper.emitted()).toMatchObject({ deleted: [['w1']], close: [[]] });
+  });
+
+  it('restores the redaction action and logs a failed mutation', async () => {
+    vi.stubGlobal('confirm', vi.fn().mockReturnValue(true));
+    const failure = new Error('denied');
+    mutation.mutate.mockRejectedValue(failure);
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    const wrapper = mount(WikiRevisionDiffModal, {
+      props: { open: true, oldVersion, newVersion },
+    });
+
+    wrapper
+      .findComponent({ name: 'GenericModal' })
+      .vm.$emit('danger-button-click');
+    await flushPromises();
+
+    expect({
+      loading: wrapper
+        .findComponent({ name: 'GenericModal' })
+        .props('dangerButtonLoading'),
+      log: consoleError.mock.calls[0],
+    }).toEqual({
+      loading: false,
+      log: ['Error deleting revision:', failure],
+    });
+  });
+
+  it('closes from the primary action', () => {
+    const wrapper = mount(WikiRevisionDiffModal, {
+      props: { open: true, oldVersion, newVersion },
+    });
+
+    wrapper
+      .findComponent({ name: 'GenericModal' })
+      .vm.$emit('primary-button-click');
+
+    expect(wrapper.emitted('close')).toEqual([[]]);
   });
 });

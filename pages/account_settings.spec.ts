@@ -6,6 +6,7 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 
 const updateUser = vi.fn();
 const refetchUser = vi.fn();
+let onDoneCallback: (() => void) | undefined;
 const getUserResult = ref({
   users: [
     {
@@ -46,7 +47,7 @@ vi.mock('@/composables/useAuthState', () => ({
 
 vi.mock('@/config', () => ({
   config: {
-    enableLanguagePicker: false,
+    enableLanguagePicker: true,
   },
 }));
 
@@ -77,19 +78,48 @@ describe('account_settings', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.clearAllMocks();
+    onDoneCallback = undefined;
+    getUserResult.value = {
+      users: [
+        {
+          Email: { address: 'alice@example.com' },
+          profilePicURL: '',
+          displayName: 'Alice',
+          bio: '',
+          notifyOnReplyToCommentByDefault: false,
+          notifyOnReplyToDiscussionByDefault: false,
+          notifyOnReplyToEventByDefault: false,
+          notifyWhenTagged: false,
+          notifyOnSubscribedIssueUpdates: null,
+          notifyOnFeedback: false,
+          notifyOnSuspensionBlocks: null,
+          notificationBundleInterval: 'hourly',
+          notificationBundleEnabled: true,
+          enableSensitiveContentByDefault: false,
+        },
+      ],
+    };
 
-    (useQuery as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      result: getUserResult,
-      loading: ref(false),
-      error: ref(null),
-      refetch: refetchUser,
-    });
+    (useQuery as unknown as ReturnType<typeof vi.fn>).mockImplementation(
+      (_query: unknown, variables: () => unknown, options: () => unknown) => {
+        variables();
+        options();
+        return {
+          result: getUserResult,
+          loading: ref(false),
+          error: ref(null),
+          refetch: refetchUser,
+        };
+      }
+    );
 
     (useMutation as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       mutate: updateUser,
       loading: ref(false),
       error: ref(null),
-      onDone: vi.fn(),
+      onDone: (callback: () => void) => {
+        onDoneCallback = callback;
+      },
     });
   });
 
@@ -110,15 +140,21 @@ describe('account_settings', () => {
             },
           }),
           RequireAuth: RequireAuthStub,
-          EditAccountSettingsFields: true,
-          NotificationComponent: true,
+          EditAccountSettingsFields: {
+            name: 'EditAccountSettingsFields',
+            props: ['formValues'],
+            emits: ['submit', 'update-form-values'],
+            template: '<div class="account-fields" />',
+          },
+          NotificationComponent: {
+            name: 'NotificationComponent',
+            emits: ['close-notification'],
+            template: '<div class="saved-notification" />',
+          },
           FormRow: defineComponent({
             setup(_props, { slots }) {
               return () =>
-                h('div', [
-                  slots.content?.(),
-                  slots['sub-description']?.(),
-                ]);
+                h('div', [slots.content?.(), slots['sub-description']?.()]);
             },
           }),
           CheckBox: CheckBoxStub,
@@ -135,7 +171,9 @@ describe('account_settings', () => {
   it('autosaves subscribed issue email preference changes', async () => {
     const wrapper = buildWrapper();
 
-    await wrapper.get('[data-testid="notify-subscribed-issues"]').trigger('click');
+    await wrapper
+      .get('[data-testid="notify-subscribed-issues"]')
+      .trigger('click');
     await vi.advanceTimersByTimeAsync(900);
 
     expect(updateUser).toHaveBeenCalledWith({
@@ -155,7 +193,9 @@ describe('account_settings', () => {
   it('autosaves suspension block notification preference changes', async () => {
     const wrapper = buildWrapper();
 
-    await wrapper.get('[data-testid="notify-suspension-blocks"]').trigger('click');
+    await wrapper
+      .get('[data-testid="notify-suspension-blocks"]')
+      .trigger('click');
     await vi.advanceTimersByTimeAsync(900);
 
     expect(updateUser).toHaveBeenCalledWith({
@@ -164,5 +204,97 @@ describe('account_settings', () => {
         notifyOnSuspensionBlocks: false,
       }),
     });
+  });
+
+  it.each([
+    ['notify-comment-reply', 'notifyOnReplyToCommentByDefault'],
+    ['notify-discussion-reply', 'notifyOnReplyToDiscussionByDefault'],
+    ['notify-event-reply', 'notifyOnReplyToEventByDefault'],
+    ['notify-tagged', 'notifyWhenTagged'],
+    ['notify-feedback', 'notifyOnFeedback'],
+    ['enable-sensitive-content', 'enableSensitiveContentByDefault'],
+  ])('autosaves the %s preference', async (testId, field) => {
+    const wrapper = buildWrapper();
+    await wrapper.get(`[data-testid="${testId}"]`).trigger('click');
+    await vi.advanceTimersByTimeAsync(900);
+    expect(updateUser).toHaveBeenCalledWith({
+      where: { username: 'alice' },
+      update: expect.objectContaining({ [field]: true }),
+    });
+  });
+
+  it('updates and submits the basic account profile', async () => {
+    const wrapper = buildWrapper();
+    const fields = wrapper.findComponent({ name: 'EditAccountSettingsFields' });
+    await fields.vm.$emit('update-form-values', {
+      displayName: 'Alicia',
+      bio: 'Hello',
+      profilePicURL: '/alice.png',
+    });
+    await fields.vm.$emit('submit');
+    expect({
+      mutation: updateUser.mock.calls.at(-1)?.[0],
+      refetches: refetchUser.mock.calls.length,
+    }).toEqual({
+      mutation: {
+        where: { username: 'alice' },
+        update: {
+          displayName: 'Alicia',
+          bio: 'Hello',
+          profilePicURL: '/alice.png',
+        },
+      },
+      refetches: 1,
+    });
+  });
+
+  it('shows and dismisses the saved notification after mutation completion', async () => {
+    const wrapper = buildWrapper();
+    onDoneCallback?.();
+    await wrapper.vm.$nextTick();
+    const notification = wrapper.findComponent({
+      name: 'NotificationComponent',
+    });
+    await notification.vm.$emit('close-notification');
+    expect(wrapper.find('.saved-notification').exists()).toBe(false);
+  });
+
+  it('updates account fields when refreshed user data arrives', async () => {
+    const wrapper = buildWrapper();
+    getUserResult.value = {
+      users: [
+        {
+          ...getUserResult.value.users[0],
+          displayName: 'Updated Alice',
+          bio: 'Updated bio',
+        },
+      ],
+    };
+    await wrapper.vm.$nextTick();
+    expect(
+      wrapper
+        .findComponent({ name: 'EditAccountSettingsFields' })
+        .props('formValues')
+    ).toEqual(
+      expect.objectContaining({
+        displayName: 'Updated Alice',
+        bio: 'Updated bio',
+      })
+    );
+  });
+
+  it('changes the selected language', async () => {
+    const wrapper = buildWrapper();
+    const select = wrapper.get('select');
+    await select.setValue('es');
+    expect((select.element as HTMLSelectElement).value).toBe('es');
+  });
+
+  it('shows the no-email fallback for a user without an email', () => {
+    getUserResult.value = {
+      users: [{ ...getUserResult.value.users[0], Email: null }],
+    };
+    const wrapper = buildWrapper();
+    expect(wrapper.text()).toContain('accountSettings.noEmailAssociated');
   });
 });

@@ -4,6 +4,11 @@ import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import EventItemInProfile from '@/components/user/EventItemInProfile.vue';
 
+const channelState = vi.hoisted(() => ({
+  selectedChannels: { value: [] as string[] },
+  hasSelectedChannels: { value: false },
+}));
+
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({ params: { username: 'alice' }, query: {} }),
 }));
@@ -14,8 +19,8 @@ vi.mock('@vue/apollo-composable', () => ({
 
 vi.mock('@/composables/useSelectedChannelsFromQuery', () => ({
   useSelectedChannelsFromQuery: () => ({
-    selectedChannels: ref([]),
-    hasSelectedChannels: ref(false),
+    selectedChannels: channelState.selectedChannels,
+    hasSelectedChannels: channelState.hasSelectedChannels,
   }),
 }));
 
@@ -42,5 +47,18 @@ describe('user events profile page', () => {
       users: [{ Events: [{ id: 'e1' }, { id: 'e2' }] }],
     });
     expect(wrapper.findAllComponents(EventItemInProfile)).toHaveLength(2);
+  });
+
+  it('adds selected channels to the event query', async () => {
+    channelState.selectedChannels.value = ['events'];
+    channelState.hasSelectedChannels.value = true;
+    await mountWith({ users: [{ Events: [] }] });
+
+    expect(mockedUseQuery.mock.calls.at(-1)?.[1]()).toEqual({
+      username: 'alice',
+      where: {
+        EventChannels_SOME: { channelUniqueName_IN: ['events'] },
+      },
+    });
   });
 });

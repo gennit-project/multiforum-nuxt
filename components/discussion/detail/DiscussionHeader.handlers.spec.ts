@@ -4,17 +4,27 @@ import { mount } from '@vue/test-utils';
 import DiscussionHeader from './DiscussionHeader.vue';
 
 let routeName = 'forums-forumId-discussions-discussionId';
-let routeParams: Record<string, unknown> = { forumId: 'cats', discussionId: 'd1' };
+let routeParams: Record<string, unknown> = {
+  forumId: 'cats',
+  discussionId: 'd1',
+};
 const routerPush = vi.fn();
 const clipboardWriteText = vi.fn().mockResolvedValue(undefined);
 // useMutation order: 0 DELETE_DISCUSSION, 1 UPDATE_DISCUSSION_SENSITIVE_CONTENT.
 let mutateSpies: ReturnType<typeof vi.fn>[] = [];
-let mutationOptions: ({ update?: (cache: unknown, payload: { data?: unknown }) => void } | undefined)[] = [];
+let mutationOptions: (
+  { update?: (cache: unknown, payload: { data?: unknown }) => void } | undefined
+)[] = [];
 let onDoneCallbacks: (() => void)[] = [];
 let useMutationCall = 0;
 
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({ name: routeName, params: routeParams, query: {}, path: '' }),
+  useRoute: () => ({
+    name: routeName,
+    params: routeParams,
+    query: {},
+    path: '',
+  }),
   useRouter: () => ({ push: routerPush, resolve: () => ({ href: '/x' }) }),
 }));
 
@@ -31,7 +41,9 @@ vi.mock('@vue/apollo-composable', () => ({
     const index = useMutationCall++;
     const mutate = vi.fn().mockResolvedValue({});
     mutateSpies[index] = mutate;
-    mutationOptions[index] = options as { update?: (cache: unknown, payload: { data?: unknown }) => void };
+    mutationOptions[index] = options as {
+      update?: (cache: unknown, payload: { data?: unknown }) => void;
+    };
     return {
       mutate,
       loading: ref(false),
@@ -69,7 +81,18 @@ vi.mock('@/composables/useForumRoleMembership', () => ({
 const stubs = {
   AvatarComponent: { template: '<div />' },
   ErrorBanner: { template: '<div />' },
-  NotificationComponent: { template: '<div />' },
+  NotificationComponent: {
+    name: 'Notification',
+    props: ['show', 'title'],
+    emits: ['close-notification'],
+    template: '<div />',
+  },
+  Notification: {
+    name: 'Notification',
+    props: ['show', 'title'],
+    emits: ['close-notification'],
+    template: '<div />',
+  },
   BrokenRulesModal: { template: '<div />' },
   EllipsisHorizontal: { template: '<i />' },
   AddToDiscussionFavorites: { template: '<div />' },
@@ -79,7 +102,8 @@ const stubs = {
   NuxtLink: { template: '<a><slot /></a>' },
   WarningModal: {
     props: ['open', 'title', 'body'],
-    template: '<div data-testid="warning-modal" :data-open="open" :data-title="title" />',
+    template:
+      '<div data-testid="warning-modal" :data-open="open" :data-title="title" />',
   },
   MenuButton: {
     props: ['items'],
@@ -95,7 +119,12 @@ const baseDiscussion = (overrides: Record<string, unknown> = {}) => ({
   updatedAt: '2024-01-01T00:00:00Z',
   hasSensitiveContent: false,
   hasDownload: false,
-  Author: { username: 'viewer', displayName: 'Viewer', profilePicURL: '', ChannelRoles: [] },
+  Author: {
+    username: 'viewer',
+    displayName: 'Viewer',
+    profilePicURL: '',
+    ChannelRoles: [],
+  },
   DiscussionChannels: [{ channelUniqueName: 'cats' }],
   ...overrides,
 });
@@ -163,6 +192,24 @@ describe('DiscussionHeader — share menu', () => {
       expect.objectContaining({ name: 'discussions-create' })
     );
   });
+
+  it('clears the copied notification after two seconds', async () => {
+    vi.useFakeTimers();
+    const wrapper = buildWrapper();
+    await shareMenu(wrapper).vm.$emit('copy-link');
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(
+      wrapper.findAllComponents({ name: 'Notification' }).at(-1)?.props('show')
+    ).toBe(false);
+    vi.useRealTimers();
+  });
+
+  it('handles a clipboard rejection', async () => {
+    clipboardWriteText.mockRejectedValueOnce(new Error('denied'));
+    const wrapper = buildWrapper();
+    await shareMenu(wrapper).vm.$emit('copy-link');
+    expect(clipboardWriteText).toHaveBeenCalledOnce();
+  });
 });
 
 describe('DiscussionHeader — action menu', () => {
@@ -183,6 +230,46 @@ describe('DiscussionHeader — action menu', () => {
       discussionId: 'd1',
       hasSensitiveContent: true,
     });
+  });
+
+  it('handles a failed sensitive-content update', async () => {
+    const wrapper = buildWrapper();
+    mutateSpies[1].mockRejectedValueOnce(new Error('offline'));
+    await actionMenu(wrapper).vm.$emit('handle-toggle-sensitive-content');
+    expect(mutateSpies[1]).toHaveBeenCalledOnce();
+  });
+
+  it.each([
+    [false, '/forums/cats/discussions/edit/d1'],
+    [true, '/forums/cats/downloads/edit/d1'],
+  ])(
+    'opens the matching edit route when download is %s',
+    async (hasDownload, path) => {
+      const wrapper = buildWrapper({
+        discussion: baseDiscussion({ hasDownload }),
+      });
+      await actionMenu(wrapper).vm.$emit('handle-edit');
+      expect(routerPush).toHaveBeenCalledWith(path);
+    }
+  );
+
+  it('forwards feedback and album actions and opens the feedback page', async () => {
+    const wrapper = buildWrapper();
+    const menu = actionMenu(wrapper);
+    await menu.vm.$emit('handle-feedback');
+    await menu.vm.$emit('handle-add-album');
+    await menu.vm.$emit('handle-view-feedback');
+    expect([wrapper.emitted(), routerPush.mock.calls]).toMatchObject([
+      { handleClickGiveFeedback: [[]], handleClickAddAlbum: [[]] },
+      [
+        [
+          {
+            name: 'forums-forumId-discussions-feedback-discussionId',
+            params: { forumId: 'cats', discussionId: 'd1' },
+          },
+        ],
+      ],
+    ]);
   });
 });
 
@@ -236,7 +323,9 @@ describe('DiscussionHeader — delete flow', () => {
   it('evicts the deleted discussion from the cache', () => {
     buildWrapper();
     const cache = { evict: vi.fn(), identify: vi.fn(() => 'id') };
-    mutationOptions[0]!.update!(cache, { data: { deleteDiscussions: { nodesDeleted: 1 } } });
+    mutationOptions[0]!.update!(cache, {
+      data: { deleteDiscussions: { nodesDeleted: 1 } },
+    });
 
     expect(cache.evict).toHaveBeenCalledTimes(1);
   });
@@ -244,9 +333,22 @@ describe('DiscussionHeader — delete flow', () => {
   it('does not evict when nothing was deleted', () => {
     buildWrapper();
     const cache = { evict: vi.fn(), identify: vi.fn(() => 'id') };
-    mutationOptions[0]!.update!(cache, { data: { deleteDiscussions: { nodesDeleted: 0 } } });
+    mutationOptions[0]!.update!(cache, {
+      data: { deleteDiscussions: { nodesDeleted: 0 } },
+    });
 
     expect(cache.evict).not.toHaveBeenCalled();
+  });
+
+  it('closes the delete modal from its close event', async () => {
+    const wrapper = buildWrapper();
+    await actionMenu(wrapper).vm.$emit('handle-delete');
+    await wrapper
+      .findComponent('[data-testid="warning-modal"]')
+      .vm.$emit('close');
+    expect(
+      wrapper.find('[data-testid="warning-modal"]').attributes('data-open')
+    ).toBe('false');
   });
 });
 

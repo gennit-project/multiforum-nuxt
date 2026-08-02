@@ -48,19 +48,36 @@ const mountLightbox = (props: Record<string, unknown> = {}) =>
         LightboxImagePanel: childStub(
           'LightboxImagePanel',
           ['currentImage', 'zoomLevel', 'isZoomed', 'isDragging'],
-          ['prev-image', 'next-image', 'mousedown', 'touchstart', 'touchend', 'touchmove']
+          [
+            'prev-image',
+            'next-image',
+            'mousedown',
+            'touchstart',
+            'touchend',
+            'touchmove',
+          ]
         ),
         LightboxInfoPanel: childStub(
           'LightboxInfoPanel',
           ['currentImage', 'isEditing', 'editingCaption'],
-          ['start-editing', 'update-caption', 'save-caption', 'cancel-editing', 'close-panel']
+          [
+            'start-editing',
+            'update-caption',
+            'save-caption',
+            'cancel-editing',
+            'close-panel',
+          ]
         ),
         BrokenRulesModal: childStub(
           'BrokenRulesModal',
           ['open', 'imageId'],
           ['close', 'report-submitted-successfully']
         ),
-        Notification: childStub('Notification', ['show', 'title'], ['close-notification']),
+        Notification: childStub(
+          'Notification',
+          ['show', 'title'],
+          ['close-notification']
+        ),
       },
     },
   });
@@ -106,7 +123,9 @@ describe('ImageLightbox current image', () => {
   it('navigates via the image panel next-image event', async () => {
     const wrapper = mountLightbox();
 
-    await wrapper.getComponent({ name: 'LightboxImagePanel' }).vm.$emit('next-image');
+    await wrapper
+      .getComponent({ name: 'LightboxImagePanel' })
+      .vm.$emit('next-image');
 
     expect(controls(wrapper).props('currentImageId')).toBe('img2');
   });
@@ -294,6 +313,18 @@ describe('ImageLightbox info panel', () => {
 
     expect(infoPanel(wrapper).props('isEditing')).toBe(false);
   });
+
+  it('alerts and stays in edit mode when the caption update fails', async () => {
+    h.updateImage = vi.fn().mockRejectedValueOnce(new Error('offline'));
+    vi.stubGlobal('alert', vi.fn());
+    const wrapper = mountLightbox();
+    await infoPanel(wrapper).vm.$emit('start-editing');
+    await infoPanel(wrapper).vm.$emit('save-caption');
+    expect([
+      vi.mocked(globalThis.alert).mock.calls,
+      infoPanel(wrapper).props('isEditing'),
+    ]).toEqual([[['Error saving caption. Please try again.']], true]);
+  });
 });
 
 describe('ImageLightbox reporting', () => {
@@ -315,15 +346,22 @@ describe('ImageLightbox reporting', () => {
     expect(wrapper.emitted('close')).toBeUndefined();
   });
 
+  it('closes the report modal when the nested modal requests it', async () => {
+    const wrapper = mountLightbox();
+    await controls(wrapper).vm.$emit('report-image');
+    await reportModal(wrapper).vm.$emit('close');
+    expect(reportModal(wrapper).props('open')).toBe(false);
+  });
+
   it('shows the success notification after a report is submitted', async () => {
     const wrapper = mountLightbox();
     await controls(wrapper).vm.$emit('report-image');
 
     await reportModal(wrapper).vm.$emit('report-submitted-successfully');
 
-    expect(
-      wrapper.getComponent({ name: 'Notification' }).props('show')
-    ).toBe(true);
+    expect(wrapper.getComponent({ name: 'Notification' }).props('show')).toBe(
+      true
+    );
   });
 
   it('dismisses the success notification', async () => {
@@ -335,8 +373,54 @@ describe('ImageLightbox reporting', () => {
       .getComponent({ name: 'Notification' })
       .vm.$emit('close-notification');
 
-    expect(
-      wrapper.getComponent({ name: 'Notification' }).props('show')
-    ).toBe(false);
+    expect(wrapper.getComponent({ name: 'Notification' }).props('show')).toBe(
+      false
+    );
+  });
+});
+
+describe('ImageLightbox pointer handling', () => {
+  it('ignores mouseup from an editing control', async () => {
+    const wrapper = mountLightbox();
+    await infoPanel(wrapper).vm.$emit('start-editing');
+    const button = document.createElement('button');
+    document.body.appendChild(button);
+    const event = new MouseEvent('mouseup', { bubbles: true });
+    const stopPropagation = vi.spyOn(event, 'stopPropagation');
+    button.dispatchEvent(event);
+    button.remove();
+    expect(stopPropagation).toHaveBeenCalled();
+  });
+
+  it('routes zoomed touch gestures through dragging', async () => {
+    const wrapper = mountLightbox();
+    await controls(wrapper).vm.$emit('zoom-in');
+    await imagePanel(wrapper).vm.$emit('touchstart', {
+      touches: [{ clientX: 10, clientY: 10 }],
+      preventDefault: vi.fn(),
+    });
+    await imagePanel(wrapper).vm.$emit('touchmove', {
+      touches: [{ clientX: 20, clientY: 25 }],
+      preventDefault: vi.fn(),
+    });
+    await imagePanel(wrapper).vm.$emit('touchend', {
+      changedTouches: [{ clientX: 30 }],
+    });
+    expect(imagePanel(wrapper).props('isDragging')).toBe(true);
+  });
+
+  it('ignores touch swipes that start on an editing button', async () => {
+    const wrapper = mountLightbox();
+    await infoPanel(wrapper).vm.$emit('start-editing');
+    const button = document.createElement('button');
+    await imagePanel(wrapper).vm.$emit('touchstart', {
+      target: button,
+      touches: [{ clientX: 300 }],
+    });
+    await imagePanel(wrapper).vm.$emit('touchend', {
+      target: button,
+      changedTouches: [{ clientX: 0 }],
+    });
+    expect(controls(wrapper).props('currentImageId')).toBe('img1');
   });
 });

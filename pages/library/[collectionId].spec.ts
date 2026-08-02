@@ -124,7 +124,11 @@ const mountWith = async (collection: unknown) => {
       stubs: {
         RequireAuth: RequireAuthStub,
         NuxtLink: { template: '<a><slot /></a>' },
-        LibraryDownloadCard: true,
+        LibraryDownloadCard: {
+          name: 'LibraryDownloadCard',
+          props: ['previewImageUrl'],
+          template: '<div class="download-card" />',
+        },
         LibraryDiscussionCard: LibraryDiscussionCardStub,
         LibraryChannelCard: true,
         LibraryCommentCard: LibraryCommentCardStub,
@@ -138,12 +142,7 @@ const mountWith = async (collection: unknown) => {
         },
         GenericModal: {
           name: 'GenericModal',
-          props: [
-            'open',
-            'title',
-            'primaryButtonDisabled',
-            'error',
-          ],
+          props: ['open', 'title', 'primaryButtonDisabled', 'error'],
           emits: ['primary-button-click', 'close'],
           template:
             '<section v-if="open" :data-title="title"><slot name="content" /><p v-if="error">{{ error }}</p><button data-testid="modal-primary" :disabled="primaryButtonDisabled" @click="$emit(\'primary-button-click\')">primary</button></section>',
@@ -157,7 +156,8 @@ const mountWith = async (collection: unknown) => {
         },
         Breadcrumbs: {
           props: ['links'],
-          template: '<nav>{{ links.map((link) => link.label).join(" > ") }}</nav>',
+          template:
+            '<nav>{{ links.map((link) => link.label).join(" > ") }}</nav>',
         },
       },
     },
@@ -182,7 +182,9 @@ describe('library collection detail page', () => {
   it('shows a not found state when the collection is missing', async () => {
     const wrapper = await mountWith(null);
 
-    expect(wrapper.text()).toContain("This collection doesn't exist or you don't have access to it.");
+    expect(wrapper.text()).toContain(
+      "This collection doesn't exist or you don't have access to it."
+    );
   });
 
   it('shows the collection name when it loads', async () => {
@@ -237,7 +239,9 @@ describe('library collection detail page', () => {
       itemCount: 0,
     });
 
-    const shareButton = wrapper.find('button[title="Make this collection public before sharing it to a forum"]');
+    const shareButton = wrapper.find(
+      'button[title="Make this collection public before sharing it to a forum"]'
+    );
     expect(shareButton.exists()).toBe(true);
     expect(shareButton.attributes('disabled')).toBeDefined();
     expect(wrapper.text()).toContain(
@@ -278,7 +282,9 @@ describe('library collection detail page', () => {
       itemCount: 0,
     });
 
-    await wrapper.find('button[title="Share this public collection to a forum discussion"]').element;
+    await wrapper.find(
+      'button[title="Share this public collection to a forum discussion"]'
+    ).element;
     await wrapper
       .findAll('button')
       .find((button) => button.text().includes('Make Private'))!
@@ -324,7 +330,9 @@ describe('library collection detail page', () => {
     });
 
     await wrapper
-      .find('button[title="Share this public collection to a forum discussion"]')
+      .find(
+        'button[title="Share this public collection to a forum discussion"]'
+      )
       .trigger('click');
     await wrapper.find('[data-testid="forum-picker"]').trigger('click');
     await wrapper.find('[data-testid="modal-primary"]').trigger('click');
@@ -353,7 +361,9 @@ describe('library collection detail page', () => {
     });
 
     await wrapper
-      .find('button[title="Share this public collection to a forum discussion"]')
+      .find(
+        'button[title="Share this public collection to a forum discussion"]'
+      )
       .trigger('click');
     await wrapper.find('[data-testid="forum-picker"]').trigger('click');
     await wrapper.find('[data-testid="modal-primary"]').trigger('click');
@@ -440,6 +450,122 @@ describe('library collection detail page', () => {
     expect(refetchCollection).toHaveBeenCalled();
   });
 
+  it.each([
+    [
+      'CHANNELS',
+      'Move Cats down',
+      {
+        Channels: [
+          { id: 'ch1', uniqueName: 'cats', displayName: 'Cats' },
+          { id: 'ch2', uniqueName: 'dogs', displayName: 'Dogs' },
+        ],
+        itemOrder: ['ch1', 'ch2'],
+        expectedId: 'ch1',
+      },
+    ],
+    [
+      'IMAGES',
+      'Move First image down',
+      {
+        Images: [
+          { id: 'i1', alt: 'First image', url: '/first.png' },
+          { id: 'i2', alt: 'Second image', url: '/second.png' },
+        ],
+        itemOrder: ['i1', 'i2'],
+        expectedId: 'i1',
+      },
+    ],
+    [
+      'COMMENTS',
+      'Move comment down',
+      {
+        Comments: [
+          { id: 'c1', text: 'First comment' },
+          { id: 'c2', text: 'Second comment' },
+        ],
+        itemOrder: ['c1', 'c2'],
+        expectedId: 'c1',
+      },
+    ],
+  ])('reorders %s collection items', async (collectionType, label, data) => {
+    const wrapper = await mountWith({
+      id: 'col-1',
+      name: 'Ordered items',
+      collectionType,
+      visibility: 'PRIVATE',
+      itemCount: 2,
+      ...data,
+    });
+    await wrapper.find(`button[aria-label="${label}"]`).trigger('click');
+    expect(mutationMocks.reorder).toHaveBeenCalledWith({
+      collectionId: 'col-1',
+      itemId: data.expectedId,
+      newPosition: 1,
+    });
+  });
+
+  it('renders a download preview using album image order', async () => {
+    const wrapper = await mountWith({
+      id: 'col-1',
+      name: 'Downloads',
+      collectionType: 'DOWNLOADS',
+      visibility: 'PRIVATE',
+      itemCount: 1,
+      Downloads: [
+        {
+          id: 'd1',
+          title: 'House',
+          Album: {
+            imageOrder: ['i2', 'i1'],
+            Images: [
+              { id: 'i1', url: '/first.png' },
+              { id: 'i2', url: '/second.png' },
+            ],
+          },
+          DiscussionChannels: [{ channelUniqueName: 'builds' }],
+        },
+      ],
+    });
+    expect(
+      wrapper.findComponent({ name: 'LibraryDownloadCard' }).props()
+    ).toEqual(expect.objectContaining({ previewImageUrl: '/second.png' }));
+  });
+
+  it('keeps the rename modal open when updating the name fails', async () => {
+    mutationMocks.update.mockRejectedValueOnce(new Error('rename failed'));
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const wrapper = await mountWith({
+      id: 'col-1',
+      name: 'Old Name',
+      collectionType: 'DISCUSSIONS',
+      visibility: 'PUBLIC',
+      Discussions: [],
+    });
+    await wrapper.find('button[title="Edit collection"]').trigger('click');
+    await wrapper.get('#collection-name').setValue('New Name');
+    await wrapper.get('[data-testid="modal-primary"]').trigger('click');
+    error.mockRestore();
+    expect(wrapper.find('[data-title="Rename Collection"]').exists()).toBe(
+      true
+    );
+  });
+
+  it('does not redirect when deleting the collection fails', async () => {
+    mutationMocks.delete.mockRejectedValueOnce(new Error('delete failed'));
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const wrapper = await mountWith({
+      id: 'col-1',
+      name: 'Public list',
+      collectionType: 'DISCUSSIONS',
+      visibility: 'PUBLIC',
+      Discussions: [],
+    });
+    await wrapper.find('button[title="Delete collection"]').trigger('click');
+    await wrapper.get('[data-testid="warning-primary"]').trigger('click');
+    error.mockRestore();
+    expect(h.routerPush).not.toHaveBeenCalled();
+  });
+
   const commentsCollection = {
     id: 'col-2',
     name: 'Saved comments',
@@ -466,15 +592,15 @@ describe('library collection detail page', () => {
   // MarkdownRenderer which cannot expand images.
   it('renders comment bodies via MarkdownPreview', async () => {
     const wrapper = await mountWith(commentsCollection);
-    expect(wrapper.findComponent(LibraryCommentCardStub).props('comment')).toEqual(
-      commentsCollection.Comments[0]
-    );
+    expect(
+      wrapper.findComponent(LibraryCommentCardStub).props('comment')
+    ).toEqual(commentsCollection.Comments[0]);
   });
 
   it('enables the image lightbox for comment bodies', async () => {
     const wrapper = await mountWith(commentsCollection);
-    expect(wrapper.findComponent(LibraryCommentCardStub).props('contextType')).toBe(
-      'Discussion'
-    );
+    expect(
+      wrapper.findComponent(LibraryCommentCardStub).props('contextType')
+    ).toBe('Discussion');
   });
 });

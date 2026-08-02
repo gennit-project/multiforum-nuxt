@@ -3,7 +3,13 @@ import { mount, flushPromises } from '@vue/test-utils';
 import StlViewer from '@/components/download/StlViewer.vue';
 
 // Control the STL loader's outcome per test.
-const stl = vi.hoisted(() => ({ mode: 'success' as 'success' | 'error' }));
+const stl = vi.hoisted(() => ({
+  mode: 'success' as 'success' | 'error',
+  controls: null as null | Record<string, unknown>,
+  renderer: null as null | Record<string, unknown>,
+  scene: null as null | { children: unknown[]; add: ReturnType<typeof vi.fn> },
+  controlEvents: {} as Record<string, () => void>,
+}));
 
 vi.mock('three/examples/jsm/loaders/STLLoader', () => ({
   STLLoader: vi.fn(function () {
@@ -20,7 +26,10 @@ vi.mock('three/examples/jsm/loaders/STLLoader', () => ({
             return;
           }
           onProgress?.({ loaded: 50, total: 100 });
-          onLoad({ computeBoundingBox: vi.fn(), boundingBox: { getCenter: vi.fn() } });
+          onLoad({
+            computeBoundingBox: vi.fn(),
+            boundingBox: { getCenter: vi.fn() },
+          });
         }
       ),
     };
@@ -29,15 +38,18 @@ vi.mock('three/examples/jsm/loaders/STLLoader', () => ({
 
 vi.mock('three/examples/jsm/controls/OrbitControls', () => ({
   OrbitControls: vi.fn(function () {
-    return {
+    stl.controls = {
       enableDamping: true,
       dampingFactor: 0,
       autoRotate: false,
       autoRotateSpeed: 0,
-      addEventListener: vi.fn(),
+      addEventListener: vi.fn((name: string, callback: () => void) => {
+        stl.controlEvents[name] = callback;
+      }),
       update: vi.fn(),
       dispose: vi.fn(),
     };
+    return stl.controls;
   }),
 }));
 
@@ -45,7 +57,12 @@ vi.mock('three', () => {
   const v3 = () => ({ x: 1, y: 1, z: 1, set: vi.fn(), sub: vi.fn() });
   return {
     Scene: vi.fn(function () {
-      return { add: vi.fn(), background: null, children: [] };
+      const children: unknown[] = [];
+      stl.scene = {
+        children,
+        add: vi.fn((child: unknown) => children.push(child)),
+      };
+      return { ...stl.scene, background: null };
     }),
     Color: vi.fn(function () {
       return {};
@@ -60,12 +77,13 @@ vi.mock('three', () => {
       };
     }),
     WebGLRenderer: vi.fn(function () {
-      return {
+      stl.renderer = {
         setSize: vi.fn(),
         render: vi.fn(),
         dispose: vi.fn(),
         domElement: document.createElement('canvas'),
       };
+      return stl.renderer;
     }),
     AmbientLight: vi.fn(function () {
       return {};
@@ -101,6 +119,10 @@ const mountViewer = (props: Record<string, unknown> = {}) =>
 beforeEach(() => {
   vi.clearAllMocks();
   stl.mode = 'success';
+  stl.controls = null;
+  stl.renderer = null;
+  stl.scene = null;
+  stl.controlEvents = {};
   vi.stubGlobal('requestAnimationFrame', vi.fn().mockReturnValue(1));
   vi.stubGlobal('cancelAnimationFrame', vi.fn());
 });
@@ -132,5 +154,73 @@ describe('StlViewer', () => {
     await wrapper.trigger('mouseenter');
     await wrapper.trigger('mouseleave');
     expect(wrapper.html()).toBeTruthy();
+  });
+
+  it('updates interaction cursor while orbit controls are active', async () => {
+    mountViewer({ src: 'http://x/model.stl' });
+    await flushPromises();
+    stl.controlEvents.start?.();
+    const grabbing = (stl.renderer?.domElement as HTMLCanvasElement).style
+      .cursor;
+    stl.controlEvents.end?.();
+    expect({
+      grabbing,
+      idle: (stl.renderer?.domElement as HTMLCanvasElement).style.cursor,
+    }).toEqual({ grabbing: 'grabbing', idle: 'grab' });
+  });
+
+  it('resizes the renderer and camera when the window changes size', async () => {
+    mountViewer({ src: 'http://x/model.stl' });
+    await flushPromises();
+    (stl.renderer?.setSize as ReturnType<typeof vi.fn>).mockClear();
+    window.dispatchEvent(new Event('resize'));
+    expect(stl.renderer?.setSize).toHaveBeenCalledOnce();
+  });
+
+  it('resets the camera and toggles auto rotation through exposed methods', async () => {
+    const wrapper = mountViewer({ src: 'http://x/model.stl' });
+    await flushPromises();
+    wrapper.vm.resetCamera();
+    wrapper.vm.setAutoRotate(true);
+    expect({
+      autoRotate: stl.controls?.autoRotate,
+      updates: (stl.controls?.update as ReturnType<typeof vi.fn>).mock.calls
+        .length,
+    }).toEqual({ autoRotate: true, updates: 3 });
+  });
+
+  it('cleans up the previous renderer and loads a changed source', async () => {
+    const wrapper = mountViewer({ src: 'http://x/first.stl' });
+    await flushPromises();
+    const firstRenderer = stl.renderer;
+    const firstControls = stl.controls;
+    await wrapper.setProps({ src: 'http://x/second.stl' });
+    await flushPromises();
+    expect({
+      rendererDisposed: (firstRenderer?.dispose as ReturnType<typeof vi.fn>)
+        .mock.calls.length,
+      controlsDisposed: (firstControls?.dispose as ReturnType<typeof vi.fn>)
+        .mock.calls.length,
+      canvases: wrapper.findAll('canvas').length,
+    }).toEqual({
+      rendererDisposed: 1,
+      controlsDisposed: 1,
+      canvases: 1,
+    });
+  });
+
+  it('disposes viewer resources when unmounted', async () => {
+    const wrapper = mountViewer({ src: 'http://x/model.stl' });
+    await flushPromises();
+    const renderer = stl.renderer;
+    const controls = stl.controls;
+    wrapper.unmount();
+    expect({
+      renderer: (renderer?.dispose as ReturnType<typeof vi.fn>).mock.calls
+        .length,
+      controls: (controls?.dispose as ReturnType<typeof vi.fn>).mock.calls
+        .length,
+      animation: vi.mocked(cancelAnimationFrame).mock.calls.length,
+    }).toEqual({ renderer: 1, controls: 1, animation: 1 });
   });
 });
