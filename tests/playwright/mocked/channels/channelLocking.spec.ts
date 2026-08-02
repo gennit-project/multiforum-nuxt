@@ -65,6 +65,15 @@ const getBaseMocks = (username: string) => ({
   getTags: () => ({
     data: { tags: [] },
   }),
+  getChannelDiscussionFlairConfig: () => ({
+    data: {
+      getChannelDiscussionFlairConfig: {
+        channelUniqueName: TEST_CHANNEL,
+        flairRequired: false,
+        flairs: [],
+      },
+    },
+  }),
   userIsModInChannel: () => ({
     data: {
       channels: [
