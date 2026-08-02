@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import CreateDiscussion from '@/components/discussion/form/CreateDiscussion.vue';
 import { useUsername } from '@/composables/useAuthState';
@@ -23,11 +23,18 @@ type CreateMutationOptions = {
   update: (cache: unknown, result: unknown) => void;
 };
 
-const { mockUsername, mockFlairConfigResult } = await vi.hoisted(async () => {
+const {
+  mockUsername,
+  mockFlairConfigResult,
+  mockRouteForumId,
+  mockApolloClientQuery,
+} = await vi.hoisted(async () => {
   const { ref } = await import('vue');
   return {
     mockUsername: ref('alice'),
     mockFlairConfigResult: ref<Record<string, unknown> | null>(null),
+    mockRouteForumId: ref('cats'),
+    mockApolloClientQuery: vi.fn(),
   };
 });
 vi.mock('@/composables/useAuthState', () => ({
@@ -42,7 +49,7 @@ let capturedCreateOptions: (() => CreateMutationOptions) | null = null;
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({
-    params: { forumId: 'cats' },
+    params: { forumId: mockRouteForumId.value || undefined },
     query: {},
   }),
   useRouter: () => ({
@@ -71,6 +78,9 @@ vi.mock('@vue/apollo-composable', () => ({
     loading: ref(false),
     error: ref(null),
   })),
+  useApolloClient: () => ({
+    resolveClient: () => ({ query: mockApolloClientQuery }),
+  }),
 }));
 
 vi.mock('@/composables/useSuspensionNotice', () => ({
@@ -87,6 +97,8 @@ describe('CreateDiscussion', () => {
     onDoneCallbacks.length = 0;
     mockPush.mockReset();
     mockFlairConfigResult.value = null;
+    mockRouteForumId.value = 'cats';
+    mockApolloClientQuery.mockReset();
     useUsername().value = 'alice';
   });
 
@@ -167,6 +179,8 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
     createMutate.mockReset();
     capturedCreateOptions = null;
     mockFlairConfigResult.value = null;
+    mockRouteForumId.value = 'cats';
+    mockApolloClientQuery.mockReset();
     useUsername().value = 'alice';
   });
 
@@ -178,6 +192,9 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
       'lockedChannelName',
       'discussionFlairs',
       'discussionFlairRequired',
+      'discussionFlairConfigs',
+      'discussionFlairsLoadingChannels',
+      'discussionFlairsErrorsByChannel',
     ],
     template:
       '<button data-testid="submit" @click="$emit(\'submit\')"></button>',
@@ -296,6 +313,123 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
     }).toEqual({
       mutationCalls: 0,
       error: 'Select at least one flair for cats.',
+    });
+  });
+
+  it('loads and submits independent flair selections for sitewide forums', async () => {
+    mockRouteForumId.value = '';
+    mockApolloClientQuery.mockImplementation(({ variables }) =>
+      Promise.resolve({
+        data: {
+          getChannelDiscussionFlairConfig: {
+            channelUniqueName: variables.channelUniqueName,
+            flairRequired: variables.channelUniqueName !== 'birds',
+            flairs: [
+              {
+                id: `${variables.channelUniqueName}-flair`,
+                displayName: `${variables.channelUniqueName} flair`,
+                color: null,
+              },
+            ],
+          },
+        },
+      })
+    );
+    const wrapper = mountCD();
+    await fields(wrapper).vm.$emit('update-form-values', {
+      selectedChannels: ['cats', 'dogs', 'birds'],
+    });
+    await flushPromises();
+    await fields(wrapper).vm.$emit('update-form-values', {
+      selectedFlairIdsByChannel: {
+        cats: ['cats-flair'],
+        dogs: ['dogs-flair'],
+      },
+    });
+
+    expect({
+      configs: fields(wrapper)
+        .props('discussionFlairConfigs')
+        .map((config: { channelUniqueName: string }) =>
+          config.channelUniqueName
+        ),
+      selections: buildChannelFlairSelections(),
+    }).toEqual({
+      configs: ['cats', 'dogs', 'birds'],
+      selections: [
+        { channelUniqueName: 'cats', flairIds: ['cats-flair'] },
+        { channelUniqueName: 'dogs', flairIds: ['dogs-flair'] },
+      ],
+    });
+  });
+
+  it('blocks sitewide submission for each missing required forum', async () => {
+    mockRouteForumId.value = '';
+    mockApolloClientQuery.mockImplementation(({ variables }) =>
+      Promise.resolve({
+        data: {
+          getChannelDiscussionFlairConfig: {
+            channelUniqueName: variables.channelUniqueName,
+            flairRequired: true,
+            flairs: [
+              {
+                id: `${variables.channelUniqueName}-flair`,
+                displayName: `${variables.channelUniqueName} flair`,
+                color: null,
+              },
+            ],
+          },
+        },
+      })
+    );
+    const wrapper = mountCD();
+    await fields(wrapper).vm.$emit('update-form-values', {
+      selectedChannels: ['cats', 'dogs'],
+    });
+    await flushPromises();
+    await fields(wrapper).vm.$emit('update-form-values', {
+      selectedFlairIdsByChannel: { cats: ['cats-flair'] },
+    });
+    await wrapper.find('[data-testid="submit"]').trigger('click');
+
+    expect({
+      mutationCalls: createMutate.mock.calls.length,
+      error: fields(wrapper).props('submitError'),
+    }).toEqual({
+      mutationCalls: 0,
+      error: 'Select at least one flair for dogs.',
+    });
+  });
+
+  it('drops flair selections when a sitewide forum is removed', async () => {
+    mockRouteForumId.value = '';
+    mockApolloClientQuery.mockImplementation(({ variables }) =>
+      Promise.resolve({
+        data: {
+          getChannelDiscussionFlairConfig: {
+            channelUniqueName: variables.channelUniqueName,
+            flairRequired: false,
+            flairs: [],
+          },
+        },
+      })
+    );
+    const wrapper = mountCD();
+    await fields(wrapper).vm.$emit('update-form-values', {
+      selectedChannels: ['cats', 'dogs'],
+    });
+    await fields(wrapper).vm.$emit('update-form-values', {
+      selectedFlairIdsByChannel: {
+        cats: ['cats-flair'],
+        dogs: ['dogs-flair'],
+      },
+    });
+    await fields(wrapper).vm.$emit('update-form-values', {
+      selectedChannels: ['cats'],
+    });
+
+    expect(fields(wrapper).props('formValues').selectedFlairIdsByChannel).toEqual({
+      cats: ['cats-flair'],
     });
   });
 
