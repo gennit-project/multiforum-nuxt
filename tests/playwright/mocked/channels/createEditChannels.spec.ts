@@ -34,6 +34,20 @@ type UpdateChannelVariables = {
   update?: ChannelUpdateInput;
 };
 
+type FlairState = {
+  id: string;
+  channelUniqueName: string;
+  displayName: string;
+  color: string | null;
+  order: number;
+  archived: boolean;
+};
+
+type SetFlairConfigVariables = {
+  flairRequired?: boolean;
+  flairs?: Array<Omit<FlairState, 'id' | 'channelUniqueName'> & { id?: string }>;
+};
+
 const buildChannelQueryResponse = (channel: MockChannelState) => ({
   data: {
     channels: [
@@ -58,6 +72,8 @@ test('creates and edits a channel', async ({
     description: '',
     tags: [],
   };
+  let flairRequired = false;
+  let flairState: FlairState[] = [];
 
   await installMockAuth(context, page);
   const diagnostics = await installGraphqlMocks(page, {
@@ -205,6 +221,15 @@ test('creates and edits a channel', async ({
       };
     },
     getChannel: () => buildChannelQueryResponse(channelState),
+    getChannelDiscussionFlairConfig: () => ({
+      data: {
+        getChannelDiscussionFlairConfig: {
+          channelUniqueName: TEST_CHANNEL,
+          flairRequired,
+          flairs: flairState,
+        },
+      },
+    }),
     getChannelDownloadCount: () => ({
       data: {
         channels: [
@@ -258,6 +283,24 @@ test('creates and edits a channel', async ({
                 rules: '[]',
               },
             ],
+          },
+        },
+      };
+    },
+    setChannelDiscussionFlairConfig: ({ body }) => {
+      const variables = body.variables as SetFlairConfigVariables | undefined;
+      flairRequired = variables?.flairRequired ?? false;
+      flairState = (variables?.flairs ?? []).map((flair, index) => ({
+        ...flair,
+        id: flair.id ?? `flair-${index + 1}`,
+        channelUniqueName: TEST_CHANNEL,
+      }));
+      return {
+        data: {
+          setChannelDiscussionFlairConfig: {
+            channelUniqueName: TEST_CHANNEL,
+            flairRequired,
+            flairs: flairState,
           },
         },
       };
@@ -355,6 +398,34 @@ test('creates and edits a channel', async ({
     await expect(page.getByText('Your changes have been saved.')).toBeVisible();
     await expect(descriptionInput).toHaveValue(TEST_DESCRIPTION);
     await expect(tagPicker).toHaveAttribute('aria-label', new RegExp(TEST_TAG));
+
+    await page.goto(`/forums/${TEST_CHANNEL}/edit/flairs`);
+    await expect(page.getByRole('heading', { name: 'Post Flairs' })).toBeVisible();
+    await page.getByRole('button', { name: 'Add flair' }).click();
+    await page.getByLabel('Flair name 1').fill('Question');
+    await page.getByLabel('Hex color for Question').fill('#2563EB');
+    await page
+      .getByLabel('Require at least one flair on new discussions')
+      .check();
+    await page.getByRole('button', { name: 'Save flair settings' }).click();
+    await waitForGraphqlOperation(
+      diagnostics.completedOperations,
+      'setChannelDiscussionFlairConfig'
+    );
+    await expect(page.getByText('Post flair settings saved')).toBeVisible();
+    expect({ flairRequired, flairState }).toEqual({
+      flairRequired: true,
+      flairState: [
+        {
+          id: 'flair-1',
+          channelUniqueName: TEST_CHANNEL,
+          displayName: 'Question',
+          color: '#2563EB',
+          order: 0,
+          archived: false,
+        },
+      ],
+    });
 
     expect(diagnostics.pageErrors).toEqual([]);
   } finally {

@@ -303,6 +303,12 @@ describe('CreateEditChannelFields — autosave tabs', () => {
     expect(wrapper.find('form').attributes('data-show-save')).toBe('true');
   });
 
+  it('hides the shared Save button on the self-saving flairs tab', () => {
+    const wrapper = mountEditTab('forums-forumId-edit-flairs');
+
+    expect(wrapper.find('form').attributes('data-show-save')).toBe('false');
+  });
+
   it('hides the save status indicator on a non-autosave tab', () => {
     const wrapper = mountEditTab('forums-forumId-edit-rules');
 
