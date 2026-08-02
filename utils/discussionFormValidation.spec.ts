@@ -25,6 +25,27 @@ describe('discussionFormNeedsChanges', () => {
       true
     );
   });
+
+  it('is true while flair requirements are loading', () => {
+    expect(
+      discussionFormNeedsChanges({ ...valid, flairSelectionPending: true })
+    ).toBe(true);
+  });
+
+  it('is true when a required flair is missing', () => {
+    expect(
+      discussionFormNeedsChanges({ ...valid, missingRequiredFlair: true })
+    ).toBe(true);
+  });
+
+  it('is true when flair requirements are unavailable', () => {
+    expect(
+      discussionFormNeedsChanges({
+        ...valid,
+        flairSelectionUnavailable: true,
+      })
+    ).toBe(true);
+  });
 });
 
 describe('getDiscussionFormValidationMessage', () => {
@@ -42,5 +63,15 @@ describe('getDiscussionFormValidationMessage', () => {
 
   it('returns an empty string for a valid form', () => {
     expect(getDiscussionFormValidationMessage(valid)).toBe('');
+  });
+
+  it('identifies the forum whose required flair is missing', () => {
+    expect(
+      getDiscussionFormValidationMessage({
+        ...valid,
+        missingRequiredFlair: true,
+        requiredFlairChannelName: 'cats',
+      })
+    ).toBe('Select at least one flair for cats.');
   });
 });

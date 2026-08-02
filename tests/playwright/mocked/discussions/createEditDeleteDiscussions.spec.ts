@@ -99,3 +99,52 @@ test('creates, edits and deletes a discussion', async ({
 
   expect(diagnostics.pageErrors).toEqual([]);
 });
+
+test('requires and submits a flair in the channel-scoped form', async ({
+  page,
+  setupMockedPage,
+}) => {
+  const state = createDiscussionState();
+  await setupMockedPage({
+    handlers: {
+      ...createDiscussionHandlers(state, {
+        channelId: TEST_CHANNEL,
+        username: 'cluse',
+      }),
+      getChannelDiscussionFlairConfig: () => ({
+        data: {
+          getChannelDiscussionFlairConfig: {
+            channelUniqueName: TEST_CHANNEL,
+            flairRequired: true,
+            flairs: [
+              {
+                id: 'question',
+                channelUniqueName: TEST_CHANNEL,
+                displayName: 'Question',
+                color: '#2563EB',
+                order: 0,
+                archived: false,
+              },
+            ],
+          },
+        },
+      }),
+    },
+  });
+
+  await page.goto(`/forums/${TEST_CHANNEL}/discussions/create`);
+  await page.getByTestId('title-input').fill(TEST_DISCUSSION);
+
+  const saveButton = page.getByRole('button', { name: 'Save' }).first();
+  await expect(saveButton).toBeDisabled();
+  await page.getByRole('button', { name: 'Select Question flair' }).click();
+  await expect(saveButton).toBeEnabled();
+  await saveButton.click();
+
+  await expect(page).toHaveURL(
+    `/forums/${TEST_CHANNEL}/discussions/discussion-1`
+  );
+  expect(state.lastChannelFlairSelections).toEqual([
+    { channelUniqueName: TEST_CHANNEL, flairIds: ['question'] },
+  ]);
+});

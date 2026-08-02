@@ -3,6 +3,7 @@ export interface CreateEditDiscussionFormValues {
   body: string;
   selectedTags: Array<string>;
   selectedChannels: Array<string>;
+  selectedFlairIdsByChannel?: Record<string, string[]>;
   author: string;
   album: {
     images: {

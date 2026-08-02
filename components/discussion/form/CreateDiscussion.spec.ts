@@ -3,15 +3,32 @@ import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import CreateDiscussion from '@/components/discussion/form/CreateDiscussion.vue';
 import { useUsername } from '@/composables/useAuthState';
-import type { Mutation } from '@/__generated__/graphql';
+import type { DiscussionCreateInput, Mutation } from '@/__generated__/graphql';
 
 type CreateDiscussionResult = {
   data?: Pick<Mutation, 'createDiscussionWithChannelConnections'>;
 };
 
-const { mockUsername } = await vi.hoisted(async () => {
+type CreateMutationOptions = {
+  variables: {
+    input: Array<{
+      discussionCreateInput: DiscussionCreateInput;
+      channelConnections: string[];
+      channelFlairSelections: Array<{
+        channelUniqueName: string;
+        flairIds: string[];
+      }>;
+    }>;
+  };
+  update: (cache: unknown, result: unknown) => void;
+};
+
+const { mockUsername, mockFlairConfigResult } = await vi.hoisted(async () => {
   const { ref } = await import('vue');
-  return { mockUsername: ref('alice') };
+  return {
+    mockUsername: ref('alice'),
+    mockFlairConfigResult: ref<Record<string, unknown> | null>(null),
+  };
 });
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => mockUsername,
@@ -21,7 +38,7 @@ vi.mock('@/composables/useAuthState', () => ({
 const mockPush = vi.fn();
 const onDoneCallbacks: Array<(result: CreateDiscussionResult) => void> = [];
 const createMutate = vi.fn();
-let capturedCreateOptions: (() => any) | null = null;
+let capturedCreateOptions: (() => CreateMutationOptions) | null = null;
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({
@@ -34,7 +51,7 @@ vi.mock('nuxt/app', () => ({
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useMutation: vi.fn((_doc: unknown, optsFn: () => any) => {
+  useMutation: vi.fn((_doc: unknown, optsFn: () => CreateMutationOptions) => {
     capturedCreateOptions = optsFn;
     return {
       mutate: createMutate,
@@ -45,8 +62,12 @@ vi.mock('@vue/apollo-composable', () => ({
       },
     };
   }),
-  useQuery: vi.fn(() => ({
-    result: ref(null),
+  useQuery: vi.fn((document: { definitions?: Array<{ name?: { value?: string } }> }) => ({
+    result:
+      document.definitions?.[0]?.name?.value ===
+      'getChannelDiscussionFlairConfig'
+        ? mockFlairConfigResult
+        : ref(null),
     loading: ref(false),
     error: ref(null),
   })),
@@ -65,6 +86,7 @@ describe('CreateDiscussion', () => {
   beforeEach(() => {
     onDoneCallbacks.length = 0;
     mockPush.mockReset();
+    mockFlairConfigResult.value = null;
     useUsername().value = 'alice';
   });
 
@@ -144,12 +166,19 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
     mockPush.mockReset();
     createMutate.mockReset();
     capturedCreateOptions = null;
+    mockFlairConfigResult.value = null;
     useUsername().value = 'alice';
   });
 
   const fieldsStub = {
     name: 'CreateEditDiscussionFields',
-    props: ['submitError', 'formValues', 'lockedChannelName'],
+    props: [
+      'submitError',
+      'formValues',
+      'lockedChannelName',
+      'discussionFlairs',
+      'discussionFlairRequired',
+    ],
     template:
       '<button data-testid="submit" @click="$emit(\'submit\')"></button>',
     emits: ['submit', 'update-form-values'],
@@ -169,6 +198,8 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
     wrapper.findComponent({ name: 'CreateEditDiscussionFields' });
   const buildInput = () =>
     capturedCreateOptions!().variables.input[0].discussionCreateInput;
+  const buildChannelFlairSelections = () =>
+    capturedCreateOptions!().variables.input[0].channelFlairSelections;
 
   it('submits the create mutation for an authenticated user', async () => {
     const wrapper = mountCD();
@@ -228,6 +259,44 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
     await fields(wrapper).vm.$emit('update-form-values', { crosspostId: 'src-1' });
 
     expect(buildInput().CrosspostedDiscussion).toBeTruthy();
+  });
+
+  it('submits the selected flair IDs for the routed channel', async () => {
+    mockFlairConfigResult.value = {
+      getChannelDiscussionFlairConfig: {
+        channelUniqueName: 'cats',
+        flairRequired: true,
+        flairs: [{ id: 'question', displayName: 'Question', color: '#2563EB' }],
+      },
+    };
+    const wrapper = mountCD();
+    await fields(wrapper).vm.$emit('update-form-values', {
+      selectedFlairIdsByChannel: { cats: ['question'] },
+    });
+
+    expect(buildChannelFlairSelections()).toEqual([
+      { channelUniqueName: 'cats', flairIds: ['question'] },
+    ]);
+  });
+
+  it('blocks submission when the routed channel requires a flair', async () => {
+    mockFlairConfigResult.value = {
+      getChannelDiscussionFlairConfig: {
+        channelUniqueName: 'cats',
+        flairRequired: true,
+        flairs: [{ id: 'question', displayName: 'Question', color: '#2563EB' }],
+      },
+    };
+    const wrapper = mountCD();
+    await wrapper.find('[data-testid="submit"]').trigger('click');
+
+    expect({
+      mutationCalls: createMutate.mock.calls.length,
+      error: fields(wrapper).props('submitError'),
+    }).toEqual({
+      mutationCalls: 0,
+      error: 'Select at least one flair for cats.',
+    });
   });
 
   it('writes the new discussion into the channel list cache', () => {
