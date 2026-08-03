@@ -7,11 +7,31 @@ import AlbumEditor from '@/components/discussion/form/AlbumEditor.vue';
 
 // Hoisted, controllable test seams: username (for the no-username branch) and
 // the URL-image creation spy (for the submit success/failure branches).
-const { usernameRef, createImageFromUrl, permanentlyDeleteImage } = vi.hoisted(
+const {
+  usernameRef,
+  createImageFromUrl,
+  permanentlyDeleteImage,
+  uploadsAvailable,
+  uploadsCapability,
+  uploadsLoading,
+  uploadsError,
+} = vi.hoisted(
   () => ({
     usernameRef: { value: 'alice' as string },
     createImageFromUrl: vi.fn(),
     permanentlyDeleteImage: vi.fn(),
+    uploadsAvailable: { value: true },
+    uploadsCapability: {
+      value: {
+        configured: true,
+        enabled: true,
+        requiredEnvVarsMissing: [],
+        setupUrl: '/admin/setup#uploads',
+        docsPath: '/self-hosting/uploads',
+      },
+    },
+    uploadsLoading: { value: false },
+    uploadsError: { value: null as Error | null },
   })
 );
 
@@ -44,6 +64,14 @@ vi.mock('@/composables/useAlbumAutoSave', () => ({
     debouncedAutoSave: vi.fn(),
   }),
 }));
+vi.mock('@/composables/useInstanceSetupStatus', () => ({
+  useInstanceCapability: () => ({
+    capability: uploadsCapability,
+    available: uploadsAvailable,
+    loading: uploadsLoading,
+    error: uploadsError,
+  }),
+}));
 
 const AlbumImageItemStub = {
   name: 'AlbumImageItem',
@@ -54,6 +82,11 @@ const AlbumImageItemStub = {
 
 const AlbumDropZoneStub = {
   name: 'AlbumDropZone',
+  props: [
+    'fileUploadAvailable',
+    'fileUploadUnavailableMessage',
+    'setupUrl',
+  ],
   emits: ['files-selected', 'drop', 'show-url-input', 'show-existing-picker'],
   template: '<div class="drop-zone-stub" />',
 };
@@ -134,11 +167,32 @@ describe('AlbumEditor', () => {
     permanentlyDeleteImage.mockResolvedValue({
       data: { permanentlyDeleteImage: { id: 'a' } },
     });
+    uploadsAvailable.value = true;
+    uploadsCapability.value.configured = true;
+    uploadsCapability.value.enabled = true;
+    uploadsCapability.value.setupUrl = '/admin/setup#uploads';
+    uploadsLoading.value = false;
+    uploadsError.value = null;
   });
 
   it('renders one image item per ordered image', () => {
     const wrapper = mountEditor();
     expect(wrapper.findAllComponents(AlbumImageItemStub)).toHaveLength(3);
+  });
+
+  it('disables direct file uploads but preserves album editing when storage is unavailable', () => {
+    uploadsAvailable.value = false;
+    uploadsCapability.value.configured = false;
+    uploadsCapability.value.enabled = false;
+
+    const wrapper = mountEditor();
+
+    expect(wrapper.getComponent(AlbumDropZoneStub).props()).toMatchObject({
+      fileUploadAvailable: false,
+      fileUploadUnavailableMessage:
+        'File uploads are unavailable until file storage is configured.',
+      setupUrl: '/admin/setup#uploads',
+    });
   });
 
   it('emits the album without the deleted image', async () => {

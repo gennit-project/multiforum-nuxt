@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref, useId } from 'vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
+import { useInstanceCapability } from '@/composables/useInstanceSetupStatus';
 
 const props = defineProps({
   fieldName: {
@@ -23,6 +24,24 @@ const props = defineProps({
 const emit = defineEmits(['file-change']);
 
 const fileInput = ref<HTMLInputElement | null>(null);
+const unavailableMessageId = useId();
+const {
+  capability: uploadsCapability,
+  available: uploadsAvailable,
+  loading: uploadsLoading,
+  error: uploadsError,
+} = useInstanceCapability('uploads');
+const uploadsUnavailable = computed(
+  () =>
+    Boolean(uploadsCapability.value || uploadsError.value) &&
+    !uploadsAvailable.value
+);
+const effectiveDisabled = computed(
+  () => props.disabled || !uploadsAvailable.value
+);
+const setupUrl = computed(
+  () => uploadsCapability.value?.setupUrl || '/admin/setup#uploads'
+);
 
 // Force iOS to properly recognize this as an image upload input
 const clearFileInput = () => {
@@ -33,7 +52,7 @@ const clearFileInput = () => {
 
 // For mobile browsers that might not properly cleanup
 const onFileSelected = (event: Event) => {
-  if (props.disabled) return;
+  if (effectiveDisabled.value) return;
 
   emit('file-change', {
     event,
@@ -51,11 +70,12 @@ const onFileSelected = (event: Event) => {
     <label
       :class="[
         'my-1 inline-flex items-center rounded-md border border-orange-400 px-3 py-1 py-1.5 text-sm transition-colors dark:border-orange-800 dark:text-white',
-        !disabled
+        !effectiveDisabled
           ? 'cursor-pointer bg-orange-100 text-orange-700 hover:bg-orange-100 dark:bg-orange-900 dark:text-orange-200 dark:hover:bg-orange-800'
           : 'cursor-not-allowed bg-gray-100 text-gray-500 opacity-60 dark:bg-gray-700 dark:text-gray-400',
       ]"
       :for="`file-input-${props.fieldName}`"
+      :aria-describedby="uploadsUnavailable ? unavailableMessageId : undefined"
     >
       <ImageIcon class="mr-2 h-4 w-4" aria-hidden="true" /> {{ props.label }}
       <input
@@ -64,10 +84,26 @@ const onFileSelected = (event: Event) => {
         type="file"
         accept="image/*"
         style="display: none"
-        :disabled="disabled"
+        :disabled="effectiveDisabled"
         @change="onFileSelected"
         @click="clearFileInput"
       >
     </label>
+    <p
+      v-if="uploadsUnavailable"
+      :id="unavailableMessageId"
+      class="mt-1 text-xs text-amber-800 dark:text-amber-200"
+    >
+      Image uploads are unavailable until file storage is configured.
+      <NuxtLink :to="setupUrl" class="font-medium underline">
+        Open instance setup
+      </NuxtLink>
+    </p>
+    <p
+      v-else-if="uploadsLoading && !uploadsCapability"
+      class="mt-1 text-xs text-gray-500 dark:text-gray-400"
+    >
+      Checking upload availability...
+    </p>
   </div>
 </template>
