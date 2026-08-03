@@ -223,8 +223,8 @@ importers:
         specifier: ^1.0.36
         version: 1.0.36
       '@types/google.maps':
-        specifier: ^3.65.2
-        version: 3.65.2
+        specifier: ^3.65.3
+        version: 3.65.3
       '@types/identicon.js':
         specifier: ^2.3.5
         version: 2.3.5
@@ -3600,8 +3600,8 @@ packages:
   '@types/geojson@7946.0.16':
     resolution: {integrity: sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg==}
 
-  '@types/google.maps@3.65.2':
-    resolution: {integrity: sha512-e52bmOhGCQSNabFpL48iQlwJybq6rfns8NUVJ20MR7CdPlHQ2RmSCnPbJfrUYJfogrE4OiHQTZ4LXpop+eer1w==}
+  '@types/google.maps@3.65.3':
+    resolution: {integrity: sha512-tqbbx7MUtoDk+RwpZMymPDj6Skez0FhqDZNhLhS5UDmCx4D1dgP+BJOHTebiO/rhjJLa1f8te2p6mJJeFKVFOQ==}
 
   '@types/html-minifier-terser@7.0.2':
     resolution: {integrity: sha512-mm2HqV22l8lFQh4r2oSsOEVea+m0qqxEmwpc9kC1p/XzmjLWrReR9D/GRs8Pex2NX/imyEH9c5IU/7tMBQCHOA==}
@@ -9389,7 +9389,7 @@ snapshots:
 
   '@googlemaps/js-api-loader@2.1.1':
     dependencies:
-      '@types/google.maps': 3.65.2
+      '@types/google.maps': 3.65.3
 
   '@googlemaps/markerclusterer@2.6.2':
     dependencies:
@@ -12008,7 +12008,7 @@ snapshots:
 
   '@types/geojson@7946.0.16': {}
 
-  '@types/google.maps@3.65.2': {}
+  '@types/google.maps@3.65.3': {}
 
   '@types/html-minifier-terser@7.0.2': {}
 
