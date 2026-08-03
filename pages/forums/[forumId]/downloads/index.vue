@@ -182,10 +182,13 @@ watch(
     <div v-show="shouldShowDownloads">
       <DownloadFilterBar :filter-groups="filterGroups" />
 
-      <!-- Desktop Layout with Sidebar -->
-      <div class="hidden lg:flex">
+      <!-- Responsive layout with a desktop-only filter sidebar -->
+      <div class="lg:flex">
         <!-- Left Sidebar for Filters -->
-        <div v-if="filterGroups.length > 0" class="w-64 flex-shrink-0 pr-6">
+        <div
+          v-if="filterGroups.length > 0"
+          class="hidden w-64 flex-shrink-0 pr-6 lg:block"
+        >
           <div class="sticky top-4">
             <DownloadFilters :filter-groups="filterGroups" :is-sidebar="true" />
           </div>
@@ -195,11 +198,6 @@ watch(
         <div class="min-w-0 flex-1">
           <DownloadList :filter-groups="filterGroups" />
         </div>
-      </div>
-
-      <!-- Mobile Layout (no sidebar) -->
-      <div class="lg:hidden">
-        <DownloadList :filter-groups="filterGroups" />
       </div>
     </div>
   </div>

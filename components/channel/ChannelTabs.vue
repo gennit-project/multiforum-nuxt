@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, watch, type Component } from 'vue';
+import { computed, onMounted, ref, watch, type Component } from 'vue';
 import TabButton from '@/components/channel/TabButton.vue';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
@@ -15,7 +15,7 @@ import {
   useUsername,
   useIsAuthenticated,
 } from '@/composables/useAuthState';
-import { useRoute } from 'nuxt/app';
+import { preloadRouteComponents, useRoute } from 'nuxt/app';
 import { useDisplay } from '@/composables/useDisplay';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
@@ -123,6 +123,8 @@ const iconSize = computed(() =>
 );
 
 const { mdAndUp } = useDisplay();
+const hasMounted = ref(false);
+const preloadedTabRoutes = new Set<string>();
 
 // Check if a tab should be active based on route
 const isTabActive = (tab: Tab) => {
@@ -256,6 +258,35 @@ const tabs = computed((): Tab[] => {
 
   return filteredResult;
 });
+
+const preloadMobileTabRoutes = () => {
+  if (!hasMounted.value || mdAndUp.value) {
+    return;
+  }
+
+  for (const tab of tabs.value) {
+    const tabRoute = tabRoutes.value[tab.name];
+    if (
+      !tabRoute ||
+      tabRoute === route.path ||
+      preloadedTabRoutes.has(tabRoute)
+    ) {
+      continue;
+    }
+
+    preloadedTabRoutes.add(tabRoute);
+    void preloadRouteComponents(tabRoute).catch(() => {
+      preloadedTabRoutes.delete(tabRoute);
+    });
+  }
+};
+
+onMounted(() => {
+  hasMounted.value = true;
+  preloadMobileTabRoutes();
+});
+
+watch([mdAndUp, tabs, tabRoutes], preloadMobileTabRoutes);
 </script>
 
 <template>

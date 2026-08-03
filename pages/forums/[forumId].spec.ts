@@ -17,6 +17,7 @@ const mockState = vi.hoisted(() => ({
   useHead: vi.fn(),
   queryResultCallback: null as null | ((result: unknown) => void),
   refetchChannel: vi.fn(),
+  mdAndUp: null as unknown,
 }));
 
 vi.mock('nuxt/app', () => ({
@@ -29,6 +30,10 @@ vi.mock('@vue/apollo-composable', () => ({ useQuery: vi.fn() }));
 
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => ref('viewer'),
+}));
+
+vi.mock('@/composables/useDisplay', () => ({
+  useDisplay: () => ({ mdAndUp: mockState.mdAndUp }),
 }));
 
 vi.mock('@/config', () => ({
@@ -208,6 +213,7 @@ describe('forum shell page', () => {
     mockState.route.name = 'forums-forumId';
     mockState.route.query = {};
     mockState.queryResultCallback = null;
+    mockState.mdAndUp = ref(true);
   });
 
   it('shows the not-found page when the channel does not exist', async () => {
@@ -368,6 +374,16 @@ describe('forum shell page', () => {
     wrapper.findComponent(ChannelSidebarStub).vm.$emit('refetch-channel-data');
 
     expect(mockState.refetchChannel).toHaveBeenCalledOnce();
+  });
+
+  it('does not mount the detail sidebar on mobile', async () => {
+    mockState.route.name = 'forums-forumId-events-eventId';
+    (mockState.mdAndUp as { value: boolean }).value = false;
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+
+    expect(wrapper.findComponent(ChannelSidebarStub).exists()).toBe(false);
   });
 
   it('builds SEO metadata from the loaded channel', async () => {

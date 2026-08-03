@@ -101,6 +101,11 @@ describe('downloads index page', () => {
     expect(wrapper.text()).not.toContain('Downloads Not Available');
   });
 
+  it('mounts one download list for both mobile and desktop layouts', async () => {
+    const wrapper = await mountWith({});
+    expect(wrapper.findAllComponents(DownloadListStub)).toHaveLength(1);
+  });
+
   it('removes stale download filter params after channel filters load', async () => {
     h.route.query = { filter_old: 'x', filter_type: 'pdf' };
     await mountWith({});

@@ -13,6 +13,7 @@ const h = vi.hoisted(() => ({
   mdAndUp: null as unknown,
   route: null as unknown,
   closePopper: vi.fn(),
+  preloadRouteComponents: vi.fn(() => Promise.resolve()),
 }));
 
 vi.mock('@/composables/useAuthState', () => ({
@@ -27,6 +28,7 @@ vi.mock('@vue/apollo-composable', () => ({
 vi.mock('nuxt/app', () => ({
   useRoute: () => h.route,
   useRouter: () => ({ push: vi.fn() }),
+  preloadRouteComponents: h.preloadRouteComponents,
 }));
 
 const makeChannel = (overrides: Partial<Channel> = {}) =>
@@ -80,6 +82,7 @@ beforeEach(() => {
     path: '/forums/cats/discussions',
   });
   h.closePopper.mockReset();
+  h.preloadRouteComponents.mockClear();
 });
 
 describe('ChannelTabs base tabs', () => {
@@ -211,5 +214,27 @@ describe('ChannelTabs mobile layout', () => {
     await wrapper.get('[data-testid="mobile-dropdown-about"]').trigger('click');
 
     expect(h.closePopper).toHaveBeenCalledOnce();
+  });
+
+  it('preloads sibling channel routes that are hidden inside the dropdown', async () => {
+    (h.mdAndUp as { value: boolean }).value = false;
+    mountTabs({
+      channel: makeChannel({ downloadsEnabled: true, eventsEnabled: true }),
+    });
+    await nextTick();
+
+    expect(h.preloadRouteComponents.mock.calls.map(([path]) => path)).toEqual([
+      '/forums/cats/downloads',
+      '/forums/cats/events',
+      '/forums/cats/contributors',
+      '/forums/cats/about',
+    ]);
+  });
+
+  it('does not preload hidden channel routes on desktop', async () => {
+    mountTabs();
+    await nextTick();
+
+    expect(h.preloadRouteComponents).not.toHaveBeenCalled();
   });
 });

@@ -32,11 +32,13 @@ import {
 import { getForumShellVisibility } from '@/utils/forumShellVisibility';
 import type { ForumItem } from '@/types/forum';
 import { useUsername } from '@/composables/useAuthState';
+import { useDisplay } from '@/composables/useDisplay';
 
 const route = useRoute();
 const router = useRouter();
 const loggedInUsername = useUsername();
 const uiStore = useUIStore();
+const { mdAndUp } = useDisplay();
 const {
   selectedChannelDiscussionTitle,
   selectedChannelEventId,
@@ -541,7 +543,7 @@ definePageMeta({
                 </div>
               </div>
               <div
-                v-if="showChannelSidebarOnIssueDetail"
+                v-if="showChannelSidebarOnIssueDetail && mdAndUp"
                 class="hidden md:flex md:w-1/3 md:flex-col md:overflow-y-auto"
                 tabindex="0"
                 role="region"
@@ -555,7 +557,7 @@ definePageMeta({
                 />
               </div>
               <div
-                v-if="showChannelSidebarOnDetail"
+                v-if="showChannelSidebarOnDetail && mdAndUp"
                 class="hidden md:flex md:w-1/3 md:flex-col md:overflow-y-auto"
                 tabindex="0"
                 role="region"
