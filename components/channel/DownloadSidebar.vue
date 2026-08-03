@@ -285,7 +285,7 @@ const groupedLabels = computed(() => {
             Available to download
           </p>
           <p v-else-if="scanStatus === 'PENDING'" class="font-medium">
-            <i class="fa-solid fa-spinner mr-1 animate-spin" />
+            <i class="fa-solid fa-hourglass-half mr-1" />
             Quarantined: security check pending
           </p>
           <template v-else-if="scanStatus === 'INFECTED' || scanStatus === 'SUSPICIOUS'">
