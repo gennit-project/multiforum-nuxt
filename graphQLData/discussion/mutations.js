@@ -314,12 +314,14 @@ export const UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
     $where: DiscussionWhere!
     $channelConnections: [String!]
     $channelDisconnections: [String!]
+    $channelFlairSelections: [DiscussionChannelFlairSelectionInput!]
   ) {
     updateDiscussionWithChannelConnections(
       discussionUpdateInput: $updateDiscussionInput
       where: $where
       channelConnections: $channelConnections
       channelDisconnections: $channelDisconnections
+      channelFlairSelections: $channelFlairSelections
     ) {
       id
       title
@@ -328,6 +330,14 @@ export const UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
         id
         channelUniqueName
         discussionId
+        Flairs {
+          id
+          channelUniqueName
+          displayName
+          color
+          order
+          archived
+        }
         Channel {
           uniqueName
         }

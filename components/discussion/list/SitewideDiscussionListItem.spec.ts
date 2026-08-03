@@ -45,12 +45,14 @@ const discussion = (overrides: DeepPartial<Discussion> = {}): Discussion =>
 
 const channel = (
   uniqueName: string,
-  channelIconURL = ''
+  channelIconURL = '',
+  flairs: Array<Record<string, unknown>> = []
 ): Partial<DiscussionChannel> => ({
   channelUniqueName: uniqueName,
   Channel: { uniqueName, displayName: uniqueName, channelIconURL },
   CommentsAggregate: { count: 0 },
-});
+  Flairs: flairs,
+}) as Partial<DiscussionChannel>;
 
 const album = (
   images: { id: string; url: string }[],
@@ -73,6 +75,28 @@ describe('SitewideDiscussionListItem', () => {
   it('reflects an overridden title', () => {
     const wrapper = mountItem(discussion({ title: 'Another One' }));
     expect(wrapper.text()).toContain('Another One');
+  });
+
+  it('identifies each assigned flair by its forum', () => {
+    const flair = (id: string, channelUniqueName: string, displayName: string) => ({
+      id,
+      channelUniqueName,
+      displayName,
+      color: null,
+      order: 0,
+      archived: false,
+    });
+    const wrapper = mountItem(
+      discussion({
+        DiscussionChannels: [
+          channel('cats', '', [flair('question', 'cats', 'Question')]),
+          channel('dogs', '', [flair('showcase', 'dogs', 'Showcase')]),
+        ],
+      })
+    );
+    expect(
+      wrapper.findAll('[data-testid="discussion-flair"]').map((item) => item.text())
+    ).toEqual(['cats: Question', 'dogs: Showcase']);
   });
 });
 

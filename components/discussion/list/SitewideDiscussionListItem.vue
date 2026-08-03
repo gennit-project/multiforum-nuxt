@@ -6,7 +6,11 @@ import type {
   Discussion,
   DiscussionChannel,
 } from '@/__generated__/graphql';
-import type { DiscussionWithFavorited } from '@/types/Discussion';
+import type {
+  DiscussionChannelWithFlairs,
+  DiscussionWithFavorited,
+} from '@/types/Discussion';
+import DiscussionFlairBadges from '@/components/discussion/DiscussionFlairBadges.vue';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import ChannelIconStack from '@/components/channel/ChannelIconStack.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
@@ -183,6 +187,15 @@ const isSelected = computed(() => {
   return discussionIdInParams.value === discussionId.value;
 });
 const title = computed(() => props.discussion?.title || '[Deleted]');
+const flairGroups = computed(() =>
+  (props.discussion?.DiscussionChannels || [])
+    .map((discussionChannel) => ({
+      channelName: discussionChannel.channelUniqueName,
+      flairs:
+        (discussionChannel as DiscussionChannelWithFlairs).Flairs || [],
+    }))
+    .filter((group) => group.flairs.length > 0)
+);
 const authorUsername = computed(
   () => props.discussion?.Author?.username || 'Deleted'
 );
@@ -495,6 +508,15 @@ const revealSensitiveContent = () => {
               </div>
             </div>
           </template>
+        </div>
+        <div v-if="flairGroups.length" class="mt-1 flex flex-wrap gap-1.5">
+          <DiscussionFlairBadges
+            v-for="group in flairGroups"
+            :key="group.channelName"
+            :flairs="group.flairs"
+            :channel-name="group.channelName"
+            :show-channel-name="true"
+          />
         </div>
     </div>
   </li>

@@ -37,7 +37,10 @@ vi.mock('@/composables/useAuthState', () =>
   createAuthStateMock({ username: 'alice' })
 );
 
-const mountItem = (title: string) => {
+const mountItem = (
+  title: string,
+  flairs: Array<Record<string, unknown>> = []
+) => {
   asMock(useQuery).mockReturnValue(createQueryMock({ users: [] }));
   const discussion = makeDiscussion({
     title,
@@ -48,6 +51,7 @@ const mountItem = (title: string) => {
     channelUniqueName: 'cats',
     Discussion: discussion,
     CommentsAggregate: { count: 0 },
+    Flairs: flairs,
   } as unknown as DiscussionChannel;
 
   return mountWithDefaults(ChannelDiscussionListItem, {
@@ -74,5 +78,21 @@ describe('ChannelDiscussionListItem', () => {
 
   it('reflects an overridden title', () => {
     expect(mountItem('Another One').text()).toContain('Another One');
+  });
+
+  it('renders the flairs assigned in this forum', () => {
+    const wrapper = mountItem('Flair post', [
+      {
+        id: 'question',
+        channelUniqueName: 'cats',
+        displayName: 'Question',
+        color: '#112233',
+        order: 0,
+        archived: false,
+      },
+    ]);
+    expect(wrapper.get('[data-testid="discussion-flair"]').text()).toBe(
+      'Question'
+    );
   });
 });

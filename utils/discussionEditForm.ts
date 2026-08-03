@@ -1,4 +1,7 @@
-import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
+import type {
+  CreateEditDiscussionFormValues,
+  DiscussionFlairData,
+} from '@/types/Discussion';
 
 /**
  * Map a loaded discussion into the edit form's values. Extracted from
@@ -20,7 +23,11 @@ export type DiscussionEditSource = {
   body?: string | null;
   Tags?: { text: string }[] | null;
   DiscussionChannels?:
-    | { Channel?: { uniqueName?: string | null } | null }[]
+    | {
+        channelUniqueName?: string | null;
+        Channel?: { uniqueName?: string | null } | null;
+        Flairs?: DiscussionFlairData[] | null;
+      }[]
     | null;
   Author?: { username?: string | null } | null;
   Album?: {
@@ -29,6 +36,30 @@ export type DiscussionEditSource = {
   } | null;
   CrosspostedDiscussion?: { id?: string | null } | null;
 };
+
+export function getActiveDiscussionFlairIdsByChannel(
+  discussion: DiscussionEditSource
+): Record<string, string[]> {
+  return Object.fromEntries(
+    (discussion.DiscussionChannels ?? [])
+      .map((discussionChannel) => {
+        const channelUniqueName =
+          discussionChannel.Channel?.uniqueName ??
+          discussionChannel.channelUniqueName ??
+          '';
+        const flairIds = (discussionChannel.Flairs ?? [])
+          .filter((flair) => !flair.archived)
+          .sort(
+            (left, right) =>
+              left.order - right.order ||
+              left.displayName.localeCompare(right.displayName)
+          )
+          .map((flair) => flair.id);
+        return [channelUniqueName, flairIds] as const;
+      })
+      .filter(([channelUniqueName]) => Boolean(channelUniqueName))
+  );
+}
 
 export function buildDiscussionEditFormValues(
   discussion: DiscussionEditSource
@@ -56,9 +87,16 @@ export function buildDiscussionEditFormValues(
     title: discussion.title ?? '',
     body: discussion.body ?? '',
     selectedTags: (discussion.Tags ?? []).map((tag) => tag.text),
-    selectedChannels: (discussion.DiscussionChannels ?? []).map(
-      (discussionChannel) => discussionChannel?.Channel?.uniqueName ?? ''
-    ),
+    selectedChannels: (discussion.DiscussionChannels ?? [])
+      .map(
+        (discussionChannel) =>
+          discussionChannel.Channel?.uniqueName ??
+          discussionChannel.channelUniqueName ??
+          ''
+      )
+      .filter(Boolean),
+    selectedFlairIdsByChannel:
+      getActiveDiscussionFlairIdsByChannel(discussion),
     author: discussion.Author?.username ?? '',
     album: {
       images: validImages,

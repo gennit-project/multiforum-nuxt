@@ -235,6 +235,28 @@ describe('DiscussionDetailContent', () => {
     expect(wrapper.find('.discussion-header-stub').exists()).toBe(true);
   });
 
+  it('renders the flairs assigned in the active forum', () => {
+    const discussion = makeDiscussion();
+    Object.assign(discussion.DiscussionChannels[0], {
+      Flairs: [
+        {
+          id: 'question',
+          channelUniqueName: 'cats',
+          displayName: 'Question',
+          color: null,
+          order: 0,
+          archived: false,
+        },
+      ],
+    });
+    const { wrapper } = setup({
+      discussions: [discussion],
+    });
+    expect(wrapper.get('[data-testid="discussion-flair"]').text()).toBe(
+      'Question'
+    );
+  });
+
   it('does not show page-not-found for a loaded discussion', () => {
     const { wrapper } = setup();
     expect(wrapper.find('.page-not-found-stub').exists()).toBe(false);

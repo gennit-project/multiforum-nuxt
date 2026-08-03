@@ -149,6 +149,81 @@ test('requires and submits a flair in the channel-scoped form', async ({
   ]);
 });
 
+test('shows, hydrates, and clears an existing optional flair', async ({
+  page,
+  setupMockedPage,
+}) => {
+  const state = createDiscussionState();
+  state.discussions = [
+    {
+      id: 'discussion-with-flair',
+      discussionChannelId: 'discussion-channel-with-flair',
+      title: TEST_DISCUSSION,
+      body: TEST_BODY,
+      tags: [],
+      flairs: [
+        {
+          id: 'question',
+          channelUniqueName: TEST_CHANNEL,
+          displayName: 'Question',
+          color: '#2563EB',
+          order: 0,
+          archived: false,
+        },
+      ],
+      deleted: false,
+    },
+  ];
+
+  await setupMockedPage({
+    handlers: {
+      ...createDiscussionHandlers(state, {
+        channelId: TEST_CHANNEL,
+        username: 'cluse',
+      }),
+      getChannelDiscussionFlairConfig: () => ({
+        data: {
+          getChannelDiscussionFlairConfig: {
+            channelUniqueName: TEST_CHANNEL,
+            flairRequired: false,
+            flairs: [
+              {
+                id: 'question',
+                channelUniqueName: TEST_CHANNEL,
+                displayName: 'Question',
+                color: '#2563EB',
+                order: 0,
+                archived: false,
+              },
+            ],
+          },
+        },
+      }),
+    },
+  });
+
+  const discussionPath =
+    `/forums/${TEST_CHANNEL}/discussions/discussion-with-flair`;
+  await page.goto(discussionPath);
+  await expect(page.getByTestId('discussion-flair')).toHaveText('Question');
+
+  await page.goto(
+    `/forums/${TEST_CHANNEL}/discussions/edit/discussion-with-flair`
+  );
+  const selectedFlair = page.getByRole('button', {
+    name: 'Remove Question flair',
+  });
+  await expect(selectedFlair).toHaveAttribute('aria-pressed', 'true');
+  await selectedFlair.click();
+  await page.getByRole('button', { name: 'Save' }).first().click();
+
+  await expect(page).toHaveURL(discussionPath);
+  expect(state.lastChannelFlairSelections).toEqual([
+    { channelUniqueName: TEST_CHANNEL, flairIds: [] },
+  ]);
+  await expect(page.getByTestId('discussion-flair')).toHaveCount(0);
+});
+
 test('requires flair selections independently in the sitewide form', async ({
   page,
   setupMockedPage,
