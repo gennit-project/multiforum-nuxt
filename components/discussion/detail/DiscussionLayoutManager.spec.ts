@@ -1,8 +1,14 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 
 import DiscussionLayoutManager from '@/components/discussion/detail/DiscussionLayoutManager.vue';
 import type { Discussion } from '@/__generated__/graphql';
+
+const mockProvideDownloadPipelineOverview = vi.hoisted(() => vi.fn());
+
+vi.mock('@/composables/useDownloadPipelineOverview', () => ({
+  provideDownloadPipelineOverview: mockProvideDownloadPipelineOverview,
+}));
 
 const ALL_EVENTS = [
   'discussion-refetch',
@@ -48,6 +54,18 @@ const mountManager = (props: Record<string, unknown> = {}) =>
   });
 
 describe('DiscussionLayoutManager', () => {
+  it('provides one pipeline overview for the download detail subtree', () => {
+    mountManager({
+      downloadMode: true,
+      discussion: {
+        id: 'd1',
+        DownloadableFiles: [{ id: 'file-1' }],
+      } as unknown as Discussion,
+    });
+
+    expect(mockProvideDownloadPipelineOverview).toHaveBeenCalledOnce();
+  });
+
   it('renders the regular layout by default', () => {
     const wrapper = mountManager();
 

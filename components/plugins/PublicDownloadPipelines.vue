@@ -3,7 +3,7 @@ import { computed, nextTick, ref, toRef, watch } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import {
   getApplicablePipelineStatus,
-  useDownloadPipelineOverview,
+  useSharedDownloadPipelineOverview,
   type ApplicablePublicPipeline,
   type PublicPipelineAttempt,
   type PublicPipelineDisplayStatus,
@@ -32,7 +32,7 @@ const {
   loading,
   error,
   refetch,
-} = useDownloadPipelineOverview(
+} = useSharedDownloadPipelineOverview(
   toRef(props, 'fileId'),
   toRef(props, 'discussionId'),
   toRef(props, 'channelName')

@@ -18,7 +18,7 @@ vi.mock('@/composables/useDownloadPipelineOverview', async () => {
   const { ref } = await import('vue');
   return {
     ...actual,
-    useDownloadPipelineOverview: () => ({
+    useSharedDownloadPipelineOverview: () => ({
       applicablePipelines: ref(mockOverview.applicablePipelines),
       attempts: ref(mockOverview.attempts),
       hasPipelineContent: ref(mockOverview.hasPipelineContent),

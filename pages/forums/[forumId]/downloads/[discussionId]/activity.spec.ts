@@ -19,7 +19,7 @@ vi.mock('@/composables/useAuthState', () => ({
 }));
 
 vi.mock('@/composables/useDownloadPipelineOverview', () => ({
-  useDownloadPipelineOverview: () => ({
+  useSharedDownloadPipelineOverview: () => ({
     attempts: ref([
       {
         pipelineId: 'pipeline-1',
