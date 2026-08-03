@@ -218,12 +218,12 @@ describe('DownloadSidebar', () => {
       message: wrapper.get('[data-testid="download-scan-status"]').text(),
       disabled: wrapper.get('button').attributes('disabled'),
     }).toEqual({
-      message: expect.stringContaining('Security scan in progress'),
+      message: expect.stringContaining('Quarantined: security check pending'),
       disabled: '',
     });
   });
 
-  it('gives the creator cause-aware blocked copy and review actions', () => {
+  it('gives the creator cause-aware quarantine copy without a direct download', () => {
     authState.value = true;
     mockUsernameRef.value = 'author';
     const wrapper = mount(DownloadSidebar, {
@@ -245,14 +245,16 @@ describe('DownloadSidebar', () => {
 
     expect({
       status: wrapper.get('[data-testid="download-scan-status"]').text(),
-      button: wrapper.findAll('button').find((button) =>
+      directReviewDownload: wrapper.findAll('button').some((button) =>
         button.text() === 'Download for review'
-      )?.text(),
+      ),
+      downloadDisabled: wrapper.findAll('button').at(-1)?.attributes('disabled'),
     }).toEqual({
       status: expect.stringContaining(
         'This upload was blocked by the security scan: Known malware signature.'
       ),
-      button: 'Download for review',
+      directReviewDownload: false,
+      downloadDisabled: '',
     });
   });
 

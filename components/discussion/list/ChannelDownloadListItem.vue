@@ -18,6 +18,7 @@ import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import CommentIcon from '@/components/icons/CommentIcon.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
+import DownloadQuarantineBadge from '@/components/download/DownloadQuarantineBadge.vue';
 
 // Define props
 const props = defineProps({
@@ -200,6 +201,10 @@ const filteredQuery = computed(() => {
 
           <!-- Top right buttons container -->
           <div class="absolute right-2 top-2 z-10 flex gap-2">
+            <DownloadQuarantineBadge
+              v-if="discussion.DownloadableFiles?.[0]"
+              :status="discussion.DownloadableFiles[0].scanStatus"
+            />
             <!-- Add to Favorites Button -->
             <div
               v-if="discussion"

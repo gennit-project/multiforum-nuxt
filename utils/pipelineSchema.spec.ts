@@ -50,6 +50,17 @@ describe('pipelineSchema utilities', () => {
       );
     });
 
+    it('should include downloadableFile.downloaded as server event', () => {
+      const event = PIPELINE_EVENTS.find((e) => e.value === 'downloadableFile.downloaded');
+      expect(event).toEqual(
+        expect.objectContaining({
+          value: 'downloadableFile.downloaded',
+          scope: 'server',
+          label: 'Download Requested',
+        })
+      );
+    });
+
     it('should include comment.created as server event', () => {
       const event = PIPELINE_EVENTS.find((e) => e.value === 'comment.created');
       expect(event).toEqual(
@@ -85,12 +96,14 @@ describe('pipelineSchema utilities', () => {
         allServer: events.every((e) => e.scope === 'server'),
         hasCreated: events.some((e) => e.value === 'downloadableFile.created'),
         hasUpdated: events.some((e) => e.value === 'downloadableFile.updated'),
+        hasDownloaded: events.some((e) => e.value === 'downloadableFile.downloaded'),
         hasComment: events.some((e) => e.value === 'comment.created'),
       }).toEqual({
-        count: 3,
+        count: 4,
         allServer: true,
         hasCreated: true,
         hasUpdated: true,
+        hasDownloaded: true,
         hasComment: true,
       });
     });
@@ -154,12 +167,14 @@ describe('pipelineSchema utilities', () => {
         titleIncludesServer: schema.title.includes('Server'),
         hasCreated: eventEnum?.includes('downloadableFile.created'),
         hasUpdated: eventEnum?.includes('downloadableFile.updated'),
+        hasDownloaded: eventEnum?.includes('downloadableFile.downloaded'),
         hasComment: eventEnum?.includes('comment.created'),
         hasChannel: eventEnum?.includes('discussionChannel.created'),
       }).toEqual({
         titleIncludesServer: true,
         hasCreated: true,
         hasUpdated: true,
+        hasDownloaded: true,
         hasComment: true,
         hasChannel: false,
       });

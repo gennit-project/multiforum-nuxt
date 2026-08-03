@@ -8,6 +8,7 @@ import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavo
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import CommentIcon from '@/components/icons/CommentIcon.vue';
+import DownloadQuarantineBadge from '@/components/download/DownloadQuarantineBadge.vue';
 import { relativeTime } from '@/utils';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 import type { DiscussionWithFavorited } from '@/types/Discussion';
@@ -218,6 +219,14 @@ const handleOpenAlbum = () => {
       </div>
 
       <!-- Top right buttons container -->
+      <div
+        v-if="discussion.DownloadableFiles?.[0]"
+        class="absolute left-2 top-2 z-10"
+      >
+        <DownloadQuarantineBadge
+          :status="discussion.DownloadableFiles[0].scanStatus"
+        />
+      </div>
       <div class="absolute right-2 top-2 z-10 flex gap-2">
         <!-- Add to Favorites Button -->
         <div

@@ -46,6 +46,12 @@ export const PIPELINE_EVENTS = [
     scope: 'server' as PipelineConfigScope,
   },
   {
+    value: 'downloadableFile.downloaded',
+    label: 'Download Requested',
+    description: 'Triggered when a download needs a fresh security check',
+    scope: 'server' as PipelineConfigScope,
+  },
+  {
     value: 'comment.created',
     label: 'Comment Created',
     description: 'Triggered when a comment is created',
