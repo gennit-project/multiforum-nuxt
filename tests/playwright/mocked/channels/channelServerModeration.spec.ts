@@ -160,6 +160,70 @@ test.describe('Forum About page – server moderation', () => {
     }
   });
 
+  for (const imageType of ['ICON', 'BANNER'] as const) {
+    test(`reporting the forum ${imageType.toLowerCase()} submits its image type`, async ({
+      context,
+      page,
+    }, testInfo) => {
+      await installMockAuth(context, page);
+      const diagnostics = await installGraphqlMocks(page, {
+        ...createBaseHandlers({
+          channelId: CHANNEL,
+          channelOverrides: {
+            channelIconURL: '/favicon.ico',
+            channelBannerURL: '/favicon.ico',
+          },
+          serverConfigOverrides: { DefaultModRole: SERVER_MOD_ROLE },
+        }),
+        getServerRules: serverRulesHandler,
+        reportChannelImage: () => ({
+          data: {
+            reportChannelImage: {
+              id: `issue-${imageType.toLowerCase()}`,
+              issueNumber: imageType === 'ICON' ? 2 : 3,
+              relatedChannelUniqueName: CHANNEL,
+            },
+          },
+        }),
+      });
+
+      try {
+        await page.goto(ABOUT_URL);
+        await page
+          .getByRole('button', {
+            name: imageType === 'ICON' ? 'Report Icon' : 'Report Banner',
+          })
+          .click();
+
+        await page.getByLabel('Select rule: Be kind').check();
+        await page
+          .getByTestId('report-channel-image-modal-primary-button')
+          .click();
+
+        await waitForGraphqlOperation(
+          diagnostics.completedOperations,
+          'reportChannelImage'
+        );
+        const operation = diagnostics.completedOperations.find(
+          (item) => item.operationName === 'reportChannelImage'
+        );
+
+        expect(operation?.variables).toMatchObject({
+          channelUniqueName: CHANNEL,
+          imageType,
+          selectedServerRules: ['Be kind'],
+        });
+      } finally {
+        await testInfo.attach('graphql-operations.json', {
+          body: Buffer.from(
+            JSON.stringify(diagnostics.seenOperations, null, 2)
+          ),
+          contentType: 'application/json',
+        });
+      }
+    });
+  }
+
   test('locking the forum from the About page fires lockChannel with a reason', async ({
     context,
     page,
@@ -171,7 +235,9 @@ test.describe('Forum About page – server moderation', () => {
         serverConfigOverrides: { DefaultModRole: SERVER_MOD_ROLE },
       }),
       getServerRules: serverRulesHandler,
-      lockChannel: () => ({ data: { lockChannel: lockedChannelResponse(true) } }),
+      lockChannel: () => ({
+        data: { lockChannel: lockedChannelResponse(true) },
+      }),
     });
 
     try {

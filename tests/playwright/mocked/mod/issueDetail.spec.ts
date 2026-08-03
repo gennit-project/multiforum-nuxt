@@ -176,7 +176,10 @@ test.describe('Moderation issue detail', () => {
       await expect(page.getByText(/the issue was closed by/i)).toBeVisible();
       await expect(page.getByText(/the user was suspended by/i)).toBeVisible();
 
-      await waitForGraphqlOperation(diagnostics.completedOperations, 'getIssue');
+      await waitForGraphqlOperation(
+        diagnostics.completedOperations,
+        'getIssue'
+      );
     } finally {
       await testInfo.attach('graphql-operations.json', {
         body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
@@ -276,6 +279,117 @@ test.describe('Moderation issue detail', () => {
       const ruleCheckbox = page.locator('input[value="Be kind"]');
       await ruleCheckbox.check();
       await expect(ruleCheckbox).toBeChecked();
+    } finally {
+      await testInfo.attach('graphql-operations.json', {
+        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
+        contentType: 'application/json',
+      });
+    }
+  });
+
+  test('archives and unarchives an image from its moderation issue', async ({
+    context,
+    page,
+  }, testInfo) => {
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
+
+    const imageId = 'reported-image-1';
+    const issue = buildIssue({
+      issueNumber: ISSUE_NUMBER,
+      channelUniqueName: TEST_CHANNEL,
+      title: 'Reported album image',
+      isOpen: true,
+      overrides: { relatedImageId: imageId },
+    });
+
+    const diagnostics = await installGraphqlMocks(page, {
+      ...getBaseMocks(TEST_USER),
+      getIssue: () => ({ data: { issues: [issue] } }),
+      GetImageDetails: () => ({
+        data: {
+          images: [
+            {
+              __typename: 'Image',
+              id: imageId,
+              archived: false,
+              url: '/favicon.ico',
+              alt: 'Reported image',
+              caption: '',
+              copyright: '',
+              longDescription: '',
+              hasSensitiveContent: false,
+              hasSpoiler: false,
+              createdAt: '2024-01-01T00:00:00.000Z',
+              scanCheckedAt: '2024-01-01T00:00:00.000Z',
+              Uploader: {
+                username: 'bob',
+                displayName: 'Bob',
+                profilePicURL: '',
+              },
+              Albums: [],
+            },
+          ],
+        },
+      }),
+      archiveImage: () => ({
+        data: { archiveImage: { id: issue.id, issueNumber: ISSUE_NUMBER } },
+      }),
+      unarchiveImage: () => ({
+        data: { unarchiveImage: { id: issue.id, issueNumber: ISSUE_NUMBER } },
+      }),
+    });
+
+    try {
+      await page.goto(`/forums/${TEST_CHANNEL}/issues/${ISSUE_NUMBER}`);
+
+      const archiveButton = page
+        .getByRole('button', { name: 'Archive Image' })
+        .first();
+      await expect(archiveButton).toBeVisible();
+      await archiveButton.click();
+      await page.getByLabel('Select rule: Be kind').first().check();
+      await page.getByTestId('report-image-modal-primary-button').click();
+
+      await waitForGraphqlOperation(
+        diagnostics.completedOperations,
+        'archiveImage'
+      );
+      await expect(archiveButton).toHaveCount(0);
+      await expect(
+        page.getByRole('button', { name: 'Unarchive' }).first()
+      ).toBeVisible();
+
+      await page.getByRole('button', { name: 'Unarchive' }).first().click();
+      await page.getByTestId('unarchive-modal-primary-button').click();
+
+      await waitForGraphqlOperation(
+        diagnostics.completedOperations,
+        'unarchiveImage'
+      );
+      await expect(
+        page.getByRole('button', { name: 'Archive Image' }).first()
+      ).toBeVisible();
+
+      const operations = diagnostics.completedOperations.filter((item) =>
+        ['archiveImage', 'unarchiveImage'].includes(item.operationName)
+      );
+      expect(operations.map((item) => item.variables)).toEqual([
+        {
+          imageId,
+          reportText: '',
+          selectedForumRules: [],
+          selectedServerRules: ['Be kind'],
+          channelUniqueName: TEST_CHANNEL,
+        },
+        {
+          imageId,
+          explanation: 'No violation',
+          channelUniqueName: TEST_CHANNEL,
+        },
+      ]);
     } finally {
       await testInfo.attach('graphql-operations.json', {
         body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),

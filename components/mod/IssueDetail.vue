@@ -348,7 +348,8 @@ const extractChannelUniqueNames = (
 
 const issueContextChannels = computed<string[]>(() => {
   const discussionChannels = extractChannelUniqueNames(
-    relatedDiscussion.value?.DiscussionChannels as DiscussionChannel[] | null | undefined
+    relatedDiscussion.value?.DiscussionChannels as
+      DiscussionChannel[] | null | undefined
   );
   if (discussionChannels.length > 0) {
     return [...new Set(discussionChannels)];
@@ -448,7 +449,9 @@ const handleLockReasonUpdate = (value: string) => {
 
     <!-- Related Channel (for server-scoped channel reports) -->
     <div v-if="relatedChannelUniqueName" class="px-4 pt-2">
-      <IssueRelatedChannel :related-channel-unique-name="relatedChannelUniqueName" />
+      <IssueRelatedChannel
+        :related-channel-unique-name="relatedChannelUniqueName"
+      />
     </div>
 
     <div v-if="activeIssue" class="mt-2 flex flex-col gap-2 px-4">
@@ -475,7 +478,9 @@ const handleLockReasonUpdate = (value: string) => {
         :report-count-label="reportCountLabel"
         :channel-id="channelId"
         :is-author-mod="authorType === 'mod'"
-        :suspend-mod-disabled="isSuspendedMod || !issueActionVisibility.modActionsEnabled"
+        :suspend-mod-disabled="
+          isSuspendedMod || !issueActionVisibility.modActionsEnabled
+        "
         :can-permanently-remove-image="
           modPermissions.canPermanentlyRemoveImage &&
           !isSuspendedMod &&
@@ -510,7 +515,7 @@ const handleLockReasonUpdate = (value: string) => {
       <div
         v-else-if="shouldShowIssueDetailsSection"
         id="original-post-container"
-        class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 dark:border-gray-600 dark:bg-gray-800"
+        class="bg-gray-50 rounded-lg border border-gray-200 px-4 py-2 dark:border-gray-600 dark:bg-gray-800"
       >
         <IssueBodyEditor
           v-if="activeIssue?.body || isIssueAuthor"
@@ -580,7 +585,7 @@ const handleLockReasonUpdate = (value: string) => {
           <ErrorBanner v-if="deleteReasonError" :text="deleteReasonError" />
           <div
             v-if="isSuspendedMod"
-            class="mb-6 rounded-lg border border-orange-200 bg-orange-50 p-4 text-sm text-gray-700 dark:border-orange-500/40 dark:bg-orange-500/10 dark:text-gray-200"
+            class="bg-orange-50 mb-6 rounded-lg border border-orange-200 p-4 text-sm text-gray-700 dark:border-orange-500/40 dark:bg-orange-500/10 dark:text-gray-200"
           >
             Your moderator account is suspended. You can still use your user
             account where normal user permissions allow it, but moderation
@@ -593,6 +598,7 @@ const handleLockReasonUpdate = (value: string) => {
             :discussion-id="activeIssue?.relatedDiscussionId || ''"
             :event-id="activeIssue?.relatedEventId || ''"
             :comment-id="activeIssue?.relatedCommentId || ''"
+            :image-id="activeIssue?.relatedImageId || ''"
             :channel-unique-name="channelId"
             :close-issue-loading="closeIssueLoading"
             :is-current-user-original-poster="
@@ -626,9 +632,15 @@ const handleLockReasonUpdate = (value: string) => {
             :actions-disabled="!issueActionVisibility.opActionsEnabled"
             :is-locked="isLocked"
             :is-closed="!activeIssue?.isOpen"
-            @delete-discussion="(id: string) => handleDeleteRelatedContent('discussion', id)"
-            @delete-event="(id: string) => handleDeleteRelatedContent('event', id)"
-            @delete-comment="(id: string) => handleDeleteRelatedContent('comment', id)"
+            @delete-discussion="
+              (id: string) => handleDeleteRelatedContent('discussion', id)
+            "
+            @delete-event="
+              (id: string) => handleDeleteRelatedContent('event', id)
+            "
+            @delete-comment="
+              (id: string) => handleDeleteRelatedContent('comment', id)
+            "
           />
 
           <IssueCommentForm

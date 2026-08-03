@@ -15,8 +15,12 @@ const issue = { id: 'issue-1', issueNumber: 1 } as unknown as Issue;
 
 const modalStub = (name: string) => ({
   name,
-  props: ['open', 'discussionId', 'eventId', 'commentId'],
-  emits: ['close', 'reported-and-archived-successfully', 'unarchived-successfully'],
+  props: ['open', 'discussionId', 'eventId', 'commentId', 'imageId'],
+  emits: [
+    'close',
+    'reported-and-archived-successfully',
+    'unarchived-successfully',
+  ],
   template: '<div />',
 });
 
@@ -27,7 +31,11 @@ const mountButton = (props: Record<string, unknown> = {}) =>
       stubs: {
         BrokenRulesModal: modalStub('BrokenRulesModal'),
         UnarchiveModal: modalStub('UnarchiveModal'),
-        Notification: { name: 'Notification', props: ['show', 'title'], template: '<div />' },
+        Notification: {
+          name: 'Notification',
+          props: ['show', 'title'],
+          template: '<div />',
+        },
         ArchiveBox: true,
         ArchiveBoxXMark: true,
       },
@@ -38,6 +46,7 @@ const archivedResult = (archived: boolean) => ({
   discussionChannels: [{ id: 'dc1', archived }],
   eventChannels: [{ id: 'ec1', archived }],
   comments: [{ archived }],
+  images: [{ archived }],
 });
 
 beforeEach(() => {
@@ -64,9 +73,22 @@ describe('ArchiveButton label', () => {
     expect(wrapper.text()).toContain('Archive Comment');
   });
 
+  it('shows "Archive Image" for an image', () => {
+    const wrapper = mountButton({ imageId: 'i1' });
+
+    expect(wrapper.text()).toContain('Archive Image');
+  });
+
   it('shows Unarchive when the content is archived', () => {
     h.result = ref(archivedResult(true));
     const wrapper = mountButton({ discussionId: 'd1' });
+
+    expect(wrapper.text()).toContain('Unarchive');
+  });
+
+  it('shows Unarchive when an image is archived', () => {
+    h.result = ref(archivedResult(true));
+    const wrapper = mountButton({ imageId: 'i1' });
 
     expect(wrapper.text()).toContain('Unarchive');
   });
@@ -84,9 +106,9 @@ describe('ArchiveButton disabled state', () => {
 
     await wrapper.get('button').trigger('click');
 
-    expect(wrapper.getComponent({ name: 'BrokenRulesModal' }).props('open')).toBe(
-      false
-    );
+    expect(
+      wrapper.getComponent({ name: 'BrokenRulesModal' }).props('open')
+    ).toBe(false);
   });
 });
 
@@ -96,9 +118,9 @@ describe('ArchiveButton modal flow', () => {
 
     await wrapper.get('button').trigger('click');
 
-    expect(wrapper.getComponent({ name: 'BrokenRulesModal' }).props('open')).toBe(
-      true
-    );
+    expect(
+      wrapper.getComponent({ name: 'BrokenRulesModal' }).props('open')
+    ).toBe(true);
   });
 
   it('opens the unarchive modal on click when archived', async () => {
