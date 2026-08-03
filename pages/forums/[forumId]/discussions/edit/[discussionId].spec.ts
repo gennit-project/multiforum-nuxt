@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { shallowMount } from '@vue/test-utils';
+import { flushPromises, shallowMount } from '@vue/test-utils';
 import { defineComponent, h, nextTick, ref } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
@@ -12,6 +12,11 @@ const hState = vi.hoisted(() => ({
   mutate: vi.fn(),
   queryResult: null as unknown as { value: unknown },
   mutationOptions: null as null | (() => { variables: unknown }),
+  flairConfigs: {} as Record<
+    string,
+    { flairRequired: boolean; flairs: Array<Record<string, unknown>> }
+  >,
+  flairQuery: vi.fn(),
 }));
 
 vi.mock('nuxt/app', () => ({
@@ -23,36 +28,13 @@ vi.mock('nuxt/app', () => ({
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
   useMutation: vi.fn(),
+  useApolloClient: () => ({
+    resolveClient: () => ({ query: hState.flairQuery }),
+  }),
 }));
 
 vi.mock('@/composables/useAuthState', () => ({
   useModProfileName: () => ref('mod-1'),
-}));
-
-vi.mock('@/utils/discussionEditForm', () => ({
-  buildDiscussionEditFormValues: (discussion: {
-    title: string;
-    body?: string;
-    DiscussionChannels?: Array<{ Channel?: { uniqueName?: string } }>;
-    Tags?: Array<{ text: string }>;
-    Album?: { Images: unknown[]; imageOrder: string[] };
-    Author?: { username?: string };
-    CrosspostedDiscussion?: { id?: string } | null;
-  }) => ({
-    title: discussion.title,
-    body: discussion.body || '',
-    selectedTags: discussion.Tags?.map((tag) => tag.text) || [],
-    selectedChannels:
-      discussion.DiscussionChannels?.map(
-        (dc) => dc.Channel?.uniqueName || ''
-      ) || [],
-    author: discussion.Author?.username || '',
-    album: {
-      images: [],
-      imageOrder: [],
-    },
-    crosspostId: discussion.CrosspostedDiscussion?.id || null,
-  }),
 }));
 
 const RequireAuthStub = defineComponent({
@@ -69,7 +51,14 @@ const ClientOnlyStub = defineComponent({
 });
 
 const DiscussionFieldsStub = defineComponent({
-  props: ['formValues', 'editMode'],
+  props: [
+    'formValues',
+    'editMode',
+    'submitError',
+    'discussionFlairConfigs',
+    'discussionFlairsLoadingChannels',
+    'discussionFlairsErrorsByChannel',
+  ],
   emits: ['submit', 'update-form-values', 'cancel'],
   setup(_props, { emit }) {
     return () =>
@@ -109,6 +98,23 @@ beforeEach(() => {
   hState.mutationOptions = null;
   hState.onResultCb = null as unknown as (value: unknown) => void;
   hState.onDoneCb = null as unknown as () => void;
+  hState.flairConfigs = {};
+  hState.flairQuery.mockReset().mockImplementation(
+    ({ variables }: { variables: { channelUniqueName: string } }) => {
+      const config = hState.flairConfigs[variables.channelUniqueName] || {
+        flairRequired: false,
+        flairs: [],
+      };
+      return Promise.resolve({
+        data: {
+          getChannelDiscussionFlairConfig: {
+            channelUniqueName: variables.channelUniqueName,
+            ...config,
+          },
+        },
+      });
+    }
+  );
   mockedUseQuery.mockReturnValue({
     result: hState.queryResult,
     onResult: (cb: (value: unknown) => void) => {
@@ -207,6 +213,7 @@ describe('discussion edit page', () => {
       .vm.$emit('update-form-values', {
         selectedChannels: ['science'],
       });
+    await flushPromises();
     await wrapper.findComponent(CreateEditDiscussionFields).vm.$emit('submit');
 
     expect(hState.mutate).toHaveBeenCalled();
@@ -332,7 +339,161 @@ describe('discussion edit page', () => {
       },
       channelConnections: ['cats'],
       channelDisconnections: ['dogs'],
+      channelFlairSelections: [],
     });
+  });
+
+  it('submits the existing active selection for a required forum', async () => {
+    hState.flairConfigs.cats = {
+      flairRequired: true,
+      flairs: [
+        {
+          id: 'question',
+          displayName: 'Question',
+          color: null,
+          order: 0,
+          archived: false,
+        },
+      ],
+    };
+    const wrapper = await mountPage();
+    hState.onResultCb({
+      loading: false,
+      data: {
+        discussions: [
+          {
+            id: 'd1',
+            title: 'Hello',
+            body: '',
+            Tags: [],
+            DiscussionChannels: [
+              {
+                channelUniqueName: 'cats',
+                Channel: { uniqueName: 'cats' },
+                Flairs: [
+                  {
+                    id: 'question',
+                    channelUniqueName: 'cats',
+                    displayName: 'Question',
+                    color: null,
+                    order: 0,
+                    archived: false,
+                  },
+                ],
+              },
+            ],
+            Author: { username: 'alice' },
+            Album: { Images: [], imageOrder: [] },
+          },
+        ],
+      },
+    });
+    await flushPromises();
+
+    await wrapper.findComponent(CreateEditDiscussionFields).vm.$emit('submit');
+
+    expect(
+      (hState.mutationOptions?.().variables as {
+        channelFlairSelections: unknown;
+      }).channelFlairSelections
+    ).toEqual([
+      { channelUniqueName: 'cats', flairIds: ['question'] },
+    ]);
+  });
+
+  it('submits an explicit empty selection when an optional flair is cleared', async () => {
+    const wrapper = await mountPage();
+    hState.onResultCb({
+      loading: false,
+      data: {
+        discussions: [
+          {
+            id: 'd1',
+            title: 'Hello',
+            body: '',
+            Tags: [],
+            DiscussionChannels: [
+              {
+                channelUniqueName: 'cats',
+                Channel: { uniqueName: 'cats' },
+                Flairs: [
+                  {
+                    id: 'question',
+                    channelUniqueName: 'cats',
+                    displayName: 'Question',
+                    color: null,
+                    order: 0,
+                    archived: false,
+                  },
+                ],
+              },
+            ],
+            Author: { username: 'alice' },
+            Album: { Images: [], imageOrder: [] },
+          },
+        ],
+      },
+    });
+    await flushPromises();
+    await wrapper
+      .findComponent(CreateEditDiscussionFields)
+      .vm.$emit('update-form-values', {
+        selectedFlairIdsByChannel: { cats: [] },
+      });
+    await wrapper.findComponent(CreateEditDiscussionFields).vm.$emit('submit');
+
+    expect(
+      (hState.mutationOptions?.().variables as {
+        channelFlairSelections: unknown;
+      }).channelFlairSelections
+    ).toEqual([{ channelUniqueName: 'cats', flairIds: [] }]);
+  });
+
+  it('blocks an edit when a required forum has no active flair selection', async () => {
+    hState.flairConfigs.cats = {
+      flairRequired: true,
+      flairs: [
+        {
+          id: 'question',
+          displayName: 'Question',
+          color: null,
+          order: 0,
+          archived: false,
+        },
+      ],
+    };
+    const wrapper = await mountPage();
+    hState.onResultCb({
+      loading: false,
+      data: {
+        discussions: [
+          {
+            id: 'd1',
+            title: 'Hello',
+            body: '',
+            Tags: [],
+            DiscussionChannels: [
+              {
+                channelUniqueName: 'cats',
+                Channel: { uniqueName: 'cats' },
+                Flairs: [],
+              },
+            ],
+            Author: { username: 'alice' },
+            Album: { Images: [], imageOrder: [] },
+          },
+        ],
+      },
+    });
+    await flushPromises();
+
+    await wrapper.findComponent(CreateEditDiscussionFields).vm.$emit('submit');
+    await nextTick();
+
+    expect(hState.mutate).not.toHaveBeenCalled();
+    expect(
+      wrapper.findComponent(CreateEditDiscussionFields).props('submitError')
+    ).toBe('Select at least one flair for cats.');
   });
 
   it('provides the discussion owner to the authorization wrapper', async () => {

@@ -29,6 +29,35 @@ describe('buildDiscussionEditFormValues', () => {
     expect(values.selectedChannels).toEqual(['cats']);
   });
 
+  it('maps active assigned flairs by forum and excludes archived assignments', () => {
+    const values = buildDiscussionEditFormValues({
+      DiscussionChannels: [
+        {
+          Channel: { uniqueName: 'cats' },
+          Flairs: [
+            {
+              id: 'help',
+              channelUniqueName: 'cats',
+              displayName: 'Help',
+              color: null,
+              order: 1,
+              archived: false,
+            },
+            {
+              id: 'old',
+              channelUniqueName: 'cats',
+              displayName: 'Old',
+              color: null,
+              order: 0,
+              archived: true,
+            },
+          ],
+        },
+      ],
+    });
+    expect(values.selectedFlairIdsByChannel).toEqual({ cats: ['help'] });
+  });
+
   it('keeps only images with both an id and a url', () => {
     const values = buildDiscussionEditFormValues({
       Album: {
@@ -60,6 +89,7 @@ describe('buildDiscussionEditFormValues', () => {
       author: '',
       selectedTags: [],
       selectedChannels: [],
+      selectedFlairIdsByChannel: {},
       crosspostId: null,
     });
   });

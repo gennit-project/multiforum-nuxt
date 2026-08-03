@@ -18,7 +18,11 @@ import type {
   Image,
 } from '@/__generated__/graphql';
 import { useModProfileName } from '@/composables/useAuthState';
-import { buildDiscussionEditFormValues } from '@/utils/discussionEditForm';
+import {
+  buildDiscussionEditFormValues,
+  getActiveDiscussionFlairIdsByChannel,
+} from '@/utils/discussionEditForm';
+import { useChannelDiscussionFlairConfigs } from '@/composables/useChannelDiscussionFlairConfigs';
 
 const modProfileNameVar = useModProfileName();
 
@@ -112,6 +116,8 @@ const getDefaultFormValues = (): CreateEditDiscussionFormValues => {
           return discussionChannel?.Channel?.uniqueName || '';
         }
       ),
+      selectedFlairIdsByChannel:
+        getActiveDiscussionFlairIdsByChannel(discussion.value),
       author: discussion.value.Author?.username || '',
       album: {
         images: orderedImages.value,
@@ -125,6 +131,7 @@ const getDefaultFormValues = (): CreateEditDiscussionFormValues => {
     body: '',
     selectedTags: [],
     selectedChannels: [],
+    selectedFlairIdsByChannel: {},
     author: '',
     album: {
       images: [],
@@ -139,6 +146,63 @@ const formValues = ref<CreateEditDiscussionFormValues>(
 );
 
 const dataLoaded = ref(false);
+
+const selectedChannelsForFlairConfig = computed(
+  () => formValues.value.selectedChannels
+);
+const {
+  configs: discussionFlairConfigs,
+  loadingChannels: discussionFlairsLoadingChannels,
+  errorsByChannel: discussionFlairsErrorsByChannel,
+} = useChannelDiscussionFlairConfigs(selectedChannelsForFlairConfig);
+
+const flairConfigsByChannel = computed(() =>
+  Object.fromEntries(
+    discussionFlairConfigs.value.map((config) => [
+      config.channelUniqueName,
+      config,
+    ])
+  )
+);
+
+const initialFlairIdsByChannel = computed(() =>
+  discussion.value
+    ? getActiveDiscussionFlairIdsByChannel(discussion.value)
+    : {}
+);
+
+const sameFlairIds = (left: string[], right: string[]) => {
+  const sortedLeft = [...left].sort();
+  const sortedRight = [...right].sort();
+  return (
+    sortedLeft.length === sortedRight.length &&
+    sortedLeft.every((id, index) => id === sortedRight[index])
+  );
+};
+
+const channelFlairSelections = computed(() =>
+  formValues.value.selectedChannels.flatMap((channelUniqueName) => {
+    const flairIds =
+      formValues.value.selectedFlairIdsByChannel?.[channelUniqueName] || [];
+    const initialFlairIds =
+      initialFlairIdsByChannel.value[channelUniqueName] || [];
+    const flairRequired =
+      flairConfigsByChannel.value[channelUniqueName]?.flairRequired || false;
+    return flairRequired || !sameFlairIds(flairIds, initialFlairIds)
+      ? [{ channelUniqueName, flairIds }]
+      : [];
+  })
+);
+
+const missingRequiredFlairConfig = computed(() =>
+  discussionFlairConfigs.value.find(
+    (config) =>
+      config.flairRequired &&
+      (formValues.value.selectedFlairIdsByChannel?.[
+        config.channelUniqueName
+      ]?.length || 0) === 0
+  )
+);
 
 onGetDiscussionResult((value) => {
   if (value.loading === true) {
@@ -255,6 +319,7 @@ const {
       .map((dc) => {
         return dc.Channel?.uniqueName;
       }),
+    channelFlairSelections: channelFlairSelections.value,
   },
 }));
 
@@ -269,11 +334,38 @@ onDone(() => {
 });
 
 // Methods converted to regular functions
+const submitError = ref<string | null>(null);
+
 async function submit() {
+  submitError.value = null;
+  if (discussionFlairsLoadingChannels.value.length > 0) {
+    submitError.value = 'Wait for the forum flair options to finish loading.';
+    return;
+  }
+  if (Object.keys(discussionFlairsErrorsByChannel.value).length > 0) {
+    submitError.value =
+      'Unable to load the forum flair options. Please try again.';
+    return;
+  }
+  if (missingRequiredFlairConfig.value) {
+    submitError.value = `Select at least one flair for ${missingRequiredFlairConfig.value.channelUniqueName}.`;
+    return;
+  }
   updateDiscussion();
 }
 
-function updateFormValues(data: CreateEditDiscussionFormValues) {
+function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
+  if (data.selectedChannels) {
+    const selectedChannels = new Set(data.selectedChannels);
+    data = {
+      ...data,
+      selectedFlairIdsByChannel: Object.fromEntries(
+        Object.entries(
+          formValues.value.selectedFlairIdsByChannel || {}
+        ).filter(([channel]) => selectedChannels.has(channel))
+      ),
+    };
+  }
   const existingValues = formValues.value;
   formValues.value = {
     ...existingValues,
@@ -307,12 +399,20 @@ function handleCancel() {
           :discussion="discussion"
           :get-discussion-error="getDiscussionError"
           :update-discussion-error="updateDiscussionError"
+          :submit-error="submitError"
           :form-values="formValues"
           :update-discussion-loading="updateDiscussionLoading"
           :download-mode="false"
           :crossposted-discussion="discussion?.CrosspostedDiscussion || null"
           :crosspost-error="getDiscussionError"
           :crosspost-loading="getDiscussionLoading"
+          :discussion-flair-configs="discussionFlairConfigs"
+          :discussion-flairs-loading-channels="
+            discussionFlairsLoadingChannels
+          "
+          :discussion-flairs-errors-by-channel="
+            discussionFlairsErrorsByChannel
+          "
           @submit="submit"
           @update-form-values="updateFormValues"
           @cancel="handleCancel"

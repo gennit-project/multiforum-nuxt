@@ -28,7 +28,17 @@ export type MockDiscussionState = {
   title: string;
   body: string;
   tags: string[];
+  flairs?: MockDiscussionFlair[];
   deleted: boolean;
+};
+
+export type MockDiscussionFlair = {
+  id: string;
+  channelUniqueName: string;
+  displayName: string;
+  color: string;
+  order: number;
+  archived: boolean;
 };
 
 export type DiscussionState = {
@@ -52,6 +62,10 @@ type CreateDiscussionVariables = {
 
 type UpdateDiscussionVariables = {
   updateDiscussionInput?: DiscussionUpdateInput;
+  channelFlairSelections?: Array<{
+    channelUniqueName: string;
+    flairIds: string[];
+  }>;
 };
 
 const buildDiscussionResponse = (
@@ -62,14 +76,25 @@ const buildDiscussionResponse = (
     discussions: discussion.deleted
       ? []
       : [
-          buildDiscussion({
-            id: discussion.id,
-            discussionChannelId: discussion.discussionChannelId,
-            channelUniqueName: channelId,
-            title: discussion.title,
-            body: discussion.body,
-            tags: discussion.tags,
-          }),
+          {
+            ...buildDiscussion({
+              id: discussion.id,
+              discussionChannelId: discussion.discussionChannelId,
+              channelUniqueName: channelId,
+              title: discussion.title,
+              body: discussion.body,
+              tags: discussion.tags,
+            }),
+            DiscussionChannels: buildDiscussion({
+              id: discussion.id,
+              discussionChannelId: discussion.discussionChannelId,
+              channelUniqueName: channelId,
+              title: discussion.title,
+            }).DiscussionChannels.map((discussionChannel) => ({
+              ...discussionChannel,
+              Flairs: discussion.flairs ?? [],
+            })),
+          },
         ],
   },
 });
@@ -89,6 +114,7 @@ const buildDiscussionListResponse = (
               discussionId: discussion.id,
               channelUniqueName: channelId,
               isFavorited: false,
+              Flairs: discussion.flairs ?? [],
               CommentsAggregate: { count: 0 },
               weightedVotesCount: 1,
               createdAt: MOCK_DATE,
@@ -285,6 +311,7 @@ export const createDiscussionHandlers = (
                   locked: false,
                   discussionId: newDiscussion.id,
                   channelUniqueName: config.channelId,
+                  Flairs: [],
                   CommentsAggregate: { count: 0 },
                   weightedVotesCount: 1,
                   createdAt: MOCK_DATE,
@@ -323,6 +350,18 @@ export const createDiscussionHandlers = (
           ?.map((tag) => tag.where.node.text)
           .filter((tag): tag is string => Boolean(tag)) || discussion.tags;
 
+      const channelFlairSelections =
+        body.variables?.channelFlairSelections ?? [];
+      state.lastChannelFlairSelections = channelFlairSelections;
+      const selection = channelFlairSelections.find(
+        ({ channelUniqueName }) => channelUniqueName === config.channelId
+      );
+      if (selection) {
+        discussion.flairs = (discussion.flairs ?? []).filter((flair) =>
+          selection.flairIds.includes(flair.id)
+        );
+      }
+
       return {
         data: {
           updateDiscussionWithChannelConnections: {
@@ -334,6 +373,7 @@ export const createDiscussionHandlers = (
                 id: discussion.discussionChannelId,
                 channelUniqueName: config.channelId,
                 discussionId: discussion.id,
+                Flairs: discussion.flairs ?? [],
                 Channel: { uniqueName: config.channelId },
                 archived: false,
                 answered: false,
