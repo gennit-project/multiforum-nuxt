@@ -108,6 +108,7 @@ client.
 Start here:
 
 - [Development setup](./docs/development-setup.md)
+- [AWS single-VM Terraform example](./deploy/terraform/aws-single-vm/README.md)
 - [Contributing guide](./CONTRIBUTING.md)
 - [Developer workflow and standards](./CLAUDE.md)
 

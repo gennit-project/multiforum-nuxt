@@ -1,0 +1,70 @@
+variable "aws_region" {
+  type        = string
+  description = "AWS region in which to create the Multiforum host."
+  default     = "us-east-1"
+}
+
+variable "name" {
+  type        = string
+  description = "Name prefix applied to the instance and security group."
+  default     = "multiforum"
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9-]{1,32}$", var.name))
+    error_message = "name must contain 1-32 letters, numbers, or hyphens."
+  }
+}
+
+variable "admin_cidr" {
+  type        = string
+  description = "Single trusted IPv4 CIDR allowed to SSH to the host, for example 203.0.113.10/32."
+
+  validation {
+    condition     = can(cidrnetmask(var.admin_cidr))
+    error_message = "admin_cidr must be a valid IPv4 CIDR. Prefer a single-address /32."
+  }
+}
+
+variable "ssh_key_name" {
+  type        = string
+  description = "Name of an existing EC2 key pair used to access the Ubuntu host."
+}
+
+variable "instance_type" {
+  type        = string
+  description = "EC2 instance type. t3.large is the conservative starting point for Neo4j plus both app services."
+  default     = "t3.large"
+}
+
+variable "root_volume_size_gib" {
+  type        = number
+  description = "Size of the encrypted gp3 root volume, which also stores Neo4j Docker volumes."
+  default     = 40
+
+  validation {
+    condition     = var.root_volume_size_gib >= 30
+    error_message = "root_volume_size_gib must be at least 30 GiB."
+  }
+}
+
+variable "application_cidrs" {
+  type        = list(string)
+  description = "IPv4 CIDRs allowed to reach the temporary HTTP application port (3000)."
+  default     = ["0.0.0.0/0"]
+
+  validation {
+    condition     = length(var.application_cidrs) > 0 && alltrue([for cidr in var.application_cidrs : can(cidrnetmask(cidr))])
+    error_message = "application_cidrs must contain at least one valid IPv4 CIDR."
+  }
+}
+
+variable "repository_ref" {
+  type        = string
+  description = "Git branch or tag checked out by cloud-init. Pin a release tag for repeatable production installs."
+  default     = "main"
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9._/-]{1,100}$", var.repository_ref))
+    error_message = "repository_ref contains unsupported characters."
+  }
+}
