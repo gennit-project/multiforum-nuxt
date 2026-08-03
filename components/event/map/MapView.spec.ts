@@ -24,6 +24,10 @@ const h = vi.hoisted(() => ({
     where: { value: unknown };
     resultsOrder: { value: unknown };
   },
+  mapsCapability: null as unknown as { value: unknown },
+  mapsAvailable: null as unknown as { value: boolean },
+  mapsCapabilityLoading: null as unknown as { value: boolean },
+  mapsCapabilityError: null as unknown as { value: unknown },
 }));
 
 vi.mock('@headlessui/vue', async (importOriginal) => ({
@@ -32,6 +36,15 @@ vi.mock('@headlessui/vue', async (importOriginal) => ({
 
 vi.mock('@/composables/useDisplay', () => ({
   useDisplay: () => ({ mdAndUp: h.mdAndUp }),
+}));
+
+vi.mock('@/composables/useInstanceSetupStatus', () => ({
+  useInstanceCapability: () => ({
+    capability: h.mapsCapability,
+    available: h.mapsAvailable,
+    loading: h.mapsCapabilityLoading,
+    error: h.mapsCapabilityError,
+  }),
 }));
 
 vi.mock('nuxt/app', () => ({
@@ -62,6 +75,16 @@ h.result = ref({ events: [] as unknown[], eventsAggregate: { count: 0 } });
 h.loading = ref(false);
 h.error = ref(null);
 h.mdAndUp = ref(true);
+h.mapsCapability = ref({
+  configured: true,
+  enabled: true,
+  requiredEnvVarsMissing: [],
+  setupUrl: '/admin/setup#maps',
+  docsPath: '/roles/admins/map-setup',
+});
+h.mapsAvailable = ref(true);
+h.mapsCapabilityLoading = ref(false);
+h.mapsCapabilityError = ref(null);
 h.route = reactive(h.route);
 
 const EventFilterBar = {
@@ -123,6 +146,11 @@ const EventMap = {
   emits: ['highlight-event', 'open-preview', 'lock-colors', 'set-marker-data'],
   template: '<div class="event-map" />',
 };
+const MapUnavailable = {
+  name: 'MapUnavailable',
+  props: ['setupUrl', 'statusUnavailable'],
+  template: '<div class="map-unavailable" />',
+};
 
 const stubs = {
   EventFilterBar,
@@ -131,6 +159,7 @@ const stubs = {
   ErrorBanner,
   EventList,
   EventMap,
+  MapUnavailable,
   EventPreview,
   PreviewContainer,
   CloseButton,
@@ -193,6 +222,16 @@ beforeEach(() => {
   h.onResultCb = null;
   h.queryVariables = null;
   h.mdAndUp.value = true;
+  h.mapsCapability.value = {
+    configured: true,
+    enabled: true,
+    requiredEnvVarsMissing: [],
+    setupUrl: '/admin/setup#maps',
+    docsPath: '/roles/admins/map-setup',
+  };
+  h.mapsAvailable.value = true;
+  h.mapsCapabilityLoading.value = false;
+  h.mapsCapabilityError.value = null;
   vi.stubGlobal('CSS', { escape: (value: string) => value });
 });
 
@@ -205,6 +244,25 @@ describe('MapView', () => {
   it('shows an error banner when the query errors', () => {
     h.error.value = { message: 'boom' };
     expect(mountView().findComponent(ErrorBanner).text()).toContain('boom');
+  });
+
+  it('renders the setup placeholder instead of the map when maps are unavailable', () => {
+    h.result.value = { events: [event('1')], eventsAggregate: { count: 1 } };
+    h.mapsCapability.value = {
+      configured: false,
+      enabled: false,
+      requiredEnvVarsMissing: ['VITE_GOOGLE_MAPS_API_KEY'],
+      setupUrl: '/admin/setup#maps',
+      docsPath: '/roles/admins/map-setup',
+    };
+    h.mapsAvailable.value = false;
+
+    const wrapper = mountView();
+
+    expect({
+      map: wrapper.findComponent(EventMap).exists(),
+      placeholder: wrapper.findComponent(MapUnavailable).exists(),
+    }).toEqual({ map: false, placeholder: true });
   });
 
   it('routes to the online list from the map search header button', async () => {

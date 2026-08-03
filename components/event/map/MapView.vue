@@ -29,11 +29,23 @@ import type { Event as EventData } from '@/__generated__/graphql';
 import type { SearchEventValues } from '@/types/Event';
 import type { Ref, PropType } from 'vue';
 import { isEventSearchRoute } from '@/utils/isEventSearchRoute';
+import { useInstanceCapability } from '@/composables/useInstanceSetupStatus';
+import MapUnavailable from './MapUnavailable.vue';
 
 // Map.vue statically imports the Google Maps JS API loader + marker clusterer
 // (~840KB decoded). Load it lazily so that weight is only fetched when the map
 // view actually renders, not prefetched with the event routes.
 const EventMap = defineAsyncComponent(() => import('./Map.vue'));
+
+const {
+  capability: mapsCapability,
+  available: mapsAvailable,
+  loading: mapsCapabilityLoading,
+  error: mapsCapabilityError,
+} = useInstanceCapability('maps');
+const mapsSetupUrl = computed(
+  () => mapsCapability.value?.setupUrl || '/admin/setup#maps'
+);
 
 const props = defineProps({
   selectedTags: {
@@ -503,7 +515,10 @@ const isClientSide = typeof window !== 'undefined';
           />
           <EventMap
             v-else-if="
-              eventResult && eventResult.events && eventResult.events.length > 0
+              mapsAvailable &&
+              eventResult &&
+              eventResult.events &&
+              eventResult.events.length > 0
             "
             :key="eventResult.events.length"
             class="absolute inset-0"
@@ -515,6 +530,17 @@ const isClientSide = typeof window !== 'undefined';
             @open-preview="openPreview"
             @lock-colors="colorLocked = true"
             @set-marker-data="setMarkerData"
+          />
+          <MapUnavailable
+            v-else-if="
+              !mapsAvailable && (mapsCapability || mapsCapabilityError)
+            "
+            :setup-url="mapsSetupUrl"
+            :status-unavailable="Boolean(mapsCapabilityError)"
+          />
+          <LoadingSpinner
+            v-else-if="mapsCapabilityLoading"
+            class="mx-auto my-4"
           />
         </div>
       </div>
@@ -533,7 +559,7 @@ const isClientSide = typeof window !== 'undefined';
         >
           <div class="event-map-container w-full">
             <EventMap
-              v-if="eventResult.events.length > 0"
+              v-if="mapsAvailable && eventResult.events.length > 0"
               :events="eventResult.events"
               :preview-is-open="
                 eventPreviewIsOpen || multipleEventPreviewIsOpen
@@ -544,6 +570,17 @@ const isClientSide = typeof window !== 'undefined';
               @open-preview="openPreview"
               @lock-colors="colorLocked = true"
               @set-marker-data="setMarkerData"
+            />
+            <MapUnavailable
+              v-else-if="
+                !mapsAvailable && (mapsCapability || mapsCapabilityError)
+              "
+              :setup-url="mapsSetupUrl"
+              :status-unavailable="Boolean(mapsCapabilityError)"
+            />
+            <LoadingSpinner
+              v-else-if="mapsCapabilityLoading"
+              class="mx-auto my-4"
             />
           </div>
           <div class="h-1/3 w-full">

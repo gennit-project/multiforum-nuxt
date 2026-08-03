@@ -2,7 +2,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_INSTANCE_SETUP_STATUS } from '@/graphQLData/admin/queries';
-import { useInstanceSetupStatus } from './useInstanceSetupStatus';
+import {
+  useInstanceCapability,
+  useInstanceSetupStatus,
+} from './useInstanceSetupStatus';
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
@@ -56,5 +59,63 @@ describe('useInstanceSetupStatus', () => {
 
     expect(setup.status.value).toBeNull();
     expect(setup.loading.value).toBe(true);
+  });
+
+  it('exposes a single available capability', () => {
+    mockedUseQuery.mockReturnValue({
+      result: ref({
+        getInstanceSetupStatus: {
+          maps: {
+            configured: true,
+            enabled: true,
+            requiredEnvVarsMissing: [],
+            setupUrl: '/admin/setup#maps',
+            docsPath: '/roles/admins/map-setup',
+          },
+        },
+      }),
+      loading: ref(false),
+      error: ref(null),
+      refetch: vi.fn(),
+    } as never);
+
+    const maps = useInstanceCapability('maps');
+
+    expect({
+      capability: maps.capability.value,
+      available: maps.available.value,
+    }).toEqual({
+      capability: {
+        configured: true,
+        enabled: true,
+        requiredEnvVarsMissing: [],
+        setupUrl: '/admin/setup#maps',
+        docsPath: '/roles/admins/map-setup',
+      },
+      available: true,
+    });
+  });
+
+  it('does not mark a configured but disabled capability as available', () => {
+    mockedUseQuery.mockReturnValue({
+      result: ref({
+        getInstanceSetupStatus: {
+          maps: {
+            configured: true,
+            enabled: false,
+            requiredEnvVarsMissing: [],
+            setupUrl: '/admin/setup#maps',
+            docsPath: '/roles/admins/map-setup',
+          },
+        },
+      }),
+      loading: ref(false),
+      error: ref(null),
+      refetch: vi.fn(),
+    } as never);
+
+    const maps = useInstanceCapability('maps');
+
+    expect(maps.available.value).toBe(false);
   });
 });

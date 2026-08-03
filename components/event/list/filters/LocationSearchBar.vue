@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref, useId } from 'vue';
 import axios from 'axios';
 import LocationIcon from '@/components/icons/LocationIcon.vue';
 import { config } from '@/config';
+import { useInstanceCapability } from '@/composables/useInstanceSetupStatus';
 
 // OpenCage API location result type
 interface LocationResult {
@@ -70,8 +71,33 @@ const props = defineProps({
 const searchQuery = ref(props.initialValue);
 const searchResults = ref<LocationResult[]>([]);
 const apiKey = config.openCageApiKey;
+const searchInputId = useId();
+const unavailableMessageId = useId();
+const {
+  capability: geocodingCapability,
+  available: geocodingAvailable,
+  loading: geocodingLoading,
+  error: geocodingError,
+} = useInstanceCapability('geocoding');
+
+const geocodingUnavailable = computed(
+  () =>
+    Boolean(geocodingCapability.value || geocodingError.value) &&
+    !geocodingAvailable.value
+);
+const effectivePlaceholder = computed(() => {
+  if (geocodingLoading.value && !geocodingCapability.value) {
+    return 'Checking location search...';
+  }
+  if (!geocodingAvailable.value) return 'Location search is not configured';
+  return props.searchPlaceholder;
+});
+const setupUrl = computed(
+  () => geocodingCapability.value?.setupUrl || '/admin/setup#geocoding'
+);
 
 const searchLocations = async () => {
+  if (!geocodingAvailable.value) return;
   if (searchQuery.value.length > 2) {
     const response = await axios.get(
       'https://api.opencagedata.com/geocode/v1/json',
@@ -103,7 +129,7 @@ const emit = defineEmits(['updateLocationInput', 'requestUserLocation']);
 
 <template>
   <div class="flex-1 dark:text-white">
-    <label for="search" class="sr-only">Search Location</label>
+    <label :for="searchInputId" class="sr-only">Search Location</label>
     <div class="relative flex items-center">
       <div
         class="pointer-events-none absolute left-0 flex items-center py-2.5 pl-3"
@@ -114,15 +140,20 @@ const emit = defineEmits(['updateLocationInput', 'requestUserLocation']);
         />
       </div>
       <input
+        :id="searchInputId"
         v-model="searchQuery"
         :autofocus="autoFocus"
-        class="h-10 w-full border border-gray-300 bg-white py-3 pl-10 pr-3 text-sm leading-5 placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
+        :disabled="!geocodingAvailable"
+        :aria-describedby="
+          geocodingUnavailable ? unavailableMessageId : undefined
+        "
+        class="h-10 w-full border border-gray-300 bg-white py-3 pl-10 pr-3 text-sm leading-5 placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:disabled:bg-gray-900 dark:disabled:text-gray-400"
         :class="[
           leftSideIsRounded ? 'rounded-l-full' : '',
           rightSideIsRounded ? 'rounded-r-full' : '',
           useMediumRoundedCorners ? 'rounded-md' : '',
         ]"
-        :placeholder="searchPlaceholder"
+        :placeholder="effectivePlaceholder"
         @input="searchLocations"
       >
       <slot />
@@ -153,6 +184,16 @@ const emit = defineEmits(['updateLocationInput', 'requestUserLocation']);
         </template>
       </client-only>
     </div>
+    <p
+      v-if="geocodingUnavailable"
+      :id="unavailableMessageId"
+      class="mt-1 text-xs text-amber-800 dark:text-amber-200"
+    >
+      Location search is unavailable until geocoding is configured.
+      <NuxtLink :to="setupUrl" class="font-medium underline">
+        Open instance setup
+      </NuxtLink>
+    </p>
   </div>
 </template>
 
