@@ -122,16 +122,24 @@ const hasReviewAccess = computed(
 const downloadDisabled = computed(
   () =>
     !hasDownloadableFile.value ||
-    (scanStatus.value !== 'CLEAN' && !hasReviewAccess.value)
+    scanStatus.value !== 'CLEAN'
 );
 
-const downloadLabel = computed(() =>
-  hasReviewAccess.value ? 'Download for review' : 'Download Now'
-);
+const downloadLabel = 'Download Now';
 
 const replaceFilePath = computed(
   () => `/forums/${props.channelUniqueName}/downloads/edit/${props.discussionId}`
 );
+
+const pipelinePath = computed(
+  () => `/forums/${props.channelUniqueName}/downloads/${props.discussionId}/pipelines`
+);
+
+const scanCheckedDisplay = computed(() => {
+  if (!primaryFile.value?.scanCheckedAt) return '';
+  const checkedAt = new Date(primaryFile.value.scanCheckedAt);
+  return Number.isNaN(checkedAt.getTime()) ? '' : checkedAt.toLocaleString();
+});
 
 // Format price display
 const priceDisplay = computed(() => {
@@ -278,12 +286,14 @@ const groupedLabels = computed(() => {
           </p>
           <p v-else-if="scanStatus === 'PENDING'" class="font-medium">
             <i class="fa-solid fa-spinner mr-1 animate-spin" />
-            {{ creatorIsViewing ? 'Scanning your upload…' : 'Security scan in progress' }}
+            Quarantined: security check pending
           </p>
           <template v-else-if="scanStatus === 'INFECTED' || scanStatus === 'SUSPICIOUS'">
             <p class="font-medium">
               <i class="fa-solid fa-shield-halved mr-1" />
-              Held for security review
+              {{ scanStatus === 'INFECTED'
+                ? 'Quarantined: threat detected'
+                : 'Quarantined: suspicious content' }}
             </p>
             <p class="mt-1">
               <template v-if="creatorIsViewing">
@@ -305,6 +315,14 @@ const groupedLabels = computed(() => {
               >
                 {{ reviewRequested ? 'Human review requested' : requestingReview ? 'Requesting review…' : 'Request human review' }}
               </button>
+              <button
+                type="button"
+                class="font-medium underline disabled:no-underline disabled:opacity-70"
+                :disabled="retryingScan"
+                @click="retryScan"
+              >
+                {{ retryingScan ? 'Retrying…' : 'Retry scan' }}
+              </button>
             </div>
             <p v-if="requestReviewError" class="mt-2 font-medium">
               The review request could not be sent. Please try again.
@@ -313,7 +331,7 @@ const groupedLabels = computed(() => {
           <template v-else>
             <p class="font-medium">
               <i class="fa-solid fa-triangle-exclamation mr-1" />
-              Security scan unavailable
+              Quarantined: security check incomplete
             </p>
             <p class="mt-1">
               <template v-if="creatorIsViewing">
@@ -343,6 +361,19 @@ const groupedLabels = computed(() => {
               {{ retryError }}
             </p>
           </template>
+          <p v-if="scanCheckedDisplay" class="mt-2 text-xs opacity-80">
+            Last checked {{ scanCheckedDisplay }}
+          </p>
+          <NuxtLink
+            v-if="scanStatus !== 'CLEAN'"
+            class="mt-2 inline-block font-medium underline"
+            :to="pipelinePath"
+          >
+            View security pipeline
+          </NuxtLink>
+          <p v-if="hasReviewAccess && scanStatus !== 'CLEAN'" class="mt-2 text-xs">
+            Direct download is disabled while this file is quarantined. Review the scanner findings before clearing it.
+          </p>
         </div>
         <dl class="mt-3 grid grid-cols-2 gap-3 text-sm">
           <div>

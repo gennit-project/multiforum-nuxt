@@ -154,6 +154,10 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
           Tags {
             text
           }
+          DownloadableFiles(where: { permanentlyRemoved_NOT: true }) {
+            id
+            scanStatus
+          }
         }
       }
     }
@@ -238,6 +242,10 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
         }
         Tags {
           text
+        }
+        DownloadableFiles(where: { permanentlyRemoved_NOT: true }) {
+          id
+          scanStatus
         }
       }
     }

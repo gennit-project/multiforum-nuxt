@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import DownloadScanReviewQueue from './DownloadScanReviewQueue.vue';
 
 const mockClear = vi.hoisted(() => vi.fn(() => Promise.resolve()));
+const mockRetry = vi.hoisted(() => vi.fn(() => Promise.resolve()));
 const mockRefetch = vi.hoisted(() => vi.fn(() => Promise.resolve()));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -26,8 +27,10 @@ vi.mock('@vue/apollo-composable', () => ({
     error: ref(null),
     refetch: mockRefetch,
   })),
-  useMutation: vi.fn(() => ({
-    mutate: mockClear,
+  useMutation: vi.fn((document) => ({
+    mutate: document.definitions?.[0]?.name?.value === 'retryDownloadableFileScan'
+      ? mockRetry
+      : mockClear,
     loading: ref(false),
     error: ref(null),
   })),
@@ -56,7 +59,7 @@ describe('DownloadScanReviewQueue', () => {
   it('clears a reviewed file and refreshes the queue', async () => {
     const wrapper = mountQueue();
     await wrapper.get('input').setValue('Reviewed archive contents');
-    await wrapper.get('button').trigger('click');
+    await wrapper.get('[data-testid="release-quarantine"]').trigger('click');
     await flushPromises();
 
     expect({
@@ -69,5 +72,22 @@ describe('DownloadScanReviewQueue', () => {
       },
       refetched: true,
     });
+  });
+
+  it('keeps quarantine release disabled until an audit reason is entered', () => {
+    const wrapper = mountQueue();
+
+    expect(wrapper.get('[data-testid="release-quarantine"]').attributes('disabled')).toBe('');
+  });
+
+  it('retries a scan from the moderation queue', async () => {
+    const wrapper = mountQueue();
+    const retryButton = wrapper.findAll('button').find((button) =>
+      button.text() === 'Retry scan'
+    );
+    await retryButton?.trigger('click');
+    await flushPromises();
+
+    expect(mockRetry).toHaveBeenCalledWith({ downloadableFileId: 'file-1' });
   });
 });
