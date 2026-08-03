@@ -40,6 +40,7 @@ vi.mock('@/composables/useAuthState', () => ({
 vi.mock('@/utils', () => ({
   getUploadFileName: vi.fn(() => 'test-file-123.jpg'),
   uploadAndGetEmbeddedLink: mockUploadAndGetEmbeddedLink,
+  isFileSizeValid: mockIsFileSizeValid,
 }));
 
 vi.mock('@/utils/index', () => ({
