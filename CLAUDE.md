@@ -1,7 +1,7 @@
 # Multiforum Development Guide
 
-> Requires **Node.js ≥ 24.13.0** (`engines` in `package.json`). Run `nvm use 24`
-> first — older majors break tooling (Node 20 crashes ESLint on `Object.groupBy`).
+> Use **Node.js 26** for development (`nvm use`). Node.js ≥ 24.13.0 remains
+> supported while Vercel deploys on Node 24; older majors break the tooling.
 
 ## Build & Run Commands
 

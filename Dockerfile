@@ -1,9 +1,9 @@
-FROM node:24-alpine
+FROM node:26.5.1-alpine
 
 WORKDIR /app
 
-# Enable pnpm via corepack (version pinned by package.json "packageManager")
-RUN corepack enable
+# Node 26 no longer bundles Corepack, so install the pinned package manager directly.
+RUN npm install --global pnpm@10.28.2
 
 COPY package.json pnpm-lock.yaml ./
 
