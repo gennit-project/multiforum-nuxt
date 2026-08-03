@@ -93,7 +93,7 @@ const retryScan = async () => {
     });
   } catch {
     retryingScan.value = false;
-    retryError.value = 'The retry could not be started. Please open an issue.';
+    retryError.value = 'The retry could not be started.';
   }
 };
 
@@ -245,7 +245,7 @@ const groupedLabels = computed(() => {
       <!-- Boxed Info Section -->
       <div
         v-if="primaryFile"
-        class="bg-gray-50 mb-4 rounded-lg border border-orange-400 p-4 dark:border-orange-500 dark:bg-gray-700"
+        class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-700"
       >
         <!-- File Name -->
         <h2
@@ -329,49 +329,66 @@ const groupedLabels = computed(() => {
             </p>
           </template>
           <template v-else>
-            <p class="font-medium">
-              <i class="fa-solid fa-triangle-exclamation mr-1" />
-              Quarantined: security check incomplete
-            </p>
-            <p class="mt-1">
-              <template v-if="creatorIsViewing">
-                We couldn't complete the security scan—a problem on our end, not your file. Try again shortly, or open an issue.
-              </template>
-              <template v-else>
-                This download is temporarily unavailable because its security scan could not complete.
-              </template>
-            </p>
-            <div v-if="creatorIsViewing" class="mt-2 flex flex-wrap gap-3">
-              <button
-                type="button"
-                class="font-medium underline"
-                :disabled="retryingScan"
-                @click="retryScan"
-              >
-                Retry scan
-              </button>
+            <div class="flex items-start gap-2">
+              <i
+                class="fa-solid fa-circle-exclamation mt-0.5"
+                aria-hidden="true"
+              />
+              <div class="min-w-0 flex-1">
+                <p class="font-medium">Security check needs another try</p>
+                <p class="mt-0.5 text-xs leading-5">
+                  {{
+                    creatorIsViewing
+                      ? "The scan service had a problem—your file wasn't rejected."
+                      : 'This download is temporarily unavailable.'
+                  }}
+                </p>
+                <div class="mt-1.5 flex flex-wrap gap-3">
+                  <button
+                    v-if="creatorIsViewing"
+                    type="button"
+                    class="font-medium underline disabled:no-underline disabled:opacity-70"
+                    :disabled="retryingScan"
+                    @click="retryScan"
+                  >
+                    {{ retryingScan ? 'Retrying…' : 'Retry scan' }}
+                  </button>
+                  <NuxtLink
+                    class="font-medium underline"
+                    :to="pipelinePath"
+                  >
+                    View checks
+                  </NuxtLink>
+                </div>
+              </div>
+            </div>
+            <p v-if="retryError" class="mt-2 font-medium">
+              {{ retryError }}
               <NuxtLink
-                class="font-medium underline"
+                class="ml-1 underline"
                 to="/server/issues/create"
               >
                 Open an issue
               </NuxtLink>
-            </div>
-            <p v-if="retryError" class="mt-2 font-medium">
-              {{ retryError }}
             </p>
           </template>
-          <p v-if="scanCheckedDisplay" class="mt-2 text-xs opacity-80">
+          <p
+            v-if="scanCheckedDisplay && scanStatus !== 'FAILED'"
+            class="mt-2 text-xs opacity-80"
+          >
             Last checked {{ scanCheckedDisplay }}
           </p>
           <NuxtLink
-            v-if="scanStatus !== 'CLEAN'"
+            v-if="scanStatus !== 'CLEAN' && scanStatus !== 'FAILED'"
             class="mt-2 inline-block font-medium underline"
             :to="pipelinePath"
           >
             View security pipeline
           </NuxtLink>
-          <p v-if="hasReviewAccess && scanStatus !== 'CLEAN'" class="mt-2 text-xs">
+          <p
+            v-if="hasReviewAccess && scanStatus !== 'CLEAN' && scanStatus !== 'FAILED'"
+            class="mt-2 text-xs"
+          >
             Direct download is disabled while this file is quarantined. Review the scanner findings before clearing it.
           </p>
         </div>
