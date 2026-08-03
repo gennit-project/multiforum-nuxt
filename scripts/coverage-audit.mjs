@@ -70,7 +70,6 @@ const HEAVY = [
   ['js-api-loader', 'Google Maps'],
   ['@googlemaps', 'Google Maps'],
   ['google.maps', 'Google Maps'],
-  ['lightgallery', 'lightgallery'],
   ['chart.js', 'Chart.js canvas'],
   ['vue-chartjs', 'Chart.js canvas'],
   ['vuemoji-picker', 'emoji picker'],

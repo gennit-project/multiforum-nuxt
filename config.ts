@@ -5,7 +5,6 @@ type ConfigType = {
   googleMapsApiKey: string;
   googleMapId: string;
   graphqlUrl: string;
-  lightgalleryLicenseKey: string;
   logoutUrl: string;
   openCageApiKey: string;
   openGraphApiKey: string;
@@ -20,7 +19,6 @@ const config: ConfigType = {
   googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
   googleMapId: import.meta.env.VITE_GOOGLE_MAP_ID,
   graphqlUrl: import.meta.env.VITE_GRAPHQL_URL,
-  lightgalleryLicenseKey: import.meta.env.VITE_LIGHTGALLERY_LICENSE_KEY,
   logoutUrl: import.meta.env.VITE_LOGOUT_URL,
   openCageApiKey: import.meta.env.VITE_OPEN_CAGE_API_KEY,
   openGraphApiKey: import.meta.env.VITE_OPEN_GRAPH_API_KEY,
