@@ -1,9 +1,12 @@
 import {
   computed,
   getCurrentInstance,
+  inject,
   onUnmounted,
+  provide,
   ref,
   watch,
+  type InjectionKey,
   type Ref,
 } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
@@ -244,4 +247,45 @@ export function useDownloadPipelineOverview(
     error,
     refetch,
   };
+}
+
+export type DownloadPipelineOverview = ReturnType<
+  typeof useDownloadPipelineOverview
+>;
+
+const downloadPipelineOverviewKey: InjectionKey<DownloadPipelineOverview> =
+  Symbol('download-pipeline-overview');
+
+export function provideDownloadPipelineOverview(
+  downloadableFileId: Ref<string | null | undefined>,
+  discussionId: Ref<string | null | undefined>,
+  channelUniqueName: Ref<string | null | undefined>
+) {
+  const overview = useDownloadPipelineOverview(
+    downloadableFileId,
+    discussionId,
+    channelUniqueName
+  );
+  provide(downloadPipelineOverviewKey, overview);
+  return overview;
+}
+
+export function useSharedDownloadPipelineOverview(
+  downloadableFileId: Ref<string | null | undefined>,
+  discussionId: Ref<string | null | undefined>,
+  channelUniqueName: Ref<string | null | undefined>,
+  options: {
+    pollInterval?: number;
+    pollWhileActive?: boolean;
+  } = {}
+) {
+  return (
+    inject(downloadPipelineOverviewKey, null) ??
+    useDownloadPipelineOverview(
+      downloadableFileId,
+      discussionId,
+      channelUniqueName,
+      options
+    )
+  );
 }

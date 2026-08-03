@@ -2,7 +2,7 @@
 import { computed, toRef } from 'vue';
 import {
   getApplicablePipelineStatus,
-  useDownloadPipelineOverview,
+  useSharedDownloadPipelineOverview,
   type PublicPipelineDisplayStatus,
 } from '@/composables/useDownloadPipelineOverview';
 
@@ -18,7 +18,7 @@ const {
   hasPipelineContent,
   hasActiveAttempt,
   loading,
-} = useDownloadPipelineOverview(
+} = useSharedDownloadPipelineOverview(
   toRef(props, 'fileId'),
   toRef(props, 'discussionId'),
   toRef(props, 'channelName'),

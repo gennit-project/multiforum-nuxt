@@ -21,7 +21,7 @@ vi.mock('@/composables/useAuthState', () => ({
 }));
 
 vi.mock('@/composables/useDownloadPipelineOverview', () => ({
-  useDownloadPipelineOverview: () => ({
+  useSharedDownloadPipelineOverview: () => ({
     hasPipelineContent: mockHasPipelineContent,
   }),
 }));

@@ -1,7 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ref } from 'vue';
+import { defineComponent, h, ref } from 'vue';
+import { mount } from '@vue/test-utils';
 import {
   getApplicablePipelineStatus,
+  provideDownloadPipelineOverview,
+  useSharedDownloadPipelineOverview,
   useDownloadPipelineOverview,
   type ApplicablePublicPipeline,
   type PublicPipelineAttempt,
@@ -58,6 +61,7 @@ describe('useDownloadPipelineOverview', () => {
     vi.useFakeTimers();
     mockQueryResult.value = {};
     mockRefetch.mockReset();
+    mockUseQuery.mockClear();
     mockUseQuery.mockReturnValue({
       result: mockQueryResult,
       loading: ref(false),
@@ -162,6 +166,38 @@ describe('useDownloadPipelineOverview', () => {
     );
 
     expect(overview.hasPipelineContent.value).toBe(false);
+  });
+
+  it('shares one query across descendant pipeline consumers', () => {
+    const Consumer = defineComponent({
+      setup() {
+        useSharedDownloadPipelineOverview(
+          ref('file-1'),
+          ref('discussion-1'),
+          ref('cats')
+        );
+        useSharedDownloadPipelineOverview(
+          ref('file-1'),
+          ref('discussion-1'),
+          ref('cats')
+        );
+        return () => null;
+      },
+    });
+    const Provider = defineComponent({
+      setup() {
+        provideDownloadPipelineOverview(
+          ref('file-1'),
+          ref('discussion-1'),
+          ref('cats')
+        );
+        return () => h(Consumer);
+      },
+    });
+
+    mount(Provider);
+
+    expect(mockUseQuery).toHaveBeenCalledOnce();
   });
 });
 

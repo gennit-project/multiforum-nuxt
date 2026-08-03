@@ -8,7 +8,7 @@ import { useQuery } from '@vue/apollo-composable';
 import { GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD } from '@/graphQLData/collection/queries';
 import PublicCollectionListItem from '@/components/collection/PublicCollectionListItem.vue';
 import { useUsername } from '@/composables/useAuthState';
-import { useDownloadPipelineOverview } from '@/composables/useDownloadPipelineOverview';
+import { useSharedDownloadPipelineOverview } from '@/composables/useDownloadPipelineOverview';
 
 const usernameVar = useUsername();
 
@@ -60,7 +60,7 @@ const primaryFileId = computed(
 );
 const {
   hasPipelineContent,
-} = useDownloadPipelineOverview(
+} = useSharedDownloadPipelineOverview(
   primaryFileId,
   computed(() => props.discussionId),
   computed(() => props.channelId),

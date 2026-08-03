@@ -1,10 +1,12 @@
 <script lang="ts" setup>
+import { computed, toRef } from 'vue';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 import DownloadModeLayout from './DownloadModeLayout.vue';
 import RegularDiscussionLayout from './RegularDiscussionLayout.vue';
 import DownloadTabNavigation from './DownloadTabNavigation.vue';
+import { provideDownloadPipelineOverview } from '@/composables/useDownloadPipelineOverview';
 
-defineProps({
+const props = defineProps({
   discussion: {
     type: Object as () => Discussion,
     required: true,
@@ -34,6 +36,19 @@ defineProps({
     default: false,
   },
 });
+
+const downloadableFileId = computed(
+  () =>
+    (props.downloadMode && props.discussion.DownloadableFiles?.[0]?.id) || ''
+);
+
+// The navigation, sidebar, activity tab, and pipelines tab all consume this
+// overview. Providing it here keeps them on one query, cache, and polling loop.
+provideDownloadPipelineOverview(
+  downloadableFileId,
+  toRef(props, 'discussionId'),
+  toRef(props, 'channelId')
+);
 
 const emit = defineEmits<{
   discussionRefetch: [];

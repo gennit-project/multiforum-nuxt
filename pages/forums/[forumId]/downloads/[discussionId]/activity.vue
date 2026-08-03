@@ -7,7 +7,7 @@ import { useModProfileName } from '@/composables/useAuthState';
 import DiscussionTitleVersions from '@/components/discussion/detail/activityFeed/DiscussionTitleVersions.vue';
 import LabelChangeHistory from '@/components/discussion/detail/activityFeed/LabelChangeHistory.vue';
 import type { Discussion } from '@/__generated__/graphql';
-import { useDownloadPipelineOverview } from '@/composables/useDownloadPipelineOverview';
+import { useSharedDownloadPipelineOverview } from '@/composables/useDownloadPipelineOverview';
 
 const modProfileNameVar = useModProfileName();
 
@@ -49,7 +49,7 @@ const discussion = computed<Discussion | null>(() => {
 const downloadableFileId = computed(
   () => discussion.value?.DownloadableFiles?.[0]?.id || ''
 );
-const { attempts: pipelineAttempts } = useDownloadPipelineOverview(
+const { attempts: pipelineAttempts } = useSharedDownloadPipelineOverview(
   downloadableFileId,
   discussionId,
   channelId,
