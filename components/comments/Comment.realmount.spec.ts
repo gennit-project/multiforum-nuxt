@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { ref } from 'vue';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { makeComment } from '@/tests/utils/factories';
-import type { Comment } from '@/__generated__/graphql';
+import type { Comment as CommentType } from '@/__generated__/graphql';
 
 import Comment from '@/components/comments/Comment.vue';
 
@@ -84,7 +84,7 @@ const stubs = {
   MenuButton: { template: '<button><slot /></button>' },
 };
 
-const baseComment = (overrides: Partial<Comment> = {}): Comment =>
+const baseComment = (overrides: Partial<CommentType> = {}): CommentType =>
   makeComment({
     id: 'c1',
     text: 'Hello world',
@@ -95,9 +95,9 @@ const baseComment = (overrides: Partial<Comment> = {}): Comment =>
     },
     Channel: { uniqueName: 'cats' },
     ...overrides,
-  } as Partial<Comment>);
+  } as Partial<CommentType>);
 
-const mountComment = (commentData: Comment) =>
+const mountComment = (commentData: CommentType) =>
   mountWithDefaults(Comment, {
     props: { commentData, depth: 1 },
     global: { stubs },
@@ -111,14 +111,14 @@ describe('Comment (real mount)', () => {
 
   it('renders the comment text via the markdown preview', () => {
     const wrapper = mountComment(
-      baseComment({ text: 'A unique body' } as Partial<Comment>)
+      baseComment({ text: 'A unique body' } as Partial<CommentType>)
     );
     expect(wrapper.text()).toContain('A unique body');
   });
 
   it('shows the archived text for an archived comment', () => {
     const wrapper = mountComment(
-      baseComment({ archived: true } as Partial<Comment>)
+      baseComment({ archived: true } as Partial<CommentType>)
     );
     expect(wrapper.find('.archived-stub').exists()).toBe(true);
   });
@@ -126,7 +126,7 @@ describe('Comment (real mount)', () => {
   it('shows the edit form and edit error for the active comment', () => {
     const wrapper = mountWithDefaults(Comment, {
       props: {
-        commentData: baseComment({ text: 'Original body' } as Partial<Comment>),
+        commentData: baseComment({ text: 'Original body' } as Partial<CommentType>),
         depth: 1,
         editFormOpenAtCommentID: 'c1',
         editCommentError: { message: 'Could not save' },
@@ -146,7 +146,7 @@ describe('Comment (real mount)', () => {
   it('emits edit text updates from the active edit form', async () => {
     const wrapper = mountWithDefaults(Comment, {
       props: {
-        commentData: baseComment({ text: 'Original body' } as Partial<Comment>),
+        commentData: baseComment({ text: 'Original body' } as Partial<CommentType>),
         depth: 1,
         editFormOpenAtCommentID: 'c1',
       },
@@ -172,7 +172,7 @@ describe('Comment (real mount)', () => {
       baseComment({
         Channel: undefined,
         DiscussionChannel: { channelUniqueName: 'dogs' },
-      } as unknown as Partial<Comment>)
+      } as unknown as Partial<CommentType>)
     );
     expect(wrapper.find('.comment-buttons-stub').exists()).toBe(true);
   });
@@ -183,7 +183,7 @@ describe('Comment (real mount)', () => {
         Channel: undefined,
         DiscussionChannel: undefined,
         Event: undefined,
-      } as unknown as Partial<Comment>)
+      } as unknown as Partial<CommentType>)
     );
     expect(wrapper.find('.comment-buttons-stub').exists()).toBe(false);
   });
@@ -205,7 +205,7 @@ describe('Comment (real mount)', () => {
     const wrapper = mountComment(
       baseComment({
         ChildCommentsAggregate: { count: 1 },
-      } as unknown as Partial<Comment>)
+      } as unknown as Partial<CommentType>)
     );
 
     expect(wrapper.text()).toContain('Child body');
@@ -215,7 +215,7 @@ describe('Comment (real mount)', () => {
     const wrapper = mountComment(
       baseComment({
         ChildCommentsAggregate: { count: 1 },
-      } as unknown as Partial<Comment>)
+      } as unknown as Partial<CommentType>)
     );
     const child = wrapper.findAllComponents(Comment)[0];
     await child.vm.$emit('start-comment-save');
@@ -278,7 +278,7 @@ describe('Comment (real mount)', () => {
     const wrapper = mountComment(
       baseComment({
         ChildCommentsAggregate: { count: 1 },
-      } as unknown as Partial<Comment>)
+      } as unknown as Partial<CommentType>)
     );
     const children = wrapper.findComponent({ name: 'ChildComments' });
     await children.trigger('mouseenter');
@@ -291,7 +291,7 @@ describe('Comment (real mount)', () => {
       props: {
         commentData: baseComment({
           ChildCommentsAggregate: { count: 1 },
-        } as unknown as Partial<Comment>),
+        } as unknown as Partial<CommentType>),
         depth: 5,
       },
       global: { stubs },
