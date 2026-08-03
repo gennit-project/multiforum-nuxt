@@ -1,6 +1,17 @@
 import { gql } from '@apollo/client/core';
 import { AUTHOR_FIELDS } from '../fragments';
 
+const DISCUSSION_FLAIR_FIELDS = gql`
+  fragment DiscussionFlairFields on DiscussionFlair {
+    id
+    channelUniqueName
+    displayName
+    color
+    order
+    archived
+  }
+`;
+
 // Re-exported for backward compatibility; the canonical definition now lives in
 // graphQLData/fragments.js.
 export { AUTHOR_FIELDS };
@@ -85,6 +96,9 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
         discussionId
         channelUniqueName
         isFavorited
+        Flairs {
+          ...DiscussionFlairFields
+        }
         CommentsAggregate {
           count
         }
@@ -144,6 +158,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
       }
     }
   }
+  ${DISCUSSION_FLAIR_FIELDS}
 `;
 
 // For site wide list view
@@ -187,6 +202,9 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
           archived
           answered
           locked
+          Flairs {
+            ...DiscussionFlairFields
+          }
           UpvotedByUsers {
             username
           }
@@ -225,6 +243,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
     }
   }
   ${AUTHOR_FIELDS}
+  ${DISCUSSION_FLAIR_FIELDS}
 `;
 
 export const IS_DISCUSSION_ANSWERED = gql`
@@ -294,6 +313,9 @@ export const GET_DISCUSSION = gql`
         archived
         answered
         locked
+        Flairs {
+          ...DiscussionFlairFields
+        }
         UpvotedByUsers {
           username
         }
@@ -424,6 +446,7 @@ export const GET_DISCUSSION = gql`
       }
     }
   }
+  ${DISCUSSION_FLAIR_FIELDS}
 `;
 
 export const GET_CROSSPOST_PREVIEW = gql`

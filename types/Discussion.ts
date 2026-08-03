@@ -1,3 +1,18 @@
+import type { DiscussionChannel } from '@/__generated__/graphql';
+
+export interface DiscussionFlairData {
+  id: string;
+  channelUniqueName: string;
+  displayName: string;
+  color?: string | null;
+  order: number;
+  archived: boolean;
+}
+
+export type DiscussionChannelWithFlairs = DiscussionChannel & {
+  Flairs?: DiscussionFlairData[];
+};
+
 export interface CreateEditDiscussionFormValues {
   title: string;
   body: string;

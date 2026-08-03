@@ -25,7 +25,9 @@ import InfoBanner from '@/components/InfoBanner.vue';
 import DiscussionHeader from '@/components/discussion/detail/DiscussionHeader.vue';
 import DiscussionCommentsWrapper from '@/components/discussion/detail/DiscussionCommentsWrapper.vue';
 import DiscussionChannelLinks from '@/components/discussion/detail/DiscussionChannelLinks.vue';
+import DiscussionFlairBadges from '@/components/discussion/DiscussionFlairBadges.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
+import type { DiscussionChannelWithFlairs } from '@/types/Discussion';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import { useRoute } from 'nuxt/app';
 import ArchivedDiscussionInfoBanner from './ArchivedDiscussionInfoBanner.vue';
@@ -605,6 +607,14 @@ const handleEditAlbum = () => {
                 @handle-click-add-album="handleClickAddAlbum"
                 @handle-click-edit-body="handleClickEditDiscussionBody"
                 @handle-click-give-feedback="handleClickGiveFeedback"
+              />
+              <DiscussionFlairBadges
+                v-if="formDiscussionChannel"
+                :flairs="
+                  (formDiscussionChannel as DiscussionChannelWithFlairs)
+                    .Flairs || []
+                "
+                :channel-name="formDiscussionChannel.channelUniqueName"
               />
               <div class="w-full">
                 <DiscussionBodyEditForm

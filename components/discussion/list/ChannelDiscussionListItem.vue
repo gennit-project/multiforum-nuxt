@@ -16,7 +16,11 @@ import type {
   DiscussionChannel,
   Tag,
 } from '@/__generated__/graphql';
-import type { DiscussionChannelWithFavorited } from '@/types/Discussion';
+import type {
+  DiscussionChannelWithFavorited,
+  DiscussionChannelWithFlairs,
+} from '@/types/Discussion';
+import DiscussionFlairBadges from '@/components/discussion/DiscussionFlairBadges.vue';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import CommentIcon from '@/components/icons/CommentIcon.vue';
 import ExpandIcon from '@/components/icons/ExpandIcon.vue';
@@ -168,6 +172,10 @@ const relativeTimeAgo = computed(() =>
 );
 const tags = computed(
   () => props.discussion?.Tags?.map((tag: Tag) => tag.text) || []
+);
+const flairs = computed(
+  () =>
+    (props.discussionChannel as DiscussionChannelWithFlairs).Flairs || []
 );
 
 const filteredQuery = computed(() => {
@@ -453,6 +461,11 @@ const revealSensitiveContent = () => {
                 @click="$emit('filterByTag', tag)"
               />
             </div>
+            <DiscussionFlairBadges
+              class="my-1"
+              :flairs="flairs"
+              :channel-name="discussionChannel.channelUniqueName"
+            />
             <div class="flex items-center gap-2 dark:text-white">
               <DiscussionVotes
                 v-if="discussionChannel"
