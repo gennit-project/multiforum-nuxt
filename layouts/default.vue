@@ -126,7 +126,15 @@ onMounted(() => {
           />
         </header>
 
-        <div class="relative flex flex-grow flex-col">
+        <!--
+          `isolate` (isolation: isolate) forces this content column to be its own
+          stacking context so page-content z-indexes stay contained below the app
+          chrome. Without it, a positioned descendant with a z-index higher than
+          the top nav's (e.g. DiscussionAlbum's `z-40` in expanded view) escapes
+          this column and paints over the fixed top nav — clipping the nav's
+          search-type dropdown (z-30, trapped inside the nav's own z-20 context).
+        -->
+        <div class="relative isolate flex flex-grow flex-col">
           <!-- Vertical Icon Navigation for Large Screens -->
           <nav aria-label="Main navigation">
             <VerticalIconNav />
