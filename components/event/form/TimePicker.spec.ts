@@ -28,6 +28,18 @@ describe('TimePicker', () => {
     expect(option(wrapper, '12:15 AM')).toBeTruthy();
   });
 
+  it('stays open when the opening click bubbles to the document', async () => {
+    const wrapper = mount(TimePicker, {
+      props: { value: '09:00' },
+      attachTo: document.body,
+    });
+
+    await trigger(wrapper).trigger('click');
+
+    expect(option(wrapper, '12:15 AM')).toBeTruthy();
+    wrapper.unmount();
+  });
+
   it('emits the 24-hour value when a time is selected', async () => {
     const wrapper = mountPicker();
     await trigger(wrapper).trigger('click');

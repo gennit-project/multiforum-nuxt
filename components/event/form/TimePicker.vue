@@ -25,7 +25,7 @@ const props = defineProps({
 const emit = defineEmits(['update']);
 
 const isDropdownOpen = ref(false);
-const dropdownRef = ref<HTMLElement | null>(null);
+const pickerRef = ref<HTMLElement | null>(null);
 
 // Format the display time in 12-hour clock format with error handling
 const formattedTime = computed(() => {
@@ -88,7 +88,7 @@ const closeDropdown = () => {
 
 // Handle clicks outside the dropdown to close it
 const handleClickOutside = (event: MouseEvent) => {
-  if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
+  if (pickerRef.value && !pickerRef.value.contains(event.target as Node)) {
     closeDropdown();
   }
 };
@@ -104,7 +104,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="relative">
+  <div ref="pickerRef" class="relative">
     <!-- Custom input field instead of native time input -->
     <div
       :data-testid="testId"
@@ -129,7 +129,6 @@ onUnmounted(() => {
     <!-- Custom dropdown for time selection -->
     <div
       v-if="isDropdownOpen"
-      ref="dropdownRef"
       class="touch-scroll-y absolute left-0 top-full z-10 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
       style="-webkit-overflow-scrolling: touch; scrollbar-width: thin"
     >
