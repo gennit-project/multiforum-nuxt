@@ -1,15 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 
 import LightgalleryAlbum from '@/components/discussion/detail/LightgalleryAlbum.vue';
 import type { Album } from '@/__generated__/graphql';
-
-// lightgallery renders a real gallery instance; replace the component + plugins.
-vi.mock('lightgallery/vue', () => ({
-  default: { name: 'Lightgallery', template: '<div class="lg"><slot /></div>' },
-}));
-vi.mock('lightgallery/plugins/thumbnail', () => ({ default: {} }));
-vi.mock('lightgallery/plugins/zoom', () => ({ default: {} }));
 
 const album = (count: number) =>
   ({
@@ -23,10 +16,21 @@ const album = (count: number) =>
 const mountAlbum = (props: Record<string, unknown> = {}) =>
   mount(LightgalleryAlbum, {
     props: { album: album(6), ...props },
-    global: { stubs: { LeftArrowIcon: true, RightArrowIcon: true } },
+    global: {
+      stubs: {
+        LeftArrowIcon: true,
+        RightArrowIcon: true,
+        VueEasyLightbox: {
+          name: 'VueEasyLightbox',
+          props: ['visible', 'imgs', 'index'],
+          emits: ['hide'],
+          template: '<div data-testid="lightbox" />',
+        },
+      },
+    },
   });
 
-const thumbnails = (w: ReturnType<typeof mount>) => w.findAll('.grid-cols-4 > div');
+const thumbnails = (w: ReturnType<typeof mount>) => w.findAll('.grid-cols-4 > button');
 const rightArrow = (w: ReturnType<typeof mount>) =>
   w.find('button[aria-label="Scroll thumbnails right"]');
 const leftArrow = (w: ReturnType<typeof mount>) =>
@@ -37,6 +41,27 @@ describe('LightgalleryAlbum grid format', () => {
     const wrapper = mountAlbum({ carouselFormat: false });
 
     expect(wrapper.findAll('img')).toHaveLength(6);
+  });
+
+  it('opens the selected image in the lightbox', async () => {
+    const wrapper = mountAlbum({ carouselFormat: false });
+
+    await wrapper.findAll('button')[2].trigger('click');
+
+    expect(wrapper.getComponent({ name: 'VueEasyLightbox' }).props()).toMatchObject({
+      visible: true,
+      index: 2,
+      imgs: Array.from({ length: 6 }, (_, i) => `https://x/${i}.png`),
+    });
+  });
+
+  it('closes the lightbox when it emits hide', async () => {
+    const wrapper = mountAlbum({ carouselFormat: false });
+    await wrapper.findAll('button')[0].trigger('click');
+
+    await wrapper.getComponent({ name: 'VueEasyLightbox' }).vm.$emit('hide');
+
+    expect(wrapper.find('[data-testid="lightbox"]').exists()).toBe(false);
   });
 });
 

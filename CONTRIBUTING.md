@@ -51,7 +51,6 @@ The application requires several environment variables to be set up. Copy `.env.
 | `VITE_GOOGLE_CLOUD_STORAGE_BUCKET` | Google Cloud Storage bucket for file uploads   |
 | `VITE_SENTRY_AUTH_TOKEN`           | Sentry authentication token for error tracking |
 | `VITE_SENTRY_DSN`                  | Sentry Data Source Name for error reporting    |
-| `VITE_LIGHTGALLERY_LICENSE_KEY`    | License key for Lightgallery component         |
 
 ### Docker Compose Variables
 
