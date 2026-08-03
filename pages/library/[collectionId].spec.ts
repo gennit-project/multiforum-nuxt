@@ -4,13 +4,13 @@ import { ref, defineComponent, h } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 vi.mock('nuxt/app', () => ({ useHead: vi.fn() }));
 
-const h = vi.hoisted(() => ({
+const harness = vi.hoisted(() => ({
   routerPush: undefined as unknown as ReturnType<typeof vi.fn>,
 }));
 
 vi.mock('vue-router', () => ({
   useRoute: () => ({ params: { collectionId: 'col-1' } }),
-  useRouter: () => ({ push: h.routerPush }),
+  useRouter: () => ({ push: harness.routerPush }),
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -73,7 +73,7 @@ let queryError: Error | null = null;
 
 beforeEach(() => {
   vi.clearAllMocks();
-  h.routerPush = vi.fn();
+  harness.routerPush = vi.fn();
   queryLoading = false;
   queryError = null;
 });
@@ -343,7 +343,7 @@ describe('library collection detail page', () => {
       title: 'Shared collection: Public list',
       shareMessage: null,
     });
-    expect(h.routerPush).toHaveBeenCalledWith(
+    expect(harness.routerPush).toHaveBeenCalledWith(
       '/forums/sims4_builds/discussions/discussion-1'
     );
   });
@@ -400,7 +400,7 @@ describe('library collection detail page', () => {
         awaitRefetchQueries: true,
       })
     );
-    expect(h.routerPush).toHaveBeenCalledWith('/library');
+    expect(harness.routerPush).toHaveBeenCalledWith('/library');
   });
 
   it('renders discussion collection items in stored order', async () => {
@@ -563,7 +563,7 @@ describe('library collection detail page', () => {
     await wrapper.find('button[title="Delete collection"]').trigger('click');
     await wrapper.get('[data-testid="warning-primary"]').trigger('click');
     error.mockRestore();
-    expect(h.routerPush).not.toHaveBeenCalled();
+    expect(harness.routerPush).not.toHaveBeenCalled();
   });
 
   const commentsCollection = {

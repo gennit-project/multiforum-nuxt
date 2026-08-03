@@ -6,7 +6,7 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import UserProfileContainer from './[username].vue';
 
 // Controllable route + nuxt helpers.
-const h = vi.hoisted(() => ({
+const harness = vi.hoisted(() => ({
   route: { path: '/u/alice/comments', params: { username: 'alice' } as Record<string, unknown> },
   useHead: null as unknown as ReturnType<typeof vi.fn>,
   resultRef: null as unknown as { value: unknown },
@@ -20,37 +20,37 @@ const h = vi.hoisted(() => ({
 vi.stubGlobal('definePageMeta', vi.fn());
 
 vi.mock('nuxt/app', () => {
-  h.useHead = vi.fn();
+  harness.useHead = vi.fn();
   return {
-    useRoute: () => h.route,
-    useHead: (...args: unknown[]) => h.useHead(...args),
+    useRoute: () => harness.route,
+    useHead: (...args: unknown[]) => harness.useHead(...args),
   };
 });
 
 vi.mock('@vue/apollo-composable', async () => {
   const { ref } = await import('vue');
-  h.resultRef = ref(null);
-  h.loadingRef = ref(false);
-  h.errorRef = ref(null);
+  harness.resultRef = ref(null);
+  harness.loadingRef = ref(false);
+  harness.errorRef = ref(null);
   return {
     useQuery: () => ({
-      result: h.resultRef,
-      loading: h.loadingRef,
-      error: h.errorRef,
+      result: harness.resultRef,
+      loading: harness.loadingRef,
+      error: harness.errorRef,
     }),
   };
 });
 
 vi.mock('@/composables/useServerRoleMembership', async () => {
   const { ref } = await import('vue');
-  h.admins = ref([]);
-  h.mods = ref([]);
-  h.modProfiles = ref([]);
+  harness.admins = ref([]);
+  harness.mods = ref([]);
+  harness.modProfiles = ref([]);
   return {
     useServerRoleMembership: () => ({
-      serverAdminUsernames: h.admins,
-      serverModUsernames: h.mods,
-      serverModProfileNames: h.modProfiles,
+      serverAdminUsernames: harness.admins,
+      serverModUsernames: harness.mods,
+      serverModProfileNames: harness.modProfiles,
     }),
   };
 });
@@ -109,13 +109,13 @@ const mountContainer = async () => {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  h.route = { path: '/u/alice/comments', params: { username: 'alice' } };
-  h.resultRef.value = { users: [makeUser()] };
-  h.loadingRef.value = false;
-  h.errorRef.value = null;
-  h.admins.value = [];
-  h.mods.value = [];
-  h.modProfiles.value = [];
+  harness.route = { path: '/u/alice/comments', params: { username: 'alice' } };
+  harness.resultRef.value = { users: [makeUser()] };
+  harness.loadingRef.value = false;
+  harness.errorRef.value = null;
+  harness.admins.value = [];
+  harness.mods.value = [];
+  harness.modProfiles.value = [];
 });
 
 describe('User profile container', () => {
@@ -125,7 +125,7 @@ describe('User profile container', () => {
   });
 
   it('shows the channel filter on a filterable tab', async () => {
-    h.route = { path: '/u/alice/comments', params: { username: 'alice' } };
+    harness.route = { path: '/u/alice/comments', params: { username: 'alice' } };
     const wrapper = await mountContainer();
     expect(
       wrapper.findComponent({ name: 'UserProfileChannelFilter' }).exists()
@@ -133,7 +133,7 @@ describe('User profile container', () => {
   });
 
   it('hides the channel filter on a non-filterable tab', async () => {
-    h.route = { path: '/u/alice/kudos', params: { username: 'alice' } };
+    harness.route = { path: '/u/alice/kudos', params: { username: 'alice' } };
     const wrapper = await mountContainer();
     expect(
       wrapper.findComponent({ name: 'UserProfileChannelFilter' }).exists()
@@ -149,7 +149,7 @@ describe('User profile container', () => {
   });
 
   it('uses the full-width image layout on an image detail page', async () => {
-    h.route = {
+    harness.route = {
       path: '/u/alice/images/img-1',
       params: { username: 'alice' },
     };
@@ -162,7 +162,7 @@ describe('User profile container', () => {
   });
 
   it('passes a server-role badge to the sidebar for an admin user', async () => {
-    h.admins.value = ['alice'];
+    harness.admins.value = ['alice'];
     const wrapper = await mountContainer();
     expect(
       wrapper.findComponent({ name: 'UserProfileSidebar' }).props('serverRoleBadge')
@@ -177,7 +177,7 @@ describe('User profile container', () => {
   });
 
   it('passes the dedicated wiki edits count through to the tabs', async () => {
-    h.resultRef.value = {
+    harness.resultRef.value = {
       getUserWikiEditsCount: 3,
       users: [makeUser({ AuthoredWikiPageVersionsAggregate: { count: 11 } })],
     };
