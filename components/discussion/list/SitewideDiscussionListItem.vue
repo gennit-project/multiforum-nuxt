@@ -5,11 +5,9 @@ import { useRoute } from 'nuxt/app';
 import type {
   Discussion,
   DiscussionChannel,
-  Tag,
 } from '@/__generated__/graphql';
 import type { DiscussionWithFavorited } from '@/types/Discussion';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
-import TagComponent from '@/components/TagComponent.vue';
 import ChannelIconStack from '@/components/channel/ChannelIconStack.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
@@ -185,9 +183,6 @@ const isSelected = computed(() => {
   return discussionIdInParams.value === discussionId.value;
 });
 const title = computed(() => props.discussion?.title || '[Deleted]');
-const tags = computed(
-  () => props.discussion?.Tags.map((tag: Tag) => tag.text) || []
-);
 const authorUsername = computed(
   () => props.discussion?.Author?.username || 'Deleted'
 );
@@ -384,7 +379,7 @@ const revealSensitiveContent = () => {
               <span aria-hidden="true">•</span>
               <button
                 type="button"
-                class="flex items-center gap-1 hover:underline"
+                class="inline-flex items-center gap-1 whitespace-nowrap hover:underline"
                 :aria-expanded="isExpanded"
                 @click="isExpanded = !isExpanded"
               >
@@ -500,18 +495,6 @@ const revealSensitiveContent = () => {
               </div>
             </div>
           </template>
-        </div>
-        <div
-          class="mt-1 flex space-x-1 text-sm font-medium text-gray-600 hover:no-underline"
-        >
-          <TagComponent
-            v-for="tag in tags"
-            :key="tag"
-            class="my-1"
-            :active="selectedTags.includes(tag)"
-            :tag="tag"
-            @click="$emit('filterByTag', tag)"
-          />
         </div>
     </div>
   </li>

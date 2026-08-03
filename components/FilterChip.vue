@@ -46,7 +46,7 @@ const handleClick = () => {
                 ? 'border-gray-500 ring-1 ring-gray-400 dark:border-gray-400 dark:ring-gray-500'
                 : '',
             ]"
-            class="font-small align-items flex whitespace-nowrap rounded-md border bg-white px-3 py-2 text-xs text-gray-700 hover:bg-gray-200 focus:border-gray-500 focus:ring-1 focus:ring-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:focus:border-gray-400 dark:focus:ring-gray-400"
+            class="flex h-9 items-center whitespace-nowrap rounded-md border border-gray-300 bg-white px-3 text-xs font-medium text-gray-700 hover:bg-gray-200 focus:border-gray-500 focus:ring-1 focus:ring-gray-400 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:focus:border-gray-400 dark:focus:ring-gray-400"
             @click="handleClick"
           >
             <slot name="icon" />
@@ -74,7 +74,7 @@ const handleClick = () => {
               ? 'border-gray-500 ring-1 ring-gray-400 dark:border-gray-400 dark:ring-gray-500'
               : '',
           ]"
-          class="max-height-3 font-small mr-2 inline-flex whitespace-nowrap rounded-md border bg-white px-3 py-2.5 text-xs text-gray-700 hover:bg-gray-200 focus:border-gray-500 focus:ring-1 focus:ring-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:focus:border-gray-400 dark:focus:ring-gray-400"
+          class="mr-2 flex h-9 items-center whitespace-nowrap rounded-md border border-gray-300 bg-white px-3 text-xs font-medium text-gray-700 hover:bg-gray-200 focus:border-gray-500 focus:ring-1 focus:ring-gray-400 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:focus:border-gray-400 dark:focus:ring-gray-400"
         >
           <slot name="icon" />
           {{ label }}
