@@ -142,14 +142,18 @@ const {
   loading: eventLoading,
   refetch: loadEvent,
   onResult: onEventResult,
-} = useQuery(GET_EVENT, {
-  id: eventId,
-  channelUniqueName: channelId.value,
-  loggedInModName: loggedInUserModName.value,
-}, {
-  fetchPolicy: 'cache-and-network',
-  nextFetchPolicy: 'cache-first',
-});
+} = useQuery(
+  GET_EVENT,
+  {
+    id: eventId,
+    channelUniqueName: channelId.value,
+    loggedInModName: loggedInUserModName.value,
+  },
+  {
+    fetchPolicy: 'cache-and-network',
+    nextFetchPolicy: 'cache-first',
+  }
+);
 
 onEventResult(({ data }) => {
   if (data?.events?.length) {
@@ -379,7 +383,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div class="w-full space-y-4 bg-white dark:bg-black dark:text-white md:px-6">
+  <div class="w-full space-y-4 bg-white md:px-6 dark:bg-black dark:text-white">
     <div class="mb-10 flex w-full justify-center rounded-lg px-2">
       <div class="w-full">
         <div class="mt-1 w-full space-y-2">
@@ -391,7 +395,7 @@ watchEffect(() => {
           />
           <div
             v-else-if="!eventLoading && !event"
-            class="bg-gray-50 rounded-lg border border-gray-300 p-4 text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+            class="rounded-lg border border-gray-300 bg-gray-50 p-4 text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
           >
             <p>
               Can't find the content that was reported. It may have been
@@ -446,7 +450,7 @@ watchEffect(() => {
             />
             <ErrorBanner
               v-if="eventIsInThePast && showEventInPastBanner"
-              class="mb-2 mt-2"
+              class="mt-2 mb-2"
               :text="'This event is in the past.'"
             />
             <ErrorBanner
@@ -458,10 +462,10 @@ watchEffect(() => {
 
             <div
               v-if="showTitle || (route.name === 'map-search-eventId' && event)"
-              class="dark:text-gray-100 md:flex md:items-center md:justify-between"
+              class="md:flex md:items-center md:justify-between dark:text-gray-100"
             >
               <div class="min-w-0 flex-1">
-                <h2 class="text-wrap px-1 text-2xl font-bold sm:tracking-tight">
+                <h2 class="px-1 text-2xl font-bold text-wrap sm:tracking-tight">
                   <template v-if="props.issueEventId && channelId && event">
                     <nuxt-link
                       :to="{
@@ -592,37 +596,23 @@ watchEffect(() => {
 </template>
 
 <style lang="scss">
+@reference '../../../assets/css/index.css';
+
 @media (prefers-color-scheme: dark) {
   #texteditor-textarea {
-    @apply bg-dark text-dark;
+    @apply bg-gray-700 text-gray-200;
   }
 }
 
 @media (prefers-color-scheme: light) {
   #texteditor-textarea {
-    @apply bg-light text-light;
+    @apply bg-gray-100 text-gray-700;
   }
-}
-
-.bg-dark {
-  @apply bg-gray-700;
-}
-
-.text-dark {
-  @apply text-gray-200;
-}
-
-.bg-light {
-  @apply bg-gray-100;
-}
-
-.text-light {
-  @apply text-gray-700;
 }
 
 /* Override the default styles when the 'dark' or 'light' class is added to the 'body' element */
 body.dark #texteditor-textarea {
-  @apply text-dark bg-dark;
+  @apply bg-gray-700 text-gray-200;
 
   .md-editor-toolbar-item:hover {
     background-color: #4a5568;
@@ -630,15 +620,15 @@ body.dark #texteditor-textarea {
 }
 
 body.light #texteditor-textarea {
-  @apply text-light bg-light;
+  @apply bg-gray-100 text-gray-700;
 }
 
 body.dark #texteditor {
-  @apply text-dark bg-dark border-gray-700;
+  @apply border-gray-700 bg-gray-700 text-gray-200;
 }
 
 body.light #texteditor {
-  @apply text-light bg-light border-gray-200;
+  @apply border-gray-200 bg-gray-100 text-gray-700;
 }
 
 .md-content .md-preview,

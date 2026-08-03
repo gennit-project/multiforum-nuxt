@@ -70,19 +70,15 @@ const updateSearch = (value: string) => {
       >
         No forums found
       </li>
-      <li
-        v-for="forum in forums"
-        :key="forum.uniqueName"
-        class="m-0 list-none"
-      >
+      <li v-for="forum in forums" :key="forum.uniqueName" class="m-0 list-none">
         <button
           type="button"
           :data-testid="`forum-finder-result-${forum.uniqueName}`"
-          class="font-semibold group flex w-full items-center gap-x-3 rounded-md px-2 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
+          class="group flex w-full items-center gap-x-3 rounded-md px-2 py-2 text-sm leading-6 font-semibold text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
           @click="emit('select', forum.uniqueName)"
         >
           <AvatarComponent
-            class="border-1 h-8 w-8 shrink-0 border-gray-200 shadow-sm dark:border-gray-800"
+            class="h-8 w-8 shrink-0 border border-gray-200 shadow-sm dark:border-gray-800"
             :text="forum.uniqueName || ''"
             :src="forum.channelIconURL ?? ''"
             :is-small="true"

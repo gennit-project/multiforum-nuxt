@@ -179,7 +179,7 @@ onGetChannelResult((result) => {
         <div class="sm:flex sm:items-start sm:justify-between sm:gap-4">
           <h1
             data-testid="wiki-page-title"
-            class="min-w-0 break-words text-2xl font-bold [overflow-wrap:anywhere] dark:text-white"
+            class="min-w-0 text-2xl font-bold wrap-anywhere wrap-break-word dark:text-white"
           >
             {{ wikiHomePage.title }}
           </h1>
@@ -287,7 +287,7 @@ onGetChannelResult((result) => {
 
           <div
             data-testid="mobile-wiki-font-size"
-            class="mt-8 border-t border-gray-200 pt-6 dark:border-gray-700 xl:hidden"
+            class="mt-8 border-t border-gray-200 pt-6 xl:hidden dark:border-gray-700"
           >
             <FontSizeControl />
           </div>
@@ -295,7 +295,7 @@ onGetChannelResult((result) => {
 
         <!-- Left sidebar - On This Page (desktop only) -->
         <div
-          class="sticky top-0 hidden max-h-screen w-64 flex-shrink-0 overflow-y-auto xl:order-1 xl:flex"
+          class="sticky top-0 hidden max-h-screen w-64 shrink-0 overflow-y-auto xl:order-1 xl:flex"
         >
           <!-- On This Page Navigation -->
           <OnThisPage
@@ -306,7 +306,7 @@ onGetChannelResult((result) => {
 
         <!-- Right sidebar - controls and more pages (desktop only) -->
         <div
-          class="sticky top-0 hidden max-h-screen w-64 flex-shrink-0 overflow-y-auto xl:order-3 xl:flex"
+          class="sticky top-0 hidden max-h-screen w-64 shrink-0 overflow-y-auto xl:order-3 xl:flex"
         >
           <div class="w-full space-y-6 py-2">
             <FontSizeControl />
@@ -319,7 +319,7 @@ onGetChannelResult((result) => {
               class="w-full"
             >
               <h3
-                class="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                class="mb-3 text-xs font-medium tracking-wide text-gray-500 uppercase dark:text-gray-400"
               >
                 More Wiki Pages
               </h3>
@@ -331,7 +331,7 @@ onGetChannelResult((result) => {
                 >
                   <a
                     :href="`/forums/${forumId}/wiki/${childPage.slug}`"
-                    class="hover:bg-orange-50 block rounded px-1 py-0.5 text-xs font-medium text-orange-600 transition-colors hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-900/20 dark:hover:text-orange-300"
+                    class="block rounded px-1 py-0.5 text-xs font-medium text-orange-600 transition-colors hover:bg-orange-50 hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-900/20 dark:hover:text-orange-300"
                     @click.prevent="
                       router.push(`/forums/${forumId}/wiki/${childPage.slug}`)
                     "
@@ -361,7 +361,7 @@ onGetChannelResult((result) => {
         <div
           class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-600 dark:bg-gray-800"
         >
-          <h3 class="font-semibold mb-4 text-lg text-gray-900 dark:text-white">
+          <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
             More Wiki Pages
           </h3>
           <div class="space-y-3">
@@ -372,7 +372,7 @@ onGetChannelResult((result) => {
             >
               <a
                 :href="`/forums/${forumId}/wiki/${childPage.slug}`"
-                class="hover:bg-orange-50 block rounded px-3 py-2 text-sm font-medium text-orange-600 transition-colors hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-900/20 dark:hover:text-orange-300"
+                class="block rounded px-3 py-2 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-50 hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-900/20 dark:hover:text-orange-300"
                 @click.prevent="
                   router.push(`/forums/${forumId}/wiki/${childPage.slug}`)
                 "

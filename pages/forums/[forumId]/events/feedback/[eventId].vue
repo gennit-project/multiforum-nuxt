@@ -94,9 +94,9 @@ const reachedEndOfResults = computed(() => {
 
 <template>
   <div
-    class="w-full max-w-screen-2xl space-y-4 rounded-lg py-2 dark:text-white sm:px-2 md:px-5"
+    class="w-full max-w-[theme(screens.2xl)] space-y-4 rounded-lg py-2 sm:px-2 md:px-5 dark:text-white"
   >
-    <h1 class="text-wrap text-center text-2xl font-bold dark:text-gray-200">
+    <h1 class="text-center text-2xl font-bold text-wrap dark:text-gray-200">
       Feedback
     </h1>
     <ErrorBanner
@@ -107,13 +107,13 @@ const reachedEndOfResults = computed(() => {
     <PageNotFound v-if="!getEventLoading && !getEventError && !event" />
     <p class="mb-4 px-2">This page collects feedback on this event:</p>
     <div class="ml-2 flex flex-col gap-2 border-l pl-4">
-      <h3 class="text-wrap px-2 text-xl font-bold sm:tracking-tight">
+      <h3 class="px-2 text-xl font-bold text-wrap sm:tracking-tight">
         {{ event && event.title ? event.title : '[Deleted]' }}
       </h3>
 
       <div class="space-y-3 px-2">
         <div
-          class="dark:bg-gray-950 rounded-lg border px-4 pb-2 dark:border-gray-700 dark:bg-gray-700"
+          class="rounded-lg border px-4 pb-2 dark:border-gray-700 dark:bg-gray-700 dark:bg-gray-950"
         >
           <EventHeader
             v-if="event"

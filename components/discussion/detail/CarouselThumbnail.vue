@@ -39,7 +39,7 @@ const sizeStyle = computed(() => ({
 
 <template>
   <div
-    class="flex-shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 transition-all lg:mb-2 lg:last:mb-0"
+    class="shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 transition-all lg:mb-2 lg:last:mb-0"
     :class="{
       'border-orange-500': isActive,
       'border-gray-300 hover:border-gray-400': !isActive,
@@ -72,6 +72,6 @@ const sizeStyle = computed(() => ({
       :alt="image.alt || ''"
       class="h-full w-full rounded object-cover shadow-sm"
       :style="sizeStyle"
-    >
+    />
   </div>
 </template>

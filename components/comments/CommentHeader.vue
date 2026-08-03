@@ -239,7 +239,7 @@ const isSticky = computed(
 
     <div
       :class="!commentAuthorUsername ? '-ml-5' : '-ml-4 border-l'"
-      class="flex-grow border-gray-300 pl-4 dark:border-gray-600"
+      class="grow border-gray-300 pl-4 dark:border-gray-600"
     >
       <div
         v-if="

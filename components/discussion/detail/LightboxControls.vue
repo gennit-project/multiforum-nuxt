@@ -109,7 +109,7 @@ const downloadImage = (imageUrl: string) => {
       :class="{ 'gap-2': panelOnSide, 'gap-4': !panelOnSide }"
     >
       <button
-        class="bg-transparent cursor-pointer border-0 text-white"
+        class="cursor-pointer border-0 bg-transparent text-white"
         :class="{ 'text-2xl': panelOnSide, 'text-3xl': !panelOnSide }"
         aria-label="Close lightbox"
         @click="emit('close')"
@@ -128,9 +128,9 @@ const downloadImage = (imageUrl: string) => {
       :class="{ 'gap-1': panelOnSide, 'gap-4': !panelOnSide }"
     >
       <!-- Zoom controls -->
-      <div class="flex flex-shrink-0 items-center rounded bg-opacity-10">
+      <div class="flex shrink-0 items-center rounded bg-white/10">
         <button
-          class="cursor-pointer text-white transition-colors hover:bg-opacity-20"
+          class="cursor-pointer text-white transition-colors hover:bg-white/20"
           :class="[
             {
               'px-1 py-1 text-sm': panelOnSide,
@@ -154,7 +154,7 @@ const downloadImage = (imageUrl: string) => {
           >{{ Math.round(zoomLevel * 100) + '%' }}</span
         >
         <button
-          class="cursor-pointer text-white transition-colors hover:bg-opacity-20"
+          class="cursor-pointer text-white transition-colors hover:bg-white/20"
           :class="[
             {
               'px-1 py-1 text-sm': panelOnSide,
@@ -171,7 +171,7 @@ const downloadImage = (imageUrl: string) => {
         </button>
         <button
           v-if="isZoomed"
-          class="flex cursor-pointer items-center justify-center text-white transition-colors hover:bg-opacity-20"
+          class="flex cursor-pointer items-center justify-center text-white transition-colors hover:bg-white/20"
           :class="{
             'h-5 w-5': panelOnSide,
             'h-6 w-6': !panelOnSide,
@@ -191,7 +191,7 @@ const downloadImage = (imageUrl: string) => {
 
       <!-- Panel toggle button -->
       <button
-        class="cursor-pointer rounded border-0 bg-gray-800 bg-opacity-10 text-white transition-colors"
+        class="cursor-pointer rounded border-0 bg-gray-800/10 text-white transition-colors"
         :class="{
           'px-1 py-1 text-xs': panelOnSide,
           'px-2 py-1 text-sm': !panelOnSide,
@@ -216,10 +216,12 @@ const downloadImage = (imageUrl: string) => {
       <!-- Panel position toggle button -->
       <button
         type="button"
-        class="flex cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white hover:bg-opacity-20"
+        class="flex cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white/20"
         :class="{ 'h-6 w-6': panelOnSide, 'h-8 w-8': !panelOnSide }"
         :title="panelOnSide ? 'Move panel to side' : 'Move panel to bottom'"
-        :aria-label="panelOnSide ? 'Move panel to side' : 'Move panel to bottom'"
+        :aria-label="
+          panelOnSide ? 'Move panel to side' : 'Move panel to bottom'
+        "
         @click="emit('toggle-panel-position')"
       >
         <SwitchHorizontalIcon
@@ -232,7 +234,7 @@ const downloadImage = (imageUrl: string) => {
           <button
             v-if="currentImageId && !isStlFile"
             type="button"
-            class="flex cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white hover:bg-opacity-20"
+            class="flex cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white/20"
             :class="{ 'h-6 w-6': panelOnSide, 'h-8 w-8': !panelOnSide }"
             aria-label="Report image"
             title="Report image"
@@ -248,7 +250,7 @@ const downloadImage = (imageUrl: string) => {
       <!-- Download button -->
       <button
         type="button"
-        class="flex cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white hover:bg-opacity-20"
+        class="flex cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white/20"
         :class="{ 'h-6 w-6': panelOnSide, 'h-8 w-8': !panelOnSide }"
         :href="currentImageUrl"
         aria-label="Download image"

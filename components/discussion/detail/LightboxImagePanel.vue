@@ -59,7 +59,6 @@ const emit = defineEmits([
   'touchmove',
 ]);
 
-
 const handleClick = (event: MouseEvent) => {
   // Don't close editing mode if click happens within editor
   if (props.editingCaption) {
@@ -86,7 +85,7 @@ const handleClick = (event: MouseEvent) => {
   >
     <button
       v-if="showNavigation"
-      class="absolute left-5 z-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-0 bg-black bg-opacity-50 text-white"
+      class="absolute left-5 z-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-0 bg-black/50 text-white"
       aria-label="Previous image"
       @click="emit('prev-image')"
     >
@@ -98,7 +97,9 @@ const handleClick = (event: MouseEvent) => {
         currentImage && currentImage.url && hasGlbExtension(currentImage.url)
       "
       :model-url="currentImage.url"
-      :model-alt="currentImage.alt || currentImage.caption || 'Interactive 3D model'"
+      :model-alt="
+        currentImage.alt || currentImage.caption || 'Interactive 3D model'
+      "
       height="100%"
       width="100%"
       class="h-full w-full object-contain transition-all duration-300 ease-in-out"
@@ -147,11 +148,11 @@ const handleClick = (event: MouseEvent) => {
       @touchstart="(e: TouchEvent) => emit('touchstart', e)"
       @touchend="(e: TouchEvent) => emit('touchend', e)"
       @touchmove="(e: TouchEvent) => emit('touchmove', e)"
-    >
+    />
 
     <button
       v-if="showNavigation"
-      class="absolute right-5 z-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-0 bg-black bg-opacity-50 text-white"
+      class="absolute right-5 z-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-0 bg-black/50 text-white"
       aria-label="Next image"
       @click="emit('next-image')"
     >

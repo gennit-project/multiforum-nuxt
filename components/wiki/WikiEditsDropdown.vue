@@ -165,7 +165,7 @@ onUnmounted(() => {
       <div
         v-if="isOpen"
         ref="popoverRef"
-        class="fixed z-[100] w-64 max-w-[calc(100vw-1rem)] rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+        class="fixed z-100 w-64 max-w-[calc(100vw-1rem)] rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
         :style="{
           top: `${adjustedPosition.top}px`,
           left: `${adjustedPosition.left}px`,

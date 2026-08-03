@@ -21,12 +21,12 @@ defineProps({
 <template>
   <div
     :data-testid="testId"
-    class="dark:border-blue-950 my-2 rounded-md border bg-blue-100 px-4 pt-4 dark:bg-blue-900 dark:text-blue-200"
+    class="my-2 rounded-md border bg-blue-100 px-4 pt-4 dark:border-blue-950 dark:bg-blue-900 dark:text-blue-200"
   >
     <div class="flex">
       <div class="shrink-0">
         <slot>
-          <InfoIcon class="h-5 w-5 flex-grow-0" />
+          <InfoIcon class="h-5 w-5 grow-0" />
         </slot>
       </div>
       <div class="ml-3 flex-1">

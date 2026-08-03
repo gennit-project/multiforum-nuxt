@@ -113,7 +113,9 @@ const markdownImagesEnabled = computed(
               <div class="flex flex-col items-center space-y-3">
                 <span v-if="!loggedInUserIsAuthor">No images available.</span>
                 <button
-                  v-if="loggedInUserIsAuthor && usernameVar && imageUploadsEnabled"
+                  v-if="
+                    loggedInUserIsAuthor && usernameVar && imageUploadsEnabled
+                  "
                   class="flex items-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-blue-700"
                   data-testid="add-album-button"
                   @click="emit('handleClickAddAlbum')"
@@ -158,7 +160,7 @@ const markdownImagesEnabled = computed(
         </template>
       </DiscussionBody>
     </div>
-    <div class="flex-shrink-0">
+    <div class="shrink-0">
       <DownloadSidebar
         v-if="discussion && activeDiscussionChannel"
         :discussion="discussion"

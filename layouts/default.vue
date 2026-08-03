@@ -35,9 +35,8 @@ if (import.meta.client) {
     shouldLoadFontAwesome,
     async (nextValue) => {
       if (!nextValue || fontAwesomeStylesheetHref.value) return;
-      const stylesheetModule = await import(
-        '@fortawesome/fontawesome-free/css/all.css?url'
-      );
+      const stylesheetModule =
+        await import('@fortawesome/fontawesome-free/css/all.css?url');
       fontAwesomeStylesheetHref.value = stylesheetModule.default;
     },
     { immediate: true }
@@ -45,15 +44,16 @@ if (import.meta.client) {
 }
 
 useHead(() => ({
-  link: shouldLoadFontAwesome.value && fontAwesomeStylesheetHref.value
-    ? [
-        {
-          key: 'fontawesome-stylesheet',
-          rel: 'stylesheet',
-          href: fontAwesomeStylesheetHref.value,
-        },
-      ]
-    : [],
+  link:
+    shouldLoadFontAwesome.value && fontAwesomeStylesheetHref.value
+      ? [
+          {
+            key: 'fontawesome-stylesheet',
+            rel: 'stylesheet',
+            href: fontAwesomeStylesheetHref.value,
+          },
+        ]
+      : [],
 }));
 
 // Responsive display
@@ -67,8 +67,7 @@ const toggleUserProfileDropdown = () =>
 const closeUserProfileDropdown = () => (showUserProfileDropdown.value = false);
 
 // Test helpers (only in dev/test environments)
-const shouldExposeTestHelpers =
-  isDevRuntime || config.environment === 'test';
+const shouldExposeTestHelpers = isDevRuntime || config.environment === 'test';
 
 if (shouldExposeTestHelpers) {
   useTestAuthHelpers();
@@ -105,7 +104,7 @@ onMounted(() => {
   <div>
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[1000] focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-black focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:bg-gray-800 dark:focus:text-white"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-1000 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-black focus:shadow-lg focus:ring-2 focus:ring-orange-500 focus:outline-none dark:focus:bg-gray-800 dark:focus:text-white"
     >
       Skip to main content
     </a>
@@ -114,7 +113,7 @@ onMounted(() => {
     <AddToListModalHost />
     <div class="flex min-h-screen flex-col">
       <div
-        class="flex flex-grow list-disc flex-col bg-gray-200 dark:bg-black dark:text-gray-200"
+        class="flex grow list-disc flex-col bg-gray-200 dark:bg-black dark:text-gray-200"
       >
         <header>
           <TopNav
@@ -134,7 +133,7 @@ onMounted(() => {
           this column and paints over the fixed top nav — clipping the nav's
           search-type dropdown (z-30, trapped inside the nav's own z-20 context).
         -->
-        <div class="relative isolate flex flex-grow flex-col">
+        <div class="relative isolate flex grow flex-col">
           <!-- Vertical Icon Navigation for Large Screens -->
           <nav aria-label="Main navigation">
             <VerticalIconNav />
@@ -150,7 +149,11 @@ onMounted(() => {
                fallback, ClientOnly renders one placeholder element that matches on
                both sides. -->
           <ClientOnly>
-            <nav v-if="!lgAndUp" id="mobile-menu" aria-label="Mobile navigation">
+            <nav
+              v-if="!lgAndUp"
+              id="mobile-menu"
+              aria-label="Mobile navigation"
+            >
               <SiteSidenav
                 :key="`${sideNavIsOpenVar}`"
                 :show-dropdown="sideNavIsOpenVar"
@@ -162,7 +165,7 @@ onMounted(() => {
           <main
             id="main-content"
             tabindex="-1"
-            class="flex min-w-0 flex-1 flex-col bg-white outline-none dark:bg-black lg:pl-20"
+            class="flex min-w-0 flex-1 flex-col bg-white outline-none lg:pl-20 dark:bg-black"
           >
             <slot />
           </main>

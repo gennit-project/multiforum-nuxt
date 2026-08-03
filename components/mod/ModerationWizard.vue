@@ -368,21 +368,21 @@ const editModalTargetType = computed(() => {
               <div class="mt-4 flex flex-col space-y-4">
                 <div
                   v-if="issue.isOpen && !isCurrentUserOriginalPoster"
-                  class="bg-blue-50 flex items-start gap-4 rounded-lg border border-blue-200 p-4 shadow-sm dark:border-blue-500/30 dark:bg-blue-500/10"
+                  class="flex items-start gap-4 rounded-lg border border-blue-200 bg-blue-50 p-4 shadow-sm dark:border-blue-500/30 dark:bg-blue-500/10"
                 >
-                  <div class="flex-shrink-0 pt-1">
+                  <div class="shrink-0 pt-1">
                     <ScalesIcon
                       class="h-8 w-8 text-blue-600 dark:text-blue-300"
                     />
                   </div>
                   <div class="space-y-1">
                     <p
-                      class="font-semibold text-xs uppercase tracking-wide text-blue-700 dark:text-blue-200"
+                      class="text-xs font-semibold tracking-wide text-blue-700 uppercase dark:text-blue-200"
                     >
                       Decision point
                     </p>
                     <p
-                      class="font-semibold text-base text-blue-800 dark:text-blue-100"
+                      class="text-base font-semibold text-blue-800 dark:text-blue-100"
                     >
                       Is there a rule violation?
                     </p>
@@ -401,7 +401,7 @@ const editModalTargetType = computed(() => {
                   >
                     <div class="space-y-1">
                       <p
-                        class="font-semibold text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                        class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400"
                       >
                         If no (no violation)
                       </p>
@@ -459,14 +459,14 @@ const editModalTargetType = computed(() => {
                   </div>
 
                   <div
-                    class="bg-gray-50 space-y-3 rounded-lg border border-gray-200 p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800/50"
+                    class="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800/50"
                     :class="[
                       actionsDisabled ? 'opacity-60 grayscale' : 'opacity-100',
                     ]"
                   >
                     <div class="space-y-1">
                       <p
-                        class="font-semibold text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                        class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400"
                       >
                         If yes (violation)
                       </p>
@@ -499,7 +499,7 @@ const editModalTargetType = computed(() => {
                         :key="action.testId"
                         type="button"
                         :data-test="action.testId"
-                        class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white transition"
+                        class="flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm font-semibold text-white transition"
                         :class="[
                           editButtonDisabled
                             ? 'cursor-not-allowed bg-gray-500'
@@ -522,7 +522,7 @@ const editModalTargetType = computed(() => {
                       class="-mx-4 -mb-4 space-y-3 rounded-b-lg border-amber-300 bg-amber-50 p-4 dark:border-amber-500/50 dark:bg-amber-500/10"
                     >
                       <p
-                        class="font-semibold text-xs uppercase tracking-wide text-gray-700 dark:text-gray-300"
+                        class="text-xs font-semibold tracking-wide text-gray-700 uppercase dark:text-gray-300"
                       >
                         Destructive actions
                       </p>
@@ -534,7 +534,7 @@ const editModalTargetType = computed(() => {
                         <!-- Actions on Content -->
                         <div class="space-y-2">
                           <p
-                            class="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-400"
+                            class="text-xs font-medium tracking-wide text-gray-600 uppercase dark:text-gray-400"
                           >
                             Actions on Content
                           </p>
@@ -559,7 +559,7 @@ const editModalTargetType = computed(() => {
                             v-else
                             type="button"
                             disabled
-                            class="font-semibold flex w-full cursor-not-allowed items-center justify-center gap-2 rounded bg-gray-400 px-4 py-2 text-sm text-white dark:bg-gray-600"
+                            class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded bg-gray-400 px-4 py-2 text-sm font-semibold text-white dark:bg-gray-600"
                             title="Content is already archived. Use the Unarchive button above to restore it."
                           >
                             Archive (Already Archived)
@@ -568,7 +568,7 @@ const editModalTargetType = computed(() => {
                         <!-- Actions on Author -->
                         <div class="space-y-2">
                           <p
-                            class="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-400"
+                            class="text-xs font-medium tracking-wide text-gray-600 uppercase dark:text-gray-400"
                           >
                             Actions on Author
                           </p>
@@ -604,7 +604,7 @@ const editModalTargetType = computed(() => {
                             v-else
                             type="button"
                             disabled
-                            class="font-semibold flex w-full cursor-not-allowed items-center justify-center gap-2 rounded bg-gray-400 px-4 py-2 text-sm text-white dark:bg-gray-600"
+                            class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded bg-gray-400 px-4 py-2 text-sm font-semibold text-white dark:bg-gray-600"
                             title="Author is already suspended. Use the Unsuspend Author button above to restore their access."
                           >
                             Suspend Author (Already Suspended)

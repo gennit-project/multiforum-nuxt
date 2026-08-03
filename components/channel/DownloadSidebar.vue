@@ -16,11 +16,7 @@ import {
 import { useUsername } from '@/composables/useAuthState';
 
 type DownloadScanStatus =
-  | 'PENDING'
-  | 'CLEAN'
-  | 'INFECTED'
-  | 'SUSPICIOUS'
-  | 'FAILED';
+  'PENDING' | 'CLEAN' | 'INFECTED' | 'SUSPICIOUS' | 'FAILED';
 
 type ScannedDownloadableFile = Omit<
   Discussion['DownloadableFiles'][number],
@@ -70,17 +66,18 @@ const showSuccessPopover = ref(false);
 
 // Get the primary downloadable file (first one)
 const primaryFile = computed(() => {
-  return (props.discussion?.DownloadableFiles?.[0] as
-    | ScannedDownloadableFile
-    | undefined) || null;
+  return (
+    (props.discussion?.DownloadableFiles?.[0] as
+      ScannedDownloadableFile | undefined) || null
+  );
 });
 
 const hasDownloadableFile = computed(() => {
   return (props.discussion?.DownloadableFiles?.length || 0) > 0;
 });
 
-const scanStatus = computed<DownloadScanStatus>(
-  () => retryingScan.value ? 'PENDING' : primaryFile.value?.scanStatus || 'PENDING'
+const scanStatus = computed<DownloadScanStatus>(() =>
+  retryingScan.value ? 'PENDING' : primaryFile.value?.scanStatus || 'PENDING'
 );
 
 const retryScan = async () => {
@@ -98,15 +95,19 @@ const retryScan = async () => {
 };
 
 const creatorIsViewing = computed(
-  () => Boolean(username.value) && props.discussion?.Author?.username === username.value
+  () =>
+    Boolean(username.value) &&
+    props.discussion?.Author?.username === username.value
 );
 
-const reviewRequested = computed(
-  () => reviewRequestedLocally.value
-);
+const reviewRequested = computed(() => reviewRequestedLocally.value);
 
 const requestHumanReview = () => {
-  if (!primaryFile.value?.id || requestingReview.value || reviewRequested.value) {
+  if (
+    !primaryFile.value?.id ||
+    requestingReview.value ||
+    reviewRequested.value
+  ) {
     return;
   }
   requestDownloadableFileReview({
@@ -120,19 +121,19 @@ const hasReviewAccess = computed(
 );
 
 const downloadDisabled = computed(
-  () =>
-    !hasDownloadableFile.value ||
-    scanStatus.value !== 'CLEAN'
+  () => !hasDownloadableFile.value || scanStatus.value !== 'CLEAN'
 );
 
 const downloadLabel = 'Download Now';
 
 const replaceFilePath = computed(
-  () => `/forums/${props.channelUniqueName}/downloads/edit/${props.discussionId}`
+  () =>
+    `/forums/${props.channelUniqueName}/downloads/edit/${props.discussionId}`
 );
 
 const pipelinePath = computed(
-  () => `/forums/${props.channelUniqueName}/downloads/${props.discussionId}/pipelines`
+  () =>
+    `/forums/${props.channelUniqueName}/downloads/${props.discussionId}/pipelines`
 );
 
 const scanCheckedDisplay = computed(() => {
@@ -239,7 +240,7 @@ const groupedLabels = computed(() => {
 
 <template>
   <div
-    class="flex w-full flex-col space-y-4 rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 lg:w-80"
+    class="flex w-full flex-col space-y-4 rounded-lg border border-gray-200 bg-white lg:w-80 dark:border-gray-700 dark:bg-gray-800"
   >
     <div class="p-6">
       <!-- Boxed Info Section -->
@@ -249,7 +250,7 @@ const groupedLabels = computed(() => {
       >
         <!-- File Name -->
         <h2
-          class="mb-3 break-words text-sm font-medium text-gray-900 dark:text-white"
+          class="mb-3 text-sm font-medium wrap-break-word text-gray-900 dark:text-white"
         >
           {{ primaryFile.fileName || 'Untitled File' }}
         </h2>
@@ -273,10 +274,14 @@ const groupedLabels = computed(() => {
           aria-live="polite"
           class="rounded-md p-3 text-sm"
           :class="{
-            'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-200': scanStatus === 'CLEAN',
-            'bg-amber-50 text-amber-900 dark:bg-amber-900/30 dark:text-amber-200': scanStatus === 'PENDING' || scanStatus === 'SUSPICIOUS',
-            'bg-red-50 text-red-900 dark:bg-red-900/30 dark:text-red-200': scanStatus === 'INFECTED',
-            'bg-sky-50 text-sky-900 dark:bg-sky-900/30 dark:text-sky-200': scanStatus === 'FAILED',
+            'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-200':
+              scanStatus === 'CLEAN',
+            'bg-amber-50 text-amber-900 dark:bg-amber-900/30 dark:text-amber-200':
+              scanStatus === 'PENDING' || scanStatus === 'SUSPICIOUS',
+            'bg-red-50 text-red-900 dark:bg-red-900/30 dark:text-red-200':
+              scanStatus === 'INFECTED',
+            'bg-sky-50 text-sky-900 dark:bg-sky-900/30 dark:text-sky-200':
+              scanStatus === 'FAILED',
           }"
           data-testid="download-scan-status"
         >
@@ -288,19 +293,27 @@ const groupedLabels = computed(() => {
             <i class="fa-solid fa-hourglass-half mr-1" />
             Quarantined: security check pending
           </p>
-          <template v-else-if="scanStatus === 'INFECTED' || scanStatus === 'SUSPICIOUS'">
+          <template
+            v-else-if="scanStatus === 'INFECTED' || scanStatus === 'SUSPICIOUS'"
+          >
             <p class="font-medium">
               <i class="fa-solid fa-shield-halved mr-1" />
-              {{ scanStatus === 'INFECTED'
-                ? 'Quarantined: threat detected'
-                : 'Quarantined: suspicious content' }}
+              {{
+                scanStatus === 'INFECTED'
+                  ? 'Quarantined: threat detected'
+                  : 'Quarantined: suspicious content'
+              }}
             </p>
             <p class="mt-1">
               <template v-if="creatorIsViewing">
-                This upload was blocked by the security scan<span v-if="primaryFile.scanReason">: {{ primaryFile.scanReason }}</span>.
+                This upload was blocked by the security scan<span
+                  v-if="primaryFile.scanReason"
+                  >: {{ primaryFile.scanReason }}</span
+                >.
               </template>
               <template v-else>
-                This download is not publicly available while its content is reviewed.
+                This download is not publicly available while its content is
+                reviewed.
               </template>
             </p>
             <div v-if="creatorIsViewing" class="mt-2 flex flex-wrap gap-3">
@@ -313,7 +326,13 @@ const groupedLabels = computed(() => {
                 :disabled="requestingReview || reviewRequested"
                 @click="requestHumanReview"
               >
-                {{ reviewRequested ? 'Human review requested' : requestingReview ? 'Requesting review…' : 'Request human review' }}
+                {{
+                  reviewRequested
+                    ? 'Human review requested'
+                    : requestingReview
+                      ? 'Requesting review…'
+                      : 'Request human review'
+                }}
               </button>
               <button
                 type="button"
@@ -353,10 +372,7 @@ const groupedLabels = computed(() => {
                   >
                     {{ retryingScan ? 'Retrying…' : 'Retry scan' }}
                   </button>
-                  <NuxtLink
-                    class="font-medium underline"
-                    :to="pipelinePath"
-                  >
+                  <NuxtLink class="font-medium underline" :to="pipelinePath">
                     View checks
                   </NuxtLink>
                 </div>
@@ -364,10 +380,7 @@ const groupedLabels = computed(() => {
             </div>
             <p v-if="retryError" class="mt-2 font-medium">
               {{ retryError }}
-              <NuxtLink
-                class="ml-1 underline"
-                to="/server/issues/create"
-              >
+              <NuxtLink class="ml-1 underline" to="/server/issues/create">
                 Open an issue
               </NuxtLink>
             </p>
@@ -386,10 +399,15 @@ const groupedLabels = computed(() => {
             View security pipeline
           </NuxtLink>
           <p
-            v-if="hasReviewAccess && scanStatus !== 'CLEAN' && scanStatus !== 'FAILED'"
+            v-if="
+              hasReviewAccess &&
+              scanStatus !== 'CLEAN' &&
+              scanStatus !== 'FAILED'
+            "
             class="mt-2 text-xs"
           >
-            Direct download is disabled while this file is quarantined. Review the scanner findings before clearing it.
+            Direct download is disabled while this file is quarantined. Review
+            the scanner findings before clearing it.
           </p>
         </div>
         <dl class="mt-3 grid grid-cols-2 gap-3 text-sm">
@@ -495,7 +513,6 @@ const groupedLabels = computed(() => {
           </div>
         </div>
       </div>
-
     </div>
   </div>
 

@@ -48,9 +48,7 @@ const emit = defineEmits([
           leave-from="opacity-100"
           leave-to="opacity-0"
         >
-          <div
-            class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-          />
+          <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
         </TransitionChild>
 
         <div class="fixed inset-0 z-10 overflow-y-auto">
@@ -67,7 +65,7 @@ const emit = defineEmits([
               leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <DialogPanel
-                class="relative transform overflow-hidden rounded-lg px-4 pb-4 pt-5 text-left shadow-xl transition-all"
+                class="relative transform overflow-hidden rounded-lg px-4 pt-5 pb-4 text-left shadow-xl transition-all"
               >
                 <div>
                   <div
@@ -83,7 +81,7 @@ const emit = defineEmits([
                   <div class="mt-3 sm:mt-5">
                     <DialogTitle
                       as="h3"
-                      class="text-center text-lg font-medium leading-6 text-gray-900"
+                      class="text-center text-lg leading-6 font-medium text-gray-900"
                     >
                       {{ props.title }}
                     </DialogTitle>
@@ -98,7 +96,7 @@ const emit = defineEmits([
                 >
                   <button
                     type="button"
-                    class="border-transparent bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 inline-flex w-full justify-center rounded-full border px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:col-start-2 sm:text-sm"
+                    class="inline-flex w-full justify-center rounded-full border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none sm:col-start-2 sm:text-sm"
                     @click="
                       () => {
                         emit('close');
@@ -115,7 +113,7 @@ const emit = defineEmits([
                   <slot name="secondaryButton">
                     <button
                       type="button"
-                      class="hover:bg-gray-50 focus:ring-indigo-500 mt-3 inline-flex w-full justify-center rounded-full border border-gray-300 px-4 py-2 text-base font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
+                      class="mt-3 inline-flex w-full justify-center rounded-full border border-gray-300 px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none sm:col-start-1 sm:mt-0 sm:text-sm"
                       @click="
                         () => {
                           emit('secondaryButtonClick');

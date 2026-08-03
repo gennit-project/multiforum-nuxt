@@ -85,14 +85,16 @@ withDefaults(
       <NuxtLink
         :to="permalink"
         aria-label="Open comment"
-        class="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+        class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
       >
         <EllipsisHorizontal class="h-5 w-5" />
       </NuxtLink>
     </div>
 
-    <div class="rounded-[1.2rem] border border-gray-200/80 bg-gray-50/85 px-4 py-4 dark:border-gray-700 dark:bg-gray-900">
-      <div class="prose prose-sm max-w-none leading-[1.6] dark:prose-invert">
+    <div
+      class="rounded-[1.2rem] border border-gray-200/80 bg-gray-50/85 px-4 py-4 dark:border-gray-700 dark:bg-gray-900"
+    >
+      <div class="prose prose-sm dark:prose-invert max-w-none leading-[1.6]">
         <MarkdownPreview :text="comment.text" :disable-gallery="false" />
       </div>
     </div>
@@ -104,11 +106,11 @@ withDefaults(
           class="flex max-w-full flex-wrap items-center gap-x-1 gap-y-0.5 rounded-2xl bg-orange-50 px-3 py-1.5 font-medium text-orange-700 transition-colors hover:bg-orange-100 dark:bg-orange-500/10 dark:text-orange-300 dark:hover:bg-orange-500/20"
         >
           <span class="opacity-75">Post from</span>
-          <span class="min-w-0 break-words">{{ contextTitle }}</span>
+          <span class="min-w-0 wrap-break-word">{{ contextTitle }}</span>
         </NuxtLink>
       </div>
 
-      <div class="flex flex-shrink-0 items-center gap-2">
+      <div class="flex shrink-0 items-center gap-2">
         <NuxtLink
           :to="permalink"
           class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
@@ -116,7 +118,7 @@ withDefaults(
         >
           <ArrowUpRightIcon class="h-4 w-4" />
         </NuxtLink>
-        <div v-if="showFavoriteButton" class="flex-shrink-0">
+        <div v-if="showFavoriteButton" class="shrink-0">
           <AddToCommentFavorites
             :allow-add-to-list="allowAddToList"
             :comment-id="comment.id"

@@ -235,7 +235,7 @@ onBeforeUnmount(() => {
       ref="triggerRef"
       type="button"
       data-testid="forum-quick-switcher-trigger"
-      class="hover:text-gray-950 flex min-w-0 max-w-[9.5rem] items-center gap-1 rounded-md px-1 py-1 text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white sm:max-w-[13.5rem] lg:max-w-[17.5rem]"
+      class="flex max-w-[9.5rem] min-w-0 items-center gap-1 rounded-md px-1 py-1 text-gray-700 transition-colors hover:bg-gray-200 hover:text-gray-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 sm:max-w-[13.5rem] lg:max-w-[17.5rem] dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white"
       aria-haspopup="dialog"
       :aria-expanded="isOpen"
       aria-label="Switch forum"
@@ -254,7 +254,7 @@ onBeforeUnmount(() => {
         v-if="isOpen"
         ref="floatingRef"
         :style="floatingStyles"
-        class="z-[10000] w-[min(24rem,calc(100vw-1rem))] overflow-hidden rounded-lg border border-gray-200 bg-white text-gray-900 shadow-xl dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+        class="z-10000 w-[min(24rem,calc(100vw-1rem))] overflow-hidden rounded-lg border border-gray-200 bg-white text-gray-900 shadow-xl dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
         role="dialog"
         aria-label="Switch forum"
         data-testid="forum-quick-switcher"
@@ -274,7 +274,7 @@ onBeforeUnmount(() => {
         <div class="max-h-[min(32rem,calc(100vh-6rem))] overflow-y-auto p-2">
           <section v-if="visibleRecentForums.length > 0" class="mb-2">
             <h2
-              class="font-semibold px-2 py-1 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+              class="px-2 py-1 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400"
             >
               Recent forums
             </h2>
@@ -289,7 +289,7 @@ onBeforeUnmount(() => {
 
           <section v-if="favoriteForums.length > 0" class="mb-2">
             <h2
-              class="font-semibold px-2 py-1 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+              class="px-2 py-1 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400"
             >
               Favorite forums
             </h2>
@@ -304,7 +304,7 @@ onBeforeUnmount(() => {
 
           <section v-if="forumCollections.length > 0" class="mb-2">
             <h2
-              class="font-semibold px-2 py-1 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+              class="px-2 py-1 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400"
             >
               Forum lists
             </h2>
@@ -347,7 +347,7 @@ onBeforeUnmount(() => {
 
           <section>
             <h2
-              class="font-semibold px-2 py-1 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+              class="px-2 py-1 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400"
             >
               {{ normalizedSearch ? 'Search results' : 'Top forums' }}
             </h2>

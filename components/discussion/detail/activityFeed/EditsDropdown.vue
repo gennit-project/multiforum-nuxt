@@ -202,7 +202,9 @@ const handleMenuKeydown = (event: KeyboardEvent) => {
   }
 
   const items = Array.from(
-    popoverRef.value?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') || []
+    popoverRef.value?.querySelectorAll<HTMLButtonElement>(
+      '[role="menuitem"]'
+    ) || []
   );
   const currentIndex = items.indexOf(event.target as HTMLButtonElement);
   let nextIndex: number | undefined;
@@ -253,7 +255,10 @@ const handleRevisionDeleted = (deletedId: string) => {
 
 const handleDocumentClick = (event: MouseEvent) => {
   const target = event.target as Node;
-  if (triggerRef.value?.contains(target) || popoverRef.value?.contains(target)) {
+  if (
+    triggerRef.value?.contains(target) ||
+    popoverRef.value?.contains(target)
+  ) {
     return;
   }
   closeDropdown();
@@ -290,7 +295,7 @@ onUnmounted(() => {
         v-if="isOpen"
         :id="menuId"
         ref="popoverRef"
-        class="fixed z-[100] w-64 max-w-[calc(100vw-1rem)] rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+        class="fixed z-100 w-64 max-w-[calc(100vw-1rem)] rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
         :style="{
           top: `${adjustedPosition.top}px`,
           left: `${adjustedPosition.left}px`,
@@ -308,14 +313,11 @@ onUnmounted(() => {
           :aria-labelledby="triggerId"
           class="max-h-80 overflow-y-auto py-1"
         >
-          <li
-            v-for="edit in allEdits"
-            :key="edit.id"
-          >
+          <li v-for="edit in allEdits" :key="edit.id">
             <button
               type="button"
               role="menuitem"
-              class="flex w-full flex-col px-3 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 dark:hover:bg-gray-700"
+              class="flex w-full flex-col px-3 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-inset dark:hover:bg-gray-700"
               @click="openRevisionDiff(edit)"
             >
               <div class="flex items-center text-sm">

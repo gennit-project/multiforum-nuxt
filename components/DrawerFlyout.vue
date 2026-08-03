@@ -47,7 +47,7 @@ function closePreview() {
       >
         <div class="absolute inset-0 overflow-hidden">
           <DialogOverlay
-            class="absolute inset-y-0 bg-gray-900 bg-opacity-50"
+            class="absolute inset-y-0 bg-gray-900/50"
             :class="props.openFromLeft ? 'right-0' : 'left-0'"
           />
           <div
@@ -81,7 +81,7 @@ function closePreview() {
                             :ref="cancelButtonRef"
                             type="button"
                             :class="smAndDown ? 'ml-2' : 'ml-4'"
-                            class="rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:text-white"
+                            class="rounded-full text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-orange-500 focus:outline-none dark:text-white"
                             @click="closePreview"
                           >
                             <span
@@ -103,11 +103,11 @@ function closePreview() {
                       <slot />
                     </div>
                   </div>
-                  <div class="flex flex-shrink-0 justify-end px-4 py-4">
+                  <div class="flex shrink-0 justify-end px-4 py-4">
                     <button
                       type="button"
                       data-testid="close-drawer-bottom-button"
-                      class="hover:bg-gray-50 rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-200"
+                      class="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none dark:border-gray-700 dark:bg-gray-700 dark:text-gray-200"
                       @click="closePreview"
                     >
                       Close

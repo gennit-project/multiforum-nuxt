@@ -225,176 +225,176 @@ const getNavLabelClasses = (isActive: boolean) =>
 
 <template>
   <div
-    class="fixed left-0 top-0 z-[18] hidden h-full w-20 flex-col items-center border-r border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-900 lg:flex"
+    class="fixed top-0 left-0 z-18 hidden h-full w-20 flex-col items-center border-r border-gray-200 bg-gray-100 lg:flex dark:border-gray-700 dark:bg-gray-900"
     :class="{ 'py-2': isVerticallyShort, 'py-4': !isVerticallyShort }"
   >
-      <!-- Create Button -->
-      <div :class="{ 'mb-2': isVerticallyShort, 'mb-4': !isVerticallyShort }">
-        <CreateAnythingButton icon-only />
-      </div>
+    <!-- Create Button -->
+    <div :class="{ 'mb-2': isVerticallyShort, 'mb-4': !isVerticallyShort }">
+      <CreateAnythingButton icon-only />
+    </div>
 
-      <!-- Main Navigation Icons -->
-      <div
-        class="flex w-full flex-col px-2"
-        :class="{
-          'space-y-1': isVerticallyShort,
-          'space-y-2': !isVerticallyShort,
-        }"
+    <!-- Main Navigation Icons -->
+    <div
+      class="flex w-full flex-col px-2"
+      :class="{
+        'space-y-1': isVerticallyShort,
+        'space-y-2': !isVerticallyShort,
+      }"
+    >
+      <IconTooltip
+        v-for="item in navigation"
+        :key="item.name"
+        :text="item.name"
       >
+        <div class="w-full">
+          <NuxtLink
+            :to="
+              item.routerName === 'library'
+                ? item.href
+                : { name: item.routerName }
+            "
+            :aria-label="item.name"
+            :title="item.name"
+            :class="getNavItemClasses(isActiveNavItem(item.routerName))"
+          >
+            <component
+              :is="item.icon"
+              :class="getNavIconClasses(isActiveNavItem(item.routerName))"
+              aria-hidden="true"
+            />
+            <span :class="getNavLabelClasses(isActiveNavItem(item.routerName))">
+              {{ item.name }}
+            </span>
+          </NuxtLink>
+        </div>
+      </IconTooltip>
+    </div>
+
+    <!-- Divider -->
+    <div
+      v-if="!isVerticallyShort"
+      class="h-px w-8 bg-gray-200 dark:bg-gray-600"
+      :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"
+    />
+
+    <!-- Recent Forums (hidden when vertically short) -->
+    <ClientOnly>
+      <div
+        v-if="recentForums.length > 0 && !isVerticallyShort"
+        class="recent-forums-rail flex w-full flex-col items-center space-y-1"
+      >
+        <!-- Limited Recent Forums -->
         <IconTooltip
-          v-for="item in navigation"
-          :key="item.name"
-          :text="item.name"
+          v-for="forum in limitedRecentForums"
+          :key="forum.uniqueName"
+          :text="forum.uniqueName"
         >
-          <div class="w-full">
+          <div class="w-full px-2">
             <NuxtLink
-              :to="
-                item.routerName === 'library'
-                  ? item.href
-                  : { name: item.routerName }
-              "
-              :aria-label="item.name"
-              :title="item.name"
-              :class="getNavItemClasses(isActiveNavItem(item.routerName))"
+              :to="{
+                name: 'forums-forumId-discussions',
+                params: { forumId: forum.uniqueName },
+              }"
+              :aria-label="forum.uniqueName"
+              :title="forum.uniqueName"
+              :class="getNavItemClasses(currentForumId === forum.uniqueName)"
             >
-              <component
-                :is="item.icon"
-                :class="getNavIconClasses(isActiveNavItem(item.routerName))"
-                aria-hidden="true"
+              <AvatarComponent
+                class="h-8 w-8"
+                :text="forum.uniqueName || ''"
+                :src="forum?.channelIconURL ?? ''"
+                :is-small="true"
+                :is-square="false"
               />
-              <span :class="getNavLabelClasses(isActiveNavItem(item.routerName))">
-                {{ item.name }}
+              <span
+                :class="[
+                  getNavLabelClasses(currentForumId === forum.uniqueName),
+                  'truncate',
+                ]"
+              >
+                {{ forum.uniqueName }}
               </span>
             </NuxtLink>
           </div>
         </IconTooltip>
-      </div>
 
-      <!-- Divider -->
-      <div
-        v-if="!isVerticallyShort"
-        class="h-px w-8 bg-gray-200 dark:bg-gray-600"
-        :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"
-      />
-
-      <!-- Recent Forums (hidden when vertically short) -->
-      <ClientOnly>
-        <div
-          v-if="recentForums.length > 0 && !isVerticallyShort"
-          class="recent-forums-rail flex w-full flex-col items-center space-y-1"
-        >
-          <!-- Limited Recent Forums -->
-          <IconTooltip
-            v-for="forum in limitedRecentForums"
-            :key="forum.uniqueName"
-            :text="forum.uniqueName"
-          >
-            <div class="w-full px-2">
-              <NuxtLink
-                :to="{
-                  name: 'forums-forumId-discussions',
-                  params: { forumId: forum.uniqueName },
-                }"
-                :aria-label="forum.uniqueName"
-                :title="forum.uniqueName"
-                :class="getNavItemClasses(currentForumId === forum.uniqueName)"
+        <!-- More Button -->
+        <div v-if="hasMoreForums" class="w-full px-2">
+          <IconTooltip text="More Forums" class="block! w-full">
+            <button
+              type="button"
+              :class="getNavItemClasses(false)"
+              aria-label="More forums"
+              title="More forums"
+              @click="isDrawerOpen = true"
+            >
+              <MoreIcon :class="getNavIconClasses(false)" />
+              <span
+                class="w-full text-center text-[10px] leading-[10px] text-gray-600 dark:text-gray-300"
+                >More</span
               >
-                <AvatarComponent
-                  class="h-8 w-8"
-                  :text="forum.uniqueName || ''"
-                  :src="forum?.channelIconURL ?? ''"
-                  :is-small="true"
-                  :is-square="false"
-                />
-                <span
-                  :class="[
-                    getNavLabelClasses(currentForumId === forum.uniqueName),
-                    'truncate',
-                  ]"
-                >
-                  {{ forum.uniqueName }}
-                </span>
-              </NuxtLink>
-            </div>
+            </button>
           </IconTooltip>
-
-          <!-- More Button -->
-          <div v-if="hasMoreForums" class="w-full px-2">
-            <IconTooltip text="More Forums" class="!block w-full">
-              <button
-                type="button"
-                :class="getNavItemClasses(false)"
-                aria-label="More forums"
-                title="More forums"
-                @click="isDrawerOpen = true"
-              >
-                <MoreIcon :class="getNavIconClasses(false)" />
-                <span
-                  class="w-full text-center text-[10px] leading-[10px] text-gray-600 dark:text-gray-300"
-                  >More</span
-                >
-              </button>
-            </IconTooltip>
-          </div>
         </div>
+      </div>
+    </ClientOnly>
+
+    <!-- Divider -->
+    <div
+      class="h-px w-8 bg-gray-200 dark:bg-gray-600"
+      :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"
+    />
+
+    <!-- User Actions -->
+    <div
+      class="mt-auto flex w-full flex-col px-2"
+      :class="{
+        'space-y-1': isVerticallyShort,
+        'space-y-2': !isVerticallyShort,
+      }"
+    >
+      <!-- Admin Dashboard (server admins/mods only) -->
+      <ClientOnly>
+        <IconTooltip v-if="canSeeAdminDashboard" text="Admin Dashboard">
+          <div class="w-full">
+            <NuxtLink
+              to="/admin/issues"
+              aria-label="Admin dashboard"
+              title="Admin dashboard"
+              :class="getNavItemClasses(isActiveUserAction('admin-issues'))"
+            >
+              <AdminIcon />
+              <span
+                :class="getNavLabelClasses(isActiveUserAction('admin-issues'))"
+              >
+                Admin
+              </span>
+            </NuxtLink>
+          </div>
+        </IconTooltip>
       </ClientOnly>
 
-      <!-- Divider -->
-      <div
-        class="h-px w-8 bg-gray-200 dark:bg-gray-600"
-        :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"
-      />
-
-      <!-- User Actions -->
-      <div
-        class="mt-auto flex w-full flex-col px-2"
-        :class="{
-          'space-y-1': isVerticallyShort,
-          'space-y-2': !isVerticallyShort,
-        }"
-      >
-        <!-- Admin Dashboard (server admins/mods only) -->
-        <ClientOnly>
-          <IconTooltip v-if="canSeeAdminDashboard" text="Admin Dashboard">
+      <!-- Authentication-dependent actions -->
+      <ClientOnly>
+        <template #fallback>
+          <!-- Fallback: Show login icon as default -->
+          <IconTooltip text="Log In">
             <div class="w-full">
-              <NuxtLink
-                to="/admin/issues"
-                aria-label="Admin dashboard"
-                title="Admin dashboard"
-                :class="getNavItemClasses(isActiveUserAction('admin-issues'))"
-              >
-                <AdminIcon />
-                <span :class="getNavLabelClasses(isActiveUserAction('admin-issues'))">
-                  Admin
-                </span>
-              </NuxtLink>
+              <div :class="getNavItemClasses(false)">
+                <LoginIcon />
+                <span :class="getNavLabelClasses(false)"> Log in </span>
+              </div>
             </div>
           </IconTooltip>
-        </ClientOnly>
-
-        <!-- Authentication-dependent actions -->
-        <ClientOnly>
-          <template #fallback>
-            <!-- Fallback: Show login icon as default -->
-            <IconTooltip text="Log In">
-              <div class="w-full">
-                <div :class="getNavItemClasses(false)">
-                  <LoginIcon />
-                  <span :class="getNavLabelClasses(false)">
-                    Log in
-                  </span>
-                </div>
-              </div>
-            </IconTooltip>
-          </template>
-        </ClientOnly>
-      </div>
-
-      <!-- Recent Forums Drawer -->
-      <RecentForumsDrawer
-        :forums="recentForums"
-        :is-open="isDrawerOpen"
-        @close="isDrawerOpen = false"
-      />
+        </template>
+      </ClientOnly>
     </div>
+
+    <!-- Recent Forums Drawer -->
+    <RecentForumsDrawer
+      :forums="recentForums"
+      :is-open="isDrawerOpen"
+      @close="isDrawerOpen = false"
+    />
+  </div>
 </template>

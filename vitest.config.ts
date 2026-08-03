@@ -74,7 +74,6 @@ export default defineConfig({
         '**/*.config.*',
         '**/config.*',
         'nuxt.config.ts',
-        'tailwind.config.js',
         'vitest.config.ts',
         '.eslintrc.*',
         'cache.ts',

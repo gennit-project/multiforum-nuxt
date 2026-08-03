@@ -60,7 +60,9 @@ const placeholderText = computed(() => {
 
 const charactersRemaining = computed(() => MAX_TEXT_LENGTH - text.value.length);
 const isOverLimit = computed(() => charactersRemaining.value < 0);
-const isValid = computed(() => text.value.trim().length > 0 && !isOverLimit.value);
+const isValid = computed(
+  () => text.value.trim().length > 0 && !isOverLimit.value
+);
 
 // Reset text and focus textarea when modal opens
 watch(
@@ -83,8 +85,12 @@ const {
 } = useMutation(CREATE_SCRATCHPAD_ENTRY, {
   update: (cache, { data }) => {
     if (!data?.createScratchpadEntry) return;
-    const typename = props.sourceType === 'comment' ? 'Comment' : 'DiscussionChannel';
-    const cacheId = cache.identify({ __typename: typename, id: props.sourceId });
+    const typename =
+      props.sourceType === 'comment' ? 'Comment' : 'DiscussionChannel';
+    const cacheId = cache.identify({
+      __typename: typename,
+      id: props.sourceId,
+    });
     if (!cacheId) return;
     const me = usernameVar.value;
     // Be authoritative about the actor instead of trusting the server's returned
@@ -143,7 +149,7 @@ const handleSubmit = () => {
           leave-to="opacity-0"
         >
           <div
-            class="fixed inset-0 bg-gray-500/75 dark:bg-gray-900/75 transition-opacity"
+            class="fixed inset-0 bg-gray-500/75 transition-opacity dark:bg-gray-900/75"
           />
         </TransitionChild>
 
@@ -161,12 +167,12 @@ const handleSubmit = () => {
               leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <DialogPanel
-                class="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
+                class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 dark:bg-gray-800"
               >
                 <div>
                   <!-- Rainbow star icon -->
                   <div
-                    class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"
+                    class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-r from-pink-500 via-purple-500 to-indigo-500"
                   >
                     <StarIcon
                       class="h-6 w-6 fill-current text-white"
@@ -177,7 +183,7 @@ const handleSubmit = () => {
                   <div class="mt-3 sm:mt-5">
                     <DialogTitle
                       as="h3"
-                      class="text-center text-lg font-semibold leading-6 text-gray-900 dark:text-white"
+                      class="text-center text-lg leading-6 font-semibold text-gray-900 dark:text-white"
                     >
                       Super Upvote
                     </DialogTitle>
@@ -193,7 +199,11 @@ const handleSubmit = () => {
                       </NuxtLink>
                     </p>
 
-                    <ErrorBanner v-if="error" :text="error.message" class="mt-4" />
+                    <ErrorBanner
+                      v-if="error"
+                      :text="error.message"
+                      class="mt-4"
+                    />
 
                     <div class="mt-4">
                       <textarea
@@ -203,7 +213,7 @@ const handleSubmit = () => {
                         :placeholder="placeholderText"
                         rows="4"
                         :maxlength="MAX_TEXT_LENGTH + 50"
-                        class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none"
+                        class="w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500"
                         :class="{
                           'border-red-500 focus:border-red-500 focus:ring-red-500':
                             isOverLimit,
@@ -222,10 +232,12 @@ const handleSubmit = () => {
                   </div>
                 </div>
 
-                <div class="mt-5 sm:mt-6 flex flex-col-reverse sm:flex-row gap-3">
+                <div
+                  class="mt-5 flex flex-col-reverse gap-3 sm:mt-6 sm:flex-row"
+                >
                   <button
                     type="button"
-                    class="flex-1 inline-flex justify-center rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    class="inline-flex flex-1 justify-center rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                     @click="emit('close')"
                   >
                     Cancel
@@ -234,11 +246,12 @@ const handleSubmit = () => {
                     type="button"
                     data-testid="super-upvote-submit"
                     :disabled="!isValid || loading"
-                    class="flex-1 inline-flex justify-center items-center gap-2 rounded-full px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:cursor-not-allowed"
+                    class="inline-flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed"
                     :class="{
-                      'bg-purple-500 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 text-white':
+                      'bg-purple-500 bg-linear-to-r from-pink-500 via-purple-500 to-indigo-500 text-white hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600':
                         isValid && !loading,
-                      'bg-gray-200 text-gray-400 dark:bg-gray-600 dark:text-gray-400': !isValid || loading,
+                      'bg-gray-200 text-gray-400 dark:bg-gray-600 dark:text-gray-400':
+                        !isValid || loading,
                     }"
                     @click="handleSubmit"
                   >

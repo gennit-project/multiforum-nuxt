@@ -30,7 +30,6 @@ const DiscussionDetailContent = defineAsyncComponent(
   () => import('@/components/discussion/detail/DiscussionDetailContent.vue')
 );
 
-
 const DISCUSSION_PAGE_LIMIT = 15;
 
 // Props and Emits
@@ -164,7 +163,8 @@ watch(
 );
 
 const discussions = computed<SiteWideDiscussion[]>(() => {
-  const liveDiscussions = discussionResult.value?.getSiteWideDiscussionList?.discussions;
+  const liveDiscussions =
+    discussionResult.value?.getSiteWideDiscussionList?.discussions;
   if (liveDiscussions) {
     return liveDiscussions;
   }
@@ -206,14 +206,16 @@ const selectedDiscussionChannels = computed(() => {
 });
 
 const selectedDiscussionChannelLinks = computed(() => {
-  return selectedDiscussionChannels.value.map((discussionChannel: DiscussionChannel) => {
-    const commentCount = discussionChannel.CommentsAggregate?.count || 0;
-    return {
-      channelUniqueName: discussionChannel.channelUniqueName,
-      commentCount,
-      link: `/forums/${discussionChannel.channelUniqueName}/discussions/${selectedDiscussionId.value}`,
-    };
-  });
+  return selectedDiscussionChannels.value.map(
+    (discussionChannel: DiscussionChannel) => {
+      const commentCount = discussionChannel.CommentsAggregate?.count || 0;
+      return {
+        channelUniqueName: discussionChannel.channelUniqueName,
+        commentCount,
+        link: `/forums/${discussionChannel.channelUniqueName}/discussions/${selectedDiscussionId.value}`,
+      };
+    }
+  );
 });
 
 const aggregateDiscussionCount = computed(() => {
@@ -287,11 +289,11 @@ const filterByChannel = (channel: string) => {
 <template>
   <div class="flex w-full min-w-0 justify-center overflow-x-hidden">
     <div
-      class="w-full min-w-0 max-w-screen-2xl flex-1 bg-white dark:bg-black dark:text-white"
+      class="w-full max-w-[theme(screens.2xl)] min-w-0 flex-1 bg-white dark:bg-black dark:text-white"
     >
       <div class="relative w-full min-w-0">
         <div
-          class="flex min-w-0 flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row"
+          class="flex min-w-0 flex-col divide-x divide-gray-300 md:flex-row dark:divide-gray-500"
         >
           <div
             class="min-w-0 flex-1 md:px-2 lg:h-[calc(100vh-3.5rem)] lg:basis-0 lg:overflow-y-auto"
@@ -301,7 +303,7 @@ const filterByChannel = (channel: string) => {
               <button
                 v-if="serverConfig"
                 type="button"
-                class="hidden items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 lg:inline-flex"
+                class="hidden items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 lg:inline-flex dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
                 :aria-expanded="isSitewideSidebarOpen"
                 aria-controls="sitewide-sidebar-drawer"
                 @click="isSitewideSidebarOpen = true"
@@ -390,7 +392,7 @@ const filterByChannel = (channel: string) => {
           </div>
           <aside
             v-if="serverConfig"
-            class="min-w-0 flex-shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto lg:hidden"
+            class="min-w-0 shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto lg:hidden"
           >
             <SitewideDiscussionSidebar
               :server-config="serverConfig"
@@ -402,19 +404,19 @@ const filterByChannel = (channel: string) => {
           >
             <div
               v-if="selectedDiscussionId"
-              class="flex w-full min-w-0 max-w-full flex-col justify-center px-2 py-4"
+              class="flex w-full max-w-full min-w-0 flex-col justify-center px-2 py-4"
             >
               <h2 v-if="selectedDiscussionTitle" class="mb-3 min-w-0">
                 <nuxt-link
                   v-if="selectedDiscussionLink"
                   :to="selectedDiscussionLink"
-                  class="break-words text-lg font-semibold text-gray-900 underline dark:text-gray-100"
+                  class="text-lg font-semibold wrap-break-word text-gray-900 underline dark:text-gray-100"
                 >
                   {{ selectedDiscussionTitle }}
                 </nuxt-link>
                 <span
                   v-else
-                  class="break-words text-lg font-semibold text-gray-900 dark:text-gray-100"
+                  class="text-lg font-semibold wrap-break-word text-gray-900 dark:text-gray-100"
                 >
                   {{ selectedDiscussionTitle }}
                 </span>
@@ -424,12 +426,14 @@ const filterByChannel = (channel: string) => {
                 :channel-id="selectedChannelId"
                 :horizontal-album-thumbnails="true"
                 :show-comments="false"
-                class="w-full min-w-0 max-w-full"
+                class="w-full max-w-full min-w-0"
               />
               <div
                 class="mt-6 w-full min-w-0 rounded-lg border border-gray-200 p-4 dark:border-gray-700"
               >
-                <p class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-200">
+                <p
+                  class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-200"
+                >
                   Select a forum to view comments
                 </p>
                 <ul
@@ -450,9 +454,7 @@ const filterByChannel = (channel: string) => {
                     >
                       {{ channelLink.commentCount }}
                       {{
-                        channelLink.commentCount === 1
-                          ? 'comment'
-                          : 'comments'
+                        channelLink.commentCount === 1 ? 'comment' : 'comments'
                       }}
                     </nuxt-link>
                   </li>
@@ -462,10 +464,7 @@ const filterByChannel = (channel: string) => {
                 </p>
               </div>
             </div>
-            <div
-              v-else
-              class="h-full min-w-0 px-2 py-4 xl:px-6"
-            >
+            <div v-else class="h-full min-w-0 px-2 py-4 xl:px-6">
               <DiscussionDetailEmptyState />
             </div>
           </aside>
@@ -483,13 +482,17 @@ const filterByChannel = (channel: string) => {
           <div
             id="sitewide-sidebar-drawer"
             ref="sitewideSidebarRef"
-            class="absolute right-0 top-0 h-full w-full max-w-sm overflow-y-auto bg-white shadow-xl dark:bg-gray-900"
+            class="absolute top-0 right-0 h-full w-full max-w-sm overflow-y-auto bg-white shadow-xl dark:bg-gray-900"
             role="dialog"
             aria-modal="true"
             aria-label="About this forum"
           >
-            <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700">
-              <span class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            <div
+              class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700"
+            >
+              <span
+                class="text-sm font-semibold text-gray-900 dark:text-gray-100"
+              >
                 About
               </span>
               <button

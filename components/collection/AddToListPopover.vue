@@ -65,7 +65,9 @@ const popoverRef = ref<HTMLElement | null>(null);
 const searchTerm = ref('');
 const isCreatingNew = ref(false);
 const newCollectionName = ref('');
-const newCollectionVisibility = ref<CollectionVisibility>('PRIVATE' as CollectionVisibility);
+const newCollectionVisibility = ref<CollectionVisibility>(
+  'PRIVATE' as CollectionVisibility
+);
 const isLoading = ref(false);
 const toastStore = useToastStore();
 const popoverIdBase = `add-to-list-popover-${props.itemType}-${props.itemId.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
@@ -373,7 +375,7 @@ onUnmounted(() => {
 
 const popoverClasses = computed(() => {
   return [
-    'add-to-list-popover z-[9999] w-80 bg-white dark:bg-black border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg p-4',
+    'add-to-list-popover z-9999 w-80 bg-white dark:bg-black border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg p-4',
     isModal.value ? 'relative' : 'fixed',
   ]
     .filter(Boolean)
@@ -394,7 +396,7 @@ const popoverStyles = computed(() => {
   <Teleport to="body">
     <div
       v-if="isVisible && isModal"
-      class="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 px-4"
+      class="fixed inset-0 z-9998 flex items-center justify-center bg-black/50 px-4"
       @click="emit('close')"
     >
       <div
@@ -435,16 +437,19 @@ const popoverStyles = computed(() => {
             type="text"
             placeholder="Search lists..."
             aria-label="Search lists"
-            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-          >
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+          />
         </div>
 
         <!-- Create New List -->
         <div class="mb-3">
           <div v-if="!isCreatingNew">
             <button
-              class="hover:bg-blue-50 flex w-full items-center rounded-md px-3 py-2 text-sm text-blue-600 transition-colors dark:text-blue-400 dark:hover:bg-blue-900/20"
-              @click="resetCreateCollectionForm(); isCreatingNew = true"
+              class="flex w-full items-center rounded-md px-3 py-2 text-sm text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
+              @click="
+                resetCreateCollectionForm();
+                isCreatingNew = true;
+              "
             >
               <span class="mr-2">+</span>
               New List
@@ -456,17 +461,19 @@ const popoverStyles = computed(() => {
               type="text"
               placeholder="Enter list name..."
               aria-label="New list name"
-              class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+              class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
               @keyup.enter="handleCreateNewCollection"
               @keyup.escape="resetCreateCollectionForm"
+            />
+            <label
+              class="block text-xs font-medium text-gray-600 dark:text-gray-300"
             >
-            <label class="block text-xs font-medium text-gray-600 dark:text-gray-300">
               Visibility
             </label>
             <select
               v-model="newCollectionVisibility"
               aria-label="New list visibility"
-              class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             >
               <option value="PRIVATE">Private (default)</option>
               <option value="PUBLIC">Public</option>
@@ -483,7 +490,7 @@ const popoverStyles = computed(() => {
                 Create
               </button>
               <button
-                class="hover:bg-gray-50 flex-1 rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                class="flex-1 rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                 @click="resetCreateCollectionForm"
               >
                 Cancel
@@ -493,7 +500,7 @@ const popoverStyles = computed(() => {
         </div>
 
         <!-- Divider -->
-        <hr class="mb-3 border-gray-200 dark:border-gray-600" >
+        <hr class="mb-3 border-gray-200 dark:border-gray-600" />
 
         <!-- Lists -->
         <div class="max-h-64 space-y-1 overflow-y-auto">
@@ -501,7 +508,7 @@ const popoverStyles = computed(() => {
           <button
             type="button"
             :aria-pressed="isItemInFavorites"
-            class="hover:bg-gray-50 flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-gray-700"
+            class="flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-gray-700"
             @click.stop="handleToggleInCollection(favoritesList)"
           >
             <div class="flex items-center">
@@ -531,9 +538,9 @@ const popoverStyles = computed(() => {
             "
             class="my-2"
           >
-            <hr class="border-gray-200 dark:border-gray-600" >
+            <hr class="border-gray-200 dark:border-gray-600" />
             <div
-              class="mb-1 mt-2 px-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              class="mt-2 mb-1 px-3 text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
             >
               Collections
             </div>
@@ -549,7 +556,7 @@ const popoverStyles = computed(() => {
                 (c: CollectionListItem) => c.id === collection.id
               )
             "
-            class="hover:bg-gray-50 flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-gray-700"
+            class="flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-gray-700"
             @click.stop="handleToggleInCollection(collection)"
           >
             <div class="flex items-center">
@@ -609,18 +616,18 @@ const popoverStyles = computed(() => {
         </div>
       </div>
     </div>
-      <div
-        v-else-if="isVisible"
-        ref="popoverRef"
-        :class="popoverClasses"
-        :style="popoverStyles"
-        role="dialog"
-        aria-modal="false"
-        :aria-labelledby="popoverTitleId"
-        :aria-describedby="popoverDescriptionId"
-        tabindex="-1"
-        @click.stop
-      >
+    <div
+      v-else-if="isVisible"
+      ref="popoverRef"
+      :class="popoverClasses"
+      :style="popoverStyles"
+      role="dialog"
+      aria-modal="false"
+      :aria-labelledby="popoverTitleId"
+      :aria-describedby="popoverDescriptionId"
+      tabindex="-1"
+      @click.stop
+    >
       <!-- Header -->
       <div class="mb-3 flex items-center justify-between">
         <p
@@ -649,16 +656,19 @@ const popoverStyles = computed(() => {
           type="text"
           placeholder="Search lists..."
           aria-label="Search lists"
-          class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-        >
+          class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+        />
       </div>
 
       <!-- Create New List -->
       <div class="mb-3">
         <div v-if="!isCreatingNew">
           <button
-            class="hover:bg-blue-50 flex w-full items-center rounded-md px-3 py-2 text-sm text-blue-600 transition-colors dark:text-blue-400 dark:hover:bg-blue-900/20"
-            @click="resetCreateCollectionForm(); isCreatingNew = true"
+            class="flex w-full items-center rounded-md px-3 py-2 text-sm text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
+            @click="
+              resetCreateCollectionForm();
+              isCreatingNew = true;
+            "
           >
             <span class="mr-2">+</span>
             New List
@@ -670,17 +680,19 @@ const popoverStyles = computed(() => {
             type="text"
             placeholder="Enter list name..."
             aria-label="New list name"
-            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
             @keyup.enter="handleCreateNewCollection"
             @keyup.escape="resetCreateCollectionForm"
+          />
+          <label
+            class="block text-xs font-medium text-gray-600 dark:text-gray-300"
           >
-          <label class="block text-xs font-medium text-gray-600 dark:text-gray-300">
             Visibility
           </label>
           <select
             v-model="newCollectionVisibility"
             aria-label="New list visibility"
-            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
           >
             <option value="PRIVATE">Private (default)</option>
             <option value="PUBLIC">Public</option>
@@ -697,7 +709,7 @@ const popoverStyles = computed(() => {
               Create
             </button>
             <button
-              class="hover:bg-gray-50 flex-1 rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              class="flex-1 rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
               @click="resetCreateCollectionForm"
             >
               Cancel
@@ -707,7 +719,7 @@ const popoverStyles = computed(() => {
       </div>
 
       <!-- Divider -->
-      <hr class="mb-3 border-gray-200 dark:border-gray-600" >
+      <hr class="mb-3 border-gray-200 dark:border-gray-600" />
 
       <!-- Lists -->
       <div class="max-h-64 space-y-1 overflow-y-auto">
@@ -715,7 +727,7 @@ const popoverStyles = computed(() => {
         <button
           type="button"
           :aria-pressed="isItemInFavorites"
-          class="hover:bg-gray-50 flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-gray-700"
+          class="flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-gray-700"
           @click.stop="handleToggleInCollection(favoritesList)"
         >
           <div class="flex items-center">
@@ -745,9 +757,9 @@ const popoverStyles = computed(() => {
           "
           class="my-2"
         >
-          <hr class="border-gray-200 dark:border-gray-600" >
+          <hr class="border-gray-200 dark:border-gray-600" />
           <div
-            class="mb-1 mt-2 px-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+            class="mt-2 mb-1 px-3 text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
           >
             Collections
           </div>
@@ -763,7 +775,7 @@ const popoverStyles = computed(() => {
               (c: CollectionListItem) => c.id === collection.id
             )
           "
-          class="hover:bg-gray-50 flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-gray-700"
+          class="flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-gray-700"
           @click.stop="handleToggleInCollection(collection)"
         >
           <div class="flex items-center">

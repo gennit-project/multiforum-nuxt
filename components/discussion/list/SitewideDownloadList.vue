@@ -254,10 +254,12 @@ const handleCloseAlbum = () => {
 
 <template>
   <div class="flex justify-center">
-    <div class="max-w-screen-2xl flex-1 bg-white dark:bg-black dark:text-white">
+    <div
+      class="max-w-[theme(screens.2xl)] flex-1 bg-white dark:bg-black dark:text-white"
+    >
       <div class="relative w-full">
         <div
-          class="flex flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row"
+          class="flex flex-col divide-x divide-gray-300 md:flex-row dark:divide-gray-500"
         >
           <div class="flex-1 md:px-2">
             <slot />
@@ -329,7 +331,7 @@ const handleCloseAlbum = () => {
           </div>
           <aside
             v-if="serverConfig"
-            class="flex-shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto"
+            class="shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto"
           >
             <SitewideDiscussionSidebar
               :server-config="serverConfig"

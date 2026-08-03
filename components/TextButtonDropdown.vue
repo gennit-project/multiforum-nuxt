@@ -39,12 +39,12 @@ function handleClick(item: MenuItemType) {
       <div>
         <MenuButton
           :data-testid="`text-dropdown-${label}`"
-          class="inline-flex h-9 w-full items-center justify-center gap-x-1.5 rounded-md border border-gray-300 bg-white pl-3 pr-4 text-xs font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:border-gray-600 dark:bg-gray-900 dark:text-white hover:dark:bg-gray-800"
+          class="inline-flex h-9 w-full items-center justify-center gap-x-1.5 rounded-md border border-gray-300 bg-white pr-4 pl-3 text-xs font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:border-gray-600 dark:bg-gray-900 dark:text-white hover:dark:bg-gray-800"
         >
           <SortIcon v-if="showSortIcon" class="h-4 w-4" aria-hidden="true" />
           {{ label }}
           <ChevronDownIcon
-            class="-mr-1 ml-1 mt-0.5 h-3 w-3"
+            class="mt-0.5 -mr-1 ml-1 h-3 w-3"
             aria-hidden="true"
           />
         </MenuButton>
@@ -58,7 +58,7 @@ function handleClick(item: MenuItemType) {
         leave-to-class="transform opacity-0 scale-95"
       >
         <MenuItems
-          class="top absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700 dark:text-gray-200"
+          class="top absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none dark:bg-gray-700 dark:text-gray-200"
         >
           <div class="py-1">
             <MenuItem
@@ -87,11 +87,11 @@ function handleClick(item: MenuItemType) {
     <template #fallback>
       <button
         :data-testid="`text-dropdown-${label}`"
-        class="inline-flex h-9 w-full items-center justify-center gap-x-1.5 rounded-md border border-gray-300 bg-white pl-3 pr-4 text-xs font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:border-gray-600 dark:bg-gray-900 dark:text-white hover:dark:bg-gray-800"
+        class="inline-flex h-9 w-full items-center justify-center gap-x-1.5 rounded-md border border-gray-300 bg-white pr-4 pl-3 text-xs font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:border-gray-600 dark:bg-gray-900 dark:text-white hover:dark:bg-gray-800"
       >
         <SortIcon v-if="showSortIcon" class="h-4 w-4" aria-hidden="true" />
         {{ label }}
-        <ChevronDownIcon class="-mr-1 ml-1 mt-0.5 h-3 w-3" aria-hidden="true" />
+        <ChevronDownIcon class="mt-0.5 -mr-1 ml-1 h-3 w-3" aria-hidden="true" />
       </button>
     </template>
   </client-only>

@@ -45,7 +45,9 @@ const props = defineProps({
 const emit = defineEmits(['updated', 'deleted']);
 
 const authorDisplayName = computed(() => {
-  return props.entry.Author?.displayName || props.entry.Author?.username || 'Unknown';
+  return (
+    props.entry.Author?.displayName || props.entry.Author?.username || 'Unknown'
+  );
 });
 
 const sourceLink = computed(() => {
@@ -118,7 +120,11 @@ const handleMakePrivate = () => {
 };
 
 const handleDelete = () => {
-  if (confirm('Are you sure you want to delete this entry? This cannot be undone.')) {
+  if (
+    confirm(
+      'Are you sure you want to delete this entry? This cannot be undone.'
+    )
+  ) {
     deleteEntry({
       scratchpadEntryId: props.entry.id,
     });
@@ -133,8 +139,10 @@ const isLoading = computed(() => updateLoading.value || deleteLoading.value);
     data-testid="scratchpad-entry"
     class="rounded-lg border p-4"
     :class="{
-      'border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800': entry.isPublic,
-      'border-yellow-200 bg-yellow-50 dark:border-yellow-700 dark:bg-yellow-900/20': !entry.isPublic,
+      'border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800':
+        entry.isPublic,
+      'border-yellow-200 bg-yellow-50 dark:border-yellow-700 dark:bg-yellow-900/20':
+        !entry.isPublic,
     }"
   >
     <ErrorBanner v-if="updateError" :text="updateError.message" class="mb-3" />
@@ -152,7 +160,7 @@ const isLoading = computed(() => updateLoading.value || deleteLoading.value);
 
     <!-- Header with author info -->
     <div class="flex items-start gap-3">
-      <NuxtLink :to="`/u/${entry.Author?.username}`" class="flex-shrink-0">
+      <NuxtLink :to="`/u/${entry.Author?.username}`" class="shrink-0">
         <AvatarComponent
           :src="entry.Author?.profilePicURL"
           :text="entry.Author?.username || 'U'"

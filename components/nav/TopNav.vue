@@ -82,11 +82,11 @@ const isOnMapPage = computed(() => {
 
 <template>
   <nav
-    class="top-nav-shell relative z-20 h-14 border-y border-white/10 bg-gray-100 pr-4 text-white dark:bg-gray-900 lg:ml-20"
+    class="top-nav-shell relative z-20 h-14 border-y border-white/10 bg-gray-100 pr-4 text-white lg:ml-20 dark:bg-gray-900"
     :class="[isOnMapPage ? 'fixed w-full lg:w-[calc(100%-5rem)]' : '']"
     aria-label="Top navigation"
   >
-    <div class="flex h-full items-center justify-between pl-14 pr-3 lg:px-5">
+    <div class="flex h-full items-center justify-between pr-3 pl-14 lg:px-5">
       <div class="flex min-w-0 items-center overflow-hidden">
         <HamburgerMenuButton
           v-if="!sideNavIsOpenVar"
@@ -99,7 +99,7 @@ const isOnMapPage = computed(() => {
         <div class="ml-2 flex min-w-0 items-center gap-2 lg:gap-3">
           <nuxt-link to="/" class="flex items-center">
             <h1
-              class="logo-font text-[1.2rem] font-semibold leading-none tracking-[-0.04em] text-gray-900 dark:text-white lg:text-[1.3rem]"
+              class="logo-font text-[1.2rem] leading-none font-semibold tracking-[-0.04em] text-gray-900 lg:text-[1.3rem] dark:text-white"
             >
               {{ config.serverDisplayName }}
             </h1>
@@ -140,7 +140,7 @@ const isOnMapPage = computed(() => {
           v-if="!smAndDown"
           class="hidden min-w-0 flex-1 justify-center px-4 md:flex"
         >
-          <div class="w-full min-w-0 max-w-xl">
+          <div class="w-full max-w-xl min-w-0">
             <TopNavSearch />
           </div>
         </div>
@@ -179,14 +179,18 @@ const isOnMapPage = computed(() => {
           <nuxt-link
             data-testid="notification-bell"
             to="/notifications"
-            :aria-label="notificationCountVar > 0 ? `${notificationCountVar} new notifications` : 'Notifications'"
+            :aria-label="
+              notificationCountVar > 0
+                ? `${notificationCountVar} new notifications`
+                : 'Notifications'
+            "
             class="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-200 hover:text-gray-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white"
           >
             <BellIcon class="h-6 w-6" aria-hidden="true" />
             <span
               v-if="notificationCountVar > 0"
               aria-hidden="true"
-              class="font-semibold absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-xs leading-none text-white"
+              class="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-xs leading-none font-semibold text-white"
             >
               {{ notificationCountVar }}
             </span>
@@ -194,7 +198,7 @@ const isOnMapPage = computed(() => {
           <ThemeSwitcher />
           <div v-if="usernameVar && !smAndDown" class="hidden md:block">
             <div class="flex items-center">
-              <div class="relative flex-shrink-0">
+              <div class="relative shrink-0">
                 <UserProfileDropdownMenu
                   :username="usernameVar"
                   :mod-name="modProfileNameVar"

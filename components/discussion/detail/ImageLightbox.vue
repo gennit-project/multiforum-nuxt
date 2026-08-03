@@ -325,7 +325,7 @@ onUnmounted(() => {
 <template>
   <div
     ref="lightboxRef"
-    class="fixed left-0 top-0 z-[1000] flex h-full w-full bg-black transition-all duration-300 ease-in-out"
+    class="fixed top-0 left-0 z-1000 flex h-full w-full bg-black transition-all duration-300 ease-in-out"
     role="dialog"
     aria-modal="true"
     aria-label="Image lightbox"

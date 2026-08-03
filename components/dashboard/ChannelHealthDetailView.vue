@@ -244,7 +244,7 @@ const refreshDashboard = () => {
 </script>
 
 <template>
-  <div class="space-y-5 px-2 py-4 dark:text-white md:px-4">
+  <div class="space-y-5 px-2 py-4 md:px-4 dark:text-white">
     <header
       class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between"
     >
@@ -257,7 +257,9 @@ const refreshDashboard = () => {
           <ArrowLeft class="h-4 w-4" />
           {{ backLabel }}
         </NuxtLink>
-        <h1 class="mt-2 font-semibold text-2xl text-gray-900 dark:text-gray-100">
+        <h1
+          class="mt-2 text-2xl font-semibold text-gray-900 dark:text-gray-100"
+        >
           {{ detailHeading }}
         </h1>
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
@@ -267,7 +269,9 @@ const refreshDashboard = () => {
           v-if="channel"
           class="mt-3 flex flex-wrap items-center gap-2 text-sm"
         >
-          <span class="rounded-full bg-blue-100 px-2.5 py-1 font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-100">
+          <span
+            class="rounded-full bg-blue-100 px-2.5 py-1 font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-100"
+          >
             {{ channel.healthLabel }}
           </span>
           <span class="text-gray-500 dark:text-gray-400">
@@ -290,8 +294,8 @@ const refreshDashboard = () => {
           <input
             v-model="startDate"
             type="date"
-            class="rounded-md border-gray-300 text-sm text-gray-900 [color-scheme:light] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:[color-scheme:dark]"
-          >
+            class="rounded-md border-gray-300 text-sm text-gray-900 scheme-light dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:scheme-dark"
+          />
         </label>
         <label
           class="flex flex-col gap-1 text-xs font-medium text-gray-600 dark:text-gray-300"
@@ -300,8 +304,8 @@ const refreshDashboard = () => {
           <input
             v-model="endDate"
             type="date"
-            class="rounded-md border-gray-300 text-sm text-gray-900 [color-scheme:light] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:[color-scheme:dark]"
-          >
+            class="rounded-md border-gray-300 text-sm text-gray-900 scheme-light dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:scheme-dark"
+          />
         </label>
         <button
           type="button"
@@ -351,10 +355,14 @@ const refreshDashboard = () => {
             :key="card.label"
             class="rounded-lg border border-gray-200 bg-white p-4 !text-gray-900 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:!text-gray-100"
           >
-            <p class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
+            <p
+              class="text-xs font-medium text-gray-500 uppercase dark:text-gray-400"
+            >
               {{ card.label }}
             </p>
-            <p class="mt-2 text-2xl font-semibold !text-gray-900 dark:!text-gray-100">
+            <p
+              class="mt-2 text-2xl font-semibold !text-gray-900 dark:!text-gray-100"
+            >
               {{ card.value }}
             </p>
             <p class="mt-3 text-sm text-gray-600 dark:text-gray-300">
@@ -379,7 +387,8 @@ const refreshDashboard = () => {
         v-else
         class="rounded-lg border border-dashed border-gray-300 px-4 py-6 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400"
       >
-        No channel health data was returned for this channel in the selected range.
+        No channel health data was returned for this channel in the selected
+        range.
       </div>
     </ClientOnly>
   </div>

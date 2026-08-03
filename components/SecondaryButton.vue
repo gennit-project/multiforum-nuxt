@@ -13,7 +13,7 @@ const props = withDefaults(
   {
     disabled: false,
     size: 'md',
-  },
+  }
 );
 
 const sizeClasses = computed(() =>
@@ -25,12 +25,11 @@ const sizeClasses = computed(() =>
     :disabled="disabled"
     :class="[
       disabled
-        ? 'cursor-default bg-gray-200 text-gray-600'
-        : 'text-gray-700 hover:bg-gray-400 dark:text-white dark:hover:bg-gray-600',
+        ? 'cursor-default bg-gray-200 text-gray-600 dark:bg-gray-200/60'
+        : 'text-gray-700 hover:bg-gray-400 dark:text-white dark:hover:bg-gray-600/60',
       sizeClasses,
-      'dark:bg-opacity-60', // class for controlling the background opacity in dark mode
     ]"
-    class="max-height-4 inline-flex items-center whitespace-nowrap rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-100"
+    class="max-height-4 inline-flex items-center rounded-md font-medium whitespace-nowrap focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-100 focus:outline-none"
   >
     <slot />{{ label }}
   </button>

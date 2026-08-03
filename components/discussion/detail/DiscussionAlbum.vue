@@ -315,7 +315,7 @@ onMounted(() => {
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="shadow-sm"
-          >
+          />
           <div
             v-if="editingCaptionIndex === idx"
             class="mt-1 text-center text-xs"
@@ -348,7 +348,7 @@ onMounted(() => {
               <span>{{ image.caption }}</span>
               <span
                 v-if="isLoggedInAuthor"
-                class="bg-transparent ml-2 inline-flex cursor-pointer rounded-full border-0 p-1 text-white transition-colors hover:bg-gray-800"
+                class="ml-2 inline-flex cursor-pointer rounded-full border-0 bg-transparent p-1 text-white transition-colors hover:bg-gray-800"
                 role="button"
                 tabindex="0"
                 @click.stop="startEditingCaption(idx)"
@@ -358,7 +358,7 @@ onMounted(() => {
                 <PencilIcon class="re h-3 w-3" />
               </span>
             </span>
-            <span v-else-if="!isLoggedInAuthor" class="italic text-gray-400"
+            <span v-else-if="!isLoggedInAuthor" class="text-gray-400 italic"
               >No caption</span
             >
             <span
@@ -394,13 +394,13 @@ onMounted(() => {
           v-if="expandedView && orderedImages.length > 1"
           class="order-2"
           :class="{
-            'lg:order-1 lg:flex-shrink-0': !horizontalExpandedThumbnails,
+            'lg:order-1 lg:shrink-0': !horizontalExpandedThumbnails,
           }"
         >
           <div
             class="flex w-full max-w-full gap-2 overflow-x-auto p-2"
             :class="{
-              'lg:flex-col lg:overflow-y-auto lg:overflow-x-visible':
+              'lg:flex-col lg:overflow-x-visible lg:overflow-y-auto':
                 !horizontalExpandedThumbnails,
             }"
             :style="
@@ -438,7 +438,7 @@ onMounted(() => {
               data-testid="discussion-album-carousel"
               class="relative touch-pan-y overflow-hidden rounded-lg dark:text-white"
               :class="{
-                'w-full min-w-0 max-w-full': expandedView,
+                'w-full max-w-full min-w-0': expandedView,
                 'max-w-96': !expandedView,
               }"
               :style="{
@@ -447,14 +447,14 @@ onMounted(() => {
               @touchstart="handleTouchStart"
               @touchend="handleTouchEnd"
             >
-              <div class="pointer-events-none absolute left-2 top-2 z-10">
+              <div class="pointer-events-none absolute top-2 left-2 z-10">
                 <span class="rounded bg-black/60 px-2 py-1 text-xs text-white">
                   {{ `${activeIndex + 1} of ${orderedImages.length}` }}
                 </span>
               </div>
               <div
                 v-if="orderedImages.length > 1"
-                class="absolute left-2 top-1/2 z-10 -translate-y-1/2"
+                class="absolute top-1/2 left-2 z-10 -translate-y-1/2"
               >
                 <button
                   type="button"
@@ -467,7 +467,7 @@ onMounted(() => {
               </div>
               <div
                 v-if="orderedImages.length > 1"
-                class="absolute right-2 top-1/2 z-10 -translate-y-1/2"
+                class="absolute top-1/2 right-2 z-10 -translate-y-1/2"
               >
                 <button
                   type="button"
@@ -490,7 +490,11 @@ onMounted(() => {
                     hasGlbExtension(activeImage.url)
                   "
                   :model-url="activeImage.url"
-                  :model-alt="activeImage.alt || activeImage.caption || 'Interactive 3D model'"
+                  :model-alt="
+                    activeImage.alt ||
+                    activeImage.caption ||
+                    'Interactive 3D model'
+                  "
                   :height="expandedView ? '400px' : '256px'"
                   class="object-contain shadow-sm"
                   :style="{
@@ -536,7 +540,7 @@ onMounted(() => {
                     maxHeight: expandedView ? 'none' : `${mainImageHeight}px`,
                     height: expandedView ? '100%' : 'auto',
                   }"
-                >
+                />
               </div>
             </div>
           </div>
@@ -583,7 +587,7 @@ onMounted(() => {
             {{ activeImage.caption }}
           </span>
         </div>
-        <div v-else class="h-3"/>
+        <div v-else class="h-3" />
       </div>
     </div>
 

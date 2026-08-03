@@ -13,14 +13,14 @@ const hideOverlay = () => {
   <Transition name="fade">
     <div
       v-if="!enteredDevelopmentEnvironmentVar"
-      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-90"
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/90"
     >
       <div class="mb-8 text-2xl font-bold text-white md:text-4xl">
         This is a remote development environment
       </div>
       <button
         type="button"
-        class="font-semibold rounded-lg bg-orange-600 px-8 py-3 text-lg text-white transition-colors hover:bg-orange-700"
+        class="rounded-lg bg-orange-600 px-8 py-3 text-lg font-semibold text-white transition-colors hover:bg-orange-700"
         @click="hideOverlay"
       >
         Enter

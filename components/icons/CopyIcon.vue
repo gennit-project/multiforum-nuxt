@@ -1,6 +1,7 @@
 <template>
-  <svg aria-hidden="true"
-    class="mr-1 h-4 w-4 flex-shrink-0"
+  <svg
+    aria-hidden="true"
+    class="mr-1 h-4 w-4 shrink-0"
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"

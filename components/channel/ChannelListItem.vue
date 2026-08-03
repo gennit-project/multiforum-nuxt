@@ -34,11 +34,11 @@ defineEmits(['filterByTag']);
 
 <template>
   <div
-    class="hover:bg-gray-50 bg-white px-6 py-4 dark:bg-black dark:text-gray-200 dark:hover:bg-gray-900"
+    class="bg-white px-6 py-4 hover:bg-gray-50 dark:bg-black dark:text-gray-200 dark:hover:bg-gray-900"
   >
     <div class="flex items-start gap-4">
       <!-- Avatar -->
-      <div class="flex-shrink-0">
+      <div class="shrink-0">
         <nuxt-link
           :to="`/forums/${channel.uniqueName}/discussions`"
           :aria-label="`Open forum ${channel.displayName || channel.uniqueName}`"
@@ -64,7 +64,7 @@ defineEmits(['filterByTag']);
           >
             <h3
               v-if="channel.displayName"
-              class="font-semibold text-lg text-gray-900 dark:text-gray-100"
+              class="text-lg font-semibold text-gray-900 dark:text-gray-100"
             >
               <HighlightedSearchTerms
                 :text="channel.displayName"
@@ -111,7 +111,7 @@ defineEmits(['filterByTag']);
 
       <!-- Stats sidebar -->
       <div
-        class="hidden flex-col items-end gap-2 text-sm text-gray-500 dark:text-gray-400 sm:flex"
+        class="hidden flex-col items-end gap-2 text-sm text-gray-500 sm:flex dark:text-gray-400"
       >
         <nuxt-link
           :to="`/forums/${channel.uniqueName}/discussions`"

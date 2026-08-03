@@ -5,12 +5,13 @@ import FilterChip from '@/components/FilterChip.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import SearchableForumList from '@/components/channel/SearchableForumList.vue';
 import TextButtonDropdown from '@/components/TextButtonDropdown.vue';
-import { issueSortOptions, type IssueSortValue } from '@/utils/issueSortOptions';
+import {
+  issueSortOptions,
+  type IssueSortValue,
+} from '@/utils/issueSortOptions';
 
 type InvolvementFilterKey =
-  | 'filterCreatedByMe'
-  | 'filterIAmOP'
-  | 'filterIReported';
+  'filterCreatedByMe' | 'filterIAmOP' | 'filterIReported';
 
 const props = withDefaults(
   defineProps<{
@@ -107,14 +108,11 @@ const issueScopeLabel = computed(() =>
           :value="startDate"
           type="date"
           data-testid="admin-issues-start-date"
-          class="rounded-md border-gray-300 px-2 py-1 text-sm text-gray-900 [color-scheme:light] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:[color-scheme:dark]"
+          class="rounded-md border-gray-300 px-2 py-1 text-sm text-gray-900 scheme-light dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:scheme-dark"
           @input="
-            emit(
-              'update:startDate',
-              ($event.target as HTMLInputElement).value
-            )
+            emit('update:startDate', ($event.target as HTMLInputElement).value)
           "
-        >
+        />
       </label>
       <label
         class="flex flex-col gap-1 text-xs font-medium text-gray-600 dark:text-gray-300"
@@ -124,14 +122,11 @@ const issueScopeLabel = computed(() =>
           :value="endDate"
           type="date"
           data-testid="admin-issues-end-date"
-          class="rounded-md border-gray-300 px-2 py-1 text-sm text-gray-900 [color-scheme:light] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:[color-scheme:dark]"
+          class="rounded-md border-gray-300 px-2 py-1 text-sm text-gray-900 scheme-light dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:scheme-dark"
           @input="
-            emit(
-              'update:endDate',
-              ($event.target as HTMLInputElement).value
-            )
+            emit('update:endDate', ($event.target as HTMLInputElement).value)
           "
-        >
+        />
       </label>
     </div>
     <div
@@ -155,7 +150,7 @@ const issueScopeLabel = computed(() =>
               value: ($event.target as HTMLInputElement).checked,
             })
           "
-        >
+        />
         {{ filter.label }}
       </label>
     </div>
@@ -184,7 +179,7 @@ const issueScopeLabel = computed(() =>
         data-testid="admin-issues-channel-filter"
       >
         <template #icon>
-          <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />
+          <ChannelIcon class="mr-2 -ml-0.5 h-4 w-4" />
         </template>
         <template #content>
           <div class="relative w-96">

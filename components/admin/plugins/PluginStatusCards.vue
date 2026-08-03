@@ -22,9 +22,13 @@ const emit = defineEmits<{
       class="rounded-xl border-2 border-green-300 bg-green-50 p-6 dark:border-green-700 dark:bg-green-900/30"
     >
       <div class="flex items-center">
-        <div class="flex-shrink-0">
-          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-800">
-            <i class="fa-solid fa-check text-2xl text-green-600 dark:text-green-300" />
+        <div class="shrink-0">
+          <div
+            class="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-800"
+          >
+            <i
+              class="fa-solid fa-check text-2xl text-green-600 dark:text-green-300"
+            />
           </div>
         </div>
         <div class="ml-4">
@@ -32,7 +36,8 @@ const emit = defineEmits<{
             Plugin Installed
           </p>
           <p class="text-sm text-green-700 dark:text-green-300">
-            Version <span class="font-mono font-semibold">v{{ installedVersion }}</span>
+            Version
+            <span class="font-mono font-semibold">v{{ installedVersion }}</span>
           </p>
         </div>
       </div>
@@ -43,14 +48,18 @@ const emit = defineEmits<{
         'rounded-xl border-2 p-6 transition-all',
         isEnabled
           ? 'border-blue-300 bg-blue-50 dark:border-blue-700 dark:bg-blue-900/30'
-          : 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/50'
+          : 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/50',
       ]"
     >
       <div v-if="isEnabled" class="flex items-center justify-between">
         <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-800">
-              <i class="fa-solid fa-power-off text-2xl text-blue-600 dark:text-blue-300" />
+          <div class="shrink-0">
+            <div
+              class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-800"
+            >
+              <i
+                class="fa-solid fa-power-off text-2xl text-blue-600 dark:text-blue-300"
+              />
             </div>
           </div>
           <div class="ml-4">
@@ -64,7 +73,7 @@ const emit = defineEmits<{
         </div>
         <button
           type="button"
-          class="rounded-lg border border-blue-300 bg-white px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-blue-600 dark:bg-blue-800 dark:text-blue-200 dark:hover:bg-blue-700"
+          class="rounded-lg border border-blue-300 bg-white px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:border-blue-600 dark:bg-blue-800 dark:text-blue-200 dark:hover:bg-blue-700"
           :disabled="enabling"
           @click="emit('toggle-enabled', false)"
         >
@@ -74,19 +83,27 @@ const emit = defineEmits<{
       </div>
 
       <div v-else class="flex flex-col items-center text-center">
-        <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
-          <i class="fa-solid fa-power-off text-2xl text-gray-500 dark:text-gray-400" />
+        <div
+          class="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700"
+        >
+          <i
+            class="fa-solid fa-power-off text-2xl text-gray-500 dark:text-gray-400"
+          />
         </div>
         <p class="mt-3 text-lg font-semibold text-gray-800 dark:text-gray-200">
           Plugin Disabled
         </p>
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-          {{ canEnable ? 'Ready to enable' : 'Complete required configuration first' }}
+          {{
+            canEnable
+              ? 'Ready to enable'
+              : 'Complete required configuration first'
+          }}
         </p>
         <button
           v-if="canEnable"
           type="button"
-          class="mt-4 w-full rounded-lg bg-green-700 px-6 py-3 text-lg font-semibold text-white shadow-lg hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          class="mt-4 w-full rounded-lg bg-green-700 px-6 py-3 text-lg font-semibold text-white shadow-lg hover:bg-green-800 focus:ring-2 focus:ring-green-600 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           :disabled="enabling"
           @click="emit('toggle-enabled', true)"
         >
@@ -94,7 +111,10 @@ const emit = defineEmits<{
           <i v-else class="fa-solid fa-power-off mr-2" />
           Enable Plugin
         </button>
-        <p v-if="canEnable" class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+        <p
+          v-if="canEnable"
+          class="mt-3 text-xs text-gray-500 dark:text-gray-400"
+        >
           <i class="fa-solid fa-info-circle mr-1" />
           After enabling, restart the backend for changes to take effect
         </p>
@@ -106,22 +126,29 @@ const emit = defineEmits<{
             <i class="fa-solid fa-lock mr-1" />
             Required before enabling
           </p>
-          <ul v-if="blockingConfigFields?.length" class="mt-2 list-disc space-y-1 pl-5">
+          <ul
+            v-if="blockingConfigFields?.length"
+            class="mt-2 list-disc space-y-1 pl-5"
+          >
             <li
               v-for="(field, index) in blockingConfigFields"
               :key="`${field.kind}:${field.key}:${index}`"
             >
               <button
                 type="button"
-                class="rounded-sm text-left underline decoration-amber-600/60 underline-offset-2 hover:decoration-current focus:outline-none focus:ring-2 focus:ring-amber-700 focus:ring-offset-2 focus:ring-offset-amber-50 dark:focus:ring-amber-300 dark:focus:ring-offset-amber-950"
+                class="rounded-sm text-left underline decoration-amber-600/60 underline-offset-2 hover:decoration-current focus:ring-2 focus:ring-amber-700 focus:ring-offset-2 focus:ring-offset-amber-50 focus:outline-none dark:focus:ring-amber-300 dark:focus:ring-offset-amber-950"
                 @click="emit('focus-config-field', field)"
               >
                 {{ field.label }}
-                <span class="text-xs opacity-80">({{ field.kind.toLowerCase() }})</span>
+                <span class="text-xs opacity-80"
+                  >({{ field.kind.toLowerCase() }})</span
+                >
               </button>
             </li>
           </ul>
-          <p v-else class="mt-1 text-xs">Configure the required fields below.</p>
+          <p v-else class="mt-1 text-xs">
+            Configure the required fields below.
+          </p>
         </div>
       </div>
     </div>

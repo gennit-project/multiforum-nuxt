@@ -155,7 +155,7 @@ const getOccurrenceLabel = (index: number): string => {
     >
       <!-- Date number indicator -->
       <div
-        class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-orange-100 text-sm font-medium text-orange-700 dark:bg-orange-900 dark:text-orange-200"
+        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-100 text-sm font-medium text-orange-700 dark:bg-orange-900 dark:text-orange-200"
       >
         {{ index + 1 }}
       </div>

@@ -50,8 +50,8 @@ const upload = async (file: File) => {
       contentType: file.type,
     });
 
-    const signedUpload = signedUrlResult?.data
-      ?.createSignedStorageURL as SignedStorageUrlPayload | undefined;
+    const signedUpload = signedUrlResult?.data?.createSignedStorageURL as
+      SignedStorageUrlPayload | undefined;
     const signedStorageURL = signedUpload?.url || '';
     const embeddedLink = uploadAndGetEmbeddedLink({
       file,
@@ -105,12 +105,12 @@ const removeImage = () => {
         alt="Cover Image"
         :src="imageUrl"
         class="h-auto max-h-64 w-full object-cover"
-      >
+      />
 
       <!-- Image overlay when loading -->
       <div
         v-if="coverImageLoading"
-        class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50"
+        class="absolute inset-0 flex items-center justify-center bg-black/50"
       >
         <div class="flex flex-col items-center text-white">
           <LoadingSpinner class="h-8 w-8 text-white" />
@@ -145,7 +145,7 @@ const removeImage = () => {
 
   <div
     v-else-if="coverImageLoading"
-    class="bg-gray-50 mb-3 rounded-md border border-gray-200 p-6 dark:border-gray-600 dark:bg-gray-700"
+    class="mb-3 rounded-md border border-gray-200 bg-gray-50 p-6 dark:border-gray-600 dark:bg-gray-700"
   >
     <div
       class="flex flex-col items-center justify-center space-y-2 text-gray-500 dark:text-gray-300"
@@ -157,9 +157,11 @@ const removeImage = () => {
 
   <div v-else class="mb-3">
     <div
-      class="bg-gray-50 rounded-md border border-dashed border-gray-300 p-8 text-center dark:border-gray-600 dark:bg-gray-800"
+      class="rounded-md border border-dashed border-gray-300 bg-gray-50 p-8 text-center dark:border-gray-600 dark:bg-gray-800"
     >
-      <ImageIcon class="mx-auto mb-3 h-8 w-8 text-gray-400 dark:text-gray-500" />
+      <ImageIcon
+        class="mx-auto mb-3 h-8 w-8 text-gray-400 dark:text-gray-500"
+      />
       <span class="mb-3 block text-sm text-gray-500 dark:text-gray-400">
         No cover image uploaded
       </span>

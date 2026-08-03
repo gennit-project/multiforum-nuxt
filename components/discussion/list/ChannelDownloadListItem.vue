@@ -119,7 +119,9 @@ const filteredQuery = computed(() => {
 </script>
 
 <template>
-  <li class="flex overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+  <li
+    class="flex overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
+  >
     <div class="flex w-full flex-col">
       <div v-if="discussion" class="w-full flex-col">
         <div class="relative">
@@ -142,7 +144,7 @@ const filteredQuery = computed(() => {
                 :src="firstAlbumImage"
                 :alt="title"
                 class="h-full w-full object-cover"
-              >
+              />
               <div
                 v-else
                 class="flex h-full w-full items-center justify-center text-center text-sm text-gray-500 dark:text-gray-400"
@@ -153,10 +155,12 @@ const filteredQuery = computed(() => {
           </nuxt-link>
 
           <!-- Bottom gradient overlay with metadata -->
-          <div class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/40 to-transparent px-3 pb-2 pt-12">
+          <div
+            class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col justify-end bg-linear-to-t from-black/80 via-black/40 to-transparent px-3 pt-12 pb-2"
+          >
             <div class="flex items-start gap-2">
               <nuxt-link
-                class="pointer-events-auto line-clamp-2 font-bold text-sm leading-tight text-white drop-shadow-md hover:text-gray-200"
+                class="pointer-events-auto line-clamp-2 text-sm leading-tight font-bold text-white drop-shadow-md hover:text-gray-200"
                 :to="{
                   name: 'forums-forumId-downloads-discussionId',
                   params: {
@@ -179,7 +183,7 @@ const filteredQuery = computed(() => {
               <span
                 v-if="discussionChannel.answered"
                 aria-label="This discussion has been answered"
-                class="shrink-0 flex items-center gap-1 rounded-full border border-green-400 px-2 py-0.5 text-xs text-green-300"
+                class="flex shrink-0 items-center gap-1 rounded-full border border-green-400 px-2 py-0.5 text-xs text-green-300"
               >
                 <CheckCircleIcon class="h-4 w-4" /> Answered
               </span>
@@ -200,7 +204,7 @@ const filteredQuery = computed(() => {
           </div>
 
           <!-- Top right buttons container -->
-          <div class="absolute right-2 top-2 z-10 flex gap-2">
+          <div class="absolute top-2 right-2 z-10 flex gap-2">
             <DownloadQuarantineBadge
               v-if="discussion.DownloadableFiles?.[0]"
               :status="discussion.DownloadableFiles[0].scanStatus"
@@ -215,7 +219,12 @@ const filteredQuery = computed(() => {
                 :allow-add-to-list="true"
                 :discussion-id="discussion.id"
                 :discussion-title="discussion.title"
-                :initial-is-favorited="(discussionChannel as DiscussionChannel & DiscussionChannelWithFavorited).isFavorited"
+                :initial-is-favorited="
+                  (
+                    discussionChannel as DiscussionChannel &
+                      DiscussionChannelWithFavorited
+                  ).isFavorited
+                "
                 entity-name="Download"
                 size="small"
                 overlay-style

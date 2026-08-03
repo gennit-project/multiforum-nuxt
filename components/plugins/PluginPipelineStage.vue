@@ -41,17 +41,15 @@ const hasDetails = computed(() => {
     <!-- Connector line -->
     <div
       v-if="!isLast"
-      class="absolute left-3 top-6 h-full w-0.5 bg-gray-200 dark:bg-gray-600"
+      class="absolute top-6 left-3 h-full w-0.5 bg-gray-200 dark:bg-gray-600"
     />
 
     <!-- Status icon -->
     <div
-      class="relative z-10 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full"
+      class="relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
       :class="statusInfo.bgColor"
     >
-      <i
-        :class="[statusInfo.icon, statusInfo.color, 'text-xs']"
-      />
+      <i :class="[statusInfo.icon, statusInfo.color, 'text-xs']" />
     </div>
 
     <!-- Content -->
@@ -88,7 +86,11 @@ const hasDetails = computed(() => {
       <p
         v-if="run.message"
         class="mt-1 text-xs"
-        :class="run.status === 'FAILED' ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'"
+        :class="
+          run.status === 'FAILED'
+            ? 'text-red-600 dark:text-red-400'
+            : 'text-gray-600 dark:text-gray-400'
+        "
       >
         {{ run.message }}
       </p>
@@ -101,7 +103,9 @@ const hasDetails = computed(() => {
 
       <!-- View logs button -->
       <button
-        v-if="hasDetails && run.status !== 'PENDING' && run.status !== 'RUNNING'"
+        v-if="
+          hasDetails && run.status !== 'PENDING' && run.status !== 'RUNNING'
+        "
         type="button"
         class="mt-1 text-xs text-orange-600 hover:underline dark:text-orange-400"
         @click="emit('viewLogs', run)"

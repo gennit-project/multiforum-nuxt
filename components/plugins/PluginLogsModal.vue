@@ -76,9 +76,7 @@ const formatTimestamp = (isoString: string) => {
           leave-from="opacity-100"
           leave-to="opacity-0"
         >
-          <div
-            class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-          />
+          <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
         </TransitionChild>
 
         <div class="fixed inset-0 z-10 overflow-y-auto">
@@ -95,10 +93,12 @@ const formatTimestamp = (isoString: string) => {
               leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <DialogPanel
-                class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all dark:bg-gray-800 sm:my-8 sm:w-full sm:max-w-2xl"
+                class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl dark:bg-gray-800"
               >
                 <!-- Header -->
-                <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+                <div
+                  class="border-b border-gray-200 px-6 py-4 dark:border-gray-700"
+                >
                   <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-3">
                       <div
@@ -135,26 +135,36 @@ const formatTimestamp = (isoString: string) => {
                   <!-- Execution Info -->
                   <div class="mb-4 grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span class="text-gray-500 dark:text-gray-400">Started:</span>
+                      <span class="text-gray-500 dark:text-gray-400"
+                        >Started:</span
+                      >
                       <span class="ml-2 text-gray-900 dark:text-white">
                         {{ formatTimestamp(run.createdAt) }}
                       </span>
                     </div>
                     <div v-if="run.durationMs">
-                      <span class="text-gray-500 dark:text-gray-400">Duration:</span>
+                      <span class="text-gray-500 dark:text-gray-400"
+                        >Duration:</span
+                      >
                       <span class="ml-2 text-gray-900 dark:text-white">
                         {{ formatDuration(run.durationMs) }}
                       </span>
                     </div>
                     <div>
-                      <span class="text-gray-500 dark:text-gray-400">Order:</span>
+                      <span class="text-gray-500 dark:text-gray-400"
+                        >Order:</span
+                      >
                       <span class="ml-2 text-gray-900 dark:text-white">
                         #{{ run.executionOrder + 1 }}
                       </span>
                     </div>
                     <div>
-                      <span class="text-gray-500 dark:text-gray-400">Pipeline ID:</span>
-                      <span class="ml-2 font-mono text-xs text-gray-900 dark:text-white">
+                      <span class="text-gray-500 dark:text-gray-400"
+                        >Pipeline ID:</span
+                      >
+                      <span
+                        class="ml-2 font-mono text-xs text-gray-900 dark:text-white"
+                      >
                         {{ run.pipelineId }}
                       </span>
                     </div>
@@ -162,12 +172,18 @@ const formatTimestamp = (isoString: string) => {
 
                   <!-- Message -->
                   <div v-if="run.message" class="mb-4">
-                    <h4 class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    <h4
+                      class="mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
                       Message
                     </h4>
                     <div
                       class="rounded-md p-3 text-sm"
-                      :class="run.status === 'FAILED' ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400' : 'bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-300'"
+                      :class="
+                        run.status === 'FAILED'
+                          ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                          : 'bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                      "
                     >
                       {{ run.message }}
                     </div>
@@ -175,10 +191,14 @@ const formatTimestamp = (isoString: string) => {
 
                   <!-- Skipped Reason -->
                   <div v-if="run.skippedReason" class="mb-4">
-                    <h4 class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    <h4
+                      class="mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
                       Skipped Reason
                     </h4>
-                    <div class="rounded-md bg-gray-50 p-3 text-sm text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                    <div
+                      class="rounded-md bg-gray-50 p-3 text-sm text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                    >
                       {{ run.skippedReason }}
                     </div>
                   </div>
@@ -186,7 +206,9 @@ const formatTimestamp = (isoString: string) => {
                   <!-- Public diagnostics -->
                   <div v-if="formattedDiagnostics">
                     <div class="mb-2 flex items-center justify-between">
-                      <h4 class="text-sm font-medium text-gray-900 dark:text-white">
+                      <h4
+                        class="text-sm font-medium text-gray-900 dark:text-white"
+                      >
                         Public diagnostics
                       </h4>
                       <button
@@ -194,16 +216,28 @@ const formatTimestamp = (isoString: string) => {
                         class="flex items-center space-x-1 text-xs text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
                         @click="copyToClipboard"
                       >
-                        <i :class="copied ? 'fa-solid fa-check' : 'fa-solid fa-copy'" />
-                        <span>{{ copied ? 'Copied!' : 'Copy diagnostics' }}</span>
+                        <i
+                          :class="
+                            copied ? 'fa-solid fa-check' : 'fa-solid fa-copy'
+                          "
+                        />
+                        <span>{{
+                          copied ? 'Copied!' : 'Copy diagnostics'
+                        }}</span>
                       </button>
                     </div>
-                    <pre class="max-h-48 overflow-auto rounded-md bg-gray-900 p-3 text-xs text-gray-100"><code>{{ formattedDiagnostics }}</code></pre>
+                    <pre
+                      class="max-h-48 overflow-auto rounded-md bg-gray-900 p-3 text-xs text-gray-100"
+                    ><code>{{ formattedDiagnostics }}</code></pre>
                   </div>
 
                   <!-- No additional info -->
                   <div
-                    v-if="!run.message && !run.skippedReason && !formattedDiagnostics"
+                    v-if="
+                      !run.message &&
+                      !run.skippedReason &&
+                      !formattedDiagnostics
+                    "
                     class="text-center text-sm text-gray-500 dark:text-gray-400"
                   >
                     No additional details available for this plugin run.
@@ -211,7 +245,9 @@ const formatTimestamp = (isoString: string) => {
                 </div>
 
                 <!-- Footer -->
-                <div class="border-t border-gray-200 px-6 py-4 dark:border-gray-700">
+                <div
+                  class="border-t border-gray-200 px-6 py-4 dark:border-gray-700"
+                >
                   <button
                     type="button"
                     class="w-full rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"

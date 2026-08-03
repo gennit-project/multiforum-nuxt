@@ -119,14 +119,12 @@ const dangerButtonClasses = computed(() => {
           leave-from="opacity-100"
           leave-to="opacity-0"
         >
-          <div
-            class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-          />
+          <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
         </TransitionChild>
 
         <div class="fixed inset-0 z-10 overflow-y-auto">
           <div
-            class="flex min-h-full items-start justify-center px-3 pb-6 pt-8 text-center sm:items-center sm:px-0 sm:pb-0 sm:pt-0 md:p-4"
+            class="flex min-h-full items-start justify-center px-3 pt-8 pb-6 text-center sm:items-center sm:px-0 sm:pt-0 sm:pb-0 md:p-4"
           >
             <TransitionChild
               as="template"
@@ -138,38 +136,36 @@ const dangerButtonClasses = computed(() => {
               leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <DialogPanel
-                class="relative w-full max-w-lg transform overflow-hidden rounded-2xl bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all dark:bg-gray-800 sm:my-8 sm:p-6"
+                class="relative w-full max-w-lg transform overflow-hidden rounded-2xl bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:p-6 dark:bg-gray-800"
               >
                 <!-- Header Area with fixed height -->
-                <div class="flex-none px-2 pb-2 pt-5 md:px-4">
+                <div class="flex-none px-2 pt-5 pb-2 md:px-4">
                   <div class="flex items-center space-x-4">
                     <div
                       :class="[
                         highlightColor === 'red'
-                          ? `bg-red-100 dark:bg-red-transparent`
-                          : `bg-yellow-100 dark:bg-yellow-transparent`,
+                          ? `dark:bg-red-transparent bg-red-100`
+                          : `dark:bg-yellow-transparent bg-yellow-100`,
                       ]"
-                      class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:h-10 sm:w-10"
+                      class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full sm:h-10 sm:w-10"
                     >
                       <slot name="icon" />
                     </div>
                     <DialogTitle
                       as="h3"
-                      class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100"
+                      class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100"
                     >
                       {{ title }}
                     </DialogTitle>
                   </div>
                 </div>
 
-                <!-- Main Content Area with flex-grow and overflow -->
-                <div
-                  class="flex flex-grow flex-col overflow-hidden px-2 md:px-4"
-                >
+                <!-- Main Content Area with grow and overflow -->
+                <div class="flex grow flex-col overflow-hidden px-2 md:px-4">
                   <p class="flex-none text-sm text-gray-500 dark:text-gray-300">
                     {{ body }}
                   </p>
-                  <div class="mt-2 flex-grow overflow-y-auto">
+                  <div class="mt-2 grow overflow-y-auto">
                     <slot name="content" />
                   </div>
                   <ErrorBanner
@@ -189,7 +185,7 @@ const dangerButtonClasses = computed(() => {
                     :disabled="primaryButtonDisabled"
                     :class="[
                       primaryButtonClasses,
-                      'inline-flex max-h-10 w-full justify-center rounded-full px-4 py-2 text-base font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm',
+                      'inline-flex max-h-10 w-full justify-center rounded-full px-4 py-2 text-base font-medium shadow-sm focus:ring-2 focus:ring-offset-2 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm',
                     ]"
                     @click="emit('primaryButtonClick')"
                   >
@@ -202,7 +198,7 @@ const dangerButtonClasses = computed(() => {
                     :disabled="dangerButtonDisabled"
                     :class="[
                       dangerButtonClasses,
-                      'mt-3 inline-flex max-h-10 w-full justify-center rounded-full px-4 py-2 text-base font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:mt-0 sm:w-auto sm:text-sm',
+                      'mt-3 inline-flex max-h-10 w-full justify-center rounded-full px-4 py-2 text-base font-medium shadow-sm focus:ring-2 focus:ring-offset-2 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm',
                     ]"
                     @click="emit('dangerButtonClick')"
                   >
@@ -214,7 +210,7 @@ const dangerButtonClasses = computed(() => {
                     v-if="showSecondaryButton"
                     ref="cancelButtonRef"
                     type="button"
-                    class="hover:bg-gray-50 inline-flex w-full justify-center rounded-full border border-gray-300 px-4 py-2 text-base font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:text-gray-200 sm:mt-0 sm:w-auto sm:text-sm"
+                    class="inline-flex w-full justify-center rounded-full border border-gray-300 px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm dark:text-gray-200"
                     @click="emit('close')"
                   >
                     {{ secondaryButtonText }}

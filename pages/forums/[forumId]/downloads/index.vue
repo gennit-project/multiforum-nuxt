@@ -187,7 +187,7 @@ watch(
         <!-- Left Sidebar for Filters -->
         <div
           v-if="filterGroups.length > 0"
-          class="hidden w-64 flex-shrink-0 pr-6 lg:block"
+          class="hidden w-64 shrink-0 pr-6 lg:block"
         >
           <div class="sticky top-4">
             <DownloadFilters :filter-groups="filterGroups" :is-sidebar="true" />

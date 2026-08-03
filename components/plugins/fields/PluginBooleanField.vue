@@ -58,7 +58,7 @@ const toggleValue = () => {
         :aria-label="field.label"
         :aria-describedby="describedBy"
         :aria-invalid="!!(error || validationError)"
-        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+        class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none"
         :class="inputValue ? 'bg-orange-500' : 'bg-gray-200 dark:bg-gray-600'"
         @click="toggleValue"
       >
@@ -69,27 +69,28 @@ const toggleValue = () => {
       </button>
       <label
         :for="controlId"
-        class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer"
+        class="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300"
         @click="toggleValue"
       >
         {{ field.label }}
         <span
           v-if="field.validation?.required || field.required"
           class="text-red-500"
-        >*</span>
+          >*</span
+        >
       </label>
     </div>
     <p
       v-if="field.description"
       :id="descriptionId"
-      class="text-xs text-gray-500 dark:text-gray-400 ml-14"
+      class="ml-14 text-xs text-gray-500 dark:text-gray-400"
     >
       {{ field.description }}
     </p>
     <p
       v-if="error || validationError"
       :id="errorId"
-      class="text-xs text-red-600 dark:text-red-400 ml-14"
+      class="ml-14 text-xs text-red-600 dark:text-red-400"
     >
       {{ error || validationError }}
     </p>

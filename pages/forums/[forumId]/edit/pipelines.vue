@@ -36,13 +36,14 @@ const {
 );
 
 // Query for installed plugins (only enabled server plugins can be used)
-const {
-  result: installedResult,
-  loading: installedLoading,
-} = useQuery(GET_INSTALLED_PLUGINS);
+const { result: installedResult, loading: installedLoading } = useQuery(
+  GET_INSTALLED_PLUGINS
+);
 
 // Mutation
-const { mutate: updatePipelines, loading: saving } = useMutation(UPDATE_CHANNEL_PLUGIN_PIPELINES);
+const { mutate: updatePipelines, loading: saving } = useMutation(
+  UPDATE_CHANNEL_PLUGIN_PIPELINES
+);
 
 // Computed
 const currentPipelines = computed((): PipelineConfig | undefined => {
@@ -51,7 +52,9 @@ const currentPipelines = computed((): PipelineConfig | undefined => {
 });
 
 const channelDisplayName = computed(() => {
-  return pipelinesResult.value?.channels?.[0]?.displayName || channelUniqueName.value;
+  return (
+    pipelinesResult.value?.channels?.[0]?.displayName || channelUniqueName.value
+  );
 });
 
 const availablePlugins = computed(() => {
@@ -59,7 +62,9 @@ const availablePlugins = computed(() => {
   return getAvailablePluginsFromInstalled(installed);
 });
 
-const isLoading = computed(() => pipelinesLoading.value || installedLoading.value);
+const isLoading = computed(
+  () => pipelinesLoading.value || installedLoading.value
+);
 
 // Methods
 async function handleSave(config: PipelineConfig) {
@@ -86,15 +91,13 @@ async function handleSave(config: PipelineConfig) {
         Plugin Pipelines
       </h2>
       <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-        Configure plugin execution when content is submitted to {{ channelDisplayName }}
+        Configure plugin execution when content is submitted to
+        {{ channelDisplayName }}
       </p>
     </div>
 
     <!-- Loading State -->
-    <div
-      v-if="isLoading"
-      class="py-8 text-center"
-    >
+    <div v-if="isLoading" class="py-8 text-center">
       <div class="inline-flex items-center">
         <LoadingSpinner class="mr-2 inline-flex" />
         Loading pipeline configuration...
@@ -102,24 +105,18 @@ async function handleSave(config: PipelineConfig) {
     </div>
 
     <!-- Error State -->
-    <div
-      v-else-if="pipelinesError"
-      class="py-8 text-center"
-    >
+    <div v-else-if="pipelinesError" class="py-8 text-center">
       <div class="text-red-600 dark:text-red-400">
         Error loading pipelines: {{ pipelinesError.message }}
       </div>
     </div>
 
     <!-- Main Content -->
-    <div
-      v-else
-      class="space-y-6"
-    >
+    <div v-else class="space-y-6">
       <!-- Info Banner -->
-      <div class="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-4">
+      <div class="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
         <div class="flex">
-          <div class="flex-shrink-0">
+          <div class="shrink-0">
             <i class="fa-solid fa-info-circle text-blue-400" />
           </div>
           <div class="ml-3">
@@ -128,14 +125,19 @@ async function handleSave(config: PipelineConfig) {
             </h3>
             <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
               <p>
-                Channel pipelines run when content with downloads is submitted to this forum.
-                Only plugins that are enabled at the server level can be used here.
+                Channel pipelines run when content with downloads is submitted
+                to this forum. Only plugins that are enabled at the server level
+                can be used here.
               </p>
-              <ul class="mt-2 list-disc list-inside space-y-1">
-                <li><strong>discussionChannel.created</strong> - When a download is submitted to this forum</li>
+              <ul class="mt-2 list-inside list-disc space-y-1">
+                <li>
+                  <strong>discussionChannel.created</strong> - When a download
+                  is submitted to this forum
+                </li>
               </ul>
               <p class="mt-2 text-xs">
-                Server pipelines run first (for security scanning), then channel pipelines run.
+                Server pipelines run first (for security scanning), then channel
+                pipelines run.
               </p>
             </div>
           </div>
@@ -145,20 +147,22 @@ async function handleSave(config: PipelineConfig) {
       <!-- No Plugins Warning -->
       <div
         v-if="availablePlugins.length === 0"
-        class="rounded-lg bg-yellow-50 dark:bg-yellow-900/20 p-4"
+        class="rounded-lg bg-yellow-50 p-4 dark:bg-yellow-900/20"
       >
         <div class="flex">
-          <div class="flex-shrink-0">
+          <div class="shrink-0">
             <i class="fa-solid fa-exclamation-triangle text-yellow-400" />
           </div>
           <div class="ml-3">
-            <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+            <h3
+              class="text-sm font-medium text-yellow-800 dark:text-yellow-200"
+            >
               No Server Plugins Available
             </h3>
             <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
               <p>
-                Channel pipelines can only use plugins that are enabled at the server level.
-                Contact a server administrator to enable plugins.
+                Channel pipelines can only use plugins that are enabled at the
+                server level. Contact a server administrator to enable plugins.
               </p>
             </div>
           </div>

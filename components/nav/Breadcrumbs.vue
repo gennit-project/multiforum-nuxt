@@ -23,7 +23,7 @@ const buildTarget = (link: Link) => {
 </script>
 
 <template>
-  <nav class="mb-1 mt-2 flex" aria-label="Breadcrumb">
+  <nav class="mt-2 mb-1 flex" aria-label="Breadcrumb">
     <ol role="list" class="flex flex-wrap items-center gap-x-4 gap-y-2">
       <li
         v-for="(link, i) in props.links"
@@ -33,7 +33,7 @@ const buildTarget = (link: Link) => {
           <!-- Heroicon name: solid/chevron-right -->
           <svg
             v-if="i !== 0"
-            class="mr-4 h-5 w-5 flex-shrink-0 text-gray-400"
+            class="mr-4 h-5 w-5 shrink-0 text-gray-400"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
             fill="currentColor"

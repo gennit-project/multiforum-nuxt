@@ -294,7 +294,7 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
         !showNewEventNextToSearchBar
       "
       class="mb-2 border border-t-gray-500 dark:border-t-gray-600"
-    >
+    />
     <div v-if="showMainFilters" class="flex flex-col gap-2 p-2">
       <div v-if="route.name !== 'EventDetail'" class="mb-2 w-full">
         <div class="flex items-center gap-2">
@@ -309,7 +309,7 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
               :label="channelLabel"
             >
               <template #icon>
-                <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />
+                <ChannelIcon class="mr-2 -ml-0.5 h-4 w-4" />
               </template>
               <template #content>
                 <div
@@ -494,11 +494,11 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
             :label="channelLabel"
           >
             <template #icon>
-              <ChannelIcon aria-hidden="true" class="-ml-0.5 mr-2 h-4 w-4" />
+              <ChannelIcon aria-hidden="true" class="mr-2 -ml-0.5 h-4 w-4" />
             </template>
             <template #content>
               <div
-                class="relative w-80 max-w-screen-sm bg-white dark:bg-gray-700"
+                class="relative w-80 max-w-[theme(screens.sm)] bg-white dark:bg-gray-700"
                 data-testid="forum-list-dropdown-mobile"
               >
                 <SearchableForumList
@@ -532,7 +532,7 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
           :label="tagLabel"
         >
           <template #icon>
-            <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
+            <TagIcon class="mr-2 -ml-0.5 h-4 w-4" />
           </template>
           <template #content>
             <div class="relative w-96">

@@ -154,18 +154,14 @@ const handleOpenAlbum = () => {
     class="flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900"
   >
     <div class="relative">
-      <nuxt-link
-        v-if="primaryChannel"
-        class="block"
-        :to="defaultLink"
-      >
-        <div class="bg-gray-50 aspect-square w-full dark:bg-gray-800">
+      <nuxt-link v-if="primaryChannel" class="block" :to="defaultLink">
+        <div class="aspect-square w-full bg-gray-50 dark:bg-gray-800">
           <img
             v-if="firstAlbumImage"
             :src="firstAlbumImage"
             :alt="discussion.title || 'Download preview'"
             class="h-full w-full object-cover"
-          >
+          />
           <div
             v-else
             class="flex h-full w-full items-center justify-center text-center text-sm text-gray-500 dark:text-gray-400"
@@ -176,12 +172,14 @@ const handleOpenAlbum = () => {
       </nuxt-link>
 
       <!-- Bottom gradient overlay with metadata -->
-      <div class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/40 to-transparent px-3 pb-2 pt-12">
+      <div
+        class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col justify-end bg-linear-to-t from-black/80 via-black/40 to-transparent px-3 pt-12 pb-2"
+      >
         <div class="space-y-1">
           <nuxt-link
             v-if="primaryChannel"
             :to="defaultLink"
-            class="pointer-events-auto line-clamp-2 font-bold text-sm leading-tight text-white drop-shadow-md hover:text-gray-200"
+            class="pointer-events-auto line-clamp-2 text-sm leading-tight font-bold text-white drop-shadow-md hover:text-gray-200"
           >
             <HighlightedSearchTerms
               :text="discussion.title || '[Deleted]'"
@@ -196,7 +194,10 @@ const handleOpenAlbum = () => {
           </span>
         </div>
 
-        <div v-if="showUploader" class="pointer-events-auto mt-1 text-xs text-gray-200">
+        <div
+          v-if="showUploader"
+          class="pointer-events-auto mt-1 text-xs text-gray-200"
+        >
           Posted {{ relativeCreated }} by
           <UsernameWithTooltip
             v-if="authorUsername"
@@ -221,13 +222,13 @@ const handleOpenAlbum = () => {
       <!-- Top right buttons container -->
       <div
         v-if="discussion.DownloadableFiles?.[0]"
-        class="absolute left-2 top-2 z-10"
+        class="absolute top-2 left-2 z-10"
       >
         <DownloadQuarantineBadge
           :status="discussion.DownloadableFiles[0].scanStatus"
         />
       </div>
-      <div class="absolute right-2 top-2 z-10 flex gap-2">
+      <div class="absolute top-2 right-2 z-10 flex gap-2">
         <!-- Add to Favorites Button -->
         <div
           class="rounded-md bg-black/50 p-1.5 transition-all duration-200 hover:bg-black/70"
@@ -237,7 +238,9 @@ const handleOpenAlbum = () => {
             :allow-add-to-list="true"
             :discussion-id="discussion.id"
             :discussion-title="discussion.title || ''"
-            :initial-is-favorited="(discussion as Discussion & DiscussionWithFavorited).isFavorited"
+            :initial-is-favorited="
+              (discussion as Discussion & DiscussionWithFavorited).isFavorited
+            "
             entity-name="Download"
             size="small"
             overlay-style
