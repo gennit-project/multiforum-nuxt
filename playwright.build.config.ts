@@ -47,9 +47,12 @@ export default defineConfig({
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     baseURL,
-    trace: 'retain-on-failure',
+    // CI retries once, so collect the expensive trace/video diagnostics only
+    // for the retry instead of recording every successful first attempt and
+    // deleting the artifacts afterward.
+    trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    video: 'on-first-retry',
     headless: true,
   },
   webServer: skipWebServer
