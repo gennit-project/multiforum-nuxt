@@ -39,6 +39,7 @@ const mountTabs = (props: Record<string, unknown> = {}) =>
         InfoIcon: true,
         UserIcon: true,
         LayoutDashboard: true,
+        ListChecks: true,
       },
     },
   });
@@ -55,7 +56,7 @@ describe('ServerTabs', () => {
   it('renders all admin tabs', () => {
     const wrapper = mountTabs();
 
-    expect(tabs(wrapper)).toHaveLength(7);
+    expect(tabs(wrapper)).toHaveLength(8);
   });
 
   it('labels the first tab Dashboard', () => {
@@ -70,7 +71,7 @@ describe('ServerTabs', () => {
     expect(tabs(wrapper)[1].props('to')).toBe('/admin/issues');
   });
 
-  it('places Suspensions between Settings and Plugins', () => {
+  it('places Setup before Settings and Suspensions before Plugins', () => {
     const wrapper = mountTabs();
     const labels = tabs(wrapper).map((tab) => tab.props('label'));
 
@@ -78,6 +79,7 @@ describe('ServerTabs', () => {
       'Dashboard',
       'Issues',
       'Channel Reports',
+      'Setup',
       'Settings',
       'Suspensions',
       'Plugins',

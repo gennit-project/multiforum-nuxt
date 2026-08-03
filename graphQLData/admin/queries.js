@@ -1,5 +1,68 @@
 import { gql } from '@apollo/client/core';
 
+export const GET_INSTANCE_SETUP_STATUS = gql`
+  query GetInstanceSetupStatus {
+    getInstanceSetupStatus {
+      auth {
+        configured
+        enabled
+        requiredEnvVarsMissing
+        setupUrl
+        docsPath
+      }
+      mail {
+        configured
+        enabled
+        requiredEnvVarsMissing
+        setupUrl
+        docsPath
+      }
+      maps {
+        configured
+        enabled
+        requiredEnvVarsMissing
+        setupUrl
+        docsPath
+      }
+      geocoding {
+        configured
+        enabled
+        requiredEnvVarsMissing
+        setupUrl
+        docsPath
+      }
+      uploads {
+        configured
+        enabled
+        requiredEnvVarsMissing
+        setupUrl
+        docsPath
+      }
+      downloads {
+        configured
+        enabled
+        requiredEnvVarsMissing
+        setupUrl
+        docsPath
+      }
+      events {
+        configured
+        enabled
+        requiredEnvVarsMissing
+        setupUrl
+        docsPath
+      }
+      plugins {
+        configured
+        enabled
+        requiredEnvVarsMissing
+        setupUrl
+        docsPath
+      }
+    }
+  }
+`;
+
 export const GET_SERVER_CONFIG = gql`
   query getServerConfig($serverName: String!) {
     serverConfigs(where: { serverName: $serverName }) {
