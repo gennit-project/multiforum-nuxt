@@ -7,6 +7,7 @@ import MarkAsAnsweredButton from '@/components/discussion/detail/MarkAsAnsweredB
 import DownloadSidebar from '@/components/channel/DownloadSidebar.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import CrosspostedDiscussionEmbed from '@/components/discussion/detail/CrosspostedDiscussionEmbed.vue';
+import DownloadMetadata from '@/components/download/DownloadMetadata.vue';
 import { useUsername } from '@/composables/useAuthState';
 
 const usernameVar = useUsername();
@@ -113,7 +114,9 @@ const markdownImagesEnabled = computed(
               <div class="flex flex-col items-center space-y-3">
                 <span v-if="!loggedInUserIsAuthor">No images available.</span>
                 <button
-                  v-if="loggedInUserIsAuthor && usernameVar && imageUploadsEnabled"
+                  v-if="
+                    loggedInUserIsAuthor && usernameVar && imageUploadsEnabled
+                  "
                   class="flex items-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-blue-700"
                   data-testid="add-album-button"
                   @click="emit('handleClickAddAlbum')"
@@ -157,6 +160,11 @@ const markdownImagesEnabled = computed(
           </div>
         </template>
       </DiscussionBody>
+      <DownloadMetadata
+        v-if="activeDiscussionChannel"
+        :discussion-id="discussionId"
+        :channel-unique-name="activeDiscussionChannel.channelUniqueName"
+      />
     </div>
     <div class="flex-shrink-0">
       <DownloadSidebar

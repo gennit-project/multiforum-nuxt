@@ -7,7 +7,9 @@ import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 
 const h = vi.hoisted(() => ({ username: null as unknown }));
 
-vi.mock('@/composables/useAuthState', () => ({ useUsername: () => h.username }));
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => h.username,
+}));
 
 const discussion = (overrides: Record<string, unknown> = {}) =>
   ({
@@ -19,7 +21,11 @@ const discussion = (overrides: Record<string, unknown> = {}) =>
   }) as unknown as Discussion;
 
 const channel = () =>
-  ({ id: 'dc1', channelUniqueName: 'cats', Channel: {} }) as unknown as DiscussionChannel;
+  ({
+    id: 'dc1',
+    channelUniqueName: 'cats',
+    Channel: {},
+  }) as unknown as DiscussionChannel;
 
 const discussionBodyStub = {
   name: 'DiscussionBody',
@@ -39,10 +45,28 @@ const mountLayout = (props: Record<string, unknown> = {}) =>
     global: {
       stubs: {
         DiscussionBody: discussionBodyStub,
-        DiscussionAlbum: { name: 'DiscussionAlbum', props: ['stlFiles'], template: '<div class="album" />' },
-        DiscussionVotes: { name: 'DiscussionVotes', emits: ['handle-click-give-feedback'], template: '<div class="votes" />' },
-        MarkAsAnsweredButton: { name: 'MarkAsAnsweredButton', template: '<div class="answered" />' },
-        DownloadSidebar: { name: 'DownloadSidebar', template: '<div class="sidebar" />' },
+        DiscussionAlbum: {
+          name: 'DiscussionAlbum',
+          props: ['stlFiles'],
+          template: '<div class="album" />',
+        },
+        DiscussionVotes: {
+          name: 'DiscussionVotes',
+          emits: ['handle-click-give-feedback'],
+          template: '<div class="votes" />',
+        },
+        MarkAsAnsweredButton: {
+          name: 'MarkAsAnsweredButton',
+          template: '<div class="answered" />',
+        },
+        DownloadSidebar: {
+          name: 'DownloadSidebar',
+          template: '<div class="sidebar" />',
+        },
+        DownloadMetadata: {
+          name: 'DownloadMetadata',
+          template: '<div class="metadata" />',
+        },
         CrosspostedDiscussionEmbed: true,
         ImageIcon: true,
       },
@@ -58,7 +82,9 @@ describe('DownloadModeLayout album empty state', () => {
   it('offers the author an Add Images button when there is no album', () => {
     const wrapper = mountLayout();
 
-    expect(wrapper.find('[data-testid="add-album-button"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="add-album-button"]').exists()).toBe(
+      true
+    );
   });
 
   it('shows "No images available" to non-authors', () => {
@@ -96,11 +122,34 @@ describe('DownloadModeLayout album present', () => {
     });
     await flushPromises();
 
-    expect(wrapper.getComponent({ name: 'DiscussionAlbum' }).props('stlFiles')).toHaveLength(1);
+    expect(
+      wrapper.getComponent({ name: 'DiscussionAlbum' }).props('stlFiles')
+    ).toHaveLength(1);
   });
 });
 
 describe('DownloadModeLayout sidebar and votes', () => {
+  it('renders metadata below the album in the left column', () => {
+    const wrapper = mountLayout({
+      discussion: discussion({ Album: { Images: [{ id: 'i1' }] } }),
+    });
+
+    expect({
+      followsAlbum: Boolean(
+        wrapper
+          .get('.album')
+          .element.compareDocumentPosition(wrapper.get('.metadata').element) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+      ),
+      precedesSidebar: Boolean(
+        wrapper
+          .get('.metadata')
+          .element.compareDocumentPosition(wrapper.get('.sidebar').element) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+      ),
+    }).toEqual({ followsAlbum: true, precedesSidebar: true });
+  });
+
   it('renders the download sidebar', () => {
     const wrapper = mountLayout();
 
@@ -117,7 +166,9 @@ describe('DownloadModeLayout sidebar and votes', () => {
     h.username = ref('bob');
     const wrapper = mountLayout();
 
-    await wrapper.getComponent({ name: 'DiscussionVotes' }).vm.$emit('handle-click-give-feedback');
+    await wrapper
+      .getComponent({ name: 'DiscussionVotes' })
+      .vm.$emit('handle-click-give-feedback');
 
     expect(wrapper.emitted('handleClickGiveFeedback')).toBeTruthy();
   });

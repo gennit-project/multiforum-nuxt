@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import type { PropType } from 'vue';
-import type { Discussion, FilterOption } from '@/__generated__/graphql';
+import type { Discussion } from '@/__generated__/graphql';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import DownloadNowButton from '@/components/channel/DownloadNowButton.vue';
 import FunctionalDownloadNow from '@/components/channel/FunctionalDownloadNow.vue';
 import DownloadSuccessPopover from '@/components/download/DownloadSuccessPopover.vue';
 import DownloadPipelineStatusSummary from '@/components/plugins/DownloadPipelineStatusSummary.vue';
 import { computed, ref } from 'vue';
-import { useMutation, useQuery } from '@vue/apollo-composable';
-import { GET_DOWNLOAD_LABELS } from '@/graphQLData/discussion/queries';
+import { useMutation } from '@vue/apollo-composable';
 import {
   REQUEST_DOWNLOADABLE_FILE_REVIEW,
   RETRY_DOWNLOADABLE_FILE_SCAN,
@@ -16,11 +15,7 @@ import {
 import { useUsername } from '@/composables/useAuthState';
 
 type DownloadScanStatus =
-  | 'PENDING'
-  | 'CLEAN'
-  | 'INFECTED'
-  | 'SUSPICIOUS'
-  | 'FAILED';
+  'PENDING' | 'CLEAN' | 'INFECTED' | 'SUSPICIOUS' | 'FAILED';
 
 type ScannedDownloadableFile = Omit<
   Discussion['DownloadableFiles'][number],
@@ -70,17 +65,18 @@ const showSuccessPopover = ref(false);
 
 // Get the primary downloadable file (first one)
 const primaryFile = computed(() => {
-  return (props.discussion?.DownloadableFiles?.[0] as
-    | ScannedDownloadableFile
-    | undefined) || null;
+  return (
+    (props.discussion?.DownloadableFiles?.[0] as
+      ScannedDownloadableFile | undefined) || null
+  );
 });
 
 const hasDownloadableFile = computed(() => {
   return (props.discussion?.DownloadableFiles?.length || 0) > 0;
 });
 
-const scanStatus = computed<DownloadScanStatus>(
-  () => retryingScan.value ? 'PENDING' : primaryFile.value?.scanStatus || 'PENDING'
+const scanStatus = computed<DownloadScanStatus>(() =>
+  retryingScan.value ? 'PENDING' : primaryFile.value?.scanStatus || 'PENDING'
 );
 
 const retryScan = async () => {
@@ -98,15 +94,19 @@ const retryScan = async () => {
 };
 
 const creatorIsViewing = computed(
-  () => Boolean(username.value) && props.discussion?.Author?.username === username.value
+  () =>
+    Boolean(username.value) &&
+    props.discussion?.Author?.username === username.value
 );
 
-const reviewRequested = computed(
-  () => reviewRequestedLocally.value
-);
+const reviewRequested = computed(() => reviewRequestedLocally.value);
 
 const requestHumanReview = () => {
-  if (!primaryFile.value?.id || requestingReview.value || reviewRequested.value) {
+  if (
+    !primaryFile.value?.id ||
+    requestingReview.value ||
+    reviewRequested.value
+  ) {
     return;
   }
   requestDownloadableFileReview({
@@ -120,49 +120,25 @@ const hasReviewAccess = computed(
 );
 
 const downloadDisabled = computed(
-  () =>
-    !hasDownloadableFile.value ||
-    scanStatus.value !== 'CLEAN'
+  () => !hasDownloadableFile.value || scanStatus.value !== 'CLEAN'
 );
 
 const downloadLabel = 'Download Now';
 
 const replaceFilePath = computed(
-  () => `/forums/${props.channelUniqueName}/downloads/edit/${props.discussionId}`
+  () =>
+    `/forums/${props.channelUniqueName}/downloads/edit/${props.discussionId}`
 );
 
 const pipelinePath = computed(
-  () => `/forums/${props.channelUniqueName}/downloads/${props.discussionId}/pipelines`
+  () =>
+    `/forums/${props.channelUniqueName}/downloads/${props.discussionId}/pipelines`
 );
 
 const scanCheckedDisplay = computed(() => {
   if (!primaryFile.value?.scanCheckedAt) return '';
   const checkedAt = new Date(primaryFile.value.scanCheckedAt);
   return Number.isNaN(checkedAt.getTime()) ? '' : checkedAt.toLocaleString();
-});
-
-// Format price display
-const priceDisplay = computed(() => {
-  if (!primaryFile.value) return { main: '$0', sub: '00', label: null };
-
-  if (primaryFile.value.priceModel === 'FREE') {
-    return { main: '$0', sub: '00', label: null };
-  }
-
-  const cents = primaryFile.value.priceCents || 0;
-  const dollars = Math.floor(cents / 100);
-  const remainingCents = cents % 100;
-
-  return {
-    main: `$${dollars}`,
-    sub: remainingCents.toString().padStart(2, '0'),
-    label: 'Purchase',
-  };
-});
-
-// Get license info
-const licenseInfo = computed(() => {
-  return primaryFile.value?.license?.name || 'No license specified';
 });
 
 const downloadCounts = computed(() => {
@@ -189,52 +165,6 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
   const decimals = unitIndex === 0 ? 0 : size >= 10 ? 1 : 2;
   return `${size.toFixed(decimals)} ${units[unitIndex]}`;
 };
-
-// Query for label options
-const { result: labelQueryResult } = useQuery(
-  GET_DOWNLOAD_LABELS,
-  {
-    discussionId: props.discussionId,
-    channelUniqueName: props.channelUniqueName,
-  },
-  {
-    enabled: !!props.discussionId && !!props.channelUniqueName,
-  }
-);
-
-// Get label options from query result
-const labelOptions = computed(() => {
-  const discussionChannels =
-    labelQueryResult.value?.discussions?.[0]?.DiscussionChannels;
-  const discussionChannel = discussionChannels?.[0];
-  return discussionChannel?.LabelOptions || [];
-});
-
-// Group labels by their group key for display
-const groupedLabels = computed(() => {
-  const groups: Record<
-    string,
-    Array<{ key: string; value: string; displayName: string }>
-  > = {};
-
-  labelOptions.value.forEach((option: FilterOption) => {
-    const groupKey = option.group?.key;
-    const groupDisplayName = option.group?.displayName;
-
-    if (groupKey && groupDisplayName) {
-      if (!groups[groupKey]) {
-        groups[groupKey] = [];
-      }
-      groups[groupKey].push({
-        key: groupDisplayName,
-        value: option.value || '',
-        displayName: option.displayName || option.value || '',
-      });
-    }
-  });
-
-  return groups;
-});
 </script>
 
 <template>
@@ -245,7 +175,7 @@ const groupedLabels = computed(() => {
       <!-- Boxed Info Section -->
       <div
         v-if="primaryFile"
-        class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-700"
+        class="bg-gray-50 mb-4 rounded-lg border border-gray-200 p-4 dark:border-gray-600 dark:bg-gray-700"
       >
         <!-- File Name -->
         <h2
@@ -259,24 +189,18 @@ const groupedLabels = computed(() => {
           {{ formatFileSize(primaryFile.size) }}
         </div>
 
-        <!-- Price Section -->
-        <!-- <div class="text-left mb-3">
-          <div class="text-3xl font-bold text-gray-900 dark:text-white">
-            <sup class="text-lg">{{ priceDisplay.main?.charAt(0) || '$' }}</sup>{{ priceDisplay.main?.slice(1) || '0' }}<sup class="text-lg">.{{ priceDisplay.sub || '00' }}</sup>
-          </div>
-          <div v-if="priceDisplay.label" class="py-1 text-sm text-gray-500 dark:text-gray-400">
-            {{ priceDisplay.label }}
-          </div>
-        </div> -->
-
         <div
           aria-live="polite"
           class="rounded-md p-3 text-sm"
           :class="{
-            'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-200': scanStatus === 'CLEAN',
-            'bg-amber-50 text-amber-900 dark:bg-amber-900/30 dark:text-amber-200': scanStatus === 'PENDING' || scanStatus === 'SUSPICIOUS',
-            'bg-red-50 text-red-900 dark:bg-red-900/30 dark:text-red-200': scanStatus === 'INFECTED',
-            'bg-sky-50 text-sky-900 dark:bg-sky-900/30 dark:text-sky-200': scanStatus === 'FAILED',
+            'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-200':
+              scanStatus === 'CLEAN',
+            'bg-amber-50 text-amber-900 dark:bg-amber-900/30 dark:text-amber-200':
+              scanStatus === 'PENDING' || scanStatus === 'SUSPICIOUS',
+            'bg-red-50 text-red-900 dark:bg-red-900/30 dark:text-red-200':
+              scanStatus === 'INFECTED',
+            'bg-sky-50 text-sky-900 dark:bg-sky-900/30 dark:text-sky-200':
+              scanStatus === 'FAILED',
           }"
           data-testid="download-scan-status"
         >
@@ -288,19 +212,27 @@ const groupedLabels = computed(() => {
             <i class="fa-solid fa-hourglass-half mr-1" />
             Quarantined: security check pending
           </p>
-          <template v-else-if="scanStatus === 'INFECTED' || scanStatus === 'SUSPICIOUS'">
+          <template
+            v-else-if="scanStatus === 'INFECTED' || scanStatus === 'SUSPICIOUS'"
+          >
             <p class="font-medium">
               <i class="fa-solid fa-shield-halved mr-1" />
-              {{ scanStatus === 'INFECTED'
-                ? 'Quarantined: threat detected'
-                : 'Quarantined: suspicious content' }}
+              {{
+                scanStatus === 'INFECTED'
+                  ? 'Quarantined: threat detected'
+                  : 'Quarantined: suspicious content'
+              }}
             </p>
             <p class="mt-1">
               <template v-if="creatorIsViewing">
-                This upload was blocked by the security scan<span v-if="primaryFile.scanReason">: {{ primaryFile.scanReason }}</span>.
+                This upload was blocked by the security scan<span
+                  v-if="primaryFile.scanReason"
+                  >: {{ primaryFile.scanReason }}</span
+                >.
               </template>
               <template v-else>
-                This download is not publicly available while its content is reviewed.
+                This download is not publicly available while its content is
+                reviewed.
               </template>
             </p>
             <div v-if="creatorIsViewing" class="mt-2 flex flex-wrap gap-3">
@@ -313,7 +245,13 @@ const groupedLabels = computed(() => {
                 :disabled="requestingReview || reviewRequested"
                 @click="requestHumanReview"
               >
-                {{ reviewRequested ? 'Human review requested' : requestingReview ? 'Requesting review…' : 'Request human review' }}
+                {{
+                  reviewRequested
+                    ? 'Human review requested'
+                    : requestingReview
+                      ? 'Requesting review…'
+                      : 'Request human review'
+                }}
               </button>
               <button
                 type="button"
@@ -353,10 +291,7 @@ const groupedLabels = computed(() => {
                   >
                     {{ retryingScan ? 'Retrying…' : 'Retry scan' }}
                   </button>
-                  <NuxtLink
-                    class="font-medium underline"
-                    :to="pipelinePath"
-                  >
+                  <NuxtLink class="font-medium underline" :to="pipelinePath">
                     View checks
                   </NuxtLink>
                 </div>
@@ -364,10 +299,7 @@ const groupedLabels = computed(() => {
             </div>
             <p v-if="retryError" class="mt-2 font-medium">
               {{ retryError }}
-              <NuxtLink
-                class="ml-1 underline"
-                to="/server/issues/create"
-              >
+              <NuxtLink class="ml-1 underline" to="/server/issues/create">
                 Open an issue
               </NuxtLink>
             </p>
@@ -386,10 +318,15 @@ const groupedLabels = computed(() => {
             View security pipeline
           </NuxtLink>
           <p
-            v-if="hasReviewAccess && scanStatus !== 'CLEAN' && scanStatus !== 'FAILED'"
+            v-if="
+              hasReviewAccess &&
+              scanStatus !== 'CLEAN' &&
+              scanStatus !== 'FAILED'
+            "
             class="mt-2 text-xs"
           >
-            Direct download is disabled while this file is quarantined. Review the scanner findings before clearing it.
+            Direct download is disabled while this file is quarantined. Review
+            the scanner findings before clearing it.
           </p>
         </div>
         <dl class="mt-3 grid grid-cols-2 gap-3 text-sm">
@@ -411,7 +348,7 @@ const groupedLabels = computed(() => {
       <!-- No File Available -->
       <div
         v-if="!primaryFile"
-        class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4 text-center text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-300"
+        class="bg-gray-50 mb-4 rounded-lg border border-gray-200 p-4 text-center text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-300"
       >
         No downloadable files available
       </div>
@@ -441,61 +378,6 @@ const groupedLabels = computed(() => {
         :discussion-id="discussionId"
         :channel-name="channelUniqueName"
       />
-      <div
-        v-if="primaryFile && priceDisplay.label === 'Free Download'"
-        class="mt-2 text-xs text-gray-500 dark:text-gray-400"
-      >
-        By downloading, you agree to the content license
-      </div>
-      <!-- <div v-else class="text-xs mt-2 text-gray-500 dark:text-gray-400">
-        By placing an order, you're purchasing a content license
-      </div> -->
-
-      <!-- License Section -->
-      <div
-        v-if="primaryFile"
-        class="border-t border-gray-200 pt-4 dark:border-gray-700"
-      >
-        <h2 class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-          License
-        </h2>
-        <p class="text-sm text-gray-600 dark:text-gray-400">
-          {{ licenseInfo }}
-        </p>
-      </div>
-
-      <!-- Labels Section -->
-      <div
-        v-if="Object.keys(groupedLabels).length > 0"
-        class="border-t border-gray-200 pt-4 dark:border-gray-700"
-      >
-        <h2 class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-          Labels
-        </h2>
-        <div class="space-y-2">
-          <div
-            v-for="(labels, groupKey) in groupedLabels"
-            :key="groupKey"
-            class="flex flex-wrap gap-2"
-          >
-            <div
-              v-for="label in labels"
-              :key="`${groupKey}-${label.value}`"
-              class="inline-flex items-center gap-2 text-sm"
-            >
-              <span class="font-medium text-gray-700 dark:text-gray-300">
-                {{ label.key }}:
-              </span>
-              <span
-                class="rounded-full bg-gray-100 px-2 py-1 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
-              >
-                {{ label.displayName }}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 

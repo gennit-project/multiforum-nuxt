@@ -6,17 +6,21 @@ import { makeDiscussion } from '@/tests/utils/factories';
 
 const authState = ref(false);
 const mockUsernameRef = ref('');
-const trackDownloadMock = vi.hoisted(() => vi.fn(() => Promise.resolve({
-  data: {
-    prepareDownload: {
-      ready: true,
-      url: 'https://signed.example.com/asset.zip',
-      scanStatus: 'CLEAN',
-      reviewAccess: false,
-      message: 'No threats found. Your download is ready.',
-    },
-  },
-})));
+const trackDownloadMock = vi.hoisted(() =>
+  vi.fn(() =>
+    Promise.resolve({
+      data: {
+        prepareDownload: {
+          ready: true,
+          url: 'https://signed.example.com/asset.zip',
+          scanStatus: 'CLEAN',
+          reviewAccess: false,
+          message: 'No threats found. Your download is ready.',
+        },
+      },
+    })
+  )
+);
 
 vi.mock('@/stores/toastStore', () => ({
   useToastStore: () => ({
@@ -180,6 +184,18 @@ describe('DownloadSidebar', () => {
     expect(wrapper.text()).toContain('4');
   });
 
+  it('does not show license details', () => {
+    const wrapper = mount(DownloadSidebar, {
+      props: {
+        discussion: discussionWithFile,
+        discussionId: 'discussion-1',
+        channelUniqueName: 'test-forum',
+      },
+    });
+
+    expect(wrapper.text()).not.toContain('CC BY');
+  });
+
   it('shows the unavailable message without rendering license details when no files exist', () => {
     const wrapper = mount(DownloadSidebar, {
       props: {
@@ -249,10 +265,13 @@ describe('DownloadSidebar', () => {
 
     expect({
       status: wrapper.get('[data-testid="download-scan-status"]').text(),
-      directReviewDownload: wrapper.findAll('button').some((button) =>
-        button.text() === 'Download for review'
-      ),
-      downloadDisabled: wrapper.findAll('button').at(-1)?.attributes('disabled'),
+      directReviewDownload: wrapper
+        .findAll('button')
+        .some((button) => button.text() === 'Download for review'),
+      downloadDisabled: wrapper
+        .findAll('button')
+        .at(-1)
+        ?.attributes('disabled'),
     }).toEqual({
       status: expect.stringContaining(
         'This upload was blocked by the security scan: Known malware signature.'
@@ -302,7 +321,9 @@ describe('DownloadSidebar', () => {
       },
     });
 
-    await wrapper.get('[data-testid="download-scan-status"] button').trigger('click');
+    await wrapper
+      .get('[data-testid="download-scan-status"] button')
+      .trigger('click');
 
     expect(trackDownloadMock).toHaveBeenCalledWith({
       downloadableFileId: 'file-1',
@@ -341,10 +362,9 @@ describe('DownloadSidebar', () => {
     expect({
       title: status.get('p.font-medium').text(),
       message: status.get('p.text-xs').text(),
-      actions: [
-        ...status.findAll('button'),
-        ...status.findAll('a'),
-      ].map((action) => action.text()),
+      actions: [...status.findAll('button'), ...status.findAll('a')].map(
+        (action) => action.text()
+      ),
     }).toEqual({
       title: 'Security check needs another try',
       message: "The scan service had a problem—your file wasn't rejected.",
@@ -370,7 +390,9 @@ describe('DownloadSidebar', () => {
       },
     });
 
-    await wrapper.get('[data-testid="download-scan-status"] button').trigger('click');
+    await wrapper
+      .get('[data-testid="download-scan-status"] button')
+      .trigger('click');
 
     expect(trackDownloadMock).toHaveBeenCalledWith({
       downloadableFileId: 'file-1',
