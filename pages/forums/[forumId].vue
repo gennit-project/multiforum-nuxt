@@ -293,12 +293,15 @@ definePageMeta({
 <template>
   <NuxtLayout>
     <PageNotFound v-if="showNotFound" />
+    <!-- Keep route content mounted while channel chrome loads so the parent and
+         child GraphQL queries run in parallel instead of in separate waves. -->
     <div
-      v-else-if="channel"
+      v-else
       class="flex flex-col bg-white dark:bg-black dark:text-white sm:px-0 md:min-h-screen"
     >
       <ChannelHeaderMobile
         v-if="
+          channel &&
           !showDiscussionTitle &&
           !showDownloadTitle &&
           !showEventTitle &&
@@ -310,6 +313,7 @@ definePageMeta({
       />
       <ChannelHeaderDesktop
         v-if="
+          channel &&
           channel.channelBannerURL &&
           !showDiscussionTitle &&
           !showDownloadTitle &&
@@ -324,7 +328,7 @@ definePageMeta({
         :show-create-button="true"
       />
       <ChannelLockedBanner
-        v-if="channel.locked"
+        v-if="channel && channel.locked"
         :locked-at="channel.lockedAt"
         :lock-reason="channel.lockReason"
         :locked-by-display-name="channel.LockedBy?.displayName"
@@ -402,7 +406,7 @@ definePageMeta({
               >
                 <div class="flex items-center justify-between">
                   <ChannelTabs
-                    v-if="showChannelTabs"
+                    v-if="showChannelTabs && channel"
                     :admin-list="adminList"
                     :channel="channel"
                     :download-count="downloadCount"

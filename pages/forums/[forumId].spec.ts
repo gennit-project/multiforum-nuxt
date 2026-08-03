@@ -121,6 +121,16 @@ const ChannelTabsStub = defineComponent({
   template: '<div class="channel-tabs-stub" />',
 });
 
+const NuxtPageStub = defineComponent({
+  name: 'NuxtPage',
+  template: '<div class="nuxt-page-stub" />',
+});
+
+const NuxtLayoutStub = defineComponent({
+  name: 'NuxtLayout',
+  template: '<div><slot /></div>',
+});
+
 vi.mock('@/components/PageNotFound.vue', () => ({
   default: PageNotFoundStub,
 }));
@@ -202,7 +212,14 @@ const mountWith = async (
       }),
     });
   const Page = (await import('./[forumId].vue')).default;
-  return shallowMount(Page);
+  return shallowMount(Page, {
+    global: {
+      stubs: {
+        NuxtLayout: NuxtLayoutStub,
+        NuxtPage: NuxtPageStub,
+      },
+    },
+  });
 };
 
 describe('forum shell page', () => {
@@ -218,7 +235,29 @@ describe('forum shell page', () => {
 
   it('shows the not-found page when the channel does not exist', async () => {
     const wrapper = await mountWith([]);
-    expect(wrapper.findComponent(PageNotFoundStub).exists()).toBe(true);
+    expect({
+      notFound: wrapper.findComponent(PageNotFoundStub).exists(),
+      childPage: wrapper.findComponent(NuxtPageStub).exists(),
+    }).toEqual({ notFound: true, childPage: false });
+  });
+
+  it('mounts the child page while the channel query is still loading', async () => {
+    const wrapper = await mountWith([], { loading: true });
+
+    expect({
+      childPage: wrapper.findComponent(NuxtPageStub).exists(),
+      channelTabs: wrapper.findComponent(ChannelTabsStub).exists(),
+      notFound: wrapper.findComponent(PageNotFoundStub).exists(),
+    }).toEqual({ childPage: true, channelTabs: false, notFound: false });
+  });
+
+  it('mounts detail title queries while the channel query is still loading', async () => {
+    mockState.route.name = 'forums-forumId-downloads-discussionId';
+    const wrapper = await mountWith([], { loading: true });
+
+    expect(wrapper.findComponent(DiscussionTitleEditFormStub).exists()).toBe(
+      true
+    );
   });
 
   it('renders the channel tabs on the plain forum route', async () => {
