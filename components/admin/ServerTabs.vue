@@ -10,7 +10,7 @@ import InfoIcon from '@/components/icons/InfoIcon.vue';
 import UserIcon from '@/components/icons/UserIcon.vue';
 import type { Channel } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
-import { LayoutDashboard } from 'lucide-vue-next';
+import { LayoutDashboard, ListChecks } from 'lucide-vue-next';
 import { useDisplay } from '@/composables/useDisplay';
 
 const Popper = defineAsyncComponent(() => import('vue3-popper'));
@@ -50,6 +50,7 @@ const tabRoutes = computed(() => {
     dashboard: `/admin/dashboard`,
     issues: `/admin/issues`,
     channelReports: `/admin/channel-reports`,
+    setup: `/admin/setup`,
     settings: `/admin/settings`,
     suspensions: `/admin/suspensions/server-membership`,
     plugins: `/admin/plugins`,
@@ -85,6 +86,13 @@ const tabs = computed((): Tab[] => {
       routeSuffix: 'channel-reports',
       label: 'Channel Reports',
       icon: LockClosedIcon,
+      countProperty: null,
+    },
+    {
+      name: 'setup',
+      routeSuffix: 'setup',
+      label: 'Setup',
+      icon: ListChecks,
       countProperty: null,
     },
     {
