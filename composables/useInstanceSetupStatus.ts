@@ -42,3 +42,15 @@ export function useInstanceSetupStatus() {
 
   return { status, loading, error, refetch };
 }
+
+export function useInstanceCapability(key: InstanceCapabilityKey) {
+  const setup = useInstanceSetupStatus();
+  const capability = computed(() => setup.status.value?.[key] ?? null);
+  const available = computed(
+    () =>
+      capability.value?.configured === true &&
+      capability.value?.enabled === true
+  );
+
+  return { ...setup, capability, available };
+}
