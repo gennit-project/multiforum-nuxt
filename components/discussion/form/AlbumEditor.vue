@@ -19,6 +19,7 @@ import {
   moveImageOrderDown,
 } from '@/utils/albumImageOrder';
 import type { Album } from '@/__generated__/graphql';
+import { useInstanceCapability } from '@/composables/useInstanceSetupStatus';
 
 const usernameVar = useUsername();
 
@@ -43,19 +44,57 @@ type ExistingImageInput = Omit<Partial<ImageInput>, 'alt' | 'caption' | 'copyrig
   copyright?: string | null;
 };
 
-const props = defineProps<{
-  formValues: {
-    album: {
-      images: ImageInput[];
-      imageOrder: string[];
+const props = withDefaults(
+  defineProps<{
+    formValues: {
+      album: {
+        images: ImageInput[];
+        imageOrder: string[];
+      };
     };
-  };
-  allowImageUpload?: boolean;
-  discussionId?: string;
-  existingAlbum?: Album | null | undefined;
-}>();
+    allowImageUpload?: boolean;
+    discussionId?: string;
+    existingAlbum?: Album | null | undefined;
+  }>(),
+  {
+    allowImageUpload: true,
+    discussionId: undefined,
+    existingAlbum: undefined,
+  }
+);
 
 const emit = defineEmits(['updateFormValues']);
+const {
+  capability: uploadsCapability,
+  available: uploadsAvailable,
+  loading: uploadsLoading,
+  error: uploadsError,
+} = useInstanceCapability('uploads');
+const uploadsUnavailable = computed(
+  () =>
+    Boolean(uploadsCapability.value || uploadsError.value) &&
+    !uploadsAvailable.value
+);
+const fileUploadAvailable = computed(
+  () => props.allowImageUpload !== false && uploadsAvailable.value
+);
+const fileUploadUnavailableMessage = computed(() => {
+  if (props.allowImageUpload === false) {
+    return 'File uploads are disabled for this channel.';
+  }
+  if (uploadsLoading.value && !uploadsCapability.value) {
+    return 'Checking file upload availability...';
+  }
+  if (uploadsUnavailable.value) {
+    return 'File uploads are unavailable until file storage is configured.';
+  }
+  return '';
+});
+const uploadSetupUrl = computed(() =>
+  uploadsUnavailable.value
+    ? uploadsCapability.value?.setupUrl || '/admin/setup#uploads'
+    : ''
+);
 
 // Track if we've reached the image limit
 const isImageLimitReached = computed(() => {
@@ -306,13 +345,13 @@ const moveImageDown = (index: number) => {
 
 // Handle files selected from drop zone
 const handleFilesSelected = (files: FileList) => {
-  if (props.allowImageUpload === false) return;
+  if (!fileUploadAvailable.value) return;
   handleMultipleFiles(files);
 };
 
 // Handle drop event from drop zone
 const handleDropEvent = (event: DragEvent) => {
-  if (props.allowImageUpload === false) return;
+  if (!fileUploadAvailable.value) return;
   handleDrop(event, true, isImageLimitReached.value);
 };
 
@@ -432,6 +471,9 @@ const handleUrlCancel = () => {
     <AlbumDropZone
       :is-limit-reached="isImageLimitReached"
       :max-images="MAX_IMAGES"
+      :file-upload-available="fileUploadAvailable"
+      :file-upload-unavailable-message="fileUploadUnavailableMessage"
+      :setup-url="uploadSetupUrl"
       @files-selected="handleFilesSelected"
       @drop="handleDropEvent"
       @show-url-input="handleShowUrlInput"

@@ -1,10 +1,20 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 
-const props = defineProps<{
-  isLimitReached: boolean;
-  maxImages: number;
-}>();
+const props = withDefaults(
+  defineProps<{
+    isLimitReached: boolean;
+    maxImages: number;
+    fileUploadAvailable?: boolean;
+    fileUploadUnavailableMessage?: string;
+    setupUrl?: string;
+  }>(),
+  {
+    fileUploadAvailable: true,
+    fileUploadUnavailableMessage: '',
+    setupUrl: '',
+  }
+);
 
 const emit = defineEmits<{
   (e: 'files-selected', files: FileList): void;
@@ -20,6 +30,8 @@ const selectFiles = (event?: Event) => {
     event.stopPropagation();
   }
 
+  if (!props.fileUploadAvailable) return;
+
   if (props.isLimitReached) {
     alert(`You've reached the maximum limit of ${props.maxImages} images.`);
     return;
@@ -31,6 +43,8 @@ const selectFiles = (event?: Event) => {
 };
 
 const handleFileInputChange = (event: Event) => {
+  if (!props.fileUploadAvailable) return;
+
   const input = event.target as HTMLInputElement;
   if (!input?.files?.length) return;
 
@@ -42,6 +56,7 @@ const handleFileInputChange = (event: Event) => {
 
 const handleDrop = (event: DragEvent) => {
   event.preventDefault();
+  if (!props.fileUploadAvailable) return;
   emit('drop', event);
 };
 
@@ -73,22 +88,41 @@ const handleShowExistingPicker = (event?: Event) => {
 <template>
   <div
     v-if="!isLimitReached"
-    class="my-3 cursor-pointer rounded-md border-2 border-dotted border-gray-400 p-4 text-center"
+    class="my-3 rounded-md border-2 border-dotted border-gray-400 p-4 text-center"
+    :class="fileUploadAvailable ? 'cursor-pointer' : ''"
     @drop="handleDrop"
     @dragover="handleDragOver"
   >
     <label
       for="album-file-input"
-      class="flex h-full w-full cursor-pointer flex-col items-center justify-center"
+      class="flex h-full w-full flex-col items-center justify-center"
+      :class="fileUploadAvailable ? 'cursor-pointer' : ''"
     >
       <p class="mb-3 text-sm text-gray-500 dark:text-gray-300">
-        Drag and drop, tap to add files, paste a link, or reuse an image you
-        already have
+        {{
+          fileUploadAvailable
+            ? 'Drag and drop, tap to add files, paste a link, or reuse an image you already have'
+            : 'Paste a link or reuse an image you already have'
+        }}
+      </p>
+      <p
+        v-if="fileUploadUnavailableMessage"
+        class="mb-3 text-xs text-amber-800 dark:text-amber-200"
+      >
+        {{ fileUploadUnavailableMessage }}
+        <NuxtLink
+          v-if="setupUrl"
+          :to="setupUrl"
+          class="font-medium underline"
+        >
+          Open instance setup
+        </NuxtLink>
       </p>
       <div class="flex flex-wrap items-center justify-center gap-4 text-black">
         <button
           type="button"
-          class="rounded bg-orange-500 px-4 py-2 transition-colors hover:bg-orange-600"
+          class="rounded bg-orange-500 px-4 py-2 transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600 dark:disabled:bg-gray-700 dark:disabled:text-gray-400"
+          :disabled="!fileUploadAvailable"
           @click="selectFiles"
         >
           Choose Files
@@ -118,6 +152,7 @@ const handleShowExistingPicker = (event?: Event) => {
       multiple
       accept="image/*"
       style="display: none"
+      :disabled="!fileUploadAvailable"
       @change="handleFileInputChange"
     >
   </div>

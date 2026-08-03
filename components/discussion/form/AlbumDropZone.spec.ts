@@ -6,6 +6,14 @@ import AlbumDropZone from '@/components/discussion/form/AlbumDropZone.vue';
 const mountZone = (props: Record<string, unknown> = {}) =>
   mount(AlbumDropZone, {
     props: { isLimitReached: false, maxImages: 5, ...props },
+    global: {
+      stubs: {
+        NuxtLink: {
+          props: ['to'],
+          template: '<a :href="to"><slot /></a>',
+        },
+      },
+    },
   });
 
 const buttonByText = (w: ReturnType<typeof mount>, text: string) =>
@@ -33,6 +41,35 @@ describe('AlbumDropZone rendering', () => {
     const wrapper = mountZone({ isLimitReached: true });
 
     expect(buttonByText(wrapper, 'Choose Files')).toBeUndefined();
+  });
+
+  it('keeps link and reuse actions available when file storage is unavailable', () => {
+    const wrapper = mountZone({
+      fileUploadAvailable: false,
+      fileUploadUnavailableMessage: 'File storage is not configured.',
+      setupUrl: '/admin/setup#uploads',
+    });
+
+    expect(
+      wrapper.findAll('button').map((button) => ({
+        text: button.text(),
+        disabled: button.attributes('disabled') !== undefined,
+      }))
+    ).toEqual([
+      { text: 'Choose Files', disabled: true },
+      { text: 'Link to Image', disabled: false },
+      { text: 'Reuse an Image', disabled: false },
+    ]);
+  });
+
+  it('links operators to upload setup when provided', () => {
+    const wrapper = mountZone({
+      fileUploadAvailable: false,
+      fileUploadUnavailableMessage: 'File storage is not configured.',
+      setupUrl: '/admin/setup#uploads',
+    });
+
+    expect(wrapper.get('a').attributes('href')).toBe('/admin/setup#uploads');
   });
 });
 
@@ -92,6 +129,14 @@ describe('AlbumDropZone actions', () => {
     await wrapper.find('.border-dotted').trigger('drop');
 
     expect(wrapper.emitted('drop')).toBeTruthy();
+  });
+
+  it('ignores dropped files when file uploads are unavailable', async () => {
+    const wrapper = mountZone({ fileUploadAvailable: false });
+
+    await wrapper.find('.border-dotted').trigger('drop');
+
+    expect(wrapper.emitted('drop')).toBeUndefined();
   });
 
   it('handles dragover without emitting', async () => {
