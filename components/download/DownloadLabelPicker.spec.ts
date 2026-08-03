@@ -51,7 +51,7 @@ const mockFilterGroups: FilterGroup[] = [
 ] as FilterGroup[];
 
 describe('DownloadLabelPicker', () => {
-  it('displays filter group names', () => {
+  it('displays non-license filter group names', () => {
     const wrapper = mount(DownloadLabelPicker, {
       props: {
         filterGroups: mockFilterGroups,
@@ -70,7 +70,26 @@ describe('DownloadLabelPicker', () => {
     });
 
     expect(wrapper.text()).toContain('Category');
-    expect(wrapper.text()).toContain('License Type');
+  });
+
+  it('hides the license filter group', () => {
+    const wrapper = mount(DownloadLabelPicker, {
+      props: {
+        filterGroups: mockFilterGroups,
+        selectedLabels: {},
+      },
+      global: {
+        stubs: {
+          MultiSelect: { template: '<div class="multi-select" />' },
+          CheckBox: {
+            template: '<div class="checkbox"><span>{{ label }}</span></div>',
+            props: ['checked', 'label'],
+          },
+        },
+      },
+    });
+
+    expect(wrapper.text()).not.toContain('License Type');
   });
 
   it('displays all options in small groups as checkboxes', () => {
@@ -90,12 +109,10 @@ describe('DownloadLabelPicker', () => {
       },
     });
 
-    // All options from both groups should be visible
+    // All options from the visible group should be visible
     expect(wrapper.text()).toContain('Tools');
     expect(wrapper.text()).toContain('Models');
     expect(wrapper.text()).toContain('Textures');
-    expect(wrapper.text()).toContain('Free');
-    expect(wrapper.text()).toContain('Commercial');
   });
 
   it('shows selected count when labels are selected', () => {
@@ -118,8 +135,8 @@ describe('DownloadLabelPicker', () => {
       },
     });
 
-    // Should show total count of selected labels
-    expect(wrapper.text()).toContain('3 selected');
+    // License selections are preserved in data but omitted from the user-facing count.
+    expect(wrapper.text()).toContain('2 selected');
   });
 
   it('emits update event when checkbox is toggled', async () => {

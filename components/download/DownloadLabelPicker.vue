@@ -21,6 +21,16 @@ const emit = defineEmits<{
   'update:selectedLabels': [labels: Record<string, string[]>];
 }>();
 
+const visibleFilterGroups = computed(() =>
+  props.filterGroups.filter((group) => group.key !== 'license')
+);
+
+const visibleSelectedLabels = computed<Array<[string, string[]]>>(() =>
+  Object.entries(props.selectedLabels).filter(
+    ([groupKey]) => groupKey !== 'license'
+  )
+);
+
 // Helper function to determine if a group should use dropdown
 const shouldUseDropdown = (group: FilterGroup) => {
   return (group.options?.length || 0) >= 10;
@@ -81,15 +91,13 @@ const handleMultiSelectUpdate = (
 
 // Check if any labels are selected
 const hasSelectedLabels = computed(() => {
-  return Object.values(props.selectedLabels).some(
-    (values) => values.length > 0
-  );
+  return visibleSelectedLabels.value.some(([, values]) => values.length > 0);
 });
 
 // Get total count of selected labels
 const selectedLabelCount = computed(() => {
-  return Object.values(props.selectedLabels).reduce(
-    (total, values) => total + values.length,
+  return visibleSelectedLabels.value.reduce(
+    (total, [, values]) => total + values.length,
     0
   );
 });
@@ -117,7 +125,11 @@ const selectedLabelCount = computed(() => {
 
     <!-- Filter Groups -->
     <div class="space-y-6">
-      <div v-for="group in filterGroups" :key="group.id" class="space-y-3">
+      <div
+        v-for="group in visibleFilterGroups"
+        :key="group.id"
+        class="space-y-3"
+      >
         <h4 class="text-md font-medium text-gray-800 dark:text-gray-200">
           {{ group.displayName }}
         </h4>
@@ -137,10 +149,7 @@ const selectedLabelCount = computed(() => {
 
         <!-- Regular checkboxes for groups with <10 options -->
         <div v-else class="space-y-2">
-          <div
-            v-for="option in group.options"
-            :key="option.id"
-          >
+          <div v-for="option in group.options" :key="option.id">
             <CheckBox
               :checked="
                 selectedLabels[group.key]?.includes(option.value) || false
@@ -155,7 +164,7 @@ const selectedLabelCount = computed(() => {
 
     <!-- Empty state -->
     <div
-      v-if="filterGroups.length === 0"
+      v-if="visibleFilterGroups.length === 0"
       class="py-6 text-center text-gray-500 dark:text-gray-400"
     >
       <p class="text-sm">No label categories configured for this forum.</p>
