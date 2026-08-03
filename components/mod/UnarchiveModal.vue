@@ -9,6 +9,7 @@ import {
   UNARCHIVE_DISCUSSION,
   UNARCHIVE_EVENT,
   UNARCHIVE_COMMENT,
+  UNARCHIVE_IMAGE,
 } from '@/graphQLData/issue/mutations';
 import { GET_ISSUE } from '@/graphQLData/issue/queries';
 
@@ -38,6 +39,11 @@ const props = defineProps({
     default: '',
   },
   eventId: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  imageId: {
     type: String,
     required: false,
     default: '',
@@ -142,6 +148,27 @@ const {
   },
 });
 
+const {
+  mutate: unarchiveImage,
+  loading: unarchiveImageLoading,
+  error: unarchiveImageError,
+  onDone: unarchiveImageDone,
+} = useMutation(UNARCHIVE_IMAGE, {
+  update: (cache) => {
+    cache.modify({
+      id: cache.identify({
+        __typename: 'Image',
+        id: props.imageId,
+      }),
+      fields: {
+        archived() {
+          return false;
+        },
+      },
+    });
+  },
+});
+
 unarchiveDiscussionDone(() => {
   client.refetchQueries({
     include: [GET_ISSUE],
@@ -163,6 +190,13 @@ unarchiveCommentDone(() => {
   emit('unarchivedSuccessfully');
 });
 
+unarchiveImageDone(() => {
+  client.refetchQueries({
+    include: [GET_ISSUE],
+  });
+  emit('unarchivedSuccessfully');
+});
+
 const modalTitle = computed(() => {
   if (props.commentId) {
     return 'Unarchive Comment';
@@ -170,6 +204,8 @@ const modalTitle = computed(() => {
     return 'Unarchive Discussion';
   } else if (props.eventId) {
     return 'Unarchive Event';
+  } else if (props.imageId) {
+    return 'Unarchive Image';
   }
 
   return 'Unarchive Content';
@@ -181,6 +217,8 @@ const modalBody = computed(() => {
     contentType = 'comment';
   } else if (props.eventId) {
     contentType = 'event';
+  } else if (props.imageId) {
+    contentType = 'image';
   }
   return `(Optional) Please add any more information or context about why this ${contentType} should be unarchived.`;
 });
@@ -191,13 +229,20 @@ const modalPlaceholder = computed(() => {
     contentType = 'comment';
   } else if (props.eventId) {
     contentType = 'event';
+  } else if (props.imageId) {
+    contentType = 'image';
   }
   return `Explain why this ${contentType} should be unarchived`;
 });
 
 const submit = async () => {
-  if (!props.discussionId && !props.eventId && !props.commentId) {
-    console.error('No discussion, event, or comment ID provided.');
+  if (
+    !props.discussionId &&
+    !props.eventId &&
+    !props.commentId &&
+    !props.imageId
+  ) {
+    console.error('No discussion, event, comment, or image ID provided.');
     return;
   }
 
@@ -205,6 +250,15 @@ const submit = async () => {
     unarchiveComment({
       commentId: props.commentId,
       explanation: explanation.value,
+    });
+    return;
+  }
+
+  if (props.imageId) {
+    unarchiveImage({
+      imageId: props.imageId,
+      explanation: explanation.value,
+      channelUniqueName: channelId.value || null,
     });
     return;
   }
@@ -241,7 +295,8 @@ const close = () => {
     :loading="
       unarchiveDiscussionLoading ||
       unarchiveEventLoading ||
-      unarchiveCommentLoading
+      unarchiveCommentLoading ||
+      unarchiveImageLoading
     "
     :primary-button-disabled="explanation.length === 0"
     :primary-button-text="'Unarchive'"
@@ -249,7 +304,8 @@ const close = () => {
     :error="
       unarchiveDiscussionError?.message ||
       unarchiveEventError?.message ||
-      unarchiveCommentError?.message
+      unarchiveCommentError?.message ||
+      unarchiveImageError?.message
     "
     @primary-button-click="submit"
     @close="close"

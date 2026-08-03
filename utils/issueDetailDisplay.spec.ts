@@ -48,6 +48,7 @@ describe('hasRelatedContent', () => {
     ['relatedDiscussionId', { relatedDiscussionId: 'd1' }],
     ['relatedEventId', { relatedEventId: 'e1' }],
     ['relatedCommentId', { relatedCommentId: 'c1' }],
+    ['relatedImageId', { relatedImageId: 'i1' }],
     ['relatedWikiPageId', { relatedWikiPageId: 'w1' }],
     ['relatedWikiRevisionId', { relatedWikiRevisionId: 'r1' }],
   ])('is true when %s is set', (_label, issue) => {

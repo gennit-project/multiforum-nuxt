@@ -4,24 +4,34 @@
  * data-derivation rules can be unit-tested in isolation.
  */
 
-type IssueReportSource = {
-  ActivityFeedAggregate?: { count?: number | null } | null;
-} | null | undefined;
+type IssueReportSource =
+  | {
+      ActivityFeedAggregate?: { count?: number | null } | null;
+    }
+  | null
+  | undefined;
 
-type IssueRelatedContent = {
-  relatedDiscussionId?: string | null;
-  relatedEventId?: string | null;
-  relatedCommentId?: string | null;
-  relatedWikiPageId?: string | null;
-  relatedWikiRevisionId?: string | null;
-} | null | undefined;
+type IssueRelatedContent =
+  | {
+      relatedDiscussionId?: string | null;
+      relatedEventId?: string | null;
+      relatedCommentId?: string | null;
+      relatedImageId?: string | null;
+      relatedWikiPageId?: string | null;
+      relatedWikiRevisionId?: string | null;
+    }
+  | null
+  | undefined;
 
-type RelatedCommentLike = {
-  CommentAuthor?: {
-    __typename?: string;
-    isBot?: boolean | null;
-  } | null;
-} | null | undefined;
+type RelatedCommentLike =
+  | {
+      CommentAuthor?: {
+        __typename?: string;
+        isBot?: boolean | null;
+      } | null;
+    }
+  | null
+  | undefined;
 
 /**
  * Number of items in the issue's activity feed, or null when the count is
@@ -48,10 +58,11 @@ export function formatReportCountLabel(count: number | null): string {
 export function hasRelatedContent(issue: IssueRelatedContent): boolean {
   return Boolean(
     issue?.relatedDiscussionId ||
-      issue?.relatedEventId ||
-      issue?.relatedCommentId ||
-      issue?.relatedWikiPageId ||
-      issue?.relatedWikiRevisionId
+    issue?.relatedEventId ||
+    issue?.relatedCommentId ||
+    issue?.relatedImageId ||
+    issue?.relatedWikiPageId ||
+    issue?.relatedWikiRevisionId
   );
 }
 

@@ -20,6 +20,7 @@ const { mockQueryState } = vi.hoisted(() => ({
       discussionChannels: [{ archived: false }],
       eventChannels: [{ archived: false }],
       comments: [{ archived: false }],
+      images: [{ archived: false }],
       isOriginalPosterSuspended: false,
       discussions: [{ hasDownload: false }],
     } as Record<string, unknown>,
@@ -61,6 +62,7 @@ describe('ModerationWizard', () => {
       discussionChannels: [{ archived: false }],
       eventChannels: [{ archived: false }],
       comments: [{ archived: false }],
+      images: [{ archived: false }],
       isOriginalPosterSuspended: false,
       discussions: [{ hasDownload: false }],
     };
@@ -289,6 +291,7 @@ describe('ModerationWizard', () => {
       { commentId: undefined, eventId: 'e1' },
       { eventChannels: [{ archived: true }] },
     ],
+    [{ commentId: undefined, imageId: 'i1' }, { images: [{ archived: true }] }],
   ])('resolves archived state for related content', (props, queryState) => {
     setQueryState(queryState);
     const wrapper = mountWrapper({ ...props, isSuspendedMod: false });

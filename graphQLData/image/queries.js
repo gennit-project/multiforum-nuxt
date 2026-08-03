@@ -4,6 +4,7 @@ export const GET_IMAGE_DETAILS = gql`
   query GetImageDetails($imageId: ID!) {
     images(where: { id: $imageId }) {
       id
+      archived
       url
       alt
       caption
@@ -162,7 +163,9 @@ export const GET_USER_ALBUMS = gql`
           username
         }
       }
-      ImagesAggregate(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
+      ImagesAggregate(
+        where: { archived_NOT: true, permanentlyRemoved_NOT: true }
+      ) {
         count
       }
       Discussions(options: { sort: { createdAt: DESC } }) {

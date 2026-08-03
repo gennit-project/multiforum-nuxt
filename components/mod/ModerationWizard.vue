@@ -19,6 +19,7 @@ import {
   IS_ORIGINAL_POSTER_SUSPENDED,
 } from '@/graphQLData/mod/queries';
 import { GET_COMMENT_ARCHIVED } from '@/graphQLData/comment/queries';
+import { GET_IMAGE_DETAILS } from '@/graphQLData/image/queries';
 
 const modProfileNameVar = useModProfileName();
 
@@ -38,6 +39,11 @@ const props = defineProps({
     default: '',
   },
   commentId: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  imageId: {
     type: String,
     required: false,
     default: '',
@@ -115,7 +121,9 @@ defineEmits([
 // Compute whether actions should be disabled
 const actionsDisabled = computed(() => {
   return (
-    !props.issue.isOpen || props.isCurrentUserOriginalPoster || props.isSuspendedMod
+    !props.issue.isOpen ||
+    props.isCurrentUserOriginalPoster ||
+    props.isSuspendedMod
   );
 });
 
@@ -185,6 +193,15 @@ const { result: isCommentArchivedResult } = useQuery(
   })
 );
 
+const { result: imageResult } = useQuery(
+  GET_IMAGE_DETAILS,
+  () => ({ imageId: props.imageId }),
+  () => ({
+    enabled: !!props.imageId,
+    fetchPolicy: 'cache-first',
+  })
+);
+
 const isArchived = computed(() => {
   if (props.discussionId) {
     return getDiscussionChannelResult.value?.discussionChannels?.[0]?.archived;
@@ -192,6 +209,8 @@ const isArchived = computed(() => {
     return getEventChannelResult.value?.eventChannels?.[0]?.archived;
   } else if (props.commentId) {
     return isCommentArchivedResult.value?.comments?.[0]?.archived;
+  } else if (props.imageId) {
+    return imageResult.value?.images?.[0]?.archived;
   }
   return false;
 });
@@ -251,8 +270,12 @@ const editActions = computed(() => {
 const editModalOpen = ref(false);
 
 const shouldShowEditActions = computed(() => {
-  const isReported = typeof props.reportCount === 'number' && props.reportCount > 0;
-  return isReported && ['comment', 'discussion'].includes(relatedContentType.value || '');
+  const isReported =
+    typeof props.reportCount === 'number' && props.reportCount > 0;
+  return (
+    isReported &&
+    ['comment', 'discussion'].includes(relatedContentType.value || '')
+  );
 });
 
 const hasEditPermission = computed(() => {
@@ -394,6 +417,7 @@ const editModalTargetType = computed(() => {
                         :discussion-id="discussionId"
                         :event-id="eventId"
                         :comment-id="commentId"
+                        :image-id="imageId"
                         :context-text="contextText"
                         :channel-unique-name="channelUniqueName"
                         :issue="issue"
@@ -495,7 +519,7 @@ const editModalTargetType = computed(() => {
                     </div>
 
                     <div
-                      class="border-amber-300 bg-amber-50 dark:border-amber-500/50 dark:bg-amber-500/10 -mx-4 -mb-4 space-y-3 rounded-b-lg p-4"
+                      class="-mx-4 -mb-4 space-y-3 rounded-b-lg border-amber-300 bg-amber-50 p-4 dark:border-amber-500/50 dark:bg-amber-500/10"
                     >
                       <p
                         class="font-semibold text-xs uppercase tracking-wide text-gray-700 dark:text-gray-300"
@@ -519,6 +543,7 @@ const editModalTargetType = computed(() => {
                             :discussion-id="discussionId"
                             :event-id="eventId"
                             :comment-id="commentId"
+                            :image-id="imageId"
                             :context-text="contextText"
                             :channel-unique-name="channelUniqueName"
                             :issue="issue"

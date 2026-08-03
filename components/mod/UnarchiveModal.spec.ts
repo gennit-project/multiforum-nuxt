@@ -15,6 +15,7 @@ const h = vi.hoisted(() => ({
   disc: {} as Slot,
   evt: {} as Slot,
   comment: {} as Slot,
+  image: {} as Slot,
   callIndex: { n: 0 },
 }));
 
@@ -22,7 +23,14 @@ vi.mock('@vue/apollo-composable', () => ({
   useApolloClient: () => ({ client: h.client }),
   useMutation: (_doc: unknown, options?: { update?: (c: unknown) => void }) => {
     h.callIndex.n++;
-    const slot = h.callIndex.n === 1 ? h.disc : h.callIndex.n === 2 ? h.evt : h.comment;
+    const slot =
+      h.callIndex.n === 1
+        ? h.disc
+        : h.callIndex.n === 2
+          ? h.evt
+          : h.callIndex.n === 3
+            ? h.comment
+            : h.image;
     slot.update = options?.update;
     return {
       mutate: slot.mutate,
@@ -34,12 +42,21 @@ vi.mock('@vue/apollo-composable', () => ({
     };
   },
 }));
-vi.mock('nuxt/app', () => ({ useRoute: () => ({ params: { forumId: 'cats' } }) }));
+vi.mock('nuxt/app', () => ({
+  useRoute: () => ({ params: { forumId: 'cats' } }),
+}));
 
 const stubs = {
   GenericModal: {
     name: 'GenericModal',
-    props: ['title', 'body', 'open', 'loading', 'primaryButtonDisabled', 'error'],
+    props: [
+      'title',
+      'body',
+      'open',
+      'loading',
+      'primaryButtonDisabled',
+      'error',
+    ],
     emits: ['primary-button-click', 'close'],
     template: '<div><slot name="content" /></div>',
   },
@@ -63,6 +80,7 @@ beforeEach(() => {
   h.disc = { mutate: vi.fn() };
   h.evt = { mutate: vi.fn() };
   h.comment = { mutate: vi.fn() };
+  h.image = { mutate: vi.fn() };
   h.client = { refetchQueries: vi.fn() };
 });
 
@@ -83,6 +101,12 @@ describe('UnarchiveModal labels', () => {
     const wrapper = mountModal({ eventId: 'e1' });
 
     expect(modal(wrapper).props('title')).toBe('Unarchive Event');
+  });
+
+  it('titles the modal for an image', () => {
+    const wrapper = mountModal({ imageId: 'i1' });
+
+    expect(modal(wrapper).props('title')).toBe('Unarchive Image');
   });
 
   it('describes the content type in the body', () => {
@@ -131,6 +155,18 @@ describe('UnarchiveModal submit', () => {
 
     expect(h.evt.mutate).toHaveBeenCalledWith({
       eventId: 'e1',
+      explanation: 'No violation',
+      channelUniqueName: 'cats',
+    });
+  });
+
+  it('unarchives an image with the channel name', async () => {
+    const wrapper = mountModal({ imageId: 'i1' });
+
+    await modal(wrapper).vm.$emit('primary-button-click');
+
+    expect(h.image.mutate).toHaveBeenCalledWith({
+      imageId: 'i1',
       explanation: 'No violation',
       channelUniqueName: 'cats',
     });
@@ -199,6 +235,15 @@ describe('UnarchiveModal cache updates', () => {
     const cache = makeCache();
 
     h.comment.update?.(cache);
+
+    expect(cache.modify).toHaveBeenCalled();
+  });
+
+  it('flips archived to false for an image', () => {
+    mountModal({ imageId: 'i1' });
+    const cache = makeCache();
+
+    h.image.update?.(cache);
 
     expect(cache.modify).toHaveBeenCalled();
   });

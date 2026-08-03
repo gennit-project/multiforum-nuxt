@@ -13,6 +13,7 @@ import {
   GET_EVENT_CHANNEL,
 } from '@/graphQLData/mod/queries';
 import { GET_COMMENT_ARCHIVED } from '@/graphQLData/comment/queries';
+import { GET_IMAGE_DETAILS } from '@/graphQLData/image/queries';
 
 const props = defineProps({
   issue: {
@@ -30,6 +31,11 @@ const props = defineProps({
     default: '',
   },
   commentId: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  imageId: {
     type: String,
     required: false,
     default: '',
@@ -55,17 +61,30 @@ const { result: getDiscussionChannelResult } = useQuery(
   {
     discussionId: props.discussionId,
     channelUniqueName: props.channelUniqueName,
-  }
+  },
+  { enabled: !!props.discussionId }
 );
 
-const { result: getEventChannelResult } = useQuery(GET_EVENT_CHANNEL, {
-  eventId: props.eventId,
-  channelUniqueName: props.channelUniqueName,
-});
+const { result: getEventChannelResult } = useQuery(
+  GET_EVENT_CHANNEL,
+  {
+    eventId: props.eventId,
+    channelUniqueName: props.channelUniqueName,
+  },
+  { enabled: !!props.eventId }
+);
 
-const { result: isCommentArchivedResult } = useQuery(GET_COMMENT_ARCHIVED, {
-  commentId: props.commentId,
-});
+const { result: isCommentArchivedResult } = useQuery(
+  GET_COMMENT_ARCHIVED,
+  { commentId: props.commentId },
+  { enabled: !!props.commentId }
+);
+
+const { result: imageResult } = useQuery(
+  GET_IMAGE_DETAILS,
+  { imageId: props.imageId },
+  { enabled: !!props.imageId }
+);
 
 const isArchived = computed(() => {
   if (props.discussionId) {
@@ -74,6 +93,8 @@ const isArchived = computed(() => {
     return getEventChannelResult.value?.eventChannels?.[0]?.archived;
   } else if (props.commentId) {
     return isCommentArchivedResult.value?.comments?.[0]?.archived;
+  } else if (props.imageId) {
+    return imageResult.value?.images?.[0]?.archived;
   }
   return false;
 });
@@ -122,6 +143,8 @@ const archivedContentType = computed(() => {
     return 'Event';
   } else if (props.commentId) {
     return 'Comment';
+  } else if (props.imageId) {
+    return 'Image';
   }
   return 'Content';
 });
@@ -162,6 +185,7 @@ const archivedContentType = computed(() => {
     :discussion-id="discussionId"
     :event-id="eventId"
     :comment-id="commentId"
+    :image-id="imageId"
     :archive-after-reporting="true"
     :discussion-channel-id="discussionChannelId"
     :event-channel-id="eventChannelId"
@@ -177,7 +201,8 @@ const archivedContentType = computed(() => {
     v-if="
       (discussionChannelId && discussionId) ||
       (eventChannelId && eventId) ||
-      commentId
+      commentId ||
+      imageId
     "
     :open="showUnarchiveModal"
     :discussion-channel-id="discussionChannelId"
@@ -185,6 +210,7 @@ const archivedContentType = computed(() => {
     :discussion-id="discussionId"
     :event-id="eventId"
     :comment-id="commentId"
+    :image-id="imageId"
     @close="closeUnarchiveModal"
     @unarchived-successfully="
       () => {
