@@ -54,7 +54,12 @@ export default defineConfig({
     },
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html', 'lcov'],
+      // CI uploads only lcov. Avoid spending time and disk space generating
+      // the JSON and HTML reports there, while preserving the richer local
+      // coverage output for developers.
+      reporter: process.env.CI
+        ? ['text', 'lcovonly']
+        : ['text', 'json', 'html', 'lcov'],
       reportsDirectory: './coverage',
       exclude: [
         'node_modules/',
