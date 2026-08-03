@@ -310,7 +310,7 @@ describe('DownloadSidebar', () => {
     });
   });
 
-  it('identifies a failed scan as a server-side problem for the creator', () => {
+  it('shows a compact failed-scan message with recovery actions', () => {
     mockUsernameRef.value = 'author';
     const wrapper = mount(DownloadSidebar, {
       props: {
@@ -329,9 +329,16 @@ describe('DownloadSidebar', () => {
       },
     });
 
-    expect(wrapper.get('[data-testid="download-scan-status"]').text()).toContain(
-      "a problem on our end, not your file"
-    );
+    expect({
+      text: wrapper.get('[data-testid="download-scan-status"]').text(),
+      links: wrapper
+        .get('[data-testid="download-scan-status"]')
+        .findAll('a')
+        .map((link) => link.text()),
+    }).toEqual({
+      text: "Security check needs another try The scan service had a problem—your file wasn't rejected. Retry scan View checks",
+      links: ['View checks'],
+    });
   });
 
   it('lets the creator retry a failed scan', async () => {
