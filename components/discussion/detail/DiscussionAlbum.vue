@@ -435,7 +435,8 @@ onMounted(() => {
           <!-- Image container -->
           <div class="flex items-center justify-center">
             <div
-              class="relative touch-pan-x overflow-hidden rounded-lg dark:text-white"
+              data-testid="discussion-album-carousel"
+              class="relative touch-pan-y overflow-hidden rounded-lg dark:text-white"
               :class="{
                 'w-full min-w-0 max-w-full': expandedView,
                 'max-w-96': !expandedView,

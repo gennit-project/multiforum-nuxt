@@ -215,6 +215,15 @@ describe('DiscussionAlbum — lightbox', () => {
 describe('DiscussionAlbum — carousel navigation', () => {
   beforeEach(() => vi.clearAllMocks());
 
+  const carousel = (wrapper: ReturnType<typeof mountAlbum>) =>
+    wrapper.get('[data-testid="discussion-album-carousel"]');
+
+  it('allows native vertical scrolling over the carousel', () => {
+    expect(carousel(mountAlbum({ carouselFormat: true })).classes()).toContain(
+      'touch-pan-y'
+    );
+  });
+
   it('advances to the next image', async () => {
     const wrapper = mountAlbum({ carouselFormat: true });
     await wrapper.get('[aria-label="Next image"]').trigger('click');
@@ -247,7 +256,7 @@ describe('DiscussionAlbum — carousel navigation', () => {
 
   it('navigates by swiping the image container', async () => {
     const wrapper = mountAlbum({ carouselFormat: true });
-    const container = wrapper.find('.touch-pan-x');
+    const container = carousel(wrapper);
     await container.trigger('touchstart', { touches: [{ clientX: 200 }] });
     await container.trigger('touchend', { changedTouches: [{ clientX: 100 }] });
 
@@ -256,7 +265,7 @@ describe('DiscussionAlbum — carousel navigation', () => {
 
   it('navigates backward on a right swipe', async () => {
     const wrapper = mountAlbum({ carouselFormat: true });
-    const container = wrapper.find('.touch-pan-x');
+    const container = carousel(wrapper);
     await container.trigger('touchstart', { touches: [{ clientX: 100 }] });
     await container.trigger('touchend', { changedTouches: [{ clientX: 200 }] });
     expect(wrapper.text()).toContain('3 of 3');
@@ -279,7 +288,7 @@ describe('DiscussionAlbum — carousel navigation', () => {
 
   it('opens the lightbox from the active carousel image', async () => {
     const wrapper = mountAlbum({ carouselFormat: true });
-    await wrapper.get('.touch-pan-x > div.h-full').trigger('click');
+    await carousel(wrapper).get('div.h-full').trigger('click');
     expect(document.body.querySelector('.lightbox-stub')).not.toBeNull();
   });
 
@@ -290,6 +299,6 @@ describe('DiscussionAlbum — carousel navigation', () => {
       downloadMode: true,
     });
 
-    expect(wrapper.find('.touch-pan-x').attributes('style')).toContain('500px');
+    expect(carousel(wrapper).attributes('style')).toContain('500px');
   });
 });
