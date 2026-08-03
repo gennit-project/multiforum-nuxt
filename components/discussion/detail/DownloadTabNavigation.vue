@@ -127,7 +127,11 @@ const {
           Activity
         </nuxt-link>
         <nuxt-link
-          v-if="hasPipelineContent"
+          v-if="
+            hasPipelineContent ||
+            (typeof $route.name === 'string' &&
+              $route.name.includes('pipelines'))
+          "
           :to="{
             name: 'forums-forumId-downloads-discussionId-pipelines',
             params: {

@@ -102,4 +102,13 @@ describe('DownloadTabNavigation', () => {
 
     expect(wrapper.text()).not.toContain('Pipelines');
   });
+
+  it('keeps the Pipelines tab visible on its route when loading fails', async () => {
+    mockHasPipelineContent.value = false;
+    const wrapper = await mountNav(
+      'forums-forumId-downloads-discussionId-pipelines'
+    );
+
+    expect(wrapper.text()).toContain('Pipelines');
+  });
 });
