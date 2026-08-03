@@ -23,7 +23,10 @@ import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { useForumLock } from '@/composables/useForumLock';
 import { useUsername } from '@/composables/useAuthState';
 import { GET_CHANNEL_DISCUSSION_FLAIR_CONFIG } from '@/graphQLData/channel/queries';
-import type { DiscussionFlairOption } from '@/components/discussion/form/DiscussionFlairPicker.vue';
+import {
+  useChannelDiscussionFlairConfigs,
+  type ChannelDiscussionFlairConfig,
+} from '@/composables/useChannelDiscussionFlairConfigs';
 
 const usernameVar = useUsername();
 
@@ -62,16 +65,10 @@ const createDiscussionDefaultValues: CreateEditDiscussionFormValues = {
 
 const formValues = ref(createDiscussionDefaultValues);
 
-type ChannelDiscussionFlairConfig = {
-  channelUniqueName: string;
-  flairRequired: boolean;
-  flairs: DiscussionFlairOption[];
-};
-
 const {
   result: flairConfigResult,
-  loading: discussionFlairsLoading,
-  error: discussionFlairsQueryError,
+  loading: scopedDiscussionFlairsLoading,
+  error: scopedDiscussionFlairsQueryError,
 } = useQuery(
   GET_CHANNEL_DISCUSSION_FLAIR_CONFIG,
   () => ({
@@ -85,13 +82,55 @@ const flairConfig = computed<ChannelDiscussionFlairConfig | null>(
   () => flairConfigResult.value?.getChannelDiscussionFlairConfig || null
 );
 
-const channelFlairSelections = computed(() => {
-  const flairIds =
-    formValues.value.selectedFlairIdsByChannel?.[channelId.value] || [];
-  return flairIds.length > 0
-    ? [{ channelUniqueName: channelId.value, flairIds }]
-    : [];
+const sitewideSelectedChannels = computed(() =>
+  channelId.value ? [] : formValues.value.selectedChannels
+);
+const {
+  configs: sitewideFlairConfigs,
+  loadingChannels: sitewideFlairsLoadingChannels,
+  errorsByChannel: sitewideFlairsErrorsByChannel,
+} = useChannelDiscussionFlairConfigs(sitewideSelectedChannels);
+
+const effectiveFlairConfigs = computed(() =>
+  channelId.value
+    ? flairConfig.value
+      ? [flairConfig.value]
+      : []
+    : sitewideFlairConfigs.value
+);
+
+const flairLoadingChannels = computed(() =>
+  channelId.value && scopedDiscussionFlairsLoading.value
+    ? [channelId.value]
+    : sitewideFlairsLoadingChannels.value
+);
+
+const flairErrorsByChannel = computed<Record<string, string>>(() => {
+  if (channelId.value && scopedDiscussionFlairsQueryError.value) {
+    return {
+      [channelId.value]: scopedDiscussionFlairsQueryError.value.message,
+    };
+  }
+  return sitewideFlairsErrorsByChannel.value;
 });
+
+const channelFlairSelections = computed(() => {
+  return formValues.value.selectedChannels.flatMap((channelUniqueName) => {
+    const flairIds =
+      formValues.value.selectedFlairIdsByChannel?.[channelUniqueName] || [];
+    return flairIds.length > 0 ? [{ channelUniqueName, flairIds }] : [];
+  });
+});
+
+const missingRequiredFlairConfig = computed(() =>
+  effectiveFlairConfigs.value.find(
+    (config) =>
+      config.flairRequired &&
+      (formValues.value.selectedFlairIdsByChannel?.[
+        config.channelUniqueName
+      ]?.length || 0) === 0
+  )
+);
 
 watch(
   () => crosspostDiscussionId.value,
@@ -322,26 +361,35 @@ function submit() {
     submitError.value = lockError.value;
     return;
   }
-  if (discussionFlairsLoading.value) {
+  if (flairLoadingChannels.value.length > 0) {
     submitError.value = 'Wait for the forum flair options to finish loading.';
     return;
   }
-  if (discussionFlairsQueryError.value) {
+  if (Object.keys(flairErrorsByChannel.value).length > 0) {
     submitError.value =
       'Unable to load the forum flair options. Please try again.';
     return;
   }
-  if (
-    flairConfig.value?.flairRequired &&
-    channelFlairSelections.value.length === 0
-  ) {
-    submitError.value = `Select at least one flair for ${channelId.value}.`;
+  if (missingRequiredFlairConfig.value) {
+    submitError.value = `Select at least one flair for ${missingRequiredFlairConfig.value.channelUniqueName}.`;
     return;
   }
   createDiscussion();
 }
 
 function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
+
+  if (data.selectedChannels) {
+    const selectedChannels = new Set(data.selectedChannels);
+    data = {
+      ...data,
+      selectedFlairIdsByChannel: Object.fromEntries(
+        Object.entries(
+          formValues.value.selectedFlairIdsByChannel || {}
+        ).filter(([channel]) => selectedChannels.has(channel))
+      ),
+    };
+  }
 
   // Handle album updates specially to avoid overwriting the entire album object
   if (data.album) {
@@ -401,8 +449,15 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
         :locked-channel-label="channelId || undefined"
         :discussion-flairs="flairConfig?.flairs || []"
         :discussion-flair-required="flairConfig?.flairRequired || false"
-        :discussion-flairs-loading="discussionFlairsLoading"
-        :discussion-flairs-error="discussionFlairsQueryError?.message"
+        :discussion-flairs-loading="scopedDiscussionFlairsLoading"
+        :discussion-flairs-error="scopedDiscussionFlairsQueryError?.message"
+        :discussion-flair-configs="sitewideFlairConfigs"
+        :discussion-flairs-loading-channels="
+          sitewideFlairsLoadingChannels
+        "
+        :discussion-flairs-errors-by-channel="
+          sitewideFlairsErrorsByChannel
+        "
         @submit="submit"
         @update-form-values="updateFormValues"
       />

@@ -239,6 +239,56 @@ describe('CreateEditDiscussionFields Component', () => {
       });
     });
 
+    it('renders and updates a flair selector for each selected sitewide forum', async () => {
+      const wrapper = mount(CreateEditDiscussionFields, {
+        props: {
+          editMode: false,
+          downloadMode: false,
+          formValues: {
+            ...defaultFormValues,
+            title: 'A multi-forum question',
+            selectedChannels: ['cats', 'dogs'],
+            selectedFlairIdsByChannel: { cats: ['question'] },
+          },
+          discussionFlairConfigs: [
+            {
+              channelUniqueName: 'cats',
+              flairRequired: true,
+              flairs: [{ id: 'question', displayName: 'Question' }],
+            },
+            {
+              channelUniqueName: 'dogs',
+              flairRequired: false,
+              flairs: [{ id: 'guide', displayName: 'Guide' }],
+            },
+          ],
+        },
+        global: { stubs: mockComponents },
+      });
+      const pickers = wrapper.findAllComponents({
+        name: 'DiscussionFlairPicker',
+      });
+      pickers[1].vm.$emit('update:modelValue', ['guide']);
+      await nextTick();
+
+      expect({
+        channels: pickers.map((picker) => picker.props('channelUniqueName')),
+        selected: pickers.map((picker) => picker.props('modelValue')),
+        update: wrapper.emitted('updateFormValues')?.[0],
+      }).toEqual({
+        channels: ['cats', 'dogs'],
+        selected: [['question'], []],
+        update: [
+          {
+            selectedFlairIdsByChannel: {
+              cats: ['question'],
+              dogs: ['guide'],
+            },
+          },
+        ],
+      });
+    });
+
     it('validates that title is required', async () => {
       const wrapper = mountComponent({
         ...defaultFormValues,

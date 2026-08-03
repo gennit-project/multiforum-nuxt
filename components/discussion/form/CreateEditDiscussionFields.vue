@@ -24,6 +24,7 @@ import type { Channel, Discussion } from '@/__generated__/graphql';
 import CrosspostedDiscussionEmbed from '@/components/discussion/detail/CrosspostedDiscussionEmbed.vue';
 import DiscussionFlairPicker from '@/components/discussion/form/DiscussionFlairPicker.vue';
 import type { DiscussionFlairOption } from '@/components/discussion/form/DiscussionFlairPicker.vue';
+import type { ChannelDiscussionFlairConfig } from '@/composables/useChannelDiscussionFlairConfigs';
 
 const props = defineProps<{
   editMode: boolean;
@@ -51,6 +52,9 @@ const props = defineProps<{
   discussionFlairRequired?: boolean;
   discussionFlairsLoading?: boolean;
   discussionFlairsError?: string;
+  discussionFlairConfigs?: ChannelDiscussionFlairConfig[];
+  discussionFlairsLoadingChannels?: string[];
+  discussionFlairsErrorsByChannel?: Record<string, string>;
 }>();
 
 defineEmits(['submit', 'updateFormValues', 'cancel']);
@@ -72,35 +76,79 @@ const formTitle = computed(() => {
 const touched = ref(false);
 const titleInputRef = ref<HTMLElement | null>(null);
 
+const effectiveFlairConfigs = computed<ChannelDiscussionFlairConfig[]>(() => {
+  if (props.lockedChannelName) {
+    return [
+      {
+        channelUniqueName: props.lockedChannelName,
+        flairRequired: props.discussionFlairRequired || false,
+        flairs: props.discussionFlairs || [],
+      },
+    ];
+  }
+  return props.discussionFlairConfigs || [];
+});
+
+const flairConfigsByChannel = computed(() =>
+  Object.fromEntries(
+    effectiveFlairConfigs.value.map((config) => [
+      config.channelUniqueName,
+      config,
+    ])
+  )
+);
+
+const flairLoadingChannels = computed(() =>
+  props.lockedChannelName && props.discussionFlairsLoading
+    ? [props.lockedChannelName]
+    : props.discussionFlairsLoadingChannels || []
+);
+
+const flairErrorsByChannel = computed<Record<string, string>>(() => {
+  if (props.lockedChannelName && props.discussionFlairsError) {
+    return { [props.lockedChannelName]: props.discussionFlairsError };
+  }
+  return props.discussionFlairsErrorsByChannel || {};
+});
+
+const missingRequiredFlairConfig = computed(() =>
+  effectiveFlairConfigs.value.find(
+    (config) =>
+      config.flairRequired &&
+      (props.formValues?.selectedFlairIdsByChannel?.[
+        config.channelUniqueName
+      ]?.length || 0) === 0
+  )
+);
+
 const discussionFormValidationInput = computed(() => ({
   selectedChannelsCount: props.formValues?.selectedChannels?.length || 0,
   title: props.formValues?.title || '',
   body: props.formValues?.body || '',
-  flairSelectionPending: props.discussionFlairsLoading,
-  flairSelectionUnavailable: Boolean(props.discussionFlairsError),
-  missingRequiredFlair:
-    props.discussionFlairRequired === true &&
-    (props.formValues?.selectedFlairIdsByChannel?.[
-      props.lockedChannelName || ''
-    ]?.length || 0) === 0,
-  requiredFlairChannelName: props.lockedChannelLabel || props.lockedChannelName,
+  flairSelectionPending: flairLoadingChannels.value.length > 0,
+  flairSelectionUnavailable:
+    Object.keys(flairErrorsByChannel.value).length > 0,
+  missingRequiredFlair: Boolean(missingRequiredFlairConfig.value),
+  requiredFlairChannelName:
+    missingRequiredFlairConfig.value?.channelUniqueName,
 }));
 
-const selectedFlairIds = computed(
-  () =>
-    props.formValues?.selectedFlairIdsByChannel?.[
-      props.lockedChannelName || ''
-    ] || []
+const flairPickerChannels = computed(() =>
+  (props.formValues?.selectedChannels || []).filter((channel) => {
+    const config = flairConfigsByChannel.value[channel];
+    return (
+      flairLoadingChannels.value.includes(channel) ||
+      Boolean(flairErrorsByChannel.value[channel]) ||
+      config?.flairRequired ||
+      (config?.flairs.length || 0) > 0
+    );
+  })
 );
 
-const showDiscussionFlairs = computed(
-  () =>
-    Boolean(props.lockedChannelName) &&
-    (props.discussionFlairsLoading ||
-      props.discussionFlairsError ||
-      props.discussionFlairRequired ||
-      (props.discussionFlairs?.length || 0) > 0)
-);
+const flairChannelLabel = (channel: string) =>
+  channel === props.lockedChannelName
+    ? props.lockedChannelLabel || channel
+    : channel;
 
 const needsChanges = computed(() =>
   discussionFormNeedsChanges(discussionFormValidationInput.value)
@@ -340,22 +388,27 @@ onMounted(() => {
             </FormRow>
 
             <FormRow
-              v-if="showDiscussionFlairs"
-              :required="discussionFlairRequired"
+              v-for="flairChannel in flairPickerChannels"
+              :key="flairChannel"
+              :required="flairConfigsByChannel[flairChannel]?.flairRequired"
             >
               <template #content>
                 <DiscussionFlairPicker
-                  :channel-unique-name="lockedChannelLabel || lockedChannelName || ''"
-                  :flairs="discussionFlairs || []"
-                  :model-value="selectedFlairIds"
-                  :required="discussionFlairRequired"
-                  :loading="discussionFlairsLoading"
-                  :error-message="discussionFlairsError"
+                  :channel-unique-name="flairChannelLabel(flairChannel)"
+                  :flairs="flairConfigsByChannel[flairChannel]?.flairs || []"
+                  :model-value="
+                    formValues.selectedFlairIdsByChannel?.[flairChannel] || []
+                  "
+                  :required="
+                    flairConfigsByChannel[flairChannel]?.flairRequired
+                  "
+                  :loading="flairLoadingChannels.includes(flairChannel)"
+                  :error-message="flairErrorsByChannel[flairChannel]"
                   @update:model-value="
                     $emit('updateFormValues', {
                       selectedFlairIdsByChannel: {
                         ...(formValues.selectedFlairIdsByChannel || {}),
-                        [lockedChannelName || '']: $event,
+                        [flairChannel]: $event,
                       },
                     })
                   "

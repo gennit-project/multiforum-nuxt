@@ -148,3 +148,79 @@ test('requires and submits a flair in the channel-scoped form', async ({
     { channelUniqueName: TEST_CHANNEL, flairIds: ['question'] },
   ]);
 });
+
+test('requires flair selections independently in the sitewide form', async ({
+  page,
+  setupMockedPage,
+}) => {
+  const state = createDiscussionState();
+  const flairByChannel = {
+    cats: { id: 'cat-question', displayName: 'Cat question', required: true },
+    dogs: { id: 'dog-topic', displayName: 'Dog topic', required: true },
+    birds: { id: 'bird-note', displayName: 'Bird note', required: false },
+  };
+  await setupMockedPage({
+    handlers: {
+      ...createDiscussionHandlers(state, {
+        channelId: TEST_CHANNEL,
+        username: 'cluse',
+      }),
+      getChannelNames: () => ({
+        data: {
+          channels: Object.keys(flairByChannel).map((uniqueName) => ({
+            uniqueName,
+            displayName: uniqueName,
+            channelIconURL: '',
+            description: '',
+          })),
+        },
+      }),
+      getChannelDiscussionFlairConfig: ({ body }) => {
+        const channelUniqueName = String(body.variables?.channelUniqueName);
+        const flair =
+          flairByChannel[channelUniqueName as keyof typeof flairByChannel];
+        return {
+          data: {
+            getChannelDiscussionFlairConfig: {
+              channelUniqueName,
+              flairRequired: flair.required,
+              flairs: [
+                {
+                  id: flair.id,
+                  channelUniqueName,
+                  displayName: flair.displayName,
+                  color: '#2563EB',
+                  order: 0,
+                  archived: false,
+                },
+              ],
+            },
+          },
+        };
+      },
+    },
+  });
+
+  await page.goto('/discussions/create');
+  await page.getByTestId('title-input').fill(TEST_DISCUSSION);
+  const channelPicker = page.getByTestId('channel-input');
+  await channelPicker.click();
+  await page.getByText('cats', { exact: true }).click();
+  await page.getByText('dogs', { exact: true }).click();
+  await page.getByText('birds', { exact: true }).click();
+  await page.getByTestId('title-input').click();
+
+  const saveButton = page.getByRole('button', { name: 'Save' }).first();
+  await expect(saveButton).toBeDisabled();
+  await page.getByRole('button', { name: 'Select Cat question flair' }).click();
+  await expect(saveButton).toBeDisabled();
+  await page.getByRole('button', { name: 'Select Dog topic flair' }).click();
+  await expect(saveButton).toBeEnabled();
+  await saveButton.click();
+
+  await expect(page).toHaveURL('/forums/cats/discussions/discussion-1');
+  expect(state.lastChannelFlairSelections).toEqual([
+    { channelUniqueName: 'cats', flairIds: ['cat-question'] },
+    { channelUniqueName: 'dogs', flairIds: ['dog-topic'] },
+  ]);
+});
