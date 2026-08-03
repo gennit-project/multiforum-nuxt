@@ -39,6 +39,7 @@ vi.mock('@/utils', async (importOriginal) => {
     ...actual,
     getUploadFileName: vi.fn(() => 'alice-banner.png'),
     uploadAndGetEmbeddedLink: h.uploadAndGetEmbeddedLink,
+    isFileSizeValid: h.isFileSizeValid,
   };
 });
 
