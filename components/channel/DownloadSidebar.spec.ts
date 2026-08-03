@@ -214,13 +214,17 @@ describe('DownloadSidebar', () => {
       },
     });
 
+    const scanStatus = wrapper.get('[data-testid="download-scan-status"]');
     expect({
-      message: wrapper.get('[data-testid="download-scan-status"]').text(),
+      message: scanStatus.text(),
       disabled: wrapper.get('button').attributes('disabled'),
+      icon: scanStatus.get('i').classes(),
     }).toEqual({
       message: expect.stringContaining('Quarantined: security check pending'),
       disabled: '',
+      icon: expect.arrayContaining(['fa-hourglass-half']),
     });
+    expect(scanStatus.get('i').classes()).not.toContain('animate-spin');
   });
 
   it('gives the creator cause-aware quarantine copy without a direct download', () => {
