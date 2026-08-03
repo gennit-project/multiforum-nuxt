@@ -327,17 +327,28 @@ describe('DownloadSidebar', () => {
         discussionId: 'discussion-1',
         channelUniqueName: 'test-forum',
       },
+      global: {
+        stubs: {
+          NuxtLink: {
+            props: ['to'],
+            template: '<a><slot /></a>',
+          },
+        },
+      },
     });
 
+    const status = wrapper.get('[data-testid="download-scan-status"]');
     expect({
-      text: wrapper.get('[data-testid="download-scan-status"]').text(),
-      links: wrapper
-        .get('[data-testid="download-scan-status"]')
-        .findAll('a')
-        .map((link) => link.text()),
+      title: status.get('p.font-medium').text(),
+      message: status.get('p.text-xs').text(),
+      actions: [
+        ...status.findAll('button'),
+        ...status.findAll('a'),
+      ].map((action) => action.text()),
     }).toEqual({
-      text: "Security check needs another try The scan service had a problem—your file wasn't rejected. Retry scan View checks",
-      links: ['View checks'],
+      title: 'Security check needs another try',
+      message: "The scan service had a problem—your file wasn't rejected.",
+      actions: ['Retry scan', 'View checks'],
     });
   });
 
