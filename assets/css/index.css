@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Pin the document's UA color-scheme to the app's own theme (toggled via the
+ * `.dark` class) rather than the OS. The <meta name="color-scheme"> hint lists
+ * both schemes, so a user whose OS is dark but who runs the app in light mode
+ * would otherwise get the browser's dark UA defaults — most visibly a white
+ * default text color — while our Tailwind backgrounds stay light, producing
+ * white-on-light text anywhere an element inherits its color (e.g. issue titles
+ * and tags on the admin dashboard, textarea contents). Tying color-scheme to
+ * the app theme keeps native defaults (text, form controls, scrollbars) in sync
+ * with the theme the user actually selected.
+ */
+:root {
+  color-scheme: light;
+}
+
+:root.dark {
+  color-scheme: dark;
+}
+
 .vue-map {
   height: 500px;
 }

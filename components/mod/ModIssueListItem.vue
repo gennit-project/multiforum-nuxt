@@ -150,7 +150,7 @@ const relatedChannelNames = computed(() =>
         >
           <nuxt-link
             v-if="issue.issueNumber"
-            class="hover:underline dark:text-gray-200 lg:hidden"
+            class="text-gray-900 hover:underline dark:text-gray-200 lg:hidden"
             :to="{
               name: 'forums-forumId-issues-issueNumber',
               params: {
@@ -165,7 +165,7 @@ const relatedChannelNames = computed(() =>
           <button
             v-if="issue.issueNumber"
             type="button"
-            class="hidden text-left hover:underline dark:text-gray-200 lg:inline-block"
+            class="hidden text-left text-gray-900 hover:underline dark:text-gray-200 lg:inline-block"
             @click="handleSelect"
           >
             <span
@@ -178,7 +178,7 @@ const relatedChannelNames = computed(() =>
               {{ issue.title }}
             </span>
           </button>
-          <span v-else class="dark:text-gray-200">{{ issue.title }}</span>
+          <span v-else class="text-gray-900 dark:text-gray-200">{{ issue.title }}</span>
           <span
             v-if="issue.locked"
             class="inline-flex items-center gap-1 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/70 dark:text-yellow-100"
@@ -200,7 +200,7 @@ const relatedChannelNames = computed(() =>
           </span>
           <span
             v-if="issue.flaggedServerRuleViolation"
-            class="rounded-lg bg-gray-200 px-2 py-1 text-xs dark:bg-gray-700 dark:text-white"
+            class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-800 dark:bg-gray-700 dark:text-white"
             >Server Rule Violation</span
           >
           <span
@@ -223,7 +223,7 @@ const relatedChannelNames = computed(() =>
             Wiki Edit
           </span>
         </span>
-        <div v-else class="dark:text-gray-200">{{ issue.title }}</div>
+        <div v-else class="text-gray-900 dark:text-gray-200">{{ issue.title }}</div>
         <div
           v-if="relatedChannelNames.length"
           class="mt-2 flex flex-wrap gap-1"
