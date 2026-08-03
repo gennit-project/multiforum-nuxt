@@ -159,10 +159,10 @@ const formValues = ref({
 const shouldShowSupportFields = (file: DownloadFormFile) =>
   Boolean(
     file.attributionOverride ||
-      file.supportPatreonUrl ||
-      file.supportBuyMeACoffeeUrl ||
-      file.supportKoFiUrl ||
-      file.supportPayPalMeUrl
+    file.supportPatreonUrl ||
+    file.supportBuyMeACoffeeUrl ||
+    file.supportKoFiUrl ||
+    file.supportPayPalMeUrl
   );
 
 const customSupportFieldsEnabled = ref<boolean[]>([]);
@@ -213,6 +213,12 @@ const downloadsDisabled = computed(() => {
   return props.channelData?.downloadsEnabled === false;
 });
 
+const downloadLabelFilterGroups = computed(() =>
+  (props.channelData?.FilterGroups || []).filter(
+    (group) => group.key !== 'license'
+  )
+);
+
 const currentChannelConnections = computed(() => {
   return props.channelData?.uniqueName ? [props.channelData.uniqueName] : [];
 });
@@ -220,8 +226,9 @@ const currentChannelConnections = computed(() => {
 // Initialize form values after component is mounted
 onMounted(() => {
   formValues.value.downloadableFiles = [...downloadableFiles.value];
-  customSupportFieldsEnabled.value =
-    formValues.value.downloadableFiles.map(shouldShowSupportFields);
+  customSupportFieldsEnabled.value = formValues.value.downloadableFiles.map(
+    shouldShowSupportFields
+  );
 
   // Initialize download labels from props
   formValues.value.downloadLabels = { ...props.existingDownloadLabels };
@@ -317,8 +324,8 @@ const uploadFile = async (file: File): Promise<boolean> => {
 
     // Ask the server for a signed storage URL
     const signedUrlResult = await createSignedStorageUrl(signedStorageURLInput);
-    const signedUpload = signedUrlResult?.data
-      ?.createSignedStorageURL as SignedStorageUrlPayload | undefined;
+    const signedUpload = signedUrlResult?.data?.createSignedStorageURL as
+      SignedStorageUrlPayload | undefined;
     const signedStorageURL = signedUpload?.url;
 
     if (!signedStorageURL) {
@@ -522,7 +529,9 @@ function handleSave() {
       />
 
       <ErrorBanner
-        v-else-if="permanentDeleteFileError || permanentlyDeleteDownloadableFileError"
+        v-else-if="
+          permanentDeleteFileError || permanentlyDeleteDownloadableFileError
+        "
         :text="
           permanentDeleteFileError ||
           permanentlyDeleteDownloadableFileError?.message ||
@@ -543,7 +552,7 @@ function handleSave() {
                 :accept="acceptAttribute"
                 :disabled="uploadingFile || downloadsDisabled"
                 @change="handleFileUpload"
-              >
+              />
               <label
                 for="downloadable-file-input"
                 class="hover:bg-gray-50 focus:ring-indigo-500 inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
@@ -563,7 +572,7 @@ function handleSave() {
                 <span v-else>
                   Maximum file size: {{ MAX_DOWNLOAD_FILE_SIZE_MB }}MB
                 </span>
-                <br >
+                <br />
                 <span v-if="channelData?.allowedFileTypes?.length">
                   Allowed file types:
                   {{ channelData.allowedFileTypes.join(', ') }}
@@ -605,7 +614,7 @@ function handleSave() {
                           readonly
                           class="bg-gray-50 flex-1 cursor-not-allowed rounded border border-gray-200 px-2 py-1 text-sm text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400"
                           type="text"
-                        >
+                        />
                         <button
                           type="button"
                           class="text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
@@ -635,14 +644,14 @@ function handleSave() {
                         <input
                           :checked="customSupportFieldsEnabled[index]"
                           type="checkbox"
-                          class="mt-1 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
+                          class="text-indigo-600 focus:ring-indigo-500 mt-1 h-4 w-4 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700"
                           @change="
                             updateCustomSupportFieldsEnabled(
                               index,
                               ($event.target as HTMLInputElement).checked
                             )
                           "
-                        >
+                        />
                         <span class="text-sm text-gray-700 dark:text-gray-300">
                           Use custom attribution and/or support links
                         </span>
@@ -685,9 +694,7 @@ function handleSave() {
                               {{ supportField.label }}
                             </span>
                             <input
-                              :value="
-                                file[supportField.key] || ''
-                              "
+                              :value="file[supportField.key] || ''"
                               type="url"
                               class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                               :placeholder="supportField.placeholder"
@@ -698,7 +705,7 @@ function handleSave() {
                                   ($event.target as HTMLInputElement).value
                                 )
                               "
-                            >
+                            />
                           </label>
                         </div>
                       </div>
@@ -716,7 +723,7 @@ function handleSave() {
                   :accept="acceptAttribute"
                   :disabled="uploadingFile || downloadsDisabled"
                   @change="handleFileUpload"
-                >
+                />
                 <label
                   for="additional-file-input"
                   class="hover:bg-gray-50 inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
@@ -737,13 +744,13 @@ function handleSave() {
 
       <!-- Download Labels Section -->
       <FormRow
-        v-if="channelData?.FilterGroups && channelData.FilterGroups.length > 0"
+        v-if="downloadLabelFilterGroups.length > 0"
         section-title="Labels"
         class="mt-6"
       >
         <template #content>
           <DownloadLabelPicker
-            :filter-groups="channelData.FilterGroups || []"
+            :filter-groups="downloadLabelFilterGroups"
             :selected-labels="formValues.downloadLabels"
             @update:selected-labels="
               (newLabels) => {

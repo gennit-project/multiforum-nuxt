@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import type { PropType } from 'vue';
-import type { Discussion, FilterOption } from '@/__generated__/graphql';
+import type { Discussion } from '@/__generated__/graphql';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import DownloadNowButton from '@/components/channel/DownloadNowButton.vue';
 import FunctionalDownloadNow from '@/components/channel/FunctionalDownloadNow.vue';
 import DownloadSuccessPopover from '@/components/download/DownloadSuccessPopover.vue';
 import DownloadPipelineStatusSummary from '@/components/plugins/DownloadPipelineStatusSummary.vue';
 import { computed, ref } from 'vue';
-import { useMutation, useQuery } from '@vue/apollo-composable';
-import { GET_DOWNLOAD_LABELS } from '@/graphQLData/discussion/queries';
+import { useMutation } from '@vue/apollo-composable';
 import {
   REQUEST_DOWNLOADABLE_FILE_REVIEW,
   RETRY_DOWNLOADABLE_FILE_SCAN,
@@ -142,30 +141,6 @@ const scanCheckedDisplay = computed(() => {
   return Number.isNaN(checkedAt.getTime()) ? '' : checkedAt.toLocaleString();
 });
 
-// Format price display
-const priceDisplay = computed(() => {
-  if (!primaryFile.value) return { main: '$0', sub: '00', label: null };
-
-  if (primaryFile.value.priceModel === 'FREE') {
-    return { main: '$0', sub: '00', label: null };
-  }
-
-  const cents = primaryFile.value.priceCents || 0;
-  const dollars = Math.floor(cents / 100);
-  const remainingCents = cents % 100;
-
-  return {
-    main: `$${dollars}`,
-    sub: remainingCents.toString().padStart(2, '0'),
-    label: 'Purchase',
-  };
-});
-
-// Get license info
-const licenseInfo = computed(() => {
-  return primaryFile.value?.license?.name || 'No license specified';
-});
-
 const downloadCounts = computed(() => {
   return {
     total: primaryFile.value?.downloadCountTotal || 0,
@@ -190,52 +165,6 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
   const decimals = unitIndex === 0 ? 0 : size >= 10 ? 1 : 2;
   return `${size.toFixed(decimals)} ${units[unitIndex]}`;
 };
-
-// Query for label options
-const { result: labelQueryResult } = useQuery(
-  GET_DOWNLOAD_LABELS,
-  {
-    discussionId: props.discussionId,
-    channelUniqueName: props.channelUniqueName,
-  },
-  {
-    enabled: !!props.discussionId && !!props.channelUniqueName,
-  }
-);
-
-// Get label options from query result
-const labelOptions = computed(() => {
-  const discussionChannels =
-    labelQueryResult.value?.discussions?.[0]?.DiscussionChannels;
-  const discussionChannel = discussionChannels?.[0];
-  return discussionChannel?.LabelOptions || [];
-});
-
-// Group labels by their group key for display
-const groupedLabels = computed(() => {
-  const groups: Record<
-    string,
-    Array<{ key: string; value: string; displayName: string }>
-  > = {};
-
-  labelOptions.value.forEach((option: FilterOption) => {
-    const groupKey = option.group?.key;
-    const groupDisplayName = option.group?.displayName;
-
-    if (groupKey && groupDisplayName) {
-      if (!groups[groupKey]) {
-        groups[groupKey] = [];
-      }
-      groups[groupKey].push({
-        key: groupDisplayName,
-        value: option.value || '',
-        displayName: option.displayName || option.value || '',
-      });
-    }
-  });
-
-  return groups;
-});
 </script>
 
 <template>
@@ -246,7 +175,7 @@ const groupedLabels = computed(() => {
       <!-- Boxed Info Section -->
       <div
         v-if="primaryFile"
-        class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-700"
+        class="bg-gray-50 mb-4 rounded-lg border border-gray-200 p-4 dark:border-gray-600 dark:bg-gray-700"
       >
         <!-- File Name -->
         <h2
@@ -259,16 +188,6 @@ const groupedLabels = computed(() => {
           {{ primaryFile.kind || 'OTHER' }} •
           {{ formatFileSize(primaryFile.size) }}
         </div>
-
-        <!-- Price Section -->
-        <!-- <div class="text-left mb-3">
-          <div class="text-3xl font-bold text-gray-900 dark:text-white">
-            <sup class="text-lg">{{ priceDisplay.main?.charAt(0) || '$' }}</sup>{{ priceDisplay.main?.slice(1) || '0' }}<sup class="text-lg">.{{ priceDisplay.sub || '00' }}</sup>
-          </div>
-          <div v-if="priceDisplay.label" class="py-1 text-sm text-gray-500 dark:text-gray-400">
-            {{ priceDisplay.label }}
-          </div>
-        </div> -->
 
         <div
           aria-live="polite"
@@ -429,7 +348,7 @@ const groupedLabels = computed(() => {
       <!-- No File Available -->
       <div
         v-if="!primaryFile"
-        class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4 text-center text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-300"
+        class="bg-gray-50 mb-4 rounded-lg border border-gray-200 p-4 text-center text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-300"
       >
         No downloadable files available
       </div>
@@ -459,60 +378,6 @@ const groupedLabels = computed(() => {
         :discussion-id="discussionId"
         :channel-name="channelUniqueName"
       />
-      <div
-        v-if="primaryFile && priceDisplay.label === 'Free Download'"
-        class="mt-2 text-xs text-gray-500 dark:text-gray-400"
-      >
-        By downloading, you agree to the content license
-      </div>
-      <!-- <div v-else class="text-xs mt-2 text-gray-500 dark:text-gray-400">
-        By placing an order, you're purchasing a content license
-      </div> -->
-
-      <!-- License Section -->
-      <div
-        v-if="primaryFile"
-        class="border-t border-gray-200 pt-4 dark:border-gray-700"
-      >
-        <h2 class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-          License
-        </h2>
-        <p class="text-sm text-gray-600 dark:text-gray-400">
-          {{ licenseInfo }}
-        </p>
-      </div>
-
-      <!-- Labels Section -->
-      <div
-        v-if="Object.keys(groupedLabels).length > 0"
-        class="border-t border-gray-200 pt-4 dark:border-gray-700"
-      >
-        <h2 class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-          Labels
-        </h2>
-        <div class="space-y-2">
-          <div
-            v-for="(labels, groupKey) in groupedLabels"
-            :key="groupKey"
-            class="flex flex-wrap gap-2"
-          >
-            <div
-              v-for="label in labels"
-              :key="`${groupKey}-${label.value}`"
-              class="inline-flex items-center gap-2 text-sm"
-            >
-              <span class="font-medium text-gray-700 dark:text-gray-300">
-                {{ label.key }}:
-              </span>
-              <span
-                class="rounded-full bg-gray-100 px-2 py-1 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
-              >
-                {{ label.displayName }}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 

@@ -1,13 +1,7 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
 import { ref, computed } from 'vue';
-import Lightgallery from 'lightgallery/vue';
-import lgThumbnail from 'lightgallery/plugins/thumbnail';
-import lgZoom from 'lightgallery/plugins/zoom';
-import { config } from '@/config';
-import 'lightgallery/css/lightgallery.css';
-import 'lightgallery/css/lg-thumbnail.css';
-import 'lightgallery/css/lg-zoom.css';
+import VueEasyLightbox from 'vue-easy-lightbox';
 import type { Album } from '@/__generated__/graphql';
 import LeftArrowIcon from '@/components/icons/LeftArrowIcon.vue';
 import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
@@ -23,10 +17,19 @@ const props = defineProps({
   },
 });
 
-const plugins = ref([lgThumbnail, lgZoom]);
-const lightGalleryLicenseKey = config.lightgalleryLicenseKey;
 const activeIndex = ref(0);
 const thumbnailStartIndex = ref(0);
+const lightboxVisible = ref(false);
+
+const galleryImages = computed(() =>
+  props.album.Images.map((image) => image.url || '')
+);
+const activeImage = computed(() => props.album.Images[activeIndex.value]);
+
+const openLightbox = (index: number) => {
+  activeIndex.value = index;
+  lightboxVisible.value = true;
+};
 
 const setActiveImage = (index: number) => {
   activeIndex.value = index;
@@ -60,18 +63,16 @@ const canScrollRight = computed(
 
 <template>
   <div class="overflow-x-auto border">
-    <lightgallery
-      v-if="!carouselFormat"
-      :settings="{
-        speed: 500,
-        plugins: plugins,
-        licenseKey: lightGalleryLicenseKey,
-      }"
-      class="grid grid-cols-3 gap-2 dark:text-white"
-    >
-      <a v-for="image in album.Images" :key="image.id" :href="image.url || ''">
+    <div v-if="!carouselFormat" class="grid grid-cols-3 gap-2 dark:text-white">
+      <button
+        v-for="(image, index) in album.Images"
+        :key="image.id"
+        type="button"
+        class="flex flex-col text-left"
+        :aria-label="`View ${image.alt || `image ${index + 1}`} in gallery`"
+        @click="openLightbox(index)"
+      >
         <img
-          v-if="image"
           :src="image.url || ''"
           :alt="image.alt || ''"
           class="shadow-sm"
@@ -79,34 +80,25 @@ const canScrollRight = computed(
         <span class="text-center">
           {{ image.alt }}
         </span>
-      </a>
-    </lightgallery>
+      </button>
+    </div>
 
     <!-- Carousel format - show first image large, then thumbnails -->
     <div v-else class="flex flex-col items-center">
       <!-- Main image display -->
-      <lightgallery
-        :settings="{
-          speed: 500,
-          plugins: plugins,
-          licenseKey: lightGalleryLicenseKey,
-        }"
+      <button
+        v-if="activeImage"
+        type="button"
         class="flex items-center justify-center"
+        :aria-label="`View ${activeImage.alt || `image ${activeIndex + 1}`} in gallery`"
+        @click="openLightbox(activeIndex)"
       >
-        <!-- Gallery items for lightgallery -->
-        <a
-          v-for="(image, index) in album.Images"
-          :key="image.id"
-          :href="image.url || ''"
-          :class="{ hidden: index !== activeIndex }"
+        <img
+          :src="activeImage.url || ''"
+          :alt="activeImage.alt || ''"
+          class="max-h-96 max-w-96 object-contain shadow-sm"
         >
-          <img
-            :src="image.url || ''"
-            :alt="image.alt || ''"
-            class="max-h-96 max-w-96 cursor-pointer object-contain shadow-sm"
-          >
-        </a>
-      </lightgallery>
+      </button>
 
       <!-- Thumbnails with navigation -->
       <div v-if="album.Images.length > 1" class="mt-4 flex items-center gap-2">
@@ -123,9 +115,10 @@ const canScrollRight = computed(
 
         <!-- Thumbnail grid -->
         <div class="grid grid-cols-4 gap-2">
-          <div
+          <button
             v-for="(image, index) in visibleThumbnails"
             :key="`thumbnail-${thumbnailStartIndex + index}`"
+            type="button"
             class="aspect-square h-20 w-20 cursor-pointer rounded border transition-all"
             :class="[
               activeIndex === thumbnailStartIndex + index
@@ -133,6 +126,7 @@ const canScrollRight = computed(
                 : 'border-gray-300 dark:border-gray-600',
               'bg-gray-100 dark:bg-gray-700',
             ]"
+            :aria-label="`Show ${image.alt || `image ${thumbnailStartIndex + index + 1}`}`"
             @click="() => setActiveImage(thumbnailStartIndex + index)"
           >
             <img
@@ -140,7 +134,7 @@ const canScrollRight = computed(
               :alt="`Thumbnail ${thumbnailStartIndex + index + 1}`"
               class="h-full w-full object-cover transition-opacity hover:opacity-80"
             >
-          </div>
+          </button>
         </div>
 
         <!-- Right arrow -->
@@ -155,11 +149,13 @@ const canScrollRight = computed(
         </button>
       </div>
     </div>
+
+    <VueEasyLightbox
+      v-if="lightboxVisible"
+      :visible="lightboxVisible"
+      :imgs="galleryImages"
+      :index="activeIndex"
+      @hide="lightboxVisible = false"
+    />
   </div>
 </template>
-
-<style scoped>
-img {
-  cursor: pointer;
-}
-</style>

@@ -194,6 +194,18 @@ describe('DownloadEditForm rendering', () => {
     ).toBe(true);
   });
 
+  it('does not render the label picker when license is the only filter group', () => {
+    const wrapper = mountForm({
+      channelData: {
+        FilterGroups: [{ id: 'license-group', key: 'license' }],
+      },
+    });
+
+    expect(
+      wrapper.findComponent({ name: 'DownloadLabelPicker' }).exists()
+    ).toBe(false);
+  });
+
   it('hides support fields by default for files without custom values', async () => {
     const wrapper = mountForm({
       discussion: makeDiscussion({ DownloadableFiles: [fileRecord()] }),

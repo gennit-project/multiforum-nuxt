@@ -27,7 +27,6 @@ vi.mock('@/config', () => ({
     googleMapsApiKey: '',
     googleMapId: '',
     graphqlUrl: '',
-    lightgalleryLicenseKey: '',
     logoutUrl: '',
     openCageApiKey: '',
     openGraphApiKey: '',

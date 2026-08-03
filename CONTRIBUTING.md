@@ -6,10 +6,10 @@ This guide is for the **frontend** ([multiforum-nuxt](https://github.com/gennit-
 
 ## Prerequisites
 
-- **Node.js ≥ 24.13.0** (see the `engines` field in `package.json`). Older
-  majors are not supported — Node 20, for example, crashes ESLint on
-  `Object.groupBy`. If you use `nvm`, run `nvm use 24` before installing or
-  running scripts.
+- **Node.js 26** is the recommended development runtime (see `.nvmrc`). Node.js
+  ≥ 24.13.0 remains supported while Vercel deploys on Node 24. Older majors are
+  not supported. If you use `nvm`, run `nvm use` before installing or running
+  scripts.
 - **npm** (bundled with Node).
 
 ## Environment Variables
@@ -51,7 +51,6 @@ The application requires several environment variables to be set up. Copy `.env.
 | `VITE_GOOGLE_CLOUD_STORAGE_BUCKET` | Google Cloud Storage bucket for file uploads   |
 | `VITE_SENTRY_AUTH_TOKEN`           | Sentry authentication token for error tracking |
 | `VITE_SENTRY_DSN`                  | Sentry Data Source Name for error reporting    |
-| `VITE_LIGHTGALLERY_LICENSE_KEY`    | License key for Lightgallery component         |
 
 ### Docker Compose Variables
 
@@ -79,8 +78,8 @@ The application requires several environment variables to be set up. Copy `.env.
 ## Getting Started
 
 1. Clone the repository
-2. Ensure you are on Node ≥ 24.13.0 (`nvm use 24`)
-3. Enable pnpm (this repo uses pnpm, pinned via the `packageManager` field): `corepack enable`
+2. Select the recommended Node 26 runtime (`nvm use`)
+3. Install the repository's pinned pnpm version (Node 26 no longer bundles Corepack): `npm install --global pnpm@10.28.2`
 4. Copy `.env.example` to `.env` and update the values
 5. Install dependencies with `pnpm install`
 6. Start the development server with `pnpm run dev`
