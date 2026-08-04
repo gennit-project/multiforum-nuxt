@@ -77,13 +77,14 @@ const isHovered = ref(false);
 const actualWidth = ref(400);
 const actualHeight = ref(400);
 
-// THREE.js objects - using any due to missing type declarations
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// THREE.js objects lack type declarations here, so these are intentionally `any`.
+/* eslint-disable @typescript-eslint/no-explicit-any */
 let scene: any,
   camera: any,
   renderer: any,
-  controls: any,
-  animationId: number | undefined;
+  controls: any;
+/* eslint-enable @typescript-eslint/no-explicit-any */
+let animationId: number | undefined;
 
 function updateDimensions() {
   if (!container.value) return;
