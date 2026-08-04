@@ -17,7 +17,7 @@ export default createConfigForNuxt({
       },
     ],
     'vue/v-on-event-hyphenation': 'off',
-    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/ban-ts-comment': 'off',
     'no-unused-vars': [
       'error',
@@ -103,7 +103,7 @@ export default createConfigForNuxt({
 }).override('nuxt/typescript/rules', {
   rules: {
     'vue/html-self-closing': 0,
-    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/ban-ts-comment': 'off',
     // Add the same rules here to ensure they're not overridden
     '@typescript-eslint/no-unused-vars': [
@@ -138,4 +138,13 @@ export default createConfigForNuxt({
   // not part of the app's lint surface. The Nuxt flat config otherwise picks it
   // up via .gitignore, so ignore it explicitly here.
   ignores: ['cloud_functions/**'],
+}).append({
+  // Test specs cast Apollo/mocks with `as any` by design (e.g.
+  // `(useMutation as any).mock`). Keep no-explicit-any relaxed in specs while it
+  // is enforced as an error in application source. Genuine external-lib interop
+  // in source (e.g. Three.js in StlViewer.vue) uses targeted inline disables.
+  files: ['**/*.spec.ts', '**/*.test.ts'],
+  rules: {
+    '@typescript-eslint/no-explicit-any': 'off',
+  },
 });

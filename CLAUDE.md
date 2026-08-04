@@ -102,9 +102,9 @@ Hard-won pitfalls (full detail + code in [CONTRIBUTING.md](./CONTRIBUTING.md#fro
 ## Code Style Guidelines
 
 - **TypeScript**: Use strict typing whenever possible, proper interfaces in `types/` directory
-  - **Import GraphQL Types**: When fixing TypeScript errors, prefer importing proper types from `@/__generated__/graphql` over using `any`
+  - **Import GraphQL Types**: Use the generated types in `@/__generated__/graphql` for **every** GraphQL input and response — query variables and mutation inputs (`…QueryVariables` / `…MutationVariables` / `…Input`) as well as responses. Use `Pick`/`Omit` on a generated entity type for subsets rather than hand-writing a partial interface.
   - **Examples**: Use `User`, `Comment`, `Discussion`, `Event`, `Revision`, `TextVersion` etc. from the generated GraphQL schema
-  - **Avoid `any`**: Only use `any` as a last resort when proper types are not available
+  - **Avoid `any`**: `@typescript-eslint/no-explicit-any` is an **error** in application source (relaxed only in `*.spec.ts`). Only use `any` for genuinely untyped third-party interop, with a targeted `// eslint-disable-next-line` + reason — never for GraphQL data. See the `apollo-data` skill.
   - **Type Checking**: Use `pnpm run tsc` (which runs `vue-tsc --noEmit`) for proper Vue component type checking
 
 ### Common TypeScript Patterns and Fixes
@@ -196,7 +196,7 @@ Hard-won pitfalls (full detail + code in [CONTRIBUTING.md](./CONTRIBUTING.md#fro
 - **RequireAuth slot pattern**: For auth-gated controls that should look identical in both auth states, extract a shared presentational child component.
   Use a thin functional wrapper for the authenticated slot when the real behavior needs to be attached, and render the shared child directly in the unauthenticated slot unless a placebo wrapper is genuinely useful.
 - **Error Handling**: Use try/catch with specific error types, validate GraphQL responses
-- **Apollo useMutation**: Always leverage `useMutation`’s built-in `loading`, `error`, and `onDone` hooks instead of recreating that state yourself. Bind UI disabled/loading states directly to the mutation’s `loading` ref and surface errors via the `error` ref.
+- **Apollo state (useQuery & useMutation)**: Always leverage the hook's built-in refs — `useMutation`'s `loading` / `error` / `onDone` and `useQuery`'s `result` / `loading` / `error` / `onResult` — instead of recreating that state in hand-written `ref`s. Bind UI disabled/loading/error states directly to the hook's refs, and put side effects in `onDone` / `onResult` / `onError`. Do not hand-roll `mutate()`/`refetch()` in try/catch to mirror state the hook already exposes. See the `apollo-data` skill and [docs/code-review-checklist.md](./docs/code-review-checklist.md).
 - **Naming**: camelCase for variables/functions, PascalCase for components/interfaces
 - **Imports**: Group imports by type (Vue, libraries, local components, utils)
 - **Testing**: Each feature should have Playwright coverage, with shared seed data and cleanup helpers
