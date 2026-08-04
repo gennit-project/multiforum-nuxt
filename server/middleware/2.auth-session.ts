@@ -31,6 +31,27 @@
 //
 // Numeric filename prefix controls middleware order (runs after
 // 1.cache-control.ts), matching the existing convention in this directory.
+import type * as H3 from 'h3';
+import type { Storage, StorageValue } from 'unstorage';
+import { isLocalDevAuth, LOCAL_AUTH_COOKIE } from '@/server/utils/local-auth';
+
+// Nitro injects these server auto-imports at build time. Declare their narrow
+// shapes here as well so this middleware remains type-checkable when a unit
+// test imports it through the client-side vue-tsc project.
+declare const defineEventHandler: typeof H3.defineEventHandler;
+declare const getCookie: typeof H3.getCookie;
+declare const deleteCookie: typeof H3.deleteCookie;
+declare const useRuntimeConfig: (event?: H3.H3Event) => {
+  public?: {
+    authProvider?: string;
+    apollo?: { clients?: { default?: { httpEndpoint?: string } } };
+  };
+};
+declare const useStorage: <T extends StorageValue>(base?: string) => Storage<T>;
+declare const useAuth0: (event: H3.H3Event) => {
+  getSession: () => Promise<{ user?: Record<string, unknown> } | null>;
+  getAccessToken: () => Promise<{ accessToken?: string } | null>;
+};
 
 type AuthSessionContext = {
   isAuthenticated: boolean;
@@ -59,6 +80,7 @@ declare module 'h3' {
 const GET_OWN_EMAIL = /* GraphQL */ `
   query getOwnEmail {
     getOwnEmail {
+      address
       username
       profilePicURL
       modProfileName
@@ -70,6 +92,7 @@ const GET_OWN_EMAIL = /* GraphQL */ `
 type OwnEmailResponse = {
   data?: {
     getOwnEmail?: {
+      address?: string | null;
       username?: string | null;
       profilePicURL?: string | null;
       modProfileName?: string | null;
@@ -146,6 +169,44 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
+  const runtimeConfig = useRuntimeConfig(event);
+  if (isLocalDevAuth(runtimeConfig)) {
+    const accessToken = getCookie(event, LOCAL_AUTH_COOKIE);
+    const graphqlUrl =
+      runtimeConfig.public?.apollo?.clients?.default?.httpEndpoint;
+    if (!accessToken || !graphqlUrl) return;
+
+    try {
+      const response = await $fetch<OwnEmailResponse>(graphqlUrl, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: { query: GET_OWN_EMAIL },
+      });
+      const profile = response?.data?.getOwnEmail;
+      if (!profile?.address) {
+        deleteCookie(event, LOCAL_AUTH_COOKIE, { path: '/' });
+        return;
+      }
+
+      event.context.accessToken = accessToken;
+      event.context.authSession = {
+        isAuthenticated: true,
+        username: profile.username || '',
+        email: profile.address,
+        modProfileName: profile.modProfileName || '',
+        notificationCount: profile.unreadNotificationCount || 0,
+        profilePicURL: profile.profilePicURL || '',
+      };
+    } catch {
+      // An expired or invalid local token restores the anonymous state.
+      deleteCookie(event, LOCAL_AUTH_COOKIE, { path: '/' });
+    }
+    return;
+  }
+
   try {
     // useAuth0 is auto-imported by @auth0/auth0-nuxt in the Nitro context.
     const auth0 = useAuth0(event);
@@ -186,8 +247,7 @@ export default defineEventHandler(async (event) => {
           event.context.accessToken = accessToken;
         }
         const graphqlUrl =
-          useRuntimeConfig(event).public?.apollo?.clients?.default
-            ?.httpEndpoint;
+          runtimeConfig.public?.apollo?.clients?.default?.httpEndpoint;
 
         if (accessToken && graphqlUrl) {
           const queryBackend = <T>(query: string) =>
@@ -209,10 +269,9 @@ export default defineEventHandler(async (event) => {
             username = cached.username;
             modProfileName = cached.modProfileName;
             profilePicURL = cached.profilePicURL;
-            const countRes =
-              await queryBackend<NotificationCountResponse>(
-                GET_NOTIFICATION_COUNT
-              );
+            const countRes = await queryBackend<NotificationCountResponse>(
+              GET_NOTIFICATION_COUNT
+            );
             notificationCount =
               countRes?.data?.getOwnEmail?.unreadNotificationCount || 0;
           } else {

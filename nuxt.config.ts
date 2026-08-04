@@ -78,9 +78,7 @@ export default defineNuxtConfig({
   },
   compatibilityDate: '2024-04-03',
   components: true,
-  css: [
-    '@/assets/css/index.css',
-  ],
+  css: ['@/assets/css/index.css'],
   devtools: { enabled: true },
   imports: {
     autoImport: true,
@@ -380,6 +378,9 @@ export default defineNuxtConfig({
     { src: '@/plugins/test-auth.client', mode: 'client' },
   ],
   runtimeConfig: {
+    // Optional explicit backend token URL for local development auth. When it
+    // is empty, the server derives /auth/local-dev/token from the GraphQL URL.
+    localAuthTokenEndpoint: '',
     // SPIKE (auth0-nuxt server-session migration): server-only Auth0 config.
     // These are overridden by NUXT_AUTH0_* env vars at runtime (see
     // .env.auth0-nuxt.example). clientSecret + sessionSecret mean this is a
@@ -404,6 +405,10 @@ export default defineNuxtConfig({
       },
     },
     public: {
+      authProvider:
+        process.env.NUXT_PUBLIC_AUTH_PROVIDER === 'local-dev'
+          ? 'local-dev'
+          : 'auth0',
       apollo: {
         clients: {
           default: {
