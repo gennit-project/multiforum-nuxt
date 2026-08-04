@@ -1,22 +1,20 @@
-version: '3.8'
-
 services:
   database:
     image: neo4j:5.1.0
-    container_name: database
+    restart: unless-stopped
     ports:
-      - '7474:7474'
-      - '7687:7687'
+      - '${MULTIFORUM_BIND_ADDRESS:-127.0.0.1}:7474:7474'
+      - '${MULTIFORUM_BIND_ADDRESS:-127.0.0.1}:7687:7687'
     environment:
-      - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/playwright-ci-password}
-      - NEO4J_PLUGINS=["apoc"]
-      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
-      - NEO4J_dbms_default__database=neo4j
-      - NEO4J_dbms_logs_debug_level=INFO
-      - NEO4J_dbms_logs_query_enabled=OFF
-      - NEO4J_dbms_memory_pagecache_size=512M
-      - NEO4J_dbms_memory_heap_initial__size=512M
-      - NEO4J_dbms_memory_heap_max__size=1G
+      NEO4J_AUTH: 'neo4j/${NEO4J_PASSWORD:-multiforum-local-neo4j}'
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: 'apoc.*'
+      NEO4J_dbms_default__database: neo4j
+      NEO4J_dbms_logs_debug_level: INFO
+      NEO4J_dbms_logs_query_enabled: 'OFF'
+      NEO4J_dbms_memory_pagecache_size: 256M
+      NEO4J_dbms_memory_heap_initial__size: 256M
+      NEO4J_dbms_memory_heap_max__size: 512M
     volumes:
       - neo4j-data:/data
       - neo4j-logs:/logs
@@ -30,83 +28,102 @@ services:
           '-u',
           'neo4j',
           '-p',
-          '${NEO4J_PASSWORD:-playwright-ci-password}',
+          '${NEO4J_PASSWORD:-multiforum-local-neo4j}',
           'RETURN 1',
         ]
-      interval: 15s
+      interval: 10s
       timeout: 10s
-      retries: 10
+      retries: 20
+      start_period: 30s
     networks:
       - multiforum-network
 
   backend:
-    image: cluse/multiforum-backend:latest
-    container_name: multiforum-backend
+    image: ${MULTIFORUM_BACKEND_IMAGE:-multiforum-backend:quickstart}
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+      args:
+        MULTIFORUM_BACKEND_REPOSITORY: ${MULTIFORUM_BACKEND_REPOSITORY:-https://github.com/gennit-project/multiforum-backend.git}
+        MULTIFORUM_BACKEND_REF: ${MULTIFORUM_BACKEND_REF:-main}
+    restart: unless-stopped
     ports:
-      - '4000:4000'
+      - '${MULTIFORUM_BIND_ADDRESS:-127.0.0.1}:4000:4000'
     depends_on:
       database:
         condition: service_healthy
     environment:
-      - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
-      - AUTH0_DOMAIN=${AUTH0_DOMAIN}
-      - ENVIRONMENT=local
-      - GCS_BUCKET_NAME=${GCS_BUCKET_NAME}
-      - GOOGLE_CREDENTIALS_BASE64=${GOOGLE_CREDENTIALS_BASE64}
-      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-playwright-ci-password}
-      - NEO4J_URI=bolt://database:7687
-      - NEO4J_USERNAME=${NEO4J_USERNAME:-neo4j}
-      - SERVER_CONFIG_NAME=${VITE_SERVER_NAME:-Gennit}
-      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+      NODE_ENV: development
+      ENVIRONMENT: local
+      MULTIFORUM_AUTH_PROVIDER: local-dev
+      MULTIFORUM_AUTO_PROVISION: 'true'
+      MULTIFORUM_BOOTSTRAP_EMAIL: ${MULTIFORUM_BOOTSTRAP_EMAIL:-admin@multiforum.local}
+      MULTIFORUM_BOOTSTRAP_USERNAME: ${MULTIFORUM_BOOTSTRAP_USERNAME:-admin}
+      MULTIFORUM_BOOTSTRAP_PASSWORD: ${MULTIFORUM_BOOTSTRAP_PASSWORD:-multiforum-local-admin}
+      SUPERADMIN_EMAIL: ${MULTIFORUM_BOOTSTRAP_EMAIL:-admin@multiforum.local}
+      SERVER_CONFIG_NAME: ${MULTIFORUM_INSTANCE_NAME:-My Multiforum}
+      NEO4J_URI: bolt://database:7687
+      NEO4J_USERNAME: neo4j
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-multiforum-local-neo4j}
+      AUTH0_DOMAIN: ''
+      AUTH0_CLIENT_ID: ''
+      GCS_BUCKET_NAME: ''
+      GOOGLE_APPLICATION_CREDENTIALS: ''
+      GOOGLE_CREDENTIALS_BASE64: ''
+      SLACK_WEBHOOK_URL: ''
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:4000']
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('net').connect(4000, '127.0.0.1').on('connect', () => process.exit(0)).on('error', () => process.exit(1))",
+        ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
+      start_period: 60s
     networks:
       - multiforum-network
 
   frontend:
+    image: ${MULTIFORUM_FRONTEND_IMAGE:-multiforum-frontend:quickstart}
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: multiforum-frontend
+      args:
+        NUXT_PUBLIC_AUTH_PROVIDER: local-dev
+        NUXT_BACKEND_GRAPHQL_URL: http://backend:4000
+        VITE_BASE_URL: ${MULTIFORUM_PUBLIC_FRONTEND_URL:-http://localhost:3000}
+        VITE_ENVIRONMENT: development
+        VITE_GRAPHQL_URL: ${MULTIFORUM_PUBLIC_BACKEND_URL:-http://localhost:4000}
+        VITE_SERVER_NAME: ${MULTIFORUM_INSTANCE_NAME:-My Multiforum}
+    restart: unless-stopped
     ports:
-      - '3000:3000'
+      - '${MULTIFORUM_BIND_ADDRESS:-127.0.0.1}:3000:3000'
     depends_on:
       backend:
         condition: service_healthy
     environment:
-      - GRAPHQL_URL_FOR_TYPES=${GRAPHQL_URL_FOR_TYPES:-http://localhost:4000}
-      - VITE_AUTH0_AUDIENCE=${VITE_AUTH0_AUDIENCE}
-      - VITE_AUTH0_CALLBACK_URL=${VITE_AUTH0_CALLBACK_URL:-http://localhost:3000}
-      - VITE_AUTH0_CLIENT_ID=${VITE_AUTH0_CLIENT_ID}
-      - VITE_AUTH0_CLIENT_SECRET=${VITE_AUTH0_CLIENT_SECRET}
-      - VITE_AUTH0_DOMAIN=${VITE_AUTH0_DOMAIN}
-      - VITE_AUTH0_PASSWORD=${VITE_AUTH0_PASSWORD}
-      - VITE_AUTH0_PASSWORD_2=${VITE_AUTH0_PASSWORD_2}
-      - VITE_AUTH0_SCOPE=${VITE_AUTH0_SCOPE}
-      - VITE_AUTH0_URL=${VITE_AUTH0_URL}
-      - VITE_AUTH0_USERNAME=${VITE_AUTH0_USERNAME}
-      - VITE_AUTH0_USERNAME_2=${VITE_AUTH0_USERNAME_2}
-      - VITE_BASE_URL=${VITE_BASE_URL:-http://localhost:3000}
-      - VITE_ENVIRONMENT=${VITE_ENVIRONMENT:-development}
-      - VITE_GOOGLE_CLOUD_STORAGE_BUCKET=${VITE_GOOGLE_CLOUD_STORAGE_BUCKET}
-      - VITE_GOOGLE_MAPS_API_KEY=${VITE_GOOGLE_MAPS_API_KEY}
-      - VITE_GRAPHQL_URL=${VITE_GRAPHQL_URL:-http://localhost:4000}
-      - VITE_LOGOUT_URL=${VITE_LOGOUT_URL:-http://localhost:3000}
-      - VITE_OPEN_CAGE_API_KEY=${VITE_OPEN_CAGE_API_KEY}
-      - VITE_OPEN_GRAPH_API_KEY=${VITE_OPEN_GRAPH_API_KEY}
-      - VITE_SERVER_NAME=${VITE_SERVER_NAME:-Gennit}
+      NUXT_PUBLIC_AUTH_PROVIDER: local-dev
+      NUXT_BACKEND_GRAPHQL_URL: http://backend:4000
+      NUXT_LOCAL_AUTH_TOKEN_ENDPOINT: http://backend:4000/auth/local-dev/token
     healthcheck:
-      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:3000']
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000').then(response => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 12
+      start_period: 30s
     logging:
-      driver: 'json-file'
+      driver: json-file
       options:
-        max-size: '10m'
+        max-size: 10m
         max-file: '3'
     networks:
       - multiforum-network

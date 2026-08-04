@@ -27,6 +27,7 @@ logs
 .env
 .env.*
 !.env.example
+!.env.quickstart.example
 
 # Cypress env file (contains secrets; must never be committed)
 cypress.env.json
