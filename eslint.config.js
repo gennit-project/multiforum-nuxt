@@ -147,4 +147,12 @@ export default createConfigForNuxt({
   rules: {
     '@typescript-eslint/no-explicit-any': 'off',
   },
+}).append({
+  // Stylistic Vue rules we intentionally do not enforce. The Nuxt Vue preset
+  // re-enables vue/html-self-closing after the top-level override, so this final
+  // append is what actually silences it (and vue/first-attribute-linebreak).
+  rules: {
+    'vue/html-self-closing': 'off',
+    'vue/first-attribute-linebreak': 'off',
+  },
 });
