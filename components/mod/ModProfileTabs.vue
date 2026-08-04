@@ -63,7 +63,10 @@ const tabs = computed(() => {
 </script>
 
 <template>
-  <nav class="max-w-screen-2xl space-x-2 pt-1 text-sm" aria-label="Tabs">
+  <nav
+    class="max-w-[theme(screens.2xl)] space-x-2 pt-1 text-sm"
+    aria-label="Tabs"
+  >
     <TabButton
       v-for="tab in tabs"
       :key="tab.name"

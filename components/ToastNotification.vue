@@ -6,7 +6,7 @@ const toastStore = useToastStore();
 
 <template>
   <Teleport to="body">
-    <div class="fixed bottom-4 left-1/2 z-[100] -translate-x-1/2 space-y-2">
+    <div class="fixed bottom-4 left-1/2 z-100 -translate-x-1/2 space-y-2">
       <TransitionGroup
         enter-active-class="transition ease-out duration-300"
         enter-from-class="translate-y-2 opacity-0"
@@ -26,7 +26,7 @@ const toastStore = useToastStore();
           :key="toast.id"
           :role="toast.type === 'error' ? 'alert' : 'status'"
           :aria-live="toast.type === 'error' ? 'assertive' : 'polite'"
-          class="flex min-w-[200px] max-w-[420px] items-center justify-between gap-3 rounded-lg bg-gray-900 px-4 py-3 text-white shadow-lg"
+          class="flex max-w-[420px] min-w-[200px] items-center justify-between gap-3 rounded-lg bg-gray-900 px-4 py-3 text-white shadow-lg"
           :class="{
             'bg-gray-900': toast.type === 'info' || !toast.type,
             'bg-green-700': toast.type === 'success',
@@ -38,7 +38,7 @@ const toastStore = useToastStore();
             <button
               v-if="toast.action"
               type="button"
-              class="font-semibold text-xs text-blue-200 underline underline-offset-2 hover:text-blue-100"
+              class="text-xs font-semibold text-blue-200 underline underline-offset-2 hover:text-blue-100"
               @click="
                 toast.action?.onClick();
                 toastStore.dismissToast(toast.id);
@@ -49,7 +49,7 @@ const toastStore = useToastStore();
           </div>
           <button
             type="button"
-            class="flex-shrink-0 text-gray-300 transition-colors hover:text-white"
+            class="shrink-0 text-gray-300 transition-colors hover:text-white"
             aria-label="Dismiss notification"
             @click="toastStore.dismissToast(toast.id)"
           >

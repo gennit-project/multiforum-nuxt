@@ -61,10 +61,8 @@ const router = useRouter();
 const startTimeObj = computed(() => DateTime.fromISO(props.event.startTime));
 
 const timeOfDay = computed(() => {
-  return getDatePieces(
-    startTimeObj.value,
-    Boolean(props.event.isAllDay)
-  ).timeOfDay;
+  return getDatePieces(startTimeObj.value, Boolean(props.event.isAllDay))
+    .timeOfDay;
 });
 
 const defaultUniqueName = computed(() => {
@@ -186,10 +184,8 @@ const eventSpansMultipleDates = computed(() => {
   return (
     // If the difference between start time and end time is greater than 24 hours
     Math.abs(
-      startTimeObj.value.diff(
-        DateTime.fromISO(props.event.endTime),
-        'hours'
-      ).hours
+      startTimeObj.value.diff(DateTime.fromISO(props.event.endTime), 'hours')
+        .hours
     ) > 24
   );
 });
@@ -199,8 +195,18 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
 
 // Series-related computed properties
 // Note: EventSeries is a new field that may not be in generated types yet
-const eventWithSeries = computed(() => props.event as Event & { EventSeries?: { id?: string; Occurrences?: Array<{ id: string; startTime: string }> } });
-const isPartOfSeries = computed(() => Boolean(eventWithSeries.value?.EventSeries?.id));
+const eventWithSeries = computed(
+  () =>
+    props.event as Event & {
+      EventSeries?: {
+        id?: string;
+        Occurrences?: Array<{ id: string; startTime: string }>;
+      };
+    }
+);
+const isPartOfSeries = computed(() =>
+  Boolean(eventWithSeries.value?.EventSeries?.id)
+);
 
 const seriesOccurrences = computed(() => {
   if (!eventWithSeries.value?.EventSeries?.Occurrences) {
@@ -220,10 +226,10 @@ const seriesOccurrences = computed(() => {
     :data-testid="`event-list-item-${event.title}`"
     @click="handleClick"
   >
-    <div class="flex-shrink-0 pt-2">
+    <div class="shrink-0 pt-2">
       <div class="flex w-16 flex-col items-center">
         <div
-          class="font-semibold text-xs uppercase text-gray-500 dark:text-orange-400"
+          class="text-xs font-semibold text-gray-500 uppercase dark:text-orange-400"
         >
           {{
             new Date(event.startTime).toLocaleString('en-US', {
@@ -235,7 +241,7 @@ const seriesOccurrences = computed(() => {
           {{ new Date(event.startTime).getDate() }}
         </div>
         <div
-          class="font-semibold text-xs lowercase text-gray-500 dark:text-gray-200"
+          class="text-xs font-semibold text-gray-500 lowercase dark:text-gray-200"
         >
           {{
             new Date(event.startTime).toLocaleString('en-US', {
@@ -245,7 +251,7 @@ const seriesOccurrences = computed(() => {
         </div>
         <div
           v-if="eventSpansMultipleDates"
-          class="ml-2 mt-2 rounded-full px-2 py-1 text-xs text-gray-500 dark:text-gray-200"
+          class="mt-2 ml-2 rounded-full px-2 py-1 text-xs text-gray-500 dark:text-gray-200"
         >
           <span>Multiple Days</span>
         </div>
@@ -267,50 +273,48 @@ const seriesOccurrences = computed(() => {
         :src="event.coverImageURL"
         alt="Event cover image"
         class="mb-4 block max-h-48 rounded-lg md:hidden"
-      >
+      />
       <!-- Title and image section for medium+ screens -->
-        <div class="hidden md:flex md:items-start md:gap-4">
-          <div class="flex-1">
-            <router-link
-              :to="detailLink"
-              :data-testid="'event-title'"
-              class="text-md mt-2 flex cursor-pointer flex-wrap items-center gap-2 text-gray-800 hover:text-orange-700 dark:text-gray-200 lg:hidden"
-              @click="handleSelect"
+      <div class="hidden md:flex md:items-start md:gap-4">
+        <div class="flex-1">
+          <router-link
+            :to="detailLink"
+            :data-testid="'event-title'"
+            class="text-md mt-2 flex cursor-pointer flex-wrap items-center gap-2 text-gray-800 hover:text-orange-700 lg:hidden dark:text-gray-200"
+            @click="handleSelect"
+          >
+            <HighlightedSearchTerms
+              :text="event.title"
+              :search-input="searchInput"
+            />
+            <span
+              v-if="isArchived"
+              class="rounded-full border border-red-500 px-2 text-xs text-red-500 dark:border-red-400 dark:text-red-400"
+              >Archived</span
+            >
+          </router-link>
+          <button
+            type="button"
+            class="text-md mt-2 hidden w-full cursor-pointer flex-wrap items-center gap-2 text-left text-gray-800 hover:text-orange-700 lg:flex dark:text-gray-200"
+            @click="handleSelect"
+          >
+            <span
+              :class="
+                isSelected ? 'rounded bg-gray-100 px-1 dark:bg-gray-700' : ''
+              "
+              class="cursor-pointer"
             >
               <HighlightedSearchTerms
                 :text="event.title"
                 :search-input="searchInput"
               />
-              <span
-                v-if="isArchived"
-                class="rounded-full border border-red-500 px-2 text-xs text-red-500 dark:border-red-400 dark:text-red-400"
-                >Archived</span
-              >
-            </router-link>
-            <button
-              type="button"
-              class="text-md mt-2 hidden w-full cursor-pointer flex-wrap items-center gap-2 text-left text-gray-800 hover:text-orange-700 dark:text-gray-200 lg:flex"
-              @click="handleSelect"
+            </span>
+            <span
+              v-if="isArchived"
+              class="rounded-full border border-red-500 px-2 text-xs text-red-500 dark:border-red-400 dark:text-red-400"
+              >Archived</span
             >
-              <span
-                :class="
-                  isSelected
-                    ? 'rounded bg-gray-100 px-1 dark:bg-gray-700'
-                    : ''
-                "
-                class="cursor-pointer"
-              >
-                <HighlightedSearchTerms
-                  :text="event.title"
-                  :search-input="searchInput"
-                />
-              </span>
-              <span
-                v-if="isArchived"
-                class="rounded-full border border-red-500 px-2 text-xs text-red-500 dark:border-red-400 dark:text-red-400"
-                >Archived</span
-              >
-            </button>
+          </button>
           <span
             v-if="event.canceled"
             class="ml-2 rounded-lg bg-red-100 px-3 py-1 text-sm text-red-500 dark:bg-red-500 dark:text-white"
@@ -362,7 +366,7 @@ const seriesOccurrences = computed(() => {
             :items="eventDetailOptions"
           >
             <span
-              class="-ml-1 mt-1 inline-flex items-center rounded-md bg-gray-100 px-4 pb-2 pt-2 text-sm text-black hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
+              class="mt-1 -ml-1 inline-flex items-center rounded-md bg-gray-100 px-4 pt-2 pb-2 text-sm text-black hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
             >
               <CommentIcon class="mr-2 h-4 w-4" aria-hidden="true" />
               {{
@@ -377,12 +381,12 @@ const seriesOccurrences = computed(() => {
           </MenuButton>
         </div>
 
-        <div v-if="event.coverImageURL" class="flex-shrink-0 pr-2">
+        <div v-if="event.coverImageURL" class="shrink-0 pr-2">
           <img
             :alt="event.title"
             :src="event.coverImageURL"
             class="h-32 w-32 rounded-lg"
-          >
+          />
         </div>
       </div>
       <!-- Title section for small screens -->

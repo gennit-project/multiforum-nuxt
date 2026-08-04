@@ -89,7 +89,10 @@ const toggleSelectedChannel = (channelUniqueName: string) => {
     router,
     route,
     params: {
-      channels: selectedChannels.value.length > 0 ? [...selectedChannels.value] : undefined,
+      channels:
+        selectedChannels.value.length > 0
+          ? [...selectedChannels.value]
+          : undefined,
     },
   });
 };
@@ -222,7 +225,7 @@ const getContextForum = (comment: Comment) => {
 
       <!-- Search bar and filters -->
       <div class="mt-4 flex flex-wrap items-center gap-2">
-        <div class="flex-grow">
+        <div class="grow">
           <SearchBar
             :auto-focus="shouldAutoFocus"
             :initial-value="searchInput"
@@ -240,7 +243,7 @@ const getContextForum = (comment: Comment) => {
           :highlighted="selectedChannels.length > 0"
         >
           <template #icon>
-            <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />
+            <ChannelIcon class="mr-2 -ml-0.5 h-4 w-4" />
           </template>
           <template #content>
             <div class="relative w-96">
@@ -297,7 +300,7 @@ const getContextForum = (comment: Comment) => {
               :tabindex="getCommentPermalink(comment) ? 0 : undefined"
               class="rounded-md border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
               :class="{
-                'cursor-pointer hover:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:hover:border-orange-400':
+                'cursor-pointer hover:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:outline-none dark:hover:border-orange-400':
                   getCommentPermalink(comment),
               }"
               @click="openCommentPermalink(comment)"
@@ -323,7 +326,10 @@ const getContextForum = (comment: Comment) => {
                   >
                     {{ getAuthorDisplayName(comment) }}
                   </router-link>
-                  <span v-else class="font-medium text-gray-900 dark:text-gray-100">
+                  <span
+                    v-else
+                    class="font-medium text-gray-900 dark:text-gray-100"
+                  >
                     {{ getAuthorDisplayName(comment) }}
                   </span>
                   <span class="ml-2 text-gray-500 dark:text-gray-400">
@@ -341,7 +347,9 @@ const getContextForum = (comment: Comment) => {
                 />
               </div>
 
-              <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <div
+                class="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400"
+              >
                 <!-- Context link -->
                 <template v-if="getContextLink(comment)">
                   <span>in</span>

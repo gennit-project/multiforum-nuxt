@@ -101,7 +101,9 @@ const getPreviewImage = (item: {
 
   if (album.imageOrder?.length) {
     const firstImageId = album.imageOrder[0];
-    const orderedImage = album.Images.find((image) => image.id === firstImageId);
+    const orderedImage = album.Images.find(
+      (image) => image.id === firstImageId
+    );
     return orderedImage?.url || '';
   }
 
@@ -223,8 +225,7 @@ const handleShareCollection = async () => {
         };
       };
     } | null;
-    const sharedDiscussion =
-      shareResult?.data?.shareCollectionAsDiscussion;
+    const sharedDiscussion = shareResult?.data?.shareCollectionAsDiscussion;
     const discussionId = sharedDiscussion?.id;
     const forumId =
       sharedDiscussion?.DiscussionChannels?.[0]?.channelUniqueName ||
@@ -276,7 +277,8 @@ const handleToggleVisibility = async () => {
     await refetchCollection();
   } catch (err: unknown) {
     console.error('Error updating visibility:', err);
-    visibilityError.value = err instanceof Error ? err.message : 'Failed to update visibility.';
+    visibilityError.value =
+      err instanceof Error ? err.message : 'Failed to update visibility.';
   } finally {
     visibilityUpdating.value = false;
   }
@@ -331,7 +333,7 @@ const handleDelete = async () => {
             <!-- Error state -->
             <div
               v-else-if="error"
-              class="bg-red-50 rounded-lg p-4 dark:bg-red-900/20"
+              class="rounded-lg bg-red-50 p-4 dark:bg-red-900/20"
             >
               <p class="text-red-800 dark:text-red-300">
                 Error loading collection: {{ error.message }}
@@ -359,11 +361,13 @@ const handleDelete = async () => {
             <!-- Collection content -->
             <template v-else>
               <!-- Header -->
-              <div class="mb-8 rounded-[1.75rem] border border-gray-200/80 bg-white/82 p-6 shadow-[0_24px_70px_-42px_rgba(38,38,38,0.26)] backdrop-blur dark:border-gray-700 dark:bg-gray-900 dark:shadow-[0_24px_70px_-48px_rgba(0,0,0,0.82)]">
+              <div
+                class="mb-8 rounded-[1.75rem] border border-gray-200/80 bg-white/82 p-6 shadow-[0_24px_70px_-42px_rgba(38,38,38,0.26)] backdrop-blur dark:border-gray-700 dark:bg-gray-900 dark:shadow-[0_24px_70px_-48px_rgba(0,0,0,0.82)]"
+              >
                 <!-- Back button for mobile -->
                 <NuxtLink
                   to="/library"
-                  class="mb-4 inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 md:hidden"
+                  class="mb-4 inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 md:hidden dark:text-gray-400 dark:hover:text-gray-200"
                 >
                   <svg
                     class="h-4 w-4"
@@ -390,13 +394,16 @@ const handleDelete = async () => {
                 </div>
 
                 <!-- Title and actions -->
-                <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div
+                  class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
+                >
                   <div class="flex-1">
                     <h1
-                      class="text-3xl font-semibold tracking-[-0.04em] text-gray-950 dark:text-white md:text-4xl"
+                      class="text-3xl font-semibold tracking-[-0.04em] text-gray-950 md:text-4xl dark:text-white"
                     >
                       {{ collection.name }}
-                      <span class="font-semibold text-gray-500 dark:text-gray-300"
+                      <span
+                        class="font-semibold text-gray-500 dark:text-gray-300"
                         >({{ collection.itemCount }})</span
                       >
                     </h1>
@@ -406,16 +413,14 @@ const handleDelete = async () => {
                     >
                       {{ collection.description }}
                     </p>
-                    <div
-                      class="mt-4 flex flex-wrap items-center gap-2 text-sm"
-                    >
+                    <div class="mt-4 flex flex-wrap items-center gap-2 text-sm">
                       <span
                         class="rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 font-medium text-emerald-700 dark:border-emerald-500/35 dark:bg-emerald-500/12 dark:text-emerald-300"
                       >
                         {{ collectionTypeLabel.toLowerCase() }}
                       </span>
                       <span
-                        class="rounded-full border border-gray-300 bg-gray-100 px-3 py-1 font-medium capitalize text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                        class="rounded-full border border-gray-300 bg-gray-100 px-3 py-1 font-medium text-gray-700 capitalize dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
                       >
                         {{ collection.visibility.toLowerCase() }}
                       </span>
@@ -430,7 +435,8 @@ const handleDelete = async () => {
                       v-if="reorderError"
                       class="mt-1 text-sm text-red-600 dark:text-red-400"
                     >
-                      Could not update collection order: {{ reorderError.message }}
+                      Could not update collection order:
+                      {{ reorderError.message }}
                     </p>
                     <p
                       v-if="!collectionIsPublic"
@@ -443,11 +449,11 @@ const handleDelete = async () => {
 
                   <!-- Action buttons -->
                   <div
-                    class="flex w-full flex-wrap items-center gap-2 lg:ml-4 lg:w-auto lg:flex-shrink-0 lg:flex-nowrap"
+                    class="flex w-full flex-wrap items-center gap-2 lg:ml-4 lg:w-auto lg:shrink-0 lg:flex-nowrap"
                   >
                     <button
                       type="button"
-                      class="inline-flex items-center rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-800 shadow-sm transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-70 dark:border-emerald-500/35 dark:bg-emerald-500/12 dark:text-emerald-200 dark:hover:bg-emerald-500/20 lg:px-3 lg:py-2 lg:text-sm"
+                      class="inline-flex items-center rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-800 shadow-sm transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-70 lg:px-3 lg:py-2 lg:text-sm dark:border-emerald-500/35 dark:bg-emerald-500/12 dark:text-emerald-200 dark:hover:bg-emerald-500/20"
                       :disabled="!collectionIsPublic"
                       :title="
                         collectionIsPublic
@@ -460,7 +466,7 @@ const handleDelete = async () => {
                     </button>
                     <button
                       type="button"
-                      class="inline-flex items-center rounded-full border border-gray-300 bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-800 shadow-sm transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-70 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 lg:px-3 lg:py-2 lg:text-sm"
+                      class="inline-flex items-center rounded-full border border-gray-300 bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-800 shadow-sm transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-70 lg:px-3 lg:py-2 lg:text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
                       :disabled="visibilityUpdating || updateLoading"
                       @click="handleToggleVisibility"
                     >
@@ -487,7 +493,7 @@ const handleDelete = async () => {
                       type="button"
                       aria-label="Edit collection"
                       title="Edit collection"
-                      class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-800 shadow-sm transition hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 lg:h-11 lg:w-11"
+                      class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-800 shadow-sm transition hover:bg-gray-100 lg:h-11 lg:w-11 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
                       @click="openRenameModal"
                     >
                       <svg
@@ -508,7 +514,7 @@ const handleDelete = async () => {
                       type="button"
                       aria-label="Delete collection"
                       title="Delete collection"
-                      class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-red-300 bg-white text-red-600 shadow-sm transition hover:bg-red-50 dark:border-red-500/40 dark:bg-gray-800 dark:text-red-300 dark:hover:bg-red-500/12 lg:h-11 lg:w-11"
+                      class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-red-300 bg-white text-red-600 shadow-sm transition hover:bg-red-50 lg:h-11 lg:w-11 dark:border-red-500/40 dark:bg-gray-800 dark:text-red-300 dark:hover:bg-red-500/12"
                       @click="showDeleteModal = true"
                     >
                       <svg
@@ -527,7 +533,6 @@ const handleDelete = async () => {
                     </button>
                   </div>
                 </div>
-
               </div>
 
               <!-- Empty state -->
@@ -567,7 +572,9 @@ const handleDelete = async () => {
                   v-for="(discussion, index) in items"
                   :key="getItemId(discussion)"
                 >
-                  <div class="grid gap-3 md:grid-cols-[auto,minmax(0,1fr)] md:items-start">
+                  <div
+                    class="grid gap-3 md:grid-cols-[auto,minmax(0,1fr)] md:items-start"
+                  >
                     <div class="flex gap-2 md:flex-col">
                       <button
                         type="button"
@@ -598,7 +605,8 @@ const handleDelete = async () => {
                           : '/'
                       "
                       :channel-unique-name="
-                        discussion.DiscussionChannels?.[0]?.channelUniqueName || ''
+                        discussion.DiscussionChannels?.[0]?.channelUniqueName ||
+                        ''
                       "
                       :author-info="getAuthorInfo(discussion)"
                       :preview-image-url="getPreviewImage(discussion)"
@@ -616,15 +624,14 @@ const handleDelete = async () => {
                           : '/'
                       "
                       :channel-unique-name="
-                        discussion.DiscussionChannels?.[0]?.channelUniqueName || ''
+                        discussion.DiscussionChannels?.[0]?.channelUniqueName ||
+                        ''
                       "
                       :author-info="getAuthorInfo(discussion)"
                       :comment-count="
                         discussion.DiscussionChannels?.reduce(
-                          (
-                            total: number,
-                            item: CollectionDiscussionChannel
-                          ) => total + (item.CommentsAggregate?.count || 0),
+                          (total: number, item: CollectionDiscussionChannel) =>
+                            total + (item.CommentsAggregate?.count || 0),
                           0
                         ) || 0
                       "
@@ -798,9 +805,9 @@ const handleDelete = async () => {
                   id="collection-name"
                   v-model="newCollectionName"
                   type="text"
-                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm"
+                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:ring-orange-500 focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   placeholder="Enter collection name"
-                >
+                />
               </div>
               <div>
                 <label
@@ -813,7 +820,7 @@ const handleDelete = async () => {
                   id="collection-description"
                   v-model="newCollectionDescription"
                   rows="3"
-                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm"
+                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:ring-orange-500 focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   placeholder="Enter description"
                 />
               </div>
@@ -875,9 +882,9 @@ const handleDelete = async () => {
                   id="share-collection-title"
                   v-model="shareTitle"
                   type="text"
-                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm"
+                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:ring-orange-500 focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   placeholder="Enter discussion title"
-                >
+                />
               </div>
               <div>
                 <label
@@ -890,7 +897,7 @@ const handleDelete = async () => {
                   id="share-collection-message"
                   v-model="shareMessage"
                   rows="3"
-                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm"
+                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:ring-orange-500 focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   placeholder="Add context for readers"
                 />
               </div>

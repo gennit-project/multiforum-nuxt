@@ -477,7 +477,7 @@ const label = computed(() =>
     <div
       :class="[
         depth > 1
-          ? 'ml-1 border-l border-gray-300 pl-2 pt-2 sm:pl-4 dark:border-gray-600'
+          ? 'ml-1 border-l border-gray-300 pt-2 pl-2 sm:pl-4 dark:border-gray-600'
           : '',
       ]"
       class="flex w-full"
@@ -488,7 +488,7 @@ const label = computed(() =>
             isHighlighted
               ? 'rounded-md border border-orange-600 bg-orange-100 p-2 dark:bg-orange-950'
               : isMarkedAsAnswer
-                ? 'dark:bg-green-950 rounded-md border border-green-600 bg-green-100 p-2'
+                ? 'rounded-md border border-green-600 bg-green-100 p-2 dark:bg-green-950'
                 : 'dark:bg-gray-950',
           ]"
           class="flex w-full"
@@ -511,7 +511,7 @@ const label = computed(() =>
               :is-forum-mod="authorBadges.isForumMod"
             />
             <div
-              class="ml-2 flex-grow border-l border-gray-300 pl-2 sm:ml-4 sm:pl-4 dark:border-gray-600"
+              class="ml-2 grow border-l border-gray-300 pl-2 sm:ml-4 sm:pl-4 dark:border-gray-600"
             >
               <div class="w-full dark:text-gray-200">
                 <div class="w-full overflow-auto">
@@ -569,7 +569,7 @@ const label = computed(() =>
                   <TextEditor
                     v-if="showEditCommentForm"
                     id="editExistingComment"
-                    class="mb-2 mt-3 p-1"
+                    class="mt-3 mb-2 p-1"
                     :initial-value="props.commentData.text || ''"
                     :editor-id="editorId"
                     :show-char-counter="true"

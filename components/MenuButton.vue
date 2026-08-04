@@ -276,7 +276,7 @@ onBeforeUnmount(() => {
           v-if="isOpen"
           ref="floatingRef"
           :style="floatingStyles"
-          class="z-[10000]"
+          class="z-10000"
           @focusout="onFocusOut"
           @keydown="onMenuKeydown"
         >
@@ -289,7 +289,7 @@ onBeforeUnmount(() => {
               <!-- Divider / section header -->
               <div
                 v-if="item.isDivider"
-                class="font-semibold cursor-default px-4 py-2 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-200"
+                class="cursor-default px-4 py-2 text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-200"
                 role="presentation"
               >
                 {{ item.value }}

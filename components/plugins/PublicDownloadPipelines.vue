@@ -45,8 +45,7 @@ const canStartPipelines = computed(
   () =>
     (Boolean(username.value) &&
       [props.ownerUsername, props.uploaderUsername].includes(username.value)) ||
-    (Boolean(modProfileName.value) &&
-      userPermissions.value.canEditDiscussions)
+    (Boolean(modProfileName.value) && userPermissions.value.canEditDiscussions)
 );
 const {
   mutate: startPluginPipeline,
@@ -83,14 +82,10 @@ const startPipeline = (pipeline: ApplicablePublicPipeline) => {
   });
 };
 
-const retryableStatuses = new Set([
-  'FAILED',
-  'TIMED_OUT',
-  'CANCELLED',
-]);
+const retryableStatuses = new Set(['FAILED', 'TIMED_OUT', 'CANCELLED']);
 const isLatestPipelineAttempt = (attempt: PublicPipelineAttempt) =>
   attempts.value.find(
-    candidate =>
+    (candidate) =>
       candidate.scope === attempt.scope &&
       candidate.eventType === attempt.eventType &&
       (candidate.channelId || null) === (attempt.channelId || null)
@@ -286,10 +281,7 @@ const shareAttempt = async (attempt: PublicPipelineAttempt) => {
   shareFeedback.value = `Shared link for attempt ${attempt.attemptNumber}.`;
 };
 
-const supportDiscussionUrl = (
-  attempt: PublicPipelineAttempt,
-  code: string
-) =>
+const supportDiscussionUrl = (attempt: PublicPipelineAttempt, code: string) =>
   `/forums/${encodeURIComponent(
     props.channelName
   )}/discussions/create?pipelineAttempt=${encodeURIComponent(
@@ -382,7 +374,11 @@ watch(
             <div class="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h4 class="font-medium text-gray-900 dark:text-white">
-                  {{ pipeline.scope === 'SERVER' ? 'Server check' : `Channel check · ${pipeline.channelId}` }}
+                  {{
+                    pipeline.scope === 'SERVER'
+                      ? 'Server check'
+                      : `Channel check · ${pipeline.channelId}`
+                  }}
                 </h4>
                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
                   {{ policyExplanation(pipeline) }}
@@ -424,7 +420,11 @@ watch(
               @click="startPipeline(pipeline)"
             >
               <i
-                :class="startingPipeline ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-play'"
+                :class="
+                  startingPipeline
+                    ? 'fa-solid fa-spinner fa-spin'
+                    : 'fa-solid fa-play'
+                "
                 aria-hidden="true"
               />
               {{ startingPipeline ? 'Starting…' : 'Run checks' }}
@@ -441,7 +441,10 @@ watch(
           >
             Attempt history
           </h3>
-          <label v-if="attempts.length" class="text-sm text-gray-600 dark:text-gray-300">
+          <label
+            v-if="attempts.length"
+            class="text-sm text-gray-600 dark:text-gray-300"
+          >
             Show
             <select
               v-model="attemptFilter"
@@ -455,7 +458,11 @@ watch(
             </select>
           </label>
         </div>
-        <p v-if="shareFeedback" role="status" class="mb-3 text-sm text-green-700 dark:text-green-300">
+        <p
+          v-if="shareFeedback"
+          role="status"
+          class="mb-3 text-sm text-green-700 dark:text-green-300"
+        >
           {{ shareFeedback }}
         </p>
         <p
@@ -476,7 +483,11 @@ watch(
             >
               <div>
                 <h4 class="font-medium text-gray-900 dark:text-white">
-                  {{ attempt.scope === 'SERVER' ? 'Server pipeline' : `Channel pipeline · ${attempt.channelId}` }}
+                  {{
+                    attempt.scope === 'SERVER'
+                      ? 'Server pipeline'
+                      : `Channel pipeline · ${attempt.channelId}`
+                  }}
                   <span class="text-gray-500 dark:text-gray-400">
                     · Attempt {{ attempt.attemptNumber }}
                   </span>
@@ -534,12 +545,18 @@ watch(
                     @click="rerunAttempt(attempt)"
                   >
                     <i
-                      :class="rerunningPipeline ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-rotate-right'"
+                      :class="
+                        rerunningPipeline
+                          ? 'fa-solid fa-spinner fa-spin'
+                          : 'fa-solid fa-rotate-right'
+                      "
                       aria-hidden="true"
                     />
                     {{ rerunningPipeline ? 'Starting…' : 'Run checks again' }}
                   </button>
-                  <p class="mt-1 max-w-48 text-xs text-gray-500 dark:text-gray-400">
+                  <p
+                    class="mt-1 max-w-48 text-xs text-gray-500 dark:text-gray-400"
+                  >
                     Runs the full pipeline using its current configuration.
                   </p>
                 </div>
@@ -547,11 +564,7 @@ watch(
             </header>
 
             <ol class="divide-y divide-gray-100 dark:divide-gray-700">
-              <li
-                v-for="job in attempt.jobs"
-                :key="job.id"
-                class="p-4"
-              >
+              <li v-for="job in attempt.jobs" :key="job.id" class="p-4">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <h5 class="font-medium text-gray-900 dark:text-white">
@@ -565,7 +578,12 @@ watch(
                     </p>
                   </div>
                   <span class="text-sm text-gray-700 dark:text-gray-200">
-                    {{ job.status === 'SUCCEEDED' ? 'Passed' : job.status.charAt(0) + job.status.slice(1).toLowerCase() }}
+                    {{
+                      job.status === 'SUCCEEDED'
+                        ? 'Passed'
+                        : job.status.charAt(0) +
+                          job.status.slice(1).toLowerCase()
+                    }}
                   </span>
                 </div>
                 <p
@@ -581,7 +599,9 @@ watch(
                     class="rounded-md bg-gray-50 p-3 text-sm dark:bg-gray-900"
                   >
                     <div class="flex flex-wrap items-center gap-2">
-                      <span class="font-mono text-xs text-gray-500 dark:text-gray-400">
+                      <span
+                        class="font-mono text-xs text-gray-500 dark:text-gray-400"
+                      >
                         {{ diagnostic.code }}
                       </span>
                       <span class="font-medium text-gray-900 dark:text-white">
@@ -590,8 +610,8 @@ watch(
                     </div>
                     <pre
                       v-if="formatDetails(diagnostic.details)"
-                      class="mt-2 max-h-64 overflow-auto whitespace-pre-wrap break-words rounded bg-gray-900 p-3 text-xs text-gray-100"
-                    >{{ formatDetails(diagnostic.details) }}</pre>
+                      class="mt-2 max-h-64 overflow-auto rounded bg-gray-900 p-3 text-xs wrap-break-word whitespace-pre-wrap text-gray-100"
+                      >{{ formatDetails(diagnostic.details) }}</pre>
                     <a
                       v-if="diagnostic.helpUrl"
                       :href="diagnostic.helpUrl"
@@ -603,7 +623,7 @@ watch(
                     </a>
                     <NuxtLink
                       :to="supportDiscussionUrl(attempt, diagnostic.code)"
-                      class="ml-3 mt-2 inline-block text-orange-700 underline dark:text-orange-300"
+                      class="mt-2 ml-3 inline-block text-orange-700 underline dark:text-orange-300"
                     >
                       Ask the community
                     </NuxtLink>

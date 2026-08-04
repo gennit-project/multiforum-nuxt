@@ -76,12 +76,12 @@ const getImageAlt = (image: Image) => {
         :alt="getImageAlt(props.image) ?? 'Image'"
         class="h-full w-full object-cover"
         loading="lazy"
-      >
+      />
 
       <!-- Overlay with sensitive content warning -->
       <div
         v-if="props.image.hasSensitiveContent || props.image.hasSpoiler"
-        class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50"
+        class="absolute inset-0 flex items-center justify-center bg-black/50"
       >
         <div class="p-2 text-center text-white">
           <div v-if="props.image.hasSensitiveContent" class="text-xs">
@@ -95,7 +95,7 @@ const getImageAlt = (image: Image) => {
     <!-- Favorite button - top right corner -->
     <div
       v-if="props.showFavoriteButton"
-      class="absolute right-2 top-2 z-10 rounded-md bg-black bg-opacity-50 p-1.5 transition-all duration-200 hover:bg-opacity-70"
+      class="absolute top-2 right-2 z-10 rounded-md bg-black/50 p-1.5 transition-all duration-200 hover:bg-white/70"
       @click.stop.prevent
     >
       <AddToImageFavorites

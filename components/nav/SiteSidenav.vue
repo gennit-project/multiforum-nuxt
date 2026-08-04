@@ -100,7 +100,9 @@ useFocusTrap(panelRef, {
   active: toRef(props, 'showDropdown'),
   onEscape: () => emit('close'),
   fallbackTrigger: () =>
-    document.querySelector<HTMLElement>('[data-testid="hamburger-menu-button"]'),
+    document.querySelector<HTMLElement>(
+      '[data-testid="hamburger-menu-button"]'
+    ),
 });
 
 const showAllForums = ref(false);
@@ -215,14 +217,14 @@ const selectSearchType = (type: SearchType) => {
       role="dialog"
       aria-modal="true"
       aria-label="Site navigation"
-      class="overlay-shade fixed left-0 top-0 flex h-full w-[275px] flex-col justify-between overflow-y-auto border-gray-300 bg-white py-2 dark:border-gray-200 dark:bg-gray-900"
+      class="overlay-shade fixed top-0 left-0 flex h-full w-[275px] flex-col justify-between overflow-y-auto border-gray-300 bg-white py-2 dark:border-gray-200 dark:bg-gray-900"
     >
       <div>
         <div class="mt-2 block px-6">
           <div class="flex h-7">
             <button
               type="button"
-              class="rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:text-gray-200"
+              class="rounded-full text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-orange-500 focus:outline-none dark:text-gray-200"
               @click="outside"
             >
               <span class="sr-only">Close panel</span>
@@ -245,9 +247,9 @@ const selectSearchType = (type: SearchType) => {
               v-model="searchInput"
               type="text"
               placeholder="Search..."
-              class="h-9 w-full rounded-lg border border-gray-200 bg-white pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
+              class="h-9 w-full rounded-lg border border-gray-200 bg-white pr-3 pl-9 text-sm text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
               @keydown.enter.prevent="executeSearch"
-            >
+            />
           </div>
           <div class="mt-2 flex items-center gap-2">
             <div class="relative flex-1">
@@ -255,10 +257,8 @@ const selectSearchType = (type: SearchType) => {
                 type="button"
                 aria-haspopup="listbox"
                 :aria-expanded="showSearchTypeDropdown"
-                class="hover:bg-gray-50 flex h-8 w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 text-xs text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-                @click.stop="
-                  showSearchTypeDropdown = !showSearchTypeDropdown
-                "
+                class="flex h-8 w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 text-xs text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                @click.stop="showSearchTypeDropdown = !showSearchTypeDropdown"
               >
                 <span>{{ selectedSearchTypeLabel }}</span>
                 <ChevronDownIcon
@@ -270,7 +270,7 @@ const selectSearchType = (type: SearchType) => {
                 v-if="showSearchTypeDropdown"
                 role="listbox"
                 aria-label="Search type"
-                class="absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800"
+                class="absolute top-full right-0 left-0 z-50 mt-1 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800"
                 @click.stop
               >
                 <button
@@ -297,7 +297,7 @@ const selectSearchType = (type: SearchType) => {
             </div>
             <button
               type="button"
-              class="font-semibold h-8 rounded-md bg-gray-600 px-4 text-xs text-white hover:bg-gray-700 dark:bg-gray-600 dark:hover:bg-gray-500"
+              class="h-8 rounded-md bg-gray-600 px-4 text-xs font-semibold text-white hover:bg-gray-700 dark:bg-gray-600 dark:hover:bg-gray-500"
               @click="executeSearch"
             >
               Search
@@ -340,7 +340,7 @@ const selectSearchType = (type: SearchType) => {
         class="border-t border-gray-200 dark:border-gray-600"
       >
         <div
-          class="text-bold mb-2 mt-3 px-6 text-sm uppercase leading-6 text-gray-400 dark:text-gray-100"
+          class="text-bold mt-3 mb-2 px-6 text-sm leading-6 text-gray-400 uppercase dark:text-gray-100"
         >
           Recent Forums
         </div>
@@ -368,7 +368,7 @@ const selectSearchType = (type: SearchType) => {
               >
                 <AvatarComponent
                   v-if="forum?.channelIconURL"
-                  class="list-item-icon border-1 h-8 w-8 shrink-0 border-gray-200 shadow-sm dark:border-gray-800"
+                  class="list-item-icon h-8 w-8 shrink-0 border border-gray-200 shadow-sm dark:border-gray-800"
                   :text="forum.uniqueName || ''"
                   :src="forum?.channelIconURL ?? ''"
                   :is-small="true"
@@ -377,7 +377,7 @@ const selectSearchType = (type: SearchType) => {
                 />
                 <AvatarComponent
                   v-if="!forum?.channelIconURL"
-                  class="list-item-icon border-1 h-8 w-8 shrink-0 border-gray-200 shadow-sm dark:border-gray-800"
+                  class="list-item-icon h-8 w-8 shrink-0 border border-gray-200 shadow-sm dark:border-gray-800"
                   :text="forum.uniqueName || ''"
                   :src="forum?.channelIconURL ?? ''"
                   :is-small="true"
@@ -406,14 +406,14 @@ const selectSearchType = (type: SearchType) => {
           </div>
         </nav>
       </div>
-      <ul role="list" class="m-0 mb-6 mt-6 border-t p-0 pt-4">
+      <ul role="list" class="m-0 mt-6 mb-6 border-t p-0 pt-4">
         <li v-if="isAuthenticatedVar && usernameVar" class="m-0 list-none">
           <nuxt-link
             :to="{
               name: 'u-username',
               params: { username: usernameVar },
             }"
-            class="font-semibold group flex items-center gap-x-3 rounded-md px-6 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
+            class="group flex items-center gap-x-3 rounded-md px-6 py-2 text-sm leading-6 font-semibold text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
             @click.prevent="
               () => {
                 routeAndClose({
@@ -467,7 +467,9 @@ const selectSearchType = (type: SearchType) => {
         <li class="m-0 list-none">
           <RequireAuth :require-ownership="false" :full-width="true">
             <template #has-auth>
-              <SiteSidenavLogout :nav-link-classes="`w-full ${navLinkClasses}`" />
+              <SiteSidenavLogout
+                :nav-link-classes="`w-full ${navLinkClasses}`"
+              />
             </template>
             <template #does-not-have-auth>
               <button

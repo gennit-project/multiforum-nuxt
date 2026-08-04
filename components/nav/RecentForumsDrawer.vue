@@ -61,7 +61,7 @@ const goToForum = (uniqueName: string) => {
     <!-- Backdrop -->
     <div
       v-if="isOpen"
-      class="fixed inset-0 z-30 bg-black bg-opacity-50"
+      class="fixed inset-0 z-30 bg-black/50"
       @click="closeDrawer"
     />
 
@@ -80,7 +80,7 @@ const goToForum = (uniqueName: string) => {
         role="dialog"
         aria-modal="true"
         aria-labelledby="recent-forums-drawer-title"
-        class="fixed left-0 top-0 z-40 h-full w-80 overflow-y-auto border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+        class="fixed top-0 left-0 z-40 h-full w-80 overflow-y-auto border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
       >
         <!-- Header -->
         <div
@@ -88,13 +88,13 @@ const goToForum = (uniqueName: string) => {
         >
           <h3
             id="recent-forums-drawer-title"
-            class="font-semibold text-lg text-gray-900 dark:text-gray-100"
+            class="text-lg font-semibold text-gray-900 dark:text-gray-100"
           >
             Recent Forums
           </h3>
           <button
             type="button"
-            class="rounded-full p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:text-gray-200"
+            class="rounded-full p-1 text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-orange-500 focus:outline-none dark:text-gray-200"
             @click="closeDrawer"
           >
             <span class="sr-only">Close</span>
@@ -141,7 +141,7 @@ const goToForum = (uniqueName: string) => {
             <button
               type="button"
               data-testid="find-forum-button"
-              class="font-semibold group mb-2 flex w-full items-center gap-x-3 rounded-md px-2 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
+              class="group mb-2 flex w-full items-center gap-x-3 rounded-md px-2 py-2 text-sm leading-6 font-semibold text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
               @click="isFindingForum = true"
             >
               <SearchIcon class="text-gray-500 dark:text-gray-400" />

@@ -16,7 +16,11 @@ const mountDrawer = (props: Record<string, unknown> = {}) =>
       stubs: {
         ClientOnly: { template: '<div><slot /></div>' },
         Transition: { template: '<div><slot /></div>' },
-        RecentForumsList: { name: 'RecentForumsList', props: ['forums', 'onNavigate'], template: '<div class="list" />' },
+        RecentForumsList: {
+          name: 'RecentForumsList',
+          props: ['forums', 'onNavigate'],
+          template: '<div class="list" />',
+        },
         // ForumFinder queries GraphQL; stub it and expose a button that emits
         // the select event so we can assert navigation without wiring Apollo.
         ForumFinder: {
@@ -83,7 +87,7 @@ describe('RecentForumsDrawer actions', () => {
   it('emits close from the backdrop', async () => {
     const wrapper = mountDrawer();
 
-    await wrapper.find('.bg-opacity-50').trigger('click');
+    await wrapper.find('[class~="bg-black/50"]').trigger('click');
 
     expect(wrapper.emitted('close')).toBeTruthy();
   });

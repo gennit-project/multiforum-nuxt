@@ -328,7 +328,7 @@ watch([mdAndUp, tabs, tabRoutes], preloadMobileTabRoutes);
         <Popper>
           <template #default>
             <button
-              class="hover:bg-gray-50 flex w-full items-center justify-between rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+              class="flex w-full items-center justify-between rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
               data-testid="mobile-channel-nav-dropdown"
             >
               <div class="flex items-center space-x-2">
@@ -351,13 +351,16 @@ watch([mdAndUp, tabs, tabRoutes], preloadMobileTabRoutes);
                   }}
                 </span>
               </div>
-              <i class="fa-solid fa-chevron-down ml-2 h-4 w-4" aria-hidden="true" />
+              <i
+                class="fa-solid fa-chevron-down ml-2 h-4 w-4"
+                aria-hidden="true"
+              />
             </button>
           </template>
 
           <template #content="{ close }">
             <div
-              class="mt-1 w-56 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-600"
+              class="mt-1 w-56 rounded-md bg-white shadow-lg ring-1 ring-black/5 dark:bg-gray-800 dark:ring-gray-600"
             >
               <div class="py-1">
                 <nuxt-link

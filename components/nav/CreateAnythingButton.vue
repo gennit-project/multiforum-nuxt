@@ -138,7 +138,7 @@ const buttonClasses = computed(() => {
     'inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-2 text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-100 dark:border-gray-600 dark:focus-visible:ring-gray-500 dark:focus-visible:ring-offset-gray-900';
 
   if (createButtonProps.usePrimaryButton) {
-    return `${baseClasses} !border !border-gray-300 dark:!border-gray-600`;
+    return `${baseClasses} border! !border-gray-300 dark:!border-gray-600`;
   }
 
   if (createButtonProps.backgroundColor === 'light') {
@@ -171,14 +171,14 @@ const buttonClasses = computed(() => {
               <span
                 v-else
                 aria-hidden="true"
-                class="-mt-0.5 text-4xl font-light leading-none"
+                class="-mt-0.5 text-4xl leading-none font-light"
               >
                 +
               </span>
               <span v-if="iconOnly" class="sr-only">Create new</span>
               <ChevronDownIcon
                 v-if="!iconOnly"
-                class="-mr-1 ml-1 mt-0.5 h-3 w-3"
+                class="mt-0.5 -mr-1 ml-1 h-3 w-3"
                 aria-hidden="true"
               />
             </button>
@@ -189,11 +189,11 @@ const buttonClasses = computed(() => {
               v-if="isMenuOpen"
               ref="floatingRef"
               :style="floatingStyles"
-              class="z-[10000]"
+              class="z-10000"
               @focusout="onFocusOut"
             >
               <div
-                class="min-w-[12rem] overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700 dark:text-gray-200"
+                class="min-w-[12rem] overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none dark:bg-gray-700 dark:text-gray-200"
                 role="menu"
               >
                 <button
@@ -222,14 +222,14 @@ const buttonClasses = computed(() => {
             <span
               v-else
               aria-hidden="true"
-              class="-mt-0.5 text-4xl font-light leading-none"
+              class="-mt-0.5 text-4xl leading-none font-light"
             >
               +
             </span>
             <span v-if="iconOnly" class="sr-only">Create new</span>
             <ChevronDownIcon
               v-if="!iconOnly"
-              class="-mr-1 ml-1 mt-0.5 h-3 w-3"
+              class="mt-0.5 -mr-1 ml-1 h-3 w-3"
               aria-hidden="true"
             />
           </button>
@@ -246,7 +246,7 @@ const buttonClasses = computed(() => {
         <span v-if="iconOnly" class="sr-only">Create new</span>
         <ChevronDownIcon
           v-if="!iconOnly"
-          class="-mr-1 ml-1 mt-0.5 h-3 w-3"
+          class="mt-0.5 -mr-1 ml-1 h-3 w-3"
           aria-hidden="true"
         />
       </button>

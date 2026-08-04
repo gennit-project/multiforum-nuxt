@@ -134,7 +134,7 @@ const supportsRolloutPolicy = computed(() =>
                 ($event.target as HTMLInputElement).checked
               )
             "
-          >
+          />
           <span class="text-sm text-gray-700 dark:text-gray-300"
             >Stop on first failure</span
           >
@@ -155,7 +155,7 @@ const supportsRolloutPolicy = computed(() =>
           :id="applicabilityInputId"
           data-testid="pipeline-applicability-select"
           :value="pipeline.applicability || 'NEW_FILES_ONLY'"
-          class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
           @change="
             updateApplicability(
               ($event.target as HTMLSelectElement)
@@ -167,9 +167,7 @@ const supportsRolloutPolicy = computed(() =>
           <option value="ALL_FILES_GRADUAL">
             New files now; existing files gradually
           </option>
-          <option value="ALL_FILES_IMMEDIATE">
-            All files immediately
-          </option>
+          <option value="ALL_FILES_IMMEDIATE">All files immediately</option>
         </select>
         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
           Existing files excluded by this policy are shown as not required,
@@ -201,7 +199,7 @@ const supportsRolloutPolicy = computed(() =>
 
               <!-- Step Number -->
               <div
-                class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900"
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900"
               >
                 <span
                   class="text-sm font-medium text-orange-600 dark:text-orange-300"
@@ -222,7 +220,7 @@ const supportsRolloutPolicy = computed(() =>
                   <select
                     :value="step.plugin"
                     data-testid="pipeline-step-plugin"
-                    class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     @change="
                       updateStep(index, {
                         plugin: ($event.target as HTMLSelectElement).value,
@@ -251,7 +249,7 @@ const supportsRolloutPolicy = computed(() =>
                     <select
                       :value="step.condition || 'ALWAYS'"
                       data-testid="pipeline-step-condition"
-                      class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                       @change="
                         updateStep(index, {
                           condition: ($event.target as HTMLSelectElement)
@@ -281,7 +279,7 @@ const supportsRolloutPolicy = computed(() =>
                             .checked,
                         })
                       "
-                    >
+                    />
                     <span class="text-sm text-gray-700 dark:text-gray-300"
                       >Continue on error</span
                     >
@@ -330,10 +328,10 @@ const supportsRolloutPolicy = computed(() =>
     <!-- Validation Errors -->
     <div
       v-if="errors && errors.length > 0"
-      class="bg-yellow-50 rounded-md p-3 text-sm text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300"
+      class="rounded-md bg-yellow-50 p-3 text-sm text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300"
     >
       <div class="flex items-start">
-        <i class="fa-solid fa-exclamation-circle mr-2 mt-0.5" />
+        <i class="fa-solid fa-exclamation-circle mt-0.5 mr-2" />
         <div>
           <p class="font-medium">Validation Errors</p>
           <ul class="mt-1 list-inside list-disc space-y-1">

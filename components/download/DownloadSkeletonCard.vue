@@ -1,5 +1,5 @@
 <template>
-  <li class="mb-2 flex border-gray-300 pt-2 dark:bg-gray-800 md:rounded-lg">
+  <li class="mb-2 flex border-gray-300 pt-2 md:rounded-lg dark:bg-gray-800">
     <div
       class="flex w-full flex-row justify-start gap-4 overflow-hidden rounded-lg"
     >
@@ -74,9 +74,9 @@
 .animate-pulse {
   background: linear-gradient(
     90deg,
-    theme('colors.gray.200') 25%,
-    theme('colors.gray.100') 37%,
-    theme('colors.gray.200') 63%
+    var(--color-gray-200) 25%,
+    var(--color-gray-100) 37%,
+    var(--color-gray-200) 63%
   );
   background-size: 400px 100%;
   animation: shimmer 1.5s ease-in-out infinite;
@@ -85,9 +85,9 @@
 .dark .animate-pulse {
   background: linear-gradient(
     90deg,
-    theme('colors.gray.600') 25%,
-    theme('colors.gray.500') 37%,
-    theme('colors.gray.600') 63%
+    var(--color-gray-600) 25%,
+    var(--color-gray-500) 37%,
+    var(--color-gray-600) 63%
   );
   background-size: 400px 100%;
   animation: shimmer 1.5s ease-in-out infinite;

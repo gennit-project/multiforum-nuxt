@@ -51,12 +51,16 @@ const handleItemClick = (item: MenuItemType) => {
     <Menu as="div" class="relative flex items-center text-left">
       <MenuButton
         :class="[
-          'font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:text-gray-300 dark:hover:text-white',
+          'inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm font-semibold text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:text-gray-300 dark:hover:text-white',
           darkBackground ? 'text-gray-200 hover:text-white' : '',
         ]"
         :aria-label="props.ariaLabel"
       >
-        <i v-if="menuButtonIcon" :class="` ${menuButtonIcon} `" aria-hidden="true" />
+        <i
+          v-if="menuButtonIcon"
+          :class="` ${menuButtonIcon} `"
+          aria-hidden="true"
+        />
         <div v-else class="flex items-center">
           <slot />
         </div>
@@ -70,7 +74,7 @@ const handleItemClick = (item: MenuItemType) => {
         leave-to-class="transform opacity-0 scale-95"
       >
         <MenuItems
-          class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700 dark:text-gray-200"
+          class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white ring-1 ring-black/5 focus:outline-none dark:bg-gray-700 dark:text-gray-200"
           style="top: calc(100% + 8px)"
         >
           <div class="py-1">
@@ -78,7 +82,7 @@ const handleItemClick = (item: MenuItemType) => {
               <!-- Divider -->
               <div
                 v-if="item.isDivider"
-                class="font-semibold px-4 py-2 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                class="px-4 py-2 text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400"
               >
                 {{ item.value }}
               </div>
@@ -107,10 +111,14 @@ const handleItemClick = (item: MenuItemType) => {
     </Menu>
     <template #fallback>
       <button
-        class="font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:text-white"
+        class="inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm font-semibold text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:text-white"
         :aria-label="props.ariaLabel"
       >
-        <i v-if="menuButtonIcon" :class="` ${menuButtonIcon} `" aria-hidden="true" />
+        <i
+          v-if="menuButtonIcon"
+          :class="` ${menuButtonIcon} `"
+          aria-hidden="true"
+        />
         <div v-else class="flex items-center">
           <slot />
         </div>

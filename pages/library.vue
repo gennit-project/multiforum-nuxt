@@ -66,24 +66,19 @@ const { result: favoriteDownloadsResult, refetch: refetchDownloads } = useQuery(
   })
 );
 
-const {
-  result: ownedDownloadsCountResult,
-  refetch: refetchOwnedDownloads,
-} = useQuery(
-  GET_USER_OWNED_DOWNLOADS_COUNT,
-  () => ({
-    username: username.value,
-  }),
-  () => ({
-    enabled: !!username.value && isAuthenticated.value,
-    fetchPolicy: 'cache-and-network',
-  })
-);
+const { result: ownedDownloadsCountResult, refetch: refetchOwnedDownloads } =
+  useQuery(
+    GET_USER_OWNED_DOWNLOADS_COUNT,
+    () => ({
+      username: username.value,
+    }),
+    () => ({
+      enabled: !!username.value && isAuthenticated.value,
+      fetchPolicy: 'cache-and-network',
+    })
+  );
 
-const {
-  result: uploadedFilesResult,
-  refetch: refetchUploadedFiles,
-} = useQuery(
+const { result: uploadedFilesResult, refetch: refetchUploadedFiles } = useQuery(
   GET_UPLOADED_DOWNLOADABLE_FILES,
   () => ({
     username: username.value,
@@ -204,7 +199,9 @@ const activeLibraryItemId = computed(() => {
     : '';
 });
 
-const normalizedSearchTerm = computed(() => searchTerm.value.trim().toLowerCase());
+const normalizedSearchTerm = computed(() =>
+  searchTerm.value.trim().toLowerCase()
+);
 
 // Collections with real counts
 const defaultCollections = computed(() => [
@@ -262,7 +259,9 @@ const autoSavedDownloadsCollection = computed(() =>
 );
 
 const myDownloadsCount = computed(() => {
-  return autoSavedDownloadsCollection.value?.itemCount ?? ownedDownloadsCount.value;
+  return (
+    autoSavedDownloadsCollection.value?.itemCount ?? ownedDownloadsCount.value
+  );
 });
 
 const myDownloadsLink = computed(() => '/library/my-downloads');
@@ -410,10 +409,14 @@ const isUploadedFilesActive = computed(
 
 <template>
   <NuxtLayout>
-    <div class="min-h-screen bg-gray-200 text-gray-900 dark:bg-gray-900 dark:text-white">
+    <div
+      class="min-h-screen bg-gray-200 text-gray-900 dark:bg-gray-900 dark:text-white"
+    >
       <RequireAuth>
         <template #has-auth>
-          <div class="flex flex-col gap-4 px-3 py-4 md:flex-row md:gap-6 md:px-4">
+          <div
+            class="flex flex-col gap-4 px-3 py-4 md:flex-row md:gap-6 md:px-4"
+          >
             <div class="md:hidden">
               <button
                 class="flex w-full items-center justify-between rounded-[1.5rem] border border-gray-200 bg-white px-4 py-3 text-left text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-800"
@@ -423,15 +426,19 @@ const isUploadedFilesActive = computed(
                 @click="isMobileNavOpen = !isMobileNavOpen"
               >
                 <div class="min-w-0">
-                  <p class="truncate text-xs font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500">
+                  <p
+                    class="truncate text-xs font-semibold tracking-[0.2em] text-gray-400 uppercase dark:text-gray-500"
+                  >
                     Library
                   </p>
-                  <p class="mt-1 truncate text-base font-semibold text-gray-900 dark:text-white">
+                  <p
+                    class="mt-1 truncate text-base font-semibold text-gray-900 dark:text-white"
+                  >
                     {{ activeLibraryItem?.name ?? 'Browse collections' }}
                   </p>
                 </div>
                 <ChevronDownIcon
-                  class="ml-3 h-4 w-4 flex-shrink-0 text-gray-500 transition-transform dark:text-gray-400"
+                  class="ml-3 h-4 w-4 shrink-0 text-gray-500 transition-transform dark:text-gray-400"
                   :class="isMobileNavOpen ? 'rotate-180' : ''"
                 />
               </button>
@@ -451,8 +458,8 @@ const isUploadedFilesActive = computed(
                     type="search"
                     placeholder="Search collections"
                     aria-label="Search library collections"
-                    class="w-full rounded-2xl border border-gray-200 bg-gray-50/90 py-3 pl-10 pr-4 text-sm text-gray-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-orange-400 dark:focus:bg-gray-800 dark:focus:ring-orange-500/20"
-                  >
+                    class="w-full rounded-2xl border border-gray-200 bg-gray-50/90 py-3 pr-4 pl-10 text-sm text-gray-900 transition outline-none focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-orange-400 dark:focus:bg-gray-800 dark:focus:ring-orange-500/20"
+                  />
                 </div>
 
                 <div class="mt-4 flex flex-wrap gap-2">
@@ -463,7 +470,7 @@ const isUploadedFilesActive = computed(
                     :class="[
                       'rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
                       activeFilter === filter.key
-                        ? 'bg-gray-900 text-white ring-1 ring-inset ring-gray-800 dark:bg-gray-700 dark:text-gray-50 dark:ring-gray-600'
+                        ? 'bg-gray-900 text-white ring-1 ring-gray-800 ring-inset dark:bg-gray-700 dark:text-gray-50 dark:ring-gray-600'
                         : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white',
                     ]"
                     @click="activeFilter = filter.key"
@@ -565,7 +572,9 @@ const isUploadedFilesActive = computed(
                     :data-testid="`mobile-library-item-${collection.id}`"
                     :class="[
                       'block rounded-2xl border px-4 py-3 text-sm transition-all',
-                      getSidebarItemClasses(activeLibraryItemId === collection.id),
+                      getSidebarItemClasses(
+                        activeLibraryItemId === collection.id
+                      ),
                     ]"
                   >
                     <div class="flex items-start justify-between gap-3">
@@ -585,8 +594,8 @@ const isUploadedFilesActive = computed(
                         <p
                           :class="
                             activeLibraryItemId === collection.id
-                              ? 'mt-1 text-xs capitalize text-gray-700 dark:text-white'
-                              : 'mt-1 text-xs capitalize text-gray-500 dark:text-gray-400'
+                              ? 'mt-1 text-xs text-gray-700 capitalize dark:text-white'
+                              : 'mt-1 text-xs text-gray-500 capitalize dark:text-gray-400'
                           "
                         >
                           {{ collection.visibility.toLowerCase() }}
@@ -595,8 +604,8 @@ const isUploadedFilesActive = computed(
                       <span
                         :class="
                           activeLibraryItemId === collection.id
-                            ? 'text-xs font-medium uppercase tracking-[0.18em] text-gray-700 dark:text-white'
-                            : 'text-xs font-medium uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500'
+                            ? 'text-xs font-medium tracking-[0.18em] text-gray-700 uppercase dark:text-white'
+                            : 'text-xs font-medium tracking-[0.18em] text-gray-400 uppercase dark:text-gray-500'
                         "
                       >
                         Fav
@@ -611,7 +620,9 @@ const isUploadedFilesActive = computed(
                     :data-testid="`mobile-library-item-${collection.id}`"
                     :class="[
                       'block rounded-2xl border px-4 py-3 text-sm transition-all',
-                      getSidebarItemClasses(activeLibraryItemId === collection.id),
+                      getSidebarItemClasses(
+                        activeLibraryItemId === collection.id
+                      ),
                     ]"
                   >
                     <div class="flex items-start justify-between gap-3">
@@ -647,8 +658,8 @@ const isUploadedFilesActive = computed(
                           <span
                             :class="
                               activeLibraryItemId === collection.id
-                                ? 'text-xs capitalize text-gray-700 dark:text-white'
-                                : 'text-xs capitalize text-gray-500 dark:text-gray-400'
+                                ? 'text-xs text-gray-700 capitalize dark:text-white'
+                                : 'text-xs text-gray-500 capitalize dark:text-gray-400'
                             "
                           >
                             {{ collection.visibility.toLowerCase() }}
@@ -675,8 +686,10 @@ const isUploadedFilesActive = computed(
               </div>
             </div>
 
-            <div class="hidden w-72 md:block md:w-[24rem] md:flex-shrink-0">
-              <div class="rounded-[2rem] border border-gray-200/80 bg-white/95 p-5 shadow-[0_25px_70px_-38px_rgba(38,38,38,0.22)] backdrop-blur dark:border-gray-700 dark:bg-gray-900 dark:shadow-[0_32px_80px_-45px_rgba(0,0,0,0.78)]">
+            <div class="hidden w-72 md:block md:w-[24rem] md:shrink-0">
+              <div
+                class="rounded-[2rem] border border-gray-200/80 bg-white/95 p-5 shadow-[0_25px_70px_-38px_rgba(38,38,38,0.22)] backdrop-blur dark:border-gray-700 dark:bg-gray-900 dark:shadow-[0_32px_80px_-45px_rgba(0,0,0,0.78)]"
+              >
                 <!-- Header -->
                 <h1
                   class="text-2xl font-semibold tracking-[-0.04em] text-gray-950 dark:text-gray-50"
@@ -694,12 +707,12 @@ const isUploadedFilesActive = computed(
                     type="search"
                     placeholder="Search collections"
                     aria-label="Search library collections"
-                    class="w-full rounded-2xl border border-gray-200 bg-gray-50/90 py-3 pl-10 pr-4 text-sm text-gray-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-orange-400 dark:focus:bg-gray-800 dark:focus:ring-orange-500/20"
-                  >
+                    class="w-full rounded-2xl border border-gray-200 bg-gray-50/90 py-3 pr-4 pl-10 text-sm text-gray-900 transition outline-none focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-orange-400 dark:focus:bg-gray-800 dark:focus:ring-orange-500/20"
+                  />
                 </div>
 
                 <!-- Filter Chips -->
-                <div class="mb-6 mt-5">
+                <div class="mt-5 mb-6">
                   <div class="flex flex-wrap gap-2">
                     <button
                       v-for="filter in filterOptions"
@@ -708,7 +721,7 @@ const isUploadedFilesActive = computed(
                       :class="[
                         'rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
                         activeFilter === filter.key
-                          ? 'bg-gray-900 text-white ring-1 ring-inset ring-gray-800 dark:bg-gray-700 dark:text-gray-50 dark:ring-gray-600'
+                          ? 'bg-gray-900 text-white ring-1 ring-gray-800 ring-inset dark:bg-gray-700 dark:text-gray-50 dark:ring-gray-600'
                           : 'bg-gray-200/80 text-gray-700 hover:bg-gray-300/80 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white',
                       ]"
                       @click="activeFilter = filter.key"
@@ -721,7 +734,7 @@ const isUploadedFilesActive = computed(
                 <!-- My Downloads Section -->
                 <div class="mb-8">
                   <div
-                    class="mb-3 px-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-400 dark:text-gray-500"
+                    class="mb-3 px-1 text-[11px] font-semibold tracking-[0.24em] text-gray-400 uppercase dark:text-gray-500"
                   >
                     My Downloads
                   </div>
@@ -840,7 +853,7 @@ const isUploadedFilesActive = computed(
                       <!-- Favorites Section -->
                       <div v-if="filteredFavorites.length > 0">
                         <div
-                          class="mb-3 px-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-400 dark:text-gray-500"
+                          class="mb-3 px-1 text-[11px] font-semibold tracking-[0.24em] text-gray-400 uppercase dark:text-gray-500"
                         >
                           Favorites
                         </div>
@@ -850,7 +863,9 @@ const isUploadedFilesActive = computed(
                           :to="`/library/${collection.id}`"
                           :class="[
                             'mb-2 block rounded-2xl border px-4 py-3 text-sm transition-all',
-                            getSidebarItemClasses(activeLibraryItemId === collection.id),
+                            getSidebarItemClasses(
+                              activeLibraryItemId === collection.id
+                            ),
                           ]"
                         >
                           <div class="flex items-start justify-between gap-3">
@@ -870,8 +885,8 @@ const isUploadedFilesActive = computed(
                               <p
                                 :class="
                                   activeLibraryItemId === collection.id
-                                    ? 'mt-1 text-xs capitalize text-gray-700 dark:text-white'
-                                    : 'mt-1 text-xs capitalize text-gray-500 dark:text-gray-400'
+                                    ? 'mt-1 text-xs text-gray-700 capitalize dark:text-white'
+                                    : 'mt-1 text-xs text-gray-500 capitalize dark:text-gray-400'
                                 "
                               >
                                 {{ collection.visibility.toLowerCase() }}
@@ -880,8 +895,8 @@ const isUploadedFilesActive = computed(
                             <span
                               :class="
                                 activeLibraryItemId === collection.id
-                                  ? 'text-xs font-medium uppercase tracking-[0.18em] text-gray-700 dark:text-white'
-                                  : 'text-xs font-medium uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500'
+                                  ? 'text-xs font-medium tracking-[0.18em] text-gray-700 uppercase dark:text-white'
+                                  : 'text-xs font-medium tracking-[0.18em] text-gray-400 uppercase dark:text-gray-500'
                               "
                             >
                               Fav
@@ -896,7 +911,7 @@ const isUploadedFilesActive = computed(
                         :class="{ 'mt-6': filteredFavorites.length > 0 }"
                       >
                         <div
-                          class="mb-3 px-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-400 dark:text-gray-500"
+                          class="mb-3 px-1 text-[11px] font-semibold tracking-[0.24em] text-gray-400 uppercase dark:text-gray-500"
                         >
                           Custom Collections
                         </div>
@@ -906,7 +921,9 @@ const isUploadedFilesActive = computed(
                           :to="`/library/${collection.id}`"
                           :class="[
                             'mb-2 block rounded-2xl border px-4 py-3 text-sm transition-all',
-                            getSidebarItemClasses(activeLibraryItemId === collection.id),
+                            getSidebarItemClasses(
+                              activeLibraryItemId === collection.id
+                            ),
                           ]"
                         >
                           <div class="flex items-start justify-between gap-3">
@@ -923,7 +940,9 @@ const isUploadedFilesActive = computed(
                                   ({{ collection.itemCount }})</span
                                 >
                               </p>
-                              <div class="mt-2 flex flex-wrap items-center gap-2">
+                              <div
+                                class="mt-2 flex flex-wrap items-center gap-2"
+                              >
                                 <span
                                   :class="[
                                     'rounded-full px-2 py-0.5 text-[11px] font-medium',
@@ -942,8 +961,8 @@ const isUploadedFilesActive = computed(
                                 <span
                                   :class="
                                     activeLibraryItemId === collection.id
-                                      ? 'text-xs capitalize text-gray-700 dark:text-white'
-                                      : 'text-xs capitalize text-gray-500 dark:text-gray-400'
+                                      ? 'text-xs text-gray-700 capitalize dark:text-white'
+                                      : 'text-xs text-gray-500 capitalize dark:text-gray-400'
                                   "
                                 >
                                   {{ collection.visibility.toLowerCase() }}

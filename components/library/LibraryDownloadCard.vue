@@ -51,17 +51,17 @@ withDefaults(
   >
     <NuxtLink
       :to="downloadLink"
-      class="relative block aspect-[16/10] overflow-hidden bg-slate-100 dark:bg-gray-700"
+      class="relative block aspect-16/10 overflow-hidden bg-slate-100 dark:bg-gray-700"
     >
       <img
         v-if="previewImageUrl"
         :src="previewImageUrl"
         :alt="download.title"
         class="h-full w-full object-cover"
-      >
+      />
       <div
         v-else
-        class="flex h-full w-full items-center justify-center bg-gradient-to-br from-orange-50 via-white to-slate-100 text-gray-400 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700"
+        class="flex h-full w-full items-center justify-center bg-linear-to-br from-orange-50 via-white to-slate-100 text-gray-400 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700"
       >
         <svg
           class="h-12 w-12"
@@ -77,8 +77,12 @@ withDefaults(
           />
         </svg>
       </div>
-      <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent p-4">
-        <div class="flex items-center justify-between gap-2 text-xs text-white/90">
+      <div
+        class="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/65 to-transparent p-4"
+      >
+        <div
+          class="flex items-center justify-between gap-2 text-xs text-white/90"
+        >
           <div
             v-if="channelUniqueName"
             class="inline-flex min-w-0 items-center gap-2 font-medium text-white"
@@ -86,7 +90,7 @@ withDefaults(
             <AvatarComponent
               :text="channelUniqueName"
               :is-square="true"
-              class="h-4 w-4 flex-shrink-0"
+              class="h-4 w-4 shrink-0"
             />
             <span class="truncate">{{ channelUniqueName }}</span>
           </div>
@@ -99,12 +103,12 @@ withDefaults(
       <div class="flex items-start gap-3">
         <NuxtLink
           :to="downloadLink"
-          class="min-w-0 flex-1 text-base font-semibold leading-6 text-gray-900 transition-colors hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
+          class="min-w-0 flex-1 text-base leading-6 font-semibold text-gray-900 transition-colors hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
         >
           {{ download.title }}
         </NuxtLink>
 
-        <div v-if="showFavoriteButton" class="flex-shrink-0">
+        <div v-if="showFavoriteButton" class="shrink-0">
           <AddToDiscussionFavorites
             :allow-add-to-list="allowAddToList"
             :discussion-id="download.id"
@@ -116,7 +120,9 @@ withDefaults(
         </div>
       </div>
 
-      <div class="flex min-w-0 items-center text-xs text-gray-500 dark:text-gray-400">
+      <div
+        class="flex min-w-0 items-center text-xs text-gray-500 dark:text-gray-400"
+      >
         <span class="mr-1">by</span>
         <UsernameWithTooltip
           v-if="authorInfo"

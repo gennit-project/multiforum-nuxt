@@ -6,7 +6,10 @@ import FormRow from '@/components/FormRow.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PluginSettingsForm from '@/components/plugins/PluginSettingsForm.vue';
 import BotProfilesEditor from '@/components/plugins/BotProfilesEditor.vue';
-import type { BotProfile, ExistingBot } from '@/components/plugins/BotProfilesEditor.vue';
+import type {
+  BotProfile,
+  ExistingBot,
+} from '@/components/plugins/BotProfilesEditor.vue';
 import { useToast } from '@/composables/useToast';
 import { GET_INSTALLED_PLUGINS } from '@/graphQLData/admin/queries';
 import {
@@ -192,7 +195,11 @@ async function handleToggleEnabled(enabled: boolean) {
     pluginState.value.enabled = enabled;
     await refetchChannel();
     await client.refetchQueries({ include: [GET_CHANNEL] });
-    toast.success(enabled ? 'Plugin enabled for this forum.' : 'Plugin disabled for this forum.');
+    toast.success(
+      enabled
+        ? 'Plugin enabled for this forum.'
+        : 'Plugin disabled for this forum.'
+    );
   } catch (err: unknown) {
     const message =
       updateChannelEnabledPluginsError.value?.message ||
@@ -373,7 +380,10 @@ const hasFilteredChannelSettings = computed(() => {
         role="alert"
       >
         <div class="flex items-start gap-2">
-          <i class="fa-solid fa-triangle-exclamation mt-0.5" aria-hidden="true" />
+          <i
+            class="fa-solid fa-triangle-exclamation mt-0.5"
+            aria-hidden="true"
+          />
           <span>{{ updateChannelEnabledPluginsError?.message }}</span>
         </div>
       </div>
@@ -384,15 +394,19 @@ const hasFilteredChannelSettings = computed(() => {
           'rounded-xl border-2 p-6 transition-all',
           isEnabled
             ? 'border-blue-300 bg-blue-50 dark:border-blue-700 dark:bg-blue-900/30'
-            : 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/50'
+            : 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/50',
         ]"
       >
         <!-- Enabled State -->
         <div v-if="isEnabled" class="flex items-center justify-between">
           <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-800">
-                <i class="fa-solid fa-power-off text-2xl text-blue-600 dark:text-blue-300" />
+            <div class="shrink-0">
+              <div
+                class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-800"
+              >
+                <i
+                  class="fa-solid fa-power-off text-2xl text-blue-600 dark:text-blue-300"
+                />
               </div>
             </div>
             <div class="ml-4">
@@ -406,21 +420,27 @@ const hasFilteredChannelSettings = computed(() => {
           </div>
           <button
             type="button"
-          class="rounded-lg border border-blue-300 bg-white px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-blue-600 dark:bg-blue-800 dark:text-blue-200 dark:hover:bg-blue-700"
-          :disabled="updating"
-          @click="handleToggleEnabled(false)"
-        >
-          <LoadingSpinner v-if="updating" class="mr-2 inline-flex" />
-          Disable
-        </button>
+            class="rounded-lg border border-blue-300 bg-white px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:border-blue-600 dark:bg-blue-800 dark:text-blue-200 dark:hover:bg-blue-700"
+            :disabled="updating"
+            @click="handleToggleEnabled(false)"
+          >
+            <LoadingSpinner v-if="updating" class="mr-2 inline-flex" />
+            Disable
+          </button>
         </div>
 
         <!-- Disabled State - Large CTA -->
         <div v-else class="flex flex-col items-center text-center">
-          <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
-            <i class="fa-solid fa-power-off text-2xl text-gray-500 dark:text-gray-400" />
+          <div
+            class="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700"
+          >
+            <i
+              class="fa-solid fa-power-off text-2xl text-gray-500 dark:text-gray-400"
+            />
           </div>
-          <p class="mt-3 text-lg font-semibold text-gray-800 dark:text-gray-200">
+          <p
+            class="mt-3 text-lg font-semibold text-gray-800 dark:text-gray-200"
+          >
             Plugin Disabled
           </p>
           <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -428,14 +448,14 @@ const hasFilteredChannelSettings = computed(() => {
           </p>
           <button
             type="button"
-          class="mt-4 w-full rounded-lg bg-green-700 px-6 py-3 text-lg font-semibold text-white shadow-lg hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          :disabled="updating"
-          @click="handleToggleEnabled(true)"
-        >
-          <LoadingSpinner v-if="updating" class="mr-2 inline-flex" />
-          <i v-else class="fa-solid fa-power-off mr-2" />
-          Enable Plugin
-        </button>
+            class="mt-4 w-full rounded-lg bg-green-700 px-6 py-3 text-lg font-semibold text-white shadow-lg hover:bg-green-800 focus:ring-2 focus:ring-green-600 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            :disabled="updating"
+            @click="handleToggleEnabled(true)"
+          >
+            <LoadingSpinner v-if="updating" class="mr-2 inline-flex" />
+            <i v-else class="fa-solid fa-power-off mr-2" />
+            Enable Plugin
+          </button>
         </div>
       </div>
 
@@ -457,10 +477,12 @@ const hasFilteredChannelSettings = computed(() => {
               @update:profiles="updateBotProfiles"
             />
 
-            <div class="flex justify-end border-t border-gray-200 pt-4 dark:border-gray-700">
+            <div
+              class="flex justify-end border-t border-gray-200 pt-4 dark:border-gray-700"
+            >
               <button
                 type="button"
-                class="rounded-md bg-orange-700 px-4 py-2 text-white hover:bg-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
+                class="rounded-md bg-orange-700 px-4 py-2 text-white hover:bg-orange-800 focus:ring-2 focus:ring-orange-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 :disabled="saving || !isDirty"
                 @click="handleSave"
               >
@@ -479,13 +501,19 @@ const hasFilteredChannelSettings = computed(() => {
         description="Configure bot personalities for this forum."
       >
         <template #content>
-          <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
-            <div class="flex items-start gap-2 text-amber-800 dark:text-amber-200">
+          <div
+            class="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
+          >
+            <div
+              class="flex items-start gap-2 text-amber-800 dark:text-amber-200"
+            >
               <i class="fa-solid fa-triangle-exclamation mt-0.5" />
               <div>
                 <p class="font-medium">Bot name not configured</p>
                 <p class="mt-1 text-sm text-amber-700 dark:text-amber-300">
-                  This bot plugin requires a bot name to be set in the server-level plugin settings before you can configure profiles.
+                  This bot plugin requires a bot name to be set in the
+                  server-level plugin settings before you can configure
+                  profiles.
                 </p>
               </div>
             </div>
@@ -507,10 +535,12 @@ const hasFilteredChannelSettings = computed(() => {
               @update:model-value="updateSettings"
             />
 
-            <div class="flex justify-end border-t border-gray-200 pt-4 dark:border-gray-700">
+            <div
+              class="flex justify-end border-t border-gray-200 pt-4 dark:border-gray-700"
+            >
               <button
                 type="button"
-                class="rounded-md bg-orange-700 px-4 py-2 text-white hover:bg-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
+                class="rounded-md bg-orange-700 px-4 py-2 text-white hover:bg-orange-800 focus:ring-2 focus:ring-orange-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 :disabled="saving || !isDirty"
                 @click="handleSave"
               >
@@ -523,10 +553,7 @@ const hasFilteredChannelSettings = computed(() => {
       </FormRow>
 
       <!-- Plugin Manifest Section -->
-      <FormRow
-        v-if="manifestJson"
-        section-title="Plugin Manifest"
-      >
+      <FormRow v-if="manifestJson" section-title="Plugin Manifest">
         <template #content>
           <div
             tabindex="0"
@@ -534,7 +561,9 @@ const hasFilteredChannelSettings = computed(() => {
             aria-label="Plugin manifest JSON"
             class="max-h-96 overflow-auto rounded-md border border-gray-300 bg-gray-900 p-3 dark:border-gray-600"
           >
-            <pre class="whitespace-pre-wrap break-words text-sm text-gray-100">{{ manifestJson }}</pre>
+            <pre
+              class="text-sm wrap-break-word whitespace-pre-wrap text-gray-100"
+              >{{ manifestJson }}</pre>
           </div>
         </template>
       </FormRow>

@@ -47,7 +47,10 @@ describe('wiki page', () => {
   beforeEach(() => setActivePinia(createPinia()));
 
   it('renders the wiki body through the markdown renderer', async () => {
-    const wrapper = await mountWith({ title: 'Intro', body: 'Welcome to the wiki' });
+    const wrapper = await mountWith({
+      title: 'Intro',
+      body: 'Welcome to the wiki',
+    });
     expect(wrapper.findComponent(MarkdownRenderer).props('text')).toBe(
       'Welcome to the wiki'
     );
@@ -60,9 +63,9 @@ describe('wiki page', () => {
       locked: true,
       lockReason: 'Vandalism',
     });
-    expect(wrapper.find('[data-testid="wiki-page-locked-banner"]').exists()).toBe(
-      true
-    );
+    expect(
+      wrapper.find('[data-testid="wiki-page-locked-banner"]').exists()
+    ).toBe(true);
   });
 
   it('hides edit buttons for locked wiki pages without lock permission', async () => {
@@ -84,9 +87,9 @@ describe('wiki page', () => {
       body: 'Body',
     });
 
-    expect(
-      wrapper.get('[data-testid="wiki-page-title"]').classes()
-    ).toEqual(expect.arrayContaining(['min-w-0', 'break-words']));
+    expect(wrapper.get('[data-testid="wiki-page-title"]').classes()).toEqual(
+      expect.arrayContaining(['min-w-0', 'wrap-break-word'])
+    );
   });
 
   it('keeps the wiki body in a shrinkable full-width container', async () => {
@@ -94,12 +97,10 @@ describe('wiki page', () => {
     const container =
       wrapper.findComponent(MarkdownRenderer).element.parentElement;
 
-    expect(
-      {
-        minWidth: container?.classList.contains('min-w-0'),
-        fullWidth: container?.classList.contains('w-full'),
-      }
-    ).toEqual({ minWidth: true, fullWidth: true });
+    expect({
+      minWidth: container?.classList.contains('min-w-0'),
+      fullWidth: container?.classList.contains('w-full'),
+    }).toEqual({ minWidth: true, fullWidth: true });
   });
 
   it('places the mobile font-size picker after the wiki body', async () => {

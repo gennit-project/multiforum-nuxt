@@ -65,7 +65,7 @@ const hideTooltip = () => {
         >
           <div
             v-if="isVisible"
-            class="pointer-events-none fixed z-[100] -translate-y-1/2 transform"
+            class="pointer-events-none fixed z-100 -translate-y-1/2 transform"
             :style="{
               top: `${tooltipPosition.top}px`,
               left: `${tooltipPosition.left}px`,
@@ -73,13 +73,13 @@ const hideTooltip = () => {
           >
             <!-- Tooltip content -->
             <div
-              class="relative whitespace-nowrap rounded-lg bg-gray-800 px-3 py-2 text-sm font-medium text-white shadow-lg"
+              class="relative rounded-lg bg-gray-800 px-3 py-2 text-sm font-medium whitespace-nowrap text-white shadow-lg"
             >
               {{ text }}
 
               <!-- Left-pointing arrow -->
               <svg
-                class="absolute right-full top-1/2 -translate-y-1/2 transform text-gray-800"
+                class="absolute top-1/2 right-full -translate-y-1/2 transform text-gray-800"
                 width="6"
                 height="12"
                 viewBox="0 0 6 12"

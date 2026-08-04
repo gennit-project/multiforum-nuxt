@@ -35,7 +35,7 @@ function handleSelect(event: SelectOptionData) {
   <Listbox v-model="selected" as="div" @update:model-value="handleSelect">
     <div class="relative mt-1">
       <ListboxButton
-        class="relative w-full cursor-default rounded-md border border-gray-300 bg-white pl-3 pr-10 text-left shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:bg-gray-800 dark:text-gray-200"
+        class="relative w-full cursor-default rounded-md border border-gray-300 bg-white pr-10 pl-3 text-left shadow-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none dark:bg-gray-800 dark:text-gray-200"
         :label="props.label ?? selected?.label"
       >
         <span
@@ -43,7 +43,7 @@ function handleSelect(event: SelectOptionData) {
         />
       </ListboxButton>
       <ListboxOptions
-        class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800 dark:text-gray-200 sm:text-sm"
+        class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm dark:bg-gray-800 dark:text-gray-200"
       >
         <ListboxOption
           v-for="(option, i) in props.options"
@@ -57,7 +57,7 @@ function handleSelect(event: SelectOptionData) {
               active
                 ? 'bg-orange-600 text-white'
                 : 'text-gray-900 dark:text-gray-200',
-              'relative cursor-default select-none py-1 pl-3 pr-9',
+              'relative cursor-default py-1 pr-9 pl-3 select-none',
             ]"
           >
             <span

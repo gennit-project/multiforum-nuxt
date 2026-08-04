@@ -2,10 +2,7 @@
 import { computed, defineAsyncComponent, ref } from 'vue';
 import type { PropType } from 'vue';
 import { useRoute } from 'nuxt/app';
-import type {
-  Discussion,
-  DiscussionChannel,
-} from '@/__generated__/graphql';
+import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 import type {
   DiscussionChannelWithFlairs,
   DiscussionWithFavorited,
@@ -191,8 +188,7 @@ const flairGroups = computed(() =>
   (props.discussion?.DiscussionChannels || [])
     .map((discussionChannel) => ({
       channelName: discussionChannel.channelUniqueName,
-      flairs:
-        (discussionChannel as DiscussionChannelWithFlairs).Flairs || [],
+      flairs: (discussionChannel as DiscussionChannelWithFlairs).Flairs || [],
     }))
     .filter((group) => group.flairs.length > 0)
 );
@@ -260,7 +256,9 @@ const revealSensitiveContent = () => {
 </script>
 
 <template>
-  <li class="list-none border-b border-gray-200 py-3 last:border-b-0 dark:border-gray-800">
+  <li
+    class="list-none border-b border-gray-200 py-3 last:border-b-0 dark:border-gray-800"
+  >
     <div
       class="flex flex-col gap-2 px-2 lg:block lg:gap-0 lg:px-0"
       :class="{
@@ -269,7 +267,7 @@ const revealSensitiveContent = () => {
     >
       <!-- Discussion row -->
       <div class="flex items-start gap-3">
-        <div class="flex flex-shrink-0 flex-col items-center gap-1">
+        <div class="flex shrink-0 flex-col items-center gap-1">
           <ChannelIconStack
             :channels="channelIcons"
             tooltip-position-class="pointer-events-none absolute -top-8 left-0 z-30 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover/chicon:opacity-100 dark:bg-gray-700"
@@ -279,7 +277,9 @@ const revealSensitiveContent = () => {
             :allow-add-to-list="true"
             :discussion-id="discussion.id"
             :discussion-title="discussion.title"
-            :initial-is-favorited="(discussion as Discussion & DiscussionWithFavorited).isFavorited"
+            :initial-is-favorited="
+              (discussion as Discussion & DiscussionWithFavorited).isFavorited
+            "
             size="small"
           />
         </div>
@@ -291,7 +291,7 @@ const revealSensitiveContent = () => {
           >
             <div class="flex items-start gap-2">
               <span
-                class="text-[15px] font-semibold leading-snug text-gray-900 dark:text-gray-100"
+                class="text-[15px] leading-snug font-semibold text-gray-900 dark:text-gray-100"
               >
                 <HighlightedSearchTerms
                   :text="title"
@@ -300,7 +300,7 @@ const revealSensitiveContent = () => {
               </span>
               <span
                 v-if="hasSensitiveContent"
-                class="mt-1 flex-shrink-0 rounded-full border border-amber-700 px-2 text-xs text-amber-700 dark:border-orange-400 dark:text-orange-400"
+                class="mt-1 shrink-0 rounded-full border border-amber-700 px-2 text-xs text-amber-700 dark:border-orange-400 dark:text-orange-400"
               >
                 Sensitive
               </span>
@@ -313,7 +313,7 @@ const revealSensitiveContent = () => {
           >
             <div class="flex items-start gap-2">
               <span
-                class="text-[15px] font-semibold leading-snug text-gray-900 dark:text-gray-100"
+                class="text-[15px] leading-snug font-semibold text-gray-900 dark:text-gray-100"
               >
                 <HighlightedSearchTerms
                   :text="title"
@@ -322,7 +322,7 @@ const revealSensitiveContent = () => {
               </span>
               <span
                 v-if="hasSensitiveContent"
-                class="mt-1 flex-shrink-0 rounded-full border border-amber-700 px-2 text-xs text-amber-700 dark:border-orange-400 dark:text-orange-400"
+                class="mt-1 shrink-0 rounded-full border border-amber-700 px-2 text-xs text-amber-700 dark:border-orange-400 dark:text-orange-400"
               >
                 Sensitive
               </span>
@@ -401,11 +401,7 @@ const revealSensitiveContent = () => {
                   class="h-3 w-3"
                   aria-hidden="true"
                 />
-                <ExpandIcon
-                  v-else
-                  class="h-3 w-3"
-                  aria-hidden="true"
-                />
+                <ExpandIcon v-else class="h-3 w-3" aria-hidden="true" />
                 {{ isExpanded ? 'Collapse' : 'Expand' }}
               </button>
             </span>
@@ -414,110 +410,108 @@ const revealSensitiveContent = () => {
         <nuxt-link
           v-if="thumbnailUrl && discussion"
           :to="getDetailLink()"
-          class="flex-shrink-0 lg:hidden"
+          class="shrink-0 lg:hidden"
         >
           <img
             :src="thumbnailUrl"
             :alt="title"
             class="h-16 w-16 rounded-lg object-cover sm:h-20 sm:w-20"
-          >
+          />
         </nuxt-link>
         <nuxt-link
           v-if="thumbnailUrl && discussion"
           :to="getDesktopSelectionLink()"
-          class="hidden flex-shrink-0 lg:block"
+          class="hidden shrink-0 lg:block"
         >
           <img
             :src="thumbnailUrl"
             :alt="title"
             class="h-16 w-16 rounded-lg object-cover sm:h-20 sm:w-20"
-          >
+          />
         </nuxt-link>
         <nuxt-link
           v-if="discussion"
           :to="getDetailLink()"
-          class="flex items-center self-center text-gray-300 dark:text-gray-600 lg:hidden"
+          class="flex items-center self-center text-gray-300 lg:hidden dark:text-gray-600"
           aria-label="Open discussion"
         >
           <RightArrowIcon class="h-4 w-4" aria-hidden="true" />
         </nuxt-link>
       </div>
 
+      <div
+        v-if="discussion && (discussion.body || discussion.Album) && isExpanded"
+        class="my-2 w-full max-w-full overflow-hidden border-l-2 border-gray-200 bg-gray-50 pt-2 dark:border-gray-700 dark:bg-gray-900"
+      >
+        <!-- Sensitive content concealment box -->
         <div
           v-if="
-            discussion && (discussion.body || discussion.Album) && isExpanded
+            hasSensitiveContent &&
+            !sensitiveContentRevealed &&
+            !userAllowsSensitiveContent
           "
-          class="my-2 w-full max-w-full overflow-hidden border-l-2 border-gray-200 bg-gray-50 pt-2 dark:border-gray-700 dark:bg-gray-900"
+          class="mx-2 mb-2 rounded border bg-gray-200 p-4 text-center dark:bg-black"
         >
-          <!-- Sensitive content concealment box -->
-          <div
-            v-if="
-              hasSensitiveContent &&
-              !sensitiveContentRevealed &&
-              !userAllowsSensitiveContent
-            "
-            class="mx-2 mb-2 rounded border bg-gray-200 p-4 text-center dark:bg-black"
-          >
-            <p class="mb-3 text-sm text-gray-600 dark:text-gray-300">
-              This content has been marked as potentially sensitive.
-            </p>
-            <RequireAuth>
-              <template #has-auth>
-                <button
-                  type="button"
-                  class="rounded bg-black px-3 py-1 text-sm text-white hover:bg-gray-800"
-                  @click="revealSensitiveContent"
-                >
-                  Reveal sensitive content
-                </button>
-              </template>
-              <template #does-not-have-auth>
-                <button
-                  type="button"
-                  class="rounded bg-black px-3 py-1 text-sm text-white hover:bg-gray-800"
-                >
-                  Log in to reveal sensitive content
-                </button>
-              </template>
-            </RequireAuth>
-          </div>
+          <p class="mb-3 text-sm text-gray-600 dark:text-gray-300">
+            This content has been marked as potentially sensitive.
+          </p>
+          <RequireAuth>
+            <template #has-auth>
+              <button
+                type="button"
+                class="rounded bg-black px-3 py-1 text-sm text-white hover:bg-gray-800"
+                @click="revealSensitiveContent"
+              >
+                Reveal sensitive content
+              </button>
+            </template>
+            <template #does-not-have-auth>
+              <button
+                type="button"
+                class="rounded bg-black px-3 py-1 text-sm text-white hover:bg-gray-800"
+              >
+                Log in to reveal sensitive content
+              </button>
+            </template>
+          </RequireAuth>
+        </div>
 
-          <!-- Discussion content (hidden when sensitive and not revealed) -->
-          <template v-if="shouldShowContent">
-            <MarkdownPreview
-              v-if="discussion.body"
-              :text="discussion.body"
-              :word-limit="50"
-              :disable-gallery="false"
-              :image-max-height="'200px'"
-              class="max-w-full break-words px-2 pb-2"
-            />
-            <div
-              v-if="discussion.Album"
-              class="relative z-30 my-4 w-full max-w-full overflow-hidden bg-black"
-            >
-              <div class="mx-auto max-w-96">
-                <DiscussionAlbum
-                  :album="discussion.Album"
-                  :carousel-format="true"
-                  :discussion-author="authorUsername"
-                  :discussion-id="discussion.id"
-                  :show-edit-album="false"
-                  :expanded-view="false"
-                />
-              </div>
-            </div>
-          </template>
-        </div>
-        <div v-if="flairGroups.length" class="mt-1 flex flex-wrap gap-1.5">
-          <DiscussionFlairBadges
-            v-for="group in flairGroups"
-            :key="group.channelName"
-            :flairs="group.flairs"
-            :channel-name="group.channelName"
-            :show-channel-name="true"
+        <!-- Discussion content (hidden when sensitive and not revealed) -->
+        <template v-if="shouldShowContent">
+          <MarkdownPreview
+            v-if="discussion.body"
+            :text="discussion.body"
+            :word-limit="50"
+            :disable-gallery="false"
+            :image-max-height="'200px'"
+            class="max-w-full px-2 pb-2 wrap-break-word"
           />
-        </div>
+          <div
+            v-if="discussion.Album"
+            class="relative z-30 my-4 w-full max-w-full overflow-hidden bg-black"
+          >
+            <div class="mx-auto max-w-96">
+              <DiscussionAlbum
+                :album="discussion.Album"
+                :carousel-format="true"
+                :discussion-author="authorUsername"
+                :discussion-id="discussion.id"
+                :show-edit-album="false"
+                :expanded-view="false"
+              />
+            </div>
+          </div>
+        </template>
+      </div>
+      <div v-if="flairGroups.length" class="mt-1 flex flex-wrap gap-1.5">
+        <DiscussionFlairBadges
+          v-for="group in flairGroups"
+          :key="group.channelName"
+          :flairs="group.flairs"
+          :channel-name="group.channelName"
+          :show-channel-name="true"
+        />
+      </div>
     </div>
   </li>
 </template>

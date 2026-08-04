@@ -50,7 +50,7 @@ const createdAgo = computed(() => {
 
 <template>
   <li
-    class="w-48 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+    class="w-48 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
   >
     <nuxt-link :to="linkTarget" class="block">
       <div
@@ -61,7 +61,7 @@ const createdAgo = computed(() => {
           :src="firstImage"
           :alt="discussion?.title || 'Download preview'"
           class="h-full w-full object-cover"
-        >
+        />
         <div
           v-else
           class="flex h-full w-full items-center justify-center text-center text-xs text-gray-500 dark:text-gray-300"
@@ -71,7 +71,7 @@ const createdAgo = computed(() => {
       </div>
       <div class="space-y-1 p-2">
         <p
-          class="font-semibold line-clamp-2 text-sm text-gray-900 dark:text-white"
+          class="line-clamp-2 text-sm font-semibold text-gray-900 dark:text-white"
         >
           {{ discussion?.title || 'Untitled download' }}
         </p>

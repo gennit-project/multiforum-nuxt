@@ -152,7 +152,7 @@ onGetWikiPageResult((result) => {
         <div class="sm:flex sm:items-start sm:justify-between sm:gap-4">
           <h1
             data-testid="wiki-page-title"
-            class="min-w-0 break-words text-2xl font-bold [overflow-wrap:anywhere] dark:text-white"
+            class="min-w-0 text-2xl font-bold wrap-anywhere wrap-break-word dark:text-white"
           >
             {{ wikiPage.title }}
           </h1>
@@ -214,7 +214,10 @@ onGetWikiPageResult((result) => {
           <p v-if="wikiPage.lockReason" class="mt-1">
             Reason: {{ wikiPage.lockReason }}
           </p>
-          <p v-if="wikiPage.lockedByUsername || wikiPage.lockedAt" class="mt-1 text-xs">
+          <p
+            v-if="wikiPage.lockedByUsername || wikiPage.lockedAt"
+            class="mt-1 text-xs"
+          >
             <span v-if="wikiPage.lockedByUsername">
               Locked by {{ wikiPage.lockedByUsername }}
             </span>
@@ -237,7 +240,7 @@ onGetWikiPageResult((result) => {
         <!-- Main content - first on mobile/tablet, middle on desktop -->
         <div class="min-w-0 flex-1 xl:order-2">
           <div class="flex w-full justify-center">
-            <div class="min-w-0 w-full max-w-[70ch]">
+            <div class="w-full max-w-[70ch] min-w-0">
               <MarkdownRenderer :text="wikiPage.body" :font-size="fontSize" />
             </div>
           </div>
@@ -258,7 +261,7 @@ onGetWikiPageResult((result) => {
 
           <div
             data-testid="mobile-wiki-font-size"
-            class="mt-8 border-t border-gray-200 pt-6 dark:border-gray-700 xl:hidden"
+            class="mt-8 border-t border-gray-200 pt-6 xl:hidden dark:border-gray-700"
           >
             <FontSizeControl />
           </div>
@@ -266,7 +269,7 @@ onGetWikiPageResult((result) => {
 
         <!-- Left sidebar - On This Page (desktop only) -->
         <div
-          class="sticky top-0 hidden max-h-screen w-64 flex-shrink-0 overflow-y-auto xl:order-1 xl:flex"
+          class="sticky top-0 hidden max-h-screen w-64 shrink-0 overflow-y-auto xl:order-1 xl:flex"
         >
           <!-- On This Page Navigation -->
           <OnThisPage :markdown-content="wikiPage.body" :is-mobile="false" />
@@ -274,7 +277,7 @@ onGetWikiPageResult((result) => {
 
         <!-- Right sidebar - controls (desktop only) -->
         <div
-          class="sticky top-0 hidden max-h-screen w-64 flex-shrink-0 overflow-y-auto xl:order-3 xl:flex"
+          class="sticky top-0 hidden max-h-screen w-64 shrink-0 overflow-y-auto xl:order-3 xl:flex"
         >
           <div class="w-full py-2">
             <FontSizeControl class="mb-6" />

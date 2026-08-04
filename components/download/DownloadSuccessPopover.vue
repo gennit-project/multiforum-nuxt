@@ -43,9 +43,9 @@ const discordCopied = ref(false);
 
 // Get the primary downloadable file for display
 const primaryFile = computed(() => {
-  return (props.discussion?.DownloadableFiles?.[0] ||
-    null) as (Discussion['DownloadableFiles'][number] &
-    DownloadableFileSupportFields) | null;
+  return (props.discussion?.DownloadableFiles?.[0] || null) as
+    | (Discussion['DownloadableFiles'][number] & DownloadableFileSupportFields)
+    | null;
 });
 
 // Generate attribution text
@@ -74,9 +74,7 @@ const supportLinks = computed(() =>
     },
     { label: 'Ko-fi', url: primaryFile.value?.supportKoFiUrl },
     { label: 'PayPal.me', url: primaryFile.value?.supportPayPalMeUrl },
-  ].filter((link): link is { label: string; url: string } =>
-    Boolean(link.url)
-  )
+  ].filter((link): link is { label: string; url: string } => Boolean(link.url))
 );
 
 // Generate share URL (current page)
@@ -184,10 +182,7 @@ const copyLink = async () => {
     class="fixed bottom-4 left-1/2 z-50 mx-4 w-full max-w-2xl -translate-x-1/2 transform"
   >
     <!-- Backdrop for mobile -->
-    <div
-      class="fixed inset-0 bg-black bg-opacity-20 sm:hidden"
-      @click="emit('close')"
-    />
+    <div class="fixed inset-0 bg-black/20 sm:hidden" @click="emit('close')" />
 
     <!-- Popover content -->
     <div
@@ -197,7 +192,7 @@ const copyLink = async () => {
       <button
         type="button"
         aria-label="Close"
-        class="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+        class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
         @click="emit('close')"
       >
         <CloseIcon />
@@ -206,9 +201,9 @@ const copyLink = async () => {
       <!-- Content -->
       <div class="flex items-start space-x-4">
         <!-- File preview placeholder -->
-        <div class="flex-shrink-0">
+        <div class="shrink-0">
           <div
-            class="flex h-16 w-16 items-center justify-center rounded-lg border-2 border-dashed border-orange-300 bg-gradient-to-br from-orange-100 to-orange-200 dark:border-orange-600 dark:from-orange-800 dark:to-orange-900"
+            class="flex h-16 w-16 items-center justify-center rounded-lg border-2 border-dashed border-orange-300 bg-linear-to-br from-orange-100 to-orange-200 dark:border-orange-600 dark:from-orange-800 dark:to-orange-900"
           >
             <DownloadFileIcon />
           </div>
@@ -221,7 +216,7 @@ const copyLink = async () => {
 
         <!-- Main content -->
         <div class="min-w-0 flex-1">
-          <h3 class="font-semibold mb-2 text-lg text-gray-900 dark:text-white">
+          <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
             Say thanks! Give a shout-out...
           </h3>
 
@@ -234,7 +229,7 @@ const copyLink = async () => {
               </p>
               <div class="flex flex-wrap gap-2">
                 <button
-                  class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
+                  class="flex items-center rounded-md bg-gray-500 px-3 py-1.5 text-xs whitespace-nowrap text-white transition-colors hover:bg-gray-600"
                   @click="shareToFacebook"
                 >
                   <FacebookIcon />
@@ -242,7 +237,7 @@ const copyLink = async () => {
                 </button>
 
                 <button
-                  class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
+                  class="flex items-center rounded-md bg-gray-500 px-3 py-1.5 text-xs whitespace-nowrap text-white transition-colors hover:bg-gray-600"
                   @click="shareToPinterest"
                 >
                   <PinterestIcon />
@@ -250,7 +245,7 @@ const copyLink = async () => {
                 </button>
 
                 <button
-                  class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
+                  class="flex items-center rounded-md bg-gray-500 px-3 py-1.5 text-xs whitespace-nowrap text-white transition-colors hover:bg-gray-600"
                   @click="shareToTumblr"
                 >
                   <TumblrIcon />
@@ -258,7 +253,7 @@ const copyLink = async () => {
                 </button>
 
                 <button
-                  class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
+                  class="flex items-center rounded-md bg-gray-500 px-3 py-1.5 text-xs whitespace-nowrap text-white transition-colors hover:bg-gray-600"
                   @click="shareToReddit"
                 >
                   <RedditIcon />
@@ -266,7 +261,7 @@ const copyLink = async () => {
                 </button>
 
                 <button
-                  class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
+                  class="flex items-center rounded-md bg-gray-500 px-3 py-1.5 text-xs whitespace-nowrap text-white transition-colors hover:bg-gray-600"
                   @click="shareToBluesky"
                 >
                   <BlueskyIcon />
@@ -274,7 +269,7 @@ const copyLink = async () => {
                 </button>
 
                 <button
-                  class="flex items-center whitespace-nowrap rounded-md px-3 py-1.5 text-xs transition-colors"
+                  class="flex items-center rounded-md px-3 py-1.5 text-xs whitespace-nowrap transition-colors"
                   :class="
                     linkCopied
                       ? 'bg-green-500 text-white'
@@ -296,12 +291,12 @@ const copyLink = async () => {
               </p>
               <div class="flex items-center space-x-2">
                 <div
-                  class="bg-gray-50 flex-1 truncate rounded p-2 text-xs text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                  class="flex-1 truncate rounded bg-gray-50 p-2 text-xs text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                 >
                   {{ attributionText }}
                 </div>
                 <button
-                  class="flex flex-shrink-0 items-center whitespace-nowrap rounded-md px-3 py-1.5 text-xs transition-colors"
+                  class="flex shrink-0 items-center rounded-md px-3 py-1.5 text-xs whitespace-nowrap transition-colors"
                   :class="
                     attributionCopied
                       ? 'bg-green-500 text-white'
@@ -327,7 +322,7 @@ const copyLink = async () => {
                   :href="link.url"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
+                  class="flex items-center rounded-md bg-gray-500 px-3 py-1.5 text-xs whitespace-nowrap text-white transition-colors hover:bg-gray-600"
                 >
                   {{ link.label }}
                 </a>

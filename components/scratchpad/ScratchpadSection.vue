@@ -52,7 +52,9 @@ const {
   }
 );
 
-const publicEntries = computed(() => publicResult.value?.scratchpadEntries || []);
+const publicEntries = computed(
+  () => publicResult.value?.scratchpadEntries || []
+);
 const publicEntriesAggregateCount = computed(() => {
   return (
     publicResult.value?.scratchpadEntriesAggregate?.count ??
@@ -60,17 +62,22 @@ const publicEntriesAggregateCount = computed(() => {
     0
   );
 });
-const pendingEntries = computed(() => pendingResult.value?.scratchpadEntries || []);
+const pendingEntries = computed(
+  () => pendingResult.value?.scratchpadEntries || []
+);
 
 const hasPendingEntries = computed(
   () => isOwner.value && pendingEntries.value.length > 0
 );
 const hasPublicEntries = computed(() => publicEntries.value.length > 0);
 const hasNoEntries = computed(
-  () => !publicLoading.value && !hasPublicEntries.value && !hasPendingEntries.value
+  () =>
+    !publicLoading.value && !hasPublicEntries.value && !hasPendingEntries.value
 );
 
-const loading = computed(() => publicLoading.value || (isOwner.value && pendingLoading.value));
+const loading = computed(
+  () => publicLoading.value || (isOwner.value && pendingLoading.value)
+);
 const showLoadMore = computed(() => {
   return publicEntriesAggregateCount.value > publicEntries.value.length;
 });
@@ -122,7 +129,11 @@ const handleEntryDeleted = () => {
 
     <!-- Error state -->
     <ErrorBanner v-if="publicError" :text="publicError.message" class="mb-4" />
-    <ErrorBanner v-if="pendingError" :text="pendingError.message" class="mb-4" />
+    <ErrorBanner
+      v-if="pendingError"
+      :text="pendingError.message"
+      class="mb-4"
+    />
 
     <template v-if="!loading">
       <!-- Empty state -->
@@ -131,10 +142,10 @@ const handleEntryDeleted = () => {
         class="rounded-lg border border-dashed border-gray-300 p-8 text-center dark:border-gray-600"
       >
         <div
-          class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-pink-100 via-purple-100 to-indigo-100 dark:from-pink-900/30 dark:via-purple-900/30 dark:to-indigo-900/30"
+          class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-r from-pink-100 via-purple-100 to-indigo-100 dark:from-pink-900/30 dark:via-purple-900/30 dark:to-indigo-900/30"
         >
           <i
-            class="fa-solid fa-star text-2xl text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"
+            class="fa-solid fa-star bg-linear-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-2xl text-transparent"
           />
         </div>
         <h3 class="text-lg font-medium text-gray-900 dark:text-white">
@@ -142,7 +153,8 @@ const handleEntryDeleted = () => {
         </h3>
         <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
           <template v-if="isOwner">
-            When someone super upvotes your content, their thank-you note will appear here.
+            When someone super upvotes your content, their thank-you note will
+            appear here.
           </template>
           <template v-else>
             This user hasn't received any public kudos yet.
@@ -164,7 +176,8 @@ const handleEntryDeleted = () => {
           </span>
         </h2>
         <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">
-          These entries are only visible to you. Make them public to show on your profile.
+          These entries are only visible to you. Make them public to show on
+          your profile.
         </p>
         <div class="space-y-4">
           <ScratchpadEntry

@@ -196,7 +196,8 @@ const onPopupKeydown = (event: KeyboardEvent) => {
   const currentIndex = controls.indexOf(target as HTMLButtonElement);
   let nextIndex: number | undefined;
 
-  if (event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % controls.length;
+  if (event.key === 'ArrowDown')
+    nextIndex = (currentIndex + 1) % controls.length;
   if (event.key === 'ArrowUp') {
     nextIndex = (currentIndex - 1 + controls.length) % controls.length;
   }
@@ -229,7 +230,9 @@ const selectableOptions = (options: MultiSelectOption[]) =>
   options.filter((option) => !option.disabled);
 
 const toggleSelectAll = (sectionOptions: MultiSelectOption[]) => {
-  const sectionValues = selectableOptions(sectionOptions).map((opt) => opt.value);
+  const sectionValues = selectableOptions(sectionOptions).map(
+    (opt) => opt.value
+  );
   const allSelected = sectionValues.every((val) =>
     selected.value.includes(val)
   );
@@ -248,7 +251,9 @@ const toggleSelectAll = (sectionOptions: MultiSelectOption[]) => {
 };
 
 const isSectionFullySelected = (sectionOptions: MultiSelectOption[]) => {
-  const sectionValues = selectableOptions(sectionOptions).map((opt) => opt.value);
+  const sectionValues = selectableOptions(sectionOptions).map(
+    (opt) => opt.value
+  );
   return (
     sectionValues.length > 0 &&
     sectionValues.every((val) => selected.value.includes(val))
@@ -367,7 +372,9 @@ const filteredOptions = computed(() => {
 });
 
 // Get option by value
-const getOptionByValue = (value: MultiSelectValue): MultiSelectOption | undefined => {
+const getOptionByValue = (
+  value: MultiSelectValue
+): MultiSelectOption | undefined => {
   return allOptions.value.find((option) => option.value === value);
 };
 
@@ -397,9 +404,11 @@ const toggleAriaLabel = computed(() => {
 });
 
 const describedBy = computed(() => {
-  return [props.description && descriptionId, props.error && errorId]
-    .filter(Boolean)
-    .join(' ') || undefined;
+  return (
+    [props.description && descriptionId, props.error && errorId]
+      .filter(Boolean)
+      .join(' ') || undefined
+  );
 });
 </script>
 
@@ -439,7 +448,7 @@ const describedBy = computed(() => {
           <div
             v-for="option in selectedOptions"
             :key="String(option.value)"
-            class="mr-2 mt-1 inline-flex items-center rounded-full bg-orange-100 px-2 py-1 text-sm text-orange-700 dark:bg-orange-700 dark:text-orange-100"
+            class="mt-1 mr-2 inline-flex items-center rounded-full bg-orange-100 px-2 py-1 text-sm text-orange-700 dark:bg-orange-700 dark:text-orange-100"
           >
             <span class="font-mono">{{ option.value }}</span>
             <button
@@ -463,15 +472,15 @@ const describedBy = computed(() => {
             v-if="selectedOptions.length === 1 && selectedOptions[0]?.avatar"
             :src="selectedOptions[0]?.avatar"
             :alt="selectedOptions[0]?.label"
-            class="mr-2 h-6 w-6 flex-shrink-0 rounded-full"
-          >
+            class="mr-2 h-6 w-6 shrink-0 rounded-full"
+          />
           <i
             v-else-if="selectedOptions.length === 1 && selectedOptions[0]?.icon"
-            :class="[selectedOptions[0]?.icon, 'mr-2 flex-shrink-0']"
+            :class="[selectedOptions[0]?.icon, 'mr-2 shrink-0']"
           />
 
           <!-- Show comma-separated labels for multiple selections -->
-          <span class="break-words text-gray-900 dark:text-white">
+          <span class="wrap-break-word text-gray-900 dark:text-white">
             {{ selectedOptions.map((option) => option.label).join(', ') }}
           </span>
         </div>
@@ -545,14 +554,14 @@ const describedBy = computed(() => {
             type="text"
             :placeholder="searchPlaceholder"
             :aria-label="searchPlaceholder"
-            class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             @input="updateSearch(searchQuery)"
             @keydown="onSearchKeydown"
             @keyup.stop
             @click.stop
             @focus.stop
             @blur.stop
-          >
+          />
         </div>
 
         <!-- Loading state -->
@@ -572,7 +581,7 @@ const describedBy = computed(() => {
           >
             <div
               :id="`${popupId}-section-${sectionIndex}`"
-              class="bg-gray-50 font-semibold px-4 py-2 text-xs uppercase text-gray-600 dark:bg-gray-900 dark:text-gray-400"
+              class="bg-gray-50 px-4 py-2 text-xs font-semibold text-gray-600 uppercase dark:bg-gray-900 dark:text-gray-400"
             >
               {{ section.title }}
             </div>
@@ -584,7 +593,7 @@ const describedBy = computed(() => {
                 data-selection-control
                 :aria-pressed="isSectionFullySelected(section.options)"
                 :class="[
-                  'flex w-full items-center border-b px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 dark:border-gray-600 dark:hover:bg-gray-700',
+                  'flex w-full items-center border-b px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-inset dark:border-gray-600 dark:hover:bg-gray-700',
                   isSectionFullySelected(section.options)
                     ? 'bg-orange-50 dark:bg-orange-900/20'
                     : '',
@@ -670,23 +679,17 @@ const describedBy = computed(() => {
                   type="button"
                   data-selection-control
                   :aria-pressed="
-                    isCollectionFullySelected(
-                      collectionOption.channels || []
-                    )
+                    isCollectionFullySelected(collectionOption.channels || [])
                   "
                   :aria-label="`Select all forums in ${collectionOption.label}`"
                   :class="[
-                    'flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 dark:hover:bg-gray-700',
-                    isCollectionFullySelected(
-                      collectionOption.channels || []
-                    )
+                    'flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-inset dark:hover:bg-gray-700',
+                    isCollectionFullySelected(collectionOption.channels || [])
                       ? 'bg-orange-50 dark:bg-orange-900/20'
                       : '',
                   ]"
                   @click="
-                    toggleCollectionChannels(
-                      collectionOption.channels || []
-                    )
+                    toggleCollectionChannels(collectionOption.channels || [])
                   "
                 >
                   <div class="relative mr-3">
@@ -694,17 +697,19 @@ const describedBy = computed(() => {
                       aria-hidden="true"
                       :class="[
                         'flex h-4 w-4 items-center justify-center rounded border',
-                        isCollectionFullySelected(collectionOption.channels || [])
+                        isCollectionFullySelected(
+                          collectionOption.channels || []
+                        )
                           ? 'border-orange-600 bg-orange-600 text-white'
                           : 'border-gray-400 dark:border-gray-500',
                       ]"
                     >
                       <CheckIcon
                         v-if="
-                        isCollectionFullySelected(
-                          collectionOption.channels || []
-                        )
-                      "
+                          isCollectionFullySelected(
+                            collectionOption.channels || []
+                          )
+                        "
                         class="h-3 w-3"
                       />
                     </span>
@@ -727,9 +732,7 @@ const describedBy = computed(() => {
                   <span class="sr-only">
                     Forums in {{ collectionOption.label }}:
                   </span>
-                  <span
-                    v-if="(collectionOption.channels || []).length <= 3"
-                  >
+                  <span v-if="(collectionOption.channels || []).length <= 3">
                     {{ (collectionOption.channels || []).join(', ') }}
                   </span>
                   <span
@@ -738,9 +741,7 @@ const describedBy = computed(() => {
                     "
                   >
                     {{
-                      (collectionOption.channels || [])
-                        .slice(0, 3)
-                        .join(', ')
+                      (collectionOption.channels || []).slice(0, 3).join(', ')
                     }}
                     <button
                       type="button"
@@ -782,10 +783,7 @@ const describedBy = computed(() => {
               :aria-labelledby="`${popupId}-section-${sectionIndex}`"
               class="py-1"
             >
-              <li
-                v-for="option in section.options"
-                :key="String(option.value)"
-              >
+              <li v-for="option in section.options" :key="String(option.value)">
                 <button
                   type="button"
                   data-selection-control
@@ -793,7 +791,7 @@ const describedBy = computed(() => {
                   :disabled="option.disabled"
                   :aria-label="optionAriaLabel(option)"
                   :class="[
-                    'flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 dark:hover:bg-gray-700',
+                    'flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-inset dark:hover:bg-gray-700',
                     selected.includes(option.value)
                       ? 'bg-orange-50 dark:bg-orange-900/20'
                       : '',
@@ -862,14 +860,8 @@ const describedBy = computed(() => {
         </div>
 
         <!-- Legacy options view (for backwards compatibility) -->
-        <ul
-          v-else-if="filteredOptions.length > 0"
-          class="py-1"
-        >
-          <li
-            v-for="option in filteredOptions"
-            :key="String(option.value)"
-          >
+        <ul v-else-if="filteredOptions.length > 0" class="py-1">
+          <li v-for="option in filteredOptions" :key="String(option.value)">
             <button
               type="button"
               data-selection-control
@@ -877,7 +869,7 @@ const describedBy = computed(() => {
               :disabled="option.disabled"
               :aria-label="optionAriaLabel(option)"
               :class="[
-                'flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 dark:hover:bg-gray-700',
+                'flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-inset dark:hover:bg-gray-700',
                 selected.includes(option.value)
                   ? 'bg-orange-50 dark:bg-orange-900/20'
                   : '',
@@ -907,7 +899,7 @@ const describedBy = computed(() => {
                 :src="option.avatar"
                 alt=""
                 class="mr-3 h-6 w-6 rounded-full"
-              >
+              />
 
               <i
                 v-else-if="option.icon"

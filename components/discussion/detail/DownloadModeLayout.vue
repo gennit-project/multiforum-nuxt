@@ -166,7 +166,7 @@ const markdownImagesEnabled = computed(
         :channel-unique-name="activeDiscussionChannel.channelUniqueName"
       />
     </div>
-    <div class="flex-shrink-0">
+    <div class="shrink-0">
       <DownloadSidebar
         v-if="discussion && activeDiscussionChannel"
         :discussion="discussion"

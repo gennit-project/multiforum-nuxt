@@ -40,7 +40,9 @@ const allProfiles = computed(() => {
     const channelIds = new Set(channelOverrides.map((p) => p.id));
 
     // Server profiles that aren't overridden by channel
-    const serverOnly = (props.serverProfiles || []).filter((p) => !channelIds.has(p.id));
+    const serverOnly = (props.serverProfiles || []).filter(
+      (p) => !channelIds.has(p.id)
+    );
 
     return [...serverOnly, ...channelOverrides];
   }
@@ -119,8 +121,8 @@ const botStatusPreview = computed(() => {
   const normalizedBot = normalizeId(props.botName);
   const botPrefix = `bot-${normalizedChannel}-${normalizedBot}`;
 
-  const relevantBots = (props.existingBots || []).filter(
-    (bot) => bot.username.startsWith(botPrefix)
+  const relevantBots = (props.existingBots || []).filter((bot) =>
+    bot.username.startsWith(botPrefix)
   );
 
   const existingBotMap = new Map<string, ExistingBot>();
@@ -224,7 +226,10 @@ function getIdValidationError(id: string): string {
 <template>
   <div class="space-y-6">
     <!-- Server Profiles (read-only in channel scope) -->
-    <div v-if="isChannelScope && serverProfiles && serverProfiles.length > 0" class="space-y-4">
+    <div
+      v-if="isChannelScope && serverProfiles && serverProfiles.length > 0"
+      class="space-y-4"
+    >
       <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
         <i class="fa-solid fa-server mr-2" />
         Server-configured Profiles
@@ -242,23 +247,37 @@ function getIdValidationError(id: string): string {
           <span class="font-medium text-gray-900 dark:text-white">
             {{ profile.label || profile.id }}
           </span>
-          <span class="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-700 dark:bg-blue-800 dark:text-blue-200">
+          <span
+            class="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-700 dark:bg-blue-800 dark:text-blue-200"
+          >
             Server Profile
           </span>
         </div>
 
         <div class="space-y-2 text-sm">
           <div>
-            <span class="font-medium text-gray-600 dark:text-gray-400">Profile ID:</span>
-            <span class="ml-2 font-mono text-gray-800 dark:text-gray-200">{{ profile.id }}</span>
+            <span class="font-medium text-gray-600 dark:text-gray-400"
+              >Profile ID:</span
+            >
+            <span class="ml-2 font-mono text-gray-800 dark:text-gray-200">{{
+              profile.id
+            }}</span>
           </div>
           <div v-if="profile.label">
-            <span class="font-medium text-gray-600 dark:text-gray-400">Display Label:</span>
-            <span class="ml-2 text-gray-800 dark:text-gray-200">{{ profile.label }}</span>
+            <span class="font-medium text-gray-600 dark:text-gray-400"
+              >Display Label:</span
+            >
+            <span class="ml-2 text-gray-800 dark:text-gray-200">{{
+              profile.label
+            }}</span>
           </div>
           <div v-if="profile.prompt">
-            <span class="font-medium text-gray-600 dark:text-gray-400">System Prompt:</span>
-            <div class="mt-1 rounded bg-white p-2 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+            <span class="font-medium text-gray-600 dark:text-gray-400"
+              >System Prompt:</span
+            >
+            <div
+              class="mt-1 rounded bg-white p-2 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+            >
               <MarkdownPreview :text="profile.prompt.replace(/\\n/g, '\n')" />
             </div>
           </div>
@@ -268,7 +287,10 @@ function getIdValidationError(id: string): string {
 
     <!-- Editable Profiles Section -->
     <div class="space-y-4">
-      <p v-if="isChannelScope && serverProfiles && serverProfiles.length > 0" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+      <p
+        v-if="isChannelScope && serverProfiles && serverProfiles.length > 0"
+        class="text-sm font-medium text-gray-700 dark:text-gray-300"
+      >
         <i class="fa-solid fa-layer-group mr-2" />
         Channel-specific Profiles
         <span class="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
@@ -306,17 +328,27 @@ function getIdValidationError(id: string): string {
               <span class="text-red-500">*</span>
             </label>
             <p class="text-xs text-gray-500 dark:text-gray-400">
-              Unique identifier used in the bot username. Cannot be changed after first save.
+              Unique identifier used in the bot username. Cannot be changed
+              after first save.
             </p>
             <input
               :id="`profile-id-${index}`"
               type="text"
               :value="profile.id"
               placeholder="e.g., helper, reviewer, translator"
-              class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              :class="{ 'border-red-500': profile.id && getIdValidationError(profile.id) }"
-              @input="updateProfile(index, 'id', ($event.target as HTMLInputElement).value)"
-            >
+              class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              :class="{
+                'border-red-500':
+                  profile.id && getIdValidationError(profile.id),
+              }"
+              @input="
+                updateProfile(
+                  index,
+                  'id',
+                  ($event.target as HTMLInputElement).value
+                )
+              "
+            />
             <p
               v-if="profile.id && getIdValidationError(profile.id)"
               class="text-xs text-red-600 dark:text-red-400"
@@ -341,9 +373,15 @@ function getIdValidationError(id: string): string {
               type="text"
               :value="profile.label"
               placeholder="e.g., Code Helper, PR Reviewer"
-              class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              @input="updateProfile(index, 'label', ($event.target as HTMLInputElement).value)"
-            >
+              class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              @input="
+                updateProfile(
+                  index,
+                  'label',
+                  ($event.target as HTMLInputElement).value
+                )
+              "
+            />
           </div>
 
           <!-- Profile Prompt -->
@@ -362,8 +400,14 @@ function getIdValidationError(id: string): string {
               :value="profile.prompt"
               rows="4"
               placeholder="e.g., You are a helpful code reviewer..."
-              class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              @input="updateProfile(index, 'prompt', ($event.target as HTMLTextAreaElement).value)"
+              class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              @input="
+                updateProfile(
+                  index,
+                  'prompt',
+                  ($event.target as HTMLTextAreaElement).value
+                )
+              "
             />
           </div>
         </div>
@@ -371,12 +415,16 @@ function getIdValidationError(id: string): string {
 
       <!-- Empty State -->
       <div
-        v-if="profiles.length === 0 && (!isChannelScope || !serverProfiles || serverProfiles.length === 0)"
+        v-if="
+          profiles.length === 0 &&
+          (!isChannelScope || !serverProfiles || serverProfiles.length === 0)
+        "
         class="rounded-lg border-2 border-dashed border-amber-300 bg-amber-50 p-6 text-center dark:border-amber-600 dark:bg-amber-900/20"
       >
         <p class="text-amber-700 dark:text-amber-300">
           <i class="fa-solid fa-triangle-exclamation mr-2" />
-          At least one bot profile is required. Add a profile to create bot users.
+          At least one bot profile is required. Add a profile to create bot
+          users.
         </p>
       </div>
 
@@ -411,24 +459,38 @@ function getIdValidationError(id: string): string {
           class="flex items-start gap-2"
         >
           <span
-            class="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full"
-            :class="bot.isSuspended
-              ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
-              : 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'"
+            class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+            :class="
+              bot.isSuspended
+                ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
+                : 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
+            "
           >
-            <i :class="bot.isSuspended ? 'fa-solid fa-ban text-xs' : 'fa-solid fa-check text-xs'" />
+            <i
+              :class="
+                bot.isSuspended
+                  ? 'fa-solid fa-ban text-xs'
+                  : 'fa-solid fa-check text-xs'
+              "
+            />
           </span>
           <div>
             <span class="flex flex-wrap items-center gap-x-2">
-              <span class="font-mono text-gray-700 dark:text-gray-300">{{ bot.username }}</span>
-              <span v-if="bot.label" class="text-gray-500 dark:text-gray-400">({{ bot.label }})</span>
+              <span class="font-mono text-gray-700 dark:text-gray-300">{{
+                bot.username
+              }}</span>
+              <span v-if="bot.label" class="text-gray-500 dark:text-gray-400"
+                >({{ bot.label }})</span
+              >
               <span
                 v-if="bot.isSuspended"
                 class="rounded-full bg-red-200 px-2 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-900/70 dark:text-red-100"
               >
                 Suspended
               </span>
-              <span v-else class="text-green-600 dark:text-green-400">(active)</span>
+              <span v-else class="text-green-600 dark:text-green-400"
+                >(active)</span
+              >
             </span>
             <div class="text-xs text-gray-500 dark:text-gray-400">
               Invoke with /bot/{{ bot.invokeHandle }}
@@ -442,14 +504,22 @@ function getIdValidationError(id: string): string {
           :key="bot.username"
           class="flex items-start gap-2"
         >
-          <span class="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+          <span
+            class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+          >
             <i class="fa-solid fa-plus text-xs" />
           </span>
           <div>
             <span class="flex flex-wrap items-center gap-x-2">
-              <span class="font-mono text-gray-700 dark:text-gray-300">{{ bot.username }}</span>
-              <span v-if="bot.label" class="text-gray-500 dark:text-gray-400">({{ bot.label }})</span>
-              <span class="text-blue-600 dark:text-blue-400">(will be created)</span>
+              <span class="font-mono text-gray-700 dark:text-gray-300">{{
+                bot.username
+              }}</span>
+              <span v-if="bot.label" class="text-gray-500 dark:text-gray-400"
+                >({{ bot.label }})</span
+              >
+              <span class="text-blue-600 dark:text-blue-400"
+                >(will be created)</span
+              >
             </span>
             <div class="text-xs text-gray-500 dark:text-gray-400">
               Invoke with /bot/{{ bot.invokeHandle }}
@@ -463,29 +533,40 @@ function getIdValidationError(id: string): string {
           :key="bot.username"
           class="flex items-start gap-2"
         >
-          <span class="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-200">
+          <span
+            class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-200"
+          >
             <i class="fa-solid fa-archive text-xs" />
           </span>
           <div>
             <span class="flex flex-wrap items-center gap-x-2">
-              <span class="font-mono text-gray-700 dark:text-gray-300">{{ bot.username }}</span>
+              <span class="font-mono text-gray-700 dark:text-gray-300">{{
+                bot.username
+              }}</span>
               <span
                 v-if="bot.isSuspended"
                 class="rounded-full bg-red-200 px-2 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-900/70 dark:text-red-100"
               >
                 Suspended
               </span>
-              <span class="text-amber-600 dark:text-yellow-300">(will be deprecated)</span>
+              <span class="text-amber-600 dark:text-yellow-300"
+                >(will be deprecated)</span
+              >
             </span>
           </div>
         </div>
 
         <!-- No Changes -->
         <p
-          v-if="botStatusPreview.newBots.length === 0 && botStatusPreview.deprecated.length === 0 && botStatusPreview.existing.length === 0"
+          v-if="
+            botStatusPreview.newBots.length === 0 &&
+            botStatusPreview.deprecated.length === 0 &&
+            botStatusPreview.existing.length === 0
+          "
           class="text-gray-500 dark:text-gray-400"
         >
-          No bot users to preview. Configure the bot name in server settings first.
+          No bot users to preview. Configure the bot name in server settings
+          first.
         </p>
       </div>
     </div>

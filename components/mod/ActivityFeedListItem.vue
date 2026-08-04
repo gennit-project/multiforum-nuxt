@@ -7,7 +7,12 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { ref, computed, watch, type PropType, type Component } from 'vue';
 import { timeAgo, ALLOWED_ICONS } from '@/utils';
-import type { Discussion, Issue, ModerationAction, TextVersion } from '@/__generated__/graphql';
+import type {
+  Discussion,
+  Issue,
+  ModerationAction,
+  TextVersion,
+} from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
 import ArchiveBox from '../icons/ArchiveBox.vue';
 import ArchiveBoxXMark from '../icons/ArchiveBoxXMark.vue';
@@ -38,7 +43,6 @@ import EllipsisHorizontal from '@/components/icons/EllipsisHorizontal.vue';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
-
 
 const actionTypeToIcon: Record<string, Component> = {
   [ActionType.Close]: XCircleIcon,
@@ -547,7 +551,6 @@ const showCommentMenu = computed(() => {
     commentMenuItems.value.length > 0
   );
 });
-
 </script>
 
 <template>
@@ -561,7 +564,7 @@ const showCommentMenu = computed(() => {
   >
     <div class="relative">
       <span
-        class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-600"
+        class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-600"
         aria-hidden="true"
       />
       <div class="relative flex items-start space-x-3">
@@ -725,7 +728,7 @@ const showCommentMenu = computed(() => {
                 v-if="showCommentMenu && !isEditing"
                 :items="commentMenuItems"
                 aria-label="Comment actions"
-                class="flex-shrink-0"
+                class="shrink-0"
                 @handle-edit="startEdit"
                 @handle-report="openReportModal"
                 @handle-suspend-mod="showSuspendModFromMenu = true"
@@ -759,7 +762,11 @@ const showCommentMenu = computed(() => {
             />
             <!-- Hidden SuspendModButton triggered by menu -->
             <SuspendModButton
-              v-if="issue && canSuspendIssueTargetModFromComment && showSuspendModFromMenu"
+              v-if="
+                issue &&
+                canSuspendIssueTargetModFromComment &&
+                showSuspendModFromMenu
+              "
               :issue="issue"
               :disabled="suspendModDisabled"
               :auto-open="true"
@@ -774,7 +781,7 @@ const showCommentMenu = computed(() => {
               >
                 <div
                   v-if="discussionRevisionContents.length > 1"
-                  class="font-semibold px-1 text-xs text-gray-600 dark:text-gray-300"
+                  class="px-1 text-xs font-semibold text-gray-600 dark:text-gray-300"
                 >
                   {{ content.label }}
                 </div>

@@ -169,7 +169,7 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
 
 <template>
   <div
-    class="flex w-full flex-col space-y-4 rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 lg:w-80"
+    class="flex w-full flex-col space-y-4 rounded-lg border border-gray-200 bg-white lg:w-80 dark:border-gray-700 dark:bg-gray-800"
   >
     <div class="p-6">
       <!-- Boxed Info Section -->
@@ -179,7 +179,7 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
       >
         <!-- File Name -->
         <h2
-          class="mb-3 break-words text-sm font-medium text-gray-900 dark:text-white"
+          class="mb-3 text-sm font-medium wrap-break-word text-gray-900 dark:text-white"
         >
           {{ primaryFile.fileName || 'Untitled File' }}
         </h2>

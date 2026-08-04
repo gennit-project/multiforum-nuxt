@@ -108,7 +108,7 @@ describe('wiki home page', () => {
     });
 
     expect(wrapper.get('[data-testid="wiki-page-title"]').classes()).toEqual(
-      expect.arrayContaining(['min-w-0', 'break-words'])
+      expect.arrayContaining(['min-w-0', 'wrap-break-word'])
     );
   });
 

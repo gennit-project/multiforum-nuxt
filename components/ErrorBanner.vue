@@ -10,7 +10,7 @@ defineProps({
 <template>
   <div
     role="alert"
-    class="my-2 flex-grow text-wrap rounded bg-red-100 p-3 pl-4 leading-normal text-red-500 dark:bg-red-900 dark:text-red-300"
+    class="my-2 grow rounded bg-red-100 p-3 pl-4 leading-normal text-wrap text-red-500 dark:bg-red-900 dark:text-red-300"
   >
     {{ text }}
   </div>

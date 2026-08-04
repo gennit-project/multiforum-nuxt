@@ -82,7 +82,7 @@ const activatorProps = computed(() => ({
         :style="floatingStyles"
         role="tooltip"
         :aria-label="ariaLabel || undefined"
-        class="z-[10000]"
+        class="z-10000"
       >
         <div
           class="custom-tooltip max-w-sm rounded-md border border-[#30363e] bg-black px-3 py-2 text-sm text-white shadow-lg"

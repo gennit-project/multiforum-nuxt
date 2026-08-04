@@ -108,7 +108,7 @@ onBeforeUnmount(() => {
         v-if="isOpen"
         ref="floatingRef"
         :style="floatingStyles"
-        class="z-[10000]"
+        class="z-10000"
         @focusout="onFocusOut"
       >
         <div

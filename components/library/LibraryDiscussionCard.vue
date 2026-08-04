@@ -72,7 +72,9 @@ const albumForDisplay = computed(() => props.discussion.Album as Album | null);
   <article
     class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_18px_45px_-28px_rgba(15,23,42,0.45)] dark:border-gray-700 dark:bg-gray-800"
   >
-    <div class="border-b border-slate-200/70 bg-slate-50/85 px-5 py-3 dark:border-gray-700 dark:bg-gray-900/40">
+    <div
+      class="border-b border-slate-200/70 bg-slate-50/85 px-5 py-3 dark:border-gray-700 dark:bg-gray-900/40"
+    >
       <div class="flex items-center justify-between gap-3">
         <NuxtLink
           v-if="channelUniqueName"
@@ -82,12 +84,14 @@ const albumForDisplay = computed(() => props.discussion.Album as Album | null);
           <AvatarComponent
             :text="channelUniqueName"
             :is-square="true"
-            class="h-5 w-5 flex-shrink-0"
+            class="h-5 w-5 shrink-0"
           />
           <span class="truncate">{{ channelUniqueName }}</span>
         </NuxtLink>
 
-        <div class="ml-auto flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+        <div
+          class="ml-auto flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400"
+        >
           <span
             v-if="discussion.hasSensitiveContent"
             class="rounded-full border border-orange-300 bg-orange-50 px-2 py-1 font-medium text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/10 dark:text-orange-300"
@@ -103,12 +107,12 @@ const albumForDisplay = computed(() => props.discussion.Album as Album | null);
       <div class="flex items-start gap-3">
         <NuxtLink
           :to="discussionLink"
-          class="min-w-0 flex-1 text-lg font-semibold leading-7 text-gray-900 transition-colors hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
+          class="min-w-0 flex-1 text-lg leading-7 font-semibold text-gray-900 transition-colors hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
         >
           {{ discussion.title }}
         </NuxtLink>
 
-        <div v-if="showFavoriteButton" class="flex-shrink-0">
+        <div v-if="showFavoriteButton" class="shrink-0">
           <AddToDiscussionFavorites
             :allow-add-to-list="allowAddToList"
             :discussion-id="discussion.id"
@@ -142,7 +146,9 @@ const albumForDisplay = computed(() => props.discussion.Album as Album | null);
         />
       </div>
 
-      <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500 dark:text-gray-400">
+      <div
+        class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500 dark:text-gray-400"
+      >
         <div class="flex min-w-0 items-center">
           <span class="mr-1">by</span>
           <UsernameWithTooltip

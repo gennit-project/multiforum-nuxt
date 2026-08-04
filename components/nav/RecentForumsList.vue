@@ -42,7 +42,7 @@ const defaultLinkClasses =
   <div v-if="forums.length > 0">
     <div
       v-if="showHeader"
-      class="text-bold mb-2 mt-3 px-6 text-sm uppercase leading-6 text-gray-400 dark:text-gray-100"
+      class="text-bold mt-3 mb-2 px-6 text-sm leading-6 text-gray-400 uppercase dark:text-gray-100"
     >
       Recent Forums
     </div>
@@ -59,7 +59,7 @@ const defaultLinkClasses =
             @click="navigateToForum(forum.uniqueName, onNavigate)"
           >
             <AvatarComponent
-              class="list-item-icon border-1 h-8 w-8 shrink-0 border-gray-200 shadow-sm dark:border-gray-800"
+              class="list-item-icon h-8 w-8 shrink-0 border border-gray-200 shadow-sm dark:border-gray-800"
               :text="forum.uniqueName || ''"
               :src="forum?.channelIconURL ?? ''"
               :is-small="true"

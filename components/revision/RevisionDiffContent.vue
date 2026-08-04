@@ -162,7 +162,7 @@ const getLineNumberClass = (kind: SideKind) => {
     <div class="rounded-md border dark:border-gray-700">
       <div class="flex flex-col md:flex-row">
         <div
-          class="flex-1 rounded-t-md border-b bg-red-500/10 p-4 dark:border-gray-700 dark:bg-red-500/20 md:rounded-l-md md:rounded-tr-none md:border-b-0 md:border-r"
+          class="flex-1 rounded-t-md border-b bg-red-500/10 p-4 md:rounded-l-md md:rounded-tr-none md:border-r md:border-b-0 dark:border-gray-700 dark:bg-red-500/20"
         >
           <h3 class="mb-2 text-sm font-medium text-red-700 dark:text-red-200">
             Previous Version
@@ -200,7 +200,7 @@ const getLineNumberClass = (kind: SideKind) => {
                   </template>
                   <template v-else>
                     <td
-                      class="w-12 select-none px-2 py-1 text-right font-mono"
+                      class="w-12 px-2 py-1 text-right font-mono select-none"
                       :class="getLineNumberClass(row.leftKind)"
                     >
                       {{ row.oldLineNumber ?? '' }}
@@ -210,7 +210,7 @@ const getLineNumberClass = (kind: SideKind) => {
                       :class="getCodeCellClass(row.leftKind)"
                     >
                       <pre
-                        class="m-0 whitespace-pre-wrap break-words"
+                        class="m-0 wrap-break-word whitespace-pre-wrap"
                       ><code>{{ row.leftText }}</code></pre>
                     </td>
                   </template>
@@ -221,7 +221,7 @@ const getLineNumberClass = (kind: SideKind) => {
         </div>
 
         <div
-          class="flex-1 rounded-b-md bg-green-500/10 p-4 dark:bg-green-500/20 md:rounded-r-md md:rounded-bl-none"
+          class="flex-1 rounded-b-md bg-green-500/10 p-4 md:rounded-r-md md:rounded-bl-none dark:bg-green-500/20"
         >
           <h3
             class="mb-2 text-sm font-medium text-green-700 dark:text-green-200"
@@ -261,7 +261,7 @@ const getLineNumberClass = (kind: SideKind) => {
                   </template>
                   <template v-else>
                     <td
-                      class="w-12 select-none px-2 py-1 text-right font-mono"
+                      class="w-12 px-2 py-1 text-right font-mono select-none"
                       :class="getLineNumberClass(row.rightKind)"
                     >
                       {{ row.newLineNumber ?? '' }}
@@ -271,7 +271,7 @@ const getLineNumberClass = (kind: SideKind) => {
                       :class="getCodeCellClass(row.rightKind)"
                     >
                       <pre
-                        class="m-0 whitespace-pre-wrap break-words"
+                        class="m-0 wrap-break-word whitespace-pre-wrap"
                       ><code>{{ row.rightText }}</code></pre>
                     </td>
                   </template>

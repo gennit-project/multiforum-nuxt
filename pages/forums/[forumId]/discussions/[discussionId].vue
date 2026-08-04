@@ -70,7 +70,7 @@ useHead(metaData);
 
 <template>
   <div
-    class="relative w-full max-w-screen-2xl flex-1 overflow-hidden p-0 focus:outline-none xl:order-last"
+    class="relative w-full max-w-[theme(screens.2xl)] flex-1 overflow-hidden p-0 focus:outline-none xl:order-last"
   >
     <div class="flex w-full justify-center space-y-4 overflow-x-hidden">
       <ErrorBanner v-if="!discussionId" text="Discussion not found" />

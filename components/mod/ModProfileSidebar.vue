@@ -43,7 +43,7 @@ const mod = computed(() => {
 <template>
   <div class="rounded-lg pt-2">
     <div
-      class="mb-3 mt-2 flex flex-col gap-2 p-2 sm:flex-row sm:items-center sm:justify-between"
+      class="mt-2 mb-3 flex flex-col gap-2 p-2 sm:flex-row sm:items-center sm:justify-between"
     >
       <div class="flex min-w-0 items-center gap-3">
         <AvatarComponent
@@ -53,13 +53,13 @@ const mod = computed(() => {
         />
         <div class="min-w-0">
           <p
-            class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            class="text-xs tracking-wide text-gray-500 uppercase dark:text-gray-400"
           >
             Mod Profile
           </p>
           <h1
             v-if="mod?.displayName"
-            class="flex flex-wrap items-center gap-2 break-words text-lg font-bold leading-5 text-gray-600 dark:text-gray-200"
+            class="flex flex-wrap items-center gap-2 text-lg leading-5 font-bold wrap-break-word text-gray-600 dark:text-gray-200"
           >
             {{ mod.displayName }}
             <span
@@ -78,7 +78,7 @@ const mod = computed(() => {
       </div>
       <div
         v-if="mod?.createdAt"
-        class="text-sm text-gray-500 dark:text-gray-400 sm:text-right"
+        class="text-sm text-gray-500 sm:text-right dark:text-gray-400"
       >
         {{ `Joined ${relativeTime(mod.createdAt)}` }}
       </div>

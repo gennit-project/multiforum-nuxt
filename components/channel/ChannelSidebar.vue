@@ -120,7 +120,7 @@ const handleBecomeAdminSuccess = () => {
     :tabindex="useScrollbar ? 0 : undefined"
     :role="useScrollbar ? 'region' : undefined"
     :aria-label="useScrollbar ? 'Forum sidebar content' : undefined"
-    class="pb-8 pt-4"
+    class="pt-4 pb-8"
   >
     <div v-if="channelId && channel" class="items-center gap-2" />
 
@@ -143,7 +143,7 @@ const handleBecomeAdminSuccess = () => {
           :is-square="false"
         />
       </div>
-      <div v-if="channelId" class="mb-1 mt-3 flex w-full flex-col">
+      <div v-if="channelId" class="mt-3 mb-1 flex w-full flex-col">
         <div class="flex items-center gap-4">
           <span
             class="flex space-y-2 rounded-full border-gray-700 text-xl leading-6 text-black dark:text-gray-200"
@@ -180,7 +180,7 @@ const handleBecomeAdminSuccess = () => {
         <div class="mt-6 flex w-full flex-col gap-6">
           <div v-if="pinnedWikiPages.length > 0">
             <span
-              class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+              class="my-2 mb-2 flex items-center text-sm leading-6 font-bold text-gray-500 dark:text-gray-400"
             >
               <ThumbtackIcon class="mr-2 h-4 w-4" />Pinned Wiki Pages
             </span>
@@ -201,7 +201,7 @@ const handleBecomeAdminSuccess = () => {
 
           <div v-if="channelRules && channelRules !== '[]'" :key="channelRules">
             <span
-              class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+              class="my-2 mb-2 flex items-center text-sm leading-6 font-bold text-gray-500 dark:text-gray-400"
             >
               <DocumentIcon class="mr-2 h-4 w-4" />Forum Rules
             </span>
@@ -215,12 +215,12 @@ const handleBecomeAdminSuccess = () => {
           <div v-if="channel.Tags?.length > 0">
             <div class="flex justify-between border-gray-300">
               <span
-                class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+                class="my-2 mb-2 flex items-center text-sm leading-6 font-bold text-gray-500 dark:text-gray-400"
               >
                 <TagIcon class="mr-2 h-4 w-4" />Tags
               </span>
             </div>
-            <div class="mb-6 mt-2 flex flex-wrap gap-2">
+            <div class="mt-2 mb-6 flex flex-wrap gap-2">
               <Tag
                 v-for="tag in channel.Tags"
                 :key="tag.text"
@@ -235,7 +235,7 @@ const handleBecomeAdminSuccess = () => {
 
           <div class="flex justify-between">
             <span
-              class="my-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+              class="my-2 flex items-center text-sm leading-6 font-bold text-gray-500 dark:text-gray-400"
             >
               <AdminIcon class="mr-2 h-4 w-4" />Admins
             </span>
@@ -256,7 +256,7 @@ const handleBecomeAdminSuccess = () => {
                 <AvatarComponent
                   :text="admin.username"
                   :src="admin.profilePicURL ?? ''"
-                  class="mr-2 h-6 w-6 flex-shrink-0"
+                  class="mr-2 h-6 w-6 shrink-0"
                 />
                 <span class="flex flex-wrap items-baseline gap-1">
                   <span v-if="!admin.displayName" class="font-bold">{{
@@ -289,7 +289,7 @@ const handleBecomeAdminSuccess = () => {
           <template v-if="botAccounts.length > 0">
             <div class="flex justify-between">
               <span
-                class="my-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+                class="my-2 flex items-center text-sm leading-6 font-bold text-gray-500 dark:text-gray-400"
               >
                 <RobotIcon class="mr-2 h-4 w-4" />Bots
               </span>
@@ -305,7 +305,7 @@ const handleBecomeAdminSuccess = () => {
                   class="flex items-start dark:text-white"
                 >
                   <div
-                    class="mr-2 mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border bg-blue-100 dark:border-gray-600 dark:bg-blue-900"
+                    class="mt-0.5 mr-2 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border bg-blue-100 dark:border-gray-600 dark:bg-blue-900"
                     title="Bot account"
                   >
                     <span class="text-sm">🤖</span>

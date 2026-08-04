@@ -25,7 +25,6 @@
       "markdown-it",
       "node",
       "vite/client",
-      "@nuxtjs/tailwindcss",
       "@nuxt/types",
       "@types/node",
       "@nuxt/schema"

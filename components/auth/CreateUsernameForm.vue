@@ -187,12 +187,12 @@ const canSave = computed(() => {
           type="text"
           :class="[
             usernameIsTaken || usernameIsInvalid
-              ? 'border-red-300 text-red-500 focus:border-red-500 focus:outline-none focus:ring-red-500'
+              ? 'border-red-300 text-red-500 focus:border-red-500 focus:ring-red-500 focus:outline-none'
               : 'focus:border-orange-500 focus:ring-orange-500',
           ]"
-          class="block w-full flex-1 rounded border-gray-300 pb-2.5 pt-2.5 dark:bg-gray-800 sm:text-sm"
+          class="block w-full flex-1 rounded border-gray-300 pt-2.5 pb-2.5 sm:text-sm dark:bg-gray-800"
           @update:model-value="updateUsername"
-        >
+        />
         <div
           v-if="usernameIsTaken || usernameIsInvalid"
           class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
@@ -211,7 +211,7 @@ const canSave = computed(() => {
           class="text-xs"
         />
         <div v-if="confirmedAvailable" class="flex items-start">
-          <div class="flex-shrink-0">
+          <div class="shrink-0">
             <CheckCircleIcon
               class="mr-2 h-6 w-6 text-green-400"
               aria-hidden="true"

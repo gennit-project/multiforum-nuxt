@@ -1,6 +1,197 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss' important;
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+@source inline(
+  'border border-gray-400 border-blue-500 border-blue-600 border-blue-700 rounded-md rounded-lg'
+);
+
+@theme {
+  --font-weight-*: initial;
+  --font-weight-thin: 100;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 600;
+  --font-weight-bold: 700;
+  --font-weight-black: 900;
+
+  --text-*: initial;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 4rem;
+  --text-7xl: 5rem;
+  --text-8xl: 6rem;
+  --text-9xl: 7rem;
+
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  --color-gray-900: #0d1117;
+  --color-gray-800: #161b22;
+  --color-gray-700: #21262d;
+  --color-gray-600: #30363d;
+  --color-gray-500: #6e7681;
+  --color-gray-400: #8b949e;
+  --color-gray-300: #c9d1d9;
+  --color-gray-200: #e6edf3;
+  --color-gray-100: #f0f6fc;
+
+  --color-blue-900: #0e1e2f;
+  --color-blue-800: #3a464f;
+  --color-blue-700: #385970;
+  --color-blue-600: #1164a3;
+  --color-blue-500: #1d9bd1;
+  --color-blue-400: #8bd0f0;
+  --color-blue-300: #b3daf5;
+  --color-blue-200: #d1f6ff;
+  --color-blue-100: #ebf2f7;
+
+  --color-red-900: #2b0e0e;
+  --color-red-800: #3c1212;
+  --color-red-700: #4e1717;
+  --color-red-600: #6a1d1d;
+  --color-red-500: #8f2525;
+  --color-red-400: #ef6b73;
+  --color-red-300: #f4b5bd;
+  --color-red-200: #f9e3e5;
+  --color-red-100: #fdf5f6;
+
+  --color-purple-900: #1e0e2b;
+  --color-purple-800: #27123c;
+  --color-purple-700: #33174e;
+  --color-purple-600: #451d6a;
+  --color-purple-500: #5b258f;
+  --color-purple-400: #b36bef;
+  --color-purple-300: #dcb5f4;
+  --color-purple-200: #f1e3f9;
+  --color-purple-100: #faf5fd;
+
+  --color-yellow-900: #2b1c0e;
+  --color-yellow-800: #3c2712;
+  --color-yellow-700: #4e3317;
+  --color-yellow-600: #6a451d;
+  --color-yellow-500: #8f5b25;
+  --color-yellow-400: #efb36b;
+  --color-yellow-300: #f4dcb5;
+  --color-yellow-200: #f9f1e3;
+  --color-yellow-100: #fdfaf5;
+
+  --color-green-900: #0e1e0e;
+  --color-green-800: #1a331a;
+  --color-green-700: #235023;
+  --color-green-600: #2e6a2e;
+  --color-green-500: #3f8f3f;
+  --color-green-400: #73ef73;
+  --color-green-300: #b5f4b5;
+  --color-green-200: #e3f9e3;
+  --color-green-100: #f5fdf5;
+
+  --color-orange-950: #431407;
+  --color-orange-900: #7c2d12;
+  --color-orange-800: #9a3412;
+  --color-orange-700: #c2410c;
+  --color-orange-600: #ea580c;
+  --color-orange-500: #f97316;
+  --color-orange-400: #fb923c;
+  --color-orange-300: #fdba74;
+  --color-orange-200: #fed7aa;
+  --color-orange-100: #ffedd5;
+
+  --color-amber-950: #451a03;
+  --color-amber-900: #78350f;
+  --color-amber-800: #92400e;
+  --color-amber-700: #b45309;
+  --color-amber-600: #d97706;
+  --color-amber-500: #f59e0b;
+  --color-amber-400: #fbbf24;
+  --color-amber-300: #fcd34d;
+  --color-amber-200: #fde68a;
+  --color-amber-100: #fef3c7;
+  --color-amber-50: #fffbeb;
+
+  --color-red-transparent: rgb(255 0 0 / 0.1);
+  --color-green-transparent: rgb(0 255 0 / 0.1);
+  --color-blue-transparent: rgb(0 0 255 / 0.1);
+  --color-blue-transparent-lighter: rgb(162 248 252 / 0.25);
+  --color-yellow-transparent: rgb(255 255 0 / 0.1);
+}
+
+@utility container {
+  padding-inline: 1rem;
+
+  @variant sm {
+    padding-inline: 2rem;
+  }
+
+  @variant lg {
+    padding-inline: 4rem;
+  }
+
+  @variant xl {
+    padding-inline: 5rem;
+  }
+
+  @variant 2xl {
+    padding-inline: 6rem;
+  }
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@layer components {
+  .prose
+    :where(ul, ol, li, p, h1, h2, h3, h4, h5, h6):not(
+      :where([class~='not-prose'], [class~='not-prose'] *)
+    ) {
+    overflow-wrap: break-word;
+  }
+
+  .prose :where(ul):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+    list-style-type: disc;
+  }
+
+  .prose :where(ol):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+    list-style-type: decimal;
+  }
+
+  .prose
+    :where(h1, h2, h3, h4, h5, h6):not(
+      :where([class~='not-prose'], [class~='not-prose'] *)
+    ) {
+    text-decoration-line: none;
+  }
+
+  .prose :where(h1):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+    font-size: 2rem;
+  }
+
+  .prose :where(h2):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+    font-size: 1.5rem;
+  }
+
+  .prose :where(h3):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+    font-size: 1rem;
+  }
+}
 
 /*
  * Pin the document's UA color-scheme to the app's own theme (toggled via the

@@ -35,7 +35,7 @@ withDefaults(
         :to="`/forums/${channel.uniqueName}`"
         class="flex min-w-0 flex-1 items-start gap-4"
       >
-        <div class="flex-shrink-0">
+        <div class="shrink-0">
           <ExpandableImage
             v-if="channel.channelIconURL"
             :src="channel.channelIconURL"
@@ -70,7 +70,7 @@ withDefaults(
         </div>
       </NuxtLink>
 
-      <div v-if="showFavoriteButton" class="flex-shrink-0">
+      <div v-if="showFavoriteButton" class="shrink-0">
         <AddToChannelFavorites
           :allow-add-to-list="allowAddToList"
           :channel-unique-name="channel.uniqueName"

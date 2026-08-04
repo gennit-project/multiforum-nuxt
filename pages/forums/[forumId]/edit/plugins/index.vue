@@ -432,7 +432,7 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
 
     <div
       v-if="updateChannelEnabledPluginsError?.message"
-      class="bg-red-50 mb-4 rounded-lg border border-red-200 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200"
+      class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200"
       role="alert"
     >
       <div class="flex items-start gap-2">
@@ -455,9 +455,9 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
     </div>
 
     <div v-else class="space-y-4">
-      <div class="bg-blue-50 rounded-lg p-4 dark:bg-blue-900/20">
+      <div class="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
         <div class="flex">
-          <div class="flex-shrink-0">
+          <div class="shrink-0">
             <i class="fa-solid fa-info-circle text-blue-400" />
           </div>
           <div class="ml-3">
@@ -476,10 +476,10 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
 
       <div
         v-if="orphanedChannelPlugins.length > 0"
-        class="bg-yellow-50 rounded-lg p-4 dark:bg-yellow-900/20"
+        class="rounded-lg bg-yellow-50 p-4 dark:bg-yellow-900/20"
       >
         <div class="flex">
-          <div class="flex-shrink-0">
+          <div class="shrink-0">
             <i class="fa-solid fa-exclamation-triangle text-yellow-400" />
           </div>
           <div class="ml-3 text-sm text-yellow-700 dark:text-yellow-300">
@@ -503,10 +503,10 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
 
       <div
         v-if="consolidatedPlugins.length === 0"
-        class="bg-yellow-50 rounded-lg p-4 dark:bg-yellow-900/20"
+        class="rounded-lg bg-yellow-50 p-4 dark:bg-yellow-900/20"
       >
         <div class="flex">
-          <div class="flex-shrink-0">
+          <div class="shrink-0">
             <i class="fa-solid fa-exclamation-triangle text-yellow-400" />
           </div>
           <div class="ml-3">
@@ -538,7 +538,7 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
               <div class="flex items-center gap-2">
                 <NuxtLink
                   :to="`/forums/${channelUniqueName}/edit/plugins/${consolidated.plugin.id}`"
-                  class="font-semibold text-lg text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300"
+                  class="text-lg font-semibold text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300"
                 >
                   {{
                     consolidated.plugin.displayName || consolidated.plugin.name
@@ -564,7 +564,7 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
               </p>
             </div>
 
-            <div class="flex flex-shrink-0 items-center gap-3">
+            <div class="flex shrink-0 items-center gap-3">
               <!-- Version selector -->
               <div class="flex items-center gap-2">
                 <label
@@ -575,7 +575,7 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
                 </label>
                 <select
                   :id="`version-${consolidated.plugin.id}`"
-                  class="rounded-md border border-gray-300 bg-white py-1 pl-2 pr-8 font-mono text-sm text-gray-700 focus:border-orange-500 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                  class="rounded-md border border-gray-300 bg-white py-1 pr-8 pl-2 font-mono text-sm text-gray-700 focus:border-orange-500 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
                   :value="
                     getEnabledVersionForPlugin(consolidated) ||
                     consolidated.versions[0]?.version
@@ -620,7 +620,7 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
                       ($event.target as HTMLInputElement).checked
                     )
                   "
-                >
+                />
                 <span class="text-sm text-gray-700 dark:text-gray-300">
                   <LoadingSpinner
                     v-if="isConsolidatedToggling(consolidated)"

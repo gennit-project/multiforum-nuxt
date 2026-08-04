@@ -170,7 +170,7 @@ watchEffect(() => {
 
 <template>
   <NuxtLayout>
-    <div class="w-full max-w-screen-2xl bg-white px-2 dark:bg-black">
+    <div class="w-full max-w-[theme(screens.2xl)] bg-white px-2 dark:bg-black">
       <!-- Image detail page layout (full width) -->
       <div v-if="isImageDetailPage" class="w-full">
         <NuxtPage />

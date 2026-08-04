@@ -200,10 +200,7 @@ const filterByChannel = (channel: string) => {
 };
 
 const filterByTag = (tag: string) => {
-  filterValues.value.tags = toggleArrayItem(
-    filterValues.value.tags ?? [],
-    tag
-  );
+  filterValues.value.tags = toggleArrayItem(filterValues.value.tags ?? [], tag);
   updateFilters({ tags: [tag] });
 };
 
@@ -271,7 +268,10 @@ const highlightEventOnMap = (input: HighlightEventInput) => {
         markerMap.markers[eventLocationId]?.events?.[highlightedEventId.value]
           ?.locationName;
 
-      const infowindowContent = buildInfowindowContent(eventTitle, eventLocation);
+      const infowindowContent = buildInfowindowContent(
+        eventTitle,
+        eventLocation
+      );
       markerMap.infowindow?.setContent(infowindowContent);
       markerMap.infowindow?.open({
         anchor: markerMap.markers[eventLocationId]?.marker,
@@ -435,7 +435,7 @@ const isClientSide = typeof window !== 'undefined';
   <div class="flex flex-col">
     <client-only>
       <div
-        class="h-34 z-10 mt-12 flex w-full items-center justify-center bg-gray-800 text-white"
+        class="z-10 mt-12 flex h-34 w-full items-center justify-center bg-gray-800 text-white"
       >
         <div
           class="z-10 flex w-full justify-center bg-gray-100 dark:bg-gray-900"
@@ -446,7 +446,7 @@ const isClientSide = typeof window !== 'undefined';
               class="flex items-center justify-between px-1 pt-1"
             >
               <div
-                class="font-semibold text-sm tracking-wide text-gray-900 [font-variant-caps:all-small-caps] dark:text-gray-100"
+                class="text-sm font-semibold tracking-wide text-gray-900 [font-variant-caps:all-small-caps] dark:text-gray-100"
               >
                 In-person events
               </div>
@@ -472,7 +472,7 @@ const isClientSide = typeof window !== 'undefined';
       <!-- Desktop View -->
       <div
         v-if="isClientSide && mdAndUp"
-        class="flex flex-grow bg-white dark:bg-black"
+        class="flex grow bg-white dark:bg-black"
       >
         <div class="w-1/2">
           <div class="space-y-4">
@@ -505,7 +505,7 @@ const isClientSide = typeof window !== 'undefined';
         </div>
 
         <div
-          class="fixed right-0 top-0 h-screen w-1/2 bg-gray-300 dark:bg-black lg:w-[calc(50%-2.5rem)]"
+          class="fixed top-0 right-0 h-screen w-1/2 bg-gray-300 lg:w-[calc(50%-2.5rem)] dark:bg-black"
         >
           <LoadingSpinner v-if="eventLoading" class="mx-auto my-4" />
           <ErrorBanner
@@ -627,7 +627,7 @@ const isClientSide = typeof window !== 'undefined';
           @highlight-event="highlightEvent"
           @open-preview="openPreview"
         />
-        <div class="flex flex-shrink-0 justify-end px-4 py-4">
+        <div class="flex shrink-0 justify-end px-4 py-4">
           <CloseButton @click="closeMultipleEventPreview" />
         </div>
         <PreviewContainer

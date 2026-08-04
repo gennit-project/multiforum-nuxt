@@ -56,7 +56,7 @@ const emit = defineEmits([
   <div class="relative p-5">
     <button
       type="button"
-      class="bg-transparent absolute right-2 top-4 rounded-full border-0 p-1 text-white transition-colors hover:bg-gray-800"
+      class="absolute top-4 right-2 rounded-full border-0 bg-transparent p-1 text-white transition-colors hover:bg-gray-800"
       title="Close panel"
       aria-label="Close panel"
       @click="emit('close-panel')"
@@ -65,7 +65,7 @@ const emit = defineEmits([
     </button>
     <div
       v-if="isEditing"
-      class="mb-4 mt-8 pb-2"
+      class="mt-8 mb-4 pb-2"
       @click.stop
       @mousedown.stop
       @touchstart.stop
@@ -98,7 +98,7 @@ const emit = defineEmits([
     </div>
     <div
       v-else-if="currentImage?.caption"
-      class="text-md relative mb-4 border-white border-opacity-20 pb-2 pr-6"
+      class="text-md relative mb-4 border-white/20 pr-6 pb-2"
     >
       <div class="flex items-start justify-between">
         <span class="flex-1">
@@ -106,7 +106,7 @@ const emit = defineEmits([
         >
         <span
           v-if="isLoggedInAuthor"
-          class="bg-transparent cursor-pointer rounded-full border-0 px-2 text-white transition-colors hover:bg-gray-800"
+          class="cursor-pointer rounded-full border-0 bg-transparent px-2 text-white transition-colors hover:bg-gray-800"
           role="button"
           tabindex="0"
           title="Edit caption"
@@ -128,7 +128,7 @@ const emit = defineEmits([
         </NuxtLink>
       </div>
     </div>
-    <div v-else class="relative italic text-gray-400">
+    <div v-else class="relative text-gray-400 italic">
       <span v-if="!isLoggedInAuthor">No caption available for this image.</span>
       <span
         v-else

@@ -1,4 +1,5 @@
 import { defineNuxtConfig } from 'nuxt/config';
+import tailwindcss from '@tailwindcss/vite';
 import { config } from './config';
 import path from 'path';
 import { inMemoryCacheOptions } from './cache';
@@ -195,18 +196,9 @@ export default defineNuxtConfig({
     ],
     // Light/dark mode is handled by the uiStore (single source of truth):
     // it reads the `theme` cookie on the server to set the initial <html> class
-    // and toggles it on the client. @nuxtjs/color-mode was unused (Tailwind uses
-    // darkMode: 'class', and nothing referenced color-mode's API), so it was
-    // removed to eliminate a competing theme system.
-    // The order matters in this list. Tailwind must come last
-    // to avoid its styles being overridden by other styles.
-    [
-      '@nuxtjs/tailwindcss',
-      {
-        cssPath: ['@/assets/css/index.css', { injectPosition: 'last' }],
-        configPath: 'tailwind.config.js',
-      },
-    ],
+    // and toggles it on the client. @nuxtjs/color-mode was unused, so it was
+    // removed to eliminate a competing theme system. Tailwind's `dark` variant
+    // is configured against the same class in assets/css/index.css.
     [
       '@nuxtjs/google-fonts',
       {
@@ -434,6 +426,7 @@ export default defineNuxtConfig({
     typeCheck: false,
   },
   vite: {
+    plugins: [tailwindcss()],
     // Pre-bundle these deps at startup. Removing Vuetify changed the lockfile,
     // which forces Vite to re-optimize from scratch; without this list it
     // discovers some deps (notably ones pulled in by client-only plugins) only

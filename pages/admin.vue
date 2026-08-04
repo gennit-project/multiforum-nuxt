@@ -37,7 +37,7 @@ const showIssueDetailPane = computed(() => {
   <NuxtLayout>
     <div v-if="serverConfig" class="flex w-full flex-1 justify-center">
       <article
-        class="w-full max-w-screen-2xl rounded-lg focus:outline-none dark:bg-black"
+        class="w-full max-w-[theme(screens.2xl)] rounded-lg focus:outline-none dark:bg-black"
       >
         <ServerIssueSplitView :show-detail-pane="showIssueDetailPane">
           <ServerTabs

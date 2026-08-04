@@ -238,7 +238,7 @@ watch(() => route.params, updateParams, { immediate: true });
 
 <template>
   <div
-    class="w-full max-w-screen-2xl space-y-4 rounded-lg py-2 dark:text-white"
+    class="w-full max-w-[theme(screens.2xl)] space-y-4 rounded-lg py-2 dark:text-white"
   >
     <div class="align-center mx-1 flex justify-between px-1 sm:mt-2 md:mt-5">
       <BackLink
@@ -246,7 +246,7 @@ watch(() => route.params, updateParams, { immediate: true });
         :data-testid="'discussion-detail-back-link'"
       />
     </div>
-    <h1 class="text-wrap text-center text-2xl font-bold dark:text-gray-200">
+    <h1 class="text-center text-2xl font-bold text-wrap dark:text-gray-200">
       Feedback
     </h1>
     <div v-if="getDiscussionLoading || getCommentLoading">Loading...</div>
@@ -259,12 +259,12 @@ watch(() => route.params, updateParams, { immediate: true });
     <div v-else-if="discussion">
       <p class="mb-4 px-2">This page collects feedback on this discussion:</p>
       <div class="ml-2 flex flex-col gap-2 border-l pl-4">
-        <h2 class="text-wrap px-1 px-2 text-xl font-bold sm:tracking-tight">
+        <h2 class="px-1 px-2 text-xl font-bold text-wrap sm:tracking-tight">
           {{ discussion && discussion.title ? discussion.title : '[Deleted]' }}
         </h2>
         <div class="space-y-3 px-2">
           <div
-            class="dark:bg-gray-950 ounded-lg border px-4 pb-2 dark:border-gray-700 dark:bg-gray-700"
+            class="ounded-lg border px-4 pb-2 dark:border-gray-700 dark:bg-gray-700 dark:bg-gray-950"
           >
             <DiscussionHeader
               :discussion="discussion"

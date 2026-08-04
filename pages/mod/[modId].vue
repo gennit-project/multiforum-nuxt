@@ -60,7 +60,7 @@ watchEffect(() => {
 
 <template>
   <NuxtLayout>
-    <div class="w-full max-w-screen-2xl px-2 dark:bg-black">
+    <div class="w-full max-w-[theme(screens.2xl)] px-2 dark:bg-black">
       <ModProfileSidebar :server-role-badge="serverRoleBadge" />
       <div class="min-w-0 flex-1">
         <client-only>

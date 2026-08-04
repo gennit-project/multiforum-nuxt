@@ -193,28 +193,20 @@ const {
   loading: overviewLoading,
   error: overviewError,
   refetch: refetchOverview,
-} = useQuery(
-  GET_SERVER_HEALTH_DASHBOARD_OVERVIEW,
-  dashboardOverviewVariables,
-  {
-    fetchPolicy: 'cache-and-network',
-    prefetch: false,
-  }
-);
+} = useQuery(GET_SERVER_HEALTH_DASHBOARD_OVERVIEW, dashboardOverviewVariables, {
+  fetchPolicy: 'cache-and-network',
+  prefetch: false,
+});
 
 const {
   result: channelHealthResult,
   loading: channelHealthLoading,
   error: channelHealthError,
   refetch: refetchChannelHealth,
-} = useQuery(
-  GET_SERVER_HEALTH_CHANNEL_HEALTH,
-  channelHealthVariables,
-  {
-    fetchPolicy: 'cache-and-network',
-    prefetch: false,
-  }
-);
+} = useQuery(GET_SERVER_HEALTH_CHANNEL_HEALTH, channelHealthVariables, {
+  fetchPolicy: 'cache-and-network',
+  prefetch: false,
+});
 
 const dashboard = computed<DashboardData | null>(() => {
   return overviewResult.value?.getServerHealthDashboard || null;
@@ -263,12 +255,12 @@ const updateChannelSort = (sortBy: ChannelHealthSortKey) => {
 </script>
 
 <template>
-  <div class="space-y-5 px-2 py-4 dark:text-white md:px-4">
+  <div class="space-y-5 px-2 py-4 md:px-4 dark:text-white">
     <header
       class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between"
     >
       <div>
-        <h1 class="font-semibold text-2xl text-gray-900 dark:text-gray-100">
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
           Server Dashboard
         </h1>
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
@@ -284,8 +276,8 @@ const updateChannelSort = (sortBy: ChannelHealthSortKey) => {
           <input
             v-model="startDate"
             type="date"
-            class="rounded-md border-gray-300 text-sm text-gray-900 [color-scheme:light] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:[color-scheme:dark]"
-          >
+            class="rounded-md border-gray-300 text-sm text-gray-900 scheme-light dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:scheme-dark"
+          />
         </label>
         <label
           class="flex flex-col gap-1 text-xs font-medium text-gray-600 dark:text-gray-300"
@@ -294,8 +286,8 @@ const updateChannelSort = (sortBy: ChannelHealthSortKey) => {
           <input
             v-model="endDate"
             type="date"
-            class="rounded-md border-gray-300 text-sm text-gray-900 [color-scheme:light] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:[color-scheme:dark]"
-          >
+            class="rounded-md border-gray-300 text-sm text-gray-900 scheme-light dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:scheme-dark"
+          />
         </label>
         <button
           type="button"

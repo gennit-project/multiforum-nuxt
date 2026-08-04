@@ -24,7 +24,7 @@ const showIssueDetailPane = computed(() => {
   <NuxtLayout>
     <div class="flex w-full flex-1 justify-center">
       <article
-        class="w-full max-w-screen-2xl rounded-lg focus:outline-none dark:bg-black"
+        class="w-full max-w-[theme(screens.2xl)] rounded-lg focus:outline-none dark:bg-black"
       >
         <ServerIssueSplitView :show-detail-pane="showIssueDetailPane">
           <h1 class="mb-2 px-3 text-2xl font-bold dark:text-white">

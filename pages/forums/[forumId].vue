@@ -297,7 +297,7 @@ definePageMeta({
          child GraphQL queries run in parallel instead of in separate waves. -->
     <div
       v-else
-      class="flex flex-col bg-white dark:bg-black dark:text-white sm:px-0 md:min-h-screen"
+      class="flex flex-col bg-white sm:px-0 md:min-h-screen dark:bg-black dark:text-white"
     >
       <ChannelHeaderMobile
         v-if="
@@ -335,13 +335,13 @@ definePageMeta({
       />
       <div class="flex w-full justify-center">
         <article
-          class="w-full max-w-screen-2xl rounded-lg focus:outline-none dark:bg-black"
+          class="w-full max-w-[theme(screens.2xl)] rounded-lg focus:outline-none dark:bg-black"
         >
           <div
             v-if="showDiscussionTitle"
             class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600"
           >
-            <div class="max-w-screen-2xl flex-1">
+            <div class="max-w-[theme(screens.2xl)] flex-1">
               <DiscussionTitleEditForm>
                 <BackLink
                   :data-testid="'discussion-detail-back-link'"
@@ -354,7 +354,7 @@ definePageMeta({
             v-else-if="showDownloadTitle"
             class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600"
           >
-            <div class="max-w-screen-2xl flex-1 pr-1">
+            <div class="max-w-[theme(screens.2xl)] flex-1 pr-1">
               <DiscussionTitleEditForm>
                 <BackLink
                   :data-testid="'download-detail-back-link'"
@@ -367,7 +367,7 @@ definePageMeta({
             v-else-if="showEventTitle"
             class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600"
           >
-            <div class="max-w-screen-2xl flex-1 pr-1">
+            <div class="max-w-[theme(screens.2xl)] flex-1 pr-1">
               <EventTitleEditForm>
                 <BackLink
                   :data-testid="'event-detail-back-link'"
@@ -380,7 +380,7 @@ definePageMeta({
             v-else-if="showIssueTitle"
             class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600"
           >
-            <div class="max-w-screen-2xl flex-1 pr-1">
+            <div class="max-w-[theme(screens.2xl)] flex-1 pr-1">
               <IssueTitleEditForm>
                 <BackLink
                   :data-testid="'issue-detail-back-link'"
@@ -392,7 +392,7 @@ definePageMeta({
 
           <div class="relative w-full">
             <div
-              class="flex flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row"
+              class="flex flex-col divide-x divide-gray-300 md:flex-row dark:divide-gray-500"
             >
               <div
                 class="min-w-0 flex-1 overflow-x-hidden px-4"
@@ -400,7 +400,7 @@ definePageMeta({
                   enableDiscussionSplitScroll ||
                   enableEventSplitScroll ||
                   enableIssueSplitScroll
-                    ? 'lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto lg:w-1/2'
+                    ? 'lg:h-[calc(100vh-3.5rem)] lg:w-1/2 lg:overflow-y-auto'
                     : ''
                 "
               >
@@ -410,7 +410,7 @@ definePageMeta({
                     :admin-list="adminList"
                     :channel="channel"
                     :download-count="downloadCount"
-                    class="w-full border-b border-gray-300 dark:border-gray-600 md:ml-2"
+                    class="w-full border-b border-gray-300 md:ml-2 dark:border-gray-600"
                     :desktop="false"
                     :route="route"
                     :show-counts="true"
@@ -423,9 +423,7 @@ definePageMeta({
                 v-if="showChannelDiscussionPanel"
                 class="hidden lg:flex lg:w-1/2 lg:flex-col lg:overflow-y-auto"
                 :class="
-                  enableDiscussionSplitScroll
-                    ? 'lg:h-[calc(100vh-3.5rem)]'
-                    : ''
+                  enableDiscussionSplitScroll ? 'lg:h-[calc(100vh-3.5rem)]' : ''
                 "
               >
                 <div
@@ -436,7 +434,7 @@ definePageMeta({
                     <div class="flex-1">
                       <h2
                         v-if="selectedChannelDiscussionTitle"
-                        class="font-semibold text-lg text-gray-900 dark:text-gray-100"
+                        class="text-lg font-semibold text-gray-900 dark:text-gray-100"
                       >
                         {{ selectedChannelDiscussionTitle }}
                       </h2>
@@ -457,10 +455,7 @@ definePageMeta({
                     class="w-full"
                   />
                 </div>
-                <div
-                  v-else
-                  class="h-full"
-                >
+                <div v-else class="h-full">
                   <DiscussionDetailEmptyState />
                 </div>
               </div>

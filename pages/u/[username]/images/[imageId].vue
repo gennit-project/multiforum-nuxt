@@ -134,15 +134,15 @@ const {
 
 const { result: albumUsageResult, refetch: refetchAlbumUsage } =
   useQuery<ImageAlbumUsageResult>(
-  GET_IMAGE_ALBUM_USAGE,
-  () => ({
-    imageId: imageId.value,
-  }),
-  () => ({
-    enabled: !!imageId.value,
-    fetchPolicy: 'network-only',
-  })
-);
+    GET_IMAGE_ALBUM_USAGE,
+    () => ({
+      imageId: imageId.value,
+    }),
+    () => ({
+      enabled: !!imageId.value,
+      fetchPolicy: 'network-only',
+    })
+  );
 
 const showAlbumSaveModal = ref(false);
 const showCollectionSaveModal = ref(false);
@@ -153,21 +153,24 @@ const lightboxRef = ref<HTMLElement | null>(null);
 const { mutate: addImageToAlbum, loading: addImageToAlbumLoading } =
   useMutation(ADD_IMAGE_TO_ALBUM);
 
-const { result: userAlbumsResult, loading: userAlbumsLoading, refetch: refetchUserAlbums } =
-  useQuery(
-    GET_USER_ALBUMS,
-    () => ({
-      where: {
-        Owner: {
-          username: usernameVar.value,
-        },
+const {
+  result: userAlbumsResult,
+  loading: userAlbumsLoading,
+  refetch: refetchUserAlbums,
+} = useQuery(
+  GET_USER_ALBUMS,
+  () => ({
+    where: {
+      Owner: {
+        username: usernameVar.value,
       },
-    }),
-    () => ({
-      enabled: showAlbumSaveModal.value && !!usernameVar.value,
-      fetchPolicy: 'network-only',
-    })
-  );
+    },
+  }),
+  () => ({
+    enabled: showAlbumSaveModal.value && !!usernameVar.value,
+    fetchPolicy: 'network-only',
+  })
+);
 
 const image = computed((): ImageWithAlbums | null => {
   if (imageError.value) return null;
@@ -267,10 +270,7 @@ const otherAlbums = computed(() => {
 const currentUserAlbumIdsContainingImage = computed(() => {
   if (!usernameVar.value) return new Set<string>();
 
-  const allUsageAlbums = [
-    ...uploaderOwnedAlbums.value,
-    ...otherAlbums.value,
-  ];
+  const allUsageAlbums = [...uploaderOwnedAlbums.value, ...otherAlbums.value];
 
   return new Set(
     allUsageAlbums
@@ -356,7 +356,9 @@ const hasAlbumUsage = computed(() => albumUsageSections.value.length > 0);
 const primaryAlbum = computed(() => {
   const albums = image.value?.Albums || [];
   return (
-    albums.find((album) => album.Owner?.username === uploader.value?.username) ||
+    albums.find(
+      (album) => album.Owner?.username === uploader.value?.username
+    ) ||
     albums[0] ||
     null
   );
@@ -524,13 +526,13 @@ onUnmounted(() => {
       <!-- Main content -->
       <div v-else class="space-y-6">
         <!-- Copied link notification -->
-        <Notification
-          :show="showCopiedLinkNotification"
-          title="Link copied!"
-        />
+        <Notification :show="showCopiedLinkNotification" title="Link copied!" />
         <h1 class="text-2xl font-bold dark:text-white">
           Image uploaded by {{ uploader?.displayName || uploader?.username }}
-          <span v-if="uploader?.displayName && uploader?.username" class="text-gray-500 dark:text-gray-400">
+          <span
+            v-if="uploader?.displayName && uploader?.username"
+            class="text-gray-500 dark:text-gray-400"
+          >
             ({{ uploader.username }})
           </span>
         </h1>
@@ -619,7 +621,7 @@ onUnmounted(() => {
             class="h-auto max-w-full cursor-pointer rounded-lg shadow-lg"
             title="Click to view in lightbox"
             @click="openLightbox"
-          >
+          />
         </div>
 
         <!-- Click hint for regular images -->
@@ -636,7 +638,7 @@ onUnmounted(() => {
 
         <!-- Uploader info -->
         <div class="rounded-lg border bg-white p-6 dark:bg-gray-900">
-          <h2 class="font-semibold mb-4 text-lg dark:text-gray-300">
+          <h2 class="mb-4 text-lg font-semibold dark:text-gray-300">
             Uploader
           </h2>
           <div class="flex items-center gap-4">
@@ -665,9 +667,7 @@ onUnmounted(() => {
             class="rounded-lg border bg-white p-6 dark:bg-gray-900"
           >
             <div class="mb-3 flex items-center justify-between">
-              <h2 class="font-semibold text-lg dark:text-gray-300">
-                Caption
-              </h2>
+              <h2 class="text-lg font-semibold dark:text-gray-300">Caption</h2>
               <button
                 v-if="isLoggedInUploader && editingField !== 'caption'"
                 type="button"
@@ -698,7 +698,7 @@ onUnmounted(() => {
             <div v-else-if="image.caption">
               <MarkdownPreview :text="image.caption" />
             </div>
-            <p v-else class="italic text-gray-500 dark:text-gray-400">
+            <p v-else class="text-gray-500 italic dark:text-gray-400">
               No caption added yet.
             </p>
           </div>
@@ -709,9 +709,7 @@ onUnmounted(() => {
             class="rounded-lg border bg-white p-6 dark:bg-gray-900"
           >
             <div class="mb-3 flex items-center justify-between">
-              <h2 class="font-semibold text-lg dark:text-gray-300">
-                Alt Text
-              </h2>
+              <h2 class="text-lg font-semibold dark:text-gray-300">Alt Text</h2>
               <button
                 v-if="isLoggedInUploader && editingField !== 'alt'"
                 type="button"
@@ -741,7 +739,7 @@ onUnmounted(() => {
             <p v-else-if="image.alt" class="text-gray-700 dark:text-gray-300">
               {{ image.alt }}
             </p>
-            <p v-else class="italic text-gray-500 dark:text-gray-400">
+            <p v-else class="text-gray-500 italic dark:text-gray-400">
               No alt text added yet.
             </p>
           </div>
@@ -750,7 +748,7 @@ onUnmounted(() => {
             v-if="image.longDescription"
             class="rounded-lg border bg-white p-6 dark:bg-gray-900"
           >
-            <h2 class="font-semibold mb-3 text-lg dark:text-gray-300">
+            <h2 class="mb-3 text-lg font-semibold dark:text-gray-300">
               Description
             </h2>
             <MarkdownPreview :text="image.longDescription" />
@@ -760,7 +758,7 @@ onUnmounted(() => {
             v-if="image.copyright"
             class="rounded-lg border bg-white p-6 dark:bg-gray-900"
           >
-            <h2 class="font-semibold mb-3 text-lg dark:text-gray-300">
+            <h2 class="mb-3 text-lg font-semibold dark:text-gray-300">
               Copyright
             </h2>
             <p class="text-gray-700 dark:text-gray-300">
@@ -797,7 +795,7 @@ onUnmounted(() => {
             v-if="hasAlbumUsage"
             class="rounded-lg border bg-white p-6 dark:bg-gray-900"
           >
-            <h2 class="font-semibold mb-3 text-lg dark:text-gray-300">
+            <h2 class="mb-3 text-lg font-semibold dark:text-gray-300">
               Appears in
             </h2>
 
@@ -806,7 +804,9 @@ onUnmounted(() => {
               :key="section.title"
               class="space-y-3"
             >
-              <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400">
+              <h3
+                class="text-sm font-semibold tracking-wide text-gray-600 uppercase dark:text-gray-400"
+              >
                 {{ section.title }}
               </h3>
 
@@ -821,7 +821,9 @@ onUnmounted(() => {
                   class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                   Album by {{ album.Owner.displayName || album.Owner.username }}
-                  <span v-if="album.Owner.displayName">({{ album.Owner.username }})</span>
+                  <span v-if="album.Owner.displayName"
+                    >({{ album.Owner.username }})</span
+                  >
                 </NuxtLink>
                 <span
                   v-else
@@ -838,7 +840,10 @@ onUnmounted(() => {
                     Related discussion:
                   </p>
                   <NuxtLink
-                    v-if="album.Discussions[0]?.DiscussionChannels?.[0]?.channelUniqueName"
+                    v-if="
+                      album.Discussions[0]?.DiscussionChannels?.[0]
+                        ?.channelUniqueName
+                    "
                     :to="`/forums/${album.Discussions[0]?.DiscussionChannels?.[0]?.channelUniqueName}/discussions/${album.Discussions[0]?.id}`"
                     class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                   >
@@ -885,7 +890,9 @@ onUnmounted(() => {
         aria-modal="true"
         aria-labelledby="save-to-album-title"
       >
-        <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl dark:bg-gray-900">
+        <div
+          class="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl dark:bg-gray-900"
+        >
           <div class="mb-4 flex items-start justify-between gap-4">
             <div>
               <h2
@@ -916,7 +923,10 @@ onUnmounted(() => {
             {{ albumSaveError }}
           </p>
 
-          <div v-if="userAlbumsLoading" class="py-6 text-center text-gray-600 dark:text-gray-400">
+          <div
+            v-if="userAlbumsLoading"
+            class="py-6 text-center text-gray-600 dark:text-gray-400"
+          >
             Loading your albums...
           </div>
 
@@ -949,7 +959,9 @@ onUnmounted(() => {
               @click="saveImageToAlbum(album)"
             >
               <span>
-                <span class="block font-medium text-gray-900 dark:text-gray-100">
+                <span
+                  class="block font-medium text-gray-900 dark:text-gray-100"
+                >
                   {{ getAlbumDisplayName(album) }}
                 </span>
                 <span class="block text-sm text-gray-600 dark:text-gray-400">
@@ -983,20 +995,20 @@ onUnmounted(() => {
       <div
         v-if="isLightboxOpen"
         ref="lightboxRef"
-        class="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black"
+        class="fixed top-0 left-0 z-50 flex h-full w-full items-center justify-center bg-black"
         role="dialog"
         aria-modal="true"
         aria-label="Image lightbox"
       >
         <!-- Header controls -->
         <div
-          class="absolute left-0 top-0 z-50 flex w-full items-center justify-between p-5 text-white"
+          class="absolute top-0 left-0 z-50 flex w-full items-center justify-between p-5 text-white"
         >
           <div class="flex items-center gap-4">
             <button
               type="button"
               aria-label="Close image lightbox"
-              class="bg-transparent cursor-pointer border-0 text-3xl text-white"
+              class="cursor-pointer border-0 bg-transparent text-3xl text-white"
               @click="closeLightbox"
             >
               ×
@@ -1005,10 +1017,10 @@ onUnmounted(() => {
 
           <div class="flex items-center gap-4">
             <!-- Zoom controls -->
-            <div class="flex items-center rounded bg-opacity-10">
+            <div class="flex items-center rounded bg-white/10">
               <button
                 type="button"
-                class="cursor-pointer px-2 py-1 text-white transition-colors hover:bg-opacity-20"
+                class="cursor-pointer px-2 py-1 text-white transition-colors hover:bg-white/20"
                 :class="{ 'cursor-not-allowed opacity-50': zoomLevel <= 1 }"
                 aria-label="Zoom out"
                 :disabled="zoomLevel <= 1"
@@ -1021,7 +1033,7 @@ onUnmounted(() => {
               </span>
               <button
                 type="button"
-                class="cursor-pointer px-2 py-1 text-white transition-colors hover:bg-opacity-20"
+                class="cursor-pointer px-2 py-1 text-white transition-colors hover:bg-white/20"
                 :class="{ 'cursor-not-allowed opacity-50': zoomLevel >= 3 }"
                 aria-label="Zoom in"
                 :disabled="zoomLevel >= 3"
@@ -1032,7 +1044,7 @@ onUnmounted(() => {
               <button
                 v-if="isZoomed"
                 type="button"
-                class="cursor-pointer px-2 py-1 text-white transition-colors hover:bg-opacity-20"
+                class="cursor-pointer px-2 py-1 text-white transition-colors hover:bg-white/20"
                 aria-label="Reset zoom"
                 @click="resetZoom"
               >
@@ -1044,7 +1056,7 @@ onUnmounted(() => {
             <button
               type="button"
               aria-label="Download image"
-              class="flex h-8 w-8 cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white hover:bg-opacity-20"
+              class="flex h-8 w-8 cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white/20"
               @click="() => downloadImage(image?.url || '')"
             >
               <DownloadIcon class="h-6 w-6" />
@@ -1097,7 +1109,7 @@ onUnmounted(() => {
               cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'auto',
             }"
             @mousedown="startDrag"
-          >
+          />
         </div>
       </div>
     </div>

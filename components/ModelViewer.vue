@@ -10,7 +10,7 @@
       ref="fullscreenButtonRef"
       type="button"
       aria-label="View 3D model in fullscreen"
-      class="absolute right-2 top-2 z-10 rounded-md bg-black bg-opacity-50 p-2 text-white transition-all duration-200 hover:bg-opacity-70"
+      class="absolute top-2 right-2 z-10 rounded-md bg-black/50 p-2 text-white transition-all duration-200 hover:bg-white/70"
       @click="openFullscreen"
     >
       <svg
@@ -53,7 +53,7 @@
       role="dialog"
       aria-modal="true"
       :aria-labelledby="dialogTitleId"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
       @click="closeFullscreen"
     >
       <h2 :id="dialogTitleId" class="sr-only">Fullscreen 3D model viewer</h2>
@@ -62,7 +62,7 @@
       <button
         type="button"
         aria-label="Close fullscreen 3D model viewer"
-        class="absolute right-4 top-4 z-[100] rounded-md bg-black bg-opacity-50 p-3 text-white transition-all duration-200 hover:bg-opacity-70"
+        class="absolute top-4 right-4 z-100 rounded-md bg-black/50 p-3 text-white transition-all duration-200 hover:bg-white/70"
         @click.stop="closeFullscreen"
         @mousedown.stop
         @touchstart.stop
