@@ -201,9 +201,11 @@ Hard-won pitfalls (full detail + code in [CONTRIBUTING.md](./CONTRIBUTING.md#fro
 - **Imports**: Group imports by type (Vue, libraries, local components, utils)
 - **Testing**: Each feature should have Playwright coverage, with shared seed data and cleanup helpers
 - **CSS**: Use Tailwind utility classes, dark mode compatible with `dark:` prefix
-- **Accessibility**:
-  - Ensure color contrast meets minimum thresholds (WCAG AA 4.5:1 for normal text).
-  - Provide accessible names for inputs and interactive controls (use explicit `<label>` or `aria-label`/`aria-labelledby` as appropriate).
+- **Accessibility**: build to WCAG 2.2 AA. The `accessibility` skill carries the full
+  contract, AA thresholds, and Vue patterns (invoke it for any UI/component work);
+  `pnpm run lint:a11y` and the axe Playwright helper are the detection layers. Baseline:
+  4.5:1 contrast for normal text; accessible names (`<label>` / `aria-label` /
+  `aria-labelledby`) on every input and interactive control.
 - **Composables**: Extract reusable logic into composables under `composables/` directory
 - **Reactivity and Watchers**:
   - Avoid unnecessary watchers. Use Vue's built-in reactivity system (props, computed, refs) whenever possible
