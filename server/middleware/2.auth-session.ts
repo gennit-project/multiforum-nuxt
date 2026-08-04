@@ -33,7 +33,11 @@
 // 1.cache-control.ts), matching the existing convention in this directory.
 import type * as H3 from 'h3';
 import type { Storage, StorageValue } from 'unstorage';
-import { isLocalDevAuth, LOCAL_AUTH_COOKIE } from '@/server/utils/local-auth';
+import {
+  getServerGraphqlUrl,
+  isLocalDevAuth,
+  LOCAL_AUTH_COOKIE,
+} from '@/server/utils/local-auth';
 
 // Nitro injects these server auto-imports at build time. Declare their narrow
 // shapes here as well so this middleware remains type-checkable when a unit
@@ -42,6 +46,7 @@ declare const defineEventHandler: typeof H3.defineEventHandler;
 declare const getCookie: typeof H3.getCookie;
 declare const deleteCookie: typeof H3.deleteCookie;
 declare const useRuntimeConfig: (event?: H3.H3Event) => {
+  backendGraphqlUrl?: string;
   public?: {
     authProvider?: string;
     apollo?: { clients?: { default?: { httpEndpoint?: string } } };
@@ -172,8 +177,7 @@ export default defineEventHandler(async (event) => {
   const runtimeConfig = useRuntimeConfig(event);
   if (isLocalDevAuth(runtimeConfig)) {
     const accessToken = getCookie(event, LOCAL_AUTH_COOKIE);
-    const graphqlUrl =
-      runtimeConfig.public?.apollo?.clients?.default?.httpEndpoint;
+    const graphqlUrl = getServerGraphqlUrl(runtimeConfig);
     if (!accessToken || !graphqlUrl) return;
 
     try {
@@ -246,8 +250,7 @@ export default defineEventHandler(async (event) => {
         if (accessToken) {
           event.context.accessToken = accessToken;
         }
-        const graphqlUrl =
-          runtimeConfig.public?.apollo?.clients?.default?.httpEndpoint;
+        const graphqlUrl = getServerGraphqlUrl(runtimeConfig);
 
         if (accessToken && graphqlUrl) {
           const queryBackend = <T>(query: string) =>

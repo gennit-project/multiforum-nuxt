@@ -5,6 +5,10 @@ import path from 'path';
 import { inMemoryCacheOptions } from './cache';
 
 const isMockedE2E = process.env.VITE_E2E_MOCK_MODE === 'true';
+const isLocalDevAuthBuild =
+  process.env.NUXT_PUBLIC_AUTH_PROVIDER === 'local-dev';
+const serverGraphqlUrl =
+  process.env.NUXT_BACKEND_GRAPHQL_URL || config?.graphqlUrl || '';
 const ignoredDevWatchPatterns = [
   '**/.claude/**',
   '**/.agents/**',
@@ -89,23 +93,32 @@ export default defineNuxtConfig({
     // Server-session auth: registers /auth/login, /auth/logout,
     // /auth/callback, /auth/backchannel-logout. Config is read from the private
     // `runtimeConfig.auth0` block below (NUXT_AUTH0_* envs).
-    [
-      '@auth0/auth0-nuxt',
-      {
-        mountRoutes: true,
-        // SPIKE Phase 2: use a server-side session store (small cookie holds
-        // only a session id). The default stateless cookie store overflows the
-        // ~4KB browser limit once a refresh token is in the session. See the
-        // factory for the dev (in-memory) vs prod (persistent) note.
-        sessionStoreFactoryPath: '~/server/utils/session-store-factory.ts',
-      },
-    ],
+    ...(isLocalDevAuthBuild
+      ? []
+      : [
+          [
+            '@auth0/auth0-nuxt',
+            {
+              mountRoutes: true,
+              // SPIKE Phase 2: use a server-side session store (small cookie
+              // holds only a session id). The default stateless cookie store
+              // overflows the ~4KB browser limit once a refresh token is in
+              // the session. See the factory for the dev (in-memory) vs prod
+              // (persistent) note.
+              sessionStoreFactoryPath:
+                '~/server/utils/session-store-factory.ts',
+            },
+          ] as [string, Record<string, unknown>],
+        ]),
     [
       '@nuxtjs/apollo',
       {
         clients: {
           default: {
-            httpEndpoint: config?.graphqlUrl || '',
+            // SSR uses the private container URL while browser requests keep
+            // using the public origin compiled into VITE_GRAPHQL_URL.
+            httpEndpoint: serverGraphqlUrl,
+            browserHttpEndpoint: config?.graphqlUrl || serverGraphqlUrl,
             // @nuxtjs/apollo attaches localStorage['token'] as the Bearer
             // (tokenStorage: 'localStorage'). plugins/apollo-auth.client.ts keeps
             // that key in sync with the server-session access token. (The old
@@ -255,7 +268,7 @@ export default defineNuxtConfig({
     authToken: process.env.VITE_SENTRY_AUTH_TOKEN,
   },
   nitro: {
-    preset: 'vercel',
+    preset: process.env.NITRO_PRESET || 'vercel',
     // `sanitize-html` (used by composables/useMarkdownRenderer.ts) is CommonJS
     // and does `require('htmlparser2')`. When Nitro externalizes it, the Vercel
     // serverless function performs that require at runtime — which crashes with
@@ -370,8 +383,13 @@ export default defineNuxtConfig({
     { src: '@/plugins/test-auth.client', mode: 'client' },
   ],
   runtimeConfig: {
+    // Optional server-only GraphQL URL. Docker deployments use this to reach
+    // the backend over the Compose network while the browser keeps using the
+    // public URL below (usually http://localhost:4000 for local quick-starts).
+    backendGraphqlUrl: '',
     // Optional explicit backend token URL for local development auth. When it
-    // is empty, the server derives /auth/local-dev/token from the GraphQL URL.
+    // is empty, the server derives /auth/local-dev/token from the server-side
+    // GraphQL URL above, then falls back to the public browser URL.
     localAuthTokenEndpoint: '',
     // SPIKE (auth0-nuxt server-session migration): server-only Auth0 config.
     // These are overridden by NUXT_AUTH0_* env vars at runtime (see

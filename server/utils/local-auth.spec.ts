@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { getLocalAuthTokenEndpoint, isLocalDevAuth } from './local-auth';
+import {
+  getLocalAuthTokenEndpoint,
+  getServerGraphqlUrl,
+  isLocalDevAuth,
+} from './local-auth';
 
 describe('local auth server configuration', () => {
   it('recognizes only the explicit local development provider', () => {
@@ -14,6 +18,50 @@ describe('local auth server configuration', () => {
         localAuthTokenEndpoint: ' http://backend:4000/custom-token ',
       })
     ).toBe('http://backend:4000/custom-token');
+  });
+
+  it('uses the private backend URL for server-side GraphQL requests', () => {
+    expect(
+      getServerGraphqlUrl({
+        backendGraphqlUrl: ' http://backend:4000 ',
+        public: {
+          apollo: {
+            clients: {
+              default: { httpEndpoint: 'http://localhost:4000' },
+            },
+          },
+        },
+      })
+    ).toBe('http://backend:4000');
+  });
+
+  it('falls back to the public GraphQL URL outside container networks', () => {
+    expect(
+      getServerGraphqlUrl({
+        public: {
+          apollo: {
+            clients: {
+              default: { httpEndpoint: ' http://localhost:4000 ' },
+            },
+          },
+        },
+      })
+    ).toBe('http://localhost:4000');
+  });
+
+  it('derives local auth from the private backend URL when available', () => {
+    expect(
+      getLocalAuthTokenEndpoint({
+        backendGraphqlUrl: 'http://backend:4000/graphql',
+        public: {
+          apollo: {
+            clients: {
+              default: { httpEndpoint: 'http://localhost:4000/graphql' },
+            },
+          },
+        },
+      })
+    ).toBe('http://backend:4000/auth/local-dev/token');
   });
 
   it('derives the token endpoint from the GraphQL origin', () => {

@@ -13,10 +13,11 @@ vi.stubGlobal('deleteCookie', h.deleteCookie);
 vi.stubGlobal('$fetch', h.fetch);
 vi.stubGlobal('useAuth0', h.useAuth0);
 vi.stubGlobal('useRuntimeConfig', () => ({
+  backendGraphqlUrl: 'http://backend:4000/graphql',
   public: {
     authProvider: 'local-dev',
     apollo: {
-      clients: { default: { httpEndpoint: 'http://backend:4000/graphql' } },
+      clients: { default: { httpEndpoint: 'http://localhost:4000/graphql' } },
     },
   },
 }));

@@ -4,6 +4,21 @@
 
 > Multiforum is under active development; test coverage is being expanded as core features stabilize.
 
+## Try it locally
+
+Start a usable local instance, including Neo4j, the backend, the frontend, and
+an automatically provisioned administrator:
+
+```bash
+docker compose up --build
+```
+
+Then open [http://localhost:3000](http://localhost:3000) and sign in with the
+default local password `multiforum-local-admin`. No Auth0, cloud storage, maps,
+email provider, or manual Cypher bootstrap is required. See the
+[local self-hosting quick-start](./docs/self-hosting-quickstart.md) before
+customizing credentials or exposing any service beyond your machine.
+
 ## About
 
 Multiforum is a community platform that lets people create and manage topic-based forums with multiple content types:
@@ -39,7 +54,7 @@ The frontend talks to the backend exclusively through GraphQL.
 
 ## Technology choices — and why
 
-These are the main technologies and, more importantly, *why* they fit a
+These are the main technologies and, more importantly, _why_ they fit a
 cross-posting, deeply-interconnected community platform. If you have never used
 them, the short version of each explains what problem it solves here.
 
@@ -73,14 +88,14 @@ every forum this download appears in" or "walk this comment thread" turns into a
 pile of join tables and recursive queries.
 
 [Neo4j](https://neo4j.com/) stores data as nodes and relationships directly, so
-those traversals — *follow the edges between connected things* — are natural and
+those traversals — _follow the edges between connected things_ — are natural and
 efficient. The shape of the database mirrors the shape of the product.
 
 ### GraphQL + Apollo Client
 
 Because the data is a graph, the API is too. [GraphQL](https://graphql.org/)
 lets the frontend ask for exactly the connected data a screen needs — a
-discussion *with* its channels, author, and comment counts — in a single
+discussion _with_ its channels, author, and comment counts — in a single
 request shaped like the result. [Apollo Client](https://www.apollographql.com/docs/react/)
 adds a normalized cache so repeated views of the same entity stay consistent and
 fast without manual bookkeeping.
@@ -107,6 +122,7 @@ client.
 
 Start here:
 
+- [Local self-hosting quick-start](./docs/self-hosting-quickstart.md)
 - [Development setup](./docs/development-setup.md)
 - [AWS single-VM Terraform example](./deploy/terraform/aws-single-vm/README.md)
 - [Contributing guide](./CONTRIBUTING.md)

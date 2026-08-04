@@ -2,6 +2,7 @@
 //
 // Same-origin session-backed profile fallback for embedded browsers where
 // localStorage-backed token flows are unreliable or unavailable.
+import { getServerGraphqlUrl } from '@/server/utils/local-auth';
 
 type OwnEmailResponse = {
   data?: {
@@ -47,8 +48,7 @@ export default defineEventHandler(async (event) => {
   try {
     const tokenSet = await useAuth0(event).getAccessToken();
     const accessToken = tokenSet?.accessToken;
-    const graphqlUrl =
-      useRuntimeConfig(event).public?.apollo?.clients?.default?.httpEndpoint;
+    const graphqlUrl = getServerGraphqlUrl(useRuntimeConfig(event));
 
     if (!accessToken || !graphqlUrl) {
       return session;

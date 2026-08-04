@@ -1,0 +1,17 @@
+.git
+.github
+.nuxt
+.output
+.vercel
+coverage
+coverage-e2e
+deploy
+docs
+node_modules
+playwright-report
+test-results
+tests
+*.log
+.env*
+!.env.example
+!.env.quickstart.example
