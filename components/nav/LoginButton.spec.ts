@@ -6,7 +6,10 @@ import LoginButton from '@/components/nav/LoginButton.vue';
 
 const route = createMockRoute();
 
-vi.mock('nuxt/app', () => ({ useRoute: () => route }));
+vi.mock('nuxt/app', () => ({
+  useRoute: () => route,
+  useRuntimeConfig: () => ({ public: { authProvider: 'auth0' } }),
+}));
 // Logout now goes through useServerLogout -> /auth/logout; no SPA SDK to mock.
 
 // Stub that renders the unauthenticated slot instead of the harness default.

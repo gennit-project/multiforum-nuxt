@@ -16,6 +16,13 @@ vi.mock('@/composables/useAuthState', () => ({
   useIsAuthenticated: () => mockIsAuthenticated,
 }));
 
+vi.mock('@/composables/useAuthNavigation', () => ({
+  useAuthNavigation: () => ({
+    getLoginUrl: (returnTo: string) =>
+      `/auth/login?returnTo=${encodeURIComponent(returnTo)}`,
+  }),
+}));
+
 const slots = {
   'has-auth': '<div data-testid="auth-content">Auth Content</div>',
   'does-not-have-auth':
@@ -87,9 +94,9 @@ describe('RequireAuth', () => {
       async ({ authenticated, username, props, expected }) => {
         await setAuthState({ authenticated, username });
         const wrapper = mount(RequireAuth, { props, slots });
-        expect(wrapper.find('[data-auth-state]').attributes('data-auth-state')).toBe(
-          expected
-        );
+        expect(
+          wrapper.find('[data-auth-state]').attributes('data-auth-state')
+        ).toBe(expected);
       }
     );
   });

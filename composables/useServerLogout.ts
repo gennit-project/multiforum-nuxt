@@ -12,9 +12,11 @@
 // token (plugins/apollo-auth.client.ts) until it is wired directly to the
 // server session. This is the one place that knows about both systems.
 import { setIsAuthenticated, setUsername } from '@/composables/useAuthState';
+import { useAuthNavigation } from '@/composables/useAuthNavigation';
 import { clearPersistedAuth } from '@/utils/authUtils';
 
 export const useServerLogout = () => {
+  const { logoutUrl } = useAuthNavigation();
   const logout = () => {
     if (typeof window === 'undefined') {
       return;
@@ -33,7 +35,7 @@ export const useServerLogout = () => {
     setIsAuthenticated(false);
     setUsername('');
     clearPersistedAuth();
-    window.location.href = '/auth/logout';
+    window.location.href = logoutUrl;
   };
 
   return { logout };

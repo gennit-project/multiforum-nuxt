@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useIsAuthenticated, useUsername } from '@/composables/useAuthState';
+import { useAuthNavigation } from '@/composables/useAuthNavigation';
 
 const isAuthenticatedVar = useIsAuthenticated();
 const usernameVar = useUsername();
+const { getLoginUrl } = useAuthNavigation();
 
 /*
 Wrapper around content that requires authentication: renders the `has-auth`
@@ -46,7 +48,7 @@ const showAuthContent = computed(() => {
 const handleLogin = () => {
   if (typeof window === 'undefined') return;
   const returnTo = window.location.pathname + window.location.search;
-  window.location.href = `/auth/login?returnTo=${encodeURIComponent(returnTo)}`;
+  window.location.href = getLoginUrl(returnTo);
 };
 </script>
 

@@ -14,6 +14,10 @@ vi.mock('@/utils/authUtils', () => ({
   clearPersistedAuth: () => clearPersistedAuth(),
 }));
 
+vi.mock('@/composables/useAuthNavigation', () => ({
+  useAuthNavigation: () => ({ logoutUrl: '/auth/logout' }),
+}));
+
 beforeEach(() => {
   vi.clearAllMocks();
   window.localStorage.clear();
