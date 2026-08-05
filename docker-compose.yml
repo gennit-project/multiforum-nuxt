@@ -39,13 +39,8 @@ services:
       - multiforum-network
 
   backend:
-    image: ${MULTIFORUM_BACKEND_IMAGE:-multiforum-backend:quickstart}
-    build:
-      context: .
-      dockerfile: docker/backend.Dockerfile
-      args:
-        MULTIFORUM_BACKEND_REPOSITORY: ${MULTIFORUM_BACKEND_REPOSITORY:-https://github.com/gennit-project/multiforum-backend.git}
-        MULTIFORUM_BACKEND_REF: ${MULTIFORUM_BACKEND_REF:-main}
+    image: ${MULTIFORUM_BACKEND_IMAGE:-ghcr.io/gennit-project/multiforum-backend:edge}
+    pull_policy: ${MULTIFORUM_BACKEND_PULL_POLICY:-always}
     restart: unless-stopped
     ports:
       - '${MULTIFORUM_BIND_ADDRESS:-127.0.0.1}:4000:4000'
@@ -63,7 +58,7 @@ services:
       SUPERADMIN_EMAIL: ${MULTIFORUM_BOOTSTRAP_EMAIL:-admin@multiforum.local}
       SERVER_CONFIG_NAME: ${MULTIFORUM_INSTANCE_NAME:-My Multiforum}
       NEO4J_URI: bolt://database:7687
-      NEO4J_USERNAME: neo4j
+      NEO4J_USER: neo4j
       NEO4J_PASSWORD: ${NEO4J_PASSWORD:-multiforum-local-neo4j}
       AUTH0_DOMAIN: ''
       AUTH0_CLIENT_ID: ''
