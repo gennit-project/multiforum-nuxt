@@ -1,17 +1,10 @@
-type ConfigType = {
-  baseUrl: string;
-  environment: string;
-  googleCloudStorageBucket: string;
-  googleMapsApiKey: string;
-  googleMapId: string;
-  graphqlUrl: string;
-  logoutUrl: string;
-  openCageApiKey: string;
-  openGraphApiKey: string;
-  serverName: string;
-  serverDisplayName: string;
-  enableLanguagePicker: boolean;
-};
+import {
+  resolveRuntimeInstanceConfig,
+  type InstanceConfigValues,
+  type RuntimeInstanceConfig,
+} from './utils/runtimeInstanceConfig';
+
+type ConfigType = InstanceConfigValues;
 const config: ConfigType = {
   baseUrl: import.meta.env.VITE_BASE_URL,
   environment: import.meta.env.VITE_ENVIRONMENT,
@@ -33,4 +26,12 @@ const config: ConfigType = {
     'Untitled',
   enableLanguagePicker: import.meta.env.VITE_ENABLE_LANGUAGE_PICKER === 'true',
 };
-export { config };
+
+const applyRuntimeInstanceConfig = (runtime: RuntimeInstanceConfig): void => {
+  Object.assign(
+    config,
+    resolveRuntimeInstanceConfig({ runtime, fallback: config })
+  );
+};
+
+export { applyRuntimeInstanceConfig, config };

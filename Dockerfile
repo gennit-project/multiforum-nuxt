@@ -11,21 +11,9 @@ RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-# Vite values are embedded in the client bundle at build time. Compose passes
-# browser-reachable defaults; other image consumers can override these args.
-ARG NUXT_PUBLIC_AUTH_PROVIDER=auth0
-ARG NUXT_BACKEND_GRAPHQL_URL=
-ARG VITE_BASE_URL=http://localhost:3000
-ARG VITE_ENVIRONMENT=production
-ARG VITE_GRAPHQL_URL=http://localhost:4000
-ARG VITE_SERVER_NAME=Multiforum
-ENV NUXT_PUBLIC_AUTH_PROVIDER=$NUXT_PUBLIC_AUTH_PROVIDER
-ENV NUXT_BACKEND_GRAPHQL_URL=$NUXT_BACKEND_GRAPHQL_URL
+# Deployment-specific configuration is supplied when the built server starts,
+# so this image can be promoted between environments without rebuilding.
 ENV NITRO_PRESET=node-server
-ENV VITE_BASE_URL=$VITE_BASE_URL
-ENV VITE_ENVIRONMENT=$VITE_ENVIRONMENT
-ENV VITE_GRAPHQL_URL=$VITE_GRAPHQL_URL
-ENV VITE_SERVER_NAME=$VITE_SERVER_NAME
 
 RUN NODE_OPTIONS=--max-old-space-size=2048 pnpm run build
 

@@ -86,13 +86,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        NUXT_PUBLIC_AUTH_PROVIDER: local-dev
-        NUXT_BACKEND_GRAPHQL_URL: http://backend:4000
-        VITE_BASE_URL: ${MULTIFORUM_PUBLIC_FRONTEND_URL:-http://localhost:3000}
-        VITE_ENVIRONMENT: development
-        VITE_GRAPHQL_URL: ${MULTIFORUM_PUBLIC_BACKEND_URL:-http://localhost:4000}
-        VITE_SERVER_NAME: ${MULTIFORUM_INSTANCE_NAME:-My Multiforum}
     restart: unless-stopped
     ports:
       - '${MULTIFORUM_BIND_ADDRESS:-127.0.0.1}:3000:3000'
@@ -101,6 +94,10 @@ services:
         condition: service_healthy
     environment:
       NUXT_PUBLIC_AUTH_PROVIDER: local-dev
+      NUXT_PUBLIC_BASE_URL: ${MULTIFORUM_PUBLIC_FRONTEND_URL:-http://localhost:3000}
+      NUXT_PUBLIC_ENVIRONMENT: development
+      NUXT_PUBLIC_SERVER_NAME: ${MULTIFORUM_INSTANCE_NAME:-My Multiforum}
+      NUXT_PUBLIC_SERVER_DISPLAY_NAME: ${MULTIFORUM_INSTANCE_NAME:-My Multiforum}
       NUXT_BACKEND_GRAPHQL_URL: http://backend:4000
       NUXT_LOCAL_AUTH_TOKEN_ENDPOINT: http://backend:4000/auth/local-dev/token
     healthcheck:

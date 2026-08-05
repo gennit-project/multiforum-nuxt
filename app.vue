@@ -15,6 +15,12 @@ useHead({
     titleChunk && titleChunk !== config.serverDisplayName
       ? `${titleChunk} · ${config.serverDisplayName}`
       : config.serverDisplayName,
+  meta: [
+    {
+      name: 'description',
+      content: () => `Welcome to ${config.serverDisplayName}`,
+    },
+  ],
 });
 
 // Initialize theme class on application load
