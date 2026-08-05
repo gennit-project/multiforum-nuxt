@@ -2,14 +2,14 @@
 
 Try Multiforum locally before configuring Auth0, cloud storage, maps, email, or
 other production integrations. The default Docker Compose stack starts Neo4j,
-builds the backend and frontend, creates the initial server configuration and
-roles, and provisions the first administrator automatically.
+pulls the backend, builds the frontend, creates the initial server configuration
+and roles, and provisions the first administrator automatically.
 
 ## Requirements
 
 - Docker Engine with Docker Compose v2 (Docker Desktop includes it)
 - Git
-- At least 6 GB of memory available to Docker during the initial builds
+- At least 4 GB of memory available to Docker during the initial frontend build
 
 ## Start Multiforum
 
@@ -19,9 +19,10 @@ From this repository's root, run:
 docker compose up --build
 ```
 
-The first run builds both applications and can take several minutes. When all
-three services are healthy, open [http://localhost:3000](http://localhost:3000)
-and choose **Sign in**. The local administrator password is:
+The first run pulls the official backend image, builds the frontend, and can
+take several minutes. When all three services are healthy, open
+[http://localhost:3000](http://localhost:3000) and choose **Sign in**. The local
+administrator password is:
 
 ```text
 multiforum-local-admin
@@ -47,14 +48,27 @@ The bootstrap password must contain at least 12 characters. The bootstrap user
 is created only when its email is not already present, so changing the values
 later does not replace an existing administrator.
 
-The backend build defaults to the public backend repository's `main` branch
-because an official continuously published image is not yet available. For
-repeatable deployments, set `MULTIFORUM_BACKEND_REF` to a release tag or commit,
-for example:
+The default `edge` backend image follows the backend repository's `main` branch.
+For a repeatable installation, pin a full release tag or immutable commit tag:
 
 ```dotenv
-MULTIFORUM_BACKEND_REF=v1.2.3
+MULTIFORUM_BACKEND_IMAGE=ghcr.io/gennit-project/multiforum-backend:1.2.3
+# Or: ghcr.io/gennit-project/multiforum-backend:sha-0123456
 ```
+
+Contributors who need to test an unmerged backend branch can retain the old
+source-build behavior with the provided override:
+
+```bash
+docker compose \
+  --env-file .env.quickstart \
+  -f docker-compose.yml \
+  -f docker-compose.source.yml \
+  up --build
+```
+
+Set `MULTIFORUM_BACKEND_REPOSITORY` and `MULTIFORUM_BACKEND_REF` in
+`.env.quickstart` to choose the source revision for that command.
 
 ## Stop or reset the stack
 
@@ -93,12 +107,9 @@ docker compose ps
 docker compose logs --tail=100 database backend frontend
 ```
 
-If an initial build is killed for lack of memory, increase Docker's memory limit
-or make Compose build one image at a time:
-
-```bash
-COMPOSE_PARALLEL_LIMIT=1 docker compose up --build
-```
+If the initial frontend build is killed for lack of memory, increase Docker's
+memory allocation and run the command again. Docker will reuse completed layers
+and already-downloaded images.
 
 If ports 3000, 4000, 7474, or 7687 are already in use, stop the conflicting
 local services before starting the stack.
