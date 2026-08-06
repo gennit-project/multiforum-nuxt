@@ -3,12 +3,24 @@ import tailwindcss from '@tailwindcss/vite';
 import { config } from './config';
 import path from 'path';
 import { inMemoryCacheOptions } from './cache';
+import { DORMANT_AUTH0_CONFIG } from './utils/auth0RuntimeConfig';
 
 const isMockedE2E = process.env.VITE_E2E_MOCK_MODE === 'true';
-const isLocalDevAuthBuild =
-  process.env.NUXT_PUBLIC_AUTH_PROVIDER === 'local-dev';
+const browserGraphqlUrl = config?.graphqlUrl || 'http://localhost:4000';
 const serverGraphqlUrl =
-  process.env.NUXT_BACKEND_GRAPHQL_URL || config?.graphqlUrl || '';
+  process.env.NUXT_BACKEND_GRAPHQL_URL || browserGraphqlUrl;
+const frontendGraphqlProxyUrl = '/api/graphql';
+const runtimeGraphqlFetch: typeof globalThis.fetch = (input, init) => {
+  const runtimeBackendUrl =
+    typeof window === 'undefined'
+      ? process.env.NUXT_BACKEND_GRAPHQL_URL?.trim()
+      : '';
+  const target =
+    typeof window === 'undefined'
+      ? runtimeBackendUrl || input
+      : input;
+  return globalThis.fetch(target, init);
+};
 const ignoredDevWatchPatterns = [
   '**/.claude/**',
   '**/.agents/**',
@@ -93,32 +105,30 @@ export default defineNuxtConfig({
     // Server-session auth: registers /auth/login, /auth/logout,
     // /auth/callback, /auth/backchannel-logout. Config is read from the private
     // `runtimeConfig.auth0` block below (NUXT_AUTH0_* envs).
-    ...(isLocalDevAuthBuild
-      ? []
-      : [
-          [
-            '@auth0/auth0-nuxt',
-            {
-              mountRoutes: true,
-              // SPIKE Phase 2: use a server-side session store (small cookie
-              // holds only a session id). The default stateless cookie store
-              // overflows the ~4KB browser limit once a refresh token is in
-              // the session. See the factory for the dev (in-memory) vs prod
-              // (persistent) note.
-              sessionStoreFactoryPath:
-                '~/server/utils/session-store-factory.ts',
-            },
-          ] as [string, Record<string, unknown>],
-        ]),
+    [
+      '@auth0/auth0-nuxt',
+      {
+        mountRoutes: true,
+        // SPIKE Phase 2: use a server-side session store (small cookie holds
+        // only a session id). Keeping the module in every build lets one
+        // container select Auth0 or local-dev auth through runtime config.
+        sessionStoreFactoryPath: '~/server/utils/session-store-factory.ts',
+      },
+    ],
     [
       '@nuxtjs/apollo',
       {
         clients: {
           default: {
-            // SSR uses the private container URL while browser requests keep
-            // using the public origin compiled into VITE_GRAPHQL_URL.
+            // The custom fetch keeps this module's generated Apollo client
+            // reusable: SSR reads NUXT_BACKEND_GRAPHQL_URL at process startup,
+            // while browser requests use the same-origin proxy below. The
+            // endpoint value is only a backward-compatible build fallback.
             httpEndpoint: serverGraphqlUrl,
-            browserHttpEndpoint: config?.graphqlUrl || serverGraphqlUrl,
+            browserHttpEndpoint: frontendGraphqlProxyUrl,
+            httpLinkOptions: {
+              fetch: runtimeGraphqlFetch,
+            },
             // @nuxtjs/apollo attaches localStorage['token'] as the Bearer
             // (tokenStorage: 'localStorage'). plugins/apollo-auth.client.ts keeps
             // that key in sync with the server-session access token. (The old
@@ -353,6 +363,9 @@ export default defineNuxtConfig({
       // disables caching for the auth routes only.
       '/api/auth/**': { cache: false },
       '/api/session/**': { cache: false },
+      // GraphQL POST responses can be user-specific and proxyRequest returns a
+      // streaming response that Nitro's route cache cannot serialize.
+      '/api/graphql': { cache: false },
       // Cache other API routes
       '/api/**': {
         cache: {
@@ -375,6 +388,7 @@ export default defineNuxtConfig({
     },
   },
   plugins: [
+    { src: '@/plugins/00.runtime-instance-config', mode: 'all' },
     { src: '@/plugins/pinia', mode: 'all' },
     { src: '@/plugins/google-maps', mode: 'client' },
     { src: '@/plugins/performance.client', mode: 'client' },
@@ -383,10 +397,10 @@ export default defineNuxtConfig({
     { src: '@/plugins/test-auth.client', mode: 'client' },
   ],
   runtimeConfig: {
-    // Optional server-only GraphQL URL. Docker deployments use this to reach
-    // the backend over the Compose network while the browser keeps using the
-    // public URL below (usually http://localhost:4000 for local quick-starts).
-    backendGraphqlUrl: '',
+    // Server-only GraphQL URL. Docker deployments override it at runtime to
+    // reach the backend over the private Compose network; browsers use the
+    // same-origin /api/graphql proxy instead.
+    backendGraphqlUrl: serverGraphqlUrl,
     // Optional explicit backend token URL for local development auth. When it
     // is empty, the server derives /auth/local-dev/token from the server-side
     // GraphQL URL above, then falls back to the public browser URL.
@@ -395,13 +409,16 @@ export default defineNuxtConfig({
     // These are overridden by NUXT_AUTH0_* env vars at runtime (see
     // .env.auth0-nuxt.example). clientSecret + sessionSecret mean this is a
     // CONFIDENTIAL "Regular Web Application" in Auth0 — a different app type
-    // than the current SPA. Empty defaults are intentional: the module only
-    // needs them when an /auth/* route is hit, so dev still boots without them.
+    // than the current SPA.
     auth0: {
-      domain: '',
-      clientId: '',
-      clientSecret: '',
-      sessionSecret: '',
+      // The Auth0 module validates these fields even when local-dev auth is
+      // selected. Inert defaults let one image boot in either mode; the Nitro
+      // startup validator rejects them whenever authProvider is actually
+      // `auth0`, so production still requires real NUXT_AUTH0_* secrets.
+      domain: DORMANT_AUTH0_CONFIG.domain,
+      clientId: DORMANT_AUTH0_CONFIG.clientId,
+      clientSecret: DORMANT_AUTH0_CONFIG.clientSecret,
+      sessionSecret: DORMANT_AUTH0_CONFIG.sessionSecret,
       appBaseUrl: 'http://localhost:3000',
       audience: '',
       // Spread by the SDK into the session store's cookie options. The session
@@ -415,6 +432,21 @@ export default defineNuxtConfig({
       },
     },
     public: {
+      // Deployment-specific values use matching NUXT_PUBLIC_* environment
+      // variables at container startup. VITE_* remains the build-time fallback
+      // for existing development and Vercel deployments.
+      baseUrl: config.baseUrl,
+      environment: config.environment,
+      googleCloudStorageBucket: config.googleCloudStorageBucket,
+      googleMapsApiKey: config.googleMapsApiKey,
+      googleMapId: config.googleMapId,
+      graphqlUrl: frontendGraphqlProxyUrl,
+      logoutUrl: config.logoutUrl,
+      openCageApiKey: config.openCageApiKey,
+      openGraphApiKey: config.openGraphApiKey,
+      serverName: config.serverName,
+      serverDisplayName: config.serverDisplayName,
+      enableLanguagePicker: config.enableLanguagePicker,
       authProvider:
         process.env.NUXT_PUBLIC_AUTH_PROVIDER === 'local-dev'
           ? 'local-dev'
@@ -422,7 +454,7 @@ export default defineNuxtConfig({
       apollo: {
         clients: {
           default: {
-            httpEndpoint: config?.graphqlUrl || '',
+            httpEndpoint: frontendGraphqlProxyUrl,
           },
         },
       },

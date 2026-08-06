@@ -70,6 +70,12 @@ docker compose \
 Set `MULTIFORUM_BACKEND_REPOSITORY` and `MULTIFORUM_BACKEND_REF` in
 `.env.quickstart` to choose the source revision for that command.
 
+The frontend currently builds locally, but its deployment-specific settings
+are runtime configurable so the same artifact can be reused by the upcoming
+official frontend image. See
+[frontend runtime configuration](./frontend-runtime-configuration.md) for the
+supported `NUXT_*` variables.
+
 ## Stop or reset the stack
 
 Stop the containers without deleting data:
