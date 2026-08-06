@@ -10,7 +10,7 @@ Start a usable local instance, including Neo4j, the backend, the frontend, and
 an automatically provisioned administrator:
 
 ```bash
-docker compose up --build
+docker compose up
 ```
 
 Then open [http://localhost:3000](http://localhost:3000) and sign in with the

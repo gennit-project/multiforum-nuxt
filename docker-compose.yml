@@ -82,10 +82,8 @@ services:
       - multiforum-network
 
   frontend:
-    image: ${MULTIFORUM_FRONTEND_IMAGE:-multiforum-frontend:quickstart}
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ${MULTIFORUM_FRONTEND_IMAGE:-ghcr.io/gennit-project/multiforum-nuxt:edge}
+    pull_policy: ${MULTIFORUM_FRONTEND_PULL_POLICY:-always}
     restart: unless-stopped
     ports:
       - '${MULTIFORUM_BIND_ADDRESS:-127.0.0.1}:3000:3000'
