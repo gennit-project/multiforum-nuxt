@@ -7,6 +7,7 @@ Developer documentation for the Multiforum Nuxt frontend. See the
 
 - [Local self-hosting quick-start](./self-hosting-quickstart.md) — start a usable instance with one Docker Compose command
 - [Frontend runtime configuration](./frontend-runtime-configuration.md) — configure one built frontend image at container startup
+- [Frontend container image](./frontend-container-image.md) — official image tags, architectures, and runtime behavior
 - [Development setup](./development-setup.md) — local environment and tooling
 - [AWS single-VM Terraform example](../deploy/terraform/aws-single-vm/README.md) — provision a Docker-ready self-hosting VM without storing app secrets in Terraform state
 - [Frontend architecture and authentication](./architecture-and-auth.md)

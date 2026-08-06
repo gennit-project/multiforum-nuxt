@@ -123,6 +123,7 @@ client.
 Start here:
 
 - [Local self-hosting quick-start](./docs/self-hosting-quickstart.md)
+- [Official frontend container image](./docs/frontend-container-image.md)
 - [Development setup](./docs/development-setup.md)
 - [AWS single-VM Terraform example](./deploy/terraform/aws-single-vm/README.md)
 - [Contributing guide](./CONTRIBUTING.md)

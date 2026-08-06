@@ -1,0 +1,194 @@
+name: Container image
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+concurrency:
+  group: container-image-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
+
+jobs:
+  build-publish-smoke:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Sign in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate image metadata
+        id: metadata
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          flavor: |
+            latest=auto
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          tags: |
+            type=ref,event=pr
+            type=raw,value=edge,enable=${{ github.ref == 'refs/heads/main' }}
+            type=sha,prefix=sha-
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+
+      - name: Build and optionally publish image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ github.event_name == 'pull_request' && 'linux/amd64' || 'linux/amd64,linux/arm64' }}
+          load: ${{ github.event_name == 'pull_request' }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: ${{ github.event_name != 'pull_request' && 'mode=max' || 'false' }}
+          sbom: ${{ github.event_name != 'pull_request' }}
+
+      - name: Select image for smoke test
+        id: smoke-image
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "value=${IMAGE_NAME}:pr-${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${IMAGE_NAME}@${DIGEST}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Start mock backend
+        run: |
+          set -euo pipefail
+          docker network create multiforum-frontend-image-smoke
+          docker run --detach \
+            --name multiforum-backend-mock \
+            --network multiforum-frontend-image-smoke \
+            node:26.5.1-alpine \
+            node -e 'require("http").createServer((_request,response)=>{response.writeHead(200,{"content-type":"application/json"});response.end(JSON.stringify({data:{imageSmoke:"ok"}}))}).listen(4000,"0.0.0.0")'
+
+      - name: Start Multiforum frontend image
+        env:
+          SMOKE_IMAGE: ${{ steps.smoke-image.outputs.value }}
+        run: |
+          set -euo pipefail
+          docker run --detach \
+            --name multiforum-frontend-smoke \
+            --network multiforum-frontend-image-smoke \
+            --publish 127.0.0.1:3000:3000 \
+            --env NUXT_PUBLIC_AUTH_PROVIDER=local-dev \
+            --env NUXT_PUBLIC_BASE_URL=http://127.0.0.1:3000 \
+            --env NUXT_PUBLIC_ENVIRONMENT=development \
+            --env NUXT_PUBLIC_SERVER_NAME='Image Smoke Test' \
+            --env NUXT_PUBLIC_SERVER_DISPLAY_NAME='Image Smoke Test' \
+            --env NUXT_BACKEND_GRAPHQL_URL=http://multiforum-backend-mock:4000/graphql \
+            --env NUXT_LOCAL_AUTH_TOKEN_ENDPOINT=http://multiforum-backend-mock:4000/auth/local-dev/token \
+            "$SMOKE_IMAGE"
+
+      - name: Verify frontend runtime behavior
+        run: |
+          set -euo pipefail
+          for _ in $(seq 1 60); do
+            status="$(docker inspect --format='{{.State.Health.Status}}' multiforum-frontend-smoke)"
+            if [ "$status" = "healthy" ]; then
+              break
+            fi
+            if [ "$status" = "unhealthy" ]; then
+              docker logs multiforum-frontend-smoke
+              exit 1
+            fi
+            sleep 5
+          done
+
+          test "$(docker inspect --format='{{.State.Health.Status}}' multiforum-frontend-smoke)" = healthy
+          test "$(docker inspect --format='{{.Config.User}}' multiforum-frontend-smoke)" = node
+
+          curl --fail --silent --show-error http://127.0.0.1:3000/login \
+            | grep --fixed-strings 'Image Smoke Test' >/dev/null
+          curl --fail --silent --show-error \
+            --header 'content-type: application/json' \
+            --data '{"query":"query ImageSmoke { imageSmoke }"}' \
+            http://127.0.0.1:3000/api/graphql \
+            | grep --fixed-strings '"imageSmoke":"ok"' >/dev/null
+
+      - name: Verify incomplete Auth0 configuration is rejected
+        env:
+          SMOKE_IMAGE: ${{ steps.smoke-image.outputs.value }}
+        run: |
+          set -euo pipefail
+          docker run --detach \
+            --name multiforum-frontend-auth0-smoke \
+            --env NUXT_PUBLIC_AUTH_PROVIDER=auth0 \
+            "$SMOKE_IMAGE"
+
+          for _ in $(seq 1 30); do
+            running="$(docker inspect --format='{{.State.Running}}' multiforum-frontend-auth0-smoke)"
+            if [ "$running" = "false" ]; then
+              break
+            fi
+            sleep 1
+          done
+
+          test "$(docker inspect --format='{{.State.Running}}' multiforum-frontend-auth0-smoke)" = false
+          test "$(docker inspect --format='{{.State.ExitCode}}' multiforum-frontend-auth0-smoke)" != 0
+          docker logs multiforum-frontend-auth0-smoke 2>&1 \
+            | grep --fixed-strings 'Auth0 runtime configuration is missing' >/dev/null
+
+      - name: Show container logs on failure
+        if: failure()
+        run: |
+          docker logs multiforum-backend-mock || true
+          docker logs multiforum-frontend-smoke || true
+          docker logs multiforum-frontend-auth0-smoke || true
+
+      - name: Clean up smoke containers
+        if: always()
+        run: |
+          docker rm --force multiforum-backend-mock multiforum-frontend-smoke multiforum-frontend-auth0-smoke || true
+          docker network rm multiforum-frontend-image-smoke || true
+
+      # GITHUB_TOKEN can publish repository-linked packages but cannot change
+      # organization package visibility. An organization owner must make the
+      # package public once; every publication then proves anonymous access.
+      - name: Verify the published image is public
+        if: github.event_name != 'pull_request'
+        env:
+          PUBLISHED_IMAGE: ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+        run: |
+          set -euo pipefail
+          anonymous_docker_config="$(mktemp -d)"
+          trap 'rm -rf "$anonymous_docker_config"' EXIT
+          DOCKER_CONFIG="$anonymous_docker_config" docker pull "$PUBLISHED_IMAGE"
