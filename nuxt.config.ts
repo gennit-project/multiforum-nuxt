@@ -18,7 +18,7 @@ const runtimeGraphqlFetch: typeof globalThis.fetch = (input, init) => {
   const target =
     typeof window === 'undefined'
       ? runtimeBackendUrl || input
-      : frontendGraphqlProxyUrl;
+      : input;
   return globalThis.fetch(target, init);
 };
 const ignoredDevWatchPatterns = [
