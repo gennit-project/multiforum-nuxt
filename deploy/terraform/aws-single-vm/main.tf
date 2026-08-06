@@ -61,6 +61,8 @@ resource "aws_instance" "multiforum" {
   vpc_security_group_ids      = [aws_security_group.multiforum.id]
 
   user_data = templatefile("${path.module}/cloud-init.tftpl", {
+    backend_image  = var.backend_image
+    frontend_image = var.frontend_image
     repository_ref = var.repository_ref
   })
 

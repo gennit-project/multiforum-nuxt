@@ -2,19 +2,22 @@
 
 This example creates one Ubuntu 24.04 EC2 instance for Multiforum, installs
 Docker and Docker Compose with cloud-init, clones the frontend repository into
-`/opt/multiforum`, and assigns a stable Elastic IP. It is deliberately a small
-operator-owned starting point, not a managed production platform.
+`/opt/multiforum` for its deployment configuration, pre-pulls the official
+backend and frontend images, and assigns a stable Elastic IP. It is deliberately
+a small operator-owned starting point, not a managed production platform.
 
-Terraform does **not** receive application secrets. Auth0 credentials, the
+Terraform does **not** receive application secrets. The bootstrap credentials,
 Neo4j password, and optional integration keys therefore stay out of Terraform
-plans and state. You add them directly on the host after provisioning.
+plans and state. The selected non-secret image references are stored in state
+and written to `/opt/multiforum/.env.quickstart`; you add secrets directly on
+the host after provisioning.
 
 ## What it creates
 
 - one EC2 instance in the account's default VPC;
 - one encrypted gp3 root volume (40 GiB by default), including Docker volumes;
 - one security group exposing SSH only to `admin_cidr`;
-- port 3000 to `application_cidrs` (public by default); and
+- port 3000 only to the explicitly configured `application_cidrs`; and
 - one Elastic IP for a stable address.
 
 Neo4j's ports (7474 and 7687) and the backend port (4000) are not admitted by
@@ -48,7 +51,9 @@ address. Terraform prints the resulting SSH command and temporary application
 URL.
 
 Cloud-init may continue installing packages for a few minutes after EC2 reports
-the instance as running. Follow its progress with:
+the instance as running. It clones the selected `repository_ref`, writes the
+selected image references, and runs `docker compose pull`. Follow its progress
+with:
 
 ```bash
 ssh ubuntu@PUBLIC_IP
@@ -57,38 +62,49 @@ cloud-init status --wait
 
 ## Configure and start Multiforum
 
-On the host, create `/opt/multiforum/.env` from the repository example and fill
-in strong, real values. The current application stack requires Auth0 for login;
-maps, geocoding, mail, and storage remain optional and degrade when omitted.
+Cloud-init creates `/opt/multiforum/.env.quickstart` from the repository example
+and injects the selected image references. On the host, replace the default
+credentials with strong, unique values before starting. Maps, geocoding, mail,
+and storage remain optional and degrade when omitted.
 
 ```bash
 cd /opt/multiforum
-cp .env.example .env
-$EDITOR .env
-docker compose up -d --build
+$EDITOR .env.quickstart
+docker compose --env-file .env.quickstart up -d
 docker compose ps
 ```
 
-Do not use the placeholder Neo4j password. Keep `NEO4J_AUTH` and
-`NEO4J_PASSWORD` consistent, and configure the Auth0 callback/base URLs for the
-address users will visit.
+Do not use either placeholder password left in `.env.quickstart` by cloud-init.
 
-Port 3000 serves plain HTTP only. Before allowing public users, put a TLS
-reverse proxy or load balancer in front of the instance, configure a domain,
-and remove public port-3000 access. A future module can make that advanced path
-repeatable without coupling the basic example to a specific DNS provider.
+This stack uses Multiforum's local development authentication and is for a
+private evaluation environment only. Restrict `application_cidrs` to trusted
+addresses and do not expose this configuration as a public production forum.
+
+Port 3000 serves plain HTTP only. A public production deployment also needs a
+production identity provider, a TLS reverse proxy or load balancer, a domain,
+and removal of public port-3000 access. Those production-hardening steps remain
+outside this private evaluation example.
 
 ## Updating and destroying
 
-Application updates are explicit so an infrastructure plan cannot silently
-change the running forum:
+The image inputs select the initial installation; Terraform is deliberately not
+an in-place application updater. Update an existing host explicitly:
 
 ```bash
+ssh ubuntu@PUBLIC_IP
 cd /opt/multiforum
 git fetch --tags
 git checkout RELEASE_TAG
-docker compose up -d --build
+# Set the new backend and frontend image references.
+$EDITOR .env.quickstart
+docker compose --env-file .env.quickstart pull
+docker compose --env-file .env.quickstart up -d
 ```
+
+Cloud-init runs only when the instance is first created. Before provisioning a
+replacement host, update `repository_ref`, `backend_image`, and `frontend_image`
+in `terraform.tfvars` to match the revisions you tested. Automated in-place
+application upgrades are deliberately outside this example's current scope.
 
 The Canonical SSM parameter selects the current Ubuntu 24.04 image when the
 instance is first created. Later AMI changes are ignored because replacing this
