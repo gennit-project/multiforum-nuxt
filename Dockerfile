@@ -21,6 +21,7 @@ COPY . .
 # Deployment-specific configuration is supplied when the built server starts,
 # so this image can be promoted between environments without rebuilding.
 ENV NITRO_PRESET=node-server
+ENV MULTIFORUM_DATA_DIR=/app/data
 
 RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm run build
 
@@ -37,6 +38,10 @@ ENV NODE_ENV=production
 ENV PORT=3000
 
 COPY --from=build --chown=node:node /app/.output ./.output
+
+# The node-server build persists Auth0 sessions here. Creating the mount point
+# in the image gives new named volumes the non-root runtime user's ownership.
+RUN mkdir -p /app/data && chown node:node /app/data
 
 USER node
 EXPOSE 3000

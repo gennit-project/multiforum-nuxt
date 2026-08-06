@@ -27,8 +27,8 @@ variables below.
 
 Nuxt exposes every `NUXT_PUBLIC_*` value to the browser. Do not put secrets in
 these variables. Auth0 client secrets and session secrets belong in the
-server-only `NUXT_AUTH0_*` variables described by
-[`.env.auth0-nuxt.example`](../.env.auth0-nuxt.example).
+server-only `NUXT_AUTH0_*` variables demonstrated by
+[`.env.production.example`](../.env.production.example).
 
 The image contains inert Auth0 placeholders solely because the Auth0 module
 validates its shape even in `local-dev` mode. Selecting `auth0` without real

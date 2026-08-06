@@ -10,14 +10,13 @@
 // only a small session id in the cookie and stores the tokens server-side.
 //
 // The 'auth0Sessions' storage mount is configured in nuxt.config (nitro):
-// Upstash Redis in production (a shared, persistent store across serverless
-// function instances) and a filesystem driver in local dev (nitro.devStorage).
-// Both survive restarts. With in-memory storage, every restart orphaned the
-// browser's session cookie (its id no longer in the store), which the SDK then
-// deleted on the resulting store miss, silently logging the user out — a shared
-// persistent store avoids that cascade. This store implementation is driver-
-// agnostic: it only talks to the unstorage interface, so the driver can change
-// without touching this file.
+// Upstash Redis is shared across serverless function instances, while local
+// development and the single-node container use a persistent filesystem mount.
+// With in-memory storage, every restart orphaned the browser's session cookie
+// (its id no longer in the store), which the SDK then deleted on the resulting
+// store miss, silently logging the user out. This implementation is driver-
+// agnostic: it only talks to unstorage, so the driver can change without
+// touching this file.
 import type {
   SessionStore,
   StateData,

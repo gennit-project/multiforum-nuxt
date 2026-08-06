@@ -1,0 +1,15 @@
+{
+	email {$CADDY_ACME_EMAIL}
+}
+
+{$MULTIFORUM_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy frontend:3000
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+}
