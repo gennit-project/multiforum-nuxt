@@ -82,9 +82,10 @@ small backend-for-frontend under [`server/`](../server):
   session access token and profile to the client (used by the embedded-browser
   token fallback).
 - **Caching** is configured in [`nuxt.config.ts`](../nuxt.config.ts) via Nitro
-  `routeRules` and storage mounts (Upstash Redis in production, filesystem in
-  dev). Auth-personalized forum detail pages are deliberately **not** route
-  cached — a shared cache would leak one user's personalized render to others.
+  `routeRules` and storage mounts (Upstash Redis on serverless deployments,
+  persistent filesystem storage for development and the single-node image).
+  Auth-personalized forum detail pages are deliberately **not** route cached —
+  a shared cache would leak one user's personalized render to others.
 
 ### Rendering — Nuxt SSR + hydration
 
