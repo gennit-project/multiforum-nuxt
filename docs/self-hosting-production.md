@@ -185,6 +185,93 @@ archives; incomplete or unrelated paths are not deleted. The local schedule is
 not an off-host backup: arrange encrypted transfer separately, monitor both the
 timer and that transfer, and alert when either stops succeeding.
 
+### Encrypt and copy backups off the host
+
+The single-VM image includes Restic, and cloud-init stages an inactive systemd
+drop-in for encrypted off-host uploads. Restic supports several remote storage
+backends; select one from its
+[repository documentation](https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html)
+and grant the host access only to the dedicated backup location.
+
+Copy the staged configuration, restrict it, and create an independent Restic
+password file. Set a repository, add any provider credentials required by that
+backend, and choose a tag unique to this Multiforum instance:
+
+```bash
+sudo install -m 0600 \
+  /etc/multiforum/restic.env.example \
+  /etc/multiforum/restic.env
+sudo install -m 0600 /dev/null /etc/multiforum/restic-password
+sudoedit /etc/multiforum/restic.env
+sudoedit /etc/multiforum/restic-password
+```
+
+Store the Restic password separately from both the server and the backup
+repository. Without it, the encrypted remote snapshots cannot be restored.
+Initialize the empty repository once:
+
+```bash
+sudo bash -c '
+  set -a
+  source /etc/multiforum/restic.env
+  set +a
+  restic init
+'
+```
+
+Test an upload before connecting it to the timer. The command selects the
+newest complete local bundle, verifies its manifest and both SHA-256 checksums,
+uploads it under the configured tag, and only then applies remote retention:
+
+```bash
+sudo bash -c '
+  set -a
+  source /etc/multiforum/restic.env
+  set +a
+  /opt/multiforum/scripts/upload-self-hosting-backup.sh \
+    --backup-root /var/backups/multiforum \
+    --keep-daily "$MULTIFORUM_BACKUP_RESTIC_KEEP_DAILY" \
+    --tag "$MULTIFORUM_BACKUP_RESTIC_TAG"
+'
+```
+
+After a successful manual upload, activate the staged systemd drop-in:
+
+```bash
+sudo install -m 0644 \
+  /etc/systemd/system/multiforum-backup.service.d/offsite.conf.example \
+  /etc/systemd/system/multiforum-backup.service.d/offsite.conf
+sudo systemctl daemon-reload
+sudo systemctl start multiforum-backup.service
+sudo systemctl enable --now multiforum-backup.timer
+```
+
+The upload runs only after the local cold backup succeeds. A remote or retention
+failure marks the service failed but does not delete the newly completed local
+bundle. Monitor the systemd unit and configure an external alert; periodically
+run `restic check` and perform a restore drill on a separate host.
+
+To retrieve the newest remote bundle for a guarded restore, load the same
+Restic configuration and restore the instance tag into an empty temporary
+directory:
+
+```bash
+sudo install -d -m 0700 /var/tmp/multiforum-restic-restore
+sudo bash -c '
+  set -a
+  source /etc/multiforum/restic.env
+  set +a
+  restic restore latest \
+    --tag "$MULTIFORUM_BACKUP_RESTIC_TAG" \
+    --target /var/tmp/multiforum-restic-restore
+'
+sudo find /var/tmp/multiforum-restic-restore -name manifest.json -print
+```
+
+Locate the restored bundle containing that manifest, inspect it, and pass its
+directory to the guarded restore command below. Securely remove the temporary
+restore tree when the recovery exercise is complete.
+
 ### Restore a cold backup
 
 Restore onto a separate host first whenever possible. Before replacing the

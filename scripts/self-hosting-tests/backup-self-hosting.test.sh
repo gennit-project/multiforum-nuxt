@@ -79,6 +79,11 @@ for timestamp in 20260101T000000Z 20260201T000000Z 20260301T000000Z; do
   : >"$bundle/neo4j-data.tar.gz"
   : >"$bundle/frontend-data.tar.gz"
 done
+decoy_bundle="$retention_root/multiforum-backup-zzzzzzzzTzzzzzzZ"
+mkdir -p "$decoy_bundle"
+: >"$decoy_bundle/manifest.json"
+: >"$decoy_bundle/neo4j-data.tar.gz"
+: >"$decoy_bundle/frontend-data.tar.gz"
 incomplete_bundle="$retention_root/multiforum-backup-20250101T000000Z"
 mkdir -p "$incomplete_bundle"
 : >"$incomplete_bundle/manifest.json"
@@ -98,7 +103,9 @@ fi
 
 complete_bundle_count=0
 for bundle in "$retention_root"/multiforum-backup-*; do
-  if [[ -f "$bundle/manifest.json" &&
+  bundle_name="${bundle##*/}"
+  if [[ "$bundle_name" =~ ^multiforum-backup-[0-9]{8}T[0-9]{6}Z$ &&
+    -f "$bundle/manifest.json" &&
     -f "$bundle/neo4j-data.tar.gz" &&
     -f "$bundle/frontend-data.tar.gz" ]]; then
     ((complete_bundle_count += 1))
@@ -110,6 +117,7 @@ if ((complete_bundle_count != 2)); then
 fi
 test -d "$retention_root/multiforum-backup-20260301T000000Z"
 test -d "$incomplete_bundle"
+test -d "$decoy_bundle"
 test ! -e "$retention_root/multiforum-backup-20260101T000000Z"
 test ! -e "$retention_root/multiforum-backup-20260201T000000Z"
 

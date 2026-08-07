@@ -34,6 +34,17 @@ cd "$contract_root"
 echo "Testing the production cold-backup command..."
 scripts/self-hosting-tests/backup-self-hosting.test.sh
 
+echo "Testing encrypted off-site backup uploads..."
+scripts/self-hosting-tests/upload-self-hosting-backup.test.sh
+if command -v restic >/dev/null 2>&1; then
+  scripts/self-hosting-tests/upload-self-hosting-backup.integration.test.sh
+elif [[ "${MULTIFORUM_REQUIRE_RESTIC_INTEGRATION:-false}" == true ]]; then
+  echo "Required command not found: restic" >&2
+  exit 1
+else
+  echo "Skipping the real Restic integration test because restic is unavailable."
+fi
+
 echo "Testing the guarded production restore command..."
 scripts/self-hosting-tests/restore-self-hosting.test.sh
 
@@ -58,6 +69,16 @@ grep --fixed-strings 'Persistent=true' \
   deploy/systemd/multiforum-backup.timer >/dev/null
 grep --fixed-strings 'RandomizedDelaySec=30m' \
   deploy/systemd/multiforum-backup.timer >/dev/null
+grep --fixed-strings \
+  'EnvironmentFile=/etc/multiforum/restic.env' \
+  deploy/systemd/multiforum-backup-offsite.conf >/dev/null
+grep --fixed-strings \
+  'ExecStartPost=/opt/multiforum/scripts/upload-self-hosting-backup.sh --backup-root ${MULTIFORUM_BACKUP_OUTPUT_DIR} --keep-daily ${MULTIFORUM_BACKUP_RESTIC_KEEP_DAILY} --tag ${MULTIFORUM_BACKUP_RESTIC_TAG}' \
+  deploy/systemd/multiforum-backup-offsite.conf >/dev/null
+grep --fixed-strings 'RESTIC_PASSWORD_FILE=/etc/multiforum/restic-password' \
+  deploy/systemd/multiforum-restic.env.example >/dev/null
+grep --fixed-strings 'MULTIFORUM_BACKUP_RESTIC_KEEP_DAILY=30' \
+  deploy/systemd/multiforum-restic.env.example >/dev/null
 
 echo "Validating the image-based quick-start contract..."
 docker compose \
