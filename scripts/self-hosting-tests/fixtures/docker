@@ -90,6 +90,23 @@ if [[ "${1:-}" == "compose" ]]; then
         exit 47
       fi
       ;;
+    *" up -d --wait --wait-timeout 300 database backend frontend "*)
+      if [[ "${MULTIFORUM_BOOTSTRAP_USERNAME:-}" != release_smoke_admin ]]; then
+        echo "Release smoke must use a backend-compatible bootstrap username." >&2
+        exit 51
+      fi
+      if [[ "${MULTIFORUM_FAKE_FAIL_RELEASE_SMOKE_START:-false}" == true ]]; then
+        exit 49
+      fi
+      ;;
+    *" down --volumes --remove-orphans "*)
+      ;;
+    *" logs --no-color --tail=200 database backend frontend "*)
+      printf 'release smoke fixture logs\n'
+      ;;
+    *" ps "*)
+      printf 'database running\nbackend running\nfrontend running\n'
+      ;;
     *)
       echo "Unexpected fake Docker Compose command: $*" >&2
       exit 90
@@ -122,6 +139,12 @@ elif [[ "${1:-}" == "inspect" ]]; then
   release_version="${MULTIFORUM_FAKE_RUNNING_RELEASE_VERSION:-1.2.3}"
   printf '%s|%s|%s|%s\n' "$image" "$status" "$health" "$release_version"
 elif [[ "${1:-}" == "run" ]]; then
+  if [[ "$*" == *"caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile"* ]]; then
+    if [[ "${MULTIFORUM_FAKE_FAIL_CADDY_VALIDATION:-false}" == true ]]; then
+      exit 50
+    fi
+    exit 0
+  fi
   if [[ "$*" == *":/target"* ]]; then
     cat >/dev/null
     if [[ "${MULTIFORUM_FAKE_FAIL_RESTORE_FRONTEND:-false}" == true && "$*" == *"frontend-volume:/target"* ]]; then

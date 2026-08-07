@@ -8,6 +8,24 @@ if [[ "${MULTIFORUM_FAKE_CURL_FAIL:-false}" == true ]]; then
   exit 22
 fi
 
+if [[ "$*" == *"/api/auth/local-dev/login"* ]]; then
+  if [[ "${MULTIFORUM_FAKE_LOGIN_FAIL:-false}" == true ]]; then
+    printf '%s\n' '{"authenticated":false}'
+  else
+    printf '%s\n' '{"authenticated":true,"expiresIn":900}'
+  fi
+  exit 0
+fi
+
+if [[ "$*" == *"/api/session/profile"* ]]; then
+  if [[ "${MULTIFORUM_FAKE_PROFILE_FAIL:-false}" == true ]]; then
+    printf '%s\n' '{"isAuthenticated":false,"username":""}'
+  else
+    printf '%s\n' '{"isAuthenticated":true,"username":"release_smoke_admin"}'
+  fi
+  exit 0
+fi
+
 if [[ "$*" == *"/api/graphql"* ]]; then
   if [[ "${MULTIFORUM_FAKE_GRAPHQL_FAIL:-false}" == true ]]; then
     printf '%s\n' '{"errors":[{"message":"unavailable"}]}'
