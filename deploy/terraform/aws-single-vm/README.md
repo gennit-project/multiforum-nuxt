@@ -77,8 +77,9 @@ Cloud-init clones the selected repository revision, copies
 `.env.production.example` to `.env.production`, injects the non-secret Terraform
 inputs, restricts the file to mode `0600`, and pre-pulls Neo4j, backend,
 frontend, and Caddy images. It also stages—but does not enable—the production
-backup service and daily timer. It deliberately does not start Compose or the
-backup timer while the required secrets are empty.
+backup service, daily timer, Restic configuration example, and encrypted
+off-site upload drop-in. It deliberately does not start Compose, activate
+off-site storage, or enable the backup timer while required secrets are empty.
 
 ## Configure Auth0 and secrets
 
@@ -150,8 +151,10 @@ systemctl list-timers multiforum-backup.timer
 ```
 
 The default retains seven complete local bundles. Follow the production guide
-to monitor the unit and arrange encrypted off-host transfer; the timer alone
-does not protect data from instance or regional loss.
+to configure the staged
+[encrypted off-host upload](../../../docs/self-hosting-production.md#encrypt-and-copy-backups-off-the-host),
+monitor the unit, and perform restore drills. The local timer alone does not
+protect data from instance or regional loss.
 
 ## Updates and destruction
 

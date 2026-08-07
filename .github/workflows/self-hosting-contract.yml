@@ -14,6 +14,7 @@ on:
       - 'docker-compose*.yml'
       - 'scripts/backup-self-hosting.sh'
       - 'scripts/restore-self-hosting.sh'
+      - 'scripts/upload-self-hosting-backup.sh'
       - 'scripts/upgrade-self-hosting.sh'
       - 'scripts/verify-self-hosting.sh'
       - 'scripts/self-hosting-tests/**'
@@ -31,6 +32,7 @@ on:
       - 'docker-compose*.yml'
       - 'scripts/backup-self-hosting.sh'
       - 'scripts/restore-self-hosting.sh'
+      - 'scripts/upload-self-hosting-backup.sh'
       - 'scripts/upgrade-self-hosting.sh'
       - 'scripts/verify-self-hosting.sh'
       - 'scripts/self-hosting-tests/**'
@@ -53,5 +55,12 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v4
 
+      - name: Install Restic
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes restic
+
       - name: Validate self-hosting deployment contract
+        env:
+          MULTIFORUM_REQUIRE_RESTIC_INTEGRATION: 'true'
         run: scripts/validate-self-hosting-contract.sh

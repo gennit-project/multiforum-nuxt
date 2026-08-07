@@ -6,6 +6,7 @@ packages:
   - docker.io
   - docker-compose-v2
   - git
+  - restic
 
 runcmd:
   - systemctl enable --now docker
@@ -23,8 +24,11 @@ runcmd:
   - chown -R ubuntu:ubuntu /opt/multiforum
   - install -d -m 0700 /etc/multiforum /var/backups/multiforum
   - install -m 0600 /opt/multiforum/deploy/systemd/multiforum-backup.env.example /etc/multiforum/backup.env
+  - install -m 0600 /opt/multiforum/deploy/systemd/multiforum-restic.env.example /etc/multiforum/restic.env.example
   - install -m 0644 /opt/multiforum/deploy/systemd/multiforum-backup.service /etc/systemd/system/multiforum-backup.service
   - install -m 0644 /opt/multiforum/deploy/systemd/multiforum-backup.timer /etc/systemd/system/multiforum-backup.timer
+  - install -d -m 0755 /etc/systemd/system/multiforum-backup.service.d
+  - install -m 0644 /opt/multiforum/deploy/systemd/multiforum-backup-offsite.conf /etc/systemd/system/multiforum-backup.service.d/offsite.conf.example
   - systemctl daemon-reload
   - docker pull '${neo4j_image}'
   - docker pull '${backend_image}'

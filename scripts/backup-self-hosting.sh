@@ -225,7 +225,9 @@ services_stopped=false
 if [[ -n "$retention_count" ]]; then
   complete_backups=()
   while IFS= read -r backup_dir; do
-    if [[ -f "$backup_dir/manifest.json" &&
+    backup_name="${backup_dir##*/}"
+    if [[ "$backup_name" =~ ^multiforum-backup-[0-9]{8}T[0-9]{6}Z$ &&
+      -f "$backup_dir/manifest.json" &&
       -f "$backup_dir/neo4j-data.tar.gz" &&
       -f "$backup_dir/frontend-data.tar.gz" ]]; then
       complete_backups+=("$backup_dir")

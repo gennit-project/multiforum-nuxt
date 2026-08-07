@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+printf '%s\n' "$*" >>"$MULTIFORUM_FAKE_RESTIC_LOG"
+
+case "${1:-}" in
+  backup)
+    if [[ "${MULTIFORUM_FAKE_RESTIC_FAIL_BACKUP:-false}" == true ]]; then
+      exit 51
+    fi
+    ;;
+  forget)
+    if [[ "${MULTIFORUM_FAKE_RESTIC_FAIL_FORGET:-false}" == true ]]; then
+      exit 52
+    fi
+    ;;
+  *)
+    echo "Unexpected fake Restic command: $*" >&2
+    exit 90
+    ;;
+esac
