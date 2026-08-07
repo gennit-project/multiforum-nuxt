@@ -52,14 +52,18 @@ scripts/validate-self-hosting-release.sh \
   --manifest multiforum-self-hosting-release.json
 ```
 
-After copying its version and image references into `.env.production.next`,
-validate the complete resolved deployment:
+Prepare and validate the complete resolved deployment without copying the
+manifest values into `.env.production.next` by hand:
 
 ```bash
-scripts/validate-self-hosting-release.sh \
+scripts/prepare-self-hosting-upgrade.sh \
   --manifest multiforum-self-hosting-release.json \
-  --env-file .env.production.next
+  --current-env-file .env.production \
+  --output-env-file .env.production.next
 ```
 
-The second form rejects any image mismatch and requires every production
+The command preserves the current secrets and instance configuration, replaces
+only the five release-controlled settings, and refuses to expose the candidate
+unless its resolved production Compose model matches the manifest. The
+underlying validator rejects any image mismatch and requires every production
 container to carry the same `net.multiforum.release` label.

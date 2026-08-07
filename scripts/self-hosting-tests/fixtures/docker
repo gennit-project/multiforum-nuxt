@@ -7,23 +7,44 @@ printf '%s\n' "$*" >>"$MULTIFORUM_FAKE_DOCKER_LOG"
 if [[ "${1:-}" == "compose" ]]; then
   case " $* " in
     *" config --format json "*)
-      if [[ "$*" == *"target.env"* ]]; then
+      env_file=""
+      previous_argument=""
+      for argument in "$@"; do
+        if [[ "$previous_argument" == "--env-file" ]]; then
+          env_file="$argument"
+          break
+        fi
+        previous_argument="$argument"
+      done
+      release_from_env=""
+      if [[ -n "$env_file" && -f "$env_file" ]]; then
+        release_from_env="$(awk -F= '$1 == "MULTIFORUM_RELEASE_VERSION" {sub(/^[^=]*=/, ""); value = $0} END {print value}' "$env_file")"
+      fi
+      if [[ -n "$release_from_env" ]]; then
+        database_image="$(awk -F= '$1 == "MULTIFORUM_NEO4J_IMAGE" {sub(/^[^=]*=/, ""); value = $0} END {print value}' "$env_file")"
+        backend_image="$(awk -F= '$1 == "MULTIFORUM_BACKEND_IMAGE" {sub(/^[^=]*=/, ""); value = $0} END {print value}' "$env_file")"
+        frontend_image="$(awk -F= '$1 == "MULTIFORUM_FRONTEND_IMAGE" {sub(/^[^=]*=/, ""); value = $0} END {print value}' "$env_file")"
+        caddy_image="$(awk -F= '$1 == "MULTIFORUM_CADDY_IMAGE" {sub(/^[^=]*=/, ""); value = $0} END {print value}' "$env_file")"
+        release_version="$release_from_env"
+      elif [[ "$*" == *"target.env"* ]]; then
         database_image="${MULTIFORUM_FAKE_TARGET_DATABASE_IMAGE:-neo4j:test}"
         backend_image="${MULTIFORUM_FAKE_TARGET_BACKEND_IMAGE:-ghcr.io/example/backend:1.2.3}"
         frontend_image="${MULTIFORUM_FAKE_TARGET_FRONTEND_IMAGE:-ghcr.io/example/frontend:1.2.3}"
         caddy_image="${MULTIFORUM_FAKE_TARGET_CADDY_IMAGE:-caddy:2.11.4-alpine}"
+        release_version="${MULTIFORUM_FAKE_RELEASE_VERSION:-1.2.3}"
       else
         database_image="neo4j:test"
         backend_image="ghcr.io/example/backend:test"
         frontend_image="ghcr.io/example/frontend:test"
         caddy_image="caddy:test"
+        release_version="${MULTIFORUM_FAKE_RELEASE_VERSION:-1.2.3}"
       fi
       jq --null-input \
         --arg databaseImage "$database_image" \
         --arg backendImage "$backend_image" \
         --arg frontendImage "$frontend_image" \
         --arg caddyImage "$caddy_image" \
-        --arg releaseVersion "${MULTIFORUM_FAKE_RELEASE_VERSION:-1.2.3}" \
+        --arg releaseVersion "${MULTIFORUM_FAKE_RELEASE_VERSION:-$release_version}" \
         '
 {
   "services": {

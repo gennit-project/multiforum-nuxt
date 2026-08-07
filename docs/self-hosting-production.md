@@ -398,15 +398,21 @@ Prepare upgrades in a separate protected environment file so the known-good
 configuration remains available for rollback:
 
 ```bash
-cp -p .env.production .env.production.next
-$EDITOR .env.production.next
+scripts/prepare-self-hosting-upgrade.sh \
+  --manifest multiforum-self-hosting-release.json \
+  --current-env-file .env.production \
+  --output-env-file .env.production.next
 ```
 
-Set explicit release or immutable `sha-*` tags for Neo4j, the backend, the
-frontend, and Caddy. The upgrade command rejects `edge`, `latest`, branch-like
-tags, and untagged target images. Review release notes for data or configuration
-migrations. Copy one complete release manifest into `.env.production.next` and
-validate it before running the upgrade:
+The preparation command validates the downloaded manifest, preserves every
+operator-owned setting and secret, changes only the release version and four
+image pins, protects the candidate with mode `0600`, and validates its resolved
+production Compose model before writing it atomically. It refuses to overwrite
+the active file, an existing candidate, or ambiguous duplicate release keys.
+Use `--replace-existing` only after reviewing or preserving an older candidate.
+
+Review release notes for data or configuration migrations. You can repeat the
+read-only validation before running the upgrade:
 
 ```bash
 scripts/validate-self-hosting-release.sh \

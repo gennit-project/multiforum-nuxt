@@ -35,6 +35,7 @@ echo "Testing the production release/version contract..."
 scripts/self-hosting-tests/validate-self-hosting-release.test.sh
 scripts/self-hosting-tests/create-self-hosting-release-manifest.test.sh
 scripts/self-hosting-tests/smoke-self-hosting-release.test.sh
+scripts/self-hosting-tests/prepare-self-hosting-upgrade.test.sh
 scripts/validate-self-hosting-release.sh \
   --manifest deploy/releases/self-hosting-release.example.json
 scripts/create-self-hosting-release-manifest.sh \
