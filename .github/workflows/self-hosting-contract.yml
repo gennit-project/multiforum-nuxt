@@ -7,6 +7,7 @@ on:
     paths:
       - '.env.quickstart.example'
       - '.env.production.example'
+      - '.github/workflows/container-image.yml'
       - '.github/workflows/self-hosting-contract.yml'
       - 'deploy/caddy/**'
       - 'deploy/releases/**'
@@ -15,6 +16,7 @@ on:
       - 'docker-compose*.yml'
       - 'scripts/backup-self-hosting.sh'
       - 'scripts/check-self-hosting-backups.sh'
+      - 'scripts/create-self-hosting-release-manifest.sh'
       - 'scripts/restore-self-hosting.sh'
       - 'scripts/validate-self-hosting-release.sh'
       - 'scripts/upload-self-hosting-backup.sh'
@@ -28,6 +30,7 @@ on:
     paths:
       - '.env.quickstart.example'
       - '.env.production.example'
+      - '.github/workflows/container-image.yml'
       - '.github/workflows/self-hosting-contract.yml'
       - 'deploy/caddy/**'
       - 'deploy/releases/**'
@@ -36,6 +39,7 @@ on:
       - 'docker-compose*.yml'
       - 'scripts/backup-self-hosting.sh'
       - 'scripts/check-self-hosting-backups.sh'
+      - 'scripts/create-self-hosting-release-manifest.sh'
       - 'scripts/restore-self-hosting.sh'
       - 'scripts/validate-self-hosting-release.sh'
       - 'scripts/upload-self-hosting-backup.sh'

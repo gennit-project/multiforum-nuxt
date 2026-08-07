@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "images": {
+    "database": "neo4j:5.1.0",
+    "backend": "ghcr.io/gennit-project/multiforum-backend:sha-a113caa2e045fb9c462d0c16279d75b5bc25152e",
+    "caddy": "caddy:2.11.4-alpine"
+  }
+}

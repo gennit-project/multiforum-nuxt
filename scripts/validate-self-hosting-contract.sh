@@ -33,8 +33,16 @@ cd "$contract_root"
 
 echo "Testing the production release/version contract..."
 scripts/self-hosting-tests/validate-self-hosting-release.test.sh
+scripts/self-hosting-tests/create-self-hosting-release-manifest.test.sh
 scripts/validate-self-hosting-release.sh \
   --manifest deploy/releases/self-hosting-release.example.json
+
+grep --fixed-strings \
+  'scripts/create-self-hosting-release-manifest.sh' \
+  .github/workflows/container-image.yml >/dev/null
+grep --fixed-strings \
+  'gh release upload "$GITHUB_REF_NAME"' \
+  .github/workflows/container-image.yml >/dev/null
 
 echo "Testing the production cold-backup command..."
 scripts/self-hosting-tests/backup-self-hosting.test.sh

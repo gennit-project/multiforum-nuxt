@@ -56,9 +56,9 @@ cp .env.production.example .env.production
 chmod 600 .env.production
 ```
 
-Obtain the self-hosting release manifest published with the release you intend
-to run. It is the machine-readable compatibility contract for the frontend,
-backend, Neo4j, and Caddy images. Copy its `release` value to
+Download the `multiforum-self-hosting-VERSION.json` asset from the GitHub
+Release you intend to run. It is the machine-readable compatibility contract
+for the frontend, backend, Neo4j, and Caddy images. Copy its `release` value to
 `MULTIFORUM_RELEASE_VERSION` and its four image references to the corresponding
 variables in `.env.production`. The file under
 `deploy/releases/self-hosting-release.example.json` documents the format; its

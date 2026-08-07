@@ -7,7 +7,8 @@ name: Release
 # conventional commit subjects (which the squash-merge PR-title check keeps
 # valid). Nothing is released until a maintainer merges that release PR — which
 # then tags the version, updates package.json + CHANGELOG.md, and cuts a
-# GitHub Release.
+# GitHub Release. The tag-triggered container workflow publishes the frontend
+# image and attaches its validated self-hosting release manifest to that release.
 on:
   push:
     branches:
