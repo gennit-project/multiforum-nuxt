@@ -155,6 +155,67 @@ encrypt it at rest, apply a retention policy, monitor scheduled runs, and test
 restoring onto a separate host. Use Neo4j's online backup tooling instead when
 your selected edition and recovery requirements support it.
 
+### Restore a cold backup
+
+Restore onto a separate host first whenever possible. Before replacing the
+current volumes, create a fresh safety backup and preserve the original
+`.env.production` in encrypted secret storage. Inspect the selected image
+versions recorded in the bundle:
+
+```bash
+jq .images /var/backups/multiforum/BACKUP_DIR/manifest.json
+```
+
+Configure the recorded Neo4j image before restoring. Neo4j stores are not
+generally portable across arbitrary database versions. Then stop the write
+path before the database:
+
+```bash
+docker compose \
+  --env-file .env.production \
+  -f docker-compose.yml \
+  -f docker-compose.production.yml \
+  stop frontend backend
+docker compose \
+  --env-file .env.production \
+  -f docker-compose.yml \
+  -f docker-compose.production.yml \
+  stop database
+```
+
+Run the guarded restore with its explicit destructive confirmation:
+
+```bash
+scripts/restore-self-hosting.sh \
+  --backup-dir /var/backups/multiforum/BACKUP_DIR \
+  --env-file .env.production \
+  --confirm-replace-existing-data
+```
+
+The command verifies the manifest, both SHA-256 checksums, archive paths, the
+stopped-service precondition, and the configured Neo4j image before replacing
+either volume. It never starts application services; once restoration begins,
+keep them stopped whether extraction succeeds or fails. After a successful
+restore, validate the Compose model and start the stack:
+
+```bash
+docker compose \
+  --env-file .env.production \
+  -f docker-compose.yml \
+  -f docker-compose.production.yml \
+  config --quiet
+docker compose \
+  --env-file .env.production \
+  -f docker-compose.yml \
+  -f docker-compose.production.yml \
+  up -d
+```
+
+Use `--allow-database-image-mismatch` only after reviewing Neo4j's supported
+upgrade and restore paths. Restoring the original Auth0 session secret lets
+the frontend read restored sessions; otherwise users may need to sign in
+again.
+
 ## Updates and limitations
 
 Update one component at a time by changing its pinned image tag, pulling, and
@@ -162,6 +223,6 @@ recreating the stack. Back up Neo4j first and review release notes for data or
 configuration migrations.
 
 This foundation does not yet provide multiple application replicas, managed
-Neo4j, zero-downtime upgrades, automated restores, or an open-source OIDC
+Neo4j, zero-downtime upgrades, unattended restores, or an open-source OIDC
 provider. Filesystem Auth0 sessions are intentionally scoped to one frontend
 replica; a multi-replica deployment needs a shared session store.

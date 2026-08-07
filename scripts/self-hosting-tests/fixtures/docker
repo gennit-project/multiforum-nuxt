@@ -28,6 +28,13 @@ JSON
         printf 'database\nbackend\nfrontend\n'
       fi
       ;;
+    *" ps --services "*)
+      if [[ -n "${MULTIFORUM_FAKE_RUNNING_SERVICES:-}" ]]; then
+        printf '%s\n' "$MULTIFORUM_FAKE_RUNNING_SERVICES"
+      else
+        printf 'database\nbackend\nfrontend\n'
+      fi
+      ;;
     *" stop frontend backend "*)
       if [[ "${MULTIFORUM_FAKE_FAIL_STOP:-false}" == true ]]; then
         exit 43
@@ -46,6 +53,13 @@ JSON
       ;;
   esac
 elif [[ "${1:-}" == "run" ]]; then
+  if [[ "$*" == *":/target"* ]]; then
+    cat >/dev/null
+    if [[ "${MULTIFORUM_FAKE_FAIL_RESTORE_FRONTEND:-false}" == true && "$*" == *"frontend-volume:/target"* ]]; then
+      exit 45
+    fi
+    exit 0
+  fi
   if [[ "${MULTIFORUM_FAKE_FAIL_FRONTEND:-false}" == true && "$*" == *"frontend-volume:/source:ro"* ]]; then
     exit 42
   fi
