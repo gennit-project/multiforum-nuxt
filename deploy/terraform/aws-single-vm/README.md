@@ -153,4 +153,6 @@ Back up Neo4j off-host before replacing or destroying the instance. From
 [cold-backup command](../../../docs/self-hosting-production.md#persistent-state-and-backups),
 then encrypt and copy the completed bundle away from the VM. The root volume is
 deleted with the instance by default, so `terraform destroy` removes the forum
-data along with the infrastructure.
+data along with the infrastructure. The same guide documents the
+[guarded restore procedure](../../../docs/self-hosting-production.md#restore-a-cold-backup)
+for a replacement host.
