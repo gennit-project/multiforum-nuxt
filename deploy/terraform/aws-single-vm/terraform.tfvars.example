@@ -2,8 +2,10 @@ aws_region   = "us-east-1"
 admin_cidr   = "203.0.113.10/32"
 ssh_key_name = "my-existing-ec2-key"
 
-# Pin a release tag for a repeatable production deployment.
+# Pin the deployment configuration and both images for a repeatable install.
 repository_ref = "main"
+backend_image  = "ghcr.io/gennit-project/multiforum-backend:edge"
+frontend_image = "ghcr.io/gennit-project/multiforum-nuxt:edge"
 
-# Start narrower during setup if the instance should not yet be public.
+# Keep the local-auth quick-start restricted to trusted addresses.
 application_cidrs = ["203.0.113.10/32"]

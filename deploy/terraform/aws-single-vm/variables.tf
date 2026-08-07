@@ -49,8 +49,7 @@ variable "root_volume_size_gib" {
 
 variable "application_cidrs" {
   type        = list(string)
-  description = "IPv4 CIDRs allowed to reach the temporary HTTP application port (3000)."
-  default     = ["0.0.0.0/0"]
+  description = "Trusted IPv4 CIDRs allowed to reach the temporary HTTP application port (3000)."
 
   validation {
     condition     = length(var.application_cidrs) > 0 && alltrue([for cidr in var.application_cidrs : can(cidrnetmask(cidr))])
@@ -60,11 +59,33 @@ variable "application_cidrs" {
 
 variable "repository_ref" {
   type        = string
-  description = "Git branch or tag checked out by cloud-init. Pin a release tag for repeatable production installs."
+  description = "Git branch or tag containing the deployment configuration. Pin a release tag for repeatable installs."
   default     = "main"
 
   validation {
     condition     = can(regex("^[a-zA-Z0-9._/-]{1,100}$", var.repository_ref))
     error_message = "repository_ref contains unsupported characters."
+  }
+}
+
+variable "backend_image" {
+  type        = string
+  description = "Backend OCI image pulled during cloud-init. Pin a release or digest for repeatable installs."
+  default     = "ghcr.io/gennit-project/multiforum-backend:edge"
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9._/:@-]{0,254}$", var.backend_image))
+    error_message = "backend_image must be a valid OCI image reference without whitespace."
+  }
+}
+
+variable "frontend_image" {
+  type        = string
+  description = "Frontend OCI image pulled during cloud-init. Pin a release or digest for repeatable installs."
+  default     = "ghcr.io/gennit-project/multiforum-nuxt:edge"
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9._/:@-]{0,254}$", var.frontend_image))
+    error_message = "frontend_image must be a valid OCI image reference without whitespace."
   }
 }
