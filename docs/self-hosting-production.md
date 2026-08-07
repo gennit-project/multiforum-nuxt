@@ -441,15 +441,24 @@ Changing Neo4j is blocked unless `--allow-database-image-change` is supplied.
 Use that option only after reviewing Neo4j's supported upgrade path and testing
 the backup on a separate host.
 
-Run `scripts/verify-self-hosting.sh --env-file .env.production.next`, complete a
-real Auth0 sign-in, and test representative reads and writes. Once satisfied,
-promote the target while retaining the old protected file through the rollback
-window:
+Complete a real Auth0 sign-in and test representative reads and writes. Once
+satisfied, run the guarded promotion command:
 
 ```bash
-mv .env.production .env.production.previous
-mv .env.production.next .env.production
+scripts/promote-self-hosting-upgrade.sh \
+  --current-env-file .env.production \
+  --target-env-file .env.production.next \
+  --previous-env-file .env.production.previous \
+  --confirm-promotion
 ```
+
+Promotion re-runs the read-only production verifier against the candidate and
+the running stack. Only after the selected images, release labels, container
+health, public HTTPS headers, and GraphQL proxy pass does it preserve the
+known-good environment as a mode-`0600` rollback file and atomically replace
+the active file. It refuses symbolic links, cross-directory replacement, or an
+existing rollback file. Use `--replace-previous` only after preserving or
+retiring the older rollback configuration.
 
 If recreation fails, do not promote the target file. Stop any partially
 recreated application services, select `.env.production` and the safety backup

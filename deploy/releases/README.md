@@ -67,3 +67,9 @@ only the five release-controlled settings, and refuses to expose the candidate
 unless its resolved production Compose model matches the manifest. The
 underlying validator rejects any image mismatch and requires every production
 container to carry the same `net.multiforum.release` label.
+
+After the guarded upgrade and operator checks, use
+`scripts/promote-self-hosting-upgrade.sh --confirm-promotion` to re-verify the
+running candidate, preserve the known-good environment for rollback, and make
+the candidate active. The complete sequence is documented in the
+[production guide](../../docs/self-hosting-production.md#updates-and-limitations).
