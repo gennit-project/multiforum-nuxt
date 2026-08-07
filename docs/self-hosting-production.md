@@ -9,6 +9,13 @@ of failure.
 Start with the [local quick-start](./self-hosting-quickstart.md) before using
 this configuration. Do not reuse its credentials or local authentication mode.
 
+If you need an AWS host, the
+[single-VM Terraform example](../deploy/terraform/aws-single-vm/README.md)
+provisions the production ports, stable IP, Docker runtime, protected
+environment template, and pinned images used by this overlay. It leaves DNS,
+Auth0 configuration, application secrets, startup, and backups under operator
+control so secrets never enter Terraform state.
+
 ## Requirements
 
 - a Linux host with Docker Engine and Docker Compose v2;
@@ -57,10 +64,11 @@ openssl rand -hex 16 # 32-character plugin encryption key
 openssl rand -hex 64 # Auth0 session encryption secret
 ```
 
-Fill every required empty value in `.env.production`. Pin the backend and
-frontend to tested semantic-version or immutable `sha-*` tags rather than
-`edge`. Optional mail, maps, geocoding, and storage settings can remain empty;
-the instance capability status will keep those features disabled.
+Fill every required empty value in `.env.production`. Pin Neo4j, the backend,
+the frontend, and Caddy to versions tested together rather than using floating
+or `edge` tags in production. Optional mail, maps, geocoding, and storage
+settings can remain empty; the instance capability status will keep those
+features disabled.
 
 Validate the merged Compose model before starting anything:
 
