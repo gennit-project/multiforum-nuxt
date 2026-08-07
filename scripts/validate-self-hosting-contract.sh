@@ -31,6 +31,9 @@ require_command jq
 
 cd "$contract_root"
 
+echo "Testing the production cold-backup command..."
+scripts/self-hosting-tests/backup-self-hosting.test.sh
+
 echo "Validating the image-based quick-start contract..."
 docker compose \
   --env-file .env.quickstart.example \

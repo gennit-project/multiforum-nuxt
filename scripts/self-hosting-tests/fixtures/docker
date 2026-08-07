@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+printf '%s\n' "$*" >>"$MULTIFORUM_FAKE_DOCKER_LOG"
+
+if [[ "${1:-}" == "compose" ]]; then
+  case " $* " in
+    *" config --format json "*)
+      cat <<'JSON'
+{
+  "services": {
+    "database": {"image": "neo4j:test"},
+    "backend": {"image": "ghcr.io/example/backend:test"},
+    "frontend": {"image": "ghcr.io/example/frontend:test"}
+  },
+  "volumes": {
+    "neo4j-data": {"name": "neo4j-volume"},
+    "frontend-data": {"name": "frontend-volume"}
+  }
+}
+JSON
+      ;;
+    *" ps --status running --services "*)
+      if [[ -n "${MULTIFORUM_FAKE_RUNNING_SERVICES:-}" ]]; then
+        printf '%s\n' "$MULTIFORUM_FAKE_RUNNING_SERVICES"
+      else
+        printf 'database\nbackend\nfrontend\n'
+      fi
+      ;;
+    *" stop frontend backend "*)
+      if [[ "${MULTIFORUM_FAKE_FAIL_STOP:-false}" == true ]]; then
+        exit 43
+      fi
+      ;;
+    *" stop database "*)
+      ;;
+    *" up -d database backend frontend "*)
+      if [[ "${MULTIFORUM_FAKE_FAIL_RESTART:-false}" == true ]]; then
+        exit 44
+      fi
+      ;;
+    *)
+      echo "Unexpected fake Docker Compose command: $*" >&2
+      exit 90
+      ;;
+  esac
+elif [[ "${1:-}" == "run" ]]; then
+  if [[ "${MULTIFORUM_FAKE_FAIL_FRONTEND:-false}" == true && "$*" == *"frontend-volume:/source:ro"* ]]; then
+    exit 42
+  fi
+  printf 'archive:%s\n' "$*"
+else
+  echo "Unexpected fake Docker command: $*" >&2
+  exit 91
+fi

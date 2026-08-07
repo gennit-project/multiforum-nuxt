@@ -148,6 +148,9 @@ stateful host would also replace its local data disk. Apply operating-system
 security updates on the host and plan host migrations as explicit
 backup-and-restore operations.
 
-Back up Neo4j off-host before replacing or destroying the instance. The root
-volume is deleted with the instance by default, so `terraform destroy` removes
-the forum data along with the infrastructure.
+Back up Neo4j off-host before replacing or destroying the instance. From
+`/opt/multiforum`, use the production guide's
+[cold-backup command](../../../docs/self-hosting-production.md#persistent-state-and-backups),
+then encrypt and copy the completed bundle away from the VM. The root volume is
+deleted with the instance by default, so `terraform destroy` removes the forum
+data along with the infrastructure.

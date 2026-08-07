@@ -129,29 +129,31 @@ The deployment has two important persistent data sets:
 Losing `frontend-data` signs users out but does not remove forum content.
 Losing `neo4j-data` loses the forum.
 
-Configure automated, encrypted, off-host backups before inviting users. For a
-simple cold snapshot, stop the write path and database, snapshot or copy the
-Neo4j volume with your infrastructure provider's tooling, and then restart:
+Configure automated, encrypted, off-host backups before inviting users. The
+repository includes a cold-backup command that verifies the production
+services are running, stops the write path and database, archives both durable
+volumes, writes a checksum manifest, and restarts the services even when an
+archive operation fails.
 
 ```bash
-docker compose \
+sudo install -d -m 0700 -o "$(id -un)" -g "$(id -gn)" \
+  /var/backups/multiforum
+scripts/backup-self-hosting.sh \
   --env-file .env.production \
-  -f docker-compose.yml \
-  -f docker-compose.production.yml \
-  stop frontend backend database
-
-# Create and export an off-host snapshot of the neo4j-data volume here.
-
-docker compose \
-  --env-file .env.production \
-  -f docker-compose.yml \
-  -f docker-compose.production.yml \
-  up -d
+  --output-dir /var/backups/multiforum
 ```
 
-Use Neo4j's backup or dump tooling when your selected edition and operational
-requirements support it. Whichever method you choose, document retention,
-encrypt backups, monitor failures, and test restoring onto a separate host.
+Each timestamped bundle contains `neo4j-data.tar.gz`,
+`frontend-data.tar.gz`, and `manifest.json`. The manifest records the selected
+database, backend, and frontend images plus a SHA-256 checksum for each
+archive. It deliberately excludes `.env.production`; preserve that file and
+its secrets separately in encrypted secret storage.
+
+The command creates a consistent cold copy, so the site has a brief outage
+while the volumes are archived. Copy the completed bundle off the host,
+encrypt it at rest, apply a retention policy, monitor scheduled runs, and test
+restoring onto a separate host. Use Neo4j's online backup tooling instead when
+your selected edition and recovery requirements support it.
 
 ## Updates and limitations
 
