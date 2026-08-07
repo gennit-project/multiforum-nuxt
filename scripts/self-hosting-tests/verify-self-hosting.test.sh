@@ -51,6 +51,17 @@ if [[ -s "$MULTIFORUM_FAKE_CURL_LOG" ]]; then
   exit 1
 fi
 
+: >"$MULTIFORUM_FAKE_CURL_LOG"
+if MULTIFORUM_FAKE_RUNNING_RELEASE_VERSION=1.2.4 \
+  "$verify_script" --env-file "$env_file" >/dev/null 2>&1; then
+  echo "Expected verification to reject a running release-label mismatch." >&2
+  exit 1
+fi
+if [[ -s "$MULTIFORUM_FAKE_CURL_LOG" ]]; then
+  echo "Release mismatches must occur before public requests." >&2
+  exit 1
+fi
+
 if MULTIFORUM_FAKE_MISSING_SERVICE=database \
   "$verify_script" --env-file "$env_file" >/dev/null 2>&1; then
   echo "Expected verification to reject a missing database container." >&2

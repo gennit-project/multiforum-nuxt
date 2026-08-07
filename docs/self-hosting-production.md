@@ -56,6 +56,14 @@ cp .env.production.example .env.production
 chmod 600 .env.production
 ```
 
+Obtain the self-hosting release manifest published with the release you intend
+to run. It is the machine-readable compatibility contract for the frontend,
+backend, Neo4j, and Caddy images. Copy its `release` value to
+`MULTIFORUM_RELEASE_VERSION` and its four image references to the corresponding
+variables in `.env.production`. The file under
+`deploy/releases/self-hosting-release.example.json` documents the format; its
+placeholder version is not an official release.
+
 Generate independent secrets rather than reusing passwords:
 
 ```bash
@@ -69,6 +77,18 @@ the frontend, and Caddy to versions tested together rather than using floating
 or `edge` tags in production. Optional mail, maps, geocoding, and storage
 settings can remain empty; the instance capability status will keep those
 features disabled.
+
+Validate the release manifest and resolved image selection together:
+
+```bash
+scripts/validate-self-hosting-release.sh \
+  --manifest multiforum-self-hosting-release.json \
+  --env-file .env.production
+```
+
+This rejects floating application tags, images from unofficial application
+repositories, a mismatched image set, or containers that would not share the
+same release identity.
 
 Validate the merged Compose model before starting anything:
 
@@ -108,11 +128,12 @@ Run the read-only production verification command:
 scripts/verify-self-hosting.sh --env-file .env.production
 ```
 
-It verifies that each running container uses the image selected by the
-environment, requires healthy database and application containers, checks the
-public HTTPS response for Caddy's security headers, and sends a harmless query
-through the same-origin GraphQL proxy. Complete a real Auth0 sign-in separately;
-the command does not accept or automate user credentials.
+It verifies that each running container uses the image and release identity
+selected by the environment, requires healthy database and application
+containers, checks the public HTTPS response for Caddy's security headers, and
+sends a harmless query through the same-origin GraphQL proxy. Complete a real
+Auth0 sign-in separately; the command does not accept or automate user
+credentials.
 
 Only Caddy publishes public ports. The frontend, backend, and Neo4j ports retain
 loopback-only bindings for host diagnostics. Caddy adds HSTS, MIME-sniffing, and
@@ -384,7 +405,16 @@ $EDITOR .env.production.next
 Set explicit release or immutable `sha-*` tags for Neo4j, the backend, the
 frontend, and Caddy. The upgrade command rejects `edge`, `latest`, branch-like
 tags, and untagged target images. Review release notes for data or configuration
-migrations, then run:
+migrations. Copy one complete release manifest into `.env.production.next` and
+validate it before running the upgrade:
+
+```bash
+scripts/validate-self-hosting-release.sh \
+  --manifest multiforum-self-hosting-release.json \
+  --env-file .env.production.next
+```
+
+Then run:
 
 ```bash
 scripts/upgrade-self-hosting.sh \

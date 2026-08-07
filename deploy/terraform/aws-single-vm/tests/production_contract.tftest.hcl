@@ -33,6 +33,7 @@ run "production_contract" {
     application_cidrs = ["0.0.0.0/0"]
     domain            = "forum.example.com"
     acme_email        = "admin@example.com"
+    release_version   = "1.2.3"
     repository_ref    = "v1.2.3"
     neo4j_image       = "neo4j:contract"
     backend_image     = "ghcr.io/example/backend:contract"
@@ -91,6 +92,7 @@ run "production_contract" {
     condition = alltrue([
       strcontains(aws_instance.multiforum.user_data, "--branch 'v1.2.3'"),
       strcontains(aws_instance.multiforum.user_data, ".env.production"),
+      strcontains(aws_instance.multiforum.user_data, "MULTIFORUM_RELEASE_VERSION=1.2.3"),
       strcontains(aws_instance.multiforum.user_data, "chmod 0600 /opt/multiforum/.env.production"),
       strcontains(aws_instance.multiforum.user_data, "/etc/systemd/system/multiforum-backup.timer"),
       strcontains(aws_instance.multiforum.user_data, "/etc/multiforum/backup.env"),

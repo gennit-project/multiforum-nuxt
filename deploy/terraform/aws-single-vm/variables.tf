@@ -80,7 +80,6 @@ variable "acme_email" {
 variable "repository_ref" {
   type        = string
   description = "Git branch or tag containing the deployment configuration. Pin a release tag for repeatable installs."
-  default     = "main"
 
   validation {
     condition     = can(regex("^[a-zA-Z0-9._/-]{1,100}$", var.repository_ref))
@@ -88,10 +87,19 @@ variable "repository_ref" {
   }
 }
 
+variable "release_version" {
+  type        = string
+  description = "Multiforum self-hosting release represented by the selected image set. Copy it from the release manifest."
+
+  validation {
+    condition     = can(regex("^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$", var.release_version))
+    error_message = "release_version must be a semantic version without a leading v."
+  }
+}
+
 variable "backend_image" {
   type        = string
   description = "Backend OCI image pulled during cloud-init. Pin a release or digest for repeatable installs."
-  default     = "ghcr.io/gennit-project/multiforum-backend:edge"
 
   validation {
     condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9._/:@-]{0,254}$", var.backend_image))
@@ -113,7 +121,6 @@ variable "neo4j_image" {
 variable "frontend_image" {
   type        = string
   description = "Frontend OCI image pulled during cloud-init. Pin a release or digest for repeatable installs."
-  default     = "ghcr.io/gennit-project/multiforum-nuxt:edge"
 
   validation {
     condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9._/:@-]{0,254}$", var.frontend_image))

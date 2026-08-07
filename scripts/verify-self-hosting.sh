@@ -93,6 +93,7 @@ base_url="${base_url%/}"
 echo "Verifying configured images and container health..."
 for service in database backend frontend caddy; do
   expected_image="$(jq --raw-output --arg service "$service" '.services[$service].image // empty' <<<"$compose_config")"
+  expected_release="$(jq --raw-output --arg service "$service" '.services[$service].labels["net.multiforum.release"] // empty' <<<"$compose_config")"
   container_id="$("${compose[@]}" ps -q "$service")"
 
   if [[ -z "$container_id" || "$container_id" == *$'\n'* ]]; then
@@ -101,14 +102,21 @@ for service in database backend frontend caddy; do
   fi
 
   inspect_result="$(docker inspect \
-    --format '{{.Config.Image}}|{{.State.Status}}|{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' \
+    --format '{{.Config.Image}}|{{.State.Status}}|{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}|{{index .Config.Labels "net.multiforum.release"}}' \
     "$container_id")"
-  IFS='|' read -r running_image container_status health_status <<<"$inspect_result"
+  IFS='|' read -r running_image container_status health_status running_release <<<"$inspect_result"
 
   if [[ "$running_image" != "$expected_image" ]]; then
     echo "Running image does not match the selected configuration: $service" >&2
     echo "Configured: $expected_image" >&2
     echo "Running:    $running_image" >&2
+    exit 1
+  fi
+
+  if [[ -z "$expected_release" || "$running_release" != "$expected_release" ]]; then
+    echo "Running container does not match the selected release: $service" >&2
+    echo "Configured: ${expected_release:-missing}" >&2
+    echo "Running:    ${running_release:-missing}" >&2
     exit 1
   fi
 

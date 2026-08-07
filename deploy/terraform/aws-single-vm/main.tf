@@ -77,14 +77,15 @@ resource "aws_instance" "multiforum" {
   vpc_security_group_ids      = [aws_security_group.multiforum.id]
 
   user_data = templatefile("${path.module}/cloud-init.tftpl", {
-    acme_email     = var.acme_email
-    backend_image  = var.backend_image
-    caddy_image    = var.caddy_image
-    domain         = var.domain
-    frontend_image = var.frontend_image
-    instance_name  = var.name
-    neo4j_image    = var.neo4j_image
-    repository_ref = var.repository_ref
+    acme_email      = var.acme_email
+    backend_image   = var.backend_image
+    caddy_image     = var.caddy_image
+    domain          = var.domain
+    frontend_image  = var.frontend_image
+    instance_name   = var.name
+    neo4j_image     = var.neo4j_image
+    release_version = var.release_version
+    repository_ref  = var.repository_ref
   })
 
   metadata_options {
