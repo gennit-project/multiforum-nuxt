@@ -2,10 +2,18 @@
 # .env.production and combine this file with docker-compose.yml.
 services:
   database:
+    image: ${MULTIFORUM_NEO4J_IMAGE:?Set MULTIFORUM_NEO4J_IMAGE from a release manifest}
+    labels:
+      net.multiforum.release: ${MULTIFORUM_RELEASE_VERSION:?Set MULTIFORUM_RELEASE_VERSION from a release manifest}
+      net.multiforum.component: database
     environment:
       NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:?Set NEO4J_PASSWORD}
 
   backend:
+    image: ${MULTIFORUM_BACKEND_IMAGE:?Set MULTIFORUM_BACKEND_IMAGE from a release manifest}
+    labels:
+      net.multiforum.release: ${MULTIFORUM_RELEASE_VERSION:?Set MULTIFORUM_RELEASE_VERSION from a release manifest}
+      net.multiforum.component: backend
     environment:
       NODE_ENV: production
       ENVIRONMENT: production
@@ -28,6 +36,10 @@ services:
       SENDGRID_FROM_EMAIL: ${SENDGRID_FROM_EMAIL:-}
 
   frontend:
+    image: ${MULTIFORUM_FRONTEND_IMAGE:?Set MULTIFORUM_FRONTEND_IMAGE from a release manifest}
+    labels:
+      net.multiforum.release: ${MULTIFORUM_RELEASE_VERSION:?Set MULTIFORUM_RELEASE_VERSION from a release manifest}
+      net.multiforum.component: frontend
     environment:
       NODE_ENV: production
       NUXT_PUBLIC_AUTH_PROVIDER: auth0
@@ -48,7 +60,10 @@ services:
       - frontend-data:/app/data
 
   caddy:
-    image: ${MULTIFORUM_CADDY_IMAGE:-caddy:2.11.4-alpine}
+    image: ${MULTIFORUM_CADDY_IMAGE:?Set MULTIFORUM_CADDY_IMAGE from a release manifest}
+    labels:
+      net.multiforum.release: ${MULTIFORUM_RELEASE_VERSION:?Set MULTIFORUM_RELEASE_VERSION from a release manifest}
+      net.multiforum.component: caddy
     restart: unless-stopped
     depends_on:
       frontend:

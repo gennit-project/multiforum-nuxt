@@ -54,8 +54,9 @@ terraform apply
 
 Set `admin_cidr` to a `/32` containing only your current public IPv4 address.
 Set `application_cidrs` to `0.0.0.0/0` for a public forum and Caddy's normal
-ACME flow. Pin `repository_ref` and every image input to revisions you have
-tested together rather than relying on `main` or `edge` in production.
+ACME flow. Copy `release_version`, `repository_ref`, and every image input from
+one self-hosting release and its manifest rather than mixing revisions or
+relying on `main` or `edge` in production.
 
 Terraform prints the stable IP, HTTPS URL, SSH command, and DNS record to
 create. Add that A record at your DNS provider:
@@ -75,7 +76,7 @@ cloud-init status --wait
 
 Cloud-init clones the selected repository revision, copies
 `.env.production.example` to `.env.production`, injects the non-secret Terraform
-inputs, restricts the file to mode `0600`, and pre-pulls Neo4j, backend,
+inputs (including the release identity), restricts the file to mode `0600`, and pre-pulls Neo4j, backend,
 frontend, and Caddy images. It also stages—but does not enable—the production
 backup service, daily timer, Restic configuration example, and encrypted
 off-site upload drop-in. It deliberately does not start Compose, activate

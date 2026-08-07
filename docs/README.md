@@ -9,6 +9,7 @@ Developer documentation for the Multiforum Nuxt frontend. See the
 - [Production Compose foundation](./self-hosting-production.md) — run the official images with Auth0, persistent sessions, and automatic TLS
 - [Frontend runtime configuration](./frontend-runtime-configuration.md) — configure one built frontend image at container startup
 - [Frontend container image](./frontend-container-image.md) — official image tags, architectures, and runtime behavior
+- [Production release manifest](../deploy/releases/README.md) — versioned compatibility contract for the complete production image set
 - [Development setup](./development-setup.md) — local environment and tooling
 - [AWS single-VM Terraform example](../deploy/terraform/aws-single-vm/README.md) — provision an AWS host for the production Compose overlay without storing app secrets in Terraform state
 - [Frontend architecture and authentication](./architecture-and-auth.md)

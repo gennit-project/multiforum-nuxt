@@ -31,6 +31,11 @@ require_command jq
 
 cd "$contract_root"
 
+echo "Testing the production release/version contract..."
+scripts/self-hosting-tests/validate-self-hosting-release.test.sh
+scripts/validate-self-hosting-release.sh \
+  --manifest deploy/releases/self-hosting-release.example.json
+
 echo "Testing the production cold-backup command..."
 scripts/self-hosting-tests/backup-self-hosting.test.sh
 
@@ -120,12 +125,45 @@ jq --exit-status '
 ' "$contract_tmp_dir/source.json" >/dev/null
 
 echo "Confirming production configuration rejects missing secrets..."
-if env NEO4J_PASSWORD= docker compose \
+if env \
+  MULTIFORUM_RELEASE_VERSION=1.2.3 \
+  MULTIFORUM_NEO4J_IMAGE=neo4j:5.1.0 \
+  MULTIFORUM_BACKEND_IMAGE=ghcr.io/gennit-project/multiforum-backend:1.2.3 \
+  MULTIFORUM_FRONTEND_IMAGE=ghcr.io/gennit-project/multiforum-nuxt:1.2.3 \
+  MULTIFORUM_CADDY_IMAGE=caddy:2.11.4-alpine \
+  NEO4J_PASSWORD= \
+  docker compose \
   --env-file .env.production.example \
   --file docker-compose.yml \
   --file docker-compose.production.yml \
   config --quiet >"$contract_tmp_dir/missing-secrets.log" 2>&1; then
   echo "Production Compose unexpectedly accepted an empty NEO4J_PASSWORD." >&2
+  exit 1
+fi
+
+echo "Confirming production configuration rejects a missing release identity..."
+if env \
+  NEO4J_PASSWORD=contract-neo4j \
+  MULTIFORUM_SUPERADMIN_EMAIL=admin@example.com \
+  PLUGIN_SECRET_ENCRYPTION_KEY=0123456789abcdef0123456789abcdef \
+  AUTH0_DOMAIN=auth.example.com \
+  AUTH0_CLIENT_ID=contract-client \
+  AUTH0_AUDIENCE=https://api.example.com \
+  NUXT_AUTH0_CLIENT_SECRET=contract-client-secret \
+  NUXT_AUTH0_SESSION_SECRET=0123456789abcdef0123456789abcdef \
+  CADDY_ACME_EMAIL=admin@example.com \
+  MULTIFORUM_DOMAIN=forum.example.com \
+  MULTIFORUM_RELEASE_VERSION= \
+  MULTIFORUM_NEO4J_IMAGE=neo4j:5.1.0 \
+  MULTIFORUM_BACKEND_IMAGE=ghcr.io/gennit-project/multiforum-backend:1.2.3 \
+  MULTIFORUM_FRONTEND_IMAGE=ghcr.io/gennit-project/multiforum-nuxt:1.2.3 \
+  MULTIFORUM_CADDY_IMAGE=caddy:2.11.4-alpine \
+  docker compose \
+    --env-file .env.production.example \
+    --file docker-compose.yml \
+    --file docker-compose.production.yml \
+    config --quiet >"$contract_tmp_dir/missing-release.log" 2>&1; then
+  echo "Production Compose unexpectedly accepted an empty MULTIFORUM_RELEASE_VERSION." >&2
   exit 1
 fi
 
@@ -141,6 +179,7 @@ env \
   NUXT_AUTH0_SESSION_SECRET=0123456789abcdef0123456789abcdef \
   CADDY_ACME_EMAIL=admin@example.com \
   MULTIFORUM_DOMAIN=forum.example.com \
+  MULTIFORUM_RELEASE_VERSION=1.2.3 \
   MULTIFORUM_NEO4J_IMAGE=neo4j:contract \
   MULTIFORUM_BACKEND_IMAGE=ghcr.io/example/backend:contract \
   MULTIFORUM_FRONTEND_IMAGE=ghcr.io/example/frontend:contract \
@@ -156,6 +195,11 @@ jq --exit-status '
   .services.backend.image == "ghcr.io/example/backend:contract" and
   .services.frontend.image == "ghcr.io/example/frontend:contract" and
   .services.caddy.image == "caddy:contract" and
+  ([.services[] | .labels["net.multiforum.release"] == "1.2.3"] | all) and
+  .services.database.labels["net.multiforum.component"] == "database" and
+  .services.backend.labels["net.multiforum.component"] == "backend" and
+  .services.frontend.labels["net.multiforum.component"] == "frontend" and
+  .services.caddy.labels["net.multiforum.component"] == "caddy" and
   ([.services[] | .build] | all(. == null)) and
   .services.backend.environment.NODE_ENV == "production" and
   .services.backend.environment.MULTIFORUM_AUTH_PROVIDER == "auth0" and

@@ -16,6 +16,7 @@ runcmd:
   - sed -i 's|^MULTIFORUM_DOMAIN=.*|MULTIFORUM_DOMAIN=${domain}|' /opt/multiforum/.env.production
   - sed -i 's|^MULTIFORUM_INSTANCE_NAME=.*|MULTIFORUM_INSTANCE_NAME=${instance_name}|' /opt/multiforum/.env.production
   - sed -i 's|^CADDY_ACME_EMAIL=.*|CADDY_ACME_EMAIL=${acme_email}|' /opt/multiforum/.env.production
+  - sed -i 's|^MULTIFORUM_RELEASE_VERSION=.*|MULTIFORUM_RELEASE_VERSION=${release_version}|' /opt/multiforum/.env.production
   - sed -i 's|^MULTIFORUM_NEO4J_IMAGE=.*|MULTIFORUM_NEO4J_IMAGE=${neo4j_image}|' /opt/multiforum/.env.production
   - sed -i 's|^MULTIFORUM_BACKEND_IMAGE=.*|MULTIFORUM_BACKEND_IMAGE=${backend_image}|' /opt/multiforum/.env.production
   - sed -i 's|^MULTIFORUM_FRONTEND_IMAGE=.*|MULTIFORUM_FRONTEND_IMAGE=${frontend_image}|' /opt/multiforum/.env.production

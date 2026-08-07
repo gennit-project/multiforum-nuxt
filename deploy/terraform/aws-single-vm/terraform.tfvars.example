@@ -4,12 +4,14 @@ ssh_key_name = "my-existing-ec2-key"
 domain       = "forum.example.com"
 acme_email   = "admin@example.com"
 
-# Pin the deployment configuration and every image for a repeatable install.
-repository_ref = "main"
+# Copy one complete set from a self-hosting release manifest. The example
+# values illustrate the contract and are not a statement that 1.2.3 exists.
+release_version = "1.2.3"
+repository_ref  = "v1.2.3"
 neo4j_image     = "neo4j:5.1.0"
-backend_image  = "ghcr.io/gennit-project/multiforum-backend:edge"
-frontend_image = "ghcr.io/gennit-project/multiforum-nuxt:edge"
-caddy_image    = "caddy:2.11.4-alpine"
+backend_image   = "ghcr.io/gennit-project/multiforum-backend:1.2.3"
+frontend_image  = "ghcr.io/gennit-project/multiforum-nuxt:1.2.3"
+caddy_image     = "caddy:2.11.4-alpine"
 
 # Public access is required for a public forum and Caddy's default ACME flow.
 application_cidrs = ["0.0.0.0/0"]

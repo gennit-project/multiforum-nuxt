@@ -23,14 +23,16 @@ if [[ "${1:-}" == "compose" ]]; then
         --arg backendImage "$backend_image" \
         --arg frontendImage "$frontend_image" \
         --arg caddyImage "$caddy_image" \
+        --arg releaseVersion "${MULTIFORUM_FAKE_RELEASE_VERSION:-1.2.3}" \
         '
 {
   "services": {
-    "database": {"image": $databaseImage},
-    "backend": {"image": $backendImage},
-    "frontend": {"image": $frontendImage},
+    "database": {"image": $databaseImage, "labels": {"net.multiforum.release": $releaseVersion}},
+    "backend": {"image": $backendImage, "labels": {"net.multiforum.release": $releaseVersion}},
+    "frontend": {"image": $frontendImage, "labels": {"net.multiforum.release": $releaseVersion}},
     "caddy": {
       "image": $caddyImage,
+      "labels": {"net.multiforum.release": $releaseVersion},
       "environment": {"MULTIFORUM_DOMAIN": "forum.example.com"}
     }
   },
@@ -117,7 +119,8 @@ elif [[ "${1:-}" == "inspect" ]]; then
   if [[ "${MULTIFORUM_FAKE_UNHEALTHY_SERVICE:-}" == "$service" ]]; then
     health=unhealthy
   fi
-  printf '%s|%s|%s\n' "$image" "$status" "$health"
+  release_version="${MULTIFORUM_FAKE_RUNNING_RELEASE_VERSION:-1.2.3}"
+  printf '%s|%s|%s|%s\n' "$image" "$status" "$health" "$release_version"
 elif [[ "${1:-}" == "run" ]]; then
   if [[ "$*" == *":/target"* ]]; then
     cat >/dev/null
