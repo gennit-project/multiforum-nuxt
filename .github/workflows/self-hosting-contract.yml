@@ -11,6 +11,8 @@ on:
       - 'deploy/caddy/**'
       - 'deploy/terraform/aws-single-vm/**'
       - 'docker-compose*.yml'
+      - 'scripts/backup-self-hosting.sh'
+      - 'scripts/self-hosting-tests/**'
       - 'scripts/validate-self-hosting-contract.sh'
   push:
     branches:
@@ -22,6 +24,8 @@ on:
       - 'deploy/caddy/**'
       - 'deploy/terraform/aws-single-vm/**'
       - 'docker-compose*.yml'
+      - 'scripts/backup-self-hosting.sh'
+      - 'scripts/self-hosting-tests/**'
       - 'scripts/validate-self-hosting-contract.sh'
   workflow_dispatch:
 
