@@ -22,7 +22,7 @@ COPY . .
 # so this image can be promoted between environments without rebuilding.
 ENV NITRO_PRESET=node-server
 
-RUN NODE_OPTIONS=--max-old-space-size=2048 pnpm run build
+RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm run build
 
 FROM node:${NODE_VERSION}-alpine AS runtime
 
