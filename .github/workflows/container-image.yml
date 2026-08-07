@@ -182,6 +182,41 @@ jobs:
           docker rm --force multiforum-backend-mock multiforum-frontend-smoke multiforum-frontend-auth0-smoke || true
           docker network rm multiforum-frontend-image-smoke || true
 
+      - name: Create the coordinated integration manifest
+        id: integration-manifest
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            frontend_image="${IMAGE_NAME}:sha-${GITHUB_SHA:0:7}"
+          else
+            frontend_image="${IMAGE_NAME}@${{ steps.build.outputs.digest }}"
+          fi
+          manifest_path="$RUNNER_TEMP/multiforum-integration-release.json"
+          scripts/create-self-hosting-release-manifest.sh \
+            --release "0.0.0-ci.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}" \
+            --frontend-image "$frontend_image" \
+            --output "$manifest_path"
+          echo "path=$manifest_path" >> "$GITHUB_OUTPUT"
+
+      - name: Pull coordinated integration dependencies
+        env:
+          INTEGRATION_MANIFEST: ${{ steps.integration-manifest.outputs.path }}
+        run: |
+          set -euo pipefail
+          anonymous_docker_config="$(mktemp -d)"
+          trap 'rm -rf "$anonymous_docker_config"' EXIT
+          while IFS= read -r image; do
+            DOCKER_CONFIG="$anonymous_docker_config" docker pull "$image"
+          done < <(jq --raw-output '.images | to_entries[] | select(.key != "frontend") | .value' "$INTEGRATION_MANIFEST")
+
+      - name: Smoke test the coordinated integration bundle
+        env:
+          INTEGRATION_MANIFEST: ${{ steps.integration-manifest.outputs.path }}
+        run: |
+          scripts/smoke-self-hosting-release.sh \
+            --manifest "$INTEGRATION_MANIFEST" \
+            --project-name "multiforum-integration-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
       # GITHUB_TOKEN can publish repository-linked packages but cannot change
       # organization package visibility. An organization owner must make the
       # package public once; every publication then proves anonymous access.
@@ -221,7 +256,7 @@ jobs:
           echo "path=$manifest_path" >> "$GITHUB_OUTPUT"
           echo "name=$(basename "$manifest_path")" >> "$GITHUB_OUTPUT"
 
-      - name: Verify release component images are public
+      - name: Pull release component images anonymously
         env:
           RELEASE_MANIFEST: ${{ steps.release-manifest.outputs.path }}
         run: |
@@ -230,7 +265,7 @@ jobs:
           trap 'rm -rf "$anonymous_docker_config"' EXIT
           while IFS= read -r image; do
             DOCKER_CONFIG="$anonymous_docker_config" docker pull "$image"
-          done < <(jq --raw-output '.images | to_entries[] | select(.key != "frontend") | .value' "$RELEASE_MANIFEST")
+          done < <(jq --raw-output '.images[]' "$RELEASE_MANIFEST")
 
       - name: Preserve the release manifest with the workflow run
         uses: actions/upload-artifact@v4

@@ -7,7 +7,8 @@ contract between a Multiforum release and the production Compose stack.
 The repository includes an example contract, not a claim that those example
 tags have been released. Every `v*.*.*` frontend tag build creates a manifest,
 preserves it as a workflow artifact, verifies that every selected component is
-publicly pullable, and attaches it to the matching GitHub Release.
+publicly pullable, and boots the selected application images together before
+attaching the manifest to the matching GitHub Release.
 
 Schema version 1 requires:
 
@@ -21,9 +22,9 @@ Schema version 1 requires:
 `release-components.json` is the reviewed input for the next release. It pins
 the backend, Neo4j, and Caddy images. Before merging a release PR, maintainers
 should update the backend reference to an immutable `sha-*` tag whose backend
-container workflow passed. The frontend tag workflow adds its own published
-multi-architecture digest and the release version; neither is guessed in the
-curated input.
+container workflow passed, preferably using that tag's multi-architecture
+digest. The frontend tag workflow adds its own published multi-architecture
+digest and the release version; neither is guessed in the curated input.
 
 The generator can be exercised locally without publishing anything:
 
@@ -36,6 +37,13 @@ scripts/create-self-hosting-release-manifest.sh \
 ```
 
 Generation is atomic and runs the same release validator used by operators.
+
+Before publication, the release workflow also validates the selected Caddy
+image against the production Caddyfile, starts a disposable Neo4j/backend/
+frontend stack, waits for health checks, verifies the same-origin GraphQL proxy,
+signs in with the automatically bootstrapped administrator, and resolves that
+administrator through the frontend session boundary. The stack and its volumes
+are deleted after either success or failure.
 
 Validate a downloaded manifest by itself:
 
