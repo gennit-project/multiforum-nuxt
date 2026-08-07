@@ -5,6 +5,16 @@ set -euo pipefail
 printf '%s\n' "$*" >>"$MULTIFORUM_FAKE_RESTIC_LOG"
 
 case "${1:-}" in
+  snapshots)
+    if [[ "${MULTIFORUM_FAKE_RESTIC_FAIL_SNAPSHOTS:-false}" == true ]]; then
+      exit 53
+    fi
+    if [[ -n "${MULTIFORUM_FAKE_RESTIC_SNAPSHOTS_JSON:-}" ]]; then
+      printf '%s\n' "$MULTIFORUM_FAKE_RESTIC_SNAPSHOTS_JSON"
+    else
+      printf '%s\n' '[{"id":"snapshot-test","time":"2026-01-01T00:30:00.000000000Z"}]'
+    fi
+    ;;
   backup)
     if [[ "${MULTIFORUM_FAKE_RESTIC_FAIL_BACKUP:-false}" == true ]]; then
       exit 51

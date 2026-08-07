@@ -5,6 +5,7 @@ set -euo pipefail
 test_root="$(mktemp -d)"
 repository_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
 upload_script="$repository_root/scripts/upload-self-hosting-backup.sh"
+health_script="$repository_root/scripts/check-self-hosting-backups.sh"
 
 trap 'rm -rf "$test_root"' EXIT
 
@@ -27,7 +28,7 @@ create_bundle() {
   neo4j_sha256="$(sha256sum "$bundle/neo4j-data.tar.gz" | awk '{print $1}')"
   frontend_sha256="$(sha256sum "$bundle/frontend-data.tar.gz" | awk '{print $1}')"
   jq --null-input \
-    --arg createdAt "2026-01-01T00:00:00Z" \
+    --arg createdAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     --arg neo4jSha256 "$neo4j_sha256" \
     --arg frontendSha256 "$frontend_sha256" \
     '{
@@ -56,6 +57,17 @@ if ! jq --exit-status '
   (.[0].paths[0] | endswith("multiforum-backup-20260201T000000Z"))
 ' <<<"$snapshot_json" >/dev/null; then
   echo "Expected Restic to retain only the newest daily snapshot." >&2
+  exit 1
+fi
+
+health_json="$("$health_script" --backup-root "$test_root/backups" \
+  --max-age-hours 1 --restic-tag multiforum-contract \
+  --offsite-max-age-hours 1 --json)"
+if ! jq --exit-status '
+  .status == "ok" and .local.integrity == "verified" and
+  .offsite.status == "ok" and .offsite.tag == "multiforum-contract"
+' <<<"$health_json" >/dev/null; then
+  echo "Expected real local and Restic backup health checks to pass." >&2
   exit 1
 fi
 
