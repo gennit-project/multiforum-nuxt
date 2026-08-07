@@ -25,6 +25,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      frontend-digest: ${{ steps.build.outputs.digest }}
 
     steps:
       - name: Check out source
@@ -192,3 +194,67 @@ jobs:
           anonymous_docker_config="$(mktemp -d)"
           trap 'rm -rf "$anonymous_docker_config"' EXIT
           DOCKER_CONFIG="$anonymous_docker_config" docker pull "$PUBLISHED_IMAGE"
+
+  publish-release-manifest:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build-publish-smoke
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out release source
+        uses: actions/checkout@v4
+
+      - name: Create the self-hosting release manifest
+        id: release-manifest
+        env:
+          FRONTEND_DIGEST: ${{ needs.build-publish-smoke.outputs.frontend-digest }}
+        run: |
+          set -euo pipefail
+          release_version="${GITHUB_REF_NAME#v}"
+          manifest_path="$RUNNER_TEMP/multiforum-self-hosting-${release_version}.json"
+          scripts/create-self-hosting-release-manifest.sh \
+            --release "$release_version" \
+            --frontend-image "${IMAGE_NAME}@${FRONTEND_DIGEST}" \
+            --output "$manifest_path"
+          echo "path=$manifest_path" >> "$GITHUB_OUTPUT"
+          echo "name=$(basename "$manifest_path")" >> "$GITHUB_OUTPUT"
+
+      - name: Verify release component images are public
+        env:
+          RELEASE_MANIFEST: ${{ steps.release-manifest.outputs.path }}
+        run: |
+          set -euo pipefail
+          anonymous_docker_config="$(mktemp -d)"
+          trap 'rm -rf "$anonymous_docker_config"' EXIT
+          while IFS= read -r image; do
+            DOCKER_CONFIG="$anonymous_docker_config" docker pull "$image"
+          done < <(jq --raw-output '.images | to_entries[] | select(.key != "frontend") | .value' "$RELEASE_MANIFEST")
+
+      - name: Preserve the release manifest with the workflow run
+        uses: actions/upload-artifact@v4
+        with:
+          name: self-hosting-release-manifest
+          path: ${{ steps.release-manifest.outputs.path }}
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Attach the manifest to the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_MANIFEST: ${{ steps.release-manifest.outputs.path }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 12); do
+            if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+              gh release upload "$GITHUB_REF_NAME" \
+                "$RELEASE_MANIFEST#Multiforum self-hosting release manifest"
+              exit 0
+            fi
+            if [ "$attempt" -eq 12 ]; then
+              echo "GitHub release was not available for tag: $GITHUB_REF_NAME" >&2
+              exit 1
+            fi
+            sleep 5
+          done

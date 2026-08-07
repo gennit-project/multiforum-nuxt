@@ -70,6 +70,12 @@ The publishing workflow tests the non-root runtime, health check, runtime
 branding, same-origin GraphQL proxy, local-development mode, and rejection of
 incomplete Auth0 configuration before accepting an image publication.
 
+For semantic-version tags, the workflow also combines the published frontend
+digest with the reviewed backend, Neo4j, and Caddy pins, verifies that all four
+images are publicly pullable, and attaches a validated self-hosting release
+manifest to the GitHub Release. Production operators should use that complete
+manifest rather than selecting component versions independently.
+
 The GHCR package must be made public once by an organization owner after its
 first publication. Every subsequent publication verifies that its digest can
 be pulled with an anonymous Docker configuration.
