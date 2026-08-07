@@ -36,6 +36,7 @@ scripts/self-hosting-tests/backup-self-hosting.test.sh
 
 echo "Testing encrypted off-site backup uploads..."
 scripts/self-hosting-tests/upload-self-hosting-backup.test.sh
+scripts/self-hosting-tests/check-self-hosting-backups.test.sh
 if command -v restic >/dev/null 2>&1; then
   scripts/self-hosting-tests/upload-self-hosting-backup.integration.test.sh
 elif [[ "${MULTIFORUM_REQUIRE_RESTIC_INTEGRATION:-false}" == true ]]; then

@@ -153,8 +153,10 @@ systemctl list-timers multiforum-backup.timer
 The default retains seven complete local bundles. Follow the production guide
 to configure the staged
 [encrypted off-host upload](../../../docs/self-hosting-production.md#encrypt-and-copy-backups-off-the-host),
-monitor the unit, and perform restore drills. The local timer alone does not
-protect data from instance or regional loss.
+run the documented
+[freshness check](../../../docs/self-hosting-production.md#monitor-backup-freshness)
+from a monitoring agent, and perform restore drills. The local timer alone does
+not protect data from instance or regional loss.
 
 ## Updates and destruction
 

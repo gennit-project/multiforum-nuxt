@@ -272,6 +272,42 @@ Locate the restored bundle containing that manifest, inspect it, and pass its
 directory to the guarded restore command below. Securely remove the temporary
 restore tree when the recovery exercise is complete.
 
+### Monitor backup freshness
+
+Use the backup health command as the contract between this host and your
+monitoring system. A local-only check verifies that the newest complete bundle
+is recent and that both archives still match their manifest checksums:
+
+```bash
+scripts/check-self-hosting-backups.sh \
+  --backup-root /var/backups/multiforum \
+  --max-age-hours 36
+```
+
+When off-site uploads are enabled, load the Restic configuration and require a
+recent snapshot with the instance's tag. The local and remote freshness windows
+can differ:
+
+```bash
+sudo bash -c '
+  set -a
+  source /etc/multiforum/restic.env
+  set +a
+  /opt/multiforum/scripts/check-self-hosting-backups.sh \
+    --backup-root /var/backups/multiforum \
+    --max-age-hours 36 \
+    --restic-tag "$MULTIFORUM_BACKUP_RESTIC_TAG" \
+    --offsite-max-age-hours 48 \
+    --json
+'
+```
+
+Success exits zero. Missing, stale, corrupt, unreachable, or absent protection
+exits nonzero; `--json` emits a compact `ok` or `critical` object suitable for
+monitoring agents. Alert on any nonzero result and on failure to run the check
+itself. An external uptime check is still required because a command running on
+the Multiforum host cannot report when that host is offline.
+
 ### Restore a cold backup
 
 Restore onto a separate host first whenever possible. Before replacing the
