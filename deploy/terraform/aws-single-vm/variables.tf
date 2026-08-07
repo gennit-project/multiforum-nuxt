@@ -49,8 +49,7 @@ variable "root_volume_size_gib" {
 
 variable "application_cidrs" {
   type        = list(string)
-  description = "IPv4 CIDRs allowed to reach the temporary HTTP application port (3000)."
-  default     = ["0.0.0.0/0"]
+  description = "IPv4 CIDRs allowed to reach Caddy on HTTP, HTTPS, and HTTP/3. Use 0.0.0.0/0 for a public forum."
 
   validation {
     condition     = length(var.application_cidrs) > 0 && alltrue([for cidr in var.application_cidrs : can(cidrnetmask(cidr))])
@@ -58,13 +57,77 @@ variable "application_cidrs" {
   }
 }
 
+variable "domain" {
+  type        = string
+  description = "Public DNS hostname used by Multiforum and Caddy, for example forum.example.com."
+
+  validation {
+    condition     = length(var.domain) <= 253 && can(regex("^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$", var.domain))
+    error_message = "domain must be a lowercase fully qualified DNS hostname without a trailing dot."
+  }
+}
+
+variable "acme_email" {
+  type        = string
+  description = "Email address Caddy supplies to the ACME certificate authority."
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,63}$", var.acme_email))
+    error_message = "acme_email must be a valid email address using ordinary DNS characters."
+  }
+}
+
 variable "repository_ref" {
   type        = string
-  description = "Git branch or tag checked out by cloud-init. Pin a release tag for repeatable production installs."
+  description = "Git branch or tag containing the deployment configuration. Pin a release tag for repeatable installs."
   default     = "main"
 
   validation {
     condition     = can(regex("^[a-zA-Z0-9._/-]{1,100}$", var.repository_ref))
     error_message = "repository_ref contains unsupported characters."
+  }
+}
+
+variable "backend_image" {
+  type        = string
+  description = "Backend OCI image pulled during cloud-init. Pin a release or digest for repeatable installs."
+  default     = "ghcr.io/gennit-project/multiforum-backend:edge"
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9._/:@-]{0,254}$", var.backend_image))
+    error_message = "backend_image must be a valid OCI image reference without whitespace."
+  }
+}
+
+variable "neo4j_image" {
+  type        = string
+  description = "Neo4j OCI image pulled during cloud-init. Pin a tested version or digest."
+  default     = "neo4j:5.1.0"
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9._/:@-]{0,254}$", var.neo4j_image))
+    error_message = "neo4j_image must be a valid OCI image reference without whitespace."
+  }
+}
+
+variable "frontend_image" {
+  type        = string
+  description = "Frontend OCI image pulled during cloud-init. Pin a release or digest for repeatable installs."
+  default     = "ghcr.io/gennit-project/multiforum-nuxt:edge"
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9._/:@-]{0,254}$", var.frontend_image))
+    error_message = "frontend_image must be a valid OCI image reference without whitespace."
+  }
+}
+
+variable "caddy_image" {
+  type        = string
+  description = "Caddy OCI image pulled during cloud-init. Pin a tested version or digest."
+  default     = "caddy:2.11.4-alpine"
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9._/:@-]{0,254}$", var.caddy_image))
+    error_message = "caddy_image must be a valid OCI image reference without whitespace."
   }
 }

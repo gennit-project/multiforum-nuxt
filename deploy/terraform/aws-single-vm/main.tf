@@ -28,10 +28,26 @@ resource "aws_security_group" "multiforum" {
   }
 
   ingress {
-    description = "Multiforum HTTP (replace with TLS before production use)"
-    from_port   = 3000
-    to_port     = 3000
+    description = "HTTP redirects and ACME validation"
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
+    cidr_blocks = var.application_cidrs
+  }
+
+  ingress {
+    description = "Multiforum HTTPS"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = var.application_cidrs
+  }
+
+  ingress {
+    description = "Multiforum HTTP/3"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "udp"
     cidr_blocks = var.application_cidrs
   }
 
@@ -61,6 +77,13 @@ resource "aws_instance" "multiforum" {
   vpc_security_group_ids      = [aws_security_group.multiforum.id]
 
   user_data = templatefile("${path.module}/cloud-init.tftpl", {
+    acme_email     = var.acme_email
+    backend_image  = var.backend_image
+    caddy_image    = var.caddy_image
+    domain         = var.domain
+    frontend_image = var.frontend_image
+    instance_name  = var.name
+    neo4j_image    = var.neo4j_image
     repository_ref = var.repository_ref
   })
 

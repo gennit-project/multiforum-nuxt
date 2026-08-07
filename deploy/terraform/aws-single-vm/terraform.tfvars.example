@@ -1,9 +1,15 @@
 aws_region   = "us-east-1"
 admin_cidr   = "203.0.113.10/32"
 ssh_key_name = "my-existing-ec2-key"
+domain       = "forum.example.com"
+acme_email   = "admin@example.com"
 
-# Pin a release tag for a repeatable production deployment.
+# Pin the deployment configuration and every image for a repeatable install.
 repository_ref = "main"
+neo4j_image     = "neo4j:5.1.0"
+backend_image  = "ghcr.io/gennit-project/multiforum-backend:edge"
+frontend_image = "ghcr.io/gennit-project/multiforum-nuxt:edge"
+caddy_image    = "caddy:2.11.4-alpine"
 
-# Start narrower during setup if the instance should not yet be public.
-application_cidrs = ["203.0.113.10/32"]
+# Public access is required for a public forum and Caddy's default ACME flow.
+application_cidrs = ["0.0.0.0/0"]

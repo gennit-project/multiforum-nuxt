@@ -11,6 +11,19 @@ runcmd:
   - systemctl enable --now docker
   - usermod -aG docker ubuntu
   - git clone --branch '${repository_ref}' --depth 1 https://github.com/gennit-project/multiforum-nuxt.git /opt/multiforum
+  - cp /opt/multiforum/.env.production.example /opt/multiforum/.env.production
+  - sed -i 's|^MULTIFORUM_DOMAIN=.*|MULTIFORUM_DOMAIN=${domain}|' /opt/multiforum/.env.production
+  - sed -i 's|^MULTIFORUM_INSTANCE_NAME=.*|MULTIFORUM_INSTANCE_NAME=${instance_name}|' /opt/multiforum/.env.production
+  - sed -i 's|^CADDY_ACME_EMAIL=.*|CADDY_ACME_EMAIL=${acme_email}|' /opt/multiforum/.env.production
+  - sed -i 's|^MULTIFORUM_NEO4J_IMAGE=.*|MULTIFORUM_NEO4J_IMAGE=${neo4j_image}|' /opt/multiforum/.env.production
+  - sed -i 's|^MULTIFORUM_BACKEND_IMAGE=.*|MULTIFORUM_BACKEND_IMAGE=${backend_image}|' /opt/multiforum/.env.production
+  - sed -i 's|^MULTIFORUM_FRONTEND_IMAGE=.*|MULTIFORUM_FRONTEND_IMAGE=${frontend_image}|' /opt/multiforum/.env.production
+  - sed -i 's|^MULTIFORUM_CADDY_IMAGE=.*|MULTIFORUM_CADDY_IMAGE=${caddy_image}|' /opt/multiforum/.env.production
+  - chmod 0600 /opt/multiforum/.env.production
   - chown -R ubuntu:ubuntu /opt/multiforum
+  - docker pull '${neo4j_image}'
+  - docker pull '${backend_image}'
+  - docker pull '${frontend_image}'
+  - docker pull '${caddy_image}'
 
-final_message: "Multiforum host prerequisites are ready. Application secrets have not been installed."
+final_message: "Multiforum production configuration and container images are ready. Configure DNS, Auth0, and every required secret before starting the stack."

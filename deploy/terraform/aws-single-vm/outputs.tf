@@ -4,8 +4,17 @@ output "public_ip" {
 }
 
 output "application_url" {
-  description = "Temporary HTTP URL. Configure a domain and TLS before production use."
-  value       = "http://${aws_eip.multiforum.public_ip}:3000"
+  description = "Public HTTPS URL served by Caddy after DNS and application configuration are complete."
+  value       = "https://${var.domain}"
+}
+
+output "dns_a_record" {
+  description = "DNS A record to create before starting the production stack."
+  value = {
+    name  = var.domain
+    type  = "A"
+    value = aws_eip.multiforum.public_ip
+  }
 }
 
 output "ssh_command" {
