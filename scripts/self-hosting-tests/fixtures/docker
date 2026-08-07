@@ -7,19 +7,36 @@ printf '%s\n' "$*" >>"$MULTIFORUM_FAKE_DOCKER_LOG"
 if [[ "${1:-}" == "compose" ]]; then
   case " $* " in
     *" config --format json "*)
-      cat <<'JSON'
+      if [[ "$*" == *"target.env"* ]]; then
+        database_image="${MULTIFORUM_FAKE_TARGET_DATABASE_IMAGE:-neo4j:test}"
+        backend_image="${MULTIFORUM_FAKE_TARGET_BACKEND_IMAGE:-ghcr.io/example/backend:1.2.3}"
+        frontend_image="${MULTIFORUM_FAKE_TARGET_FRONTEND_IMAGE:-ghcr.io/example/frontend:1.2.3}"
+        caddy_image="${MULTIFORUM_FAKE_TARGET_CADDY_IMAGE:-caddy:2.11.4-alpine}"
+      else
+        database_image="neo4j:test"
+        backend_image="ghcr.io/example/backend:test"
+        frontend_image="ghcr.io/example/frontend:test"
+        caddy_image="caddy:test"
+      fi
+      jq --null-input \
+        --arg databaseImage "$database_image" \
+        --arg backendImage "$backend_image" \
+        --arg frontendImage "$frontend_image" \
+        --arg caddyImage "$caddy_image" \
+        '
 {
   "services": {
-    "database": {"image": "neo4j:test"},
-    "backend": {"image": "ghcr.io/example/backend:test"},
-    "frontend": {"image": "ghcr.io/example/frontend:test"}
+    "database": {"image": $databaseImage},
+    "backend": {"image": $backendImage},
+    "frontend": {"image": $frontendImage},
+    "caddy": {"image": $caddyImage}
   },
   "volumes": {
     "neo4j-data": {"name": "neo4j-volume"},
     "frontend-data": {"name": "frontend-volume"}
   }
 }
-JSON
+'
       ;;
     *" ps --status running --services "*)
       if [[ -n "${MULTIFORUM_FAKE_RUNNING_SERVICES:-}" ]]; then
@@ -45,6 +62,21 @@ JSON
     *" up -d database backend frontend "*)
       if [[ "${MULTIFORUM_FAKE_FAIL_RESTART:-false}" == true ]]; then
         exit 44
+      fi
+      ;;
+    *" pull database backend frontend caddy "*)
+      if [[ "${MULTIFORUM_FAKE_FAIL_PULL:-false}" == true ]]; then
+        exit 46
+      fi
+      ;;
+    *" up -d --force-recreate --wait "*)
+      if [[ "${MULTIFORUM_BACKEND_PULL_POLICY:-}" != never ||
+        "${MULTIFORUM_FRONTEND_PULL_POLICY:-}" != never ]]; then
+        echo "Upgrade recreation must use only the pre-pulled application images." >&2
+        exit 48
+      fi
+      if [[ "${MULTIFORUM_FAKE_FAIL_UPGRADE:-false}" == true ]]; then
+        exit 47
       fi
       ;;
     *)

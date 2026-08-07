@@ -137,10 +137,11 @@ single-host limitations.
 ## Updates and destruction
 
 Terraform provisions infrastructure; it is deliberately not an in-place
-application updater. To update, back up Neo4j, select a repository tag and
-tested image versions, pull them, validate the merged model, and recreate the
-stack. Changing `repository_ref` or image variables in Terraform does not
-rerun cloud-init on an existing instance.
+application updater. Use the production guide's
+[safe upgrade command](../../../docs/self-hosting-production.md#updates-and-limitations)
+to pre-pull pinned images, take a safety backup, and recreate the existing
+stack. Changing `repository_ref` or image variables in Terraform does not rerun
+cloud-init on an existing instance.
 
 The Canonical SSM parameter selects the current Ubuntu 24.04 image at initial
 creation. Later AMI changes are ignored because silently replacing this
