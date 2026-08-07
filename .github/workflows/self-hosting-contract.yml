@@ -14,6 +14,7 @@ on:
       - 'scripts/backup-self-hosting.sh'
       - 'scripts/restore-self-hosting.sh'
       - 'scripts/upgrade-self-hosting.sh'
+      - 'scripts/verify-self-hosting.sh'
       - 'scripts/self-hosting-tests/**'
       - 'scripts/validate-self-hosting-contract.sh'
   push:
@@ -29,6 +30,7 @@ on:
       - 'scripts/backup-self-hosting.sh'
       - 'scripts/restore-self-hosting.sh'
       - 'scripts/upgrade-self-hosting.sh'
+      - 'scripts/verify-self-hosting.sh'
       - 'scripts/self-hosting-tests/**'
       - 'scripts/validate-self-hosting-contract.sh'
   workflow_dispatch:
