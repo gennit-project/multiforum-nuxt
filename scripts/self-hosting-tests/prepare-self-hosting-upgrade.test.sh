@@ -120,7 +120,7 @@ grep --fixed-strings 'NEO4J_PASSWORD=preserve-this-secret' "$target_env_file" >/
 grep --fixed-strings 'AUTH0_CLIENT_ID=preserve-this-identity' "$target_env_file" >/dev/null
 grep --fixed-strings '# Operator-owned production configuration.' "$target_env_file" >/dev/null
 test "$(grep --count '^MULTIFORUM_RELEASE_VERSION=' "$target_env_file")" -eq 1
-test "$(stat -f '%Lp' "$target_env_file" 2>/dev/null || stat -c '%a' "$target_env_file")" = 600
+test "$(stat -c '%a' "$target_env_file" 2>/dev/null || stat -f '%Lp' "$target_env_file")" = 600
 
 if "$prepare_script" \
   --manifest "$manifest_file" \
