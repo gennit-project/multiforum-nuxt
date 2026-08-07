@@ -29,7 +29,10 @@ if [[ "${1:-}" == "compose" ]]; then
     "database": {"image": $databaseImage},
     "backend": {"image": $backendImage},
     "frontend": {"image": $frontendImage},
-    "caddy": {"image": $caddyImage}
+    "caddy": {
+      "image": $caddyImage,
+      "environment": {"MULTIFORUM_DOMAIN": "forum.example.com"}
+    }
   },
   "volumes": {
     "neo4j-data": {"name": "neo4j-volume"},
@@ -50,6 +53,12 @@ if [[ "${1:-}" == "compose" ]]; then
         printf '%s\n' "$MULTIFORUM_FAKE_RUNNING_SERVICES"
       else
         printf 'database\nbackend\nfrontend\n'
+      fi
+      ;;
+    *" ps -q "*)
+      service="${!#}"
+      if [[ "${MULTIFORUM_FAKE_MISSING_SERVICE:-}" != "$service" ]]; then
+        printf '%s-container\n' "$service"
       fi
       ;;
     *" stop frontend backend "*)
@@ -84,6 +93,31 @@ if [[ "${1:-}" == "compose" ]]; then
       exit 90
       ;;
   esac
+elif [[ "${1:-}" == "inspect" ]]; then
+  container_id="${!#}"
+  service="${container_id%-container}"
+  case "$service" in
+    database) image="neo4j:test" ;;
+    backend) image="ghcr.io/example/backend:test" ;;
+    frontend) image="ghcr.io/example/frontend:test" ;;
+    caddy) image="caddy:test" ;;
+    *)
+      echo "Unexpected fake container: $container_id" >&2
+      exit 92
+      ;;
+  esac
+  if [[ "${MULTIFORUM_FAKE_IMAGE_MISMATCH_SERVICE:-}" == "$service" ]]; then
+    image="$image-mismatch"
+  fi
+  status=running
+  health=healthy
+  if [[ "$service" == caddy ]]; then
+    health=none
+  fi
+  if [[ "${MULTIFORUM_FAKE_UNHEALTHY_SERVICE:-}" == "$service" ]]; then
+    health=unhealthy
+  fi
+  printf '%s|%s|%s\n' "$image" "$status" "$health"
 elif [[ "${1:-}" == "run" ]]; then
   if [[ "$*" == *":/target"* ]]; then
     cat >/dev/null

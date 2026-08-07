@@ -102,16 +102,17 @@ docker compose \
   logs --tail=100 caddy frontend backend
 ```
 
-Verify the HTTPS origin, sign-in redirect, and container health:
+Run the read-only production verification command:
 
 ```bash
-curl --fail --show-error --head https://forum.example.com
-docker compose \
-  --env-file .env.production \
-  -f docker-compose.yml \
-  -f docker-compose.production.yml \
-  ps
+scripts/verify-self-hosting.sh --env-file .env.production
 ```
+
+It verifies that each running container uses the image selected by the
+environment, requires healthy database and application containers, checks the
+public HTTPS response for Caddy's security headers, and sends a harmless query
+through the same-origin GraphQL proxy. Complete a real Auth0 sign-in separately;
+the command does not accept or automate user credentials.
 
 Only Caddy publishes public ports. The frontend, backend, and Neo4j ports retain
 loopback-only bindings for host diagnostics. Caddy adds HSTS, MIME-sniffing, and
@@ -196,7 +197,8 @@ The command verifies the manifest, both SHA-256 checksums, archive paths, the
 stopped-service precondition, and the configured Neo4j image before replacing
 either volume. It never starts application services; once restoration begins,
 keep them stopped whether extraction succeeds or fails. After a successful
-restore, validate the Compose model and start the stack:
+restore, validate the Compose model, start the stack, and run production
+verification:
 
 ```bash
 docker compose \
@@ -209,6 +211,7 @@ docker compose \
   -f docker-compose.yml \
   -f docker-compose.production.yml \
   up -d
+scripts/verify-self-hosting.sh --env-file .env.production
 ```
 
 Use `--allow-database-image-mismatch` only after reviewing Neo4j's supported
@@ -250,9 +253,10 @@ Changing Neo4j is blocked unless `--allow-database-image-change` is supplied.
 Use that option only after reviewing Neo4j's supported upgrade path and testing
 the backup on a separate host.
 
-Verify HTTPS, authentication, application health, and representative reads and
-writes. Once satisfied, promote the target while retaining the old protected
-file through the rollback window:
+Run `scripts/verify-self-hosting.sh --env-file .env.production.next`, complete a
+real Auth0 sign-in, and test representative reads and writes. Once satisfied,
+promote the target while retaining the old protected file through the rollback
+window:
 
 ```bash
 mv .env.production .env.production.previous

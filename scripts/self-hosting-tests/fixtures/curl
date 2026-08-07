@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+printf '%s\n' "$*" >>"$MULTIFORUM_FAKE_CURL_LOG"
+
+if [[ "${MULTIFORUM_FAKE_CURL_FAIL:-false}" == true ]]; then
+  exit 22
+fi
+
+if [[ "$*" == *"/api/graphql"* ]]; then
+  if [[ "${MULTIFORUM_FAKE_GRAPHQL_FAIL:-false}" == true ]]; then
+    printf '%s\n' '{"errors":[{"message":"unavailable"}]}'
+  else
+    printf '%s\n' '{"data":{"__typename":"Query"}}'
+  fi
+  exit 0
+fi
+
+printf 'HTTP/1.1 200 OK\r\n'
+if [[ "${MULTIFORUM_FAKE_MISSING_HEADER:-}" != hsts ]]; then
+  printf 'Strict-Transport-Security: max-age=31536000\r\n'
+fi
+if [[ "${MULTIFORUM_FAKE_MISSING_HEADER:-}" != content-type ]]; then
+  printf 'X-Content-Type-Options: nosniff\r\n'
+fi
+if [[ "${MULTIFORUM_FAKE_MISSING_HEADER:-}" != referrer ]]; then
+  printf 'Referrer-Policy: strict-origin-when-cross-origin\r\n'
+fi
+printf 'Content-Type: text/html\r\n\r\n<html>Multiforum</html>\n'

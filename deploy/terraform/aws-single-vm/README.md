@@ -130,8 +130,13 @@ docker compose \
   logs --tail=100 caddy frontend backend
 ```
 
-Verify `https://YOUR_DOMAIN`, the Auth0 sign-in flow, and container health.
-The full production guide covers backups, verification, and current
+Run production verification, then complete a real Auth0 sign-in:
+
+```bash
+scripts/verify-self-hosting.sh --env-file .env.production
+```
+
+The full production guide covers backups, recovery, upgrades, and current
 single-host limitations.
 
 ## Updates and destruction
