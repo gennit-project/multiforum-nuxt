@@ -102,9 +102,9 @@ only when you need them.
 Local development authentication is intentionally restricted by the backend to
 `NODE_ENV=development`. Its shared bootstrap password is not a production
 identity system. Do not expose this Compose configuration to the public
-internet; use the production self-hosting path with Auth0 (or a future supported
-OIDC provider), TLS, unique secrets, backups, and an appropriately secured
-Neo4j deployment.
+internet; use the [production Compose foundation](./self-hosting-production.md)
+with Auth0 (or a future supported OIDC provider), TLS, unique secrets, backups,
+and an appropriately secured Neo4j deployment.
 
 ## Troubleshooting
 

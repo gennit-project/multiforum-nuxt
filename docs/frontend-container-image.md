@@ -46,6 +46,12 @@ The same image supports Auth0 when the corresponding server-only
 [frontend runtime configuration](./frontend-runtime-configuration.md) for the
 complete variable list and security boundaries.
 
+The `node-server` image stores Auth0 sessions below `/app/data`. Mount persistent
+storage there for production use. This filesystem store supports one frontend
+replica; horizontally scaled deployments require a shared session store. The
+[production Compose foundation](./self-hosting-production.md) configures the
+volume and TLS proxy.
+
 The local-development provider must not be exposed to the public internet.
 Production deployments require TLS, production authentication, unique secrets,
 backups, and appropriately secured backend and database services.

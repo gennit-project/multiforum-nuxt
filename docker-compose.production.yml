@@ -1,0 +1,73 @@
+# Production overlay for the image-based stack. Supply every required value in
+# .env.production and combine this file with docker-compose.yml.
+services:
+  database:
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:?Set NEO4J_PASSWORD}
+
+  backend:
+    environment:
+      NODE_ENV: production
+      ENVIRONMENT: production
+      MULTIFORUM_AUTH_PROVIDER: auth0
+      MULTIFORUM_AUTO_PROVISION: 'true'
+      SUPERADMIN_EMAIL: ${MULTIFORUM_SUPERADMIN_EMAIL:?Set MULTIFORUM_SUPERADMIN_EMAIL}
+      AUTH0_DOMAIN: ${AUTH0_DOMAIN:?Set AUTH0_DOMAIN}
+      AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID:?Set AUTH0_CLIENT_ID}
+      AUTH0_AUDIENCE: ${AUTH0_AUDIENCE:?Set AUTH0_AUDIENCE}
+      FRONTEND_URL: https://${MULTIFORUM_DOMAIN:?Set MULTIFORUM_DOMAIN}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:?Set NEO4J_PASSWORD}
+      PLUGIN_SECRET_ENCRYPTION_KEY: ${PLUGIN_SECRET_ENCRYPTION_KEY:?Set PLUGIN_SECRET_ENCRYPTION_KEY}
+      GCS_BUCKET_NAME: ${GCS_BUCKET_NAME:-}
+      GCS_PRIVATE_DOWNLOAD_BUCKET_NAME: ${GCS_PRIVATE_DOWNLOAD_BUCKET_NAME:-}
+      GOOGLE_CREDENTIALS_BASE64: ${GOOGLE_CREDENTIALS_BASE64:-}
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY:-}
+      SENDGRID_FROM_EMAIL: ${SENDGRID_FROM_EMAIL:-}
+
+  frontend:
+    environment:
+      NODE_ENV: production
+      NUXT_PUBLIC_AUTH_PROVIDER: auth0
+      NUXT_PUBLIC_BASE_URL: https://${MULTIFORUM_DOMAIN:?Set MULTIFORUM_DOMAIN}
+      NUXT_PUBLIC_ENVIRONMENT: production
+      NUXT_PUBLIC_LOGOUT_URL: https://${MULTIFORUM_DOMAIN:?Set MULTIFORUM_DOMAIN}/auth/logout
+      NUXT_AUTH0_DOMAIN: ${AUTH0_DOMAIN:?Set AUTH0_DOMAIN}
+      NUXT_AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID:?Set AUTH0_CLIENT_ID}
+      NUXT_AUTH0_CLIENT_SECRET: ${NUXT_AUTH0_CLIENT_SECRET:?Set NUXT_AUTH0_CLIENT_SECRET}
+      NUXT_AUTH0_SESSION_SECRET: ${NUXT_AUTH0_SESSION_SECRET:?Set NUXT_AUTH0_SESSION_SECRET}
+      NUXT_AUTH0_APP_BASE_URL: https://${MULTIFORUM_DOMAIN:?Set MULTIFORUM_DOMAIN}
+      NUXT_AUTH0_AUDIENCE: ${AUTH0_AUDIENCE:?Set AUTH0_AUDIENCE}
+      NUXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+      NUXT_PUBLIC_GOOGLE_MAP_ID: ${GOOGLE_MAP_ID:-}
+      NUXT_PUBLIC_OPEN_CAGE_API_KEY: ${OPEN_CAGE_API_KEY:-}
+      NUXT_PUBLIC_GOOGLE_CLOUD_STORAGE_BUCKET: ${GCS_BUCKET_NAME:-}
+    volumes:
+      - frontend-data:/app/data
+
+  caddy:
+    image: caddy:2.11.4-alpine
+    restart: unless-stopped
+    depends_on:
+      frontend:
+        condition: service_healthy
+    environment:
+      CADDY_ACME_EMAIL: ${CADDY_ACME_EMAIL:?Set CADDY_ACME_EMAIL}
+      MULTIFORUM_DOMAIN: ${MULTIFORUM_DOMAIN:?Set MULTIFORUM_DOMAIN}
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    volumes:
+      - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - multiforum-network
+
+volumes:
+  frontend-data:
+  caddy-data:
+  caddy-config:

@@ -4,6 +4,7 @@ import { config } from './config';
 import path from 'path';
 import { inMemoryCacheOptions } from './cache';
 import { DORMANT_AUTH0_CONFIG } from './utils/auth0RuntimeConfig';
+import { getAuthStorageConfig } from './utils/authStorageConfig';
 
 const isMockedE2E = process.env.VITE_E2E_MOCK_MODE === 'true';
 const browserGraphqlUrl = config?.graphqlUrl || 'http://localhost:4000';
@@ -16,9 +17,7 @@ const runtimeGraphqlFetch: typeof globalThis.fetch = (input, init) => {
       ? process.env.NUXT_BACKEND_GRAPHQL_URL?.trim()
       : '';
   const target =
-    typeof window === 'undefined'
-      ? runtimeBackendUrl || input
-      : input;
+    typeof window === 'undefined' ? runtimeBackendUrl || input : input;
   return globalThis.fetch(target, init);
 };
 const ignoredDevWatchPatterns = [
@@ -306,28 +305,14 @@ export default defineNuxtConfig({
     // silently logged out. A persistent, shared store survives restarts and (on
     // serverless) is shared across function instances, avoiding that cascade.
     //
-    // Production (Vercel) uses Upstash Redis over its REST API — no persistent
-    // TCP connections, so it fits the serverless model. The driver reads
-    // UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN from the environment at
-    // runtime (set these in the Vercel project). `ttl` (seconds) bounds orphaned
-    // entries: each session refresh re-`set`s the key and resets its TTL, so
-    // active sessions stay alive while abandoned ones expire after 30 days.
-    storage: {
-      auth0Sessions: {
-        driver: 'upstash',
-        base: 'auth0Sessions',
-        ttl: 60 * 60 * 24 * 30, // 30 days
-      },
-      // Per-email cache of the stable auth profile (username / mod name /
-      // avatar), so server/middleware/2.auth-session.ts doesn't re-run the full
-      // backend lookup on every authenticated request. Entries are written with
-      // a per-item TTL (PROFILE_CACHE_TTL_SECONDS); the unread-notification
-      // count is never cached here (fetched fresh per request).
-      authProfileCache: {
-        driver: 'upstash',
-        base: 'authProfileCache',
-      },
-    },
+    // Vercel uses Upstash Redis over its REST API so sessions are shared across
+    // function instances. The official node-server container keeps Auth0
+    // sessions under /app/data and uses a bounded in-process profile cache,
+    // avoiding an external Redis service for one frontend replica.
+    storage: getAuthStorageConfig({
+      nitroPreset: process.env.NITRO_PRESET,
+      dataDir: process.env.MULTIFORUM_DATA_DIR,
+    }),
     // Local dev keeps filesystem-backed mounts (no Upstash creds needed) that
     // still survive `nuxt dev` restarts. devStorage overrides the production
     // mounts above only during development.
@@ -337,8 +322,9 @@ export default defineNuxtConfig({
         base: './.auth0-sessions',
       },
       authProfileCache: {
-        driver: 'upstash',
-        base: 'authProfileCache',
+        driver: 'lru-cache',
+        max: 1000,
+        ttl: 60 * 60 * 1000,
       },
     },
     // Enable server-side caching
@@ -407,7 +393,7 @@ export default defineNuxtConfig({
     localAuthTokenEndpoint: '',
     // SPIKE (auth0-nuxt server-session migration): server-only Auth0 config.
     // These are overridden by NUXT_AUTH0_* env vars at runtime (see
-    // .env.auth0-nuxt.example). clientSecret + sessionSecret mean this is a
+    // .env.production.example). clientSecret + sessionSecret mean this is a
     // CONFIDENTIAL "Regular Web Application" in Auth0 — a different app type
     // than the current SPA.
     auth0: {

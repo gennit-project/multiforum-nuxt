@@ -6,6 +6,7 @@ Developer documentation for the Multiforum Nuxt frontend. See the
 ## Getting started & architecture
 
 - [Local self-hosting quick-start](./self-hosting-quickstart.md) — start a usable instance with one Docker Compose command
+- [Production Compose foundation](./self-hosting-production.md) — run the official images with Auth0, persistent sessions, and automatic TLS
 - [Frontend runtime configuration](./frontend-runtime-configuration.md) — configure one built frontend image at container startup
 - [Frontend container image](./frontend-container-image.md) — official image tags, architectures, and runtime behavior
 - [Development setup](./development-setup.md) — local environment and tooling
