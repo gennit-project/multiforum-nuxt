@@ -1,0 +1,45 @@
+name: Self-hosting deployment contract
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.env.quickstart.example'
+      - '.env.production.example'
+      - '.github/workflows/self-hosting-contract.yml'
+      - 'deploy/caddy/**'
+      - 'deploy/terraform/aws-single-vm/**'
+      - 'docker-compose*.yml'
+      - 'scripts/validate-self-hosting-contract.sh'
+  push:
+    branches:
+      - main
+    paths:
+      - '.env.quickstart.example'
+      - '.env.production.example'
+      - '.github/workflows/self-hosting-contract.yml'
+      - 'deploy/caddy/**'
+      - 'deploy/terraform/aws-single-vm/**'
+      - 'docker-compose*.yml'
+      - 'scripts/validate-self-hosting-contract.sh'
+  workflow_dispatch:
+
+concurrency:
+  group: self-hosting-contract-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate deployment contract
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Validate self-hosting deployment contract
+        run: scripts/validate-self-hosting-contract.sh
