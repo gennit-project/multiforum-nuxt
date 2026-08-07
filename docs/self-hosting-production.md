@@ -218,9 +218,52 @@ again.
 
 ## Updates and limitations
 
-Update one component at a time by changing its pinned image tag, pulling, and
-recreating the stack. Back up Neo4j first and review release notes for data or
-configuration migrations.
+Prepare upgrades in a separate protected environment file so the known-good
+configuration remains available for rollback:
+
+```bash
+cp -p .env.production .env.production.next
+$EDITOR .env.production.next
+```
+
+Set explicit release or immutable `sha-*` tags for Neo4j, the backend, the
+frontend, and Caddy. The upgrade command rejects `edge`, `latest`, branch-like
+tags, and untagged target images. Review release notes for data or configuration
+migrations, then run:
+
+```bash
+scripts/upgrade-self-hosting.sh \
+  --current-env-file .env.production \
+  --target-env-file .env.production.next \
+  --backup-output-dir /var/backups/multiforum \
+  --confirm-upgrade
+```
+
+The command validates both Compose models, requires the current production
+services to be running, pre-pulls every target image, creates a cold safety
+backup with the current image metadata, and then force-recreates the stack from
+the already-pulled local images in the target file. Image pull or backup
+failures happen before recreation, and Compose waits for services to become
+running or healthy. The command does not overwrite `.env.production`.
+
+Changing Neo4j is blocked unless `--allow-database-image-change` is supplied.
+Use that option only after reviewing Neo4j's supported upgrade path and testing
+the backup on a separate host.
+
+Verify HTTPS, authentication, application health, and representative reads and
+writes. Once satisfied, promote the target while retaining the old protected
+file through the rollback window:
+
+```bash
+mv .env.production .env.production.previous
+mv .env.production.next .env.production
+```
+
+If recreation fails, do not promote the target file. Stop any partially
+recreated application services, select `.env.production` and the safety backup
+created immediately before recreation, and follow the guarded restore procedure
+above. Encrypt or securely remove `.env.production.previous` after the rollback
+window because it contains production secrets.
 
 This foundation does not yet provide multiple application replicas, managed
 Neo4j, zero-downtime upgrades, unattended restores, or an open-source OIDC

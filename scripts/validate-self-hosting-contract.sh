@@ -37,6 +37,9 @@ scripts/self-hosting-tests/backup-self-hosting.test.sh
 echo "Testing the guarded production restore command..."
 scripts/self-hosting-tests/restore-self-hosting.test.sh
 
+echo "Testing the safe production upgrade command..."
+scripts/self-hosting-tests/upgrade-self-hosting.test.sh
+
 echo "Validating the image-based quick-start contract..."
 docker compose \
   --env-file .env.quickstart.example \
