@@ -91,6 +91,10 @@ if [[ "${1:-}" == "compose" ]]; then
       fi
       ;;
     *" up -d --wait --wait-timeout 300 database backend frontend "*)
+      if [[ "${MULTIFORUM_BOOTSTRAP_USERNAME:-}" != release_smoke_admin ]]; then
+        echo "Release smoke must use a backend-compatible bootstrap username." >&2
+        exit 51
+      fi
       if [[ "${MULTIFORUM_FAKE_FAIL_RELEASE_SMOKE_START:-false}" == true ]]; then
         exit 49
       fi

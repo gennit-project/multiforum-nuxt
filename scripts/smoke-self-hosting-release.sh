@@ -120,7 +120,7 @@ export MULTIFORUM_BACKEND_PULL_POLICY=never
 export MULTIFORUM_FRONTEND_PULL_POLICY=never
 export MULTIFORUM_INSTANCE_NAME="Multiforum Release $release_version"
 export MULTIFORUM_BOOTSTRAP_EMAIL=release-smoke@multiforum.local
-export MULTIFORUM_BOOTSTRAP_USERNAME=release-smoke-admin
+export MULTIFORUM_BOOTSTRAP_USERNAME=release_smoke_admin
 export MULTIFORUM_BOOTSTRAP_PASSWORD=multiforum-release-smoke-password
 export NEO4J_PASSWORD=multiforum-release-smoke-neo4j
 export MULTIFORUM_BIND_ADDRESS=127.0.0.1
@@ -172,7 +172,7 @@ profile_response="$(curl \
   "$base_url/api/session/profile")"
 if ! jq --exit-status '
   .isAuthenticated == true and
-  .username == "release-smoke-admin"
+  .username == "release_smoke_admin"
 ' <<<"$profile_response" >/dev/null; then
   echo "Release session did not resolve the bootstrapped administrator." >&2
   exit 1

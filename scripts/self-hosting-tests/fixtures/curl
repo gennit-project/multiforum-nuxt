@@ -21,7 +21,7 @@ if [[ "$*" == *"/api/session/profile"* ]]; then
   if [[ "${MULTIFORUM_FAKE_PROFILE_FAIL:-false}" == true ]]; then
     printf '%s\n' '{"isAuthenticated":false,"username":""}'
   else
-    printf '%s\n' '{"isAuthenticated":true,"username":"release-smoke-admin"}'
+    printf '%s\n' '{"isAuthenticated":true,"username":"release_smoke_admin"}'
   fi
   exit 0
 fi
