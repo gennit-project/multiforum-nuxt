@@ -1,0 +1,11 @@
+[Unit]
+Description=Schedule daily Multiforum production backups
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=30m
+Unit=multiforum-backup.service
+
+[Install]
+WantedBy=timers.target

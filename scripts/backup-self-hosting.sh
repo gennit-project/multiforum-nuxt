@@ -4,15 +4,19 @@ set -euo pipefail
 
 backup_root=""
 env_file=".env.production"
+retention_count=""
 backup_helper_image="${MULTIFORUM_BACKUP_HELPER_IMAGE:-busybox:1.36.1}"
 script_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 
 usage() {
   cat <<'EOF'
 Usage: scripts/backup-self-hosting.sh --output-dir PATH [--env-file PATH]
+       [--retention-count COUNT]
 
 Creates a consistent cold backup of the production Neo4j and frontend-session
-volumes. The frontend, backend, and database must already be running.
+volumes. The frontend, backend, and database must already be running. When a
+retention count is supplied, the oldest complete bundles are removed only after
+a new backup has completed successfully.
 EOF
 }
 
@@ -54,6 +58,15 @@ while (($# > 0)); do
       backup_root="$2"
       shift 2
       ;;
+    --retention-count)
+      if [[ -z "${2:-}" ]]; then
+        echo "--retention-count requires a positive integer." >&2
+        usage >&2
+        exit 2
+      fi
+      retention_count="$2"
+      shift 2
+      ;;
     --help|-h)
       usage
       exit 0
@@ -69,6 +82,11 @@ done
 if [[ -z "$backup_root" ]]; then
   echo "--output-dir is required." >&2
   usage >&2
+  exit 2
+fi
+
+if [[ -n "$retention_count" && ! "$retention_count" =~ ^[1-9][0-9]*$ ]]; then
+  echo "--retention-count must be a positive integer." >&2
   exit 2
 fi
 
@@ -195,4 +213,30 @@ mv -- "$working_dir" "$final_dir"
 backup_complete=true
 
 echo "Backup created: $final_dir"
+
+echo "Restarting the production services..."
+if ! "${compose[@]}" up -d database backend frontend; then
+  services_stopped=false
+  echo "Failed to restart one or more production services." >&2
+  exit 1
+fi
+services_stopped=false
+
+if [[ -n "$retention_count" ]]; then
+  complete_backups=()
+  while IFS= read -r backup_dir; do
+    if [[ -f "$backup_dir/manifest.json" &&
+      -f "$backup_dir/neo4j-data.tar.gz" &&
+      -f "$backup_dir/frontend-data.tar.gz" ]]; then
+      complete_backups+=("$backup_dir")
+    fi
+  done < <(find "$backup_root" -mindepth 1 -maxdepth 1 -type d \
+    -name 'multiforum-backup-????????T??????Z' -print | LC_ALL=C sort -r)
+
+  for ((backup_index = retention_count; backup_index < ${#complete_backups[@]}; backup_index++)); do
+    echo "Removing expired backup: ${complete_backups[$backup_index]}"
+    rm -rf -- "${complete_backups[$backup_index]}"
+  done
+fi
+
 echo "Encrypt and copy this bundle off the host before relying on it."

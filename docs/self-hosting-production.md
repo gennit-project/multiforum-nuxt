@@ -156,6 +156,35 @@ encrypt it at rest, apply a retention policy, monitor scheduled runs, and test
 restoring onto a separate host. Use Neo4j's online backup tooling instead when
 your selected edition and recovery requirements support it.
 
+### Schedule backups on the single-VM host
+
+The AWS single-VM example stages a disabled systemd service and daily timer.
+After the forum is running, first complete a manual backup and copy it off the
+host. Then review `/etc/multiforum/backup.env`; its default policy writes to
+`/var/backups/multiforum` and retains the seven newest complete local bundles.
+Enable the timer only after those values are correct:
+
+```bash
+sudo systemctl start multiforum-backup.service
+sudo systemctl enable --now multiforum-backup.timer
+systemctl list-timers multiforum-backup.timer
+```
+
+The timer is persistent, runs daily with a randomized delay of up to 30
+minutes, and uses a restrictive file-creation mask. Inspect the most recent run
+and its logs with:
+
+```bash
+systemctl status multiforum-backup.service
+journalctl -u multiforum-backup.service --since "2 days ago"
+```
+
+Retention runs only after a new backup completes successfully. It considers
+only timestamped directories containing the manifest and both expected
+archives; incomplete or unrelated paths are not deleted. The local schedule is
+not an off-host backup: arrange encrypted transfer separately, monitor both the
+timer and that transfer, and alert when either stops succeeding.
+
 ### Restore a cold backup
 
 Restore onto a separate host first whenever possible. Before replacing the

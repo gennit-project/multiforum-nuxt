@@ -27,6 +27,18 @@ if "$backup_script" --unknown >/dev/null 2>&1; then
   exit 1
 fi
 
+if "$backup_script" --output-dir "$test_root/invalid-retention" \
+  --env-file "$env_file" --retention-count 0 >/dev/null 2>&1; then
+  echo "Expected a zero retention count to fail." >&2
+  exit 1
+fi
+
+if "$backup_script" --output-dir "$test_root/invalid-retention" \
+  --env-file "$env_file" --retention-count >/dev/null 2>&1; then
+  echo "Expected a missing retention count to fail." >&2
+  exit 1
+fi
+
 if "$backup_script" --output-dir "$test_root/missing-env" \
   --env-file "$test_root/does-not-exist" >/dev/null 2>&1; then
   echo "Expected a missing production environment file to fail." >&2
@@ -58,18 +70,72 @@ grep --fixed-strings "stop frontend backend" "$MULTIFORUM_FAKE_DOCKER_LOG" >/dev
 grep --fixed-strings "stop database" "$MULTIFORUM_FAKE_DOCKER_LOG" >/dev/null
 grep --fixed-strings "up -d database backend frontend" "$MULTIFORUM_FAKE_DOCKER_LOG" >/dev/null
 
+retention_root="$test_root/retention"
+mkdir -p "$retention_root"
+for timestamp in 20260101T000000Z 20260201T000000Z 20260301T000000Z; do
+  bundle="$retention_root/multiforum-backup-$timestamp"
+  mkdir -p "$bundle"
+  : >"$bundle/manifest.json"
+  : >"$bundle/neo4j-data.tar.gz"
+  : >"$bundle/frontend-data.tar.gz"
+done
+incomplete_bundle="$retention_root/multiforum-backup-20250101T000000Z"
+mkdir -p "$incomplete_bundle"
+: >"$incomplete_bundle/manifest.json"
+
+retention_output="$("$backup_script" --env-file "$env_file" \
+  --output-dir "$retention_root" --retention-count 2)"
+printf '%s\n' "$retention_output"
+
+restart_line="$(grep --line-number --fixed-strings \
+  'Restarting the production services...' <<<"$retention_output" | cut -d: -f1)"
+removal_line="$(grep --line-number --fixed-strings \
+  --max-count=1 'Removing expired backup:' <<<"$retention_output" | cut -d: -f1)"
+if [[ -z "$restart_line" || -z "$removal_line" || "$restart_line" -ge "$removal_line" ]]; then
+  echo "Expected production services to restart before local retention work." >&2
+  exit 1
+fi
+
+complete_bundle_count=0
+for bundle in "$retention_root"/multiforum-backup-*; do
+  if [[ -f "$bundle/manifest.json" &&
+    -f "$bundle/neo4j-data.tar.gz" &&
+    -f "$bundle/frontend-data.tar.gz" ]]; then
+    ((complete_bundle_count += 1))
+  fi
+done
+if ((complete_bundle_count != 2)); then
+  echo "Expected retention to preserve exactly two complete backups." >&2
+  exit 1
+fi
+test -d "$retention_root/multiforum-backup-20260301T000000Z"
+test -d "$incomplete_bundle"
+test ! -e "$retention_root/multiforum-backup-20260101T000000Z"
+test ! -e "$retention_root/multiforum-backup-20260201T000000Z"
+
 failure_root="$test_root/failure"
 mkdir -p "$failure_root"
+preserved_bundle="$failure_root/multiforum-backup-20260101T000000Z"
+mkdir -p "$preserved_bundle"
+: >"$preserved_bundle/manifest.json"
+: >"$preserved_bundle/neo4j-data.tar.gz"
+: >"$preserved_bundle/frontend-data.tar.gz"
 : >"$MULTIFORUM_FAKE_DOCKER_LOG"
 
 if MULTIFORUM_FAKE_FAIL_FRONTEND=true \
-  "$backup_script" --env-file "$env_file" --output-dir "$failure_root"; then
+  "$backup_script" --env-file "$env_file" --output-dir "$failure_root" \
+  --retention-count 1; then
   echo "Expected a failed archive command to fail the backup." >&2
   exit 1
 fi
 
-if find "$failure_root" -mindepth 1 -print -quit | grep --quiet .; then
-  echo "A failed backup must not leave a partial bundle." >&2
+if [[ ! -d "$preserved_bundle" ]]; then
+  echo "A failed backup must not prune an existing complete bundle." >&2
+  exit 1
+fi
+if find "$failure_root" -mindepth 1 -maxdepth 1 \
+  ! -path "$preserved_bundle" -print -quit | grep --quiet .; then
+  echo "A failed backup must not leave a new partial bundle." >&2
   exit 1
 fi
 grep --fixed-strings "up -d database backend frontend" "$MULTIFORUM_FAKE_DOCKER_LOG" >/dev/null
