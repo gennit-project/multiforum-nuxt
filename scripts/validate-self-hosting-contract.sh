@@ -120,7 +120,7 @@ jq --exit-status '
   ] | all(.host_ip == "127.0.0.1")) and
   ([
     .services[] | .ports[]? | select(.host_ip == null) |
-    {published: .published, protocol: .protocol}
+    {published: (.published | tonumber), protocol: .protocol}
   ] | sort_by(.published, .protocol)) == [
     {published: 80, protocol: "tcp"},
     {published: 443, protocol: "tcp"},
