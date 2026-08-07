@@ -76,8 +76,9 @@ cloud-init status --wait
 Cloud-init clones the selected repository revision, copies
 `.env.production.example` to `.env.production`, injects the non-secret Terraform
 inputs, restricts the file to mode `0600`, and pre-pulls Neo4j, backend,
-frontend, and Caddy images. It deliberately does not start Compose while the
-required secrets are empty.
+frontend, and Caddy images. It also stages—but does not enable—the production
+backup service and daily timer. It deliberately does not start Compose or the
+backup timer while the required secrets are empty.
 
 ## Configure Auth0 and secrets
 
@@ -138,6 +139,19 @@ scripts/verify-self-hosting.sh --env-file .env.production
 
 The full production guide covers backups, recovery, upgrades, and current
 single-host limitations.
+
+After a manual backup succeeds, review `/etc/multiforum/backup.env` and enable
+the staged daily schedule:
+
+```bash
+sudo systemctl start multiforum-backup.service
+sudo systemctl enable --now multiforum-backup.timer
+systemctl list-timers multiforum-backup.timer
+```
+
+The default retains seven complete local bundles. Follow the production guide
+to monitor the unit and arrange encrypted off-host transfer; the timer alone
+does not protect data from instance or regional loss.
 
 ## Updates and destruction
 

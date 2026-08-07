@@ -43,6 +43,22 @@ scripts/self-hosting-tests/upgrade-self-hosting.test.sh
 echo "Testing production verification..."
 scripts/self-hosting-tests/verify-self-hosting.test.sh
 
+echo "Validating the systemd backup schedule..."
+grep --fixed-strings \
+  'EnvironmentFile=/etc/multiforum/backup.env' \
+  deploy/systemd/multiforum-backup.service >/dev/null
+grep --fixed-strings \
+  'ExecStart=/opt/multiforum/scripts/backup-self-hosting.sh --env-file ${MULTIFORUM_BACKUP_ENV_FILE} --output-dir ${MULTIFORUM_BACKUP_OUTPUT_DIR} --retention-count ${MULTIFORUM_BACKUP_RETENTION_COUNT}' \
+  deploy/systemd/multiforum-backup.service >/dev/null
+grep --fixed-strings 'UMask=0077' \
+  deploy/systemd/multiforum-backup.service >/dev/null
+grep --fixed-strings 'OnCalendar=daily' \
+  deploy/systemd/multiforum-backup.timer >/dev/null
+grep --fixed-strings 'Persistent=true' \
+  deploy/systemd/multiforum-backup.timer >/dev/null
+grep --fixed-strings 'RandomizedDelaySec=30m' \
+  deploy/systemd/multiforum-backup.timer >/dev/null
+
 echo "Validating the image-based quick-start contract..."
 docker compose \
   --env-file .env.quickstart.example \

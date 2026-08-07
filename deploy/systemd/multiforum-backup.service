@@ -1,0 +1,15 @@
+[Unit]
+Description=Create a consistent Multiforum production backup
+Documentation=https://github.com/gennit-project/multiforum-nuxt/blob/main/docs/self-hosting-production.md
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/multiforum/backup.env
+WorkingDirectory=/opt/multiforum
+ExecStart=/opt/multiforum/scripts/backup-self-hosting.sh --env-file ${MULTIFORUM_BACKUP_ENV_FILE} --output-dir ${MULTIFORUM_BACKUP_OUTPUT_DIR} --retention-count ${MULTIFORUM_BACKUP_RETENTION_COUNT}
+UMask=0077
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7

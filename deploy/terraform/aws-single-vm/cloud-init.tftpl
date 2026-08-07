@@ -21,6 +21,11 @@ runcmd:
   - sed -i 's|^MULTIFORUM_CADDY_IMAGE=.*|MULTIFORUM_CADDY_IMAGE=${caddy_image}|' /opt/multiforum/.env.production
   - chmod 0600 /opt/multiforum/.env.production
   - chown -R ubuntu:ubuntu /opt/multiforum
+  - install -d -m 0700 /etc/multiforum /var/backups/multiforum
+  - install -m 0600 /opt/multiforum/deploy/systemd/multiforum-backup.env.example /etc/multiforum/backup.env
+  - install -m 0644 /opt/multiforum/deploy/systemd/multiforum-backup.service /etc/systemd/system/multiforum-backup.service
+  - install -m 0644 /opt/multiforum/deploy/systemd/multiforum-backup.timer /etc/systemd/system/multiforum-backup.timer
+  - systemctl daemon-reload
   - docker pull '${neo4j_image}'
   - docker pull '${backend_image}'
   - docker pull '${frontend_image}'
