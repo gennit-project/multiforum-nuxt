@@ -1,6 +1,6 @@
 services:
   database:
-    image: neo4j:5.1.0
+    image: ${MULTIFORUM_NEO4J_IMAGE:-neo4j:5.1.0}
     restart: unless-stopped
     ports:
       - '${MULTIFORUM_BIND_ADDRESS:-127.0.0.1}:7474:7474'

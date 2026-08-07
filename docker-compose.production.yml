@@ -48,7 +48,7 @@ services:
       - frontend-data:/app/data
 
   caddy:
-    image: caddy:2.11.4-alpine
+    image: ${MULTIFORUM_CADDY_IMAGE:-caddy:2.11.4-alpine}
     restart: unless-stopped
     depends_on:
       frontend:
