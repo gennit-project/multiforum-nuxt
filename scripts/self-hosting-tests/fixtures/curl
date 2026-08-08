@@ -8,6 +8,40 @@ if [[ "${MULTIFORUM_FAKE_CURL_FAIL:-false}" == true ]]; then
   exit 22
 fi
 
+if [[ "$*" == *"/releases/download/"* ]]; then
+  output_file=""
+  previous_argument=""
+  for argument in "$@"; do
+    if [[ "$previous_argument" == "--output" ]]; then
+      output_file="$argument"
+      break
+    fi
+    previous_argument="$argument"
+  done
+  if [[ -z "$output_file" ]]; then
+    echo "Release download fixture requires --output." >&2
+    exit 2
+  fi
+  if [[ -n "${MULTIFORUM_FAKE_RELEASE_MANIFEST:-}" ]]; then
+    cp "$MULTIFORUM_FAKE_RELEASE_MANIFEST" "$output_file"
+  else
+    jq --null-input \
+      --arg release "${MULTIFORUM_FAKE_RELEASE_VERSION:-1.2.3}" '
+        {
+          schemaVersion: 1,
+          release: $release,
+          images: {
+            database: "neo4j:5.1.0",
+            backend: "ghcr.io/gennit-project/multiforum-backend:1.2.3",
+            frontend: "ghcr.io/gennit-project/multiforum-nuxt:1.2.3",
+            caddy: "caddy:2.11.4-alpine"
+          }
+        }
+      ' >"$output_file"
+  fi
+  exit 0
+fi
+
 if [[ "$*" == *"/api/auth/local-dev/login"* ]]; then
   if [[ "${MULTIFORUM_FAKE_LOGIN_FAIL:-false}" == true ]]; then
     printf '%s\n' '{"authenticated":false}'
