@@ -45,12 +45,17 @@ signs in with the automatically bootstrapped administrator, and resolves that
 administrator through the frontend session boundary. The stack and its volumes
 are deleted after either success or failure.
 
-Validate a downloaded manifest by itself:
+Download and validate a specific official release manifest:
 
 ```bash
-scripts/validate-self-hosting-release.sh \
-  --manifest multiforum-self-hosting-release.json
+scripts/download-self-hosting-release.sh --release 1.2.3
 ```
+
+The command accepts only SemVer without a leading `v`, constructs the asset URL
+under Multiforum's official GitHub repository, follows HTTPS redirects only,
+validates the downloaded release contract, confirms its declared version, and
+writes it atomically. It preserves an existing output unless
+`--replace-existing` is explicitly supplied.
 
 Prepare and validate the complete resolved deployment without copying the
 manifest values into `.env.production.next` by hand:

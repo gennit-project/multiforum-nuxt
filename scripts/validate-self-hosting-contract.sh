@@ -34,6 +34,7 @@ cd "$contract_root"
 echo "Testing the production release/version contract..."
 scripts/self-hosting-tests/validate-self-hosting-release.test.sh
 scripts/self-hosting-tests/create-self-hosting-release-manifest.test.sh
+scripts/self-hosting-tests/download-self-hosting-release.test.sh
 scripts/self-hosting-tests/smoke-self-hosting-release.test.sh
 scripts/self-hosting-tests/prepare-self-hosting-upgrade.test.sh
 scripts/validate-self-hosting-release.sh \
