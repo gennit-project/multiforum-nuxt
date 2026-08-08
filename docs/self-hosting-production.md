@@ -62,6 +62,19 @@ Download and validate the release manifest for the version you intend to run:
 scripts/download-self-hosting-release.sh --release VERSION
 ```
 
+For a high-assurance installation, install and authenticate the GitHub CLI and
+verify the manifest's signed build provenance while downloading it:
+
+```bash
+scripts/download-self-hosting-release.sh \
+  --release VERSION \
+  --verify-attestation
+```
+
+This check requires provenance signed by GitHub Actions for the requested
+release tag, from Multiforum's official container publishing workflow. A
+verification failure leaves no manifest at the requested output path.
+
 The resulting `multiforum-self-hosting-VERSION.json` is the machine-readable
 compatibility contract for the frontend, backend, Neo4j, and Caddy images. Copy
 its `release` value to

@@ -59,11 +59,22 @@ backups, and appropriately secured backend and database services.
 ## Supply-chain metadata
 
 Main-branch and release publications include OCI source and revision labels,
-a software bill of materials, and build provenance. Pulling by digest provides
-an immutable reference independent of the tag policy:
+a software bill of materials, and signed GitHub artifact attestations for the
+image's build provenance. Pulling by digest provides an immutable reference
+independent of the tag policy:
 
 ```bash
 docker pull ghcr.io/gennit-project/multiforum-nuxt@sha256:DIGEST
+```
+
+With the GitHub CLI authenticated for GitHub and GHCR, verify that the digest
+was produced by Multiforum's official publishing workflow:
+
+```bash
+gh attestation verify \
+  oci://ghcr.io/gennit-project/multiforum-nuxt@sha256:DIGEST \
+  --repo gennit-project/multiforum-nuxt \
+  --signer-workflow gennit-project/multiforum-nuxt/.github/workflows/container-image.yml
 ```
 
 The publishing workflow tests the non-root runtime, health check, runtime
