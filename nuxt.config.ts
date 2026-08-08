@@ -376,8 +376,6 @@ export default defineNuxtConfig({
   plugins: [
     { src: '@/plugins/00.runtime-instance-config', mode: 'all' },
     { src: '@/plugins/pinia', mode: 'all' },
-    { src: '@/plugins/google-maps', mode: 'client' },
-    { src: '@/plugins/performance.client', mode: 'client' },
     { src: '@/plugins/click-outside', mode: 'all' },
     { src: '@/plugins/accented.client', mode: 'client' },
     { src: '@/plugins/test-auth.client', mode: 'client' },
@@ -478,7 +476,6 @@ export default defineNuxtConfig({
         'accented',
         'luxon',
         'three',
-        'vue-google-maps-community-fork',
       ],
     },
     resolve: {
