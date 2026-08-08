@@ -17,8 +17,13 @@ const mountThumb = (props: Record<string, unknown>) =>
 describe('CarouselThumbnail', () => {
   it('renders a plain image for a regular url', () => {
     expect(
-      mountThumb({ image: { url: 'a.png' } }).find('img').exists()
-    ).toBe(true);
+      mountThumb({ image: { url: 'a.png' } }).find('img').attributes()
+    ).toMatchObject({
+      width: '80',
+      height: '80',
+      loading: 'lazy',
+      decoding: 'async',
+    });
   });
 
   it('renders the model viewer for a glb url', () => {

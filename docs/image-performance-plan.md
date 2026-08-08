@@ -178,3 +178,9 @@ Started Phase 1 Slice 1:
 - migrate avatar surfaces
 - migrate the sitewide discussion list thumbnail
 - migrate event list cover images
+
+Started Phase 1 Slice 2:
+
+- migrate the user image grid cards to the shared optimized-image wrapper
+- migrate library download preview cards to explicit dimensions and responsive sizes
+- migrate reusable gallery thumbnails to stable dimensions and lazy decoding

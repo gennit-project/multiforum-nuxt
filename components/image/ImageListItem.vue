@@ -3,6 +3,7 @@ import { defineAsyncComponent } from 'vue';
 import type { PropType } from 'vue';
 import type { Image } from '@/__generated__/graphql';
 import ModelViewer from '@/components/ModelViewer.vue';
+import AppImage from '@/components/image/AppImage.vue';
 import AddToImageFavorites from '@/components/favorites/AddToImageFavorites.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
 
@@ -70,12 +71,16 @@ const getImageAlt = (image: Image) => {
         />
       </ClientOnly>
       <!-- Regular image -->
-      <img
+      <AppImage
         v-else-if="props.image.url"
         :src="props.image.url"
         :alt="getImageAlt(props.image) ?? 'Image'"
         class="h-full w-full object-cover"
+        :width="300"
+        :height="300"
+        sizes="(min-width: 1280px) 20vw, (min-width: 768px) 25vw, 50vw"
         loading="lazy"
+        decoding="async"
       />
 
       <!-- Overlay with sensitive content warning -->

@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
+import AppImage from '@/components/image/AppImage.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
 
 const props = defineProps({
@@ -66,12 +67,16 @@ const sizeStyle = computed(() => ({
         :style="sizeStyle"
       />
     </ClientOnly>
-    <img
+    <AppImage
       v-else-if="image"
       :src="image.url || ''"
       :alt="image.alt || ''"
       class="h-full w-full rounded object-cover shadow-sm"
-      :style="sizeStyle"
+      :width="thumbnailWidth"
+      :height="thumbnailHeight"
+      :sizes="`${thumbnailWidth}px`"
+      loading="lazy"
+      decoding="async"
     />
   </div>
 </template>

@@ -20,7 +20,12 @@ const mountItem = (image: Partial<Image>) =>
 describe('ImageListItem', () => {
   it('renders a plain image for a regular url', () => {
     const wrapper = mountItem({ id: 'i1', url: 'https://img.test/a.png' });
-    expect(wrapper.find('img').exists()).toBe(true);
+    expect(wrapper.find('img').attributes()).toMatchObject({
+      width: '300',
+      height: '300',
+      loading: 'lazy',
+      decoding: 'async',
+    });
   });
 
   it('uses alt, then caption, then a fallback for the image alt', () => {
