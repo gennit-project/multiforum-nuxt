@@ -51,9 +51,13 @@ describe('EventCoverImageField', () => {
 
   it('renders the cover image when a url is provided', () => {
     const wrapper = mountField('https://img.test/cover.png');
-    expect(wrapper.get('img').attributes('src')).toBe(
-      'https://img.test/cover.png'
-    );
+    expect(wrapper.get('app-image-stub').attributes()).toMatchObject({
+      src: 'https://img.test/cover.png',
+      width: '1024',
+      height: '512',
+      loading: 'lazy',
+      decoding: 'async',
+    });
   });
 
   it('shows the empty state when there is no image', () => {

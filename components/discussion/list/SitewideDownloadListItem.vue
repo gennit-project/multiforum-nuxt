@@ -9,6 +9,7 @@ import ImageIcon from '@/components/icons/ImageIcon.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import CommentIcon from '@/components/icons/CommentIcon.vue';
 import DownloadQuarantineBadge from '@/components/download/DownloadQuarantineBadge.vue';
+import AppImage from '@/components/image/AppImage.vue';
 import { relativeTime } from '@/utils';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 import type { DiscussionWithFavorited } from '@/types/Discussion';
@@ -156,11 +157,16 @@ const handleOpenAlbum = () => {
     <div class="relative">
       <nuxt-link v-if="primaryChannel" class="block" :to="defaultLink">
         <div class="aspect-square w-full bg-gray-50 dark:bg-gray-800">
-          <img
+          <AppImage
             v-if="firstAlbumImage"
             :src="firstAlbumImage"
             :alt="discussion.title || 'Download preview'"
             class="h-full w-full object-cover"
+            :width="320"
+            :height="320"
+            sizes="(min-width: 1280px) 20vw, (min-width: 768px) 25vw, 50vw"
+            loading="lazy"
+            decoding="async"
           />
           <div
             v-else

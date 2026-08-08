@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import type { PropType } from 'vue';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
+import AppImage from '@/components/image/AppImage.vue';
 import { relativeTime } from '@/utils';
 
 const props = defineProps({
@@ -56,11 +57,16 @@ const createdAgo = computed(() => {
       <div
         class="aspect-square w-full overflow-hidden bg-gray-100 dark:bg-gray-700"
       >
-        <img
+        <AppImage
           v-if="firstImage"
           :src="firstImage"
           :alt="discussion?.title || 'Download preview'"
           class="h-full w-full object-cover"
+          :width="192"
+          :height="192"
+          sizes="192px"
+          loading="lazy"
+          decoding="async"
         />
         <div
           v-else

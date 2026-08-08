@@ -38,6 +38,19 @@ const mountDetails = () =>
       stubs: {
         LoadingSpinner: { name: 'LoadingSpinner', template: '<div class="spinner" />' },
         ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err">{{ text }}</div>' },
+        NuxtImg: {
+          props: [
+            'src',
+            'alt',
+            'width',
+            'height',
+            'sizes',
+            'loading',
+            'decoding',
+            'fetchpriority',
+          ],
+          template: '<img v-bind="$props" />',
+        },
         NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
         'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
       },
@@ -79,7 +92,13 @@ describe('ImageDetails content', () => {
   it('renders the image', () => {
     const wrapper = mountDetails();
 
-    expect(wrapper.get('img').attributes('src')).toBe('https://x/i.jpg');
+    expect(wrapper.get('img').attributes()).toMatchObject({
+      src: 'https://x/i.jpg',
+      width: '640',
+      height: '640',
+      loading: 'lazy',
+      decoding: 'async',
+    });
   });
 
   it('shows the uploader display name', () => {

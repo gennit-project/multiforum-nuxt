@@ -13,6 +13,7 @@ import AddImage from '@/components/AddImage.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import TrashIcon from '@/components/icons/TrashIcon.vue';
+import AppImage from '@/components/image/AppImage.vue';
 
 defineProps<{
   imageUrl?: string | null;
@@ -101,10 +102,15 @@ const removeImage = () => {
     <div
       class="relative overflow-hidden rounded-md border border-gray-200 dark:border-gray-600"
     >
-      <img
+      <AppImage
         alt="Cover Image"
         :src="imageUrl"
         class="h-auto max-h-64 w-full object-cover"
+        :width="1024"
+        :height="512"
+        sizes="(min-width: 1024px) 768px, 100vw"
+        loading="lazy"
+        decoding="async"
       />
 
       <!-- Image overlay when loading -->

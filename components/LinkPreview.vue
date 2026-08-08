@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed } from 'vue';
 import { config } from '@/config';
+import AppImage from '@/components/image/AppImage.vue';
 
 const props = defineProps<{
   url: string;
@@ -54,13 +55,17 @@ onMounted(() => {
 <template>
   <div class="my-1 overflow-hidden rounded border shadow-lg">
     <a :href="url" target="_blank" rel="noopener">
-      <img
+      <AppImage
         v-if="imageUrl && showImage"
-        class="m-4 w-20 object-cover"
+        class="m-4 h-20 w-20 object-cover"
         :src="imageUrl"
         :alt="imageAlt"
+        :width="80"
+        :height="80"
+        loading="lazy"
+        decoding="async"
         @error="showImage = false"
-      >
+      />
     </a>
     <div class="px-6 py-4">
       <a :href="url" target="_blank" rel="noopener"

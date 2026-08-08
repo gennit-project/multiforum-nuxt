@@ -123,6 +123,26 @@ describe('MultiSelect', () => {
     expect(wrapper.emitted('update:modelValue')).toBeUndefined();
   });
 
+  it('renders avatar images in the selected display and options list', async () => {
+    const wrapper = mountSelect({
+      multiple: false,
+      showChips: false,
+      modelValue: ['a'],
+      options: [
+        { value: 'a', label: 'Apple', avatar: 'https://img.test/a.png' },
+        { value: 'b', label: 'Banana', avatar: 'https://img.test/b.png' },
+      ],
+    });
+
+    await wrapper.get('[data-testid="ms"]').trigger('click');
+
+    expect(wrapper.findAll('img').map((img) => img.attributes('src'))).toEqual([
+      'https://img.test/a.png',
+      'https://img.test/a.png',
+      'https://img.test/b.png',
+    ]);
+  });
+
   const clickRow = async (
     wrapper: ReturnType<typeof mountSelect>,
     label: string

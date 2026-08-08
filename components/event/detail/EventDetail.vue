@@ -508,6 +508,10 @@ watchEffect(() => {
               v-if="event.coverImageURL"
               :src="event.coverImageURL"
               :alt="event.title"
+              :full-width="true"
+              sizes="(min-width: 1024px) 896px, 100vw"
+              loading="eager"
+              fetchpriority="high"
             />
 
             <div>

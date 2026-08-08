@@ -103,7 +103,13 @@ describe('ChannelDownloadListItem album image', () => {
       })
     );
 
-    expect(wrapper.get('img').attributes('src')).toBe('u2');
+    expect(wrapper.get('img').attributes()).toMatchObject({
+      src: 'u2',
+      width: '320',
+      height: '320',
+      loading: 'lazy',
+      decoding: 'async',
+    });
   });
 
   it('falls back to the first image when there is no order', () => {
@@ -111,7 +117,13 @@ describe('ChannelDownloadListItem album image', () => {
       makeDiscussion({ Album: { Images: [{ id: 'img1', url: 'u1' }] } })
     );
 
-    expect(wrapper.get('img').attributes('src')).toBe('u1');
+    expect(wrapper.get('img').attributes()).toMatchObject({
+      src: 'u1',
+      width: '320',
+      height: '320',
+      loading: 'lazy',
+      decoding: 'async',
+    });
   });
 
   it('shows a placeholder when there is no album', () => {

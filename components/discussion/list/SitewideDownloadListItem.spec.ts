@@ -43,4 +43,38 @@ describe('SitewideDownloadListItem', () => {
   it('reflects an overridden title', () => {
     expect(mountItem('Another Model').text()).toContain('Another Model');
   });
+
+  it('renders a sized lazy-loaded album preview', () => {
+    const wrapper = mountWithDefaults(SitewideDownloadListItem, {
+      props: {
+        discussion: makeDiscussion({
+          title: 'Cool Model',
+          hasDownload: true,
+          Author: { username: 'alice' },
+          Album: {
+            Images: [{ id: 'img-1', url: 'https://example.com/a.jpg' }],
+          },
+          DiscussionChannels: [
+            { channelUniqueName: 'cats' },
+          ] as Discussion['DiscussionChannels'],
+        } as Partial<Discussion>),
+      },
+      global: {
+        stubs: {
+          AddToDiscussionFavorites: true,
+          UsernameWithTooltip: true,
+          ImageIcon: true,
+          ChevronDownIcon: true,
+        },
+      },
+    });
+
+    expect(wrapper.get('img').attributes()).toMatchObject({
+      src: 'https://example.com/a.jpg',
+      width: '320',
+      height: '320',
+      loading: 'lazy',
+      decoding: 'async',
+    });
+  });
 });

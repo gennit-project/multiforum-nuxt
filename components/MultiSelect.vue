@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, useId } from 'vue';
 import type { PropType } from 'vue';
+import AppImage from '@/components/image/AppImage.vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import XmarkIcon from '@/components/icons/XmarkIcon.vue';
@@ -468,11 +469,16 @@ const describedBy = computed(() => {
           class="flex flex-1 items-start"
         >
           <!-- Show avatar/icon only for single selection -->
-          <img
+          <AppImage
             v-if="selectedOptions.length === 1 && selectedOptions[0]?.avatar"
             :src="selectedOptions[0]?.avatar"
             :alt="selectedOptions[0]?.label"
             class="mr-2 h-6 w-6 shrink-0 rounded-full"
+            :width="24"
+            :height="24"
+            sizes="24px"
+            loading="lazy"
+            decoding="async"
           />
           <i
             v-else-if="selectedOptions.length === 1 && selectedOptions[0]?.icon"
@@ -894,11 +900,16 @@ const describedBy = computed(() => {
                 </span>
               </div>
 
-              <img
+              <AppImage
                 v-if="option.avatar"
                 :src="option.avatar"
                 alt=""
                 class="mr-3 h-6 w-6 rounded-full"
+                :width="24"
+                :height="24"
+                sizes="24px"
+                loading="lazy"
+                decoding="async"
               />
 
               <i

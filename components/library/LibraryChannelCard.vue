@@ -41,6 +41,10 @@ withDefaults(
             :src="channel.channelIconURL"
             :alt="channel.displayName || channel.uniqueName"
             :rounded="true"
+            :full-width="true"
+            :width="48"
+            :height="48"
+            sizes="48px"
             class="h-12 w-12"
           />
           <AvatarComponent

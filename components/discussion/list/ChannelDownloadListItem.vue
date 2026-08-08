@@ -19,6 +19,7 @@ import CommentIcon from '@/components/icons/CommentIcon.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import DownloadQuarantineBadge from '@/components/download/DownloadQuarantineBadge.vue';
+import AppImage from '@/components/image/AppImage.vue';
 
 // Define props
 const props = defineProps({
@@ -139,11 +140,16 @@ const filteredQuery = computed(() => {
             <div
               class="aspect-square w-full overflow-hidden bg-gray-100 dark:bg-gray-700"
             >
-              <img
+              <AppImage
                 v-if="firstAlbumImage"
                 :src="firstAlbumImage"
                 :alt="title"
                 class="h-full w-full object-cover"
+                :width="320"
+                :height="320"
+                sizes="(min-width: 1280px) 20vw, (min-width: 768px) 25vw, 50vw"
+                loading="lazy"
+                decoding="async"
               />
               <div
                 v-else

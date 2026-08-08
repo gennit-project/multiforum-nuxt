@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import AppImage from '@/components/image/AppImage.vue';
 import type { ReusableImage } from './reusableImageTypes';
 
 const props = defineProps<{
@@ -63,12 +64,16 @@ const getUploaderLabel = (image: ReusableImage) => {
         :key="image.id"
         class="overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
       >
-        <img
+        <AppImage
           :src="image.url"
           :alt="getImageAlt(image)"
           class="h-32 w-full object-cover"
+          :width="320"
+          :height="128"
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           loading="lazy"
-        >
+          decoding="async"
+        />
         <div class="space-y-2 p-3">
           <p class="line-clamp-2 text-sm font-medium text-gray-900 dark:text-white">
             {{ image.caption || image.alt || image.id }}

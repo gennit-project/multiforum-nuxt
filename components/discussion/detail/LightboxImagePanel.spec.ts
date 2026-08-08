@@ -23,6 +23,19 @@ const mountPanel = (props: Record<string, unknown> = {}) =>
         ModelViewer: { name: 'ModelViewer', props: ['modelUrl'], template: '<div class="model" />' },
         StlViewer: { name: 'StlViewer', props: ['src'], template: '<div class="stl" />' },
         ClientOnly: { template: '<div><slot /></div>' },
+        NuxtImg: {
+          props: [
+            'src',
+            'alt',
+            'width',
+            'height',
+            'sizes',
+            'loading',
+            'decoding',
+            'fetchpriority',
+          ],
+          template: '<img v-bind="$props" />',
+        },
         LeftArrowIcon: true,
         RightArrowIcon: true,
       },
@@ -36,7 +49,12 @@ describe('LightboxImagePanel viewer selection', () => {
   it('renders an img for a regular image', () => {
     const wrapper = mountPanel();
 
-    expect(wrapper.find('img').attributes('src')).toBe('https://x/pic.png');
+    expect(wrapper.find('img').attributes()).toMatchObject({
+      src: 'https://x/pic.png',
+      loading: 'eager',
+      fetchpriority: 'high',
+      decoding: 'async',
+    });
   });
 
   it('renders a ModelViewer for a glb file', () => {

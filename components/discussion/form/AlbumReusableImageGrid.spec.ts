@@ -34,7 +34,13 @@ const addButtons = (wrapper: ReturnType<typeof mountGrid>) =>
 describe('AlbumReusableImageGrid', () => {
   it('renders one card per image', () => {
     const wrapper = mountGrid({ images: [image('a'), image('b')] });
-    expect(wrapper.findAll('article')).toHaveLength(2);
+    expect(wrapper.findAll('img')[0]?.attributes()).toMatchObject({
+      src: 'https://img.test/a.jpg',
+      width: '320',
+      height: '128',
+      loading: 'lazy',
+      decoding: 'async',
+    });
   });
 
   it('shows the loading spinner while loading with no images yet', () => {
