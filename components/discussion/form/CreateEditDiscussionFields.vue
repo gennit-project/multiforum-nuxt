@@ -407,7 +407,7 @@ onMounted(() => {
                   @update:model-value="
                     $emit('updateFormValues', {
                       selectedFlairIdsByChannel: {
-                        ...(formValues.selectedFlairIdsByChannel || {}),
+                        ...(formValues?.selectedFlairIdsByChannel || {}),
                         [flairChannel]: $event,
                       },
                     })

@@ -19,6 +19,7 @@ import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
+import AppImage from '@/components/image/AppImage.vue';
 import XmarkIcon from '@/components/icons/XmarkIcon.vue';
 import { stableRelativeTime } from '@/utils';
 import { useQuery } from '@vue/apollo-composable';
@@ -412,10 +413,13 @@ const revealSensitiveContent = () => {
           :to="getDetailLink()"
           class="shrink-0 lg:hidden"
         >
-          <img
+          <AppImage
             :src="thumbnailUrl"
             :alt="title"
             class="h-16 w-16 rounded-lg object-cover sm:h-20 sm:w-20"
+            :width="80"
+            :height="80"
+            sizes="(max-width: 639px) 64px, 80px"
           />
         </nuxt-link>
         <nuxt-link
@@ -423,10 +427,13 @@ const revealSensitiveContent = () => {
           :to="getDesktopSelectionLink()"
           class="hidden shrink-0 lg:block"
         >
-          <img
+          <AppImage
             :src="thumbnailUrl"
             :alt="title"
             class="h-16 w-16 rounded-lg object-cover sm:h-20 sm:w-20"
+            :width="80"
+            :height="80"
+            sizes="80px"
           />
         </nuxt-link>
         <nuxt-link
