@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.0](https://github.com/gennit-project/multiforum-nuxt/compare/v0.2.0...v0.3.0) (2026-08-08)
+
+
+### Features
+
+* **self-hosting:** attest release artifacts ([#499](https://github.com/gennit-project/multiforum-nuxt/issues/499)) ([a2cc02a](https://github.com/gennit-project/multiforum-nuxt/commit/a2cc02abde83792123d4034ba36c8855c5769f3b))
+
+
+### Performance Improvements
+
+* **cwv:** drop unused maps wrapper dependency ([#503](https://github.com/gennit-project/multiforum-nuxt/issues/503)) ([394f45b](https://github.com/gennit-project/multiforum-nuxt/commit/394f45bbe8c8a5cd9598f784adbcd9c50ab4adf5))
+* **cwv:** remove dead global client plugins ([#501](https://github.com/gennit-project/multiforum-nuxt/issues/501)) ([e497e4e](https://github.com/gennit-project/multiforum-nuxt/commit/e497e4e01d953da16fe616e9529045ec366baf5a))
+* **cwv:** start image delivery phase one ([#504](https://github.com/gennit-project/multiforum-nuxt/issues/504)) ([3144216](https://github.com/gennit-project/multiforum-nuxt/commit/314421694a16023c4aa4a3f8cfd775caafa4ba56))
+
 ## [0.2.0](https://github.com/gennit-project/multiforum-nuxt/compare/v0.1.0...v0.2.0) (2026-08-08)
 
 
