@@ -54,6 +54,15 @@ grep --fixed-strings \
   'scripts/smoke-self-hosting-release.sh' \
   .github/workflows/container-image.yml >/dev/null
 grep --fixed-strings \
+  'uses: actions/attest@v4' \
+  .github/workflows/container-image.yml >/dev/null
+grep --fixed-strings \
+  'subject-digest: ${{ steps.build.outputs.digest }}' \
+  .github/workflows/container-image.yml >/dev/null
+grep --fixed-strings \
+  'subject-path: ${{ steps.release-manifest.outputs.path }}' \
+  .github/workflows/container-image.yml >/dev/null
+grep --fixed-strings \
   'actions: write' \
   .github/workflows/release-please.yml >/dev/null
 grep --fixed-strings \

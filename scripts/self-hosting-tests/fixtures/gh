@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+printf '%s\n' "$*" >>"$MULTIFORUM_FAKE_GH_LOG"
+
+if [[ "${MULTIFORUM_FAKE_GH_FAIL:-false}" == true ]]; then
+  exit 1
+fi
+
+if [[ "${1:-}" != attestation || "${2:-}" != verify ]]; then
+  echo "Unexpected GitHub CLI fixture command: $*" >&2
+  exit 2
+fi

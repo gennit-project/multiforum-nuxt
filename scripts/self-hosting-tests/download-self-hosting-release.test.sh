@@ -11,7 +11,9 @@ trap 'rm -rf "$test_root"' EXIT
 
 export PATH="$fixture_bin:$PATH"
 export MULTIFORUM_FAKE_CURL_LOG="$test_root/curl.log"
+export MULTIFORUM_FAKE_GH_LOG="$test_root/gh.log"
 : >"$MULTIFORUM_FAKE_CURL_LOG"
+: >"$MULTIFORUM_FAKE_GH_LOG"
 
 file_mode() {
   stat -c '%a' "$1" 2>/dev/null || stat -f '%Lp' "$1"
@@ -40,6 +42,7 @@ output_file="$test_root/releases/multiforum-self-hosting-1.2.3.json"
 test -f "$output_file"
 jq --exit-status '.schemaVersion == 1 and .release == "1.2.3"' "$output_file" >/dev/null
 test "$(file_mode "$output_file")" = 644
+test ! -s "$MULTIFORUM_FAKE_GH_LOG"
 grep --fixed-strings \
   'https://github.com/gennit-project/multiforum-nuxt/releases/download/v1.2.3/multiforum-self-hosting-1.2.3.json' \
   "$MULTIFORUM_FAKE_CURL_LOG" >/dev/null
@@ -122,6 +125,36 @@ if MULTIFORUM_FAKE_CURL_FAIL=true \
   exit 1
 fi
 test ! -e "$failed_output"
+
+attested_output="$test_root/attested.json"
+"$download_script" \
+  --release 1.2.3 \
+  --output "$attested_output" \
+  --verify-attestation >/dev/null
+test -f "$attested_output"
+grep --fixed-strings \
+  'attestation verify' \
+  "$MULTIFORUM_FAKE_GH_LOG" >/dev/null
+grep --fixed-strings -- \
+  '--repo gennit-project/multiforum-nuxt' \
+  "$MULTIFORUM_FAKE_GH_LOG" >/dev/null
+grep --fixed-strings -- \
+  '--signer-workflow gennit-project/multiforum-nuxt/.github/workflows/container-image.yml' \
+  "$MULTIFORUM_FAKE_GH_LOG" >/dev/null
+grep --fixed-strings -- \
+  '--source-ref refs/tags/v1.2.3' \
+  "$MULTIFORUM_FAKE_GH_LOG" >/dev/null
+
+failed_attestation_output="$test_root/failed-attestation.json"
+if MULTIFORUM_FAKE_GH_FAIL=true \
+  "$download_script" \
+  --release 1.2.3 \
+  --output "$failed_attestation_output" \
+  --verify-attestation >/dev/null 2>&1; then
+  echo "Expected release download to propagate an attestation failure." >&2
+  exit 1
+fi
+test ! -e "$failed_attestation_output"
 
 (
   cd "$test_root"

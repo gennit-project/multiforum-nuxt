@@ -23,7 +23,10 @@ jobs:
   build-publish-smoke:
     runs-on: ubuntu-latest
     permissions:
+      artifact-metadata: write
+      attestations: write
       contents: read
+      id-token: write
       packages: write
     outputs:
       frontend-digest: ${{ steps.build.outputs.digest }}
@@ -230,12 +233,23 @@ jobs:
           trap 'rm -rf "$anonymous_docker_config"' EXIT
           DOCKER_CONFIG="$anonymous_docker_config" docker pull "$PUBLISHED_IMAGE"
 
+      - name: Attest the accepted frontend image
+        if: github.event_name != 'pull_request'
+        uses: actions/attest@v4
+        with:
+          subject-name: ${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
   publish-release-manifest:
     if: startsWith(github.ref, 'refs/tags/v')
     needs: build-publish-smoke
     runs-on: ubuntu-latest
     permissions:
+      artifact-metadata: write
+      attestations: write
       contents: write
+      id-token: write
 
     steps:
       - name: Check out release source
@@ -266,6 +280,11 @@ jobs:
           while IFS= read -r image; do
             DOCKER_CONFIG="$anonymous_docker_config" docker pull "$image"
           done < <(jq --raw-output '.images[]' "$RELEASE_MANIFEST")
+
+      - name: Attest the self-hosting release manifest
+        uses: actions/attest@v4
+        with:
+          subject-path: ${{ steps.release-manifest.outputs.path }}
 
       - name: Preserve the release manifest with the workflow run
         uses: actions/upload-artifact@v4

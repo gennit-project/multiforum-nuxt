@@ -5,18 +5,21 @@ set -euo pipefail
 release_version=""
 output_file=""
 replace_existing=false
+verify_attestation=false
 official_repository="gennit-project/multiforum-nuxt"
+official_signer_workflow="${official_repository}/.github/workflows/container-image.yml"
 script_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 
 usage() {
   cat <<'EOF'
 Usage: scripts/download-self-hosting-release.sh --release VERSION
-       [--output PATH] [--replace-existing]
+       [--output PATH] [--replace-existing] [--verify-attestation]
 
 Downloads one version-pinned self-hosting manifest from Multiforum's official
 GitHub Release, validates its schema and image references, confirms that its
 declared version matches VERSION, and writes it atomically. VERSION must be
-SemVer without a leading v.
+SemVer without a leading v. --verify-attestation additionally requires the
+GitHub CLI and verifies signed provenance from the official release workflow.
 EOF
 }
 
@@ -44,6 +47,10 @@ while (($# > 0)); do
       ;;
     --replace-existing)
       replace_existing=true
+      shift
+      ;;
+    --verify-attestation)
+      verify_attestation=true
       shift
       ;;
     --help|-h)
@@ -89,6 +96,10 @@ for required_command in curl jq; do
     exit 1
   fi
 done
+if [[ "$verify_attestation" == true ]] && ! command -v gh >/dev/null 2>&1; then
+  echo "Required command not found for attestation verification: gh" >&2
+  exit 1
+fi
 
 output_dir="$(dirname -- "$output_file")"
 mkdir -p "$output_dir"
@@ -120,6 +131,14 @@ if [[ "$downloaded_version" != "$release_version" ]]; then
   echo "Requested:  $release_version" >&2
   echo "Downloaded: $downloaded_version" >&2
   exit 1
+fi
+
+if [[ "$verify_attestation" == true ]]; then
+  echo "Verifying signed provenance for the release manifest"
+  gh attestation verify "$temporary_output" \
+    --repo "$official_repository" \
+    --signer-workflow "$official_signer_workflow" \
+    --source-ref "refs/tags/v${release_version}" >/dev/null
 fi
 
 chmod 644 "$temporary_output"
