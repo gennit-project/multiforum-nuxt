@@ -45,6 +45,8 @@ if [[ "${1:-}" == "compose" ]]; then
         --arg frontendImage "$frontend_image" \
         --arg caddyImage "$caddy_image" \
         --arg releaseVersion "${MULTIFORUM_FAKE_RELEASE_VERSION:-$release_version}" \
+        --arg neo4jVolume "${MULTIFORUM_FAKE_NEO4J_VOLUME:-neo4j-volume}" \
+        --arg frontendVolume "${MULTIFORUM_FAKE_FRONTEND_VOLUME:-frontend-volume}" \
         '
 {
   "services": {
@@ -58,8 +60,8 @@ if [[ "${1:-}" == "compose" ]]; then
     }
   },
   "volumes": {
-    "neo4j-data": {"name": "neo4j-volume"},
-    "frontend-data": {"name": "frontend-volume"}
+    "neo4j-data": {"name": $neo4jVolume},
+    "frontend-data": {"name": $frontendVolume}
   }
 }
 '
@@ -160,6 +162,9 @@ elif [[ "${1:-}" == "inspect" ]]; then
   release_version="${MULTIFORUM_FAKE_RUNNING_RELEASE_VERSION:-1.2.3}"
   printf '%s|%s|%s|%s\n' "$image" "$status" "$health" "$release_version"
 elif [[ "${1:-}" == "run" ]]; then
+  if [[ "${MULTIFORUM_FAKE_DOCKER_REAL_VOLUME_IO:-false}" == true ]]; then
+    exec "$MULTIFORUM_REAL_DOCKER" "$@"
+  fi
   if [[ "$*" == *"caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile"* ]]; then
     if [[ "${MULTIFORUM_FAKE_FAIL_CADDY_VALIDATION:-false}" == true ]]; then
       exit 50
