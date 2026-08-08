@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, useAttrs } from 'vue';
 import { canOptimizeImageUrl } from '@/utils/imageOptimization';
+
+defineOptions({
+  inheritAttrs: false,
+});
 
 const props = withDefaults(
   defineProps<{
@@ -12,8 +16,6 @@ const props = withDefaults(
     loading?: 'lazy' | 'eager';
     decoding?: 'async' | 'sync' | 'auto';
     fetchpriority?: 'high' | 'low' | 'auto';
-    class?: string;
-    ariaHidden?: string;
   }>(),
   {
     width: undefined,
@@ -22,17 +24,17 @@ const props = withDefaults(
     loading: 'lazy',
     decoding: 'async',
     fetchpriority: 'auto',
-    class: '',
-    ariaHidden: undefined,
   }
 );
 
+const attrs = useAttrs();
 const shouldOptimize = computed(() => canOptimizeImageUrl(props.src));
 </script>
 
 <template>
   <NuxtImg
     v-if="shouldOptimize"
+    v-bind="attrs"
     :src="src"
     :alt="alt"
     :width="width"
@@ -41,11 +43,10 @@ const shouldOptimize = computed(() => canOptimizeImageUrl(props.src));
     :loading="loading"
     :decoding="decoding"
     :fetchpriority="fetchpriority"
-    :class="props.class"
-    :aria-hidden="ariaHidden"
   />
   <img
     v-else
+    v-bind="attrs"
     :src="src"
     :alt="alt"
     :width="width"
@@ -53,7 +54,5 @@ const shouldOptimize = computed(() => canOptimizeImageUrl(props.src));
     :loading="loading"
     :decoding="decoding"
     :fetchpriority="fetchpriority"
-    :class="props.class"
-    :aria-hidden="ariaHidden"
   >
 </template>
