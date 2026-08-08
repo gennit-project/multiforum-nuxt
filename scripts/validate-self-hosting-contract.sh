@@ -80,6 +80,9 @@ scripts/self-hosting-tests/verify-self-hosting.test.sh
 echo "Testing guarded upgrade promotion..."
 scripts/self-hosting-tests/promote-self-hosting-upgrade.test.sh
 
+echo "Testing guarded upgrade rollback..."
+scripts/self-hosting-tests/rollback-self-hosting-upgrade.test.sh
+
 echo "Validating the systemd backup schedule..."
 grep --fixed-strings \
   'EnvironmentFile=/etc/multiforum/backup.env' \

@@ -460,6 +460,33 @@ the active file. It refuses symbolic links, cross-directory replacement, or an
 existing rollback file. Use `--replace-previous` only after preserving or
 retiring the older rollback configuration.
 
+If a release problem appears during the rollback window, review whether its
+data or database migrations are backward-compatible, then redeploy the
+preserved environment through the guarded rollback command:
+
+```bash
+scripts/rollback-self-hosting-upgrade.sh \
+  --current-env-file .env.production \
+  --rollback-env-file .env.production.previous \
+  --failed-env-file .env.production.failed \
+  --backup-output-dir /var/backups/multiforum \
+  --confirm-rollback
+```
+
+Rollback pre-pulls the preserved image set, creates a fresh cold safety backup
+of the current data, recreates the stack, and verifies it before rotating any
+environment files. On success, the rollback configuration becomes
+`.env.production` and the failed release is retained as a protected
+`.env.production.failed`. A Neo4j image change remains blocked unless
+`--allow-database-image-change` is supplied after reviewing the supported
+downgrade path. An existing failed-release file is preserved unless
+`--replace-failed` is explicitly supplied.
+
+If rollback verification fails, the recreated services remain selected by the
+rollback file but no environment files are rotated. Resolve the verification
+failure, then use `promote-self-hosting-upgrade.sh` with the rollback file as
+the target. The fresh safety backup remains available throughout recovery.
+
 If recreation fails, do not promote the target file. Stop any partially
 recreated application services, select `.env.production` and the safety backup
 created immediately before recreation, and follow the guarded restore procedure
