@@ -15,6 +15,7 @@ import { useUsername } from '@/composables/useAuthState';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
 import CarouselThumbnail from '@/components/discussion/detail/CarouselThumbnail.vue';
+import AppImage from '@/components/image/AppImage.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
 
 const ImageLightbox = defineAsyncComponent(
@@ -136,6 +137,13 @@ const orderedImages = computed(() => {
 const activeImage = computed(() => {
   return orderedImages.value[activeIndex.value] || null;
 });
+
+const mainImageWidth = computed(() => (props.expandedView ? 600 : 384));
+const mainImageSizes = computed(() =>
+  props.expandedView
+    ? '(min-width: 1024px) 600px, 100vw'
+    : '(min-width: 1024px) 384px, (min-width: 768px) 60vw, 100vw'
+);
 
 // Caption editing for thumbnail grid
 const editingCaptionIndex = ref(-1);
@@ -310,11 +318,16 @@ onMounted(() => {
               class="shadow-sm"
             />
           </ClientOnly>
-          <img
+          <AppImage
             v-else-if="image"
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="shadow-sm"
+            :width="200"
+            :height="200"
+            sizes="(min-width: 1024px) 33vw, 50vw"
+            loading="lazy"
+            decoding="async"
           />
           <div
             v-if="editingCaptionIndex === idx"
@@ -526,11 +539,17 @@ onMounted(() => {
                     }"
                   />
                 </ClientOnly>
-                <img
+                <AppImage
                   v-else
                   :src="activeImage.url || ''"
                   :alt="activeImage.alt || ''"
                   class="shadow-sm"
+                  :width="mainImageWidth"
+                  :height="mainImageHeight"
+                  :sizes="mainImageSizes"
+                  :loading="expandedView ? 'eager' : 'lazy'"
+                  decoding="async"
+                  :fetchpriority="expandedView ? 'high' : 'auto'"
                   :class="{
                     'max-h-96 max-w-96 object-contain': !expandedView,
                     'h-full w-full object-cover': expandedView,

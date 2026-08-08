@@ -3,6 +3,7 @@ import type { PropType } from 'vue';
 import { ref, computed } from 'vue';
 import VueEasyLightbox from 'vue-easy-lightbox';
 import type { Album } from '@/__generated__/graphql';
+import AppImage from '@/components/image/AppImage.vue';
 import LeftArrowIcon from '@/components/icons/LeftArrowIcon.vue';
 import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
 
@@ -59,6 +60,12 @@ const canScrollLeft = computed(() => thumbnailStartIndex.value > 0);
 const canScrollRight = computed(
   () => thumbnailStartIndex.value < props.album.Images.length - 4
 );
+
+const carouselMainImageSizes = computed(() =>
+  props.carouselFormat
+    ? '(min-width: 1024px) 384px, (min-width: 768px) 60vw, 100vw'
+    : '(min-width: 1024px) 33vw, 50vw'
+);
 </script>
 
 <template>
@@ -72,11 +79,16 @@ const canScrollRight = computed(
         :aria-label="`View ${image.alt || `image ${index + 1}`} in gallery`"
         @click="openLightbox(index)"
       >
-        <img
+        <AppImage
           :src="image.url || ''"
           :alt="image.alt || ''"
           class="shadow-sm"
-        >
+          :width="200"
+          :height="200"
+          sizes="(min-width: 1024px) 33vw, 50vw"
+          loading="lazy"
+          decoding="async"
+        />
         <span class="text-center">
           {{ image.alt }}
         </span>
@@ -93,11 +105,17 @@ const canScrollRight = computed(
         :aria-label="`View ${activeImage.alt || `image ${activeIndex + 1}`} in gallery`"
         @click="openLightbox(activeIndex)"
       >
-        <img
+        <AppImage
           :src="activeImage.url || ''"
           :alt="activeImage.alt || ''"
           class="max-h-96 max-w-96 object-contain shadow-sm"
-        >
+          :width="384"
+          :height="384"
+          :sizes="carouselMainImageSizes"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+        />
       </button>
 
       <!-- Thumbnails with navigation -->
@@ -129,11 +147,16 @@ const canScrollRight = computed(
             :aria-label="`Show ${image.alt || `image ${thumbnailStartIndex + index + 1}`}`"
             @click="() => setActiveImage(thumbnailStartIndex + index)"
           >
-            <img
+            <AppImage
               :src="image.url || ''"
               :alt="`Thumbnail ${thumbnailStartIndex + index + 1}`"
               class="h-full w-full object-cover transition-opacity hover:opacity-80"
-            >
+              :width="80"
+              :height="80"
+              sizes="80px"
+              loading="lazy"
+              decoding="async"
+            />
           </button>
         </div>
 
