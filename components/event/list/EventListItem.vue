@@ -13,6 +13,7 @@ import type { Event } from '@/__generated__/graphql';
 import type { SearchEventValues } from '@/types/Event';
 import { useRoute, useRouter } from 'nuxt/app';
 import { isEventSearchRoute } from '@/utils/isEventSearchRoute';
+import AppImage from '@/components/image/AppImage.vue';
 
 const props = defineProps({
   event: {
@@ -268,11 +269,14 @@ const seriesOccurrences = computed(() => {
     </div>
 
     <div class="min-w-0 flex-1">
-      <img
+      <AppImage
         v-if="event.coverImageURL"
         :src="event.coverImageURL"
         alt="Event cover image"
         class="mb-4 block max-h-48 rounded-lg md:hidden"
+        :width="640"
+        :height="360"
+        sizes="100vw"
       />
       <!-- Title and image section for medium+ screens -->
       <div class="hidden md:flex md:items-start md:gap-4">
@@ -382,10 +386,13 @@ const seriesOccurrences = computed(() => {
         </div>
 
         <div v-if="event.coverImageURL" class="shrink-0 pr-2">
-          <img
+          <AppImage
             :alt="event.title"
             :src="event.coverImageURL"
             class="h-32 w-32 rounded-lg"
+            :width="128"
+            :height="128"
+            sizes="128px"
           />
         </div>
       </div>

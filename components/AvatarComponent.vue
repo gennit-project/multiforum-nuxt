@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import Identicon from 'identicon.js';
 import sha256 from 'crypto-js/sha256';
+import AppImage from '@/components/image/AppImage.vue';
 
 const props = defineProps({
   text: {
@@ -58,22 +59,43 @@ const identiconData = computed(() => {
 
   return 'data:image/svg+xml;base64,' + data;
 });
+
+const avatarDimensions = computed(() => {
+  if (props.isLarge) {
+    return { width: 192, height: 192 };
+  }
+
+  if (props.isMedium) {
+    return { width: 48, height: 48 };
+  }
+
+  if (props.isSmall) {
+    return { width: 32, height: 32 };
+  }
+
+  return { width: undefined, height: undefined };
+});
 </script>
 
 <template>
   <div>
-    <img
+    <AppImage
       v-if="src"
       :src="src"
       :alt="isDecorative ? '' : text"
       :aria-hidden="isDecorative ? 'true' : undefined"
+      :width="avatarDimensions.width"
+      :height="avatarDimensions.height"
+      :loading="isLarge ? 'eager' : 'lazy'"
+      :decoding="'async'"
+      :fetchpriority="isLarge ? 'high' : 'auto'"
       :class="[
         isLarge ? 'h-48 w-48' : '',
         isMedium ? 'h-12 w-12' : '',
         isSmall ? 'h-8 w-8' : '',
         isSquare ? 'rounded-lg' : 'rounded-full',
       ]"
-    >
+    />
     <img
       v-else
       class="border bg-white dark:border-gray-600 dark:bg-black"
@@ -83,6 +105,8 @@ const identiconData = computed(() => {
         isSmall ? 'h-8 w-8' : '',
         isSquare ? 'rounded-lg' : 'rounded-full',
       ]"
+      :width="avatarDimensions.width"
+      :height="avatarDimensions.height"
       :src="identiconData"
       :alt="isDecorative ? '' : text"
       :aria-hidden="isDecorative ? 'true' : undefined"

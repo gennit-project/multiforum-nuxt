@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useQuery } from '@vue/apollo-composable';
-import gql from 'graphql-tag';
+import AppImage from '@/components/image/AppImage.vue';
 
 withDefaults(defineProps<{
   src: string;
@@ -12,33 +10,19 @@ withDefaults(defineProps<{
   isSquare: false,
   isLarge: false,
 });
-
-const GET_THEME = gql`
-  query getTheme {
-    theme @client
-  }
-`;
-
-const {
-  result: themeResult,
-  loading: themeLoading,
-  error: themeError,
-} = useQuery(GET_THEME);
-
-const _theme = computed(() => {
-  if (themeLoading.value || themeError.value) {
-    return '';
-  }
-  return themeResult.value?.theme;
-});
 </script>
 <template>
-  <img
+  <AppImage
     :class="[
       isLarge ? '' : 'h-8 w-8',
       isSquare ? 'rounded-lg' : 'rounded-full',
     ]"
     :src="src"
     :alt="alt"
-  >
+    :width="isLarge ? undefined : 32"
+    :height="isLarge ? undefined : 32"
+    :loading="isLarge ? 'eager' : 'lazy'"
+    :decoding="'async'"
+    :fetchpriority="isLarge ? 'high' : 'auto'"
+  />
 </template>
