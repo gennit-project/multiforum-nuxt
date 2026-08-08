@@ -9,6 +9,7 @@ import { GET_SPECIFIC_COMMENT_FEEDBACK as GET_FEEDBACK } from '@/graphQLData/com
 import type { Comment } from '@/__generated__/graphql';
 import CommentHeader from '@/components/comments/CommentHeader.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
+import TrashIcon from '@/components/icons/TrashIcon.vue';
 
 const props = defineProps({
   commentId: {
@@ -97,7 +98,7 @@ const body = computed(() => 'Are you sure you want to delete your feedback?');
     @secondary-button-click="$emit('close')"
   >
     <template #icon>
-      <i class="fas fa-trash-alt dark:text-white" />
+      <TrashIcon class="h-6 w-6 dark:text-white" />
     </template>
     <template #content>
       <CommentHeader

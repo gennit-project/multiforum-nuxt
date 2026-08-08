@@ -23,7 +23,6 @@ import type {
 } from '@/__generated__/graphql';
 import InfoBanner from '@/components/InfoBanner.vue';
 import DiscussionHeader from '@/components/discussion/detail/DiscussionHeader.vue';
-import DiscussionCommentsWrapper from '@/components/discussion/detail/DiscussionCommentsWrapper.vue';
 import DiscussionChannelLinks from '@/components/discussion/detail/DiscussionChannelLinks.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
@@ -43,6 +42,9 @@ const DiscussionBodyEditForm = defineAsyncComponent(
   () => import('./DiscussionBodyEditForm.vue')
 );
 const AlbumEditForm = defineAsyncComponent(() => import('./AlbumEditForm.vue'));
+const DiscussionCommentsWrapper = defineAsyncComponent(
+  () => import('./DiscussionCommentsWrapper.vue')
+);
 
 const isAuthenticatedVar = useIsAuthenticated();
 const modProfileNameVar = useModProfileName();

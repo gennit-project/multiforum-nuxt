@@ -20,14 +20,19 @@ const isDevelopment = computed(() => config.environment === 'development');
 const route = useRoute();
 const showFooter = !route.name?.toString().includes('map');
 const fontAwesomeStylesheetHref = ref('');
-const shouldLoadFontAwesome = computed(() => {
-  // Keep the sitewide discussions landing view free of the global Font Awesome
-  // stylesheet. The detail preview still uses legacy FA classes, so we keep
-  // the stylesheet once a discussion is selected.
-  return !(
-    route.name === 'discussions' &&
-    typeof route.query.selectedDiscussionId !== 'string'
+const isFontAwesomeFreePublicDiscussionRoute = computed(() => {
+  const routeName = route.name?.toString() || '';
+
+  return (
+    routeName === 'discussions' ||
+    routeName === 'forums-forumId-discussions-discussionId' ||
+    routeName === 'forums-forumId-discussions-discussionId-comments-commentId' ||
+    routeName === 'forums-forumId-downloads-discussionId' ||
+    routeName === 'forums-forumId-downloads-discussionId-comments-commentId'
   );
+});
+const shouldLoadFontAwesome = computed(() => {
+  return !isFontAwesomeFreePublicDiscussionRoute.value;
 });
 
 if (import.meta.client) {

@@ -3,7 +3,6 @@ import { config } from '@/config';
 import { ref, computed } from 'vue';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import 'md-editor-v3/lib/style.css';
 import { useModProfileName } from '@/composables/useAuthState';
 import { useRoute, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';

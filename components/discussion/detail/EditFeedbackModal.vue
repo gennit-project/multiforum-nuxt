@@ -8,6 +8,7 @@ import type { Comment } from '@/__generated__/graphql';
 import CommentHeader from '@/components/comments/CommentHeader.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
+import PencilIcon from '@/components/icons/PencilIcon.vue';
 import type { CreateEditCommentFormValues } from '@/types/Comment';
 
 const props = defineProps({
@@ -107,7 +108,7 @@ const body = 'Are you sure you want to update your feedback?';
     @close="$emit('close')"
   >
     <template #icon>
-      <i class="fas fa-pencil-alt text-white" />
+      <PencilIcon class="h-6 w-6 text-white" />
     </template>
     <template #content>
       <CommentHeader
