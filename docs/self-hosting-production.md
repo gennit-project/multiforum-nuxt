@@ -291,6 +291,14 @@ failure marks the service failed but does not delete the newly completed local
 bundle. Monitor the systemd unit and configure an external alert; periodically
 run `restic check` and perform a restore drill on a separate host.
 
+Multiforum's deployment-contract CI runs the actual backup and guarded-restore
+commands against disposable Docker volumes. It removes the source volumes,
+creates clean replacements, restores both Neo4j and frontend-session data, and
+checks the original bytes while confirming that restore does not restart the
+application. This protects the mechanics of the documented procedure; it does
+not replace your own scheduled drill using your encrypted off-site repository
+and production-sized data.
+
 To retrieve the newest remote bundle for a guarded restore, load the same
 Restic configuration and restore the instance tag into an empty temporary
 directory:

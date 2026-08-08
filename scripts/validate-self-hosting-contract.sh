@@ -93,6 +93,9 @@ fi
 echo "Testing the guarded production restore command..."
 scripts/self-hosting-tests/restore-self-hosting.test.sh
 
+echo "Drilling backup and restore against disposable Docker volumes..."
+scripts/self-hosting-tests/backup-restore.integration.test.sh
+
 echo "Testing the safe production upgrade command..."
 scripts/self-hosting-tests/upgrade-self-hosting.test.sh
 
