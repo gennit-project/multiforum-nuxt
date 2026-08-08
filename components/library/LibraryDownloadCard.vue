@@ -135,6 +135,7 @@ withDefaults(
           :username="authorInfo.username"
           :display-name="authorInfo.displayName"
           :src="authorInfo.profilePicURL"
+          :variant-source="authorInfo"
           :is-server-admin="authorInfo.isAdmin"
           :comment-karma="authorInfo.commentKarma"
           :discussion-karma="authorInfo.discussionKarma"

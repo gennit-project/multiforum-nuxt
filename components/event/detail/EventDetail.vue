@@ -420,12 +420,14 @@ watchEffect(() => {
                 v-if="event?.Poster?.username"
                 :text="event?.Poster.username"
                 :src="event?.Poster.profilePicURL ?? ''"
+                :variant-source="event?.Poster || null"
                 class="mr-2 h-6 w-6"
               />
               <UsernameWithTooltip
                 v-if="event?.Poster?.username"
                 :username="event?.Poster?.username"
                 :src="event?.Poster.profilePicURL ?? ''"
+                :variant-source="event?.Poster || null"
                 :display-name="event?.Poster.displayName ?? ''"
                 :comment-karma="event?.Poster.commentKarma ?? 0"
                 :discussion-karma="event?.Poster.discussionKarma ?? 0"

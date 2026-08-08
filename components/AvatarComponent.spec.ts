@@ -10,6 +10,24 @@ describe('AvatarComponent', () => {
     expect(wrapper.find('img').attributes('src')).toBe('https://img.test/a.png');
   });
 
+  it('prefers matching avatar variants when a variant source is available', () => {
+    const wrapper = mount(AvatarComponent, {
+      props: {
+        text: 'alice',
+        src: 'https://img.test/original.png',
+        isMedium: true,
+        variantSource: {
+          avatar48Url: 'https://img.test/avatar-48.png',
+          avatar64Url: 'https://img.test/avatar-64.png',
+        },
+      },
+    });
+
+    expect(wrapper.find('img').attributes('src')).toBe(
+      'https://img.test/avatar-48.png'
+    );
+  });
+
   it('generates an identicon data URI when no src is provided', () => {
     const wrapper = mount(AvatarComponent, { props: { text: 'alice' } });
     expect(wrapper.find('img').attributes('src')).toContain(

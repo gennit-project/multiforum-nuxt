@@ -339,6 +339,7 @@ const revealSensitiveContent = () => {
                     :is-forum-mod="authorBadges.isForumMod"
                     :username="authorUsername"
                     :src="authorProfilePicURL ?? ''"
+                    :variant-source="discussion?.Author || null"
                     :display-name="authorDisplayName ?? ''"
                     :comment-karma="authorCommentKarma"
                     :discussion-karma="authorDiscussionKarma"

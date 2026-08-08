@@ -79,4 +79,21 @@ describe('PhotoAvatar', () => {
       hasSmallWidth: false,
     });
   });
+
+  it('prefers matching avatar variants when a variant source is available', () => {
+    const wrapper = mount(PhotoAvatar, {
+      props: {
+        src: 'https://example.test/original.png',
+        alt: 'Alice avatar',
+        variantSource: {
+          avatar32Url: 'https://example.test/avatar-32.png',
+          avatar48Url: 'https://example.test/avatar-48.png',
+        },
+      },
+    });
+
+    expect(wrapper.get('img').attributes('src')).toBe(
+      'https://example.test/avatar-32.png'
+    );
+  });
 });

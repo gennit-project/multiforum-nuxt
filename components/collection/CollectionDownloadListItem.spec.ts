@@ -92,6 +92,26 @@ describe('CollectionDownloadListItem preview image', () => {
     });
   });
 
+  it('prefers a generated list variant when present', () => {
+    const wrapper = mountItem({
+      discussion: discussion({
+        Album: {
+          Images: [
+            {
+              id: 'i1',
+              url: 'https://x/original.png',
+              variantUrls: { list320: 'https://x/list-320.webp' },
+            },
+          ],
+        },
+      }),
+    });
+
+    expect(wrapper.find('img').attributes('src')).toBe(
+      'https://x/list-320.webp'
+    );
+  });
+
   it('shows a no-preview placeholder without images', () => {
     const wrapper = mountItem({ discussion: discussion({ Album: { Images: [] } }) });
 

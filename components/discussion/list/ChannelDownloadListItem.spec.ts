@@ -58,7 +58,7 @@ const mountItem = (
         'nuxt-link': nuxtLinkStub,
         HighlightedSearchTerms: { props: ['text', 'searchInput'], template: '<span>{{ text }}</span>' },
         TagComponent: stub('TagComponent', ['tag', 'active'], ['click']),
-        UsernameWithTooltip: stub('UsernameWithTooltip', ['username', 'isServerAdmin', 'isServerMod', 'isForumAdmin', 'isForumMod']),
+        UsernameWithTooltip: stub('UsernameWithTooltip', ['username', 'variantSource', 'isServerAdmin', 'isServerMod', 'isForumAdmin', 'isForumMod']),
         AddToDiscussionFavorites: stub('AddToDiscussionFavorites', ['discussionId']),
         DiscussionVotes: true,
         ErrorBanner: true,
@@ -126,6 +126,24 @@ describe('ChannelDownloadListItem album image', () => {
     });
   });
 
+  it('prefers a generated list variant when present', () => {
+    const wrapper = mountItem(
+      makeDiscussion({
+        Album: {
+          Images: [
+            {
+              id: 'img1',
+              url: 'u1',
+              variantUrls: { list320: 'u1-list.webp' },
+            },
+          ],
+        },
+      })
+    );
+
+    expect(wrapper.get('img').attributes('src')).toBe('u1-list.webp');
+  });
+
   it('shows a placeholder when there is no album', () => {
     const wrapper = mountItem(makeDiscussion());
 
@@ -156,6 +174,19 @@ describe('ChannelDownloadListItem metadata', () => {
     const wrapper = mountItem(makeDiscussion({ Author: null }));
 
     expect(author(wrapper).props('username')).toBe('Deleted');
+  });
+
+  it('passes the full author as the avatar variant source', () => {
+    const discussion = makeDiscussion({
+      Author: {
+        username: 'alice',
+        profilePicURL: 'https://img.test/original.png',
+        avatar32Url: 'https://img.test/avatar-32.png',
+      },
+    });
+    const wrapper = mountItem(discussion);
+
+    expect(author(wrapper).props('variantSource')).toEqual(discussion.Author);
   });
 });
 

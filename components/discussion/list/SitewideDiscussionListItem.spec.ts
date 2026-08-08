@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import { defineComponent } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { asMock, createQueryMock } from '@/tests/utils/mockApollo';
 import { createMockRoute } from '@/tests/utils/mockRouter';
@@ -19,6 +20,15 @@ vi.mock('@/composables/useAuthState', () =>
   createAuthStateMock({ username: 'alice' })
 );
 
+const UsernameWithTooltipStub = defineComponent({
+  name: 'UsernameWithTooltip',
+  props: {
+    username: { type: String, default: '' },
+    variantSource: { type: Object, default: null },
+  },
+  template: '<div><slot /></div>',
+});
+
 const mountItem = (discussion: Discussion) => {
   asMock(useQuery).mockReturnValue(createQueryMock({ users: [] }));
   return mountWithDefaults(SitewideDiscussionListItem, {
@@ -28,7 +38,7 @@ const mountItem = (discussion: Discussion) => {
         AddToDiscussionFavorites: true,
         AvatarComponent: true,
         MarkdownPreview: true,
-        UsernameWithTooltip: true,
+        UsernameWithTooltip: UsernameWithTooltipStub,
         TagComponent: true,
         ChevronDownIcon: true,
       },
@@ -210,5 +220,21 @@ describe('SitewideDiscussionListItem thumbnail', () => {
       })
     );
     expect(thumbnail(wrapper).exists()).toBe(false);
+  });
+
+  it('passes the full author as the avatar variant source', () => {
+    const fullDiscussion = discussion({
+      DiscussionChannels: [channel('cats')],
+      Author: {
+        username: 'alice',
+        profilePicURL: 'https://img.test/original.png',
+        avatar48Url: 'https://img.test/avatar-48.png',
+      },
+    });
+    const wrapper = mountItem(fullDiscussion);
+
+    expect(
+      wrapper.getComponent(UsernameWithTooltipStub).props('variantSource')
+    ).toEqual(fullDiscussion.Author);
   });
 });

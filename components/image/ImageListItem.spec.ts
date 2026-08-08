@@ -33,6 +33,17 @@ describe('ImageListItem', () => {
     expect(wrapper.find('img').attributes('alt')).toBe('A cat');
   });
 
+  it('prefers a list variant url when present', () => {
+    const wrapper = mountItem({
+      id: 'i1',
+      url: 'https://img.test/original.png',
+      variantUrls: { list320: 'https://img.test/list-320.webp' },
+    } as Partial<Image>);
+    expect(wrapper.find('img').attributes('src')).toBe(
+      'https://img.test/list-320.webp'
+    );
+  });
+
   it('renders the 3D model viewer for a glb url', () => {
     const wrapper = mountItem({ id: 'i1', url: 'https://img.test/m.glb' });
     expect(wrapper.find('.model').exists()).toBe(true);

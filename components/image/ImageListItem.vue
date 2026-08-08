@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { defineAsyncComponent } from 'vue';
+import { computed, defineAsyncComponent } from 'vue';
 import type { PropType } from 'vue';
 import type { Image } from '@/__generated__/graphql';
 import ModelViewer from '@/components/ModelViewer.vue';
 import AppImage from '@/components/image/AppImage.vue';
 import AddToImageFavorites from '@/components/favorites/AddToImageFavorites.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
+import { getPreferredImageUrl } from '@/utils/imageVariants';
 
 // StlViewer statically imports three.js (~2MB decoded). Load it lazily so that
 // weight is only fetched when an STL image actually renders, not on every page
@@ -41,6 +42,14 @@ const props = defineProps({
 const getImageAlt = (image: Image) => {
   return image.alt || image.caption || 'Image';
 };
+
+const imageUrl = computed(() =>
+  getPreferredImageUrl({
+    source: props.image,
+    preferred: ['list320', 'list160'],
+    originalUrl: props.image.url,
+  }) || ''
+);
 </script>
 
 <template>
@@ -72,8 +81,8 @@ const getImageAlt = (image: Image) => {
       </ClientOnly>
       <!-- Regular image -->
       <AppImage
-        v-else-if="props.image.url"
-        :src="props.image.url"
+        v-else-if="imageUrl"
+        :src="imageUrl"
         :alt="getImageAlt(props.image) ?? 'Image'"
         class="h-full w-full object-cover"
         :width="300"

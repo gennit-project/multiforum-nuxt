@@ -382,6 +382,7 @@ const warningModalBody = computed(() => {
           <AvatarComponent
             :text="discussion?.Author?.username ?? '[Deleted]'"
             :src="discussion?.Author?.profilePicURL ?? ''"
+            :variant-source="discussion?.Author || null"
             :is-small="true"
           />
         </div>

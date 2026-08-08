@@ -101,10 +101,44 @@ describe('ImageDetails content', () => {
     });
   });
 
+  it('prefers a generated detail variant when present', () => {
+    h.result = ref({
+      images: [
+        image({
+          variantUrls: {
+            detail640: 'https://x/i-640.webp',
+          },
+        }),
+      ],
+    });
+    const wrapper = mountDetails();
+
+    expect(wrapper.get('img').attributes('src')).toBe('https://x/i-640.webp');
+  });
+
   it('shows the uploader display name', () => {
     const wrapper = mountDetails();
 
     expect(wrapper.text()).toContain('Alice A');
+  });
+
+  it('prefers a generated uploader avatar variant when present', () => {
+    h.result = ref({
+      images: [
+        image({
+          Uploader: {
+            username: 'alice',
+            displayName: 'Alice A',
+            profilePicURL: 'https://x/original-avatar.jpg',
+            avatar32Url: 'https://x/avatar-32.webp',
+          },
+        }),
+      ],
+    });
+    const wrapper = mountDetails();
+    const images = wrapper.findAll('img');
+
+    expect(images[1]?.attributes('src')).toBe('https://x/avatar-32.webp');
   });
 
   it('falls back to the username when there is no display name', () => {

@@ -20,6 +20,7 @@ import ImageIcon from '@/components/icons/ImageIcon.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import DownloadQuarantineBadge from '@/components/download/DownloadQuarantineBadge.vue';
 import AppImage from '@/components/image/AppImage.vue';
+import { getPreferredImageUrl } from '@/utils/imageVariants';
 
 // Define props
 const props = defineProps({
@@ -103,12 +104,20 @@ const firstAlbumImage = computed(() => {
   if (album.imageOrder?.length && album.imageOrder.length > 0) {
     const firstImageId = album.imageOrder[0];
     const orderedImage = album.Images.find((img) => img.id === firstImageId);
-    return orderedImage?.url || null;
+    return orderedImage || null;
   }
 
   // Fallback to first image in the Images array
-  return album.Images[0]?.url || null;
+  return album.Images[0] || null;
 });
+
+const firstAlbumImageUrl = computed(() =>
+  getPreferredImageUrl({
+    source: firstAlbumImage.value,
+    preferred: ['list320', 'list160'],
+    originalUrl: firstAlbumImage.value?.url,
+  }) || ''
+);
 
 const filteredQuery = computed(() => {
   const query = { ...route.query };
@@ -141,8 +150,8 @@ const filteredQuery = computed(() => {
               class="aspect-square w-full overflow-hidden bg-gray-100 dark:bg-gray-700"
             >
               <AppImage
-                v-if="firstAlbumImage"
-                :src="firstAlbumImage"
+                v-if="firstAlbumImageUrl"
+                :src="firstAlbumImageUrl"
                 :alt="title"
                 class="h-full w-full object-cover"
                 :width="320"
@@ -203,6 +212,7 @@ const filteredQuery = computed(() => {
                 :discussion-karma="authorDiscussionKarma"
                 :display-name="authorDisplayName ?? ''"
                 :src="authorProfilePicURL ?? ''"
+                :variant-source="discussion?.Author || null"
                 :username="authorUsername"
                 light-text
               />

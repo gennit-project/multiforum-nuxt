@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import type { PropType } from 'vue';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 import AppImage from '@/components/image/AppImage.vue';
+import { getPreferredImageUrl } from '@/utils/imageVariants';
 import { relativeTime } from '@/utils';
 
 const props = defineProps({
@@ -37,10 +38,18 @@ const firstImage = computed(() => {
     const ordered = album.Images.find(
       (img) => img.id === album.imageOrder?.[0]
     );
-    if (ordered?.url) return ordered.url;
+    if (ordered) return ordered;
   }
-  return album.Images[0]?.url || null;
+  return album.Images[0] || null;
 });
+
+const firstImageUrl = computed(() =>
+  getPreferredImageUrl({
+    source: firstImage.value,
+    preferred: ['list320', 'list160'],
+    originalUrl: firstImage.value?.url,
+  }) || ''
+);
 
 const createdAgo = computed(() => {
   return props.discussion?.createdAt
@@ -58,8 +67,8 @@ const createdAgo = computed(() => {
         class="aspect-square w-full overflow-hidden bg-gray-100 dark:bg-gray-700"
       >
         <AppImage
-          v-if="firstImage"
-          :src="firstImage"
+          v-if="firstImageUrl"
+          :src="firstImageUrl"
           :alt="discussion?.title || 'Download preview'"
           class="h-full w-full object-cover"
           :width="192"
