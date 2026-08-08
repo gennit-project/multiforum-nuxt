@@ -10,6 +10,14 @@ preserves it as a workflow artifact, verifies that every selected component is
 publicly pullable, and boots the selected application images together before
 attaching the manifest to the matching GitHub Release.
 
+Release Please uses the repository `GITHUB_TOKEN`, whose tag creation does not
+recursively trigger tag workflows. After it creates a release, the release
+workflow therefore dispatches `container-image.yml` explicitly at the new tag.
+That tag-aware run publishes the multi-architecture frontend image, creates and
+smokes the coordinated manifest, proves every image is anonymously pullable,
+and attaches the manifest to the already-created GitHub Release. No personal
+access token is required.
+
 Schema version 1 requires:
 
 - a SemVer `release` without a leading `v`;

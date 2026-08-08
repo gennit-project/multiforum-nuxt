@@ -53,6 +53,18 @@ grep --fixed-strings \
 grep --fixed-strings \
   'scripts/smoke-self-hosting-release.sh' \
   .github/workflows/container-image.yml >/dev/null
+grep --fixed-strings \
+  'actions: write' \
+  .github/workflows/release-please.yml >/dev/null
+grep --fixed-strings \
+  "if: steps.release.outputs.release_created == 'true'" \
+  .github/workflows/release-please.yml >/dev/null
+grep --fixed-strings \
+  'gh workflow run container-image.yml' \
+  .github/workflows/release-please.yml >/dev/null
+grep --fixed-strings -- \
+  '--ref "$RELEASE_TAG"' \
+  .github/workflows/release-please.yml >/dev/null
 
 echo "Testing the production cold-backup command..."
 scripts/self-hosting-tests/backup-self-hosting.test.sh
