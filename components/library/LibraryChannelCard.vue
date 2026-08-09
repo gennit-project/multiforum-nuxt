@@ -2,6 +2,8 @@
 import ExpandableImage from '@/components/ExpandableImage.vue';
 import TagComponent from '@/components/TagComponent.vue';
 import AddToChannelFavorites from '@/components/favorites/AddToChannelFavorites.vue';
+import { computed } from 'vue';
+import { getPreferredImageUrl } from '@/utils/imageVariants';
 
 type ChannelItem = {
   uniqueName: string;
@@ -11,7 +13,7 @@ type ChannelItem = {
   Tags?: Array<{ text?: string | null }> | null;
 };
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     channel: ChannelItem;
     showFavoriteButton?: boolean;
@@ -23,6 +25,15 @@ withDefaults(
     allowAddToList: false,
     isFavorited: false,
   }
+);
+
+const channelIconSrc = computed(
+  () =>
+    getPreferredImageUrl({
+      source: props.channel,
+      preferred: ['avatar48', 'avatar64', 'avatar32'],
+      originalUrl: props.channel.channelIconURL,
+    }) || ''
 );
 </script>
 
@@ -38,7 +49,7 @@ withDefaults(
         <div class="shrink-0">
           <ExpandableImage
             v-if="channel.channelIconURL"
-            :src="channel.channelIconURL"
+            :src="channelIconSrc"
             :alt="channel.displayName || channel.uniqueName"
             :rounded="true"
             :full-width="true"

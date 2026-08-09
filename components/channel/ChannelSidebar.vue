@@ -271,6 +271,7 @@ const handleBecomeAdminSuccess = () => {
                 <AvatarComponent
                   :text="admin.username"
                   :src="admin.profilePicURL ?? ''"
+                  :variant-source="admin"
                   class="mr-2 h-6 w-6 shrink-0"
                 />
                 <span class="flex flex-wrap items-baseline gap-1">
