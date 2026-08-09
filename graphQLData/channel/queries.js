@@ -1,16 +1,18 @@
 import { gql } from '@apollo/client/core';
 import { DateTime } from 'luxon';
+import { AUTHOR_FIELDS, CHANNEL_ICON_FIELDS } from '../fragments';
 
 export const GET_CHANNEL_NAMES = gql`
   query getChannelNames($channelWhere: ChannelWhere) {
     channels(where: $channelWhere, options: { limit: 10 }) {
       uniqueName
       displayName
-      channelIconURL
+      ...ChannelIconFields
       description
       eventsEnabled
     }
   }
+  ${CHANNEL_ICON_FIELDS}
 `;
 
 export const GET_CHANNEL_DISCUSSION_FLAIR_CONFIG = gql`
@@ -87,7 +89,7 @@ export const GET_CHANNEL = gql`
       uniqueName
       displayName
       description
-      channelIconURL
+      ...ChannelIconFields
       channelBannerURL
       isFavorited(username: $loggedInUsername)
       rules
@@ -146,12 +148,7 @@ export const GET_CHANNEL = gql`
         text
       }
       Admins {
-        username
-        displayName
-        profilePicURL
-        commentKarma
-        discussionKarma
-        createdAt
+        ...AuthorFields
       }
       Bots {
         username
@@ -286,6 +283,8 @@ export const GET_CHANNEL = gql`
       }
     }
   }
+  ${AUTHOR_FIELDS}
+  ${CHANNEL_ICON_FIELDS}
 `;
 
 export const GET_CHANNEL_RULES = gql`

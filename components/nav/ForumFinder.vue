@@ -9,7 +9,14 @@ import type { Channel } from '@/__generated__/graphql';
 
 type ForumOption = Pick<
   Channel,
-  'uniqueName' | 'displayName' | 'channelIconURL'
+  | 'uniqueName'
+  | 'displayName'
+  | 'channelIconURL'
+  | 'variantUrls'
+  | 'icon32Url'
+  | 'icon48Url'
+  | 'icon64Url'
+  | 'icon96Url'
 >;
 
 const emit = defineEmits<{
@@ -81,6 +88,7 @@ const updateSearch = (value: string) => {
             class="h-8 w-8 shrink-0 border border-gray-200 shadow-sm dark:border-gray-800"
             :text="forum.uniqueName || ''"
             :src="forum.channelIconURL ?? ''"
+            :variant-source="forum"
             :is-small="true"
             :is-square="false"
             :is-decorative="true"

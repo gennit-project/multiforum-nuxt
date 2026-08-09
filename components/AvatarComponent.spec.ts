@@ -28,6 +28,24 @@ describe('AvatarComponent', () => {
     );
   });
 
+  it('supports channel icon field aliases when selecting small variants', () => {
+    const wrapper = mount(AvatarComponent, {
+      props: {
+        text: 'cats',
+        src: 'https://img.test/original.png',
+        isSmall: true,
+        variantSource: {
+          icon32Url: 'https://img.test/icon-32.png',
+          icon48Url: 'https://img.test/icon-48.png',
+        },
+      },
+    });
+
+    expect(wrapper.find('img').attributes('src')).toBe(
+      'https://img.test/icon-32.png'
+    );
+  });
+
   it('generates an identicon data URI when no src is provided', () => {
     const wrapper = mount(AvatarComponent, { props: { text: 'alice' } });
     expect(wrapper.find('img').attributes('src')).toContain(

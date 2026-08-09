@@ -46,6 +46,7 @@ defineEmits(['filterByTag']);
           <AvatarComponent
             :text="channel.uniqueName"
             :src="channel?.channelIconURL || ''"
+            :variant-source="channel"
             :is-small="false"
             :square="true"
             :is-decorative="true"

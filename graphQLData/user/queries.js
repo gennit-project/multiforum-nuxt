@@ -1,15 +1,11 @@
 import { gql } from '@apollo/client/core';
+import { AUTHOR_FIELDS, CHANNEL_ICON_FIELDS } from '../fragments';
 
 export const GET_USER = gql`
   query getBasicUserInfo($username: String!) {
     getUserWikiEditsCount(username: $username)
     users(where: { username: $username }) {
-      username
-      commentKarma
-      discussionKarma
-      createdAt
-      displayName
-      profilePicURL
+      ...AuthorFields
       location
       pronouns
       bio
@@ -58,6 +54,7 @@ export const GET_USER = gql`
       }
     }
   }
+  ${AUTHOR_FIELDS}
 `;
 
 // Public profile data only. Keep owner-only account fields (email, notification
@@ -67,12 +64,7 @@ export const GET_PUBLIC_USER_PROFILE = gql`
   query getPublicUserProfile($username: String!) {
     getUserWikiEditsCount(username: $username)
     users(where: { username: $username }) {
-      username
-      commentKarma
-      discussionKarma
-      createdAt
-      displayName
-      profilePicURL
+      ...AuthorFields
       location
       pronouns
       bio
@@ -107,6 +99,7 @@ export const GET_PUBLIC_USER_PROFILE = gql`
       }
     }
   }
+  ${AUTHOR_FIELDS}
 `;
 
 export const GET_USER_COMMENTS = gql`
@@ -451,13 +444,14 @@ export const GET_USER_FAVORITE_CHANNELS = gql`
         uniqueName
         displayName
         description
-        channelIconURL
+        ...ChannelIconFields
         Tags {
           text
         }
       }
     }
   }
+  ${CHANNEL_ICON_FIELDS}
 `;
 
 export const GET_MODDED_CHANNELS = gql`
@@ -468,7 +462,7 @@ export const GET_MODDED_CHANNELS = gql`
       ModOfChannels {
         uniqueName
         description
-        channelIconURL
+        ...ChannelIconFields
         Tags {
           text
         }
@@ -484,6 +478,7 @@ export const GET_MODDED_CHANNELS = gql`
       }
     }
   }
+  ${CHANNEL_ICON_FIELDS}
 `;
 
 export const GET_OWNED_CHANNELS = gql`
@@ -494,7 +489,7 @@ export const GET_OWNED_CHANNELS = gql`
       AdminOfChannels {
         uniqueName
         description
-        channelIconURL
+        ...ChannelIconFields
         Tags {
           text
         }
@@ -510,6 +505,7 @@ export const GET_OWNED_CHANNELS = gql`
       }
     }
   }
+  ${CHANNEL_ICON_FIELDS}
 `;
 
 export const GET_USER_CONTRIBUTIONS = gql`

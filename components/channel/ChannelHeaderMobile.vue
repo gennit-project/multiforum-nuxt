@@ -37,6 +37,7 @@ const initialIsFavorited = computed(
         class="align-items my-2 ml-2 flex h-14 w-14 justify-center pt-2 shadow-sm"
         :text="channelId"
         :src="channel?.channelIconURL ?? ''"
+        :variant-source="channel"
         :is-square="false"
       />
       <div v-if="channel.displayName && channel.uniqueName" class="mt-4">

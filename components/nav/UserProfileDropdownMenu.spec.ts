@@ -29,7 +29,11 @@ const mountMenu = (props: Record<string, unknown> = {}) =>
     global: {
       stubs: {
         IconButtonDropdown: dropdownStub,
-        AvatarComponent: { name: 'AvatarComponent', props: ['src', 'text'], template: '<div class="avatar" />' },
+        AvatarComponent: {
+          name: 'AvatarComponent',
+          props: ['src', 'text', 'variantSource'],
+          template: '<div class="avatar" />',
+        },
       },
     },
   });
@@ -56,6 +60,14 @@ describe('UserProfileDropdownMenu', () => {
     expect(wrapper.getComponent({ name: 'AvatarComponent' }).props('src')).toBe(
       'https://x/pic.png'
     );
+  });
+
+  it('passes the full user as the variant source', () => {
+    const wrapper = mountMenu();
+
+    expect(
+      wrapper.getComponent({ name: 'AvatarComponent' }).props('variantSource')
+    ).toEqual(h.result.value.users[0]);
   });
 
   it('falls back to an empty avatar src without a user', () => {

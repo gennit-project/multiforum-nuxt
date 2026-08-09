@@ -14,7 +14,7 @@ vi.mock('@/composables/useAuthState', () => ({
 
 const AvatarStub = {
   name: 'AvatarComponent',
-  props: ['text', 'src', 'isSmall'],
+  props: ['text', 'src', 'variantSource', 'isSmall'],
   template: '<div class="avatar" />',
 };
 
@@ -38,6 +38,20 @@ describe('LoggedInUserAvatar', () => {
   it('passes the profile picture URL from the query', () => {
     query.result.value = { users: [{ profilePicURL: 'https://img/pic.png' }] };
     expect(avatar(mountAvatar()).props('src')).toBe('https://img/pic.png');
+  });
+
+  it('passes the full user object as the variant source', () => {
+    query.result.value = {
+      users: [
+        {
+          profilePicURL: 'https://img/pic.png',
+          avatar32Url: 'https://img/pic-32.png',
+        },
+      ],
+    };
+    expect(avatar(mountAvatar()).props('variantSource')).toEqual(
+      query.result.value.users[0]
+    );
   });
 
   it('falls back to an empty src when the user has no profile picture', () => {

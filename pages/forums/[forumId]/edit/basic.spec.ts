@@ -7,6 +7,7 @@ import type * as UtilsIndexModule from '@/utils/index';
 
 const h = vi.hoisted(() => ({
   createSignedStorageUrl: vi.fn(),
+  setChannelIcon: vi.fn(),
   removeForumOwner: vi.fn(),
   permanentlyDeleteChannelBanner: vi.fn(),
   uploadAndGetEmbeddedLink: vi.fn(),
@@ -55,6 +56,7 @@ vi.mock('@/utils/index', async (importOriginal) => {
 
 vi.mock('@/graphQLData/channel/mutations', () => ({
   PERMANENTLY_DELETE_CHANNEL_BANNER: 'PERMANENTLY_DELETE_CHANNEL_BANNER',
+  SET_CHANNEL_ICON: 'SET_CHANNEL_ICON',
 }));
 
 vi.mock('@/graphQLData/mod/mutations', () => ({
@@ -71,6 +73,8 @@ vi.mock('@vue/apollo-composable', () => ({
       mutate:
         operation === 'PERMANENTLY_DELETE_CHANNEL_BANNER'
           ? h.permanentlyDeleteChannelBanner
+          : operation === 'SET_CHANNEL_ICON'
+            ? h.setChannelIcon
           : operation === 'REMOVE_FORUM_OWNER'
             ? h.removeForumOwner
             : h.createSignedStorageUrl,
@@ -169,6 +173,7 @@ beforeEach(() => {
       },
     },
   });
+  h.setChannelIcon.mockResolvedValue({ data: { setChannelIcon: {} } });
   h.permanentlyDeleteChannelBanner.mockResolvedValue({ data: {} });
 });
 
@@ -209,19 +214,23 @@ describe('forum basic settings page', () => {
     });
   });
 
-  it('uploads an image and submits the resulting field update', async () => {
+  it('uploads a forum icon through the dedicated channel icon mutation', async () => {
     const wrapper = await buildWrapper({});
     emitImage(
       wrapper,
       new File(['banner'], 'banner.png', { type: 'image/png' })
     );
     await flushPromises();
+    expect(h.setChannelIcon).toHaveBeenCalledWith({
+      channelUniqueName: 'cats',
+      imageUrl: 'https://cdn.example.com/new.png',
+    });
     expect(wrapper.emitted()).toMatchObject({
       updateFormValues: [
         [{ channelIconURL: 'https://cdn.example.com/new.png' }],
       ],
-      submit: [[]],
     });
+    expect(wrapper.emitted('submit')).toBeUndefined();
   });
 
   it('does not upload when no user is signed in', async () => {

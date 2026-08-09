@@ -6,6 +6,11 @@ defineProps<{
     uniqueName: string;
     displayName: string;
     channelIconURL: string;
+    variantUrls?: Record<string, string> | null;
+    icon32Url?: string | null;
+    icon48Url?: string | null;
+    icon64Url?: string | null;
+    icon96Url?: string | null;
   };
   active?: boolean;
   compact?: boolean;
@@ -29,6 +34,7 @@ const emit = defineEmits<{
       :class="compact ? 'h-6 w-6' : 'h-7 w-7'"
       :text="forum.uniqueName"
       :src="forum.channelIconURL"
+      :variant-source="forum"
       :is-small="true"
       :is-square="false"
       :is-decorative="true"

@@ -303,6 +303,7 @@ const getNavLabelClasses = (isActive: boolean) =>
                 class="h-8 w-8"
                 :text="forum.uniqueName || ''"
                 :src="forum?.channelIconURL ?? ''"
+                :variant-source="forum"
                 :is-small="true"
                 :is-square="false"
               />

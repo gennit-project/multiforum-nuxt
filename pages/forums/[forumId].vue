@@ -163,6 +163,14 @@ const addForumToLocalStorage = (channel: Channel) => {
     uniqueName: channelId.value,
     displayName: channel.displayName,
     channelIconURL: channel.channelIconURL,
+    variantUrls:
+      channel.variantUrls && typeof channel.variantUrls === 'object'
+        ? channel.variantUrls
+        : null,
+    icon32Url: channel.icon32Url,
+    icon48Url: channel.icon48Url,
+    icon64Url: channel.icon64Url,
+    icon96Url: channel.icon96Url,
     timestamp: Date.now(),
   };
 

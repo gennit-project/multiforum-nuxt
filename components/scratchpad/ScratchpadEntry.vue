@@ -164,6 +164,7 @@ const isLoading = computed(() => updateLoading.value || deleteLoading.value);
         <AvatarComponent
           :src="entry.Author?.profilePicURL"
           :text="entry.Author?.username || 'U'"
+          :variant-source="entry.Author || null"
           :is-square="false"
           class="h-10 w-10"
         />
