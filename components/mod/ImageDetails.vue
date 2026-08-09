@@ -4,7 +4,9 @@ import { GET_IMAGE_DETAILS } from '@/graphQLData/image/queries';
 import { useQuery } from '@vue/apollo-composable';
 import ErrorBanner from '../ErrorBanner.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import AppImage from '@/components/image/AppImage.vue';
 import { stableRelativeTime } from '@/utils';
+import { getPreferredImageUrl } from '@/utils/imageVariants';
 
 const props = defineProps({
   imageId: {
@@ -39,6 +41,22 @@ const uploaderDisplayName = computed(() => {
 const uploaderUsername = computed(() => {
   return image.value?.Uploader?.username || null;
 });
+
+const detailImageUrl = computed(() =>
+  getPreferredImageUrl({
+    source: image.value,
+    preferred: ['detail640', 'detail960', 'detail1280'],
+    originalUrl: image.value?.url,
+  }) || ''
+);
+
+const uploaderImageUrl = computed(() =>
+  getPreferredImageUrl({
+    source: image.value?.Uploader,
+    preferred: ['avatar32', 'avatar48'],
+    originalUrl: image.value?.Uploader?.profilePicURL,
+  }) || ''
+);
 
 const formattedDate = computed(() => {
   if (!image.value?.createdAt) return '';
@@ -86,12 +104,16 @@ onImageResult(({ data }) => {
       <div class="flex flex-col gap-4">
         <div class="flex items-start gap-4">
           <div class="relative max-w-md overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
-            <img
-              :src="image.url"
+            <AppImage
+              :src="detailImageUrl"
               :alt="image.alt || 'Reported image'"
               class="max-h-80 w-auto object-contain"
+              :width="640"
+              :height="640"
+              sizes="(min-width: 1024px) 32rem, 100vw"
               loading="lazy"
-            >
+              decoding="async"
+            />
             <div
               v-if="image.hasSensitiveContent"
               class="absolute right-2 top-2 rounded bg-red-500 px-2 py-1 text-xs font-medium text-white"
@@ -107,12 +129,17 @@ onImageResult(({ data }) => {
           </div>
           <div class="flex flex-col gap-2 text-sm text-gray-600 dark:text-gray-400">
             <div class="flex items-center gap-2">
-              <img
-                v-if="image.Uploader?.profilePicURL"
-                :src="image.Uploader.profilePicURL"
+              <AppImage
+                v-if="uploaderImageUrl"
+                :src="uploaderImageUrl"
                 :alt="uploaderDisplayName"
                 class="h-8 w-8 rounded-full object-cover"
-              >
+                :width="32"
+                :height="32"
+                sizes="32px"
+                loading="lazy"
+                decoding="async"
+              />
               <div
                 v-else
                 class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-300"

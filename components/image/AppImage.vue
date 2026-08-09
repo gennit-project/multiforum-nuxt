@@ -5,7 +5,6 @@ import { canOptimizeImageUrl } from '@/utils/imageOptimization';
 defineOptions({
   inheritAttrs: false,
 });
-
 const props = withDefaults(
   defineProps<{
     src: string;

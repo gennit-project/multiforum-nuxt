@@ -1,7 +1,19 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
+import { defineComponent } from 'vue';
 
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
+
+const AvatarComponentStub = defineComponent({
+  name: 'AvatarComponent',
+  props: {
+    text: { type: String, default: '' },
+    src: { type: String, default: '' },
+    variantSource: { type: Object, default: null },
+    isMedium: { type: Boolean, default: false },
+  },
+  template: '<div />',
+});
 
 const mountUsername = (props: Record<string, unknown> = {}) =>
   mount(UsernameWithTooltip, {
@@ -13,7 +25,7 @@ const mountUsername = (props: Record<string, unknown> = {}) =>
           name: 'Tooltip',
           template: '<div><slot name="activator" :props="{}" /><slot /></div>',
         },
-        AvatarComponent: true,
+        AvatarComponent: AvatarComponentStub,
         NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
         'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
       },
@@ -96,5 +108,16 @@ describe('UsernameWithTooltip tooltip content', () => {
     const wrapper = mountUsername({ disableTooltip: true, commentKarma: 5 });
 
     expect(wrapper.text()).not.toContain('comment karma');
+  });
+
+  it('forwards the variant source to the avatar inside the tooltip', () => {
+    const variantSource = { avatar48Url: 'https://img.test/avatar-48.png' };
+    const wrapper = mountUsername({
+      src: 'https://img.test/original.png',
+      variantSource,
+    });
+
+    const avatar = wrapper.getComponent(AvatarComponentStub);
+    expect(avatar.props('variantSource')).toEqual(variantSource);
   });
 });

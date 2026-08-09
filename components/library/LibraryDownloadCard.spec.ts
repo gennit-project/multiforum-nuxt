@@ -76,7 +76,13 @@ describe('LibraryDownloadCard', () => {
   it('renders a preview image when one is provided', () => {
     const wrapper = mountCard({ previewImageUrl: 'https://example.com/preview.jpg' });
 
-    expect(wrapper.get('img').attributes('src')).toBe('https://example.com/preview.jpg');
+    expect(wrapper.get('img').attributes()).toMatchObject({
+      src: 'https://example.com/preview.jpg',
+      width: '640',
+      height: '400',
+      loading: 'lazy',
+      decoding: 'async',
+    });
   });
 
   it('shows the empty preview fallback when no image is provided', () => {

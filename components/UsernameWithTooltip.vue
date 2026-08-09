@@ -6,6 +6,7 @@ interface Props {
   username: string;
   displayName?: string;
   src?: string;
+  variantSource?: Record<string, unknown> | null;
   accountCreated?: string;
   commentKarma?: number;
   discussionKarma?: number;
@@ -21,6 +22,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   displayName: '',
   src: '',
+  variantSource: null,
   accountCreated: '',
   commentKarma: 0,
   discussionKarma: 0,
@@ -127,12 +129,22 @@ const modBadgeClasses = computed(() => {
       <template #default>
         <div>
           <div v-if="!displayName" class="text-md flex w-full flex-col">
-            <AvatarComponent :text="username" :src="src" :is-medium="true" />{{
+            <AvatarComponent
+              :text="username"
+              :src="src"
+              :variant-source="variantSource"
+              :is-medium="true"
+            />{{
               username
             }}
           </div>
           <div v-if="displayName" class="text-md flex w-full flex-col">
-            <AvatarComponent :text="username" :src="src" :is-medium="true" />
+            <AvatarComponent
+              :text="username"
+              :src="src"
+              :variant-source="variantSource"
+              :is-medium="true"
+            />
             <p class="text-xs font-bold">
               {{ displayName }}
             </p>

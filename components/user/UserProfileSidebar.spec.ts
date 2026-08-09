@@ -44,7 +44,7 @@ const mountSidebar = (props: Record<string, unknown> = {}) =>
     props,
     global: {
       stubs: {
-        AvatarComponent: { name: 'AvatarComponent', props: ['src', 'text'], template: '<div class="avatar" />' },
+        AvatarComponent: { name: 'AvatarComponent', props: ['src', 'text', 'variantSource'], template: '<div class="avatar" />' },
         MarkdownPreview: { name: 'MarkdownPreview', props: ['text'], template: '<div class="bio">{{ text }}</div>' },
         ReportProfilePictureModal: { name: 'ReportProfilePictureModal', props: ['open'], template: '<div class="report-modal" />' },
         RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
@@ -128,6 +128,17 @@ describe('UserProfileSidebar profile picture', () => {
     const wrapper = mountSidebar();
 
     expect(avatar(wrapper).props('src')).toBe('https://x/reactive.png');
+  });
+
+  it('passes the queried user as the avatar variant source', () => {
+    const wrapper = mountSidebar();
+
+    expect(avatar(wrapper).props('variantSource')).toEqual(
+      expect.objectContaining({
+        username: 'alice',
+        profilePicURL: 'https://x/query.png',
+      })
+    );
   });
 
   it('shows a report button for another user with a picture', () => {

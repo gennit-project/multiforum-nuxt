@@ -121,6 +121,10 @@ const getUploaderLabel = (image: ImageData) => {
           class="w-72 object-cover"
           :src="image.url"
           :alt="image.alt"
+          :full-width="true"
+          :width="288"
+          :height="288"
+          sizes="288px"
         />
       </div>
 

@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { mount, flushPromises } from '@vue/test-utils';
-
 import TextEditor from '@/components/TextEditor.vue';
 
 // Vuetify's useDisplay needs the Vuetify plugin context, which we don't install
@@ -93,6 +92,25 @@ vi.mock('@/components/text-editor/EmojiPickerWrapper.vue', () => ({
     name: 'EmojiPickerWrapper',
     emits: ['emoji-click', 'close'],
     template: '<div class="emoji-picker" />',
+  },
+}));
+
+// TextEditor lazy-loads these modules via defineAsyncComponent. Mocking the
+// modules themselves prevents Vitest from importing the real implementations
+// after a test has already finished, which can otherwise trip teardown-time
+// runtime-config imports in CI.
+vi.mock('@/components/text-editor/TextEditorFullScreen.vue', () => ({
+  default: {
+    name: 'TextEditorFullScreen',
+    template: '<div class="text-editor-full-screen" />',
+  },
+}));
+
+vi.mock('@/components/MarkdownRenderer.vue', () => ({
+  default: {
+    name: 'MarkdownRenderer',
+    props: ['text'],
+    template: '<div class="markdown-renderer-stub">{{ text }}</div>',
   },
 }));
 

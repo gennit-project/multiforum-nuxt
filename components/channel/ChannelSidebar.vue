@@ -133,6 +133,11 @@ const handleBecomeAdminSuccess = () => {
           :full-width="true"
           :alt="channelId"
           :src="channel?.channelIconURL ?? ''"
+          :width="80"
+          :height="80"
+          sizes="80px"
+          loading="eager"
+          fetchpriority="high"
         />
         <AvatarComponent
           v-if="!channel?.channelIconURL"

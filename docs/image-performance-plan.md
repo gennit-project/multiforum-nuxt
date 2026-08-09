@@ -178,3 +178,16 @@ Started Phase 1 Slice 1:
 - migrate avatar surfaces
 - migrate the sitewide discussion list thumbnail
 - migrate event list cover images
+
+Started Phase 1 Slice 2:
+
+- migrate the user image grid cards to the shared optimized-image wrapper
+- migrate library download preview cards to explicit dimensions and responsive sizes
+- migrate reusable gallery thumbnails to stable dimensions and lazy decoding
+
+Started Phase 2 Slice 1:
+
+- add a frontend image-variant selection contract that can prefer generated backend variants when they begin appearing in GraphQL responses
+- wire list and gallery image-object surfaces to prefer semantic variant keys over raw originals while preserving current fallback behavior
+- extend avatar/detail surfaces to pass full source objects into the shared variant contract, including discussion lists, public/event detail headers, moderator detail views, and the public profile sidebar
+- add focused regression tests that lock in variant-source propagation and variant preference behavior before backend-generated thumbnail fields land broadly

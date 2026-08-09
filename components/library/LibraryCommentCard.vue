@@ -54,6 +54,7 @@ withDefaults(
         <AvatarComponent
           :text="authorInfo?.displayName || authorInfo?.username || 'Deleted'"
           :src="authorInfo?.profilePicURL || ''"
+          :variant-source="authorInfo || null"
           :is-small="true"
         />
         <div class="min-w-0">
@@ -63,6 +64,7 @@ withDefaults(
               :username="authorInfo.username"
               :display-name="authorInfo.displayName"
               :src="authorInfo.profilePicURL"
+              :variant-source="authorInfo"
               :is-server-admin="authorInfo.isAdmin"
               :comment-karma="authorInfo.commentKarma"
               :discussion-karma="authorInfo.discussionKarma"

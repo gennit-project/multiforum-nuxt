@@ -2,7 +2,9 @@
 import { computed } from 'vue';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
+import AppImage from '@/components/image/AppImage.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
+import { getPreferredImageUrl } from '@/utils/imageVariants';
 
 const props = defineProps({
   image: {
@@ -35,6 +37,13 @@ const sizeStyle = computed(() => ({
   width: `${thumbnailWidth.value}px`,
   height: `${thumbnailHeight.value}px`,
 }));
+const imageUrl = computed(() =>
+  getPreferredImageUrl({
+    source: props.image,
+    preferred: ['list160', 'list80'],
+    originalUrl: props.image?.url,
+  }) || ''
+);
 </script>
 
 <template>
@@ -66,12 +75,16 @@ const sizeStyle = computed(() => ({
         :style="sizeStyle"
       />
     </ClientOnly>
-    <img
+    <AppImage
       v-else-if="image"
-      :src="image.url || ''"
+      :src="imageUrl"
       :alt="image.alt || ''"
       class="h-full w-full rounded object-cover shadow-sm"
-      :style="sizeStyle"
+      :width="thumbnailWidth"
+      :height="thumbnailHeight"
+      :sizes="`${thumbnailWidth}px`"
+      loading="lazy"
+      decoding="async"
     />
   </div>
 </template>

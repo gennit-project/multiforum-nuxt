@@ -71,6 +71,7 @@ function getTimeZone(startTime: string) {
         :is-forum-mod="posterBadges.isForumMod"
         :username="eventData.Poster.username"
         :src="eventData.Poster.profilePicURL ?? ''"
+        :variant-source="eventData.Poster || null"
         :display-name="eventData.Poster.displayName || ''"
         :comment-karma="eventData.Poster.commentKarma ?? 0"
         :discussion-karma="eventData.Poster.discussionKarma ?? 0"

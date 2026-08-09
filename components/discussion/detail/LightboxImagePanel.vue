@@ -4,6 +4,7 @@ import LeftArrowIcon from '@/components/icons/LeftArrowIcon.vue';
 import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
+import AppImage from '@/components/image/AppImage.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
 // Simplified image type for lightbox display
 interface LightboxImage {
@@ -135,11 +136,15 @@ const handleClick = (event: MouseEvent) => {
         />
       </ClientOnly>
     </div>
-    <img
+    <AppImage
       v-else
       :src="currentImage.url || ''"
       :alt="currentImage.alt || ''"
       class="h-full w-full object-contain transition-all duration-300 ease-in-out"
+      sizes="100vw"
+      loading="eager"
+      decoding="async"
+      fetchpriority="high"
       :style="{
         transform: `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`,
         cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'auto',

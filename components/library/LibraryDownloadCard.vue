@@ -2,6 +2,7 @@
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import TagComponent from '@/components/TagComponent.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
+import AppImage from '@/components/image/AppImage.vue';
 import { relativeTime } from '@/utils';
 
 type AuthorInfo = {
@@ -53,11 +54,16 @@ withDefaults(
       :to="downloadLink"
       class="relative block aspect-16/10 overflow-hidden bg-slate-100 dark:bg-gray-700"
     >
-      <img
+      <AppImage
         v-if="previewImageUrl"
         :src="previewImageUrl"
         :alt="download.title"
         class="h-full w-full object-cover"
+        :width="640"
+        :height="400"
+        sizes="(min-width: 1280px) 24rem, (min-width: 768px) 50vw, 100vw"
+        loading="lazy"
+        decoding="async"
       />
       <div
         v-else
@@ -129,6 +135,7 @@ withDefaults(
           :username="authorInfo.username"
           :display-name="authorInfo.displayName"
           :src="authorInfo.profilePicURL"
+          :variant-source="authorInfo"
           :is-server-admin="authorInfo.isAdmin"
           :comment-karma="authorInfo.commentKarma"
           :discussion-karma="authorInfo.discussionKarma"

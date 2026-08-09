@@ -312,6 +312,11 @@ const getContextForum = (comment: Comment) => {
                 <AvatarComponent
                   :src="getAuthorProfilePic(comment)"
                   :text="getAuthorUsername(comment)"
+                  :variant-source="
+                    comment.CommentAuthor?.__typename === 'User'
+                      ? comment.CommentAuthor
+                      : null
+                  "
                   :is-small="true"
                 />
                 <div class="text-sm">

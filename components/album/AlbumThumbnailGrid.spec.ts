@@ -23,9 +23,15 @@ describe('AlbumThumbnailGrid', () => {
   });
 
   it('renders a tile per image', () => {
-    expect(
-      mountGrid({ images: [img('a'), img('b')] }).findAll('img')
-    ).toHaveLength(2);
+    const images = mountGrid({ images: [img('a'), img('b')] }).findAll('img');
+
+    expect(images[0]?.attributes()).toMatchObject({
+      src: 'a.png',
+      width: '320',
+      height: '320',
+      loading: 'lazy',
+      decoding: 'async',
+    });
   });
 
   it('caps the number of tiles at maxImages', () => {

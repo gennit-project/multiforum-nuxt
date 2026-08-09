@@ -9,6 +9,8 @@ import ImageIcon from '@/components/icons/ImageIcon.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import CommentIcon from '@/components/icons/CommentIcon.vue';
 import DownloadQuarantineBadge from '@/components/download/DownloadQuarantineBadge.vue';
+import AppImage from '@/components/image/AppImage.vue';
+import { getPreferredImageUrl } from '@/utils/imageVariants';
 import { relativeTime } from '@/utils';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 import type { DiscussionWithFavorited } from '@/types/Discussion';
@@ -129,10 +131,18 @@ const firstAlbumImage = computed(() => {
     const orderedImage = album.Images.find(
       (img) => img.id === album.imageOrder?.[0]
     );
-    if (orderedImage?.url) return orderedImage.url;
+    if (orderedImage) return orderedImage;
   }
-  return album.Images[0]?.url || null;
+  return album.Images[0] || null;
 });
+
+const firstAlbumImageUrl = computed(() =>
+  getPreferredImageUrl({
+    source: firstAlbumImage.value,
+    preferred: ['list320', 'list160'],
+    originalUrl: firstAlbumImage.value?.url,
+  }) || ''
+);
 
 const relativeCreated = computed(() => {
   if (!props.discussion?.createdAt) return '';
@@ -156,11 +166,16 @@ const handleOpenAlbum = () => {
     <div class="relative">
       <nuxt-link v-if="primaryChannel" class="block" :to="defaultLink">
         <div class="aspect-square w-full bg-gray-50 dark:bg-gray-800">
-          <img
-            v-if="firstAlbumImage"
-            :src="firstAlbumImage"
+          <AppImage
+            v-if="firstAlbumImageUrl"
+            :src="firstAlbumImageUrl"
             :alt="discussion.title || 'Download preview'"
             class="h-full w-full object-cover"
+            :width="320"
+            :height="320"
+            sizes="(min-width: 1280px) 20vw, (min-width: 768px) 25vw, 50vw"
+            loading="lazy"
+            decoding="async"
           />
           <div
             v-else
@@ -204,6 +219,7 @@ const handleOpenAlbum = () => {
             :username="authorUsername"
             :display-name="authorDisplayName"
             :src="authorProfilePicURL"
+            :variant-source="discussion?.Author || null"
             :comment-karma="authorCommentKarma"
             :discussion-karma="authorDiscussionKarma"
             :account-created="authorAccountCreated"

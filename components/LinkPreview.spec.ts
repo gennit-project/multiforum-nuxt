@@ -49,7 +49,13 @@ describe('LinkPreview', () => {
     const wrapper = mountPreview();
     await flushPromises();
 
-    expect(wrapper.find('img').attributes('src')).toBe('https://x/og.png');
+    expect(wrapper.find('img').attributes()).toMatchObject({
+      src: 'https://x/og.png',
+      width: '80',
+      height: '80',
+      loading: 'lazy',
+      decoding: 'async',
+    });
   });
 
   it('links to the target url', () => {

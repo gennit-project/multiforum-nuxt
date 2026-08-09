@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
+import AppImage from '@/components/image/AppImage.vue';
+import { getPreferredImageUrl } from '@/utils/imageVariants';
 
 type AlbumImage = {
   id: string;
@@ -29,6 +31,13 @@ defineProps({
     default: 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4',
   },
 });
+
+const getImageUrl = (image: AlbumImage) =>
+  getPreferredImageUrl({
+    source: image,
+    preferred: ['list320', 'list160'],
+    originalUrl: image.url,
+  }) || '';
 </script>
 
 <template>
@@ -39,10 +48,15 @@ defineProps({
       :to="`/u/${image.Uploader?.username}/images/${image.id}`"
       class="group relative aspect-square overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800"
     >
-      <img
-        :src="image.url || ''"
+      <AppImage
+        :src="getImageUrl(image)"
         :alt="image.alt || image.caption || 'Album image'"
         class="h-full w-full object-cover"
+        :width="320"
+        :height="320"
+        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+        loading="lazy"
+        decoding="async"
       />
       <div
         v-if="showCaptions && image.caption"

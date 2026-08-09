@@ -1,8 +1,10 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
+import type { PropType } from 'vue';
 import Identicon from 'identicon.js';
 import sha256 from 'crypto-js/sha256';
 import AppImage from '@/components/image/AppImage.vue';
+import { getPreferredImageUrl, type ImageVariantKey } from '@/utils/imageVariants';
 
 const props = defineProps({
   text: {
@@ -18,6 +20,11 @@ const props = defineProps({
     type: String,
     required: false,
     default: '',
+  },
+  variantSource: {
+    type: Object as PropType<Record<string, unknown> | null>,
+    required: false,
+    default: null,
   },
   isLarge: {
     type: Boolean,
@@ -75,13 +82,34 @@ const avatarDimensions = computed(() => {
 
   return { width: undefined, height: undefined };
 });
+
+const preferredAvatarVariants = computed<ImageVariantKey[]>(() => {
+  if (props.isLarge) {
+    return ['avatar96', 'avatar64', 'avatar48'];
+  }
+  if (props.isMedium) {
+    return ['avatar48', 'avatar64', 'avatar32'];
+  }
+  if (props.isSmall) {
+    return ['avatar32', 'avatar48'];
+  }
+  return ['avatar64', 'avatar48', 'avatar32', 'avatar96'];
+});
+
+const avatarSrc = computed(() =>
+  getPreferredImageUrl({
+    source: props.variantSource,
+    preferred: preferredAvatarVariants.value,
+    originalUrl: props.src,
+  }) || ''
+);
 </script>
 
 <template>
   <div>
     <AppImage
-      v-if="src"
-      :src="src"
+      v-if="avatarSrc"
+      :src="avatarSrc"
       :alt="isDecorative ? '' : text"
       :aria-hidden="isDecorative ? 'true' : undefined"
       :width="avatarDimensions.width"

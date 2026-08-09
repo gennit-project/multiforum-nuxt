@@ -229,6 +229,7 @@ const isSticky = computed(
       :is-small="true"
       :text="commentAuthorUsername"
       :src="commentAuthorProfilePic || ''"
+      :variant-source="commentData.CommentAuthor || null"
     />
     <AvatarComponent
       v-else-if="commentData.CommentAuthor?.displayName"

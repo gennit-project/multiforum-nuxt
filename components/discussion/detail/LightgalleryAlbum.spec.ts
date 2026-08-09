@@ -43,6 +43,17 @@ describe('LightgalleryAlbum grid format', () => {
     expect(wrapper.findAll('img')).toHaveLength(6);
   });
 
+  it('applies fixed dimensions and lazy decoding to grid images', () => {
+    const wrapper = mountAlbum({ carouselFormat: false });
+
+    expect(wrapper.find('img').attributes()).toMatchObject({
+      width: '200',
+      height: '200',
+      loading: 'lazy',
+      decoding: 'async',
+    });
+  });
+
   it('opens the selected image in the lightbox', async () => {
     const wrapper = mountAlbum({ carouselFormat: false });
 
@@ -90,6 +101,17 @@ describe('LightgalleryAlbum carousel thumbnails', () => {
     await thumbnails(wrapper)[2].trigger('click');
 
     expect(thumbnails(wrapper)[2].classes()).toContain('border-orange-500');
+  });
+
+  it('eager loads the active carousel image', () => {
+    const wrapper = mountAlbum({ carouselFormat: true });
+
+    expect(wrapper.find('img.max-h-96').attributes()).toMatchObject({
+      width: '384',
+      height: '384',
+      loading: 'eager',
+      fetchpriority: 'high',
+    });
   });
 });
 

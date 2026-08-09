@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import { defineComponent } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import {
   asMock,
@@ -37,6 +38,15 @@ vi.mock('@/composables/useAuthState', () =>
   createAuthStateMock({ username: 'alice' })
 );
 
+const UsernameWithTooltipStub = defineComponent({
+  name: 'UsernameWithTooltip',
+  props: {
+    username: { type: String, default: '' },
+    variantSource: { type: Object, default: null },
+  },
+  template: '<div><slot /></div>',
+});
+
 const mountItem = (
   title: string,
   flairs: Array<Record<string, unknown>> = []
@@ -60,7 +70,7 @@ const mountItem = (
       stubs: {
         AddToDiscussionFavorites: true,
         MarkdownPreview: true,
-        UsernameWithTooltip: true,
+        UsernameWithTooltip: UsernameWithTooltipStub,
         TagComponent: true,
         ErrorBanner: true,
         CheckCircleIcon: true,
@@ -93,6 +103,18 @@ describe('ChannelDiscussionListItem', () => {
     ]);
     expect(wrapper.get('[data-testid="discussion-flair"]').text()).toBe(
       'Question'
+    );
+  });
+
+  it('passes the full author as the avatar variant source', () => {
+    const wrapper = mountItem('Variant author');
+
+    expect(
+      wrapper.getComponent(UsernameWithTooltipStub).props('variantSource')
+    ).toEqual(
+      expect.objectContaining({
+        username: 'alice',
+      })
     );
   });
 });

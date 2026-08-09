@@ -20,12 +20,28 @@ const mountItem = (image: Partial<Image>) =>
 describe('ImageListItem', () => {
   it('renders a plain image for a regular url', () => {
     const wrapper = mountItem({ id: 'i1', url: 'https://img.test/a.png' });
-    expect(wrapper.find('img').exists()).toBe(true);
+    expect(wrapper.find('img').attributes()).toMatchObject({
+      width: '300',
+      height: '300',
+      loading: 'lazy',
+      decoding: 'async',
+    });
   });
 
   it('uses alt, then caption, then a fallback for the image alt', () => {
     const wrapper = mountItem({ id: 'i1', url: 'a.png', caption: 'A cat' });
     expect(wrapper.find('img').attributes('alt')).toBe('A cat');
+  });
+
+  it('prefers a list variant url when present', () => {
+    const wrapper = mountItem({
+      id: 'i1',
+      url: 'https://img.test/original.png',
+      variantUrls: { list320: 'https://img.test/list-320.webp' },
+    } as Partial<Image>);
+    expect(wrapper.find('img').attributes('src')).toBe(
+      'https://img.test/list-320.webp'
+    );
   });
 
   it('renders the 3D model viewer for a glb url', () => {

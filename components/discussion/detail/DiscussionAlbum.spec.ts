@@ -79,12 +79,20 @@ describe('DiscussionAlbum', () => {
 
   it('falls back to the Images array (in order) when imageOrder is empty', () => {
     const wrapper = mountAlbum({ album: makeAlbum(['a', 'b'], []) });
-    const srcs = cells(wrapper).map((cell) =>
-      cell.find('img').attributes('src')
-    );
-    expect(srcs).toEqual([
-      'https://example.com/a.jpg',
-      'https://example.com/b.jpg',
+    const attrs = cells(wrapper).map((cell) => cell.find('img').attributes());
+    expect(attrs).toEqual([
+      expect.objectContaining({
+        src: 'https://example.com/a.jpg',
+        width: '200',
+        height: '200',
+        loading: 'lazy',
+      }),
+      expect.objectContaining({
+        src: 'https://example.com/b.jpg',
+        width: '200',
+        height: '200',
+        loading: 'lazy',
+      }),
     ]);
   });
 
@@ -300,5 +308,19 @@ describe('DiscussionAlbum — carousel navigation', () => {
     });
 
     expect(carousel(wrapper).attributes('style')).toContain('500px');
+  });
+
+  it('eager loads the expanded active image with stable dimensions', () => {
+    const wrapper = mountAlbum({
+      carouselFormat: true,
+      expandedView: true,
+    });
+
+    expect(carousel(wrapper).find('img').attributes()).toMatchObject({
+      width: '600',
+      height: '400',
+      loading: 'eager',
+      fetchpriority: 'high',
+    });
   });
 });

@@ -122,6 +122,7 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
             <AvatarComponent
               :text="discussion?.Author.username"
               :src="discussion?.Author.profilePicURL ?? ''"
+              :variant-source="discussion?.Author || null"
               class="mr-2 h-6 w-6"
             />
           </span>
@@ -130,6 +131,7 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
               v-if="discussion?.Author?.username"
               :username="discussion?.Author?.username"
               :src="discussion?.Author.profilePicURL ?? ''"
+              :variant-source="discussion?.Author || null"
               :display-name="discussion?.Author.displayName ?? ''"
               :comment-karma="discussion?.Author.commentKarma ?? 0"
               :discussion-karma="discussion?.Author.discussionKarma ?? 0"

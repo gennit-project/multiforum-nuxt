@@ -15,7 +15,9 @@ import { useUsername } from '@/composables/useAuthState';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
 import CarouselThumbnail from '@/components/discussion/detail/CarouselThumbnail.vue';
+import AppImage from '@/components/image/AppImage.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
+import { getPreferredImageUrl } from '@/utils/imageVariants';
 
 const ImageLightbox = defineAsyncComponent(
   () => import('@/components/discussion/detail/ImageLightbox.vue')
@@ -136,6 +138,28 @@ const orderedImages = computed(() => {
 const activeImage = computed(() => {
   return orderedImages.value[activeIndex.value] || null;
 });
+
+const mainImageWidth = computed(() => (props.expandedView ? 600 : 384));
+const mainImageSizes = computed(() =>
+  props.expandedView
+    ? '(min-width: 1024px) 600px, 100vw'
+    : '(min-width: 1024px) 384px, (min-width: 768px) 60vw, 100vw'
+);
+const getGridImageUrl = (image: { url?: string | null } & Record<string, unknown>) =>
+  getPreferredImageUrl({
+    source: image,
+    preferred: ['list320', 'list160'],
+    originalUrl: image.url,
+  }) || '';
+const activeImageUrl = computed(() =>
+  activeImage.value
+    ? getPreferredImageUrl({
+        source: activeImage.value,
+        preferred: ['detail960', 'detail640', 'detail1280'],
+        originalUrl: activeImage.value.url,
+      }) || ''
+    : ''
+);
 
 // Caption editing for thumbnail grid
 const editingCaptionIndex = ref(-1);
@@ -310,11 +334,16 @@ onMounted(() => {
               class="shadow-sm"
             />
           </ClientOnly>
-          <img
+          <AppImage
             v-else-if="image"
-            :src="image.url || ''"
+            :src="getGridImageUrl(image)"
             :alt="image.alt || ''"
             class="shadow-sm"
+            :width="200"
+            :height="200"
+            sizes="(min-width: 1024px) 33vw, 50vw"
+            loading="lazy"
+            decoding="async"
           />
           <div
             v-if="editingCaptionIndex === idx"
@@ -526,11 +555,17 @@ onMounted(() => {
                     }"
                   />
                 </ClientOnly>
-                <img
+                <AppImage
                   v-else
-                  :src="activeImage.url || ''"
+                  :src="activeImageUrl"
                   :alt="activeImage.alt || ''"
                   class="shadow-sm"
+                  :width="mainImageWidth"
+                  :height="mainImageHeight"
+                  :sizes="mainImageSizes"
+                  :loading="expandedView ? 'eager' : 'lazy'"
+                  decoding="async"
+                  :fetchpriority="expandedView ? 'high' : 'auto'"
                   :class="{
                     'max-h-96 max-w-96 object-contain': !expandedView,
                     'h-full w-full object-cover': expandedView,

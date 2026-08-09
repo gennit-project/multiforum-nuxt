@@ -9,6 +9,12 @@ const mountImage = () =>
       src: 'https://example.test/image.png',
       alt: 'Example image',
       rounded: true,
+      fullWidth: true,
+      width: 640,
+      height: 360,
+      sizes: '100vw',
+      loading: 'eager',
+      fetchpriority: 'high',
     },
     global: {
       stubs: {
@@ -18,23 +24,38 @@ const mountImage = () =>
           emits: ['hide'],
           template: '<div data-testid="lightbox" />',
         },
+        NuxtImg: {
+          props: [
+            'src',
+            'alt',
+            'width',
+            'height',
+            'sizes',
+            'loading',
+            'decoding',
+            'fetchpriority',
+          ],
+          template: '<img v-bind="$props" />',
+        },
       },
     },
   });
 
 describe('ExpandableImage', () => {
-  it('renders the image with alt text and rounded class', () => {
+  it('renders the image with optimization hints and rounded class', () => {
     const wrapper = mountImage();
 
-    expect({
-      src: wrapper.get('img').attributes('src'),
-      alt: wrapper.get('img').attributes('alt'),
-      rounded: wrapper.get('img').classes('rounded-full'),
-    }).toEqual({
+    expect(wrapper.get('img').attributes()).toMatchObject({
       src: 'https://example.test/image.png',
       alt: 'Example image',
-      rounded: true,
+      width: '640',
+      height: '360',
+      loading: 'eager',
+      fetchpriority: 'high',
     });
+    expect(wrapper.get('img').classes()).toEqual(
+      expect.arrayContaining(['rounded-full', 'w-full'])
+    );
   });
 
   it('opens and closes the lightbox for the image', async () => {

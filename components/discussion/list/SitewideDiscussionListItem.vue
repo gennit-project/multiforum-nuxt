@@ -27,6 +27,7 @@ import { GET_USER } from '@/graphQLData/user/queries';
 import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import { getPreferredImageUrl } from '@/utils/imageVariants';
 
 const usernameVar = useUsername();
 const isAuthenticatedVar = useIsAuthenticated();
@@ -210,9 +211,25 @@ const thumbnailUrl = computed(() => {
     const order = album?.imageOrder || [];
     if (order.length) {
       const firstOrdered = images.find((img) => img?.id === order[0]);
-      if (firstOrdered?.url) return firstOrdered.url;
+      if (firstOrdered) {
+        return (
+          getPreferredImageUrl({
+            source: firstOrdered,
+            preferred: ['list160', 'list80'],
+            originalUrl: firstOrdered.url,
+          }) || ''
+        );
+      }
     }
-    if (images[0]?.url) return images[0].url;
+    if (images[0]) {
+      return (
+        getPreferredImageUrl({
+          source: images[0],
+          preferred: ['list160', 'list80'],
+          originalUrl: images[0].url,
+        }) || ''
+      );
+    }
   }
 
   const body = props.discussion?.body || '';
@@ -359,6 +376,7 @@ const revealSensitiveContent = () => {
                 :is-server-admin="authorIsAdmin"
                 :username="authorUsername"
                 :src="discussion?.Author?.profilePicURL || ''"
+                :variant-source="discussion?.Author || null"
                 :display-name="discussion?.Author?.displayName || ''"
                 :comment-karma="discussion?.Author?.commentKarma ?? 0"
                 :discussion-karma="discussion?.Author?.discussionKarma ?? 0"

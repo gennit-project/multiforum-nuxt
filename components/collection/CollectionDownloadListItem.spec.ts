@@ -61,7 +61,13 @@ describe('CollectionDownloadListItem preview image', () => {
   it('shows the first album image', () => {
     const wrapper = mountItem();
 
-    expect(wrapper.find('img').attributes('src')).toBe('https://x/a.png');
+    expect(wrapper.find('img').attributes()).toMatchObject({
+      src: 'https://x/a.png',
+      width: '192',
+      height: '192',
+      loading: 'lazy',
+      decoding: 'async',
+    });
   });
 
   it('respects the album image order', () => {
@@ -77,7 +83,33 @@ describe('CollectionDownloadListItem preview image', () => {
       }),
     });
 
-    expect(wrapper.find('img').attributes('src')).toBe('https://x/b.png');
+    expect(wrapper.find('img').attributes()).toMatchObject({
+      src: 'https://x/b.png',
+      width: '192',
+      height: '192',
+      loading: 'lazy',
+      decoding: 'async',
+    });
+  });
+
+  it('prefers a generated list variant when present', () => {
+    const wrapper = mountItem({
+      discussion: discussion({
+        Album: {
+          Images: [
+            {
+              id: 'i1',
+              url: 'https://x/original.png',
+              variantUrls: { list320: 'https://x/list-320.webp' },
+            },
+          ],
+        },
+      }),
+    });
+
+    expect(wrapper.find('img').attributes('src')).toBe(
+      'https://x/list-320.webp'
+    );
   });
 
   it('shows a no-preview placeholder without images', () => {

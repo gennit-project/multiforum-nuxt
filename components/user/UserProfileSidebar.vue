@@ -89,6 +89,7 @@ const handleReportSuccess = () => {
           class="max-w-72 flex-1"
           :src="profilePic"
           :text="username"
+          :variant-source="user"
           :is-square="false"
         />
         <RequireAuth v-if="canReportProfilePicture">

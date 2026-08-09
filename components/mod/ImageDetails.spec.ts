@@ -38,6 +38,19 @@ const mountDetails = () =>
       stubs: {
         LoadingSpinner: { name: 'LoadingSpinner', template: '<div class="spinner" />' },
         ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err">{{ text }}</div>' },
+        NuxtImg: {
+          props: [
+            'src',
+            'alt',
+            'width',
+            'height',
+            'sizes',
+            'loading',
+            'decoding',
+            'fetchpriority',
+          ],
+          template: '<img v-bind="$props" />',
+        },
         NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
         'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
       },
@@ -79,13 +92,53 @@ describe('ImageDetails content', () => {
   it('renders the image', () => {
     const wrapper = mountDetails();
 
-    expect(wrapper.get('img').attributes('src')).toBe('https://x/i.jpg');
+    expect(wrapper.get('img').attributes()).toMatchObject({
+      src: 'https://x/i.jpg',
+      width: '640',
+      height: '640',
+      loading: 'lazy',
+      decoding: 'async',
+    });
+  });
+
+  it('prefers a generated detail variant when present', () => {
+    h.result = ref({
+      images: [
+        image({
+          variantUrls: {
+            detail640: 'https://x/i-640.webp',
+          },
+        }),
+      ],
+    });
+    const wrapper = mountDetails();
+
+    expect(wrapper.get('img').attributes('src')).toBe('https://x/i-640.webp');
   });
 
   it('shows the uploader display name', () => {
     const wrapper = mountDetails();
 
     expect(wrapper.text()).toContain('Alice A');
+  });
+
+  it('prefers a generated uploader avatar variant when present', () => {
+    h.result = ref({
+      images: [
+        image({
+          Uploader: {
+            username: 'alice',
+            displayName: 'Alice A',
+            profilePicURL: 'https://x/original-avatar.jpg',
+            avatar32Url: 'https://x/avatar-32.webp',
+          },
+        }),
+      ],
+    });
+    const wrapper = mountDetails();
+    const images = wrapper.findAll('img');
+
+    expect(images[1]?.attributes('src')).toBe('https://x/avatar-32.webp');
   });
 
   it('falls back to the username when there is no display name', () => {
