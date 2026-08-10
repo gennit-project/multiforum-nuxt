@@ -5,19 +5,12 @@ import { GET_CHANNEL_NAMES } from '@/graphQLData/channel/queries';
 import { createCaseInsensitivePattern } from '@/utils/searchUtils';
 import SearchBar from '@/components/SearchBar.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';
-import type { Channel } from '@/__generated__/graphql';
 
-type ForumOption = Pick<
-  Channel,
-  | 'uniqueName'
-  | 'displayName'
-  | 'channelIconURL'
-  | 'variantUrls'
-  | 'icon32Url'
-  | 'icon48Url'
-  | 'icon64Url'
-  | 'icon96Url'
->;
+type ForumOption = {
+  uniqueName: string;
+  displayName?: string | null;
+  channelIconURL?: string | null;
+};
 
 const emit = defineEmits<{
   select: [uniqueName: string];

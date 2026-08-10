@@ -27,10 +27,5 @@ export const AUTHOR_FIELDS = gql`
 export const CHANNEL_ICON_FIELDS = gql`
   fragment ChannelIconFields on Channel {
     channelIconURL
-    variantUrls
-    icon32Url
-    icon48Url
-    icon64Url
-    icon96Url
   }
 `;
