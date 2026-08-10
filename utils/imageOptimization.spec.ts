@@ -6,10 +6,10 @@ describe('canOptimizeImageUrl', () => {
     expect(canOptimizeImageUrl('/images/cat.jpg')).toBe(true);
   });
 
-  it('optimizes storage.googleapis.com URLs', () => {
+  it('does not optimize storage.googleapis.com URLs', () => {
     expect(
       canOptimizeImageUrl('https://storage.googleapis.com/bucket/cat.jpg')
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it('does not optimize arbitrary external hosts', () => {
