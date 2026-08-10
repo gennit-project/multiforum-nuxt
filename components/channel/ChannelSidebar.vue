@@ -16,6 +16,7 @@ import RobotIcon from '@/components/icons/RobotIcon.vue';
 import TagIcon from '@/components/icons/TagIcon.vue';
 import ThumbtackIcon from '@/components/icons/ThumbtackIcon.vue';
 import { useIsAuthenticated } from '@/composables/useAuthState';
+import { getPreferredImageUrl } from '@/utils/imageVariants';
 import { getPlainWikiTitle } from '@/utils/wikiTitle';
 
 const isAuthenticatedVar = useIsAuthenticated();
@@ -67,6 +68,14 @@ const botAccounts = computed(() => {
   const channel = props.channel as Channel & { Bots?: BotSummary[] };
   return channel?.Bots ?? [];
 });
+
+const sidebarIconSrc = computed(() =>
+  getPreferredImageUrl({
+    source: props.channel,
+    preferred: ['avatar64', 'avatar96', 'avatar48'],
+    originalUrl: props.channel?.channelIconURL ?? '',
+  }) || ''
+);
 
 // Check if a bot has active suspensions
 const isBotSuspended = (bot: BotSummary): boolean => {
@@ -132,7 +141,7 @@ const handleBecomeAdminSuccess = () => {
           :rounded="true"
           :full-width="true"
           :alt="channelId"
-          :src="channel?.channelIconURL ?? ''"
+          :src="sidebarIconSrc"
           :width="80"
           :height="80"
           sizes="80px"
@@ -144,6 +153,7 @@ const handleBecomeAdminSuccess = () => {
           class="h-20 w-20 dark:border-gray-800"
           :text="channelId"
           :src="channel?.channelIconURL ?? ''"
+          :variant-source="channel"
           :full-width="true"
           :is-square="false"
         />
@@ -261,6 +271,7 @@ const handleBecomeAdminSuccess = () => {
                 <AvatarComponent
                   :text="admin.username"
                   :src="admin.profilePicURL ?? ''"
+                  :variant-source="admin"
                   class="mr-2 h-6 w-6 shrink-0"
                 />
                 <span class="flex flex-wrap items-baseline gap-1">

@@ -5,6 +5,11 @@ import AvatarComponent from '@/components/AvatarComponent.vue';
 type ForumItem = {
   uniqueName: string;
   channelIconURL?: string | null;
+  variantUrls?: Record<string, string> | null;
+  icon32Url?: string | null;
+  icon48Url?: string | null;
+  icon64Url?: string | null;
+  icon96Url?: string | null;
   timestamp: number;
 };
 
@@ -62,6 +67,7 @@ const defaultLinkClasses =
               class="list-item-icon h-8 w-8 shrink-0 border border-gray-200 shadow-sm dark:border-gray-800"
               :text="forum.uniqueName || ''"
               :src="forum?.channelIconURL ?? ''"
+              :variant-source="forum"
               :is-small="true"
               :is-square="false"
               :is-decorative="true"

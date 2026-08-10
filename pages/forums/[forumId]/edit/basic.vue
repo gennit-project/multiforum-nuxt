@@ -17,7 +17,10 @@ import {
 import { useUsername } from '@/composables/useAuthState';
 import { ref, nextTick, computed } from 'vue';
 import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
-import { PERMANENTLY_DELETE_CHANNEL_BANNER } from '@/graphQLData/channel/mutations';
+import {
+  PERMANENTLY_DELETE_CHANNEL_BANNER,
+  SET_CHANNEL_ICON,
+} from '@/graphQLData/channel/mutations';
 import { REMOVE_FORUM_OWNER } from '@/graphQLData/mod/mutations';
 import { useMutation } from '@vue/apollo-composable';
 import { isFileSizeValid } from '@/utils/index';
@@ -94,6 +97,8 @@ const {
   error: permanentlyDeleteChannelBannerError,
 } = useMutation(PERMANENTLY_DELETE_CHANNEL_BANNER);
 
+const { mutate: setChannelIcon } = useMutation(SET_CHANNEL_ICON);
+
 const {
   mutate: removeForumOwner,
   loading: removeForumOwnerLoading,
@@ -169,6 +174,15 @@ const handleImageChange = async (input: FileChangeInput) => {
   if (selectedFile) {
     const embeddedLink = await upload(selectedFile);
     if (!embeddedLink) return;
+
+    if (fieldName === 'channelIconURL' && forumId.value) {
+      await setChannelIcon({
+        channelUniqueName: forumId.value,
+        imageUrl: embeddedLink,
+      });
+      emit('updateFormValues', { channelIconURL: embeddedLink });
+      return;
+    }
 
     emit('updateFormValues', { [fieldName]: embeddedLink });
     emit('submit');

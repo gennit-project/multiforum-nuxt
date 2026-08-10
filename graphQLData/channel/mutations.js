@@ -112,6 +112,15 @@ export const PERMANENTLY_DELETE_CHANNEL_BANNER = gql`
   }
 `;
 
+export const SET_CHANNEL_ICON = gql`
+  mutation setChannelIcon($channelUniqueName: String!, $imageUrl: String!) {
+    setChannelIcon(channelUniqueName: $channelUniqueName, imageUrl: $imageUrl) {
+      uniqueName
+      channelIconURL
+    }
+  }
+`;
+
 export const CREATE_WIKI_PAGE = gql`
   mutation createWikiPage($where: ChannelWhere!, $update: ChannelUpdateInput!) {
     updateChannels(where: $where, update: $update) {

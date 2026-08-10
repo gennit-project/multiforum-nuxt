@@ -35,6 +35,10 @@ const profilePicURL = computed(() => {
   if (!getUserResult.value?.users?.length) return '';
   return getUserResult.value.users[0]?.profilePicURL || '';
 });
+const user = computed(() => {
+  if (!getUserResult.value?.users?.length) return null;
+  return getUserResult.value.users[0] || null;
+});
 const router = useRouter();
 
 const menuItems = [
@@ -77,6 +81,7 @@ const goToUserProfile = () => {
       :key="profilePicURL"
       :is-small="true"
       :src="profilePicURL"
+      :variant-source="user"
       :text="username"
     />
   </IconButtonDropdown>

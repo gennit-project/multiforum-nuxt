@@ -20,6 +20,8 @@ const { result: getUserResult } = useQuery(
 const profilePicURL = computed(() => {
   return getUserResult.value?.users?.[0]?.profilePicURL || '';
 });
+
+const user = computed(() => getUserResult.value?.users?.[0] || null);
 </script>
 
 <template>
@@ -27,6 +29,7 @@ const profilePicURL = computed(() => {
     class="h-8 w-8"
     :text="usernameVar"
     :src="profilePicURL"
+    :variant-source="user"
     :is-small="true"
   />
 </template>

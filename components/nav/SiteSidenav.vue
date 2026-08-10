@@ -371,6 +371,7 @@ const selectSearchType = (type: SearchType) => {
                   class="list-item-icon h-8 w-8 shrink-0 border border-gray-200 shadow-sm dark:border-gray-800"
                   :text="forum.uniqueName || ''"
                   :src="forum?.channelIconURL ?? ''"
+                  :variant-source="forum"
                   :is-small="true"
                   :is-square="false"
                   :is-decorative="true"
@@ -380,6 +381,7 @@ const selectSearchType = (type: SearchType) => {
                   class="list-item-icon h-8 w-8 shrink-0 border border-gray-200 shadow-sm dark:border-gray-800"
                   :text="forum.uniqueName || ''"
                   :src="forum?.channelIconURL ?? ''"
+                  :variant-source="forum"
                   :is-small="true"
                   :is-square="false"
                   :is-decorative="true"
@@ -427,6 +429,7 @@ const selectSearchType = (type: SearchType) => {
               v-if="profilePicURL"
               :text="usernameVar"
               :src="profilePicURL"
+              :variant-source="user"
               :is-small="true"
             />
             My Profile

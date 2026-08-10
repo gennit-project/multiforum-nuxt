@@ -13,8 +13,19 @@ export const AUTHOR_FIELDS = gql`
     username
     displayName
     profilePicURL
+    variantUrls
+    avatar32Url
+    avatar48Url
+    avatar64Url
+    avatar96Url
     createdAt
     discussionKarma
     commentKarma
+  }
+`;
+
+export const CHANNEL_ICON_FIELDS = gql`
+  fragment ChannelIconFields on Channel {
+    channelIconURL
   }
 `;

@@ -24,10 +24,10 @@ type VariantArrayEntry = {
 type VariantSourceRecord = Record<string, unknown>;
 
 const DIRECT_VARIANT_FIELD_ALIASES: Record<ImageVariantKey, string[]> = {
-  avatar32: ['avatar32Url'],
-  avatar48: ['avatar48Url'],
-  avatar64: ['avatar64Url'],
-  avatar96: ['avatar96Url'],
+  avatar32: ['avatar32Url', 'icon32Url'],
+  avatar48: ['avatar48Url', 'icon48Url'],
+  avatar64: ['avatar64Url', 'icon64Url'],
+  avatar96: ['avatar96Url', 'icon96Url'],
   list80: ['list80Url', 'thumbnailUrl'],
   list160: ['list160Url'],
   list320: ['list320Url', 'cardImageUrl'],
@@ -38,7 +38,12 @@ const DIRECT_VARIANT_FIELD_ALIASES: Record<ImageVariantKey, string[]> = {
 
 const VARIANT_RECORD_FIELDS = ['variantUrls', 'imageVariantUrls'] as const;
 const VARIANT_ARRAY_FIELDS = ['variants', 'imageVariants'] as const;
-const ORIGINAL_URL_FIELDS = ['url', 'profilePicURL', 'coverImageURL'] as const;
+const ORIGINAL_URL_FIELDS = [
+  'url',
+  'profilePicURL',
+  'channelIconURL',
+  'coverImageURL',
+] as const;
 
 const isRecord = (value: unknown): value is VariantSourceRecord =>
   typeof value === 'object' && value !== null;
