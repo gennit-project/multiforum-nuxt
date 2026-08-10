@@ -6,14 +6,25 @@ describe('canOptimizeImageUrl', () => {
     expect(canOptimizeImageUrl('/images/cat.jpg')).toBe(true);
   });
 
-  it('does not optimize storage.googleapis.com URLs', () => {
+  it('optimizes storage.googleapis.com URLs when the vercel provider is active', () => {
     expect(
-      canOptimizeImageUrl('https://storage.googleapis.com/bucket/cat.jpg')
+      canOptimizeImageUrl(
+        'https://storage.googleapis.com/bucket/cat.jpg',
+        'vercel'
+      )
+    ).toBe(true);
+  });
+
+  it('does not optimize storage.googleapis.com URLs for the ipx provider', () => {
+    expect(
+      canOptimizeImageUrl('https://storage.googleapis.com/bucket/cat.jpg', 'ipx')
     ).toBe(false);
   });
 
   it('does not optimize arbitrary external hosts', () => {
-    expect(canOptimizeImageUrl('https://example.com/cat.jpg')).toBe(false);
+    expect(canOptimizeImageUrl('https://example.com/cat.jpg', 'vercel')).toBe(
+      false
+    );
   });
 
   it('does not optimize data URLs', () => {

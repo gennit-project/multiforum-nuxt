@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue';
 import { canOptimizeImageUrl } from '@/utils/imageOptimization';
+import { useRuntimeConfig } from 'nuxt/app';
 
 defineOptions({
   inheritAttrs: false,
@@ -27,7 +28,13 @@ const props = withDefaults(
 );
 
 const attrs = useAttrs();
-const shouldOptimize = computed(() => canOptimizeImageUrl(props.src));
+const runtimeConfig = useRuntimeConfig();
+const activeImageProvider = computed(
+  () => String(runtimeConfig.public.imageProvider || 'ipx')
+);
+const shouldOptimize = computed(() =>
+  canOptimizeImageUrl(props.src, activeImageProvider.value)
+);
 </script>
 
 <template>

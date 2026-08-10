@@ -1,4 +1,9 @@
-export function canOptimizeImageUrl(url: string): boolean {
+export type ImageOptimizationProvider = 'ipx' | 'vercel' | 'none' | string;
+
+export function canOptimizeImageUrl(
+  url: string,
+  provider: ImageOptimizationProvider = 'ipx'
+): boolean {
   if (!url) {
     return false;
   }
@@ -15,5 +20,18 @@ export function canOptimizeImageUrl(url: string): boolean {
     return true;
   }
 
-  return false;
+  if (!/^https?:\/\//.test(url)) {
+    return false;
+  }
+
+  if (provider !== 'vercel') {
+    return false;
+  }
+
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.hostname === 'storage.googleapis.com';
+  } catch {
+    return false;
+  }
 }

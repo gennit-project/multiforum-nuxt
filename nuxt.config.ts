@@ -11,6 +11,8 @@ const browserGraphqlUrl = config?.graphqlUrl || 'http://localhost:4000';
 const serverGraphqlUrl =
   process.env.NUXT_BACKEND_GRAPHQL_URL || browserGraphqlUrl;
 const frontendGraphqlProxyUrl = '/api/graphql';
+const nitroPreset = process.env.NITRO_PRESET || 'vercel';
+const activeImageProvider = nitroPreset === 'vercel' ? 'vercel' : 'ipx';
 const runtimeGraphqlFetch: typeof globalThis.fetch = (input, init) => {
   const runtimeBackendUrl =
     typeof window === 'undefined'
@@ -166,9 +168,30 @@ export default defineNuxtConfig({
         // Use WebP and AVIF formats where supported
         format: ['webp', 'avif', 'jpg', 'png'],
         // Provider for image generation
-        provider: 'ipx',
+        provider: activeImageProvider,
         // Responsive image breakpoints
         screens: {
+          icon24: 24,
+          avatar32: 32,
+          avatar48: 48,
+          avatar64: 64,
+          avatar80: 80,
+          avatar96: 96,
+          thumb128: 128,
+          thumb160: 160,
+          thumb192: 192,
+          thumb200: 200,
+          thumb256: 256,
+          thumb288: 288,
+          thumb300: 300,
+          thumb320: 320,
+          thumb384: 384,
+          thumb400: 400,
+          thumb512: 512,
+          thumb640: 640,
+          thumb768: 768,
+          thumb800: 800,
+          thumb1024: 1024,
           xs: 320,
           sm: 640,
           md: 768,
@@ -431,6 +454,7 @@ export default defineNuxtConfig({
       serverName: config.serverName,
       serverDisplayName: config.serverDisplayName,
       enableLanguagePicker: config.enableLanguagePicker,
+      imageProvider: activeImageProvider,
       authProvider:
         process.env.NUXT_PUBLIC_AUTH_PROVIDER === 'local-dev'
           ? 'local-dev'
