@@ -15,14 +15,5 @@ export function canOptimizeImageUrl(url: string): boolean {
     return true;
   }
 
-  if (!/^https?:\/\//.test(url)) {
-    return false;
-  }
-
-  try {
-    const parsedUrl = new URL(url);
-    return parsedUrl.hostname === 'storage.googleapis.com';
-  } catch {
-    return false;
-  }
+  return false;
 }
