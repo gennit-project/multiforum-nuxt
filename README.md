@@ -2,8 +2,6 @@
 
 [![codecov](https://codecov.io/gh/gennit-project/multiforum-nuxt/branch/main/graph/badge.svg)](https://codecov.io/gh/gennit-project/multiforum-nuxt)
 
-> Multiforum is under active development; test coverage is being expanded as core features stabilize.
-
 ## Try it locally
 
 Start a usable local instance, including Neo4j, the backend, the frontend, and
@@ -34,6 +32,10 @@ Key differentiators:
 - Map integration for location-based event discovery
 - Personal libraries for organizing favorites and collections
 - Granular moderation at both channel and server levels
+
+Docs: https://docs.multiforum.net/
+Website: https://www.multiforum.net/
+Hosted Demo: https://www.topical.space/
 
 ## How it fits together
 
