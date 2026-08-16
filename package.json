@@ -128,7 +128,7 @@
     "happy-dom": "^20.11.1",
     "husky": "^9.1.7",
     "jsdom": "^29.1.1",
-    "knip": "^6.27.0",
+    "knip": "^6.32.2",
     "lint-staged": "^17.2.0",
     "monocart-coverage-reports": "^2.12.12",
     "prettier": "^3.9.3",
