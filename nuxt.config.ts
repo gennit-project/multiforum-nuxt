@@ -240,32 +240,6 @@ export default defineNuxtConfig({
         preconnect: true,
       },
     ],
-    [
-      '@nuxtjs/i18n',
-      {
-        locales: [
-          {
-            code: 'en',
-            name: 'English',
-            file: 'en.yaml',
-          },
-          {
-            code: 'es',
-            name: 'Espanol',
-            file: 'es.yaml',
-          },
-        ],
-        defaultLocale: 'en',
-        lazy: true,
-        langDir: 'locales',
-        strategy: 'no_prefix',
-        detectBrowserLanguage: {
-          useCookie: true,
-          cookieKey: 'i18n_redirected',
-          fallbackLocale: 'en',
-        },
-      },
-    ],
   ],
   sentry: {
     // Build-time module options ONLY (source maps upload). Runtime options such
@@ -430,7 +404,6 @@ export default defineNuxtConfig({
       openGraphApiKey: config.openGraphApiKey,
       serverName: config.serverName,
       serverDisplayName: config.serverDisplayName,
-      enableLanguagePicker: config.enableLanguagePicker,
       authProvider:
         process.env.NUXT_PUBLIC_AUTH_PROVIDER === 'local-dev'
           ? 'local-dev'
@@ -443,7 +416,6 @@ export default defineNuxtConfig({
         },
       },
       googleMapsApiKey: config?.googleMapsApiKey,
-      enableLanguagePicker: config?.enableLanguagePicker || false,
       enableAccented:
         process.env.NUXT_PUBLIC_ENABLE_ACCENTED === 'false' ? false : true,
     },

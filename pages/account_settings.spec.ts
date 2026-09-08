@@ -33,22 +33,10 @@ vi.mock('@vue/apollo-composable', () => ({
   useMutation: vi.fn(),
 }));
 
-vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    locale: ref('en'),
-  }),
-}));
-
 vi.mock('nuxt/app', () => ({ useHead: vi.fn() }));
 
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => ({ value: 'alice' }),
-}));
-
-vi.mock('@/config', () => ({
-  config: {
-    enableLanguagePicker: true,
-  },
 }));
 
 const RequireAuthStub = defineComponent({
@@ -130,9 +118,6 @@ describe('account_settings', () => {
   const buildWrapper = () =>
     mount(AccountSettingsPage, {
       global: {
-        mocks: {
-          $t: (value: string) => value,
-        },
         stubs: {
           NuxtLayout: defineComponent({
             setup(_props, { slots }) {
@@ -283,18 +268,11 @@ describe('account_settings', () => {
     );
   });
 
-  it('changes the selected language', async () => {
-    const wrapper = buildWrapper();
-    const select = wrapper.get('select');
-    await select.setValue('es');
-    expect((select.element as HTMLSelectElement).value).toBe('es');
-  });
-
   it('shows the no-email fallback for a user without an email', () => {
     getUserResult.value = {
       users: [{ ...getUserResult.value.users[0], Email: null }],
     };
     const wrapper = buildWrapper();
-    expect(wrapper.text()).toContain('accountSettings.noEmailAssociated');
+    expect(wrapper.text()).toContain('No email address associated');
   });
 });

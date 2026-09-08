@@ -10,29 +10,17 @@ export type InstanceConfigValues = {
   openGraphApiKey: string;
   serverName: string;
   serverDisplayName: string;
-  enableLanguagePicker: boolean;
 };
 
 export type RuntimeInstanceConfig = Partial<
-  Record<Exclude<keyof InstanceConfigValues, 'enableLanguagePicker'>, unknown>
-> & {
-  enableLanguagePicker?: unknown;
-};
+  Record<keyof InstanceConfigValues, unknown>
+>;
 
 const runtimeString = (value: unknown, fallback: string): string =>
   typeof value === 'string' ? value : fallback;
 
 const runtimeDisplayName = (value: unknown, fallback: string): string =>
   typeof value === 'string' && value.trim() ? value : fallback;
-
-const runtimeBoolean = (value: unknown, fallback: boolean): boolean => {
-  if (typeof value === 'boolean') return value;
-  if (typeof value === 'string') {
-    if (value.toLowerCase() === 'true') return true;
-    if (value.toLowerCase() === 'false') return false;
-  }
-  return fallback;
-};
 
 export const resolveRuntimeInstanceConfig = ({
   runtime,
@@ -70,10 +58,6 @@ export const resolveRuntimeInstanceConfig = ({
     serverDisplayName: runtimeDisplayName(
       runtime.serverDisplayName,
       explicitRuntimeServerName || fallback.serverDisplayName || 'Untitled'
-    ),
-    enableLanguagePicker: runtimeBoolean(
-      runtime.enableLanguagePicker,
-      fallback.enableLanguagePicker
     ),
   };
 };

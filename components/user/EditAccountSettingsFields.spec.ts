@@ -48,7 +48,6 @@ const mountFields = (props: Record<string, unknown> = {}) =>
       ...props,
     },
     global: {
-      mocks: { $t: (k: string) => k },
       stubs: {
         FormComponent: stub('FormComponent', ['needsChanges', 'loading'], ['input', 'submit']),
         FormRow: { template: '<div><slot name="content" /></div>' },
@@ -106,7 +105,7 @@ describe('EditAccountSettingsFields states', () => {
   it('shows a loading message while the user is loading with no form', () => {
     const wrapper = mountFields({ formValues: null, userLoading: true });
 
-    expect(wrapper.text()).toContain('common.loading');
+    expect(wrapper.text()).toContain('Loading...');
   });
 
   it('shows query errors', () => {

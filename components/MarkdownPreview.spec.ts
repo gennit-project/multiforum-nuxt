@@ -32,7 +32,6 @@ vi.mock('@/config', () => ({
     openGraphApiKey: '',
     serverName: '',
     serverDisplayName: 'Untitled',
-    enableLanguagePicker: false,
   },
 }));
 
