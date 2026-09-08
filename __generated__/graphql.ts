@@ -162,6 +162,15 @@ export type AddToCollectionInput = {
   position?: InputMaybe<Scalars['Int']['input']>;
 };
 
+/** Public, non-identifying age policy for this server. */
+export type AgePolicy = {
+  __typename?: 'AgePolicy';
+  accountAgeGateEnabled: Scalars['Boolean']['output'];
+  minimumAccountAge: Scalars['Int']['output'];
+  minimumSensitiveContentAge: Scalars['Int']['output'];
+  sensitiveContentAgeGateEnabled: Scalars['Boolean']['output'];
+};
+
 export type Album = {
   __typename?: 'Album';
   Discussions: Array<Discussion>;
@@ -51233,6 +51242,14 @@ export type OwnEmail = {
   username?: Maybe<Scalars['String']['output']>;
 };
 
+/** The authenticated caller's private age-attestation status. */
+export type OwnAgeProfile = {
+  __typename?: 'OwnAgeProfile';
+  birthday?: Maybe<Scalars['String']['output']>;
+  mayAccessSensitiveContent: Scalars['Boolean']['output'];
+  meetsAccountMinimumAge?: Maybe<Scalars['Boolean']['output']>;
+};
+
 export type OwnEmailAggregateSelection = {
   __typename?: 'OwnEmailAggregateSelection';
   address: StringAggregateSelection;
@@ -58764,12 +58781,16 @@ export type ServerConfig = {
   SuspendedUsers: Array<Suspension>;
   SuspendedUsersAggregate?: Maybe<ServerConfigSuspensionSuspendedUsersAggregationSelection>;
   SuspendedUsersConnection: ServerConfigSuspendedUsersConnection;
+  accountAgeGateEnabled?: Maybe<Scalars['Boolean']['output']>;
   allowedFileTypes?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   enableDownloads?: Maybe<Scalars['Boolean']['output']>;
   enableEvents?: Maybe<Scalars['Boolean']['output']>;
+  minimumAccountAge?: Maybe<Scalars['Int']['output']>;
+  minimumSensitiveContentAge?: Maybe<Scalars['Int']['output']>;
   pluginPipelines?: Maybe<Scalars['JSON']['output']>;
   pluginRegistries?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   rules?: Maybe<Scalars['JSON']['output']>;
+  sensitiveContentAgeGateEnabled?: Maybe<Scalars['Boolean']['output']>;
   serverDescription?: Maybe<Scalars['String']['output']>;
   serverIconURL?: Maybe<Scalars['String']['output']>;
   serverName?: Maybe<Scalars['String']['output']>;
@@ -59755,12 +59776,16 @@ export type ServerConfigCreateInput = {
   SuperAdmins?: InputMaybe<ServerConfigSuperAdminsFieldInput>;
   SuspendedMods?: InputMaybe<ServerConfigSuspendedModsFieldInput>;
   SuspendedUsers?: InputMaybe<ServerConfigSuspendedUsersFieldInput>;
+  accountAgeGateEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   allowedFileTypes?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   enableDownloads?: InputMaybe<Scalars['Boolean']['input']>;
   enableEvents?: InputMaybe<Scalars['Boolean']['input']>;
+  minimumAccountAge?: InputMaybe<Scalars['Int']['input']>;
+  minimumSensitiveContentAge?: InputMaybe<Scalars['Int']['input']>;
   pluginPipelines?: InputMaybe<Scalars['JSON']['input']>;
   pluginRegistries?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   rules?: InputMaybe<Scalars['JSON']['input']>;
+  sensitiveContentAgeGateEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   serverDescription?: InputMaybe<Scalars['String']['input']>;
   serverIconURL?: InputMaybe<Scalars['String']['input']>;
   serverName?: InputMaybe<Scalars['String']['input']>;
@@ -62860,16 +62885,20 @@ export type ServerConfigUpdateInput = {
   SuperAdmins?: InputMaybe<Array<ServerConfigSuperAdminsUpdateFieldInput>>;
   SuspendedMods?: InputMaybe<Array<ServerConfigSuspendedModsUpdateFieldInput>>;
   SuspendedUsers?: InputMaybe<Array<ServerConfigSuspendedUsersUpdateFieldInput>>;
+  accountAgeGateEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   allowedFileTypes?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   allowedFileTypes_POP?: InputMaybe<Scalars['Int']['input']>;
   allowedFileTypes_PUSH?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   enableDownloads?: InputMaybe<Scalars['Boolean']['input']>;
   enableEvents?: InputMaybe<Scalars['Boolean']['input']>;
+  minimumAccountAge?: InputMaybe<Scalars['Int']['input']>;
+  minimumSensitiveContentAge?: InputMaybe<Scalars['Int']['input']>;
   pluginPipelines?: InputMaybe<Scalars['JSON']['input']>;
   pluginRegistries?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   pluginRegistries_POP?: InputMaybe<Scalars['Int']['input']>;
   pluginRegistries_PUSH?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   rules?: InputMaybe<Scalars['JSON']['input']>;
+  sensitiveContentAgeGateEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   serverDescription?: InputMaybe<Scalars['String']['input']>;
   serverIconURL?: InputMaybe<Scalars['String']['input']>;
   serverName?: InputMaybe<Scalars['String']['input']>;

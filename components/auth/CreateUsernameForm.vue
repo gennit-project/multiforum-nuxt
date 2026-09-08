@@ -8,7 +8,9 @@ import DatePicker from '@/components/event/form/DatePicker.vue';
 import CharCounter from '@/components/CharCounter.vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { DOES_USER_EXIST } from '@/graphQLData/user/queries';
+import { GET_AGE_POLICY } from '@/graphQLData/age/queries';
 import { CREATE_EMAIL_AND_USER } from '@/graphQLData/email/mutations';
+import type { AgePolicy } from '@/__generated__/graphql';
 import {
   setUsername,
   setModProfileName,
@@ -16,12 +18,12 @@ import {
 } from '@/composables/useAuthState';
 import { setIsLoadingAuth } from '@/cache';
 import { MAX_CHARS_IN_USERNAME } from '@/utils/constants';
+import { getAgeErrorMessage } from '@/utils/ageGating';
 import {
   isValidUsername,
   getUsernameValidationMessage,
-  calculateAge,
   getBirthdayValidationMessage,
-  MIN_SIGNUP_AGE,
+  DEFAULT_MIN_SIGNUP_AGE,
 } from '@/utils/usernameValidation';
 
 const props = defineProps({
@@ -32,6 +34,25 @@ const props = defineProps({
 });
 const newUsername = ref(props.email?.split('@')[0]);
 const birthday = ref('');
+
+const {
+  result: agePolicyResult,
+  error: agePolicyError,
+  loading: agePolicyLoading,
+} = useQuery<{ getAgePolicy: AgePolicy }>(GET_AGE_POLICY);
+
+const agePolicy = computed(() => agePolicyResult.value?.getAgePolicy);
+const birthdayRequired = computed(
+  () =>
+    agePolicy.value?.accountAgeGateEnabled === true ||
+    agePolicy.value?.sensitiveContentAgeGateEnabled === true
+);
+const minimumAccountAge = computed(
+  () => agePolicy.value?.minimumAccountAge ?? DEFAULT_MIN_SIGNUP_AGE
+);
+const enforcedMinimumAccountAge = computed(() =>
+  agePolicy.value?.accountAgeGateEnabled ? minimumAccountAge.value : null
+);
 
 const {
   error: getUserError,
@@ -50,6 +71,7 @@ const {
   variables: {
     emailAddress: props.email,
     username: newUsername.value,
+    birthday: birthday.value || null,
   },
 }));
 
@@ -82,19 +104,19 @@ const usernameIsInvalid = computed(
   () => !isValidUsername(newUsername.value || '')
 );
 
-const userAge = computed(() => calculateAge(birthday.value));
-
 const birthdayIsEmpty = computed(
   () => !birthday.value || birthday.value.length === 0
 );
 
-const isUnderAge = computed(() => {
-  if (birthdayIsEmpty.value) return false;
-  return userAge.value < MIN_SIGNUP_AGE;
-});
-
 const birthdayValidationMessage = computed(() =>
-  getBirthdayValidationMessage({ birthday: birthday.value })
+  getBirthdayValidationMessage({
+    birthday: birthday.value,
+    minimumAge: enforcedMinimumAccountAge.value,
+    required: birthdayRequired.value,
+  })
+);
+const birthdayIsInvalid = computed(
+  () => birthdayValidationMessage.value.length > 0
 );
 
 const confirmedAvailable = computed(
@@ -159,10 +181,10 @@ const canSave = computed(() => {
   if (newUsername.value && newUsername.value.length > MAX_CHARS_IN_USERNAME) {
     return false;
   }
-  if (birthdayIsEmpty.value) {
+  if (agePolicyLoading.value || agePolicyError.value || !agePolicy.value) {
     return false;
   }
-  if (isUnderAge.value) {
+  if (birthdayIsInvalid.value) {
     return false;
   }
 
@@ -234,11 +256,12 @@ const canSave = computed(() => {
         <div class="relative mt-1 flex rounded-full shadow-sm">
           <DatePicker
             :value="birthday"
+            input-id="birthday"
             test-id="birthday-picker"
             @update="updateBirthday"
           />
           <div
-            v-if="isUnderAge"
+            v-if="birthdayIsInvalid && !birthdayIsEmpty"
             class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
           >
             <ExclamationIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
@@ -247,8 +270,29 @@ const canSave = computed(() => {
         <p class="my-1 text-xs text-red-500">
           {{ birthdayValidationMessage }}
         </p>
-        <p class="text-xs text-gray-500 dark:text-gray-400">
-          You must be at least 13 years old to create an account
+        <p
+          v-if="agePolicyLoading"
+          class="text-xs text-gray-500 dark:text-gray-400"
+        >
+          Loading this server's age requirements...
+        </p>
+        <p
+          v-else-if="agePolicy?.accountAgeGateEnabled"
+          class="text-xs text-gray-500 dark:text-gray-400"
+        >
+          You must be at least {{ minimumAccountAge }} years old to create an
+          account. It is not allowed to create an account if you are too young
+          in your country.
+        </p>
+        <p
+          v-else-if="agePolicy?.sensitiveContentAgeGateEnabled"
+          class="text-xs text-gray-500 dark:text-gray-400"
+        >
+          Your birthday is required to determine whether you can view sensitive
+          content. It is private and only visible to you.
+        </p>
+        <p v-else class="text-xs text-gray-500 dark:text-gray-400">
+          Optional. Your birthday is private and only visible to you.
         </p>
       </div>
 
@@ -262,9 +306,13 @@ const canSave = computed(() => {
       <p v-if="createEmailAndUserLoading">Loading...</p>
     </div>
     <ErrorBanner
-      v-if="createEmailAndUserError"
+      v-if="agePolicyError || createEmailAndUserError"
       class="mx-auto my-3 max-w-5xl"
-      :text="createEmailAndUserError.message"
+      :text="
+        agePolicyError?.message ||
+        getAgeErrorMessage(createEmailAndUserError?.message) ||
+        'Unable to load age requirements.'
+      "
     />
   </div>
 </template>

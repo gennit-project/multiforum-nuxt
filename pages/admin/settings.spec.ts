@@ -131,6 +131,10 @@ describe('Admin server settings page', () => {
             allowedFileTypes: ['pdf'],
             enableDownloads: true,
             enableEvents: false,
+            accountAgeGateEnabled: true,
+            minimumAccountAge: 16,
+            sensitiveContentAgeGateEnabled: true,
+            minimumSensitiveContentAge: 21,
             pluginRegistries: ['https://r'],
             featuredWikiPageIds: ['w1'],
           },
@@ -156,6 +160,33 @@ describe('Admin server settings page', () => {
     });
     expect(fields(wrapper).props('formValues').serverDescription).toBe(
       'Updated'
+    );
+  });
+
+  it('populates age-gating settings from the server config', async () => {
+    const wrapper = mountPage();
+    harness.onResultCb({
+      data: {
+        serverConfigs: [
+          {
+            accountAgeGateEnabled: true,
+            minimumAccountAge: 16,
+            sensitiveContentAgeGateEnabled: true,
+            minimumSensitiveContentAge: 21,
+            rules: '[]',
+          },
+        ],
+      },
+    });
+    await wrapper.vm.$nextTick();
+
+    expect(fields(wrapper).props('formValues')).toEqual(
+      expect.objectContaining({
+        accountAgeGateEnabled: true,
+        minimumAccountAge: 16,
+        sensitiveContentAgeGateEnabled: true,
+        minimumSensitiveContentAge: 21,
+      })
     );
   });
 
@@ -186,6 +217,28 @@ describe('Admin server settings page', () => {
       serverName: 'test-server',
       wikiPageIds: ['w2', 'w1'],
     });
+  });
+
+  it('submits all age-gating settings', async () => {
+    const wrapper = mountPage();
+    await fields(wrapper).vm.$emit('update-form-values', {
+      accountAgeGateEnabled: true,
+      minimumAccountAge: 16,
+      sensitiveContentAgeGateEnabled: true,
+      minimumSensitiveContentAge: 21,
+    });
+    await fields(wrapper).vm.$emit('submit');
+
+    expect(harness.updateMutate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: expect.objectContaining({
+          accountAgeGateEnabled: true,
+          minimumAccountAge: 16,
+          sensitiveContentAgeGateEnabled: true,
+          minimumSensitiveContentAge: 21,
+        }),
+      })
+    );
   });
 
   it('shows the permission denied message when auth is missing', async () => {

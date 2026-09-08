@@ -83,6 +83,10 @@ export type ServerConfigFixture = Pick<
   | 'allowedFileTypes'
   | 'enableDownloads'
   | 'enableEvents'
+  | 'accountAgeGateEnabled'
+  | 'minimumAccountAge'
+  | 'sensitiveContentAgeGateEnabled'
+  | 'minimumSensitiveContentAge'
   | 'pluginRegistries'
 > & {
   Admins: Array<Pick<User, 'username'>>;
@@ -287,6 +291,10 @@ export const buildServerConfig = (
   allowedFileTypes: [],
   enableDownloads: true,
   enableEvents: true,
+  accountAgeGateEnabled: false,
+  minimumAccountAge: 13,
+  sensitiveContentAgeGateEnabled: false,
+  minimumSensitiveContentAge: 18,
   pluginRegistries: [],
   ...overrides,
 });
@@ -317,7 +325,9 @@ export const buildServerRole = (overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 });
 
-export const buildModServerRole = (overrides: Record<string, unknown> = {}) => ({
+export const buildModServerRole = (
+  overrides: Record<string, unknown> = {}
+) => ({
   __typename: 'ModServerRole' as const,
   name: 'Basic Server Mod Role',
   description: 'Baseline server moderator capabilities.',
@@ -593,9 +603,12 @@ export const buildComment = ({
   isFavoritedByUser: false,
   CommentAuthor: buildUser(),
   ChildCommentsAggregate: {
-    count: comments.filter((child) => child.parentCommentId === comment.id).length,
+    count: comments.filter((child) => child.parentCommentId === comment.id)
+      .length,
   },
-  ParentComment: comment.parentCommentId ? { id: comment.parentCommentId } : null,
+  ParentComment: comment.parentCommentId
+    ? { id: comment.parentCommentId }
+    : null,
   ChildComments: comments
     .filter((child) => child.parentCommentId === comment.id)
     .map((child) =>
@@ -824,7 +837,10 @@ export const buildModCommentActivityItem = ({
     createdAt: MOCK_DATE,
     updatedAt: MOCK_DATE,
     Issue: { id: issueId },
-    CommentAuthor: { __typename: 'ModerationProfile', displayName: modDisplayName },
+    CommentAuthor: {
+      __typename: 'ModerationProfile',
+      displayName: modDisplayName,
+    },
     Channel: { uniqueName: channelUniqueName },
     ChildCommentsAggregate: { count: 0 },
     ParentComment: null,
