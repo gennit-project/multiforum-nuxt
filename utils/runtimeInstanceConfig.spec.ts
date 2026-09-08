@@ -17,7 +17,6 @@ const fallback: InstanceConfigValues = {
   openGraphApiKey: 'build-link-preview-key',
   serverName: 'build-server',
   serverDisplayName: 'Build Forum',
-  enableLanguagePicker: false,
 };
 
 describe('resolveRuntimeInstanceConfig', () => {
@@ -37,7 +36,6 @@ describe('resolveRuntimeInstanceConfig', () => {
           openGraphApiKey: 'runtime-link-preview-key',
           serverName: 'runtime-server',
           serverDisplayName: 'Runtime Forum',
-          enableLanguagePicker: true,
         },
       })
     ).toEqual({
@@ -52,7 +50,6 @@ describe('resolveRuntimeInstanceConfig', () => {
       openGraphApiKey: 'runtime-link-preview-key',
       serverName: 'runtime-server',
       serverDisplayName: 'Runtime Forum',
-      enableLanguagePicker: true,
     });
   });
 
@@ -63,24 +60,9 @@ describe('resolveRuntimeInstanceConfig', () => {
         runtime: {
           baseUrl: 42,
           environment: null,
-          enableLanguagePicker: 'not-a-boolean',
         },
       })
     ).toEqual(fallback);
-  });
-
-  it.each([
-    ['true', true],
-    ['TRUE', true],
-    ['false', false],
-    ['FALSE', false],
-  ])('normalizes the runtime language-picker value %s', (value, expected) => {
-    expect(
-      resolveRuntimeInstanceConfig({
-        fallback,
-        runtime: { enableLanguagePicker: value },
-      }).enableLanguagePicker
-    ).toBe(expected);
   });
 
   it('uses an explicitly overridden server name as the display-name fallback', () => {

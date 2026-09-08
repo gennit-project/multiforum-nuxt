@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
 import { UPDATE_USER } from '@/graphQLData/user/mutations';
@@ -12,27 +11,12 @@ import CheckBox from '@/components/CheckBox.vue';
 import type { UserUpdateInput } from '@/__generated__/graphql';
 import type { EditAccountSettingsFormValues } from '@/types/User';
 import { useUsername } from '@/composables/useAuthState';
-import { config } from '@/config';
 import { useHead } from 'nuxt/app';
 
 useHead({ title: 'Account Settings' });
 
 const usernameVar = useUsername();
 
-const enableLanguagePicker = config.enableLanguagePicker;
-
-const { locale } = useI18n();
-
-// Available locales - matches nuxt.config.ts i18n configuration
-const availableLocales = [
-  { code: 'en', name: 'English' },
-  { code: 'es', name: 'Espanol' },
-];
-
-function handleLocaleChange(event: Event) {
-  const target = event.target as HTMLSelectElement;
-  locale.value = target.value;
-}
 type NotificationFormValues = {
   notifyOnReplyToCommentByDefault: boolean;
   notifyOnReplyToDiscussionByDefault: boolean;
@@ -283,32 +267,24 @@ function handleCheckboxUpdate(
             </div>
 
             <div v-if="dataLoaded" class="space-y-6">
-              <h2 class="font-semibold mb-4 text-xl">
-                {{ $t('accountSettings.account') }}
-              </h2>
+              <h2 class="mb-4 text-xl font-semibold">Account</h2>
 
               <!-- Email Address -->
-              <FormRow :section-title="$t('accountSettings.emailAddress')">
+              <FormRow section-title="Email Address">
                 <template #content>
                   <div class="text-sm text-gray-700 dark:text-gray-300">
                     <span v-if="userEmail">{{ userEmail }}</span>
-                    <span
-                      v-else
-                      class="italic text-gray-500 dark:text-gray-400"
-                      >{{ $t('accountSettings.noEmailAssociated') }}</span
+                    <span v-else class="text-gray-500 italic dark:text-gray-400"
+                      >No email address associated</span
                     >
                   </div>
                 </template>
               </FormRow>
 
-              <h2 class="font-semibold mb-4 pt-6 text-xl">
-                {{ $t('accountSettings.preferences') }}
-              </h2>
+              <h2 class="mb-4 pt-6 text-xl font-semibold">Preferences</h2>
 
               <!-- Email Notification Preferences -->
-              <FormRow
-                :section-title="$t('accountSettings.emailNotifications')"
-              >
+              <FormRow section-title="Email Notifications">
                 <template #content>
                   <div class="space-y-4">
                     <CheckBox
@@ -316,7 +292,7 @@ function handleCheckboxUpdate(
                       :checked="
                         notificationFormValues.notifyOnReplyToCommentByDefault
                       "
-                      :label="$t('accountSettings.notifyOnCommentReply')"
+                      label="Email me when someone replies to my comments"
                       @update="
                         handleCheckboxUpdate(
                           'notifyOnReplyToCommentByDefault',
@@ -330,7 +306,7 @@ function handleCheckboxUpdate(
                       :checked="
                         notificationFormValues.notifyOnReplyToDiscussionByDefault
                       "
-                      :label="$t('accountSettings.notifyOnDiscussionReply')"
+                      label="Email me when someone replies to my discussions"
                       @update="
                         handleCheckboxUpdate(
                           'notifyOnReplyToDiscussionByDefault',
@@ -344,7 +320,7 @@ function handleCheckboxUpdate(
                       :checked="
                         notificationFormValues.notifyOnReplyToEventByDefault
                       "
-                      :label="$t('accountSettings.notifyOnEventReply')"
+                      label="Email me when someone replies to my events"
                       @update="
                         handleCheckboxUpdate(
                           'notifyOnReplyToEventByDefault',
@@ -356,7 +332,7 @@ function handleCheckboxUpdate(
                     <CheckBox
                       :test-id="'notify-tagged'"
                       :checked="notificationFormValues.notifyWhenTagged"
-                      :label="$t('accountSettings.notifyWhenTagged')"
+                      label="Email me when someone tags me in a comment"
                       @update="handleCheckboxUpdate('notifyWhenTagged', $event)"
                     />
 
@@ -377,7 +353,7 @@ function handleCheckboxUpdate(
                     <CheckBox
                       :test-id="'notify-feedback'"
                       :checked="notificationFormValues.notifyOnFeedback"
-                      :label="$t('accountSettings.notifyOnFeedback')"
+                      label="Email me when I receive feedback from moderators"
                       @update="handleCheckboxUpdate('notifyOnFeedback', $event)"
                     />
 
@@ -396,9 +372,7 @@ function handleCheckboxUpdate(
               </FormRow>
 
               <!-- Content Preferences -->
-              <FormRow
-                :section-title="$t('accountSettings.contentPreferences')"
-              >
+              <FormRow section-title="Content Preferences">
                 <template #content>
                   <div class="space-y-4">
                     <CheckBox
@@ -406,7 +380,7 @@ function handleCheckboxUpdate(
                       :checked="
                         notificationFormValues.enableSensitiveContentByDefault
                       "
-                      :label="$t('accountSettings.enableSensitiveContent')"
+                      label="I am over 18 and want to view sensitive content by default"
                       @update="
                         handleCheckboxUpdate(
                           'enableSensitiveContentByDefault',
@@ -415,29 +389,6 @@ function handleCheckboxUpdate(
                       "
                     />
                   </div>
-                </template>
-              </FormRow>
-
-              <!-- Language (gated behind NUXT_PUBLIC_ENABLE_LANGUAGE_PICKER env var) -->
-              <FormRow
-                v-if="enableLanguagePicker"
-                :section-title="$t('accountSettings.language')"
-              >
-                <template #content>
-                  <select
-                    :value="locale"
-                    :aria-label="$t('accountSettings.language')"
-                    class="block w-full max-w-xs rounded-md border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                    @change="handleLocaleChange"
-                  >
-                    <option
-                      v-for="loc in availableLocales"
-                      :key="loc.code"
-                      :value="loc.code"
-                    >
-                      {{ loc.name }}
-                    </option>
-                  </select>
                 </template>
               </FormRow>
 
@@ -453,13 +404,13 @@ function handleCheckboxUpdate(
             <!-- Loading State for Notifications -->
             <div v-else-if="getUserLoading" class="py-8 text-center">
               <div class="text-gray-500 dark:text-gray-400">
-                {{ $t('accountSettings.loadingNotifications') }}
+                Loading notification settings...
               </div>
             </div>
 
             <NotificationComponent
               v-if="showSavedChangesNotification"
-              :title="$t('accountSettings.settingsSaved')"
+              title="Your settings have been saved."
               @close-notification="showSavedChangesNotification = false"
             />
           </div>
@@ -468,7 +419,7 @@ function handleCheckboxUpdate(
       <template #does-not-have-auth>
         <div class="mx-auto max-w-4xl px-6 py-8 lg:px-12">
           <p class="mt-6 dark:text-white">
-            {{ $t('accountSettings.requiresAuth') }}
+            You must be logged in to access account settings.
           </p>
         </div>
       </template>

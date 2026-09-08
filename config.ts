@@ -24,7 +24,6 @@ const config: ConfigType = {
     import.meta.env.VITE_SERVER_DISPLAY_NAME ||
     import.meta.env.VITE_SERVER_NAME ||
     'Untitled',
-  enableLanguagePicker: import.meta.env.VITE_ENABLE_LANGUAGE_PICKER === 'true',
 };
 
 const applyRuntimeInstanceConfig = (runtime: RuntimeInstanceConfig): void => {
