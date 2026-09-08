@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.3.0](https://github.com/gennit-project/multiforum-nuxt/compare/v0.2.0...v0.3.0) (2026-09-08)
+
+
+### Features
+
+* **age-gating:** add frontend verification flows ([#523](https://github.com/gennit-project/multiforum-nuxt/issues/523)) ([26cf0e6](https://github.com/gennit-project/multiforum-nuxt/commit/26cf0e6bb9b48e899c69cd9f950eef959e46965a))
+* **self-hosting:** attest release artifacts ([#499](https://github.com/gennit-project/multiforum-nuxt/issues/499)) ([a2cc02a](https://github.com/gennit-project/multiforum-nuxt/commit/a2cc02abde83792123d4034ba36c8855c5769f3b))
+
+
+### Bug Fixes
+
+* **graphql:** align image rollout branch with current schema ([#507](https://github.com/gennit-project/multiforum-nuxt/issues/507)) ([da20370](https://github.com/gennit-project/multiforum-nuxt/commit/da20370bcdb0a4ee7cf7f013cc8cdcc0fa35d947))
+* **graphql:** degrade gracefully when backend is unavailable ([#508](https://github.com/gennit-project/multiforum-nuxt/issues/508)) ([187c4cc](https://github.com/gennit-project/multiforum-nuxt/commit/187c4cc2d71375d9970eb41afb683c38bb4f8264))
+* **image:** bypass ipx for remote storage urls ([#509](https://github.com/gennit-project/multiforum-nuxt/issues/509)) ([2fccedd](https://github.com/gennit-project/multiforum-nuxt/commit/2fccedd1b084d03f9e409938ff42d5bc12e13cfc))
+
+
+### Performance Improvements
+
+* **cwv:** continue frontend image delivery optimization ([#505](https://github.com/gennit-project/multiforum-nuxt/issues/505)) ([d3ad6ea](https://github.com/gennit-project/multiforum-nuxt/commit/d3ad6ea774cfc9a12f5a629c9af3dffef2585654))
+* **cwv:** drop unused maps wrapper dependency ([#503](https://github.com/gennit-project/multiforum-nuxt/issues/503)) ([394f45b](https://github.com/gennit-project/multiforum-nuxt/commit/394f45bbe8c8a5cd9598f784adbcd9c50ab4adf5))
+* **cwv:** remove dead global client plugins ([#501](https://github.com/gennit-project/multiforum-nuxt/issues/501)) ([e497e4e](https://github.com/gennit-project/multiforum-nuxt/commit/e497e4e01d953da16fe616e9529045ec366baf5a))
+* **cwv:** start image delivery phase one ([#504](https://github.com/gennit-project/multiforum-nuxt/issues/504)) ([3144216](https://github.com/gennit-project/multiforum-nuxt/commit/314421694a16023c4aa4a3f8cfd775caafa4ba56))
+* **image:** route avatars and forum icons to generated variants ([#506](https://github.com/gennit-project/multiforum-nuxt/issues/506)) ([2ae4385](https://github.com/gennit-project/multiforum-nuxt/commit/2ae4385e221fe23666cfd202df39af8be671833b))
+
 ## [0.2.0](https://github.com/gennit-project/multiforum-nuxt/compare/v0.1.0...v0.2.0) (2026-08-08)
 
 
