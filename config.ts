@@ -1,3 +1,4 @@
+import { readBrandingEnv } from './utils/branding';
 import {
   resolveRuntimeInstanceConfig,
   type InstanceConfigValues,
@@ -26,6 +27,11 @@ const config: ConfigType = {
     'Untitled',
 };
 
+// Build-time branding defaults. Each key is overridable at container startup
+// by its NUXT_PUBLIC_BRANDING_* counterpart once it reaches
+// `runtimeConfig.public.branding` in nuxt.config.ts.
+const brandingEnvDefaults = readBrandingEnv(import.meta.env);
+
 const applyRuntimeInstanceConfig = (runtime: RuntimeInstanceConfig): void => {
   Object.assign(
     config,
@@ -33,4 +39,4 @@ const applyRuntimeInstanceConfig = (runtime: RuntimeInstanceConfig): void => {
   );
 };
 
-export { applyRuntimeInstanceConfig, config };
+export { applyRuntimeInstanceConfig, brandingEnvDefaults, config };

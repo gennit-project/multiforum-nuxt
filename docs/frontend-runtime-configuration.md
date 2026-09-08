@@ -24,6 +24,13 @@ variables below.
 | `NUXT_PUBLIC_OPEN_GRAPH_API_KEY` | Optional link-preview API key |
 | `NUXT_PUBLIC_LOGOUT_URL` | Optional post-logout destination |
 | `NUXT_PUBLIC_ENABLE_LANGUAGE_PICKER` | Set to `true` to show language selection |
+| `NUXT_PUBLIC_BRANDING_PRODUCT_NAME` | Product name in the footer attribution (default `Multiforum`) |
+| `NUXT_PUBLIC_BRANDING_DOCS_URL` | Documentation link target |
+| `NUXT_PUBLIC_BRANDING_SOURCE_URL` | Source repository link target |
+| `NUXT_PUBLIC_BRANDING_ISSUES_URL` | Upstream bug tracker offered in the footer |
+| `NUXT_PUBLIC_BRANDING_SUPPORT_EMAIL` | Contact address for instance support (unset by default) |
+| `NUXT_PUBLIC_BRANDING_SHOW_UPSTREAM_LINKS` | Set to `false` to hide all upstream references |
+| `NUXT_PUBLIC_BRANDING_CUSTOM_FOOTER_LINKS` | JSON array of `{"label","url"}` footer links |
 
 Nuxt exposes every `NUXT_PUBLIC_*` value to the browser. Do not put secrets in
 these variables. Auth0 client secrets and session secrets belong in the
@@ -44,3 +51,42 @@ Browser GraphQL requests use the frontend's same-origin `/api/graphql` route.
 The Node server proxies that route to `NUXT_BACKEND_GRAPHQL_URL`, so changing a
 backend hostname or container network does not require rebuilding browser
 assets and does not require exposing the backend directly to browsers.
+
+
+## Instance branding
+
+The footer's documentation, source, issue-tracker and support links are
+configurable, so a deployment can point users at its own documentation and
+support address instead of the upstream project's. Values resolve through
+ordered layers, lowest precedence first:
+
+```
+upstream defaults  ->  NUXT_PUBLIC_BRANDING_*  ->  (planned) admin ServerConfig
+```
+
+`NUXT_PUBLIC_BRANDING_SHOW_UPSTREAM_LINKS=false` removes the "Powered by",
+documentation, source and upstream issue-tracker links in one setting, for
+deployments that present the software under their own name. The support email
+is independent of that flag and still renders.
+
+No support address is configured by default, so an instance that never sets one
+omits the address rather than directing its users to the upstream maintainers.
+Set `NUXT_PUBLIC_BRANDING_SUPPORT_EMAIL` to this deployment's own address.
+
+Per-field value rules, applied by `utils/branding.ts`:
+
+- An explicit empty string disables that field — `NUXT_PUBLIC_BRANDING_DOCS_URL=`
+  removes the documentation link, matching the opt-out behavior of the other
+  optional runtime values above.
+- A malformed value falls back to the layer below rather than rendering. Only
+  `http(s)` URLs and site-relative paths are accepted, so a `javascript:` or
+  `data:` URL can never reach the page, and a malformed address in
+  `NUXT_PUBLIC_BRANDING_SUPPORT_EMAIL` keeps the previous address rather than
+  producing a broken `mailto:` link.
+- `NUXT_PUBLIC_BRANDING_CUSTOM_FOOTER_LINKS` takes a JSON array, for example
+  `[{"label":"Community Handbook","url":"/handbook"}]`. Entries missing a label
+  or carrying an unsafe URL are dropped individually; the list is capped at
+  eight links. Off-site links open in a new tab.
+
+`VITE_BRANDING_*` equivalents remain available as build-time defaults for local
+development and Vercel deployments.

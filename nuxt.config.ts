@@ -1,6 +1,6 @@
 import { defineNuxtConfig } from 'nuxt/config';
 import tailwindcss from '@tailwindcss/vite';
-import { config } from './config';
+import { brandingEnvDefaults, config } from './config';
 import path from 'path';
 import { inMemoryCacheOptions } from './cache';
 import { DORMANT_AUTH0_CONFIG } from './utils/auth0RuntimeConfig';
@@ -404,6 +404,11 @@ export default defineNuxtConfig({
       openGraphApiKey: config.openGraphApiKey,
       serverName: config.serverName,
       serverDisplayName: config.serverDisplayName,
+      // Instance branding (docs/source/support links and footer text). Nuxt
+      // maps each nested key to a NUXT_PUBLIC_BRANDING_* variable, so a single
+      // built image can be re-branded at container startup without a rebuild.
+      // See docs/frontend-runtime-configuration.md.
+      branding: brandingEnvDefaults,
       authProvider:
         process.env.NUXT_PUBLIC_AUTH_PROVIDER === 'local-dev'
           ? 'local-dev'
