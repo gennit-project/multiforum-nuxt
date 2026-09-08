@@ -410,7 +410,7 @@ definePageMeta({
                     :admin-list="adminList"
                     :channel="channel"
                     :download-count="downloadCount"
-                    class="w-full border-b border-gray-300 md:ml-2 dark:border-gray-600"
+                    class="mt-4 w-full border-b border-gray-300 md:mt-0 md:ml-2 dark:border-gray-600"
                     :desktop="false"
                     :route="route"
                     :show-counts="true"
