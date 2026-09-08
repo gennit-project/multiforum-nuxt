@@ -14,6 +14,28 @@ export type GraphQLHandler = (input: {
 
 export type GraphQLHandlers = Record<string, GraphQLHandler>;
 
+const defaultAgeHandlers: GraphQLHandlers = {
+  getAgePolicy: () => ({
+    data: {
+      getAgePolicy: {
+        accountAgeGateEnabled: false,
+        minimumAccountAge: 13,
+        sensitiveContentAgeGateEnabled: false,
+        minimumSensitiveContentAge: 18,
+      },
+    },
+  }),
+  getMyAgeProfile: () => ({
+    data: {
+      getMyAgeProfile: {
+        birthday: '2000-01-01',
+        meetsAccountMinimumAge: true,
+        mayAccessSensitiveContent: true,
+      },
+    },
+  }),
+};
+
 type CompletedOperation = {
   operationName: string;
   variables?: Record<string, unknown>;
@@ -26,14 +48,17 @@ export async function waitForGraphqlOperation(
   await expect
     .poll(
       () =>
-        operations.some(operation => operation.operationName === operationName),
+        operations.some(
+          (operation) => operation.operationName === operationName
+        ),
       { timeout: 10000 }
     )
     .toBe(true);
 }
 
 function summarizeConsoleError(text: string) {
-  const apolloPrefix = 'An error occurred! For more details, see the full error text at ';
+  const apolloPrefix =
+    'An error occurred! For more details, see the full error text at ';
   if (!text.startsWith(apolloPrefix)) {
     return text;
   }
@@ -102,7 +127,8 @@ export async function installGraphqlMocks(
       variables: body.variables,
     });
 
-    const handler = handlers[operationName];
+    const handler =
+      handlers[operationName] ?? defaultAgeHandlers[operationName];
     if (!handler) {
       console.error(
         `[playwright:unhandled-graphql] ${operationName} ${JSON.stringify(body.variables ?? {})}`

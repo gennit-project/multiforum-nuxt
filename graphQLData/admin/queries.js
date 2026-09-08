@@ -164,6 +164,10 @@ export const GET_SERVER_CONFIG = gql`
       allowedFileTypes
       enableDownloads
       enableEvents
+      accountAgeGateEnabled
+      minimumAccountAge
+      sensitiveContentAgeGateEnabled
+      minimumSensitiveContentAge
       pluginRegistries
     }
   }

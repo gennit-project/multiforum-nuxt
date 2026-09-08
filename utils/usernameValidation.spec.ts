@@ -19,32 +19,48 @@ describe('isValidUsername', () => {
 describe('getUsernameValidationMessage', () => {
   it('flags an empty username', () => {
     expect(
-      getUsernameValidationMessage({ username: '', isEmpty: true, isTaken: false })
+      getUsernameValidationMessage({
+        username: '',
+        isEmpty: true,
+        isTaken: false,
+      })
     ).toBe('Username cannot be empty.');
   });
 
   it('flags a taken username', () => {
     expect(
-      getUsernameValidationMessage({ username: 'alice', isEmpty: false, isTaken: true })
+      getUsernameValidationMessage({
+        username: 'alice',
+        isEmpty: false,
+        isTaken: true,
+      })
     ).toBe('The username is already taken.');
   });
 
   it('flags invalid characters', () => {
     expect(
-      getUsernameValidationMessage({ username: 'a-b', isEmpty: false, isTaken: false })
+      getUsernameValidationMessage({
+        username: 'a-b',
+        isEmpty: false,
+        isTaken: false,
+      })
     ).toContain('letters, numbers, and underscores');
   });
 
   it('returns an empty string for a valid username', () => {
     expect(
-      getUsernameValidationMessage({ username: 'alice', isEmpty: false, isTaken: false })
+      getUsernameValidationMessage({
+        username: 'alice',
+        isEmpty: false,
+        isTaken: false,
+      })
     ).toBe('');
   });
 });
 
 describe('calculateAge', () => {
-  it('returns 0 for an empty birth date', () => {
-    expect(calculateAge('', new Date('2024-06-15'))).toBe(0);
+  it('returns null for an empty birth date', () => {
+    expect(calculateAge('', new Date('2024-06-15'))).toBeNull();
   });
 
   it('computes age, accounting for a birthday later in the year', () => {
@@ -75,5 +91,27 @@ describe('getBirthdayValidationMessage', () => {
         now: new Date('2024-06-15'),
       })
     ).toBe('');
+  });
+
+  it('uses a configured minimum age', () => {
+    expect(
+      getBirthdayValidationMessage({
+        birthday: '2007-01-01',
+        minimumAge: 21,
+        now: new Date('2024-06-15'),
+      })
+    ).toContain('at least 21 years old');
+  });
+
+  it('accepts an omitted birthday when it is optional', () => {
+    expect(
+      getBirthdayValidationMessage({ birthday: '', required: false })
+    ).toBe('');
+  });
+
+  it('rejects impossible dates', () => {
+    expect(getBirthdayValidationMessage({ birthday: '2024-02-31' })).toBe(
+      'Enter a valid birthday.'
+    );
   });
 });

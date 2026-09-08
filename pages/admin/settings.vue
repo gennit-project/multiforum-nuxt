@@ -48,6 +48,10 @@ const formValues = ref<ServerSettingsFormValues>({
   allowedFileTypes: [],
   enableDownloads: false,
   enableEvents: false,
+  accountAgeGateEnabled: false,
+  minimumAccountAge: 13,
+  sensitiveContentAgeGateEnabled: false,
+  minimumSensitiveContentAge: 18,
   pluginRegistries: [],
   featuredWikiPageIds: [],
 });
@@ -70,6 +74,12 @@ onGetServerResult((result) => {
     allowedFileTypes: serverConfig.allowedFileTypes || [],
     enableDownloads: Boolean(serverConfig.enableDownloads),
     enableEvents: Boolean(serverConfig.enableEvents),
+    accountAgeGateEnabled: Boolean(serverConfig.accountAgeGateEnabled),
+    minimumAccountAge: serverConfig.minimumAccountAge ?? 13,
+    sensitiveContentAgeGateEnabled: Boolean(
+      serverConfig.sensitiveContentAgeGateEnabled
+    ),
+    minimumSensitiveContentAge: serverConfig.minimumSensitiveContentAge ?? 18,
     pluginRegistries: serverConfig.pluginRegistries || [],
     featuredWikiPageIds: serverConfig.featuredWikiPageIds || [],
   };
@@ -90,6 +100,12 @@ const serverUpdateInput = computed(() => {
     allowedFileTypes: formValues.value.allowedFileTypes || [],
     enableDownloads: formValues.value.enableDownloads || false,
     enableEvents: formValues.value.enableEvents || false,
+    accountAgeGateEnabled: formValues.value.accountAgeGateEnabled || false,
+    minimumAccountAge: formValues.value.minimumAccountAge ?? 13,
+    sensitiveContentAgeGateEnabled:
+      formValues.value.sensitiveContentAgeGateEnabled || false,
+    minimumSensitiveContentAge:
+      formValues.value.minimumSensitiveContentAge ?? 18,
     pluginRegistries: formValues.value.pluginRegistries || [],
   };
 });
@@ -124,7 +140,6 @@ const {
           enableDownloads: Boolean(newServerConfig.enableDownloads),
           enableEvents: Boolean(newServerConfig.enableEvents),
         };
-
 
         // Also update the cache - reconstruct the full config
         cache.writeQuery({

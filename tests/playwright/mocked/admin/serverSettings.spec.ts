@@ -14,7 +14,9 @@ const TEST_USER = 'alice';
 
 const getMocks = (overrides: { enableDownloads?: boolean } = {}) => ({
   getBasicUserInfo: () => ({
-    data: { users: [buildBasicUser({ username: TEST_USER, displayName: TEST_USER })] },
+    data: {
+      users: [buildBasicUser({ username: TEST_USER, displayName: TEST_USER })],
+    },
   }),
   getUser: () => ({
     data: {
@@ -28,7 +30,9 @@ const getMocks = (overrides: { enableDownloads?: boolean } = {}) => ({
     },
   }),
   getUserFavorites: () => ({
-    data: { users: [{ username: TEST_USER, FavoriteChannels: [], Collections: [] }] },
+    data: {
+      users: [{ username: TEST_USER, FavoriteChannels: [], Collections: [] }],
+    },
   }),
   GetUserFavoriteChannels: () => ({
     data: { users: [{ username: TEST_USER, FavoriteChannels: [] }] },
@@ -54,11 +58,19 @@ test.describe('Server settings (admin)', () => {
     context,
     page,
   }, testInfo) => {
-    await installMockAuth(context, page, { username: TEST_USER, email: 'alice@example.com' });
-    const diagnostics = await installGraphqlMocks(page, getMocks({ enableDownloads: true }));
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
+    const diagnostics = await installGraphqlMocks(
+      page,
+      getMocks({ enableDownloads: true })
+    );
 
     try {
-      await page.goto('/admin/settings/downloads', { waitUntil: 'domcontentloaded' });
+      await page.goto('/admin/settings/downloads', {
+        waitUntil: 'domcontentloaded',
+      });
       await expect(
         page.getByText('Enable downloads tab in individual forums')
       ).toBeVisible();
@@ -72,7 +84,11 @@ test.describe('Server settings (admin)', () => {
 
   const tabs = [
     { path: 'basic', text: 'Server Description' },
-    { path: 'calendar', text: 'Enable events/calendar tab in individual forums' },
+    { path: 'age-gating', text: 'Account age requirement' },
+    {
+      path: 'calendar',
+      text: 'Enable events/calendar tab in individual forums',
+    },
     { path: 'rules', text: 'Forum Rules' },
   ];
 
@@ -81,15 +97,22 @@ test.describe('Server settings (admin)', () => {
       context,
       page,
     }, testInfo) => {
-      await installMockAuth(context, page, { username: TEST_USER, email: 'alice@example.com' });
+      await installMockAuth(context, page, {
+        username: TEST_USER,
+        email: 'alice@example.com',
+      });
       const diagnostics = await installGraphqlMocks(page, getMocks());
 
       try {
-        await page.goto(`/admin/settings/${tab.path}`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`/admin/settings/${tab.path}`, {
+          waitUntil: 'domcontentloaded',
+        });
         await expect(page.getByText(tab.text)).toBeVisible();
       } finally {
         await testInfo.attach('graphql-operations.json', {
-          body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
+          body: Buffer.from(
+            JSON.stringify(diagnostics.seenOperations, null, 2)
+          ),
           contentType: 'application/json',
         });
       }
@@ -100,7 +123,10 @@ test.describe('Server settings (admin)', () => {
     context,
     page,
   }, testInfo) => {
-    await installMockAuth(context, page, { username: TEST_USER, email: 'alice@example.com' });
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
     const diagnostics = await installGraphqlMocks(page, {
       ...getMocks(),
       getServerConfig: () => ({
@@ -112,8 +138,12 @@ test.describe('Server settings (admin)', () => {
     });
 
     try {
-      await page.goto('/admin/settings/roles', { waitUntil: 'domcontentloaded' });
-      await expect(page.getByRole('heading', { name: 'Server Roles' })).toBeVisible();
+      await page.goto('/admin/settings/roles', {
+        waitUntil: 'domcontentloaded',
+      });
+      await expect(
+        page.getByRole('heading', { name: 'Server Roles' })
+      ).toBeVisible();
     } finally {
       await testInfo.attach('graphql-operations.json', {
         body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
