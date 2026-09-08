@@ -226,3 +226,12 @@ export const readBrandingEnv = (
     customFooterLinks: text('VITE_BRANDING_CUSTOM_FOOTER_LINKS', ''),
   };
 };
+
+/**
+ * Whether branding is pinned by deployment config rather than editable in the
+ * admin UI. Operators who manage a deployment declaratively set this so a
+ * database value cannot drift from the checked-in configuration.
+ */
+export const readBrandingLocked = (
+  env: Record<string, unknown> | undefined
+): boolean => parseBrandingFlag(env?.VITE_BRANDING_LOCKED) ?? false;

@@ -1,15 +1,36 @@
 import { mount } from '@vue/test-utils';
+import { computed, ref } from 'vue';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import SiteFooter from './SiteFooter.vue';
 import { UPSTREAM_BRANDING } from '@/utils/branding';
 
 // The real useBranding composable (and therefore the real resolver) runs in
-// these tests; only its input — the deployment's public runtime config — is
-// mocked, so the footer is exercised the way a deployment configures it.
-const mockPublicConfig: { branding?: Record<string, unknown> } = {};
+// these tests; only its two inputs are mocked — the deployment's public runtime
+// config and the admin-editable ServerConfig branding — so the footer is
+// exercised the way a real deployment resolves them.
+const mockPublicConfig: {
+  branding?: Record<string, unknown>;
+  brandingLocked?: boolean;
+} = {};
+const mockServerBranding: { value: Record<string, unknown> | null } = {
+  value: null,
+};
 
 vi.mock('nuxt/app', () => ({
   useRuntimeConfig: () => ({ public: mockPublicConfig }),
+}));
+
+vi.mock('@vue/apollo-composable', () => ({
+  useQuery: () => ({
+    result: computed(() =>
+      mockServerBranding.value
+        ? { serverConfigs: [mockServerBranding.value] }
+        : undefined
+    ),
+    loading: ref(false),
+    error: ref(null),
+    onResult: vi.fn(),
+  }),
 }));
 
 describe('SiteFooter', () => {
@@ -27,6 +48,8 @@ describe('SiteFooter', () => {
 
   beforeEach(() => {
     delete mockPublicConfig.branding;
+    delete mockPublicConfig.brandingLocked;
+    mockServerBranding.value = null;
   });
 
   it('links to the harmful or illegal content report form', () => {
@@ -123,6 +146,38 @@ describe('SiteFooter', () => {
     expect(mountFooter().find('a[href="mailto:help@acme.test"]').exists()).toBe(
       true
     );
+  });
+
+  it('lets admin-configured branding win over the deployment default', () => {
+    mockPublicConfig.branding = { docsUrl: 'https://docs.from-env.test' };
+    mockServerBranding.value = {
+      brandingDocsURL: 'https://docs.from-admin.test',
+    };
+
+    expect(
+      mountFooter().find('a[href="https://docs.from-admin.test"]').exists()
+    ).toBe(true);
+  });
+
+  it('ignores unset admin branding fields', () => {
+    mockPublicConfig.branding = { docsUrl: 'https://docs.from-env.test' };
+    mockServerBranding.value = { brandingDocsURL: null };
+
+    expect(
+      mountFooter().find('a[href="https://docs.from-env.test"]').exists()
+    ).toBe(true);
+  });
+
+  it('lets the deployment win over admin branding when branding is locked', () => {
+    mockPublicConfig.brandingLocked = true;
+    mockPublicConfig.branding = { docsUrl: 'https://docs.from-env.test' };
+    mockServerBranding.value = {
+      brandingDocsURL: 'https://docs.from-admin.test',
+    };
+
+    expect(
+      mountFooter().find('a[href="https://docs.from-env.test"]').exists()
+    ).toBe(true);
   });
 
   it('renders operator-configured footer links', () => {

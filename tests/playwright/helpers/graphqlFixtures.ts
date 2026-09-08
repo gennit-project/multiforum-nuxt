@@ -88,6 +88,13 @@ export type ServerConfigFixture = Pick<
   | 'sensitiveContentAgeGateEnabled'
   | 'minimumSensitiveContentAge'
   | 'pluginRegistries'
+  | 'brandingProductName'
+  | 'brandingDocsURL'
+  | 'brandingSourceURL'
+  | 'brandingIssuesURL'
+  | 'brandingSupportEmail'
+  | 'brandingShowUpstreamLinks'
+  | 'brandingCustomFooterLinks'
 > & {
   Admins: Array<Pick<User, 'username'>>;
   Moderators: unknown[];
@@ -296,6 +303,15 @@ export const buildServerConfig = (
   sensitiveContentAgeGateEnabled: false,
   minimumSensitiveContentAge: 18,
   pluginRegistries: [],
+  // Null branding means "this instance configured none", so the footer falls
+  // back to its deployment/upstream defaults.
+  brandingProductName: null,
+  brandingDocsURL: null,
+  brandingSourceURL: null,
+  brandingIssuesURL: null,
+  brandingSupportEmail: null,
+  brandingShowUpstreamLinks: null,
+  brandingCustomFooterLinks: null,
   ...overrides,
 });
 

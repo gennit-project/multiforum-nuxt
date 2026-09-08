@@ -1,6 +1,6 @@
 import { defineNuxtConfig } from 'nuxt/config';
 import tailwindcss from '@tailwindcss/vite';
-import { brandingEnvDefaults, config } from './config';
+import { brandingEnvDefaults, brandingLockedDefault, config } from './config';
 import path from 'path';
 import { inMemoryCacheOptions } from './cache';
 import { DORMANT_AUTH0_CONFIG } from './utils/auth0RuntimeConfig';
@@ -409,6 +409,9 @@ export default defineNuxtConfig({
       // built image can be re-branded at container startup without a rebuild.
       // See docs/frontend-runtime-configuration.md.
       branding: brandingEnvDefaults,
+      // When true, the values above win over the admin-editable ServerConfig
+      // branding and the admin form renders read-only.
+      brandingLocked: brandingLockedDefault,
       authProvider:
         process.env.NUXT_PUBLIC_AUTH_PROVIDER === 'local-dev'
           ? 'local-dev'

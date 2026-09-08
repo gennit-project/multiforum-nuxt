@@ -31,6 +31,7 @@ variables below.
 | `NUXT_PUBLIC_BRANDING_SUPPORT_EMAIL` | Contact address for instance support (unset by default) |
 | `NUXT_PUBLIC_BRANDING_SHOW_UPSTREAM_LINKS` | Set to `false` to hide all upstream references |
 | `NUXT_PUBLIC_BRANDING_CUSTOM_FOOTER_LINKS` | JSON array of `{"label","url"}` footer links |
+| `NUXT_PUBLIC_BRANDING_LOCKED` | Set to `true` to pin branding to deployment config and make the admin form read-only |
 
 Nuxt exposes every `NUXT_PUBLIC_*` value to the browser. Do not put secrets in
 these variables. Auth0 client secrets and session secrets belong in the
@@ -61,8 +62,18 @@ support address instead of the upstream project's. Values resolve through
 ordered layers, lowest precedence first:
 
 ```
-upstream defaults  ->  NUXT_PUBLIC_BRANDING_*  ->  (planned) admin ServerConfig
+upstream defaults  ->  NUXT_PUBLIC_BRANDING_*  ->  admin ServerConfig
 ```
+
+Admins edit the last layer under **Admin → Settings → Branding**. A field the
+admin has never set is null in `ServerConfig` and leaves the deployment's own
+value in place; an empty string there is a deliberate opt-out and does clear the
+link.
+
+`NUXT_PUBLIC_BRANDING_LOCKED=true` reverses the last two layers, so deployment
+configuration wins over whatever is stored in the database and the admin form
+renders read-only with an explanation. Use it when branding is managed
+declaratively (GitOps, Helm values, a Vercel project) and must not drift.
 
 `NUXT_PUBLIC_BRANDING_SHOW_UPSTREAM_LINKS=false` removes the "Powered by",
 documentation, source and upstream issue-tracker links in one setting, for
