@@ -14,7 +14,10 @@ export type GraphQLHandler = (input: {
 
 export type GraphQLHandlers = Record<string, GraphQLHandler>;
 
-const defaultAgeHandlers: GraphQLHandlers = {
+// Operations that fire on essentially every page, so every mocked test needs
+// them even when its own handler map says nothing about them. A test that cares
+// about the response can still override the operation by name.
+const defaultHandlers: GraphQLHandlers = {
   getAgePolicy: () => ({
     data: {
       getAgePolicy: {
@@ -32,6 +35,25 @@ const defaultAgeHandlers: GraphQLHandlers = {
         meetsAccountMinimumAge: true,
         mayAccessSensitiveContent: true,
       },
+    },
+  }),
+  // Site footer branding. Every field null means "this instance configured no
+  // branding", so the footer falls back to its deployment/upstream defaults.
+  getServerBranding: () => ({
+    data: {
+      serverConfigs: [
+        {
+          __typename: 'ServerConfig',
+          serverName: 'Listical',
+          brandingProductName: null,
+          brandingDocsURL: null,
+          brandingSourceURL: null,
+          brandingIssuesURL: null,
+          brandingSupportEmail: null,
+          brandingShowUpstreamLinks: null,
+          brandingCustomFooterLinks: null,
+        },
+      ],
     },
   }),
 };
@@ -128,7 +150,7 @@ export async function installGraphqlMocks(
     });
 
     const handler =
-      handlers[operationName] ?? defaultAgeHandlers[operationName];
+      handlers[operationName] ?? defaultHandlers[operationName];
     if (!handler) {
       console.error(
         `[playwright:unhandled-graphql] ${operationName} ${JSON.stringify(body.variables ?? {})}`

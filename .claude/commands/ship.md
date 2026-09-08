@@ -14,10 +14,13 @@ Do these steps in order, stopping to report if any step fails:
 2. **Branch.** Run `git rev-parse --abbrev-ref HEAD`. If on `main`, create a feature
    branch first (never commit directly to `main`). Otherwise stay on the current branch.
 
-3. **Commit.** Stage the relevant changes and commit. End the commit message with:
+3. **Commit.** Stage the relevant changes and commit. End the commit message with a
+   `Co-Authored-By:` trailer naming the model you are actually running as, e.g.:
    ```
-   Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+   Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
    ```
+   Use your own model name rather than copying the example — a hardcoded version
+   here goes stale and misattributes the commit.
 
 4. **Push** the branch to the remote.
 

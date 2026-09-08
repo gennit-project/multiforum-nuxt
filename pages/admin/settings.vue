@@ -8,6 +8,7 @@ import {
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import type { ServerConfigUpdateInput } from '@/__generated__/graphql';
+import type { BrandingLink } from '@/utils/branding';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { config } from '@/config';
 import CreateEditServerFields from '@/components/admin/CreateEditServerFields.vue';
@@ -18,6 +19,20 @@ import {
 
 type ServerSettingsFormValues = ServerConfigUpdateInput & {
   featuredWikiPageIds?: string[];
+};
+
+// The API returns the JSON column as either a parsed array or a string,
+// depending on the driver; normalize before the form binds to it.
+const parseCustomFooterLinks = (value: unknown): BrandingLink[] => {
+  if (Array.isArray(value)) return value as BrandingLink[];
+  if (typeof value !== 'string' || !value.trim()) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? (parsed as BrandingLink[]) : [];
+  } catch (e) {
+    console.error('Error parsing branding footer links', e);
+    return [];
+  }
 };
 
 const dataLoaded = ref(false);
@@ -54,6 +69,13 @@ const formValues = ref<ServerSettingsFormValues>({
   minimumSensitiveContentAge: 18,
   pluginRegistries: [],
   featuredWikiPageIds: [],
+  brandingProductName: '',
+  brandingDocsURL: '',
+  brandingSourceURL: '',
+  brandingIssuesURL: '',
+  brandingSupportEmail: '',
+  brandingShowUpstreamLinks: true,
+  brandingCustomFooterLinks: [],
 });
 
 onGetServerResult((result) => {
@@ -82,6 +104,17 @@ onGetServerResult((result) => {
     minimumSensitiveContentAge: serverConfig.minimumSensitiveContentAge ?? 18,
     pluginRegistries: serverConfig.pluginRegistries || [],
     featuredWikiPageIds: serverConfig.featuredWikiPageIds || [],
+    brandingProductName: serverConfig.brandingProductName || '',
+    brandingDocsURL: serverConfig.brandingDocsURL || '',
+    brandingSourceURL: serverConfig.brandingSourceURL || '',
+    brandingIssuesURL: serverConfig.brandingIssuesURL || '',
+    brandingSupportEmail: serverConfig.brandingSupportEmail || '',
+    // The column is null until an admin saves the tab; the footer's default is
+    // to show upstream links, so null must read as true rather than false.
+    brandingShowUpstreamLinks: serverConfig.brandingShowUpstreamLinks !== false,
+    brandingCustomFooterLinks: parseCustomFooterLinks(
+      serverConfig.brandingCustomFooterLinks
+    ),
   };
 
   // Prime the autosave baselines so the first edit that happens to match the
@@ -107,6 +140,17 @@ const serverUpdateInput = computed(() => {
     minimumSensitiveContentAge:
       formValues.value.minimumSensitiveContentAge ?? 18,
     pluginRegistries: formValues.value.pluginRegistries || [],
+    brandingProductName: formValues.value.brandingProductName || '',
+    brandingDocsURL: formValues.value.brandingDocsURL || '',
+    brandingSourceURL: formValues.value.brandingSourceURL || '',
+    brandingIssuesURL: formValues.value.brandingIssuesURL || '',
+    brandingSupportEmail: formValues.value.brandingSupportEmail || '',
+    brandingShowUpstreamLinks:
+      formValues.value.brandingShowUpstreamLinks !== false,
+    // Stored as a JSON column, the same way rules are.
+    brandingCustomFooterLinks: JSON.stringify(
+      formValues.value.brandingCustomFooterLinks || []
+    ),
   };
 });
 
