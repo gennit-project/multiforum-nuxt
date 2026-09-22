@@ -2,8 +2,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { computed, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 import DiscussionHeader from './DiscussionHeader.vue';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 
 const serverAdminUsernames = ref<string[]>([]);
+const apollo = vi.hoisted(() => ({ useQuery: vi.fn() }));
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({
@@ -21,23 +23,25 @@ vi.mock('nuxt/app', () => ({
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => ({
-    result: ref({
-      channels: [
-        {
-          feedbackEnabled: true,
-        },
-      ],
-      serverConfigs: [{}],
-      issues: [],
-      discussionChannels: [],
-    }),
-  }),
+  useQuery: apollo.useQuery,
   useMutation: () => ({
     mutate: vi.fn(),
     loading: ref(false),
     error: ref(null),
     onDone: vi.fn(),
+  }),
+}));
+
+apollo.useQuery.mockImplementation(() => ({
+  result: ref({
+    channels: [
+      {
+        feedbackEnabled: true,
+      },
+    ],
+    serverConfigs: [{}],
+    issues: [],
+    discussionChannels: [],
   }),
 }));
 
@@ -62,6 +66,7 @@ vi.mock('@/composables/useServerRoleMembership', () => ({
 describe('DiscussionHeader', () => {
   beforeEach(() => {
     serverAdminUsernames.value = [];
+    apollo.useQuery.mockClear();
   });
 
   const buildWrapper = () =>
@@ -110,6 +115,18 @@ describe('DiscussionHeader', () => {
       },
     });
 
+  it('uses the forum layout channel variables so Apollo can reuse its result', () => {
+    buildWrapper();
+
+    const call = apollo.useQuery.mock.calls.find(
+      ([document]) => document === GET_CHANNEL
+    );
+    expect(call?.[1]).toEqual({
+      uniqueName: 'cats',
+      loggedInUsername: 'viewer',
+      now: expect.stringMatching(/Z$/),
+    });
+  });
   it('shows the Server Admin label when the discussion author belongs to server admin membership', () => {
     serverAdminUsernames.value = ['alice'];
 

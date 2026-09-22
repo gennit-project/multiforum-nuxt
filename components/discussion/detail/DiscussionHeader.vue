@@ -164,8 +164,9 @@ const { result: getChannelResult } = useQuery(
   GET_CHANNEL,
   {
     uniqueName: props.channelId || defaultChannel.value,
-    // Using luxon, round down to the nearest hour
-    now: DateTime.local().startOf('hour').toISO(),
+    loggedInUsername: usernameVar.value || null,
+    // Match the forum layout variables so Apollo can reuse its SSR result.
+    now: DateTime.utc().startOf('hour').toISO(),
   },
   {
     fetchPolicy: 'cache-first',
@@ -488,7 +489,7 @@ const warningModalBody = computed(() => {
           @crosspost="handleCrosspost"
         >
           <div
-            class="font-semibold flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-600 hover:text-black dark:text-gray-300 dark:hover:text-white"
+            class="flex items-center gap-1 rounded px-2 py-1 text-xs font-semibold text-gray-600 hover:text-black dark:text-gray-300 dark:hover:text-white"
           >
             <LinkIcon class="h-4 w-4" />
             <span>Share</span>

@@ -360,7 +360,8 @@ useQuery(
   GET_CHANNEL,
   {
     uniqueName: channelId.value,
-    now: DateTime.local().startOf('hour').toISO(),
+    loggedInUsername: usernameVar.value || null,
+    now: DateTime.utc().startOf('hour').toISO(),
   },
   {
     fetchPolicy: 'cache-first',

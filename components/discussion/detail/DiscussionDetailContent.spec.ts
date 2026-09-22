@@ -20,6 +20,7 @@ import {
   CHECK_DISCUSSION_ISSUE_EXISTENCE,
   CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
 } from '@/graphQLData/issue/queries';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 
 vi.mock('@vue/apollo-composable', () => ({ useQuery: vi.fn() }));
 vi.mock('nuxt/app', () => ({
@@ -311,6 +312,22 @@ describe('DiscussionDetailContent', () => {
     ).toBe(7);
     expect(wrapper.findComponent(DiscussionCommentsWrapperStub).exists()).toBe(
       false
+    );
+  });
+
+  it('prefetches the channel with the forum layout cache key', () => {
+    setup();
+
+    const variables = asMock(useQuery)
+      .mock.calls.filter(([document]) => document === GET_CHANNEL)
+      .map(([, value]) => (typeof value === 'function' ? value() : value));
+    expect(variables).not.toHaveLength(0);
+    expect(variables).toEqual(
+      variables.map(() => ({
+        uniqueName: 'cats',
+        loggedInUsername: null,
+        now: expect.stringMatching(/Z$/),
+      }))
     );
   });
 
