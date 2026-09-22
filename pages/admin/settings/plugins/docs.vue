@@ -243,25 +243,43 @@ const troubleshootingContent = `
 - Verify the channel has a pipeline configured
 - Check that the discussion has a downloadable file
 
-### Public diagnostics and internal logs
+### Public diagnostics and internal telemetry
 
-Plugins must publish community-safe results through
-\`context.diagnostics.public(...)\`. Diagnostic codes use uppercase letters,
-numbers, and underscores and should remain stable so documentation and support
-threads can link to them. The server bounds and redacts public output.
+Plugins must publish community-safe findings through
+\`context.diagnostics.public(...)\`. Public diagnostics appear in the
+download's **Pipelines** tab for everyone, so they should help an uploader or
+community member understand the failure without access to server logs.
+
+For every expected failure path, publish:
+- A stable uppercase diagnostic code that documentation and support threads can link to
+- A plain-language message explaining what failed
+- Safe structured details that help with remediation
+- A documentation URL when a user can take action
+- A correlation ID when an external provider supplies one
+
+Put correlation IDs in \`details.correlationId\`. The Pipelines tab highlights
+that field and includes it when diagnostics are copied. Never publish secrets,
+authorization headers, signed attachment URLs, full provider responses, or
+personal data in a public diagnostic.
 
 Legacy \`context.log(...)\` calls and \`context.log.internal(...)\` are internal
-operational telemetry. They are never returned by public pipeline APIs.
+operational telemetry. They are excluded from public pipeline APIs. Authorized
+server administrators can explicitly open **Technical details** for an attempt;
+the frontend then loads the protected telemetry on demand and warns the admin to
+review it before sharing.
 
-After a pipeline runs, public viewers can see:
-1. Navigate to a download's detail page
-2. Find the "Plugin Pipelines" section in the sidebar
-3. Click on a pipeline stage to view public diagnostics
+Internal telemetry should identify the stage and provider operation, include a
+correlation ID where possible, and retain enough context to diagnose retries and
+timeouts. It still must not contain credentials or authorization headers.
 
-Public details include:
-- Execution timestamps
-- Sanitized diagnostic codes, messages, and remediation links
-- Duration of each step
+Plugin tests should verify both sides of this boundary:
+1. Provider failures publish a useful public code, safe message, remediation, and correlation ID
+2. Sensitive provider context is written only to internal telemetry
+3. Public diagnostic objects do not contain secrets or signed URLs
+4. Unexpected exceptions still produce a safe fallback diagnostic
+
+After a pipeline runs, open the download's **Pipelines** tab to see timestamps,
+step duration, public findings, remediation links, and correlation IDs.
 `;
 </script>
 
@@ -274,7 +292,8 @@ Public details include:
           Plugin Documentation
         </h1>
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-          Learn how to set up registries, create plugins, and configure pipelines
+          Learn how to set up registries, create plugins, and configure
+          pipelines
         </p>
       </div>
       <NuxtLink
@@ -287,7 +306,9 @@ Public details include:
     </div>
 
     <!-- Table of Contents -->
-    <div class="mb-8 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+    <div
+      class="mb-8 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800"
+    >
       <h2 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">
         Contents
       </h2>
@@ -338,42 +359,27 @@ Public details include:
     <!-- Documentation Sections -->
     <div class="space-y-8">
       <!-- Overview -->
-      <FormRow
-        id="overview"
-        section-title="Overview"
-      >
+      <FormRow id="overview" section-title="Overview">
         <template #content>
-          <div class="prose prose-sm max-w-none dark:prose-invert">
-            <MarkdownRenderer
-              :text="overviewContent"
-              font-size="small"
-            />
+          <div class="prose prose-sm dark:prose-invert max-w-none">
+            <MarkdownRenderer :text="overviewContent" font-size="small" />
           </div>
         </template>
       </FormRow>
 
       <!-- Registry Setup -->
-      <FormRow
-        id="registry"
-        section-title="Setting Up a Plugin Registry"
-      >
+      <FormRow id="registry" section-title="Setting Up a Plugin Registry">
         <template #content>
-          <div class="prose prose-sm max-w-none dark:prose-invert">
-            <MarkdownRenderer
-              :text="registryContent"
-              font-size="small"
-            />
+          <div class="prose prose-sm dark:prose-invert max-w-none">
+            <MarkdownRenderer :text="registryContent" font-size="small" />
           </div>
         </template>
       </FormRow>
 
       <!-- Plugin Structure -->
-      <FormRow
-        id="plugin-structure"
-        section-title="Creating a Plugin"
-      >
+      <FormRow id="plugin-structure" section-title="Creating a Plugin">
         <template #content>
-          <div class="prose prose-sm max-w-none dark:prose-invert">
+          <div class="prose prose-sm dark:prose-invert max-w-none">
             <MarkdownRenderer
               :text="pluginStructureContent"
               font-size="small"
@@ -383,27 +389,18 @@ Public details include:
       </FormRow>
 
       <!-- Pipelines -->
-      <FormRow
-        id="pipelines"
-        section-title="Configuring Pipelines"
-      >
+      <FormRow id="pipelines" section-title="Configuring Pipelines">
         <template #content>
-          <div class="prose prose-sm max-w-none dark:prose-invert">
-            <MarkdownRenderer
-              :text="pipelinesContent"
-              font-size="small"
-            />
+          <div class="prose prose-sm dark:prose-invert max-w-none">
+            <MarkdownRenderer :text="pipelinesContent" font-size="small" />
           </div>
         </template>
       </FormRow>
 
       <!-- Troubleshooting -->
-      <FormRow
-        id="troubleshooting"
-        section-title="Troubleshooting"
-      >
+      <FormRow id="troubleshooting" section-title="Troubleshooting">
         <template #content>
-          <div class="prose prose-sm max-w-none dark:prose-invert">
+          <div class="prose prose-sm dark:prose-invert max-w-none">
             <MarkdownRenderer
               :text="troubleshootingContent"
               font-size="small"
