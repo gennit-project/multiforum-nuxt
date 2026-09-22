@@ -89,6 +89,9 @@ const channelId = computed(() => {
 });
 const loggedInUserModName = computed(() => modProfileNameVar.value);
 const lastValidDiscussion = ref<Discussion | null>(null);
+const shouldLoadInlineComments = computed(
+  () => !props.downloadMode && props.showComments
+);
 
 provideForumRoleMembership(channelId);
 
@@ -142,6 +145,7 @@ const {
   }),
   {
     fetchPolicy: 'cache-first',
+    enabled: shouldLoadInlineComments,
   }
 );
 
@@ -164,7 +168,9 @@ watch(
   (newUsername, prevUsername) => {
     if (!newUsername || newUsername === prevUsername) return;
     refetchDiscussion();
-    refetchDiscussionChannel();
+    if (shouldLoadInlineComments.value) {
+      refetchDiscussionChannel();
+    }
   }
 );
 
@@ -179,7 +185,9 @@ watch(
 onMounted(() => {
   if (isAuthenticatedVar.value || usernameVar.value) {
     refetchDiscussion();
-    refetchDiscussionChannel();
+    if (shouldLoadInlineComments.value) {
+      refetchDiscussionChannel();
+    }
   }
 });
 
@@ -221,14 +229,6 @@ watch(
   }
 );
 
-const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
-  return (
-    getDiscussionChannelResult.value?.getCommentSection?.DiscussionChannel ||
-    lastValidCommentSection.value?.DiscussionChannel ||
-    null
-  );
-});
-
 const formDiscussionChannel = computed<DiscussionChannel | null>(() => {
   const discussionChannels = discussion.value?.DiscussionChannels || [];
   return (
@@ -236,6 +236,14 @@ const formDiscussionChannel = computed<DiscussionChannel | null>(() => {
       (discussionChannel) =>
         discussionChannel.channelUniqueName === channelId.value
     ) || null
+  );
+});
+
+const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
+  return (
+    getDiscussionChannelResult.value?.getCommentSection?.DiscussionChannel ||
+    lastValidCommentSection.value?.DiscussionChannel ||
+    (props.downloadMode ? formDiscussionChannel.value : null)
   );
 });
 
@@ -295,6 +303,7 @@ const { result: getDiscussionChannelCommentAggregateResult } = useQuery(
   }),
   {
     fetchPolicy: 'cache-first',
+    enabled: shouldLoadInlineComments,
   }
 );
 
@@ -306,6 +315,7 @@ const { result: getDiscussionChannelRootCommentAggregateResult } = useQuery(
   }),
   {
     fetchPolicy: 'cache-first',
+    enabled: shouldLoadInlineComments,
   }
 );
 
@@ -322,6 +332,7 @@ const { result: getDiscussionIssueResult } = useQuery(
   {
     fetchPolicy: 'cache-first',
     enabled: computed(() => !!props.discussionId && !!channelId.value),
+    prefetch: false,
   }
 );
 
@@ -334,6 +345,7 @@ const { result: getDiscussionCommentIssueResult } = useQuery(
   {
     fetchPolicy: 'cache-first',
     enabled: computed(() => !!props.discussionId && !!channelId.value),
+    prefetch: false,
   }
 );
 
@@ -402,6 +414,9 @@ const imageUploadsEnabled = computed(
 );
 
 const aggregateCommentCount = computed(() => {
+  if (props.downloadMode) {
+    return formDiscussionChannel.value?.CommentsAggregate?.count || 0;
+  }
   return (
     getDiscussionChannelCommentAggregateResult.value?.discussionChannels?.[0]
       ?.CommentsAggregate?.count || 0
@@ -410,8 +425,8 @@ const aggregateCommentCount = computed(() => {
 
 const aggregateRootCommentCount = computed(() => {
   return (
-    getDiscussionChannelRootCommentAggregateResult.value?.discussionChannels?.[0]
-      ?.CommentsAggregate?.count || 0
+    getDiscussionChannelRootCommentAggregateResult.value
+      ?.discussionChannels?.[0]?.CommentsAggregate?.count || 0
   );
 });
 
@@ -461,6 +476,14 @@ const handleClickUndoFeedback = () => {
 
 const handleClickEditFeedback = () => {
   feedbackModalManager.value?.handleClickEditFeedback();
+};
+
+const refetchActiveDiscussionChannel = () => {
+  if (props.downloadMode) {
+    refetchDiscussion();
+    return;
+  }
+  refetchDiscussionChannel();
 };
 
 const onFeedbackSubmitted = () => {
@@ -569,7 +592,7 @@ const handleEditAlbum = () => {
     />
     <div
       v-else
-      class="mx-1 my-4 w-full space-y-2 rounded-lg bg-white py-2 shadow-lg ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-gray-700 lg:px-4"
+      class="mx-1 my-4 w-full space-y-2 rounded-lg bg-white py-2 shadow-lg ring-1 ring-gray-200 lg:px-4 dark:bg-gray-900 dark:ring-gray-700"
     >
       <div class="w-full space-y-2 overflow-hidden">
         <ErrorBanner
@@ -640,7 +663,7 @@ const handleEditAlbum = () => {
                   :aggregate-comment-count="aggregateCommentCount"
                   :horizontal-album-thumbnails="horizontalAlbumThumbnails"
                   @discussion-refetch="refetchDiscussion"
-                  @discussion-channel-refetch="refetchDiscussionChannel"
+                  @discussion-channel-refetch="refetchActiveDiscussionChannel"
                   @handle-click-add-album="handleClickAddAlbum"
                   @edit-album="handleEditAlbum"
                   @handle-click-edit-feedback="handleClickEditFeedback"

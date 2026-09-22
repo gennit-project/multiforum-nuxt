@@ -162,8 +162,7 @@ const markdownImagesEnabled = computed(
       </DiscussionBody>
       <DownloadMetadata
         v-if="activeDiscussionChannel"
-        :discussion-id="discussionId"
-        :channel-unique-name="activeDiscussionChannel.channelUniqueName"
+        :label-options="activeDiscussionChannel.LabelOptions || []"
       />
     </div>
     <div class="shrink-0">

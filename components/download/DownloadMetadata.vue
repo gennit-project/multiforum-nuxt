@@ -1,36 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useQuery } from '@vue/apollo-composable';
+import { computed, type PropType } from 'vue';
 import type { FilterOption } from '@/__generated__/graphql';
-import { GET_DOWNLOAD_LABELS } from '@/graphQLData/discussion/queries';
 
 const props = defineProps({
-  discussionId: {
-    type: String,
-    required: true,
+  labelOptions: {
+    type: Array as PropType<FilterOption[]>,
+    default: () => [],
   },
-  channelUniqueName: {
-    type: String,
-    required: true,
-  },
-});
-
-const { result: labelQueryResult } = useQuery(
-  GET_DOWNLOAD_LABELS,
-  {
-    discussionId: props.discussionId,
-    channelUniqueName: props.channelUniqueName,
-  },
-  {
-    enabled: !!props.discussionId && !!props.channelUniqueName,
-  }
-);
-
-const labelOptions = computed<FilterOption[]>(() => {
-  return (
-    labelQueryResult.value?.discussions?.[0]?.DiscussionChannels?.[0]
-      ?.LabelOptions || []
-  );
 });
 
 const groupedLabels = computed(() => {
@@ -42,7 +18,7 @@ const groupedLabels = computed(() => {
     }
   > = {};
 
-  labelOptions.value.forEach((option) => {
+  props.labelOptions.forEach((option) => {
     const groupKey = option.group?.key;
     const groupDisplayName = option.group?.displayName;
 
@@ -67,7 +43,7 @@ const groupedLabels = computed(() => {
     class="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
     data-testid="download-metadata"
   >
-    <h2 class="font-semibold mb-3 text-sm text-gray-900 dark:text-white">
+    <h2 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">
       Metadata
     </h2>
     <dl class="space-y-3">

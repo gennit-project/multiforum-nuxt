@@ -20,11 +20,22 @@ const discussion = (overrides: Record<string, unknown> = {}) =>
     ...overrides,
   }) as unknown as Discussion;
 
+const labelOptions = [
+  {
+    id: 'label-1',
+    value: 'park',
+    displayName: 'Park',
+    order: 0,
+    group: { id: 'group-1', key: 'lot-type', displayName: 'Lot type' },
+  },
+];
+
 const channel = () =>
   ({
     id: 'dc1',
     channelUniqueName: 'cats',
     Channel: {},
+    LabelOptions: labelOptions,
   }) as unknown as DiscussionChannel;
 
 const discussionBodyStub = {
@@ -65,6 +76,7 @@ const mountLayout = (props: Record<string, unknown> = {}) =>
         },
         DownloadMetadata: {
           name: 'DownloadMetadata',
+          props: ['labelOptions'],
           template: '<div class="metadata" />',
         },
         CrosspostedDiscussionEmbed: true,
@@ -134,6 +146,9 @@ describe('DownloadModeLayout sidebar and votes', () => {
       discussion: discussion({ Album: { Images: [{ id: 'i1' }] } }),
     });
 
+    expect(
+      wrapper.getComponent({ name: 'DownloadMetadata' }).props('labelOptions')
+    ).toEqual(labelOptions);
     expect({
       followsAlbum: Boolean(
         wrapper
