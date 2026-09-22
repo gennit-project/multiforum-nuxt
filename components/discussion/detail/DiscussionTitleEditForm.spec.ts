@@ -14,17 +14,21 @@ const h = vi.hoisted(() => ({
   onDone: undefined as undefined | (() => void),
   username: null as unknown,
   route: null as unknown,
+  queryDocument: '',
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => ({
-    result: h.discussionResult,
-    error: h.discussionError,
-    loading: h.discussionLoading,
-    onResult: (cb: (r: unknown) => void) => {
-      h.onResult = cb;
-    },
-  }),
+  useQuery: (document: string) => {
+    h.queryDocument = document;
+    return {
+      result: h.discussionResult,
+      error: h.discussionError,
+      loading: h.discussionLoading,
+      onResult: (cb: (r: unknown) => void) => {
+        h.onResult = cb;
+      },
+    };
+  },
   useMutation: () => ({
     mutate: h.updateDiscussion,
     error: h.updateError,
@@ -35,6 +39,10 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
+vi.mock('@/graphQLData/discussion/queries', () => ({
+  GET_DISCUSSION: 'GET_DISCUSSION',
+  GET_DOWNLOAD_DETAIL: 'GET_DOWNLOAD_DETAIL',
+}));
 vi.mock('@/composables/useTheme', () => ({
   useAppTheme: () => ({ theme: ref('light') }),
 }));
@@ -107,6 +115,7 @@ beforeEach(() => {
   h.discussionLoading = ref(false);
   h.discussionError = ref(null);
   h.onResult = undefined;
+  h.queryDocument = '';
   h.updateError = { value: null };
   h.onDone = undefined;
   h.username = ref('alice');
@@ -117,6 +126,19 @@ beforeEach(() => {
 });
 
 describe('DiscussionTitleEditForm display', () => {
+  it('uses the full discussion query on discussion routes', () => {
+    mountForm();
+
+    expect(h.queryDocument).toBe('GET_DISCUSSION');
+  });
+
+  it('uses the download query on download routes', () => {
+    h.route.name = 'forums-forumId-downloads-discussionId';
+    mountForm();
+
+    expect(h.queryDocument).toBe('GET_DOWNLOAD_DETAIL');
+  });
+
   it('shows skeletons while loading', () => {
     h.discussionLoading = ref(true);
     h.discussionResult = ref(null);

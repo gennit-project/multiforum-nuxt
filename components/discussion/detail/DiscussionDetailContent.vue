@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch, defineAsyncComponent } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
+import {
+  GET_DISCUSSION,
+  GET_DOWNLOAD_DETAIL,
+} from '@/graphQLData/discussion/queries';
 import {
   GET_DISCUSSION_COMMENTS,
   GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
@@ -103,7 +106,7 @@ const {
   refetch: refetchDiscussion,
   onResult: onGetDiscussionResult,
 } = useQuery(
-  GET_DISCUSSION,
+  props.downloadMode ? GET_DOWNLOAD_DETAIL : GET_DISCUSSION,
   () => ({
     id: props.discussionId,
     loggedInModName: loggedInUserModName.value,

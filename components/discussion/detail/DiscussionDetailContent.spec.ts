@@ -21,6 +21,10 @@ import {
   CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
 } from '@/graphQLData/issue/queries';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import {
+  GET_DISCUSSION,
+  GET_DOWNLOAD_DETAIL,
+} from '@/graphQLData/discussion/queries';
 
 vi.mock('@vue/apollo-composable', () => ({ useQuery: vi.fn() }));
 vi.mock('nuxt/app', () => ({
@@ -212,6 +216,7 @@ const setup = (
     useQuery,
     queries: {
       'getDiscussion(': discussionQuery,
+      'getDownloadDetail(': discussionQuery,
       getCommentSection: commentSectionQuery,
       GetDiscussionChannelCommentAggregate: commentAggregateQuery,
       GetDiscussionChannelRootCommentAggregate: rootAggregateQuery,
@@ -253,6 +258,23 @@ describe('DiscussionDetailContent', () => {
     auth.isAuthenticated.value = false;
     auth.modProfileName.value = '';
     auth.username.value = '';
+  });
+
+  it('uses the full query for discussions and the slim query for downloads', () => {
+    setup();
+    expect(
+      asMock(useQuery).mock.calls.some(
+        ([document]) => document === GET_DISCUSSION
+      )
+    ).toBe(true);
+
+    asMock(useQuery).mockReset();
+    setup({ componentProps: { downloadMode: true } });
+    expect(
+      asMock(useQuery).mock.calls.some(
+        ([document]) => document === GET_DOWNLOAD_DETAIL
+      )
+    ).toBe(true);
   });
 
   it('renders the discussion header for a loaded discussion', () => {
