@@ -151,7 +151,12 @@ const downloadCount = computed(() => {
 
 const showNotFound = computed(() => {
   // Only show 404 if query has completed and no channel was found
-  return !channelLoading.value && channelId.value && !channel.value;
+  return (
+    shouldPrefetchForumShell.value &&
+    !channelLoading.value &&
+    channelId.value &&
+    !channel.value
+  );
 });
 
 const handleRefetchChannelData = () => {

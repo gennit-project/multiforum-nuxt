@@ -262,7 +262,7 @@ describe('forum shell page', () => {
 
   it('defers forum shell queries during download detail SSR', async () => {
     mockState.route.name = 'forums-forumId-downloads-discussionId';
-    await mountWith([]);
+    const wrapper = await mountWith([]);
 
     const queryOptions = mockedUseQuery.mock.calls.slice(0, 2).map((call) => {
       const options = call[2];
@@ -273,6 +273,10 @@ describe('forum shell page', () => {
       false,
       false,
     ]);
+    expect({
+      childPage: wrapper.findComponent(NuxtPageStub).exists(),
+      notFound: wrapper.findComponent(PageNotFoundStub).exists(),
+    }).toEqual({ childPage: true, notFound: false });
   });
 
   it('prefetches forum shell queries on the plain forum route', async () => {
