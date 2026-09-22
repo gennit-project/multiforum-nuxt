@@ -910,23 +910,24 @@ watch(
                 <p class="text-xs text-gray-500 dark:text-gray-400">
                   Pipeline ID:
                   <code>{{
-                    technicalDetails[attempt.pipelineId].attempt.pipelineId
+                    technicalDetails[attempt.pipelineId]?.attempt.pipelineId
                   }}</code>
                   · Started:
                   {{
                     formatTimestamp(
-                      technicalDetails[attempt.pipelineId].attempt.startedAt
+                      technicalDetails[attempt.pipelineId]?.attempt.startedAt
                     )
                   }}
                   · Finished:
                   {{
                     formatTimestamp(
-                      technicalDetails[attempt.pipelineId].attempt.finishedAt
+                      technicalDetails[attempt.pipelineId]?.attempt.finishedAt
                     )
                   }}
                 </p>
                 <article
-                  v-for="job in technicalDetails[attempt.pipelineId].jobs"
+                  v-for="job in technicalDetails[attempt.pipelineId]?.jobs ||
+                  []"
                   :key="job.id"
                   class="rounded border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800"
                 >
