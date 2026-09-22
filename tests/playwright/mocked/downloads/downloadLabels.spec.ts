@@ -95,6 +95,9 @@ const createDownloadHandlers = ({
   getDiscussion: () => ({
     data: { discussions: [buildDownload({ withActivity })] },
   }),
+  getDownloadDetail: () => ({
+    data: { discussions: [buildDownload({ withActivity })] },
+  }),
   getDiscussionChannelRootCommentAggregate: () => ({
     data: {
       discussionChannels: [
