@@ -316,6 +316,10 @@ export default defineNuxtConfig({
       // no longer holds. If per-page caching is wanted back, it would need to be
       // anonymous-only — e.g. bypass the cache whenever a session cookie is
       // present — not a blanket ISR rule.)
+      // Pipeline history is interactive operational data, not SEO content.
+      // Render it client-side so the detail page's SSR query waterfall cannot
+      // exhaust the Vercel function timeout before pipeline data is requested.
+      '/forums/*/downloads/*/pipelines': { ssr: false },
       // SPIKE Phase 2: auth endpoints must NOT be route-cached. Nitro's route
       // cache serves shared, cookie-independent responses, so /api/auth/token
       // was reaching its handler with NO cookies (no session → null token →
