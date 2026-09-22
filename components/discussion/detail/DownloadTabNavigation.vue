@@ -48,6 +48,7 @@ const {
   },
   {
     enabled: !!props.discussionId,
+    prefetch: false,
   }
 );
 
@@ -58,9 +59,7 @@ const publicCollections = computed(() => {
 const primaryFileId = computed(
   () => props.discussion?.DownloadableFiles?.[0]?.id || ''
 );
-const {
-  hasPipelineContent,
-} = useSharedDownloadPipelineOverview(
+const { hasPipelineContent } = useSharedDownloadPipelineOverview(
   primaryFileId,
   computed(() => props.discussionId),
   computed(() => props.channelId),
@@ -178,7 +177,7 @@ const {
           >
             <button
               type="button"
-              class="hover:bg-gray-50 inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+              class="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
               data-testid="edit-download-button-fallback"
               @click="
                 router.push(
@@ -196,7 +195,7 @@ const {
   </div>
 
   <div class="mt-6 px-2">
-    <h3 class="font-semibold mb-3 text-base text-gray-900 dark:text-white">
+    <h3 class="mb-3 text-base font-semibold text-gray-900 dark:text-white">
       Public collections featuring this download
     </h3>
     <div

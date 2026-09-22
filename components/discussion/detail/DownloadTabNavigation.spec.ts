@@ -3,17 +3,20 @@ import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
 
 const mockHasPipelineContent = ref(true);
+const h = vi.hoisted(() => ({ useQuery: vi.fn() }));
 
 vi.mock('nuxt/app', () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => ({
-    result: ref({ publicCollectionsContaining: [] }),
-    loading: ref(false),
-    error: ref(null),
-  }),
+  useQuery: h.useQuery,
+}));
+
+h.useQuery.mockImplementation(() => ({
+  result: ref({ publicCollectionsContaining: [] }),
+  loading: ref(false),
+  error: ref(null),
 }));
 
 vi.mock('@/composables/useAuthState', () => ({
@@ -55,6 +58,13 @@ const mountNav = async (routeName: string) => {
 };
 
 describe('DownloadTabNavigation', () => {
+  it('defers the public collections query until hydration', async () => {
+    h.useQuery.mockClear();
+    await mountNav('forums-forumId-downloads-discussionId');
+
+    expect(h.useQuery.mock.calls[0]?.[2]).toMatchObject({ prefetch: false });
+  });
+
   it('renders the Pipelines tab when checks are applicable or have history', async () => {
     mockHasPipelineContent.value = true;
     const wrapper = await mountNav('forums-forumId-downloads-discussionId');

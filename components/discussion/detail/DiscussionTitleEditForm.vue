@@ -10,10 +10,7 @@ import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discus
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
-import {
-  GET_DISCUSSION,
-  IS_DISCUSSION_ANSWERED,
-} from '@/graphQLData/discussion/queries';
+import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { DISCUSSION_TITLE_CHAR_LIMIT } from '@/utils/constants';
 import { useRoute } from 'nuxt/app';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
@@ -21,7 +18,6 @@ import { useModProfileName, useUsername } from '@/composables/useAuthState';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
-
 
 const route = useRoute();
 const titleEditMode = ref(false);
@@ -32,23 +28,6 @@ const channelId = computed(() =>
 const discussionId = computed(() =>
   typeof route.params.discussionId === 'string' ? route.params.discussionId : ''
 );
-
-const {
-  result: isDiscussionAnsweredResult,
-  error: isDiscussionAnsweredError,
-  loading: isDiscussionAnsweredLoading,
-} = useQuery(IS_DISCUSSION_ANSWERED, {
-  discussionId: discussionId.value,
-  channelUniqueName: channelId.value,
-});
-
-const answered = computed(() => {
-  if (isDiscussionAnsweredLoading.value) return false;
-  if (isDiscussionAnsweredError.value) return false;
-  return (
-    isDiscussionAnsweredResult.value?.discussionChannels?.[0]?.answered || false
-  );
-});
 
 const {
   result: getDiscussionResult,
@@ -71,6 +50,13 @@ const discussion = computed<Discussion | null>(() => {
   }
   return discussion || null;
 });
+const answered = computed(
+  () =>
+    discussion.value?.DiscussionChannels?.find(
+      (discussionChannel) =>
+        discussionChannel.channelUniqueName === channelId.value
+    )?.answered || false
+);
 const authorIsLoggedInUser = computed(
   () => discussion.value?.Author?.username === usernameVar.value
 );

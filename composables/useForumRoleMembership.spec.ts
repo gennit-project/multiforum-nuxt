@@ -24,6 +24,16 @@ describe('useForumRoleMembership', () => {
   });
 
   describe('createForumRoleMembership', () => {
+    it('supports deferring SSR prefetch', () => {
+      mockQueryResult({ channels: [] });
+
+      createForumRoleMembership('forum', ref(false));
+
+      const options = (useQuery as unknown as ReturnType<typeof vi.fn>).mock
+        .calls[0]?.[2] as () => { prefetch: boolean };
+      expect(options().prefetch).toBe(false);
+    });
+
     it('maps admin usernames from the channel', () => {
       mockQueryResult({
         channels: [
@@ -76,11 +86,8 @@ describe('useForumRoleMembership', () => {
     it('returns empty arrays when the channel is missing', () => {
       mockQueryResult({ channels: [] });
 
-      const {
-        forumAdminUsernames,
-        forumModUsernames,
-        forumModProfileNames,
-      } = createForumRoleMembership('forum');
+      const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
+        createForumRoleMembership('forum');
 
       expect([
         forumAdminUsernames.value,
@@ -111,7 +118,8 @@ describe('useForumRoleMembership', () => {
           const { forumAdminUsernames } = useForumRoleMembership();
           return { forumAdminUsernames };
         },
-        template: '<div class="admins">{{ forumAdminUsernames.join(",") }}</div>',
+        template:
+          '<div class="admins">{{ forumAdminUsernames.join(",") }}</div>',
       });
 
       const Parent = defineComponent({

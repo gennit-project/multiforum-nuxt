@@ -260,6 +260,39 @@ describe('forum shell page', () => {
     );
   });
 
+  it('defers forum shell queries during download detail SSR', async () => {
+    mockState.route.name = 'forums-forumId-downloads-discussionId';
+    const wrapper = await mountWith([]);
+
+    const queryOptions = mockedUseQuery.mock.calls.slice(0, 2).map((call) => {
+      const options = call[2];
+      return typeof options === 'function' ? options() : options;
+    });
+
+    expect(queryOptions.map((options) => options.prefetch)).toEqual([
+      false,
+      false,
+    ]);
+    expect({
+      childPage: wrapper.findComponent(NuxtPageStub).exists(),
+      notFound: wrapper.findComponent(PageNotFoundStub).exists(),
+    }).toEqual({ childPage: true, notFound: false });
+  });
+
+  it('prefetches forum shell queries on the plain forum route', async () => {
+    await mountWith([]);
+
+    const queryOptions = mockedUseQuery.mock.calls.slice(0, 2).map((call) => {
+      const options = call[2];
+      return typeof options === 'function' ? options() : options;
+    });
+
+    expect(queryOptions.map((options) => options.prefetch)).toEqual([
+      true,
+      true,
+    ]);
+  });
+
   it('renders the channel tabs on the plain forum route', async () => {
     const wrapper = await mountWith([
       { uniqueName: 'cats', displayName: 'Cats' },

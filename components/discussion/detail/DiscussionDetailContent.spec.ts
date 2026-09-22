@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { ref } from 'vue';
+import { unref, type ref } from 'vue';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import {
   asMock,
@@ -11,6 +11,16 @@ import type { Comment, Discussion } from '@/__generated__/graphql';
 import { useQuery } from '@vue/apollo-composable';
 
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
+import {
+  GET_DISCUSSION_COMMENTS,
+  GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
+  GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
+} from '@/graphQLData/comment/queries';
+import {
+  CHECK_DISCUSSION_ISSUE_EXISTENCE,
+  CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
+} from '@/graphQLData/issue/queries';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 
 vi.mock('@vue/apollo-composable', () => ({ useQuery: vi.fn() }));
 vi.mock('nuxt/app', () => ({
@@ -89,6 +99,7 @@ const stubs = {
   },
   DiscussionLayoutManager: {
     name: 'DiscussionLayoutManager',
+    props: ['activeDiscussionChannel', 'aggregateCommentCount'],
     emits: [
       'discussion-refetch',
       'discussion-channel-refetch',
@@ -121,6 +132,7 @@ const makeDiscussion = (overrides: Record<string, unknown> = {}): Discussion =>
         locked: false,
         Answers: [],
         Channel: { feedbackEnabled: true, emojiEnabled: true },
+        CommentsAggregate: { count: 0 },
         __typename: 'DiscussionChannel',
       },
     ],
@@ -156,6 +168,7 @@ const setup = (
     discussionChannelOverrides?: Record<string, unknown>;
     issueResult?: Record<string, unknown>;
     commentIssueResult?: Record<string, unknown>;
+    componentProps?: { downloadMode?: boolean; showComments?: boolean };
   } = {}
 ) => {
   const {
@@ -165,6 +178,7 @@ const setup = (
     discussionChannelOverrides = {},
     issueResult = { issues: [] },
     commentIssueResult = { discussionChannels: [] },
+    componentProps = {},
   } = params;
   const section = commentSection(comments);
   Object.assign(
@@ -207,7 +221,7 @@ const setup = (
     fallbackQuery: createQueryMock({ discussionChannels: [] }),
   });
   const wrapper = mountWithDefaults(DiscussionDetailContent, {
-    props: { discussionId: 'd1', channelId: 'cats' },
+    props: { discussionId: 'd1', channelId: 'cats', ...componentProps },
     global: { stubs },
   });
   return {
@@ -218,6 +232,17 @@ const setup = (
     rootAggregateQuery,
     issueQuery,
     commentIssueQuery,
+  };
+};
+
+const getQueryOptions = (query: unknown) => {
+  const call = asMock(useQuery).mock.calls.find(
+    ([document]) => document === query
+  );
+  if (!call) throw new Error('Expected query was not called');
+  return call[2] as {
+    enabled?: boolean | ReturnType<typeof ref<boolean>>;
+    prefetch?: boolean;
   };
 };
 
@@ -260,6 +285,74 @@ describe('DiscussionDetailContent', () => {
   it('does not show page-not-found for a loaded discussion', () => {
     const { wrapper } = setup();
     expect(wrapper.find('.page-not-found-stub').exists()).toBe(false);
+  });
+
+  it('skips inline comment queries for downloads and reuses the discussion channel aggregate', () => {
+    const discussion = makeDiscussion();
+    Object.assign(discussion.DiscussionChannels[0], {
+      CommentsAggregate: { count: 7 },
+    });
+
+    const { wrapper } = setup({
+      discussions: [discussion],
+      componentProps: { downloadMode: true },
+    });
+
+    expect(
+      [
+        GET_DISCUSSION_COMMENTS,
+        GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
+        GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
+      ].map((query) => unref(getQueryOptions(query).enabled))
+    ).toEqual([false, false, false]);
+    expect(
+      wrapper
+        .findComponent({ name: 'DiscussionLayoutManager' })
+        .props('aggregateCommentCount')
+    ).toBe(7);
+    expect(wrapper.findComponent(DiscussionCommentsWrapperStub).exists()).toBe(
+      false
+    );
+  });
+
+  it('prefetches the channel with the forum layout cache key', () => {
+    setup();
+
+    const variables = asMock(useQuery)
+      .mock.calls.filter(([document]) => document === GET_CHANNEL)
+      .map(([, value]) => (typeof value === 'function' ? value() : value));
+    expect(variables).not.toHaveLength(0);
+    expect(variables).toEqual(
+      variables.map(() => ({
+        uniqueName: 'cats',
+        loggedInUsername: null,
+        now: expect.stringMatching(/Z$/),
+      }))
+    );
+  });
+
+  it('defers channel chrome queries during download SSR', () => {
+    setup({ componentProps: { downloadMode: true } });
+
+    const options = asMock(useQuery)
+      .mock.calls.filter(([document]) => document === GET_CHANNEL)
+      .map((call) => {
+        const value = call[2];
+        return typeof value === 'function' ? value() : value;
+      });
+    expect(options).not.toHaveLength(0);
+    expect(options.every((value) => value?.prefetch === false)).toBe(true);
+  });
+
+  it('defers issue-link lookups until hydration', () => {
+    setup();
+
+    expect(
+      [
+        CHECK_DISCUSSION_ISSUE_EXISTENCE,
+        CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
+      ].map((query) => getQueryOptions(query).prefetch)
+    ).toEqual([false, false]);
   });
 
   it('shows page-not-found when the discussion and channel are absent', () => {
@@ -375,6 +468,23 @@ describe('DiscussionDetailContent', () => {
     });
   });
 
+  it('refetches the discussion instead of the disabled comment query for downloads', async () => {
+    const { wrapper, discussionQuery, commentSectionQuery } = setup({
+      componentProps: { downloadMode: true },
+    });
+
+    await wrapper
+      .findComponent({ name: 'DiscussionLayoutManager' })
+      .vm.$emit('discussion-channel-refetch');
+
+    expect({
+      discussionRefetches: discussionQuery.refetch.mock.calls.length,
+      channelRefetches: commentSectionQuery.refetch.mock.calls.length,
+    }).toEqual({
+      discussionRefetches: 1,
+      channelRefetches: 0,
+    });
+  });
   it('refetches discussion data from layout and feedback events', async () => {
     const { wrapper, discussionQuery, commentSectionQuery } = setup();
     const layout = wrapper.findComponent({ name: 'DiscussionLayoutManager' });

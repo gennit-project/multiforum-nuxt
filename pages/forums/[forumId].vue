@@ -66,6 +66,9 @@ const showDiscussionTitle = computed(
 const showDownloadTitle = computed(
   () => shellVisibility.value.showDownloadTitle
 );
+// Download detail routes render their own channel-aware content. Let the forum
+// shell hydrate after SSR so these non-critical queries do not block it.
+const shouldPrefetchForumShell = computed(() => !showDownloadTitle.value);
 const showEventTitle = computed(() => shellVisibility.value.showEventTitle);
 const showIssueTitle = computed(() => shellVisibility.value.showIssueTitle);
 const showChannelTabs = computed(() => shellVisibility.value.showChannelTabs);
@@ -113,11 +116,12 @@ const {
     // Keep SSR/client Apollo variables identical during hydration.
     now: currentHour(),
   }),
-  {
+  () => ({
     fetchPolicy: 'cache-first',
     nextFetchPolicy: 'cache-first',
-    enabled: computed(() => !!channelId.value),
-  }
+    enabled: !!channelId.value,
+    prefetch: shouldPrefetchForumShell.value,
+  })
 );
 
 const channel = computed(() => {
@@ -130,11 +134,12 @@ const { result: downloadCountResult } = useQuery(
   () => ({
     uniqueName: channelId.value,
   }),
-  {
+  () => ({
     fetchPolicy: 'cache-first',
     nextFetchPolicy: 'cache-first',
-    enabled: computed(() => !!channelId.value),
-  }
+    enabled: !!channelId.value,
+    prefetch: shouldPrefetchForumShell.value,
+  })
 );
 
 const downloadCount = computed(() => {
@@ -146,7 +151,12 @@ const downloadCount = computed(() => {
 
 const showNotFound = computed(() => {
   // Only show 404 if query has completed and no channel was found
-  return !channelLoading.value && channelId.value && !channel.value;
+  return (
+    shouldPrefetchForumShell.value &&
+    !channelLoading.value &&
+    channelId.value &&
+    !channel.value
+  );
 });
 
 const handleRefetchChannelData = () => {
