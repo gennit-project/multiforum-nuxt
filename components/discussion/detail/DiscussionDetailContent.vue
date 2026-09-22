@@ -92,8 +92,9 @@ const lastValidDiscussion = ref<Discussion | null>(null);
 const shouldLoadInlineComments = computed(
   () => !props.downloadMode && props.showComments
 );
+const shouldPrefetchDownloadChrome = computed(() => !props.downloadMode);
 
-provideForumRoleMembership(channelId);
+provideForumRoleMembership(channelId, shouldPrefetchDownloadChrome);
 
 const {
   result: getDiscussionResult,
@@ -277,7 +278,10 @@ const locked = computed(() => {
 // A locked forum (channel-level lock) also blocks new comments, independent of
 // the per-discussion lock above. Kept separate so the banner can explain which
 // lock is in effect.
-const { locked: forumLocked } = useForumLock(channelId);
+const { locked: forumLocked } = useForumLock(
+  channelId,
+  shouldPrefetchDownloadChrome
+);
 const commentsDisabled = computed(() => locked.value || forumLocked.value);
 
 const comments = computed(() => {
@@ -363,10 +367,11 @@ useQuery(
     loggedInUsername: usernameVar.value || null,
     now: DateTime.utc().startOf('hour').toISO(),
   },
-  {
+  () => ({
     fetchPolicy: 'cache-first',
-    enabled: computed(() => !!channelId.value),
-  }
+    enabled: !!channelId.value,
+    prefetch: shouldPrefetchDownloadChrome.value,
+  })
 );
 
 useQuery(

@@ -69,7 +69,7 @@ describe('DiscussionHeader', () => {
     apollo.useQuery.mockClear();
   });
 
-  const buildWrapper = () =>
+  const buildWrapper = (downloadMode = false) =>
     mount(DiscussionHeader, {
       props: {
         discussion: {
@@ -91,6 +91,7 @@ describe('DiscussionHeader', () => {
           ],
         },
         channelId: 'cats',
+        downloadMode,
       },
       global: {
         stubs: {
@@ -127,6 +128,15 @@ describe('DiscussionHeader', () => {
       now: expect.stringMatching(/Z$/),
     });
   });
+  it('defers channel chrome during download SSR', () => {
+    buildWrapper(true);
+
+    const call = apollo.useQuery.mock.calls.find(
+      ([document]) => document === GET_CHANNEL
+    );
+    expect(call?.[2]).toMatchObject({ prefetch: false });
+  });
+
   it('shows the Server Admin label when the discussion author belongs to server admin membership', () => {
     serverAdminUsernames.value = ['alice'];
 

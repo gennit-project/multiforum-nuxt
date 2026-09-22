@@ -172,6 +172,7 @@ const { result: getChannelResult } = useQuery(
     fetchPolicy: 'cache-first',
     nextFetchPolicy: 'cache-first',
     enabled: computed(() => !!props.channelId || !!defaultChannel.value),
+    prefetch: !props.downloadMode,
   }
 );
 

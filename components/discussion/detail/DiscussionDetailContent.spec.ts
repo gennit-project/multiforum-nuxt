@@ -331,6 +331,19 @@ describe('DiscussionDetailContent', () => {
     );
   });
 
+  it('defers channel chrome queries during download SSR', () => {
+    setup({ componentProps: { downloadMode: true } });
+
+    const options = asMock(useQuery)
+      .mock.calls.filter(([document]) => document === GET_CHANNEL)
+      .map((call) => {
+        const value = call[2];
+        return typeof value === 'function' ? value() : value;
+      });
+    expect(options).not.toHaveLength(0);
+    expect(options.every((value) => value?.prefetch === false)).toBe(true);
+  });
+
   it('defers issue-link lookups until hydration', () => {
     setup();
 

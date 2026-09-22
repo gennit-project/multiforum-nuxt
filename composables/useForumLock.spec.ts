@@ -50,6 +50,17 @@ describe('useForumLock', () => {
     });
   });
 
+  it('supports deferring SSR prefetch', () => {
+    mockChannel({ locked: false });
+
+    useForumLock(ref('cats'), ref(false));
+
+    const options = asMock(useQuery).mock.calls[0]?.[2] as () => {
+      prefetch: boolean;
+    };
+    expect(options().prefetch).toBe(false);
+  });
+
   it('reports locked=true for a locked forum', () => {
     mockChannel({ locked: true, lockReason: 'Spam wave' });
     expect(useForumLock(ref('cats')).locked.value).toBe(true);
