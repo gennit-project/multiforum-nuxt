@@ -127,6 +127,12 @@ const NuxtPageStub = defineComponent({
   template: '<div class="nuxt-page-stub" />',
 });
 
+const NuxtLinkStub = defineComponent({
+  name: 'NuxtLink',
+  props: { to: [String, Object] },
+  template: '<a><slot /></a>',
+});
+
 const NuxtLayoutStub = defineComponent({
   name: 'NuxtLayout',
   template: '<div><slot /></div>',
@@ -218,6 +224,7 @@ const mountWith = async (
       stubs: {
         NuxtLayout: NuxtLayoutStub,
         NuxtPage: NuxtPageStub,
+        NuxtLink: NuxtLinkStub,
       },
     },
   });
@@ -432,7 +439,19 @@ describe('forum shell page', () => {
       id: wrapper
         .findComponent(DiscussionDetailContentStub)
         .props('discussionId'),
-    }).toEqual({ title: true, id: 'discussion-1' });
+      link: wrapper
+        .getComponent('[data-testid="channel-discussion-detail-link"]')
+        .props('to'),
+      hasOpenInNewTab: wrapper.text().includes('Open in new tab'),
+    }).toEqual({
+      title: true,
+      id: 'discussion-1',
+      link: {
+        name: 'forums-forumId-discussions-discussionId',
+        params: { forumId: 'cats', discussionId: 'discussion-1' },
+      },
+      hasOpenInNewTab: false,
+    });
   });
 
   it('renders the empty discussion selection state', async () => {

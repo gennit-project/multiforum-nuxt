@@ -444,24 +444,24 @@ definePageMeta({
                   v-if="selectedChannelDiscussionId"
                   class="flex w-full flex-col justify-center rounded-lg border border-gray-200 p-4 dark:border-gray-700"
                 >
-                  <div class="mb-3 flex items-start justify-between gap-3">
-                    <div class="flex-1">
-                      <h2
-                        v-if="selectedChannelDiscussionTitle"
-                        class="text-lg font-semibold text-gray-900 dark:text-gray-100"
-                      >
-                        {{ selectedChannelDiscussionTitle }}
-                      </h2>
-                    </div>
-                    <a
-                      :href="`/forums/${channelId}/discussions/${selectedChannelDiscussionId}`"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="text-xs font-medium text-orange-600 hover:underline dark:text-orange-400"
+                  <h2
+                    v-if="selectedChannelDiscussionTitle"
+                    class="mb-3 min-w-0"
+                  >
+                    <nuxt-link
+                      :to="{
+                        name: 'forums-forumId-discussions-discussionId',
+                        params: {
+                          forumId: channelId,
+                          discussionId: selectedChannelDiscussionId,
+                        },
+                      }"
+                      class="text-lg font-semibold wrap-break-word text-gray-900 underline dark:text-gray-100"
+                      data-testid="channel-discussion-detail-link"
                     >
-                      Open in new tab
-                    </a>
-                  </div>
+                      {{ selectedChannelDiscussionTitle }}
+                    </nuxt-link>
+                  </h2>
                   <DiscussionDetailContent
                     :discussion-id="selectedChannelDiscussionId"
                     :channel-id="channelId"
