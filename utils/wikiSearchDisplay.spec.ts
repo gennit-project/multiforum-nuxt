@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatWordCount } from './wikiSearchDisplay';
+import { formatWikiExcerpt, formatWordCount } from './wikiSearchDisplay';
 
 describe('formatWordCount', () => {
   it('returns "0 words" for an empty body', () => {
@@ -28,5 +28,23 @@ describe('formatWordCount', () => {
 
   it('keeps one decimal place for non-round thousands', () => {
     expect(formatWordCount(Array(1200).fill('w').join(' '))).toBe('1.2k words');
+  });
+});
+
+describe('formatWikiExcerpt', () => {
+  it('returns an empty preview when the page has no body', () => {
+    expect(formatWikiExcerpt(null)).toBe('');
+  });
+
+  it('turns Markdown links and formatting into readable plain text', () => {
+    expect(
+      formatWikiExcerpt('## **Cat care**\nRead the [feeding guide](/food).')
+    ).toBe('Cat care Read the feeding guide.');
+  });
+
+  it('truncates long previews at a word boundary', () => {
+    expect(
+      formatWikiExcerpt('Cats need patient and consistent care.', 24)
+    ).toBe('Cats need patient and…');
   });
 });
