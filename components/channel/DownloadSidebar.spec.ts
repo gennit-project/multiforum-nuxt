@@ -368,8 +368,57 @@ describe('DownloadSidebar', () => {
     }).toEqual({
       title: 'Security check needs another try',
       message: "The scan service had a problem—your file wasn't rejected.",
-      actions: ['Retry scan', 'View checks'],
+      actions: ['Retry scan', 'Replace file', 'View checks'],
     });
+  });
+
+  it('directs the creator to replace a missing attachment instead of retrying', () => {
+    mockUsernameRef.value = 'author';
+    const wrapper = mount(DownloadSidebar, {
+      props: {
+        discussion: makeDiscussion({
+          ...discussionWithFile,
+          DownloadableFiles: [
+            {
+              ...discussionWithFile.DownloadableFiles[0],
+              url: '',
+              scanStatus: 'FAILED',
+              scanReason:
+                'No readable downloadable attachment is available to scan.',
+            },
+          ],
+        }),
+        discussionId: 'discussion-1',
+        channelUniqueName: 'test-forum',
+      },
+      global: {
+        stubs: {
+          NuxtLink: {
+            props: ['to'],
+            template: '<a :data-to="to"><slot /></a>',
+          },
+        },
+      },
+    });
+
+    const status = wrapper.get('[data-testid="download-scan-status"]');
+    expect(status.get('p.font-medium').text()).toBe(
+      'File needs to be replaced'
+    );
+    expect(status.get('p.text-xs').text()).toBe(
+      'No readable file is attached, so the security check could not run.'
+    );
+    expect(status.get('[data-testid="download-scan-reason"]').text()).toBe(
+      'No readable downloadable attachment is available to scan.'
+    );
+    expect(status.find('button').exists()).toBe(false);
+    expect(status.get('a').attributes('data-to')).toBe(
+      '/forums/test-forum/downloads/edit/discussion-1'
+    );
+    expect(status.findAll('a').map((action) => action.text())).toEqual([
+      'Replace file',
+      'View checks',
+    ]);
   });
 
   it('lets the creator retry a failed scan', async () => {
