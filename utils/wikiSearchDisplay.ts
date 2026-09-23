@@ -17,3 +17,32 @@ export function formatWordCount(body: string | null | undefined): string {
   }
   return `${words} ${words === 1 ? 'word' : 'words'}`;
 }
+
+/**
+ * Convert the beginning of a Markdown wiki body into a compact plain-text
+ * preview suitable for a search-result card.
+ */
+export function formatWikiExcerpt(
+  body: string | null | undefined,
+  maxLength = 150
+): string {
+  if (!body) return '';
+
+  const plainText = body
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/^\s*#{1,6}\s+/gm, '')
+    .replace(/^\s*[-+>*]\s+/gm, '')
+    .replace(/[*_~`]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (plainText.length <= maxLength) return plainText;
+
+  const shortened = plainText.slice(0, maxLength + 1);
+  const lastSpace = shortened.lastIndexOf(' ');
+  const cutoff = lastSpace > maxLength * 0.6 ? lastSpace : maxLength;
+
+  return `${shortened.slice(0, cutoff).trimEnd()}…`;
+}

@@ -66,6 +66,20 @@ describe('SiteSidenav visibility', () => {
 });
 
 describe('SiteSidenav navigation', () => {
+  it('includes the sitewide wiki list in the primary navigation', () => {
+    const wrapper = mountNav();
+
+    expect(wrapper.get('[data-testid="nav-link-Wikis"]').text()).toBe('Wikis');
+  });
+
+  it('navigates to the sitewide wiki list and closes the nav', async () => {
+    const wrapper = mountNav();
+
+    await wrapper.get('[data-testid="nav-link-Wikis"]').trigger('click');
+
+    expect(h.push).toHaveBeenCalledWith({ name: 'wiki-search' });
+  });
+
   it('navigates and closes the nav when a primary link is clicked', async () => {
     const wrapper = mountNav();
 
@@ -124,7 +138,9 @@ describe('SiteSidenav search', () => {
     await searchButton(wrapper)!.trigger('click');
 
     expect(h.push).toHaveBeenCalledWith(
-      expect.objectContaining({ query: expect.objectContaining({ searchInput: undefined }) })
+      expect.objectContaining({
+        query: expect.objectContaining({ searchInput: undefined }),
+      })
     );
   });
 
