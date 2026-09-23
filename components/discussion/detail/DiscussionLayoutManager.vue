@@ -102,6 +102,7 @@ const emit = defineEmits<{
       :discussion-id="discussionId"
       :channel-id="channelId"
       :aggregate-comment-count="aggregateCommentCount"
+      :label-options="activeDiscussionChannel?.LabelOptions || []"
     />
   </div>
 </template>

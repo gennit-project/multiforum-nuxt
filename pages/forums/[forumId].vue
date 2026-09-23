@@ -351,7 +351,7 @@ definePageMeta({
             v-if="showDiscussionTitle"
             class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600"
           >
-            <div class="max-w-[theme(screens.2xl)] flex-1">
+            <div class="mx-auto w-full flex-1 xl:max-w-6xl xl:pl-4">
               <DiscussionTitleEditForm>
                 <BackLink
                   :data-testid="'discussion-detail-back-link'"
@@ -364,7 +364,7 @@ definePageMeta({
             v-else-if="showDownloadTitle"
             class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600"
           >
-            <div class="max-w-[theme(screens.2xl)] flex-1 pr-1">
+            <div class="mx-auto w-full flex-1 pr-1 xl:max-w-6xl">
               <DiscussionTitleEditForm>
                 <BackLink
                   :data-testid="'download-detail-back-link'"
@@ -400,7 +400,11 @@ definePageMeta({
             </div>
           </div>
 
-          <div class="relative w-full">
+          <div
+            class="relative w-full"
+            :class="showDiscussionTitle ? 'mx-auto xl:max-w-6xl' : ''"
+            data-testid="forum-detail-content-row"
+          >
             <div
               class="flex flex-col divide-x divide-gray-300 md:flex-row dark:divide-gray-500"
             >

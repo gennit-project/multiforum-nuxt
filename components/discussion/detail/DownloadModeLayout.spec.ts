@@ -141,28 +141,12 @@ describe('DownloadModeLayout album present', () => {
 });
 
 describe('DownloadModeLayout sidebar and votes', () => {
-  it('renders metadata below the album in the left column', () => {
-    const wrapper = mountLayout({
-      discussion: discussion({ Album: { Images: [{ id: 'i1' }] } }),
-    });
+  it('leaves metadata rendering to the description tab', () => {
+    const wrapper = mountLayout();
 
-    expect(
-      wrapper.getComponent({ name: 'DownloadMetadata' }).props('labelOptions')
-    ).toEqual(labelOptions);
-    expect({
-      followsAlbum: Boolean(
-        wrapper
-          .get('.album')
-          .element.compareDocumentPosition(wrapper.get('.metadata').element) &
-        Node.DOCUMENT_POSITION_FOLLOWING
-      ),
-      precedesSidebar: Boolean(
-        wrapper
-          .get('.metadata')
-          .element.compareDocumentPosition(wrapper.get('.sidebar').element) &
-        Node.DOCUMENT_POSITION_FOLLOWING
-      ),
-    }).toEqual({ followsAlbum: true, precedesSidebar: true });
+    expect(wrapper.findComponent({ name: 'DownloadMetadata' }).exists()).toBe(
+      false
+    );
   });
 
   it('renders the download sidebar', () => {

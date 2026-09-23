@@ -374,6 +374,47 @@ describe('forum shell page', () => {
     }
   );
 
+  it('aligns the discussion title bar with the full detail layout', async () => {
+    mockState.route.name = 'forums-forumId-discussions-discussionId';
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+
+    expect(
+      Array.from(
+        wrapper.findComponent(DiscussionTitleEditFormStub).element.parentElement
+          ?.classList || []
+      )
+    ).toEqual(
+      expect.arrayContaining(['mx-auto', 'w-full', 'xl:max-w-6xl', 'xl:pl-4'])
+    );
+  });
+
+  it('constrains the discussion and metadata columns as one layout', async () => {
+    mockState.route.name = 'forums-forumId-discussions-discussionId';
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+
+    expect(
+      wrapper.get('[data-testid="forum-detail-content-row"]').classes()
+    ).toEqual(expect.arrayContaining(['mx-auto', 'xl:max-w-6xl']));
+  });
+
+  it('aligns the download title bar with the centered detail content', async () => {
+    mockState.route.name = 'forums-forumId-downloads-discussionId';
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+
+    expect(
+      Array.from(
+        wrapper.findComponent(DiscussionTitleEditFormStub).element.parentElement
+          ?.classList || []
+      )
+    ).toEqual(expect.arrayContaining(['mx-auto', 'w-full', 'xl:max-w-6xl']));
+  });
+
   it('renders a selected discussion in the split panel', async () => {
     mockState.route.name = 'forums-forumId-discussions';
     mockState.route.query = { selectedDiscussionId: 'discussion-1' };

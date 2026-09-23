@@ -33,12 +33,19 @@ const mountPage = async () => {
 };
 
 describe('discussion detail page', () => {
+  it('constrains and centers the detail content at desktop widths', async () => {
+    const wrapper = await mountPage();
+    expect(wrapper.classes()).toEqual(
+      expect.arrayContaining(['mx-auto', 'w-full', 'xl:max-w-6xl'])
+    );
+  });
+
   it('renders the discussion detail content when an id is present', async () => {
     routeParams.discussionId = 'd1';
     const wrapper = await mountPage();
-    expect(wrapper.findComponent(DiscussionDetailContent).props('discussionId')).toBe(
-      'd1'
-    );
+    expect(
+      wrapper.findComponent(DiscussionDetailContent).props('discussionId')
+    ).toBe('d1');
   });
 
   it('shows an error banner when there is no discussion id', async () => {

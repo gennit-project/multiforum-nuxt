@@ -7,7 +7,6 @@ import MarkAsAnsweredButton from '@/components/discussion/detail/MarkAsAnsweredB
 import DownloadSidebar from '@/components/channel/DownloadSidebar.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import CrosspostedDiscussionEmbed from '@/components/discussion/detail/CrosspostedDiscussionEmbed.vue';
-import DownloadMetadata from '@/components/download/DownloadMetadata.vue';
 import { useUsername } from '@/composables/useAuthState';
 
 const usernameVar = useUsername();
@@ -160,10 +159,6 @@ const markdownImagesEnabled = computed(
           </div>
         </template>
       </DiscussionBody>
-      <DownloadMetadata
-        v-if="activeDiscussionChannel"
-        :label-options="activeDiscussionChannel.LabelOptions || []"
-      />
     </div>
     <div class="shrink-0">
       <DownloadSidebar

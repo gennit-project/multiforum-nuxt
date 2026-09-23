@@ -73,6 +73,14 @@ beforeEach(() => {
 });
 
 describe('download detail page wrapper', () => {
+  it('constrains and centers the detail content at desktop widths', async () => {
+    const wrapper = await mountPage();
+
+    expect(wrapper.classes()).toEqual(
+      expect.arrayContaining(['mx-auto', 'w-full', 'xl:max-w-6xl'])
+    );
+  });
+
   it('uses the download-specific query for SSR metadata', async () => {
     await mountPage();
 

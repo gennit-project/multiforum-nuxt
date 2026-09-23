@@ -3,10 +3,14 @@ import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
 
 const mockHasPipelineContent = ref(true);
-const h = vi.hoisted(() => ({ useQuery: vi.fn() }));
+const h = vi.hoisted(() => ({
+  useQuery: vi.fn(),
+  route: { name: 'forums-forumId-downloads-discussionId' },
+}));
 
 vi.mock('nuxt/app', () => ({
   useRouter: () => ({ push: vi.fn() }),
+  useRoute: () => h.route,
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -36,6 +40,7 @@ const NuxtLinkStub = {
 };
 
 const mountNav = async (routeName: string) => {
+  h.route.name = routeName;
   const Component = (await import('./DownloadTabNavigation.vue')).default;
   return shallowMount(Component, {
     props: {
@@ -43,6 +48,14 @@ const mountNav = async (routeName: string) => {
       channelId: 'cats',
       aggregateCommentCount: 5,
       discussion: { DownloadableFiles: [{ id: 'file-1' }] },
+      labelOptions: [
+        {
+          id: 'label-1',
+          value: 'park',
+          displayName: 'Park',
+          group: { key: 'lot-type', displayName: 'Lot type' },
+        },
+      ],
     },
     global: {
       mocks: { $route: { name: routeName } },
@@ -52,6 +65,11 @@ const mountNav = async (routeName: string) => {
         MarkdownPreview: true,
         PublicCollectionListItem: true,
         PencilIcon: true,
+        DownloadMetadata: {
+          name: 'DownloadMetadata',
+          props: ['labelOptions'],
+          template: '<div class="metadata" />',
+        },
       },
     },
   });
@@ -120,5 +138,25 @@ describe('DownloadTabNavigation', () => {
     );
 
     expect(wrapper.text()).toContain('Pipelines');
+  });
+
+  it('renders metadata within the Description tab', async () => {
+    const wrapper = await mountNav(
+      'forums-forumId-downloads-discussionId-description'
+    );
+
+    expect(
+      wrapper.getComponent({ name: 'DownloadMetadata' }).props('labelOptions')
+    ).toHaveLength(1);
+  });
+
+  it('hides metadata outside the Description tab', async () => {
+    const wrapper = await mountNav(
+      'forums-forumId-downloads-discussionId-comments'
+    );
+
+    expect(wrapper.findComponent({ name: 'DownloadMetadata' }).exists()).toBe(
+      false
+    );
   });
 });
