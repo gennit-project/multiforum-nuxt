@@ -144,7 +144,7 @@ useHead(metaData);
 
 <template>
   <div
-    class="relative w-full max-w-[theme(screens.2xl)] flex-1 overflow-hidden p-0 focus:outline-none xl:order-last"
+    class="relative mx-auto w-full flex-1 overflow-hidden p-0 focus:outline-none xl:order-last xl:max-w-6xl"
   >
     <div class="flex w-full justify-center space-y-4 overflow-x-hidden">
       <ErrorBanner v-if="!discussionId" text="Download not found" />
@@ -159,8 +159,8 @@ useHead(metaData);
   </div>
 </template>
 
-<style>
-h1 {
+<style scoped>
+:deep(h1) {
   font-size: 2.65em;
   padding-bottom: 0.3em;
 }

@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { useRouter } from 'nuxt/app';
-import type { Discussion } from '@/__generated__/graphql';
+import { useRoute, useRouter } from 'nuxt/app';
+import type { Discussion, FilterOption } from '@/__generated__/graphql';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
+import DownloadMetadata from '@/components/download/DownloadMetadata.vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD } from '@/graphQLData/collection/queries';
 import PublicCollectionListItem from '@/components/collection/PublicCollectionListItem.vue';
@@ -29,9 +30,14 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  labelOptions: {
+    type: Array as () => FilterOption[],
+    default: () => [],
+  },
 });
 
 const router = useRouter();
+const route = useRoute();
 
 const loggedInUserIsAuthor = computed(() => {
   return props.discussion?.Author?.username === usernameVar.value;
@@ -64,6 +70,13 @@ const { hasPipelineContent } = useSharedDownloadPipelineOverview(
   computed(() => props.discussionId),
   computed(() => props.channelId),
   { pollWhileActive: false }
+);
+
+const isDescriptionTab = computed(
+  () =>
+    typeof route.name === 'string' &&
+    (route.name === 'forums-forumId-downloads-discussionId' ||
+      route.name.includes('description'))
 );
 </script>
 
@@ -191,6 +204,11 @@ const { hasPipelineContent } = useSharedDownloadPipelineOverview(
           </div>
         </div>
       </div>
+      <DownloadMetadata
+        v-if="isDescriptionTab"
+        class="mx-2 mt-4"
+        :label-options="labelOptions"
+      />
     </div>
   </div>
 
