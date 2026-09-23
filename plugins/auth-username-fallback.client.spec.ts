@@ -8,7 +8,9 @@ import plugin from '@/plugins/auth-username-fallback.client';
 const h = vi.hoisted(() => ({
   isAuthenticated: { value: true } as { value: boolean },
   username: { value: '' } as { value: string },
+  setIsAuthenticated: vi.fn(),
   setUsername: vi.fn(),
+  setEmail: vi.fn(),
   setModProfileName: vi.fn(),
   setProfilePicURL: vi.fn(),
   setNotificationCount: vi.fn(),
@@ -22,22 +24,30 @@ vi.mock('nuxt/app', () => ({
 vi.mock('@/composables/useAuthState', () => ({
   useIsAuthenticated: () => h.isAuthenticated,
   useUsername: () => h.username,
+  setIsAuthenticated: h.setIsAuthenticated,
   setUsername: h.setUsername,
+  setEmail: h.setEmail,
   setModProfileName: h.setModProfileName,
   setProfilePicURL: h.setProfilePicURL,
   setNotificationCount: h.setNotificationCount,
 }));
 
-const start = () => {
-  (plugin as (nuxtApp: { hook: (name: string, callback: () => void) => void }) => void)({
+const start = (serverRendered = true) => {
+  (
+    plugin as (nuxtApp: {
+      payload: { serverRendered: boolean };
+      hook: (name: string, callback: () => void) => void;
+    }) => void
+  )({
+    payload: { serverRendered },
     hook: (name, callback) => {
       if (name === 'app:mounted') h.appMounted = callback;
     },
   });
 };
 
-const run = async () => {
-  start();
+const run = async (serverRendered = true) => {
+  start(serverRendered);
   h.appMounted?.();
   await flushPromises();
 };
@@ -49,6 +59,7 @@ const resolvedUser = (user: Record<string, unknown> | null) => ({
       ? {
           isAuthenticated: true,
           username: user.username,
+          email: user.email,
           profilePicURL: user.profilePicURL,
           modProfileName: user.modProfileName,
           notificationCount: user.unreadNotificationCount,
@@ -64,6 +75,7 @@ const resolvedUser = (user: Record<string, unknown> | null) => ({
 
 const fullUser = {
   username: 'cluse',
+  email: 'cluse@example.com',
   profilePicURL: 'https://pics/cluse.png',
   modProfileName: 'mod-cluse',
   unreadNotificationCount: 4,
@@ -111,10 +123,53 @@ describe('auth-username-fallback plugin: resolves when authenticated but usernam
   });
 });
 
+describe('auth-username-fallback plugin: bootstraps client-rendered routes', () => {
+  beforeEach(() => {
+    h.isAuthenticated.value = false;
+  });
+
+  it('does not fetch for an anonymous server-rendered route', async () => {
+    await run(true);
+    expect(h.fetch).not.toHaveBeenCalled();
+  });
+
+  it('loads the session profile for an initially anonymous client-rendered route', async () => {
+    await run(false);
+    expect(h.fetch).toHaveBeenCalledOnce();
+  });
+
+  it('seeds authentication and email from a valid server session', async () => {
+    await run(false);
+    expect(h.setIsAuthenticated).toHaveBeenCalledWith(true);
+    expect(h.setEmail).toHaveBeenCalledWith('cluse@example.com');
+  });
+
+  it('seeds the application profile from a valid server session', async () => {
+    await run(false);
+    expect(h.setUsername).toHaveBeenCalledWith('cluse');
+    expect(h.setModProfileName).toHaveBeenCalledWith('mod-cluse');
+    expect(h.setProfilePicURL).toHaveBeenCalledWith('https://pics/cluse.png');
+    expect(h.setNotificationCount).toHaveBeenCalledWith(4);
+  });
+
+  it('keeps the client anonymous when the server has no session', async () => {
+    h.fetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ isAuthenticated: false }),
+    });
+    await run(false);
+    expect(h.setIsAuthenticated).not.toHaveBeenCalled();
+    expect(h.setUsername).not.toHaveBeenCalled();
+  });
+});
+
 describe('auth-username-fallback plugin: skips resolution when not needed', () => {
   it.each([
     ['username is already resolved', () => (h.username.value = 'cluse')],
-    ['the session is not authenticated', () => (h.isAuthenticated.value = false)],
+    [
+      'the session is not authenticated',
+      () => (h.isAuthenticated.value = false),
+    ],
   ])('does not call the backend when %s', async (_label, setup) => {
     setup();
     await run();

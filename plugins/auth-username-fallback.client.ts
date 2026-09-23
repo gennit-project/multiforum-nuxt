@@ -1,6 +1,6 @@
 // plugins/auth-username-fallback.client.ts
 //
-// Client-side fallback for the app username.
+// Client-side fallback for the session-backed auth profile.
 //
 // The app identity username (e.g. "cluse") is resolved server-side during SSR
 // in server/middleware/2.auth-session.ts (Auth0 email -> backend getOwnEmail ->
@@ -16,16 +16,22 @@
 // the toggle handlers bail on `if (!usernameVar.value) return` and the favorite
 // mutations require the username.
 //
-// This plugin restores a minimal client fallback: when the session is
-// authenticated but username is still empty, resolve it from the server session
-// and seed the auth state. Using a same-origin Nitro endpoint avoids depending
-// on browser token storage, which is brittle in some embedded browser
-// environments.
+// This plugin restores a minimal client fallback in two cases:
+//   1. SSR established the session but could not resolve the username, or
+//   2. the route is client-rendered (`ssr: false`), so no SSR auth payload exists.
+//
+// The second case is especially important for pipeline pages: they deliberately
+// avoid SSR to stay under Vercel's function timeout, but a client-only page must
+// still import the valid server session after it mounts. Using a same-origin
+// Nitro endpoint avoids depending on browser token storage, which is brittle in
+// some embedded browser environments.
 import { defineNuxtPlugin } from 'nuxt/app';
 import {
   useIsAuthenticated,
   useUsername,
+  setIsAuthenticated,
   setUsername,
+  setEmail,
   setModProfileName,
   setProfilePicURL,
   setNotificationCount,
@@ -34,12 +40,13 @@ import {
 type AuthProfileResponse = {
   isAuthenticated?: boolean;
   username?: string | null;
+  email?: string | null;
   profilePicURL?: string | null;
   modProfileName?: string | null;
   notificationCount?: number | null;
 };
 
-const resolveUsername = async () => {
+const resolveAuthProfile = async () => {
   try {
     const res = await fetch('/api/session/profile', {
       credentials: 'include',
@@ -48,11 +55,18 @@ const resolveUsername = async () => {
     if (!res.ok) return;
 
     const profile = (await res.json()) as AuthProfileResponse;
-    if (!profile?.username) return;
+    if (!profile?.isAuthenticated) return;
+
+    if (!useIsAuthenticated().value) {
+      setIsAuthenticated(true);
+    }
+    if (profile.email) {
+      setEmail(profile.email);
+    }
 
     // Only seed if SSR still hasn't filled it in (avoid clobbering a value that
     // arrived between scheduling and resolving).
-    if (!useUsername().value) {
+    if (profile.username && !useUsername().value) {
       setUsername(profile.username);
     }
     if (profile.modProfileName) {
@@ -80,8 +94,13 @@ export default defineNuxtPlugin((nuxtApp) => {
   // hydration, so defer the fallback until the server tree is fully adopted.
   nuxtApp.hook('app:mounted', () => {
     // Re-check after mounting because another source may have resolved the
-    // username while the app was starting.
-    if (!isAuthenticated.value || username.value) return;
-    void resolveUsername();
+    // profile while the app was starting. Anonymous SSR routes already have a
+    // definitive server answer, so only client-rendered routes bootstrap an
+    // initially anonymous state with an additional request.
+    const needsClientRenderedSession =
+      nuxtApp.payload.serverRendered === false && !isAuthenticated.value;
+    const needsUsernameFallback = isAuthenticated.value && !username.value;
+    if (!needsClientRenderedSession && !needsUsernameFallback) return;
+    void resolveAuthProfile();
   });
 });
