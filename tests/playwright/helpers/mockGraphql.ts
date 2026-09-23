@@ -36,6 +36,14 @@ const defaultAgeHandlers: GraphQLHandlers = {
   }),
 };
 
+// Keep scenario-specific fixtures compatible when a production query is split
+// into focused operations. The legacy handler remains the single source of the
+// discussion state each scenario is trying to model.
+const legacyOperationAliases: Record<string, string> = {
+  getDiscussionDetail: 'getDiscussion',
+  getDiscussionActivity: 'getDiscussion',
+};
+
 type CompletedOperation = {
   operationName: string;
   variables?: Record<string, unknown>;
@@ -127,8 +135,11 @@ export async function installGraphqlMocks(
       variables: body.variables,
     });
 
+    const legacyOperationName = legacyOperationAliases[operationName];
     const handler =
-      handlers[operationName] ?? defaultAgeHandlers[operationName];
+      handlers[operationName] ??
+      (legacyOperationName ? handlers[legacyOperationName] : undefined) ??
+      defaultAgeHandlers[operationName];
     if (!handler) {
       console.error(
         `[playwright:unhandled-graphql] ${operationName} ${JSON.stringify(body.variables ?? {})}`

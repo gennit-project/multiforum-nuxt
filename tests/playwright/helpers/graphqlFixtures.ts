@@ -163,6 +163,7 @@ export type DiscussionChannelFixture = Pick<
   > & { Bots: unknown[] };
   Discussion: Pick<Discussion, 'id' | 'title'> & { Author: UserFixture };
   CommentsAggregate: CountAggregate;
+  RootCommentsAggregate: CountAggregate;
   UpvotedByUsers: Array<Pick<User, 'username'>>;
   UpvotedByUsersAggregate: CountAggregate;
   SuperUpvotedByUsers: Array<Pick<User, 'username'>>;
@@ -171,6 +172,7 @@ export type DiscussionChannelFixture = Pick<
 
 export type DiscussionFixture = Pick<
   Discussion,
+  | '__typename'
   | 'id'
   | 'title'
   | 'body'
@@ -517,6 +519,7 @@ export const buildDiscussionChannel = ({
     Author: buildUser(),
   },
   CommentsAggregate: { count: commentsCount },
+  RootCommentsAggregate: { count: commentsCount },
   UpvotedByUsers: [{ username: DEFAULT_USERNAME }],
   UpvotedByUsersAggregate: { count: 1 },
   SuperUpvotedByUsers: [],
@@ -545,6 +548,7 @@ export const buildDiscussion = ({
   commentsCount?: number;
   overrides?: Override<DiscussionFixture>;
 } = {}): DiscussionFixture => ({
+  __typename: 'Discussion',
   id,
   title,
   body,
