@@ -40,7 +40,7 @@ vi.mock('@vue/apollo-composable', () => ({
 }));
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
 vi.mock('@/graphQLData/discussion/queries', () => ({
-  GET_DISCUSSION: 'GET_DISCUSSION',
+  GET_DISCUSSION_DETAIL: 'GET_DISCUSSION_DETAIL',
   GET_DOWNLOAD_DETAIL: 'GET_DOWNLOAD_DETAIL',
 }));
 vi.mock('@/composables/useTheme', () => ({
@@ -126,10 +126,10 @@ beforeEach(() => {
 });
 
 describe('DiscussionTitleEditForm display', () => {
-  it('uses the full discussion query on discussion routes', () => {
+  it('uses the focused detail query on discussion routes', () => {
     mountForm();
 
-    expect(h.queryDocument).toBe('GET_DISCUSSION');
+    expect(h.queryDocument).toBe('GET_DISCUSSION_DETAIL');
   });
 
   it('uses the download query on download routes', () => {

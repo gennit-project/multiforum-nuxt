@@ -140,7 +140,9 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
           Album {
             id
             imageOrder
-            Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
+            Images(
+              where: { archived_NOT: true, permanentlyRemoved_NOT: true }
+            ) {
               id
               url
               alt
@@ -216,7 +218,9 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
             username
           }
           CommentsAggregate(
-            where: { OR: [{ isFeedbackComment: null }, { isFeedbackComment: false }] }
+            where: {
+              OR: [{ isFeedbackComment: null }, { isFeedbackComment: false }]
+            }
           ) {
             count
           }
@@ -398,89 +402,187 @@ export const GET_DOWNLOAD_DETAIL = gql`
   ${DISCUSSION_FLAIR_FIELDS}
 `;
 
-export const GET_DISCUSSION = gql`
+export const DISCUSSION_DETAIL_FIELDS = gql`
   ${AUTHOR_FIELDS}
   ${CROSSPOST_PREVIEW_FIELDS}
   ${SHARED_COLLECTION_PREVIEW_FIELDS}
+  fragment DiscussionDetailFields on Discussion {
+    id
+    title
+    body
+    createdAt
+    updatedAt
+    hasDownload
+    hasSensitiveContent
+    Author {
+      ...AuthorFields
+    }
+    Album {
+      id
+      imageOrder
+      Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
+        id
+        url
+        alt
+        caption
+        copyright
+        Uploader {
+          username
+          displayName
+        }
+      }
+    }
+    DiscussionChannels {
+      id
+      discussionId
+      channelUniqueName
+      weightedVotesCount
+      archived
+      answered
+      locked
+      Flairs {
+        ...DiscussionFlairFields
+      }
+      UpvotedByUsers {
+        username
+      }
+      SuperUpvotedByUsers {
+        username
+      }
+      Channel {
+        uniqueName
+        channelIconURL
+        displayName
+        feedbackEnabled
+        imageUploadsEnabled
+        markdownImagesEnabled
+        emojiEnabled
+      }
+      Discussion {
+        id
+      }
+      CommentsAggregate(where: { isFeedbackComment: false }) {
+        count
+      }
+      Answers {
+        id
+        text
+        createdAt
+        CommentAuthor {
+          ... on User {
+            username
+            displayName
+          }
+          ... on ModerationProfile {
+            displayName
+          }
+        }
+      }
+    }
+    Tags {
+      text
+    }
+    DownloadableFiles(where: { permanentlyRemoved_NOT: true }) {
+      id
+      fileName
+      url
+      kind
+      size
+      priceModel
+      priceCents
+      priceCurrency
+      downloadCountTotal
+      downloadCountUnique
+      attributionOverride
+      supportPatreonUrl
+      supportBuyMeACoffeeUrl
+      supportKoFiUrl
+      supportPayPalMeUrl
+      scanStatus
+      scanCheckedAt
+      scanReason
+      uploadedByUsername
+      license {
+        id
+        name
+      }
+    }
+    FeedbackCommentsAggregate {
+      count
+    }
+    FeedbackComments(
+      where: {
+        CommentAuthorConnection: {
+          ModerationProfile: { node: { displayName: $loggedInModName } }
+        }
+      }
+    ) {
+      id
+    }
+    CrosspostedDiscussion {
+      ...CrosspostPreviewFields
+    }
+    SharedCollection {
+      ...SharedCollectionPreviewFields
+    }
+  }
+  ${DISCUSSION_FLAIR_FIELDS}
+`;
+
+export const GET_DISCUSSION_DETAIL = gql`
+  ${DISCUSSION_DETAIL_FIELDS}
+  query getDiscussionDetail(
+    $id: ID!
+    $loggedInModName: String
+    $channelUniqueName: String!
+  ) {
+    discussions(where: { id: $id }) {
+      ...DiscussionDetailFields
+    }
+  }
+`;
+
+export const GET_DISCUSSION_ACTIVITY = gql`
+  query getDiscussionActivity($id: ID!) {
+    discussions(where: { id: $id }) {
+      id
+      PastTitleVersions(options: { sort: [{ createdAt: DESC }] }) {
+        id
+        Author {
+          username
+        }
+        body
+        editReason
+        createdAt
+      }
+      PastBodyVersions(options: { sort: [{ createdAt: DESC }] }) {
+        id
+        Author {
+          username
+        }
+        body
+        editReason
+        createdAt
+      }
+      BodyLastEditedBy {
+        username
+      }
+    }
+  }
+`;
+
+export const GET_DISCUSSION = gql`
+  ${DISCUSSION_DETAIL_FIELDS}
   query getDiscussion(
     $id: ID!
     $loggedInModName: String
     $channelUniqueName: String!
   ) {
     discussions(where: { id: $id }) {
-      id
-      title
-      body
+      ...DiscussionDetailFields
       editReason
-      createdAt
-      updatedAt
-      hasDownload
-      hasSensitiveContent
       authorIsChannelModerator(channelUniqueName: $channelUniqueName)
-      Author {
-        ...AuthorFields
-      }
-      Album {
-        id
-        imageOrder
-        Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
-          id
-          url
-          alt
-          caption
-          copyright
-          Uploader {
-            username
-            displayName
-          }
-        }
-      }
       DiscussionChannels {
-        id
-        discussionId
-        channelUniqueName
-        weightedVotesCount
-        archived
-        answered
-        locked
-        Flairs {
-          ...DiscussionFlairFields
-        }
-        UpvotedByUsers {
-          username
-        }
-        SuperUpvotedByUsers {
-          username
-        }
-        Channel {
-          uniqueName
-          channelIconURL
-          displayName
-          feedbackEnabled
-          imageUploadsEnabled
-          markdownImagesEnabled
-          emojiEnabled
-        }
-        Discussion {
-          id
-        }
-        CommentsAggregate(where: { isFeedbackComment: false }) {
-          count
-        }
-        Answers {
-          id
-          text
-          createdAt
-          CommentAuthor {
-            ... on User {
-              username
-              displayName
-            }
-            ... on ModerationProfile {
-              displayName
-            }
-          }
-        }
         LabelOptions {
           id
           value
@@ -507,46 +609,6 @@ export const GET_DISCUSSION = gql`
           }
         }
       }
-      Tags {
-        text
-      }
-      DownloadableFiles(where: { permanentlyRemoved_NOT: true }) {
-        id
-        fileName
-        url
-        kind
-        size
-        priceModel
-        priceCents
-        priceCurrency
-        downloadCountTotal
-        downloadCountUnique
-        attributionOverride
-        supportPatreonUrl
-        supportBuyMeACoffeeUrl
-        supportKoFiUrl
-        supportPayPalMeUrl
-        scanStatus
-        scanCheckedAt
-        scanReason
-        uploadedByUsername
-        license {
-          id
-          name
-        }
-      }
-      FeedbackCommentsAggregate {
-        count
-      }
-      FeedbackComments(
-        where: {
-          CommentAuthorConnection: {
-            ModerationProfile: { node: { displayName: $loggedInModName } }
-          }
-        }
-      ) {
-        id
-      }
       PastTitleVersions(options: { sort: [{ createdAt: DESC }] }) {
         id
         Author {
@@ -568,15 +630,8 @@ export const GET_DISCUSSION = gql`
       BodyLastEditedBy {
         username
       }
-      CrosspostedDiscussion {
-        ...CrosspostPreviewFields
-      }
-      SharedCollection {
-        ...SharedCollectionPreviewFields
-      }
     }
   }
-  ${DISCUSSION_FLAIR_FIELDS}
 `;
 
 export const GET_CROSSPOST_PREVIEW = gql`

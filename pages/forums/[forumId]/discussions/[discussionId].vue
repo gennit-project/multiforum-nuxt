@@ -7,7 +7,7 @@ import 'md-editor-v3/lib/style.css';
 import { useModProfileName } from '@/composables/useAuthState';
 import { useRoute, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
+import { GET_DISCUSSION_DETAIL } from '@/graphQLData/discussion/queries';
 import { buildDiscussionHead } from '@/utils/discussionSeo';
 
 const modProfileNameVar = useModProfileName();
@@ -33,7 +33,7 @@ const channelId = computed(() => {
   return '';
 });
 
-const { result: discussionResult } = useQuery(GET_DISCUSSION, {
+const { result: discussionResult } = useQuery(GET_DISCUSSION_DETAIL, {
   id: discussionId,
   loggedInModName: modProfileNameVar.value,
   channelUniqueName: channelId.value,

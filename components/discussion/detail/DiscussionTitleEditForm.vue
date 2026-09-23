@@ -11,7 +11,7 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
 import {
-  GET_DISCUSSION,
+  GET_DISCUSSION_DETAIL,
   GET_DOWNLOAD_DETAIL,
 } from '@/graphQLData/discussion/queries';
 import { DISCUSSION_TITLE_CHAR_LIMIT } from '@/utils/constants';
@@ -43,7 +43,7 @@ const {
   loading: getDiscussionLoading,
   onResult: onGetDiscussionResult,
 } = useQuery(
-  isDownloadDetailPage.value ? GET_DOWNLOAD_DETAIL : GET_DISCUSSION,
+  isDownloadDetailPage.value ? GET_DOWNLOAD_DETAIL : GET_DISCUSSION_DETAIL,
   {
     id: discussionId,
     loggedInModName: modProfileNameVar.value || '',

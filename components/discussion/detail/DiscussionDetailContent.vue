@@ -2,14 +2,11 @@
 import { computed, onMounted, ref, watch, defineAsyncComponent } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import {
-  GET_DISCUSSION,
+  GET_DISCUSSION_ACTIVITY,
+  GET_DISCUSSION_DETAIL,
   GET_DOWNLOAD_DETAIL,
 } from '@/graphQLData/discussion/queries';
-import {
-  GET_DISCUSSION_COMMENTS,
-  GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
-  GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
-} from '@/graphQLData/comment/queries';
+import { GET_DISCUSSION_COMMENTS } from '@/graphQLData/comment/queries';
 import {
   CHECK_DISCUSSION_ISSUE_EXISTENCE,
   CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
@@ -106,7 +103,7 @@ const {
   refetch: refetchDiscussion,
   onResult: onGetDiscussionResult,
 } = useQuery(
-  props.downloadMode ? GET_DOWNLOAD_DETAIL : GET_DISCUSSION,
+  props.downloadMode ? GET_DOWNLOAD_DETAIL : GET_DISCUSSION_DETAIL,
   () => ({
     id: props.discussionId,
     loggedInModName: loggedInUserModName.value,
@@ -114,6 +111,19 @@ const {
   }),
   {
     fetchPolicy: 'cache-first',
+  }
+);
+
+// Revision history is useful but noncritical to first paint. Fetching it in the
+// browser keeps potentially unbounded version lists out of the SSR response and
+// lets the discussion body, channel state, and comments render first.
+const { result: getDiscussionActivityResult } = useQuery(
+  GET_DISCUSSION_ACTIVITY,
+  () => ({ id: props.discussionId }),
+  {
+    fetchPolicy: 'cache-first',
+    enabled: computed(() => !props.downloadMode && !!props.discussionId),
+    prefetch: false,
   }
 );
 
@@ -159,8 +169,12 @@ const feedbackModalManager = ref();
 
 const discussion = computed<Discussion | null>(() => {
   const currentDiscussion = getDiscussionResult.value?.discussions?.[0];
+  const activity = getDiscussionActivityResult.value?.discussions?.[0];
+  const currentWithActivity = currentDiscussion
+    ? { ...currentDiscussion, ...(activity || {}) }
+    : null;
 
-  return currentDiscussion || lastValidDiscussion.value;
+  return currentWithActivity || lastValidDiscussion.value;
 });
 
 watch(commentSort, () =>
@@ -302,30 +316,6 @@ const loadedRootCommentCount = computed(() => {
   return rootComments.length;
 });
 
-const { result: getDiscussionChannelCommentAggregateResult } = useQuery(
-  GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
-  () => ({
-    discussionId: props.discussionId,
-    channelUniqueName: channelId.value,
-  }),
-  {
-    fetchPolicy: 'cache-first',
-    enabled: shouldLoadInlineComments,
-  }
-);
-
-const { result: getDiscussionChannelRootCommentAggregateResult } = useQuery(
-  GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
-  () => ({
-    discussionId: props.discussionId,
-    channelUniqueName: channelId.value,
-  }),
-  {
-    fetchPolicy: 'cache-first',
-    enabled: shouldLoadInlineComments,
-  }
-);
-
 // Issue-existence checks are hoisted to this always-mounted parent so they fire
 // on mount (keyed off the route's discussionId + channelId) in parallel with
 // GET_DISCUSSION, rather than waiting for the discussion to load and the gated
@@ -423,20 +413,16 @@ const imageUploadsEnabled = computed(
 );
 
 const aggregateCommentCount = computed(() => {
-  if (props.downloadMode) {
-    return formDiscussionChannel.value?.CommentsAggregate?.count || 0;
-  }
-  return (
-    getDiscussionChannelCommentAggregateResult.value?.discussionChannels?.[0]
-      ?.CommentsAggregate?.count || 0
-  );
+  return activeDiscussionChannel.value?.CommentsAggregate?.count || 0;
 });
 
 const aggregateRootCommentCount = computed(() => {
-  return (
-    getDiscussionChannelRootCommentAggregateResult.value
-      ?.discussionChannels?.[0]?.CommentsAggregate?.count || 0
-  );
+  const channel = activeDiscussionChannel.value as
+    | (DiscussionChannel & {
+        RootCommentsAggregate?: { count?: number | null } | null;
+      })
+    | null;
+  return channel?.RootCommentsAggregate?.count || 0;
 });
 
 const loadMore = () => {

@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import { GET_DISCUSSION_DETAIL } from '@/graphQLData/discussion/queries';
 
 const useHead = vi.fn();
 const routeParams: { discussionId?: string; forumId?: string } = {
@@ -38,6 +39,12 @@ describe('discussion detail page', () => {
     expect(wrapper.classes()).toEqual(
       expect.arrayContaining(['mx-auto', 'w-full', 'xl:max-w-6xl'])
     );
+  });
+
+  it('uses the focused detail query for SSR metadata', async () => {
+    await mountPage();
+
+    expect(mockedUseQuery.mock.calls[0]?.[0]).toBe(GET_DISCUSSION_DETAIL);
   });
 
   it('renders the discussion detail content when an id is present', async () => {
