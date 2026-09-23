@@ -18,6 +18,7 @@ const h = vi.hoisted(() => ({
   modName: null as unknown as Ref<string>,
   queryResult: null as unknown as Ref<QueryResultShape | undefined>,
   useHead: vi.fn(),
+  queryDocument: '',
 }));
 
 h.modName = ref('modAlice');
@@ -37,13 +38,14 @@ vi.mock('nuxt/app', () => ({
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => ({
-    result: h.queryResult,
-  }),
+  useQuery: (document: string) => {
+    h.queryDocument = document;
+    return { result: h.queryResult };
+  },
 }));
 
 vi.mock('@/graphQLData/discussion/queries', () => ({
-  GET_DISCUSSION: 'GET_DISCUSSION',
+  GET_DOWNLOAD_DETAIL: 'GET_DOWNLOAD_DETAIL',
 }));
 
 const DiscussionDetailContentStub = defineComponent({
@@ -71,6 +73,12 @@ beforeEach(() => {
 });
 
 describe('download detail page wrapper', () => {
+  it('uses the download-specific query for SSR metadata', async () => {
+    await mountPage();
+
+    expect(h.queryDocument).toBe('GET_DOWNLOAD_DETAIL');
+  });
+
   it('shows an error banner when the route discussion id is missing', async () => {
     h.route = { params: { forumId: 'cats', discussionId: null } };
 

@@ -10,7 +10,10 @@ import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discus
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
-import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
+import {
+  GET_DISCUSSION,
+  GET_DOWNLOAD_DETAIL,
+} from '@/graphQLData/discussion/queries';
 import { DISCUSSION_TITLE_CHAR_LIMIT } from '@/utils/constants';
 import { useRoute } from 'nuxt/app';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
@@ -28,17 +31,25 @@ const channelId = computed(() =>
 const discussionId = computed(() =>
   typeof route.params.discussionId === 'string' ? route.params.discussionId : ''
 );
+const isDownloadDetailPage = computed(
+  () =>
+    typeof route.name === 'string' &&
+    route.name.includes('forums-forumId-downloads-discussionId')
+);
 
 const {
   result: getDiscussionResult,
   error: getDiscussionError,
   loading: getDiscussionLoading,
   onResult: onGetDiscussionResult,
-} = useQuery(GET_DISCUSSION, {
-  id: discussionId,
-  loggedInModName: modProfileNameVar.value || '',
-  channelUniqueName: channelId.value,
-});
+} = useQuery(
+  isDownloadDetailPage.value ? GET_DOWNLOAD_DETAIL : GET_DISCUSSION,
+  {
+    id: discussionId,
+    loggedInModName: modProfileNameVar.value || '',
+    channelUniqueName: channelId.value,
+  }
+);
 
 const discussion = computed<Discussion | null>(() => {
   const discussion = getDiscussionResult.value?.discussions?.[0];
@@ -100,13 +111,6 @@ const formattedDate = computed(() => {
     day: 'numeric',
     year: 'numeric',
   });
-});
-const isDownloadDetailPage = computed(() => {
-  return (
-    route.name &&
-    typeof route.name === 'string' &&
-    route.name.includes('forums-forumId-downloads-discussionId')
-  );
 });
 </script>
 

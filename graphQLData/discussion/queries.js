@@ -276,6 +276,128 @@ export const IS_DISCUSSION_ANSWERED = gql`
   }
 `;
 
+export const GET_DOWNLOAD_DETAIL = gql`
+  ${AUTHOR_FIELDS}
+  ${CROSSPOST_PREVIEW_FIELDS}
+  query getDownloadDetail(
+    $id: ID!
+    $loggedInModName: String
+    $channelUniqueName: String!
+  ) {
+    discussions(where: { id: $id }) {
+      id
+      title
+      body
+      createdAt
+      updatedAt
+      hasDownload
+      hasSensitiveContent
+      Author {
+        ...AuthorFields
+      }
+      Album {
+        id
+        imageOrder
+        Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
+          id
+          url
+          alt
+          caption
+          copyright
+          Uploader {
+            username
+            displayName
+          }
+        }
+      }
+      DiscussionChannels(where: { channelUniqueName: $channelUniqueName }) {
+        id
+        discussionId
+        channelUniqueName
+        archived
+        answered
+        locked
+        Flairs {
+          ...DiscussionFlairFields
+        }
+        UpvotedByUsers {
+          username
+        }
+        SuperUpvotedByUsers {
+          username
+        }
+        Channel {
+          uniqueName
+          channelIconURL
+          displayName
+          feedbackEnabled
+          imageUploadsEnabled
+          markdownImagesEnabled
+          emojiEnabled
+        }
+        CommentsAggregate(where: { isFeedbackComment: false }) {
+          count
+        }
+        LabelOptions {
+          id
+          value
+          displayName
+          order
+          group {
+            id
+            key
+            displayName
+          }
+        }
+      }
+      Tags {
+        text
+      }
+      DownloadableFiles(where: { permanentlyRemoved_NOT: true }) {
+        id
+        fileName
+        url
+        kind
+        size
+        priceModel
+        priceCents
+        priceCurrency
+        downloadCountTotal
+        downloadCountUnique
+        attributionOverride
+        supportPatreonUrl
+        supportBuyMeACoffeeUrl
+        supportKoFiUrl
+        supportPayPalMeUrl
+        scanStatus
+        scanCheckedAt
+        scanReason
+        uploadedByUsername
+        license {
+          id
+          name
+        }
+      }
+      FeedbackCommentsAggregate {
+        count
+      }
+      FeedbackComments(
+        where: {
+          CommentAuthorConnection: {
+            ModerationProfile: { node: { displayName: $loggedInModName } }
+          }
+        }
+      ) {
+        id
+      }
+      CrosspostedDiscussion {
+        ...CrosspostPreviewFields
+      }
+    }
+  }
+  ${DISCUSSION_FLAIR_FIELDS}
+`;
+
 export const GET_DISCUSSION = gql`
   ${AUTHOR_FIELDS}
   ${CROSSPOST_PREVIEW_FIELDS}
