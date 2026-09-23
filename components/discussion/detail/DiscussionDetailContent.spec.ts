@@ -22,7 +22,8 @@ import {
 } from '@/graphQLData/issue/queries';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import {
-  GET_DISCUSSION,
+  GET_DISCUSSION_ACTIVITY,
+  GET_DISCUSSION_DETAIL,
   GET_DOWNLOAD_DETAIL,
 } from '@/graphQLData/discussion/queries';
 
@@ -52,7 +53,7 @@ vi.mock('@/composables/useForumRoleMembership', () => ({
 
 const DiscussionCommentsWrapperStub = {
   name: 'DiscussionCommentsWrapper',
-  props: ['comments', 'locked', 'reachedEndOfResults'],
+  props: ['aggregateCommentCount', 'comments', 'locked', 'reachedEndOfResults'],
   emits: ['load-more'],
   template: '<div class="comments-wrapper-stub" />',
 };
@@ -103,7 +104,7 @@ const stubs = {
   },
   DiscussionLayoutManager: {
     name: 'DiscussionLayoutManager',
-    props: ['activeDiscussionChannel', 'aggregateCommentCount'],
+    props: ['discussion', 'activeDiscussionChannel', 'aggregateCommentCount'],
     emits: [
       'discussion-refetch',
       'discussion-channel-refetch',
@@ -157,6 +158,7 @@ const commentSection = (comments: Comment[]) => ({
       archived: false,
       locked: false,
       CommentsAggregate: { count: comments.length },
+      RootCommentsAggregate: { count: comments.length },
       Channel: { feedbackEnabled: true, emojiEnabled: true },
       __typename: 'DiscussionChannel',
     },
@@ -195,6 +197,14 @@ const setup = (
     { discussions },
     { onResult: (cb: (r: unknown) => void) => cb({ data: { discussions } }) }
   );
+  const activityQuery = createQueryMock({
+    discussions: discussions.map((discussion) => ({
+      id: discussion.id,
+      PastTitleVersions: [],
+      PastBodyVersions: [],
+      BodyLastEditedBy: null,
+    })),
+  });
   const csData = hasCommentSection ? section : { getCommentSection: null };
   const commentSectionQuery = {
     ...createQueryMock(csData, {
@@ -204,22 +214,15 @@ const setup = (
   } as ReturnType<typeof createQueryMock> & {
     fetchMore: ReturnType<typeof vi.fn>;
   };
-  const commentAggregateQuery = createQueryMock({
-    discussionChannels: [{ CommentsAggregate: { count: comments.length } }],
-  });
-  const rootAggregateQuery = createQueryMock({
-    discussionChannels: [{ CommentsAggregate: { count: comments.length } }],
-  });
   const issueQuery = createQueryMock(issueResult);
   const commentIssueQuery = createQueryMock(commentIssueResult);
   configureApolloMocks({
     useQuery,
     queries: {
-      'getDiscussion(': discussionQuery,
+      'getDiscussionDetail(': discussionQuery,
+      'getDiscussionActivity(': activityQuery,
       'getDownloadDetail(': discussionQuery,
       getCommentSection: commentSectionQuery,
-      GetDiscussionChannelCommentAggregate: commentAggregateQuery,
-      GetDiscussionChannelRootCommentAggregate: rootAggregateQuery,
       'query getIssue': issueQuery,
       getDiscussionCommentIssue: commentIssueQuery,
     },
@@ -232,9 +235,8 @@ const setup = (
   return {
     wrapper,
     discussionQuery,
+    activityQuery,
     commentSectionQuery,
-    commentAggregateQuery,
-    rootAggregateQuery,
     issueQuery,
     commentIssueQuery,
   };
@@ -260,11 +262,11 @@ describe('DiscussionDetailContent', () => {
     auth.username.value = '';
   });
 
-  it('uses the full query for discussions and the slim query for downloads', () => {
+  it('uses focused detail queries for discussions and downloads', () => {
     setup();
     expect(
       asMock(useQuery).mock.calls.some(
-        ([document]) => document === GET_DISCUSSION
+        ([document]) => document === GET_DISCUSSION_DETAIL
       )
     ).toBe(true);
 
@@ -275,6 +277,12 @@ describe('DiscussionDetailContent', () => {
         ([document]) => document === GET_DOWNLOAD_DETAIL
       )
     ).toBe(true);
+  });
+
+  it('defers discussion revision history until after SSR', () => {
+    setup();
+
+    expect(getQueryOptions(GET_DISCUSSION_ACTIVITY).prefetch).toBe(false);
   });
 
   it('renders the discussion header for a loaded discussion', () => {
@@ -317,16 +325,12 @@ describe('DiscussionDetailContent', () => {
 
     const { wrapper } = setup({
       discussions: [discussion],
+      hasCommentSection: false,
       componentProps: { downloadMode: true },
     });
 
-    expect(
-      [
-        GET_DISCUSSION_COMMENTS,
-        GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
-        GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
-      ].map((query) => unref(getQueryOptions(query).enabled))
-    ).toEqual([false, false, false]);
+    expect(unref(getQueryOptions(GET_DISCUSSION_COMMENTS).enabled)).toBe(false);
+    expect(unref(getQueryOptions(GET_DISCUSSION_ACTIVITY).enabled)).toBe(false);
     expect(
       wrapper
         .findComponent({ name: 'DiscussionLayoutManager' })
@@ -335,6 +339,29 @@ describe('DiscussionDetailContent', () => {
     expect(wrapper.findComponent(DiscussionCommentsWrapperStub).exists()).toBe(
       false
     );
+  });
+
+  it('reads total and root comment counts from the comment-section query', () => {
+    const { wrapper } = setup({
+      comments: [makeComment('a'), makeComment('b')],
+      discussionChannelOverrides: {
+        RootCommentsAggregate: { count: 1 },
+      },
+    });
+
+    expect(
+      wrapper
+        .findComponent(DiscussionCommentsWrapperStub)
+        .props('aggregateCommentCount')
+    ).toBe(2);
+    expect(
+      [
+        GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
+        GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
+      ].every((query) =>
+        asMock(useQuery).mock.calls.every(([document]) => document !== query)
+      )
+    ).toBe(true);
   });
 
   it('prefetches the channel with the forum layout cache key', () => {

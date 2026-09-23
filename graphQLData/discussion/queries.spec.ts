@@ -1,8 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { print } from 'graphql';
-import { GET_DOWNLOAD_DETAIL } from './queries';
+import {
+  GET_DISCUSSION_ACTIVITY,
+  GET_DISCUSSION_DETAIL,
+  GET_DOWNLOAD_DETAIL,
+} from './queries';
 
 const source = print(GET_DOWNLOAD_DETAIL);
+const discussionSource = print(GET_DISCUSSION_DETAIL);
+const activitySource = print(GET_DISCUSSION_ACTIVITY);
 
 describe('GET_DOWNLOAD_DETAIL', () => {
   it('keeps the fields required by the initial download view', () => {
@@ -23,5 +29,32 @@ describe('GET_DOWNLOAD_DETAIL', () => {
     expect(source).not.toContain('BodyLastEditedBy');
     expect(source).not.toContain('SharedCollection');
     expect(source).not.toContain('Answers');
+  });
+});
+
+describe('GET_DISCUSSION_DETAIL', () => {
+  it('keeps fields required by the initial discussion view', () => {
+    expect(discussionSource).toContain('query getDiscussionDetail');
+    expect(discussionSource).toContain('DiscussionChannels');
+    expect(discussionSource).toContain('Answers');
+    expect(discussionSource).toContain('SharedCollection');
+    expect(discussionSource).toContain('CrosspostedDiscussion');
+  });
+
+  it('leaves revision and label activity out of the initial response', () => {
+    expect(discussionSource).not.toContain('LabelChangeHistory');
+    expect(discussionSource).not.toContain('PastTitleVersions');
+    expect(discussionSource).not.toContain('PastBodyVersions');
+    expect(discussionSource).not.toContain('BodyLastEditedBy');
+    expect(discussionSource).not.toContain('LabelOptions');
+  });
+});
+
+describe('GET_DISCUSSION_ACTIVITY', () => {
+  it('loads the revision fields deferred from the initial response', () => {
+    expect(activitySource).toContain('query getDiscussionActivity');
+    expect(activitySource).toContain('PastTitleVersions');
+    expect(activitySource).toContain('PastBodyVersions');
+    expect(activitySource).toContain('BodyLastEditedBy');
   });
 });
