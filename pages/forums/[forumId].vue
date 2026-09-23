@@ -570,8 +570,10 @@ definePageMeta({
                 />
               </div>
               <div
-                v-if="showChannelSidebarOnDetail && mdAndUp"
-                class="hidden md:flex md:w-1/3 md:flex-col md:overflow-y-auto"
+                v-if="
+                  showChannelSidebarOnDetail && (showDiscussionTitle || mdAndUp)
+                "
+                class="flex w-full flex-col border-t border-gray-300 md:w-1/3 md:overflow-y-auto md:border-t-0 dark:border-gray-600"
                 tabindex="0"
                 role="region"
                 aria-label="Forum sidebar"
@@ -579,6 +581,7 @@ definePageMeta({
                 <ChannelSidebar
                   v-if="channel"
                   :channel="channel"
+                  :use-scrollbar="mdAndUp"
                   class="px-4"
                   @refetch-channel-data="handleRefetchChannelData"
                 />

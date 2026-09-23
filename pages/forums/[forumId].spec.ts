@@ -90,6 +90,7 @@ const EventDetailStub = defineComponent({
 
 const ChannelSidebarStub = defineComponent({
   name: 'ChannelSidebar',
+  props: { useScrollbar: Boolean },
   template: '<div class="channel-sidebar-stub" />',
 });
 
@@ -497,6 +498,20 @@ describe('forum shell page', () => {
     ]);
 
     expect(wrapper.findComponent(ChannelSidebarStub).exists()).toBe(false);
+  });
+
+  it('stacks the discussion sidebar below the main content on mobile', async () => {
+    mockState.route.name = 'forums-forumId-discussions-discussionId';
+    (mockState.mdAndUp as { value: boolean }).value = false;
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+    const sidebar = wrapper.findComponent(ChannelSidebarStub);
+
+    expect({
+      exists: sidebar.exists(),
+      usesNestedScrollbar: sidebar.props('useScrollbar'),
+    }).toEqual({ exists: true, usesNestedScrollbar: false });
   });
 
   it('builds SEO metadata from the loaded channel', async () => {
