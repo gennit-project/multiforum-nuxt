@@ -533,6 +533,23 @@ describe('forum shell page', () => {
     }).toEqual({ exists: true, usesNestedScrollbar: false });
   });
 
+  it('lets discussion metadata flow with the page on desktop', async () => {
+    mockState.route.name = 'forums-forumId-discussions-discussionId';
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+
+    expect({
+      columnIsScrollable: wrapper
+        .get('[data-testid="forum-detail-sidebar"]')
+        .classes()
+        .includes('md:overflow-y-auto'),
+      usesNestedScrollbar: wrapper
+        .getComponent(ChannelSidebarStub)
+        .props('useScrollbar'),
+    }).toEqual({ columnIsScrollable: false, usesNestedScrollbar: false });
+  });
+
   it('builds SEO metadata from the loaded channel', async () => {
     const description = 'x'.repeat(170);
     await mountWith([

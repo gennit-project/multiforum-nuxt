@@ -84,8 +84,8 @@ useHead(metaData);
   </div>
 </template>
 
-<style>
-h1 {
+<style scoped>
+:deep(h1) {
   font-size: 2.65em;
   padding-bottom: 0.3em;
 }

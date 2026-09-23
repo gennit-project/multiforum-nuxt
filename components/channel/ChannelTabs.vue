@@ -324,7 +324,11 @@ watch([mdAndUp, tabs, tabRoutes], preloadMobileTabRoutes);
       </nav>
 
       <!-- Mobile Dropdown (sm and down) -->
-      <div v-else class="relative">
+      <div
+        v-else
+        class="relative py-4"
+        data-testid="mobile-channel-nav-container"
+      >
         <Popper>
           <template #default>
             <button

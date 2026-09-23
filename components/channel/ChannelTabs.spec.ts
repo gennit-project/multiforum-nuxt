@@ -200,6 +200,15 @@ describe('ChannelTabs routing and active state', () => {
 });
 
 describe('ChannelTabs mobile layout', () => {
+  it('adds vertical space around the mobile dropdown', () => {
+    (h.mdAndUp as { value: boolean }).value = false;
+    const wrapper = mountTabs();
+
+    expect(
+      wrapper.get('[data-testid="mobile-channel-nav-container"]').classes()
+    ).toContain('py-4');
+  });
+
   it('renders the active tab label in the mobile dropdown', () => {
     (h.mdAndUp as { value: boolean }).value = false;
     const wrapper = mountTabs();
