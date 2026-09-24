@@ -30,6 +30,7 @@ import {
   extractDownloadLabels,
   mapDownloadableFiles,
 } from '@/utils/downloadEditForm';
+import { buildDownloadableFilesUpdateInput } from '@/utils/downloadFileHelpers';
 
 const modProfileNameVar = useModProfileName();
 
@@ -129,25 +130,21 @@ const getDefaultFormValues = (): CreateEditDiscussionFormValues => {
   if (discussion.value) {
     // Extract existing download labels from DiscussionChannel
     const downloadLabels: Record<string, string[]> = {};
-    const primaryDiscussionChannel =
-      discussion.value.DiscussionChannels.find(
-        (dc: DiscussionChannel) =>
-          dc.Channel?.uniqueName === channelId.value
-      );
+    const primaryDiscussionChannel = discussion.value.DiscussionChannels.find(
+      (dc: DiscussionChannel) => dc.Channel?.uniqueName === channelId.value
+    );
 
     if (primaryDiscussionChannel?.LabelOptions) {
       // Group labels by their filter group key
-      primaryDiscussionChannel.LabelOptions.forEach(
-        (option: FilterOption) => {
-          const groupKey = option.group?.key;
-          if (groupKey) {
-            if (!downloadLabels[groupKey]) {
-              downloadLabels[groupKey] = [];
-            }
-            downloadLabels[groupKey].push(option.value);
+      primaryDiscussionChannel.LabelOptions.forEach((option: FilterOption) => {
+        const groupKey = option.group?.key;
+        if (groupKey) {
+          if (!downloadLabels[groupKey]) {
+            downloadLabels[groupKey] = [];
           }
+          downloadLabels[groupKey].push(option.value);
         }
-      );
+      });
     }
 
     return {
@@ -198,9 +195,7 @@ const getDefaultFormValues = (): CreateEditDiscussionFormValues => {
   };
 };
 
-const formValues = ref<CreateEditDiscussionFormValues>(
-  getDefaultFormValues()
-);
+const formValues = ref<CreateEditDiscussionFormValues>(getDefaultFormValues());
 
 const dataLoaded = ref(false);
 
@@ -253,11 +248,9 @@ const existingTags = computed(() => {
   ) {
     return [];
   }
-  return getDiscussionResult.value.discussions[0].Tags.map(
-    (tag: TagData) => {
-      return tag.text;
-    }
-  );
+  return getDiscussionResult.value.discussions[0].Tags.map((tag: TagData) => {
+    return tag.text;
+  });
 });
 
 // Function to get album update input
@@ -302,6 +295,10 @@ const updateDiscussionInput = computed<DiscussionUpdateInput>(() => {
 
   // Get album update input
   const albumUpdateInput = getAlbumUpdateInput();
+  const downloadableFilesUpdateInput = buildDownloadableFilesUpdateInput({
+    originalFiles: discussion.value?.DownloadableFiles,
+    currentFiles: formValues.value.downloadableFiles,
+  });
 
   const result: DiscussionUpdateInput = {
     title: formValues.value.title,
@@ -313,6 +310,7 @@ const updateDiscussionInput = computed<DiscussionUpdateInput>(() => {
       },
     ],
     ...albumUpdateInput, // Include album data
+    ...downloadableFilesUpdateInput,
   };
   return result;
 });
@@ -333,13 +331,9 @@ const {
     },
     updateDiscussionInput: updateDiscussionInput.value,
     channelConnections: channelConnections.value,
-    channelDisconnections: discussion.value.DiscussionChannels.filter(
-      (dc) => {
-        return !channelConnections.value.includes(
-          dc.Channel?.uniqueName || ''
-        );
-      }
-    ).map((dc) => {
+    channelDisconnections: discussion.value.DiscussionChannels.filter((dc) => {
+      return !channelConnections.value.includes(dc.Channel?.uniqueName || '');
+    }).map((dc) => {
       return dc.Channel?.uniqueName;
     }),
   },

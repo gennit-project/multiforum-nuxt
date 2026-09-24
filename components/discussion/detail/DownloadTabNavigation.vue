@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import type { Discussion, FilterOption } from '@/__generated__/graphql';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
@@ -12,6 +12,11 @@ import { useUsername } from '@/composables/useAuthState';
 import { useSharedDownloadPipelineOverview } from '@/composables/useDownloadPipelineOverview';
 
 const usernameVar = useUsername();
+const hasMounted = ref(false);
+
+onMounted(() => {
+  hasMounted.value = true;
+});
 
 const props = defineProps({
   discussionId: {
@@ -217,7 +222,7 @@ const isDescriptionTab = computed(
       Public collections featuring this download
     </h3>
     <div
-      v-if="publicCollectionsLoading"
+      v-if="!hasMounted || publicCollectionsLoading"
       class="text-sm text-gray-600 dark:text-gray-300"
     >
       Loading collections...

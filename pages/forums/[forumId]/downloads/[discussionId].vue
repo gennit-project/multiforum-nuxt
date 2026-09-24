@@ -4,12 +4,13 @@ import { ref, computed, watchEffect } from 'vue';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import 'md-editor-v3/lib/style.css';
-import { useModProfileName } from '@/composables/useAuthState';
+import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { useRoute, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_DOWNLOAD_DETAIL } from '@/graphQLData/discussion/queries';
 
 const modProfileNameVar = useModProfileName();
+const usernameVar = useUsername();
 
 const route = useRoute();
 
@@ -35,6 +36,7 @@ watchEffect(() => {
 const { result: discussionResult } = useQuery(GET_DOWNLOAD_DETAIL, {
   id: discussionId,
   loggedInModName: modProfileNameVar.value,
+  loggedInUsername: usernameVar.value || null,
   channelUniqueName: channelId.value,
 });
 

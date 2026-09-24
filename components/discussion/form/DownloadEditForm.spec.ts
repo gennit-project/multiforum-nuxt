@@ -11,12 +11,13 @@ const h = vi.hoisted(() => ({
   createDownloadableFile: undefined as unknown,
   permanentlyDeleteDownloadableFile: undefined as unknown,
   updateMutate: undefined as unknown,
+  updateOptions: undefined as unknown,
   uploadLink: undefined as unknown,
   onDoneCb: { fn: undefined as undefined | (() => void) },
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useMutation: (document: unknown) => {
+  useMutation: (document: unknown, options?: unknown) => {
     const operationName = (
       document as {
         definitions?: Array<{ name?: { value?: string } }>;
@@ -33,9 +34,11 @@ vi.mock('@vue/apollo-composable', () => ({
         loading: ref(false),
         error: ref(null),
       };
+    h.updateOptions = options;
     return {
       mutate: h.updateMutate,
       error: ref(null),
+      options,
       onDone: (cb: () => void) => {
         h.onDoneCb.fn = cb;
       },
@@ -159,6 +162,7 @@ beforeEach(() => {
     },
   });
   h.updateMutate = vi.fn().mockResolvedValue({});
+  h.updateOptions = undefined;
   h.uploadLink = vi.fn().mockResolvedValue('http://files/new.stl');
 });
 
@@ -413,6 +417,23 @@ describe('DownloadEditForm upload', () => {
         }
       ).downloadableFiles.some((f) => f.id === 'new1')
     ).toBe(true);
+  });
+
+  it('attaches the uploaded file to an existing discussion', async () => {
+    const wrapper = mountForm();
+
+    await setFiles(wrapper, '#downloadable-file-input', [
+      new File(['x'], 'new.stl'),
+    ]);
+
+    expect(h.updateMutate).toHaveBeenCalledOnce();
+    const options = h.updateOptions as () => {
+      variables: { updateDiscussionInput: unknown };
+    };
+    expect(options().variables.updateDiscussionInput).toEqual({
+      hasDownload: true,
+      DownloadableFiles: [{ connect: [{ where: { node: { id: 'new1' } } }] }],
+    });
   });
 
   it('surfaces an error when the file is too large', async () => {
