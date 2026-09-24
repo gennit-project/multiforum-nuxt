@@ -100,7 +100,8 @@ const populatedDiscussion = () => ({
 let capturedOnResult: ((value: unknown) => void) | null = null;
 
 const setupQueries = (
-  discussion: Record<string, unknown> = emptyDiscussion()
+  discussion: Record<string, unknown> = emptyDiscussion(),
+  discussionLoading = false
 ) => {
   capturedOnResult = null;
   mockedUseQuery
@@ -109,7 +110,7 @@ const setupQueries = (
       onResult: (cb: (value: unknown) => void) => {
         capturedOnResult = cb;
       },
-      loading: ref(false),
+      loading: ref(discussionLoading),
       error: ref(null),
     })
     .mockReturnValueOnce({
@@ -121,9 +122,10 @@ const setupQueries = (
 
 const loadPage = async (
   requireAuthStub: unknown,
-  discussion?: Record<string, unknown>
+  discussion?: Record<string, unknown>,
+  discussionLoading = false
 ) => {
-  setupQueries(discussion);
+  setupQueries(discussion, discussionLoading);
   const Page = (await import('./[discussionId].vue')).default;
   return shallowMount(Page, {
     global: { stubs: { RequireAuth: requireAuthStub } },
@@ -151,6 +153,13 @@ describe('download edit page', () => {
     );
     expect(wrapper.findComponent(CreateEditDiscussionFields).exists()).toBe(
       false
+    );
+  });
+
+  it('does not show permission denied while the discussion is loading', async () => {
+    const wrapper = await loadPage(RequireAuthDeniedStub, undefined, true);
+    expect(wrapper.text()).not.toContain(
+      'You do not have permission to see this page.'
     );
   });
 
