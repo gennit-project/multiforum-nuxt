@@ -57,6 +57,18 @@ describe('TabButton active state', () => {
     expect(wrapper.find('a').classes()).toContain('border-orange-500');
   });
 
+  it('does not apply a conflicting transparent border when active', () => {
+    const wrapper = mountTab({ isActive: true });
+
+    expect(wrapper.find('a').classes()).not.toContain('border-transparent');
+  });
+
+  it('does not apply the inactive dark text color when active', () => {
+    const wrapper = mountTab({ isActive: true });
+
+    expect(wrapper.find('a').classes()).not.toContain('dark:text-gray-400');
+  });
+
   it('is active when the route path matches', () => {
     h.route = { path: '/forums/cats' };
     const wrapper = mountTab();
@@ -68,6 +80,12 @@ describe('TabButton active state', () => {
     const wrapper = mountTab();
 
     expect(wrapper.find('a').classes()).toContain('text-gray-500');
+  });
+
+  it('uses a transparent border when inactive', () => {
+    const wrapper = mountTab();
+
+    expect(wrapper.find('a').classes()).toContain('border-transparent');
   });
 
   it('uses background highlight for an active vertical tab', () => {
