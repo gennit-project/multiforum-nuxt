@@ -9,6 +9,7 @@ import {
 
 const SERVICE_UNAVAILABLE_MESSAGE =
   'The backend service is temporarily unavailable. Please try again later.';
+const UPSTREAM_TIMEOUT_MS = 45_000;
 
 const buildUnavailableGraphqlResponse = (
   event: Parameters<typeof defineEventHandler>[0] extends (event: infer T) => unknown
@@ -61,6 +62,9 @@ export default defineEventHandler(async (event) => {
       method,
       headers,
       body,
+      // Finish before the Vercel function's 60-second ceiling so callers get a
+      // valid GraphQL error instead of an opaque platform-level 504.
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     });
   } catch {
     return buildUnavailableGraphqlResponse(event);

@@ -252,6 +252,14 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: process.env.NITRO_PRESET || 'vercel',
+    // Nuxt bundles pages, middleware, and API routes into one Vercel Function.
+    // The GraphQL proxy can legitimately wait for a pre-download security scan,
+    // which exceeds Vercel's 15-second non-Fluid default on a cold scanner.
+    vercel: {
+      functions: {
+        maxDuration: 60,
+      },
+    },
     // `sanitize-html` (used by composables/useMarkdownRenderer.ts) is CommonJS
     // and does `require('htmlparser2')`. When Nitro externalizes it, the Vercel
     // serverless function performs that require at runtime — which crashes with
