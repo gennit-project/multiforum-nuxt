@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { print } from 'graphql';
+import { buildSchema, NoUnusedVariablesRule, print, validate } from 'graphql';
 import {
   GET_DISCUSSION_ACTIVITY,
   GET_DISCUSSION_DETAIL,
@@ -9,6 +9,19 @@ import {
 const source = print(GET_DOWNLOAD_DETAIL);
 const discussionSource = print(GET_DISCUSSION_DETAIL);
 const activitySource = print(GET_DISCUSSION_ACTIVITY);
+const discussionValidationSchema = buildSchema(`
+  type Query {
+    discussions(where: DiscussionWhere): [Discussion!]!
+  }
+
+  input DiscussionWhere {
+    id: ID
+  }
+
+  type Discussion {
+    id: ID!
+  }
+`);
 
 describe('GET_DOWNLOAD_DETAIL', () => {
   it('keeps the fields required by the initial download view', () => {
@@ -33,6 +46,14 @@ describe('GET_DOWNLOAD_DETAIL', () => {
 });
 
 describe('GET_DISCUSSION_DETAIL', () => {
+  it('does not declare variables unused by the focused query', () => {
+    expect(
+      validate(discussionValidationSchema, GET_DISCUSSION_DETAIL, [
+        NoUnusedVariablesRule,
+      ])
+    ).toEqual([]);
+  });
+
   it('keeps fields required by the initial discussion view', () => {
     expect(discussionSource).toContain('query getDiscussionDetail');
     expect(discussionSource).toContain('DiscussionChannels');
