@@ -12,6 +12,7 @@ import { useQuery, useMutation } from '@vue/apollo-composable';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import type {
   Discussion,
   DiscussionChannel,
@@ -410,10 +411,16 @@ void updateLabelsLoading;
 </script>
 <template>
   <ClientOnly>
+    <div
+      v-if="getDiscussionLoading"
+      class="flex min-h-[400px] items-center justify-center"
+    >
+      <LoadingSpinner label="Checking permissions…" />
+    </div>
     <RequireAuth
+      v-else
       :require-ownership="true"
       :owners="ownerList"
-      :loading="getDiscussionLoading"
     >
       <template #has-auth>
         <CreateEditDiscussionFields
@@ -443,9 +450,7 @@ void updateLabelsLoading;
     </RequireAuth>
     <template #fallback>
       <div class="flex min-h-[400px] items-center justify-center">
-        <div
-          class="h-12 w-12 animate-spin rounded-full border-b-2 border-blue-500"
-        />
+        <LoadingSpinner label="Checking permissions…" />
       </div>
     </template>
   </ClientOnly>
