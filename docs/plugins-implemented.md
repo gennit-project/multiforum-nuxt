@@ -1,498 +1,176 @@
-# Plugins Feature - Implemented Features
-
-This document describes the completed plugin system functionality.
-
-## Overview
-
-The Multiforum plugin system allows server administrators to extend platform functionality through installable plugins. Plugins can process file uploads, scan for security threats, auto-label content, and more.
-
-## Architecture
-
-### Plugin Lifecycle
-
-1. **Registry** - Plugins are published to a registry (HTTP URL or GCS bucket)
-2. **Allow** - Server admin allows a plugin for use on their server
-3. **Install** - A specific version is installed
-4. **Configure** - Secrets and settings are configured
-5. **Enable** - Plugin is activated and runs in pipelines
-6. **Execute** - Plugin runs when triggered by events
-
-### Event-Driven Execution
-
-Plugins execute in response to events at two scopes:
-
-**Server-Scoped Events** (configured by server admin):
-- `downloadableFile.created` - When a file is uploaded
-- `downloadableFile.updated` - When a file is modified
-
-**Channel-Scoped Events** (configured by channel admin):
-- `discussionChannel.created` - When a discussion with download is submitted to a channel
-
-> **Note:** the download-create flow did not actually fire the
-> `downloadableFile.created` trigger until the backend fix in
-> [multiforum-backend#152](https://github.com/gennit-project/multiforum-backend/pull/152)
-> (the event and pipeline config existed, but uploads never invoked download
-> plugins). `discussionChannel.created` was wired up already.
-
-Plugins run in configurable pipelines with ordering, conditions, and error handling.
-
----
-
-## Backend Features (gennit-backend)
-
-### Plugin CRUD Operations
-- Install plugins from registry
-- Enable/disable plugins per server
-- Configure plugin secrets with AES-256-GCM encryption
-- Configure plugin settings via JSON
-
-### Plugin Registry Support
-- HTTP-based registries
-- GCS (Google Cloud Storage) registries
-- Registry JSON format with plugin metadata and versions
-- SHA256 integrity verification for plugin tarballs
-
-### Pipeline Execution Engine
-- GitHub Actions-style pipeline configuration
-- Conditional execution: `ALWAYS`, `PREVIOUS_SUCCEEDED`, `PREVIOUS_FAILED`
-- Pipeline-level `stopOnFirstFailure` option
-- Step-level `continueOnError` option
-- Fallback to running all enabled plugins if no pipeline defined
-
-### Execution Tracking
-- `PluginRun` records for each execution
-- Status tracking: `PENDING`, `RUNNING`, `SUCCEEDED`, `FAILED`, `SKIPPED`
-- Pipeline grouping via `pipelineId`
-- Execution order tracking
-- Skip reason recording
-- Duration tracking in milliseconds
-- Scope tracking: `SERVER` or `CHANNEL`
-
-### Channel-Scoped Pipeline Support (Phase 9.1-9.4, 9.8)
-- Channel admins can configure pipelines for `discussionChannel.created` event
-- Pipelines stored in `Channel.pluginPipelines` JSON field
-- Only server-enabled plugins can be used in channel pipelines
-- Automatic trigger when discussion with download is submitted to channel
-- Pipeline errors logged but don't fail discussion creation
-- Plugin context includes channel metadata:
-  - `uniqueName` - Channel's unique identifier
-  - `displayName` - Channel's display name
-  - `tags` - Channel's tags
-  - `filterGroups` - Channel's filter configuration with options (for auto-labeling)
-
-### GraphQL API
-
-**Queries:**
-- `getAvailablePlugins` - List plugins from registry
-- `getInstalledPlugins` - List installed plugins with enabled status
-- `getPipelineRuns` - Get execution history for a target
-- `getServerPluginSecrets` - Get secret validation status
-
-**Mutations:**
-- `allowServerPlugin` - Allow a plugin for use
-- `disallowServerPlugin` - Remove plugin from allowed list
-- `installServerPluginVersion` - Install specific version
-- `enableServerPlugin` - Enable with settings
-- `disableServerPlugin` - Disable plugin
-- `setServerPluginSecret` - Store encrypted secret
-- `updatePluginPipelines` - Configure server-level pipeline execution order
-- `updateChannelPluginPipelines` - Configure channel-level pipeline execution order
-
----
-
-## Frontend Features (multiforum-nuxt)
-
-### Plugin Management Page (`/admin/settings/plugins`)
-
-**Plugin List:**
-- View all available, allowed, and installed plugins
-- Search/filter by name, description, or ID
-- Status filter (all/available/allowed/installed/enabled)
-- Sort by name or status with direction toggle
-- Per-button loading states for allow/disallow actions
-- Description preview in list view
-- Empty state with getting started instructions
-
-**Actions:**
-- Allow/disallow plugins for server use
-- Navigate to plugin detail for configuration
-
-### Plugin Detail Page (`/admin/settings/plugins/[pluginId]`)
-
-**Plugin Information:**
-- Display name, version, description
-- Author name with link to author URL
-- Homepage link
-- License badge
-- Tags as chips
-- README markdown rendering
-- "View Source" link to repository
-
-**Configuration:**
-- Enable/disable toggle (only shown when installed)
-- Secret configuration with validation
-- Dynamic settings form generated from plugin schema
-
-**Secret Management:**
-- Password input with show/hide toggle
-- Validation status indicator (Not Set, Set (untested), Valid, Invalid)
-- "Validate" button with loading spinner
-- Error message display from validation
-- Last validated timestamp
-
-### Dynamic Forms (Phase 4)
-
-**Form Generation:**
-- Automatic form generation from plugin's `ui.forms` schema
-- Support for field types: text, textarea, number, boolean, select, secret
-- Validation based on schema: min/max, minLength/maxLength, pattern, required
-- Default value handling from schema
-- Dark mode support
-
-**Components:**
-- `PluginSettingsForm.vue` - Main form container
-- `PluginTextField.vue` - Text/textarea inputs
-- `PluginNumberField.vue` - Number input with range hints
-- `PluginBooleanField.vue` - Toggle switch
-- `PluginSelectField.vue` - Dropdown select
-- `PluginSecretField.vue` - Password with validation status
-
-### Pipeline View (Phase 3)
-
-**Pipeline Display:**
-- Shows each plugin as a pipeline stage
-- Status icons: pending (gray), running (spinner), success (green check), failed (red X), skipped (gray)
-- Duration display for completed stages
-- Auto-refreshing while pipeline is running (polling)
-- Expandable stages for details
-
-**Components:**
-- `PluginPipeline.vue` - Main pipeline display
-- `PluginPipelineStage.vue` - Individual stage
-- `usePluginPipeline.ts` - Data fetching composable with polling
-
-**Integration:**
-- Pipeline section in download sidebar
-- Shows pipeline progress after file upload
-- View logs button for execution details
-
-### Pipeline Logs Modal
-
-**Features:**
-- Modal showing detailed logs for a pipeline run
-- Syntax highlighting for JSON payloads
-- Timestamp for each log entry
-- Copy button for logs
-- Filter by log level (info, warn, error)
-
-### Pipeline Configuration UI (Phase 7)
-
-**Hybrid YAML/Visual Editor:**
-- Mode toggle between YAML and Visual editing
-- Bidirectional conversion preserves data
-
-**YAML Mode (Primary):**
-- Monaco editor with YAML syntax highlighting
-- JSON Schema validation with error hints
-- Plugin ID autocomplete
-- Dark mode support
-- Parse error display
-- Available plugins reference panel
-- Available events reference panel
-
-**Visual Mode (Alternative):**
-- Drag-and-drop step reordering
-- Plugin dropdown selection
-- Condition selector per step
-- Toggle switches for options
-- Add/remove step buttons
-- Empty state guidance
-
-**Server Pipeline Configuration Page (`/admin/settings/plugins/pipelines`):**
-- Load current pipeline config from ServerConfig
-- Save validation before submission
-- Info banner explaining pipeline concepts
-- Link from plugin management index page
-
-### Channel Pipeline Configuration UI (Phase 9.5-9.6)
-
-**Channel Pipeline Page (`/forums/[forumId]/edit/pipelines`):**
-- Integrated into forum settings navigation as "Pipelines" tab
-- Reuses `PluginPipelineEditor` with `scope="channel"` prop
-- Shows only channel-relevant events (`discussionChannel.created`)
-- Loads/saves from Channel's `pluginPipelines` field
-- Info banner explaining channel pipeline behavior
-- Warning if no server plugins are enabled
-
-**Schema Updates:**
-- Added `PipelineScope` type ('server' | 'channel')
-- Added `scope` property to `PIPELINE_EVENTS`
-- Added `getEventsForScope()` helper function
-- Added `getDefaultPipelineYaml(scope)` for scope-specific defaults
-- Added `getPipelineJsonSchema(scope)` for Monaco validation
-- Updated `validatePipelineConfig()` to accept scope parameter
-
-**Component Updates:**
-- `PluginPipelineEditor.vue` - Added `scope` prop, uses scoped events/defaults
-- `PipelineVisualEditor.vue` - Added `events` prop for scope-filtered display
-
-### Public Pipeline View
-
-Pipeline history now lives in the public **Pipelines** tab on download detail
-pages.
-
-The view:
-- shows configured server and channel checks before they run;
-- distinguishes `NOT_REQUIRED`, `NOT_EXECUTED`, active, and terminal states;
-- displays newest-first attempt history and ordered jobs;
-- displays bounded public diagnostics and documentation links;
-- provides stable attempt permalinks;
-- auto-polls while any attempt is active.
-
-The download sidebar retains only a compact status and **View checks** link.
-
-**Updated Files:**
-- `composables/useDownloadPipelineOverview.ts`
-- `components/plugins/PublicDownloadPipelines.vue`
-- `components/plugins/DownloadPipelineStatusSummary.vue`
-- `pages/forums/[forumId]/downloads/[discussionId]/pipelines.vue`
-
-### Plugin Version Management (Phase 5)
-
-**Goal**: Allow server admins to see when plugin updates are available and easily update to newer versions.
-
-**Backend Changes** (`gennit-backend`):
-- Updated `getInstalledPlugins` resolver to fetch plugin registry
-- Added semver-style version comparison logic
-- New fields on `InstalledPlugin` type:
-  - `hasUpdate: Boolean` - True when a newer version exists in registry
-  - `latestVersion: String` - The newest available version
-  - `availableVersions: [String!]` - All versions from registry, sorted newest first
-
-**Frontend - Plugin List Page** (`pages/admin/settings/plugins/index.vue`):
-- "Update Available" badge next to version when `hasUpdate` is true
-- Shows latest available version in the badge
-- "Update" button appears for plugins with available updates
-- Clicking "Update" navigates to detail page with `?update=true` param
-
-**Frontend - Plugin Detail Page** (`pages/admin/settings/plugins/[pluginId].vue`):
-- Prominent "Update Available" banner when newer version exists
-- Shows installed vs latest version comparison
-- "Update to vX.Y.Z" button for one-click updates
-- Version dropdown marks versions as "(Installed)" or "(Latest)"
-- Auto-selects latest version when accessing with `?update=true` query param
-- Number of available registry versions shown in update banner
-
-**Version Comparison Logic**:
-- Handles semver-style versions (major.minor.patch)
-- Supports 'v' prefix (e.g., "v1.0.0" treated same as "1.0.0")
-- Gracefully handles non-standard version strings
-
-### Channel Pipeline Unit Tests (Phase 9.9)
-
-**New Test Files**:
-- `utils/pipelineSchema.spec.ts` - 36 tests
-- `pages/forums/[forumId]/edit/pipelines.spec.ts` - 12 tests
-
-**Test Coverage**:
-- Pipeline events (server vs channel scope)
-- `getEventsForScope()` filtering
-- `SERVER_PIPELINE_EVENTS` and `CHANNEL_PIPELINE_EVENTS` constants
-- Pipeline conditions (ALWAYS, PREVIOUS_SUCCEEDED, PREVIOUS_FAILED)
-- JSON Schema generation for different scopes
-- Default YAML templates per scope
-- `validatePipelineConfig()` with scope-aware event validation
-- Channel pipeline page loading/error states
-- Available plugins filtering (only enabled server plugins)
-- Scope configuration passed to editor
-- Pipeline execution order documentation
-
-### Documentation & E2E Tests (Phase 8)
-
-**In-App Documentation Page** (`pages/admin/settings/plugins/docs.vue`):
-- Comprehensive plugin system documentation
-- Table of contents with anchor links
-- Sections covering:
-  - Overview and plugin lifecycle
-  - Setting up a plugin registry (with JSON format examples)
-  - Creating a plugin (tarball structure, manifest format, entry point)
-  - Configuring pipelines (server vs channel, YAML examples)
-  - Troubleshooting common issues
-- Documentation link added to plugin management page
-
-**E2E Tests**:
-- Plugin management page loading and navigation
-- Documentation page content verification
-- Pipeline configuration page access
-- Plugin detail page navigation
-- Update flow indicators
-- Search and filter controls
-- Back navigation links
-
-**Updated Files**:
-- `pages/admin/settings/plugins/index.vue` - Added "Documentation" link
-- Playwright coverage added for the plugin management flow
-
----
-
-## Plugins Repository (multiforum-plugins)
-
-### Release Model (Plugin-Scoped)
-
-- Each plugin is versioned independently via its `plugin.json.version`.
-- Releases are tagged per plugin (recommended: `<plugin-id>@<version>`).
-- Registries may host any subset of plugins and should preserve older versions.
-
-### Available Plugins
-
-1. **hello-world** - Demo plugin for testing
-2. **security-attachment-scan** - VirusTotal integration for malware scanning
-3. **auto-labeler** - Stub plugin for channel-scoped auto-labeling (Phase 9.8)
-   - Receives `discussionChannel.created` events
-   - Logs available filter groups from channel context
-   - Returns error with filter summary for debugging
-   - Ready for implementation of actual labeling logic
-
-### CI/CD Pipeline
-- GitHub Actions workflow for building and publishing (plugin-scoped releases)
-- Registry merging (preserves existing plugins and older versions)
-- GCS deployment for plugin artifacts
-- Deterministic tarball bundling
-- SHA256 integrity hashes
-
----
-
-## Unit Tests
-
-### Frontend (multiforum-nuxt)
-
-#### Phase 3 - Pipeline View
-- `composables/usePluginPipeline.spec.ts` - 17 tests
-- `components/plugins/PluginPipeline.spec.ts` - 14 tests
-- `components/plugins/PluginPipelineStage.spec.ts` - 12 tests
-- `components/plugins/PluginLogsModal.spec.ts` - 13 tests
-
-#### Phase 4 - Dynamic Forms
-- `components/plugins/fields/pluginFields.spec.ts` - 27 tests
-
-#### Phase 6 - UI Polish
-- `pages/admin/settings/plugins/index.spec.ts` - 19 tests
-- `pages/admin/settings/plugins/pluginDetail.spec.ts` - 17 tests
-
-#### Phase 7 - Pipeline Configuration
-- `components/plugins/pipelineEditor.spec.ts` - 72 tests
-
-#### Phase 9.9 - Channel Pipeline Unit Tests
-- `utils/pipelineSchema.spec.ts` - 36 tests
-- `pages/forums/[forumId]/edit/pipelines.spec.ts` - 12 tests
-
-### Backend (gennit-backend)
-
-#### Phase 7 - Server Pipeline Configuration
-- `customResolvers/mutations/updatePluginPipelines.test.ts` - Pipeline validation tests
-
-#### Phase 9.1-9.4 - Channel Pipeline Support
-- `customResolvers/mutations/updateChannelPluginPipelines.test.ts` - 10 tests
-  - Channel event validation
-  - Server event rejection for channel pipelines
-  - Structure validation
-- `services/pluginRunner.test.ts` - 11 tests
-  - `shouldRunStep()` condition logic
-  - `generatePipelineId()` format and uniqueness
-  - `isSupportedEvent()` server event detection
-  - `isChannelEvent()` channel event detection
-
----
-
-## Configuration Examples
-
-### Server Pipeline YAML Configuration
+# Plugin system: implemented behavior
+
+This document is the maintained engineering summary of Multiforum's plugin
+system. It describes shipped behavior rather than the order in which features
+were developed.
+
+## Lifecycle and trust boundaries
+
+A server administrator can discover a plugin from a configured registry,
+allow it, install an exact version, configure settings and encrypted secrets,
+and enable that installed version. Enabling a plugin only makes it available
+to pipelines: it does not subscribe the plugin to every event automatically.
+
+Plugin packages run in the backend process. Expensive or risky work should be
+delegated to a separately isolated service. The first-party attachment scanner
+uses this pattern: the TypeScript plugin sends an authenticated request to a
+Python scan service, which fetches and inspects the untrusted file.
+
+Registry artifacts are checked against their SHA-256 integrity metadata.
+Plugin compatibility metadata can require a minimum Multiforum server version
+and plugin API version. Each pipeline job snapshots the resolved plugin version
+and configuration used for that attempt.
+
+## Events and scope
+
+Pipelines are explicit ordered policies stored on either `ServerConfig` or a
+`Channel`.
+
+| Event | Supported scope | Purpose |
+| --- | --- | --- |
+| `downloadableFile.created` | Server | Run checks when a file is uploaded. |
+| `downloadableFile.updated` | Server | Run checks when the file is replaced or modified. |
+| `downloadableFile.downloaded` | Server | Run a check when a download request needs a fresh result. |
+| `comment.created` | Server and channel | Run comment automation; a matching channel pipeline takes precedence over the server pipeline. |
+| `discussionChannel.created` | Channel | Run automation when a discussion is submitted to a channel. |
+
+Channel owners configure channel pipelines at
+`/forums/[forumId]/edit/pipelines`. They can only use plugin versions that a
+server administrator has installed and enabled. A channel policy cannot
+disable or bypass a server policy.
+
+The pipeline editor's YAML uses `plugin` for a step identifier and translates
+it to the GraphQL/backend field `pluginId` when saving. The declarative
+configuration manifest is an API-facing format and therefore uses `pluginId`
+directly.
 
 ```yaml
 pipelines:
   - event: downloadableFile.created
-    stopOnFirstFailure: false
-    steps:
-      - plugin: security-attachment-scan
-        condition: ALWAYS
-        continueOnError: false
-      - plugin: auto-labeler
-        condition: PREVIOUS_SUCCEEDED
-        continueOnError: true
-```
-
-### Channel Pipeline YAML Configuration
-
-```yaml
-pipelines:
-  - event: discussionChannel.created
+    applicability: NEW_FILES_ONLY
     stopOnFirstFailure: true
     steps:
-      - plugin: auto-labeler
+      - plugin: security-attachment-scan
+        version: "0.5.1"
         condition: ALWAYS
         continueOnError: false
 ```
 
-Note: Channel pipelines can only use the `discussionChannel.created` event and can only reference plugins that are enabled at the server level.
+Steps support `ALWAYS`, `PREVIOUS_SUCCEEDED`, and `PREVIOUS_FAILED` conditions,
+plus step-level `continueOnError` and pipeline-level `stopOnFirstFailure`.
+There is no implicit “run every enabled plugin” fallback.
 
-### Channel Plugin Event Payload
+## Download checks and rollout policy
 
-When a channel pipeline is triggered, plugins receive this context:
+Download pipeline applicability is an explicit policy:
 
-```json
-{
-  "type": "discussionChannel.created",
-  "payload": {
-    "discussionId": "abc123",
-    "discussionTitle": "Awesome Mod v1.2",
-    "discussionBody": "Check out this mod!",
-    "downloadableFileId": "file123",
-    "fileName": "awesome-mod-v1.2.zip",
-    "fileSize": 2468421632,
-    "fileUrl": "https://storage.example.com/...",
-    "channel": {
-      "uniqueName": "gaming-mods",
-      "displayName": "Gaming Mods",
-      "tags": ["gaming", "mods"],
-      "filterGroups": [
-        {
-          "id": "fg1",
-          "key": "platform",
-          "displayName": "Platform",
-          "mode": "SINGLE",
-          "order": 0,
-          "options": [
-            { "id": "opt1", "value": "windows", "displayName": "Windows", "order": 0 },
-            { "id": "opt2", "value": "linux", "displayName": "Linux", "order": 1 }
-          ]
-        }
-      ]
-    }
-  }
-}
-```
+- `NEW_FILES_ONLY` requires the check for file versions uploaded on or after
+  the policy effective time;
+- `ALL_FILES_GRADUAL` creates a controlled existing-file backfill campaign;
+- `ALL_FILES_IMMEDIATE` immediately applies the policy to existing files.
 
-### Plugin Manifest UI Schema
+The applicability decision, policy ID, effective time, target file version,
+and campaign ID are retained with attempts. Replacing a binary creates a new
+file version and requires a new decision; a prior clean result or manual
+release does not carry forward.
 
-```json
-{
-  "ui": {
-    "forms": {
-      "server": [
-        {
-          "title": "API Configuration",
-          "fields": [
-            {
-              "key": "scanTimeoutMs",
-              "type": "number",
-              "label": "Scan Timeout (ms)",
-              "default": 45000,
-              "validation": { "min": 5000, "max": 120000 }
-            }
-          ]
-        }
-      ]
-    }
-  }
-}
-```
+Campaigns support preview, rate and concurrency controls, pause/resume, and
+completed/running/failed/timed-out totals.
+
+## Attempts, jobs, and recovery
+
+A pipeline attempt contains ordered jobs. Attempt states are `QUEUED`,
+`RUNNING`, `SUCCEEDED`, `FAILED`, `TIMED_OUT`, and `CANCELLED`. Jobs additionally
+support `PENDING` and `SKIPPED`.
+
+Only one attempt can be active for the same target, event, scope, channel, and
+file version. Execution leases and heartbeats identify abandoned work. The
+watchdog marks an expired job and attempt timed out and releases the active
+attempt lock so an eligible person can retry.
+
+The uploader or discussion author can start a required check that has not run.
+A channel moderator with `canEditDiscussions` can do the same for downloads in
+that channel. Those users can retry only the latest failed, timed-out, or
+cancelled attempt for the unchanged file version. Retries have a one-minute
+cooldown and a limit of three retry attempts in a rolling hour.
+
+## Public history and private logs
+
+When a visible download has applicable checks or history, its detail page has a
+public **Pipelines** tab. It shows planned checks before execution, current and
+past attempts, ordered job statuses, stable attempt links, and deliberately
+published public diagnostics. The tab follows the visibility of its target; it
+does not make removed or otherwise hidden content public.
+
+Public diagnostics are structured, bounded, and sanitized before storage.
+They are not a projection of arbitrary plugin logs. Internal payloads and logs
+remain restricted to users with plugin-management permission and can contain
+operational or provider details that are unsafe to repost publicly.
+
+## Security scan and logical quarantine
+
+The first-party `security-attachment-scan` plugin version `0.5.1` handles the
+three `downloadableFile.*` events. It calls the separate scan service with an
+`X-API-Key`; the shared backend secret is `SCAN_SERVICE_API_KEY` and must match
+the service's `SCAN_API_KEY`. The VirusTotal key is configured on the scan
+service, not in Multiforum.
+
+The plugin publishes share-safe codes including `SCAN_COMPLETE`,
+`SCAN_NOT_APPLICABLE`, `SCAN_SUSPICIOUS`, `SCAN_MALWARE_DETECTED`,
+`SCAN_PROVIDER_ERROR`, and `SCAN_CONFIGURATION_REQUIRED`. A correlation ID
+connects a public diagnostic to private backend and scan-service logs without
+exposing a signed file URL.
+
+Files in `PENDING`, `SUSPICIOUS`, `INFECTED`, or `FAILED` are logically
+quarantined and cannot be downloaded. A successful check sets `CLEAN`. Users
+with the server's `canPermanentlyRemoveImage` moderation permission can review
+the security queue and release quarantine with a required audit reason. The
+release preserves the failed or suspicious pipeline history and notifies the
+uploader.
+
+If the same security scanner is selected in both a server upload policy and a
+channel submission policy, the server requirement takes precedence and the
+channel trigger does not scan the same bytes a second time.
+
+## Administration surfaces
+
+- `/admin/settings/plugins` manages allowed, installed, and enabled versions.
+- `/admin/settings/plugins/[pluginId]` manages server settings and secrets.
+- `/admin/settings/plugins/pipelines` manages server pipelines and existing-file
+  campaigns.
+- `/forums/[forumId]/edit/plugins` manages channel plugin settings.
+- `/forums/[forumId]/edit/pipelines` manages channel pipelines.
+- The admin dashboard contains the download security review queue and pipeline
+  health information.
+
+## Declarative configuration
+
+Operators can keep desired server plugin state in source control with the
+`multiforum.gennit.dev/v1alpha1` manifest and the backend's `mfctl` command.
+`plan` previews drift without resolving plugin secrets; `apply` preflights and
+then installs versions, writes resolved secrets, configures and enables
+plugins, and updates the complete managed server pipeline list.
+
+The format is additive for plugins: an omitted plugin is not disabled or
+uninstalled. Pipelines are different: omitting `pipelines` leaves them
+unmanaged, while `pipelines: []` manages them as an empty list. Secret values
+remain in the operator's environment or CI secret store and are write-only.
+
+The backend reference is `docs/plugin-configuration-reconciliation.md` in the
+backend repository. The public operator guide contains the supported CLI and
+machine-identity workflow.
+
+## Source locations
+
+- Pipeline schema and editor translation: `utils/pipelineSchema.ts` and
+  `utils/pipelineUtils.ts`
+- Public pipeline UI: `components/plugins/PublicDownloadPipelines.vue`
+- Server pipeline page: `pages/admin/settings/plugins/pipelines.vue`
+- Channel pipeline page: `pages/forums/[forumId]/edit/pipelines.vue`
+- Download pipeline route:
+  `pages/forums/[forumId]/downloads/[discussionId]/pipelines.vue`
+- Backend runtime and reconciliation: `services/plugin/` and
+  `customResolvers/mutations/` in `gennit-backend`
+
+Public behavior and operating procedures belong in the Multiforum public docs;
+this document exists to keep contributors oriented to the implementation.
