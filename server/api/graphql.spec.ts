@@ -56,6 +56,7 @@ describe('runtime GraphQL proxy', () => {
       expect.objectContaining({
         method: 'POST',
         body: '{"query":"{ __typename }"}',
+        signal: expect.any(AbortSignal),
         headers: {
           'content-type': 'application/json',
           authorization: 'Bearer test-token',
@@ -123,6 +124,29 @@ describe('runtime GraphQL proxy', () => {
 
   it('returns a GraphQL error payload when the backend cannot be reached', async () => {
     h.fetch.mockRejectedValue(new Error('connect ECONNREFUSED'));
+
+    const result = await (handler as (input: unknown) => Promise<unknown>)(event);
+
+    expect(h.setResponseStatus).toHaveBeenCalledWith(event, 200);
+    expect(result).toEqual({
+      data: null,
+      errors: [
+        {
+          message:
+            'The backend service is temporarily unavailable. Please try again later.',
+          extensions: {
+            code: 'SERVICE_UNAVAILABLE',
+            upstreamStatusCode: undefined,
+          },
+        },
+      ],
+    });
+  });
+
+  it('returns a GraphQL error payload when the upstream request times out', async () => {
+    h.fetch.mockRejectedValue(
+      new DOMException('The operation was aborted due to timeout', 'TimeoutError')
+    );
 
     const result = await (handler as (input: unknown) => Promise<unknown>)(event);
 
