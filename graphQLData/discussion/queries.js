@@ -531,11 +531,7 @@ export const DISCUSSION_DETAIL_FIELDS = gql`
 
 export const GET_DISCUSSION_DETAIL = gql`
   ${DISCUSSION_DETAIL_FIELDS}
-  query getDiscussionDetail(
-    $id: ID!
-    $loggedInModName: String
-    $channelUniqueName: String!
-  ) {
+  query getDiscussionDetail($id: ID!, $loggedInModName: String) {
     discussions(where: { id: $id }) {
       ...DiscussionDetailFields
     }
