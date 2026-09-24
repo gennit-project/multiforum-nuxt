@@ -180,6 +180,22 @@ describe('ChannelTabs routing and active state', () => {
     expect(tabByLabel(wrapper, 'About')?.props('isActive')).toBe(true);
   });
 
+  it('marks the Wiki tab active on a channel wiki article', () => {
+    (h.route as { path: string }).path = '/forums/cats/wiki/relationships';
+    const wrapper = mountTabs({ channel: makeChannel({ wikiEnabled: true }) });
+
+    expect(tabByLabel(wrapper, 'Wiki')?.props('isActive')).toBe(true);
+  });
+
+  it('marks the Downloads tab active on the channel download list', () => {
+    (h.route as { path: string }).path = '/forums/cats/downloads';
+    const wrapper = mountTabs({
+      channel: makeChannel({ downloadsEnabled: true }),
+    });
+
+    expect(tabByLabel(wrapper, 'Downloads')?.props('isActive')).toBe(true);
+  });
+
   it('does not mark the wiki tab active on the wiki-settings page', () => {
     (h.route as { path: string }).path = '/forums/cats/edit/wiki-settings';
     const wrapper = mountTabs({ channel: makeChannel({ wikiEnabled: true }) });
