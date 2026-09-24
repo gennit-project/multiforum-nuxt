@@ -14,7 +14,6 @@ const h = vi.hoisted(() => ({
   isLightboxOpen: null as unknown as { value: boolean },
   closeLightbox: vi.fn(),
   addImageToAlbum: vi.fn(),
-  refetchAlbumUsage: vi.fn(),
   refetchUserAlbums: vi.fn(),
   updateDone: null as null | (() => void),
 }));
@@ -84,7 +83,6 @@ const mountWith = async (
   options: {
     loading?: boolean;
     error?: unknown;
-    albumUsage?: unknown;
     userAlbums?: unknown[];
     userAlbumsLoading?: boolean;
   } = {}
@@ -94,10 +92,6 @@ const mountWith = async (
       result: ref({ images: image ? [image] : [] }),
       error: ref(options.error ?? null),
       loading: ref(options.loading ?? false),
-    })
-    .mockReturnValueOnce({
-      result: ref({ getImageAlbumUsage: options.albumUsage ?? null }),
-      refetch: h.refetchAlbumUsage,
     })
     .mockReturnValueOnce({
       result: ref({ albums: options.userAlbums ?? [] }),
@@ -129,7 +123,6 @@ beforeEach(() => {
   h.updateDone = null;
   h.updateImage.mockResolvedValue(undefined);
   h.addImageToAlbum.mockResolvedValue(undefined);
-  h.refetchAlbumUsage.mockResolvedValue(undefined);
   h.refetchUserAlbums.mockResolvedValue(undefined);
 });
 
@@ -163,6 +156,20 @@ describe('user image detail page', () => {
     expect(wrapper.find('img').attributes('src')).toBe(
       'https://img.test/photo.jpg'
     );
+  });
+
+  it('does not show albums containing the image', async () => {
+    const wrapper = await mountWith({
+      ...baseImage,
+      Albums: [
+        {
+          id: 'album-1',
+          Owner: { username: 'alice', displayName: 'Alice' },
+        },
+      ],
+    });
+
+    expect(wrapper.text()).not.toContain('Appears in');
   });
 
   it('saves an updated caption for the uploader', async () => {
@@ -250,9 +257,12 @@ describe('user image detail page', () => {
   });
 
   it('marks albums that already contain the image as saved', async () => {
-    const album = { id: 'album-1', Owner: { username: 'alice' } };
+    const album = {
+      id: 'album-1',
+      Owner: { username: 'alice' },
+      matchingImages: [{ id: 'img1' }],
+    };
     const wrapper = await mountWith(baseImage, {
-      albumUsage: { uploaderOwnedAlbums: [album], otherAlbums: [] },
       userAlbums: [{ ...album, ImagesAggregate: { count: 1 } }],
     });
     await wrapper
@@ -281,11 +291,9 @@ describe('user image detail page', () => {
 
     expect({
       mutation: h.addImageToAlbum.mock.calls[0]?.[0],
-      usageRefreshes: h.refetchAlbumUsage.mock.calls.length,
       albumRefreshes: h.refetchUserAlbums.mock.calls.length,
     }).toEqual({
       mutation: { albumId: 'album-2', imageId: 'img1' },
-      usageRefreshes: 1,
       albumRefreshes: 2,
     });
   });
@@ -414,37 +422,6 @@ describe('user image detail page', () => {
     expect(wrapper.findComponent({ name: 'AddToListPopover' }).exists()).toBe(
       false
     );
-  });
-
-  it('renders ordered sibling images from the uploader album', async () => {
-    const wrapper = await mountWith(
-      {
-        ...baseImage,
-        Albums: [
-          {
-            id: 'album-1',
-            Owner: { username: 'alice' },
-            imageOrder: ['img2', 'img1'],
-            Images: [
-              baseImage,
-              { id: 'img2', url: 'https://img.test/two.jpg' },
-            ],
-          },
-        ],
-      },
-      {
-        albumUsage: {
-          uploaderOwnedAlbums: [
-            { id: 'album-1', Owner: { username: 'alice' } },
-          ],
-          otherAlbums: [],
-        },
-      }
-    );
-
-    expect(
-      wrapper.findComponent({ name: 'AlbumThumbnailGrid' }).props('images')
-    ).toEqual([{ id: 'img2', url: 'https://img.test/two.jpg' }]);
   });
 
   it.each([
