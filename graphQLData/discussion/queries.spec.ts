@@ -33,6 +33,7 @@ describe('GET_DOWNLOAD_DETAIL', () => {
     expect(source).toContain('scanStatus');
     expect(source).toContain('LabelOptions');
     expect(source).toContain('CrosspostedDiscussion');
+    expect(source).toContain('isFavorited(username: $loggedInUsername)');
   });
 
   it('leaves activity and edit history to their dedicated views', () => {

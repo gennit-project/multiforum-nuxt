@@ -16,12 +16,14 @@ type QueryResultShape = {
 const h = vi.hoisted(() => ({
   route: { params: { forumId: 'cats', discussionId: 'd1' } } as RouteShape,
   modName: null as unknown as Ref<string>,
+  username: null as unknown as Ref<string>,
   queryResult: null as unknown as Ref<QueryResultShape | undefined>,
   useHead: vi.fn(),
   queryDocument: '',
 }));
 
 h.modName = ref('modAlice');
+h.username = ref('alice');
 h.queryResult = ref<QueryResultShape>();
 
 vi.mock('@/config', () => ({
@@ -30,6 +32,7 @@ vi.mock('@/config', () => ({
 
 vi.mock('@/composables/useAuthState', () => ({
   useModProfileName: () => h.modName,
+  useUsername: () => h.username,
 }));
 
 vi.mock('nuxt/app', () => ({

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
-import { ref } from 'vue';
+import { createSSRApp, ref } from 'vue';
+import { renderToString } from 'vue/server-renderer';
 
 const mockHasPipelineContent = ref(true);
 const h = vi.hoisted(() => ({
@@ -81,6 +82,24 @@ describe('DownloadTabNavigation', () => {
     await mountNav('forums-forumId-downloads-discussionId');
 
     expect(h.useQuery.mock.calls[0]?.[2]).toMatchObject({ prefetch: false });
+  });
+
+  it('renders the loading state during SSR for hydration parity', async () => {
+    const Component = (await import('./DownloadTabNavigation.vue')).default;
+    const app = createSSRApp(Component, {
+      discussionId: 'd1',
+      channelId: 'cats',
+      discussion: { DownloadableFiles: [{ id: 'file-1' }] },
+    });
+    app.config.globalProperties.$route = h.route;
+    app.component('NuxtLink', NuxtLinkStub);
+    app.component('NuxtPage', { template: '<div />' });
+    app.component('MarkdownPreview', { template: '<div />' });
+    app.component('PublicCollectionListItem', { template: '<div />' });
+    app.component('PencilIcon', { template: '<span />' });
+    app.component('DownloadMetadata', { template: '<div />' });
+
+    expect(await renderToString(app)).toContain('Loading collections...');
   });
 
   it('renders the Pipelines tab when checks are applicable or have history', async () => {

@@ -57,6 +57,7 @@ const discussion = () => ({
   Author: { username: 'alice' },
   createdAt: '2024-03-30T00:00:00Z',
   DiscussionChannels: [{ channelUniqueName: 'cats', answered: false }],
+  isFavorited: true,
 });
 
 const mountForm = () =>
@@ -151,6 +152,25 @@ describe('DiscussionTitleEditForm display', () => {
     const wrapper = mountForm();
 
     expect(wrapper.get('h1').text()).toBe('My Discussion');
+  });
+
+  it('uses a deterministic UTC publication date', () => {
+    h.discussionResult = ref({
+      discussions: [{ ...discussion(), createdAt: '2025-08-23T01:00:00.000Z' }],
+    });
+    const wrapper = mountForm();
+
+    expect(wrapper.text()).toContain('Aug 23, 2025');
+  });
+
+  it('passes the query favorite state into the favorite control', () => {
+    const wrapper = mountForm();
+
+    expect(
+      wrapper
+        .getComponent({ name: 'AddToDiscussionFavorites' })
+        .props('initialIsFavorited')
+    ).toBe(true);
   });
 
   it('shows a not-found message when the discussion is missing', () => {

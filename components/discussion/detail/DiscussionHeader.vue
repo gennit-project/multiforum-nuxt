@@ -480,6 +480,7 @@ const warningModalBody = computed(() => {
           :discussion-title="discussion.title"
           :entity-name="downloadMode ? 'Download' : 'Discussion'"
           :entity-type="downloadMode ? 'download' : 'discussion'"
+          :initial-is-favorited="discussion.isFavorited ?? false"
           size="small"
         />
         <MenuButton

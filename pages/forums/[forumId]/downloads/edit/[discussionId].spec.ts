@@ -274,6 +274,28 @@ describe('download edit page', () => {
     });
   });
 
+  it('includes newly uploaded files in the final discussion update', async () => {
+    const wrapper = await loadPage(RequireAuthStub, emptyDiscussion());
+    await wrapper
+      .findComponent(CreateEditDiscussionFields)
+      .vm.$emit('update-form-values', {
+        downloadableFiles: [{ id: 'new-file' }],
+      });
+
+    const tracker = mutationTrackers.get(
+      UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS
+    ) as {
+      options: () => { variables: Record<string, unknown> };
+    };
+
+    expect(tracker.options().variables.updateDiscussionInput).toMatchObject({
+      hasDownload: true,
+      DownloadableFiles: [
+        { connect: [{ where: { node: { id: 'new-file' } } }] },
+      ],
+    });
+  });
+
   it('builds label update variables from the channel filter groups', async () => {
     setupQueries(populatedDiscussion());
     mockedUseQuery.mockReset();

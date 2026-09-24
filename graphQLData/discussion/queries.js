@@ -286,6 +286,7 @@ export const GET_DOWNLOAD_DETAIL = gql`
   query getDownloadDetail(
     $id: ID!
     $loggedInModName: String
+    $loggedInUsername: String
     $channelUniqueName: String!
   ) {
     discussions(where: { id: $id }) {
@@ -296,6 +297,7 @@ export const GET_DOWNLOAD_DETAIL = gql`
       updatedAt
       hasDownload
       hasSensitiveContent
+      isFavorited(username: $loggedInUsername)
       Author {
         ...AuthorFields
       }
@@ -572,10 +574,12 @@ export const GET_DISCUSSION = gql`
   query getDiscussion(
     $id: ID!
     $loggedInModName: String
+    $loggedInUsername: String
     $channelUniqueName: String!
   ) {
     discussions(where: { id: $id }) {
       ...DiscussionDetailFields
+      isFavorited(username: $loggedInUsername)
       editReason
       authorIsChannelModerator(channelUniqueName: $channelUniqueName)
       DiscussionChannels {

@@ -107,6 +107,7 @@ const {
   () => ({
     id: props.discussionId,
     loggedInModName: loggedInUserModName.value,
+    loggedInUsername: usernameVar.value || null,
     channelUniqueName: channelId.value,
   }),
   {

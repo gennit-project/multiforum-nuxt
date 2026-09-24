@@ -383,8 +383,9 @@ const uploadFile = async (file: File): Promise<boolean> => {
       supportPayPalMeUrl: '',
     });
 
-    // Auto-save after successful file upload
-    handleSave();
+    // Persist the relationship as part of the upload. Creating the file node
+    // alone is not enough for it to appear on the download detail page.
+    await handleSave();
 
     return true;
   } catch (err) {
@@ -403,7 +404,7 @@ const removeFileFromForm = (index: number) => {
   formValues.value.downloadableFiles.splice(index, 1);
   customSupportFieldsEnabled.value.splice(index, 1);
   // Auto-save after file removal
-  handleSave();
+  void handleSave();
 };
 
 const requestRemoveFile = (index: number) => {
@@ -471,7 +472,7 @@ const updateFileSupportField = (
 ) => {
   if (formValues.value.downloadableFiles[fileIndex]) {
     formValues.value.downloadableFiles[fileIndex][field] = value;
-    handleSave();
+    void handleSave();
   }
 };
 
@@ -494,12 +495,17 @@ function getUpdateDiscussionInputForDownloadableFiles(): DiscussionUpdateInput {
 }
 
 // For handling save
-function handleSave() {
-  // Always emit to parent - let the parent decide how to handle the save
+async function handleSave() {
+  // Keep the parent form in sync so its final submit is also a persistence
+  // fallback for the file relationship and related fields.
   emit('updateFormValues', {
     downloadableFiles: formValues.value.downloadableFiles,
     downloadLabels: formValues.value.downloadLabels,
   });
+
+  if (props.discussion.id !== 'temp-id') {
+    await _updateDiscussion();
+  }
 
   // Only show success notification if we're in temp-id mode (create/embedded mode)
   if (props.discussion.id === 'temp-id') {
@@ -513,7 +519,7 @@ function handleSave() {
 
 <template>
   <div class="w-full">
-    <div class="mb-3 mt-3 flex w-full flex-col">
+    <div class="mt-3 mb-3 flex w-full flex-col">
       <ErrorBanner v-if="uploadError" :text="uploadError" class="mb-4" />
 
       <ErrorBanner
@@ -555,7 +561,7 @@ function handleSave() {
               />
               <label
                 for="downloadable-file-input"
-                class="hover:bg-gray-50 focus:ring-indigo-500 inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                class="inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                 :class="{
                   'cursor-not-allowed opacity-50':
                     uploadingFile || downloadsDisabled,
@@ -612,7 +618,7 @@ function handleSave() {
                         <input
                           :value="file.url"
                           readonly
-                          class="bg-gray-50 flex-1 cursor-not-allowed rounded border border-gray-200 px-2 py-1 text-sm text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                          class="flex-1 cursor-not-allowed rounded border border-gray-200 bg-gray-50 px-2 py-1 text-sm text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400"
                           type="text"
                         />
                         <button
@@ -644,7 +650,7 @@ function handleSave() {
                         <input
                           :checked="customSupportFieldsEnabled[index]"
                           type="checkbox"
-                          class="text-indigo-600 focus:ring-indigo-500 mt-1 h-4 w-4 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                          class="mt-1 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
                           @change="
                             updateCustomSupportFieldsEnabled(
                               index,
@@ -726,7 +732,7 @@ function handleSave() {
                 />
                 <label
                   for="additional-file-input"
-                  class="hover:bg-gray-50 inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                  class="inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                   :class="{
                     'cursor-not-allowed opacity-50':
                       uploadingFile || downloadsDisabled,

@@ -47,6 +47,7 @@ const {
   {
     id: discussionId,
     loggedInModName: modProfileNameVar.value || '',
+    loggedInUsername: usernameVar.value || null,
     channelUniqueName: channelId.value,
   }
 );
@@ -110,6 +111,7 @@ const formattedDate = computed(() => {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
+    timeZone: 'UTC',
   });
 });
 </script>
@@ -117,7 +119,7 @@ const formattedDate = computed(() => {
 <template>
   <div class="w-full pb-2 shadow-sm">
     <div
-      class="mb-3 mt-4 flex w-full flex-col md:flex-row md:items-center md:justify-between md:space-x-2"
+      class="mt-4 mb-3 flex w-full flex-col md:flex-row md:items-center md:justify-between md:space-x-2"
     >
       <div v-if="getDiscussionLoading" class="flex-1">
         <div class="flex flex-col gap-2 px-1">
@@ -132,7 +134,7 @@ const formattedDate = computed(() => {
       <div v-else ref="discussionDetail" class="flex-1">
         <h1
           v-if="!titleEditMode"
-          class="text-wrap px-1 text-lg text-black sm:tracking-tight md:text-2xl dark:text-white"
+          class="px-1 text-lg text-wrap text-black sm:tracking-tight md:text-2xl dark:text-white"
         >
           {{
             discussion && discussion.title
@@ -163,7 +165,7 @@ const formattedDate = computed(() => {
         </div>
         <p
           v-if="!titleEditMode"
-          class="ml-1 mt-1 flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
+          class="mt-1 ml-1 flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
         >
           <slot />
           <span
@@ -183,6 +185,7 @@ const formattedDate = computed(() => {
             :discussion-title="discussion.title"
             :entity-name="isDownloadDetailPage ? 'Download' : 'Discussion'"
             :entity-type="isDownloadDetailPage ? 'download' : 'discussion'"
+            :initial-is-favorited="discussion.isFavorited ?? false"
             size="large"
           />
         </div>
@@ -196,14 +199,14 @@ const formattedDate = computed(() => {
             <nuxt-link
               v-if="!titleEditMode && !isDownloadDetailPage"
               :to="`/forums/${channelId}/discussions/create`"
-              class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              class="ml-2 inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
             >
               New Discussion
             </nuxt-link>
             <nuxt-link
               v-if="!titleEditMode && isDownloadDetailPage"
               :to="`/forums/${channelId}/downloads/create`"
-              class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              class="ml-2 inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
             >
               New Upload
             </nuxt-link>
@@ -228,14 +231,14 @@ const formattedDate = computed(() => {
             <button
               v-if="!isDownloadDetailPage"
               type="button"
-              class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              class="ml-2 inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
             >
               New Discussion
             </button>
             <button
               v-else
               type="button"
-              class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              class="ml-2 inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
             >
               New Upload
             </button>
