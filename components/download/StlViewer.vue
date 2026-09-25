@@ -23,8 +23,22 @@ import {
   computed,
   nextTick,
 } from 'vue';
-// @ts-expect-error - THREE.js types not installed
-import * as THREE from 'three';
+// Named imports (not `import * as THREE`) so the bundler can tree-shake the
+// parts of three.js this viewer never uses.
+import {
+  AmbientLight,
+  Box3,
+  Color,
+  DirectionalLight,
+  GridHelper,
+  Mesh,
+  MeshStandardMaterial,
+  PerspectiveCamera,
+  Scene,
+  Vector3,
+  WebGLRenderer,
+  // @ts-expect-error - THREE.js types not installed
+} from 'three';
 // @ts-expect-error - THREE.js types not installed
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 // @ts-expect-error - THREE.js types not installed
@@ -114,10 +128,10 @@ function initViewer(stlUrl: string) {
   nextTick(() => {
     updateDimensions();
 
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(props.backgroundColor);
+    scene = new Scene();
+    scene.background = new Color(props.backgroundColor);
 
-    camera = new THREE.PerspectiveCamera(
+    camera = new PerspectiveCamera(
       45,
       actualWidth.value / actualHeight.value,
       0.1,
@@ -125,7 +139,7 @@ function initViewer(stlUrl: string) {
     );
     camera.position.set(3, 3, 3);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer = new WebGLRenderer({ antialias: true });
     renderer.setSize(actualWidth.value, actualHeight.value);
     container.value!.appendChild(renderer.domElement);
 
@@ -146,16 +160,16 @@ function initViewer(stlUrl: string) {
       renderer.domElement.style.cursor = 'grab';
     });
 
-    const ambientLight = new THREE.AmbientLight(0x999999);
+    const ambientLight = new AmbientLight(0x999999);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    const directionalLight = new DirectionalLight(0xffffff, 1);
     directionalLight.position.set(5, 10, 7.5);
     scene.add(directionalLight);
 
     // Grid (optional)
     if (props.showGrid) {
-      const gridHelper = new THREE.GridHelper(200, 20);
+      const gridHelper = new GridHelper(200, 20);
       scene.add(gridHelper);
     }
 
@@ -164,21 +178,21 @@ function initViewer(stlUrl: string) {
       stlUrl,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (geometry: any) => {
-        const material = new THREE.MeshStandardMaterial({
+        const material = new MeshStandardMaterial({
           color: props.modelColor,
         });
-        const mesh = new THREE.Mesh(geometry, material);
+        const mesh = new Mesh(geometry, material);
 
         geometry.computeBoundingBox();
-        const center = new THREE.Vector3();
+        const center = new Vector3();
         geometry.boundingBox.getCenter(center);
         mesh.position.sub(center); // center the object
 
         scene.add(mesh);
 
         // Adjust camera position based on object size
-        const box = new THREE.Box3().setFromObject(mesh);
-        const size = box.getSize(new THREE.Vector3());
+        const box = new Box3().setFromObject(mesh);
+        const size = box.getSize(new Vector3());
         const maxDim = Math.max(size.x, size.y, size.z);
         const distance = calculateCameraDistance(maxDim, camera.fov);
 
@@ -227,8 +241,8 @@ function resetCamera() {
   if (camera && controls && scene.children.find((child: any) => child.isMesh)) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mesh = scene.children.find((child: any) => child.isMesh);
-    const box = new THREE.Box3().setFromObject(mesh);
-    const size = box.getSize(new THREE.Vector3());
+    const box = new Box3().setFromObject(mesh);
+    const size = box.getSize(new Vector3());
     const maxDim = Math.max(size.x, size.y, size.z);
     const distance = calculateCameraDistance(maxDim, camera.fov);
 

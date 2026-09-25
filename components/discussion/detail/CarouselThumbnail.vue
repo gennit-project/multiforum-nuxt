@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
-import ModelViewer from '@/components/ModelViewer.vue';
-import StlViewer from '@/components/download/StlViewer.vue';
 import AppImage from '@/components/image/AppImage.vue';
-import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
+import ModelPreviewTile from '@/components/image/ModelPreviewTile.vue';
+import { is3DModelFile } from '@/utils/fileTypeUtils';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
 
 const props = defineProps({
@@ -56,25 +55,13 @@ const imageUrl = computed(() =>
     :style="sizeStyle"
     @click="emit('click')"
   >
-    <ModelViewer
-      v-if="image && image.url && hasGlbExtension(image.url)"
+    <ModelPreviewTile
+      v-if="image && image.url && is3DModelFile(image.url)"
       :model-url="image.url"
-      :model-alt="image.alt || image.caption || '3D model thumbnail'"
-      :show-fullscreen-button="false"
-      :height="`${thumbnailHeight}px`"
+      :alt="image.alt || image.caption || '3D model thumbnail'"
       :width="`${thumbnailWidth}px`"
-      class="rounded"
-      :style="sizeStyle"
+      :height="`${thumbnailHeight}px`"
     />
-    <ClientOnly v-else-if="image && image.url && hasStlExtension(image.url)">
-      <StlViewer
-        :src="image.url"
-        :width="thumbnailWidth"
-        :height="thumbnailHeight"
-        class="rounded"
-        :style="sizeStyle"
-      />
-    </ClientOnly>
     <AppImage
       v-else-if="image"
       :src="imageUrl"

@@ -10,8 +10,6 @@ const mountItem = (image: Partial<Image>) =>
       stubs: {
         NuxtLink: { template: '<a><slot /></a>' },
         ClientOnly: { template: '<div><slot /></div>' },
-        ModelViewer: { template: '<div class="model" />' },
-        StlViewer: { template: '<div class="stl" />' },
         AddToImageFavorites: { template: '<div class="fav" />' },
       },
     },
@@ -44,9 +42,12 @@ describe('ImageListItem', () => {
     );
   });
 
-  it('renders the 3D model viewer for a glb url', () => {
-    const wrapper = mountItem({ id: 'i1', url: 'https://img.test/m.glb' });
-    expect(wrapper.find('.model').exists()).toBe(true);
+  // Gallery tiles show a static 3D tile; the viewer loads on the image page.
+  it.each(['m.glb', 'm.stl'])('renders a static 3D tile for %s', (file) => {
+    const wrapper = mountItem({ id: 'i1', url: `https://img.test/${file}` });
+    expect(wrapper.find('[data-testid="model-preview-tile"]').exists()).toBe(
+      true
+    );
   });
 
   it('shows the sensitive-content overlay', () => {
@@ -69,8 +70,6 @@ describe('ImageListItem', () => {
         stubs: {
           NuxtLink: { template: '<a><slot /></a>' },
           ClientOnly: { template: '<div><slot /></div>' },
-          ModelViewer: true,
-          StlViewer: true,
           AddToImageFavorites: { template: '<div class="fav" />' },
         },
       },

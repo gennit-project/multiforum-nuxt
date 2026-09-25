@@ -1,19 +1,12 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent } from 'vue';
+import { computed } from 'vue';
 import type { PropType } from 'vue';
 import type { Image } from '@/__generated__/graphql';
-import ModelViewer from '@/components/ModelViewer.vue';
 import AppImage from '@/components/image/AppImage.vue';
+import ModelPreviewTile from '@/components/image/ModelPreviewTile.vue';
 import AddToImageFavorites from '@/components/favorites/AddToImageFavorites.vue';
-import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
+import { is3DModelFile } from '@/utils/fileTypeUtils';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
-
-// StlViewer statically imports three.js (~2MB decoded). Load it lazily so that
-// weight is only fetched when an STL image actually renders, not on every page
-// that shows an image list.
-const StlViewer = defineAsyncComponent(
-  () => import('@/components/download/StlViewer.vue')
-);
 
 const props = defineProps({
   allowAddToList: {
@@ -58,27 +51,12 @@ const imageUrl = computed(() =>
       :to="`/u/${props.username}/images/${props.image.id}`"
       class="block h-full w-full"
     >
-      <!-- 3D Model viewer for GLB files -->
-      <ModelViewer
-        v-if="props.image.url && hasGlbExtension(props.image.url)"
+      <!-- 3D models get a static tile; the viewer loads on the image page -->
+      <ModelPreviewTile
+        v-if="props.image.url && is3DModelFile(props.image.url)"
         :model-url="props.image.url"
-        :model-alt="getImageAlt(props.image)"
-        :show-fullscreen-button="false"
-        height="100%"
-        width="100%"
-        class="h-full w-full object-cover"
+        :alt="getImageAlt(props.image) || '3D model'"
       />
-      <!-- STL viewer for STL files -->
-      <ClientOnly
-        v-else-if="props.image.url && hasStlExtension(props.image.url)"
-      >
-        <StlViewer
-          :src="props.image.url"
-          :width="300"
-          :height="300"
-          class="h-full w-full object-cover"
-        />
-      </ClientOnly>
       <!-- Regular image -->
       <AppImage
         v-else-if="imageUrl"
