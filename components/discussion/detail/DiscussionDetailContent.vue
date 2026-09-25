@@ -23,7 +23,6 @@ import type {
 } from '@/__generated__/graphql';
 import InfoBanner from '@/components/InfoBanner.vue';
 import DiscussionHeader from '@/components/discussion/detail/DiscussionHeader.vue';
-import DiscussionCommentsWrapper from '@/components/discussion/detail/DiscussionCommentsWrapper.vue';
 import DiscussionChannelLinks from '@/components/discussion/detail/DiscussionChannelLinks.vue';
 import DiscussionFlairBadges from '@/components/discussion/DiscussionFlairBadges.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
@@ -41,6 +40,9 @@ const DiscussionBodyEditForm = defineAsyncComponent(
   () => import('./DiscussionBodyEditForm.vue')
 );
 const AlbumEditForm = defineAsyncComponent(() => import('./AlbumEditForm.vue'));
+const DiscussionCommentsWrapper = defineAsyncComponent(
+  () => import('./DiscussionCommentsWrapper.vue')
+);
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
@@ -156,6 +158,9 @@ const {
   {
     fetchPolicy: 'cache-first',
     enabled: shouldLoadInlineComments,
+    // Comments sit below the primary discussion content. Fetch them after
+    // hydration so backend latency does not hold up the SSR response.
+    prefetch: false,
   }
 );
 
@@ -240,7 +245,7 @@ const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
   return (
     getDiscussionChannelResult.value?.getCommentSection?.DiscussionChannel ||
     lastValidCommentSection.value?.DiscussionChannel ||
-    (props.downloadMode ? formDiscussionChannel.value : null)
+    formDiscussionChannel.value
   );
 });
 
@@ -652,28 +657,58 @@ const handleEditAlbum = () => {
         <!-- Comments section (shown for non-download mode) -->
         <div v-if="!downloadMode && showComments">
           <div class="my-2 px-2 pt-2">
-            <DiscussionCommentsWrapper
-              :key="activeDiscussionChannel?.id"
-              :aggregate-comment-count="aggregateCommentCount || 0"
-              :comments="comments"
-              :discussion-author="discussionAuthor || ''"
-              :discussion-channel="activeDiscussionChannel || undefined"
-              :form-discussion-channel="formDiscussionChannel || undefined"
-              :channel-id="channelId"
-              :enable-feedback="
-                activeDiscussionChannel?.Channel?.feedbackEnabled ?? true
-              "
-              :enable-emoji="
-                activeDiscussionChannel?.Channel?.emojiEnabled ?? true
-              "
-              :loading="getDiscussionChannelLoading"
-              :locked="commentsDisabled"
-              :mod-name="loggedInUserModName"
-              :previous-offset="previousOffset"
-              :reached-end-of-results="reachedEndOfResults"
-              :answers="answers"
-              @load-more="loadMore"
-            />
+            <ClientOnly>
+              <DiscussionCommentsWrapper
+                :key="activeDiscussionChannel?.id"
+                :aggregate-comment-count="aggregateCommentCount || 0"
+                :comments="comments"
+                :discussion-author="discussionAuthor || ''"
+                :discussion-channel="activeDiscussionChannel || undefined"
+                :form-discussion-channel="formDiscussionChannel || undefined"
+                :channel-id="channelId"
+                :enable-feedback="
+                  activeDiscussionChannel?.Channel?.feedbackEnabled ?? true
+                "
+                :enable-emoji="
+                  activeDiscussionChannel?.Channel?.emojiEnabled ?? true
+                "
+                :loading="getDiscussionChannelLoading"
+                :locked="commentsDisabled"
+                :mod-name="loggedInUserModName"
+                :previous-offset="previousOffset"
+                :reached-end-of-results="reachedEndOfResults"
+                :answers="answers"
+                @load-more="loadMore"
+              />
+              <template #fallback>
+                <div
+                  aria-label="Loading comments"
+                  aria-busy="true"
+                  class="space-y-3 py-4"
+                  data-testid="comments-loading"
+                >
+                  <div
+                    class="h-5 w-32 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+                  />
+                  <div v-for="index in 2" :key="index" class="flex gap-3">
+                    <div
+                      class="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700"
+                    />
+                    <div class="flex-1 space-y-2">
+                      <div
+                        class="h-4 w-1/4 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+                      />
+                      <div
+                        class="h-3 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+                      />
+                      <div
+                        class="h-3 w-5/6 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </ClientOnly>
           </div>
           <DiscussionChannelLinks
             v-if="discussion && (discussion as Discussion).DiscussionChannels"

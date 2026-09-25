@@ -64,6 +64,9 @@ const feedbackManagerSpies = {
 };
 
 const stubs = {
+  ClientOnly: {
+    template: '<div><slot /></div>',
+  },
   DiscussionHeader: {
     name: 'DiscussionHeader',
     props: ['relatedIssueLink'],
@@ -279,6 +282,22 @@ describe('DiscussionDetailContent', () => {
     setup();
 
     expect(getQueryOptions(GET_DISCUSSION_ACTIVITY).prefetch).toBe(false);
+  });
+
+  it('defers the below-the-fold comment query until after SSR', () => {
+    setup();
+
+    expect(getQueryOptions(GET_DISCUSSION_COMMENTS).prefetch).toBe(false);
+  });
+
+  it('uses the detail response channel while deferred comments load', () => {
+    const { wrapper } = setup({ hasCommentSection: false });
+
+    expect(
+      wrapper
+        .findComponent({ name: 'DiscussionLayoutManager' })
+        .props('activeDiscussionChannel')
+    ).toMatchObject({ id: 'dc1' });
   });
 
   it('renders the discussion header for a loaded discussion', () => {
