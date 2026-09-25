@@ -42,6 +42,7 @@ const defaultAgeHandlers: GraphQLHandlers = {
 const legacyOperationAliases: Record<string, string> = {
   getDiscussionDetail: 'getDiscussion',
   getDiscussionActivity: 'getDiscussion',
+  getDownloadActivity: 'getDiscussion',
 };
 
 type CompletedOperation = {

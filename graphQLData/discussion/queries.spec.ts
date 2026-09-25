@@ -3,12 +3,14 @@ import { buildSchema, NoUnusedVariablesRule, print, validate } from 'graphql';
 import {
   GET_DISCUSSION_ACTIVITY,
   GET_DISCUSSION_DETAIL,
+  GET_DOWNLOAD_ACTIVITY,
   GET_DOWNLOAD_DETAIL,
 } from './queries';
 
 const source = print(GET_DOWNLOAD_DETAIL);
 const discussionSource = print(GET_DISCUSSION_DETAIL);
 const activitySource = print(GET_DISCUSSION_ACTIVITY);
+const downloadActivitySource = print(GET_DOWNLOAD_ACTIVITY);
 const discussionValidationSchema = buildSchema(`
   type Query {
     discussions(where: DiscussionWhere): [Discussion!]!
@@ -78,5 +80,23 @@ describe('GET_DISCUSSION_ACTIVITY', () => {
     expect(activitySource).toContain('PastTitleVersions');
     expect(activitySource).toContain('PastBodyVersions');
     expect(activitySource).toContain('BodyLastEditedBy');
+  });
+});
+
+describe('GET_DOWNLOAD_ACTIVITY', () => {
+  it('loads only the deferred fields used by the download activity tab', () => {
+    expect({
+      operation: downloadActivitySource.includes('query getDownloadActivity'),
+      titleHistory: downloadActivitySource.includes('PastTitleVersions'),
+      labelHistory: downloadActivitySource.includes('LabelChangeHistory'),
+      fileId: downloadActivitySource.includes('DownloadableFiles'),
+      bodyHistory: downloadActivitySource.includes('PastBodyVersions'),
+    }).toEqual({
+      operation: true,
+      titleHistory: true,
+      labelHistory: true,
+      fileId: true,
+      bodyHistory: false,
+    });
   });
 });

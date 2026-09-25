@@ -569,6 +569,44 @@ export const GET_DISCUSSION_ACTIVITY = gql`
   }
 `;
 
+export const GET_DOWNLOAD_ACTIVITY = gql`
+  query getDownloadActivity($id: ID!, $channelUniqueName: String!) {
+    discussions(where: { id: $id }) {
+      id
+      DownloadableFiles(where: { permanentlyRemoved_NOT: true }) {
+        id
+      }
+      DiscussionChannels(where: { channelUniqueName: $channelUniqueName }) {
+        id
+        channelUniqueName
+        LabelChangeHistory(options: { sort: [{ createdAt: DESC }] }) {
+          id
+          createdAt
+          actionType
+          labelDisplayName
+          labelValue
+          ActorUser {
+            username
+            displayName
+          }
+          ActorMod {
+            displayName
+          }
+        }
+      }
+      PastTitleVersions(options: { sort: [{ createdAt: DESC }] }) {
+        id
+        Author {
+          username
+        }
+        body
+        editReason
+        createdAt
+      }
+    }
+  }
+`;
+
 export const GET_DISCUSSION = gql`
   ${DISCUSSION_DETAIL_FIELDS}
   query getDiscussion(
