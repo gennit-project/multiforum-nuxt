@@ -35,6 +35,8 @@
     "coverage:e2e:collect": "E2E_COVERAGE=true playwright test --config playwright.build.config.ts",
     "coverage:e2e:report": "node --max-old-space-size=6144 tests/playwright/coverage/report.mjs",
     "coverage:audit": "node scripts/coverage-audit.mjs",
+    "perf:budget": "node scripts/check-route-budgets.mjs",
+    "test:performance-budgets": "node --test scripts/check-route-budgets.test.mjs",
     "knip": "knip",
     "tsc": "vue-tsc --noEmit",
     "verify": "pnpm run tsc && pnpm run test:unit:run",
