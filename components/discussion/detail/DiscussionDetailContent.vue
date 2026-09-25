@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch, defineAsyncComponent } from 'vue';
+import { computed, ref, watch, defineAsyncComponent } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import {
   GET_DISCUSSION_ACTIVITY,
@@ -35,22 +35,17 @@ import DiscussionLayoutManager from './DiscussionLayoutManager.vue';
 import FeedbackModalManager from './FeedbackModalManager.vue';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { useForumLock } from '@/composables/useForumLock';
-import {
-  useIsAuthenticated,
-  useModProfileName,
-  useUsername,
-} from '@/composables/useAuthState';
+import { useModProfileName, useUsername } from '@/composables/useAuthState';
 
 const DiscussionBodyEditForm = defineAsyncComponent(
   () => import('./DiscussionBodyEditForm.vue')
 );
 const AlbumEditForm = defineAsyncComponent(() => import('./AlbumEditForm.vue'));
 
-const isAuthenticatedVar = useIsAuthenticated();
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
 
-const COMMENT_LIMIT = 50;
+const COMMENT_LIMIT = 20;
 
 const props = defineProps({
   discussionId: {
@@ -192,23 +187,6 @@ watch(
     }
   }
 );
-
-watch(
-  () => isAuthenticatedVar.value,
-  (isAuthenticated, wasAuthenticated) => {
-    if (!isAuthenticated || isAuthenticated === wasAuthenticated) return;
-    refetchDiscussion();
-  }
-);
-
-onMounted(() => {
-  if (isAuthenticatedVar.value || usernameVar.value) {
-    refetchDiscussion();
-    if (shouldLoadInlineComments.value) {
-      refetchDiscussionChannel();
-    }
-  }
-});
 
 const setLastValidCommentSection = (
   section: {

@@ -204,12 +204,6 @@ export const GET_DISCUSSION_COMMENTS = gql`
         ) {
           count
         }
-        UpvotedByUsers {
-          username
-        }
-        UpvotedByUsersAggregate {
-          count
-        }
         SubscribedToNotifications {
           username
         }
@@ -249,10 +243,6 @@ export const GET_DISCUSSION_COMMENTS = gql`
         }
         ParentComment {
           id
-        }
-        ChildComments {
-          id
-          text
         }
         FeedbackComments {
           id

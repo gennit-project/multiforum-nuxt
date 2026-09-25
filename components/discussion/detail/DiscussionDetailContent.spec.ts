@@ -32,17 +32,14 @@ vi.mock('nuxt/app', () => ({
   useRoute: vi.fn(() => ({ params: {}, query: {} })),
 }));
 const auth = vi.hoisted(() => ({
-  isAuthenticated: null as unknown as ReturnType<typeof ref<boolean>>,
   modProfileName: null as unknown as ReturnType<typeof ref<string>>,
   username: null as unknown as ReturnType<typeof ref<string>>,
 }));
 vi.mock('@/composables/useAuthState', async () => {
   const { ref: vref } = await import('vue');
-  auth.isAuthenticated = vref(false);
   auth.modProfileName = vref('');
   auth.username = vref('');
   return {
-    useIsAuthenticated: () => auth.isAuthenticated,
     useModProfileName: () => auth.modProfileName,
     useUsername: () => auth.username,
   };
@@ -257,7 +254,6 @@ describe('DiscussionDetailContent', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     asMock(useQuery).mockReset();
-    auth.isAuthenticated.value = false;
     auth.modProfileName.value = '';
     auth.username.value = '';
   });
@@ -417,6 +413,18 @@ describe('DiscussionDetailContent', () => {
       .findComponent(DiscussionCommentsWrapperStub)
       .props('comments') as Comment[];
     expect(passed.map((c) => c.id)).toEqual(['a', 'b']);
+  });
+
+  it('limits the initial comment page to twenty comments', () => {
+    setup();
+    const call = asMock(useQuery).mock.calls.find(
+      ([document]) => document === GET_DISCUSSION_COMMENTS
+    );
+    const variables = typeof call?.[1] === 'function' ? call[1]() : call?.[1];
+
+    expect(variables).toEqual(
+      expect.objectContaining({ limit: 20, offset: 0 })
+    );
   });
 
   it('enters and exits discussion body edit mode from child events', async () => {
@@ -668,20 +676,13 @@ describe('DiscussionDetailContent', () => {
     ]).toEqual([1, 1]);
   });
 
-  it('refetches the discussion when authentication becomes active', async () => {
-    const { wrapper, discussionQuery } = setup();
-    auth.isAuthenticated.value = true;
-    await wrapper.vm.$nextTick();
-    expect(discussionQuery.refetch).toHaveBeenCalledOnce();
-  });
-
-  it('refetches on mount for an already authenticated user', () => {
-    auth.isAuthenticated.value = true;
+  it('reuses SSR data on mount for an already authenticated user', () => {
+    auth.username.value = 'alice';
     const { discussionQuery, commentSectionQuery } = setup();
     expect([
       discussionQuery.refetch.mock.calls.length,
       commentSectionQuery.refetch.mock.calls.length,
-    ]).toEqual([1, 1]);
+    ]).toEqual([0, 0]);
   });
 
   it('clears cached comment-section state when the discussion ID changes', async () => {
