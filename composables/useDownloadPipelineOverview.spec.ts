@@ -74,6 +74,22 @@ describe('useDownloadPipelineOverview', () => {
     vi.useRealTimers();
   });
 
+  it('does not block SSR on the pipeline overview query', () => {
+    useDownloadPipelineOverview(
+      ref('file-1'),
+      ref('discussion-1'),
+      ref('cats')
+    );
+
+    const options = mockUseQuery.mock.calls[0]?.[2]?.();
+
+    expect(options).toMatchObject({
+      enabled: true,
+      fetchPolicy: 'cache-and-network',
+      prefetch: false,
+    });
+  });
+
   it('merges server and channel attempt history newest first', () => {
     mockQueryResult.value = {
       serverApplicable: applicable(),

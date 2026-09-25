@@ -21,7 +21,7 @@ Developer documentation for the Multiforum Nuxt frontend. See the
 - [Feature roadmap](./feature-roadmap.md)
 - [Moderation plan](./moderation-plan.md)
 - [Notifications plan](./notifications-plan.md)
-- Plugins — [implemented](./plugins-implemented.md) · [roadmap](./plugins-roadmap.md) · [implementation plan](./plugins-implementation-plan.md) · [bot/betabot plan](./plugins-bot-betabot-plan.md)
+- Plugins — [current implementation](./plugins-implemented.md) · [remaining roadmap](./plugins-roadmap.md) · [completed implementation plan](./plugins-implementation-plan.md) · [bot/betabot design plan](./plugins-bot-betabot-plan.md)
 - Maps — [developer docs](./map-developer-docs.md) · [clustering guide](./map-clustering-guide.md)
 - [Automated test plan](./automated-test-plan.md)
 

@@ -45,10 +45,7 @@ export const SEARCH_COMMENT_FIELDS = gql`
 
 // Query for searching comments site-wide
 export const SEARCH_COMMENTS = gql`
-  query searchComments(
-    $where: CommentWhere
-    $options: CommentOptions
-  ) {
+  query searchComments($where: CommentWhere, $options: CommentOptions) {
     comments(where: $where, options: $options) {
       ...SearchCommentFields
     }
@@ -192,13 +189,19 @@ export const GET_DISCUSSION_COMMENTS = gql`
             ...AuthorFields
           }
         }
-        CommentsAggregate {
+        CommentsAggregate(
+          where: {
+            OR: [{ isFeedbackComment: null }, { isFeedbackComment: false }]
+          }
+        ) {
           count
         }
-        UpvotedByUsers {
-          username
-        }
-        UpvotedByUsersAggregate {
+        RootCommentsAggregate: CommentsAggregate(
+          where: {
+            isRootComment: true
+            OR: [{ isFeedbackComment: null }, { isFeedbackComment: false }]
+          }
+        ) {
           count
         }
         SubscribedToNotifications {
@@ -240,10 +243,6 @@ export const GET_DISCUSSION_COMMENTS = gql`
         }
         ParentComment {
           id
-        }
-        ChildComments {
-          id
-          text
         }
         FeedbackComments {
           id

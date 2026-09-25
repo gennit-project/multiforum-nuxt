@@ -19,87 +19,6 @@ export const GET_IMAGE_DETAILS = gql`
         displayName
         profilePicURL
       }
-      Albums {
-        id
-        imageOrder
-        Owner {
-          username
-          displayName
-        }
-        Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
-          id
-          url
-          alt
-          caption
-          Uploader {
-            username
-          }
-        }
-        Discussions {
-          id
-          title
-          createdAt
-          Author {
-            username
-            displayName
-          }
-          DiscussionChannels {
-            id
-            channelUniqueName
-          }
-        }
-      }
-    }
-  }
-`;
-
-export const GET_IMAGE_ALBUM_USAGE = gql`
-  query GetImageAlbumUsage($imageId: ID!) {
-    getImageAlbumUsage(imageId: $imageId) {
-      imageId
-      uploaderUsername
-      uploaderOwnedAlbums {
-        id
-        imageOrder
-        Owner {
-          username
-          displayName
-        }
-        Discussions {
-          id
-          title
-          createdAt
-          Author {
-            username
-            displayName
-          }
-          DiscussionChannels {
-            id
-            channelUniqueName
-          }
-        }
-      }
-      otherAlbums {
-        id
-        imageOrder
-        Owner {
-          username
-          displayName
-        }
-        Discussions {
-          id
-          title
-          createdAt
-          Author {
-            username
-            displayName
-          }
-          DiscussionChannels {
-            id
-            channelUniqueName
-          }
-        }
-      }
     }
   }
 `;
@@ -176,6 +95,30 @@ export const GET_USER_ALBUMS = gql`
           id
           channelUniqueName
         }
+      }
+    }
+  }
+`;
+
+export const GET_USER_ALBUMS_FOR_IMAGE_SAVE = gql`
+  query GetUserAlbumsForImageSave($username: String!, $imageId: ID!) {
+    albums(where: { Owner: { username: $username } }) {
+      id
+      Owner {
+        username
+        displayName
+      }
+      matchingImages: Images(where: { id: $imageId }) {
+        id
+      }
+      ImagesAggregate(
+        where: { archived_NOT: true, permanentlyRemoved_NOT: true }
+      ) {
+        count
+      }
+      Discussions(options: { sort: { createdAt: DESC } }) {
+        id
+        title
       }
     }
   }

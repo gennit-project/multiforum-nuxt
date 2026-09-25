@@ -26,9 +26,15 @@ const {
         configured: true,
         enabled: true,
         requiredEnvVarsMissing: [],
-        setupUrl: '/admin/setup#uploads',
+        setupUrl: '/admin/setup#file-uploads',
         docsPath: '/self-hosting/uploads',
-      },
+      } as {
+        configured: boolean;
+        enabled: boolean;
+        requiredEnvVarsMissing: string[];
+        setupUrl: string;
+        docsPath: string;
+      } | null,
     },
     uploadsLoading: { value: false },
     uploadsError: { value: null as Error | null },
@@ -168,9 +174,13 @@ describe('AlbumEditor', () => {
       data: { permanentlyDeleteImage: { id: 'a' } },
     });
     uploadsAvailable.value = true;
-    uploadsCapability.value.configured = true;
-    uploadsCapability.value.enabled = true;
-    uploadsCapability.value.setupUrl = '/admin/setup#uploads';
+    uploadsCapability.value = {
+      configured: true,
+      enabled: true,
+      requiredEnvVarsMissing: [],
+      setupUrl: '/admin/setup#file-uploads',
+      docsPath: '/self-hosting/uploads',
+    };
     uploadsLoading.value = false;
     uploadsError.value = null;
   });
@@ -182,8 +192,11 @@ describe('AlbumEditor', () => {
 
   it('disables direct file uploads but preserves album editing when storage is unavailable', () => {
     uploadsAvailable.value = false;
-    uploadsCapability.value.configured = false;
-    uploadsCapability.value.enabled = false;
+    uploadsCapability.value = {
+      ...uploadsCapability.value!,
+      configured: false,
+      enabled: false,
+    };
 
     const wrapper = mountEditor();
 
@@ -191,7 +204,22 @@ describe('AlbumEditor', () => {
       fileUploadAvailable: false,
       fileUploadUnavailableMessage:
         'File uploads are unavailable until file storage is configured.',
-      setupUrl: '/admin/setup#uploads',
+      setupUrl: '/admin/setup#file-uploads',
+    });
+  });
+
+  it('reports an availability check failure without linking to instance setup', () => {
+    uploadsAvailable.value = false;
+    uploadsCapability.value = null;
+    uploadsError.value = new Error('Not Authorised!');
+
+    const wrapper = mountEditor();
+
+    expect(wrapper.getComponent(AlbumDropZoneStub).props()).toMatchObject({
+      fileUploadAvailable: false,
+      fileUploadUnavailableMessage:
+        'File upload availability could not be checked. Try refreshing the page.',
+      setupUrl: '',
     });
   });
 

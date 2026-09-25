@@ -2,14 +2,11 @@
 import { computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
-import { useModProfileName } from '@/composables/useAuthState';
+import { GET_DOWNLOAD_ACTIVITY } from '@/graphQLData/discussion/queries';
 import DiscussionTitleVersions from '@/components/discussion/detail/activityFeed/DiscussionTitleVersions.vue';
 import LabelChangeHistory from '@/components/discussion/detail/activityFeed/LabelChangeHistory.vue';
 import type { Discussion } from '@/__generated__/graphql';
 import { useSharedDownloadPipelineOverview } from '@/composables/useDownloadPipelineOverview';
-
-const modProfileNameVar = useModProfileName();
 
 const props = defineProps<{
   discussion?: Discussion;
@@ -27,23 +24,29 @@ const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
-const loggedInUserModName = computed(() => modProfileNameVar.value);
-
-// If discussion is not provided via props, fetch it
 const { result: getDiscussionResult } = useQuery(
-  GET_DISCUSSION,
+  GET_DOWNLOAD_ACTIVITY,
   () => ({
     id: discussionId.value,
-    loggedInModName: loggedInUserModName.value,
     channelUniqueName: channelId.value,
   }),
   {
-    enabled: !props.discussion,
+    enabled: computed(() => !!discussionId.value && !!channelId.value),
+    prefetch: false,
   }
 );
 
 const discussion = computed<Discussion | null>(() => {
-  return props.discussion || getDiscussionResult.value?.discussions?.[0] || null;
+  const initialDiscussion = props.discussion || null;
+  const activity = getDiscussionResult.value?.discussions?.[0] || null;
+
+  if (!activity) return initialDiscussion;
+  if (!initialDiscussion) return activity;
+
+  return {
+    ...initialDiscussion,
+    ...activity,
+  };
 });
 
 const downloadableFileId = computed(
@@ -107,7 +110,10 @@ const hasAnyActivity = computed(() => {
 
 <template>
   <div class="px-2 py-4">
-    <div v-if="!hasAnyActivity" class="text-center text-gray-500 dark:text-gray-400">
+    <div
+      v-if="!hasAnyActivity"
+      class="text-center text-gray-500 dark:text-gray-400"
+    >
       No activity to display yet.
     </div>
     <div v-else class="space-y-4">
@@ -128,7 +134,10 @@ const hasAnyActivity = computed(() => {
         aria-labelledby="pipeline-activity-heading"
         class="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
       >
-        <h2 id="pipeline-activity-heading" class="font-semibold dark:text-white">
+        <h2
+          id="pipeline-activity-heading"
+          class="font-semibold dark:text-white"
+        >
           Pipeline activity
         </h2>
         <ol class="mt-3 divide-y divide-gray-200 dark:divide-gray-700">
@@ -142,7 +151,11 @@ const hasAnyActivity = computed(() => {
               class="font-medium text-orange-700 underline dark:text-orange-300"
             >
               {{ attempt.scope === 'SERVER' ? 'Server' : 'Channel' }} checks
-              {{ attempt.status === 'SUCCEEDED' ? 'passed' : attempt.status.toLowerCase().replace('_', ' ') }}
+              {{
+                attempt.status === 'SUCCEEDED'
+                  ? 'passed'
+                  : attempt.status.toLowerCase().replace('_', ' ')
+              }}
             </NuxtLink>
             <span class="ml-2 text-gray-500 dark:text-gray-400">
               {{ formatPipelineTime(attempt.finishedAt || attempt.updatedAt) }}

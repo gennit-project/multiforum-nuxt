@@ -5,9 +5,6 @@ import { mount } from '@vue/test-utils';
 import DiscussionTitleEditForm from '@/components/discussion/detail/DiscussionTitleEditForm.vue';
 
 const h = vi.hoisted(() => ({
-  answeredResult: null as unknown,
-  answeredLoading: null as unknown,
-  answeredError: null as unknown,
   discussionResult: null as unknown,
   discussionLoading: null as unknown,
   discussionError: null as unknown,
@@ -17,18 +14,12 @@ const h = vi.hoisted(() => ({
   onDone: undefined as undefined | (() => void),
   username: null as unknown,
   route: null as unknown,
-  callIndex: { n: 0 },
+  queryDocument: '',
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => {
-    h.callIndex.n++;
-    if (h.callIndex.n === 1)
-      return {
-        result: h.answeredResult,
-        error: h.answeredError,
-        loading: h.answeredLoading,
-      };
+  useQuery: (document: string) => {
+    h.queryDocument = document;
     return {
       result: h.discussionResult,
       error: h.discussionError,
@@ -48,7 +39,13 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
-vi.mock('@/composables/useTheme', () => ({ useAppTheme: () => ({ theme: ref('light') }) }));
+vi.mock('@/graphQLData/discussion/queries', () => ({
+  GET_DISCUSSION_DETAIL: 'GET_DISCUSSION_DETAIL',
+  GET_DOWNLOAD_DETAIL: 'GET_DOWNLOAD_DETAIL',
+}));
+vi.mock('@/composables/useTheme', () => ({
+  useAppTheme: () => ({ theme: ref('light') }),
+}));
 vi.mock('@/composables/useAuthState', () => ({
   useModProfileName: () => ref(''),
   useUsername: () => h.username,
@@ -59,6 +56,8 @@ const discussion = () => ({
   title: 'My Discussion',
   Author: { username: 'alice' },
   createdAt: '2024-03-30T00:00:00Z',
+  DiscussionChannels: [{ channelUniqueName: 'cats', answered: false }],
+  isFavorited: true,
 });
 
 const mountForm = () =>
@@ -89,11 +88,19 @@ const mountForm = () =>
           emits: ['click'],
           template: '<button @click="$emit(\'click\')">{{ text }}</button>',
         },
-        ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err" />' },
-        InfoBanner: { name: 'InfoBanner', props: ['text'], template: '<div class="info" />' },
+        ErrorBanner: {
+          name: 'ErrorBanner',
+          props: ['text'],
+          template: '<div class="err" />',
+        },
+        InfoBanner: {
+          name: 'InfoBanner',
+          props: ['text'],
+          template: '<div class="info" />',
+        },
         CharCounter: { props: ['current', 'max'], template: '<div />' },
         CheckCircleIcon: true,
-        'SkeletonLoader': { template: '<div class="skeleton" />' },
+        SkeletonLoader: { template: '<div class="skeleton" />' },
         NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
         'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
       },
@@ -105,14 +112,11 @@ const button = (w: ReturnType<typeof mount>, text: string) =>
 
 beforeEach(() => {
   vi.clearAllMocks();
-  h.callIndex.n = 0;
-  h.answeredResult = ref({ discussionChannels: [{ answered: false }] });
-  h.answeredLoading = ref(false);
-  h.answeredError = ref(null);
   h.discussionResult = ref({ discussions: [discussion()] });
   h.discussionLoading = ref(false);
   h.discussionError = ref(null);
   h.onResult = undefined;
+  h.queryDocument = '';
   h.updateError = { value: null };
   h.onDone = undefined;
   h.username = ref('alice');
@@ -123,6 +127,19 @@ beforeEach(() => {
 });
 
 describe('DiscussionTitleEditForm display', () => {
+  it('uses the focused detail query on discussion routes', () => {
+    mountForm();
+
+    expect(h.queryDocument).toBe('GET_DISCUSSION_DETAIL');
+  });
+
+  it('uses the download query on download routes', () => {
+    h.route.name = 'forums-forumId-downloads-discussionId';
+    mountForm();
+
+    expect(h.queryDocument).toBe('GET_DOWNLOAD_DETAIL');
+  });
+
   it('shows skeletons while loading', () => {
     h.discussionLoading = ref(true);
     h.discussionResult = ref(null);
@@ -135,6 +152,25 @@ describe('DiscussionTitleEditForm display', () => {
     const wrapper = mountForm();
 
     expect(wrapper.get('h1').text()).toBe('My Discussion');
+  });
+
+  it('uses a deterministic UTC publication date', () => {
+    h.discussionResult = ref({
+      discussions: [{ ...discussion(), createdAt: '2025-08-23T01:00:00.000Z' }],
+    });
+    const wrapper = mountForm();
+
+    expect(wrapper.text()).toContain('Aug 23, 2025');
+  });
+
+  it('passes the query favorite state into the favorite control', () => {
+    const wrapper = mountForm();
+
+    expect(
+      wrapper
+        .getComponent({ name: 'AddToDiscussionFavorites' })
+        .props('initialIsFavorited')
+    ).toBe(true);
   });
 
   it('shows a not-found message when the discussion is missing', () => {
@@ -152,7 +188,14 @@ describe('DiscussionTitleEditForm display', () => {
   });
 
   it('shows the answered badge when the discussion is answered', () => {
-    h.answeredResult = ref({ discussionChannels: [{ answered: true }] });
+    h.discussionResult = ref({
+      discussions: [
+        {
+          ...discussion(),
+          DiscussionChannels: [{ channelUniqueName: 'cats', answered: true }],
+        },
+      ],
+    });
     const wrapper = mountForm();
 
     expect(wrapper.text()).toContain('Answered');

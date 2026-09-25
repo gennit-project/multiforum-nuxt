@@ -6,7 +6,7 @@ import AddImage from '@/components/AddImage.vue';
 
 const h = vi.hoisted(() => ({
   available: null as unknown as { value: boolean },
-  capability: null as unknown as { value: Record<string, unknown> },
+  capability: null as unknown as { value: Record<string, unknown> | null },
   error: null as unknown as { value: Error | null },
   loading: null as unknown as { value: boolean },
 }));
@@ -40,7 +40,7 @@ describe('AddImage', () => {
       configured: true,
       enabled: true,
       requiredEnvVarsMissing: [],
-      setupUrl: '/admin/setup#uploads',
+      setupUrl: '/admin/setup#file-uploads',
       docsPath: '/self-hosting/uploads',
     });
     h.error = ref(null);
@@ -114,5 +114,23 @@ describe('AddImage', () => {
     expect(wrapper.get('a').attributes('href')).toBe(
       '/admin/setup#custom-uploads'
     );
+  });
+
+  it('reports an availability check failure without claiming storage is unconfigured', () => {
+    h.available = ref(false);
+    h.capability = ref(null);
+    h.error = ref(new Error('Not Authorised!'));
+
+    const wrapper = mountAdd();
+
+    expect({
+      text: wrapper.text(),
+      hasSetupLink: wrapper.find('a').exists(),
+    }).toEqual({
+      text: expect.stringContaining(
+        'Image upload availability could not be checked. Try refreshing the page.'
+      ),
+      hasSetupLink: false,
+    });
   });
 });

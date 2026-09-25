@@ -17,9 +17,11 @@ type ForumRoleMembership = {
 };
 
 type MaybeRefString = string | Ref<string> | ComputedRef<string>;
+type MaybeRefBoolean = boolean | Ref<boolean> | ComputedRef<boolean>;
 
-const forumRoleMembershipKey: InjectionKey<ForumRoleMembership> =
-  Symbol('forumRoleMembership');
+const forumRoleMembershipKey: InjectionKey<ForumRoleMembership> = Symbol(
+  'forumRoleMembership'
+);
 
 const defaultForumRoleMembership: ForumRoleMembership = {
   forumAdminUsernames: computed(() => []),
@@ -28,7 +30,8 @@ const defaultForumRoleMembership: ForumRoleMembership = {
 };
 
 export const createForumRoleMembership = (
-  channelUniqueName: MaybeRefString
+  channelUniqueName: MaybeRefString,
+  prefetch: MaybeRefBoolean = true
 ): ForumRoleMembership => {
   const { result } = useQuery(
     GET_MODS_BY_CHANNEL,
@@ -38,6 +41,7 @@ export const createForumRoleMembership = (
     () => ({
       fetchPolicy: 'cache-first',
       enabled: !!unref(channelUniqueName),
+      prefetch: unref(prefetch),
     })
   );
 
@@ -52,9 +56,8 @@ export const createForumRoleMembership = (
   const forumModUsernames = computed(() => {
     return (
       result.value?.channels?.[0]?.Moderators?.map(
-        (moderator: {
-          User?: { username?: string | null } | null;
-        }) => moderator.User?.username
+        (moderator: { User?: { username?: string | null } | null }) =>
+          moderator.User?.username
       ).filter(Boolean) || []
     );
   });
@@ -75,9 +78,10 @@ export const createForumRoleMembership = (
 };
 
 export const provideForumRoleMembership = (
-  channelUniqueName: MaybeRefString
+  channelUniqueName: MaybeRefString,
+  prefetch: MaybeRefBoolean = true
 ) => {
-  const membership = createForumRoleMembership(channelUniqueName);
+  const membership = createForumRoleMembership(channelUniqueName, prefetch);
   provide(forumRoleMembershipKey, membership);
   return membership;
 };

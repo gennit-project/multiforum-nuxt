@@ -882,6 +882,43 @@ export const GET_PLUGIN_PIPELINE_SUMMARY = gql`
   }
 `;
 
+export const GET_INTERNAL_PLUGIN_PIPELINE_RUN = gql`
+  query GetInternalPluginPipelineRun($pipelineRunId: ID!) {
+    getInternalPluginPipelineRun(pipelineRunId: $pipelineRunId) {
+      attempt {
+        id
+        pipelineId
+        status
+        queuedAt
+        startedAt
+        heartbeatAt
+        timeoutAt
+        finishedAt
+        updatedAt
+      }
+      jobs {
+        id
+        pluginId
+        pluginName
+        version
+        status
+        message
+        durationMs
+        payload
+        executionOrder
+        skippedReason
+        leaseId
+        queuedAt
+        startedAt
+        heartbeatAt
+        timeoutAt
+        finishedAt
+        updatedAt
+      }
+    }
+  }
+`;
+
 export const GET_DOWNLOAD_PIPELINE_OVERVIEW = gql`
   query GetDownloadPipelineOverview(
     $downloadableFileId: ID!

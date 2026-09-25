@@ -11,8 +11,8 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
 import {
-  GET_DISCUSSION,
-  IS_DISCUSSION_ANSWERED,
+  GET_DISCUSSION_DETAIL,
+  GET_DOWNLOAD_DETAIL,
 } from '@/graphQLData/discussion/queries';
 import { DISCUSSION_TITLE_CHAR_LIMIT } from '@/utils/constants';
 import { useRoute } from 'nuxt/app';
@@ -21,7 +21,6 @@ import { useModProfileName, useUsername } from '@/composables/useAuthState';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
-
 
 const route = useRoute();
 const titleEditMode = ref(false);
@@ -32,34 +31,26 @@ const channelId = computed(() =>
 const discussionId = computed(() =>
   typeof route.params.discussionId === 'string' ? route.params.discussionId : ''
 );
-
-const {
-  result: isDiscussionAnsweredResult,
-  error: isDiscussionAnsweredError,
-  loading: isDiscussionAnsweredLoading,
-} = useQuery(IS_DISCUSSION_ANSWERED, {
-  discussionId: discussionId.value,
-  channelUniqueName: channelId.value,
-});
-
-const answered = computed(() => {
-  if (isDiscussionAnsweredLoading.value) return false;
-  if (isDiscussionAnsweredError.value) return false;
-  return (
-    isDiscussionAnsweredResult.value?.discussionChannels?.[0]?.answered || false
-  );
-});
+const isDownloadDetailPage = computed(
+  () =>
+    typeof route.name === 'string' &&
+    route.name.includes('forums-forumId-downloads-discussionId')
+);
 
 const {
   result: getDiscussionResult,
   error: getDiscussionError,
   loading: getDiscussionLoading,
   onResult: onGetDiscussionResult,
-} = useQuery(GET_DISCUSSION, {
-  id: discussionId,
-  loggedInModName: modProfileNameVar.value || '',
-  channelUniqueName: channelId.value,
-});
+} = useQuery(
+  isDownloadDetailPage.value ? GET_DOWNLOAD_DETAIL : GET_DISCUSSION_DETAIL,
+  {
+    id: discussionId,
+    loggedInModName: modProfileNameVar.value || '',
+    loggedInUsername: usernameVar.value || null,
+    channelUniqueName: channelId.value,
+  }
+);
 
 const discussion = computed<Discussion | null>(() => {
   const discussion = getDiscussionResult.value?.discussions?.[0];
@@ -71,6 +62,13 @@ const discussion = computed<Discussion | null>(() => {
   }
   return discussion || null;
 });
+const answered = computed(
+  () =>
+    discussion.value?.DiscussionChannels?.find(
+      (discussionChannel) =>
+        discussionChannel.channelUniqueName === channelId.value
+    )?.answered || false
+);
 const authorIsLoggedInUser = computed(
   () => discussion.value?.Author?.username === usernameVar.value
 );
@@ -113,21 +111,15 @@ const formattedDate = computed(() => {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
+    timeZone: 'UTC',
   });
-});
-const isDownloadDetailPage = computed(() => {
-  return (
-    route.name &&
-    typeof route.name === 'string' &&
-    route.name.includes('forums-forumId-downloads-discussionId')
-  );
 });
 </script>
 
 <template>
   <div class="w-full pb-2 shadow-sm">
     <div
-      class="mb-3 mt-4 flex w-full flex-col md:flex-row md:items-center md:justify-between md:space-x-2"
+      class="mt-4 mb-3 flex w-full flex-col md:flex-row md:items-center md:justify-between md:space-x-2"
     >
       <div v-if="getDiscussionLoading" class="flex-1">
         <div class="flex flex-col gap-2 px-1">
@@ -142,7 +134,7 @@ const isDownloadDetailPage = computed(() => {
       <div v-else ref="discussionDetail" class="flex-1">
         <h1
           v-if="!titleEditMode"
-          class="text-wrap px-1 text-lg text-black sm:tracking-tight md:text-2xl dark:text-white"
+          class="px-1 text-lg text-wrap text-black sm:tracking-tight md:text-2xl dark:text-white"
         >
           {{
             discussion && discussion.title
@@ -173,7 +165,7 @@ const isDownloadDetailPage = computed(() => {
         </div>
         <p
           v-if="!titleEditMode"
-          class="ml-1 mt-1 flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
+          class="mt-1 ml-1 flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
         >
           <slot />
           <span
@@ -193,6 +185,7 @@ const isDownloadDetailPage = computed(() => {
             :discussion-title="discussion.title"
             :entity-name="isDownloadDetailPage ? 'Download' : 'Discussion'"
             :entity-type="isDownloadDetailPage ? 'download' : 'discussion'"
+            :initial-is-favorited="discussion.isFavorited ?? false"
             size="large"
           />
         </div>
@@ -206,14 +199,14 @@ const isDownloadDetailPage = computed(() => {
             <nuxt-link
               v-if="!titleEditMode && !isDownloadDetailPage"
               :to="`/forums/${channelId}/discussions/create`"
-              class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              class="ml-2 inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
             >
               New Discussion
             </nuxt-link>
             <nuxt-link
               v-if="!titleEditMode && isDownloadDetailPage"
               :to="`/forums/${channelId}/downloads/create`"
-              class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              class="ml-2 inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
             >
               New Upload
             </nuxt-link>
@@ -238,14 +231,14 @@ const isDownloadDetailPage = computed(() => {
             <button
               v-if="!isDownloadDetailPage"
               type="button"
-              class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              class="ml-2 inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
             >
               New Discussion
             </button>
             <button
               v-else
               type="button"
-              class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              class="ml-2 inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
             >
               New Upload
             </button>

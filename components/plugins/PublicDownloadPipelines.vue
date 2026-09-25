@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, toRef, watch } from 'vue';
-import { useMutation } from '@vue/apollo-composable';
+import { useApolloClient, useMutation } from '@vue/apollo-composable';
 import {
   getApplicablePipelineStatus,
   useSharedDownloadPipelineOverview,
@@ -10,10 +10,53 @@ import {
 } from '@/composables/useDownloadPipelineOverview';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { useChannelPermissions } from '@/composables/useCommentPermissions';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import {
   RERUN_PLUGIN_PIPELINE,
   START_PLUGIN_PIPELINE,
 } from '@/graphQLData/admin/mutations';
+import { GET_INTERNAL_PLUGIN_PIPELINE_RUN } from '@/graphQLData/admin/queries';
+
+interface InternalPipelineJob {
+  id: string;
+  pluginId: string;
+  pluginName: string;
+  version: string;
+  status: string;
+  message?: string | null;
+  durationMs?: number | null;
+  payload?: unknown;
+  executionOrder: number;
+  skippedReason?: string | null;
+  leaseId?: string | null;
+  queuedAt?: string | null;
+  startedAt?: string | null;
+  heartbeatAt?: string | null;
+  timeoutAt?: string | null;
+  finishedAt?: string | null;
+  updatedAt: string;
+}
+
+interface InternalPipelineRunDetail {
+  attempt: {
+    id: string;
+    pipelineId: string;
+    status: string;
+    queuedAt?: string | null;
+    startedAt?: string | null;
+    heartbeatAt?: string | null;
+    timeoutAt?: string | null;
+    finishedAt?: string | null;
+    updatedAt: string;
+  };
+  jobs: InternalPipelineJob[];
+}
+
+interface PublicDetailEntry {
+  key: string;
+  label: string;
+  value: unknown;
+}
 
 const props = defineProps<{
   fileId: string;
@@ -40,6 +83,13 @@ const {
 
 const username = useUsername();
 const modProfileName = useModProfileName();
+const { serverAdminUsernames } = useServerRoleMembership();
+const canViewInternalLogs = computed(
+  () =>
+    Boolean(username.value) &&
+    serverAdminUsernames.value.includes(username.value)
+);
+const { client } = useApolloClient();
 const { userPermissions } = useChannelPermissions(toRef(props, 'channelName'));
 const canStartPipelines = computed(
   () =>
@@ -211,6 +261,117 @@ const formatDetails = (details: unknown) => {
   return typeof details === 'string'
     ? details
     : JSON.stringify(details, null, 2);
+};
+
+const detailRecord = (details: unknown): Record<string, unknown> | null =>
+  typeof details === 'object' && details !== null && !Array.isArray(details)
+    ? (details as Record<string, unknown>)
+    : null;
+
+const diagnosticCorrelationId = (details: unknown) => {
+  const value = detailRecord(details)?.correlationId;
+  return typeof value === 'string' && value.trim() ? value : null;
+};
+
+const detailLabel = (key: string) =>
+  key
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/[_-]+/g, ' ')
+    .replace(/^./, (character) => character.toUpperCase());
+
+const publicDetailEntries = (details: unknown): PublicDetailEntry[] =>
+  Object.entries(detailRecord(details) || {})
+    .filter(([key]) => key !== 'correlationId')
+    .map(([key, value]) => ({ key, label: detailLabel(key), value }));
+
+const expandedTechnicalDetails = ref<Record<string, boolean>>({});
+const technicalDetails = ref<Record<string, InternalPipelineRunDetail>>({});
+const technicalDetailsLoading = ref<Record<string, boolean>>({});
+const technicalDetailsErrors = ref<Record<string, boolean>>({});
+
+const isTechnicalDetailsExpanded = (pipelineId: string) =>
+  Boolean(expandedTechnicalDetails.value[pipelineId]);
+
+const loadTechnicalDetails = async (pipelineId: string) => {
+  if (!canViewInternalLogs.value || technicalDetailsLoading.value[pipelineId]) {
+    return;
+  }
+
+  technicalDetailsLoading.value = {
+    ...technicalDetailsLoading.value,
+    [pipelineId]: true,
+  };
+  technicalDetailsErrors.value = {
+    ...technicalDetailsErrors.value,
+    [pipelineId]: false,
+  };
+
+  try {
+    const result = await client.query<{
+      getInternalPluginPipelineRun: InternalPipelineRunDetail | null;
+    }>({
+      query: GET_INTERNAL_PLUGIN_PIPELINE_RUN,
+      variables: { pipelineRunId: pipelineId },
+      fetchPolicy: 'network-only',
+    });
+    if (!result.data.getInternalPluginPipelineRun) {
+      throw new Error('Pipeline telemetry was not found.');
+    }
+    technicalDetails.value = {
+      ...technicalDetails.value,
+      [pipelineId]: result.data.getInternalPluginPipelineRun,
+    };
+  } catch {
+    technicalDetailsErrors.value = {
+      ...technicalDetailsErrors.value,
+      [pipelineId]: true,
+    };
+  } finally {
+    technicalDetailsLoading.value = {
+      ...technicalDetailsLoading.value,
+      [pipelineId]: false,
+    };
+  }
+};
+
+const toggleTechnicalDetails = async (pipelineId: string) => {
+  if (!canViewInternalLogs.value) return;
+
+  const expanded = !isTechnicalDetailsExpanded(pipelineId);
+  expandedTechnicalDetails.value = {
+    ...expandedTechnicalDetails.value,
+    [pipelineId]: expanded,
+  };
+  if (expanded && !technicalDetails.value[pipelineId]) {
+    await loadTechnicalDetails(pipelineId);
+  }
+};
+
+const technicalReportText = (detail: InternalPipelineRunDetail) =>
+  [
+    `Pipeline ${detail.attempt.pipelineId}`,
+    `Status: ${detail.attempt.status}`,
+    `Queued: ${detail.attempt.queuedAt || 'Not recorded'}`,
+    `Started: ${detail.attempt.startedAt || 'Not recorded'}`,
+    `Finished: ${detail.attempt.finishedAt || 'Not recorded'}`,
+    ...detail.jobs.flatMap((job) => [
+      '',
+      `${job.executionOrder + 1}. ${job.pluginName} (${job.status})`,
+      `Plugin: ${job.pluginId}@${job.version}`,
+      `Message: ${job.message || job.skippedReason || 'Not recorded'}`,
+      `Execution lease: ${job.leaseId || 'Not recorded'}`,
+      `Payload: ${formatDetails(job.payload) || 'Not recorded'}`,
+    ]),
+  ].join('\n');
+
+const copyTechnicalDetails = async (
+  pipelineId: string,
+  attemptNumber: number
+) => {
+  const detail = technicalDetails.value[pipelineId];
+  if (!detail) return;
+  await navigator.clipboard.writeText(technicalReportText(detail));
+  shareFeedback.value = `Copied internal telemetry for attempt ${attemptNumber}.`;
 };
 
 type AttemptFilter = 'ALL' | 'ACTIVE' | 'PASSED' | 'FAILED';
@@ -537,6 +698,22 @@ watch(
                 >
                   Share this attempt
                 </button>
+                <button
+                  v-if="canViewInternalLogs"
+                  type="button"
+                  class="text-sm text-orange-700 underline dark:text-orange-300"
+                  :aria-expanded="
+                    isTechnicalDetailsExpanded(attempt.pipelineId)
+                  "
+                  :aria-controls="`technical-details-${attempt.pipelineId}`"
+                  @click="toggleTechnicalDetails(attempt.pipelineId)"
+                >
+                  {{
+                    isTechnicalDetailsExpanded(attempt.pipelineId)
+                      ? 'Hide technical details'
+                      : 'Technical details'
+                  }}
+                </button>
                 <div v-if="canRerunAttempt(attempt)" class="text-right">
                   <button
                     type="button"
@@ -608,8 +785,46 @@ watch(
                         {{ diagnostic.message }}
                       </span>
                     </div>
+                    <div
+                      v-if="diagnosticCorrelationId(diagnostic.details)"
+                      class="mt-3 flex flex-wrap items-center gap-2 rounded border border-blue-200 bg-blue-50 px-3 py-2 dark:border-blue-900 dark:bg-blue-950/30"
+                    >
+                      <span
+                        class="font-medium text-blue-900 dark:text-blue-100"
+                      >
+                        Correlation ID
+                      </span>
+                      <code
+                        class="text-xs break-all text-blue-800 dark:text-blue-200"
+                        >{{ diagnosticCorrelationId(diagnostic.details) }}</code
+                      >
+                    </div>
+                    <dl
+                      v-if="publicDetailEntries(diagnostic.details).length"
+                      class="mt-3 grid gap-2 sm:grid-cols-2"
+                    >
+                      <div
+                        v-for="entry in publicDetailEntries(diagnostic.details)"
+                        :key="entry.key"
+                        class="rounded border border-gray-200 bg-white p-2 dark:border-gray-700 dark:bg-gray-800"
+                      >
+                        <dt
+                          class="text-xs font-medium text-gray-500 dark:text-gray-400"
+                        >
+                          {{ entry.label }}
+                        </dt>
+                        <dd
+                          class="mt-1 break-words text-gray-900 dark:text-gray-100"
+                        >
+                          {{ formatDetails(entry.value) }}
+                        </dd>
+                      </div>
+                    </dl>
                     <pre
-                      v-if="formatDetails(diagnostic.details)"
+                      v-else-if="
+                        formatDetails(diagnostic.details) &&
+                        !detailRecord(diagnostic.details)
+                      "
                       class="mt-2 max-h-64 overflow-auto rounded bg-gray-900 p-3 text-xs wrap-break-word whitespace-pre-wrap text-gray-100"
                       >{{ formatDetails(diagnostic.details) }}</pre>
                     <a
@@ -631,6 +846,120 @@ watch(
                 </ul>
               </li>
             </ol>
+            <section
+              v-if="
+                canViewInternalLogs &&
+                isTechnicalDetailsExpanded(attempt.pipelineId)
+              "
+              :id="`technical-details-${attempt.pipelineId}`"
+              class="border-t border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900"
+              :aria-busy="technicalDetailsLoading[attempt.pipelineId]"
+            >
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h5 class="font-semibold text-gray-900 dark:text-white">
+                    Internal telemetry
+                  </h5>
+                  <p
+                    class="mt-1 max-w-3xl text-sm text-amber-800 dark:text-amber-200"
+                  >
+                    This data can contain private attachment URLs, provider
+                    details, or other sensitive context. Review it before
+                    copying or sharing it.
+                  </p>
+                </div>
+                <button
+                  v-if="technicalDetails[attempt.pipelineId]"
+                  type="button"
+                  class="text-sm text-orange-700 underline dark:text-orange-300"
+                  @click="
+                    copyTechnicalDetails(
+                      attempt.pipelineId,
+                      attempt.attemptNumber
+                    )
+                  "
+                >
+                  Copy internal telemetry
+                </button>
+              </div>
+
+              <p
+                v-if="technicalDetailsLoading[attempt.pipelineId]"
+                class="mt-4 text-sm text-gray-600 dark:text-gray-300"
+              >
+                Loading internal telemetry…
+              </p>
+              <div
+                v-else-if="technicalDetailsErrors[attempt.pipelineId]"
+                class="mt-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200"
+                role="alert"
+              >
+                <p>Internal telemetry could not be loaded.</p>
+                <button
+                  type="button"
+                  class="mt-2 underline"
+                  @click="loadTechnicalDetails(attempt.pipelineId)"
+                >
+                  Try again
+                </button>
+              </div>
+              <div
+                v-else-if="technicalDetails[attempt.pipelineId]"
+                class="mt-4 space-y-3"
+              >
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  Pipeline ID:
+                  <code>{{
+                    technicalDetails[attempt.pipelineId]?.attempt.pipelineId
+                  }}</code>
+                  · Started:
+                  {{
+                    formatTimestamp(
+                      technicalDetails[attempt.pipelineId]?.attempt.startedAt
+                    )
+                  }}
+                  · Finished:
+                  {{
+                    formatTimestamp(
+                      technicalDetails[attempt.pipelineId]?.attempt.finishedAt
+                    )
+                  }}
+                </p>
+                <article
+                  v-for="job in technicalDetails[attempt.pipelineId]?.jobs ||
+                  []"
+                  :key="job.id"
+                  class="rounded border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800"
+                >
+                  <div class="flex flex-wrap justify-between gap-2">
+                    <h6 class="font-medium text-gray-900 dark:text-white">
+                      {{ job.executionOrder + 1 }}. {{ job.pluginName }}
+                    </h6>
+                    <span class="text-sm text-gray-600 dark:text-gray-300">{{
+                      job.status
+                    }}</span>
+                  </div>
+                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    {{ job.pluginId }}@{{ job.version }}
+                    <span v-if="job.leaseId">
+                      · Execution lease {{ job.leaseId }}</span
+                    >
+                  </p>
+                  <p
+                    v-if="job.message || job.skippedReason"
+                    class="mt-2 text-sm"
+                  >
+                    {{ job.message || job.skippedReason }}
+                  </p>
+                  <pre
+                    class="mt-3 max-h-80 overflow-auto rounded bg-gray-950 p-3 text-xs wrap-break-word whitespace-pre-wrap text-gray-100"
+                    >{{
+                      formatDetails(job.payload) ||
+                      'No internal payload was recorded.'
+                    }}</pre>
+                </article>
+              </div>
+            </section>
           </article>
         </div>
         <p
