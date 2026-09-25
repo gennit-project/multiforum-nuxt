@@ -485,8 +485,11 @@ export default defineNuxtConfig({
       },
     },
     build: {
-      minify: false,
-      cssMinify: false,
+      // Keep production assets small enough to download, parse, and execute
+      // quickly. These had been disabled globally, which shipped unminified
+      // JavaScript and CSS to every visitor.
+      minify: 'esbuild',
+      cssMinify: 'esbuild',
       // terserOptions: {
       //   compress: {
       //     drop_console: process.env.NODE_ENV === 'production',

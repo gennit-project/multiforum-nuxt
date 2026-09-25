@@ -12,13 +12,17 @@ import CancelButton from '@/components/CancelButton.vue';
 import { useMutation } from '@vue/apollo-composable';
 import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
 import { useUsername } from '@/composables/useAuthState';
-import ModelViewer from '@/components/ModelViewer.vue';
-import StlViewer from '@/components/download/StlViewer.vue';
 import CarouselThumbnail from '@/components/discussion/detail/CarouselThumbnail.vue';
 import AppImage from '@/components/image/AppImage.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
 
+const ModelViewer = defineAsyncComponent(
+  () => import('@/components/ModelViewer.vue')
+);
+const StlViewer = defineAsyncComponent(
+  () => import('@/components/download/StlViewer.vue')
+);
 const ImageLightbox = defineAsyncComponent(
   () => import('@/components/discussion/detail/ImageLightbox.vue')
 );
@@ -145,7 +149,9 @@ const mainImageSizes = computed(() =>
     ? '(min-width: 1024px) 600px, 100vw'
     : '(min-width: 1024px) 384px, (min-width: 768px) 60vw, 100vw'
 );
-const getGridImageUrl = (image: { url?: string | null } & Record<string, unknown>) =>
+const getGridImageUrl = (
+  image: { url?: string | null } & Record<string, unknown>
+) =>
   getPreferredImageUrl({
     source: image,
     preferred: ['list320', 'list160'],

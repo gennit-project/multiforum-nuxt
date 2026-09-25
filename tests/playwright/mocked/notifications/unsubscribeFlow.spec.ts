@@ -267,24 +267,36 @@ test.describe('Unsubscribe flow', () => {
     });
 
     try {
+      const unsubscribeRequest = page.waitForResponse(
+        (response) =>
+          response.url().includes('/graphql') &&
+          response
+            .request()
+            .postData()
+            ?.includes('unsubscribeFromDiscussionChannel') === true
+      );
+
       // Navigate with unsubscribe action parameter
       await page.goto(
         `/forums/${TEST_CHANNEL}/discussions/${DISCUSSION_ID}?action=unsubscribe`
       );
 
       // Wait for page to load
-      await expect(page.getByRole('heading', { name: 'Test Discussion' })).toBeVisible({
+      await expect(
+        page.getByRole('heading', { name: 'Test Discussion' })
+      ).toBeVisible({
         timeout: 30000,
       });
 
-      // Should allow unsubscribe via subscription controls
-      const unsubscribeRequest = page.waitForResponse(
-        (response) =>
-          response.url().includes('/graphql') &&
-          response.request().postData()?.includes('unsubscribeFromDiscussionChannel') === true
-      );
-      await page.getByRole('button', { name: /^Unsubscribe$/ }).click();
       await expect((await unsubscribeRequest).status()).toBe(200);
+      await expect(
+        page.getByText('You have been unsubscribed from this discussion.', {
+          exact: true,
+        })
+      ).toBeVisible();
+      await expect(
+        page.getByRole('button', { name: /^Subscribe$/ })
+      ).toBeVisible();
 
       expect(diagnostics.pageErrors).toEqual([]);
     } finally {
