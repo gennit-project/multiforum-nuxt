@@ -10,6 +10,10 @@ const props = defineProps({
     type: String,
     default: 'date-picker',
   },
+  inputId: {
+    type: String,
+    default: '',
+  },
   disabled: {
     type: Boolean,
     default: false,
@@ -41,6 +45,7 @@ const baseStyles = computed(() => {
 <template>
   <div class="relative">
     <input
+      :id="inputId || undefined"
       ref="inputRef"
       :class="baseStyles"
       :data-testid="testId"

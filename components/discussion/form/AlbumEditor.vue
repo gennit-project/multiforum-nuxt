@@ -71,9 +71,10 @@ const {
   error: uploadsError,
 } = useInstanceCapability('uploads');
 const uploadsUnavailable = computed(
-  () =>
-    Boolean(uploadsCapability.value || uploadsError.value) &&
-    !uploadsAvailable.value
+  () => Boolean(uploadsCapability.value) && !uploadsAvailable.value
+);
+const uploadsCheckFailed = computed(
+  () => Boolean(uploadsError.value) && !uploadsCapability.value
 );
 const fileUploadAvailable = computed(
   () => props.allowImageUpload !== false && uploadsAvailable.value
@@ -82,17 +83,20 @@ const fileUploadUnavailableMessage = computed(() => {
   if (props.allowImageUpload === false) {
     return 'File uploads are disabled for this channel.';
   }
-  if (uploadsLoading.value && !uploadsCapability.value) {
-    return 'Checking file upload availability...';
+  if (uploadsCheckFailed.value) {
+    return 'File upload availability could not be checked. Try refreshing the page.';
   }
   if (uploadsUnavailable.value) {
     return 'File uploads are unavailable until file storage is configured.';
+  }
+  if (uploadsLoading.value && !uploadsCapability.value) {
+    return 'Checking file upload availability...';
   }
   return '';
 });
 const uploadSetupUrl = computed(() =>
   uploadsUnavailable.value
-    ? uploadsCapability.value?.setupUrl || '/admin/setup#uploads'
+    ? uploadsCapability.value?.setupUrl || '/admin/setup#file-uploads'
     : ''
 );
 

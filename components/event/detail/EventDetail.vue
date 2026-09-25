@@ -606,19 +606,22 @@ watchEffect(() => {
 
 @media (prefers-color-scheme: dark) {
   #texteditor-textarea {
-    @apply bg-gray-700 text-gray-200;
+    background-color: #374151;
+    color: #e5e7eb;
   }
 }
 
 @media (prefers-color-scheme: light) {
   #texteditor-textarea {
-    @apply bg-gray-100 text-gray-700;
+    background-color: #f3f4f6;
+    color: #374151;
   }
 }
 
 /* Override the default styles when the 'dark' or 'light' class is added to the 'body' element */
 body.dark #texteditor-textarea {
-  @apply bg-gray-700 text-gray-200;
+  background-color: #374151;
+  color: #e5e7eb;
 
   .md-editor-toolbar-item:hover {
     background-color: #4a5568;
@@ -626,15 +629,20 @@ body.dark #texteditor-textarea {
 }
 
 body.light #texteditor-textarea {
-  @apply bg-gray-100 text-gray-700;
+  background-color: #f3f4f6;
+  color: #374151;
 }
 
 body.dark #texteditor {
-  @apply border-gray-700 bg-gray-700 text-gray-200;
+  border-color: #374151;
+  background-color: #374151;
+  color: #e5e7eb;
 }
 
 body.light #texteditor {
-  @apply border-gray-200 bg-gray-100 text-gray-700;
+  border-color: #e5e7eb;
+  background-color: #f3f4f6;
+  color: #374151;
 }
 
 .md-content .md-preview,

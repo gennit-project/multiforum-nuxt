@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
-import { useRouter } from 'nuxt/app';
-import type { Discussion } from '@/__generated__/graphql';
+import { computed, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'nuxt/app';
+import type { Discussion, FilterOption } from '@/__generated__/graphql';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
+import DownloadMetadata from '@/components/download/DownloadMetadata.vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD } from '@/graphQLData/collection/queries';
 import PublicCollectionListItem from '@/components/collection/PublicCollectionListItem.vue';
@@ -11,6 +12,11 @@ import { useUsername } from '@/composables/useAuthState';
 import { useSharedDownloadPipelineOverview } from '@/composables/useDownloadPipelineOverview';
 
 const usernameVar = useUsername();
+const hasMounted = ref(false);
+
+onMounted(() => {
+  hasMounted.value = true;
+});
 
 const props = defineProps({
   discussionId: {
@@ -29,9 +35,14 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  labelOptions: {
+    type: Array as () => FilterOption[],
+    default: () => [],
+  },
 });
 
 const router = useRouter();
+const route = useRoute();
 
 const loggedInUserIsAuthor = computed(() => {
   return props.discussion?.Author?.username === usernameVar.value;
@@ -48,6 +59,7 @@ const {
   },
   {
     enabled: !!props.discussionId,
+    prefetch: false,
   }
 );
 
@@ -58,13 +70,18 @@ const publicCollections = computed(() => {
 const primaryFileId = computed(
   () => props.discussion?.DownloadableFiles?.[0]?.id || ''
 );
-const {
-  hasPipelineContent,
-} = useSharedDownloadPipelineOverview(
+const { hasPipelineContent } = useSharedDownloadPipelineOverview(
   primaryFileId,
   computed(() => props.discussionId),
   computed(() => props.channelId),
   { pollWhileActive: false }
+);
+
+const isDescriptionTab = computed(
+  () =>
+    typeof route.name === 'string' &&
+    (route.name === 'forums-forumId-downloads-discussionId' ||
+      route.name.includes('description'))
 );
 </script>
 
@@ -178,7 +195,7 @@ const {
           >
             <button
               type="button"
-              class="hover:bg-gray-50 inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+              class="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
               data-testid="edit-download-button-fallback"
               @click="
                 router.push(
@@ -192,15 +209,20 @@ const {
           </div>
         </div>
       </div>
+      <DownloadMetadata
+        v-if="isDescriptionTab"
+        class="mx-2 mt-4"
+        :label-options="labelOptions"
+      />
     </div>
   </div>
 
   <div class="mt-6 px-2">
-    <h3 class="font-semibold mb-3 text-base text-gray-900 dark:text-white">
+    <h3 class="mb-3 text-base font-semibold text-gray-900 dark:text-white">
       Public collections featuring this download
     </h3>
     <div
-      v-if="publicCollectionsLoading"
+      v-if="!hasMounted || publicCollectionsLoading"
       class="text-sm text-gray-600 dark:text-gray-300"
     >
       Loading collections...

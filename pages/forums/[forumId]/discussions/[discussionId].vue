@@ -7,7 +7,7 @@ import 'md-editor-v3/lib/style.css';
 import { useModProfileName } from '@/composables/useAuthState';
 import { useRoute, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
+import { GET_DISCUSSION_DETAIL } from '@/graphQLData/discussion/queries';
 import { buildDiscussionHead } from '@/utils/discussionSeo';
 
 const modProfileNameVar = useModProfileName();
@@ -33,7 +33,7 @@ const channelId = computed(() => {
   return '';
 });
 
-const { result: discussionResult } = useQuery(GET_DISCUSSION, {
+const { result: discussionResult } = useQuery(GET_DISCUSSION_DETAIL, {
   id: discussionId,
   loggedInModName: modProfileNameVar.value,
   channelUniqueName: channelId.value,
@@ -70,7 +70,7 @@ useHead(metaData);
 
 <template>
   <div
-    class="relative w-full max-w-[theme(screens.2xl)] flex-1 overflow-hidden p-0 focus:outline-none xl:order-last"
+    class="relative mx-auto w-full flex-1 overflow-hidden p-0 focus:outline-none xl:order-last xl:max-w-6xl"
   >
     <div class="flex w-full justify-center space-y-4 overflow-x-hidden">
       <ErrorBanner v-if="!discussionId" text="Discussion not found" />
@@ -84,8 +84,8 @@ useHead(metaData);
   </div>
 </template>
 
-<style>
-h1 {
+<style scoped>
+:deep(h1) {
   font-size: 2.65em;
   padding-bottom: 0.3em;
 }

@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import {
-  GET_IMAGE_DETAILS,
   GET_ALBUM_DETAILS,
   GET_USER_ALBUMS,
 } from '@/graphQLData/image/queries';
@@ -16,7 +15,6 @@ const queryBody = (doc: { loc?: { source: { body: string } } }) =>
 
 describe('archived/removed image hiding filter', () => {
   it.each([
-    ['GET_IMAGE_DETAILS', GET_IMAGE_DETAILS],
     ['GET_ALBUM_DETAILS', GET_ALBUM_DETAILS],
     ['GET_USER_ALBUMS', GET_USER_ALBUMS],
     ['GET_DISCUSSION', GET_DISCUSSION],

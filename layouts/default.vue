@@ -9,6 +9,7 @@ import SiteFooter from '@/components/layout/SiteFooter.vue';
 import DevOverlay from '@/components/nav/DevOverlay.vue';
 import ToastNotification from '@/components/ToastNotification.vue';
 import AddToListModalHost from '@/components/collection/AddToListModalHost.vue';
+import AgeProfilePrompt from '@/components/auth/AgeProfilePrompt.vue';
 import { config } from '@/config';
 import { sideNavIsOpenVar, setSideNavIsOpenVar } from '@/cache';
 
@@ -111,6 +112,9 @@ onMounted(() => {
     <DevOverlay v-if="isDevelopment" />
     <ToastNotification />
     <AddToListModalHost />
+    <ClientOnly>
+      <AgeProfilePrompt />
+    </ClientOnly>
     <div class="flex min-h-screen flex-col">
       <div
         class="flex grow list-disc flex-col bg-gray-200 dark:bg-black dark:text-gray-200"

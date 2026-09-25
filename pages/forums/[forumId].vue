@@ -66,6 +66,9 @@ const showDiscussionTitle = computed(
 const showDownloadTitle = computed(
   () => shellVisibility.value.showDownloadTitle
 );
+// Download detail routes render their own channel-aware content. Let the forum
+// shell hydrate after SSR so these non-critical queries do not block it.
+const shouldPrefetchForumShell = computed(() => !showDownloadTitle.value);
 const showEventTitle = computed(() => shellVisibility.value.showEventTitle);
 const showIssueTitle = computed(() => shellVisibility.value.showIssueTitle);
 const showChannelTabs = computed(() => shellVisibility.value.showChannelTabs);
@@ -113,11 +116,12 @@ const {
     // Keep SSR/client Apollo variables identical during hydration.
     now: currentHour(),
   }),
-  {
+  () => ({
     fetchPolicy: 'cache-first',
     nextFetchPolicy: 'cache-first',
-    enabled: computed(() => !!channelId.value),
-  }
+    enabled: !!channelId.value,
+    prefetch: shouldPrefetchForumShell.value,
+  })
 );
 
 const channel = computed(() => {
@@ -130,11 +134,12 @@ const { result: downloadCountResult } = useQuery(
   () => ({
     uniqueName: channelId.value,
   }),
-  {
+  () => ({
     fetchPolicy: 'cache-first',
     nextFetchPolicy: 'cache-first',
-    enabled: computed(() => !!channelId.value),
-  }
+    enabled: !!channelId.value,
+    prefetch: shouldPrefetchForumShell.value,
+  })
 );
 
 const downloadCount = computed(() => {
@@ -146,7 +151,12 @@ const downloadCount = computed(() => {
 
 const showNotFound = computed(() => {
   // Only show 404 if query has completed and no channel was found
-  return !channelLoading.value && channelId.value && !channel.value;
+  return (
+    shouldPrefetchForumShell.value &&
+    !channelLoading.value &&
+    channelId.value &&
+    !channel.value
+  );
 });
 
 const handleRefetchChannelData = () => {
@@ -341,7 +351,7 @@ definePageMeta({
             v-if="showDiscussionTitle"
             class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600"
           >
-            <div class="max-w-[theme(screens.2xl)] flex-1">
+            <div class="mx-auto w-full flex-1 xl:max-w-6xl xl:pl-4">
               <DiscussionTitleEditForm>
                 <BackLink
                   :data-testid="'discussion-detail-back-link'"
@@ -354,7 +364,7 @@ definePageMeta({
             v-else-if="showDownloadTitle"
             class="flex w-full items-start gap-2 border-b border-gray-300 px-4 dark:border-gray-600"
           >
-            <div class="max-w-[theme(screens.2xl)] flex-1 pr-1">
+            <div class="mx-auto w-full flex-1 pr-1 xl:max-w-6xl">
               <DiscussionTitleEditForm>
                 <BackLink
                   :data-testid="'download-detail-back-link'"
@@ -390,7 +400,11 @@ definePageMeta({
             </div>
           </div>
 
-          <div class="relative w-full">
+          <div
+            class="relative w-full"
+            :class="showDiscussionTitle ? 'mx-auto xl:max-w-6xl' : ''"
+            data-testid="forum-detail-content-row"
+          >
             <div
               class="flex flex-col divide-x divide-gray-300 md:flex-row dark:divide-gray-500"
             >
@@ -410,7 +424,7 @@ definePageMeta({
                     :admin-list="adminList"
                     :channel="channel"
                     :download-count="downloadCount"
-                    class="mt-4 w-full border-b border-gray-300 md:mt-0 md:ml-2 dark:border-gray-600"
+                    class="w-full border-b border-gray-300 md:ml-2 dark:border-gray-600"
                     :desktop="false"
                     :route="route"
                     :show-counts="true"
@@ -430,24 +444,24 @@ definePageMeta({
                   v-if="selectedChannelDiscussionId"
                   class="flex w-full flex-col justify-center rounded-lg border border-gray-200 p-4 dark:border-gray-700"
                 >
-                  <div class="mb-3 flex items-start justify-between gap-3">
-                    <div class="flex-1">
-                      <h2
-                        v-if="selectedChannelDiscussionTitle"
-                        class="text-lg font-semibold text-gray-900 dark:text-gray-100"
-                      >
-                        {{ selectedChannelDiscussionTitle }}
-                      </h2>
-                    </div>
-                    <a
-                      :href="`/forums/${channelId}/discussions/${selectedChannelDiscussionId}`"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="text-xs font-medium text-orange-600 hover:underline dark:text-orange-400"
+                  <h2
+                    v-if="selectedChannelDiscussionTitle"
+                    class="mb-3 min-w-0"
+                  >
+                    <nuxt-link
+                      :to="{
+                        name: 'forums-forumId-discussions-discussionId',
+                        params: {
+                          forumId: channelId,
+                          discussionId: selectedChannelDiscussionId,
+                        },
+                      }"
+                      class="text-lg font-semibold wrap-break-word text-gray-900 underline dark:text-gray-100"
+                      data-testid="channel-discussion-detail-link"
                     >
-                      Open in new tab
-                    </a>
-                  </div>
+                      {{ selectedChannelDiscussionTitle }}
+                    </nuxt-link>
+                  </h2>
                   <DiscussionDetailContent
                     :discussion-id="selectedChannelDiscussionId"
                     :channel-id="channelId"
@@ -556,8 +570,12 @@ definePageMeta({
                 />
               </div>
               <div
-                v-if="showChannelSidebarOnDetail && mdAndUp"
-                class="hidden md:flex md:w-1/3 md:flex-col md:overflow-y-auto"
+                v-if="
+                  showChannelSidebarOnDetail && (showDiscussionTitle || mdAndUp)
+                "
+                class="flex w-full flex-col border-t border-gray-300 md:w-1/3 md:border-t-0 dark:border-gray-600"
+                :class="showDiscussionTitle ? '' : 'md:overflow-y-auto'"
+                data-testid="forum-detail-sidebar"
                 tabindex="0"
                 role="region"
                 aria-label="Forum sidebar"
@@ -565,6 +583,7 @@ definePageMeta({
                 <ChannelSidebar
                   v-if="channel"
                   :channel="channel"
+                  :use-scrollbar="mdAndUp && !showDiscussionTitle"
                   class="px-4"
                   @refetch-channel-data="handleRefetchChannelData"
                 />

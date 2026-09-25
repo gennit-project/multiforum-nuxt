@@ -4,7 +4,7 @@ import { MAX_CHARS_IN_USERNAME } from '@/utils/constants';
  * Pure username/age validation for CreateUsernameForm. `now` is injectable so
  * age math is deterministic in tests.
  */
-export const MIN_SIGNUP_AGE = 13;
+export const DEFAULT_MIN_SIGNUP_AGE = 13;
 
 export function isValidUsername(username: string): boolean {
   return /^[a-zA-Z0-9_]+$/.test(username);
@@ -35,12 +35,31 @@ export function getUsernameValidationMessage(
   return '';
 }
 
-export function calculateAge(birthDate: string, now: Date = new Date()): number {
-  if (!birthDate) return 0;
-  const birth = new Date(birthDate);
-  let age = now.getFullYear() - birth.getFullYear();
-  const monthDiff = now.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
+export function calculateAge(
+  birthDate: string,
+  now: Date = new Date()
+): number | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(birthDate);
+  if (!match) return null;
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const birth = new Date(Date.UTC(year, month - 1, day));
+  if (
+    birth.getUTCFullYear() !== year ||
+    birth.getUTCMonth() !== month - 1 ||
+    birth.getUTCDate() !== day
+  ) {
+    return null;
+  }
+
+  let age = now.getUTCFullYear() - birth.getUTCFullYear();
+  const monthDiff = now.getUTCMonth() - birth.getUTCMonth();
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && now.getUTCDate() < birth.getUTCDate())
+  ) {
     age--;
   }
   return age;
@@ -48,18 +67,30 @@ export function calculateAge(birthDate: string, now: Date = new Date()): number 
 
 export type BirthdayValidationParams = {
   birthday: string;
+  minimumAge?: number | null;
+  required?: boolean;
   now?: Date;
 };
 
 export function getBirthdayValidationMessage(
   params: BirthdayValidationParams
 ): string {
-  const { birthday, now = new Date() } = params;
+  const {
+    birthday,
+    minimumAge = DEFAULT_MIN_SIGNUP_AGE,
+    required = true,
+    now = new Date(),
+  } = params;
   if (!birthday || birthday.length === 0) {
-    return 'Birthday is required.';
+    return required ? 'Birthday is required.' : '';
   }
-  if (calculateAge(birthday, now) < MIN_SIGNUP_AGE) {
-    return 'You must be at least 13 years old to create an account.';
+
+  const age = calculateAge(birthday, now);
+  if (age === null || age < 0) {
+    return 'Enter a valid birthday.';
+  }
+  if (minimumAge !== null && age < minimumAge) {
+    return `You must be at least ${minimumAge} years old to create an account.`;
   }
   return '';
 }

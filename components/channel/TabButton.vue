@@ -94,7 +94,7 @@ const innerClasses = computed(() => [
     :data-testid="dataTestid"
     :to="to"
     :aria-current="isActive ? 'page' : undefined"
-    class="link group inline-flex items-center gap-1 border-transparent pt-2 font-medium hover:text-gray-600 dark:text-gray-400"
+    class="link group inline-flex items-center gap-1 pt-2 font-medium hover:text-gray-600"
     :class="classes"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"

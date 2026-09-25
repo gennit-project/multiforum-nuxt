@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch, defineAsyncComponent } from 'vue';
+import { computed, ref, watch, defineAsyncComponent } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import {
-  GET_DISCUSSION_COMMENTS,
-  GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
-  GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
-} from '@/graphQLData/comment/queries';
+  GET_DISCUSSION_ACTIVITY,
+  GET_DISCUSSION_DETAIL,
+  GET_DOWNLOAD_DETAIL,
+} from '@/graphQLData/discussion/queries';
+import { GET_DISCUSSION_COMMENTS } from '@/graphQLData/comment/queries';
 import {
   CHECK_DISCUSSION_ISSUE_EXISTENCE,
   CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
@@ -23,7 +23,6 @@ import type {
 } from '@/__generated__/graphql';
 import InfoBanner from '@/components/InfoBanner.vue';
 import DiscussionHeader from '@/components/discussion/detail/DiscussionHeader.vue';
-import DiscussionCommentsWrapper from '@/components/discussion/detail/DiscussionCommentsWrapper.vue';
 import DiscussionChannelLinks from '@/components/discussion/detail/DiscussionChannelLinks.vue';
 import DiscussionFlairBadges from '@/components/discussion/DiscussionFlairBadges.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
@@ -35,22 +34,20 @@ import DiscussionLayoutManager from './DiscussionLayoutManager.vue';
 import FeedbackModalManager from './FeedbackModalManager.vue';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { useForumLock } from '@/composables/useForumLock';
-import {
-  useIsAuthenticated,
-  useModProfileName,
-  useUsername,
-} from '@/composables/useAuthState';
+import { useModProfileName, useUsername } from '@/composables/useAuthState';
 
 const DiscussionBodyEditForm = defineAsyncComponent(
   () => import('./DiscussionBodyEditForm.vue')
 );
 const AlbumEditForm = defineAsyncComponent(() => import('./AlbumEditForm.vue'));
+const DiscussionCommentsWrapper = defineAsyncComponent(
+  () => import('./DiscussionCommentsWrapper.vue')
+);
 
-const isAuthenticatedVar = useIsAuthenticated();
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
 
-const COMMENT_LIMIT = 50;
+const COMMENT_LIMIT = 20;
 
 const props = defineProps({
   discussionId: {
@@ -89,8 +86,12 @@ const channelId = computed(() => {
 });
 const loggedInUserModName = computed(() => modProfileNameVar.value);
 const lastValidDiscussion = ref<Discussion | null>(null);
+const shouldLoadInlineComments = computed(
+  () => !props.downloadMode && props.showComments
+);
+const shouldPrefetchDownloadChrome = computed(() => !props.downloadMode);
 
-provideForumRoleMembership(channelId);
+provideForumRoleMembership(channelId, shouldPrefetchDownloadChrome);
 
 const {
   result: getDiscussionResult,
@@ -99,14 +100,28 @@ const {
   refetch: refetchDiscussion,
   onResult: onGetDiscussionResult,
 } = useQuery(
-  GET_DISCUSSION,
+  props.downloadMode ? GET_DOWNLOAD_DETAIL : GET_DISCUSSION_DETAIL,
   () => ({
     id: props.discussionId,
     loggedInModName: loggedInUserModName.value,
+    loggedInUsername: usernameVar.value || null,
     channelUniqueName: channelId.value,
   }),
   {
     fetchPolicy: 'cache-first',
+  }
+);
+
+// Revision history is useful but noncritical to first paint. Fetching it in the
+// browser keeps potentially unbounded version lists out of the SSR response and
+// lets the discussion body, channel state, and comments render first.
+const { result: getDiscussionActivityResult } = useQuery(
+  GET_DISCUSSION_ACTIVITY,
+  () => ({ id: props.discussionId }),
+  {
+    fetchPolicy: 'cache-first',
+    enabled: computed(() => !props.downloadMode && !!props.discussionId),
+    prefetch: false,
   }
 );
 
@@ -142,6 +157,10 @@ const {
   }),
   {
     fetchPolicy: 'cache-first',
+    enabled: shouldLoadInlineComments,
+    // Comments sit below the primary discussion content. Fetch them after
+    // hydration so backend latency does not hold up the SSR response.
+    prefetch: false,
   }
 );
 
@@ -151,8 +170,12 @@ const feedbackModalManager = ref();
 
 const discussion = computed<Discussion | null>(() => {
   const currentDiscussion = getDiscussionResult.value?.discussions?.[0];
+  const activity = getDiscussionActivityResult.value?.discussions?.[0];
+  const currentWithActivity = currentDiscussion
+    ? { ...currentDiscussion, ...(activity || {}) }
+    : null;
 
-  return currentDiscussion || lastValidDiscussion.value;
+  return currentWithActivity || lastValidDiscussion.value;
 });
 
 watch(commentSort, () =>
@@ -164,24 +187,11 @@ watch(
   (newUsername, prevUsername) => {
     if (!newUsername || newUsername === prevUsername) return;
     refetchDiscussion();
-    refetchDiscussionChannel();
+    if (shouldLoadInlineComments.value) {
+      refetchDiscussionChannel();
+    }
   }
 );
-
-watch(
-  () => isAuthenticatedVar.value,
-  (isAuthenticated, wasAuthenticated) => {
-    if (!isAuthenticated || isAuthenticated === wasAuthenticated) return;
-    refetchDiscussion();
-  }
-);
-
-onMounted(() => {
-  if (isAuthenticatedVar.value || usernameVar.value) {
-    refetchDiscussion();
-    refetchDiscussionChannel();
-  }
-});
 
 const setLastValidCommentSection = (
   section: {
@@ -221,14 +231,6 @@ watch(
   }
 );
 
-const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
-  return (
-    getDiscussionChannelResult.value?.getCommentSection?.DiscussionChannel ||
-    lastValidCommentSection.value?.DiscussionChannel ||
-    null
-  );
-});
-
 const formDiscussionChannel = computed<DiscussionChannel | null>(() => {
   const discussionChannels = discussion.value?.DiscussionChannels || [];
   return (
@@ -236,6 +238,14 @@ const formDiscussionChannel = computed<DiscussionChannel | null>(() => {
       (discussionChannel) =>
         discussionChannel.channelUniqueName === channelId.value
     ) || null
+  );
+});
+
+const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
+  return (
+    getDiscussionChannelResult.value?.getCommentSection?.DiscussionChannel ||
+    lastValidCommentSection.value?.DiscussionChannel ||
+    formDiscussionChannel.value
   );
 });
 
@@ -269,7 +279,10 @@ const locked = computed(() => {
 // A locked forum (channel-level lock) also blocks new comments, independent of
 // the per-discussion lock above. Kept separate so the banner can explain which
 // lock is in effect.
-const { locked: forumLocked } = useForumLock(channelId);
+const { locked: forumLocked } = useForumLock(
+  channelId,
+  shouldPrefetchDownloadChrome
+);
 const commentsDisabled = computed(() => locked.value || forumLocked.value);
 
 const comments = computed(() => {
@@ -287,28 +300,6 @@ const loadedRootCommentCount = computed(() => {
   return rootComments.length;
 });
 
-const { result: getDiscussionChannelCommentAggregateResult } = useQuery(
-  GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
-  () => ({
-    discussionId: props.discussionId,
-    channelUniqueName: channelId.value,
-  }),
-  {
-    fetchPolicy: 'cache-first',
-  }
-);
-
-const { result: getDiscussionChannelRootCommentAggregateResult } = useQuery(
-  GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
-  () => ({
-    discussionId: props.discussionId,
-    channelUniqueName: channelId.value,
-  }),
-  {
-    fetchPolicy: 'cache-first',
-  }
-);
-
 // Issue-existence checks are hoisted to this always-mounted parent so they fire
 // on mount (keyed off the route's discussionId + channelId) in parallel with
 // GET_DISCUSSION, rather than waiting for the discussion to load and the gated
@@ -322,6 +313,7 @@ const { result: getDiscussionIssueResult } = useQuery(
   {
     fetchPolicy: 'cache-first',
     enabled: computed(() => !!props.discussionId && !!channelId.value),
+    prefetch: false,
   }
 );
 
@@ -334,6 +326,7 @@ const { result: getDiscussionCommentIssueResult } = useQuery(
   {
     fetchPolicy: 'cache-first',
     enabled: computed(() => !!props.discussionId && !!channelId.value),
+    prefetch: false,
   }
 );
 
@@ -348,12 +341,14 @@ useQuery(
   GET_CHANNEL,
   {
     uniqueName: channelId.value,
-    now: DateTime.local().startOf('hour').toISO(),
+    loggedInUsername: usernameVar.value || null,
+    now: DateTime.utc().startOf('hour').toISO(),
   },
-  {
+  () => ({
     fetchPolicy: 'cache-first',
-    enabled: computed(() => !!channelId.value),
-  }
+    enabled: !!channelId.value,
+    prefetch: shouldPrefetchDownloadChrome.value,
+  })
 );
 
 useQuery(
@@ -402,17 +397,16 @@ const imageUploadsEnabled = computed(
 );
 
 const aggregateCommentCount = computed(() => {
-  return (
-    getDiscussionChannelCommentAggregateResult.value?.discussionChannels?.[0]
-      ?.CommentsAggregate?.count || 0
-  );
+  return activeDiscussionChannel.value?.CommentsAggregate?.count || 0;
 });
 
 const aggregateRootCommentCount = computed(() => {
-  return (
-    getDiscussionChannelRootCommentAggregateResult.value?.discussionChannels?.[0]
-      ?.CommentsAggregate?.count || 0
-  );
+  const channel = activeDiscussionChannel.value as
+    | (DiscussionChannel & {
+        RootCommentsAggregate?: { count?: number | null } | null;
+      })
+    | null;
+  return channel?.RootCommentsAggregate?.count || 0;
 });
 
 const loadMore = () => {
@@ -461,6 +455,14 @@ const handleClickUndoFeedback = () => {
 
 const handleClickEditFeedback = () => {
   feedbackModalManager.value?.handleClickEditFeedback();
+};
+
+const refetchActiveDiscussionChannel = () => {
+  if (props.downloadMode) {
+    refetchDiscussion();
+    return;
+  }
+  refetchDiscussionChannel();
 };
 
 const onFeedbackSubmitted = () => {
@@ -569,7 +571,7 @@ const handleEditAlbum = () => {
     />
     <div
       v-else
-      class="mx-1 my-4 w-full space-y-2 rounded-lg bg-white py-2 shadow-lg ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-gray-700 lg:px-4"
+      class="mx-1 my-4 w-full space-y-2 rounded-lg bg-white py-2 shadow-lg ring-1 ring-gray-200 lg:px-4 dark:bg-gray-900 dark:ring-gray-700"
     >
       <div class="w-full space-y-2 overflow-hidden">
         <ErrorBanner
@@ -640,7 +642,7 @@ const handleEditAlbum = () => {
                   :aggregate-comment-count="aggregateCommentCount"
                   :horizontal-album-thumbnails="horizontalAlbumThumbnails"
                   @discussion-refetch="refetchDiscussion"
-                  @discussion-channel-refetch="refetchDiscussionChannel"
+                  @discussion-channel-refetch="refetchActiveDiscussionChannel"
                   @handle-click-add-album="handleClickAddAlbum"
                   @edit-album="handleEditAlbum"
                   @handle-click-edit-feedback="handleClickEditFeedback"
@@ -655,28 +657,58 @@ const handleEditAlbum = () => {
         <!-- Comments section (shown for non-download mode) -->
         <div v-if="!downloadMode && showComments">
           <div class="my-2 px-2 pt-2">
-            <DiscussionCommentsWrapper
-              :key="activeDiscussionChannel?.id"
-              :aggregate-comment-count="aggregateCommentCount || 0"
-              :comments="comments"
-              :discussion-author="discussionAuthor || ''"
-              :discussion-channel="activeDiscussionChannel || undefined"
-              :form-discussion-channel="formDiscussionChannel || undefined"
-              :channel-id="channelId"
-              :enable-feedback="
-                activeDiscussionChannel?.Channel?.feedbackEnabled ?? true
-              "
-              :enable-emoji="
-                activeDiscussionChannel?.Channel?.emojiEnabled ?? true
-              "
-              :loading="getDiscussionChannelLoading"
-              :locked="commentsDisabled"
-              :mod-name="loggedInUserModName"
-              :previous-offset="previousOffset"
-              :reached-end-of-results="reachedEndOfResults"
-              :answers="answers"
-              @load-more="loadMore"
-            />
+            <ClientOnly>
+              <DiscussionCommentsWrapper
+                :key="activeDiscussionChannel?.id"
+                :aggregate-comment-count="aggregateCommentCount || 0"
+                :comments="comments"
+                :discussion-author="discussionAuthor || ''"
+                :discussion-channel="activeDiscussionChannel || undefined"
+                :form-discussion-channel="formDiscussionChannel || undefined"
+                :channel-id="channelId"
+                :enable-feedback="
+                  activeDiscussionChannel?.Channel?.feedbackEnabled ?? true
+                "
+                :enable-emoji="
+                  activeDiscussionChannel?.Channel?.emojiEnabled ?? true
+                "
+                :loading="getDiscussionChannelLoading"
+                :locked="commentsDisabled"
+                :mod-name="loggedInUserModName"
+                :previous-offset="previousOffset"
+                :reached-end-of-results="reachedEndOfResults"
+                :answers="answers"
+                @load-more="loadMore"
+              />
+              <template #fallback>
+                <div
+                  aria-label="Loading comments"
+                  aria-busy="true"
+                  class="space-y-3 py-4"
+                  data-testid="comments-loading"
+                >
+                  <div
+                    class="h-5 w-32 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+                  />
+                  <div v-for="index in 2" :key="index" class="flex gap-3">
+                    <div
+                      class="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700"
+                    />
+                    <div class="flex-1 space-y-2">
+                      <div
+                        class="h-4 w-1/4 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+                      />
+                      <div
+                        class="h-3 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+                      />
+                      <div
+                        class="h-3 w-5/6 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </ClientOnly>
           </div>
           <DiscussionChannelLinks
             v-if="discussion && (discussion as Discussion).DiscussionChannels"

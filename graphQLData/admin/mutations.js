@@ -12,6 +12,10 @@ export const UPDATE_SERVER_CONFIG = gql`
         rules
         enableDownloads
         enableEvents
+        accountAgeGateEnabled
+        minimumAccountAge
+        sensitiveContentAgeGateEnabled
+        minimumSensitiveContentAge
         allowedFileTypes
         pluginRegistries
       }
@@ -21,10 +25,7 @@ export const UPDATE_SERVER_CONFIG = gql`
 
 export const SET_FEATURED_WIKI_PAGES = gql`
   mutation setFeaturedWikiPages($serverName: String!, $wikiPageIds: [ID!]!) {
-    setFeaturedWikiPages(
-      serverName: $serverName
-      wikiPageIds: $wikiPageIds
-    ) {
+    setFeaturedWikiPages(serverName: $serverName, wikiPageIds: $wikiPageIds) {
       serverName
       featuredWikiPageIds
     }
@@ -297,13 +298,22 @@ export const REMOVE_SERVER_MODERATOR = gql`
 // Server admin invite workflow
 export const INVITE_SERVER_ADMIN = gql`
   mutation InviteServerAdmin($serverName: String!, $inviteeUsername: String!) {
-    inviteServerAdmin(serverName: $serverName, inviteeUsername: $inviteeUsername)
+    inviteServerAdmin(
+      serverName: $serverName
+      inviteeUsername: $inviteeUsername
+    )
   }
 `;
 
 export const CANCEL_INVITE_SERVER_ADMIN = gql`
-  mutation CancelInviteServerAdmin($serverName: String!, $inviteeUsername: String!) {
-    cancelInviteServerAdmin(serverName: $serverName, inviteeUsername: $inviteeUsername)
+  mutation CancelInviteServerAdmin(
+    $serverName: String!
+    $inviteeUsername: String!
+  ) {
+    cancelInviteServerAdmin(
+      serverName: $serverName
+      inviteeUsername: $inviteeUsername
+    )
   }
 `;
 
@@ -321,8 +331,14 @@ export const INVITE_SERVER_MOD = gql`
 `;
 
 export const CANCEL_INVITE_SERVER_MOD = gql`
-  mutation CancelInviteServerMod($serverName: String!, $inviteeUsername: String!) {
-    cancelInviteServerMod(serverName: $serverName, inviteeUsername: $inviteeUsername)
+  mutation CancelInviteServerMod(
+    $serverName: String!
+    $inviteeUsername: String!
+  ) {
+    cancelInviteServerMod(
+      serverName: $serverName
+      inviteeUsername: $inviteeUsername
+    )
   }
 `;
 

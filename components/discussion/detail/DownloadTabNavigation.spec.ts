@@ -1,19 +1,27 @@
 import { describe, it, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
-import { ref } from 'vue';
+import { createSSRApp, ref } from 'vue';
+import { renderToString } from 'vue/server-renderer';
 
 const mockHasPipelineContent = ref(true);
+const h = vi.hoisted(() => ({
+  useQuery: vi.fn(),
+  route: { name: 'forums-forumId-downloads-discussionId' },
+}));
 
 vi.mock('nuxt/app', () => ({
   useRouter: () => ({ push: vi.fn() }),
+  useRoute: () => h.route,
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => ({
-    result: ref({ publicCollectionsContaining: [] }),
-    loading: ref(false),
-    error: ref(null),
-  }),
+  useQuery: h.useQuery,
+}));
+
+h.useQuery.mockImplementation(() => ({
+  result: ref({ publicCollectionsContaining: [] }),
+  loading: ref(false),
+  error: ref(null),
 }));
 
 vi.mock('@/composables/useAuthState', () => ({
@@ -33,6 +41,7 @@ const NuxtLinkStub = {
 };
 
 const mountNav = async (routeName: string) => {
+  h.route.name = routeName;
   const Component = (await import('./DownloadTabNavigation.vue')).default;
   return shallowMount(Component, {
     props: {
@@ -40,6 +49,14 @@ const mountNav = async (routeName: string) => {
       channelId: 'cats',
       aggregateCommentCount: 5,
       discussion: { DownloadableFiles: [{ id: 'file-1' }] },
+      labelOptions: [
+        {
+          id: 'label-1',
+          value: 'park',
+          displayName: 'Park',
+          group: { key: 'lot-type', displayName: 'Lot type' },
+        },
+      ],
     },
     global: {
       mocks: { $route: { name: routeName } },
@@ -49,12 +66,42 @@ const mountNav = async (routeName: string) => {
         MarkdownPreview: true,
         PublicCollectionListItem: true,
         PencilIcon: true,
+        DownloadMetadata: {
+          name: 'DownloadMetadata',
+          props: ['labelOptions'],
+          template: '<div class="metadata" />',
+        },
       },
     },
   });
 };
 
 describe('DownloadTabNavigation', () => {
+  it('defers the public collections query until hydration', async () => {
+    h.useQuery.mockClear();
+    await mountNav('forums-forumId-downloads-discussionId');
+
+    expect(h.useQuery.mock.calls[0]?.[2]).toMatchObject({ prefetch: false });
+  });
+
+  it('renders the loading state during SSR for hydration parity', async () => {
+    const Component = (await import('./DownloadTabNavigation.vue')).default;
+    const app = createSSRApp(Component, {
+      discussionId: 'd1',
+      channelId: 'cats',
+      discussion: { DownloadableFiles: [{ id: 'file-1' }] },
+    });
+    app.config.globalProperties.$route = h.route;
+    app.component('NuxtLink', NuxtLinkStub);
+    app.component('NuxtPage', { template: '<div />' });
+    app.component('MarkdownPreview', { template: '<div />' });
+    app.component('PublicCollectionListItem', { template: '<div />' });
+    app.component('PencilIcon', { template: '<span />' });
+    app.component('DownloadMetadata', { template: '<div />' });
+
+    expect(await renderToString(app)).toContain('Loading collections...');
+  });
+
   it('renders the Pipelines tab when checks are applicable or have history', async () => {
     mockHasPipelineContent.value = true;
     const wrapper = await mountNav('forums-forumId-downloads-discussionId');
@@ -110,5 +157,25 @@ describe('DownloadTabNavigation', () => {
     );
 
     expect(wrapper.text()).toContain('Pipelines');
+  });
+
+  it('renders metadata within the Description tab', async () => {
+    const wrapper = await mountNav(
+      'forums-forumId-downloads-discussionId-description'
+    );
+
+    expect(
+      wrapper.getComponent({ name: 'DownloadMetadata' }).props('labelOptions')
+    ).toHaveLength(1);
+  });
+
+  it('hides metadata outside the Description tab', async () => {
+    const wrapper = await mountNav(
+      'forums-forumId-downloads-discussionId-comments'
+    );
+
+    expect(wrapper.findComponent({ name: 'DownloadMetadata' }).exists()).toBe(
+      false
+    );
   });
 });

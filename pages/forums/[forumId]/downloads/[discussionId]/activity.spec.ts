@@ -1,8 +1,13 @@
-import { describe, expect, it, vi } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { mount, shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
 import type { Discussion } from '@/__generated__/graphql';
 import ActivityPage from './activity.vue';
+import DiscussionTitleVersions from '@/components/discussion/detail/activityFeed/DiscussionTitleVersions.vue';
+import LabelChangeHistory from '@/components/discussion/detail/activityFeed/LabelChangeHistory.vue';
+import { GET_DOWNLOAD_ACTIVITY } from '@/graphQLData/discussion/queries';
+
+const mockUseQuery = vi.hoisted(() => vi.fn());
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({
@@ -11,11 +16,7 @@ vi.mock('nuxt/app', () => ({
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => ({ result: ref(null) }),
-}));
-
-vi.mock('@/composables/useAuthState', () => ({
-  useModProfileName: () => ref(''),
+  useQuery: mockUseQuery,
 }));
 
 vi.mock('@/composables/useDownloadPipelineOverview', () => ({
@@ -39,6 +40,11 @@ vi.mock('@/composables/useDownloadPipelineOverview', () => ({
 }));
 
 describe('download activity', () => {
+  beforeEach(() => {
+    mockUseQuery.mockReset();
+    mockUseQuery.mockReturnValue({ result: ref(null) });
+  });
+
   it('shows terminal pipeline events with stable attempt links', () => {
     const discussion = {
       id: 'discussion-1',
@@ -66,5 +72,50 @@ describe('download activity', () => {
     expect(wrapper.get('a').attributes('href')).toContain(
       '?attempt=pipeline-1#attempt-pipeline-1'
     );
+  });
+
+  it('merges deferred activity into the download passed by the parent route', () => {
+    const activity = {
+      id: 'discussion-1',
+      PastTitleVersions: [{ id: 'version-1', body: 'Old title' }],
+      DiscussionChannels: [
+        {
+          id: 'channel-1',
+          channelUniqueName: 'cats',
+          LabelChangeHistory: [{ id: 'label-change-1' }],
+        },
+      ],
+    };
+    mockUseQuery.mockReturnValue({
+      result: ref({ discussions: [activity] }),
+    });
+
+    const wrapper = shallowMount(ActivityPage, {
+      props: {
+        discussion: {
+          id: 'discussion-1',
+          DownloadableFiles: [{ id: 'file-1' }],
+        } as unknown as Discussion,
+      },
+    });
+    const queryCall = mockUseQuery.mock.calls[0]!;
+
+    expect({
+      document: queryCall[0],
+      variables: queryCall[1](),
+      prefetch: queryCall[2].prefetch,
+      titleVersions: wrapper
+        .findComponent(DiscussionTitleVersions)
+        .props('discussion').PastTitleVersions,
+      labelChanges: wrapper
+        .findComponent(LabelChangeHistory)
+        .props('labelChangeHistory'),
+    }).toEqual({
+      document: GET_DOWNLOAD_ACTIVITY,
+      variables: { id: 'discussion-1', channelUniqueName: 'cats' },
+      prefetch: false,
+      titleVersions: activity.PastTitleVersions,
+      labelChanges: activity.DiscussionChannels[0]!.LabelChangeHistory,
+    });
   });
 });

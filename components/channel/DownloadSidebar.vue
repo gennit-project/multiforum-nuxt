@@ -123,6 +123,16 @@ const downloadDisabled = computed(
   () => !hasDownloadableFile.value || scanStatus.value !== 'CLEAN'
 );
 
+const attachmentUnavailable = computed(() => {
+  if (scanStatus.value !== 'FAILED') return false;
+  const reason = primaryFile.value?.scanReason?.toLowerCase() || '';
+  return (
+    !primaryFile.value?.url ||
+    reason.includes('no attachments to scan') ||
+    reason.includes('no readable downloadable attachment')
+  );
+});
+
 const downloadLabel = 'Download Now';
 
 const replaceFilePath = computed(
@@ -175,7 +185,7 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
       <!-- Boxed Info Section -->
       <div
         v-if="primaryFile"
-        class="bg-gray-50 mb-4 rounded-lg border border-gray-200 p-4 dark:border-gray-600 dark:bg-gray-700"
+        class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-700"
       >
         <!-- File Name -->
         <h2
@@ -273,17 +283,39 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
                 aria-hidden="true"
               />
               <div class="min-w-0 flex-1">
-                <p class="font-medium">Security check needs another try</p>
+                <p class="font-medium">
+                  {{
+                    attachmentUnavailable
+                      ? 'File needs to be replaced'
+                      : 'Security check needs another try'
+                  }}
+                </p>
                 <p class="mt-0.5 text-xs leading-5">
                   {{
                     creatorIsViewing
-                      ? "The scan service had a problem—your file wasn't rejected."
+                      ? attachmentUnavailable
+                        ? 'No readable file is attached, so the security check could not run.'
+                        : "The scan service had a problem—your file wasn't rejected."
                       : 'This download is temporarily unavailable.'
                   }}
                 </p>
+                <p
+                  v-if="creatorIsViewing && primaryFile.scanReason"
+                  class="mt-1 text-xs leading-5"
+                  data-testid="download-scan-reason"
+                >
+                  {{ primaryFile.scanReason }}
+                </p>
                 <div class="mt-1.5 flex flex-wrap gap-3">
-                  <button
+                  <NuxtLink
                     v-if="creatorIsViewing"
+                    class="font-medium underline"
+                    :to="replaceFilePath"
+                  >
+                    Replace file
+                  </NuxtLink>
+                  <button
+                    v-if="creatorIsViewing && !attachmentUnavailable"
                     type="button"
                     class="font-medium underline disabled:no-underline disabled:opacity-70"
                     :disabled="retryingScan"
@@ -348,7 +380,7 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
       <!-- No File Available -->
       <div
         v-if="!primaryFile"
-        class="bg-gray-50 mb-4 rounded-lg border border-gray-200 p-4 text-center text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-300"
+        class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4 text-center text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-300"
       >
         No downloadable files available
       </div>

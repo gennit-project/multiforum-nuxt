@@ -4,9 +4,8 @@ import { computed, watchEffect, ref, onMounted, onUnmounted } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useRoute, useHead } from 'nuxt/app';
 import {
-  GET_IMAGE_ALBUM_USAGE,
   GET_IMAGE_DETAILS,
-  GET_USER_ALBUMS,
+  GET_USER_ALBUMS_FOR_IMAGE_SAVE,
 } from '@/graphQLData/image/queries';
 import { ADD_IMAGE_TO_ALBUM } from '@/graphQLData/image/mutations';
 import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
@@ -20,13 +19,11 @@ import LinkIcon from '@/components/icons/LinkIcon.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import AddImageToFavorites from '@/components/favorites/AddImageToFavorites.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
-import { orderImagesByOrder } from '@/utils/albumImageOrder';
 import { useUsername } from '@/composables/useAuthState';
 import TextEditor from '@/components/TextEditor.vue';
 import SaveButton from '@/components/SaveButton.vue';
 import CancelButton from '@/components/CancelButton.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
-import AlbumThumbnailGrid from '@/components/album/AlbumThumbnailGrid.vue';
 import { useImageZoomPan } from '@/composables/useImageZoomPan';
 import AddToListPopover from '@/components/collection/AddToListPopover.vue';
 import { useToastStore } from '@/stores/toastStore';
@@ -34,52 +31,6 @@ import { useFocusTrap } from '@/composables/useFocusTrap';
 
 const usernameVar = useUsername();
 const toastStore = useToastStore();
-
-type AlbumUsageDiscussion = {
-  id: string;
-  title?: string | null;
-  createdAt?: string | null;
-  Author?: {
-    username?: string | null;
-    displayName?: string | null;
-  } | null;
-  DiscussionChannels?: Array<{
-    id?: string | null;
-    channelUniqueName?: string | null;
-  }> | null;
-};
-
-type AlbumUsageAlbum = {
-  id: string;
-  imageOrder?: string[] | null;
-  Owner?: {
-    username?: string | null;
-    displayName?: string | null;
-  } | null;
-  Images?: Array<{
-    id: string;
-    url?: string | null;
-    alt?: string | null;
-    caption?: string | null;
-    Uploader?: {
-      username?: string | null;
-    } | null;
-  }> | null;
-  Discussions?: AlbumUsageDiscussion[] | null;
-};
-
-type ImageWithAlbums = Image & {
-  Albums?: AlbumUsageAlbum[] | null;
-};
-
-type ImageAlbumUsageResult = {
-  getImageAlbumUsage?: {
-    imageId: string;
-    uploaderUsername?: string | null;
-    uploaderOwnedAlbums?: AlbumUsageAlbum[] | null;
-    otherAlbums?: AlbumUsageAlbum[] | null;
-  } | null;
-};
 
 type UserAlbumListItem = {
   id: string;
@@ -91,6 +42,9 @@ type UserAlbumListItem = {
   ImagesAggregate?: {
     count?: number | null;
   } | null;
+  matchingImages?: Array<{
+    id: string;
+  }> | null;
   Discussions?: Array<{
     title?: string | null;
   }> | null;
@@ -132,18 +86,6 @@ const {
   })
 );
 
-const { result: albumUsageResult, refetch: refetchAlbumUsage } =
-  useQuery<ImageAlbumUsageResult>(
-    GET_IMAGE_ALBUM_USAGE,
-    () => ({
-      imageId: imageId.value,
-    }),
-    () => ({
-      enabled: !!imageId.value,
-      fetchPolicy: 'network-only',
-    })
-  );
-
 const showAlbumSaveModal = ref(false);
 const showCollectionSaveModal = ref(false);
 const albumSaveError = ref('');
@@ -158,13 +100,10 @@ const {
   loading: userAlbumsLoading,
   refetch: refetchUserAlbums,
 } = useQuery(
-  GET_USER_ALBUMS,
+  GET_USER_ALBUMS_FOR_IMAGE_SAVE,
   () => ({
-    where: {
-      Owner: {
-        username: usernameVar.value,
-      },
-    },
+    username: usernameVar.value,
+    imageId: imageId.value,
   }),
   () => ({
     enabled: showAlbumSaveModal.value && !!usernameVar.value,
@@ -172,10 +111,10 @@ const {
   })
 );
 
-const image = computed((): ImageWithAlbums | null => {
+const image = computed((): Image | null => {
   if (imageError.value) return null;
   if (imageResult.value && imageResult.value.images.length > 0) {
-    return imageResult.value.images[0] as ImageWithAlbums;
+    return imageResult.value.images[0] as Image;
   }
   return null;
 });
@@ -255,26 +194,10 @@ const saveAlt = async () => {
   }
 };
 
-const albumUsage = computed(() => {
-  return albumUsageResult.value?.getImageAlbumUsage || null;
-});
-
-const uploaderOwnedAlbums = computed(() => {
-  return albumUsage.value?.uploaderOwnedAlbums || [];
-});
-
-const otherAlbums = computed(() => {
-  return albumUsage.value?.otherAlbums || [];
-});
-
 const currentUserAlbumIdsContainingImage = computed(() => {
-  if (!usernameVar.value) return new Set<string>();
-
-  const allUsageAlbums = [...uploaderOwnedAlbums.value, ...otherAlbums.value];
-
   return new Set(
-    allUsageAlbums
-      .filter((album) => album.Owner?.username === usernameVar.value)
+    userAlbums.value
+      .filter((album) => album.matchingImages?.length)
       .map((album) => album.id)
   );
 });
@@ -327,7 +250,6 @@ const saveImageToAlbum = async (album: UserAlbumListItem) => {
       imageId: image.value.id,
     });
     toastStore.showToast('Image saved to album.');
-    await refetchAlbumUsage();
     await refetchUserAlbums();
     closeAlbumSaveModal();
   } catch (error) {
@@ -337,44 +259,6 @@ const saveImageToAlbum = async (album: UserAlbumListItem) => {
     toastStore.showToast('Could not save image to album.', 'error');
   }
 };
-
-const albumUsageSections = computed(() => {
-  return [
-    {
-      title: 'Albums by the uploader',
-      albums: uploaderOwnedAlbums.value,
-    },
-    {
-      title: 'Albums by other users',
-      albums: otherAlbums.value,
-    },
-  ].filter((section) => section.albums.length > 0);
-});
-
-const hasAlbumUsage = computed(() => albumUsageSections.value.length > 0);
-
-const primaryAlbum = computed(() => {
-  const albums = image.value?.Albums || [];
-  return (
-    albums.find(
-      (album) => album.Owner?.username === uploader.value?.username
-    ) ||
-    albums[0] ||
-    null
-  );
-});
-
-// Album images - ordered according to imageOrder (utils/albumImageOrder),
-// excluding the current image.
-const albumImages = computed(() => {
-  const album = primaryAlbum.value;
-  if (!album?.Images) return [];
-
-  return orderImagesByOrder({
-    images: album.Images,
-    imageOrder: album.imageOrder,
-  }).filter((img) => img.id !== image.value?.id);
-});
 
 // Lightbox zoom + pan state (extracted to a composable). The open guard keeps
 // the component's url/format checks.
@@ -787,96 +671,6 @@ onUnmounted(() => {
               <p class="text-sm text-red-800 dark:text-red-200">
                 🚫 This image contains spoilers
               </p>
-            </div>
-          </div>
-
-          <!-- Appears in albums -->
-          <div
-            v-if="hasAlbumUsage"
-            class="rounded-lg border bg-white p-6 dark:bg-gray-900"
-          >
-            <h2 class="mb-3 text-lg font-semibold dark:text-gray-300">
-              Appears in
-            </h2>
-
-            <div
-              v-for="section in albumUsageSections"
-              :key="section.title"
-              class="space-y-3"
-            >
-              <h3
-                class="text-sm font-semibold tracking-wide text-gray-600 uppercase dark:text-gray-400"
-              >
-                {{ section.title }}
-              </h3>
-
-              <div
-                v-for="album in section.albums"
-                :key="album.id"
-                class="rounded-md border border-gray-200 p-3 dark:border-gray-700"
-              >
-                <NuxtLink
-                  v-if="album.Owner?.username"
-                  :to="`/u/${album.Owner.username}/albums/${album.id}`"
-                  class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                >
-                  Album by {{ album.Owner.displayName || album.Owner.username }}
-                  <span v-if="album.Owner.displayName"
-                    >({{ album.Owner.username }})</span
-                  >
-                </NuxtLink>
-                <span
-                  v-else
-                  class="font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Album by unknown user
-                </span>
-
-                <div
-                  v-if="album.Discussions?.length && album.Discussions[0]"
-                  class="mt-3 border-t pt-3 dark:border-gray-700"
-                >
-                  <p class="mb-2 text-sm text-gray-600 dark:text-gray-400">
-                    Related discussion:
-                  </p>
-                  <NuxtLink
-                    v-if="
-                      album.Discussions[0]?.DiscussionChannels?.[0]
-                        ?.channelUniqueName
-                    "
-                    :to="`/forums/${album.Discussions[0]?.DiscussionChannels?.[0]?.channelUniqueName}/discussions/${album.Discussions[0]?.id}`"
-                    class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                  >
-                    {{ album.Discussions[0]?.title }}
-                  </NuxtLink>
-                  <span v-else class="text-gray-700 dark:text-gray-300">
-                    {{ album.Discussions[0]?.title }}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Other images in the album -->
-            <div
-              v-if="primaryAlbum && albumImages.length > 0"
-              class="mt-4 border-t pt-4 dark:border-gray-700"
-            >
-              <p class="mb-3 text-sm text-gray-600 dark:text-gray-400">
-                Other images in this album:
-              </p>
-              <AlbumThumbnailGrid
-                :images="albumImages"
-                :max-images="8"
-                :show-captions="false"
-                columns="grid-cols-4 sm:grid-cols-4 md:grid-cols-4"
-              />
-              <NuxtLink
-                v-if="albumImages.length > 8 && primaryAlbum.Owner?.username"
-                :to="`/u/${primaryAlbum.Owner.username}/albums/${primaryAlbum.id}`"
-                class="mt-3 block text-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-              >
-                View all {{ albumImages.length + 1 }} images in album
-              </NuxtLink>
             </div>
           </div>
         </div>
