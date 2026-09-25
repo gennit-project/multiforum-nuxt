@@ -476,6 +476,15 @@ export default defineNuxtConfig({
         'fast-deep-equal': 'fast-deep-equal/es6/index.js',
       },
     },
+    $client: {
+      resolve: {
+        alias: {
+          // See stubs/postcss.ts: sanitize-html only needs postcss for style
+          // attribute parsing, which the markdown renderer disables.
+          postcss: path.resolve(__dirname, 'stubs/postcss.ts'),
+        },
+      },
+    },
     define: {
       global: 'globalThis',
       // Keep Vue's production hydration warnings actionable. Without this,
