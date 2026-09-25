@@ -1,0 +1,43 @@
+{
+  "routes": [
+    {
+      "name": "Public discussions",
+      "entries": ["pages/discussions/index.vue"],
+      "budgets": {
+        "preloadFiles": 47,
+        "rawBytes": 1040000,
+        "gzipBytes": 312000,
+        "jsGzipBytes": 287000,
+        "cssGzipBytes": 26000
+      }
+    },
+    {
+      "name": "Discussion detail",
+      "entries": [
+        "pages/forums/[forumId].vue",
+        "pages/forums/[forumId]/discussions/[discussionId].vue"
+      ],
+      "budgets": {
+        "preloadFiles": 193,
+        "rawBytes": 2440000,
+        "gzipBytes": 763000,
+        "jsGzipBytes": 708000,
+        "cssGzipBytes": 55000
+      }
+    },
+    {
+      "name": "Download detail",
+      "entries": [
+        "pages/forums/[forumId].vue",
+        "pages/forums/[forumId]/downloads/[discussionId].vue"
+      ],
+      "budgets": {
+        "preloadFiles": 193,
+        "rawBytes": 2441000,
+        "gzipBytes": 763000,
+        "jsGzipBytes": 708000,
+        "cssGzipBytes": 55000
+      }
+    }
+  ]
+}

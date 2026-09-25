@@ -35,11 +35,25 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Test route performance budget tooling
+        run: pnpm run test:performance-budgets
+
       - name: Build for Vercel compatibility
         env:
           VITE_GRAPHQL_URL: http://127.0.0.1:4000/graphql
           VITE_SENTRY_AUTH_TOKEN: ''
         run: pnpm run build
+
+      - name: Check public route performance budgets
+        run: pnpm run perf:budget -- --json artifacts/performance/route-budgets.json
+
+      - name: Preserve public route performance report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-route-performance-budgets
+          path: artifacts/performance/route-budgets.json
+          if-no-files-found: warn
 
   lint:
     runs-on: ubuntu-latest
