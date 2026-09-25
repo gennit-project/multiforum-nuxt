@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { beforeAll, describe, it, expect } from 'vitest';
 import { useMarkdownRenderer } from '@/composables/useMarkdownRenderer';
+import { loadCodeHighlighter } from '@/utils/codeHighlighter';
 
 describe('useMarkdownRenderer', () => {
   const { renderMarkdown } = useMarkdownRenderer();
@@ -189,16 +190,48 @@ describe('useMarkdownRenderer', () => {
       expect(result).toContain('class="hljs');
     });
 
-    it('applies syntax highlighting for javascript', () => {
-      const result = renderMarkdown('```javascript\nconst x = 1;\n```');
+    // highlight.js loads on demand; describe blocks run in file order, so this
+    // block runs before the "with the highlighter loaded" block below.
+    it('renders escaped plain code for a language before the highlighter loads', () => {
+      const result = renderMarkdown('```html\n<b>x</b>\n```');
 
-      expect(result).toContain('<span class="hljs-');
+      expect(result).toContain(
+        '<pre class="hljs p-4 text-xs"><code>&lt;b&gt;x&lt;/b&gt;\n</code></pre>'
+      );
     });
 
     it('escapes HTML in code blocks without language', () => {
       const result = renderMarkdown('```\n<script>alert("xss")</script>\n```');
 
       expect(result).toContain('&lt;script&gt;');
+    });
+  });
+
+  describe('code blocks with the highlighter loaded', () => {
+    beforeAll(async () => {
+      await loadCodeHighlighter();
+    });
+
+    it('applies syntax highlighting for javascript', () => {
+      const result = renderMarkdown('```javascript\nconst x = 1;\n```');
+
+      expect(result).toContain('<span class="hljs-');
+    });
+
+    it('falls back to escaped plain text for an unknown language', () => {
+      const result = renderMarkdown('```notalanguage\n<b>x</b>\n```');
+
+      expect(result).toContain('<code>&lt;b&gt;x&lt;/b&gt;');
+    });
+  });
+
+  describe('style attributes', () => {
+    it('strips inline style attributes', () => {
+      const result = renderMarkdown(
+        '<span style="background:url(javascript:alert(1))">x</span>'
+      );
+
+      expect(result).toBe('<p><span>x</span></p>\n');
     });
   });
 

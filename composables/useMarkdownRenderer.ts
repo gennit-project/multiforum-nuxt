@@ -1,14 +1,9 @@
 import MarkdownIt from 'markdown-it';
 import type Token from 'markdown-it/lib/token.mjs';
 import type Renderer from 'markdown-it/lib/renderer.mjs';
-// Import the "common" bundle (~37 popular languages) instead of the full
-// highlight.js build (~190 languages). The full build adds ~1.5MB (decoded) of
-// language grammars we never render; `common` covers JS/TS, Python, bash, SQL,
-// JSON, GraphQL, etc. Unknown languages fall back to escaped plain text below,
-// which was already the behavior for any language hljs didn't recognize.
-import hljs from 'highlight.js/lib/common';
 import sanitizeHtml from 'sanitize-html';
 import { generateHeadingId } from '@/utils/markdown';
+import { getCodeHighlighter } from '@/utils/codeHighlighter';
 import { config } from '@/config';
 
 // markdown-it's `Options` is a namespace member, not a named export; derive it
@@ -66,7 +61,7 @@ const linkifyUserMentions = (text: string): string => {
 
 /**
  * Creates and configures a MarkdownIt instance with:
- * - Syntax highlighting via highlight.js
+ * - Syntax highlighting via highlight.js, once loaded on demand
  * - External link handling (target="_blank", rel="noopener noreferrer", icon)
  * - Heading anchors for deep linking
  * - Spoiler text support (>!spoiler text!<)
@@ -76,7 +71,11 @@ export function useMarkdownRenderer() {
   const md = new MarkdownIt({
     html: true,
     highlight: (str: string, lang: string): string => {
-      if (lang && hljs.getLanguage(lang)) {
+      // highlight.js is loaded on demand (see utils/codeHighlighter.ts). Until
+      // it arrives, and for languages outside its "common" bundle, code falls
+      // back to escaped plain text.
+      const hljs = getCodeHighlighter();
+      if (lang && hljs?.getLanguage(lang)) {
         try {
           return `<pre class="hljs p-4 text-xs"><code>${hljs.highlight(str, { language: lang }).value}</code></pre>`;
         } catch (error) {
@@ -233,6 +232,10 @@ export function useMarkdownRenderer() {
         line: ['x1', 'y1', 'x2', 'y2'],
       },
       allowedSchemes: ['http', 'https', 'mailto'],
+      // `style` is never an allowed attribute, so style parsing is unreachable.
+      // Disabling it also keeps sanitize-html from calling postcss, which the
+      // client build stubs out (see nuxt.config.ts).
+      parseStyleAttributes: false,
     });
 
     if (options.allowImages === false) {
