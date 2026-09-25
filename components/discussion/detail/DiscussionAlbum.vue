@@ -14,7 +14,12 @@ import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
 import { useUsername } from '@/composables/useAuthState';
 import CarouselThumbnail from '@/components/discussion/detail/CarouselThumbnail.vue';
 import AppImage from '@/components/image/AppImage.vue';
-import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
+import ModelPreviewTile from '@/components/image/ModelPreviewTile.vue';
+import {
+  hasGlbExtension,
+  hasStlExtension,
+  is3DModelFile,
+} from '@/utils/fileTypeUtils';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
 
 const ModelViewer = defineAsyncComponent(
@@ -321,25 +326,13 @@ onMounted(() => {
           class="cursor-pointer"
           @click="openLightbox(idx)"
         >
-          <ModelViewer
-            v-if="image && hasGlbExtension(image.url ?? '')"
-            :model-url="image.url || ''"
-            :model-alt="image.alt || image.caption || '3D model thumbnail'"
-            :show-fullscreen-button="false"
+          <ModelPreviewTile
+            v-if="image && image.url && is3DModelFile(image.url)"
+            :model-url="image.url"
+            :alt="image.alt || image.caption || '3D model thumbnail'"
             height="200px"
-            width="100%"
             class="shadow-sm"
           />
-          <ClientOnly
-            v-else-if="image && image.url && hasStlExtension(image.url)"
-          >
-            <StlViewer
-              :src="image.url"
-              :width="200"
-              :height="200"
-              class="shadow-sm"
-            />
-          </ClientOnly>
           <AppImage
             v-else-if="image"
             :src="getGridImageUrl(image)"

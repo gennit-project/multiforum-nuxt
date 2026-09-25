@@ -114,35 +114,60 @@ describe('DiscussionAlbum', () => {
     expect(cells(wrapper)).toHaveLength(2);
   });
 
-  it('renders a model viewer for GLB images', () => {
-    const wrapper = mountAlbum({
-      album: {
-        ...makeAlbum(['model']),
-        Images: [
-          {
-            id: 'model',
-            url: 'https://example.com/model.glb',
-            alt: 'alt-model',
-            caption: '',
-            __typename: 'Image',
-          },
-        ],
-      } as Album,
-    });
+  // The grid shows static tiles; an interactive viewer loads only for the
+  // item a visitor selects, so the grid never downloads the 3D runtime.
+  const glbAlbum = {
+    ...makeAlbum(['model']),
+    Images: [
+      {
+        id: 'model',
+        url: 'https://example.com/model.glb',
+        alt: 'alt-model',
+        caption: '',
+        __typename: 'Image',
+      },
+    ],
+  } as Album;
+  const stlOnly = {
+    album: makeAlbum([]),
+    stlFiles: [
+      { id: 's1', url: 'https://example.com/m.stl', fileName: 'm.stl' },
+    ],
+  };
 
-    expect(wrapper.find('.model-viewer-stub').exists()).toBe(true);
+  it.each([
+    ['GLB images', { album: glbAlbum }],
+    ['STL files', stlOnly],
+  ])('renders a static 3D tile in the grid for %s', (_label, props) => {
+    expect(
+      mountAlbum(props).find('[data-testid="model-preview-tile"]').exists()
+    ).toBe(true);
   });
 
-  it('renders an STL viewer for STL images', () => {
-    const wrapper = mountAlbum({
-      album: makeAlbum([]),
-      stlFiles: [
-        { id: 's1', url: 'https://example.com/m.stl', fileName: 'm.stl' },
-      ],
-    });
+  it.each([
+    ['GLB images', { album: glbAlbum }],
+    ['STL files', stlOnly],
+  ])('does not mount a 3D viewer in the grid for %s', (_label, props) => {
+    const wrapper = mountAlbum(props);
 
-    expect(wrapper.find('.stl-viewer-stub').exists()).toBe(true);
+    expect(wrapper.find('.model-viewer-stub, .stl-viewer-stub').exists()).toBe(
+      false
+    );
   });
+
+  it.each([
+    ['GLB image', { album: glbAlbum }, '.model-viewer-stub'],
+    ['STL file', stlOnly, '.stl-viewer-stub'],
+  ])(
+    'mounts the interactive viewer for the selected %s in the carousel',
+    (_label, props, selector) => {
+      expect(
+        mountAlbum({ ...props, carouselFormat: true })
+          .find(selector)
+          .exists()
+      ).toBe(true);
+    }
+  );
 
   it('enters caption edit mode and saves the caption', async () => {
     const wrapper = mountAlbum();

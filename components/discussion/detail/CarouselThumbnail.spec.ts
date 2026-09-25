@@ -6,18 +6,16 @@ const mountThumb = (props: Record<string, unknown>) =>
   mount(CarouselThumbnail, {
     props,
     global: {
-      stubs: {
-        ClientOnly: { template: '<div><slot /></div>' },
-        ModelViewer: { template: '<div class="model" />' },
-        StlViewer: { template: '<div class="stl" />' },
-      },
+      stubs: {},
     },
   });
 
 describe('CarouselThumbnail', () => {
   it('renders a plain image for a regular url', () => {
     expect(
-      mountThumb({ image: { url: 'a.png' } }).find('img').attributes()
+      mountThumb({ image: { url: 'a.png' } })
+        .find('img')
+        .attributes()
     ).toMatchObject({
       width: '80',
       height: '80',
@@ -26,10 +24,22 @@ describe('CarouselThumbnail', () => {
     });
   });
 
-  it('renders the model viewer for a glb url', () => {
+  // Thumbnails show a static tile; the interactive viewer loads only for the
+  // selected item, so a thumbnail never pulls in the 3D runtime.
+  it.each(['m.glb', 'm.stl'])('renders a static 3D tile for %s', (url) => {
     expect(
-      mountThumb({ image: { url: 'm.glb' } }).find('.model').exists()
+      mountThumb({ image: { url } })
+        .find('[data-testid="model-preview-tile"]')
+        .exists()
     ).toBe(true);
+  });
+
+  it('labels the 3D tile with the image alt text', () => {
+    expect(
+      mountThumb({ image: { url: 'm.glb', alt: 'A tiny warrior' } })
+        .find('[role="img"]')
+        .attributes('aria-label')
+    ).toBe('A tiny warrior');
   });
 
   it('emits click when the thumbnail is clicked', async () => {
