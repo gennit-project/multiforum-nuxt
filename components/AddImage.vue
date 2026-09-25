@@ -32,15 +32,16 @@ const {
   error: uploadsError,
 } = useInstanceCapability('uploads');
 const uploadsUnavailable = computed(
-  () =>
-    Boolean(uploadsCapability.value || uploadsError.value) &&
-    !uploadsAvailable.value
+  () => Boolean(uploadsCapability.value) && !uploadsAvailable.value
+);
+const uploadsCheckFailed = computed(
+  () => Boolean(uploadsError.value) && !uploadsCapability.value
 );
 const effectiveDisabled = computed(
   () => props.disabled || !uploadsAvailable.value
 );
 const setupUrl = computed(
-  () => uploadsCapability.value?.setupUrl || '/admin/setup#uploads'
+  () => uploadsCapability.value?.setupUrl || '/admin/setup#file-uploads'
 );
 
 // Force iOS to properly recognize this as an image upload input
@@ -98,6 +99,12 @@ const onFileSelected = (event: Event) => {
       <NuxtLink :to="setupUrl" class="font-medium underline">
         Open instance setup
       </NuxtLink>
+    </p>
+    <p
+      v-else-if="uploadsCheckFailed"
+      class="mt-1 text-xs text-amber-800 dark:text-amber-200"
+    >
+      Image upload availability could not be checked. Try refreshing the page.
     </p>
     <p
       v-else-if="uploadsLoading && !uploadsCapability"

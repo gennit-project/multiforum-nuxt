@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, type Ref } from 'vue';
 
 type RouteShape = {
   params: {
@@ -10,19 +10,21 @@ type RouteShape = {
 };
 
 type QueryResultShape = {
-  data?: {
-    discussions?: Array<Record<string, unknown> | null>;
-  };
+  discussions?: Array<Record<string, unknown> | null>;
 };
 
 const h = vi.hoisted(() => ({
   route: { params: { forumId: 'cats', discussionId: 'd1' } } as RouteShape,
-  modName: null as unknown as { value: string },
+  modName: null as unknown as Ref<string>,
+  username: null as unknown as Ref<string>,
+  queryResult: null as unknown as Ref<QueryResultShape | undefined>,
   useHead: vi.fn(),
-  onResult: null as null | ((result: QueryResultShape) => void),
+  queryDocument: '',
 }));
 
 h.modName = ref('modAlice');
+h.username = ref('alice');
+h.queryResult = ref<QueryResultShape>();
 
 vi.mock('@/config', () => ({
   config: { serverDisplayName: 'Multiforum' },
@@ -30,6 +32,7 @@ vi.mock('@/config', () => ({
 
 vi.mock('@/composables/useAuthState', () => ({
   useModProfileName: () => h.modName,
+  useUsername: () => h.username,
 }));
 
 vi.mock('nuxt/app', () => ({
@@ -38,15 +41,14 @@ vi.mock('nuxt/app', () => ({
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => ({
-    onResult: (cb: typeof h.onResult) => {
-      h.onResult = cb;
-    },
-  }),
+  useQuery: (document: string) => {
+    h.queryDocument = document;
+    return { result: h.queryResult };
+  },
 }));
 
 vi.mock('@/graphQLData/discussion/queries', () => ({
-  GET_DISCUSSION: 'GET_DISCUSSION',
+  GET_DOWNLOAD_DETAIL: 'GET_DOWNLOAD_DETAIL',
 }));
 
 const DiscussionDetailContentStub = defineComponent({
@@ -64,24 +66,60 @@ const mountPage = async () => {
   return mount(Page);
 };
 
+const headValue = () => h.useHead.mock.calls[0]?.[0]?.value;
+
 beforeEach(() => {
   vi.clearAllMocks();
   h.route = { params: { forumId: 'cats', discussionId: 'd1' } };
-  h.onResult = null;
+  h.queryResult.value = undefined;
   vi.stubEnv('VITE_BASE_URL', 'https://example.test');
 });
 
 describe('download detail page wrapper', () => {
+  it('constrains and centers the detail content at desktop widths', async () => {
+    const wrapper = await mountPage();
+
+    expect(wrapper.classes()).toEqual(
+      expect.arrayContaining(['mx-auto', 'w-full', 'xl:max-w-6xl'])
+    );
+  });
+
+  it('uses the download-specific query for SSR metadata', async () => {
+    await mountPage();
+
+    expect(h.queryDocument).toBe('GET_DOWNLOAD_DETAIL');
+  });
+
   it('shows an error banner when the route discussion id is missing', async () => {
     h.route = { params: { forumId: 'cats', discussionId: null } };
+
     const wrapper = await mountPage();
+
     expect(wrapper.text()).toContain('Download not found');
   });
 
-  it('sets not-found metadata when the query returns no discussions', async () => {
+  it('registers fallback metadata during setup before Apollo resolves', async () => {
     await mountPage();
-    h.onResult?.({ data: { discussions: [] } });
-    expect(h.useHead).toHaveBeenCalledWith({
+
+    expect(h.useHead).toHaveBeenCalledOnce();
+    expect(headValue()).toEqual({
+      title: 'Download | cats',
+      meta: [
+        {
+          name: 'description',
+          content: 'View this download on Multiforum',
+        },
+      ],
+    });
+  });
+
+  it('reactively sets not-found metadata without calling useHead again', async () => {
+    await mountPage();
+
+    h.queryResult.value = { discussions: [] };
+
+    expect(h.useHead).toHaveBeenCalledOnce();
+    expect(headValue()).toEqual({
       title: 'Download Not Found | cats',
       meta: [
         {
@@ -92,39 +130,33 @@ describe('download detail page wrapper', () => {
     });
   });
 
-  it('omits the channel suffix from not-found metadata when the forum id is missing', async () => {
+  it('omits the channel suffix from not-found metadata without a forum id', async () => {
     h.route = { params: { discussionId: 'd1' } };
     await mountPage();
-    h.onResult?.({ data: { discussions: [] } });
-    expect(h.useHead).toHaveBeenCalledWith({
-      title: 'Download Not Found',
-      meta: [
-        {
-          name: 'description',
-          content: 'The requested download could not be found.',
-        },
-      ],
-    });
+
+    h.queryResult.value = { discussions: [] };
+
+    expect(headValue()?.title).toBe('Download Not Found');
   });
 
-  it('sets SEO metadata when the query returns a download', async () => {
+  it('reactively sets complete SEO metadata when Apollo resolves', async () => {
     await mountPage();
-    h.onResult?.({
-      data: {
-        discussions: [
-          {
-            title: 'My Download',
-            body: 'A'.repeat(200),
-            coverImageURL: 'https://example.test/image.png',
-            createdAt: '2024-01-01T00:00:00.000Z',
-            updatedAt: '2024-01-02T00:00:00.000Z',
-            Author: { displayName: 'Alice', username: 'alice' },
-          },
-        ],
-      },
-    });
 
-    expect(h.useHead).toHaveBeenCalledWith(
+    h.queryResult.value = {
+      discussions: [
+        {
+          title: 'My Download',
+          body: 'A'.repeat(200),
+          coverImageURL: 'https://example.test/image.png',
+          createdAt: '2024-01-01T00:00:00.000Z',
+          updatedAt: '2024-01-02T00:00:00.000Z',
+          Author: { displayName: 'Alice', username: 'alice' },
+        },
+      ],
+    };
+
+    expect(h.useHead).toHaveBeenCalledOnce();
+    expect(headValue()).toEqual(
       expect.objectContaining({
         title: 'My Download | cats | Multiforum',
         meta: expect.arrayContaining([
@@ -132,28 +164,33 @@ describe('download detail page wrapper', () => {
           { property: 'og:image', content: 'https://example.test/image.png' },
           { name: 'twitter:card', content: 'summary_large_image' },
         ]),
+        script: [
+          expect.objectContaining({
+            type: 'application/ld+json',
+            innerHTML: expect.stringContaining('"@type":"DigitalDocument"'),
+          }),
+        ],
       })
     );
   });
 
-  it('uses fallback SEO values when the download has no body or image', async () => {
+  it('uses fallback SEO values and omits image tags when fields are empty', async () => {
     await mountPage();
-    h.onResult?.({
-      data: {
-        discussions: [
-          {
-            title: '',
-            body: '',
-            coverImageURL: '',
-            createdAt: '2024-01-01T00:00:00.000Z',
-            updatedAt: '',
-            Author: { username: 'alice' },
-          },
-        ],
-      },
-    });
 
-    expect(h.useHead).toHaveBeenCalledWith(
+    h.queryResult.value = {
+      discussions: [
+        {
+          title: '',
+          body: '',
+          coverImageURL: '',
+          createdAt: '2024-01-01T00:00:00.000Z',
+          updatedAt: '',
+          Author: { username: 'alice' },
+        },
+      ],
+    };
+
+    expect(headValue()).toEqual(
       expect.objectContaining({
         title: 'Download | cats | Multiforum',
         meta: expect.arrayContaining([
@@ -165,48 +202,20 @@ describe('download detail page wrapper', () => {
         ]),
       })
     );
-  });
-
-  it('does not add image meta tags when the download has no cover image', async () => {
-    await mountPage();
-    h.onResult?.({
-      data: {
-        discussions: [
-          {
-            title: 'No Image',
-            body: 'Plain body',
-            coverImageURL: '',
-            createdAt: '2024-01-01T00:00:00.000Z',
-            updatedAt: '2024-01-01T00:00:00.000Z',
-            Author: { displayName: 'Alice', username: 'alice' },
-          },
-        ],
-      },
-    });
-
     expect(
-      h.useHead.mock.calls.at(-1)?.[0]?.meta?.some(
+      headValue()?.meta?.some(
         (tag: Record<string, string>) =>
           tag.property === 'og:image' || tag.name === 'twitter:image'
       )
     ).toBe(false);
   });
 
-  it('ignores query results that do not include discussions', async () => {
+  it('falls back to generic metadata for an invalid query item', async () => {
     await mountPage();
-    h.onResult?.({ data: {} });
-    expect(h.useHead).not.toHaveBeenCalled();
-  });
 
-  it('falls back to generic metadata when building SEO tags throws', async () => {
-    await mountPage();
-    h.onResult?.({
-      data: {
-        discussions: [null],
-      },
-    });
+    h.queryResult.value = { discussions: [null] };
 
-    expect(h.useHead).toHaveBeenCalledWith({
+    expect(headValue()).toEqual({
       title: 'Download',
       meta: [
         {

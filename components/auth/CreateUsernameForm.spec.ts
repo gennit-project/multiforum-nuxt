@@ -10,7 +10,18 @@ const h = vi.hoisted(() => ({
   setIsLoadingAuth: vi.fn(),
   createMutate: vi.fn(),
   onDone: undefined as undefined | ((r: unknown) => void),
+  mutationOptions: undefined as undefined | (() => unknown),
   userResult: { value: { users: [] as unknown[] } },
+  agePolicyResult: {
+    value: {
+      getAgePolicy: {
+        accountAgeGateEnabled: true,
+        minimumAccountAge: 13,
+        sensitiveContentAgeGateEnabled: true,
+        minimumSensitiveContentAge: 18,
+      },
+    },
+  },
   getError: { value: null as unknown },
   getLoading: { value: false },
   createError: { value: null as unknown },
@@ -18,19 +29,25 @@ const h = vi.hoisted(() => ({
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => ({
-    result: h.userResult,
+  useQuery: (query: unknown) => ({
+    result: query === 'GET_AGE_POLICY' ? h.agePolicyResult : h.userResult,
     error: h.getError,
     loading: h.getLoading,
   }),
-  useMutation: () => ({
-    mutate: h.createMutate,
-    error: h.createError,
-    loading: h.createLoading,
-    onDone: (cb: (r: unknown) => void) => {
-      h.onDone = cb;
-    },
-  }),
+  useMutation: (_mutation: unknown, options: () => unknown) => {
+    h.mutationOptions = options;
+    return {
+      mutate: h.createMutate,
+      error: h.createError,
+      loading: h.createLoading,
+      onDone: (cb: (r: unknown) => void) => {
+        h.onDone = cb;
+      },
+    };
+  },
+}));
+vi.mock('@/graphQLData/age/queries', () => ({
+  GET_AGE_POLICY: 'GET_AGE_POLICY',
 }));
 vi.mock('@/composables/useAuthState', () => ({
   setUsername: h.setUsername,
@@ -53,7 +70,11 @@ const stubs = {
     template: '<div />',
   },
   CharCounter: { props: ['current', 'max'], template: '<div />' },
-  ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err" />' },
+  ErrorBanner: {
+    name: 'ErrorBanner',
+    props: ['text'],
+    template: '<div class="err" />',
+  },
   CheckCircleIcon: true,
   ExclamationIcon: true,
 };
@@ -70,18 +91,27 @@ const setBirthday = (wrapper: ReturnType<typeof mount>, date: string) =>
 beforeEach(() => {
   vi.clearAllMocks();
   h.onDone = undefined;
+  h.mutationOptions = undefined;
   h.userResult = { value: { users: [] } };
   h.getError = { value: null };
   h.getLoading = { value: false };
   h.createError = { value: null };
   h.createLoading = { value: false };
+  h.agePolicyResult.value.getAgePolicy = {
+    accountAgeGateEnabled: true,
+    minimumAccountAge: 13,
+    sensitiveContentAgeGateEnabled: true,
+    minimumSensitiveContentAge: 18,
+  };
 });
 
 describe('CreateUsernameForm initial state', () => {
   it('seeds the username from the local part of the email', () => {
     const wrapper = mountForm('bob@example.com');
 
-    expect((wrapper.get('input').element as HTMLInputElement).value).toBe('bob');
+    expect((wrapper.get('input').element as HTMLInputElement).value).toBe(
+      'bob'
+    );
   });
 
   it('shows the username as available for a fresh valid name', () => {
@@ -137,6 +167,33 @@ describe('CreateUsernameForm birthday and canSave', () => {
 
     expect(saveButton(wrapper).props('disabled')).toBe(true);
   });
+
+  it('uses the server-configured minimum account age', async () => {
+    h.agePolicyResult.value.getAgePolicy.minimumAccountAge = 21;
+    const wrapper = mountForm();
+
+    await setBirthday(wrapper, '2007-01-01');
+
+    expect(wrapper.text()).toContain('at least 21 years old');
+  });
+
+  it('allows an omitted birthday when both age gates are disabled', () => {
+    h.agePolicyResult.value.getAgePolicy.accountAgeGateEnabled = false;
+    h.agePolicyResult.value.getAgePolicy.sensitiveContentAgeGateEnabled = false;
+
+    const wrapper = mountForm();
+
+    expect(saveButton(wrapper).props('disabled')).toBe(false);
+  });
+
+  it('requires but does not minimum-age-block a birthday for a sensitive-content-only gate', async () => {
+    h.agePolicyResult.value.getAgePolicy.accountAgeGateEnabled = false;
+    const wrapper = mountForm();
+
+    await setBirthday(wrapper, '2020-01-01');
+
+    expect(saveButton(wrapper).props('disabled')).toBe(false);
+  });
 });
 
 describe('CreateUsernameForm submission', () => {
@@ -147,6 +204,21 @@ describe('CreateUsernameForm submission', () => {
     await saveButton(wrapper).trigger('click');
 
     expect(h.createMutate).toHaveBeenCalled();
+  });
+
+  it('passes the birthday to account creation', async () => {
+    const wrapper = mountForm();
+    await setBirthday(wrapper, '2000-01-01');
+
+    await saveButton(wrapper).trigger('click');
+
+    expect(h.mutationOptions?.()).toEqual({
+      variables: {
+        emailAddress: 'alice@example.com',
+        username: 'alice',
+        birthday: '2000-01-01',
+      },
+    });
   });
 
   it('shows an error banner when creation fails', () => {

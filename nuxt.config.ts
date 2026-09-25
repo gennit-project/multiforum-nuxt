@@ -1,6 +1,6 @@
 import { defineNuxtConfig } from 'nuxt/config';
 import tailwindcss from '@tailwindcss/vite';
-import { config } from './config';
+import { brandingEnvDefaults, brandingLockedDefault, config } from './config';
 import path from 'path';
 import { inMemoryCacheOptions } from './cache';
 import { DORMANT_AUTH0_CONFIG } from './utils/auth0RuntimeConfig';
@@ -252,6 +252,14 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: process.env.NITRO_PRESET || 'vercel',
+    // Nuxt bundles pages, middleware, and API routes into one Vercel Function.
+    // The GraphQL proxy can legitimately wait for a pre-download security scan,
+    // which exceeds Vercel's 15-second non-Fluid default on a cold scanner.
+    vercel: {
+      functions: {
+        maxDuration: 60,
+      },
+    },
     // `sanitize-html` (used by composables/useMarkdownRenderer.ts) is CommonJS
     // and does `require('htmlparser2')`. When Nitro externalizes it, the Vercel
     // serverless function performs that require at runtime — which crashes with
@@ -316,6 +324,10 @@ export default defineNuxtConfig({
       // no longer holds. If per-page caching is wanted back, it would need to be
       // anonymous-only — e.g. bypass the cache whenever a session cookie is
       // present — not a blanket ISR rule.)
+      // Pipeline history is interactive operational data, not SEO content.
+      // Render it client-side so the detail page's SSR query waterfall cannot
+      // exhaust the Vercel function timeout before pipeline data is requested.
+      '/forums/*/downloads/*/pipelines': { ssr: false },
       // SPIKE Phase 2: auth endpoints must NOT be route-cached. Nitro's route
       // cache serves shared, cookie-independent responses, so /api/auth/token
       // was reaching its handler with NO cookies (no session → null token →
@@ -404,6 +416,14 @@ export default defineNuxtConfig({
       openGraphApiKey: config.openGraphApiKey,
       serverName: config.serverName,
       serverDisplayName: config.serverDisplayName,
+      // Instance branding (docs/source/support links and footer text). Nuxt
+      // maps each nested key to a NUXT_PUBLIC_BRANDING_* variable, so a single
+      // built image can be re-branded at container startup without a rebuild.
+      // See docs/frontend-runtime-configuration.md.
+      branding: brandingEnvDefaults,
+      // When true, the values above win over the admin-editable ServerConfig
+      // branding and the admin form renders read-only.
+      brandingLocked: brandingLockedDefault,
       authProvider:
         process.env.NUXT_PUBLIC_AUTH_PROVIDER === 'local-dev'
           ? 'local-dev'
@@ -456,6 +476,15 @@ export default defineNuxtConfig({
         'fast-deep-equal': 'fast-deep-equal/es6/index.js',
       },
     },
+    $client: {
+      resolve: {
+        alias: {
+          // See stubs/postcss.ts: sanitize-html only needs postcss for style
+          // attribute parsing, which the markdown renderer disables.
+          postcss: path.resolve(__dirname, 'stubs/postcss.ts'),
+        },
+      },
+    },
     define: {
       global: 'globalThis',
       // Keep Vue's production hydration warnings actionable. Without this,
@@ -473,8 +502,11 @@ export default defineNuxtConfig({
       },
     },
     build: {
-      minify: false,
-      cssMinify: false,
+      // Keep production assets small enough to download, parse, and execute
+      // quickly. These had been disabled globally, which shipped unminified
+      // JavaScript and CSS to every visitor.
+      minify: 'esbuild',
+      cssMinify: 'esbuild',
       // terserOptions: {
       //   compress: {
       //     drop_console: process.env.NODE_ENV === 'production',

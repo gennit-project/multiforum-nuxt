@@ -21,7 +21,11 @@ describe('isValidUsername', () => {
 describe('getUsernameValidationMessage', () => {
   it('reports an empty username first', () => {
     expect(
-      getUsernameValidationMessage({ username: '', isEmpty: true, isTaken: false })
+      getUsernameValidationMessage({
+        username: '',
+        isEmpty: true,
+        isTaken: false,
+      })
     ).toBe('Username cannot be empty.');
   });
 
@@ -67,8 +71,8 @@ describe('getUsernameValidationMessage', () => {
 });
 
 describe('calculateAge', () => {
-  it('returns 0 for an empty birth date', () => {
-    expect(calculateAge('', NOW)).toBe(0);
+  it('returns null for an empty birth date', () => {
+    expect(calculateAge('', NOW)).toBeNull();
   });
 
   it('computes age before the birthday this year', () => {
@@ -96,6 +100,16 @@ describe('getBirthdayValidationMessage', () => {
   it('accepts users 13 and older', () => {
     expect(
       getBirthdayValidationMessage({ birthday: '2000-01-01', now: NOW })
+    ).toBe('');
+  });
+
+  it('does not apply a minimum age when configured with no account gate', () => {
+    expect(
+      getBirthdayValidationMessage({
+        birthday: '2015-01-01',
+        minimumAge: null,
+        now: NOW,
+      })
     ).toBe('');
   });
 });

@@ -1,5 +1,8 @@
 import { expect, test } from '../../helpers/testFixture';
-import { buildBasicUser, buildServerConfig } from '../../helpers/graphqlFixtures';
+import {
+  buildBasicUser,
+  buildServerConfig,
+} from '../../helpers/graphqlFixtures';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { installGraphqlMocks } from '../../helpers/mockGraphql';
 
@@ -47,7 +50,9 @@ const getBaseMocks = (username: string) => ({
   }),
   getChannelDownloadCount: () => ({
     data: {
-      channels: [{ uniqueName: 'cats', DiscussionChannelsAggregate: { count: 0 } }],
+      channels: [
+        { uniqueName: 'cats', DiscussionChannelsAggregate: { count: 0 } },
+      ],
     },
   }),
 });
@@ -98,6 +103,7 @@ test('renders server-suspended users (temporary + indefinite) with issue links',
       data: {
         serverConfigs: [
           {
+            __typename: 'ServerConfig',
             serverName: 'Listical',
             SuspendedUsersAggregate: { count: 2 },
             SuspendedUsers: [
@@ -127,13 +133,17 @@ test('renders server-suspended users (temporary + indefinite) with issue links',
 
   await page.goto('/admin/suspended-users', { waitUntil: 'domcontentloaded' });
 
-  await expect(page.getByText('baduser').first()).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByText('baduser').first()).toBeVisible({
+    timeout: 60_000,
+  });
   await expect(page.getByText('tempuser').first()).toBeVisible();
   // Indefinite vs temporary rendering.
   await expect(page.getByText(/Suspended indefinitely/i).first()).toBeVisible();
   await expect(page.getByText(/Suspended until/i).first()).toBeVisible();
   // Related-issue link(s).
-  await expect(page.getByRole('link', { name: /Related Issue/i }).first()).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: /Related Issue/i }).first()
+  ).toBeVisible();
 });
 
 test('shows the empty state when there are no server-suspended users', async ({
@@ -150,7 +160,12 @@ test('shows the empty state when there are no server-suspended users', async ({
     getServerSuspendedUsers: () => ({
       data: {
         serverConfigs: [
-          { serverName: 'Listical', SuspendedUsersAggregate: { count: 0 }, SuspendedUsers: [] },
+          {
+            __typename: 'ServerConfig',
+            serverName: 'Listical',
+            SuspendedUsersAggregate: { count: 0 },
+            SuspendedUsers: [],
+          },
         ],
       },
     }),
@@ -178,6 +193,7 @@ test('renders server-suspended mods with the mod name and issue link', async ({
       data: {
         serverConfigs: [
           {
+            __typename: 'ServerConfig',
             serverName: 'Listical',
             SuspendedModsAggregate: { count: 1 },
             SuspendedMods: [modSuspension()],
@@ -189,7 +205,9 @@ test('renders server-suspended mods with the mod name and issue link', async ({
 
   await page.goto('/admin/suspended-mods', { waitUntil: 'domcontentloaded' });
 
-  await expect(page.getByText('BadMod').first()).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByText('BadMod').first()).toBeVisible({
+    timeout: 60_000,
+  });
   await expect(page.getByText(/Suspended indefinitely/i).first()).toBeVisible();
   await expect(
     page.getByRole('link', { name: /Related Issue/i }).first()
@@ -210,7 +228,12 @@ test('shows the empty state when there are no server-suspended mods', async ({
     getServerSuspendedMods: () => ({
       data: {
         serverConfigs: [
-          { serverName: 'Listical', SuspendedModsAggregate: { count: 0 }, SuspendedMods: [] },
+          {
+            __typename: 'ServerConfig',
+            serverName: 'Listical',
+            SuspendedModsAggregate: { count: 0 },
+            SuspendedMods: [],
+          },
         ],
       },
     }),

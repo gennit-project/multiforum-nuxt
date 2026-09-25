@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import PublicDownloadPipelines from './PublicDownloadPipelines.vue';
 import type * as DownloadPipelineOverviewModule from '@/composables/useDownloadPipelineOverview';
 
@@ -20,19 +20,17 @@ const mockUserPermissions = vi.hoisted(() => ({
 }));
 const mockStartPipeline = vi.hoisted(() => vi.fn());
 const mockRerunPipeline = vi.hoisted(() => vi.fn());
-const mockStartDoneCallbacks = vi.hoisted(
-  () => [] as Array<() => void>
-);
-const mockRerunDoneCallbacks = vi.hoisted(
-  () => [] as Array<() => void>
-);
+const mockStartDoneCallbacks = vi.hoisted(() => [] as Array<() => void>);
+const mockRerunDoneCallbacks = vi.hoisted(() => [] as Array<() => void>);
+const mockApolloQuery = vi.hoisted(() => vi.fn());
+const mockServerAdminUsernames = vi.hoisted(() => ({
+  value: [] as string[],
+}));
 
 vi.mock('@vue/apollo-composable', async () => {
   const { ref } = await import('vue');
   return {
-    useMutation: (document: {
-      loc?: { source?: { body?: string } };
-    }) => {
+    useMutation: (document: { loc?: { source?: { body?: string } } }) => {
       const isRerun = document.loc?.source?.body?.includes(
         'RerunPluginPipeline'
       );
@@ -52,6 +50,7 @@ vi.mock('@vue/apollo-composable', async () => {
         },
       };
     },
+    useApolloClient: () => ({ client: { query: mockApolloQuery } }),
   };
 });
 
@@ -66,11 +65,16 @@ vi.mock('@/composables/useCommentPermissions', () => ({
     loading: { value: false },
   }),
 }));
+vi.mock('@/composables/useServerRoleMembership', () => ({
+  useServerRoleMembership: () => ({
+    serverAdminUsernames: mockServerAdminUsernames,
+  }),
+}));
 
 vi.mock('@/composables/useDownloadPipelineOverview', async () => {
-  const actual = await vi.importActual<
-    typeof DownloadPipelineOverviewModule
-  >('@/composables/useDownloadPipelineOverview');
+  const actual = await vi.importActual<typeof DownloadPipelineOverviewModule>(
+    '@/composables/useDownloadPipelineOverview'
+  );
   const { ref } = await import('vue');
   return {
     ...actual,
@@ -129,6 +133,8 @@ describe('PublicDownloadPipelines', () => {
     mockModProfileName.value = '';
     mockUserPermissions.value.canEditDiscussions = false;
     mockStartPipeline.mockReset();
+    mockServerAdminUsernames.value = [];
+    mockApolloQuery.mockReset();
     mockRerunPipeline.mockReset();
     mockStartDoneCallbacks.length = 0;
     mockRerunDoneCallbacks.length = 0;
@@ -175,9 +181,7 @@ describe('PublicDownloadPipelines', () => {
 
     expect({
       notRequired: text.includes('Not required'),
-      policyReason: text.includes(
-        'uploaded before this check became required'
-      ),
+      policyReason: text.includes('uploaded before this check became required'),
       notExecuted: text.includes('Not executed'),
       channel: text.includes('Channel check · cats'),
       expectedJob: text.includes('Virus Scanner'),
@@ -213,8 +217,23 @@ describe('PublicDownloadPipelines', () => {
                 level: 'INFO',
                 code: 'SCAN_CLEAN',
                 message: 'No threats were found.',
-                details: { filesChecked: 3 },
+                details: {
+                  filesChecked: 3,
+                  correlationId: 'scan-correlation-1',
+                },
                 helpUrl: 'https://example.test/checks/scan-clean',
+              },
+              {
+                level: 'WARNING',
+                code: 'PROVIDER_REFERENCE',
+                message: 'The provider returned a reference.',
+                details: 'Reference ABC',
+              },
+              {
+                level: 'INFO',
+                code: 'NO_DETAILS',
+                message: 'No additional details were supplied.',
+                details: null,
               },
             ],
             createdAt: '2026-07-30T00:00:00.000Z',
@@ -253,10 +272,9 @@ describe('PublicDownloadPipelines', () => {
         (status) => wrapper.text().includes(status)
       ),
       diagnostic: wrapper.text().includes('SCAN_CLEAN'),
-      details: wrapper.text().includes('"filesChecked": 3'),
-      documentation: wrapper
-        .get('a[target="_blank"]')
-        .attributes('href'),
+      details: wrapper.text().includes('Files Checked'),
+      correlationId: wrapper.text().includes('scan-correlation-1'),
+      documentation: wrapper.get('a[target="_blank"]').attributes('href'),
       permalink: wrapper
         .get('[aria-label="Permalink to attempt 5"]')
         .attributes('href'),
@@ -264,6 +282,7 @@ describe('PublicDownloadPipelines', () => {
       statuses: true,
       diagnostic: true,
       details: true,
+      correlationId: true,
       documentation: 'https://example.test/checks/scan-clean',
       permalink:
         '/forums/cats/downloads/discussion-1/pipelines?attempt=pipeline-1#attempt-pipeline-1',
@@ -274,9 +293,7 @@ describe('PublicDownloadPipelines', () => {
     mockOverview.hasPipelineContent = true;
     mockOverview.hasActiveAttempt = true;
     mockOverview.isPolling = true;
-    mockOverview.attempts = [
-      baseAttempt({ status: 'RUNNING', jobs: [] }),
-    ];
+    mockOverview.attempts = [baseAttempt({ status: 'RUNNING', jobs: [] })];
 
     expect(mountView().text()).toContain('Updating');
   });
@@ -300,9 +317,11 @@ describe('PublicDownloadPipelines', () => {
     const wrapper = mountView('discussion-author', 'alice');
 
     expect({
-      explanation: wrapper.text().includes(
-        'The uploader or an authorized channel moderator must run this check.'
-      ),
+      explanation: wrapper
+        .text()
+        .includes(
+          'The uploader or an authorized channel moderator must run this check.'
+        ),
       hasButton: wrapper.find('button').exists(),
     }).toEqual({ explanation: true, hasButton: false });
   });
@@ -443,9 +462,7 @@ describe('PublicDownloadPipelines', () => {
 
     expect({
       mutation: mockRerunPipeline.mock.calls[0]?.[0],
-      explanation: wrapper.text().includes(
-        'current configuration'
-      ),
+      explanation: wrapper.text().includes('current configuration'),
       refetched: mockOverview.refetch.mock.calls.length,
     }).toEqual({
       mutation: { pipelineRunId: 'failed-pipeline' },
@@ -480,18 +497,22 @@ describe('PublicDownloadPipelines', () => {
         pipelineId: 'failed-pipeline',
         attemptNumber: 2,
         status: 'FAILED',
-        jobs: [{
-          id: 'job-1',
-          pluginName: 'Security scan',
-          status: 'FAILED',
-          diagnostics: [{
-            code: 'SCAN_PROVIDER_ERROR',
-            message: 'Provider unavailable',
-            details: { retryable: true },
-          }],
-          executionOrder: 0,
-          version: '1.0.0',
-        }],
+        jobs: [
+          {
+            id: 'job-1',
+            pluginName: 'Security scan',
+            status: 'FAILED',
+            diagnostics: [
+              {
+                code: 'SCAN_PROVIDER_ERROR',
+                message: 'Provider unavailable',
+                details: { retryable: true },
+              },
+            ],
+            executionOrder: 0,
+            version: '1.0.0',
+          },
+        ],
       }),
     ];
     const wrapper = mountView();
@@ -510,5 +531,158 @@ describe('PublicDownloadPipelines', () => {
       expect.stringContaining('SCAN_PROVIDER_ERROR')
     );
     expect(wrapper.text()).toContain('Copied diagnostics for attempt 2');
+  });
+
+  it('never offers or requests internal telemetry for a non-admin viewer', () => {
+    mockUsername.value = 'alice';
+    mockOverview.hasPipelineContent = true;
+    mockOverview.attempts = [
+      baseAttempt({ status: 'FAILED', pipelineId: 'failed-pipeline' }),
+    ];
+
+    const wrapper = mountView('alice', 'alice');
+
+    expect(wrapper.text()).not.toContain('Technical details');
+    expect(wrapper.text()).not.toContain('Internal telemetry');
+    expect(mockApolloQuery).not.toHaveBeenCalled();
+  });
+
+  it('lazily loads and copies internal telemetry for a server admin', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { clipboard: { writeText } });
+    mockUsername.value = 'admin';
+    mockServerAdminUsernames.value = ['admin'];
+    mockOverview.hasPipelineContent = true;
+    mockOverview.attempts = [
+      baseAttempt({ status: 'FAILED', pipelineId: 'failed-pipeline' }),
+    ];
+    mockApolloQuery.mockResolvedValue({
+      data: {
+        getInternalPluginPipelineRun: {
+          attempt: {
+            id: 'attempt-1',
+            pipelineId: 'failed-pipeline',
+            status: 'FAILED',
+            queuedAt: '2026-07-30T00:00:00.000Z',
+            startedAt: '2026-07-30T00:00:01.000Z',
+            finishedAt: '2026-07-30T00:00:02.000Z',
+            updatedAt: '2026-07-30T00:00:02.000Z',
+          },
+          jobs: [
+            {
+              id: 'job-1',
+              pluginId: 'security-attachment-scan',
+              pluginName: 'Security: Attachment Scan',
+              version: '0.5.1',
+              status: 'FAILED',
+              message: 'Scanner request failed.',
+              payload: {
+                logs: ['Provider returned 503'],
+                attachmentUrl: 'https://private.example.test/signed-file',
+              },
+              executionOrder: 0,
+              leaseId: 'lease-1',
+              updatedAt: '2026-07-30T00:00:02.000Z',
+            },
+            {
+              id: 'job-2',
+              pluginId: 'follow-up',
+              pluginName: 'Follow-up check',
+              version: '1.0.0',
+              status: 'SKIPPED',
+              skippedReason: 'Previous stage failed.',
+              payload: null,
+              executionOrder: 1,
+              updatedAt: '2026-07-30T00:00:02.000Z',
+            },
+          ],
+        },
+      },
+    });
+    const wrapper = mountView();
+
+    expect(wrapper.text()).toContain('Technical details');
+    expect(wrapper.text()).not.toContain('Provider returned 503');
+    expect(mockApolloQuery).not.toHaveBeenCalled();
+
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Technical details')!
+      .trigger('click');
+    await flushPromises();
+
+    expect(mockApolloQuery).toHaveBeenCalledWith(
+      expect.objectContaining({
+        variables: { pipelineRunId: 'failed-pipeline' },
+        fetchPolicy: 'network-only',
+      })
+    );
+    expect(wrapper.text()).toContain('Provider returned 503');
+    expect(wrapper.text()).toContain('private attachment URLs');
+    expect(wrapper.text()).toContain('Execution lease lease-1');
+
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Copy internal telemetry')!
+      .trigger('click');
+    expect(writeText).toHaveBeenCalledWith(
+      expect.stringContaining('Provider returned 503')
+    );
+    expect(wrapper.text()).toContain('Copied internal telemetry for attempt 1');
+
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Hide technical details')!
+      .trigger('click');
+    expect(wrapper.text()).not.toContain('Provider returned 503');
+
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Technical details')!
+      .trigger('click');
+    expect(wrapper.text()).toContain('Provider returned 503');
+    expect(mockApolloQuery).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows a recoverable error when internal telemetry cannot be loaded', async () => {
+    mockUsername.value = 'admin';
+    mockServerAdminUsernames.value = ['admin'];
+    mockOverview.hasPipelineContent = true;
+    mockOverview.attempts = [
+      baseAttempt({ status: 'FAILED', pipelineId: 'failed-pipeline' }),
+    ];
+    mockApolloQuery
+      .mockResolvedValueOnce({
+        data: { getInternalPluginPipelineRun: null },
+      })
+      .mockResolvedValueOnce({
+        data: {
+          getInternalPluginPipelineRun: {
+            attempt: {
+              id: 'attempt-1',
+              pipelineId: 'failed-pipeline',
+              status: 'FAILED',
+              updatedAt: '2026-07-30T00:00:02.000Z',
+            },
+            jobs: [],
+          },
+        },
+      });
+    const wrapper = mountView();
+
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Technical details')!
+      .trigger('click');
+    await flushPromises();
+    expect(wrapper.text()).toContain('Internal telemetry could not be loaded');
+
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Try again')!
+      .trigger('click');
+    await flushPromises();
+    expect(wrapper.text()).toContain('Pipeline ID: failed-pipeline');
+    expect(mockApolloQuery).toHaveBeenCalledTimes(2);
   });
 });

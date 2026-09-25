@@ -1,5 +1,8 @@
 import { expect, test } from '../../helpers/testFixture';
-import { buildBasicUser, buildServerConfig } from '../../helpers/graphqlFixtures';
+import {
+  buildBasicUser,
+  buildServerConfig,
+} from '../../helpers/graphqlFixtures';
 import { installMockAuth } from '../../helpers/mockAuth';
 import {
   installGraphqlMocks,
@@ -41,14 +44,6 @@ const buildImage = (overrides = {}) => ({
   ...overrides,
 });
 
-const buildImageAlbumUsage = (overrides = {}) => ({
-  imageId: IMAGE_ID,
-  uploaderUsername: TEST_USER,
-  uploaderOwnedAlbums: [],
-  otherAlbums: [],
-  ...overrides,
-});
-
 const getBaseMocks = (username: string) => ({
   getBasicUserInfo: () => ({
     data: { users: [buildBasicUser({ username, displayName: username })] },
@@ -80,10 +75,7 @@ const getBaseMocks = (username: string) => ({
     data: { serverConfigs: [buildServerConfig({ serverName: 'Listical' })] },
   }),
   GetImageDetails: () => ({ data: { images: [buildImage()] } }),
-  GetImageAlbumUsage: () => ({
-    data: { getImageAlbumUsage: buildImageAlbumUsage() },
-  }),
-  GetUserAlbums: () => ({ data: { albums: [] } }),
+  GetUserAlbumsForImageSave: () => ({ data: { albums: [] } }),
   GetUserCollectionsImages: () => ({
     data: {
       users: [
@@ -110,7 +102,10 @@ test.describe('User image detail', () => {
       email: 'alice@example.com',
     });
 
-    const diagnostics = await installGraphqlMocks(page, getBaseMocks(TEST_USER));
+    const diagnostics = await installGraphqlMocks(
+      page,
+      getBaseMocks(TEST_USER)
+    );
 
     try {
       await page.goto(`/u/${TEST_USER}/images/${IMAGE_ID}`);
@@ -123,10 +118,6 @@ test.describe('User image detail', () => {
       await waitForGraphqlOperation(
         diagnostics.completedOperations,
         'GetImageDetails'
-      );
-      await waitForGraphqlOperation(
-        diagnostics.completedOperations,
-        'GetImageAlbumUsage'
       );
     } finally {
       await testInfo.attach('graphql-operations.json', {
@@ -166,102 +157,7 @@ test.describe('User image detail', () => {
       // Route says /u/alice but the image was uploaded by bob.
       await page.goto(`/u/${TEST_USER}/images/${IMAGE_ID}`);
 
-      await expect(
-        page.getByText(/uploaded by bob, not/i)
-      ).toBeVisible();
-    } finally {
-      await testInfo.attach('graphql-operations.json', {
-        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
-        contentType: 'application/json',
-      });
-    }
-  });
-
-  test('groups album usage by uploader-owned and other-user albums', async ({
-    context,
-    page,
-  }, testInfo) => {
-    await installMockAuth(context, page, {
-      username: TEST_USER,
-      email: 'alice@example.com',
-    });
-
-    const uploaderAlbum = buildAlbum({
-      id: 'album-uploader',
-      imageOrder: ['image-2'],
-      Images: [
-        {
-          id: 'image-2',
-          url: 'https://img.test/other.png',
-          alt: 'Another scenic photo',
-          caption: 'Another image',
-          Uploader: { username: TEST_USER },
-        },
-      ],
-      Discussions: [
-        {
-          id: 'discussion-1',
-          title: 'Alice album discussion',
-          createdAt: '2024-01-02T00:00:00.000Z',
-          Author: { username: TEST_USER, displayName: 'Alice' },
-          DiscussionChannels: [
-            { id: 'channel-1', channelUniqueName: 'sims4_builds' },
-          ],
-        },
-      ],
-    });
-
-    const otherUserAlbum = buildAlbum({
-      id: 'album-other',
-      Owner: {
-        username: 'bob',
-        displayName: 'Bob',
-      },
-      Discussions: [
-        {
-          id: 'discussion-2',
-          title: 'Bob remixed this album',
-          createdAt: '2024-01-03T00:00:00.000Z',
-          Author: { username: 'bob', displayName: 'Bob' },
-          DiscussionChannels: [
-            { id: 'channel-1', channelUniqueName: 'sims4_builds' },
-          ],
-        },
-      ],
-    });
-
-    const diagnostics = await installGraphqlMocks(page, {
-      ...getBaseMocks(TEST_USER),
-      GetImageDetails: () => ({
-        data: {
-          images: [
-            buildImage({
-              Albums: [uploaderAlbum],
-            }),
-          ],
-        },
-      }),
-      GetImageAlbumUsage: () => ({
-        data: {
-          getImageAlbumUsage: buildImageAlbumUsage({
-            uploaderOwnedAlbums: [uploaderAlbum],
-            otherAlbums: [otherUserAlbum],
-          }),
-        },
-      }),
-    });
-
-    try {
-      await page.goto(`/u/${TEST_USER}/images/${IMAGE_ID}`);
-
-      await expect(page.getByText('Albums by the uploader')).toBeVisible();
-      await expect(page.getByText('Album by Alice')).toBeVisible();
-      await expect(page.getByText('Alice album discussion')).toBeVisible();
-      await expect(page.getByText('Albums by other users')).toBeVisible();
-      await expect(page.getByText('Album by Bob')).toBeVisible();
-      await expect(page.getByText('Bob remixed this album')).toBeVisible();
-      await expect(page.getByText('Other images in this album:')).toBeVisible();
-      await expect(page.getByAltText('Another scenic photo')).toBeVisible();
+      await expect(page.getByText(/uploaded by bob, not/i)).toBeVisible();
     } finally {
       await testInfo.attach('graphql-operations.json', {
         body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
@@ -279,7 +175,6 @@ test.describe('User image detail', () => {
       email: 'alice@example.com',
     });
 
-    let wasSaved = false;
     const bobImage = buildImage({
       Uploader: {
         username: 'bob',
@@ -307,34 +202,18 @@ test.describe('User image detail', () => {
     const diagnostics = await installGraphqlMocks(page, {
       ...getBaseMocks(TEST_USER),
       GetImageDetails: () => ({ data: { images: [bobImage] } }),
-      GetUserAlbums: () => ({
-        data: { albums: [aliceAlbum] },
+      GetUserAlbumsForImageSave: () => ({
+        data: {
+          albums: [{ ...aliceAlbum, matchingImages: [] }],
+        },
       }),
       AddImageToAlbum: ({ body }) => {
         expect(body.variables).toEqual({
           albumId: 'album-alice',
           imageId: IMAGE_ID,
         });
-        wasSaved = true;
         return { data: { addImageToAlbum: true } };
       },
-      GetImageAlbumUsage: () => ({
-        data: {
-          getImageAlbumUsage: buildImageAlbumUsage(
-            wasSaved
-              ? {
-                  uploaderUsername: 'bob',
-                  uploaderOwnedAlbums: [],
-                  otherAlbums: [aliceAlbum],
-                }
-              : {
-                  uploaderUsername: 'bob',
-                  uploaderOwnedAlbums: [],
-                  otherAlbums: [],
-                }
-          ),
-        },
-      }),
     });
 
     try {
@@ -344,14 +223,17 @@ test.describe('User image detail', () => {
       await expect(
         page.getByRole('heading', { name: 'Save image to album' })
       ).toBeVisible();
-      await page.getByRole('button', { name: /Alice inspiration board/ }).click();
+      await page
+        .getByRole('button', { name: /Alice inspiration board/ })
+        .click();
 
       await waitForGraphqlOperation(
         diagnostics.completedOperations,
         'AddImageToAlbum'
       );
-      await expect(page.getByText('Albums by other users')).toBeVisible();
-      await expect(page.getByText('Alice inspiration board')).toBeVisible();
+      await expect(
+        page.getByRole('heading', { name: 'Save image to album' })
+      ).not.toBeVisible();
     } finally {
       await testInfo.attach('graphql-operations.json', {
         body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
@@ -369,7 +251,10 @@ test.describe('User image detail', () => {
       email: 'alice@example.com',
     });
 
-    const diagnostics = await installGraphqlMocks(page, getBaseMocks(TEST_USER));
+    const diagnostics = await installGraphqlMocks(
+      page,
+      getBaseMocks(TEST_USER)
+    );
 
     try {
       await page.goto(`/u/${TEST_USER}/images/${IMAGE_ID}`);

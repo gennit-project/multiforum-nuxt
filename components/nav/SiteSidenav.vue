@@ -10,6 +10,7 @@ import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import LocationIcon from '@/components/icons/LocationIcon.vue';
 import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
+import BookIcon from '@/components/icons/BookIcon.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import BookmarkIcon from '@/components/icons/BookmarkIcon.vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
@@ -68,6 +69,12 @@ const navigation: NavigationItem[] = [
     href: '/downloads',
     icon: DownloadIcon,
     routerName: 'downloads',
+  },
+  {
+    name: 'Wikis',
+    href: '/wiki/search',
+    icon: BookIcon,
+    routerName: 'wiki-search',
   },
   {
     name: 'All Forums',

@@ -14,6 +14,59 @@ export type GraphQLHandler = (input: {
 
 export type GraphQLHandlers = Record<string, GraphQLHandler>;
 
+// Operations that fire on essentially every page, so every mocked test needs
+// them even when its own handler map says nothing about them. A test that cares
+// about the response can still override the operation by name.
+const defaultHandlers: GraphQLHandlers = {
+  getAgePolicy: () => ({
+    data: {
+      getAgePolicy: {
+        accountAgeGateEnabled: false,
+        minimumAccountAge: 13,
+        sensitiveContentAgeGateEnabled: false,
+        minimumSensitiveContentAge: 18,
+      },
+    },
+  }),
+  getMyAgeProfile: () => ({
+    data: {
+      getMyAgeProfile: {
+        birthday: '2000-01-01',
+        meetsAccountMinimumAge: true,
+        mayAccessSensitiveContent: true,
+      },
+    },
+  }),
+  // Site footer branding. Every field null means "this instance configured no
+  // branding", so the footer falls back to its deployment/upstream defaults.
+  getServerBranding: () => ({
+    data: {
+      serverConfigs: [
+        {
+          __typename: 'ServerConfig',
+          serverName: 'Listical',
+          brandingProductName: null,
+          brandingDocsURL: null,
+          brandingSourceURL: null,
+          brandingIssuesURL: null,
+          brandingSupportEmail: null,
+          brandingShowUpstreamLinks: null,
+          brandingCustomFooterLinks: null,
+        },
+      ],
+    },
+  }),
+};
+
+// Keep scenario-specific fixtures compatible when a production query is split
+// into focused operations. The legacy handler remains the single source of the
+// discussion state each scenario is trying to model.
+const legacyOperationAliases: Record<string, string> = {
+  getDiscussionDetail: 'getDiscussion',
+  getDiscussionActivity: 'getDiscussion',
+  getDownloadActivity: 'getDiscussion',
+};
+
 type CompletedOperation = {
   operationName: string;
   variables?: Record<string, unknown>;
@@ -26,14 +79,17 @@ export async function waitForGraphqlOperation(
   await expect
     .poll(
       () =>
-        operations.some(operation => operation.operationName === operationName),
+        operations.some(
+          (operation) => operation.operationName === operationName
+        ),
       { timeout: 10000 }
     )
     .toBe(true);
 }
 
 function summarizeConsoleError(text: string) {
-  const apolloPrefix = 'An error occurred! For more details, see the full error text at ';
+  const apolloPrefix =
+    'An error occurred! For more details, see the full error text at ';
   if (!text.startsWith(apolloPrefix)) {
     return text;
   }
@@ -102,7 +158,11 @@ export async function installGraphqlMocks(
       variables: body.variables,
     });
 
-    const handler = handlers[operationName];
+    const legacyOperationName = legacyOperationAliases[operationName];
+    const handler =
+      handlers[operationName] ??
+      (legacyOperationName ? handlers[legacyOperationName] : undefined) ??
+      defaultHandlers[operationName];
     if (!handler) {
       console.error(
         `[playwright:unhandled-graphql] ${operationName} ${JSON.stringify(body.variables ?? {})}`

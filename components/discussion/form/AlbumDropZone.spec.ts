@@ -47,7 +47,7 @@ describe('AlbumDropZone rendering', () => {
     const wrapper = mountZone({
       fileUploadAvailable: false,
       fileUploadUnavailableMessage: 'File storage is not configured.',
-      setupUrl: '/admin/setup#uploads',
+      setupUrl: '/admin/setup#file-uploads',
     });
 
     expect(
@@ -66,10 +66,12 @@ describe('AlbumDropZone rendering', () => {
     const wrapper = mountZone({
       fileUploadAvailable: false,
       fileUploadUnavailableMessage: 'File storage is not configured.',
-      setupUrl: '/admin/setup#uploads',
+      setupUrl: '/admin/setup#file-uploads',
     });
 
-    expect(wrapper.get('a').attributes('href')).toBe('/admin/setup#uploads');
+    expect(wrapper.get('a').attributes('href')).toBe(
+      '/admin/setup#file-uploads'
+    );
   });
 });
 

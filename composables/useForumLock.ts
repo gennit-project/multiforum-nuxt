@@ -1,7 +1,8 @@
-import { computed, type Ref } from 'vue';
+import { computed, unref, type ComputedRef, type Ref } from 'vue';
 import { DateTime } from 'luxon';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { useUsername } from '@/composables/useAuthState';
 
 // Shared copy for the "creation blocked because the forum is locked" notice, so
 // every create surface (discussions, events, comments) shows the same message.
@@ -18,7 +19,11 @@ export const FORUM_LOCKED_MESSAGE =
 // Reads GET_CHANNEL cache-first with the same variables the forum layout
 // (pages/forums/[forumId].vue) already fetches, so it reuses that result instead
 // of issuing a second network request.
-export const useForumLock = (channelUniqueName: Ref<string> | string) => {
+export const useForumLock = (
+  channelUniqueName: Ref<string> | string,
+  prefetch: boolean | Ref<boolean> | ComputedRef<boolean> = true
+) => {
+  const loggedInUsername = useUsername();
   const channelId = computed(() =>
     typeof channelUniqueName === 'string'
       ? channelUniqueName
@@ -29,13 +34,15 @@ export const useForumLock = (channelUniqueName: Ref<string> | string) => {
     GET_CHANNEL,
     () => ({
       uniqueName: channelId.value,
+      loggedInUsername: loggedInUsername.value || null,
       // Match the forum layout's variables so this hits the same cache entry.
       now: DateTime.utc().startOf('hour').toISO(),
     }),
-    {
+    () => ({
       fetchPolicy: 'cache-first',
-      enabled: computed(() => !!channelId.value),
-    }
+      enabled: !!channelId.value,
+      prefetch: unref(prefetch),
+    })
   );
 
   const channel = computed(() => result.value?.channels?.[0] ?? null);

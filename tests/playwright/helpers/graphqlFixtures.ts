@@ -83,7 +83,18 @@ export type ServerConfigFixture = Pick<
   | 'allowedFileTypes'
   | 'enableDownloads'
   | 'enableEvents'
+  | 'accountAgeGateEnabled'
+  | 'minimumAccountAge'
+  | 'sensitiveContentAgeGateEnabled'
+  | 'minimumSensitiveContentAge'
   | 'pluginRegistries'
+  | 'brandingProductName'
+  | 'brandingDocsURL'
+  | 'brandingSourceURL'
+  | 'brandingIssuesURL'
+  | 'brandingSupportEmail'
+  | 'brandingShowUpstreamLinks'
+  | 'brandingCustomFooterLinks'
 > & {
   Admins: Array<Pick<User, 'username'>>;
   Moderators: unknown[];
@@ -159,6 +170,7 @@ export type DiscussionChannelFixture = Pick<
   > & { Bots: unknown[] };
   Discussion: Pick<Discussion, 'id' | 'title'> & { Author: UserFixture };
   CommentsAggregate: CountAggregate;
+  RootCommentsAggregate: CountAggregate;
   UpvotedByUsers: Array<Pick<User, 'username'>>;
   UpvotedByUsersAggregate: CountAggregate;
   SuperUpvotedByUsers: Array<Pick<User, 'username'>>;
@@ -167,6 +179,7 @@ export type DiscussionChannelFixture = Pick<
 
 export type DiscussionFixture = Pick<
   Discussion,
+  | '__typename'
   | 'id'
   | 'title'
   | 'body'
@@ -287,7 +300,20 @@ export const buildServerConfig = (
   allowedFileTypes: [],
   enableDownloads: true,
   enableEvents: true,
+  accountAgeGateEnabled: false,
+  minimumAccountAge: 13,
+  sensitiveContentAgeGateEnabled: false,
+  minimumSensitiveContentAge: 18,
   pluginRegistries: [],
+  // Null branding means "this instance configured none", so the footer falls
+  // back to its deployment/upstream defaults.
+  brandingProductName: null,
+  brandingDocsURL: null,
+  brandingSourceURL: null,
+  brandingIssuesURL: null,
+  brandingSupportEmail: null,
+  brandingShowUpstreamLinks: null,
+  brandingCustomFooterLinks: null,
   ...overrides,
 });
 
@@ -317,7 +343,9 @@ export const buildServerRole = (overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 });
 
-export const buildModServerRole = (overrides: Record<string, unknown> = {}) => ({
+export const buildModServerRole = (
+  overrides: Record<string, unknown> = {}
+) => ({
   __typename: 'ModServerRole' as const,
   name: 'Basic Server Mod Role',
   description: 'Baseline server moderator capabilities.',
@@ -507,6 +535,7 @@ export const buildDiscussionChannel = ({
     Author: buildUser(),
   },
   CommentsAggregate: { count: commentsCount },
+  RootCommentsAggregate: { count: commentsCount },
   UpvotedByUsers: [{ username: DEFAULT_USERNAME }],
   UpvotedByUsersAggregate: { count: 1 },
   SuperUpvotedByUsers: [],
@@ -535,6 +564,7 @@ export const buildDiscussion = ({
   commentsCount?: number;
   overrides?: Override<DiscussionFixture>;
 } = {}): DiscussionFixture => ({
+  __typename: 'Discussion',
   id,
   title,
   body,
@@ -593,9 +623,12 @@ export const buildComment = ({
   isFavoritedByUser: false,
   CommentAuthor: buildUser(),
   ChildCommentsAggregate: {
-    count: comments.filter((child) => child.parentCommentId === comment.id).length,
+    count: comments.filter((child) => child.parentCommentId === comment.id)
+      .length,
   },
-  ParentComment: comment.parentCommentId ? { id: comment.parentCommentId } : null,
+  ParentComment: comment.parentCommentId
+    ? { id: comment.parentCommentId }
+    : null,
   ChildComments: comments
     .filter((child) => child.parentCommentId === comment.id)
     .map((child) =>
@@ -824,7 +857,10 @@ export const buildModCommentActivityItem = ({
     createdAt: MOCK_DATE,
     updatedAt: MOCK_DATE,
     Issue: { id: issueId },
-    CommentAuthor: { __typename: 'ModerationProfile', displayName: modDisplayName },
+    CommentAuthor: {
+      __typename: 'ModerationProfile',
+      displayName: modDisplayName,
+    },
     Channel: { uniqueName: channelUniqueName },
     ChildCommentsAggregate: { count: 0 },
     ParentComment: null,

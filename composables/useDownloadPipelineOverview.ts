@@ -173,6 +173,10 @@ export function useDownloadPipelineOverview(
     () => ({
       enabled: enabled.value,
       fetchPolicy: 'cache-and-network',
+      // The download detail tree already performs several SSR query waves.
+      // Fetch this non-SEO overview after hydration so a slow check history
+      // cannot prevent Vercel from returning the page shell.
+      prefetch: false,
     })
   );
 

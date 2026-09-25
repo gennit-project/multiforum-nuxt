@@ -90,6 +90,7 @@ const EventDetailStub = defineComponent({
 
 const ChannelSidebarStub = defineComponent({
   name: 'ChannelSidebar',
+  props: { useScrollbar: Boolean },
   template: '<div class="channel-sidebar-stub" />',
 });
 
@@ -124,6 +125,12 @@ const ChannelTabsStub = defineComponent({
 const NuxtPageStub = defineComponent({
   name: 'NuxtPage',
   template: '<div class="nuxt-page-stub" />',
+});
+
+const NuxtLinkStub = defineComponent({
+  name: 'NuxtLink',
+  props: { to: [String, Object] },
+  template: '<a><slot /></a>',
 });
 
 const NuxtLayoutStub = defineComponent({
@@ -217,6 +224,7 @@ const mountWith = async (
       stubs: {
         NuxtLayout: NuxtLayoutStub,
         NuxtPage: NuxtPageStub,
+        NuxtLink: NuxtLinkStub,
       },
     },
   });
@@ -258,6 +266,39 @@ describe('forum shell page', () => {
     expect(wrapper.findComponent(DiscussionTitleEditFormStub).exists()).toBe(
       true
     );
+  });
+
+  it('defers forum shell queries during download detail SSR', async () => {
+    mockState.route.name = 'forums-forumId-downloads-discussionId';
+    const wrapper = await mountWith([]);
+
+    const queryOptions = mockedUseQuery.mock.calls.slice(0, 2).map((call) => {
+      const options = call[2];
+      return typeof options === 'function' ? options() : options;
+    });
+
+    expect(queryOptions.map((options) => options.prefetch)).toEqual([
+      false,
+      false,
+    ]);
+    expect({
+      childPage: wrapper.findComponent(NuxtPageStub).exists(),
+      notFound: wrapper.findComponent(PageNotFoundStub).exists(),
+    }).toEqual({ childPage: true, notFound: false });
+  });
+
+  it('prefetches forum shell queries on the plain forum route', async () => {
+    await mountWith([]);
+
+    const queryOptions = mockedUseQuery.mock.calls.slice(0, 2).map((call) => {
+      const options = call[2];
+      return typeof options === 'function' ? options() : options;
+    });
+
+    expect(queryOptions.map((options) => options.prefetch)).toEqual([
+      true,
+      true,
+    ]);
   });
 
   it('renders the channel tabs on the plain forum route', async () => {
@@ -341,6 +382,47 @@ describe('forum shell page', () => {
     }
   );
 
+  it('aligns the discussion title bar with the full detail layout', async () => {
+    mockState.route.name = 'forums-forumId-discussions-discussionId';
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+
+    expect(
+      Array.from(
+        wrapper.findComponent(DiscussionTitleEditFormStub).element.parentElement
+          ?.classList || []
+      )
+    ).toEqual(
+      expect.arrayContaining(['mx-auto', 'w-full', 'xl:max-w-6xl', 'xl:pl-4'])
+    );
+  });
+
+  it('constrains the discussion and metadata columns as one layout', async () => {
+    mockState.route.name = 'forums-forumId-discussions-discussionId';
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+
+    expect(
+      wrapper.get('[data-testid="forum-detail-content-row"]').classes()
+    ).toEqual(expect.arrayContaining(['mx-auto', 'xl:max-w-6xl']));
+  });
+
+  it('aligns the download title bar with the centered detail content', async () => {
+    mockState.route.name = 'forums-forumId-downloads-discussionId';
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+
+    expect(
+      Array.from(
+        wrapper.findComponent(DiscussionTitleEditFormStub).element.parentElement
+          ?.classList || []
+      )
+    ).toEqual(expect.arrayContaining(['mx-auto', 'w-full', 'xl:max-w-6xl']));
+  });
+
   it('renders a selected discussion in the split panel', async () => {
     mockState.route.name = 'forums-forumId-discussions';
     mockState.route.query = { selectedDiscussionId: 'discussion-1' };
@@ -357,7 +439,19 @@ describe('forum shell page', () => {
       id: wrapper
         .findComponent(DiscussionDetailContentStub)
         .props('discussionId'),
-    }).toEqual({ title: true, id: 'discussion-1' });
+      link: wrapper
+        .getComponent('[data-testid="channel-discussion-detail-link"]')
+        .props('to'),
+      hasOpenInNewTab: wrapper.text().includes('Open in new tab'),
+    }).toEqual({
+      title: true,
+      id: 'discussion-1',
+      link: {
+        name: 'forums-forumId-discussions-discussionId',
+        params: { forumId: 'cats', discussionId: 'discussion-1' },
+      },
+      hasOpenInNewTab: false,
+    });
   });
 
   it('renders the empty discussion selection state', async () => {
@@ -423,6 +517,37 @@ describe('forum shell page', () => {
     ]);
 
     expect(wrapper.findComponent(ChannelSidebarStub).exists()).toBe(false);
+  });
+
+  it('stacks the discussion sidebar below the main content on mobile', async () => {
+    mockState.route.name = 'forums-forumId-discussions-discussionId';
+    (mockState.mdAndUp as { value: boolean }).value = false;
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+    const sidebar = wrapper.findComponent(ChannelSidebarStub);
+
+    expect({
+      exists: sidebar.exists(),
+      usesNestedScrollbar: sidebar.props('useScrollbar'),
+    }).toEqual({ exists: true, usesNestedScrollbar: false });
+  });
+
+  it('lets discussion metadata flow with the page on desktop', async () => {
+    mockState.route.name = 'forums-forumId-discussions-discussionId';
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+
+    expect({
+      columnIsScrollable: wrapper
+        .get('[data-testid="forum-detail-sidebar"]')
+        .classes()
+        .includes('md:overflow-y-auto'),
+      usesNestedScrollbar: wrapper
+        .getComponent(ChannelSidebarStub)
+        .props('useScrollbar'),
+    }).toEqual({ columnIsScrollable: false, usesNestedScrollbar: false });
   });
 
   it('builds SEO metadata from the loaded channel', async () => {
