@@ -63,6 +63,24 @@ export const GET_INSTANCE_SETUP_STATUS = gql`
   }
 `;
 
+// Lightweight branding-only query. The footer renders on every page, so it must
+// not pull the full GET_SERVER_CONFIG payload (roles, admins, invites, plugins)
+// just to read a handful of links.
+export const GET_SERVER_BRANDING = gql`
+  query getServerBranding($serverName: String!) {
+    serverConfigs(where: { serverName: $serverName }) {
+      serverName
+      brandingProductName
+      brandingDocsURL
+      brandingSourceURL
+      brandingIssuesURL
+      brandingSupportEmail
+      brandingShowUpstreamLinks
+      brandingCustomFooterLinks
+    }
+  }
+`;
+
 export const GET_SERVER_CONFIG = gql`
   query getServerConfig($serverName: String!) {
     serverConfigs(where: { serverName: $serverName }) {
@@ -70,6 +88,13 @@ export const GET_SERVER_CONFIG = gql`
       serverIconURL
       serverDescription
       featuredWikiPageIds
+      brandingProductName
+      brandingDocsURL
+      brandingSourceURL
+      brandingIssuesURL
+      brandingSupportEmail
+      brandingShowUpstreamLinks
+      brandingCustomFooterLinks
       Admins {
         username
       }

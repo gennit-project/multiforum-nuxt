@@ -15,6 +15,7 @@ import BookIcon from '@/components/icons/BookIcon.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import IdentificationIcon from '@/components/icons/IdentificationIcon.vue';
+import PaintBrushIcon from '@/components/icons/PaintBrushIcon.vue';
 
 const props = defineProps({
   editMode: {
@@ -111,6 +112,12 @@ const tabs = [
     key: 'wiki',
     label: 'Wiki Settings',
     icon: BookIcon,
+    fontAwesome: null,
+  },
+  {
+    key: 'branding',
+    label: 'Branding',
+    icon: PaintBrushIcon,
     fontAwesome: null,
   },
   {
