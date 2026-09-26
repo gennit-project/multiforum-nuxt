@@ -191,9 +191,6 @@ const modSuggestions = computed(() => {
     Channel?: {
       Moderators?: Array<{
         displayName?: string | null;
-        User?: {
-          username?: string | null;
-        } | null;
       }>;
     };
   };
@@ -202,10 +199,7 @@ const modSuggestions = computed(() => {
     mods: (channel?.Channel?.Moderators || [])
       .filter((mod): mod is typeof mod & { displayName: string } =>
         typeof mod.displayName === 'string' && mod.displayName.length > 0)
-      .map((mod) => ({
-        displayName: mod.displayName,
-        username: mod.User?.username || null,
-      })),
+      .map((mod) => ({ displayName: mod.displayName })),
   });
 });
 

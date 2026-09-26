@@ -196,9 +196,7 @@ test('shows a Server Mod badge on a comment authored with a mod profile', async 
         // mod-mary is a server moderator (acting via their mod profile).
         serverConfigOverrides: {
           Admins: [],
-          Moderators: [
-            { displayName: MOD_PROFILE, User: { username: 'mary' } },
-          ],
+          Moderators: [{ displayName: MOD_PROFILE }],
         },
       }),
       getDiscussionCommentIssue: () => ({

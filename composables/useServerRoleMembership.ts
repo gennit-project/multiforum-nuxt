@@ -22,16 +22,8 @@ export const useServerRoleMembership = () => {
     );
   });
 
-  const serverModUsernames = computed(() => {
-    return (
-      result.value?.serverConfigs?.[0]?.Moderators?.map(
-        (moderator: {
-          User?: { username?: string | null } | null;
-        }) => moderator.User?.username
-      ).filter(Boolean) || []
-    );
-  });
-
+  // Server moderators are identified by mod-profile name only; see
+  // useForumRoleMembership for why usernames are never matched.
   const serverModProfileNames = computed(() => {
     return (
       result.value?.serverConfigs?.[0]?.Moderators?.map(
@@ -42,7 +34,6 @@ export const useServerRoleMembership = () => {
 
   return {
     serverAdminUsernames,
-    serverModUsernames,
     serverModProfileNames,
   };
 };

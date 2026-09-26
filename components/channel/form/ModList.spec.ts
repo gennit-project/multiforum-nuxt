@@ -19,7 +19,6 @@ const withMods = (mods: unknown[]) => ({ channels: [{ Moderators: mods }] });
 
 const mod = (overrides: Record<string, unknown> = {}) => ({
   displayName: 'mod1',
-  User: { username: 'alice' },
   ...overrides,
 });
 
@@ -75,17 +74,19 @@ describe('ModList states', () => {
 });
 
 describe('ModList content', () => {
-  it('renders a mod with its display name and username', () => {
+  it('renders a mod by display name only', () => {
     const wrapper = mountList();
 
-    expect(wrapper.text()).toContain('mod1 (alice)');
+    expect(wrapper.text()).toContain('mod1');
   });
 
-  it('emits click-remove-mod with the username', async () => {
+  // Removal identifies the moderator by mod-profile name; the account behind
+  // the profile is never known to the client.
+  it('emits click-remove-mod with the mod-profile name', async () => {
     const wrapper = mountList();
 
     await removeButton(wrapper)!.trigger('click');
 
-    expect(wrapper.emitted('click-remove-mod')?.[0]).toEqual(['alice']);
+    expect(wrapper.emitted('click-remove-mod')?.[0]).toEqual(['mod1']);
   });
 });

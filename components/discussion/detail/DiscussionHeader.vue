@@ -64,9 +64,9 @@ const emit = defineEmits([
 
 const route = useRoute();
 const router = useRouter();
-const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+const { serverAdminUsernames, serverModProfileNames } =
   useServerRoleMembership();
-const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
+const { forumAdminUsernames, forumModProfileNames } =
   useForumRoleMembership();
 
 const editedAt = computed(() => {
@@ -348,10 +348,8 @@ const authorBadges = computed(() =>
   getAuthorBadges({
     username: props.discussion?.Author?.username,
     serverAdminUsernames: serverAdminUsernames.value,
-    serverModUsernames: serverModUsernames.value,
     serverModProfileNames: serverModProfileNames.value,
     forumAdminUsernames: forumAdminUsernames.value,
-    forumModUsernames: forumModUsernames.value,
     forumModProfileNames: forumModProfileNames.value,
   })
 );

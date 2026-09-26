@@ -12,7 +12,6 @@ import { GET_MODS_BY_CHANNEL } from '@/graphQLData/mod/queries';
 
 type ForumRoleMembership = {
   forumAdminUsernames: ComputedRef<string[]>;
-  forumModUsernames: ComputedRef<string[]>;
   forumModProfileNames: ComputedRef<string[]>;
 };
 
@@ -25,7 +24,6 @@ const forumRoleMembershipKey: InjectionKey<ForumRoleMembership> = Symbol(
 
 const defaultForumRoleMembership: ForumRoleMembership = {
   forumAdminUsernames: computed(() => []),
-  forumModUsernames: computed(() => []),
   forumModProfileNames: computed(() => []),
 };
 
@@ -53,15 +51,9 @@ export const createForumRoleMembership = (
     );
   });
 
-  const forumModUsernames = computed(() => {
-    return (
-      result.value?.channels?.[0]?.Moderators?.map(
-        (moderator: { User?: { username?: string | null } | null }) =>
-          moderator.User?.username
-      ).filter(Boolean) || []
-    );
-  });
-
+  // Moderators are identified by mod-profile name only. The backend denies
+  // ModerationProfile.User, so the account behind a profile is never known,
+  // and matching a regular username would link the two publicly.
   const forumModProfileNames = computed(() => {
     return (
       result.value?.channels?.[0]?.Moderators?.map(
@@ -72,7 +64,6 @@ export const createForumRoleMembership = (
 
   return {
     forumAdminUsernames,
-    forumModUsernames,
     forumModProfileNames,
   };
 };

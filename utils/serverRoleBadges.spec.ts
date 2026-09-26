@@ -20,21 +20,22 @@ describe('getServerRoleBadge', () => {
     ).toBe('serverMod');
   });
 
-  it('returns serverMod when moderator user is matched by username', () => {
+  it('never returns serverMod for a username match', () => {
     expect(
       getServerRoleBadge({
         username: 'alice',
-        modUsernames: ['alice'],
+        modProfileNames: ['alice'],
       })
-    ).toBe('serverMod');
+    ).toBe(null);
   });
 
   it('prefers serverAdmin over serverMod when both match', () => {
     expect(
       getServerRoleBadge({
         username: 'alice',
+        modProfileName: 'mod-alice',
         adminUsernames: ['alice'],
-        modUsernames: ['alice'],
+        modProfileNames: ['mod-alice'],
       })
     ).toBe('serverAdmin');
   });

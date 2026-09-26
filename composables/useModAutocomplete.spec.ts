@@ -8,7 +8,6 @@ const makeSuggestion = (value: string): ModSuggestion => ({
   label: value,
   mention: `/m/${value}`,
   displayName: value,
-  username: value,
 });
 
 type State = {

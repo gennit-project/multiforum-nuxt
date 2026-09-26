@@ -7,14 +7,13 @@ const suggestion = (overrides: Partial<ModSuggestion> = {}): ModSuggestion => ({
   value: 'mod-1',
   label: 'Mod One',
   mention: '@mod-one',
-  username: 'modone',
   ...overrides,
 });
 
 const three: ModSuggestion[] = [
-  suggestion({ value: 'a', mention: '@a', username: 'alpha' }),
-  suggestion({ value: 'b', mention: '@b', username: 'bravo' }),
-  suggestion({ value: 'c', mention: '@c', username: 'charlie' }),
+  suggestion({ value: 'a', mention: '@a' }),
+  suggestion({ value: 'b', mention: '@b' }),
+  suggestion({ value: 'c', mention: '@c' }),
 ];
 
 const mountPopover = (
@@ -34,13 +33,9 @@ describe('ModSuggestionsPopover', () => {
     expect(mountPopover().findAll('button')[0]!.text()).toContain('@a');
   });
 
-  it('shows the username when present', () => {
-    expect(mountPopover().findAll('button')[0]!.text()).toContain('@alpha');
-  });
-
-  it('omits the username span when absent', () => {
-    const wrapper = mountPopover([suggestion({ mention: '@x', username: null })]);
-    expect(wrapper.findAll('span')).toHaveLength(1);
+  // Only the mod-profile mention is shown; the account behind it is private.
+  it('shows no account name next to the mention', () => {
+    expect(mountPopover().findAll('button')[0]!.findAll('span')).toHaveLength(1);
   });
 
   it('emits select with the clicked suggestion', async () => {

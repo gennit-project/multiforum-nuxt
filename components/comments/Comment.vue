@@ -249,9 +249,9 @@ const forumId = computed(() => {
 
 // Use the permission composable
 const { userPermissions } = useCommentPermissions(forumId);
-const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
+const { forumAdminUsernames, forumModProfileNames } =
   useForumRoleMembership();
-const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+const { serverAdminUsernames, serverModProfileNames } =
   useServerRoleMembership();
 
 // Reactive refs for the best answer composable
@@ -332,10 +332,8 @@ const authorBadges = computed(() => {
     username,
     modProfileName,
     serverAdminUsernames: serverAdminUsernames.value,
-    serverModUsernames: serverModUsernames.value,
     serverModProfileNames: serverModProfileNames.value,
     forumAdminUsernames: forumAdminUsernames.value,
-    forumModUsernames: forumModUsernames.value,
     forumModProfileNames: forumModProfileNames.value,
   });
 });

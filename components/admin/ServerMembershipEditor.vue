@@ -20,9 +20,10 @@ type ServerUser = {
   createdAt?: string | null;
 };
 
+// Moderators are identified by mod-profile name only; the API never reveals
+// which account is behind a mod profile.
 type ServerModerator = {
   displayName?: string | null;
-  User?: ServerUser | null;
 };
 
 type PendingInvite = {
@@ -337,14 +338,9 @@ const removeModerator = async (displayName: string) => {
             :key="moderator.displayName || ''"
             class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
-            <div class="flex flex-col">
-              <span class="font-medium text-gray-900 dark:text-gray-100">
-                {{ moderator.displayName }}
-              </span>
-              <span class="text-sm text-gray-600 dark:text-gray-300">
-                {{ moderator.User?.username ? `u/${moderator.User.username}` : 'No linked user' }}
-              </span>
-            </div>
+            <span class="font-medium text-gray-900 dark:text-gray-100">
+              {{ moderator.displayName }}
+            </span>
             <button
               type="button"
               class="rounded border border-orange-500 px-2 py-1 text-sm text-orange-500"

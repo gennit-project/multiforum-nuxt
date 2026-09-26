@@ -100,9 +100,6 @@ export const GET_SERVER_CONFIG = gql`
       }
       Moderators {
         displayName
-        User {
-          username
-        }
       }
       PendingAdminInvites {
         username
@@ -419,14 +416,6 @@ export const GET_SERVER_PERMISSIONS = gql`
       }
       Moderators {
         displayName
-        User {
-          username
-          displayName
-          profilePicURL
-          commentKarma
-          discussionKarma
-          createdAt
-        }
       }
       PendingAdminInvites {
         username

@@ -10,7 +10,6 @@ export type RoleBadgeParams = {
   username?: string | null;
   modProfileName?: string | null;
   adminUsernames?: string[];
-  modUsernames?: string[];
   modProfileNames?: string[];
 };
 
@@ -29,17 +28,15 @@ export const resolveRoleBadge = ({
   username,
   modProfileName,
   adminUsernames = [],
-  modUsernames = [],
   modProfileNames = [],
 }: RoleBadgeParams): RoleBadgeKind => {
   if (hasMatch(username, adminUsernames)) {
     return 'admin';
   }
 
-  if (
-    hasMatch(username, modUsernames) ||
-    hasMatch(modProfileName, modProfileNames)
-  ) {
+  // Mods match by mod-profile name only: the account behind a mod profile is
+  // private, so a regular username never earns a mod badge.
+  if (hasMatch(modProfileName, modProfileNames)) {
     return 'mod';
   }
 
@@ -76,30 +73,24 @@ export const getAuthorBadges = ({
   username,
   modProfileName,
   serverAdminUsernames = [],
-  serverModUsernames = [],
   serverModProfileNames = [],
   forumAdminUsernames = [],
-  forumModUsernames = [],
   forumModProfileNames = [],
 }: {
   username?: string | null;
   modProfileName?: string | null;
   serverAdminUsernames?: string[];
-  serverModUsernames?: string[];
   serverModProfileNames?: string[];
   forumAdminUsernames?: string[];
-  forumModUsernames?: string[];
   forumModProfileNames?: string[];
 }): AuthorBadges => {
   const isServerAdmin = hasMatch(username, serverAdminUsernames);
   const isServerMod =
     !isServerAdmin &&
-    (hasMatch(username, serverModUsernames) ||
-      hasMatch(modProfileName, serverModProfileNames));
+    hasMatch(modProfileName, serverModProfileNames);
   const isForumAdmin = hasMatch(username, forumAdminUsernames);
   const isForumMod =
     !isForumAdmin &&
-    (hasMatch(username, forumModUsernames) ||
-      hasMatch(modProfileName, forumModProfileNames));
+    hasMatch(modProfileName, forumModProfileNames);
   return { isServerAdmin, isServerMod, isForumAdmin, isForumMod };
 };

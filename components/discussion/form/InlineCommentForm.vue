@@ -500,12 +500,6 @@ const applyModSuggestion = (value: string) => {
               <span class="text-sm font-semibold text-gray-900 dark:text-white">
                 {{ suggestion.mention }}
               </span>
-              <span
-                v-if="suggestion.username"
-                class="text-xs text-gray-500 dark:text-gray-400"
-              >
-                @{{ suggestion.username }}
-              </span>
             </button>
           </div>
           <button

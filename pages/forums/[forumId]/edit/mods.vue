@@ -22,8 +22,7 @@ interface PendingModInvite {
 }
 
 interface ChannelMod {
-  username: string;
-  displayName?: string;
+  displayName?: string | null;
 }
 
 interface PendingModsQueryResult {
@@ -31,7 +30,7 @@ interface PendingModsQueryResult {
 }
 
 interface ModsQueryResult {
-  channels?: Array<{ Admins?: ChannelMod[] }>;
+  channels?: Array<{ uniqueName?: string; Moderators?: ChannelMod[] }>;
 }
 
 const route = useRoute();
@@ -132,8 +131,8 @@ const {
   error: removeForumModError,
 } = useMutation(REMOVE_FORUM_MOD, {
   update: (cache, { data: _data }) => {
-    // update the result of GET_MODS_BY_CHANNEL
-    // to remove the removed user
+    // Drop the removed moderator from GET_MODS_BY_CHANNEL, keeping the rest of
+    // the cached channel (admins, other mods) intact.
 
     const existingData = cache.readQuery({
       query: GET_MODS_BY_CHANNEL,
@@ -142,7 +141,8 @@ const {
       },
     }) as ModsQueryResult | null;
 
-    const existingMods = existingData?.channels?.[0]?.Admins ?? [];
+    const existingChannel = existingData?.channels?.[0];
+    if (!existingChannel) return;
 
     cache.writeQuery({
       query: GET_MODS_BY_CHANNEL,
@@ -152,11 +152,10 @@ const {
       data: {
         channels: [
           {
-            Admins: [
-              ...existingMods.filter(
-                (mod: ChannelMod) => mod.username !== newModUsername.value
-              ),
-            ],
+            ...existingChannel,
+            Moderators: (existingChannel.Moderators ?? []).filter(
+              (mod: ChannelMod) => mod.displayName !== forumModToRemove.value
+            ),
           },
         ],
       },
@@ -187,8 +186,8 @@ const clickCancelInvite = (inviteeUsername: string) => {
   showCancelInviteModal.value = true;
 };
 
-const clickRemoveMod = (modUsername: string) => {
-  forumModToRemove.value = modUsername;
+const clickRemoveMod = (modProfileName: string) => {
+  forumModToRemove.value = modProfileName;
   showRemoveChannelModModal.value = true;
 };
 </script>
@@ -267,7 +266,7 @@ const clickRemoveMod = (modUsername: string) => {
       @primary-button-click="
         () =>
           removeForumMod({
-            username: forumModToRemove,
+            modProfileName: forumModToRemove,
             channelUniqueName: forumId,
           })
       "
