@@ -15,6 +15,7 @@ import {
   GET_DOWNLOAD_DETAIL,
 } from '@/graphQLData/discussion/queries';
 import { DISCUSSION_TITLE_CHAR_LIMIT } from '@/utils/constants';
+import { buildDetailQueryVariables } from '@/utils/discussionDetailQuery';
 import { useRoute } from 'nuxt/app';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
@@ -44,12 +45,14 @@ const {
   onResult: onGetDiscussionResult,
 } = useQuery(
   isDownloadDetailPage.value ? GET_DOWNLOAD_DETAIL : GET_DISCUSSION_DETAIL,
-  {
-    id: discussionId,
-    loggedInModName: modProfileNameVar.value || '',
-    loggedInUsername: usernameVar.value || null,
-    channelUniqueName: channelId.value,
-  }
+  () =>
+    buildDetailQueryVariables({
+      discussionId: discussionId.value,
+      downloadMode: isDownloadDetailPage.value,
+      modProfileName: modProfileNameVar.value,
+      username: usernameVar.value,
+      channelUniqueName: channelId.value,
+    })
 );
 
 const discussion = computed<Discussion | null>(() => {

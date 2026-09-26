@@ -8,6 +8,7 @@ import { useModProfileName } from '@/composables/useAuthState';
 import { useRoute, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_DISCUSSION_DETAIL } from '@/graphQLData/discussion/queries';
+import { buildDetailQueryVariables } from '@/utils/discussionDetailQuery';
 import { buildDiscussionHead } from '@/utils/discussionSeo';
 
 const modProfileNameVar = useModProfileName();
@@ -33,11 +34,15 @@ const channelId = computed(() => {
   return '';
 });
 
-const { result: discussionResult } = useQuery(GET_DISCUSSION_DETAIL, {
-  id: discussionId,
-  loggedInModName: modProfileNameVar.value,
-  channelUniqueName: channelId.value,
-});
+// Same variables as DiscussionDetailContent so Apollo sends one request.
+const { result: discussionResult } = useQuery(GET_DISCUSSION_DETAIL, () =>
+  buildDetailQueryVariables({
+    discussionId: discussionId.value,
+    downloadMode: false,
+    modProfileName: modProfileNameVar.value,
+    channelUniqueName: channelId.value,
+  })
+);
 
 // Reactive meta data that updates when discussion data changes. The pure
 // tag-building logic lives in utils/discussionSeo.ts (unit-tested).
