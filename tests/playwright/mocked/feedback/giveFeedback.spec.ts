@@ -161,9 +161,6 @@ const getFeedbackHandlers = (username: string, modProfileName: string) => ({
               displayName: modProfileName,
               createdAt: MOCK_DATE,
               ModChannelRoles: [FEEDBACK_MOD_ROLE],
-              User: {
-                username,
-              },
             },
           ],
         },

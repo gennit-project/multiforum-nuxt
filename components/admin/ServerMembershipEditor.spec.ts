@@ -75,9 +75,6 @@ describe('ServerMembershipEditor', () => {
     Moderators: [
       {
         displayName: 'Mod Alice',
-        User: {
-          username: 'alice',
-        },
       },
     ],
   };
@@ -91,9 +88,22 @@ describe('ServerMembershipEditor', () => {
     });
 
     expect(wrapper.text()).toContain('Server Admins');
-    expect(wrapper.text()).toContain('alice');
+    // Admin rows render through the stubbed UsernameWithTooltip.
+    expect(wrapper.html()).toContain('alice');
     expect(wrapper.text()).toContain('Server Moderators');
     expect(wrapper.text()).toContain('Mod Alice');
+  });
+
+  // The account behind a mod profile is private; rows show the profile only.
+  it('shows no linked account for a moderator', () => {
+    const wrapper = mount(ServerMembershipEditor, {
+      props: { serverConfig },
+      global: {
+        stubs: ['AvatarComponent', 'UsernameWithTooltip'],
+      },
+    });
+
+    expect(wrapper.text()).not.toMatch(/u\/|No linked user/);
   });
 
   it('invites a server admin by username', async () => {

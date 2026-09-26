@@ -33,23 +33,6 @@ describe('useServerRoleMembership', () => {
     expect(serverAdminUsernames.value).toEqual(['alice', 'bob']);
   });
 
-  it('returns moderator usernames from server config membership', () => {
-    (useQuery as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      result: ref({
-        serverConfigs: [
-          {
-            Admins: [],
-            Moderators: [{ User: { username: 'alice' } }, { User: null }],
-          },
-        ],
-      }),
-    });
-
-    const { serverModUsernames } = useServerRoleMembership();
-
-    expect(serverModUsernames.value).toEqual(['alice']);
-  });
-
   it('returns moderator display names from server config membership', () => {
     (useQuery as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       result: ref({
@@ -78,16 +61,12 @@ describe('useServerRoleMembership', () => {
       }),
     });
 
-    const {
-      serverAdminUsernames,
-      serverModUsernames,
-      serverModProfileNames,
-    } = useServerRoleMembership();
+    const { serverAdminUsernames, serverModProfileNames } =
+      useServerRoleMembership();
 
-    expect([
-      serverAdminUsernames.value,
-      serverModUsernames.value,
-      serverModProfileNames.value,
-    ]).toEqual([[], [], []]);
+    expect([serverAdminUsernames.value, serverModProfileNames.value]).toEqual([
+      [],
+      [],
+    ]);
   });
 });

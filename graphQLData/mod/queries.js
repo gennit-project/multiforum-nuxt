@@ -306,9 +306,6 @@ export const GET_MODS_BY_CHANNEL = gql`
           name
           description
         }
-        User {
-          username
-        }
       }
     }
   }

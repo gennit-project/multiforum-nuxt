@@ -62,9 +62,9 @@ defineEmits(['archived-successfully']);
 
 const route = useRoute();
 const router = useRouter();
-const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+const { serverAdminUsernames, serverModProfileNames } =
   useServerRoleMembership();
-const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
+const { forumAdminUsernames, forumModProfileNames } =
   useForumRoleMembership();
 
 const showCopiedLinkNotification = ref(false);
@@ -286,10 +286,8 @@ const posterBadges = computed(() =>
   getAuthorBadges({
     username: props.eventData.Poster?.username,
     serverAdminUsernames: serverAdminUsernames.value,
-    serverModUsernames: serverModUsernames.value,
     serverModProfileNames: serverModProfileNames.value,
     forumAdminUsernames: forumAdminUsernames.value,
-    forumModUsernames: forumModUsernames.value,
     forumModProfileNames: forumModProfileNames.value,
   })
 );

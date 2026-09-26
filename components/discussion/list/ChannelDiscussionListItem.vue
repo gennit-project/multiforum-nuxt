@@ -104,9 +104,9 @@ const { result: getUserResult } = useQuery(
 const channelIdInParams = computed(() =>
   typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
-const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+const { serverAdminUsernames, serverModProfileNames } =
   useServerRoleMembership();
-const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
+const { forumAdminUsernames, forumModProfileNames } =
   useForumRoleMembership();
 const defaultUniqueName = computed(
   () => channelIdInParams.value || props.discussionChannel.channelUniqueName
@@ -119,10 +119,8 @@ const authorBadges = computed(() =>
   getAuthorBadges({
     username: props.discussion?.Author?.username,
     serverAdminUsernames: serverAdminUsernames.value,
-    serverModUsernames: serverModUsernames.value,
     serverModProfileNames: serverModProfileNames.value,
     forumAdminUsernames: forumAdminUsernames.value,
-    forumModUsernames: forumModUsernames.value,
     forumModProfileNames: forumModProfileNames.value,
   })
 );

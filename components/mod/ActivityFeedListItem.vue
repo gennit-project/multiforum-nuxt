@@ -101,9 +101,9 @@ const props = defineProps({
 const commentIdInParams = useRoute().params.commentId as string;
 const isPermalinked =
   commentIdInParams && commentIdInParams === props.activityItem.Comment?.id;
-const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
+const { forumAdminUsernames, forumModProfileNames } =
   useForumRoleMembership();
-const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+const { serverAdminUsernames, serverModProfileNames } =
   useServerRoleMembership();
 
 const isCommentAuthor = computed(() => {
@@ -384,10 +384,8 @@ const actorBadges = computed(() => {
     username: props.activityItem.User?.username,
     modProfileName: props.activityItem.ModerationProfile?.displayName,
     serverAdminUsernames: serverAdminUsernames.value,
-    serverModUsernames: serverModUsernames.value,
     serverModProfileNames: serverModProfileNames.value,
     forumAdminUsernames: forumAdminUsernames.value,
-    forumModUsernames: forumModUsernames.value,
     forumModProfileNames: forumModProfileNames.value,
   });
 });

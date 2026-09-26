@@ -20,7 +20,11 @@ import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from '@/utils/localStorageUtils';
-import { useIsAuthenticated, useUsername } from '@/composables/useAuthState';
+import {
+  useIsAuthenticated,
+  useModProfileName,
+  useUsername,
+} from '@/composables/useAuthState';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import type { ForumItem } from '@/types/forum';
 
@@ -100,16 +104,21 @@ const hasMounted = ref(false);
 // who is a server admin or server moderator. Server-role membership is the
 // proxy the rest of the app already uses (see useServerRoleMembership and
 // headerPermissionUtils) to decide server admin/mod status — there is no
-// per-user server permission flag beyond membership in these lists.
+// per-user server permission flag beyond membership in these lists. Moderators
+// are matched by the signed-in user's own mod-profile name, since the API never
+// reveals which account is behind a mod profile.
 const isAuthenticated = useIsAuthenticated();
 const username = useUsername();
-const { serverAdminUsernames, serverModUsernames } = useServerRoleMembership();
+const modProfileName = useModProfileName();
+const { serverAdminUsernames, serverModProfileNames } =
+  useServerRoleMembership();
 
 const canSeeAdminDashboard = computed(() => {
   if (!isAuthenticated.value || !username.value) return false;
   return (
     serverAdminUsernames.value.includes(username.value) ||
-    serverModUsernames.value.includes(username.value)
+    (!!modProfileName.value &&
+      serverModProfileNames.value.includes(modProfileName.value))
   );
 });
 

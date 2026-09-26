@@ -110,12 +110,12 @@ describe('forum mods edit page', () => {
 
   it('removes the selected forum moderator', async () => {
     const wrapper = await mountPage();
-    wrapper.findComponent(ModList).vm.$emit('click-remove-mod', 'bob');
+    wrapper.findComponent(ModList).vm.$emit('click-remove-mod', 'ModBob');
     await wrapper
       .findAllComponents(WarningModalStub)[1]
       .vm.$emit('primary-button-click');
     expect(h.mutations.get('remove')).toHaveBeenCalledWith({
-      username: 'bob',
+      modProfileName: 'ModBob',
       channelUniqueName: 'cats',
     });
   });
@@ -135,7 +135,7 @@ describe('forum mods edit page', () => {
     ).toEqual([{ username: 'alice' }, { displayName: 'bob' }]);
   });
 
-  it('filters cached invitations and moderators', async () => {
+  it('filters cached invitations after cancelling an invite', async () => {
     await mountPage();
     const cache = {
       readQuery: vi.fn().mockReturnValue({
@@ -146,16 +146,32 @@ describe('forum mods edit page', () => {
       writeQuery: vi.fn(),
     };
     h.options.get('cancel')?.update?.(cache);
-    cache.readQuery.mockReturnValue({
-      channels: [{ Admins: [{ username: 'alice' }, { username: '' }] }],
+    expect(cache.writeQuery.mock.calls[0][0].data.channels[0]).toEqual({
+      PendingModInvites: [{ username: 'alice' }],
     });
+  });
+
+  it('drops only the removed moderator from the cached channel', async () => {
+    const wrapper = await mountPage();
+    wrapper.findComponent(ModList).vm.$emit('click-remove-mod', 'ModBob');
+    const cache = {
+      readQuery: vi.fn().mockReturnValue({
+        channels: [
+          {
+            uniqueName: 'cats',
+            Admins: [{ username: 'alice' }],
+            Moderators: [{ displayName: 'ModBob' }, { displayName: 'ModCarol' }],
+          },
+        ],
+      }),
+      writeQuery: vi.fn(),
+    };
     h.options.get('remove')?.update?.(cache, { data: null });
-    expect(
-      cache.writeQuery.mock.calls.map((call) => call[0].data.channels[0])
-    ).toEqual([
-      { PendingModInvites: [{ username: 'alice' }] },
-      { Admins: [{ username: 'alice' }] },
-    ]);
+    expect(cache.writeQuery.mock.calls[0][0].data.channels[0]).toEqual({
+      uniqueName: 'cats',
+      Admins: [{ username: 'alice' }],
+      Moderators: [{ displayName: 'ModCarol' }],
+    });
   });
 
   it('closes action modals when mutations finish', async () => {

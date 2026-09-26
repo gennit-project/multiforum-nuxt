@@ -30,9 +30,9 @@ const emit = defineEmits([
 ]);
 
 const route = useRoute();
-const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
+const { forumAdminUsernames, forumModProfileNames } =
   useForumRoleMembership();
-const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+const { serverAdminUsernames, serverModProfileNames } =
   useServerRoleMembership();
 const channelId = computed(() => {
   if (typeof route.params.forumId === 'string') {
@@ -68,10 +68,8 @@ const authorBadges = computed(() => {
     username,
     modProfileName,
     serverAdminUsernames: serverAdminUsernames.value,
-    serverModUsernames: serverModUsernames.value,
     serverModProfileNames: serverModProfileNames.value,
     forumAdminUsernames: forumAdminUsernames.value,
-    forumModUsernames: forumModUsernames.value,
     forumModProfileNames: forumModProfileNames.value,
   });
 });

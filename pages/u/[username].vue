@@ -17,7 +17,7 @@ definePageMeta({
 });
 
 const route = useRoute();
-const { serverAdminUsernames, serverModUsernames, serverModProfileNames } =
+const { serverAdminUsernames, serverModProfileNames } =
   useServerRoleMembership();
 const username = computed(() => {
   return typeof route.params.username === 'string' ? route.params.username : '';
@@ -77,7 +77,6 @@ const serverRoleBadge = computed(() => {
   return getServerRoleBadge({
     username: user.value.username,
     adminUsernames: serverAdminUsernames.value,
-    modUsernames: serverModUsernames.value,
     modProfileNames: serverModProfileNames.value,
   });
 });

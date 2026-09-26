@@ -9,7 +9,8 @@ const h = vi.hoisted(() => ({
   isAuthenticated: false,
   username: '',
   serverAdminUsernames: [] as string[],
-  serverModUsernames: [] as string[],
+  modProfileName: '',
+  serverModProfileNames: [] as string[],
 }));
 
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
@@ -21,11 +22,12 @@ vi.mock('@/utils/localStorageUtils', () => ({
 vi.mock('@/composables/useAuthState', () => ({
   useIsAuthenticated: () => ref(h.isAuthenticated),
   useUsername: () => ref(h.username),
+  useModProfileName: () => ref(h.modProfileName),
 }));
 vi.mock('@/composables/useServerRoleMembership', () => ({
   useServerRoleMembership: () => ({
     serverAdminUsernames: ref(h.serverAdminUsernames),
-    serverModUsernames: ref(h.serverModUsernames),
+    serverModProfileNames: ref(h.serverModProfileNames),
   }),
 }));
 
@@ -62,7 +64,8 @@ beforeEach(() => {
   h.isAuthenticated = false;
   h.username = '';
   h.serverAdminUsernames = [];
-  h.serverModUsernames = [];
+  h.modProfileName = '';
+  h.serverModProfileNames = [];
 });
 
 describe('VerticalIconNav items', () => {
@@ -87,7 +90,8 @@ describe('VerticalIconNav items', () => {
   it('shows the admin dashboard item to a logged-in server mod', () => {
     h.isAuthenticated = true;
     h.username = 'bob';
-    h.serverModUsernames = ['bob'];
+    h.modProfileName = 'ModBob';
+    h.serverModProfileNames = ['ModBob'];
     const wrapper = mountNav();
 
     expect(navLink(wrapper, 'Admin dashboard').exists()).toBe(true);
@@ -104,7 +108,8 @@ describe('VerticalIconNav items', () => {
     h.isAuthenticated = true;
     h.username = 'carol';
     h.serverAdminUsernames = ['alice'];
-    h.serverModUsernames = ['bob'];
+    h.modProfileName = 'ModCarol';
+    h.serverModProfileNames = ['ModBob'];
     const wrapper = mountNav();
 
     expect(navLink(wrapper, 'Admin dashboard').exists()).toBe(false);

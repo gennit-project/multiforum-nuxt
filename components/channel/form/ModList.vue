@@ -23,7 +23,11 @@ const { result, loading, error } = useQuery(
 );
 const mods = computed(() => result.value?.channels?.[0]?.Moderators);
 
-defineEmits(['click-remove-mod']);
+// Moderators are identified by mod-profile name; the account behind a profile
+// is private (the API denies ModerationProfile.User).
+defineEmits<{
+  'click-remove-mod': [modProfileName: string];
+}>();
 </script>
 <template>
   <div class="flex flex-col gap-3 py-3 dark:text-white">
@@ -49,14 +53,13 @@ defineEmits(['click-remove-mod']);
           class="flex items-center dark:text-white"
         >
           <AvatarComponent :text="mod.displayName" class="mr-2 h-6 w-6" />
-          <span class="text-sm font-bold">{{
-            `${mod.displayName} ${mod.User?.username ? `(${mod.User?.username})` : ''}`
-          }}</span>
+          <span class="text-sm font-bold">{{ mod.displayName }}</span>
         </nuxt-link>
         <button
           type="button"
           class="flex items-center gap-1 rounded border border-orange-500 px-2 py-1 text-orange-500"
-          @click="$emit('click-remove-mod', mod.User?.username)"
+          :aria-label="`Remove ${mod.displayName} as a forum mod`"
+          @click="$emit('click-remove-mod', mod.displayName)"
         >
           Remove Mod
         </button>

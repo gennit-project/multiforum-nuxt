@@ -40,12 +40,6 @@ const emit = defineEmits<{
       <span class="flex-1 text-gray-900 dark:text-white">
         {{ suggestion.mention }}
       </span>
-      <span
-        v-if="suggestion.username"
-        class="text-xs text-gray-500 dark:text-gray-300"
-      >
-        @{{ suggestion.username }}
-      </span>
     </button>
   </div>
 </template>

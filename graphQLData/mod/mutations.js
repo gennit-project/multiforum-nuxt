@@ -55,8 +55,11 @@ export const REMOVE_FORUM_OWNER = gql`
 `;
 
 export const REMOVE_FORUM_MOD = gql`
-  mutation removeForumMod($username: String!, $channelUniqueName: String!) {
-    removeForumMod(username: $username, channelUniqueName: $channelUniqueName)
+  mutation removeForumMod($modProfileName: String!, $channelUniqueName: String!) {
+    removeForumMod(
+      modProfileName: $modProfileName
+      channelUniqueName: $channelUniqueName
+    )
   }
 `;
 

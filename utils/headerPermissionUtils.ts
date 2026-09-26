@@ -455,13 +455,11 @@ export const getEventHeaderMenuItems = (params: {
 export const getCommentAuthorStatus = (params: {
   author: AuthorWithRoles | null | undefined;
   serverAdminUsernames?: string[];
-  serverModUsernames?: string[];
   serverModProfileNames?: string[];
 }): { isAdmin: boolean; isMod: boolean } => {
   const {
     author,
     serverAdminUsernames = [],
-    serverModUsernames = [],
     serverModProfileNames = [],
   } = params;
 
@@ -477,13 +475,12 @@ export const getCommentAuthorStatus = (params: {
       username: author.username,
       modProfileName: author.displayName,
       adminUsernames: serverAdminUsernames,
-      modUsernames: serverModUsernames,
       modProfileNames: serverModProfileNames,
     });
     const isServerAdmin = serverRoleBadge === 'serverAdmin';
-    const isServerMod =
-      serverModUsernames.includes(author.username || '') ||
-      serverModProfileNames.includes(author.displayName || '');
+    const isServerMod = serverModProfileNames.includes(
+      author.displayName || ''
+    );
 
     isAdmin = isServerAdmin;
 
@@ -494,7 +491,6 @@ export const getCommentAuthorStatus = (params: {
     const serverRoleBadge = getServerRoleBadge({
       modProfileName: author.displayName,
       adminUsernames: serverAdminUsernames,
-      modUsernames: serverModUsernames,
       modProfileNames: serverModProfileNames,
     });
     const isServerMod = serverModProfileNames.includes(author.displayName || '');

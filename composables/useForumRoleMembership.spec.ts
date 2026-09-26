@@ -49,21 +49,6 @@ describe('useForumRoleMembership', () => {
       expect(forumAdminUsernames.value).toEqual(['alice', 'bob']);
     });
 
-    it('maps moderator usernames and drops moderators without a user', () => {
-      mockQueryResult({
-        channels: [
-          {
-            Admins: [],
-            Moderators: [{ User: { username: 'alice' } }, { User: null }],
-          },
-        ],
-      });
-
-      const { forumModUsernames } = createForumRoleMembership('forum');
-
-      expect(forumModUsernames.value).toEqual(['alice']);
-    });
-
     it('maps moderator display names and drops empty ones', () => {
       mockQueryResult({
         channels: [
@@ -86,14 +71,13 @@ describe('useForumRoleMembership', () => {
     it('returns empty arrays when the channel is missing', () => {
       mockQueryResult({ channels: [] });
 
-      const { forumAdminUsernames, forumModUsernames, forumModProfileNames } =
+      const { forumAdminUsernames, forumModProfileNames } =
         createForumRoleMembership('forum');
 
       expect([
         forumAdminUsernames.value,
-        forumModUsernames.value,
         forumModProfileNames.value,
-      ]).toEqual([[], [], []]);
+      ]).toEqual([[], []]);
     });
 
     it('accepts a ref for the channel name', () => {

@@ -42,8 +42,8 @@ describe('modMentions', () => {
   describe('buildModMentionOptions', () => {
     it('builds suggestions from mod profiles', () => {
       const mods: ModSummary[] = [
-        { displayName: 'alice', username: 'alice_user' },
-        { displayName: 'bob', username: 'bob_user' },
+        { displayName: 'alice' },
+        { displayName: 'bob' },
       ];
 
       const result = buildModMentionOptions({ mods });
@@ -51,27 +51,16 @@ describe('modMentions', () => {
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual({
         value: 'alice',
-        label: 'alice (@alice_user)',
+        label: 'alice',
         mention: '/m/alice',
         displayName: 'alice',
-        username: 'alice_user',
       });
-    });
-
-    it('handles mods without username', () => {
-      const mods: ModSummary[] = [{ displayName: 'anonymous_mod' }];
-
-      const result = buildModMentionOptions({ mods });
-
-      expect(result).toHaveLength(1);
-      expect(result[0].label).toBe('anonymous_mod');
-      expect(result[0].username).toBeUndefined();
     });
 
     it('skips mods with empty displayName', () => {
       const mods: ModSummary[] = [
-        { displayName: '', username: 'user1' },
-        { displayName: 'valid_mod', username: 'user2' },
+        { displayName: '' },
+        { displayName: 'valid_mod' },
       ];
 
       const result = buildModMentionOptions({ mods });

@@ -1,14 +1,14 @@
+// Mod suggestions carry only the mod-profile name: the account behind a
+// profile is private, so it must never appear next to the mention.
 export type ModSuggestion = {
   value: string;
   label: string;
   mention: string;
   displayName?: string | null;
-  username?: string | null;
 };
 
 export type ModSummary = {
   displayName: string;
-  username?: string | null;
 };
 
 type ModMentionState = {
@@ -32,17 +32,11 @@ export const buildModMentionOptions = (input: {
     const displayName = (mod.displayName || '').trim();
     if (!displayName) continue;
 
-    const mention = `/m/${displayName}`;
-    const label = mod.username
-      ? `${displayName} (@${mod.username})`
-      : displayName;
-
     suggestions.push({
       value: displayName,
-      label,
-      mention,
+      label: displayName,
+      mention: `/m/${displayName}`,
       displayName,
-      username: mod.username,
     });
   }
 

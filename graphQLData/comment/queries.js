@@ -177,9 +177,6 @@ export const GET_DISCUSSION_COMMENTS = gql`
           }
           Moderators {
             displayName
-            User {
-              username
-            }
           }
         }
         Discussion {

@@ -19,11 +19,7 @@ describe('getAuthorBadges', () => {
     expect(badges.isServerAdmin).toBe(true);
   });
 
-  it('flags a server mod (by username and by mod-profile name)', () => {
-    expect(
-      getAuthorBadges({ username: 'bob', serverModUsernames: ['bob'] })
-        .isServerMod
-    ).toBe(true);
+  it('flags a server mod by mod-profile name', () => {
     expect(
       getAuthorBadges({
         modProfileName: 'mod-bob',
@@ -32,11 +28,21 @@ describe('getAuthorBadges', () => {
     ).toBe(true);
   });
 
+  // The account behind a mod profile is private, so a regular username never
+  // earns a mod badge, even if it resembles a moderator's profile name.
+  it('never flags a server mod by username', () => {
+    expect(
+      getAuthorBadges({ username: 'mod-bob', serverModProfileNames: ['mod-bob'] })
+        .isServerMod
+    ).toBe(false);
+  });
+
   it('suppresses Server Mod for a server admin (admin implies mod)', () => {
     const badges = getAuthorBadges({
       username: 'alice',
+      modProfileName: 'mod-alice',
       serverAdminUsernames: ['alice'],
-      serverModUsernames: ['alice'],
+      serverModProfileNames: ['mod-alice'],
     });
     expect(badges.isServerAdmin).toBe(true);
     expect(badges.isServerMod).toBe(false);
@@ -51,11 +57,7 @@ describe('getAuthorBadges', () => {
     expect(badges.isForumMod).toBe(false);
   });
 
-  it('flags a forum mod (by username and by mod-profile name)', () => {
-    expect(
-      getAuthorBadges({ username: 'dave', forumModUsernames: ['dave'] })
-        .isForumMod
-    ).toBe(true);
+  it('flags a forum mod by mod-profile name', () => {
     expect(
       getAuthorBadges({
         modProfileName: 'mod-dave',
@@ -64,11 +66,19 @@ describe('getAuthorBadges', () => {
     ).toBe(true);
   });
 
+  it('never flags a forum mod by username', () => {
+    expect(
+      getAuthorBadges({ username: 'mod-dave', forumModProfileNames: ['mod-dave'] })
+        .isForumMod
+    ).toBe(false);
+  });
+
   it('suppresses Forum Mod for a channel owner (owner implies mod)', () => {
     const badges = getAuthorBadges({
       username: 'carol',
+      modProfileName: 'mod-carol',
       forumAdminUsernames: ['carol'],
-      forumModUsernames: ['carol'],
+      forumModProfileNames: ['mod-carol'],
     });
     expect(badges.isForumAdmin).toBe(true);
     expect(badges.isForumMod).toBe(false);
@@ -77,8 +87,9 @@ describe('getAuthorBadges', () => {
   it('resolves server and forum badges independently', () => {
     const badges = getAuthorBadges({
       username: 'eve',
+      modProfileName: 'mod-eve',
       serverAdminUsernames: ['eve'],
-      forumModUsernames: ['eve'],
+      forumModProfileNames: ['mod-eve'],
     });
     expect(badges).toEqual({
       isServerAdmin: true,

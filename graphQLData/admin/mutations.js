@@ -265,9 +265,6 @@ export const ADD_SERVER_MODERATOR = gql`
         serverName
         Moderators {
           displayName
-          User {
-            username
-          }
         }
       }
     }
@@ -286,9 +283,6 @@ export const REMOVE_SERVER_MODERATOR = gql`
         serverName
         Moderators {
           displayName
-          User {
-            username
-          }
         }
       }
     }

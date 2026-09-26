@@ -763,9 +763,8 @@ describe('headerPermissionUtils', () => {
 
     it('should return correct mod status when user is in server moderator membership', () => {
       const modAuthor = {
-        __typename: 'User',
-        username: 'mod1',
-        ChannelRoles: [],
+        __typename: 'ModerationProfile',
+        displayName: 'ModOne',
       };
 
       const nonModAuthor = {
@@ -776,11 +775,11 @@ describe('headerPermissionUtils', () => {
 
       const modResult = getCommentAuthorStatus({
         author: modAuthor,
-        serverModUsernames: ['mod1'],
+        serverModProfileNames: ['ModOne'],
       });
       const nonModResult = getCommentAuthorStatus({
         author: nonModAuthor,
-        serverModUsernames: ['mod1'],
+        serverModProfileNames: ['ModOne'],
       });
 
       expect(modResult.isAdmin).toBe(false);
@@ -794,13 +793,14 @@ describe('headerPermissionUtils', () => {
       const adminModAuthor = {
         __typename: 'User',
         username: 'adminmod1',
+        displayName: 'AdminModOne',
         ChannelRoles: [],
       };
 
       const result = getCommentAuthorStatus({
         author: adminModAuthor,
         serverAdminUsernames: ['adminmod1'],
-        serverModUsernames: ['adminmod1'],
+        serverModProfileNames: ['AdminModOne'],
       });
 
       expect(result.isAdmin).toBe(true);

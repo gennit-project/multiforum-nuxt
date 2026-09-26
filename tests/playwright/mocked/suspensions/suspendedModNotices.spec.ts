@@ -235,7 +235,6 @@ test.describe('Mod suspension notices', () => {
               Moderators: [
                 {
                   displayName: MOD_PROFILE_NAME,
-                  User: { username: MOD_USER },
                 },
               ],
               SuspendedMods: [buildModSuspension()],
@@ -330,7 +329,6 @@ test.describe('Mod suspension notices', () => {
               Moderators: [
                 {
                   displayName: MOD_PROFILE_NAME,
-                  User: { username: MOD_USER },
                 },
               ],
               SuspendedMods: [buildModSuspension()], // Only mod profile is suspended
@@ -439,9 +437,7 @@ test.describe('Mod suspension notices', () => {
               uniqueName: TEST_CHANNEL,
               Admins: [],
               SuspendedUsers: [],
-              Moderators: [
-                { displayName: MOD_PROFILE_NAME, User: { username: MOD_USER } },
-              ],
+              Moderators: [{ displayName: MOD_PROFILE_NAME }],
               SuspendedMods: [buildModSuspension()],
             },
           ],
