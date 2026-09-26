@@ -453,13 +453,15 @@ describe('getCommentAuthorStatus', () => {
     expect(result.isAdmin).toBe(true);
   });
 
-  it('returns isMod true for User in serverModUsernames', () => {
+  // A regular account never earns a mod badge by username: the account behind
+  // a mod profile is private.
+  it('returns isMod false for a User matched only by username', () => {
     const result = getCommentAuthorStatus({
       author: { __typename: 'User', username: 'servermod' },
-      serverModUsernames: ['servermod'],
+      serverModProfileNames: ['ModProfile'],
     });
 
-    expect(result.isMod).toBe(true);
+    expect(result.isMod).toBe(false);
   });
 
   it('returns isMod true for ModerationProfile in serverModProfileNames', () => {
