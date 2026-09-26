@@ -66,6 +66,28 @@ describe('runtime GraphQL proxy', () => {
     expect(result).toEqual({ data: { ok: true } });
   });
 
+  it('passes the backend Server-Timing through with the proxy hop appended', async () => {
+    h.fetch.mockResolvedValue(
+      new Response(JSON.stringify({ data: { ok: true } }), {
+        status: 200,
+        headers: {
+          'content-type': 'application/json',
+          'server-timing': 'db;dur=12;desc="2 calls", total;dur=40',
+        },
+      })
+    );
+
+    await (handler as (input: unknown) => Promise<unknown>)(event);
+
+    expect(h.setResponseHeader).toHaveBeenCalledWith(
+      event,
+      'server-timing',
+      expect.stringMatching(
+        /^db;dur=12;desc="2 calls", total;dur=40, proxy;dur=[\d.]+;desc="Vercel -> backend"$/
+      )
+    );
+  });
+
   it('trims the configured backend URL', async () => {
     h.backendGraphqlUrl = '  http://backend:4000/graphql  ';
     h.fetch.mockResolvedValue(

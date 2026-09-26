@@ -6,6 +6,7 @@ import {
   setResponseHeader,
   setResponseStatus,
 } from 'h3';
+import { buildProxyServerTiming } from '@/server/utils/serverTiming';
 
 const SERVICE_UNAVAILABLE_MESSAGE =
   'The backend service is temporarily unavailable. Please try again later.';
@@ -56,6 +57,7 @@ export default defineEventHandler(async (event) => {
       ? undefined
       : await readRawBody(event, false);
 
+  const upstreamStart = performance.now();
   let response: Response;
   try {
     response = await fetch(target, {
@@ -80,6 +82,17 @@ export default defineEventHandler(async (event) => {
   if (contentType) {
     setResponseHeader(event, 'content-type', contentType);
   }
+
+  // Pass the backend's per-phase timing through and add this hop, so browser
+  // dev tools show proxy vs backend vs database time for each operation.
+  setResponseHeader(
+    event,
+    'server-timing',
+    buildProxyServerTiming({
+      upstream: response.headers.get('server-timing'),
+      proxyMs: performance.now() - upstreamStart,
+    })
+  );
 
   if (contentType?.includes('application/json')) {
     return await response.json();

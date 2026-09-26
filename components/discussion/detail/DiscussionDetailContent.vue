@@ -28,6 +28,7 @@ import DiscussionFlairBadges from '@/components/discussion/DiscussionFlairBadges
 import PageNotFound from '@/components/PageNotFound.vue';
 import type { DiscussionChannelWithFlairs } from '@/types/Discussion';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
+import { buildDetailQueryVariables } from '@/utils/discussionDetailQuery';
 import { useRoute } from 'nuxt/app';
 import ArchivedDiscussionInfoBanner from './ArchivedDiscussionInfoBanner.vue';
 import DiscussionLayoutManager from './DiscussionLayoutManager.vue';
@@ -101,12 +102,14 @@ const {
   onResult: onGetDiscussionResult,
 } = useQuery(
   props.downloadMode ? GET_DOWNLOAD_DETAIL : GET_DISCUSSION_DETAIL,
-  () => ({
-    id: props.discussionId,
-    loggedInModName: loggedInUserModName.value,
-    loggedInUsername: usernameVar.value || null,
-    channelUniqueName: channelId.value,
-  }),
+  () =>
+    buildDetailQueryVariables({
+      discussionId: props.discussionId,
+      downloadMode: props.downloadMode,
+      modProfileName: loggedInUserModName.value,
+      username: usernameVar.value,
+      channelUniqueName: channelId.value,
+    }),
   {
     fetchPolicy: 'cache-first',
   }

@@ -107,6 +107,9 @@ export const GET_CHANNEL = gql`
       emojiEnabled
       downloadsEnabled
       allowedFileTypes
+      # Only the fields forum pages read. The full revision history
+      # (PastVersions with every past body) made this response ~36 KB larger on
+      # every forum page; the wiki page and revision views fetch it themselves.
       WikiHomePage {
         id
         title
@@ -117,25 +120,6 @@ export const GET_CHANNEL = gql`
         updatedAt
         VersionAuthor {
           username
-        }
-        PastVersions(options: { sort: [{ createdAt: DESC }] }) {
-          id
-          body
-          editReason
-          createdAt
-          Author {
-            username
-          }
-        }
-        ChildPages {
-          id
-          title
-          slug
-          createdAt
-          updatedAt
-          VersionAuthor {
-            username
-          }
         }
       }
       PinnedWikiPages(options: { sort: [{ updatedAt: DESC }] }) {
