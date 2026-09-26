@@ -178,7 +178,14 @@ const discussion = computed<Discussion | null>(() => {
     ? { ...currentDiscussion, ...(activity || {}) }
     : null;
 
-  return currentWithActivity || lastValidDiscussion.value;
+  // Keep showing the last result only while the same discussion refetches.
+  // After switching discussions (e.g. clicking another item in the list),
+  // fall through to the loading skeleton instead of the previous body.
+  const lastValid =
+    lastValidDiscussion.value?.id === props.discussionId
+      ? lastValidDiscussion.value
+      : null;
+  return currentWithActivity || lastValid;
 });
 
 watch(commentSort, () =>
