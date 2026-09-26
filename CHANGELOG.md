@@ -1,5 +1,55 @@
 # Changelog
 
+## [0.3.0](https://github.com/gennit-project/multiforum-nuxt/compare/v0.2.0...v0.3.0) (2026-09-26)
+
+
+### Features
+
+* **age-gating:** add frontend verification flows ([#523](https://github.com/gennit-project/multiforum-nuxt/issues/523)) ([26cf0e6](https://github.com/gennit-project/multiforum-nuxt/commit/26cf0e6bb9b48e899c69cd9f950eef959e46965a))
+* **branding:** add configurable instance branding ([#524](https://github.com/gennit-project/multiforum-nuxt/issues/524)) ([0f54d59](https://github.com/gennit-project/multiforum-nuxt/commit/0f54d5915b09835e0b609291100d7bc7110f869e))
+* **images:** remove album usage from detail page ([db592bf](https://github.com/gennit-project/multiforum-nuxt/commit/db592bf7a0e6acf6b4b4edf1f0f0545452cc8fd1))
+* **plugins:** add pipeline diagnostic details ([#525](https://github.com/gennit-project/multiforum-nuxt/issues/525)) ([bf315a7](https://github.com/gennit-project/multiforum-nuxt/commit/bf315a725044c474b139a4ce4d0b8baadddaced8))
+* **self-hosting:** attest release artifacts ([#499](https://github.com/gennit-project/multiforum-nuxt/issues/499)) ([a2cc02a](https://github.com/gennit-project/multiforum-nuxt/commit/a2cc02abde83792123d4034ba36c8855c5769f3b))
+* **wiki:** redesign channel wiki landing page ([#540](https://github.com/gennit-project/multiforum-nuxt/issues/540)) ([d7cef52](https://github.com/gennit-project/multiforum-nuxt/commit/d7cef52264199a31e705e63918f46110956d13fd))
+* **wiki:** redesign sitewide wiki search ([#533](https://github.com/gennit-project/multiforum-nuxt/issues/533)) ([e140e5a](https://github.com/gennit-project/multiforum-nuxt/commit/e140e5a5417ad624975238d33206f030b2a9ecb9))
+
+
+### Bug Fixes
+
+* **auth:** bootstrap sessions on client-rendered routes ([#531](https://github.com/gennit-project/multiforum-nuxt/issues/531)) ([f859e0f](https://github.com/gennit-project/multiforum-nuxt/commit/f859e0f0b1542e123313d9f7bb6a9ca41accff08))
+* **auth:** make top nav login a native link ([#530](https://github.com/gennit-project/multiforum-nuxt/issues/530)) ([8ecc34b](https://github.com/gennit-project/multiforum-nuxt/commit/8ecc34ba6e05dee01fc8efb1cb94b23704516198))
+* **channel:** restore active tab styling ([#537](https://github.com/gennit-project/multiforum-nuxt/issues/537)) ([611503e](https://github.com/gennit-project/multiforum-nuxt/commit/611503e258f8cfc8576a6a92276788fc7ebff2bb))
+* **discussions:** remove unused detail query variable ([#535](https://github.com/gennit-project/multiforum-nuxt/issues/535)) ([ba2da07](https://github.com/gennit-project/multiforum-nuxt/commit/ba2da07e8a5d750c34c03ecb5d5bbe228172c0af))
+* **downloads:** avoid permission flash while loading ([#538](https://github.com/gennit-project/multiforum-nuxt/issues/538)) ([c1364e5](https://github.com/gennit-project/multiforum-nuxt/commit/c1364e5008c42b1abb5a79f4c1a7d17e7443ed4a))
+* **downloads:** guide failed scan recovery ([#529](https://github.com/gennit-project/multiforum-nuxt/issues/529)) ([579f161](https://github.com/gennit-project/multiforum-nuxt/commit/579f161ae5ab9503339cc4af9e4cc8d07e130039))
+* **downloads:** persist uploads and stabilize hydration ([#539](https://github.com/gennit-project/multiforum-nuxt/issues/539)) ([ae00dba](https://github.com/gennit-project/multiforum-nuxt/commit/ae00dbab22f48b7691cc80fb12f0dd267fb1d146))
+* **downloads:** prevent SSR metadata timeout ([#526](https://github.com/gennit-project/multiforum-nuxt/issues/526)) ([5495d11](https://github.com/gennit-project/multiforum-nuxt/commit/5495d11b67ced7ba94e3a3ee6e35da6be702f735))
+* **graphql:** align image rollout branch with current schema ([#507](https://github.com/gennit-project/multiforum-nuxt/issues/507)) ([da20370](https://github.com/gennit-project/multiforum-nuxt/commit/da20370bcdb0a4ee7cf7f013cc8cdcc0fa35d947))
+* **graphql:** degrade gracefully when backend is unavailable ([#508](https://github.com/gennit-project/multiforum-nuxt/issues/508)) ([187c4cc](https://github.com/gennit-project/multiforum-nuxt/commit/187c4cc2d71375d9970eb41afb683c38bb4f8264))
+* **image:** bypass ipx for remote storage urls ([#509](https://github.com/gennit-project/multiforum-nuxt/issues/509)) ([2fccedd](https://github.com/gennit-project/multiforum-nuxt/commit/2fccedd1b084d03f9e409938ff42d5bc12e13cfc))
+* **layout:** improve discussion and download detail layouts ([#532](https://github.com/gennit-project/multiforum-nuxt/issues/532)) ([2f84f22](https://github.com/gennit-project/multiforum-nuxt/commit/2f84f22b1d84739b652fa1d23dc3a7ae8ac1a4cc))
+* **mods:** identify moderators by mod-profile name only ([#557](https://github.com/gennit-project/multiforum-nuxt/issues/557)) ([0e46529](https://github.com/gennit-project/multiforum-nuxt/commit/0e4652985bb603d2ddf128da1bcf6bb79c073ecc))
+* **proxy:** allow security scans to complete ([#542](https://github.com/gennit-project/multiforum-nuxt/issues/542)) ([1e2b708](https://github.com/gennit-project/multiforum-nuxt/commit/1e2b708de141efcecb821efdf803d99c4953d053))
+* **uploads:** distinguish capability check failures ([#541](https://github.com/gennit-project/multiforum-nuxt/issues/541)) ([50fab6a](https://github.com/gennit-project/multiforum-nuxt/commit/50fab6a5241f7e04b2de0436574b40d3edf3f5d5))
+
+
+### Performance Improvements
+
+* **3d:** split the 3D chunk and defer viewers to the selected item ([#554](https://github.com/gennit-project/multiforum-nuxt/issues/554)) ([c9b6775](https://github.com/gennit-project/multiforum-nuxt/commit/c9b67750d28a1436f754e77c2e4c581760c1c0ac)), closes [#551](https://github.com/gennit-project/multiforum-nuxt/issues/551)
+* **ci:** enforce public route budgets ([#555](https://github.com/gennit-project/multiforum-nuxt/issues/555)) ([441a5bd](https://github.com/gennit-project/multiforum-nuxt/commit/441a5bda38528d80e205e6d64846397edb89d66d))
+* **cwv:** continue frontend image delivery optimization ([#505](https://github.com/gennit-project/multiforum-nuxt/issues/505)) ([d3ad6ea](https://github.com/gennit-project/multiforum-nuxt/commit/d3ad6ea774cfc9a12f5a629c9af3dffef2585654))
+* **cwv:** drop unused maps wrapper dependency ([#503](https://github.com/gennit-project/multiforum-nuxt/issues/503)) ([394f45b](https://github.com/gennit-project/multiforum-nuxt/commit/394f45bbe8c8a5cd9598f784adbcd9c50ab4adf5))
+* **cwv:** remove dead global client plugins ([#501](https://github.com/gennit-project/multiforum-nuxt/issues/501)) ([e497e4e](https://github.com/gennit-project/multiforum-nuxt/commit/e497e4e01d953da16fe616e9529045ec366baf5a))
+* **cwv:** start image delivery phase one ([#504](https://github.com/gennit-project/multiforum-nuxt/issues/504)) ([3144216](https://github.com/gennit-project/multiforum-nuxt/commit/314421694a16023c4aa4a3f8cfd775caafa4ba56))
+* **discussions:** defer comment hydration ([#545](https://github.com/gennit-project/multiforum-nuxt/issues/545)) ([a541dd8](https://github.com/gennit-project/multiforum-nuxt/commit/a541dd8401db908100cb15572e0c7c1f2d63891d))
+* **discussions:** reduce detail page queries ([#534](https://github.com/gennit-project/multiforum-nuxt/issues/534)) ([e072e45](https://github.com/gennit-project/multiforum-nuxt/commit/e072e456db016ee4b8883642da5ce964b04684b4))
+* **discussions:** reduce detail page startup cost ([#544](https://github.com/gennit-project/multiforum-nuxt/issues/544)) ([486a335](https://github.com/gennit-project/multiforum-nuxt/commit/486a3359e971783e51de7fa4f26df9577b61b194))
+* **discussions:** trim getChannel, dedupe detail query, forward Server-Timing ([#556](https://github.com/gennit-project/multiforum-nuxt/issues/556)) ([1732f28](https://github.com/gennit-project/multiforum-nuxt/commit/1732f28de1b2ad297797a19fbe194fed5d4422a0))
+* **downloads:** reduce detail SSR queries ([#527](https://github.com/gennit-project/multiforum-nuxt/issues/527)) ([ed475de](https://github.com/gennit-project/multiforum-nuxt/commit/ed475dec964319311b9d9f970ed2b786299bf731))
+* **downloads:** use focused detail query ([#528](https://github.com/gennit-project/multiforum-nuxt/issues/528)) ([7ecfef0](https://github.com/gennit-project/multiforum-nuxt/commit/7ecfef08e50bcddf94891cc6bcd433e679ad450c))
+* **image:** route avatars and forum icons to generated variants ([#506](https://github.com/gennit-project/multiforum-nuxt/issues/506)) ([2ae4385](https://github.com/gennit-project/multiforum-nuxt/commit/2ae4385e221fe23666cfd202df39af8be671833b))
+* **markdown:** load highlight.js on demand and drop postcss from the client ([#553](https://github.com/gennit-project/multiforum-nuxt/issues/553)) ([4261625](https://github.com/gennit-project/multiforum-nuxt/commit/42616254a68a51a5538eb08e5e12b9cd38b73d87)), closes [#550](https://github.com/gennit-project/multiforum-nuxt/issues/550)
+
 ## [0.2.0](https://github.com/gennit-project/multiforum-nuxt/compare/v0.1.0...v0.2.0) (2026-08-08)
 
 
