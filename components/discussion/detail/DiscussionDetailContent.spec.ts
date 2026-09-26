@@ -434,6 +434,59 @@ describe('DiscussionDetailContent', () => {
     expect(passed.map((c) => c.id)).toEqual(['a', 'b']);
   });
 
+  // Clicking another item in the list swaps discussionId while the new
+  // discussion loads: show the skeleton, not the previous discussion.
+  it('shows the loading skeleton instead of the previous discussion while another loads', async () => {
+    const { wrapper, discussionQuery } = setup();
+    discussionQuery.result.value = { discussions: [] };
+    discussionQuery.loading.value = true;
+    await wrapper.setProps({ discussionId: 'd2' });
+
+    expect(wrapper.find('[aria-busy="true"]').exists()).toBe(true);
+  });
+
+  it('keeps showing the discussion while the same discussion refetches', async () => {
+    const { wrapper, discussionQuery } = setup();
+    discussionQuery.result.value = { discussions: [] };
+    discussionQuery.loading.value = true;
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('[aria-busy="true"]').exists()).toBe(false);
+  });
+
+  // Guarded by the existing discussionId watch that clears the saved section.
+  it("does not show the previous discussion's comments while the next ones load", async () => {
+    const { wrapper, discussionQuery, commentSectionQuery } = setup({
+      comments: [makeComment('a'), makeComment('b')],
+      discussionChannelOverrides: { discussionId: 'd1' },
+    });
+    discussionQuery.result.value = {
+      discussions: [makeDiscussion({ id: 'd2' })],
+    };
+    commentSectionQuery.result.value = { getCommentSection: null };
+    commentSectionQuery.loading.value = true;
+    await wrapper.setProps({ discussionId: 'd2' });
+
+    expect(
+      wrapper.findComponent(DiscussionCommentsWrapperStub).props('comments')
+    ).toEqual([]);
+  });
+
+  it('keeps the comments while the same discussion refetches them', async () => {
+    const { wrapper, commentSectionQuery } = setup({
+      comments: [makeComment('a'), makeComment('b')],
+      discussionChannelOverrides: { discussionId: 'd1' },
+    });
+    commentSectionQuery.result.value = { getCommentSection: null };
+    commentSectionQuery.loading.value = true;
+    await wrapper.vm.$nextTick();
+
+    const passed = wrapper
+      .findComponent(DiscussionCommentsWrapperStub)
+      .props('comments') as Comment[];
+    expect(passed.map((c) => c.id)).toEqual(['a', 'b']);
+  });
+
   it('limits the initial comment page to twenty comments', () => {
     setup();
     const call = asMock(useQuery).mock.calls.find(
