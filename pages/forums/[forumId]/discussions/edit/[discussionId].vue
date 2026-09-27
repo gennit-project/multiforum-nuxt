@@ -4,6 +4,7 @@ import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
 import { computed, ref } from 'vue';
 import { useRouter, useRoute, useHead } from 'nuxt/app';
+import { buildEditDiscussionHead } from '@/utils/discussionSeo';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
@@ -204,23 +205,24 @@ const missingRequiredFlairConfig = computed(() =>
   )
 );
 
+// Page title and meta. Called once in setup with a computed so it stays
+// inside the component context on SSR; calling useHead from onResult throws.
+useHead(
+  computed(() =>
+    buildEditDiscussionHead({
+      kind: 'Discussion',
+      discussionTitle: getDiscussionResult.value?.discussions?.[0]?.title,
+      channelId: channelId.value,
+      serverDisplayName: config.serverDisplayName,
+    })
+  )
+);
+
 onGetDiscussionResult((value) => {
   if (value.loading === true) {
     return;
   }
   const discussion = value.data.discussions[0];
-
-  // Set page title and meta tags
-  const serverName = config.serverDisplayName;
-  useHead({
-    title: `Edit Discussion | ${channelId.value} | ${serverName}`,
-    meta: [
-      {
-        name: 'description',
-        content: `Edit discussion: ${discussion.title}`,
-      },
-    ],
-  });
 
   // Field mapping (incl. the validImageOrder cross-check) lives in
   // utils/discussionEditForm.ts (unit-tested).

@@ -66,31 +66,21 @@ function goToWikiHome() {
   router.push(`/forums/${forumId}/wiki`);
 }
 
-// SEO metadata setup
-const { onResult: onGetWikiPageResult } = useQuery(
-  GET_WIKI_PAGE,
-  {
-    channelUniqueName: forumId,
-    slug: slug,
-  },
-  { errorPolicy: 'all' }
+// SEO metadata. Built from the page query's result in a computed and passed
+// to useHead once in setup; calling useHead from onResult throws on SSR.
+// The pure head-building logic lives in utils/wikiSeo.ts (unit-tested).
+useHead(
+  computed(
+    () =>
+      buildWikiPageHead({
+        wikiPages: wikiPageResult.value?.wikiPages,
+        forumId,
+        slug,
+        serverDisplayName: config.serverDisplayName,
+        baseUrl: import.meta.env.VITE_BASE_URL,
+      }) ?? {}
+  )
 );
-
-onGetWikiPageResult((result) => {
-  try {
-    // The pure head-building logic lives in utils/wikiSeo.ts (unit-tested).
-    const head = buildWikiPageHead({
-      wikiPages: result?.data?.wikiPages,
-      forumId,
-      slug,
-      serverDisplayName: config.serverDisplayName,
-      baseUrl: import.meta.env.VITE_BASE_URL,
-    });
-    if (head) useHead(head);
-  } catch (error) {
-    console.error('Error setting wiki page SEO metadata:', error);
-  }
-});
 </script>
 
 <template>

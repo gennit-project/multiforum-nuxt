@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
-import { ref } from 'vue';
+import { ref, unref } from 'vue';
+import { useHead } from 'nuxt/app';
 import { setActivePinia, createPinia } from 'pinia';
 import { useQuery } from '@vue/apollo-composable';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
@@ -36,15 +37,23 @@ const mountWith = async (wikiPage: unknown) => {
       result: ref({ serverConfigs: [] }),
       loading: ref(false),
       error: ref(null),
-    })
-    // SEO query (onResult callback)
-    .mockReturnValueOnce({ onResult: vi.fn() });
+    });
   const Page = (await import('./[slug].vue')).default;
   return shallowMount(Page);
 };
 
 describe('wiki page', () => {
-  beforeEach(() => setActivePinia(createPinia()));
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    vi.mocked(useHead).mockClear();
+  });
+
+  it('titles the page from the wiki page query result', async () => {
+    await mountWith({ title: 'Intro', body: 'Welcome to the wiki' });
+    expect(unref(vi.mocked(useHead).mock.calls[0][0]).title).toMatch(
+      /^Intro \| cats Wiki \| /
+    );
+  });
 
   it('renders the wiki body through the markdown renderer', async () => {
     const wrapper = await mountWith({

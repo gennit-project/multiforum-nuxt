@@ -50,7 +50,6 @@ const {
   result: channelResult,
   loading: channelLoading,
   error: channelError,
-  onResult: onGetChannelResult,
 } = useQuery(GET_CHANNEL, { uniqueName: forumId }, { errorPolicy: 'all' });
 
 const channel = computed(() => channelResult.value?.channels?.[0]);
@@ -152,19 +151,19 @@ function updateSearchInput(value: string) {
   searchInput.value = value;
 }
 
-onGetChannelResult((result) => {
-  try {
-    const head = buildWikiHomeHead({
-      channels: result?.data?.channels,
-      forumId,
-      serverDisplayName: config.serverDisplayName,
-      baseUrl: import.meta.env.VITE_BASE_URL,
-    });
-    if (head) useHead(head);
-  } catch (error) {
-    console.error('Error setting wiki index SEO metadata:', error);
-  }
-});
+// SEO metadata. Built from the channel query's result in a computed and
+// passed to useHead once in setup; calling useHead from onResult throws on SSR.
+useHead(
+  computed(
+    () =>
+      buildWikiHomeHead({
+        channels: channelResult.value?.channels,
+        forumId,
+        serverDisplayName: config.serverDisplayName,
+        baseUrl: import.meta.env.VITE_BASE_URL,
+      }) ?? {}
+  )
+);
 </script>
 
 <template>

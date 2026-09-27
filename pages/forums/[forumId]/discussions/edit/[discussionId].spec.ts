@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { flushPromises, shallowMount } from '@vue/test-utils';
-import { defineComponent, h, nextTick, ref } from 'vue';
+import { defineComponent, h, nextTick, ref, unref } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 
@@ -156,6 +156,34 @@ describe('discussion edit page', () => {
       },
     });
   };
+
+  it('sets the page head during setup, before the query resolves', async () => {
+    await mountPage();
+    expect(hState.useHead).toHaveBeenCalledOnce();
+  });
+
+  it('describes the loaded discussion in the page head', async () => {
+    await mountPage();
+    hState.onResultCb({
+      loading: false,
+      data: {
+        discussions: [
+          {
+            id: 'd1',
+            title: 'Hello',
+            body: 'Body',
+            Tags: [],
+            DiscussionChannels: [{ Channel: { uniqueName: 'cats' } }],
+            Author: { username: 'alice' },
+            Album: { Images: [], imageOrder: [] },
+          },
+        ],
+      },
+    });
+    expect(unref(hState.useHead.mock.calls[0][0]).meta).toEqual([
+      { name: 'description', content: 'Edit discussion: Hello' },
+    ]);
+  });
 
   it('populates the edit form from the loaded discussion', async () => {
     const wrapper = await mountPage();

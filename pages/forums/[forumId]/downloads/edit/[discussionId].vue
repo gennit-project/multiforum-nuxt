@@ -8,6 +8,7 @@ import {
 } from '@/graphQLData/discussion/mutations';
 import { computed, ref } from 'vue';
 import { useRouter, useRoute, useHead } from 'nuxt/app';
+import { buildEditDiscussionHead } from '@/utils/discussionSeo';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
@@ -200,23 +201,24 @@ const formValues = ref<CreateEditDiscussionFormValues>(getDefaultFormValues());
 
 const dataLoaded = ref(false);
 
+// Page title and meta. Called once in setup with a computed so it stays
+// inside the component context on SSR; calling useHead from onResult throws.
+useHead(
+  computed(() =>
+    buildEditDiscussionHead({
+      kind: 'Download',
+      discussionTitle: getDiscussionResult.value?.discussions?.[0]?.title,
+      channelId: channelId.value,
+      serverDisplayName: config.serverDisplayName,
+    })
+  )
+);
+
 onGetDiscussionResult((value) => {
   if (value.loading === true || !value.data?.discussions?.length) {
     return;
   }
   const discussion = value.data.discussions[0];
-
-  // Set page title and meta tags
-  const serverName = config.serverDisplayName;
-  useHead({
-    title: `Edit Download | ${channelId.value} | ${serverName}`,
-    meta: [
-      {
-        name: 'description',
-        content: `Edit download: ${discussion.title}`,
-      },
-    ],
-  });
 
   // Preserve any existing downloadLabels the user might have changed; otherwise
   // derive them from the discussion's primary channel (utils/downloadEditForm).
