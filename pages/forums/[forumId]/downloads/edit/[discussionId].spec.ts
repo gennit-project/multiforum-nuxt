@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
-import { ref, defineComponent, h } from 'vue';
+import { ref, unref, defineComponent, h } from 'vue';
+import { useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import {
   UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
@@ -137,6 +138,21 @@ describe('download edit page', () => {
     mutationTrackers.clear();
     mockedUseQuery.mockReset();
     routeHarness.routerPush.mockReset();
+    vi.mocked(useHead).mockClear();
+  });
+
+  it('sets the page head during setup, before the query resolves', async () => {
+    await loadPage(RequireAuthStub);
+    expect(useHead).toHaveBeenCalledOnce();
+  });
+
+  it('describes the loaded download in the page head', async () => {
+    await loadPage(RequireAuthStub, populatedDiscussion());
+    expect(unref(vi.mocked(useHead).mock.calls[0][0])).toEqual(
+      expect.objectContaining({
+        meta: [{ name: 'description', content: 'Edit download: Cool model' }],
+      })
+    );
   });
 
   it('renders the download edit form for authorized users', async () => {

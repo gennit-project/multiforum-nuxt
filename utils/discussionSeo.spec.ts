@@ -3,6 +3,7 @@ import {
   truncateDescription,
   buildDiscussionHead,
   buildDiscussionStructuredData,
+  buildEditDiscussionHead,
   DESCRIPTION_MAX_LENGTH,
 } from './discussionSeo';
 
@@ -123,5 +124,42 @@ describe('buildDiscussionStructuredData', () => {
       ...BASE,
     });
     expect(data.dateModified).toBe('2024-01-01T00:00:00Z');
+  });
+});
+
+describe('buildEditDiscussionHead', () => {
+  it.each([
+    { kind: 'Discussion' as const, title: 'Edit Discussion | cats | Topical' },
+    { kind: 'Download' as const, title: 'Edit Download | cats | Topical' },
+  ])('titles the $kind edit page', ({ kind, title }) => {
+    expect(
+      buildEditDiscussionHead({
+        kind,
+        channelId: 'cats',
+        serverDisplayName: 'Topical',
+      }).title
+    ).toBe(title);
+  });
+
+  it('describes the loaded download by its title', () => {
+    expect(
+      buildEditDiscussionHead({
+        kind: 'Download',
+        discussionTitle: 'Desert Bloom',
+        channelId: 'cats',
+        serverDisplayName: 'Topical',
+      }).meta
+    ).toEqual([{ name: 'description', content: 'Edit download: Desert Bloom' }]);
+  });
+
+  it('omits the description while the discussion is loading', () => {
+    expect(
+      buildEditDiscussionHead({
+        kind: 'Discussion',
+        discussionTitle: undefined,
+        channelId: 'cats',
+        serverDisplayName: 'Topical',
+      }).meta
+    ).toEqual([]);
   });
 });

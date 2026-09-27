@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
-import { ref } from 'vue';
+import { ref, unref } from 'vue';
 import { setActivePinia, createPinia } from 'pinia';
 import { useQuery } from '@vue/apollo-composable';
 import GenericButton from '@/components/GenericButton.vue';
@@ -13,7 +13,6 @@ const testState = vi.hoisted(() => ({
   issueNumber: null as number | null,
   routerPush: vi.fn(),
   useHead: vi.fn(),
-  onChannelResult: null as null | ((result: unknown) => void),
 }));
 
 vi.mock('nuxt/app', () => ({
@@ -78,9 +77,6 @@ const mountWith = async ({
       result: ref({ channels: channel ? [channel] : [] }),
       loading: ref(queryState.channelLoading ?? false),
       error: ref(queryState.channelError ?? null),
-      onResult: (callback: (result: unknown) => void) => {
-        testState.onChannelResult = callback;
-      },
     })
     .mockReturnValueOnce({
       result: ref({
@@ -115,7 +111,6 @@ describe('channel wiki landing page', () => {
     mockedUseQuery.mockReset();
     testState.activeSuspension = null;
     testState.issueNumber = null;
-    testState.onChannelResult = null;
   });
 
   it('renders the authored home page as a compact introduction', async () => {
@@ -330,12 +325,15 @@ describe('channel wiki landing page', () => {
     expect(testState.routerPush).not.toHaveBeenCalled();
   });
 
-  it('applies SEO metadata when the channel query completes', async () => {
+  it('sets SEO metadata during setup, before the channel query resolves', async () => {
     await mountWith();
-    testState.onChannelResult?.({
-      data: { channels: [{ WikiHomePage: { title: 'Home' } }] },
-    });
-
     expect(testState.useHead).toHaveBeenCalledOnce();
+  });
+
+  it('titles the wiki home from the channel query result', async () => {
+    await mountWith({
+      channel: { wikiEnabled: true, WikiHomePage: { title: 'Home' } },
+    });
+    expect(unref(testState.useHead.mock.calls[0][0]).title).toMatch(/^Home \| /);
   });
 });

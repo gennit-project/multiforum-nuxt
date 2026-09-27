@@ -161,3 +161,34 @@ export function buildDiscussionHead(
     ],
   };
 }
+
+export type BuildEditDiscussionHeadParams = {
+  /** Whether the page edits a plain discussion or a download. */
+  kind: 'Discussion' | 'Download';
+  /** The loaded discussion's title; omitted while the query is loading. */
+  discussionTitle?: string | null;
+  channelId: string;
+  serverDisplayName: string;
+};
+
+/**
+ * Head for the discussion/download edit pages. Built from a computed in setup
+ * (not an Apollo onResult callback) so useHead runs inside the component
+ * context on SSR. The description is added once the discussion has loaded.
+ */
+export function buildEditDiscussionHead(
+  params: BuildEditDiscussionHeadParams
+): HeadObject {
+  const { kind, discussionTitle, channelId, serverDisplayName } = params;
+  return {
+    title: `Edit ${kind} | ${channelId} | ${serverDisplayName}`,
+    meta: discussionTitle
+      ? [
+          {
+            name: 'description',
+            content: `Edit ${kind.toLowerCase()}: ${discussionTitle}`,
+          },
+        ]
+      : [],
+  };
+}
