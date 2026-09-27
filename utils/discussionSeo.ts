@@ -30,11 +30,6 @@ export type BuildDiscussionHeadParams = {
   discussionId: string;
   serverDisplayName: string;
   baseUrl: string;
-  /**
-   * The discussion is behind the sensitive-content age gate for this viewer,
-   * so the empty result doesn't mean it's missing. Never reveals the title.
-   */
-  ageGated?: boolean;
 };
 
 type HeadMeta = { name?: string; property?: string; content: string };
@@ -101,14 +96,8 @@ export function buildDiscussionStructuredData(params: {
 export function buildDiscussionHead(
   params: BuildDiscussionHeadParams
 ): HeadObject {
-  const {
-    discussions,
-    channelId,
-    discussionId,
-    serverDisplayName,
-    baseUrl,
-    ageGated,
-  } = params;
+  const { discussions, channelId, discussionId, serverDisplayName, baseUrl } =
+    params;
 
   if (!discussions) {
     return {
@@ -118,12 +107,6 @@ export function buildDiscussionHead(
   }
 
   const discussion = discussions[0];
-  if (!discussion && ageGated) {
-    return {
-      title: `Sensitive content${channelId ? ` | ${channelId}` : ''}`,
-      description: 'This content is marked sensitive.',
-    };
-  }
   if (!discussion) {
     return {
       title: `Discussion Not Found${channelId ? ` | ${channelId}` : ''}`,

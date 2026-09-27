@@ -10,7 +10,6 @@ import { useQuery } from '@vue/apollo-composable';
 import { GET_DISCUSSION_DETAIL } from '@/graphQLData/discussion/queries';
 import { buildDetailQueryVariables } from '@/utils/discussionDetailQuery';
 import { buildDiscussionHead } from '@/utils/discussionSeo';
-import { useDiscussionAgeGateCheck } from '@/composables/useDiscussionAgeGateCheck';
 
 const modProfileNameVar = useModProfileName();
 
@@ -45,13 +44,6 @@ const { result: discussionResult } = useQuery(GET_DISCUSSION_DETAIL, () =>
   })
 );
 
-// An empty result may mean the discussion is behind the age gate for this
-// viewer rather than missing; the title shouldn't say "not found" then.
-const { requiresAgeCheck } = useDiscussionAgeGateCheck({
-  discussionId,
-  enabled: computed(() => discussionResult.value?.discussions?.length === 0),
-});
-
 // Reactive meta data that updates when discussion data changes. The pure
 // tag-building logic lives in utils/discussionSeo.ts (unit-tested).
 const metaData = computed(() => {
@@ -62,7 +54,6 @@ const metaData = computed(() => {
       discussionId: discussionId.value,
       serverDisplayName: config.serverDisplayName,
       baseUrl: import.meta.env.VITE_BASE_URL,
-      ageGated: requiresAgeCheck.value,
     });
   } catch (error) {
     console.error('Error setting meta tags:', error);
