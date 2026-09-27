@@ -15,8 +15,12 @@ const {
   uploadsCapability,
   uploadsLoading,
   uploadsError,
+  saveImageMetadata,
+  debouncedAutoSave,
 } = vi.hoisted(
   () => ({
+    saveImageMetadata: vi.fn(),
+    debouncedAutoSave: vi.fn(),
     usernameRef: { value: 'alice' as string },
     createImageFromUrl: vi.fn(),
     permanentlyDeleteImage: vi.fn(),
@@ -67,7 +71,14 @@ vi.mock('@/composables/useAlbumAutoSave', () => ({
     isAutoSaving: ref(false),
     autoSaveSuccess: ref(false),
     updateDiscussionError: ref(null),
-    debouncedAutoSave: vi.fn(),
+    debouncedAutoSave,
+  }),
+}));
+vi.mock('@/composables/useImageMetadataAutoSave', () => ({
+  useImageMetadataAutoSave: () => ({
+    saveImageMetadata,
+    isSavingImageMetadata: ref(false),
+    imageMetadataError: ref(null),
   }),
 }));
 vi.mock('@/composables/useInstanceSetupStatus', () => ({
@@ -183,6 +194,8 @@ describe('AlbumEditor', () => {
     };
     uploadsLoading.value = false;
     uploadsError.value = null;
+    saveImageMetadata.mockReset();
+    debouncedAutoSave.mockReset();
   });
 
   it('renders one image item per ordered image', () => {
@@ -294,6 +307,41 @@ describe('AlbumEditor', () => {
     wrapper.findAllComponents(AlbumImageItemStub)[0].vm.$emit('update-field', 'alt', 'new alt');
     const updated = lastEmit(wrapper).images.find((i) => i.id === 'a') as { alt: string };
     expect(updated.alt).toBe('new alt');
+  });
+
+  it.each(['alt', 'caption', 'copyright'])(
+    'saves an edited %s straight to the image with its other text fields',
+    (field) => {
+      const wrapper = mountEditor();
+      wrapper
+        .findAllComponents(AlbumImageItemStub)[0]
+        .vm.$emit('update-field', field, 'new value');
+      expect(saveImageMetadata).toHaveBeenCalledWith({
+        imageId: 'a',
+        metadata: {
+          alt: 'alt-a',
+          caption: '',
+          copyright: '',
+          [field]: 'new value',
+        },
+      });
+    }
+  );
+
+  it('leaves image text-field edits out of the album save', () => {
+    const wrapper = mountEditor();
+    wrapper
+      .findAllComponents(AlbumImageItemStub)[0]
+      .vm.$emit('update-field', 'caption', 'new caption');
+    expect(debouncedAutoSave).not.toHaveBeenCalled();
+  });
+
+  it('saves an image URL edit through the album save', () => {
+    const wrapper = mountEditor();
+    wrapper
+      .findAllComponents(AlbumImageItemStub)[0]
+      .vm.$emit('update-field', 'url', 'https://example.com/new.jpg');
+    expect(debouncedAutoSave).toHaveBeenCalled();
   });
 
   it('adds an existing image from the picker', async () => {

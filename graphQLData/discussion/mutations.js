@@ -581,6 +581,29 @@ export const UPDATE_IMAGE = gql`
   }
 `;
 
+// Saves an album image's descriptive fields straight to the Image, so they
+// persist whether or not the image was already in the album when it was edited.
+export const UPDATE_IMAGE_METADATA = gql`
+  mutation updateImageMetadata(
+    $imageId: ID!
+    $alt: String
+    $caption: String
+    $copyright: String
+  ) {
+    updateImages(
+      where: { id: $imageId }
+      update: { alt: $alt, caption: $caption, copyright: $copyright }
+    ) {
+      images {
+        id
+        alt
+        caption
+        copyright
+      }
+    }
+  }
+`;
+
 export const DELETE_DISCUSSION_BODY_REVISION = gql`
   mutation deleteDiscussionBodyRevision($textVersionId: ID!) {
     deleteDiscussionBodyRevision(textVersionId: $textVersionId) {
