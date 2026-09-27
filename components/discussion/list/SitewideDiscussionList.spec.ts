@@ -9,9 +9,11 @@ import {
 
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
-
-// Import after mocks are declared (hoisted) so the component picks them up.
 import SitewideDiscussionList from '@/components/discussion/list/SitewideDiscussionList.vue';
+
+const h = vi.hoisted(() => ({
+  prefetchChannelDiscussionList: vi.fn(),
+}));
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
@@ -22,6 +24,11 @@ vi.mock('nuxt/app', () => ({
 }));
 vi.mock('@/composables/useTheme', () => ({
   useAppTheme: () => ({ theme: ref('light') }),
+}));
+vi.mock('@/composables/useChannelDiscussionListPrefetch', () => ({
+  useChannelDiscussionListPrefetch: () => ({
+    prefetchChannelDiscussionList: h.prefetchChannelDiscussionList,
+  }),
 }));
 
 const SERVER_CONFIG = { serverConfigs: [{ serverName: 'Test', __typename: 'ServerConfig' }] };
@@ -175,6 +182,14 @@ describe('SitewideDiscussionList', () => {
       .findAllComponents({ name: 'NuxtLink' })
       .find((link) => link.text().includes('2 comments'));
     expect(commentLink?.props('to')).toBe('/forums/cats/discussions/1');
+  });
+
+  it('prefetches the selected discussion channel list', () => {
+    setupQueries(createQueryMock(listResult([makeDiscussion('1')])));
+
+    mountList({ query: { selectedDiscussionId: '1' } });
+
+    expect(h.prefetchChannelDiscussionList).toHaveBeenCalledWith('cats');
   });
 
   it('opens the About overlay as a modal dialog', async () => {

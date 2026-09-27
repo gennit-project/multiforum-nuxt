@@ -21,6 +21,7 @@ import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 import { useUsername } from '@/composables/useAuthState';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import { useFocusTrap } from '@/composables/useFocusTrap';
+import { useChannelDiscussionListPrefetch } from '@/composables/useChannelDiscussionListPrefetch';
 
 const usernameVar = useUsername();
 const SitewideDiscussionSidebar = defineAsyncComponent(
@@ -190,6 +191,21 @@ const selectedChannelId = computed(() => {
   );
   return firstChannel?.channelUniqueName || '';
 });
+
+const { prefetchChannelDiscussionList } = useChannelDiscussionListPrefetch();
+
+// The preview's title opens this channel's detail route. Warm the list route
+// and its Apollo cache entry while the preview is visible so returning to the
+// channel does not wait on a cold frontend GraphQL proxy request.
+watch(
+  selectedChannelId,
+  (channelUniqueName) => {
+    if (channelUniqueName) {
+      void prefetchChannelDiscussionList(channelUniqueName);
+    }
+  },
+  { immediate: true }
+);
 
 const selectedDiscussionTitle = computed(() => {
   return selectedDiscussion.value?.title || '';
