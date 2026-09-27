@@ -10,9 +10,9 @@ import {
   linkifyUrls,
   calculateAspectRatioFit,
   extractImageUrlsFromMarkdown,
-  countWords,
   type GalleryItem,
 } from '@/utils/markdownLinkify';
+import { truncateMarkdown } from '@/utils/truncateMarkdown';
 
 interface Props {
   disableGallery?: boolean;
@@ -43,20 +43,29 @@ const visibleRef = ref(false);
 const indexRef = ref(0);
 const { fontSize } = storeToRefs(uiStore);
 
-const showFullText = ref(
-  !props.showShowMore || countWords(props.text) < props.wordLimit
+const linkifiedMarkdown = computed(() => {
+  const botMentionsLinkified = linkifyBotMentions({
+    markdownString: props.text,
+    forumId: props.botMentionForumId,
+  });
+  const channelNamesLinkified = linkifyChannelNames(botMentionsLinkified);
+  return linkifyUrls(channelNamesLinkified);
+});
+
+// Cut on parsed markdown, never through its syntax, so a collapsed preview
+// renders the same way as the full text (no dangling `*` or `[link` text).
+const truncation = computed(() =>
+  truncateMarkdown({
+    markdown: linkifiedMarkdown.value,
+    wordLimit: props.wordLimit,
+  })
 );
 
-const shouldShowMoreButton = computed(() => {
-  if (!props.showShowMore) {
-    return false;
-  }
-  if (!props.text) {
-    return false;
-  }
-  const words = props.text.split(' ');
-  return words.length > props.wordLimit;
-});
+const showFullText = ref(!props.showShowMore || !truncation.value.truncated);
+
+const shouldShowMoreButton = computed(
+  () => props.showShowMore && truncation.value.truncated
+);
 
 const toggleShowFullText = () => {
   showFullText.value = !showFullText.value;
@@ -73,9 +82,7 @@ const updateImageDimensions = (src: string) => {
         maxHeight: window.innerHeight,
       });
 
-      const imageItem = embeddedImages.value.find(
-        (item) => item.src === src
-      );
+      const imageItem = embeddedImages.value.find((item) => item.src === src);
       if (imageItem) {
         imageItem.width = width;
         imageItem.height = height;
@@ -104,28 +111,9 @@ watchEffect(() => {
   });
 });
 
-const linkifiedMarkdown = computed(() => {
-  const botMentionsLinkified = linkifyBotMentions({
-    markdownString: props.text,
-    forumId: props.botMentionForumId,
-  });
-  const channelNamesLinkified = linkifyChannelNames(botMentionsLinkified);
-  return linkifyUrls(channelNamesLinkified);
-});
-
-const shownText = computed(() => {
-  if (showFullText.value) {
-    return linkifiedMarkdown.value;
-  }
-  const words = linkifiedMarkdown.value.split(' ');
-  if (words.length > props.wordLimit) {
-    return (
-      words.slice(0, props.wordLimit).join(' ') +
-      (words.length > props.wordLimit ? '...' : '')
-    );
-  }
-  return linkifiedMarkdown.value;
-});
+const shownText = computed(() =>
+  showFullText.value ? linkifiedMarkdown.value : truncation.value.text
+);
 
 const handleImageClick = (event: MouseEvent) => {
   if (props.disableGallery) {
