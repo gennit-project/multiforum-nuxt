@@ -9,6 +9,7 @@ import AlbumUrlInputForm from './AlbumUrlInputForm.vue';
 import AlbumExistingImagePicker from './AlbumExistingImagePicker.vue';
 import { useAlbumImageUpload } from '@/composables/useAlbumImageUpload';
 import { useAlbumAutoSave } from '@/composables/useAlbumAutoSave';
+import { useImageMetadataAutoSave } from '@/composables/useImageMetadataAutoSave';
 import { useMutation } from '@vue/apollo-composable';
 import WarningModal from '@/components/WarningModal.vue';
 import { PERMANENTLY_DELETE_IMAGE } from '@/graphQLData/discussion/mutations';
@@ -202,6 +203,15 @@ const {
   getAlbumData: () => props.formValues.album,
 });
 
+// Alt text, caption and attribution are saved on the Image itself; the album
+// save only handles which images are in the album, their order and URLs.
+const { saveImageMetadata, imageMetadataError } = useImageMetadataAutoSave();
+const IMAGE_METADATA_FIELDS = new Set<keyof ImageInput>([
+  'alt',
+  'caption',
+  'copyright',
+]);
+
 // URL input form state
 const showUrlInput = ref(false);
 // Existing-image picker is hidden until the user asks to reuse an image, so we
@@ -244,6 +254,19 @@ const updateImageField = (
       imageOrder: props.formValues.album.imageOrder,
     },
   });
+
+  const updatedImage = updatedImages[actualIndex];
+  if (IMAGE_METADATA_FIELDS.has(fieldName) && updatedImage?.id) {
+    saveImageMetadata({
+      imageId: updatedImage.id,
+      metadata: {
+        alt: updatedImage.alt,
+        caption: updatedImage.caption,
+        copyright: updatedImage.copyright,
+      },
+    });
+    return;
+  }
 
   debouncedAutoSave();
 };
@@ -410,6 +433,7 @@ const handleUrlCancel = () => {
       v-if="updateDiscussionError"
       :text="updateDiscussionError.message"
     />
+    <ErrorBanner v-if="imageMetadataError" :text="imageMetadataError.message" />
 
     <!-- Auto-save indicators -->
     <div
