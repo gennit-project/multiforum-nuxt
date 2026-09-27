@@ -379,7 +379,7 @@ const warningModalBody = computed(() => {
     >
       <div
         data-testid="discussion-author-row"
-        class="flex min-w-[min(100%,28rem)] flex-1 items-start gap-2 text-xs dark:text-white"
+        class="flex min-w-[min(100%,22rem)] flex-1 items-start gap-2 text-xs dark:text-white"
       >
         <div data-testid="discussion-author-avatar" class="shrink-0">
           <AvatarComponent
