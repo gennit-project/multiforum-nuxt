@@ -91,13 +91,28 @@ services:
       backend:
         condition: service_healthy
     environment:
-      NUXT_PUBLIC_AUTH_PROVIDER: local-dev
-      NUXT_PUBLIC_BASE_URL: ${MULTIFORUM_PUBLIC_FRONTEND_URL:-http://localhost:3000}
-      NUXT_PUBLIC_ENVIRONMENT: development
-      NUXT_PUBLIC_SERVER_NAME: ${MULTIFORUM_INSTANCE_NAME:-My Multiforum}
-      NUXT_PUBLIC_SERVER_DISPLAY_NAME: ${MULTIFORUM_INSTANCE_NAME:-My Multiforum}
-      NUXT_BACKEND_GRAPHQL_URL: http://backend:4000
-      NUXT_LOCAL_AUTH_TOKEN_ENDPOINT: http://backend:4000/auth/local-dev/token
+      - NUXT_PUBLIC_AUTH_PROVIDER=local-dev
+      - NUXT_PUBLIC_BASE_URL=${MULTIFORUM_PUBLIC_FRONTEND_URL:-http://localhost:3000}
+      - NUXT_PUBLIC_ENVIRONMENT=development
+      - NUXT_PUBLIC_SERVER_NAME=${MULTIFORUM_INSTANCE_NAME:-My Multiforum}
+      - NUXT_PUBLIC_SERVER_DISPLAY_NAME=${MULTIFORUM_INSTANCE_NAME:-My Multiforum}
+      - NUXT_BACKEND_GRAPHQL_URL=http://backend:4000
+      - NUXT_LOCAL_AUTH_TOKEN_ENDPOINT=http://backend:4000/auth/local-dev/token
+      # Optional instance branding, passed through only when the operator sets
+      # it. These use the bare passthrough form deliberately: with
+      # `KEY: ${VAR:-}` Compose would inject an empty string, and an empty
+      # branding value means "hide this link" rather than "not configured", so
+      # every deployment would silently lose its documentation and source
+      # links. Unset variables are omitted entirely, leaving the application
+      # defaults in place. See docs/frontend-runtime-configuration.md.
+      - NUXT_PUBLIC_BRANDING_PRODUCT_NAME
+      - NUXT_PUBLIC_BRANDING_DOCS_URL
+      - NUXT_PUBLIC_BRANDING_SOURCE_URL
+      - NUXT_PUBLIC_BRANDING_ISSUES_URL
+      - NUXT_PUBLIC_BRANDING_SUPPORT_EMAIL
+      - NUXT_PUBLIC_BRANDING_SHOW_UPSTREAM_LINKS
+      - NUXT_PUBLIC_BRANDING_CUSTOM_FOOTER_LINKS
+      - NUXT_PUBLIC_BRANDING_LOCKED
     healthcheck:
       test:
         [
