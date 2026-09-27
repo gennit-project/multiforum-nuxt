@@ -205,6 +205,8 @@ onMounted(() => {
         :needs-changes="needsChanges"
         :loading="createDiscussionLoading || updateDiscussionLoading"
         :handle-cancel-in-parent="editMode"
+        :sticky-footer="true"
+        :surface="true"
         @input="touched = true"
         @submit="$emit('submit')"
         @cancel="$emit('cancel')"
@@ -243,7 +245,7 @@ onMounted(() => {
           :text="updateDiscussionError.message"
         />
         <div class="divide-y divide-gray-200">
-          <div class="mt-6 space-y-4">
+          <div class="mt-6 space-y-6">
             <FormRow
               :section-title="downloadMode ? 'Title' : ''"
               :required="true"
@@ -292,7 +294,26 @@ onMounted(() => {
               </template>
             </FormRow>
 
-            <FormRow v-if="downloadMode" :section-title="'Downloadable File'">
+            <FormRow :section-title="downloadMode ? 'Description' : ''">
+              <template #content>
+                <TextEditor
+                  class="mb-3"
+                  :test-id="'body-input'"
+                  :disable-auto-focus="true"
+                  :initial-value="formValues.body || ''"
+                  :placeholder="'Add details'"
+                  :rows="7"
+                  :channel-connections="formValues.selectedChannels"
+                  @update="$emit('updateFormValues', { body: $event })"
+                />
+                <CharCounter
+                  :current="formValues.body?.length || 0"
+                  :max="MAX_CHARS_IN_DISCUSSION_BODY"
+                />
+              </template>
+            </FormRow>
+
+            <FormRow v-if="downloadMode">
               <template #content>
                 <DownloadEditForm
                   v-if="formValues"
@@ -332,31 +353,13 @@ onMounted(() => {
               </template>
             </FormRow>
 
-            <FormRow :section-title="downloadMode ? 'Description' : ''">
-              <template #content>
-                <TextEditor
-                  class="mb-3"
-                  :test-id="'body-input'"
-                  :disable-auto-focus="true"
-                  :initial-value="formValues.body || ''"
-                  :placeholder="'Add details'"
-                  :rows="7"
-                  :channel-connections="formValues.selectedChannels"
-                  @update="$emit('updateFormValues', { body: $event })"
-                />
-                <CharCounter
-                  :current="formValues.body?.length || 0"
-                  :max="MAX_CHARS_IN_DISCUSSION_BODY"
-                />
-              </template>
-            </FormRow>
-
-            <FormRow>
+            <FormRow :section-title="'Images (optional)'">
               <template #content>
                 <AlbumEditForm
                   v-if="formValues"
                   :discussion="discussion"
                   :show-close-button="false"
+                  :show-heading="false"
                   @update-form-values="
                     (albumData) => {
                       $emit('updateFormValues', { album: albumData.album });
@@ -366,7 +369,10 @@ onMounted(() => {
               </template>
             </FormRow>
 
-            <FormRow :required="true">
+            <FormRow
+              :section-title="downloadMode ? 'Forum' : ''"
+              :required="true"
+            >
               <template #content>
                 <ForumPicker
                   :test-id="'channel-input'"
@@ -416,7 +422,7 @@ onMounted(() => {
               </template>
             </FormRow>
 
-            <FormRow>
+            <FormRow :section-title="downloadMode ? 'Tags' : ''">
               <template #content>
                 <TagPicker
                   data-testid="tag-input"

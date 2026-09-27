@@ -409,7 +409,7 @@ definePageMeta({
               class="flex flex-col divide-x divide-gray-300 md:flex-row dark:divide-gray-500"
             >
               <div
-                class="min-w-0 flex-1 overflow-x-hidden px-4"
+                class="min-w-0 flex-1 overflow-x-clip px-4"
                 :class="
                   enableDiscussionSplitScroll ||
                   enableEventSplitScroll ||

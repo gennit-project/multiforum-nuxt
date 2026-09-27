@@ -9,6 +9,7 @@ import type {
 } from '@/__generated__/graphql';
 // Using string literals instead of importing enums from massive generated file
 import FormRow from '@/components/FormRow.vue';
+import XmarkIcon from '@/components/icons/XmarkIcon.vue';
 import { useMutation } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import {
@@ -547,7 +548,7 @@ async function handleSave() {
       />
 
       <!-- File Upload Section -->
-      <FormRow section-title="File Upload" :required="true">
+      <FormRow section-title="Files" :required="true">
         <template #content>
           <div class="space-y-4">
             <div v-if="formValues.downloadableFiles.length === 0">
@@ -596,9 +597,11 @@ async function handleSave() {
                 :key="index"
                 class="rounded-lg border border-gray-200 p-4 dark:border-gray-600"
               >
-                <div class="mb-3 flex items-center justify-between">
-                  <div class="flex-1">
-                    <h4 class="font-medium text-gray-900 dark:text-gray-100">
+                <div class="mb-3 flex items-start justify-between gap-3">
+                  <div class="min-w-0 flex-1">
+                    <h4
+                      class="break-words font-medium text-gray-900 dark:text-gray-100"
+                    >
                       {{ file.fileName }}
                     </h4>
                     <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -608,40 +611,34 @@ async function handleSave() {
                           : '0'
                       }}MB • {{ file.kind }}
                     </p>
-                    <!-- Show URL for existing files (non-editable) -->
-                    <div v-if="file.url" class="mt-2">
-                      <label
-                        class="text-xs font-medium text-gray-700 dark:text-gray-300"
-                        >File URL:</label
-                      >
-                      <div class="mt-1 flex items-center gap-2">
-                        <input
-                          :value="file.url"
-                          readonly
-                          class="flex-1 cursor-not-allowed rounded border border-gray-200 bg-gray-50 px-2 py-1 text-sm text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400"
-                          type="text"
-                        />
-                        <button
-                          type="button"
-                          class="text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                          title="Delete this file"
-                          @click="requestRemoveFile(index)"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
                   </div>
-                  <!-- For newly uploaded files without URL yet, show regular Remove button -->
                   <button
-                    v-if="!file.url"
                     type="button"
-                    class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                    class="flex shrink-0 items-center gap-1 rounded border border-gray-500 px-2 py-1 text-sm text-gray-500 dark:border-gray-600 dark:text-gray-200"
+                    :title="file.url ? 'Delete this file' : 'Remove this file'"
+                    :aria-label="`${file.url ? 'Delete' : 'Remove'} ${file.fileName}`"
                     @click="requestRemoveFile(index)"
                   >
-                    Remove
+                    <XmarkIcon class="h-4" aria-hidden="true" />
+                    {{ file.url ? 'Delete' : 'Remove' }}
                   </button>
                 </div>
+
+                <!-- The storage URL is rarely needed, so keep it collapsed -->
+                <details v-if="file.url" class="mb-3">
+                  <summary
+                    class="cursor-pointer text-xs font-medium text-gray-600 dark:text-gray-300"
+                  >
+                    Show file URL
+                  </summary>
+                  <input
+                    :value="file.url"
+                    readonly
+                    :aria-label="`File URL for ${file.fileName}`"
+                    class="mt-1 w-full rounded border border-gray-200 bg-gray-50 px-2 py-1 text-sm text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                    type="text"
+                  />
+                </details>
 
                 <FormRow section-title="Attribution and support links">
                   <template #content>

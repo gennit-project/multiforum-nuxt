@@ -184,8 +184,8 @@ describe('DownloadLabelPicker', () => {
     );
   });
 
-  it('shows header and description', () => {
-    const wrapper = mount(DownloadLabelPicker, {
+  const mountWithGroups = () =>
+    mount(DownloadLabelPicker, {
       props: {
         filterGroups: mockFilterGroups,
         selectedLabels: {},
@@ -201,9 +201,25 @@ describe('DownloadLabelPicker', () => {
       },
     });
 
-    expect(wrapper.text()).toContain('Download Labels');
-    expect(wrapper.text()).toContain(
+  it('shows the description', () => {
+    expect(mountWithGroups().text()).toContain(
       'Select labels to help users find your download'
+    );
+  });
+
+  it('leaves the section heading to the parent form row', () => {
+    expect(mountWithGroups().find('h3').exists()).toBe(false);
+  });
+
+  it('groups each filter group in a fieldset named by its legend', () => {
+    expect(
+      mountWithGroups()
+        .findAll('fieldset legend')
+        .map((legend) => legend.text())
+    ).toEqual(
+      mockFilterGroups
+        .filter((group) => group.key !== 'license')
+        .map((group) => group.displayName)
     );
   });
 });

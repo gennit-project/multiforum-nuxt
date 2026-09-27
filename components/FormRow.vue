@@ -33,7 +33,7 @@ const fieldId = useId();
       v-if="sectionTitle"
       :for="fieldId"
       :class="dangerous ? 'text-red-400' : 'text-gray-900 dark:text-gray-200'"
-      class="block text-sm font-medium leading-6"
+      class="mb-1 block text-sm font-medium leading-6"
     >
       {{ sectionTitle }}<span v-if="required" class="ml-1 text-red-400">*</span>
     </label>

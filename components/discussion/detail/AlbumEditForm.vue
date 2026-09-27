@@ -63,6 +63,11 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // Hide the built-in heading when a parent form labels this section itself.
+  showHeading: {
+    type: Boolean,
+    default: true,
+  },
 });
 const emit = defineEmits<{
   closeEditor: [];
@@ -276,7 +281,7 @@ function handleUpdateAlbum(newVals: AlbumFormData) {
 <template>
   <div class="w-full">
     <div class="mb-3 mt-3 flex w-full flex-col">
-      <h3 class="font-semibold mb-4 text-lg dark:text-white">
+      <h3 v-if="showHeading" class="font-semibold mb-4 text-lg dark:text-white">
         Edit Album (Optional)
       </h3>
 
