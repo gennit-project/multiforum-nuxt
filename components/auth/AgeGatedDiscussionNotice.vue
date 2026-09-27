@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRoute } from 'nuxt/app';
-import { useApolloClient, useMutation, useQuery } from '@vue/apollo-composable';
+import { useApolloClient, useMutation } from '@vue/apollo-composable';
 import {
   AgeGateCheckStatus,
-  type AgeGateCheck,
   type OwnAgeProfile,
 } from '@/__generated__/graphql';
 import DatePicker from '@/components/event/form/DatePicker.vue';
-import { GET_DISCUSSION_AGE_GATE_CHECK } from '@/graphQLData/age/queries';
 import { SET_MY_BIRTHDAY } from '@/graphQLData/age/mutations';
 import { useAuthNavigation } from '@/composables/useAuthNavigation';
+import { useDiscussionAgeGateCheck } from '@/composables/useDiscussionAgeGateCheck';
 import { getAgeErrorMessage } from '@/utils/ageGating';
 import { getBirthdayValidationMessage } from '@/utils/usernameValidation';
 
@@ -31,11 +30,10 @@ const loginUrl = computed(() =>
   getLoginUrl(route.fullPath.split('#', 1)[0] || '/')
 );
 
-const { result, loading } = useQuery<{
-  getDiscussionAgeGateCheck: AgeGateCheck;
-}>(GET_DISCUSSION_AGE_GATE_CHECK, () => ({ discussionId: props.discussionId }));
-
-const check = computed(() => result.value?.getDiscussionAgeGateCheck);
+const { check, loading } = useDiscussionAgeGateCheck({
+  discussionId: computed(() => props.discussionId),
+  enabled: true,
+});
 const status = computed(() =>
   check.value?.requiresAgeCheck ? check.value.status : null
 );

@@ -8,6 +8,7 @@ import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { useRoute, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_DOWNLOAD_DETAIL } from '@/graphQLData/discussion/queries';
+import { useDiscussionAgeGateCheck } from '@/composables/useDiscussionAgeGateCheck';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
@@ -40,6 +41,13 @@ const { result: discussionResult } = useQuery(GET_DOWNLOAD_DETAIL, {
   channelUniqueName: channelId.value,
 });
 
+// An empty result may mean the download is behind the age gate for this
+// viewer rather than missing; the title shouldn't say "not found" then.
+const { requiresAgeCheck } = useDiscussionAgeGateCheck({
+  discussionId,
+  enabled: computed(() => discussionResult.value?.discussions?.length === 0),
+});
+
 const metaData = computed(() => {
   try {
     const discussions = discussionResult.value?.discussions;
@@ -51,6 +59,14 @@ const metaData = computed(() => {
             name: 'description',
             content: `View this download on ${config.serverDisplayName}`,
           },
+        ],
+      };
+    }
+    if (discussions.length === 0 && requiresAgeCheck.value) {
+      return {
+        title: `Sensitive content${channelId.value ? ` | ${channelId.value}` : ''}`,
+        meta: [
+          { name: 'description', content: 'This content is marked sensitive.' },
         ],
       };
     }

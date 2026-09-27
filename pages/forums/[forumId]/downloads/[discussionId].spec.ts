@@ -20,11 +20,13 @@ const h = vi.hoisted(() => ({
   queryResult: null as unknown as Ref<QueryResultShape | undefined>,
   useHead: vi.fn(),
   queryDocument: '',
+  ageGated: null as unknown as Ref<boolean>,
 }));
 
 h.modName = ref('modAlice');
 h.username = ref('alice');
 h.queryResult = ref<QueryResultShape>();
+h.ageGated = ref(false);
 
 vi.mock('@/config', () => ({
   config: { serverDisplayName: 'Multiforum' },
@@ -45,6 +47,10 @@ vi.mock('@vue/apollo-composable', () => ({
     h.queryDocument = document;
     return { result: h.queryResult };
   },
+}));
+
+vi.mock('@/composables/useDiscussionAgeGateCheck', () => ({
+  useDiscussionAgeGateCheck: () => ({ requiresAgeCheck: h.ageGated }),
 }));
 
 vi.mock('@/graphQLData/discussion/queries', () => ({
@@ -72,6 +78,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   h.route = { params: { forumId: 'cats', discussionId: 'd1' } };
   h.queryResult.value = undefined;
+  h.ageGated.value = false;
   vi.stubEnv('VITE_BASE_URL', 'https://example.test');
 });
 
@@ -128,6 +135,15 @@ describe('download detail page wrapper', () => {
         },
       ],
     });
+  });
+
+  it('titles an age-gated download as sensitive content, not missing', async () => {
+    h.ageGated.value = true;
+    await mountPage();
+
+    h.queryResult.value = { discussions: [] };
+
+    expect(headValue()?.title).toBe('Sensitive content | cats');
   });
 
   it('omits the channel suffix from not-found metadata without a forum id', async () => {
