@@ -181,7 +181,7 @@ describe('DiscussionHeader', () => {
       authorKeepsReadableWidth: wrapper
         .get('[data-testid="discussion-author-row"]')
         .classes()
-        .includes('min-w-[min(100%,28rem)]'),
+        .includes('min-w-[min(100%,22rem)]'),
       actionsStayTogether: wrapper
         .get('[data-testid="discussion-header-actions"]')
         .classes()
