@@ -101,3 +101,12 @@ Per-field value rules, applied by `utils/branding.ts`:
 
 `VITE_BRANDING_*` equivalents remain available as build-time defaults for local
 development and Vercel deployments.
+
+The Compose files pass the branding variables through to the frontend container
+only when the operator sets them, using Docker Compose's bare `- VARIABLE`
+form. That distinction is load-bearing: written as `KEY: ${VAR:-}`, Compose
+would inject an empty string for every unset variable, and an empty branding
+value means "hide this link" rather than "not configured" — so a deployment
+that never touched branding would silently lose its documentation and source
+links. Assigning an empty value in the env file still disables the link, as
+documented above.
