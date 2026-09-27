@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { computed } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { gql } from '@apollo/client/core';
 import {
@@ -8,6 +8,7 @@ import {
 } from '@/graphQLData/user/mutations';
 import { useUsername } from '@/composables/useAuthState';
 import { useFavoriteToggle } from '@/composables/useFavoriteToggle';
+import { useFavoritedState } from '@/composables/useFavoritedState';
 import AddToFavoritesButton from '@/components/favorites/AddToFavoritesButton.vue';
 
 const usernameVar = useUsername();
@@ -39,8 +40,6 @@ const GET_USER_FAVORITE_IMAGE = gql`
   }
 `;
 
-const isFavorited = ref(false);
-
 const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
   GET_USER_FAVORITE_IMAGE,
   () => ({
@@ -52,17 +51,15 @@ const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
   })
 );
 
-watch(
-  favoritesResult,
-  (newResult) => {
-    if (newResult?.users?.[0]?.FavoriteImages) {
-      isFavorited.value = newResult.users[0].FavoriteImages.some(
-        (image: { id: string }) => image.id === props.imageId
-      );
-    }
-  },
-  { immediate: true }
-);
+// Derived (not copied from a watcher) so SSR and hydration agree; see
+// composables/useFavoritedState.ts.
+const isFavorited = useFavoritedState({
+  provided: () => undefined,
+  queried: () =>
+    favoritesResult.value?.users?.[0]?.FavoriteImages?.some(
+      (image: { id: string }) => image.id === props.imageId
+    ),
+});
 
 const { mutate: addFavorite } = useMutation(ADD_FAVORITE_IMAGE);
 const { mutate: removeFavorite } = useMutation(REMOVE_FAVORITE_IMAGE);

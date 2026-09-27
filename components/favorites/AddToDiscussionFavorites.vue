@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { computed } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { gql } from '@apollo/client/core';
 import {
@@ -8,6 +8,7 @@ import {
 } from '@/graphQLData/user/mutations';
 import { useUsername } from '@/composables/useAuthState';
 import { useFavoriteToggle } from '@/composables/useFavoriteToggle';
+import { useFavoritedState } from '@/composables/useFavoritedState';
 import AddToFavoritesButton from '@/components/favorites/AddToFavoritesButton.vue';
 
 const usernameVar = useUsername();
@@ -62,8 +63,6 @@ const GET_USER_FAVORITE_DISCUSSION = gql`
 `;
 
 // Use initial value if provided, otherwise default to false
-const isFavorited = ref(props.initialIsFavorited ?? false);
-
 // Only fetch if initialIsFavorited was not provided
 const shouldFetchFavorite = computed(() =>
   props.initialIsFavorited === undefined && !!usernameVar.value && !!props.discussionId
@@ -80,28 +79,17 @@ const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
   })
 );
 
-// Watch for changes to initialIsFavorited prop (e.g., when parent refetches)
-watch(
-  () => props.initialIsFavorited,
-  (newValue) => {
-    if (newValue !== undefined) {
-      isFavorited.value = newValue;
-    }
-  }
-);
-
-// Watch query result only when we're fetching
-watch(
-  favoritesResult,
-  (newResult) => {
-    if (shouldFetchFavorite.value && newResult?.users?.[0]?.FavoriteDiscussions) {
-      isFavorited.value = newResult.users[0].FavoriteDiscussions.some(
-        (discussion: { id: string }) => discussion.id === props.discussionId
-      );
-    }
+// Derived (not copied from a watcher) so SSR and hydration agree; see
+// composables/useFavoritedState.ts.
+const isFavorited = useFavoritedState({
+  provided: () => props.initialIsFavorited,
+  queried: () => {
+    if (!shouldFetchFavorite.value) return undefined;
+    return favoritesResult.value?.users?.[0]?.FavoriteDiscussions?.some(
+      (discussion: { id: string }) => discussion.id === props.discussionId
+    );
   },
-  { immediate: true }
-);
+});
 
 const { mutate: addFavorite } = useMutation(ADD_FAVORITE_DISCUSSION);
 const { mutate: removeFavorite } = useMutation(REMOVE_FAVORITE_DISCUSSION);

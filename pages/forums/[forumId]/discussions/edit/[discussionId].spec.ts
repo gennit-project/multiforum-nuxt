@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import AccessDeniedMessage from '@/components/auth/AccessDeniedMessage.vue';
 import { flushPromises, shallowMount } from '@vue/test-utils';
 import { defineComponent, h, nextTick, ref, unref } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
@@ -305,9 +306,9 @@ describe('discussion edit page', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(
-      "You don't have permission to see this page."
-    );
+    expect(
+      wrapper.findComponent(AccessDeniedMessage).props('action')
+    ).toBe('edit this discussion');
   });
 
   it('ignores query callback updates while the discussion is loading', async () => {

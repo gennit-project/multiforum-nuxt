@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed } from 'vue';
 import type { PropType } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { gql } from '@apollo/client/core';
@@ -9,6 +9,7 @@ import {
 } from '@/graphQLData/user/mutations';
 import { useUsername } from '@/composables/useAuthState';
 import { useFavoriteToggle } from '@/composables/useFavoriteToggle';
+import { useFavoritedState } from '@/composables/useFavoritedState';
 import AddToFavoritesButton from '@/components/favorites/AddToFavoritesButton.vue';
 
 const usernameVar = useUsername();
@@ -42,7 +43,6 @@ const GET_USER_FAVORITE_COMMENT = gql`
   }
 `;
 
-const isFavorited = ref(props.isFavorited ?? false);
 const shouldLookupFavorite = computed(() => props.isFavorited === null);
 
 const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
@@ -54,6 +54,17 @@ const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
     enabled: shouldLookupFavorite.value && !!props.commentId && !!usernameVar.value,
   })
 );
+
+// Derived (not copied from a watcher) so SSR and hydration agree; see
+// composables/useFavoritedState.ts. A null prop means "look it up".
+const isFavorited = useFavoritedState({
+  provided: () => props.isFavorited,
+  queried: () => {
+    if (!shouldLookupFavorite.value) return undefined;
+    const value = favoritesResult.value?.getUserFavoriteComment;
+    return typeof value === 'boolean' ? value : undefined;
+  },
+});
 
 const { mutate: addFavorite } = useMutation(ADD_FAVORITE_COMMENT);
 const { mutate: removeFavorite } = useMutation(REMOVE_FAVORITE_COMMENT);
@@ -74,26 +85,6 @@ const { isLoading, handleToggleFavorite } = useFavoriteToggle({
     }
   },
 });
-
-watch(
-  () => props.isFavorited,
-  (newValue) => {
-    if (isLoading.value) return;
-    if (newValue === null) return;
-    isFavorited.value = newValue;
-  }
-);
-
-watch(
-  favoritesResult,
-  (newResult) => {
-    if (!shouldLookupFavorite.value) return;
-    if (typeof newResult?.getUserFavoriteComment === 'boolean') {
-      isFavorited.value = newResult.getUserFavoriteComment;
-    }
-  },
-  { immediate: true }
-);
 </script>
 
 <template>

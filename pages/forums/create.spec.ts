@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import AccessDeniedMessage from '@/components/auth/AccessDeniedMessage.vue';
 import { defineComponent, h as createEl } from 'vue';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
@@ -85,9 +86,14 @@ describe('Create forum page', () => {
     expect(fields(mountPage()).exists()).toBe(true);
   });
 
-  it('shows a permission message for unauthorized users', () => {
-    const wrapper = mountPage({ RequireAuth: RequireAuthUnauth });
-    expect(wrapper.text()).toContain("don't have permission");
+  it('shows the access-denied message for unauthorized users', () => {
+    const wrapper = mountPage({
+      RequireAuth: RequireAuthUnauth,
+      AccessDeniedMessage: true,
+    });
+    expect(
+      wrapper.findComponent(AccessDeniedMessage).props('action')
+    ).toBe('create a forum');
   });
 
   it('merges field updates into the form values', async () => {

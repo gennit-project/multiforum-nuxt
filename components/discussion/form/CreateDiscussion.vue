@@ -13,6 +13,7 @@ import { CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discus
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import AccessDeniedMessage from '@/components/auth/AccessDeniedMessage.vue';
 import 'md-editor-v3/lib/style.css';
 import {
   getSortFromQuery,
@@ -463,9 +464,7 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
       />
     </template>
     <template #does-not-have-auth>
-      <div class="flex justify-center p-8 dark:text-white">
-        You don't have permission to see this page.
-      </div>
+      <AccessDeniedMessage action="start a discussion" />
     </template>
   </RequireAuth>
 </template>
