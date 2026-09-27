@@ -53,8 +53,8 @@ test('creates, edits and deletes a discussion', async ({
 
   const tagPicker = page.getByTestId('tag-picker');
   await tagPicker.click();
-  await page.getByText(TAG_ONE, { exact: true }).click();
-  await page.getByText(TAG_TWO, { exact: true }).click();
+  await page.getByRole('button', { name: TAG_ONE, exact: true }).click();
+  await page.getByRole('button', { name: TAG_TWO, exact: true }).click();
   await expect(tagPicker).toHaveAttribute('aria-label', new RegExp(TAG_ONE));
   await expect(tagPicker).toHaveAttribute('aria-label', new RegExp(TAG_TWO));
 
@@ -83,7 +83,7 @@ test('creates, edits and deletes a discussion', async ({
 
   await tagPicker.click();
   await page.getByText(TAG_THREE, { exact: true }).click();
-  await page.getByText(TAG_ONE, { exact: true }).click();
+  await page.getByRole('button', { name: TAG_ONE, exact: true }).click();
   await expect(tagPicker).toHaveAttribute('aria-label', new RegExp(TAG_TWO));
   await expect(tagPicker).toHaveAttribute('aria-label', new RegExp(TAG_THREE));
   await expect(tagPicker).not.toHaveAttribute('aria-label', new RegExp(TAG_ONE));

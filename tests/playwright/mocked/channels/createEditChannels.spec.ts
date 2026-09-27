@@ -387,7 +387,8 @@ test('creates and edits a channel', async ({
     const tagPicker = page.getByTestId('tag-picker');
     await tagPicker.click();
     const tagOption = page.getByRole('button', {
-      name: new RegExp(`${TEST_TAG}$`),
+      name: TEST_TAG,
+      exact: true,
     });
     await tagOption.click();
     await expect(tagOption).toHaveAttribute('aria-pressed', 'true');

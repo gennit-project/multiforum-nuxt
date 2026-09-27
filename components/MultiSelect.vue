@@ -98,11 +98,18 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // Let users submit typed search text as entries: Enter submits the
+  // whole query, and typing a comma submits everything before it.
+  allowTextEntry: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits<{
   'update:modelValue': [value: MultiSelectValue[]];
   search: [query: string];
+  submitText: [entries: string[]];
 }>();
 
 const isDropdownOpen = ref(false);
@@ -170,8 +177,27 @@ const closeAndReturnFocus = () => {
   nextTick(() => toggleButtonRef.value?.focus());
 };
 
+const splitEntries = (text: string) =>
+  text
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+
+// Hand the entries to the parent and set the search box to what's left.
+const submitEntries = (params: { entries: string[]; remainder: string }) => {
+  searchQuery.value = params.remainder;
+  emit('search', params.remainder);
+  if (params.entries.length > 0) {
+    emit('submitText', params.entries);
+  }
+};
+
 const onSearchKeydown = (event: KeyboardEvent) => {
-  if (event.key === 'Escape') {
+  if (event.key === 'Enter' && props.allowTextEntry) {
+    // Also keeps Enter from submitting a surrounding form.
+    event.preventDefault();
+    submitEntries({ entries: splitEntries(searchQuery.value), remainder: '' });
+  } else if (event.key === 'Escape') {
     event.preventDefault();
     closeAndReturnFocus();
   } else if (event.key === 'ArrowDown') {
@@ -316,6 +342,15 @@ const clearSelection = () => {
 };
 
 const updateSearch = (query: string) => {
+  if (props.allowTextEntry && query.includes(',')) {
+    // Everything before the last comma is complete; keep the rest as search.
+    const lastComma = query.lastIndexOf(',');
+    submitEntries({
+      entries: splitEntries(query.slice(0, lastComma)),
+      remainder: query.slice(lastComma + 1).trimStart(),
+    });
+    return;
+  }
   // ONLY update search query for filtering - do NOT affect selection
   searchQuery.value = query;
   emit('search', query);
