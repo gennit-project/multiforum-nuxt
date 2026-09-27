@@ -5,12 +5,17 @@ import path from 'path';
 import { inMemoryCacheOptions } from './cache';
 import { DORMANT_AUTH0_CONFIG } from './utils/auth0RuntimeConfig';
 import { getAuthStorageConfig } from './utils/authStorageConfig';
+import { resolveImageProvider } from './utils/imageProvider';
 
 const isMockedE2E = process.env.VITE_E2E_MOCK_MODE === 'true';
 const browserGraphqlUrl = config?.graphqlUrl || 'http://localhost:4000';
 const serverGraphqlUrl =
   process.env.NUXT_BACKEND_GRAPHQL_URL || browserGraphqlUrl;
 const frontendGraphqlProxyUrl = '/api/graphql';
+const imageProvider = resolveImageProvider({
+  nitroPreset: process.env.NITRO_PRESET,
+  vercel: process.env.VERCEL,
+});
 const runtimeGraphqlFetch: typeof globalThis.fetch = (input, init) => {
   const runtimeBackendUrl =
     typeof window === 'undefined'
@@ -165,8 +170,10 @@ export default defineNuxtConfig({
         quality: 80,
         // Use WebP and AVIF formats where supported
         format: ['webp', 'avif', 'jpg', 'png'],
-        // Provider for image generation
-        provider: 'ipx',
+        // Vercel's native optimizer avoids packaging IPX and sharp into the
+        // server function. Other deployment targets keep the self-hosted IPX
+        // endpoint so their image behavior is unchanged.
+        provider: imageProvider,
         // Responsive image breakpoints
         screens: {
           xs: 320,
