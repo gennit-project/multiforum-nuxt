@@ -26,6 +26,7 @@ import DiscussionHeader from '@/components/discussion/detail/DiscussionHeader.vu
 import DiscussionChannelLinks from '@/components/discussion/detail/DiscussionChannelLinks.vue';
 import DiscussionFlairBadges from '@/components/discussion/DiscussionFlairBadges.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
+import AgeGatedDiscussionNotice from '@/components/auth/AgeGatedDiscussionNotice.vue';
 import type { DiscussionChannelWithFlairs } from '@/types/Discussion';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import { buildDetailQueryVariables } from '@/utils/discussionDetailQuery';
@@ -574,11 +575,14 @@ const handleEditAlbum = () => {
         </div>
       </div>
     </div>
-    <PageNotFound
+    <AgeGatedDiscussionNotice
       v-else-if="
         !discussion && !activeDiscussionChannel && !getDiscussionLoading
       "
-    />
+      :discussion-id="discussionId"
+    >
+      <PageNotFound />
+    </AgeGatedDiscussionNotice>
     <div
       v-else
       class="mx-1 my-4 w-full space-y-2 rounded-lg bg-white py-2 shadow-lg ring-1 ring-gray-200 lg:px-4 dark:bg-gray-900 dark:ring-gray-700"

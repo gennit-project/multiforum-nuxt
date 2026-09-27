@@ -37,6 +37,18 @@ const defaultHandlers: GraphQLHandlers = {
       },
     },
   }),
+  // Matches the default policy above (gate off): no discussion needs an age
+  // check, so a missing discussion still shows the not-found page.
+  getDiscussionAgeGateCheck: () => ({
+    data: {
+      getDiscussionAgeGateCheck: {
+        __typename: 'AgeGateCheck',
+        requiresAgeCheck: false,
+        status: 'ALLOWED',
+        minimumAge: null,
+      },
+    },
+  }),
   // Site footer branding. Every field null means "this instance configured no
   // branding", so the footer falls back to its deployment/upstream defaults.
   getServerBranding: () => ({
