@@ -89,6 +89,29 @@ describe('RequireAuth', () => {
         props: { requireOwnership: true, owners: [] },
         expected: 'unauthenticated',
       },
+      // The owner list comes from data the page is still loading; don't show
+      // "no permission" to a signed-in owner in the meantime.
+      {
+        name: 'authenticated, ownership required, owners still loading',
+        authenticated: true,
+        username: 'testowner',
+        props: { requireOwnership: true, owners: [], loading: true },
+        expected: 'checking',
+      },
+      {
+        name: 'not authenticated, ownership required, owners still loading',
+        authenticated: false,
+        username: '',
+        props: { requireOwnership: true, owners: [], loading: true },
+        expected: 'unauthenticated',
+      },
+      {
+        name: 'authenticated, no ownership required, still loading',
+        authenticated: true,
+        username: 'testuser',
+        props: { requireOwnership: false, loading: true },
+        expected: 'authenticated',
+      },
     ])(
       'renders the $expected slot when $name',
       async ({ authenticated, username, props, expected }) => {

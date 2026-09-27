@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useIsAuthenticated, useUsername } from '@/composables/useAuthState';
 import { useAuthNavigation } from '@/composables/useAuthNavigation';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 
 const isAuthenticatedVar = useIsAuthenticated();
 const usernameVar = useUsername();
@@ -35,6 +36,13 @@ const isOwner = computed(() => {
   return props.owners?.includes(usernameVar.value);
 });
 
+// Ownership is decided by data the page is still loading (e.g. the discussion
+// author). Until it arrives the owner list is empty, so without this a signed-in
+// owner briefly sees the does-not-have-auth slot ("no permission").
+const checkingOwnership = computed(
+  () => props.loading && props.requireOwnership && isAuthenticatedVar.value
+);
+
 const showAuthContent = computed(() => {
   if (!isAuthenticatedVar.value) {
     return false;
@@ -61,9 +69,16 @@ const handleLogin = () => {
     ]"
   >
     <div class="w-full">
+      <div
+        v-if="checkingOwnership"
+        class="flex w-full justify-center p-8"
+        data-auth-state="checking"
+      >
+        <LoadingSpinner label="Checking permissions…" />
+      </div>
       <!-- Always render content immediately for SEO, no loading states -->
       <div
-        v-if="!showAuthContent"
+        v-else-if="!showAuthContent"
         class="w-full"
         data-auth-state="unauthenticated"
         @click="handleLogin"

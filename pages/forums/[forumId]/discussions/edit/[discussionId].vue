@@ -389,7 +389,6 @@ function handleCancel() {
     :owners="ownerList"
     :loading="getDiscussionLoading"
   >
-    {{ formValues }}
     <template #has-auth>
       <ClientOnly>
         <CreateEditDiscussionFields
