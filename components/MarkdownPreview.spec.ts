@@ -88,8 +88,9 @@ describe('MarkdownPreview', () => {
       wordLimit: 3,
       showShowMore: true,
     });
-    // Truncated text keeps the first words and drops the rest.
-    expect(renderedText(wrapper)).not.toContain('five');
+    // Truncated text keeps the first words, drops the rest and ends in a
+    // single ellipsis.
+    expect(renderedText(wrapper)).toBe('one two three...');
   });
 
   it('does not show the toggle for empty text', () => {

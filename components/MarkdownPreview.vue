@@ -194,7 +194,7 @@ const handleModalClose = () => {
 <template>
   <div class="dark:text-white" @click="handleClick">
     <MarkdownRenderer
-      :text="`${shownText}${!showFullText ? '...' : ''}`"
+      :text="shownText"
       :class="[{ clickable: !disableGallery && allowImages }]"
       :font-size="fontSize"
       :image-max-height="imageMaxHeight"
