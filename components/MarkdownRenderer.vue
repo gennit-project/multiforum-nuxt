@@ -65,7 +65,11 @@ const containerStyle = computed(() => {
 </script>
 
 <template>
-  <div class="markdown-container" :style="containerStyle">
+  <div
+    class="markdown-container"
+    :class="{ 'has-inline-slot': props.hasSlot }"
+    :style="containerStyle"
+  >
     <div
       ref="slotContainer"
       class="markdown-body"
@@ -76,7 +80,7 @@ const containerStyle = computed(() => {
       }"
       v-html="renderedMarkdown"
     />
-    <div v-if="$slots.default" class="inline-slot">
+    <div v-if="$slots.default && props.hasSlot" class="inline-slot">
       <slot />
     </div>
   </div>

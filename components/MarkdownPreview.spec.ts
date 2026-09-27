@@ -52,12 +52,18 @@ const WarningModalStub = {
   template: '<div data-testid="warning-modal-stub" />',
 };
 
+const MarkdownRendererStub = {
+  name: 'MarkdownRenderer',
+  props: ['text', 'hasSlot', 'fontSize', 'imageMaxHeight', 'allowImages'],
+  template: '<div data-testid="markdown-renderer-stub"><slot /></div>',
+};
+
 const mountPreview = (props: Record<string, unknown>) =>
   mountWithDefaults(MarkdownPreview, {
     props,
     global: {
       stubs: {
-        MarkdownRenderer: true,
+        MarkdownRenderer: MarkdownRendererStub,
         WarningModal: WarningModalStub,
       },
     },
@@ -132,6 +138,28 @@ describe('MarkdownPreview', () => {
       });
       const button = wrapper.get('button');
       expect(button.text()).toBe('Show More');
+    });
+
+    it('places "Show More" in the renderer inline slot', () => {
+      const wrapper = mountPreview({
+        text: longText,
+        wordLimit: 3,
+        showShowMore: true,
+      });
+
+      expect(wrapper.findComponent(MarkdownRenderer).props('hasSlot')).toBe(
+        true
+      );
+    });
+
+    it('uses the active link color for "Show More"', () => {
+      const wrapper = mountPreview({
+        text: longText,
+        wordLimit: 3,
+        showShowMore: true,
+      });
+
+      expect(wrapper.get('button').classes()).toContain('dark:text-orange-400');
     });
 
     it('reveals the full text and flips the label when toggled', async () => {
