@@ -193,7 +193,11 @@ const submitEntries = (params: { entries: string[]; remainder: string }) => {
 };
 
 const onSearchKeydown = (event: KeyboardEvent) => {
-  if (event.key === 'Enter' && props.allowTextEntry) {
+  if (
+    event.key === 'Enter' &&
+    props.allowTextEntry &&
+    !event.isComposing
+  ) {
     // Also keeps Enter from submitting a surrounding form.
     event.preventDefault();
     submitEntries({ entries: splitEntries(searchQuery.value), remainder: '' });
