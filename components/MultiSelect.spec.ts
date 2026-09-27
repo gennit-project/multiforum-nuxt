@@ -322,6 +322,24 @@ describe('MultiSelect', () => {
         wrapper.unmount();
       }
     );
+
+    it('does not submit text when Enter confirms an IME composition', async () => {
+      const wrapper = mountSelect({
+        modelValue: [],
+        searchable: true,
+        allowTextEntry: true,
+      });
+      await toggleButton(wrapper).trigger('click');
+      const input = wrapper.get('input');
+      await input.setValue('自然');
+
+      await input.trigger('keydown', { key: 'Enter', isComposing: true });
+
+      expect({
+        submitted: wrapper.emitted('submitText'),
+        value: (input.element as HTMLInputElement).value,
+      }).toEqual({ submitted: undefined, value: '自然' });
+    });
   });
 
   describe('single-select mode', () => {

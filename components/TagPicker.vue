@@ -1,15 +1,13 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 import type { PropType } from 'vue';
-import { useQuery, useMutation } from '@vue/apollo-composable';
+import { useQuery } from '@vue/apollo-composable';
 import { GET_TAGS } from '@/graphQLData/tag/queries';
-import { CREATE_TAG } from '@/graphQLData/tag/mutations';
 import MultiSelect from '@/components/MultiSelect.vue';
 import type { MultiSelectOption } from '@/components/MultiSelect.vue';
-import type { Tag } from '@/__generated__/graphql';
+import type { Tag, TagWhere } from '@/__generated__/graphql';
 
-// Props are used in template
-defineProps({
+const props = defineProps({
   selectedTags: {
     type: Array as PropType<string[]>,
     default: () => [],
@@ -20,18 +18,16 @@ defineProps({
   },
 });
 
-const emit = defineEmits(['setSelectedTags']);
+const emit = defineEmits<{
+  setSelectedTags: [tags: string[]];
+}>();
 
 const searchQuery = ref('');
 
-const { mutate: createTag, loading: createTagLoading } =
-  useMutation(CREATE_TAG);
-
-const {
-  loading: tagsLoading,
-  result: tagsResult,
-  refetch: refetchTags,
-} = useQuery(
+const { loading: tagsLoading, result: tagsResult } = useQuery<
+  { tags: Pick<Tag, 'text'>[] },
+  { where: TagWhere }
+>(
   GET_TAGS,
   computed(() => ({
     where: {
@@ -43,23 +39,31 @@ const {
   }
 );
 
+const searchResultTags = computed(
+  () => tagsResult.value?.tags.map((tag) => tag.text) || []
+);
+
+// New tags don't need to be created here: every form that saves tags
+// uses connectOrCreate, so a tag that doesn't exist yet is created on save.
 const tagOptions = computed<MultiSelectOption[]>(() => {
-  const tags = tagsResult.value?.tags || [];
-  const options = tags.map((tag: Tag) => ({
-    value: tag.text,
-    label: tag.text,
+  // Selected tags stay in the options even when they don't match the
+  // current search, so MultiSelect can always render the full selection.
+  const knownTags = [
+    ...new Set([...props.selectedTags, ...searchResultTags.value]),
+  ];
+  const options: MultiSelectOption[] = knownTags.map((tag) => ({
+    value: tag,
+    label: tag,
   }));
 
-  // Add option to create new tag if search doesn't match existing tags
-  if (
-    searchQuery.value &&
-    !tags.some(
-      (tag: Tag) => tag.text.toLowerCase() === searchQuery.value.toLowerCase()
-    )
-  ) {
+  const query = searchQuery.value.trim();
+  const queryIsKnown = knownTags.some(
+    (tag) => tag.toLowerCase() === query.toLowerCase()
+  );
+  if (query && !queryIsKnown) {
     options.unshift({
-      value: searchQuery.value,
-      label: `Create "${searchQuery.value}"`,
+      value: query,
+      label: `Create "${query}"`,
       icon: 'fa-solid fa-plus',
     });
   }
@@ -67,27 +71,26 @@ const tagOptions = computed<MultiSelectOption[]>(() => {
   return options;
 });
 
-const handleUpdateTags = async (newTags: string[]) => {
-  // Check if we need to create any new tags
-  const existingTags =
-    tagsResult.value?.tags?.map((tag: Tag) => tag.text) || [];
-  const tagsToCreate = newTags.filter((tag) => !existingTags.includes(tag));
+const handleUpdateTags = (newTags: string[]) => {
+  emit('setSelectedTags', [...newTags]);
+};
 
-  // Create new tags
-  for (const tagText of tagsToCreate) {
-    try {
-      await createTag({ input: [{ text: tagText }] });
-    } catch (error) {
-      console.error('Error creating tag:', error);
+// Typed entries reuse the casing of a matching known tag, and are skipped
+// if they're already selected.
+const handleSubmitText = (entries: string[]) => {
+  const nextTags = [...props.selectedTags];
+  for (const entry of entries) {
+    const tag =
+      [...nextTags, ...searchResultTags.value].find(
+        (known) => known.toLowerCase() === entry.toLowerCase()
+      ) || entry;
+    if (!nextTags.includes(tag)) {
+      nextTags.push(tag);
     }
   }
-
-  // Refetch tags to update the list
-  if (tagsToCreate.length > 0) {
-    await refetchTags();
+  if (nextTags.length !== props.selectedTags.length) {
+    emit('setSelectedTags', nextTags);
   }
-
-  emit('setSelectedTags', newTags);
 };
 
 const handleSearch = (query: string) => {
@@ -100,13 +103,14 @@ const handleSearch = (query: string) => {
     :model-value="selectedTags"
     :options="tagOptions"
     :description="description"
-    :loading="tagsLoading || createTagLoading"
+    :loading="tagsLoading"
     placeholder="Select tags..."
-    search-placeholder="Type to search or create tags..."
+    search-placeholder="Type to search or add tags, separated by commas..."
     test-id="tag-picker"
     searchable
-    :show-chips="false"
+    allow-text-entry
     @update:model-value="handleUpdateTags"
     @search="handleSearch"
+    @submit-text="handleSubmitText"
   />
 </template>
