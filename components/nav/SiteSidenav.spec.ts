@@ -220,6 +220,18 @@ describe('SiteSidenav auth links', () => {
 });
 
 describe('SiteSidenav dialog semantics', () => {
+  it('keeps the drawer and backdrop above expanded page media', () => {
+    const wrapper = mountNav();
+
+    expect({
+      backdrop: wrapper
+        .get('.side-nav-override > .fixed')
+        .classes()
+        .includes('z-50'),
+      drawer: wrapper.get('[role="dialog"]').classes().includes('z-50'),
+    }).toEqual({ backdrop: true, drawer: true });
+  });
+
   it('marks the open drawer panel as a modal dialog', () => {
     const wrapper = mountNav();
 

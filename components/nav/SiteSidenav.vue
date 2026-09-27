@@ -216,7 +216,7 @@ const selectSearchType = (type: SearchType) => {
 <template>
   <div v-if="showDropdown" class="side-nav-override">
     <div
-      class="top fixed inset-0 bg-gray-100 opacity-50 dark:bg-gray-900 dark:text-gray-200"
+      class="fixed inset-0 z-50 bg-gray-100 opacity-50 dark:bg-gray-900 dark:text-gray-200"
       @click="outside"
     />
     <div
@@ -224,7 +224,7 @@ const selectSearchType = (type: SearchType) => {
       role="dialog"
       aria-modal="true"
       aria-label="Site navigation"
-      class="overlay-shade fixed top-0 left-0 flex h-full w-[275px] flex-col justify-between overflow-y-auto border-gray-300 bg-white py-2 dark:border-gray-200 dark:bg-gray-900"
+      class="fixed top-0 left-0 z-50 flex h-full w-[275px] flex-col justify-between overflow-y-auto border-gray-300 bg-white py-2 dark:border-gray-200 dark:bg-gray-900"
     >
       <div>
         <div class="mt-2 block px-6">
@@ -500,11 +500,5 @@ const selectSearchType = (type: SearchType) => {
 nav li:hover,
 .list-item-icon {
   color: #9ca3af;
-}
-.top {
-  z-index: 40;
-}
-.overlay-shade {
-  z-index: 40;
 }
 </style>
