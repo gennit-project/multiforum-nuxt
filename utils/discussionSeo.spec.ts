@@ -36,16 +36,6 @@ describe('buildDiscussionHead - loading state', () => {
   });
 });
 
-describe('buildDiscussionHead - age gated', () => {
-  it('titles an age-gated discussion as sensitive content', () => {
-    const head = buildDiscussionHead({ ...BASE, discussions: [], ageGated: true });
-    expect(head).toEqual({
-      title: 'Sensitive content | cats',
-      description: 'This content is marked sensitive.',
-    });
-  });
-});
-
 describe('buildDiscussionHead - not found', () => {
   it('reports a not-found title for an empty result', () => {
     const head = buildDiscussionHead({ ...BASE, discussions: [] });

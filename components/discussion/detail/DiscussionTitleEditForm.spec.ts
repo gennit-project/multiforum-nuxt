@@ -41,7 +41,10 @@ vi.mock('@vue/apollo-composable', () => ({
 }));
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
 vi.mock('@/composables/useDiscussionAgeGateCheck', () => ({
-  useDiscussionAgeGateCheck: () => ({ requiresAgeCheck: h.ageGated }),
+  useDiscussionAgeGateCheck: () => ({
+    requiresAgeCheck: h.ageGated,
+    loading: ref(false),
+  }),
 }));
 vi.mock('@/graphQLData/discussion/queries', () => ({
   GET_DISCUSSION_DETAIL: 'GET_DISCUSSION_DETAIL',

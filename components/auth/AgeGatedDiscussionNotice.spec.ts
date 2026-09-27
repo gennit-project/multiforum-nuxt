@@ -20,11 +20,18 @@ const h = vi.hoisted(() => ({
   mutate: vi.fn(),
   onDone: undefined as undefined | (() => Promise<void>),
   refetchQueries: vi.fn(),
+  head: undefined as undefined | { value: { title?: string } },
   queryVariables: undefined as undefined | (() => unknown),
 }));
 
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({ fullPath: '/forums/f/discussions/d#comments' }),
+  useRoute: () => ({
+    fullPath: '/forums/f/discussions/d#comments',
+    params: { forumId: 'f' },
+  }),
+  useHead: (head: unknown) => {
+    h.head = head as { value: { title?: string } };
+  },
 }));
 vi.mock('@/composables/useAuthNavigation', () => ({
   useAuthNavigation: () => ({
@@ -117,6 +124,18 @@ describe('AgeGatedDiscussionNotice', () => {
     expect(mountNotice().find('[data-testid="not-found"]').exists()).toBe(
       false
     );
+  });
+
+  it('titles a gated page as sensitive content, without its real title', () => {
+    gated('SIGN_IN_REQUIRED');
+    mountNotice();
+    expect(h.head?.value.title).toBe('Sensitive content | f');
+  });
+
+  it('leaves the page title alone when no age check applies', () => {
+    withCheck({ requiresAgeCheck: false, status: 'ALLOWED', minimumAge: null });
+    mountNotice();
+    expect(h.head?.value).toEqual({});
   });
 
   describe('signed out', () => {

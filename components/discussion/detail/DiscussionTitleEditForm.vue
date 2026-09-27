@@ -19,7 +19,7 @@ import { buildDetailQueryVariables } from '@/utils/discussionDetailQuery';
 import { useRoute } from 'nuxt/app';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
-import { useDiscussionAgeGateCheck } from '@/composables/useDiscussionAgeGateCheck';
+import AgeGateCheckScope from '@/components/auth/AgeGateCheckScope.vue';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
@@ -67,14 +67,11 @@ const discussion = computed<Discussion | null>(() => {
   return discussion || null;
 });
 // A discussion that's behind the age gate for this viewer comes back empty,
-// the same as a deleted one; the page body shows the gate, so the header
-// shouldn't call it missing or deleted.
-const { requiresAgeCheck } = useDiscussionAgeGateCheck({
-  discussionId,
-  enabled: computed(
-    () => !getDiscussionLoading.value && !getDiscussionError.value && !discussion.value
-  ),
-});
+// the same as a deleted one. The missing-discussion header asks why through
+// AgeGateCheckScope, so it doesn't call a gated discussion missing or deleted.
+const discussionMissing = computed(
+  () => !getDiscussionLoading.value && !getDiscussionError.value && !discussion.value
+);
 const answered = computed(
   () =>
     discussion.value?.DiscussionChannels?.find(
@@ -145,17 +142,36 @@ const formattedDate = computed(() => {
         <SkeletonLoader class="w-28" type="button" />
       </div>
       <div v-else ref="discussionDetail" class="flex-1">
-        <h1
-          v-if="!titleEditMode"
-          class="px-1 text-lg text-wrap text-black sm:tracking-tight md:text-2xl dark:text-white"
+        <AgeGateCheckScope
+          v-if="discussionMissing"
+          v-slot="{ requiresAgeCheck }"
+          :discussion-id="discussionId"
         >
-          {{
-            discussion && discussion.title
-              ? discussion.title
-              : requiresAgeCheck
+          <h1
+            class="px-1 text-lg text-wrap text-black sm:tracking-tight md:text-2xl dark:text-white"
+          >
+            {{
+              requiresAgeCheck
                 ? 'Sensitive content'
                 : "Couldn't find the discussion"
-          }}
+            }}
+          </h1>
+          <div
+            v-if="!requiresAgeCheck"
+            class="px-1 py-1 text-xs text-gray-500 dark:text-gray-300"
+          >
+            {{
+              isDownloadDetailPage
+                ? `published by [Deleted] in ${channelId}`
+                : `[Deleted] started this discussion in ${channelId}`
+            }}
+          </div>
+        </AgeGateCheckScope>
+        <h1
+          v-else-if="!titleEditMode"
+          class="px-1 text-lg text-wrap text-black sm:tracking-tight md:text-2xl dark:text-white"
+        >
+          {{ discussion?.title || "Couldn't find the discussion" }}
         </h1>
 
         <TextInput
@@ -172,7 +188,7 @@ const formattedDate = computed(() => {
           :max="DISCUSSION_TITLE_CHAR_LIMIT"
         />
         <div
-          v-if="discussion || !requiresAgeCheck"
+          v-if="!discussionMissing"
           class="px-1 py-1 text-xs text-gray-500 dark:text-gray-300"
         >
           {{
@@ -270,16 +286,17 @@ const formattedDate = computed(() => {
       class="mx-auto my-3 max-w-5xl"
       :text="getDiscussionError.message"
     />
-    <InfoBanner
-      v-else-if="
-        !getDiscussionLoading &&
-        !getDiscussionError &&
-        !discussion &&
-        !requiresAgeCheck
-      "
-      class="mx-auto my-3 max-w-5xl"
-      :text="'The discussion was deleted.'"
-    />
+    <AgeGateCheckScope
+      v-else-if="discussionMissing"
+      v-slot="{ requiresAgeCheck }"
+      :discussion-id="discussionId"
+    >
+      <InfoBanner
+        v-if="!requiresAgeCheck"
+        class="mx-auto my-3 max-w-5xl"
+        :text="'The discussion was deleted.'"
+      />
+    </AgeGateCheckScope>
     <ErrorBanner
       v-if="updateDiscussionError"
       class="mx-auto my-3 max-w-5xl"

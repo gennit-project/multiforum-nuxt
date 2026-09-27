@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useRoute } from 'nuxt/app';
+import { useHead, useRoute } from 'nuxt/app';
 import { useApolloClient, useMutation } from '@vue/apollo-composable';
 import {
   AgeGateCheckStatus,
@@ -38,6 +38,28 @@ const status = computed(() =>
   check.value?.requiresAgeCheck ? check.value.status : null
 );
 const minimumAge = computed(() => check.value?.minimumAge ?? 18);
+
+// The page's own head calls an empty result "not found". Server rendering
+// waits for this component's check and a later head entry wins, so a gated
+// page gets a neutral title that doesn't reveal the real one.
+const forumId = computed(() =>
+  typeof route.params?.forumId === 'string' ? route.params.forumId : ''
+);
+useHead(
+  computed(() =>
+    status.value
+      ? {
+          title: `Sensitive content${forumId.value ? ` | ${forumId.value}` : ''}`,
+          meta: [
+            {
+              name: 'description',
+              content: 'This content is marked sensitive.',
+            },
+          ],
+        }
+      : {}
+  )
+);
 
 const birthday = ref('');
 const validationMessage = computed(() =>
