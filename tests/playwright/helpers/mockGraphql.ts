@@ -28,15 +28,6 @@ const defaultHandlers: GraphQLHandlers = {
       },
     },
   }),
-  getMyAgeProfile: () => ({
-    data: {
-      getMyAgeProfile: {
-        birthday: '2000-01-01',
-        meetsAccountMinimumAge: true,
-        mayAccessSensitiveContent: true,
-      },
-    },
-  }),
   // Matches the default policy above (gate off): no discussion needs an age
   // check, so a missing discussion still shows the not-found page.
   getDiscussionAgeGateCheck: () => ({

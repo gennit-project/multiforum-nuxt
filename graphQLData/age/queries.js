@@ -11,16 +11,6 @@ export const GET_AGE_POLICY = gql`
   }
 `;
 
-export const GET_MY_AGE_PROFILE = gql`
-  query getMyAgeProfile {
-    getMyAgeProfile {
-      birthday
-      meetsAccountMinimumAge
-      mayAccessSensitiveContent
-    }
-  }
-`;
-
 export const GET_DISCUSSION_AGE_GATE_CHECK = gql`
   query getDiscussionAgeGateCheck($discussionId: ID!) {
     getDiscussionAgeGateCheck(discussionId: $discussionId) {
