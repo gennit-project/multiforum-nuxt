@@ -19,6 +19,7 @@ import { buildDetailQueryVariables } from '@/utils/discussionDetailQuery';
 import { useRoute } from 'nuxt/app';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
+import { useDiscussionAgeGateCheck } from '@/composables/useDiscussionAgeGateCheck';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
@@ -64,6 +65,15 @@ const discussion = computed<Discussion | null>(() => {
     return null;
   }
   return discussion || null;
+});
+// A discussion that's behind the age gate for this viewer comes back empty,
+// the same as a deleted one; the page body shows the gate, so the header
+// shouldn't call it missing or deleted.
+const { requiresAgeCheck } = useDiscussionAgeGateCheck({
+  discussionId,
+  enabled: computed(
+    () => !getDiscussionLoading.value && !getDiscussionError.value && !discussion.value
+  ),
 });
 const answered = computed(
   () =>
@@ -142,7 +152,9 @@ const formattedDate = computed(() => {
           {{
             discussion && discussion.title
               ? discussion.title
-              : "Couldn't find the discussion"
+              : requiresAgeCheck
+                ? 'Sensitive content'
+                : "Couldn't find the discussion"
           }}
         </h1>
 
@@ -159,7 +171,10 @@ const formattedDate = computed(() => {
           :current="formValues.title?.length || 0"
           :max="DISCUSSION_TITLE_CHAR_LIMIT"
         />
-        <div class="px-1 py-1 text-xs text-gray-500 dark:text-gray-300">
+        <div
+          v-if="discussion || !requiresAgeCheck"
+          class="px-1 py-1 text-xs text-gray-500 dark:text-gray-300"
+        >
           {{
             isDownloadDetailPage
               ? `published by ${discussion?.Author ? discussion.Author.username : '[Deleted]'} ${formattedDate ? `on ${formattedDate}` : ''} in ${channelId}`
@@ -256,7 +271,12 @@ const formattedDate = computed(() => {
       :text="getDiscussionError.message"
     />
     <InfoBanner
-      v-else-if="!getDiscussionLoading && !getDiscussionError && !discussion"
+      v-else-if="
+        !getDiscussionLoading &&
+        !getDiscussionError &&
+        !discussion &&
+        !requiresAgeCheck
+      "
       class="mx-auto my-3 max-w-5xl"
       :text="'The discussion was deleted.'"
     />

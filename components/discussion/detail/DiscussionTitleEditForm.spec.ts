@@ -15,6 +15,7 @@ const h = vi.hoisted(() => ({
   username: null as unknown,
   route: null as unknown,
   queryDocument: '',
+  ageGated: null as unknown,
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -39,6 +40,9 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
+vi.mock('@/composables/useDiscussionAgeGateCheck', () => ({
+  useDiscussionAgeGateCheck: () => ({ requiresAgeCheck: h.ageGated }),
+}));
 vi.mock('@/graphQLData/discussion/queries', () => ({
   GET_DISCUSSION_DETAIL: 'GET_DISCUSSION_DETAIL',
   GET_DOWNLOAD_DETAIL: 'GET_DOWNLOAD_DETAIL',
@@ -120,6 +124,7 @@ beforeEach(() => {
   h.updateError = { value: null };
   h.onDone = undefined;
   h.username = ref('alice');
+  h.ageGated = ref(false);
   h.route = {
     params: { forumId: 'cats', discussionId: 'd1' },
     name: 'forums-forumId-discussions-discussionId',
@@ -178,6 +183,25 @@ describe('DiscussionTitleEditForm display', () => {
     const wrapper = mountForm();
 
     expect(wrapper.find('.info').exists()).toBe(true);
+  });
+
+  describe('when the missing discussion is behind the age gate', () => {
+    beforeEach(() => {
+      h.discussionResult = ref({ discussions: [] });
+      h.ageGated = ref(true);
+    });
+
+    it('titles the page as sensitive content', () => {
+      expect(mountForm().get('h1').text()).toBe('Sensitive content');
+    });
+
+    it('does not say the discussion was deleted', () => {
+      expect(mountForm().find('.info').exists()).toBe(false);
+    });
+
+    it('does not show a deleted-author byline', () => {
+      expect(mountForm().text()).not.toContain('[Deleted]');
+    });
   });
 
   it('shows an error banner on query error', () => {
