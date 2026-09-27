@@ -63,10 +63,30 @@ describe('MarkdownRenderer layout', () => {
     );
   });
 
-  it('renders default slot content', () => {
-    const wrapper = mountRenderer({}, { default: '<span>extra</span>' });
+  it('renders default slot content when the inline slot is enabled', () => {
+    const wrapper = mountRenderer(
+      { hasSlot: true },
+      { default: '<span>extra</span>' }
+    );
 
     expect(wrapper.find('.inline-slot').exists()).toBe(true);
+  });
+
+  it('applies inline layout when the inline slot is enabled', () => {
+    const wrapper = mountRenderer(
+      { hasSlot: true },
+      { default: '<span>extra</span>' }
+    );
+
+    expect(wrapper.get('.markdown-container').classes()).toContain(
+      'has-inline-slot'
+    );
+  });
+
+  it('omits default slot content when the inline slot is disabled', () => {
+    const wrapper = mountRenderer({}, { default: '<span>extra</span>' });
+
+    expect(wrapper.find('.inline-slot').exists()).toBe(false);
   });
 
   it('omits the slot wrapper when no slot content is provided', () => {

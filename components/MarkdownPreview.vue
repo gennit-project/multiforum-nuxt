@@ -196,17 +196,28 @@ const handleModalClose = () => {
     <MarkdownRenderer
       :text="shownText"
       :class="[{ clickable: !disableGallery && allowImages }]"
+      :has-slot="shouldShowMoreButton && !showFullText"
       :font-size="fontSize"
       :image-max-height="imageMaxHeight"
       :allow-images="allowImages"
       @click="handleImageClick"
-    />
+    >
+      <button
+        v-if="shouldShowMoreButton && !showFullText"
+        type="button"
+        class="rounded-sm text-sm font-bold text-orange-600 hover:text-orange-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:text-orange-400 dark:hover:text-orange-300 dark:focus-visible:ring-offset-gray-900"
+        @click="toggleShowFullText"
+      >
+        Show More
+      </button>
+    </MarkdownRenderer>
     <button
-      v-if="shouldShowMoreButton"
-      class="text-sm font-bold text-orange-600 hover:underline dark:text-gray-300"
+      v-if="shouldShowMoreButton && showFullText"
+      type="button"
+      class="rounded-sm text-sm font-bold text-orange-600 hover:text-orange-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:text-orange-400 dark:hover:text-orange-300 dark:focus-visible:ring-offset-gray-900"
       @click="toggleShowFullText"
     >
-      {{ showFullText ? 'Show Less' : 'Show More' }}
+      Show Less
     </button>
     <ClientOnly>
       <component
