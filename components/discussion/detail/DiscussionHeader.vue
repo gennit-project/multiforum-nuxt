@@ -373,10 +373,13 @@ const warningModalBody = computed(() => {
 
 <template>
   <div>
-    <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:justify-between">
+    <div
+      data-testid="discussion-header-layout"
+      class="mt-2 flex flex-wrap items-start justify-between gap-2"
+    >
       <div
         data-testid="discussion-author-row"
-        class="flex min-w-0 items-start gap-2 text-xs dark:text-white"
+        class="flex min-w-[min(100%,28rem)] flex-1 items-start gap-2 text-xs dark:text-white"
       >
         <div data-testid="discussion-author-avatar" class="shrink-0">
           <AvatarComponent
@@ -407,30 +410,40 @@ const warningModalBody = computed(() => {
                 class="text-gray-500 dark:text-gray-300"
                 >{{ `(u/${discussion.Author.username})` }}</span
               >
-
-              <span
-                v-if="authorBadges.isServerAdmin"
-                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
-                >Server Admin</span
-              >
-              <span
-                v-if="authorBadges.isServerMod"
-                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
-                >Server Mod</span
-              >
-              <span
-                v-if="authorBadges.isForumAdmin"
-                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
-                >Forum Admin</span
-              >
-              <span
-                v-if="authorBadges.isForumMod"
-                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
-                >Forum Mod</span
-              >
             </span>
           </nuxt-link>
           <span v-else>[Deleted]</span>
+          <div
+            v-if="
+              authorBadges.isServerAdmin ||
+              authorBadges.isServerMod ||
+              authorBadges.isForumAdmin ||
+              authorBadges.isForumMod
+            "
+            data-testid="discussion-author-badges"
+            class="mt-1 flex flex-wrap items-center gap-1"
+          >
+            <span
+              v-if="authorBadges.isServerAdmin"
+              class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+              >Server Admin</span
+            >
+            <span
+              v-if="authorBadges.isServerMod"
+              class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+              >Server Mod</span
+            >
+            <span
+              v-if="authorBadges.isForumAdmin"
+              class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+              >Forum Admin</span
+            >
+            <span
+              v-if="authorBadges.isForumMod"
+              class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+              >Forum Mod</span
+            >
+          </div>
           <div
             data-testid="discussion-author-meta"
             class="mt-0.5 flex flex-wrap items-center gap-x-2"
@@ -450,7 +463,10 @@ const warningModalBody = computed(() => {
           </div>
         </div>
       </div>
-      <div class="flex items-center gap-2">
+      <div
+        data-testid="discussion-header-actions"
+        class="ml-auto flex flex-wrap items-center justify-end gap-2"
+      >
         <div
           v-if="usernameVar === discussion?.Author?.username && !downloadMode"
         >

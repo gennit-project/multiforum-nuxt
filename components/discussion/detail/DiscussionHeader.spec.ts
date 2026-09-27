@@ -170,6 +170,29 @@ describe('DiscussionHeader', () => {
     });
   });
 
+  it('wraps actions as a group before squeezing the author details', () => {
+    const wrapper = buildWrapper();
+
+    expect({
+      headerWraps: wrapper
+        .get('[data-testid="discussion-header-layout"]')
+        .classes()
+        .includes('flex-wrap'),
+      authorKeepsReadableWidth: wrapper
+        .get('[data-testid="discussion-author-row"]')
+        .classes()
+        .includes('min-w-[min(100%,28rem)]'),
+      actionsStayTogether: wrapper
+        .get('[data-testid="discussion-header-actions"]')
+        .classes()
+        .includes('ml-auto'),
+    }).toEqual({
+      headerWraps: true,
+      authorKeepsReadableWidth: true,
+      actionsStayTogether: true,
+    });
+  });
+
   it('allows the author identity and badges to wrap within the details column', () => {
     const wrapper = buildWrapper();
 
@@ -177,6 +200,15 @@ describe('DiscussionHeader', () => {
       wrapper
         .get('[data-testid="discussion-author-details"] a > span')
         .classes()
+    ).toContain('flex-wrap');
+  });
+
+  it('keeps role badges in a separate wrapping group', () => {
+    serverAdminUsernames.value = ['alice'];
+    const wrapper = buildWrapper();
+
+    expect(
+      wrapper.get('[data-testid="discussion-author-badges"]').classes()
     ).toContain('flex-wrap');
   });
 
