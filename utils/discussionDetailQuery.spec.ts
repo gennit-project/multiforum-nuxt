@@ -17,7 +17,11 @@ describe('buildDetailQueryVariables', () => {
   ])('gives the discussion query the same variables for %s', (_label, extra) => {
     expect(
       buildDetailQueryVariables({ ...base, downloadMode: false, ...extra })
-    ).toEqual({ id: 'd1', loggedInModName: null });
+    ).toEqual({
+      id: 'd1',
+      loggedInModName: null,
+      channelUniqueName: 'cats',
+    });
   });
 
   it('passes the mod name through when there is one', () => {
@@ -27,7 +31,11 @@ describe('buildDetailQueryVariables', () => {
         downloadMode: false,
         modProfileName: 'ModAlice',
       })
-    ).toEqual({ id: 'd1', loggedInModName: 'ModAlice' });
+    ).toEqual({
+      id: 'd1',
+      loggedInModName: 'ModAlice',
+      channelUniqueName: 'cats',
+    });
   });
 
   it('includes the variables the download query declares', () => {

@@ -289,7 +289,10 @@ export const GET_DOWNLOAD_DETAIL = gql`
     $loggedInUsername: String
     $channelUniqueName: String!
   ) {
-    discussions(where: { id: $id }) {
+    discussions: getDiscussionDetail(
+      discussionId: $id
+      channelUniqueName: $channelUniqueName
+    ) {
       id
       title
       body
@@ -328,6 +331,9 @@ export const GET_DOWNLOAD_DETAIL = gql`
         }
         UpvotedByUsers {
           username
+        }
+        UpvotedByUsersAggregate {
+          count
         }
         SuperUpvotedByUsers {
           username
@@ -448,6 +454,9 @@ export const DISCUSSION_DETAIL_FIELDS = gql`
       UpvotedByUsers {
         username
       }
+      UpvotedByUsersAggregate {
+        count
+      }
       SuperUpvotedByUsers {
         username
       }
@@ -533,8 +542,15 @@ export const DISCUSSION_DETAIL_FIELDS = gql`
 
 export const GET_DISCUSSION_DETAIL = gql`
   ${DISCUSSION_DETAIL_FIELDS}
-  query getDiscussionDetail($id: ID!, $loggedInModName: String) {
-    discussions(where: { id: $id }) {
+  query getDiscussionDetail(
+    $id: ID!
+    $loggedInModName: String
+    $channelUniqueName: String!
+  ) {
+    discussions: getDiscussionDetail(
+      discussionId: $id
+      channelUniqueName: $channelUniqueName
+    ) {
       ...DiscussionDetailFields
     }
   }

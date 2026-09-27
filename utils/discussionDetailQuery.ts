@@ -16,11 +16,11 @@ type DetailQueryVariablesParams = {
 export type DiscussionDetailQueryVariables = {
   id: string;
   loggedInModName: string | null;
+  channelUniqueName: string;
 };
 
 export type DownloadDetailQueryVariables = DiscussionDetailQueryVariables & {
   loggedInUsername: string | null;
-  channelUniqueName: string;
 };
 
 /**
@@ -33,6 +33,7 @@ export const buildDetailQueryVariables = (
   const base: DiscussionDetailQueryVariables = {
     id: params.discussionId,
     loggedInModName: params.modProfileName || null,
+    channelUniqueName: params.channelUniqueName,
   };
   if (!params.downloadMode) return base;
   return {
