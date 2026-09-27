@@ -1,9 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import CreateEditChannelFields from '@/components/channel/form/CreateEditChannelFields.vue';
 import { FilterMode } from '@/__generated__/graphql';
+
+const mockMutationError = ref<Error | null>(null);
 
 const h = vi.hoisted(() => ({
   mutate: vi.fn(),
@@ -41,7 +43,7 @@ vi.mock('@vue/apollo-composable', () => ({
   useMutation: () => ({
     mutate: h.mutate,
     loading: ref(false),
-    error: ref(null),
+    error: mockMutationError,
     onDone: (callback: () => void) => h.doneCallbacks.push(callback),
     onError: (callback: (error: Error) => void) =>
       h.errorCallbacks.push(callback),
@@ -333,6 +335,39 @@ describe('forum settings edit page', () => {
     h.doneCallbacks.at(-1)?.();
     await wrapper.vm.$nextTick();
     expect(refetch).toHaveBeenCalledOnce();
+  });
+
+  const mountWithChannel = async () => {
+    mockedUseQuery.mockReturnValue({
+      result: ref({ channels: [channelData] }),
+      loading: ref(false),
+      error: ref(null),
+      refetch: vi.fn(),
+    });
+    const Page = (await import('./edit.vue')).default;
+    return shallowMount(Page, {
+      global: { mocks: { $route: { fullPath: '/forums/cats/edit' } } },
+    });
+  };
+
+  // #580: sending every group/option on every save exceeded Neo4j's
+  // transaction memory, so unchanged filter groups must not be sent at all.
+  it('sends no filter group changes when only other settings changed', async () => {
+    h.mutate.mockClear();
+    const wrapper = await mountWithChannel();
+    const fields = wrapper.findComponent(CreateEditChannelFields);
+    fields.vm.$emit('updateFormValues', { description: 'New description' });
+    fields.vm.$emit('submit');
+    expect(h.mutate.mock.calls[0][0].update).not.toHaveProperty('FilterGroups');
+  });
+
+  it('keeps the form (and unsaved edits) on screen when the save fails', async () => {
+    mockMutationError.value = null;
+    const wrapper = await mountWithChannel();
+    mockMutationError.value = new Error('The backend service is temporarily unavailable.');
+    await nextTick();
+    expect(wrapper.findComponent(CreateEditChannelFields).exists()).toBe(true);
+    mockMutationError.value = null;
   });
 
   it('handles update mutation errors', async () => {

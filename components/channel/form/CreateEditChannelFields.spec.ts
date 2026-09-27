@@ -185,12 +185,12 @@ describe('CreateEditChannelFields — errors and validation', () => {
     expect(wrapper.text()).toContain('Something broke');
   });
 
-  it('surfaces an update error', () => {
+  it('surfaces an update error and says the changes were not saved', () => {
     const wrapper = mountFields({
       updateChannelError: { message: 'Update failed', graphQLErrors: [] },
     });
 
-    expect(wrapper.text()).toContain('Update failed');
+    expect(wrapper.text()).toContain("Your changes weren't saved. Update failed");
   });
 
   it('rewrites the channel-already-exists error to a friendly message', () => {

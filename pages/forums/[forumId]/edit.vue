@@ -7,12 +7,8 @@ import type { CreateEditChannelFormValues } from '@/types/Channel';
 import CreateEditChannelFields from '@/components/channel/form/CreateEditChannelFields.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { useUsername } from '@/composables/useAuthState';
-import type {
-  ChannelUpdateInput,
-  FilterGroup,
-  FilterOption,
-  Tag as TagData,
-} from '@/__generated__/graphql';
+import type { ChannelUpdateInput, Tag as TagData } from '@/__generated__/graphql';
+import { buildFilterGroupsUpdate } from '@/utils/filterGroupUpdates';
 import { useRoute } from 'nuxt/app';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import {
@@ -168,65 +164,6 @@ const existingFilterGroups = computed(() => {
   return channel.value?.FilterGroups || [];
 });
 
-const isPersistedId = (id: unknown): id is string =>
-  typeof id === 'string' && id.length > 0 && !id.startsWith('local-');
-
-const toFilterOptionCreate = (option: FilterOption, optionIndex: number) => ({
-  node: {
-    id: '',
-    value: option.value,
-    displayName: option.displayName,
-    order: optionIndex,
-  },
-});
-
-const toFilterOptionUpdate = (option: FilterOption, optionIndex: number) => ({
-  where: { node: { id: option.id } },
-  update: {
-    node: {
-      value: option.value,
-      displayName: option.displayName,
-      order: optionIndex,
-    },
-  },
-});
-
-const buildFilterOptionUpdates = (
-  currentGroup: FilterGroup,
-  existingGroup?: FilterGroup
-) => {
-  const currentOptions = currentGroup.options || [];
-  const existingOptions = existingGroup?.options || [];
-  const currentExistingOptionIds = currentOptions
-    .map((option: FilterOption) => option.id)
-    .filter(isPersistedId);
-  const createdOptions = currentOptions
-    .flatMap((option: FilterOption, optionIndex: number) =>
-      !isPersistedId(option.id)
-        ? [toFilterOptionCreate(option, optionIndex)]
-        : []
-    );
-  const updatedOptions = currentOptions
-    .flatMap((option: FilterOption, optionIndex: number) =>
-      isPersistedId(option.id)
-        ? [toFilterOptionUpdate(option, optionIndex)]
-        : []
-    );
-  const deletedOptions = existingOptions
-    .filter((option: FilterOption) =>
-      !currentExistingOptionIds.includes(option.id)
-    )
-    .map((option: FilterOption) => ({
-      where: { node: { id: option.id } },
-    }));
-
-  return [
-    ...(updatedOptions.length > 0 ? updatedOptions : []),
-    ...(createdOptions.length > 0 ? [{ create: createdOptions }] : []),
-    ...(deletedOptions.length > 0 ? [{ delete: deletedOptions }] : []),
-  ];
-};
-
 const channelUpdateInput = computed<ChannelUpdateInput>(() => {
   const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
     onCreate: { node: { text: tag } },
@@ -239,61 +176,12 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
       where: { node: { text: tag } },
     }));
 
-  // Keep filter groups atomic inside the channel update: create new groups,
-  // update existing groups/options, and delete removed groups/options.
-  const existingFilterGroupIds = existingFilterGroups.value.map(
-    (group: FilterGroup) => group.id
-  );
-  const currentFilterGroupIds = formValues.value.downloadFilterGroups
-    .map((group: FilterGroup) => group.id)
-    .filter(isPersistedId);
-
-  const filterGroupUpdates = formValues.value.downloadFilterGroups
-    .filter((group: FilterGroup) => isPersistedId(group.id))
-    .map((group, index) => {
-      const existingGroup = existingFilterGroups.value.find(
-        (existingGroup: FilterGroup) => existingGroup.id === group.id
-      );
-      const optionUpdates = buildFilterOptionUpdates(group, existingGroup);
-      return {
-        where: { node: { id: group.id } },
-        update: {
-          node: {
-            key: group.key,
-            displayName: group.displayName,
-            mode: group.mode,
-            order: index,
-            ...(optionUpdates.length > 0 ? { options: optionUpdates } : {}),
-          },
-        },
-      };
-    });
-
-  // Create new groups (those without IDs)
-  const filterGroupCreations = formValues.value.downloadFilterGroups
-    .filter((group: FilterGroup) => !isPersistedId(group.id))
-    .map((group, _index) => ({
-      node: {
-        id: '', // Empty ID for new groups - server will generate
-        key: group.key,
-        displayName: group.displayName,
-        mode: group.mode,
-        order: formValues.value.downloadFilterGroups.indexOf(group),
-        options: group.options
-          ? {
-              create: group.options.map(toFilterOptionCreate),
-            }
-          : undefined,
-      },
-    }));
-
-  // Delete groups that were removed from the settings form.
-  const filterGroupDeletions = existingFilterGroupIds
-    .filter((id: string) => !currentFilterGroupIds.includes(id))
-    .map((id: string) => ({
-      where: { node: { id } },
-      delete: { options: [{}] },
-    }));
+  // Only changed groups/options are sent; see utils/filterGroupUpdates.ts
+  // (sending the whole tree exceeded Neo4j's transaction memory, #580).
+  const filterGroupsUpdate = buildFilterGroupsUpdate({
+    current: formValues.value.downloadFilterGroups,
+    existing: existingFilterGroups.value,
+  });
 
   return {
     description: formValues.value.description,
@@ -310,17 +198,9 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
     downloadsEnabled: formValues.value.downloadsEnabled,
     allowedFileTypes: formValues.value.allowedFileTypes,
     Tags: [{ connectOrCreate: tagConnections, disconnect: tagDisconnections }],
-    FilterGroups: [
-      ...(filterGroupUpdates.length > 0
-        ? filterGroupUpdates
-        : []),
-      ...(filterGroupCreations.length > 0
-        ? [{ create: filterGroupCreations }]
-        : []),
-      ...(filterGroupDeletions.length > 0
-        ? [{ delete: filterGroupDeletions }]
-        : []),
-    ],
+    ...(filterGroupsUpdate.length > 0
+      ? { FilterGroups: filterGroupsUpdate }
+      : {}),
     Admins: [
       { connect: [{ where: { node: { username: usernameVar.value } } }] },
     ],
@@ -380,9 +260,10 @@ function updateFormValues(data: CreateEditChannelFormValues) {
   }
 }
 
-const hasError = computed(() => {
-  return !!getChannelError.value || !!updateChannelError.value;
-});
+// Only a failed *load* replaces the form. A failed save is shown by the
+// fields component above the form, so the user keeps their unsaved edits
+// (a save timeout used to wipe the form behind a "loading" error, #580).
+const hasError = computed(() => !!getChannelError.value);
 </script>
 
 <template>
@@ -396,7 +277,7 @@ const hasError = computed(() => {
         later.
       </p>
       <p class="mt-2 text-sm">
-        {{ getChannelError?.message || updateChannelError?.message }}
+        {{ getChannelError?.message }}
       </p>
     </div>
 
