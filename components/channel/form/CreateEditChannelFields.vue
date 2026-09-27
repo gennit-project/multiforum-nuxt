@@ -321,7 +321,9 @@ const showCreateChannelError = computed(() => {
     <div>
       <!-- Error Displays -->
       <div v-if="updateChannelError" class="mt-6">
-        <ErrorBanner :text="updateChannelError.message" />
+        <ErrorBanner
+          :text="`Your changes weren't saved. ${updateChannelError.message}`"
+        />
       </div>
       <div v-if="getChannelError">
         <ErrorBanner
