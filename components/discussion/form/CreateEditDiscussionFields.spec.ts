@@ -409,6 +409,37 @@ describe('CreateEditDiscussionFields Component', () => {
   });
 
   describe('Form rendering', () => {
+    it('orders and labels the download form sections', () => {
+      const wrapper = mount(CreateEditDiscussionFields, {
+        props: {
+          editMode: true,
+          downloadMode: true,
+          formValues: defaultFormValues,
+        },
+        global: {
+          stubs: {
+            ...mockComponents,
+            FormRow: {
+              template:
+                '<div><label v-if="sectionTitle">{{ sectionTitle }}</label><slot name="content" /></div>',
+              props: ['sectionTitle', 'required', 'description'],
+            },
+            DownloadEditForm: {
+              template: '<div data-testid="download-edit-form"></div>',
+            },
+          },
+        },
+      });
+
+      expect(wrapper.findAll('label').map((label) => label.text())).toEqual([
+        'Title',
+        'Description',
+        'Images (optional)',
+        'Forum',
+        'Tags',
+      ]);
+    });
+
     it('renders the correct form title for create mode', async () => {
       const wrapper = mountComponent(defaultFormValues, false);
 

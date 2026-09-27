@@ -39,6 +39,18 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // Pins the bottom Cancel/Save bar to the viewport so long forms can be
+  // saved without scrolling back to the top or bottom.
+  stickyFooter: {
+    type: Boolean,
+    default: false,
+  },
+  // Renders the form on a lifted panel (bordered; gray-900 in dark mode) so
+  // long forms read as one surface instead of floating fields on black.
+  surface: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(['submit', 'cancel']);
@@ -58,7 +70,12 @@ function handleCancel() {
 <template>
   <form
     autocomplete="off"
-    class="space-y-3 divide-y divide-gray-200 rounded-lg border-gray-300 p-2 dark:divide-gray-700 dark:border-gray-700"
+    class="space-y-3 divide-y divide-gray-200 rounded-lg border-gray-300 dark:divide-gray-700 dark:border-gray-700"
+    :class="
+      surface
+        ? 'border bg-white px-4 pt-2 sm:px-6 dark:border-gray-700 dark:bg-gray-900'
+        : 'p-2'
+    "
   >
     <div>
       <div class="flex justify-between">
@@ -89,9 +106,18 @@ function handleCancel() {
         {{ props.description }}
       </p>
       <slot />
-      <FormRow>
+      <FormRow
+        :class="
+          stickyFooter
+            ? [
+                'sticky bottom-0 z-10 border-t border-gray-200 bg-white dark:border-gray-700',
+                surface ? 'dark:bg-gray-900' : 'dark:bg-black',
+              ]
+            : ''
+        "
+      >
         <template #content>
-          <div class="pb-5 pt-5">
+          <div :class="stickyFooter ? 'py-3' : 'pb-5 pt-5'">
             <div class="flex justify-end">
               <CancelButton
                 v-if="!props.loading && props.showCancelButton"

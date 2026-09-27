@@ -104,20 +104,17 @@ const selectedLabelCount = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-4">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-      <div>
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-          Download Labels
-        </h3>
-        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-          Select labels to help users find your download through filters
-        </p>
-      </div>
+  <div
+    class="space-y-4 rounded-lg border border-gray-200 p-4 dark:border-gray-600"
+  >
+    <!-- Header: the section title comes from the parent form row -->
+    <div class="flex items-start justify-between gap-3">
+      <p class="text-sm text-gray-600 dark:text-gray-400">
+        Select labels to help users find your download through filters
+      </p>
       <div
         v-if="hasSelectedLabels"
-        class="text-sm text-gray-600 dark:text-gray-400"
+        class="shrink-0 text-sm text-gray-600 dark:text-gray-400"
       >
         {{ selectedLabelCount }} selected
       </div>
@@ -125,14 +122,16 @@ const selectedLabelCount = computed(() => {
 
     <!-- Filter Groups -->
     <div class="space-y-6">
-      <div
+      <fieldset
         v-for="group in visibleFilterGroups"
         :key="group.id"
-        class="space-y-3"
+        class="space-y-2"
       >
-        <h4 class="text-md font-medium text-gray-800 dark:text-gray-200">
+        <legend
+          class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           {{ group.displayName }}
-        </h4>
+        </legend>
 
         <!-- MultiSelect for groups with 10+ options -->
         <div v-if="shouldUseDropdown(group)">
@@ -159,7 +158,7 @@ const selectedLabelCount = computed(() => {
             />
           </div>
         </div>
-      </div>
+      </fieldset>
     </div>
 
     <!-- Empty state -->

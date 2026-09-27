@@ -103,7 +103,9 @@ export function useAlbumImageUpload(params: UseAlbumImageUploadParams) {
       // The backend automatically sets the Uploader from the logged-in user's context
       const createImageResult = await createImage({
         url: fileUrl,
-        alt: file.name,
+        // Leave alt empty so the author writes a real description; a file
+        // name like "07-21-25_5-25-45PM.png" is worse than no alt at all.
+        alt: '',
         caption: '',
         copyright: '',
         storageObjectName: signedUpload?.storageObjectName,

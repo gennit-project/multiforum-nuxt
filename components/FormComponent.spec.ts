@@ -42,6 +42,42 @@ describe('FormComponent', () => {
     routerGoMock.mockReset();
   });
 
+  it.each([
+    { stickyFooter: true, expected: true },
+    { stickyFooter: false, expected: false },
+  ])(
+    'pins the bottom action bar when stickyFooter is $stickyFooter',
+    async ({ stickyFooter, expected }) => {
+      const FormComponent = await import(
+        '@/components/FormComponent.vue'
+      ).then((m) => m.default);
+
+      const wrapper = mount(FormComponent, { props: { stickyFooter } });
+
+      expect(
+        wrapper.find('.mock-form-row').classes().includes('sticky')
+      ).toBe(expected);
+    }
+  );
+
+  it.each([
+    { surface: true, expected: true },
+    { surface: false, expected: false },
+  ])(
+    'renders the lifted panel when surface is $surface',
+    async ({ surface, expected }) => {
+      const FormComponent = await import(
+        '@/components/FormComponent.vue'
+      ).then((m) => m.default);
+
+      const wrapper = mount(FormComponent, { props: { surface } });
+
+      expect(wrapper.find('form').classes().includes('dark:bg-gray-900')).toBe(
+        expected
+      );
+    }
+  );
+
   it('renders with default props', async () => {
     const FormComponent = await import('@/components/FormComponent.vue').then(
       (m) => m.default

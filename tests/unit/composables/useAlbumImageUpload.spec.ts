@@ -255,6 +255,38 @@ describe('useAlbumImageUpload', () => {
       );
     });
 
+    it('does not use the file name as alt text for uploaded images', async () => {
+      mockCreateSignedStorageUrl.mockResolvedValue({
+        data: {
+          createSignedStorageURL: { url: 'https://signed-url.example.com' },
+        },
+      });
+      mockCreateImage.mockResolvedValue({
+        data: {
+          createImageWithUploader: {
+            id: 'img-1',
+            url: 'https://storage.example.com/test-file-123.jpg',
+            alt: '',
+            caption: '',
+            copyright: '',
+          },
+        },
+      });
+      const { handleMultipleFiles } = useAlbumImageUpload({
+        maxImages: 25,
+        currentImageCount,
+        onImageUploaded,
+      });
+
+      await handleMultipleFiles([
+        new File(['content1'], 'file1.jpg', { type: 'image/jpeg' }),
+      ]);
+
+      expect(mockCreateImage).toHaveBeenCalledWith(
+        expect.objectContaining({ alt: '' })
+      );
+    });
+
     it('alerts when at max capacity', async () => {
       const alertMock = vi.spyOn(window, 'alert').mockImplementation(() => {});
 
