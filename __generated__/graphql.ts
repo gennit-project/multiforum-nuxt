@@ -162,6 +162,25 @@ export type AddToCollectionInput = {
   position?: InputMaybe<Scalars['Int']['input']>;
 };
 
+/**
+ * Whether a discussion is behind the sensitive-content age gate for this
+ * viewer. Carries no content fields.
+ */
+export type AgeGateCheck = {
+  __typename?: 'AgeGateCheck';
+  minimumAge?: Maybe<Scalars['Int']['output']>;
+  requiresAgeCheck: Scalars['Boolean']['output'];
+  status: AgeGateCheckStatus;
+};
+
+/** What a viewer needs before they can open an age-gated discussion. */
+export enum AgeGateCheckStatus {
+  Allowed = 'ALLOWED',
+  BirthdayRequired = 'BIRTHDAY_REQUIRED',
+  SignInRequired = 'SIGN_IN_REQUIRED',
+  UnderMinimumAge = 'UNDER_MINIMUM_AGE'
+}
+
 /** Public, non-identifying age policy for this server. */
 export type AgePolicy = {
   __typename?: 'AgePolicy';

@@ -20,3 +20,13 @@ export const GET_MY_AGE_PROFILE = gql`
     }
   }
 `;
+
+export const GET_DISCUSSION_AGE_GATE_CHECK = gql`
+  query getDiscussionAgeGateCheck($discussionId: ID!) {
+    getDiscussionAgeGateCheck(discussionId: $discussionId) {
+      requiresAgeCheck
+      status
+      minimumAge
+    }
+  }
+`;

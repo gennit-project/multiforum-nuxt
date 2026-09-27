@@ -81,6 +81,13 @@ const stubs = {
   DiscussionCommentsWrapper: DiscussionCommentsWrapperStub,
   DiscussionChannelLinks: { template: '<div />' },
   PageNotFound: { template: '<div class="page-not-found-stub" />' },
+  // Renders its slot (the not-found page) when no age check applies; its own
+  // behavior is covered in AgeGatedDiscussionNotice.spec.ts.
+  AgeGatedDiscussionNotice: {
+    name: 'AgeGatedDiscussionNotice',
+    props: ['discussionId'],
+    template: '<div class="age-gate-stub"><slot /></div>',
+  },
   InfoBanner: {
     props: ['text'],
     template: '<div class="info-banner-stub">{{ text }}</div>',
@@ -422,6 +429,13 @@ describe('DiscussionDetailContent', () => {
   it('shows page-not-found when the discussion and channel are absent', () => {
     const { wrapper } = setup({ discussions: [], hasCommentSection: false });
     expect(wrapper.find('.page-not-found-stub').exists()).toBe(true);
+  });
+
+  it('checks the age gate for the discussion it could not load', () => {
+    const { wrapper } = setup({ discussions: [], hasCommentSection: false });
+    expect(
+      wrapper.findComponent({ name: 'AgeGatedDiscussionNotice' }).props('discussionId')
+    ).toBe(wrapper.props('discussionId'));
   });
 
   it('passes the comment-section comments through in order', () => {
