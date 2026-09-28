@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
-import { ref, defineComponent, h } from 'vue';
+import { ref, unref, defineComponent, h } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 
 vi.stubGlobal('definePageMeta', vi.fn());
@@ -76,12 +76,18 @@ const mountPage = async (mod: unknown) => {
 
 describe('mod profile layout page', () => {
   it('sets the page title from the mod display name', async () => {
+    useHead.mockClear();
     await mountPage({ displayName: 'Cool Mod' });
-    expect(useHead).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: expect.stringContaining('Cool Mod - Mod Profile'),
-      })
+    expect(unref(useHead.mock.calls[0][0]).title).toContain(
+      'Cool Mod - Mod Profile'
     );
+  });
+
+  // #583: useHead must be registered once in setup, not from a watcher.
+  it('registers the page head exactly once', async () => {
+    useHead.mockClear();
+    await mountPage({ displayName: 'Cool Mod' });
+    expect(useHead).toHaveBeenCalledTimes(1);
   });
 
   it('renders the mod profile tabs when the mod loads', async () => {

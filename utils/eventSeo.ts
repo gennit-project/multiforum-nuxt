@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon';
 import { toMetaDescription } from '@/utils/discussionSeo';
+import { jsonLdScript, type HeadMeta, type HeadObject } from '@/utils/seoHead';
 
 /**
  * Pure builders for EventDetail's SEO metadata and schema.org structured data,
@@ -111,5 +112,43 @@ export function buildEventStructuredData(
     eventAttendanceMode: event.virtualEventUrl
       ? 'https://schema.org/OnlineEventAttendanceMode'
       : 'https://schema.org/OfflineEventAttendanceMode',
+  };
+}
+
+export type BuildEventHeadParams = BuildEventSeoMetaParams & {
+  baseUrl: string;
+};
+
+/**
+ * Full `useHead` object for the event detail page: title, description,
+ * OpenGraph/Twitter tags and schema.org Event JSON-LD.
+ *
+ * The page used to pass `buildEventSeoMeta()` straight to `useHead`, which
+ * ignores `description` / `image` / `type` keys, so event pages rendered a
+ * title and nothing else (#583).
+ */
+export function buildEventHead(params: BuildEventHeadParams): HeadObject {
+  const { event, baseUrl } = params;
+  const seo = buildEventSeoMeta(params);
+  const meta: HeadMeta[] = [
+    { name: 'description', content: seo.description },
+    { property: 'og:title', content: seo.title },
+    { property: 'og:description', content: seo.description },
+    { name: 'twitter:title', content: seo.title },
+    { name: 'twitter:description', content: seo.description },
+  ];
+  if (seo.type) meta.push({ property: 'og:type', content: seo.type });
+  if (seo.image) {
+    meta.push({ property: 'og:image', content: seo.image });
+    meta.push({ name: 'twitter:card', content: 'summary_large_image' });
+    meta.push({ name: 'twitter:image', content: seo.image });
+  }
+
+  return {
+    title: seo.title,
+    meta,
+    ...(event
+      ? { script: [jsonLdScript(buildEventStructuredData({ event, baseUrl }))] }
+      : {}),
   };
 }

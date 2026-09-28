@@ -53,7 +53,7 @@ type HeadObject = {
   title: string;
   description?: string;
   meta?: HeadMeta[];
-  script?: { type: string; children: string }[];
+  script?: { type: string; innerHTML: string }[];
 };
 
 const fallbackDescription = (serverDisplayName: string): string =>
@@ -162,7 +162,7 @@ export function buildDiscussionHead(
     script: [
       {
         type: 'application/ld+json',
-        children: JSON.stringify(
+        innerHTML: JSON.stringify(
           buildDiscussionStructuredData({
             discussion,
             title,

@@ -27,7 +27,7 @@ type HeadMeta = { name?: string; property?: string; content: string };
 type HeadObject = {
   title: string;
   meta: HeadMeta[];
-  script?: { type: string; children: string }[];
+  script?: { type: string; innerHTML: string }[];
 };
 
 /**
@@ -86,7 +86,7 @@ export function buildWikiPageHead(
     script: [
       {
         type: 'application/ld+json',
-        children: JSON.stringify({
+        innerHTML: JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'Article',
           headline: title,
@@ -193,7 +193,7 @@ export function buildWikiHomeHead(
       script: [
         {
           type: 'application/ld+json',
-          children: JSON.stringify({
+          innerHTML: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'WebSite',
             name: title,
@@ -231,7 +231,7 @@ export function buildWikiHomeHead(
     script: [
       {
         type: 'application/ld+json',
-        children: JSON.stringify({
+        innerHTML: JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'Article',
           headline: title,

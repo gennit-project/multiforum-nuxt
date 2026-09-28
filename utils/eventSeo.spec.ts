@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  buildEventHead,
   buildEventSeoMeta,
   buildEventStructuredData,
   type EventSeoData,
@@ -84,5 +85,48 @@ describe('buildEventStructuredData', () => {
         baseUrl: 'https://x.test',
       }).eventAttendanceMode
     ).toBe('https://schema.org/OnlineEventAttendanceMode');
+  });
+});
+
+describe('buildEventHead', () => {
+  const params = {
+    channelId: 'cats',
+    forumName: 'Cats Forum',
+    serverDisplayName: 'Multiforum',
+    baseUrl: 'https://example.test',
+  };
+  const event = {
+    id: 'e1',
+    title: 'Meetup',
+    description: 'Come hang out',
+    startTime: '2024-01-01T00:00:00Z',
+    coverImageURL: 'https://img.test/c.png',
+  };
+  const metaContent = (head: ReturnType<typeof buildEventHead>, key: string) =>
+    head.meta.find((m) => (m.name || m.property) === key)?.content;
+
+  it.each([
+    ['description', 'Come hang out'],
+    ['og:description', 'Come hang out'],
+    ['og:title', 'Meetup | Cats Forum | Multiforum'],
+    ['og:type', 'event'],
+    ['og:image', 'https://img.test/c.png'],
+  ])('emits %s', (key, expected) => {
+    expect(metaContent(buildEventHead({ ...params, event }), key)).toBe(expected);
+  });
+
+  it('omits image tags when the event has no cover image', () => {
+    expect(
+      metaContent(buildEventHead({ ...params, event: { ...event, coverImageURL: '' } }), 'og:image')
+    ).toBeUndefined();
+  });
+
+  it('emits schema.org Event JSON-LD in the script body', () => {
+    const [script] = buildEventHead({ ...params, event }).script!;
+    expect(JSON.parse(script.innerHTML)['@type']).toBe('Event');
+  });
+
+  it('has no JSON-LD while the event is missing', () => {
+    expect(buildEventHead({ ...params, event: null }).script).toBeUndefined();
   });
 });

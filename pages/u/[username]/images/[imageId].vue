@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { config } from '@/config';
-import { computed, watchEffect, ref, onMounted, onUnmounted } from 'vue';
+import { buildImageHead } from '@/utils/imageSeo';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useRoute, useHead } from 'nuxt/app';
 import {
@@ -311,42 +312,16 @@ const downloadImage = (imageUrl: string) => {
     });
 };
 
-// SEO metadata
-watchEffect(() => {
-  if (!image.value || !uploader.value) {
-    useHead({
-      title: 'Image Not Found',
-      meta: [
-        {
-          name: 'description',
-          content: 'The requested image could not be found.',
-        },
-      ],
-    });
-    return;
-  }
-
-  const imageCaption = image.value.caption || image.value.alt || 'Image';
-  const uploaderName = uploader.value.displayName || uploader.value.username;
-  const serverName = config.serverDisplayName;
-
-  const description = `Image uploaded by ${uploaderName}: ${imageCaption}${image.value.longDescription ? '. ' + image.value.longDescription : ''}`;
-
-  useHead({
-    title: `${imageCaption} by ${uploaderName} | ${serverName}`,
-    meta: [
-      { name: 'description', content: description },
-      { property: 'og:title', content: imageCaption },
-      { property: 'og:description', content: description },
-      { property: 'og:image', content: image.value.url || '' },
-      { property: 'og:type', content: 'article' },
-      { name: 'twitter:card', content: 'summary_large_image' },
-      { name: 'twitter:title', content: imageCaption },
-      { name: 'twitter:description', content: description },
-      { name: 'twitter:image', content: image.value.url || '' },
-    ],
-  });
-});
+// SEO metadata: built in a computed and registered once in setup (#583).
+useHead(
+  computed(() =>
+    buildImageHead({
+      image: image.value,
+      uploader: uploader.value,
+      serverDisplayName: config.serverDisplayName,
+    })
+  )
+);
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown);

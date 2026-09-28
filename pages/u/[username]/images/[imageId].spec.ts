@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
-import { ref } from 'vue';
+import { ref, unref } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { createPinia, setActivePinia } from 'pinia';
 
@@ -397,6 +397,7 @@ describe('user image detail page', () => {
   });
 
   it('sets descriptive metadata for an image', async () => {
+    h.useHead.mockClear();
     await mountWith({
       ...baseImage,
       alt: 'A tabby cat',
@@ -404,9 +405,16 @@ describe('user image detail page', () => {
       Uploader: { username: 'alice', displayName: 'Alice' },
     });
 
-    expect(h.useHead).toHaveBeenCalledWith(
-      expect.objectContaining({ title: 'A photo by Alice | Multiforum' })
+    expect(unref(h.useHead.mock.calls[0][0]).title).toBe(
+      'A photo by Alice | Multiforum'
     );
+  });
+
+  // #583: useHead must be registered once in setup, not from a watcher.
+  it('registers the page head exactly once', async () => {
+    h.useHead.mockClear();
+    await mountWith(baseImage);
+    expect(h.useHead).toHaveBeenCalledTimes(1);
   });
 
   it('opens and closes the collection picker', async () => {

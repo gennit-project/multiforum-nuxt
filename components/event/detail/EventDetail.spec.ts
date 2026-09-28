@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ref } from 'vue';
+import { ref, unref } from 'vue';
+import { useHead } from 'nuxt/app';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import {
   asMock,
@@ -211,6 +212,27 @@ describe('EventDetail', () => {
     };
     h.username = ref('');
     h.modProfileName = ref('');
+  });
+
+  // #583: registered once in setup (was a watchEffect), and a real head object
+  // (the old one passed description/image keys useHead ignores).
+  it('registers the page head exactly once', () => {
+    setup();
+    expect(useHead).toHaveBeenCalledTimes(1);
+  });
+
+  it('emits description and OpenGraph meta for the event', () => {
+    setup();
+    const head = unref(asMock(useHead).mock.calls[0][0]);
+    expect(
+      head.meta.map((m: { name?: string; property?: string }) => m.name || m.property)
+    ).toEqual(expect.arrayContaining(['description', 'og:title', 'og:description']));
+  });
+
+  it('emits schema.org Event JSON-LD in the script body', () => {
+    setup();
+    const head = unref(asMock(useHead).mock.calls[0][0]);
+    expect(JSON.parse(head.script[0].innerHTML)['@type']).toBe('Event');
   });
 
   it('shows the loading state before the event arrives', () => {

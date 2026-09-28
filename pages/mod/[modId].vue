@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { config } from '@/config';
-import { computed, watchEffect } from 'vue';
+import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_MOD } from '@/graphQLData/mod/queries';
 import ModProfileSidebar from '@/components/mod/ModProfileSidebar.vue';
@@ -45,17 +45,17 @@ const serverRoleBadge = computed(() =>
   })
 );
 
-// Set page title for mod profile
-watchEffect(() => {
-  const serverName = config.serverDisplayName;
-  const displayName = mod.value?.displayName || modProfileName.value;
-
-  useHead({
-    title: displayName
-      ? `${displayName} - Mod Profile | ${serverName}`
-      : 'Mod Profile',
-  });
-});
+// Page title: a computed registered once in setup (#583).
+useHead(
+  computed(() => {
+    const displayName = mod.value?.displayName || modProfileName.value;
+    return {
+      title: displayName
+        ? `${displayName} - Mod Profile | ${config.serverDisplayName}`
+        : 'Mod Profile',
+    };
+  })
+);
 </script>
 
 <template>
