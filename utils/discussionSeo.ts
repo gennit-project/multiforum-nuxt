@@ -1,3 +1,5 @@
+import removeMarkdown from 'remove-markdown';
+
 /**
  * Pure builders for the discussion detail page's SEO/social metadata and
  * schema.org structured data, extracted from the page's `metaData` computed so
@@ -11,7 +13,21 @@ export function truncateDescription(
   text: string,
   max: number = DESCRIPTION_MAX_LENGTH
 ): string {
-  return text.length > max ? `${text.substring(0, max)}...` : text;
+  return text.length > max ? `${text.substring(0, max).trimEnd()}...` : text;
+}
+
+/**
+ * Meta/OG/Twitter/JSON-LD description from a markdown body: strip the markdown
+ * (emphasis, lists, headings, links, images, code fences, inline HTML), collapse
+ * whitespace to single spaces, then truncate. Without this, search results and
+ * link previews showed raw syntax like `**On PC (Windows):**` (issue #584).
+ */
+export function toMetaDescription(
+  markdown: string,
+  max: number = DESCRIPTION_MAX_LENGTH
+): string {
+  const plain = removeMarkdown(markdown).replace(/\s+/g, ' ').trim();
+  return truncateDescription(plain, max);
 }
 
 export type DiscussionSeoSource = {
@@ -116,7 +132,7 @@ export function buildDiscussionHead(
 
   const title = discussion.title || 'Discussion';
   const description = discussion.body
-    ? truncateDescription(discussion.body)
+    ? toMetaDescription(discussion.body)
     : fallbackDescription(serverDisplayName);
   const imageUrl = discussion.coverImageURL || '';
   const url = `${baseUrl}/forums/${channelId}/discussions/${discussionId}`;

@@ -35,6 +35,15 @@ describe('buildEventSeoMeta', () => {
       }).description
     ).toBe('Come hang out');
   });
+
+  it('strips markdown from the event description', () => {
+    expect(
+      buildEventSeoMeta({
+        ...params,
+        event: { title: 'Meetup', description: '**Bring** a [snack](https://x.test)' },
+      }).description
+    ).toBe('Bring a snack');
+  });
 });
 
 describe('buildEventStructuredData', () => {

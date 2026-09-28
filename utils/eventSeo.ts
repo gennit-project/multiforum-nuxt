@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { truncateDescription } from '@/utils/discussionSeo';
+import { toMetaDescription } from '@/utils/discussionSeo';
 
 /**
  * Pure builders for EventDetail's SEO metadata and schema.org structured data,
@@ -28,7 +28,7 @@ const eventTitle = (event: EventSeoData): string => event.title || 'Event';
 
 const eventDescription = (event: EventSeoData): string => {
   if (event.description) {
-    return truncateDescription(event.description);
+    return toMetaDescription(event.description);
   }
   return `${eventTitle(event)} - Event on ${formatEventDate(event.startTime || '')}`;
 };
