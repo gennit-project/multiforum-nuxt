@@ -16,7 +16,7 @@ importers:
     dependencies:
       '@apollo/client':
         specifier: ^3.13.5
-        version: 3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.1))(graphql@16.14.2)
+        version: 3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.3))(graphql@16.14.2)
       '@auth0/auth0-nuxt':
         specifier: ^1.1.0
         version: 1.1.0
@@ -73,7 +73,7 @@ importers:
         version: 1.38.0
       '@vue/apollo-composable':
         specifier: ^4.2.2
-        version: 4.2.2(@apollo/client@3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.1))(graphql@16.14.2))(graphql@16.14.2)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+        version: 4.2.2(@apollo/client@3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.3))(graphql@16.14.2))(graphql@16.14.2)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
       axios:
         specifier: ^1.18.1
         version: 1.18.1
@@ -191,7 +191,7 @@ importers:
         version: 2.18.1
       '@nuxtjs/apollo':
         specifier: ^5.0.0-alpha.15
-        version: 5.0.0-alpha.16(crossws@0.3.5)(magicast@0.5.3)(rollup@4.62.2)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))(ws@8.21.1)
+        version: 5.0.0-alpha.16(crossws@0.3.5)(magicast@0.5.3)(rollup@4.62.2)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))(ws@8.21.3)
       '@nuxtjs/google-fonts':
         specifier: ^3.2.0
         version: 3.2.0(magicast@0.5.3)
@@ -256,8 +256,8 @@ importers:
         specifier: ^17.7.0
         version: 17.7.0
       happy-dom:
-        specifier: ^20.11.1
-        version: 20.11.1
+        specifier: ^20.14.5
+        version: 20.14.5
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -293,7 +293,7 @@ importers:
         version: 8.2.0(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0)
       vitest:
         specifier: ^4.1.9
-        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.11.1)(jsdom@29.1.1(@noble/hashes@2.2.0))(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0))
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.14.5)(jsdom@29.1.1(@noble/hashes@2.2.0))(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0))
       vue-tsc:
         specifier: ^3.3.11
         version: 3.3.11(typescript@6.0.3)
@@ -4795,8 +4795,8 @@ packages:
     resolution: {integrity: sha512-TWrgLOFUQTH994YUyl1yT4uyavY5nNB5muff+RtWaqNVCAK408b5ZnnbNAUEWLTCpum9w6arT70i1XdQ4UeOPA==}
     engines: {node: '>=0.12'}
 
-  entities@8.0.0:
-    resolution: {integrity: sha512-zwfzJecQ/Uej6tusMqwAqU/6KL2XaB2VZ2Jg54Je6ahNBGNH6Ek6g3jjNCF0fG9EWQKGZNddNjU5F1ZQn/sBnA==}
+  entities@8.1.0:
+    resolution: {integrity: sha512-kxL7msIffSuh9aaFAMD7rxAIuTRMAHMeBtgHW2yUdWw732ZNh4MehkF2gdjvtdmikkaIP9bFDDJOPlsvm7avrA==}
     engines: {node: '>=20.19.0'}
 
   env-paths@2.2.1:
@@ -5307,8 +5307,8 @@ packages:
   h3@1.15.11:
     resolution: {integrity: sha512-L3THSe2MPeBwgIZVSH5zLdBBU90TOxarvhK9d04IDY2AmVS8j2Jz2LIWtwsGOU3lu2I5jCN7FNvVfY2+XyF+mg==}
 
-  happy-dom@20.11.1:
-    resolution: {integrity: sha512-XSt8tMzbW9ymE7687xztkO1ckR7qJNQ3LywY9vlYGhGi3zXrGBHuUo2Cl1ztZaICW+1eAGdkLbj6iwVqDT33kg==}
+  happy-dom@20.14.5:
+    resolution: {integrity: sha512-x/RzkpWO40bTjIoT30iQtt64FLLmH/iRcUCN2X//bLx7H3ifkdfPXyqsro/OYtqzIAhiLMMA7mmiOR9C3NOKjQ==}
     engines: {node: '>=20.0.0'}
 
   has-flag@4.0.0:
@@ -8022,8 +8022,8 @@ packages:
     resolution: {integrity: sha512-42AtmgqjV+X1VpdOfyTGOYRi0/zsoLqtXQckTmqTeybT+BDIbM/Guxo7x3pE2vtpr1ok6xRqM9OpBe+Jyoqyww==}
     engines: {node: '>=18'}
 
-  ws@8.21.1:
-    resolution: {integrity: sha512-+0NTnW77fFN/DjQi6k/Sq/Yvk4Sgajw7urW8V+asjXnRgDs9gyGkdb7EzgfhA4goXsRIZKE28fzIXBHEzhuiWw==}
+  ws@8.21.3:
+    resolution: {integrity: sha512-201TZ/kPWxoPr/OKWjquZR1SWKXcvxdH+e1xrx89b3YbmzLMFCLfnaG1HFIgWzJOEWZ7MvpK++odZufgYR50Rw==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -8132,7 +8132,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@apollo/client@3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.1))(graphql@16.14.2)':
+  '@apollo/client@3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.3))(graphql@16.14.2)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.14.2)
       '@wry/caches': 1.0.1
@@ -8149,7 +8149,7 @@ snapshots:
       tslib: 2.8.1
       zen-observable-ts: 1.2.5
     optionalDependencies:
-      graphql-ws: 6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.1)
+      graphql-ws: 6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.3)
     transitivePeerDependencies:
       - '@types/react'
 
@@ -9265,10 +9265,10 @@ snapshots:
       '@graphql-tools/utils': 11.2.2(graphql@16.14.2)
       '@whatwg-node/disposablestack': 0.0.6
       graphql: 16.14.2
-      graphql-ws: 6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.1)
-      isows: 1.0.7(ws@8.21.1)
+      graphql-ws: 6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.3)
+      isows: 1.0.7(ws@8.21.3)
       tslib: 2.8.1
-      ws: 8.21.1
+      ws: 8.21.3
     transitivePeerDependencies:
       - '@fastify/websocket'
       - bufferutil
@@ -9295,9 +9295,9 @@ snapshots:
       '@graphql-tools/utils': 11.2.2(graphql@16.14.2)
       '@types/ws': 8.18.1
       graphql: 16.14.2
-      isomorphic-ws: 5.0.0(ws@8.21.1)
+      isomorphic-ws: 5.0.0(ws@8.21.3)
       tslib: 2.8.1
-      ws: 8.21.1
+      ws: 8.21.3
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -9419,10 +9419,10 @@ snapshots:
       '@whatwg-node/fetch': 0.10.13
       '@whatwg-node/promise-helpers': 1.3.2
       graphql: 16.14.2
-      isomorphic-ws: 5.0.0(ws@8.21.1)
+      isomorphic-ws: 5.0.0(ws@8.21.3)
       sync-fetch: 0.6.0
       tslib: 2.8.1
-      ws: 8.21.1
+      ws: 8.21.3
     transitivePeerDependencies:
       - '@fastify/websocket'
       - '@types/node'
@@ -10010,7 +10010,7 @@ snapshots:
       vite-plugin-inspect: 11.4.1(@nuxt/kit@4.5.2(magic-string@0.30.21)(magicast@0.5.3)(oxc-parser@0.133.0)(rolldown@1.2.2)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.2)(rollup@4.62.2)(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0))))(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0))
       vite-plugin-vue-tracer: 1.4.0(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0))(vue@3.5.40(typescript@6.0.3))
       which: 6.0.1
-      ws: 8.21.1
+      ws: 8.21.3
     transitivePeerDependencies:
       - bufferutil
       - magic-string
@@ -10367,18 +10367,18 @@ snapshots:
       - vue-tsc
       - yaml
 
-  '@nuxtjs/apollo@5.0.0-alpha.16(crossws@0.3.5)(magicast@0.5.3)(rollup@4.62.2)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))(ws@8.21.1)':
+  '@nuxtjs/apollo@5.0.0-alpha.16(crossws@0.3.5)(magicast@0.5.3)(rollup@4.62.2)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))(ws@8.21.3)':
     dependencies:
-      '@apollo/client': 3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.1))(graphql@16.14.2)
+      '@apollo/client': 3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.3))(graphql@16.14.2)
       '@nuxt/kit': 4.4.8(magicast@0.5.3)
       '@rollup/plugin-graphql': 2.0.5(graphql@16.14.2)(rollup@4.62.2)
-      '@vue/apollo-composable': 4.2.2(@apollo/client@3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.1))(graphql@16.14.2))(graphql@16.14.2)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
-      '@vue/apollo-option': 4.2.2(@apollo/client@3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.1))(graphql@16.14.2))(vue@3.5.40(typescript@6.0.3))
+      '@vue/apollo-composable': 4.2.2(@apollo/client@3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.3))(graphql@16.14.2))(graphql@16.14.2)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))
+      '@vue/apollo-option': 4.2.2(@apollo/client@3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.3))(graphql@16.14.2))(vue@3.5.40(typescript@6.0.3))
       defu: 6.1.7
       destr: 2.0.5
       graphql: 16.14.2
       graphql-tag: 2.12.7(graphql@16.14.2)
-      graphql-ws: 6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.1)
+      graphql-ws: 6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.3)
       jiti: 2.7.0
       ohash: 2.0.11
     transitivePeerDependencies:
@@ -11780,7 +11780,7 @@ snapshots:
       obug: 2.1.3
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.11.1)(jsdom@29.1.1(@noble/hashes@2.2.0))(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0))
+      vitest: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.14.5)(jsdom@29.1.1(@noble/hashes@2.2.0))(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0))
 
   '@vitest/expect@4.1.9':
     dependencies:
@@ -11826,7 +11826,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.17
       tinyrainbow: 3.1.0
-      vitest: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.11.1)(jsdom@29.1.1(@noble/hashes@2.2.0))(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0))
+      vitest: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.14.5)(jsdom@29.1.1(@noble/hashes@2.2.0))(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0))
 
   '@vitest/utils@4.1.9':
     dependencies:
@@ -11856,9 +11856,9 @@ snapshots:
     optionalDependencies:
       vue: 3.5.40(typescript@6.0.3)
 
-  '@vue/apollo-composable@4.2.2(@apollo/client@3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.1))(graphql@16.14.2))(graphql@16.14.2)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
+  '@vue/apollo-composable@4.2.2(@apollo/client@3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.3))(graphql@16.14.2))(graphql@16.14.2)(typescript@6.0.3)(vue@3.5.40(typescript@6.0.3))':
     dependencies:
-      '@apollo/client': 3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.1))(graphql@16.14.2)
+      '@apollo/client': 3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.3))(graphql@16.14.2)
       graphql: 16.14.2
       throttle-debounce: 5.0.2
       ts-essentials: 9.4.2(typescript@6.0.3)
@@ -11867,9 +11867,9 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@vue/apollo-option@4.2.2(@apollo/client@3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.1))(graphql@16.14.2))(vue@3.5.40(typescript@6.0.3))':
+  '@vue/apollo-option@4.2.2(@apollo/client@3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.3))(graphql@16.14.2))(vue@3.5.40(typescript@6.0.3))':
     dependencies:
-      '@apollo/client': 3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.1))(graphql@16.14.2)
+      '@apollo/client': 3.14.1(graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.3))(graphql@16.14.2)
       throttle-debounce: 5.0.2
       vue: 3.5.40(typescript@6.0.3)
 
@@ -12729,7 +12729,7 @@ snapshots:
     dependencies:
       domelementtype: 3.0.0
       domhandler: 6.0.1
-      entities: 8.0.0
+      entities: 8.1.0
 
   domelementtype@2.3.0: {}
 
@@ -12807,7 +12807,7 @@ snapshots:
 
   entities@7.0.1: {}
 
-  entities@8.0.0: {}
+  entities@8.1.0: {}
 
   env-paths@2.2.1: {}
 
@@ -13386,12 +13386,12 @@ snapshots:
       graphql: 16.14.2
       tslib: 2.8.1
 
-  graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.1):
+  graphql-ws@6.0.8(crossws@0.3.5)(graphql@16.14.2)(ws@8.21.3):
     dependencies:
       graphql: 16.14.2
     optionalDependencies:
       crossws: 0.3.5
-      ws: 8.21.1
+      ws: 8.21.3
 
   graphql@16.14.2: {}
 
@@ -13411,7 +13411,7 @@ snapshots:
       ufo: 1.6.4
       uncrypto: 0.1.3
 
-  happy-dom@20.11.1:
+  happy-dom@20.14.5:
     dependencies:
       '@types/node': 26.1.2
       '@types/whatwg-mimetype': 3.0.2
@@ -13419,7 +13419,7 @@ snapshots:
       buffer-image-size: 0.6.4
       entities: 7.0.1
       whatwg-mimetype: 3.0.0
-      ws: 8.21.1
+      ws: 8.21.3
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -13466,7 +13466,7 @@ snapshots:
       domelementtype: 3.0.0
       domhandler: 6.0.1
       domutils: 4.0.2
-      entities: 8.0.0
+      entities: 8.1.0
 
   http-errors@2.0.1:
     dependencies:
@@ -13684,13 +13684,13 @@ snapshots:
 
   isexe@4.0.0: {}
 
-  isomorphic-ws@5.0.0(ws@8.21.1):
+  isomorphic-ws@5.0.0(ws@8.21.3):
     dependencies:
-      ws: 8.21.1
+      ws: 8.21.3
 
-  isows@1.0.7(ws@8.21.1):
+  isows@1.0.7(ws@8.21.3):
     dependencies:
-      ws: 8.21.1
+      ws: 8.21.3
 
   istanbul-lib-coverage@3.2.2: {}
 
@@ -14799,7 +14799,7 @@ snapshots:
 
   parse5@8.0.1:
     dependencies:
-      entities: 8.0.0
+      entities: 8.1.0
 
   parseurl@1.3.3: {}
 
@@ -16092,7 +16092,7 @@ snapshots:
       terser: 5.48.0
       yaml: 2.9.0
 
-  vitest@4.1.9(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.11.1)(jsdom@29.1.1(@noble/hashes@2.2.0))(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0)):
+  vitest@4.1.9(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(happy-dom@20.14.5)(jsdom@29.1.1(@noble/hashes@2.2.0))(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0)):
     dependencies:
       '@vitest/expect': 4.1.9
       '@vitest/mocker': 4.1.9(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.101.0)(terser@5.48.0)(yaml@2.9.0))
@@ -16119,7 +16119,7 @@ snapshots:
       '@types/node': 26.1.2
       '@vitest/coverage-v8': 4.1.9(vitest@4.1.9)
       '@vitest/ui': 4.1.9(vitest@4.1.9)
-      happy-dom: 20.11.1
+      happy-dom: 20.14.5
       jsdom: 29.1.1(@noble/hashes@2.2.0)
     transitivePeerDependencies:
       - msw
@@ -16314,7 +16314,7 @@ snapshots:
       string-width: 7.2.0
       strip-ansi: 7.2.0
 
-  ws@8.21.1: {}
+  ws@8.21.3: {}
 
   wsl-utils@0.3.1:
     dependencies:
