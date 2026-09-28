@@ -1,4 +1,4 @@
-import { truncateDescription } from '@/utils/discussionSeo';
+import { toMetaDescription } from '@/utils/discussionSeo';
 
 /**
  * Pure builder for the wiki page's SEO/social metadata and schema.org Article
@@ -58,7 +58,7 @@ export function buildWikiPageHead(
   const wikiPage = wikiPages[0];
   const title = wikiPage?.title || 'Wiki Page';
   const description = wikiPage?.body
-    ? truncateDescription(wikiPage.body)
+    ? toMetaDescription(wikiPage.body)
     : `View this wiki page on ${serverDisplayName}`;
   const pageUrl = `${baseUrl}/forums/${forumId}/wiki/${slug}`;
 
@@ -210,7 +210,7 @@ export function buildWikiHomeHead(
 
   const title = wikiHomePage.title || `${forumId} Wiki`;
   const description = wikiHomePage.body
-    ? truncateDescription(wikiHomePage.body)
+    ? toMetaDescription(wikiHomePage.body)
     : `Explore the wiki for ${forumId} on ${serverDisplayName}`;
 
   return {

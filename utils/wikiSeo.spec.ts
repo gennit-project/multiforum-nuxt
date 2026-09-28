@@ -31,6 +31,23 @@ describe('buildWikiPageHead', () => {
     expect(head?.title).toBe('Getting Started | cats Wiki | Topical');
   });
 
+  // #584: the example from the issue, which rendered as raw markdown.
+  it('uses plain text for the description, og and twitter descriptions', () => {
+    const head = buildWikiPageHead({
+      ...BASE,
+      wikiPages: [{ title: 'Screenshots', body: '\n**On PC (Windows):**\n\n* **In-game shortcut:** Press **C** on your keyboard to take a screenshot.' }],
+    });
+    expect(
+      head?.meta
+        .filter((m) => /description$/.test(m.name || m.property || ''))
+        .map((m) => m.content)
+    ).toEqual(
+      Array(3).fill(
+        'On PC (Windows): In-game shortcut: Press C on your keyboard to take a screenshot.'
+      )
+    );
+  });
+
   it('truncates a long body for the description', () => {
     const head = buildWikiPageHead({
       ...BASE,

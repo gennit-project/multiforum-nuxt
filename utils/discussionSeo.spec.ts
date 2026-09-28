@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   truncateDescription,
+  toMetaDescription,
   buildDiscussionHead,
   buildDiscussionStructuredData,
   buildEditDiscussionHead,
@@ -90,6 +91,15 @@ describe('buildDiscussionHead - loaded', () => {
     expect(head.meta?.some((m) => m.property === 'og:image')).toBe(false);
   });
 
+  it('strips markdown from the body for the description meta', () => {
+    const head = buildDiscussionHead({
+      ...BASE,
+      discussions: [{ ...discussion, body: '## Tips\n\nUse **bold** [links](https://x.test)' }],
+    });
+    const desc = head.meta?.find((m) => m.name === 'description');
+    expect(desc?.content).toBe('Tips Use bold links');
+  });
+
   it('truncates a long body for the description meta', () => {
     const head = buildDiscussionHead({
       ...BASE,
@@ -161,5 +171,27 @@ describe('buildEditDiscussionHead', () => {
         serverDisplayName: 'Topical',
       }).meta
     ).toEqual([]);
+  });
+});
+
+describe('toMetaDescription', () => {
+  it.each([
+    [
+      '\n**On PC (Windows):**\n\n* **In-game shortcut:** Press **C**',
+      'On PC (Windows): In-game shortcut: Press C',
+    ],
+    ['# Heading\n\nBody text', 'Heading Body text'],
+    ['See [the docs](https://example.test) and ![a porch](p.png)', 'See the docs and a porch'],
+    ['> quoted <b>html</b>', 'quoted html'],
+    ['```js\ncode()\n```', 'code()'],
+    ['plain text', 'plain text'],
+  ])('turns %j into plain text', (markdown, expected) => {
+    expect(toMetaDescription(markdown)).toBe(expected);
+  });
+
+  it('truncates after stripping, without a space before the ellipsis', () => {
+    expect(toMetaDescription(`**${'word '.repeat(40).trimEnd()}**`)).toBe(
+      `${'word '.repeat(32).trimEnd()}...`
+    );
   });
 });
