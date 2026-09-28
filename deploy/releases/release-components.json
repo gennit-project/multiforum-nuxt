@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "images": {
     "database": "neo4j:5.1.0",
-    "backend": "ghcr.io/gennit-project/multiforum-backend@sha256:89a593269971952a622f2a504dab76d358e6dc1e1f7fc69dcbe30d680635d22d",
+    "backend": "ghcr.io/gennit-project/multiforum-backend@sha256:d7e934ddba4f4709cf1617ff8d4db8d8488a103fee4c4d765101adf6672e50bf",
     "caddy": "caddy:2.11.4-alpine"
   }
 }

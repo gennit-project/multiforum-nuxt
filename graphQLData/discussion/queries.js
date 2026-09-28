@@ -188,6 +188,10 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
       loggedInUsername: $loggedInUsername
     ) {
       aggregateDiscussionCount
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
       discussions {
         id
         title

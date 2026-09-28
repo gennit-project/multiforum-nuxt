@@ -39,6 +39,11 @@ const listResult = (
   getSiteWideDiscussionList: {
     discussions,
     aggregateDiscussionCount: aggregate ?? discussions.length,
+    pageInfo: {
+      endCursor: discussions.length > 0 ? `cursor-${discussions.at(-1)?.id}` : null,
+      hasNextPage: (aggregate ?? discussions.length) > discussions.length,
+      __typename: 'DiscussionListPageInfo',
+    },
     __typename: 'DiscussionListResponse',
   },
 });
@@ -129,6 +134,25 @@ describe('SitewideDownloadList', () => {
     const wrapper = mountList();
     await wrapper.find('.load-more-stub').trigger('click');
     expect(fetchMore).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads the next download page from the returned cursor', async () => {
+    const fetchMore = vi.fn();
+    setupQueries(
+      createQueryMock(listResult([makeDownload('1')], 5), {
+        ...({ fetchMore } as object),
+      })
+    );
+    const wrapper = mountList();
+
+    await wrapper.find('.load-more-stub').trigger('click');
+
+    expect(fetchMore.mock.calls[0][0].variables.options).toEqual({
+      after: 'cursor-1',
+      limit: 15,
+      sort: 'hot',
+      timeFrame: 'month',
+    });
   });
 
   it('merges the next download page into the existing query result', async () => {
