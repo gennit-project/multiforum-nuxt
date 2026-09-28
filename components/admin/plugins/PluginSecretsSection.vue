@@ -229,7 +229,7 @@ const getSecretControlId = (
     <template #content>
       <div class="space-y-3">
         <div
-          class="rounded-md border border-sky-200 bg-sky-50 p-3 text-sm text-sky-900 dark:border-sky-700 dark:bg-sky-900/30 dark:text-sky-200"
+          class="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-200"
         >
           <p class="font-medium">These secrets are retained for rollback compatibility.</p>
           <p class="mt-1">

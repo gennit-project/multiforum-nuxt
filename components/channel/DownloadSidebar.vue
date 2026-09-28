@@ -209,7 +209,7 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
               scanStatus === 'PENDING' || scanStatus === 'SUSPICIOUS',
             'bg-red-50 text-red-900 dark:bg-red-900/30 dark:text-red-200':
               scanStatus === 'INFECTED',
-            'bg-sky-50 text-sky-900 dark:bg-sky-900/30 dark:text-sky-200':
+            'bg-blue-50 text-blue-900 dark:bg-blue-900/30 dark:text-blue-200':
               scanStatus === 'FAILED',
           }"
           data-testid="download-scan-status"

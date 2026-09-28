@@ -99,7 +99,7 @@ const emit = defineEmits([
 ]);
 
 const writeReplyStyle =
-  'block h-10 w-full rounded-lg border-gray-300 dark:bg-gray-700 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:ring-gray-9';
+  'block h-10 w-full rounded-lg border-gray-300 dark:bg-gray-700 text-sm shadow-sm focus:border-orange-500 focus:ring-orange-500 dark:border-gray-800 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:ring-gray-9';
 
 const botMentionsBlocked = computed(() => {
   return !props.allowBotMentions && hasBotMention(props.createFormValues?.text);

@@ -103,7 +103,7 @@ const onTogglePermission = async (
 
 <template>
   <div
-    class="dark:bg-slate-800 rounded-lg border border-gray-200 p-4 shadow-sm dark:border-gray-700"
+    class="dark:bg-gray-800 rounded-lg border border-gray-200 p-4 shadow-sm dark:border-gray-700"
   >
     <div class="mb-4 space-y-1">
       <h2 class="font-semibold text-lg text-gray-900 dark:text-white">
@@ -131,7 +131,7 @@ const onTogglePermission = async (
       <div
         v-for="(role, roleIndex) in sortedRoles"
         :key="role.name ?? role.channelUniqueName ?? roleIndex"
-        class="bg-gray-50 dark:bg-slate-900/60 rounded-md border border-gray-200 p-4 dark:border-gray-700"
+        class="bg-gray-50 dark:bg-gray-900/60 rounded-md border border-gray-200 p-4 dark:border-gray-700"
       >
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div class="space-y-1">
@@ -159,7 +159,7 @@ const onTogglePermission = async (
           <label
             v-for="permission in permissionKeys"
             :key="permission"
-            class="dark:bg-slate-800 flex items-center justify-between rounded border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-600"
+            class="dark:bg-gray-800 flex items-center justify-between rounded border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-600"
             :data-test="`permission-${permission}`"
           >
             <span class="text-gray-800 dark:text-gray-100">

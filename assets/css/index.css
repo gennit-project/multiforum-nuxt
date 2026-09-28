@@ -34,9 +34,13 @@
   --text-9xl: 7rem;
 
   --color-*: initial;
+  /* Custom palette. Only colors defined here generate CSS: a class like
+     bg-slate-100 or bg-gray-975 silently produces nothing. Each scale runs
+     50-950; tests/unit/themePalette.spec.ts fails on undefined color classes. */
   --color-white: #ffffff;
   --color-black: #000000;
 
+  --color-gray-950: #010409;
   --color-gray-900: #0d1117;
   --color-gray-800: #161b22;
   --color-gray-700: #21262d;
@@ -46,7 +50,9 @@
   --color-gray-300: #c9d1d9;
   --color-gray-200: #e6edf3;
   --color-gray-100: #f0f6fc;
+  --color-gray-50: #f6f8fa;
 
+  --color-blue-950: #07111c;
   --color-blue-900: #0e1e2f;
   --color-blue-800: #3a464f;
   --color-blue-700: #385970;
@@ -56,7 +62,9 @@
   --color-blue-300: #b3daf5;
   --color-blue-200: #d1f6ff;
   --color-blue-100: #ebf2f7;
+  --color-blue-50: #f5f9fc;
 
+  --color-red-950: #1a0808;
   --color-red-900: #2b0e0e;
   --color-red-800: #3c1212;
   --color-red-700: #4e1717;
@@ -66,7 +74,9 @@
   --color-red-300: #f4b5bd;
   --color-red-200: #f9e3e5;
   --color-red-100: #fdf5f6;
+  --color-red-50: #fffbfb;
 
+  --color-purple-950: #12081a;
   --color-purple-900: #1e0e2b;
   --color-purple-800: #27123c;
   --color-purple-700: #33174e;
@@ -76,7 +86,9 @@
   --color-purple-300: #dcb5f4;
   --color-purple-200: #f1e3f9;
   --color-purple-100: #faf5fd;
+  --color-purple-50: #fdfbfe;
 
+  --color-yellow-950: #1a1108;
   --color-yellow-900: #2b1c0e;
   --color-yellow-800: #3c2712;
   --color-yellow-700: #4e3317;
@@ -86,7 +98,9 @@
   --color-yellow-300: #f4dcb5;
   --color-yellow-200: #f9f1e3;
   --color-yellow-100: #fdfaf5;
+  --color-yellow-50: #fffefb;
 
+  --color-green-950: #071207;
   --color-green-900: #0e1e0e;
   --color-green-800: #1a331a;
   --color-green-700: #235023;
@@ -96,6 +110,7 @@
   --color-green-300: #b5f4b5;
   --color-green-200: #e3f9e3;
   --color-green-100: #f5fdf5;
+  --color-green-50: #fafffa;
 
   --color-orange-950: #431407;
   --color-orange-900: #7c2d12;
@@ -107,6 +122,7 @@
   --color-orange-300: #fdba74;
   --color-orange-200: #fed7aa;
   --color-orange-100: #ffedd5;
+  --color-orange-50: #fff7ed;
 
   --color-amber-950: #451a03;
   --color-amber-900: #78350f;

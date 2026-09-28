@@ -70,10 +70,10 @@ const albumForDisplay = computed(() => props.discussion.Album as Album | null);
 
 <template>
   <article
-    class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_18px_45px_-28px_rgba(15,23,42,0.45)] dark:border-gray-700 dark:bg-gray-800"
+    class="overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-[0_18px_45px_-28px_rgba(15,23,42,0.45)] dark:border-gray-700 dark:bg-gray-800"
   >
     <div
-      class="border-b border-slate-200/70 bg-slate-50/85 px-5 py-3 dark:border-gray-700 dark:bg-gray-900/40"
+      class="border-b border-gray-200/70 bg-gray-50/85 px-5 py-3 dark:border-gray-700 dark:bg-gray-900/40"
     >
       <div class="flex items-center justify-between gap-3">
         <NuxtLink
@@ -126,7 +126,7 @@ const albumForDisplay = computed(() => props.discussion.Album as Album | null);
 
       <div
         v-if="discussion.body"
-        class="rounded-xl bg-slate-50/80 px-4 py-3 text-sm text-gray-700 dark:bg-gray-900/45 dark:text-gray-300"
+        class="rounded-xl bg-gray-50/80 px-4 py-3 text-sm text-gray-700 dark:bg-gray-900/45 dark:text-gray-300"
       >
         <div class="line-clamp-3">
           <MarkdownRenderer :text="discussion.body" font-size="small" />
@@ -135,7 +135,7 @@ const albumForDisplay = computed(() => props.discussion.Album as Album | null);
 
       <div
         v-if="discussion.Album?.Images?.length"
-        class="overflow-hidden rounded-xl border border-slate-200 bg-black dark:border-gray-700"
+        class="overflow-hidden rounded-xl border border-gray-200 bg-black dark:border-gray-700"
       >
         <DiscussionAlbum
           :album="albumForDisplay"
@@ -180,7 +180,7 @@ const albumForDisplay = computed(() => props.discussion.Album as Album | null);
 
       <div
         v-if="visibleTags.length > 0"
-        class="flex flex-wrap gap-2 border-t border-slate-200/80 pt-4 dark:border-gray-700"
+        class="flex flex-wrap gap-2 border-t border-gray-200/80 pt-4 dark:border-gray-700"
       >
         <TagComponent
           v-for="(tag, index) in visibleTags"

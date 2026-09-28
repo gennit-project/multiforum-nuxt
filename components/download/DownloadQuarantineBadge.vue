@@ -16,7 +16,7 @@ const badge = computed(() => {
     case 'SUSPICIOUS':
       return { label: 'Quarantined', classes: 'bg-amber-600 text-black' };
     case 'FAILED':
-      return { label: 'Scan failed', classes: 'bg-sky-700 text-white' };
+      return { label: 'Scan failed', classes: 'bg-blue-700 text-white' };
     default:
       return { label: 'Scanning', classes: 'bg-gray-800 text-white' };
   }

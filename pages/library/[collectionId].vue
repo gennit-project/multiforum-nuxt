@@ -415,7 +415,7 @@ const handleDelete = async () => {
                     </p>
                     <div class="mt-4 flex flex-wrap items-center gap-2 text-sm">
                       <span
-                        class="rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 font-medium text-emerald-700 dark:border-emerald-500/35 dark:bg-emerald-500/12 dark:text-emerald-300"
+                        class="rounded-full border border-green-300 bg-green-50 px-3 py-1 font-medium text-green-700 dark:border-green-500/35 dark:bg-green-500/12 dark:text-green-300"
                       >
                         {{ collectionTypeLabel.toLowerCase() }}
                       </span>
@@ -453,7 +453,7 @@ const handleDelete = async () => {
                   >
                     <button
                       type="button"
-                      class="inline-flex items-center rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-800 shadow-sm transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-70 lg:px-3 lg:py-2 lg:text-sm dark:border-emerald-500/35 dark:bg-emerald-500/12 dark:text-emerald-200 dark:hover:bg-emerald-500/20"
+                      class="inline-flex items-center rounded-full border border-green-300 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-800 shadow-sm transition hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-70 lg:px-3 lg:py-2 lg:text-sm dark:border-green-500/35 dark:bg-green-500/12 dark:text-green-200 dark:hover:bg-green-500/20"
                       :disabled="!collectionIsPublic"
                       :title="
                         collectionIsPublic
@@ -844,7 +844,7 @@ const handleDelete = async () => {
         >
           <template #icon>
             <svg
-              class="h-6 w-6 text-emerald-600 dark:text-emerald-400"
+              class="h-6 w-6 text-green-600 dark:text-green-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

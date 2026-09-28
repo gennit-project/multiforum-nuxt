@@ -141,7 +141,7 @@ const pipelinePath = (item: ReviewItem) => {
             :class="item.scanStatus === 'INFECTED'
               ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'
             : item.scanStatus === 'FAILED'
-              ? 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-200'
+              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200'
               : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200'"
           >
             {{ item.scanStatus }}

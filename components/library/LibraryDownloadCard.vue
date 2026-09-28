@@ -48,11 +48,11 @@ withDefaults(
 
 <template>
   <article
-    class="group overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_18px_45px_-28px_rgba(15,23,42,0.45)] dark:border-gray-700 dark:bg-gray-800"
+    class="group overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-[0_18px_45px_-28px_rgba(15,23,42,0.45)] dark:border-gray-700 dark:bg-gray-800"
   >
     <NuxtLink
       :to="downloadLink"
-      class="relative block aspect-16/10 overflow-hidden bg-slate-100 dark:bg-gray-700"
+      class="relative block aspect-16/10 overflow-hidden bg-gray-100 dark:bg-gray-700"
     >
       <AppImage
         v-if="previewImageUrl"
@@ -67,7 +67,7 @@ withDefaults(
       />
       <div
         v-else
-        class="flex h-full w-full items-center justify-center bg-linear-to-br from-orange-50 via-white to-slate-100 text-gray-400 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700"
+        class="flex h-full w-full items-center justify-center bg-linear-to-br from-orange-50 via-white to-gray-100 text-gray-400 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700"
       >
         <svg
           class="h-12 w-12"
@@ -146,7 +146,7 @@ withDefaults(
 
       <div
         v-if="download.Tags?.length"
-        class="flex flex-wrap gap-2 border-t border-slate-200/80 pt-3 dark:border-gray-700"
+        class="flex flex-wrap gap-2 border-t border-gray-200/80 pt-3 dark:border-gray-700"
       >
         <TagComponent
           v-for="(tag, index) in download.Tags.slice(0, 4)"

@@ -39,7 +39,7 @@ const channelIconSrc = computed(
 
 <template>
   <article
-    class="rounded-2xl border border-slate-200/80 bg-white p-5 dark:border-gray-700 dark:bg-gray-800"
+    class="rounded-2xl border border-gray-200/80 bg-white p-5 dark:border-gray-700 dark:bg-gray-800"
   >
     <div class="flex items-start justify-between gap-4">
       <NuxtLink
@@ -98,7 +98,7 @@ const channelIconSrc = computed(
 
     <div
       v-if="channel.Tags?.length"
-      class="mt-4 flex flex-wrap gap-2 border-t border-slate-200/80 pt-4 dark:border-gray-700"
+      class="mt-4 flex flex-wrap gap-2 border-t border-gray-200/80 pt-4 dark:border-gray-700"
     >
       <TagComponent
         v-for="(tag, index) in channel.Tags.slice(0, 4)"
