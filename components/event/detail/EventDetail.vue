@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch, watchEffect } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import Tag from '@/components/TagComponent.vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_EVENT } from '@/graphQLData/event/queries';
@@ -21,8 +21,7 @@ import { stableRelativeTime } from '@/utils';
 import { isEventInThePast, hasEventStarted } from '@/utils/eventTiming';
 import {
   formatEventDate,
-  buildEventSeoMeta,
-  buildEventStructuredData,
+  buildEventHead,
 } from '@/utils/eventSeo';
 import 'md-editor-v3/lib/style.css';
 import EventFooter from '@/components/event/detail/EventFooter.vue';
@@ -348,38 +347,19 @@ const handleClickEditEventDescription = () => {
   eventDescriptionEditMode.value = true;
 };
 
-// Add SEO metadata for the event
-watchEffect(() => {
-  const forumName =
-    activeEventChannel.value?.Channel?.displayName || channelId.value || '';
-  const serverDisplayName = config.serverDisplayName;
-
-  useHead(
-    buildEventSeoMeta({
+// SEO metadata: built in a computed and registered once in setup (#583).
+useHead(
+  computed(() =>
+    buildEventHead({
       event: event.value,
       channelId: channelId.value,
-      forumName,
-      serverDisplayName,
+      forumName:
+        activeEventChannel.value?.Channel?.displayName || channelId.value || '',
+      serverDisplayName: config.serverDisplayName,
+      baseUrl: import.meta.env.VITE_BASE_URL,
     })
-  );
-
-  if (!event.value) return;
-
-  // Add structured data for rich results
-  useHead({
-    script: [
-      {
-        type: 'application/ld+json',
-        innerHTML: JSON.stringify(
-          buildEventStructuredData({
-            event: event.value,
-            baseUrl: import.meta.env.VITE_BASE_URL,
-          })
-        ),
-      },
-    ],
-  });
-});
+  )
+);
 </script>
 
 <template>

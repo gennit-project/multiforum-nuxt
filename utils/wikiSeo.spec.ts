@@ -79,7 +79,7 @@ describe('buildWikiPageHead', () => {
       ...BASE,
       wikiPages: [{ title: 'T', body: 'b', VersionAuthor: null }],
     });
-    const data = JSON.parse(head!.script![0].children);
+    const data = JSON.parse(head!.script![0].innerHTML);
     expect(data.author.name).toBe('Anonymous');
   });
 });
@@ -121,7 +121,7 @@ describe('buildWikiHomeHead', () => {
       ...HOME,
       channels: [{ wikiEnabled: true, WikiHomePage: null }],
     });
-    const data = JSON.parse(head!.script![0].children);
+    const data = JSON.parse(head!.script![0].innerHTML);
     expect(data['@type']).toBe('WebSite');
   });
 

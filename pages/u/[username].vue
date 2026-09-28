@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { config } from '@/config';
-import { computed, watchEffect } from 'vue';
+import { buildUserProfileHead } from '@/utils/profileSeo';
+import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_PUBLIC_USER_PROFILE } from '@/graphQLData/user/queries';
 import UserProfileSidebar from '@/components/user/UserProfileSidebar.vue';
@@ -102,69 +103,17 @@ const shouldShowProfileChannelFilter = computed(() => {
   });
 });
 
-// Add SEO metadata for the user profile
-watchEffect(() => {
-  if (!user.value) {
-    useHead({
-      title: username.value ? `${username.value} - Profile` : 'User Not Found',
-      meta: [
-        {
-          name: 'description',
-          content: 'The requested user profile could not be found.',
-        },
-      ],
-    });
-    return;
-  }
-
-  const userName = user.value.displayName || user.value.username;
-  const baseUrl = import.meta.env.VITE_BASE_URL;
-  const serverName = config.serverDisplayName;
-  const profilePic = user.value.profilePicURL || '';
-  const userBio = user.value.bio || `${userName}'s profile`;
-
-  // Calculate metrics for description
-  const discussionCount = user.value.discussionCount || 0;
-  const commentCount = user.value.commentCount || 0;
-  const eventsCount = user.value.eventsCount || 0;
-
-  const description =
-    userBio.length > 10
-      ? userBio.substring(0, 160) + (userBio.length > 160 ? '...' : '')
-      : `${userName} has posted ${discussionCount} discussions, ${commentCount} comments, and ${eventsCount} events on ${serverName}.`;
-
-  // Set basic SEO meta tags
-  useHead({
-    title: `${userName} | ${serverName}`,
-    meta: [
-      { name: 'description', content: description },
-      { property: 'og:image', content: profilePic },
-      { property: 'og:type', content: 'profile' },
-    ],
-  });
-
-  // Add structured data for rich results
-  useHead({
-    script: [
-      {
-        type: 'application/ld+json',
-        innerHTML: JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'Person',
-          name: userName,
-          description: description,
-          image: profilePic,
-          url: `${baseUrl}/u/${user.value.username}`,
-          memberOf: {
-            '@type': 'Organization',
-            name: serverName,
-            url: baseUrl,
-          },
-        }),
-      },
-    ],
-  });
-});
+// SEO metadata: built in a computed and registered once in setup (#583).
+useHead(
+  computed(() =>
+    buildUserProfileHead({
+      user: user.value,
+      username: username.value,
+      serverDisplayName: config.serverDisplayName,
+      baseUrl: import.meta.env.VITE_BASE_URL,
+    })
+  )
+);
 </script>
 
 <template>

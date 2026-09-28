@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { defineComponent, h, Suspense } from 'vue';
+import { defineComponent, h, nextTick, Suspense, unref } from 'vue';
 import { flushPromises } from '@vue/test-utils';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
@@ -119,6 +119,20 @@ beforeEach(() => {
 });
 
 describe('User profile container', () => {
+  it('titles the page with the user and server name', async () => {
+    await mountContainer();
+    expect(unref(harness.useHead.mock.calls[0][0]).title).toMatch(/ \| /);
+  });
+
+  // #583: the old watchEffect called useHead three times per run and re-ran
+  // on every data change, stacking head entries.
+  it('registers the page head once, even when the user data changes', async () => {
+    await mountContainer();
+    harness.resultRef.value = { users: [makeUser()] };
+    await nextTick();
+    expect(harness.useHead).toHaveBeenCalledTimes(1);
+  });
+
   it('renders the profile tabs once the user has loaded', async () => {
     const wrapper = await mountContainer();
     expect(wrapper.findComponent({ name: 'UserProfileTabs' }).exists()).toBe(true);
