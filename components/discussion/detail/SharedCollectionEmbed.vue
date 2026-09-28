@@ -34,7 +34,7 @@ const typeLabel = computed(() =>
         Shared Collection
       </p>
       <span
-        class="rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:border-emerald-500/35 dark:bg-emerald-500/12 dark:text-emerald-300"
+        class="rounded-full border border-green-300 bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700 dark:border-green-500/35 dark:bg-green-500/12 dark:text-green-300"
       >
         {{ typeLabel }}
       </span>

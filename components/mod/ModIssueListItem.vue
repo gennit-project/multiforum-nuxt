@@ -218,7 +218,7 @@ const relatedChannelNames = computed(() =>
           </span>
           <span
             v-if="isRelatedToWiki"
-            class="rounded-full bg-emerald-200 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-900/70 dark:text-emerald-100"
+            class="rounded-full bg-green-200 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/70 dark:text-green-100"
           >
             Wiki Edit
           </span>

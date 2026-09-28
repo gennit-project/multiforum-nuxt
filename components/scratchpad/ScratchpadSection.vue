@@ -142,10 +142,10 @@ const handleEntryDeleted = () => {
         class="rounded-lg border border-dashed border-gray-300 p-8 text-center dark:border-gray-600"
       >
         <div
-          class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-r from-pink-100 via-purple-100 to-indigo-100 dark:from-pink-900/30 dark:via-purple-900/30 dark:to-indigo-900/30"
+          class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-r from-red-100 via-purple-100 to-blue-100 dark:from-red-900/30 dark:via-purple-900/30 dark:to-blue-900/30"
         >
           <i
-            class="fa-solid fa-star bg-linear-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-2xl text-transparent"
+            class="fa-solid fa-star bg-linear-to-r from-red-400 via-purple-500 to-blue-500 bg-clip-text text-2xl text-transparent"
           />
         </div>
         <h3 class="text-lg font-medium text-gray-900 dark:text-white">
