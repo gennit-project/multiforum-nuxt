@@ -27,7 +27,7 @@ When using Docker Compose, variables can be supplied from environment or `.env`.
 
 Core commands:
 
-- `pnpm run dev` - start development server
+- `pnpm run dev` - start development server at http://localhost:3000
 - `pnpm run build` - build for production
 - `pnpm run tsc` - TypeScript type checking
 - `pnpm run test:unit` - run unit tests
@@ -36,6 +36,22 @@ Core commands:
 - `pnpm run test:playwright:mocked:build` - run mocked Playwright against the prebuilt app
 
 For detailed development standards, testing conventions, and workflow guidance, see [CLAUDE.md](../CLAUDE.md).
+
+### Troubleshooting the dev server
+
+- **Open `http://localhost:3000`, not `127.0.0.1`.** The dev server binds
+  `localhost` because `VITE_BASE_URL` and the Auth0 callback use
+  `http://localhost:3000`. (Playwright starts its own server on `127.0.0.1`
+  with its own flags, so tests are unaffected.)
+- **"Upgrade Required" (HTTP 426).** Another process's WebSocket listener,
+  typically Vite's HMR socket from a second dev server started in another
+  checkout or worktree, is answering on port 3000. Stop the other dev server
+  and restart this one.
+- **Fresh checkouts and worktrees.** Run `pnpm install` and then
+  `pnpm exec nuxi prepare` before `pnpm run test:unit`. Without the generated
+  `.nuxt/tsconfig.json`, every spec fails with "Failed to load tsconfig".
+  Copy your `.env` from your main checkout. A typical local `.env` points
+  `VITE_GRAPHQL_URL` at a local backend on port 4000.
 
 ## Testing
 
