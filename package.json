@@ -74,7 +74,7 @@
     "h3": "^1.15.11",
     "highlight.js": "^11.11.1",
     "identicon.js": "^2.3.3",
-    "js-yaml": "^5.1.0",
+    "js-yaml": "^5.4.2",
     "lucide-vue-next": "^0.548.0",
     "luxon": "^3.6.0",
     "markdown-it": "^14.2.0",
