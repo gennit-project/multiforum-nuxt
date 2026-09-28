@@ -102,7 +102,6 @@ const {
     loggedInUsername: usernameVar.value || null,
     options: {
       limit: DISCUSSION_PAGE_LIMIT,
-      offset: 0,
       sort: activeSort.value,
       timeFrame: activeTimeFrame.value,
     },
@@ -150,6 +149,12 @@ const loadedDiscussions = ref<SiteWideDiscussion[]>(
 const loadedAggregateCount = ref(
   getLiveDiscussionList()?.aggregateDiscussionCount ?? 0
 );
+const loadedPageInfo = ref(
+  getLiveDiscussionList()?.pageInfo ?? {
+    endCursor: null,
+    hasNextPage: false,
+  }
+);
 
 watch(
   discussionResult,
@@ -158,6 +163,10 @@ watch(
     if (!list) return;
     loadedDiscussions.value = list.discussions ?? [];
     loadedAggregateCount.value = list.aggregateDiscussionCount ?? 0;
+    loadedPageInfo.value = list.pageInfo ?? {
+      endCursor: null,
+      hasNextPage: false,
+    };
   },
   { immediate: true }
 );
@@ -227,14 +236,32 @@ const aggregateDiscussionCount = computed(() => {
   return loadedAggregateCount.value;
 });
 
+const pageInfo = computed(() => {
+  return (
+    discussionResult.value?.getSiteWideDiscussionList?.pageInfo ??
+    loadedPageInfo.value
+  );
+});
+
+const hasNextPage = computed(() => {
+  if (pageInfo.value) return pageInfo.value.hasNextPage;
+  return aggregateDiscussionCount.value > discussions.value.length;
+});
+
 const loadMore = () => {
-  if (!discussionResult.value?.getSiteWideDiscussionList?.discussions) return;
+  const endCursor = pageInfo.value?.endCursor;
+  if (
+    !discussionResult.value?.getSiteWideDiscussionList?.discussions ||
+    !hasNextPage.value ||
+    !endCursor
+  ) {
+    return;
+  }
   fetchMore({
     variables: {
       options: {
         limit: DISCUSSION_PAGE_LIMIT,
-        offset:
-          discussionResult.value.getSiteWideDiscussionList.discussions.length,
+        after: endCursor,
         sort: activeSort.value,
         timeFrame: activeTimeFrame.value,
       },
@@ -247,6 +274,7 @@ const loadMore = () => {
           ...previousResult.getSiteWideDiscussionList,
           aggregateDiscussionCount:
             previousResult.getSiteWideDiscussionList.aggregateDiscussionCount,
+          pageInfo: fetchMoreResult.getSiteWideDiscussionList.pageInfo,
           discussions: [
             ...previousResult.getSiteWideDiscussionList.discussions,
             ...fetchMoreResult.getSiteWideDiscussionList.discussions,
@@ -382,9 +410,7 @@ const filterByChannel = (channel: string) => {
                 <LoadMore
                   class="ml-4 justify-self-center"
                   :loading="discussionLoading"
-                  :reached-end-of-results="
-                    aggregateDiscussionCount === discussions.length
-                  "
+                  :reached-end-of-results="!hasNextPage"
                   @load-more="loadMore"
                 />
               </div>

@@ -67,7 +67,6 @@ const {
     loggedInUsername: usernameVar.value || null,
     options: {
       limit: DISCUSSION_PAGE_LIMIT,
-      offset: 0,
       sort: activeSort.value,
       timeFrame: activeTimeFrame.value,
     },
@@ -116,18 +115,33 @@ const aggregateDiscussionCount = computed(() => {
   );
 });
 
+const pageInfo = computed(
+  () => discussionResult.value?.getSiteWideDiscussionList?.pageInfo ?? null
+);
+
+const hasNextPage = computed(() => {
+  if (pageInfo.value) return pageInfo.value.hasNextPage;
+  return aggregateDiscussionCount.value > discussions.value.length;
+});
+
 const isInitialLoading = computed(
   () => discussionLoading.value && discussions.value.length === 0
 );
 
 const loadMore = () => {
-  if (!discussionResult.value?.getSiteWideDiscussionList?.discussions) return;
+  const endCursor = pageInfo.value?.endCursor;
+  if (
+    !discussionResult.value?.getSiteWideDiscussionList?.discussions ||
+    !hasNextPage.value ||
+    !endCursor
+  ) {
+    return;
+  }
   fetchMore({
     variables: {
       options: {
         limit: DISCUSSION_PAGE_LIMIT,
-        offset:
-          discussionResult.value.getSiteWideDiscussionList.discussions.length,
+        after: endCursor,
         sort: activeSort.value,
         timeFrame: activeTimeFrame.value,
       },
@@ -139,6 +153,7 @@ const loadMore = () => {
           ...previousResult.getSiteWideDiscussionList,
           aggregateDiscussionCount:
             fetchMoreResult.getSiteWideDiscussionList.aggregateDiscussionCount,
+          pageInfo: fetchMoreResult.getSiteWideDiscussionList.pageInfo,
           discussions: [
             ...previousResult.getSiteWideDiscussionList.discussions,
             ...fetchMoreResult.getSiteWideDiscussionList.discussions,
@@ -321,9 +336,7 @@ const handleCloseAlbum = () => {
                 <LoadMore
                   class="mt-4 justify-self-center"
                   :loading="discussionLoading"
-                  :reached-end-of-results="
-                    aggregateDiscussionCount === discussions.length
-                  "
+                  :reached-end-of-results="!hasNextPage"
                   @load-more="loadMore"
                 />
               </div>
