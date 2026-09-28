@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { unref, type ref } from 'vue';
+import { flushPromises } from '@vue/test-utils';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import {
   asMock,
@@ -24,10 +25,19 @@ import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import {
   GET_DISCUSSION_ACTIVITY,
   GET_DISCUSSION_DETAIL,
+  GET_DISCUSSION_DETAIL_ANSWERS_PAGE,
+  GET_DISCUSSION_DETAIL_FILES_PAGE,
+  GET_DISCUSSION_DETAIL_IMAGES_PAGE,
   GET_DOWNLOAD_DETAIL,
 } from '@/graphQLData/discussion/queries';
 
-vi.mock('@vue/apollo-composable', () => ({ useQuery: vi.fn() }));
+const mockApolloClientQuery = vi.hoisted(() => vi.fn());
+vi.mock('@vue/apollo-composable', () => ({
+  useQuery: vi.fn(),
+  useApolloClient: () => ({
+    resolveClient: () => ({ query: mockApolloClientQuery }),
+  }),
+}));
 vi.mock('nuxt/app', () => ({
   useRoute: vi.fn(() => ({ params: {}, query: {} })),
 }));
@@ -50,8 +60,15 @@ vi.mock('@/composables/useForumRoleMembership', () => ({
 
 const DiscussionCommentsWrapperStub = {
   name: 'DiscussionCommentsWrapper',
-  props: ['aggregateCommentCount', 'comments', 'locked', 'reachedEndOfResults'],
-  emits: ['load-more'],
+  props: [
+    'aggregateCommentCount',
+    'answers',
+    'answersHasNextPage',
+    'comments',
+    'locked',
+    'reachedEndOfResults',
+  ],
+  emits: ['load-more', 'load-more-answers'],
   template: '<div class="comments-wrapper-stub" />',
 };
 
@@ -264,6 +281,7 @@ describe('DiscussionDetailContent', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     asMock(useQuery).mockReset();
+    mockApolloClientQuery.mockReset();
     auth.modProfileName.value = '';
     auth.username.value = '';
   });
@@ -446,6 +464,139 @@ describe('DiscussionDetailContent', () => {
       .findComponent(DiscussionCommentsWrapperStub)
       .props('comments') as Comment[];
     expect(passed.map((c) => c.id)).toEqual(['a', 'b']);
+  });
+
+  it('appends the next answer page without duplicating answers', async () => {
+    const initialAnswer = makeComment('answer-1');
+    const { wrapper } = setup({
+      discussionChannelOverrides: {
+        Answers: [initialAnswer],
+        detailAnswersPageInfo: { endCursor: 'answer-cursor', hasNextPage: true },
+      },
+    });
+    mockApolloClientQuery.mockResolvedValue({
+      data: {
+        getDiscussionDetailAnswers: {
+          answers: [initialAnswer, makeComment('answer-2')],
+          pageInfo: { endCursor: null, hasNextPage: false },
+        },
+      },
+    });
+
+    await wrapper
+      .findComponent(DiscussionCommentsWrapperStub)
+      .vm.$emit('load-more-answers');
+    await flushPromises();
+
+    expect({
+      answers: (
+        wrapper
+          .findComponent(DiscussionCommentsWrapperStub)
+          .props('answers') as Comment[]
+      ).map((answer) => answer.id),
+      query: mockApolloClientQuery.mock.calls[0]?.[0]?.query,
+    }).toEqual({
+      answers: ['answer-1', 'answer-2'],
+      query: GET_DISCUSSION_DETAIL_ANSWERS_PAGE,
+    });
+  });
+
+  it('ignores an answer page that finishes after navigation', async () => {
+    let resolvePage!: (value: {
+      data: {
+        getDiscussionDetailAnswers: {
+          answers: Comment[];
+          pageInfo: { endCursor: null; hasNextPage: boolean };
+        };
+      };
+    }) => void;
+    mockApolloClientQuery.mockReturnValue(
+      new Promise((resolve) => {
+        resolvePage = resolve;
+      })
+    );
+    const { wrapper, discussionQuery, commentSectionQuery } = setup({
+      discussionChannelOverrides: {
+        detailAnswersPageInfo: { endCursor: 'answer-cursor', hasNextPage: true },
+      },
+    });
+
+    wrapper
+      .findComponent(DiscussionCommentsWrapperStub)
+      .vm.$emit('load-more-answers');
+    discussionQuery.result.value = {
+      discussions: [makeDiscussion({ id: 'd2' })],
+    };
+    commentSectionQuery.result.value = { getCommentSection: null };
+    await wrapper.setProps({ discussionId: 'd2' });
+    resolvePage({
+      data: {
+        getDiscussionDetailAnswers: {
+          answers: [makeComment('stale-answer')],
+          pageInfo: { endCursor: null, hasNextPage: false },
+        },
+      },
+    });
+    await flushPromises();
+
+    expect(
+      wrapper.findComponent(DiscussionCommentsWrapperStub).props('answers')
+    ).toEqual([]);
+  });
+
+  it('loads the next image and file pages together', async () => {
+    const discussion = makeDiscussion({
+      Album: {
+        id: 'album-1',
+        Images: [{ id: 'image-1', url: 'one.jpg' }],
+        detailImagesPageInfo: { endCursor: 'image-cursor', hasNextPage: true },
+      },
+      DownloadableFiles: [{ id: 'file-1', url: 'one.stl' }],
+      detailFilesPageInfo: { endCursor: 'file-cursor', hasNextPage: true },
+    });
+    mockApolloClientQuery.mockImplementation(({ query }) => {
+      if (query === GET_DISCUSSION_DETAIL_IMAGES_PAGE) {
+        return Promise.resolve({
+          data: {
+            getDiscussionDetailImages: {
+              images: [{ id: 'image-2', url: 'two.jpg' }],
+              pageInfo: { endCursor: null, hasNextPage: false },
+            },
+          },
+        });
+      }
+      if (query === GET_DISCUSSION_DETAIL_FILES_PAGE) {
+        return Promise.resolve({
+          data: {
+            getDiscussionDetailFiles: {
+              files: [{ id: 'file-2', url: 'two.stl' }],
+              pageInfo: { endCursor: null, hasNextPage: false },
+            },
+          },
+        });
+      }
+      throw new Error('Unexpected query');
+    });
+    const { wrapper } = setup({ discussions: [discussion] });
+
+    await wrapper.getComponent({ name: 'LoadMore' }).vm.$emit('loadMore');
+    await flushPromises();
+
+    const renderedDiscussion = wrapper
+      .findComponent({ name: 'DiscussionLayoutManager' })
+      .props('discussion') as Discussion;
+    expect({
+      images: renderedDiscussion.Album?.Images.map((image) => image.id),
+      files: renderedDiscussion.DownloadableFiles.map((file) => file.id),
+      queries: mockApolloClientQuery.mock.calls.map(([options]) => options.query),
+    }).toEqual({
+      images: ['image-1', 'image-2'],
+      files: ['file-1', 'file-2'],
+      queries: [
+        GET_DISCUSSION_DETAIL_IMAGES_PAGE,
+        GET_DISCUSSION_DETAIL_FILES_PAGE,
+      ],
+    });
   });
 
   // Clicking another item in the list swaps discussionId while the new

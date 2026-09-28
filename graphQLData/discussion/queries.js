@@ -311,6 +311,10 @@ export const GET_DOWNLOAD_DETAIL = gql`
       Album {
         id
         imageOrder
+        detailImagesPageInfo {
+          endCursor
+          hasNextPage
+        }
         Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
           id
           url
@@ -394,6 +398,10 @@ export const GET_DOWNLOAD_DETAIL = gql`
           name
         }
       }
+      detailFilesPageInfo {
+        endCursor
+        hasNextPage
+      }
       FeedbackCommentsAggregate {
         count
       }
@@ -432,6 +440,10 @@ export const DISCUSSION_DETAIL_FIELDS = gql`
     Album {
       id
       imageOrder
+      detailImagesPageInfo {
+        endCursor
+        hasNextPage
+      }
       Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
         id
         url
@@ -493,6 +505,10 @@ export const DISCUSSION_DETAIL_FIELDS = gql`
           }
         }
       }
+      detailAnswersPageInfo {
+        endCursor
+        hasNextPage
+      }
     }
     Tags {
       text
@@ -521,6 +537,10 @@ export const DISCUSSION_DETAIL_FIELDS = gql`
         id
         name
       }
+    }
+    detailFilesPageInfo {
+      endCursor
+      hasNextPage
     }
     FeedbackCommentsAggregate {
       count
@@ -556,6 +576,113 @@ export const GET_DISCUSSION_DETAIL = gql`
       channelUniqueName: $channelUniqueName
     ) {
       ...DiscussionDetailFields
+    }
+  }
+`;
+
+export const GET_DISCUSSION_DETAIL_ANSWERS_PAGE = gql`
+  query getDiscussionDetailAnswersPage(
+    $discussionId: ID!
+    $channelUniqueName: String!
+    $after: String
+  ) {
+    getDiscussionDetailAnswers(
+      discussionId: $discussionId
+      channelUniqueName: $channelUniqueName
+      after: $after
+    ) {
+      answers {
+        id
+        text
+        createdAt
+        CommentAuthor {
+          ... on User {
+            username
+            displayName
+          }
+          ... on ModerationProfile {
+            displayName
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+`;
+
+export const GET_DISCUSSION_DETAIL_IMAGES_PAGE = gql`
+  query getDiscussionDetailImagesPage(
+    $discussionId: ID!
+    $channelUniqueName: String!
+    $after: String
+  ) {
+    getDiscussionDetailImages(
+      discussionId: $discussionId
+      channelUniqueName: $channelUniqueName
+      after: $after
+    ) {
+      images {
+        id
+        url
+        alt
+        caption
+        copyright
+        Uploader {
+          username
+          displayName
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+`;
+
+export const GET_DISCUSSION_DETAIL_FILES_PAGE = gql`
+  query getDiscussionDetailFilesPage(
+    $discussionId: ID!
+    $channelUniqueName: String!
+    $after: String
+  ) {
+    getDiscussionDetailFiles(
+      discussionId: $discussionId
+      channelUniqueName: $channelUniqueName
+      after: $after
+    ) {
+      files {
+        id
+        fileName
+        url
+        kind
+        size
+        priceModel
+        priceCents
+        priceCurrency
+        downloadCountTotal
+        downloadCountUnique
+        attributionOverride
+        supportPatreonUrl
+        supportBuyMeACoffeeUrl
+        supportKoFiUrl
+        supportPayPalMeUrl
+        scanStatus
+        scanCheckedAt
+        scanReason
+        uploadedByUsername
+        license {
+          id
+          name
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
     }
   }
 `;

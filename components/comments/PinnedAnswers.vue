@@ -6,11 +6,20 @@ import type { BotSuggestion } from '@/utils/botMentions';
 import type { ModSuggestion } from '@/utils/modMentions';
 import type { ApolloError } from '@apollo/client/core';
 import Comment from './Comment.vue';
+import LoadMore from '../LoadMore.vue';
 
 const props = defineProps({
   answers: {
     type: Array as PropType<CommentType[]>,
     default: () => [],
+  },
+  hasNextPage: {
+    type: Boolean,
+    default: false,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
   },
   enableFeedback: {
     type: Boolean,
@@ -97,6 +106,7 @@ const emit = defineEmits([
   'update-edit-comment-input',
   'showMarkedAsBestAnswerNotification',
   'showUnmarkedAsBestAnswerNotification',
+  'loadMore',
 ]);
 
 const hasAnswers = computed(() => {
@@ -185,5 +195,12 @@ const answerPassThroughProps = computed(() => ({
         />
       </div>
     </div>
+    <LoadMore
+      v-if="hasNextPage || loading"
+      class="mt-4 justify-self-center"
+      :loading="loading"
+      :reached-end-of-results="false"
+      @load-more="emit('loadMore')"
+    />
   </div>
 </template>
