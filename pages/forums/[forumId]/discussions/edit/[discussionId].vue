@@ -9,6 +9,7 @@ import { useQuery, useMutation } from '@vue/apollo-composable';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import AccessDeniedMessage from '@/components/auth/AccessDeniedMessage.vue';
 import type {
   Discussion,
   DiscussionChannel,
@@ -428,9 +429,7 @@ function handleCancel() {
       </ClientOnly>
     </template>
     <template #does-not-have-auth>
-      <div class="flex justify-center p-8 dark:text-white">
-        You don't have permission to see this page.
-      </div>
+      <AccessDeniedMessage action="edit this discussion" />
     </template>
   </RequireAuth>
 </template>

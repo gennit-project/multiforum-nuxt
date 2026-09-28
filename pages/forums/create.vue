@@ -4,6 +4,7 @@ import { useMutation } from '@vue/apollo-composable';
 import { gql } from '@apollo/client/core';
 import CreateEditChannelFields from '@/components/channel/form/CreateEditChannelFields.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import AccessDeniedMessage from '@/components/auth/AccessDeniedMessage.vue';
 import { CREATE_CHANNEL } from '@/graphQLData/channel/mutations';
 import type {
   Channel,
@@ -227,9 +228,7 @@ const updateFormValues = (data: Partial<CreateEditChannelFormValues>) => {
             </div>
           </template>
           <template #does-not-have-auth>
-            <div class="flex justify-center p-8 dark:text-white">
-              You don't have permission to see this page
-            </div>
+            <AccessDeniedMessage action="create a forum" />
           </template>
         </RequireAuth>
       </div>

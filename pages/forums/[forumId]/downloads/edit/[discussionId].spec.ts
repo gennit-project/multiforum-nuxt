@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import AccessDeniedMessage from '@/components/auth/AccessDeniedMessage.vue';
 import { shallowMount } from '@vue/test-utils';
 import { ref, unref, defineComponent, h } from 'vue';
 import { useHead } from 'nuxt/app';
@@ -162,11 +163,15 @@ describe('download edit page', () => {
     );
   });
 
-  it('shows a permission-denied message for unauthorized users', async () => {
+  it('shows the access-denied message for unauthorized users', async () => {
     const wrapper = await loadPage(RequireAuthDeniedStub);
-    expect(wrapper.text()).toContain(
-      'You do not have permission to see this page.'
-    );
+    expect(
+      wrapper.findComponent(AccessDeniedMessage).props('action')
+    ).toBe('edit this download');
+  });
+
+  it('does not render the form for unauthorized users', async () => {
+    const wrapper = await loadPage(RequireAuthDeniedStub);
     expect(wrapper.findComponent(CreateEditDiscussionFields).exists()).toBe(
       false
     );
@@ -174,9 +179,7 @@ describe('download edit page', () => {
 
   it('does not show permission denied while the discussion is loading', async () => {
     const wrapper = await loadPage(RequireAuthDeniedStub, undefined, true);
-    expect(wrapper.text()).not.toContain(
-      'You do not have permission to see this page.'
-    );
+    expect(wrapper.findComponent(AccessDeniedMessage).exists()).toBe(false);
   });
 
   it('updates labels after the discussion update succeeds', async () => {

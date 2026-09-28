@@ -4,6 +4,7 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
 import { DateTime } from 'luxon';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import AccessDeniedMessage from '@/components/auth/AccessDeniedMessage.vue';
 import CreateEditEventFields from '@/components/event/form/CreateEditEventFields.vue';
 import {
   CREATE_EVENT_WITH_CHANNEL_CONNECTIONS,
@@ -335,9 +336,7 @@ function updateFormValues(data: CreateEditEventFormValues) {
       />
     </template>
     <template #does-not-have-auth>
-      <div class="flex justify-center p-8 dark:text-white">
-        You don't have permission to see this page.
-      </div>
+      <AccessDeniedMessage action="create an event" />
     </template>
   </RequireAuth>
 </template>
