@@ -606,6 +606,7 @@ const handleLockReasonUpdate = (value: string) => {
             "
             :author-type="authorType"
             :is-suspended-mod="isSuspendedMod"
+            :is-locked="isLocked"
             :can-edit-comments="modPermissions.canEditComments"
             :can-edit-discussions="modPermissions.canEditDiscussions"
             :can-edit-events="modPermissions.canEditEvents"

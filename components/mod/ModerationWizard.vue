@@ -78,6 +78,11 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  isLocked: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
   relatedDiscussionHasDownload: {
     type: Boolean,
     required: false,
@@ -123,9 +128,16 @@ const actionsDisabled = computed(() => {
   return (
     !props.issue.isOpen ||
     props.isCurrentUserOriginalPoster ||
-    props.isSuspendedMod
+    props.isSuspendedMod ||
+    props.isLocked
   );
 });
+
+// A locked issue can't be acted on, so it shouldn't call for a mod action
+const needsModAction = computed(
+  () =>
+    props.issue.isOpen && !props.isCurrentUserOriginalPoster && !props.isLocked,
+);
 
 const shouldFetchDiscussion = computed(() => {
   return !!props.discussionId;
@@ -316,7 +328,7 @@ const editModalTargetType = computed(() => {
         <div
           class="flex h-10 w-10 items-center justify-center rounded-lg"
           :class="[
-            issue.isOpen ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700',
+            needsModAction ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700',
           ]"
         >
           <div class="">
@@ -326,13 +338,13 @@ const editModalTargetType = computed(() => {
         <div
           class="flex-1 flex-col space-y-4 rounded-lg border px-4 py-4"
           :class="[
-            issue.isOpen && !isCurrentUserOriginalPoster
+            needsModAction
               ? 'border-blue-500'
               : 'border-gray-300 dark:border-gray-700',
           ]"
         >
           <h1
-            v-if="issue.isOpen && !isCurrentUserOriginalPoster"
+            v-if="needsModAction"
             class="flex items-center gap-2 border-b border-gray-300 pb-2 text-xl font-bold text-blue-500 dark:border-gray-600"
           >
             <AdminIcon class="h-6 w-6 text-blue-500" />
@@ -346,6 +358,9 @@ const editModalTargetType = computed(() => {
           </h1>
           <p v-if="!issue.isOpen" class="text-gray-600 dark:text-gray-400">
             {{ 'Mod actions are disabled because the issue is closed.' }}
+          </p>
+          <p v-else-if="isLocked" class="text-gray-600 dark:text-gray-400">
+            {{ 'Mod actions are disabled because the issue is locked.' }}
           </p>
           <p
             v-else-if="isSuspendedMod"
@@ -367,7 +382,7 @@ const editModalTargetType = computed(() => {
             <template #has-auth>
               <div class="mt-4 flex flex-col space-y-4">
                 <div
-                  v-if="issue.isOpen && !isCurrentUserOriginalPoster"
+                  v-if="needsModAction"
                   class="flex items-start gap-4 rounded-lg border border-blue-200 bg-blue-50 p-4 shadow-sm dark:border-blue-500/30 dark:bg-blue-500/10"
                 >
                   <div class="shrink-0 pt-1">
