@@ -10,6 +10,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import OnThisPage from '@/components/wiki/OnThisPage.vue';
 import WikiPagePinButton from '@/components/wiki/WikiPagePinButton.vue';
+import WikiPageFeatureButton from '@/components/wiki/WikiPageFeatureButton.vue';
 import WikiPageLockButton from '@/components/wiki/WikiPageLockButton.vue';
 import FontSizeControl from '@/components/channel/FontSizeControl.vue';
 import { useUIStore } from '@/stores/uiStore';
@@ -156,6 +157,9 @@ useHead(
               :channel-unique-name="forumId"
               @pinned-changed="refetchChannel"
             />
+            <ClientOnly>
+              <WikiPageFeatureButton :wiki-page-id="wikiPage.id" />
+            </ClientOnly>
             <WikiPageLockButton
               v-if="channel"
               :channel="channel"
