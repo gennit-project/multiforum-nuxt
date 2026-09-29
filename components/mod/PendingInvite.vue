@@ -8,6 +8,7 @@ import {
   ACCEPT_FORUM_OWNER_INVITE,
   ACCEPT_FORUM_MOD_INVITE,
 } from '@/graphQLData/mod/mutations';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useUsername } from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
@@ -56,7 +57,10 @@ const {
   loading: acceptForumModInviteLoading,
   onDone: onDoneAcceptForumModInvite,
   error: acceptForumModInviteError,
-} = useMutation(ACCEPT_FORUM_MOD_INVITE);
+} = useMutation(ACCEPT_FORUM_MOD_INVITE, {
+  refetchQueries: [GET_CHANNEL],
+  awaitRefetchQueries: true,
+});
 
 const pendingOwnerInviteExists = computed(() => {
   const channelData = pendingOwnerInviteResult.value?.channels?.[0];
